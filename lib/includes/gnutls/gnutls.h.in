@@ -696,10 +696,22 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_RSA_SHA512: Digital signature algorithm RSA with SHA-512.
  * @GNUTLS_SIGN_RSA_SHA224: Digital signature algorithm RSA with SHA-224.
  * @GNUTLS_SIGN_ECDSA_SHA1: ECDSA with SHA1.
+ * @GNUTLS_SIGN_ECDSA_SHA224: Digital signature algorithm ECDSA with SHA-224.
  * @GNUTLS_SIGN_ECDSA_SHA256: Digital signature algorithm ECDSA with SHA-256.
  * @GNUTLS_SIGN_ECDSA_SHA384: Digital signature algorithm ECDSA with SHA-384.
  * @GNUTLS_SIGN_ECDSA_SHA512: Digital signature algorithm ECDSA with SHA-512.
- * @GNUTLS_SIGN_ECDSA_SHA224: Digital signature algorithm ECDSA with SHA-224.
+ * @GNUTLS_SIGN_ECDSA_SHA3_224: Digital signature algorithm ECDSA with SHA3-224.
+ * @GNUTLS_SIGN_ECDSA_SHA3_256: Digital signature algorithm ECDSA with SHA3-256.
+ * @GNUTLS_SIGN_ECDSA_SHA3_384: Digital signature algorithm ECDSA with SHA3-384.
+ * @GNUTLS_SIGN_ECDSA_SHA3_512: Digital signature algorithm ECDSA with SHA3-512.
+ * @GNUTLS_SIGN_DSA_SHA3_224: Digital signature algorithm DSA with SHA3-224.
+ * @GNUTLS_SIGN_DSA_SHA3_256: Digital signature algorithm DSA with SHA3-256.
+ * @GNUTLS_SIGN_DSA_SHA3_384: Digital signature algorithm DSA with SHA3-384.
+ * @GNUTLS_SIGN_DSA_SHA3_512: Digital signature algorithm DSA with SHA3-512.
+ * @GNUTLS_SIGN_RSA_SHA3_224: Digital signature algorithm RSA with SHA3-224.
+ * @GNUTLS_SIGN_RSA_SHA3_256: Digital signature algorithm RSA with SHA3-256.
+ * @GNUTLS_SIGN_RSA_SHA3_384: Digital signature algorithm RSA with SHA3-384.
+ * @GNUTLS_SIGN_RSA_SHA3_512: Digital signature algorithm RSA with SHA3-512.
  *
  * Enumeration of different digital signature algorithms.
  */
@@ -724,7 +736,20 @@ typedef enum {
 	GNUTLS_SIGN_ECDSA_SHA384 = 15,
 	GNUTLS_SIGN_ECDSA_SHA512 = 16,
 	GNUTLS_SIGN_DSA_SHA384 = 17,
-	GNUTLS_SIGN_DSA_SHA512 = 18
+	GNUTLS_SIGN_DSA_SHA512 = 18,
+	GNUTLS_SIGN_ECDSA_SHA3_224 = 20,
+	GNUTLS_SIGN_ECDSA_SHA3_256 = 21,
+	GNUTLS_SIGN_ECDSA_SHA3_384 = 22,
+	GNUTLS_SIGN_ECDSA_SHA3_512 = 23,
+
+	GNUTLS_SIGN_DSA_SHA3_224 = 24,
+	GNUTLS_SIGN_DSA_SHA3_256 = 25,
+	GNUTLS_SIGN_DSA_SHA3_384 = 26,
+	GNUTLS_SIGN_DSA_SHA3_512 = 27,
+	GNUTLS_SIGN_RSA_SHA3_224 = 28,
+	GNUTLS_SIGN_RSA_SHA3_256 = 29,
+	GNUTLS_SIGN_RSA_SHA3_384 = 30,
+	GNUTLS_SIGN_RSA_SHA3_512 = 31
 } gnutls_sign_algorithm_t;
 
 /**

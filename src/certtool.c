@@ -1107,8 +1107,11 @@ static void cmd_parser(int argc, char **argv)
 		else if (strcasecmp(OPT_ARG(HASH), "rmd160") == 0)
 			default_dig = GNUTLS_DIG_RMD160;
 		else {
-			fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
-			exit(1);
+			default_dig = gnutls_digest_get_id(OPT_ARG(HASH));
+			if (default_dig == GNUTLS_DIG_UNKNOWN) {
+				fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
+				exit(1);
+			}
 		}
 	}
 
