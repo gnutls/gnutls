@@ -1,0 +1,163 @@
+#!/bin/sh
+
+# Copyright (C) 2006-2012 Free Software Foundation, Inc.
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+DIFF="${DIFF:-diff}"
+TMPFILE=sha3$$.tmp
+export TZ="UTC"
+
+# Check for datefudge
+TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
+if test "$TSTAMP" != "1158969600"; then
+	echo $TSTAMP
+	echo "You need datefudge to run this test"
+	exit 77
+fi
+
+# Note that in rare cases this test may fail because the
+# time set using datefudge could have changed since the generation
+# (if example the system was busy)
+
+# Test SHA3 signatures
+
+rc=1
+counter=1
+
+while [ "${rc}" != "0" -a $counter -le 3 ]; do
+	datefudge "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/template-test.key" \
+		--template "${srcdir}/template-test.tmpl" \
+		--outfile ${TMPFILE} --hash sha3-256 2>/dev/null
+
+	${DIFF} "${srcdir}/template-rsa-sha3-256.pem" ${TMPFILE} >/dev/null 2>&1
+	rc=$?
+	test ${rc} != 0 && sleep 3
+	counter=`expr $counter + 1`
+done
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 10 (RSA-SHA3-256) failed"
+	exit ${rc}
+fi
+
+datefudge "2007-04-22" \
+	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+rc=$?
+if test "${rc}" != "0"; then
+	echo "Test 10 (verification of RSA-SHA3-256) failed"
+	exit ${rc}
+fi
+
+
+rc=1
+counter=1
+
+while [ "${rc}" != "0" -a $counter -le 3 ]; do
+	datefudge "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/template-test.key" \
+		--template "${srcdir}/template-test.tmpl" \
+		--outfile ${TMPFILE} --hash sha3-512 2>/dev/null
+
+	${DIFF} "${srcdir}/template-rsa-sha3-512.pem" ${TMPFILE} >/dev/null 2>&1
+	rc=$?
+	test ${rc} != 0 && sleep 3
+	counter=`expr $counter + 1`
+done
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 11 (RSA-SHA3-512) failed"
+	exit ${rc}
+fi
+
+datefudge "2007-04-22" \
+	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+rc=$?
+if test "${rc}" != "0"; then
+	echo "Test 11 (verification of RSA-SHA3-512) failed"
+	exit ${rc}
+fi
+
+# Test SHA3 signatures with ECDSA
+
+rc=1
+counter=1
+
+while [ "${rc}" != "0" -a $counter -le 3 ]; do
+	datefudge "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/template-test-ecc.key" \
+		--template "${srcdir}/template-test.tmpl" \
+		--outfile ${TMPFILE} --hash sha3-256 2>/dev/null
+	rc=$?
+done
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 12 (ECDSA-SHA3-256) failed"
+	exit ${rc}
+fi
+
+datefudge "2007-04-22" \
+	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+rc=$?
+if test "${rc}" != "0"; then
+	echo "Test 12 (verification of ECDSA-SHA3-256) failed"
+	exit ${rc}
+fi
+
+
+rc=1
+counter=1
+
+while [ "${rc}" != "0" -a $counter -le 3 ]; do
+	datefudge "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/template-test-ecc.key" \
+		--template "${srcdir}/template-test.tmpl" \
+		--outfile ${TMPFILE} --hash sha3-512 2>/dev/null
+
+	rc=$?
+done
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 13 (ECDSA-SHA3-512) failed"
+	exit ${rc}
+fi
+
+datefudge "2007-04-22" \
+	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+rc=$?
+if test "${rc}" != "0"; then
+	echo "Test 13 (verification of ECDSA-SHA3-256) failed"
+	exit ${rc}
+fi
+
+
+rm -f ${TMPFILE}
+
+exit 0
