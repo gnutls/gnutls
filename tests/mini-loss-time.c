@@ -50,7 +50,7 @@ int main()
 #include "utils.h"
 
 /* This program tests whether a DTLS handshake would timeout
- * in a minute.
+ * in the expected time.
  */
 
 static void print_type(const unsigned char *buf, int size)
@@ -136,7 +136,7 @@ static void client(int fd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, 1 * 1000, 30 * 1000);
+	gnutls_dtls_set_timeouts(session, 1 * 1000, 31 * 1000);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
