@@ -301,7 +301,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 			do {
 				ret =
 				    _gnutls_recv_int(session, GNUTLS_ALERT,
-						     NULL, NULL, 0, NULL,
+						     NULL, 0, NULL,
 						     session->internals.
 						     record_timeout_ms);
 			}
@@ -583,7 +583,7 @@ check_recv_type(gnutls_session_t session, content_type_t recv_type)
  * then it copies the data.
  */
 static int
-check_buffers(gnutls_session_t session, content_type_t type,
+get_data_from_buffers(gnutls_session_t session, content_type_t type,
 	      uint8_t * data, int data_size, void *seq)
 {
 	if ((type == GNUTLS_APPLICATION_DATA ||
@@ -612,7 +612,7 @@ check_buffers(gnutls_session_t session, content_type_t type,
 /* Checks and retrieves any pending data in the application data record buffers.
  */
 static int
-check_packet_buffers(gnutls_session_t session, content_type_t type,
+get_packet_from_buffers(gnutls_session_t session, content_type_t type,
 		     gnutls_packet_t *packet)
 {
 	if (_gnutls_record_buffer_get_size(session) > 0) {
@@ -1356,22 +1356,12 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		return ret;
 }
 
-/* This function behaves exactly like read(). The only difference is
- * that it accepts the gnutls_session_t and the content_type_t of data to
- * receive (if called by the user the Content is Userdata only)
- * It is intended to receive data, under the current session.
- */
-ssize_t
-_gnutls_recv_int(gnutls_session_t session, content_type_t type,
-		 gnutls_packet_t *packet,
-		 uint8_t * data, size_t data_size, void *seq,
-		 unsigned int ms)
+/* Returns a value greater than zero (>= 0) if buffers should be checked
+ * for data. */
+static ssize_t
+check_session_status(gnutls_session_t session)
 {
 	int ret;
-
-	if (packet == NULL && (type != GNUTLS_ALERT && type != GNUTLS_HEARTBEAT)
-	    && (data_size == 0 || data == NULL))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (session->internals.read_eof != 0) {
 		/* if we have already read an EOF
@@ -1390,37 +1380,48 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 			return gnutls_assert_val(ret);
 
 		session->internals.recv_state = RECV_STATE_0;
+		/* Fall through: */
 	case RECV_STATE_0:
 
 		_dtls_async_timer_check(session);
-
-		if (packet == NULL) {
-			/* If we have enough data in the cache do not bother receiving
-			 * a new packet. (in order to flush the cache)
-			 */
-			ret = check_buffers(session, type, data, data_size, seq);
-			if (ret != 0)
-				return ret;
-
-			ret = _gnutls_recv_in_buffers(session, type, -1, ms);
-			if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
-				return gnutls_assert_val(ret);
-
-			return check_buffers(session, type, data, data_size, seq);
-		} else {
-			ret = check_packet_buffers(session, type, packet);
-			if (ret != 0)
-				return ret;
-
-			ret = _gnutls_recv_in_buffers(session, type, -1, ms);
-			if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
-				return gnutls_assert_val(ret);
-
-			return check_packet_buffers(session, type, packet);
-		}
+		return 1;
 	default:
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
+}
+
+/* This function behaves exactly like read(). The only difference is
+ * that it accepts the gnutls_session_t and the content_type_t of data to
+ * receive (if called by the user the Content is Userdata only)
+ * It is intended to receive data, under the current session.
+ */
+ssize_t
+_gnutls_recv_int(gnutls_session_t session, content_type_t type,
+		 uint8_t * data, size_t data_size, void *seq,
+		 unsigned int ms)
+{
+	int ret;
+
+	if ((type != GNUTLS_ALERT && type != GNUTLS_HEARTBEAT)
+	    && (data_size == 0 || data == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = check_session_status(session);
+	if (ret <= 0)
+		return ret;
+
+	/* If we have enough data in the cache do not bother receiving
+	 * a new packet. (in order to flush the cache)
+	 */
+	ret = get_data_from_buffers(session, type, data, data_size, seq);
+	if (ret != 0)
+		return ret;
+
+	ret = _gnutls_recv_in_buffers(session, type, -1, ms);
+	if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
+		return gnutls_assert_val(ret);
+
+	return get_data_from_buffers(session, type, data, data_size, seq);
 }
 
 /**
@@ -1511,9 +1512,25 @@ ssize_t
 gnutls_record_recv_packet(gnutls_session_t session, 
 		   	  gnutls_packet_t *packet)
 {
-	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, packet,
-				NULL, 0, NULL,
-				session->internals.record_timeout_ms);
+	int ret;
+
+	if (packet == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = check_session_status(session);
+	if (ret <= 0)
+		return ret;
+
+	ret = get_packet_from_buffers(session, GNUTLS_APPLICATION_DATA, packet);
+	if (ret != 0)
+		return ret;
+
+	ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1,
+	                              session->internals.record_timeout_ms);
+	if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
+		return gnutls_assert_val(ret);
+
+	return get_packet_from_buffers(session, GNUTLS_APPLICATION_DATA, packet);
 }
 
 /**
@@ -1694,7 +1711,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 ssize_t
 gnutls_record_recv(gnutls_session_t session, void *data, size_t data_size)
 {
-	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, NULL,
+	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA,
 				data, data_size, NULL,
 				session->internals.record_timeout_ms);
 }
@@ -1723,7 +1740,7 @@ ssize_t
 gnutls_record_recv_seq(gnutls_session_t session, void *data,
 		       size_t data_size, unsigned char *seq)
 {
-	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, NULL,
+	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA,
 				data, data_size, seq,
 				session->internals.record_timeout_ms);
 }
