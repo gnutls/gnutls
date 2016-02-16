@@ -29,7 +29,7 @@ See the end for copying conditions.
    attacks related to unsafe renegotiation.
 
 ** libgnutls: Enforce the RFC 7627 (extended master secret) requirements on
-   session resumption.
+   session resumption. Reported by Hubert Kario (#69).
 
 ** libgnutls: Replaced writev() system call with sendmsg().
 
