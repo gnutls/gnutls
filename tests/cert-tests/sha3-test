@@ -103,17 +103,12 @@ fi
 
 # Test SHA3 signatures with ECDSA
 
-rc=1
-counter=1
-
-while [ "${rc}" != "0" -a $counter -le 3 ]; do
-	datefudge "2007-04-22" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test-ecc.key" \
-		--template "${srcdir}/template-test.tmpl" \
-		--outfile ${TMPFILE} --hash sha3-256 2>/dev/null
-	rc=$?
-done
+datefudge "2007-04-22" \
+"${CERTTOOL}" --generate-self-signed \
+	--load-privkey "${srcdir}/template-test-ecc.key" \
+	--template "${srcdir}/template-test.tmpl" \
+	--outfile ${TMPFILE} --hash sha3-256 2>/dev/null
+rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
@@ -130,18 +125,13 @@ if test "${rc}" != "0"; then
 fi
 
 
-rc=1
-counter=1
+datefudge "2007-04-22" \
+"${CERTTOOL}" --generate-self-signed \
+	--load-privkey "${srcdir}/template-test-ecc.key" \
+	--template "${srcdir}/template-test.tmpl" \
+	--outfile ${TMPFILE} --hash sha3-512 2>/dev/null
 
-while [ "${rc}" != "0" -a $counter -le 3 ]; do
-	datefudge "2007-04-22" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test-ecc.key" \
-		--template "${srcdir}/template-test.tmpl" \
-		--outfile ${TMPFILE} --hash sha3-512 2>/dev/null
-
-	rc=$?
-done
+rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
