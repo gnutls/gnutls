@@ -2065,6 +2065,8 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 	int prev;
 	unsigned int j, i;
 	int issuer[DEFAULT_MAX_VERIFY_DEPTH];	/* contain the index of the issuers */
+	unsigned insorted[DEFAULT_MAX_VERIFY_DEPTH]; /* non zero if clist[i] used in sorted list */
+	unsigned orig_size = *clist_size;
 
 	/* Do not bother sorting if too many certificates are given.
 	 * Prevent any DoS attacks.
@@ -2072,8 +2074,10 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 	if (*clist_size > DEFAULT_MAX_VERIFY_DEPTH)
 		return clist;
 
-	for (i = 0; i < DEFAULT_MAX_VERIFY_DEPTH; i++)
+	for (i = 0; i < DEFAULT_MAX_VERIFY_DEPTH; i++) {
 		issuer[i] = -1;
+		insorted[i] = 0;
+	}
 
 	/* Find the issuer of each certificate and store it
 	 * in issuer array.
@@ -2091,25 +2095,32 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 		}
 	}
 
+	/* always included */
+	sorted[0] = clist[0];
+	insorted[0] = 1;
+
 	if (issuer[0] == -1) {
 		*clist_size = 1;
-		return clist;
+		goto exit;
 	}
 
 	prev = 0;
-	sorted[0] = clist[0];
 	for (i = 1; i < *clist_size; i++) {
 		prev = issuer[prev];
-		if (prev == -1) {	/* no issuer */
+		if (prev < 0) {	/* no issuer */
 			*clist_size = i;
 			break;
 		}
 		sorted[i] = clist[prev];
+		insorted[prev] = 1;
 	}
 
+ exit:
 	if (func) {
-		for (i = 1; i < *clist_size; i++) {
-			if (issuer[i] == -1) {
+		/* call func() on all the elements that were
+		 * not used in the sorted list */
+		for (i = 1; i < orig_size; i++) {
+			if (insorted[i] == 0) {
 				func(clist[i]);
 			}
 		}
