@@ -90,6 +90,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 {
 	if (session->internals.try_ext_master_secret == 0 ||
 	    session->internals.priorities.no_ext_master_secret != 0) {
+	    session->security_parameters.ext_master_secret = 0;
 	    return 0;
 	}
 
