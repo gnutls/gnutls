@@ -321,7 +321,7 @@ typedef enum {
   /* exported for other gnutls headers. This is the maximum number of
    * algorithms (ciphers, kx or macs).
    */
-#define GNUTLS_MAX_ALGORITHM_NUM 32
+#define GNUTLS_MAX_ALGORITHM_NUM 64
 #define GNUTLS_MAX_SESSION_ID_SIZE 32
 
 
