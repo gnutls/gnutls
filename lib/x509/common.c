@@ -2043,7 +2043,14 @@ _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
  * equal to the original).
  * @func: the function to call to elements outside the sort.
  *
+ * This function is intentionally kept simple to be easily verified
+ * so that it can be used with untrusted chains. The introduction
+ * of the func parameter added significant complexity in that aspect.
+ * If more demanding use-cases need to be handled, consider splitting
+ * that function.
+ *
  * Returns the sorted list which may be the original clist.
+ *
  */
 gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 				     sorted[DEFAULT_MAX_VERIFY_DEPTH],
@@ -2054,7 +2061,7 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 	int prev;
 	unsigned int j, i;
 	int issuer[DEFAULT_MAX_VERIFY_DEPTH];	/* contain the index of the issuers */
-	unsigned insorted[DEFAULT_MAX_VERIFY_DEPTH]; /* non zero if clist[i] used in sorted list */
+	bool insorted[DEFAULT_MAX_VERIFY_DEPTH]; /* non zero if clist[i] used in sorted list */
 	unsigned orig_size = *clist_size;
 
 	/* Do not bother sorting if too many certificates are given.
@@ -2069,7 +2076,8 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 	}
 
 	/* Find the issuer of each certificate and store it
-	 * in issuer array.
+	 * in issuer array. O(n^2) so consider that before
+	 * increasing DEFAULT_MAX_VERIFY_DEPTH.
 	 */
 	for (i = 0; i < *clist_size; i++) {
 		for (j = 1; j < *clist_size; j++) {
@@ -2084,7 +2092,7 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 		}
 	}
 
-	/* always included */
+	/* the first element is always included */
 	sorted[0] = clist[0];
 	insorted[0] = 1;
 
