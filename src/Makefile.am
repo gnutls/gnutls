@@ -25,7 +25,7 @@ BUILT_SOURCES = srptool-args.c srptool-args.h \
 	serv-args.c serv-args.h cli-args.c cli-args.h \
 	cli-debug-args.c cli-debug-args.h certtool-args.c certtool-args.h \
 	danetool-args.c danetool-args.h p11tool-args.c p11tool-args.h \
-	tpmtool-args.c tpmtool-args.h
+	tpmtool-args.c tpmtool-args.h systemkey-args.c systemkey-args.h
 
 if ENABLE_CRYWRAP
 SUBDIRS += crywrap
