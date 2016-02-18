@@ -2353,6 +2353,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	gnutls_datum_t tmp;
 	gnutls_x509_crt_t *x509_cert_list = NULL;
 	gnutls_x509_crt_t *x509_ca_list = NULL;
+	gnutls_x509_crt_t *pca_list = NULL;
 	gnutls_x509_crl_t *x509_crl_list = NULL;
 	unsigned int x509_ncerts, x509_ncrls = 0, x509_ncas = 0;
 	gnutls_x509_trust_list_t list;
@@ -2410,6 +2411,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 				exit(1);
 			}
 		}
+		pca_list = x509_ca_list;
 
 		ret =
 		    gnutls_x509_crl_list_import2(&x509_crl_list,
@@ -2436,12 +2438,12 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 		}
 
 		if (ca == NULL) {
-			x509_ca_list = &x509_cert_list[x509_ncerts - 1];
+			pca_list = &x509_cert_list[x509_ncerts - 1];
 			x509_ncas = 1;
 		}
 
 		ret =
-		    gnutls_x509_trust_list_add_cas(list, x509_ca_list,
+		    gnutls_x509_trust_list_add_cas(list, pca_list,
 						   x509_ncas, 0);
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_x509_trust_add_cas: %s\n",
@@ -2517,6 +2519,11 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	for (i=0;i<x509_ncerts;i++)
 		gnutls_x509_crt_deinit(x509_cert_list[i]);
 	gnutls_free(x509_cert_list);
+	if (x509_ca_list != NULL) {
+		for (i=0;i<x509_ncas;i++)
+			gnutls_x509_crt_deinit(x509_ca_list[i]);
+		gnutls_free(x509_ca_list);
+	}
 	for (i=0;i<x509_ncrls;i++)
 		gnutls_x509_crl_deinit(x509_crl_list[i]);
 	gnutls_free(x509_crl_list);
@@ -2604,6 +2611,8 @@ static void verify_certificate(common_info_st * cinfo)
 	_verify_x509_mem(cert, cert_size, cas, ca_size,
 			 (cinfo->ca != NULL) ? 0 : 1, OPT_ARG(VERIFY_PURPOSE),
 			 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
+	free(cert);
+	free(cas);
 
 
 }
