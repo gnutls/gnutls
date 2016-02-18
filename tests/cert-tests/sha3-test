@@ -48,9 +48,9 @@ while [ "${rc}" != "0" -a $counter -le 3 ]; do
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template "${srcdir}/template-test.tmpl" \
-		--outfile ${TMPFILE} --hash sha3-256 2>/dev/null
+		--outfile "${TMPFILE}" --hash sha3-256 2>/dev/null
 
-	${DIFF} "${srcdir}/template-rsa-sha3-256.pem" ${TMPFILE} >/dev/null 2>&1
+	${DIFF} "${srcdir}/template-rsa-sha3-256.pem" "${TMPFILE}" >/dev/null 2>&1
 	rc=$?
 	test ${rc} != 0 && sleep 3
 	counter=`expr $counter + 1`
@@ -62,8 +62,8 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-22" \
-	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+datefudge "2007-04-25" \
+	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 10 (verification of RSA-SHA3-256) failed"
@@ -79,9 +79,9 @@ while [ "${rc}" != "0" -a $counter -le 3 ]; do
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template "${srcdir}/template-test.tmpl" \
-		--outfile ${TMPFILE} --hash sha3-512 2>/dev/null
+		--outfile "${TMPFILE}" --hash sha3-512 2>/dev/null
 
-	${DIFF} "${srcdir}/template-rsa-sha3-512.pem" ${TMPFILE} >/dev/null 2>&1
+	${DIFF} "${srcdir}/template-rsa-sha3-512.pem" "${TMPFILE}" >/dev/null 2>&1
 	rc=$?
 	test ${rc} != 0 && sleep 3
 	counter=`expr $counter + 1`
@@ -93,8 +93,8 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-22" \
-	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+datefudge "2007-04-25" \
+	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 11 (verification of RSA-SHA3-512) failed"
@@ -107,7 +107,7 @@ datefudge "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/template-test-ecc.key" \
 	--template "${srcdir}/template-test.tmpl" \
-	--outfile ${TMPFILE} --hash sha3-256 2>/dev/null
+	--outfile "${TMPFILE}" --hash sha3-256 2>/dev/null
 rc=$?
 
 # We're done.
@@ -116,8 +116,8 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-22" \
-	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+datefudge "2007-04-25" \
+	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 12 (verification of ECDSA-SHA3-256) failed"
@@ -129,7 +129,7 @@ datefudge "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/template-test-ecc.key" \
 	--template "${srcdir}/template-test.tmpl" \
-	--outfile ${TMPFILE} --hash sha3-512 2>/dev/null
+	--outfile "${TMPFILE}" --hash sha3-512 2>/dev/null
 
 rc=$?
 
@@ -139,8 +139,8 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-22" \
-	"${CERTTOOL}" --load-ca-certificate ${TMPFILE} --verify --infile ${TMPFILE} >/dev/null 2>&1
+datefudge "2007-04-25" \
+	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 13 (verification of ECDSA-SHA3-256) failed"
@@ -148,6 +148,6 @@ if test "${rc}" != "0"; then
 fi
 
 
-rm -f ${TMPFILE}
+rm -f "${TMPFILE}"
 
 exit 0
