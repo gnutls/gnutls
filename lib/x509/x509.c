@@ -3302,7 +3302,7 @@ gnutls_x509_crt_list_import(gnutls_x509_crt_t * certs,
 	const char *ptr;
 	gnutls_datum_t tmp;
 	int ret, nocopy = 0;
-	unsigned int count = 0, j;
+	unsigned int count = 0, j, copied = 0;
 
 	if (format == GNUTLS_X509_FMT_DER) {
 		if (*cert_max < 1) {
@@ -3369,6 +3369,8 @@ gnutls_x509_crt_list_import(gnutls_x509_crt_t * certs,
 				gnutls_assert();
 				goto error;
 			}
+
+			copied++;
 		}
 
 		/* now we move ptr after the pem header 
@@ -3398,35 +3400,37 @@ gnutls_x509_crt_list_import(gnutls_x509_crt_t * certs,
 
 	*cert_max = count;
 
-	if (flags & GNUTLS_X509_CRT_LIST_SORT && *cert_max > 1) {
-		gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
-		gnutls_x509_crt_t *s;
+	if (nocopy == 0) {
+		if (flags & GNUTLS_X509_CRT_LIST_SORT && *cert_max > 1) {
+			gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
+			gnutls_x509_crt_t *s;
 
-		s = _gnutls_sort_clist(sorted, certs, cert_max, gnutls_x509_crt_deinit);
-		if (s == certs) {
-			gnutls_assert();
-			ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-			goto error;
+			s = _gnutls_sort_clist(sorted, certs, cert_max, gnutls_x509_crt_deinit);
+			if (s == certs) {
+				gnutls_assert();
+				ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+				goto error;
+			}
+
+			count = *cert_max;
+			if (s == sorted) {
+				memcpy(certs, s, (*cert_max)*sizeof(gnutls_x509_crt_t));
+			}
 		}
 
-		count = *cert_max;
-		if (s == sorted) {
-			memcpy(certs, s, (*cert_max)*sizeof(gnutls_x509_crt_t));
+		if (flags & GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED) {
+			ret = _gnutls_check_if_sorted(certs, *cert_max);
+			if (ret < 0) {
+				gnutls_assert();
+				goto error;
+			}
 		}
-	}
 
-	if (flags & GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED) {
-		ret = _gnutls_check_if_sorted(certs, *cert_max);
-		if (ret < 0) {
-			gnutls_assert();
-			goto error;
-		}
-	}
-
-	if (nocopy == 0)
 		return count;
-	else
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	} else {
+		count = copied;
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
 
       error:
 	for (j = 0; j < count; j++)
