@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Eliminated issues preventing buffers more than 2^32 bytes
    to be used with hashing functions.
 
+** libgnutls: Corrected leaks and other issues in gnutls_x509_crt_list_import().
+
 ** API and ABI modifications:
 No changes since last version.
 
