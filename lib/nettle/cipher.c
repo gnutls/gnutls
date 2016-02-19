@@ -39,6 +39,7 @@
 #include <gcm-camellia.h>
 #endif
 #include <fips.h>
+#include "gnettle.h"
 
 /* Functions that refer to the nettle library.
  */
@@ -656,6 +657,11 @@ wrap_nettle_cipher_decrypt(void *_ctx, const void *encr, size_t encrsize,
 {
 	struct nettle_cipher_ctx *ctx = _ctx;
 
+#ifndef USE_NETTLE3
+	if (encrsize > UINT_MAX)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+#endif
+
 	ctx->decrypt(ctx->ctx_ptr, ctx->i_decrypt, ctx->block_size,
 		     ctx->iv, encrsize, plain, encr);
 
@@ -667,6 +673,11 @@ wrap_nettle_cipher_encrypt(void *_ctx, const void *plain, size_t plainsize,
 			   void *encr, size_t encrsize)
 {
 	struct nettle_cipher_ctx *ctx = _ctx;
+
+#ifndef USE_NETTLE3
+	if (plainsize > UINT_MAX)
+		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
+#endif
 
 	ctx->encrypt(ctx->ctx_ptr, ctx->i_encrypt, ctx->block_size,
 		     ctx->iv, plainsize, encr, plain);
