@@ -98,6 +98,14 @@ static void try(unsigned onclient)
 		fail("%d: ext master secret was not detected by client\n", onclient);
 	}
 
+	if ((gnutls_session_get_flags(server) & GNUTLS_SFLAGS_EXT_MASTER_SECRET) == 0) {
+		fail("%d: ext master secret was not detected by server\n", onclient);
+	}
+
+	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_EXT_MASTER_SECRET) == 0) {
+		fail("%d: ext master secret was not detected by client\n", onclient);
+	}
+
 	if (onclient)
 		gnutls_priority_set_direct(client, "NORMAL:%NO_SESSION_HASH", NULL);
 	else
