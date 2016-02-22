@@ -1305,3 +1305,36 @@ gnutls_record_set_state(gnutls_session_t session,
 	memcpy(UINT64DATA(record_state->sequence_number), seq_number, 8);
 	return 0;
 }
+
+/**
+ * gnutls_session_get_flags:
+ * @session: is a #gnutls_session_t type.
+ *
+ * This function will return a series (ORed) of flags, applicable
+ * for the current session.
+ *
+ * This replaces individual informational functions such as
+ * gnutls_safe_renegotiation_status(), gnutls_session_ext_master_secret_status(),
+ * etc.
+ *
+ * Returns: An ORed sequence of flags (see %gnutls_session_flags_t)
+ *
+ * Since: 3.5.0
+ **/
+unsigned gnutls_session_get_flags(gnutls_session_t session)
+{
+	unsigned flags = 0;
+
+	if (gnutls_safe_renegotiation_status(session))
+		flags |= GNUTLS_SFLAGS_SAFE_RENEGOTIATION;
+	if (gnutls_session_ext_master_secret_status(session))
+		flags |= GNUTLS_SFLAGS_EXT_MASTER_SECRET;
+	if (gnutls_session_etm_status(session))
+		flags |= GNUTLS_SFLAGS_ETM;
+	if (gnutls_heartbeat_allowed(session, GNUTLS_HB_LOCAL_ALLOWED_TO_SEND))
+		flags |= GNUTLS_SFLAGS_HB_LOCAL_SEND;
+	if (gnutls_heartbeat_allowed(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND))
+		flags |= GNUTLS_SFLAGS_HB_PEER_SEND;
+
+	return flags;
+}

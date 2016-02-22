@@ -1076,6 +1076,7 @@ GNUTLS_3_4
 	gnutls_x509_crt_set_subject_alt_othername;
 	gnutls_x509_crt_set_issuer_alt_othername;
 	gnutls_dh_params_import_dsa;
+	gnutls_session_get_flags;
  local:
 	*;
 };

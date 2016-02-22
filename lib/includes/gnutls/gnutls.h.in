@@ -1,5 +1,6 @@
 /* -*- c -*-
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1175,6 +1176,24 @@ int gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type);
 int gnutls_safe_renegotiation_status(gnutls_session_t session);
 unsigned gnutls_session_ext_master_secret_status(gnutls_session_t session);
 unsigned gnutls_session_etm_status(gnutls_session_t session);
+
+/**
+ * gnutls_session_flags_t:
+ * @GNUTLS_SFLAGS_SAFE_RENEGOTIATION: Safe renegotiation (RFC5746) was used
+ * @GNUTLS_SFLAGS_EXT_MASTER_SECRET: The extended master secret (RFC7627) extension was used
+ * @GNUTLS_SFLAGS_ETM: The encrypt then MAC (RFC7366) extension was used
+ *
+ * Enumeration of different session parameters.
+ */
+typedef enum {
+	GNUTLS_SFLAGS_SAFE_RENEGOTIATION = 1,
+	GNUTLS_SFLAGS_EXT_MASTER_SECRET = 1<<1,
+	GNUTLS_SFLAGS_ETM = 1<<2,
+	GNUTLS_SFLAGS_HB_LOCAL_SEND = 1<<3,
+	GNUTLS_SFLAGS_HB_PEER_SEND = 1<<4
+} gnutls_session_flags_t;
+
+unsigned gnutls_session_get_flags(gnutls_session_t session);
 
 /**
  * gnutls_supplemental_data_format_type_t:
