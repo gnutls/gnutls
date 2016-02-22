@@ -166,10 +166,18 @@ static void client(int fd, const char *prio, unsigned etm)
 			(gnutls_protocol_get_version(session)));
 
 	if (etm != 0 && gnutls_session_etm_status(session) == 0) {
-		fail("server: EtM was not negotiated with %s!\n", prio);
+		fail("client: EtM was not negotiated with %s!\n", prio);
 		exit(1);
 	} else if (etm == 0 && gnutls_session_etm_status(session) != 0) {
-		fail("server: EtM was negotiated with %s!\n", prio);
+		fail("client: EtM was negotiated with %s!\n", prio);
+		exit(1);
+	}
+
+	if (etm != 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) == 0)) {
+		fail("client: EtM was not negotiated with %s!\n", prio);
+		exit(1);
+	} else if (etm == 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) != 0)) {
+		fail("client: EtM was negotiated with %s!\n", prio);
 		exit(1);
 	}
 
@@ -269,6 +277,14 @@ static void server(int fd, const char *prio, unsigned etm)
 		fail("server: EtM was not negotiated with %s!\n", prio);
 		exit(1);
 	} else if (etm == 0 && gnutls_session_etm_status(session) != 0) {
+		fail("server: EtM was negotiated with %s!\n", prio);
+		exit(1);
+	}
+
+	if (etm != 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) == 0)) {
+		fail("server: EtM was not negotiated with %s!\n", prio);
+		exit(1);
+	} else if (etm == 0 && ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_ETM) != 0)) {
 		fail("server: EtM was negotiated with %s!\n", prio);
 		exit(1);
 	}
