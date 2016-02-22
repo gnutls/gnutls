@@ -24,7 +24,7 @@ Build and Check with asan:
 Build and Check - separate build dir (x86):
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-guile --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
+    ../configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -j4
   tags:
   - x86
@@ -34,7 +34,7 @@ Build and Check - separate build dir (x86):
 Build and Check - clang (x86):
   script:
   - git submodule update --init && make autoreconf && 
-    CC=clang ./configure --disable-guile --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
+    CC=clang ./configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -C tests -j4
   tags:
   - x86
@@ -44,7 +44,7 @@ Build and Check - clang (x86):
 Build and Check in FIPS140-2 mode:
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-guile --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
+    ../configure --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -j4
   tags:
   - nettle3
@@ -53,7 +53,7 @@ Build and Check in FIPS140-2 mode:
 Build and Check for windows in separate build dir:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw32-configure --disable-guile --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j4 && mingw32-make -C tests check -j4
   tags:
   - nettle3
@@ -64,7 +64,7 @@ Build and Check for windows in separate build dir:
 Build and Check with valgrind:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
-    --disable-guile --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
+    --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
   tags:
   - x86-64
   - nettle3
