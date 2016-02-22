@@ -136,6 +136,12 @@ void doit(void)
 		exit(1);
 	}
 
+	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
+	    !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
+		tls_log_func(0, "Session not using safe renegotiation!\n");
+		exit(1);
+	}
+
 	sret = gnutls_rehandshake(server);
 	if (debug) {
 		tls_log_func(0, "gnutls_rehandshake (server)...\n");
@@ -155,6 +161,13 @@ void doit(void)
 
 	if (!gnutls_safe_renegotiation_status(client) ||
 	    !gnutls_safe_renegotiation_status(server)) {
+		tls_log_func(0,
+			     "Rehandshaked session not using safe renegotiation!\n");
+		exit(1);
+	}
+
+	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
+	    !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
 		tls_log_func(0,
 			     "Rehandshaked session not using safe renegotiation!\n");
 		exit(1);

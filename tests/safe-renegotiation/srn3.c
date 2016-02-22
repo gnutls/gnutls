@@ -137,6 +137,12 @@ void doit(void)
 		abort();
 	}
 
+	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
+	    (gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
+		puts("Client or server using extension before handshake?");
+		abort();
+	}
+
 	HANDSHAKE_EXPECT(client, server,
 			 GNUTLS_E_SAFE_RENEGOTIATION_FAILED,
 			 GNUTLS_E_AGAIN);

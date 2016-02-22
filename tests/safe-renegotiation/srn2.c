@@ -132,11 +132,23 @@ void doit(void)
 		abort();
 	}
 
+	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
+	    (gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
+		puts("Client or server using extension before handshake?");
+		abort();
+	}
+
 	HANDSHAKE(client, server);
 
 	/* Check that both sessions use the extension. */
 	if (!gnutls_safe_renegotiation_status(server)
 	    || !gnutls_safe_renegotiation_status(client)) {
+		puts("Client or server not using safe renegotiation extension?");
+		abort();
+	}
+
+	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
+	    !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
 		puts("Client or server not using safe renegotiation extension?");
 		abort();
 	}
@@ -161,6 +173,12 @@ void doit(void)
 	/* Check that session still use the extension. */
 	if (!gnutls_safe_renegotiation_status(server)
 	    || !gnutls_safe_renegotiation_status(client)) {
+		puts("Client or server not using safe renegotiation extension?");
+		abort();
+	}
+
+	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION) ||
+	    !(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_SAFE_RENEGOTIATION)) {
 		puts("Client or server not using safe renegotiation extension?");
 		abort();
 	}
