@@ -53,6 +53,43 @@ const char *pkcs3 =
     "GeGOEywcw+oQT4SmFOD7H0smJe2CNyjYpexBXQ/A0mbTF9QKm1cCAQU=\n"
     "-----END DH PARAMETERS-----\n";
 
+const char *pkcs3_2048 =
+	"-----BEGIN DH PARAMETERS-----\n"
+	"MIICDgKCAQEAvVNCqM8M9ZoVYBKEkV2KN8ELHHJ75aTZiK9z6170iKSgbITkOxsd\n"
+	"aBCLzHZd7d6/2aNofUeuWdDGHm73d8v53ma2HRVCNESeC2LKsEDFG9FjjUeugvfl\n"
+	"zb85TLZwWT9Lb35Ddhdk7CtxoukjS0/JkCE+8RGzmk5+57N8tNffs4aSSHSe4+cw\n"
+	"i4wULDxiG2p052czAMP3YR5egWvMuiByhy0vKShiZmOy1/Os5r6E/GUF+298gDjG\n"
+	"OeaEUF9snrTcoBwB4yNjVSEbuAh5fMd5zFtz2+dzrk9TYZ44u4DQYkgToW05WcmC\n"
+	"+LG0bLAH6lrJR5OMgyheZEo6F20z/d2yyQKCAQEAtzcuTHW61SFQiDRouk6eD0Yx\n"
+	"0k1RJdaQdlRf6/Dcc6lEqnbezL90THzvxkBwfJ5jG1VZE7JlVCvLRkBtgb0/6SCf\n"
+	"MATfEKG2JMOnKsJxvidmKEp4uN32LketXRrrEBl7rS+HABEfKAzqx+J6trBaq25E\n"
+	"7FVJFsyoa8IL8N8YUWwhE2UuEfmiqQQaeoIUYC/xD2arMXn9N0W84Nyy2S9IL4ct\n"
+	"e3Azi1Wc8MMfpbxxDRxXCnM2uMkLYWs1lQmcUUX+Uygv3P8lgS+RJ1Pi3+BWMx0S\n"
+	"ocsZXqOr6dbEF1WOLObQRK7h/MZp80iVUyrBgX0MbVFN9M5i2u4KKTG95VKRtgIC\n"
+	"AQA=\n"
+	"-----END DH PARAMETERS-----\n";
+
+const char *pkcs3_3072 =
+	"-----BEGIN DH PARAMETERS-----\n"
+	"MIIDDgKCAYEAtRUay8nDgwE5dSVzW525wEu/d0vrFolvYJSevxg2myj5S+gr3Fgq\n"
+	"OGaZc4zrBxkxsELc7GuCqaXSOWL4yobT8N05yGbYWkWRPf4crRMx3P7/Gba9WsmH\n"
+	"BlL71uPf1IN9CanAlabkhV89RKiYaCpUI19+/sq+N2dO874ToBZCNhxZnTgRZ+po\n"
+	"Gdr6XWM0lQ8imIKSer0px3ZHI+/5gmyPry35tGpwlbyclJAg3wlTSdnqDcLxq7AF\n"
+	"OZ23PzC3ij7SFErOX9EFBdS2bjtU47O3OkPc9EIYMEv5nwnXICLHslwVifmURAjV\n"
+	"LfpObL8LYGN4Gac4tFxuDa0PMg0ES5ADugYBwdRFTAtCy5WOYXINzAAOrH9MommT\n"
+	"rMkELf7JOCaV2ktBsvTlrgMAXeyqbf2YSG6CGjj4QnUuqPybSgwPru7VlahsS2lo\n"
+	"qjutBPpgIxS53o97Wi3V5kQedKJiNuIDNnJMFNuTADAM+OYwClTH7ZSwTsxEgVpr\n"
+	"tMH+WnTI7KTJAoIBgQCrELwIUB4oNbf0x+fIpVndhDpl/WcFc/lDtmiRuym5gWbb\n"
+	"NPeI+1rdhnS2R3+nCJODFQTcPNMgIJuSu2EnDCSs5xJ2k08SAgSzyxEdjBpY7qJe\n"
+	"+lJPJ12zhcl0vgcvMhb/YgqVe2MKz0RvnYZPwHM/aJbjYjq/6OpK3fVw4M1ZccBK\n"
+	"QD4OHK8HOvGU7Wf6kRIcxUlfn15spMCIsrAZQBddWLmQgktsxJNUS+AnaPwTBoOv\n"
+	"nGCr1vzw8OS1DtS03VCmtqt3otXhJ3D2oCIG6ogxVAKfHR30KIfzZLBfmCjdzHmH\n"
+	"x4OwYTN1wy5juA438QtiDtcgK60ZqSzQO08ZklRncA/TkkyEH6kPn5KSh/hW9O3D\n"
+	"KZeAY/KF0/Bc1XNtqPEYFb7Vo3rbTsyjXkICN1Hk9S0OIKL42K7rWBepO9KuddSd\n"
+	"aXgH9staP0HXCyyW1VAyqo0TwcWDhE/R7IQQGGwGyd4rD0T+ySW/t09ox23O6X8J\n"
+	"FSp6mOVNcuvhB5U2gW8CAgEA\n"
+	"-----END DH PARAMETERS-----\n";
+
 void fail(const char *format, ...)
 {
 	char str[1024];

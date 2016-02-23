@@ -47,6 +47,8 @@ extern int error_count;
 extern int break_on_error;
 
 extern const char *pkcs3;
+extern const char *pkcs3_2048;
+extern const char *pkcs3_3072;
 
 extern void fail(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
