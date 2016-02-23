@@ -227,7 +227,7 @@ typedef struct {
 typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE3, STATE4, STATE5, STATE6, STATE7, STATE8,
 	STATE9, STATE10, STATE11, STATE12, STATE13, STATE14,
-	STATE15, STATE16, STATE17, STATE18,
+	STATE15, STATE16, STATE17, STATE18, STATE19,
 	STATE20 = 20, STATE21, STATE22,
 	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
 	STATE60 = 60, STATE61, STATE62, 
@@ -493,6 +493,7 @@ typedef struct {
 	bool selectable_sighash;	/* whether signatures can be selected */
 	bool selectable_prf;	/* whether the PRF is ciphersuite-defined */
 	bool obsolete;		/* Do not use this protocol version as record version */
+	bool false_start;	/* That version can be used with false start */
 } version_entry_st;
 
 
@@ -1016,6 +1017,10 @@ typedef struct {
 	/* the SHA256 hash of the peer's certificate */
 	uint8_t cert_hash[32];
 	bool cert_hash_set;
+
+	/* function to be called at false start */
+	gnutls_handshake_simple_hook_func false_start_func;
+	bool false_start_used; /* non-zero if false start was used for appdata */
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

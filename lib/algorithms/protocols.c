@@ -27,13 +27,13 @@
 
 /* TLS Versions */
 static const version_entry_st sup_versions[] = {
-	{"SSL3.0", GNUTLS_SSL3, 0, 3, 0, GNUTLS_STREAM, 1, 0, 0, 0, 0, 1},
-	{"TLS1.0", GNUTLS_TLS1, 1, 3, 1, GNUTLS_STREAM, 1, 0, 1, 0, 0, 0},
-	{"TLS1.1", GNUTLS_TLS1_1, 2, 3, 2, GNUTLS_STREAM, 1, 1, 1, 0, 0, 0},
-	{"TLS1.2", GNUTLS_TLS1_2, 3, 3, 3, GNUTLS_STREAM, 1, 1, 1, 1, 1, 0},
-	{"DTLS0.9", GNUTLS_DTLS0_9, 200, 1, 0, GNUTLS_DGRAM, 1, 1, 1, 0, 0, 0},	/* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
-	{"DTLS1.0", GNUTLS_DTLS1_0, 201, 254, 255, GNUTLS_DGRAM, 1, 1, 1, 0, 0, 0},	/* 1.1 over datagram */
-	{"DTLS1.2", GNUTLS_DTLS1_2, 202, 254, 253, GNUTLS_DGRAM, 1, 1, 1, 1, 1, 0},	/* 1.2 over datagram */
+	{"SSL3.0", GNUTLS_SSL3, 0, 3, 0, GNUTLS_STREAM, 1, 0, 0, 0, 0, 1, 0},
+	{"TLS1.0", GNUTLS_TLS1, 1, 3, 1, GNUTLS_STREAM, 1, 0, 1, 0, 0, 0, 0},
+	{"TLS1.1", GNUTLS_TLS1_1, 2, 3, 2, GNUTLS_STREAM, 1, 1, 1, 0, 0, 0, 0},
+	{"TLS1.2", GNUTLS_TLS1_2, 3, 3, 3, GNUTLS_STREAM, 1, 1, 1, 1, 1, 0, 1},
+	{"DTLS0.9", GNUTLS_DTLS0_9, 200, 1, 0, GNUTLS_DGRAM, 1, 1, 1, 0, 0, 0, 0},	/* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
+	{"DTLS1.0", GNUTLS_DTLS1_0, 201, 254, 255, GNUTLS_DGRAM, 1, 1, 1, 0, 0, 0, 0},	/* 1.1 over datagram */
+	{"DTLS1.2", GNUTLS_DTLS1_2, 202, 254, 253, GNUTLS_DGRAM, 1, 1, 1, 1, 1, 0, 1},	/* 1.2 over datagram */
 	{0, 0, 0, 0, 0}
 };
 

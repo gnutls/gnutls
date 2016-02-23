@@ -1002,8 +1002,7 @@ _gnutls_rsa_pms_set_version(gnutls_session_t session,
  **/
 void
 gnutls_handshake_set_post_client_hello_function(gnutls_session_t session,
-						gnutls_handshake_post_client_hello_func
-						func)
+						gnutls_handshake_simple_hook_func func)
 {
 	session->internals.user_hello_func = func;
 }
@@ -1352,6 +1351,8 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_HB_LOCAL_SEND;
 	if (gnutls_heartbeat_allowed(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND))
 		flags |= GNUTLS_SFLAGS_HB_PEER_SEND;
+	if (session->internals.false_start_used)
+		flags |= GNUTLS_SFLAGS_FALSE_START;
 
 	return flags;
 }

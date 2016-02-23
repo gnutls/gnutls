@@ -86,49 +86,50 @@ struct gnutls_kx_algo_entry {
 	const char *name;
 	gnutls_kx_algorithm_t algorithm;
 	mod_auth_st *auth_struct;
-	int needs_dh_params;
+	bool needs_dh_params;
 	gnutls_pk_algorithm_t cert_pk; /* the type of certificate required */
+	bool false_start;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #if defined(ENABLE_ANON) && defined(ENABLE_DHE)
-	{"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, GNUTLS_PK_UNKNOWN},
+	{"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, GNUTLS_PK_UNKNOWN, 0},
 #endif
 #if defined(ENABLE_ANON) && defined(ENABLE_ECDHE)
-	{"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, GNUTLS_PK_UNKNOWN},
+	{"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, GNUTLS_PK_UNKNOWN, 0},
 #endif
-	{"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, GNUTLS_PK_RSA},
+	{"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, GNUTLS_PK_RSA, 0},
 #ifdef ENABLE_DHE
-	{"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, GNUTLS_PK_RSA},
-	{"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, GNUTLS_PK_DSA},
+	{"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, GNUTLS_PK_RSA, 1},
+	{"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, GNUTLS_PK_DSA, 1},
 #endif
 #ifdef ENABLE_ECDHE
-	{"ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, &ecdhe_rsa_auth_struct, 0, GNUTLS_PK_RSA},
+	{"ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, &ecdhe_rsa_auth_struct, 0, GNUTLS_PK_RSA, 1},
 	{"ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, &ecdhe_ecdsa_auth_struct,
-	 0, GNUTLS_PK_EC},
+	 0, GNUTLS_PK_EC, 1},
 #endif
 #ifdef ENABLE_SRP
-	{"SRP-DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, GNUTLS_PK_DSA},
-	{"SRP-RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, GNUTLS_PK_RSA},
-	{"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0, GNUTLS_PK_UNKNOWN},
+	{"SRP-DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, GNUTLS_PK_DSA, 0},
+	{"SRP-RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, GNUTLS_PK_RSA, 0},
+	{"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0, GNUTLS_PK_UNKNOWN, 0},
 #endif
 #ifdef ENABLE_PSK
-	{"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, GNUTLS_PK_UNKNOWN},
-	{"RSA-PSK", GNUTLS_KX_RSA_PSK, &rsa_psk_auth_struct, 0, GNUTLS_PK_RSA},
+	{"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, GNUTLS_PK_UNKNOWN, 0},
+	{"RSA-PSK", GNUTLS_KX_RSA_PSK, &rsa_psk_auth_struct, 0, GNUTLS_PK_RSA, 0},
 #ifdef ENABLE_DHE
 	{"DHE-PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
-	 1 /* needs DHE params */, GNUTLS_PK_UNKNOWN},
+	 1 /* needs DHE params */, GNUTLS_PK_UNKNOWN, 0},
 #endif
 #ifdef ENABLE_ECDHE
-	{"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0, GNUTLS_PK_UNKNOWN},
+	{"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0, GNUTLS_PK_UNKNOWN, 0},
 #endif
 #endif
 	/* for deprecated and legacy algorithms no longer supported, use
 	 * GNUTLS_KX_INVALID as an entry. This will make them available
 	 * as priority strings, but they will be a no-op.
 	 */
-	{"RSA-EXPORT", GNUTLS_KX_INVALID, NULL, 0, GNUTLS_PK_UNKNOWN},
+	{"RSA-EXPORT", GNUTLS_KX_INVALID, NULL, 0, GNUTLS_PK_UNKNOWN, 0},
 	{0, 0, 0, 0, 0}
 };
 
@@ -258,7 +259,35 @@ int _gnutls_kx_is_ok(gnutls_kx_algorithm_t algorithm)
 	return ret;
 }
 
-int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm_t algorithm)
+bool _gnutls_kx_allows_false_start(gnutls_session_t session)
+{
+	unsigned algorithm = session->security_parameters.kx_algorithm;
+	bool needs_dh = 0;
+	int bits;
+
+	ssize_t ret = 0;
+	GNUTLS_KX_ALG_LOOP(ret = p->false_start; needs_dh = p->needs_dh_params);
+
+	if (ret != 0) {
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
+		if (needs_dh != 0) {
+			bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_HIGH);
+			/* check whether sizes are sufficient */
+			if (gnutls_dh_get_prime_bits(session) < bits)
+				ret = 0;
+		} else 
+#endif
+		if (algorithm == GNUTLS_KX_ECDHE_RSA || algorithm == GNUTLS_KX_ECDHE_ECDSA) {
+			bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_EC, GNUTLS_SEC_PARAM_HIGH);
+
+			if (gnutls_ecc_curve_get_size(session->security_parameters.ecc_curve) * 8 < bits)
+				ret = 0;
+		}
+	}
+	return ret;
+}
+
+bool _gnutls_kx_needs_dh_params(gnutls_kx_algorithm_t algorithm)
 {
 	ssize_t ret = 0;
 	GNUTLS_KX_ALG_LOOP(ret = p->needs_dh_params);

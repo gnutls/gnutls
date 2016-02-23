@@ -1276,6 +1276,8 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 		return ret;
 	}
 
+	/* The messages which are followed by another are not sent by default
+	 * but are cached instead */
 	switch (type) {
 	case GNUTLS_HANDSHAKE_CERTIFICATE_PKT:	/* this one is followed by ServerHelloDone
 						 * or ClientKeyExchange always.
@@ -2413,6 +2415,44 @@ int gnutls_rehandshake(gnutls_session_t session)
 	return 0;
 }
 
+/**
+ * gnutls_handshake_set_false_start_function:
+ * @session: is a #gnutls_session_t type.
+ * @func: is the function to be called
+ * @flags: should be zero
+ *
+ * This function in client side will ensure that @func is called
+ * after the client's side of the handshake is complete. That is,
+ * it can be used to send data before gnutls_handshake() completes
+ * (i.e., before the peer's Finished message is received)
+ * and reduce the handshake to a single round-trip.
+ *
+ * This callback must return 0 on success or a gnutls error code to
+ * terminate the handshake. Typically it should include a call to
+ * gnutls_record_send().
+ *
+ * Note that, this utilises the so-called TLS False Start,
+ * which may increase the risk of cryptographic failure when
+ * combined with certain ciphers and key exchanges. For that
+ * GnuTLS will call the provided function prior to receiving
+ * the finished messages only in  case of known to be secure ciphers.
+ * Otherwise @func is called after the handshake is fully complete.
+ *
+ * On the server side this function always fail.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ **/
+int gnutls_handshake_set_false_start_function(gnutls_session_t session,
+					      gnutls_handshake_simple_hook_func func, unsigned flags)
+{
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		session->internals.false_start_func = func;
+		return 0;
+	}
+
+	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
 inline static int
 _gnutls_abort_handshake(gnutls_session_t session, int ret)
 {
@@ -2738,6 +2778,23 @@ static int run_verify_callback(gnutls_session_t session, unsigned int side)
 	return 0;
 }
 
+static bool can_send_false_start(gnutls_session_t session)
+{
+	const version_entry_st *vers;
+
+	vers = get_version(session);
+	if (unlikely(vers == NULL || !vers->false_start))
+		return 0;
+
+	if (session->internals.selected_cert_list != NULL)
+		return 0;
+
+	if (!_gnutls_kx_allows_false_start(session))
+		return 0;
+
+	return 1;
+}
+
 /*
  * handshake_client 
  * This function performs the client side of the handshake of the TLS/SSL protocol.
@@ -2906,6 +2963,16 @@ static int handshake_client(gnutls_session_t session)
 
 	case STATE17:
 		STATE = STATE17;
+		if (session->internals.resumed == RESUME_FALSE && can_send_false_start(session) && session->internals.false_start_func != 0) {
+			session->internals.false_start_used = 1;
+			ret = session->internals.false_start_func(session);
+			IMED_RET("false start", ret, 1);
+		} else {
+			session->internals.false_start_used = 0;
+		}
+
+	case STATE18:
+		STATE = STATE18;
 		if (session->internals.resumed == RESUME_FALSE) {
 #ifdef ENABLE_SESSION_TICKETS
 			ret = _gnutls_recv_new_session_ticket(session);
@@ -2917,14 +2984,21 @@ static int handshake_client(gnutls_session_t session)
 			IMED_RET("recv handshake final", ret, 1);
 		}
 
-	case STATE18:
-		STATE = STATE18;
+	case STATE19:
+		STATE = STATE19;
 		if (session->internals.resumed == RESUME_FALSE) {
 			ret = recv_handshake_final(session, FALSE);
 			IMED_RET("recv handshake final 2", ret, 1);
 		} else {
 			ret = send_handshake_final(session, FALSE);
 			IMED_RET("send handshake final", ret, 1);
+		}
+
+	case STATE20:
+		STATE = STATE20;
+		if ((session->internals.resumed != RESUME_FALSE || !can_send_false_start(session)) && session->internals.false_start_func != 0) {
+			ret = session->internals.false_start_func(session);
+			IMED_RET("false start", ret, 1);
 		}
 
 		STATE = STATE0;
