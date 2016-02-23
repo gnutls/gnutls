@@ -410,6 +410,7 @@ in @acronym{GnuTLS} are discussed in the subsections that follow.
 * Safe renegotiation::
 * OCSP status request::
 * SRTP::
+* False Start::
 * Application Layer Protocol Negotiation (ALPN)::
 * Extensions and Supplemental Data::
 @end menu
@@ -636,6 +637,26 @@ To obtain the negotiated keys use the function below.
 Other helper functions are listed below.
 
 @showfuncC{gnutls_srtp_get_selected_profile,gnutls_srtp_get_profile_name,gnutls_srtp_get_profile_id}
+
+@node False Start
+@subsection False Start
+@cindex False Start
+@cindex TLS False Start
+
+The TLS protocol was extended in @xcite{draft-ietf-tls-falsestart-01} to allow the client
+to send data to server in a single round trip. This change however operates on the borderline
+of the TLS protocol security assumptions and should be used for the cases where the reduced
+latency outperforms the risk of an adversary intercepting the transferred data. In GnuTLS
+applications can use @funcref{gnutls_handshake_set_false_start_function} to set
+a function to be called prior to handshake completion. Typically the function will be used
+to send the required data.
+
+Note however, that the API ensures that function set will be called, even
+if the false start guarrantees are not satisfied. In that case the function will be called
+after the full handshake completion. To verify that false start was used you may use 
+@funcref{gnutls_session_get_flags} and check for the @acronym{GNUTLS_SFLAGS_FALSE_START} flag.
+
+@showfuncdesc{gnutls_handshake_set_false_start_function}
 
 @node Application Layer Protocol Negotiation (ALPN)
 @subsection Application Layer Protocol Negotiation (ALPN)
