@@ -35,6 +35,11 @@ See the end for copying conditions.
 
 ** libgnutls: Replaced select() system call with poll() on POSIX systems.
 
+** libgnutls: Added SHA3 based signing algorithms for DSA, RSA and ECDSA,
+   based on http://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html
+
+** certtool: Added the ability to sign certificates using SHA3.
+
 ** certtool: Added the --provable option.
 
 ** API and ABI modifications:
