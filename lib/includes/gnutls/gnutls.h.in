@@ -1348,6 +1348,10 @@ int gnutls_session_get_data2(gnutls_session_t session,
 void gnutls_session_get_random(gnutls_session_t session,
 			       gnutls_datum_t * client,
 			       gnutls_datum_t * server);
+
+void gnutls_session_get_master_secret(gnutls_session_t session,
+			              gnutls_datum_t * secret);
+
 char *gnutls_session_get_desc(gnutls_session_t session);
 
 typedef int gnutls_certificate_verify_function(gnutls_session_t);

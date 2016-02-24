@@ -1128,6 +1128,23 @@ gnutls_session_get_random(gnutls_session_t session,
 	}
 }
 
+/**
+ * gnutls_session_get_master_secret:
+ * @session: is a #gnutls_session_t type.
+ * @secret: the session's master secret
+ *
+ * This function returns pointers to the master secret
+ * used in the TLS session. The pointers are not to be modified or deallocated.
+ *
+ * Since: 3.5.0
+ **/
+void
+gnutls_session_get_master_secret(gnutls_session_t session, gnutls_datum_t *secret)
+{
+	secret->data = session->security_parameters.master_secret;
+	secret->size = sizeof(session->security_parameters.master_secret);
+}
+
 unsigned int timespec_sub_ms(struct timespec *a, struct timespec *b)
 {
 	return (a->tv_sec * 1000 + a->tv_nsec / (1000 * 1000) -
