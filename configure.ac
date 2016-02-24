@@ -96,6 +96,7 @@ use_accel=yes
 case "$host" in
   *android*)
     have_android=yes
+    have_elf=yes
   ;;
   *mingw32* | *mingw64*)
     have_win=yes
