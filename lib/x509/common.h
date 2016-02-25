@@ -75,7 +75,7 @@
 #define ASN1_NULL_SIZE 2
 
 int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
-			  int general);
+			  int force_general);
 
 int _gnutls_x509_decode_string(unsigned int etype,
 			       const uint8_t * der, size_t der_size,

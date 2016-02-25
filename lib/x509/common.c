@@ -550,7 +550,7 @@ data2hex(const void *data, size_t data_size,
  *
  */
 
-/* This is an emulations of the struct tm.
+/* This is an emulation of the struct tm.
  * Since we do not use libc's functions, we don't need to
  * depend on the libc structure.
  */
@@ -733,8 +733,48 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 	return time2gtime(ttime, year);
 }
 
+/* tag will contain ASN1_TAG_UTCTime or ASN1_TAG_GENERALIZEDTime */
 static int
-gtime2generalTime(time_t gtime, char *str_time, size_t str_time_size)
+gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsigned *tag)
+{
+	size_t ret;
+	struct tm _tm;
+
+	if (gtime == (time_t)-1
+#if SIZEOF_LONG == 8
+		|| gtime >= 253402210800
+#endif
+	 ) {
+        	if (tag)
+        		*tag = ASN1_TAG_GENERALIZEDTime;
+        	snprintf(str_time, str_time_size, "99991231235959Z");
+        	return 0;
+	}
+
+	if (!gmtime_r(&gtime, &_tm)) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	if (_tm.tm_year >= 150) {
+		if (tag)
+        		*tag = ASN1_TAG_GENERALIZEDTime;
+		ret = strftime(str_time, str_time_size, "%Y%m%d%H%M%SZ", &_tm);
+	} else {
+		if (tag)
+        		*tag = ASN1_TAG_UTCTime;
+		ret = strftime(str_time, str_time_size, "%y%m%d%H%M%SZ", &_tm);
+	}
+	if (!ret) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	return 0;
+}
+
+static int
+gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
 {
 	size_t ret;
 	struct tm _tm;
@@ -759,7 +799,6 @@ gtime2generalTime(time_t gtime, char *str_time, size_t str_time_size)
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-
 	return 0;
 }
 
@@ -768,7 +807,7 @@ gtime2generalTime(time_t gtime, char *str_time, size_t str_time_size)
  * be something like "tbsCertList.thisUpdate".
  */
 #define MAX_TIME 64
-time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when, int nochoice)
+time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int force_general)
 {
 	char ttime[MAX_TIME];
 	char name[128];
@@ -776,28 +815,35 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when, int nochoice)
 	int len, result;
 
 	len = sizeof(ttime) - 1;
-	result = asn1_read_value(c2, when, ttime, &len);
+	result = asn1_read_value(c2, where, ttime, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return (time_t) (-1);
 	}
 
-	if (nochoice != 0) {
+	if (force_general != 0) {
 		c_time = _gnutls_x509_generalTime2gtime(ttime);
 	} else {
-		_gnutls_str_cpy(name, sizeof(name), when);
+		_gnutls_str_cpy(name, sizeof(name), where);
 
 		/* choice */
 		if (strcmp(ttime, "generalTime") == 0) {
-			_gnutls_str_cat(name, sizeof(name),
-					".generalTime");
+			if (name[0] == 0)
+				_gnutls_str_cpy(name, sizeof(name),
+						"generalTime");
+			else
+				_gnutls_str_cat(name, sizeof(name),
+						".generalTime");
 			len = sizeof(ttime) - 1;
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
 				c_time =
 				    _gnutls_x509_generalTime2gtime(ttime);
 		} else {	/* UTCTIME */
-			_gnutls_str_cat(name, sizeof(name), ".utcTime");
+			if (name[0] == 0)
+				_gnutls_str_cpy(name, sizeof(name), "utcTime");
+			else
+				_gnutls_str_cat(name, sizeof(name), ".utcTime");
 			len = sizeof(ttime) - 1;
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
@@ -821,15 +867,16 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when, int nochoice)
  */
 int
 _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
-		      int nochoice)
+		      int force_general)
 {
 	char str_time[MAX_TIME];
 	char name[128];
 	int result, len;
+	unsigned tag;
 
-	if (nochoice != 0) {
+	if (force_general != 0) {
 		result =
-		    gtime2generalTime(tim, str_time, sizeof(str_time));
+		    gtime_to_generalTime(tim, str_time, sizeof(str_time));
 		if (result < 0)
 			return gnutls_assert_val(result);
 		len = strlen(str_time);
@@ -840,20 +887,26 @@ _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 		return 0;
 	}
 
-	_gnutls_str_cpy(name, sizeof(name), where);
-
-	if ((result = asn1_write_value(c2, name, "generalTime", 1)) < 0) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = gtime2generalTime(tim, str_time, sizeof(str_time));
+	result = gtime_to_suitable_time(tim, str_time, sizeof(str_time), &tag);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	_gnutls_str_cat(name, sizeof(name), ".generalTime");
+	_gnutls_str_cpy(name, sizeof(name), where);
+	if (tag == ASN1_TAG_UTCTime) {
+		if ((result = asn1_write_value(c2, where, "utcTime", 1)) < 0) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+		_gnutls_str_cat(name, sizeof(name), ".utcTime");
+	} else {
+		if ((result = asn1_write_value(c2, where, "generalTime", 1)) < 0) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+		_gnutls_str_cat(name, sizeof(name), ".generalTime");
+	}
 
 	len = strlen(str_time);
 	result = asn1_write_value(c2, name, str_time, len);
