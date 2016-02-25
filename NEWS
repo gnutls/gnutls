@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Eliminated issues preventing buffers more than 2^32 bytes
    to be used with hashing functions.
 
+** libgnutls: Follow closely RFC5280 recommendations and use UTCTime for
+   dates prior to 2050.
+
 ** API and ABI modifications:
 No changes since last version.
 
