@@ -193,6 +193,14 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 }
 
 ck_rv_t
+pkcs11_generate_key(struct ck_function_list * module,
+		    ck_session_handle_t sess,
+		    struct ck_mechanism * mechanism,
+		    struct ck_attribute * templ,
+		    unsigned long count,
+		    ck_object_handle_t * key);
+
+ck_rv_t
 pkcs11_generate_key_pair(struct ck_function_list * module,
 			 ck_session_handle_t sess,
 			 struct ck_mechanism * mechanism,

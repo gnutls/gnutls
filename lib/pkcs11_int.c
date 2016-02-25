@@ -192,6 +192,17 @@ pkcs11_sign(struct ck_function_list * module,
 }
 
 ck_rv_t
+pkcs11_generate_key(struct ck_function_list * module,
+		    ck_session_handle_t sess,
+		    struct ck_mechanism * mechanism,
+		    struct ck_attribute * templ,
+		    unsigned long count,
+		    ck_object_handle_t * key)
+{
+	return (module)->C_GenerateKey(sess, mechanism, templ, count, key);
+}
+
+ck_rv_t
 pkcs11_generate_key_pair(struct ck_function_list * module,
 			 ck_session_handle_t sess,
 			 struct ck_mechanism * mechanism,
