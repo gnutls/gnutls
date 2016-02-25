@@ -48,7 +48,7 @@ apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-uti
 Fedora/RHEL:
 ```
 yum install -y git autoconf libtool gettext-devel automake autogen
-yum install -y automake autogen nettle-devel p11-kit-devel autogen-libopts-devel
+yum install -y nettle-devel p11-kit-devel autogen-libopts-devel
 yum install -y trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl
 yum install -y unbound-devel bison help2man gtk-doc texinfo texlive
 ```
@@ -83,7 +83,7 @@ yum install -y dieharder mbedtls-utils openssl
 To download the version controlled sources:
 
 ```
-$ git clone git@gitlab.com:gnutls/gnutls.git
+$ git clone https://gitlab.com/gnutls/gnutls.git
 $ cd gnutls
 $ git submodule update --init
 ```
