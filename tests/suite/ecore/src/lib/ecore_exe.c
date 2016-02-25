@@ -2,7 +2,7 @@
 # include <config.h>
 #endif
 
-#if defined (__FreeBSD__) || defined (__OpenBSD__) || defined (__NetBSD__)
+#if defined (__FreeBSD__) || defined (__OpenBSD__) || defined (__NetBSD__) || defined(__linux__)
 # include <sys/time.h>
 # include <sys/resource.h>
 #endif
