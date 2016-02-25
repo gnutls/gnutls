@@ -506,7 +506,9 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   unsigned int pad = 0;
   int length;
   uint16_t blocksize;
-  int ret, i, pad_failed = 0;
+  int ret, i;
+  unsigned int tmp_pad_failed = 0;
+  unsigned int pad_failed = 0;
   opaque preamble[PREAMBLE_SIZE];
   int preamble_size = 0;
   int ver = gnutls_protocol_get_version (session);
@@ -561,20 +563,20 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
           return GNUTLS_E_DECRYPTION_FAILED;
         }
       pad = ciphertext.data[ciphertext.size - 1];   /* pad */
-      if (pad+1 > ciphertext.size-hash_size)
-        pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 
       /* Check the pading bytes (TLS 1.x). 
        * Note that we access all 256 bytes of ciphertext for padding check
        * because there is a timing channel in that memory access (in certain CPUs).
        */
-      if (_gnutls_version_has_variable_padding (ver) && pad_failed == 0)
-        for (i = 2; i <= pad; i++)
+      if (_gnutls_version_has_variable_padding (ver))
+        for (i = 2; i <= MIN(256, ciphertext.size); i++)
           {
-            if (ciphertext.data[ciphertext.size - i] != pad)
-              pad_failed = GNUTLS_E_DECRYPTION_FAILED;
+            tmp_pad_failed |= (ciphertext.data[ciphertext.size - i] != pad);
+            pad_failed |= ((i <= (1+pad)) & (tmp_pad_failed));
           }
-          
+
+      pad_failed |= 1+pad > ((int) ciphertext.size - hash_size);
+
       if (pad_failed)
         pad = 0;
       length = ciphertext.size - hash_size - pad - 1;
