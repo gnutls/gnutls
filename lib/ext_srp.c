@@ -71,6 +71,8 @@ _gnutls_srp_recv_params (gnutls_session_t session, const opaque * data,
     {
       if (data_size > 0)
         {
+          DECR_LEN(data_size, 1);
+
           len = data[0];
           DECR_LEN (data_size, len);
 
