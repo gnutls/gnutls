@@ -191,6 +191,22 @@ generate_temp_rsa_privkey () {
 #  fi
 }
 
+generate_temp_dsa_privkey () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+	bits="$3"
+
+	echo -n "* Generating DSA private key ("${bits}")... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --label temp-dsa-"${bits}" --generate-dsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		RETCODE=0
+		echo ok
+	else
+		echo failed
+		RETCODE=1
+	fi
+}
+
 # $1: token
 # $2: PIN
 delete_temp_privkey () {
@@ -536,6 +552,9 @@ delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-384
 
 generate_temp_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 2048
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" rsa-2048
+
+generate_temp_dsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 3072
+delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" dsa-3072
 
 generate_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 1024
 change_id_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
