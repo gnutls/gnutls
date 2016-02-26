@@ -2137,7 +2137,8 @@ _gnutls_tls_aid_to_sign (const sign_algorithm_st * aid)
 {
   gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
-  if (memcmp(aid, &unknown_tls_aid, sizeof(*aid))==0)
+  if (aid->hash_algorithm == unknown_tls_aid.hash_algorithm &&
+      aid->sign_algorithm == unknown_tls_aid.sign_algorithm)
     return ret;
 
   GNUTLS_SIGN_LOOP (if (p->aid.hash_algorithm == aid->hash_algorithm
@@ -2160,7 +2161,8 @@ _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign)
 
   GNUTLS_SIGN_ALG_LOOP (ret = &p->aid);
 
-  if (ret != NULL && memcmp(ret, &unknown_tls_aid, sizeof(*ret))==0)
+  if (ret != NULL && ret->hash_algorithm == unknown_tls_aid.hash_algorithm &&
+      ret->sign_algorithm == unknown_tls_aid.sign_algorithm)
     return NULL;
 
   return ret;
