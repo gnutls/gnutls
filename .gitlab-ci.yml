@@ -43,7 +43,16 @@ Build and Check with asan:
     && make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
-  - x86-64
   - nettle2
+  except:
+  - tags
+Build and Check with asan:
+  script:
+  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
+    -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
+    && make -j4 && make check -j4
+  - cat tests/test-suite.log
+  tags:
+  - nettle3
   except:
   - tags
