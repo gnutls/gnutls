@@ -69,6 +69,11 @@ AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
 
+AC_ARG_ENABLE(doc,
+  AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
+    enable_doc=$enableval, enable_doc=yes)
+AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
+
 AC_HEADER_STDC
 AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
 AC_DEFINE([HAVE_FLOAT_H], 1, [Hard-code for src/cfg/.])
