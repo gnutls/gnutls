@@ -1472,7 +1472,7 @@ _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
       goto cleanup;
     }
 
-  if (bits % 8 != 0)
+  if (bits % 8 != 0 || bits < 8)
     {
       gnutls_assert ();
       result = GNUTLS_E_CERTIFICATE_ERROR;
