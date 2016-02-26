@@ -33,8 +33,7 @@
 #include <gmp.h>
 #include <nettle/bignum.h>
 #include <random.h>
-
-#define TOMPZ(x) (*((mpz_t*)(x)))
+#include "gnettle.h"
 
 static int
 wrap_nettle_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
@@ -87,17 +86,17 @@ wrap_nettle_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
 static bigint_t
 wrap_nettle_mpi_new (int nbits)
 {
-  mpz_t *p;
+  bigint_t r;
 
-  p = gnutls_malloc (sizeof (*p));
-  if (p == NULL)
+  r = gnutls_malloc (SIZEOF_MPZT);
+  if (r == NULL)
     {
       gnutls_assert ();
       return NULL;
     }
-  mpz_init2 (*p, nbits);
+  mpz_init(TOMPZ(r));
 
-  return p;
+  return r;
 }
 
 static bigint_t

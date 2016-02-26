@@ -43,8 +43,7 @@
 #include <nettle/bignum.h>
 #include <random.h>
 #include <gnutls/crypto.h>
-
-#define TOMPZ(x) (*((mpz_t*)(x)))
+#include "gnettle.h"
 
 static void
 rnd_func (void *_ctx, unsigned length, uint8_t * data)
@@ -56,29 +55,31 @@ static void
 _dsa_params_to_pubkey (const gnutls_pk_params_st * pk_params,
                        struct dsa_public_key *pub)
 {
-  memcpy (&pub->p, pk_params->params[0], sizeof (mpz_t));
-  memcpy (&pub->q, pk_params->params[1], sizeof (mpz_t));
-  memcpy (&pub->g, pk_params->params[2], sizeof (mpz_t));
-  memcpy (&pub->y, pk_params->params[3], sizeof (mpz_t));
+  memcpy (pub->p, pk_params->params[0], SIZEOF_MPZT);
+  if (pk_params->params[1])
+    memcpy (pub->q, pk_params->params[1], SIZEOF_MPZT);
+  memcpy (pub->g, pk_params->params[2], SIZEOF_MPZT);
+  if (pk_params->params[3])
+    memcpy (pub->y, pk_params->params[3], SIZEOF_MPZT);
 }
 
 static void
 _dsa_params_to_privkey (const gnutls_pk_params_st * pk_params,
                         struct dsa_private_key *pub)
 {
-  memcpy (&pub->x, pk_params->params[4], sizeof (mpz_t));
+  memcpy (pub->x, pk_params->params[4], SIZEOF_MPZT);
 }
 
 static void
 _rsa_params_to_privkey (const gnutls_pk_params_st * pk_params,
                         struct rsa_private_key *priv)
 {
-  memcpy (&priv->d, pk_params->params[2], sizeof (mpz_t));
-  memcpy (&priv->p, pk_params->params[3], sizeof (mpz_t));
-  memcpy (&priv->q, pk_params->params[4], sizeof (mpz_t));
-  memcpy (&priv->c, pk_params->params[5], sizeof (mpz_t));
-  memcpy (&priv->a, pk_params->params[6], sizeof (mpz_t));
-  memcpy (&priv->b, pk_params->params[7], sizeof (mpz_t));
+  memcpy (priv->d, pk_params->params[2], SIZEOF_MPZT);
+  memcpy (priv->p, pk_params->params[3], SIZEOF_MPZT);
+  memcpy (priv->q, pk_params->params[4], SIZEOF_MPZT);
+  memcpy (priv->c, pk_params->params[5], SIZEOF_MPZT);
+  memcpy (priv->a, pk_params->params[6], SIZEOF_MPZT);
+  memcpy (priv->b, pk_params->params[7], SIZEOF_MPZT);
 
 }
 
@@ -433,8 +434,8 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
           }
         memset(&pub, 0, sizeof(pub));
         _dsa_params_to_pubkey (pk_params, &pub);
-        memcpy (&sig.r, tmp[0], sizeof (sig.r));
-        memcpy (&sig.s, tmp[1], sizeof (sig.s));
+        memcpy (sig.r, tmp[0], SIZEOF_MPZT);
+        memcpy (sig.s, tmp[1], SIZEOF_MPZT);
 
         hash = _gnutls_dsa_q_to_hash (pub.q, &hash_len);
 
