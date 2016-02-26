@@ -176,13 +176,15 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 int
 gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
 {
-  _set_priority (&session->internals.priorities.protocol, list);
-
   /* set the current version to the first in the chain.
    * This will be overridden later.
    */
   if (list)
-    _gnutls_set_current_version (session, list[0]);
+    {
+      _set_priority (&session->internals.priorities.protocol, list);
+      _gnutls_set_current_version (session, list[0]);
+    }
+    
 
   return 0;
 }
