@@ -13,7 +13,7 @@ Version 2.12.24 (unreleased)
 GNUTLS-SA-2014-2, GNUTLS-SA-2015-1)
 
 ** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
-Karthikeyan Bhargavan.
+Karthikeyan Bhargavan (GNUTLS-SA-2015-2).
 
 ** API and ABI modifications:
 No changes since last version.
