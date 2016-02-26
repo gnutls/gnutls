@@ -2707,7 +2707,6 @@ gnutls_handshake (gnutls_session_t session)
   return 0;
 }
 
-
 #define IMED_RET( str, ret, allow_alert) do { \
 	if (ret < 0) { \
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
@@ -2717,6 +2716,8 @@ gnutls_handshake (gnutls_session_t session)
 		if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
+		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
+		session->internals.invalid_connection = 1; \
 		_gnutls_handshake_hash_buffers_clear(session); \
 		return ret; \
 	} } while (0)
