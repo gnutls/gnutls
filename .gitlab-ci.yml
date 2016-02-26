@@ -21,6 +21,16 @@ Build and Check with asan:
   - nettle3
   except:
   - tags
+Build and Check with ubsan:
+  script:
+  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=undefined -g
+    -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
+    && make -j4 && make check -j4
+  tags:
+  - ubsan
+  - nettle3
+  except:
+  - tags
 Build and Check - separate build dir (x86):
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
