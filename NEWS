@@ -10,6 +10,9 @@ See the end for copying conditions.
 
 ** libgnutls: Corrected leaks and other issues in gnutls_x509_crt_list_import().
 
+** libgnutls: Fixes in DSA key handling for PKCS #11. Report and patches
+   by Jan Vcelak.
+
 ** API and ABI modifications:
 No changes since last version.
 
