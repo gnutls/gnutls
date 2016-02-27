@@ -47,7 +47,7 @@ fi
 rc=1
 counter=1
 
-while [ "${rc}" != "0" -a $counter -le 3 ]; do
+while [ "${rc}" != "0" -a $counter -le 5 ]; do
 	datefudge "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
