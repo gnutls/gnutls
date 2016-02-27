@@ -68,6 +68,19 @@ void fail(const char *format, ...)
 	exit(1);
 }
 
+void fail_ignore(const char *format, ...)
+{
+	char str[1024];
+	va_list arg_ptr;
+
+	va_start(arg_ptr, format);
+	vsnprintf(str, sizeof(str), format, arg_ptr);
+	va_end(arg_ptr);
+	fputs(str, stderr);
+	error_count++;
+	exit(77);
+}
+
 void sec_sleep(int sec)
 {
 	int ret;

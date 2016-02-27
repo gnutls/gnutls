@@ -41,7 +41,6 @@ init_card () {
 		if test $? = 0; then
 			echo "softhsm2-util 2.0.0 is broken"
 			export BROKEN_SOFTHSM2=1
-			exit 77
 		fi
 	fi
 

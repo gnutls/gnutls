@@ -23,7 +23,7 @@
 
 #include <sys/stat.h>
 
-#define SOFTHSM_V1
+#define SOFTHSM_V2
 
 #ifdef SOFTHSM_V1
 # define SOFTHSM_URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
@@ -38,8 +38,8 @@
 # define SOFTHSM_URL "pkcs11:model=SoftHSM%20v2;manufacturer=SoftHSM%20project;token=test"
 # define LIB1 "/usr/lib64/pkcs11/libsofthsm2.so"
 # define LIB2 "/usr/lib/pkcs11/libsofthsm2.so"
-# define LIB3 "/usr/lib/softhsm/libsofthsm.so"
-# define LIB4 "/usr/lib64/softhsm/libsofthsm.so"
+# define LIB3 "/usr/lib/softhsm/libsofthsm2.so"
+# define LIB4 "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so"
 # define SOFTHSM_BIN1 "/usr/bin/softhsm2-util"
 # define SOFTHSM_BIN2 "/usr/local/bin/softhsm2-util"
 # define SOFTHSM_ENV "SOFTHSM2_CONF"
