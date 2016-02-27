@@ -50,6 +50,8 @@ extern const char *pkcs3;
 
 extern void fail(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
+extern void fail_ignore(const char *format, ...)
+    __attribute__ ((format(printf, 1, 2)));
 extern void success(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
 

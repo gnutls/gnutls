@@ -213,8 +213,8 @@ void doit(void)
 			GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|
 			GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 		if (ret < 0) {
-			fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
-			exit(1);
+			/* FIXME: this is a known softhsm v2.0.0 bug - remove this once our testsuite is updated */
+			fail_ignore("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 		}
 
 		gnutls_x509_trust_list_init(&tl, 0);
