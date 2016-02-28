@@ -40,21 +40,14 @@ fi
 
 # Test SHA3 signatures
 
-rc=1
-counter=1
-
-while [ "${rc}" != "0" -a $counter -le 3 ]; do
-	datefudge "2007-04-22" \
-	"${CERTTOOL}" --generate-self-signed \
+datefudge -s "2007-04-22" \
+"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template "${srcdir}/template-test.tmpl" \
 		--outfile "${TMPFILE}" --hash sha3-256 2>/dev/null
 
-	${DIFF} "${srcdir}/template-rsa-sha3-256.pem" "${TMPFILE}" >/dev/null 2>&1
-	rc=$?
-	test ${rc} != 0 && sleep 3
-	counter=`expr $counter + 1`
-done
+${DIFF} "${srcdir}/template-rsa-sha3-256.pem" "${TMPFILE}" >/dev/null 2>&1
+rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
@@ -62,7 +55,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-25" \
+datefudge -s "2007-04-25" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
@@ -71,21 +64,14 @@ if test "${rc}" != "0"; then
 fi
 
 
-rc=1
-counter=1
-
-while [ "${rc}" != "0" -a $counter -le 3 ]; do
-	datefudge "2007-04-22" \
+datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template "${srcdir}/template-test.tmpl" \
 		--outfile "${TMPFILE}" --hash sha3-512 2>/dev/null
 
-	${DIFF} "${srcdir}/template-rsa-sha3-512.pem" "${TMPFILE}" >/dev/null 2>&1
-	rc=$?
-	test ${rc} != 0 && sleep 3
-	counter=`expr $counter + 1`
-done
+${DIFF} "${srcdir}/template-rsa-sha3-512.pem" "${TMPFILE}" >/dev/null 2>&1
+rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
@@ -93,7 +79,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-25" \
+datefudge -s "2007-04-25" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
@@ -103,7 +89,7 @@ fi
 
 # Test SHA3 signatures with ECDSA
 
-datefudge "2007-04-22" \
+datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/template-test-ecc.key" \
 	--template "${srcdir}/template-test.tmpl" \
@@ -116,7 +102,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-25" \
+datefudge -s "2007-04-25" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
@@ -125,7 +111,7 @@ if test "${rc}" != "0"; then
 fi
 
 
-datefudge "2007-04-22" \
+datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/template-test-ecc.key" \
 	--template "${srcdir}/template-test.tmpl" \
@@ -139,7 +125,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-datefudge "2007-04-25" \
+datefudge -s "2007-04-25" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then

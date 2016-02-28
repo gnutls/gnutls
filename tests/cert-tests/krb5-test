@@ -44,21 +44,14 @@ fi
 # time set using datefudge could have changed since the generation
 # (if example the system was busy)
 
-rc=1
-counter=1
-
-while [ "${rc}" != "0" -a $counter -le 5 ]; do
-	datefudge "2007-04-22" \
+datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template "${srcdir}/template-krb5name.tmpl" \
 		--outfile ${OUTFILE} 2>/dev/null
 
-	${DIFF} "${srcdir}/template-krb5name.pem" ${OUTFILE} >/dev/null 2>&1
-	rc=$?
-	test ${rc} != 0 && sleep 3
-	counter=`expr $counter + 1`
-done
+${DIFF} "${srcdir}/template-krb5name.pem" ${OUTFILE} >/dev/null 2>&1
+rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
@@ -70,7 +63,7 @@ fi
 cp template-krb5name.tmpl ${TMPLFILE}
 echo "krb5_principal = 'xxxxxxxxxxxxxx'" >>${TMPLFILE}
 
-datefudge "2007-04-22" \
+datefudge -s "2007-04-22" \
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template ${TMPLFILE} \
@@ -87,7 +80,7 @@ fi
 cp template-krb5name.tmpl ${TMPLFILE}
 echo "krb5_principal = 'comp1/comp2/comp3/comp4/comp5/comp6/comp7/comp8/comp9/comp10@REALM.COM'" >>${TMPLFILE}
 
-datefudge "2007-04-22" \
+datefudge -s "2007-04-22" \
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template ${TMPLFILE} \
