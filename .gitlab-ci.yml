@@ -23,7 +23,7 @@ Build and Check with asan:
   - tags
 Build and Check with ubsan:
   script:
-  - git submodule update --init && make autoreconf && CFLAGS="-fsanitize=undefined -g
+  - git submodule update --init && make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
   tags:
