@@ -40,6 +40,7 @@
 
 static
 char *get_single_token_url(common_info_st * info);
+static char *_saved_url = NULL;
 
 #define FIX(url, out, det, info) \
 	if (url == NULL) { \
@@ -49,7 +50,10 @@ char *get_single_token_url(common_info_st * info);
 			pkcs11_token_list(out, det, info, 1); \
 			exit(1); \
 		} \
+		_saved_url = (void*)url; \
 	}
+
+#define UNFIX gnutls_free(_saved_url);_saved_url = NULL
 
 #define CHECK_LOGIN_FLAG(flag) \
 	if (flag == 0) \
@@ -236,6 +240,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		fprintf(outfile, "\n");
 	}
 
+	UNFIX;
 	return;
 }
 
@@ -338,6 +343,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	gnutls_free(sig.data);
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
+	UNFIX;
 }
 
 void
@@ -382,6 +388,7 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int flags,
 
 	gnutls_pkcs11_obj_deinit(obj);
 
+	UNFIX;
 	return;
 }
 
@@ -479,6 +486,7 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
                 
         } while(1);
         
+	UNFIX;
 	return;
 }
 
@@ -498,8 +506,8 @@ char *get_single_token_url(common_info_st * info)
 
 	ret = gnutls_pkcs11_token_get_url(1, 0, &t);
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-		gnutls_free(url);
 		gnutls_free(t);
+		gnutls_free(url);
 		return NULL;
 	}
 
@@ -698,6 +706,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		}
 
 		gnutls_x509_crt_get_key_usage(xcrt, &key_usage, NULL);
+		gnutls_x509_crt_deinit(xcrt);
 	}
 
 	xkey = load_x509_private_key(0, info);
@@ -712,6 +721,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 				__LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
+		gnutls_x509_privkey_deinit(xkey);
 	}
 
 	xpubkey = load_pubkey(0, info);
@@ -725,6 +735,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 				__LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
+		gnutls_pubkey_deinit(xpubkey);
 	}
 
 	if (xkey == NULL && xcrt == NULL && secret_key == NULL && xpubkey == NULL) {
@@ -733,6 +744,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		exit(1);
 	}
 
+	UNFIX;
 	return;
 }
 
@@ -789,6 +801,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 	fwrite(pubkey.data, 1, pubkey.size, outfile);
 	gnutls_free(pubkey.data);
 
+	UNFIX;
 	return;
 }
 
@@ -837,6 +850,7 @@ pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int
 	fwrite(pubkey.data, 1, pubkey.size, outfile);
 	gnutls_free(pubkey.data);
 
+	UNFIX;
 	return;
 }
 
