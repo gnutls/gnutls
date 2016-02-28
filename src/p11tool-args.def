@@ -402,7 +402,6 @@ flag = {
 flag = {
     name      = provider;
     arg-type  = file;
-    file-exists = yes;
     descrip   = "Specify the PKCS #11 provider library";
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
 };
