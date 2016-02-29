@@ -551,24 +551,22 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 				left = data->size - ((ptrdiff_t)begin_ptr - (ptrdiff_t)data->data);
 
 				ptr += sizeof("-----BEGIN ")-1;
-			}
 
-			if (ptr != NULL) {
 				IF_CHECK_FOR(PEM_KEY_RSA, GNUTLS_PK_RSA, ptr, begin_ptr, left, key)
 				else IF_CHECK_FOR(PEM_KEY_ECC, GNUTLS_PK_EC, ptr, begin_ptr, left, key)
 				else IF_CHECK_FOR(PEM_KEY_DSA, GNUTLS_PK_DSA, ptr, begin_ptr, left, key)
 				else IF_CHECK_FOR(PEM_KEY_RSA_PROVABLE, GNUTLS_PK_RSA, ptr, begin_ptr, left, key)
 				else IF_CHECK_FOR(PEM_KEY_DSA_PROVABLE, GNUTLS_PK_DSA, ptr, begin_ptr, left, key)
-			}
 
-			if (key->pk_algorithm == GNUTLS_PK_UNKNOWN && ptr != NULL && left >= sizeof(PEM_KEY_PKCS8)) {
-				if (memcmp(ptr, PEM_KEY_PKCS8, sizeof(PEM_KEY_PKCS8)-1) == 0) {
-					result =
-					    _gnutls_fbase64_decode(PEM_KEY_PKCS8, begin_ptr,
+				if (key->pk_algorithm == GNUTLS_PK_UNKNOWN && left >= sizeof(PEM_KEY_PKCS8)) {
+					if (memcmp(ptr, PEM_KEY_PKCS8, sizeof(PEM_KEY_PKCS8)-1) == 0) {
+						result =
+						    _gnutls_fbase64_decode(PEM_KEY_PKCS8, begin_ptr,
 							   	   left, &_data);
-					if (result >= 0) {
-						/* signal for PKCS #8 keys */
-						key->pk_algorithm = -1;
+						if (result >= 0) {
+							/* signal for PKCS #8 keys */
+							key->pk_algorithm = -1;
+						}
 					}
 				}
 			}
