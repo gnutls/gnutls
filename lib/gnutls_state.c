@@ -46,6 +46,7 @@
 #include <system.h>
 #include <random.h>
 #include <fips.h>
+#include <intprops.h>
 #include <gnutls/dtls.h>
 
 /* These should really be static, but src/tests.c calls them.  Make
@@ -1428,8 +1429,14 @@ gnutls_session_get_random(gnutls_session_t session,
 
 unsigned int timespec_sub_ms(struct timespec *a, struct timespec *b)
 {
-	return (a->tv_sec * 1000 + a->tv_nsec / (1000 * 1000) -
-		(b->tv_sec * 1000 + b->tv_nsec / (1000 * 1000)));
+	time_t dsecs;
+
+	dsecs = a->tv_sec - b->tv_sec;
+	if (!INT_MULTIPLY_OVERFLOW(dsecs, 1000)) {
+		return (dsecs*1000 + (a->tv_nsec - b->tv_nsec) / (1000 * 1000));
+	} else {
+		return UINT_MAX;
+	}
 }
 
 /**
