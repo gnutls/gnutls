@@ -3000,7 +3000,8 @@ gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
 	}
 
 	*n_list = priv.current;
-	memcpy(p_list, priv.p_list, priv.current*sizeof(p_list[0]));
+	if (p_list)
+		memcpy(p_list, priv.p_list, priv.current*sizeof(p_list[0]));
 	gnutls_free(priv.p_list);
 
 	return 0;
