@@ -41,7 +41,7 @@ u32 _cdk_buftou32(const byte * buf)
 
 	if (!buf)
 		return 0;
-	u = buf[0] << 24;
+	u = ((u32)buf[0]) << 24;
 	u |= buf[1] << 16;
 	u |= buf[2] << 8;
 	u |= buf[3];
