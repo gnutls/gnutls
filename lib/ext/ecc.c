@@ -224,11 +224,18 @@ _gnutls_supported_ecc_pf_recv_params(gnutls_session_t session,
 			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
 		len = data[0];
+		if (len < 1)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+
 		DECR_LEN(data_size, len + 1);
 
 		for (i = 1; i <= len; i++)
-			if (data[i] == 0)	/* uncompressed */
+			if (data[i] == 0) {	/* uncompressed */
 				uncompressed = 1;
+				break;
+			}
 
 		if (uncompressed == 0)
 			return
