@@ -13,6 +13,9 @@ See the end for copying conditions.
 ** libgnutls: Fixes in DSA key handling for PKCS #11. Report and patches
    by Jan Vcelak.
 
+** libgnutls: Several fixes to prevent relying on undefined behavior of C
+   (found with libubsan).
+
 ** API and ABI modifications:
 No changes since last version.
 
