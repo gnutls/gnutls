@@ -417,9 +417,7 @@ static int cert_verify_callback(gnutls_session_t session)
 	unsigned int status = 0;
 	int ssh = ENABLED_OPT(TOFU);
 	int strictssh = ENABLED_OPT(STRICT_TOFU);
-#ifdef HAVE_DANE
 	int dane = ENABLED_OPT(DANE);
-#endif
 	int ca_verify = ENABLED_OPT(CA_VERIFICATION);
 	const char *txt_service;
 
@@ -458,8 +456,8 @@ static int cert_verify_callback(gnutls_session_t session)
 		}
 	}
 
-#ifdef HAVE_DANE
 	if (dane) {		/* try DANE auth */
+#ifdef HAVE_DANE
 		int port;
 		unsigned vflags = 0;
 		unsigned int sflags =
@@ -497,9 +495,12 @@ static int cert_verify_callback(gnutls_session_t session)
 			if (status != 0 && !insecure && !ssh)
 				return -1;
 		}
-
-	}
+#else
+		fprintf(stderr, "*** DANE error: GnuTLS is not compiled with DANE support.\n");
+		if (!insecure && !ssh)
+			return -1;
 #endif
+	}
 
 	if (ssh) {		/* try ssh auth */
 		unsigned int list_size;
