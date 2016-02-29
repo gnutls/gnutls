@@ -11,6 +11,9 @@ See the end for copying conditions.
 ** libgnutls: Follow closely RFC5280 recommendations and use UTCTime for
    dates prior to 2050.
 
+** libgnutls: Several fixes to prevent relying on undefined behavior of C
+   (found with libubsan).
+
 ** API and ABI modifications:
 No changes since last version.
 
