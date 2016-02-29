@@ -578,7 +578,8 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 	if (ctx->cipher->set_iv) {
 		ctx->cipher->set_iv(ctx->ctx_ptr, iv_size, iv);
 	} else {
-		memcpy(ctx->iv, iv, iv_size);
+		if (iv)
+			memcpy(ctx->iv, iv, iv_size);
 		ctx->iv_size = iv_size;
 	}
 
