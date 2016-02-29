@@ -45,6 +45,9 @@ See the end for copying conditions.
 
 ** certtool: Added the --provable option.
 
+** gnutls-cli: The --dane option will cause verification failure if gnutls is not
+   compiled with DANE support.
+
 ** API and ABI modifications:
 GNUTLS_INDEFINITE_TIMEOUT: Added
 GNUTLS_ALPN_SERVER_PRECEDENCE: Added
