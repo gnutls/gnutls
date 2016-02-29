@@ -1851,7 +1851,8 @@ EAPI Eina_Iterator *eina_hash_iterator_tuple_new(const Eina_Hash * hash)
    used by WebCore (http://webkit.org/blog/8/hashtables-part-2/) */
 EAPI int eina_hash_superfast(const char *key, int len)
 {
-	int hash = len, tmp;
+	unsigned hash = len;
+	int tmp;
 	int rem;
 
 	rem = len & 3;
