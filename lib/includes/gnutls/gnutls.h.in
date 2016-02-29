@@ -726,7 +726,7 @@ typedef enum {
 
 /* macros to allow specifying a specific curve in gnutls_privkey_generate()
  * and gnutls_x509_privkey_generate() */
-#define GNUTLS_CURVE_TO_BITS(curve) (unsigned int)((1<<31)|((unsigned int)(curve)))
+#define GNUTLS_CURVE_TO_BITS(curve) (unsigned int)(((unsigned int)1<<31)|((unsigned int)(curve)))
 #define GNUTLS_BITS_TO_CURVE(bits) (((unsigned int)(bits)) & 0x7FFFFFFF)
 #define GNUTLS_BITS_ARE_CURVE(bits) (((unsigned int)(bits)) & 0x80000000)
 
