@@ -24,24 +24,25 @@ set -e
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+TMPFILE1=rsa-md5.$$.tmp
+TMPFILE2=rsa-md5-2.$$.tmp
 
 "${CERTTOOL}" --inder --certificate-info \
-	--infile "${srcdir}/MD5CollisionCA.cer" > ca.pem
+	--infile "${srcdir}/TargetCollidingCertificate1.cer" > $TMPFILE1
 "${CERTTOOL}" --inder --certificate-info \
-	--infile "${srcdir}/TargetCollidingCertificate1.cer" > client1.pem
+	--infile "${srcdir}/TargetCollidingCertificate2.cer" > $TMPFILE2
+
 "${CERTTOOL}" --inder --certificate-info \
-	--infile "${srcdir}/TargetCollidingCertificate2.cer" > client2.pem
+	--infile "${srcdir}/MD5CollisionCA.cer" >> $TMPFILE1
+"${CERTTOOL}" --inder --certificate-info \
+	--infile "${srcdir}/MD5CollisionCA.cer" >> $TMPFILE2
 
-cat client1.pem ca.pem > chain1.pem
-cat client2.pem ca.pem > chain2.pem
-
-"${CERTTOOL}" --verify-chain < chain1.pem | \
+"${CERTTOOL}" --verify-chain < $TMPFILE1 | \
 	grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
-"${CERTTOOL}" --verify-chain < chain2.pem | \
+"${CERTTOOL}" --verify-chain < $TMPFILE2 | \
 	grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
 
-rm -f ca.pem client1.pem client2.pem \
-	chain1.pem chain2.pem
+rm -f $TMPFILE1 $TMPFILE2
 
 # We're done.
 exit 0
