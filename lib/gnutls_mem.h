@@ -32,6 +32,15 @@ void *_gnutls_calloc(size_t nmemb, size_t size);
 char *_gnutls_strdup(const char *);
 void gnutls_memset(void *data, int c, size_t size);
 
+/* To avoid undefined behavior when s1 or s2 are null and n = 0 */
+inline static
+int safe_memcmp(const void *s1, const void *s2, size_t n)
+{
+        if (n == 0)
+                return 0;
+        return memcmp(s1, s2, n);
+}
+
 #define zrelease_mpi_key(mpi) if (*mpi!=NULL) { \
                 _gnutls_mpi_clear(*mpi); \
                 _gnutls_mpi_release(mpi); \

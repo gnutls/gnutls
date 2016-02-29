@@ -216,7 +216,7 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 	}
 
 	if (empty1 != empty2 || 
-	    sp1.size != sp2.size || memcmp(sp1.data, sp2.data, sp1.size) != 0) {
+	    sp1.size != sp2.size || safe_memcmp(sp1.data, sp2.data, sp1.size) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_CERTIFICATE_ERROR;
 		goto cleanup;
@@ -3571,6 +3571,8 @@ gnutls_x509_crt_get_subject_unique_id(gnutls_x509_crt_t crt, char *buf,
 	    _gnutls_x509_read_value(crt->cert,
 				    "tbsCertificate.subjectUniqueID",
 				    &datum);
+	if (result < 0)
+		return gnutls_assert_val(result);
 
 	if (datum.size > *buf_size) {	/* then we're not going to fit */
 		*buf_size = datum.size;
@@ -3614,6 +3616,8 @@ gnutls_x509_crt_get_issuer_unique_id(gnutls_x509_crt_t crt, char *buf,
 	    _gnutls_x509_read_value(crt->cert,
 				    "tbsCertificate.issuerUniqueID",
 				    &datum);
+	if (result < 0)
+		return gnutls_assert_val(result);
 
 	if (datum.size > *buf_size) {	/* then we're not going to fit */
 		*buf_size = datum.size;
