@@ -36,7 +36,7 @@
 
 /**
  * gnutls_openpgp_keyring_init:
- * @keyring: The structure to be initialized
+ * @keyring: A pointer to the type to be initialized
  *
  * This function will initialize an keyring structure.
  *
@@ -54,7 +54,7 @@ int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring_t * keyring)
 
 /**
  * gnutls_openpgp_keyring_deinit:
- * @keyring: The structure to be initialized
+ * @keyring: A pointer to the type to be initialized
  *
  * This function will deinitialize a keyring structure.
  **/
@@ -124,6 +124,7 @@ gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
 	cdk_stream_t input = NULL;
 	size_t raw_len = 0;
 	uint8_t *raw_data = NULL;
+	unsigned free_data = 0;
 
 	if (data->data == NULL || data->size == 0) {
 		gnutls_assert();
@@ -182,6 +183,8 @@ gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
 			err = GNUTLS_E_BASE64_DECODING_ERROR;
 			goto error;
 		}
+
+		free_data = 1;
 	} else {		/* RAW */
 		raw_len = data->size;
 		raw_data = data->data;
@@ -191,6 +194,11 @@ gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
 	    cdk_keydb_new_from_mem(&keyring->db, 0, 0, raw_data, raw_len);
 	if (err)
 		gnutls_assert();
+
+	if (free_data) {
+		err = _gnutls_map_cdk_rc(err);
+		goto error;
+	}
 
 	return _gnutls_map_cdk_rc(err);
 
@@ -251,7 +259,7 @@ int gnutls_openpgp_keyring_get_crt_count(gnutls_openpgp_keyring_t ring)
  * gnutls_openpgp_keyring_get_crt:
  * @ring: Holds the keyring.
  * @idx: the index of the certificate to export
- * @cert: An uninitialized #gnutls_openpgp_crt_t structure
+ * @cert: An uninitialized #gnutls_openpgp_crt_t type
  *
  * This function will extract an OpenPGP certificate from the given
  * keyring.  If the index given is out of range
