@@ -342,7 +342,8 @@ if test "$gl_gcc_warnings" = yes; then
   for w in $ws; do
     gl_WARN_ADD([$w])
   done
-
+  gl_WARN_ADD([-Wno-parentheses-equality]) # We need this one for clang warnings
+  gl_WARN_ADD([-Wno-tautological-compare]) # We need this one for clang warnings
   gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
   gl_WARN_ADD([-Wno-format-y2k])     # Too many warnings for now
   gl_WARN_ADD([-Wno-unused-value]) # warnings for things we don't want to get
