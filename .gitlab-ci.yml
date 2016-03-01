@@ -17,7 +17,6 @@ Build and Check with asan:
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
   tags:
-  - x86-64
   - nettle3
   except:
   - tags
@@ -41,13 +40,12 @@ Build and Check - separate build dir (x86):
   - nettle3
   except:
   - tags
-Build and Check - clang (x86):
+Build and Check - clang:
   script:
   - git submodule update --init && make autoreconf && 
     CC=clang ./configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -C tests -j4
   tags:
-  - x86
   - nettle3
   except:
   - tags
@@ -76,7 +74,6 @@ Build and Check with valgrind:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
     --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
   tags:
-  - x86-64
   - nettle3
   except:
   - tags
