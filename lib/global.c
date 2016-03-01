@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -51,11 +52,18 @@
 # define _DESTRUCTOR __attribute__((destructor))
 #endif
 
+#ifndef _WIN32
 int __attribute__((weak)) _gnutls_global_init_skip(void);
 int _gnutls_global_init_skip(void)
 {
 	return 0;
 }
+#else
+inline static int _gnutls_global_init_skip(void)
+{
+	return 0;
+}
+#endif
 
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
