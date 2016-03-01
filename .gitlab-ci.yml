@@ -36,7 +36,7 @@ Build and Check with valgrind:
   - nettle2
   except:
   - tags
-Build and Check with asan:
+Build and Check with asan (nettle2):
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
@@ -45,7 +45,7 @@ Build and Check with asan:
   - nettle2
   except:
   - tags
-Build and Check with asan:
+Build and Check with asan (nettle3):
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
