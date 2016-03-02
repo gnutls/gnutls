@@ -1,5 +1,5 @@
 GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2000-2015 Free Software Foundation, Inc.
+Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
@@ -47,6 +47,15 @@ See the end for copying conditions.
 
 ** gnutls-cli: The --dane option will cause verification failure if gnutls is not
    compiled with DANE support.
+
+** guile: .go files are now built and installed
+
+** guile: Fix compatibility issue of the test suite with Guile 2.1
+
+** guile: When --with-guile-site-dir is passed, modules are installed in a
+   versioned directory, typically $(datadir)/guile/site/2.0
+
+** guile: Tests no longer leave zombie processes behind
 
 ** API and ABI modifications:
 GNUTLS_INDEFINITE_TIMEOUT: Added
