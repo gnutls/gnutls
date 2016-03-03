@@ -8,10 +8,10 @@ Build and Check - FIPS140-2 (x86-64):
   - nettle2
   except:
   - tags
-Build and Check - with ARCFOUR:
+Build and Check - with SSL3/ARCFOUR:
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
-    --with-arcfour128 --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --enable-seccomp-tests --disable-valgrind-tests --disable-doc && make -j4 && make check -j4
+    --with-ssl3 --with-arcfour128 --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --enable-seccomp-tests --disable-valgrind-tests --disable-doc && make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
   - nettle2
