@@ -14,6 +14,11 @@ See the end for copying conditions.
 ** libgnutls: Several fixes to prevent relying on undefined behavior of C
    (found with libubsan).
 
+** libgnutls: SSL 3.0 is no longer included in the default priorities
+   list. It has to be explicitly enabled, e.g., with a string like
+   "NORMAL:+VERS-SSL3.0". The previous behavior can be restored using
+   the flag --with-ssl3 to configure.
+
 ** API and ABI modifications:
 No changes since last version.
 
