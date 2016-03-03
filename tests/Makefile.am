@@ -96,7 +96,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 rehandshake-switch-cert-client-allow handshake-versions dtls-handshake-versions \
 	 dtls-max-record tls-max-record alpn-server-prec ocsp-filename-memleak \
 	 dh-params rehandshake-ext-secret pcert-list session-export-funcs \
-	 handshake-false-start
+	 handshake-false-start version-checks
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
