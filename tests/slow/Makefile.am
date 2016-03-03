@@ -38,9 +38,11 @@ else
 cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
 endif
 
-ctests = gendh keygen cipher-test
+dist_check_SCRIPTS = test-hash-large
 
-check_PROGRAMS = $(ctests) hash-large
+ctests = gendh keygen cipher-test hash-large
+
+check_PROGRAMS = $(ctests)
 TESTS = $(ctests) test-hash-large
 
 EXTRA_DIST = README
