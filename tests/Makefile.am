@@ -35,7 +35,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h test-chains.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
-	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem
+	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem \
+	cert-common.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -84,7 +85,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-cert-status mini-rsa-psk global-init sec-params \
 	 fips-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr \
-	 crlverify init_fds mini-rehandshake-2 sign-md5-rep global-init-override
+	 crlverify init_fds mini-rehandshake-2 sign-md5-rep global-init-override \
+	 version-checks
 
 if ENABLE_OCSP
 ctests += ocsp
