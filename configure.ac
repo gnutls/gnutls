@@ -358,6 +358,14 @@ if [ test "$enable_arcfour" = "yes" ];then
 fi
 AM_CONDITIONAL(ENABLE_ARCFOUR128, test "$enable_arcfour" = "yes")
 
+AC_ARG_WITH(ssl3,
+  AS_HELP_STRING([--with-ssl3], [include SSL3.0 in priority strings]),
+    enable_ssl3=$withval, enable_ssl3=no)
+if [ test "$enable_ssl3" = "yes" ];then
+  AC_DEFINE([ENABLE_SSL3], 1, [Enable SSL3.0])
+fi
+AM_CONDITIONAL(ENABLE_SSL3, test "$enable_ssl3" = "yes")
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],
