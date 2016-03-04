@@ -40,9 +40,9 @@ endif
 
 dist_check_SCRIPTS = test-hash-large
 
-ctests = gendh keygen cipher-test hash-large
+ctests = gendh keygen cipher-test
 
-check_PROGRAMS = $(ctests)
+check_PROGRAMS = $(ctests) hash-large
 TESTS = $(ctests) test-hash-large
 
 EXTRA_DIST = README
