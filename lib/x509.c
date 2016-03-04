@@ -1311,7 +1311,7 @@ gnutls_certificate_set_trust_list(gnutls_certificate_credentials_t res,
  * deallocated when the @res structure is deinitialized.
  *
  * Since: 3.4.0
- */
+ **/
 void
 gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
                                   gnutls_x509_trust_list_t *tlist)
