@@ -779,7 +779,7 @@ int gnutls_load_file(const char *filename, gnutls_datum_t * data)
  *
  * If the flag %GNUTLS_OCSP_SR_IS_AVAIL is specified, the return
  * value of the function indicates whether an OCSP status response have
- * been received (even if invalid).
+ * been received (even if invalid). The flag was introduced in GnuTLS 3.4.0.
  *
  * Returns: non zero if the response was valid, or a zero if it wasn't sent,
  * or sent and was invalid.
