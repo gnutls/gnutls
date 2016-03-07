@@ -658,7 +658,7 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
  *
  * If the flag %GNUTLS_OCSP_SR_IS_AVAIL is specified, the return
  * value of the function indicates whether an OCSP status response have
- * been received (even if invalid).
+ * been received (even if invalid). The flag was introduced in GnuTLS 3.4.0.
  *
  * Returns: non zero if the response was valid, or a zero if it wasn't sent,
  * or sent and was invalid.
