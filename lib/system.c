@@ -179,7 +179,9 @@ int gnutls_system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 		timeo = -1;
 	else
 		timeo = ms;
-	ret = poll(&pfd, 1, timeo);
+	do {
+		ret = poll(&pfd, 1, timeo);
+	} while(ret == -1 && errno == EINTR);
 #else
 	fd_set rfds;
 	struct timeval _tv, *tv = NULL;
