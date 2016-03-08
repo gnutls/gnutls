@@ -9,7 +9,7 @@ See the end for copying conditions.
    to be used with hashing functions.
 
 ** libgnutls: Follow closely RFC5280 recommendations and use UTCTime for
-   dates prior to 2050.
+   dates prior to 2050. Backported from 3.4.x branch.
 
 ** libgnutls: Several fixes to prevent relying on undefined behavior of C
    (found with libubsan).
