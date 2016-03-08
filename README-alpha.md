@@ -1,4 +1,6 @@
-[![build status](https://ci.gitlab.com/projects/684/status.png?ref=master)](https://gitlab.com/gnutls/gnutls/builds)
+Master [![build status](https://ci.gitlab.com/projects/684/status.png?ref=master)](https://gitlab.com/gnutls/gnutls/builds)
+  3.4.x [![build status](https://ci.gitlab.com/projects/684/status.png?ref=gnutls_3_4_x)](https://gitlab.com/gnutls/gnutls/builds)
+  3.3.x [![build status](https://ci.gitlab.com/projects/684/status.png?ref=gnutls_3_3_x)](https://gitlab.com/gnutls/gnutls/builds)
 
 # GnuTLS -- Information for developers
 
