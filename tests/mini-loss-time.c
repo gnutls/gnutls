@@ -50,7 +50,7 @@ int main()
 #include "utils.h"
 
 /* This program tests whether a DTLS handshake would timeout
- * in a minute.
+ * in the expected time.
  */
 
 static void print_type(const unsigned char *buf, int size)
@@ -116,7 +116,7 @@ push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static void client(int fd)
+static void client(int fd, unsigned timeout)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -136,7 +136,7 @@ static void client(int fd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, 1 * 1000, 30 * 1000);
+	gnutls_dtls_set_timeouts(session, 1 * 1000, timeout * 1000);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
@@ -178,7 +178,7 @@ static void client(int fd)
 /* These are global */
 pid_t child;
 
-static void server(int fd, int packet)
+static void server(int fd, int packet, unsigned timeout)
 {
 	gnutls_anon_server_credentials_t anoncred;
 	gnutls_session_t session;
@@ -196,7 +196,7 @@ static void server(int fd, int packet)
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, 1 * 1000, 30 * 1000);
+	gnutls_dtls_set_timeouts(session, 1 * 1000, timeout * 1000);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -265,17 +265,17 @@ static void start(int server_packet, int wait_server)
 		/* parent */
 		close(fd[0]);
 		if (wait_server)
-			server(fd[1], server_packet);
+			server(fd[1], server_packet, 30);
 		else
-			client(fd[1]);
+			client(fd[1], 30);
 		close(fd[1]);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[1]);
 		if (wait_server)
-			client(fd[0]);
+			client(fd[0], 32);
 		else
-			server(fd[0], server_packet);
+			server(fd[0], server_packet, 32);
 		close(fd[0]);
 		exit(0);
 	}
