@@ -166,11 +166,10 @@ generate_temp_rsa_privkey () {
 	echo -n "* Generating RSA private key ("${bits}")... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --label temp-rsa-"${bits}" --generate-rsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
-		RETCODE=0
 		echo ok
 	else
 		echo failed
-		RETCODE=1
+		exit 1
 	fi
 
 #  if test ${RETCODE} = 0; then
@@ -199,11 +198,10 @@ generate_temp_dsa_privkey () {
 	echo -n "* Generating DSA private key ("${bits}")... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --label temp-dsa-"${bits}" --generate-dsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
-		RETCODE=0
 		echo ok
 	else
 		echo failed
-		RETCODE=1
+		exit 1
 	fi
 }
 
@@ -314,11 +312,10 @@ generate_temp_ecc_privkey () {
 	echo -n "* Generating ECC private key (${bits})... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --label "temp-ecc-${bits}" --generate-ecc --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
-		RETCODE=0
 		echo ok
 	else
 		echo failed
-		RETCODE=1
+		exit 1
 	fi
 }
 
@@ -342,18 +339,16 @@ import_privkey () {
 
 	"${CERTTOOL}" ${CERTTOOL_PARAM} --generate-privkey "${gen_option}" --pkcs8 --password= --outfile "${outfile}" >>"${TMPFILE}" 2>&1
 	if test $? != 0; then
-		RETCODE=1
 		echo failed
-		return
+		exit 1
 	fi
 
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label "${prefix}-${bits}" --load-privkey "${outfile}" "${token}" >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
-		RETCODE=0
 		echo ok
 	else
 		echo failed
-		RETCODE=1
+		exit 1
 	fi
 }
 
