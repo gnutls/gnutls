@@ -34,7 +34,7 @@ No changes since last version.
    "NORMAL:+ARCFOUR-128". The previous behavior can be restored using
    the flag --with-arcfour128 to configure.
 
-** libgnutls: Corrected regression causes by incorrect fix in
+** libgnutls: Corrected regression caused by incorrect fix in
    gnutls_x509_ext_export_key_usage() at 3.3.20 release.
 
 ** API and ABI modifications:
