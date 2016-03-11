@@ -1866,7 +1866,7 @@ static int cert_verify_ocsp(gnutls_session_t session)
 	const gnutls_datum_t *cert_list;
 	unsigned int cert_list_size = 0, ok = 0;
 	unsigned failed = 0;
-	int deinit_issuer = 0, deinit_cert;
+	int deinit_issuer = 0, deinit_cert = 0;
 	gnutls_datum_t resp;
 	unsigned char noncebuf[23];
 	gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
