@@ -40,6 +40,16 @@ Build and Check - separate build dir (x86):
   - nettle3
   except:
   - tags
+Build and ABI-check (x86-64):
+  script:
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
+    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 && make abi-check
+  tags:
+  - x86-64
+  - nettle3
+  - abi-checker
+  except:
+  - tags
 Build and Check - clang:
   script:
   - git submodule update --init && make autoreconf && 
