@@ -1,5 +1,0 @@
-<version>3.2</version>
-<headers>../gnutls3.2/lib/includes/gnutls/</headers>
-<libs>../gnutls3.2/lib/.libs/</libs>
-<skip_symbols>xssl_</skip_symbols>
-<skip_headers>xssl.h</skip_headers>
