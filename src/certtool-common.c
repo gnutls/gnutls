@@ -53,8 +53,14 @@ unsigned long lbuffer_size = 0;
 static unsigned long file_size(FILE *fp)
 {
 	unsigned long size;
-	unsigned long cur = ftell(fp);
-	fseek(fp, 0, SEEK_END);
+	long cur = ftell(fp);
+
+	if (cur == -1)
+		return 0;
+
+	if (fseek(fp, 0, SEEK_END) == -1)
+		return 0;
+
 	size = ftell(fp);
 	fseek(fp, cur, SEEK_SET);
 	return size;
