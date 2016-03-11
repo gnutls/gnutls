@@ -631,7 +631,7 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 	size_t l;
 
 	if (!buf || !buflen)
-		return NULL;
+		return "(error)";
 
 	*buf = 0;
 
@@ -653,7 +653,7 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 
 	if (getnameinfo(sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) !=
 	    0) {	
-		   return NULL;
+		return "(error)";
         }
 
 	l = strlen(buf);
