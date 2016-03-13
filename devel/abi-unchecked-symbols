@@ -23,4 +23,3 @@ _gnutls_buffer_pop_prefix@@GNUTLS_PRIVATE
 _gnutls_buffer_to_datum@@GNUTLS_PRIVATE
 _gnutls_pkcs12_string_to_key@@GNUTLS_PRIVATE
 _gnutls_x509_parse_dn_oid@@GNUTLS_PRIVATE
-gnutls_x509_crl_get_issuer_dn@@GNUTLS_3_4
