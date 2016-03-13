@@ -2425,7 +2425,8 @@ int gnutls_rehandshake(gnutls_session_t session)
  * after the client's side of the handshake is complete. That is,
  * it can be used to send data before gnutls_handshake() completes
  * (i.e., before the peer's Finished message is received)
- * and reduce the handshake to a single round-trip.
+ * and reduce the handshake to a single round-trip. The callback
+ * must only be used to send data using gnutls_record_send().
  *
  * This callback must return 0 on success or a gnutls error code to
  * terminate the handshake. Typically it should include a call to
