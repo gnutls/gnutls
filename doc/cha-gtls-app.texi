@@ -124,6 +124,12 @@ shown below.
   } gnutls_datum_t;
 @end verbatim
 
+In functions where this structure is a returned type, if the function succeeds,
+it is expected from the caller to use @code{gnutls_free()} to deinitialize the
+data element after use, unless otherwise specified. If the function fails, the
+contents of the @code{gnutls_datum_t} should be considered undefined and must
+not be deinitialized.
+
 Other functions that require data for scattered read use a structure similar
 to @code{struct iovec} typically used by @funcintref{readv}. It is shown
 below.
