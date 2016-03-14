@@ -288,13 +288,14 @@ procedure applies to session.
 Many procedures operate on binary data.  For instance,
 @code{pkcs3-import-dh-parameters} expects binary data as input.
 
+@cindex bytevectors
 @cindex SRFI-4
 @cindex homogeneous vector
-
-Binary data is represented on the Scheme side using SRFI-4 homogeneous
-vectors (@pxref{SRFI-4,,, guile, The GNU Guile Reference Manual}).
-Although any type of homogeneous vector may be used, @code{u8vector}s
-(i.e., vectors of bytes) are highly recommended.
+Binary data is represented on the Scheme side using bytevectors
+(@pxref{Bytevectors,,, guile, The GNU Guile Reference Manual}).
+Homogeneous vectors such as SRFI-4 @code{u8vector}s can also be
+used@footnote{Historically, SRFI-4 @code{u8vector}s are the closest
+thing to bytevectors that Guile 1.8 and earlier supported.}.
 
 As an example, generating and then exporting Diffie-Hellman parameters
 in the PEM format can be done as follows:
@@ -385,9 +386,10 @@ applications do their own buffering.
 @findex record-receive!
 
 A lower-level I/O API is provided by @code{record-send} and
-@code{record-receive!} which take an SRFI-4 vector to represent the
-data sent or received.  While it might improve performance, it is much
-less convenient than the above and should rarely be needed.
+@code{record-receive!} which take a bytevector (or a SRFI-4 vector) to
+represent the data sent or received.  While it might improve
+performance, it is much less convenient than the session record port and
+should rarely be needed.
 
 
 @node Exception Handling
