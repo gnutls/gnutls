@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
@@ -650,18 +651,23 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
  * @session: is a gnutls session
  * @flags: should be zero or %GNUTLS_OCSP_SR_IS_AVAIL
  *
- * Check whether an OCSP status response was included in the handshake
- * and whether it was checked and valid (not too old or superseded). 
- * This is a helper function when needing to decide whether to perform an
- * OCSP validity check on the peer's certificate. Should be called after
- * any of gnutls_certificate_verify_peers*() are called.
+ * When flags are zero this function returns non-zero if a valid OCSP status
+ * response was included in the TLS handshake. That is, an OCSP status response
+ * which is not too old or superseded. It returns zero otherwise.
  *
- * If the flag %GNUTLS_OCSP_SR_IS_AVAIL is specified, the return
- * value of the function indicates whether an OCSP status response has
- * been received (even if invalid). The flag was introduced in GnuTLS 3.4.0.
+ * When the flag %GNUTLS_OCSP_SR_IS_AVAIL is specified, the function
+ * returns non-zero if an OCSP status response was included in the handshake
+ * even if it was invalid. Otherwise, if no OCSP status response was included,
+ * it returns zero. The %GNUTLS_OCSP_SR_IS_AVAIL flag was introduced in GnuTLS 3.4.0.
+ *
+ * This is a helper function when needing to decide whether to perform an
+ * explicit OCSP validity check on the peer's certificate. Should be called after
+ * any of gnutls_certificate_verify_peers*() are called.
  *
  * Returns: non zero if the response was valid, or a zero if it wasn't sent,
  * or sent and was invalid.
+ *
+ * Since: 3.1.4
  **/
 int
 gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
