@@ -359,17 +359,27 @@ Once a TLS session is established, data can be communicated through it
 
   ;;
   ;; Initialize the various parameters of SESSION, set up
-  ;; a network connection, etc...
+  ;; a network connection, etc.
   ;;
 
   (let ((i/o (session-record-port session)))
-    (write "Hello peer!" i/o)
+    (display "Hello peer!" i/o)
     (let ((greetings (read i/o)))
 
-      ;; ...
+      ;; @dots{}
 
       (bye session close-request/rdwr))))
 @end example
+
+@c See <http://bugs.gnu.org/22966> for details.
+@cindex buffering
+Note that each write to the session record port leads to the
+transmission of an encrypted TLS ``Application Data'' packet.  In the
+above example, we create an Application Data packet for the 11 bytes for
+the string that we write.  This is not efficient both in terms of CPU
+usage and bandwidth (each packet adds at least 5 bytes of overhead and
+can lead to one @code{write} system call), so we recommend that
+applications do their own buffering.
 
 @findex record-send
 @findex record-receive!
