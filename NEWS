@@ -8,6 +8,12 @@ See the end for copying conditions.
 ** libgnutls: Fixes in DSA key generation under PKCS #11. Report and patches
    by Jan Vcelak.
 
+** certtool: do not require a CA for OCSP signing tag. This follows the
+   recommendations in RFC6960 in 4.2.2.2 which allow a CA to delegate OCSP
+   signing to another certificate without requiring it to be a CA. Reported
+   by Thomas Klute.
+
+
 ** API and ABI modifications:
 No changes since last version.
 
