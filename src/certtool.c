@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -519,6 +520,18 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		if (result)
 			usage |= GNUTLS_KEY_NON_REPUDIATION;
 
+		result = get_ocsp_sign_status();
+		if (result) {
+			result =
+			    gnutls_x509_crt_set_key_purpose_oid
+			    (crt, GNUTLS_KP_OCSP_SIGNING, 0);
+			if (result < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(result));
+				exit(1);
+			}
+		}
+
 		if (ca_status) {
 			result = get_cert_sign_status();
 			if (result)
@@ -542,17 +555,6 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 			crt_constraints_set(crt);
 
-			result = get_ocsp_sign_status();
-			if (result) {
-				result =
-				    gnutls_x509_crt_set_key_purpose_oid
-				    (crt, GNUTLS_KP_OCSP_SIGNING, 0);
-				if (result < 0) {
-					fprintf(stderr, "key_kp: %s\n",
-						gnutls_strerror(result));
-					exit(1);
-				}
-			}
 
 			result = get_time_stamp_status();
 			if (result) {
