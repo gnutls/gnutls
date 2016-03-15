@@ -30,22 +30,17 @@ static int _gnutls_alpn_recv_params(gnutls_session_t session,
 static int _gnutls_alpn_send_params(gnutls_session_t session,
 				    gnutls_buffer_st * extdata);
 
-static int _gnutls_alpn_unpack(gnutls_buffer_st * ps,
-			       extension_priv_data_t * _priv);
-static int _gnutls_alpn_pack(extension_priv_data_t _priv,
-			     gnutls_buffer_st * ps);
 static void _gnutls_alpn_deinit_data(extension_priv_data_t priv);
 
 
 extension_entry_st ext_mod_alpn = {
 	.name = "ALPN",
 	.type = GNUTLS_EXTENSION_ALPN,
-	.parse_type = GNUTLS_EXT_APPLICATION,
+	/* this extension must be parsed even on resumption */
+	.parse_type = GNUTLS_EXT_MANDATORY,
 
 	.recv_func = _gnutls_alpn_recv_params,
 	.send_func = _gnutls_alpn_send_params,
-	.pack_func = _gnutls_alpn_pack,
-	.unpack_func = _gnutls_alpn_unpack,
 	.deinit_func = _gnutls_alpn_deinit_data,
 };
 
@@ -305,45 +300,4 @@ gnutls_alpn_set_protocols(gnutls_session_t session,
 static void _gnutls_alpn_deinit_data(extension_priv_data_t priv)
 {
 	gnutls_free(priv);
-}
-
-static int
-_gnutls_alpn_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
-{
-	alpn_ext_st *priv = epriv;
-	int ret;
-
-	BUFFER_APPEND_PFX4(ps, priv->selected_protocol,
-			   priv->selected_protocol_size);
-
-	return 0;
-}
-
-static int
-_gnutls_alpn_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
-{
-	alpn_ext_st *priv;
-	int ret;
-	extension_priv_data_t epriv;
-
-	priv = gnutls_calloc(1, sizeof(*priv));
-	if (priv == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	BUFFER_POP_NUM(ps, priv->protocol_size[0]);
-	BUFFER_POP(ps, &priv->protocols[0], priv->protocol_size[0]);
-	priv->size++;
-	priv->selected_protocol_size = priv->protocol_size[0];
-	priv->selected_protocol = priv->protocols[0];
-
-	epriv = priv;
-	*_priv = epriv;
-
-	return 0;
-
-      error:
-	gnutls_free(priv);
-	return ret;
 }
