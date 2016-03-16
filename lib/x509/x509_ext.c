@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Free Software Foundation
+ * Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -348,8 +349,10 @@ int gnutls_x509_ext_export_subject_alt_names(gnutls_subject_alt_names_t sans,
  *
  * When the @flags is set to %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, then if 
  * the @nc type is empty this function will behave identically as if the flag was not set.
- * Otherwise if there are elements in the @nc type then only the
- * excluded constraints will be appended to the constraints.
+ * Otherwise if there are elements in the @nc structure then the
+ * constraints will be merged with the existing constraints following
+ * RFC5280 p6.1.4 (excluded constraints will be appended, permitted
+ * will be intersected).
  *
  * Note that @nc must be initialized prior to calling this function.
  *
@@ -364,6 +367,7 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t * ext,
 {
 	int result, ret;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	gnutls_x509_name_constraints_t nc2 = NULL;
 
 	result = asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.NameConstraints", &c2);
@@ -379,8 +383,39 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t * ext,
 		goto cleanup;
 	}
 
-	if (!(flags & GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND)
-	    || (nc->permitted == NULL && nc->excluded == NULL)) {
+	if (flags & GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND &&
+	    (nc->permitted != NULL || nc->excluded != NULL)) {
+		ret = gnutls_x509_name_constraints_init (&nc2);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret =
+		    _gnutls_extract_name_constraints(c2, "permittedSubtrees",
+						     &nc2->permitted);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret =
+		    _gnutls_extract_name_constraints(c2, "excludedSubtrees",
+						     &nc2->excluded);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _gnutls_x509_name_constraints_merge(nc, nc2);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else {
+		_gnutls_name_constraints_node_free(nc->permitted);
+		_gnutls_name_constraints_node_free(nc->excluded);
+
 		ret =
 		    _gnutls_extract_name_constraints(c2, "permittedSubtrees",
 						     &nc->permitted);
@@ -388,20 +423,22 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t * ext,
 			gnutls_assert();
 			goto cleanup;
 		}
-	}
 
-	ret =
-	    _gnutls_extract_name_constraints(c2, "excludedSubtrees",
-					     &nc->excluded);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+		ret =
+		    _gnutls_extract_name_constraints(c2, "excludedSubtrees",
+						     &nc->excluded);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	ret = 0;
 
  cleanup:
 	asn1_delete_structure(&c2);
+	if (nc2)
+		gnutls_x509_name_constraints_deinit (nc2);
 
 	return ret;
 }

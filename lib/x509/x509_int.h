@@ -474,6 +474,9 @@ typedef struct name_constraints_node_st {
 
 int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 				    name_constraints_node_st ** _nc);
+void _gnutls_name_constraints_node_free (name_constraints_node_st *node);
+int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
+					gnutls_x509_name_constraints_t nc2);
 
 void _gnutls_x509_policies_erase(gnutls_x509_policies_t policies, unsigned int seq);
 

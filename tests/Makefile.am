@@ -98,7 +98,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 dtls-max-record tls-max-record alpn-server-prec ocsp-filename-memleak \
 	 dh-params rehandshake-ext-secret pcert-list session-export-funcs \
 	 handshake-false-start version-checks key-material-dtls key-material-set-dtls \
-	 system-prio-file
+	 system-prio-file name-constraints-merge
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -163,6 +163,14 @@ atfork_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 pkcs12_s2k_CPPFLAGS = $(CPPFLAGS) \
+	-I$(top_srcdir)/lib/includes		\
+	-I$(top_builddir)/lib/includes		\
+	-I$(top_srcdir)/lib/minitasn1		\
+	-I$(top_srcdir)/lib			\
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl
+
+name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\

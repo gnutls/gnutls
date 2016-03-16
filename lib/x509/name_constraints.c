@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Free Software Foundation, Inc.
+ * Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -34,6 +35,9 @@
 
 /* Name constraints is limited to DNS names.
  */
+
+static int name_constraints_match(name_constraints_node_st * nc1,
+				  name_constraints_node_st * nc2);
 
 static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc, unsigned type)
 {
@@ -128,6 +132,128 @@ int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 	return ret;
 }
 
+void
+_gnutls_name_constraints_node_free(name_constraints_node_st *node)
+{
+	name_constraints_node_st *next, *t;
+
+	t = node;
+	while (t != NULL) {
+		next = t->next;
+		gnutls_free(t->name.data);
+		gnutls_free(t);
+		t = next;
+	}
+}
+
+static
+int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
+				       name_constraints_node_st * _nc2)
+{
+	name_constraints_node_st *nc, *nc2, *t, *dest = NULL, *prev = NULL;
+	int ret;
+
+	if (*_nc == NULL || _nc2 == NULL)
+		return 0;
+
+	/* For each name in _NC, if a _NC2 does not contain a name
+	 * with the same type, preserve the original name.  */
+	t = nc = *_nc;
+	while (t != NULL) {
+		name_constraints_node_st *next = t->next;
+		nc2 = _nc2;
+		while (nc2 != NULL) {
+			if (t->type == nc2->type)
+				break;
+			nc2 = nc2->next;
+		}
+		if (nc2 == NULL) {
+			/* move node from NC to DEST */
+			if (prev != NULL)
+				prev->next = next;
+			else
+				prev = nc = next;
+			t->next = dest;
+			dest = t;
+		} else {
+			prev = t;
+		}
+		t = next;
+	}
+
+	nc2 = _nc2;
+	while (nc2 != NULL) {
+		t = nc;
+		while (t != NULL) {
+			struct name_constraints_node_st *tmp;
+
+			if (!name_constraints_match(t, nc2)) {
+				t = t->next;
+				continue;
+			}
+
+			/* copy node at NC2 to DEST */
+			tmp = gnutls_malloc(sizeof(struct name_constraints_node_st));
+			if (tmp == NULL) {
+				_gnutls_name_constraints_node_free(dest);
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+
+			tmp->type = nc2->type;
+			ret = _gnutls_set_datum(&tmp->name, nc2->name.data, nc2->name.size);
+			if (ret < 0) {
+				_gnutls_name_constraints_node_free(dest);
+				return gnutls_assert_val(ret);
+			}
+
+			tmp->next = dest;
+			dest = tmp;
+			t = t->next;
+		}
+		nc2 = nc2->next;
+	}
+
+	/* replace the original with the new */
+	_gnutls_name_constraints_node_free(nc);
+	*_nc = dest;
+	return 0;
+}
+
+static
+int _gnutls_name_constraints_append(name_constraints_node_st ** _nc,
+				    name_constraints_node_st * _nc2)
+{
+	name_constraints_node_st *nc, *nc2;
+	struct name_constraints_node_st *tmp;
+	int ret;
+
+	if (_nc2 == NULL)
+		return 0;
+
+	nc2 = _nc2;
+	while (nc2) {
+		nc = *_nc;
+
+		tmp = gnutls_malloc(sizeof(struct name_constraints_node_st));
+		if (tmp == NULL) {
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+
+		tmp->type = nc2->type;
+		ret = _gnutls_set_datum(&tmp->name, nc2->name.data, nc2->name.size);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		tmp->next = nc;
+		*_nc = tmp;
+
+		nc2 = nc2->next;
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_x509_crt_get_name_constraints:
  * @crt: should contain a #gnutls_x509_crt_t type
@@ -140,11 +266,13 @@ int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
  * structure can be used in combination with gnutls_x509_name_constraints_check()
  * to verify whether a server's name is in accordance with the constraints.
  *
- * When the @flags is set to %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, then if 
- * the @nc structure is empty
- * this function will behave identically as if the flag was not set.
- * Otherwise if there are elements in the @nc structure then only the
- * excluded constraints will be appended to the constraints.
+ * When the @flags is set to %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND,
+ * then if the @nc structure is empty this function will behave
+ * identically as if the flag was not set.
+ * Otherwise if there are elements in the @nc structure then the
+ * constraints will be merged with the existing constraints following
+ * RFC5280 p6.1.4 (excluded constraints will be appended, permitted
+ * will be intersected).
  *
  * Note that @nc must be initialized prior to calling this function.
  *
@@ -200,23 +328,9 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
  **/
 void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc)
 {
-	name_constraints_node_st * next, *t;
+	_gnutls_name_constraints_node_free(nc->permitted);
+	_gnutls_name_constraints_node_free(nc->excluded);
 
-	t = nc->permitted;
-	while (t != NULL) {
-		next = t->next;
-		gnutls_free(t->name.data);
-		gnutls_free(t);
-		t = next;
-	}
-
-	t = nc->excluded;
-	while (t != NULL) {
-		next = t->next;
-		gnutls_free(t->name.data);
-		gnutls_free(t);
-		t = next;
-	}
 	gnutls_free(nc);
 }
 
@@ -285,6 +399,46 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
 			nc->excluded = tmp;
 	} else
 		prev->next = tmp;
+
+	return 0;
+}
+
+/*-
+ * _gnutls_x509_name_constraints_merge:
+ * @nc: The nameconstraints
+ * @nc2: The name constraints to be merged with
+ *
+ * This function will merge the provided name constraints structures
+ * as per RFC5280 p6.1.4. That is, the excluded constraints will be appended,
+ * and permitted will be intersected. The intersection assumes that @nc
+ * is the root CA constraints.
+ *
+ * The merged constraints will be placed in @nc.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
+ *
+ * Since: 3.5.0
+ -*/
+int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
+					gnutls_x509_name_constraints_t nc2)
+{
+	int ret;
+
+	ret =
+	    _gnutls_name_constraints_intersect(&nc->permitted,
+					       nc2->permitted);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret =
+	    _gnutls_name_constraints_append(&nc->excluded,
+					    nc2->excluded);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0;
 }
@@ -431,6 +585,22 @@ static unsigned email_matches(const gnutls_datum_t *name, const gnutls_datum_t *
 		return 1; /* match */
 
 	return email_ends_with(name, suffix);
+}
+
+static int
+name_constraints_match(name_constraints_node_st * nc1,
+		       name_constraints_node_st * nc2)
+{
+	if (nc1->type != nc2->type)
+		return 0;
+	switch (nc1->type) {
+	case GNUTLS_SAN_DNSNAME:
+		return dnsname_matches(&nc2->name, &nc1->name);
+	case GNUTLS_SAN_RFC822NAME:
+		return email_matches(&nc2->name, &nc1->name);
+	default:
+		return 0;
+	}
 }
 
 static
