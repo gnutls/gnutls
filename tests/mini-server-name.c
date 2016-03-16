@@ -107,7 +107,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 };
 
 
-static void client(int fd, const char *name)
+static void client(int fd, const char *name, unsigned name_len)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -138,7 +138,7 @@ static void client(int fd, const char *name)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
-	gnutls_server_name_set(session, GNUTLS_NAME_DNS, name, name!=NULL?strlen(name):0);
+	gnutls_server_name_set(session, GNUTLS_NAME_DNS, name, name_len);
 
 	/* Perform the TLS handshake
 	 */
@@ -183,7 +183,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd, const char *name)
+static void server(int fd, const char *name, unsigned name_len)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -255,7 +255,7 @@ static void server(int fd, const char *name)
 			fail("server: did not received expected name\n");
 			exit(1);
 		}
-		if (strlen(name) != buffer_size || strcmp(name, buffer) != 0) {
+		if (name_len != buffer_size || memcmp(name, buffer, name_len) != 0) {
 			fail("server: received name '%s', expected '%s'\n", buffer, name);
 			exit(1);
 		}
@@ -280,7 +280,7 @@ static void server(int fd, const char *name)
 		success("server: finished\n");
 }
 
-static void start(const char *prio)
+static void start(const char *name, unsigned len)
 {
 	int fd[2];
 	int ret;
@@ -301,11 +301,11 @@ static void start(const char *prio)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0], prio);
+		server(fd[0], name, len);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
-		client(fd[1], prio);
+		client(fd[1], name, len);
 		exit(0);
 	}
 }
@@ -331,9 +331,10 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	start(NULL);
-	start("");
-	start("test.example.com");
+	start(NULL, 0);
+	start("", 0);
+	start("test.example.com", strlen("test.example.com"));
+	start("longtest.example.com.", strlen("longtest.example.com"));
 }
 
 #endif				/* _WIN32 */
