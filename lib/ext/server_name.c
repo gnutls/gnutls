@@ -351,6 +351,27 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 	return ret;
 }
 
+#ifdef HAVE_LIBIDN
+static int l_idna_to_ascii (const char *_name, unsigned length, char **output)
+{
+	char *name;
+	int rc;
+
+	name = gnutls_malloc(length+1);
+	if (name == NULL)
+		return IDNA_MALLOC_ERROR;
+
+	memcpy(name, _name, length);
+	name[length] = 0;
+
+	rc = idna_to_ascii_8z (name, output, IDNA_ALLOW_UNASSIGNED);
+
+	gnutls_free(name);
+
+	return rc;
+}
+#endif
+
 /**
  * gnutls_server_name_set:
  * @session: is a #gnutls_session_t type.
@@ -394,7 +415,7 @@ gnutls_server_name_set(gnutls_session_t session,
 	}
 
 #ifdef HAVE_LIBIDN
-	rc = idna_to_ascii_8z (name, &idn_name, IDNA_ALLOW_UNASSIGNED);
+	rc = l_idna_to_ascii (name, name_length, &idn_name);
 	if (rc != IDNA_SUCCESS) {
 		 _gnutls_debug_log("unable to convert name %s to IDNA format: %s\n", (char*)name, idna_strerror(rc));
 		 return GNUTLS_E_IDNA_ERROR;
