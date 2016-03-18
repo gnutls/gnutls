@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Fixes in DSA key generation under PKCS #11. Report and patches
    by Jan Vcelak.
 
+** libgnutls: Corrected behavior of ALPN extension parsing during session
+   resumption. Report and patches by Yuriy M. Kaminskiy.
+
 ** libgnutls: Corrected regression (since 3.4.0) in gnutls_server_name_set()
    which caused it not to accept non-null-terminated hostnames. Reported
    by Tim Ruehsen.
