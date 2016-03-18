@@ -53,15 +53,15 @@ if test -f /etc/debian_version; then
 fi
 
 echo "Compatibility checks using "`${SERV} version`
-${SERV} version|grep -e 1\.0 >/dev/null 2>&1
+${SERV} version|grep -e '1\.0\..' >/dev/null 2>&1
 SV=$?
 if test ${SV} != 0; then
 	echo "OpenSSL 1.0.0 is required for ECDH and DTLS tests"
 	exit 77
 fi
 
-${SERV} version|grep -e 1\.0\.1 >/dev/null 2>&1
-SV2=$?
+${SERV} version|grep -e '[1-9]\.[0-9]\.[1-9]' >/dev/null 2>&1
+NO_TLS1_2=$?
 
 . "${srcdir}/testcompat-common"
 
@@ -228,7 +228,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	kill ${PID}
 	wait
 
-	if test ${SV2} = 0; then
+	if test ${NO_TLS1_2} = 0; then
 		# Tests requiring openssl 1.0.1 - TLS 1.2
 		#-cipher RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA
 		launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1_2 -dhparam "${srcdir}/params.dh" -key "${RSA_KEY}" -cert "${RSA_CERT}" -dkey "${DSA_KEY}" -dcert "${DSA_CERT}" -Verify 1 -CAfile "${CA_CERT}" &
@@ -297,7 +297,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 			kill ${PID}
 			wait
 		fi #FIPS
-	fi #SV2
+	fi #NO_TLS1_2
 
 	#-cipher PSK
 	launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -tls1_2 -keyform pem -certform pem -dhparam "${srcdir}/params.dh" -key "${RSA_KEY}" -cert "${RSA_CERT}" -cipher PSK -psk 9e32cf7786321a828ef7668f09fb35db &
@@ -529,7 +529,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	kill ${PID}
 	wait
 
-	if test ${SV2} = 0; then
+	if test ${NO_TLS1_2} = 0; then
 
 		echo "Check TLS 1.2 with DHE-RSA ciphersuite"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh" &
@@ -629,7 +629,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		kill ${PID}
 		wait
 
-	fi #SV2
+	fi #NO_TLS1_2
 
 	# DTLS
 	echo "Check DTLS 1.0 with RSA ciphersuite"
