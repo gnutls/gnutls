@@ -69,6 +69,7 @@ struct params_res {
 	int enable_session_ticket_server;
 	int enable_session_ticket_client;
 	int expect_resume;
+	int try_alpn;
 };
 
 pid_t child;
@@ -78,6 +79,12 @@ struct params_res resume_tests[] = {
 	 .enable_db = 1,
 	 .enable_session_ticket_server = 0,
 	 .enable_session_ticket_client = 0,
+	 .expect_resume = 1},
+	{.desc = "try to resume from db and check ALPN",
+	 .enable_db = 1,
+	 .enable_session_ticket_server = 0,
+	 .enable_session_ticket_client = 0,
+	 .try_alpn = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from session ticket", 
 	 .enable_db = 0, 
@@ -148,6 +155,53 @@ static int hsk_hook_cb(gnutls_session_t session, unsigned int htype, unsigned po
 	return 0;
 }
 
+static void append_alpn(gnutls_session_t session, struct params_res *params, unsigned alpn_counter)
+{
+	gnutls_datum_t protocol;
+	int ret;
+	char str[64];
+
+	if (!params->try_alpn)
+		return;
+
+	snprintf(str, sizeof(str), "myproto-%d", alpn_counter);
+
+	protocol.data = (void*)str;
+	protocol.size = strlen(str);
+
+	ret = gnutls_alpn_set_protocols(session, &protocol, 1, 0);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
+}
+
+static void verify_alpn(gnutls_session_t session, struct params_res *params, unsigned alpn_counter)
+{
+	int ret;
+	gnutls_datum_t selected;
+	char str[64];
+
+	if (!params->try_alpn)
+		return;
+
+	snprintf(str, sizeof(str), "myproto-%d", alpn_counter);
+
+	ret = gnutls_alpn_get_selected_protocol(session, &selected);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
+
+	if (strlen(str) != selected.size || memcmp(str, selected.data, selected.size) != 0) {
+		fail("expected protocol %s, got %.*s\n", str, selected.size, selected.data);
+		exit(1);
+	}
+
+	if (debug)
+		success("ALPN got: %s\n", str);
+}
+
 static void client(int sds[], struct params_res *params)
 {
 	int ret, ii;
@@ -189,6 +243,7 @@ static void client(int sds[], struct params_res *params)
 						   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH:%NO_TICKETS",
 						   NULL);
 		}
+		append_alpn(session, params, t);
 
 		/* put the anonymous credentials to the current session
 		 */
@@ -231,6 +286,7 @@ static void client(int sds[], struct params_res *params)
 						     &session_data);
 			if (ret < 0)
 				fail("Getting resume data failed\n");
+
 		} else {	/* the second time we connect */
 
 			/* check if we actually resumed the previous session */
@@ -251,6 +307,8 @@ static void client(int sds[], struct params_res *params)
 				}
 			}
 		}
+
+		verify_alpn(session, params, t);
 
 		gnutls_record_send(session, MSG, strlen(MSG));
 
@@ -291,7 +349,6 @@ static void client(int sds[], struct params_res *params)
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
 static gnutls_datum_t session_ticket_key = { NULL, 0 };
 
 static gnutls_session_t initialize_tls_session(struct params_res *params)
@@ -307,7 +364,6 @@ static gnutls_session_t initialize_tls_session(struct params_res *params)
 				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
 				   NULL);
 
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
 	gnutls_dh_set_prime_bits(session, DH_BITS);
 
@@ -326,6 +382,7 @@ static gnutls_session_t initialize_tls_session(struct params_res *params)
 }
 
 static gnutls_dh_params_t dh_params;
+gnutls_anon_server_credentials_t anoncred;
 
 static int generate_dh_params(void)
 {
@@ -340,11 +397,6 @@ static int generate_dh_params(void)
 					     GNUTLS_X509_FMT_PEM);
 }
 
-int err, ret;
-char topbuf[512];
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
-int optval = 1;
 
 static void global_stop(void)
 {
@@ -361,6 +413,9 @@ static void global_stop(void)
 static void server(int sds[], struct params_res *params)
 {
 	size_t t;
+	int ret;
+	gnutls_session_t session;
+	char buffer[MAX_BUF + 1];
 
 	/* this must be called once in the program, it is mostly for the server.
 	 */
@@ -391,6 +446,9 @@ static void server(int sds[], struct params_res *params)
 
 		session = initialize_tls_session(params);
 
+		append_alpn(session, params, t);
+
+		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 		gnutls_transport_set_int(session, sd);
 		gnutls_handshake_set_timeout(session, 20 * 1000);
 		do {
@@ -406,6 +464,8 @@ static void server(int sds[], struct params_res *params)
 		}
 		if (debug)
 			success("server: Handshake was completed\n");
+
+		verify_alpn(session, params, t);
 
 		/* see the Getting peer's information example */
 		/* print_info(session); */
@@ -452,7 +512,7 @@ static void server(int sds[], struct params_res *params)
 
 void doit(void)
 {
-	int i;
+	int i, err;
 
 	signal(SIGCHLD, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
