@@ -606,6 +606,13 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	 * Unconditionally try to parse extensions; safe renegotiation uses them in
 	 * sslv3 and higher, even though sslv3 doesn't officially support them.
 	 */
+	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
+				       &data[pos], len);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_APPLICATION,
 				       &data[pos], len);
 	/* len is the rest of the parsed length */
@@ -619,13 +626,6 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	if (sret < 0 && sret != GNUTLS_E_INT_RET_0) {
 		gnutls_assert();
 		return sret;
-	}
-
-	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
-				       &data[pos], len);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
 	}
 
 	ret =
