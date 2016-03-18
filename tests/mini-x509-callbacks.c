@@ -47,8 +47,33 @@ static int client_callback(gnutls_session_t session)
 	return 0;
 }
 
+static void verify_alpn(gnutls_session_t session)
+{
+	int ret;
+	gnutls_datum_t selected;
+	char str[64];
+
+	snprintf(str, sizeof(str), "myproto");
+
+	ret = gnutls_alpn_get_selected_protocol(session, &selected);
+	if (ret < 0) {
+		fail("gnutls_alpn_get_selected_protocol: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (strlen(str) != selected.size || memcmp(str, selected.data, selected.size) != 0) {
+		fail("expected protocol %s, got %.*s\n", str, selected.size, selected.data);
+		exit(1);
+	}
+
+	if (debug)
+		success("ALPN got: %s\n", str);
+}
+
 static int post_client_hello_callback(gnutls_session_t session)
 {
+	/* verify that the post-client-hello callback has access to ALPN data */
+	verify_alpn(session);
 	pch_ok = 1;
 	return 0;
 }
@@ -164,6 +189,24 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
+static void append_alpn(gnutls_session_t session)
+{
+	gnutls_datum_t protocol;
+	int ret;
+	char str[64];
+
+	snprintf(str, sizeof(str), "myproto");
+
+	protocol.data = (void*)str;
+	protocol.size = strlen(str);
+
+	ret = gnutls_alpn_set_protocols(session, &protocol, 1, 0);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
+}
+
 void doit(void)
 {
 	/* Server stuff. */
@@ -201,6 +244,7 @@ void doit(void)
 	gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
+	append_alpn(server);
 
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
@@ -213,6 +257,7 @@ void doit(void)
 	gnutls_transport_set_ptr(client, client);
 	gnutls_certificate_set_verify_function(clientx509cred,
 					       client_callback);
+	append_alpn(client);
 
 	HANDSHAKE(client, server);
 
