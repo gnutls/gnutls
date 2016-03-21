@@ -10,6 +10,9 @@ typedef struct {
 	struct addrinfo *ptr;
 	struct addrinfo *addr_info;
 	int verbose;
+
+	/* resumption data */
+	gnutls_datum_t rdata;
 } socket_st;
 
 ssize_t socket_recv(const socket_st * socket, void *buffer,

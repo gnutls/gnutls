@@ -881,17 +881,20 @@ static int try_rehandshake(socket_st * hd)
 static int try_resume(socket_st * hd)
 {
 	int ret;
+	gnutls_datum_t rdata = {NULL, 0};
 
-	char *session_data;
-	size_t session_data_size = 0;
-
-	gnutls_session_get_data(hd->session, NULL, &session_data_size);
-	session_data = (char *) malloc(session_data_size);
-	if (session_data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-	gnutls_session_get_data(hd->session, session_data,
-				&session_data_size);
+	if (gnutls_session_is_resumed(hd->session) == 0) {
+		/* not resumed - obtain the session data */
+		ret = gnutls_session_get_data2(hd->session, &rdata);
+		if (ret < 0) {
+			rdata.data = NULL;
+		}
+	} else {
+		/* resumed - try to reuse the previous session data */
+		rdata.data = hd->rdata.data;
+		rdata.size = hd->rdata.size;
+		hd->rdata.data = NULL;
+	}
 
 	printf("- Disconnecting\n");
 	socket_bye(hd);
@@ -904,9 +907,12 @@ static int try_resume(socket_st * hd)
 	        socket_starttls(hd, OPT_ARG(STARTTLS_PROTO));
 
 	hd->session = init_tls_session(hostname);
-	gnutls_session_set_data(hd->session, session_data,
-				session_data_size);
-	free(session_data);
+	if (rdata.data) {
+		hd->rdata.data = rdata.data;
+		hd->rdata.size = rdata.size;
+
+		gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
+	}
 
 	ret = do_handshake(hd);
 	if (ret < 0) {

@@ -311,6 +311,9 @@ void socket_bye(socket_st * socket)
 	shutdown(socket->fd, SHUT_RDWR);	/* no more receptions */
 	close(socket->fd);
 
+	gnutls_free(socket->rdata.data);
+	socket->rdata.data = NULL;
+
 	socket->fd = -1;
 	socket->secure = 0;
 }
@@ -408,6 +411,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	hd->service = strdup(portname);
 	hd->ptr = ptr;
 	hd->addr_info = res;
+	hd->rdata.data = NULL;
 #ifdef HAVE_LIBIDN
 	idn_free(a_hostname);
 #endif
