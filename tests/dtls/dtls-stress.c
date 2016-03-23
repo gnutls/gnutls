@@ -346,8 +346,7 @@ static void _process_error_or_timeout(int loc, int err, time_t tdiff)
 
 static void rperror(const char *name)
 {
-	fprintf(stdout, "%i %s| %s: %s\n", run_id, role_name, name,
-		strerror(errno));
+	fprintf(stdout, "%i %s| %s\n", run_id, role_name, name);
 }
 
 // }}}
