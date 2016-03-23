@@ -495,7 +495,6 @@ static void ask_server(const char *url)
 	}
 
 	_response_info(&resp_data);
-	fprintf(outfile, "\n");
 
 	if (HAVE_OPT(LOAD_TRUST)) {
 		v = _verify_response(&resp_data, n, NULL);
@@ -508,9 +507,10 @@ static void ask_server(const char *url)
 		v = _verify_response(&resp_data, n, issuer);
 	}
 
-	if (HAVE_OPT(OUTFILE) && v == 0) {
+	if (HAVE_OPT(OUTFILE) && (v == 0 || HAVE_OPT(IGNORE_ERRORS))) {
 		fwrite(resp_data.data, 1, resp_data.size, outfile);
 	}
+
 }
 
 int main(int argc, char **argv)
