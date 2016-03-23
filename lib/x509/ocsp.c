@@ -2086,7 +2086,9 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 	signercert = find_signercert(resp);
 	if (!signercert) {
 		signercert = issuer;
-	} else {		/* response contains a signer. Verify him */
+	} else if (!_gnutls_check_if_same_cert(signercert, issuer)) {
+
+		/* response contains a signer. Verify him */
 
 		unsigned int vtmp;
 
