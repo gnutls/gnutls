@@ -23,6 +23,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <signal.h>
 #include <string.h>
 #include <stdarg.h>
 #include <gnutls/gnutls.h>
