@@ -120,6 +120,12 @@ flag = {
     doc      = "";
 };
 
+flag = {
+    name      = ignore-errors;
+    descrip   = "Ignore any verification errors";
+    doc = "";
+};
+
 doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';
