@@ -443,6 +443,7 @@ static void verify_response(gnutls_datum_t *nonce)
 	gnutls_datum_t dat;
 	size_t size;
 	gnutls_x509_crt_t signer;
+	int v;
 
 	if (HAVE_OPT(LOAD_RESPONSE))
 		dat.data =
@@ -458,13 +459,15 @@ static void verify_response(gnutls_datum_t *nonce)
 
 	signer = load_signer();
 
-	_verify_response(&dat, nonce, signer);
+	v = _verify_response(&dat, nonce, signer);
+	if (v)
+		exit(1);
 }
 
 static void ask_server(const char *url)
 {
 	gnutls_datum_t resp_data;
-	int ret, v;
+	int ret, v = 0;
 	gnutls_x509_crt_t cert, issuer;
 	unsigned char noncebuf[23];
 	gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
@@ -511,6 +514,8 @@ static void ask_server(const char *url)
 		fwrite(resp_data.data, 1, resp_data.size, outfile);
 	}
 
+	if (v)
+		exit(1);
 }
 
 int main(int argc, char **argv)
