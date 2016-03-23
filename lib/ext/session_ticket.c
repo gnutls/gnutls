@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2009-2016 Free Software Foundation, Inc.
  *
  * Author: Daiki Ueno
  *
@@ -38,11 +38,15 @@
 
 #ifdef ENABLE_SESSION_TICKETS
 
-#define KEY_NAME_SIZE SESSION_TICKET_KEY_NAME_SIZE
-#define KEY_SIZE SESSION_TICKET_KEY_SIZE
-#define IV_SIZE 12 /* GCM */
+#define KEY_NAME_SIZE 16
+#define CIPHER_KEY_SIZE 32
+#define CIPHER GNUTLS_CIPHER_AES_256_CBC
+#define IV_SIZE 16
+#define BLOCK_SIZE 16
 
-#define TAG_SIZE 16 /* GCM */
+#define MAC_SECRET_SIZE 16
+#define MAC_ALGO GNUTLS_MAC_SHA1
+#define MAC_SIZE 20 /* HMAC-SHA1 */
 
 static int session_ticket_recv_params(gnutls_session_t session,
 				      const uint8_t * data,
@@ -67,9 +71,10 @@ const extension_entry_st ext_mod_session_ticket = {
 	.deinit_func = session_ticket_deinit_data,
 };
 
-#define SESSION_KEY_SIZE (SESSION_TICKET_KEY_NAME_SIZE+SESSION_TICKET_KEY_SIZE)
+#define SESSION_KEY_SIZE (KEY_NAME_SIZE+CIPHER_KEY_SIZE+MAC_SECRET_SIZE)
 #define NAME_POS (0)
-#define KEY_POS (SESSION_TICKET_KEY_NAME_SIZE)
+#define KEY_POS (KEY_NAME_SIZE)
+#define MAC_SECRET_POS (KEY_NAME_SIZE+CIPHER_KEY_SIZE)
 
 typedef struct {
 	int session_ticket_enable;
@@ -86,27 +91,66 @@ struct ticket_st {
 	uint8_t IV[IV_SIZE];
 	uint8_t *encrypted_state;
 	uint16_t encrypted_state_len;
-	uint8_t tag[TAG_SIZE];
+	uint8_t mac[MAC_SIZE];
 };
+
+static
+int digest_ticket(const gnutls_datum_t * key, struct ticket_st *ticket,
+	      uint8_t * digest)
+{
+	mac_hd_st digest_hd;
+	uint16_t length16;
+	int ret;
+
+	ret = _gnutls_mac_init(&digest_hd, mac_to_entry(MAC_ALGO),
+			      key->data, key->size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	_gnutls_mac(&digest_hd, ticket->key_name, KEY_NAME_SIZE);
+	_gnutls_mac(&digest_hd, ticket->IV, IV_SIZE);
+	length16 = _gnutls_conv_uint16(ticket->encrypted_state_len);
+	_gnutls_mac(&digest_hd, &length16, 2);
+	_gnutls_mac(&digest_hd, ticket->encrypted_state,
+		   ticket->encrypted_state_len);
+	_gnutls_mac_deinit(&digest_hd, digest);
+
+	return 0;
+}
 
 static int
 decrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 	       struct ticket_st *ticket)
 {
 	cipher_hd_st cipher_hd;
-	gnutls_datum_t key, IV, state;
-	uint8_t final[TAG_SIZE];
+	gnutls_datum_t key, IV, state, mac_secret;
+	uint8_t cmac[MAC_SIZE];
 	time_t timestamp = gnutls_time(0);
 	int ret;
 
-	/* Decrypt encrypted_state using 128-bit AES in GCM mode. */
+	/* Check the integrity of ticket */
+	mac_secret.data = (void *) &priv->key[MAC_SECRET_POS];
+	mac_secret.size = MAC_SECRET_SIZE;
+	ret = digest_ticket(&mac_secret, ticket, cmac);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (memcmp(ticket->mac, cmac, MAC_SIZE))
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	if (ticket->encrypted_state_len % BLOCK_SIZE != 0)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	/* Decrypt encrypted_state */
 	key.data = (void *) &priv->key[KEY_POS];
-	key.size = KEY_SIZE;
+	key.size = CIPHER_KEY_SIZE;
 	IV.data = ticket->IV;
 	IV.size = IV_SIZE;
 	ret =
 	    _gnutls_cipher_init(&cipher_hd,
-				cipher_to_entry(GNUTLS_CIPHER_AES_128_GCM),
+				cipher_to_entry(CIPHER),
 				&key, &IV, 0);
 	if (ret < 0) {
 		gnutls_assert();
@@ -116,13 +160,6 @@ decrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 				     ticket->encrypted_state_len);
 	if (ret < 0) {
 		gnutls_assert();
-		goto cleanup;
-	}
-	
-	_gnutls_cipher_tag(&cipher_hd, final, TAG_SIZE);
-	if (gnutls_memcmp(ticket->tag, final, TAG_SIZE) != 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_DECRYPTION_FAILED;
 		goto cleanup;
 	}
 
@@ -155,9 +192,9 @@ decrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 
 	ret = 0;
 cleanup:
-        _gnutls_cipher_deinit(&cipher_hd);
-        
-        return ret;
+	_gnutls_cipher_deinit(&cipher_hd);
+
+	return ret;
 
 }
 
@@ -169,6 +206,7 @@ encrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 	gnutls_datum_t key, IV;
 	gnutls_datum_t state = {NULL,0}, encrypted_state = {NULL,0};
 	uint8_t iv[IV_SIZE];
+	gnutls_datum_t mac_secret;
 	uint32_t t;
 	int ret;
 
@@ -179,22 +217,21 @@ encrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 		return ret;
 	}
 
-	encrypted_state.size = state.size;
-	encrypted_state.data = gnutls_malloc(encrypted_state.size);
+	encrypted_state.size = ((state.size + BLOCK_SIZE - 1) / BLOCK_SIZE) * BLOCK_SIZE;
+	encrypted_state.data = gnutls_calloc(1, encrypted_state.size);
 	if (!encrypted_state.data) {
 		gnutls_assert();
 		ret = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
-	memset(encrypted_state.data, 0, encrypted_state.size);
 	memcpy(encrypted_state.data, state.data, state.size);
 
-	/* Encrypt state using 128-bit AES in GCM mode. */
+	/* Encrypt state */
 	key.data = (void *) &priv->key[KEY_POS];
-	key.size = KEY_SIZE;
+	key.size = CIPHER_KEY_SIZE;
 	IV.data = iv;
 	IV.size = IV_SIZE;
-	
+
 	t = gnutls_time(0);
 	memcpy(iv, &t, 4);
 	ret = _gnutls_rnd(GNUTLS_RND_NONCE, iv+4, IV_SIZE-4);
@@ -205,7 +242,7 @@ encrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 
 	ret =
 	    _gnutls_cipher_init(&cipher_hd,
-				cipher_to_entry(GNUTLS_CIPHER_AES_128_GCM),
+				cipher_to_entry(CIPHER),
 				&key, &IV, 1);
 	if (ret < 0) {
 		gnutls_assert();
@@ -218,15 +255,22 @@ encrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 		gnutls_assert();
 		goto cleanup2;
 	}
-	
-	_gnutls_cipher_tag(&cipher_hd, ticket->tag, TAG_SIZE);
+
 
 	/* Fill the ticket structure to compute MAC. */
 	memcpy(ticket->key_name, &priv->key[NAME_POS], KEY_NAME_SIZE);
 	memcpy(ticket->IV, IV.data, IV.size);
 	ticket->encrypted_state_len = encrypted_state.size;
 	ticket->encrypted_state = encrypted_state.data;
-	
+
+	mac_secret.data = &priv->key[MAC_SECRET_POS];
+	mac_secret.size = MAC_SECRET_SIZE;
+	ret = digest_ticket(&mac_secret, ticket, ticket->mac);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup2;
+	}
+
 	encrypted_state.data = NULL;
 
 	ret = 0;
@@ -272,6 +316,13 @@ session_ticket_recv_params(gnutls_session_t session,
 			return 0;
 		}
 
+		/* Format:
+		 *  Key name
+		 *  IV
+		 *  data length
+		 *  encrypted data
+		 *  MAC
+		 */
 		DECR_LEN(data_size, KEY_NAME_SIZE);
 		memcpy(ticket.key_name, data, KEY_NAME_SIZE);
 		data += KEY_NAME_SIZE;
@@ -298,8 +349,8 @@ session_ticket_recv_params(gnutls_session_t session,
 		DECR_LEN(data_size, ticket.encrypted_state_len);
 		data += ticket.encrypted_state_len;
 
-		DECR_LEN(data_size, TAG_SIZE);
-		memcpy(ticket.tag, data, TAG_SIZE);
+		DECR_LEN(data_size, MAC_SIZE);
+		memcpy(ticket.mac, data, MAC_SIZE);
 
 		ticket.encrypted_state =
 		    gnutls_malloc(ticket.encrypted_state_len);
@@ -311,7 +362,10 @@ session_ticket_recv_params(gnutls_session_t session,
 		       ticket.encrypted_state_len);
 
 		ret = decrypt_ticket(session, priv, &ticket);
+
 		gnutls_free(ticket.encrypted_state);
+		ticket.encrypted_state = NULL;
+
 		if (ret < 0) {
 			priv->session_ticket_renew = 1;
 			return 0;
@@ -585,7 +639,7 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 
 		ticket_len =
 		    KEY_NAME_SIZE + IV_SIZE + 2 +
-		    ticket.encrypted_state_len + TAG_SIZE;
+		    ticket.encrypted_state_len + MAC_SIZE;
 
 		bufel =
 		    _gnutls_handshake_alloc(session, 
@@ -618,8 +672,8 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 		gnutls_free(ticket.encrypted_state);
 		p += ticket.encrypted_state_len;
 
-		memcpy(p, ticket.tag, TAG_SIZE);
-		p += TAG_SIZE;
+		memcpy(p, ticket.mac, MAC_SIZE);
+		p += MAC_SIZE;
 
 		data_size = p - data;
 
