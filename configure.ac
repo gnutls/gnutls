@@ -923,6 +923,7 @@ AC_CONFIG_FILES([
   tests/Makefile
   tests/windows/Makefile
   tests/cert-tests/Makefile
+  tests/ocsp-tests/Makefile
   tests/dsa/Makefile
   tests/dtls/Makefile
   tests/srp/Makefile
