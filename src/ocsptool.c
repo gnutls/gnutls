@@ -460,7 +460,7 @@ static void verify_response(gnutls_datum_t *nonce)
 	signer = load_signer();
 
 	v = _verify_response(&dat, nonce, signer);
-	if (v)
+	if (v && !HAVE_OPT(IGNORE_ERRORS))
 		exit(1);
 }
 
@@ -514,7 +514,7 @@ static void ask_server(const char *url)
 		fwrite(resp_data.data, 1, resp_data.size, outfile);
 	}
 
-	if (v)
+	if (v && !HAVE_OPT(IGNORE_ERRORS))
 		exit(1);
 }
 
