@@ -460,6 +460,10 @@ static void verify_response(gnutls_datum_t *nonce)
 	signer = load_signer();
 
 	v = _verify_response(&dat, nonce, signer);
+
+	gnutls_x509_crt_deinit(signer);
+	free(dat.data);
+
 	if (v && !HAVE_OPT(IGNORE_ERRORS))
 		exit(1);
 }
