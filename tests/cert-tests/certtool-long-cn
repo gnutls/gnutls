@@ -25,7 +25,7 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
-outfile=out.$$.pem
+outfile="out.$$.pem"
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
@@ -49,5 +49,7 @@ if test $? != 0;then
 	echo "Error in parsing cert with long CN"
 	exit 1
 fi
+
+rm -f "$outfile"
 
 exit 0
