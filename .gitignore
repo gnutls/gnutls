@@ -807,3 +807,10 @@ tests/mini-server-name
 tests/mini-x509-cert-callback
 tests/sign-md5-rep
 tests/slow/cipher-override2
+tests/windows/cng-windows
+tests/suite/pkcs11-pubkey-import-rsa
+tests/suite/pkcs11-pubkey-import-ecdsa
+tests/slow/hash-large
+tests/session-export-funcs
+tests/key-material-dtls
+tests/version-checks
