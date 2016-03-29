@@ -34,7 +34,7 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	pkcs7-detached.txt p7-combined.out template-generalized.pem \
 	template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
 	name-constraints-ip.pem cert-invalid-utf8.der very-long-dn.pem \
-	template-unique.tmpl template-unique.pem
+	template-unique.tmpl template-unique.pem name-constraints-ip2.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 privkey-import name-constraints certtool-long-cn crl

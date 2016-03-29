@@ -22,10 +22,11 @@
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF=$"{DIFF:-diff}"
+DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
+TMPFILE=tmp.$$.pem
 
 ${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/name-constraints-ip.pem"
 rc=$?
@@ -34,5 +35,23 @@ if test "${rc}" != "0"; then
 	echo "name constraints test 1 failed"
 	exit 1
 fi
+
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/name-constraints-ip2.pem" --outfile "${TMPFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "name constraints test 2 failed"
+	exit 1
+fi
+
+${DIFF} "${TMPFILE}" "${srcdir}/name-constraints-ip2.pem" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "name constraints test 3 failed"
+	exit 1
+fi
+
+rm -f "${TMPFILE}"
 
 exit 0
