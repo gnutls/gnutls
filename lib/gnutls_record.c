@@ -1227,20 +1227,22 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	 * is processed and authenticated to avoid someone
 	 * messing with our windows.
 	 */
-	if (IS_DTLS(session)
-	    && session->internals.no_replay_protection == 0) {
-		ret = _dtls_record_check(record_params, packet_sequence);
-		if (ret < 0) {
-			_gnutls_record_log
-			    ("REC[%p]: Discarded duplicate message[%u.%u]: %s\n",
-			     session,
-			     (unsigned int) record.sequence.i[0] * 256 +
-			     (unsigned int) record.sequence.i[1],
-			     (unsigned int)
-			     _gnutls_uint64touint32(packet_sequence),
-			     _gnutls_packet2str(record.type));
-			goto sanity_check_error;
+	if (IS_DTLS(session)) {
+		if (likely(session->internals.no_replay_protection == 0)) {
+			ret = _dtls_record_check(record_params, packet_sequence);
+			if (ret < 0) {
+				_gnutls_record_log
+				    ("REC[%p]: Discarded duplicate message[%u.%u]: %s\n",
+				     session,
+				     (unsigned int) record.sequence.i[0] * 256 +
+				     (unsigned int) record.sequence.i[1],
+				     (unsigned int)
+				     _gnutls_uint64touint32(packet_sequence),
+				     _gnutls_packet2str(record.type));
+				goto sanity_check_error;
+			}
 		}
+
 		_gnutls_record_log
 		    ("REC[%p]: Decrypted Packet[%u.%u] %s(%d) with length: %d\n",
 		     session,
@@ -1250,6 +1252,10 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		     _gnutls_uint64touint32(packet_sequence),
 		     _gnutls_packet2str(record.type), record.type,
 		     (int) _mbuffer_get_udata_size(decrypted));
+
+		/* store the last valid sequence number. We don't use that internally but
+		 * callers of gnutls_record_get_state() could take advantage of it. */
+		memcpy(&record_state->sequence_number, packet_sequence, 8);
 	} else {
 		_gnutls_record_log
 		    ("REC[%p]: Decrypted Packet[%u] %s(%d) with length: %d\n",
@@ -1258,13 +1264,14 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		     _gnutls_uint64touint32(packet_sequence),
 		     _gnutls_packet2str(record.type), record.type,
 		     (int) _mbuffer_get_udata_size(decrypted));
+
 	}
 
-	/* increase sequence number 
+	/* Increase sequence number. We do both for TLS and DTLS, since in
+	 * DTLS we also rely on that number (roughly) since it may get reported
+	 * to application via gnutls_record_get_state().
 	 */
-	if (!IS_DTLS(session)
-	    && sequence_increment(session,
-				  &record_state->sequence_number) != 0) {
+	if (sequence_increment(session, &record_state->sequence_number) != 0) {
 		session_invalidate(session);
 		gnutls_assert();
 		ret = GNUTLS_E_RECORD_LIMIT_REACHED;
