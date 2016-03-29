@@ -1278,10 +1278,14 @@ gnutls_record_get_state(gnutls_session_t session,
 	else
 		record_state = &record_params->write;
 
-	memcpy(mac_key, &record_state->mac_secret, sizeof(gnutls_datum_t));
-	memcpy(IV, &record_state->IV, sizeof(gnutls_datum_t));
-	memcpy(cipher_key, &record_state->key, sizeof(gnutls_datum_t));
-	memcpy(seq_number, UINT64DATA(record_state->sequence_number), 8);
+	if (mac_key)
+		memcpy(mac_key, &record_state->mac_secret, sizeof(gnutls_datum_t));
+	if (IV)
+		memcpy(IV, &record_state->IV, sizeof(gnutls_datum_t));
+	if (cipher_key)
+		memcpy(cipher_key, &record_state->key, sizeof(gnutls_datum_t));
+	if (seq_number)
+		memcpy(seq_number, UINT64DATA(record_state->sequence_number), 8);
 	return 0;
 }
 
