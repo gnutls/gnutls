@@ -18,6 +18,8 @@ See the end for copying conditions.
    which caused it not to accept non-null-terminated hostnames. Reported
    by Tim Ruehsen.
 
+** libgnutls: Properly print the IP Adress name constraints.
+
 ** certtool: do not require a CA for OCSP signing tag. This follows the
    recommendations in RFC6960 in 4.2.2.2 which allow a CA to delegate OCSP
    signing to another certificate without requiring it to be a CA. Reported
