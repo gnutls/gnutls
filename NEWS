@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.4.11 (unreleased)
 
+** libgnutls: Fixes in gnutls_record_get/set_state() with DTLS. Reported
+   by Fridolin Pokorny.
+
 ** libgnutls: Fixes in DSA key generation under PKCS #11. Report and patches
    by Jan Vcelak.
 
