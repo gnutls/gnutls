@@ -1731,5 +1731,10 @@ gnutls_record_set_state(gnutls_session_t session,
 		record_state = &record_params->write;
 
 	memcpy(UINT64DATA(record_state->sequence_number), seq_number, 8);
+
+	if (IS_DTLS(session)) {
+		_dtls_reset_window(session, seq_number);
+	}
+
 	return 0;
 }
