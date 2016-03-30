@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Corrected behavior of ALPN extension parsing during session
    resumption. Report and patches by Yuriy M. Kaminskiy.
 
+** libgnutls: Properly print the IP Adress name constraints.
+
 ** certtool: do not require a CA for OCSP signing tag. This follows the
    recommendations in RFC6960 in 4.2.2.2 which allow a CA to delegate OCSP
    signing to another certificate without requiring it to be a CA. Reported
