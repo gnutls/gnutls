@@ -139,6 +139,11 @@ int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 	int ret;
 	int fd = GNUTLS_POINTER_TO_INT(ptr);
 
+	if (fd < 0 || fd >= FD_SETSIZE) {
+		errno = EINVAL;
+		return -1;
+	}
+
 	FD_ZERO(&rfds);
 	FD_SET(fd, &rfds);
 
