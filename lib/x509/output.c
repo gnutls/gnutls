@@ -70,39 +70,10 @@ char *ip_to_string(void *_ip, int ip_size, char *string,
 		return inet_ntop(AF_INET6, _ip, string, string_size);
 }
 
-static int bit_count(uint32_t i)
-{
-	int c = 0;
-	unsigned int seen_one = 0;
-
-	while (i > 0) {
-		if (i & 1) {
-			seen_one = 1;
-			c++;
-		} else {
-			if (seen_one) {
-				return -1;
-			}
-		}
-		i >>= 1;
-	}
-
-	return c;
-}
-
-static unsigned mask_to_prefix(uint8_t mask[4])
-{
-	uint32_t m;
-
-	memcpy(&m, mask, 4);
-	m = ntohl(m);
-	return bit_count(m);
-}
-
-static unsigned mask6_to_prefix(uint8_t mask[16])
+static unsigned mask_to_prefix(const uint8_t *mask, unsigned mask_size)
 {
 	unsigned i, c = 0;
-	for (i=0; i<16; i++) {
+	for (i=0; i<mask_size; i++) {
 		if (mask[i] == 0xFF) {
 			c += 8;
 		} else {
@@ -142,12 +113,12 @@ char *cidr_to_string(void *_ip, int ip_size, char *string,
 		p = inet_ntop(AF_INET, ip, tmp, sizeof(tmp));
 
 		if (p)
-			snprintf(string, string_size, "%s/%u", tmp, mask_to_prefix(ip+4));
+			snprintf(string, string_size, "%s/%u", tmp, mask_to_prefix(ip+4, 4));
 	} else {
 		p = inet_ntop(AF_INET6, ip, tmp, sizeof(tmp));
 
 		if (p)
-			snprintf(string, string_size, "%s/%u", tmp, mask6_to_prefix(ip+16));
+			snprintf(string, string_size, "%s/%u", tmp, mask_to_prefix(ip+16, 16));
 	}
 
 	if (p == NULL)
