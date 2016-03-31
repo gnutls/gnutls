@@ -20,6 +20,10 @@ See the end for copying conditions.
    rejected with a "protocol_version" alert message. Reported by Hubert
    Kario (#42).
 
+** libgnutls: Lifted the limitation of calling the gnutls_session_get_data*()
+   functions, only on non-resumed sessions. This brings the API in par with
+   its usage (#79).
+
 ** libgnutls: Consider the max-record TLS extension even when under DTLS.
    Reported by Peter Dettman (#61).
 
