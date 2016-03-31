@@ -130,6 +130,12 @@ flag = {
 };
 
 flag = {
+    name      = verify-allow-broken;
+    descrip   = "Allow broken algorithms, such as MD5 for verification";
+    doc = "This can be combined with --p7-verify, --verify or --verify-chain.";
+};
+
+flag = {
     name      = generate-dh-params;
     descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
     doc = "";

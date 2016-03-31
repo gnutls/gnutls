@@ -2360,6 +2360,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	unsigned int x509_ncerts, x509_ncrls = 0, x509_ncas = 0;
 	gnutls_x509_trust_list_t list;
 	unsigned int output;
+	unsigned vflags;
 
 	ret = gnutls_x509_trust_list_init(&list, 0);
 	if (ret < 0) {
@@ -2467,6 +2468,12 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	fprintf(stdout, "Loaded %d certificates, %d CAs and %d CRLs\n\n",
 		x509_ncerts, x509_ncas, x509_ncrls);
 
+	vflags = GNUTLS_VERIFY_DO_NOT_ALLOW_SAME;
+
+	if (HAVE_OPT(VERIFY_ALLOW_BROKEN))
+		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
+
+
 	if (purpose || hostname || email) {
 		gnutls_typed_vdata_st vdata[2];
 		unsigned vdata_size = 0;
@@ -2495,14 +2502,14 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 						       x509_ncerts,
 						       vdata,
 						       vdata_size,
-						       GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
+						       vflags,
 						       &output,
 						       detailed_verification);
 	} else { 
 		ret =
 		    gnutls_x509_trust_list_verify_crt(list, x509_cert_list,
 						      x509_ncerts,
-						      GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
+						      vflags,
 						      &output,
 						      detailed_verification);
 	}
@@ -2798,6 +2805,7 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_
 	gnutls_typed_vdata_st vdata[2];
 	unsigned vdata_size = 0;
 	gnutls_x509_crt_t signer = NULL;
+	unsigned flags = 0;
 
 	ret = gnutls_pkcs7_init(&pkcs7);
 	if (ret < 0) {
@@ -2886,10 +2894,13 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_
 
 		gnutls_pkcs7_signature_info_deinit(&info);
 
+		if (HAVE_OPT(VERIFY_ALLOW_BROKEN))
+			flags |= GNUTLS_VERIFY_ALLOW_BROKEN;
+
 		if (signer)
-			ret = gnutls_pkcs7_verify_direct(pkcs7, signer, i, detached.data!=NULL?&detached:NULL, 0);
+			ret = gnutls_pkcs7_verify_direct(pkcs7, signer, i, detached.data!=NULL?&detached:NULL, flags);
 		else
-			ret = gnutls_pkcs7_verify(pkcs7, tl, vdata, vdata_size, i, detached.data!=NULL?&detached:NULL, 0);
+			ret = gnutls_pkcs7_verify(pkcs7, tl, vdata, vdata_size, i, detached.data!=NULL?&detached:NULL, flags);
 		if (ret < 0) {
 			fprintf(stderr, "\tSignature status: verification failed: %s\n", gnutls_strerror(ret));
 			ecode = 1;
