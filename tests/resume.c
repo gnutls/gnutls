@@ -72,6 +72,7 @@ struct params_res {
 	int first_no_ext_master;
 	int second_no_ext_master;
 	int try_alpn;
+	int try_resumed_data;
 };
 
 pid_t child;
@@ -81,6 +82,12 @@ struct params_res resume_tests[] = {
 	 .enable_db = 1,
 	 .enable_session_ticket_server = 0,
 	 .enable_session_ticket_client = 0,
+	 .expect_resume = 1},
+	{.desc = "try to resume from db using resumed session's data",
+	 .enable_db = 1,
+	 .enable_session_ticket_server = 0,
+	 .enable_session_ticket_client = 0,
+	 .try_resumed_data = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from db and check ALPN",
 	 .enable_db = 1,
@@ -106,6 +113,12 @@ struct params_res resume_tests[] = {
 	 .enable_db = 0, 
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
+	 .expect_resume = 1},
+	{.desc = "try to resume from session ticket using resumed session's data", 
+	 .enable_db = 0, 
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .try_resumed_data = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from session ticket (ext master secret -> none)", 
 	 .enable_db = 0, 
@@ -330,6 +343,14 @@ static void client(int sds[], struct params_res *params)
 				fail("Getting resume data failed\n");
 
 		} else {	/* the second time we connect */
+			if (params->try_resumed_data) {
+				gnutls_free(session_data.data);
+				ret =
+				    gnutls_session_get_data2(session,
+							     &session_data);
+				if (ret < 0)
+					fail("Getting resume data failed\n");
+			}
 
 			/* check if we actually resumed the previous session */
 			if (gnutls_session_is_resumed(session) != 0) {
@@ -493,6 +514,7 @@ static void server(int sds[], struct params_res *params)
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 		gnutls_transport_set_int(session, sd);
 		gnutls_handshake_set_timeout(session, 20 * 1000);
+
 		do {
 			ret = gnutls_handshake(session);
 		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
