@@ -49,6 +49,7 @@
 #include <fips.h>
 #include <intprops.h>
 #include <gnutls/dtls.h>
+#include "dtls.h"
 
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
