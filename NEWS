@@ -47,7 +47,7 @@ See the end for copying conditions.
 
 ** certtool: Added the ability to sign certificates using SHA3.
 
-** certtool: Added the --provable option.
+** certtool: Added the --provable and --verify-allow-broken options.
 
 ** gnutls-cli: The --dane option will cause verification failure if gnutls is not
    compiled with DANE support.
