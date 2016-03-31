@@ -34,8 +34,6 @@
  * Returns all session parameters needed to be stored to support resumption.
  * The client should call this, and store the returned session data. A session
  * may be resumed later by calling gnutls_session_set_data().  
- * This function must be called after a successful (full) handshake. It should
- * not be used in already resumed sessions --see gnutls_session_is_resumed().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -48,12 +46,7 @@ gnutls_session_get_data(gnutls_session_t session,
 	gnutls_datum_t psession;
 	int ret;
 
-	if (session->internals.resumable == RESUME_FALSE)
-		return GNUTLS_E_INVALID_SESSION;
-
-	psession.data = session_data;
-
-	ret = _gnutls_session_pack(session, &psession);
+	ret = gnutls_session_get_data2(session, &psession);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -84,8 +77,6 @@ gnutls_session_get_data(gnutls_session_t session,
  * Returns all session parameters needed to be stored to support resumption.
  * The client should call this, and store the returned session data. A session
  * may be resumed later by calling gnutls_session_set_data().  
- * This function must be called after a successful (full) handshake. It should
- * not be used in already resumed sessions --see gnutls_session_is_resumed().
  *
  * The returned @data are allocated and must be released using gnutls_free().
  *
@@ -93,13 +84,21 @@ gnutls_session_get_data(gnutls_session_t session,
  *   an error code is returned.
  **/
 int
-gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t * data)
+gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
 {
 
 	int ret;
 
 	if (data == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	if (gnutls_session_is_resumed(session) && session->internals.resumption_data.data) {
+		ret = _gnutls_set_datum(data, session->internals.resumption_data.data, session->internals.resumption_data.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		return 0;
 	}
 
 	if (session->internals.resumable == RESUME_FALSE)
@@ -219,6 +218,10 @@ gnutls_session_set_data(gnutls_session_t session,
 	}
 
 	session->internals.resumption_requested = 1;
+
+	if (session->internals.resumption_data.data != NULL)
+		gnutls_free(session->internals.resumption_data.data);
+	_gnutls_set_datum(&session->internals.resumption_data, session_data, session_data_size);
 
 	return 0;
 }

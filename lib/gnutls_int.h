@@ -789,6 +789,7 @@ typedef struct {
 	bool resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */
 	bool resumption_requested;	/* non-zero if resumption was requested by client */
 	security_parameters_st resumed_security_parameters;
+	gnutls_datum_t resumption_data; /* copy of input to gnutls_session_set_data() */
 
 	/* These buffers are used in the handshake
 	 * protocol only. freed using _gnutls_handshake_io_buffer_clear();

@@ -504,6 +504,8 @@ void gnutls_deinit(gnutls_session_t session)
 	_mbuffer_head_clear(&session->internals.record_recv_buffer);
 	_mbuffer_head_clear(&session->internals.record_send_buffer);
 
+	_gnutls_free_datum(&session->internals.resumption_data);
+
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
 
