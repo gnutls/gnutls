@@ -35,7 +35,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
-	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd
+	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
+	system.prio
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -96,7 +97,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 rehandshake-switch-cert-client-allow handshake-versions dtls-handshake-versions \
 	 dtls-max-record tls-max-record alpn-server-prec ocsp-filename-memleak \
 	 dh-params rehandshake-ext-secret pcert-list session-export-funcs \
-	 handshake-false-start version-checks key-material-dtls key-material-set-dtls
+	 handshake-false-start version-checks key-material-dtls key-material-set-dtls \
+	 system-prio-file
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -183,6 +185,7 @@ TESTS_ENVIRONMENT =						\
 	PKCS12PASSWORD_2=""					\
 	PKCS12PATH=$(srcdir)/pkcs12-decode/			\
 	X509CERTDIR=$(srcdir)/x509cert-dir/			\
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/system.prio	\
 	PSK_FILE=$(srcdir)/psk.passwd				\
 	EXEEXT=$(EXEEXT)					\
 	top_builddir="$(top_builddir)"				\
