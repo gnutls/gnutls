@@ -38,6 +38,7 @@
 #include <atfork.h>
 #include <system-keys.h>
 #include "str.h"
+#include "global.h"
 
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
@@ -356,6 +357,7 @@ int gnutls_global_init(void)
 
 	_gnutls_register_accel_crypto();
 	_gnutls_cryptodev_init();
+	_gnutls_load_system_priorities();
 
 #ifdef ENABLE_FIPS140
 	/* These self tests are performed on the overriden algorithms
@@ -406,6 +408,7 @@ static void _gnutls_global_deinit(unsigned destructor)
 		_gnutls_cryptodev_deinit();
 
 		_gnutls_supplemental_deinit();
+		_gnutls_unload_system_priorities();
 
 #ifdef ENABLE_PKCS11
 		/* Do not try to deinitialize the PKCS #11 libraries

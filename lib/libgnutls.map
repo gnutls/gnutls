@@ -1130,8 +1130,9 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_mpi_ops;
 	_gnutls_mpi_log;
 	_gnutls_mpi_release;
-	# Internal symbols needed by tests/pkcs12_s2k:
+	# Internal symbols needed by tests/:
 	_gnutls_pkcs12_string_to_key;
 	_gnutls_bin2hex;
 	_gnutls_mac_to_entry;
+	_gnutls_resolve_priorities;
 };

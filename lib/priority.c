@@ -34,6 +34,7 @@
 
 #define MAX_ELEMENTS 64
 
+char *_gnutls_resolve_priorities(const char* priorities);
 static void prio_remove(priority_st * priority_list, unsigned int algo);
 static void prio_add(priority_st * priority_list, unsigned int algo);
 static void
@@ -892,6 +893,40 @@ static char *check_str(char *line, size_t line_size, const char *needle, size_t 
 	return NULL;
 }
 
+static const char *system_priority_file = SYSTEM_PRIORITY_FILE;
+static char *system_priority_buf = NULL;
+static size_t system_priority_buf_size = 0;
+
+void _gnutls_load_system_priorities(void)
+{
+	gnutls_datum_t data;
+	const char *p;
+	int ret;
+
+	p = getenv("GNUTLS_SYSTEM_PRIORITY_FILE");
+	if (p != NULL)
+		system_priority_file = p;
+
+#ifdef HAVE_FMEMOPEN
+	ret = gnutls_load_file(system_priority_file, &data);
+	if (ret < 0)
+		return;
+
+	system_priority_buf = (char*)data.data;
+	system_priority_buf_size = data.size;
+#endif
+	return;
+}
+
+void _gnutls_unload_system_priorities(void)
+{
+#ifdef HAVE_FMEMOPEN
+	gnutls_free(system_priority_buf);
+#endif
+	system_priority_buf = NULL;
+	system_priority_buf_size = 0;
+}
+
 /* Returns the new priorities if SYSTEM is specified in
  * an allocated string, or just a copy of the provided
  * priorities, appended with any additional present in
@@ -899,7 +934,7 @@ static char *check_str(char *line, size_t line_size, const char *needle, size_t 
  *
  * The returned string must be released using free().
  */
-static char *resolve_priorities(const char* priorities)
+char *_gnutls_resolve_priorities(const char* priorities)
 {
 char *p = (char*)priorities;
 char *additional = NULL;
@@ -924,7 +959,11 @@ size_t n, n2 = 0, line_size;
 			ss_len = strlen(ss);
 		}
 
-		fp = fopen(SYSTEM_PRIORITY_FILE, "r");
+#ifdef HAVE_FMEMOPEN
+		fp = fmemopen(system_priority_buf, system_priority_buf_size, "r");
+#endif
+		if (fp == NULL)
+			fp = fopen(system_priority_file, "r");
 		if (fp == NULL) {/* fail */
 			ret = NULL;
 			goto finish;
@@ -1095,7 +1134,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	if (priorities == NULL)
 		priorities = "NORMAL";
 
-	darg = resolve_priorities(priorities);
+	darg = _gnutls_resolve_priorities(priorities);
 	if (darg == NULL) {
 		gnutls_assert();
 		goto error;
