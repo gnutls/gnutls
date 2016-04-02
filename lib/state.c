@@ -318,12 +318,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
  * be allocated.  This function allocates structures which can only
  * be free'd by calling gnutls_deinit().  Returns %GNUTLS_E_SUCCESS (0) on success.
  *
- * @flags can be one of %GNUTLS_CLIENT, %GNUTLS_SERVER, %GNUTLS_DATAGRAM,
- * %GNUTLS_NONBLOCK or %GNUTLS_NOSIGNAL (since 3.4.2).
- *
- * The flag %GNUTLS_NO_REPLAY_PROTECTION will disable any 
- * replay protection in DTLS mode. That must only used when 
- * replay protection is achieved using other means.
+ * @flags can be any of %gnutls_init_flags_t.
  *
  * Note that since version 3.1.2 this function enables some common
  * TLS extensions such as session tickets and OCSP certificate status
