@@ -37,7 +37,7 @@
 #include <ocsptool-common.h>
 
 #define MAX_BUF 4*1024
-#define HEADER_PATTERN "POST /%s HTTP/1.1\r\n" \
+#define HEADER_PATTERN "POST /%s HTTP/1.0\r\n" \
   "Host: %s\r\n" \
   "Accept: */*\r\n" \
   "Content-Type: application/ocsp-request\r\n" \
