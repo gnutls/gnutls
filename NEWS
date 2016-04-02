@@ -10,6 +10,10 @@ See the end for copying conditions.
 
 ** libgnutls: Properly print the IP Adress name constraints.
 
+** ocsptool: use HTTP/1.0 for requests. This avoids issue with servers
+   serving chunk encoding which ocsptool doesn't support. Reported by Thomas
+   Klute.
+
 ** certtool: do not require a CA for OCSP signing tag. This follows the
    recommendations in RFC6960 in 4.2.2.2 which allow a CA to delegate OCSP
    signing to another certificate without requiring it to be a CA. Reported
