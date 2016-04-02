@@ -17,6 +17,13 @@ The rules here are not always used, although we try to stick to them.
  to the main TLS protocol implementation.
 
 
+*** C dialect:
+  While parts of GnuTLS were written in older dialects, new code
+ in GnuTLS are expected to conform to C99. Exceptions could be made
+ for C99 features that are not supported in popular platforms on a
+ case by case basis.
+
+
 *** Indentation style:
   In general, use the Linux coding style.  You may indent the source
   using GNU indent, e.g. "indent -linux *.c".
