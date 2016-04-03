@@ -46,7 +46,7 @@ __attribute__((visibility("hidden")))
 #elif defined(__SUNPRO_C)
 __hidden
 #endif
-unsigned int _gnutls_x86_cpuid_s[3];
+unsigned int _gnutls_x86_cpuid_s[4];
 
 #ifndef bit_PCLMUL
 # define bit_PCLMUL 0x2
