@@ -814,3 +814,6 @@ tests/slow/hash-large
 tests/session-export-funcs
 tests/key-material-dtls
 tests/version-checks
+tests/system-prio-file
+tests/name-constraints-merge
+tests/key-material-set-dtls
