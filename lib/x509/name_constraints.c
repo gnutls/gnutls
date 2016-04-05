@@ -254,6 +254,10 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
 		type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI && type != GNUTLS_SAN_IPADDRESS)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (type == GNUTLS_SAN_IPADDRESS && (name->size != 8 && name->size != 32)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
 	if (permitted != 0)
 		prev = tmp = nc->permitted;
 	else
@@ -296,7 +300,10 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
  * @name: The data of the constraints
  *
  * This function will add a name constraint to the list of permitted
- * constraints.
+ * constraints. The constraints @type can be any of the following types:
+ * %GNUTLS_SAN_DNSNAME, %GNUTLS_SAN_RFC822NAME, %GNUTLS_SAN_DN,
+ * %GNUTLS_SAN_URI, %GNUTLS_SAN_IPADDRESS. For the latter, an IP address
+ * in network byte order is expected, followed by its network mask.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
@@ -316,7 +323,11 @@ int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc
  * @name: The data of the constraints
  *
  * This function will add a name constraint to the list of excluded
- * constraints.
+ * constraints. The constraints @type can be any of the following types:
+ * %GNUTLS_SAN_DNSNAME, %GNUTLS_SAN_RFC822NAME, %GNUTLS_SAN_DN,
+ * %GNUTLS_SAN_URI, %GNUTLS_SAN_IPADDRESS. For the latter, an IP address
+ * in network byte order is expected, followed by its network mask (which is
+ * 4 bytes in IPv4 or 16-bytes in IPv6).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
