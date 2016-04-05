@@ -35,6 +35,10 @@ See the end for copying conditions.
    applications which do not check user credentials on rehandshakes from
    attacks related to unsafe renegotiation.
 
+** libgnutls: Follow RFC5280 strictly in name constraints computation. The
+   permitted subtrees is intersected with any previous values. Report and
+   patch by Daiki Ueno.
+
 ** libgnutls: Enforce the RFC 7627 (extended master secret) requirements on
    session resumption. Reported by Hubert Kario (#69).
 
