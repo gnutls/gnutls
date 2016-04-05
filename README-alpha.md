@@ -26,7 +26,7 @@ We require several tools to check out and build the software, including:
 * [Guile](http://www.gnu.org/software/guile/)
 * [p11-kit](http://p11-glue.freedesktop.org/p11-kit.html)
 * [gperf](http://www.gnu.org/software/gperf/)
-* [libtasn1](http://josefsson.org/libtasn1/) (optional)
+* [libtasn1](https://www.gnu.org/software/libtasn1/) (optional)
 * [Libidn](http://www.gnu.org/software/libidn/) (optional, for internationalization of DNS)
 * [AWK](http://www.gnu.org/software/awk/) (for make dist, pmccabe2html)
 * [git2cl](http://savannah.nongnu.org/projects/git2cl/) (for make dist, ChangeLog)
