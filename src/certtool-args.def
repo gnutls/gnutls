@@ -935,6 +935,11 @@ encryption_key
 # Exclude all e-mail addresses of example.com
 #nc_exclude_email = example.com
 
+# IP
+#nc_permit_ip = 192.168.0.0/16
+#nc_exclude_ip = 192.168.5.0/24
+#nc_permit_ip = fc0a:eef2:e7e7:a56e::/64
+
 
 # Options for proxy certificates
 #proxy_policy_language = 1.3.6.1.5.5.7.21.1

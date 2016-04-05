@@ -90,8 +90,10 @@ static struct cfg_options available_options[] = {
 	{ .name = "xmpp_name", .type = OPTION_MULTI_LINE },
 	{ .name = "key_purpose_oid", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_exclude_dns", .type = OPTION_MULTI_LINE },
+	{ .name = "nc_exclude_ip", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_exclude_email", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_permit_dns", .type = OPTION_MULTI_LINE },
+	{ .name = "nc_permit_ip", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_permit_email", .type = OPTION_MULTI_LINE },
 	{ .name = "dn_oid", .type = OPTION_MULTI_LINE },
 	{ .name = "crl_dist_points", .type = OPTION_MULTI_LINE },
@@ -167,6 +169,8 @@ typedef struct _cfg_ctx {
 	char **other_name_octet;
 	char **xmpp_name;
 	char **dn_oid;
+	char **permitted_nc_ip;
+	char **excluded_nc_ip;
 	char **permitted_nc_dns;
 	char **excluded_nc_dns;
 	char **permitted_nc_email;
@@ -468,8 +472,10 @@ int template_parse(const char *template)
 	READ_MULTI_LINE("email", cfg.email);
 	READ_MULTI_LINE("key_purpose_oid", cfg.key_purpose_oids);
 
+	READ_MULTI_LINE("nc_exclude_ip", cfg.excluded_nc_ip);
 	READ_MULTI_LINE("nc_exclude_dns", cfg.excluded_nc_dns);
 	READ_MULTI_LINE("nc_exclude_email", cfg.excluded_nc_email);
+	READ_MULTI_LINE("nc_permit_ip", cfg.permitted_nc_ip);
 	READ_MULTI_LINE("nc_permit_dns", cfg.permitted_nc_dns);
 	READ_MULTI_LINE("nc_permit_email", cfg.permitted_nc_email);
 
@@ -926,6 +932,103 @@ void get_dn_crt_set(gnutls_x509_crt_t crt)
 	}
 }
 
+static void prefix_to_mask6(unsigned prefix, uint8_t mask[16])
+{
+	int i, j;
+
+	memset(mask, 0, 16);
+
+	for (i = prefix, j = 0; i > 0; i -= 8, j++) {
+		if (i >= 8) {
+			mask[j] = 0xff;
+		} else {
+			mask[j] = (unsigned long)(0xffU << (8 - i));
+		}
+	}
+
+	return;
+}
+
+static void prefix_to_mask4(unsigned prefix, uint8_t _mask[4])
+{
+	uint32_t mask;
+
+	mask = htonl(~((1 << (32 - prefix)) - 1));
+	memcpy(_mask, &mask, 4);
+}
+
+static void mask_ip(uint8_t *ip, uint8_t *mask, unsigned size)
+{
+	unsigned i;
+	for (i=0;i<size;i++)
+		ip[i] &= mask[i];
+}
+
+/* converts an IP to the format RFC5280 expects it */
+static void cidr_to_datum(char *ip, gnutls_datum_t *res)
+{
+	int prefix = -1;
+	uint8_t out[32];
+	int ret;
+	char *p;
+
+	p = strchr(ip, '/');
+	if (p != NULL) {
+		prefix = atoi(p+1);
+		if (prefix == 0) {
+			fprintf(stderr, "Invalid prefix given for %s\n", ip);
+			exit(1);
+		}
+		*p = 0;
+	}
+
+	if (strchr(ip, ':') != 0) { /* IPv6 */
+		if (prefix == -1)
+			prefix = 128;
+
+		if (prefix == 0 || prefix > 128) {
+			fprintf(stderr, "Invalid IPv6 prefix (%d)\n", prefix);
+			exit(1);
+		}
+
+		ret = inet_pton(AF_INET6, ip, out);
+		if (ret == 0) {
+			fprintf(stderr, "Error parsing IPv6 %s\n", ip);
+			exit(1);
+		}
+
+		prefix_to_mask6(prefix, &out[16]);
+		mask_ip(out, &out[16], 16);
+		res->size = 32;
+	} else {
+		if (prefix == -1)
+			prefix = 32;
+
+		if (prefix == 0 || prefix > 32) {
+			fprintf(stderr, "Invalid IPv4 prefix (%d)\n", prefix);
+			exit(1);
+		}
+
+		ret = inet_pton(AF_INET, ip, out);
+		if (ret == 0) {
+			fprintf(stderr, "Error parsing IPv4 %s\n", ip);
+			exit(1);
+		}
+
+		prefix_to_mask4(prefix, &out[4]);
+		mask_ip(out, &out[4], 4);
+		res->size = 8;
+	}
+
+	res->data = malloc(res->size);
+	if (res->data == NULL) {
+		fprintf(stderr, "memory error\n");
+		exit(1);
+	}
+
+	memcpy(res->data, out, res->size);
+}
+
 void crt_constraints_set(gnutls_x509_crt_t crt)
 {
 	int ret;
@@ -935,13 +1038,38 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 
 	if (batch) {
 		if (cfg.permitted_nc_dns == NULL && cfg.permitted_nc_email == NULL &&
-			cfg.excluded_nc_dns == NULL && cfg.excluded_nc_email == NULL)
+			cfg.excluded_nc_dns == NULL && cfg.excluded_nc_email == NULL &&
+			cfg.permitted_nc_ip == NULL && cfg.excluded_nc_ip == NULL)
 			return; /* nothing to do */
 
 		ret = gnutls_x509_name_constraints_init(&nc);
 		if (ret < 0) {
 			fprintf(stderr, "nc_init: %s\n", gnutls_strerror(ret));
 			exit(1);
+		}
+
+		if (cfg.permitted_nc_ip) {
+			for (i = 0; cfg.permitted_nc_ip[i] != NULL; i++) {
+				cidr_to_datum(cfg.permitted_nc_ip[i], &name);
+				ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_IPADDRESS, &name);
+				if (ret < 0) {
+					fprintf(stderr, "error adding constraint: %s\n", gnutls_strerror(ret));
+					exit(1);
+				}
+				free(name.data);
+			}
+		}
+
+		if (cfg.excluded_nc_ip) {
+			for (i = 0; cfg.excluded_nc_ip[i] != NULL; i++) {
+				cidr_to_datum(cfg.excluded_nc_ip[i], &name);
+				ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_IPADDRESS, &name);
+				if (ret < 0) {
+					fprintf(stderr, "error adding constraint: %s\n", gnutls_strerror(ret));
+					exit(1);
+				}
+				free(name.data);
+			}
 		}
 
 		if (cfg.permitted_nc_dns) {
@@ -957,6 +1085,7 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 				}
 			}
 		}
+
 
 		if (cfg.excluded_nc_dns) {
 			for (i = 0; cfg.excluded_nc_dns[i] != NULL; i++) {
