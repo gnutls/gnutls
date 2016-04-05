@@ -120,6 +120,8 @@ int _gnutls_x509_export_int_named2(ASN1_TYPE asn1_data, const char *name,
 
 int _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
 			    gnutls_datum_t * ret);
+int _gnutls_x509_read_null_value(ASN1_TYPE c, const char *root,
+			    gnutls_datum_t * ret);
 int _gnutls_x509_read_string(ASN1_TYPE c, const char *root,
 			     gnutls_datum_t * ret, unsigned int etype,
 			     unsigned allow_ber);

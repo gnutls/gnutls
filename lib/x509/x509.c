@@ -1297,7 +1297,7 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 		_gnutls_str_cat(nptr, sizeof(nptr), ".");
 		_gnutls_str_cat(nptr, sizeof(nptr), choice_type);
 
-		ret = _gnutls_x509_read_value(src, nptr, &tmp);
+		ret = _gnutls_x509_read_null_value(src, nptr, &tmp);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

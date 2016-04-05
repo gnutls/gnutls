@@ -1092,24 +1092,26 @@ _gnutls_x509_decode_string(unsigned int etype,
  * Note that this function always allocates one plus
  * the required data size (and places a null byte).
  */
-int
-_gnutls_x509_read_value(ASN1_TYPE c, const char *root,
-			gnutls_datum_t * ret)
+static int
+x509_read_value(ASN1_TYPE c, const char *root,
+		gnutls_datum_t * ret, unsigned allow_null)
 {
 	int len = 0, result;
 	uint8_t *tmp = NULL;
 	unsigned int etype;
 
 	result = asn1_read_value_type(c, root, NULL, &len, &etype);
-	if (result == 0 && len == 0) {
+	if (result == 0 && allow_null == 0 && len == 0) {
 		/* don't allow null strings */
 		return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
 	}
 
 	if (result != ASN1_MEM_ERROR) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		return result;
+		if (result != ASN1_SUCCESS || allow_null == 0 || len != 0) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			return result;
+		}
 	}
 
 	if (etype == ASN1_ETYPE_BIT_STRING) {
@@ -1123,17 +1125,21 @@ _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
 		goto cleanup;
 	}
 
-	result = asn1_read_value(c, root, tmp, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
+	if (len > 0) {
+		result = asn1_read_value(c, root, tmp, &len);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
 
-	if (etype == ASN1_ETYPE_BIT_STRING) {
-		ret->size = (len+7) / 8;
+		if (etype == ASN1_ETYPE_BIT_STRING) {
+			ret->size = (len+7) / 8;
+		} else {
+			ret->size = (unsigned) len;
+		}
 	} else {
-		ret->size = (unsigned) len;
+		ret->size = 0;
 	}
 
 	tmp[ret->size] = 0;
@@ -1144,6 +1150,20 @@ _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
       cleanup:
 	gnutls_free(tmp);
 	return result;
+}
+
+int
+_gnutls_x509_read_value(ASN1_TYPE c, const char *root,
+			gnutls_datum_t * ret)
+{
+	return x509_read_value(c, root, ret, 0);
+}
+
+int
+_gnutls_x509_read_null_value(ASN1_TYPE c, const char *root,
+			gnutls_datum_t * ret)
+{
+	return x509_read_value(c, root, ret, 1);
 }
 
 /* Reads a value from an ASN1 tree, then interprets it as the provided
