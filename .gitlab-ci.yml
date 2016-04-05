@@ -40,7 +40,15 @@ Build and Check - separate build dir (x86):
   - nettle3
   except:
   - tags
-Build and ABI-check (x86-64):
+Build with C99 flags:
+  script:
+  - make autoreconf && mkdir -p build && cd build &&
+    CFLAGS="-g -O2 -std=c99" ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 -C gl && make -j4 -C lib && make -j4 -C libdane
+  tags:
+  - nettle3
+  except:
+  - tags
+Build with ABI-check (x86-64):
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 && make abi-check
