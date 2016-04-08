@@ -641,7 +641,7 @@ ResponseData ::= SEQUENCE {
 ResponderID ::= CHOICE {
 -- Changed to work with the libtasn1 parser.
    byName   [1] EXPLICIT RDNSequence, --Name
-   byKey    [2] OCTET STRING --SHA-1 hash of responder's public key 
+   byKey    [2] EXPLICIT OCTET STRING --SHA-1 hash of responder's public key 
 }
 
 SingleResponse ::= SEQUENCE {
