@@ -935,20 +935,16 @@ void
  * @session: is a #gnutls_session_t type.
  *
  * This function provides information about the internals of the
- * record protocol and is only useful if a prior gnutls function call
- * (e.g.  gnutls_handshake()) was interrupted for some reason, that
+ * record protocol and is only useful if a prior gnutls function call,
+ * e.g.  gnutls_handshake(), was interrupted for some reason. That
  * is, if a function returned %GNUTLS_E_INTERRUPTED or
- * %GNUTLS_E_AGAIN.  In such a case, you might want to call select()
- * or poll() before calling the interrupted gnutls function again.  To
- * tell you whether a file descriptor should be selected for either
- * reading or writing, gnutls_record_get_direction() returns 0 if the
- * interrupted function was trying to read data, and 1 if it was
- * trying to write data.
+ * %GNUTLS_E_AGAIN. In such a case, you might want to call select()
+ * or poll() before restoring the interrupted gnutls function.
  *
- * This function's output is unreliable if you are using the
+ * This function's output is unreliable if you are using the same
  * @session in different threads, for sending and receiving.
  *
- * Returns: 0 if trying to read data, 1 if trying to write data.
+ * Returns: 0 if interrupted while trying to read data, or 1 while trying to write data.
  **/
 int gnutls_record_get_direction(gnutls_session_t session)
 {
