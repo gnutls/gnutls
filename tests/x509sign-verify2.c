@@ -99,7 +99,7 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 	sign_algo =
 	    gnutls_pk_to_sign(pk, hash);
 
-	for (j = 0; j < 1200; j++) {
+	for (j = 0; j < 100; j++) {
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
 			ERR(__LINE__);
