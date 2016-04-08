@@ -806,11 +806,11 @@ The only exception is @funcref{gnutls_record_send},
 which if interrupted subsequent calls need not to include the data to be
 sent (can be called with NULL argument).
 
-When using the @funcintref{select} system call though, one should remember
-that it is only applicable to the kernel sockets API. To check for any
-available buffers in a @acronym{GnuTLS} session, 
+When using the @funcintref{poll} or @funcintref{select} system calls though, one should remember
+that they only apply to the kernel sockets API. To check for any
+available buffered data in a @acronym{GnuTLS} session, 
 utilize @funcref{gnutls_record_check_pending},
-either before the @funcintref{select} system call, or after a call to
+either before the @funcintref{poll} system call, or after a call to
 @funcref{gnutls_record_recv}. Data queued by @funcref{gnutls_record_send}
 (when interrupted) can be discarded using @funcref{gnutls_record_discard_queued}.
 
@@ -927,8 +927,8 @@ protocol, this field allows distinguishing out-of-order messages.
 
 The @funcref{gnutls_record_check_pending} helper function is available to 
 allow checking whether data are available to be read in a @acronym{GnuTLS} session 
-buffers. Note that this function complements but does not replace @funcintref{select},
-i.e., @funcref{gnutls_record_check_pending} reports no data to be read, @funcintref{select}
+buffers. Note that this function complements but does not replace @funcintref{poll},
+i.e., @funcref{gnutls_record_check_pending} reports no data to be read, @funcintref{poll}
 should be called to check for data in the network buffers.
 
 @showfuncdesc{gnutls_record_check_pending}
