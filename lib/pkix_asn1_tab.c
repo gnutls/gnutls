@@ -489,7 +489,7 @@ const asn1_static_node pkix_asn1_tab[] = {
   { "byName", 1610620930, "RDNSequence"},
   { NULL, 2056, "1"},
   { "byKey", 536879111, NULL },
-  { NULL, 4104, "2"},
+  { NULL, 2056, "2"},
   { "SingleResponse", 1610612741, NULL },
   { "certID", 1073741826, "CertID"},
   { "certStatus", 1073741826, "CertStatus"},
