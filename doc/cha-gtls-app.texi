@@ -791,7 +791,7 @@ The blocking, due to network interaction, calls such as
 can be set to non-blocking by setting the underlying sockets to non-blocking.
 If other push and pull functions are setup, then they should behave the same
 way as @funcintref{recv} and @funcintref{send} when used in a non-blocking
-way, i.e., set errno to @code{EAGAIN}. Since, during a TLS protocol session 
+way, i.e., return -1 and set errno to @code{EAGAIN}. Since, during a TLS protocol session 
 @acronym{GnuTLS} does not block except for network interaction, the non blocking
 @code{EAGAIN} errno will be propagated and @acronym{GnuTLS} functions 
 will return the @code{GNUTLS_E_AGAIN} error code. Such calls can be resumed the 
@@ -805,8 +805,8 @@ that it is only applicable to the kernel sockets API. To check for any
 available buffers in a @acronym{GnuTLS} session, 
 utilize @funcref{gnutls_record_check_pending},
 either before the @funcintref{select} system call, or after a call to
-@funcref{gnutls_record_recv}. @acronym{GnuTLS} does not keep a write buffer,
-thus when writing no additional actions are required.
+@funcref{gnutls_record_recv}. Data queued by @funcref{gnutls_record_send}
+(when interrupted) can be discarded using @funcref{gnutls_record_discard_queued}.
 
 The following paragraphs describe the detailed requirements for non-blocking
 operation when using the TLS or DTLS protocols.
