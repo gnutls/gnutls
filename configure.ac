@@ -826,52 +826,6 @@ AC_DEFINE([fread_file], [_gnutls_fread_file], [static lib rename])
 AC_DEFINE([read_file], [_gnutls_read_file], [static lib rename])
 AC_DEFINE([read_binary_file], [_gnutls_read_binary_file], [static lib rename])
 
-dnl Crywrap dependencies
-   AC_MSG_RESULT([***
-*** Checking dependencies for crywrap...
-])
-
-crywrap=no
-
-if test "$have_win" != "yes"; then
-
-AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/select.h sys/types.h sys/wait.h])
-
-dnl **********************
-dnl * Typedefs & co
-dnl **********************
-AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
-[AC_LANG_PROGRAM([#include <sys/types.h>
-#include <signal.h>
-],
-		 [return *(signal (0, 0)) (0) == 1;])],
-		   [ac_cv_type_signal=int],
-		   [ac_cv_type_signal=void])])
-AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
-		    (`int' or `void').])
-
-AC_FUNC_SELECT_ARGTYPES
-AC_CHECK_FUNCS([alarm atexit dup2 epoll_create kqueue memchr memset munmap \
-		putenv regcomp scandir select socket strcasecmp strchr \
-		strdup strerror strncasecmp strrchr strstr strtoul uname])
-
-AC_ARG_ENABLE(crywrap,
-	AS_HELP_STRING([--disable-crywrap], [unconditionally disable the crywrap TLS proxy service]))
-
-
- if test "x$enable_crywrap" != "xno" ; then
-   AC_CHECK_FUNCS([argp_usage],[ac_argp=yes],[ac_argp=no])
-   if test "$ac_cv_func_daemon" != "no" && test "$ac_argp" != "no" && test "$with_libidn" != "no";then
-     crywrap=yes
-   fi
- fi
-
-fi
-
-AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$crywrap" != "xno")
-
-dnl end of crywrap requirements
-
 dnl Some variables needed in makefiles
 YEAR=`date +%Y`
 AC_SUBST([YEAR], $YEAR)
@@ -918,7 +872,6 @@ AC_CONFIG_FILES([
   lib/x509/Makefile
   po/Makefile.in
   src/Makefile
-  src/crywrap/Makefile
   src/gl/Makefile
   tests/Makefile
   tests/windows/Makefile
@@ -996,11 +949,6 @@ if features are disabled)
   Self checks:          $enable_self_checks
   Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips
-])
-
-AC_MSG_NOTICE([Optional applications:
-
-  crywrap app:          $crywrap
 ])
 
 AC_MSG_NOTICE([Optional libraries:

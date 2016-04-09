@@ -27,10 +27,6 @@ BUILT_SOURCES = srptool-args.c srptool-args.h \
 	danetool-args.c danetool-args.h p11tool-args.c p11tool-args.h \
 	tpmtool-args.c tpmtool-args.h systemkey-args.c systemkey-args.h
 
-if ENABLE_CRYWRAP
-SUBDIRS += crywrap
-endif
-
 EXTRA_DIST = args-std.def
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
