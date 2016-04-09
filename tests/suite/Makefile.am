@@ -100,6 +100,10 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	top_builddir="$(top_builddir)"			\
 	srcdir="$(srcdir)"
 
+if ENABLE_NON_SUITEB_CURVES
+TESTS_ENVIRONMENT += ENABLE_NON_SUITEB_CURVES=1
+endif
+
 if ENABLE_DANE
 nodist_check_SCRIPTS += testdane.sh
 endif
