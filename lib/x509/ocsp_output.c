@@ -530,7 +530,7 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 				name = _("unknown");
 			addf(str, _("\tSignature Algorithm: %s\n"), name);
 		}
-		if (gnutls_sign_is_secure(ret) == 0) {
+		if (ret != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(ret) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
 			       "algorithm that can be forged.\n"));
