@@ -443,7 +443,9 @@ asn1_bit_der (const unsigned char *str, int bit_len,
     len_byte++;
   asn1_length_der (len_byte + 1, der, &len_len);
   der[len_len] = len_pad;
-  memcpy (der + len_len + 1, str, len_byte);
+
+  if (str)
+    memcpy (der + len_len + 1, str, len_byte);
   der[len_len + len_byte] &= bit_mask[len_pad];
   *der_len = len_byte + len_len + 1;
 }
@@ -628,7 +630,7 @@ _asn1_insert_tag_der (asn1_node node, unsigned char *der, int *counter,
 				   tag_der, &tag_len);
 
 		  *max_len -= tag_len;
-		  if (*max_len >= 0)
+		  if (der && *max_len >= 0)
 		    memcpy (der + *counter, tag_der, tag_len);
 		  *counter += tag_len;
 
@@ -680,7 +682,7 @@ _asn1_insert_tag_der (asn1_node node, unsigned char *der, int *counter,
     }
 
   *max_len -= tag_len;
-  if (*max_len >= 0)
+  if (der && *max_len >= 0)
     memcpy (der + *counter, tag_der, tag_len);
   *counter += tag_len;
 
@@ -1018,6 +1020,9 @@ asn1_der_coding (asn1_node element, const char *name, void *ider, int *len,
   int err;
   unsigned char *der = ider;
 
+  if (ErrorDescription)
+    ErrorDescription[0] = 0;
+
   node = asn1_find_node (element, name);
   if (node == NULL)
     return ASN1_ELEMENT_NOT_FOUND;
@@ -1248,7 +1253,7 @@ asn1_der_coding (asn1_node element, const char *name, void *ider, int *len,
 		  continue;
 		}
 	      else
-		p = _asn1_get_up (p);
+		p = _asn1_find_up (p);
 	      move = UP;
 	    }
 	  if (move == UP)
@@ -1323,7 +1328,7 @@ asn1_der_coding (asn1_node element, const char *name, void *ider, int *len,
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_get_up (p);
+	p = _asn1_find_up (p);
     }
 
   *len = counter;
