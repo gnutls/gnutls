@@ -52,7 +52,7 @@ _asn1_hierarchical_name (asn1_node node, char *name, int name_size)
 	  _asn1_str_cat (name, name_size, ".");
 	  _asn1_str_cat (name, name_size, tmp_name);
 	}
-      p = _asn1_get_up (p);
+      p = _asn1_find_up (p);
     }
 
   if (name[0] == 0)
@@ -132,14 +132,14 @@ _asn1_convert_integer (const unsigned char *value, unsigned char *value_out,
  * node. The new element will have a name of '?number', where number
  * is a monotonically increased serial number.
  *
- * The last element in the list may be provided in @ptail, to avoid
+ * The last element in the list may be provided in @pcache, to avoid
  * traversing the list, an expensive operation in long lists.
  *
- * On success it returns in @ptail the added element (which is the 
+ * On success it returns in @pcache the added element (which is the 
  * tail in the list of added elements).
  */
 int
-_asn1_append_sequence_set (asn1_node node, asn1_node *ptail)
+_asn1_append_sequence_set (asn1_node node, struct node_tail_cache_st *pcache)
 {
   asn1_node p, p2;
   char temp[LTOSTR_MAX_SIZE];
@@ -154,18 +154,24 @@ _asn1_append_sequence_set (asn1_node node, asn1_node *ptail)
     p = p->right;
   p2 = _asn1_copy_structure3 (p);
 
-  if (ptail == NULL || *ptail == NULL || (*ptail)->up != p->up)
-    while (p->right) {
-      p = p->right;
+  if (pcache == NULL || pcache->tail == NULL || pcache->head != node)
+    {
+      while (p->right)
+        {
+          p = p->right;
+        }
     }
   else
     {
-      p = *ptail;
+      p = pcache->tail;
     }
 
   _asn1_set_right (p, p2);
-  if (ptail)
-    *ptail = p2;
+  if (pcache)
+    {
+      pcache->head = node;
+      pcache->tail = p2;
+    }
 
   if (p->name[0] == 0)
     _asn1_str_cpy (temp, sizeof (temp), "?1");
