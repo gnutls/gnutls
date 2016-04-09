@@ -51,6 +51,10 @@ typedef struct _Eina_File_Direct_Info Eina_File_Direct_Info;
 typedef void (*Eina_File_Dir_List_Cb) (const char *name, const char *path,
 				       void *data);
 
+#ifndef _POSIX_PATH_MAX
+# define _POSIX_PATH_MAX 256
+#endif
+
 /**
  * @struct _Eina_File_Direct_Info
  * A structure to store informations of a path.
@@ -62,7 +66,7 @@ struct _Eina_File_Direct_Info {
 		       /**< size of the filename/basename component */
 	size_t name_start;
 		      /**< where the filename/basename component starts */
-	char path[PATH_MAX];
+	char path[_POSIX_PATH_MAX];
 			/**< the path */
 	const struct dirent *dirent;
 				/**< the dirent structure of the path */
