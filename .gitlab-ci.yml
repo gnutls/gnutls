@@ -20,9 +20,9 @@ Build and Check with asan:
   - nettle3
   except:
   - tags
-Build and Check with ubsan:
+Build and Check with C99 and ubsan:
   script:
-  - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g
+  - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
   tags:
@@ -37,14 +37,6 @@ Build and Check - separate build dir (x86):
     make -j4 && make check -j4
   tags:
   - x86
-  - nettle3
-  except:
-  - tags
-Build with C99 flags:
-  script:
-  - make autoreconf && mkdir -p build && cd build &&
-    CFLAGS="-g -O2 -std=c99" ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 -C gl && make -j4 -C lib && make -j4 -C libdane
-  tags:
   - nettle3
   except:
   - tags
