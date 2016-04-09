@@ -1453,7 +1453,7 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 				name = _("unknown");
 			addf(str, _("\tSignature Algorithm: %s\n"), name);
 		}
-		if (gnutls_sign_is_secure(err) == 0) {
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
 			       "algorithm that can be forged.\n"));
@@ -2095,7 +2095,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 				name = _("unknown");
 			addf(str, _("\tSignature Algorithm: %s\n"), name);
 		}
-		if (gnutls_sign_is_secure(err) == 0) {
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
 			       "algorithm that can be forged.\n"));
