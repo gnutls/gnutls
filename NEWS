@@ -59,6 +59,9 @@ See the end for copying conditions.
 ** gnutls-cli: The --dane option will cause verification failure if gnutls is not
    compiled with DANE support.
 
+** crywrap: The tool was unbundled from gnutls' distribution. It can be found at
+   https://github.com/nmav/crywrap
+
 ** guile: .go files are now built and installed
 
 ** guile: Fix compatibility issue of the test suite with Guile 2.1
