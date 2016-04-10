@@ -89,7 +89,6 @@ if test "$use_cxx" != "no"; then
   AC_LANG_POP(C++)
 fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
-AM_CONDITIONAL(WANT_TEST_SUITE, [test -f "${srcdir}/tests/suite/mini-eagain2.c"])
 
 dnl Detect windows build
 use_accel=yes
@@ -273,12 +272,27 @@ if test "$ac_have_unicode" != "yes";then
   fi
 fi
 
+SUITE_FILE="${srcdir}/tests/suite/mini-eagain2.c"
+if test -f "$SUITE_FILE";then
+	can_do_valgrind_tests=yes
+else
+	can_do_valgrind_tests=no
+fi
+
 dnl Note that g*l_INIT are run after we check for library capabilities,
 dnl to prevent issues from caching lib dependencies. See discussion
 dnl in https://bugs.gentoo.org/show_bug.cgi?id=494940 and
 dnl http://gnu-autoconf.7623.n7.nabble.com/Correct-way-to-check-for-clock-gettime-td12276.html
 gl_INIT
 ggl_INIT
+
+if test "$can_do_valgrind_tests" != "yes";then
+	VALGRIND=""
+	AC_SUBST(VALGRIND, [])
+	opt_valgrind_tests=no
+fi
+
+AM_CONDITIONAL(WANT_TEST_SUITE, [test "$opt_valgrind_tests" != no])
 
 dnl GCC warnings to enable
 
@@ -907,7 +921,6 @@ AC_CONFIG_FILES([
 AC_OUTPUT
 
 dnl  Warning flags:        errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
-dnl  Valgrind:             $opt_valgrind_tests ${VALGRIND}
 AC_MSG_NOTICE([summary of build options:
 
   version:              ${VERSION} shared $LT_CURRENT:$LT_REVISION:$LT_AGE
@@ -915,6 +928,7 @@ AC_MSG_NOTICE([summary of build options:
   Build system:         ${build}
   Install prefix:       ${prefix}
   Compiler:             ${CC}
+  Valgrind:             $opt_valgrind_tests ${VALGRIND}
   CFlags:               ${CFLAGS}
   Library types:        Shared=${enable_shared}, Static=${enable_static}
   Local libopts:        ${included_libopts}
