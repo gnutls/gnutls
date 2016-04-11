@@ -361,7 +361,9 @@ gnutls_pubkey_import_pkcs11(gnutls_pubkey_t key,
 			goto cleanup_crt;
 		}
 
-		gnutls_x509_crt_get_key_usage(xcrt, &key->key_usage, NULL);
+		ret = gnutls_x509_crt_get_key_usage(xcrt, &key->key_usage, NULL);
+		if (ret < 0)
+		  key->key_usage = 0;
 
 		ret = 0;
 	      cleanup_crt:

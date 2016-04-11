@@ -701,8 +701,11 @@ verify_crt(gnutls_x509_crt_t cert,
 
 			ret =
 			    gnutls_x509_crt_get_key_usage(issuer, &usage, NULL);
-			if (ret >= 0) {
-				if (!(usage & GNUTLS_KEY_KEY_CERT_SIGN)) {
+			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+				if (ret < 0) {
+					gnutls_assert();
+					out |= GNUTLS_CERT_INVALID;
+				} else if (!(usage & GNUTLS_KEY_KEY_CERT_SIGN)) {
 					gnutls_assert();
 					out |=
 					    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE
@@ -1461,8 +1464,12 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 
 			result =
 			    gnutls_x509_crt_get_key_usage(issuer, &usage, NULL);
-			if (result >= 0) {
-				if (!(usage & GNUTLS_KEY_CRL_SIGN)) {
+			if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+				if (result < 0) {
+					gnutls_assert();
+					if (verify)
+						*verify |= GNUTLS_CERT_INVALID;
+				} else if (!(usage & GNUTLS_KEY_CRL_SIGN)) {
 					gnutls_assert();
 					if (verify)
 						*verify |=
