@@ -58,8 +58,8 @@ yum install -y unbound-devel bison help2man gtk-doc texinfo texlive
 Sometimes, you may need to install more recent versions of Automake,
 Nettle, P11-kit and Autogen, which you will need to build from sources. 
 
-Dependencies that are used during make check are listed below. Moreover,
-for basic interoperability testing you may want to install openssl
+Dependencies that are used during make check or make dist are listed below.
+Moreover, for basic interoperability testing you may want to install openssl
 and polarssl.
 
 * [Valgrind](http://valgrind.org/) (optional)
@@ -72,13 +72,13 @@ and polarssl.
 Debian/Ubuntu:
 ```
 apt-get install -y valgrind libasan1 nodejs softhsm datefudge
-apt-get install -y dieharder libpolarssl-runtime openssl
+apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker
 ```
 
 Fedora/RHEL:
 ```
 yum install -y valgrind libasan nodejs softhsm datefudge
-yum install -y dieharder mbedtls-utils openssl
+yum install -y dieharder mbedtls-utils openssl abi-compliance-checker
 ```
 
 
