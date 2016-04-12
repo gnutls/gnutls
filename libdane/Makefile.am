@@ -33,7 +33,7 @@ AM_CPPFLAGS = \
 
 SUBDIRS = includes
 
-libgnutls_dane_la_LDFLAGS = -no-undefined $(COMMON_LDFLAGS)
+libgnutls_dane_la_LDFLAGS = -no-undefined $(COMMON_LINK_FLAGS)
 
 lib_LTLIBRARIES = libgnutls-dane.la
 
