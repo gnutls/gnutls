@@ -770,6 +770,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 
 		if (ret < 0) {
 			gnutls_assert();
+			/* fall through to PKCS #8 decoding */
 		}
 	}
 
