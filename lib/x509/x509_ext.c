@@ -1895,7 +1895,7 @@ int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 				policies->policy[j].qualifier[i].type =
 				    GNUTLS_X509_QUALIFIER_URI;
 			} else if (strcmp(tmpoid, "1.3.6.1.5.5.7.2.2") == 0) {
-				gnutls_datum_t txt;
+				gnutls_datum_t txt = {NULL, 0};
 
 				snprintf(tmpstr, sizeof(tmpstr),
 					 "?%u.policyQualifiers.?%u.qualifier",
