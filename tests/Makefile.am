@@ -90,7 +90,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen \
 	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok fallback-scsv pkcs8-key-decode \
-	 key-usage resume-psk mini-session-verify-function auto-verify \
+	 key-usage mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
 	 mini-x509-dual mini-x509-kx global-init-override tlsext-decoding \
 	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
@@ -106,6 +106,14 @@ endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
+resume_psk_CFLAGS = -DUSE_PSK
+resume_psk_SOURCES = resume.c
+
+resume_anon_CFLAGS = -DUSE_ANON
+resume_anon_SOURCES = resume.c
+
+resume_x509_CFLAGS = -DUSE_X509
+resume_x509_SOURCES = resume.c
 
 if ENABLE_OCSP
 ctests += ocsp
@@ -130,7 +138,7 @@ endif
 
 if HAVE_FORK
 ctests += x509self x509dn anonself pskself dhepskself	\
-	resume setcredcrash
+	setcredcrash resume-x509 resume-psk resume-anon
 
 if ENABLE_OPENPGP
 ctests += openpgpself 

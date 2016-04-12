@@ -51,8 +51,8 @@ int main(int argc, char **argv)
 #include <gnutls/gnutls.h>
 #include <sys/wait.h>
 #include <signal.h>
-
 #include "utils.h"
+#include "cert-common.h"
 
 static void wrap_db_init(void);
 static void wrap_db_deinit(void);
@@ -250,9 +250,19 @@ static void client(int sds[], struct params_res *params)
 	int ret, ii;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
-	gnutls_anon_client_credentials_t anoncred;
 	unsigned int ext_master_secret_check = 0;
 	char prio_str[256];
+#ifdef USE_PSK
+# define PRIO_STR "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+PSK:+CURVE-ALL"
+	const gnutls_datum_t pskkey = { (void *) "DEADBEEF", 8 };
+	gnutls_psk_client_credentials_t pskcred;
+#elif defined(USE_ANON)
+# define PRIO_STR "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+ANON-DH:+CURVE-ALL"
+	gnutls_anon_client_credentials_t anoncred;
+#elif defined(USE_X509)
+# define PRIO_STR "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+RSA:+CURVE-ALL"
+	gnutls_certificate_credentials_t clientx509cred;
+#endif
 
 	/* Need to enable anonymous KX specifically. */
 
@@ -267,7 +277,15 @@ static void client(int sds[], struct params_res *params)
 	}
 	global_init();
 
+#ifdef USE_PSK
+	gnutls_psk_allocate_client_credentials(&pskcred);
+	gnutls_psk_set_client_credentials(pskcred, "test", &pskkey, GNUTLS_PSK_KEY_HEX);
+#elif defined(USE_ANON)
 	gnutls_anon_allocate_client_credentials(&anoncred);
+#elif defined(USE_X509)
+	gnutls_certificate_allocate_credentials(&clientx509cred);
+#endif
+
 
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
@@ -276,7 +294,7 @@ static void client(int sds[], struct params_res *params)
 		 */
 		gnutls_init(&session, GNUTLS_CLIENT);
 
-		snprintf(prio_str, sizeof(prio_str), "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH");
+		snprintf(prio_str, sizeof(prio_str), "%s", PRIO_STR);
 
 		/* Use default priorities */
 		if (params->enable_session_ticket_client == 0) {
@@ -302,7 +320,13 @@ static void client(int sds[], struct params_res *params)
 
 		/* put the anonymous credentials to the current session
 		 */
+#ifdef USE_PSK
+		gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
+#elif defined(USE_ANON)
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+#elif defined(USE_X509)
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, clientx509cred);
+#endif
 
 		if (t > 0) {
 			/* if this is not the first time we connect */
@@ -403,7 +427,13 @@ static void client(int sds[], struct params_res *params)
 	gnutls_free(session_data.data);
 
       end:
+#ifdef USE_PSK
+	gnutls_psk_free_client_credentials(pskcred);
+#elif defined(USE_ANON)
 	gnutls_anon_free_client_credentials(anoncred);
+#elif defined(USE_X509)
+	gnutls_certificate_free_credentials(clientx509cred);
+#endif
 }
 
 /* This is a sample TLS 1.0 echo server, for anonymous authentication only.
@@ -424,7 +454,7 @@ static gnutls_session_t initialize_tls_session(struct params_res *params)
 	 * are adequate.
 	 */
 	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   PRIO_STR,
 				   NULL);
 
 
@@ -445,7 +475,14 @@ static gnutls_session_t initialize_tls_session(struct params_res *params)
 }
 
 static gnutls_dh_params_t dh_params;
+
+#ifdef USE_PSK
+gnutls_psk_server_credentials_t pskcred;
+#elif defined(USE_ANON)
 gnutls_anon_server_credentials_t anoncred;
+#elif defined(USE_X509)
+gnutls_certificate_credentials_t serverx509cred;
+#endif
 
 static int generate_dh_params(void)
 {
@@ -466,12 +503,34 @@ static void global_stop(void)
 	if (debug)
 		success("global stop\n");
 
+#ifdef USE_PSK
+	gnutls_psk_free_server_credentials(pskcred);
+#elif defined(USE_ANON)
 	gnutls_anon_free_server_credentials(anoncred);
-
+#elif defined(USE_X509)
+	gnutls_certificate_free_credentials(serverx509cred);
+#endif
 	gnutls_dh_params_deinit(dh_params);
 
 	gnutls_global_deinit();
 }
+
+#ifdef USE_PSK
+static int
+pskfunc(gnutls_session_t session, const char *username,
+	gnutls_datum_t * key)
+{
+	if (debug)
+		printf("psk: username %s\n", username);
+	key->data = gnutls_malloc(4);
+	key->data[0] = 0xDE;
+	key->data[1] = 0xAD;
+	key->data[2] = 0xBE;
+	key->data[3] = 0xEF;
+	key->size = 4;
+	return 0;
+}
+#endif
 
 static void server(int sds[], struct params_res *params)
 {
@@ -488,14 +547,26 @@ static void server(int sds[], struct params_res *params)
 	}
 
 	global_init();
+
+#ifdef USE_PSK
+	gnutls_psk_allocate_server_credentials(&pskcred);
+	gnutls_psk_set_server_credentials_function(pskcred, pskfunc);
+#elif defined(USE_ANON)
 	gnutls_anon_allocate_server_credentials(&anoncred);
+#elif defined(USE_X509)
+	gnutls_certificate_allocate_credentials(&serverx509cred);
+	gnutls_certificate_set_x509_key_mem(serverx509cred,
+		&server_cert, &server_key, GNUTLS_X509_FMT_PEM);
+#endif
 
 	if (debug)
 		success("Launched, generating DH parameters...\n");
 
 	generate_dh_params();
 
+#if USE_ANON
 	gnutls_anon_set_server_dh_params(anoncred, dh_params);
+#endif
 
 	if (params->enable_db) {
 		wrap_db_init();
@@ -511,7 +582,13 @@ static void server(int sds[], struct params_res *params)
 
 		append_alpn(session, params, t);
 
+#ifdef USE_PSK
+		gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
+#elif defined(USE_ANON)
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+#elif defined(USE_X509)
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+#endif
 		gnutls_transport_set_int(session, sd);
 		gnutls_handshake_set_timeout(session, 20 * 1000);
 
