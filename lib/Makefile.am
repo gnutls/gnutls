@@ -20,7 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-EXTRA_DIST = priority_options.gperf
+EXTRA_DIST = priority_options.gperf common.mk
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
@@ -31,7 +31,8 @@ endif
 
 localedir = $(datadir)/locale
 
-AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS) $(NETTLE_CFLAGS)
+include $(top_srcdir)/lib/common.mk
+
 AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\"		\
 	-I$(srcdir)/../gl			\
@@ -115,8 +116,6 @@ HFILES = abstract_int.h debug.h compress.h cipher.h	\
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h pkcs11x.h
 endif
-
-# Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 	$(PSK_COBJECTS) \

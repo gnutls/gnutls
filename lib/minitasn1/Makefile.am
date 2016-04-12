@@ -20,6 +20,8 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
+include $(top_srcdir)/lib/common.mk
+
 AM_CPPFLAGS = -DASN1_BUILDING		\
 	-I$(srcdir)/../../gl		\
 	-I$(builddir)/../../gl          \
