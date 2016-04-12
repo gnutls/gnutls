@@ -1450,6 +1450,7 @@ void gnutls_packet_get(gnutls_packet_t packet, gnutls_datum_t *data, unsigned ch
 		if (data) {
 			data->data = NULL;
 			data->size = 0;
+			return;
 		}
 	}
 
