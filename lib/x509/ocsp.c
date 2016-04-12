@@ -1500,10 +1500,11 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 		ret = asn1_read_value(resp->basicresp, name, ttime, &len);
 		if (ret != ASN1_SUCCESS) {
 			gnutls_assert();
-			*this_update = (time_t) (-1);
-		} else
+			return GNUTLS_E_ASN1_DER_ERROR;
+		} else {
 			*this_update =
 			    _gnutls_x509_generalTime2gtime(ttime);
+		}
 	}
 
 	if (next_update) {
