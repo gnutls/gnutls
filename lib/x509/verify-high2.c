@@ -377,24 +377,16 @@ int load_dir_certs(const char *dirname,
 	int ret;
 	int r = 0;
 	char path[GNUTLS_PATH_MAX];
-#ifndef _WIN32
-	struct dirent e;
-#endif
 
 	dirp = opendir(dirname);
 	if (dirp != NULL) {
 		do {
-#ifdef _WIN32
 			d = readdir(dirp);
-			if (d != NULL) {
-#else
-			ret = readdir_r(dirp, &e, &d);
-			if (ret == 0 && d != NULL
+			if (d != NULL
 #ifdef _DIRENT_HAVE_D_TYPE
 				&& (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
 #endif
 			) {
-#endif
 				snprintf(path, sizeof(path), "%s/%s",
 					 dirname, d->d_name);
 
