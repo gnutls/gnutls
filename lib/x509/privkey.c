@@ -1882,8 +1882,6 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 	else
 		ret = cmp_dsa_key(key, okey);
 
-	ret = 0;
-
       cleanup:
         gnutls_x509_privkey_deinit(okey);
 
