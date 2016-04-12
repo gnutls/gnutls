@@ -40,7 +40,8 @@
 #define gnutls_assert()
 #endif
 
-int _gnutls_asn2err(int asn_err);
+int _gnutls_asn2err(int asn_err) __GNUTLS_CONST__;
+
 void _gnutls_log(int, const char *fmt, ...)
 #ifdef __GNUC__
     __attribute__ ((format(printf, 2, 3)));
