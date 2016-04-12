@@ -314,7 +314,7 @@ if test "$can_do_valgrind_tests" != "yes";then
 	opt_valgrind_tests=no
 fi
 
-AM_CONDITIONAL(WANT_TEST_SUITE, [test "$opt_valgrind_tests" != no])
+AM_CONDITIONAL(WANT_TEST_SUITE, [test -f "$SUITE_FILE"])
 
 dnl GCC warnings to enable
 
