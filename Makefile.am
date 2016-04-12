@@ -80,6 +80,8 @@ abi-check:
 	test ! -f "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" || abi-compliance-checker -abi -lib gnutls-dane -old "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" -new $(TMPFILE)
 	@rm -f $(TMPFILE)
 
+@CODE_COVERAGE_RULES@
+
 dist-hook: abi-check
 	make -C doc/ compare-makefile
 	make -C doc/ compare-exported

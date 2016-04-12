@@ -46,6 +46,8 @@ AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_PROG_SED
 
+AX_CODE_COVERAGE
+
 AC_ARG_ENABLE(doc,
   AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
     enable_doc=$enableval, enable_doc=yes)

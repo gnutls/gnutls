@@ -68,16 +68,17 @@ and polarssl.
 * [nodejs](http://nodejs.org/) (needed for certain test cases)
 * [softhsm](http://www.opendnssec.org/softhsm/) (for testing smart card support)
 * [dieharder](http://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
+* [lcov](http://linux-test-project.github.io/) (for code coverage)
 
 Debian/Ubuntu:
 ```
-apt-get install -y valgrind libasan1 nodejs softhsm datefudge
+apt-get install -y valgrind libasan1 nodejs softhsm datefudge lcov gcov
 apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker
 ```
 
 Fedora/RHEL:
 ```
-yum install -y valgrind libasan nodejs softhsm datefudge
+yum install -y valgrind libasan nodejs softhsm datefudge lcov gcov
 yum install -y dieharder mbedtls-utils openssl abi-compliance-checker
 ```
 
@@ -104,6 +105,12 @@ Then build the project normally, and run the test suite.
 ```
 $ make
 $ make check
+```
+
+To test the code coverage of the test suite use the following:
+```
+$ ./configure --enable-code-coverage
+$ make && make check && make code-coverage-capture
 ```
 
 Individual tests that may require additional hardware (e.g., smart cards)
