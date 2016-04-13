@@ -361,6 +361,46 @@ int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl_t crl)
 }
 
 /**
+ * gnutls_x509_crl_get_signature_oid:
+ * @crl: should contain a #gnutls_x509_crl_t type
+ * @oid: a pointer to a buffer to hold the OID (may be null)
+ * @oid_size: initially holds the size of @oid
+ *
+ * This function will return the OID of the signature algorithm
+ * that has been used to sign this CRL. This is function
+ * is useful in the case gnutls_x509_crl_get_signature_algorithm()
+ * returned %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Returns: zero or a negative error code on error.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_x509_crl_get_signature_oid(gnutls_x509_crl_t crl, char *oid, size_t *oid_size)
+{
+	char str[MAX_OID_SIZE];
+	int len, result, ret;
+	gnutls_datum_t out;
+
+	len = sizeof(str);
+	result = asn1_read_value(crl->crl, "signatureAlgorithm.algorithm", str, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	out.data = (void*)str;
+	out.size = len;
+
+	ret = _gnutls_copy_string(&out, (void*)oid, oid_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_x509_crl_get_signature:
  * @crl: should contain a gnutls_x509_crl_t type
  * @sig: a pointer where the signature part will be copied (may be null).

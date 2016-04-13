@@ -709,6 +709,8 @@ int gnutls_x509_crl_get_signature(gnutls_x509_crl_t crl,
 				  char *sig, size_t * sizeof_sig);
 int gnutls_x509_crl_get_version(gnutls_x509_crl_t crl);
 
+int gnutls_x509_crl_get_signature_oid(gnutls_x509_crl_t crl, char *oid, size_t *oid_size);
+
 time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl_t crl);
 time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl_t crl);
 
