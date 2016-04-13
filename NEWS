@@ -79,6 +79,11 @@ gnutls_check_version_numeric: Added
 gnutls_x509_crq_set_subject_alt_othername: Added
 gnutls_x509_crt_set_subject_alt_othername: Added
 gnutls_x509_crt_set_issuer_alt_othername: Added
+gnutls_x509_crt_get_signature_oid: Added
+gnutls_x509_crt_get_pk_oid: Added
+gnutls_x509_crq_get_pk_oid: Added
+gnutls_x509_crq_get_signature_oid: Added
+gnutls_x509_crl_get_signature_oid: Added
 gnutls_x509_privkey_generate2: Added
 gnutls_x509_privkey_get_seed: Added
 gnutls_x509_privkey_verify_seed: Added
