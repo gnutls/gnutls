@@ -184,6 +184,51 @@ static time_t mytime(time_t * t)
 	return then;
 }
 
+static void check_stored_algos(gnutls_x509_crt_t server_crt)
+{
+	int ret;
+	char oid[256];
+	size_t oid_size;
+
+	oid_size = sizeof(oid);
+	ret = gnutls_x509_crt_get_signature_oid(server_crt, oid, &oid_size);
+	if (ret < 0) {
+		fail("cannot get signature algorithm: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (strcmp(oid, "1.2.840.113549.1.1.5") != 0) {
+		fail("detected wrong algorithm OID: %s\n", oid);
+		exit(1);
+	}
+
+	ret = gnutls_x509_crt_get_signature_algorithm(server_crt);
+	if (ret != GNUTLS_SIGN_RSA_SHA1) {
+		fail("detected wrong algorithm: %s\n", gnutls_sign_get_name(ret));
+		exit(1);
+	}
+
+	/* PK */
+	oid_size = sizeof(oid);
+	ret = gnutls_x509_crt_get_pk_oid(server_crt, oid, &oid_size);
+	if (ret < 0) {
+		fail("cannot get PK algorithm: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (strcmp(oid, "1.2.840.113549.1.1.1") != 0) {
+		fail("detected wrong PK algorithm OID: %s\n", oid);
+		exit(1);
+	}
+
+	ret = gnutls_x509_crt_get_pk_algorithm(server_crt, NULL);
+	if (ret != GNUTLS_PK_RSA) {
+		fail("detected wrong PK algorithm: %s\n", gnutls_pk_get_name(ret));
+		exit(1);
+	}
+
+}
+
 #define NAME "localhost"
 #define NAME_SIZE (sizeof(NAME)-1)
 void doit(void)
@@ -222,11 +267,7 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_x509_crt_import");
 
-	ret = gnutls_x509_crt_get_signature_algorithm(server_crt);
-	if (ret != GNUTLS_SIGN_RSA_SHA1) {
-		fail("detected wrong algorithm: %s\n", gnutls_sign_get_name(ret));
-		exit(1);
-	}
+	check_stored_algos(server_crt);
 
 	ret = gnutls_x509_crt_get_preferred_hash_algorithm(server_crt, &hash, &mand);
 	if (ret < 0) {
