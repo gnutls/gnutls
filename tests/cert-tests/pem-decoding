@@ -127,7 +127,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} ${TMPFILE} gost-cert.pem || ${DIFF} --strip-trailing-cr ${TMPFILE} gost-cert.pem
+${DIFF} ${TMPFILE} "${srcdir}/gost-cert.pem" || ${DIFF} --strip-trailing-cr "${TMPFILE}" "${srcdir}/gost-cert.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
