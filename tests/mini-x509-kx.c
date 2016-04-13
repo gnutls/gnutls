@@ -142,7 +142,9 @@ const gnutls_datum_t server_key = { server_key_pem,
 
 #define MSG "hello there ppl"
 
-static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx)
+static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx,
+		gnutls_sign_algorithm_t server_sign_algo,
+		gnutls_sign_algorithm_t client_sign_algo)
 {
 	int ret;
 	char buffer[256];
@@ -226,6 +228,31 @@ static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx)
 		exit(1);
 	}
 
+	/* test signature algorithm match */
+	ret = gnutls_sign_algorithm_get(server);
+	if (ret != (int)server_sign_algo) {
+		fail("%s: got unexpected server signature algorithm: %d/%s\n", client_prio, ret, gnutls_sign_get_name(ret));
+		exit(1);
+	}
+
+	ret = gnutls_sign_algorithm_get_client(server);
+	if (ret != (int)client_sign_algo) {
+		fail("%s: got unexpected server signature algorithm: %d/%s\n", client_prio, ret, gnutls_sign_get_name(ret));
+		exit(1);
+	}
+
+	ret = gnutls_sign_algorithm_get(client);
+	if (ret != (int)server_sign_algo) {
+		fail("%s: got unexpected server signature algorithm: %d/%s\n", client_prio, ret, gnutls_sign_get_name(ret));
+		exit(1);
+	}
+
+	ret = gnutls_sign_algorithm_get_client(client);
+	if (ret != (int)client_sign_algo) {
+		fail("%s: got unexpected server signature algorithm: %d/%s\n", client_prio, ret, gnutls_sign_get_name(ret));
+		exit(1);
+	}
+
 	gnutls_record_send(server, MSG, strlen(MSG));
 
 	ret = gnutls_record_recv(client, buffer, sizeof(buffer));
@@ -259,14 +286,14 @@ void doit(void)
 {
 	global_init();
 
-	try("NORMAL:-KX-ALL:+ANON-ECDH", GNUTLS_KX_ANON_ECDH);
+	try("NORMAL:-KX-ALL:+ANON-ECDH", GNUTLS_KX_ANON_ECDH, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+ANON-DH", GNUTLS_KX_ANON_DH);
+	try("NORMAL:-KX-ALL:+ANON-DH", GNUTLS_KX_ANON_DH, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA);
+	try("NORMAL:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA);
+	try("NORMAL:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+RSA", GNUTLS_KX_RSA);
+	try("NORMAL:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
 	gnutls_global_deinit();
 }
