@@ -302,7 +302,8 @@ verify_tls_hash(gnutls_session_t session,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	gnutls_sign_algorithm_set_server(session, sign_algo);
+	if (session->security_parameters.entity == GNUTLS_CLIENT)
+		gnutls_sign_algorithm_set_server(session, sign_algo);
 
 	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo, flags,
 					 &vdata, signature);
