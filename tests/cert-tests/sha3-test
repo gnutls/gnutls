@@ -23,7 +23,7 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
-TMPFILE=sha3$$.tmp
+TMPFILE=sha3.$$.tmp
 export TZ="UTC"
 
 # Check for datefudge
@@ -40,18 +40,22 @@ fi
 
 # Test SHA3 signatures
 
+for i in sha3-224 sha3-256 sha3-384 sha3-512;do
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template "${srcdir}/template-test.tmpl" \
-		--outfile "${TMPFILE}" --hash sha3-256 2>/dev/null
-
-${DIFF} "${srcdir}/template-rsa-sha3-256.pem" "${TMPFILE}" >/dev/null 2>&1
+		--outfile "${TMPFILE}" --hash $i 2>/dev/null
 rc=$?
+
+if test -f "${srcdir}/template-rsa-$i.pem";then
+${DIFF} "${srcdir}/template-rsa-$i.pem" "${TMPFILE}" >/dev/null 2>&1
+rc=$?
+fi
 
 # We're done.
 if test "${rc}" != "0"; then
-	echo "Test 10 (RSA-SHA3-256) failed"
+	echo "Test (RSA-$i) failed"
 	exit ${rc}
 fi
 
@@ -59,46 +63,23 @@ datefudge -s "2007-04-25" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
-	echo "Test 10 (verification of RSA-SHA3-256) failed"
+	echo "Test (verification of RSA-$i) failed"
 	exit ${rc}
 fi
-
-
-datefudge -s "2007-04-22" \
-	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
-		--template "${srcdir}/template-test.tmpl" \
-		--outfile "${TMPFILE}" --hash sha3-512 2>/dev/null
-
-${DIFF} "${srcdir}/template-rsa-sha3-512.pem" "${TMPFILE}" >/dev/null 2>&1
-rc=$?
-
-# We're done.
-if test "${rc}" != "0"; then
-	echo "Test 11 (RSA-SHA3-512) failed"
-	exit ${rc}
-fi
-
-datefudge -s "2007-04-25" \
-	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
-rc=$?
-if test "${rc}" != "0"; then
-	echo "Test 11 (verification of RSA-SHA3-512) failed"
-	exit ${rc}
-fi
+done
 
 # Test SHA3 signatures with ECDSA
 
+for i in sha3-224 sha3-256 sha3-384 sha3-512;do
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/template-test-ecc.key" \
 	--template "${srcdir}/template-test.tmpl" \
-	--outfile "${TMPFILE}" --hash sha3-256 2>/dev/null
+	--outfile "${TMPFILE}" --hash $i 2>/dev/null
 rc=$?
 
-# We're done.
 if test "${rc}" != "0"; then
-	echo "Test 12 (ECDSA-SHA3-256) failed"
+	echo "Test (ECDSA-$i) failed"
 	exit ${rc}
 fi
 
@@ -106,33 +87,10 @@ datefudge -s "2007-04-25" \
 	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 if test "${rc}" != "0"; then
-	echo "Test 12 (verification of ECDSA-SHA3-256) failed"
+	echo "Test (verification of ECDSA-$i) failed"
 	exit ${rc}
 fi
-
-
-datefudge -s "2007-04-22" \
-"${CERTTOOL}" --generate-self-signed \
-	--load-privkey "${srcdir}/template-test-ecc.key" \
-	--template "${srcdir}/template-test.tmpl" \
-	--outfile "${TMPFILE}" --hash sha3-512 2>/dev/null
-
-rc=$?
-
-# We're done.
-if test "${rc}" != "0"; then
-	echo "Test 13 (ECDSA-SHA3-512) failed"
-	exit ${rc}
-fi
-
-datefudge -s "2007-04-25" \
-	"${CERTTOOL}" --load-ca-certificate "${TMPFILE}" --verify --infile "${TMPFILE}" >/dev/null 2>&1
-rc=$?
-if test "${rc}" != "0"; then
-	echo "Test 13 (verification of ECDSA-SHA3-256) failed"
-	exit ${rc}
-fi
-
+done
 
 rm -f "${TMPFILE}"
 
