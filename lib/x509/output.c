@@ -215,6 +215,125 @@ unsigned i;
 	}
 }
 
+static char *get_pk_name(gnutls_x509_crt_t cert, unsigned *bits)
+{
+	char oid[MAX_OID_SIZE];
+	size_t oid_size;
+	oid_size = sizeof(oid);
+	int ret;
+
+	ret = gnutls_x509_crt_get_pk_algorithm(cert, bits);
+	if (ret > 0) {
+		const char *name = gnutls_pk_algorithm_get_name(ret);
+
+		if (name != NULL)
+			return gnutls_strdup(name);
+	}
+
+	ret = gnutls_x509_crt_get_pk_oid(cert, oid, &oid_size);
+	if (ret < 0)
+		return NULL;
+
+	return gnutls_strdup(oid);
+}
+
+static char *crq_get_pk_name(gnutls_x509_crq_t crq)
+{
+	char oid[MAX_OID_SIZE];
+	size_t oid_size;
+	oid_size = sizeof(oid);
+	int ret;
+
+	ret = gnutls_x509_crq_get_pk_algorithm(crq, NULL);
+	if (ret > 0) {
+		const char *name = gnutls_pk_algorithm_get_name(ret);
+
+		if (name != NULL)
+			return gnutls_strdup(name);
+	}
+
+	ret = gnutls_x509_crq_get_pk_oid(crq, oid, &oid_size);
+	if (ret < 0)
+		return NULL;
+
+	return gnutls_strdup(oid);
+}
+
+static char *get_sign_name(gnutls_x509_crt_t cert, int *algo)
+{
+	char oid[MAX_OID_SIZE];
+	size_t oid_size;
+	oid_size = sizeof(oid);
+	int ret;
+
+	*algo = 0;
+
+	ret = gnutls_x509_crt_get_signature_algorithm(cert);
+	if (ret > 0) {
+		const char *name = gnutls_sign_get_name(ret);
+
+		*algo = ret;
+
+		if (name != NULL)
+			return gnutls_strdup(name);
+	}
+
+	ret = gnutls_x509_crt_get_signature_oid(cert, oid, &oid_size);
+	if (ret < 0)
+		return NULL;
+
+	return gnutls_strdup(oid);
+}
+
+static char *crq_get_sign_name(gnutls_x509_crq_t crq)
+{
+	char oid[MAX_OID_SIZE];
+	size_t oid_size;
+	oid_size = sizeof(oid);
+	int ret;
+
+	ret = gnutls_x509_crq_get_signature_algorithm(crq);
+	if (ret > 0) {
+		const char *name = gnutls_sign_get_name(ret);
+
+		if (name != NULL)
+			return gnutls_strdup(name);
+	}
+
+	ret = gnutls_x509_crq_get_signature_oid(crq, oid, &oid_size);
+	if (ret < 0)
+		return NULL;
+
+	return gnutls_strdup(oid);
+}
+
+static char *crl_get_sign_name(gnutls_x509_crl_t crl, int *algo)
+{
+	char oid[MAX_OID_SIZE];
+	size_t oid_size;
+	oid_size = sizeof(oid);
+	int ret;
+
+	*algo = 0;
+
+	ret = gnutls_x509_crl_get_signature_algorithm(crl);
+	if (ret > 0) {
+		const char *name = gnutls_sign_get_name(ret);
+
+		*algo = ret;
+
+		if (name != NULL)
+			return gnutls_strdup(name);
+	}
+
+	ret = gnutls_x509_crl_get_signature_oid(crl, oid, &oid_size);
+	if (ret < 0)
+		return NULL;
+
+	return gnutls_strdup(oid);
+}
+
+
 static void print_proxy(gnutls_buffer_st * str, gnutls_datum_t *der)
 {
 	int pathlen;
@@ -1256,7 +1375,7 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 	}
 }
 
-static void
+static int
 print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 		 gnutls_certificate_print_formats_t format)
 {
@@ -1265,17 +1384,32 @@ print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
-		return;
+		return ret;
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
 	if (ret < 0)
 		goto cleanup;
 
 	print_pubkey(str, _("Subject "), pubkey, format);
+	ret = 0;
 
       cleanup:
 	gnutls_pubkey_deinit(pubkey);
-	return;
+
+	if (ret < 0) { /* print only name */
+		const char *p;
+		char *name = get_pk_name(crt, NULL);
+		if (name == NULL)
+			p = _("unknown");
+		else
+			p = name;
+
+		addf(str, "\tSubject Public Key Algorithm: %s\n", p);
+		gnutls_free(name);
+		ret = 0;
+	}
+
+	return ret;
 }
 
 static void
@@ -1441,18 +1575,18 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		int err;
 		size_t size = 0;
 		char *buffer = NULL;
+		char *name;
+		const char *p;
 
-		err = gnutls_x509_crt_get_signature_algorithm(cert);
-		if (err < 0)
-			addf(str, "error: get_signature_algorithm: %s\n",
-			     gnutls_strerror(err));
-		else {
-			const char *name =
-			    gnutls_sign_algorithm_get_name(err);
-			if (name == NULL)
-				name = _("unknown");
-			addf(str, _("\tSignature Algorithm: %s\n"), name);
-		}
+		name = get_sign_name(cert, &err);
+		if (name == NULL)
+			p = _("unknown");
+		else
+			p = name;
+
+		addf(str, _("\tSignature Algorithm: %s\n"), p);
+		gnutls_free(name);
+
 		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
@@ -1519,6 +1653,9 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	unsigned int bits;
 
 	err = gnutls_x509_crt_get_key_id(cert, 0, buffer, &size);
+	if (err == GNUTLS_E_UNIMPLEMENTED_FEATURE) /* unsupported algo */
+		return;
+
 	if (err < 0) {
 		addf(str, "error: get_key_id: %s\n", gnutls_strerror(err));
 		return;
@@ -1641,30 +1778,31 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	/* Key algorithm and size. */
 	{
 		unsigned int bits;
-		const char *name = gnutls_pk_algorithm_get_name
-		    (gnutls_x509_crt_get_pk_algorithm(cert, &bits));
+		const char *p;
+		char *name = get_pk_name(cert, &bits);
 		if (name == NULL)
-			name = "Unknown";
-		addf(str, "%s key %d bits, ", name, bits);
+			p = _("unknown");
+		else
+			p = name;
+		addf(str, "%s key %d bits, ", p, bits);
+		gnutls_free(name);
 	}
 
 	/* Signature Algorithm. */
 	{
-		err = gnutls_x509_crt_get_signature_algorithm(cert);
-		if (err < 0)
-			addf(str, "unknown signature algorithm (%s), ",
-			     gnutls_strerror(err));
-		else {
-			const char *name =
-			    gnutls_sign_algorithm_get_name(err);
-			if (name == NULL)
-				name = _("unknown");
-			if (gnutls_sign_is_secure(err) == 0)
-				addf(str, _("signed using %s (broken!), "),
-				     name);
-			else
-				addf(str, _("signed using %s, "), name);
-		}
+		char *name = get_sign_name(cert, &err);
+		const char *p;
+
+		if (name == NULL)
+			p = _("unknown");
+		else
+			p = name;
+
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure( err) == 0)
+			addf(str, _("signed using %s (broken!), "), p);
+		else
+			addf(str, _("signed using %s, "), p);
+		gnutls_free(name);
 	}
 
 	/* Validity. */
@@ -2083,18 +2221,18 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 		int err;
 		size_t size = 0;
 		char *buffer = NULL;
+		char *name;
+		const char *p;
 
-		err = gnutls_x509_crl_get_signature_algorithm(crl);
-		if (err < 0)
-			addf(str, "error: get_signature_algorithm: %s\n",
-			     gnutls_strerror(err));
-		else {
-			const char *name =
-			    gnutls_sign_algorithm_get_name(err);
-			if (name == NULL)
-				name = _("unknown");
-			addf(str, _("\tSignature Algorithm: %s\n"), name);
-		}
+		name = crl_get_sign_name(crl, &err);
+		if (name == NULL)
+			p = _("unknown");
+		else
+			p = name;
+
+		addf(str, _("\tSignature Algorithm: %s\n"), p);
+		gnutls_free(name);
+
 		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
@@ -2161,7 +2299,7 @@ gnutls_x509_crl_print(gnutls_x509_crl_t crl,
 	return _gnutls_buffer_to_datum(&str, out, 1);
 }
 
-static void
+static int
 print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 		 gnutls_certificate_print_formats_t format)
 {
@@ -2170,17 +2308,32 @@ print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
-		return;
+		return ret;
 
 	ret = gnutls_pubkey_import_x509_crq(pubkey, crq, 0);
 	if (ret < 0)
 		goto cleanup;
 
 	print_pubkey(str, _("Subject "), pubkey, format);
+	ret = 0;
 
       cleanup:
 	gnutls_pubkey_deinit(pubkey);
-	return;
+
+	if (ret < 0) { /* print only name */
+		const char *p;
+		char *name = crq_get_pk_name(crq);
+		if (name == NULL)
+			p = _("unknown");
+		else
+			p = name;
+
+		addf(str, "\tSubject Public Key Algorithm: %s\n", p);
+		gnutls_free(name);
+		ret = 0;
+	}
+
+	return ret;
 }
 
 static void
@@ -2233,27 +2386,20 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 	}
 
 	{
-		int err;
-		unsigned int bits;
+		char *name;
+		const char *p;
 
-		err = gnutls_x509_crq_get_pk_algorithm(cert, &bits);
-		if (err < 0)
-			addf(str, "error: get_pk_algorithm: %s\n",
-			     gnutls_strerror(err));
+		print_crq_pubkey(str, cert, format);
+
+		name = crq_get_sign_name(cert);
+		if (name == NULL)
+			p = _("unknown");
 		else
-			print_crq_pubkey(str, cert, format);
+			p = name;
 
-		err = gnutls_x509_crq_get_signature_algorithm(cert);
-		if (err < 0)
-			addf(str, "error: get_signature_algorithm: %s\n",
-			     gnutls_strerror(err));
-		else {
-			const char *name =
-			    gnutls_sign_algorithm_get_name(err);
-			if (name == NULL)
-				name = _("unknown");
-			addf(str, _("\tSignature Algorithm: %s\n"), name);
-		}
+		addf(str, _("\tSignature Algorithm: %s\n"), p);
+
+		gnutls_free(name);
 	}
 
 	/* parse attributes */
