@@ -1241,6 +1241,86 @@ gnutls_x509_crq_get_pk_algorithm(gnutls_x509_crq_t crq, unsigned int *bits)
 }
 
 /**
+ * gnutls_x509_crq_get_signature_oid:
+ * @crq: should contain a #gnutls_x509_crq_t type
+ * @oid: a pointer to a buffer to hold the OID (may be null)
+ * @oid_size: initially holds the size of @oid
+ *
+ * This function will return the OID of the signature algorithm
+ * that has been used to sign this certificate request. This is function
+ * is useful in the case gnutls_x509_crq_get_signature_algorithm()
+ * returned %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Returns: zero or a negative error code on error.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_x509_crq_get_signature_oid(gnutls_x509_crq_t crq, char *oid, size_t *oid_size)
+{
+	char str[MAX_OID_SIZE];
+	int len, result, ret;
+	gnutls_datum_t out;
+
+	len = sizeof(str);
+	result = asn1_read_value(crq->crq, "signatureAlgorithm.algorithm", str, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	out.data = (void*)str;
+	out.size = len;
+
+	ret = _gnutls_copy_string(&out, (void*)oid, oid_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_crq_get_pk_oid:
+ * @crq: should contain a #gnutls_x509_crq_t type
+ * @oid: a pointer to a buffer to hold the OID (may be null)
+ * @oid_size: initially holds the size of @oid
+ *
+ * This function will return the OID of the public key algorithm
+ * on that certificate request. This is function
+ * is useful in the case gnutls_x509_crq_get_pk_algorithm()
+ * returned %GNUTLS_PK_UNKNOWN.
+ *
+ * Returns: zero or a negative error code on error.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_x509_crq_get_pk_oid(gnutls_x509_crq_t crq, char *oid, size_t *oid_size)
+{
+	char str[MAX_OID_SIZE];
+	int len, result, ret;
+	gnutls_datum_t out;
+
+	len = sizeof(str);
+	result = asn1_read_value(crq->crq, "certificationRequestInfo.subjectPKInfo.algorithm.algorithm", str, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	out.data = (void*)str;
+	out.size = len;
+
+	ret = _gnutls_copy_string(&out, (void*)oid, oid_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_x509_crq_get_attribute_info:
  * @crq: should contain a #gnutls_x509_crq_t type
  * @indx: Specifies which attribute number to get. Use (0) to get the first one.

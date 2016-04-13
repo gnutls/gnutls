@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1285,6 +1286,9 @@ int gnutls_x509_crq_get_attribute_info(gnutls_x509_crq_t crq,
 				       size_t * sizeof_oid);
 int gnutls_x509_crq_get_pk_algorithm(gnutls_x509_crq_t crq,
 				     unsigned int *bits);
+
+int gnutls_x509_crq_get_signature_oid(gnutls_x509_crq_t crq, char *oid, size_t *oid_size);
+int gnutls_x509_crq_get_pk_oid(gnutls_x509_crq_t crq, char *oid, size_t *oid_size);
 
 int gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq,
 			       unsigned int flags,
