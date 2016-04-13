@@ -3046,7 +3046,7 @@ gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = _gnutls_copy_data(&out, oid, oid_size);
+	ret = _gnutls_copy_string(&out, oid, oid_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
