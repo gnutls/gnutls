@@ -29,6 +29,10 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
+TMPFILE=tmp-$$.pem.tmp
+TMPFILE1=tmp1-$$.pem.tmp
+TMPFILE2=tmp2-$$.pem.tmp
+
 #check whether "funny" spaces can be interpreted
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/funny-spacing.pem" >/dev/null 2>&1
 rc=$?
@@ -40,7 +44,7 @@ if test "${rc}" != "0"; then
 fi
 
 #check whether a BMPString attribute can be properly decoded
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/bmpstring.pem" >tmp-pem.pem
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/bmpstring.pem" >${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -49,7 +53,7 @@ if test "${rc}" != "0"; then
 fi
 
 #FIXME: the output string differs in windows and linux on the last char.
-${DIFF} "${srcdir}/bmpstring.pem" tmp-pem.pem || ${DIFF} --strip-trailing-cr "${srcdir}/bmpstring.pem" tmp-pem.pem
+${DIFF} "${srcdir}/bmpstring.pem" ${TMPFILE} || ${DIFF} --strip-trailing-cr "${srcdir}/bmpstring.pem" ${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -58,7 +62,7 @@ if test "${rc}" != "0"; then
 fi
 
 #check whether complex-cert is decoded as expected
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/complex-cert.pem" >tmp-pem.pem
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/complex-cert.pem" >${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -66,9 +70,9 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-cat "${srcdir}/complex-cert.pem" |grep -v "Not After:" >tmp1
-cat tmp-pem.pem |grep -v "Not After:" >tmp2
-${DIFF} tmp1 tmp2 || ${DIFF} --strip-trailing-cr tmp1 tmp2
+cat "${srcdir}/complex-cert.pem" |grep -v "Not After:" >${TMPFILE1}
+cat ${TMPFILE} |grep -v "Not After:" >${TMPFILE2}
+${DIFF} ${TMPFILE1} ${TMPFILE2} || ${DIFF} --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -77,7 +81,7 @@ if test "${rc}" != "0"; then
 fi
 
 #check whether the cert with many othernames is decoded as expected
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/xmpp-othername.pem" >tmp-pem.pem
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/xmpp-othername.pem" >${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -85,9 +89,9 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-cat "${srcdir}/xmpp-othername.pem" |grep -v "Not After:" >tmp1
-cat tmp-pem.pem |grep -v "Not After:" >tmp2
-${DIFF} tmp1 tmp2 || ${DIFF} --strip-trailing-cr tmp1 tmp2
+cat "${srcdir}/xmpp-othername.pem" |grep -v "Not After:" >${TMPFILE1}
+cat ${TMPFILE} |grep -v "Not After:" >${TMPFILE2}
+${DIFF} ${TMPFILE1} ${TMPFILE2} || ${DIFF} --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -95,7 +99,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/template-krb5name.pem" >tmp-pem.pem
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/template-krb5name.pem" >${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -103,9 +107,9 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-cat tmp-pem.pem |grep "KRB5Principal:" >tmp1
-cat "${srcdir}/template-krb5name-full.pem" |grep "KRB5Principal:" >tmp2
-${DIFF} -u tmp1 tmp2 || ${DIFF} -u --strip-trailing-cr tmp1 tmp2
+cat ${TMPFILE} |grep "KRB5Principal:" >${TMPFILE1}
+cat "${srcdir}/template-krb5name-full.pem" |grep "KRB5Principal:" >${TMPFILE2}
+${DIFF} -u ${TMPFILE1} ${TMPFILE2} || ${DIFF} -u --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -115,7 +119,7 @@ fi
 
 
 #check whether the cert with GOST parameters is decoded as expected
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/gost-cert.pem" >tmp-pem.pem
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/gost-cert.pem" >${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -123,7 +127,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} tmp-pem.pem gost-cert.pem || ${DIFF} --strip-trailing-cr tmp-pem.pem gost-cert.pem
+${DIFF} ${TMPFILE} gost-cert.pem || ${DIFF} --strip-trailing-cr ${TMPFILE} gost-cert.pem
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -131,6 +135,6 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-pem.pem tmp1 tmp2
+rm -f ${TMPFILE} ${TMPFILE1} ${TMPFILE2}
 
 exit 0
