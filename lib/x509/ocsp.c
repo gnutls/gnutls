@@ -2018,7 +2018,7 @@ static inline unsigned int vstatus_to_ocsp_status(unsigned int status)
 
 static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
 {
-	char oidtmp[sizeof(GNUTLS_KP_OCSP_SIGNING)];
+	char oidtmp[MAX_OID_SIZE];
 	size_t oidsize;
 	int indx, rc;
 
@@ -2027,6 +2027,7 @@ static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
 		rc = gnutls_x509_crt_get_key_purpose_oid(signercert, indx,
 							 oidtmp, &oidsize,
 							 NULL);
+
 		if (rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			gnutls_assert();
 			return rc;
