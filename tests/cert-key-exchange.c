@@ -24,6 +24,9 @@
 #include <config.h>
 #endif
 
+/* This program tests the various certificate key exchange methods supported
+ * in gnutls */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,10 +77,16 @@ static void try(const char *name, const char *client_prio, gnutls_kx_algorithm_t
 	/* Init server */
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_cert, &server_key,
-					    GNUTLS_X509_FMT_PEM);
 
+	if (client_kx == GNUTLS_KX_ECDHE_ECDSA) {
+		gnutls_certificate_set_x509_key_mem(serverx509cred,
+						    &server_ecc_cert, &server_ecc_key,
+						    GNUTLS_X509_FMT_PEM);
+	} else {
+		gnutls_certificate_set_x509_key_mem(serverx509cred,
+						    &server_cert, &server_key,
+						    GNUTLS_X509_FMT_PEM);
+	}
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
@@ -90,7 +99,7 @@ static void try(const char *name, const char *client_prio, gnutls_kx_algorithm_t
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA",
+				   "NORMAL:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -208,6 +217,9 @@ void doit(void)
 	reset_buffers();
 	try("ecdhe rsa no cert", "NORMAL:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN, 0);
 	reset_buffers();
+	try("ecdhe ecdsa no cert", "NORMAL:-KX-ALL:+ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_ECDSA_SHA256, GNUTLS_SIGN_UNKNOWN, 0);
+	reset_buffers();
+
 	try("rsa no cert", "NORMAL:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, 0);
 	reset_buffers();
 	try("dhe-rsa cert", "NORMAL:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_RSA_SHA256, USE_CERT);
@@ -216,11 +228,17 @@ void doit(void)
 	reset_buffers();
 	try("rsa cert", "NORMAL:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_RSA_SHA256, USE_CERT);
 	reset_buffers();
+	try("ecdhe ecdsa cert", "NORMAL:-KX-ALL:+ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_ECDSA_SHA256, GNUTLS_SIGN_RSA_SHA256, USE_CERT);
+	reset_buffers();
+
 	try("dhe-rsa ask cert", "NORMAL:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
 	reset_buffers();
 	try("ecdhe-rsa ask cert", "NORMAL:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
 	reset_buffers();
 	try("rsa ask cert", "NORMAL:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
 	reset_buffers();
+	try("ecdhe ecdsa cert", "NORMAL:-KX-ALL:+ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_ECDSA_SHA256, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
+	reset_buffers();
+
 	gnutls_global_deinit();
 }
