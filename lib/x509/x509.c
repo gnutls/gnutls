@@ -672,6 +672,8 @@ gnutls_x509_crt_get_dn_oid(gnutls_x509_crt_t cert,
  * enumeration that is the signature algorithm that has been used to
  * sign this certificate.
  *
+ * Unknown/unsupported signature algorithms are mapped to %GNUTLS_SIGN_UNKNOWN.
+ *
  * Returns: a #gnutls_sign_algorithm_t value, or a negative error code on
  *   error.
  **/
@@ -679,6 +681,86 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert)
 {
 	return _gnutls_x509_get_signature_algorithm(cert->cert,
 						    "signatureAlgorithm.algorithm");
+}
+
+/**
+ * gnutls_x509_crt_get_signature_oid:
+ * @cert: should contain a #gnutls_x509_crt_t type
+ * @oid: a pointer to a buffer to hold the OID (may be null)
+ * @oid_size: initially holds the size of @oid
+ *
+ * This function will return the OID of the signature algorithm
+ * that has been used to sign this certificate. This is function
+ * is useful in the case gnutls_x509_crt_get_signature_algorithm()
+ * returned %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Returns: zero or a negative error code on error.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_x509_crt_get_signature_oid(gnutls_x509_crt_t cert, char *oid, size_t *oid_size)
+{
+	char str[MAX_OID_SIZE];
+	int len, result, ret;
+	gnutls_datum_t out;
+
+	len = sizeof(str);
+	result = asn1_read_value(cert->cert, "signatureAlgorithm.algorithm", str, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	out.data = (void*)str;
+	out.size = len;
+
+	ret = _gnutls_copy_string(&out, (void*)oid, oid_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_crt_get_pk_oid:
+ * @cert: should contain a #gnutls_x509_crt_t type
+ * @oid: a pointer to a buffer to hold the OID (may be null)
+ * @oid_size: initially holds the size of @oid
+ *
+ * This function will return the OID of the public key algorithm
+ * on that certificate. This is function
+ * is useful in the case gnutls_x509_crt_get_pk_algorithm()
+ * returned %GNUTLS_PK_UNKNOWN.
+ *
+ * Returns: zero or a negative error code on error.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_x509_crt_get_pk_oid(gnutls_x509_crt_t cert, char *oid, size_t *oid_size)
+{
+	char str[MAX_OID_SIZE];
+	int len, result, ret;
+	gnutls_datum_t out;
+
+	len = sizeof(str);
+	result = asn1_read_value(cert->cert, "tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm", str, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	out.data = (void*)str;
+	out.size = len;
+
+	ret = _gnutls_copy_string(&out, (void*)oid, oid_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
 }
 
 /**
@@ -1154,6 +1236,8 @@ gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt_t cert, void *id,
  * size in bits. For RSA the bits returned is the modulus.
  * For DSA the bits returned are of the public
  * exponent.
+ *
+ * Unknown/unsupported algorithms are mapped to %GNUTLS_PK_UNKNOWN.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  * success, or a negative error code on error.

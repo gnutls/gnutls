@@ -192,6 +192,8 @@ int gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
 				  char *sig, size_t * sizeof_sig);
 int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert);
 
+int gnutls_x509_crt_get_pk_oid(gnutls_x509_crt_t cert, char *oid, size_t *oid_size);
+int gnutls_x509_crt_get_signature_oid(gnutls_x509_crt_t cert, char *oid, size_t *oid_size);
 
 /**
  * gnutls_keyid_flags_t:
