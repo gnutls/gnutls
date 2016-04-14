@@ -814,6 +814,9 @@ either before the @funcintref{poll} system call, or after a call to
 @funcref{gnutls_record_recv}. Data queued by @funcref{gnutls_record_send}
 (when interrupted) can be discarded using @funcref{gnutls_record_discard_queued}.
 
+An example of GnuTLS' usage with asynchronous operation can be found
+in @code{doc/examples/tlsproxy}.
+
 The following paragraphs describe the detailed requirements for non-blocking
 operation when using the TLS or DTLS protocols.
 

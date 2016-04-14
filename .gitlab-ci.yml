@@ -1,6 +1,6 @@
 Compile minimal library:
   script:
-  - make autoreconf && ./configure --with-included-libtasn1
+  - git submodule update --init && make autoreconf && ./configure --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe --disable-openpgp-authentication
@@ -13,7 +13,7 @@ Compile minimal library:
   - tags
 Build and Check with asan:
   script:
-  - make autoreconf && CFLAGS="-fsanitize=address -g
+  - git submodule update --init && make autoreconf && CFLAGS="-fsanitize=address -g
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
   tags:
@@ -22,7 +22,7 @@ Build and Check with asan:
   - tags
 Build and Check with C99 and ubsan:
   script:
-  - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
+  - git submodule update --init && make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
   tags:
@@ -32,7 +32,7 @@ Build and Check with C99 and ubsan:
   - tags
 Build and Check - separate build dir (x86):
   script:
-  - make autoreconf && mkdir -p build && cd build &&
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -j4
   tags:
@@ -42,7 +42,7 @@ Build and Check - separate build dir (x86):
   - tags
 Build with ABI-check (x86-64):
   script:
-  - make autoreconf && mkdir -p build && cd build &&
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 && make abi-check
   tags:
   - x86-64
@@ -52,7 +52,7 @@ Build with ABI-check (x86-64):
   - tags
 Build and Check - clang:
   script:
-  - make autoreconf && 
+  - git submodule update --init && make autoreconf && 
     CC=clang ./configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -C tests -j4
   tags:
@@ -61,7 +61,7 @@ Build and Check - clang:
   - tags
 Build and Check in FIPS140-2 mode:
   script:
-  - make autoreconf && mkdir -p build && cd build &&
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -j4
   tags:
@@ -70,7 +70,7 @@ Build and Check in FIPS140-2 mode:
   - tags
 Build and Check for windows in separate build dir:
   script:
-  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
+  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j4 && mingw32-make -C tests check -j4
   tags:
@@ -81,7 +81,7 @@ Build and Check for windows in separate build dir:
   - tags
 Build and Check with valgrind:
   script:
-  - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
+  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
     --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
   tags:
   - nettle3

@@ -41,6 +41,10 @@ LDADD = libexamples.la				\
 CXX_LDADD = ../../lib/libgnutlsxx.la \
 	$(LDADD)
 
+EXTRA_DIST = tlsproxy/buffer.c tlsproxy/buffer.h tlsproxy/crypto-gnutls.c \
+	tlsproxy/crypto-gnutls.h tlsproxy/LICENSE tlsproxy/tlsproxy.c \
+	tlsproxy/README.md tlsproxy/Makefile
+
 noinst_PROGRAMS = ex-client-resume ex-client-dtls
 noinst_PROGRAMS += ex-cert-select ex-client-x509
 noinst_PROGRAMS += ex-serv-dtls
