@@ -28,7 +28,7 @@ See the end for copying conditions.
    Reported by Peter Dettman (#61).
 
 ** libgnutls: Added support for TLS false start (draft-ietf-tls-falsestart-01)
-   by introducing gnutls_handshake_set_false_start_function() (#73).
+   by introducing gnutls_init() flag GNUTLS_ENABLE_FALSE_START (#73).
 
 ** libgnutls: On a rehandshake ensure that the certificate of the peer (if
    available) is the same as in previous handshakes. That is to protect
@@ -72,9 +72,11 @@ See the end for copying conditions.
 ** guile: Tests no longer leave zombie processes behind
 
 ** API and ABI modifications:
+GNUTLS_ENABLE_FALSE_START: Added
 GNUTLS_INDEFINITE_TIMEOUT: Added
 GNUTLS_ALPN_SERVER_PRECEDENCE: Added
 GNUTLS_E_ASN1_EMBEDDED_NULL_IN_STRING: Added
+GNUTLS_E_HANDSHAKE_DURING_FALSE_START: Added
 gnutls_check_version_numeric: Added
 gnutls_x509_crq_set_subject_alt_othername: Added
 gnutls_x509_crt_set_subject_alt_othername: Added
@@ -94,7 +96,6 @@ gnutls_decode_ber_digest_info: Added
 gnutls_encode_ber_digest_info: Added
 gnutls_dh_params_import_dsa: Added
 gnutls_session_get_master_secret: Added
-gnutls_handshake_set_false_start_function: Added
 
 
 * Version 3.4.3 (released 2015-07-12)
