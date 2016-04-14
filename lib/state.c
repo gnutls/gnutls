@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2002-2015 Free Software Foundation, Inc.
- * Copyright (C) 2014-2015 Nikos Mavrogiannopoulos
+ * Copyright (C) 2002-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2014-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -449,6 +450,9 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 	if (flags & GNUTLS_ALLOW_CERT_CHANGE)
 		(*session)->internals.allow_cert_change = 1;
+
+	if (flags & GNUTLS_ENABLE_FALSE_START)
+		(*session)->internals.enable_false_start = 1;
 
 	return 0;
 }

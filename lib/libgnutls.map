@@ -1078,7 +1078,6 @@ GNUTLS_3_4
 	gnutls_dh_params_import_dsa;
 	gnutls_session_get_flags;
 	gnutls_session_get_master_secret;
-	gnutls_handshake_set_false_start_function;
 	gnutls_x509_crt_get_signature_oid;
 	gnutls_x509_crt_get_pk_oid;
 	gnutls_x509_crq_get_signature_oid;

@@ -226,19 +226,26 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE9, STATE10, STATE11, STATE12, STATE13, STATE14,
 	STATE15, STATE16, STATE17, STATE18, STATE19,
 	STATE20 = 20, STATE21, STATE22,
-	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
-	STATE60 = 60, STATE61, STATE62, 
+	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50
 } handshake_state_t;
+
+typedef enum bye_state_t {
+	BYE_STATE0 = 0, BYE_STATE1, BYE_STATE2
+} bye_state_t;
+
+#define BYE_STATE session->internals.bye_state
 
 typedef enum heartbeat_state_t {
 	SHB_SEND1 = 0,
 	SHB_SEND2,
-	SHB_RECV,
+	SHB_RECV
 } heartbeat_state_t;
 
 typedef enum recv_state_t {
 	RECV_STATE_0 = 0,
 	RECV_STATE_DTLS_RETRANSMIT,
+	RECV_STATE_FALSE_START_HANDLING, /* we are calling gnutls_handshake() within record_recv() */
+	RECV_STATE_FALSE_START /* gnutls_record_recv() should complete the handshake */
 } recv_state_t;
 
 #include "str.h"
@@ -760,6 +767,7 @@ typedef struct {
 						 * message */
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */
 	bool ticket_sent;	/* whether a session ticket was sent */
+	bye_state_t bye_state; /* used by gnutls_bye() */
 	handshake_state_t handshake_final_state;
 	handshake_state_t handshake_state;	/* holds
 						 * a number which indicates where
@@ -1016,8 +1024,7 @@ typedef struct {
 	uint8_t cert_hash[32];
 	bool cert_hash_set;
 
-	/* function to be called at false start */
-	gnutls_handshake_simple_hook_func false_start_func;
+	bool enable_false_start; /* whether TLS false start has been requested */
 	bool false_start_used; /* non-zero if false start was used for appdata */
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().

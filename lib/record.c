@@ -275,28 +275,27 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 {
 	int ret = 0;
 
-	switch (STATE) {
-	case STATE0:
-	case STATE60:
+	switch (BYE_STATE) {
+	case BYE_STATE0:
 		ret = _gnutls_io_write_flush(session);
-		STATE = STATE60;
+		BYE_STATE = BYE_STATE0;
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 		/* fallthrough */
-	case STATE61:
+	case BYE_STATE1:
 		ret =
 		    gnutls_alert_send(session, GNUTLS_AL_WARNING,
 				      GNUTLS_A_CLOSE_NOTIFY);
-		STATE = STATE61;
+		BYE_STATE = BYE_STATE1;
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 
-	case STATE62:
-		STATE = STATE62;
+	case BYE_STATE2:
+		BYE_STATE = BYE_STATE2;
 		if (how == GNUTLS_SHUT_RDWR) {
 			do {
 				ret =
@@ -315,7 +314,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 				return ret;
 			}
 		}
-		STATE = STATE62;
+		BYE_STATE = BYE_STATE2;
 
 		break;
 	default:
@@ -323,7 +322,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	STATE = STATE0;
+	BYE_STATE = BYE_STATE0;
 
 	session->internals.may_not_write = 1;
 	return 0;
@@ -732,13 +731,14 @@ record_add_to_buffers(gnutls_session_t session,
 		type == GNUTLS_CHANGE_CIPHER_SPEC ||
 		type == GNUTLS_HANDSHAKE)) {
 		_gnutls_record_buffer_put(session, type, seq, bufel);
-
+gnutls_assert();
 		/* if we received application data as expected then we
 		 * deactivate the async timer */
 		_dtls_async_timer_delete(session);
 	} else {
 		/* if the expected type is different than the received 
 		 */
+gnutls_assert();
 		switch (recv->type) {
 		case GNUTLS_ALERT:
 			if (bufel->msg.size < 2) {
@@ -1381,6 +1381,30 @@ check_session_status(gnutls_session_t session)
 	}
 
 	switch (session->internals.recv_state) {
+	case RECV_STATE_FALSE_START_HANDLING:
+		return 1;
+	case RECV_STATE_FALSE_START:
+		/* if false start is not complete we always expect for handshake packets
+		 * prior to anything else. */
+		if (session->security_parameters.entity == GNUTLS_CLIENT &&
+		    session->internals.enable_false_start != 0) {
+		    	/* Attempt to complete handshake */
+
+			session->internals.recv_state = RECV_STATE_FALSE_START_HANDLING;
+			ret = gnutls_handshake(session);
+			if (ret < 0) {
+				/* a temp or fatal error, make sure we reset the state
+				 * so we can resume or temp errors */
+				session->internals.recv_state = RECV_STATE_FALSE_START;
+				gnutls_assert();
+				return ret;
+			}
+
+			session->internals.recv_state = RECV_STATE_0;
+			return 1;
+		} else {
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
 	case RECV_STATE_DTLS_RETRANSMIT:
 		ret = _dtls_retransmit(session);
 		if (ret < 0)
