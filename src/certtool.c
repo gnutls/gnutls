@@ -139,6 +139,12 @@ generate_private_key_int(common_info_st * cinfo)
 		fprintf(stderr,
 			"Note that ECDSA keys with size less than 256 are not widely supported.\n\n");
 
+	if (provable && (key_type != GNUTLS_PK_RSA && key_type != GNUTLS_PK_DSA)) {
+		fprintf(stderr,
+			"The --provable parameter cannot be used with ECDSA keys.\n");
+		exit(1);
+	}
+
 	if (bits > 1024 && key_type == GNUTLS_PK_DSA)
 		fprintf(stderr,
 			"Note that DSA keys with size over 1024 may cause incompatibility problems when used with earlier than TLS 1.2 versions.\n\n");
