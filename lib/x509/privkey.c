@@ -1537,24 +1537,25 @@ cleanup:
 
 /**
  * gnutls_x509_privkey_generate:
- * @key: a key
+ * @key: an initialized key
  * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
- * @bits: the size of the modulus
+ * @bits: the size of the parameters to generate
  * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
  *
  * This function will generate a random private key. Note that this
  * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
- * instructs the key generation process to use algorithms which generate
- * provable parameters out of a seed.
+ * instructs the key generation process to use algorithms like Shawe-Taylor
+ * which generate provable parameters out of a seed.
  *
  * Note that when generating an elliptic curve key, the curve
  * can be substituted in the place of the bits parameter using the
- * GNUTLS_CURVE_TO_BITS() macro.
+ * GNUTLS_CURVE_TO_BITS() macro. The input to the macro is any curve from
+ * %gnutls_ecc_curve_t.
  *
  * For DSA keys, if the subgroup size needs to be specified check
  * the GNUTLS_SUBGROUP_TO_BITS() macro.
  *
- * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
+ * It is recommended to do not set the number of @bits directly, use gnutls_sec_param_to_pk_bits() instead .
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
