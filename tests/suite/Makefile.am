@@ -98,7 +98,8 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"					\
 	VALGRIND="$(VALGRIND)"				\
 	top_builddir="$(top_builddir)"			\
-	srcdir="$(srcdir)"
+	srcdir="$(srcdir)"				\
+	OPENSSL_ia32cap=0x00000000
 
 if ENABLE_NON_SUITEB_CURVES
 TESTS_ENVIRONMENT += ENABLE_NON_SUITEB_CURVES=1
