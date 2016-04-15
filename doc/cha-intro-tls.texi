@@ -652,6 +652,11 @@ to request an early return of the @funcref{gnutls_handshake} function. After tha
 return the application is expected to transfer any data to be piggybacked on the last handshake
 message.
 
+After handshake's early termination, the application is expected to call
+@funcref{gnutls_record_recv} on any received data as soon, to ensure that handshake
+completes timely. That is, especially relevant for applications which set an explicit
+time limit for the handshake process via @funcref{gnutls_handshake_set_timeout}.
+
 Note however, that the API ensures that the early return will not happen
 if the false start requirements are not satisfied. That is on ciphersuites which are not
 whitelisted for false start (see @xcite{draft-ietf-tls-falsestart-01}), the handshake
