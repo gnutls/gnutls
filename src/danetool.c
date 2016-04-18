@@ -90,7 +90,7 @@ static void cmd_parser(int argc, char **argv)
 	int ret, privkey_op = 0;
 	common_info_st cinfo;
 	const char *proto = "tcp";
-	const char *service = "443";
+	char service[32] = "443";
 
 	optionProcess(&danetoolOptions, argc, argv);
 
@@ -159,10 +159,10 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
 
 	if (HAVE_OPT(PORT)) {
-		service = OPT_ARG(PORT);
+		snprintf(service, sizeof(service), "%s", OPT_ARG(PORT));
 	} else {
 		if (HAVE_OPT(STARTTLS_PROTO))
-			service = starttls_proto_to_service(OPT_ARG(STARTTLS_PROTO));
+			snprintf(service, sizeof(service), "%s", starttls_proto_to_service(OPT_ARG(STARTTLS_PROTO)));
 	}
 
 	if (HAVE_OPT(PROTO))

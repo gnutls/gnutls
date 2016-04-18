@@ -73,7 +73,7 @@
 int resume, starttls, insecure, ranges, rehandshake, udp, mtu,
     inline_commands;
 const char *hostname = NULL;
-const char *service = NULL;
+char service[32]="";
 int record_max_size;
 int fingerprint;
 int crlf;
@@ -1533,12 +1533,12 @@ static void cmd_parser(int argc, char **argv)
 	mtu = OPT_VALUE_MTU;
 
 	if (HAVE_OPT(PORT)) {
-		service = OPT_ARG(PORT);
+		snprintf(service, sizeof(service), "%s", OPT_ARG(PORT));
 	} else {
 		if (HAVE_OPT(STARTTLS_PROTO))
-			service = starttls_proto_to_service(OPT_ARG(STARTTLS_PROTO));
+			snprintf(service, sizeof(service), "%s", starttls_proto_to_service(OPT_ARG(STARTTLS_PROTO)));
 		else
-			service = "443";
+			strcpy(service, "443");
 	}
 
 	record_max_size = OPT_VALUE_RECORDSIZE;

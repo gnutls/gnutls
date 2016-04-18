@@ -192,7 +192,7 @@ int main(int argc, char **argv)
 	gnutls_session_t state;
 	char portname[6];
 	socket_st hd;
-	const char *app_proto = NULL;
+	char app_proto[32] = "";
 
 	cmd_parser(argc, argv);
 
@@ -236,11 +236,11 @@ int main(int argc, char **argv)
 #endif
 
 	if (HAVE_OPT(APP_PROTO)) {
-		app_proto = OPT_ARG(APP_PROTO);
+		snprintf(app_proto, sizeof(app_proto), "%s", OPT_ARG(APP_PROTO));
 	}
 
 	if (app_proto == NULL) {
-		app_proto = port_to_service(portname, "tcp");
+		snprintf(app_proto, sizeof(app_proto), "%s", port_to_service(portname, "tcp"));
 	}
 
 	sockets_init();
