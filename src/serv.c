@@ -135,6 +135,7 @@ LIST_TYPE_DECLARE(listener_item, char *http_request; char *http_response;
 		  int listen_socket; int fd;
 		  gnutls_session_t tls_session;
 		  int handshake_ok;
+		  int no_close;
 		  time_t start;
     );
 
@@ -152,7 +153,8 @@ static void listener_free(listener_item * j)
 	free(j->http_request);
 	free(j->http_response);
 	if (j->fd >= 0) {
-		gnutls_bye(j->tls_session, GNUTLS_SHUT_WR);
+		if (j->no_close == 0)
+			gnutls_bye(j->tls_session, GNUTLS_SHUT_WR);
 		shutdown(j->fd, 2);
 		close(j->fd);
 		gnutls_deinit(j->tls_session);
@@ -1214,6 +1216,7 @@ static void retry_handshake(listener_item *j)
 		do {
 			ret = gnutls_alert_send_appropriate(j->tls_session, r);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		j->no_close = 1;
 	} else if (r == 0) {
 		if (gnutls_session_is_resumed(j->tls_session) != 0 && verbose != 0)
 			printf("*** This is a resumed session\n");
@@ -1357,6 +1360,7 @@ static void tcp_server(const char *name, int port)
 					    (j->tls_session, accept_fd);
 					set_read_funcs(j->tls_session);
 					j->handshake_ok = 0;
+					j->no_close = 0;
 
 					if (verbose != 0) {
 						ctt = ctime(&tt);
@@ -1410,6 +1414,7 @@ static void tcp_server(const char *name, int port)
 									ret = gnutls_alert_send_appropriate(j->tls_session, r);
 								} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 								GERR(r);
+								j->no_close = 1;
 							}
 						}
 					} else {
