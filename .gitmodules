@@ -4,3 +4,12 @@
 [submodule "tlsproxy"]
 	path = doc/examples/tlsproxy
 	url = https://github.com/abligh/tlsproxy.git
+[submodule "tests/suite/tls-fuzzer/tlsfuzzer"]
+	path = tests/suite/tls-fuzzer/tlsfuzzer
+	url = https://github.com/tomato42/tlsfuzzer.git
+[submodule "tests/suite/tls-fuzzer/python-ecdsa"]
+	path = tests/suite/tls-fuzzer/python-ecdsa
+	url = https://github.com/warner/python-ecdsa
+[submodule "tests/suite/tls-fuzzer/tlslite-ng"]
+	path = tests/suite/tls-fuzzer/tlslite-ng
+	url = https://github.com/tomato42/tlslite-ng.git
