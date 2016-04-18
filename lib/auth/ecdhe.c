@@ -159,6 +159,9 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
+	if (data_size != 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 	/* generate pre-shared key */
 	ret = calc_ecdh_key(session, psk_key, curve);
 	if (ret < 0) {

@@ -71,6 +71,10 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 	_n_Y = n_Y;
 
 	DECR_LEN(data_size, n_Y);
+
+	if (data_size != 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 	if (_gnutls_mpi_init_scan_nz(&session->key.client_Y, &data[2], _n_Y)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -86,7 +90,6 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 		gnutls_assert();
 		goto error;
 	}
-
 
 	if (psk_key == NULL) {
 		session->key.key.data = tmp_dh_key.data;
