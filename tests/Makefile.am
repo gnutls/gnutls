@@ -187,7 +187,7 @@ name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test
+dist_check_SCRIPTS = rfc2253-escape-test danetool.sh
 
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
