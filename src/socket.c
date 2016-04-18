@@ -338,7 +338,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 #endif
 
 	if (msg != NULL)
-		printf("Resolving '%s'...\n", a_hostname);
+		printf("Resolving '%s:%s'...\n", a_hostname,service);
 
 	/* get server name */
 	memset(&hints, 0, sizeof(hints));
@@ -472,7 +472,7 @@ int service_to_port(const char *service, const char *proto)
 
 	sr = getservbyname(service, proto);
 	if (sr == NULL) {
-		fprintf(stderr, "Warning: getservbyname() failed.\n");
+		fprintf(stderr, "Warning: getservbyname() failed for '%s/%s'.\n", service, proto);
 		exit(1);
 	}
 

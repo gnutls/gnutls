@@ -84,9 +84,9 @@ flag = {
 
 flag = {
     name      = port;
-    arg-type  = number;
-    descrip   = "Specify the port number for the DANE data";
-    default-value = 443;
+    arg-type  = string;
+    descrip   = "The port or service to connect to, for DANE data";
+    default-value = "443";
     doc      = "";
 };
 

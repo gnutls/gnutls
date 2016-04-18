@@ -52,15 +52,15 @@
 #include "certtool-common.h"
 #include "socket.h"
 
-static const char* obtain_cert(const char *hostname, const char *proto, unsigned int port,
+static const char *obtain_cert(const char *hostname, const char *proto, const char *service,
 				const char *app_proto, unsigned quiet);
 static void cmd_parser(int argc, char **argv);
 static void dane_info(const char *host, const char *proto,
-		      unsigned int port, unsigned int ca,
+		      const char *service, unsigned int ca,
 		      unsigned int domain, common_info_st * cinfo);
 
 static void dane_check(const char *host, const char *proto,
-		       unsigned int port, common_info_st * cinfo);
+		       const char *service, common_info_st * cinfo);
 
 FILE *outfile;
 static gnutls_digest_algorithm_t default_dig;
@@ -90,7 +90,7 @@ static void cmd_parser(int argc, char **argv)
 	int ret, privkey_op = 0;
 	common_info_st cinfo;
 	const char *proto = "tcp";
-	unsigned int port = 443;
+	const char *service = "443";
 
 	optionProcess(&danetoolOptions, argc, argv);
 
@@ -159,19 +159,20 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
 
 	if (HAVE_OPT(PORT)) {
-		port = OPT_VALUE_PORT;
+		service = OPT_ARG(PORT);
 	} else {
 		if (HAVE_OPT(STARTTLS_PROTO))
-			port = starttls_proto_to_port(OPT_ARG(STARTTLS_PROTO));
+			service = starttls_proto_to_service(OPT_ARG(STARTTLS_PROTO));
 	}
+
 	if (HAVE_OPT(PROTO))
 		proto = OPT_ARG(PROTO);
 
 	if (HAVE_OPT(TLSA_RR))
-		dane_info(OPT_ARG(HOST), proto, port,
+		dane_info(OPT_ARG(HOST), proto, service,
 			  HAVE_OPT(CA), ENABLED_OPT(DOMAIN), &cinfo);
 	else if (HAVE_OPT(CHECK))
-		dane_check(OPT_ARG(CHECK), proto, port, &cinfo);
+		dane_check(OPT_ARG(CHECK), proto, service, &cinfo);
 	else
 		USAGE(1);
 
@@ -185,7 +186,7 @@ static void cmd_parser(int argc, char **argv)
 
 #define MAX_CLIST_SIZE 32
 static void dane_check(const char *host, const char *proto,
-		       unsigned int port, common_info_st * cinfo)
+		       const char *service, common_info_st * cinfo)
 {
 #ifdef HAVE_DANE
 	dane_state_t s;
@@ -203,6 +204,7 @@ static void dane_check(const char *host, const char *proto,
 	gnutls_x509_crt_t *clist = NULL;
 	unsigned int clist_size = 0;
 	gnutls_datum_t certs[MAX_CLIST_SIZE];
+	int port = service_to_port(service, proto);
 
 	if (ENABLED_OPT(LOCAL_DNS))
 		flags = 0;
@@ -221,7 +223,7 @@ static void dane_check(const char *host, const char *proto,
 		if (HAVE_OPT(APP_PROTO))
 			app_proto = OPT_ARG(APP_PROTO);
 
-		cinfo->cert = obtain_cert(host, proto, port, app_proto, HAVE_OPT(QUIET));
+		cinfo->cert = obtain_cert(host, proto, service, app_proto, HAVE_OPT(QUIET));
 		del = 1;
 	}
 
@@ -444,7 +446,7 @@ static void dane_check(const char *host, const char *proto,
 }
 
 static void dane_info(const char *host, const char *proto,
-		      unsigned int port, unsigned int ca,
+		      const char *service, unsigned int ca,
 		      unsigned int domain, common_info_st * cinfo)
 {
 	gnutls_pubkey_t pubkey;
@@ -454,11 +456,10 @@ static void dane_info(const char *host, const char *proto,
 	int ret;
 	unsigned int usage, selector, type;
 	size_t size;
+	int port = service_to_port(service, proto);
 
 	if (proto == NULL)
 		proto = "tcp";
-	if (port == 0)
-		port = 443;
 
 	crt = load_cert(0, cinfo);
 	if (crt != NULL && HAVE_OPT(X509)) {
@@ -660,16 +661,15 @@ static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
 	return 0;
 }
 
-static const char *obtain_cert(const char *hostname, const char *proto, unsigned port,
+static const char *obtain_cert(const char *hostname, const char *proto, const char *service,
 				const char *app_proto, unsigned quiet)
 {
 	socket_st hd;
-	char txt_port[16];
+	const char *txt_service;
 	unsigned udp = 0;
 	static char tmpfile[32];
 	int fd, ret;
 	const char *str = "Obtaining certificate from";
-	const char *service;
 
 	if (strcmp(proto, "udp") == 0)
 		udp = 1;
@@ -681,14 +681,13 @@ static const char *obtain_cert(const char *hostname, const char *proto, unsigned
 	strcpy(tmpfile, "danetool-certXXXXXX");
 
 	sockets_init();
-	snprintf(txt_port, sizeof(txt_port), "%u", port);
+	txt_service = port_to_service(service, proto);
 
 	if (quiet)
 		str = NULL;
-	service = port_to_service(txt_port, proto);
-	socket_open(&hd, hostname, service, udp, str);
+	socket_open(&hd, hostname, txt_service, udp, str);
 
-	if (app_proto == NULL) app_proto = service;
+	if (app_proto == NULL) app_proto = txt_service;
 	socket_starttls(&hd, app_proto);
 
 	umask(066);
