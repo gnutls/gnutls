@@ -37,7 +37,7 @@
 
 #include <dirent.h>
 
-#ifndef _DIRENT_HAVE_D_TYPE
+#if !defined(_DIRENT_HAVE_D_TYPE) && !defined(__native_client__)
 # ifdef DT_UNKNOWN
 #  define _DIRENT_HAVE_D_TYPE
 # endif
