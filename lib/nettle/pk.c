@@ -193,23 +193,17 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_mpi_modm(ff, f, prime);
+		ret = _gnutls_mpi_add_ui(ff, f, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto dh_cleanup;
 		}
 
-		ret = _gnutls_mpi_add_ui(ff, ff, 1);
-		if (ret < 0) {
-			gnutls_assert();
-			goto dh_cleanup;
-		}
-
-		/* check if f==0,1,p-1. 
-		 * or (ff=f+1) equivalently ff==1,2,p */
+		/* check if f==0,1, or f >= p-1. 
+		 * or (ff=f+1) equivalently ff==1,2, ff >= p */
 		if ((_gnutls_mpi_cmp_ui(ff, 2) == 0)
 		    || (_gnutls_mpi_cmp_ui(ff, 1) == 0)
-		    || (_gnutls_mpi_cmp(ff, prime) == 0)) {
+		    || (_gnutls_mpi_cmp(ff, prime) >= 0)) {
 			gnutls_assert();
 			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			goto dh_cleanup;
