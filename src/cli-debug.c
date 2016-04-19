@@ -264,6 +264,8 @@ int main(int argc, char **argv)
 		}
 
 		socket_open(&hd, hostname, portname, 0, NULL);
+		hd.verbose = verbose;
+
 		socket_starttls(&hd, app_proto);
 
 		gnutls_init(&state, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
