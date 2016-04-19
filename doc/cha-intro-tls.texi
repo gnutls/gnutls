@@ -652,17 +652,25 @@ to request an early return of the @funcref{gnutls_handshake} function. After tha
 return the application is expected to transfer any data to be piggybacked on the last handshake
 message.
 
-After handshake's early termination, the application is expected to call
-@funcref{gnutls_record_recv} on any received data as soon, to ensure that handshake
-completes timely. That is, especially relevant for applications which set an explicit
-time limit for the handshake process via @funcref{gnutls_handshake_set_timeout}.
+After handshake's early termination, the application is expected to transmit
+data using @funcref{gnutls_record_send}, and call @funcref{gnutls_record_recv} on
+any received data as soon, to ensure that handshake completes timely. That is, especially
+relevant for applications which set an explicit time limit for the handshake process
+via @funcref{gnutls_handshake_set_timeout}.
 
 Note however, that the API ensures that the early return will not happen
-if the false start requirements are not satisfied. That is on ciphersuites which are not
-whitelisted for false start (see @xcite{draft-ietf-tls-falsestart-01}), the handshake
+if the false start requirements are not satisfied. That is, on ciphersuites which are not
+whitelisted for false start or on insufficient key sizes, the handshake
 process will complete properly (i.e., no early return). To verify that false start was used you
 may use @funcref{gnutls_session_get_flags} and check for the @acronym{GNUTLS_SFLAGS_FALSE_START}
-flag.
+flag. For GnuTLS the false start is whitelisted for the following
+key exchange methods (see @xcite{draft-ietf-tls-falsestart-01} for rationale)
+@itemize
+@item DHE
+@item ECDHE
+@end itemize
+but only when the negotiated parameters exceed @code{GNUTLS_SEC_PARAM_HIGH}
+--see @ref{tab:key-sizes}, and when under (D)TLS 1.2 or later.
 
 @node Application Layer Protocol Negotiation (ALPN)
 @subsection Application Layer Protocol Negotiation (ALPN)
