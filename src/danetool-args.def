@@ -218,6 +218,7 @@ $ danetool --check www.example.com --proto tcp --port 443
 To verify an HTTPS server's DANE TLSA entry, use:
 @example
 $ danetool --check www.example.com --proto tcp --port 443 --load-certificate chain.pem
+@end example
 
 To verify an SMTP server's DANE TLSA entry, use:
 @example
