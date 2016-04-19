@@ -220,8 +220,8 @@ static void dane_check(const char *host, const char *proto,
 
 	if (!cinfo->cert) {
 		const char *app_proto = NULL;
-		if (HAVE_OPT(APP_PROTO))
-			app_proto = OPT_ARG(APP_PROTO);
+		if (HAVE_OPT(STARTTLS_PROTO))
+			app_proto = OPT_ARG(STARTTLS_PROTO);
 
 		cinfo->cert = obtain_cert(host, proto, service, app_proto, HAVE_OPT(QUIET));
 		del = 1;
