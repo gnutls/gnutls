@@ -33,7 +33,8 @@ See the end for copying conditions.
 ** libgnutls: On a rehandshake ensure that the certificate of the peer (if
    available) is the same as in previous handshakes. That is to protect
    applications which do not check user credentials on rehandshakes from
-   attacks related to unsafe renegotiation.
+   attacks related to unsafe renegotiation. This can be overriden using
+   the %GNUTLS_ALLOW_CERT_CHANGE flag in gnutls_init().
 
 ** libgnutls: Follow RFC5280 strictly in name constraints computation. The
    permitted subtrees is intersected with any previous values. Report and
