@@ -325,6 +325,8 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	char portname[16] = { 0 };
 	char *a_hostname = (char*)hostname;
 
+	memset(hd, 0, sizeof(*hd));
+
 #ifdef HAVE_LIBIDN
 	err = idna_to_ascii_8z(hostname, &a_hostname, IDNA_ALLOW_UNASSIGNED);
 	if (err != IDNA_SUCCESS) {
