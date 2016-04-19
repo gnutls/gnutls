@@ -451,7 +451,7 @@ flag = {
     name      = hash;
     arg-type  = string;
     descrip   = "Hash algorithm to use for signing";
-    doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512.";
+    doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.";
 };
 
 flag = {
