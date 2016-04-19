@@ -424,6 +424,13 @@ Connecting to '127.0.0.1:5556'...
 @end example
 By keeping the --pskusername parameter and removing the --pskkey parameter, it will query only for the password during the handshake. 
 
+@subheading Connecting to STARTTLS services
+
+You could also use the client to connect to services with starttls capability.
+@example
+$ gnutls-cli --starttls-proto smtp --port 25 localhost
+@end example
+
 @subheading Listing ciphersuites in a priority string
 To list the ciphersuites in a priority string:
 @example
