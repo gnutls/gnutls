@@ -242,7 +242,7 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		if (!c_isdigit(app_proto[0])) {
 			static int warned = 0;
 			if (warned == 0) {
-				fprintf(stderr, "unknown protocol %s\n", app_proto);
+				fprintf(stderr, "unknown protocol '%s'\n", app_proto);
 				warned = 1;
 			}
 		}

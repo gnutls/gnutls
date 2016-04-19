@@ -52,7 +52,7 @@ doc-section = {
   ds-format = 'texi';
   ds-text   = <<-_EOF_
 @example
-$ ../src/gnutls-cli-debug localhost
+$ gnutls-cli-debug localhost
 GnuTLS debug client 3.5.0
 Checking localhost:443
                              for SSL 3.0 (RFC6101) support... yes
@@ -101,6 +101,12 @@ whether a bogus TLS record version in the client hello is accepted... yes
                 for OCSP status response (RFC6066) support... no
               for OpenPGP authentication (RFC6091) support... no
 @end example
+
+You could also use the client to debug services with starttls capability.
+@example
+$ gnutls-cli-debug --starttls-proto smtp --port 25 localhost
+@end example
+
 _EOF_;
 };
 
