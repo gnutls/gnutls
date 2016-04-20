@@ -41,7 +41,7 @@ static size_t _mmap_size;
 static void *get_mem(size_t size)
 {
 	_mmap_size = size;
-	return mmap(NULL, size, PROT_READ, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+	return mmap(NULL, size, PROT_READ, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 }
 
 static void put_mem(void *mem)
