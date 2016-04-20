@@ -87,3 +87,11 @@ Build and Check with valgrind:
   - nettle3
   except:
   - tags
+Build and Check on FreeBSD:
+  script:
+  - git submodule update --init && gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
+    --disable-doc --disable-valgrind-tests && gmake -j4 && gmake check -j4
+  tags:
+  - freebsd
+  except:
+  - tags
