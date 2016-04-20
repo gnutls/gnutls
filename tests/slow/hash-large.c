@@ -33,6 +33,29 @@
 
 /* Test hashing on large buffers */
 
+#ifdef HAVE_MMAP
+
+#include <sys/mman.h>
+
+static size_t _mmap_size;
+static void *get_mem(size_t size)
+{
+	_mmap_size = size;
+	return mmap(NULL, size, PROT_READ, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+}
+
+static void put_mem(void *mem)
+{
+	munmap(mem, _mmap_size);
+}
+
+#else
+
+# define get_mem(x) calloc(1, x)
+# define put_mem(x) free(x)
+
+#endif
+
 void doit(void)
 {
 	unsigned char digest[32];
@@ -47,7 +70,7 @@ void doit(void)
 	global_init();
 
 	size = (ssize_t)UINT_MAX + (ssize_t)64*1024;
-	buf = calloc(1, size);
+	buf = get_mem(size);
 	if (buf == NULL)
 		exit(77);
 
@@ -129,6 +152,7 @@ void doit(void)
 		}
 	}
 
-	free(buf);
+	put_mem(buf);
 	gnutls_global_deinit();
 }
+
