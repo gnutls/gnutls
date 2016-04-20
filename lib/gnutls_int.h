@@ -94,17 +94,12 @@ typedef struct {
 #include <gnutls/abstract.h>
 #include <system.h>
 
-/*
- * They are not needed any more. You can simply enable
- * the gnutls_log callback to get error descriptions.
-
-#define BUFFERS_DEBUG
-#define WRITE_DEBUG
-#define READ_DEBUG
-#define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define COMPRESSION_DEBUG
-#define DEBUG
-*/
+/* in case we compile with system headers taking priority, we
+ * make sure that some new attributes are still available.
+ */
+#ifndef __GNUTLS_CONST__
+# define __GNUTLS_CONST__
+#endif
 
 /* The size of a handshake message should not
  * be larger than this value.
