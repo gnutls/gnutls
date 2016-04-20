@@ -21,9 +21,11 @@
 srcdir="${srcdir:-.}"
 DANETOOL="${DANETOOL:-../src/danetool${EXEEXT}}"
 
-# Unfortunately it is extremely fragile and fails 99% of the
-# time.
 if test "${WINDIR}" != ""; then
+	exit 77
+fi
+
+if ! test -x "${DANETOOL}"; then
 	exit 77
 fi
 
