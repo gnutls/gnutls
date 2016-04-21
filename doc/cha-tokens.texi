@@ -478,7 +478,9 @@ operational differences from @acronym{PKCS} #11 module, and thus require differe
 The basic TPM operations supported and used by GnuTLS, are key generation and signing. 
 
 The next sections assume that the TPM chip in the system is already initialized and
-in a operational state.
+in a operational state. If not, ensure that the TPM chip is enabled by your BIOS,
+that the @code{tcsd} daemon is running, and that TPM ownership is set
+(by running @code{tpm_takeownership}).
 
 In GnuTLS the TPM functionality is available in @code{gnutls/tpm.h}.
 
