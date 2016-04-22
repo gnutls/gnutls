@@ -43,10 +43,13 @@
 
 const char *side = "";
 
-#define PRIO_DH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
-#define PRIO_ECDH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
-#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
-#define PRIO_RSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_DH "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
+#define PRIO_ECDH "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
+#define PRIO_ECDHX "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
+#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
+#define PRIO_ECDHX_ECDSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
+#define PRIO_RSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+
 
 #define PRIO_ARCFOUR_128_SHA1 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
@@ -356,7 +359,7 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 	gnutls_session_t server;
 	int sret, cret;
 	const char *str;
-	const char *suite = NULL;
+	char *suite = NULL;
 	/* Client stuff. */
 	gnutls_anon_client_credentials_t c_anoncred;
 	gnutls_certificate_credentials_t c_certcred, s_certcred;
@@ -455,12 +458,7 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 
 		if (suite == NULL)
 			suite =
-			    gnutls_cipher_suite_get_name(gnutls_kx_get
-							 (server),
-							 gnutls_cipher_get
-							 (server),
-							 gnutls_mac_get
-							 (server));
+			    gnutls_session_get_desc(server);
 
 		gnutls_deinit(client);
 		gnutls_deinit(server);
@@ -474,6 +472,7 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 	while (benchmark_must_finish == 0);
 
 	fprintf(stdout, "%38s  ", suite);
+	gnutls_free(suite);
 	stop_benchmark(&st, "transactions", 1);
 
 	avg = calc_avg(diffs, diffs_size);
@@ -528,7 +527,9 @@ void benchmark_tls(int debug_level, int ciphers)
 		     rsa_bits, ec_bits);
 		test_ciphersuite_kx(PRIO_DH);
 		test_ciphersuite_kx(PRIO_ECDH);
+		test_ciphersuite_kx(PRIO_ECDHX);
 		test_ciphersuite_kx(PRIO_ECDHE_ECDSA);
+		test_ciphersuite_kx(PRIO_ECDHX_ECDSA);
 		test_ciphersuite_kx(PRIO_RSA);
 	}
 
