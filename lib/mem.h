@@ -31,6 +31,8 @@ void *gnutls_realloc_fast(void *ptr, size_t size);
 void *_gnutls_calloc(size_t nmemb, size_t size);
 char *_gnutls_strdup(const char *);
 
+unsigned _gnutls_mem_is_zero(const uint8_t *ptr, unsigned size);
+
 /* To avoid undefined behavior when s1 or s2 are null and n = 0 */
 inline static
 int safe_memcmp(const void *s1, const void *s2, size_t n)

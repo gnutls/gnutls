@@ -34,6 +34,8 @@
 /* would allow for 256 ciphersuites */
 #define MAX_CIPHERSUITE_SIZE 512
 
+#define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDHX))
+
 /* Functions for version handling. */
 const version_entry_st *version_to_entry(gnutls_protocol_t c);
 const version_entry_st *_gnutls_version_lowest(gnutls_session_t session);
@@ -319,6 +321,7 @@ struct gnutls_ecc_curve_entry_st {
 	const char *name;
 	const char *oid;
 	gnutls_ecc_curve_t id;
+	gnutls_pk_algorithm_t pk;
 	int tls_id;		/* The RFC4492 namedCurve ID */
 	int size;		/* the size in bytes */
 };

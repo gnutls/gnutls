@@ -91,6 +91,7 @@ _gnutls_ecc_ansi_x963_export(gnutls_ecc_curve_t curve, bigint_t x,
 }
 
 
+
 int
 _gnutls_ecc_ansi_x963_import(const uint8_t * in,
 			     unsigned long inlen, bigint_t * x,
@@ -123,3 +124,4 @@ _gnutls_ecc_ansi_x963_import(const uint8_t * in,
 
 	return 0;
 }
+

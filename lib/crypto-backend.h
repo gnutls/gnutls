@@ -173,6 +173,8 @@ typedef struct {
 	bigint_t params[GNUTLS_MAX_PK_PARAMS];
 	unsigned int params_nr;	/* the number of parameters */
 	unsigned int flags;
+	gnutls_datum_t raw_pub; /* used by x25519 */
+	gnutls_datum_t raw_priv;
 
 	unsigned int seed_size;
 	uint8_t seed[MAX_PVP_SEED_SIZE];

@@ -187,6 +187,16 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 		dst->params_nr++;
 	}
 
+	if (_gnutls_set_datum(&dst->raw_priv, src->raw_priv.data, src->raw_priv.size) < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	if (_gnutls_set_datum(&dst->raw_pub, src->raw_pub.data, src->raw_pub.size) < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
 	if (src->seed_size) {
 		dst->seed_size = src->seed_size;
 		memcpy(dst->seed, src->seed, src->seed_size);
@@ -211,6 +221,11 @@ void gnutls_pk_params_release(gnutls_pk_params_st * p)
 	for (i = 0; i < p->params_nr; i++) {
 		_gnutls_mpi_release(&p->params[i]);
 	}
+	gnutls_free(p->raw_priv.data);
+	gnutls_free(p->raw_pub.data);
+	p->raw_priv.data = NULL;
+	p->raw_pub.data = NULL;
+
 	p->params_nr = 0;
 }
 
@@ -223,6 +238,10 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
 	}
 	gnutls_memset(p->seed, 0, p->seed_size);
 	p->seed_size = 0;
+	if (p->raw_priv.data != NULL) {
+		gnutls_memset(p->raw_priv.data, 0, p->raw_priv.size);
+		p->raw_priv.size = 0;
+	}
 }
 
 /* Writes the digest information and the digest in a DER encoded

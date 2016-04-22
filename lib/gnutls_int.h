@@ -376,9 +376,11 @@ typedef struct auth_cred_st {
 
 struct gnutls_key_st {
 	/* For ECDH KX */
-	gnutls_pk_params_st ecdh_params;
+	gnutls_pk_params_st ecdh_params; /* private part */
+	/* public part */
 	bigint_t ecdh_x;
 	bigint_t ecdh_y;
+	gnutls_datum_t ecdhx; /* public key used in ECDHX (point) */
 
 	/* For DH KX */
 	gnutls_datum_t key;

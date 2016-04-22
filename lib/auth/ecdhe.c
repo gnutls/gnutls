@@ -87,40 +87,40 @@ const mod_auth_st ecdhe_rsa_auth_struct = {
 
 static int calc_ecdh_key(gnutls_session_t session,
 			 gnutls_datum_t * psk_key,
-			 gnutls_ecc_curve_t curve)
+			 const gnutls_ecc_curve_entry_st *ecurve)
 {
 	gnutls_pk_params_st pub;
 	int ret;
+	gnutls_datum_t tmp_dh_key;
 
 	gnutls_pk_params_init(&pub);
 	pub.params[ECC_X] = session->key.ecdh_x;
 	pub.params[ECC_Y] = session->key.ecdh_y;
-	pub.flags = curve;
+	pub.raw_pub.data = session->key.ecdhx.data;
+	pub.raw_pub.size = session->key.ecdhx.size;
+	pub.flags = ecurve->id;
+
+	ret =
+	    _gnutls_pk_derive(ecurve->pk, &tmp_dh_key,
+			      &session->key.ecdh_params, &pub);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
 	if (psk_key == NULL) {
-		ret =
-		    _gnutls_pk_derive(GNUTLS_PK_EC, &session->key.key,
-				      &session->key.ecdh_params, &pub);
+		memcpy(&session->key.key, &tmp_dh_key, sizeof(gnutls_datum_t));
+		tmp_dh_key.data = NULL; /* no longer needed */
 	} else {
-		gnutls_datum_t tmp_dh_key;
-
-		ret =
-		    _gnutls_pk_derive(GNUTLS_PK_EC, &tmp_dh_key,
-				      &session->key.ecdh_params, &pub);
-		if (ret < 0) {
-			ret = gnutls_assert_val(ret);
-			goto cleanup;
-		}
-
 		ret =
 		    _gnutls_set_psk_session_key(session, psk_key,
 						&tmp_dh_key);
 		_gnutls_free_temp_key_datum(&tmp_dh_key);
-	}
 
-	if (ret < 0) {
-		ret = gnutls_assert_val(ret);
-		goto cleanup;
+		if (ret < 0) {
+			ret = gnutls_assert_val(ret);
+			goto cleanup;
+		}
 	}
 
 	ret = 0;
@@ -129,6 +129,7 @@ static int calc_ecdh_key(gnutls_session_t session,
 	/* no longer needed */
 	_gnutls_mpi_release(&session->key.ecdh_x);
 	_gnutls_mpi_release(&session->key.ecdh_y);
+	_gnutls_free_datum(&session->key.ecdhx);
 	gnutls_pk_params_release(&session->key.ecdh_params);
 	return ret;
 }
@@ -141,8 +142,9 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 	int ret, i = 0;
 	int point_size;
+	const gnutls_ecc_curve_entry_st *ecurve = _gnutls_ecc_curve_get_params(curve);
 
-	if (curve == GNUTLS_ECC_CURVE_INVALID)
+	if (curve == GNUTLS_ECC_CURVE_INVALID || ecurve == NULL)
 		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
 
 	DECR_LEN(data_size, 1);
@@ -150,20 +152,43 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 	i += 1;
 
 	DECR_LEN(data_size, point_size);
-	ret =
-	    _gnutls_ecc_ansi_x963_import(&data[i], point_size,
+
+	if (ecurve->pk == GNUTLS_PK_EC) {
+		ret =
+		    _gnutls_ecc_ansi_x963_import(&data[i], point_size,
 					 &session->key.ecdh_x,
 					 &session->key.ecdh_y);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else if (ecurve->pk == GNUTLS_PK_ECDHX) {
+		if (ecurve->size != point_size)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		if (_gnutls_mem_is_zero(&data[i], point_size))
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		ret = _gnutls_set_datum(&session->key.ecdhx,
+					&data[i], point_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		/* RFC7748 requires to mask the MSB in the final byte */
+		if (ecurve->id == GNUTLS_ECC_CURVE_X25519) {
+			session->key.ecdhx.data[point_size-1] &= 0x7f;
+		}
+	} else {
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
 	if (data_size != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	/* generate pre-shared key */
-	ret = calc_ecdh_key(session, psk_key, curve);
+	ret = calc_ecdh_key(session, psk_key, ecurve);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -208,37 +233,57 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 	int ret;
 	gnutls_datum_t out;
 	int curve = _gnutls_session_ecc_curve_get(session);
+	const gnutls_ecc_curve_entry_st *ecurve = _gnutls_ecc_curve_get_params(curve);
+	int pk;
+
+	if (ecurve == NULL)
+		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
+
+	pk = ecurve->pk;
 
 	/* generate temporal key */
 	ret =
-	    _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve,
+	    _gnutls_pk_generate_keys(pk, curve,
 				     &session->key.ecdh_params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_ecc_ansi_x963_export(curve,
-					 session->key.ecdh_params.
-					 params[ECC_X] /* x */ ,
-					 session->key.ecdh_params.
-					 params[ECC_Y] /* y */ , &out);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	if (pk == GNUTLS_PK_EC) {
+		ret =
+		    _gnutls_ecc_ansi_x963_export(curve,
+						 session->key.ecdh_params.
+						 params[ECC_X] /* x */ ,
+						 session->key.ecdh_params.
+						 params[ECC_Y] /* y */ , &out);
 
-	ret =
-	    _gnutls_buffer_append_data_prefix(data, 8, out.data, out.size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-	_gnutls_free_datum(&out);
+		ret =
+		    _gnutls_buffer_append_data_prefix(data, 8, out.data, out.size);
 
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+		_gnutls_free_datum(&out);
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else if (pk == GNUTLS_PK_ECDHX) {
+		ret =
+		    _gnutls_buffer_append_data_prefix(data, 8,
+		    			session->key.ecdh_params.raw_pub.data,
+		    			session->key.ecdh_params.raw_pub.size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	/* generate pre-shared key */
-	ret = calc_ecdh_key(session, psk_key, curve);
+	ret = calc_ecdh_key(session, psk_key, ecurve);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -276,6 +321,7 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 	int i, ret, point_size;
 	gnutls_ecc_curve_t curve;
 	ssize_t data_size = _data_size;
+	const gnutls_ecc_curve_entry_st *ecurve;
 
 	/* just in case we are resuming a session */
 	gnutls_pk_params_release(&session->key.ecdh_params);
@@ -302,6 +348,12 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	ecurve = _gnutls_ecc_curve_get_params(curve);
+	if (ecurve == NULL) {
+		gnutls_assert();
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	}
+
 	_gnutls_session_ecc_curve_set(session, curve);
 
 	DECR_LEN(data_size, 1);
@@ -309,12 +361,34 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 	i++;
 
 	DECR_LEN(data_size, point_size);
-	ret =
-	    _gnutls_ecc_ansi_x963_import(&data[i], point_size,
-					 &session->key.ecdh_x,
-					 &session->key.ecdh_y);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+
+	if (ecurve->pk == GNUTLS_PK_EC) {
+		ret =
+		    _gnutls_ecc_ansi_x963_import(&data[i], point_size,
+						 &session->key.ecdh_x,
+						 &session->key.ecdh_y);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+	} else if (ecurve->pk == GNUTLS_PK_ECDHX) {
+		if (ecurve->size != point_size)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		if (_gnutls_mem_is_zero(&data[i], point_size))
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		ret = _gnutls_set_datum(&session->key.ecdhx,
+					&data[i], point_size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		/* RFC7748 requires to mask the MSB in the final byte */
+		if (ecurve->id == GNUTLS_ECC_CURVE_X25519) {
+			session->key.ecdhx.data[point_size-1] &= 0x7f;
+		}
+	} else {
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	}
 
 	i += point_size;
 
@@ -328,7 +402,7 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 					gnutls_ecc_curve_t curve)
 {
 	uint8_t p;
-	int ret;
+	int ret, pk;
 	gnutls_datum_t out;
 
 	if (curve == GNUTLS_ECC_CURVE_INVALID)
@@ -353,29 +427,42 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	pk = gnutls_ecc_curve_get_pk(curve);
+
 	/* generate temporal key */
 	ret =
-	    _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve,
+	    _gnutls_pk_generate_keys(pk, curve,
 				     &session->key.ecdh_params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_ecc_ansi_x963_export(curve,
-					 session->key.ecdh_params.
-					 params[ECC_X] /* x */ ,
-					 session->key.ecdh_params.
-					 params[ECC_Y] /* y */ , &out);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	if (pk == GNUTLS_PK_EC) {
+		ret =
+		    _gnutls_ecc_ansi_x963_export(curve,
+						 session->key.ecdh_params.
+						 params[ECC_X] /* x */ ,
+						 session->key.ecdh_params.
+						 params[ECC_Y] /* y */ , &out);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_buffer_append_data_prefix(data, 8, out.data, out.size);
+		ret =
+		    _gnutls_buffer_append_data_prefix(data, 8, out.data, out.size);
 
-	_gnutls_free_datum(&out);
+		_gnutls_free_datum(&out);
 
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+	} else if (pk == GNUTLS_PK_ECDHX) {
+		ret =
+		    _gnutls_buffer_append_data_prefix(data, 8,
+		    				session->key.ecdh_params.raw_pub.data,
+		    				session->key.ecdh_params.raw_pub.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
 	return data->length;
 }

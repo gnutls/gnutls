@@ -35,6 +35,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .oid = "1.2.840.10045.3.1.1",
 	 .id = GNUTLS_ECC_CURVE_SECP192R1,
 	 .tls_id = 19,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 24,
 	},
 	{
@@ -42,6 +43,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .oid = "1.3.132.0.33",
 	 .id = GNUTLS_ECC_CURVE_SECP224R1,
 	 .tls_id = 21,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 28,
 	},
 	{
@@ -49,6 +51,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .oid = "1.2.840.10045.3.1.7",
 	 .id = GNUTLS_ECC_CURVE_SECP256R1,
 	 .tls_id = 23,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 32,
 	},
 	{
@@ -56,6 +59,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .oid = "1.3.132.0.34",
 	 .id = GNUTLS_ECC_CURVE_SECP384R1,
 	 .tls_id = 24,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 48,
 	},
 	{
@@ -63,7 +67,15 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .oid = "1.3.132.0.35",
 	 .id = GNUTLS_ECC_CURVE_SECP521R1,
 	 .tls_id = 25,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 66,
+	},
+	{
+	 .name = "X25519",
+	 .id = GNUTLS_ECC_CURVE_X25519,
+	 .tls_id = 29,
+	 .pk = GNUTLS_PK_ECDHX,
+	 .size = 32,
 	},
 	{0, 0, 0}
 };
@@ -279,9 +291,7 @@ const gnutls_ecc_curve_entry_st
  * gnutls_ecc_curve_get_size:
  * @curve: is an ECC curve
  *
- * Returns the size in bytes of the curve.
- *
- * Returns: a the size or (0).
+ * Returns: the size in bytes of the curve or 0 on failure.
  *
  * Since: 3.0
  **/
@@ -298,3 +308,26 @@ int gnutls_ecc_curve_get_size(gnutls_ecc_curve_t curve)
 
 	return ret;
 }
+
+/**
+ * gnutls_ecc_curve_get_pk:
+ * @curve: is an ECC curve
+ *
+ * Returns: the public key algorithm associated with the named curve or %GNUTLS_PK_UNKNOWN.
+ *
+ * Since: 3.5.0
+ **/
+gnutls_pk_algorithm_t gnutls_ecc_curve_get_pk(gnutls_ecc_curve_t curve)
+{
+	int ret = GNUTLS_PK_UNKNOWN;
+
+	GNUTLS_ECC_CURVE_LOOP(
+		if (p->id == curve) {
+			ret = p->pk;
+			break;
+		}
+	);
+
+	return ret;
+}
+

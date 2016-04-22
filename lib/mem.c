@@ -113,3 +113,18 @@ void gnutls_free(void *ptr)
 }
 
 #endif
+
+/* Returns 1 if the provided buffer is all zero.
+ * It leaks no information via timing.
+ */
+unsigned _gnutls_mem_is_zero(const uint8_t *ptr, unsigned size)
+{
+	unsigned i;
+	uint8_t res = 0;
+
+	for (i=0;i<size;i++) {
+		res |= ptr[i];
+	}
+
+	return ((res==0)?1:0);
+}
