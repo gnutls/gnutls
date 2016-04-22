@@ -476,6 +476,7 @@ accessing them. That is very similar to the operation of a @acronym{PKCS} #11 sm
 The chip allows for storage and usage of RSA keys, but has quite some 
 operational differences from @acronym{PKCS} #11 module, and thus require different handling. 
 The basic TPM operations supported and used by GnuTLS, are key generation and signing. 
+That support is currently limited to TPM 1.2.
 
 The next sections assume that the TPM chip in the system is already initialized and
 in a operational state. If not, ensure that the TPM chip is enabled by your BIOS,
