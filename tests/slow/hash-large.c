@@ -28,6 +28,14 @@
 #include <gnutls/crypto.h>
 #include <limits.h>
 #include "utils.h"
+#if !defined(_WIN32)
+# include <signal.h>
+
+static void exit_77(int signo)
+{
+	exit(77);
+}
+#endif
 
 #define MIN(x,y) ((x)<(y))?(x):(y)
 
@@ -66,6 +74,11 @@ void doit(void)
 
 	if (sizeof(size) <= 4)
 		exit(77);
+
+#if !defined(_WIN32)
+	signal(SIGSEGV, exit_77);
+	signal(SIGBUS, exit_77);
+#endif
 
 	global_init();
 
