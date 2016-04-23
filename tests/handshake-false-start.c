@@ -292,6 +292,8 @@ void doit(void)
 			reset_buffers();
 			try("ecdhe-rsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-RSA", 2048, j);
 			reset_buffers();
+			try("ecdhe-x25519-rsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519", 2048, j);
+			reset_buffers();
 			try("ecdhe-ecdsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-ECDSA", 2048, j);
 			reset_buffers();
 			try("dhe-rsa-2048:", i, 0, "NORMAL:-KX-ALL:+DHE-RSA", 2048, j);
