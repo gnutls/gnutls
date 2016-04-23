@@ -397,9 +397,6 @@ struct gnutls_key_st {
 	bigint_t b;
 	bigint_t a;
 	bigint_t x;
-	/* RSA: e, m
-	 */
-	bigint_t rsa[2];
 
 	/* this is used to hold the peers authentication data 
 	 */

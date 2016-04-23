@@ -246,10 +246,6 @@ static void deinit_keys(gnutls_session_t session)
 	zrelease_temp_mpi_key(&session->key.B);
 	zrelease_temp_mpi_key(&session->key.b);
 
-	/* RSA */
-	zrelease_temp_mpi_key(&session->key.rsa[0]);
-	zrelease_temp_mpi_key(&session->key.rsa[1]);
-
 	_gnutls_free_temp_key_datum(&session->key.key);
 }
 
