@@ -165,6 +165,8 @@ static const TLS_TEST tls_tests[] = {
 	{"for 3DES-CBC cipher (RFC2246) support", test_3des, "yes", "no", "dunno"},
 	{"for ARCFOUR 128 cipher (RFC2246) support", test_arcfour, "yes", "no",
 	 "dunno"},
+	{"for CHACHA20-POLY1305 cipher (draft-ietf-tls-chacha20-poly1305-04) support", test_chacha20, "yes", "no",
+	 "dunno"},
 	{"for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 	{"for SHA256 MAC support", test_sha256, "yes", "no", "dunno"},

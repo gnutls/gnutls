@@ -116,7 +116,7 @@ char prio_str[512] = "";
 #define ALL_CIPHERS "+AES-128-GCM:+CAMELLIA-128-GCM:+AES-128-CBC:+CAMELLIA-128-CBC:+3DES-CBC:+ARCFOUR-128"
 #define BLOCK_CIPHERS "+3DES-CBC:+AES-128-CBC:+CAMELLIA-128-CBC"
 #define ALL_COMP "+COMP-NULL"
-#define ALL_MACS "+SHA1:+MD5"
+#define ALL_MACS "+SHA1:+MD5:+AEAD"
 #define ALL_CERTTYPES "+CTYPE-X509"
 #define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+ECDHE-RSA:+ECDHE-ECDSA:+ANON-ECDH"
 #define INIT_STR "NONE:"
@@ -572,7 +572,7 @@ test_code_t test_aes_gcm(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str, INIT_STR
-		"+AES-128-GCM:+AES-256-GCM:+AEAD:" ALL_COMP ":"
+		"+AES-128-GCM:+AES-256-GCM:" ALL_COMP ":"
 		ALL_CERTTYPES ":%s:" ALL_MACS ":" ALL_KX ":%s",
 		protocol_all_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
@@ -588,7 +588,7 @@ test_code_t test_aes_ccm(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str, INIT_STR
-		"+AES-128-CCM:+AES-256-CCM:+AEAD:" ALL_COMP ":"
+		"+AES-128-CCM:+AES-256-CCM:" ALL_COMP ":"
 		ALL_CERTTYPES ":%s:" ALL_MACS ":" ALL_KX ":%s",
 		protocol_all_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
@@ -604,7 +604,7 @@ test_code_t test_aes_ccm_8(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str, INIT_STR
-		"+AES-128-CCM-8:+AES-256-CCM-8:+AEAD:" ALL_COMP ":"
+		"+AES-128-CCM-8:+AES-256-CCM-8:" ALL_COMP ":"
 		ALL_CERTTYPES ":%s:" ALL_MACS ":" ALL_KX ":%s",
 		protocol_all_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
@@ -635,8 +635,8 @@ test_code_t test_camellia_gcm(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str,
-		INIT_STR "+CAMELLIA-128-GCM:+AEAD:" ALL_COMP ":" ALL_CERTTYPES
-		":%s:" ALL_KX ":%s", protocol_str, rest);
+		INIT_STR "+CAMELLIA-128-GCM:" ALL_COMP ":" ALL_CERTTYPES
+		":%s:" ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
@@ -768,6 +768,20 @@ test_code_t test_arcfour(gnutls_session_t session)
 
 	sprintf(prio_str,
 		INIT_STR "+ARCFOUR-128:" ALL_COMP ":" ALL_CERTTYPES ":%s:"
+		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+	return ret;
+}
+
+test_code_t test_chacha20(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str,
+		INIT_STR "+CHACHA20-POLY1305:" ALL_COMP ":" ALL_CERTTYPES ":%s:"
 		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);

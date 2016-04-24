@@ -39,6 +39,7 @@ test_code_t test_md5(gnutls_session_t state);
 test_code_t test_sha(gnutls_session_t state);
 test_code_t test_3des(gnutls_session_t state);
 test_code_t test_arcfour(gnutls_session_t state);
+test_code_t test_chacha20(gnutls_session_t state);
 test_code_t test_tls1(gnutls_session_t state);
 test_code_t test_tls1_nossl3(gnutls_session_t session);
 test_code_t test_safe_renegotiation(gnutls_session_t state);
