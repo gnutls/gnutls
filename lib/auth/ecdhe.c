@@ -166,9 +166,6 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 		if (ecurve->size != point_size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-		if (_gnutls_mem_is_zero(&data[i], point_size))
-			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-
 		ret = _gnutls_set_datum(&session->key.ecdhx,
 					&data[i], point_size);
 		if (ret < 0) {
@@ -372,9 +369,6 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 
 	} else if (ecurve->pk == GNUTLS_PK_ECDHX) {
 		if (ecurve->size != point_size)
-			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-
-		if (_gnutls_mem_is_zero(&data[i], point_size))
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		ret = _gnutls_set_datum(&session->key.ecdhx,
