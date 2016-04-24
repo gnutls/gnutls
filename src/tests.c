@@ -181,8 +181,6 @@ test_code_t test_server(gnutls_session_t session)
 
 static gnutls_datum_t pubkey = { NULL, 0 };
 
-static gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
-
 test_code_t test_dhe(gnutls_session_t session)
 {
 #ifdef ENABLE_DHE
@@ -224,9 +222,55 @@ test_code_t test_ecdhe(gnutls_session_t session)
 	if (ret < 0)
 		return TEST_FAILED;
 
-	curve = gnutls_ecc_curve_get(session);
-
 	return ret;
+}
+
+static
+test_code_t test_ecdhe_curve(gnutls_session_t session, const char *curve, unsigned id)
+{
+	int ret;
+
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
+	/* We always enable all the curves but set our selected as first. That is
+	 * because list of curves may be also used by the server to select a cert. */
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+		":+ECDHE-RSA:+ECDHE-ECDSA:%s:%s", protocol_all_str, curve, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+
+	if (ret < 0)
+		return TEST_FAILED;
+
+	if (gnutls_ecc_curve_get(session) != id)
+		return TEST_FAILED;
+
+	return TEST_SUCCEED;
+}
+
+test_code_t test_ecdhe_secp256r1(gnutls_session_t session)
+{
+	return test_ecdhe_curve(session, "+CURVE-SECP256R1", GNUTLS_ECC_CURVE_SECP256R1);
+}
+
+test_code_t test_ecdhe_secp384r1(gnutls_session_t session)
+{
+	return test_ecdhe_curve(session, "+CURVE-SECP384R1", GNUTLS_ECC_CURVE_SECP384R1);
+}
+
+test_code_t test_ecdhe_secp521r1(gnutls_session_t session)
+{
+	return test_ecdhe_curve(session, "+CURVE-SECP521R1", GNUTLS_ECC_CURVE_SECP521R1);
+}
+
+test_code_t test_ecdhe_x25519(gnutls_session_t session)
+{
+	return test_ecdhe_curve(session, "+CURVE-X25519", GNUTLS_ECC_CURVE_X25519);
 }
 
 test_code_t test_rfc7507(gnutls_session_t session)
@@ -461,15 +505,6 @@ test_code_t test_dhe_group(gnutls_session_t session)
 		fclose(fp);
 	}
 	return ret;
-}
-
-test_code_t test_ecdhe_curve(gnutls_session_t session)
-{
-	if (curve == GNUTLS_ECC_CURVE_INVALID)
-		return TEST_IGNORE;
-
-	ext_text = gnutls_ecc_curve_get_name(curve);
-	return TEST_SUCCEED;
 }
 
 test_code_t test_ssl3(gnutls_session_t session)
