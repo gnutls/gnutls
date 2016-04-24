@@ -5,12 +5,28 @@ See the end for copying conditions.
 
 * Version 3.5.0 (unreleased)
 
+** libgnutls: Added SHA3 based signing algorithms for DSA, RSA and ECDSA,
+   based on http://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html
+
+** libgnutls: Added support for curve X25519 (RFC 7748, draft-ietf-tls-rfc4492bis-07).
+   This curve is disabled by default as it is still on specification status. It
+   can be enabled using the priority string modifier +CURVE-X25519.
+
+** libgnutls: Added support for TLS false start (draft-ietf-tls-falsestart-01)
+   by introducing gnutls_init() flag GNUTLS_ENABLE_FALSE_START (#73).
+
 ** libgnutls: Added new APIs to access the FIPS186-4 (Shawe-Taylor based) provable
    RSA and DSA parameter generation from a seed.
 
 ** libgnutls: Added new simple verification functions. That avoids the need
    to install a callback to perform certificate verification. See
    doc/examples/ex-client-x509.c for usage.
+
+** libgnutls: On a rehandshake ensure that the certificate of the peer (if
+   available) is the same as in previous handshakes. That is to protect
+   applications which do not check user credentials on rehandshakes from
+   attacks related to unsafe renegotiation. This can be overriden using
+   the %GNUTLS_ALLOW_CERT_CHANGE flag in gnutls_init().
 
 ** libgnutls: Be strict in TLS extension decoding. That is, do not tolerate
    parsing errors in the extensions field and treat it as a typical Hello
@@ -24,18 +40,6 @@ See the end for copying conditions.
    functions, only on non-resumed sessions. This brings the API in par with
    its usage (#79).
 
-** libgnutls: Consider the max-record TLS extension even when under DTLS.
-   Reported by Peter Dettman (#61).
-
-** libgnutls: Added support for TLS false start (draft-ietf-tls-falsestart-01)
-   by introducing gnutls_init() flag GNUTLS_ENABLE_FALSE_START (#73).
-
-** libgnutls: On a rehandshake ensure that the certificate of the peer (if
-   available) is the same as in previous handshakes. That is to protect
-   applications which do not check user credentials on rehandshakes from
-   attacks related to unsafe renegotiation. This can be overriden using
-   the %GNUTLS_ALLOW_CERT_CHANGE flag in gnutls_init().
-
 ** libgnutls: Follow RFC5280 strictly in name constraints computation. The
    permitted subtrees is intersected with any previous values. Report and
    patch by Daiki Ueno.
@@ -43,12 +47,12 @@ See the end for copying conditions.
 ** libgnutls: Enforce the RFC 7627 (extended master secret) requirements on
    session resumption. Reported by Hubert Kario (#69).
 
+** libgnutls: Consider the max-record TLS extension even when under DTLS.
+   Reported by Peter Dettman (#61).
+
 ** libgnutls: Replaced writev() system call with sendmsg().
 
 ** libgnutls: Replaced select() system call with poll() on POSIX systems.
-
-** libgnutls: Added SHA3 based signing algorithms for DSA, RSA and ECDSA,
-   based on http://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html
 
 ** libgnutls: Preload the system priority file on library load. This allows
    applications that chroot() to also use the system priorities.
