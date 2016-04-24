@@ -289,6 +289,13 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 
 	DECR_LEN(data_size, 2);
 	curve = _gnutls_tls_id_to_ecc_curve(_gnutls_read_uint16(&data[i]));
+
+	if (curve == GNUTLS_ECC_CURVE_INVALID) {
+		_gnutls_debug_log("received curve %u.%u\n", (unsigned)data[i], (unsigned)data[i+1]);
+	} else {
+		_gnutls_debug_log("received curve %s\n", gnutls_ecc_curve_get_name(curve));
+	}
+
 	i += 2;
 
 	ret = _gnutls_session_supports_ecc_curve(session, curve);
