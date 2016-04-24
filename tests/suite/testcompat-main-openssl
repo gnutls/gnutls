@@ -154,6 +154,11 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CAMELLIA-256-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
+	# Test TLS 1.0 with DHE-DSS ciphersuite
+	echo "Checking TLS 1.0 with DHE-DSS..."
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+		fail ${PID} "Failed"
+
 	# Test TLS 1.0 with DHE-RSA ciphersuite
 	echo "Checking TLS 1.0 with DHE-RSA..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
@@ -164,15 +169,21 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
-	# Test TLS 1.0 with DHE-DSS ciphersuite
-	echo "Checking TLS 1.0 with DHE-DSS..."
-	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
-		fail ${PID} "Failed"
-
 	kill ${PID}
 	wait
 
 	if test "${FIPS}" != 1; then
+		launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1 -key "${RSA_KEY}" -cert "${RSA_CERT}" -named_curve prime192v1 -CAfile "${CA_CERT}" &
+		PID=$!
+		wait_server ${PID}
+
+		# Test TLS 1.2 with ECDHE-ECDSA ciphersuite
+		echo "Checking TLS 1.0 with ECDHE-RSA (SECP192R1)..."
+		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-SECP192R1${ADD}" --insecure </dev/null >/dev/null || \
+			fail ${PID} "Failed"
+
+		kill ${PID}
+		wait
 
 		#-cipher ECDHE-ECDSA-AES128-SHA
 		launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1 -key "${ECC224_KEY}" -cert "${ECC224_CERT}" -Verify 1 -named_curve secp224r1 -CAfile "${CA_ECC_CERT}" &
@@ -181,7 +192,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 
 		# Test TLS 1.0 with ECDHE-ECDSA ciphersuite
 		echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP224R1)..."
-		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" </dev/null >/dev/null || \
+		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-SECP224R1${ADD}" --insecure --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -201,20 +212,18 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	kill ${PID}
 	wait
 
-	if test "${FIPS}" != 1; then
-		#-cipher ECDHE-ECDSA-AES128-SHA
-		launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1 -key "${ECC521_KEY}" -cert "${ECC521_CERT}" -Verify 1 -named_curve secp521r1 -CAfile "${CA_ECC_CERT}" &
-		PID=$!
-		wait_server ${PID}
+	#-cipher ECDHE-ECDSA-AES128-SHA
+	launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1 -key "${ECC521_KEY}" -cert "${ECC521_CERT}" -Verify 1 -named_curve secp521r1 -CAfile "${CA_ECC_CERT}" &
+	PID=$!
+	wait_server ${PID}
 
-		# Test TLS 1.0 with ECDHE-ECDSA ciphersuite
-		echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP521R1)..."
-		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" </dev/null >/dev/null || \
-			fail ${PID} "Failed"
+	# Test TLS 1.0 with ECDHE-ECDSA ciphersuite
+	echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP521R1)..."
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" </dev/null >/dev/null || \
+		fail ${PID} "Failed"
 
-		kill ${PID}
-		wait
-	fi
+	kill ${PID}
+	wait
 
 	#-cipher PSK
 	launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -tls1 -keyform pem -certform pem -dhparam "${srcdir}/params.dh" -key "${RSA_KEY}" -cert "${RSA_CERT}" -cipher PSK -psk 9e32cf7786321a828ef7668f09fb35db &
@@ -265,7 +274,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 			wait_server ${PID}
 
 			echo "Checking TLS 1.2 with ECDHE-ECDSA... (SECP224R1)"
-			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" </dev/null >/dev/null || \
+			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" </dev/null >/dev/null || \
 				fail ${PID} "Failed"
 
 			kill ${PID}
@@ -467,12 +476,12 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 
 	if test "${FIPS}" != 1; then
 		echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
-		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}" &
+		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}" &
 		PID=$!
 		wait_server ${PID}
 
 		#-cipher ECDHE-ECDSA-AES128-SHA
-		${OPENSSL_CLI} s_client -host localhost -tls1 -port "${PORT}" -cert "${ECC224_CERT}" -key "${ECC224_KEY}" -CAfile "${CA_ECC_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		${OPENSSL_CLI} s_client -host localhost -tls1 -named_curve secp224r1 -port "${PORT}" -cert "${ECC224_CERT}" -key "${ECC224_KEY}" -CAfile "${CA_ECC_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -567,12 +576,12 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 
 		if test "${FIPS}" != 1; then
 			echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
-			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}" &
+			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}" &
 			PID=$!
 			wait_server ${PID}
 
 			#-cipher ECDHE-ECDSA-AES128-SHA
-			${OPENSSL_CLI} s_client -host localhost -tls1_2 -port "${PORT}" -cert "${ECC224_CERT}" -key "${ECC224_KEY}" -CAfile "${CA_ECC_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+			${OPENSSL_CLI} s_client -host localhost -tls1_2 -named_curve secp224r1 -port "${PORT}" -cert "${ECC224_CERT}" -key "${ECC224_KEY}" -CAfile "${CA_ECC_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 				fail ${PID} "Failed"
 
 			kill ${PID}
