@@ -9,6 +9,7 @@ Compile minimal library:
     --without-zlib --disable-doc --disable-tests && make -j4
   tags:
   - nettle3
+  - linux
   except:
   - tags
 Build and Check with asan:
@@ -18,6 +19,7 @@ Build and Check with asan:
     && make -j4 && make check -j4
   tags:
   - nettle3
+  - linux
   except:
   - tags
 Build and Check with C99 and ubsan:
@@ -28,6 +30,7 @@ Build and Check with C99 and ubsan:
   tags:
   - ubsan
   - nettle3
+  - linux
   except:
   - tags
 Build and Check - separate build dir (x86):
@@ -38,6 +41,7 @@ Build and Check - separate build dir (x86):
   tags:
   - x86
   - nettle3
+  - linux
   except:
   - tags
 Build with ABI-check (x86-64):
@@ -48,6 +52,7 @@ Build with ABI-check (x86-64):
   - x86-64
   - nettle3
   - abi-checker
+  - linux
   except:
   - tags
 Build and Check - clang:
@@ -57,6 +62,7 @@ Build and Check - clang:
     make -j4 && make check -C tests -j4
   tags:
   - nettle3
+  - linux
   except:
   - tags
 Build and Check in FIPS140-2 mode:
@@ -66,6 +72,7 @@ Build and Check in FIPS140-2 mode:
     make -j4 && make check -j4
   tags:
   - nettle3
+  - linux
   except:
   - tags
 Build and Check for windows in separate build dir:
@@ -77,6 +84,7 @@ Build and Check for windows in separate build dir:
   - nettle3
   - wine
   - mingw
+  - linux
   except:
   - tags
 Build and Check with valgrind:
@@ -85,6 +93,7 @@ Build and Check with valgrind:
     --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
   tags:
   - nettle3
+  - linux
   except:
   - tags
 Build and Check on FreeBSD:
