@@ -33,6 +33,7 @@ implemented by another example.
 * Client using a smart card with TLS::
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
+* Legacy client example with X.509 certificate support::
 * Simple client example in C++::
 * Helper functions for TCP connections::
 * Helper functions for UDP connections::
@@ -43,11 +44,13 @@ implemented by another example.
 @anchor{ex-verify}
 
 Let's assume now that we want to create a TCP client which
-communicates with servers that use @acronym{X.509} or
-@acronym{OpenPGP} certificate authentication. The following client is
-a very simple @acronym{TLS} client, which uses the high level verification
-functions for certificates, but does not support session
-resumption. 
+communicates with servers that use @acronym{X.509} certificate authentication.
+The following client is a very simple @acronym{TLS} client, which uses
+the high level verification functions for certificates, but does not support session
+resumption.
+
+Note that this client utilizes functionality present in the latest GnuTLS
+version. For a reasonably portable version see @ref{Legacy client example with X.509 certificate support}.
 
 @verbatiminclude examples/ex-client-x509.c
 
@@ -150,6 +153,18 @@ client which connects to a server and authenticates using a
 itself using a certificate, and in that case it has to be verified.
 
 @verbatiminclude examples/ex-client-srp.c
+
+
+@node Legacy client example with X.509 certificate support
+@subsection Legacy client example with @acronym{X.509} certificate support
+@anchor{ex-verify-legacy}
+
+For applications that need to maintain compatibility with the GnuTLS 3.1.x
+library, this client example is identical to @ref{Simple client example with X.509 certificate support}
+but utilizes APIs that were available in GnuTLS 3.1.4. 
+
+@verbatiminclude examples/ex-client-x509-3.1.c
+
 
 @node Simple client example in C++
 @subsection Simple client example using the C++ API
