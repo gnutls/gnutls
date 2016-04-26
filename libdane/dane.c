@@ -572,8 +572,8 @@ verify_ca(const gnutls_datum_t * raw_crt, unsigned raw_crt_size,
 	gnutls_x509_crt_t crt = NULL, ca = NULL;
 	unsigned is_ok = 0;
 
-	if (raw_crt_size < 2)
-		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
+	if (raw_crt_size < 2) /* we cannot verify the CA */
+		return gnutls_assert_val(DANE_E_UNKNOWN_DANE_DATA);
 
 	if (ctype == DANE_CERT_X509 && crt_type == GNUTLS_CRT_X509) {
 		is_ok = 0;
@@ -918,7 +918,9 @@ dane_verify_crt(dane_state_t s,
  *
  * Returns: a negative error code on error and %DANE_E_SUCCESS (0)
  * when the DANE entries were successfully parsed, irrespective of
- * whether they were verified (see @verify for that information).
+ * whether they were verified (see @verify for that information). If
+ * no usable entries were encountered %DANE_E_REQUESTED_DATA_NOT_AVAILABLE
+ * will be returned.
  *
  **/
 int
