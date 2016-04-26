@@ -1562,7 +1562,9 @@ The high level functionality provided by the DANE library is shown below.
 
 Note that the @code{dane_state_t} structure that is accepted by both
 verification functions is optional. It is required when many queries
-are performed to facilitate caching.
+are performed to optimize against multiple re-initializations of the
+resolving back-end and loading of DNSSEC keys.
+
 The following flags are returned by the verify functions to
 indicate the status of the verification.
 

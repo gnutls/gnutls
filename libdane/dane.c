@@ -223,7 +223,9 @@ dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
  * @s: The structure to be initialized
  * @flags: flags from the %dane_state_flags enumeration
  *
- * This function will initialize a DANE query structure.
+ * This function will initialize the backend resolver. It is
+ * intended to be used in scenarios where multiple resolvings
+ * occur, to optimize against multiple re-initializations.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -303,7 +305,7 @@ void dane_state_deinit(dane_state_t s)
  * @file: The file holding the DLV keys.
  *
  * This function will set a file with trusted keys
- * for DLV  (DNSSEC  Lookaside  Validation).
+ * for DLV (DNSSEC Lookaside Validation).
  *
  **/
 int dane_state_set_dlv_file(dane_state_t s, const char *file)
