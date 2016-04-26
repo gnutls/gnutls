@@ -757,8 +757,11 @@ verify_ee(const gnutls_datum_t * raw_crt,
  *
  * If the @q parameter is provided it will be used for caching entries.
  *
- * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ * Returns: a negative error code on error and %DANE_E_SUCCESS (0)
+ * when the DANE entries were successfully parsed, irrespective of
+ * whether they were verified (see @verify for that information). If
+ * no usable entries were encountered %DANE_E_REQUESTED_DATA_NOT_AVAILABLE
+ * will be returned.
  *
  **/
 int
@@ -859,10 +862,11 @@ dane_verify_crt_raw(dane_state_t s,
  * then the function will check whether the key of the peer matches the
  * key advertized in the DANE entry.
  *
- * If the @q parameter is provided it will be used for caching entries.
- *
- * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ * Returns: a negative error code on error and %DANE_E_SUCCESS (0)
+ * when the DANE entries were successfully parsed, irrespective of
+ * whether they were verified (see @verify for that information). If
+ * no usable entries were encountered %DANE_E_REQUESTED_DATA_NOT_AVAILABLE
+ * will be returned.
  *
  **/
 int
@@ -921,8 +925,9 @@ dane_verify_crt(dane_state_t s,
  * verification is restricted to end certificates, this must be
  * be performed separately using gnutls_certificate_verify_peers3().
  *
- * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ * Returns: a negative error code on error and %DANE_E_SUCCESS (0)
+ * when the DANE entries were successfully parsed, irrespective of
+ * whether they were verified (see @verify for that information).
  *
  **/
 int
