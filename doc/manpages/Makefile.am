@@ -93,6 +93,24 @@ psktool.1: ../../src/psktool-args.def
 	rm -f "$<".tmp
 
 APIMANS =
+APIMANS += dane_cert_type_name.3
+APIMANS += dane_cert_usage_name.3
+APIMANS += dane_match_type_name.3
+APIMANS += dane_query_data.3
+APIMANS += dane_query_deinit.3
+APIMANS += dane_query_entries.3
+APIMANS += dane_query_status.3
+APIMANS += dane_query_tlsa.3
+APIMANS += dane_query_to_raw_tlsa.3
+APIMANS += dane_raw_tlsa.3
+APIMANS += dane_state_deinit.3
+APIMANS += dane_state_init.3
+APIMANS += dane_state_set_dlv_file.3
+APIMANS += dane_strerror.3
+APIMANS += dane_verification_status_print.3
+APIMANS += dane_verify_crt.3
+APIMANS += dane_verify_crt_raw.3
+APIMANS += dane_verify_session_crt.3
 APIMANS += gnutls_aead_cipher_decrypt.3
 APIMANS += gnutls_aead_cipher_deinit.3
 APIMANS += gnutls_aead_cipher_encrypt.3
@@ -260,6 +278,7 @@ APIMANS += gnutls_ecc_curve_get.3
 APIMANS += gnutls_ecc_curve_get_id.3
 APIMANS += gnutls_ecc_curve_get_name.3
 APIMANS += gnutls_ecc_curve_get_oid.3
+APIMANS += gnutls_ecc_curve_get_pk.3
 APIMANS += gnutls_ecc_curve_get_size.3
 APIMANS += gnutls_ecc_curve_list.3
 APIMANS += gnutls_encode_ber_digest_info.3
@@ -283,7 +302,6 @@ APIMANS += gnutls_handshake.3
 APIMANS += gnutls_handshake_description_get_name.3
 APIMANS += gnutls_handshake_get_last_in.3
 APIMANS += gnutls_handshake_get_last_out.3
-APIMANS += gnutls_handshake_set_false_start_function.3
 APIMANS += gnutls_handshake_set_hook_function.3
 APIMANS += gnutls_handshake_set_max_packet_length.3
 APIMANS += gnutls_handshake_set_post_client_hello_function.3
@@ -1160,7 +1178,7 @@ compare-makefile:
 	@echo "******************************************************************************"
 	@echo "If the following step fails copy $(srcdir)/doc/manpages/tmp-compare-makefile to doc/manpages/Makefile.am"
 	@echo "******************************************************************************"
-	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
+	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h $(top_srcdir)/libdane/includes/gnutls/*.h| $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
 	MANS=""; \
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nAPIMANS += $$i.3"; \
