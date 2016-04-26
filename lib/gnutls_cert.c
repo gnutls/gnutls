@@ -597,7 +597,7 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
  * or use gnutls_certificate_verify_peers3().
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0)
- * when the peer's certificate was successfully parsed, whether or not
+ * when the peer's certificate was successfully parsed, irrespective of whether
  * it was verified.
  **/
 int
@@ -630,8 +630,8 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * In order to verify the purpose of the end-certificate (by checking the extended
  * key usage), use gnutls_certificate_verify_peers().
  *
- * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) 
- * when the peer's certificate was successfully parsed, whether or not
+ * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0)
+ * when the peer's certificate was successfully parsed, irrespective of whether
  * it was verified.
  *
  * Since: 3.1.4
@@ -677,7 +677,7 @@ gnutls_typed_vdata_st data;
  * or be marked for any purpose, otherwise verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0)
- * when the peer's certificate was successfully parsed, whether or not
+ * when the peer's certificate was successfully parsed, irrespective of whether
  * it was verified.
  *
  * Since: 3.3.0
