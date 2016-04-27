@@ -18,10 +18,6 @@ See the end for copying conditions.
 ** libgnutls: Added new APIs to access the FIPS186-4 (Shawe-Taylor based) provable
    RSA and DSA parameter generation from a seed.
 
-** libgnutls: Added new simple verification functions. That avoids the need
-   to install a callback to perform certificate verification. See
-   doc/examples/ex-client-x509.c for usage.
-
 ** libgnutls: On a rehandshake ensure that the certificate of the peer (if
    available) is the same as in previous handshakes. That is to protect
    applications which do not check user credentials on rehandshakes from
