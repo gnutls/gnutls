@@ -7,14 +7,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include "examples.h"
 
 /* A very basic TLS client, with X.509 authentication and server certificate
- * verification. Note that error checking for missing files etc. is omitted
- * for simplicity.
+ * verification utilizing the GnuTLS 3.1.x API. 
+ * Note that error recovery is minimal for simplicity.
  */
+
+#define CHECK(x) assert((x)>=0)
 
 #define MAX_BUF 1024
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
@@ -29,7 +32,6 @@ int main(void)
         int ret, sd, ii;
         gnutls_session_t session;
         char buffer[MAX_BUF + 1];
-        const char *err;
         gnutls_certificate_credentials_t xcred;
 
         if (gnutls_check_version("3.1.4") == NULL) {
@@ -37,16 +39,15 @@ int main(void)
                 exit(1);
         }
 
-        /* for backwards compatibility with gnutls < 3.3.0 */
-        gnutls_global_init();
+        CHECK(gnutls_global_init());
 
         /* X509 stuff */
-        gnutls_certificate_allocate_credentials(&xcred);
+        CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
         /* sets the trusted cas file
          */
-        gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
+        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
+                                                     GNUTLS_X509_FMT_PEM));
         gnutls_certificate_set_verify_function(xcred,
                                                _verify_certificate_callback);
 
@@ -59,7 +60,7 @@ int main(void)
 
         /* Initialize TLS session 
          */
-        gnutls_init(&session, GNUTLS_CLIENT);
+        CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
         gnutls_session_set_ptr(session, (void *) "my_host_name");
 
@@ -67,7 +68,7 @@ int main(void)
                                strlen("my_host_name"));
 
         /* use default priorities */
-        gnutls_set_default_priority(session);
+        CHECK(gnutls_set_default_priority(session));
 #if 0
 	/* if more fine-graned control is required */
         ret = gnutls_priority_set_direct(session, 
@@ -82,7 +83,7 @@ int main(void)
 
         /* put the x509 credentials to the current session
          */
-        gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+        CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
 
         /* connect to the peer
          */
@@ -111,7 +112,7 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        gnutls_record_send(session, MSG, strlen(MSG));
+        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
 
         ret = gnutls_record_recv(session, buffer, MAX_BUF);
         if (ret == 0) {
@@ -132,7 +133,7 @@ int main(void)
                 fputs("\n", stdout);
         }
 
-        gnutls_bye(session, GNUTLS_SHUT_RDWR);
+        CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
       end:
 
@@ -153,7 +154,7 @@ int main(void)
 static int _verify_certificate_callback(gnutls_session_t session)
 {
         unsigned int status;
-        int ret, type;
+        int type;
         const char *hostname;
         gnutls_datum_t out;
 
@@ -164,22 +165,13 @@ static int _verify_certificate_callback(gnutls_session_t session)
          * structure. So you must have installed one or more CA certificates.
          */
 
-        ret = gnutls_certificate_verify_peers3(session, hostname,
-					       &status);
-        if (ret < 0) {
-                printf("Error\n");
-                return GNUTLS_E_CERTIFICATE_ERROR;
-        }
+        CHECK(gnutls_certificate_verify_peers3(session, hostname,
+					       &status));
 
         type = gnutls_certificate_type_get(session);
 
-        ret =
-            gnutls_certificate_verification_status_print(status, type,
-                                                         &out, 0);
-        if (ret < 0) {
-                printf("Error\n");
-                return GNUTLS_E_CERTIFICATE_ERROR;
-        }
+        CHECK(gnutls_certificate_verification_status_print(status, type,
+                                                           &out, 0));
 
         printf("%s", out.data);
 
