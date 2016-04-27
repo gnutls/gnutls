@@ -104,8 +104,16 @@ int main(void)
         }
         while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
         if (ret < 0) {
-                fprintf(stderr, "*** Handshake failed\n");
-                gnutls_perror(ret);
+                if (ret == GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR) {
+                        /* check certificate verification status */
+                        type = gnutls_certificate_type_get(session);
+                        status = gnutls_session_get_verify_cert_status(session);
+                        CHECK(gnutls_certificate_verification_status_print(status,
+                              type, &out, 0));
+                        printf("cert verify output: %s\n", out.data);
+                        gnutls_free(out.data);
+                }
+                fprintf(stderr, "*** Handshake failed: %s\n", gnutls_strerror(ret));
                 goto end;
         } else {
                 char *desc;
@@ -114,15 +122,6 @@ int main(void)
                 printf("- Session info: %s\n", desc);
                 gnutls_free(desc);
         }
-
-        /* check certificate verification status */
-        type = gnutls_certificate_type_get(session);
-        status = gnutls_session_get_verify_cert_status(session);
-        CHECK(gnutls_certificate_verification_status_print(status, type,
-                                                           &out, 0));
-
-        printf("%s", out.data);
-        gnutls_free(out.data);
 
 	/* send data */
         CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
