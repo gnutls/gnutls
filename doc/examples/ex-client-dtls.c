@@ -10,12 +10,15 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <assert.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 
 /* A very basic Datagram TLS client, over UDP with X.509 authentication.
  */
+
+#define CHECK(x) assert((x)>=0)
 
 #define MAX_BUF 1024
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
@@ -30,7 +33,6 @@ int main(void)
         int ret, sd, ii;
         gnutls_session_t session;
         char buffer[MAX_BUF + 1];
-        const char *err;
         gnutls_certificate_credentials_t xcred;
 
         if (gnutls_check_version("3.1.4") == NULL) {
@@ -39,34 +41,27 @@ int main(void)
         }
 
         /* for backwards compatibility with gnutls < 3.3.0 */
-        gnutls_global_init();
+        CHECK(gnutls_global_init());
 
         /* X509 stuff */
-        gnutls_certificate_allocate_credentials(&xcred);
+        CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
         /* sets the trusted cas file */
-        gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
-        gnutls_certificate_set_verify_function(xcred,
-                                               verify_certificate_callback);
+        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
+                                                     GNUTLS_X509_FMT_PEM));
 
         /* Initialize TLS session */
-        gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
+        CHECK(gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM));
 
         /* Use default priorities */
-        ret = gnutls_priority_set_direct(session, 
-                                         "NORMAL", &err);
-        if (ret < 0) {
-                if (ret == GNUTLS_E_INVALID_REQUEST) {
-                        fprintf(stderr, "Syntax error at: %s\n", err);
-                }
-                exit(1);
-        }
+        CHECK(gnutls_set_default_priority(session));
 
         /* put the x509 credentials to the current session */
-        gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-        gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
-                               strlen("my_host_name"));
+        CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
+        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
+                                     strlen("my_host_name")));
+
+        gnutls_session_set_verify_cert(session, "my_host_name", 0);
 
         /* connect to the peer */
         sd = udp_connect();
@@ -96,7 +91,7 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        gnutls_record_send(session, MSG, strlen(MSG));
+        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
 
         ret = gnutls_record_recv(session, buffer, MAX_BUF);
         if (ret == 0) {
@@ -120,7 +115,7 @@ int main(void)
         /* It is suggested not to use GNUTLS_SHUT_RDWR in DTLS
          * connections because the peer's closure message might
          * be lost */
-        gnutls_bye(session, GNUTLS_SHUT_WR);
+        CHECK(gnutls_bye(session, GNUTLS_SHUT_WR));
 
       end:
 

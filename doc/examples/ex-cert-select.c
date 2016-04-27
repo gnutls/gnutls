@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
@@ -20,6 +21,8 @@
 
 /* A TLS client that loads the certificate and key.
  */
+
+#define CHECK(x) assert((x)>=0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -45,43 +48,22 @@ gnutls_privkey_t key;
  */
 static void load_keys(void)
 {
-        int ret;
         gnutls_datum_t data;
 
-        ret = gnutls_load_file(CERT_FILE, &data);
-        if (ret < 0) {
-                fprintf(stderr, "*** Error loading certificate file.\n");
-                exit(1);
-        }
+        CHECK(gnutls_load_file(CERT_FILE, &data));
 
-        ret =
-            gnutls_pcert_import_x509_raw(&pcrt, &data, GNUTLS_X509_FMT_PEM,
-                                         0);
-        if (ret < 0) {
-                fprintf(stderr, "*** Error loading certificate file: %s\n",
-                        gnutls_strerror(ret));
-                exit(1);
-        }
+        CHECK(gnutls_pcert_import_x509_raw(&pcrt, &data,
+                                           GNUTLS_X509_FMT_PEM, 0));
 
         gnutls_free(data.data);
 
-        ret = gnutls_load_file(KEY_FILE, &data);
-        if (ret < 0) {
-                fprintf(stderr, "*** Error loading key file.\n");
-                exit(1);
-        }
+        CHECK(gnutls_load_file(KEY_FILE, &data));
 
-        gnutls_privkey_init(&key);
+        CHECK(gnutls_privkey_init(&key));
 
-        ret =
-            gnutls_privkey_import_x509_raw(key, &data, GNUTLS_X509_FMT_PEM,
-                                           NULL, 0);
-        if (ret < 0) {
-                fprintf(stderr, "*** Error loading key file: %s\n",
-                        gnutls_strerror(ret));
-                exit(1);
-        }
-
+        CHECK(gnutls_privkey_import_x509_raw(key, &data,
+                                             GNUTLS_X509_FMT_PEM,
+                                             NULL, 0));
         gnutls_free(data.data);
 }
 
@@ -89,7 +71,6 @@ int main(void)
 {
         int ret, sd, ii;
         gnutls_session_t session;
-        gnutls_priority_t priorities_cache;
         char buffer[MAX_BUF + 1];
         gnutls_certificate_credentials_t xcred;
         
@@ -99,34 +80,30 @@ int main(void)
         }
 
         /* for backwards compatibility with gnutls < 3.3.0 */
-        gnutls_global_init();
+        CHECK(gnutls_global_init());
 
         load_keys();
 
         /* X509 stuff */
-        gnutls_certificate_allocate_credentials(&xcred);
-
-        /* priorities */
-        gnutls_priority_init(&priorities_cache, 
-                             "NORMAL", NULL);
+        CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
         /* sets the trusted cas file
          */
-        gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
+        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
+                                                     GNUTLS_X509_FMT_PEM));
 
         gnutls_certificate_set_retrieve_function2(xcred, cert_callback);
 
         /* Initialize TLS session 
          */
-        gnutls_init(&session, GNUTLS_CLIENT);
+        CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
         /* Use default priorities */
-        gnutls_priority_set(session, priorities_cache);
+        CHECK(gnutls_set_default_priority(session));
 
         /* put the x509 credentials to the current session
          */
-        gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+        CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
 
         /* connect to the peer
          */
@@ -150,7 +127,7 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        gnutls_record_send(session, MSG, strlen(MSG));
+        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
 
         ret = gnutls_record_recv(session, buffer, MAX_BUF);
         if (ret == 0) {
@@ -167,7 +144,7 @@ int main(void)
         }
         fputs("\n", stdout);
 
-        gnutls_bye(session, GNUTLS_SHUT_RDWR);
+        CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
       end:
 
@@ -176,7 +153,6 @@ int main(void)
         gnutls_deinit(session);
 
         gnutls_certificate_free_credentials(xcred);
-        gnutls_priority_deinit(priorities_cache);
 
         gnutls_global_deinit();
 

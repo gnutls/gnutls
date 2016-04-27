@@ -14,11 +14,14 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <assert.h>
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define CRLFILE "crl.pem"
+
+#define CHECK(x) assert((x)>=0)
 
 /* The OCSP status file contains up to date information about revocation
  * of the server's certificate. That can be periodically be updated
@@ -41,14 +44,14 @@ static gnutls_dh_params_t dh_params;
 static int generate_dh_params(void)
 {
         unsigned int bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH,
-                                                        GNUTLS_SEC_PARAM_LEGACY);
+                                                        GNUTLS_SEC_PARAM_MEDIUM);
 
         /* Generate Diffie-Hellman parameters - for use with DHE
          * kx algorithms. When short bit length is used, it might
          * be wise to regenerate parameters often.
          */
-        gnutls_dh_params_init(&dh_params);
-        gnutls_dh_params_generate2(dh_params, bits);
+        CHECK(gnutls_dh_params_init(&dh_params));
+        CHECK(gnutls_dh_params_generate2(dh_params, bits));
 
         return 0;
 }
@@ -68,35 +71,29 @@ int main(void)
         int optval = 1;
 
         /* for backwards compatibility with gnutls < 3.3.0 */
-        gnutls_global_init();
+        CHECK(gnutls_global_init());
 
-        gnutls_certificate_allocate_credentials(&x509_cred);
-        /* gnutls_certificate_set_x509_system_trust(xcred); */
-        gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
+        CHECK(gnutls_certificate_allocate_credentials(&x509_cred));
 
-        gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE,
-                                             GNUTLS_X509_FMT_PEM);
+        CHECK(gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE,
+                                                     GNUTLS_X509_FMT_PEM));
 
-        ret =
-            gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE,
-                                                 KEYFILE,
-                                                 GNUTLS_X509_FMT_PEM);
-        if (ret < 0) {
-                printf("No certificate or key were found\n");
-                exit(1);
-        }
+        CHECK(gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE,
+                                                   GNUTLS_X509_FMT_PEM));
+
+        CHECK(gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE,
+                                                   KEYFILE,
+                                                   GNUTLS_X509_FMT_PEM));
 
         /* loads an OCSP status request if available */
-        gnutls_certificate_set_ocsp_status_request_file(x509_cred,
-                                                        OCSP_STATUS_FILE,
-                                                        0);
+        CHECK(gnutls_certificate_set_ocsp_status_request_file(x509_cred,
+                                                              OCSP_STATUS_FILE,
+                                                              0));
 
         generate_dh_params();
 
-        gnutls_priority_init(&priority_cache,
-                             "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
-
+        CHECK(gnutls_priority_init(&priority_cache,
+                                   "PERFORMANCE:%SERVER_PRECEDENCE", NULL));
 
         gnutls_certificate_set_dh_params(x509_cred, dh_params);
 
@@ -120,10 +117,10 @@ int main(void)
 
         client_len = sizeof(sa_cli);
         for (;;) {
-                gnutls_init(&session, GNUTLS_SERVER);
-                gnutls_priority_set(session, priority_cache);
-                gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-                                       x509_cred);
+                CHECK(gnutls_init(&session, GNUTLS_SERVER));
+                CHECK(gnutls_priority_set(session, priority_cache));
+                CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+                                             x509_cred));
 
                 /* We don't request any certificate from the client.
                  * If we did we would need to verify it. One way of
@@ -179,13 +176,13 @@ int main(void)
                         } else if (ret > 0) {
                                 /* echo data back to the client
                                  */
-                                gnutls_record_send(session, buffer, ret);
+                                CHECK(gnutls_record_send(session, buffer, ret));
                         }
                 }
                 printf("\n");
                 /* do not wait for the peer to close the connection.
                  */
-                gnutls_bye(session, GNUTLS_SHUT_WR);
+                CHECK(gnutls_bye(session, GNUTLS_SHUT_WR));
 
                 close(sd);
                 gnutls_deinit(session);

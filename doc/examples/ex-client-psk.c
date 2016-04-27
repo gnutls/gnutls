@@ -11,10 +11,13 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 
 /* A very basic TLS client, with PSK authentication.
  */
+
+#define CHECK(x) assert((x)>=0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -31,15 +34,15 @@ int main(void)
         gnutls_psk_client_credentials_t pskcred;
         const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 
-        gnutls_global_init();
+        CHECK(gnutls_global_init());
 
-        gnutls_psk_allocate_client_credentials(&pskcred);
-        gnutls_psk_set_client_credentials(pskcred, "test", &key,
-                                          GNUTLS_PSK_KEY_HEX);
+        CHECK(gnutls_psk_allocate_client_credentials(&pskcred));
+        CHECK(gnutls_psk_set_client_credentials(pskcred, "test", &key,
+                                                GNUTLS_PSK_KEY_HEX));
 
         /* Initialize TLS session
          */
-        gnutls_init(&session, GNUTLS_CLIENT);
+        CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
         /* Use default priorities */
         ret =
@@ -55,7 +58,7 @@ int main(void)
 
         /* put the x509 credentials to the current session
          */
-        gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
+        CHECK(gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred));
 
         /* connect to the peer
          */
@@ -84,7 +87,7 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        gnutls_record_send(session, MSG, strlen(MSG));
+        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
 
         ret = gnutls_record_recv(session, buffer, MAX_BUF);
         if (ret == 0) {
@@ -105,7 +108,7 @@ int main(void)
                 fputs("\n", stdout);
         }
 
-        gnutls_bye(session, GNUTLS_SHUT_RDWR);
+        CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
       end:
 

@@ -14,6 +14,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/pkcs11.h>
+#include <assert.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -21,6 +22,8 @@
 
 /* A TLS client that loads the certificate and key.
  */
+
+#define CHECK(x) assert((x)>=0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -73,7 +76,6 @@ int main(void)
 {
         int ret, sd, ii;
         gnutls_session_t session;
-        gnutls_priority_t priorities_cache;
         char buffer[MAX_BUF + 1];
         gnutls_certificate_credentials_t xcred;
         /* Allow connections to servers that have OpenPGP keys as well.
@@ -85,37 +87,37 @@ int main(void)
         }
 
         /* for backwards compatibility with gnutls < 3.3.0 */
-        gnutls_global_init();
+        CHECK(gnutls_global_init());
 
         /* The PKCS11 private key operations may require PIN.
          * Register a callback. */
         gnutls_pkcs11_set_pin_function(pin_callback, NULL);
 
         /* X509 stuff */
-        gnutls_certificate_allocate_credentials(&xcred);
-
-        /* priorities */
-        gnutls_priority_init(&priorities_cache, 
-                             "NORMAL", NULL);
+        CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
         /* sets the trusted cas file
          */
-        gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
+        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
+                                                     GNUTLS_X509_FMT_PEM));
 
-        gnutls_certificate_set_x509_key_file(xcred, CERT_URL, KEY_URL,
-                                             GNUTLS_X509_FMT_DER);
+        CHECK(gnutls_certificate_set_x509_key_file(xcred, CERT_URL, KEY_URL,
+                                                   GNUTLS_X509_FMT_DER));
+
+        /* Note that there is no server certificate verification in this example
+         */
+
 
         /* Initialize TLS session
          */
-        gnutls_init(&session, GNUTLS_CLIENT);
+        CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
         /* Use default priorities */
-        gnutls_priority_set(session, priorities_cache);
+        CHECK(gnutls_set_default_priority(session));
 
         /* put the x509 credentials to the current session
          */
-        gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+        CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
 
         /* connect to the peer
          */
@@ -139,7 +141,7 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        gnutls_record_send(session, MSG, strlen(MSG));
+        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
 
         ret = gnutls_record_recv(session, buffer, MAX_BUF);
         if (ret == 0) {
@@ -156,7 +158,7 @@ int main(void)
         }
         fputs("\n", stdout);
 
-        gnutls_bye(session, GNUTLS_SHUT_RDWR);
+        CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
       end:
 
@@ -165,7 +167,6 @@ int main(void)
         gnutls_deinit(session);
 
         gnutls_certificate_free_credentials(xcred);
-        gnutls_priority_deinit(priorities_cache);
 
         gnutls_global_deinit();
 
