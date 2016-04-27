@@ -36,8 +36,8 @@ int main(void)
 #endif
         gnutls_certificate_credentials_t xcred;
 
-        if (gnutls_check_version("3.5.0") == NULL) {
-                fprintf(stderr, "GnuTLS 3.5.0 or later is required for this example\n");
+        if (gnutls_check_version("3.4.6") == NULL) {
+                fprintf(stderr, "GnuTLS 3.4.6 or later is required for this example\n");
                 exit(1);
         }
 
