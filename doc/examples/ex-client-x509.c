@@ -7,14 +7,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include "examples.h"
 
 /* A very basic TLS client, with X.509 authentication and server certificate
- * verification. Note that error checking for missing files etc. is omitted
- * for simplicity.
+ * verification. Note that error recovery is minimal for simplicity.
  */
+
+#define CHECK(x) assert((x)>=0)
 
 #define MAX_BUF 1024
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
@@ -42,15 +44,15 @@ int main(void)
         }
 
         /* for backwards compatibility with gnutls < 3.3.0 */
-        gnutls_global_init();
+        CHECK(gnutls_global_init());
 
         /* X509 stuff */
-        gnutls_certificate_allocate_credentials(&xcred);
+        CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
         /* sets the trusted cas file
          */
-        gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
+        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
+                                                     GNUTLS_X509_FMT_PEM));
 
         /* If client holds a certificate it can be set using the following:
          *
@@ -61,15 +63,15 @@ int main(void)
 
         /* Initialize TLS session 
          */
-        gnutls_init(&session, GNUTLS_CLIENT);
+        CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
         gnutls_session_set_ptr(session, (void *) "my_host_name");
 
-        gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
-                               strlen("my_host_name"));
+        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
+                                     strlen("my_host_name")));
 
         /* It is recommended to use the default priorities */
-        gnutls_set_default_priority(session);
+        CHECK(gnutls_set_default_priority(session));
 #if 0
 	/* if more fine-graned control is required */
         ret = gnutls_priority_set_direct(session, 
@@ -84,7 +86,7 @@ int main(void)
 
         /* put the x509 credentials to the current session
          */
-        gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+        CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
         gnutls_session_set_verify_cert(session, "my_host_name", 0);
 
         /* connect to the peer
@@ -102,8 +104,16 @@ int main(void)
         }
         while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
         if (ret < 0) {
-                fprintf(stderr, "*** Handshake failed\n");
-                gnutls_perror(ret);
+                if (ret == GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR) {
+                        /* check certificate verification status */
+                        type = gnutls_certificate_type_get(session);
+                        status = gnutls_session_get_verify_cert_status(session);
+                        CHECK(gnutls_certificate_verification_status_print(status,
+                              type, &out, 0));
+                        printf("cert verify output: %s\n", out.data);
+                        gnutls_free(out.data);
+                }
+                fprintf(stderr, "*** Handshake failed: %s\n", gnutls_strerror(ret));
                 goto end;
         } else {
                 char *desc;
@@ -113,22 +123,8 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        /* check certificate verification status */
-        type = gnutls_certificate_type_get(session);
-        status = gnutls_session_get_verify_cert_status(session);
-        ret =
-            gnutls_certificate_verification_status_print(status, type,
-                                                         &out, 0);
-        if (ret < 0) {
-                printf("Error\n");
-                return GNUTLS_E_CERTIFICATE_ERROR;
-        }
-
-        printf("%s", out.data);
-        gnutls_free(out.data);
-
 	/* send data */
-        gnutls_record_send(session, MSG, strlen(MSG));
+        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
 
         ret = gnutls_record_recv(session, buffer, MAX_BUF);
         if (ret == 0) {
@@ -149,7 +145,7 @@ int main(void)
                 fputs("\n", stdout);
         }
 
-        gnutls_bye(session, GNUTLS_SHUT_RDWR);
+        CHECK(gnutls_bye(session, GNUTLS_SHUT_RDWR));
 
       end:
 
