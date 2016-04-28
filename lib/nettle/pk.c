@@ -289,7 +289,7 @@ dh_cleanup:
 
 			/* The point is in pub, while the private part (scalar) in priv. */
 
-			if (size == 0)
+			if (size == 0 || priv->raw_priv.size != size)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 			out->data = gnutls_malloc(size);
