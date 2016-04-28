@@ -73,6 +73,7 @@ See the end for copying conditions.
 ** guile: Tests no longer leave zombie processes behind
 
 ** API and ABI modifications:
+GNUTLS_FORCE_CLIENT_CERT: Added
 GNUTLS_ENABLE_FALSE_START: Added
 GNUTLS_INDEFINITE_TIMEOUT: Added
 GNUTLS_ALPN_SERVER_PRECEDENCE: Added
