@@ -53,7 +53,7 @@ void _dtls_reset_window(gnutls_session_t session, uint8_t sequence[8]);
       int _rr; \
       if (r != GNUTLS_E_INTERRUPTED) _rr = GNUTLS_E_AGAIN; \
       else _rr = r; \
-      if (session->internals.blocking != 0) \
+      if (!(session->internals.flags & GNUTLS_NONBLOCK)) \
         millisleep(50); \
       return gnutls_assert_val(_rr); \
     } \

@@ -1153,7 +1153,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	record_state = &record_params->read;
 
 	/* receive headers */
-	ret = recv_headers(session, record_params, type, htype, &record, session->internals.blocking?&ms:0);
+	ret = recv_headers(session, record_params, type, htype, &record, (!(session->internals.flags & GNUTLS_NONBLOCK))?&ms:0);
 	if (ret < 0) {
 		ret = gnutls_assert_val_fatal(ret);
 		goto recv_error;
@@ -1168,7 +1168,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	 */
 	ret =
 	    _gnutls_io_read_buffered(session, record.packet_size,
-				     record.type, session->internals.blocking?&ms:0);
+				     record.type, (!(session->internals.flags & GNUTLS_NONBLOCK))?&ms:0);
 	if (ret != record.packet_size) {
 		gnutls_assert();
 		goto recv_error;
@@ -1228,7 +1228,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	 * messing with our windows.
 	 */
 	if (IS_DTLS(session)) {
-		if (likely(session->internals.no_replay_protection == 0)) {
+		if (likely(!(session->internals.flags & GNUTLS_NO_REPLAY_PROTECTION))) {
 			ret = _dtls_record_check(record_params, packet_sequence);
 			if (ret < 0) {
 				_gnutls_record_log
@@ -1387,7 +1387,7 @@ check_session_status(gnutls_session_t session)
 		/* if false start is not complete we always expect for handshake packets
 		 * prior to anything else. */
 		if (session->security_parameters.entity == GNUTLS_CLIENT &&
-		    session->internals.enable_false_start != 0) {
+		    (session->internals.flags & GNUTLS_ENABLE_FALSE_START)) {
 		    	/* Attempt to complete handshake */
 
 			session->internals.recv_state = RECV_STATE_FALSE_START_HANDLING;

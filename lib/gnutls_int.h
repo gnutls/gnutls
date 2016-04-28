@@ -998,10 +998,8 @@ typedef struct {
 	recv_state_t recv_state;	/* state of the receive function */
 
 	bool sc_random_set;
-	bool no_replay_protection;	/* DTLS replay protection */
-	bool allow_cert_change;		/* whether the peer is allowed to change certificate */
-	bool force_client_cert;
-	bool try_ext_master_secret;	/* whether to try negotiating the ext master secret */
+
+	unsigned flags; /* the flags in gnutls_init() */
 
 	/* a verify callback to override the verify callback from the credentials
 	 * structure */
@@ -1012,14 +1010,10 @@ typedef struct {
 	unsigned vc_status;
 	unsigned int additional_verify_flags; /* may be set by priorities or the vc functions */
 
-	/* whether this session uses non-blocking sockets */
-	bool blocking;
-
 	/* the SHA256 hash of the peer's certificate */
 	uint8_t cert_hash[32];
 	bool cert_hash_set;
 
-	bool enable_false_start; /* whether TLS false start has been requested */
 	bool false_start_used; /* non-zero if false start was used for appdata */
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().

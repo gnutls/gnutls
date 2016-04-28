@@ -424,11 +424,6 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 		(*session)->internals.transport = GNUTLS_STREAM;
 	}
 
-	if (flags & GNUTLS_NONBLOCK)
-		(*session)->internals.blocking = 0;
-	else
-		(*session)->internals.blocking = 1;
-
 	/* Enable useful extensions */
 	if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_EXTENSIONS)) {
 #ifdef ENABLE_SESSION_TICKETS
@@ -440,20 +435,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 #endif
 	}
 
-	if (!(flags & GNUTLS_NO_EXTENSIONS))
-		(*session)->internals.try_ext_master_secret = 1;
-
-	if (flags & GNUTLS_FORCE_CLIENT_CERT)
-		(*session)->internals.force_client_cert = 1;
-
-	if (flags & GNUTLS_NO_REPLAY_PROTECTION)
-		(*session)->internals.no_replay_protection = 1;
-
-	if (flags & GNUTLS_ALLOW_CERT_CHANGE)
-		(*session)->internals.allow_cert_change = 1;
-
-	if (flags & GNUTLS_ENABLE_FALSE_START)
-		(*session)->internals.enable_false_start = 1;
+	(*session)->internals.flags = flags;
 
 	return 0;
 }

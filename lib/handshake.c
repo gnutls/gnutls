@@ -2593,7 +2593,7 @@ int gnutls_handshake(gnutls_session_t session)
 
 	/* clear handshake buffer */
 	if (session->security_parameters.entity != GNUTLS_CLIENT ||
-	    !session->internals.enable_false_start ||
+	    !(session->internals.flags & GNUTLS_ENABLE_FALSE_START) ||
 	    session->internals.recv_state != RECV_STATE_FALSE_START) {
 
 		_gnutls_handshake_hash_buffers_clear(session);
@@ -2677,7 +2677,7 @@ static int check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certifica
 	char tmp[32];
 	int ret;
 
-	if (session->internals.allow_cert_change != 0)
+	if (session->internals.flags & GNUTLS_ALLOW_CERT_CHANGE)
 		return 0;
 
 	ai = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
@@ -2934,7 +2934,7 @@ static int handshake_client(gnutls_session_t session)
 
 	case STATE17:
 		STATE = STATE17;
-		if (session->internals.resumed == RESUME_FALSE && session->internals.enable_false_start != 0 && can_send_false_start(session)) {
+		if (session->internals.resumed == RESUME_FALSE && (session->internals.flags & GNUTLS_ENABLE_FALSE_START) && can_send_false_start(session)) {
 			session->internals.false_start_used = 1;
 			session->internals.recv_state = RECV_STATE_FALSE_START;
 			/* complete this phase of the handshake. We

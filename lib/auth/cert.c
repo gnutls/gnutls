@@ -223,7 +223,7 @@ find_x509_client_cert(gnutls_session_t session,
 	 * then send that one.
 	 */
 	if (cred->ncerts == 1 &&
-		(data_size == 0 || session->internals.force_client_cert)) {
+		(data_size == 0 || (session->internals.flags & GNUTLS_FORCE_CLIENT_CERT))) {
 			*indx = 0;
 			return 0;
 	}
