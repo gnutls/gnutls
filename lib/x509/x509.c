@@ -3887,6 +3887,17 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 				  const char *url, unsigned int flags)
 {
 	int ret;
+	unsigned i;
+
+	for (i=0;i<_gnutls_custom_urls_size;i++) {
+		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+			if (_gnutls_custom_urls[i].import_crt) {
+				ret = _gnutls_custom_urls[i].import_crt(crt, url, flags);
+				goto cleanup;
+			}
+			break;
+		}
+	}
 
 	if (strncmp(url, SYSTEM_URL, SYSTEM_URL_SIZE) == 0) {
 		ret = _gnutls_x509_crt_import_system_url(crt, url);
@@ -3895,15 +3906,6 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 			ret = _gnutls_x509_crt_import_pkcs11_url(crt, url, flags);
 #endif
 	} else {
-		unsigned i;
-		for (i=0;i<_gnutls_custom_urls_size;i++) {
-			if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
-				if (_gnutls_custom_urls[i].import_crt) {
-					ret = _gnutls_custom_urls[i].import_crt(crt, url, flags);
-					goto cleanup;
-				}
-			}
-		}
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 

@@ -1348,6 +1348,16 @@ gnutls_privkey_import_url(gnutls_privkey_t key, const char *url,
 	unsigned i;
 	int ret;
 
+	for (i=0;i<_gnutls_custom_urls_size;i++) {
+		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+			if (_gnutls_custom_urls[i].import_key) {
+				ret = _gnutls_custom_urls[i].import_key(key, url, flags);
+				goto cleanup;
+			}
+			break;
+		}
+	}
+
 	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 #ifdef ENABLE_PKCS11
 		ret = _gnutls_privkey_import_pkcs11_url(key, url, flags);
@@ -1369,16 +1379,6 @@ gnutls_privkey_import_url(gnutls_privkey_t key, const char *url,
 	if (strncmp(url, SYSTEM_URL, SYSTEM_URL_SIZE) == 0) {
 		ret = _gnutls_privkey_import_system_url(key, url);
 		goto cleanup;
-	}
-
-	for (i=0;i<_gnutls_custom_urls_size;i++) {
-		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
-			if (_gnutls_custom_urls[i].import_key) {
-				ret = _gnutls_custom_urls[i].import_key(key, url, flags);
-				goto cleanup;
-			}
-			break;
-		}
 	}
 
 	ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);

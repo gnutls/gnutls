@@ -1318,6 +1318,13 @@ gnutls_pubkey_import_url(gnutls_pubkey_t key, const char *url,
 {
 	unsigned i;
 
+	for (i=0;i<_gnutls_custom_urls_size;i++) {
+		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+			if (_gnutls_custom_urls[i].import_pubkey)
+				return _gnutls_custom_urls[i].import_pubkey(key, url, flags);
+		}
+	}
+
 	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0)
 #ifdef ENABLE_PKCS11
 		return _gnutls_pubkey_import_pkcs11_url(key, url, flags);
@@ -1331,13 +1338,6 @@ gnutls_pubkey_import_url(gnutls_pubkey_t key, const char *url,
 #else
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
-
-	for (i=0;i<_gnutls_custom_urls_size;i++) {
-		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
-			if (_gnutls_custom_urls[i].import_pubkey)
-				return _gnutls_custom_urls[i].import_pubkey(key, url, flags);
-		}
-	}
 
 	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 }
