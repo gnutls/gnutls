@@ -1311,6 +1311,8 @@ static void cmd_parser(int argc, char **argv)
 	if (outfile != stdout)
 		fclose(outfile);
 
+
+	free(cinfo.seed);
 #ifdef ENABLE_PKCS11
 	gnutls_pkcs11_deinit();
 #endif

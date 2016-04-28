@@ -1044,6 +1044,8 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 		}
 	}
 
+	gnutls_free(p.data);
+	gnutls_free(g.data);
 	gnutls_dh_params_deinit(dh_params);
 }
 
@@ -1418,6 +1420,11 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				gnutls_strerror(ret));
 		}
 
+	}
+
+	if (how != 0) {
+		gnutls_free(p.data);
+		gnutls_free(g.data);
 	}
 
 	gnutls_dh_params_deinit(dh_params);
