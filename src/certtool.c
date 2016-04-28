@@ -155,27 +155,30 @@ generate_private_key_int(common_info_st * cinfo)
 		}
 	}
 
-	if (HAVE_OPT(SEED)) {
+	if (cinfo->seed_size > 0) {
 		gnutls_keygen_data_st data;
-		unsigned char seed[256];
-		size_t seed_size = sizeof(seed);
-		ret = gnutls_hex2bin(OPT_ARG(SEED), strlen(OPT_ARG(SEED)), seed, &seed_size);
+		gnutls_datum_t hexseed, seed;
+
+		hexseed.data = (void*)cinfo->seed;
+		hexseed.size = cinfo->seed_size;
+
+		ret = gnutls_hex_decode2(&hexseed, &seed);
 		if (ret < 0) {
 			fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 
 		data.type = GNUTLS_KEYGEN_SEED;
-		data.data = seed;
-		data.size = seed_size;
+		data.data = seed.data;
+		data.size = seed.size;
 
 		if (key_type == GNUTLS_PK_RSA) {
-			if ((bits == 3072 && seed_size != 32) || (bits == 2048 && seed_size != 28)) {
-				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)seed_size);
+			if ((bits == 3072 && seed.size != 32) || (bits == 2048 && seed.size != 28)) {
+				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)seed.size);
 			}
 		} else if (key_type == GNUTLS_PK_DSA) {
-			if (seed_size != 65) {
-				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)seed_size);
+			if (seed.size != 65) {
+				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)seed.size);
 			}
 		}
 
@@ -1054,7 +1057,6 @@ static void cmd_parser(int argc, char **argv)
 	} else
 		outfile = stdout;
 
-
 	if (HAVE_OPT(INFILE)) {
 		struct stat st;
 		if (stat(OPT_ARG(INFILE), &st) == 0) {
@@ -1167,6 +1169,11 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(VERBOSE))
 		cinfo.verbose = 1;
+
+	if (HAVE_OPT(SEED)) {
+		cinfo.seed = OPT_ARG(SEED);
+		cinfo.seed_size = strlen(OPT_ARG(SEED));
+	}
 
 	cinfo.batch = batch;
 	cinfo.cprint = HAVE_OPT(CPRINT);

@@ -57,6 +57,9 @@ typedef struct common_info {
 	/* for key generation */
 	unsigned provable;
 
+	const char *seed;
+	unsigned seed_size;
+
 	const char *pin;
 	const char *so_pin;
 

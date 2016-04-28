@@ -1296,7 +1296,34 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				exit(1);
 			}
 
-			ret = gnutls_x509_privkey_generate(pkey, GNUTLS_PK_DSA, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE);
+			if (info->seed_size > 0) {
+				gnutls_keygen_data_st data;
+				gnutls_datum_t hexseed, seed;
+
+				hexseed.data = (void*)info->seed;
+				hexseed.size = info->seed_size;
+
+				ret = gnutls_hex_decode2(&hexseed, &seed);
+				if (ret < 0) {
+					fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
+					exit(1);
+				}
+
+				if (seed.size < 32) {
+					fprintf(stderr, "For DH parameter generation a 32-byte seed value or larger is expected (have: %d); use -d 2 for more information.\n", (int)seed.size);
+					exit(1);
+				}
+
+				data.type = GNUTLS_KEYGEN_SEED;
+				data.data = seed.data;
+				data.size = seed.size;
+
+				ret = gnutls_x509_privkey_generate2(pkey, GNUTLS_PK_DSA, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
+				gnutls_free(seed.data);
+			} else {
+				ret = gnutls_x509_privkey_generate(pkey, GNUTLS_PK_DSA, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE);
+			}
+
 			if (ret < 0) {
 				fprintf(stderr,
 					"Error generating DSA parameters: %s\n",
