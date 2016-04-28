@@ -53,6 +53,9 @@ See the end for copying conditions.
 ** libgnutls: Preload the system priority file on library load. This allows
    applications that chroot() to also use the system priorities.
 
+** libgnutls: Applications are allowed to override the built-in key and
+   certificate URLs.
+
 ** certtool: Added the ability to sign certificates using SHA3.
 
 ** certtool: Added the --provable and --verify-allow-broken options.
