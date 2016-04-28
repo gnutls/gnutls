@@ -57,7 +57,7 @@ typedef struct common_info {
 	/* for key generation */
 	unsigned provable;
 
-	const char *seed;
+	const unsigned char *seed;
 	unsigned seed_size;
 
 	const char *pin;
@@ -133,5 +133,7 @@ extern unsigned char *lbuffer;
 extern unsigned long lbuffer_size;
 
 void fix_lbuffer(unsigned long);
+
+void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size);
 
 #endif

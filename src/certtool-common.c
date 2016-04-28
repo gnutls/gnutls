@@ -1298,28 +1298,17 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 
 			if (info->seed_size > 0) {
 				gnutls_keygen_data_st data;
-				gnutls_datum_t hexseed, seed;
 
-				hexseed.data = (void*)info->seed;
-				hexseed.size = info->seed_size;
-
-				ret = gnutls_hex_decode2(&hexseed, &seed);
-				if (ret < 0) {
-					fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
-					exit(1);
-				}
-
-				if (seed.size < 32) {
-					fprintf(stderr, "For DH parameter generation a 32-byte seed value or larger is expected (have: %d); use -d 2 for more information.\n", (int)seed.size);
+				if (info->seed_size < 32) {
+					fprintf(stderr, "For DH parameter generation a 32-byte seed value or larger is expected (have: %d); use -d 2 for more information.\n", (int)info->seed_size);
 					exit(1);
 				}
 
 				data.type = GNUTLS_KEYGEN_SEED;
-				data.data = seed.data;
-				data.size = seed.size;
+				data.data = (void*)info->seed;
+				data.size = info->seed_size;
 
 				ret = gnutls_x509_privkey_generate2(pkey, GNUTLS_PK_DSA, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
-				gnutls_free(seed.data);
 			} else {
 				ret = gnutls_x509_privkey_generate(pkey, GNUTLS_PK_DSA, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE);
 			}
@@ -1434,4 +1423,28 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 	gnutls_dh_params_deinit(dh_params);
 
 	return 0;
+}
+
+void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size)
+{
+	int ret;
+	size_t seed_size;
+
+	seed->size = hex_size;
+	seed->data = malloc(hex_size);
+
+	if (seed->data == NULL) {
+		fprintf(stderr, "memory error\n");
+		exit(1);
+	}
+
+	seed_size = hex_size;
+	ret = gnutls_hex2bin(hex, hex_size, seed->data, &seed_size);
+	if (ret < 0) {
+		fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	seed->size = seed_size;
+
+	return;
 }
