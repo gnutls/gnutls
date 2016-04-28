@@ -42,7 +42,8 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	name-constraints-ip2.pem chain-md5.pem gost-cert.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
-	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey
+	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
+	provable-dh
 
 if !HAVE_BUGGY_LIBIDN
 dist_check_SCRIPTS += certtool-utf8
