@@ -443,6 +443,9 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	if (!(flags & GNUTLS_NO_EXTENSIONS))
 		(*session)->internals.try_ext_master_secret = 1;
 
+	if (flags & GNUTLS_FORCE_CLIENT_CERT)
+		(*session)->internals.force_client_cert = 1;
+
 	if (flags & GNUTLS_NO_REPLAY_PROTECTION)
 		(*session)->internals.no_replay_protection = 1;
 

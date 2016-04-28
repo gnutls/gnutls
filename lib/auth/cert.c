@@ -204,7 +204,8 @@ static int cert_get_issuer_dn(gnutls_pcert_st * cert, gnutls_datum_t * odn)
  * CAs and sign algorithms supported by the peer server.
  */
 static int
-find_x509_cert(const gnutls_certificate_credentials_t cred,
+find_x509_client_cert(gnutls_session_t session,
+	       const gnutls_certificate_credentials_t cred,
 	       uint8_t * _data, size_t _data_size,
 	       const gnutls_pk_algorithm_t * pk_algos,
 	       int pk_algos_length, int *indx)
@@ -221,9 +222,10 @@ find_x509_cert(const gnutls_certificate_credentials_t cred,
 	/* If peer doesn't send any issuers and we have a single certificate
 	 * then send that one.
 	 */
-	if (data_size == 0 && cred->ncerts == 1) {
-		*indx = 0;
-		return 0;
+	if (cred->ncerts == 1 &&
+		(data_size == 0 || session->internals.force_client_cert)) {
+			*indx = 0;
+			return 0;
 	}
 
 	do {
@@ -654,7 +656,7 @@ select_client_cert(gnutls_session_t session,
 
 		if (session->security_parameters.cert_type == GNUTLS_CRT_X509)
 			result =
-			    find_x509_cert(cred, _data, _data_size,
+			    find_x509_client_cert(session, cred, _data, _data_size,
 					   pk_algos, pk_algos_length, &indx);
 #ifdef ENABLE_OPENPGP
 		else if (session->security_parameters.cert_type ==

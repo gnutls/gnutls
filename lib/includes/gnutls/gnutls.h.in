@@ -353,8 +353,9 @@ typedef enum {
  * @GNUTLS_NO_SIGNAL: In systems where SIGPIPE is delivered on send, it will be disabled. That flag has effect in systems which support the MSG_NOSIGNAL sockets flag (since 3.4.2).
  * @GNUTLS_NO_EXTENSIONS: Do not enable any TLS extensions by default (since 3.1.2).
  * @GNUTLS_NO_REPLAY_PROTECTION: Disable any replay protection in DTLS. This must only be used if  replay protection is achieved using other means.
- * @GNUTLS_ALLOW_CERT_CHANGE: Allow the peer to replace its certificate during a rehandshake. This change is often used in attacks and thus prohibited by default (since 3.5.0).
- * @GNUTLS_ENABLE_FALSE_START: Enable the TLS false start on client side if the negotiated ciphersuites allow it. This will enable sending data prior to the handshake being complete, and may introduce a risk of crypto failure when combined with certain key exchanged; for that GnuTLS may not enable that option in ciphersuites that are known to be not safe for false start (since 3.5.0).
+ * @GNUTLS_ALLOW_CERT_CHANGE: Allow the peer to replace its certificate during a rehandshake. This change is often used in attacks and thus prohibited by default. Since 3.5.0.
+ * @GNUTLS_ENABLE_FALSE_START: Enable the TLS false start on client side if the negotiated ciphersuites allow it. This will enable sending data prior to the handshake being complete, and may introduce a risk of crypto failure when combined with certain key exchanged; for that GnuTLS may not enable that option in ciphersuites that are known to be not safe for false start. Since 3.5.0.
+ * @GNUTLS_FORCE_CLIENT_CERT: When in client side and only a single cert is specified, send that certificate irrespective of the issuers expectated by the server. Since 3.5.0.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
@@ -369,7 +370,8 @@ typedef enum {
 	GNUTLS_NO_REPLAY_PROTECTION = (1<<5),
 	GNUTLS_NO_SIGNAL = (1<<6),
 	GNUTLS_ALLOW_CERT_CHANGE = (1<<7),
-	GNUTLS_ENABLE_FALSE_START = (1<<8)
+	GNUTLS_ENABLE_FALSE_START = (1<<8),
+	GNUTLS_FORCE_CLIENT_CERT = (1<<9)
 } gnutls_init_flags_t;
 
 /**

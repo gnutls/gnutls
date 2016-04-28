@@ -1000,6 +1000,7 @@ typedef struct {
 	bool sc_random_set;
 	bool no_replay_protection;	/* DTLS replay protection */
 	bool allow_cert_change;		/* whether the peer is allowed to change certificate */
+	bool force_client_cert;
 	bool try_ext_master_secret;	/* whether to try negotiating the ext master secret */
 
 	/* a verify callback to override the verify callback from the credentials
