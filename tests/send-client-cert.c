@@ -44,13 +44,14 @@ static void tls_log_func(int level, const char *str)
 
 #include "cert-common.h"
 
-#define OK 0
-#define FAIL 1
+#define SENT 0
+#define NOT_SENT 1
 
 enum {
-	INCORRECT_CA = 0,
-	CORRECT_CA = 1,
-	NO_CA = 2
+	INCORRECT_CA_FORCE = 0,
+	INCORRECT_CA = 1,
+	CORRECT_CA = 2,
+	NO_CA = 3
 };
 
 static void try(unsigned expect, unsigned ca_type)
@@ -65,6 +66,7 @@ static void try(unsigned expect, unsigned ca_type)
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
 	gnutls_certificate_credentials_t clientx509cred;
+	unsigned flags = 0;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
 
@@ -88,7 +90,7 @@ static void try(unsigned expect, unsigned ca_type)
 
 	if (ca_type == CORRECT_CA) {
 		ret = gnutls_certificate_set_x509_trust_mem(serverx509cred, &ca3_cert, GNUTLS_X509_FMT_PEM);
-	} else if (ca_type == INCORRECT_CA) {
+	} else if (ca_type == INCORRECT_CA || ca_type == INCORRECT_CA_FORCE) {
 		ret = gnutls_certificate_set_x509_trust_mem(serverx509cred, &unknown_ca_cert, GNUTLS_X509_FMT_PEM);
 	} else if (ca_type == NO_CA) {
 		ret = 0;
@@ -122,11 +124,16 @@ static void try(unsigned expect, unsigned ca_type)
 	if (ret < 0)
 		exit(1);
 
+
 	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT);
+	if (ca_type == INCORRECT_CA_FORCE) {
+		flags |= GNUTLS_FORCE_CLIENT_CERT;
+	}
+
+	ret = gnutls_init(&client, GNUTLS_CLIENT|flags);
 	if (ret < 0)
 		exit(1);
 
@@ -143,11 +150,11 @@ static void try(unsigned expect, unsigned ca_type)
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 
-	success("Testing CA type %d, expecting %s\n", ca_type, expect==0?"ok":"fail");
+	success("Testing CA type %d, expecting %s\n", ca_type, expect==SENT?"sent":"not sent");
 
 	HANDSHAKE(client, server);
 
-	if (expect == OK) {
+	if (expect == SENT) {
 		if (gnutls_certificate_get_ours(client) == NULL) {
 			fail("Test %d: client didn't send any certificate\n", ca_type);
 			exit(1);
@@ -171,8 +178,9 @@ void doit(void)
 {
 	global_init();
 
-	try(OK, NO_CA);
-	try(OK, CORRECT_CA);
-	try(FAIL, INCORRECT_CA);
+	try(SENT, NO_CA);
+	try(SENT, CORRECT_CA);
+	try(NOT_SENT, INCORRECT_CA);
+	try(SENT, INCORRECT_CA_FORCE);
 	gnutls_global_deinit();
 }
