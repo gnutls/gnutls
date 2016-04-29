@@ -127,7 +127,7 @@ inline static int encode(uint8_t * result, const uint8_t * rdata, unsigned left)
 		}
 		break;
 	default:
-		return -1;
+		return GNUTLS_E_BASE64_ENCODING_ERROR;
 	}
 
 	return ret;
@@ -155,7 +155,7 @@ _gnutls_sbase64_encode(uint8_t * data, size_t data_size, char **result)
 
 	(*result) = gnutls_calloc(1, ret + 1);
 	if ((*result) == NULL)
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 
 	i = j = 0;
 /* encode the bytes that are not a multiple of 3 
@@ -203,7 +203,7 @@ inline static int decode(uint8_t * result, const uint8_t * data)
 	if (a1 != 0xff)
 		result[2] = a1 & 0xff;
 	else
-		return -1;
+		return GNUTLS_E_BASE64_DECODING_ERROR;
 	if (a2 != 0xff)
 		result[2] |= ((a2 & 0x03) << 6) & 0xff;
 
@@ -252,7 +252,7 @@ _gnutls_sbase64_decode(char *data, size_t idata_size, uint8_t ** result)
 
 	(*result) = gnutls_malloc(ret + 1);
 	if ((*result) == NULL)
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 
 	/* the first "block" is treated with special care */
 	tmp = 0;
