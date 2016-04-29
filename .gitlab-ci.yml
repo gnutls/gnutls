@@ -12,13 +12,14 @@ Compile minimal library:
   - linux
   except:
   - tags
-Build and Check with asan:
+Build and Check with asan and coverage run:
   script:
-  - make autoreconf && CFLAGS="-fsanitize=address -g
-    -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
-    && make -j4 && make check -j4
+  - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
+    ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
+    make -j4 && make check -j4 && make local-code-coverage-output
   tags:
   - nettle3
+  - lcov
   - linux
   except:
   - tags
