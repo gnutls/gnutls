@@ -99,7 +99,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 dh-params rehandshake-ext-secret pcert-list session-export-funcs \
 	 handshake-false-start version-checks key-material-dtls key-material-set-dtls \
 	 system-prio-file name-constraints-merge crl-basic crq-basic \
-	 send-client-cert custom-urls-override hex
+	 send-client-cert custom-urls-override hex rehandshake-switch-psk-id
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
