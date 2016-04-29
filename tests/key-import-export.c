@@ -109,6 +109,25 @@ unsigned char ecc_x[] = "\x37\xcc\x56\xd9\x76\x09\x1e\x5a\x72\x3e\xc7\x59\x2d\xf
 unsigned char ecc_y[] = "\x4e\xe5\x00\xd8\x23\x11\xff\xea\x2f\xd2\x34\x5d\x5d\x16\xbd\x8a\x88\xc2\x6b\x77\x0d\x55\xcd\x8a\x2a\x0e\xfa\x01\xc8\xb4\xed\xff";
 unsigned char ecc_k[] = "\x00\xf1\x2a\x13\x20\x76\x02\x70\xa8\x3c\xbf\xfd\x53\xf6\x03\x1e\xf7\x6a\x5d\x86\xc8\xa2\x04\xf2\xc3\x0c\xa9\xeb\xf5\x1f\x0f\x0e\xa7";
 
+gnutls_datum_t _dsa_p = {dsa_p, sizeof(dsa_p)-1};
+gnutls_datum_t _dsa_q = {dsa_q, sizeof(dsa_q)-1};
+gnutls_datum_t _dsa_g = {dsa_g, sizeof(dsa_g)-1};
+gnutls_datum_t _dsa_y = {dsa_y, sizeof(dsa_y)-1};
+gnutls_datum_t _dsa_x = {dsa_x, sizeof(dsa_x)-1};
+
+gnutls_datum_t _rsa_m = {rsa_m, sizeof(rsa_m)-1};
+gnutls_datum_t _rsa_e = {rsa_e, sizeof(rsa_e)-1};
+gnutls_datum_t _rsa_d = {rsa_d, sizeof(rsa_d)-1};
+gnutls_datum_t _rsa_p = {rsa_p, sizeof(rsa_p)-1};
+gnutls_datum_t _rsa_q = {rsa_q, sizeof(rsa_q)-1};
+gnutls_datum_t _rsa_u = {rsa_u, sizeof(rsa_u)-1};
+gnutls_datum_t _rsa_e1 = {rsa_e1, sizeof(rsa_e1)-1};
+gnutls_datum_t _rsa_e2 = {rsa_e2, sizeof(rsa_e2)-1};
+
+gnutls_datum_t _ecc_x = {ecc_x, sizeof(ecc_x)-1};
+gnutls_datum_t _ecc_y = {ecc_y, sizeof(ecc_y)-1};
+gnutls_datum_t _ecc_k = {ecc_k, sizeof(ecc_k)-1};
+
 unsigned char ecc_params[] = "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
 unsigned char ecc_point[] = "\x04\x41\x04\x37\xcc\x56\xd9\x76\x09\x1e\x5a\x72\x3e\xc7\x59\x2d\xff\x20\x6e\xee\x7c\xf9\x06\x91\x74\xd0\xad\x14\xb5\xf7\x68\x22\x59\x62\x92\x4e\xe5\x00\xd8\x23\x11\xff\xea\x2f\xd2\x34\x5d\x5d\x16\xbd\x8a\x88\xc2\x6b\x77\x0d\x55\xcd\x8a\x2a\x0e\xfa\x01\xc8\xb4\xed\xff";
 
@@ -132,7 +151,7 @@ static int cmp(const char *name, int line, gnutls_datum_t *v1, unsigned char *v2
 }
 
 static
-int check_privkey(void)
+int check_x509_privkey(void)
 {
 	gnutls_x509_privkey_t key;
 	gnutls_datum_t p, q, g, y, x;
@@ -144,15 +163,15 @@ int check_privkey(void)
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_x509_privkey_import(key, &dsa_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_x509_privkey_export_dsa_raw(key, &p, &q, &g, &y, &x);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	CMP("p", &p, dsa_p);
 	CMP("q", &q, dsa_q);
@@ -169,15 +188,15 @@ int check_privkey(void)
 	/* RSA */
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_x509_privkey_import(key, &rsa_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_x509_privkey_export_rsa_raw2(key, &m, &e, &d, &p, &q, &u, &e1, &e2);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	CMP("m", &m, rsa_m);
 	CMP("e", &e, rsa_e);
@@ -200,17 +219,17 @@ int check_privkey(void)
 	/* ECC */
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_x509_privkey_import(key, &ecc_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_x509_privkey_export_ecc_raw(key, &curve, &x, &y, &p);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
-	if (curve != 2) {
+	if (curve != GNUTLS_ECC_CURVE_SECP256R1) {
 		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
 		exit(1);
 	}
@@ -226,12 +245,11 @@ int check_privkey(void)
 }
 
 static
-int check_pubkey(void)
+int check_privkey_import_export(void)
 {
 	gnutls_privkey_t key;
-	gnutls_pubkey_t pub;
 	gnutls_datum_t p, q, g, y, x;
-	gnutls_datum_t m, e;
+	gnutls_datum_t m, e, u, e1, e2, d;
 	gnutls_ecc_curve_t curve;
 	int ret;
 
@@ -239,23 +257,116 @@ int check_pubkey(void)
 
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
+
+	ret = gnutls_privkey_import_dsa_raw(key, &_dsa_p, &_dsa_q, &_dsa_g, &_dsa_y, &_dsa_x);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_dsa_raw(key, &p, &q, &g, &y, &x);
+	if (ret < 0)
+		fail("error: %s\n", gnutls_strerror(ret));
+
+	CMP("p", &p, dsa_p);
+	CMP("q", &q, dsa_q);
+	CMP("g", &g, dsa_g);
+	CMP("y", &y, dsa_y);
+	CMP("x", &x, dsa_x);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(g.data);
+	gnutls_free(y.data);
+	gnutls_free(x.data);
+	gnutls_privkey_deinit(key);
+
+	/* RSA */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_rsa_raw(key, &_rsa_m, &_rsa_e, &_rsa_d, &_rsa_p, &_rsa_q, &_rsa_u, &_rsa_e1, &_rsa_e2);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_rsa_raw(key, &m, &e, &d, &p, &q, &u, &e1, &e2);
+	if (ret < 0)
+		fail("error\n");
+
+	CMP("m", &m, rsa_m);
+	CMP("e", &e, rsa_e);
+	CMP("d", &d, rsa_d);
+	CMP("p", &p, rsa_p);
+	CMP("q", &q, rsa_q);
+	CMP("u", &u, rsa_u);
+	CMP("e1", &e1, rsa_e1);
+	CMP("e2", &e2, rsa_e2);
+	gnutls_free(m.data);
+	gnutls_free(e.data);
+	gnutls_free(d.data);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(u.data);
+	gnutls_free(e1.data);
+	gnutls_free(e2.data);
+	gnutls_privkey_deinit(key);
+
+	/* ECC */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_SECP256R1, &_ecc_x, &_ecc_y, &_ecc_k);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_ecc_raw(key, &curve, &x, &y, &p);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_SECP256R1) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	CMP("x", &x, ecc_x);
+	CMP("y", &y, ecc_y);
+	CMP("k", &p, ecc_k);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+	gnutls_free(p.data);
+	gnutls_privkey_deinit(key);
+
+	return 0;
+}
+
+static
+int check_dsa(void)
+{
+	gnutls_privkey_t key;
+	gnutls_pubkey_t pub;
+	gnutls_datum_t p, q, g, y, x;
+	int ret;
+
+	global_init();
+
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
 
 	ret = gnutls_pubkey_init(&pub);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &dsa_key, GNUTLS_X509_FMT_PEM, 0, 0);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_export_dsa_raw(pub, &p, &q, &g, &y);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	CMP("p", &p, dsa_p);
 	CMP("q", &q, dsa_q);
@@ -265,60 +376,118 @@ int check_pubkey(void)
 	gnutls_free(q.data);
 	gnutls_free(g.data);
 	gnutls_free(y.data);
+
+	ret = gnutls_privkey_export_dsa_raw(key, &p, &q, &g, &y, &x);
+	if (ret < 0)
+		fail("error\n");
+	CMP("p", &p, dsa_p);
+	CMP("q", &q, dsa_q);
+	CMP("g", &g, dsa_g);
+	CMP("y", &y, dsa_y);
+	CMP("x", &x, dsa_x);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(g.data);
+	gnutls_free(y.data);
+	gnutls_free(x.data);
+
 	gnutls_privkey_deinit(key);
 	gnutls_pubkey_deinit(pub);
 
+	return 0;
+}
+
+static
+int check_rsa(void)
+{
+	gnutls_privkey_t key;
+	gnutls_pubkey_t pub;
+	gnutls_datum_t m, e, d, p, q, u, e1, e2;
+	int ret;
 	/* RSA */
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_init(&pub);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &rsa_key, GNUTLS_X509_FMT_PEM, 0, 0);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_export_rsa_raw(pub, &m, &e);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	CMP("m", &m, rsa_m);
 	CMP("e", &e, rsa_e);
 	gnutls_free(m.data);
 	gnutls_free(e.data);
+
+	ret = gnutls_privkey_export_rsa_raw(key, &m, &e, &d, &p, &q, &u, &e1, &e2);
+	if (ret < 0)
+		fail("error\n");
+
+	CMP("m", &m, rsa_m);
+	CMP("e", &e, rsa_e);
+	CMP("d", &d, rsa_d);
+	CMP("p", &p, rsa_p);
+	CMP("q", &q, rsa_q);
+	CMP("u", &u, rsa_u);
+	CMP("e1", &e1, rsa_e1);
+	CMP("e2", &e2, rsa_e2);
+	gnutls_free(m.data);
+	gnutls_free(e.data);
+	gnutls_free(d.data);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(u.data);
+	gnutls_free(e1.data);
+	gnutls_free(e2.data);
+
 	gnutls_privkey_deinit(key);
 	gnutls_pubkey_deinit(pub);
+
+	return 0;
+}
+
+static
+int check_ecc(void)
+{
+	gnutls_privkey_t key;
+	gnutls_pubkey_t pub;
+	gnutls_datum_t y, x, k;
+	gnutls_ecc_curve_t curve;
+	int ret;
 
 	/* ECC */
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_init(&pub);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_privkey_import_x509_raw(key, &ecc_key, GNUTLS_X509_FMT_PEM, 0, 0);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	ret = gnutls_pubkey_export_ecc_raw(pub, &curve, &x, &y);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
-
-	if (curve != 2) {
+	if (curve != GNUTLS_ECC_CURVE_SECP256R1) {
 		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
 		exit(1);
 	}
@@ -327,35 +496,48 @@ int check_pubkey(void)
 	gnutls_free(x.data);
 	gnutls_free(y.data);
 
+
+	/* check the private key export */
+	ret = gnutls_privkey_export_ecc_raw(key, &curve, &x, &y, &k);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_SECP256R1) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	CMP("x", &x, ecc_x);
+	CMP("y", &y, ecc_y);
+	CMP("k", &k, ecc_k);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+	gnutls_free(k.data);
+
+	gnutls_privkey_deinit(key);
+
+	/* More public key ops */
+
 	ret = gnutls_pubkey_export_ecc_x962(pub, &x, &y);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
 	CMP("parameters", &x, ecc_params);
 	CMP("ecpoint", &y, ecc_point);
 
-	gnutls_privkey_deinit(key);
-#if 0
-	gnutls_pubkey_deinit(pub);
-	ret = gnutls_pubkey_init(&pub);
-	if (ret < 0)
-		return 1;
-#endif
-
 	ret = gnutls_pubkey_import_ecc_x962(pub, &x, &y);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 	gnutls_free(x.data);
 	gnutls_free(y.data);
 
 	/* check again */
 	ret = gnutls_pubkey_export_ecc_raw(pub, &curve, &x, &y);
 	if (ret < 0)
-		return 1;
+		fail("error\n");
 
-	if (curve != 2) {
+	if (curve != GNUTLS_ECC_CURVE_SECP256R1) {
 		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
-		exit(1);
+		fail("error\n");
 	}
 	CMP("x", &x, ecc_x);
 	CMP("y", &y, ecc_y);
@@ -367,15 +549,30 @@ int check_pubkey(void)
 	return 0;
 }
 
-int main(void)
+void doit(void)
 {
-	if (check_privkey() != 0) {
-		fprintf(stderr, "error in privkey check\n");
+	if (check_x509_privkey() != 0) {
+		fail("error in privkey check\n");
 		exit(1);
 	}
-	if (check_pubkey() != 0) {
-		fprintf(stderr, "error in pubkey check\n");
+
+	if (check_privkey_import_export() != 0) {
+		fail("error in privkey import/export check\n");
 		exit(1);
 	}
-	return 0;
+
+	if (check_dsa() != 0) {
+		fail("error in pubkey check\n");
+		exit(1);
+	}
+
+	if (check_rsa() != 0) {
+		fail("error in pubkey check\n");
+		exit(1);
+	}
+
+	if (check_ecc() != 0) {
+		fail("error in pubkey check\n");
+		exit(1);
+	}
 }
