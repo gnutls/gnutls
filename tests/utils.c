@@ -90,7 +90,7 @@ const char *pkcs3_3072 =
 	"FSp6mOVNcuvhB5U2gW8CAgEA\n"
 	"-----END DH PARAMETERS-----\n";
 
-void fail(const char *format, ...)
+void _fail(const char *format, ...)
 {
 	char str[1024];
 	va_list arg_ptr;

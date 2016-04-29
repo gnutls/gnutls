@@ -51,7 +51,10 @@ extern const char *pkcs3;
 extern const char *pkcs3_2048;
 extern const char *pkcs3_3072;
 
-extern void fail(const char *format, ...)
+#define fail(format, ...) \
+    _fail("%s:%d: "format, __func__, __LINE__, ##__VA_ARGS__)
+
+extern void _fail(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
 extern void fail_ignore(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
