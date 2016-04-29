@@ -97,6 +97,7 @@ void doit(void)
 	const int null = 5;
 	const int sec128 = 50;
 
+	try_prio("PFS", 42, 12, __LINE__);
 	try_prio("NORMAL", normal, 12, __LINE__);
 	try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal, 12, __LINE__);
 #ifndef ENABLE_FIPS140
@@ -111,6 +112,7 @@ void doit(void)
 	try_prio("SECURE128:+SECURE256", sec128, 10, __LINE__);	/* should be the same as SECURE128 */
 	try_prio("SECURE128:+SECURE256:+NORMAL", normal, 12, __LINE__);	/* should be the same as NORMAL */
 	try_prio("SUITEB192", 1, 1, __LINE__);
+	try_prio("SUITEB128", 2, 2, __LINE__);
 	/* check legacy strings */
 	try_prio("NORMAL:+RSA-EXPORT:+ARCFOUR-40", normal, 12, __LINE__);
 }
