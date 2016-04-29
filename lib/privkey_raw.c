@@ -309,7 +309,7 @@ gnutls_x509_privkey_t xkey;
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = gnutls_x509_privkey_import_ecc_raw(xkey, curve, y, x, k);
+	ret = gnutls_x509_privkey_import_ecc_raw(xkey, curve, x, y, k);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
