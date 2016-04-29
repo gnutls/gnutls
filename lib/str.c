@@ -513,6 +513,9 @@ _gnutls_hex2bin(const char *hex_data, size_t hex_size, uint8_t * bin_data,
 			return GNUTLS_E_SHORT_MEMORY_BUFFER;
 		}
 
+		if (i+1 >= hex_size)
+			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
 		hex2_data[0] = hex_data[i];
 		hex2_data[1] = hex_data[i + 1];
 		i += 2;
