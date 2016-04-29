@@ -75,7 +75,7 @@ static void try(void)
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
 	gnutls_certificate_set_dh_params(serverx509cred, dh_params);
 
-	gnutls_init(&server, GNUTLS_SERVER|GNUTLS_ALLOW_CERT_CHANGE);
+	gnutls_init(&server, GNUTLS_SERVER|GNUTLS_ALLOW_ID_CHANGE);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);

@@ -141,7 +141,7 @@ static void try(void)
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 			       clientx509cred2);
 
-	HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_SESSION_CERTIFICATE_CHANGED);
+	HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_SESSION_USER_ID_CHANGED);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);

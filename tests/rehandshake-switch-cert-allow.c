@@ -100,7 +100,7 @@ static void try(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_ALLOW_CERT_CHANGE);
+	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_ALLOW_ID_CHANGE);
 	if (ret < 0)
 		exit(1);
 

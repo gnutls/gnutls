@@ -22,7 +22,7 @@ See the end for copying conditions.
    available) is the same as in previous handshakes. That is to protect
    applications which do not check user credentials on rehandshakes from
    attacks related to unsafe renegotiation. This can be overriden using
-   the %GNUTLS_ALLOW_CERT_CHANGE flag in gnutls_init().
+   the %GNUTLS_ALLOW_ID_CHANGE flag in gnutls_init().
 
 ** libgnutls: Be strict in TLS extension decoding. That is, do not tolerate
    parsing errors in the extensions field and treat it as a typical Hello

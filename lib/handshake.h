@@ -73,4 +73,7 @@ inline static int handshake_remaining_time(gnutls_session_t session)
 
 int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t *shash);
 
+int _gnutls_check_id_for_change(gnutls_session_t session);
+int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certificate_credentials_t cred);
+
 #endif

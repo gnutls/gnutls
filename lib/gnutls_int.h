@@ -1014,6 +1014,10 @@ typedef struct {
 	uint8_t cert_hash[32];
 	bool cert_hash_set;
 
+	/* The saved username from PSK or SRP auth */
+	char saved_username[MAX_USERNAME_SIZE+1];
+	bool saved_username_set;
+
 	bool false_start_used; /* non-zero if false start was used for appdata */
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
