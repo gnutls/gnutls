@@ -944,6 +944,7 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 
 	key->params.params_nr = RSA_PRIVATE_PARAMS;
 	key->pk_algorithm = GNUTLS_PK_RSA;
+	key->params.algo = key->pk_algorithm;
 
 	return 0;
 
@@ -1031,6 +1032,7 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 
 	key->params.params_nr = DSA_PRIVATE_PARAMS;
 	key->pk_algorithm = GNUTLS_PK_DSA;
+	key->params.algo = key->pk_algorithm;
 
 	return 0;
 
@@ -1099,6 +1101,7 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 	key->params.params_nr++;
 
 	key->pk_algorithm = GNUTLS_PK_EC;
+	key->params.algo = key->pk_algorithm;
 
 	return 0;
 
