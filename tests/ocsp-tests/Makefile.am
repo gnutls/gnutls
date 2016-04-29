@@ -19,10 +19,12 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = ca.key ca.pem ocsp-server.key ocsp-server.pem response1.der \
-	response2.der
+EXTRA_DIST = certs/ca.key certs/ca.pem certs/ocsp-server.key certs/ocsp-server.pem response1.der \
+	response2.der certs/ocsp_index.txt certs/ocsp_index.txt.attr \
+	certs/server_good.key certs/server_bad.key certs/server_good.template \
+	certs/server_bad.template
 
-dist_check_SCRIPTS = ocsp-test
+dist_check_SCRIPTS = ocsp-test ocsp-tls-connection
 
 TESTS = $(dist_check_SCRIPTS)
 
