@@ -757,7 +757,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, asn1_node node)
       if (err != ASN1_SUCCESS)
 	goto error;
 
-      t = class << 24;
+      t = ((unsigned int)class) << 24;
       p_vet->value = t | tag;
       counter += len2;
 

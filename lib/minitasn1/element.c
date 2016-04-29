@@ -152,7 +152,10 @@ _asn1_append_sequence_set (asn1_node node, struct node_tail_cache_st *pcache)
   while ((type_field (p->type) == ASN1_ETYPE_TAG)
 	 || (type_field (p->type) == ASN1_ETYPE_SIZE))
     p = p->right;
+
   p2 = _asn1_copy_structure3 (p);
+  if (p2 == NULL)
+    return ASN1_GENERIC_ERROR;
 
   if (pcache == NULL || pcache->tail == NULL || pcache->head != node)
     {
