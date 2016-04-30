@@ -28,9 +28,9 @@ DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
-OUTFILE=out-crl.tmp
-OUTFILE2=out2-crl.tmp
-TMPFILE=tmp.tmpl
+OUTFILE=out-crl.$$.tmp
+OUTFILE2=out2-crl.$$.tmp
+TMPFILE=crl.$$.tmpl
 
 echo "crl_next_update = 43" >$TMPFILE
 echo "crl_number = 7" >>$TMPFILE
