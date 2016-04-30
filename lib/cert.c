@@ -123,8 +123,8 @@ gnutls_certificate_get_issuer(gnutls_certificate_credentials_t sc,
 /**
  * gnutls_certificate_get_crt_raw:
  * @sc: is a #gnutls_certificate_credentials_t type.
- * @idx1: the index of the certificate if multiple are present
- * @idx2: the index in the certificate list. Zero gives the server's certificate.
+ * @idx1: the index of the certificate chain if multiple are present
+ * @idx2: the index of the certificate in the chain. Zero gives the server's certificate.
  * @cert: Will hold the DER encoded certificate.
  *
  * This function will return the DER encoded certificate of the
