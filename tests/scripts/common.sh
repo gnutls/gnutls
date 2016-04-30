@@ -18,7 +18,13 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-RPORT="$(((($$<<15)|RANDOM) % 63001 + 2000))"
+rc=0
+while test $rc = 0
+do
+	RPORT="$(((($$<<15)|RANDOM) % 63001 + 2000))"
+	netstat -anlt|grep "\:$RPORT"
+	rc=$?
+done
 
 fail() {
    PID="$1"
