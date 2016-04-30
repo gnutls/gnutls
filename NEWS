@@ -60,6 +60,8 @@ See the end for copying conditions.
 ** libgnutls: Applications are allowed to override the built-in key and
    certificate URLs.
 
+** libgnutls: The gnutls.h header marks constant and pure functions explictly.
+
 ** certtool: Added the ability to sign certificates using SHA3.
 
 ** certtool: Added the --provable and --verify-allow-broken options.
