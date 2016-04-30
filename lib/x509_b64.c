@@ -168,8 +168,14 @@ gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
  *
  * You should use gnutls_free() to free the returned data.
  *
+ * Note, that prior to GnuTLS 3.4.0 this function was available
+ * under the name gnutls_pem_base64_encode_alloc(). There is
+ * compatibility macro pointing to this function.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
+ *
+ * Since: 3.4.0
  **/
 int
 gnutls_pem_base64_encode2(const char *msg,
@@ -404,8 +410,14 @@ gnutls_pem_base64_decode(const char *header,
  *
  * You should use gnutls_free() to free the returned data.
  *
+ * Note, that prior to GnuTLS 3.4.0 this function was available
+ * under the name gnutls_pem_base64_decode_alloc(). There is
+ * compatibility macro pointing to this function.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
+ *
+ * Since: 3.4.0
  **/
 int
 gnutls_pem_base64_decode2(const char *header,
