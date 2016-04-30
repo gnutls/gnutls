@@ -26,10 +26,11 @@ Build and Check with asan and coverage run:
 Build and Check with C99 and ubsan:
   script:
   - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
-    -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
-    && make -j4 && make check -j4
+    -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --enable-code-coverage
+    && make -j4 && make check -j4 && make local-code-coverage-output
   tags:
   - ubsan
+  - lcov
   - nettle3
   - linux
   except:
@@ -91,9 +92,10 @@ Build and Check for windows in separate build dir:
 Build and Check with valgrind:
   script:
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
-    --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
+    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j4 && make check -j4 && make local-code-coverage-output
   tags:
   - nettle3
+  - lcov
   - linux
   except:
   - tags
