@@ -278,6 +278,7 @@ storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
 
 @menu
 * PKCS11 Initialization::
+* PKCS11 Manual Initialization::
 * Accessing objects that require a PIN::
 * Reading objects::
 * Writing objects::
@@ -289,8 +290,9 @@ storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
 @subsection Initialization
 To allow all @acronym{GnuTLS} applications to transparently access smart cards
 and tokens, @acronym{PKCS} #11 is automatically initialized during the first
-call of a @acronym{PKCS} #11 related function. The initialization process, based
-on p11-kit configuration, loads any appropriate modules. The p11-kit configuration
+call of a @acronym{PKCS} #11 related function, in a thread safe way.
+The default initialization process, utilizes p11-kit configuration, and loads any
+appropriate @acronym{PKCS} #11 modules. The p11-kit configuration
 files@footnote{@url{http://p11-glue.freedesktop.org/}} are typically stored in @code{/etc/pkcs11/modules/}.
 For example a file that will instruct GnuTLS to load the @acronym{OpenSC} module,
 could be named @code{/etc/pkcs11/modules/opensc.module} and contain the following:
@@ -306,24 +308,42 @@ In several cases, however, it is desirable to limit badly behaving modules
 to single applications. That can be done using the ``enable-in:'' option
 followed by the base name of applications that this module should be used.
 
-It is also possible to manually initialize the PKCS #11 subsystem if the 
-default settings are not desirable. To completely disable PKCS #11 support you
-need to call @funcref{gnutls_pkcs11_init} with the flag @code{GNUTLS_PKCS11_FLAG_MANUAL}
-prior to @funcref{gnutls_global_init}.
-
-@showfuncdesc{gnutls_pkcs11_init}
+It is also possible to manually initialize or even disable the PKCS #11 subsystem if the 
+default settings are not desirable or not available (see @ref{PKCS11 Manual Initialization}
+for more information).
 
 Note that, PKCS #11 modules behave in a peculiar way after a fork; they
 require a reinitialization of all the used PKCS #11 resources.
 While GnuTLS automates that process, there are corner cases where
 it is not possible to handle it correctly in an automated way@footnote{For
 example when an open session is to be reinitialized, but the PIN is not available
-to GnuTLS (e.g., it was entered at a pinpad).}. For that reasons it is
+to GnuTLS (e.g., it was entered at a pinpad).}. For that, it is
 recommended not to mix fork() and PKCS #11 module usage. It is recommended
 to initialize and use any PKCS #11 resources in a single process.
 
 Older versions of @acronym{GnuTLS} required to call @funcref{gnutls_pkcs11_reinit}
 after a fork() call; since 3.3.0 this is no longer required.
+
+
+@node PKCS11 Manual Initialization
+@subsection Manual initialization of user-specific modules
+
+In systems where one cannot rely on a globally available p11-kit configuration
+to be available, it is still possible to utilize PKCS #11 objects. That
+can be done by loading directly the PKCS #11 shared module in the
+application using @funcref{gnutls_pkcs11_add_provider}, after having
+called @funcref{gnutls_pkcs11_init} specifying the @code{GNUTLS_PKCS11_FLAG_MANUAL}
+flag.
+
+@showfuncdesc{gnutls_pkcs11_add_provider}
+
+In that case, the application will only have access to the modules explictly
+loaded. If the @code{GNUTLS_PKCS11_FLAG_MANUAL} flag is specified and no calls
+to @funcref{gnutls_pkcs11_add_provider} are made, then the PKCS #11 functionality
+is effectively disabled.
+
+@showfuncdesc{gnutls_pkcs11_init}
+
 
 @node Accessing objects that require a PIN
 @subsection Accessing objects that require a PIN
@@ -386,13 +406,13 @@ while the smart card itself can be referenced as:
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315;manufacturer=EnterSafe
 @end example
 
-Objects stored in a @acronym{PKCS} #11 token can be extracted
+Objects stored in a @acronym{PKCS} #11 token can typically be extracted
 if they are not marked as sensitive. Usually only private keys are marked as
 sensitive and cannot be extracted, while certificates and other data can
-be retrieved. The functions that can be used to access objects
+be retrieved. The functions that can be used to enumerate and access objects
 are shown below.
 
-@showfuncB{gnutls_pkcs11_obj_import_url,gnutls_pkcs11_obj_export_url}
+@showfuncC{gnutls_pkcs11_obj_list_import_url4,gnutls_pkcs11_obj_import_url,gnutls_pkcs11_obj_export_url}
 
 @showfuncdesc{gnutls_pkcs11_obj_get_info}
 

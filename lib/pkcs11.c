@@ -2928,19 +2928,31 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 
 /**
  * gnutls_pkcs11_obj_list_import_url3:
- * @p_list: An uninitialized object list (may be NULL)
- * @n_list: initially should hold the maximum size of the list. Will contain the actual size.
+ * @p_list: An uninitialized object list (may be %NULL)
+ * @n_list: Initially should hold the maximum size of the list. Will contain the actual size.
  * @url: A PKCS 11 url identifying a set of objects
  * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will initialize and set values to an object list
  * by using all objects identified by a PKCS 11 URL.
  *
+ * This function will enumerate all the objects specified by the PKCS#11 URL
+ * provided. It expects an already allocated @p_list which has *@n_list elements,
+ * and that value will be updated to the actual number of present objects. The
+ * @p_list objects will be initialized and set by this function.
+ * To obtain a list of all available objects use a @url of 'pkcs11:'.
+ *
+ * All returned objects must be deinitialized using gnutls_pkcs11_obj_deinit().
+ *
  * The supported in this function @flags are %GNUTLS_PKCS11_OBJ_FLAG_LOGIN,
  * %GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO, %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE,
  * %GNUTLS_PKCS11_OBJ_FLAG_CRT, %GNUTLS_PKCS11_OBJ_FLAG_PUBKEY, %GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY,
  * %GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
  * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED.
+ *
+ * On versions of GnuTLS prior to 3.4.0 the equivalent function was
+ * gnutls_pkcs11_obj_list_import_url(). That is also available on this version
+ * as a macro which maps to this function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -3012,18 +3024,22 @@ gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
  * @url: A PKCS 11 url identifying a set of objects
  * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
- * This function will initialize and set values to an object list
- * by using all objects identified by the PKCS 11 URL. The output
- * is stored in @p_list, which will be initialized.
+ * This function will enumerate all the objects specified by the PKCS#11 URL
+ * provided. It will initialize and set values to the object pointer list (@p_list)
+ * provided. To obtain a list of all available objects use a @url of 'pkcs11:'.
  *
  * All returned objects must be deinitialized using gnutls_pkcs11_obj_deinit(),
- * and @p_list must be free'd using gnutls_free().
+ * and @p_list must be deinitialized using gnutls_free().
  *
  * The supported in this function @flags are %GNUTLS_PKCS11_OBJ_FLAG_LOGIN,
  * %GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO, %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE,
  * %GNUTLS_PKCS11_OBJ_FLAG_CRT, %GNUTLS_PKCS11_OBJ_FLAG_PUBKEY, %GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY,
  * %GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
  * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED.
+ *
+ * On versions of GnuTLS prior to 3.4.0 the equivalent function was
+ * gnutls_pkcs11_obj_list_import_url2(). That is also available on this version
+ * as a macro which maps to this function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
