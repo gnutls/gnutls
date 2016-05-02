@@ -49,7 +49,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/extra/includes		\
 	-I$(top_builddir)/extra/includes	\
 	-I$(top_srcdir)/lib			\
-	-I$(top_srcdir)/doc/examples
+	-I$(top_srcdir)/doc/examples		\
+	$(P11_KIT_CFLAGS)
 
 AM_LDFLAGS = -no-install
 LDADD = ../lib/libgnutls.la \
@@ -67,6 +68,8 @@ endif
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 libutils_la_LIBADD = ../gl/libgnu.la
+
+pkglib_LTLIBRARIES = 
 
 ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mpi certificate_set_x509_crl dn parse_ca moredn record-sizes \
@@ -87,6 +90,26 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 long-session-id mini-x509-callbacks-intr \
 	 crlverify init_fds mini-rehandshake-2 sign-md5-rep global-init-override \
 	 version-checks
+
+if ENABLE_PKCS11
+if !WINDOWS
+pkglib_LTLIBRARIES += libpkcs11mock1.la
+libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h
+libpkcs11mock1_la_LDFLAGS = -module -no-undefined -avoid-version
+libpkcs11mock1_la_LIBADD = ../gl/libgnu.la
+
+pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
+pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
+
+pkcs11_get_exts_SOURCES = pkcs11/pkcs11-get-exts.c
+pkcs11_get_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
+
+pkcs11_get_raw_issuer_exts_SOURCES = pkcs11/pkcs11-get-raw-issuer-exts.c
+pkcs11_get_raw_issuer_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
+
+ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
+endif
+endif
 
 if ENABLE_OCSP
 ctests += ocsp
@@ -125,6 +148,7 @@ TESTS = $(ctests) $(dist_check_SCRIPTS)
 TESTS_ENVIRONMENT =						\
 	LC_ALL="C"						\
 	CAFILE=$(srcdir)/cert-tests/ca-certs.pem		\
+	P11MOCKLIB1=$(abs_builddir)/.libs/libpkcs11mock1.so	\
 	PKCS12_MANY_CERTS_FILE=$(srcdir)/pkcs12-decode/pkcs12_5certs.p12	\
 	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12		\
 	PKCS12PASSWORD=foobar					\
