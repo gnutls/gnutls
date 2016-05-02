@@ -418,7 +418,7 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 
 		gnutls_assert();
 		asn1_delete_structure(&dinfo);
-		return GNUTLS_E_UNKNOWN_ALGORITHM;
+		return GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
 	}
 
 	len = sizeof(str) - 1;
