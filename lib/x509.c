@@ -1554,7 +1554,7 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 			goto cleanup;
 		}
 
-		ret = _gnutls_x509_crt_cpy(new_list[i], ca_list[i]);
+		ret = _gnutls_x509_crt_cpy(new_list[i], ca_list[i], CRT_CPY_FAST);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

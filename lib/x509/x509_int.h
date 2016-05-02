@@ -126,7 +126,8 @@ typedef struct gnutls_x509_privkey_int {
 	struct pin_info_st pin;
 } gnutls_x509_privkey_int;
 
-int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src);
+#define CRT_CPY_FAST 1
+int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src, unsigned flags);
 
 int _gnutls_x509_compare_raw_dn(const gnutls_datum_t * dn1,
 				const gnutls_datum_t * dn2);

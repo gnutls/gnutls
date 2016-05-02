@@ -157,52 +157,42 @@ int gnutls_x509_crt_init(gnutls_x509_crt_t * cert)
  * _gnutls_x509_crt_cpy - This function copies a gnutls_x509_crt_t type
  * @dest: The data where to copy
  * @src: The data to be copied
+ * @flags: zero or CRT_CPY_FAST
  *
- * This function will copy an X.509 certificate structure.
+ * This function will copy an X.509 certificate structure. Unless 
+ * %CRT_CPY_FAST is specified this function does encode and decode
+ * the given source to allow copying modified structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
-int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
+int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src, unsigned flags)
 {
 	int ret;
-	size_t der_size = 0;
-	uint8_t *der;
 	gnutls_datum_t tmp;
 
-	ret =
-	    gnutls_x509_crt_export(src, GNUTLS_X509_FMT_DER, NULL,
-				   &der_size);
-	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		gnutls_assert();
-		return ret;
+	/* if no DER data are present don't consider the fast flag */
+	if (src->der.size == 0)
+		flags &= ~CRT_CPY_FAST;
+
+	if (!(flags & CRT_CPY_FAST)) {
+		ret =
+		    gnutls_x509_crt_export2(src, GNUTLS_X509_FMT_DER, &tmp);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	} else {
+		tmp.data = src->der.data;
+		tmp.size = src->der.size;
 	}
 
-	der = gnutls_malloc(der_size);
-	if (der == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	ret =
-	    gnutls_x509_crt_export(src, GNUTLS_X509_FMT_DER, der,
-				   &der_size);
-	if (ret < 0) {
-		gnutls_assert();
-		gnutls_free(der);
-		return ret;
-	}
-
-	tmp.data = der;
-	tmp.size = der_size;
 	ret = gnutls_x509_crt_import(dest, &tmp, GNUTLS_X509_FMT_DER);
 
-	gnutls_free(der);
-
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+	if (!(flags & CRT_CPY_FAST)) {
+		gnutls_free(tmp.data);
 	}
+
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
