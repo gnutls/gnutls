@@ -40,6 +40,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
+	$(P11_KIT_CFLAGS) \
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/libdane/includes	\
@@ -61,6 +62,7 @@ AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
 endif
 
 noinst_LTLIBRARIES = libutils.la
+pkglib_LTLIBRARIES = 
 libutils_la_SOURCES = utils.h utils.c seccomp.c
 
 ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
@@ -116,6 +118,25 @@ resume_anon_SOURCES = resume.c
 
 resume_x509_CFLAGS = -DUSE_X509
 resume_x509_SOURCES = resume.c
+
+if ENABLE_PKCS11
+if !WINDOWS
+pkglib_LTLIBRARIES += libpkcs11mock1.la
+libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h
+libpkcs11mock1_la_LDFLAGS = -module -no-undefined -avoid-version
+
+pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
+pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
+
+pkcs11_get_exts_SOURCES = pkcs11/pkcs11-get-exts.c
+pkcs11_get_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
+
+pkcs11_get_raw_issuer_exts_SOURCES = pkcs11/pkcs11-get-raw-issuer-exts.c
+pkcs11_get_raw_issuer_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
+
+ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
+endif
+endif
 
 if ENABLE_OCSP
 ctests += ocsp
@@ -200,6 +221,7 @@ TESTS = $(ctests) $(dist_check_SCRIPTS)
 TESTS_ENVIRONMENT =						\
 	LC_ALL="C"						\
 	CAFILE=$(srcdir)/cert-tests/ca-certs.pem		\
+	P11MOCKLIB1=$(abs_builddir)/.libs/libpkcs11mock1.so	\
 	PKCS12_MANY_CERTS_FILE=$(srcdir)/pkcs12-decode/pkcs12_5certs.p12	\
 	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12		\
 	PKCS12PASSWORD=foobar					\
