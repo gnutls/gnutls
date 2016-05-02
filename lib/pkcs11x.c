@@ -229,15 +229,18 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 }
 
 /**
- * gnutls_pkcs11_obj_get_ext:
+ * gnutls_pkcs11_obj_get_exts:
  * @obj: should contain a #gnutls_pkcs11_obj_t type
- * @exts: an allocated list of pointers to %gnutls_x509_ext_st
- * @exts_size: the number of @exts
+ * @exts: a pointer to a %gnutls_x509_ext_st pointer
+ * @exts_size: will be updated with the number of @exts
  * @flags: Or sequence of %GNUTLS_PKCS11_OBJ_* flags 
  *
  * This function will return information about attached extensions
  * that associate to the provided object (which should be a certificate).
  * The extensions are the attached p11-kit trust module extensions.
+ *
+ * Each element of @exts must be deinitialized using gnutls_x509_ext_deinit()
+ * while @exts should be deallocated using gnutls_free().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  *
