@@ -127,6 +127,10 @@ typedef enum gnutls_certificate_import_flags {
 
 int gnutls_x509_crt_init(gnutls_x509_crt_t * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert);
+
+unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
+unsigned gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1, gnutls_datum_t * der);
+
 int gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 			   const gnutls_datum_t * data,
 			   gnutls_x509_crt_fmt_t format);

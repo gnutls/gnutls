@@ -40,7 +40,7 @@
 #include <stdbool.h>
 
 /* Checks if two certs have the same name and the same key.  Return 1 on match. 
- * If @is_ca is zero then this function is identical to _gnutls_check_if_same_cert()
+ * If @is_ca is zero then this function is identical to gnutls_x509_crt_equals()
  */
 bool
 _gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
@@ -51,7 +51,7 @@ _gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
 	bool result;
 
 	if (is_ca == 0)
-		return _gnutls_check_if_same_cert(cert1, cert2);
+		return gnutls_x509_crt_equals(cert1, cert2);
 
 	ret = _gnutls_is_same_dn(cert1, cert2);
 	if (ret == 0)
@@ -89,40 +89,6 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 	return ret;
 }
 
-bool
-_gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
-			   gnutls_x509_crt_t cert2)
-{
-	int ret;
-	bool result;
-
-	ret = _gnutls_is_same_dn(cert1, cert2);
-	if (ret == 0)
-		return 0;
-
-	if ((cert1->der.size == cert2->der.size) &&
-	    (memcmp(cert1->der.data, cert2->der.data, cert1->der.size) == 0))
-		result = 1;
-	else
-		result = 0;
-
-	return result;
-}
-
-bool
-_gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
-			    gnutls_datum_t * cert2bin)
-{
-	bool result;
-
-	if ((cert1->der.size == cert2bin->size) &&
-	    (memcmp(cert1->der.data, cert2bin->data, cert1->der.size) == 0))
-		result = 1;
-	else
-		result = 0;
-
-	return result;
-}
 
 /* Checks if the issuer of a certificate is a
  * Certificate Authority, or if the certificate is the same

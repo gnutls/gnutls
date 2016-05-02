@@ -2088,7 +2088,7 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 	signercert = find_signercert(resp);
 	if (!signercert) {
 		signercert = issuer;
-	} else if (!_gnutls_check_if_same_cert(signercert, issuer)) {
+	} else if (!gnutls_x509_crt_equals(signercert, issuer)) {
 
 		/* response contains a signer. Verify him */
 

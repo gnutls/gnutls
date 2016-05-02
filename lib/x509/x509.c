@@ -59,6 +59,63 @@ static int crt_reinit(gnutls_x509_crt_t crt)
 }
 
 /**
+ * gnutls_x509_crt_equals - This function compares two gnutls_x509_crt_t certificates
+ * @cert1: The first certificate
+ * @cert2: The second certificate
+ *
+ * This function will compare two X.509 certificate structures.
+ *
+ * Returns: On equality non-zero is returned, otherwise zero.
+ *
+ * Since: 3.5.0
+ **/
+unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1,
+			        gnutls_x509_crt_t cert2)
+{
+	int ret;
+	bool result;
+
+	ret = _gnutls_is_same_dn(cert1, cert2);
+	if (ret == 0)
+		return 0;
+
+	if ((cert1->der.size == cert2->der.size) &&
+	    (memcmp(cert1->der.data, cert2->der.data, cert1->der.size) == 0))
+		result = 1;
+	else
+		result = 0;
+
+	return result;
+}
+
+/**
+ * gnutls_x509_crt_equals2 - This function compares a gnutls_x509_crt_t cert with DER data
+ * @cert1: The first certificate
+ * @der: A DER encoded certificate
+ *
+ * This function will compare an X.509 certificate structures, with DER
+ * encoded certificate data.
+ *
+ * Returns: On equality non-zero is returned, otherwise zero.
+ *
+ * Since: 3.5.0
+ **/
+unsigned
+gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1,
+			gnutls_datum_t * der)
+{
+	bool result;
+
+	if ((cert1->der.size == der->size) &&
+	    (memcmp(cert1->der.data, der->data, cert1->der.size) == 0))
+		result = 1;
+	else
+		result = 0;
+
+	return result;
+}
+
+/**
  * gnutls_x509_crt_init:
  * @cert: A pointer to the type to be initialized
  *

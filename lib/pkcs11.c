@@ -3417,7 +3417,7 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 			goto cleanup;
 		}
 
-		if (_gnutls_check_if_same_cert(priv->crt, tcrt) == 0) {
+		if (gnutls_x509_crt_equals(priv->crt, tcrt) == 0) {
 			/* doesn't match */
 			ret = -1;
 			goto cleanup;
