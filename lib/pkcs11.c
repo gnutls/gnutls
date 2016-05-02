@@ -287,7 +287,7 @@ int _gnutls_pkcs11_check_init(void)
 /**
  * gnutls_pkcs11_add_provider:
  * @name: The filename of the module
- * @params: should be NULL
+ * @params: should be NULL or a known string (see description)
  *
  * This function will load and add a PKCS 11 module to the module
  * list used in gnutls. After this function is called the module will
