@@ -32,7 +32,7 @@
 
 #ifdef __FILE__
 #ifdef __LINE__
-#define gnutls_assert() _gnutls_assert_log( "ASSERT: %s:%d %s:\n", __FILE__,__LINE__,__func__);
+#define gnutls_assert() _gnutls_assert_log( "ASSERT: %s:%d %s\n", __FILE__,__LINE__,__func__);
 #else
 #define gnutls_assert()
 #endif
