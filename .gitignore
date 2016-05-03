@@ -834,4 +834,7 @@ tests/resume-anon
 tests/resume-x509
 tests/send-client-cert
 tests/srpbase64
+tests/set_x509_key
+tests/set_x509_key_file_der
+tests/set_x509_pkcs12_key
 GnuTLS-*-coverage/
