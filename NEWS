@@ -10,6 +10,15 @@ See the end for copying conditions.
 
 ** libgnutls: Properly print the IP Adress name constraints.
 
+** libgnutls: Fixes in gnutls_privkey_import_ecc_raw().
+
+** libgnutls: Fixed gnutls_pkcs11_get_raw_issuer() usage with the
+   GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT flag. Previously that
+   operation could fail on certain PKCS#11 modules.
+
+** libgnutls: gnutls_pkcs11_obj_import_url() and gnutls_x509_crt_import_url()
+   can accept the GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT flag.
+
 ** ocsptool: use HTTP/1.0 for requests. This avoids issue with servers
    serving chunk encoding which ocsptool doesn't support. Reported by Thomas
    Klute.
