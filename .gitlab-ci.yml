@@ -12,7 +12,7 @@ Compile minimal library:
   - linux
   except:
   - tags
-Build and Check with asan and coverage run:
+Build and Check with asan:
   script:
   - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
@@ -38,10 +38,11 @@ Build and Check with C99 and ubsan:
 Build and Check - separate build dir (x86):
   script:
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
-    make -j4 && make check -j4
+    ../configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
+    make -j4 && make check -j4 && make local-code-coverage-output
   tags:
   - x86
+  - lcov
   - nettle3
   - linux
   except:
