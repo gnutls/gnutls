@@ -88,8 +88,7 @@ void doit(void)
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
 	if (ret != 0) {
-		fail("%d: %s\n", ret, gnutls_strerror(ret));
-		exit(1);
+		exit(77);
 	}
 
 	assert(gnutls_x509_crt_init(&crt)>=0);

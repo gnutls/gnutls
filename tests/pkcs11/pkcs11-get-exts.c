@@ -75,8 +75,7 @@ void doit(void)
 
 	ret = gnutls_pkcs11_add_provider(lib, NULL);
 	if (ret != 0) {
-		fail("%d: %s\n", ret, gnutls_strerror(ret));
-		exit(1);
+		exit(77);
 	}
 
 	assert(gnutls_pkcs11_obj_init(&obj)>=0);
