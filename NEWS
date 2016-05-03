@@ -16,7 +16,7 @@ See the end for copying conditions.
    GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT flag. Previously that
    operation could fail on certain PKCS#11 modules.
 
-** libgnutls: gnutls_pkcs11_obj_import_url() and gnutls_x509_crt_import_url()
+** libgnutls: gnutls_pkcs11_obj_import_url() and gnutls_x509_crt_import_pkcs11_url()
    can accept the GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT flag.
 
 ** ocsptool: use HTTP/1.0 for requests. This avoids issue with servers
