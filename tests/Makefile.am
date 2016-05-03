@@ -92,6 +92,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 version-checks
 
 if ENABLE_PKCS11
+if !HAVE_BUGGY_P11_KIT
 if !WINDOWS
 pkglib_LTLIBRARIES += libpkcs11mock1.la
 libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h
@@ -108,6 +109,7 @@ pkcs11_get_raw_issuer_exts_SOURCES = pkcs11/pkcs11-get-raw-issuer-exts.c
 pkcs11_get_raw_issuer_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
 ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
+endif
 endif
 endif
 

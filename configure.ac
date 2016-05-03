@@ -441,6 +441,9 @@ if test "$with_p11_kit" != "no"; then
 		else
 			GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
 		fi
+		if ! $PKG_CONFIG --atleast-version=0.22.0 p11-kit-1; then
+			with_buggy_p11_kit=yes
+		fi
 	else
 	        with_p11_kit=no
 	        AC_MSG_WARN([[
@@ -452,6 +455,7 @@ if test "$with_p11_kit" != "no"; then
 fi
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
+AM_CONDITIONAL(HAVE_BUGGY_P11_KIT, test "$with_buggy_p11_kit" = "yes")
 
 AC_ARG_WITH(tpm,
 	AS_HELP_STRING([--without-tpm],
