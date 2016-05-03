@@ -217,7 +217,7 @@ void doit(void)
 			fail("unexpected activation time: %lu\n", (long unsigned)t);
 		}
 
-		if (sizeof(time_t) >= 4) {
+		if (sizeof(time_t) >= 8) {
 			t = gnutls_certificate_expiration_time_peers(client);
 			if (t != (time_t)253402300799UL) {
 				fail("unexpected expiration time: %lu\n", (long unsigned)t);
