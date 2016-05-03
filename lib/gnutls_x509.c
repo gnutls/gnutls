@@ -1166,7 +1166,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
  * entity certificate (e.g., also an intermediate CA cert) then put
  * the certificate chain in @pcert_list. 
  *
- * Note that the @pcert_list and @key will become part of the credentials 
+ * Note that the @key and the elements of @pcert_list will become part of the credentials 
  * structure and must not be deallocated. They will be automatically deallocated 
  * when the @res structure is deinitialized.
  *
@@ -1186,6 +1186,7 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 {
 	int ret, i;
 	gnutls_str_array_t str_names;
+	gnutls_pcert_st *new_pcert_list;
 
 	_gnutls_str_array_init(&str_names);
 
@@ -1211,12 +1212,20 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
+	new_pcert_list = gnutls_malloc(sizeof(gnutls_pcert_st) * pcert_list_size);
+	if (new_pcert_list == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	memcpy(new_pcert_list, pcert_list, sizeof(gnutls_pcert_st) * pcert_list_size);
+
 	ret =
 	    certificate_credential_append_crt_list(res, str_names,
-						   pcert_list,
+						   new_pcert_list,
 						   pcert_list_size);
 	if (ret < 0) {
 		gnutls_assert();
+		gnutls_free(new_pcert_list);
 		goto cleanup;
 	}
 
