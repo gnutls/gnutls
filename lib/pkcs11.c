@@ -3241,6 +3241,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 	unsigned tries, i, finalized;
 	ck_bool_t trusted = 1;
 	time_t now;
+	gnutls_datum_t label = {NULL,0}, id = {NULL,0};
 
 	if (info == NULL) {
 		gnutls_assert();
@@ -3361,41 +3362,11 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 			if (rv == CKR_OK && pkcs11_get_attribute_value
 			    (sinfo->module, sinfo->pks, obj, a,
 			     2) == CKR_OK) {
-				gnutls_datum_t label =
-				    { a[0].value, a[0].value_len };
-				gnutls_datum_t id =
-				    { a[1].value, a[1].value_len };
+				label.data = a[0].value;
+				label.size = a[0].value_len;
+				id.data = a[1].value;
+				id.size = a[1].value_len;
 
-				ret = check_found_cert(priv, &data, now);
-				if (ret < 0) {
-					_gnutls_free_datum(&data);
-					continue;
-				}
-
-				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT) {
-					gnutls_datum_t spki;
-					rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_PUBLIC_KEY_INFO, &spki);
-					if (rv == CKR_OK) {
-						ret = pkcs11_override_cert_exts(sinfo, &spki, &data);
-						gnutls_free(spki.data);
-						if (ret < 0) {
-							gnutls_assert();
-							goto cleanup;
-						}
-					}
-				}
-
-				if (priv->need_import != 0) {
-					ret =
-					    pkcs11_obj_import(class, priv->obj,
-							      &data, &id, &label,
-							      &info->tinfo,
-							      lib_info);
-					if (ret < 0) {
-						gnutls_assert();
-						goto cleanup;
-					}
-				}
 
 
 				found = 1;
@@ -3409,8 +3380,39 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 		pkcs11_find_objects_final(sinfo);
 		finalized = 1;
 
-		if (found != 0)
+		if (found != 0) {
+			ret = check_found_cert(priv, &data, now);
+			if (ret < 0) {
+				_gnutls_free_datum(&data);
+				continue;
+			}
+
+			if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT) {
+				gnutls_datum_t spki;
+				rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_PUBLIC_KEY_INFO, &spki);
+				if (rv == CKR_OK) {
+					ret = pkcs11_override_cert_exts(sinfo, &spki, &data);
+					gnutls_free(spki.data);
+					if (ret < 0) {
+						gnutls_assert();
+						goto cleanup;
+					}
+				}
+			}
+
+			if (priv->need_import != 0) {
+				ret =
+				    pkcs11_obj_import(class, priv->obj,
+						      &data, &id, &label,
+						      &info->tinfo,
+						      lib_info);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+			}
 			break;
+		}
 	}
 
 	if (found == 0) {
