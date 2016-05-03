@@ -64,6 +64,7 @@ struct find_flags_data_st {
 
 struct find_url_data_st {
 	gnutls_pkcs11_obj_t obj;
+	bool overwrite_exts; /* only valid if looking for a certificate */
 };
 
 struct find_obj_data_st {
@@ -1774,6 +1775,19 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
       cleanup:
 	pkcs11_find_objects_final(sinfo);
 
+	if (ret == 0 && find_data->overwrite_exts && find_data->obj->raw.size > 0) {
+		gnutls_datum_t spki;
+		rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_PUBLIC_KEY_INFO, &spki);
+		if (rv == CKR_OK) {
+			ret = pkcs11_override_cert_exts(sinfo, &spki, &find_data->obj->raw);
+			gnutls_free(spki.data);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+		}
+	}
+
 	return ret;
 }
 
@@ -1824,6 +1838,10 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
+	}
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT) {
+		find_data.overwrite_exts = 1;
 	}
 
 	ret =
