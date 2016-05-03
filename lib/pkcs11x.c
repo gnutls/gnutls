@@ -219,6 +219,7 @@ find_ext_cb(struct pkcs11_session_info *sinfo,
 			if (_gnutls_x509_decode_ext(&ext, &find_data->exts[find_data->exts_size]) == 0) {
 				find_data->exts_size++;
 			}
+			gnutls_free(ext.data);
 		}
 	}
 
