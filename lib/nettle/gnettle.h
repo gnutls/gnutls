@@ -16,7 +16,7 @@
 # define _NETTLE_SIZE_T unsigned
 #define _NETTLE_UPDATE(func, ptr, size, data) { \
 	size_t _rsize = size; \
-	const uint8_t *_t = text; \
+	const uint8_t *_t = data; \
 	while(size > 0) { \
 		_rsize = MIN(size, UINT_MAX); \
 		func(ptr, _rsize, _t); \
