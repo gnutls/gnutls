@@ -75,7 +75,7 @@ void doit(void)
 
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 
-	certfile = tmpnam(NULL);
+	certfile = get_tmpname(NULL);
 
 	fp = fopen(certfile, "w");
 	if (fp == NULL)

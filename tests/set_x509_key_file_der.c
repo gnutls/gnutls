@@ -31,15 +31,6 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-#if defined(_WIN32)
-
-void doit(void)
-{
-	exit(77);
-}
-
-#else
-
 #include "cert-common.h"
 #include "utils.h"
 
@@ -87,8 +78,8 @@ void doit(void)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred;
-	char keyfile[L_tmpnam];
-	char certfile[L_tmpnam];
+	char keyfile[TMPNAME_SIZE];
+	char certfile[TMPNAME_SIZE];
 	gnutls_datum_t tcert;
 
 	global_init();
@@ -98,8 +89,8 @@ void doit(void)
 	if (TMP_MAX < 2)
 		exit(77);
 
-	assert(tmpnam(certfile)!=NULL);
-	assert(tmpnam(keyfile)!=NULL);
+	assert(get_tmpname(certfile)!=NULL);
+	assert(get_tmpname(keyfile)!=NULL);
 
 	write_der(certfile, "CERTIFICATE", (char*)server_cert_pem);
 	write_der(keyfile, "RSA PRIVATE KEY", (char*)server_key_pem);
@@ -125,4 +116,3 @@ void doit(void)
 	gnutls_global_deinit();
 }
 
-#endif

@@ -27,16 +27,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#if defined(_WIN32)
-
-void doit(void)
-{
-	exit(77);
-}
-
-#else
-
 #include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -84,7 +74,7 @@ void doit(void)
 
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 
-	certfile = tmpnam(NULL);
+	certfile = get_tmpname(NULL);
 
 	fp = fopen(certfile, "w");
 	if (fp == NULL)
@@ -113,4 +103,3 @@ void doit(void)
 	gnutls_global_deinit();
 }
 
-#endif

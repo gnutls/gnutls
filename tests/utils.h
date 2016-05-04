@@ -23,6 +23,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdio.h>
 #include <signal.h>
 #include <string.h>
 #include <stdarg.h>
@@ -66,6 +67,9 @@ extern void hexprint(const void *str, size_t len);
 extern void binprint(const void *str, size_t len);
 int disable_system_calls(void);
 void sec_sleep(int sec);
+
+#define TMPNAME_SIZE 128
+char *get_tmpname(char s[TMPNAME_SIZE]);
 
 /* This must be implemented elsewhere. */
 extern void doit(void);

@@ -64,6 +64,7 @@ endif
 noinst_LTLIBRARIES = libutils.la
 pkglib_LTLIBRARIES = 
 libutils_la_SOURCES = utils.h utils.c seccomp.c
+libutils_la_LIBADD = ../lib/libgnutls.la
 
 ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mpi certificate_set_x509_crl dn parse_ca moredn record-sizes \
@@ -233,6 +234,7 @@ TESTS_ENVIRONMENT =						\
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/system.prio	\
 	PSK_FILE=$(srcdir)/psk.passwd				\
 	EXEEXT=$(EXEEXT)					\
+	builddir="$(builddir)"				\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
 
