@@ -27,6 +27,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(_WIN32)
+
+void doit(void)
+{
+	exit(77);
+}
+
+#else
+
 #include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -102,3 +112,5 @@ void doit(void)
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_global_deinit();
 }
+
+#endif

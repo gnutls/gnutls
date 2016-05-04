@@ -31,6 +31,15 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+#if defined(_WIN32)
+
+void doit(void)
+{
+	exit(77);
+}
+
+#else
+
 #include "cert-common.h"
 #include "utils.h"
 
@@ -115,3 +124,5 @@ void doit(void)
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_global_deinit();
 }
+
+#endif
