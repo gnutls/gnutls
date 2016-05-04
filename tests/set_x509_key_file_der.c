@@ -65,7 +65,7 @@ static void write_der(const char *file, const char *header, const char *ipem)
 		fail("error: %s\n", gnutls_strerror(ret));
 	}
 
-	fp = fopen(file, "w");
+	fp = fopen(file, "wb");
 	if (fp == NULL)
 		fail("error in fopen\n");
 
