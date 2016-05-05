@@ -18,6 +18,9 @@ See the end for copying conditions.
 ** libgnutls: Added new APIs to access the FIPS186-4 (Shawe-Taylor based) provable
    RSA and DSA parameter generation from a seed.
 
+** libgnutls: The CHACHA20-POLY1305 ciphersuite is enabled by default. This
+   cipher is prioritized after AES-GCM.
+
 ** libgnutls: On a rehandshake ensure that the certificate of the peer or
    its username remains the same as in previous handshakes. That is to protect
    applications which do not check user credentials on rehandshakes. The
