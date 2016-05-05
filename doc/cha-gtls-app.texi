@@ -1583,8 +1583,15 @@ you may use danetool (see @ref{danetool Invocation}).
 In TLS there is no distinction between rekey, re-authentication, and re-negotiation.
 All of these use cases are handled by the TLS' rehandshake process. For that reason
 in GnuTLS rehandshake is not transparent to the application, and the application
-must take control of that process. The following paragraphs explain how to safely
-use the rehandshake process.
+must explicitly take control of that process. In addition GnuTLS since version 3.5.0 will not
+allow the peer to switch identities during a rehandshake.
+The threat addressed by that behavior depends on the application protocol,
+but primarily it protects applications from being misled
+by a rehandshake which switches the peer's identity. Applications can
+disable this protection by using the @code{GNUTLS_ALLOW_ID_CHANGE} flag in
+@funcref{gnutls_init}.
+
+The following paragraphs explain how to safely use the rehandshake process.
 
 @subsubsection Client side
 
@@ -1598,10 +1605,7 @@ of type GNUTLS_A_NO_RENEGOTIATION.
 
 Due to limitations of early protocol versions, it is required to check whether
 safe renegotiation is in place, i.e., using @funcref{gnutls_safe_renegotiation_status},
-which ensures that the server remains the same as the initial. For older servers,
-which do not support renegotiation, it is required on the second handshake
-to verify that their certificate/credentials remained the same as in the initial
-session.
+which ensures that the server remains the same as the initial.
 
 @showfuncdesc{gnutls_safe_renegotiation_status}
 
