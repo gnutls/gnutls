@@ -103,6 +103,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 			    ("SSSE3 acceleration requested but not available\n");
 		}
 	}
+
 	if (capabilities & INTEL_PCLMUL) {
 		if (b & bit_PCLMUL) {
 			_gnutls_x86_cpuid_s[1] |= bit_PCLMUL;
@@ -111,6 +112,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 			    ("PCLMUL acceleration requested but not available\n");
 		}
 	}
+
 }
 
 static unsigned check_optimized_aes(void)
@@ -275,7 +277,10 @@ void register_x86_padlock_crypto(unsigned capabilities)
 			gnutls_assert();
 		}
 #endif
+	} else {
+		_gnutls_priority_update_non_aesni();
 	}
+
 #ifdef HAVE_LIBNETTLE
 	phe = check_phe(edx);
 
@@ -644,6 +649,8 @@ void register_x86_intel_crypto(unsigned capabilities)
 				gnutls_assert();
 			}
 		}
+	} else {
+		_gnutls_priority_update_non_aesni();
 	}
 
 	return;

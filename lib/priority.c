@@ -31,6 +31,7 @@
 #include <gnutls/x509.h>
 #include <c-ctype.h>
 #include <extensions.h>
+#include "fips.h"
 
 #define MAX_ELEMENTS 64
 
@@ -232,14 +233,30 @@ static const int _cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CHACHA20_POLY1305,
+	GNUTLS_CIPHER_AES_128_CCM,
+	GNUTLS_CIPHER_AES_256_CCM,
 	GNUTLS_CIPHER_CAMELLIA_128_GCM,
 	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
+	GNUTLS_CIPHER_3DES_CBC,
+	0
+};
+
+static const int _cipher_priority_performance_no_aesni[] = {
+	GNUTLS_CIPHER_CHACHA20_POLY1305,
+	GNUTLS_CIPHER_AES_128_GCM,
+	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_AES_128_CCM,
 	GNUTLS_CIPHER_AES_256_CCM,
+	GNUTLS_CIPHER_CAMELLIA_128_GCM,
+	GNUTLS_CIPHER_CAMELLIA_256_GCM,
+	GNUTLS_CIPHER_AES_128_CBC,
+	GNUTLS_CIPHER_AES_256_CBC,
+	GNUTLS_CIPHER_CAMELLIA_128_CBC,
+	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
@@ -251,16 +268,17 @@ static const int _cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_CHACHA20_POLY1305,
+	GNUTLS_CIPHER_AES_256_CCM,
 
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
-	GNUTLS_CIPHER_AES_256_CCM,
 
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_CAMELLIA_128_GCM,
+	GNUTLS_CIPHER_AES_128_CCM,
+
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
-	GNUTLS_CIPHER_AES_128_CCM,
 
 	GNUTLS_CIPHER_3DES_CBC,
 	0
@@ -268,19 +286,20 @@ static const int _cipher_priority_normal_default[] = {
 
 static const int cipher_priority_performance_fips[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
+	GNUTLS_CIPHER_AES_128_CCM,
 	GNUTLS_CIPHER_AES_256_GCM,
+	GNUTLS_CIPHER_AES_256_CCM,
+
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_AES_128_CCM,
-	GNUTLS_CIPHER_AES_256_CCM,
 	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
 
 static const int cipher_priority_normal_fips[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
-	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_AES_256_CCM,
+	GNUTLS_CIPHER_AES_256_CBC,
 
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
@@ -416,6 +435,15 @@ void _gnutls_priority_update_fips(void)
 	cipher_priority_performance = cipher_priority_performance_fips;
 	cipher_priority_normal = cipher_priority_normal_fips;
 	mac_priority_normal = mac_priority_normal_fips;
+}
+
+void _gnutls_priority_update_non_aesni(void)
+{
+	/* if we have no AES acceleration in performance mode
+	 * prefer fast stream ciphers */
+	if (_gnutls_fips_mode_enabled() == 0) {
+		cipher_priority_performance = _cipher_priority_performance_no_aesni;
+	}
 }
 
 static const int _mac_priority_suiteb[] = {
