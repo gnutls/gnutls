@@ -75,15 +75,43 @@ unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1,
 	int ret;
 	bool result;
 
-	ret = _gnutls_is_same_dn(cert1, cert2);
-	if (ret == 0)
-		return 0;
+	if (cert1->raw_dn.size > 0 && cert2->raw_dn.size > 0) {
+		ret = _gnutls_is_same_dn(cert1, cert2);
+		if (ret == 0)
+			return 0;
+	}
 
-	if ((cert1->der.size == cert2->der.size) &&
-	    (memcmp(cert1->der.data, cert2->der.data, cert1->der.size) == 0))
-		result = 1;
-	else
-		result = 0;
+	if (cert1->der.size == 0 || cert2->der.size == 0) {
+		gnutls_datum_t tmp1, tmp2;
+
+		/* on uninitialized certificates, we have to-reencode */
+		ret =
+		    gnutls_x509_crt_export2(cert1, GNUTLS_X509_FMT_DER, &tmp1);
+		if (ret < 0)
+			return gnutls_assert_val(0);
+
+		ret =
+		    gnutls_x509_crt_export2(cert2, GNUTLS_X509_FMT_DER, &tmp2);
+		if (ret < 0) {
+			gnutls_free(tmp1.data);
+			return gnutls_assert_val(0);
+		}
+
+		if ((tmp1.size == tmp2.size) &&
+		    (memcmp(tmp1.data, tmp2.data, tmp1.size) == 0))
+			result = 1;
+		else
+			result = 0;
+
+		gnutls_free(tmp1.data);
+		gnutls_free(tmp2.data);
+	} else {
+		if ((cert1->der.size == cert2->der.size) &&
+		    (memcmp(cert1->der.data, cert2->der.data, cert1->der.size) == 0))
+			result = 1;
+		else
+			result = 0;
+	}
 
 	return result;
 }
@@ -106,11 +134,30 @@ gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1,
 {
 	bool result;
 
-	if ((cert1->der.size == der->size) &&
-	    (memcmp(cert1->der.data, der->data, cert1->der.size) == 0))
-		result = 1;
-	else
-		result = 0;
+	if (cert1->der.size == 0) {
+		gnutls_datum_t tmp1;
+		int ret;
+
+		/* on uninitialized certificates, we have to-reencode */
+		ret =
+		    gnutls_x509_crt_export2(cert1, GNUTLS_X509_FMT_DER, &tmp1);
+		if (ret < 0)
+			return gnutls_assert_val(0);
+
+		if ((tmp1.size == der->size) &&
+		    (memcmp(tmp1.data, der->data, tmp1.size) == 0))
+			result = 1;
+		else
+			result = 0;
+
+		gnutls_free(tmp1.data);
+	} else {
+		if ((cert1->der.size == der->size) &&
+		    (memcmp(cert1->der.data, der->data, cert1->der.size) == 0))
+			result = 1;
+		else
+			result = 0;
+	}
 
 	return result;
 }
