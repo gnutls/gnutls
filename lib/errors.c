@@ -382,6 +382,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_ASN1_EMBEDDED_NULL_IN_STRING),
 	ERROR_ENTRY(N_("Attempted handshake during false start."),
 		    GNUTLS_E_HANDSHAKE_DURING_FALSE_START),
+	ERROR_ENTRY(N_("The SNI host name not recognised."),
+		    GNUTLS_E_UNRECOGNIZED_NAME),
 	{NULL, NULL, 0}
 };
 
