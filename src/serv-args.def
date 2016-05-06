@@ -9,6 +9,19 @@ detail        = "Server program that listens to incoming TLS connections.";
 #include args-std.def
 
 flag = {
+    name      = sni-hostname;
+    descrip   = "Server's hostname for server name extension";
+    arg-type  = string;
+    doc      = "Server name of type host_name that the server will recognise as its own. If the server receives client hello with different name, it will send a warning-level unrecognized_name alert.";
+};
+
+flag = {
+    name      = sni-hostname-fatal;
+    descrip   = "Send fatal alert on sni-hostname mismatch";
+    doc      = "";
+};
+
+flag = {
     name      = noticket;
     descrip   = "Don't accept session tickets";
     doc      = "";
