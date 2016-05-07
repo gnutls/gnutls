@@ -72,7 +72,10 @@ typedef struct gnutls_x509_dn_st {
 typedef struct gnutls_x509_crt_int {
 	ASN1_TYPE cert;
 	int use_extensions;
-	int expanded;		/* a certificate has been expanded */
+	unsigned expanded; /* a certificate has been expanded */
+	unsigned modified; /* the cached values below may no longer be valid */
+
+	struct pin_info_st pin;
 
 	/* These two cached values allow fast calls to
 	 * get_raw_*_dn(). */
@@ -81,13 +84,14 @@ typedef struct gnutls_x509_crt_int {
 	gnutls_datum_t raw_spki;
 
 	gnutls_datum_t der;
-	struct pin_info_st pin;
 
 	/* backwards compatibility for gnutls_x509_crt_get_subject()
 	 * and gnutls_x509_crt_get_issuer() */
 	gnutls_x509_dn_st dn;
 	gnutls_x509_dn_st idn;
 } gnutls_x509_crt_int;
+
+#define MODIFIED(crt) crt->modified=1
 
 typedef struct gnutls_x509_crq_int {
 	ASN1_TYPE crq;

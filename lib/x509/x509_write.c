@@ -67,6 +67,8 @@ gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt_t crt, const char *oid,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	MODIFIED(crt);
+
 	return _gnutls_x509_set_dn_oid(crt->cert, "tbsCertificate.subject",
 				       oid, raw_flag, name, sizeof_name);
 }
@@ -107,6 +109,8 @@ gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt_t crt,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	MODIFIED(crt);
+
 	return _gnutls_x509_set_dn_oid(crt->cert, "tbsCertificate.issuer",
 				       oid, raw_flag, name, sizeof_name);
 }
@@ -139,6 +143,8 @@ gnutls_x509_crt_set_proxy_dn(gnutls_x509_crt_t crt,
 	if (crt == NULL || eecrt == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(crt);
 
 	result = asn1_copy_node(crt->cert, "tbsCertificate.subject",
 				eecrt->cert, "tbsCertificate.subject");
@@ -186,6 +192,8 @@ gnutls_x509_crt_set_version(gnutls_x509_crt_t crt, unsigned int version)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	MODIFIED(crt);
+
 	if (null > 0)
 		null--;
 
@@ -225,6 +233,8 @@ gnutls_x509_crt_set_key(gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	MODIFIED(crt);
+
 	result = _gnutls_x509_encode_and_copy_PKI_params(crt->cert,
 							 "tbsCertificate.subjectPublicKeyInfo",
 							 key->pk_algorithm,
@@ -261,6 +271,8 @@ int gnutls_x509_crt_set_crq(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(crt);
 
 	result = gnutls_x509_crq_verify(crq, 0);
 	if (result < 0)
@@ -309,6 +321,8 @@ gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(crt);
 
 	for (i = 0;; i++) {
 		int result;
@@ -368,9 +382,6 @@ gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
 		}
 	}
 
-	if (i > 0)
-		crt->use_extensions = 1;
-
 	return 0;
 }
 
@@ -412,8 +423,6 @@ gnutls_x509_crt_set_extension_by_oid(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		return result;
 	}
-
-	crt->use_extensions = 1;
 
 	return 0;
 
@@ -462,8 +471,6 @@ gnutls_x509_crt_set_basic_constraints(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		return result;
 	}
-
-	crt->use_extensions = 1;
 
 	return 0;
 }
@@ -524,8 +531,6 @@ gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt, unsigned int usage)
 		gnutls_assert();
 		return result;
 	}
-
-	crt->use_extensions = 1;
 
 	return 0;
 }
@@ -642,8 +647,6 @@ gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
 		return result;
 	}
 
-	crt->use_extensions = 1;
-
 	result = 0;
 
       finish:
@@ -721,8 +724,6 @@ gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		return result;
 	}
-
-	crt->use_extensions = 1;
 
 	result = 0;
 
@@ -828,8 +829,6 @@ gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
 		goto finish;
 	}
 
-	crt->use_extensions = 1;
-
 	result = 0;
 
       finish:
@@ -920,8 +919,6 @@ gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
 		goto finish;
 	}
 
-	crt->use_extensions = 1;
-
 	result = 0;
 
       finish:
@@ -981,8 +978,6 @@ gnutls_x509_crt_set_proxy(gnutls_x509_crt_t crt,
 		return result;
 	}
 
-	crt->use_extensions = 1;
-
 	return 0;
 }
 
@@ -1022,8 +1017,6 @@ gnutls_x509_crt_set_private_key_usage_period(gnutls_x509_crt_t crt,
 
 	_gnutls_free_datum(&der_data);
 
-	crt->use_extensions = 1;
-
  cleanup:
 	return result;
 }
@@ -1057,6 +1050,8 @@ gnutls_x509_crt_sign2(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(crt);
 
 	result = gnutls_privkey_init(&privkey);
 	if (result < 0) {
@@ -1125,6 +1120,8 @@ gnutls_x509_crt_set_activation_time(gnutls_x509_crt_t cert,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	MODIFIED(cert);
+
 	return _gnutls_x509_set_time(cert->cert,
 				     "tbsCertificate.validity.notBefore",
 				     act_time, 0);
@@ -1150,6 +1147,9 @@ gnutls_x509_crt_set_expiration_time(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(cert);
+
 	return _gnutls_x509_set_time(cert->cert,
 				     "tbsCertificate.validity.notAfter",
 				     exp_time, 0);
@@ -1181,6 +1181,8 @@ gnutls_x509_crt_set_serial(gnutls_x509_crt_t cert, const void *serial,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(cert);
 
 	ret =
 	    asn1_write_value(cert->cert, "tbsCertificate.serialNumber",
@@ -1218,6 +1220,8 @@ gnutls_x509_crt_set_issuer_unique_id(gnutls_x509_crt_t cert, const void *id,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	MODIFIED(cert);
+
 	ret =
 	    asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID",
 			     id, id_size*8);
@@ -1252,6 +1256,8 @@ gnutls_x509_crt_set_subject_unique_id(gnutls_x509_crt_t cert, const void *id,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(cert);
 
 	ret =
 	    asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID",
@@ -1403,7 +1409,6 @@ gnutls_x509_crt_set_crl_dist_points2(gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 
-	crt->use_extensions = 1;
 	ret = 0;
  cleanup:
 	_gnutls_free_datum(&der_data);
@@ -1459,8 +1464,6 @@ gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt_t dst,
 		gnutls_assert();
 		return result;
 	}
-
-	dst->use_extensions = 1;
 
 	return 0;
 }
@@ -1526,8 +1529,6 @@ gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt_t cert,
 		return result;
 	}
 
-	cert->use_extensions = 1;
-
 	return 0;
 }
 
@@ -1587,8 +1588,6 @@ gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		return result;
 	}
-
-	cert->use_extensions = 1;
 
 	return 0;
 }
@@ -1659,8 +1658,6 @@ gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	cert->use_extensions = 1;
-
 	ret = 0;
  cleanup:
 	_gnutls_free_datum(&der);
@@ -1702,6 +1699,8 @@ gnutls_x509_crt_privkey_sign(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	MODIFIED(crt);
 
 	/* disable all the unneeded OPTIONAL fields.
 	 */
@@ -1793,8 +1792,6 @@ gnutls_x509_crt_set_authority_info_access(gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 
-	crt->use_extensions = 1;
-
       cleanup:
       	if (aia_ctx != NULL)
       		gnutls_x509_aia_deinit(aia_ctx);
@@ -1874,8 +1871,6 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
 
 	ret = _gnutls_x509_crt_set_extension(crt, "2.5.29.32",
 						&der_data, 0);
-
-	crt->use_extensions = 1;
 
  cleanup:
  	if (policies != NULL)

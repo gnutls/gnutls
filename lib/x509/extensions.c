@@ -500,6 +500,9 @@ _gnutls_x509_crt_set_extension(gnutls_x509_crt_t cert,
 			       const gnutls_datum_t * ext_data,
 			       unsigned int critical)
 {
+	MODIFIED(cert);
+	cert->use_extensions = 1;
+
 	return _gnutls_set_extension(cert->cert, "tbsCertificate.extensions",
 			     ext_id, ext_data, critical);
 }
