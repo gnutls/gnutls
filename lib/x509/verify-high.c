@@ -447,7 +447,7 @@ gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_x509_crt_cpy(*crt, list->node[(*iter)->node_index].trusted_cas[(*iter)->ca_index], 0);
+		ret = _gnutls_x509_crt_cpy(*crt, list->node[(*iter)->node_index].trusted_cas[(*iter)->ca_index]);
 		if (ret < 0) {
 			gnutls_x509_crt_deinit(*crt);
 			return gnutls_assert_val(ret);
@@ -528,7 +528,7 @@ int ret;
 		return NULL;
 	}
 
-	ret = _gnutls_x509_crt_cpy(dst, src, 0);
+	ret = _gnutls_x509_crt_cpy(dst, src);
 	if (ret < 0) {
 		gnutls_x509_crt_deinit(dst);
 		gnutls_assert();

@@ -41,8 +41,10 @@ static int crt_reinit(gnutls_x509_crt_t crt)
 {
 	int result;
 
+	_gnutls_free_datum(&crt->der);
 	crt->raw_dn.size = 0;
 	crt->raw_issuer_dn.size = 0;
+	crt->raw_spki.size = 0;
 
 	asn1_delete_structure(&crt->cert);
 
@@ -75,16 +77,18 @@ unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1,
 	int ret;
 	bool result;
 
-	if (cert1->raw_dn.size > 0 && cert2->raw_dn.size > 0) {
+	if (cert1->modified == 0 && cert2->modified == 0 &&
+	    cert1->raw_dn.size > 0 && cert2->raw_dn.size > 0) {
 		ret = _gnutls_is_same_dn(cert1, cert2);
 		if (ret == 0)
 			return 0;
 	}
 
-	if (cert1->der.size == 0 || cert2->der.size == 0) {
+	if (cert1->der.size == 0 || cert2->der.size == 0 ||
+	    cert1->modified != 0 || cert2->modified != 0) {
 		gnutls_datum_t tmp1, tmp2;
 
-		/* on uninitialized certificates, we have to-reencode */
+		/* on uninitialized or modified certificates, we have to-reencode */
 		ret =
 		    gnutls_x509_crt_export2(cert1, GNUTLS_X509_FMT_DER, &tmp1);
 		if (ret < 0)
@@ -134,11 +138,11 @@ gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1,
 {
 	bool result;
 
-	if (cert1->der.size == 0) {
+	if (cert1->der.size == 0 || cert1->modified) {
 		gnutls_datum_t tmp1;
 		int ret;
 
-		/* on uninitialized certificates, we have to-reencode */
+		/* on uninitialized or modified certificates, we have to-reencode */
 		ret =
 		    gnutls_x509_crt_export2(cert1, GNUTLS_X509_FMT_DER, &tmp1);
 		if (ret < 0)
@@ -206,27 +210,23 @@ int gnutls_x509_crt_init(gnutls_x509_crt_t * cert)
  * @src: The data to be copied
  * @flags: zero or CRT_CPY_FAST
  *
- * This function will copy an X.509 certificate structure. Unless 
- * %CRT_CPY_FAST is specified this function does encode and decode
- * the given source to allow copying modified structure.
+ * This function will copy an X.509 certificate structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
-int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src, unsigned flags)
+int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
 {
 	int ret;
 	gnutls_datum_t tmp;
+	unsigned dealloc = 0;
 
-	/* if no DER data are present don't consider the fast flag */
-	if (src->der.size == 0)
-		flags &= ~CRT_CPY_FAST;
-
-	if (!(flags & CRT_CPY_FAST)) {
+	if (src->der.size == 0 || src->modified) {
 		ret =
 		    gnutls_x509_crt_export2(src, GNUTLS_X509_FMT_DER, &tmp);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+		dealloc = 1;
 	} else {
 		tmp.data = src->der.data;
 		tmp.size = src->der.size;
@@ -234,7 +234,7 @@ int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src, unsigned
 
 	ret = gnutls_x509_crt_import(dest, &tmp, GNUTLS_X509_FMT_DER);
 
-	if (!(flags & CRT_CPY_FAST)) {
+	if (dealloc) {
 		gnutls_free(tmp.data);
 	}
 
@@ -355,9 +355,15 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (cert->der.data) {
-		gnutls_free(cert->der.data);
-		cert->der.data = NULL;
+	if (cert->expanded) {
+		/* Any earlier _asn1_strict_der_decode will modify the ASN.1
+		   structure, so we need to replace it with a fresh
+		   structure. */
+		result = crt_reinit(cert);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	/* If the Certificate is in PEM format then decode it
@@ -388,18 +394,8 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		}
 	}
 
-	if (cert->expanded) {
-		/* Any earlier _asn1_strict_der_decode will modify the ASN.1
-		   structure, so we need to replace it with a fresh
-		   structure. */
-		result = crt_reinit(cert);
-		if (result < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-	}
-
 	cert->expanded = 1;
+	cert->modified = 0;
 
 	result =
 	    _asn1_strict_der_decode(&cert->cert, cert->der.data, cert->der.size, NULL);
@@ -415,7 +411,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-
+	/* The following do not allocate but rather point to DER data */
 	result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
 					  "tbsCertificate.issuer.rdnSequence",
 					  &cert->raw_issuer_dn);
@@ -2437,7 +2433,7 @@ int
 gnutls_x509_crt_get_raw_issuer_dn(gnutls_x509_crt_t cert,
 				  gnutls_datum_t * dn)
 {
-	if (cert->raw_issuer_dn.size > 0) {
+	if (cert->raw_issuer_dn.size > 0 && cert->modified == 0) {
 		return _gnutls_set_datum(dn, cert->raw_issuer_dn.data,
 					 cert->raw_issuer_dn.size);
 	} else {
@@ -2459,7 +2455,7 @@ gnutls_x509_crt_get_raw_issuer_dn(gnutls_x509_crt_t cert,
  **/
 int gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 {
-	if (cert->raw_dn.size > 0) {
+	if (cert->raw_dn.size > 0 && cert->modified == 0) {
 		return _gnutls_set_datum(dn, cert->raw_dn.data, cert->raw_dn.size);
 	} else {
 		return _gnutls_x509_get_raw_field(cert->cert, "tbsCertificate.subject.rdnSequence", dn);
