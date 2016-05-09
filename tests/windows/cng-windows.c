@@ -31,6 +31,8 @@
 
 #ifndef _WIN32
 
+#include <stdlib.h>
+
 void doit()
 {
 	exit(77);
