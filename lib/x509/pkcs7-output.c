@@ -176,8 +176,8 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_datum_t * out)
 {
-	unsigned i, count;
-	int ret;
+	unsigned i;
+	int count, ret;
 	gnutls_pkcs7_signature_info_st info;
 	gnutls_buffer_st str;
 
