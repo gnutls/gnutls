@@ -28,6 +28,16 @@
 #include <gnutls/crypto.h>
 #include <limits.h>
 #include "utils.h"
+
+#if defined(__FreeBSD__)
+/* its libc cannot handle that large allocations */
+void doit(void)
+{
+	exit(77);
+}
+
+#else /* not freebsd */
+
 #if !defined(_WIN32)
 # include <signal.h>
 
@@ -172,4 +182,4 @@ void doit(void)
 	put_mem(buf);
 	gnutls_global_deinit();
 }
-
+#endif
