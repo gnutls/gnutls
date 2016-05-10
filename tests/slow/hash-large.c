@@ -48,8 +48,12 @@ static void exit_77(int signo)
 static size_t _mmap_size;
 static void *get_mem(size_t size)
 {
+	void *p;
 	_mmap_size = size;
-	return mmap(NULL, size, PROT_READ, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+	p = mmap(NULL, size, PROT_READ, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+	if (p == MAP_FAILED)
+		return NULL;
+	return p;
 }
 
 static void put_mem(void *mem)
