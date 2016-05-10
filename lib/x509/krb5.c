@@ -283,6 +283,8 @@ int _gnutls_krb5_der_to_principal(const gnutls_datum * der, gnutls_datum_t *name
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	gnutls_buffer_st str;
 
+	_gnutls_buffer_init(&str);
+
 	result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.KRB5PrincipalName", &c2);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -296,8 +298,6 @@ int _gnutls_krb5_der_to_principal(const gnutls_datum * der, gnutls_datum_t *name
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
-
-	_gnutls_buffer_init(&str);
 
 	ret = principal_to_str(c2, &str);
 	if (ret < 0) {
