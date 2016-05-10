@@ -321,6 +321,7 @@ static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
 	size_t max_size;
 	int i, ret = 0, ret2;
 	char name[MAX_CN];
+	unsigned have_dns_name = 0;
 
 	for (i = 0; !(ret < 0); i++) {
 		max_size = sizeof(name);
@@ -329,6 +330,8 @@ static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
 		    gnutls_x509_crt_get_subject_alt_name(crt, i, name,
 							 &max_size, NULL);
 		if (ret == GNUTLS_SAN_DNSNAME) {
+			have_dns_name = 1;
+
 			ret2 =
 			    _gnutls_str_array_append(names, name,
 						     max_size);
@@ -339,15 +342,17 @@ static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
 		}
 	}
 
-	max_size = sizeof(name);
-	ret =
-	    gnutls_x509_crt_get_dn_by_oid(crt, OID_X520_COMMON_NAME, 0, 0,
-					  name, &max_size);
-	if (ret >= 0) {
-		ret = _gnutls_str_array_append(names, name, max_size);
-		if (ret < 0) {
-			_gnutls_str_array_clear(names);
-			return gnutls_assert_val(ret);
+	if (have_dns_name == 0) {
+		max_size = sizeof(name);
+		ret =
+		    gnutls_x509_crt_get_dn_by_oid(crt, OID_X520_COMMON_NAME, 0, 0,
+						  name, &max_size);
+		if (ret >= 0) {
+			ret = _gnutls_str_array_append(names, name, max_size);
+			if (ret < 0) {
+				_gnutls_str_array_clear(names);
+				return gnutls_assert_val(ret);
+			}
 		}
 	}
 
