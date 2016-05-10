@@ -481,9 +481,10 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
  *
  * If @buf is null then only the size will be filled. 
  *
- * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- * long enough, and in that case the @buf_size will be updated with
- * the required size.  On success 0 is returned.
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+ *   long enough, and in that case the @buf_size will be updated
+ *   with the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if
+ *   the DN does not exist, or another error value on error. On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
@@ -627,7 +628,8 @@ gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated
- *   with the required size.  On success 0 is returned.
+ *   with the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if
+ *   the DN does not exist, or another error value on error. On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
