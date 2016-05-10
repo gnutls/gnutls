@@ -2163,9 +2163,14 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 	name_size = sizeof(name);
 	ret = gnutls_x509_crt_get_dn(cert, name, &name_size);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_crt_get_dn: %s\n",
-			gnutls_strerror(ret));
-		exit(1);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			name[0] = 0;
+			name_size = 0;
+		} else {
+			fprintf(stderr, "gnutls_x509_crt_get_dn: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
 	}
 
 	fprintf(outfile, "\tSubject: %s\n", name);
