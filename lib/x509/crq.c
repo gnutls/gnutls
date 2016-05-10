@@ -269,7 +269,7 @@ gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf, size_t * buf_size)
 
 	return _gnutls_x509_parse_dn(crq->crq,
 				     "certificationRequestInfo.subject.rdnSequence",
-				     buf, buf_size);
+				     buf, buf_size, 1);
 }
 
 /**
