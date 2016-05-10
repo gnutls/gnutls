@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1239,6 +1240,29 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 				ret = gnutls_assert_val(ret);
 				goto cleanup;
 			}
+		}
+	} else if (names == NULL && pcert_list[0].type == GNUTLS_CRT_X509) {
+		gnutls_x509_crt_t crt;
+
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = gnutls_x509_crt_import(crt, &pcert_list[0].cert, GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(crt);
+			goto cleanup;
+		}
+
+		ret = get_x509_name(crt, &str_names);
+		gnutls_x509_crt_deinit(crt);
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
 		}
 	}
 
