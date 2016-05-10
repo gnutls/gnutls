@@ -421,7 +421,7 @@ pack_srp_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	size_t cur_size;
 	const char *username = NULL;
 
-	if (info && info->username) {
+	if (info) {
 		username = info->username;
 		len = strlen(info->username) + 1;	/* include the terminating null */
 	} else
@@ -652,6 +652,8 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	}
 
 	BUFFER_POP(ps, info->username, username_size);
+	if (username_size == 0)
+		info->username[0] = 0;
 
 	BUFFER_POP_NUM(ps, hint_size);
 	if (hint_size > sizeof(info->hint)) {
@@ -659,6 +661,8 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	BUFFER_POP(ps, info->hint, hint_size);
+	if (hint_size == 0)
+		info->hint[0] = 0;
 
 	BUFFER_POP_NUM(ps, info->dh.secret_bits);
 
