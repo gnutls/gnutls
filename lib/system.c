@@ -291,7 +291,7 @@ static int gnutls_system_mutex_unlock(void **priv)
 
 #endif				/* NO_LOCKS */
 
-gnutls_time_func gnutls_time = time;
+gnutls_time_func gnutls_time;
 mutex_init_func gnutls_mutex_init = gnutls_system_mutex_init;
 mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
 mutex_lock_func gnutls_mutex_lock = gnutls_system_mutex_lock;
@@ -318,6 +318,7 @@ int gnutls_system_global_init(void)
 	Crypt32_dll = crypto;
 #endif
 #endif
+	gnutls_time = time;
 	return 0;
 }
 
@@ -328,6 +329,7 @@ void gnutls_system_global_deinit(void)
 	FreeLibrary(Crypt32_dll);
 #endif
 #endif
+	gnutls_time = time;
 }
 
 
