@@ -26,8 +26,6 @@
 
 #include "gnutls_int.h"
 
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
 #include <string.h>		/* memset */
 #include <x509/x509_int.h>
 #include <libtasn1.h>
