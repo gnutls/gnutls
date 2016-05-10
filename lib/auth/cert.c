@@ -573,11 +573,6 @@ call_get_cert_callback(gnutls_session_t session,
 #endif
 	}
 
-	if (ret < 0) {
-		if (local_key != NULL)
-			gnutls_privkey_deinit(local_key);
-	}
-
 	return ret;
 }
 
