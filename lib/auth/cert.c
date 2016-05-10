@@ -1975,6 +1975,8 @@ _gnutls_server_select_cert(gnutls_session_t session,
 	get_server_name(session, (unsigned char *)server_name,
 			sizeof(server_name));
 
+	_gnutls_handshake_log ("HSK[%p]: Requested server name: '%s'\n",
+				     session, server_name);
 	idx = -1;		/* default is use no certificate */
 
 	/* find certificates that match the requested server_name
@@ -1993,7 +1995,7 @@ _gnutls_server_select_cert(gnutls_session_t session,
 								   NULL);
 
 				_gnutls_handshake_log
-				    ("HSK[%p]: Requested server name: '%s', ctype: %s (%d)",
+				    ("HSK[%p]: Requested server name: '%s', ctype: %s (%d)\n",
 				     session, server_name,
 				     gnutls_certificate_type_get_name
 				     (session->security_parameters.cert_type),
