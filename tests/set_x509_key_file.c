@@ -34,6 +34,15 @@
 #include "cert-common.h"
 #include "utils.h"
 
+static time_t mytime(time_t * t)
+{
+	time_t then = 1461671166;
+	if (t)
+		*t = then;
+
+	return then;
+}
+
 static void compare(const gnutls_datum_t *der, const void *ipem)
 {
 	gnutls_datum_t pem = {(void*)ipem, strlen((char*)ipem)};
@@ -64,6 +73,7 @@ void doit(void)
 
 	global_init();
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
+	gnutls_global_set_time_function(mytime);
 
 	/* this will fail */
 	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, keyfile,
@@ -106,6 +116,8 @@ void doit(void)
 	compare(&tcert, server_cert_pem+2);
 
 	remove(certfile);
+
+	test_cli_serv(xcred, "NORMAL", &ca_cert, "localhost"); /* the DNS name of the first cert */
 
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_global_deinit();

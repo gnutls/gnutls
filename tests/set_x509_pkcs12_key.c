@@ -95,9 +95,11 @@ void doit(void)
 		exit(1);
 	}
 
-	compare(&tcert, server_ca3_cert_pem);
+	compare(&tcert, server_localhost_ca3_cert_pem);
 
 	remove(certfile);
+
+	test_cli_serv(xcred, "NORMAL", &ca3_cert, "localhost"); /* the DNS name of the first cert */
 
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_global_deinit();

@@ -63,7 +63,7 @@ endif
 
 noinst_LTLIBRARIES = libutils.la
 pkglib_LTLIBRARIES = 
-libutils_la_SOURCES = utils.h utils.c seccomp.c
+libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
 ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\

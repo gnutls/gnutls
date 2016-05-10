@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -67,6 +68,9 @@ extern void hexprint(const void *str, size_t len);
 extern void binprint(const void *str, size_t len);
 int disable_system_calls(void);
 void sec_sleep(int sec);
+
+void test_cli_serv(gnutls_certificate_credentials_t server_cred, const char *prio,
+              const gnutls_datum_t *ca_cert, const char *host);
 
 #define TMPNAME_SIZE 128
 char *get_tmpname(char s[TMPNAME_SIZE]);

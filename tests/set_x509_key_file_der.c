@@ -92,8 +92,8 @@ void doit(void)
 	assert(get_tmpname(certfile)!=NULL);
 	assert(get_tmpname(keyfile)!=NULL);
 
-	write_der(certfile, "CERTIFICATE", (char*)server_cert_pem);
-	write_der(keyfile, "RSA PRIVATE KEY", (char*)server_key_pem);
+	write_der(certfile, "CERTIFICATE", (char*)server_localhost_ca3_cert_pem);
+	write_der(keyfile, "RSA PRIVATE KEY", (char*)server_ca3_key_pem);
 
 	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, keyfile,
 						    GNUTLS_X509_FMT_DER, NULL, 0);
@@ -107,10 +107,12 @@ void doit(void)
 		exit(1);
 	}
 
-	compare(&tcert, server_cert_pem);
+	compare(&tcert, server_localhost_ca3_cert_pem);
 
 	remove(certfile);
 	remove(keyfile);
+
+	test_cli_serv(xcred, "NORMAL", &ca3_cert, "localhost"); /* the DNS name of the first cert */
 
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_global_deinit();
