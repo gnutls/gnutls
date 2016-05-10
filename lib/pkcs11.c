@@ -2608,6 +2608,7 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 	ck_object_handle_t obj;
 	unsigned long count, current;
 	char certid_tmp[PKCS11_ID_SIZE];
+	int ret;
 
 	class = CKO_PRIVATE_KEY;
 
@@ -2669,9 +2670,11 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 
 		if (pkcs11_get_attribute_value
 		    (sinfo->module, sinfo->pks, obj, a, 1) == CKR_OK) {
-			_gnutls_buffer_append_data(&list->key_ids[current],
+			ret = _gnutls_buffer_append_data(&list->key_ids[current],
 						   a[0].value,
 						   a[0].value_len);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 			current++;
 		}
 
