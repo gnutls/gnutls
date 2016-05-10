@@ -210,7 +210,7 @@ gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl_t crl, char *buf,
 
 	return _gnutls_x509_parse_dn(crl->crl,
 				     "tbsCertList.issuer.rdnSequence",
-				     buf, sizeof_buf, 0);
+				     buf, sizeof_buf);
 }
 
 /**

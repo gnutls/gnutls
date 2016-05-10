@@ -227,7 +227,7 @@ _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
 int
 _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		      const char *asn1_rdn_name, char *buf,
-		      size_t * buf_size, unsigned allow_empty)
+		      size_t * buf_size)
 {
 	int ret;
 	gnutls_datum_t dn = {NULL, 0};
@@ -243,14 +243,8 @@ _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		*buf_size = 0;
 
 	ret = _gnutls_x509_get_dn(asn1_struct, asn1_rdn_name, &dn);
-	if (ret < 0) {
-		if (allow_empty && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			gnutls_assert();
-			*buf_size = 0;
-			return 0;
-		}
+	if (ret < 0)
 		return gnutls_assert_val(ret);
-	}
 
 	if (dn.size >= (unsigned int) *buf_size) {
 		gnutls_assert();
@@ -870,7 +864,7 @@ gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_parse_dn(dn, "rdnSequence", buf, buf_size, 0);
+	result = _gnutls_x509_parse_dn(dn, "rdnSequence", buf, buf_size);
 
 	asn1_delete_structure(&dn);
 	return result;

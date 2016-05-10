@@ -1123,7 +1123,7 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 
 	ret = _gnutls_x509_parse_dn
 	    (resp->basicresp, "tbsResponseData.responderID.byName",
-	     NULL, &l, 0);
+	     NULL, &l);
 	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			return 0; /* for backwards compatibility */
@@ -1139,7 +1139,7 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 
 	ret = _gnutls_x509_parse_dn
 	    (resp->basicresp, "tbsResponseData.responderID.byName",
-	     (char *) dn->data, &l, 0);
+	     (char *) dn->data, &l);
 	if (ret != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		return ret;

@@ -160,7 +160,7 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 
 int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			  const char *asn1_rdn_name, char *buf,
-			  size_t * sizeof_buf, unsigned allow_empty);
+			  size_t * sizeof_buf);
 
 int
 _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,

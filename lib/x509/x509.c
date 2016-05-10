@@ -496,7 +496,7 @@ gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
 
 	return _gnutls_x509_parse_dn(cert->cert,
 				     "tbsCertificate.issuer.rdnSequence",
-				     buf, buf_size, 0);
+				     buf, buf_size);
 }
 
 /**
@@ -640,7 +640,7 @@ gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
 
 	return _gnutls_x509_parse_dn(cert->cert,
 				     "tbsCertificate.subject.rdnSequence",
-				     buf, buf_size, 1);
+				     buf, buf_size);
 }
 
 /**
