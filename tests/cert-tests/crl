@@ -37,7 +37,7 @@ echo "crl_number = 7" >>$TMPFILE
 
 ${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
 	"${srcdir}/template-test.pem" --load-certificate "${srcdir}/ca-certs.pem" --template \
-	"${TMPFILE}" >${OUTFILE} 2>&1
+	"${TMPFILE}" >${OUTFILE}
 rc=$?
 
 # We're done.
@@ -56,7 +56,7 @@ fi
 
 ${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
 	"${srcdir}/template-test.pem" --load-crl "${OUTFILE}" --load-certificate "${srcdir}/cert-ecc256.pem" --template \
-	"${TMPFILE}" -d 9 >${OUTFILE2} 2>&1
+	"${TMPFILE}" -d 9 >${OUTFILE2}
 rc=$?
 
 # We're done.
