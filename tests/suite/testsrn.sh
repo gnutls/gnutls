@@ -62,6 +62,7 @@ ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANO
 
 kill ${PID}
 wait
+sleep 5
 
 launch_server $$  --echo --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION --dhparams "${srcdir}/params.dh" >/dev/null &
 PID=$!
@@ -81,6 +82,7 @@ ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANO
 
 kill ${PID}
 wait
+sleep 5
 
 launch_server $$ --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --dhparams "${srcdir}/params.dh" >/dev/null &
 PID=$!
