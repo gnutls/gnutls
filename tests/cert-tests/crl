@@ -29,6 +29,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 OUTFILE=out-crl.$$.tmp
+INFOFILE=out-crl-info.$$.tmp
 OUTFILE2=out2-crl.$$.tmp
 TMPFILE=crl.$$.tmpl
 
@@ -37,7 +38,7 @@ echo "crl_number = 7" >>$TMPFILE
 
 ${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
 	"${srcdir}/template-test.pem" --load-certificate "${srcdir}/ca-certs.pem" --template \
-	"${TMPFILE}" >${OUTFILE} 2>&1
+	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
 rc=$?
 
 # We're done.
@@ -46,7 +47,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-grep "Revoked certificates (152)" "${OUTFILE}" >/dev/null 2>&1
+grep "Revoked certificates (152)" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL generation didn't succeed as expected"
 	exit 1
@@ -56,7 +57,7 @@ fi
 
 ${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
 	"${srcdir}/template-test.pem" --load-crl "${OUTFILE}" --load-certificate "${srcdir}/cert-ecc256.pem" --template \
-	"${TMPFILE}" -d 9 >${OUTFILE2} 2>&1
+	"${TMPFILE}" -d 9 >${OUTFILE2} 2>${INFOFILE}
 rc=$?
 
 # We're done.
@@ -65,13 +66,13 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-grep "Revoked certificates (153)" "${OUTFILE2}" >/dev/null 2>&1
+grep "Revoked certificates (153)" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL appending didn't succeed as expected"
 	exit 1
 fi
 
-grep "Serial Number (hex): 07" "${OUTFILE2}" >/dev/null 2>&1
+grep "Serial Number (hex): 07" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL appending didn't succeed as expected (2)"
 	exit 1
@@ -86,7 +87,7 @@ echo "crl_revocation_date = \"2003-02-01 10:00:00\"" >>$TMPFILE
 
 ${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
 	"${srcdir}/template-test.pem" --load-certificate "${srcdir}/cert-ecc256.pem" --template \
-	"${TMPFILE}" -d 9 >${OUTFILE2} 2>&1
+	"${TMPFILE}" -d 9 >${OUTFILE2} 2>${INFOFILE}
 rc=$?
 
 # We're done.
@@ -95,25 +96,26 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-grep "Revoked at: Sat Feb 01 10:00:00 UTC 2003" "${OUTFILE2}" >/dev/null 2>&1
+grep "Revoked at: Sat Feb 01 10:00:00 UTC 2003" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL date setting didn't succeed as expected"
 	exit 1
 fi
 
-grep "Issued: Mon Mar 29 16:21:42 UTC 2004" "${OUTFILE2}" >/dev/null 2>&1
+grep "Issued: Mon Mar 29 16:21:42 UTC 2004" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL date setting didn't succeed as expected (2)"
 	exit 1
 fi
 
-grep "Next at: Wed Mar 29 13:21:42 UTC 2006" "${OUTFILE2}" >/dev/null 2>&1
+grep "Next at: Wed Mar 29 13:21:42 UTC 2006" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL date setting didn't succeed as expected (3)"
 	exit 1
 fi
 
 rm -f "${OUTFILE}"
+rm -f "${INFOFILE}"
 rm -f "${OUTFILE2}"
 rm -f "${TMPFILE}"
 
