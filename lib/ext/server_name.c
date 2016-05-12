@@ -42,6 +42,10 @@ static int _gnutls_server_name_pack(extension_priv_data_t _priv,
 				    gnutls_buffer_st * ps);
 static void _gnutls_server_name_deinit_data(extension_priv_data_t priv);
 
+int
+_gnutls_server_name_set_raw(gnutls_session_t session,
+		       gnutls_server_name_type_t type,
+		       const void *name, size_t name_length);
 
 const extension_entry_st ext_mod_server_name = {
 	.name = "SERVER NAME",
@@ -376,61 +380,19 @@ static int l_idna_to_ascii (const char *_name, unsigned length, char **output)
 }
 #endif
 
-/**
- * gnutls_server_name_set:
- * @session: is a #gnutls_session_t type.
- * @type: specifies the indicator type
- * @name: is a string that contains the server name.
- * @name_length: holds the length of name
- *
- * This function is to be used by clients that want to inform (via a
- * TLS extension mechanism) the server of the name they connected to.
- * This should be used by clients that connect to servers that do
- * virtual hosting.
- *
- * The value of @name depends on the @type type.  In case of
- * %GNUTLS_NAME_DNS, a UTF-8 null-terminated domain name string,
- * without the trailing dot, is expected.
- *
- * IPv4 or IPv6 addresses are not permitted.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
- *   otherwise a negative error code is returned.
- **/
+/* This does not do any conversion not perform any check */
 int
-gnutls_server_name_set(gnutls_session_t session,
+_gnutls_server_name_set_raw(gnutls_session_t session,
 		       gnutls_server_name_type_t type,
 		       const void *name, size_t name_length)
 {
 	int server_names, ret;
 	server_name_ext_st *priv;
 	extension_priv_data_t epriv;
-	char *idn_name = NULL;
-	int set = 0, rc;
-
-	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	if (name_length == 0) { /* unset extension */
-		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SERVER_NAME);
-		return 0;
-	}
-
-#ifdef HAVE_LIBIDN
-	rc = l_idna_to_ascii (name, name_length, &idn_name);
-	if (rc != IDNA_SUCCESS) {
-		 _gnutls_debug_log("unable to convert name %s to IDNA format: %s\n", (char*)name, idna_strerror(rc));
-		 return GNUTLS_E_IDNA_ERROR;
-	}
-	name = idn_name;
-	name_length = strlen(idn_name);
-#endif
+	int set = 0;
 
 	if (name_length > MAX_SERVER_NAME_SIZE) {
-		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
-		goto cleanup;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
 	ret =
@@ -459,6 +421,7 @@ gnutls_server_name_set(gnutls_session_t session,
 	priv->server_names[server_names - 1].type = type;
 	memcpy(priv->server_names[server_names - 1].name, name,
 	       name_length);
+	priv->server_names[server_names - 1].name[name_length] = 0;
 	priv->server_names[server_names - 1].name_length = name_length;
 
 	priv->server_names_size = server_names;
@@ -468,8 +431,61 @@ gnutls_server_name_set(gnutls_session_t session,
 					     GNUTLS_EXTENSION_SERVER_NAME,
 					     epriv);
 
-	ret = 0;
- cleanup:
+	return 0;
+}
+
+/**
+ * gnutls_server_name_set:
+ * @session: is a #gnutls_session_t type.
+ * @type: specifies the indicator type
+ * @name: is a string that contains the server name.
+ * @name_length: holds the length of name
+ *
+ * This function is to be used by clients that want to inform (via a
+ * TLS extension mechanism) the server of the name they connected to.
+ * This should be used by clients that connect to servers that do
+ * virtual hosting.
+ *
+ * The value of @name depends on the @type type.  In case of
+ * %GNUTLS_NAME_DNS, a UTF-8 null-terminated domain name string,
+ * without the trailing dot, is expected.
+ *
+ * IPv4 or IPv6 addresses are not permitted to be set by this function.
+ * If the function is called with a name of @name_length zero it will clear
+ * all server names set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int
+gnutls_server_name_set(gnutls_session_t session,
+		       gnutls_server_name_type_t type,
+		       const void *name, size_t name_length)
+{
+	int ret, rc;
+	char *idn_name = NULL;
+
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (name_length == 0) { /* unset extension */
+		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SERVER_NAME);
+		return 0;
+	}
+
+#ifdef HAVE_LIBIDN
+	rc = l_idna_to_ascii (name, name_length, &idn_name);
+	if (rc != IDNA_SUCCESS) {
+		 _gnutls_debug_log("unable to convert name %s to IDNA format: %s\n", (char*)name, idna_strerror(rc));
+		 return GNUTLS_E_IDNA_ERROR;
+	}
+	name = idn_name;
+	name_length = strlen(idn_name);
+#endif
+
+	ret = _gnutls_server_name_set_raw(session, type, name, name_length);
 #ifdef HAVE_LIBIDN
 	idn_free(idn_name);
 #endif
