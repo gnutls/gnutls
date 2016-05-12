@@ -83,7 +83,8 @@ To append certificates, or CRLs in the structure the following functions are pro
 
 The available operations to access hash functions and hash-MAC (HMAC) algorithms
 are shown below. HMAC algorithms provided keyed hash functionality. The supported MAC and HMAC
-algorithms are listed in @ref{gnutls_mac_algorithm_t}.
+algorithms are listed in @ref{gnutls_mac_algorithm_t}. Note that, despite the @code{hmac} part 
+in the name of the MAC functions listed below, they can be used either for HMAC or MAC operations.
 
 @showenumdesc{gnutls_mac_algorithm_t,The supported MAC and HMAC algorithms.}
 
