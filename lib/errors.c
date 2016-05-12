@@ -384,6 +384,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_HANDSHAKE_DURING_FALSE_START),
 	ERROR_ENTRY(N_("The SNI host name not recognised."),
 		    GNUTLS_E_UNRECOGNIZED_NAME),
+	ERROR_ENTRY(N_("There was an issue converting to or from UTF8."),
+		    GNUTLS_E_IDNA_ERROR),
 	{NULL, NULL, 0}
 };
 
