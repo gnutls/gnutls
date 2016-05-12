@@ -17,6 +17,9 @@ See the end for copying conditions.
 ** libgnutls: gnutls_certificate_set_key() was enhanced to import the DNS
    name of the certificates if the provided names are NULL.
 
+** libgnutls: when receiving SNI names, only save and expose to application
+   the supported DNS names.
+
 ** libgnutls: when importing the certificate names at the
    gnutls_certificate_set* functions, only consider the CN as a fallback
    if DNS names are provided via the alternative name extension.
