@@ -68,7 +68,7 @@ static int
 _gnutls_server_name_recv_params(gnutls_session_t session,
 				const uint8_t * data, size_t _data_size)
 {
-	int i;
+	int i, j;
 	const unsigned char *p;
 	uint16_t len, type;
 	ssize_t data_size = _data_size;
@@ -128,10 +128,8 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		priv->server_names_size = server_names;
-
 		p = data + 2;
-		for (i = 0; i < server_names; i++) {
+		for (j = i = 0; i < server_names; i++) {
 			type = *p;
 			p++;
 
@@ -141,13 +139,17 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 			switch (type) {
 			case 0:	/* NAME_DNS */
 				if (len < MAX_SERVER_NAME_SIZE) {
-					memcpy(priv->server_names[i].name,
+					memcpy(priv->server_names[j].name,
 					       p, len);
-					priv->server_names[i].name[len] = 0;
-					priv->server_names[i].name_length =
-					    len;
-					priv->server_names[i].type =
-					    GNUTLS_NAME_DNS;
+					priv->server_names[j].name[len] = 0;
+					priv->server_names[j].name_length =
+					    strlen((char*)priv->server_names[j].name);
+					if (priv->server_names[j].name_length == len) {
+						/* valid ascii with no embedded NULL */
+						priv->server_names[j].type =
+						    GNUTLS_NAME_DNS;
+						j++;
+					}
 					break;
 				}
 			}
@@ -155,6 +157,8 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 			/* move to next record */
 			p += len;
 		}
+
+		priv->server_names_size = j;
 
 		epriv = priv;
 		_gnutls_ext_set_session_data(session,
@@ -184,7 +188,6 @@ _gnutls_server_name_send_params(gnutls_session_t session,
 					 &epriv);
 	if (ret < 0)
 		return 0;
-
 
 	/* this function sends the client extension data (dnsname)
 	 */
