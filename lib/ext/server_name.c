@@ -276,8 +276,9 @@ _gnutls_server_name_send_params(gnutls_session_t session,
  * and so on.  If no name with the given index exists
  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
- *   otherwise a negative error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, on UTF-8
+ *  decoding error %GNUTLS_E_IDNA_ERROR is returned, otherwise a negative
+ *  error code is returned.
  **/
 int
 gnutls_server_name_get(gnutls_session_t session, void *data,
