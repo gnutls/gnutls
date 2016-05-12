@@ -106,8 +106,12 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
+/* internal function */
+int _gnutls_server_name_set_raw(gnutls_session_t session,
+				gnutls_server_name_type_t type,
+				const void *name, size_t name_length);
 
-static void client(int fd, const char *name, unsigned name_len)
+static void client(int fd, unsigned raw, const char *name, unsigned name_len)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -138,7 +142,10 @@ static void client(int fd, const char *name, unsigned name_len)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
-	gnutls_server_name_set(session, GNUTLS_NAME_DNS, name, name_len);
+	if (raw)
+		_gnutls_server_name_set_raw(session, GNUTLS_NAME_DNS, name, name_len);
+	else
+		gnutls_server_name_set(session, GNUTLS_NAME_DNS, name, name_len);
 
 	/* Perform the TLS handshake
 	 */
@@ -244,19 +251,23 @@ static void server(int fd, const char *name, unsigned name_len)
 	buffer_size = sizeof(buffer);
 	ret = gnutls_server_name_get(session, buffer, &buffer_size, &type, 0);
 
-	if ((name == NULL || name[0] == 0) && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if ((name == NULL || name[0] == 0) && (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || ret == GNUTLS_E_IDNA_ERROR)) {
 		/* expected */
 		if (debug)
 			success("server: empty name matches\n");
 	} else if (ret < 0) {
-		fail("server: server_name: %s\n", gnutls_strerror(ret));
+		fail("server: server_name: %s/%d\n", gnutls_strerror(ret), ret);
 	} else {
 		if (name == NULL || name[0] == 0) {
 			fail("server: did not received expected name\n");
 			exit(1);
 		}
+		if (buffer_size != strlen(buffer)) {
+			fail("server: received name '%s/%d/%d', with embedded null\n", buffer, (int)buffer_size, (int)strlen(buffer));
+			exit(1);
+		}
 		if (name_len != buffer_size || memcmp(name, buffer, name_len) != 0) {
-			fail("server: received name '%s', expected '%s'\n", buffer, name);
+			fail("server: received name '%s/%d', expected '%s/%d'\n", buffer, (int)buffer_size, name, (int)name_len);
 			exit(1);
 		}
 		if (debug)
@@ -280,7 +291,10 @@ static void server(int fd, const char *name, unsigned name_len)
 		success("server: finished\n");
 }
 
-static void start(const char *name, unsigned len)
+/* name: the name sent by client
+ * server_exp: the name which should be expected by the server to see
+ */
+static void start(unsigned raw, const char *name, unsigned len, const char *server_exp, unsigned server_exp_len)
 {
 	int fd[2];
 	int ret;
@@ -301,11 +315,11 @@ static void start(const char *name, unsigned len)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0], name, len);
+		server(fd[0], server_exp, server_exp_len);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
-		client(fd[1], name, len);
+		client(fd[1], raw, name, len);
 		exit(0);
 	}
 }
@@ -331,10 +345,14 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	start(NULL, 0);
-	start("", 0);
-	start("test.example.com", strlen("test.example.com"));
-	start("longtest.example.com.", strlen("longtest.example.com"));
+	start(0, NULL, 0, NULL, 0);
+	start(0, "", 0, "", 0);
+	start(0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"));
+	start(0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"));
+	/* test invalid UTF8 */
+	start(1, "invalid\xff.example.com.", sizeof("invalid\xff.example.com")-1, NULL, 0);
+	/* test embedded NULL */
+	start(1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0);
 }
 
 #endif				/* _WIN32 */
