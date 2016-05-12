@@ -372,6 +372,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_SOCKETS_INIT_ERROR),
 	ERROR_ENTRY(N_("Error in public key generation."),
 		    GNUTLS_E_PK_GENERATION_ERROR),
+	ERROR_ENTRY(N_("There was an issue converting to or from UTF8."),
+		    GNUTLS_E_IDNA_ERROR),
 	{NULL, NULL, 0}
 };
 
