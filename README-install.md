@@ -105,22 +105,7 @@ commits.  Please see http://www.gnutls.org/lists.html.
 LICENSING
 =========
 
-Since GnuTLS version 3.1.10, the core library has been released under
-the GNU Lesser General Public License (LGPL) version 2.1 or later.
-
-Note, however, that version 6.0.0 and later of the gmplib library used
-by GnuTLS are distributed under a LGPLv3+ or GPLv2+ dual license, and
-as such binaries of this library need to adhere to either LGPLv3+ or
-GPLv2+ license.
-
-The GNU LGPL applies to the main GnuTLS library, while the
-included applications as well as gnutls-openssl 
-library are under the GNU GPL version 3.  The gnutls library is 
-located in the lib/ and libdane/ directories, while the applications
-in src/ and, the gnutls-openssl library is at extra/.
-
-For any copyright year range specified as YYYY-ZZZZ in this package
-note that the range specifies every single year in that closed interval.
+See the [LICENSE](LICENSE) file.
 
 
 BUGS
