@@ -22,13 +22,16 @@
 
 srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv${EXEEXT}} -q"
-PORT="${PORT:-5445}"
 
+. "${srcdir}/../scripts/common.sh"
 
-$SERV -p "${PORT}" --echo --priority "NORMAL:+ANON-DH" --dhparams "${srcdir}/params.dh" >/dev/null 2>&1 &
+eval "${GETPORT}"
+
+launch_server $$ --echo --priority "NORMAL:+ANON-DH" --dhparams "${srcdir}/params.dh"
 PID=$!
+wait_server ${PID}
 
-sleep 2
+export PORT
 
 ./eagain-cli
 if [ $? != 0 ]; then

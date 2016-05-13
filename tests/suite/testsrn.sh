@@ -36,11 +36,10 @@ fi
 
 . "${srcdir}/../scripts/common.sh"
 
-PORT="${PORT:-${RPORT}}"
-
 echo "Checking Safe renegotiation"
 
-launch_server $$ --echo --priority NORMAL:+ANON-DH:%PARTIAL_RENEGOTIATION --dhparams "${srcdir}/params.dh" >/dev/null 2>&1 &
+eval "${GETPORT}"
+launch_server $$ --echo --priority NORMAL:+ANON-DH:%PARTIAL_RENEGOTIATION --dhparams "${srcdir}/params.dh"
 PID=$!
 wait_server ${PID}
 
@@ -62,9 +61,9 @@ ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANO
 
 kill ${PID}
 wait
-sleep 5
 
-launch_server $$  --echo --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION --dhparams "${srcdir}/params.dh" >/dev/null &
+eval "${GETPORT}"
+launch_server $$  --echo --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION --dhparams "${srcdir}/params.dh"
 PID=$!
 wait_server ${PID}
 
@@ -82,9 +81,9 @@ ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANO
 
 kill ${PID}
 wait
-sleep 5
 
-launch_server $$ --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --dhparams "${srcdir}/params.dh" >/dev/null &
+eval "${GETPORT}"
+launch_server $$ --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --dhparams "${srcdir}/params.dh"
 PID=$!
 wait_server ${PID}
 
