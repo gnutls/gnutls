@@ -40,6 +40,7 @@ void doit(void)
 
 #if !defined(_WIN32)
 # include <signal.h>
+# include <unistd.h>
 
 static void exit_77(int signo)
 {
