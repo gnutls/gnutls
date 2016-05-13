@@ -34,11 +34,10 @@ fi
 
 . "${srcdir}/../scripts/common.sh"
 
-PORT="${PORT:-$RPORT}"
-
 echo "Checking OpenPGP certificate verification"
 
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-127.0.0.1-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg" >/dev/null 2>&1 &
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-127.0.0.1-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
 PID=$!
 wait_server ${PID}
 
@@ -59,7 +58,8 @@ ${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" localhost --priority NORMAL:+CTYPE-OP
 kill ${PID}
 wait
 
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-localhost-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg" >/dev/null 2>&1 &
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-localhost-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
 PID=$!
 wait_server ${PID}
 
@@ -76,7 +76,8 @@ ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.
 kill ${PID}
 wait
 
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-all-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg" >/dev/null 2>&1 &
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-all-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
 PID=$!
 wait_server ${PID}
 
