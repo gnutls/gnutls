@@ -138,7 +138,7 @@ mingw32-make check
 
 # Contributing
 
-If you wish to contribute, you may read more about our [coding style](doc/README.CODING_STYLE).
+If you wish to contribute, you may read more about our [coding style](CONTRIBUTING.md).
 Note that when contributing code that is not assigned to FSF, you will
 need to assert that the contribution is in accordance to the "Developer's
 Certificate of Origin" as found in the file [DCO.txt](doc/DCO.txt).
