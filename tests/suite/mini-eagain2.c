@@ -68,7 +68,7 @@ static const char
  */
 static int tcp_connect(void)
 {
-	const char *PORT = "5445";
+	const char *PORT = getenv("PORT");
 	const char *SERVER = "127.0.0.1";	//verisign.com
 	int err, sd;
 	int flag = 1, curstate = 0;

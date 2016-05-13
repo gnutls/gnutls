@@ -30,12 +30,14 @@ if test "${WINDIR}" != "";then
   exit 77
 fi 
 
-. $srcdir/../scripts/common.sh
+. "${srcdir}/../scripts/common.sh"
 
 echo "Checking OpenPGP certificate verification"
 
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile $srcdir/srv-public-127.0.0.1-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
-wait_server $PID
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-127.0.0.1-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
+PID=$!
+wait_server ${PID}
 
 # give the server a chance to initialize
 
@@ -54,8 +56,10 @@ $CLI $DEBUG -p $PORT localhost --priority NORMAL:+CTYPE-OPENPGP --pgpkeyring $sr
 kill $PID
 wait
 
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile $srcdir/srv-public-localhost-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
-wait_server $PID
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-localhost-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
+PID=$!
+wait_server ${PID}
 
 echo | $CLI $DEBUG --priority NORMAL:+CTYPE-OPENPGP -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
   fail $PID "Connection to unverified IP address should have failed! (error code $?)" $?
@@ -70,8 +74,10 @@ $CLI $DEBUG --priority NORMAL:+CTYPE-OPENPGP -p $PORT 127.0.0.2 --pgpkeyring $sr
 kill $PID
 wait
 
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile $srcdir/srv-public-all-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
-wait_server $PID
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-all-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
+PID=$!
+wait_server ${PID}
 
 # give the server a chance to initialize
 echo | $CLI $DEBUG --priority NORMAL:+CTYPE-OPENPGP -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null || \
