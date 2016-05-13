@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
 static void handle_sigill(int sig)
 {
-	exit(0);
+	_exit(0);
 }
 
 static void tls_log_func(int level, const char *str)

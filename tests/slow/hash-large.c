@@ -43,7 +43,7 @@ void doit(void)
 
 static void exit_77(int signo)
 {
-	exit(77);
+	_exit(77);
 }
 #endif
 

@@ -59,8 +59,7 @@ int main()
 static
 void sigpipe(int sig)
 {
-	fail("sigpipe received\n");
-	exit(1);
+	_exit(2);
 }
 
 #define BUF_SIZE 64
