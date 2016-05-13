@@ -3,7 +3,7 @@ LICENSING
 
 Since GnuTLS version 3.1.10, the core library is released under
 the GNU Lesser General Public License (LGPL) version 2.1 or later
-(see COPYING.LESSER for the license terms).
+(see doc/COPYING.LESSER for the license terms).
 
 The GNU LGPL applies to the main GnuTLS library, while the
 included applications as well as gnutls-openssl 
