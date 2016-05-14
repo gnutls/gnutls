@@ -193,7 +193,9 @@ typedef struct {
 		mac_hd_st mac;
 	} mac;
 	unsigned int is_mac:1;
+#ifdef ENABLE_SSL3
 	unsigned int ssl_hmac:1;
+#endif
 	unsigned int non_null:1;
 	unsigned int etm:1;
 	size_t tag_size;

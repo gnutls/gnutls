@@ -139,7 +139,9 @@ void doit(void)
 	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2", GNUTLS_TLS1_2);
 	reset_buffers();
+#ifdef ENABLE_SSL3
 	try("NORMAL:-VERS-TLS-ALL:+VERS-SSL3.0", -1);
 	reset_buffers();
+#endif
 	gnutls_global_deinit();
 }

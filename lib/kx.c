@@ -126,6 +126,7 @@ generate_normal_master(gnutls_session_t session,
 		       session->security_parameters.server_random,
 		       GNUTLS_RANDOM_SIZE);
 
+#ifdef ENABLE_SSL3
 		if (get_num_version(session) == GNUTLS_SSL3) {
 			ret =
 			    _gnutls_ssl3_generate_random(premaster->data,
@@ -134,7 +135,8 @@ generate_normal_master(gnutls_session_t session,
 							 GNUTLS_MASTER_SIZE,
 							 session->security_parameters.
 							 master_secret);
-		} else {
+		} else
+#endif
 			ret =
 			    _gnutls_PRF(session, premaster->data, premaster->size,
 					MASTER_SECRET, MASTER_SECRET_SIZE,
@@ -142,7 +144,6 @@ generate_normal_master(gnutls_session_t session,
 					GNUTLS_MASTER_SIZE,
 					session->security_parameters.
 					master_secret);
-		}
 	} else {
 		gnutls_datum_t shash = {NULL, 0};
 

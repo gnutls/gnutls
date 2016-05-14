@@ -126,7 +126,8 @@ int
 _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		  const void *text, size_t textlen, void *digest);
 
-/* help functions */
+#ifdef ENABLE_SSL3
+/* helper functions */
 int _gnutls_mac_init_ssl3(digest_hd_st *, const mac_entry_st * e,
 			  void *key, int keylen);
 int _gnutls_mac_deinit_ssl3(digest_hd_st * handle, void *digest);
@@ -141,6 +142,7 @@ int _gnutls_ssl3_hash_md5(const void *first, int first_len,
 
 int _gnutls_mac_deinit_ssl3_handshake(digest_hd_st * handle, void *digest,
 				      uint8_t * key, uint32_t key_size);
+#endif
 
 inline static int IS_SHA(gnutls_digest_algorithm_t algo)
 {

@@ -173,7 +173,8 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 			     const mac_entry_st * me,
 			     const gnutls_datum_t * mac_key,
 			     unsigned etm,
-			     unsigned ssl_hmac, int enc)
+			     unsigned ssl_hmac,
+			     int enc)
 {
 	int ret;
 
@@ -197,6 +198,7 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 
 	if (me->id != GNUTLS_MAC_AEAD) {
 		handle->is_mac = 1;
+#ifdef ENABLE_SSL3
 		handle->ssl_hmac = ssl_hmac;
 
 		if (ssl_hmac)
@@ -205,6 +207,7 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 						  mac_key->data,
 						  mac_key->size);
 		else
+#endif
 			ret =
 			    _gnutls_mac_init(&handle->mac.mac, me,
 					     mac_key->data, mac_key->size);
@@ -230,7 +233,8 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 
 }
 
-#define MAC(handle, text, textlen) \
+#ifdef ENABLE_SSL3
+# define MAC(handle, text, textlen) \
 		if (handle->ssl_hmac) { \
 			ret = \
 			    _gnutls_hash(&handle->mac.dig, text, textlen); \
@@ -239,6 +243,12 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 		} \
 		if (unlikely(ret < 0)) \
 			return gnutls_assert_val(ret)
+#else
+# define MAC(handle, text, textlen) \
+		ret = _gnutls_mac(&handle->mac.mac, text, textlen); \
+		if (unlikely(ret < 0)) \
+			return gnutls_assert_val(ret)
+#endif
 
 int _gnutls_auth_cipher_add_auth(auth_cipher_hd_st * handle,
 				 const void *text, int textlen)
@@ -404,17 +414,18 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void *tag,
 			    int tag_size)
 {
-	int ret;
-
 	if (handle->is_mac) {
+#ifdef ENABLE_SSL3
+		int ret;
+
 		if (handle->ssl_hmac) {
 			ret =
 			    _gnutls_mac_output_ssl3(&handle->mac.dig, tag);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
-		} else {
+		} else
+#endif
 			_gnutls_mac_output(&handle->mac.mac, tag);
-		}
 	} else if (_gnutls_cipher_is_aead(&handle->cipher)) {
 		_gnutls_cipher_tag(&handle->cipher, tag, tag_size);
 	} else
@@ -426,9 +437,11 @@ int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void *tag,
 void _gnutls_auth_cipher_deinit(auth_cipher_hd_st * handle)
 {
 	if (handle->is_mac) {
+#ifdef ENABLE_SSL3
 		if (handle->ssl_hmac)	/* failure here doesn't matter */
 			_gnutls_mac_deinit_ssl3(&handle->mac.dig, NULL);
 		else
+#endif
 			_gnutls_mac_deinit(&handle->mac.mac, NULL);
 	}
 	if (handle->non_null != 0)

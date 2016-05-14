@@ -252,6 +252,7 @@ void _gnutls_mac_deinit(mac_hd_st * handle, void *digest)
 	handle->handle = NULL;
 }
 
+#ifdef ENABLE_SSL3
 inline static int get_padsize(gnutls_mac_algorithm_t algorithm)
 {
 	switch (algorithm) {
@@ -532,3 +533,5 @@ _gnutls_ssl3_generate_random(void *secret, int secret_len,
 
 	return 0;
 }
+
+#endif

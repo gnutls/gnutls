@@ -265,6 +265,7 @@ int _gnutls_set_server_random(gnutls_session_t session, uint8_t * rnd)
 	return 0;
 }
 
+#ifdef ENABLE_SSL3
 /* Calculate The SSL3 Finished message
  */
 #define SSL3_CLIENT_MSG "CLNT"
@@ -328,6 +329,7 @@ _gnutls_ssl3_finished(gnutls_session_t session, int type, uint8_t * ret,
 
 	return 0;
 }
+#endif
 
 /* Hash the handshake messages as required by TLS 1.0
  */
@@ -693,6 +695,7 @@ static int _gnutls_send_finished(gnutls_session_t session, int again)
 		if (unlikely(vers == NULL))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+#ifdef ENABLE_SSL3
 		if (vers->id == GNUTLS_SSL3) {
 			ret =
 			    _gnutls_ssl3_finished(session,
@@ -701,12 +704,15 @@ static int _gnutls_send_finished(gnutls_session_t session, int again)
 						  entity, data, 1);
 			_mbuffer_set_udata_size(bufel, 36);
 		} else {	/* TLS 1.0+ */
+#endif
 			ret = _gnutls_finished(session,
 					       session->
 					       security_parameters.entity,
 					       data, 1);
 			_mbuffer_set_udata_size(bufel, 12);
+#ifdef ENABLE_SSL3
 		}
+#endif
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -776,9 +782,11 @@ static int _gnutls_recv_finished(gnutls_session_t session)
 	vrfy = buf.data;
 	vrfy_size = buf.length;
 
+#ifdef ENABLE_SSL3
 	if (vers->id == GNUTLS_SSL3)
 		data_size = 36;
 	else
+#endif
 		data_size = 12;
 
 	if (vrfy_size != data_size) {
@@ -787,17 +795,18 @@ static int _gnutls_recv_finished(gnutls_session_t session)
 		goto cleanup;
 	}
 
+#ifdef ENABLE_SSL3
 	if (vers->id == GNUTLS_SSL3) {
 		ret =
 		    _gnutls_ssl3_finished(session,
 					  (session->security_parameters.
 					   entity + 1) % 2, data, 0);
-	} else {		/* TLS 1.0 */
+	} else /* TLS 1.0+ */
+#endif
 		ret =
 		    _gnutls_finished(session,
 				     (session->security_parameters.entity +
 				      1) % 2, data, 0);
-	}
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -899,6 +908,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 							 */
 
 	for (i = 0; i < datalen; i += 2) {
+#ifdef ENABLE_SSL3 /* No need to support certain SCSV's without SSL 3.0 */
 		/* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
 		if (session->internals.priorities.sr != SR_DISABLED &&
 		    data[i] == GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR &&
@@ -912,6 +922,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 				return retval;
 			}
 		}
+#endif
 
 		/* TLS_FALLBACK_SCSV */
 		if (data[i] == GNUTLS_FALLBACK_SCSV_MAJOR &&
@@ -1869,6 +1880,7 @@ copy_ciphersuites(gnutls_session_t session,
 		    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
 	cipher_suites_size = ret;
+#ifdef ENABLE_SSL3
 	if (add_scsv) {
 		cipher_suites[cipher_suites_size] = 0x00;
 		cipher_suites[cipher_suites_size + 1] = 0xff;
@@ -1878,6 +1890,7 @@ copy_ciphersuites(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
+#endif
 
 	if (session->internals.priorities.fallback) {
 		cipher_suites[cipher_suites_size] =
@@ -1977,7 +1990,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		if (hver == NULL) {
 			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
+			return GNUTLS_E_NO_PRIORITIES_WERE_SET;
 		}
 
 		if (unlikely(session->internals.default_hello_version[0] != 0)) {
@@ -2001,8 +2014,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 		if (session->internals.priorities.min_record_version != 0) {
-			/* Advertize the SSL 3.0 record packet version in
-			 * record packets during the handshake.
+			/* Advertize the lowest supported (SSL 3.0) record packet
+			 * version in record packets during the handshake.
 			 * That is to avoid confusing implementations
 			 * that do not support TLS 1.2 and don't know
 			 * how 3,3 version of record packets look like.
@@ -2011,7 +2024,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 			if (v == NULL) {
 				gnutls_assert();
-				return GNUTLS_E_INTERNAL_ERROR;
+				return GNUTLS_E_NO_PRIORITIES_WERE_SET;
 			} else {
 				_gnutls_record_set_default_version(session,
 								   v->major, v->minor);
@@ -2063,8 +2076,9 @@ static int send_client_hello(gnutls_session_t session, int again)
 		}
 
 		/* Copy the ciphersuites.
-		 *
-		 * If using SSLv3 Send TLS_RENEGO_PROTECTION_REQUEST SCSV for MITM
+		 */
+#ifdef ENABLE_SSL3
+		/* If using SSLv3 Send TLS_RENEGO_PROTECTION_REQUEST SCSV for MITM
 		 * prevention on initial negotiation (but not renegotiation; that's
 		 * handled with the RI extension below).
 		 */
@@ -2079,6 +2093,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 				_gnutls_extension_list_add(session,
 						   GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
 		} else
+#endif
 			ret =
 			    copy_ciphersuites(session, &extdata,
 					      FALSE);

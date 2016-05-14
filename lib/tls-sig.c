@@ -469,6 +469,7 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 		     session->internals.handshake_hash_buffer.data,
 		     session->internals.handshake_hash_buffer_prev_len);
 
+#ifdef ENABLE_SSL3
 	if (ver->id == GNUTLS_SSL3) {
 		ret = _gnutls_generate_master(session, 1);
 		if (ret < 0) {
@@ -495,9 +496,12 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 		}
 	} else {
+#endif
 		_gnutls_hash_deinit(&td_md5, concat);
 		_gnutls_hash_deinit(&td_sha, &concat[16]);
+#ifdef ENABLE_SSL3
 	}
+#endif
 
 	dconcat.data = concat;
 	dconcat.size = 20 + 16;	/* md5+ sha */
@@ -610,6 +614,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 		     session->internals.handshake_hash_buffer.data,
 		     session->internals.handshake_hash_buffer.length);
 
+#ifdef ENABLE_SSL3
 	if (ver->id == GNUTLS_SSL3) {
 		ret = _gnutls_generate_master(session, 1);
 		if (ret < 0) {
@@ -626,6 +631,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else
+#endif
 		_gnutls_hash_deinit(&td_sha, &concat[16]);
 
 	/* ensure 1024 bit DSA keys are used */
@@ -648,6 +654,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 			     session->internals.handshake_hash_buffer.
 			     length);
 
+#ifdef ENABLE_SSL3
 		if (ver->id == GNUTLS_SSL3) {
 			ret =
 			    _gnutls_mac_deinit_ssl3_handshake(&td_md5,
@@ -658,6 +665,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		} else
+#endif
 			_gnutls_hash_deinit(&td_md5, concat);
 
 		dconcat.data = concat;

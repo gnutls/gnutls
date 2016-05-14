@@ -147,13 +147,16 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 	ssize_t data_size = _data_size;
 	gnutls_datum_t rndkey = {NULL, 0};
 
+#ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3) {
 		/* SSL 3.0 
 		 */
 		ciphertext.data = data;
 		ciphertext.size = data_size;
-	} else {
-		/* TLS 1.0
+	} else
+#endif
+	{
+		/* TLS 1.0+
 		 */
 		DECR_LEN(data_size, 2);
 		ciphertext.data = &data[2];
@@ -298,12 +301,15 @@ _gnutls_gen_rsa_client_kx(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 
+#ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		_gnutls_buffer_replace_data(data, &sdata);
 
 		return data->length;
-	} else {		/* TLS 1 */
+	} else
+#endif
+	{		/* TLS 1.x */
 		ret =
 		    _gnutls_buffer_append_data_prefix(data, 16, sdata.data,
 						      sdata.size);
@@ -311,5 +317,4 @@ _gnutls_gen_rsa_client_kx(gnutls_session_t session,
 		_gnutls_free_datum(&sdata);
 		return ret;
 	}
-
 }

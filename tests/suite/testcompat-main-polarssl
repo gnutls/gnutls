@@ -93,43 +93,6 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 
 	eval "${GETPORT}"
 
-	# SSL 3.0 is disabled in debian's polarssl
-	if test 0 = 1; then
-		echo "Check SSL 3.0 with RSA ciphersuite"
-		launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
-		PID=$!
-		wait_server ${PID}
-
-		"${POLARSSL_CLI}" server_port="${PORT}" server_name=localhost max_version=ssl3 crt_file="${CLI_CERT}" key_file="${CLI_KEY}" ca_file="${CA_CERT}" </dev/null >>"${LOGFILE}" 2>&1 || \
-			fail ${PID} "Failed"
-
-		kill ${PID}
-		wait
-
-		echo "Check SSL 3.0 with DHE-RSA ciphersuite"
-		launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
-		PID=$!
-		wait_server ${PID}
-
-		"${POLARSSL_CLI}" server_name=localhost server_port="${PORT}" max_version=ssl3 crt_file="${CLI_CERT}" key_file="${CLI_KEY}" ca_file="${CA_CERT}" </dev/null >>"${LOGFILE}" 2>&1 || \
-			fail ${PID} "Failed"
-
-		kill ${PID}
-		wait
-
-		# No DSS for polarssl
-		#echo "Check SSL 3.0 with DHE-DSS ciphersuite"
-		#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
-		#PID=$!
-		#wait_server ${PID}
-
-		#"${POLARSSL_CLI}" server_name=localhost server_port="${PORT}" max_version=ssl3 crt_file="${CLI_CERT}" key_file="${CLI_KEY}" ca_file="${CA_CERT}" </dev/null >>"${LOGFILE}" 2>&1 || \
-		#  fail ${PID} "Failed"
-		#
-		#kill ${PID}
-		#wait
-	fi
-
 	#TLS 1.0
 
 	echo "Check TLS 1.0 with DHE-RSA ciphersuite"

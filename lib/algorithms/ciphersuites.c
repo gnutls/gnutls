@@ -30,6 +30,10 @@
 #include <auth/anon.h>
 #include <auth/psk.h>
 
+#ifndef ENABLE_SSL3
+# define GNUTLS_SSL3 GNUTLS_TLS1
+#endif
+
 /* Cipher SUITES */
 #define ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version ) \
 	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256}

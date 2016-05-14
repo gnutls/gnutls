@@ -140,6 +140,21 @@ LIBTASN1_MINIMUM=4.3
     AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
   ])
 
+  ac_enable_ssl3=yes
+  AC_MSG_CHECKING([whether to disable the SSL 3.0 protocol])
+  AC_ARG_ENABLE(ssl3-support,
+    AS_HELP_STRING([--disable-ssl3-support],
+                   [disable support for the SSL 3.0 protocol]),
+    ac_enable_ssl3=$enableval)
+  if test x$ac_enable_ssl3 != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_SSL3], 1, [enable SSL3.0 support])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl3" != "no")
+
   ac_enable_srtp=yes
   AC_MSG_CHECKING([whether to disable DTLS-SRTP extension])
   AC_ARG_ENABLE(dtls-srtp-support,

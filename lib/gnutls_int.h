@@ -490,7 +490,10 @@ typedef struct {
 	bool extensions;	/* whether it supports extensions */
 	bool selectable_sighash;	/* whether signatures can be selected */
 	bool selectable_prf;	/* whether the PRF is ciphersuite-defined */
-	bool obsolete;		/* Do not use this protocol version as record version */
+
+	/* if SSL3 is disabled this flag indicates that this protocol is a placeholder,
+	 * otherwise it prevents this protocol from being set as record version */
+	bool obsolete;
 	bool false_start;	/* That version can be used with false start */
 } version_entry_st;
 

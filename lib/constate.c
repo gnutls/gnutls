@@ -85,20 +85,21 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 	       session->security_parameters.server_random,
 	       GNUTLS_RANDOM_SIZE);
 
+#ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3) {	/* SSL 3 */
 		ret =
 		    _gnutls_ssl3_generate_random
 		    (session->security_parameters.master_secret,
 		     GNUTLS_MASTER_SIZE, rnd, 2 * GNUTLS_RANDOM_SIZE,
 		     block_size, key_block);
-	} else {		/* TLS 1.0 */
+	} else /* TLS 1.0+ */
+#endif
 		ret =
 		    _gnutls_PRF(session,
 				session->security_parameters.master_secret,
 				GNUTLS_MASTER_SIZE, keyexp, keyexp_length,
 				rnd, 2 * GNUTLS_RANDOM_SIZE, block_size,
 				key_block);
-	}
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);

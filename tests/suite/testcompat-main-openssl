@@ -88,7 +88,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		echo "** Modifier: ${ADD}"
 	fi
 
-	if test "${HAVE_SSL3}" != 1; then
+	if test "${HAVE_SSL3}" != 1 && test "{ENABLE_SSL3}" = 1; then
 		# It seems debian disabled SSL 3.0 completely on openssl
 
 		eval "${GETPORT}"
@@ -423,7 +423,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		echo "** Modifier: ${ADD}"
 	fi
 
-	if test "${HAVE_SSL3}" != 1; then
+	if test "${HAVE_SSL3}" != 1 && test "{ENABLE_SSL3}" = 1; then
 
 		echo "Check SSL 3.0 with RSA ciphersuite"
 		eval "${GETPORT}"
