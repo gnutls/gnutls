@@ -838,3 +838,10 @@ tests/set_x509_key
 tests/set_x509_key_file_der
 tests/set_x509_pkcs12_key
 GnuTLS-*-coverage/
+tests/tls1.2-cert-key-exchange
+tests/tls1.1-cert-key-exchange
+tests/tls1.0-cert-key-exchange
+tests/dtls1.2-cert-key-exchange
+tests/dtls1.0-cert-key-exchange
+tests/ssl3.0-cert-key-exchange
+tests/crt_apis
