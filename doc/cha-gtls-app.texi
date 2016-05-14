@@ -1316,7 +1316,7 @@ Enabling the 128-bit secure ciphers, while disabling TLS 1.0 and enabling compre
 
 Enabling the 128-bit and 192-bit secure ciphers, while disabling all TLS versions 
 except TLS 1.2:
-    "SECURE128:+SECURE192:-VERS-TLS-ALL:+VERS-TLS1.2"
+    "SECURE128:+SECURE192:-VERS-ALL:+VERS-TLS1.2"
 @end example
 
 @node Selecting cryptographic key sizes
@@ -1761,7 +1761,7 @@ NORMAL:%COMPAT
 For very old broken peers that do not tolerate TLS version numbers over TLS 1.0
 another priority string is:
 @verbatim
-NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
+NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
 @end verbatim
 This priority string will in addition to above, only enable SSL 3.0 and 
 TLS 1.0 as protocols. 
