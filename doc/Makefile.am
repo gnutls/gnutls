@@ -22,7 +22,7 @@
 EXTRA_DIST = TODO certtool.cfg gnutls.pdf gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
 	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions \
-	doc.mk
+	doc.mk COPYING COPYING.LESSER
 
 SUBDIRS = examples cyclo scripts credentials latex
 if ENABLE_GTK_DOC
