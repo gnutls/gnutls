@@ -448,7 +448,8 @@ gnutls_sign_algorithm_get_requested(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  *
  * Returns the signature algorithm that is (or will be) used in this 
- * session by the server to sign data.
+ * session by the server to sign data. This function should be
+ * used only with TLS 1.2 or later.
  *
  * Returns: The sign algorithm or %GNUTLS_SIGN_UNKNOWN.
  *
@@ -464,7 +465,8 @@ int gnutls_sign_algorithm_get(gnutls_session_t session)
  * @session: is a #gnutls_session_t type.
  *
  * Returns the signature algorithm that is (or will be) used in this 
- * session by the client to sign data.
+ * session by the client to sign data. This function should be
+ * used only with TLS 1.2 or later.
  *
  * Returns: The sign algorithm or %GNUTLS_SIGN_UNKNOWN.
  *
