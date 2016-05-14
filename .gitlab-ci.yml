@@ -6,7 +6,7 @@ Compile minimal library and openssl compat:
     --disable-anon-authentication --disable-dhe --disable-ecdhe --disable-openpgp-authentication
     --disable-ocsp --disable-session-tickets --disable-openssl-compatibility --disable-non-suiteb-curves
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
-    --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j4
+    --disable-ssl3 --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j4
   tags:
   - nettle3
   - linux
@@ -38,10 +38,21 @@ Build and Check with C99 and ubsan:
 Build and Check - separate build dir (x86):
   script:
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
+    ../configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
     make -j4 && make check -j4 && make local-code-coverage-output
   tags:
   - x86
+  - lcov
+  - nettle3
+  - linux
+  except:
+  - tags
+Build and Check - without SSL 3.0:
+  script:
+  - make autoreconf && mkdir -p build && cd build &&
+    ../configure --disable-ssl3 --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
+    make -j4 && make check -j4 && make local-code-coverage-output
+  tags:
   - lcov
   - nettle3
   - linux
@@ -61,7 +72,7 @@ Build with ABI-check (x86-64):
 Build and Check - clang:
   script:
   - make autoreconf && 
-    CC=clang ./configure --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
+    CC=clang ./configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -C tests -j4
   tags:
   - nettle3
@@ -71,7 +82,7 @@ Build and Check - clang:
 Build and Check in FIPS140-2 mode:
   script:
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
+    ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -j4
   tags:
   - nettle3
