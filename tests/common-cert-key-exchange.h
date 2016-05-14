@@ -33,3 +33,8 @@ void try(const char *name, const char *client_prio, gnutls_kx_algorithm_t client
 		gnutls_sign_algorithm_t server_sign_algo,
 		gnutls_sign_algorithm_t client_sign_algo,
 		unsigned client_cert);
+
+void dtls_try(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
+		gnutls_sign_algorithm_t server_sign_algo,
+		gnutls_sign_algorithm_t client_sign_algo,
+		unsigned client_cert);

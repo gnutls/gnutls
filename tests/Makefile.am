@@ -105,7 +105,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 send-client-cert custom-urls-override hex rehandshake-switch-psk-id \
 	 rehandshake-switch-srp-id base64 srpbase64 pkcs1-digest-info set_x509_key \
 	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls1.2-cert-key-exchange \
-	 tls1.1-cert-key-exchange tls1.0-cert-key-exchange ssl3.0-cert-key-exchange
+	 tls1.1-cert-key-exchange tls1.0-cert-key-exchange ssl3.0-cert-key-exchange \
+	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -122,6 +123,8 @@ resume_anon_SOURCES = resume.c
 resume_x509_CFLAGS = -DUSE_X509
 resume_x509_SOURCES = resume.c
 
+dtls1_2_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls1.2-cert-key-exchange.c common-cert-key-exchange.h
+dtls1_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls1.0-cert-key-exchange.c common-cert-key-exchange.h
 tls1_2_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls1.2-cert-key-exchange.c common-cert-key-exchange.h
 tls1_1_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls1.1-cert-key-exchange.c common-cert-key-exchange.h
 tls1_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls1.0-cert-key-exchange.c common-cert-key-exchange.h
