@@ -47,6 +47,16 @@ const extension_entry_st ext_mod_ext_master_secret = {
 	.deinit_func = NULL
 };
 
+#ifdef ENABLE_SSL3
+static inline unsigned have_only_ssl3_enabled(gnutls_session_t session)
+{
+	if (session->internals.priorities.protocol.algorithms == 1 &&
+	    session->internals.priorities.protocol.priority[0] == GNUTLS_SSL3)
+	    return 1;
+	return 0;
+}
+#endif
+
 /* 
  * In case of a server: if an EXT_MASTER_SECRET extension type is received then it
  * sets a flag into the session security parameters.
@@ -76,7 +86,8 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 
 		if (ver->id != GNUTLS_SSL3)
 			session->security_parameters.ext_master_secret = 1;
-	} else
+	/* do not enable ext master secret if SSL 3.0 is the only protocol supported by server */
+	} else if (!have_only_ssl3_enabled(session))
 #endif
 		session->security_parameters.ext_master_secret = 1;
 
@@ -98,8 +109,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 	/* this function sends the client extension data */
 #ifdef ENABLE_SSL3
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if (session->internals.priorities.protocol.algorithms == 1 &&
-		    session->internals.priorities.protocol.priority[0] == GNUTLS_SSL3)
+		if (have_only_ssl3_enabled(session))
 		    return 0; /* this extension isn't available for SSL 3.0 */
 
 		return GNUTLS_E_INT_RET_0;
