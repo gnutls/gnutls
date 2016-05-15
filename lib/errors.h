@@ -98,13 +98,13 @@ static inline
 #ifdef __GNUC__
     __attribute__ ((always_inline))
 #endif
-int gnutls_assert_val_int(int val, const char *file, int line)
+int gnutls_assert_val_int(int val, const char *file, const char *func, int line)
 {
-	_gnutls_assert_log( "ASSERT: %s[%s]:%d\n", __FILE__,__func__,__LINE__);
+	_gnutls_assert_log( "ASSERT: %s[%s]:%d\n", file,func,line);
 	return val;
 }
 
-#define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
-#define gnutls_assert_val_fatal(x) (((x)!=GNUTLS_E_AGAIN && (x)!=GNUTLS_E_INTERRUPTED)?gnutls_assert_val_int(x, __FILE__, __LINE__):(x))
+#define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __func__, __LINE__)
+#define gnutls_assert_val_fatal(x) (((x)!=GNUTLS_E_AGAIN && (x)!=GNUTLS_E_INTERRUPTED)?gnutls_assert_val_int(x, __FILE__, __func__, __LINE__):(x))
 
 #endif				/* GNUTLS_ERRORS_H */
