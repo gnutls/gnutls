@@ -100,7 +100,7 @@ static inline
 #endif
 int gnutls_assert_val_int(int val, const char *file, int line)
 {
-	_gnutls_assert_log("ASSERT: %s:%d\n", file, line);
+	_gnutls_assert_log( "ASSERT: %s[%s]:%d\n", __FILE__,__func__,__LINE__);
 	return val;
 }
 
