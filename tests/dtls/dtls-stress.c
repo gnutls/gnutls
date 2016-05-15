@@ -34,6 +34,7 @@
  *	-retransmit <n>     set retransmit timeout to <n> milliseconds (default: 100)
  *	-j <n>              run up to <n> tests in parallel
  *	-full               use full handshake with mutual certificate authentication
+ *	-resume             use resumed handshake
  *	-shello <perm>      run only one test, with the server hello flight permuted as <perm>
  *	-sfinished <perm>   run only one test, with the server finished flight permuted as <perm>
  *	-cfinished <perm>   run only one test, with the client finished flight permuted as <perm>
@@ -52,6 +53,8 @@
  * For example, -full -shello 42130 will transmit server hello flight packets in the order
  * SHelloDone, SKeyExchange, SCertificate, SCertificateRequest, SHello
  *
+ * When -resume is specified the -sfinished flight length is 3 (same as shello), cfinished is 2.
+ * The -resume option has to be combined with sfinished or cfinished.
  *
  * **** Output format ****
  *
@@ -102,11 +105,15 @@
 
 // {{{ types
 
+#define log(fmt, ...) \
+	if (debug) fprintf(stdout, "%i %s| "fmt, run_id, role_name, ##__VA_ARGS__)
+
 typedef struct {
 	int count;
 } filter_packet_state_t;
 
 typedef struct {
+	const char *name;
 	gnutls_datum_t packets[5];
 	int *order;
 	int count;
@@ -200,6 +207,14 @@ static const char *filter_names[8]
 	"SFinished"
 };
 
+static const char *filter_names_resume[]
+    = { "SHello",
+	"SChangeCipherSpec",
+	"SFinished",
+	"CChangeCipherSpec",
+	"CFinished"
+};
+
 static const char *filter_names_full[12]
     = { "SHello",
 	"SCertificate",
@@ -278,6 +293,7 @@ int debug;
 int nonblock;
 int replay;
 int full;
+int resume;
 int timeout_seconds;
 int retransmit_milliseconds;
 int run_to_end;
@@ -305,8 +321,7 @@ static void auditfn(gnutls_session_t session, const char *s)
 static void drop(const char *packet)
 {
 	if (debug) {
-		fprintf(stdout, "%i %s| dropping %s\n", run_id, role_name,
-			packet);
+		log("dropping %s\n", packet);
 	}
 }
 
@@ -334,9 +349,7 @@ static void _process_error_or_timeout(int loc, int err, time_t tdiff)
 		if (err != GNUTLS_E_TIMEDOUT || tdiff >= 60) {
 			_process_error(loc, err, 0);
 		} else {
-			fprintf(stdout,
-				"%i %s| line %i: {spurious timeout} (fatal)",
-				run_id, role_name, loc);
+			log("line %i: {spurious timeout} (fatal)", loc);
 			exit(1);
 		}
 	}
@@ -363,19 +376,25 @@ filter_packet_state_t state_packet_ClientKeyExchange = { 0 };
 filter_packet_state_t state_packet_ClientCertificateVerify = { 0 };
 filter_packet_state_t state_packet_ClientChangeCipherSpec = { 0 };
 filter_packet_state_t state_packet_ClientFinished = { 0 };
+filter_packet_state_t state_packet_ClientFinishedResume = { 0 };
 filter_packet_state_t state_packet_ServerChangeCipherSpec = { 0 };
 filter_packet_state_t state_packet_ServerFinished = { 0 };
+filter_packet_state_t state_packet_ServerFinishedResume = { 0 };
 
-filter_permute_state_t state_permute_ServerHello =
-    { {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
-filter_permute_state_t state_permute_ServerHelloFull =
-    { {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
-filter_permute_state_t state_permute_ServerFinished =
-    { {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
-filter_permute_state_t state_permute_ClientFinished =
-    { {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
-filter_permute_state_t state_permute_ClientFinishedFull =
-    { {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
+static filter_permute_state_t state_permute_ServerHello =
+    { 0, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
+static filter_permute_state_t state_permute_ServerHelloFull =
+    { 0, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
+static filter_permute_state_t state_permute_ServerFinished =
+    { 0, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
+static filter_permute_state_t state_permute_ServerFinishedResume =
+    { 0, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
+static filter_permute_state_t state_permute_ClientFinished =
+    { 0, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
+static filter_permute_state_t state_permute_ClientFinishedResume =
+    { 0, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
+static filter_permute_state_t state_permute_ClientFinishedFull =
+    { 0, {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, 0, 0 };
 
 filter_fn filter_chain[32];
 int filter_current_idx;
@@ -397,7 +416,9 @@ static void filter_clear_state(void)
 	filter_permute_state_free_buffer(&state_permute_ServerHello);
 	filter_permute_state_free_buffer(&state_permute_ServerHelloFull);
 	filter_permute_state_free_buffer(&state_permute_ServerFinished);
+	filter_permute_state_free_buffer(&state_permute_ServerFinishedResume);
 	filter_permute_state_free_buffer(&state_permute_ClientFinished);
+	filter_permute_state_free_buffer(&state_permute_ClientFinishedResume);
 	filter_permute_state_free_buffer(&state_permute_ClientFinishedFull);
 
 	memset(&state_packet_ServerHello, 0, sizeof(state_packet_ServerHello));
@@ -419,10 +440,14 @@ static void filter_clear_state(void)
 	       sizeof(state_packet_ClientChangeCipherSpec));
 	memset(&state_packet_ClientFinished, 0,
 	       sizeof(state_packet_ClientFinished));
+	memset(&state_packet_ClientFinishedResume, 0,
+	       sizeof(state_packet_ClientFinishedResume));
 	memset(&state_packet_ServerChangeCipherSpec, 0,
 	       sizeof(state_packet_ServerChangeCipherSpec));
 	memset(&state_packet_ServerFinished, 0,
 	       sizeof(state_packet_ServerFinished));
+	memset(&state_packet_ServerFinishedResume, 0,
+	       sizeof(state_packet_ServerFinishedResume));
 	memset(&state_permute_ServerHello, 0,
 	       sizeof(state_permute_ServerHello));
 	memset(&state_permute_ServerHelloFull, 0,
@@ -431,8 +456,18 @@ static void filter_clear_state(void)
 	       sizeof(state_permute_ServerFinished));
 	memset(&state_permute_ClientFinished, 0,
 	       sizeof(state_permute_ClientFinished));
+	memset(&state_permute_ClientFinishedResume, 0,
+	       sizeof(state_permute_ClientFinishedResume));
 	memset(&state_permute_ClientFinishedFull, 0,
 	       sizeof(state_permute_ClientFinishedFull));
+
+	state_permute_ServerHello.name = "ServerHello";
+	state_permute_ServerHelloFull.name = "ServerHelloFull";
+	state_permute_ServerFinished.name = "ServerFinished";
+	state_permute_ServerFinishedResume.name = "ServerFinishedResume";
+	state_permute_ClientFinished.name = "ClientFinished";
+	state_permute_ClientFinishedResume.name = "ClientFinishedResume";
+	state_permute_ClientFinishedFull.name = "ClientFinishedFull";
 }
 
 /* replay buffer */
@@ -578,6 +613,9 @@ static void filter_permute_state_run(filter_permute_state_t * state,
 	unsigned char *data = malloc(len);
 	int packet = state->order[state->count];
 
+	if (debug > 2)
+		log("running permutation for %s/%d/%d\n", state->name, packetCount, state->count);
+
 	memcpy(data, buffer, len);
 	state->packets[packet].data = data;
 	state->packets[packet].size = len;
@@ -610,15 +648,25 @@ static void filter_permute_state_run(filter_permute_state_t * state,
 
 static match_fn permute_match_ServerHello[] =
     { match_ServerHello, match_ServerKeyExchange, match_ServerHelloDone };
+
 static match_fn permute_match_ServerHelloFull[] =
     { match_ServerHello, match_ServerCertificate, match_ServerKeyExchange,
 	match_ServerCertificateRequest, match_ServerHelloDone
 };
+
 static match_fn permute_match_ServerFinished[] =
     { match_ServerChangeCipherSpec, match_ServerFinished };
+
+static match_fn permute_match_ServerFinishedResume[] =
+    { match_ServerHello, match_ServerChangeCipherSpec, match_ServerFinished };
+
 static match_fn permute_match_ClientFinished[] =
     { match_ClientKeyExchange, match_ClientChangeCipherSpec,
 	match_ClientFinished
+};
+
+static match_fn permute_match_ClientFinishedResume[] =
+    { match_ClientChangeCipherSpec, match_ClientFinished
 };
 
 static match_fn permute_match_ClientFinishedFull[] =
@@ -629,8 +677,10 @@ static match_fn permute_match_ClientFinishedFull[] =
 
 DECLARE_PERMUTE(ServerHello)
     DECLARE_PERMUTE(ServerHelloFull)
+    DECLARE_PERMUTE(ServerFinishedResume)
     DECLARE_PERMUTE(ServerFinished)
     DECLARE_PERMUTE(ClientFinished)
+    DECLARE_PERMUTE(ClientFinishedResume)
     DECLARE_PERMUTE(ClientFinishedFull)
 // }}}
 // {{{ emergency deadlock resolution time bomb
@@ -719,8 +769,6 @@ static void session_init(int sock, int server)
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, acred);
 	}
 
-	gnutls_transport_set_push_function(session, writefn);
-
 	gnutls_dtls_set_mtu(session, 1400);
 	gnutls_dtls_set_timeouts(session, retransmit_milliseconds,
 				 timeout_seconds * 1000);
@@ -732,9 +780,40 @@ static void client(int sock)
 	time_t started = time(0);
 	const char *line = "foobar!";
 	char buffer[8192];
-	int len;
+	int len, ret;
+	gnutls_datum_t data = {NULL, 0};
 
 	session_init(sock, 0);
+
+	killtimer_set();
+
+	if (resume) {
+		do {
+			err = process_error(gnutls_handshake(session));
+			if (err != 0) {
+				int t = gnutls_dtls_get_timeout(session);
+				await(sock, t ? t : 100);
+			}
+		} while (err != 0);
+		process_error_or_timeout(err, time(0) - started);
+
+		ret = gnutls_session_get_data2(session, &data);
+		if (ret < 0) {
+			exit(1);
+		}
+		gnutls_deinit(session);
+
+		session_init(sock, 0);
+		gnutls_session_set_data(session, data.data, data.size);
+		gnutls_free(data.data);
+		data.data = NULL;
+
+		if (debug) {
+			fprintf(stdout, "%i %s| initial handshake complete\n", run_id, role_name);
+		}
+	}
+
+	gnutls_transport_set_push_function(session, writefn);
 
 	killtimer_set();
 	do {
@@ -746,31 +825,122 @@ static void client(int sock)
 	} while (err != 0);
 	process_error_or_timeout(err, time(0) - started);
 
-	killtimer_set();
-	die_on_error(gnutls_record_send(session, line, strlen(line)));
-
-	do {
-		await(sock, -1);
-		len =
-		    process_error(gnutls_record_recv
-				  (session, buffer, sizeof(buffer)));
-	} while (len < 0);
-
-	if (len > 0 && strncmp(line, buffer, len) == 0) {
-		exit(0);
-	} else {
-		exit(1);
+	if (debug) {
+		fprintf(stdout, "%i %s| handshake complete\n", run_id, role_name);
 	}
+
+	if (resume) {
+		killtimer_set();
+
+		do {
+			await(sock, -1);
+			len =
+			    process_error(gnutls_record_recv
+					  (session, buffer, sizeof(buffer)));
+		} while (len < 0);
+
+		log("received data\n");
+
+		die_on_error(gnutls_record_send(session, buffer, len));
+
+		log("sent data\n");
+		exit(0);
+
+	} else {
+		killtimer_set();
+		die_on_error(gnutls_record_send(session, line, strlen(line)));
+
+		log("sent data\n");
+
+		do {
+			await(sock, -1);
+			len =
+			    process_error(gnutls_record_recv
+				  (session, buffer, sizeof(buffer)));
+		} while (len < 0);
+
+		log("received data\n");
+
+		if (len > 0 && strncmp(line, buffer, len) == 0) {
+			exit(0);
+		} else {
+			exit(1);
+		}
+	}
+
+}
+
+static gnutls_datum_t saved_data = {NULL, 0};
+
+static gnutls_datum_t db_fetch(void *dbf, gnutls_datum_t key)
+{
+	gnutls_datum_t t = {NULL, 0};
+	t.data = malloc(saved_data.size);
+	if (t.data == NULL)
+		return t;
+	memcpy(t.data, saved_data.data, saved_data.size);
+	t.size = saved_data.size;
+
+	return t;
+}
+
+static int db_delete(void *dbf, gnutls_datum_t key)
+{
+	return 0;
+}
+
+static int db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
+{
+	saved_data.data = malloc(data.size);
+	if (saved_data.data == NULL)
+		return -1;
+	memcpy(saved_data.data, data.data, data.size);
+	saved_data.size = data.size;
+	return 0;
 }
 
 static void server(int sock)
 {
 	int err;
+	const char *line = "server foobar!";
 	time_t started = time(0);
 	char buffer[8192];
 	int len;
 
 	session_init(sock, 1);
+
+	await(sock, -1);
+
+	killtimer_set();
+	if (resume) {
+		gnutls_db_set_retrieve_function(session, db_fetch);
+		gnutls_db_set_store_function(session, db_store);
+		gnutls_db_set_remove_function(session, db_delete);
+		gnutls_db_set_ptr(session, NULL);
+
+		do {
+			err = process_error(gnutls_handshake(session));
+			if (err != 0) {
+				int t = gnutls_dtls_get_timeout(session);
+				await(sock, t ? t : 100);
+			}
+		} while (err != 0);
+		process_error_or_timeout(err, time(0) - started);
+
+		gnutls_deinit(session);
+
+		session_init(sock, 1);
+		gnutls_db_set_retrieve_function(session, db_fetch);
+		gnutls_db_set_store_function(session, db_store);
+		gnutls_db_set_remove_function(session, db_delete);
+		gnutls_db_set_ptr(session, NULL);
+
+		if (debug) {
+			fprintf(stdout, "%i %s| initial handshake complete\n", run_id, role_name);
+		}
+	}
+
+	gnutls_transport_set_push_function(session, writefn);
 
 	await(sock, -1);
 
@@ -784,15 +954,50 @@ static void server(int sock)
 	} while (err != 0);
 	process_error_or_timeout(err, time(0) - started);
 
-	killtimer_set();
-	do {
-		await(sock, -1);
-		len =
-		    process_error(gnutls_record_recv
-				  (session, buffer, sizeof(buffer)));
-	} while (len < 0);
+	log("handshake complete\n");
 
-	die_on_error(gnutls_record_send(session, buffer, len));
+	if (resume) {
+		free(saved_data.data);
+		saved_data.data = NULL;
+	}
+
+	if (resume) {
+		killtimer_set();
+		die_on_error(gnutls_record_send(session, line, strlen(line)));
+
+		log("sent data\n");
+
+		do {
+			await(sock, -1);
+			len =
+			    process_error(gnutls_record_recv
+				  (session, buffer, sizeof(buffer)));
+		} while (len < 0);
+
+		log("received data\n");
+
+		if (len > 0 && strncmp(line, buffer, len) == 0) {
+			exit(0);
+		} else {
+			exit(1);
+		}
+	} else {
+		killtimer_set();
+
+		do {
+			await(sock, -1);
+			len =
+			    process_error(gnutls_record_recv
+					  (session, buffer, sizeof(buffer)));
+		} while (len < 0);
+
+		log("received data\n");
+
+		die_on_error(gnutls_record_send(session, buffer, len));
+
+		log("sent data\n");
+	}
+
 	exit(0);
 }
 
@@ -863,7 +1068,7 @@ static int run_test(void)
 	}
 }
 
-static filter_fn filters[8]
+static filter_fn filters[]
     = { filter_packet_ServerHello,
 	filter_packet_ServerKeyExchange,
 	filter_packet_ServerHelloDone,
@@ -874,7 +1079,15 @@ static filter_fn filters[8]
 	filter_packet_ServerFinished
 };
 
-static filter_fn filters_full[12]
+static filter_fn filters_resume[]
+    = { filter_packet_ServerHello,
+	filter_packet_ServerChangeCipherSpec,
+	filter_packet_ServerFinished,
+	filter_packet_ClientChangeCipherSpec,
+	filter_packet_ClientFinished
+};
+
+static filter_fn filters_full[]
     = { filter_packet_ServerHello,
 	filter_packet_ServerCertificate,
 	filter_packet_ServerKeyExchange,
@@ -894,12 +1107,36 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 {
 	int fnIdx = 0;
 	int res, filterIdx;
-	filter_fn *local_filters = full ? filters_full : filters;
-	const char **local_filter_names =
-	    full ? filter_names_full : filter_names;
-	const char **permutation_namesX =
-	    full ? permutation_names5 : permutation_names3;
-	int filter_count = full ? 12 : 8;
+	filter_fn *local_filters;
+	const char **local_filter_names;
+	const char **client_finished_permutation_names;
+	const char **server_finished_permutation_names;
+	const char **server_hello_permutation_names;
+	int filter_count;
+
+	if (full) {
+		local_filters = filters_full;
+		local_filter_names = filter_names_full;
+		filter_count = sizeof(filters_full)/sizeof(filters_full[0]);
+		client_finished_permutation_names = permutation_names5;
+		server_finished_permutation_names = permutation_names2;
+		server_hello_permutation_names = permutation_names5;
+	} else if (resume) {
+		local_filters = filters_resume;
+		local_filter_names = filter_names_resume;
+		filter_count = sizeof(filters_resume)/sizeof(filters_resume[0]);
+		client_finished_permutation_names = permutation_names2;
+		server_finished_permutation_names = permutation_names3;
+		server_hello_permutation_names = NULL;
+	} else {
+		local_filters = filters;
+		local_filter_names = filter_names;
+		filter_count = sizeof(filters)/sizeof(filters[0]);
+		client_finished_permutation_names = permutation_names3;
+		server_finished_permutation_names = permutation_names2;
+		server_hello_permutation_names = permutation_names3;
+	}
+
 	run_id =
 	    ((dropMode * 2 + serverFinishedPermute) * (full ? 120 : 6) +
 	     serverHelloPermute) * (full ? 120 : 6) + clientFinishedPermute;
@@ -914,6 +1151,18 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 		filter_chain[fnIdx++] = filter_permute_ClientFinishedFull;
 		state_permute_ClientFinishedFull.order =
 		    permutations5[clientFinishedPermute];
+
+		filter_chain[fnIdx++] = filter_permute_ServerFinished;
+		state_permute_ServerFinished.order =
+		    permutations2[serverFinishedPermute];
+	} else if (resume) {
+		filter_chain[fnIdx++] = filter_permute_ServerFinishedResume;
+		state_permute_ServerFinishedResume.order =
+		    permutations3[serverFinishedPermute];
+
+		filter_chain[fnIdx++] = filter_permute_ClientFinishedResume;
+		state_permute_ClientFinishedResume.order =
+		    permutations2[clientFinishedPermute];
 	} else {
 		filter_chain[fnIdx++] = filter_permute_ServerHello;
 		state_permute_ServerHello.order =
@@ -922,11 +1171,11 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 		filter_chain[fnIdx++] = filter_permute_ClientFinished;
 		state_permute_ClientFinished.order =
 		    permutations3[clientFinishedPermute];
-	}
 
-	filter_chain[fnIdx++] = filter_permute_ServerFinished;
-	state_permute_ServerFinished.order =
-	    permutations2[serverFinishedPermute];
+		filter_chain[fnIdx++] = filter_permute_ServerFinished;
+		state_permute_ServerFinished.order =
+		    permutations2[serverFinishedPermute];
+	}
 
 	if (dropMode) {
 		for (filterIdx = 0; filterIdx < filter_count; filterIdx++) {
@@ -955,11 +1204,12 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 		break;
 	}
 
-	fprintf(stdout, "SHello(%s), ", permutation_namesX[serverHelloPermute]);
+	if (!resume)
+		fprintf(stdout, "SHello(%s), ", server_hello_permutation_names[serverHelloPermute]);
 	fprintf(stdout, "SFinished(%s), ",
-		permutation_names2[serverFinishedPermute]);
+		server_finished_permutation_names[serverFinishedPermute]);
 	fprintf(stdout, "CFinished(%s) :- ",
-		permutation_namesX[clientFinishedPermute]);
+		client_finished_permutation_names[clientFinishedPermute]);
 	if (dropMode) {
 		for (filterIdx = 0; filterIdx < filter_count; filterIdx++) {
 			if (dropMode & (1 << filterIdx)) {
@@ -1148,6 +1398,7 @@ int main(int argc, const char *argv[])
 	int serverHelloPermute = 0;
 	int clientFinishedPermute = 0;
 	int batch = 0;
+	unsigned single = 0;
 	int arg;
 
 	nonblock = 0;
@@ -1228,8 +1479,25 @@ int main(int argc, const char *argv[])
 				FAIL_ARG(j);
 			}
 		} else if (strcmp("-full", argv[arg]) == 0) {
+			if (resume) {
+				fprintf(stderr, "You cannot combine full with resume\n");
+				exit(1);
+			}
+
 			full = 1;
+		} else if (strcmp("-resume", argv[arg]) == 0) {
+			if (full) {
+				fprintf(stderr, "You cannot combine full with resume\n");
+				exit(1);
+			}
+
+			resume = 1;
 		} else if (strcmp("-shello", argv[arg]) == 0) {
+			if (resume) {
+				fprintf(stderr, "Please use -sfinished instead of -shello\n");
+				exit(1);
+			}
+
 			NEXT_ARG(shello);
 			if (!parse_permutation
 			    (argv[arg],
@@ -1237,26 +1505,46 @@ int main(int argc, const char *argv[])
 			     permutation_names3, &serverHelloPermute)) {
 				FAIL_ARG(shell);
 			}
+			single++;
 		} else if (strcmp("-sfinished", argv[arg]) == 0) {
-			NEXT_ARG(sfinished);
-			if (!parse_permutation
-			    (argv[arg], permutation_names2,
-			     &serverFinishedPermute)) {
-				FAIL_ARG(sfinished);
-			}
-		} else if (strcmp("-cfinished", argv[arg]) == 0) {
+			const char **pname;
 			NEXT_ARG(cfinished);
+			if (resume) pname = permutation_names3;
+			else pname = permutation_names2;
 			if (!parse_permutation
-			    (argv[arg],
-			     full ? permutation_names5 :
-			     permutation_names3, &clientFinishedPermute)) {
+			    (argv[arg], pname,
+			     &serverFinishedPermute)) {
 				FAIL_ARG(cfinished);
 			}
+			single++;
+		} else if (strcmp("-cfinished", argv[arg]) == 0) {
+			const char **pname;
+			NEXT_ARG(cfinished);
+			if (full) pname = permutation_names5;
+			else if (resume) pname = permutation_names2;
+			else pname = permutation_names3;
+			if (!parse_permutation
+			    (argv[arg], pname,
+			     &clientFinishedPermute)) {
+				FAIL_ARG(cfinished);
+			}
+			single++;
 		} else {
 			int drop;
-			int filter_count = full ? 12 : 8;
-			const char **local_filter_names =
-			    full ? filter_names_full : filter_names;
+			int filter_count;
+			const char **local_filter_names;
+
+			if (full) {
+				local_filter_names = filter_names_full;
+				filter_count = sizeof(filters_full)/sizeof(filters_full[0]);
+			} else if (resume) {
+				local_filter_names = filter_names_resume;
+				filter_count = sizeof(filters_resume)/sizeof(filters_resume[0]);
+			} else {
+				local_filter_names = filter_names;
+				filter_count = sizeof(filters)/sizeof(filters[0]);
+			}
+
 			for (drop = 0; drop < filter_count; drop++) {
 				if (strcmp
 				    (local_filter_names[drop],
@@ -1270,6 +1558,7 @@ int main(int argc, const char *argv[])
 					argv[arg]);
 				exit(8);
 			}
+			single++;
 		}
 	}
 
@@ -1280,11 +1569,20 @@ int main(int argc, const char *argv[])
 	gnutls_global_set_audit_log_function(auditfn);
 	gnutls_global_set_log_level(debug);
 
-	if (dropMode || serverFinishedPermute || serverHelloPermute
-	    || clientFinishedPermute) {
+	if (single) {
+		if (debug)
+			fprintf(stderr, "single test mode\n");
 		return run_one_test(dropMode, serverFinishedPermute,
 				    serverHelloPermute, clientFinishedPermute);
 	} else {
+		if (debug)
+			fprintf(stderr, "multi test mode\n");
+
+		if (resume) {
+			fprintf(stderr, "full run not implemented yet for resumed runs\n");
+			exit(5);
+		}
+
 		job_pids = calloc(sizeof(int), job_limit);
 		if (batch) {
 			return run_tests_from_id_list(job_limit);
