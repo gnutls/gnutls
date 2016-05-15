@@ -731,14 +731,13 @@ record_add_to_buffers(gnutls_session_t session,
 		type == GNUTLS_CHANGE_CIPHER_SPEC ||
 		type == GNUTLS_HANDSHAKE)) {
 		_gnutls_record_buffer_put(session, type, seq, bufel);
-gnutls_assert();
+
 		/* if we received application data as expected then we
 		 * deactivate the async timer */
 		_dtls_async_timer_delete(session);
 	} else {
 		/* if the expected type is different than the received 
 		 */
-gnutls_assert();
 		switch (recv->type) {
 		case GNUTLS_ALERT:
 			if (bufel->msg.size < 2) {
