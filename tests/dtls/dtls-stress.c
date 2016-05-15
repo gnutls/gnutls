@@ -1179,10 +1179,14 @@ int main(int argc, const char *argv[])
 			batch = 1;
 		} else if (strcmp("-d", argv[arg]) == 0) {
 			char *end;
-			int level = strtol(argv[arg + 1], &end, 10);
-			if (*end == '\0') {
-				debug = level;
-				arg++;
+			int level;
+
+			if (arg+1 < argc) {
+				level = strtol(argv[arg + 1], &end, 10);
+				if (*end == '\0') {
+					debug = level;
+					arg++;
+				}
 			} else {
 				debug++;
 			}
