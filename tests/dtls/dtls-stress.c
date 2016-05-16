@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2012 Sean Buckheister
+ * Copyright (C) 2012-2016 Sean Buckheister
+ * Copyright (C) 2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
