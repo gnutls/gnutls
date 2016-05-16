@@ -1439,7 +1439,8 @@ int main(int argc, const char *argv[])
 				if (*end == '\0') {
 					debug = level;
 					arg++;
-				}
+				} else
+					debug++;
 			} else {
 				debug++;
 			}
