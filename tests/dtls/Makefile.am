@@ -40,7 +40,7 @@ LDADD = ../../lib/libgnutls.la \
 if !WINDOWS
 
 check_PROGRAMS = dtls-stress
-TESTS = dtls dtls-nb dtls-resume
+TESTS = dtls dtls-resume
 
 endif
 
