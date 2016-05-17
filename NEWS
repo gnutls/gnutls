@@ -38,6 +38,9 @@ See the end for copying conditions.
    signing to another certificate without requiring it to be a CA. Reported
    by Thomas Klute.
 
+** certtool: on OCSP verification do not fail if we have a single valid
+   reply. Report and reproducer by Thomas Klute.
+
 ** API and ABI modifications:
 No changes since last version.
 
