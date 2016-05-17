@@ -39,8 +39,6 @@ The library depends on libnettle and gmplib.
 * gmplib: for big number arithmetic, http://gmplib.org/
 * nettle: for cryptographic algorithms, http://www.lysator.liu.se/~nisse/nettle/
 
-Versions 2.10.3 and prior used libgcrypt as the default cryptographic library.
-
 Optionally it may use the following libraries:
 * libtasn1: For ASN.1 parsing (a copy is included, if not found), http://www.gnu.org/software/libtasn1/
 * p11-kit: for smart card support, http://p11-glue.freedesktop.org/p11-kit.html
