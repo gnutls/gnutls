@@ -24,6 +24,9 @@ See the end for copying conditions.
    gnutls_certificate_set* functions, only consider the CN as a fallback
    if DNS names are provided via the alternative name extension.
 
+** gnutls-cli: on OCSP verification do not fail if we have a single valid
+   reply. Report and reproducer by Thomas Klute.
+
 ** API and ABI modifications:
 No changes since last version.
 
