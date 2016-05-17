@@ -89,7 +89,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-dtls-record-asym openpgp-callback key-import-export \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
 	 strict-der mini-extension mini-supplementaldata mini-dtls0-9 \
-	 mini-record-retvals mini-server-name mini-etm mini-x509-cert-callback \
+	 mini-record-retvals mini-server-name mini-etm x509-cert-callback \
 	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen \
 	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok fallback-scsv pkcs8-key-decode \
@@ -106,7 +106,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 rehandshake-switch-srp-id base64 srpbase64 pkcs1-digest-info set_x509_key \
 	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls1.2-cert-key-exchange \
 	 tls1.1-cert-key-exchange tls1.0-cert-key-exchange ssl3.0-cert-key-exchange \
-	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange mini-x509-cert-callback-legacy
+	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange x509-cert-callback-legacy
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
