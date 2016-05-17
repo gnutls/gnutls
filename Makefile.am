@@ -52,13 +52,8 @@ endif
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4
 
-EXTRA_DIST = cfg.mk maint.mk .clcopying CONTRIBUTING.md README-alpha.md LICENSE AUTHORS NEWS \
-	ChangeLog INSTALL README THANKS
-
-README: README-install.md
-	rm -f $@
-	cp $^ $@
-	chmod 444 $@
+EXTRA_DIST = cfg.mk maint.mk .clcopying CONTRIBUTING.md README.md LICENSE AUTHORS NEWS \
+	ChangeLog THANKS INSTALL.md
 
 TMPFILE="abi-temp.xml"
 
