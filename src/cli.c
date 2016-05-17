@@ -1950,5 +1950,5 @@ cleanup:
 
 	if (failed > 0)
 		return -1;
-	return ok > 1 ? (int) ok : -1;
+	return ok >= 1 ? (int) ok : -1;
 }
