@@ -406,7 +406,7 @@ get_issuers(gnutls_session_t session,
 	return 0;
 }
 
-/* Calls the client get callback.
+/* Calls the client or server get callback.
  */
 static int
 call_get_cert_callback(gnutls_session_t session,
