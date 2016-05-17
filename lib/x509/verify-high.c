@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
- * Copyright (C) 2015 Red Hat, Inc.
+ * Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -934,8 +934,10 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
  * This function will find the issuer of the given certificate.
  * If the flag %GNUTLS_TL_GET_COPY is specified a copy of the issuer
  * will be returned which must be freed using gnutls_x509_crt_deinit().
+ * In that case the provided @issuer must not be initialized.
+ *
  * Note that the flag %GNUTLS_TL_GET_COPY is required for this function
- * to work with PKCS #11 trust lists in a thread-safe way.
+ * to work with PKCS#11 trust lists in a thread-safe way.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

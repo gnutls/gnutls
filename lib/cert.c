@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -101,9 +102,13 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials_t sc)
  * @flags: Use zero or %GNUTLS_TL_GET_COPY
  *
  * This function will return the issuer of a given certificate.
+ * If the flag %GNUTLS_TL_GET_COPY is specified a copy of the issuer
+ * will be returned which must be freed using gnutls_x509_crt_deinit().
+ * In that case the provided @issuer must not be initialized.
+ *
  * As with gnutls_x509_trust_list_get_issuer() this function requires
- * the %GNUTLS_TL_GET_COPY flag in order to operate with PKCS #11 trust
- * lists. In that case the issuer must be freed using gnutls_x509_crt_deinit().
+ * the %GNUTLS_TL_GET_COPY flag in order to operate with PKCS#11 trust
+ * lists in a thread-safe way. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
