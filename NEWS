@@ -27,6 +27,11 @@ See the end for copying conditions.
 ** gnutls-cli: on OCSP verification do not fail if we have a single valid
    reply. Report and reproducer by Thomas Klute.
 
+** libgnutls: The GNUTLS_KEYLOGFILE environment variable can be used to
+   log session keys in client side. These session keys are compatible with
+   the NSS Key Log Format and can be used to decrypt the session for
+   debugging using wireshark.
+
 ** API and ABI modifications:
 No changes since last version.
 
