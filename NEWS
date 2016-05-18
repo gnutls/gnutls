@@ -8,6 +8,11 @@ See the end for copying conditions.
 ** libgnutls: The SSL 3.0 protocol support can completely be removed
    using a compile time option. The configure option is --disable-ssl3.
 
+** libgnutls: The GNUTLS_KEYLOGFILE environment variable can be used to
+   log session keys in client side. These session keys are compatible with
+   the NSS Key Log Format and can be used to decrypt the session for
+   debugging using wireshark.
+
 ** API and ABI modifications:
 No changes since last version.
 
