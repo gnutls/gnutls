@@ -183,6 +183,12 @@ In several systems there are keystores which allow to read, store and use certif
 and private keys. For these systems GnuTLS provides the system-key API in @code{gnutls/system-keys.h}.
 That API provides the ability to iterate through all stored keys, add and delete keys as well
 as use these keys using a URL which starts with "system:". The format of the URLs is system-specific.
+The @code{systemkey} tool is also provided to assist in listing keys and debugging.
+
+The systems supported via this API are the following.
+@itemize
+@item Windows Cryptography API (CNG)
+@end itemize
 
 @showfuncdesc{gnutls_system_key_iter_get_info}
 
