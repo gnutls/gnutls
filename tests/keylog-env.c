@@ -99,7 +99,15 @@ void doit(void)
 		exit(1);
 	}
 
+#ifdef _WIN32
+	{
+		char buf[512];
+		snprintf(buf, sizeof(buf), "GNUTLS_KEYLOGFILE=%s", filename);
+		_putenv(buf);
+	}
+#else
 	setenv("GNUTLS_KEYLOGFILE", filename, 1);
+#endif
 	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "localhost");
 
 	if (access(filename, R_OK) != 0) {
