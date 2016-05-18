@@ -95,6 +95,47 @@ int _gnutls_generate_master(gnutls_session_t session, int keep_premaster)
 	return 0;
 }
 
+static void write_nss_key_log(gnutls_session_t session, const gnutls_datum_t *premaster)
+{
+	const char *filename;
+	char buf[512];
+	FILE *fp;
+
+	if (session->security_parameters.entity == GNUTLS_SERVER)
+		return;
+
+	filename = getenv("GNUTLS_KEYLOGFILE");
+
+	if (filename == NULL)
+		return;
+
+	fp = fopen(filename, "w");
+	if (fp == NULL)
+		return;
+
+	if (session->security_parameters.kx_algorithm == GNUTLS_KX_RSA) {
+		fprintf(fp, "RSA %s ", 
+			_gnutls_bin2hex(premaster->data,
+					premaster->size,
+					buf, sizeof(buf),
+					NULL));
+		fprintf(fp, "%s\n",
+			 _gnutls_bin2hex(session->security_parameters.
+					 master_secret, GNUTLS_MASTER_SIZE,
+					 buf, sizeof(buf), NULL));
+	}
+
+	fprintf(fp, "CLIENT_RANDOM %s ", 
+		 _gnutls_bin2hex(session->security_parameters.
+				 client_random, 32, buf,
+				 sizeof(buf), NULL));
+	fprintf(fp, "%s\n", 
+		 _gnutls_bin2hex(session->security_parameters.
+				 master_secret, GNUTLS_MASTER_SIZE,
+				 buf, sizeof(buf), NULL));
+	fclose(fp);
+}
+
 /* here we generate the TLS Master secret.
  */
 static int
@@ -175,6 +216,8 @@ generate_normal_master(gnutls_session_t session,
 			 _gnutls_bin2hex(session->security_parameters.
 					 master_secret, GNUTLS_MASTER_SIZE,
 					 buf, sizeof(buf), NULL));
+
+	write_nss_key_log(session, premaster);
 
 	return ret;
 }
