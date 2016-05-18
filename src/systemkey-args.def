@@ -12,7 +12,7 @@ explain       = "";
 
 flag = {
     name      = list;
-    descrip   = "Lists all stored keys in the TPM";
+    descrip   = "Lists all stored keys.";
     doc = "";
 };
 
@@ -20,7 +20,7 @@ flag = {
     name      = delete;
     arg-type  = string;
     arg-name  = "url";
-    descrip   = "Delete the key identified by the given URL (UUID).";
+    descrip   = "Delete the key identified by the given URL.";
     doc      = "";
 };
 
@@ -29,9 +29,7 @@ flag = {
     descrip   = "Use the DER format for keys.";
     disabled;
     disable   = "no";
-    doc       = "The input files will be assumed to be in the portable
-DER format of TPM. The default format is a custom format used by various
-TPM tools";
+    doc       = "The input files will be assumed to be in DER format.";
 };
 
 flag = {
@@ -39,7 +37,7 @@ flag = {
     descrip   = "Use DER format for output keys";
     disabled;
     disable   = "no";
-    doc       = "The output will be in the TPM portable DER format.";
+    doc       = "The output will be in DER format.";
 };
 
 doc-section = {

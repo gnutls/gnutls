@@ -90,18 +90,18 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(INDER)) {
 		incert_format = GNUTLS_X509_FMT_DER;
-		inkey_format = GNUTLS_TPMKEY_FMT_DER;
+		inkey_format = GNUTLS_X509_FMT_DER;
 	} else {
 		incert_format = GNUTLS_X509_FMT_PEM;
-		inkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
+		inkey_format = GNUTLS_X509_FMT_PEM;
 	}
 
 	if (HAVE_OPT(OUTDER)) {
 		outcert_format = GNUTLS_X509_FMT_DER;
-		outkey_format = GNUTLS_TPMKEY_FMT_DER;
+		outkey_format = GNUTLS_X509_FMT_DER;
 	} else {
 		outcert_format = GNUTLS_X509_FMT_PEM;
-		outkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
+		outkey_format = GNUTLS_X509_FMT_PEM;
 	}
 
 	if (HAVE_OPT(OUTFILE)) {
