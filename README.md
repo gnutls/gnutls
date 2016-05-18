@@ -4,8 +4,13 @@ Master [![build status](https://gitlab.com/gnutls/gnutls/badges/master/build.svg
 
 # GnuTLS -- Information for developers
 
+GnuTLS implements the TLS/SSL (Transport Layer Security aka Secure
+Sockets Layer) protocol.  GnuTLS is a GNU project.  Additional
+information can be found at <http://www.gnutls.org/>.
+
 This file contains instructions for developers and advanced users that
-want to build from version controlled sources.
+want to build from version controlled sources. See [INSTALL.md](INSTALL.md)
+for building released versions.
 
 We require several tools to check out and build the software, including:
 
