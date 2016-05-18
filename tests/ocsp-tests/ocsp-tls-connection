@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Test case: Try to establish TLS connections with gnutls-cli and
 # check the validity of the server certificate via OCSP
