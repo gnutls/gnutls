@@ -262,7 +262,9 @@ static const int _cipher_priority_performance_no_aesni[] = {
 };
 
 /* If GCM and AES acceleration is available then prefer
- * them over anything else.
+ * them over anything else. Overall we prioritise AEAD
+ * over legacy ciphers, and 256-bit over 128 (for future
+ * proof).
  */
 static const int _cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
