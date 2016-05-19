@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2000-2014 Free Software Foundation, Inc.
- * Copyright (C) 2013-2014 Nikos Mavrogiannopoulos
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -103,6 +104,10 @@ static gnutls_srp_client_credentials_t srp_cred;
 static gnutls_psk_client_credentials_t psk_cred;
 static gnutls_anon_client_credentials_t anon_cred;
 static gnutls_certificate_credentials_t xcred;
+
+/* The number of seconds we wait for a reply from peer prior to
+ * closing the connection. */
+#define TERM_TIMEOUT 8000
 
 /* end of global stuff */
 
@@ -830,7 +835,7 @@ static int check_net_or_keyboard_input(socket_st * hd)
 #endif
 
 		tv.tv_sec = 0;
-		tv.tv_usec = 50 * 1000;
+		tv.tv_usec = 500 * 1000;
 
 		if (hd->secure == 1)
 			if (gnutls_record_check_pending(hd->session))
@@ -1148,6 +1153,26 @@ print_other_info(gnutls_session_t session)
 	}
 }
 
+static void flush_socket(socket_st *hd, unsigned ms)
+{
+	int ret, ii;
+	char buffer[MAX_BUF + 1];
+
+	memset(buffer, 0, MAX_BUF + 1);
+	ret = socket_recv_timeout(hd, buffer, MAX_BUF, ms);
+	if (ret == 0)
+		return;
+	else if (ret > 0) {
+		if (verbose != 0)
+			printf("- Received[%d]: ", ret);
+
+		for (ii = 0; ii < ret; ii++) {
+			fputc(buffer[ii], stdout);
+		}
+		fflush(stdout);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int ret;
@@ -1158,6 +1183,7 @@ int main(int argc, char **argv)
 	ssize_t bytes, keyboard_bytes;
 	char *keyboard_buffer_ptr;
 	inline_cmds_st inline_cmds;
+	unsigned last_op_is_write = 0;
 #ifndef _WIN32
 	struct sigaction new_action;
 #endif
@@ -1260,6 +1286,7 @@ int main(int argc, char **argv)
 
 		if (inp == IN_NET) {
 			memset(buffer, 0, MAX_BUF + 1);
+			last_op_is_write = 0;
 			ret = socket_recv(&hd, buffer, MAX_BUF);
 
 			if (ret == 0) {
@@ -1305,6 +1332,8 @@ int main(int argc, char **argv)
 						break;
 					}
 				} else {
+					if (last_op_is_write)
+						flush_socket(&hd, TERM_TIMEOUT);
 					user_term = 1;
 					break;
 				}
@@ -1344,6 +1373,7 @@ int main(int argc, char **argv)
 				}
 			}
 
+			last_op_is_write = 1;
 			if (ranges
 			    && gnutls_record_can_use_length_hiding(hd.
 								   session))
