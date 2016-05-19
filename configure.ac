@@ -330,7 +330,7 @@ AC_ARG_ENABLE([gcc-warnings],
 )
 
 if test "$gl_gcc_warnings" = yes; then
-  gl_WARN_ADD([-Wframe-larger-than=2048], [WSTACK_CFLAGS])
+  gl_WARN_ADD([-Wframe-larger-than=4096], [WSTACK_CFLAGS])
 
   nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
   nw="$nw -Wc++-compat"             # We don't care about C++ compilers
@@ -358,15 +358,8 @@ if test "$gl_gcc_warnings" = yes; then
   for w in $ws; do
     gl_WARN_ADD([$w])
   done
-  gl_WARN_ADD([-Wno-parentheses-equality]) # We need this one for clang warnings
-  gl_WARN_ADD([-Wno-tautological-compare]) # We need this one for clang warnings
   gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
-  gl_WARN_ADD([-Wno-format-y2k])     # Too many warnings for now
-  gl_WARN_ADD([-Wno-unused-value]) # warnings for things we don't want to get
-  gl_WARN_ADD([-Wno-unused-result]) # warnings for things we don't want to get
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
-  gl_WARN_ADD([-Wno-stack-protector])  # Some functions cannot be protected
-  gl_WARN_ADD([-Wno-int-to-pointer-cast])  # Some files cannot be compiled with that (gl_fd_to_handle)
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
