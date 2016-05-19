@@ -85,6 +85,21 @@ socket_recv(const socket_st * socket, void *buffer, int buffer_size)
 }
 
 ssize_t
+socket_recv_timeout(const socket_st * socket, void *buffer, int buffer_size, unsigned ms)
+{
+	int ret;
+
+	if (socket->secure)
+		gnutls_record_set_timeout(socket->session, ms);
+	ret = socket_recv(socket, buffer, buffer_size);
+
+	if (socket->secure)
+		gnutls_record_set_timeout(socket->session, 0);
+
+	return ret;
+}
+
+ssize_t
 socket_send(const socket_st * socket, const void *buffer, int buffer_size)
 {
 	return socket_send_range(socket, buffer, buffer_size, NULL);
