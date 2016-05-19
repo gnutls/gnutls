@@ -14,6 +14,8 @@ typedef struct {
 
 ssize_t socket_recv(const socket_st * socket, void *buffer,
 		    int buffer_size);
+ssize_t socket_recv_timeout(const socket_st * socket, void *buffer,
+		    int buffer_size, unsigned ms);
 ssize_t socket_send(const socket_st * socket, const void *buffer,
 		    int buffer_size);
 ssize_t socket_send_range(const socket_st * socket, const void *buffer,
