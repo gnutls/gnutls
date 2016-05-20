@@ -93,6 +93,24 @@ psktool.1: ../../src/psktool-args.def
 	rm -f "$<".tmp
 
 APIMANS =
+APIMANS += dane_cert_type_name.3
+APIMANS += dane_cert_usage_name.3
+APIMANS += dane_match_type_name.3
+APIMANS += dane_query_data.3
+APIMANS += dane_query_deinit.3
+APIMANS += dane_query_entries.3
+APIMANS += dane_query_status.3
+APIMANS += dane_query_tlsa.3
+APIMANS += dane_query_to_raw_tlsa.3
+APIMANS += dane_raw_tlsa.3
+APIMANS += dane_state_deinit.3
+APIMANS += dane_state_init.3
+APIMANS += dane_state_set_dlv_file.3
+APIMANS += dane_strerror.3
+APIMANS += dane_verification_status_print.3
+APIMANS += dane_verify_crt.3
+APIMANS += dane_verify_crt_raw.3
+APIMANS += dane_verify_session_crt.3
 APIMANS += gnutls_aead_cipher_decrypt.3
 APIMANS += gnutls_aead_cipher_deinit.3
 APIMANS += gnutls_aead_cipher_encrypt.3
