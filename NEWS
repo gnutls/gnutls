@@ -3,7 +3,10 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.4.12 (unreleased)
+* Version 3.4.12 (released 2016-05-20)
+
+** libgnutls: The CHACHA20-POLY1305 ciphersuite is enabled by default. This
+   cipher is prioritized after AES-GCM.
 
 ** libgnutls: Fixes in gnutls_privkey_import_ecc_raw().
 
