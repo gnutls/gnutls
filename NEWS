@@ -3,7 +3,7 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.23 (unreleased)
+* Version 3.3.23 (released 2016-05-20)
 
 ** libgnutls: Corrected behavior of ALPN extension parsing during session
    resumption. Report and patches by Yuriy M. Kaminskiy.
