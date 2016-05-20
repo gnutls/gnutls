@@ -6,7 +6,10 @@ See the end for copying conditions.
 * Version 3.5.1 (unreleased)
 
 ** libgnutls: The SSL 3.0 protocol support can completely be removed
-   using a compile time option. The configure option is --disable-ssl3.
+   using a compile time option. The configure option is --disable-ssl3-support.
+
+** libgnutls: The SSL 2.0 client hello support can completely be removed
+   using a compile time option. The configure option is --disable-ssl2-support.
 
 ** libgnutls: The GNUTLS_KEYLOGFILE environment variable can be used to
    log session keys in client side. These session keys are compatible with
