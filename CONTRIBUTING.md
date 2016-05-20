@@ -14,15 +14,16 @@ try to follow them too.
   The original author of the changes should be the author of the commit.
 The "Signed-off-by" git flag is used to by committers to indicate they
 agreed with project's DCO as described in [DCO.txt](doc/DCO.txt). Note 
-that we not longer require FSF copyright assignment.
+that we no longer require FSF copyright assignment.
 
 # Test suite:
 
    New functionality should be accompanied by a test case which verifies
 the correctness of GnuTLS' operation on successful use of the new
 functionality, as well as on fail cases. An example test suite can be seen
-in mini-x509-cas.c.  The GnuTLS test suite is run on "make check"
-on every system GnuTLS is installed.
+in tests/set_x509_key_mem.c.  The GnuTLS test suite is run on "make check"
+on every system GnuTLS is installed, except for the tests/suite part
+which is only run during development.
 
 
 # File names:
