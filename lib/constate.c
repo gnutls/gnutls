@@ -211,7 +211,9 @@ _gnutls_init_record_state(record_parameters_st * params,
 				       params->cipher, &state->key, iv,
 				       params->mac, &state->mac_secret,
 				       params->etm,
+#ifdef ENABLE_SSL3
 				       (ver->id == GNUTLS_SSL3) ? 1 : 0,
+#endif
 				       1 - read /*1==encrypt */ );
 	if (ret < 0 && params->cipher->id != GNUTLS_CIPHER_NULL)
 		return gnutls_assert_val(ret);

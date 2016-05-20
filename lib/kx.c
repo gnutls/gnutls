@@ -192,8 +192,10 @@ generate_normal_master(gnutls_session_t session,
 		ret = _gnutls_handshake_get_session_hash(session, &shash);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+#ifdef ENABLE_SSL3
 		if (get_num_version(session) == GNUTLS_SSL3)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+#endif
 
 		ret =
 		    _gnutls_PRF(session, premaster->data, premaster->size,
@@ -413,7 +415,10 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 	_gnutls_buffer_init(&data);
 
 	if (again == 0) {
-		if (get_num_version(session) != GNUTLS_SSL3 ||
+		if (
+#ifdef ENABLE_SSL3
+		    get_num_version(session) != GNUTLS_SSL3 ||
+#endif
 		    session->internals.selected_cert_list_length > 0) {
 			/* TLS 1.0 or SSL 3.0 with a valid certificate 
 			 */
@@ -429,6 +434,7 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 		}
 	}
 
+#ifdef ENABLE_SSL3
 	/* In the SSL 3.0 protocol we need to send a
 	 * no certificate alert instead of an
 	 * empty certificate.
@@ -439,11 +445,11 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 		    gnutls_alert_send(session, GNUTLS_AL_WARNING,
 				      GNUTLS_A_SSL3_NO_CERTIFICATE);
 
-	} else {		/* TLS 1.0 or SSL 3.0 with a valid certificate 
-				 */
+	} else		/* TLS 1.0 or SSL 3.0 with a valid certificate 
+			 */
+#endif
 		ret = send_handshake(session, data.data, data.length,
 				     GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
-	}
 
       cleanup:
 	_gnutls_buffer_clear(&data);
@@ -617,6 +623,7 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 		 * a warning alert instead of an empty certificate to indicate
 		 * no certificate.
 		 */
+#ifdef ENABLE_SSL3
 		if (optional != 0 &&
 		    ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
 		    get_num_version(session) == GNUTLS_SSL3 &&
@@ -629,6 +636,7 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 			gnutls_assert();
 			return 0;
 		}
+#endif
 
 		/* certificate was required 
 		 */

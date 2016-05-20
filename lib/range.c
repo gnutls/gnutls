@@ -106,8 +106,10 @@ int gnutls_record_can_use_length_hiding(gnutls_session_t session)
 	int ret;
 	record_parameters_st *record_params;
 
+#ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3)
 		return 0;
+#endif
 
 	ret =
 	    _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT,

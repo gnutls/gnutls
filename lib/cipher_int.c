@@ -173,7 +173,9 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 			     const mac_entry_st * me,
 			     const gnutls_datum_t * mac_key,
 			     unsigned etm,
+#ifdef ENABLE_SSL3
 			     unsigned ssl_hmac,
+#endif
 			     int enc)
 {
 	int ret;

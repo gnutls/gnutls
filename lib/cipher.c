@@ -265,7 +265,10 @@ make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
 	p += 8;
 	*p = type;
 	p++;
-	if (ver->id != GNUTLS_SSL3) {	/* TLS protocols */
+#ifdef ENABLE_SSL3
+	if (ver->id != GNUTLS_SSL3)
+#endif
+	{	/* TLS protocols */
 		*p = ver->major;
 		p++;
 		*p = ver->minor;
@@ -739,7 +742,9 @@ ciphertext_to_compressed(gnutls_session_t session,
 			 * Note that we access all 256 bytes of ciphertext for padding check
 			 * because there is a timing channel in that memory access (in certain CPUs).
 			 */
+#ifdef ENABLE_SSL3
 			if (ver->id != GNUTLS_SSL3)
+#endif
 				for (i = 2; i <= MIN(256, ciphertext->size); i++) {
 					tmp_pad_failed |=
 					    (compressed->
