@@ -60,6 +60,25 @@ Build and Check in FIPS140-2 mode:
   - nettle3
   except:
   - tags
+Release build for windows DLLs:
+  script:
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-make -j4 && make check -j4 
+  tags:
+  - nettle3
+  - wine
+  - mingw
+  - linux
+  only:
+  - tags
+  artifacts:
+    paths:
+      - src/*.exe
+      - lib/.libs/*.dll
+      - lib/.libs/*.a
+      - lib/*.def
+      - lib/includes/gnutls/*.h
+      - lib/gnutls.pc
 Build and Check for windows in separate build dir:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
