@@ -61,7 +61,9 @@ struct tls_record_st {
 	uint16_t packet_size;	/* header_size + length */
 	content_type_t type;
 	uint16_t epoch;		/* valid in DTLS only */
+#ifdef ENABLE_SSL2
 	unsigned v2:1;		/* whether an SSLv2 client hello */
+#endif
 	/* the data */
 };
 
@@ -948,6 +950,7 @@ record_read_headers(gnutls_session_t session,
 	 * version 2 message 
 	 */
 
+#ifdef ENABLE_SSL2
 	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
 	    && type == GNUTLS_HANDSHAKE && headers[0] > 127
 	    && !(IS_DTLS(session))) {
@@ -977,9 +980,13 @@ record_read_headers(gnutls_session_t session,
 		     session, _gnutls_packet2str(record->type),
 		     record->length);
 
-	} else {
+	} else
+#endif
+	{
 		/* dtls version 1.0 and TLS version 1.x */
+#ifdef ENABLE_SSL2
 		record->v2 = 0;
+#endif
 
 		record->type = headers[0];
 		record->version[0] = headers[1];
@@ -1290,9 +1297,12 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		goto begin;
 	}
 
+#ifdef ENABLE_SSL2
 	if (record.v2) {
 		decrypted->htype = GNUTLS_HANDSHAKE_CLIENT_HELLO_V2;
-	} else {
+	} else
+#endif
+	{
 		uint8_t *p = _mbuffer_get_udata_ptr(decrypted);
 		decrypted->htype = p[0];
 	}

@@ -887,6 +887,7 @@ parse_handshake_header(gnutls_session_t session, mbuffer_st * bufel,
 	dataptr = _mbuffer_get_udata_ptr(bufel);
 
 	/* if reading a client hello of SSLv2 */
+#ifdef ENABLE_SSL2
 	if (unlikely
 	    (!IS_DTLS(session)
 	     && bufel->htype == GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)) {
@@ -903,7 +904,9 @@ parse_handshake_header(gnutls_session_t session, mbuffer_st * bufel,
 		hsk->sequence = 0;
 		hsk->start_offset = 0;
 		hsk->end_offset = hsk->length;
-	} else {		/* TLS or DTLS handshake headers */
+	} else
+#endif
+	{		/* TLS or DTLS handshake headers */
 
 
 		hsk->htype = dataptr[0];
@@ -1075,7 +1078,10 @@ inline static int cmp_hsk_types(gnutls_handshake_description_t expected,
 				gnutls_handshake_description_t recvd)
 {
 	if ((expected != GNUTLS_HANDSHAKE_CLIENT_HELLO
-	     || recvd != GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)
+#ifdef ENABLE_SSL2
+	     || recvd != GNUTLS_HANDSHAKE_CLIENT_HELLO_V2
+#endif
+	     )
 	    && (expected != recvd))
 		return 0;
 

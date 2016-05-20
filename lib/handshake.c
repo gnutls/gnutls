@@ -1469,12 +1469,14 @@ _gnutls_recv_handshake(gnutls_session_t session,
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO_V2:
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO:
 	case GNUTLS_HANDSHAKE_SERVER_HELLO:
+#ifdef ENABLE_SSL2
 		if (hsk.htype == GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)
 			ret =
 			    _gnutls_read_client_hello_v2(session,
 							 hsk.data.data,
 							 hsk.data.length);
 		else
+#endif
 			ret =
 			    recv_hello(session, hsk.data.data,
 					hsk.data.length);

@@ -942,7 +942,8 @@ AC_MSG_NOTICE([Optional features:
 (note that included applications might not compile properly
 if features are disabled)
 
-  SSL3 support:         $ac_enable_ssl3
+  SSL3.0 support:       $ac_enable_ssl3
+  SSL2.0 client hello:  $ac_enable_ssl2
   DTLS-SRTP support:    $ac_enable_srtp
   ALPN support:         $ac_enable_alpn
   OCSP support:         $ac_enable_ocsp

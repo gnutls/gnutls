@@ -155,6 +155,21 @@ LIBTASN1_MINIMUM=4.3
   fi
   AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl3" != "no")
 
+  ac_enable_ssl2=yes
+  AC_MSG_CHECKING([whether to disable the SSL 2.0 client hello])
+  AC_ARG_ENABLE(ssl2-support,
+    AS_HELP_STRING([--disable-ssl2-support],
+                   [disable support for the SSL 2.0 client hello]),
+    ac_enable_ssl2=$enableval)
+  if test x$ac_enable_ssl2 != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_SSL2], 1, [enable SSL2.0 support for client hello])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl2" != "no")
+
   ac_enable_srtp=yes
   AC_MSG_CHECKING([whether to disable DTLS-SRTP extension])
   AC_ARG_ENABLE(dtls-srtp-support,

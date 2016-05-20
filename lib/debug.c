@@ -90,9 +90,11 @@ const char
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO:
 		return "CLIENT HELLO";
 		break;
+#ifdef ENABLE_SSL2
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO_V2:
 		return "SSL2 CLIENT HELLO";
 		break;
+#endif
 	case GNUTLS_HANDSHAKE_SERVER_HELLO:
 		return "SERVER HELLO";
 		break;

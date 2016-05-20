@@ -41,6 +41,7 @@
 #include "sslv2_compat.h"
 #include "constate.h"
 
+#ifdef ENABLE_SSL2
 /* This selects the best supported ciphersuite from the ones provided */
 static int
 _gnutls_handshake_select_v2_suite(gnutls_session_t session,
@@ -254,3 +255,4 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 
 	return sret;
 }
+#endif
