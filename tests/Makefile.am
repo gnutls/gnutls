@@ -62,7 +62,6 @@ AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
 endif
 
 noinst_LTLIBRARIES = libutils.la
-pkglib_LTLIBRARIES = 
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
@@ -133,9 +132,9 @@ ssl3_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c ssl3.0-cert-key-ex
 
 if ENABLE_PKCS11
 if !WINDOWS
-pkglib_LTLIBRARIES += libpkcs11mock1.la
+noinst_LTLIBRARIES += libpkcs11mock1.la
 libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h
-libpkcs11mock1_la_LDFLAGS = -module -no-undefined -avoid-version
+libpkcs11mock1_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
 
 pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
 pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
