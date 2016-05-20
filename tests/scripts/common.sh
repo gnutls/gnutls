@@ -1,4 +1,5 @@
-# Copyright (C) 2011-2012 Free Software Foundation, Inc.
+# Copyright (C) 2011-2016 Free Software Foundation, Inc.
+# Copyright (C) 2015-2016 Red Hat, Inc.
 #
 # This file is part of GnuTLS.
 #
@@ -18,6 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+# due to the use of $RANDOM, this script requires bash
 
 GETPORT='rc=0;while test $rc = 0;do PORT="$(((($$<<15)|RANDOM) % 63001 + 2000))";
 	netstat -anl|grep "[\:\.]$PORT" >/dev/null 2>&1;
