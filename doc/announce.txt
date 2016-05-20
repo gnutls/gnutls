@@ -1,4 +1,4 @@
-To: gnutls-help@lists.gnutls.org, gnutls-dev@lists.gnutls.org
+To: gnutls-help@lists.gnutls.org, gnutls-devel@lists.gnutls.org
 Bcc: coordinator@translationproject.org
 Subject: GnuTLS 3.4.0 released
 <#part sign=pgpmime>
