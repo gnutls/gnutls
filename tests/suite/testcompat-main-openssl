@@ -82,10 +82,11 @@ echo "#################################################"
 echo "# Client mode tests (gnutls cli-openssl server) #"
 echo "#################################################"
 
-for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
+run_client_suite() {
+	ADD=$1
+	PREFIX=""
 	if ! test -z "${ADD}"; then
-		echo ""
-		echo "** Modifier: ${ADD}"
+		PREFIX="$(echo $ADD|sed 's/://g'): "
 	fi
 
 	if test "${HAVE_SSL3}" != 1 && test "{ENABLE_SSL3}" = 1; then
@@ -97,17 +98,17 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		wait_server ${PID}
 
 		# Test SSL 3.0 with RSA ciphersuite
-		echo "Checking SSL 3.0 with RSA..."
+		echo "${PREFIX}Checking SSL 3.0 with RSA..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		# Test SSL 3.0 with DHE-RSA ciphersuite
-		echo "Checking SSL 3.0 with DHE-RSA..."
+		echo "${PREFIX}Checking SSL 3.0 with DHE-RSA..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		# Test SSL 3.0 with DHE-DSS ciphersuite
-		echo "Checking SSL 3.0 with DHE-DSS..."
+		echo "${PREFIX}Checking SSL 3.0 with DHE-DSS..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
@@ -119,7 +120,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		PID=$!
 		wait_server ${PID}
 
-		echo "Checking SSL 3.0 with RSA-RC4-MD5..."
+		echo "${PREFIX}Checking SSL 3.0 with RSA-RC4-MD5..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+VERS-SSL3.0:+RSA${ADD}" --insecure </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
@@ -135,7 +136,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		wait_server ${PID}
 
 		# Test TLS 1.0 with RSA-NULL ciphersuite
-		echo "Checking TLS 1.0 with RSA-NULL..."
+		echo "${PREFIX}Checking TLS 1.0 with RSA-NULL..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+NULL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
@@ -150,42 +151,42 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait_server ${PID}
 
 	# Test TLS 1.0 with RSA ciphersuite
-	echo "Checking TLS 1.0 with RSA and 3DES-CBC..."
+	echo "${PREFIX}Checking TLS 1.0 with RSA and 3DES-CBC..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
-	echo "Checking TLS 1.0 with RSA and AES-128-CBC..."
+	echo "${PREFIX}Checking TLS 1.0 with RSA and AES-128-CBC..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
-	echo "Checking TLS 1.0 with RSA and AES-256-CBC..."
+	echo "${PREFIX}Checking TLS 1.0 with RSA and AES-256-CBC..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-256-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
 	if test "${NO_CAMELLIA}" != 1; then
-		echo "Checking TLS 1.0 with RSA and CAMELLIA-128-CBC..."
+		echo "${PREFIX}Checking TLS 1.0 with RSA and CAMELLIA-128-CBC..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CAMELLIA-128-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
-		echo "Checking TLS 1.0 with RSA and CAMELLIA-256-CBC..."
+		echo "${PREFIX}Checking TLS 1.0 with RSA and CAMELLIA-256-CBC..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CAMELLIA-256-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 	fi
 
 	if test "${NO_DSS}" != 1; then
 		# Test TLS 1.0 with DHE-DSS ciphersuite
-		echo "Checking TLS 1.0 with DHE-DSS..."
+		echo "${PREFIX}Checking TLS 1.0 with DHE-DSS..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 	fi
 
 	# Test TLS 1.0 with DHE-RSA ciphersuite
-	echo "Checking TLS 1.0 with DHE-RSA..."
+	echo "${PREFIX}Checking TLS 1.0 with DHE-RSA..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
 	# Test TLS 1.0 with DHE-RSA ciphersuite
-	echo "Checking TLS 1.0 with ECDHE-RSA..."
+	echo "${PREFIX}Checking TLS 1.0 with ECDHE-RSA..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
@@ -199,7 +200,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		wait_server ${PID}
 
 		# Test TLS 1.2 with ECDHE-ECDSA ciphersuite
-		echo "Checking TLS 1.0 with ECDHE-RSA (SECP192R1)..."
+		echo "${PREFIX}Checking TLS 1.0 with ECDHE-RSA (SECP192R1)..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-SECP192R1${ADD}" --insecure </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
@@ -213,7 +214,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		wait_server ${PID}
 
 		# Test TLS 1.0 with ECDHE-ECDSA ciphersuite
-		echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP224R1)..."
+		echo "${PREFIX}Checking TLS 1.0 with ECDHE-ECDSA (SECP224R1)..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-SECP224R1${ADD}" --insecure --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
@@ -228,7 +229,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait_server ${PID}
 
 	# Test TLS 1.0 with ECDHE-ECDSA ciphersuite
-	echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP384R1)..."
+	echo "${PREFIX}Checking TLS 1.0 with ECDHE-ECDSA (SECP384R1)..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC384_CERT}" --x509keyfile "${ECC384_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
@@ -242,7 +243,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait_server ${PID}
 
 	# Test TLS 1.0 with ECDHE-ECDSA ciphersuite
-	echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP521R1)..."
+	echo "${PREFIX}Checking TLS 1.0 with ECDHE-ECDSA (SECP521R1)..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
@@ -255,7 +256,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	PID=$!
 	wait_server ${PID}
 
-	echo "Checking TLS 1.0 with PSK..."
+	echo "${PREFIX}Checking TLS 1.0 with PSK..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+PSK${ADD}" --pskusername Client_identity --pskkey 9e32cf7786321a828ef7668f09fb35db --insecure </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
@@ -270,25 +271,25 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		PID=$!
 		wait_server ${PID}
 
-		echo "Checking TLS 1.2 with RSA and AES-128-GCM..."
+		echo "${PREFIX}Checking TLS 1.2 with RSA and AES-128-GCM..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
-		echo "Checking TLS 1.2 with RSA and AES-256-GCM..."
+		echo "${PREFIX}Checking TLS 1.2 with RSA and AES-256-GCM..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-256-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
-		echo "Checking TLS 1.2 with DHE-RSA..."
+		echo "${PREFIX}Checking TLS 1.2 with DHE-RSA..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		if test "${NO_DSS}" != 1; then
-			echo "Checking TLS 1.2 with DHE-DSS..."
+			echo "${PREFIX}Checking TLS 1.2 with DHE-DSS..."
 			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 				fail ${PID} "Failed"
 		fi
 
-		echo "Checking TLS 1.2 with ECDHE-RSA..."
+		echo "${PREFIX}Checking TLS 1.2 with ECDHE-RSA..."
 		"${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
@@ -301,7 +302,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 			PID=$!
 			wait_server ${PID}
 
-			echo "Checking TLS 1.2 with ECDHE-RSA (X25519)..."
+			echo "${PREFIX}Checking TLS 1.2 with ECDHE-RSA (X25519)..."
 			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-X25519${ADD}" --insecure --x509certfile "${RSA_CERT}" --x509keyfile "${RSA_KEY}" </dev/null >/dev/null || \
 				fail ${PID} "Failed"
 
@@ -316,7 +317,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 			PID=$!
 			wait_server ${PID}
 
-			echo "Checking TLS 1.2 with ECDHE-ECDSA... (SECP224R1)"
+			echo "${PREFIX}Checking TLS 1.2 with ECDHE-ECDSA... (SECP224R1)"
 			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" </dev/null >/dev/null || \
 				fail ${PID} "Failed"
 
@@ -330,7 +331,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		PID=$!
 		wait_server ${PID}
 
-		echo "Checking TLS 1.2 with ECDHE-ECDSA... (SECP384R1)"
+		echo "${PREFIX}Checking TLS 1.2 with ECDHE-ECDSA... (SECP384R1)"
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC384_CERT}" --x509keyfile "${ECC384_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
@@ -344,7 +345,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 			PID=$!
 			wait_server ${PID}
 
-			echo "Checking TLS 1.2 with ECDHE-ECDSA... (SECP521R1)"
+			echo "${PREFIX}Checking TLS 1.2 with ECDHE-ECDSA... (SECP521R1)"
 			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --insecure --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" </dev/null >/dev/null || \
 				fail ${PID} "Failed"
 
@@ -359,7 +360,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	PID=$!
 	wait_server ${PID}
 
-	echo "Checking TLS 1.2 with PSK..."
+	echo "${PREFIX}Checking TLS 1.2 with PSK..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+PSK:+CURVE-ALL${ADD}" --insecure --pskusername Client_identity --pskkey 9e32cf7786321a828ef7668f09fb35db </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
@@ -372,7 +373,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait_udp_server ${PID}
 
 	# Test DTLS 1.0 with RSA ciphersuite
-	echo "Checking DTLS 1.0 with RSA..."
+	echo "${PREFIX}Checking DTLS 1.0 with RSA..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+RSA${ADD}" --udp --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
@@ -385,7 +386,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait_udp_server ${PID}
 
 	# Test DTLS 1.0 with DHE-RSA ciphersuite
-	echo "Checking DTLS 1.0 with DHE-RSA..."
+	echo "${PREFIX}Checking DTLS 1.0 with DHE-RSA..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-RSA${ADD}" --udp --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 		fail ${PID} "Failed"
 
@@ -399,33 +400,39 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 		wait_udp_server ${PID}
 
 		# Test DTLS 1.0 with DHE-DSS ciphersuite
-		echo "Checking DTLS 1.0 with DHE-DSS..."
+		echo "${PREFIX}Checking DTLS 1.0 with DHE-DSS..."
 		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --udp --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		kill ${PID}
 		wait
 	fi
-done
+}
 
-echo "Client mode tests were successfully completed"
-echo ""
-echo "###############################################"
-echo "# Server mode tests (gnutls server-openssl cli#"
-echo "###############################################"
+for mod in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
+	run_client_suite $mod &
+done
+wait
+
+echo "${PREFIX}Client mode tests were successfully completed"
+echo "${PREFIX}"
+echo "${PREFIX}###############################################"
+echo "${PREFIX}# Server mode tests (gnutls server-openssl cli#"
+echo "${PREFIX}###############################################"
 SERV="../../src/gnutls-serv${EXEEXT} -q"
 
 # Note that openssl s_client does not return error code on failure
 
-for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"; do
+run_server_suite() {
+	ADD=$1
+	PREFIX=""
 	if ! test -z "${ADD}"; then
-		echo ""
-		echo "** Modifier: ${ADD}"
+		PREFIX="$(echo $ADD|sed 's/://g'): "
 	fi
 
 	if test "${HAVE_SSL3}" != 1 && test "{ENABLE_SSL3}" = 1; then
 
-		echo "Check SSL 3.0 with RSA ciphersuite"
+		echo "${PREFIX}Check SSL 3.0 with RSA ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+MD5:+ARCFOUR-128:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 		PID=$!
@@ -434,14 +441,14 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -ssl3 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
-		echo "Check SSL 3.0 with RSA-RC4-MD5 ciphersuite"
+		echo "${PREFIX}Check SSL 3.0 with RSA-RC4-MD5 ciphersuite"
 		${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -ssl3 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" -cipher RC4-MD5 </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
 		kill ${PID}
 		wait
 
-		echo "Check SSL 3.0 with DHE-RSA ciphersuite"
+		echo "${PREFIX}Check SSL 3.0 with DHE-RSA ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 		PID=$!
@@ -453,7 +460,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		kill ${PID}
 		wait
 
-		echo "Check SSL 3.0 with DHE-DSS ciphersuite"
+		echo "${PREFIX}Check SSL 3.0 with DHE-DSS ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
 		PID=$!
@@ -470,7 +477,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	#TLS 1.0
 
 	# This test was disabled because it doesn't work as expected with openssl 1.0.0d
-	#echo "Check TLS 1.0 with RSA ciphersuite (SSLv2 hello)"
+	#echo "${PREFIX}Check TLS 1.0 with RSA ciphersuite (SSLv2 hello)"
 	#launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	#PID=$!
 	#wait_server ${PID}
@@ -482,7 +489,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	#wait
 
 	if test "${NO_NULL}" = 0; then
-		echo "Check TLS 1.0 with RSA-NULL ciphersuite"
+		echo "${PREFIX}Check TLS 1.0 with RSA-NULL ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+NULL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 		PID=$!
@@ -495,7 +502,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		wait
 	fi
 
-	echo "Check TLS 1.0 with DHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with DHE-RSA ciphersuite"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
@@ -508,7 +515,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	wait
 
 	if test "${NO_DSS}" != 1; then
-		echo "Check TLS 1.0 with DHE-DSS ciphersuite"
+		echo "${PREFIX}Check TLS 1.0 with DHE-DSS ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
 		PID=$!
@@ -521,7 +528,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		wait
 	fi
 
-	echo "Check TLS 1.0 with ECDHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-RSA ciphersuite"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
@@ -535,7 +542,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	wait
 
 	if test "${FIPS}" != 1; then
-		echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
+		echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}"
 		PID=$!
@@ -549,7 +556,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		wait
 	fi
 
-	echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP256R1)"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP256R1)"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC256_CERT}" --x509keyfile "${ECC256_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
@@ -562,7 +569,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	kill ${PID}
 	wait
 
-	echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP384R1)"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP384R1)"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC384_CERT}" --x509keyfile "${ECC384_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
@@ -576,7 +583,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	wait
 
 	if test "${FIPS}" != 1; then
-		echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP521R1)"
+		echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP521R1)"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" --x509cafile "${CA_ECC_CERT}"
 		PID=$!
@@ -590,7 +597,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		wait
 	fi
 
-	echo "Check TLS 1.0 with PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with PSK ciphersuite"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
@@ -605,7 +612,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 
 	if test ${NO_TLS1_2} = 0; then
 
-		echo "Check TLS 1.2 with DHE-RSA ciphersuite"
+		echo "${PREFIX}Check TLS 1.2 with DHE-RSA ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 		PID=$!
@@ -618,7 +625,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		wait
 
 		if test "${NO_DSS}" != 1; then
-			echo "Check TLS 1.2 with DHE-DSS ciphersuite"
+			echo "${PREFIX}Check TLS 1.2 with DHE-DSS ciphersuite"
 			eval "${GETPORT}"
 			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
 			PID=$!
@@ -631,7 +638,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 			wait
 		fi
 
-		echo "Check TLS 1.2 with ECDHE-RSA ciphersuite"
+		echo "${PREFIX}Check TLS 1.2 with ECDHE-RSA ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-ALL${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 		PID=$!
@@ -645,7 +652,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		wait
 
 		if test "${NO_X22519}" = 0 && test "${FIPS}" != 1; then
-			echo "Check TLS 1.2 with ECDHE-RSA ciphersuite (X25519)"
+			echo "${PREFIX}Check TLS 1.2 with ECDHE-RSA ciphersuite (X25519)"
 			eval "${GETPORT}"
 			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-X25519${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 			PID=$!
@@ -659,7 +666,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		fi
 
 		if test "${FIPS}" != 1; then
-			echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
+			echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
 			eval "${GETPORT}"
 			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}"
 			PID=$!
@@ -673,7 +680,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 			wait
 		fi
 
-		echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP256R1)"
+		echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP256R1)"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC256_CERT}" --x509keyfile "${ECC256_KEY}" --x509cafile "${CA_ECC_CERT}"
 		PID=$!
@@ -686,7 +693,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		kill ${PID}
 		wait
 
-		echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP384R1)"
+		echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP384R1)"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC384_CERT}" --x509keyfile "${ECC384_KEY}" --x509cafile "${CA_ECC_CERT}"
 		PID=$!
@@ -700,7 +707,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 		wait
 
 		if test "${FIPS}" != 1; then
-			echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP521R1)"
+			echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP521R1)"
 			eval "${GETPORT}"
 			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" --x509cafile "${CA_ECC_CERT}"
 			PID=$!
@@ -714,7 +721,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 			wait
 		fi
 
-		echo "Check TLS 1.2 with PSK ciphersuite"
+		echo "${PREFIX}Check TLS 1.2 with PSK ciphersuite"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 		PID=$!
@@ -730,7 +737,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	fi #NO_TLS1_2
 
 	# DTLS
-	echo "Check DTLS 1.0 with RSA ciphersuite"
+	echo "${PREFIX}Check DTLS 1.0 with RSA ciphersuite"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+RSA${ADD}" --udp --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
@@ -744,7 +751,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	wait
 
 
-	echo "Check DTLS 1.0 with DHE-RSA ciphersuite"
+	echo "${PREFIX}Check DTLS 1.0 with DHE-RSA ciphersuite"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-RSA${ADD}" --udp --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
@@ -758,7 +765,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 	wait
 
 
-	echo "Check DTLS 1.0 with DHE-DSS ciphersuite"
+	echo "${PREFIX}Check DTLS 1.0 with DHE-DSS ciphersuite"
 	eval "${GETPORT}"
 	launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --udp --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
 	PID=$!
@@ -770,6 +777,10 @@ for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION
 
 	kill ${PID}
 	wait
+}
+for mod in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"; do
+	run_server_suite $mod &
 done
+wait
 
 exit 0

@@ -85,17 +85,18 @@ SERV="../../src/gnutls-serv${EXEEXT} -q"
 
 rm -f "${LOGFILE}"
 
-for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
+run_server_suite() {
+	ADD=$1
+	PREFIX=""
 	if ! test -z "${ADD}"; then
-		echo ""
-		echo "** Modifier: ${ADD}"
+		PREFIX="$(echo $ADD|sed 's/://g'): "
 	fi
 
 	eval "${GETPORT}"
 
 	#TLS 1.0
 
-	echo "Check TLS 1.0 with DHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with DHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
 	wait_server ${PID}
@@ -106,7 +107,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	kill ${PID}
 	wait
 
-	#echo "Check TLS 1.0 with DHE-DSS ciphersuite"
+	#echo "${PREFIX}Check TLS 1.0 with DHE-DSS ciphersuite"
 	#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
 	#PID=$!
 	#wait_server ${PID}
@@ -118,7 +119,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	#wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with ECDHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -131,7 +132,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -144,7 +145,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with DHE-PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with DHE-PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -157,7 +158,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with ECDHE-PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -170,7 +171,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with RSA-PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.0 with RSA-PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA-PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -184,7 +185,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 
 	if test ${ALL_CURVES} = 1; then
 		eval "${GETPORT}"
-		echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
+		echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
 		launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}"
 		PID=$!
 		wait_server ${PID}
@@ -198,7 +199,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	fi
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP256R1)"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP256R1)"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC256_CERT}" --x509keyfile "${ECC256_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -211,7 +212,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP384R1)"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP384R1)"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC384_CERT}" --x509keyfile "${ECC384_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -224,7 +225,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP521R1)"
+	echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP521R1)"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -237,7 +238,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with DHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with DHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
 	wait_server ${PID}
@@ -249,7 +250,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with CAMELLIA-128-GCM-DHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with CAMELLIA-128-GCM-DHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-128-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
 	wait_server ${PID}
@@ -261,7 +262,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with CAMELLIA-256-GCM-DHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with CAMELLIA-256-GCM-DHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
 	wait_server ${PID}
@@ -273,7 +274,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with AES-128-CCM-DHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with AES-128-CCM-DHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:-CIPHER-ALL:+AES-128-CCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
 	wait_server ${PID}
@@ -285,7 +286,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with AES-128-CCM-8-DHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with AES-128-CCM-8-DHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:-CIPHER-ALL:+AES-128-CCM-8:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
 	PID=$!
 	wait_server ${PID}
@@ -296,7 +297,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	kill ${PID}
 	wait
 
-	#echo "Check TLS 1.2 with DHE-DSS ciphersuite"
+	#echo "${PREFIX}Check TLS 1.2 with DHE-DSS ciphersuite"
 	#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
 	#PID=$!
 	#wait_server ${PID}
@@ -308,7 +309,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	#wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with ECDHE-RSA ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with ECDHE-RSA ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-ALL${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -322,7 +323,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 
 	if test ${ALL_CURVES} = 1; then
 		eval "${GETPORT}"
-		echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
+		echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
 		launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}"
 		PID=$!
 		wait_server ${PID}
@@ -336,7 +337,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	fi
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP256R1)"
+	echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP256R1)"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC256_CERT}" --x509keyfile "${ECC256_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -349,7 +350,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP384R1)"
+	echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP384R1)"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC384_CERT}" --x509keyfile "${ECC384_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -362,7 +363,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP521R1)"
+	echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP521R1)"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" --x509cafile "${CA_ECC_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -375,7 +376,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -388,7 +389,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with DHE-PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with DHE-PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -401,7 +402,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with ECDHE-PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with ECDHE-PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -414,7 +415,7 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 	wait
 
 	eval "${GETPORT}"
-	echo "Check TLS 1.2 with RSA-PSK ciphersuite"
+	echo "${PREFIX}Check TLS 1.2 with RSA-PSK ciphersuite"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA-PSK:+CURVE-ALL${ADD}" --pskpasswd "${SERV_PSK}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
@@ -425,7 +426,12 @@ for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTI
 
 	kill ${PID}
 	wait
+}
+
+for mod in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
+	run_server_suite $mod &
 done
+wait
 
 rm -f "${LOGFILE}"
 
