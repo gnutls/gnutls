@@ -82,7 +82,7 @@ echo "#################################################"
 echo "# Client mode tests (gnutls cli-openssl server) #"
 echo "#################################################"
 
-for ADD in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
+for ADD in "" ":%COMPAT" ; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
 	if ! test -z "${ADD}"; then
 		echo ""
 		echo "** Modifier: ${ADD}"
@@ -417,7 +417,7 @@ SERV="../../src/gnutls-serv${EXEEXT} -q"
 
 # Note that openssl s_client does not return error code on failure
 
-for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"; do
+for ADD in "" ":%COMPAT" ":%DISABLE_SAFE_RENEGOTIATION"; do
 	if ! test -z "${ADD}"; then
 		echo ""
 		echo "** Modifier: ${ADD}"

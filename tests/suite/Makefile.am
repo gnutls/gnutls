@@ -98,11 +98,12 @@ TESTS += pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-co
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
-	LC_ALL="C"					\
-	VALGRIND="$(VALGRIND)"				\
-	LIBTOOL="$(LIBTOOL)"				\
-	top_builddir="$(top_builddir)"			\
-	srcdir="$(srcdir)"
+	LC_ALL="C"				\
+	VALGRIND="$(VALGRIND)"			\
+	LIBTOOL="$(LIBTOOL)"			\
+	top_builddir="$(top_builddir)"		\
+	srcdir="$(srcdir)"			\
+	OPENSSL_ia32cap=0x00000000
 
 if ENABLE_DANE
 TESTS += testdane
