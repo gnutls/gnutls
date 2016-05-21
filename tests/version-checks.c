@@ -133,6 +133,8 @@ void doit(void)
 {
 	global_init();
 
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.0", GNUTLS_TLS1_0);
+	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0", GNUTLS_TLS1_0);
 	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1", GNUTLS_TLS1_1);
