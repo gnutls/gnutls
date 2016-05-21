@@ -29,13 +29,15 @@
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <assert.h>
 #include "utils.h"
 #include "eagain-common.h"
 #include "cert-common.h"
 
 /* 
- * That test verifies whether the support versions are negotiated
- * in the NORMAL priority string.
+ * That test verifies whether all the supported versions are negotiated
+ * with the NORMAL priority string.
  */
 
 const char *side;
@@ -55,6 +57,16 @@ static void try(const char *client_prio, int expected)
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
+	unsigned flags = 0;
+	unsigned dtls = 0;
+	const char *server_prio = "NORMAL";
+
+	if (expected >= GNUTLS_DTLS_VERSION_MIN && expected <= GNUTLS_DTLS_VERSION_MAX) {
+		dtls = 1;
+		/* we do not really do negotiation in that version */
+		if (expected == GNUTLS_DTLS0_9)
+			server_prio = client_prio;
+	}
 
 	/* General init. */
 	gnutls_global_set_log_function(tls_log_func);
@@ -67,15 +79,19 @@ static void try(const char *client_prio, int expected)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	gnutls_init(&server, GNUTLS_SERVER);
+	if (dtls)
+		flags |= (GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
+
+	gnutls_init(&server, GNUTLS_SERVER|flags);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL",
-				   NULL);
+	assert(gnutls_priority_set_direct(server,
+				   server_prio,
+				   NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
+	gnutls_transport_set_pull_timeout_function(server, server_pull_timeout_func);
 	gnutls_transport_set_ptr(server, server);
 
 	/* Init client */
@@ -88,7 +104,7 @@ static void try(const char *client_prio, int expected)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT);
+	ret = gnutls_init(&client, GNUTLS_CLIENT|flags);
 	if (ret < 0)
 		exit(1);
 
@@ -99,15 +115,22 @@ static void try(const char *client_prio, int expected)
 
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
+	gnutls_transport_set_pull_timeout_function(client, client_pull_timeout_func);
 	gnutls_transport_set_ptr(client, client);
 
 	ret = gnutls_priority_set_direct(client, client_prio, NULL);
 	if (ret < 0) {
+		fprintf(stderr, "error in %s\n", client_prio);
 		exit(1);
 	}
 
 	if (expected > 0) {
-		HANDSHAKE(client, server);
+		success("handshake with %s\n", client_prio);
+		if (dtls) {
+			HANDSHAKE_DTLS(client, server);
+		} else {
+			HANDSHAKE(client, server);
+		}
 
 		ret = gnutls_protocol_get_version(client);
 		if (ret != expected) {
@@ -143,5 +166,13 @@ void doit(void)
 	try("NORMAL:-VERS-TLS-ALL:+VERS-SSL3.0", -1);
 	reset_buffers();
 #endif
+	try("NORMAL:-VERS-ALL:+VERS-DTLS1.0", GNUTLS_DTLS1_0);
+	reset_buffers();
+	try("NORMAL:-VERS-DTLS-ALL:+VERS-DTLS1.2", GNUTLS_DTLS1_2);
+	reset_buffers();
+
+	/* special test for this legacy crap */
+	try("NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-CBC:+SHA1:+RSA:%COMPAT", GNUTLS_DTLS0_9);
+	reset_buffers();
 	gnutls_global_deinit();
 }
