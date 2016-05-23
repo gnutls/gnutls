@@ -1688,7 +1688,7 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 	ck_object_class_t class = -1;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
 	ck_rv_t rv;
-	ck_object_handle_t obj;
+	ck_object_handle_t obj = CK_INVALID_HANDLE;
 	unsigned long count, a_vals;
 	int found = 0, ret;
 
@@ -1775,7 +1775,7 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
       cleanup:
 	pkcs11_find_objects_final(sinfo);
 
-	if (ret == 0 && find_data->overwrite_exts && find_data->obj->raw.size > 0) {
+	if (ret == 0 && find_data->overwrite_exts && find_data->obj->raw.size > 0 && obj != CK_INVALID_HANDLE) {
 		gnutls_datum_t spki;
 		rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_PUBLIC_KEY_INFO, &spki);
 		if (rv == CKR_OK) {
@@ -1783,7 +1783,7 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 			gnutls_free(spki.data);
 			if (ret < 0) {
 				gnutls_assert();
-				goto cleanup;
+				return ret;
 			}
 		}
 	}
