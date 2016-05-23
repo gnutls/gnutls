@@ -1915,7 +1915,7 @@ find_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sin
 	ck_certificate_type_t type;
 	ck_object_class_t class;
 	ck_rv_t rv;
-	ck_object_handle_t obj;
+	ck_object_handle_t objx = CK_INVALID_HANDLE;
 	unsigned long count;
 	unsigned a_vals;
 	int found = 0, ret;
@@ -1950,9 +1950,9 @@ find_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sin
 		goto cleanup;
 	}
 
-	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK &&
+	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &objx, 1, &count) == CKR_OK &&
 	    count == 1) {
-		ret = pkcs11_import_object(obj, class, sinfo, tinfo, lib_info, find_data->obj);
+		ret = pkcs11_import_object(objx, class, sinfo, tinfo, lib_info, find_data->obj);
 		if (ret >= 0) {
 			found = 1;
 		}
@@ -1971,15 +1971,15 @@ find_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sin
       cleanup:
 	pkcs11_find_objects_final(sinfo);
 
-	if (ret == 0 && find_data->overwrite_exts && find_data->obj->raw.size > 0) {
+	if (ret == 0 && find_data->overwrite_exts && find_data->obj->raw.size > 0 && objx != CK_INVALID_HANDLE) {
 		gnutls_datum_t spki;
-		rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_PUBLIC_KEY_INFO, &spki);
+		rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, objx, CKA_PUBLIC_KEY_INFO, &spki);
 		if (rv == CKR_OK) {
 			ret = pkcs11_override_cert_exts(sinfo, &spki, &find_data->obj->raw);
 			gnutls_free(spki.data);
 			if (ret < 0) {
 				gnutls_assert();
-				goto cleanup;
+				return ret;
 			}
 		}
 	}
