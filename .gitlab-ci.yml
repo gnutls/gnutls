@@ -50,7 +50,7 @@ Build and Check - separate build dir (x86):
 Build and Check - without SSL 3.0:
   script:
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-ssl3 --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
+    ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
     make -j4 && make check -j4 && make local-code-coverage-output
   tags:
   - lcov
