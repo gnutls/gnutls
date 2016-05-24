@@ -415,12 +415,12 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 	_gnutls_buffer_init(&data);
 
 	if (again == 0) {
-		if (
 #ifdef ENABLE_SSL3
-		    get_num_version(session) != GNUTLS_SSL3 ||
+		if (get_num_version(session) != GNUTLS_SSL3 ||
+		    session->internals.selected_cert_list_length > 0)
 #endif
-		    session->internals.selected_cert_list_length > 0) {
-			/* TLS 1.0 or SSL 3.0 with a valid certificate 
+		{
+			/* TLS 1.x or SSL 3.0 with a valid certificate 
 			 */
 			ret =
 			    session->internals.auth_struct->
