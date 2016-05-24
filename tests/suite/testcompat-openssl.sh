@@ -53,4 +53,9 @@ if test "${TSTAMP}" != "1158969600"; then
 	exit 77
 fi
 
-datefudge "2012-09-2" "${srcdir}/testcompat-main-openssl"
+timeout 1800 datefudge "2012-09-2" "${srcdir}/testcompat-main-openssl"
+
+ret=$?
+test $ret = 124 && exit 77
+
+exit $ret
