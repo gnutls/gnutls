@@ -1191,12 +1191,13 @@ problematic clients and servers is achieved. More specifically this
 string would disable TLS record random padding, tolerate packets
 over the maximum allowed TLS record, and add a padding to TLS Client
 Hello packet to prevent it being in the 256-512 range which is known
-to be causing issues with a commonly used firewall.
+to be causing issues with a commonly used firewall (see the %DUMBFW option).
 
 @item %DUMBFW @tab
 will add a private extension with bogus data that make the client
 hello exceed 512 bytes. This avoids a black hole behavior in some
-firewalls. This is a non-standard TLS extension, use with care.
+firewalls. This is the @xcite{rfc7685} client hello padding extension, also enabled
+with %COMPAT.
 
 @item %NO_EXTENSIONS @tab
 will prevent the sending of any TLS extensions in client side. Note
@@ -1217,7 +1218,9 @@ and not the client's.
 
 @item %SSL3_RECORD_VERSION @tab
 will use SSL3.0 record version in client hello.
-This is the default.
+By default GnuTLS will set the minimum supported version as the
+client hello record version (do not confuse that version with the
+proposed handshake version at the client hello).
 
 @item %LATEST_RECORD_VERSION @tab
 will use the latest TLS version record version in client hello.
