@@ -18,18 +18,15 @@ In GnuTLS the approach is to handle all keys transparently by the high level API
 the API that loads a key or certificate from a file.
 The high-level API will accept URIs in addition to files that specify keys on an HSM or in TPM,
 and a callback function will be used to obtain any required keys. The URI format is defined in 
-@xcite{TPMURI} and the standardized @xcite{PKCS11URI}.
+@xcite{PKCS11URI}.
 
 More information on the API is provided in the next sections. Examples of a URI of a certificate 
 stored in an HSM, as well as a key stored in the TPM chip are shown below. To discover the URIs 
-of the objects the @code{p11tool} (see @ref{p11tool Invocation}),
-or @code{tpmtool} (see @ref{tpmtool Invocation}) may be used.
-
+of the objects the @code{p11tool} (see @ref{p11tool Invocation}).
 @example
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315; \
 manufacturer=EnterSafe;object=test1;type=cert
 
-tpmkey:uuid=42309df8-d101-11e1-a89a-97bb33c23ad1;storage=user
 @end example
 
 
@@ -491,7 +488,10 @@ certificates by specifying a PKCS #11 URL instead of a filename.
 @cindex TPM
 
 In this section we present the Trusted Platform Module (TPM) support 
-in @acronym{GnuTLS}. 
+in @acronym{GnuTLS}. Note that we recommend against using TPM with this
+API because it is restricted to TPM 1.2. We recommend instead
+to use PKCS#11 wrappers for TPM such as CHAPS@footnote{@url{https://github.com/google/chaps-linux}} or opencryptoki@footnote{@url{https://sourceforge.net/projects/opencryptoki/}}.
+These will allow using the standard smart card and HSM functionality (see @ref{Smart cards and HSMs}) for TPM keys.
 
 There was a big hype when the TPM chip was introduced into 
 computers. Briefly it is a co-processor in your PC that allows it to perform 
