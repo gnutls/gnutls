@@ -22,6 +22,17 @@
 
 #include <gnutls/gnutls.h>
 
+
+/* This file contains a lot of common parameters used by legacy and new
+ * tests. The recommended to use for new tests are:
+ *
+ * CA: ca3_cert, ca3_key
+ * TLS client: cli_ca3_cert, cli_ca3_key
+ * IPv6 server: server_ca3_localhost6_cert, server_ca3_key
+ * IPv4 server: server_ca3_localhost_cert, server_ca3_key
+ */
+
+
 static char ecc_key[] =
 	"-----BEGIN EC PRIVATE KEY-----\n"
 	"MHgCAQEEIQD9KwCA8zZfETJl440wMztH9c74E+VMws/96AVqyslBsaAKBggqhkjO\n"
@@ -609,6 +620,7 @@ static char server_localhost6_ca3_cert_pem[] =
 const gnutls_datum_t server_ca3_localhost6_cert = { (void*)server_localhost6_ca3_cert_pem,
 	sizeof(server_localhost6_ca3_cert_pem)-1
 };
+
 
 /* shares server_ca3 key */
 static char server_localhost_ca3_cert_pem[] =
