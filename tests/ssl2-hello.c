@@ -33,7 +33,7 @@
  * completed hello parsing and reached the alert message.
  */
 
-#if defined(_WIN32)
+#if defined(_WIN32) || !defined(ENABLE_SSL2)
 
 /* socketpair isn't supported on Win32. */
 int main(int argc, char **argv)
