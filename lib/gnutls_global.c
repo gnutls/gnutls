@@ -241,11 +241,11 @@ int gnutls_global_init(void)
 
 	_gnutls_switch_lib_state(LIB_STATE_INIT);
 
-	_gnutls_keylogfile = getenv("GNUTLS_KEYLOGFILE");
+	_gnutls_keylogfile = secure_getenv("GNUTLS_KEYLOGFILE");
 	if (_gnutls_keylogfile == NULL)
-		_gnutls_keylogfile = getenv("SSLKEYLOGFILE");
+		_gnutls_keylogfile = secure_getenv("SSLKEYLOGFILE");
 
-	e = getenv("GNUTLS_DEBUG_LEVEL");
+	e = secure_getenv("GNUTLS_DEBUG_LEVEL");
 	if (e != NULL) {
 		level = atoi(e);
 		gnutls_global_set_log_level(level);
@@ -478,7 +478,7 @@ const char *e;
 	if (_gnutls_global_init_skip() != 0)
 		return;
 
-	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
+	e = secure_getenv("GNUTLS_NO_EXPLICIT_INIT");
 	if (e != NULL) {
 		ret = atoi(e);
 		if (ret == 1)
@@ -499,7 +499,7 @@ static void _DESTRUCTOR lib_deinit(void)
 	if (_gnutls_global_init_skip() != 0)
 		return;
 
-	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
+	e = secure_getenv("GNUTLS_NO_EXPLICIT_INIT");
 	if (e != NULL) {
 		int ret = atoi(e);
 		if (ret == 1)
