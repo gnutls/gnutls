@@ -323,7 +323,7 @@ void gnutls_system_global_deinit()
  */
 int _gnutls_find_config_path(char *path, size_t max_size)
 {
-	const char *home_dir = getenv("HOME");
+	const char *home_dir = secure_getenv("HOME");
 
 	if (home_dir != NULL && home_dir[0] != 0) {
 		snprintf(path, max_size, "%s/" CONFIG_PATH, home_dir);

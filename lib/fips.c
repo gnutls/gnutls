@@ -53,7 +53,7 @@ const char *p;
 	if (_fips_mode != -1)
 		return _fips_mode;
 
-	p = getenv("GNUTLS_FORCE_FIPS_MODE");
+	p = secure_getenv("GNUTLS_FORCE_FIPS_MODE");
 	if (p) {
 		if (p[0] == '1')
 			_fips_mode = 1;
