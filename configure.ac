@@ -46,6 +46,8 @@ AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_PROG_SED
 
+AC_USE_SYSTEM_EXTENSIONS
+
 AX_CODE_COVERAGE
 
 AC_ARG_ENABLE(doc,
@@ -241,7 +243,7 @@ fi
 
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
-AC_CHECK_FUNCS([__register_atfork],,)
+AC_CHECK_FUNCS([__register_atfork secure_getenv],,)
 
 AC_ARG_ENABLE(seccomp-tests,
   AS_HELP_STRING([--enable-seccomp-tests], [unconditionally enable tests with seccomp]),
