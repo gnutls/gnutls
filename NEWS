@@ -11,8 +11,8 @@ See the end for copying conditions.
 ** libgnutls: The SSL 2.0 client hello support can completely be removed
    using a compile time option. The configure option is --disable-ssl2-support.
 
-** libgnutls: The GNUTLS_KEYLOGFILE environment variable can be used to
-   log session keys in client side. These session keys are compatible with
+** libgnutls: The SSLKEYLOGFILE and GNUTLS_KEYLOGFILE environment variables can
+   be used to log session keys. These session keys are compatible with
    the NSS Key Log Format and can be used to decrypt the session for
    debugging using wireshark.
 
