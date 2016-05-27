@@ -3,6 +3,18 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.4.13 (unreleased)
+
+** libgnutls: Consider both SSLKEYLOGFILE and GNUTLS_KEYLOGFILE environment
+   variables with the latter having priority; append the keys to the file.
+
+** libgnutls: use secure_getenv() where available to obtain environment
+   variables.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.4.12 (released 2016-05-20)
 
 ** libgnutls: The CHACHA20-POLY1305 ciphersuite is enabled by default. This
