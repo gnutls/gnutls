@@ -46,6 +46,8 @@ AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_PROG_SED
 
+AC_USE_SYSTEM_EXTENSIONS
+
 AC_ARG_ENABLE(doc,
   AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
     enable_doc=$enableval, enable_doc=yes)
@@ -229,7 +231,7 @@ fi
 
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
-AC_CHECK_FUNCS([__register_atfork],,)
+AC_CHECK_FUNCS([__register_atfork secure_getenv],,)
 
 AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
 #include <signal.h>
