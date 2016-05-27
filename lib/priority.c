@@ -933,7 +933,7 @@ void _gnutls_load_system_priorities(void)
 	const char *p;
 	int ret;
 
-	p = getenv("GNUTLS_SYSTEM_PRIORITY_FILE");
+	p = secure_getenv("GNUTLS_SYSTEM_PRIORITY_FILE");
 	if (p != NULL)
 		system_priority_file = p;
 
