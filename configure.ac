@@ -47,6 +47,8 @@ AC_PROG_YACC
 AC_PROG_SED
 AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [/bin/true])
 
+AC_USE_SYSTEM_EXTENSIONS
+
 if test x"$AUTOGEN" = "x/bin/true"; then
   AC_MSG_WARN([[
 ***
@@ -165,7 +167,7 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime iconv localtime vasprintf],,)
+AC_CHECK_FUNCS([secure_getenv fork inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime iconv localtime vasprintf],,)
 if test "$ac_cv_func_vasprintf" != "yes";then
   AC_MSG_CHECKING([for va_copy])
   AC_LINK_IFELSE([AC_LANG_PROGRAM([
