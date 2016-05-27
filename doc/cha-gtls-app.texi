@@ -159,6 +159,10 @@ error. Other available environment variables are shown in @ref{tab:environment}.
 @item @code{GNUTLS_DEBUG_LEVEL}
 @tab When set to a numeric value, it sets the default debugging level for GnuTLS applications.
 
+@item @code{GNUTLS_KEYLOGFILE}, @code{SSLKEYLOGFILE}
+@tab When set to a filename, GnuTLS will append to it the session keys in the NSS Key Log
+format. That format can be read by wireshark and will allow decryption of the session for debugging.
+
 @item @code{GNUTLS_CPUID_OVERRIDE}
 @tab That environment variable can be used to
 explicitly enable/disable the use of certain CPU capabilities. Note that CPU
