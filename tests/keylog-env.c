@@ -70,18 +70,24 @@ static void search_for_str(const char *filename)
 	fail("file did not contain CLIENT_RANDOM\n");
 }
 
-void doit(void)
+static void run(const char *env, const char *filename)
 {
 	gnutls_certificate_credentials_t x509_cred;
 	int ret;
-	char filename[TMPNAME_SIZE];
 
-	/* this must be called once in the program
-	 */
-	global_init();
-
-	assert(get_tmpname(filename)!=NULL);
 	remove(filename);
+
+#ifdef _WIN32
+	{
+		char buf[512];
+		snprintf(buf, sizeof(buf), "%s=%s", env, filename);
+		_putenv(buf);
+	}
+#else
+	setenv(env, filename, 1);
+#endif
+
+	global_init();
 
 	if (debug) {
 		gnutls_global_set_log_level(6);
@@ -99,15 +105,6 @@ void doit(void)
 		exit(1);
 	}
 
-#ifdef _WIN32
-	{
-		char buf[512];
-		snprintf(buf, sizeof(buf), "GNUTLS_KEYLOGFILE=%s", filename);
-		_putenv(buf);
-	}
-#else
-	setenv("GNUTLS_KEYLOGFILE", filename, 1);
-#endif
 	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "localhost");
 
 	if (access(filename, R_OK) != 0) {
@@ -124,4 +121,15 @@ void doit(void)
 
 	if (debug)
 		success("success");
+}
+
+void doit(void)
+{
+	char filename[TMPNAME_SIZE];
+
+	assert(get_tmpname(filename)!=NULL);
+
+	gnutls_global_deinit();
+	run("GNUTLS_KEYLOGFILE", filename);
+	run("SSLKEYLOGFILE", filename);
 }
