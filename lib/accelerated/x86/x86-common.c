@@ -654,7 +654,7 @@ void register_x86_crypto(void)
 {
 	unsigned capabilities = 0;
 	char *p;
-	p = getenv("GNUTLS_CPUID_OVERRIDE");
+	p = secure_getenv("GNUTLS_CPUID_OVERRIDE");
 	if (p) {
 		capabilities = strtol(p, NULL, 0);
 	}
