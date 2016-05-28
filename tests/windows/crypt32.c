@@ -180,8 +180,8 @@ BOOL WINAPI CryptSignHash(
   DWORD      dwKeySpec,
   LPCTSTR    sDescription,
   DWORD      dwFlags,
-  _Out_   BYTE       *pbSignature,
-  _Inout_ DWORD      *pdwSigLen)
+  BYTE       *pbSignature,
+  DWORD      *pdwSigLen)
 {
 	return 0;
 }
