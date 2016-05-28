@@ -24,7 +24,11 @@
 #  include <unistd.h>
 # else
 #  undef issetugid
-#  define issetugid() 1
+#  ifdef _WIN32
+#   define issetugid() 0
+#  else
+#   define issetugid() 1
+#  endif
 # endif
 #endif
 
