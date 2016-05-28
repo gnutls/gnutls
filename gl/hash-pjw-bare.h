@@ -1,5 +1,5 @@
 /* hash-pjw-bare.h -- declaration for a simple hash function
-   Copyright (C) 2012-2015 Free Software Foundation, Inc.
+   Copyright (C) 2012-2016 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
@@ -20,5 +20,5 @@
    and return the hash code.  Note that unlike hash_pjw(), it does not
    return it modulo a table size.
    The result is platform dependent: it depends on the size of the 'size_t'
-   type and on the signedness of the 'char' type.  */
+   type.  */
 extern size_t hash_pjw_bare (const void *x, size_t n) _GL_ATTRIBUTE_PURE;
