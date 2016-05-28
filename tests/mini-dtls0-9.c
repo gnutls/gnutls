@@ -43,6 +43,7 @@ int main()
 #include <sys/wait.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <signal.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 
@@ -81,7 +82,7 @@ static gnutls_datum_t master =
 static gnutls_datum_t sess_id =
     { (void*)"\xd9\xb9\x95\xe7\xea", 5};
 
-static void client(int fd)
+static void client(int fd, int proto, int cipher, int mac)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -105,12 +106,12 @@ static void client(int fd)
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-CBC:+SHA1:+RSA:%COMPAT",
+				   "NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-GCM:+AEAD:+AES-128-CBC:+SHA1:+RSA:%COMPAT",
 				   NULL);
 
 	ret = gnutls_session_set_premaster(session, GNUTLS_CLIENT,
-		GNUTLS_DTLS0_9, GNUTLS_KX_RSA,
-		GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1,
+		proto, GNUTLS_KX_RSA,
+		cipher, mac,
 		GNUTLS_COMP_NULL, &master, &sess_id);
 	if (ret < 0) {
 		fail("client: gnutls_session_set_premaster failed: %s\n", gnutls_strerror(ret));
@@ -183,7 +184,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, int proto, int cipher, int mac)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred;
@@ -193,6 +194,8 @@ static void server(int fd)
 	/* this must be called once in the program
 	 */
 	global_init();
+
+	success("testing for %s-%s\n", gnutls_cipher_get_name(cipher), gnutls_mac_get_name(mac));
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);
@@ -209,12 +212,12 @@ static void server(int fd)
 	 * are adequate.
 	 */
 	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-CBC:+SHA1:+RSA:%COMPAT",
+				   "NONE:+VERS-DTLS0.9:+COMP-NULL:+AES-128-CBC:+AES-128-GCM:+AEAD:+SHA1:+RSA:%COMPAT",
 				   NULL);
 
 	ret = gnutls_session_set_premaster(session, GNUTLS_SERVER,
-		GNUTLS_DTLS0_9, GNUTLS_KX_RSA,
-		GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1,
+		proto, GNUTLS_KX_RSA,
+		cipher, mac,
 		GNUTLS_COMP_NULL, &master, &sess_id);
 	if (ret < 0) {
 		fail("server: gnutls_session_set_premaster failed: %s\n", gnutls_strerror(ret));
@@ -277,7 +280,7 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static void run(int proto, int cipher, int mac)
 {
 	int fd[2];
 	int ret;
@@ -299,16 +302,27 @@ void doit(void)
 		int status;
 		/* parent */
 
-		server(fd[0]);
+		close(fd[1]);
+		server(fd[0], proto, cipher, mac);
 		wait(&status);
 		if (WEXITSTATUS(status) != 0)
 			fail("Child died with status %d\n",
 			     WEXITSTATUS(status));
+		close(fd[0]);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], proto, cipher, mac);
+		close(fd[1]);
 		exit(0);
 	}
+}
+
+void doit(void)
+{
+	signal(SIGPIPE, SIG_IGN);
+
+	run(GNUTLS_DTLS0_9, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1);
+	run(GNUTLS_DTLS0_9, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD);
 }
 
 #endif				/* _WIN32 */
