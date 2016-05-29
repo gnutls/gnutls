@@ -205,7 +205,7 @@ flag = {
 
 flag = {
     name      = load-data;
-    descrip   = "Loads auxilary data";
+    descrip   = "Loads auxiliary data";
     arg-type  = string;
     doc = "";
 };
