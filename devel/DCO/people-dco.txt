@@ -45,3 +45,7 @@ Jaak Ristioja <jaak.ristioja||cyber.ee>
 Luke Dashjr <luke-jr+git||utopios.org>
 	13 Jan 2015
 	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7949
+
+Tim Kosse <tim.kosse||filezilla-project.org>
+	30 May 2016
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/8559
