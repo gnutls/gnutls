@@ -790,6 +790,14 @@ expiration_days = 700
 # An email in case of a person
 email = "none@@none.org"
 
+# TLS feature (rfc7633) extension. That can is used to indicate mandatory TLS
+# extension features to be provided by the server. In practice this is used
+# to require the Status Request (extid: 5) extension from the server. That is,
+# to require the server holding this certificate to provide a stapled OCSP response.
+
+# To ask for OCSP status request use:
+#tls_feature = 5
+
 # Challenge password used in certificate requests
 challenge_password = 123456
 
