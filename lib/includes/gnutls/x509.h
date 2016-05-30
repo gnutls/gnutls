@@ -462,6 +462,9 @@ int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *features);
 void gnutls_x509_tlsfeatures_deinit(gnutls_x509_tlsfeatures_t);
 int gnutls_x509_tlsfeatures_get(gnutls_x509_tlsfeatures_t f, unsigned idx, unsigned int *feature);
 
+int gnutls_x509_crt_set_tlsfeatures(gnutls_x509_crt_t crt,
+				    gnutls_x509_tlsfeatures_t features);
+
 int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t cert,
 								   gnutls_x509_tlsfeatures_t * features);
 

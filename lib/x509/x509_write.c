@@ -1880,3 +1880,45 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
 
 	return ret;
 }
+
+/**
+ * gnutls_x509_crt_set_tlsfeatures:
+ * @crt: A X.509 certificate
+ * @features: If the function succeeds, the
+ *   features will be added to the certificate.
+ *
+ * This function will set the certificates
+ * X.509 TLS extention from the given structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_crt_set_tlsfeatures(gnutls_x509_crt_t crt,
+				    gnutls_x509_tlsfeatures_t features)
+{
+	int ret;
+	gnutls_datum_t der;
+
+	if (crt == NULL || features == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_x509_ext_export_tlsfeatures(features, &der);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _gnutls_x509_crt_set_extension(crt, GNUTLS_X509EXT_OID_TLSFEATURES, &der, 0);
+
+	_gnutls_free_datum(&der);
+
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+	return ret;
+}

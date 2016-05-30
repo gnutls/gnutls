@@ -2121,7 +2121,7 @@ int gnutls_x509_tlsfeatures_get(gnutls_x509_tlsfeatures_t f, unsigned idx, unsig
  *   features will be stored in this variable.
  *
  * This function will get the X.509 TLS features
- * extention structure from the certificate. The
+ * extension structure from the certificate. The
  * returned structure needs to be freed using
  * gnutls_x509_tlsfeatures_deinit().
  *
