@@ -45,7 +45,7 @@ datefudge -s "2007-04-22" \
 		--outfile "${TMPFILE}" 2>/dev/null
 rc=$?
 
-${DIFF} "${srcdir}/template-tlsfeature.pem" "${TMPFILE}" >/dev/null 2>&1
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/template-tlsfeature.pem" "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -101,15 +101,19 @@ datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-request \
 		--load-privkey "${srcdir}/template-test.key" \
 		--template "${srcdir}/template-tlsfeature.tmpl" \
-		--outfile "${TMPFILE}" 2>/dev/null
+		--outfile "${TMPFILE}" -d 4 #2>/dev/null
 rc=$?
+if test "${rc}" != "0"; then
+	echo "CSR generation test (0) failed"
+	exit ${rc}
+fi
 
-${DIFF} "${srcdir}/template-tlsfeature.csr" "${TMPFILE}" >/dev/null 2>&1
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/template-tlsfeature.csr" "${TMPFILE}" #>/dev/null 2>&1
 rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
-	echo "CSR generation test failed"
+	echo "CSR generation test (1) failed"
 	exit ${rc}
 fi
 
