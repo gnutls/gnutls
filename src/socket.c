@@ -338,7 +338,7 @@ void socket_bye(socket_st * socket)
 void canonicalize_host(char *hostname, char *service, unsigned service_size)
 {
 	char *p;
-	unsigned char buf[sizeof(struct in6_addr)];
+	unsigned char buf[64];
 
 	p = strchr(hostname, ':');
 	if (p == NULL)
