@@ -529,12 +529,14 @@ const asn1_static_node pkix_asn1_tab[] = {
   { "GeneralSubtrees", 1612709899, NULL },
   { "MAX", 1074266122, "1"},
   { NULL, 2, "GeneralSubtree"},
-  { "GeneralSubtree", 536870917, NULL },
+  { "GeneralSubtree", 1610612741, NULL },
   { "base", 1073741826, "GeneralName"},
   { "minimum", 1610653699, NULL },
   { NULL, 1073741833, "0"},
   { NULL, 4104, "0"},
   { "maximum", 536895491, NULL },
   { NULL, 4104, "1"},
+  { "TlsFeatures", 536870923, NULL },
+  { NULL, 3, NULL },
   { NULL, 0, NULL }
 };

@@ -2052,6 +2052,131 @@ gnutls_x509_crt_get_proxy(gnutls_x509_crt_t cert,
 }
 
 /**
+ * gnutls_x509_tlsfeatures_init:
+ * @f: The TLS features
+ *
+ * This function will initialize a X.509 TLS features extention structure
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *f)
+{
+	*f = gnutls_calloc(1, sizeof(struct gnutls_x509_tlsfeatures_st));
+	if (*f == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_tlsfeatures_deinit:
+ * @f: The TLS features
+ *
+ * This function will deinitialize a X.509 TLS features extention structure
+ *
+ * Since: TBD
+ **/
+void gnutls_x509_tlsfeatures_deinit(gnutls_x509_tlsfeatures_t f)
+{
+	gnutls_free(f->features);
+	gnutls_free(f);
+}
+
+/**
+ * gnutls_x509_tlsfeatures_get:
+ * @f: The TLS features
+ * @idx: The index of the feature to get
+ * @feature: If the function succeeds, the feature will be stored in this variable
+ *
+ * This function will get a feature from the X.509 TLS features
+ * extention structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_tlsfeatures_get(gnutls_x509_tlsfeatures_t f, unsigned idx, unsigned int *feature)
+{
+	if (f == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (idx >= f->size) {
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	}
+
+	*feature = f->features[idx].feature;
+	return 0;
+}
+
+/**
+ * gnutls_x509_crt_get_tlsfeatures:
+ * @crt: A X.509 certificate
+ * @features: If the function succeeds, the
+ *   features will be stored in this variable.
+ *
+ * This function will get the X.509 TLS features
+ * extention structure from the certificate. The
+ * returned structure needs to be freed using
+ * gnutls_x509_tlsfeatures_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t crt,
+								   gnutls_x509_tlsfeatures_t *features)
+{
+	int ret;
+	gnutls_datum_t der;
+	unsigned int critical;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if ((ret =
+		 _gnutls_x509_crt_get_extension(crt, GNUTLS_X509EXT_OID_TLSFEATURES, 0,
+						&der, &critical)) < 0)
+	{
+		return ret;
+	}
+
+	if (der.size == 0 || der.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	ret = gnutls_x509_tlsfeatures_init(features);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_x509_ext_import_tlsfeatures(&der, *features, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	gnutls_free(der.data);
+	return ret;
+
+ cleanup:
+	if (features != NULL)
+		gnutls_x509_tlsfeatures_deinit(*features);
+	gnutls_free(der.data);
+	return ret;
+}
+
+/**
  * gnutls_x509_policy_release:
  * @policy: a certificate policy
  *
@@ -3845,7 +3970,7 @@ legacy_parse_aia(ASN1_TYPE src,
  *
  * If @what is %GNUTLS_IA_OCSP_URI, @data will hold the OCSP URI.
  * Requesting this @what value leads to an error if the accessMethod
- * is not 1.3.6.1.5.5.7.48.1 aka OSCP, or if accessLocation is not of
+ * is not 1.3.6.1.5.5.7.48.1 aka OCSP, or if accessLocation is not of
  * the "uniformResourceIdentifier" type. In that case %GNUTLS_E_UNKNOWN_ALGORITHM
  * will be returned, and @seq should be increased and this function
  * called again.

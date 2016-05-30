@@ -103,6 +103,7 @@ extern "C" {
 #define GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE "2.5.29.37"
 #define GNUTLS_X509EXT_OID_AUTHORITY_INFO_ACCESS "1.3.6.1.5.5.7.1.1"
 #define GNUTLS_X509EXT_OID_PROXY_CRT_INFO "1.3.6.1.5.5.7.1.14"
+#define GNUTLS_X509EXT_OID_TLSFEATURES "1.3.6.1.5.5.7.1.24"
 
 /* Certificate handling functions.
  */
@@ -453,6 +454,16 @@ int gnutls_x509_crt_get_proxy(gnutls_x509_crt_t cert,
 			      int *pathlen,
 			      char **policyLanguage,
 			      char **policy, size_t * sizeof_policy);
+
+
+typedef struct gnutls_x509_tlsfeatures_st *gnutls_x509_tlsfeatures_t;
+
+int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *features);
+void gnutls_x509_tlsfeatures_deinit(gnutls_x509_tlsfeatures_t);
+int gnutls_x509_tlsfeatures_get(gnutls_x509_tlsfeatures_t f, unsigned idx, unsigned int *feature);
+
+int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t cert,
+								   gnutls_x509_tlsfeatures_t * features);
 
 #define GNUTLS_MAX_QUALIFIERS 8
 

@@ -687,4 +687,7 @@ GeneralSubtree ::= SEQUENCE {
      minimum         [0]     INTEGER DEFAULT 0,
      maximum         [1]     INTEGER OPTIONAL }
 
+-- rfc7633
+TlsFeatures ::= SEQUENCE OF INTEGER
+
 END

@@ -3151,3 +3151,100 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 	
 }
 
+
+static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f)
+{
+	char nptr[ASN1_MAX_NAME_SIZE];
+	int result;
+	void * tmp;
+	unsigned i, indx;
+	unsigned int feature;
+
+	for (i = 1;; i++) {
+		snprintf(nptr, sizeof(nptr), "?%u", i);
+
+		result = _gnutls_x509_read_uint(c2, nptr, &feature);
+
+		if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND || result == GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+			break;
+		}
+		else if (result != GNUTLS_E_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+		if (feature > UINT16_MAX) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		indx = f->size;
+		tmp = gnutls_realloc(f->features, (f->size + 1) * sizeof(f->features[0]));
+		if (tmp == NULL) {
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+		f->features = tmp;
+
+		f->features[indx].feature = feature;
+
+		f->size++;
+	}
+
+	if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		return result;
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_ext_import_tlsfeatures:
+ * @ext: The DER-encoded extension data
+ * @f: The features structure
+ * @flags: should be zero
+ *
+ * This function will export the features in the provided DER-encoded
+ * TLS Features PKIX extension, to a %gnutls_x509_tlsfeatures_t type. @f
+ * must be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
+									   gnutls_x509_tlsfeatures_t f,
+									   unsigned int flags)
+{
+	int ret;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	if (ext->size == 0 || ext->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	ret = asn1_create_element(_gnutls_get_pkix(),
+				  "PKIX1.TlsFeatures", &c2);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(ret);
+	}
+
+	ret = _asn1_strict_der_decode(&c2, ext->data, ext->size, NULL);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+
+	ret = parse_tlsfeatures(c2, f);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+ cleanup:
+	asn1_delete_structure(&c2);
+
+	return ret;
+}
+

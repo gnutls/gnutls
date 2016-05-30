@@ -880,6 +880,41 @@ print_unique_ids(gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
 	}
 }
 
+static void print_tlsfeatures(gnutls_buffer_st * str, const char *prefix, const gnutls_datum_t *der)
+{
+	int err;
+	int seq;
+	gnutls_x509_tlsfeatures_t features;
+	unsigned int feature;
+
+	err = gnutls_x509_tlsfeatures_init(&features);
+	if (err < 0)
+		return;
+
+	err = gnutls_x509_ext_import_tlsfeatures(der, features, 0);
+	if (err < 0) {
+		addf(str, "error: get_tlsfeatures: %s\n",
+			 gnutls_strerror(err));
+		goto cleanup;
+	}
+
+	for (seq=0;;seq++) {
+		err = gnutls_x509_tlsfeatures_get(features, seq, &feature);
+		if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			goto cleanup;
+		if (err < 0) {
+			addf(str, "error: get_tlsfeatures: %s\n",
+				 gnutls_strerror(err));
+			goto cleanup;
+		}
+
+		addf(str, "%s\t\t\t%u\n", prefix, feature);
+	}
+
+cleanup:
+	gnutls_x509_tlsfeatures_deinit(features);
+}
+
 struct ext_indexes_st {
 	int san;
 	int ian;
@@ -890,6 +925,7 @@ struct ext_indexes_st {
 	int ski;
 	int aki, nc;
 	int crldist, pkey_usage_period;
+	int tlsfeatures;
 };
 
 static void print_extension(gnutls_buffer_st * str, const char *prefix,
@@ -1110,6 +1146,19 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 		     critical ? _("critical") : _("not critical"));
 
 		print_nc(str, prefix, der);
+	} else if (strcmp(oid, GNUTLS_X509EXT_OID_TLSFEATURES) == 0) {
+		if (idx->tlsfeatures) {
+			addf(str,
+				 "warning: more than one tlsfeatures extension\n");
+		}
+
+		addf(str, _("%s\t\tTLS Features (%s):\n"),
+			 prefix,
+			 critical ? _("critical") : _("not critical"));
+
+		print_tlsfeatures(str, prefix, der);
+
+		idx->tlsfeatures++;
 	} else {
 		addf(str, _("%s\t\tUnknown extension %s (%s):\n"),
 		     prefix, oid,
