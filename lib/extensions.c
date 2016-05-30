@@ -136,7 +136,7 @@ static gnutls_ext_unpack_func _gnutls_ext_func_unpack(uint16_t type)
 }
 
 
-static const char *_gnutls_extension_get_name(uint16_t type)
+const char *_gnutls_extension_get_name(uint16_t type)
 {
 	size_t i;
 

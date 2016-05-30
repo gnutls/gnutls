@@ -88,4 +88,6 @@ typedef struct {
 
 int _gnutls_ext_register(extension_entry_st *);
 
+const char *_gnutls_extension_get_name(uint16_t type);
+
 #endif

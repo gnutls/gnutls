@@ -33,6 +33,7 @@
 #include <extras/randomart.h>
 #include <c-ctype.h>
 #include <gnutls-idna.h>
+#include "extensions.h"
 
 #ifdef HAVE_INET_NTOP
 # include <arpa/inet.h>
@@ -885,6 +886,7 @@ static void print_tlsfeatures(gnutls_buffer_st * str, const char *prefix, const 
 	int err;
 	int seq;
 	gnutls_x509_tlsfeatures_t features;
+	const char *name;
 	unsigned int feature;
 
 	err = gnutls_x509_tlsfeatures_init(&features);
@@ -908,7 +910,11 @@ static void print_tlsfeatures(gnutls_buffer_st * str, const char *prefix, const 
 			goto cleanup;
 		}
 
-		addf(str, "%s\t\t\t%u\n", prefix, feature);
+		name = _gnutls_extension_get_name(feature);
+		if (name == NULL)
+			addf(str, "%s\t\t\t%u\n", prefix, feature);
+		else
+			addf(str, "%s\t\t\t%s(%u)\n", prefix, name, feature);
 	}
 
 cleanup:
