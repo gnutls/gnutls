@@ -39,7 +39,8 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	template-othername-xmpp.tmpl template-othername-xmpp.pem template-krb5name.tmpl \
 	template-krb5name.pem template-krb5name-full.pem template-test-ecc.key \
 	template-rsa-sha3-256.pem template-rsa-sha3-512.pem template-rsa-sha3-224.pem template-rsa-sha3-384.pem \
-	name-constraints-ip2.pem chain-md5.pem gost-cert.pem
+	name-constraints-ip2.pem chain-md5.pem gost-cert.pem template-tlsfeature.tmpl \
+	template-tlsfeature.pem template-tlsfeature.csr
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -54,7 +55,8 @@ dist_check_SCRIPTS += crq
 endif
 
 if !WINDOWS
-dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test
+dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
+	tlsfeature-test
 endif
 
 if ENABLE_DANE
