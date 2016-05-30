@@ -1086,6 +1086,16 @@ GNUTLS_3_4
 	gnutls_ecc_curve_get_pk;
 	gnutls_x509_crt_equals;
 	gnutls_x509_crt_equals2;
+	gnutls_x509_ext_import_tlsfeatures;
+	gnutls_x509_ext_export_tlsfeatures;
+	gnutls_x509_tlsfeatures_add;
+	gnutls_x509_tlsfeatures_init;
+	gnutls_x509_tlsfeatures_deinit;
+	gnutls_x509_tlsfeatures_get;
+	gnutls_x509_crt_get_tlsfeatures;
+	gnutls_x509_crt_set_tlsfeatures;
+	gnutls_x509_crq_get_tlsfeatures;
+	gnutls_x509_crq_set_tlsfeatures;
  local:
 	*;
 };
