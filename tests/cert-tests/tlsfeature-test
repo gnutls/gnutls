@@ -139,7 +139,7 @@ grep "17" "${TMPFILE2}" >/dev/null 2>&1
 rc=$?
 
 if test "${rc}" != "0"; then
-	echo "CSR printing (1) failed"
+	echo "CSR printing (2) failed"
 	exit ${rc}
 fi
 
@@ -147,7 +147,42 @@ grep "Status Request(5)" "${TMPFILE2}" >/dev/null 2>&1
 rc=$?
 
 if test "${rc}" != "0"; then
-	echo "CSR printing (2) failed"
+	echo "CSR printing (3) failed"
+	exit ${rc}
+fi
+
+#
+# Test certificate generation after a request
+#
+datefudge -s "2007-04-22" \
+"${CERTTOOL}" --generate-certificate \
+		--load-privkey "${srcdir}/template-test.key" \
+		--load-ca-privkey "${srcdir}/template-test.key" \
+		--load-ca-certificate "${srcdir}/template-tlsfeature.pem" \
+		--template "${srcdir}/template-tlsfeature-crq.tmpl" \
+		--load-request "${TMPFILE}" >"${TMPFILE2}" 2>&1
+
+grep -A 2 "TLS Features" "${TMPFILE2}" >"${TMPFILE}" 2>/dev/null
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Cert generation (csr) (0) failed"
+	exit ${rc}
+fi
+
+grep "17" "${TMPFILE}" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Cert generation (csr) (1) failed"
+	exit ${rc}
+fi
+
+grep "Status Request(5)" "${TMPFILE}" >/dev/null 2>&1
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Cert generation (csr) (2) failed"
 	exit ${rc}
 fi
 
