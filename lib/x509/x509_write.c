@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1893,7 +1893,7 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 int gnutls_x509_crt_set_tlsfeatures(gnutls_x509_crt_t crt,
 				    gnutls_x509_tlsfeatures_t features)

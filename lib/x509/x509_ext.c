@@ -3205,7 +3205,7 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
 									   gnutls_x509_tlsfeatures_t f,
@@ -3255,7 +3255,7 @@ int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
 					  gnutls_datum_t * ext)
@@ -3315,7 +3315,7 @@ int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 int gnutls_x509_tlsfeatures_add(gnutls_x509_tlsfeatures_t f, unsigned int feature)
 {

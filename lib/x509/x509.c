@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ *
  * Authors: Nikos Mavrogiannopoulos, Simon Josefsson, Howard Chu
  *
  * This file is part of GnuTLS.
@@ -2060,7 +2061,7 @@ gnutls_x509_crt_get_proxy(gnutls_x509_crt_t cert,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *f)
 {
@@ -2077,7 +2078,7 @@ int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *f)
  *
  * This function will deinitialize a X.509 TLS features extention structure
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 void gnutls_x509_tlsfeatures_deinit(gnutls_x509_tlsfeatures_t f)
 {
@@ -2097,7 +2098,7 @@ void gnutls_x509_tlsfeatures_deinit(gnutls_x509_tlsfeatures_t f)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 int gnutls_x509_tlsfeatures_get(gnutls_x509_tlsfeatures_t f, unsigned idx, unsigned int *feature)
 {
@@ -2128,7 +2129,7 @@ int gnutls_x509_tlsfeatures_get(gnutls_x509_tlsfeatures_t f, unsigned idx, unsig
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
  *
- * Since: TBD
+ * Since: 3.5.1
  **/
 int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t crt,
 								   gnutls_x509_tlsfeatures_t *features)

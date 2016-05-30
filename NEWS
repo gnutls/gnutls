@@ -11,13 +11,27 @@ See the end for copying conditions.
 ** libgnutls: The SSL 2.0 client hello support can completely be removed
    using a compile time option. The configure option is --disable-ssl2-support.
 
+** libgnutls: Added support for OCSP Must staple PKIX extension. That is,
+   implemented the RFC7633 TLSFeature for OCSP status request extension.
+   Feature implemented by Tim Kosse.
+
 ** libgnutls: The SSLKEYLOGFILE and GNUTLS_KEYLOGFILE environment variables can
    be used to log session keys. These session keys are compatible with
    the NSS Key Log Format and can be used to decrypt the session for
    debugging using wireshark.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_ext_import_tlsfeatures: Added
+gnutls_x509_ext_export_tlsfeatures: Added
+gnutls_x509_tlsfeatures_add: Added
+gnutls_x509_tlsfeatures_init: Added
+gnutls_x509_tlsfeatures_deinit: Added
+gnutls_x509_tlsfeatures_get: Added
+gnutls_x509_crt_get_tlsfeatures: Added
+gnutls_x509_crt_set_tlsfeatures: Added
+gnutls_x509_crq_get_tlsfeatures: Added
+gnutls_x509_crq_set_tlsfeatures: Added
+gnutls_ext_get_name: Added
 
 
 * Version 3.5.0 (released 2016-05-09)
