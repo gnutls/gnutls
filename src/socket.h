@@ -36,4 +36,6 @@ const char *port_to_service(const char *sport, const char *proto);
 int starttls_proto_to_port(const char *app_proto);
 const char *starttls_proto_to_service(const char *app_proto);
 
+void canonicalize_host(char *hostname, char *service, unsigned service_size);
+
 #define CONNECT_MSG "Connecting to"

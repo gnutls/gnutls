@@ -333,6 +333,24 @@ void socket_bye(socket_st * socket)
 	socket->secure = 0;
 }
 
+/* Handle host:port format.
+ */
+void canonicalize_host(char *hostname, char *service, unsigned service_size)
+{
+	char *p;
+	unsigned char buf[sizeof(struct in6_addr)];
+
+	p = strchr(hostname, ':');
+	if (p == NULL)
+		return;
+
+	if (inet_pton(AF_INET6, hostname, buf) == 1)
+		return;
+
+	*p = 0;
+	snprintf(service, service_size, "%s", p+1);
+}
+
 void
 socket_open(socket_st * hd, const char *hostname, const char *service,
 	    int udp, const char *msg)

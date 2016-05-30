@@ -73,7 +73,7 @@
 /* global stuff here */
 int resume, starttls, insecure, ranges, rehandshake, udp, mtu,
     inline_commands;
-const char *hostname = NULL;
+char *hostname = NULL;
 char service[32]="";
 int record_max_size;
 int fingerprint;
@@ -904,6 +904,8 @@ static int try_resume(socket_st * hd)
 	printf("- Disconnecting\n");
 	socket_bye(hd);
 
+	canonicalize_host(hostname, service, sizeof(service));
+
 	printf
 	    ("\n\n- Connecting again- trying to resume previous session\n");
 	socket_open(hd, hostname, service, udp, CONNECT_MSG);
@@ -1207,6 +1209,8 @@ int main(int argc, char **argv)
 
 	init_global_tls_stuff();
 
+	canonicalize_host(hostname, service, sizeof(service));
+
 	socket_open(&hd, hostname, service, udp, CONNECT_MSG);
 	hd.verbose = verbose;
 
@@ -1478,7 +1482,7 @@ void print_priority_list(void)
 
 static void cmd_parser(int argc, char **argv)
 {
-	const char *rest = NULL;
+	char *rest = NULL;
 
 	int optct = optionProcess(&gnutls_cliOptions, argc, argv);
 	argc -= optct;

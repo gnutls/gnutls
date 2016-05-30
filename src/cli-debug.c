@@ -44,7 +44,7 @@ static void cmd_parser(int argc, char **argv);
 
 /* global stuff here */
 int resume;
-const char *hostname = NULL;
+char *hostname = NULL;
 int port;
 int record_max_size;
 int fingerprint;
@@ -251,6 +251,8 @@ int main(int argc, char **argv)
 	i = 0;
 
 	printf("GnuTLS debug client %s\n", gnutls_check_version(NULL));
+
+	canonicalize_host(hostname, portname, sizeof(portname));
 	printf("Checking %s:%s\n", hostname, portname);
 	do {
 
@@ -273,8 +275,7 @@ int main(int argc, char **argv)
 
 		gnutls_init(&state, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
 
-		gnutls_transport_set_ptr(state, (gnutls_transport_ptr_t)
-					 gl_fd_to_handle(hd.fd));
+		gnutls_transport_set_int(state, hd.fd);
 		set_read_funcs(state);
 		if (hostname && is_ip(hostname) == 0)
 			gnutls_server_name_set(state, GNUTLS_NAME_DNS,
@@ -334,7 +335,8 @@ int main(int argc, char **argv)
 
 static void cmd_parser(int argc, char **argv)
 {
-	const char *rest = NULL;
+	char *rest = NULL;
+	static char lh[] = "localhost";
 	int optct = optionProcess(&gnutls_cli_debugOptions, argc, argv);
 	argc -= optct;
 	argv += optct;
@@ -352,7 +354,7 @@ static void cmd_parser(int argc, char **argv)
 	}
 
 	if (rest == NULL)
-		hostname = "localhost";
+		hostname = lh;
 	else
 		hostname = rest;
 
