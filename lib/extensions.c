@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos, Simon Josefsson
  *
@@ -136,12 +137,21 @@ static gnutls_ext_unpack_func _gnutls_ext_func_unpack(uint16_t type)
 }
 
 
-const char *_gnutls_extension_get_name(uint16_t type)
+/**
+ * gnutls_ext_get_name:
+ * @ext: is a TLS extension numeric ID
+ *
+ * Convert a TLS extension numeric ID to a printable string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified cipher, or %NULL.
+ **/
+const char *gnutls_ext_get_name(unsigned int ext)
 {
 	size_t i;
 
 	for (i = 0; extfunc[i] != NULL; i++)
-		if (extfunc[i]->type == type)
+		if (extfunc[i]->type == ext)
 			return extfunc[i]->name;
 
 	return NULL;
@@ -184,7 +194,7 @@ _gnutls_parse_extensions(gnutls_session_t session,
 			_gnutls_handshake_log
 			    ("EXT[%d]: expecting extension '%s'\n",
 			     session,
-			     _gnutls_extension_get_name(session->internals.
+			     gnutls_ext_get_name(session->internals.
 							extensions_sent
 							[i]));
 		}
@@ -223,14 +233,14 @@ _gnutls_parse_extensions(gnutls_session_t session,
 		if (ext_recv == NULL) {
 			_gnutls_handshake_log
 			    ("EXT[%p]: Found extension '%s/%d'\n", session,
-			     _gnutls_extension_get_name(type), type);
+			     gnutls_ext_get_name(type), type);
 
 			continue;
 		}
 
 		_gnutls_handshake_log
 		    ("EXT[%p]: Parsing extension '%s/%d' (%d bytes)\n",
-		     session, _gnutls_extension_get_name(type), type,
+		     session, gnutls_ext_get_name(type), type,
 		     size);
 
 		if ((ret = ext_recv(session, sdata, size)) < 0) {

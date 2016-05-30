@@ -2515,6 +2515,8 @@ int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t pars
 				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 				gnutls_ext_unpack_func unpack_func);
 
+const char *gnutls_ext_get_name(unsigned int ext);
+
 /* Public supplemental data related functions */
 
 typedef int (*gnutls_supp_recv_func) (gnutls_session_t session,

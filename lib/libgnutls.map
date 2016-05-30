@@ -1096,6 +1096,7 @@ GNUTLS_3_4
 	gnutls_x509_crt_set_tlsfeatures;
 	gnutls_x509_crq_get_tlsfeatures;
 	gnutls_x509_crq_set_tlsfeatures;
+	gnutls_ext_get_name;
  local:
 	*;
 };

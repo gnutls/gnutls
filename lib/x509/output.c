@@ -910,7 +910,7 @@ static void print_tlsfeatures(gnutls_buffer_st * str, const char *prefix, const 
 			goto cleanup;
 		}
 
-		name = _gnutls_extension_get_name(feature);
+		name = gnutls_ext_get_name(feature);
 		if (name == NULL)
 			addf(str, "%s\t\t\t%u\n", prefix, feature);
 		else
