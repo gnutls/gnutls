@@ -3190,10 +3190,6 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f)
 		f->size++;
 	}
 
-	if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-		return result;
-	}
-
 	return 0;
 }
 
@@ -3248,3 +3244,99 @@ int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
 	return ret;
 }
 
+/**
+ * gnutls_x509_ext_export_tlsfeatures:
+ * @f: The features structure
+ * @ext: The DER-encoded extension data; must be freed using gnutls_free().
+ *
+ * This function will convert the provided TLS features structure structure to a
+ * DER-encoded TLS features PKIX extension. The output data in @ext will be allocated using
+ * gnutls_malloc().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
+					  gnutls_datum_t * ext)
+{
+	if (f == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int ret;
+	unsigned i;
+
+	ret = asn1_create_element(_gnutls_get_pkix(), "PKIX1.TlsFeatures", &c2);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(ret);
+	}
+
+	for (i = 0; i < f->size; ++i) {
+
+		ret = asn1_write_value(c2, "", "NEW", 1);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;
+		}
+
+		ret = _gnutls_x509_write_uint32(c2, "?LAST", f->features[i].feature);
+		if (ret != GNUTLS_E_SUCCESS) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	ret = _gnutls_x509_der_encode(c2, "", ext, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+
+ cleanup:
+	asn1_delete_structure(&c2);
+	return ret;
+}
+
+/**
+ * gnutls_x509_tlsfeatures_add:
+ * @f: The TLS features
+ * @feature: The feature to add
+ *
+ * This function will append a feature to the X.509 TLS features
+ * extention structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_tlsfeatures_add(gnutls_x509_tlsfeatures_t f, unsigned int feature)
+{
+	void * tmp;
+
+	if (f == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (feature > UINT16_MAX) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	tmp = gnutls_realloc(f->features, (f->size + 1) * sizeof(f->features[0]));
+	if (tmp == NULL) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+	f->features = tmp;
+	f->features[f->size++].feature = feature;
+
+	return 0;
+}

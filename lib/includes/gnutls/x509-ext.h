@@ -189,6 +189,11 @@ int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
 									   gnutls_x509_tlsfeatures_t,
 									   unsigned int flags);
 
+int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
+					  gnutls_datum_t * ext);
+
+int gnutls_x509_tlsfeatures_add(gnutls_x509_tlsfeatures_t f, unsigned int feature);
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }
