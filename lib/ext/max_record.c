@@ -48,7 +48,7 @@ static int _gnutls_mre_record2num(uint16_t record_size);
 
 
 const extension_entry_st ext_mod_max_record_size = {
-	.name = "MAX RECORD SIZE",
+	.name = "Maximum Record Size",
 	.type = GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 	.parse_type = GNUTLS_EXT_TLS,
 

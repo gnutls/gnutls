@@ -46,7 +46,7 @@ static int _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
 						extdata);
 
 const extension_entry_st ext_mod_supported_ecc = {
-	.name = "SUPPORTED ECC",
+	.name = "Supported curves",
 	.type = GNUTLS_EXTENSION_SUPPORTED_ECC,
 	.parse_type = GNUTLS_EXT_TLS,
 

@@ -32,7 +32,7 @@ static int _gnutls_sr_send_params(gnutls_session_t state,
 static void _gnutls_sr_deinit_data(extension_priv_data_t priv);
 
 const extension_entry_st ext_mod_sr = {
-	.name = "SAFE RENEGOTIATION",
+	.name = "Safe Renegotiation",
 	.type = GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 	.parse_type = GNUTLS_EXT_MANDATORY,
 

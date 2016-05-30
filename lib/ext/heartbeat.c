@@ -520,7 +520,7 @@ _gnutls_heartbeat_unpack(gnutls_buffer_st * ps,
 }
 
 const extension_entry_st ext_mod_heartbeat = {
-	.name = "HEARTBEAT",
+	.name = "Heartbeat",
 	.type = GNUTLS_EXTENSION_HEARTBEAT,
 	.parse_type = GNUTLS_EXT_TLS,
 
