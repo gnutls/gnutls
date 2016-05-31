@@ -58,7 +58,7 @@ int gnutls_pkcs7_get_signature_count(gnutls_pkcs7_t pkcs7);
 int gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_datum_t *data);
 
 int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7);
-int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7, int indx,
+int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7, unsigned indx,
 			     void *certificate, size_t * certificate_size);
 
 int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7_t pkcs7,
@@ -67,7 +67,7 @@ int gnutls_pkcs7_set_crt(gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt);
 int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx);
 
 int gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
-			     int indx, void *crl, size_t * crl_size);
+			     unsigned indx, void *crl, size_t * crl_size);
 int gnutls_pkcs7_get_crl_count(gnutls_pkcs7_t pkcs7);
 
 int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7,
@@ -130,10 +130,10 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 
 int
 gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
-			 int indx, gnutls_datum_t *cert);
+			  unsigned indx, gnutls_datum_t *cert);
 int
 gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
-			  int indx, gnutls_datum_t *crl);
+			  unsigned indx, gnutls_datum_t *crl);
 
 int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		       gnutls_certificate_print_formats_t format,

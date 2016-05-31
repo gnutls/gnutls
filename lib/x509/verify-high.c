@@ -560,10 +560,10 @@ int ret;
 int
 gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 				  const gnutls_x509_crt_t * clist,
-				  int clist_size)
+				  unsigned clist_size)
 {
-	int i, r = 0;
-	unsigned j;
+	int r = 0;
+	unsigned j, i;
 	uint32_t hash;
 
 	for (i = 0; i < clist_size; i++) {
@@ -700,11 +700,11 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
 int
 gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 				const gnutls_x509_crl_t * crl_list,
-				int crl_size, unsigned int flags,
+				unsigned crl_size, unsigned int flags,
 				unsigned int verification_flags)
 {
-	int ret, i, j = 0;
-	unsigned x;
+	int ret;
+	unsigned x, i, j = 0;
 	unsigned int vret = 0;
 	uint32_t hash;
 

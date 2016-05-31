@@ -110,8 +110,8 @@ typedef enum gnutls_pkcs12_bag_type_t {
 } gnutls_pkcs12_bag_type_t;
 
 gnutls_pkcs12_bag_type_t
-gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t bag, int indx);
-int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t bag, int indx,
+gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t bag, unsigned indx);
+int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t bag, unsigned indx,
 			       gnutls_datum_t * data);
 int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t bag,
 			       gnutls_pkcs12_bag_type_t type,
@@ -130,15 +130,15 @@ int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t * bag);
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag_t bag);
 int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag_t bag);
 
-int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t bag, int indx,
+int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
 				 gnutls_datum_t * id);
-int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t bag, int indx,
+int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t bag, unsigned indx,
 				 const gnutls_datum_t * id);
 
 int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t bag,
-					int indx, char **name);
+					unsigned indx, char **name);
 int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag_t bag,
-					int indx, const char *name);
+					unsigned indx, const char *name);
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

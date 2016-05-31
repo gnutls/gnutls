@@ -560,7 +560,7 @@ gnutls_x509_crt_get_issuer_dn2(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
  **/
 int
 gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
-				     const char *oid, int indx,
+				     const char *oid, unsigned indx,
 				     unsigned int raw_flag, void *buf,
 				     size_t * buf_size)
 {
@@ -602,7 +602,7 @@ gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
-				  int indx, void *oid, size_t * oid_size)
+				  unsigned indx, void *oid, size_t * oid_size)
 {
 	if (cert == NULL) {
 		gnutls_assert();
@@ -704,7 +704,7 @@ int gnutls_x509_crt_get_dn2(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
  **/
 int
 gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert, const char *oid,
-			      int indx, unsigned int raw_flag,
+			      unsigned indx, unsigned int raw_flag,
 			      void *buf, size_t * buf_size)
 {
 	gnutls_datum_t td;
@@ -745,7 +745,7 @@ gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert, const char *oid,
  **/
 int
 gnutls_x509_crt_get_dn_oid(gnutls_x509_crt_t cert,
-			   int indx, void *oid, size_t * oid_size)
+			   unsigned indx, void *oid, size_t * oid_size)
 {
 	if (cert == NULL) {
 		gnutls_assert();
@@ -2215,7 +2215,7 @@ void gnutls_x509_policy_release(struct gnutls_x509_policy_st *policy)
  * Since: 3.1.5
  **/
 int
-gnutls_x509_crt_get_policy(gnutls_x509_crt_t crt, int indx,
+gnutls_x509_crt_get_policy(gnutls_x509_crt_t crt, unsigned indx,
 			   struct gnutls_x509_policy_st *policy,
 			   unsigned int *critical)
 {
@@ -2291,7 +2291,7 @@ gnutls_x509_crt_get_policy(gnutls_x509_crt_t crt, int indx,
  **/
 int
 gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert,
-				     const char *oid, int indx,
+				     const char *oid, unsigned indx,
 				     void *buf, size_t * buf_size,
 				     unsigned int *critical)
 {
@@ -2352,7 +2352,7 @@ gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,
-				     const char *oid, int indx,
+				     const char *oid, unsigned indx,
 				     gnutls_datum_t *output,
 				     unsigned int *critical)
 {
@@ -2397,7 +2397,7 @@ gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,
  *   will be returned.
  **/
 int
-gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert, int indx,
+gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert, unsigned indx,
 				  void *oid, size_t * oid_size)
 {
 	int result;
@@ -2442,7 +2442,7 @@ gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert, int indx,
  *   will be returned.
  **/
 int
-gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert, int indx,
+gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert, unsigned indx,
 				   void *oid, size_t * oid_size,
 				   unsigned int *critical)
 {
@@ -2512,7 +2512,7 @@ gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert, int indx,
  *   will be returned.
  **/
 int
-gnutls_x509_crt_get_extension_data(gnutls_x509_crt_t cert, int indx,
+gnutls_x509_crt_get_extension_data(gnutls_x509_crt_t cert, unsigned indx,
 				   void *data, size_t * sizeof_data)
 {
 	int result, len;
@@ -3133,7 +3133,7 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				 const gnutls_x509_crl_t * crl_list,
-				 int crl_list_length)
+				 unsigned crl_list_length)
 {
 	return _gnutls_x509_crt_check_revocation(cert, crl_list,
 						 crl_list_length, NULL);
@@ -3301,7 +3301,7 @@ gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
-				    int indx, void *oid, size_t * oid_size,
+				    unsigned indx, void *oid, size_t * oid_size,
 				    unsigned int *critical)
 {
 	int ret;

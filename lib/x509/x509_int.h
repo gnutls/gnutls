@@ -359,7 +359,7 @@ struct bag_element {
 
 typedef struct gnutls_pkcs12_bag_int {
 	struct bag_element element[MAX_BAG_ELEMENTS];
-	int bag_elements;
+	unsigned bag_elements;
 } gnutls_pkcs12_bag_int;
 
 #define BAG_PKCS8_KEY "1.2.840.113549.1.12.10.1.1"

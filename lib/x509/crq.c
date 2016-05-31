@@ -326,7 +326,7 @@ int gnutls_x509_crq_get_dn2(gnutls_x509_crq_t crq, gnutls_datum_t * dn)
  **/
 int
 gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
-			      int indx, unsigned int raw_flag,
+			      unsigned indx, unsigned int raw_flag,
 			      void *buf, size_t * buf_size)
 {
 	gnutls_datum_t td;
@@ -363,7 +363,7 @@ gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
  **/
 int
 gnutls_x509_crq_get_dn_oid(gnutls_x509_crq_t crq,
-			   int indx, void *oid, size_t * sizeof_oid)
+			   unsigned indx, void *oid, size_t * sizeof_oid)
 {
 	if (crq == NULL) {
 		gnutls_assert();
@@ -387,7 +387,7 @@ gnutls_x509_crq_get_dn_oid(gnutls_x509_crq_t crq,
  */
 static int
 parse_attribute(ASN1_TYPE asn1_struct,
-		const char *attr_name, const char *given_oid, int indx,
+		const char *attr_name, const char *given_oid, unsigned indx,
 		int raw, gnutls_datum_t * out)
 {
 	int k1, result;
@@ -583,7 +583,7 @@ add_attribute(ASN1_TYPE asn, const char *root, const char *attribute_id,
  * index here starts from one.
  */
 static int
-overwrite_attribute(ASN1_TYPE asn, const char *root, unsigned int indx,
+overwrite_attribute(ASN1_TYPE asn, const char *root, unsigned indx,
 		    const gnutls_datum_t * ext_data)
 {
 	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
@@ -731,7 +731,7 @@ gnutls_x509_crq_set_attribute_by_oid(gnutls_x509_crq_t crq,
  **/
 int
 gnutls_x509_crq_get_attribute_by_oid(gnutls_x509_crq_t crq,
-				     const char *oid, int indx, void *buf,
+				     const char *oid, unsigned indx, void *buf,
 				     size_t * buf_size)
 {
 	int ret;
@@ -1345,7 +1345,7 @@ int gnutls_x509_crq_get_pk_oid(gnutls_x509_crq_t crq, char *oid, size_t *oid_siz
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_attribute_info(gnutls_x509_crq_t crq, int indx,
+gnutls_x509_crq_get_attribute_info(gnutls_x509_crq_t crq, unsigned indx,
 				   void *oid, size_t * sizeof_oid)
 {
 	int result;
@@ -1399,7 +1399,7 @@ gnutls_x509_crq_get_attribute_info(gnutls_x509_crq_t crq, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_attribute_data(gnutls_x509_crq_t crq, int indx,
+gnutls_x509_crq_get_attribute_data(gnutls_x509_crq_t crq, unsigned indx,
 				   void *data, size_t * sizeof_data)
 {
 	int result, len;
@@ -1454,7 +1454,7 @@ gnutls_x509_crq_get_attribute_data(gnutls_x509_crq_t crq, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_extension_info(gnutls_x509_crq_t crq, int indx,
+gnutls_x509_crq_get_extension_info(gnutls_x509_crq_t crq, unsigned indx,
 				   void *oid, size_t * sizeof_oid,
 				   unsigned int *critical)
 {
@@ -1579,7 +1579,7 @@ gnutls_x509_crq_get_extension_info(gnutls_x509_crq_t crq, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_extension_data(gnutls_x509_crq_t crq, int indx,
+gnutls_x509_crq_get_extension_data(gnutls_x509_crq_t crq, unsigned indx,
 				   void *data, size_t * sizeof_data)
 {
 	int ret;
@@ -1984,7 +1984,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid(gnutls_x509_crq_t crq,
  **/
 int
 gnutls_x509_crq_get_extension_by_oid(gnutls_x509_crq_t crq,
-				     const char *oid, int indx,
+				     const char *oid, unsigned indx,
 				     void *buf, size_t * buf_size,
 				     unsigned int *critical)
 {
@@ -2043,7 +2043,7 @@ gnutls_x509_crq_get_extension_by_oid(gnutls_x509_crq_t crq,
  **/
 int
 gnutls_x509_crq_get_extension_by_oid2(gnutls_x509_crq_t crq,
-				     const char *oid, int indx,
+				     const char *oid, unsigned indx,
 				     gnutls_datum_t *output,
 				     unsigned int *critical)
 {
@@ -2426,7 +2426,7 @@ gnutls_x509_crq_set_key_usage(gnutls_x509_crq_t crq, unsigned int usage)
  **/
 int
 gnutls_x509_crq_get_key_purpose_oid(gnutls_x509_crq_t crq,
-				    int indx, void *oid,
+				    unsigned indx, void *oid,
 				    size_t * sizeof_oid,
 				    unsigned int *critical)
 {

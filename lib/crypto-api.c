@@ -419,7 +419,7 @@ void gnutls_hmac_deinit(gnutls_hmac_hd_t handle, void *digest)
  *
  * Since: 2.10.0
  **/
-int gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm)
+unsigned gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm)
 {
 	return _gnutls_mac_get_algo_len(mac_to_entry(algorithm));
 }
@@ -549,7 +549,7 @@ void gnutls_hash_deinit(gnutls_hash_hd_t handle, void *digest)
  *
  * Since: 2.10.0
  **/
-int gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm)
+unsigned gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm)
 {
 	return _gnutls_hash_get_algo_len(hash_to_entry(algorithm));
 }

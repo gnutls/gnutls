@@ -786,7 +786,7 @@ verify_crt(gnutls_x509_crt_t cert,
  * Returns: It will return true (1) if the given certificate is issued
  *   by the given issuer, and false (0) if not.  
  **/
-int
+unsigned
 gnutls_x509_crt_check_issuer(gnutls_x509_crt_t cert,
 			     gnutls_x509_crt_t issuer)
 {
@@ -1233,14 +1233,15 @@ _gnutls_x509_verify_data(const mac_entry_st * me,
  **/
 int
 gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
-			    int cert_list_length,
+			    unsigned cert_list_length,
 			    const gnutls_x509_crt_t * CA_list,
-			    int CA_list_length,
+			    unsigned CA_list_length,
 			    const gnutls_x509_crl_t * CRL_list,
-			    int CRL_list_length, unsigned int flags,
+			    unsigned CRL_list_length, unsigned int flags,
 			    unsigned int *verify)
 {
-	int i, ret;
+	unsigned i;
+	int ret;
 
 	if (cert_list == NULL || cert_list_length == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
@@ -1288,7 +1289,7 @@ gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
 int
 gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
 		       const gnutls_x509_crt_t * CA_list,
-		       int CA_list_length, unsigned int flags,
+		       unsigned CA_list_length, unsigned int flags,
 		       unsigned int *verify)
 {
 	/* Verify certificate 
@@ -1311,7 +1312,7 @@ gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
  * Returns: true (1) if the given CRL was issued by the given issuer, 
  * and false (0) if not.
  **/
-int
+unsigned
 gnutls_x509_crl_check_issuer(gnutls_x509_crl_t crl,
 			     gnutls_x509_crt_t issuer)
 {
@@ -1359,7 +1360,7 @@ find_crl_issuer(gnutls_x509_crl_t crl,
 int
 gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 		       const gnutls_x509_crt_t * trusted_cas,
-		       int tcas_size, unsigned int flags,
+		       unsigned tcas_size, unsigned int flags,
 		       unsigned int *verify)
 {
 /* CRL is ignored for now */

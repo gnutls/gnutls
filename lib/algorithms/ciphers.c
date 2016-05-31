@@ -249,7 +249,7 @@ const cipher_entry_st *cipher_name_to_entry(const char *name)
  *
  * Since: 2.10.0
  **/
-int gnutls_cipher_get_block_size(gnutls_cipher_algorithm_t algorithm)
+unsigned gnutls_cipher_get_block_size(gnutls_cipher_algorithm_t algorithm)
 {
 	size_t ret = 0;
 	GNUTLS_ALG_LOOP(ret = p->blocksize);
@@ -265,7 +265,7 @@ int gnutls_cipher_get_block_size(gnutls_cipher_algorithm_t algorithm)
  *
  * Since: 3.2.2
  **/
-int gnutls_cipher_get_tag_size(gnutls_cipher_algorithm_t algorithm)
+unsigned gnutls_cipher_get_tag_size(gnutls_cipher_algorithm_t algorithm)
 {
 	return _gnutls_cipher_get_tag_size(cipher_to_entry(algorithm));
 }
@@ -280,7 +280,7 @@ int gnutls_cipher_get_tag_size(gnutls_cipher_algorithm_t algorithm)
  *
  * Since: 3.2.0
  **/
-int gnutls_cipher_get_iv_size(gnutls_cipher_algorithm_t algorithm)
+unsigned gnutls_cipher_get_iv_size(gnutls_cipher_algorithm_t algorithm)
 {
 	size_t ret = 0;
 	GNUTLS_ALG_LOOP(ret = p->cipher_iv);

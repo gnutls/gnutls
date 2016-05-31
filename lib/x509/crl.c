@@ -241,7 +241,7 @@ gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl_t crl, char *buf,
  **/
 int
 gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl_t crl,
-				     const char *oid, int indx,
+				     const char *oid, unsigned indx,
 				     unsigned int raw_flag, void *buf,
 				     size_t * sizeof_buf)
 {
@@ -281,7 +281,7 @@ gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl_t crl,
  **/
 int
 gnutls_x509_crl_get_dn_oid(gnutls_x509_crl_t crl,
-			   int indx, void *oid, size_t * sizeof_oid)
+			   unsigned indx, void *oid, size_t * sizeof_oid)
 {
 	if (crl == NULL) {
 		gnutls_assert();
@@ -573,7 +573,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl)
  *   negative error value.
  **/
 int
-gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
+gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, unsigned indx,
 			       unsigned char *serial,
 			       size_t * serial_size, time_t * t)
 {
@@ -1078,7 +1078,7 @@ gnutls_x509_crl_get_number(gnutls_x509_crl_t crl, void *ret,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl, int indx,
+gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl, unsigned indx,
 				  void *oid, size_t * sizeof_oid)
 {
 	int result;
@@ -1124,7 +1124,7 @@ gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crl_get_extension_info(gnutls_x509_crl_t crl, int indx,
+gnutls_x509_crl_get_extension_info(gnutls_x509_crl_t crl, unsigned indx,
 				   void *oid, size_t * sizeof_oid,
 				   unsigned int *critical)
 {
@@ -1196,7 +1196,7 @@ gnutls_x509_crl_get_extension_info(gnutls_x509_crl_t crl, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crl_get_extension_data(gnutls_x509_crl_t crl, int indx,
+gnutls_x509_crl_get_extension_data(gnutls_x509_crl_t crl, unsigned indx,
 				   void *data, size_t * sizeof_data)
 {
 	int result, len;

@@ -290,7 +290,7 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
  **/
 int
 gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
-			 int indx, gnutls_datum_t *cert)
+			  unsigned indx, gnutls_datum_t *cert)
 {
 	int result, len;
 	char root2[ASN1_MAX_NAME_SIZE];
@@ -372,7 +372,7 @@ gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
  **/
 int
 gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
-			 int indx, void *certificate,
+			 unsigned indx, void *certificate,
 			 size_t * certificate_size)
 {
 	int ret;
@@ -1527,7 +1527,7 @@ int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx)
  **/
 int
 gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
-			  int indx, gnutls_datum_t *crl)
+			  unsigned indx, gnutls_datum_t *crl)
 {
 	int result;
 	char root2[ASN1_MAX_NAME_SIZE];
@@ -1585,7 +1585,7 @@ gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
  **/
 int
 gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
-			 int indx, void *crl, size_t * crl_size)
+			 unsigned indx, void *crl, size_t * crl_size)
 {
 	int ret;
 	gnutls_datum_t tmp = {NULL, 0};
