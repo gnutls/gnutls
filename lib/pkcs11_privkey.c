@@ -676,6 +676,11 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 		a[a_val].value = (void *) &tval;
 		a[a_val].value_len = sizeof(tval);
 		a_val++;
+
+		a[a_val].type = CKA_PRIVATE;
+		a[a_val].value = (void *) &fval;
+		a[a_val].value_len = sizeof(fval);
+		a_val++;
 	}
 
 	a[a_val].type = CKA_ID;
