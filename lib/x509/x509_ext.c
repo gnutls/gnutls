@@ -1486,9 +1486,8 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 
 /**
  * gnutls_x509_ext_export_proxy:
- * @pathLenConstraint: non-negative error codes indicate maximum length of path,
- *   and negative error codes indicate that the pathLenConstraints field should
- *   not be present.
+ * @pathLenConstraint: A negative value will remove the path length constraint,
+ *   while non-negative values will be set as the length of the pathLenConstraints field.
  * @policyLanguage: OID describing the language of @policy.
  * @policy: uint8_t byte array with policy language, can be %NULL
  * @sizeof_policy: size of @policy.
@@ -1496,8 +1495,7 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
  *
  * This function will convert the parameters provided to a proxyCertInfo extension.
  *
- * The @ext data will be allocated using
- * gnutls_malloc().
+ * The @ext data will be allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
