@@ -333,6 +333,7 @@ AC_ARG_ENABLE([gcc-warnings],
 
 if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Wframe-larger-than=4096], [WSTACK_CFLAGS])
+  gl_WARN_ADD([-Wtype-limits], [WSTACK_CFLAGS])
 
   nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
   nw="$nw -Wc++-compat"             # We don't care about C++ compilers
@@ -353,6 +354,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wsuggest-attribute=const" # Is it worth using attributes?
   nw="$nw -Wsuggest-attribute=noreturn" # Is it worth using attributes?
   nw="$nw -Wstack-protector"        # Some functions cannot be protected
+  nw="$nw -Wunsafe-loop-optimizations" # Warnings with no point
   nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
 
   gl_MANYWARN_ALL_GCC([ws])
