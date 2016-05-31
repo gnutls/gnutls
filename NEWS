@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.3.24 (unreleased)
 
+** libgnutls: when generating private keys mark the public key as not
+   private.
+
 ** libgnutls: use secure_getenv() where available to obtain environment
    variables.
 
