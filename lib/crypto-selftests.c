@@ -476,7 +476,7 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 		iv.size = vectors[i].iv_size;
 		tag_size = vectors[i].tag_size;
 
-		if ((int)tag_size > gnutls_cipher_get_tag_size(cipher)) {
+		if (tag_size > gnutls_cipher_get_tag_size(cipher)) {
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 #if 0
