@@ -515,6 +515,7 @@ typedef struct verify_state_st {
 	time_t now;
 	unsigned int max_path;
 	gnutls_x509_name_constraints_t nc;
+	gnutls_x509_tlsfeatures_t tls_feat;
 	gnutls_verify_output_function *func;
 } verify_state_st;
 
@@ -644,6 +645,26 @@ verify_crt(gnutls_x509_crt_t cert,
 					gnutls_assert();
 					goto nc_fail;
 				}
+			}
+		}
+
+		if (vparams->tls_feat != NULL) {
+			/* append the issuer's constraints */
+			ret = gnutls_x509_crt_get_tlsfeatures(issuer, vparams->tls_feat, GNUTLS_EXT_FLAG_APPEND, NULL);
+			if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+ feat_fail:
+				out |=
+				    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE |
+				    GNUTLS_CERT_INVALID;
+				gnutls_assert();
+				result = 0;
+				goto nc_done;
+			}
+
+			ret = gnutls_x509_tlsfeatures_check_crt(vparams->tls_feat, cert);
+			if (ret == 0) {
+				gnutls_assert();
+				goto feat_fail;
 			}
 		}
  nc_done:
@@ -895,6 +916,13 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		return status;
 	}
 
+	ret = gnutls_x509_tlsfeatures_init(&vparams.tls_feat);
+	if (ret < 0) {
+		gnutls_assert();
+		status |= GNUTLS_CERT_INVALID;
+		goto cleanup;
+	}
+
 	/* Verify the last certificate in the certificate path
 	 * against the trusted CA certificate list.
 	 *
@@ -962,6 +990,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 
 cleanup:
 	gnutls_x509_name_constraints_deinit(vparams.nc);
+	gnutls_x509_tlsfeatures_deinit(vparams.tls_feat);
 	return status;
 }
 

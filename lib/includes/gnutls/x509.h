@@ -299,7 +299,9 @@ unsigned gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t n
 int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc);
 void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc);
 
-#define GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND 1
+#define GNUTLS_EXT_FLAG_APPEND 1
+
+#define GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND GNUTLS_EXT_FLAG_APPEND
 int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 					 gnutls_x509_name_constraints_t nc,
 					 unsigned int flags,
@@ -466,7 +468,13 @@ int gnutls_x509_crt_set_tlsfeatures(gnutls_x509_crt_t crt,
 				    gnutls_x509_tlsfeatures_t features);
 
 int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t cert,
-								   gnutls_x509_tlsfeatures_t * features);
+				    gnutls_x509_tlsfeatures_t features,
+				    unsigned int flags,
+				    unsigned int *critical);
+
+unsigned gnutls_x509_tlsfeatures_check_crt(gnutls_x509_tlsfeatures_t feat,
+				           gnutls_x509_crt_t crt);
+
 
 #define GNUTLS_MAX_QUALIFIERS 8
 
@@ -1348,9 +1356,11 @@ int gnutls_x509_crq_get_extension_by_oid(gnutls_x509_crq_t crq,
 					 unsigned int *critical);
 
 int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
-								   gnutls_x509_tlsfeatures_t * features);
+				    gnutls_x509_tlsfeatures_t features,
+				    unsigned flags,
+				    unsigned int *critical);
 int gnutls_x509_crq_set_tlsfeatures(gnutls_x509_crq_t crq,
-								   gnutls_x509_tlsfeatures_t features);
+				    gnutls_x509_tlsfeatures_t features);
 
 int
 gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,

@@ -2921,11 +2921,20 @@ gnutls_x509_crq_set_private_key_usage_period(gnutls_x509_crq_t crq,
  * @crt: A X.509 certificate request
  * @features: If the function succeeds, the
  *   features will be stored in this variable.
+ * @flags: zero or %GNUTLS_EXT_FLAG_APPEND
+ * @critical: the extension status
  *
  * This function will get the X.509 TLS features
  * extension structure from the certificate request.
  * The returned structure needs to be freed using
  * gnutls_x509_tlsfeatures_deinit().
+ *
+ * When the @flags is set to %GNUTLS_EXT_FLAG_APPEND,
+ * then if the @features structure is empty this function will behave
+ * identically as if the flag was not set. Otherwise if there are elements 
+ * in the @features structure then they will be merged with.
+ *
+ * Note that @features must be initialized prior to calling this function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
@@ -2933,11 +2942,12 @@ gnutls_x509_crq_set_private_key_usage_period(gnutls_x509_crq_t crq,
  * Since: 3.5.1
  **/
 int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
-								   gnutls_x509_tlsfeatures_t *features)
+				    gnutls_x509_tlsfeatures_t features,
+				    unsigned int flags,
+				    unsigned int *critical)
 {
 	int ret;
 	gnutls_datum_t der;
-	unsigned int critical;
 
 	if (crq == NULL) {
 		gnutls_assert();
@@ -2946,7 +2956,7 @@ int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
 
 	if ((ret =
 		 gnutls_x509_crq_get_extension_by_oid2(crq, GNUTLS_X509EXT_OID_TLSFEATURES, 0,
-						&der, &critical)) < 0)
+						&der, critical)) < 0)
 	{
 		return ret;
 	}
@@ -2956,24 +2966,14 @@ int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	ret = gnutls_x509_tlsfeatures_init(features);
+	ret = gnutls_x509_ext_import_tlsfeatures(&der, features, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_import_tlsfeatures(&der, *features, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	gnutls_free(der.data);
-	return ret;
-
+	ret = 0;
  cleanup:
-	if (features != NULL)
-		gnutls_x509_tlsfeatures_deinit(*features);
 	gnutls_free(der.data);
 	return ret;
 }

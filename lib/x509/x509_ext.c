@@ -3149,16 +3149,21 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 	
 }
 
-
-static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f)
+/* flags can be zero or GNUTLS_EXT_FLAG_APPEND
+ */
+static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned flags)
 {
 	char nptr[ASN1_MAX_NAME_SIZE];
 	int result;
 	void * tmp;
-	unsigned i, indx;
+	unsigned i, indx, j;
 	unsigned int feature;
 
+	if (!(flags & GNUTLS_EXT_FLAG_APPEND))
+		f->size = 0;
+
 	for (i = 1;; i++) {
+		unsigned skip = 0;
 		snprintf(nptr, sizeof(nptr), "?%u", i);
 
 		result = _gnutls_x509_read_uint(c2, nptr, &feature);
@@ -3173,19 +3178,28 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f)
 
 		if (feature > UINT16_MAX) {
 			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
+			return GNUTLS_E_CERTIFICATE_ERROR;
 		}
 
-		indx = f->size;
-		tmp = gnutls_realloc(f->features, (f->size + 1) * sizeof(f->features[0]));
-		if (tmp == NULL) {
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		/* skip duplicates */
+		for (j=0;j<f->size;j++) {
+			if (f->features[j].feature == feature) {
+				skip = 1;
+				break;
+			}
 		}
-		f->features = tmp;
 
-		f->features[indx].feature = feature;
+		if (!skip) {
+			indx = f->size;
+			tmp = gnutls_realloc(f->features, (f->size + 1) * sizeof(f->features[0]));
+			if (tmp == NULL) {
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+			f->features = tmp;
 
-		f->size++;
+			f->features[indx].feature = feature;
+			f->size++;
+		}
 	}
 
 	return 0;
@@ -3195,19 +3209,24 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f)
  * gnutls_x509_ext_import_tlsfeatures:
  * @ext: The DER-encoded extension data
  * @f: The features structure
- * @flags: should be zero
+ * @flags: zero or %GNUTLS_EXT_FLAG_APPEND
  *
  * This function will export the features in the provided DER-encoded
  * TLS Features PKIX extension, to a %gnutls_x509_tlsfeatures_t type. @f
  * must be initialized.
+ *
+ * When the @flags is set to %GNUTLS_EXT_FLAG_APPEND,
+ * then if the @features structure is empty this function will behave
+ * identically as if the flag was not set. Otherwise if there are elements 
+ * in the @features structure then they will be merged with.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
  * Since: 3.5.1
  **/
 int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
-									   gnutls_x509_tlsfeatures_t f,
-									   unsigned int flags)
+				       gnutls_x509_tlsfeatures_t f,
+				       unsigned int flags)
 {
 	int ret;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -3231,7 +3250,7 @@ int gnutls_x509_ext_import_tlsfeatures(const gnutls_datum_t * ext,
 		goto cleanup;
 	}
 
-	ret = parse_tlsfeatures(c2, f);
+	ret = parse_tlsfeatures(c2, f, flags);
 	if (ret < 0) {
 		gnutls_assert();
 	}

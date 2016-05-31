@@ -68,6 +68,7 @@ libgnutls_x509_la_SOURCES =	\
 	virt-san.c		\
 	virt-san.h		\
 	x509_ext_int.h		\
+	tls_features.c		\
 	krb5.c krb5.h
 
 if ENABLE_OCSP

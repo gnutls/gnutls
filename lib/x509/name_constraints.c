@@ -258,7 +258,7 @@ int _gnutls_name_constraints_append(name_constraints_node_st ** _nc,
  * gnutls_x509_crt_get_name_constraints:
  * @crt: should contain a #gnutls_x509_crt_t type
  * @nc: The nameconstraints intermediate type
- * @flags: zero or %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND
+ * @flags: zero or %GNUTLS_EXT_FLAG_APPEND
  * @critical: the extension status
  *
  * This function will return an intermediate type containing
@@ -266,7 +266,7 @@ int _gnutls_name_constraints_append(name_constraints_node_st ** _nc,
  * structure can be used in combination with gnutls_x509_name_constraints_check()
  * to verify whether a server's name is in accordance with the constraints.
  *
- * When the @flags is set to %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND,
+ * When the @flags is set to %GNUTLS_EXT_FLAG_APPEND,
  * then if the @nc structure is empty this function will behave
  * identically as if the flag was not set.
  * Otherwise if there are elements in the @nc structure then the
