@@ -43,7 +43,7 @@
 #define OPENPGP_KEY_SUBKEY 1
 
 
-int pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params)
+unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params)
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
