@@ -1622,13 +1622,13 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 	return ret;
 }
 
-bool
+unsigned
 _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
                            gnutls_x509_crt_t cert, time_t now)
 {
 	uint8_t id[MAX_KEY_ID_SIZE];
 	size_t id_size;
-	bool result = 0;
+	unsigned result = 0;
 
 	if (now > gnutls_x509_crt_get_expiration_time(cert) ||
 	    now < gnutls_x509_crt_get_activation_time(cert)) {

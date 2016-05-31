@@ -37,18 +37,17 @@
 #include <x509_int.h>
 #include <common.h>
 #include <pk.h>
-#include <stdbool.h>
 
 /* Checks if two certs have the same name and the same key.  Return 1 on match. 
  * If @is_ca is zero then this function is identical to gnutls_x509_crt_equals()
  */
-bool
+unsigned
 _gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
 			  gnutls_x509_crt_t cert2,
 			  unsigned is_ca)
 {
 	int ret;
-	bool result;
+	unsigned result;
 
 	if (is_ca == 0)
 		return gnutls_x509_crt_equals(cert1, cert2);
@@ -66,7 +65,7 @@ _gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
 	return result;
 }
 
-bool
+unsigned
 _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 			   gnutls_datum_t * cert2bin)
 {
@@ -97,7 +96,7 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
  * Returns true or false, if the issuer is a CA,
  * or not.
  */
-static bool
+static unsigned
 check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	    unsigned int *max_path, unsigned int flags)
 {
@@ -106,7 +105,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_datum_t issuer_signature = { NULL, 0 };
 	int pathlen = -1, ret;
-	bool result;
+	unsigned result;
 	unsigned int ca_status = 0;
 
 	/* Check if the issuer is the same with the
@@ -214,14 +213,14 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
  *
  * Returns 1 if they match and (0) if they don't match. 
  */
-static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
+static unsigned is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 {
 	uint8_t id1[MAX_KEY_ID_SIZE];
 	uint8_t id2[MAX_KEY_ID_SIZE];
 	size_t id1_size;
 	size_t id2_size;
 	int ret;
-	bool result;
+	unsigned result;
 
 	if (_gnutls_x509_compare_raw_dn
 	    (&cert->raw_issuer_dn, &issuer->raw_dn) != 0)
@@ -270,7 +269,7 @@ static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 /* Check if the given certificate is the issuer of the CRL.
  * Returns 1 on success and 0 otherwise.
  */
-static bool is_crl_issuer(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
+static unsigned is_crl_issuer(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
 {
 	if (_gnutls_x509_compare_raw_dn
 	    (&crl->raw_issuer_dn, &issuer->raw_dn) != 0)
@@ -283,7 +282,7 @@ static bool is_crl_issuer(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
  * Returns 1 if they match and (0) if they don't match. Otherwise
  * a negative error code is returned to indicate error.
  */
-bool _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
+unsigned _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
 {
 	if (_gnutls_x509_compare_raw_dn(&cert1->raw_dn, &cert2->raw_dn) !=
 	    0)
@@ -393,7 +392,7 @@ int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
  * @sigalg: the signature algorithm used
  * @flags: the specified verification flags
  */
-static bool is_level_acceptable(
+static unsigned is_level_acceptable(
 	gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 	gnutls_sign_algorithm_t sigalg, unsigned flags)
 {
@@ -524,7 +523,7 @@ int hash;
  * Output will hold some extra information about the verification
  * procedure. Issuer will hold the actual issuer from the trusted list.
  */
-static bool
+static unsigned
 verify_crt(gnutls_x509_crt_t cert,
 			    const gnutls_x509_crt_t * trusted_cas,
 			    int tcas_size, unsigned int flags,
@@ -532,7 +531,7 @@ verify_crt(gnutls_x509_crt_t cert,
 			    gnutls_x509_crt_t * _issuer,
 			    time_t now,
 			    unsigned int *max_path,
-			    bool end_cert,
+			    unsigned end_cert,
 			    gnutls_x509_name_constraints_t nc,
 			    gnutls_verify_output_function func)
 {
@@ -540,7 +539,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_x509_crt_t issuer = NULL;
 	int issuer_version, hash_algo;
-	bool result = 1;
+	unsigned result = 1;
 	const mac_entry_st * me;
 	unsigned int out = 0, usage;
 	int sigalg, ret;
@@ -964,7 +963,7 @@ cleanup:
 
 /* Returns true if the provided purpose is in accordance with the certificate.
  */
-bool _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, unsigned no_any)
+unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, unsigned no_any)
 {
 	char oid[MAX_OID_SIZE];
 	size_t oid_size;
