@@ -511,6 +511,13 @@ int hash;
 	return 1;
 }
 
+typedef struct verify_state_st {
+	time_t now;
+	unsigned int max_path;
+	gnutls_x509_name_constraints_t nc;
+	gnutls_verify_output_function *func;
+} verify_state_st;
+
 /* 
  * Verifies the given certificate against a certificate list of
  * trusted CAs.
@@ -528,12 +535,8 @@ verify_crt(gnutls_x509_crt_t cert,
 			    const gnutls_x509_crt_t * trusted_cas,
 			    int tcas_size, unsigned int flags,
 			    unsigned int *output,
-			    gnutls_x509_crt_t * _issuer,
-			    time_t now,
-			    unsigned int *max_path,
-			    unsigned end_cert,
-			    gnutls_x509_name_constraints_t nc,
-			    gnutls_verify_output_function func)
+			    verify_state_st *vparams,
+			    unsigned end_cert)
 {
 	gnutls_datum_t cert_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
@@ -547,7 +550,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	if (output)
 		*output = 0;
 
-	if (*max_path == 0) {
+	if (vparams->max_path == 0) {
 		out |=
 		    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE |
 		    GNUTLS_CERT_INVALID;
@@ -556,13 +559,10 @@ verify_crt(gnutls_x509_crt_t cert,
 		/* bail immediately, to avoid inconistency  */
 		goto cleanup;
 	}
-	(*max_path)--;
+	vparams->max_path--;
 
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
-
-	if (_issuer != NULL)
-		*_issuer = issuer;
 
 	ret =
 	    _gnutls_x509_get_signed_data(cert->cert, &cert->der, "tbsCertificate",
@@ -599,9 +599,9 @@ verify_crt(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		result = 0;
 	} else {
-		if (nc != NULL) {
+		if (vparams->nc != NULL) {
 			/* append the issuer's constraints */
-			ret = gnutls_x509_crt_get_name_constraints(issuer, nc, 
+			ret = gnutls_x509_crt_get_name_constraints(issuer, vparams->nc, 
 				GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, NULL);
 			if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
  nc_fail:
@@ -615,31 +615,31 @@ verify_crt(gnutls_x509_crt_t cert,
 
 			/* only check name constraints in server certificates, not CAs */
 			if (end_cert != 0) {
-				ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DNSNAME, cert);
+				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_DNSNAME, cert);
 				if (ret == 0) {
 					gnutls_assert();
 					goto nc_fail;
 				}
 
-				ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_RFC822NAME, cert);
+				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_RFC822NAME, cert);
 				if (ret == 0) {
 					gnutls_assert();
 					goto nc_fail;
 				}
 
-				ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DN, cert);
+				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_DN, cert);
 				if (ret == 0) {
 					gnutls_assert();
 					goto nc_fail;
 				}
 
-				ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_URI, cert);
+				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_URI, cert);
 				if (ret == 0) {
 					gnutls_assert();
 					goto nc_fail;
 				}
 
-				ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_IPADDRESS, cert);
+				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_IPADDRESS, cert);
 				if (ret == 0) {
 					gnutls_assert();
 					goto nc_fail;
@@ -656,7 +656,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		} else if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
 	                   ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT)
 	                    || issuer_version != 1)) {
-			if (check_if_ca(cert, issuer, max_path, flags) != 1) {
+			if (check_if_ca(cert, issuer, &vparams->max_path, flags) != 1) {
 				gnutls_assert();
 				out |=
 				    GNUTLS_CERT_SIGNER_NOT_CA |
@@ -741,14 +741,14 @@ verify_crt(gnutls_x509_crt_t cert,
 		/* check the time of the issuer first */
 		if (issuer != NULL &&
 		    !(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)) {
-			out |= check_time_status(issuer, now);
+			out |= check_time_status(issuer, vparams->now);
 			if (out != 0) {
 				gnutls_assert();
 				result = 0;
 			}
 		}
 
-		out |= check_time_status(cert, now);
+		out |= check_time_status(cert, vparams->now);
 		if (out != 0) {
 			gnutls_assert();
 			result = 0;
@@ -759,11 +759,11 @@ verify_crt(gnutls_x509_crt_t cert,
 	if (output)
 		*output |= out;
 
-	if (func) {
+	if (vparams->func) {
 		if (result == 0) {
 			out |= GNUTLS_CERT_INVALID;
 		}
-		func(cert, issuer, NULL, out);
+		vparams->func(cert, issuer, NULL, out);
 	}
 	_gnutls_free_datum(&cert_signed_data);
 	_gnutls_free_datum(&cert_signature);
@@ -812,9 +812,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 	int i = 0, ret;
 	unsigned int status = 0, output;
 	time_t now = gnutls_time(0);
-	gnutls_x509_crt_t issuer = NULL;
-	unsigned int max_path;
-	gnutls_x509_name_constraints_t nc;
+	verify_state_st vparams;
 
 	if (clist_size > 1) {
 		/* Check if the last certificate in the path is self signed.
@@ -885,7 +883,12 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		return status;
 	}
 
-	ret = gnutls_x509_name_constraints_init(&nc);
+	memset(&vparams, 0, sizeof(vparams));
+	vparams.now = now;
+	vparams.max_path = MAX_VERIFY_DEPTH;
+	vparams.func = func;
+
+	ret = gnutls_x509_name_constraints_init(&vparams.nc);
 	if (ret < 0) {
 		gnutls_assert();
 		status |= GNUTLS_CERT_INVALID;
@@ -899,12 +902,12 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 	 * in self signed etc certificates.
 	 */
 	output = 0;
-	max_path = MAX_VERIFY_DEPTH;
 
 	ret = verify_crt(certificate_list[clist_size - 1],
 					  trusted_cas, tcas_size, flags,
-					  &output, &issuer, now, &max_path,
-					  clist_size==1?1:0, nc, func);
+					  &output,
+					  &vparams,
+					  clist_size==1?1:0);
 	if (ret != 1) {
 		/* if the last certificate in the certificate
 		 * list is invalid, then the certificate is not
@@ -947,8 +950,9 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		if ((ret =
 		     verify_crt(certificate_list[i - 1],
 						 &certificate_list[i], 1,
-						 flags, &output, NULL, now,
-						 &max_path, i==1?1:0, nc, func)) != 1) {
+						 flags, &output,
+						 &vparams,
+						 i==1?1:0)) != 1) {
 			gnutls_assert();
 			status |= output;
 			status |= GNUTLS_CERT_INVALID;
@@ -957,7 +961,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 	}
 
 cleanup:
-	gnutls_x509_name_constraints_deinit(nc);
+	gnutls_x509_name_constraints_deinit(vparams.nc);
 	return status;
 }
 
