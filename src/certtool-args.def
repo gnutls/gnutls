@@ -794,6 +794,7 @@ email = "none@@none.org"
 # extension features to be provided by the server. In practice this is used
 # to require the Status Request (extid: 5) extension from the server. That is,
 # to require the server holding this certificate to provide a stapled OCSP response.
+# You can have multiple lines for multiple TLS features.
 
 # To ask for OCSP status request use:
 #tls_feature = 5
