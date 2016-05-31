@@ -31,17 +31,17 @@ unsigned _gnutls_custom_urls_size = 0;
 
 /**
  * gnutls_url_is_supported:
- * @url: A PKCS 11 url
+ * @url: A URI to be tested
  *
- * Check whether url is supported.  Depending on the system libraries
- * GnuTLS may support pkcs11 or tpmkey URLs.
+ * Check whether the provided @url is supported.  Depending on the system libraries
+ * GnuTLS may support pkcs11, tpmkey or other URLs.
  *
  * Returns: return non-zero if the given URL is supported, and zero if
  * it is not known.
  *
  * Since: 3.1.0
  **/
-int gnutls_url_is_supported(const char *url)
+unsigned gnutls_url_is_supported(const char *url)
 {
 	unsigned i;
 

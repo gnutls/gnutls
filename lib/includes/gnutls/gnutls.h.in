@@ -2384,7 +2384,7 @@ int gnutls_store_pubkey(const char *db_name,
   /* Other helper functions */
 int gnutls_load_file(const char *filename, gnutls_datum_t * data);
 
-int gnutls_url_is_supported(const char *url);
+unsigned gnutls_url_is_supported(const char *url);
 
   /* PIN callback */
 
