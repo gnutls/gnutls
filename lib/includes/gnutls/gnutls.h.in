@@ -531,6 +531,7 @@ const char
  * @GNUTLS_CERT_MISMATCH: The certificate presented isn't the expected one (TOFU)
  * @GNUTLS_CERT_PURPOSE_MISMATCH: The certificate or an intermediate does not match the intended purpose (extended key usage).
  * @GNUTLS_CERT_MISSING_OCSP_STATUS: The certificate requires the server to send the certifiate status, but no status was received.
+ * @GNUTLS_CERT_INVALID_OCSP_STATUS: The received OCSP status response is invalid.
  *
  * Enumeration of certificate status codes.  Note that the status
  * bits may have different meanings in OpenPGP keys and X.509
@@ -551,7 +552,8 @@ typedef enum {
 	GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE = 1 << 16,
 	GNUTLS_CERT_MISMATCH = 1 << 17,
 	GNUTLS_CERT_PURPOSE_MISMATCH = 1 << 18,
-	GNUTLS_CERT_MISSING_OCSP_STATUS = 1 << 19
+	GNUTLS_CERT_MISSING_OCSP_STATUS = 1 << 19,
+	GNUTLS_CERT_INVALID_OCSP_STATUS = 1 << 20
 } gnutls_certificate_status_t;
 
 /**

@@ -991,6 +991,11 @@ gnutls_certificate_verification_status_print(unsigned int status,
 					  _
 					  ("The certificate requires the server to include an OCSP status in its response, but the OCSP status is missing. "));
 
+	if (status & GNUTLS_CERT_INVALID_OCSP_STATUS)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The received OCSP status response is invalid. "));
+
 	return _gnutls_buffer_to_datum(&str, out, 1);
 }
 

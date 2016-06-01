@@ -88,6 +88,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 				  gnutls_strerror(ret));
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
 
@@ -97,6 +98,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		_gnutls_audit_log(session,
 				  "Got OCSP response with an unrelated certificate.\n");
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
 
@@ -105,6 +107,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		ret = gnutls_assert_val(0);
 		gnutls_assert();
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
 
@@ -112,6 +115,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	if (status != 0) {
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
 
@@ -124,6 +128,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 				  gnutls_strerror(ret));
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
+		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;
 		goto cleanup;
 	}
 
