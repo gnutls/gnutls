@@ -51,6 +51,11 @@ S. Santesson, "TLS Handshake Message for Supplemental Data",
 September 2006, Available from
 @url{http://www.ietf.org/rfc/rfc4680.txt}.
 
+@item @anchor{RFC7633}[RFC7633]
+P. Hallam-Baker, "X.509v3 Transport Layer Security (TLS) Feature Extension",
+October 2015, Available from
+@url{http://www.ietf.org/rfc/rfc7633.txt}.
+
 @item @anchor{RFC4514}[RFC4514]
 Kurt D.  Zeilenga, "Lightweight Directory Access Protocol (LDAP): String Representation of Distinguished Names",
 June 2006, Available from

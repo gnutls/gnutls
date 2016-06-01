@@ -11,6 +11,7 @@ structures, etc., are discussed in this chapter.
 * PKCS 10 certificate requests::
 * PKIX certificate revocation lists::
 * OCSP certificate status checking::
+* OCSP stapling::
 * Managing encrypted keys::
 * certtool Invocation::            Invoking certtool
 * ocsptool Invocation::            Invoking ocsptool
@@ -152,10 +153,10 @@ identity of a peer will verify the certificate against a set of
 trusted certificates and then check whether the certificate is listed
 in a CRL and/or perform an OCSP check for the certificate.
 
-Note that in the context of a TLS session the server may provide an
-OCSP response that will be used during the TLS certificate verification
-(see @funcref{gnutls_certificate_verify_peers2}).
-You may obtain this response using @funcref{gnutls_ocsp_status_request_get}.
+Applications are typically expected to contact the OCSP server in order to
+request the certificate validity status. The OCSP server replies with an OCSP
+response. This section describes this online communication (which can be avoided
+when using OCSP stapled responses, for that, see @ref{OCSP stapling}).
 
 Before performing the OCSP query, the application will need to figure
 out the address of the OCSP server.  The OCSP server address can be
@@ -300,6 +301,38 @@ anchors before it can be relied upon. It is also important to check
 whether the received OCSP response corresponds to the certificate being checked.
 
 @showfuncC{gnutls_ocsp_resp_verify,gnutls_ocsp_resp_verify_direct,gnutls_ocsp_resp_check_crt}
+
+@node OCSP stapling
+@subsection OCSP stapling
+@cindex certificate status
+@cindex Online Certificate Status Protocol
+@cindex OCSP stapling
+
+To avoid applications contacting the OCSP server directly, TLS servers
+can provide a "stapled" OCSP response in the TLS handshake. That way
+the client application needs to do nothing more. GnuTLS will automatically
+consider the stapled OCSP response during the TLS certificate verification
+(see @funcref{gnutls_certificate_verify_peers2}).
+The stapled response can be obtained using @funcref{gnutls_ocsp_status_request_get}.
+
+In addition, since GnuTLS 3.5.1 the client will consider the @xcite{RFC7633} OCSP-Must-staple
+certificate extension, and will consider it while checking for stapled OCSP responses. If the
+extension is present and no OCSP staple is found the certificate verification will fail
+and the status code @code{GNUTLS_CERT_MISSING_OCSP_STATUS} will returned from the verification
+function.
+
+GnuTLS servers can provide this response to their clients using the following functions.
+
+@showfuncC{gnutls_certificate_set_ocsp_status_request_function,gnutls_certificate_set_ocsp_status_request_file,gnutls_ocsp_status_request_is_checked}
+
+The simplest approach is for a server to provide the OCSP server's response using the @funcref{gnutls_certificate_set_ocsp_status_request_file}.
+The response may be updated periodically using the following command (see also @ref{ocsptool Invocation}).
+
+@example
+ocsptool --ask --load-cert server_cert.pem --load-issuer the_issuer.pem
+         --load-signer the_issuer.pem --outfile ocsp.response
+@end example
+
 
 @node Managing encrypted keys
 @subsection Managing encrypted keys

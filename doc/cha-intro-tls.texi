@@ -600,15 +600,7 @@ may periodically run @code{ocsptool} (see @ref{ocsptool Invocation}) to obtain
 its certificate revocation status and serve it to the clients. That
 way a client avoids an additional connection to the OCSP server.
 
-@showfuncD{gnutls_certificate_set_ocsp_status_request_function,gnutls_certificate_set_ocsp_status_request_file,gnutls_ocsp_status_request_enable_client,gnutls_ocsp_status_request_is_checked}
-
-A server is required to provide the OCSP server's response using the @funcref{gnutls_certificate_set_ocsp_status_request_file}.
-The response may be obtained periodically using the following command.
-
-@example
-ocsptool --ask --load-cert server_cert.pem --load-issuer the_issuer.pem
-         --load-signer the_issuer.pem --outfile ocsp.response
-@end example
+See @ref{OCSP stapling} for further information.
 
 Since version 3.1.3 GnuTLS clients transparently support the certificate status
 request.
