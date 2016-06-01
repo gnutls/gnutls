@@ -56,8 +56,8 @@
  * some x509 certificate parsing functions.
  */
 
-/* three days */
-#define MAX_OCSP_VALIDITY_SECS (3*60*60*24)
+/* fifteen days */
+#define MAX_OCSP_VALIDITY_SECS (15*60*60*24)
 #ifdef ENABLE_OCSP
 /* If the certificate is revoked status will be GNUTLS_CERT_REVOKED.
  * 
@@ -150,6 +150,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 			_gnutls_audit_log(session,
 					  "The OCSP response is old\n");
 			check_failed = 1;
+			*ostatus |= GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED;
 			goto cleanup;
 		}
 	} else {
@@ -158,6 +159,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 			_gnutls_audit_log(session,
 					  "There is a newer OCSP response but was not provided by the server\n");
 			check_failed = 1;
+			*ostatus |= GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED;
 			goto cleanup;
 		}
 	}
