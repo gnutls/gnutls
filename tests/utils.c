@@ -152,7 +152,7 @@ void escapeprint(const char *str, size_t len)
 {
 	size_t i;
 
-	printf(" (length %d bytes):\n\t", (int)len);
+	printf(" (length %d bytes):\n\t'", (int)len);
 	for (i = 0; i < len; i++) {
 		if (((str[i] & 0xFF) >= 'A' && (str[i] & 0xFF) <= 'Z') ||
 		    ((str[i] & 0xFF) >= 'a' && (str[i] & 0xFF) <= 'z') ||
@@ -165,6 +165,19 @@ void escapeprint(const char *str, size_t len)
 			printf("'\n\t'");
 	}
 	printf("\n");
+}
+
+void c_print(const unsigned char *str, size_t len)
+{
+	size_t i;
+
+	printf(" (length %d bytes):\n\t\"", (int)len);
+	for (i = 0; i < len; i++) {
+		printf("\\x%02X", (str[i] & 0xFF));
+		if ((i + 1) % 16 == 0 && (i + 1) < len)
+			printf("\"\n\t\"");
+	}
+	printf("\"\n");
 }
 
 void hexprint(const void *_str, size_t len)
