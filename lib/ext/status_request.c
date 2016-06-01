@@ -522,7 +522,7 @@ _gnutls_status_request_unpack(gnutls_buffer_st * ps,
 }
 
 const extension_entry_st ext_mod_status_request = {
-	.name = "Status Request",
+	.name = "OCSP Status Request",
 	.type = GNUTLS_EXTENSION_STATUS_REQUEST,
 	.parse_type = GNUTLS_EXT_TLS,
 	.recv_func = _gnutls_status_request_recv_params,

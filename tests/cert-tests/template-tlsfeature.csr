@@ -33,7 +33,7 @@ PKCS #10 Certificate Request Information:
 				Digital signature.
 				Certificate signing.
 			TLS Features (not critical):
-				Status Request(5)
+				OCSP Status Request(5)
 				17
 Other Information:
 	Public Key ID:
