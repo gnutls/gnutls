@@ -64,7 +64,6 @@ int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *f)
  **/
 void gnutls_x509_tlsfeatures_deinit(gnutls_x509_tlsfeatures_t f)
 {
-	gnutls_free(f->features);
 	gnutls_free(f);
 }
 
@@ -93,7 +92,7 @@ int gnutls_x509_tlsfeatures_get(gnutls_x509_tlsfeatures_t f, unsigned idx, unsig
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 	}
 
-	*feature = f->features[idx].feature;
+	*feature = f->feature[idx];
 	return 0;
 }
 
@@ -246,14 +245,14 @@ unsigned gnutls_x509_tlsfeatures_check_crt(gnutls_x509_tlsfeatures_t feat,
 	for (i=0;i<feat->size;i++) {
 		found = 0;
 		for (j=0;j<cfeat->size;j++) {
-			if (feat->features[i].feature == cfeat->features[j].feature) {
+			if (feat->feature[i] == cfeat->feature[j]) {
 				found = 1;
 				break;
 			}
 		}
 
 		if (found == 0) {
-			_gnutls_debug_log("feature %d was not found in cert\n", (int)feat->features[i].feature);
+			_gnutls_debug_log("feature %d was not found in cert\n", (int)feat->feature[i]);
 			uret = 0;
 			goto cleanup;
 		}

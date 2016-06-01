@@ -3155,7 +3155,6 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned
 {
 	char nptr[ASN1_MAX_NAME_SIZE];
 	int result;
-	void * tmp;
 	unsigned i, indx, j;
 	unsigned int feature;
 
@@ -3181,9 +3180,14 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned
 			return GNUTLS_E_CERTIFICATE_ERROR;
 		}
 
+		if (f->size >= sizeof(f->feature)/sizeof(f->feature[0])) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
 		/* skip duplicates */
 		for (j=0;j<f->size;j++) {
-			if (f->features[j].feature == feature) {
+			if (f->feature[j] == feature) {
 				skip = 1;
 				break;
 			}
@@ -3191,13 +3195,7 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned
 
 		if (!skip) {
 			indx = f->size;
-			tmp = gnutls_realloc(f->features, (f->size + 1) * sizeof(f->features[0]));
-			if (tmp == NULL) {
-				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-			}
-			f->features = tmp;
-
-			f->features[indx].feature = feature;
+			f->feature[indx] = feature;
 			f->size++;
 		}
 	}
@@ -3301,7 +3299,7 @@ int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
 			goto cleanup;
 		}
 
-		ret = _gnutls_x509_write_uint32(c2, "?LAST", f->features[i].feature);
+		ret = _gnutls_x509_write_uint32(c2, "?LAST", f->feature[i]);
 		if (ret != GNUTLS_E_SUCCESS) {
 			gnutls_assert();
 			goto cleanup;
@@ -3336,24 +3334,18 @@ int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
  **/
 int gnutls_x509_tlsfeatures_add(gnutls_x509_tlsfeatures_t f, unsigned int feature)
 {
-	void * tmp;
-
 	if (f == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (feature > UINT16_MAX) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
+	if (feature > UINT16_MAX)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	tmp = gnutls_realloc(f->features, (f->size + 1) * sizeof(f->features[0]));
-	if (tmp == NULL) {
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-	f->features = tmp;
-	f->features[f->size++].feature = feature;
+	if (f->size >= sizeof(f->feature)/sizeof(f->feature[0]))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	f->feature[f->size++] = feature;
 
 	return 0;
 }

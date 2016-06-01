@@ -485,9 +485,7 @@ int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
 void _gnutls_x509_policies_erase(gnutls_x509_policies_t policies, unsigned int seq);
 
 struct gnutls_x509_tlsfeatures_st {
-	struct {
-		uint16_t feature;
-	} *features;
+	uint16_t feature[MAX_EXT_TYPES];
 	unsigned int size;
 };
 
