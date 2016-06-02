@@ -66,7 +66,8 @@
  */
 static int
 check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
-		    gnutls_x509_crt_t issuer,
+		    gnutls_x509_trust_list_t tl,
+		    gnutls_x509_crt_t *cand_issuers, unsigned cand_issuers_size,
 		    gnutls_datum_t * data, unsigned int *ostatus)
 {
 	gnutls_ocsp_resp_t resp;
@@ -102,7 +103,28 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_ocsp_resp_verify_direct(resp, issuer, &status, 0);
+	/* Attempt to verify against our trusted list */
+	ret = gnutls_ocsp_resp_verify(resp, tl, &status, 0);
+	if ((ret < 0 || status != 0) && cand_issuers_size > 0) {
+		/* Attempt to verify against the certificate list provided by the server */
+		ret = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[0], &status, 0);
+		/* if verification fails attempt to find whether any of the other
+		 * bundled CAs is an issuer of the OCSP response */
+		if ((ret < 0 || status != 0) && cand_issuers_size > 1) {
+			int ret2;
+			unsigned status2, i;
+
+			for (i=1;i<cand_issuers_size;i++) {
+				ret2 = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[i], &status2, 0);
+				if (ret2 >= 0 && status2 == 0) {
+					status = status2;
+					ret = ret2;
+					break;
+				}
+			}
+		}
+	}
+
 	if (ret < 0) {
 		ret = gnutls_assert_val(0);
 		gnutls_assert();
@@ -248,10 +270,10 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	gnutls_x509_crt_t *peer_certificate_list;
 	gnutls_datum_t resp;
 	int peer_certificate_list_size, i, x, ret;
-	gnutls_x509_crt_t issuer = NULL;
+	gnutls_x509_crt_t *cand_issuers = NULL;
+	unsigned cand_issuers_size = 0;
 	unsigned int ocsp_status = 0;
 	unsigned int verify_flags;
-	unsigned issuer_deinit = 0;
 
 	/* No OCSP check so far */
 	session->internals.ocsp_check_ok = 0;
@@ -330,23 +352,13 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	}
 
 	if (peer_certificate_list_size > 1) {
-		issuer = peer_certificate_list[1];
-	} else {
-		ret =
-		    gnutls_x509_trust_list_get_issuer(cred->tlist,
-						      peer_certificate_list
-						      [0], &issuer, GNUTLS_TL_GET_COPY);
-		if (ret < 0) {
-			goto skip_ocsp;
-		}
-		issuer_deinit = 1;
+		cand_issuers = &peer_certificate_list[1];
+		cand_issuers_size = peer_certificate_list_size-1;
 	}
 
 	ret =
-	    check_ocsp_response(session, peer_certificate_list[0], issuer,
-				&resp, &ocsp_status);
-	if (issuer_deinit != 0)
-		gnutls_x509_crt_deinit(issuer);
+	    check_ocsp_response(session, peer_certificate_list[0], cred->tlist, cand_issuers,
+	    			cand_issuers_size, &resp, &ocsp_status);
 
 	if (ret < 0) {
 		CLEAR_CERTS;
