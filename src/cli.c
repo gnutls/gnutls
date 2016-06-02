@@ -1226,6 +1226,7 @@ int main(int argc, char **argv)
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake has failed\n");
 		gnutls_perror(ret);
+		print_other_info(hd.session);
 		gnutls_deinit(hd.session);
 		return 1;
 	} else
