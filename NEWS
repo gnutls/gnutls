@@ -15,6 +15,11 @@ See the end for copying conditions.
    implemented the RFC7633 TLSFeature for OCSP status request extension.
    Feature implemented by Tim Kosse.
 
+** libgnutls: Treat CA certificates with the "Server Gated Cryptography" key
+   purpose OIDs equivalent to having the GNUTLS_KP_TLS_WWW_SERVER OID. This
+   improves interoperability with several old intermediate CA certificates
+   carrying these legacy OIDs.
+
 ** libgnutls: The SSLKEYLOGFILE and GNUTLS_KEYLOGFILE environment variables can
    be used to log session keys. These session keys are compatible with
    the NSS Key Log Format and can be used to decrypt the session for
