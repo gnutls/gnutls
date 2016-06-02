@@ -961,6 +961,9 @@ cleanup:
 	return status;
 }
 
+#define PURPOSE_NSSGC "2.16.840.1.113730.4.1"
+#define PURPOSE_VSGC "2.16.840.1.113733.1.8.1"
+
 /* Returns true if the provided purpose is in accordance with the certificate.
  */
 unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, unsigned no_any)
@@ -969,7 +972,24 @@ unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, 
 	size_t oid_size;
 	int ret;
 	unsigned critical = 0;
+	unsigned check_obsolete_oids = 0;
 	unsigned i;
+
+	/* The check_obsolete_oids hack is because of certain very old CA certificates
+	 * around which instead of having the GNUTLS_KP_TLS_WWW_SERVER have some old
+	 * OIDs for that purpose. Assume these OIDs equal GNUTLS_KP_TLS_WWW_SERVER in
+	 * CA certs */
+	if (strcmp(purpose, GNUTLS_KP_TLS_WWW_SERVER) == 0) {
+		unsigned ca_status;
+		ret =
+		    gnutls_x509_crt_get_basic_constraints(cert, NULL, &ca_status,
+							  NULL);
+		if (ret < 0)
+			ca_status = 0;
+
+		if (ca_status)
+			check_obsolete_oids = 1;
+	}
 
 	for (i=0;;i++) {
 		oid_size = sizeof(oid);
@@ -985,6 +1005,14 @@ unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, 
 		} else if (ret < 0) {
 			gnutls_assert();
 			break;
+		}
+
+		if (check_obsolete_oids) {
+			if (strcmp(oid, PURPOSE_NSSGC) == 0) {
+				return 1;
+			} else if (strcmp(oid, PURPOSE_VSGC) == 0) {
+				return 1;
+			}
 		}
 
 		if (strcmp(oid, purpose) == 0 || (no_any == 0 && strcmp(oid, GNUTLS_KP_ANY) == 0)) {
