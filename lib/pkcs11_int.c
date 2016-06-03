@@ -203,21 +203,21 @@ pkcs11_generate_key_pair(struct ck_function_list * module,
 			 unsigned long pub_templ_count,
 			 struct ck_attribute * priv_templ,
 			 unsigned long priv_templ_count,
-			 ck_object_handle_t * pub,
-			 ck_object_handle_t * priv)
+			 ck_object_handle_t * pub_ctx,
+			 ck_object_handle_t * priv_ctx)
 {
 	return (module)->C_GenerateKeyPair(sess, mechanism, pub_templ,
 					   pub_templ_count, priv_templ,
-					   priv_templ_count, pub, priv);
+					   priv_templ_count, pub_ctx, priv_ctx);
 }
 
 ck_rv_t
 pkcs11_decrypt_init(struct ck_function_list * module,
 		    ck_session_handle_t sess,
 		    struct ck_mechanism * mechanism,
-		    ck_object_handle_t key)
+		    ck_object_handle_t key_ctx)
 {
-	return (module)->C_DecryptInit(sess, mechanism, key);
+	return (module)->C_DecryptInit(sess, mechanism, key_ctx);
 }
 
 ck_rv_t
@@ -235,16 +235,16 @@ ck_rv_t
 pkcs11_create_object(struct ck_function_list * module,
 		     ck_session_handle_t sess,
 		     struct ck_attribute * templ,
-		     unsigned long count, ck_object_handle_t * object)
+		     unsigned long count, ck_object_handle_t * ctx)
 {
-	return (module)->C_CreateObject(sess, templ, count, object);
+	return (module)->C_CreateObject(sess, templ, count, ctx);
 }
 
 ck_rv_t
 pkcs11_destroy_object(struct ck_function_list * module,
-		      ck_session_handle_t sess, ck_object_handle_t object)
+		      ck_session_handle_t sess, ck_object_handle_t ctx)
 {
-	return (module)->C_DestroyObject(sess, object);
+	return (module)->C_DestroyObject(sess, ctx);
 }
 
 ck_rv_t

@@ -103,7 +103,7 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	struct ck_attribute a[MAX_ASIZE];
 	ck_object_class_t class = CKO_CERTIFICATE;
 	ck_certificate_type_t type = CKC_X_509;
-	ck_object_handle_t obj;
+	ck_object_handle_t ctx;
 	unsigned a_val;
 	struct pkcs11_session_info sinfo;
 	
@@ -216,7 +216,7 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 
 	mark_flags(flags, a, &a_val);
 
-	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
+	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &ctx);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
@@ -376,7 +376,7 @@ gnutls_pkcs11_copy_pubkey(const char *token_url,
 	struct ck_attribute a[MAX_ASIZE];
 	gnutls_pk_algorithm_t pk;
 	ck_object_class_t class = CKO_PUBLIC_KEY;
-	ck_object_handle_t obj;
+	ck_object_handle_t ctx;
 	unsigned a_val;
 	ck_key_type_t type;
 	struct pkcs11_session_info sinfo;
@@ -475,7 +475,7 @@ gnutls_pkcs11_copy_pubkey(const char *token_url,
 		a_val++;
 	}
 
-	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
+	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &ctx);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
@@ -525,7 +525,7 @@ gnutls_pkcs11_copy_attached_extension(const char *token_url,
 	struct p11_kit_uri *info = NULL;
 	ck_rv_t rv;
 	struct ck_attribute a[MAX_ASIZE];
-	ck_object_handle_t hobj;
+	ck_object_handle_t ctx;
 	unsigned a_vals;
 	struct pkcs11_session_info sinfo;
 	ck_object_class_t class;
@@ -582,7 +582,7 @@ gnutls_pkcs11_copy_attached_extension(const char *token_url,
 		a[a_vals++].value_len = strlen(label);
 	}
 
-	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_vals, &hobj);
+	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_vals, &ctx);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
@@ -631,7 +631,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	uint8_t id[20];
 	struct ck_attribute a[32];
 	ck_object_class_t class = CKO_PRIVATE_KEY;
-	ck_object_handle_t obj;
+	ck_object_handle_t ctx;
 	ck_key_type_t type;
 	int a_val;
 	gnutls_pk_algorithm_t pk;
@@ -916,7 +916,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	a[a_val].value_len = sizeof(type);
 	a_val++;
 
-	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
+	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &ctx);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
@@ -984,7 +984,7 @@ delete_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *s
 	ck_object_class_t class;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
 	ck_rv_t rv;
-	ck_object_handle_t obj;
+	ck_object_handle_t ctx;
 	unsigned long count, a_vals;
 	int found = 0, ret;
 
@@ -1048,9 +1048,9 @@ delete_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *s
 	}
 
 	while (pkcs11_find_objects
-	       (sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK
+	       (sinfo->module, sinfo->pks, &ctx, 1, &count) == CKR_OK
 	       && count == 1) {
-		rv = pkcs11_destroy_object(sinfo->module, sinfo->pks, obj);
+		rv = pkcs11_destroy_object(sinfo->module, sinfo->pks, ctx);
 		if (rv != CKR_OK) {
 			_gnutls_debug_log
 			    ("p11: Cannot destroy object: %s\n",

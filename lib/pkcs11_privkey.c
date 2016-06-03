@@ -183,11 +183,11 @@ gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
 static int
 find_object(struct pkcs11_session_info *sinfo,
 	    struct pin_info_st *pin_info,
-	    ck_object_handle_t * _obj,
+	    ck_object_handle_t * _ctx,
 	    struct p11_kit_uri *info, unsigned int flags)
 {
 	int ret;
-	ck_object_handle_t obj;
+	ck_object_handle_t ctx;
 	struct ck_attribute *attrs;
 	unsigned long attr_count;
 	unsigned long count;
@@ -211,9 +211,9 @@ find_object(struct pkcs11_session_info *sinfo,
 		goto fail;
 	}
 
-	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1, &count)
+	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &ctx, 1, &count)
 	    == CKR_OK && count == 1) {
-		*_obj = obj;
+		*_ctx = ctx;
 		pkcs11_find_objects_final(sinfo);
 		return 0;
 	}
@@ -752,7 +752,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	struct p11_kit_uri *info = NULL;
 	ck_rv_t rv;
 	struct ck_attribute a[22], p[22];
-	ck_object_handle_t pub, priv;
+	ck_object_handle_t pub_ctx, priv_ctx;
 	unsigned long _bits = bits;
 	int a_val, p_val;
 	struct ck_mechanism mech;
@@ -988,7 +988,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	}
 
 	rv = pkcs11_generate_key_pair(sinfo.module, sinfo.pks, &mech, a,
-				      a_val, p, p_val, &pub, &priv);
+				      a_val, p, p_val, &pub_ctx, &priv_ctx);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
@@ -1014,7 +1014,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		obj->pk_algorithm = pk;
 		obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 		ret =
-		    pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub,
+		    pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub_ctx,
 				       key_type, obj);
 		if (ret < 0) {
 			gnutls_assert();
