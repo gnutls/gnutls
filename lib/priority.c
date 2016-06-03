@@ -999,8 +999,8 @@ char *_gnutls_resolve_priorities(const char* priorities)
 char *p = (char*)priorities;
 char *additional = NULL;
 char *ret = NULL;
-char *ss, *line = NULL;
-unsigned ss_len;
+char *ss, *ss_next, *line = NULL;
+unsigned ss_len, ss_next_len;
 int l;
 FILE* fp = NULL;
 size_t n, n2 = 0, line_size;
@@ -1010,40 +1010,64 @@ size_t n, n2 = 0, line_size;
 
 	if (*p == '@') {
 		ss = p+1;
-
-		additional = strchr(p, ':');
+		additional = strchr(ss, ':');
 		if (additional != NULL) {
-			ss_len = additional - ss;
 			additional++;
-		} else {
-			ss_len = strlen(ss);
-		}
-
-#ifdef HAVE_FMEMOPEN
-		/* Always try to refresh the cached data, to
-		 * allow it to be updated without restarting
-		 * all applications
-		 */
-		_gnutls_update_system_priorities();
-		fp = fmemopen(system_priority_buf, system_priority_buf_size, "r");
-#else
-		fp = fopen(system_priority_file, "r");
-#endif
-		if (fp == NULL) {/* fail */
-			ret = NULL;
-			goto finish;
 		}
 
 		do {
-			l = getline(&line, &line_size, fp);
-			if (l > 0) {
-				p = check_str(line, line_size, ss, ss_len);
-				if (p != NULL)
-					break;
+			ss_next = strchr(ss, ',');
+			if (ss_next != NULL) {
+				if (additional && ss_next > additional)
+					ss_next = NULL;
+				else
+					ss_next++;
 			}
-		} while (l>0);
+
+			if (ss_next) {
+				ss_len = ss_next - ss - 1;
+				ss_next_len = additional - ss_next - 1;
+			} else if (additional) {
+				ss_len = additional - ss - 1;
+				ss_next_len = 0;
+			} else {
+				ss_len = strlen(ss);
+				ss_next_len = 0;
+			}
+
+#ifdef HAVE_FMEMOPEN
+			/* Always try to refresh the cached data, to
+			 * allow it to be updated without restarting
+			 * all applications
+			 */
+			_gnutls_update_system_priorities();
+			fp = fmemopen(system_priority_buf, system_priority_buf_size, "r");
+#else
+			fp = fopen(system_priority_file, "r");
+#endif
+			if (fp == NULL) {/* fail */
+				ret = NULL;
+				goto finish;
+			}
+
+			do {
+				l = getline(&line, &line_size, fp);
+				if (l > 0) {
+					p = check_str(line, line_size, ss, ss_len);
+					if (p != NULL)
+						break;
+				}
+			} while (l>0);
+
+			_gnutls_debug_log("resolved '%.*s' to '%s', next '%.*s'\n",
+					  ss_len, ss, p ? : "", ss_next_len, ss_next ? : "");
+			ss = ss_next;
+			fclose(fp);
+			fp = NULL;
+		} while (ss && p == NULL);
 
 		if (p == NULL) {
+			_gnutls_debug_log("unable to resolve %s\n", priorities);
 			ret = NULL;
 			goto finish;
 		}
@@ -1129,12 +1153,22 @@ finish:
  * "NONE" means nothing is enabled.  This disables even protocols and
  * compression methods.
  *
- * "@@KEYWORD" The system administrator imposed settings. The provided keywords
- * will be expanded from a configuration-time provided file - default is:
- * /etc/gnutls/default-priorities. Any keywords that follow it, will 
- * be appended to the expanded string. If there is no system string,
- * then the function will fail. The system file should be formatted
- * as "KEYWORD=VALUE", e.g., "SYSTEM=NORMAL:+ARCFOUR-128".
+ * "@@KEYWORD1,KEYWORD2,..." The system administrator imposed settings.
+ * The provided keyword(s) will be expanded from a configuration-time
+ * provided file - default is: /etc/gnutls/default-priorities.
+ * Any attributes that follow it, will be appended to the expanded
+ * string. If multiple keywords are provided, separated by commas,
+ * then the first keyword that exists in the configuration file
+ * will be used. At least one of the keywords must exist, or this
+ * function will return an error. Typical usage would be to specify
+ * an application specified keyword first, followed by "SYSTEM" as
+ * a default fallback. e.g., "@LIBVIRT,SYSTEM:!-VERS-SSL3.0" will
+ * first try to find a config file entry matching "LIBVIRT", but if
+ * that does not exist will use the entry for "SYSTEM". If "SYSTEM"
+ * does not exist either, an error will be returned. In all cases,
+ * the SSL3.0 protocol will be disabled. The system priority file
+ * entries should be formatted as "KEYWORD=VALUE", e.g.,
+ * "SYSTEM=NORMAL:+ARCFOUR-128".
  *
  * Special keywords are "!", "-" and "+".
  * "!" or "-" appended with an algorithm will remove this algorithm.
