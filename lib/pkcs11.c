@@ -2990,54 +2990,27 @@ gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
 				  const char *url,
 				  unsigned int flags)
 {
+	gnutls_pkcs11_obj_t *list1;
+	unsigned int n_list1, i;
 	int ret;
-	struct find_obj_data_st priv;
-	unsigned i;
 
-	PKCS11_CHECK_INIT;
+	ret = gnutls_pkcs11_obj_list_import_url4(&list1, &n_list1, url, flags);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	memset(&priv, 0, sizeof(priv));
-
-	/* fill in the find data structure */
-	priv.flags = flags;
-
-	if (url == NULL || url[0] == 0) {
-		url = "pkcs11:";
-	}
-
-	ret = pkcs11_url_to_info(url, &priv.info, flags);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret =
-	    _pkcs11_traverse_tokens(find_objs_cb, &priv, priv.info,
-				    NULL, pkcs11_obj_flags_to_int(flags));
-	p11_kit_uri_free(priv.info);
-
-	if (ret < 0) {
-		gnutls_assert();
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			*n_list = 0;
-			ret = 0;
+	if (n_list1 > *n_list) {
+		*n_list = n_list1;
+		for (i=0;i<n_list1;i++) {
+			gnutls_pkcs11_obj_deinit(list1[i]);
 		}
-		return ret;
-	}
-
-	if (priv.current > *n_list) {
-		*n_list = priv.current;
-		for (i=0;i<priv.current;i++) {
-			gnutls_pkcs11_obj_deinit(priv.p_list[i]);
-		}
-		gnutls_free(priv.p_list);
+		gnutls_free(list1);
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 	}
 
-	*n_list = priv.current;
+	*n_list = n_list1;
 	if (p_list)
-		memcpy(p_list, priv.p_list, priv.current*sizeof(p_list[0]));
-	gnutls_free(priv.p_list);
+		memcpy(p_list, list1, n_list1*sizeof(p_list[0]));
+	gnutls_free(list1);
 
 	return 0;
 }
