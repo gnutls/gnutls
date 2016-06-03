@@ -107,7 +107,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls1.2-cert-key-exchange \
 	 tls1.1-cert-key-exchange tls1.0-cert-key-exchange ssl3.0-cert-key-exchange \
 	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange x509-cert-callback-legacy \
-	 keylog-env ssl2-hello tlsfeature-ext pkcs11-cert-import-url4-exts
+	 keylog-env ssl2-hello tlsfeature-ext
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -149,7 +149,8 @@ pkcs11_get_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_get_raw_issuer_exts_SOURCES = pkcs11/pkcs11-get-raw-issuer-exts.c
 pkcs11_get_raw_issuer_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
-ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
+ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts \
+	 pkcs11-cert-import-url4-exts
 endif
 endif
 
