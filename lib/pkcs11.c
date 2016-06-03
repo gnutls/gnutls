@@ -2012,6 +2012,10 @@ unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
  * parsing (such as X.509 or OpenPGP) since the #gnutls_pkcs11_obj_t is
  * format agnostic. Only data are transferred.
  *
+ * If the flag %GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT is specified
+ * any certificate read, will have its extensions overwritten by any
+ * stapled extensions in the trust module.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -2247,7 +2251,7 @@ gnutls_pkcs11_token_get_info(const char *url,
  * @detailed: non zero if a detailed URL is required
  * @url: will contain an allocated url
  *
- * This function will export a URL identifying the given certificate.
+ * This function will export a URL identifying the given object.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
