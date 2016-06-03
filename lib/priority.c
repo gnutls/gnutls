@@ -32,6 +32,7 @@
 #include <c-ctype.h>
 #include <extensions.h>
 #include "fips.h"
+#include "errno.h"
 
 #define MAX_ELEMENTS 64
 
@@ -926,26 +927,54 @@ static char *check_str(char *line, size_t line_size, const char *needle, size_t 
 static const char *system_priority_file = SYSTEM_PRIORITY_FILE;
 static char *system_priority_buf = NULL;
 static size_t system_priority_buf_size = 0;
+static time_t system_priority_last_mod = 0;
+
+
+static void _gnutls_update_system_priorities(void)
+{
+#ifdef HAVE_FMEMOPEN
+	gnutls_datum_t data;
+	int ret;
+	struct stat sb;
+
+	if (stat(system_priority_file, &sb) < 0) {
+		_gnutls_debug_log("unable to access: %s: %d\n",
+				  system_priority_file, errno);
+		return;
+	}
+
+	if (sb.st_mtime == system_priority_last_mod) {
+		_gnutls_debug_log("system priority %s has not changed\n",
+				  system_priority_file);
+		return;
+	}
+
+	ret = gnutls_load_file(system_priority_file, &data);
+	if (ret < 0) {
+		_gnutls_debug_log("unable to load: %s: %d\n",
+				  system_priority_file, ret);
+		return;
+	}
+
+	_gnutls_debug_log("cached system priority %s mtime %lld\n",
+			  system_priority_file,
+			  (unsigned long long)sb.st_mtime);
+	gnutls_free(system_priority_buf);
+	system_priority_buf = (char*)data.data;
+	system_priority_buf_size = data.size;
+	system_priority_last_mod = sb.st_mtime;
+#endif
+}
 
 void _gnutls_load_system_priorities(void)
 {
-	gnutls_datum_t data;
 	const char *p;
-	int ret;
 
 	p = secure_getenv("GNUTLS_SYSTEM_PRIORITY_FILE");
 	if (p != NULL)
 		system_priority_file = p;
 
-#ifdef HAVE_FMEMOPEN
-	ret = gnutls_load_file(system_priority_file, &data);
-	if (ret < 0)
-		return;
-
-	system_priority_buf = (char*)data.data;
-	system_priority_buf_size = data.size;
-#endif
-	return;
+	_gnutls_update_system_priorities();
 }
 
 void _gnutls_unload_system_priorities(void)
@@ -955,6 +984,7 @@ void _gnutls_unload_system_priorities(void)
 #endif
 	system_priority_buf = NULL;
 	system_priority_buf_size = 0;
+	system_priority_last_mod = 0;
 }
 
 /* Returns the new priorities if SYSTEM is specified in
@@ -990,10 +1020,15 @@ size_t n, n2 = 0, line_size;
 		}
 
 #ifdef HAVE_FMEMOPEN
+		/* Always try to refresh the cached data, to
+		 * allow it to be updated without restarting
+		 * all applications
+		 */
+		_gnutls_update_system_priorities();
 		fp = fmemopen(system_priority_buf, system_priority_buf_size, "r");
+#else
+		fp = fopen(system_priority_file, "r");
 #endif
-		if (fp == NULL)
-			fp = fopen(system_priority_file, "r");
 		if (fp == NULL) {/* fail */
 			ret = NULL;
 			goto finish;
