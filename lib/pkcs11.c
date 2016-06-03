@@ -72,6 +72,7 @@ struct find_obj_data_st {
 	unsigned int current;
 	unsigned int flags;
 	struct p11_kit_uri *info;
+	bool overwrite_exts; /* only valid if looking for a certificate */
 };
 
 struct find_token_num {
@@ -2715,6 +2716,7 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	int ret;
 	struct find_pkey_list_st plist;	/* private key holder */
 	unsigned int i, tot_values = 0, class_set = 0;
+	unsigned start_elem;
 
 	if (tinfo == NULL) {
 		gnutls_assert();
@@ -2853,6 +2855,8 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 		goto fail;
 	}
 
+	start_elem = find_data->current;
+
 	while (pkcs11_find_objects
 	       (sinfo->module, sinfo->pks, ctx, OBJECTS_A_TIME, &count) == CKR_OK
 	       && count > 0) {
@@ -2925,8 +2929,27 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
  		}
 	}
 
-	gnutls_free(ctx);
 	pkcs11_find_objects_final(sinfo);
+
+	/* we can have only a search state going on, so we can only overwrite extensions
+	 * after we have read everything. */
+	if (find_data->overwrite_exts) {
+		for (i=start_elem;i<find_data->current;i++) {
+			if (find_data->p_list[i]->raw.size > 0) {
+				gnutls_datum_t spki;
+				rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, ctx[i], CKA_PUBLIC_KEY_INFO, &spki);
+				if (rv == CKR_OK) {
+					ret = pkcs11_override_cert_exts(sinfo, &spki, &find_data->p_list[i]->raw);
+					gnutls_free(spki.data);
+					if (ret < 0) {
+						gnutls_assert();
+						goto fail;
+					}
+				}
+			}
+		}
+	}
+	gnutls_free(ctx);
 
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;	/* continue until all tokens have been checked */
 
@@ -2973,7 +2996,7 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
  * %GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO, %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE,
  * %GNUTLS_PKCS11_OBJ_FLAG_CRT, %GNUTLS_PKCS11_OBJ_FLAG_PUBKEY, %GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY,
  * %GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED.
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED, %GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT.
  *
  * On versions of GnuTLS prior to 3.4.0 the equivalent function was
  * gnutls_pkcs11_obj_list_import_url(). That is also available on this version
@@ -3033,7 +3056,7 @@ gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
  * %GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO, %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE,
  * %GNUTLS_PKCS11_OBJ_FLAG_CRT, %GNUTLS_PKCS11_OBJ_FLAG_PUBKEY, %GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY,
  * %GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED.
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED, %GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT.
  *
  * On versions of GnuTLS prior to 3.4.0 the equivalent function was
  * gnutls_pkcs11_obj_list_import_url2(). That is also available on this version
@@ -3068,6 +3091,10 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
+	}
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT) {
+		priv.overwrite_exts = 1;
 	}
 
 	ret =
