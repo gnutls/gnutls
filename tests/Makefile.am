@@ -107,7 +107,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls1.2-cert-key-exchange \
 	 tls1.1-cert-key-exchange tls1.0-cert-key-exchange ssl3.0-cert-key-exchange \
 	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange x509-cert-callback-legacy \
-	 keylog-env ssl2-hello tlsfeature-ext
+	 keylog-env ssl2-hello tlsfeature-ext pkcs11-cert-import-url4-exts
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -139,6 +139,9 @@ libpkcs11mock1_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -a
 
 pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
 pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
+
+pkcs11_cert_import_url4_exts_SOURCES = pkcs11/pkcs11-cert-import-url4-exts.c
+pkcs11_cert_import_url4_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
 pkcs11_get_exts_SOURCES = pkcs11/pkcs11-get-exts.c
 pkcs11_get_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
