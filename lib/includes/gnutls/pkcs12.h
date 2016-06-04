@@ -109,7 +109,7 @@ typedef enum gnutls_pkcs12_bag_type_t {
 	GNUTLS_BAG_UNKNOWN = 20
 } gnutls_pkcs12_bag_type_t;
 
-gnutls_pkcs12_bag_type_t
+int
 gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t bag, unsigned indx);
 int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t bag, unsigned indx,
 			       gnutls_datum_t * data);

@@ -91,10 +91,9 @@ void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag_t bag)
  *
  * This function will return the bag's type.
  *
- * Returns: On error a negative error value (when casted as integer) or
- *   one of the #gnutls_pkcs12_bag_type_t enumerations.
+ * Returns: On error a negative error value or one of the #gnutls_pkcs12_bag_type_t enumerations.
  **/
-gnutls_pkcs12_bag_type_t
+int
 gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t bag, unsigned indx)
 {
 	if (bag == NULL) {
