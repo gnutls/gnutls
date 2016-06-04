@@ -63,10 +63,6 @@ if ENABLE_ANON
 noinst_PROGRAMS += ex-client-anon ex-serv-anon
 endif
 
-if ENABLE_OPENPGP
-noinst_PROGRAMS += ex-serv-pgp
-endif
-
 if ENABLE_PKCS11
 noinst_PROGRAMS += ex-cert-select-pkcs11
 endif

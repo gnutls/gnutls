@@ -212,18 +212,6 @@ This example is a very simple echo server which supports
 
 @verbatiminclude examples/ex-serv-x509.c
 
-@node Echo server with OpenPGP authentication
-@subsection Echo server with @acronym{OpenPGP} authentication
-@cindex OpenPGP server
-
-The following example is an echo server which supports
-@acronym{OpenPGP} key authentication. You can easily combine
-this functionality ---that is have a server that supports both
-@acronym{X.509} and @acronym{OpenPGP} certificates--- but we separated
-them to keep these examples as simple as possible.
-
-@verbatiminclude examples/ex-serv-pgp.c
-
 @node Echo server with SRP authentication
 @subsection Echo server with @acronym{SRP} authentication
 
