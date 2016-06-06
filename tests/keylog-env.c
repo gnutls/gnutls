@@ -129,7 +129,5 @@ void doit(void)
 
 	assert(get_tmpname(filename)!=NULL);
 
-	gnutls_global_deinit();
-	run("GNUTLS_KEYLOGFILE", filename);
 	run("SSLKEYLOGFILE", filename);
 }

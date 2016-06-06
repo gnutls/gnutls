@@ -100,11 +100,18 @@ static void write_nss_key_log(gnutls_session_t session, const gnutls_datum_t *pr
 	char buf[512];
 	char buf2[512];
 	FILE *fp;
+	static const char *keylogfile = NULL;
+	static unsigned checked_env = 0;
 
-	if (_gnutls_keylogfile == NULL)
+	if (!checked_env) {
+		checked_env = 1;
+		keylogfile = secure_getenv("SSLKEYLOGFILE");
+	}
+
+	if (keylogfile == NULL)
 		return;
 
-	fp = fopen(_gnutls_keylogfile, "a");
+	fp = fopen(keylogfile, "a");
 	if (fp == NULL)
 		return;
 

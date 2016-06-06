@@ -71,7 +71,6 @@ extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 void *_gnutls_file_mutex;
 void *_gnutls_pkcs11_mutex;
-const char *_gnutls_keylogfile = NULL;
 
 ASN1_TYPE _gnutls_pkix1_asn = ASN1_TYPE_EMPTY;
 ASN1_TYPE _gnutls_gnutls_asn = ASN1_TYPE_EMPTY;
@@ -241,10 +240,6 @@ int gnutls_global_init(void)
 	}
 
 	_gnutls_switch_lib_state(LIB_STATE_INIT);
-
-	_gnutls_keylogfile = secure_getenv("GNUTLS_KEYLOGFILE");
-	if (_gnutls_keylogfile == NULL)
-		_gnutls_keylogfile = secure_getenv("SSLKEYLOGFILE");
 
 	e = secure_getenv("GNUTLS_DEBUG_LEVEL");
 	if (e != NULL) {
