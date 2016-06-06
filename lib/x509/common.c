@@ -1184,7 +1184,7 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
  * returns them into signed_data.
  */
 int
-_gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *der,
+_gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum_t *der,
 			     const char *src_name,
 			     gnutls_datum_t * signed_data)
 {

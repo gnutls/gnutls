@@ -2795,8 +2795,8 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
  **/
 int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 {
-	gnutls_datum data = { NULL, 0 };
-	gnutls_datum signature = { NULL, 0 };
+	gnutls_datum_t data = { NULL, 0 };
+	gnutls_datum_t signature = { NULL, 0 };
 	gnutls_pk_params_st params;
 	gnutls_digest_algorithm_t algo;
 	int ret;

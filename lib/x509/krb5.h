@@ -18,5 +18,5 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum * der);
-int _gnutls_krb5_der_to_principal(const gnutls_datum * der, gnutls_datum_t *name);
+int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der);
+int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der, gnutls_datum_t *name);

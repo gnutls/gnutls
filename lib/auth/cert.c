@@ -1983,7 +1983,7 @@ _gnutls_server_select_cert(gnutls_session_t session,
 			    && _gnutls_str_array_match(cred->certs[i].names,
 						       server_name) != 0) {
 				/* if requested algorithms are also compatible select it */
-				gnutls_pk_algorithm pk =
+				gnutls_pk_algorithm_t pk =
 				    gnutls_pubkey_get_pk_algorithm(cred->certs
 								   [i].cert_list
 								   [0].pubkey,
@@ -2017,7 +2017,7 @@ _gnutls_server_select_cert(gnutls_session_t session,
 		     session->security_parameters.cert_type);
 
 		for (i = 0; i < cred->ncerts; i++) {
-			gnutls_pk_algorithm pk =
+			gnutls_pk_algorithm_t pk =
 			    gnutls_pubkey_get_pk_algorithm(cred->certs[i].
 							   cert_list[0].pubkey,
 							   NULL);

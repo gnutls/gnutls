@@ -131,7 +131,7 @@ static krb5_principal_data* name_to_principal(const char *_name)
 	return princ;
 }
 
-int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum * der)
+int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 {
 	int ret, result;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -277,7 +277,7 @@ static int principal_to_str(ASN1_TYPE c2, gnutls_buffer_st *str)
  	return ret;
 }
 
-int _gnutls_krb5_der_to_principal(const gnutls_datum * der, gnutls_datum_t *name)
+int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der, gnutls_datum_t *name)
 {
 	int ret, result;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;

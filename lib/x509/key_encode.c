@@ -497,7 +497,7 @@ _gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 {
 	int ret;
 	uint8_t one = '\x01';
-	gnutls_datum pubkey = { NULL, 0 };
+	gnutls_datum_t pubkey = { NULL, 0 };
 	const char *oid;
 
 	oid = gnutls_ecc_curve_get_oid(params->flags);

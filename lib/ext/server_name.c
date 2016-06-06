@@ -300,7 +300,7 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 	char *idn_name = NULL;
 #endif
 	extension_priv_data_t epriv;
-	gnutls_datum name;
+	gnutls_datum_t name;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		gnutls_assert();
