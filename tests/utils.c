@@ -31,15 +31,16 @@
 #include <unistd.h>
 #include <errno.h>
 #ifndef _WIN32
-# include <netinet/in.h>
-# include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #else
-#ifdef _WIN32
-# include <windows.h>		/* for Sleep */
-# include <winbase.h>  
+#include <windows.h>		/* for Sleep */
+#include <winbase.h>
 #endif
 
-#endif
+#include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
+
 #include <sys/types.h>
 
 #include "utils.h"
@@ -55,7 +56,42 @@ const char *pkcs3 =
     "GeGOEywcw+oQT4SmFOD7H0smJe2CNyjYpexBXQ/A0mbTF9QKm1cCAQU=\n"
     "-----END DH PARAMETERS-----\n";
 
-void fail(const char *format, ...)
+const char *pkcs3_2048 =
+    "-----BEGIN DH PARAMETERS-----\n"
+    "MIICDgKCAQEAvVNCqM8M9ZoVYBKEkV2KN8ELHHJ75aTZiK9z6170iKSgbITkOxsd\n"
+    "aBCLzHZd7d6/2aNofUeuWdDGHm73d8v53ma2HRVCNESeC2LKsEDFG9FjjUeugvfl\n"
+    "zb85TLZwWT9Lb35Ddhdk7CtxoukjS0/JkCE+8RGzmk5+57N8tNffs4aSSHSe4+cw\n"
+    "i4wULDxiG2p052czAMP3YR5egWvMuiByhy0vKShiZmOy1/Os5r6E/GUF+298gDjG\n"
+    "OeaEUF9snrTcoBwB4yNjVSEbuAh5fMd5zFtz2+dzrk9TYZ44u4DQYkgToW05WcmC\n"
+    "+LG0bLAH6lrJR5OMgyheZEo6F20z/d2yyQKCAQEAtzcuTHW61SFQiDRouk6eD0Yx\n"
+    "0k1RJdaQdlRf6/Dcc6lEqnbezL90THzvxkBwfJ5jG1VZE7JlVCvLRkBtgb0/6SCf\n"
+    "MATfEKG2JMOnKsJxvidmKEp4uN32LketXRrrEBl7rS+HABEfKAzqx+J6trBaq25E\n"
+    "7FVJFsyoa8IL8N8YUWwhE2UuEfmiqQQaeoIUYC/xD2arMXn9N0W84Nyy2S9IL4ct\n"
+    "e3Azi1Wc8MMfpbxxDRxXCnM2uMkLYWs1lQmcUUX+Uygv3P8lgS+RJ1Pi3+BWMx0S\n"
+    "ocsZXqOr6dbEF1WOLObQRK7h/MZp80iVUyrBgX0MbVFN9M5i2u4KKTG95VKRtgIC\n"
+    "AQA=\n" "-----END DH PARAMETERS-----\n";
+
+const char *pkcs3_3072 =
+    "-----BEGIN DH PARAMETERS-----\n"
+    "MIIDDgKCAYEAtRUay8nDgwE5dSVzW525wEu/d0vrFolvYJSevxg2myj5S+gr3Fgq\n"
+    "OGaZc4zrBxkxsELc7GuCqaXSOWL4yobT8N05yGbYWkWRPf4crRMx3P7/Gba9WsmH\n"
+    "BlL71uPf1IN9CanAlabkhV89RKiYaCpUI19+/sq+N2dO874ToBZCNhxZnTgRZ+po\n"
+    "Gdr6XWM0lQ8imIKSer0px3ZHI+/5gmyPry35tGpwlbyclJAg3wlTSdnqDcLxq7AF\n"
+    "OZ23PzC3ij7SFErOX9EFBdS2bjtU47O3OkPc9EIYMEv5nwnXICLHslwVifmURAjV\n"
+    "LfpObL8LYGN4Gac4tFxuDa0PMg0ES5ADugYBwdRFTAtCy5WOYXINzAAOrH9MommT\n"
+    "rMkELf7JOCaV2ktBsvTlrgMAXeyqbf2YSG6CGjj4QnUuqPybSgwPru7VlahsS2lo\n"
+    "qjutBPpgIxS53o97Wi3V5kQedKJiNuIDNnJMFNuTADAM+OYwClTH7ZSwTsxEgVpr\n"
+    "tMH+WnTI7KTJAoIBgQCrELwIUB4oNbf0x+fIpVndhDpl/WcFc/lDtmiRuym5gWbb\n"
+    "NPeI+1rdhnS2R3+nCJODFQTcPNMgIJuSu2EnDCSs5xJ2k08SAgSzyxEdjBpY7qJe\n"
+    "+lJPJ12zhcl0vgcvMhb/YgqVe2MKz0RvnYZPwHM/aJbjYjq/6OpK3fVw4M1ZccBK\n"
+    "QD4OHK8HOvGU7Wf6kRIcxUlfn15spMCIsrAZQBddWLmQgktsxJNUS+AnaPwTBoOv\n"
+    "nGCr1vzw8OS1DtS03VCmtqt3otXhJ3D2oCIG6ogxVAKfHR30KIfzZLBfmCjdzHmH\n"
+    "x4OwYTN1wy5juA438QtiDtcgK60ZqSzQO08ZklRncA/TkkyEH6kPn5KSh/hW9O3D\n"
+    "KZeAY/KF0/Bc1XNtqPEYFb7Vo3rbTsyjXkICN1Hk9S0OIKL42K7rWBepO9KuddSd\n"
+    "aXgH9staP0HXCyyW1VAyqo0TwcWDhE/R7IQQGGwGyd4rD0T+ySW/t09ox23O6X8J\n"
+    "FSp6mOVNcuvhB5U2gW8CAgEA\n" "-----END DH PARAMETERS-----\n";
+
+void _fail(const char *format, ...)
 {
 	char str[1024];
 	va_list arg_ptr;
@@ -116,7 +152,7 @@ void escapeprint(const char *str, size_t len)
 {
 	size_t i;
 
-	printf(" (length %d bytes):\n\t", (int) len);
+	printf(" (length %d bytes):\n\t'", (int)len);
 	for (i = 0; i < len; i++) {
 		if (((str[i] & 0xFF) >= 'A' && (str[i] & 0xFF) <= 'Z') ||
 		    ((str[i] & 0xFF) >= 'a' && (str[i] & 0xFF) <= 'z') ||
@@ -129,6 +165,19 @@ void escapeprint(const char *str, size_t len)
 			printf("'\n\t'");
 	}
 	printf("\n");
+}
+
+void c_print(const unsigned char *str, size_t len)
+{
+	size_t i;
+
+	printf(" (length %d bytes):\n\t\"", (int)len);
+	for (i = 0; i < len; i++) {
+		printf("\\x%02X", (str[i] & 0xFF));
+		if ((i + 1) % 16 == 0 && (i + 1) < len)
+			printf("\"\n\t\"");
+	}
+	printf("\"\n");
 }
 
 void hexprint(const void *_str, size_t len)
@@ -188,7 +237,7 @@ int main(int argc, char *argv[])
 			     argv[0]);
 			return 1;
 		}
-	while (argc-- > 1);
+	while (argc-- > 1) ;
 
 	doit();
 
@@ -199,3 +248,29 @@ int main(int argc, char *argv[])
 	return error_count ? 1 : 0;
 }
 
+char *get_tmpname(char s[TMPNAME_SIZE])
+{
+	unsigned char rnd[6];
+	static char _s[TMPNAME_SIZE];
+	int ret;
+	char *p;
+	const char *path;
+
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, rnd, sizeof(rnd));
+	if (ret < 0)
+		return NULL;
+
+	path = getenv("builddir");
+	if (path == NULL)
+		path = ".";
+
+	if (s == NULL)
+		p = _s;
+	else
+		p = s;
+
+	snprintf(p, TMPNAME_SIZE, "%s/tmpfile-%02x%02x%02x%02x%02x%02x.tmp", path, (unsigned)rnd[0], (unsigned)rnd[1],
+		(unsigned)rnd[2], (unsigned)rnd[3], (unsigned)rnd[4], (unsigned)rnd[5]);
+
+	return p;
+}

@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -23,6 +24,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdio.h>
 #include <signal.h>
 #include <string.h>
 #include <stdarg.h>
@@ -48,19 +50,31 @@ extern int error_count;
 extern int break_on_error;
 
 extern const char *pkcs3;
+extern const char *pkcs3_2048;
+extern const char *pkcs3_3072;
 
-extern void fail(const char *format, ...)
+#define fail(format, ...) \
+    _fail("%s:%d: "format, __func__, __LINE__, ##__VA_ARGS__)
+
+extern void _fail(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
 extern void fail_ignore(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
 extern void success(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
 
+extern void c_print(const unsigned char *str, size_t len);
 extern void escapeprint(const char *str, size_t len);
 extern void hexprint(const void *str, size_t len);
 extern void binprint(const void *str, size_t len);
-
+int disable_system_calls(void);
 void sec_sleep(int sec);
+
+void test_cli_serv(gnutls_certificate_credentials_t server_cred, const char *prio,
+              const gnutls_datum_t *ca_cert, const char *host);
+
+#define TMPNAME_SIZE 128
+char *get_tmpname(char s[TMPNAME_SIZE]);
 
 /* This must be implemented elsewhere. */
 extern void doit(void);
