@@ -62,6 +62,7 @@ endif
 
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c utils-adv.c
+libutils_la_LIBADD = ../lib/libgnutls.la
 
 ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mpi certificate_set_x509_crl dn parse_ca moredn record-sizes \
