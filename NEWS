@@ -5,8 +5,9 @@ See the end for copying conditions.
 
 * Version 3.4.13 (unreleased)
 
-** libgnutls: Consider both SSLKEYLOGFILE and GNUTLS_KEYLOGFILE environment
-   variables with the latter having priority; append the keys to the file.
+** libgnutls: Consider the SSLKEYLOGFILE environment to be compatible with
+   NSS instead of using a separate variable; in addition append any keys to
+   the file instead of overwriting it.
 
 ** libgnutls: use secure_getenv() where available to obtain environment
    variables.
