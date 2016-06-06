@@ -71,9 +71,9 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 crq_key_id x509sign-verify cve-2009-1415 cve-2009-1416		\
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain		\
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
-	 mini-rehandshake rng-fork mini-eagain-dtls resume-dtls \
+	 tls-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify \
-	 mini-tdb mini-dtls-rehandshake mini-alpn mini-dtls-large \
+	 mini-tdb dtls-rehandshake-anon mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities	\
@@ -83,7 +83,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 fips-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu \
 	 crlverify mini-dtls-discard init_fds mini-record-failure \
-	 mini-rehandshake-2 custom-urls set_x509_key_mem set_x509_key_file \
+	 tls-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu \
 	 mini-dtls-record-asym openpgp-callback key-import-export \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \

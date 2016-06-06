@@ -51,7 +51,7 @@ int main()
 
 static void terminate(void);
 
-/* This program tests client initiated rehandshake.
+/* This program tests client and server initiated rehandshake.
  */
 
 static void server_log_func(int level, const char *str)
