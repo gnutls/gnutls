@@ -36,7 +36,9 @@
 
 #define MAX_ELEMENTS 64
 
+/* This function is used by the test suite */
 char *_gnutls_resolve_priorities(const char* priorities);
+
 static void prio_remove(priority_st * priority_list, unsigned int algo);
 static void prio_add(priority_st * priority_list, unsigned int algo);
 static void
