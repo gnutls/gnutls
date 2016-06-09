@@ -198,7 +198,6 @@ servers, using @acronym{GnuTLS}.
 
 @menu
 * Echo server with X.509 authentication::
-* Echo server with OpenPGP authentication::
 * Echo server with SRP authentication::
 * Echo server with anonymous authentication::
 * DTLS echo server with X.509 authentication::

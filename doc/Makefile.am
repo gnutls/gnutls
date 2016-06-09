@@ -155,7 +155,7 @@ gnutls_TEXINFOS += examples/ex-client-anon.c				\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
 	examples/ex-client-srp.c examples/ex-client-x509.c		\
 	examples/ex-serv-x509.c examples/ex-serv-anon.c			\
-	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
+	examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
 	examples/ex-pkcs12.c examples/ex-client-dtls.c
 
