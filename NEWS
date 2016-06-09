@@ -20,6 +20,9 @@ See the end for copying conditions.
    improves interoperability with several old intermediate CA certificates
    carrying these legacy OIDs.
 
+** libgnutls: Re-read the system wide priority file when needed. Patch by
+   Daniel P. Berrange.
+
 ** libgnutls: The SSLKEYLOGFILE environment variable can be used to log
    session keys. These session keys are compatible with the NSS Key Log
    Format and can be used to decrypt the session for debugging using
