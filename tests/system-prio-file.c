@@ -31,6 +31,11 @@
 
 #include "utils.h"
 
+/* This test verifies the correct operation of system-wide priority
+ * strings. The test suite sets the GNUTLS_SYSTEM_PRIORITY_FILE environment
+ * variable to specify the test file (system.prio).
+ */
+
 char *_gnutls_resolve_priorities(const char* priorities);
 
 static void
