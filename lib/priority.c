@@ -987,8 +987,8 @@ void _gnutls_unload_system_priorities(void)
 	system_priority_last_mod = 0;
 }
 
-/* Returns the new priorities if SYSTEM is specified in
- * an allocated string, or just a copy of the provided
+/* Returns the new priorities if a priority string prefixed
+ * with '@' is provided, or just a copy of the provided
  * priorities, appended with any additional present in
  * the priorities string.
  *
@@ -1129,7 +1129,7 @@ finish:
  * "NONE" means nothing is enabled.  This disables even protocols and
  * compression methods.
  *
- * "@KEYWORD" The system administrator imposed settings. The provided keywords
+ * "@@KEYWORD" The system administrator imposed settings. The provided keywords
  * will be expanded from a configuration-time provided file - default is:
  * /etc/gnutls/default-priorities. Any keywords that follow it, will 
  * be appended to the expanded string. If there is no system string,
