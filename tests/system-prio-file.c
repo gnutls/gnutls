@@ -51,7 +51,7 @@ try_prio(const char *prio, const char *expected_str)
 	if (p == NULL && expected_str == NULL)
 		goto ok;
 
-	if (p == NULL || strcmp(p, expected_str) != 0) {
+	if (p == NULL || expected_str == NULL || strcmp(p, expected_str) != 0) {
 		fail("test: %s: error; got: %s, expected: %s\n", prio, p, expected_str);
 		exit(1);
 	}
@@ -72,6 +72,7 @@ void doit(void)
 	try_prio("@HELLO1,HELLO2", "NORMAL");
 	try_prio("@HELLO1,HELLO2:+AES-128-CBC", "NORMAL:+AES-128-CBC");
 	try_prio("@HELLO1,HELLO1", "NORMAL");
+	try_prio("@HELLO1,", "NORMAL");
 	try_prio("@HELLO2,HELLO1", "NORMAL:+AES-128-CBC");
 	try_prio("@HELLO2,HELLO1,@HELLONO", "NORMAL:+AES-128-CBC");
 	try_prio("@HELLO2,HELLO1,@HELLO3", "NORMAL:+AES-128-CBC");
@@ -79,5 +80,8 @@ void doit(void)
 	try_prio("@HELLONO,HELLONO2,HELLO1", "NORMAL");
 	try_prio("@HELLONO,HELLONO2,HELLO1:+AES-128-CBC", "NORMAL:+AES-128-CBC");
 	try_prio("@HELLONO", NULL);
+	try_prio("@HELLONO,", NULL);
+	try_prio("@HELLONO:+AES-128-CBC", NULL);
+	try_prio("@HELLONO,:+AES-128-CBC", NULL);
 }
 
