@@ -34,6 +34,7 @@
 #include <state.h>
 #include <extensions.h>
 #include <buffers.h>
+#include "dtls.h"
 
 static int
 _gnutls_set_kx(gnutls_session_t session, gnutls_kx_algorithm_t algo);
@@ -378,7 +379,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	params->record_sw_size = 0;
+	_dtls_reset_window(params);
 
 	_gnutls_record_log("REC[%p]: Epoch #%u ready\n", session,
 			   params->epoch);

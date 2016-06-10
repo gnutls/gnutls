@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2000-2013 Free Software Foundation, Inc.
- * Copyright (C) 2012,2013 Nikos Mavrogiannopoulos
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2016 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1194,6 +1194,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	if (bufel == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+
 	/* We allocate the maximum possible to allow few compressed bytes to expand to a
 	 * full record. Moreover we add space for any pad and the MAC (in case
 	 * they are encrypted).
@@ -1229,11 +1230,10 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		goto sanity_check_error;
 	}
 
-	/* check for duplicates. We check after the message
-	 * is processed and authenticated to avoid someone
-	 * messing with our windows.
-	 */
 	if (IS_DTLS(session)) {
+		/* check for duplicates. We check after the message
+		 * is processed and authenticated to avoid someone
+		 * messing with our windows. */
 		if (likely(!(session->internals.flags & GNUTLS_NO_REPLAY_PROTECTION))) {
 			ret = _dtls_record_check(record_params, packet_sequence);
 			if (ret < 0) {

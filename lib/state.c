@@ -1313,7 +1313,7 @@ gnutls_record_set_state(gnutls_session_t session,
 	memcpy(UINT64DATA(record_state->sequence_number), seq_number, 8);
 
 	if (IS_DTLS(session)) {
-		_dtls_reset_window(session, seq_number);
+		_dtls_reset_window(record_params);
 	}
 
 	return 0;

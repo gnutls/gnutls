@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2000-2015 Free Software Foundation, Inc.
- * Copyright (C) 2015 Red Hat, Inc.
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -123,7 +123,6 @@ typedef struct {
 #define GNUTLS_RANDOM_SIZE 32
 
 /* DTLS */
-#define DTLS_RECORD_WINDOW_SIZE 64
 #define DTLS_RETRANS_TIMEOUT 1000
 
 /* TLS Extensions */
@@ -620,10 +619,10 @@ struct record_parameters_st {
 	bool etm;
 	const mac_entry_st *mac;
 
-	/* for DTLS */
-	uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
-	unsigned int record_sw_head_idx;
-	unsigned int record_sw_size;
+	/* for DTLS sliding window */
+	uint64_t dtls_sw_bits;
+	uint64_t dtls_sw_start; /* The starting point of the sliding window without epoch */
+	unsigned dtls_sw_have_recv; /* whether at least a packet has been received */
 
 	record_state_st read;
 	record_state_st write;
