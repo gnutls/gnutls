@@ -28,7 +28,12 @@ DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
-OUTFILE=out.tmp
+OUTFILE=out.$$.tmp
+OUTFILE2=out2.$$.tmp
+
+. ${srcdir}/../scripts/common.sh
+
+check_for_datefudge
 
 ${VALGRIND} "${CERTTOOL}" --inder --crq-info --infile "${srcdir}/data/csr-invalid.der" >"${OUTFILE}" 2>&1
 rc=$?
@@ -46,5 +51,32 @@ if test "$?" != "0"; then
 fi
 
 rm -f "${OUTFILE}"
+
+# check whether the honor_crq_extension option works
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-request \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
+		--outfile $OUTFILE 2>/dev/null
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-certificate \
+		--load-ca-privkey "${srcdir}/data/template-test.key" \
+		--load-ca-certificate "${srcdir}/data/template-tlsfeature.pem" \
+		--load-request="$OUTFILE" \
+		--template "${srcdir}/templates/template-crq.tmpl" \
+		--outfile "${OUTFILE2}" 2>/dev/null
+
+${DIFF} "${srcdir}/data/template-crq.pem" "${OUTFILE2}" >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Certificate request generation failed"
+	echo $OUTFILE2
+	exit ${rc}
+fi
+
+rm -f "${OUTFILE}" "${OUTFILE2}"
 
 exit 0
