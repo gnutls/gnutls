@@ -42,7 +42,7 @@ fi
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
-		--template "${srcdir}/template-othername.tmpl" \
+		--template "${srcdir}/templates/template-othername.tmpl" \
 		--outfile ${OUTFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/template-othername.pem" ${OUTFILE} >/dev/null 2>&1
@@ -57,7 +57,7 @@ fi
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
-		--template "${srcdir}/template-othername-xmpp.tmpl" \
+		--template "${srcdir}/templates/template-othername-xmpp.tmpl" \
 		--outfile ${OUTFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/template-othername-xmpp.pem" ${OUTFILE} >/dev/null 2>&1

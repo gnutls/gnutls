@@ -41,7 +41,7 @@ fi
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
-		--template "${srcdir}/template-tlsfeature.tmpl" \
+		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
 		--outfile "${TMPFILE}" 2>/dev/null
 rc=$?
 
@@ -100,7 +100,7 @@ fi
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-request \
 		--load-privkey "${srcdir}/template-test.key" \
-		--template "${srcdir}/template-tlsfeature.tmpl" \
+		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
 		--outfile "${TMPFILE}" -d 4 #2>/dev/null
 rc=$?
 if test "${rc}" != "0"; then
@@ -163,7 +163,7 @@ datefudge -s "2007-04-22" \
 		--load-privkey "${srcdir}/template-test.key" \
 		--load-ca-privkey "${srcdir}/template-test.key" \
 		--load-ca-certificate "${srcdir}/template-tlsfeature.pem" \
-		--template "${srcdir}/template-tlsfeature-crq.tmpl" \
+		--template "${srcdir}/templates/template-tlsfeature-crq.tmpl" \
 		--load-request "${TMPFILE}" >"${TMPFILE2}" 2>&1
 
 grep -A 2 "TLS Features" "${TMPFILE2}" >"${TMPFILE}" 2>/dev/null

@@ -44,7 +44,7 @@ for i in sha3-224 sha3-256 sha3-384 sha3-512;do
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
-		--template "${srcdir}/template-test.tmpl" \
+		--template "${srcdir}/templates/template-test.tmpl" \
 		--outfile "${TMPFILE}" --hash $i 2>/dev/null
 rc=$?
 
@@ -74,7 +74,7 @@ for i in sha3-224 sha3-256 sha3-384 sha3-512;do
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
 	--load-privkey "${srcdir}/template-test-ecc.key" \
-	--template "${srcdir}/template-test.tmpl" \
+	--template "${srcdir}/templates/template-test.tmpl" \
 	--outfile "${TMPFILE}" --hash $i 2>/dev/null
 rc=$?
 

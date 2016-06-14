@@ -47,7 +47,7 @@ fi
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/template-test.key" \
-		--template "${srcdir}/template-krb5name.tmpl" \
+		--template "${srcdir}/templates/template-krb5name.tmpl" \
 		--outfile ${OUTFILE} 2>/dev/null
 
 ${DIFF} "${srcdir}/template-krb5name.pem" ${OUTFILE} >/dev/null 2>&1
@@ -60,7 +60,7 @@ if test "${rc}" != "0"; then
 fi
 
 # Negative tests. Check against values which may cause problems
-cp template-krb5name.tmpl ${TMPLFILE}
+cp templates/template-krb5name.tmpl ${TMPLFILE}
 echo "krb5_principal = 'xxxxxxxxxxxxxx'" >>${TMPLFILE}
 
 datefudge -s "2007-04-22" \
@@ -77,7 +77,7 @@ if test "${rc}" != "1"; then
 	exit ${rc}
 fi
 
-cp template-krb5name.tmpl ${TMPLFILE}
+cp templates/template-krb5name.tmpl ${TMPLFILE}
 echo "krb5_principal = 'comp1/comp2/comp3/comp4/comp5/comp6/comp7/comp8/comp9/comp10@REALM.COM'" >>${TMPLFILE}
 
 datefudge -s "2007-04-22" \

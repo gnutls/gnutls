@@ -20,27 +20,32 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
-	template-test.key template-test.pem template-test.tmpl \
+	template-test.key template-test.pem templates/template-test.tmpl \
 	funny-spacing.pem ca-certs.pem dane-test.rr cert-ecc256.pem \
-	bmpstring.pem template-utf8.pem template-utf8.tmpl \
-	template-dn.tmpl template-dn.pem complex-cert.pem template-overflow.pem \
-	template-overflow.tmpl template-overflow2.pem template-overflow2.tmpl \
-	template-date.tmpl template-date.pem template-dn-err.tmpl \
-	template-nc.tmpl template-nc.pem xmpp-othername.pem \
+	bmpstring.pem template-utf8.pem templates/template-utf8.tmpl \
+	templates/template-dn.tmpl template-dn.pem complex-cert.pem template-overflow.pem \
+	templates/template-overflow.tmpl template-overflow2.pem \
+	templates/template-overflow2.tmpl \
+	templates/template-date.tmpl template-date.pem templates/template-dn-err.tmpl \
+	templates/template-nc.tmpl template-nc.pem xmpp-othername.pem \
 	suppressions.valgrind csr-invalid.der invalid-sig2.pem invalid-sig3.pem \
 	invalid-sig.pem email-certs/chain.exclude.test.example.com email-certs/chain.test.example.com \
 	email-certs/chain.invalid.example.com email-certs/chain.test.example.com-2 \
 	single-ca.p7b single-ca.p7b.out full.p7b full.p7b.out detached.p7b \
 	pkcs7-detached.txt p7-combined.out template-generalized.pem \
-	template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
+	templates/template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
 	name-constraints-ip.pem cert-invalid-utf8.der very-long-dn.pem \
 	provable3072.pem provable2048.pem provable-dsa2048.pem provable-dsa2048-fips.pem \
-	template-unique.tmpl template-unique.pem template-othername.tmpl template-othername.pem \
-	template-othername-xmpp.tmpl template-othername-xmpp.pem template-krb5name.tmpl \
+	templates/template-unique.tmpl template-unique.pem \
+	templates/template-othername.tmpl template-othername.pem \
+	templates/template-othername-xmpp.tmpl template-othername-xmpp.pem \
+	templates/template-krb5name.tmpl \
 	template-krb5name.pem template-krb5name-full.pem template-test-ecc.key \
 	template-rsa-sha3-256.pem template-rsa-sha3-512.pem template-rsa-sha3-224.pem template-rsa-sha3-384.pem \
-	name-constraints-ip2.pem chain-md5.pem gost-cert.pem template-tlsfeature.tmpl \
-	template-tlsfeature.pem template-tlsfeature.csr template-tlsfeature-crq.tmpl
+	name-constraints-ip2.pem chain-md5.pem gost-cert.pem \
+	templates/template-tlsfeature.tmpl \
+	template-tlsfeature.pem template-tlsfeature.csr \
+	templates/template-tlsfeature-crq.tmpl
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
