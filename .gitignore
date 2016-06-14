@@ -838,6 +838,7 @@ tests/set_x509_key
 tests/set_x509_key_file_der
 tests/set_x509_pkcs12_key
 GnuTLS-*-coverage/
+compat_reports/
 tests/tls1.2-cert-key-exchange
 tests/tls1.1-cert-key-exchange
 tests/tls1.0-cert-key-exchange
@@ -849,3 +850,14 @@ tests/ssl2-hello
 tests/x509-cert-callback
 tests/x509-cert-callback-legacy
 tests/keylog-env
+tests/dtls-record-check
+tests/dtls-rehandshake-anon
+tests/dtls-rehandshake-cert
+tests/dtls-rehandshake-cert-2
+tests/pkcs11-cert-import-url4-exts
+tests/tls-rehandshake-anon
+tests/tls-rehandshake-cert
+tests/tls-rehandshake-cert-2
+tests/tlsfeature-crt
+tests/tlsfeature-ext
+tests/urls
