@@ -21,6 +21,8 @@
 
 # due to the use of $RANDOM, this script requires bash
 
+export TZ="UTC"
+
 GETPORT='rc=0;while test $rc = 0;do PORT="$(((($$<<15)|RANDOM) % 63001 + 2000))";
 	netstat -anl|grep "[\:\.]$PORT" >/dev/null 2>&1;
 	rc=$?;done;'
