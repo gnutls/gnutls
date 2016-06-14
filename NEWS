@@ -29,6 +29,7 @@ See the end for copying conditions.
    wireshark.
 
 ** API and ABI modifications:
+gnutls_x509_crt_set_crq_extension_by_oid: Added
 gnutls_x509_ext_import_tlsfeatures: Added
 gnutls_x509_ext_export_tlsfeatures: Added
 gnutls_x509_tlsfeatures_add: Added
