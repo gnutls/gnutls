@@ -1254,6 +1254,11 @@ int gnutls_x509_crt_set_crq(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
 int gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
 				       gnutls_x509_crq_t crq);
 
+int
+gnutls_x509_crt_set_crq_extension_by_oid(gnutls_x509_crt_t crt,
+				         gnutls_x509_crq_t crq, const char *oid,
+				         unsigned flags);
+
 int gnutls_x509_crq_set_private_key_usage_period(gnutls_x509_crq_t
 						 crq,
 						 time_t activation,

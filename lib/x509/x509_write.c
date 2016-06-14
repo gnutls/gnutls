@@ -303,7 +303,7 @@ int gnutls_x509_crt_set_crq(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @crq: holds a certificate request
  *
- * This function will set extensions from the given request to the
+ * This function will set the extensions from the given request to the
  * certificate.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -314,6 +314,29 @@ int gnutls_x509_crt_set_crq(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
 int
 gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
 				   gnutls_x509_crq_t crq)
+{
+	return gnutls_x509_crt_set_crq_extension_by_oid(crt, crq, NULL, 0);
+}
+
+/**
+ * gnutls_x509_crt_set_crq_extension_by_oid:
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @crq: holds a certificate request
+ * @oid: the object identifier of the OID to copy
+ * @flags: should be zero
+ *
+ * This function will set the extension specify by @oid from the given request to the
+ * certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.1
+ **/
+int
+gnutls_x509_crt_set_crq_extension_by_oid(gnutls_x509_crt_t crt,
+				         gnutls_x509_crq_t crq, const char *oid,
+				         unsigned flags)
 {
 	size_t i;
 
@@ -326,16 +349,16 @@ gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
 
 	for (i = 0;; i++) {
 		int result;
-		char oid[MAX_OID_SIZE];
-		size_t oid_size;
+		char local_oid[MAX_OID_SIZE];
+		size_t local_oid_size;
 		uint8_t *extensions;
 		size_t extensions_size;
 		unsigned int critical;
 		gnutls_datum_t ext;
 
-		oid_size = sizeof(oid);
-		result = gnutls_x509_crq_get_extension_info(crq, i, oid,
-							    &oid_size,
+		local_oid_size = sizeof(local_oid);
+		result = gnutls_x509_crq_get_extension_info(crq, i, local_oid,
+							    &local_oid_size,
 							    &critical);
 		if (result < 0) {
 			if (result ==
@@ -345,6 +368,9 @@ gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
 			gnutls_assert();
 			return result;
 		}
+
+		if (oid && strcmp(local_oid, oid) != 0)
+			continue;
 
 		extensions_size = 0;
 		result = gnutls_x509_crq_get_extension_data(crq, i, NULL,
@@ -373,7 +399,7 @@ gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
 		ext.size = extensions_size;
 
 		result =
-		    _gnutls_x509_crt_set_extension(crt, oid, &ext,
+		    _gnutls_x509_crt_set_extension(crt, local_oid, &ext,
 						   critical);
 		gnutls_free(extensions);
 		if (result < 0) {
