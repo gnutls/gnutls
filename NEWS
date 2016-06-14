@@ -29,6 +29,11 @@ See the end for copying conditions.
 ** libgnutls: Re-read the system wide priority file when needed. Patch by
    Daniel P. Berrange.
 
+** libgnutls: Allow for fallback in system-specific initial keywords
+   (prefixed with '@'). That allows to specify a keyword such as
+   "@KEYWORD1,KEYWORD2" which will use the first available of these
+   two keywords. Patch by Daniel P. Berrange.
+
 ** libgnutls: The SSLKEYLOGFILE environment variable can be used to log
    session keys. These session keys are compatible with the NSS Key Log
    Format and can be used to decrypt the session for debugging using
