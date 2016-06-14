@@ -19,32 +19,34 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
-	template-test.key template-test.pem templates/template-test.tmpl \
-	funny-spacing.pem ca-certs.pem dane-test.rr cert-ecc256.pem \
-	bmpstring.pem template-utf8.pem templates/template-utf8.tmpl \
-	templates/template-dn.tmpl template-dn.pem complex-cert.pem template-overflow.pem \
-	templates/template-overflow.tmpl template-overflow2.pem \
+EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem \
+	data/template-test.key data/template-test.pem data/templates/template-test.tmpl \
+	data/funny-spacing.pem data/ca-certs.pem data/dane-test.rr data/cert-ecc256.pem \
+	data/bmpstring.pem data/template-utf8.pem templates/template-utf8.tmpl \
+	templates/template-dn.tmpl data/template-dn.pem data/complex-cert.pem \
+	data/template-overflow.pem templates/template-overflow.tmpl data/template-overflow2.pem \
 	templates/template-overflow2.tmpl \
-	templates/template-date.tmpl template-date.pem templates/template-dn-err.tmpl \
-	templates/template-nc.tmpl template-nc.pem xmpp-othername.pem \
-	suppressions.valgrind csr-invalid.der invalid-sig2.pem invalid-sig3.pem \
-	invalid-sig.pem email-certs/chain.exclude.test.example.com email-certs/chain.test.example.com \
-	email-certs/chain.invalid.example.com email-certs/chain.test.example.com-2 \
-	single-ca.p7b single-ca.p7b.out full.p7b full.p7b.out detached.p7b \
-	pkcs7-detached.txt p7-combined.out template-generalized.pem \
-	templates/template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
-	name-constraints-ip.pem cert-invalid-utf8.der very-long-dn.pem \
-	provable3072.pem provable2048.pem provable-dsa2048.pem provable-dsa2048-fips.pem \
-	templates/template-unique.tmpl template-unique.pem \
-	templates/template-othername.tmpl template-othername.pem \
-	templates/template-othername-xmpp.tmpl template-othername-xmpp.pem \
+	templates/template-date.tmpl data/template-date.pem templates/template-dn-err.tmpl \
+	templates/template-nc.tmpl data/template-nc.pem data/xmpp-othername.pem \
+	suppressions.valgrind data/csr-invalid.der data/invalid-sig2.pem data/invalid-sig3.pem \
+	data/invalid-sig.pem email-data/chain.exclude.test.example.com email-data/chain.test.example.com \
+	email-data/chain.invalid.example.com email-data/chain.test.example.com-2 \
+	data/single-ca.p7b data/single-ca.p7b.out data/full.p7b data/full.p7b.out data/detached.p7b \
+	data/pkcs7-detached.txt data/p7-combined.out data/template-generalized.pem \
+	templates/template-generalized.tmpl data/privkey1.pem data/privkey2.pem data/privkey3.pem \
+	data/name-constraints-ip.pem data/cert-invalid-utf8.der data/very-long-dn.pem \
+	data/provable3072.pem data/provable2048.pem data/provable-dsa2048.pem \
+	data/provable-dsa2048-fips.pem \
+	templates/template-unique.tmpl data/template-unique.pem \
+	templates/template-othername.tmpl data/template-othername.pem \
+	templates/template-othername-xmpp.tmpl data/template-othername-xmpp.pem \
 	templates/template-krb5name.tmpl \
-	template-krb5name.pem template-krb5name-full.pem template-test-ecc.key \
-	template-rsa-sha3-256.pem template-rsa-sha3-512.pem template-rsa-sha3-224.pem template-rsa-sha3-384.pem \
-	name-constraints-ip2.pem chain-md5.pem gost-cert.pem \
+	data/template-krb5name.pem data/template-krb5name-full.pem data/template-test-ecc.key \
+	data/template-rsa-sha3-256.pem data/template-rsa-sha3-512.pem data/template-rsa-sha3-224.pem \
+	data/template-rsa-sha3-384.pem \
+	data/name-constraints-ip2.pem data/chain-md5.pem data/gost-cert.pem \
 	templates/template-tlsfeature.tmpl \
-	template-tlsfeature.pem template-tlsfeature.csr \
+	data/template-tlsfeature.pem data/template-tlsfeature.csr \
 	templates/template-tlsfeature-crq.tmpl
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \

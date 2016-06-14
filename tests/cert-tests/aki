@@ -29,7 +29,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/aki-cert.pem" \
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/aki-cert.pem" \
 	|grep -v "Algorithm Security Level" > tmp-aki.pem
 rc=$?
 
@@ -39,7 +39,7 @@ if test "${rc}" != "0"; then
 fi
 
 
-${DIFF} "${srcdir}/aki-cert.pem" tmp-aki.pem
+${DIFF} "${srcdir}/data/aki-cert.pem" tmp-aki.pem
 rc=$?
 
 # We're done.

@@ -40,12 +40,12 @@ fi
 #
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
 		--outfile "${TMPFILE}" 2>/dev/null
 rc=$?
 
-${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/template-tlsfeature.pem" "${TMPFILE}" >/dev/null 2>&1
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/template-tlsfeature.pem" "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -60,7 +60,7 @@ fi
 rm -f "${TMPFILE}"
 rm -f "${TMPFILE2}"
 "${CERTTOOL}" -i \
-		--infile "${srcdir}/template-tlsfeature.pem" --outfile "${TMPFILE}"
+		--infile "${srcdir}/data/template-tlsfeature.pem" --outfile "${TMPFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -99,7 +99,7 @@ fi
 
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-request \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
 		--outfile "${TMPFILE}" -d 4 #2>/dev/null
 rc=$?
@@ -108,7 +108,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/template-tlsfeature.csr" "${TMPFILE}" #>/dev/null 2>&1
+${DIFF} --ignore-matching-lines "Algorithm Security Level" "${srcdir}/data/template-tlsfeature.csr" "${TMPFILE}" #>/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -123,7 +123,7 @@ fi
 rm -f "${TMPFILE}"
 rm -f "${TMPFILE2}"
 "${CERTTOOL}" --crq-info \
-		--infile "${srcdir}/template-tlsfeature.csr" --outfile "${TMPFILE}" >/dev/null 2>&1
+		--infile "${srcdir}/data/template-tlsfeature.csr" --outfile "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -160,9 +160,9 @@ fi
 #
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-certificate \
-		--load-privkey "${srcdir}/template-test.key" \
-		--load-ca-privkey "${srcdir}/template-test.key" \
-		--load-ca-certificate "${srcdir}/template-tlsfeature.pem" \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--load-ca-privkey "${srcdir}/data/template-test.key" \
+		--load-ca-certificate "${srcdir}/data/template-tlsfeature.pem" \
 		--template "${srcdir}/templates/template-tlsfeature-crq.tmpl" \
 		--load-request "${TMPFILE}" >"${TMPFILE2}" 2>&1
 

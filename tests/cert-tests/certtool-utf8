@@ -29,7 +29,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 
 	# Check improper UTF8 errors
-	${VALGRIND} --error-exitcode=3 "${CERTTOOL}" -i --inder --infile "${srcdir}/cert-invalid-utf8.der"
+	${VALGRIND} --error-exitcode=3 "${CERTTOOL}" -i --inder --infile "${srcdir}/data/cert-invalid-utf8.der"
 	rc=$?
 
 	if test "${rc}" = 3;then

@@ -31,7 +31,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
 fi
 
-${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/very-long-dn.pem" >$outfile
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/very-long-dn.pem" >$outfile
 rc=$?
 
 if test "${rc}" = 3;then
@@ -44,7 +44,7 @@ if test "${rc}" != 0;then
 	exit 1
 fi
 
-$DIFF $outfile "${srcdir}/very-long-dn.pem"
+$DIFF $outfile "${srcdir}/data/very-long-dn.pem"
 if test $? != 0;then
 	echo "Error in parsing cert with long CN"
 	exit 1

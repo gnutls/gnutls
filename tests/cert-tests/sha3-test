@@ -43,13 +43,13 @@ fi
 for i in sha3-224 sha3-256 sha3-384 sha3-512;do
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
 		--outfile "${TMPFILE}" --hash $i 2>/dev/null
 rc=$?
 
-if test -f "${srcdir}/template-rsa-$i.pem";then
-${DIFF} "${srcdir}/template-rsa-$i.pem" "${TMPFILE}" >/dev/null 2>&1
+if test -f "${srcdir}/data/template-rsa-$i.pem";then
+${DIFF} "${srcdir}/data/template-rsa-$i.pem" "${TMPFILE}" >/dev/null 2>&1
 rc=$?
 fi
 
@@ -73,7 +73,7 @@ done
 for i in sha3-224 sha3-256 sha3-384 sha3-512;do
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed \
-	--load-privkey "${srcdir}/template-test-ecc.key" \
+	--load-privkey "${srcdir}/data/template-test-ecc.key" \
 	--template "${srcdir}/templates/template-test.tmpl" \
 	--outfile "${TMPFILE}" --hash $i 2>/dev/null
 rc=$?

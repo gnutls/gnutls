@@ -30,7 +30,7 @@ if ! test -z "${VALGRIND}"; then
 fi
 
 #check whether a different PKCS #1 signature than the advertized in certificate is tolerated
-${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/invalid-sig.pem"
+${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/invalid-sig.pem"
 rc=$?
 
 # We're done.
@@ -40,7 +40,7 @@ if test "${rc}" = "0"; then
 fi
 
 #check whether a different tbsCertificate than the outer signature algorithm is tolerated
-${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/invalid-sig2.pem"
+${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/invalid-sig2.pem"
 rc=$?
 
 # We're done.
@@ -50,7 +50,7 @@ if test "${rc}" = "0"; then
 fi
 
 #check whether a different tbsCertificate than the outer signature algorithm is tolerated
-${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/invalid-sig3.pem"
+${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/invalid-sig3.pem"
 rc=$?
 
 # We're done.

@@ -30,7 +30,7 @@ if ! test -z "${VALGRIND}"; then
 fi
 
 #RSA keys
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/provable2048.pem"
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/provable2048.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -38,7 +38,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/provable3072.pem"
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/provable3072.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -87,7 +87,7 @@ DSAFILE=provable-dsa2048.pem
 fi
 
 #DSA keys
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/${DSAFILE}"
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/${DSAFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then

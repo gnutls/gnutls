@@ -29,7 +29,7 @@ fi
 
 for i in privkey1.pem privkey2.pem privkey3.pem;do
 #check whether "funny" spaces can be interpreted
-${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/${i}"
+${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/data/${i}"
 rc=$?
 
 if test "${rc}" != "0";then

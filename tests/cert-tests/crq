@@ -30,7 +30,7 @@ if ! test -z "${VALGRIND}"; then
 fi
 OUTFILE=out.tmp
 
-${VALGRIND} "${CERTTOOL}" --inder --crq-info --infile "${srcdir}/csr-invalid.der" >"${OUTFILE}" 2>&1
+${VALGRIND} "${CERTTOOL}" --inder --crq-info --infile "${srcdir}/data/csr-invalid.der" >"${OUTFILE}" 2>&1
 rc=$?
 
 # We're done.

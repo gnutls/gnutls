@@ -40,11 +40,11 @@ fi
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-test.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-test.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -57,11 +57,11 @@ rm -f tmp-tt.pem
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-utf8.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-utf8.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-utf8.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -74,11 +74,11 @@ rm -f tmp-tt.pem
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-dn.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-dn.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -91,7 +91,7 @@ rm -f tmp-tt.pem
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn-err.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 rc=$?
@@ -105,11 +105,11 @@ rm -f tmp-tt.pem
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-overflow.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-overflow.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -125,11 +125,11 @@ if echo __SIZEOF_POINTER__ | cpp -E - - | grep '^8$' >/dev/null; then
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow2.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-overflow2.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-overflow2.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -143,11 +143,11 @@ fi
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-date.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-date.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-date.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -162,11 +162,11 @@ rm -f tmp-tt.pem
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-nc.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-nc.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-nc.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -183,11 +183,11 @@ if test "$(getconf LONG_BIT)" = "64"; then
 	# we should test that on systems which have 64-bit time_t.
 	datefudge -s "2051-04-22" \
 			"${CERTTOOL}" --generate-self-signed \
-				--load-privkey "${srcdir}/template-test.key" \
+				--load-privkey "${srcdir}/data/template-test.key" \
 				--template "${srcdir}/templates/template-generalized.tmpl" \
 				--outfile tmp-tt.pem 2>/dev/null
 
-	${DIFF} "${srcdir}/template-generalized.pem" tmp-tt.pem >/dev/null 2>&1
+	${DIFF} "${srcdir}/data/template-generalized.pem" tmp-tt.pem >/dev/null 2>&1
 	rc=$?
 
 	# We're done.
@@ -203,11 +203,11 @@ rm -f tmp-tt.pem
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
-		--load-privkey "${srcdir}/template-test.key" \
+		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-unique.tmpl" \
 		--outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-unique.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-unique.pem" tmp-tt.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.

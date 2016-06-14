@@ -31,7 +31,7 @@ OUTFILE2=out2-pkcs7.$$.tmp
 
 # Test signing with MD5
 FILE="signing"
-${VALGRIND} "${CERTTOOL}" --p7-sign --hash md5 --load-privkey  "${srcdir}/../../doc/credentials/x509/key-rsa.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --infile "${srcdir}/pkcs7-detached.txt" >"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --p7-sign --hash md5 --load-privkey  "${srcdir}/../../doc/credentials/x509/key-rsa.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then

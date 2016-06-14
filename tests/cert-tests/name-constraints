@@ -28,7 +28,7 @@ if ! test -z "${VALGRIND}"; then
 fi
 TMPFILE=tmp.$$.pem
 
-${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/name-constraints-ip.pem"
+${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/name-constraints-ip.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -36,7 +36,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/name-constraints-ip2.pem" --outfile "${TMPFILE}"
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/name-constraints-ip2.pem" --outfile "${TMPFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -44,7 +44,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${DIFF} "${TMPFILE}" "${srcdir}/name-constraints-ip2.pem" >/dev/null 2>&1
+${DIFF} "${TMPFILE}" "${srcdir}/data/name-constraints-ip2.pem" >/dev/null 2>&1
 rc=$?
 
 if test "${rc}" != "0"; then

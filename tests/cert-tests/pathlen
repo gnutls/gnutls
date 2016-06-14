@@ -29,7 +29,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/ca-no-pathlen.pem" \
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/ca-no-pathlen.pem" \
 	|grep -v "Algorithm Security Level" > new-ca-no-pathlen.pem
 rc=$?
 
@@ -38,7 +38,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/no-ca-or-pathlen.pem" \
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/no-ca-or-pathlen.pem" \
 	|grep -v "Algorithm Security Level" > new-no-ca-or-pathlen.pem
 rc=$?
 
@@ -47,9 +47,9 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} "${srcdir}/ca-no-pathlen.pem" new-ca-no-pathlen.pem
+${DIFF} "${srcdir}/data/ca-no-pathlen.pem" new-ca-no-pathlen.pem
 rc1=$?
-${DIFF} "${srcdir}/no-ca-or-pathlen.pem" new-no-ca-or-pathlen.pem
+${DIFF} "${srcdir}/data/no-ca-or-pathlen.pem" new-no-ca-or-pathlen.pem
 rc2=$?
 
 

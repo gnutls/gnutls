@@ -36,8 +36,8 @@ TMPFILE=crl.$$.tmpl
 echo "crl_next_update = 43" >$TMPFILE
 echo "crl_number = 7" >>$TMPFILE
 
-${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
-	"${srcdir}/template-test.pem" --load-certificate "${srcdir}/ca-certs.pem" --template \
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/ca-certs.pem" --template \
 	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
 rc=$?
 
@@ -55,8 +55,8 @@ fi
 
 # check appending a certificate
 
-${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
-	"${srcdir}/template-test.pem" --load-crl "${OUTFILE}" --load-certificate "${srcdir}/cert-ecc256.pem" --template \
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-crl "${OUTFILE}" --load-certificate "${srcdir}/data/cert-ecc256.pem" --template \
 	"${TMPFILE}" -d 9 >${OUTFILE2} 2>${INFOFILE}
 rc=$?
 
@@ -85,8 +85,8 @@ echo "crl_next_update_date = \"2006-03-29 13:21:42\"" >>$TMPFILE
 echo "crl_number = 8" >>$TMPFILE
 echo "crl_revocation_date = \"2003-02-01 10:00:00\"" >>$TMPFILE
 
-${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
-	"${srcdir}/template-test.pem" --load-certificate "${srcdir}/cert-ecc256.pem" --template \
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/cert-ecc256.pem" --template \
 	"${TMPFILE}" -d 9 >${OUTFILE2} 2>${INFOFILE}
 rc=$?
 
