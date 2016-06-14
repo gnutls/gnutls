@@ -484,7 +484,7 @@ test_code_t test_dhe_group(gnutls_session_t session)
 		{
 			/* save the PKCS #3 params */
 			gnutls_dh_params_t dhp;
-			gnutls_datum p3;
+			gnutls_datum_t p3;
 			
 			ret2 = gnutls_dh_params_init(&dhp);
 			if (ret2 < 0)

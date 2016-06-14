@@ -97,7 +97,7 @@ static void _response_info(const gnutls_datum_t * data)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
-	gnutls_datum buf;
+	gnutls_datum_t buf;
 
 	ret = gnutls_ocsp_resp_init(&resp);
 	if (ret < 0) {
