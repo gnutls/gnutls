@@ -319,6 +319,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				gnutls_strerror(result));
 			exit(1);
 		}
+
+		crq_extensions_set(crt, crq);
 	}
 
 

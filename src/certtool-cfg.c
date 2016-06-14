@@ -126,6 +126,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "path_len", .type = OPTION_NUMERIC },
 	{ .name = "ca", .type = OPTION_BOOLEAN },
 	{ .name = "honor_crq_extensions", .type = OPTION_BOOLEAN },
+	{ .name = "honor_crq_ext", .type = OPTION_MULTI_LINE },
 	{ .name = "tls_www_client", .type = OPTION_BOOLEAN },
 	{ .name = "tls_www_server", .type = OPTION_BOOLEAN },
 	{ .name = "signing_key", .type = OPTION_BOOLEAN },
@@ -205,8 +206,9 @@ typedef struct _cfg_ctx {
 	char **key_purpose_oids;
 	int crl_next_update;
 	int64_t crl_number;
-	int crq_extensions;
+	int honor_crq_extensions;
 	char *proxy_policy_language;
+	char **exts_to_honor;
 	char **ocsp_uris;
 	char **ca_issuers_uris;
 	char **tls_features;
@@ -509,7 +511,9 @@ int template_parse(const char *template)
 	READ_MULTI_LINE("ca_issuers_uri", cfg.ca_issuers_uris);
 
 	READ_BOOLEAN("ca", cfg.ca);
-	READ_BOOLEAN("honor_crq_extensions", cfg.crq_extensions);
+	READ_BOOLEAN("honor_crq_extensions", cfg.honor_crq_extensions);
+	READ_MULTI_LINE("honor_crq_ext", cfg.exts_to_honor);
+
 	READ_BOOLEAN("tls_www_client", cfg.tls_www_client);
 	READ_BOOLEAN("tls_www_server", cfg.tls_www_server);
 	READ_BOOLEAN("signing_key", cfg.signing_key);
@@ -1514,11 +1518,11 @@ int get_ca_status(void)
 int get_crq_extensions_status(void)
 {
 	if (batch) {
-		return cfg.crq_extensions;
+		return cfg.honor_crq_extensions;
 	} else {
 		return
 		    read_yesno
-		    ("Do you want to honour the extensions from the request? (y/N): ",
+		    ("Do you want to honour all the extensions from the request? (y/N): ",
 		     0);
 	}
 }
@@ -2625,5 +2629,23 @@ void get_tlsfeatures_set(int type, void *crt)
 		}
 
 		gnutls_x509_tlsfeatures_deinit(features);
+	}
+}
+
+void crq_extensions_set(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
+{
+	int ret, i;
+
+	if (batch) {
+		if (!cfg.exts_to_honor)
+			return;
+
+		for (i = 0; cfg.exts_to_honor[i]; ++i) {
+			ret = gnutls_x509_crt_set_crq_extension_by_oid(crt, crq, cfg.exts_to_honor[i], 0);
+			if (ret < 0) {
+				fprintf(stderr, "setting extension failed: %s: %s\n", cfg.exts_to_honor[i],
+					gnutls_strerror(ret));
+			}
+		}
 	}
 }

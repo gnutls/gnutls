@@ -908,6 +908,10 @@ encryption_key
 # and store them in the real certificate.
 #honor_crq_extensions
 
+# Alternatively only specific extensions can be copied.
+#honor_crq_ext = 2.5.29.17
+#honor_crq_ext = 2.5.29.15
+
 # Path length contraint. Sets the maximum number of
 # certificates that can be used to certify this certificate.
 # (i.e. the certificate chain length)

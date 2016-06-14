@@ -98,3 +98,5 @@ void get_organization_crq_set(gnutls_x509_crq_t crq);
 void get_country_crq_set(gnutls_x509_crq_t crq);
 void get_oid_crq_set(gnutls_x509_crq_t crq);
 const char *get_proxy_policy(char **policy, size_t * policylen);
+
+void crq_extensions_set(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
