@@ -20,17 +20,17 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem \
-	data/template-test.key data/template-test.pem data/templates/template-test.tmpl \
+	data/template-test.key data/template-test.pem templates/template-test.tmpl \
 	data/funny-spacing.pem data/ca-certs.pem data/dane-test.rr data/cert-ecc256.pem \
 	data/bmpstring.pem data/template-utf8.pem templates/template-utf8.tmpl \
 	templates/template-dn.tmpl data/template-dn.pem data/complex-cert.pem \
 	data/template-overflow.pem templates/template-overflow.tmpl data/template-overflow2.pem \
-	templates/template-overflow2.tmpl \
+	templates/template-overflow2.tmpl data/template-crq.pem \
 	templates/template-date.tmpl data/template-date.pem templates/template-dn-err.tmpl \
 	templates/template-nc.tmpl data/template-nc.pem data/xmpp-othername.pem \
 	suppressions.valgrind data/csr-invalid.der data/invalid-sig2.pem data/invalid-sig3.pem \
-	data/invalid-sig.pem email-data/chain.exclude.test.example.com email-data/chain.test.example.com \
-	email-data/chain.invalid.example.com email-data/chain.test.example.com-2 \
+	data/invalid-sig.pem email-certs/chain.exclude.test.example.com email-certs/chain.test.example.com \
+	email-certs/chain.invalid.example.com email-certs/chain.test.example.com-2 \
 	data/single-ca.p7b data/single-ca.p7b.out data/full.p7b data/full.p7b.out data/detached.p7b \
 	data/pkcs7-detached.txt data/p7-combined.out data/template-generalized.pem \
 	templates/template-generalized.tmpl data/privkey1.pem data/privkey2.pem data/privkey3.pem \
