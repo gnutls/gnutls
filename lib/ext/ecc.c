@@ -58,7 +58,7 @@ const extension_entry_st ext_mod_supported_ecc = {
 };
 
 const extension_entry_st ext_mod_supported_ecc_pf = {
-	.name = "SUPPORTED ECC POINT FORMATS",
+	.name = "Supported ECC Point Formats",
 	.type = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
 	.parse_type = GNUTLS_EXT_TLS,
 
