@@ -34,6 +34,8 @@
 
 #include "utils.h"
 
+#ifdef ENABLE_SRP
+
 static void encode(const char *test_name, const gnutls_datum_t *raw, const char *expected)
 {
 	int ret;
@@ -175,3 +177,10 @@ void doit(void)
 	}
 }
 
+#else
+
+void doit(void)
+{
+	exit(77);
+}
+#endif
