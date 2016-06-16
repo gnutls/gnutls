@@ -97,6 +97,7 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	struct p11_kit_uri *info = NULL;
 	ck_rv_t rv;
 	size_t der_size, id_size, serial_size;
+	gnutls_datum_t serial_der = {NULL, 0};
 	uint8_t *der = NULL;
 	uint8_t serial[128];
 	uint8_t id[20];
@@ -201,10 +202,13 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 
 	serial_size = sizeof(serial);
 	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
-		a[a_val].type = CKA_SERIAL_NUMBER;
-		a[a_val].value = (void *) serial;
-		a[a_val].value_len = serial_size;
-		a_val++;
+		ret = _gnutls_x509_ext_gen_number(serial, serial_size, &serial_der);
+		if (ret >= 0) {
+			a[a_val].type = CKA_SERIAL_NUMBER;
+			a[a_val].value = (void *) serial_der.data;
+			a[a_val].value_len = serial_der.size;
+			a_val++;
+		}
 	}
 
 	if (label) {
@@ -231,6 +235,7 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 
       cleanup:
 	gnutls_free(der);
+	gnutls_free(serial_der.data);
 	pkcs11_close_session(&sinfo);
 	return ret;
 
