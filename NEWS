@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed DTLS handshake packet reconstruction. Reported by
    Guillaume Roguez.
 
+** libgnutls: Corrected the writing of PKCS#11 CKA_SERIAL_NUMBER. Report
+   and fix by Stanislav Židek.
+
 ** API and ABI modifications:
 No changes since last version.
 
