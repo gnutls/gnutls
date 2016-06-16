@@ -992,14 +992,14 @@ static int merge_handshake_packet(gnutls_session_t session,
 		}
 	}
 
-	if (exists == 0)
+	if (!exists)
 		pos = session->internals.handshake_recv_buffer_size;
 
 	if (pos >= MAX_HANDSHAKE_MSGS)
 		return
 		    gnutls_assert_val(GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS);
 
-	if (exists == 0) {
+	if (!exists) {
 		if (hsk->length > 0 && hsk->end_offset > 0
 		    && hsk->end_offset - hsk->start_offset + 1 !=
 		    hsk->length) {
@@ -1030,7 +1030,7 @@ static int merge_handshake_packet(gnutls_session_t session,
 		if (hsk->start_offset <
 		    session->internals.handshake_recv_buffer[pos].
 		    start_offset
-		    && hsk->end_offset >=
+		    && hsk->end_offset + 1 >=
 		    session->internals.handshake_recv_buffer[pos].
 		    start_offset) {
 			memcpy(&session->internals.
@@ -1187,7 +1187,7 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session)
 				    gnutls_assert_val
 				    (GNUTLS_E_UNEXPECTED_PACKET);
 
-			/* if we have a half received message the complete it.
+			/* if we have a half received message then complete it.
 			 */
 			remain = recv_buf[0].length -
 			    recv_buf[0].data.length;
