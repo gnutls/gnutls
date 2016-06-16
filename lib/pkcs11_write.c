@@ -60,6 +60,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	ck_object_class_t class = CKO_CERTIFICATE;
 	ck_certificate_type_t type = CKC_X_509;
 	ck_object_handle_t obj;
+	gnutls_datum_t serial_der = {NULL, 0};
 	int a_val;
 	unsigned long category;
 	struct pkcs11_session_info sinfo;
@@ -152,10 +153,13 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 
 	serial_size = sizeof(serial);
 	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
-		a[a_val].type = CKA_SERIAL_NUMBER;
-		a[a_val].value = (void *) serial;
-		a[a_val].value_len = serial_size;
-		a_val++;
+		ret = _gnutls_x509_ext_gen_number(serial, serial_size, &serial_der);
+		if (ret >= 0) {
+			a[a_val].type = CKA_SERIAL_NUMBER;
+			a[a_val].value = (void *) serial;
+			a[a_val].value_len = serial_size;
+			a_val++;
+		}
 	}
 
 	if (label) {
@@ -212,6 +216,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 
       cleanup:
 	gnutls_free(der);
+	gnutls_free(serial_der.data);
 	pkcs11_close_session(&sinfo);
 	return ret;
 
