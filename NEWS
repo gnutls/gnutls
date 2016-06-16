@@ -3,6 +3,18 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.2 (unreleased)
+
+** libgnutls: Fixed DTLS handshake packet reconstruction. Reported by
+   Guillaume Roguez.
+
+** libgnutls: Corrected the writing of PKCS#11 CKA_SERIAL_NUMBER. Report
+   and fix by Stanislav Židek.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.5.1 (released 2016-06-14)
 
 ** libgnutls: The SSL 3.0 protocol support can completely be removed
