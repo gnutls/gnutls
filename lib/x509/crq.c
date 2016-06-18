@@ -2986,7 +2986,7 @@ int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
  *   request.
  *
  * This function will set the certificate request's
- * X.509 TLS extention from the given structure.
+ * X.509 TLS extension from the given structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.

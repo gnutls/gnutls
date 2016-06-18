@@ -38,7 +38,7 @@
  * gnutls_x509_tlsfeatures_init:
  * @f: The TLS features
  *
- * This function will initialize a X.509 TLS features extention structure
+ * This function will initialize a X.509 TLS features extension structure
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
@@ -58,7 +58,7 @@ int gnutls_x509_tlsfeatures_init(gnutls_x509_tlsfeatures_t *f)
  * gnutls_x509_tlsfeatures_deinit:
  * @f: The TLS features
  *
- * This function will deinitialize a X.509 TLS features extention structure
+ * This function will deinitialize a X.509 TLS features extension structure
  *
  * Since: 3.5.1
  **/
@@ -74,7 +74,7 @@ void gnutls_x509_tlsfeatures_deinit(gnutls_x509_tlsfeatures_t f)
  * @feature: If the function succeeds, the feature will be stored in this variable
  *
  * This function will get a feature from the X.509 TLS features
- * extention structure.
+ * extension structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.
@@ -165,7 +165,7 @@ int gnutls_x509_crt_get_tlsfeatures(gnutls_x509_crt_t crt,
  *   features will be added to the certificate.
  *
  * This function will set the certificates
- * X.509 TLS extention from the given structure.
+ * X.509 TLS extension from the given structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.

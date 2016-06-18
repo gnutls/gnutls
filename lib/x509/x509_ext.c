@@ -3325,7 +3325,7 @@ int gnutls_x509_ext_export_tlsfeatures(gnutls_x509_tlsfeatures_t f,
  * @feature: The feature to add
  *
  * This function will append a feature to the X.509 TLS features
- * extention structure.
+ * extension structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error value.

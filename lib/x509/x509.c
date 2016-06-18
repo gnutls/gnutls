@@ -89,7 +89,7 @@ unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1,
 	    cert1->modified != 0 || cert2->modified != 0) {
 		gnutls_datum_t tmp1, tmp2;
 
-		/* on uninitialized or modified certificates, we have to-reencode */
+		/* on uninitialized or modified certificates, we have to re-encode */
 		ret =
 		    gnutls_x509_crt_export2(cert1, GNUTLS_X509_FMT_DER, &tmp1);
 		if (ret < 0)
@@ -143,7 +143,7 @@ gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1,
 		gnutls_datum_t tmp1;
 		int ret;
 
-		/* on uninitialized or modified certificates, we have to-reencode */
+		/* on uninitialized or modified certificates, we have to re-encode */
 		ret =
 		    gnutls_x509_crt_export2(cert1, GNUTLS_X509_FMT_DER, &tmp1);
 		if (ret < 0)
