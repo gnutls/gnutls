@@ -28,7 +28,7 @@
 
 #define BSECS 5
 
-int benchmark_must_finish = 0;
+volatile int benchmark_must_finish = 0;
 
 #if defined(_WIN32)
 #include <windows.h>

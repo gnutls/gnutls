@@ -53,7 +53,7 @@ struct benchmark_st {
 #endif
 };
 
-extern int benchmark_must_finish;
+extern volatile int benchmark_must_finish;
 
 void start_benchmark(struct benchmark_st *st);
 double stop_benchmark(struct benchmark_st *st, const char *metric,
