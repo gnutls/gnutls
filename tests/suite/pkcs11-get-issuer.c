@@ -37,7 +37,6 @@
 #include "../test-chains.h"
 #include "softhsm.h"
 
-#define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
 #define CONFIG "softhsm-issuer.config"
 
 /* GnuTLS internally calls time() to find out the current time when
@@ -78,7 +77,6 @@ void doit(void)
 	int exit_val = 0;
 	int ret;
 	unsigned j;
-	FILE *fp;
 	const char *lib, *bin;
 	gnutls_x509_crt_t issuer = NULL;
 	gnutls_x509_trust_list_t tl;
@@ -125,16 +123,7 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	/* write softhsm.config */
-	fp = fopen(CONFIG, "w");
-	if (fp == NULL) {
-		fprintf(stderr, "error writing %s\n", CONFIG);
-		exit(1);
-	}
-	remove("./softhsm-issuer.db");
-	fputs("0:./softhsm-issuer.db\n", fp);
-	fclose(fp);
-
-	setenv("SOFTHSM_CONF", CONFIG, 0);
+	set_softhsm_conf(CONFIG);
 
 	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN, bin);
 	system(buf);
@@ -219,14 +208,14 @@ void doit(void)
 		printf("\tVerifying...");
 
 	/* initialize softhsm token */
-	ret = gnutls_pkcs11_token_init(URL, PIN, "test");
+	ret = gnutls_pkcs11_token_init(SOFTHSM_URL, PIN, "test");
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_init\n");
 		exit(1);
 	}
 
 	/* write CA certificate to softhsm */
-	ret = gnutls_pkcs11_copy_x509_crt(URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
+	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -234,7 +223,7 @@ void doit(void)
 
 	gnutls_x509_trust_list_init(&tl, 0);
 
-	ret = gnutls_x509_trust_list_add_trust_file(tl, URL, NULL, 0, 0, 0);
+	ret = gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL, 0, 0, 0);
 	if (ret < 0) {
 		fail("gnutls_x509_trust_list_add_trust_file\n");
 		exit(1);

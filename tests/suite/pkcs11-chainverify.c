@@ -36,7 +36,6 @@
 #include "softhsm.h"
 #include "../test-chains.h"
 
-#define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
 #define CONFIG "softhsm.config"
 
 #define DEFAULT_THEN 1256803113
@@ -75,7 +74,6 @@ void doit(void)
 	int exit_val = 0;
 	size_t i;
 	int ret;
-	FILE *fp;
 	char buf[128];
 	const char *lib, *bin;
 
@@ -104,15 +102,7 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	/* write softhsm.config */
-	fp = fopen(CONFIG, "w");
-	if (fp == NULL) {
-		fprintf(stderr, "error writing softhsm.config\n");
-		exit(1);
-	}
-	fputs("0:./softhsm.db\n", fp);
-	fclose(fp);
-
-	setenv("SOFTHSM_CONF", CONFIG, 0);
+	set_softhsm_conf(CONFIG);
 
 	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin 1234 --pin 1234", bin);
 	system(buf);
@@ -209,14 +199,14 @@ void doit(void)
 			printf("\tVerifying...");
 
 		/* initialize softhsm token */
-		ret = gnutls_pkcs11_token_init(URL, "1234", "test");
+		ret = gnutls_pkcs11_token_init(SOFTHSM_URL, "1234", "test");
 		if (ret < 0) {
 			fail("gnutls_pkcs11_token_init\n");
 			exit(1);
 		}
 
 		/* write CA certificate to softhsm */
-		ret = gnutls_pkcs11_copy_x509_crt(URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|
+		ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|
 			GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|
 			GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 		if (ret < 0) {
@@ -226,7 +216,7 @@ void doit(void)
 
 		gnutls_x509_trust_list_init(&tl, 0);
 
-		ret = gnutls_x509_trust_list_add_trust_file(tl, URL, NULL, 0, 0, 0);
+		ret = gnutls_x509_trust_list_add_trust_file(tl, SOFTHSM_URL, NULL, 0, 0, 0);
 		if (ret < 0) {
 			fail("gnutls_x509_trust_list_add_trust_file: %s\n", gnutls_strerror(ret));
 			exit(1);
