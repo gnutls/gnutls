@@ -156,8 +156,8 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 		ret = _gnutls_x509_ext_gen_number(serial, serial_size, &serial_der);
 		if (ret >= 0) {
 			a[a_val].type = CKA_SERIAL_NUMBER;
-			a[a_val].value = (void *) serial;
-			a[a_val].value_len = serial_size;
+			a[a_val].value = (void *) serial_der.data;
+			a[a_val].value_len = serial_der.size;
 			a_val++;
 		}
 	}
