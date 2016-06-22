@@ -64,7 +64,7 @@ static char pem[] =
     "/do1TDFI0vSl5+M=\n" "-----END CERTIFICATE-----\n";
 
 static const char *info =
-    "subject `jurisdictionOfIncorporationCountryName=DE,jurisdictionOfIncorporationLocalityName=Muenchen,businessCategory=V1.0\\, Clause 5.(b),serialNumber=HRB 144261,C=DE,postalCode=80807,ST=Bavaria,L=Muenchen,street=Frankfurter Ring 129,O=GMX GmbH,CN=www.gmx.de', issuer `C=US,O=VeriSign\\, Inc.,OU=VeriSign Trust Network,OU=Terms of use at https://www.verisign.com/rpa (c)06,CN=VeriSign Class 3 Extended Validation SSL SGC CA', RSA key 1024 bits, signed using RSA-SHA1, activated `2008-11-13 00:00:00 UTC', expires `2009-11-13 23:59:59 UTC', SHA-1 fingerprint `7ece297c45d5b17685224b4e929a30e91a9553cb'";
+    "subject `jurisdictionOfIncorporationCountryName=DE,jurisdictionOfIncorporationLocalityName=Muenchen,businessCategory=V1.0\\, Clause 5.(b),serialNumber=HRB 144261,C=DE,postalCode=80807,ST=Bavaria,L=Muenchen,street=Frankfurter Ring 129,O=GMX GmbH,CN=www.gmx.de', issuer `C=US,O=VeriSign\\, Inc.,OU=VeriSign Trust Network,OU=Terms of use at https://www.verisign.com/rpa (c)06,CN=VeriSign Class 3 Extended Validation SSL SGC CA', serial 0x48eca1e3c658be04c547c1eca67a6433, RSA key 1024 bits, signed using RSA-SHA1, activated `2008-11-13 00:00:00 UTC', expires `2009-11-13 23:59:59 UTC', SHA-1 fingerprint `7ece297c45d5b17685224b4e929a30e91a9553cb'";
 
 void doit(void)
 {
@@ -90,10 +90,12 @@ void doit(void)
 		fail("x509_crt_print %d\n", ret);
 
 	if (out.size != strlen(info) ||
-	    strcasecmp((char *) out.data, info) != 0)
-		fail("comparison fail (%d/%d)\nexpect: %s\n   got: %.*s\n",
+	    strcasecmp((char *) out.data, info) != 0) {
+		fprintf(stderr, "comparison fail (%d/%d)\nexpected: %s\n\n   got: %.*s\n\n",
 		     out.size, (int) strlen(info), info, out.size,
 		     out.data);
+		fail("comparison failed\n");
+	}
 
 	gnutls_x509_crt_deinit(cert);
 	gnutls_global_deinit();
