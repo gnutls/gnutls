@@ -1830,6 +1830,19 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		}
 	}
 
+	{
+		char serial[128];
+		size_t serial_size = sizeof(serial);
+
+		err =
+		    gnutls_x509_crt_get_serial(cert, serial, &serial_size);
+		if (err >= 0) {
+			adds(str, "serial 0x");
+			_gnutls_buffer_hexprint(str, serial, serial_size);
+			adds(str, ", ");
+		}
+	}
+
 	/* Key algorithm and size. */
 	{
 		unsigned int bits;
