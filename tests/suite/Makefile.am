@@ -84,7 +84,7 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common \
-	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm
+	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm softhsm.h
 nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
 	testpkcs11.sh testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
 	testrandom.sh
