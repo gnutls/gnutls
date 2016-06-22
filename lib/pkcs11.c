@@ -3593,8 +3593,6 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 				id.data = a[1].value;
 				id.size = a[1].value_len;
 
-
-
 				found = 1;
 				break;
 			} else {
@@ -3955,10 +3953,8 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 {
 	int ret;
 	struct find_cert_st priv;
-	uint8_t serial[ASN1_MAX_TL_SIZE+64];
+	uint8_t serial[128];
 	size_t serial_size;
-	uint8_t tag[ASN1_MAX_TL_SIZE];
-	unsigned int tag_size;
 	struct p11_kit_uri *info = NULL;
 
 	PKCS11_CHECK_INIT_RET(0);
@@ -3976,29 +3972,22 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	}
 
 	/* Attempt searching using the issuer DN + serial number */
-	serial_size = sizeof(serial) - sizeof(tag);
+	serial_size = sizeof(serial);
 	ret =
-	    gnutls_x509_crt_get_serial(cert, serial+sizeof(tag), &serial_size);
+	    gnutls_x509_crt_get_serial(cert, serial, &serial_size);
 	if (ret < 0) {
 		gnutls_assert();
 		ret = 0;
 		goto cleanup;
 	}
 
-	/* PKCS#11 requires a DER encoded serial, wtf. $@(*$@ */
-	tag_size = sizeof(tag);
-	ret = asn1_encode_simple_der(ASN1_ETYPE_INTEGER, serial+sizeof(tag), serial_size,
-		tag, &tag_size);
-	if (ret != ASN1_SUCCESS) {
+	ret = _gnutls_x509_ext_gen_number(serial, serial_size, &priv.serial);
+	if (ret < 0) {
 		gnutls_assert();
 		ret = 0;
 		goto cleanup;
 	}
 
-	memcpy(serial+sizeof(tag)-tag_size, tag, tag_size);
-
-	priv.serial.data = serial+sizeof(tag)-tag_size;
-	priv.serial.size = serial_size + tag_size;
 	priv.crt = cert;
 
 	priv.issuer_dn.data = cert->raw_issuer_dn.data;
@@ -4015,8 +4004,10 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
 				    NULL, pkcs11_obj_flags_to_int(flags));
 	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		_gnutls_debug_log("crt_is_known: did not find cert, using issuer DN + serial, using DN only\n");
 		/* attempt searching with the subject DN only */
 		gnutls_assert();
+		gnutls_free(priv.serial.data);
 		memset(&priv, 0, sizeof(priv));
 		priv.crt = cert;
 		priv.flags = flags;
@@ -4029,6 +4020,7 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	}
 	if (ret < 0) {
 		gnutls_assert();
+		_gnutls_debug_log("crt_is_known: did not find any cert\n");
 		ret = 0;
 		goto cleanup;
 	}
@@ -4038,6 +4030,7 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
       cleanup:
 	if (info)
 		p11_kit_uri_free(info);
+	gnutls_free(priv.serial.data);
 
 	return ret;
 }
