@@ -3610,6 +3610,7 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 			ret = check_found_cert(priv, &data, now);
 			if (ret < 0) {
 				_gnutls_free_datum(&data);
+				found = 0;
 				continue;
 			}
 
