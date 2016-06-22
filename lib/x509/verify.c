@@ -1051,6 +1051,7 @@ unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, 
 		if (strcmp(oid, purpose) == 0 || (no_any == 0 && strcmp(oid, GNUTLS_KP_ANY) == 0)) {
 			return 1;
 		}
+		_gnutls_debug_log("looking for key purpose '%s', but have '%s'\n", purpose, oid);
 	}
 	return 0;
 }

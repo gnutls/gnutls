@@ -3431,6 +3431,7 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 	if (priv->key_id.size > 0 &&
 	    !_gnutls_check_valid_key_id(&priv->key_id, tcrt, now)) {
 		gnutls_assert();
+		_gnutls_debug_log("check_found_cert: cert has invalid key ID\n");
 		ret = -1;
 		goto cleanup;
 	}
@@ -3444,6 +3445,7 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 
 		if (gnutls_x509_crt_equals(priv->crt, tcrt) == 0) {
 			/* doesn't match */
+			_gnutls_debug_log("check_found_cert: cert doesn't match the expected\n");
 			ret = -1;
 			goto cleanup;
 		}
@@ -3458,6 +3460,7 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 
 		if (_gnutls_check_if_same_key(priv->crt, tcrt, 1) == 0) {
 			/* doesn't match */
+			_gnutls_debug_log("check_found_cert: cert key doesn't match the expected key\n");
 			ret = -1;
 			goto cleanup;
 		}
