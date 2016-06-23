@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2008-2014 Free Software Foundation, Inc.
  *
- * Author: Simon Josefsson, Nikos Mavrogiannopoulos
+ * Authors: Simon Josefsson, Nikos Mavrogiannopoulos, Martin Ukrop
  *
  * This file is part of GnuTLS.
  *
@@ -740,6 +740,88 @@ static const char *nc_bad4[] = {
 NULL
 };
 
+/* Name constraints: IPAddress_v4 in excluded range */
+static const char *nc_bad5[] = {
+  /* IPAddress: 203.0.113.10 */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIEHDCCAoSgAwIBAgIMV3OYdiegYYrQTBXhMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
+  "BgNVBAMTBENBLTEwIBcNMTYwNjI5MDk0NDIyWhgPOTk5OTEyMzEyMzU5NTlaMBMx\n"
+  "ETAPBgNVBAMTCHNlcnZlci0yMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKC\n"
+  "AYEA3Gp+KHwqvpNlEVkKyW1etHhOCXJPde/OJ7INv5RAd2xH5pQJI/mY7ET8RAz3\n"
+  "oh4t9Ev65yljuhE1Q5qDGkjZrAhSpY8OwIQ7ZKtxH6zdKTsegAr60cfShgk2bDef\n"
+  "wxbz92UBccyqzTQqWdi0Xvt9nVOkNL6EJWJ9eOW7s5fQgeEBlHYIzZyZs8ndiYqw\n"
+  "Hpy6gg4XG777A0pgq96o8ybNBIHALV9aq1UGLWXGvEbi+yc6pQMYCg7OMcZq9aVO\n"
+  "KBlR6HIxEohhFIWctmQDwd6ey73YV5XrDTRB7Qpe66/pqygQZNqMSaa4KL4z9KcL\n"
+  "YNUtIFC39ivNBGT1gM5V3c69mkR38kYwRy0UU7C84/8t45+e6ZmSqe63RKKioaJU\n"
+  "LlTCgHXwI1oeYlt7Pnm0kaWgArDJxBk5n1YxEoqkVXJ+lFy/qIF67Dosv3bNh2PU\n"
+  "iPpLmbuFmdqq+E9DENeqji21CcPkvY1ekdib4JLolNJCVaRLnXPc5o0UEZrhCqfq\n"
+  "UYfBAgMBAAGjcjBwMAwGA1UdEwEB/wQCMAAwDwYDVR0RBAgwBocEywBxCjAPBgNV\n"
+  "HQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBRcj6YutTxQa7DfoqMSjPPQgv+p0TAfBgNV\n"
+  "HSMEGDAWgBSSabOPqlecJ2jDyxpE3oaYyIBWBDANBgkqhkiG9w0BAQsFAAOCAYEA\n"
+  "OyCT0ywwikYVSKEK2npyzAx7mkbkfrAHmkcCnVEgRonXKIWOL8lbRQp0m85ynVea\n"
+  "aTfAVc0SNc7DMPR4tw+1gCpgsqhGEuip2Ltol9bhUovzfIpveUdJgeCI/NHBPAHH\n"
+  "kwYgua8dcOwjb2SDCieXvWlE5DZUHWHNYxgTKQVB/WfAjmQbuF5olusFc2UtSk3z\n"
+  "cnpBDb0+jUHfqCo8On+Wk5cc76mCvrcl9DLRFvPWN6T5IhisGVA93M1lIMQ9J9jN\n"
+  "Q8SxZ7OeNaOXhBX2j27KzV7IXy0vqajdQDui1XV3Cos+EUFAt4Es8gUg5I8gNETl\n"
+  "DqGglGUz2fVnLAQLClnVkZ0ExF3kDao7JwU2nl2XbzPcwwGGqLf06s5sEWinAZ2x\n"
+  "k4L6YBjhauxndIkk0567/+GVeUaJxtruYA9rn/vJO6kEZXUy9eY0BF3GXQ4CKYG/\n"
+  "FmFqfCwQ71LshpMsKncFp66QESAwmq9qaUqXoWSYtRABJKb9gYH42Fx0EY7QFjhq\n"
+  "-----END CERTIFICATE-----\n",
+  /* Name Constraints (critical):
+    Permitted: IPAddress: 203.0.113.0/24
+    Excluded:  IPAddress: 203.0.113.0/26 */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIEKzCCApOgAwIBAgIBATANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+  "MCAXDTE2MDYyOTA5NDQyMVoYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0xMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA33/Xbt7c8Y+UxoU3\n"
+  "4O0f+OTJF59lqe4UJK9owqXpiyt4d4hWwZV9EkPT9ZaysPaL05+AXdfXsfUz3ClE\n"
+  "RPvK1zjR7WBqhu7dQ8RGNomaP0gY7eVqa0/OcDe1Z4ogmf27WbAUVR4xDZP18Qqy\n"
+  "HB9BDStOJ24wbVfYgbJq3djb886yHDch5/mtdI4/C6aZqayaLjmoNs7UovuRlQV/\n"
+  "Tdid3rleUeoH9xFD3CeI+PZMIbhyQww66qMiCkrTtUN3EOtrsvWwuxUTH1dedEI3\n"
+  "tboI8UO+e2VJsDjbdzGIV0+HnvwoPQHYRlrog4RW9pNSTst+DeA4XY8+/FVnfhdT\n"
+  "vDdbcmit4BxdtZf9npP5iaIQTOHNntdAAPOFCoALiCMF0parEKNwNFHa98hXr+Nj\n"
+  "u4/oQM57fMcOC1z4y1pt6HK0zzFNhwHUrZUlAgcnXJ9bW510m6vu2LEFgJb7mM3L\n"
+  "ku+ddujNOoL0BxsaaUJCh2IP2xC0rXGi6tNwR1Bv5RBnenDxAgMBAAGjgY8wgYww\n"
+  "DwYDVR0TAQH/BAUwAwEB/zAoBgNVHR4BAf8EHjAcoAwwCocIywBxAP///wChDDAK\n"
+  "hwjLAHEA////wDAPBgNVHQ8BAf8EBQMDBwQAMB0GA1UdDgQWBBSSabOPqlecJ2jD\n"
+  "yxpE3oaYyIBWBDAfBgNVHSMEGDAWgBTAJHQ/p0WPW1fW+sKB5zbefu6HDTANBgkq\n"
+  "hkiG9w0BAQsFAAOCAYEAbPahfACWMab9ccrS+pBdz+4hiy+LmvOP4FRFDz/zOCsG\n"
+  "iZc61cYPWmRYWGsyWz2CksTg+Ktx/85PPvKTmEctK9NSehUgKESur3CPTp32k8YZ\n"
+  "4NMXYXtwNYLPe5F6uehdPst5h7lg3Rz2pPqKopQ8lfv2qYTjtNCJFZ9wCtijqWwJ\n"
+  "gZA9kFfPlHeY7kdnTY/Uhw1UVC0ty6daWXkKq4fhiiCXqcIO81GQHwOYySQSJef+\n"
+  "KQ3m7QHascLKSzAISbK9Ncy/C/fIcM7pQmODKPwY/K3V1CQky6jmoZQ5LUbpXEW3\n"
+  "qOjCElV2WMnkj5WuxDUeoVEKtnFGXI0UY5EY1z89GP7BatbNKLyodfp9qgjuXgr9\n"
+  "DacHAUWOH6sH/wg4d5pgySVJeos5l6DzwgkyECaAGFM2t08waO2Xk9SgpmfMCxCM\n"
+  "Gop4d5bIEMC8qScQmA4S1wfuoQQRRZiy2A4QckXoJ1OxLj1XVgossO21h8f9uNFJ\n"
+  "nfnYYSRbIp+X0mo7JjHO\n"
+  "-----END CERTIFICATE-----\n",
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIID3jCCAkagAwIBAgIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+  "MCAXDTE2MDYyOTA5NDQyMVoYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0wMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAs4uT4SEkVU0hdD6p\n"
+  "aAkXBPeVl2y37jNB88rwam6kbHKfTQ/JpTpiXULo/dCmw0fr8np/FfoMZTUk8DMm\n"
+  "zIsPjgx0yDx/PeUeA1Jw+KA60rApvxhtHhw2XLkF9hkU3YVwdcKfe1Cy3ZUT+3Xr\n"
+  "rfoLLyRTR8qhj2wS/ARTx989cGbOpMGgFQxOrFZhm8N2/ORYDYJQYNTeqjEmHsuu\n"
+  "wR0lvKj81hVe3mu6OsK4THbVpfeNW52zWW1FXwE3xbEXuckhzs2ZAc7t7SWzqD0u\n"
+  "8lVWb6vXI7LGv217EpIRwtqa9zUHXLt4UqV+kqiUxLUOjxfitJI8CPYGPhc7aocC\n"
+  "popaFqZJcLYvSJJY6Ya2ihZ4VyXQoXD+N8nQsFIm6dernNYQH2rB8plknAWbQqUG\n"
+  "bhjTKX/oF2LCk8ow0KumqQre1UgcPLNiLQRAhyVdXgCMQ1bd0mFrwXUT2m2X+0sn\n"
+  "DmW1by2bH2cevKtVaVMHq1Y6K7mcMb7pyQak7gFYAdu3D1u5AgMBAAGjQzBBMA8G\n"
+  "A1UdEwEB/wQFMAMBAf8wDwYDVR0PAQH/BAUDAwcEADAdBgNVHQ4EFgQUwCR0P6dF\n"
+  "j1tX1vrCgec23n7uhw0wDQYJKoZIhvcNAQELBQADggGBABfMsNqRJrgIsQdneT1B\n"
+  "s6fXdAlPkvbRvnScn+i/OOQxolgDQwge9A+0JxqTMtvxs+X5ahi79pPzqqzH1iYV\n"
+  "2eBY1JpmYbdOYBVoLUQG7GG6ZRJWcDtAjGhnxgoc+lxVePpSsiZWpXFzAYbV7jQa\n"
+  "2BXvzAk+uuBCUqKhrkmGZ+ZdQ8SlDjrQyblhKLy3vPi2LhfeNwTWAv2Qx8V2XRyB\n"
+  "BQSchuMBq19mSppzjN+e5ixiRoNx02fH8dfZ0bu4ONUZcoECwuCmKW6UchQTL8Yf\n"
+  "GJH9beqEAHevvE8Qn5aZcpX/BPBpx5jzOFXAD4Oqg+tY9T/vfgdElD2fQOI0gJQV\n"
+  "bzC83bbAkqrjeZXyn0srzegPRyVczuv26SYGjhBsLVk5pAt6Msfnu5g3MC3BjKgc\n"
+  "/gYV2bFtj3NMu8bAPYkKE9G/+0PT/a3/B5k3iw9FMxuZD/vjYIdSo/oloM+Ht9WG\n"
+  "EYaTPDOTm4sXdqMVlPIyhwxADNrPnlAke68rKN7H5ChozQ==\n"
+  "-----END CERTIFICATE-----\n",
+  NULL
+};
+
+
 /* Different name constraint types (testing symmetry of merging) */
 static const char *nc_bad6[] = {
   /* Subject alternative name (not critical):
@@ -1000,6 +1082,139 @@ static const char *nc_good1[] = {
 "bdOzcKFyDuklHl2IQPnYTFxm/G8=\n"
 "-----END CERTIFICATE-----\n",
 NULL
+};
+
+/* Name constraints: IPAddress_v6 in permitted range, intermediate certs without constraints */
+static const char *nc_good2[] = {
+  /* IPAddress: 2001:db8:4000:: */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIEKDCCApCgAwIBAgIMV3OWtCJqV9nu6MtYMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
+  "BgNVBAMTBENBLTMwIBcNMTYwNjI5MDkzNjUyWhgPOTk5OTEyMzEyMzU5NTlaMBMx\n"
+  "ETAPBgNVBAMTCHNlcnZlci00MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKC\n"
+  "AYEA34kB6fm9NLwz3CGzya+pVo6qWXVxkaXiKnKYk7nzcT5nozZYERR8gd3FWmAX\n"
+  "T1lzNC92Yxbz7zvonD8cxmRqMNGXqNrHrGmO9u0pr8eFnIRhSEscSWv3gwoMKH+C\n"
+  "+FajvWM9XK7+ndiXLL4ReFtrPcryrN3B0duMX+l2vgIBlBsIoj6m/n6ExQ8uyE3a\n"
+  "VyzM2gZgvjX3hw3ieLcOURRVRSsINlNcDZeUB/oGNkWKECUAEbmarutqeoYDZOyI\n"
+  "LBxcFhZ3/l2khMHuU5G/uQlBVuR45LqEk2LkRtG3MiidmFOnvHbFwFucT1JexwAs\n"
+  "5YAeBVfIkO/ZaHTnfL4d/z2GKniNyCmbwQ6kBqG8kK/EGWkpPwIHu8KRap8LmrrS\n"
+  "YY2pRT7L5UCmsFsWyTm3N4n6QYImCnn8h9IY4zKtQfzfbh10wWgd4tqtJZELQjgL\n"
+  "DvxNsv443bqJ1vWvwmV9X8O0G4nSjcMsgQQCPYWTfnNpcVVOa80n2p23xyG58hdl\n"
+  "hQ0HAgMBAAGjfjB8MAwGA1UdEwEB/wQCMAAwGwYDVR0RBBQwEocQIAENuEAAAAAA\n"
+  "AAAAAAAAADAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBSRsZYeRAUgOYrmLOR7\n"
+  "W7JTQVTJ5TAfBgNVHSMEGDAWgBQVna/6ANq7at0JSC476WWFVlOauzANBgkqhkiG\n"
+  "9w0BAQsFAAOCAYEAZ/NaFq9GGqsXyIB8Lgmf8GqmHCq5EC3qPijOf34McVtAfZU8\n"
+  "0q2ZNkBlV+P14n4DUdNKoLwjZ9jL33IiyRWPNdz2SgqOgu0rdN2xXc/Hq5Wu/bBw\n"
+  "ZtASxQBV1crYvtoRCTBmei8j+WJ1Qfh+1QNar1mgofCR99Sqx+x0HWC9nAF6aAMd\n"
+  "6t4GS+E3Cmpu/MzgCHHr7yT0XkltJ7m/oLjSwR4RFepNAc5zMOD2ujxwB+5t+mnE\n"
+  "fO5i3SF8OZEnq0c8LtiZvn0bbVtRMcRFpi5kLzV+5b4J4y2BocR8cSvbp/GOvyYi\n"
+  "AYKfwboXK9nJmaxsYdT9zKSp5sPETMMXD7ZDtaM0jKunb9sUF98FsK1j1I416cQI\n"
+  "ChBUCeANDhHTAmaxPKpyjnHsEtbA27z5l5bQmUXSTc5vVYEj4HhNAE89T/4AbMbH\n"
+  "6hvlsD0t9cq9nWly0CC7UIoI1Llv7TVgIKVieLQ5DIZHGL/VuPFHNqfFZDzPByjf\n"
+  "kU9hILqMbOM6P182\n"
+  "-----END CERTIFICATE-----\n",
+  /* (no name constraints set) */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIID/zCCAmegAwIBAgIBAzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0y\n"
+  "MCAXDTE2MDYyOTA5MzY1MloYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0zMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxCKO/30Vk2JmTvrV\n"
+  "j/yi2Bi2rx+SQbIwJRmpGXedQfO90q9EXXZ7INQzo+xhk3dsuzkgTxeVnf7ONJwh\n"
+  "r6KoEgoUXSH+R2MaX1+LjrD2MU3zDO11DE+nAv8hgOZJqYawmgve9RMsVREUcnCu\n"
+  "85pT7bIsNqtuaXG7/mkMib1YfHwiMCl3u0jwhTWf0FuSRqe9ozqHo8DR89vHyrjl\n"
+  "t7FsrUnECJLZtDlf0VUG0lekZIY+WL7w54j4C9z+e8ZnKPpGIJyTgS4W/yXslyNR\n"
+  "VECiQHKW/gwSJBDMLODesJsSpgwh2NZ7VmreWTGSoFgS84Hteogj8jY0C7Ky6DHo\n"
+  "kYLpHcWo3FBIZ6oSiWR49zcJ1r26+JnHQEE1Kxt9Rpn6m6E2k4yW6hBFIZcWnFSQ\n"
+  "LKPtHMQS+soqC/qj4fFNqm7/OJof33LAG6T3cC8wtgtom7n9Jd1RZvkGtlAbNzzm\n"
+  "Wwh4SUyMyq9/dQ3WkJ1RVzVLhqYi9+QiHuVrqVSFO8dmL1/zAgMBAAGjZDBiMA8G\n"
+  "A1UdEwEB/wQFMAMBAf8wDwYDVR0PAQH/BAUDAwcEADAdBgNVHQ4EFgQUFZ2v+gDa\n"
+  "u2rdCUguO+llhVZTmrswHwYDVR0jBBgwFoAU2X5m+TBOqGUVhmhVmzQagc4mEqEw\n"
+  "DQYJKoZIhvcNAQELBQADggGBAHbh1c2UYg23aHZN/cVkAD6fqOykWqF9ZeqI9r0c\n"
+  "BGpvnhcVMOdGitpIYk3cW5a2UYmo6SkfOHos6yB3fZKHz525YhS7Tg96t+c4es8D\n"
+  "GlbJdr/O2vwPVsBseyvk+AHPBrcJDooiqD1rXeJWUiIREVBC1hICYaEDTSdPKxRX\n"
+  "93sRnfEFpZMcWd2dsqOUwwwN6VIeZAxoeysM2O6qkqDIjIVOK613oMYUEKBSyZ+w\n"
+  "d9Ds5sStkaLXxNJ06q3Mst5rE+IgpznpYvJBtpp6HQQeqiTXI9lIoU2oZda8UChA\n"
+  "Tc6iNFl+oQVvaMMUo2YlbEKbQ4UPbxT6wx5LfF3imbReMtRQCbs7uvCkTNTkY2mf\n"
+  "LFTMPMBjbLaY5ogx3vRZQd3833vC9iUcgBewyJc81BcEzI6F9rcg9quzkAnXdUsV\n"
+  "zcMfadJlDrnPm/n3mNiHZs70MQ/dXQtbaD5H6T9BME5sRwAmW7VJ/ySeytkoUw8z\n"
+  "leNeFV8T+J9lz0g5hWY78QJaTQ==\n"
+  "-----END CERTIFICATE-----\n",
+  /* Name Constraints (critical):
+    Permitted: IPAddress: 2001:db8::/32
+    Excluded:  IPAddress: 2001:db8::/34 */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIEWzCCAsOgAwIBAgIBAjANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0x\n"
+  "MCAXDTE2MDYyOTA5MzY1MVoYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0yMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAq03TF1WvguiqwoZG\n"
+  "XbM/lSligqO1tCd8dhAsa1lZmuHqcZRsQLs4Dq4Ffh00AVWDnn734hGzyvBA2LNj\n"
+  "tSH+slECZ55lVWKvJ0D8ip481YFP4CTWcJbM4cvkZdM82+ygYERy/WfR9cJqyrLX\n"
+  "tYvvs1b15fb7s0alE0gJK4j0RbzDjp1DsHFKzG2bNJxJ39xnfa6h4zwDJ+NgJAQN\n"
+  "z84OEw5ECZlKp2HbZZdTx0rXFYiyucao/Ugs1rZ3SPzcPg+EJJMSTdxypD8qWaGg\n"
+  "xP0UrmYxl0D9+m+pV8YftD3h9yFDB0DC0eaXyST224mJDUYR4E6tBSFetWgLkc6l\n"
+  "+1os8Ys6SvrlKvtxr0xQFxV1LhMX/gZgntyflljj/DWYpo+uaA74bkhOzIxEpa1Z\n"
+  "BXMLauKJ7dzm2aHYIgFlYxu1TIjib0D/UaEp3wmoZ6pDUpxjoiqjfDc6WxV5b2Gj\n"
+  "TIZ6qwLcADF90estBeLEtkcf8xk71JzFe0FGL4bDkPPKax0jAgMBAAGjgb8wgbww\n"
+  "DwYDVR0TAQH/BAUwAwEB/zBYBgNVHR4BAf8ETjBMoCQwIocgIAENuAAAAAAAAAAA\n"
+  "AAAAAP////8AAAAAAAAAAAAAAAChJDAihyAgAQ24AAAAAAAAAAAAAAAA/////8AA\n"
+  "AAAAAAAAAAAAADAPBgNVHQ8BAf8EBQMDBwQAMB0GA1UdDgQWBBTZfmb5ME6oZRWG\n"
+  "aFWbNBqBziYSoTAfBgNVHSMEGDAWgBQZXWHEGPF89Ep5BX76GGJZxvxVQDANBgkq\n"
+  "hkiG9w0BAQsFAAOCAYEAl5x0spmwJ0kKiVOLu8WRRtHb6DK6pSu+jGxGh4GNwCFw\n"
+  "bvX8u6QBlCu9xW4afd6/a1PduPtoRQltWeZaB2SDWnnjclKpaG8A9736YV9XKHdL\n"
+  "QX6GZcKSa2r81aAaHSZqxo60HfMPbCLWiWwWDX6O284kLumq7m2Z+pTKmb/Fmdqc\n"
+  "i292pyamXuj8eMsYNGvxzknwe3jr4HZhNfdjRvsLTI6ovEGsa6tdIgszSOrLT/kh\n"
+  "yu8zt9gljas6aBJ2rzT1OECaHQ74IkVZkhA6C4tSf2grH4yDZ4oZrcgJFHF/saC6\n"
+  "5uj5niAxmJrlaBeb+dwl+c5aNFo51zZRYktoQuvCGykWwqc8XwZBKu8MGNsEjEo7\n"
+  "wtfgu/bzXrLUJluXnzVBNCcXwDzsgIxlpJcFZ5aqaVhfYrl8cd5Wa3FrkHvkGyBP\n"
+  "aXS1nd/tvl96i6p60w/VkX6FlSknXh8IdkjcChckJv3AukUrV0U1ViTaVkWpVhQL\n"
+  "JKM8n9POeVPK4pUlaXAd\n"
+  "-----END CERTIFICATE-----\n",
+  /* (no name constraints set) */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIID/zCCAmegAwIBAgIBATANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+  "MCAXDTE2MDYyOTA5MzY1MVoYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0xMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAnf+axUDkYDVQNCvR\n"
+  "hvLcW2nWKZo3g2JciS/h+V2gKWjDDNWxg6luyxlCFsDCaNx+t3j2YJECRZvNMLDP\n"
+  "QiE7U8+GKtJgR3FhHnA5xu/IbBWbNYUO08Q1s+w82dfy6QxRRDOXXh0fjAbd153J\n"
+  "K/9FDpyCuJ/RC9RKphwOz5YsSlMbUpYCCm0pten44HzyT/F2hwVLEEnLn1uuM8x2\n"
+  "HggBYH6WHFiGJLZH6h9ajt04JjyvcTDIaGw4ttET1doBnnRU+6CDiFYeYFqzUDkG\n"
+  "4lKKPxyXsqC0B20vV/N03c5DnODkMnTGPQ696HuhNtf4+i6PRhTieX2iu8uDOPcF\n"
+  "aOfokwfuUx3Ws4dShfvSMN/jFpdpOVn41dceY1Dbqy3tMF0YVFY6SSvRtvUQAvmz\n"
+  "KYmaYwKKpe/yMDqICAdE3fjkHHkQeQri6FP7RrLfbsprLtQlS/1ZclT9CnIz3uES\n"
+  "7C4a9OVvxIz+RZoIps/q94PB5fqvzXsmDIukV9VFKpAjrXWVAgMBAAGjZDBiMA8G\n"
+  "A1UdEwEB/wQFMAMBAf8wDwYDVR0PAQH/BAUDAwcEADAdBgNVHQ4EFgQUGV1hxBjx\n"
+  "fPRKeQV++hhiWcb8VUAwHwYDVR0jBBgwFoAU5xR9/WMP7pTmHW6KSB7HSeK6exkw\n"
+  "DQYJKoZIhvcNAQELBQADggGBABBXBE8psujTJ83QlsnyQYUk2MPfvm5CuJGuC4rr\n"
+  "uc3FFNi1A9h1XR44J5iDf84SZcaNZgYag79SHaQ0OdHHYPdJ6Yc+59IIf8PncoGd\n"
+  "wgeU61u8uIZL53yfDSE7o0t0UrJpBNb7oGF2adRJs7ZqyUZyN6A9+74jcrxllpjI\n"
+  "oha9WgugzP9CUqWYgv/MDNuwAtv+1znNFgv8C8mkhbr8wmf737XsQzfrYFK1ibhw\n"
+  "8rBGJLnLT+Xh+CgaDYeZrnS/oSMXCJETTbnPWfJGacX6FtB829fYhO6VMDqTy74p\n"
+  "k04UcXRxH7ZnRXbCImqnGTfNZtXYLu1oCDC/Ubi08ev2r8Lxrg8B/F6ME0hihiHh\n"
+  "8X1ggr2fDll2mUwBnalRgRYfYc3MRfQv1oy/lQDp0A2rpbKQiX8ji8r1y9xDcu/B\n"
+  "ERwaNiUxyK+Tx3BiMIN4EP7+yGh/f71PDvlZYBkXNYrQBaCpW8fj2hr6N/B4kCPr\n"
+  "/AJhLcEQybcD4IKiqywx8kx3Ig==\n"
+  "-----END CERTIFICATE-----\n",
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIID3jCCAkagAwIBAgIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+  "MCAXDTE2MDYyOTA5MzY1MFoYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0wMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEApAgApH8PdlQKWr+K\n"
+  "ja6KYXYYNxdhs4JoiOBxr3OQuS/ocqp1HU5vVRXKiu0XpqkB631wmC1tTk7N4LYZ\n"
+  "+4ffM82JhkK0y1FwV4soqeuwYraF//8ekgmCxi7tqie0WDmXc+aO2O8pruFHTjCV\n"
+  "TCMAer+wspFEQgHVsbFRAr+zyZpz8bn3Ywy801aM+807sEyNeeIMR0UnM5uELKvF\n"
+  "iHXJwdPdXM48sGe6DHJtSw4OLx3+xqRMlhVBAb0/yYLv1HDFwul0IRBfjj96rXgc\n"
+  "bWLiKIjZCl64+Y+UbbHp71pT09T/tzu15tvjHoIGLudWIaZHCnU10fQS1ySL/Xjm\n"
+  "n0xxze2AVSzoYoiw3ldkTvik9gqESC+uu+QXhzhxKe+GKEd6oGE+8KOxAkTJT6BO\n"
+  "vXKa6R7XDgI4AXeNlTgOZXDAqmhPFjARaLS8jdUIKJLHSaqlzX0+XLilgTGMNaXA\n"
+  "4Sm5pKnJcoCpL4OisgiJnuIRshO10IKgM5YqeytbkjeJzqX9AgMBAAGjQzBBMA8G\n"
+  "A1UdEwEB/wQFMAMBAf8wDwYDVR0PAQH/BAUDAwcEADAdBgNVHQ4EFgQU5xR9/WMP\n"
+  "7pTmHW6KSB7HSeK6exkwDQYJKoZIhvcNAQELBQADggGBAARJRZIqmdoMRq3iYxh9\n"
+  "vApIvuQ8cImjusmIaYzZpAvjcOiX5RGuN/69e7Os6QxnN+H6TAj3IX+a0Msu+P/c\n"
+  "NrrQWttd+uR2xZic+dNXzhsEI5+o4G7W9srnDLU01FmlytvH1CSgLYm8uv3Q8G3/\n"
+  "RVEYmOphvHUUDYJeFIUDyaC88k52tyZ1SeSkveLRy+vf7GkHicVVMAOuyiQV3aQD\n"
+  "M8o3QFyrncw5i608d8JArJZ7LXhx+S+37rMsBGHnXAyKjv8zNt/YW3IjAA4ifr+m\n"
+  "rbTurPyCNxKFdhTBQaF1ofQaKVNEIdSjNCB+5RXUXmoAELsiRQS4LGN6NhMfBlbu\n"
+  "YAMUmDjwu/LkDGLbZHX0cGiDuLc/qefVc1QBAQZ2zoCAnYZU6itnzqlayOijNj8n\n"
+  "0aHMa8P8rb9gzOKcNOz147lLK5oHjYgeYOy3hpUDT/k7wyELWb20GKaaWLgGqWS0\n"
+  "W5U6UgHQoBLyOvHIOkbCRVyIPLh9ijufA0LpUdk2Lf1Sww==\n"
+  "-----END CERTIFICATE-----\n",
+  NULL
 };
 
 static const char *v1_intermed_check[] = {
@@ -2578,11 +2793,13 @@ static struct
   	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL},
   { "name constraints: empty CN, empty SAN, permitted dns range", nc_good0, &nc_good0[2], 0, 0, 0, 1427270515},
   { "name constraints: dns in permitted range", nc_good1, &nc_good1[4], 0, 0, NULL, 1412850586},
+  { "name constraints: ipv6 in permitted range", nc_good2, &nc_good2[4], 0, 0, NULL, 1467193927},
   { "name constraints: 2 constraints (dns, dns), non-intuitive order", nc_bad0, &nc_bad0[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1468920734},
   { "name constraints: empty CN, empty excluded dns", nc_bad1, &nc_bad1[2], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1412850586},
   { "name constraints: multiple dns constraints, empty intersection", nc_bad2, &nc_bad2[4], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1412850586},
   { "name constraints: dns excluded range", nc_bad3, &nc_bad3[2], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1412850586},
   { "name constraints: basic dns intersection", nc_bad4, &nc_bad4[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1412850586},
+  { "name constraints: IP in excluded range", nc_bad5, &nc_bad5[2], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1469540953},
   { "name constraints: 2 constraints (dns, email), non-intuitive order", nc_bad6, &nc_bad6[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1469540953},
   { "not-modified", modified2, &modified2[3], 0, 0, NULL, 1412850586},
   { "kp-interm", kp_fail1, &kp_fail1[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_PURPOSE_MISMATCH, GNUTLS_KP_TLS_WWW_SERVER, 1412850586},
