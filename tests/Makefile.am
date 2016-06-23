@@ -36,7 +36,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
-	system.prio
+	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -151,7 +151,10 @@ pkcs11_get_raw_issuer_exts_SOURCES = pkcs11/pkcs11-get-raw-issuer-exts.c
 pkcs11_get_raw_issuer_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
 ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts \
-	 pkcs11-cert-import-url4-exts
+	pkcs11-cert-import-url4-exts pkcs11/pkcs11-chainverify pkcs11/pkcs11-get-issuer pkcs11/pkcs11-is-known \
+	pkcs11/pkcs11-combo pkcs11/pkcs11-privkey pkcs11/pkcs11-pubkey-import-rsa pkcs11/pkcs11-pubkey-import-ecdsa
+
+
 endif
 endif
 
@@ -248,8 +251,9 @@ TESTS_ENVIRONMENT =						\
 	X509CERTDIR=$(srcdir)/x509cert-dir/			\
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/system.prio	\
 	PSK_FILE=$(srcdir)/psk.passwd				\
+	OPENSSL_ia32cap=0x00000000				\
 	EXEEXT=$(EXEEXT)					\
-	builddir="$(builddir)"				\
+	builddir="$(builddir)"					\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
 

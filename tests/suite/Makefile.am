@@ -84,14 +84,13 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common \
-	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm softhsm.h
+	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm
 nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
 	testpkcs11.sh testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
 	testrandom.sh
 
 if ENABLE_PKCS11
-check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer pkcs11-is-known pkcs11-combo pkcs11-privkey pkcs11-pubkey-import-rsa pkcs11-pubkey-import-ecdsa
-nodist_check_SCRIPTS += testpkcs11.sh pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo pkcs11-privkey pkcs11-pubkey-import-ecdsa pkcs11-pubkey-import-rsa
+nodist_check_SCRIPTS += testpkcs11.sh pkcs11-chainverify pkcs11-get-issuer crl-test
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
