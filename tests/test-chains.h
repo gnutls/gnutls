@@ -412,6 +412,7 @@ static const char *nc_bad0[] = {
   NULL
 };
 
+/* Name constraints: Empty excluded DNSname, empty Common name */
 static const char *nc_bad1[] = {
 /* DNSname: localhost
    DNSname: www.example.com
@@ -436,7 +437,8 @@ static const char *nc_bad1[] = {
 "nci6MKXViEdeHbPLcZe9+vzSSpFh5u/l47w+2B1oz7mndFFpxkw37zDaVH5yAFxK\n"
 "+5VijiKxH6nmniLUX8Zsv82YBaO0liNb2fOZopxQGQ==\n"
 "-----END CERTIFICATE-----\n",
-/* Name Constraints (critical): (empty) */
+/* Name Constraints (critical):
+ * Excluded DNSname: (empty) */
 "-----BEGIN CERTIFICATE-----\n"
 "MIIDFTCCAf2gAwIBAgIBATANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
 "MCIYDzIwMTQwODI2MTEwODUyWhgPOTk5OTEyMzEyMzU5NTlaMA8xDTALBgNVBAMT\n"
@@ -477,6 +479,7 @@ static const char *nc_bad1[] = {
 NULL
 };
 
+/* Name constraints: Multiple-level constraints, intersection empty */
 static const char *nc_bad2[] = {
 /* DNSname: www.example.com */
 "-----BEGIN CERTIFICATE-----\n"
@@ -585,6 +588,7 @@ static const char *nc_bad2[] = {
 NULL
 };
 
+/* Name constraints: DNSname in excluded range */
 static const char *nc_bad3[] = {
 /* CN=www.example.com */
 "-----BEGIN CERTIFICATE-----\n"
@@ -649,6 +653,7 @@ static const char *nc_bad3[] = {
 NULL
 };
 
+/* Name constraints: Multiple-level constraints, different subdomains */
 static const char *nc_bad4[] = {
 /* DNSname: sub2.example.org */
 "-----BEGIN CERTIFICATE-----\n"

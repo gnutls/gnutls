@@ -307,6 +307,25 @@ void doit(void)
 	gnutls_x509_name_constraints_deinit(nc);
 	gnutls_x509_crt_deinit(crt);
 
+	/* 4: corner cases */
+
+	/* 4a: empty excluded name (works as wildcard) */
+
+	ret = gnutls_x509_name_constraints_init(&nc);
+	check_for_error(ret);
+
+	set_name("", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
+
+	set_name("example.net", &name);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
+
+	gnutls_x509_name_constraints_deinit(nc);
+
+	// Test suite end.
+
 	if (debug)
 		success("Test success.\n");
 }
