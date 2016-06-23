@@ -559,17 +559,34 @@ void doit(void)
 		exit(1);
 	}
 
-	/* we should find a certificate with the same DN */
-	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, 0);
+#if 0
+	/* test searching invalid certs. the distrusted flag disables any validity check except DN and serial number
+	 * matching so it should work - unfortunately works only under p11-kit */
+
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED);
 	if (ret == 0) {
 		fail("error in gnutls_pkcs11_crt_is_known - did not get a known cert\n");
 		exit(1);
 	}
 
-	/* we should find a certificate with the same issuer DN + serial number */
-	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, 0);
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED);
 	if (ret == 0) {
 		fail("error in gnutls_pkcs11_crt_is_known - did not get a known cert\n");
+		exit(1);
+	}
+#endif
+
+	/* we should find a certificate with the same DN */
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, 0);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
+		exit(1);
+	}
+
+	/* we should find a certificate with the same issuer DN + serial number */
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, 0);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
 		exit(1);
 	}
 
