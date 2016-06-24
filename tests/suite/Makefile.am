@@ -90,7 +90,7 @@ nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
 	testrandom.sh
 
 if ENABLE_PKCS11
-nodist_check_SCRIPTS += testpkcs11.sh pkcs11-chainverify pkcs11-get-issuer crl-test
+nodist_check_SCRIPTS += testpkcs11.sh crl-test
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
