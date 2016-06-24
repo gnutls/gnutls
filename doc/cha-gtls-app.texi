@@ -82,12 +82,15 @@ resumed one, and will share the same session ID with the previous one.
 @node Error handling
 @subsection Error handling
 
-In @acronym{GnuTLS} most functions return an integer type as a result.
-In almost all cases a zero or a positive number means success, and a
-negative number indicates failure, or a situation that some action has
-to be taken. Thus negative error codes may be fatal or not.
+There two types of @acronym{GnuTLS} functions. One type returns
+a boolean true (non-zero) or false (zero) value, which are set
+to return an unsigned integer type. The other type returns a
+signed integer type with zero indicating success and a negative
+value indicating failure. 
 
-Fatal errors terminate the connection immediately and further sends
+For certain operations such as TLS handshake and TLS packet receive
+there is the notion of fatal and non-fatal error codes.
+Fatal errors terminate the TLS session immediately and further sends
 and receives will be disallowed.  Such an example is
 @code{GNUTLS_@-E_@-DECRYPTION_@-FAILED}. Non-fatal errors may warn about
 something, i.e., a warning alert was received, or indicate the some
