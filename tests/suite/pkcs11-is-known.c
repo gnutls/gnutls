@@ -32,6 +32,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/x509-ext.h>
+#include <assert.h>
 
 #include "../utils.h"
 #include "softhsm.h"
@@ -168,6 +169,94 @@ static const char *ca_list[MAX_CHAIN] = {
 "-----END CERTIFICATE-----\n",
 NULL};
 
+/* this certificate has the same CN as one of the CAs above */
+static const char same_dn_cert_str[] = 
+"-----BEGIN CERTIFICATE-----\n"
+"MIIHSjCCBjKgAwIBAgIKYRHt9wABAAAAFTANBgkqhkiG9w0BAQUFADBSMQswCQYD\n"
+"VQQGEwJVUzEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xJzAlBgNVBAMTHklu\n"
+"dGVsIEludHJhbmV0IEJvc2FjIFBvbGljeSBDQTAeFw0xMzAyMDQyMTUyMThaFw0x\n"
+"ODA1MjQxOTU5MzlaMFYxCzAJBgNVBAYTAlVTMRowGAYDVQQKExFJbnRlbCBDb3Jw\n"
+"b3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgSW50cmFuZXQgQmFzaWMgSXNzdWluZyBD\n"
+"QSAyQjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALn3ogjraWSmK5Wb\n"
+"/4e9mENA1F36FBVemaG7L93ZhRRXq4UV0PQM5/4TOe9KAaOlX+a2cuULeeUtN9Rk\n"
+"V/nHAVzSWlqc/NTMJfuI/1AD7ICNejQFYLxDMXGjR7eAHtiMz0iTMp9u6YTw4WXh\n"
+"WffqTPiqUZ6DEWsMic9dM9yw/JqzycKClLcTD1OCvtw7Fx4tNTu6/ngrYJcTo29e\n"
+"BBh/DupgtgnYPYuExEkHmucb4VIDdjfRkPo/BdNqrUSYfYqnUDj5mH+hPzIgppsZ\n"
+"Rw0S5PUZGuC1f+Zok+4vZPR+hGG3Pdm2LTUEWSnurlhyfBoM+0yxeHsmL9aHU7zt\n"
+"EIzVmKUCAwEAAaOCBBwwggQYMBIGCSsGAQQBgjcVAQQFAgMCAAIwIwYJKwYBBAGC\n"
+"NxUCBBYEFMqHyYZOx6LYwRwZ+5vjOyIl9hENMB0GA1UdDgQWBBQ4Y3b6tgU6qVlP\n"
+"SoeNoIO3fpE6CzAZBgkrBgEEAYI3FAIEDB4KAFMAdQBiAEMAQTALBgNVHQ8EBAMC\n"
+"AYYwEgYDVR0TAQH/BAgwBgEB/wIBADAfBgNVHSMEGDAWgBRp6zCRHAOAgE4RFYhG\n"
+"pOJBmtNpHzCCAaIGA1UdHwSCAZkwggGVMIIBkaCCAY2gggGJhlFodHRwOi8vd3d3\n"
+"LmludGVsLmNvbS9yZXBvc2l0b3J5L1hYWC9JbnRlbCUyMEludHJhbmV0JTIwQmFz\n"
+"aWMlMjBQb2xpY3klMjBDQSgxKS5jcmyGWmh0dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50\n"
+"ZWwuY29tL3JlcG9zaXRvcnkvQ1JML0ludGVsJTIwSW50cmFuZXQlMjBCYXNpYyUy\n"
+"MFBvbGljeSUyMENBKDEpLmNybIaB12xkYXA6Ly8vQ049SW50ZWwlMjBJbnRyYW5l\n"
+"dCUyMEJhc2ljJTIwUG9saWN5JTIwQ0EoMSksQ049bWNzaWJwY2EsQ049Q0RQLENO\n"
+"PVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3Vy\n"
+"YXRpb24sREM9Y29ycCxEQz1pbnRlbCxEQz1jb20/Y2VydGlmaWNhdGVSZXZvY2F0\n"
+"aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNSTERpc3RyaWJ1dGlvblBvaW50MIIB\n"
+"uQYIKwYBBQUHAQEEggGrMIIBpzBmBggrBgEFBQcwAoZaaHR0cDovL3d3dy5pbnRl\n"
+"bC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBJbnRyYW5ldCUy\n"
+"MEJhc2ljJTIwUG9saWN5JTIwQ0EoMSkuY3J0MG8GCCsGAQUFBzAChmNodHRwOi8v\n"
+"Y2VydGlmaWNhdGVzLmludGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRlcy9J\n"
+"bnRlbCUyMEludHJhbmV0JTIwQmFzaWMlMjBQb2xpY3klMjBDQSgxKS5jcnQwgcsG\n"
+"CCsGAQUFBzAChoG+bGRhcDovLy9DTj1JbnRlbCUyMEludHJhbmV0JTIwQmFzaWMl\n"
+"MjBQb2xpY3klMjBDQSxDTj1BSUEsQ049UHVibGljJTIwS2V5JTIwU2VydmljZXMs\n"
+"Q049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1jb3JwLERDPWludGVsLERD\n"
+"PWNvbT9jQUNlcnRpZmljYXRlP2Jhc2U/b2JqZWN0Q2xhc3M9Y2VydGlmaWNhdGlv\n"
+"bkF1dGhvcml0eTANBgkqhkiG9w0BAQUFAAOCAQEAsj8cHt2jSAmnIGulE9jXooAc\n"
+"qH2xehlI+ko/al+nDnBzbjDYYjVS52XitYg8JGo6j72ijiGlGb/03FcQJRBZmUH6\n"
+"znktx2rGTm4IdjL8quhvHthlzXXCozL8GMeeOuZ5rzHlhapKx764a5RuZtyx89uS\n"
+"9cECon6oLGesXjFJ8Xrq6ecHZrQwJUpmvZalwvloKACAWqBh8yV12WDnUNZhtp8N\n"
+"8rqeJZoy/lXGnTxsSSodO/5Y/CxYJM4W6u4WgvXNJSjO/0qWvb64S+pVLjBzwI+Y\n"
+"X6oLqmBovRp1lGPOLjkXZi3EKDR8DmzhtpJq2677RtYowewnFedQ+exH9cXoJw==\n"
+"-----END CERTIFICATE-----\n";
+
+/* this certificate has the same subject and issuer DNs and serial as one of the CAs above */
+static const char same_issuer_cert_str[] = 
+"-----BEGIN CERTIFICATE-----\n"
+"MIIHSjCCBjKgAwIBAgIKYRHt9wABAAAAFTANBgkqhkiG9w0BAQUFADBSMQswCQYD\n"
+"VQQGEwJVUzEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xJzAlBgNVBAMTHklu\n"
+"dGVsIEludHJhbmV0IEJhc2ljIFBvbGljeSBDQTAeFw0xMzAyMDQyMTUyMThaFw0x\n"
+"ODA1MjQxOTU5MzlaMFYxCzAJBgNVBAYTAlVTMRowGAYDVQQKExFJbnRlbCBDb3Jw\n"
+"b3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgSW50cmFuZXQgQmFzaWMgSXNzdWluZyBD\n"
+"QSAyQjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALn3ogjraWSmK5Wb\n"
+"/4e9mENA1F36FBVemaG7L93ZhRRXq4UV0PQM5/4TOe9KAaOlX+a2cuULeeUtN9Rk\n"
+"V/nHAVzSWlqc/NTMJfuI/1AD7ICNejQFYLxDMXGjR7eAHtiMz0iTMp9u6YTw4WXh\n"
+"WffqTPiqUZ6DEWsMic9dM9yw/JqzycKClLcTD1OCvtw7Fx4tNTu6/ngrYJcTo29e\n"
+"BBh/DupgtgnYPYuExEkHmucb4VIDdjfRkPo/BdNqrUSYfYqnUDj5mH+hPzIgppsZ\n"
+"Rw0S5PUZGuC1f+Zok+4vZPR+hGG3Pdm2LTUEWSnurlhyfBoM+0yxeHsmL9aHU7zt\n"
+"EIzVmKUCAwEAAaOCBBwwggQYMBIGCSsGAQQBgjcVAQQFAgMCAAIwIwYJKwYBBAGC\n"
+"NxUCBBYEFMqHyYZOx6LYwRwZ+5vjOyIl9hENMB0GA1UdDgQWBBQ4Y3b6tgU6qVlP\n"
+"SoeNoIO3fpE6CzAZBgkrBgEEAYI3FAIEDB4KAFMAdQBiAEMAQTALBgNVHQ8EBAMC\n"
+"AYYwEgYDVR0TAQH/BAgwBgEB/wIBADAfBgNVHSMEGDAWgBRp6zCRHAOAgE4RFYhG\n"
+"pOJBmtNpHzCCAaIGA1UdHwSCAZkwggGVMIIBkaCCAY2gggGJhlFodHRwOi8vd3d3\n"
+"LmludGVsLmNvbS9yZXBvc2l0b3J5L1hYWC9JbnRlbCUyMEludHJhbmV0JTIwQmFz\n"
+"aWMlMjBQb2xpY3klMjBDQSgxKS5jcmyGWmh0dHA6Ly9jZXJ0aWZpY2F0ZXMuaW50\n"
+"ZWwuY29tL3JlcG9zaXRvcnkvQ1JML0ludGVsJTIwSW50cmFuZXQlMjBCYXNpYyUy\n"
+"MFBvbGljeSUyMENBKDEpLmNybIaB12xkYXA6Ly8vQ049SW50ZWwlMjBJbnRyYW5l\n"
+"dCUyMEJhc2ljJTIwUG9saWN5JTIwQ0EoMSksQ049bWNzaWJwY2EsQ049Q0RQLENO\n"
+"PVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3Vy\n"
+"YXRpb24sREM9Y29ycCxEQz1pbnRlbCxEQz1jb20/Y2VydGlmaWNhdGVSZXZvY2F0\n"
+"aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNSTERpc3RyaWJ1dGlvblBvaW50MIIB\n"
+"uQYIKwYBBQUHAQEEggGrMIIBpzBmBggrBgEFBQcwAoZaaHR0cDovL3d3dy5pbnRl\n"
+"bC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBJbnRyYW5ldCUy\n"
+"MEJhc2ljJTIwUG9saWN5JTIwQ0EoMSkuY3J0MG8GCCsGAQUFBzAChmNodHRwOi8v\n"
+"Y2VydGlmaWNhdGVzLmludGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRlcy9J\n"
+"bnRlbCUyMEludHJhbmV0JTIwQmFzaWMlMjBQb2xpY3klMjBDQSgxKS5jcnQwgcsG\n"
+"CCsGAQUFBzAChoG+bGRhcDovLy9DTj1JbnRlbCUyMEludHJhbmV0JTIwQmFzaWMl\n"
+"MjBQb2xpY3klMjBDQSxDTj1BSUEsQ049UHVibGljJTIwS2V5JTIwU2VydmljZXMs\n"
+"Q049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1jb3JwLERDPWludGVsLERD\n"
+"PWNvbT9jQUNlcnRpZmljYXRlP2Jhc2U/b2JqZWN0Q2xhc3M9Y2VydGlmaWNhdGlv\n"
+"bkF1dGhvcml0eTANBgkqhkiG9w0BAQUFAAOCAQEAsj8cHt2jSAmnIGulE9jXooAc\n"
+"qH2xehlI+ko/al+nDnBzbjDYYjVS52XitYg8JGo6j72ijiGlGb/03FcQJRBZmUH6\n"
+"znktx2rGTm4IdjL8quhvHthlzXXCozL8GMeeOuZ5rzHlhapKx764a5RuZtyx89uS\n"
+"9cECon6oLGesXjFJ8Xrq6ecHZrQwJUpmvZalwvloKACAWqBh8yV12WDnUNZhtp8N\n"
+"8rqeJZoy/lXGnTxsSSodO/5Y/CxYJM4W6u4WgvXNJSjO/0qWvb64S+pVLjBzwI+Y\n"
+"X6oLqmBovRp1lGPOLjkXZi3EKDR8DmzhtpJq2677RtYowewnFedQ+exH9cXoJw==\n"
+"-----END CERTIFICATE-----\n";
+
 /* this certificate is issued by one of the above */
 static const char intermediate_str[] =
 "-----BEGIN CERTIFICATE-----\n"
@@ -260,7 +349,7 @@ void doit(void)
 	gnutls_x509_crt_t issuer = NULL;
 	gnutls_x509_trust_list_t tl;
 	gnutls_x509_crt_t certs[MAX_CHAIN];
-	gnutls_x509_crt_t intermediate;
+	gnutls_x509_crt_t intermediate, same_dn, same_issuer;
 	gnutls_datum_t tmp;
 
 	/* The overloading of time() seems to work in linux (ELF?)
@@ -365,6 +454,31 @@ void doit(void)
 		       tmp.data);
 	gnutls_free(tmp.data);
 
+	assert(gnutls_x509_crt_init(&same_dn)>=0);
+	assert(gnutls_x509_crt_init(&same_issuer)>=0);
+
+	tmp.data = (unsigned char *) same_issuer_cert_str;
+	tmp.size = strlen(same_issuer_cert_str);
+
+	ret =
+	    gnutls_x509_crt_import(same_dn, &tmp, GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_x509_crt_import: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	tmp.data = (unsigned char *) same_dn_cert_str;
+	tmp.size = strlen(same_dn_cert_str);
+
+	ret =
+	    gnutls_x509_crt_import(same_issuer, &tmp, GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_x509_crt_import: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
 	if (debug)
 		printf("\tVerifying...");
 
@@ -445,6 +559,75 @@ void doit(void)
 		exit(1);
 	}
 
+#if 0
+	/* test searching invalid certs. the distrusted flag disables any validity check except DN and serial number
+	 * matching so it should work - unfortunately works only under p11-kit */
+
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED);
+	if (ret == 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - did not get a known cert\n");
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED);
+	if (ret == 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - did not get a known cert\n");
+		exit(1);
+	}
+#endif
+
+	/* we should find a certificate with the same DN */
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, 0);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
+		exit(1);
+	}
+
+	/* we should find a certificate with the same issuer DN + serial number */
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, 0);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
+		exit(1);
+	}
+
+	/* these are invalid certificates but their key matches existing keys, the following should work */
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED);
+	if (ret == 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - did not find a cert that does match key\n");
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED);
+	if (ret == 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - did not find a cert that does match key\n");
+		exit(1);
+	}
+
+
+	/* The following check whether the RETRIEVE_TRUSTED implies compare of the certificate */
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_dn, GNUTLS_PKCS11_OBJ_FLAG_COMPARE|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_crt_is_known(SOFTHSM_URL, same_issuer, GNUTLS_PKCS11_OBJ_FLAG_COMPARE|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED);
+	if (ret != 0) {
+		fail("error in gnutls_pkcs11_crt_is_known - found a cert that doesn't match\n");
+		exit(1);
+	}
 
 	gnutls_x509_trust_list_deinit(tl, 1);
 
@@ -453,6 +636,8 @@ void doit(void)
 		printf("\tCleanup...");
 
 	gnutls_x509_crt_deinit(intermediate);
+	gnutls_x509_crt_deinit(same_dn);
+	gnutls_x509_crt_deinit(same_issuer);
 	for (j = 0; ca_list[j]; j++) {
 		gnutls_x509_crt_deinit(certs[j]);
 	}
