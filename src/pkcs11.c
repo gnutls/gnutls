@@ -1234,12 +1234,12 @@ void pkcs11_set_id(FILE * outfile, const char *url, int detailed,
 		   unsigned int flags, common_info_st * info,
 		   const char *id)
 {
-	return pkcs11_set_val(outfile, url, detailed, flags, info, GNUTLS_PKCS11_OBJ_ID_HEX, id);
+	pkcs11_set_val(outfile, url, detailed, flags, info, GNUTLS_PKCS11_OBJ_ID_HEX, id);
 }
 
 void pkcs11_set_label(FILE * outfile, const char *url, int detailed,
 		   unsigned int flags, common_info_st * info,
 		   const char *label)
 {
-	return pkcs11_set_val(outfile, url, detailed, flags, info, GNUTLS_PKCS11_OBJ_LABEL, label);
+	pkcs11_set_val(outfile, url, detailed, flags, info, GNUTLS_PKCS11_OBJ_LABEL, label);
 }
