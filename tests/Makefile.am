@@ -137,6 +137,7 @@ if !WINDOWS
 noinst_LTLIBRARIES += libpkcs11mock1.la
 libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h
 libpkcs11mock1_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
+libpkcs11mock1_la_LIBADD =  ../gl/libgnu.la
 
 pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
 pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
