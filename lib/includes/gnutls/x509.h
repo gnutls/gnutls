@@ -321,6 +321,7 @@ int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc
 int gnutls_x509_name_constraints_get_excluded(gnutls_x509_name_constraints_t nc,
 				     unsigned idx,
 				     unsigned *type, gnutls_datum_t * name);
+int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t *cidr_rfc5280);
 
 
 #define GNUTLS_CRL_REASON_SUPERSEEDED GNUTLS_CRL_REASON_SUPERSEDED,

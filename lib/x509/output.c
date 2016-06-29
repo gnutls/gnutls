@@ -34,99 +34,13 @@
 #include <c-ctype.h>
 #include <gnutls-idna.h>
 #include "extensions.h"
-
-#ifdef HAVE_INET_NTOP
-# include <arpa/inet.h>
-#endif
+#include "ip.h"
 
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str
 
 #define NON_NULL(x) (((x)!=NULL)?((char*)(x)):"")
 #define ERROR_STR (char*) "(error)"
-
-static const
-char *ip_to_string(void *_ip, int ip_size, char *string,
-			  int string_size)
-{
-
-	if (ip_size != 4 && ip_size != 16) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	if (ip_size == 4 && string_size < 16) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	if (ip_size == 16 && string_size < 48) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	if (ip_size == 4)
-		return inet_ntop(AF_INET, _ip, string, string_size);
-	else
-		return inet_ntop(AF_INET6, _ip, string, string_size);
-}
-
-static unsigned mask_to_prefix(const uint8_t *mask, unsigned mask_size)
-{
-	unsigned i, c = 0;
-	for (i=0; i<mask_size; i++) {
-		if (mask[i] == 0xFF) {
-			c += 8;
-		} else {
-			switch(mask[i]) {
-				case 0xFE: c += 7; break;
-				case 0xFC: c += 6; break;
-				case 0xF8: c += 5; break;
-				case 0xF0: c += 4; break;
-				case 0xE0: c += 3; break;
-				case 0xC0: c += 2; break;
-				case 0x80: c += 1; break;
-				case 0x00: break;
-				default:
-					return 0;
-			}
-			break;
-		}
-	}
-
-	return c;
-}
-
-static const
-char *cidr_to_string(void *_ip, int ip_size, char *string,
-			  int string_size)
-{
-	uint8_t *ip = _ip;
-	char tmp[64];
-	const char *p;
-
-	if (ip_size != 8 && ip_size != 32) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	if (ip_size == 8) {
-		p = inet_ntop(AF_INET, ip, tmp, sizeof(tmp));
-
-		if (p)
-			snprintf(string, string_size, "%s/%u", tmp, mask_to_prefix(ip+4, 4));
-	} else {
-		p = inet_ntop(AF_INET6, ip, tmp, sizeof(tmp));
-
-		if (p)
-			snprintf(string, string_size, "%s/%u", tmp, mask_to_prefix(ip+16, 16));
-	}
-
-	if (p == NULL)
-		return NULL;
-
-	return string;
-}
 
 static void
 print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datum_t *name, unsigned ip_is_cidr)
@@ -188,9 +102,9 @@ unsigned i;
 
 	case GNUTLS_SAN_IPADDRESS:
 		if (!ip_is_cidr)
-			p = ip_to_string(name->data, name->size, str_ip, sizeof(str_ip));
+			p = _gnutls_ip_to_string(name->data, name->size, str_ip, sizeof(str_ip));
 		else
-			p = cidr_to_string(name->data, name->size, str_ip, sizeof(str_ip));
+			p = _gnutls_cidr_to_string(name->data, name->size, str_ip, sizeof(str_ip));
 		if (p == NULL)
 			p = ERROR_STR;
 		addf(str, "%sIPAddress: %s\n", prefix, p);

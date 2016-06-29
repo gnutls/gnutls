@@ -35,8 +35,8 @@
 #include <x509_int.h>
 #include <libtasn1.h>
 
-/* Name constraints is limited to DNS names.
- */
+#include "ip.h"
+#include "ip-in-cidr.h"
 
 // for documentation see the implementation
 static int name_constraints_intersect_nodes(name_constraints_node_st * nc1,

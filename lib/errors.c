@@ -163,6 +163,9 @@ static const gnutls_error_entry error_entries[] = {
 	ERROR_ENTRY(N_
 		    ("Unknown Subject Alternative name in X.509 certificate."),
 		    GNUTLS_E_X509_UNKNOWN_SAN),
+	ERROR_ENTRY(N_
+			("CIDR name constraint is malformed in size or structure."),
+			GNUTLS_E_MALFORMED_CIDR),
 
 	ERROR_ENTRY(N_
 		    ("Unsupported critical extension in X.509 certificate."),
