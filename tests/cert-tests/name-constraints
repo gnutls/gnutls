@@ -28,7 +28,12 @@ if ! test -z "${VALGRIND}"; then
 fi
 TMPFILE=tmp.$$.pem
 
-${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/name-constraints-ip.pem"
+. ${srcdir}/../scripts/common.sh
+
+check_for_datefudge
+
+datefudge -s "2016-04-22" \
+	${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/data/name-constraints-ip.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
