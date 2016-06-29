@@ -256,7 +256,6 @@ int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t *cidr_rfc5280)
 		ret = gnutls_assert_val(GNUTLS_E_MALFORMED_CIDR);
 		goto cleanup;
 	}
-	//memcpy(cidr_rfc5280, out, iplength);
 
 	prefix_to_mask(prefix, &cidr_rfc5280->data[iplength], iplength);
 	_gnutls_mask_ip(cidr_rfc5280->data, &cidr_rfc5280->data[iplength], iplength);
