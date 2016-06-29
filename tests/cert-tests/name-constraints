@@ -28,7 +28,18 @@ if ! test -z "${VALGRIND}"; then
 fi
 TMPFILE=tmp.$$.pem
 
-${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/name-constraints-ip.pem"
+export TZ="UTC"
+
+# Check for datefudge
+TSTAMP=`datefudge -s "2006-09-23" date -u +%s || true`
+if test "$TSTAMP" != "1158969600"; then
+	echo $TSTAMP
+	echo "You need datefudge to run this test"
+	exit 77
+fi
+
+datefudge -s "2016-04-22" \
+	${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/name-constraints-ip.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
