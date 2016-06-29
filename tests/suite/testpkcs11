@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (C) 2013 Nikos Mavrogiannopoulos
 #
@@ -24,7 +24,6 @@ CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
 DIFF="${DIFF:-diff -b -B}"
 SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
 CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
-PORT="${PORT:-5561}"
 RETCODE=0
 
 if ! test -z "${VALGRIND}";then
@@ -41,6 +40,8 @@ fi
 P11TOOL="$VALGRIND $P11TOOL --batch"
 
 . $srcdir/../scripts/common.sh
+
+eval "${GETPORT}"
 
 rm -f $TMPFILE
 
@@ -312,8 +313,7 @@ use_certificate_test () {
 	# start server
 	launch_pkcs11_server $$ "$ADDITIONAL_PARAM" --echo --priority NORMAL --x509certfile="$certfile" \
 		--x509keyfile="$keyfile" --x509cafile="$cafile" \
-		--require-client-cert >>$TMPFILE 2>&1 &
-
+		--require-client-cert >>$TMPFILE 2>&1
 	PID=$!
 	wait_server $PID
 
@@ -384,7 +384,7 @@ delete_temp_privkey $TOKEN $GNUTLS_PIN
 generate_temp_rsa_privkey $TOKEN $GNUTLS_PIN 2048
 delete_temp_privkey $TOKEN $GNUTLS_PIN
 
-export_pubkey_of_privkey $TOKEN $GNUTLS_PIN
+#export_pubkey_of_privkey $TOKEN $GNUTLS_PIN
 
 generate_rsa_privkey $TOKEN $GNUTLS_PIN 1024
 
