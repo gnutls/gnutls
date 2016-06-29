@@ -14,6 +14,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed DTLS handshake packet reconstruction. Reported by
    Guillaume Roguez.
 
+** libgnutls: Fixed issues with PKCS#11 reading of sensitive objects
+   from SafeNet Network HSM. Reported by Anthony Alba.
+
 ** libgnutls: Corrected reading and writing of PKCS#11 CKA_SERIAL_NUMBER. Report
    and fix by Stanislav Židek.
 
