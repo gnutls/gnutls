@@ -93,8 +93,7 @@ TESTS = test-ciphersuite-names eagain testsrn testcompat chain invalid-cert \
 	testpkcs11 testrng test-ciphersuite-names
 
 if ENABLE_PKCS11
-check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer pkcs11-is-known pkcs11-combo
-TESTS += pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo
+TESTS += crl-test
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \

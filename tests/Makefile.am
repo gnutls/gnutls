@@ -36,7 +36,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h test-chains.h \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem \
-	cert-common.h
+	cert-common.h pkcs11/softhsm.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -106,7 +106,10 @@ pkcs11_get_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_get_raw_issuer_exts_SOURCES = pkcs11/pkcs11-get-raw-issuer-exts.c
 pkcs11_get_raw_issuer_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
-ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
+ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts \
+	pkcs11/pkcs11-chainverify pkcs11/pkcs11-get-issuer pkcs11/pkcs11-is-known \
+	pkcs11/pkcs11-combo
+
 endif
 endif
 endif
@@ -158,7 +161,8 @@ TESTS_ENVIRONMENT =						\
 	X509CERTDIR=$(srcdir)/x509cert-dir/			\
 	EXEEXT=$(EXEEXT)					\
 	top_builddir="$(top_builddir)"				\
-	srcdir="$(srcdir)"
+	srcdir="$(srcdir)"					\
+	OPENSSL_ia32cap=0x00000000
 
 if WANT_TEST_SUITE
 LOG_COMPILER = $(VALGRIND)
