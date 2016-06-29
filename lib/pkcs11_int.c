@@ -138,6 +138,7 @@ pkcs11_get_attribute_avalue(struct ck_function_list * module,
 		rv = (module)->C_GetAttributeValue(sess, object, &templ, 1);
 		if (rv != CKR_OK) {
 			gnutls_free(t);
+			return rv;
 		}
 		res->data = t;
 		res->size = templ.value_len;
