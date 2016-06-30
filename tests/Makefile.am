@@ -93,7 +93,7 @@ if ENABLE_PKCS11
 if !HAVE_BUGGY_P11_KIT
 if !WINDOWS
 noinst_LTLIBRARIES += libpkcs11mock1.la
-libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h
+libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h pkcs11/pkcs11-mock-ext.h
 libpkcs11mock1_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
 libpkcs11mock1_la_LIBADD = ../gl/libgnu.la
 
