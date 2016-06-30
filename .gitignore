@@ -861,3 +861,15 @@ tests/tls-rehandshake-cert-2
 tests/tlsfeature-crt
 tests/tlsfeature-ext
 tests/urls
+tests/dtls-rehandshake-cert-3
+tests/pkcs11-import-url-privkey
+tests/pkcs11/pkcs11-chainverify
+tests/pkcs11/pkcs11-combo
+tests/pkcs11/pkcs11-get-issuer
+tests/pkcs11/pkcs11-import-url-privkey
+tests/pkcs11/pkcs11-is-known
+tests/pkcs11/pkcs11-privkey
+tests/pkcs11/pkcs11-pubkey-import-ecdsa
+tests/pkcs11/pkcs11-pubkey-import-rsa
+tests/softhsm-*.db/
+tests/status-request-missing
