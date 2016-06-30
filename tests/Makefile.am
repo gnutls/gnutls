@@ -135,7 +135,7 @@ ssl3_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c ssl3.0-cert-key-ex
 if ENABLE_PKCS11
 if !WINDOWS
 noinst_LTLIBRARIES += libpkcs11mock1.la
-libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h
+libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h pkcs11/pkcs11-mock-ext.h
 libpkcs11mock1_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
 libpkcs11mock1_la_LIBADD =  ../gl/libgnu.la
 
