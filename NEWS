@@ -20,6 +20,9 @@ See the end for copying conditions.
 ** libgnutls: Corrected reading and writing of PKCS#11 CKA_SERIAL_NUMBER. Report
    and fix by Stanislav Židek.
 
+** libgnutls: Enhanced the priority functions to understand -VERS-ALL keyword
+   to allow compatibility of priority strings between 3.4.x and 3.3.x.
+
 ** API and ABI modifications:
 No changes since last version.
 
