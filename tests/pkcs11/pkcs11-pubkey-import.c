@@ -63,7 +63,7 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 	return -1;
 }
 
-void try(int rsa)
+static void try(int rsa)
 {
 	char buf[128];
 	int ret, pk;
