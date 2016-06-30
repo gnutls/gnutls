@@ -381,12 +381,13 @@ AC_ARG_ENABLE(self-checks,
   AS_HELP_STRING([--enable-self-checks], [enable self checking functionality]),
     enable_self_checks=$enableval, enable_self_checks=no)
 
+AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dladdr (0, 0);])
+
 AC_ARG_ENABLE(fips140-mode,
   AS_HELP_STRING([--enable-fips140-mode], [enable FIPS140-2 mode (implies self checks)]),
     enable_fips=$enableval, enable_fips=no)
 AM_CONDITIONAL(ENABLE_FIPS140, test "$enable_fips" = "yes")
 if [ test "$enable_fips" = "yes" ];then
-  AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dladdr (0, 0);])
   if test "x$HAVE_LIBDL" = "xyes";then
     enable_self_checks=yes
 
