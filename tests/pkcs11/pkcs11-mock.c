@@ -13,9 +13,11 @@
  *  Please contact JWC s.r.o. at <info@pkcs11interop.net> for more details.
  */
 
-
 #include "pkcs11-mock.h"
+#include "pkcs11-mock-ext.h"
 #include <stdlib.h>
+
+unsigned int pkcs11_mock_flags = 0;
 
 /* This is a very basic mock PKCS #11 module that will return a given fixed
  * certificate, and public key for all searches. It will also provide a
@@ -964,6 +966,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 			else if (PKCS11_MOCK_CK_OBJECT_HANDLE_PRIVATE_KEY == hObject)
 			{
 				pTemplate[i].ulValueLen = (CK_ULONG) -1;
+				if (!(pkcs11_mock_flags & MOCK_FLAG_BROKEN_GET_ATTRIBUTES)) {
+					return CKR_ATTRIBUTE_SENSITIVE;
+				}
 			}
 			else
 			{
