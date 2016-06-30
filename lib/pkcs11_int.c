@@ -137,6 +137,12 @@ pkcs11_get_attribute_avalue(struct ck_function_list * module,
 	templ.value_len = 0;
 	rv = (module)->C_GetAttributeValue(sess, object, &templ, 1);
 	if (rv == CKR_OK) {
+		/* PKCS#11 v2.20 requires sensitive values to set a length
+		 * of -1. In that case an error should have been returned,
+		 * but some implementations return CKR_OK instead. */
+		if (templ.value_len == (unsigned long)-1)
+			return CKR_ATTRIBUTE_SENSITIVE;
+
 		if (templ.value_len == 0)
 			return rv;
 
