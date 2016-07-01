@@ -177,13 +177,12 @@ ASM_SOURCES_XXX := \
 	lib/accelerated/x86/XXX/ghash-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86.s \
-	lib/accelerated/x86/XXX/e_padlock-x86_64.s \
-	lib/accelerated/x86/XXX/e_padlock-x86.s \
 	lib/accelerated/x86/XXX/sha1-ssse3-x86.s \
 	lib/accelerated/x86/XXX/sha1-ssse3-x86_64.s \
 	lib/accelerated/x86/XXX/sha256-ssse3-x86.s \
 	lib/accelerated/x86/XXX/sha512-ssse3-x86.s \
 	lib/accelerated/x86/XXX/sha512-ssse3-x86_64.s \
+	lib/accelerated/x86/XXX/aesni-gcm-x86_64.s \
 	lib/accelerated/x86/XXX/aes-ssse3-x86.s \
 	lib/accelerated/x86/XXX/aes-ssse3-x86_64.s
 
@@ -200,7 +199,8 @@ X86_FILES=XXX/aesni-x86.s XXX/cpuid-x86.s XXX/sha1-ssse3-x86.s \
 	XXX/sha256-ssse3-x86.s XXX/sha512-ssse3-x86.s XXX/aes-ssse3-x86.s
 
 X86_64_FILES=XXX/aesni-x86_64.s XXX/cpuid-x86_64.s XXX/ghash-x86_64.s \
-	XXX/sha1-ssse3-x86_64.s XXX/sha512-ssse3-x86_64.s XXX/aes-ssse3-x86_64.s
+	XXX/sha1-ssse3-x86_64.s XXX/sha512-ssse3-x86_64.s XXX/aes-ssse3-x86_64.s \
+	XXX/aesni-gcm-x86_64.s
 
 X86_PADLOCK_FILES=XXX/e_padlock-x86.s
 X86_64_PADLOCK_FILES=XXX/e_padlock-x86_64.s
@@ -237,25 +237,25 @@ lib/accelerated/x86/files.mk: $(ASM_SOURCES_ELF)
 # Appro's code
 lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl .submodule.stamp 
 	cat $<.license > $@
-	perl $< elf >> $@
+	CC=gcc perl $< elf >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl .submodule.stamp 
 	cat $<.license > $@
-	perl $< coff >> $@
+	CC=gcc perl $< coff >> $@
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl .submodule.stamp 
 	cat $<.license > $@
-	perl $< mingw64 >> $@
+	CC=gcc perl $< mingw64 >> $@
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl .submodule.stamp 
 	cat $<.license > $@
-	perl $< macosx >> $@
+	CC=gcc perl $< macosx >> $@
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@

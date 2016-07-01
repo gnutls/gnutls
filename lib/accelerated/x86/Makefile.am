@@ -50,7 +50,7 @@ include files.mk
 
 if ASM_X86_64
 AM_CFLAGS += -DASM_X86_64 -DASM_X86
-libx86_la_SOURCES += aes-gcm-x86-pclmul.c
+libx86_la_SOURCES += aes-gcm-x86-pclmul.c aes-gcm-x86-pclmul-avx.c
 
 if WINDOWS
 libx86_la_SOURCES += $(X86_64_FILES_COFF)

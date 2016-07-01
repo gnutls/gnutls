@@ -51,10 +51,19 @@ if test $ret != 0; then
 	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x8 ${PROG}
+#AESNI+PCLMUL
+GNUTLS_CPUID_OVERRIDE=0xA ${PROG}
 ret=$?
 if test $ret != 0; then
 	echo "PCLMUL cipher tests failed"
+	exit $ret
+fi
+
+#AESNI+PCLMUL+AVX
+GNUTLS_CPUID_OVERRIDE=0x1A ${PROG}
+ret=$?
+if test $ret != 0; then
+	echo "PCLMUL-AVX cipher tests failed"
 	exit $ret
 fi
 

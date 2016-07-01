@@ -35,6 +35,12 @@ void aesni_ctr32_encrypt_blocks(const unsigned char *in,
 				const void *key,
 				const unsigned char *ivec);
 
+size_t aesni_gcm_encrypt(const void *inp, void *out, size_t len,
+	const AES_KEY *key, const unsigned char iv[16], uint64_t* Xi);
+
+size_t aesni_gcm_decrypt(const void *inp, void *out, size_t len,
+	const AES_KEY *key, const unsigned char iv[16], uint64_t* Xi);
+
 int vpaes_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);  
 int vpaes_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
 void vpaes_cbc_encrypt(const unsigned char *in, unsigned char *out,
@@ -43,6 +49,7 @@ void vpaes_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *k
 void vpaes_decrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_pclmul;
+extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_pclmul_avx;
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_aesni;
 extern const gnutls_crypto_cipher_st _gnutls_aes_ccm_x86_aesni;
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_ssse3;

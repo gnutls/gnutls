@@ -60,6 +60,14 @@ unsigned int _gnutls_x86_cpuid_s[4];
 # define bit_AES 0x2000000
 #endif
 
+#ifndef bit_AVX
+# define bit_AVX 0x10000000
+#endif
+
+#ifndef bit_MOVBE
+# define bit_MOVBE 0x00400000
+#endif
+
 #define via_bit_PADLOCK (0x3 << 6)
 #define via_bit_PADLOCK_PHE (0x3 << 10)
 #define via_bit_PADLOCK_PHE_SHA512 (0x3 << 25)
@@ -70,6 +78,7 @@ unsigned int _gnutls_x86_cpuid_s[4];
 #define INTEL_AES_NI (1<<1)
 #define INTEL_SSSE3 (1<<2)
 #define INTEL_PCLMUL (1<<3)
+#define INTEL_AVX (1<<4)
 #define VIA_PADLOCK (1<<20)
 #define VIA_PADLOCK_PHE (1<<21)
 #define VIA_PADLOCK_PHE_SHA512 (1<<22)
@@ -104,6 +113,15 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 		}
 	}
 
+	if (capabilities & INTEL_AVX) {
+		if ((b & bit_AVX) && (b & bit_MOVBE)) {
+			_gnutls_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
+		} else {
+			_gnutls_debug_log
+			    ("AVX acceleration requested but not available\n");
+		}
+	}
+
 	if (capabilities & INTEL_PCLMUL) {
 		if (b & bit_PCLMUL) {
 			_gnutls_x86_cpuid_s[1] |= bit_PCLMUL;
@@ -126,6 +144,11 @@ static unsigned check_ssse3(void)
 }
 
 #ifdef ASM_X86_64
+static unsigned check_avx_movbe(void)
+{
+	return ((_gnutls_x86_cpuid_s[1] & bit_AVX) && (_gnutls_x86_cpuid_s[1] & bit_MOVBE));
+}
+
 static unsigned check_pclmul(void)
 {
 	return (_gnutls_x86_cpuid_s[1] & bit_PCLMUL);
@@ -613,22 +636,42 @@ void register_x86_intel_crypto(unsigned capabilities)
 #ifdef ASM_X86_64
 		if (check_pclmul()) {
 			/* register GCM ciphers */
-			_gnutls_debug_log
-			    ("Intel GCM accelerator was detected\n");
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_128_GCM, 80,
-			     &_gnutls_aes_gcm_pclmul, 0);
-			if (ret < 0) {
-				gnutls_assert();
-			}
+			if (check_avx_movbe()) {
+				_gnutls_debug_log
+				    ("Intel GCM accelerator (AVX) was detected\n");
+				ret =
+				    gnutls_crypto_single_cipher_register
+				    (GNUTLS_CIPHER_AES_128_GCM, 80,
+				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				if (ret < 0) {
+					gnutls_assert();
+				}
 
-			ret =
-			    gnutls_crypto_single_cipher_register
-			    (GNUTLS_CIPHER_AES_256_GCM, 80,
-			     &_gnutls_aes_gcm_pclmul, 0);
-			if (ret < 0) {
-				gnutls_assert();
+				ret =
+				    gnutls_crypto_single_cipher_register
+				    (GNUTLS_CIPHER_AES_256_GCM, 80,
+				     &_gnutls_aes_gcm_pclmul_avx, 0);
+				if (ret < 0) {
+					gnutls_assert();
+				}
+			} else {
+				_gnutls_debug_log
+				    ("Intel GCM accelerator was detected\n");
+				ret =
+				    gnutls_crypto_single_cipher_register
+				    (GNUTLS_CIPHER_AES_128_GCM, 80,
+				     &_gnutls_aes_gcm_pclmul, 0);
+				if (ret < 0) {
+					gnutls_assert();
+				}
+
+				ret =
+				    gnutls_crypto_single_cipher_register
+				    (GNUTLS_CIPHER_AES_256_GCM, 80,
+				     &_gnutls_aes_gcm_pclmul, 0);
+				if (ret < 0) {
+					gnutls_assert();
+				}
 			}
 		} else
 #endif
@@ -665,7 +708,7 @@ void register_x86_crypto(void)
 	if (p) {
 		capabilities = strtol(p, NULL, 0);
 	}
-	
+
 	register_x86_intel_crypto(capabilities);
 #ifdef ENABLE_PADLOCK
 	register_x86_padlock_crypto(capabilities);

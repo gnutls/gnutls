@@ -72,7 +72,4 @@ gnutls_have_cpuid:
 .size	gnutls_have_cpuid,.-.L_gnutls_have_cpuid_begin
 .byte	67,80,85,73,68,32,102,111,114,32,120,56,54,0
 
-
 .section .note.GNU-stack,"",%progbits
-
-
