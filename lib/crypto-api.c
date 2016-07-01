@@ -713,7 +713,7 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 		return gnutls_assert_val(ret);
 
 	/* That assumes that AEAD ciphers are stream */
-	*ptext_len = ctext_len;
+	*ptext_len = ctext_len - tag_size;
 
 	return 0;
 }

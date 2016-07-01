@@ -550,7 +550,7 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 				    gnutls_assert_val
 				    (GNUTLS_E_SELF_TEST_ERROR);
 
-			if (s2 != vectors[i].tag_size+vectors[i].plaintext_size && memcmp(tmp, vectors[i].plaintext, vectors[i].plaintext_size) != 0) {
+			if (s2 != vectors[i].plaintext_size && memcmp(tmp, vectors[i].plaintext, vectors[i].plaintext_size) != 0) {
 				_gnutls_debug_log("%s test vector %d failed (decryption)!\n",
 					gnutls_cipher_get_name(cipher), i);
 				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
