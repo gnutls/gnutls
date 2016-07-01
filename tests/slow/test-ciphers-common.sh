@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Copyright (C) 2014 Red Hat, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
@@ -20,7 +18,6 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-PROG=./cipher-test${EXEEXT}
 unset RETCODE
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"

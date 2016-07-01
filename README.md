@@ -77,13 +77,13 @@ and polarssl.
 
 Debian/Ubuntu:
 ```
-apt-get install -y valgrind libasan1 nodejs softhsm datefudge lcov
+apt-get install -y valgrind libasan1 nodejs softhsm datefudge lcov libssl-dev
 apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker
 ```
 
 Fedora/RHEL:
 ```
-yum install -y valgrind libasan nodejs softhsm datefudge lcov
+yum install -y valgrind libasan nodejs softhsm datefudge lcov openssl-devel
 yum install -y dieharder mbedtls-utils openssl abi-compliance-checker
 ```
 
