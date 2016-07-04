@@ -445,6 +445,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 	FIND_OBJECT(pkey);
 
+	pkey->pk_algorithm = GNUTLS_PK_UNKNOWN;
 	a[0].type = CKA_KEY_TYPE;
 	a[0].value = &key_type;
 	a[0].value_len = sizeof(key_type);
@@ -452,12 +453,13 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, a, 1)
 	    == CKR_OK) {
 		pkey->pk_algorithm = key_type_to_pk(key_type);
-		if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
-			_gnutls_debug_log
-			    ("Cannot determine PKCS #11 key algorithm\n");
-			ret = GNUTLS_E_UNKNOWN_ALGORITHM;
-			goto cleanup;
-		}
+	}
+
+	if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
+		_gnutls_debug_log
+		    ("Cannot determine PKCS #11 key algorithm\n");
+		ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+		goto cleanup;
 	}
 
 	a[0].type = CKA_ALWAYS_AUTHENTICATE;
