@@ -60,10 +60,11 @@ check_PROGRAMS += cipher-openssl-compat
 TESTS += test-ciphers-openssl.sh
 endif
 
-EXTRA_DIST = README
+EXTRA_DIST = README gnutls-asan.supp
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
+	ASAN_OPTIONS=suppressions=gnutls-asan.supp		\
 	OPENSSL_ia32cap=0x00000000				\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
