@@ -64,6 +64,7 @@ EXTRA_DIST = README
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
+	OPENSSL_ia32cap=0x00000000				\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
 
