@@ -1,9 +1,12 @@
 GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2000-2015 Free Software Foundation, Inc.
-Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
+Copyright (C) 2000-2016 Free Software Foundation, Inc.
+Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.4.14 (unreleased)
+* Version 3.4.14 (released 2016-06-06)
+
+** libgnutls: Address issue when utilizing the p11-kit trust store
+   for certificate verification (GNUTLS-SA-2016-2).
 
 ** libgnutls: Fixed DTLS handshake packet reconstruction. Reported by
    Guillaume Roguez.
