@@ -23,6 +23,11 @@ Build and Check with asan:
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
 Build and Check with C99 and ubsan:
   script:
   - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
@@ -35,6 +40,11 @@ Build and Check with C99 and ubsan:
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
 Build and Check - separate build dir (x86):
   script:
   - make autoreconf && mkdir -p build && cd build &&
@@ -47,6 +57,11 @@ Build and Check - separate build dir (x86):
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - build/tests/*.log
+      - build/tests/*/*.log
 Build and Check - without SSL 3.0:
   script:
   - make autoreconf && mkdir -p build && cd build &&
@@ -58,10 +73,15 @@ Build and Check - without SSL 3.0:
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - build/tests/*.log
+      - build/tests/*/*.log
 Build with ABI-check (x86-64):
   script:
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 && make abi-check
+    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 && make abi-check 
   tags:
   - x86-64
   - nettle3
@@ -79,6 +99,11 @@ Build and Check - clang:
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
 Build and Check in FIPS140-2 mode:
   script:
   - make autoreconf && mkdir -p build && cd build &&
@@ -89,6 +114,11 @@ Build and Check in FIPS140-2 mode:
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - build/tests/*.log
+      - build/tests/*/*.log
 Release build for windows DLLs:
   script:
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
@@ -120,6 +150,11 @@ Build and Check for windows in separate build dir:
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - build/tests/*.log
+      - build/tests/*/*.log
 Build and Check with valgrind:
   script:
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
@@ -130,6 +165,11 @@ Build and Check with valgrind:
   - linux
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
 Build and Check on FreeBSD:
   script:
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
@@ -138,3 +178,8 @@ Build and Check on FreeBSD:
   - freebsd
   except:
   - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
