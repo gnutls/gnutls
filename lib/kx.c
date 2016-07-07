@@ -197,6 +197,8 @@ generate_normal_master(gnutls_session_t session,
 		gnutls_free(shash.data);
 	}
 
+	write_nss_key_log(session, premaster);
+
 	if (!keep_premaster)
 		_gnutls_free_temp_key_datum(premaster);
 
@@ -207,8 +209,6 @@ generate_normal_master(gnutls_session_t session,
 			 _gnutls_bin2hex(session->security_parameters.
 					 master_secret, GNUTLS_MASTER_SIZE,
 					 buf, sizeof(buf), NULL));
-
-	write_nss_key_log(session, premaster);
 
 	return ret;
 }
