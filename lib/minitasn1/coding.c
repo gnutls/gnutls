@@ -369,7 +369,7 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
       else
 	{
 	  first = 0;
-	  for (k = 4; k >= 0; k--)
+	  for (k = sizeof(val); k >= 0; k--)
 	    {
 	      bit7 = (val >> (k * 7)) & 0x7F;
 	      if (bit7 || first || !k)
