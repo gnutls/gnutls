@@ -7,6 +7,8 @@
 *.o
 *.plist
 *~
+*.tmp
+*.swp
 suppressions.valgrind
 .deps
 .libs
@@ -15,6 +17,7 @@ INSTALL
 ChangeLog
 Makefile
 Makefile.in
+Makefile.user
 TAGS
 aclocal.m4
 autom4te.cache/
@@ -213,6 +216,7 @@ gl/tests/arg-nonnull.h
 gl/tests/arpa/
 gl/tests/c++defs.h
 gl/tests/fcntl.h
+gl/tests/ctype.h
 gl/tests/glthread/.dirstamp
 gl/tests/glthread/glthread
 gl/tests/inttypes.h
