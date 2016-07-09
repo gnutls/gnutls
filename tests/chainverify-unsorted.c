@@ -654,6 +654,17 @@ void doit(void)
 	/* Chain 2 */
 	data.data = (void *) chain2;
 	data.size = sizeof(chain2);
+
+	/* verify whether the GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED flag is
+	 * considered by gnutls_x509_crt_list_import2() */
+	ret =
+		gnutls_x509_crt_list_import2(&crts, &crts_size, &data,
+					 GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
+	if (ret != GNUTLS_E_CERTIFICATE_LIST_UNSORTED) {
+		fail("gnutls_x509_crt_list_import2 with flag GNUTLS_E_CERTIFICATE_LIST_UNSORTED on unsorted chain didn't fail: %s\n",  gnutls_strerror(ret));
+		exit(1);
+	}
+
 	ret =
 	    gnutls_x509_crt_list_import2(&crts, &crts_size, &data,
 					 GNUTLS_X509_FMT_PEM, 0);
