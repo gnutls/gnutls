@@ -3336,7 +3336,7 @@ gnutls_x509_crt_list_import2(gnutls_x509_crt_t ** certs,
 
 	ret =
 	    gnutls_x509_crt_list_import(*certs, &init, data, format,
-					GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+					flags | GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
 	if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		*certs =
 		    gnutls_realloc_fast(*certs,
