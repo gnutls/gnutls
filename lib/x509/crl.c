@@ -1221,7 +1221,7 @@ gnutls_x509_crl_list_import2(gnutls_x509_crl_t ** crls,
 
 	ret =
 	    gnutls_x509_crl_list_import(*crls, &init, data, format,
-					GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+					flags | GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
 	if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		*crls =
 		    gnutls_realloc_fast(*crls,
