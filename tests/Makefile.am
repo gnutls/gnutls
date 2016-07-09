@@ -114,6 +114,11 @@ if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
 endif
 
+if HAVE_CMOCKA
+LDADD += $(CMOCKA_LIBS)
+ctests += dtls-sliding-window
+endif
+
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
 # These tests need gnulib for memmem()

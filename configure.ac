@@ -415,6 +415,9 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
+PKG_CHECK_MODULES(CMOCKA, cmocka, [with_cmocka=yes], [with_cmocka=no])
+AM_CONDITIONAL(HAVE_CMOCKA, test "$with_cmocka" != "no")
+
 AC_ARG_WITH(idn, AS_HELP_STRING([--without-idn],
                                  [disable support for libidn]),
             try_libidn="$withval", 
