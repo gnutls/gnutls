@@ -414,7 +414,7 @@ gnutls_x509_crt_set_crq_extension_by_oid(gnutls_x509_crt_t crt,
 /**
  * gnutls_x509_crt_set_extension_by_oid:
  * @crt: a certificate of type #gnutls_x509_crt_t
- * @oid: holds an Object Identified in null terminated string
+ * @oid: holds an Object Identifier in null terminated string
  * @buf: a pointer to a DER encoded data
  * @sizeof_buf: holds the size of @buf
  * @critical: should be non-zero if the extension is to be marked as critical

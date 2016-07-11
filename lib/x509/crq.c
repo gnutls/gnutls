@@ -3020,3 +3020,46 @@ int gnutls_x509_crq_set_tlsfeatures(gnutls_x509_crq_t crq,
 
 	return ret;
 }
+
+/**
+ * gnutls_x509_crq_set_extension_by_oid:
+ * @crq: a certificate of type #gnutls_x509_crq_t
+ * @oid: holds an Object Identifier in null terminated string
+ * @buf: a pointer to a DER encoded data
+ * @sizeof_buf: holds the size of @buf
+ * @critical: should be non-zero if the extension is to be marked as critical
+ *
+ * This function will set an the extension, by the specified OID, in
+ * the certificate request.  The extension data should be binary data DER
+ * encoded.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crq_set_extension_by_oid(gnutls_x509_crq_t crq,
+				     const char *oid, const void *buf,
+				     size_t sizeof_buf,
+				     unsigned int critical)
+{
+	int result;
+	gnutls_datum_t der_data;
+
+	der_data.data = (void *) buf;
+	der_data.size = sizeof_buf;
+
+	if (crq == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result =
+	    _gnutls_x509_crq_set_extension(crq, oid, &der_data, critical);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+
+}

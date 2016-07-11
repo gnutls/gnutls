@@ -1238,6 +1238,12 @@ int gnutls_x509_crq_get_version(gnutls_x509_crq_t crq);
 int gnutls_x509_crq_set_key(gnutls_x509_crq_t crq,
 			    gnutls_x509_privkey_t key);
 
+int
+gnutls_x509_crq_set_extension_by_oid(gnutls_x509_crq_t crq,
+				     const char *oid, const void *buf,
+				     size_t sizeof_buf,
+				     unsigned int critical);
+
 int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 					   const char *pass);
 int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq_t crq,
