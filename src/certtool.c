@@ -295,6 +295,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 			get_oid_crt_set(crt);
 			get_key_purpose_set(TYPE_CRT, crt);
+			get_extensions_crt_set(TYPE_CRT, crt);
 
 			if (!batch)
 				fprintf(stderr,
@@ -1985,6 +1986,7 @@ void generate_request(common_info_st * cinfo)
 	get_ip_addr_set(TYPE_CRQ, crq);
 	get_email_set(TYPE_CRQ, crq);
 	get_other_name_set(TYPE_CRQ, crq);
+	get_extensions_crt_set(TYPE_CRQ, crq);
 
 	pass = get_challenge_pass();
 

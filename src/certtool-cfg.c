@@ -97,6 +97,8 @@ static struct cfg_options available_options[] = {
 	{ .name = "nc_permit_ip", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_permit_email", .type = OPTION_MULTI_LINE },
 	{ .name = "dn_oid", .type = OPTION_MULTI_LINE },
+	{ .name = "add_extension", .type = OPTION_MULTI_LINE },
+	{ .name = "add_critical_extension", .type = OPTION_MULTI_LINE },
 	{ .name = "crl_dist_points", .type = OPTION_MULTI_LINE },
 	{ .name = "ocsp_uri", .type = OPTION_MULTI_LINE },
 	{ .name = "ca_issuers_uri", .type = OPTION_MULTI_LINE },
@@ -172,6 +174,8 @@ typedef struct _cfg_ctx {
 	char **other_name_octet;
 	char **xmpp_name;
 	char **dn_oid;
+	char **extensions;
+	char **crit_extensions;
 	char **permitted_nc_ip;
 	char **excluded_nc_ip;
 	char **permitted_nc_dns;
@@ -485,6 +489,9 @@ int template_parse(const char *template)
 	READ_MULTI_LINE("nc_permit_email", cfg.permitted_nc_email);
 
 	READ_MULTI_LINE_TOKENIZED("dn_oid", cfg.dn_oid);
+
+	READ_MULTI_LINE_TOKENIZED("add_extension", cfg.extensions);
+	READ_MULTI_LINE_TOKENIZED("add_critical_extension", cfg.crit_extensions);
 
 	READ_MULTI_LINE("crl_dist_points", cfg.crl_dist_points);
 
@@ -1215,6 +1222,88 @@ void get_oid_crt_set(gnutls_x509_crt_t crt)
 
 			if (ret < 0) {
 				fprintf(stderr, "set_dn_oid: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+	}
+}
+
+void get_extensions_crt_set(int type, void *crt)
+{
+	int ret, i;
+	unsigned char *raw = NULL;
+	unsigned raw_size;
+	char *p;
+
+	if (batch) {
+		if (!cfg.extensions)
+			return;
+		for (i = 0; cfg.extensions[i] != NULL; i += 2) {
+			if (cfg.extensions[i + 1] == NULL) {
+				fprintf(stderr,
+					"extensions: %s does not have an argument.\n",
+					cfg.extensions[i]);
+				exit(1);
+			}
+
+			/* convert hex to bin */
+			if (strncmp(cfg.extensions[i+1], "0x", 2) == 0)
+				p = cfg.extensions[i+1]+2;
+			else
+				p = cfg.extensions[i+1];
+			HEX_DECODE(p, raw, raw_size);
+
+			if (type == TYPE_CRT)
+				ret =
+				    gnutls_x509_crt_set_extension_by_oid(crt,
+							  cfg.extensions[i],
+							  raw, raw_size, 0);
+			else
+				ret =
+				    gnutls_x509_crq_set_extension_by_oid(crt,
+							  cfg.extensions[i],
+							  raw, raw_size, 0);
+
+			gnutls_free(raw);
+			if (ret < 0) {
+				fprintf(stderr, "set_extensions: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		if (!cfg.crit_extensions)
+			return;
+		for (i = 0; cfg.crit_extensions[i] != NULL; i += 2) {
+			if (cfg.crit_extensions[i + 1] == NULL) {
+				fprintf(stderr,
+					"extensions: %s does not have an argument.\n",
+					cfg.crit_extensions[i]);
+				exit(1);
+			}
+			/* convert hex to bin */
+			if (strncmp(cfg.crit_extensions[i+1], "0x", 2) == 0)
+				p = cfg.crit_extensions[i+1]+2;
+			else
+				p = cfg.crit_extensions[i+1];
+			HEX_DECODE(p, raw, raw_size);
+
+			if (type == TYPE_CRT)
+				ret =
+				    gnutls_x509_crt_set_extension_by_oid(crt,
+							  cfg.crit_extensions[i],
+							  raw, raw_size, 1);
+			else
+				ret =
+				    gnutls_x509_crq_set_extension_by_oid(crt,
+							  cfg.crit_extensions[i],
+							  raw, raw_size, 1);
+
+			gnutls_free(raw);
+
+			if (ret < 0) {
+				fprintf(stderr, "set_extensions: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
