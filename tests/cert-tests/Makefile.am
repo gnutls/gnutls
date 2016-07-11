@@ -47,7 +47,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/name-constraints-ip2.pem data/chain-md5.pem data/gost-cert.pem \
 	templates/template-tlsfeature.tmpl \
 	data/template-tlsfeature.pem data/template-tlsfeature.csr \
-	templates/template-tlsfeature-crq.tmpl
+	templates/template-tlsfeature-crq.tmpl templates/arb-extensions.tmpl data/arb-extensions.pem \
+	data/arb-extensions.csr
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -63,7 +64,7 @@ endif
 
 if !WINDOWS
 dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
-	tlsfeature-test
+	tlsfeature-test template-exts-test
 endif
 
 if ENABLE_DANE
