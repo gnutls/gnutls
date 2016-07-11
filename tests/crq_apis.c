@@ -64,6 +64,7 @@ static gnutls_x509_crq_t generate_crq(void)
 	size_t s = 0;
 	char smallbuf[10];
 	gnutls_datum_t out;
+	unsigned crit;
 
 	ret = gnutls_x509_privkey_init(&pkey);
 	if (ret != 0)
@@ -178,6 +179,19 @@ static gnutls_x509_crq_t generate_crq(void)
 	if (ret != 0)
 		fail("gnutls_x509_crq_set_key_purpose_oid2 %d\n", ret);
 
+#define EXT_ID1 "1.2.3.4.5"
+#define EXT_ID2 "1.5.3.555555991.5"
+#define EXT_DATA1 "\xCA\xFE\xFF"
+#define EXT_DATA2 "\xCA\xFE\xFF\xFA\xFE"
+	/* test writing arbitrary extensions */
+	ret = gnutls_x509_crq_set_extension_by_oid(crq, EXT_ID1, EXT_DATA1, sizeof(EXT_DATA1)-1, 0);
+	if (ret != 0)
+		fail("gnutls_x509_crq_set_extension_by_oid %s\n", gnutls_strerror(ret));
+
+	ret = gnutls_x509_crq_set_extension_by_oid(crq, EXT_ID2, EXT_DATA2, sizeof(EXT_DATA2)-1, 1);
+	if (ret != 0)
+		fail("gnutls_x509_crq_set_extension_by_oid %s\n", gnutls_strerror(ret));
+
 	ret = gnutls_x509_crq_print(crq, GNUTLS_CRT_PRINT_FULL, &out);
 	if (ret != 0)
 		fail("gnutls_x509_crq_print\n");
@@ -190,6 +204,35 @@ static gnutls_x509_crq_t generate_crq(void)
 		fail("gnutls_x509_crq_sign2: %s\n", gnutls_strerror(ret));
 
 	gnutls_x509_privkey_deinit(pkey);
+
+	/* test reading the arb. extensions */
+	crit = -1;
+	ret = gnutls_x509_crq_get_extension_by_oid2(crq, EXT_ID1, 0, &out, &crit);
+	if (ret < 0)
+		fail("gnutls_x509_crq_get_extension_by_oid2: %s\n", gnutls_strerror(ret));
+
+	if (out.size != sizeof(EXT_DATA1)-1 || memcmp(out.data, EXT_DATA1, out.size) != 0) {
+		fail("ext1 doesn't match\n");
+	}
+	if (crit != 0) {
+		fail("ext1 crit flag doesn't match\n");
+	}
+	gnutls_free(out.data);
+
+	crit = -1;
+	ret = gnutls_x509_crq_get_extension_by_oid2(crq, EXT_ID2, 0, &out, &crit);
+	if (ret < 0)
+		fail("gnutls_x509_crq_get_extension_by_oid2: %s\n", gnutls_strerror(ret));
+
+	if (out.size != sizeof(EXT_DATA2)-1 || memcmp(out.data, EXT_DATA2, out.size) != 0) {
+		fail("ext2 doesn't match\n");
+	}
+	if (crit != 1) {
+		fail("ext2 crit flag doesn't match\n");
+	}
+
+	gnutls_free(out.data);
+
 	return crq;
 }
 
