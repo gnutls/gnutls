@@ -30,7 +30,7 @@ which is only run during development.
 
   Files are split to directories according to the subsystem
 they belong to. Examples are x509/, minitasn1/, openpgp/,
-opencdk/ etc. The files in the root directory are of concern
+opencdk/ etc. The files in the root directory related
 to the main TLS protocol implementation.
 
 
@@ -50,24 +50,24 @@ using GNU indent, e.g. "indent -linux *.c".
 
 # Function names:
 
-  All the function names use underscore "_", to separate words,
-functions like gnutlsDoThat are not used. The exported function names
-usually start with "gnutls_" prefix, and the words that follow
-specify the exact part of gnutls that this function refers to.
-E.g. "gnutls_x509_crt_get_dn", refers to the X.509
+  All the function names use underscore ```_```, to separate words,
+functions like ```gnutlsDoThat``` are not used. The exported function names
+usually start with the ```gnutls_``` prefix, and the words that follow
+specify the exact subsystem of gnutls that this function refers to.
+E.g. ```gnutls_x509_crt_get_dn```, refers to the X.509
 certificate parsing part of gnutls. Currently used prefixes are:
-"gnutls_x509_crt_" for the X.509 certificate part
-"gnutls_openpgp_key_" for the openpgp key part
-"gnutls_session_" for the TLS session part (but this may be omited)
-"gnutls_handshake_" for the TLS handshake part
-"gnutls_record_" for the TLS record protocol part
-"gnutls_alert_" for the TLS alert protocol part
-"gnutls_credentials_" for the credentials structures
-"gnutls_global_" for the global structures handling
+```gnutls_x509_crt_``` for the X.509 certificate part
+```gnutls_openpgp_key_``` for the openpgp key part
+```gnutls_session_``` for the TLS session part (but this may be omited)
+```gnutls_handshake_``` for the TLS handshake part
+```gnutls_record_``` for the TLS record protocol part
+```gnutls_alert_``` for the TLS alert protocol part
+```gnutls_credentials_``` for the credentials structures
+```gnutls_global_``` for the global structures handling
 and probably more.
 
 Internal functions -- that are not exported in the API -- should
-be prefixed with an underscore. E.g. _gnutls_handshake_begin()
+be prefixed with an underscore. E.g. ```_gnutls_handshake_begin()```
 
 Internal structures should not be exported. Especially pointers to
 internal data. Doing so harms future reorganization/rewrite of subsystems.
@@ -78,16 +78,16 @@ in order to be exported.
 
 # Constructed types:
 
-  The constructed types in gnutls always have the "gnutls_" prefix.
+  The constructed types in gnutls always have the ```gnutls_``` prefix.
 Definitions, value defaults and enumerated values should be in
-capitals. E.g. GNUTLS_CIPHER_3DES_CBC
+capitals. E.g. ```GNUTLS_CIPHER_3DES_CBC```.
 
-Structures should have the '_st' suffix in their name even
+Structures should have the ```_st``` suffix in their name even
 if they are a typedef. One can use the sizeof() on types with 
-'_st' as suffix.
+```_st``` as suffix to get the structure's size.
 
-Other constructed types should have the '_t' suffix. A pointer
-to a structure also has the '_t' suffix.
+Other constructed types should have the ```_t``` suffix. A pointer
+to a structure also has the ```_t``` suffix.
 
 
 # Function parameters:
