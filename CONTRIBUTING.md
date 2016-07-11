@@ -55,16 +55,16 @@ functions like ```gnutlsDoThat``` are not used. The exported function names
 usually start with the ```gnutls_``` prefix, and the words that follow
 specify the exact subsystem of gnutls that this function refers to.
 E.g. ```gnutls_x509_crt_get_dn```, refers to the X.509
-certificate parsing part of gnutls. Currently used prefixes are:
-```gnutls_x509_crt_``` for the X.509 certificate part
-```gnutls_openpgp_key_``` for the openpgp key part
-```gnutls_session_``` for the TLS session part (but this may be omited)
-```gnutls_handshake_``` for the TLS handshake part
-```gnutls_record_``` for the TLS record protocol part
-```gnutls_alert_``` for the TLS alert protocol part
-```gnutls_credentials_``` for the credentials structures
-```gnutls_global_``` for the global structures handling
-and probably more.
+certificate parsing part of gnutls. Some of the used prefixes are the
+following.
+ * ```gnutls_x509_crt_``` for the X.509 certificate part
+ * ```gnutls_openpgp_key_``` for the openpgp key part
+ * ```gnutls_session_``` for the TLS session part (but this may be omited)
+ * ```gnutls_handshake_``` for the TLS handshake part
+ * ```gnutls_record_``` for the TLS record protocol part
+ * ```gnutls_alert_``` for the TLS alert protocol part
+ * ```gnutls_credentials_``` for the credentials structures
+ * ```gnutls_global_``` for the global structures handling
 
 Internal functions -- that are not exported in the API -- should
 be prefixed with an underscore. E.g. ```_gnutls_handshake_begin()```
