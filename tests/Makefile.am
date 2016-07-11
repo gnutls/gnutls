@@ -116,14 +116,18 @@ endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
+# These tests need gnulib for memmem()
 resume_psk_CFLAGS = -DUSE_PSK
 resume_psk_SOURCES = resume.c
+resume_psk_LDADD = $(LDADD) ../gl/libgnu.la
 
 resume_anon_CFLAGS = -DUSE_ANON
 resume_anon_SOURCES = resume.c
+resume_anon_LDADD = $(LDADD) ../gl/libgnu.la
 
 resume_x509_CFLAGS = -DUSE_X509
 resume_x509_SOURCES = resume.c
+resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
 
 dtls1_2_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls1.2-cert-key-exchange.c common-cert-key-exchange.h
 dtls1_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls1.0-cert-key-exchange.c common-cert-key-exchange.h
