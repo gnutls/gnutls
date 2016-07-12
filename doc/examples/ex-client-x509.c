@@ -65,8 +65,6 @@ int main(void)
          */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
-        gnutls_session_set_ptr(session, (void *) "my_host_name");
-
         CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
                                      strlen("my_host_name")));
 
