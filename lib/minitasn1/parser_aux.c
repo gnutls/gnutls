@@ -549,9 +549,9 @@ _asn1_delete_list_and_nodes (void)
 
 
 char *
-_asn1_ltostr (long v, char str[LTOSTR_MAX_SIZE])
+_asn1_ltostr (int64_t v, char str[LTOSTR_MAX_SIZE])
 {
-  long d, r;
+  int64_t d, r;
   char temp[LTOSTR_MAX_SIZE];
   int count, k, start;
 

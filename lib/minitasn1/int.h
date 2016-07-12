@@ -118,6 +118,12 @@ extern const tag_and_class_st _asn1_tags[];
 #define _asn1_strcpy(a,b) strcpy((char *)a, (const char *)b)
 #define _asn1_strcat(a,b) strcat((char *)a, (const char *)b)
 
+#if SIZEOF_UNSIGNED_LONG_INT == 8
+# define _asn1_strtou64(n,e,b) strtoul((const char *) n, e, b)
+#else
+# define _asn1_strtou64(n,e,b) strtoull((const char *) n, e, b)
+#endif
+
 #define MAX_LOG_SIZE 1024	/* maximum number of characters of a log message */
 
 /* Define used for visiting trees. */

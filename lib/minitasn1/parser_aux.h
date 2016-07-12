@@ -54,7 +54,7 @@ void _asn1_delete_list_and_nodes (void);
 
 /* Max 64-bit integer length is 20 chars + 1 for sign + 1 for null termination */
 #define LTOSTR_MAX_SIZE 22
-char *_asn1_ltostr (long v, char str[LTOSTR_MAX_SIZE]);
+char *_asn1_ltostr (int64_t v, char str[LTOSTR_MAX_SIZE]);
 
 asn1_node _asn1_find_up (asn1_node node);
 
