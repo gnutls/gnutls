@@ -3,6 +3,16 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.3 (unreleased)
+
+** libgnutls: Adopted a simpler with less memory requirements DTLS sliding
+   window implementation. Based on Fridolin Pokorny's implementation for
+   AF_KTLS.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.5.2 (released 2016-07-06)
 
 ** libgnutls: Address issue when utilizing the p11-kit trust store
