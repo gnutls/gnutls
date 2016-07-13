@@ -57,7 +57,7 @@ Fedora/RHEL:
 yum install -y git autoconf libtool gettext-devel automake autogen
 yum install -y nettle-devel p11-kit-devel autogen-libopts-devel
 yum install -y trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl
-yum install -y unbound-devel bison help2man gtk-doc texinfo texlive
+yum install -y libtasn1-tools unbound-devel bison help2man gtk-doc texinfo texlive
 ```
 
 Sometimes, you may need to install more recent versions of Automake,
