@@ -24,6 +24,7 @@ Build and Check with asan:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - tests/*.log
@@ -41,6 +42,7 @@ Build and Check with C99 and ubsan:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - tests/*.log
@@ -58,6 +60,7 @@ Build and Check - separate build dir (x86):
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - build/tests/*.log
@@ -74,6 +77,7 @@ Build and Check - without SSL 3.0:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - build/tests/*.log
@@ -100,6 +104,7 @@ Build and Check - clang:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - tests/*.log
@@ -131,6 +136,7 @@ Release build for windows DLLs:
   only:
   - tags
   artifacts:
+    expire_in: 6 months
     paths:
       - src/*.exe
       - lib/.libs/*.dll
@@ -151,6 +157,7 @@ Build and Check for windows in separate build dir:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - build/tests/*.log
@@ -166,6 +173,7 @@ Build and Check with valgrind:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - tests/*.log
@@ -179,6 +187,7 @@ Build and Check on FreeBSD:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - tests/*.log
