@@ -905,8 +905,11 @@ encryption_key
 
 ### Adding arbitrary extensions
 # This requires to provide the extension OIDs, as well as the extension data in
-# hex format.
+# hex format. The following two options are available since GnuTLS 3.5.3.
 #add_extension = "1.2.3.4 0x0AAB01ACFE"
+
+# As above but encode the data as an octet string
+#add_extension = "1.2.3.4 octet_string(0x0AAB01ACFE)"
 
 # For portability critical extensions shouldn't be set to certificates.
 #add_critical_extension = "5.6.7.8 0x1AAB01ACFE"

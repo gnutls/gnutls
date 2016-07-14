@@ -38,6 +38,7 @@
 #include <autoopts/options.h>
 #include <intprops.h>
 #include <gnutls/crypto.h>
+#include <libtasn1.h>
 
 /* for inet_pton */
 #include <sys/types.h>
@@ -1229,12 +1230,72 @@ void get_oid_crt_set(gnutls_x509_crt_t crt)
 	}
 }
 
+#define ACTION_NONE  0
+#define ENCODE_OCTET_STRING 1
+static unsigned char *decode_ext_string(char *str, unsigned int *ret_size)
+{
+	char *p, *p2;
+	unsigned char *tmp;
+	unsigned char *raw;
+	unsigned int raw_size;
+	unsigned action = ACTION_NONE;
+	unsigned char tag[ASN1_MAX_TL_SIZE];
+	unsigned int tag_len;
+	int ret, res;
+
+	p = strchr(str, '(');
+	if (p != 0) {
+		if (strncmp(str, "octet_string", 12) == 0) {
+			action = ENCODE_OCTET_STRING;
+		} else {
+			fprintf(stderr, "cannot parse: %s\n", str);
+			exit(1);
+		}
+		p++;
+		p2 = strchr(p, ')');
+		if (p2 == NULL) {
+			fprintf(stderr, "there is no terminating parenthesis in: %s\n", str);
+			exit(1);
+		}
+		*p2 = 0;
+	} else {
+		p = str;
+	}
+
+	if (strncmp(p, "0x", 2) == 0)
+		p+=2;
+	HEX_DECODE(p, raw, raw_size);
+
+	switch(action) {
+		case ENCODE_OCTET_STRING:
+			tag_len = sizeof(tag);
+			res = asn1_encode_simple_der(ASN1_ETYPE_OCTET_STRING, raw, raw_size, tag, &tag_len);
+			if (res != ASN1_SUCCESS) {
+				fprintf(stderr, "error in DER encoding: %s\n", asn1_strerror(res));
+				exit(1);
+			}
+			tmp = gnutls_malloc(raw_size+tag_len);
+			if (tmp == NULL) {
+				fprintf(stderr, "error in allocation\n");
+				exit(1);
+			}
+			memcpy(tmp, tag, tag_len);
+			memcpy(tmp+tag_len, raw, raw_size);
+			gnutls_free(raw);
+			raw = tmp;
+			raw_size += tag_len;
+			break;
+	}
+
+	*ret_size = raw_size;
+	return raw;
+}
+
 void get_extensions_crt_set(int type, void *crt)
 {
 	int ret, i;
 	unsigned char *raw = NULL;
 	unsigned raw_size;
-	char *p;
 
 	if (batch) {
 		if (!cfg.extensions)
@@ -1248,11 +1309,7 @@ void get_extensions_crt_set(int type, void *crt)
 			}
 
 			/* convert hex to bin */
-			if (strncmp(cfg.extensions[i+1], "0x", 2) == 0)
-				p = cfg.extensions[i+1]+2;
-			else
-				p = cfg.extensions[i+1];
-			HEX_DECODE(p, raw, raw_size);
+			raw = decode_ext_string(cfg.extensions[i+1], &raw_size);
 
 			if (type == TYPE_CRT)
 				ret =
@@ -1283,11 +1340,7 @@ void get_extensions_crt_set(int type, void *crt)
 				exit(1);
 			}
 			/* convert hex to bin */
-			if (strncmp(cfg.crit_extensions[i+1], "0x", 2) == 0)
-				p = cfg.crit_extensions[i+1]+2;
-			else
-				p = cfg.crit_extensions[i+1];
-			HEX_DECODE(p, raw, raw_size);
+			raw = decode_ext_string(cfg.crit_extensions[i+1], &raw_size);
 
 			if (type == TYPE_CRT)
 				ret =
