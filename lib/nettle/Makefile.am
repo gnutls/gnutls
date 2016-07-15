@@ -42,6 +42,16 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c egd.c egd.h \
 	rnd.c int/rsa-fips.h int/rsa-keygen-fips186.c int/provable-prime.c \
 	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c
 
+if WINDOWS
+libcrypto_la_SOURCES += rnd-windows.c
+else
+if HAVE_GETENTROPY
+libcrypto_la_SOURCES += rnd-getentropy.c
+else
+libcrypto_la_SOURCES += rnd-linux.c
+endif
+endif
+
 if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \
 	int/drbg-aes.c int/drbg-aes.h

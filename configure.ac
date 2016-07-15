@@ -197,6 +197,8 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([
 		   enable_getrandom=getentropy],
 		  [AC_MSG_RESULT(no)])
 
+AM_CONDITIONAL(HAVE_GETENTROPY, test "$enable_getrandom" = "getentropy")
+
 dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS

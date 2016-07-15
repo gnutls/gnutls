@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2010-2016 Free Software Foundation, Inc.
  * Copyright (C) 2015-2016 Red Hat, Inc.
- * Copyright (C) 2000, 2001, 2008 Niels Möller
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,21 +21,15 @@
  *
  */
 
-/* Here are the common parts of the random generator layer. 
- * Some of this code was based on the LSH 
- * random generator (the trivia and device source functions for POSIX)
- * and modified to fit gnutls' needs. Relicenced with permission. 
- * Original author Niels Möller.
+/* The *BSD getentropy() system random generator. The simplest of all.
  */
 
 #include "gnutls_int.h"
 #include "errors.h"
 #include <locks.h>
 #include <num.h>
-#include <nettle/yarrow.h>
 #include <errno.h>
 #include <rnd-common.h>
-#include <hash-pjw-bare.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,35 +38,40 @@
 /* gnulib wants to claim strerror even if it cannot provide it. WTF */
 #undef strerror
 
-#ifdef HAVE_GETRUSAGE
-# ifdef RUSAGE_THREAD
-#  define ARG_RUSAGE RUSAGE_THREAD
-# else
-#  define ARG_RUSAGE RUSAGE_SELF
-# endif
-#endif
+/* The POSIX (Linux-BSD) randomness gatherer.
+ */
 
-get_entropy_func _rnd_get_system_entropy = NULL;
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <fcntl.h>
 
-void _rnd_get_event(struct event_st *e)
+static int _rnd_get_system_entropy_simple(void* _rnd, size_t size)
 {
-	static unsigned count = 0;
-
-	memset(e, 0, sizeof(*e));
-	gettime(&e->now);
-
-#ifdef HAVE_GETRUSAGE
-	if (getrusage(ARG_RUSAGE, &e->rusage) < 0) {
-		_gnutls_debug_log("getrusage failed: %s\n",
-			  strerror(errno));
+	if (getentropy(_rnd, size) < 0) {
+		gnutls_assert();
+		_gnutls_debug_log
+			("Failed to use getentropy: %s\n",
+					 strerror(errno));
+		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
-#endif
+	return 0;
+}
 
-#ifdef HAVE_GETPID
-	e->pid = getpid();
-#endif
-	e->count = count++;
-	e->err = errno;
+int _rnd_system_entropy_init(void)
+{
+	_rnd_get_system_entropy = _rnd_get_system_entropy_simple;
+	return 0;
+}
 
+int _rnd_system_entropy_check(void)
+{
+	return 0;
+}
+
+void _rnd_system_entropy_deinit(void)
+{
 	return;
 }
+

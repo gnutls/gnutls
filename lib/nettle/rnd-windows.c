@@ -42,38 +42,48 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-/* gnulib wants to claim strerror even if it cannot provide it. WTF */
-#undef strerror
+/* The windows randomness gatherer.
+ */
 
-#ifdef HAVE_GETRUSAGE
-# ifdef RUSAGE_THREAD
-#  define ARG_RUSAGE RUSAGE_THREAD
-# else
-#  define ARG_RUSAGE RUSAGE_SELF
-# endif
-#endif
+#include <windows.h>
+#include <wincrypt.h>
 
-get_entropy_func _rnd_get_system_entropy = NULL;
+static HCRYPTPROV device_fd = 0;
 
-void _rnd_get_event(struct event_st *e)
+static
+int _rnd_get_system_entropy_win32(void* rnd, size_t size)
 {
-	static unsigned count = 0;
-
-	memset(e, 0, sizeof(*e));
-	gettime(&e->now);
-
-#ifdef HAVE_GETRUSAGE
-	if (getrusage(ARG_RUSAGE, &e->rusage) < 0) {
-		_gnutls_debug_log("getrusage failed: %s\n",
-			  strerror(errno));
+	if (!CryptGenRandom(device_fd, (DWORD) size, rnd)) {
+		_gnutls_debug_log("Error in CryptGenRandom: %d\n",
+					(int)GetLastError());
+		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
-#endif
 
-#ifdef HAVE_GETPID
-	e->pid = getpid();
-#endif
-	e->count = count++;
-	e->err = errno;
+	return 0;
+}
 
-	return;
+int _rnd_system_entropy_check(void)
+{
+	return 0;
+}
+
+int _rnd_system_entropy_init(void)
+{
+	int old;
+
+	if (!CryptAcquireContext
+		(&device_fd, NULL, NULL, PROV_RSA_FULL,
+		 CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
+		_gnutls_debug_log
+			("error in CryptAcquireContext!\n");
+		return GNUTLS_E_RANDOM_DEVICE_ERROR;
+	}
+
+	_rnd_get_system_entropy = _rnd_get_system_entropy_win32;
+	return 0;
+}
+
+void _rnd_system_entropy_deinit(void)
+{
+	CryptReleaseContext(device_fd, 0);
 }
