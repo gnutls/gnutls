@@ -137,7 +137,8 @@ void _rnd_system_entropy_deinit(void)
 #include "egd.h"
 
 static int _gnutls_urandom_fd = -1;
-static mode_t _gnutls_urandom_fd_mode = 0;
+static ino_t _gnutls_urandom_fd_ino = 0;
+static dev_t _gnutls_urandom_fd_rdev = 0;
 
 static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 {
@@ -202,7 +203,7 @@ int _rnd_system_entropy_check(void)
 	struct stat st;
 
 	ret = fstat(_gnutls_urandom_fd, &st);
-	if (ret < 0 || st.st_mode != _gnutls_urandom_fd_mode) {
+	if (ret < 0 || st.st_ino != _gnutls_urandom_fd_ino || st.st_rdev != _gnutls_urandom_fd_rdev) {
 		return _rnd_system_entropy_init();
 	}
 	return 0;
@@ -224,7 +225,8 @@ int _rnd_system_entropy_init(void)
 		fcntl(_gnutls_urandom_fd, F_SETFD, old | FD_CLOEXEC);
 
 	if (fstat(_gnutls_urandom_fd, &st) >= 0) {
-		_gnutls_urandom_fd_mode = st.st_mode;
+		_gnutls_urandom_fd_ino = st.st_ino;
+		_gnutls_urandom_fd_rdev = st.st_rdev;
 	}
 
 	_rnd_get_system_entropy = _rnd_get_system_entropy_urandom;
@@ -240,7 +242,8 @@ fallback:
 	}
 
 	if (fstat(_gnutls_urandom_fd, &st) >= 0) {
-		_gnutls_urandom_fd_mode = st.st_mode;
+		_gnutls_urandom_fd_ino = st.st_ino;
+		_gnutls_urandom_fd_rdev = st.st_rdev;
 	}
 
 	_rnd_get_system_entropy = _rnd_get_system_entropy_egd;
