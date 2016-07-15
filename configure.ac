@@ -189,7 +189,11 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([
 
 AC_MSG_CHECKING([for getentropy])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([
-	   #include <unistd.h>],[
+	   #include <unistd.h>
+           #ifdef __linux__
+           #error 1
+           #endif
+	   ],[
 		   getentropy(0, 0);
 		  ])],
 		  [AC_MSG_RESULT(yes)
