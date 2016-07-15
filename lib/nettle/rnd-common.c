@@ -187,7 +187,9 @@ void _rnd_system_entropy_deinit(void)
 static unsigned have_getrandom(void)
 {
 	char c;
-	if (getrandom(&c, 1, 0) == 1)
+	int ret;
+	ret = getrandom(&c, 1, 1/*GRND_NONBLOCK*/);
+	if (ret == 1 || (ret == -1 && errno == EAGAIN))
 		return 1;
 	return 0;
 }
