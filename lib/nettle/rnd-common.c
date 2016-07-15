@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2010-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  * Copyright (C) 2000, 2001, 2008 Niels Möller
  *
  * Author: Nikos Mavrogiannopoulos
@@ -37,11 +38,6 @@
 #include <rnd-common.h>
 #include <hash-pjw-bare.h>
 
-#if defined(HAVE_LINUX_GETRANDOM)
-# include <linux/random.h>
-# define getentropy(x, size) getrandom(x, size, 0)
-# define HAVE_GETENTROPY
-#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -178,6 +174,40 @@ void _rnd_system_entropy_deinit(void)
 
 #else /* /dev/urandom - egd approach */
 
+#if defined(__linux)
+# ifdef HAVE_LINUX_GETRANDOM
+#  include <linux/random.h>
+# else
+#  include <sys/syscall.h>
+#  undef getrandom
+#  define getrandom(dst,s,flags) syscall(__NR_getrandom, (void*)dst, (size_t)s, (unsigned int)flags)
+# endif
+
+static unsigned have_getrandom(void)
+{
+	char c;
+	if (getrandom(&c, 1, 0) == 1)
+		return 1;
+	return 0;
+}
+
+static int _rnd_get_system_entropy_getrandom(void* _rnd, size_t size)
+{
+	int ret;
+	ret = getrandom(_rnd, size, 0);
+	if (ret == -1) {
+		gnutls_assert();
+		_gnutls_debug_log
+			("Failed to use getrandom: %s\n",
+					 strerror(errno));
+		return GNUTLS_E_RANDOM_DEVICE_ERROR;
+	}
+	return 0;
+}
+#else
+# define have_getrandom() 0
+#endif
+
 static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 {
 	uint8_t* rnd = _rnd;
@@ -238,6 +268,9 @@ int _rnd_system_entropy_check(void)
 	int ret;
 	struct stat st;
 
+	if (_gnutls_urandom_fd == -1) /* not using urandom */
+		return 0;
+
 	ret = fstat(_gnutls_urandom_fd, &st);
 	if (ret < 0 || st.st_mode != _gnutls_urandom_fd_mode) {
 		return _rnd_system_entropy_init();
@@ -250,6 +283,16 @@ int _rnd_system_entropy_init(void)
 	int old;
 	struct stat st;
 
+#if defined(__linux)
+	/* Enable getrandom() usage if available */
+	if (have_getrandom()) {
+		_rnd_get_system_entropy = _rnd_get_system_entropy_getrandom;
+		_gnutls_debug_log("getrandom random generator was detected\n");
+		return 0;
+	}
+#endif
+
+	/* First fallback: /dev/unrandom */
 	_gnutls_urandom_fd = open("/dev/urandom", O_RDONLY);
 	if (_gnutls_urandom_fd < 0) {
 		_gnutls_debug_log("Cannot open urandom!\n");
@@ -268,6 +311,7 @@ int _rnd_system_entropy_init(void)
 
 	return 0;
 fallback:
+	/* Third fallback: EGD */
 	_gnutls_urandom_fd = _rndegd_connect_socket();
 	if (_gnutls_urandom_fd < 0) {
 		_gnutls_debug_log("Cannot open egd socket!\n");
@@ -280,6 +324,7 @@ fallback:
 		_gnutls_urandom_fd_mode = st.st_mode;
 	}
 
+	_gnutls_debug_log("EGD random generator was detected\n");
 	_rnd_get_system_entropy = _rnd_get_system_entropy_egd;
 	
 	return 0;
