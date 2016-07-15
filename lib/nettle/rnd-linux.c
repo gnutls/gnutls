@@ -83,6 +83,12 @@ static int _rnd_get_system_entropy_getrandom(void* _rnd, size_t size)
 					 strerror(errno));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
+
+	/* This function is only used internally for small sizes which
+	 * should be delivered by getrandom(). */
+	if ((size_t)ret != size)
+		return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
+
 	return 0;
 }
 #else
