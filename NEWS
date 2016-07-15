@@ -9,6 +9,10 @@ See the end for copying conditions.
    window implementation. Based on Fridolin Pokorny's implementation for
    AF_KTLS.
 
+** libgnutls: use getrandom where available via the syscall interface.
+   This works around an issue of not-using getrandom even if it exists
+   since glibc doesn't declare such function.
+
 ** certtool: added the "add_extension" and "add_critical_extension"
    template options. This allows specifying arbitrary extensions into
    certificates and certificate requests.
