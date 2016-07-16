@@ -22,7 +22,7 @@
  */
 
 /* The Linux style system random generator: That is,
- * getrandom() -> /dev/urandom -> EGD, where "->" indicates fallback.
+ * getrandom() -> /dev/urandom, where "->" indicates fallback.
  */
 
 #include "gnutls_int.h"
@@ -47,7 +47,6 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <locks.h>
-#include "egd.h"
 
 static int _gnutls_urandom_fd = -1;
 static ino_t _gnutls_urandom_fd_ino = 0;
@@ -125,31 +124,6 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 	return 0;
 }
 
-static
-int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
-{
-	unsigned int done;
-	uint8_t* rnd = _rnd;
-	int res;
-
-	for (done = 0; done < size;) {
-		res =
-		    _rndegd_read(&_gnutls_urandom_fd, rnd + done, size - done);
-		if (res <= 0) {
-			if (res < 0) {
-				_gnutls_debug_log("Failed to read egd.\n");
-			} else {
-				_gnutls_debug_log("Failed to read egd: end of file\n");
-			}
-
-			return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
-		}
-		done += res;
-	}
-
-	return 0;
-}
-
 int _rnd_system_entropy_check(void)
 {
 	int ret;
@@ -183,7 +157,7 @@ int _rnd_system_entropy_init(void)
 	_gnutls_urandom_fd = open("/dev/urandom", O_RDONLY);
 	if (_gnutls_urandom_fd < 0) {
 		_gnutls_debug_log("Cannot open urandom!\n");
-		goto fallback;
+		return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
 	}
 
 	old = fcntl(_gnutls_urandom_fd, F_GETFD);
@@ -197,25 +171,6 @@ int _rnd_system_entropy_init(void)
 
 	_rnd_get_system_entropy = _rnd_get_system_entropy_urandom;
 
-	return 0;
-fallback:
-	/* Third fallback: EGD */
-	_gnutls_urandom_fd = _rndegd_connect_socket();
-	if (_gnutls_urandom_fd < 0) {
-		_gnutls_debug_log("Cannot open egd socket!\n");
-		return
-			gnutls_assert_val
-			(GNUTLS_E_RANDOM_DEVICE_ERROR);
-	}
-
-	if (fstat(_gnutls_urandom_fd, &st) >= 0) {
-		_gnutls_urandom_fd_ino = st.st_ino;
-		_gnutls_urandom_fd_rdev = st.st_rdev;
-	}
-
-	_gnutls_debug_log("EGD random generator was detected\n");
-	_rnd_get_system_entropy = _rnd_get_system_entropy_egd;
-	
 	return 0;
 }
 
