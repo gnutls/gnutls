@@ -874,3 +874,7 @@ tests/pkcs11/pkcs11-pubkey-import-rsa
 tests/softhsm-*.db/
 tests/status-request-missing
 tests/slow/cipher-openssl-compat
+build-aux/ar-lib
+build-aux/config.rpath
+build-aux/test-driver
+build-aux/ylwrap
