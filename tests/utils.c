@@ -93,13 +93,24 @@ const char *pkcs3_3072 =
 
 void _fail(const char *format, ...)
 {
-	char str[1024];
 	va_list arg_ptr;
 
 	va_start(arg_ptr, format);
-	vsnprintf(str, sizeof(str), format, arg_ptr);
+#ifdef HAVE_VASPRINTF
+	char *str = NULL;
+	vasprintf(&str, format, arg_ptr);
+
+	if (str)
+		fputs(str, stderr);
+#else
+	{
+		char str[1024];
+
+		vsnprintf(str, sizeof(str), format, arg_ptr);
+		fputs(str, stderr);
+	}
+#endif
 	va_end(arg_ptr);
-	fputs(str, stderr);
 	error_count++;
 	exit(1);
 }
