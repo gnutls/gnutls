@@ -196,7 +196,8 @@ crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
  * @err: indicates the error position (if any)
  *
  * This function will set the DN on the provided certificate.
- * The input string should be plain ASCII or UTF-8 encoded.
+ * The input string should be plain ASCII or UTF-8 encoded. On
+ * DN parsing error %GNUTLS_E_PARSING_ERROR is returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -216,7 +217,8 @@ gnutls_x509_crt_set_dn(gnutls_x509_crt_t crt, const char *dn,
  * @err: indicates the error position (if any)
  *
  * This function will set the DN on the provided certificate.
- * The input string should be plain ASCII or UTF-8 encoded.
+ * The input string should be plain ASCII or UTF-8 encoded. On
+ * DN parsing error %GNUTLS_E_PARSING_ERROR is returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -237,7 +239,8 @@ gnutls_x509_crt_set_issuer_dn(gnutls_x509_crt_t crt, const char *dn,
  * @err: indicates the error position (if any)
  *
  * This function will set the DN on the provided certificate.
- * The input string should be plain ASCII or UTF-8 encoded.
+ * The input string should be plain ASCII or UTF-8 encoded. On
+ * DN parsing error %GNUTLS_E_PARSING_ERROR is returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -248,4 +251,37 @@ gnutls_x509_crq_set_dn(gnutls_x509_crq_t crq, const char *dn,
 {
 	return crt_set_dn((set_dn_func) gnutls_x509_crq_set_dn_by_oid, crq,
 			  dn, err);
+}
+
+static
+int set_dn_by_oid(gnutls_x509_dn_t dn, const char *oid, unsigned int raw_flag, const void *name, unsigned name_size)
+{
+	return _gnutls_x509_set_dn_oid(dn->asn, "", oid, raw_flag, name, name_size);
+}
+
+/**
+ * gnutls_x509_dn_set_str:
+ * @dn: a pointer to DN
+ * @str: a comma separated DN string (RFC4514)
+ * @err: indicates the error position (if any)
+ *
+ * This function will set the DN on the provided DN structure.
+ * The input string should be plain ASCII or UTF-8 encoded. On
+ * DN parsing error %GNUTLS_E_PARSING_ERROR is returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.3
+ **/
+int
+gnutls_x509_dn_set_str(gnutls_x509_dn_t dn, const char *str, const char **err)
+{
+	if (dn == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return crt_set_dn((set_dn_func) set_dn_by_oid, dn,
+			  str, err);
 }

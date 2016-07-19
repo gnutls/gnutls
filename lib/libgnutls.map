@@ -1100,6 +1100,7 @@ GNUTLS_3_4
 	gnutls_x509_crt_set_crq_extension_by_oid;
 	gnutls_x509_tlsfeatures_check_crt;
 	gnutls_x509_crq_set_extension_by_oid;
+	gnutls_x509_dn_set_str;
  local:
 	*;
 };

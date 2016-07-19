@@ -684,6 +684,8 @@ int gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn, int irdn,
 			       int iava, gnutls_x509_ava_st * ava);
 
 int gnutls_x509_dn_get_str(gnutls_x509_dn_t dn, gnutls_datum_t *str);
+int
+gnutls_x509_dn_set_str(gnutls_x509_dn_t dn, const char *str, const char **err);
 
 int gnutls_x509_dn_init(gnutls_x509_dn_t * dn);
 

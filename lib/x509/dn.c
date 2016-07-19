@@ -687,9 +687,13 @@ _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
 		return _gnutls_asn2err(result);
 	}
 
-	_gnutls_str_cpy(asn1_rdn_name, sizeof(asn1_rdn_name), asn1_name);
-	_gnutls_str_cat(asn1_rdn_name, sizeof(asn1_rdn_name),
+	if (asn1_name[0] != 0) {
+		_gnutls_str_cpy(asn1_rdn_name, sizeof(asn1_rdn_name), asn1_name);
+		_gnutls_str_cat(asn1_rdn_name, sizeof(asn1_rdn_name),
 			".rdnSequence");
+	} else {
+		_gnutls_str_cpy(asn1_rdn_name, sizeof(asn1_rdn_name), "rdnSequence");
+	}
 
 	/* create a new element 
 	 */
