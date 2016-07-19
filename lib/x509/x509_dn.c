@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013 Nikos Mavrogiannopoulos
+ * Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -36,7 +37,7 @@ typedef int (*set_dn_func) (void *, const char *oid, unsigned int raw_flag,
 
 static
 int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
-		    const gnutls_datum_t * val)
+		    const gnutls_datum_t * val, unsigned is_raw)
 {
 	char _oid[MAX_OID_SIZE];
 	gnutls_datum_t tmp;
@@ -56,7 +57,7 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 
 		oid = _oid;
 
-		if (gnutls_x509_dn_oid_known(oid) == 0) {
+		if (gnutls_x509_dn_oid_known(oid) == 0 && !is_raw) {
 			_gnutls_debug_log("Unknown OID: '%s'\n", oid);
 			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 		}
@@ -72,27 +73,33 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 	}
 
-	if (val->data[0] == '#')
-		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	if (is_raw) {
+		gnutls_datum_t hex = {val->data+1, val->size-1};
 
-	tmp.size = val->size;
-	tmp.data = gnutls_malloc(tmp.size+1);
-	if (tmp.data == NULL) {
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-
-	for (j=i=0;i<tmp.size;i++) {
-		if (1+j!=val->size && val->data[j] == '\\' && val->data[j+1] == ',') {
-			tmp.data[i] = ',';
-			j+=2;
-			tmp.size--;
-		} else {
-			tmp.data[i] = val->data[j++];
+		ret = gnutls_hex_decode2(&hex, &tmp);
+		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	} else {
+		tmp.size = val->size;
+		tmp.data = gnutls_malloc(tmp.size+1);
+		if (tmp.data == NULL) {
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
-	}
-	tmp.data[tmp.size] = 0;
 
-	ret = f(crt, oid, 0, tmp.data, tmp.size);
+		for (j=i=0;i<tmp.size;i++) {
+			if (1+j!=val->size && val->data[j] == '\\' &&
+			    (val->data[j+1] == ',' || val->data[j+1] == '#' || val->data[j+1] == ' ')) {
+				tmp.data[i] = val->data[j+1];
+				j+=2;
+				tmp.size--;
+			} else {
+				tmp.data[i] = val->data[j++];
+			}
+		}
+		tmp.data[tmp.size] = 0;
+	}
+
+	ret = f(crt, oid, is_raw, tmp.data, tmp.size);
 	gnutls_free(tmp.data);
 
 	if (ret < 0)
@@ -102,9 +109,11 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 }
 
 static int read_attr_and_val(const char **ptr,
-			     gnutls_datum_t * name, gnutls_datum_t * val)
+			     gnutls_datum_t * name, gnutls_datum_t * val, unsigned *is_raw)
 {
 	const unsigned char *p = (void *) *ptr;
+
+	*is_raw = 0;
 
 	/* skip any space */
 	while (c_isspace(*p))
@@ -128,6 +137,10 @@ static int read_attr_and_val(const char **ptr,
 	while (c_isspace(*p))
 		p++;
 
+	if (*p == '#') {
+		*is_raw = 1;
+	}
+
 	/* Read value */
 	val->data = (void *) p;
 	while (*p != 0 && (*p != ',' || (*p == ',' && *(p - 1) == '\\'))
@@ -138,6 +151,8 @@ static int read_attr_and_val(const char **ptr,
 
 	/* remove spaces from the end */
 	while(val->size > 0 && c_isspace(val->data[val->size-1])) {
+		if (val->size-2 > 0 && val->data[val->size-2] == '\\')
+			break;
 		val->size--;
 	}
 
@@ -155,6 +170,7 @@ crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
 	const char *p = dn;
 	int ret;
 	gnutls_datum_t name, val;
+	unsigned is_raw;
 
 	if (crt == NULL || dn == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -164,7 +180,8 @@ crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
 		if (err)
 			*err = p;
 
-		ret = read_attr_and_val(&p, &name, &val);
+		is_raw = 0;
+		ret = read_attr_and_val(&p, &name, &val, &is_raw);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -172,7 +189,7 @@ crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
 		while (c_isspace(*p))
 			p++;
 
-		ret = dn_attr_crt_set(f, crt, &name, &val);
+		ret = dn_attr_crt_set(f, crt, &name, &val, is_raw);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
