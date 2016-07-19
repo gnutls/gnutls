@@ -21,6 +21,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_x509_crq_set_extension_by_oid: Added
+gnutls_x509_dn_set_str: Added
 
 
 * Version 3.5.2 (released 2016-07-06)
