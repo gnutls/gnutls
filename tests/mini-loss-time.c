@@ -70,8 +70,6 @@ static void print_type(const unsigned char *buf, int size)
 			fprintf(stderr, "Client Key Exchange\n");
 		else if (buf[4] == 1)
 			fprintf(stderr, "Finished\n");
-		else if (buf[13] == 11)
-			fprintf(stderr, "Server Hello Done\n");
 		else
 			fprintf(stderr, "Unknown handshake\n");
 	} else if (buf[0] == 20) {
