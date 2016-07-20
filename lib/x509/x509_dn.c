@@ -302,3 +302,294 @@ gnutls_x509_dn_set_str(gnutls_x509_dn_t dn, const char *str, const char **err)
 	return crt_set_dn((set_dn_func) set_dn_by_oid, dn,
 			  str, err);
 }
+
+/**
+ * gnutls_x509_dn_init:
+ * @dn: the object to be initialized
+ *
+ * This function initializes a #gnutls_x509_dn_t type.
+ *
+ * The object returned must be deallocated using
+ * gnutls_x509_dn_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 2.4.0
+ **/
+int gnutls_x509_dn_init(gnutls_x509_dn_t * dn)
+{
+	int result;
+
+	*dn = gnutls_calloc(1, sizeof(gnutls_x509_dn_st));
+
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+				 "PKIX1.Name", &(*dn)->asn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		gnutls_free(*dn);
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_dn_import:
+ * @dn: the structure that will hold the imported DN
+ * @data: should contain a DER encoded RDN sequence
+ *
+ * This function parses an RDN sequence and stores the result to a
+ * #gnutls_x509_dn_t type. The data must have been initialized
+ * with gnutls_x509_dn_init(). You may use gnutls_x509_dn_get_rdn_ava() to
+ * decode the DN.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 2.4.0
+ **/
+int gnutls_x509_dn_import(gnutls_x509_dn_t dn, const gnutls_datum_t * data)
+{
+	int result;
+	char err[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
+
+	if (data->data == NULL || data->size == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	result = _asn1_strict_der_decode(&dn->asn,
+				   data->data, data->size, err);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		_gnutls_debug_log("ASN.1 Decoding error: %s\n", err);
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_dn_deinit:
+ * @dn: a DN uint8_t object pointer.
+ *
+ * This function deallocates the DN object as returned by
+ * gnutls_x509_dn_import().
+ *
+ * Since: 2.4.0
+ **/
+void gnutls_x509_dn_deinit(gnutls_x509_dn_t dn)
+{
+	asn1_delete_structure(&dn->asn);
+	gnutls_free(dn);
+}
+
+/**
+ * gnutls_x509_dn_export:
+ * @dn: Holds the uint8_t DN object
+ * @format: the format of output params. One of PEM or DER.
+ * @output_data: will contain a DN PEM or DER encoded
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ *
+ * This function will export the DN to DER or PEM format.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER
+ * will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN NAME".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_dn_export(gnutls_x509_dn_t dn,
+		      gnutls_x509_crt_fmt_t format, void *output_data,
+		      size_t * output_data_size)
+{
+	if (dn == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_export_int_named(dn->asn, "rdnSequence",
+					     format, "NAME",
+					     output_data,
+					     output_data_size);
+}
+
+/**
+ * gnutls_x509_dn_export2:
+ * @dn: Holds the uint8_t DN object
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a DN PEM or DER encoded
+ *
+ * This function will export the DN to DER or PEM format.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN NAME".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.3
+ **/
+int
+gnutls_x509_dn_export2(gnutls_x509_dn_t dn,
+		       gnutls_x509_crt_fmt_t format, gnutls_datum_t * out)
+{
+	if (dn == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_export_int_named2(dn->asn, "rdnSequence",
+					      format, "NAME", out);
+}
+
+/**
+ * gnutls_x509_dn_get_rdn_ava:
+ * @dn: a pointer to DN
+ * @irdn: index of RDN
+ * @iava: index of AVA.
+ * @ava: Pointer to structure which will hold output information.
+ *
+ * Get pointers to data within the DN. The format of the @ava structure
+ * is shown below.
+ *
+ *  struct gnutls_x509_ava_st {
+ *    gnutls_datum_t oid;
+ *    gnutls_datum_t value;
+ *    unsigned long value_tag;
+ *  };
+ *
+ * The X.509 distinguished name is a sequence of sequences of strings
+ * and this is what the @irdn and @iava indexes model.
+ *
+ * Note that @ava will contain pointers into the @dn structure which
+ * in turns points to the original certificate. Thus you should not
+ * modify any data or deallocate any of those.
+ *
+ * This is a low-level function that requires the caller to do the
+ * value conversions when necessary (e.g. from UCS-2).
+ *
+ * Returns: Returns 0 on success, or an error code.
+ **/
+int
+gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn,
+			   int irdn, int iava, gnutls_x509_ava_st * ava)
+{
+	ASN1_TYPE rdn, elem;
+	ASN1_DATA_NODE vnode;
+	long len;
+	int lenlen, remlen, ret;
+	char rbuf[ASN1_MAX_NAME_SIZE];
+	unsigned char cls;
+	const unsigned char *ptr;
+
+	iava++;
+	irdn++;			/* 0->1, 1->2 etc */
+
+	snprintf(rbuf, sizeof(rbuf), "rdnSequence.?%d.?%d", irdn, iava);
+	rdn = asn1_find_node(dn->asn, rbuf);
+	if (!rdn) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+	}
+
+	snprintf(rbuf, sizeof(rbuf), "?%d.type", iava);
+	elem = asn1_find_node(rdn, rbuf);
+	if (!elem) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+	}
+
+	ret = asn1_read_node_value(elem, &vnode);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+	}
+
+	ava->oid.data = (void *) vnode.value;
+	ava->oid.size = vnode.value_len;
+
+	snprintf(rbuf, sizeof(rbuf), "?%d.value", iava);
+	elem = asn1_find_node(rdn, rbuf);
+	if (!elem) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+	}
+
+	ret = asn1_read_node_value(elem, &vnode);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+	}
+	/* The value still has the previous tag's length bytes, plus the
+	 * current value's tag and length bytes. Decode them.
+	 */
+
+	ptr = vnode.value;
+	remlen = vnode.value_len;
+	len = asn1_get_length_der(ptr, remlen, &lenlen);
+	if (len < 0) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_DER_ERROR;
+	}
+
+	ptr += lenlen;
+	remlen -= lenlen;
+	ret =
+	    asn1_get_tag_der(ptr, remlen, &cls, &lenlen, &ava->value_tag);
+	if (ret) {
+		gnutls_assert();
+		return _gnutls_asn2err(ret);
+	}
+
+	ptr += lenlen;
+	remlen -= lenlen;
+
+	{
+		signed long tmp;
+
+		tmp = asn1_get_length_der(ptr, remlen, &lenlen);
+		if (tmp < 0) {
+			gnutls_assert();
+			return GNUTLS_E_ASN1_DER_ERROR;
+		}
+		ava->value.size = tmp;
+	}
+	ava->value.data = (void *) (ptr + lenlen);
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_dn_get_str:
+ * @dn: a pointer to DN
+ * @str: a datum that will hold the name
+ *
+ * This function will allocate buffer and copy the name in the provided DN.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.2
+ **/
+int
+gnutls_x509_dn_get_str(gnutls_x509_dn_t dn, gnutls_datum_t *str)
+{
+	if (dn == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn(dn->asn, "rdnSequence", str);
+}
