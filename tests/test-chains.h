@@ -303,9 +303,119 @@ static const char *modified2[] = {
     "-----END CERTIFICATE-----\n"
 };
 
+/* Empty intersection of 2 permitted DNS names,
+ * non-intuitive contraints order (more specific higher) */
+static const char *nc_bad0[] = {
+  /* Alternative DNSname: two.example.org */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIEJzCCAo+gAwIBAgIMV4T0BxqceieCt/KBMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
+  "BgNVBAMTBENBLTIwIBcNMTYwNzEyMTM0MzM1WhgPOTk5OTEyMzEyMzU5NTlaMBMx\n"
+  "ETAPBgNVBAMTCHNlcnZlci0zMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKC\n"
+  "AYEAm1IOBuzu9Pya9O3FKhQKus22xPlm+fVex8EV+p3IymnZGZUlDeTX5OcxCOm4\n"
+  "G87KNl/UQjgCB6n2FPiIYFbH9skxyvW8ZlG+M4so5yg7mwRjB8QPe0yEOLyxaLaa\n"
+  "uNp9icjtPJgPpIrEgppevfiP4iXrRGakzpjayazVCDTp9+XAhdWEi43mN6fgpM8V\n"
+  "Yc5sstkEueCjIfhApBzReMTvEUs3jCtmpqIvm07zVLpCh3sWh5MPSZtcw6UiKZdb\n"
+  "rRoaypznSkQDGQXCTZ92gSnkg0m86OIOHNQcxLXqfbrNJ7QZBf1wpi04s4DHNHSC\n"
+  "k9TpKe/dbDO4vgMgBNrcZ/9B7y95Pe+XJawG3klGhz2zGG7DmvWNygtUcM9nqk/P\n"
+  "f7TQhwsU4McmyxvVb09OVwk/2zEaPswv6MFvoxOskcQ5aYhJZs6wLDG3hh8yE4fr\n"
+  "BBvJb53flMnuSIWLfzeGUg4eeS8xP7ORApwLM0K0VGLaT4V9lpmWFLot0hv7XAcH\n"
+  "jeTVAgMBAAGjfTB7MAwGA1UdEwEB/wQCMAAwGgYDVR0RBBMwEYIPdHdvLmV4YW1w\n"
+  "bGUub3JnMA8GA1UdDwEB/wQFAwMHoAAwHQYDVR0OBBYEFERr13TeLMJ3q5QS2W4O\n"
+  "HiqwpM0RMB8GA1UdIwQYMBaAFDTfJRBdiC6+QinO/HA/E7TWxeHrMA0GCSqGSIb3\n"
+  "DQEBCwUAA4IBgQAiOgI7RgzjDBHgliXb2Q9iuCq/o/08Fz2he8AzTJ0fw+Xd+g40\n"
+  "HWnhZZxlnSq/XFircrHwLuMyG2B6HJ9gXWg7SI/5PG9fVz0USC0tcxKzA87iB2sx\n"
+  "KWzdfmzBM32ioTFEisH9YQqCVXc3Umol15r3dAZsKGRKQzYjVG8APJS4LYZTX918\n"
+  "Yg06jCmp+ZhyRHVhQ1NbrX9geOK8tuZoTQ/10iI1+eIF50a43qA0H8YDuyQbrZA3\n"
+  "ECdVIQVCUQTVlTx+JMl7DoZnm+m+BrisAAuq/4TeJwm2Es3IF4SPB/pwaZyx8YnK\n"
+  "xqne/auI6Rq7nfsi3owxBjjX1YamlmM6UWdvIsejsy92im2G0+J5s55yw+fCGXE5\n"
+  "5mItHVWOiviaPa95NU3NeD8RkUUFI568GM8GnIcSfJi1yxed8UApbCiZMbIIN8fl\n"
+  "5mMgyZv2QJXbJxhIiCQixn8nYsj2iaJu9Ns6zd5cFaQSmQxIEUfCiNZ9kO0xwpor\n"
+  "tHWgZdawxv2CfGg=\n"
+  "-----END CERTIFICATE-----\n",
+  /* Name Constraints (critical):
+    Permitted: DNSname: example.org */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIEIDCCAoigAwIBAgIBAjANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0x\n"
+  "MCAXDTE2MDcxMjEzNDMzNVoYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0yMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAtpx8p5POIgdnDbBr\n"
+  "fH1kByvm2PP+iN4UJhJYY1V7EMiucC/CU5HoYhi/KpBwoY+28oaISEMr0KEf/3rv\n"
+  "CTZRBxuqxCboK6+u/dDOlyYeM0dU57jpKmgCrETLMq92QaIEhNzv88cTaWP0OGzv\n"
+  "2klLqim5AJC2J/XWqHGprfdhf9GCWurMT+km7LPIClDHfwnmrPHuNhelfPCVzKpO\n"
+  "9S9+Lq5KpaV45DRQtMve5NjUju1q9LotEeEdlu5bnomIK3SyfS+n5AZnLNVAqmMg\n"
+  "kSB1ymtWqn4wiw3hCBz8biSlkeowdh37cm3j0za27R3IjFnIQLD44Ena3pTU8v+P\n"
+  "4/k1OML8UWXpigP5QuTSASx0fXiShHf3baY1HnEqULfYvi+IUb6wMs/3f13NVVBE\n"
+  "z+LsjiWlwqB0fK5lefO32cEDvtSMlIxgt3FUDCo3/rLAh4ZorURONh4MUWiODTSl\n"
+  "417JOLB/miH37jodViv6zfbtTvw/+GbZM9TnvHlzqvZj5nLFAgMBAAGjgYQwgYEw\n"
+  "DwYDVR0TAQH/BAUwAwEB/zAdBgNVHR4BAf8EEzARoA8wDYILZXhhbXBsZS5vcmcw\n"
+  "DwYDVR0PAQH/BAUDAwcEADAdBgNVHQ4EFgQUNN8lEF2ILr5CKc78cD8TtNbF4esw\n"
+  "HwYDVR0jBBgwFoAU4SfGxDtCWqGQsk7xBIooEZNCoMYwDQYJKoZIhvcNAQELBQAD\n"
+  "ggGBABJZw4MHkE+8Fg+r/ET/kJ0n0NtsB57O3ogPpe/0/EWpsEJsjnRzimfu5NjS\n"
+  "PIcEKk/l2Ij8vbmDxb1uNsZmeYphdjb+w/D44OnxahxeLELwZPHWpJLvuf5S8bsz\n"
+  "Z0bZFNkDUXYbKDX8kWr1gNCKURBS344fRfe8HzZsG68stouvCuOh5pvre7mGGMJI\n"
+  "5/OMISmQiKIGLpUi1YOSRM25VMZ6GnzgYiN/bcZU1ph+R0lQv7/RRZ7oiaYmFBTi\n"
+  "FfWIE2hsJla3mbhCnUUp18MpRu4+gPirCVhNQ+ii9FPklcIhXxOrq6cqfX/YAcWO\n"
+  "uF70tZK/+Z7UXqGYJeQ8pdmlzjNGSH7Q6D+QKNAjZ+Ovb7zEh3NmyTT2XEykMR6+\n"
+  "bQYaGGcRu8Uvz4wHDaqeUuF/vgTiFaJ8kwNGX8Xb1x+ok5QrJAKZzvy59kojz8L0\n"
+  "ukQ6SqsvZ6SkJRbHHEh39YPNdC66O58KTiayjKgxQmVHsMOhraI1+YmPntCNBqNN\n"
+  "AvhLDg==\n"
+  "-----END CERTIFICATE-----\n",
+  /* Name Constraints (critical):
+    Permitted: DNSname: one.example.com */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIEJDCCAoygAwIBAgIBATANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+  "MCAXDTE2MDcxMjEzNDMzNFoYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0xMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAt7EPrrm4e4JEPXVI\n"
+  "3s6eNQCyQv24LU9HD+7hDMEOFf//DoHeb8QqSDJdiCk+Hax5ydKZR2h4HZRmj5HO\n"
+  "s6nxh0AWL645fKcvfk9Oj3r1roLWxH9Kk/UR246s7FcujhDzEz3LEOZUedeMY2CS\n"
+  "tyjPLsKoP0jiDslRk0Yt4m7OfayB71B26qq92SzRr2YlMvf6AWHEiZhCRqVNidDV\n"
+  "LxdMwqIkO8s93DN8Kw74X8U5o5vTjmmDiW1HVrqsxOuImnjQ4qTUiDv0JbzTQbTp\n"
+  "uPOlJ5u/qMTK1jsGDcgfnojHLrsyuuTPR4v6Rmebpi0HHrT2PkxLeGtQEUxM7TeS\n"
+  "Ccq+eva9zm4UngonS2/nkfYawLDkP3XQ7cJQueNKLC5etDr9NqhFaD624InblWGy\n"
+  "V7jtEJRwRPH9FeMG7HyWb4BHYz36dCsMLbsCrCLIH8H7r/1nswVxlL5SRwiL06fK\n"
+  "11pwae1uyNgQuvjno4zHKM5V+mJe1Tz//2X3bfb7crFPQgsxAgMBAAGjgYgwgYUw\n"
+  "DwYDVR0TAQH/BAUwAwEB/zAhBgNVHR4BAf8EFzAVoBMwEYIPb25lLmV4YW1wbGUu\n"
+  "Y29tMA8GA1UdDwEB/wQFAwMHBAAwHQYDVR0OBBYEFOEnxsQ7QlqhkLJO8QSKKBGT\n"
+  "QqDGMB8GA1UdIwQYMBaAFJm3gYrByx1mGmb4CnWXtNzxwGapMA0GCSqGSIb3DQEB\n"
+  "CwUAA4IBgQAU53SjH5nO+ah/pAQaIDuxaJ6yaFWt1ZuW8riu/dTqn9vI0R4K6WCh\n"
+  "EZ/rf4Z4YWMLm0+wI/+1CbFHtuZ9savA4qx7rtXQw5mF1JTEBsBM/chiXZ50euKW\n"
+  "DRE2e8egOESxDQWk5cnaAxtbiRYXu/KYGqFcGeRvSoy85gIwfjBtweYn+rOwM9Yi\n"
+  "9JsrKwsdFlzvzB6+ozDMCHncqtkU3DqI9QD80oP033z45EJxWxOhd6YhnrZN9SKp\n"
+  "E/lnc/XuY3NflVE5PGT5efrfGkAfbp2fWPfvc2PP0Lh172zoPy3mBwcXpWdij+H2\n"
+  "JCzwEqzxQzLpACtFy0kwq9HhzfgcdbbFmUbNweIf30eVG0XQ35myZy9Q1LQINhaj\n"
+  "UN0Ao7qtLUtC8z5DlUFMuEHQBLhFkmuRHJHCkFRqLO0nHFYmKxtQ2nNmbHt1909s\n"
+  "I20OEegNTFV8luCbFahoILckFlsbep9P4d0wOMjZuJkLyModK7Yx+CdOpq6/Cegg\n"
+  "gt+aIvJzHEY=\n"
+  "-----END CERTIFICATE-----\n",
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIID3jCCAkagAwIBAgIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+  "MCAXDTE2MDcxMjEzNDMzM1oYDzk5OTkxMjMxMjM1OTU5WjAPMQ0wCwYDVQQDEwRD\n"
+  "QS0wMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmmrn3nN2bIFYipZN\n"
+  "ED4nbWSc0ZYDbo8VzqjCKNVhMbYJlu07tV0qDK/1IDHf9awo5AladB4NEH3oJi9c\n"
+  "sCtiBtJ9UnqD+gxsJFNtpOfNRfelOE8R7suXAxDxJto7YLtXnLCcMx+UMkhlDfVi\n"
+  "Yy5Hqua//+EFyffokOPJ0/JCxFvTd9ldbNnxgLL27yDJBL1e4SMSw03/wKoLS0nW\n"
+  "Sjzcu1+Y2sdj6CNVDtZjGmDLMNtyykX4BDz71PrlR1euktkuHS1HMthQdj3rSWjU\n"
+  "Rehe7LxjYG548SpnIVA93EOfDyqLhjpKUL8+rA0cKBIsaJK+TyUNQ8XYa98djBAj\n"
+  "gjRYRsPkZt/FH2BTg+4XSHWMrmfEbxyxqAf6euUkY4Z+Y2xkUHQl5GdYk44Rb/+4\n"
+  "NxSBBKSj+6SqK2f0o3WTHXwJTeX+B0rV2x507hFqf6lRGzwzffrXKqH3yxfqbycl\n"
+  "XlahOiBJ1xKNrR0XGeq9yPcrWv/RYvYt4JJp9OV1U2Mz3DRRAgMBAAGjQzBBMA8G\n"
+  "A1UdEwEB/wQFMAMBAf8wDwYDVR0PAQH/BAUDAwcEADAdBgNVHQ4EFgQUmbeBisHL\n"
+  "HWYaZvgKdZe03PHAZqkwDQYJKoZIhvcNAQELBQADggGBABaf05+i07lJI74gv87t\n"
+  "87BuaYEvySlQuUqycCvEs31RXFxJQhpHS7RvqPw6vqDv418SZwd/hNaC7a1JU0gL\n"
+  "Zuha61y9u6/HbmeCBSgXYcd+4M/2oPz6WcJ9uoOZk8D2NxafubVtyXH26O6tMEnK\n"
+  "0JJuV6q7fsqvIHf+tvRs/fTD7gKtyAsj1OoO3EjkRRQPnHOR4anXr1jxDFvldHEs\n"
+  "qhlibWotfyvS4BvSk8nEo+/hrXs86cQDqCg1bbbz04sTQVHW1/kCKYl7c/HQGnTT\n"
+  "I3Yc7pFq7n5sNP31XN1a8VaGiKseNXmxjhS9XlIvQ1qB5ObE+Dm0tWQbrDo73udb\n"
+  "dW+I2/Pcij0tGBi8Cxe/PZKv5wio4NpWGTNiF6PMSaUp+lqX2iLYfjjl7osr3Hph\n"
+  "gnwxlST3q0Av0+91jCfj6IZ9YRHLakceaRxcj8zLoVGpQqTdJjuH4Sy7nKoL58G1\n"
+  "96Asqk2NsUztvRfw5pYFoe7ZUgsa4M+0/nZxOPd2UeodMA==\n"
+  "-----END CERTIFICATE-----\n",
+  NULL
+};
+
 static const char *nc_bad1[] = {
 /* DNSname: localhost
-   DNSname: www.example.com */
+   DNSname: www.example.com
+   Common name: (empty) */
 "-----BEGIN CERTIFICATE-----\n"
 "MIIDSzCCAjOgAwIBAgIMU/xqxDpxZ3J5cUcrMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
 "BgNVBAMTBENBLTEwIhgPMjAxNDA4MjYxMTA4NTJaGA85OTk5MTIzMTIzNTk1OVow\n"
@@ -2353,6 +2463,7 @@ static struct
   { "ecc cert not ok (due to profile)", ecc_cert, &ecc_cert[1], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB192), 
   	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL},
   { "name constraints chain ok1", nc_good1, &nc_good1[4], 0, 0, NULL, 1412850586},
+  { "name constraints: 2 constraints, non-intuitive order", nc_bad0, &nc_bad0[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1468920734},
   { "name constraints chain bad1", nc_bad1, &nc_bad1[2], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1412850586},
   { "name constraints chain bad2", nc_bad2, &nc_bad2[4], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1412850586},
   { "name constraints chain bad3", nc_bad3, &nc_bad3[2], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, NULL, 1412850586},
