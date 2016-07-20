@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2016 Red Hat, Inc.
  *
- * Author: Nikos Mavrogiannopoulos
+ * Authors: Nikos Mavrogiannopoulos, Martin Ukrop
  *
  * This file is part of GnuTLS.
  *
@@ -39,222 +39,179 @@
 /* Test for name constraints PKIX extension.
  */
 
+static void check_for_error(int ret) {
+	if (ret != GNUTLS_E_SUCCESS)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+}
+
+#define NAME_ACCEPTED 1
+#define NAME_REJECTED 0
+
+static void check_test_result(int ret, int expected_outcome, gnutls_datum_t *tested_data) {
+	if (expected_outcome == NAME_ACCEPTED ? ret == 0 : ret != 0) {
+		if (expected_outcome == NAME_ACCEPTED) {
+			fail("Checking \"%.*s\" should have succeeded.\n", tested_data->size, tested_data->data);
+		} else {
+			fail("Checking \"%.*s\" should have failed.\n", tested_data->size, tested_data->data);
+		}
+	}
+}
+
+static void set_name(const char *name, gnutls_datum_t *datum) {
+	datum->data = (unsigned char*) name;
+	datum->size = strlen((char*) name);
+}
+
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-/* deny */
-const gnutls_datum_t example_com = { (void*)"example.com", sizeof("example.com")-1 };
-const gnutls_datum_t example_net = { (void*)"example.net", sizeof("example.net")-1 };
-
-/* allowed */
-const gnutls_datum_t org = { (void*)"org", sizeof("org")-1 };
-const gnutls_datum_t ccc_com = { (void*)"ccc.com", sizeof("ccc.com")-1 };
-const gnutls_datum_t aaa_bbb_ccc_com = { (void*)"aaa.bbb.ccc.com", sizeof("aaa.bbb.ccc.com")-1 };
-
 void doit(void)
 {
 	int ret;
-	gnutls_x509_name_constraints_t nc;
-	gnutls_x509_name_constraints_t nc2;
+	gnutls_x509_name_constraints_t nc1, nc2;
 	gnutls_datum_t name;
-
-	/* this must be called once in the program
-	 */
-	global_init();
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(6);
 
-	/* 0: test the merge permitted */
+	/* 0: test the merge permitted name constraints
+	 * NC1: permitted DNS org
+	 *      permitted DNS ccc.com
+	 *      permitted email ccc.com
+	 * NC2: permitted DNS org
+	 *      permitted DNS aaa.bbb.ccc.com
+	 */
 
-	ret = gnutls_x509_name_constraints_init(&nc);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	ret = gnutls_x509_name_constraints_init(&nc1);
+	check_for_error(ret);
 
 	ret = gnutls_x509_name_constraints_init(&nc2);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
+	set_name("org", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
 
-	/* nc: dnsName: .org + ccc.com, rfc822Name: ccc.com */
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
-		&org);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	set_name("ccc.com", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
-		&ccc_com);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	set_name("ccc.com", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc1, GNUTLS_SAN_RFC822NAME, &name);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME,
-		&ccc_com);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	set_name("org", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc2, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
 
-	/* nc2: dnsName: .org + aaa.bbb.ccc.com */
-	ret = gnutls_x509_name_constraints_add_permitted(nc2, GNUTLS_SAN_DNSNAME,
-		&org);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	set_name("aaa.bbb.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_add_permitted(nc2, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc2, GNUTLS_SAN_DNSNAME,
-		&aaa_bbb_ccc_com);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
-
-	/* intersection: permit: aaa.bbb.ccc.com */
-	ret = _gnutls_x509_name_constraints_merge(nc, nc2);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
-
+	ret = _gnutls_x509_name_constraints_merge(nc1, nc2);
+	check_for_error(ret);
 
 	/* unrelated */
-	name.data = (unsigned char*)"xxx.example.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking domain should have failed\n");
+	set_name("xxx.example.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"example.org";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
+	set_name("example.org", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	set_name("com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"xxx.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	set_name("xxx.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
-
+	set_name("ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
 	/* check intersection of permitted */
-	name.data = (unsigned char*)"xxx.aaa.bbb.ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
+	set_name("xxx.aaa.bbb.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"aaa.bbb.ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
+	set_name("aaa.bbb.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"xxx.bbb.ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	set_name("xxx.bbb.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"xxx.ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	set_name("xxx.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	set_name("ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
+	set_name("ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_RFC822NAME, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"xxx.ccc.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	set_name("xxx.ccc.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_RFC822NAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	gnutls_x509_name_constraints_deinit(nc);
+	gnutls_x509_name_constraints_deinit(nc1);
 	gnutls_x509_name_constraints_deinit(nc2);
 
-	/* 1: test the merge of name constraints with excluded */
+	/* 1: test the merge of excluded name constraints
+	 * NC1: denied DNS example.com
+	 * NC2: denied DNS example.net
+	 */
 
-	ret = gnutls_x509_name_constraints_init(&nc);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	ret = gnutls_x509_name_constraints_init(&nc1);
+	check_for_error(ret);
 
 	ret = gnutls_x509_name_constraints_init(&nc2);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
-		&example_com);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	set_name("example.com", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_excluded(nc2, GNUTLS_SAN_DNSNAME,
-		&example_net);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	set_name("example.net", &name);
+	ret = gnutls_x509_name_constraints_add_excluded(nc2, GNUTLS_SAN_DNSNAME, &name);
+	check_for_error(ret);
 
+	ret = _gnutls_x509_name_constraints_merge(nc1, nc2);
+	check_for_error(ret);
 
-	/* intersection: permit: example.com and example.net denied */
-	ret = _gnutls_x509_name_constraints_merge(nc, nc2);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	set_name("xxx.example.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
+	set_name("xxx.example.net", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	/* check the union */
-	name.data = (unsigned char*)"xxx.example.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking domain should have failed\n");
+	set_name("example.com", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"xxx.example.net";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking domain should have failed\n");
+	set_name("example.net", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"example.com";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking domain should have failed\n");
+	set_name("example.org", &name);
+	ret = gnutls_x509_name_constraints_check(nc1, GNUTLS_SAN_DNSNAME, &name);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"example.net";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking domain should have failed\n");
-
-
-	/* check an allowed name */
-	name.data = (unsigned char*)"example.org";
-	name.size = strlen((char*)name.data);
-	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
-
-	gnutls_x509_name_constraints_deinit(nc);
+	gnutls_x509_name_constraints_deinit(nc1);
 	gnutls_x509_name_constraints_deinit(nc2);
 
-	gnutls_global_deinit();
-
 	if (debug)
-		success("success");
+		success("Test success.\n");
 }

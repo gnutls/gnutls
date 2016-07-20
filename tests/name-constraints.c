@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 Free Software Foundation, Inc.
  *
- * Author: Nikos Mavrogiannopoulos
+ * Authors: Nikos Mavrogiannopoulos, Martin Ukrop
  *
  * This file is part of GnuTLS.
  *
@@ -38,6 +38,29 @@
 
 /* Test for name constraints PKIX extension.
  */
+
+static void check_for_error(int ret) {
+	if (ret != GNUTLS_E_SUCCESS)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+}
+
+#define NAME_ACCEPTED 1
+#define NAME_REJECTED 0
+
+static void check_test_result(int ret, int expected_outcome, gnutls_datum_t *tested_data) {
+	if (expected_outcome == NAME_ACCEPTED ? ret == 0 : ret != 0) {
+		if (expected_outcome == NAME_ACCEPTED) {
+			fail("Checking \"%.*s\" should have succeeded.\n", tested_data->size, tested_data->data);
+		} else {
+			fail("Checking \"%.*s\" should have failed.\n", tested_data->size, tested_data->data);
+		}
+	}
+}
+
+static void set_name(const char *name, gnutls_datum_t *datum) {
+	datum->data = (unsigned char*) name;
+	datum->size = strlen((char*) name);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -86,15 +109,11 @@ const gnutls_datum_t mail4 = { (void*)"koko.example.net", sizeof("koko.example.n
 void doit(void)
 {
 	int ret;
-	unsigned int crit, i;
+	unsigned int crit, i, permitted, excluded;
 	gnutls_x509_crt_t crt;
 	gnutls_x509_name_constraints_t nc;
 	unsigned type;
 	gnutls_datum_t name;
-
-	/* this must be called once in the program
-	 */
-	global_init();
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
@@ -103,20 +122,16 @@ void doit(void)
 	/* 0: test the reading of name constraints */
 
 	ret = gnutls_x509_name_constraints_init(&nc);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
 	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
 	ret = gnutls_x509_crt_import(crt, &cert, GNUTLS_X509_FMT_PEM);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
 	ret = gnutls_x509_crt_get_name_constraints(crt, nc, 0, &crit);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
 	if (crit != 0) {
 		fail("error reading criticality\n");
@@ -142,66 +157,56 @@ void doit(void)
 
 	/* 1: test the generation of name constraints */
 
+	permitted = 0;
+	excluded = 0;
+
 	ret = gnutls_x509_name_constraints_init(&nc);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
 	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
 	ret = gnutls_x509_crt_import(crt, &cert, GNUTLS_X509_FMT_PEM);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
-		&name1);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	permitted++;
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME, &name1);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
-		&name2);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	excluded++;
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME, &name2);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME,
-		&name3);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	excluded++;
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME, &name3);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
-		&name4);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	permitted++;
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME, &name4);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_URI,
-		&name3);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	excluded++;
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_URI, &name3);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME,
-		&mail1);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	permitted++;
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME, &mail1);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME,
-		&mail2);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	permitted++;
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME, &mail2);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME,
-		&mail3);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	permitted++;
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME, &mail3);
+	check_for_error(ret);
 
-	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_RFC822NAME,
-		&mail4);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	excluded++;
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_RFC822NAME, &mail4);
+	check_for_error(ret);
 
 	ret = gnutls_x509_crt_set_name_constraints(crt, nc, 1);
-	if (ret < 0)
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+	check_for_error(ret);
 
 	/* 2: test the reading of the generated constraints */
 
@@ -216,8 +221,8 @@ void doit(void)
 		}
 	} while(ret == 0);
 
-	if (i-1 != 5) {
-		fail("Could not read all contraints; read %d, expected %d\n", i-1, 5);
+	if (i-1 != permitted) {
+		fail("Could not read all contraints; read %d, expected %d\n", i-1, permitted);
 	}
 
 	i = 0;
@@ -236,100 +241,72 @@ void doit(void)
 		}
 	} while(ret == 0);
 
-	if (i-1 != 4) {
-		fail("Could not read all excluded contraints; read %d, expected %d\n", i-1, 4);
+	if (i-1 != excluded) {
+		fail("Could not read all excluded contraints; read %d, expected %d\n", i-1, excluded);
 	}
 
 	/* 3: test the name constraints check function */
 
 	/* This name constraints structure doesn't have any excluded GNUTLS_SAN_DN so
 	 * this test should succeed */
-	name.data = (unsigned char*)"ASFHAJHjhafjs";
-	name.size = strlen((char*)name.data);
+	set_name("ASFHAJHjhafjs", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DN, &name);
-	if (ret == 0)
-		fail("Checking DN should have succeeded\n");
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
 	/* Test e-mails */
-	name.data = (unsigned char*)"nmav@redhat.com";
-	name.size = strlen((char*)name.data);
+	set_name("nmav@redhat.com", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret == 0)
-		fail("Checking email should have succeeded\n");
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"nmav@radhat.com";
-	name.size = strlen((char*)name.data);
+	set_name("nmav@radhat.com", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret != 0)
-		fail("Checking email should have failed\n");
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"nmav@example.com";
-	name.size = strlen((char*)name.data);
+	set_name("nmav@example.com", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret == 0)
-		fail("Checking email should have succeeded\n");
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"nmav@test.example.net";
-	name.size = strlen((char*)name.data);
+	set_name("nmav@test.example.net", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret == 0)
-		fail("Checking email should have succeeded\n");
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"nmav@example.net";
-	name.size = strlen((char*)name.data);
+	set_name("nmav@example.net", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret != 0)
-		fail("Checking email should have failed\n");
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"nmav@koko.example.net";
-	name.size = strlen((char*)name.data);
+	set_name("nmav@koko.example.net", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
-	if (ret != 0)
-		fail("Checking email should have failed\n");
+	check_test_result(ret, NAME_REJECTED, &name);
 
 	/* This name constraints structure does have an excluded URI so
 	 * this test should fail */
-	name.data = (unsigned char*)"http://www.com";
-	name.size = strlen((char*)name.data);
+	set_name("http://www.com", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_URI, &name);
-	if (ret != 0)
-		fail("Checking URI should have failed\n");
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"goodexample.com";
-	name.size = strlen((char*)name.data);
+	set_name("goodexample.com", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"good.com";
-	name.size = strlen((char*)name.data);
+	set_name("good.com", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
-	name.data = (unsigned char*)"www.example.com";
-	name.size = strlen((char*)name.data);
+	set_name("www.example.com", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"www.example.net";
-	name.size = strlen((char*)name.data);
+	set_name("www.example.net", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret != 0)
-		fail("Checking %s should have failed\n", name.data);
+	check_test_result(ret, NAME_REJECTED, &name);
 
-	name.data = (unsigned char*)"www.example.gr";
-	name.size = strlen((char*)name.data);
+	set_name("www.example.gr", &name);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
-	if (ret == 0)
-		fail("Checking %s should have succeeded\n", name.data);
+	check_test_result(ret, NAME_ACCEPTED, &name);
 
 	gnutls_x509_name_constraints_deinit(nc);
 	gnutls_x509_crt_deinit(crt);
 
-	gnutls_global_deinit();
-
 	if (debug)
-		success("success");
+		success("Test success.\n");
 }
