@@ -310,12 +310,11 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
  * @session: is a pointer to a #gnutls_session_t type.
  * @flags: indicate if this session is to be used for server or client.
  *
- * This function initializes the current session to null. Every
- * session must be initialized before use, so internal structures can
- * be allocated.  This function allocates structures which can only
- * be free'd by calling gnutls_deinit().  Returns %GNUTLS_E_SUCCESS (0) on success.
+ * This function initializes the provided session. Every
+ * session must be initialized before use, and must be deinitialized
+ * after used by calling gnutls_deinit().
  *
- * @flags can be any of %gnutls_init_flags_t.
+ * @flags can be any combination of flags from %gnutls_init_flags_t.
  *
  * Note that since version 3.1.2 this function enables some common
  * TLS extensions such as session tickets and OCSP certificate status
