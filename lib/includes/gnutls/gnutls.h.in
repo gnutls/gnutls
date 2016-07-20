@@ -2140,6 +2140,7 @@ typedef enum gnutls_x509_subject_alt_name_t {
 	GNUTLS_SAN_IPADDRESS = 4,
 	GNUTLS_SAN_OTHERNAME = 5,
 	GNUTLS_SAN_DN = 6,
+	GNUTLS_SAN_MAX = GNUTLS_SAN_DN,
 	/* The following are "virtual" subject alternative name types, in
 	   that they are represented by an otherName value and an OID.
 	   Used by gnutls_x509_crt_get_subject_alt_othername_oid.  */

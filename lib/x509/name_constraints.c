@@ -2,6 +2,8 @@
  * Copyright (C) 2014-2016 Free Software Foundation, Inc.
  * Copyright (C) 2016 Red Hat, Inc.
  *
+ * Authors: Nikos Mavrogiannopoulos, Daiki Ueno, Martin Ukrop
+ *
  * This file is part of GnuTLS.
  *
  * The GnuTLS is free software; you can redistribute it and/or
@@ -36,8 +38,10 @@
 /* Name constraints is limited to DNS names.
  */
 
-static int name_constraints_match(name_constraints_node_st * nc1,
-				  name_constraints_node_st * nc2);
+// for documentation see the implementation
+static int name_constraints_intersect_nodes(name_constraints_node_st * nc1,
+								  name_constraints_node_st * nc2,
+								  name_constraints_node_st ** intersection);
 
 static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc, unsigned type)
 {
@@ -148,23 +152,39 @@ _gnutls_name_constraints_node_free(name_constraints_node_st *node)
 
 static
 int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
-				       name_constraints_node_st * _nc2)
+					   name_constraints_node_st * _nc2,
+					   name_constraints_node_st ** _nc_excluded)
 {
-	name_constraints_node_st *nc, *nc2, *t, *dest = NULL, *prev = NULL;
+	name_constraints_node_st *nc, *nc2, *t, *tmp, *dest = NULL, *prev = NULL;
 	int ret;
+
+	/* temporary array to see, if we need to add universal excluded constraints
+	 * (see phase 3 for details)
+	 * indexed directly by (gnutls_x509_subject_alt_name_t enum - 1) */
+	unsigned char types_with_empty_intersection[GNUTLS_SAN_MAX];
+	memset(types_with_empty_intersection, 0, sizeof(types_with_empty_intersection));
 
 	if (*_nc == NULL || _nc2 == NULL)
 		return 0;
 
-	/* For each name in _NC, if a _NC2 does not contain a name
+	/* Phase 1
+	 * For each name in _NC, if a _NC2 does not contain a name
 	 * with the same type, preserve the original name.  */
 	t = nc = *_nc;
 	while (t != NULL) {
 		name_constraints_node_st *next = t->next;
 		nc2 = _nc2;
 		while (nc2 != NULL) {
-			if (t->type == nc2->type)
+			if (t->type == nc2->type) {
+				// check bounds (we will use 't->type' as index)
+				if (t->type > GNUTLS_SAN_MAX || t->type == 0)
+					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				// note the possibility of empty intersection for this type
+				// if we add something to the intersection in phase 2,
+				// we will reset this flag back to 0 then
+				types_with_empty_intersection[t->type - 1] = 1;
 				break;
+			}
 			nc2 = nc2->next;
 		}
 		if (nc2 == NULL) {
@@ -181,33 +201,29 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 		t = next;
 	}
 
+	/* Phase 2
+	 * iterate through all combinations from nc2 and nc1
+	 * and create intersections of nodes with same type */
 	nc2 = _nc2;
 	while (nc2 != NULL) {
 		t = nc;
 		while (t != NULL) {
-			struct name_constraints_node_st *tmp;
-
-			if (!name_constraints_match(t, nc2)) {
-				t = t->next;
-				continue;
+			// save intersection of name constraints into tmp
+			ret = name_constraints_intersect_nodes(t, nc2, &tmp);
+			if (ret < 0) return gnutls_assert_val(ret);
+			// if intersection is not empty
+			if (tmp != NULL) { // intersection for this type is not empty
+				// check bounds
+				if (tmp->type > GNUTLS_SAN_MAX || tmp->type == 0) {
+					gnutls_free(tmp);
+					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				}
+				// we will not add universal excluded constraint for this type
+				types_with_empty_intersection[tmp->type - 1] = 0;
+				// add intersection node to DEST
+				tmp->next = dest;
+				dest = tmp;
 			}
-
-			/* copy node at NC2 to DEST */
-			tmp = gnutls_malloc(sizeof(struct name_constraints_node_st));
-			if (tmp == NULL) {
-				_gnutls_name_constraints_node_free(dest);
-				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-			}
-
-			tmp->type = nc2->type;
-			ret = _gnutls_set_datum(&tmp->name, nc2->name.data, nc2->name.size);
-			if (ret < 0) {
-				_gnutls_name_constraints_node_free(dest);
-				return gnutls_assert_val(ret);
-			}
-
-			tmp->next = dest;
-			dest = tmp;
 			t = t->next;
 		}
 		nc2 = nc2->next;
@@ -216,6 +232,32 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 	/* replace the original with the new */
 	_gnutls_name_constraints_node_free(nc);
 	*_nc = dest;
+
+	/* Phase 3
+	 * For each type: If we have empty permitted name constraints now
+	 * and we didn't have at the beginning, we have to add a new
+	 * excluded constraint with universal wildcard
+	 * (since the intersection of permitted is now empty). */
+	for (int type = 1; type <= GNUTLS_SAN_MAX; type++) {
+		if (types_with_empty_intersection[type-1] == 0)
+			continue;
+		_gnutls_hard_log("Adding universal excluded name constraintfor type %d.\n", type);
+		tmp = gnutls_malloc(sizeof(struct name_constraints_node_st));
+		if (tmp == NULL) {
+			_gnutls_name_constraints_node_free(dest);
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+		tmp->type = type;
+		tmp->name.data = NULL;
+		tmp->name.size = 0;
+		if (ret < 0) {
+			_gnutls_name_constraints_node_free(tmp);
+			return gnutls_assert_val(ret);
+		}
+		tmp->next = *_nc_excluded;
+		*_nc_excluded = tmp;
+	}
+
 	return 0;
 }
 
@@ -430,7 +472,7 @@ int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
 
 	ret =
 	    _gnutls_name_constraints_intersect(&nc->permitted,
-					       nc2->permitted);
+						   nc2->permitted, &nc->excluded);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -598,20 +640,55 @@ static unsigned email_matches(const gnutls_datum_t *name, const gnutls_datum_t *
 	return email_ends_with(name, suffix);
 }
 
+/*-
+ * name_constraints_intersect_nodes:
+ * @nc1: name constraints node 1
+ * @nc2: name constraints node 2
+ * @intersection: newly allocated node with intersected constraints,
+ *                NULL if the intersection is empty
+ *
+ * Inspect 2 name constraints nodes (of possibly different types) and allocate
+ * a new node with intersection of given constraints.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
+ -*/
 static int
-name_constraints_match(name_constraints_node_st * nc1,
-		       name_constraints_node_st * nc2)
-{
-	if (nc1->type != nc2->type)
-		return 0;
+name_constraints_intersect_nodes(name_constraints_node_st * nc1,
+					   name_constraints_node_st * nc2,
+					   name_constraints_node_st ** intersection) {
+	// presume empty intersection
+	*intersection = NULL;
+	name_constraints_node_st *to_copy = NULL;
+
+	if (nc1->type != nc2->type) {
+		return GNUTLS_E_SUCCESS;
+	}
 	switch (nc1->type) {
 	case GNUTLS_SAN_DNSNAME:
-		return dnsname_matches(&nc2->name, &nc1->name);
+		if (dnsname_matches(&nc2->name, &nc1->name))
+			to_copy = nc2;
+		break;
 	case GNUTLS_SAN_RFC822NAME:
-		return email_matches(&nc2->name, &nc1->name);
+		if (email_matches(&nc2->name, &nc1->name))
+			to_copy = nc2;
+		break;
 	default:
-		return 0;
+		return GNUTLS_E_SUCCESS;
 	}
+	// copy the node if necessary
+	if (to_copy != NULL) {
+		*intersection = gnutls_malloc(sizeof(struct name_constraints_node_st));
+		if (*intersection == NULL) {
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+		(*intersection)->type = to_copy->type;
+		int ret = _gnutls_set_datum(&(*intersection)->name, to_copy->name.data, to_copy->name.size);
+		if (ret < 0) {
+			_gnutls_name_constraints_node_free(*intersection);
+			return gnutls_assert_val(ret);
+		}
+	}
+	return GNUTLS_E_SUCCESS;
 }
 
 static
