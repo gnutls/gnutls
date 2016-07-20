@@ -340,6 +340,10 @@ static void ch_handler(int sig)
 	return;
 }
 
+#ifndef GNUTLS_NONBLOCK
+# error GNUTLS_NONBLOCK should have been defined
+#endif
+
 void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
