@@ -74,19 +74,37 @@ static unsigned have_getrandom(void)
 static int _rnd_get_system_entropy_getrandom(void* _rnd, size_t size)
 {
 	int ret;
-	ret = getrandom(_rnd, size, 0);
+	do {
+		ret = getrandom(_rnd, size, 0);
+	} while (ret == -1 && errno == EINTR);
+
 	if (ret == -1) {
+		int e = errno;
 		gnutls_assert();
 		_gnutls_debug_log
 			("Failed to use getrandom: %s\n",
-					 strerror(errno));
+					 strerror(e));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
 
-	/* This function is only used internally for small sizes which
-	 * should be delivered by getrandom(). */
-	if ((size_t)ret != size)
-		return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
+	/* Since this function is only used internally for small sizes,
+	 * any limits of getrandom() are not reached. The only way
+	 * to receive less data than asked, is due to a signal interrupting
+	 * the system call. In that case we retry. */
+	if ((size_t)ret != size) {
+		unsigned i;
+		for (i=0;i<3;i++) {
+			do {
+				ret = getrandom(_rnd, size, 0);
+			} while (ret == -1 && errno == EINTR);
+
+			if ((size_t)ret == size)
+				break;
+		}
+
+		if (ret == -1 || (size_t)ret != size)
+			return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
+	}
 
 	return 0;
 }
@@ -106,10 +124,11 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 		} while (res < 0 && errno == EINTR);
 
 		if (res <= 0) {
+			int e = errno;
 			if (res < 0) {
 				_gnutls_debug_log
 					("Failed to read /dev/urandom: %s\n",
-					 strerror(errno));
+					 strerror(e));
 			} else {
 				_gnutls_debug_log
 					("Failed to read /dev/urandom: end of file\n");
