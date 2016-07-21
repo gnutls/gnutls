@@ -50,10 +50,11 @@
 static int _rnd_get_system_entropy_simple(void* _rnd, size_t size)
 {
 	if (getentropy(_rnd, size) < 0) {
+		int e = errno;
 		gnutls_assert();
 		_gnutls_debug_log
 			("Failed to use getentropy: %s\n",
-					 strerror(errno));
+					 strerror(e));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
 	return 0;
