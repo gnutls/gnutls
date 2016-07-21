@@ -18,6 +18,9 @@ See the end for copying conditions.
 
 ** libgnutls: Dropped support for the EGD random generator.
 
+** libgnutls: Allow the decoding of raw elements (starting with #)
+   in RFC4514 DN string decoding.
+
 ** certtool: Added the "add_extension" and "add_critical_extension"
    template options. This allows specifying arbitrary extensions into
    certificates and certificate requests.
