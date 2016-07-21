@@ -600,9 +600,8 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
  * the verified certificate belongs to the actual peer, see gnutls_x509_crt_check_hostname(),
  * or use gnutls_certificate_verify_peers3().
  *
- * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0)
- * when the peer's certificate was successfully parsed, irrespective of whether
- * it was verified.
+ * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
+ * A sucessful error code means that the @status parameter must be checked to obtain the validation status.
  **/
 int
 gnutls_certificate_verify_peers2(gnutls_session_t session,
@@ -634,9 +633,8 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * In order to verify the purpose of the end-certificate (by checking the extended
  * key usage), use gnutls_certificate_verify_peers().
  *
- * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0)
- * when the peer's certificate was successfully parsed, irrespective of whether
- * it was verified.
+ * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
+ * A sucessful error code means that the @status parameter must be checked to obtain the validation status.
  *
  * Since: 3.1.4
  **/
@@ -673,16 +671,17 @@ gnutls_typed_vdata_st data;
  * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME, %GNUTLS_DT_RFC822NAME and %GNUTLS_DT_KEY_PURPOSE_OID.
  * The former two accept as data a null-terminated hostname or email address, and the latter a null-terminated
  * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
+ *
  * If a DNS hostname is provided then this function will compare
  * the hostname in the certificate against the given. If names do not match the 
  * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  * If a key purpose OID is provided and the end-certificate contains the extended key
  * usage PKIX extension, it will be required to be have the provided key purpose 
- * or be marked for any purpose, otherwise verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
+ * or be marked for any purpose, otherwise verification status will have the
+ * %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE flag set.
  *
- * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0)
- * when the peer's certificate was successfully parsed, irrespective of whether
- * it was verified.
+ * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
+ * A sucessful error code means that the @status parameter must be checked to obtain the validation status.
  *
  * Since: 3.3.0
  **/
