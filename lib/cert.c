@@ -627,9 +627,9 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
  * If the @hostname provided is non-NULL then this function will compare
- * the hostname in the certificate against the given. The comparison will
- * be accurate for ascii names; non-ascii names are compared byte-by-byte. 
- * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
+ * the hostname in the certificate against it. The comparison will follow
+ * the RFC6125 recommendations. If names do not match the
+ * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  *
  * In order to verify the purpose of the end-certificate (by checking the extended
  * key usage), use gnutls_certificate_verify_peers().
