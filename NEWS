@@ -13,6 +13,9 @@ See the end for copying conditions.
    This works around an issue of not-using getrandom even if it exists
    since glibc doesn't declare such function.
 
+** libgnutls: Fixed DNS name constraints checking in the case of empty
+   intersection of domain names in the chain. Report and fix by Martin Ukrop.
+
 ** libgnutls: Dropped support for the EGD random generator.
 
 ** certtool: Added the "add_extension" and "add_critical_extension"
@@ -20,6 +23,7 @@ See the end for copying conditions.
    certificates and certificate requests.
 
 ** API and ABI modifications:
+GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE: Added
 gnutls_x509_crq_set_extension_by_oid: Added
 gnutls_x509_dn_set_str: Added
 
