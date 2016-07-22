@@ -185,9 +185,9 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert,
 				  const char *oid, unsigned indx,
 				  unsigned int raw_flag, void *buf,
 				  size_t * buf_size);
-int gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
+unsigned gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 				   const char *hostname);
-int gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
+unsigned gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	 			    const char *hostname, unsigned int flags);
 int
 gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,

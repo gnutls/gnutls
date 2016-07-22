@@ -41,7 +41,7 @@
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
-int
+unsigned
 gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 			       const char *hostname)
 {
@@ -92,7 +92,7 @@ static int has_embedded_null(const char *str, unsigned size)
 }
 
 /**
- * gnutls_x509_crt_check_hostname:
+ * gnutls_x509_crt_check_hostname2:
  * @cert: should contain an gnutls_x509_crt_t type
  * @hostname: A null terminated string that contains a DNS name
  * @flags: gnutls_certificate_verify_flags
@@ -116,7 +116,7 @@ static int has_embedded_null(const char *str, unsigned size)
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
-int
+unsigned
 gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			        const char *hostname, unsigned int flags)
 {
