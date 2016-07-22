@@ -500,6 +500,9 @@ static int record_overhead(const cipher_entry_st * cipher,
 	int total = 0;
 	int t, ret;
 
+	if (unlikely(cipher == NULL))
+		return 0;
+
 	if (_gnutls_cipher_type(cipher) == CIPHER_BLOCK) {
 		t = _gnutls_cipher_get_explicit_iv_size(cipher);
 		total += t;
@@ -598,7 +601,6 @@ static int record_overhead_rt(gnutls_session_t session)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	/* requires padding */
 	return record_overhead(params->cipher, params->mac,
 			       params->compression_algorithm);
 }
