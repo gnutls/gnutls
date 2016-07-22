@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -34,6 +35,10 @@
  * Returns all session parameters needed to be stored to support resumption.
  * The client should call this, and store the returned session data. A session
  * may be resumed later by calling gnutls_session_set_data().  
+ *
+ * This function will fail if called prior to handshake completion. In
+ * case of false start TLS, the handshake completes only after data have
+ * been successfully received from the peer.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -79,6 +84,10 @@ gnutls_session_get_data(gnutls_session_t session,
  * may be resumed later by calling gnutls_session_set_data().  
  *
  * The returned @data are allocated and must be released using gnutls_free().
+ *
+ * This function will fail if called prior to handshake completion. In
+ * case of false start TLS, the handshake completes only after data have
+ * been successfully received from the peer.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
