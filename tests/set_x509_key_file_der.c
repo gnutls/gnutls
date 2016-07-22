@@ -77,7 +77,7 @@ static void write_der(const char *file, const char *header, const char *ipem)
 void doit(void)
 {
 	int ret;
-	gnutls_certificate_credentials_t xcred;
+	gnutls_certificate_credentials_t xcred, clicred;
 	char keyfile[TMPNAME_SIZE];
 	char certfile[TMPNAME_SIZE];
 	gnutls_datum_t tcert;
@@ -88,6 +88,12 @@ void doit(void)
 
 	if (TMP_MAX < 2)
 		exit(77);
+
+	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
+
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	assert(get_tmpname(certfile)!=NULL);
 	assert(get_tmpname(keyfile)!=NULL);
@@ -112,9 +118,10 @@ void doit(void)
 	remove(certfile);
 	remove(keyfile);
 
-	test_cli_serv(xcred, "NORMAL", &ca3_cert, "localhost"); /* the DNS name of the first cert */
+	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL); /* the DNS name of the first cert */
 
 	gnutls_certificate_free_credentials(xcred);
+	gnutls_certificate_free_credentials(clicred);
 	gnutls_global_deinit();
 }
 

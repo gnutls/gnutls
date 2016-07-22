@@ -67,6 +67,7 @@ static time_t mytime(time_t * t)
 static void basic(void)
 {
 	gnutls_certificate_credentials_t x509_cred;
+	gnutls_certificate_credentials_t clicred;
 	gnutls_pcert_st pcert_list[16];
 	gnutls_privkey_t key;
 	unsigned pcert_list_size;
@@ -84,8 +85,13 @@ static void basic(void)
 	if (debug)
 		gnutls_global_set_log_level(6);
 
+	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
 	assert(gnutls_privkey_init(&key)>=0);
+
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	pcert_list_size = sizeof(pcert_list)/sizeof(pcert_list[0]);
 	ret = gnutls_pcert_list_import_x509_raw(pcert_list, &pcert_list_size,
@@ -129,9 +135,10 @@ static void basic(void)
 		exit(1);
 	}
 
-	test_cli_serv(x509_cred, "NORMAL", &ca_cert, "localhost");
+	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);
 
 	gnutls_certificate_free_credentials(x509_cred);
+	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_global_deinit();
 
@@ -141,7 +148,7 @@ static void basic(void)
 
 static void auto_parse(void)
 {
-	gnutls_certificate_credentials_t x509_cred;
+	gnutls_certificate_credentials_t x509_cred, clicred;
 	gnutls_pcert_st pcert_list[16];
 	gnutls_privkey_t key;
 	gnutls_pcert_st second_pcert;
@@ -161,6 +168,12 @@ static void auto_parse(void)
 
 	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
 	assert(gnutls_privkey_init(&key)>=0);
+
+	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
+
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	pcert_list_size = sizeof(pcert_list)/sizeof(pcert_list[0]);
 	ret = gnutls_pcert_list_import_x509_raw(pcert_list, &pcert_list_size,
@@ -203,11 +216,12 @@ static void auto_parse(void)
 		exit(1);
 	}
 
-	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "localhost"); /* the DNS name of the first cert */
-	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "localhost6"); /* the DNS name of ECC cert */
-	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "www.none.org"); /* the DNS name of ECC cert */
+	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL); /* the DNS name of the first cert */
+	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost6", NULL, NULL, NULL); /* the DNS name of ECC cert */
+	test_cli_serv(x509_cred, clicred, "NORMAL", "www.none.org", NULL, NULL, NULL); /* the DNS name of ECC cert */
 
 	gnutls_certificate_free_credentials(x509_cred);
+	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_global_deinit();
 

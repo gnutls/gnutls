@@ -73,6 +73,7 @@ static void search_for_str(const char *filename)
 static void run(const char *env, const char *filename)
 {
 	gnutls_certificate_credentials_t x509_cred;
+	gnutls_certificate_credentials_t clicred;
 	int ret;
 
 	remove(filename);
@@ -96,6 +97,7 @@ static void run(const char *env, const char *filename)
 
 	/* test gnutls_certificate_flags() */
 	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
+	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
 	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost_cert,
 					    &server_ca3_key,
@@ -105,7 +107,12 @@ static void run(const char *env, const char *filename)
 		exit(1);
 	}
 
-	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "localhost");
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
+
+
+	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);
 
 	if (access(filename, R_OK) != 0) {
 		fail("keylog file was not created\n");
@@ -115,6 +122,7 @@ static void run(const char *env, const char *filename)
 	search_for_str(filename);
 
 	gnutls_certificate_free_credentials(x509_cred);
+	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_global_deinit();
 	remove(filename);

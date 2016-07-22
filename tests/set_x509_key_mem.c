@@ -37,6 +37,7 @@
 #include <arpa/inet.h>
 #endif
 #include <unistd.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
@@ -55,6 +56,7 @@ static void tls_log_func(int level, const char *str)
 void doit(void)
 {
 	gnutls_certificate_credentials_t x509_cred;
+	gnutls_certificate_credentials_t clicred;
 	int ret;
 
 	/* this must be called once in the program
@@ -65,7 +67,13 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(6);
 
+	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 	gnutls_certificate_allocate_credentials(&x509_cred);
+
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
+
 
 	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &cli_cert,
 					    &server_key,
@@ -97,10 +105,11 @@ void doit(void)
 		exit(1);
 	}
 
-	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "localhost");
-	test_cli_serv(x509_cred, "NORMAL", &ca3_cert, "localhost6");
+	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);
+	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost6", NULL, NULL, NULL);
 
 	gnutls_certificate_free_credentials(x509_cred);
+	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_global_deinit();
 

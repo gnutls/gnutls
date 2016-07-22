@@ -65,7 +65,7 @@ static void compare(const gnutls_datum_t *der, const void *ipem)
 void doit(void)
 {
 	int ret;
-	gnutls_certificate_credentials_t xcred;
+	gnutls_certificate_credentials_t xcred, clicred;
 	const char *keyfile = "./certs/ecc256.pem";
 	const char *certfile = "does-not-exist.pem";
 	gnutls_datum_t tcert;
@@ -84,6 +84,11 @@ void doit(void)
 	gnutls_certificate_free_credentials(xcred);
 
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
+	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
+
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	certfile = get_tmpname(NULL);
 
@@ -117,8 +122,9 @@ void doit(void)
 
 	remove(certfile);
 
-	test_cli_serv(xcred, "NORMAL", &ca_cert, "localhost"); /* the DNS name of the first cert */
+	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL); /* the DNS name of the first cert */
 
 	gnutls_certificate_free_credentials(xcred);
+	gnutls_certificate_free_credentials(clicred);
 	gnutls_global_deinit();
 }

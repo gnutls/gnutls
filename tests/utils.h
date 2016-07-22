@@ -70,8 +70,13 @@ extern void binprint(const void *str, size_t len);
 int disable_system_calls(void);
 void sec_sleep(int sec);
 
-void test_cli_serv(gnutls_certificate_credentials_t server_cred, const char *prio,
-              const gnutls_datum_t *ca_cert, const char *host);
+typedef void callback_func(gnutls_session_t, void *priv);
+void test_cli_serv(gnutls_certificate_credentials_t server_cred,
+                   gnutls_certificate_credentials_t client_cred,
+                   const char *prio, const char *host,
+                   void *priv,
+                   callback_func *client_cb,
+                   callback_func *server_cb);
 
 #define TMPNAME_SIZE 128
 char *get_tmpname(char s[TMPNAME_SIZE]);
