@@ -728,7 +728,7 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	if (session->security_parameters.epoch_read
 	    != session->security_parameters.epoch_write) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE;
 	}
 
 	ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &params);

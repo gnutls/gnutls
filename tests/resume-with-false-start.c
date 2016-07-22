@@ -121,7 +121,7 @@ void doit(void)
 	/* try obtaining the resumption data. This should fail because
 	 * the handshake is not yet complete (due to false start) */
 	ret = gnutls_session_get_data2(client, &data);
-	if (ret != GNUTLS_E_INVALID_REQUEST) {
+	if (ret != GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE) {
 		fail("unexpected error: %s\n", gnutls_strerror(ret));
 	}
 

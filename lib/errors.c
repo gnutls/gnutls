@@ -386,6 +386,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNRECOGNIZED_NAME),
 	ERROR_ENTRY(N_("There was an issue converting to or from UTF8."),
 		    GNUTLS_E_IDNA_ERROR),
+	ERROR_ENTRY(N_("Cannot obtain resumption parameters while handshake is incomplete."),
+		    GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE),
 	{NULL, NULL, 0}
 };
 
