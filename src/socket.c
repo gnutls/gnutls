@@ -318,6 +318,7 @@ void socket_bye(socket_st * socket)
 
 	freeaddrinfo(socket->addr_info);
 	socket->addr_info = socket->ptr = NULL;
+	socket->connect_addrlen = 0;
 
 	free(socket->ip);
 	free(socket->hostname);
@@ -353,10 +354,12 @@ void canonicalize_host(char *hostname, char *service, unsigned service_size)
 
 void
 socket_open(socket_st * hd, const char *hostname, const char *service,
-	    int udp, const char *msg)
+	    int flags, const char *msg)
 {
 	struct addrinfo hints, *res, *ptr;
 	int sd, err = 0;
+	int udp = flags & 1;
+	int fastopen = flags & 2;
 	char buffer[MAX_BUF + 1];
 	char portname[16] = { 0 };
 	char *a_hostname = (char*)hostname;
@@ -416,14 +419,21 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 #endif
 		}
 
+		if (fastopen && ptr->ai_socktype == SOCK_STREAM
+		    && (ptr->ai_family == AF_INET || ptr->ai_family == AF_INET6)) {
+			memcpy(&hd->connect_addr, ptr->ai_addr, ptr->ai_addrlen);
+			hd->connect_addrlen = ptr->ai_addrlen;
 
-		if (msg)
-			printf("%s '%s:%s'...\n", msg, buffer, portname);
+			if (msg)
+				printf("%s '%s:%s' (TFO)...\n", msg, buffer, portname);
+		} else {
+			if (msg)
+				printf("%s '%s:%s'...\n", msg, buffer, portname);
 
-		err = connect(sd, ptr->ai_addr, ptr->ai_addrlen);
-		if (err < 0) {
-			continue;
+			if ((err = connect(sd, ptr->ai_addr, ptr->ai_addrlen)) < 0)
+				continue;
 		}
+
 		break;
 	}
 

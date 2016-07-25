@@ -122,6 +122,12 @@ flag = {
 };
 
 flag = {
+    name      = fastopen;
+    descrip   = "Enable TCP Fast Open";
+    doc      = "";
+};
+
+flag = {
     name      = x509fmtder;
     descrip   = "Use DER format for certificates to read from";
     doc      = "";

@@ -1,4 +1,5 @@
 #include <gnutls/gnutls.h>
+#include <gnutls/socket.h>
 
 typedef struct {
 	int fd;
@@ -10,6 +11,10 @@ typedef struct {
 	struct addrinfo *ptr;
 	struct addrinfo *addr_info;
 	int verbose;
+
+	/* Needed for TCP Fast Open */
+	struct sockaddr_storage connect_addr;
+	socklen_t connect_addrlen;
 
 	/* resumption data */
 	gnutls_datum_t rdata;
@@ -24,7 +29,7 @@ ssize_t socket_send(const socket_st * socket, const void *buffer,
 ssize_t socket_send_range(const socket_st * socket, const void *buffer,
 			  int buffer_size, gnutls_range_st * range);
 void socket_open(socket_st * hd, const char *hostname, const char *service,
-		 int udp, const char *msg);
+		 int flags, const char *msg);
 
 void socket_starttls(socket_st * hd, const char *app_proto);
 void socket_bye(socket_st * socket);

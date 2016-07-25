@@ -41,6 +41,11 @@
 #include <netdb.h>
 #include <ctype.h>
 
+/* Get TCP_FASTOPEN */
+#ifdef HAVE_NETINET_TCP_H
+#include <netinet/tcp.h>
+#endif
+
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/dtls.h>
@@ -48,6 +53,7 @@
 #include <gnutls/openpgp.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/crypto.h>
+#include <gnutls/socket.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -78,6 +84,7 @@ char service[32]="";
 int record_max_size;
 int fingerprint;
 int crlf;
+int fastopen;
 unsigned int verbose = 0;
 int print_cert;
 
@@ -908,7 +915,7 @@ static int try_resume(socket_st * hd)
 
 	printf
 	    ("\n\n- Connecting again- trying to resume previous session\n");
-	socket_open(hd, hostname, service, udp, CONNECT_MSG);
+	socket_open(hd, hostname, service, udp | (fastopen << 1), CONNECT_MSG);
 
 	if (HAVE_OPT(STARTTLS_PROTO))
 	        socket_starttls(hd, OPT_ARG(STARTTLS_PROTO));
@@ -1211,7 +1218,7 @@ int main(int argc, char **argv)
 
 	canonicalize_host(hostname, service, sizeof(service));
 
-	socket_open(&hd, hostname, service, udp, CONNECT_MSG);
+	socket_open(&hd, hostname, service, udp | (fastopen << 1), CONNECT_MSG);
 	hd.verbose = verbose;
 
 	if (HAVE_OPT(STARTTLS_PROTO))
@@ -1623,6 +1630,15 @@ static void cmd_parser(int argc, char **argv)
 
 	crlf = HAVE_OPT(CRLF);
 
+#ifdef TCP_FASTOPEN
+	fastopen = HAVE_OPT(FASTOPEN);
+#else
+	if (HAVE_OPT(FASTOPEN)) {
+		fprintf(stderr, "TCP Fast Open not supported for this OS\n");
+		exit(1);
+	}
+#endif
+
 	if (rest != NULL)
 		hostname = rest;
 
@@ -1658,8 +1674,15 @@ static int do_handshake(socket_st * socket)
 {
 	int ret;
 
-	gnutls_transport_set_int(socket->session, socket->fd);
-	set_read_funcs(socket->session);
+	if (fastopen && socket->connect_addrlen) {
+		gnutls_transport_set_fastopen(socket->session, socket->fd,
+					      (struct sockaddr*)&socket->connect_addr,
+					      socket->connect_addrlen);
+		socket->connect_addrlen = 0;
+	} else {
+		gnutls_transport_set_int(socket->session, socket->fd);
+		set_read_funcs(socket->session);
+	}
 
 	do {
 		gnutls_handshake_set_timeout(socket->session,
