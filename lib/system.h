@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2010-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -27,10 +28,20 @@
 #include <time.h>
 #include <sys/time.h>
 
-#ifndef _WIN32
-#include <sys/uio.h>		/* for writev */
-#else
+#ifdef _WIN32
+# if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+#  define NEED_CERT_ENUM_CRLS
+typedef PCCRL_CONTEXT WINAPI(*CertEnumCRLsInStoreFunc) (HCERTSTORE
+							 hCertStore,
+							 PCCRL_CONTEXT
+							 pPrevCrlContext);
+extern CertEnumCRLsInStoreFunc pCertEnumCRLsInStore;
+# else
+#  define pCertEnumCRLsInStore CertEnumCRLsInStore
+# endif
 #include <windows.h>		/* for Sleep */
+#else
+#include <sys/uio.h>		/* for writev */
 #endif
 
 #ifdef _POSIX_PATH_MAX
