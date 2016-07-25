@@ -1861,10 +1861,7 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src);
 
 /* Session stuff
  */
-typedef struct {
-	void *iov_base;		/* Starting address */
-	size_t iov_len;		/* Number of bytes to transfer */
-} giovec_t;
+@DEFINE_IOVEC_T@
 
 typedef ssize_t(*gnutls_pull_func) (gnutls_transport_ptr_t, void *,
 				    size_t);

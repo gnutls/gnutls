@@ -160,6 +160,22 @@ esac
 
 fi
 
+dnl Check for iovec type
+AC_CHECK_MEMBERS([struct iovec.iov_basea],
+      [
+        AC_SUBST([DEFINE_IOVEC_T], ["#include <sys/uio.h>
+typedef struct iovec giovec_t;"])
+      ],
+      [
+        AC_SUBST([DEFINE_IOVEC_T], ["typedef struct {
+    void *iov_base;
+    size_t iov_len;
+} giovec_t;"])
+      ],
+      [#include <sys/uio.h>
+      ])
+AM_SUBST_NOTMAKE([DEFINE_IOVEC_T])
+
 dnl Need netinet/tcp.h for TCP_FASTOPEN
 AC_CHECK_HEADERS([netinet/tcp.h])
 
