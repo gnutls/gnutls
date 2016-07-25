@@ -384,7 +384,8 @@ _asn1_get_time_der (unsigned type, const unsigned char *der, int der_len, int *r
  * @str: Pre-allocated output buffer to put the textual object id in.
  * @str_size: Length of pre-allocated output buffer.
  *
- * Converts a DER encoded object identifier to its textual form.
+ * Converts a DER encoded object identifier to its textual form. This
+ * function expects the DER object identifier without the tag.
  *
  * Returns: %ASN1_SUCCESS on success, or an error.
  **/
@@ -395,7 +396,7 @@ asn1_get_object_id_der (const unsigned char *der, int der_len, int *ret_len,
   int len_len, len, k;
   int leading;
   char temp[LTOSTR_MAX_SIZE];
-  unsigned long val, val1;
+  uint64_t val, val1;
 
   *ret_len = 0;
   if (str && str_size > 0)
@@ -1361,7 +1362,15 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 			{	/* indefinite length method */
 		          p->tmp_ival = -1;
 			}
+
 		      p2 = p->down;
+                      if (p2 == NULL)
+		        {
+		          result = ASN1_DER_ERROR;
+                          warn();
+		          goto cleanup;
+		        }
+
 		      while ((type_field (p2->type) == ASN1_ETYPE_TAG)
 			     || (type_field (p2->type) == ASN1_ETYPE_SIZE))
 			p2 = p2->right;
@@ -1531,11 +1540,6 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 {
   return asn1_der_decoding2 (element, ider, &ider_len, 0, errorDescription);
 }
-
-#define FOUND        1
-#define SAME_BRANCH  2
-#define OTHER_BRANCH 3
-#define EXIT         4
 
 /**
  * asn1_der_decoding_element:
