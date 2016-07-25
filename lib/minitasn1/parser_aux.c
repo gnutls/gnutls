@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -316,22 +316,14 @@ _asn1_append_value (asn1_node node, const void *value, unsigned int len)
 {
   if (node == NULL)
     return node;
-  if (node->value != NULL && node->value != node->small_value)
-    {
-      /* value is allocated */
-      int prev_len = node->value_len;
-      node->value_len += len;
-      node->value = realloc (node->value, node->value_len);
-      if (node->value == NULL)
-	{
-	  node->value_len = 0;
-	  return NULL;
-	}
-      memcpy (&node->value[prev_len], value, len);
 
-      return node;
-    }
-  else if (node->value == node->small_value)
+  if (node->value == NULL)
+    return _asn1_set_value (node, value, len);
+
+  if (len == 0)
+    return node;
+
+  if (node->value == node->small_value)
     {
       /* value is in node */
       int prev_len = node->value_len;
@@ -342,13 +334,31 @@ _asn1_append_value (asn1_node node, const void *value, unsigned int len)
 	  node->value_len = 0;
 	  return NULL;
 	}
-      memcpy (node->value, node->small_value, prev_len);
+
+      if (prev_len > 0)
+        memcpy (node->value, node->small_value, prev_len);
+
       memcpy (&node->value[prev_len], value, len);
 
       return node;
     }
-  else				/* node->value == NULL */
-    return _asn1_set_value (node, value, len);
+  else /* if (node->value != NULL && node->value != node->small_value) */
+    {
+      /* value is allocated */
+      int prev_len = node->value_len;
+      node->value_len += len;
+
+      node->value = _asn1_realloc (node->value, node->value_len);
+      if (node->value == NULL)
+	{
+	  node->value_len = 0;
+	  return NULL;
+	}
+
+      memcpy (&node->value[prev_len], value, len);
+
+      return node;
+    }
 }
 
 /******************************************************************/
@@ -425,11 +435,7 @@ _asn1_set_right (asn1_node node, asn1_node right)
     return node;
   node->right = right;
   if (right)
-    {
-      right->left = node;
-      if (right->up == NULL)
-        right->up = node->up;
-    }
+    right->left = node;
   return node;
 }
 
@@ -543,9 +549,9 @@ _asn1_delete_list_and_nodes (void)
 
 
 char *
-_asn1_ltostr (long v, char str[LTOSTR_MAX_SIZE])
+_asn1_ltostr (int64_t v, char str[LTOSTR_MAX_SIZE])
 {
-  long d, r;
+  int64_t d, r;
   char temp[LTOSTR_MAX_SIZE];
   int count, k, start;
 
@@ -625,7 +631,7 @@ _asn1_change_integer_value (asn1_node node)
 	    {
 	      while (1)
 		{
-		  p = _asn1_get_up (p);
+		  p = _asn1_find_up (p);
 		  if (p == node)
 		    {
 		      p = NULL;
@@ -753,7 +759,7 @@ _asn1_expand_object_id (asn1_node node)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_get_up (p);
+	p = _asn1_find_up (p);
     }
 
 
@@ -786,6 +792,9 @@ _asn1_expand_object_id (asn1_node node)
 		    {
 		      if (type_field (p4->type) == ASN1_ETYPE_CONSTANT)
 			{
+			  if (p4->value == NULL)
+			    return ASN1_VALUE_NOT_FOUND;
+
 			  if (name2[0])
 			    _asn1_str_cat (name2, sizeof (name2), ".");
 			  _asn1_str_cat (name2, sizeof (name2),
@@ -825,7 +834,7 @@ _asn1_expand_object_id (asn1_node node)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_get_up (p);
+	p = _asn1_find_up (p);
     }
 
   return ASN1_SUCCESS;
@@ -895,7 +904,7 @@ _asn1_type_set_config (asn1_node node)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_get_up (p);
+	p = _asn1_find_up (p);
     }
 
   return ASN1_SUCCESS;
@@ -992,7 +1001,7 @@ _asn1_check_identifier (asn1_node node)
 	{
 	  while (1)
 	    {
-	      p = _asn1_get_up (p);
+	      p = _asn1_find_up (p);
 	      if (p == node)
 		{
 		  p = NULL;
@@ -1052,7 +1061,7 @@ _asn1_set_default_tag (asn1_node node)
 	{
 	  while (1)
 	    {
-	      p = _asn1_get_up (p);
+	      p = _asn1_find_up (p);
 	      if (p == node)
 		{
 		  p = NULL;
