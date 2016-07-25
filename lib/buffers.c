@@ -496,8 +496,7 @@ _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
 		}
 
 		if (no_writev == 0) {
-			i = session->internals.vec_push_func(fd, giovec,
-							     giovec_cnt);
+			i = session->internals.vec_push_func(fd, giovec, giovec_cnt);
 		} else {
 			i = _gnutls_writev_emu(session, fd, giovec, giovec_cnt, 1);
 		}

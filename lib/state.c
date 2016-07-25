@@ -303,6 +303,9 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 
 	session->internals.handshake_endtime = 0;
 	session->internals.handshake_in_progress = 0;
+
+	session->internals.tfo.connect_addrlen = 0;
+	session->internals.tfo.connect_only = 0;
 }
 
 /**

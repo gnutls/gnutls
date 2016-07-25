@@ -50,6 +50,10 @@ ssize_t system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 		      int iovec_cnt);
 ssize_t system_writev_nosignal(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 		      int iovec_cnt);
+ssize_t system_writev_tfo(gnutls_session_t ptr, const giovec_t * iovec,
+		      int iovec_cnt);
+ssize_t system_writev_nosignal_tfo(gnutls_session_t ptr, const giovec_t * iovec,
+		      int iovec_cnt);
 #endif
 ssize_t system_read(gnutls_transport_ptr_t ptr, void *data,
 		    size_t data_size);

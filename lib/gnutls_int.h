@@ -92,6 +92,7 @@ typedef struct {
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <gnutls/abstract.h>
+#include <gnutls/socket.h>
 #include <system.h>
 
 /* in case we compile with system headers taking priority, we
@@ -751,6 +752,14 @@ typedef struct {
 	unsigned int packets_dropped;
 } dtls_st;
 
+typedef struct tfo_st {
+	int fd;
+	int flags;
+	bool connect_only; /* a previous sendmsg() failed, attempting connect() */
+	struct sockaddr_storage connect_addr;
+	socklen_t connect_addrlen;
+} tfo_st;
+
 typedef struct {
 	/* holds all the parsed data received by the record layer */
 	mbuffer_head_st record_buffer;
@@ -1021,6 +1030,9 @@ typedef struct {
 	bool saved_username_set;
 
 	bool false_start_used; /* non-zero if false start was used for appdata */
+
+	/* Needed for TCP Fast Open (TFO), set by gnutls_transport_set_fastopen() */
+	tfo_st tfo;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

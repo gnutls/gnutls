@@ -160,6 +160,9 @@ esac
 
 fi
 
+dnl Need netinet/tcp.h for TCP_FASTOPEN
+AC_CHECK_HEADERS([netinet/tcp.h])
+
 AC_ARG_ENABLE(padlock,
   AS_HELP_STRING([--disable-padlock], [unconditionally disable padlock acceleration]),
     use_padlock=$enableval)

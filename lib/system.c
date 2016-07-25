@@ -111,10 +111,9 @@ int system_errno(gnutls_transport_ptr_t ptr)
 	return errno;
 }
 
-#ifdef MSG_NOSIGNAL
-ssize_t
-system_writev_nosignal(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
-	      int iovec_cnt)
+static ssize_t
+_system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
+	      int iovec_cnt, int flags)
 {
 	struct msghdr hdr;
 
@@ -122,22 +121,26 @@ system_writev_nosignal(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 	hdr.msg_iov = (struct iovec *)iovec;
 	hdr.msg_iovlen = iovec_cnt;
 
-	return sendmsg(GNUTLS_POINTER_TO_INT(ptr), &hdr, MSG_NOSIGNAL);
+	return sendmsg(GNUTLS_POINTER_TO_INT(ptr), &hdr, flags);
 }
+
+#ifdef MSG_NOSIGNAL
+ssize_t
+system_writev_nosignal(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
+	      int iovec_cnt)
+{
+	return _system_writev(ptr, iovec, iovec_cnt, MSG_NOSIGNAL);
+}
+
 #endif
 
 ssize_t
 system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 	      int iovec_cnt)
 {
-	struct msghdr hdr;
-
-	memset(&hdr, 0, sizeof(hdr));
-	hdr.msg_iov = (struct iovec *)iovec;
-	hdr.msg_iovlen = iovec_cnt;
-
-	return sendmsg(GNUTLS_POINTER_TO_INT(ptr), &hdr, 0);
+	return _system_writev(ptr, iovec, iovec_cnt, 0);
 }
+
 #endif
 
 

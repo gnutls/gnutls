@@ -831,6 +831,7 @@ APIMANS += gnutls_transport_get_ptr.3
 APIMANS += gnutls_transport_get_ptr2.3
 APIMANS += gnutls_transport_set_errno.3
 APIMANS += gnutls_transport_set_errno_function.3
+APIMANS += gnutls_transport_set_fastopen.3
 APIMANS += gnutls_transport_set_int.3
 APIMANS += gnutls_transport_set_int2.3
 APIMANS += gnutls_transport_set_ptr.3
