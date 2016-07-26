@@ -53,6 +53,14 @@ This runner has mingw and basic libraries installed.
 yum install -y mingw32-nettle mingw32-libtasn1 mingw32-gcc
 ```
 
+## ubsan
+
+This runner has undefined sanitizer available
+
+## asan
+
+This runner has address sanitizer available
+
 ## fedora
 
 This is a system with Fedora installed.
