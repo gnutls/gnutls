@@ -13,6 +13,7 @@
 * PKCS 11 API::
 * TPM API::
 * Abstract key API::
+* Socket specific API::
 * DANE API::
 * Cryptographic API::
 * Compatibility API::
@@ -101,6 +102,13 @@ The following functions are to be used for abstract key handling.
 Their prototypes lie in @file{gnutls/abstract.h}.
 
 @include abstract-api.texi
+
+@node Socket specific API
+@section Socket specific API
+
+The prototypes for the following functions lie in
+@file{gnutls/socket.h}.
+@include socket-api.texi
 
 @node DANE API
 @section DANE API

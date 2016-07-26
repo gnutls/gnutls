@@ -792,6 +792,7 @@ remaining until the next retransmission, or better the time until
 
 @menu
 * Asynchronous operation::
+* Reducing round-trips::
 * DTLS sessions::
 @end menu
 
@@ -858,6 +859,31 @@ to be able to handle properly the DTLS handshake retransmission timers,
 the function @funcref{gnutls_dtls_get_timeout}
 should be used to estimate when to call @funcref{gnutls_handshake} if
 no data have been received.
+
+@node Reducing round-trips
+@subsection Reducing round-trips
+
+The full TLS 1.2 handshake requires 2 round-trips to complete, and when
+combined with TCP's SYN and SYN-ACK negotiation it extends to 3 full
+round-trips. While, the abbreviated (resumed) TLS handshake drops that to 2.5
+round-trips, it still adds considerable latency, reducing its applicability
+to certain applications.
+
+In client side, it is possible to take advantage of the TCP fast open
+@xcite{RFC7413} mechanism on operating
+systems that support it. That can be done either by manually crafting the push and pull
+callbacks, or by utilizing @funcref{gnutls_transport_set_fastopen}. In that
+case the initial TCP handshake is eliminated, reducing the TLS handshake round-trip to 2.
+Note, that in that case any connection failures will be reported during the
+@funcref{gnutls_handshake} function call with error code
+@code{GNUTLS_E_PUSH_ERROR}.
+
+@showfuncdesc{gnutls_transport_set_fastopen}
+
+In non-resumed sessions it is possible to further reduce the round-trips to
+a single one by taking advantage of the @ref{False Start} TLS extension.
+This can be enabled by setting the @acronym{GNUTLS_ENABLE_FALSE_START} flag
+on @funcref{gnutls_init}.
 
 @node DTLS sessions
 @subsection DTLS sessions

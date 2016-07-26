@@ -1232,6 +1232,20 @@ stamp_mans: $(HEADER_FILES)
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
+	@echo $(ECHO_N) "Creating man pages for socket.h..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/socket.h`; do \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-pkg-site "http://www.gnutls.org" \
+			-include "gnutls/socket.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
+			-function $$i \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+		echo $(ECHO_N) "."; \
+	done
+	@echo ""
 	@echo $(ECHO_N) "Creating man pages for dane.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/libdane/includes/gnutls/dane.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
