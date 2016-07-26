@@ -915,16 +915,13 @@ AC_CONFIG_FILES([
   tests/ecdsa/Makefile
   tests/key-tests/Makefile
   tests/openpgp-certs/Makefile
-  tests/pkcs1-padding/Makefile
   tests/pkcs12-decode/Makefile
   tests/pkcs8-decode/Makefile
-  tests/rsa-md5-collision/Makefile
   tests/safe-renegotiation/Makefile
   tests/scripts/Makefile
   tests/sha2/Makefile
   tests/slow/Makefile
   tests/suite/Makefile
-  tests/userid/Makefile
 ])
 
 AC_OUTPUT
