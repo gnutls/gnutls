@@ -20,6 +20,7 @@ Build and Check with asan:
   tags:
   - nettle3
   - lcov
+  - asan
   - linux
   except:
   - tags
