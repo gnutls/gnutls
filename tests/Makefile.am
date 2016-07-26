@@ -20,7 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 SUBDIRS = . pkcs1-padding pkcs8-decode pkcs12-decode	\
-	userid cert-tests ocsp-tests key-tests sha2 safe-renegotiation dsa scripts ecdsa \
+	cert-tests ocsp-tests key-tests sha2 safe-renegotiation dsa scripts ecdsa \
 	slow dtls srp windows
 
 if ENABLE_OPENPGP
