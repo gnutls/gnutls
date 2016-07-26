@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . pkcs1-padding pkcs8-decode pkcs12-decode	\
+SUBDIRS = . pkcs8-decode pkcs12-decode \
 	cert-tests ocsp-tests key-tests sha2 safe-renegotiation dsa scripts ecdsa \
 	slow dtls srp windows
 
