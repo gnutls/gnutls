@@ -212,6 +212,19 @@
 }
 
 {
+   ignore p11 leaks2
+   Memcheck:Leak
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:p11_kit_module_initialize
+   fun:gnutls_pkcs11_add_provider
+}
+
+{
    nettle memxor3
    Memcheck:Addr8
    fun:memxor3

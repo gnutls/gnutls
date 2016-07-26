@@ -52,8 +52,6 @@
 #endif
 
 
-static const gnutls_datum_t testdata = {(void*)"test test", 9};
-
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
@@ -145,6 +143,7 @@ void doit(void)
 
 		gnutls_free(sig.data);		
 		gnutls_privkey_deinit(key);
+		gnutls_pkcs11_deinit();
 		gnutls_global_deinit();
 		exit(0);
 	}
@@ -153,6 +152,7 @@ void doit(void)
 		printf("done\n\n\n");
 
 	gnutls_privkey_deinit(key);
+	gnutls_pkcs11_deinit();
 	gnutls_global_deinit();
 }
 #else
