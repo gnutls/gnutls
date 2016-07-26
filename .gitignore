@@ -878,3 +878,12 @@ build-aux/ar-lib
 build-aux/config.rpath
 build-aux/test-driver
 build-aux/ylwrap
+tests/client-fastopen
+tests/dtls-sliding-window
+tests/pkcs11-privkey-fork
+tests/resume-with-false-start
+tests/rng-sigint
+tests/set_x509_key_file_ocsp
+tests/slow/cipher-compat
+tests/x509-dn
+tests/x509-dn-decode
