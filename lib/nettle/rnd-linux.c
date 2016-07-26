@@ -25,14 +25,13 @@
  * getrandom() -> /dev/urandom, where "->" indicates fallback.
  */
 
-#include "gnutls_int.h"
-#include "errors.h"
-#include <locks.h>
-#include <num.h>
-#include <nettle/yarrow.h>
-#include <errno.h>
-#include <rnd-common.h>
-#include <hash-pjw-bare.h>
+#ifndef RND_NO_INCLUDES
+# include "gnutls_int.h"
+# include "errors.h"
+# include <num.h>
+# include <errno.h>
+# include <rnd-common.h>
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -46,7 +45,6 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <fcntl.h>
-#include <locks.h>
 
 static int _gnutls_urandom_fd = -1;
 static ino_t _gnutls_urandom_fd_ino = 0;
