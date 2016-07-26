@@ -126,24 +126,27 @@ gnutls_transport_set_ptr2(gnutls_session_t session,
 /**
  * gnutls_transport_set_int2:
  * @session: is a #gnutls_session_t type.
- * @recv_int: is the value for the pull function
- * @send_int: is the value for the push function
+ * @recv_fd: is socket descriptor for the pull function
+ * @send_fd: is socket descriptor for the push function
  *
- * Used to set the first argument of the transport function (for push
- * and pull callbacks), when using the berkeley style sockets. 
- * With this function you can set two different
- * pointers for receiving and sending.
+ * This function sets the first argument of the transport functions,
+ * such as send() and recv() for the default callbacks using the
+ * system's socket API. With this function you can set two different
+ * descriptors for receiving and sending.
+ *
+ * This function is equivalent to calling gnutls_transport_set_ptr2()
+ * with the descriptors, but requires no casts.
  *
  * Since: 3.1.9
  **/
 void
 gnutls_transport_set_int2(gnutls_session_t session,
-			  int recv_int, int send_int)
+			  int recv_fd, int send_fd)
 {
 	session->internals.transport_send_ptr =
-	    (gnutls_transport_ptr_t) (long) send_int;
+	    (gnutls_transport_ptr_t) (long) send_fd;
 	session->internals.transport_recv_ptr =
-	    (gnutls_transport_ptr_t) (long) recv_int;
+	    (gnutls_transport_ptr_t) (long) recv_fd;
 }
 
 #if 0
@@ -151,20 +154,24 @@ gnutls_transport_set_int2(gnutls_session_t session,
 /**
  * gnutls_transport_set_int:
  * @session: is a #gnutls_session_t type.
- * @i: is the value.
+ * @fd: is the socket descriptor for the connection.
  *
- * Used to set the first argument of the transport function (for push
- * and pull callbacks) for berkeley style sockets.
+ * This function sets the first argument of the transport function, such
+ * as send() and recv() for the default callbacks using the
+ * system's socket API.
+ *
+ * This function is equivalent to calling gnutls_transport_set_ptr()
+ * with the descriptor, but requires no casts.
  *
  * Since: 3.1.9
  * 
  **/
-void gnutls_transport_set_int(gnutls_session_t session, int i)
+void gnutls_transport_set_int(gnutls_session_t session, int fd)
 {
 	session->internals.transport_recv_ptr =
-	    (gnutls_transport_ptr_t) (long) i;
+	    (gnutls_transport_ptr_t) (long) fd;
 	session->internals.transport_send_ptr =
-	    (gnutls_transport_ptr_t) (long) i;
+	    (gnutls_transport_ptr_t) (long) fd;
 }
 #endif
 
