@@ -71,13 +71,33 @@ static unsigned have_getrandom(void)
 	return 0;
 }
 
+/* returns exactly the amount of bytes requested */
+static int force_getrandom(void *buf, size_t buflen, unsigned int flags)
+{
+	int left = buflen;
+	int ret;
+	uint8_t *p = buf;
+
+	while (left > 0) {
+		ret = getrandom(p, left, flags);
+		if (ret == -1) {
+			if (errno != EINTR)
+				return ret;
+		}
+
+		if (ret > 0) {
+			left -= ret;
+			p += ret;
+		}
+	}
+
+	return buflen;
+}
+
 static int _rnd_get_system_entropy_getrandom(void* _rnd, size_t size)
 {
 	int ret;
-	do {
-		ret = getrandom(_rnd, size, 0);
-	} while (ret == -1 && errno == EINTR);
-
+	ret = force_getrandom(_rnd, size, 0);
 	if (ret == -1) {
 		int e = errno;
 		gnutls_assert();
@@ -85,25 +105,6 @@ static int _rnd_get_system_entropy_getrandom(void* _rnd, size_t size)
 			("Failed to use getrandom: %s\n",
 					 strerror(e));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
-	}
-
-	/* Since this function is only used internally for small sizes,
-	 * any limits of getrandom() are not reached. The only way
-	 * to receive less data than asked, is due to a signal interrupting
-	 * the system call. In that case we retry. */
-	if ((size_t)ret != size) {
-		unsigned i;
-		for (i=0;i<3;i++) {
-			do {
-				ret = getrandom(_rnd, size, 0);
-			} while (ret == -1 && errno == EINTR);
-
-			if ((size_t)ret == size)
-				break;
-		}
-
-		if (ret == -1 || (size_t)ret != size)
-			return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
 	}
 
 	return 0;
