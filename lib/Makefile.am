@@ -82,9 +82,9 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c			\
 	cert-session.c handshake-checks.c dtls-sw.c
 
 if WINDOWS
-COBJECTS += system-keys-win.c
+COBJECTS += system/keys-win.c
 else
-COBJECTS += system-keys-dummy.c
+COBJECTS += system/keys-dummy.c
 endif
 
 if ENABLE_SELF_CHECKS
