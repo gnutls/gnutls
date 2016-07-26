@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode	\
+SUBDIRS = . pkcs1-padding pkcs8-decode pkcs12-decode	\
 	userid cert-tests ocsp-tests key-tests sha2 safe-renegotiation dsa scripts ecdsa \
 	slow dtls srp windows
 
@@ -36,7 +36,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
-	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp
+	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
+	rsa-md5-collision/MD5CollisionCA.cer rsa-md5-collision/TargetCollidingCertificate1.cer \
+	rsa-md5-collision/TargetCollidingCertificate2.cer rsa-md5-collision/README
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -250,7 +252,7 @@ name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test
+dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
 
 if !WINDOWS
 dist_check_SCRIPTS += danetool.sh fastopen.sh
