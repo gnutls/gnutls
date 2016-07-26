@@ -109,7 +109,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange x509-cert-callback-legacy \
 	 keylog-env ssl2-hello tlsfeature-ext dtls-rehandshake-cert-2 \
 	 tlsfeature-crt dtls-rehandshake-cert-3 resume-with-false-start \
-	 set_x509_key_file_ocsp
+	 set_x509_key_file_ocsp client-fastopen
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
