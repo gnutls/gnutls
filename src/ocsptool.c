@@ -47,6 +47,16 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
+gnutls_session_t init_tls_session(const char *host)
+{
+	return NULL;
+}
+
+int do_handshake(socket_st * socket)
+{
+	return -1;
+}
+
 static void request_info(void)
 {
 	gnutls_ocsp_req_t req;

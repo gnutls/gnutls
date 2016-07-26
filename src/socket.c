@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -201,18 +202,18 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 	return ret;
 }
 
-void
-socket_starttls(socket_st * socket, const char *app_proto)
+static void
+socket_starttls(socket_st * socket)
 {
 	char buf[512];
 
 	if (socket->secure)
 		return;
 
-	if (app_proto == NULL || strcasecmp(app_proto, "https") == 0)
+	if (socket->app_proto == NULL || strcasecmp(socket->app_proto, "https") == 0)
 		return;
 
-	if (strcasecmp(app_proto, "smtp") == 0 || strcasecmp(app_proto, "submission") == 0) {
+	if (strcasecmp(socket->app_proto, "smtp") == 0 || strcasecmp(socket->app_proto, "submission") == 0) {
 		if (socket->verbose)
 			printf("Negotiating SMTP STARTTLS\n");
 
@@ -222,7 +223,7 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		wait_for_text(socket, "250 ", 4);
 		send_line(socket, "STARTTLS\n");
 		wait_for_text(socket, "220 ", 4);
-	} else if (strcasecmp(app_proto, "imap") == 0 || strcasecmp(app_proto, "imap2") == 0) {
+	} else if (strcasecmp(socket->app_proto, "imap") == 0 || strcasecmp(socket->app_proto, "imap2") == 0) {
 		if (socket->verbose)
 			printf("Negotiating IMAP STARTTLS\n");
 
@@ -230,7 +231,7 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		wait_for_text(socket, "a OK", 4);
 		send_line(socket, "a STARTTLS\r\n");
 		wait_for_text(socket, "a OK", 4);
-	} else if (strcasecmp(app_proto, "xmpp") == 0) {
+	} else if (strcasecmp(socket->app_proto, "xmpp") == 0) {
 		if (socket->verbose)
 			printf("Negotiating XMPP STARTTLS\n");
 
@@ -239,13 +240,13 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		wait_for_text(socket, "<?", 2);
 		send_line(socket, "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
 		wait_for_text(socket, "<proceed", 8);
-	} else if (strcasecmp(app_proto, "ldap") == 0) {
+	} else if (strcasecmp(socket->app_proto, "ldap") == 0) {
 		if (socket->verbose)
 			printf("Negotiating LDAP STARTTLS\n");
 #define LDAP_STR "\x30\x1d\x02\x01\x01\x77\x18\x80\x16\x31\x2e\x33\x2e\x36\x2e\x31\x2e\x34\x2e\x31\x2e\x31\x34\x36\x36\x2e\x32\x30\x30\x33\x37"
 		send(socket->fd, LDAP_STR, sizeof(LDAP_STR)-1, 0);
 		wait_for_text(socket, NULL, 0);
-	} else if (strcasecmp(app_proto, "ftp") == 0 || strcasecmp(app_proto, "ftps") == 0) {
+	} else if (strcasecmp(socket->app_proto, "ftp") == 0 || strcasecmp(socket->app_proto, "ftps") == 0) {
 		if (socket->verbose)
 			printf("Negotiating FTP STARTTLS\n");
 
@@ -254,10 +255,10 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		send_line(socket, "AUTH TLS\r\n");
 		wait_for_text(socket, "234", 3);
 	} else {
-		if (!c_isdigit(app_proto[0])) {
+		if (!c_isdigit(socket->app_proto[0])) {
 			static int warned = 0;
 			if (warned == 0) {
-				fprintf(stderr, "unknown protocol '%s'\n", app_proto);
+				fprintf(stderr, "unknown protocol '%s'\n", socket->app_proto);
 				warned = 1;
 			}
 		}
@@ -309,7 +310,7 @@ void socket_bye(socket_st * socket)
 			ret = gnutls_bye(socket->session, GNUTLS_SHUT_WR);
 		while (ret == GNUTLS_E_INTERRUPTED
 		       || ret == GNUTLS_E_AGAIN);
-		if (ret < 0)
+		if (socket->verbose && ret < 0)
 			fprintf(stderr, "*** gnutls_bye() error: %s\n",
 				gnutls_strerror(ret));
 		gnutls_deinit(socket->session);
@@ -352,19 +353,25 @@ void canonicalize_host(char *hostname, char *service, unsigned service_size)
 	snprintf(service, service_size, "%s", p+1);
 }
 
+
 void
 socket_open(socket_st * hd, const char *hostname, const char *service,
-	    int flags, const char *msg)
+	    const char *app_proto, int flags, const char *msg, gnutls_datum_t *rdata)
 {
 	struct addrinfo hints, *res, *ptr;
 	int sd, err = 0;
-	int udp = flags & 1;
-	int fastopen = flags & 2;
+	int udp = flags & SOCKET_FLAG_UDP;
+	int fastopen = flags & SOCKET_FLAG_FASTOPEN;
 	char buffer[MAX_BUF + 1];
 	char portname[16] = { 0 };
 	char *a_hostname = (char*)hostname;
 
 	memset(hd, 0, sizeof(*hd));
+
+	if (rdata) {
+		hd->rdata.data = rdata->data;
+		hd->rdata.size = rdata->size;
+	}
 
 #ifdef HAVE_LIBIDN
 	err = idna_to_ascii_8z(hostname, &a_hostname, IDNA_ALLOW_UNASSIGNED);
@@ -374,6 +381,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 		exit(1);
 	}
 #endif
+	hd->hostname = strdup(hostname);
 
 	if (msg != NULL)
 		printf("Resolving '%s:%s'...\n", a_hostname,service);
@@ -426,12 +434,39 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 
 			if (msg)
 				printf("%s '%s:%s' (TFO)...\n", msg, buffer, portname);
+
 		} else {
 			if (msg)
 				printf("%s '%s:%s'...\n", msg, buffer, portname);
 
 			if ((err = connect(sd, ptr->ai_addr, ptr->ai_addrlen)) < 0)
 				continue;
+		}
+
+		if (!(flags & SOCKET_FLAG_RAW)) {
+			if (flags & SOCKET_FLAG_STARTTLS) {
+				socket_starttls(hd);
+			}
+
+			hd->session = init_tls_session(hostname);
+			if (hd->rdata.data) {
+				gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
+			}
+
+			hd->fd = sd;
+			gnutls_transport_set_int(hd->session, sd);
+
+			err = do_handshake(hd);
+			if (err == GNUTLS_E_PUSH_ERROR) { /* failed connecting */
+				gnutls_deinit(hd->session);
+				hd->session = NULL;
+				continue;
+			}
+			else if (err < 0) {
+				fprintf(stderr, "*** handshake has failed: %s\n", gnutls_strerror(err));
+				exit(1);
+			} else if (hd->verbose)
+				printf("- Handshake was completed\n");
 		}
 
 		break;
@@ -449,9 +484,12 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 		exit(1);
 	}
 
-	hd->secure = 0;
+	if (flags & SOCKET_FLAG_RAW)
+		hd->secure = 0;
+	else
+		hd->secure = 1;
+
 	hd->fd = sd;
-	hd->hostname = strdup(hostname);
 	hd->ip = strdup(buffer);
 	hd->service = strdup(portname);
 	hd->ptr = ptr;
@@ -461,22 +499,6 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	idn_free(a_hostname);
 #endif
 	return;
-}
-
-void sockets_init(void)
-{
-#ifdef _WIN32
-	WORD wVersionRequested;
-	WSADATA wsaData;
-
-	wVersionRequested = MAKEWORD(1, 1);
-	if (WSAStartup(wVersionRequested, &wsaData) != 0) {
-		perror("WSA_STARTUP_ERROR");
-	}
-#else
-	signal(SIGPIPE, SIG_IGN);
-#endif
-
 }
 
 /* converts a textual service or port to

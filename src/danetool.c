@@ -614,23 +614,18 @@ static int cert_callback(gnutls_session_t session)
 	return -1;
 }
 
-static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
+static gnutls_certificate_credentials_t xcred;
+static int file_fd = -1;
+static unsigned udp = 0;
+
+gnutls_session_t init_tls_session(const char *hostname)
 {
-	gnutls_certificate_credentials_t xcred;
 	gnutls_session_t session;
 	int ret;
-	struct priv_st priv;
+	static struct priv_st priv;
 
 	priv.found = 0;
-	priv.fd = fd;
-
-	ret = gnutls_certificate_allocate_credentials(&xcred);
-	if (ret < 0) {
-		fprintf(stderr, "error[%d]: %s\n", __LINE__,
-			gnutls_strerror(ret));
-		exit(1);
-	}
-	gnutls_certificate_set_verify_function(xcred, cert_callback);
+	priv.fd = file_fd;
 
 	ret = gnutls_init(&session, (udp?GNUTLS_DATAGRAM:0)|GNUTLS_CLIENT);
 	if (ret < 0) {
@@ -639,7 +634,6 @@ static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
 		exit(1);
 	}
 	gnutls_session_set_ptr(session, &priv);
-	gnutls_transport_set_int(session, hd->fd);
 
 	gnutls_set_default_priority(session);
 	if (hostname && is_ip(hostname)==0) {
@@ -647,29 +641,40 @@ static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
 	}
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
+	return session;
+}
+
+int do_handshake(socket_st * socket)
+{
+	int ret;
+
 	do {
-		ret = gnutls_handshake(session);
+		ret = gnutls_handshake(socket->session);
 	} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_WARNING_ALERT_RECEIVED);
 	/* we don't care on the result */
 
-	gnutls_deinit(session);
-	gnutls_certificate_free_credentials(xcred);
-
-	if (priv.found == 0)
-		return -1;
-
 	return 0;
 }
+
 
 static const char *obtain_cert(const char *hostname, const char *proto, const char *service,
 				const char *app_proto, unsigned quiet)
 {
 	socket_st hd;
 	const char *txt_service;
-	unsigned udp = 0;
 	static char tmpfile[32];
-	int fd, ret;
+	int ret;
 	const char *str = "Obtaining certificate from";
+	int socket_flags = 0;
+	struct priv_st *priv;
+
+	ret = gnutls_certificate_allocate_credentials(&xcred);
+	if (ret < 0) {
+		fprintf(stderr, "error[%d]: %s\n", __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+	gnutls_certificate_set_verify_function(xcred, cert_callback);
 
 	if (strcmp(proto, "udp") == 0)
 		udp = 1;
@@ -685,24 +690,33 @@ static const char *obtain_cert(const char *hostname, const char *proto, const ch
 
 	if (quiet)
 		str = NULL;
-	socket_open(&hd, hostname, txt_service, udp, str);
 
 	if (app_proto == NULL) app_proto = txt_service;
-	socket_starttls(&hd, app_proto);
+
+	if (udp)
+		socket_flags |= SOCKET_FLAG_UDP;
+	
 
 	umask(066);
-	fd = mkstemp(tmpfile);
-	if (fd == -1) {
+	file_fd = mkstemp(tmpfile);
+	if (file_fd == -1) {
 		int e = errno;
 		fprintf(stderr, "error[%d]: %s\n", __LINE__,
 			strerror(e));
 		exit(1);
 	}
 
-	ret = get_cert(&hd, hostname, udp, fd);
-	close(fd);
+	socket_open(&hd, hostname, txt_service, app_proto, socket_flags|SOCKET_FLAG_STARTTLS, str, NULL);
+
+	close(file_fd);
+
+	ret = 0;
+	priv = gnutls_session_get_ptr(hd.session);
+	if (priv->found == 0)
+		ret = -1;
 
 	socket_bye(&hd);
+	gnutls_certificate_free_credentials(xcred);
 
 	if (ret == -1)
 		return NULL;

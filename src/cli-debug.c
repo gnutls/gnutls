@@ -188,11 +188,28 @@ static const TLS_TEST tls_tests[] = {
 
 const char *ip;
 
+gnutls_session_t init_tls_session(const char *host)
+{
+	gnutls_session_t state = NULL;
+	gnutls_init(&state, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
+
+	set_read_funcs(state);
+	if (host && is_ip(host) == 0)
+		gnutls_server_name_set(state, GNUTLS_NAME_DNS,
+				       host, strlen(host));
+
+	return state;
+}
+
+int do_handshake(socket_st * socket)
+{
+	return 0; /* we do it locally */
+}
+
 int main(int argc, char **argv)
 {
 	int ret;
 	int i;
-	gnutls_session_t state;
 	char portname[6];
 	socket_st hd;
 	char app_proto[32] = "";
@@ -268,18 +285,8 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		socket_open(&hd, hostname, portname, 0, NULL);
+		socket_open(&hd, hostname, portname, app_proto, SOCKET_FLAG_STARTTLS, NULL, NULL);
 		hd.verbose = verbose;
-
-		socket_starttls(&hd, app_proto);
-
-		gnutls_init(&state, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
-
-		gnutls_transport_set_int(state, hd.fd);
-		set_read_funcs(state);
-		if (hostname && is_ip(hostname) == 0)
-			gnutls_server_name_set(state, GNUTLS_NAME_DNS,
-					       hostname, strlen(hostname));
 
 		do {
 			if (strcmp(app_proto, "https") != 0 && tls_tests[i].https_only != 0) {
@@ -287,7 +294,7 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			ret = tls_tests[i].func(state);
+			ret = tls_tests[i].func(hd.session);
 
 			if (ret != TEST_IGNORE) {
 				printf("%58s...", tls_tests[i].test_name);
@@ -312,8 +319,6 @@ int main(int argc, char **argv)
 		}
 		while (ret == TEST_IGNORE
 		       && tls_tests[i].test_name != NULL);
-
-		gnutls_deinit(state);
 
 		socket_bye(&hd);
 

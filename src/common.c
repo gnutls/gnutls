@@ -37,6 +37,13 @@
 #include <gnutls/crypto.h>
 #include <time.h>
 #include <common.h>
+#include <unistd.h>
+
+#ifndef _WIN32
+# include <signal.h>
+#else
+#include <ws2tcpip.h>
+#endif
 
 #ifdef ENABLE_PKCS11
 #include <gnutls/pkcs11.h>
@@ -1124,3 +1131,18 @@ void pkcs11_common(common_info_st *c)
 }
 
 #endif
+
+void sockets_init(void)
+{
+#ifdef _WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+
+	wVersionRequested = MAKEWORD(1, 1);
+	if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+		perror("WSA_STARTUP_ERROR");
+	}
+#else
+	signal(SIGPIPE, SIG_IGN);
+#endif
+}

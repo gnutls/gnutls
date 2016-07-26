@@ -87,6 +87,8 @@ int len = strlen(hostname);
 	return 0;
 }
 
+void sockets_init(void);
+
 #ifdef _WIN32
 static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {

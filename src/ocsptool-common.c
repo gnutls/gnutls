@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "common.h"
 
 #include <gnutls/gnutls.h>
 #include <gnutls/ocsp.h>
@@ -204,7 +205,7 @@ int send_ocsp_request(const char *server,
 		 (unsigned int) req.size);
 	headers_size = strlen(headers);
 
-	socket_open(&hd, hostname, service, 0, CONNECT_MSG);
+	socket_open(&hd, hostname, service, NULL, SOCKET_FLAG_RAW, CONNECT_MSG, NULL);
 
 	socket_send(&hd, headers, headers_size);
 	socket_send(&hd, req.data, req.size);

@@ -121,7 +121,6 @@ static gnutls_certificate_credentials_t xcred;
 /* prototypes */
 
 static void check_rehandshake(socket_st * socket, int ret);
-static int do_handshake(socket_st * socket);
 static void init_global_tls_stuff(void);
 static int cert_verify_ocsp(gnutls_session_t session);
 
@@ -660,7 +659,7 @@ cert_callback(gnutls_session_t session,
 
 /* initializes a gnutls_session_t with some defaults.
  */
-static gnutls_session_t init_tls_session(const char *host)
+gnutls_session_t init_tls_session(const char *host)
 {
 	const char *err;
 	int ret;
@@ -892,7 +891,7 @@ static int try_rehandshake(socket_st * hd)
 
 static int try_resume(socket_st * hd)
 {
-	int ret;
+	int ret, socket_flags = 0;
 	gnutls_datum_t rdata = {NULL, 0};
 
 	if (gnutls_session_is_resumed(hd->session) == 0) {
@@ -915,25 +914,15 @@ static int try_resume(socket_st * hd)
 
 	printf
 	    ("\n\n- Connecting again- trying to resume previous session\n");
-	socket_open(hd, hostname, service, udp | (fastopen << 1), CONNECT_MSG);
-
 	if (HAVE_OPT(STARTTLS_PROTO))
-	        socket_starttls(hd, OPT_ARG(STARTTLS_PROTO));
+		socket_flags |= SOCKET_FLAG_STARTTLS;
+	else if (fastopen)
+		socket_flags |= SOCKET_FLAG_FASTOPEN;
 
-	hd->session = init_tls_session(hostname);
-	if (rdata.data) {
-		hd->rdata.data = rdata.data;
-		hd->rdata.size = rdata.size;
+	if (udp)
+		socket_flags |= SOCKET_FLAG_UDP;
 
-		gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
-	}
-
-	ret = do_handshake(hd);
-	if (ret < 0) {
-		fprintf(stderr, "*** Resume handshake has failed\n");
-		gnutls_perror(ret);
-		return ret;
-	}
+	socket_open(hd, hostname, service, OPT_ARG(STARTTLS_PROTO), socket_flags, CONNECT_MSG, &rdata);
 
 	printf("- Resume Handshake was completed\n");
 	if (gnutls_session_is_resumed(hd->session) != 0)
@@ -1193,6 +1182,7 @@ int main(int argc, char **argv)
 	char *keyboard_buffer_ptr;
 	inline_cmds_st inline_cmds;
 	unsigned last_op_is_write = 0;
+	int socket_flags = 0;
 #ifndef _WIN32
 	struct sigaction new_action;
 #endif
@@ -1218,34 +1208,21 @@ int main(int argc, char **argv)
 
 	canonicalize_host(hostname, service, sizeof(service));
 
-	socket_open(&hd, hostname, service, udp | (fastopen << 1), CONNECT_MSG);
-	hd.verbose = verbose;
-
-	if (HAVE_OPT(STARTTLS_PROTO))
-	        socket_starttls(&hd, OPT_ARG(STARTTLS_PROTO));
-
-	hd.session = init_tls_session(hostname);
+	if (udp)
+		socket_flags |= SOCKET_FLAG_UDP;
+	if (fastopen)
+		socket_flags |= SOCKET_FLAG_FASTOPEN;
 	if (starttls)
-		goto after_handshake;
+		socket_flags |= SOCKET_FLAG_STARTTLS;
 
-	ret = do_handshake(&hd);
-
-	if (ret < 0) {
-		fprintf(stderr, "*** Handshake has failed\n");
-		gnutls_perror(ret);
-		print_other_info(hd.session);
-		gnutls_deinit(hd.session);
-		return 1;
-	} else
-		printf("- Handshake was completed\n");
+	socket_open(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO), socket_flags, CONNECT_MSG, NULL);
+	hd.verbose = verbose;
 
 	if (resume != 0)
 		if (try_resume(&hd))
 			return 1;
 
 	print_other_info(hd.session);
-
-      after_handshake:
 
 	/* Warning!  Do not touch this text string, it is used by external
 	   programs to search for when gnutls-cli has reached this point. */
@@ -1670,7 +1647,7 @@ static void check_rehandshake(socket_st * socket, int ret)
 }
 
 
-static int do_handshake(socket_st * socket)
+int do_handshake(socket_st * socket)
 {
 	int ret;
 
@@ -1680,7 +1657,6 @@ static int do_handshake(socket_st * socket)
 					      socket->connect_addrlen);
 		socket->connect_addrlen = 0;
 	} else {
-		gnutls_transport_set_int(socket->session, socket->fd);
 		set_read_funcs(socket->session);
 	}
 
