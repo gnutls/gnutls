@@ -79,6 +79,9 @@ gnutls_log_func _gnutls_log_func = NULL;
 gnutls_audit_log_func _gnutls_audit_log_func = NULL;
 int _gnutls_log_level = 0;	/* default log level */
 
+static int _gnutls_global_init(unsigned constructor);
+static void _gnutls_global_deinit(unsigned destructor);
+
 static void default_log_func(int level, const char* str)
 {
 	fprintf(stderr, "gnutls[%d]: %s", level, str);
@@ -217,11 +220,18 @@ static int _gnutls_init_ret = 0;
  **/
 int gnutls_global_init(void)
 {
+	return _gnutls_global_init(0);
+}
+
+static int _gnutls_global_init(unsigned constructor)
+{
 	int ret = 0, res;
 	int level;
 	const char* e;
-	
-	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
+
+	if (!constructor) {
+		GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
+	}
 
 	_gnutls_init++;
 	if (_gnutls_init > 1) {
@@ -379,13 +389,17 @@ int gnutls_global_init(void)
 
       out:
 	_gnutls_init_ret = ret;
-	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+	if (!constructor) {
+		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+	}
 	return ret;
 }
 
 static void _gnutls_global_deinit(unsigned destructor)
 {
-	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
+	if (!destructor) {
+		GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
+	}
 
 	if (_gnutls_init == 1) {
 		_gnutls_init = 0;
@@ -431,7 +445,9 @@ static void _gnutls_global_deinit(unsigned destructor)
 	}
 
  fail:
-	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+	if (!destructor) {
+		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+	}
 }
 
 /**
@@ -485,7 +501,7 @@ const char *e;
 			return;
 	}
 
-	ret = gnutls_global_init();
+	ret = _gnutls_global_init(1);
 	if (ret < 0) {
 		fprintf(stderr, "Error in GnuTLS initialization: %s\n", gnutls_strerror(ret));
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
