@@ -156,7 +156,7 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 					   name_constraints_node_st ** _nc_excluded)
 {
 	name_constraints_node_st *nc, *nc2, *t, *tmp, *dest = NULL, *prev = NULL;
-	int ret, type;
+	int ret, type, used;
 
 	/* temporary array to see, if we need to add universal excluded constraints
 	 * (see phase 3 for details)
@@ -206,11 +206,15 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 	 * and create intersections of nodes with same type */
 	nc2 = _nc2;
 	while (nc2 != NULL) {
+		// current nc2 node has not yet been used for any intersection
+		// (and is not in DEST either)
+		used = 0;
 		t = nc;
 		while (t != NULL) {
 			// save intersection of name constraints into tmp
 			ret = name_constraints_intersect_nodes(t, nc2, &tmp);
 			if (ret < 0) return gnutls_assert_val(ret);
+			used = 1;
 			// if intersection is not empty
 			if (tmp != NULL) { // intersection for this type is not empty
 				// check bounds
@@ -225,6 +229,22 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 				dest = tmp;
 			}
 			t = t->next;
+		}
+		// if the node from nc2 was not used for intersection, copy it to DEST
+		if (!used) {
+			tmp = gnutls_malloc(sizeof(struct name_constraints_node_st));
+			if (tmp == NULL) {
+				_gnutls_name_constraints_node_free(dest);
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			}
+			tmp->type = nc2->type;
+			ret = _gnutls_set_datum(&tmp->name, nc2->name.data, nc2->name.size);
+			if (ret < 0) {
+				_gnutls_name_constraints_node_free(dest);
+				return gnutls_assert_val(ret);
+			}
+			tmp->next = dest;
+			dest = tmp;
 		}
 		nc2 = nc2->next;
 	}
@@ -250,10 +270,6 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 		tmp->type = type;
 		tmp->name.data = NULL;
 		tmp->name.size = 0;
-		if (ret < 0) {
-			_gnutls_name_constraints_node_free(tmp);
-			return gnutls_assert_val(ret);
-		}
 		tmp->next = *_nc_excluded;
 		*_nc_excluded = tmp;
 	}
