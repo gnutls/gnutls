@@ -359,6 +359,8 @@ char *gnutls_session_get_desc(gnutls_session_t session)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
+ *
+ * Since: 3.2.1
  **/
 int
 gnutls_session_set_id(gnutls_session_t session, const gnutls_datum_t * sid)
