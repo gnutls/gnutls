@@ -411,6 +411,9 @@ gnutls_prf_rfc5705(gnutls_session_t session,
  *
  * The output is placed in @out, which must be pre-allocated.
  *
+ * Note: This function produces identical output with gnutls_prf_rfc5705()
+ * when @server_random_first is set to 0 and @extra is %NULL.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
