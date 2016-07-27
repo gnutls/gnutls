@@ -50,7 +50,7 @@ static int _gnutls_urandom_fd = -1;
 static ino_t _gnutls_urandom_fd_ino = 0;
 static dev_t _gnutls_urandom_fd_rdev = 0;
 
-#if defined(__linux)
+#if defined(__linux__)
 # ifdef HAVE_LINUX_GETRANDOM
 #  include <linux/random.h>
 # else
@@ -107,7 +107,7 @@ static int _rnd_get_system_entropy_getrandom(void* _rnd, size_t size)
 
 	return 0;
 }
-#else
+#else /* not linux */
 # define have_getrandom() 0
 #endif
 
@@ -162,7 +162,7 @@ int _rnd_system_entropy_init(void)
 	int old;
 	struct stat st;
 
-#if defined(__linux)
+#if defined(__linux__)
 	/* Enable getrandom() usage if available */
 	if (have_getrandom()) {
 		_rnd_get_system_entropy = _rnd_get_system_entropy_getrandom;
