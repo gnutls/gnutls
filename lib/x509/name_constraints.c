@@ -156,7 +156,7 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 					   name_constraints_node_st ** _nc_excluded)
 {
 	name_constraints_node_st *nc, *nc2, *t, *tmp, *dest = NULL, *prev = NULL;
-	int ret;
+	int ret, type;
 
 	/* temporary array to see, if we need to add universal excluded constraints
 	 * (see phase 3 for details)
@@ -238,7 +238,7 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 	 * and we didn't have at the beginning, we have to add a new
 	 * excluded constraint with universal wildcard
 	 * (since the intersection of permitted is now empty). */
-	for (int type = 1; type <= GNUTLS_SAN_MAX; type++) {
+	for (type = 1; type <= GNUTLS_SAN_MAX; type++) {
 		if (types_with_empty_intersection[type-1] == 0)
 			continue;
 		_gnutls_hard_log("Adding universal excluded name constraintfor type %d.\n", type);
