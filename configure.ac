@@ -48,6 +48,14 @@ AC_PROG_SED
 
 AC_USE_SYSTEM_EXTENSIONS
 
+#
+# Require C99 support
+#    
+AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" = "no"; then
+  AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])
+fi
+
 AX_CODE_COVERAGE
 
 AC_ARG_ENABLE(doc,
