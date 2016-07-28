@@ -19,10 +19,10 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = README key-ca.pem key-user.pem \
-	ca-gnutls-keyid.pem ca-no-keyid.pem ca-weird-keyid.pem \
-	key-ca-1234.p8 key-ca-empty.p8 key-ca-null.p8 \
-	openssl-key-ecc.p8 key-ecc.p8 key-ecc.pem suppressions.valgrind
+EXTRA_DIST = README data/key-ca.pem data/key-user.pem \
+	data/ca-gnutls-keyid.pem data/ca-no-keyid.pem data/ca-weird-keyid.pem \
+	data/key-ca-1234.p8 data/key-ca-empty.p8 data/key-ca-null.p8 \
+	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind
 
 dist_check_SCRIPTS = key-id pkcs8
 

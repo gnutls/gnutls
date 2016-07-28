@@ -24,14 +24,16 @@ set -e
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+TMPFILE=key-id.$$.tmp
+TEMPLFILE=tmpl.$$.tmp
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
 
-PARAMS="--generate-certificate --load-privkey '${srcdir}/key-user.pem' --load-ca-privkey '${srcdir}/key-ca.pem' --template tmpl"
+PARAMS="--generate-certificate --load-privkey '${srcdir}/data/key-user.pem' --load-ca-privkey '${srcdir}/data/key-ca.pem' --template $TEMPLFILE"
 
-echo "serial = 0" > tmpl
+echo "serial = 0" > $TEMPLFILE
 
 #eval "${CERTTOOL}" ${PARAMS} --load-ca-certificate $srcdir/ca-gnutls-keyid.pem \
 #    --outfile user-gnutls-keyid.pem 2> /dev/null
@@ -39,10 +41,10 @@ echo "serial = 0" > tmpl
 #eval "${CERTTOOL}" ${PARAMS} --load-ca-certificate $srcdir/ca-no-keyid.pem \
 #    --outfile user-no-keyid.pem 2> /dev/null
 
-eval ${VALGRIND} "${CERTTOOL}" ${PARAMS} --load-ca-certificate "${srcdir}/ca-weird-keyid.pem" \
-	--outfile user-weird-keyid.pem
+eval ${VALGRIND} "${CERTTOOL}" ${PARAMS} --load-ca-certificate "${srcdir}/data/ca-weird-keyid.pem" \
+	--outfile $TMPFILE
 
-if ${VALGRIND} "${CERTTOOL}" -i < user-weird-keyid.pem \
+if ${VALGRIND} "${CERTTOOL}" -i < $TMPFILE \
 	| grep '7a2c7a6097460603cbfb28e8e219df18deeb4e0d' > /dev/null; then
 :
 else
@@ -50,7 +52,7 @@ else
 	exit 1;
 fi
 
-rm -f tmpl user-gnutls-keyid.pem user-no-keyid.pem user-weird-keyid.pem
+rm -f $TEMPLFILE $TMPFILE
 
 # We're done.
 exit 0

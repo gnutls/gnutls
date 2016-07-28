@@ -22,15 +22,17 @@ srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 GREP="${GREP:-grep}"
 
+TMPFILE=tmp-key-ca.$$.p8
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
 
 # check keys with password
-${VALGRIND} "${CERTTOOL}" --to-p8 --load-privkey  "${srcdir}/key-ca.pem" --password "1234" \
-	--outfile tmp-key-ca.p8 2>/dev/null
+${VALGRIND} "${CERTTOOL}" --to-p8 --load-privkey  "${srcdir}/data/key-ca.pem" --password "1234" \
+	--outfile $TMPFILE 2>/dev/null
 
-${GREP} "BEGIN ENCRYPTED PRIVATE KEY" tmp-key-ca.p8  >/dev/null 2>&1
+${GREP} "BEGIN ENCRYPTED PRIVATE KEY" $TMPFILE  >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -38,7 +40,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/key-ca.pem" --password "1234" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/key-ca.pem" --password "1234" >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -46,7 +48,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/key-ca-1234.p8" --password "1234" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/key-ca-1234.p8" --password "1234" >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -55,10 +57,10 @@ if test "${rc}" != "0"; then
 fi
 
 #keys encrypted with empty password
-${VALGRIND} "${CERTTOOL}" --to-p8 --load-privkey  "${srcdir}/key-ca.pem" --password "" \
-		--outfile tmp-key-ca.p8 2>/dev/null
+${VALGRIND} "${CERTTOOL}" --to-p8 --load-privkey  "${srcdir}/data/key-ca.pem" --password "" \
+		--outfile $TMPFILE 2>/dev/null
 
-${GREP} "BEGIN PRIVATE KEY" tmp-key-ca.p8  >/dev/null 2>&1
+${GREP} "BEGIN PRIVATE KEY" $TMPFILE  >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -66,7 +68,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/key-ca.pem" --password "" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/key-ca.pem" --password "" >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -74,7 +76,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/key-ca-empty.p8" --password "" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/key-ca-empty.p8" --password "" >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -83,10 +85,10 @@ if test "${rc}" != "0"; then
 fi
 
 #keys encrypted with null password
-${VALGRIND} "${CERTTOOL}" --to-p8 --load-privkey  "${srcdir}/key-ca.pem" --null-password \
-	--outfile tmp-key-ca.p8 2>/dev/null
+${VALGRIND} "${CERTTOOL}" --to-p8 --load-privkey  "${srcdir}/data/key-ca.pem" --null-password \
+	--outfile $TMPFILE 2>/dev/null
 
-${GREP} "BEGIN ENCRYPTED PRIVATE KEY" tmp-key-ca.p8 >/dev/null 2>&1
+${GREP} "BEGIN ENCRYPTED PRIVATE KEY" $TMPFILE >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -94,7 +96,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/key-ca.pem" --null-password >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/key-ca.pem" --null-password >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -102,7 +104,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/key-ca-null.p8" --null-password >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/key-ca-null.p8" --null-password >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -112,7 +114,7 @@ fi
 
 # Tests for PKCS #8 ECC keys
 
-${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/key-ecc.pem" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/data/key-ecc.pem" >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -120,7 +122,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/key-ecc.p8" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/key-ecc.p8" >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -128,7 +130,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/openssl-key-ecc.p8" >/dev/null 2>&1
+${VALGRIND} "${CERTTOOL}" -k --pkcs8 --infile "${srcdir}/data/openssl-key-ecc.p8" >/dev/null 2>&1
 rc=$?
 # We're done.
 if test "${rc}" != "0"; then
@@ -136,6 +138,6 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-key-ca.p8
+rm -f $TMPFILE
 
 exit 0
