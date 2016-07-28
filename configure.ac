@@ -933,17 +933,10 @@ AC_CONFIG_FILES([
   tests/windows/Makefile
   tests/cert-tests/Makefile
   tests/ocsp-tests/Makefile
-  tests/dsa/Makefile
   tests/dtls/Makefile
-  tests/srp/Makefile
-  tests/ecdsa/Makefile
   tests/key-tests/Makefile
   tests/openpgp-certs/Makefile
-  tests/pkcs12-decode/Makefile
-  tests/pkcs8-decode/Makefile
-  tests/safe-renegotiation/Makefile
   tests/scripts/Makefile
-  tests/sha2/Makefile
   tests/slow/Makefile
   tests/suite/Makefile
 ])
