@@ -76,9 +76,12 @@ const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
  *
  * Get the peer's raw certificate (chain) as sent by the peer.  These
  * certificates are in raw format (DER encoded for X.509).  In case of
- * a X.509 then a certificate list may be present.  The first
- * certificate in the list is the peer's certificate, following the
- * issuer's certificate, then the issuer's issuer etc.
+ * a X.509 then a certificate list may be present.  The list
+ * is provided as sent by the server; the server must send as first
+ * certificate in the list its own certificate, following the
+ * issuer's certificate, then the issuer's issuer etc. However, there
+ * are servers which violate this principle and thus on certain
+ * occasions this may be an unsorted list.
  *
  * In case of OpenPGP keys a single key will be returned in raw
  * format.
