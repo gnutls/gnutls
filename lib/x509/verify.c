@@ -529,7 +529,7 @@ typedef struct verify_state_st {
  * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
  *
  * Output will hold some extra information about the verification
- * procedure. Issuer will hold the actual issuer from the trusted list.
+ * procedure.
  */
 static unsigned
 verify_crt(gnutls_x509_crt_t cert,
