@@ -3180,11 +3180,6 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned
 			return GNUTLS_E_CERTIFICATE_ERROR;
 		}
 
-		if (f->size >= sizeof(f->feature)/sizeof(f->feature[0])) {
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
-
 		/* skip duplicates */
 		for (j=0;j<f->size;j++) {
 			if (f->feature[j] == feature) {
@@ -3194,6 +3189,11 @@ static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned
 		}
 
 		if (!skip) {
+			if (f->size >= sizeof(f->feature)/sizeof(f->feature[0])) {
+				gnutls_assert();
+				return GNUTLS_E_INTERNAL_ERROR;
+			}
+
 			indx = f->size;
 			f->feature[indx] = feature;
 			f->size++;
