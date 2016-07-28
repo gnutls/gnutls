@@ -142,7 +142,6 @@ void doit(void)
         /* check whether we can import a very long list */
         assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        /* we don't fail, we simply import to our upper limit with no error */
         assert(gnutls_x509_ext_import_tlsfeatures(&der_long, feat, 0) == GNUTLS_E_INTERNAL_ERROR);
 
         gnutls_x509_tlsfeatures_deinit(feat);
