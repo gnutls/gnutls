@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . cert-tests ocsp-tests key-tests sha2 safe-renegotiation scripts ecdsa \
+SUBDIRS = . cert-tests ocsp-tests key-tests sha2 safe-renegotiation scripts \
 	slow dtls srp windows
 
 if ENABLE_OPENPGP
