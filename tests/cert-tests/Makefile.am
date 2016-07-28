@@ -51,11 +51,13 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/arb-extensions.csr data/pkcs1-pad-ok.pem data/pkcs1-pad-broken.pem \
 	data/pkcs1-pad-ok2.pem data/pkcs1-pad-broken2.pem data/pkcs1-pad-broken3.pem \
 	data/client.p12 data/noclient.p12 data/unclient.p12 data/pkcs12_2certs.p12 \
-	data/pkcs12_5certs.p12 data/test-null.p12 data/cert-ca.p12 data/sha256.p12
+	data/pkcs12_5certs.p12 data/test-null.p12 data/cert-ca.p12 data/sha256.p12 \
+	data/key-ca.pem data/key-subca.pem data/key-subsubca.pem data/key-user.pem \
+	data/key-dsa.pem data/key-ca-dsa.pem data/key-subca-dsa.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
-	provable-dh userid
+	provable-dh userid sha2-test sha2-dsa-test
 
 if !ENABLE_FIPS140
 dist_check_SCRIPTS += pkcs12
