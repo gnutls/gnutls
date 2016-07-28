@@ -258,6 +258,8 @@ gl/tests/test-ftello4
 gl/tests/test-ftruncate
 gl/tests/test-func
 gl/tests/test-fwrite
+gl/tests/ctype.h
+gl/tests/test-ctype
 gl/tests/test-getaddrinfo
 gl/tests/test-getcwd-lgpl
 gl/tests/test-getdelim
@@ -887,3 +889,4 @@ tests/set_x509_key_file_ocsp
 tests/slow/cipher-compat
 tests/x509-dn
 tests/x509-dn-decode
+config.cache
