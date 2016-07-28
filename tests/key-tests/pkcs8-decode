@@ -23,51 +23,52 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
+TMPFILE=pkcs8-decode.$$.tmp
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 ret=0
-for p8 in 'encpkcs8.pem foobar' unencpkcs8.pem 'enc2pkcs8.pem baz'; do
+for p8 in "encpkcs8.pem foobar" "unencpkcs8.pem" "enc2pkcs8.pem baz"; do
 	set -- ${p8}
 	file="$1"
 	passwd="$2"
 	${VALGRIND} "${CERTTOOL}" --key-info --pkcs8 --password "${passwd}" \
-		--infile "${srcdir}/${file}" | tee out >/dev/null
+		--infile "${srcdir}/data/${file}" | tee $TMPFILE >/dev/null
 	rc=$?
 	if test ${rc} != 0; then
-		cat out
+		cat $TMPFILE
 		echo "PKCS8 FATAL ${p8}"
 		ret=1
 	else
 		echo "PKCS8 OK ${p8}"
 	fi
 done
-rm -f out
+rm -f $TMPFILE
 
-for p8 in openssl-aes128.p8 openssl-aes256.p8 openssl-3des.p8; do
+for p8 in "openssl-aes128.p8" "openssl-aes256.p8" "openssl-3des.p8"; do
 	set -- ${p8}
 	file="$1"
 	passwd="$2"
 	${VALGRIND} "${CERTTOOL}" --p8-info --password "1234" \
-		--infile "${srcdir}/${file}" | tee out >/dev/null
+		--infile "${srcdir}/data/${file}" | tee $TMPFILE >/dev/null
 	rc=$?
 	if test ${rc} != 0; then
-		cat out
+		cat $TMPFILE
 		echo "PKCS8 FATAL ${p8}"
 		ret=1
 	fi
 
-	${DIFF} "${srcdir}/${p8}.txt" out
+	${DIFF} "${srcdir}/data/${p8}.txt" $TMPFILE
 	rc=$?
 	if test ${rc} != 0; then
-		cat out
+		cat $TMPFILE
 		echo "PKCS8 FATAL TXT ${p8}"
 		ret=1
 	fi
 done
-rm -f out
+rm -f $TMPFILE
 
 echo "PKCS8 DONE (rc $ret)"
 exit $ret
