@@ -49,11 +49,17 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/template-tlsfeature.pem data/template-tlsfeature.csr \
 	templates/template-tlsfeature-crq.tmpl templates/arb-extensions.tmpl data/arb-extensions.pem \
 	data/arb-extensions.csr data/pkcs1-pad-ok.pem data/pkcs1-pad-broken.pem \
-	data/pkcs1-pad-ok2.pem data/pkcs1-pad-broken2.pem data/pkcs1-pad-broken3.pem
+	data/pkcs1-pad-ok2.pem data/pkcs1-pad-broken2.pem data/pkcs1-pad-broken3.pem \
+	data/client.p12 data/noclient.p12 data/unclient.p12 data/pkcs12_2certs.p12 \
+	data/pkcs12_5certs.p12 data/test-null.p12 data/cert-ca.p12 data/sha256.p12
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
 	provable-dh userid
+
+if !ENABLE_FIPS140
+dist_check_SCRIPTS += pkcs12
+endif
 
 if !HAVE_BUGGY_LIBIDN
 dist_check_SCRIPTS += certtool-utf8
