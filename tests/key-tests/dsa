@@ -37,7 +37,7 @@ fi
 
 . "${srcdir}/../scripts/common.sh"
 
-size=`${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/dsa-pubkey-1018.pem"|grep "Algorithm Secur"|cut -d '(' -f 2|cut -d ' ' -f 1`
+size=`${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/dsa-pubkey-1018.pem"|grep "Algorithm Secur"|cut -d '(' -f 2|cut -d ' ' -f 1`
 
 if test "${size}" != "1024"; then
 	echo "The prime size (${size}) doesn't match the expected: 1024"
@@ -52,7 +52,7 @@ echo "Checking various DSA key sizes (port ${PORT})"
 echo "Checking DSA-1024 with TLS 1.0"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/cert.dsa.1024.pem" --x509keyfile "${srcdir}/dsa.1024.pem"
+launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem"
 PID=$!
 wait_server "${PID}"
 
@@ -63,19 +63,19 @@ PRIO="--priority NORMAL:+DHE-DSS:+SIGN-DSA-SHA512:+SIGN-DSA-SHA384:+SIGN-DSA-SHA
 echo "Checking server DSA-1024 with client DSA-1024 and TLS 1.0"
 
 #try with client key of 1024 bits (should succeed) 
-"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/cert.dsa.1024.pem" --x509keyfile "${srcdir}/dsa.1024.pem" </dev/null >/dev/null || \
+"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem" </dev/null >/dev/null || \
 	fail "${PID}" "Failed connection to a server with DSA 1024 key and TLS 1.0!"
 
 echo "Checking server DSA-1024 with client DSA-2048 and TLS 1.0"
 
 #try with client key of 2048 bits (should fail) 
-"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/cert.dsa.2048.pem" --x509keyfile "${srcdir}/dsa.2048.pem" </dev/null >/dev/null 2>&1 && \
+"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem" </dev/null >/dev/null 2>&1 && \
 	fail "${PID}" "Succeeded connection to a server with a client DSA 2048 key and TLS 1.0!"
 
 echo "Checking server DSA-1024 with client DSA-3072 and TLS 1.0"
 
 #try with client key of 3072 bits (should fail) 
-"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/cert.dsa.3072.pem" --x509keyfile "${srcdir}/dsa.3072.pem" </dev/null >/dev/null 2>&1 && \
+"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem" </dev/null >/dev/null 2>&1 && \
 	fail "${PID}" "Succeeded connection to a server with a client DSA 3072 key and TLS 1.0!"
 
 kill "${PID}"
@@ -86,7 +86,7 @@ wait
 echo "Checking DSA-1024 with TLS 1.2"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/cert.dsa.1024.pem" --x509keyfile "${srcdir}/dsa.1024.pem"
+launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem"
 PID=$!
 wait_server "${PID}"
 
@@ -96,19 +96,19 @@ wait_server "${PID}"
 echo "Checking server DSA-1024 with client DSA-1024 and TLS 1.2"
 
 #try with client key of 1024 bits (should succeed) 
-"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/cert.dsa.1024.pem" --x509keyfile "${srcdir}/dsa.1024.pem" </dev/null >/dev/null || \
+"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.1024.pem" --x509keyfile "${srcdir}/data/dsa.1024.pem" </dev/null >/dev/null || \
 	fail "${PID}" "Failed connection to a server with DSA 1024 key and TLS 1.2!"
 
 echo "Checking server DSA-1024 with client DSA-2048 and TLS 1.2"
 
 #try with client key of 2048 bits (should succeed) 
-"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/cert.dsa.2048.pem" --x509keyfile "${srcdir}/dsa.2048.pem" </dev/null >/dev/null || \
+"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem" </dev/null >/dev/null || \
 	fail "${PID}" "Failed connection to a server with a client DSA 2048 key and TLS 1.2!"
 
 echo "Checking server DSA-1024 with client DSA-3072 and TLS 1.2"
 
 #try with client key of 3072 bits (should succeed) 
-"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/cert.dsa.3072.pem" --x509keyfile "${srcdir}/dsa.3072.pem" </dev/null >/dev/null || \
+"${CLI}" ${DEBUG} ${PRIO} -p "${PORT}" 127.0.0.1 --insecure --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem" </dev/null >/dev/null || \
 	fail "${PID}" "Failed connection to a server with a client DSA 3072 key and TLS 1.2!"
 
 kill "${PID}"
@@ -119,7 +119,7 @@ wait
 #echo "Checking DSA-2048 with TLS 1.0"
 
 #eval "${GETPORT}"
-#launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/cert.dsa.2048.pem" --x509keyfile "${srcdir}/dsa.2048.pem"
+#launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem"
 #PID=$!
 #wait_server "${PID}"
 
@@ -133,7 +133,7 @@ wait
 echo "Checking DSA-2048 with TLS 1.2"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/cert.dsa.2048.pem" --x509keyfile "${srcdir}/dsa.2048.pem"
+launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.2048.pem" --x509keyfile "${srcdir}/data/dsa.2048.pem"
 PID=$!
 wait_server "${PID}"
 
@@ -147,7 +147,7 @@ wait
 
 #echo "Checking DSA-3072 with TLS 1.0"
 
-#launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/cert.dsa.3072.pem" --x509keyfile "${srcdir}/dsa.3072.pem"
+#launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem"
 #PID=$!
 #wait_server "${PID}"
 #
@@ -162,7 +162,7 @@ wait
 echo "Checking DSA-3072 with TLS 1.2"
 
 eval "${GETPORT}"
-launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/cert.dsa.3072.pem" --x509keyfile "${srcdir}/dsa.3072.pem"
+launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1" --x509certfile "${srcdir}/data/cert.dsa.3072.pem" --x509keyfile "${srcdir}/data/dsa.3072.pem"
 PID=$!
 wait_server "${PID}"
 

@@ -25,11 +25,17 @@ EXTRA_DIST = README data/key-ca.pem data/key-user.pem \
 	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind
 	data/encpkcs8.pem data/unencpkcs8.pem data/enc2pkcs8.pem \
 	data/openssl-3des.p8 data/openssl-3des.p8.txt data/openssl-aes128.p8 \
-	data/openssl-aes128.p8.txt data/openssl-aes256.p8 data/openssl-aes256.p8.txt
+	data/openssl-aes128.p8.txt data/openssl-aes256.p8 data/openssl-aes256.p8.txt \
+	data/cert.dsa.1024.pem data/cert.dsa.2048.pem data/cert.dsa.3072.pem \
+	data/dsa.1024.pem data/dsa.2048.pem data/dsa.3072.pem data/dsa-pubkey-1018.pem
 
-dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode
+dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa
 
 TESTS = key-id pkcs8 pkcs8-decode
+
+if !WINDOWS
+TESTS += dsa
+endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
