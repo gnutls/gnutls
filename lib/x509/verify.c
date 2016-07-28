@@ -519,6 +519,10 @@ typedef struct verify_state_st {
 	gnutls_verify_output_function *func;
 } verify_state_st;
 
+#define MARK_INVALID(x) gnutls_assert(); \
+	out |= (x|GNUTLS_CERT_INVALID); \
+	result = 0
+
 /* 
  * Verifies the given certificate against a certificate list of
  * trusted CAs.
@@ -552,11 +556,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		*output = 0;
 
 	if (vparams->max_path == 0) {
-		out |=
-		    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE |
-		    GNUTLS_CERT_INVALID;
-		gnutls_assert();
-		result = 0;
+		MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
 		/* bail immediately, to avoid inconistency  */
 		goto cleanup;
 	}
@@ -569,8 +569,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	    _gnutls_x509_get_signed_data(cert->cert, &cert->der, "tbsCertificate",
 					 &cert_signed_data);
 	if (ret < 0) {
-		result = 0;
-		gnutls_assert();
+		MARK_INVALID(0);
 		cert_signed_data.data = NULL;
 	}
 
@@ -578,8 +577,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	    _gnutls_x509_get_signature(cert->cert, "signature",
 				       &cert_signature);
 	if (ret < 0) {
-		result = 0;
-		gnutls_assert();
+		MARK_INVALID(0);
 		cert_signature.data = NULL;
 	}
 
@@ -587,8 +585,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	    _gnutls_x509_get_signature_algorithm(cert->cert,
 						 "signatureAlgorithm.algorithm");
 	if (ret < 0) {
-		result = 0;
-		gnutls_assert();
+		MARK_INVALID(0);
 	}
 	sigalg = ret;
 
@@ -596,21 +593,14 @@ verify_crt(gnutls_x509_crt_t cert,
 	 * authorities.
 	 */
 	if (issuer == NULL) {
-		out |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
-		gnutls_assert();
-		result = 0;
+		MARK_INVALID(GNUTLS_CERT_SIGNER_NOT_FOUND);
 	} else {
 		if (vparams->nc != NULL) {
 			/* append the issuer's constraints */
 			ret = gnutls_x509_crt_get_name_constraints(issuer, vparams->nc, 
 				GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, NULL);
 			if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
- nc_fail:
-				out |=
-				    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE |
-				    GNUTLS_CERT_INVALID;
-				gnutls_assert();
-				result = 0;
+				MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
 				goto nc_done;
 			}
 
@@ -618,85 +608,71 @@ verify_crt(gnutls_x509_crt_t cert,
 			if (end_cert != 0) {
 				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_DNSNAME, cert);
 				if (ret == 0) {
-					gnutls_assert();
-					goto nc_fail;
+					MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+					goto nc_done;
 				}
 
 				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_RFC822NAME, cert);
 				if (ret == 0) {
-					gnutls_assert();
-					goto nc_fail;
+					MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+					goto nc_done;
 				}
 
 				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_DN, cert);
 				if (ret == 0) {
-					gnutls_assert();
-					goto nc_fail;
+					MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+					goto nc_done;
 				}
 
 				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_URI, cert);
 				if (ret == 0) {
-					gnutls_assert();
-					goto nc_fail;
+					MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+					goto nc_done;
 				}
 
 				ret = gnutls_x509_name_constraints_check_crt(vparams->nc, GNUTLS_SAN_IPADDRESS, cert);
 				if (ret == 0) {
-					gnutls_assert();
-					goto nc_fail;
+					MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+					goto nc_done;
 				}
 			}
 		}
 
+ nc_done:
 		if (vparams->tls_feat != NULL) {
 			/* append the issuer's constraints */
 			ret = gnutls_x509_crt_get_tlsfeatures(issuer, vparams->tls_feat, GNUTLS_EXT_FLAG_APPEND, NULL);
 			if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
- feat_fail:
-				out |=
-				    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE |
-				    GNUTLS_CERT_INVALID;
-				gnutls_assert();
-				result = 0;
-				goto nc_done;
+				MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+				goto feat_done;
 			}
 
 			ret = gnutls_x509_tlsfeatures_check_crt(vparams->tls_feat, cert);
 			if (ret == 0) {
-				gnutls_assert();
-				goto feat_fail;
+				MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+				goto feat_done;
 			}
 		}
- nc_done:
 
+ feat_done:
 		issuer_version = gnutls_x509_crt_get_version(issuer);
 
 		if (issuer_version < 0) {
-			gnutls_assert();
-			result = 0;
+			MARK_INVALID(0);
 		} else if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
 	                   ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT)
 	                    || issuer_version != 1)) {
 			if (check_if_ca(cert, issuer, &vparams->max_path, flags) != 1) {
-				gnutls_assert();
-				out |=
-				    GNUTLS_CERT_SIGNER_NOT_CA |
-				    GNUTLS_CERT_INVALID;
-				result = 0;
+				MARK_INVALID(GNUTLS_CERT_SIGNER_NOT_CA);
 			}
 
 			ret =
 			    gnutls_x509_crt_get_key_usage(issuer, &usage, NULL);
 			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 				if (ret < 0) {
-					gnutls_assert();
-					out |= GNUTLS_CERT_INVALID;
+					MARK_INVALID(0);
 				} else if (!(usage & GNUTLS_KEY_KEY_CERT_SIGN)) {
-					gnutls_assert();
-					out |=
-					    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE
-					    | GNUTLS_CERT_INVALID;
-					result = 0;
+					MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
 				}
 			}
 		}
@@ -709,8 +685,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		}
 
 		if (me == NULL) {
-			gnutls_assert();
-			result = 0;
+			MARK_INVALID(0);
 		} else if (cert_signed_data.data != NULL &&
 		           cert_signature.data != NULL) {
 			ret =
@@ -719,26 +694,16 @@ verify_crt(gnutls_x509_crt_t cert,
 		        	                     &cert_signature,
 						     issuer);
 			if (ret == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
-				gnutls_assert();
-				out |=
-				    GNUTLS_CERT_INVALID |
-				    GNUTLS_CERT_SIGNATURE_FAILURE;
-				/* error. ignore it */
-				result = 0;
+				MARK_INVALID(GNUTLS_CERT_SIGNATURE_FAILURE);
 			} else if (ret < 0) {
-				result = 0;
-				gnutls_assert();
+				MARK_INVALID(0);
 			}
 		}
 	}
 
 	if (sigalg >= 0) {
 		if (is_level_acceptable(cert, issuer, sigalg, flags) == 0) {
-			gnutls_assert();
-			out |=
-			    GNUTLS_CERT_INSECURE_ALGORITHM |
-			    GNUTLS_CERT_INVALID;
-			result = 0;
+			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
 		}
 
 		/* If the certificate is not self signed check if the algorithms
@@ -748,11 +713,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		if (gnutls_sign_is_secure(sigalg) == 0 &&
 		    is_broken_allowed(sigalg, flags) == 0 &&
 		    is_issuer(cert, cert) == 0) {
-			gnutls_assert();
-			out |=
-			    GNUTLS_CERT_INSECURE_ALGORITHM |
-			    GNUTLS_CERT_INVALID;
-			result = 0;
+			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
 		}
 	}
 
