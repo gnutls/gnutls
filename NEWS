@@ -6,7 +6,7 @@ See the end for copying conditions.
 * Version 3.5.3 (unreleased)
 
 ** libgnutls: Added support for TCP fast open (RFC7413), allowing
-   to reduce round-trips in initial handshake. Based on proposal and
+   to reduce by one round-trip the handshake process. Based on proposal and
    patch by Tim Ruehsen.
 
 ** libgnutls: Adopted a simpler with less memory requirements DTLS sliding
@@ -27,7 +27,7 @@ See the end for copying conditions.
 
 ** libgnutls: Fixes in gnutls_x509_crt_list_import2, which was
    ignoring flags if all certificates in the list fit within the
-   initially allocated memory.
+   initially allocated memory. Patch by Tim Kosse.
 
 ** certtool: Added the "add_extension" and "add_critical_extension"
    template options. This allows specifying arbitrary extensions into
