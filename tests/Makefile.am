@@ -19,8 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . cert-tests ocsp-tests key-tests safe-renegotiation scripts \
-	slow dtls windows
+SUBDIRS = . cert-tests ocsp-tests key-tests scripts slow dtls windows
 
 if ENABLE_OPENPGP
 SUBDIRS += openpgp-certs
@@ -37,7 +36,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
 	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
 	rsa-md5-collision/MD5CollisionCA.cer rsa-md5-collision/TargetCollidingCertificate1.cer \
-	rsa-md5-collision/TargetCollidingCertificate2.cer rsa-md5-collision/README
+	rsa-md5-collision/TargetCollidingCertificate2.cer rsa-md5-collision/README \
+	safe-renegotiation/README 
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -110,7 +110,9 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange x509-cert-callback-legacy \
 	 keylog-env ssl2-hello tlsfeature-ext dtls-rehandshake-cert-2 \
 	 tlsfeature-crt dtls-rehandshake-cert-3 resume-with-false-start \
-	 set_x509_key_file_ocsp client-fastopen rng-sigint srp
+	 set_x509_key_file_ocsp client-fastopen rng-sigint srp \
+	 safe-renegotiation/srn0 safe-renegotiation/srn1 safe-renegotiation/srn2 \
+	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
