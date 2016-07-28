@@ -236,7 +236,7 @@ unsigned gnutls_x509_tlsfeatures_check_crt(gnutls_x509_tlsfeatures_t feat,
 
 	/* if cert's features cannot be a superset */
 	if (feat->size > cfeat->size) {
-		_gnutls_debug_log("certificate has %d, while issuer has %d tlsfeatures\n", cfeat->size, feat->size);
+		_gnutls_debug_log("certificate has %u, while issuer has %u tlsfeatures\n", cfeat->size, feat->size);
 		gnutls_assert();
 		uret = 0;
 		goto cleanup;
