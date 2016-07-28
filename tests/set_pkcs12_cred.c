@@ -72,7 +72,7 @@ void doit(void)
 
 		path = getenv("PKCS12PATH");
 		if (!path)
-			path = "pkcs12-decode/";
+			path = "cert-tests/data/";
 
 		snprintf(file, sizeof(file), "%s/%s", path, files[i].file);
 

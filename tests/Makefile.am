@@ -266,12 +266,12 @@ TESTS_ENVIRONMENT =						\
 	ASAN_OPTIONS=suppressions=gnutls-asan.supp		\
 	CAFILE=$(srcdir)/cert-tests/data/ca-certs.pem		\
 	P11MOCKLIB1=$(abs_builddir)/.libs/libpkcs11mock1.so	\
-	PKCS12_MANY_CERTS_FILE=$(srcdir)/pkcs12-decode/pkcs12_5certs.p12	\
-	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12		\
+	PKCS12_MANY_CERTS_FILE=$(srcdir)/cert-tests/data/pkcs12_5certs.p12	\
+	PKCS12FILE=$(srcdir)/cert-tests/data/client.p12		\
 	PKCS12PASSWORD=foobar					\
-	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
+	PKCS12FILE_2=$(srcdir)/cert-tests/data/pkcs12_2certs.p12	\
 	PKCS12PASSWORD_2=""					\
-	PKCS12PATH=$(srcdir)/pkcs12-decode/			\
+	PKCS12PATH=$(srcdir)/cert-tests/data/			\
 	X509CERTDIR=$(srcdir)/x509cert-dir/			\
 	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/system.prio	\
 	PSK_FILE=$(srcdir)/psk.passwd				\
