@@ -20,6 +20,11 @@ See the end for copying conditions.
 ** libgnutls: Fixed DNS name constraints checking in the case of empty
    intersection of domain names in the chain. Report and fix by Martin Ukrop.
 
+** libgnutls: Fixed name constraints checking in the case of chains
+   where the higher level certificates contained different types of
+   constraints than the ones present in the lower intermediate CAs.
+   Report and fix by Martin Ukrop.
+
 ** libgnutls: Dropped support for the EGD random generator.
 
 ** libgnutls: Allow the decoding of raw elements (starting with #)
