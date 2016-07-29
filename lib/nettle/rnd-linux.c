@@ -56,7 +56,7 @@ static dev_t _gnutls_urandom_fd_rdev = 0;
 # else
 #  include <sys/syscall.h>
 #  undef getrandom
-#  define getrandom(dst,s,flags) syscall(__NR_getrandom, (void*)dst, (size_t)s, (unsigned int)flags)
+#  define getrandom(dst,s,flags) syscall(SYS_getrandom, (void*)dst, (size_t)s, (unsigned int)flags)
 # endif
 
 static unsigned have_getrandom(void)
