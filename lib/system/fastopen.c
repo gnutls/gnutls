@@ -153,21 +153,27 @@ tfo_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
  * @connect_addr: is the address we want to connect to
  * @connect_addrlen: is the length of @connect_addr
  *
- * Enables TCP Fast Open (TFO) when @connect_addr and @connect_addrlen are set
- * before the transport socket has been connected.
+ * Enables TCP Fast Open (TFO) for the specified TLS client session.
+ * That means that TCP connection establishment and the transmission
+ * of the first TLS client hello packet are combined. The
+ * peer's address must be  specified in @connect_addr and @connect_addrlen,
+ * and the socket specified by @fd should not be connected.
  *
  * TFO only works for TCP sockets of type AF_INET and AF_INET6.
- * If the OS doesn't support TCP fast open this function will use
- * connect() transparently during the first write.
+ * If the OS doesn't support TCP fast open this function will result
+ * to gnutls using connect() transparently during the first write.
  *
- * Note: This function overrides all transport callback functions.
+ * Note: This function overrides all the transport callback functions.
  * If this is undesirable, TCP Fast Open must be implemented on the user
  * callback functions without calling this function. When using
- * this function gnutls_transport_set_ptr() or gnutls_transport_set_int()
- * must not be used.
+ * this function, transport callbacks must not be set, and 
+ * gnutls_transport_set_ptr() or gnutls_transport_set_int()
+ * must not be called.
  *
  * On GNU/Linux TFO has to be enabled at the system layer, that is
  *   in /proc/sys/net/ipv4/tcp_fastopen, bit 0 has to be set.
+ *
+ * This function has no effect on server sessions.
  *
  * Since: 3.5.3
  **/
@@ -178,6 +184,11 @@ gnutls_transport_set_fastopen(gnutls_session_t session,
 	if (connect_addrlen > (socklen_t)sizeof(session->internals.tfo.connect_addr)) {
 		gnutls_assert();
 		abort();
+	}
+
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		gnutls_assert();
+		return;
 	}
 
 	memcpy(&session->internals.tfo.connect_addr, connect_addr, connect_addrlen);
