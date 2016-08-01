@@ -89,7 +89,8 @@ _dsa_params_get(const gnutls_pk_params_st * pk_params,
 	memcpy(pub->g, pk_params->params[DSA_G], SIZEOF_MPZT);
 }
 
-static void
+/* returns 0 on invalid privkey */
+static unsigned
 _rsa_params_to_privkey(const gnutls_pk_params_st * pk_params,
 		       struct rsa_private_key *priv)
 {
@@ -99,18 +100,18 @@ _rsa_params_to_privkey(const gnutls_pk_params_st * pk_params,
 	memcpy(priv->c, pk_params->params[5], SIZEOF_MPZT);
 	memcpy(priv->a, pk_params->params[6], SIZEOF_MPZT);
 	memcpy(priv->b, pk_params->params[7], SIZEOF_MPZT);
-	priv->size =
-	    nettle_mpz_sizeinbase_256_u(TOMPZ
-					(pk_params->params[RSA_MODULUS]));
+	return (unsigned)rsa_private_key_prepare(priv);
 }
 
-static void
+/* returns 0 on invalid pubkey */
+static unsigned
 _rsa_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 		      struct rsa_public_key *pub)
 {
 	memcpy(pub->n, pk_params->params[RSA_MODULUS], SIZEOF_MPZT);
 	memcpy(pub->e, pk_params->params[RSA_PUB], SIZEOF_MPZT);
-	pub->size = nettle_mpz_sizeinbase_256_u(pub->n);
+
+	return (unsigned)rsa_public_key_prepare(pub);
 }
 
 static int
@@ -313,7 +314,13 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 		{
 			struct rsa_public_key pub;
 
-			_rsa_params_to_pubkey(pk_params, &pub);
+			ret = _rsa_params_to_pubkey(pk_params, &pub);
+			if (ret == 0) {
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_ENCRYPTION_FAILED);
+				goto cleanup;
+			}
 
 			ret =
 			    rsa_encrypt(&pub, NULL, rnd_func,
@@ -370,8 +377,13 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			size_t length;
 			bigint_t c;
 
-			_rsa_params_to_privkey(pk_params, &priv);
-			_rsa_params_to_pubkey(pk_params, &pub);
+			ret = _rsa_params_to_privkey(pk_params, &priv);
+			if (ret == 0)
+				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+			ret = _rsa_params_to_pubkey(pk_params, &pub);
+			if (ret == 0)
+				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 			if (ciphertext->size != pub.size)
 				return
@@ -542,8 +554,13 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			struct rsa_public_key pub;
 			mpz_t s;
 
-			_rsa_params_to_privkey(pk_params, &priv);
-			_rsa_params_to_pubkey(pk_params, &pub);
+			ret = _rsa_params_to_privkey(pk_params, &priv);
+			if (ret == 0)
+				return gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+
+			ret = _rsa_params_to_pubkey(pk_params, &pub);
+			if (ret == 0)
+				return gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
 
 			mpz_init(s);
 
@@ -680,7 +697,10 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		{
 			struct rsa_public_key pub;
 
-			_rsa_params_to_pubkey(pk_params, &pub);
+			ret = _rsa_params_to_pubkey(pk_params, &pub);
+			if (ret == 0) {
+				return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			}
 
 			if (signature->size != pub.size)
 				return
