@@ -55,7 +55,7 @@ tfo_send(gnutls_transport_ptr_t ptr, const void *buf, size_t len)
 		int ret;
 
 		ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
-		if (errno == ENOTCONN || errno == EINPROGRESS) {
+		if (ret == -1 && (errno == EINPROGRESS)) {
 			gnutls_assert();
 			errno = EAGAIN;
 		}
