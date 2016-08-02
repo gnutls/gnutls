@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_WIN32) || !defined(HAVE_LIBSECCOMP)
+#if defined(_WIN32)
 
 int main()
 {
