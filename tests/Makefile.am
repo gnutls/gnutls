@@ -121,7 +121,7 @@ endif
 
 if HAVE_CMOCKA
 LDADD += $(CMOCKA_LIBS)
-ctests += dtls-sliding-window ip-in-cidr
+ctests += dtls-sliding-window ip-utils
 endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread

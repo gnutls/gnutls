@@ -756,6 +756,7 @@ tests/mini-global-load
 .submodule.stamp
 lib/priority_options.h
 tests/name-constraints
+tests/ip-utils
 tests/x509-extensions
 tests/sec-params
 tests/suite/pkcs11-chainverify
