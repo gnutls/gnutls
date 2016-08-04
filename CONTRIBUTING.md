@@ -20,11 +20,20 @@ that we no longer require FSF copyright assignment.
 
    New functionality should be accompanied by a test case which verifies
 the correctness of GnuTLS' operation on successful use of the new
-functionality, as well as on fail cases. An example test suite can be seen
-in tests/set_x509_key_mem.c.  The GnuTLS test suite is run on "make check"
+functionality, as well as on fail cases. The GnuTLS test suite is run on "make check"
 on every system GnuTLS is installed, except for the tests/suite part
 which is only run during development.
 
+For testing functionality of gnutls we use two test unit testing frameworks:
+1. The gnutls testing framework as in [utils.h](tests/utils.h), usually for high level
+   tests such as testing a client against a server. See [set_x509_key_mem.c](tests/set_x509_key_mem.c).
+2. The cmocka unit testing framework, for unit testing of functions
+   or interfaces. See [dtls-sliding-window.c](tests/dtls-sliding-window.c).
+
+Certificates for testing purposes are available at [cert-common.h](tests/cert-common.h).
+Note that we do not regenerate test certificates when they expire, but
+we rather fix the test's time using datefudge or gnutls_global_set_time_function().
+For example, see [x509cert-tl.c](tests/x509cert-tl.c).
 
 # File names:
 
