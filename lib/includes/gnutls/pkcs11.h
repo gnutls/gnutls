@@ -432,7 +432,7 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 int gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
 				     gnutls_pkcs11_url_type_t
 				     detailed, char **url);
-int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key);
+unsigned gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key);
 
 #define gnutls_pkcs11_privkey_generate(url, pk, bits, label, flags) \
 	gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, 0, NULL, 0, flags)

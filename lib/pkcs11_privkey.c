@@ -355,7 +355,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
  * Since: 3.1.9
  *
  **/
-int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
+unsigned gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 {
 	ck_rv_t rv;
 	int ret;
