@@ -794,6 +794,7 @@ remaining until the next retransmission, or better the time until
 * Asynchronous operation::
 * Reducing round-trips::
 * DTLS sessions::
+* DTLS and SCTP::
 @end menu
 
 @node Asynchronous operation
@@ -914,6 +915,23 @@ a path MTU discovery mechanism @xcite{RFC4821}.
 
 @showfuncC{gnutls_dtls_set_mtu,gnutls_dtls_get_mtu,gnutls_dtls_get_data_mtu}
 
+@node DTLS and SCTP
+@subsection DTLS and SCTP
+
+Although DTLS can run under any reliable or unreliable layer, there are
+special requirements for SCTP according to @xcite{RFC6083}. We summarize the
+most important below, however for a full treatment we refer to @xcite{RFC6083}.
+
+@itemize
+@item The MTU set via @funcref{gnutls_dtls_set_mtu} must be 2^14.
+@item Replay detection must be disabled; use the flag @code{GNUTLS_NO_REPLAY_PROTECTION} with @funcref{gnutls_init}.
+@item Retransmission of messages must be disabled; use @funcref{gnutls_dtls_set_timeouts}
+   with a retransmission timeout larger than the total.
+@item Handshake, Alert and ChangeCipherSpec messages must be sent over stream 0 with unlimited reliability
+   and with the ordered delivery feature.
+@item During a rehandshake, the caching of messages with unknown epoch is
+   not handled by GnuTLS; this must be implemented in a special pull function.
+@end itemize
 
 @node TLS handshake
 @section TLS handshake
