@@ -290,6 +290,9 @@ static void server(int fd, const char *prio, int ign)
 	 * detects an error on the peer, the main process will never know.
 	 */
 
+	/* make sure we are not blocked forever */
+	gnutls_record_set_timeout(session, 10000);
+
 	/* Test receiving */
 	do {
 		ret = gnutls_record_recv(session, buffer, MAX_BUF);
@@ -335,7 +338,6 @@ static void start(const char *prio, int ign)
 		/* parent */
 		close(fd[1]);
 		server(fd[0], prio, ign);
-		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
 		client(fd[1], prio, ign);

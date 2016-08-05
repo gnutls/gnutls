@@ -207,6 +207,9 @@ static void client(int fd, const char *prio, int ign)
 		exit(1);
 	}
 
+	/* make sure we are not blocked forever */
+	gnutls_record_set_timeout(session, 10000);
+
 	/* Test receiving */
 	do {
 		do {
@@ -402,7 +405,6 @@ static void start(const char *prio, int ign)
 		/* parent */
 		close(fd[1]);
 		server(fd[0], prio, ign);
-		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
 		client(fd[1], prio, ign);
