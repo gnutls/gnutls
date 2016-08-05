@@ -216,6 +216,9 @@ static void client(int fd, const char *prio)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
+	/* make sure we are not blocked forever */
+	gnutls_record_set_timeout(session, 10000);
+
 	do {
 		do {
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
@@ -376,12 +379,11 @@ static void start(const char *prio)
 
 	if (child) {
 		/* parent */
-		close(fd[1]);
-		server(fd[0], prio);
-		kill(child, SIGTERM);
-	} else {
 		close(fd[0]);
 		client(fd[1], prio);
+	} else {
+		close(fd[1]);
+		server(fd[0], prio);
 		exit(0);
 	}
 }
