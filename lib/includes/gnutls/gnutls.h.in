@@ -2544,7 +2544,7 @@ void gnutls_supplemental_recv(gnutls_session_t session, unsigned do_recv_supplem
 void gnutls_supplemental_send(gnutls_session_t session, unsigned do_send_supplemental);
 
 /* FIPS140-2 related functions */
-int gnutls_fips140_mode_enabled(void);
+unsigned gnutls_fips140_mode_enabled(void);
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.

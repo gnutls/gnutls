@@ -402,7 +402,7 @@ error:
  *
  * Since: 3.3.0
  **/
-int gnutls_fips140_mode_enabled(void)
+unsigned gnutls_fips140_mode_enabled(void)
 {
 #ifdef ENABLE_FIPS140
 int ret = _gnutls_fips_mode_enabled();
