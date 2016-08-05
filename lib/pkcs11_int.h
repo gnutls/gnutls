@@ -350,7 +350,9 @@ _gnutls_pkcs11_get_random(struct ck_function_list *module,
 
 const char *pkcs11_strerror(ck_rv_t rv);
 
-inline static bool is_object_pkcs11_url(const char *url)
+/* Returns 1 if the provided URL is an object, rather than
+ * a token. */
+inline static bool is_pkcs11_url_object(const char *url)
 {
 	if (strstr(url, "id=") != 0 || strstr(url, "object=") != 0)
 		return 1;

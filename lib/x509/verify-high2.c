@@ -321,7 +321,7 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 			/* in case of a token URL import it as a PKCS #11 token,
 			 * otherwise import the individual certificates.
 			 */
-			if (is_object_pkcs11_url(ca_file) != 0) {
+			if (is_pkcs11_url_object(ca_file) != 0) {
 				return add_trust_list_pkcs11_object_url(list, ca_file, tl_flags);
 			} else { /* token */
 				if (list->pkcs11_token != NULL)
@@ -488,7 +488,7 @@ gnutls_x509_trust_list_remove_trust_file(gnutls_x509_trust_list_t list,
 
 #ifdef ENABLE_PKCS11
 	if (strncmp(ca_file, "pkcs11:", 7) == 0) {
-		if (is_object_pkcs11_url(ca_file) != 0) {
+		if (is_pkcs11_url_object(ca_file) != 0) {
 			return remove_pkcs11_object_url(list, ca_file);
 		} else { /* token */
 			return remove_pkcs11_url(list, ca_file);
