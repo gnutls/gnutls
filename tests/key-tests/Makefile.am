@@ -22,7 +22,7 @@
 EXTRA_DIST = README data/key-ca.pem data/key-user.pem \
 	data/ca-gnutls-keyid.pem data/ca-no-keyid.pem data/ca-weird-keyid.pem \
 	data/key-ca-1234.p8 data/key-ca-empty.p8 data/key-ca-null.p8 \
-	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind
+	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind \
 	data/encpkcs8.pem data/unencpkcs8.pem data/enc2pkcs8.pem \
 	data/openssl-3des.p8 data/openssl-3des.p8.txt data/openssl-aes128.p8 \
 	data/openssl-aes128.p8.txt data/openssl-aes256.p8 data/openssl-aes256.p8.txt \
