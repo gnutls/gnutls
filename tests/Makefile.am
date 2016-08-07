@@ -112,7 +112,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 tlsfeature-crt dtls-rehandshake-cert-3 resume-with-false-start \
 	 set_x509_key_file_ocsp client-fastopen rng-sigint srp \
 	 safe-renegotiation/srn0 safe-renegotiation/srn1 safe-renegotiation/srn2 \
-	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5
+	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5 \
+	 rsa-illegal-import
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp

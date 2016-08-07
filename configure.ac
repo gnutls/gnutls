@@ -456,6 +456,12 @@ AC_ARG_WITH(idn, AS_HELP_STRING([--without-idn],
             try_libidn="$withval", 
             try_libidn=yes)
 
+with_old_nettle=no
+if ! $PKG_CONFIG --atleast-version=3.3 nettle; then
+	with_old_nettle=yes
+fi
+AM_CONDITIONAL(WITH_OLD_NETTLE, test "$with_old_nettle" != "no")
+
 if test "$try_libidn" = yes;then
 PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
 if test "$with_libidn" != "no";then
