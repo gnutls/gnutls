@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
- * Copyright (C) 2012-2015 Nikos Mavrogiannopoulos
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -221,13 +222,6 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 		goto error;
 	}
 	pkey->params.params_nr++;
-
-	result =
-	    _gnutls_pk_fixup(GNUTLS_PK_RSA, GNUTLS_IMPORT, &pkey->params);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
 
 	pkey->params.params_nr = RSA_PRIVATE_PARAMS;
 
@@ -643,10 +637,16 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 	if (key->key == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_ASN1_DER_ERROR;
-	} else {
-		result = 0;
+		goto cleanup;
 	}
 
+	result =
+	    _gnutls_pk_fixup(key->pk_algorithm, GNUTLS_IMPORT, &key->params);
+	if (result < 0) {
+		gnutls_assert();
+	}
+
+ cleanup:
 	if (need_free)
 		_gnutls_free_datum(&_data);
 
@@ -727,6 +727,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 			    const char *password, unsigned int flags)
 {
 	int ret = 0;
+	int saved_ret = GNUTLS_E_PARSING_ERROR;
 	char pin[GNUTLS_PKCS11_MAX_PIN_LEN];
 	unsigned head_enc = 1;
 
@@ -770,6 +771,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 
 		if (ret < 0) {
 			gnutls_assert();
+			saved_ret = ret;
 			/* fall through to PKCS #8 decoding */
 		}
 	}
@@ -793,6 +795,9 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 			    gnutls_x509_privkey_import_pkcs8(key, data, format,
 						     password, flags);
 		}
+
+		if (saved_ret == GNUTLS_E_PARSING_ERROR)
+			saved_ret = ret;
 
 		if (ret < 0) {
 			if (ret == GNUTLS_E_DECRYPTION_FAILED)
@@ -822,6 +827,9 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 	ret = 0;
 
       cleanup:
+	if (ret == GNUTLS_E_PARSING_ERROR)
+		ret = saved_ret;
+
 	return ret;
 }
 
@@ -1061,6 +1069,13 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 	}
 
 	ret =
+	    _gnutls_pk_fixup(GNUTLS_PK_DSA, GNUTLS_IMPORT, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret =
 	    _gnutls_asn1_encode_privkey(GNUTLS_PK_DSA, &key->key,
 					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
@@ -1137,6 +1152,13 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 	key->params.params_nr++;
+
+	ret =
+	    _gnutls_pk_fixup(GNUTLS_PK_EC, GNUTLS_IMPORT, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	key->pk_algorithm = GNUTLS_PK_EC;
 	key->params.algo = key->pk_algorithm;

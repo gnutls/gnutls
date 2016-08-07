@@ -34,6 +34,7 @@
 #include <algorithms.h>
 #include <num.h>
 #include <random.h>
+#include <pk.h>
 #include <nettle/pbkdf2.h>
 
 static int _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn,
@@ -1507,12 +1508,18 @@ gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
+	result =
+	    _gnutls_pk_fixup(key->pk_algorithm, GNUTLS_IMPORT, &key->params);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
 	if (need_free)
 		_gnutls_free_datum(&_data);
 
 	/* The key has now been decoded.
 	 */
-
 	return 0;
 
       cleanup:
