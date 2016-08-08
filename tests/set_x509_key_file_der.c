@@ -91,15 +91,15 @@ void doit(void)
 
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca3_cert, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca2_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 	assert(get_tmpname(certfile)!=NULL);
 	assert(get_tmpname(keyfile)!=NULL);
 
-	write_der(certfile, "CERTIFICATE", (char*)server_localhost_ca3_cert_pem);
-	write_der(keyfile, "RSA PRIVATE KEY", (char*)server_ca3_key_pem);
+	write_der(certfile, "CERTIFICATE", (char*)server2_cert_pem);
+	write_der(keyfile, "RSA PRIVATE KEY", (char*)server2_key_pem);
 
 	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, keyfile,
 						    GNUTLS_X509_FMT_DER, NULL, 0);
@@ -113,7 +113,7 @@ void doit(void)
 		exit(1);
 	}
 
-	compare(&tcert, server_localhost_ca3_cert_pem);
+	compare(&tcert, server2_cert_pem);
 
 	remove(certfile);
 	remove(keyfile);

@@ -78,7 +78,7 @@ static void try(unsigned expect, unsigned ca_type)
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 	gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    &server_ca3_cert, &server_ca3_key,
+					    &server_ca3_cert_chain, &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_dh_params_init(&dh_params);
@@ -119,7 +119,7 @@ static void try(unsigned expect, unsigned ca_type)
 		exit(1);
 
 	ret = gnutls_certificate_set_x509_key_mem(clientx509cred, 
-						  &cli_ca3_cert, &cli_ca3_key,
+						  &cli_ca3_cert_chain, &cli_ca3_key,
 						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);

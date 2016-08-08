@@ -99,7 +99,7 @@ static void run(const char *env, const char *filename)
 	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost_cert,
+	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost_cert_chain,
 					    &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {

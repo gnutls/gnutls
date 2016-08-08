@@ -151,7 +151,7 @@ static void auto_parse(void)
 	gnutls_certificate_credentials_t x509_cred, clicred;
 	gnutls_pcert_st pcert_list[16];
 	gnutls_privkey_t key;
-	gnutls_pcert_st second_pcert;
+	gnutls_pcert_st second_pcert[2];
 	gnutls_privkey_t second_key;
 	unsigned pcert_list_size;
 	int ret;
@@ -177,7 +177,7 @@ static void auto_parse(void)
 
 	pcert_list_size = sizeof(pcert_list)/sizeof(pcert_list[0]);
 	ret = gnutls_pcert_list_import_x509_raw(pcert_list, &pcert_list_size,
-		&server_ca3_localhost_cert, GNUTLS_X509_FMT_PEM, 0);
+		&server_ca3_localhost_cert_chain, GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 		fail("error in gnutls_pcert_list_import_x509_raw: %s\n", gnutls_strerror(ret));
 	}
@@ -197,9 +197,9 @@ static void auto_parse(void)
 	/* set the ECC key */
 	assert(gnutls_privkey_init(&second_key)>=0);
 
-	pcert_list_size = 1;
-	ret = gnutls_pcert_list_import_x509_raw(&second_pcert, &pcert_list_size,
-		&server_ca3_localhost6_cert, GNUTLS_X509_FMT_PEM, 0);
+	pcert_list_size = 2;
+	ret = gnutls_pcert_list_import_x509_raw(second_pcert, &pcert_list_size,
+		&server_ca3_localhost6_cert_chain, GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 		fail("error in gnutls_pcert_list_import_x509_raw: %s\n", gnutls_strerror(ret));
 	}
@@ -209,8 +209,8 @@ static void auto_parse(void)
 		fail("error in key import: %s\n", gnutls_strerror(ret));
 	}
 
-	ret = gnutls_certificate_set_key(x509_cred, NULL, 0, &second_pcert,
-				1, second_key);
+	ret = gnutls_certificate_set_key(x509_cred, NULL, 0, second_pcert,
+				2, second_key);
 	if (ret < 0) {
 		fail("error in gnutls_certificate_set_key: %s\n", gnutls_strerror(ret));
 		exit(1);

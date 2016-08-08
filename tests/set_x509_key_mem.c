@@ -89,7 +89,7 @@ void doit(void)
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_flags(x509_cred, GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH);
 
-	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost6_cert,
+	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost6_cert_chain,
 					    &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
@@ -97,7 +97,7 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost_cert,
+	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost_cert_chain,
 					    &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {

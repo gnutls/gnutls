@@ -68,7 +68,7 @@ void doit(void)
 	gnutls_x509_privkey_t get_key;
 	gnutls_x509_crt_t *get_crts;
 	unsigned n_get_crts;
-	gnutls_datum_t get_datum;
+	gnutls_datum_t get_datum, chain_datum[2] = {server_ca3_cert, subca3_cert};
 	gnutls_x509_trust_list_t trust_list;
 	gnutls_x509_trust_list_iter_t trust_iter;
 	gnutls_x509_crt_t get_ca_crt;
@@ -86,7 +86,7 @@ void doit(void)
 	gnutls_certificate_set_x509_trust_mem(x509_cred, &ca3_cert,
 					      GNUTLS_X509_FMT_PEM);
 
-	gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_cert,
+	gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_cert_chain,
 					    &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 
@@ -105,19 +105,19 @@ void doit(void)
 
 	list_size = LIST_SIZE;
 	ret =
-	    gnutls_x509_crt_list_import(list, &list_size, &cli_ca3_cert,
+	    gnutls_x509_crt_list_import(list, &list_size, &cli_ca3_cert_chain,
 					GNUTLS_X509_FMT_PEM,
 					GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
 	if (ret < 0)
 		fail("gnutls_x509_crt_list_import");
 
 	ret =
-	    gnutls_certificate_get_issuer(x509_cred, list[0], &issuer, 0);
+	    gnutls_certificate_get_issuer(x509_cred, list[list_size-1], &issuer, 0);
 	if (ret < 0)
 		fail("gnutls_certificate_get_isser");
 
 	ret =
-	    gnutls_certificate_get_issuer(x509_cred, list[0], &issuer, GNUTLS_TL_GET_COPY);
+	    gnutls_certificate_get_issuer(x509_cred, list[list_size-1], &issuer, GNUTLS_TL_GET_COPY);
 	if (ret < 0)
 		fail("gnutls_certificate_get_isser");
 
@@ -163,25 +163,27 @@ void doit(void)
 	    gnutls_certificate_get_x509_crt(x509_cred, 0, &get_crts, &n_get_crts);
 	if (ret < 0)
 		fail("gnutls_certificate_get_x509_crt");
-	if (n_get_crts != 1)
-		fail("gnutls_certificate_get_x509_crt: n_crts != 1");
+	if (n_get_crts != 2)
+		fail("gnutls_certificate_get_x509_crt: n_crts != 2");
 
-	ret =
-	    gnutls_x509_crt_export2(get_crts[0],
-	                            GNUTLS_X509_FMT_PEM,
-	                            &get_datum);
-	if (ret < 0)
-		fail("gnutls_x509_crt_export2");
+	for (i = 0; i < n_get_crts; i++) {
+		ret =
+			gnutls_x509_crt_export2(get_crts[i],
+						GNUTLS_X509_FMT_PEM,
+						&get_datum);
+		if (ret < 0)
+			fail("gnutls_x509_crt_export2");
 
-	if (get_datum.size != server_ca3_cert.size ||
-	    memcmp(get_datum.data, server_ca3_cert.data, get_datum.size) != 0) {
-		fail(
-		    "exported certificate %u vs. %u\n\n%s\n\nvs.\n\n%s",
-		    get_datum.size, server_ca3_cert.size,
-		    get_datum.data, server_ca3_cert.data);
+		if (get_datum.size != chain_datum[i].size ||
+		    memcmp(get_datum.data, chain_datum[i].data, get_datum.size) != 0) {
+			fail(
+				"exported certificate %u vs. %u\n\n%s\n\nvs.\n\n%s",
+				get_datum.size, chain_datum[i].size,
+				get_datum.data, chain_datum[i].data);
+		}
+
+		gnutls_free(get_datum.data);
 	}
-
-	gnutls_free(get_datum.data);
 
 	gnutls_certificate_get_trust_list(x509_cred, &trust_list);
 

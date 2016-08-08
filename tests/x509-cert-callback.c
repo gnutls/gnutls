@@ -57,22 +57,30 @@ cert_callback(gnutls_session_t session,
 	int ret;
 	gnutls_pcert_st *p;
 	gnutls_privkey_t lkey;
+	gnutls_x509_crt_t *certs;
+	unsigned certs_size, i;
 
 	if (gnutls_certificate_client_get_request_status(session) == 0) {
 		fail("gnutls_certificate_client_get_request_status failed\n");
 		return -1;
 	}
 
-	p = gnutls_malloc(sizeof(*p));
+	p = gnutls_malloc(2 * sizeof(*p));
 	if (p == NULL)
 		return -1;
 
 	if (g_pkey == NULL) {
-		ret =
-		    gnutls_pcert_import_x509_raw(p, &cli_ca3_cert,
-						 GNUTLS_X509_FMT_PEM, 0);
+		ret = gnutls_x509_crt_list_import2(&certs, &certs_size,
+						   &cli_ca3_cert_chain,
+						   GNUTLS_X509_FMT_PEM, 0);
 		if (ret < 0)
 			return -1;
+		ret = gnutls_pcert_import_x509_list(p, certs, &certs_size, 0);
+		if (ret < 0)
+			return -1;
+		for (i = 0; i < certs_size; i++)
+			gnutls_x509_crt_deinit(certs[i]);
+		gnutls_free(certs);
 
 		ret = gnutls_privkey_init(&lkey);
 		if (ret < 0)
@@ -89,11 +97,11 @@ cert_callback(gnutls_session_t session,
 		g_pkey = lkey;
 
 		*pcert = p;
-		*pcert_length = 1;
+		*pcert_length = 2;
 		*pkey = lkey;
 	} else {
 		*pcert = g_pcert;
-		*pcert_length = 1;
+		*pcert_length = 2;
 		if (gnutls_certificate_client_get_request_status(session) == 0) {
 			fail("gnutls_certificate_client_get_request_status failed\n");
 			return -1;
@@ -117,17 +125,25 @@ server_cert_callback(gnutls_session_t session,
 	int ret;
 	gnutls_pcert_st *p;
 	gnutls_privkey_t lkey;
+	gnutls_x509_crt_t *certs;
+	unsigned certs_size, i;
 
-	p = gnutls_malloc(sizeof(*p));
+	p = gnutls_malloc(2 * sizeof(*p));
 	if (p == NULL)
 		return -1;
 
 	if (server_pkey == NULL) {
-		ret =
-		    gnutls_pcert_import_x509_raw(p, &server_ca3_localhost_cert,
-						 GNUTLS_X509_FMT_PEM, 0);
+		ret = gnutls_x509_crt_list_import2(&certs, &certs_size,
+						   &server_ca3_localhost_cert_chain,
+						   GNUTLS_X509_FMT_PEM, 0);
 		if (ret < 0)
 			return -1;
+		ret = gnutls_pcert_import_x509_list(p, certs, &certs_size, 0);
+		if (ret < 0)
+			return -1;
+		for (i = 0; i < certs_size; i++)
+			gnutls_x509_crt_deinit(certs[i]);
+		gnutls_free(certs);
 
 		ret = gnutls_privkey_init(&lkey);
 		if (ret < 0)
@@ -144,11 +160,11 @@ server_cert_callback(gnutls_session_t session,
 		server_pkey = lkey;
 
 		*pcert = p;
-		*pcert_length = 1;
+		*pcert_length = 2;
 		*pkey = lkey;
 	} else {
 		*pcert = server_pcert;
-		*pcert_length = 1;
+		*pcert_length = 2;
 		*pkey = server_pkey;
 	}
 
@@ -317,7 +333,7 @@ void doit(void)
 		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
-		if (cert_list_size != 1) {
+		if (cert_list_size != 2) {
 			fprintf(stderr, "received a certificate list of %d!\n",
 				cert_list_size);
 			exit(1);
@@ -343,7 +359,7 @@ void doit(void)
 		data[1].data = (void *)GNUTLS_KP_TLS_WWW_CLIENT;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
-		if (cert_list_size != 1) {
+		if (cert_list_size != 2) {
 			fprintf(stderr, "received a certificate list of %d!\n",
 				cert_list_size);
 			exit(1);

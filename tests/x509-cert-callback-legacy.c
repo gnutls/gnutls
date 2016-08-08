@@ -63,7 +63,7 @@ cert_callback(gnutls_session_t session,
 
 	st->cert_type = GNUTLS_CRT_X509;
 
-	ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &cli_ca3_cert, GNUTLS_X509_FMT_PEM,
+	ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &cli_ca3_cert_chain, GNUTLS_X509_FMT_PEM,
 		GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));
@@ -105,7 +105,7 @@ server_cert_callback(gnutls_session_t session,
 
 	st->cert_type = GNUTLS_CRT_X509;
 
-	ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &server_ca3_cert, GNUTLS_X509_FMT_PEM,
+	ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &server_ca3_cert_chain, GNUTLS_X509_FMT_PEM,
 		GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
 	if (ret < 0) {
 		fail("error: %s\n", gnutls_strerror(ret));
@@ -217,7 +217,7 @@ void doit(void)
 
 		gnutls_x509_crt_init(&crt);
 		ret =
-		    gnutls_x509_crt_import(crt, &server_ca3_localhost_cert,
+		    gnutls_x509_crt_import(crt, &server_ca3_localhost_cert_chain,
 					   GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fail("gnutls_x509_crt_import: %s\n",
@@ -255,7 +255,7 @@ void doit(void)
 
 		gnutls_x509_crt_init(&crt);
 		ret =
-		    gnutls_x509_crt_import(crt, &cli_ca3_cert,
+		    gnutls_x509_crt_import(crt, &cli_ca3_cert_chain,
 					   GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fail("gnutls_x509_crt_import: %s\n",
@@ -295,7 +295,7 @@ void doit(void)
 		data[1].data = (void *)GNUTLS_KP_TLS_WWW_SERVER;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
-		if (cert_list_size != 1) {
+		if (cert_list_size != 2) {
 			fprintf(stderr, "received a certificate list of %d!\n",
 				cert_list_size);
 			exit(1);
@@ -321,7 +321,7 @@ void doit(void)
 		data[1].data = (void *)GNUTLS_KP_TLS_WWW_CLIENT;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
-		if (cert_list_size != 1) {
+		if (cert_list_size != 2) {
 			fprintf(stderr, "received a certificate list of %d!\n",
 				cert_list_size);
 			exit(1);

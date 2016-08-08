@@ -95,7 +95,7 @@ void doit(void)
 	fp = fopen(certfile, "wb");
 	if (fp == NULL)
 		fail("error in fopen\n");
-	assert(fwrite(server_localhost_ca3_cert_pem, 1, strlen(server_localhost_ca3_cert_pem), fp)>0);
+	assert(fwrite(server_localhost_ca3_cert_chain_pem, 1, strlen(server_localhost_ca3_cert_chain_pem), fp)>0);
 	assert(fwrite(server_ca3_key_pem, 1, strlen((char*)server_ca3_key_pem), fp)>0);
 	fclose(fp);
 
@@ -108,7 +108,7 @@ void doit(void)
 	fp = fopen(certfile, "wb");
 	if (fp == NULL)
 		fail("error in fopen\n");
-	assert(fwrite(server_localhost6_ca3_cert_pem, 1, strlen(server_localhost6_ca3_cert_pem), fp)>0);
+	assert(fwrite(server_localhost6_ca3_cert_chain_pem, 1, strlen(server_localhost6_ca3_cert_chain_pem), fp)>0);
 	assert(fwrite(server_ca3_key_pem, 1, strlen((char*)server_ca3_key_pem), fp)>0);
 	fclose(fp);
 
