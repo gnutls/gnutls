@@ -61,11 +61,11 @@ static char ecc_cert[] =
 	"-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_ecc_cert =
-	{(void *) ecc_cert, sizeof(ecc_cert)};
+	{(void *) ecc_cert, sizeof(ecc_cert)-1};
 
 
 const gnutls_datum_t server_ecc_key =
-	{(void *) ecc_key, sizeof(ecc_key)};
+	{(void *) ecc_key, sizeof(ecc_key)-1};
 
 /* A cert-key pair */
 static char pem1_cert[] =
@@ -101,11 +101,11 @@ static char pem1_key[] =
     "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cert_dat =
-	{(void *) pem1_cert, sizeof(pem1_cert)};
+	{(void *) pem1_cert, sizeof(pem1_cert)-1};
 
 
 const gnutls_datum_t key_dat =
-	{(void *) pem1_key, sizeof(pem1_key)};
+	{(void *) pem1_key, sizeof(pem1_key)-1};
 
 
 /* A server cert/key pair with CA */
@@ -150,7 +150,7 @@ static unsigned char server_cert_pem[] =
 "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
+	sizeof(server_cert_pem)-1
 };
 
 static unsigned char server_key_pem[] =
@@ -183,7 +183,7 @@ static unsigned char server_key_pem[] =
 "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
+	sizeof(server_key_pem)-1
 };
 
 static unsigned char ca_cert_pem[] =
@@ -207,7 +207,7 @@ static unsigned char ca_cert_pem[] =
 "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t ca_cert = { ca_cert_pem,
-	sizeof(ca_cert_pem)
+	sizeof(ca_cert_pem)-1
 };
 
 /* A server cert/key pair with CA */
@@ -263,7 +263,7 @@ static unsigned char server2_cert_pem[] =
 "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server2_cert = { server2_cert_pem,
-	sizeof(server2_cert_pem)
+	sizeof(server2_cert_pem)-1
 };
 
 static unsigned char server2_key_pem[] =
@@ -308,7 +308,7 @@ static unsigned char server2_key_pem[] =
 "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t server2_key = { server2_key_pem,
-	sizeof(server2_key_pem)
+	sizeof(server2_key_pem)-1
 };
 
 static unsigned char ca2_cert_pem[] =
@@ -338,7 +338,7 @@ static unsigned char ca2_cert_pem[] =
 "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t ca2_cert = { ca2_cert_pem,
-	sizeof(ca2_cert_pem)
+	sizeof(ca2_cert_pem)-1
 };
 
 static unsigned char cert_pem[] =
@@ -389,7 +389,7 @@ static char dsa_key_pem[] =
     "AoNBXjeBjgCGMei2m8E=\n" "-----END DSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t dsa_key = { (void*)dsa_key_pem,
-	sizeof(dsa_key_pem)
+	sizeof(dsa_key_pem)-1
 };
 
 
@@ -461,11 +461,11 @@ static char ca3_key_pem[] =
 	"-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t ca3_key = { (void*)ca3_key_pem,
-	sizeof(ca3_key_pem)
+	sizeof(ca3_key_pem)-1
 };
 
 const gnutls_datum_t ca3_cert = { (void*)ca3_cert_pem,
-	sizeof(ca3_cert_pem)
+	sizeof(ca3_cert_pem)-1
 };
 
 static char cli_ca3_cert_pem[] =
@@ -537,11 +537,11 @@ static char cli_ca3_key_pem[] =
 	"-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cli_ca3_key = { (void*)cli_ca3_key_pem,
-	sizeof(cli_ca3_key_pem)
+	sizeof(cli_ca3_key_pem)-1
 };
 
 const gnutls_datum_t cli_ca3_cert = { (void*)cli_ca3_cert_pem,
-	sizeof(cli_ca3_cert_pem)
+	sizeof(cli_ca3_cert_pem)-1
 };
 
 static char server_ca3_key_pem[] =
@@ -586,7 +586,7 @@ static char server_ca3_key_pem[] =
 	"-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_ca3_key = { (void*)server_ca3_key_pem,
-	sizeof(server_ca3_key_pem)
+	sizeof(server_ca3_key_pem)-1
 };
 
 /* shares server_ca3 key */
@@ -680,7 +680,7 @@ static char unknown_ca_cert_pem[] =
 	"-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t unknown_ca_cert = { (void*)unknown_ca_cert_pem,
-	sizeof(unknown_ca_cert_pem)
+	sizeof(unknown_ca_cert_pem)-1
 };
 
 static const char server_ca3_pkcs12_pem[] =
