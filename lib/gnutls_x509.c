@@ -1182,10 +1182,10 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
 	}
 
 	for (i = 0; i < res->certs[index].cert_list_length; ++i) {
-		ret = gnutls_pcert_export_x509(&res->certs[index].cert_list[i], crt_list[i]);
+		ret = gnutls_pcert_export_x509(&res->certs[index].cert_list[i], &(*crt_list)[i]);
 		if (ret < 0) {
 			while (i--)
-				gnutls_x509_crt_deinit(*crt_list[i]);
+				gnutls_x509_crt_deinit((*crt_list)[i]);
 			gnutls_free(*crt_list);
 			*crt_list = NULL;
 
