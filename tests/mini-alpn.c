@@ -283,9 +283,7 @@ static void start(const char *p1, const char *p2)
 
 		server(fd[0], p1, p2);
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
 		client(fd[1], "unknown/1.4", p2, p1);

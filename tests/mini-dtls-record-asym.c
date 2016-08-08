@@ -336,9 +336,7 @@ void run(unsigned cache)
 		close(fd[1]);
 		client(fd[0], cache);
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
 		server(fd[1], cache);

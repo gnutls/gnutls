@@ -305,9 +305,7 @@ static void run(int proto, int cipher, int mac)
 		close(fd[1]);
 		server(fd[0], proto, cipher, mac);
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 		close(fd[0]);
 	} else {
 		close(fd[0]);

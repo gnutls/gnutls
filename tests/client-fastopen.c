@@ -298,9 +298,7 @@ void doit(void)
 		server(fd);
 
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 	} else {
 		fd = socket(AF_INET, SOCK_STREAM, 0);
 

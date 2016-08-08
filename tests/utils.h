@@ -72,16 +72,42 @@ void sec_sleep(int sec);
 
 typedef void callback_func(gnutls_session_t, void *priv);
 void test_cli_serv(gnutls_certificate_credentials_t server_cred,
-                   gnutls_certificate_credentials_t client_cred,
-                   const char *prio, const char *host,
-                   void *priv,
-                   callback_func *client_cb,
-                   callback_func *server_cb);
+		   gnutls_certificate_credentials_t client_cred,
+		   const char *prio, const char *host,
+		   void *priv,
+		   callback_func * client_cb, callback_func * server_cb);
 
 #define TMPNAME_SIZE 128
 char *get_tmpname(char s[TMPNAME_SIZE]);
 
 /* This must be implemented elsewhere. */
 extern void doit(void);
+
+/* calls fail() if status indicates an error  */
+inline static void _check_wait_status(int status, unsigned sigonly)
+{
+#if defined WEXITSTATUS && defined WIFSIGNALED
+	if (WEXITSTATUS(status) != 0 ||
+	    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {
+		if (WIFSIGNALED(status)) {
+			fail("Child died with signal %d\n", WTERMSIG(status));
+		} else {
+			if (!sigonly)
+				fail("Child died with status %d\n",
+				     WEXITSTATUS(status));
+		}
+	}
+#endif
+}
+
+inline static void check_wait_status(int status)
+{
+	_check_wait_status(status, 0);
+}
+
+inline static void check_wait_status_for_sig(int status)
+{
+	_check_wait_status(status, 1);
+}
 
 #endif				/* UTILS_H */

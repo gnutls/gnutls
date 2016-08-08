@@ -350,14 +350,7 @@ void doit(void)
 			if (done != child)
 				fail("who's that?! %d\n", done);
 
-			if (WIFEXITED(status)) {
-				if (WEXITSTATUS(status) != 0)
-					fail("child exited with status %d\n", WEXITSTATUS(status));
-			} else if (WIFSIGNALED(status))
-				fail("child stopped by signal %d\n",
-				     WTERMSIG(status));
-			else
-				fail("child failed: %d\n", status);
+			check_wait_status(status);
 		}
 	}
 

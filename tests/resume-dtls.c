@@ -413,8 +413,7 @@ void doit(void)
 				close(client_sds[j]);
 			server(server_sds, &resume_tests[i]);
 			wait(&status);
-			if (WEXITSTATUS(status) != 0 || (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV))
-				exit(1);
+			check_wait_status(status);
 		} else {
 			for (j = 0; j < SESSIONS; j++)
 				close(server_sds[j]);

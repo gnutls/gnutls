@@ -331,9 +331,7 @@ static void start(int server_initiated)
 
 		server(fd[0], server_initiated);
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
 		client(fd[1], server_initiated);

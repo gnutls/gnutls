@@ -289,9 +289,7 @@ static void start(const char *prio)
 		/* parent */
 		server(fd[0], prio);
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 	} else {
 		client(fd[1], prio);
 		exit(0);

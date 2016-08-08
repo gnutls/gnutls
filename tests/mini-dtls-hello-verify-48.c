@@ -300,9 +300,7 @@ void doit(void)
 
 		client(fd[0]);
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Server died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
 		server(fd[1]);

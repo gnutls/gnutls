@@ -309,9 +309,7 @@ void doit(void)
 		close(fd[0]);
 		server(fd[1]);
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 	} else {
 		close(fd[1]);
 		client(fd[0]);

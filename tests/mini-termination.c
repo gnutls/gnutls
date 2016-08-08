@@ -316,15 +316,7 @@ static void ch_handler(int sig)
 	int status = 0;
 
 	waitpid(-1, &status, 0);
-	if (WEXITSTATUS(status) != 0 ||
-	    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {
-		if (WIFSIGNALED(status))
-			fail("Child died with sigsegv\n");
-		else
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
-		terminate();
-	}
+	check_wait_status(status);
 	return;
 }
 

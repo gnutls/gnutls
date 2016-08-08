@@ -693,8 +693,7 @@ void doit(void)
 			server(server_sds, &resume_tests[i]);
 
 			waitpid(child, &status, 0);
-			if (WEXITSTATUS(status) != 0 || (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV))
-				exit(1);
+			check_wait_status(status);
 			global_stop();
 		} else {
 			for (j = 0; j < SESSIONS; j++)

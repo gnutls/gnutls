@@ -246,17 +246,7 @@ static void ch_handler(int sig)
 {
 	int status, ret = 0;
 	wait(&status);
-	if (WEXITSTATUS(status) != 0 ||
-	    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {
-		if (WIFSIGNALED(status)) {
-			fprintf(stderr, "Child died with sigsegv\n");
-			ret = 1;
-		} else {
-			fprintf(stderr, "Child died with status %d\n",
-			     WEXITSTATUS(status));
-		}
-		terminate(ret);
-	}
+	check_wait_status(status);
 	return;
 }
 

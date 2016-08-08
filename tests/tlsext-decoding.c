@@ -266,9 +266,7 @@ static void start(void)
 		server(fd[1]);
 
 		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
+		check_wait_status(status);
 		close(fd[1]);
 	} else {
 		close(fd[1]);

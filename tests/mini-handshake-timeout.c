@@ -215,8 +215,7 @@ static void ch_handler(int sig)
 {
 	int status = 0;
 	wait(&status);
-	if (WEXITSTATUS(status) != 0)
-		fail("Child died with status %d\n", WEXITSTATUS(status));
+	check_wait_status(status);
 	return;
 }
 

@@ -324,15 +324,7 @@ void doit(void)
 		close(fd[1]);
 		client(fd[0]);
 		waitpid(child, &status, 0);
-
-		if (WEXITSTATUS(status) != 0 ||
-		    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {
-			if (WIFSIGNALED(status))
-				fail("Child died with sigsegv\n");
-			else
-				fail("Child died with status %d\n",
-			     WEXITSTATUS(status));
-		}
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
 		server(fd[1]);

@@ -391,20 +391,7 @@ void doit(void)
 		close(sockets[1]);
 		server(sockets[0]);
 		wait(&status);
-
-#if defined WIFEXITED && defined WEXITSTATUS
-		if (WIFEXITED(status) && WEXITSTATUS(status)) {
-			fail("server: client failed with exit status %d\n",
-			     WEXITSTATUS(status));
-		}
-#endif
-
-#if defined WIFSIGNALED && defined WTERMSIG
-		if (WIFSIGNALED(status)) {
-			fail("server: client failed with fatal signal %d\n", WTERMSIG(status));
-		}
-#endif
-
+		check_wait_status(status);
 	} else {
 		close(sockets[0]);
 		client(sockets[1]);
