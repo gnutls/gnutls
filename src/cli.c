@@ -1654,7 +1654,7 @@ int do_handshake(socket_st * socket)
 	if (fastopen && socket->connect_addrlen) {
 		gnutls_transport_set_fastopen(socket->session, socket->fd,
 					      (struct sockaddr*)&socket->connect_addr,
-					      socket->connect_addrlen);
+					      socket->connect_addrlen, 0);
 		socket->connect_addrlen = 0;
 	} else {
 		set_read_funcs(socket->session);

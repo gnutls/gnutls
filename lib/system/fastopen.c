@@ -152,6 +152,7 @@ tfo_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
  * @fd: is the session's socket descriptor
  * @connect_addr: is the address we want to connect to
  * @connect_addrlen: is the length of @connect_addr
+ * @flags: must be zero
  *
  * Enables TCP Fast Open (TFO) for the specified TLS client session.
  * That means that TCP connection establishment and the transmission
@@ -179,7 +180,8 @@ tfo_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
  **/
 void
 gnutls_transport_set_fastopen(gnutls_session_t session,
-			      int fd, struct sockaddr *connect_addr, socklen_t connect_addrlen)
+			      int fd, struct sockaddr *connect_addr, socklen_t connect_addrlen,
+			      unsigned int flags)
 {
 	if (connect_addrlen > (socklen_t)sizeof(session->internals.tfo.connect_addr)) {
 		gnutls_assert();

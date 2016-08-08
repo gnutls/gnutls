@@ -93,7 +93,7 @@ static void client(int fd, struct sockaddr *connect_addr, socklen_t connect_addr
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	gnutls_transport_set_fastopen(session, fd, connect_addr, connect_addrlen);
+	gnutls_transport_set_fastopen(session, fd, connect_addr, connect_addrlen, 0);
 
 	/* Perform the TLS handshake
 	 */
