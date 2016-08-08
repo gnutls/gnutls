@@ -34,6 +34,13 @@ See the end for copying conditions.
    ignoring flags if all certificates in the list fit within the
    initially allocated memory. Patch by Tim Kosse.
 
+** libgnutls: Corrected issue which made gnutls_certificate_get_x509_crt()
+   to return invalid pointers when returned more than a single certificate.
+   Report and fix by Stefan Sørensen.
+
+** libgnutls: Fix gnutls_pkcs12_simple_parse to always extract the complete chain.
+   Report and fix by Stefan Sørensen.
+
 ** certtool: Added the "add_extension" and "add_critical_extension"
    template options. This allows specifying arbitrary extensions into
    certificates and certificate requests.
