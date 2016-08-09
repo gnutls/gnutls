@@ -9,6 +9,9 @@ See the end for copying conditions.
    ignoring flags if all certificates in the list fit within the
    initially allocated memory.
 
+** libgnutls: Fix gnutls_pkcs12_simple_parse to always extract the complete chain,
+   even when the extra_certs was non-null. Report and fix by Stefan Sørensen.
+
 ** API and ABI modifications:
 No changes since last version.
 
