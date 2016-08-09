@@ -27,6 +27,12 @@ option (nodb) { $nodb = 1 } "Does not use the resume database."
 #int noticket;
 option (noticket) { $noticket = 1 } "Does not issue session tickets."
 
+#int sni_hostname_fatal;
+option (sni-hostname-fatal) { $sni_hostname_fatal = 1 } "Send fatal alert on sni-hostname mismatch"
+
+#char *sni_hostname;
+option (sni-hostname) STR "HOSTNAME" { $sni_hostname = $1 } "Server's hostname for server name extension"
+
 #int http;
 option (http) { $http = 1 } "Act as an HTTP Server."
 option (echo) { $http = 0 } "Act as an Echo Server."
@@ -103,7 +109,8 @@ init { $generate=0; $port=5556; $http=0; $nodb = 0; $noticket = 0;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $x509_crlfile = NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
-	$pgp_keyring=NULL; $fmtder = 0;
+	$pgp_keyring=NULL; $fmtder = 0; $sni_hostname_fatal = 0;
+	$sni_hostname = NULL;
 	$disable_client_cert = 0; $priorities = NULL;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0;
 	$opaque_prf_input=NULL; $pgp_subkey = NULL;}

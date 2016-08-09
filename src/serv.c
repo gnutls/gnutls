@@ -80,6 +80,9 @@ char *x509_cafile;
 char *dh_params_file;
 char *x509_crlfile = NULL;
 
+const char *sni_hostname = NULL;
+int sni_hostname_fatal = 0;
+
 gnutls_datum_t session_ticket_key;
 
 /* end of globals */
@@ -131,6 +134,7 @@ LIST_TYPE_DECLARE (listener_item, char *http_request; char *http_response;
                    int listen_socket; int fd;
                    gnutls_session_t tls_session;
                    int handshake_ok;
+                   int no_close;
   );
 
 static const char *
@@ -150,7 +154,8 @@ listener_free (listener_item * j)
   free (j->http_response);
   if (j->fd >= 0)
     {
-      gnutls_bye (j->tls_session, GNUTLS_SHUT_WR);
+      if (j->no_close == 0)
+        gnutls_bye (j->tls_session, GNUTLS_SHUT_WR);
       shutdown (j->fd, 2);
       close (j->fd);
       gnutls_deinit (j->tls_session);
@@ -326,6 +331,83 @@ generate_rsa_params (void)
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
+/* callback used to verify if the host name advertised in client hello matches
+ * the one configured in server
+ */
+static int
+post_client_hello(gnutls_session_t session)
+{
+	int ret;
+	/* DNS names (only type supported) may be at most 256 byte long */
+	char *name;
+	size_t len = 256;
+	unsigned int type;
+	int i;
+
+	name = malloc(len);
+	if (name == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+
+	for (i=0; ; ) {
+		ret = gnutls_server_name_get(session, name, &len, &type, i);
+		if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			char *new_name;
+			new_name = realloc(name, len);
+			if (new_name == NULL) {
+				ret = GNUTLS_E_MEMORY_ERROR;
+				goto end;
+			}
+			name = new_name;
+			continue; /* retry call with same index */
+		}
+
+		/* check if it is the last entry in list */
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+		i++;
+		if (ret != GNUTLS_E_SUCCESS)
+			goto end;
+		/* unknown types need to be ignored */
+		if (type != GNUTLS_NAME_DNS)
+			continue;
+
+		if (strlen(sni_hostname) != len)
+			continue;
+		/* API guarantees that the name of type DNS will be null terminated */
+		if (!strncmp(name, sni_hostname, len)) {
+			ret = GNUTLS_E_SUCCESS;
+			goto end;
+		}
+	};
+	/* when there is no extension, we can't send the extension specific alert */
+	if (i == 0) {
+		fprintf(stderr, "Warning: client did not include SNI extension, using default host\n");
+		ret = GNUTLS_E_SUCCESS;
+		goto end;
+	}
+
+	if (sni_hostname_fatal == 1) {
+		/* abort the connection, propagate error up the stack */
+		ret = -1;
+		goto end;
+	}
+
+	fprintf(stderr, "Warning: client provided unrecognized host name\n");
+	/* since we just want to send an alert, not abort the connection, we
+	 * need to send it ourselves
+	 */
+	do {
+		ret = gnutls_alert_send(session,
+					GNUTLS_AL_WARNING,
+					GNUTLS_A_UNRECOGNIZED_NAME);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	/* continue handshake, fall through */
+end:
+	free(name);
+	return ret;
+}
+
 static gnutls_session_t
 initialize_session (void)
 {
@@ -355,6 +437,9 @@ initialize_session (void)
       fprintf (stderr, "Syntax error at: %s\n", err);
       exit (1);
     }
+
+  if (sni_hostname != NULL)
+    gnutls_handshake_set_post_client_hello_function(session, &post_client_hello);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, dh_cred);
 
@@ -1144,6 +1229,7 @@ main (int argc, char **argv)
                                           (gnutls_transport_ptr_t)
                                           gl_fd_to_handle (accept_fd));
                 j->handshake_ok = 0;
+                j->no_close = 0;
 
                 if (verbose == 0)
                   {
@@ -1187,6 +1273,7 @@ main (int argc, char **argv)
                     while (ret == GNUTLS_E_AGAIN
                            || ret == GNUTLS_E_INTERRUPTED);
                     j->http_state = HTTP_STATE_CLOSING;
+                    j->no_close = 1;
                   }
                 else if (r == 0)
                   {
@@ -1238,6 +1325,7 @@ main (int argc, char **argv)
 
                             GERR (r);
                             j->http_state = HTTP_STATE_CLOSING;
+                            j->no_close = 1;
                           }
                       }
                     else
@@ -1247,6 +1335,11 @@ main (int argc, char **argv)
                           {
                             check_alert (j->tls_session, r);
                             fprintf (stderr, "Error while receiving data\n");
+                            do
+                              {
+                                ret = gnutls_alert_send_appropriate(j->tls_session, r);
+                              }
+                            while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
                             GERR (r);
                           }
                       }
@@ -1448,6 +1541,8 @@ gaa_parser (int argc, char **argv)
   verbose = info.quiet;
   nodb = info.nodb;
   noticket = info.noticket;
+  sni_hostname = info.sni_hostname;
+  sni_hostname_fatal = info.sni_hostname_fatal;
 
   if (info.http == 0)
     http = 0;
