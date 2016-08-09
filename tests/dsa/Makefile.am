@@ -21,8 +21,12 @@
 
 EXTRA_DIST = cert.dsa.1024.pem  cert.dsa.2048.pem  cert.dsa.3072.pem  dsa.1024.pem  dsa.2048.pem  dsa.3072.pem
 
-dist_check_SCRIPTS = testdsa
+dist_check_SCRIPTS = testdsa testdsa1024
 
+if !ENABLE_NETTLE
+TESTS = testdsa1024
+else
 TESTS = testdsa
+endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)

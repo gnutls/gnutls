@@ -24,6 +24,10 @@ EXTRA_DIST = key-ca.pem key-subca.pem key-subsubca.pem key-user.pem key-dsa.pem 
 
 dist_check_SCRIPTS = sha2 sha2-dsa
 
-TESTS = sha2 sha2-dsa
+TESTS = sha2
+
+if ENABLE_NETTLE
+TESTS += sha2-dsa
+endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)

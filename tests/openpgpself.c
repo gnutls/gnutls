@@ -529,6 +529,14 @@ server_start (void)
     success ("server: ready. Listening to port '%d'.\n", PORT);
 }
 
+/* gcrypt's DSA2 support is broken.
+ */
+#ifdef HAVE_LIBNETTLE
+static unsigned use_only_1024 = 0;
+#else
+static unsigned use_only_1024 = 1;
+#endif
+
 static void
 server (void)
 {
@@ -550,7 +558,7 @@ server (void)
 
   for (j = 0; j < 2; j++)
     {
-     if (j==0)
+     if (j==0 || use_only_1024)
        {
          gnutls_certificate_allocate_credentials (&pgp_cred);
          ret = gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &server_crt,
