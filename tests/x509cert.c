@@ -86,7 +86,7 @@ void doit(void)
 	gnutls_certificate_set_x509_trust_mem(x509_cred, &ca3_cert,
 					      GNUTLS_X509_FMT_PEM);
 
-	gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_localhost_chain_cert,
+	gnutls_certificate_set_x509_key_mem(x509_cred, &server_ca3_cert,
 					    &server_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 
@@ -159,13 +159,12 @@ void doit(void)
 
 	gnutls_free(get_datum.data);
 
-	/* check the first certificate set */
 	ret =
 	    gnutls_certificate_get_x509_crt(x509_cred, 0, &get_crts, &n_get_crts);
 	if (ret < 0)
-		fail("gnutls_certificate_get_x509_crt\n");
-	if (n_get_crts != 2)
-		fail("gnutls_certificate_get_x509_crt: n_crts != 2\n");
+		fail("gnutls_certificate_get_x509_crt");
+	if (n_get_crts != 1)
+		fail("gnutls_certificate_get_x509_crt: n_crts != 1");
 
 	ret =
 	    gnutls_x509_crt_export2(get_crts[0],
@@ -183,25 +182,6 @@ void doit(void)
 	}
 
 	gnutls_free(get_datum.data);
-
-	/* check the second */
-	ret =
-	    gnutls_x509_crt_export2(get_crts[1],
-	                            GNUTLS_X509_FMT_PEM,
-	                            &get_datum);
-	if (ret < 0)
-		fail("gnutls_x509_crt_export2");
-
-	if (get_datum.size != ca3_cert.size ||
-	    memcmp(get_datum.data, ca3_cert.data, get_datum.size) != 0) {
-		fail(
-		    "exported certificate %u vs. %u\n\n%s\n\nvs.\n\n%s",
-		    get_datum.size, ca3_cert.size,
-		    get_datum.data, ca3_cert.data);
-	}
-
-	gnutls_free(get_datum.data);
-
 
 	gnutls_certificate_get_trust_list(x509_cred, &trust_list);
 

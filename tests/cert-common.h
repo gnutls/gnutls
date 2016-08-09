@@ -392,33 +392,32 @@ const gnutls_datum_t dsa_key = { (void*)dsa_key_pem,
 	sizeof(dsa_key_pem)-1
 };
 
-#define CA3_CERT_PEM \
-	"-----BEGIN CERTIFICATE-----\n" \
-	"MIID+jCCAmKgAwIBAgIIVzGgXgSsTYwwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n" \
-	"AxMEQ0EtMzAgFw0xNjA1MTAwODQ4MzBaGA85OTk5MTIzMTIzNTk1OVowDzENMAsG\n" \
-	"A1UEAxMEQ0EtMzCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBALbdxniG\n" \
-	"+2wP/ONeZfvR7AJakVo5deFKIHVTiiBWwhg+HSjd4nfDa+vyTt/wIdldP1PriD1R\n" \
-	"igc8z68+RxPpGfAc197pKlKpO08I0L1RDKnjBWr4fGdCzE6uZ/ZsKVifoIZpdC8M\n" \
-	"2IYpAIMajEtnH53XZ1hTEviXTsneuiCTtap73OeSkL71SrIMkgBmAX17gfX3SxFj\n" \
-	"QUzOs6QMMOa3+8GW7RI+E/SyS1QkOO860dj9XYgOnTL20ibGcWF2XmTiQASI+KmH\n" \
-	"vYJCNJF/8pvmyJRyBHGZO830aBY0+DcS2bLKcyMiWfOJw7WnpaO7zSEC5WFgo4jd\n" \
-	"qroUBQdjQNCSSdrt1yYrAl1Sj2PMxYFX4H545Pr2sMpwC9AnPk9+uucT1Inj9615\n" \
-	"qbuXgFwhkgpK5pnPjzKaHp7ESlJj4/dIPTmhlt5BV+CLh7tSLzVLrddGU+os8Jin\n" \
-	"T42radJ5V51Hn0C1CHIaFAuBCd5XRHXtrKb7WcnwCOxlcvux9h5/847F4wIDAQAB\n" \
-	"o1gwVjAPBgNVHRMBAf8EBTADAQH/MBMGA1UdJQQMMAoGCCsGAQUFBwMJMA8GA1Ud\n" \
-	"DwEB/wQFAwMHBgAwHQYDVR0OBBYEFPmohhljtqQUE2B2DwGaNTbv8bSvMA0GCSqG\n" \
-	"SIb3DQEBCwUAA4IBgQBhBi8dXQMtXH2oqcuHuEj9JkxraAsaJvc1WAoxbiqVcJKc\n" \
-	"VSC0gvoCY3q+NQvuePzw5dzd5JBfkoIsP5U6ATWAUPPqCP+/jRnFqDQlH626mhDG\n" \
-	"VS8W7Ee8z1KWqnKWGv5nkrZ6r3y9bVaNUmY7rytzuct1bI9YkX1kM66vgnU2xeMI\n" \
-	"jDe36/wTtBRVFPSPpE3KL9hxCg3KgPSeSmmIhmQxJ1M6xe00314/GX3lTDt55UdM\n" \
-	"gmldl2LHV+0i1NPCgnuOEFVOiz2nHAnw2LNmvHEDDpPauz2Meeh9aaDeefIh2u/w\n" \
-	"g39WRPhU1mYvmxvYZqA/jwSctiEhuKEBBZSOHxeTjplH1THlIziVnYyVW4sPMiGU\n" \
-	"ajXhTi47H219hx87+bldruOtirbDIslL9RGWqWAkMeGP+hUl1R2zvDukaqIKqIN8\n" \
-	"1/A/EeMoI6/IHb1BpgY2rGs/I/QTb3VTKqQUYv09Hi+itPCdKqamSm8dZMKKaPA0\n" \
-	"fD9yskUMFPBhfj8BvXg=\n" \
-	"-----END CERTIFICATE-----\n"
 
-static char ca3_cert_pem[] = CA3_CERT_PEM;
+static char ca3_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIID+jCCAmKgAwIBAgIIVzGgXgSsTYwwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNjA1MTAwODQ4MzBaGA85OTk5MTIzMTIzNTk1OVowDzENMAsG\n"
+	"A1UEAxMEQ0EtMzCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBALbdxniG\n"
+	"+2wP/ONeZfvR7AJakVo5deFKIHVTiiBWwhg+HSjd4nfDa+vyTt/wIdldP1PriD1R\n"
+	"igc8z68+RxPpGfAc197pKlKpO08I0L1RDKnjBWr4fGdCzE6uZ/ZsKVifoIZpdC8M\n"
+	"2IYpAIMajEtnH53XZ1hTEviXTsneuiCTtap73OeSkL71SrIMkgBmAX17gfX3SxFj\n"
+	"QUzOs6QMMOa3+8GW7RI+E/SyS1QkOO860dj9XYgOnTL20ibGcWF2XmTiQASI+KmH\n"
+	"vYJCNJF/8pvmyJRyBHGZO830aBY0+DcS2bLKcyMiWfOJw7WnpaO7zSEC5WFgo4jd\n"
+	"qroUBQdjQNCSSdrt1yYrAl1Sj2PMxYFX4H545Pr2sMpwC9AnPk9+uucT1Inj9615\n"
+	"qbuXgFwhkgpK5pnPjzKaHp7ESlJj4/dIPTmhlt5BV+CLh7tSLzVLrddGU+os8Jin\n"
+	"T42radJ5V51Hn0C1CHIaFAuBCd5XRHXtrKb7WcnwCOxlcvux9h5/847F4wIDAQAB\n"
+	"o1gwVjAPBgNVHRMBAf8EBTADAQH/MBMGA1UdJQQMMAoGCCsGAQUFBwMJMA8GA1Ud\n"
+	"DwEB/wQFAwMHBgAwHQYDVR0OBBYEFPmohhljtqQUE2B2DwGaNTbv8bSvMA0GCSqG\n"
+	"SIb3DQEBCwUAA4IBgQBhBi8dXQMtXH2oqcuHuEj9JkxraAsaJvc1WAoxbiqVcJKc\n"
+	"VSC0gvoCY3q+NQvuePzw5dzd5JBfkoIsP5U6ATWAUPPqCP+/jRnFqDQlH626mhDG\n"
+	"VS8W7Ee8z1KWqnKWGv5nkrZ6r3y9bVaNUmY7rytzuct1bI9YkX1kM66vgnU2xeMI\n"
+	"jDe36/wTtBRVFPSPpE3KL9hxCg3KgPSeSmmIhmQxJ1M6xe00314/GX3lTDt55UdM\n"
+	"gmldl2LHV+0i1NPCgnuOEFVOiz2nHAnw2LNmvHEDDpPauz2Meeh9aaDeefIh2u/w\n"
+	"g39WRPhU1mYvmxvYZqA/jwSctiEhuKEBBZSOHxeTjplH1THlIziVnYyVW4sPMiGU\n"
+	"ajXhTi47H219hx87+bldruOtirbDIslL9RGWqWAkMeGP+hUl1R2zvDukaqIKqIN8\n"
+	"1/A/EeMoI6/IHb1BpgY2rGs/I/QTb3VTKqQUYv09Hi+itPCdKqamSm8dZMKKaPA0\n"
+	"fD9yskUMFPBhfj8BvXg=\n"
+	"-----END CERTIFICATE-----\n";
 
 static char ca3_key_pem[] =
 	"-----BEGIN RSA PRIVATE KEY-----\n"
@@ -651,40 +650,9 @@ static char server_localhost_ca3_cert_pem[] =
 	"MTK0U84=\n"
 	"-----END CERTIFICATE-----\n";
 
-static char server_localhost_ca3_cert_chain_pem[] =
-	"-----BEGIN CERTIFICATE-----\n"
-	"MIIEITCCAomgAwIBAgIIVzGhBTuLU+swDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
-	"AxMEQ0EtMzAgFw0xNjA1MTAwODUxMThaGA85OTk5MTIzMTIzNTk1OVowADCCAaIw\n"
-	"DQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBANk9eJmqLPfAu7P4Hhmcm4KmEsRf\n"
-	"uTXk1ylqYvf715riBfJ94VIdtJqKE9q4FRwMxVsv/B+SHFiIlEJfvCociQkrgSfl\n"
-	"oTNIMNrqkj8IjmVJuJd00MZsUuHlvwa6+F/PLLyUOMU03LdpuR9TbvS2fMVjmaRj\n"
-	"BiCO439GA+qHRvwxxP7FR433Hg+5JdeYwLWve/vLgm4zETxnMYOFbZpArkizpBi/\n"
-	"RYQtLmFW8HwZ0/ldDBMnDgcfmL9gRLtMQ1XZEHLNFjyEVD1JsrlgccaizNUkiUi7\n"
-	"Gbm/w3YiDVxbq3u3cee5lsNhEMIREyISKAHPy8RlnIWwwuDlnsmI0pIb9/4RH0LM\n"
-	"MlceDEFy1X0QRzYqZFPU/0l4j/FlQ6X2UqWNz63ybRSbcCzHl25abi1xmbsV5ydo\n"
-	"mJNcP+0QbripMpa0O6gjv5f0yMd7mW9/aAglPcKgpbbhGfo7V9z2gIKdUCLRXoUs\n"
-	"zhdobnRf00LrrpFUQWReKHxMcDWAL2b00kysPQIDAQABo4GNMIGKMAwGA1UdEwEB\n"
-	"/wQCMAAwFAYDVR0RBA0wC4IJbG9jYWxob3N0MBMGA1UdJQQMMAoGCCsGAQUFBwMB\n"
-	"MA8GA1UdDwEB/wQFAwMHoAAwHQYDVR0OBBYEFDOd4SfTi9X86wX8tceBaU9eO9nW\n"
-	"MB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv8bSvMA0GCSqGSIb3DQEBCwUA\n"
-	"A4IBgQAAS3T2uhrGl99HErgOFyGLX6c/+moBjJDtMckBW8T3ajxOHzw7XI6I821a\n"
-	"MPVXaXXHmnTUFhAHZrjpn5UYIwEJUaimtCviumHcK0h/yWnHdbxs+aglu66aJ5V0\n"
-	"uvPdtLNBtS1y3SryTtskbZ3RPjHiON+brrVH0KcoT+t92T3CDtv0r37k92QKZlRK\n"
-	"K/wnqTOBUEhvpSztFai5vPy8QWv/RSHb2vFZeJkdiXybcedmLLmp56rWbzzCvfzj\n"
-	"mfOAFD0oGD8BTDTz55IrAfMvth7OYVqF0Se530c1GRxZwqYrEcfDJAc8QqfnYzkR\n"
-	"6KRXCVCbJ5CKi3grTzqcAJYsy9sxE2afaa/hh/XnMwYtHgIE1xfrcDnnBuNyYWHZ\n"
-	"GJaVdRTPtaRXUAJZtGLpy6SBEWGMP7wyhoFdbA3IWYbfypyM/t/LpQHtLzM3N7s8\n"
-	"oXG/Pucnsyp8fJ3LEJW0STMsWBoPPdfJFdTxK5i+bcmKq3OFPIGfXgw1Jf5vGfgM\n"
-	"MTK0U84=\n"
-	"-----END CERTIFICATE-----\n"
-	CA3_CERT_PEM;
-
 #define server_ca3_cert server_ca3_localhost_cert
 const gnutls_datum_t server_ca3_localhost_cert = { (void*)server_localhost_ca3_cert_pem,
 	sizeof(server_localhost_ca3_cert_pem)-1};
-
-const gnutls_datum_t server_ca3_localhost_chain_cert = { (void*)server_localhost_ca3_cert_chain_pem,
-	sizeof(server_localhost_ca3_cert_chain_pem)-1};
 
 static char unknown_ca_cert_pem[] =
 	"-----BEGIN CERTIFICATE-----\n"
