@@ -1114,17 +1114,7 @@ _gnutls_proc_x509_server_certificate (gnutls_session_t session,
                                            CERT_ONLY_EXTENSIONS)) < 0)
         {
           gnutls_assert ();
-          goto cleanup;
-        }
-
-      /* check if signature algorithm is supported */
-      ret =
-        _gnutls_session_sign_algo_enabled (session,
-                                           peer_certificate_list
-                                           [j].sign_algo);
-      if (ret < 0)
-        {
-          gnutls_assert ();
+          peer_certificate_list_size = j;
           goto cleanup;
         }
 
@@ -2097,15 +2087,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
            */
 	  /* *INDENT-OFF* */
 	  if (session->security_parameters.cert_type
-	      == cred->cert_list[i][0].cert_type
-	      && (cred->cert_list[i][0].cert_type == GNUTLS_CRT_OPENPGP
-		  ||	/* FIXME: make this a check for certificate
-			   type capabilities */
-		  !_gnutls_version_has_selectable_sighash
-		  (gnutls_protocol_get_version (session))
-		  ||
-		  _gnutls_session_sign_algo_requested
-		  (session, cred->cert_list[i][0].sign_algo) == 0))
+	      == cred->cert_list[i][0].cert_type)
 	    {
 	      idx = i;
 	      break;

@@ -59,7 +59,6 @@ typedef struct gnutls_cert
   /* holds the type (PGP, X509)
    */
   gnutls_certificate_type_t cert_type;
-  gnutls_sign_algorithm_t sign_algo;
 
   gnutls_datum_t raw;
 

@@ -730,7 +730,6 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
   memset (gcert, 0, sizeof (gnutls_cert));
   gcert->cert_type = GNUTLS_CRT_OPENPGP;
-  gcert->sign_algo = GNUTLS_SIGN_UNKNOWN;       /* N/A here */
 
   gcert->version = gnutls_openpgp_crt_get_version (cert);
   gcert->params_size = MAX_PUBLIC_PARAMS_SIZE;

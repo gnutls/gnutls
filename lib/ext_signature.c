@@ -321,58 +321,6 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert)
 }
 
 
-/* Check if the given signature algorithm is accepted by
- * the peer. Returns 0 on success or a negative value
- * on error.
- */
-int
-_gnutls_session_sign_algo_requested (gnutls_session_t session,
-                                     gnutls_sign_algorithm_t sig)
-{
-  unsigned i;
-  int ret, hash;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
-  sig_ext_st *priv;
-  extension_priv_data_t epriv;
-
-  if (!_gnutls_version_has_selectable_sighash (ver))
-    {
-      return 0;
-    }
-
-  ret =
-    _gnutls_ext_get_session_data (session,
-                                  GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
-                                  &epriv);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      /* extension not received allow SHA1 and SHA256 */
-      hash = _gnutls_sign_get_hash_algorithm (sig);
-      if (hash == GNUTLS_DIG_SHA1 || hash == GNUTLS_DIG_SHA256)
-        return 0;
-      else
-        return ret;
-    }
-  priv = epriv.ptr;
-
-  if (priv->sign_algorithms_size == 0)
-    /* none set, allow all */
-    {
-      return 0;
-    }
-
-  for (i = 0; i < priv->sign_algorithms_size; i++)
-    {
-      if (priv->sign_algorithms[i] == sig)
-        {
-          return 0;             /* ok */
-        }
-    }
-
-  return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-}
-
 /* Check if the given signature algorithm is supported.
  * This means that it is enabled by the priority functions,
  * and in case of a server a matching certificate exists.

@@ -914,7 +914,6 @@ _gnutls_x509_crt_to_gcert (gnutls_cert * gcert,
 
   memset (gcert, 0, sizeof (gnutls_cert));
   gcert->cert_type = GNUTLS_CRT_X509;
-  gcert->sign_algo = gnutls_x509_crt_get_signature_algorithm (cert);
 
   if (!(flags & CERT_NO_COPY))
     {
