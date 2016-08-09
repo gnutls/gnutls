@@ -729,6 +729,7 @@ gnutls_transport_get_ptr2@GNUTLS_3_4
 gnutls_transport_get_ptr@GNUTLS_3_4
 gnutls_transport_set_errno@GNUTLS_3_4
 gnutls_transport_set_errno_function@GNUTLS_3_4
+gnutls_transport_set_fastopen@GNUTLS_3_4
 gnutls_transport_set_int2@GNUTLS_3_4
 gnutls_transport_set_ptr2@GNUTLS_3_4
 gnutls_transport_set_ptr@GNUTLS_3_4
@@ -833,6 +834,7 @@ gnutls_x509_crq_set_basic_constraints@GNUTLS_3_4
 gnutls_x509_crq_set_challenge_password@GNUTLS_3_4
 gnutls_x509_crq_set_dn@GNUTLS_3_4
 gnutls_x509_crq_set_dn_by_oid@GNUTLS_3_4
+gnutls_x509_crq_set_extension_by_oid@GNUTLS_3_4
 gnutls_x509_crq_set_key@GNUTLS_3_4
 gnutls_x509_crq_set_key_purpose_oid@GNUTLS_3_4
 gnutls_x509_crq_set_key_rsa_raw@GNUTLS_3_4
@@ -972,6 +974,7 @@ gnutls_x509_dn_import@GNUTLS_3_4
 gnutls_x509_dn_init@GNUTLS_3_4
 gnutls_x509_dn_oid_known@GNUTLS_3_4
 gnutls_x509_dn_oid_name@GNUTLS_3_4
+gnutls_x509_dn_set_str@GNUTLS_3_4
 gnutls_x509_ext_deinit@GNUTLS_3_4
 gnutls_x509_ext_export_aia@GNUTLS_3_4
 gnutls_x509_ext_export_authority_key_id@GNUTLS_3_4
