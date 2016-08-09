@@ -24,6 +24,9 @@ Version 2.12.24 (unreleased)
    This improves interoperability against broken servers which
    assume that this version is supported by the client.
 
+** libgnutls: Do not call the post client hello callback twice when resuming
+   using session tickets.
+
 ** API and ABI modifications:
 No changes since last version.
 
