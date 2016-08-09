@@ -412,6 +412,7 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
   int rc = -1, ret;
   bigint_t hash;
   bigint_t tmp[2] = { NULL, NULL };
+  unsigned pub_size;
 
   if (_gnutls_mpi_scan_nz (&hash, vdata->data, vdata->size) != 0)
     {
@@ -479,6 +480,11 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
       break;
 
     case GNUTLS_PK_RSA:
+      pub_size = (_gnutls_mpi_get_nbits(pk_params->params[0])+7)/8;
+
+      if (signature->size != pub_size)
+        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
       ret = _gnutls_mpi_scan_nz (&tmp[0], signature->data, signature->size);
       if (ret < 0)
         {
