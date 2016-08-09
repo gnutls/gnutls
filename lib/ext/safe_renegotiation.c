@@ -427,7 +427,7 @@ static void _gnutls_sr_deinit_data(extension_priv_data_t priv)
  *
  * Since: 2.10.0
  **/
-int gnutls_safe_renegotiation_status(gnutls_session_t session)
+unsigned gnutls_safe_renegotiation_status(gnutls_session_t session)
 {
 	int ret;
 	sr_ext_st *priv;

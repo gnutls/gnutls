@@ -1206,7 +1206,7 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type);
 int gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type);
 
   /* Safe renegotiation */
-int gnutls_safe_renegotiation_status(gnutls_session_t session);
+unsigned gnutls_safe_renegotiation_status(gnutls_session_t session);
 unsigned gnutls_session_ext_master_secret_status(gnutls_session_t session);
 unsigned gnutls_session_etm_status(gnutls_session_t session);
 
