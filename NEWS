@@ -10,10 +10,14 @@ Version 2.12.24 (unreleased)
 ** libgnutls: Fix in TLS record decoding (GNUTLS-SA-2013-2)
 
 ** libgnutls: Fix in certificate verification (GNUTLS-SA-2014-1,
-GNUTLS-SA-2014-2, GNUTLS-SA-2015-1)
+   GNUTLS-SA-2014-2, GNUTLS-SA-2015-1)
 
 ** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
-Karthikeyan Bhargavan (GNUTLS-SA-2015-2).
+   Karthikeyan Bhargavan (GNUTLS-SA-2015-2).
+
+** libgnutls: No longer set SSL 3.0 as the record layer version by default
+   This improves interoperability against broken servers which
+   assume that this version is supported by the client.
 
 ** API and ABI modifications:
 No changes since last version.
