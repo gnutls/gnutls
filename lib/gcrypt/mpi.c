@@ -74,6 +74,8 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
 
   if (nbytes == NULL || a == NULL)
     return GNUTLS_E_INVALID_REQUEST;
+  if (buffer == NULL && nbytes)
+    *nbytes = 0;
 
   ret = gcry_mpi_print (format, buffer, *nbytes, nbytes, a);
   if (!ret)
