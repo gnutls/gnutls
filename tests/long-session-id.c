@@ -48,8 +48,6 @@ void doit(void)
 #include <signal.h>
 #include "utils.h"
 
-static void terminate(int);
-
 /* This program tests the robustness of record
  * decoding.
  */
@@ -171,12 +169,6 @@ static void client(int fd, const char *prio)
 /* These are global */
 pid_t child;
 
-static void terminate(int ret)
-{
-	kill(child, SIGTERM);
-	exit(ret);
-}
-
 static void server(int fd, const char *prio)
 {
 	int ret;
@@ -244,7 +236,7 @@ static void start(const char *prio)
 
 static void ch_handler(int sig)
 {
-	int status, ret = 0;
+	int status;
 	wait(&status);
 	check_wait_status(status);
 	return;

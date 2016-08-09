@@ -31,10 +31,12 @@
 #include <gnutls/x509.h>
 #include "utils.h"
 
+#ifdef ENABLE_NON_SUITEB_CURVES
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "<%d>| %s", level, str);
 }
+#endif
 
 void doit(void)
 {
