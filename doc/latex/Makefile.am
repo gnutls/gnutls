@@ -109,7 +109,7 @@ alerts.tex:
 	$(builddir)/../alert-printlist --latex > $@-tmp
 	mv -f $@-tmp $@
 
-gnutls-api.tex: $(srcdir)/../../lib/*.c $(srcdir)/../../lib/ext/*.c $(srcdir)/../../lib/auth/*.c $(srcdir)/../../lib/algorithms/*.c
+gnutls-api.tex: $(srcdir)/../../lib/*.c $(srcdir)/../../lib/ext/*.c $(srcdir)/../../lib/system/*.c $(srcdir)/../../lib/auth/*.c $(srcdir)/../../lib/algorithms/*.c
 	echo "" > $@-tmp
 	for i in $^; do \
 		echo -n "Creating documentation for file $$i... " && \
