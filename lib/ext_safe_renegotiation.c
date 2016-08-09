@@ -215,11 +215,6 @@ _gnutls_ext_sr_recv_cs (gnutls_session_t session)
     {
       set = 1;
     }
-  else if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
 
   if (set != 0)
     {
