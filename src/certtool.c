@@ -943,7 +943,7 @@ generate_signed_crl (common_info_st * cinfo)
   crl = generate_crl (ca_crt, cinfo);
 
   fprintf (stderr, "\n");
-  result = gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key, SIGN_HASH, 0);
+  result = gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key, (default_dig != GNUTLS_DIG_UNKNOWN)?default_dig:SIGN_HASH, 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crl_privkey_sign: %s", gnutls_strerror (result));
 
@@ -1919,7 +1919,7 @@ generate_request (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (ret));
 
-  ret = gnutls_x509_crq_privkey_sign (crq, pkey, SIGN_HASH, 0);
+  ret = gnutls_x509_crq_privkey_sign (crq, pkey, (default_dig != GNUTLS_DIG_UNKNOWN)?default_dig:SIGN_HASH, 0);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "sign: %s", gnutls_strerror (ret));
 
