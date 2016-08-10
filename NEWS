@@ -28,6 +28,9 @@ Version 2.12.24 (unreleased)
    backend. There are interoperability issues, and these algorithms are
    too rare to require a proper fix.
 
+** libgnutls: The minimum Diffie-Hellman bits size was raised to 1023 from
+   768.
+
 ** libgnutls: Do not call the post client hello callback twice when resuming
    using session tickets.
 

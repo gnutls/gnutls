@@ -256,7 +256,7 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 
 }
 
-#define MIN_DH_BITS 727
+#define MIN_DH_BITS 1023
 /**
  * gnutls_init:
  * @con_end: indicate if this session is to be used for server or client.
