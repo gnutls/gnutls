@@ -7,6 +7,12 @@ Build and Check - separate build dir:
   - nettle2
   except:
   - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/tests/*.log
+      - build/tests/*/*.log
 Build and Check with valgrind:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
@@ -17,6 +23,12 @@ Build and Check with valgrind:
   - nettle2
   except:
   - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
 Build and Check with asan:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
@@ -28,3 +40,9 @@ Build and Check with asan:
   - nettle2
   except:
   - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
