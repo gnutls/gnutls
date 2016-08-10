@@ -334,8 +334,10 @@ static const int comp_priority[] = {
 };
 
 static const int sign_priority_default[] = {
+#ifdef HAVE_LIBNETTLE
   GNUTLS_SIGN_DSA_SHA224,
   GNUTLS_SIGN_DSA_SHA256,
+#endif
   GNUTLS_SIGN_RSA_SHA256,
   GNUTLS_SIGN_RSA_SHA384,
   GNUTLS_SIGN_RSA_SHA512,

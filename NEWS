@@ -24,6 +24,10 @@ Version 2.12.24 (unreleased)
    This improves interoperability against broken servers which
    assume that this version is supported by the client.
 
+** libgnutls: Prohibit DSA2 signatures when used with the libgcrypt
+   backend. There are interoperability issues, and these algorithms are
+   too rare to require a proper fix.
+
 ** libgnutls: Do not call the post client hello callback twice when resuming
    using session tickets.
 
