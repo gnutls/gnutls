@@ -45,6 +45,7 @@ int main()
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
+#include <signal.h>
 
 #include "utils.h"
 
@@ -317,6 +318,8 @@ void doit(void)
 {
 	int fd[2];
 	int ret;
+
+	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
