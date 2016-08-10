@@ -45,7 +45,6 @@
 #include <auth_anon.h>
 #include <auth_psk.h>
 #include <gnutls_algorithms.h>
-#include <gnutls_rsa_export.h>
 #include <gnutls_extensions.h>
 #include <system.h>
 
@@ -210,9 +209,6 @@ deinit_internal_params (gnutls_session_t session)
 {
   if (session->internals.params.free_dh_params)
     gnutls_dh_params_deinit (session->internals.params.dh_params);
-
-  if (session->internals.params.free_rsa_params)
-    gnutls_rsa_params_deinit (session->internals.params.rsa_params);
 
   _gnutls_handshake_hash_buffers_clear (session);
 
@@ -424,10 +420,6 @@ gnutls_deinit (gnutls_session_t session)
       _gnutls_mpi_release (&session->key->B);
       _gnutls_mpi_release (&session->key->b);
 
-      /* RSA */
-      _gnutls_mpi_release (&session->key->rsa[0]);
-      _gnutls_mpi_release (&session->key->rsa[1]);
-
       _gnutls_mpi_release (&session->key->dh_secret);
       gnutls_free (session->key);
 
@@ -544,45 +536,6 @@ _gnutls_dh_set_secret_bits (gnutls_session_t session, unsigned bits)
 
   return 0;
 }
-
-/* This function will set in the auth info structure the
- * RSA exponent and the modulus.
- */
-int
-_gnutls_rsa_export_set_pubkey (gnutls_session_t session,
-                               bigint_t exponent, bigint_t modulus)
-{
-  cert_auth_info_t info;
-  int ret;
-
-  info = _gnutls_get_auth_info (session);
-  if (info == NULL)
-    return GNUTLS_E_INTERNAL_ERROR;
-
-  if (info->rsa_export.modulus.data)
-    _gnutls_free_datum (&info->rsa_export.modulus);
-
-  if (info->rsa_export.exponent.data)
-    _gnutls_free_datum (&info->rsa_export.exponent);
-
-  ret = _gnutls_mpi_dprint_lz (modulus, &info->rsa_export.modulus);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = _gnutls_mpi_dprint_lz (exponent, &info->rsa_export.exponent);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (&info->rsa_export.modulus);
-      return ret;
-    }
-
-  return 0;
-}
-
 
 /* Sets the prime and the generator in the auth info structure.
  */
@@ -1187,27 +1140,6 @@ gnutls_session_is_resumed (gnutls_session_t session)
       if (session->internals.resumed == RESUME_TRUE)
         return 1;
     }
-
-  return 0;
-}
-
-/*-
- * _gnutls_session_is_export - Used to check whether this session is of export grade
- * @session: is a #gnutls_session_t structure.
- *
- * This function will return non zero if this session is of export grade.
- -*/
-int
-_gnutls_session_is_export (gnutls_session_t session)
-{
-  gnutls_cipher_algorithm_t cipher;
-
-  cipher =
-    _gnutls_cipher_suite_get_cipher_algo (&session->
-                                          security_parameters.current_cipher_suite);
-
-  if (_gnutls_cipher_get_export_flag (cipher) != 0)
-    return 1;
 
   return 0;
 }

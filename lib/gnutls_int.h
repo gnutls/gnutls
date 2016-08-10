@@ -256,9 +256,6 @@ struct gnutls_key_st
   bigint_t b;
   bigint_t a;
   bigint_t x;
-  /* RSA: e, m
-   */
-  bigint_t rsa[2];
 
   /* this is used to hold the peers authentication data 
    */
@@ -463,8 +460,6 @@ typedef struct
 {
   gnutls_dh_params_t dh_params;
   int free_dh_params;
-  gnutls_rsa_params_t rsa_params;
-  int free_rsa_params;
 } internal_params_st;
 
 

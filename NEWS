@@ -31,6 +31,9 @@ Version 2.12.24 (unreleased)
 ** libgnutls: The minimum Diffie-Hellman bits size was raised to 1023 from
    768.
 
+** libgnutls: Removed support for EXPORT ciphersuites. The EXPORT priority
+   string becomes and alias to NORMAL.
+
 ** libgnutls: Do not call the post client hello callback twice when resuming
    using session tickets.
 

@@ -30,7 +30,6 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
-#include <gnutls_rsa_export.h>
 #include "x509/x509_int.h"
 #include "debug.h"
 

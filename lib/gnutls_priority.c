@@ -235,14 +235,6 @@ static const int kx_priority_performance[] = {
   0
 };
 
-static const int kx_priority_export[] = {
-  GNUTLS_KX_RSA,
-  GNUTLS_KX_DHE_RSA,
-  GNUTLS_KX_DHE_DSS,
-  GNUTLS_KX_RSA_EXPORT,
-  0
-};
-
 static const int kx_priority_secure[] = {
   /* The ciphersuites that offer forward secrecy take
    * precendance
@@ -310,20 +302,6 @@ static const int cipher_priority_secure256[] = {
   GNUTLS_CIPHER_3DES_CBC,
   GNUTLS_CIPHER_ARCFOUR_128,
   /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
-  0
-};
-
-/* The same as cipher_priority_security_normal + arcfour-40. */
-static const int cipher_priority_export[] = {
-  GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_AES_256_CBC,
-#ifdef	ENABLE_CAMELLIA
-  GNUTLS_CIPHER_CAMELLIA_128_CBC,
-  GNUTLS_CIPHER_CAMELLIA_256_CBC,
-#endif
-  GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128,
-  GNUTLS_CIPHER_ARCFOUR_40,
   0
 };
 
@@ -587,7 +565,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
         }
-      else if (strcasecmp (broken_list[i], "NORMAL") == 0)
+      else if (strcasecmp (broken_list[i], "NORMAL") == 0 || strcasecmp (broken_list[i], "EXPORT") == 0)
         {
           _set_priority (&(*priority_cache)->cipher, cipher_priority_normal);
           _set_priority (&(*priority_cache)->kx, kx_priority_secure);
@@ -614,14 +592,6 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_secure128);
         }
-      else if (strcasecmp (broken_list[i], "EXPORT") == 0)
-        {
-          _set_priority (&(*priority_cache)->cipher, cipher_priority_export);
-          _set_priority (&(*priority_cache)->kx, kx_priority_export);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_default);
-        }                       /* now check if the element is something like -ALGO */
       else if (broken_list[i][0] == '!' || broken_list[i][0] == '+'
                || broken_list[i][0] == '-')
         {

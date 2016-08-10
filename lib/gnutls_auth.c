@@ -301,7 +301,6 @@ void
 _gnutls_free_auth_info (gnutls_session_t session)
 {
   dh_info_st *dh_info;
-  rsa_info_st *rsa_info;
 
   if (session == NULL || session->key == NULL)
     {
@@ -344,7 +343,6 @@ _gnutls_free_auth_info (gnutls_session_t session)
           break;
 
         dh_info = &info->dh;
-        rsa_info = &info->rsa_export;
         for (i = 0; i < info->ncerts; i++)
           {
             _gnutls_free_datum (&info->raw_certificate_list[i]);
@@ -355,7 +353,6 @@ _gnutls_free_auth_info (gnutls_session_t session)
         info->ncerts = 0;
 
         _gnutls_free_dh_info (dh_info);
-        _gnutls_free_rsa_info (rsa_info);
       }
 
 

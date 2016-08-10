@@ -115,7 +115,6 @@ typedef struct cert_auth_info_st
    * They must be freed.
    */
   dh_info_st dh;
-  rsa_info_st rsa_export;
 
   gnutls_datum_t *raw_certificate_list; /* holds the raw certificate of the
                                          * peer.

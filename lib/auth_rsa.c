@@ -97,37 +97,6 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
     }
 
 
-  /* EXPORT case: */
-  if (_gnutls_cipher_suite_get_kx_algo
-      (&session->security_parameters.current_cipher_suite) ==
-      GNUTLS_KX_RSA_EXPORT
-      && _gnutls_mpi_get_nbits (peer_cert.params[0]) > 512)
-    {
-
-      _gnutls_gcert_deinit (&peer_cert);
-
-      if (session->key->rsa[0] == NULL || session->key->rsa[1] == NULL)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
-
-      if (*params_len < 2)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
-      *params_len = 2;
-      for (i = 0; i < *params_len; i++)
-        {
-          params[i] = _gnutls_mpi_copy (session->key->rsa[i]);
-        }
-
-      return 0;
-    }
-
-  /* end of export case */
-
   if (*params_len < peer_cert.params_size)
     {
       gnutls_assert ();

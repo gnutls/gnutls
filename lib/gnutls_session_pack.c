@@ -318,10 +318,6 @@ pack_certificate_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
                          info->dh.generator.size);
       BUFFER_APPEND_PFX (ps, info->dh.public_key.data,
                          info->dh.public_key.size);
-      BUFFER_APPEND_PFX (ps, info->rsa_export.modulus.data,
-                         info->rsa_export.modulus.size);
-      BUFFER_APPEND_PFX (ps, info->rsa_export.exponent.data,
-                         info->rsa_export.exponent.size);
 
       BUFFER_APPEND_NUM (ps, info->ncerts);
 
@@ -375,8 +371,6 @@ unpack_certificate_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_POP_DATUM (ps, &info->dh.prime);
   BUFFER_POP_DATUM (ps, &info->dh.generator);
   BUFFER_POP_DATUM (ps, &info->dh.public_key);
-  BUFFER_POP_DATUM (ps, &info->rsa_export.modulus);
-  BUFFER_POP_DATUM (ps, &info->rsa_export.exponent);
 
   BUFFER_POP_NUM (ps, info->ncerts);
 
@@ -405,9 +399,6 @@ error:
       _gnutls_free_datum (&info->dh.prime);
       _gnutls_free_datum (&info->dh.generator);
       _gnutls_free_datum (&info->dh.public_key);
-
-      _gnutls_free_datum (&info->rsa_export.modulus);
-      _gnutls_free_datum (&info->rsa_export.exponent);
 
       for (j = 0; j < i; j++)
         _gnutls_free_datum (&info->raw_certificate_list[j]);

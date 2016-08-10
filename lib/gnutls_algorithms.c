@@ -72,7 +72,6 @@ typedef struct
 static const gnutls_cred_map cred_mappings[] = {
   {GNUTLS_KX_ANON_DH, GNUTLS_CRD_ANON, GNUTLS_CRD_ANON},
   {GNUTLS_KX_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
-  {GNUTLS_KX_RSA_EXPORT, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
@@ -111,7 +110,6 @@ typedef struct
  */
 static const gnutls_pk_map pk_mappings[] = {
   {GNUTLS_KX_RSA, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
-  {GNUTLS_KX_RSA_EXPORT, GNUTLS_PK_RSA, CIPHER_SIGN},
   {GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
   {GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
   {GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
@@ -289,7 +287,6 @@ static const gnutls_mac_algorithm_t supported_macs[] = {
 
 
 extern mod_auth_st rsa_auth_struct;
-extern mod_auth_st rsa_export_auth_struct;
 extern mod_auth_st dhe_rsa_auth_struct;
 extern mod_auth_st dhe_dss_auth_struct;
 extern mod_auth_st anon_auth_struct;
@@ -314,8 +311,6 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
   {"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
 #endif
   {"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0},
-  {"RSA-EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0,
-   1 /* needs RSA params */ },
   {"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
   {"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
 
@@ -338,7 +333,6 @@ static const gnutls_kx_algorithm_t supported_kxs[] = {
   GNUTLS_KX_ANON_DH,
 #endif
   GNUTLS_KX_RSA,
-  GNUTLS_KX_RSA_EXPORT,
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
 #ifdef ENABLE_SRP
@@ -438,8 +432,6 @@ typedef struct
 #define GNUTLS_RSA_ARCFOUR_SHA1 { 0x00, 0x05 }
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA1 { 0x00, 0x0A }
-
-#define GNUTLS_RSA_EXPORT_ARCFOUR_40_MD5 { 0x00, 0x03 }
 
 /* rfc3268:
  */
@@ -704,12 +696,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_NULL,
                              GNUTLS_KX_RSA, GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX),
-
-  /* RSA-EXPORT */
-  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_EXPORT_ARCFOUR_40_MD5,
-                             GNUTLS_CIPHER_ARCFOUR_40,
-                             GNUTLS_KX_RSA_EXPORT, GNUTLS_MAC_MD5,
-                             GNUTLS_SSL3, GNUTLS_TLS1_0),
 
   /* RSA */
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_ARCFOUR_SHA1,
@@ -1131,14 +1117,6 @@ _gnutls_kx_is_ok (gnutls_kx_algorithm_t algorithm)
     ret = 0;
   else
     ret = 1;
-  return ret;
-}
-
-int
-_gnutls_kx_needs_rsa_params (gnutls_kx_algorithm_t algorithm)
-{
-  ssize_t ret = 0;
-  GNUTLS_KX_ALG_LOOP (ret = p->needs_rsa_params);
   return ret;
 }
 
