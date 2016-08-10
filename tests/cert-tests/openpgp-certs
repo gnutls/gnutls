@@ -37,7 +37,7 @@ fi
 echo "Checking OpenPGP certificate verification"
 
 eval "${GETPORT}"
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-127.0.0.1-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/data/srv-public-127.0.0.1-signed.gpg" --pgpkeyfile "${srcdir}/data/srv-secret.gpg"
 PID=$!
 wait_server ${PID}
 
@@ -49,24 +49,24 @@ wait_server ${PID}
 #"${CLI}" -p "${PORT}" 127.0.0.1 --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
 #  fail "Connection to verified IP address should have succeeded! (error code $?)" $?
 
-${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.2 --priority NORMAL:+CTYPE-OPENPGP --pgpkeyring "${srcdir}/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.2 --priority NORMAL:+CTYPE-OPENPGP --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
 	fail ${PID} "Connection to unrecognized IP address should have failed!"
 
-${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" localhost --priority NORMAL:+CTYPE-OPENPGP --pgpkeyring "${srcdir}/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" localhost --priority NORMAL:+CTYPE-OPENPGP --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
 	fail ${PID} "Connection to unverified (but present) 'localhost' should have failed!"
 
 kill ${PID}
 wait
 
 eval "${GETPORT}"
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-localhost-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/data/srv-public-localhost-signed.gpg" --pgpkeyfile "${srcdir}/data/srv-secret.gpg"
 PID=$!
 wait_server ${PID}
 
-echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
 	fail ${PID} "Connection to unverified IP address should have failed! (error code $?)" $?
 
-${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.2 --pgpkeyring "${srcdir}/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.2 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
 	fail ${PID} "Connection to unrecognized IP address should have failed!"
 
 #see reason above
@@ -77,15 +77,15 @@ kill ${PID}
 wait
 
 eval "${GETPORT}"
-launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/srv-public-all-signed.gpg" --pgpkeyfile "${srcdir}/srv-secret.gpg"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/data/srv-public-all-signed.gpg" --pgpkeyfile "${srcdir}/data/srv-secret.gpg"
 PID=$!
 wait_server ${PID}
 
 # give the server a chance to initialize
-echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/ca-public.gpg" </dev/null >/dev/null || \
+echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null || \
 	fail ${PID} "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
 
-${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.2 --pgpkeyring "${srcdir}/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.2 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
 	fail ${PID} "Connection to unrecognized IP address should have failed!"
 
 kill ${PID}

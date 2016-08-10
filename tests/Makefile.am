@@ -21,10 +21,6 @@
 
 SUBDIRS = . cert-tests ocsp-tests key-tests scripts slow dtls windows
 
-if ENABLE_OPENPGP
-SUBDIRS += openpgp-certs
-endif
-
 if WANT_TEST_SUITE
 SUBDIRS += suite
 endif

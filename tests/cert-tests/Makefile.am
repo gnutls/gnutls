@@ -53,7 +53,12 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/client.p12 data/noclient.p12 data/unclient.p12 data/pkcs12_2certs.p12 \
 	data/pkcs12_5certs.p12 data/test-null.p12 data/cert-ca.p12 data/sha256.p12 \
 	data/key-ca.pem data/key-subca.pem data/key-subsubca.pem data/key-user.pem \
-	data/key-dsa.pem data/key-ca-dsa.pem data/key-subca-dsa.pem
+	data/key-dsa.pem data/key-ca-dsa.pem data/key-subca-dsa.pem \
+	data/ca-public.gpg data/srv-public-all-signed.gpg data/srv-secret.gpg \
+	data/ca-secret.gpg data/srv-public.gpg data/srv-public-127.0.0.1-signed.gpg	\
+	data/srv-public-localhost-signed.gpg data/selfsigs/alice-mallory-badsig18.pub \
+	data/selfsigs/alice-mallory-irrelevantsig.pub data/selfsigs/alice-mallory-nosig18.pub \
+	data/selfsigs/alice.pub
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -61,6 +66,15 @@ dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 
 if !ENABLE_FIPS140
 dist_check_SCRIPTS += pkcs12
+endif
+
+if ENABLE_OPENPGP
+# The selftest is disabled until we can make it work under Wine and
+# under Debian buildds (problem with 127.0.0.2?).
+dist_check_SCRIPTS += openpgp-selfsigs
+if !WINDOWS
+dist_check_SCRIPTS += openpgp-certs
+endif
 endif
 
 if !HAVE_BUGGY_LIBIDN
