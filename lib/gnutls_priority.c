@@ -249,7 +249,6 @@ static const int kx_priority_secure[] = {
 };
 
 static const int cipher_priority_performance[] = {
-  GNUTLS_CIPHER_ARCFOUR_128,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
 #endif
@@ -259,18 +258,19 @@ static const int cipher_priority_performance[] = {
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
 #endif
-  /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
+  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_128,
   0
 };
 
 static const int cipher_priority_normal[] = {
-  GNUTLS_CIPHER_AES_128_CBC,
-#ifdef	ENABLE_CAMELLIA
-  GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
   GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
+#endif
+  GNUTLS_CIPHER_AES_128_CBC,
+#ifdef	ENABLE_CAMELLIA
+  GNUTLS_CIPHER_CAMELLIA_128_CBC,
 #endif
   GNUTLS_CIPHER_3DES_CBC,
   GNUTLS_CIPHER_ARCFOUR_128,
@@ -280,11 +280,12 @@ static const int cipher_priority_normal[] = {
 
 static const int cipher_priority_secure128[] = {
   GNUTLS_CIPHER_AES_128_CBC,
+  GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
+  GNUTLS_CIPHER_CAMELLIA_256_CBC,
 #endif
   GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128,
   /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
   0
 };
@@ -300,7 +301,6 @@ static const int cipher_priority_secure256[] = {
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
 #endif
   GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128,
   /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
   0
 };
