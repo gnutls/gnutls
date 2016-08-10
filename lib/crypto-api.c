@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -587,6 +588,8 @@ gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 {
 	int ret;
+
+	FAIL_IF_LIB_ERROR;
 
 #ifdef ENABLE_FIPS140
 	/* The FIPS140 approved RNGs are not allowed to be used
