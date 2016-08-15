@@ -1746,7 +1746,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
  * depending on the client's will. A server receiving this error code
  * can only initiate a new handshake or terminate the session.
  *
- * If %EINTR is returned by the internal push function (the default
+ * If %EINTR is returned by the internal pull function (the default
  * is recv()) then %GNUTLS_E_INTERRUPTED will be returned.  If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
  * call this function again to get the data.  See also
