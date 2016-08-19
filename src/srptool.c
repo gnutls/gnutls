@@ -114,11 +114,13 @@ static int generate_create_conf(const char *tpasswd_conf)
 
 		if (gnutls_srp_base64_encode_alloc(&n, &str_n) < 0) {
 			fprintf(stderr, "Could not encode\n");
+			fclose(fd);
 			return -1;
 		}
 
 		if (gnutls_srp_base64_encode_alloc(&g, &str_g) < 0) {
 			fprintf(stderr, "Could not encode\n");
+			fclose(fd);
 			return -1;
 		}
 

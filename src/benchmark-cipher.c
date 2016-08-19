@@ -66,8 +66,11 @@ static void cipher_mac_bench(int algo, int mac_algo, int size)
 	memset(_key, 0xf0, keysize);
 
 	_iv = malloc(ivsize);
-	if (_iv == NULL)
+	if (_iv == NULL) {
+		if (_key)
+			free(_key);
 		return;
+	}
 	memset(_iv, 0xf0, ivsize);
 
 	iv.data = _iv;
