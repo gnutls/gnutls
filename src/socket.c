@@ -465,8 +465,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 			else if (err < 0) {
 				fprintf(stderr, "*** handshake has failed: %s\n", gnutls_strerror(err));
 				exit(1);
-			} else if (hd->verbose)
-				printf("- Handshake was completed\n");
+			}
 		}
 
 		break;

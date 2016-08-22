@@ -1218,6 +1218,8 @@ int main(int argc, char **argv)
 	socket_open(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO), socket_flags, CONNECT_MSG, NULL);
 	hd.verbose = verbose;
 
+	printf("- Handshake was completed\n");
+
 	if (resume != 0)
 		if (try_resume(&hd))
 			return 1;
