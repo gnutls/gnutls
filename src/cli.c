@@ -1619,8 +1619,7 @@ static void cmd_parser(int argc, char **argv)
 	fastopen = HAVE_OPT(FASTOPEN);
 #else
 	if (HAVE_OPT(FASTOPEN)) {
-		fprintf(stderr, "TCP Fast Open not supported for this OS\n");
-		exit(1);
+		fprintf(stderr, "Warning: TCP Fast Open not supported on this OS\n");
 	}
 #endif
 
