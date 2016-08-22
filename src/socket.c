@@ -161,13 +161,21 @@ static
 ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 {
 	char buf[1024];
-	char *p;
+	char *pbuf, *p;
 	int ret;
 	fd_set read_fds;
 	struct timeval tv;
+	size_t left, got;
+
+	if (txt_size > sizeof(buf))
+		abort();
 
 	if (socket->verbose && txt != NULL)
 		fprintf(stderr, "starttls: waiting for: \"%.*s\"\n", txt_size, txt);
+
+	pbuf = buf;
+	left = sizeof(buf)-1;
+	got = 0;
 
 	do {
 		FD_ZERO(&read_fds);
@@ -178,28 +186,37 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 		if (ret <= 0)
 			ret = -1;
 		else
-			ret = recv(socket->fd, buf, sizeof(buf)-1, 0);
-		if (ret == -1) {
-			fprintf(stderr, "error receiving %s\n", txt);
+			ret = recv(socket->fd, pbuf, left, 0);
+		if (ret == -1 || ret == 0) {
+			int e = errno;
+			fprintf(stderr, "error receiving %s: %s\n", txt, strerror(e));
 			exit(2);
 		}
-		buf[ret] = 0;
+		pbuf[ret] = 0;
 
 		if (txt == NULL)
 			break;
 
 		if (socket->verbose)
-			fprintf(stderr, "starttls: received: %s\n", buf);
+			fprintf(stderr, "starttls: received: %s\n", pbuf);
 
-		p = memmem(buf, ret, txt, txt_size);
-		if (p != NULL && p != buf) {
-			p--;
-			if (*p == '\n')
+		pbuf += ret;
+		left -= ret;
+		got += ret;
+
+
+		/* check for text after a newline in buffer */
+		if (got > txt_size) {
+			p = memmem(buf, got, txt, txt_size);
+			if (p != NULL && p != buf) {
+				p--;
+				if (*p == '\n' || *p == '\r')
 				break;
+			}
 		}
-	} while(ret < (int)txt_size || strncmp(buf, txt, txt_size) != 0);
+	} while(got < txt_size || strncmp(buf, txt, txt_size) != 0);
 
-	return ret;
+	return got;
 }
 
 static void
