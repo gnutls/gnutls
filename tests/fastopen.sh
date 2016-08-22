@@ -21,8 +21,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv${EXEEXT}} -q"
-CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
+SERV="${SERV:-../src/gnutls-serv${EXEEXT}} -q"
+CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
 unset RETCODE
 
 if test "${WINDIR}" != ""; then
@@ -34,12 +34,12 @@ if ! test -z "${VALGRIND}"; then
 fi
 
 
-. "${srcdir}/../scripts/common.sh"
+. "${srcdir}/scripts/common.sh"
 
 echo "Checking Fast open"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ANON-ECDH:+ANON-DH" --dhparams "${srcdir}/params.dh"
+launch_server $$ --echo --priority "NORMAL:+ANON-ECDH"
 PID=$!
 wait_server ${PID}
 
