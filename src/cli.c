@@ -1212,19 +1212,25 @@ int main(int argc, char **argv)
 		socket_flags |= SOCKET_FLAG_UDP;
 	if (fastopen)
 		socket_flags |= SOCKET_FLAG_FASTOPEN;
+	if (verbose)
+		socket_flags |= SOCKET_FLAG_VERBOSE;
 	if (starttls)
+		socket_flags |= SOCKET_FLAG_RAW;
+	else if (HAVE_OPT(STARTTLS_PROTO))
 		socket_flags |= SOCKET_FLAG_STARTTLS;
 
 	socket_open(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO), socket_flags, CONNECT_MSG, NULL);
 	hd.verbose = verbose;
 
-	printf("- Handshake was completed\n");
+	if (hd.secure) {
+		printf("- Handshake was completed\n");
 
-	if (resume != 0)
-		if (try_resume(&hd))
-			return 1;
+		if (resume != 0)
+			if (try_resume(&hd))
+				return 1;
 
-	print_other_info(hd.session);
+		print_other_info(hd.session);
+	}
 
 	/* Warning!  Do not touch this text string, it is used by external
 	   programs to search for when gnutls-cli has reached this point. */

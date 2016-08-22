@@ -368,6 +368,9 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 
 	memset(hd, 0, sizeof(*hd));
 
+	if (flags & SOCKET_FLAG_VERBOSE)
+		hd->verbose = 1;
+
 	if (rdata) {
 		hd->rdata.data = rdata->data;
 		hd->rdata.size = rdata->size;
@@ -443,19 +446,21 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 				continue;
 		}
 
+		hd->fd = sd;
+		if (flags & SOCKET_FLAG_STARTTLS) {
+			hd->app_proto = app_proto;
+			socket_starttls(hd);
+			hd->app_proto = NULL;
+		}
+
+		hd->session = init_tls_session(hostname);
+		if (hd->rdata.data) {
+			gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
+		}
+
+		gnutls_transport_set_int(hd->session, sd);
+
 		if (!(flags & SOCKET_FLAG_RAW)) {
-			if (flags & SOCKET_FLAG_STARTTLS) {
-				socket_starttls(hd);
-			}
-
-			hd->session = init_tls_session(hostname);
-			if (hd->rdata.data) {
-				gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
-			}
-
-			hd->fd = sd;
-			gnutls_transport_set_int(hd->session, sd);
-
 			err = do_handshake(hd);
 			if (err == GNUTLS_E_PUSH_ERROR) { /* failed connecting */
 				gnutls_deinit(hd->session);
