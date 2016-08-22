@@ -7,6 +7,8 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for IP name constraints. Patch by Martin Ukrop.
 
+** gnutls-cli: Fixed starttls regression from 3.5.3.
+
 ** API and ABI modifications:
 GNUTLS_E_MALFORMED_CIDR: Added
 gnutls_x509_cidr_to_rfc5280: Added
