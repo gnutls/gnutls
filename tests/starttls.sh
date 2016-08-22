@@ -68,4 +68,19 @@ fi
 kill ${PID}
 wait
 
+echo "Checking STARTTLS over FTP"
+
+eval "${GETPORT}"
+socat TCP-LISTEN:${PORT} EXEC:"chat -e -S -v -f ${srcdir}/starttls-ftp.txt",pty &
+PID=$!
+wait_server ${PID}
+
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls-proto ftp --verbose </dev/null >/dev/null
+if test $? != 1;then
+	fail ${PID} "connect should have failed with error code 1"
+fi
+
+kill ${PID}
+wait
+
 exit 0
