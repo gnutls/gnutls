@@ -151,7 +151,7 @@ ssize_t send_line(socket_st * socket, const char *txt)
 
 	if (ret == -1) {
 		fprintf(stderr, "error sending \"%s\"\n", txt);
-		exit(1);
+		exit(2);
 	}
 
 	return ret;
@@ -181,7 +181,7 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 			ret = recv(socket->fd, buf, sizeof(buf)-1, 0);
 		if (ret == -1) {
 			fprintf(stderr, "error receiving %s\n", txt);
-			exit(1);
+			exit(2);
 		}
 		buf[ret] = 0;
 
