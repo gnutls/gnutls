@@ -33,7 +33,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
 	rsa-md5-collision/MD5CollisionCA.cer rsa-md5-collision/TargetCollidingCertificate1.cer \
 	rsa-md5-collision/TargetCollidingCertificate2.cer rsa-md5-collision/README \
-	safe-renegotiation/README 
+	safe-renegotiation/README starttls-smtp.txt
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -253,7 +253,7 @@ check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
 
 if !WINDOWS
-dist_check_SCRIPTS += danetool.sh fastopen.sh
+dist_check_SCRIPTS += danetool.sh fastopen.sh starttls.sh
 endif
 
 TESTS = $(ctests) $(dist_check_SCRIPTS)
