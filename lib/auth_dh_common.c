@@ -74,6 +74,9 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
+   if (data_size != 0)
+     return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
   _gnutls_dh_set_peer_public (session, session->key->client_Y);
 
   session->key->KEY =
