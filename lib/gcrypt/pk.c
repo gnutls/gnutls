@@ -640,7 +640,7 @@ _dsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
 }
 
 static int
-_rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
+_rsa_generate_params (bigint_t * resarr, unsigned *resarr_len, int bits)
 {
 
   int ret, i;
