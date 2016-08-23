@@ -438,8 +438,6 @@ struct gnutls_priority_st
   priority_st cert_type;
   priority_st sign_algo;
 
-  /* to disable record padding */
-  int no_padding:1;
   int allow_large_records:1;
   safe_renegotiation_t sr;
   int ssl3_record_version:1;

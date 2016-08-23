@@ -113,7 +113,7 @@ gnutls_transport_set_lowat (gnutls_session_t session, int num)
 void
 gnutls_record_disable_padding (gnutls_session_t session)
 {
-  session->internals.priorities.no_padding = 1;
+  return;
 }
 
 /**
@@ -441,9 +441,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       cipher_size =
         _gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
                          data2send_size, _mbuffer_get_udata_ptr (bufel),
-                         cipher_size, type,
-                         (session->internals.priorities.no_padding ==
-                          0) ? 1 : 0, record_params);
+                         cipher_size, type, 0, record_params);
       if (cipher_size <= 0)
         {
           gnutls_assert ();

@@ -705,7 +705,6 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
         {
           if (strcasecmp (&broken_list[i][1], "COMPAT") == 0)
             {
-              (*priority_cache)->no_padding = 1;
               (*priority_cache)->allow_large_records = 1;
             }
           else if (strcasecmp (&broken_list[i][1],
