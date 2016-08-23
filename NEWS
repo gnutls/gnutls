@@ -24,6 +24,9 @@ Version 2.12.24 (unreleased)
    This improves interoperability against broken servers which
    assume that this version is supported by the client.
 
+** libgnutls: No longer include SSL 3.0 to the default protocol list.
+   SSL 3.0 it must be explicitly enabled using a priority string, to be used.
+
 ** libgnutls: Prohibit DSA2 signatures when used with the libgcrypt
    backend. There are interoperability issues, and these algorithms are
    too rare to require a proper fix.
@@ -32,7 +35,7 @@ Version 2.12.24 (unreleased)
    768.
 
 ** libgnutls: Removed support for EXPORT ciphersuites. The EXPORT priority
-   string becomes and alias to NORMAL.
+   string becomes an alias to NORMAL.
 
 ** libgnutls: ARCFOUR-128 was prioritized lower than any other cipher. Was
    removed from the algorithms when the SECURE priority string is specified.
