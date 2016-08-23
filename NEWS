@@ -37,11 +37,16 @@ Version 2.12.24 (unreleased)
 ** libgnutls: Removed support for EXPORT ciphersuites. The EXPORT priority
    string becomes an alias to NORMAL.
 
+** libgnutls: Disabled random padding in the TLS protocol to improve compatibility
+   with various broken servers.
+
 ** libgnutls: ARCFOUR-128 was prioritized lower than any other cipher. Was
    removed from the algorithms when the SECURE priority string is specified.
 
 ** libgnutls: Do not call the post client hello callback twice when resuming
    using session tickets.
+
+** libgnutls: Do not link with libpthread unless necessary.
 
 ** API and ABI modifications:
 No changes since last version.
