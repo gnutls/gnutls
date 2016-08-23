@@ -61,6 +61,18 @@ AC_CHECK_TYPE(ssize_t,
     #include <sys/types.h>
   ])
 
+case "$host" in
+  *mingw32* | *mingw64*)
+    have_win=yes
+  ;;
+  *darwin*)
+    have_macosx=yes
+  ;;
+  *)
+    have_elf=yes
+  ;;
+esac
+
 # For minitasn1.
 AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
@@ -125,7 +137,13 @@ fi
 lgl_INIT
 
 AC_CHECK_FUNCS(getrusage,,)
-AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+
+if test "$have_win" != "yes";then
+  AC_CHECK_FUNCS([pthread_mutex_lock],,)
+  if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
+    AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+  fi
+fi
 
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
 LIBGNUTLS_CFLAGS="-I${includedir}"
