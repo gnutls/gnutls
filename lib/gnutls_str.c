@@ -644,7 +644,11 @@ int
 _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, const void *data,
                                    size_t data_size)
 {
-  _gnutls_buffer_append_prefix (buf, data_size);
+  int ret;
+  ret = _gnutls_buffer_append_prefix (buf, data_size);
+  if (ret < 0)
+    return ret;
+
   if (data_size > 0)
     return _gnutls_buffer_append_data (buf, data, data_size);
 
