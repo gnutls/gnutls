@@ -97,13 +97,15 @@ gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
   bigint_t k, ff, ret;
   int bits;
   
-  ff = _gnutls_mpi_mod(f, prime);
-  _gnutls_mpi_add_ui(ff, ff, 1);
+  ff = _gnutls_mpi_alloc_like(f);
+  if (ff == NULL)
+    return NULL;
+  _gnutls_mpi_add_ui(ff, f, 1);
 
-  /* check if f==0,1,p-1. 
-   * or (ff=f+1) equivalently ff==1,2,p */
+  /* check if f==0,1, f>=p-1. 
+   * or (ff=f+1) equivalently ff==1,2, ff >= p */
   if ((_gnutls_mpi_cmp_ui(ff, 2) == 0) || (_gnutls_mpi_cmp_ui(ff, 1) == 0) ||
-      (_gnutls_mpi_cmp(ff,prime) == 0))
+      (_gnutls_mpi_cmp(ff,prime) >= 0))
     {
       gnutls_assert();
       ret = NULL;
