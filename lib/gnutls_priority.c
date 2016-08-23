@@ -567,7 +567,12 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       else if (strcasecmp (broken_list[i], "NORMAL") == 0 || strcasecmp (broken_list[i], "EXPORT") == 0)
         {
           _set_priority (&(*priority_cache)->cipher, cipher_priority_normal);
-          _set_priority (&(*priority_cache)->kx, kx_priority_secure);
+          /* We give priority to RSA ciphersuites since the DHE-*
+           * ciphersuites have many compatibility issues (e.g.,
+           * if the security level agreed between peers does not match
+           * in DHE ciphersuites one can only tear down the connection).
+           */
+          _set_priority (&(*priority_cache)->kx, kx_priority_performance);
           _set_priority (&(*priority_cache)->mac, mac_priority_normal);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
