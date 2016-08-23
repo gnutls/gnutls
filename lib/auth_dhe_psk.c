@@ -126,6 +126,7 @@ gen_psk_server_kx (gnutls_session_t session, opaque ** data)
   int ret;
   gnutls_dh_params_t dh_params;
   gnutls_psk_server_credentials_t cred;
+  gnutls_datum_t hint = {NULL, 0};
 
   cred = (gnutls_psk_server_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
@@ -157,7 +158,13 @@ gen_psk_server_kx (gnutls_session_t session, opaque ** data)
 
   _gnutls_dh_set_group (session, g, p);
 
-  ret = _gnutls_dh_common_print_server_kx (session, g, p, data, 1);
+  if (cred->hint)
+    {
+      hint.data = (uint8_t *) cred->hint;
+      hint.size = strlen(cred->hint);
+    }
+
+  ret = _gnutls_dh_common_print_server_kx (session, g, p, data, &hint);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -238,12 +245,37 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
 
 }
 
+static int copy_hint(gnutls_session_t session, gnutls_datum_t *hint)
+{
+	psk_auth_info_t info;
+
+	/* copy the hint to the auth info structures
+	 */
+	info = _gnutls_get_auth_info(session);
+	if (info == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	if (hint->size > MAX_USERNAME_SIZE) {
+		gnutls_assert();
+		return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+	}
+
+	memcpy(info->hint, hint->data, hint->size);
+	info->hint[hint->size] = 0;
+
+	return 0;
+}
+
 int
 proc_psk_server_kx (gnutls_session_t session, opaque * data,
                     size_t _data_size)
 {
 
   int ret;
+  gnutls_datum_t hint;
+  ssize_t data_size = _data_size;
 
   /* set auth_info */
   if ((ret =
@@ -254,7 +286,21 @@ proc_psk_server_kx (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size, 1);
+  DECR_LEN(data_size, 2);
+  hint.size = _gnutls_read_uint16(&data[0]);
+  hint.data = &data[2];
+
+  DECR_LEN(data_size, hint.size);
+  data += 2 + hint.size;
+
+  ret = copy_hint(session, &hint);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  ret = _gnutls_proc_dh_common_server_kx (session, data, data_size);
   if (ret < 0)
     {
       gnutls_assert ();

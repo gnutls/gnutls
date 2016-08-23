@@ -222,7 +222,7 @@ error:
 
 int
 _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
-                                  opaque * data, size_t _data_size, int psk)
+                                  opaque * data, size_t _data_size)
 {
   uint16_t n_Y, n_g, n_p;
   size_t _n_Y, _n_g, _n_p;
@@ -233,14 +233,6 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
   ssize_t data_size = _data_size;
 
   i = 0;
-
-  if (psk != 0)
-    {
-      DECR_LEN (data_size, 2);
-      psk_size = _gnutls_read_uint16 (&data[i]);
-      DECR_LEN (data_size, psk_size);
-      i += 2 + psk_size;
-    }
 
   DECR_LEN (data_size, 2);
   n_p = _gnutls_read_uint16 (&data[i]);
@@ -307,8 +299,6 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
   _gnutls_dh_set_peer_public (session, session->key->client_Y);
 
   ret = n_Y + n_p + n_g + 6;
-  if (psk != 0)
-    ret += 2;
 
   return ret;
 }
@@ -318,7 +308,7 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
 int
 _gnutls_dh_common_print_server_kx (gnutls_session_t session,
                                    bigint_t g, bigint_t p, opaque ** data,
-                                   int psk)
+                                   gnutls_datum_t *psk_hint)
 {
   bigint_t x, X;
   size_t n_X, n_g, n_p;
@@ -340,8 +330,8 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   _gnutls_mpi_print (X, NULL, &n_X);
 
   data_size = n_g + n_p + n_X + 6;
-  if (psk != 0)
-    data_size += 2;
+  if (psk_hint != NULL)
+    data_size += 2 + psk_hint->size;
 
   (*data) = gnutls_malloc (data_size);
   if (*data == NULL)
@@ -353,10 +343,15 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   pos = 0;
   pdata = *data;
 
-  if (psk != 0)
+  if (psk_hint != NULL)
     {
-      _gnutls_write_uint16 (0, &pdata[pos]);
+      _gnutls_write_uint16 (psk_hint->size, &pdata[pos]);
       pos += 2;
+      if (psk_hint->size > 0)
+        {
+          memcpy(&pdata[pos], psk_hint->data, psk_hint->size);
+          pos += psk_hint->size;
+        }
     }
 
   _gnutls_mpi_print (p, &pdata[pos + 2], &n_p);
@@ -378,8 +373,8 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
    * have been pessimist and might have returned initially
    * more data */
   ret = n_g + n_p + n_X + 6;
-  if (psk != 0)
-    ret += 2;
+  if (psk_hint != NULL)
+    ret += 2 + psk_hint->size;
 
   return ret;
 }

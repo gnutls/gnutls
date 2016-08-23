@@ -133,7 +133,7 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
 
   _gnutls_dh_set_group (session, g, p);
 
-  ret = _gnutls_dh_common_print_server_kx (session, g, p, data, 0);
+  ret = _gnutls_dh_common_print_server_kx (session, g, p, data, NULL);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -229,7 +229,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size, 0);
+  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size);
   if (ret < 0)
     {
       gnutls_assert ();
