@@ -1341,6 +1341,7 @@ main (int argc, char **argv)
                               }
                             while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
                             GERR (r);
+                            j->no_close = 1;
                           }
                       }
                   }
@@ -1393,6 +1394,7 @@ main (int argc, char **argv)
                     int ret;
 
                     j->http_state = HTTP_STATE_CLOSING;
+                    j->no_close = 1;
                     check_alert (j->tls_session, r);
                     fprintf (stderr, "Error in handshake\n");
                     GERR (r);
@@ -1402,7 +1404,7 @@ main (int argc, char **argv)
                         ret =
                           gnutls_alert_send_appropriate (j->tls_session, r);
                       }
-                    while (ret == GNUTLS_E_AGAIN);
+                    while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
                   }
                 else if (r == 0)
                   {
