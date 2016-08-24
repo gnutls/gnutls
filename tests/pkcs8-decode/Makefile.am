@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
+EXTRA_DIST = encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem pkcs8-pbes2-sha256.pem
 
 dist_check_SCRIPTS = pkcs8
 
