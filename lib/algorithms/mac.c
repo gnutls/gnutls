@@ -25,25 +25,31 @@
 #include <gnutls_errors.h>
 #include <x509/common.h>
 
+#define MAC_OID_SHA1 "1.2.840.113549.2.7"
+#define MAC_OID_SHA224 "1.2.840.113549.2.8"
+#define MAC_OID_SHA256 "1.2.840.113549.2.9"
+#define MAC_OID_SHA384 "1.2.840.113549.2.10"
+#define MAC_OID_SHA512 "1.2.840.113549.2.11"
+
 static const mac_entry_st hash_algorithms[] = {
-	{"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 0, 1, 64},
-	{"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0, 0, 64},
-	{"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 0, 1,
+	{"SHA1", HASH_OID_SHA1, MAC_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 0, 1, 64},
+	{"MD5", HASH_OID_MD5, NULL, GNUTLS_MAC_MD5, 16, 16, 0, 0, 0, 64},
+	{"SHA256", HASH_OID_SHA256, MAC_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 0, 1,
 	 64},
-	{"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1,
+	{"SHA384", HASH_OID_SHA384, MAC_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1,
 	 64},
-	{"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1,
+	{"SHA512", HASH_OID_SHA512, MAC_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1,
 	 64},
-	{"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1,
+	{"SHA224", HASH_OID_SHA224, MAC_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1,
 	 64},
-	{"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1, 0},
-	{"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 8, 0, 1, 0},
-	{"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1, 0},
-	{"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0, 0},	/* not used as MAC */
-	{"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1,
+	{"UMAC-96", NULL, NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1, 0},
+	{"UMAC-128", NULL, NULL, GNUTLS_MAC_UMAC_128, 16, 16, 8, 0, 1, 0},
+	{"AEAD", NULL, NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1, 0},
+	{"MD2", HASH_OID_MD2, NULL, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0, 0},	/* not used as MAC */
+	{"RIPEMD160", HASH_OID_RMD160, NULL, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1,
 	 64},
-	{"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0}
+	{"MAC-NULL", NULL, NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 
@@ -278,3 +284,33 @@ gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest(const char *oid)
 		return GNUTLS_DIG_UNKNOWN;
 	return ret;
 }
+
+/*-
+ * gnutls_oid_to_mac:
+ * @oid: is an object identifier
+ *
+ * Converts a textual object identifier typically from PKCS#5 values to a #gnutls_mac_algorithm_t value.
+ *
+ * Returns: a #gnutls_mac_algorithm_t id of the specified digest
+ *   algorithm, or %GNUTLS_MAC_UNKNOWN on failure.
+ *
+ * Since: 3.5.4
+ -*/
+gnutls_mac_algorithm_t gnutls_oid_to_mac(const char *oid)
+{
+	gnutls_digest_algorithm_t ret = 0;
+
+	GNUTLS_HASH_LOOP(
+		if (p->mac_oid && strcmp(oid, p->mac_oid) == 0) {
+			if (_gnutls_mac_exists(p->id)) {
+				ret = p->id;
+			}
+			break;
+		}
+	);
+
+	if (ret == 0)
+		return GNUTLS_MAC_UNKNOWN;
+	return ret;
+}
+

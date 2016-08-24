@@ -85,6 +85,14 @@ typedef struct gnutls_pkcs7_int {
 	unsigned expanded;
 } gnutls_pkcs7_int;
 
+struct pbkdf2_params {
+	uint8_t salt[32];
+	int salt_size;
+	unsigned int iter_count;
+	unsigned int key_size;
+	gnutls_mac_algorithm_t mac;
+};
+
 typedef struct gnutls_x509_privkey_int {
 	/* the size of params depends on the public
 	 * key algorithm
@@ -348,7 +356,8 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 
 typedef enum schema_id {
 	PBES2_GENERIC,		/* when the algorithm is unknown, temporal use when reading only */
-	PBES2_3DES,		/* the stuff in PKCS #5 */
+	PBES2_DES,		/* the stuff in PKCS #5 */
+	PBES2_3DES,
 	PBES2_AES_128,
 	PBES2_AES_192,
 	PBES2_AES_256,

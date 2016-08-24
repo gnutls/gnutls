@@ -12,6 +12,9 @@ See the end for copying conditions.
 ** libgnutls: Fix gnutls_pkcs12_simple_parse to always extract the complete chain,
    even when the extra_certs was non-null. Report and fix by Stefan Sørensen.
 
+** libgnutls: Added support for decrypting PKCS#8 files which use HMAC-SHA256
+   as PRF.
+
 ** API and ABI modifications:
 No changes since last version.
 

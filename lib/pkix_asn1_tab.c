@@ -293,6 +293,8 @@ const asn1_static_node pkix_asn1_tab[] = {
   { "encryptionAlgorithm", 1073741826, "AlgorithmIdentifier"},
   { "encryptedData", 2, "pkcs-8-EncryptedData"},
   { "pkcs-8-EncryptedData", 1073741831, NULL },
+  { "pkcs-5-des-CBC-params", 1612709895, NULL },
+  { NULL, 1048586, "8"},
   { "pkcs-5-des-EDE3-CBC-params", 1612709895, NULL },
   { NULL, 1048586, "8"},
   { "pkcs-5-aes128-CBC-params", 1612709895, NULL },

@@ -1022,7 +1022,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 		return _gnutls_asn2err(result);
 	}
 
-	algo = _gnutls_x509_oid_to_mac(oid);
+	algo = _gnutls_x509_oid_to_digest(oid);
 	if (algo == GNUTLS_MAC_UNKNOWN) {
  unknown_mac:
 		gnutls_assert();
