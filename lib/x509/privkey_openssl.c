@@ -291,8 +291,8 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 			}
 			keylen += ofs;
 
-			/* If there appears to be more padding than required, fail */
-			if (key_data_size - keylen > blocksize) {
+			/* If there appears to be more or less padding than required, fail */
+			if (key_data_size - keylen > blocksize || key_data_size < keylen+1) {
 				gnutls_assert();
 				goto fail;
 			}
