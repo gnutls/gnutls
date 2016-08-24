@@ -106,6 +106,7 @@ struct pbkdf2_params {
 	int salt_size;
 	unsigned int iter_count;
 	unsigned int key_size;
+	gnutls_mac_algorithm_t mac;
 };
 
 typedef struct gnutls_x509_privkey_int {

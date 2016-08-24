@@ -44,6 +44,9 @@ int _gnutls_version_is_supported(gnutls_session_t session,
 				 const gnutls_protocol_t version);
 gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor);
 
+gnutls_mac_algorithm_t
+        gnutls_oid_to_mac(const char *oid);
+
 /* Functions for feature checks */
 inline static int
 _gnutls_version_has_selectable_prf(const version_entry_st * ver)
@@ -138,8 +141,6 @@ inline static int _gnutls_mac_get_key_size(const mac_entry_st * e)
 	else
 		return e->key_size;
 }
-
-#define _gnutls_x509_oid_to_mac(oid) (gnutls_mac_algorithm_t)gnutls_oid_to_digest(oid)
 
 /* Functions for digests. */
 #define _gnutls_x509_digest_to_oid _gnutls_x509_mac_to_oid

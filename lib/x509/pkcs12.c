@@ -1042,7 +1042,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 		return _gnutls_asn2err(result);
 	}
 
-	algo = _gnutls_x509_oid_to_mac(oid);
+	algo = gnutls_oid_to_digest(oid);
 	if (algo == GNUTLS_MAC_UNKNOWN) {
  unknown_mac:
 		gnutls_assert();
@@ -1865,7 +1865,7 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 		*oid = (char*)tmp.data;
 	}
 
-	algo = _gnutls_x509_oid_to_mac((char*)tmp.data);
+	algo = gnutls_oid_to_digest((char*)tmp.data);
 	if (algo == GNUTLS_MAC_UNKNOWN || mac_to_entry(algo) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
