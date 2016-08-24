@@ -30,6 +30,10 @@ DIFF="${DIFF:-diff}"
 TEMPLATE_FILE="out.$$.tmpl.tmp"
 SERVER_CERT_FILE="cert.$$.pem.tmp"
 
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
+
 export TZ="UTC"
 
 . "${srcdir}/../scripts/common.sh"
@@ -114,7 +118,7 @@ t=0
 while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     # Run a test request to make sure the server works
     datefudge "${TESTDATE}" \
-	      "${OCSPTOOL}" --ask \
+	      ${VALGRIND} "${OCSPTOOL}" --ask \
 	      --load-cert "${SERVER_CERT_FILE}" \
 	      --load-issuer "${srcdir}/certs/ca.pem"
     rc=$?

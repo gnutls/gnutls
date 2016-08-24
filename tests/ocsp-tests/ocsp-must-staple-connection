@@ -31,6 +31,10 @@ OCSP_REQ_FILE="ms-req.$$.tmp"
 
 export TZ="UTC"
 
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
+
 . "${srcdir}/../scripts/common.sh"
 
 eval "${GETPORT}"
@@ -49,13 +53,6 @@ SERVER_START_TIMEOUT=10
 OPENSSL=`which openssl`
 if ! test -x "${OPENSSL}"; then
     echo "You need openssl to run this test."
-    exit 77
-fi
-
-# Check for netcat
-NETCAT=`which nc`
-if ! test -x "${NETCAT}"; then
-    echo "You need nc to run this test."
     exit 77
 fi
 
@@ -100,6 +97,11 @@ datefudge -s "${CERTDATE}" ${CERTTOOL} \
 
 echo "=== Bringing OCSP server up ==="
 
+INDEXFILE="ocsp_index.txt"
+ATTRFILE="${INDEXFILE}.attr"
+cp "${srcdir}/certs/ocsp_index.txt" ${INDEXFILE}
+cp "${srcdir}/certs/ocsp_index.txt.attr" ${ATTRFILE}
+
 # Start OpenSSL OCSP server
 #
 # WARNING: As of version 1.0.2g, OpenSSL OCSP cannot bind the TCP port
@@ -108,7 +110,7 @@ echo "=== Bringing OCSP server up ==="
 PORT=${OCSP_PORT}
 launch_bare_server $$ \
 	  datefudge "${TESTDATE}" \
-	  "${OPENSSL}" ocsp -index "${srcdir}/certs/ocsp_index.txt" -text \
+	  "${OPENSSL}" ocsp -index "${INDEXFILE}" -text \
 	  -port "${OCSP_PORT}" \
 	  -rsigner "${srcdir}/certs/ocsp-server.pem" \
 	  -rkey "${srcdir}/certs/ocsp-server.key" \
@@ -124,7 +126,7 @@ t=0
 while test "${t}" -lt "${SERVER_START_TIMEOUT}"; do
     # Run a test request to make sure the server works
     datefudge "${TESTDATE}" \
-	      "${OCSPTOOL}" --ask \
+	      ${VALGRIND} "${OCSPTOOL}" --ask \
 	      --load-cert "${SERVER_CERT_FILE}" \
 	      --load-issuer "${srcdir}/certs/ca.pem" \
 	      --outfile "${OCSP_RESPONSE_FILE}"
@@ -284,9 +286,9 @@ rm -f "${OCSP_RESPONSE_FILE}"
 
 # Generate an OCSP response which expires in 2 days and use it after
 # a month.
-${OCSPTOOL} --generate-request --load-issuer "${srcdir}/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
+${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
 datefudge -s ${EXP_OCSP_DATE} \
-	${OPENSSL} ocsp -index certs/ocsp_index.txt -rsigner "${srcdir}/certs/ocsp-server.pem" -rkey "${srcdir}/certs/ocsp-server.key" -CA "${srcdir}/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}" -ndays 2
+	${OPENSSL} ocsp -index "${INDEXFILE}" -rsigner "${srcdir}/certs/ocsp-server.pem" -rkey "${srcdir}/certs/ocsp-server.key" -CA "${srcdir}/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}" -ndays 2
 
 eval "${GETPORT}"
 # Port for gnutls-serv
@@ -327,9 +329,9 @@ echo "=== Test 6: Server with valid certificate - old staple ==="
 
 rm -f "${OCSP_RESPONSE_FILE}"
 
-${OCSPTOOL} --generate-request --load-issuer "${srcdir}/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
+${VALGRIND} ${OCSPTOOL} --generate-request --load-issuer "${srcdir}/certs/ocsp-server.pem" --load-cert "${SERVER_CERT_FILE}" --outfile "${OCSP_REQ_FILE}"
 datefudge -s ${EXP_OCSP_DATE} \
-	${OPENSSL} ocsp -index certs/ocsp_index.txt -rsigner "${srcdir}/certs/ocsp-server.pem" -rkey "${srcdir}/certs/ocsp-server.key" -CA "${srcdir}/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}"
+	${OPENSSL} ocsp -index ${INDEXFILE} -rsigner "${srcdir}/certs/ocsp-server.pem" -rkey "${srcdir}/certs/ocsp-server.key" -CA "${srcdir}/certs/ca.pem" -reqin "${OCSP_REQ_FILE}" -respout "${OCSP_RESPONSE_FILE}"
 
 eval "${GETPORT}"
 # Port for gnutls-serv
@@ -371,5 +373,6 @@ rm -f "${OCSP_RESPONSE_FILE}"
 rm -f "${OCSP_REQ_FILE}"
 rm -f "${SERVER_CERT_FILE}"
 rm -f "${TEMPLATE_FILE}"
+rm -f "${INDEXFILE}" "${ATTRFILE}"
 
 exit 0
