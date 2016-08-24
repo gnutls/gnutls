@@ -471,11 +471,18 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 		}
 
 		hd->session = init_tls_session(hostname);
-		if (hd->rdata.data) {
-			gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
+		if (hd->session == NULL && !(flags & SOCKET_FLAG_RAW)) {
+			fprintf(stderr, "error initializing session\n");
+			exit(1);
 		}
 
-		gnutls_transport_set_int(hd->session, sd);
+		if (hd->session) {
+			if (hd->rdata.data) {
+				gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
+			}
+
+			gnutls_transport_set_int(hd->session, sd);
+		}
 
 		if (!(flags & SOCKET_FLAG_RAW)) {
 			err = do_handshake(hd);
