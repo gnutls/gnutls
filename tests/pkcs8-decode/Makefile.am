@@ -22,7 +22,7 @@
 EXTRA_DIST = suppressions.valgrind encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem \
 	openssl-3des.p8	openssl-3des.p8.txt \
 	openssl-aes128.p8 openssl-aes128.p8.txt \
-	openssl-aes256.p8 openssl-aes256.p8.txt
+	openssl-aes256.p8 openssl-aes256.p8.txt pkcs8-pbes2-sha256.pem
 
 dist_check_SCRIPTS = pkcs8
 
