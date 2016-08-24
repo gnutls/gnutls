@@ -621,7 +621,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             fn (&(*priority_cache)->kx, algo);
           else if (strncasecmp (&broken_list[i][1], "VERS-", 5) == 0)
             {
-              if (strncasecmp (&broken_list[i][1], "VERS-TLS-ALL", 12) == 0)
+              if (strncasecmp (&broken_list[i][1], "VERS-TLS-ALL", 12) == 0 || strncasecmp (&broken_list[i][1], "VERS-ALL", 8) == 0)
                 {
                   bulk_fn (&(*priority_cache)->protocol,
                                  protocol_priority);
@@ -693,10 +693,19 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                   bulk_fn (&(*priority_cache)->mac,
                                 mac_priority_secure);
             }
-          else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 7) == 0)
+          else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 10) == 0)
             {
                   bulk_fn (&(*priority_cache)->cipher,
                                 cipher_priority_normal);
+            }
+          else if (strncasecmp (&broken_list[i][1], "KX-ALL", 6) == 0)
+            {
+                  bulk_fn (&(*priority_cache)->kx,
+                                kx_priority_secure);
+            }
+          else if (strncasecmp (&broken_list[i][1], "CURVE-ALL", 9) == 0)
+            {
+              continue;
             }
           else
             goto error;
