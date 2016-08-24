@@ -194,6 +194,10 @@ static int _gnutls_init_ret = 0;
 /**
  * gnutls_global_init:
  *
+ * Since GnuTLS 3.3.0 this function is no longer necessary to be explicitly
+ * called. To disable the implicit call (in a library constructor) of this
+ * function set the environment variable %GNUTLS_NO_EXPLICIT_INIT to 1.
+ *
  * This function performs any required precalculations, detects
  * the supported CPU capabilities and initializes the underlying
  * cryptographic backend. In order to free any resources 
@@ -206,11 +210,6 @@ static int _gnutls_init_ret = 0;
  * GnuTLS is used by more than one library in an application.  This
  * function can be called many times, but will only do something the
  * first time.
- *
- * Since GnuTLS 3.3.0 this function is automatically called on library
- * constructor. Since the same version this function is also thread safe.
- * The automatic initialization can be avoided if the environment variable
- * %GNUTLS_NO_EXPLICIT_INIT is set to be 1.
  *
  * A subsequent call of this function if the initial has failed will
  * return the same error code.
@@ -455,6 +454,10 @@ static void _gnutls_global_deinit(unsigned destructor)
  *
  * This function deinitializes the global data, that were initialized
  * using gnutls_global_init().
+ *
+ * Since GnuTLS 3.3.0 this function is no longer necessary to be explicitly
+ * called. GnuTLS will automatically deinitialize on library destructor. See
+ * gnutls_global_init() for disabling the implicit initialization/deinitialization.
  *
  **/
 void gnutls_global_deinit(void)
