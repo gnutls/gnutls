@@ -1147,7 +1147,7 @@ pkcs11_mechanism_list(FILE * outfile, const char *url, unsigned int flags,
 						      &mechanism);
 		if (ret >= 0) {
 			str = NULL;
-			if (mechanism <=
+			if (mechanism <
 			    sizeof(mech_list) / sizeof(mech_list[0]))
 				str = mech_list[mechanism];
 			if (str == NULL)
