@@ -258,7 +258,7 @@ end:
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials_t pgp_cred;
+gnutls_certificate_credentials_t pgp_cred = NULL;
 
 static gnutls_session_t
 initialize_tls_session (void)
@@ -560,6 +560,7 @@ server (void)
     {
      if (j==0 || use_only_1024)
        {
+         if (pgp_cred) gnutls_certificate_free_credentials (pgp_cred);
          gnutls_certificate_allocate_credentials (&pgp_cred);
          ret = gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &server_crt,
                                                  &server_key, "auto",
