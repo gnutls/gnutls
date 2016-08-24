@@ -469,6 +469,7 @@ typedef struct gnutls_cipher_suite_entry_st {
 typedef struct mac_entry_st {
 	const char *name;
 	const char *oid;	/* OID of the hash - if it is a hash */
+	const char *mac_oid;    /* OID of the MAC algorithm - if it is a MAC */
 	gnutls_mac_algorithm_t id;
 	unsigned output_size;
 	unsigned key_size;

@@ -1018,6 +1018,8 @@ gnutls_pk_algorithm_t gnutls_ecc_curve_get_pk(gnutls_ecc_curve_t curve) __GNUTLS
 
 gnutls_digest_algorithm_t
 	gnutls_oid_to_digest(const char *oid)  __GNUTLS_CONST__;
+gnutls_mac_algorithm_t
+	gnutls_oid_to_mac(const char *oid)  __GNUTLS_CONST__;
 gnutls_pk_algorithm_t
 	gnutls_oid_to_pk(const char *oid) __GNUTLS_CONST__;
 gnutls_sign_algorithm_t

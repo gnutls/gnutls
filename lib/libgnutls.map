@@ -1103,6 +1103,7 @@ GNUTLS_3_4
 	gnutls_x509_crq_set_extension_by_oid;
 	gnutls_x509_dn_set_str;
 	gnutls_transport_set_fastopen;
+	gnutls_oid_to_mac;
  local:
 	*;
 };

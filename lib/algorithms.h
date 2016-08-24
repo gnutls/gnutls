@@ -142,8 +142,6 @@ inline static int _gnutls_mac_get_key_size(const mac_entry_st * e)
 		return e->key_size;
 }
 
-#define _gnutls_x509_oid_to_mac(oid) (gnutls_mac_algorithm_t)gnutls_oid_to_digest(oid)
-
 /* Functions for digests. */
 #define _gnutls_x509_digest_to_oid _gnutls_x509_mac_to_oid
 #define _gnutls_digest_get_name _gnutls_mac_get_name

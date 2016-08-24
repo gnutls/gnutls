@@ -866,14 +866,12 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 		result = read_pbkdf2_params(pbes2_asn, &tmp, kdf_params);
 		if (result < 0) {
 			gnutls_assert();
-			result = _gnutls_asn2err(result);
 			goto error;
 		}
 
 		result = read_pbe_enc_params(pbes2_asn, &tmp, enc_params);
 		if (result < 0) {
 			gnutls_assert();
-			result = _gnutls_asn2err(result);
 			goto error;
 		}
 
@@ -1543,6 +1541,8 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 
 	memset(params, 0, sizeof(*params));
 
+	params->mac = GNUTLS_MAC_SHA1;
+
 	/* Check the key derivation algorithm
 	 */
 	len = sizeof(oid);
@@ -1626,8 +1626,23 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	}
 	_gnutls_hard_log("keyLength: %d\n", params->key_size);
 
-	/* We don't read the PRF. We only use the default.
-	 */
+	len = sizeof(oid);
+	result =
+	    asn1_read_value(pbkdf2_asn, "prf.algorithm",
+			    oid, &len);
+	if (result != ASN1_SUCCESS) {
+		/* use the default MAC */
+		result = 0;
+		goto error;
+	}
+
+	params->mac = gnutls_oid_to_mac(oid);
+	if (params->mac == GNUTLS_MAC_UNKNOWN) {
+		gnutls_assert();
+		_gnutls_debug_log("Unsupported hash algorithm: %s\n", oid);
+		result = GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
+		goto error;
+	}
 
 	result = 0;
 
@@ -1738,13 +1753,13 @@ read_pbe_enc_params(ASN1_TYPE pbes2_asn,
 			    &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		goto error;
+		return _gnutls_asn2err(result);
 	}
 	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", oid);
 
 	if ((result = pbes2_oid_to_cipher(oid, &params->cipher)) < 0) {
 		gnutls_assert();
-		goto error;
+		return result;
 	}
 
 	result =
@@ -1842,10 +1857,17 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	p = pbes2_schema_get(schema);
 	if (p != NULL && p->pbes2 != 0) { /* PBES2 */
-		pbkdf2_hmac_sha1(pass_len, (uint8_t*)password,
-				 kdf_params->iter_count,
-				 kdf_params->salt_size, kdf_params->salt,
-				 key_size, key);
+		if (kdf_params->mac == GNUTLS_MAC_SHA1)
+			pbkdf2_hmac_sha1(pass_len, (uint8_t*)password,
+					 kdf_params->iter_count,
+					 kdf_params->salt_size, kdf_params->salt,
+					 key_size, key);
+		else if (kdf_params->mac == GNUTLS_MAC_SHA256)
+			pbkdf2_hmac_sha256(pass_len, (uint8_t*)password,
+					 kdf_params->iter_count,
+					 kdf_params->salt_size, kdf_params->salt,
+					 key_size, key);
+		else return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 	} else if (p != NULL) { /* PKCS 12 schema */
 		result =
 		    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
