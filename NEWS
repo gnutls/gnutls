@@ -46,6 +46,8 @@ Version 2.12.24 (unreleased)
 ** libgnutls: Do not call the post client hello callback twice when resuming
    using session tickets.
 
+** libgnutls: Corrected the setting of PSK hint for DHE-PSK ciphersuites.
+
 ** libgnutls: Do not link with libpthread unless necessary.
 
 ** libgnutls: Introduced the priority strings KX-ALL, VERS-ALL, CURVE-ALL (no-op)
