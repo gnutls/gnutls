@@ -1004,6 +1004,7 @@ int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
  * @GNUTLS_PKCS_PBES2_AES_192: PBES2 AES-192.
  * @GNUTLS_PKCS_PBES2_AES_256: PBES2 AES-256.
  * @GNUTLS_PKCS_PBES2_DES: PBES2 single DES.
+ * @GNUTLS_PKCS_PBES2_DES_MD5: PBES1 with single DES; for compatibility with openssl only.
  *
  * Enumeration of different PKCS encryption flags.
  */
@@ -1017,8 +1018,11 @@ typedef enum gnutls_pkcs_encrypt_flags_t {
 	GNUTLS_PKCS_PBES2_AES_192 = 1<<6,
 	GNUTLS_PKCS_PBES2_AES_256 = 1<<7,
 	GNUTLS_PKCS_NULL_PASSWORD = 1<<8,
-	GNUTLS_PKCS_PBES2_DES = 1<<9
+	GNUTLS_PKCS_PBES2_DES = 1<<9,
+	GNUTLS_PKCS_PBES1_DES_MD5 = 1<<10
 } gnutls_pkcs_encrypt_flags_t;
+
+#define GNUTLS_PKCS_CIPHER_MASK(x) ((x)&(~(GNUTLS_PKCS_NULL_PASSWORD)))
 
 #define GNUTLS_PKCS_USE_PKCS12_3DES GNUTLS_PKCS_PKCS12_3DES
 #define GNUTLS_PKCS_USE_PKCS12_ARCFOUR GNUTLS_PKCS_PKCS12_ARCFOUR

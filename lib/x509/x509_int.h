@@ -390,7 +390,7 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 			       const char *password, gnutls_datum_t * dec);
 
 typedef enum schema_id {
-	PBES2_GENERIC=1,		/* when the algorithm is unknown, temporal use when reading only */
+	PBES2_GENERIC=1,	/* when the algorithm is unknown, temporal use when reading only */
 	PBES2_DES,		/* the stuff in PKCS #5 */
 	PBES2_3DES,
 	PBES2_AES_128,
@@ -398,7 +398,8 @@ typedef enum schema_id {
 	PBES2_AES_256,
 	PKCS12_3DES_SHA1,	/* the stuff in PKCS #12 */
 	PKCS12_ARCFOUR_SHA1,
-	PKCS12_RC2_40_SHA1
+	PKCS12_RC2_40_SHA1,
+	PBES1_DES_MD5		/* openssl before 1.1.0 uses that by default */
 } schema_id;
 
 
@@ -408,9 +409,29 @@ struct pbes2_schema_st {
 	unsigned int flag;
 	unsigned int cipher;
 	unsigned pbes2;
-	const char *oid;
+	const char *cipher_oid;
+	const char *write_oid;
 	const char *desc;
+	unsigned decrypt_only;
 };
+
+struct pbe_enc_params {
+	gnutls_cipher_algorithm_t cipher;
+	uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
+	int iv_size;
+};
+
+int _gnutls_read_pbkdf1_params(const uint8_t * data, int data_size,
+		       struct pbkdf2_params *kdf_params,
+		       struct pbe_enc_params *enc_params);
+
+int
+_gnutls_decrypt_pbes1_des_md5_data(const char *password,
+			   unsigned password_len,
+			   const struct pbkdf2_params *kdf_params,
+			   const struct pbe_enc_params *enc_params,
+			   gnutls_datum_t *encrypted_data, /* overwritten */
+			   gnutls_datum_t *decrypted_data);
 
 int _gnutls_pkcs_flags_to_schema(unsigned int flags);
 int _gnutls_pkcs7_encrypt_data(schema_id schema,

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2003-2014 Free Software Foundation, Inc.
- * Copyright (C) 2014 Red Hat
- * Copyright (C) 2014 Nikos Mavrogiannopoulos
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2014-2016 Red Hat
+ * Copyright (C) 2014-2016 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,6 +45,7 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 		   struct pbkdf2_params *kdf_params,
 		   char **oid);
 
+#define PBES1_DES_MD5_OID "1.2.840.113549.1.5.3"
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
 #define PBKDF2_OID "1.2.840.113549.1.5.12"
@@ -59,11 +60,6 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 #define PKCS12_PBE_ARCFOUR_SHA1_OID "1.2.840.113549.1.12.1.1"
 #define PKCS12_PBE_RC2_40_SHA1_OID "1.2.840.113549.1.12.1.6"
 
-struct pbe_enc_params {
-	gnutls_cipher_algorithm_t cipher;
-	uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
-	int iv_size;
-};
 
 static int generate_key(schema_id schema, const char *password,
 			struct pbkdf2_params *kdf_params,
@@ -300,23 +296,106 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 
 static const struct pbes2_schema_st avail_pbes2_schemas[] =
 {
-	{PBES2_3DES, "PBES2-3DES-CBC", GNUTLS_PKCS_PBES2_3DES, GNUTLS_CIPHER_3DES_CBC,
-		1, DES_EDE3_CBC_OID, "PKIX1.pkcs-5-des-EDE3-CBC-params"},
-	{PBES2_DES, "PBES2-DES-CBC", GNUTLS_PKCS_PBES2_DES, GNUTLS_CIPHER_DES_CBC,
-		1, DES_CBC_OID, "PKIX1.pkcs-5-des-CBC-params"},
-	{PBES2_AES_128, "PBES2-AES128-CBC", GNUTLS_PKCS_PBES2_AES_128, GNUTLS_CIPHER_AES_128_CBC,
-		1, AES_128_CBC_OID, "PKIX1.pkcs-5-aes128-CBC-params"},
-	{PBES2_AES_192, "PBES2-AES192-CBC", GNUTLS_PKCS_PBES2_AES_192, GNUTLS_CIPHER_AES_192_CBC,
-		1, AES_192_CBC_OID, "PKIX1.pkcs-5-aes192-CBC-params"},
-	{PBES2_AES_256, "PBES2-AES256-CBC", GNUTLS_PKCS_PBES2_AES_256, GNUTLS_CIPHER_AES_256_CBC,
-		1, AES_256_CBC_OID, "PKIX1.pkcs-5-aes256-CBC-params"},
-	{PKCS12_ARCFOUR_SHA1, "PKCS12-ARCFOUR-SHA1", GNUTLS_PKCS_PKCS12_ARCFOUR, GNUTLS_CIPHER_ARCFOUR,
-		0, PKCS12_PBE_ARCFOUR_SHA1_OID, NULL},
-	{PKCS12_RC2_40_SHA1, "PKCS12-RC2-40-SHA1", GNUTLS_PKCS_PKCS12_RC2_40, GNUTLS_CIPHER_RC2_40_CBC,
-		0, PKCS12_PBE_RC2_40_SHA1_OID, NULL},
-	{PKCS12_3DES_SHA1, "PKCS12-3DES-SHA1", GNUTLS_PKCS_PKCS12_3DES, GNUTLS_CIPHER_3DES_CBC,
-		0, PKCS12_PBE_3DES_SHA1_OID, NULL},
-	{0, 0, 0}
+	{
+		.schema = PBES1_DES_MD5,
+		.name = "PBES1-DES-CBC-MD5",
+		.flag = GNUTLS_PKCS_PBES1_DES_MD5,
+		.cipher = GNUTLS_CIPHER_DES_CBC,
+		.pbes2 = 0,
+		.cipher_oid = PBES1_DES_MD5_OID,
+		.write_oid = PBES1_DES_MD5_OID,
+		.desc = NULL,
+		.decrypt_only = 1
+	},
+	{
+		.schema = PBES2_3DES,
+		.name = "PBES2-3DES-CBC",
+		.flag = GNUTLS_PKCS_PBES2_3DES,
+		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.pbes2 = 1,
+		.cipher_oid = DES_EDE3_CBC_OID,
+		.write_oid = PBES2_OID,
+		.desc = "PKIX1.pkcs-5-des-EDE3-CBC-params",
+		.decrypt_only = 0
+	},
+	{
+		.schema = PBES2_DES,
+		.name = "PBES2-DES-CBC",
+		.flag = GNUTLS_PKCS_PBES2_DES,
+		.cipher = GNUTLS_CIPHER_DES_CBC,
+		.pbes2 = 1,
+		.cipher_oid = DES_CBC_OID,
+		.write_oid = PBES2_OID,
+		.desc = "PKIX1.pkcs-5-des-CBC-params",
+		.decrypt_only = 0
+	},
+	{
+		.schema = PBES2_AES_128,
+		.name = "PBES2-AES128-CBC",
+		.flag = GNUTLS_PKCS_PBES2_AES_128,
+		.cipher = GNUTLS_CIPHER_AES_128_CBC,
+		.pbes2 = 1,
+		.cipher_oid = AES_128_CBC_OID,
+		.write_oid = PBES2_OID,
+		.desc = "PKIX1.pkcs-5-aes128-CBC-params",
+		.decrypt_only = 0
+	},
+	{
+		.schema = PBES2_AES_192,
+		.name = "PBES2-AES192-CBC",
+		.flag = GNUTLS_PKCS_PBES2_AES_192,
+		.cipher = GNUTLS_CIPHER_AES_192_CBC,
+		.pbes2 = 1,
+		.cipher_oid = AES_192_CBC_OID,
+		.write_oid = PBES2_OID,
+		.desc = "PKIX1.pkcs-5-aes192-CBC-params",
+		.decrypt_only = 0
+	},
+	{
+		.schema = PBES2_AES_256,
+		.name = "PBES2-AES256-CBC",
+		.flag = GNUTLS_PKCS_PBES2_AES_256,
+		.cipher = GNUTLS_CIPHER_AES_256_CBC,
+		.pbes2 = 1,
+		.cipher_oid = AES_256_CBC_OID,
+		.write_oid = PBES2_OID,
+		.desc = "PKIX1.pkcs-5-aes256-CBC-params",
+		.decrypt_only = 0
+	},
+	{
+		.schema = PKCS12_ARCFOUR_SHA1,
+		.name = "PKCS12-ARCFOUR-SHA1",
+		.flag = GNUTLS_PKCS_PKCS12_ARCFOUR,
+		.cipher = GNUTLS_CIPHER_ARCFOUR,
+		.pbes2 = 0,
+		.cipher_oid = PKCS12_PBE_ARCFOUR_SHA1_OID,
+		.write_oid = PKCS12_PBE_ARCFOUR_SHA1_OID,
+		.desc = NULL,
+		.decrypt_only = 0
+	},
+	{
+		.schema = PKCS12_RC2_40_SHA1,
+		.name = "PKCS12-RC2-40-SHA1",
+		.flag = GNUTLS_PKCS_PKCS12_RC2_40,
+		.cipher = GNUTLS_CIPHER_RC2_40_CBC,
+		.pbes2 = 0,
+		.cipher_oid = PKCS12_PBE_RC2_40_SHA1_OID,
+		.write_oid = PKCS12_PBE_RC2_40_SHA1_OID,
+		.desc = NULL,
+		.decrypt_only = 0
+	},
+	{
+		.schema = PKCS12_3DES_SHA1,
+		.name = "PKCS12-3DES-SHA1",
+		.flag = GNUTLS_PKCS_PKCS12_3DES,
+		.cipher = GNUTLS_CIPHER_3DES_CBC,
+		.pbes2 = 0,
+		.cipher_oid = PKCS12_PBE_3DES_SHA1_OID,
+		.write_oid = PKCS12_PBE_3DES_SHA1_OID,
+		.desc = NULL,
+		.decrypt_only = 0
+	},
+	{0, 0, 0, 0, 0}
 };
 
 #define PBES2_SCHEMA_LOOP(b) { \
@@ -325,7 +404,7 @@ static const struct pbes2_schema_st avail_pbes2_schemas[] =
 	}
 
 #define PBES2_SCHEMA_FIND_FROM_FLAGS(fl, what) \
-	PBES2_SCHEMA_LOOP( if (_p->flag == fl) { what; } )
+	PBES2_SCHEMA_LOOP( if (_p->flag == GNUTLS_PKCS_CIPHER_MASK(fl)) { what; } )
 
 int _gnutls_pkcs_flags_to_schema(unsigned int flags)
 {
@@ -355,6 +434,7 @@ const char *gnutls_pkcs_schema_get_name(unsigned int schema)
 	return NULL;
 }
 
+
 /**
  * gnutls_pkcs_schema_get_oid:
  * @schema: Holds the PKCS #12 or PBES2 schema (%gnutls_pkcs_encrypt_flags_t)
@@ -368,7 +448,7 @@ const char *gnutls_pkcs_schema_get_name(unsigned int schema)
  */
 const char *gnutls_pkcs_schema_get_oid(unsigned int schema)
 {
-	PBES2_SCHEMA_FIND_FROM_FLAGS(schema, return _p->oid;);
+	PBES2_SCHEMA_FIND_FROM_FLAGS(schema, return _p->cipher_oid;);
 	return NULL;
 }
 
@@ -383,32 +463,12 @@ static const struct pbes2_schema_st *cipher_to_pbes2_schema(unsigned cipher)
 	return NULL;
 }
 
-/* returns the OID corresponding to given schema
- */
-static int pkcs12_schema_to_oid(schema_id schema, const char **str_oid)
-{
-	PBES2_SCHEMA_LOOP(
-		if (_p->schema == schema) {
-			if (_p->pbes2 != 0) {
-				*str_oid = PBES2_OID;
-				return 0;
-			} else {
-				*str_oid =  _p->oid;
-				return 0;
-			}
-		}
-	);
-
-	gnutls_assert();
-	return GNUTLS_E_INTERNAL_ERROR;
-}
-
-static int check_pkcs12_schema(const char *oid)
+static int check_pbes2_schema(const char *oid)
 {
 	if (strcmp(oid, PBES2_OID) == 0)
-		return PBES2_GENERIC;	/* ok */
+		return PBES2_GENERIC; /* PBES2 ciphers are under an umbrella OID */
 
-	PBES2_SCHEMA_LOOP(if (_p->pbes2 == 0 && strcmp(oid, _p->oid) == 0) {return _p->schema;});
+	PBES2_SCHEMA_LOOP(if (_p->pbes2 == 0 && strcmp(oid, _p->write_oid) == 0) {return _p->schema;});
 	_gnutls_debug_log
 	    ("PKCS #12 encryption schema OID '%s' is unsupported.\n", oid);
 
@@ -426,11 +486,11 @@ static const struct pbes2_schema_st *pbes2_schema_get(schema_id schema)
 /* Converts an OID to a gnutls cipher type.
  */
 static int
-pbes2_oid_to_cipher(const char *oid, gnutls_cipher_algorithm_t * algo)
+pbes2_cipher_oid_to_algo(const char *oid, gnutls_cipher_algorithm_t *algo)
 {
 
 	*algo = 0;
-	PBES2_SCHEMA_LOOP(if (_p->pbes2 != 0 && strcmp(_p->oid, oid) == 0) {
+	PBES2_SCHEMA_LOOP(if (_p->pbes2 != 0 && strcmp(_p->cipher_oid, oid) == 0) {
 			*algo  = _p->cipher;
 			return 0;
 		}
@@ -440,7 +500,6 @@ pbes2_oid_to_cipher(const char *oid, gnutls_cipher_algorithm_t * algo)
 			  oid);
 	return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 }
-
 
 /* Converts a PKCS #8 private key info to
  * a PKCS #8 EncryptedPrivateKeyInfo.
@@ -455,29 +514,26 @@ encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
 	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
 	struct pbkdf2_params kdf_params;
 	struct pbe_enc_params enc_params;
-	const char *str_oid;
+	const struct pbes2_schema_st *s;
 
+	s = pbes2_schema_get(schema);
+	if (s == NULL || s->decrypt_only) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
 				 "PKIX1.pkcs-8-EncryptedPrivateKeyInfo",
 				 &pkcs8_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
+		return _gnutls_asn2err(result);
 	}
 
 	/* Write the encryption schema OID
 	 */
-	result = pkcs12_schema_to_oid(schema, &str_oid);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
 	result =
 	    asn1_write_value(pkcs8_asn, "encryptionAlgorithm.algorithm",
-			     str_oid, 1);
+			     s->write_oid, 1);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -886,6 +942,8 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 
 		*schema = p->schema;
 		return 0;
+	} else if (*schema == PBES1_DES_MD5) {
+		return _gnutls_read_pbkdf1_params(data, data_size, kdf_params, enc_params);
 	} else { /* PKCS #12 schema */
 		memset(enc_params, 0, sizeof(*enc_params));
 
@@ -996,7 +1054,7 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 		goto error;
 	}
 
-	if ((result = check_pkcs12_schema(enc_oid)) < 0) {
+	if ((result = check_pbes2_schema(enc_oid)) < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -1101,7 +1159,7 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 		*oid = gnutls_strdup(enc_oid);
 	}
 
-	if ((result = check_pkcs12_schema(enc_oid)) < 0) {
+	if ((result = check_pbes2_schema(enc_oid)) < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -1610,7 +1668,7 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	result =
 	    _gnutls_x509_read_uint(pbkdf2_asn, "iterationCount",
 				   &params->iter_count);
-	if (result != ASN1_SUCCESS) {
+	if (result < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -1678,7 +1736,7 @@ read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn, struct pbkdf2_params *params)
 	result =
 	    _gnutls_x509_read_uint(pbes2_asn, "iterations",
 				   &params->iter_count);
-	if (result != ASN1_SUCCESS) {
+	if (result < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -1757,7 +1815,7 @@ read_pbe_enc_params(ASN1_TYPE pbes2_asn,
 	}
 	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", oid);
 
-	if ((result = pbes2_oid_to_cipher(oid, &params->cipher)) < 0) {
+	if ((result = pbes2_cipher_oid_to_algo(oid, &params->cipher)) < 0) {
 		gnutls_assert();
 		return result;
 	}
@@ -1819,7 +1877,7 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	     const char *root, const char *password,
 	     const struct pbkdf2_params *kdf_params,
 	     const struct pbe_enc_params *enc_params,
-	     gnutls_datum_t * decrypted_data)
+	     gnutls_datum_t *decrypted_data)
 {
 	int result;
 	gnutls_datum_t enc = {NULL, 0};
@@ -1840,6 +1898,12 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 		return _gnutls_asn2err(result);
 	}
 
+	if (schema == PBES1_DES_MD5) {
+		return _gnutls_decrypt_pbes1_des_md5_data(password, pass_len,
+					              kdf_params, enc_params,
+					              &enc, decrypted_data);
+	}
+
 	if (kdf_params->key_size == 0) {
 		key_size = gnutls_cipher_get_key_size(enc_params->cipher);
 	} else
@@ -1854,7 +1918,6 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	/* generate the key
 	 */
-
 	p = pbes2_schema_get(schema);
 	if (p != NULL && p->pbes2 != 0) { /* PBES2 */
 		if (kdf_params->mac == GNUTLS_MAC_SHA1)
@@ -2053,13 +2116,13 @@ write_pbe_enc_params(ASN1_TYPE pbes2_asn,
 	}
 
 	result =
-	    asn1_write_value(pbes2_asn, "encryptionScheme.algorithm", p->oid,
+	    asn1_write_value(pbes2_asn, "encryptionScheme.algorithm", p->cipher_oid,
 			     1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
 	}
-	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", p->oid);
+	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", p->cipher_oid);
 
 	/* Now check the encryption parameters.
 	 */
@@ -2414,7 +2477,7 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 		goto error;
 	}
 
-	if ((result = check_pkcs12_schema(enc_oid)) < 0) {
+	if ((result = check_pbes2_schema(enc_oid)) < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -2437,9 +2500,8 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 	    read_pkcs_schema_params(&schema, password,
 				    &data->data[params_start],
 				    params_len, &kdf_params, &enc_params);
-	if (result < ASN1_SUCCESS) {
+	if (result < 0) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
@@ -2513,7 +2575,7 @@ _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pbes2_sche
 		*oid = gnutls_strdup(enc_oid);
 	}
 
-	if ((result = check_pkcs12_schema(enc_oid)) < 0) {
+	if ((result = check_pbes2_schema(enc_oid)) < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -2574,7 +2636,12 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 	ASN1_TYPE pkcs7_asn = ASN1_TYPE_EMPTY;
 	struct pbkdf2_params kdf_params;
 	struct pbe_enc_params enc_params;
-	const char *str_oid;
+	const struct pbes2_schema_st *s;
+
+	s = pbes2_schema_get(schema);
+	if (s == NULL || s->decrypt_only) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -2585,18 +2652,10 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 		goto error;
 	}
 
-	/* Write the encryption schema OID
-	 */
-	result = pkcs12_schema_to_oid(schema, &str_oid);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
 	result =
 	    asn1_write_value(pkcs7_asn,
 			     "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
-			     str_oid, 1);
+			     s->write_oid, 1);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
