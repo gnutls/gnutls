@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Added support for decrypting PKCS#8 files which use HMAC-SHA256
    as PRF.
 
+** libgnutls: Added support of PKCS#8 file decryption using DES-CBC-MD5. This
+   is added to allow decryption of PKCS #8 private keys from openssl prior to 1.1.0.
+
 ** gnutls-cli: Fixed starttls regression from 3.5.3.
 
 ** API and ABI modifications:
