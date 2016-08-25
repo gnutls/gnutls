@@ -1187,6 +1187,7 @@ pkcs11_get_random(FILE * outfile, const char *url, unsigned bytes,
 	}
 
 	fwrite(output, 1, bytes, outfile);
+	free(output);
 
 	return;
 }
