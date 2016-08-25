@@ -369,11 +369,6 @@ typedef struct gnutls_pkcs12_bag_int {
 #define BAG_CRL "1.2.840.113549.1.12.10.1.4"
 #define BAG_SECRET "1.2.840.113549.1.12.10.1.5"
 
-/* PKCS #7
- */
-#define DATA_OID "1.2.840.113549.1.7.1"
-#define ENC_DATA_OID "1.2.840.113549.1.7.6"
-
 /* Bag attributes
  */
 #define FRIENDLY_NAME_OID "1.2.840.113549.1.9.20"
@@ -386,61 +381,6 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 			     const char *pw, unsigned int req_keylen,
 			     uint8_t * keybuf);
 
-int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
-			       const char *password, gnutls_datum_t * dec);
-
-typedef enum schema_id {
-	PBES2_GENERIC=1,	/* when the algorithm is unknown, temporal use when reading only */
-	PBES2_DES,		/* the stuff in PKCS #5 */
-	PBES2_3DES,
-	PBES2_AES_128,
-	PBES2_AES_192,
-	PBES2_AES_256,
-	PKCS12_3DES_SHA1,	/* the stuff in PKCS #12 */
-	PKCS12_ARCFOUR_SHA1,
-	PKCS12_RC2_40_SHA1,
-	PBES1_DES_MD5		/* openssl before 1.1.0 uses that by default */
-} schema_id;
-
-
-struct pbes2_schema_st {
-	unsigned int schema;
-	const char *name;
-	unsigned int flag;
-	unsigned int cipher;
-	unsigned pbes2;
-	const char *cipher_oid;
-	const char *write_oid;
-	const char *desc;
-	unsigned decrypt_only;
-};
-
-struct pbe_enc_params {
-	gnutls_cipher_algorithm_t cipher;
-	uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
-	int iv_size;
-};
-
-int _gnutls_read_pbkdf1_params(const uint8_t * data, int data_size,
-		       struct pbkdf2_params *kdf_params,
-		       struct pbe_enc_params *enc_params);
-
-int
-_gnutls_decrypt_pbes1_des_md5_data(const char *password,
-			   unsigned password_len,
-			   const struct pbkdf2_params *kdf_params,
-			   const struct pbe_enc_params *enc_params,
-			   gnutls_datum_t *encrypted_data, /* overwritten */
-			   gnutls_datum_t *decrypted_data);
-
-int _gnutls_pkcs_flags_to_schema(unsigned int flags);
-int _gnutls_pkcs7_encrypt_data(schema_id schema,
-			       const gnutls_datum_t * data,
-			       const char *password, gnutls_datum_t * enc);
-
-int
-_gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pbes2_schema_st **p,
-	struct pbkdf2_params *kdf_params, char **oid);
 
 int _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 				 gnutls_pkcs12_bag_t bag);

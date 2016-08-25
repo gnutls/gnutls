@@ -34,6 +34,7 @@
 #include <common.h>
 #include <x509_b64.h>
 #include "x509_int.h"
+#include "pkcs7_int.h"
 #include <random.h>
 
 

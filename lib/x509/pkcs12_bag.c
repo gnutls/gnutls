@@ -31,6 +31,7 @@
 #include "errors.h"
 #include <common.h>
 #include "x509_int.h"
+#include "pkcs7_int.h"
 
 /**
  * gnutls_pkcs12_bag_init:
@@ -810,7 +811,7 @@ gnutls_pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, unsigned int *schema, unsign
 {
 	int ret;
 	struct pbkdf2_params kdf;
-	const struct pbes2_schema_st *p;
+	const struct pkcs_cipher_schema_st *p;
 
 	if (bag == NULL) {
 		gnutls_assert();
