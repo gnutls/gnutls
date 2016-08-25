@@ -281,9 +281,15 @@ static gnutls_x509_crt_t load_cert(void)
 static void generate_request(gnutls_datum_t *nonce)
 {
 	gnutls_datum_t dat;
+	gnutls_x509_crt_t cert, issuer;
 
-	_generate_request(load_cert(), load_issuer(), &dat, nonce);
+	cert = load_cert();
+	issuer = load_issuer();
 
+	_generate_request(cert, issuer, &dat, nonce);
+
+	gnutls_x509_crt_deinit(cert);
+	gnutls_x509_crt_deinit(issuer);
 	fwrite(dat.data, 1, dat.size, outfile);
 
 	gnutls_free(dat.data);
@@ -528,6 +534,10 @@ static void ask_server(const char *url)
 		fwrite(resp_data.data, 1, resp_data.size, outfile);
 	}
 
+	free(resp_data.data);
+	gnutls_x509_crt_deinit(issuer);
+	gnutls_x509_crt_deinit(cert);
+
 	if (v && !HAVE_OPT(IGNORE_ERRORS))
 		exit(1);
 }
@@ -582,6 +592,10 @@ int main(int argc, char **argv)
 	else {
 		USAGE(1);
 	}
+
+	if (infile != stdin)
+		fclose(infile);
+	gnutls_global_deinit();
 
 	return 0;
 }

@@ -209,6 +209,7 @@ int send_ocsp_request(const char *server,
 
 	socket_send(&hd, headers, headers_size);
 	socket_send(&hd, req.data, req.size);
+	gnutls_free(req.data);
 
 	do {
 		ret = socket_recv(&hd, buffer, sizeof(buffer));
@@ -238,6 +239,8 @@ int send_ocsp_request(const char *server,
 	memcpy(resp_data->data, p, resp_data->size);
 
 	free(ud.data);
+	if (url != server)
+		free(url);
 
 	return 0;
 }
