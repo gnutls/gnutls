@@ -44,7 +44,7 @@ void
 socket_open(socket_st * hd, const char *hostname, const char *service,
 	    const char *app_proto, int flags, const char *msg, gnutls_datum_t *rdata);
 
-void socket_bye(socket_st * socket);
+void socket_bye(socket_st * socket, unsigned polite);
 
 int service_to_port(const char *service, const char *proto);
 const char *port_to_service(const char *sport, const char *proto);

@@ -908,7 +908,7 @@ static int try_resume(socket_st * hd)
 	}
 
 	printf("- Disconnecting\n");
-	socket_bye(hd);
+	socket_bye(hd, 1);
 
 	canonicalize_host(hostname, service, sizeof(service));
 
@@ -1408,9 +1408,9 @@ int main(int argc, char **argv)
 	}
 
 	if (user_term != 0)
-		socket_bye(&hd);
+		socket_bye(&hd, 1);
 	else
-		gnutls_deinit(hd.session);
+		socket_bye(&hd, 0);
 
 #ifdef ENABLE_SRP
 	if (srp_cred)

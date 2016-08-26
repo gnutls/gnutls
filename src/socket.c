@@ -319,17 +319,19 @@ const char *starttls_proto_to_service(const char *app_proto)
 	return "443";
 }
 
-void socket_bye(socket_st * socket)
+void socket_bye(socket_st * socket, unsigned polite)
 {
 	int ret;
 	if (socket->secure) {
-		do
-			ret = gnutls_bye(socket->session, GNUTLS_SHUT_WR);
-		while (ret == GNUTLS_E_INTERRUPTED
-		       || ret == GNUTLS_E_AGAIN);
-		if (socket->verbose && ret < 0)
-			fprintf(stderr, "*** gnutls_bye() error: %s\n",
-				gnutls_strerror(ret));
+		if (polite) {
+			do
+				ret = gnutls_bye(socket->session, GNUTLS_SHUT_WR);
+			while (ret == GNUTLS_E_INTERRUPTED
+			       || ret == GNUTLS_E_AGAIN);
+			if (socket->verbose && ret < 0)
+				fprintf(stderr, "*** gnutls_bye() error: %s\n",
+					gnutls_strerror(ret));
+		}
 		gnutls_deinit(socket->session);
 		socket->session = NULL;
 	}

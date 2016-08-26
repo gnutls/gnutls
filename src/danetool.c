@@ -715,7 +715,7 @@ static const char *obtain_cert(const char *hostname, const char *proto, const ch
 	if (priv->found == 0)
 		ret = -1;
 
-	socket_bye(&hd);
+	socket_bye(&hd, 1);
 	gnutls_certificate_free_credentials(xcred);
 
 	if (ret == -1)

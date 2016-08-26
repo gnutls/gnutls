@@ -320,7 +320,7 @@ int main(int argc, char **argv)
 		while (ret == TEST_IGNORE
 		       && tls_tests[i].test_name != NULL);
 
-		socket_bye(&hd);
+		socket_bye(&hd, 1);
 
 		i++;
 	}
