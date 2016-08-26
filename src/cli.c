@@ -1928,7 +1928,6 @@ static int cert_verify_ocsp(gnutls_session_t session)
 	}
 
 	for (it = 0; it < cert_list_size; it++) {
-		gnutls_x509_crt_init(&cert);
 		if (deinit_cert)
 			gnutls_x509_crt_deinit(cert);
 		gnutls_x509_crt_init(&cert);
@@ -1975,6 +1974,7 @@ static int cert_verify_ocsp(gnutls_session_t session)
 
 		/* verify and check the response for revoked cert */
 		ret = check_ocsp_response(cert, issuer, &resp, &nonce, verbose);
+		free(resp.data);
 		if (ret == 1)
 			ok++;
 		else if (ret == 0) {

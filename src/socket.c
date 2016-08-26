@@ -332,6 +332,9 @@ void socket_bye(socket_st * socket, unsigned polite)
 				fprintf(stderr, "*** gnutls_bye() error: %s\n",
 					gnutls_strerror(ret));
 		}
+	}
+
+	if (socket->session) {
 		gnutls_deinit(socket->session);
 		socket->session = NULL;
 	}

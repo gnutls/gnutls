@@ -222,7 +222,7 @@ int send_ocsp_request(const char *server,
 		return -1;
 	}
 
-	socket_bye(&hd, 1);
+	socket_bye(&hd, 0);
 
 	p = memmem(ud.data, ud.size, "\r\n\r\n", 4);
 	if (p == NULL) {
