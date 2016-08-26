@@ -27,23 +27,7 @@
 #include <c-ctype.h>
 #include <algorithms.h>
 
-/* Returns 0 if the password is ok, or a negative error
- * code instead.
- */
-static int _pkcs12_check_pass(const char *pass, size_t plen)
-{
-	unsigned int i;
-
-	for (i = 0; i < plen; i++) {
-		if (c_isascii(pass[i]))
-			continue;
-		return GNUTLS_E_INVALID_PASSWORD;
-	}
-
-	return 0;
-}
-
-#define MAX_PASS_LEN 128
+#define MAX_PASS_LEN 256
 
 /* ID should be:
  * 3 for MAC
@@ -66,10 +50,11 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	bigint_t num_b1 = NULL, num_ij = NULL;
 	bigint_t mpi512 = NULL;
 	unsigned int pwlen;
-	uint8_t hash[MAX_HASH_SIZE], buf_b[64], buf_i[MAX_PASS_LEN * 2 + 64], *p;
+	uint8_t hash[MAX_HASH_SIZE], buf_b[64], buf_i[MAX_PASS_LEN + 64], *p;
 	uint8_t d[64];
 	size_t cur_keylen;
 	size_t n, m, p_size, i_size;
+	gnutls_datum_t ucs2 = {NULL, 0};
 	unsigned mac_len;
 	const uint8_t buf_512[] =	/* 2^64 */
 	{ 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -83,46 +68,65 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 
 	cur_keylen = 0;
 
-	if (pw == NULL)
-		pwlen = 0;
-	else
-		pwlen = strlen(pw);
-
-	if (pwlen > MAX_PASS_LEN)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 	if (me->block_size != 64)
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
-	if ((rc = _pkcs12_check_pass(pw, pwlen)) < 0) {
-		gnutls_assert();
-		return rc;
+	if (pw) {
+		pwlen = strlen(pw);
+
+		if (pwlen == 0) {
+			ucs2.data = gnutls_calloc(1, 2);
+			if (ucs2.data == NULL)
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			ucs2.size = 2;
+		} else {
+			rc = _gnutls_utf8_to_ucs2(pw, pwlen, &ucs2);
+			if (rc < 0)
+				return gnutls_assert_val(rc);
+
+			/* include terminating zero */
+			ucs2.size+=2;
+		}
+		pwlen = ucs2.size;
+		pw = (char*)ucs2.data;
+	} else {
+		pwlen = 0;
+	}
+
+	if (pwlen > MAX_PASS_LEN) {
+		rc = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
 	}
 
 	rc = _gnutls_mpi_init_scan(&mpi512, buf_512, sizeof(buf_512));
 	if (rc < 0) {
 		gnutls_assert();
-		return rc;
+		goto cleanup;
 	}
 
 	/* Store salt and password in BUF_I */
 	p_size = ((pwlen / 64) * 64) + 64;
 
-	if (p_size > sizeof(buf_i) - 64)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (p_size > sizeof(buf_i) - 64) {
+		rc = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
 
 	p = buf_i;
 	for (i = 0; i < 64; i++)
 		*p++ = salt[i % salt_size];
+
 	if (pw) {
 		for (i = j = 0; i < p_size; i += 2) {
-			*p++ = 0;
 			*p++ = pw[j];
-			if (++j > pwlen)	/* Note, that we include the trailing (0) */
+			*p++ = pw[j+1];
+			j+=2;
+			if (j >= pwlen)
 				j = 0;
 		}
-	} else
+	} else {
 		memset(p, 0, p_size);
+	}
 
 	i_size = 64 + p_size;
 	mac_len = _gnutls_mac_get_algo_len(me);
@@ -167,7 +171,7 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 			gnutls_assert();
 			goto cleanup;
 		}
-		
+
 		for (i = 0; i < 128; i += 64) {
 			n = 64;
 			rc = _gnutls_mpi_init_scan(&num_ij, buf_i + i, n);
@@ -183,11 +187,8 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 			}
 
 			n = 64;
-#ifndef PKCS12_BROKEN_KEYGEN
 			m = (_gnutls_mpi_get_nbits(num_ij) + 7) / 8;
-#else
-			m = n;
-#endif
+
 			memset(buf_i + i, 0, n - m);
 			rc = _gnutls_mpi_print(num_ij, buf_i + i + n - m,
 					       &n);
@@ -202,6 +203,7 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	_gnutls_mpi_release(&num_ij);
 	_gnutls_mpi_release(&num_b1);
 	_gnutls_mpi_release(&mpi512);
+	gnutls_free(ucs2.data);
 
 	return rc;
 }
