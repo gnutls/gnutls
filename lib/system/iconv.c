@@ -56,7 +56,7 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 		checked = 1;
 	}
 
-	if (((uint8_t *) data)[size] == 0 && ((uint8_t *) data)[size+1] == 0) {
+	if (size > 2 && ((uint8_t *) data)[size-1] == 0 && ((uint8_t *) data)[size-2] == 0) {
 		size -= 2;
 	}
 
