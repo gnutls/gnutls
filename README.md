@@ -2,6 +2,8 @@ Master [![build status](https://gitlab.com/gnutls/gnutls/badges/master/build.svg
   3.4.x [![build status](https://gitlab.com/gnutls/gnutls/badges/gnutls_3_4_x/build.svg)](https://gitlab.com/gnutls/gnutls/commits/gnutls_3_4_x)
   3.3.x [![build status](https://gitlab.com/gnutls/gnutls/badges/gnutls_3_3_x/build.svg)](https://gitlab.com/gnutls/gnutls/commits/gnutls_3_3_x)
 
+[![coverage report](https://gitlab.com/gnutls/gnutls/badges/master/coverage.svg)](https://gitlab.com/gnutls/gnutls/commits/master)
+
 # GnuTLS -- Information for developers
 
 GnuTLS implements the TLS/SSL (Transport Layer Security aka Secure
