@@ -1216,7 +1216,7 @@ write_pbkdf2_params(ASN1_TYPE pasn,
 		goto error;
 	}
 
-	return 0;
+	result = 0;
 
       error:
 	asn1_delete_structure(&pbkdf2_asn);
@@ -1281,7 +1281,7 @@ write_pbes2_enc_params(ASN1_TYPE pasn,
 		goto error;
 	}
 
-	return 0;
+	result = 0;
 
       error:
 	asn1_delete_structure(&pbe_asn);
