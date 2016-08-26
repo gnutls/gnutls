@@ -58,11 +58,11 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/ca-secret.gpg data/srv-public.gpg data/srv-public-127.0.0.1-signed.gpg	\
 	data/srv-public-localhost-signed.gpg data/selfsigs/alice-mallory-badsig18.pub \
 	data/selfsigs/alice-mallory-irrelevantsig.pub data/selfsigs/alice-mallory-nosig18.pub \
-	data/selfsigs/alice.pub
+	data/selfsigs/alice.pub data/key-utf8-1.p12 data/key-utf8-2.p12
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
-	provable-dh userid sha2-test sha2-dsa-test
+	provable-dh userid sha2-test sha2-dsa-test pkcs12-utf8
 
 if !ENABLE_FIPS140
 dist_check_SCRIPTS += pkcs12
