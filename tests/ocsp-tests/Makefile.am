@@ -22,7 +22,7 @@
 EXTRA_DIST = certs/ca.key certs/ca.pem certs/ocsp-server.key certs/ocsp-server.pem response1.der \
 	response2.der certs/ocsp_index.txt certs/ocsp_index.txt.attr \
 	certs/server_good.key certs/server_bad.key certs/server_good.template \
-	certs/server_bad.template certs/ocsp-staple-unrelated.der
+	certs/server_bad.template certs/ocsp-staple-unrelated.der suppressions.valgrind
 
 dist_check_SCRIPTS = ocsp-test
 
