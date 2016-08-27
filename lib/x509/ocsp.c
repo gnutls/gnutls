@@ -1396,30 +1396,42 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 			    time_t * revocation_time,
 			    unsigned int *revocation_reason)
 {
-	gnutls_datum_t sa;
 	char name[ASN1_MAX_NAME_SIZE];
-	int ret;
+	int ret, result;
+	char oidtmp[MAX_OID_SIZE];
+	int len;
+	char ttime[MAX_TIME];
 
-	snprintf(name, sizeof(name),
-		 "tbsResponseData.responses.?%u.certID.hashAlgorithm.algorithm",
-		 indx + 1);
-	ret = _gnutls_x509_read_value(resp->basicresp, name, &sa);
-	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	else if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	/* initialize any allocated values to NULL, to allow deallocation
+	 * on error. */
+	if (issuer_name_hash)
+		issuer_name_hash->data = NULL;
+	if (issuer_key_hash)
+		issuer_key_hash->data = NULL;
+	if (serial_number)
+		serial_number->data = NULL;
 
-	ret = gnutls_oid_to_digest((char *) sa.data);
-	_gnutls_free_datum(&sa);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	if (digest) {
+		snprintf(name, sizeof(name),
+			 "tbsResponseData.responses.?%u.certID.hashAlgorithm.algorithm",
+			 indx + 1);
+		len = sizeof(oidtmp);
+		result = asn1_read_value(resp->basicresp, name, oidtmp, &len);
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		} else if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 
-	if (digest)
+		ret = gnutls_oid_to_digest(oidtmp);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
 		*digest = ret;
+	}
 
 	if (issuer_name_hash) {
 		snprintf(name, sizeof(name),
@@ -1427,7 +1439,7 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 			 indx + 1);
 		ret = _gnutls_x509_read_value(resp->basicresp, name,
 					      issuer_name_hash);
-		if (ret != GNUTLS_E_SUCCESS) {
+		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
@@ -1439,11 +1451,9 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 			 indx + 1);
 		ret = _gnutls_x509_read_value(resp->basicresp, name,
 					      issuer_key_hash);
-		if (ret != GNUTLS_E_SUCCESS) {
+		if (ret < 0) {
 			gnutls_assert();
-			if (issuer_name_hash)
-				gnutls_free(issuer_name_hash->data);
-			return ret;
+			goto fail;
 		}
 	}
 
@@ -1453,13 +1463,9 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 			 indx + 1);
 		ret = _gnutls_x509_read_value(resp->basicresp, name,
 					      serial_number);
-		if (ret != GNUTLS_E_SUCCESS) {
+		if (ret < 0) {
 			gnutls_assert();
-			if (issuer_name_hash)
-				gnutls_free(issuer_name_hash->data);
-			if (issuer_key_hash)
-				gnutls_free(issuer_key_hash->data);
-			return ret;
+			goto fail;
 		}
 	}
 
@@ -1467,41 +1473,44 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 		snprintf(name, sizeof(name),
 			 "tbsResponseData.responses.?%u.certStatus",
 			 indx + 1);
-		ret = _gnutls_x509_read_value(resp->basicresp, name, &sa);
-		if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-		else if (ret < 0) {
+
+		len = sizeof(oidtmp);
+		result = asn1_read_value(resp->basicresp, name, oidtmp, &len);
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
 			gnutls_assert();
-			return ret;
+			ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+			goto fail;
+		} else if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			goto fail;
 		}
-		if (sa.size == 5 && memcmp(sa.data, "good", sa.size) == 0)
+
+		if (len == 5 && memcmp(oidtmp, "good", len) == 0)
 			*cert_status = GNUTLS_OCSP_CERT_GOOD;
-		else if (sa.size == 8
-			 && memcmp(sa.data, "revoked", sa.size) == 0)
+		else if (len == 8
+			 && memcmp(oidtmp, "revoked", len) == 0)
 			*cert_status = GNUTLS_OCSP_CERT_REVOKED;
-		else if (sa.size == 8
-			 && memcmp(sa.data, "unknown", sa.size) == 0)
+		else if (len == 8
+			 && memcmp(oidtmp, "unknown", len) == 0)
 			*cert_status = GNUTLS_OCSP_CERT_UNKNOWN;
 		else {
 			gnutls_assert();
-			gnutls_free(sa.data);
-			return GNUTLS_E_ASN1_DER_ERROR;
+			ret = GNUTLS_E_ASN1_DER_ERROR;
+			goto fail;
 		}
-		gnutls_free(sa.data);
 	}
 
 	if (this_update) {
-		char ttime[MAX_TIME];
-		int len;
-
 		snprintf(name, sizeof(name),
 			 "tbsResponseData.responses.?%u.thisUpdate",
 			 indx + 1);
 		len = sizeof(ttime) - 1;
-		ret = asn1_read_value(resp->basicresp, name, ttime, &len);
-		if (ret != ASN1_SUCCESS) {
+		result = asn1_read_value(resp->basicresp, name, ttime, &len);
+		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
-			return GNUTLS_E_ASN1_DER_ERROR;
+			ret = GNUTLS_E_ASN1_DER_ERROR;
+			goto fail;
 		} else {
 			*this_update =
 			    _gnutls_x509_generalTime2gtime(ttime);
@@ -1509,15 +1518,12 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 	}
 
 	if (next_update) {
-		char ttime[MAX_TIME];
-		int len;
-
 		snprintf(name, sizeof(name),
 			 "tbsResponseData.responses.?%u.nextUpdate",
 			 indx + 1);
 		len = sizeof(ttime) - 1;
-		ret = asn1_read_value(resp->basicresp, name, ttime, &len);
-		if (ret != ASN1_SUCCESS) {
+		result = asn1_read_value(resp->basicresp, name, ttime, &len);
+		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			*next_update = (time_t) (-1);
 		} else
@@ -1526,15 +1532,12 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 	}
 
 	if (revocation_time) {
-		char ttime[MAX_TIME];
-		int len;
-
 		snprintf(name, sizeof(name),
 			 "tbsResponseData.responses.?%u.certStatus."
 			 "revoked.revocationTime", indx + 1);
 		len = sizeof(ttime) - 1;
-		ret = asn1_read_value(resp->basicresp, name, ttime, &len);
-		if (ret != ASN1_SUCCESS) {
+		result = asn1_read_value(resp->basicresp, name, ttime, &len);
+		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			*revocation_time = (time_t) (-1);
 		} else
@@ -1556,6 +1559,20 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 	}
 
 	return GNUTLS_E_SUCCESS;
+ fail:
+	if (issuer_name_hash) {
+		gnutls_free(issuer_name_hash->data);
+		issuer_name_hash->data = NULL;
+	}
+	if (issuer_key_hash) {
+		gnutls_free(issuer_key_hash->data);
+		issuer_key_hash->data = NULL;
+	}
+	if (serial_number) {
+		gnutls_free(serial_number->data);
+		serial_number->data = NULL;
+	}
+	return ret;
 }
 
 /**
