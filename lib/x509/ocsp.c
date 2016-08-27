@@ -1257,6 +1257,7 @@ gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_t resp,
 		gnutls_assert();
 		goto cleanup;
 	}
+	cserial.size = t;
 
 	if (rserial.size != cserial.size
 	    || memcmp(cserial.data, rserial.data, rserial.size) != 0) {
