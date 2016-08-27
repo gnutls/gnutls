@@ -1233,6 +1233,48 @@ static void req_addcert(void)
 	gnutls_ocsp_req_deinit(req);
 }
 
+static void check_ocsp_resp(gnutls_ocsp_resp_t resp)
+{
+	int ret;
+	gnutls_digest_algorithm_t digest;
+	gnutls_datum_t issuer_name_hash;
+	gnutls_datum_t issuer_key_hash;
+	gnutls_datum_t serial_number;
+	unsigned cert_status;
+	time_t this_update;
+	time_t next_update;
+	time_t revocation_time;
+	unsigned revocation_reason;
+
+	/* functionality check of gnutls_ocsp_resp_get_single(), the data
+	 * sanity check is done with the gnutls_ocsp_resp_print() checks. */
+	ret = gnutls_ocsp_resp_get_single(resp, 0, &digest, &issuer_name_hash,
+		&issuer_key_hash, &serial_number, &cert_status, &this_update,
+		&next_update, &revocation_time, &revocation_reason);
+	if (ret < 0) {
+		fail("error in gnutls_ocsp_resp_get_single: %s\n", gnutls_strerror(ret));
+	}
+
+	gnutls_free(issuer_key_hash.data);
+	gnutls_free(issuer_name_hash.data);
+	gnutls_free(serial_number.data);
+
+	/* test if everything works with null params */
+	ret = gnutls_ocsp_resp_get_single(resp, 0, &digest, NULL, NULL, NULL,
+		NULL, NULL, NULL, NULL, NULL);
+	if (ret < 0) {
+		fail("error in gnutls_ocsp_resp_get_single: %s\n", gnutls_strerror(ret));
+	}
+
+	ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
+		NULL, NULL, NULL, NULL, &revocation_reason);
+	if (ret < 0) {
+		fail("error in gnutls_ocsp_resp_get_single: %s\n", gnutls_strerror(ret));
+	}
+
+	return;
+}
+
 static void resp_import(void)
 {
 	gnutls_ocsp_resp_t resp;
@@ -1281,8 +1323,9 @@ static void resp_import(void)
 		exit(1);
 	}
 
-	/* print response */
+	check_ocsp_resp(resp);
 
+	/* print response */
 	ret = gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_FULL, &d);
 	if (ret != 0) {
 		fail("gnutls_ocsp_resp_print\n");
