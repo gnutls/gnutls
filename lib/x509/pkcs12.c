@@ -1762,8 +1762,10 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 		gnutls_pkcs12_bag_deinit(bag);
 
 	if (ret < 0) {
-		if (*key)
+		if (*key) {
 			gnutls_x509_privkey_deinit(*key);
+			*key = NULL;
+		}
 		if (_extra_certs_len && _extra_certs != NULL) {
 			for (i = 0; i < _extra_certs_len; i++)
 				gnutls_x509_crt_deinit(_extra_certs[i]);
