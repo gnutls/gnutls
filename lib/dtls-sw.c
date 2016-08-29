@@ -51,7 +51,15 @@
 
 #define DTLS_WINDOW_MARK(W, S)		((W)->dtls_sw_bits |= ((uint64_t) 1 << DTLS_WINDOW_OFFSET(W, S)))
 
-#define DTLS_WINDOW_UPDATE(W)		while ((W)->dtls_sw_bits & (uint64_t) 1) { \
+/* We forcefully advance the window once we have received more than
+ * 8 packets since the first one. That way we ensure that we don't
+ * get stuck on connections with many lost packets. */
+#define DTLS_WINDOW_UPDATE(W)		\
+					if (((W)->dtls_sw_bits & 0xffffffffffff0000LL) != 0) { \
+						(W)->dtls_sw_bits = (W)->dtls_sw_bits >> 1; \
+						(W)->dtls_sw_start++; \
+					} \
+					while ((W)->dtls_sw_bits & (uint64_t) 1) { \
 						(W)->dtls_sw_bits = (W)->dtls_sw_bits >> 1; \
 						(W)->dtls_sw_start++; \
 					}
