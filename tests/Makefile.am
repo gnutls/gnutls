@@ -253,7 +253,10 @@ check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
 
 if !WINDOWS
-dist_check_SCRIPTS += danetool.sh fastopen.sh starttls.sh
+dist_check_SCRIPTS += fastopen.sh starttls.sh
+if ENABLE_DANE
+dist_check_SCRIPTS += danetool.sh
+endif
 endif
 
 TESTS = $(ctests) $(dist_check_SCRIPTS)
