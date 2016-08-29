@@ -69,8 +69,6 @@ int _rnd_system_entropy_check(void)
 
 int _rnd_system_entropy_init(void)
 {
-	int old;
-
 	if (!CryptAcquireContext
 		(&device_fd, NULL, NULL, PROV_RSA_FULL,
 		 CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
