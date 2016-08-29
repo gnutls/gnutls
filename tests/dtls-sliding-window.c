@@ -147,6 +147,38 @@ static void check_dtls_window_19(void **glob_state)
 	assert_int_equal(_dtls_record_check(&state, &t), 0);
 }
 
+static void check_dtls_window_skip1(void **glob_state)
+{
+	struct record_parameters_st state;
+	uint64 t;
+	unsigned i;
+
+	RESET_WINDOW;
+	SET_WINDOW_START(0);
+	SET_WINDOW_LAST_RECV(1);
+
+	for (i=2;i<256;i+=2) {
+		uint64_set(&t, BSWAP64(i));
+		assert_int_equal(_dtls_record_check(&state, &t), 0);
+	}
+}
+
+static void check_dtls_window_skip3(void **glob_state)
+{
+	struct record_parameters_st state;
+	uint64 t;
+	unsigned i;
+
+	RESET_WINDOW;
+	SET_WINDOW_START(0);
+	SET_WINDOW_LAST_RECV(1);
+
+	for (i=5;i<256;i+=2) {
+		uint64_set(&t, BSWAP64(i));
+		assert_int_equal(_dtls_record_check(&state, &t), 0);
+	}
+}
+
 static void check_dtls_window_21(void **glob_state)
 {
 	struct record_parameters_st state;
@@ -491,7 +523,9 @@ int main(void)
 		cmocka_unit_test(check_dtls_window_very_large_12),
 		cmocka_unit_test(check_dtls_window_very_large_19),
 		cmocka_unit_test(check_dtls_window_very_large_91),
-		cmocka_unit_test(check_dtls_window_very_large_outside)
+		cmocka_unit_test(check_dtls_window_very_large_outside),
+		cmocka_unit_test(check_dtls_window_skip3),
+		cmocka_unit_test(check_dtls_window_skip1)
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
