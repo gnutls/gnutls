@@ -163,7 +163,7 @@ static ssize_t n_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 
 /* The first five messages are handshake. Thus corresponds to msg_seq+5 */
 static int recv_msg_seq[] =
-    { 1, 2, 3, 4, 5, 6, 12, 28, 7, 8, 9, 10, 11, 13, 15, 16, 14, 18, 20,
+    { 1, 2, 3, 4, 5, 6, 12, 28, 8, 9, 10, 11, 13, 15, 16, 14, 18, 20,
 	19, 21, 22, 23, 25, 24, 26, 27, 29, 30, 31, 33, 32, 34, 35, 38, 36, 37,
 	    -1
 };
