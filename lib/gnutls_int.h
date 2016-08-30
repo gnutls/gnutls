@@ -622,8 +622,8 @@ struct record_parameters_st {
 	const mac_entry_st *mac;
 
 	/* for DTLS sliding window */
+	uint64_t dtls_sw_next; /* The end point (next expected packet) of the sliding window without epoch */
 	uint64_t dtls_sw_bits;
-	uint64_t dtls_sw_start; /* The starting point of the sliding window without epoch */
 	unsigned dtls_sw_have_recv; /* whether at least a packet has been received */
 
 	record_state_st read;

@@ -37,42 +37,26 @@
  */
 #define DTLS_EPOCH_SHIFT		(6*CHAR_BIT)
 #define DTLS_SEQ_NUM_MASK		0x0000FFFFFFFFFFFF
-#define DTLS_WINDOW_HAVE_RECV_PACKET(W) ((W)->dtls_sw_have_recv != 0)
 
-#define DTLS_WINDOW_INIT_AT(W, S)	(W)->dtls_sw_bits = ((W)->dtls_sw_have_recv) = 0; (W)->dtls_sw_start = (S&DTLS_SEQ_NUM_MASK)
-#define DTLS_WINDOW_INIT(W)		DTLS_WINDOW_INIT_AT(W, 0)
+#define DTLS_EMPTY_BITMAP		(0xFFFFFFFFFFFFFFFFULL)
 
-#define DTLS_WINDOW_INSIDE(W, S)	((((S) & DTLS_SEQ_NUM_MASK) > (W)->dtls_sw_start) && \
-						(((S)  & DTLS_SEQ_NUM_MASK) - (W)->dtls_sw_start <= (sizeof((W)->dtls_sw_bits) * CHAR_BIT)))
+/* We expect the compiler to be able to spot that this is a byteswapping
+ * load, and emit instructions like 'movbe' on x86_64 where appropriate.
+*/
+#define LOAD_UINT64(out, ubytes)  \
+	out = (((uint64_t)ubytes[0] << 56) |	\
+	       ((uint64_t)ubytes[1] << 48) |	\
+	       ((uint64_t)ubytes[2] << 40) |	\
+	       ((uint64_t)ubytes[3] << 32) |	\
+	       ((uint64_t)ubytes[4] << 24) |	\
+	       ((uint64_t)ubytes[5] << 16) |	\
+	       ((uint64_t)ubytes[6] << 8) |	\
+	       ((uint64_t)ubytes[7] << 0) )
 
-#define DTLS_WINDOW_OFFSET(W, S)	((((S) & DTLS_SEQ_NUM_MASK) - (W)->dtls_sw_start) - 1)
-
-#define DTLS_WINDOW_RECEIVED(W, S)	(((W)->dtls_sw_bits & ((uint64_t) 1 << DTLS_WINDOW_OFFSET(W, S))) != 0)
-
-#define DTLS_WINDOW_MARK(W, S)		((W)->dtls_sw_bits |= ((uint64_t) 1 << DTLS_WINDOW_OFFSET(W, S)))
-
-/* We forcefully advance the window once we have received more than
- * 8 packets since the first one. That way we ensure that we don't
- * get stuck on connections with many lost packets. */
-#define DTLS_WINDOW_UPDATE(W)		\
-					if (((W)->dtls_sw_bits & 0xffffffffffff0000LL) != 0) { \
-						(W)->dtls_sw_bits = (W)->dtls_sw_bits >> 1; \
-						(W)->dtls_sw_start++; \
-					} \
-					while ((W)->dtls_sw_bits & (uint64_t) 1) { \
-						(W)->dtls_sw_bits = (W)->dtls_sw_bits >> 1; \
-						(W)->dtls_sw_start++; \
-					}
-
-#define LOAD_UINT64(out, ubytes) \
-	for (i = 0; i < 8; i++) { \
-		out <<= 8; \
-		out |= ubytes[i] & 0xff; \
-	}
 
 void _dtls_reset_window(struct record_parameters_st *rp)
 {
-	DTLS_WINDOW_INIT(rp);
+	rp->dtls_sw_have_recv = 0;
 }
 
 /* Checks if a sequence number is not replayed. If a replayed
@@ -82,7 +66,6 @@ void _dtls_reset_window(struct record_parameters_st *rp)
 int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
 {
 	uint64_t seq_num = 0;
-	unsigned i;
 
 	LOAD_UINT64(seq_num, _seq->i);
 
@@ -90,24 +73,86 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
 		return gnutls_assert_val(-1);
 	}
 
-	if (!DTLS_WINDOW_HAVE_RECV_PACKET(rp)) {
-		DTLS_WINDOW_INIT_AT(rp, seq_num);
+	seq_num &= DTLS_SEQ_NUM_MASK;
+
+	/*
+	 * rp->dtls_sw_next is the next *expected* packet (N), being
+	 * the sequence number *after* the latest we have received.
+	 *
+	 * By definition, therefore, packet N-1 *has* been received.
+	 * And thus there's no point wasting a bit in the bitmap for it.
+	 *
+	 * So the backlog bitmap covers the 64 packets prior to that,
+	 * with the LSB representing packet (N - 2), and the MSB
+	 * representing (N - 65). A received packet is represented
+	 * by a zero bit, and a missing packet is represented by a one.
+	 *
+	 * Thus we can allow out-of-order reception of packets that are
+	 * within a reasonable interval of the latest packet received.
+	 */
+	if (!rp->dtls_sw_have_recv) {
+		rp->dtls_sw_next = seq_num + 1;
+		rp->dtls_sw_bits = DTLS_EMPTY_BITMAP;
 		rp->dtls_sw_have_recv = 1;
 		return 0;
+	} else if (seq_num == rp->dtls_sw_next) {
+		/* The common case. This is the packet we expected next. */
+
+		rp->dtls_sw_bits <<= 1;
+
+		/* This might reach a value higher than 48-bit DTLS sequence
+		 * numbers can actually reach. Which is fine. When that
+		 * happens, we'll do the right thing and just not accept
+		 * any newer packets. Someone needs to start a new epoch. */
+		rp->dtls_sw_next++;
+		return 0;
+	} else if (seq_num > rp->dtls_sw_next) {
+		/* The packet we were expecting has gone missing; this one is newer.
+		 * We always advance the window to accommodate it. */
+		uint64_t delta = seq_num - rp->dtls_sw_next;
+
+		if (delta >= 64) {
+			/* We jumped a long way into the future. We have not seen
+			 * any of the previous 32 packets so set the backlog bitmap
+			 * to all ones. */
+			rp->dtls_sw_bits = DTLS_EMPTY_BITMAP;
+		} else if (delta == 63) {
+			/* Avoid undefined behaviour that shifting by 64 would incur.
+			 * The (clear) top bit represents the packet which is currently
+			 * rp->dtls_sw_next, which we know was already received. */
+			rp->dtls_sw_bits = DTLS_EMPTY_BITMAP >> 1;
+		} else {
+			/* We have missed (delta) packets. Shift the backlog by that
+			 * amount *plus* the one we would have shifted it anyway if
+			 * we'd received the packet we were expecting. The zero bit
+			 * representing the packet which is currently rp->dtls_sw_next-1,
+			 * which we know has been received, ends up at bit position
+			 * (1<<delta). Then we set all the bits lower than that, which
+			 * represent the missing packets. */
+			rp->dtls_sw_bits <<= delta + 1;
+			rp->dtls_sw_bits |= (1ULL << delta) - 1;
+		}
+		rp->dtls_sw_next = seq_num + 1;
+		return 0;
+	} else {
+		/* This packet is older than the one we were expecting. By how much...? */
+		uint64_t delta = rp->dtls_sw_next - seq_num;
+
+		if (delta > 65) {
+			/* Too old. We can't know if it's a replay */
+			return gnutls_assert_val(-2);
+		} else if (delta == 1) {
+			/* Not in the bitmask since it is by definition already received. */
+			return gnutls_assert_val(-3);
+		} else {
+			/* Within the sliding window, so we remember whether we've seen it or not */
+			uint64_t mask = 1ULL << (rp->dtls_sw_next - seq_num - 2);
+
+			if (!(rp->dtls_sw_bits & mask))
+				return gnutls_assert_val(-3);
+
+			rp->dtls_sw_bits &= ~mask;
+			return 0;
+		}
 	}
-
-	/* are we inside sliding window? */
-	if (!DTLS_WINDOW_INSIDE(rp, seq_num)) {
-		return gnutls_assert_val(-2);
-	}
-
-	/* already received? */
-	if (DTLS_WINDOW_RECEIVED(rp, seq_num)) {
-		return gnutls_assert_val(-3);
-	}
-
-	DTLS_WINDOW_MARK(rp, seq_num);
-	DTLS_WINDOW_UPDATE(rp);
-
-	return 0;
 }
