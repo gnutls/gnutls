@@ -146,6 +146,7 @@ libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args
 COMMON_LIBS = $(LIBOPTS) $(LTLIBINTL)
 if ENABLE_MINITASN1
 COMMON_LIBS += ../lib/minitasn1/libminitasn1.la ../gl/libgnu.la 
+AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
 else
 COMMON_LIBS += $(LIBTASN1_LIBS)
 endif
