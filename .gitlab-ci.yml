@@ -1,5 +1,9 @@
+image: fedora:24
+
 Compile minimal library and openssl compat:
   script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && ./configure --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
@@ -8,38 +12,18 @@ Compile minimal library and openssl compat:
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
     --disable-ssl3-support --disable-ssl2-support --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j4
   tags:
-  - nettle3
-  - linux
+  - shared
   except:
   - tags
-Build and Check with asan:
-  script:
-  - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
-    ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
-    make -j4 && make check -j4 && make local-code-coverage-output
-  tags:
-  - nettle3
-  - lcov
-  - asan
-  - linux
-  except:
-  - tags
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - tests/*.log
-      - tests/*/*.log
 Build and Check with C99 and ubsan:
   script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --enable-code-coverage
     && make -j4 && make check -j4 && make local-code-coverage-output
   tags:
-  - ubsan
-  - lcov
-  - nettle3
-  - linux
+  - shared
   except:
   - tags
   artifacts:
@@ -48,33 +32,16 @@ Build and Check with C99 and ubsan:
     paths:
       - tests/*.log
       - tests/*/*.log
-Build and Check - separate build dir (x86):
-  script:
-  - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
-    make -j4 && make check -j4 && make local-code-coverage-output
-  tags:
-  - x86
-  - lcov
-  - nettle3
-  - linux
-  except:
-  - tags
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - build/tests/*.log
-      - build/tests/*/*.log
+
 Build and Check - without SSL 3.0:
   script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
     make -j4 && make check -j4 && make local-code-coverage-output
   tags:
-  - lcov
-  - nettle3
-  - linux
+  - shared
   except:
   - tags
   artifacts:
@@ -84,25 +51,35 @@ Build and Check - without SSL 3.0:
       - build/guile/tests/*.log
       - build/tests/*.log
       - build/tests/*/*.log
+
+# Needs gnutls' headers due to some abi-checker issue with resolving deps
 Build with ABI-check (x86-64):
   script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - dnf install -y gnutls-devel
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 && make abi-check 
   tags:
-  - x86-64
-  - nettle3
-  - abi-checker
-  - linux
+  - shared
   except:
   - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/logs/gnutls-dane/*/log.txt
+      - build/logs/gnutls/*/log.txt
+
 Build and Check - clang:
   script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && 
     CC=clang ./configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -C tests -j4
   tags:
-  - nettle3
-  - linux
+  - shared
   except:
   - tags
   artifacts:
@@ -112,14 +89,16 @@ Build and Check - clang:
       - guile/tests/*.log
       - tests/*.log
       - tests/*/*.log
+
 Build and Check in FIPS140-2 mode:
   script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-valgrind-tests &&
-    make -j4 && make check -j4
+    ../configure --disable-non-suiteb-curves --enable-fips140-mode --enable-code-coverage --disable-doc --disable-valgrind-tests &&
+    make -j4 && make check -j4 && make local-code-coverage-output
   tags:
-  - nettle3
-  - linux
+  - shared
   except:
   - tags
   artifacts:
@@ -128,15 +107,36 @@ Build and Check in FIPS140-2 mode:
       - guile/tests/*.log
       - build/tests/*.log
       - build/tests/*/*.log
-Release build for windows DLLs:
+
+Build and Check with valgrind:
   script:
-  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
-    mingw32-make -j4 && mingw32-make -C tests check -j4 
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
+    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j4 && make check -j4 && make local-code-coverage-output
   tags:
-  - nettle3
-  - wine
-  - mingw
-  - linux
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
+
+Release build for windows32 DLLs:
+  script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - dnf install -y wine.i686 mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
+    mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-make -j4 && mingw32-make -C tests check -j4
+  tags:
+  - shared
   only:
   - tags
   artifacts:
@@ -148,16 +148,43 @@ Release build for windows DLLs:
       - lib/*.def
       - lib/includes/gnutls/*.h
       - lib/gnutls.pc
-Build and Check for windows in separate build dir:
+
+Release build for windows64 DLLs:
   script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
-    mingw32-make -j4 && mingw32-make -C tests check -j4
+    mingw64-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw64-make -j4 && mingw64-make -C tests check -j4
   tags:
-  - nettle3
-  - wine
-  - mingw
-  - linux
+  - shared
+  only:
+  - tags
+  artifacts:
+    expire_in: 6 months
+    paths:
+      - src/*.exe
+      - lib/.libs/*.dll
+      - lib/.libs/*.a
+      - lib/*.def
+      - lib/includes/gnutls/*.h
+      - lib/gnutls.pc
+
+Build and Check for windows64 in separate build dir:
+  script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw32-libidn util-linux
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
+    mingw64-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw64-make -j4 && mingw64-make -C tests check -j4
+  tags:
+  - shared
   except:
   - tags
   artifacts:
@@ -167,14 +194,36 @@ Build and Check for windows in separate build dir:
       - guile/tests/*.log
       - build/tests/*.log
       - build/tests/*/*.log
-Build and Check with valgrind:
+
+Build and Check for windows32 in separate build dir:
   script:
-  - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
-    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j4 && make check -j4 && make local-code-coverage-output
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - dnf install -y wine.i686 mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
+    mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-make -j4 && mingw32-make -C tests check -j4
   tags:
-  - nettle3
-  - lcov
-  - linux
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - guile/tests/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+
+
+Build and Check on FreeBSD:
+  script:
+  - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
+    --disable-guile --disable-doc --disable-valgrind-tests && gmake -j4 && gmake check -j4
+  tags:
+  - freebsd
   except:
   - tags
   artifacts:
@@ -183,12 +232,38 @@ Build and Check with valgrind:
     paths:
       - tests/*.log
       - tests/*/*.log
-Build and Check on FreeBSD:
+
+# We need a clean 32-bit fedora for testing
+Build and Check - separate build dir (x86):
+  image: nickcis/fedora-32:23
   script:
-  - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
-    --disable-guile --disable-doc --disable-valgrind-tests && gmake -j4 && gmake check -j4
+  - linux32 dnf install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind 
+  - make autoreconf && mkdir -p build && cd build &&
+    ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
+    make -j4 && make check -j4 && make local-code-coverage-output
   tags:
-  - freebsd
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+
+# Address sanitizer in fedora 24 cannot read suppression files
+Build and Check with asan:
+  image: fedora:23
+  script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man net-tools
+  - dnf install -y clang libasan-static nodejs softhsm datefudge lcov openssl-devel libasan dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp
+  - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
+    ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
+    make -j4 && make check -j4 && make local-code-coverage-output
+  tags:
+  - shared
   except:
   - tags
   artifacts:
