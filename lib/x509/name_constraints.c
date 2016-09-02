@@ -261,7 +261,6 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 	 * indexed directly by (gnutls_x509_subject_alt_name_t enum - 1) */
 	unsigned char types_with_empty_intersection[GNUTLS_SAN_MAX];
 	memset(types_with_empty_intersection, 0, sizeof(types_with_empty_intersection));
-	unsigned int ipv4_empty_intersection = 0, ipv6_empty_intersection = 0;
 
 	if (*_nc == NULL || _nc2 == NULL)
 		return 0;
@@ -275,9 +274,7 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 		name_constraints_node_st *next = t->next;
 		nc2 = _nc2;
 		while (nc2 != NULL) {
-			if (t->type == nc2->type
-				// in case of IP addresses, compare sizes as well
-				&& (t->type != GNUTLS_SAN_IPADDRESS || t->name.size == nc2->name.size)) {
+			if (t->type == nc2->type) {
 				// check bounds (we will use 't->type' as index)
 				if (t->type > GNUTLS_SAN_MAX || t->type == 0)
 					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -285,11 +282,6 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 				// if we add something to the intersection in phase 2,
 				// we will reset this flag back to 0 then
 				types_with_empty_intersection[t->type - 1] = 1;
-				// differentiate IPv4 and IPv6
-				if (t->type == GNUTLS_SAN_IPADDRESS && t->name.size == 8)
-					ipv4_empty_intersection = 1;
-				if (t->type == GNUTLS_SAN_IPADDRESS && t->name.size == 32)
-					ipv6_empty_intersection = 1;
 				break;
 			}
 			nc2 = nc2->next;
@@ -298,7 +290,6 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 			(t->type != GNUTLS_SAN_DNSNAME &&
 			 t->type != GNUTLS_SAN_RFC822NAME &&
 			 t->type != GNUTLS_SAN_IPADDRESS)
-
 		   ) {
 			/* move node from NC to DEST */
 			if (prev != NULL)
@@ -335,13 +326,7 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 				}
 				// we will not add universal excluded constraint for this type
-				if (tmp->type != GNUTLS_SAN_IPADDRESS) {
-					types_with_empty_intersection[tmp->type - 1] = 0;
-				} else if (tmp->name.size == 8) {
-					ipv4_empty_intersection = 0;
-				} else {
-					ipv6_empty_intersection = 0;
-				}
+				types_with_empty_intersection[tmp->type - 1] = 0;
 				// add intersection node to DEST
 				tmp->next = dest;
 				dest = tmp;
@@ -375,32 +360,25 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 	for (type = 1; type <= GNUTLS_SAN_MAX; type++) {
 		if (types_with_empty_intersection[type-1] == 0)
 			continue;
-		if (type == GNUTLS_SAN_IPADDRESS) {
-			_gnutls_hard_log("Adding universal excluded name constraint for IP (IPv4: %d, IPv6: %d).\n",
-							 ipv4_empty_intersection, ipv6_empty_intersection);
-		} else {
-			_gnutls_hard_log("Adding universal excluded name constraint for type %d.\n", type);
-		}
+		_gnutls_hard_log("Adding universal excluded name constraint for type %d.\n", type);
 		switch (type) {
 			case GNUTLS_SAN_IPADDRESS:
-				if (ipv4_empty_intersection) {
-					tmp = name_constraints_node_new(GNUTLS_SAN_IPADDRESS, NULL, 8);
-					if (tmp == NULL) {
-						_gnutls_name_constraints_node_free(dest);
-						return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-					}
-					tmp->next = *_nc_excluded;
-					*_nc_excluded = tmp;
+				// add universal restricted range for IPv4
+				tmp = name_constraints_node_new(GNUTLS_SAN_IPADDRESS, NULL, 8);
+				if (tmp == NULL) {
+					_gnutls_name_constraints_node_free(dest);
+					return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				}
-				if (ipv6_empty_intersection) {
-					tmp = name_constraints_node_new(GNUTLS_SAN_IPADDRESS, NULL, 32);
-					if (tmp == NULL) {
-						_gnutls_name_constraints_node_free(dest);
-						return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-					}
-					tmp->next = *_nc_excluded;
-					*_nc_excluded = tmp;
+				tmp->next = *_nc_excluded;
+				*_nc_excluded = tmp;
+				// add universal restricted range for IPv6
+				tmp = name_constraints_node_new(GNUTLS_SAN_IPADDRESS, NULL, 32);
+				if (tmp == NULL) {
+					_gnutls_name_constraints_node_free(dest);
+					return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				}
+				tmp->next = *_nc_excluded;
+				*_nc_excluded = tmp;
 				break;
 			case GNUTLS_SAN_DNSNAME:
 			case GNUTLS_SAN_RFC822NAME:
@@ -782,7 +760,7 @@ static unsigned email_matches(const gnutls_datum_t *name, const gnutls_datum_t *
  * @nc1: name constraints node 1
  * @nc2: name constraints node 2
  * @_intersection: newly allocated node with intersected constraints,
- *                NULL if the intersection is empty
+ *                 NULL if the intersection is empty
  *
  * Inspect 2 name constraints nodes (of possibly different types) and allocate
  * a new node with intersection of given constraints.

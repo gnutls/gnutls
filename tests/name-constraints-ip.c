@@ -520,10 +520,10 @@ static void check_ipv6_intersection(void **glob_state)
 	check_test_result(ret, IP_REJECTED, ip);
 }
 
-static void check_empty_iv4_intersection_ipv6_remains(void **glob_state)
+static void check_empty_ipv4_intersection_ipv6_remains(void **glob_state)
 {
 	/* 9: IPv4 and IPv6 in a common test case
-	 *    IPv4 with empty intersection, but IPv6 remains
+	 *    IPv4 with empty intersection, but IPv6 gets restricted as well
 	 * --P:127.0.113.0/24--
 	 *                            --P:255.0.113.0/24--
 	 *      A                 B          C
@@ -566,7 +566,7 @@ static void check_empty_iv4_intersection_ipv6_remains(void **glob_state)
 	parse_cidr("bfa6:ab01::/128", ip); // D
 	ip->size = 16; // strip network mask
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
-	check_test_result(ret, IP_ACCEPTED, ip);
+	check_test_result(ret, IP_REJECTED, ip);
 
 	parse_cidr("bfa7::/128", ip); // E
 	ip->size = 16; // strip network mask
@@ -664,7 +664,7 @@ static void check_ipv4v6_single_constraint_each(void **glob_state)
 	parse_cidr("127.0.113.2/32", ip); // A
 	ip->size = 4; // strip network mask
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
-	check_test_result(ret, IP_ACCEPTED, ip);
+	check_test_result(ret, IP_REJECTED, ip);
 
 	parse_cidr("255.0.0.2/32", ip); // B
 	ip->size = 4; // strip network mask
@@ -674,7 +674,7 @@ static void check_ipv4v6_single_constraint_each(void **glob_state)
 	parse_cidr("bfa6:ab01::/128", ip); // C
 	ip->size = 16; // strip network mask
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_IPADDRESS, ip);
-	check_test_result(ret, IP_ACCEPTED, ip);
+	check_test_result(ret, IP_REJECTED, ip);
 
 	parse_cidr("bfa7::/128", ip); // D
 	ip->size = 16; // strip network mask
@@ -718,7 +718,7 @@ void doit(void)
 		cmocka_unit_test_setup_teardown(check_mediocre_intersection, setup, teardown),
 		cmocka_unit_test_setup_teardown(check_difficult_intersection, setup, teardown),
 		cmocka_unit_test_setup_teardown(check_ipv6_intersection, setup, teardown),
-		cmocka_unit_test_setup_teardown(check_empty_iv4_intersection_ipv6_remains, setup, teardown),
+		cmocka_unit_test_setup_teardown(check_empty_ipv4_intersection_ipv6_remains, setup, teardown),
 		cmocka_unit_test_setup_teardown(check_empty_ipv4v6_intersections, setup, teardown),
 		cmocka_unit_test_setup_teardown(check_ipv4v6_single_constraint_each, setup, teardown)
 	};
