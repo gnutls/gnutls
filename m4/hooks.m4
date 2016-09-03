@@ -105,7 +105,7 @@ AC_MSG_ERROR([[
   AC_SUBST(GMP_CFLAGS)
   AC_SUBST(GMP_LIBS)
 
-LIBTASN1_MINIMUM=4.3
+LIBTASN1_MINIMUM=4.9
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
       included_libtasn1=$withval,
