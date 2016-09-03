@@ -150,7 +150,6 @@ if test "$rc" != "0"; then
 fi
 
 rm -f tmp-tt.pem
-fi
 
 rc=1
 counter=1
@@ -175,6 +174,7 @@ if test "$rc" != "0"; then
 fi
 
 rm -f tmp-tt.pem
+fi
 
 rc=1
 counter=1
@@ -227,6 +227,8 @@ fi
 rm -f tmp-tt.pem
 
 # Test the GeneralizedTime support
+if test "$(getconf LONG_BIT)" = "64"; then
+
 rc=1
 counter=1
 
@@ -253,5 +255,6 @@ fi
 
 rm -f tmp-tt.pem
 
+fi
 
 exit 0
