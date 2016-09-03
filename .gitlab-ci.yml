@@ -1,57 +1,113 @@
-Build and Check - FIPS140-2 (x86-64):
+image: centos:7
+
+Build and Check - with SSL 3.0/ARCFOUR:
   script:
-  - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
-    --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --enable-seccomp-tests --disable-valgrind-tests --disable-doc && make -j4 && make check -j4
-  - cat tests/test-suite.log
+  - yum install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - yum install -y clang libseccomp-devel nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - make autoreconf && mkdir -p build && cd build &&
+    ../configure --with-ssl3 --with-arcfour128 --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
+    make -j4 && make check -j4
   tags:
-  - x86-64
-  - nettle2
+  - shared
   except:
   - tags
-Build and Check - with SSL3/ARCFOUR:
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/guile/tests/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+
+Build and Check in FIPS140-2 mode:
   script:
-  - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
-    --with-ssl3 --with-arcfour128 --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --enable-seccomp-tests --disable-valgrind-tests --disable-doc && make -j4 && make check -j4
-  - cat tests/test-suite.log
+  - yum install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - yum install -y clang libseccomp-devel nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - make autoreconf && mkdir -p build && cd build &&
+    ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-valgrind-tests &&
+    make -j4 && make check -j4
   tags:
-  - nettle2
+  - shared
   except:
   - tags
-Build and Check - separate build dir:
-  script:
-  - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
-    --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-valgrind-tests --disable-doc && make -j4 && make check -j4
-  - cat tests/test-suite.log
-  tags:
-  - nettle2
-  except:
-  - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - guile/tests/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+
 Build and Check with valgrind:
   script:
-  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
-    --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
-  - cat tests/test-suite.log
+  - yum install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - yum install -y clang libseccomp-devel nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
+    --disable-non-suiteb-curves --disable-doc && make -j4 && make check -j4 
   tags:
-  - x86-64
-  - nettle2
+  - shared
   except:
   - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
+
+# We need a clean 32-bit fedora for testing
+Build and Check - separate build dir (x86):
+  image: nickcis/fedora-32:23
+  script:
+  - linux32 yum install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind 
+  - make autoreconf && mkdir -p build && cd build &&
+    ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
+    make -j4 && make check -j4 
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+
+# Address sanitizer in fedora 24 cannot read suppression files
+Build and Check with asan (nettle3):
+  image: fedora:23
+  script:
+  - yum install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man net-tools
+  - yum install -y clang libasan-static nodejs softhsm datefudge lcov openssl-devel libasan dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
+    ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
+    make -j4 && make check -j4
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
+
 Build and Check with asan (nettle2):
   script:
-  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
-    -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
-    && make -j4 && make check -j4
+  - yum install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man net-tools
+  - yum install -y clang libasan-static nodejs softhsm datefudge lcov openssl-devel libasan dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
+    ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
+    make -j4 && make check -j4
   tags:
-  - nettle2
+  - shared
   except:
   - tags
-Build and Check with asan (nettle3):
-  script:
-  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
-    -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
-    && make -j4 && make check -j4
-  tags:
-  - x86-64
-  - nettle3
-  except:
-  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
