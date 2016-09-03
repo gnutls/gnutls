@@ -29,9 +29,55 @@
 #include <limits.h>
 #include "utils.h"
 
+#if defined(__FreeBSD__)
+/* its libc cannot handle that large allocations */
+void doit(void)
+{
+	exit(77);
+}
+
+#else /* not freebsd */
+
+#if !defined(_WIN32)
+# include <signal.h>
+# include <unistd.h>
+
+static void exit_77(int signo)
+{
+	_exit(77);
+}
+#endif
+
 #define MIN(x,y) ((x)<(y))?(x):(y)
 
 /* Test hashing on large buffers */
+
+#ifdef HAVE_MMAP
+
+#include <sys/mman.h>
+
+static size_t _mmap_size;
+static void *get_mem(size_t size)
+{
+	void *p;
+	_mmap_size = size;
+	p = mmap(NULL, size, PROT_READ, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+	if (p == MAP_FAILED)
+		return NULL;
+	return p;
+}
+
+static void put_mem(void *mem)
+{
+	munmap(mem, _mmap_size);
+}
+
+#else
+
+# define get_mem(x) calloc(1, x)
+# define put_mem(x) free(x)
+
+#endif
 
 void doit(void)
 {
@@ -44,10 +90,15 @@ void doit(void)
 	if (sizeof(size) <= 4)
 		exit(77);
 
+#if !defined(_WIN32)
+	signal(SIGSEGV, exit_77);
+	signal(SIGBUS, exit_77);
+#endif
+
 	global_init();
 
 	size = (ssize_t)UINT_MAX + (ssize_t)64*1024;
-	buf = calloc(1, size);
+	buf = get_mem(size);
 	if (buf == NULL)
 		exit(77);
 
@@ -129,6 +180,7 @@ void doit(void)
 		}
 	}
 
-	free(buf);
+	put_mem(buf);
 	gnutls_global_deinit();
 }
+#endif
