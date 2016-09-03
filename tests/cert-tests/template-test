@@ -117,7 +117,7 @@ fi
 rm -f tmp-tt.pem
 
 # The following test works in 64-bit systems
-if echo __SIZEOF_POINTER__ | cpp -E - - | grep '^8$' >/dev/null; then
+if test "$(getconf LONG_BIT)" = "64"; then
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
