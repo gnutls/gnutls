@@ -13,6 +13,11 @@ See the end for copying conditions.
 ** libgnutls: Added support of PKCS#8 file decryption using DES-CBC-MD5. This
    is added to allow decryption of PKCS #8 private keys from openssl prior to 1.1.0.
 
+** libgnutls: Addressed issue with PKCS#11 signature generation on ECDSA
+   keys. The signature is now written as unsigned integers into the DSASignatureValue
+   structure. Previously signed integers could be written depending on what
+   the underlying module would produce. Addresses #122.
+
 ** gnutls-cli: Fixed starttls regression from 3.5.3.
 
 ** API and ABI modifications:
