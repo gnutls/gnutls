@@ -20,8 +20,11 @@ See the end for copying conditions.
    structure. Previously signed integers could be written depending on what
    the underlying module would produce. Addresses #122.
 
+** libgnutls: backported X.509 unique ID functionality from later versions.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_set_issuer_unique_id: Added
+gnutls_x509_crt_set_subject_unique_id: Added
 
 
 * Version 3.3.24 (released 2016-07-06)
