@@ -84,7 +84,7 @@ _asn1_add_static_node (unsigned int type)
  * @name: null terminated string with the element's name to find.
  *
  * Searches for an element called @name starting from @pointer.  The
- * name is composed by differents identifiers separated by dots.  When
+ * name is composed by different identifiers separated by dots.  When
  * *@pointer has a name, the first identifier must be the name of
  * *@pointer, otherwise it must be the name of one child of *@pointer.
  *
@@ -637,7 +637,7 @@ _asn1_change_integer_value (asn1_node node)
 		      p = NULL;
 		      break;
 		    }
-		  if (p->right)
+		  if (p && p->right)
 		    {
 		      p = p->right;
 		      break;
@@ -753,7 +753,7 @@ _asn1_expand_object_id (asn1_node node)
 
       if (move == RIGHT)
 	{
-	  if (p->right)
+	  if (p && p->right)
 	    p = p->right;
 	  else
 	    move = UP;
@@ -828,7 +828,7 @@ _asn1_expand_object_id (asn1_node node)
 
       if (move == RIGHT)
 	{
-	  if (p->right)
+	  if (p && p->right)
 	    p = p->right;
 	  else
 	    move = UP;
@@ -898,7 +898,7 @@ _asn1_type_set_config (asn1_node node)
 
       if (move == RIGHT)
 	{
-	  if (p->right)
+	  if (p && p->right)
 	    p = p->right;
 	  else
 	    move = UP;
@@ -1007,7 +1007,7 @@ _asn1_check_identifier (asn1_node node)
 		  p = NULL;
 		  break;
 		}
-	      if (p->right)
+	      if (p && p->right)
 		{
 		  p = p->right;
 		  break;
@@ -1067,7 +1067,7 @@ _asn1_set_default_tag (asn1_node node)
 		  p = NULL;
 		  break;
 		}
-	      if (p->right)
+	      if (p && p->right)
 		{
 		  p = p->right;
 		  break;
