@@ -65,6 +65,10 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 		      bigint_t * s);
 
 int
+_gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
+			  gnutls_datum_t *s);
+
+int
 encode_ber_digest_info(const mac_entry_st * e,
 		       const gnutls_datum_t * digest,
 		       gnutls_datum_t * output);

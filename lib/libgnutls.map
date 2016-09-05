@@ -1124,6 +1124,7 @@ GNUTLS_FIPS140_3_4 {
 	dsa_generate_dss_keypair;
 	_gnutls_prf_raw;
 	_gnutls_encode_ber_rs_raw;
+	_gnutls_decode_ber_rs_raw;
 	_rsa_generate_fips186_4_keypair;
 	_gnutls_dh_compute_key;
 	_gnutls_dh_generate_key;
