@@ -125,6 +125,24 @@ Build and Check with valgrind:
       - tests/*.log
       - tests/*/*.log
 
+Build and Check with asan:
+  script:
+  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man net-tools
+  - dnf install -y clang libasan-static nodejs softhsm datefudge lcov openssl-devel libasan dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp
+  - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
+    ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
+    make -j4 && make check -j4 && make local-code-coverage-output
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - tests/*.log
+      - tests/*/*.log
+
 Release build for windows32 DLLs:
   script:
   - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
@@ -217,7 +235,6 @@ Build and Check for windows32 in separate build dir:
       - build/tests/*.log
       - build/tests/*/*.log
 
-
 Build and Check on FreeBSD:
   script:
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
@@ -253,22 +270,3 @@ Build and Check - separate build dir (x86):
       - build/tests/*.log
       - build/tests/*/*.log
 
-# Address sanitizer in fedora 24 cannot read suppression files
-Build and Check with asan:
-  image: fedora:23
-  script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man net-tools
-  - dnf install -y clang libasan-static nodejs softhsm datefudge lcov openssl-devel libasan dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp
-  - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
-    ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
-    make -j4 && make check -j4 && make local-code-coverage-output
-  tags:
-  - shared
-  except:
-  - tags
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - tests/*.log
-      - tests/*/*.log
