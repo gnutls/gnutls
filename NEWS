@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 3.5.4 (unreleased)
 
+** libgnutls: Corrected the comparison of the serial size in OCSP response.
+   Previously the OCSP certificate check wouldn't verify the serial length
+   and could succeed in cases it shouldn't. Reported by Stefan Buehler.
+
 ** libgnutls: Added support for IP name constraints. Patch by Martin Ukrop.
 
 ** libgnutls: Added support for decrypting PKCS#8 files which use HMAC-SHA256
