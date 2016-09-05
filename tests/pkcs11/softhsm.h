@@ -50,13 +50,13 @@ inline static const char *softhsm_lib(void)
 {
 	const char *lib;
 
-	if (sizeof(int) == 8 && access(LIB1, R_OK) == 0) {
+	if (sizeof(long) == 8 && access(LIB1, R_OK) == 0) {
 		lib = LIB1;
 	} else if (access(LIB2, R_OK) == 0) {
 		lib = LIB2;
 	} else if (access(LIB3, R_OK) == 0) {
 		lib = LIB3;
-	} else if (sizeof(int) == 8 && access(LIB4, R_OK) == 0) {
+	} else if (sizeof(long) == 8 && access(LIB4, R_OK) == 0) {
 		lib = LIB4;
 	} else {
 		fprintf(stderr, "cannot find softhsm module\n");
