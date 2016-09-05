@@ -56,39 +56,33 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 		return _gnutls_asn2err(result);
 	}
 
-	if (r->data[0] >= 0x80) {
-		tmp = gnutls_malloc(r->size+1);
+	if (s->data[0] >= 0x80 || r->data[0] >= 0x80) {
+		tmp = gnutls_malloc(MAX(r->size, s->size)+1);
 		if (tmp == NULL) {
 			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 			goto cleanup;
 		}
-		memcpy(&tmp[1], r->data, r->size);
-		tmp[0] = 0;
-		result = asn1_write_value(sig, "r", tmp, 1+r->size);
+	}
 
-		gnutls_free(tmp);
-		tmp = NULL;
+	if (r->data[0] >= 0x80) {
+		tmp[0] = 0;
+		memcpy(&tmp[1], r->data, r->size);
+		result = asn1_write_value(sig, "r", tmp, 1+r->size);
 	} else {
 		result = asn1_write_value(sig, "r", r->data, r->size);
 	}
+
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if (s->data[0] >= 0x80) {
-		tmp = gnutls_malloc(s->size+1);
-		if (tmp == NULL) {
-			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-			goto cleanup;
-		}
-		memcpy(&tmp[1], s->data, s->size);
-		tmp[0] = 0;
-		result = asn1_write_value(sig, "s", tmp, 1+s->size);
 
-		gnutls_free(tmp);
-		tmp = NULL;
+	if (s->data[0] >= 0x80) {
+		tmp[0] = 0;
+		memcpy(&tmp[1], s->data, s->size);
+		result = asn1_write_value(sig, "s", tmp, 1+s->size);
 	} else {
 		result = asn1_write_value(sig, "s", s->data, s->size);
 	}
@@ -107,6 +101,7 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 
 	ret = 0;
  cleanup:
+ 	gnutls_free(tmp);
 	asn1_delete_structure(&sig);
 	return ret;
 }
