@@ -195,7 +195,7 @@ Build and Check for windows64 in separate build dir:
   script:
   - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
-  - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw32-libidn util-linux
+  - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux
   - dnf install -y "http://people.redhat.com/nmavrogi/fedora/mingw64-libcmocka-1.0.1-1.fc24.noarch.rpm"
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
