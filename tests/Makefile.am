@@ -117,7 +117,7 @@ endif
 
 if HAVE_CMOCKA
 LDADD += $(CMOCKA_LIBS)
-ctests += dtls-sliding-window ip-utils name-constraints-ip
+ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8
 endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
