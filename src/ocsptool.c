@@ -495,7 +495,6 @@ static void ask_server(const char *url)
 	}
 
 	_response_info(&resp_data);
-	fprintf(outfile, "\n");
 
 	if (HAVE_OPT(LOAD_TRUST)) {
 		v = _verify_response(&resp_data, n, NULL);
