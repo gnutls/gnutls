@@ -210,7 +210,7 @@ Build and Check for windows64 in separate build dir:
     expire_in: 1 week
     when: on_failure
     paths:
-      - guile/tests/*.log
+      - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
 
@@ -233,7 +233,7 @@ Build and Check for windows32 in separate build dir:
     expire_in: 1 week
     when: on_failure
     paths:
-      - guile/tests/*.log
+      - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
 
