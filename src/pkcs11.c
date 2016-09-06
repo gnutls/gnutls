@@ -238,7 +238,9 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		}
 
 		fprintf(outfile, "\n");
+		gnutls_pkcs11_obj_deinit(crt_list[i]);
 	}
+	gnutls_free(crt_list);
 
 	UNFIX;
 	return;
