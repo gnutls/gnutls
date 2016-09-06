@@ -48,9 +48,11 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/doc/examples
 
 AM_LDFLAGS = -no-install
-LDADD = ../lib/libgnutls.la \
-	libutils.la \
+COMMON_LDADD = ../lib/libgnutls.la \
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) $(LIBSECCOMP)
+
+LDADD = $(COMMON_LDADD) \
+	libutils.la
 
 dane_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
 
@@ -116,8 +118,14 @@ ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client
 endif
 
 if HAVE_CMOCKA
-LDADD += $(CMOCKA_LIBS)
+CMOCKA_LDADD = $(COMMON_LDADD) $(CMOCKA_LIBS)
 ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8
+
+dtls_sliding_window_LDADD = $(CMOCKA_LDADD)
+ip_utils_LDADD = $(CMOCKA_LDADD)
+name_constraints_ip_LDADD = $(CMOCKA_LDADD)
+conv_utf8_LDADD = $(CMOCKA_LDADD)
+
 endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread

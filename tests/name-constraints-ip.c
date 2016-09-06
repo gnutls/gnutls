@@ -39,9 +39,6 @@
 #include <gnutls/x509.h>
 #include "../lib/x509/ip.h"
 
-extern int debug;
-void doit(void);
-
 typedef struct test_vars_t {
 	gnutls_x509_name_constraints_t nc;
 	gnutls_x509_name_constraints_t nc2;
@@ -134,8 +131,7 @@ static void check_generation_reading_basic_checking(void **glob_state)
 	char ip_out[60];
 
 	gnutls_global_set_log_function(tls_log_func);
-	if (debug)
-		gnutls_global_set_log_level(6000);
+	gnutls_global_set_log_level(2);
 
 	/* 1: test the generation of name constraints */
 
@@ -189,10 +185,10 @@ static void check_generation_reading_basic_checking(void **glob_state)
 	i = 0;
 	do {
 		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &type, &name);
-		if (debug) {
+#ifdef DEBUG
 			_gnutls_cidr_to_string(name.data, name.size, ip_out, sizeof(ip_out));
 			printf("Loaded name constraint: %s\n",ip_out);
-		}
+#endif
 	} while(ret == 0);
 
 	if (i-1 != num_permitted) {
@@ -202,10 +198,10 @@ static void check_generation_reading_basic_checking(void **glob_state)
 	i = 0;
 	do {
 		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &type, &name);
-		if (debug) {
+#ifdef DEBUG
 		_gnutls_cidr_to_string(name.data, name.size, ip_out, sizeof(ip_out));
 		printf("Loaded name constraint: %s\n",ip_out);
-		}
+#endif
 	} while(ret == 0);
 
 	if (i-1 != num_excluded) {
@@ -708,7 +704,7 @@ static int teardown(void **state) {
 	return 0;
 }
 
-void doit(void)
+int main()
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test_setup_teardown(check_generation_reading_basic_checking, setup, teardown),
