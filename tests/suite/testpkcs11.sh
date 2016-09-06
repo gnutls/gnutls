@@ -69,6 +69,14 @@ write_privkey () {
 		exit_error
 	fi
 
+	echo -n "* Checking whether object was marked private... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --list-privkeys "${token};object=gnutls-client2" 2>/dev/null | grep 'Label\:' >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		echo "private object was public"
+		exit_error
+	fi
+	echo ok
+
 }
 
 # $1: token
@@ -401,6 +409,18 @@ write_certificate_test () {
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=gnutls-client;object-type=private;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${TMPFILE}" 2>&1
 	if test $? != 0; then
 		echo "ID was not set on copy"
+		exit_error
+	fi
+	echo ok
+
+	if test -n "${BROKEN_SOFTHSM2}";then
+		return
+	fi
+
+	echo -n "* Checking whether object was public... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --list-all-certs "${token};object=gnutls-client;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo "certificate object was not public"
 		exit_error
 	fi
 	echo ok
