@@ -270,7 +270,6 @@ flag = {
 flag = {
     name      = mark-private;
     disable   = "no";
-    enabled;
     descrip   = "Marks the object to be written as private";
     doc = "Marks the object to be generated/written with the CKA_PRIVATE flag. The written object will require a PIN to be used.";
 };
