@@ -1164,6 +1164,9 @@ GNUTLS_PRIVATE_3_4 {
 	# Internal symbols needed by tests/name-constraints:
 	_gnutls_ip_to_string;
 	_gnutls_cidr_to_string;
+	# needed by tests/conv-utf8.c:
+	_gnutls_utf8_to_ucs2;
+	_gnutls_ucs2_to_utf8;
 	# Internal symbols needed by tests/name-constraints-merge:
 	_gnutls_x509_name_constraints_merge;
 	_gnutls_server_name_set_raw;
