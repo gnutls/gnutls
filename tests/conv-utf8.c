@@ -40,12 +40,30 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 int _gnutls_ucs2_to_utf8(const void *data, size_t size,
                          gnutls_datum_t * output, unsigned be);
 
+#define DEBUG
+
+#ifdef DEBUG
+static void PRINT(const char *str, unsigned char *val, unsigned int size)
+{
+	unsigned i;
+	printf("%s", str);
+	for (i=0;i<size;i++) {
+		printf("%.2x", val[i]);
+	}
+	printf("\n");
+}
+#else
+#define PRINT(x, y, x)
+#endif
+
 #define UTF8_MATCH(fname, utf8, utf16) \
 static void fname(void **glob_state) \
 { \
 	gnutls_datum_t out; \
 	int ret = _gnutls_utf8_to_ucs2(utf8, strlen(utf8), &out); \
 	assert_int_equal(ret, 0); \
+	if (out.size != sizeof(utf16)-1 || memcmp(utf16, out.data, out.size) != 0) { PRINT("got:      ", out.data, out.size); \
+	PRINT("expected: ", (unsigned char*)utf16, sizeof(utf16)-1); } \
 	assert_int_equal(out.size, sizeof(utf16)-1); \
 	assert_memory_equal(utf16, out.data, out.size); \
 	gnutls_free(out.data); \
@@ -57,6 +75,8 @@ static void fname(void **glob_state) \
 	gnutls_datum_t out; \
 	int ret = _gnutls_ucs2_to_utf8(utf16, sizeof(utf16)-1, &out, 1); \
 	assert_int_equal(ret, 0); \
+	if (out.size != strlen(utf8) || memcmp(utf8, out.data, out.size) != 0) { PRINT("got:      ", out.data, out.size); \
+	PRINT("expected: ", (unsigned char*)utf8, strlen(utf8)); } \
 	assert_int_equal(out.size, strlen(utf8)); \
 	assert_memory_equal(utf8, out.data, out.size); \
 	gnutls_free(out.data); \
@@ -89,16 +109,19 @@ UTF16_MATCH(check_utf16_ok3, "简体中文", "\x7B\x80\x4F\x53\x4E\x2D\x65\x87")
 UTF16_MATCH(check_utf16_ok4, "Σὲ γνωρίζω ἀπὸ", "\x03\xA3\x1F\x72\x00\x20\x03\xB3\x03\xBD\x03\xC9\x03\xC1\x03\xAF\x03\xB6\x03\xC9\x00\x20\x1F\x00\x03\xC0\x1F\x78");
 
 UTF8_FAIL(check_utf8_fail1, "\xfe\xff\xaa\x80\xff", 5);
+#ifndef _WIN32
 UTF8_FAIL(check_utf8_fail2, "\x64\x00\x62\xf3\x64\x65", 6);
-
 UTF16_FAIL(check_utf16_fail1, "\xd8\x00\xdb\xff\x00\x63\x00\x04", 8);
+#endif
 
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(check_utf8_fail1),
+#ifndef _WIN32
 		cmocka_unit_test(check_utf8_fail2),
 		cmocka_unit_test(check_utf16_fail1),
+#endif
 		cmocka_unit_test(check_utf8_ok1),
 		cmocka_unit_test(check_utf8_ok2),
 		cmocka_unit_test(check_utf8_ok3),
