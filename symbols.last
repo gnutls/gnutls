@@ -279,6 +279,7 @@ gnutls_ocsp_status_request_get@GNUTLS_3_4
 gnutls_ocsp_status_request_is_checked@GNUTLS_3_4
 gnutls_oid_to_digest@GNUTLS_3_4
 gnutls_oid_to_ecc_curve@GNUTLS_3_4
+gnutls_oid_to_mac@GNUTLS_3_4
 gnutls_oid_to_pk@GNUTLS_3_4
 gnutls_oid_to_sign@GNUTLS_3_4
 gnutls_openpgp_crt_check_email@GNUTLS_3_4
@@ -749,6 +750,7 @@ gnutls_x509_aki_get_id@GNUTLS_3_4
 gnutls_x509_aki_init@GNUTLS_3_4
 gnutls_x509_aki_set_cert_issuer@GNUTLS_3_4
 gnutls_x509_aki_set_id@GNUTLS_3_4
+gnutls_x509_cidr_to_rfc5280@GNUTLS_3_4
 gnutls_x509_crl_check_issuer@GNUTLS_3_4
 gnutls_x509_crl_deinit@GNUTLS_3_4
 gnutls_x509_crl_dist_points_deinit@GNUTLS_3_4
