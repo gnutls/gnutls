@@ -36,6 +36,7 @@
 
 const char *side = NULL;
 
+/* if @host is NULL certificate check is skipped */
 void
 test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
@@ -67,8 +68,8 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	if (ret < 0)
 		exit(1);
 
-
-	assert(gnutls_server_name_set(client, GNUTLS_NAME_DNS, host, strlen(host))>=0);
+	if (host)
+		assert(gnutls_server_name_set(client, GNUTLS_NAME_DNS, host, strlen(host))>=0);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				client_cred);
@@ -83,7 +84,7 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	HANDSHAKE(client, server);
 
 	/* check the number of certificates received and verify */
-	{
+	if (host) {
 		gnutls_typed_vdata_st data[2];
 		unsigned status;
 
