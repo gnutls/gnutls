@@ -615,8 +615,6 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 		size -= 2;
 	}
 
-	src_len = wcslen(data);
-
 	src = gnutls_malloc(size+2);
 	if (src == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -632,6 +630,8 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 	}
 	src[size] = 0;
 	src[size+1] = 0;
+
+	src_len = wcslen(src);
 
 	ret =
 	    WideCharToMultiByte(CP_UTF8, flags,
