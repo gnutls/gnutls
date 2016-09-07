@@ -185,8 +185,8 @@ int _gnutls_mask_ip(unsigned char *ip, const unsigned char *mask, unsigned ipsiz
 
 /**
  * gnutls_x509_cidr_to_rfc5280:
- * @param cidr CIDR in RFC4632 format (IP/prefix), null-terminated
- * @param cidr_rfc5280 CIDR range converted to RFC5280 format
+ * @cidr: CIDR in RFC4632 format (IP/prefix), null-terminated
+ * @cidr_rfc5280: CIDR range converted to RFC5280 format
  *
  * This function will convert text CIDR range with prefix (such as '10.0.0.0/8')
  * to RFC5280 (IP address in network byte order followed by its network mask).

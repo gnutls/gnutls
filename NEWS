@@ -11,13 +11,15 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for IP name constraints. Patch by Martin Ukrop.
 
-** libgnutls: Added support for decrypting PKCS#8 files which use HMAC-SHA256
-   as PRF.
-
-** libgnutls: Added support for internationalized passwords in PKCS#12 files.
-
 ** libgnutls: Added support of PKCS#8 file decryption using DES-CBC-MD5. This
    is added to allow decryption of PKCS #8 private keys from openssl prior to 1.1.0.
+
+** libgnutls: Added support for decrypting PKCS#8 files which use HMAC-SHA256
+   as PRF. This allow decrypting PKCS #8 private keys generated with openssl 1.1.0.
+
+** libgnutls: Added support for internationalized passwords in PKCS#12 files.
+   Previous versions would only encrypt or decrypt using passwords from the ASCII
+   set.
 
 ** libgnutls: Addressed issue with PKCS#11 signature generation on ECDSA
    keys. The signature is now written as unsigned integers into the DSASignatureValue
