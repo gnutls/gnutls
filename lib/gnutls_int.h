@@ -889,6 +889,8 @@ typedef struct {
 	int16_t selected_cert_list_length;
 	struct gnutls_privkey_st *selected_key;
 	bool selected_need_free;
+	gnutls_status_request_ocsp_func selected_ocsp_func;
+	void *selected_ocsp_func_ptr;
 
 	/* In case of a client holds the extensions we sent to the peer;
 	 * otherwise the extensions we received from the client.

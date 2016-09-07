@@ -193,40 +193,6 @@ server_recv(gnutls_session_t session,
 	return 0;
 }
 
-/*
-  Servers return a certificate response along with their certificate
-  by sending a "CertificateStatus" message immediately after the
-  "Certificate" message (and before any "ServerKeyExchange" or
-  "CertificateRequest" messages).  If a server returns a
-  "CertificateStatus" message, then the server MUST have included an
-  extension of type "status_request" with empty "extension_data" in
-  the extended server hello.
-*/
-
-static int
-server_send(gnutls_session_t session,
-	    gnutls_buffer_st * extdata, status_request_ext_st * priv)
-{
-	int ret;
-	gnutls_certificate_credentials_t cred;
-
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
-	if (cred == NULL)	/* no certificate authentication */
-		return gnutls_assert_val(0);
-
-	if (cred->ocsp_func == NULL)
-		return gnutls_assert_val(GNUTLS_E_SUCCESS);
-
-	ret =
-	    cred->ocsp_func(session, cred->ocsp_func_ptr, &priv->response);
-	if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS)
-		return 0;
-	else if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	return GNUTLS_E_INT_RET_0;
-}
 
 static int
 client_recv(gnutls_session_t session,
@@ -269,7 +235,16 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 					     GNUTLS_EXTENSION_STATUS_REQUEST,
 					     epriv);
 
-		return server_send(session, extdata, priv);
+		/*
+		  Servers return a certificate response along with their certificate
+		  by sending a "CertificateStatus" message immediately after the
+		  "Certificate" message (and before any "ServerKeyExchange" or
+		  "CertificateRequest" messages).  If a server returns a
+		  "CertificateStatus" message, then the server MUST have included an
+		  extension of type "status_request" with empty "extension_data" in
+		  the extended server hello.
+		*/
+		return GNUTLS_E_INT_RET_0;
 	}
 }
 
@@ -409,8 +384,8 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
  * OCSP response. The response must be a value allocated using gnutls_malloc(),
  * and will be deinitialized by the caller.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
- *   otherwise a negative error code is returned.
+ * It is possible to set a specific callback for each provided certificate
+ * using gnutls_certificate_set_ocsp_status_request_function2().
  *
  * Since: 3.1.3
  **/
@@ -420,17 +395,59 @@ gnutls_certificate_set_ocsp_status_request_function
 gnutls_status_request_ocsp_func ocsp_func, void *ptr)
 {
 
-	sc->ocsp_func = ocsp_func;
-	sc->ocsp_func_ptr = ptr;
+	sc->glob_ocsp_func = ocsp_func;
+	sc->glob_ocsp_func_ptr = ptr;
+}
+
+/**
+ * gnutls_certificate_set_ocsp_status_request_function2:
+ * @sc: is a #gnutls_certificate_credentials_t type.
+ * @idx: is a certificate index as returned by gnutls_certificate_set_key() and friends
+ * @ocsp_func: function pointer to OCSP status request callback.
+ * @ptr: opaque pointer passed to callback function
+ *
+ * This function is to be used by server to register a callback to
+ * handle OCSP status requests that correspond to the indexed certificate
+ * from the client.  The callback will be invoked if the client supplied a 
+ * status-request OCSP extension.
+ *
+ * The callback function prototype is:
+ *
+ * typedef int (*gnutls_status_request_ocsp_func)
+ *    (gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response);
+ *
+ * The callback will be invoked if the client requests an OCSP certificate
+ * status.  The callback may return %GNUTLS_E_NO_CERTIFICATE_STATUS, if
+ * there is no recent OCSP response. If the callback returns %GNUTLS_E_SUCCESS,
+ * it is expected to have the @ocsp_response field set with a valid (DER-encoded)
+ * OCSP response. The response must be a value allocated using gnutls_malloc(),
+ * and will be deinitialized by the caller.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ *
+ * Since: 3.5.5
+ **/
+int
+gnutls_certificate_set_ocsp_status_request_function2
+(gnutls_certificate_credentials_t sc, unsigned idx, gnutls_status_request_ocsp_func ocsp_func, void *ptr)
+{
+	if (idx >= sc->ncerts)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	sc->certs[idx].ocsp_func = ocsp_func;
+	sc->certs[idx].ocsp_func_ptr = ptr;
+
+	return 0;
 }
 
 static int file_ocsp_func(gnutls_session_t session, void *ptr,
 			  gnutls_datum_t * ocsp_response)
 {
 	int ret;
-	gnutls_certificate_credentials_t sc = ptr;
+	const char *file = ptr;
 
-	ret = gnutls_load_file(sc->ocsp_response_file, ocsp_response);
+	ret = gnutls_load_file(file, ocsp_response);
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_STATUS);
 
@@ -441,13 +458,15 @@ static int file_ocsp_func(gnutls_session_t session, void *ptr,
  * gnutls_certificate_set_ocsp_status_request_file:
  * @sc: is a credentials structure.
  * @response_file: a filename of the OCSP response
- * @flags: should be zero
+ * @idx: is a certificate index as returned by gnutls_certificate_set_key() and friends
  *
  * This function sets the filename of an OCSP response, that will be
- * sent to the client if requests an OCSP certificate status. This is
- * a convenience function which is inefficient on busy servers since
+ * sent to the client if requests an OCSP certificate status for
+ * the certificate chain specified by @idx.
+ *
+ * This is a convenience function which may be inefficient on busy servers since
  * the file is opened on every access. Use 
- * gnutls_certificate_set_ocsp_status_request_function() to fine-tune
+ * gnutls_certificate_set_ocsp_status_request_function2() to fine-tune
  * file accesses.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
@@ -458,14 +477,17 @@ static int file_ocsp_func(gnutls_session_t session, void *ptr,
 int
 gnutls_certificate_set_ocsp_status_request_file
 (gnutls_certificate_credentials_t sc, const char *response_file,
- unsigned int flags)
+ unsigned idx)
 {
-	sc->ocsp_func = file_ocsp_func;
-	sc->ocsp_func_ptr = sc;
-	gnutls_free(sc->ocsp_response_file);
-	sc->ocsp_response_file = gnutls_strdup(response_file);
-	if (sc->ocsp_response_file == NULL)
+	if (idx >= sc->ncerts)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	gnutls_free(sc->certs[idx].ocsp_response_file);
+	sc->certs[idx].ocsp_response_file = gnutls_strdup(response_file);
+	if (sc->certs[idx].ocsp_response_file == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	gnutls_certificate_set_ocsp_status_request_function2(sc, idx, file_ocsp_func, sc->certs[idx].ocsp_response_file);
 
 	return 0;
 }
@@ -540,8 +562,12 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 	uint8_t *data;
 	int data_size = 0;
 	int ret;
-	status_request_ext_st *priv = NULL;
 	extension_priv_data_t epriv;
+	gnutls_datum_t response = {NULL, 0};
+	gnutls_status_request_ocsp_func func;
+	void *func_ptr;
+	gnutls_certificate_credentials_t cred;
+
 	if (again == 0) {
 		ret =
 		    _gnutls_ext_get_session_data(session,
@@ -549,24 +575,47 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 						 &epriv);
 		if (ret < 0)
 			return 0;
-		priv = epriv;
 
-		if (!priv->response.size)
+		cred = (gnutls_certificate_credentials_t)
+			_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+		if (cred == NULL)
+			return gnutls_assert_val(0);
+
+		if (session->internals.selected_ocsp_func) {
+			func = session->internals.selected_ocsp_func;
+			func_ptr = session->internals.selected_ocsp_func_ptr;
+		} else if (cred->glob_ocsp_func) {
+			func = cred->glob_ocsp_func;
+			func_ptr = cred->glob_ocsp_func_ptr;
+		} else
 			return 0;
 
-		data_size = priv->response.size + 4;
+		if (func) {
+			ret = func(session, func_ptr, &response);
+			if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS)
+				return 0;
+			else if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
+
+		if (!response.size)
+			return 0;
+
+		data_size = response.size + 4;
 		bufel =
 		    _gnutls_handshake_alloc(session, data_size);
-		if (!bufel)
+		if (!bufel) {
+			_gnutls_free_datum(&response);
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
 
 		data = _mbuffer_get_udata_ptr(bufel);
 
 		data[0] = 0x01;
-		_gnutls_write_uint24(priv->response.size, &data[1]);
-		memcpy(&data[4], priv->response.data, priv->response.size);
+		_gnutls_write_uint24(response.size, &data[1]);
+		memcpy(&data[4], response.data, response.size);
 
-		_gnutls_free_datum(&priv->response);
+		_gnutls_free_datum(&response);
 	}
 	return _gnutls_send_handshake(session, data_size ? bufel : NULL,
 				      GNUTLS_HANDSHAKE_CERTIFICATE_STATUS);

@@ -1761,9 +1761,14 @@ gnutls_certificate_set_ocsp_status_request_function
 gnutls_status_request_ocsp_func ocsp_func, void *ptr);
 
 int
+gnutls_certificate_set_ocsp_status_request_function2
+(gnutls_certificate_credentials_t res, unsigned idx,
+gnutls_status_request_ocsp_func ocsp_func, void *ptr);
+
+int
 gnutls_certificate_set_ocsp_status_request_file
 (gnutls_certificate_credentials_t res, const char *response_file,
- unsigned int flags);
+ unsigned idx);
 
 int gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 					     gnutls_datum_t * responder_id,

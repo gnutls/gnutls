@@ -63,6 +63,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
 			gnutls_pcert_deinit(&sc->certs[i].cert_list[j]);
 		}
 		gnutls_free(sc->certs[i].cert_list);
+		gnutls_free(sc->certs[i].ocsp_response_file);
 		_gnutls_str_array_clear(&sc->certs[i].names);
 	}
 
@@ -200,7 +201,6 @@ gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 {
 	gnutls_x509_trust_list_deinit(sc->tlist, 1);
 	gnutls_certificate_free_keys(sc);
-	gnutls_free(sc->ocsp_response_file);
 	memset(sc->pin_tmp, 0, sizeof(sc->pin_tmp));
 #ifdef ENABLE_OPENPGP
 	gnutls_openpgp_keyring_deinit(sc->keyring);

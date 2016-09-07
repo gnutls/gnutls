@@ -1049,6 +1049,8 @@ certificate_credential_append_crt_list(gnutls_certificate_credentials_t
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
+	memset(&res->certs[res->ncerts], 0, sizeof(res->certs[0]));
+
 	res->certs[res->ncerts].cert_list = crt;
 	res->certs[res->ncerts].cert_list_length = nr;
 	res->certs[res->ncerts].names = names;
