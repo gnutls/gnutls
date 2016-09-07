@@ -135,7 +135,8 @@ gnutls_certificate_get_issuer(gnutls_certificate_credentials_t sc,
  * This function will return the DER encoded certificate of the
  * server or any other certificate on its certificate chain (based on @idx2).
  * The returned data should be treated as constant and only accessible during the lifetime
- * of @sc.
+ * of @sc. The @idx1 matches the value gnutls_certificate_set_x509_key() and friends
+ * functions.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. In case the indexes are out of bounds %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE

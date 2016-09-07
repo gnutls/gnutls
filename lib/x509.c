@@ -966,7 +966,7 @@ read_key_file(gnutls_certificate_credentials_t res,
  * The @key may be %NULL if you are using a sign callback, see
  * gnutls_sign_callback_set().
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
  **/
 int
 gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res,
@@ -1002,7 +1002,7 @@ gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res,
  * The @key may be %NULL if you are using a sign callback, see
  * gnutls_sign_callback_set().
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
  **/
 int
 gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
@@ -1032,7 +1032,8 @@ gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
 		return ret;
 	}
 
-	return 0;
+	/* return the index of the chain */
+	return res->ncerts-1;
 }
 
 int
@@ -1092,7 +1093,7 @@ certificate_credentials_append_pkey(gnutls_certificate_credentials_t res,
  * If that function fails to load the @res type is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1171,7 +1172,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
-	return 0;
+	return res->ncerts-1;
 
       cleanup:
 	gnutls_free(pcerts);
@@ -1196,6 +1197,8 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
  * If there is no key with the given index,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the key with the
  * given index is not a X.509 key, %GNUTLS_E_INVALID_REQUEST is returned.
+ * The @index matches the value gnutls_certificate_set_x509_key() and friends
+ * functions.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
@@ -1230,7 +1233,8 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
  * certificate list must be deallocated with gnutls_x509_crt_deinit(), and the
  * list itself must be freed with gnutls_free().
  *
- * If there is no certificate with the given index,
+ * The @index matches the value gnutls_certificate_set_x509_key() and friends
+ * functions. If there is no certificate with the given index,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the certificate
  * with the given index is not a X.509 certificate, %GNUTLS_E_INVALID_REQUEST
  * is returned. The returned certificates must be deinitialized after
@@ -1289,18 +1293,18 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t type.  This function may be
  * called more than once, in case multiple keys/certificates exist for
- * the server.  For clients that wants to send more than its own end
- * entity certificate (e.g., also an intermediate CA cert) then put
- * the certificate chain in @pcert_list. 
+ * the server.  For clients that want to send more than their own end-
+ * entity certificate (e.g., also an intermediate CA cert), the full
+ * certificate chain must be provided in @pcert_list.
  *
  * Note that the @key and the elements of @pcert_list will become part of the credentials 
  * structure and must not be deallocated. They will be automatically deallocated 
- * when the @res type is deinitialized.
+ * when the @res structure is deinitialized.
  *
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
  *
  * Since: 3.0
  **/
@@ -1386,7 +1390,7 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 		return ret;
 	}
 
-	return 0;
+	return res->ncerts-1;
 
       cleanup:
 	_gnutls_str_array_clear(&str_names);
@@ -1467,7 +1471,7 @@ gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
  *
  * Since: 3.1.11
  **/
@@ -1515,7 +1519,8 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ *
  **/
 int
 gnutls_certificate_set_x509_key_file2(gnutls_certificate_credentials_t res,
@@ -1544,7 +1549,7 @@ gnutls_certificate_set_x509_key_file2(gnutls_certificate_credentials_t res,
 		return ret;
 	}
 
-	return 0;
+	return res->ncerts-1;
 }
 
 /* Returns 0 if it's ok to use the gnutls_kx_algorithm_t with this 
@@ -1936,7 +1941,8 @@ int ret;
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ *
  **/
 int
  gnutls_certificate_set_x509_simple_pkcs12_file
@@ -1991,7 +1997,7 @@ int
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
  *
  * Since: 2.8.0
  **/
@@ -2004,7 +2010,7 @@ int
 	gnutls_x509_crt_t *chain = NULL;
 	gnutls_x509_crl_t crl = NULL;
 	unsigned int chain_size = 0, i;
-	int ret;
+	int ret, idx;
 
 	ret = gnutls_pkcs12_init(&p12);
 	if (ret < 0) {
@@ -2045,6 +2051,8 @@ int
 			gnutls_assert();
 			goto done;
 		}
+
+		idx = ret;
 	} else {
 		gnutls_assert();
 		ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -2059,7 +2067,7 @@ int
 		}
 	}
 
-	ret = 0;
+	ret = idx;
 
       done:
 	if (chain) {
