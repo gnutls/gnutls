@@ -21,6 +21,9 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+# This test cannot run under windows because it passes UTF8 data on command
+# line. This seems not to work under windows.
+
 srcdir="${srcdir:-.}"
 top_builddir="${top_builddir:-../..}"
 CERTTOOL="${CERTTOOL:-${top_builddir}/src/certtool${EXEEXT}}"

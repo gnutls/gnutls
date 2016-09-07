@@ -62,7 +62,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
-	provable-dh userid sha2-test sha2-dsa-test pkcs12-utf8
+	provable-dh userid sha2-test sha2-dsa-test
 
 if !ENABLE_FIPS140
 dist_check_SCRIPTS += pkcs12
@@ -87,7 +87,7 @@ endif
 
 if !WINDOWS
 dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
-	tlsfeature-test template-exts-test pkcs1-pad
+	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8
 endif
 
 if ENABLE_DANE
