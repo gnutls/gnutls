@@ -405,10 +405,9 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
  * The callback will be invoked if the client requests an OCSP certificate
  * status.  The callback may return %GNUTLS_E_NO_CERTIFICATE_STATUS, if
  * there is no recent OCSP response. If the callback returns %GNUTLS_E_SUCCESS,
- * the server will provide the client with the ocsp_response.
- *
- * The response must be a value allocated using gnutls_malloc(), and will be
- * deinitialized when needed.
+ * it is expected to have the @ocsp_response field set with a valid (DER-encoded)
+ * OCSP response. The response must be a value allocated using gnutls_malloc(),
+ * and will be deinitialized by the caller.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
