@@ -8,7 +8,7 @@ Compile minimal library and openssl compat:
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe --disable-openpgp-authentication
-    --disable-ocsp --disable-session-tickets --disable-openssl-compatibility --disable-non-suiteb-curves
+    --disable-ocsp --disable-session-tickets --disable-non-suiteb-curves
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
     --disable-ssl3-support --disable-ssl2-support --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j4
   tags:
