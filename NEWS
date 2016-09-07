@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 3.3.25 (unreleased)
 
+** libgnutls: Corrected the comparison of the serial size in OCSP response.
+   Previously the OCSP certificate check wouldn't verify the serial length
+   and could succeed in cases it shouldn't (GNUTLS-SA-2016-3).
+   Reported by Stefan Buehler.
+
 ** libgnutls: Fixes in gnutls_x509_crt_list_import2, which was
    ignoring flags if all certificates in the list fit within the
    initially allocated memory.
@@ -12,7 +17,7 @@ See the end for copying conditions.
 ** libgnutls: Fix gnutls_pkcs12_simple_parse to always extract the complete chain,
    even when the extra_certs was non-null. Report and fix by Stefan Sørensen.
 
-** libgnutls: Added support for decrypting PKCS#8 files which use HMAC-SHA256
+** libgnutls: Added support for decrypting PKCS#8 files which use the HMAC-SHA256
    as PRF.
 
 ** libgnutls: Addressed issue with PKCS#11 signature generation on ECDSA
