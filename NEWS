@@ -3,11 +3,12 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.5.4 (unreleased)
+* Version 3.5.4 (released 2016-09-08)
 
 ** libgnutls: Corrected the comparison of the serial size in OCSP response.
    Previously the OCSP certificate check wouldn't verify the serial length
-   and could succeed in cases it shouldn't. Reported by Stefan Buehler.
+   and could succeed in cases it shouldn't (GNUTLS-SA-2016-3).
+   Reported by Stefan Buehler.
 
 ** libgnutls: Added support for IP name constraints. Patch by Martin Ukrop.
 
