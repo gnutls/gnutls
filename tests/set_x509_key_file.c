@@ -36,7 +36,7 @@
 
 static time_t mytime(time_t * t)
 {
-	time_t then = 1461671166;
+	time_t then = 1470002400;
 	if (t)
 		*t = then;
 
@@ -62,18 +62,68 @@ static void compare(const gnutls_datum_t *der, const void *ipem)
 	return;
 }
 
+static unsigned set_cert(gnutls_certificate_credentials_t xcred, const gnutls_datum_t *key, const gnutls_datum_t *cert)
+{
+	const char *certfile;
+	FILE *fp;
+	int ret;
+
+	certfile = get_tmpname(NULL);
+
+	fp = fopen(certfile, "w");
+	if (fp == NULL)
+		fail("error in fopen\n");
+	assert(fwrite(cert->data, 1, cert->size, fp)>0);
+	assert(fwrite(key->data, 1, key->size, fp)>0);
+	fclose(fp);
+
+	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, certfile,
+						    GNUTLS_X509_FMT_PEM, NULL, 0);
+	if (ret < 0)
+		fail("set_x509_key_file failed: %s\n", gnutls_strerror(ret));
+
+	/* return index */
+	return ret;
+}
+
+static void verify_written_cert(gnutls_certificate_credentials_t xcred, unsigned idx, const gnutls_datum_t *cert, unsigned ncerts)
+{
+	int ret;
+	gnutls_datum_t tcert = {NULL, 0};
+
+	/* verify whether the stored certificate match the ones we have */
+	ret = gnutls_certificate_get_crt_raw(xcred, idx, 0, &tcert);
+	if (ret < 0) {
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	compare(&tcert, cert->data);
+
+	if (ncerts > 1) {
+		ret = gnutls_certificate_get_crt_raw(xcred, idx, 1, &tcert);
+		if (ret < 0) {
+			fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		/* skip headers of first cert */
+		compare(&tcert, cert->data+2);
+	}
+}
+
 void doit(void)
 {
 	int ret;
 	gnutls_certificate_credentials_t xcred, clicred;
 	const char *keyfile = "./certs/ecc256.pem";
 	const char *certfile = "does-not-exist.pem";
-	gnutls_datum_t tcert;
-	FILE *fp;
+	unsigned idx, i;
 
 	global_init();
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 	gnutls_global_set_time_function(mytime);
+	track_temp_files();
 
 	/* this will fail */
 	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, keyfile,
@@ -86,45 +136,41 @@ void doit(void)
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(clicred, &subca3_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
-	certfile = get_tmpname(NULL);
+	success("Testing store of certificates\n");
 
-	fp = fopen(certfile, "w");
-	if (fp == NULL)
-		fail("error in fopen\n");
-	assert(fwrite(server_cert_pem, 1, strlen((char*)server_cert_pem), fp)>0);
-	assert(fwrite(server_key_pem, 1, strlen((char*)server_key_pem), fp)>0);
-	fclose(fp);
+	idx = set_cert(xcred, &server_ca3_key, &server_ca3_localhost6_cert_chain);
+	verify_written_cert(xcred, idx, &server_ca3_localhost6_cert_chain, 2);
+	assert(idx == 0);
 
-	ret = gnutls_certificate_set_x509_key_file2(xcred, certfile, certfile,
-						    GNUTLS_X509_FMT_PEM, NULL, 0);
-	if (ret < 0)
-		fail("set_x509_key_file failed: %s\n", gnutls_strerror(ret));
+	success("Tested store of %d\n", idx);
 
-	/* verify whether the stored certificate match the ones we have */
-	ret = gnutls_certificate_get_crt_raw(xcred, 0, 0, &tcert);
-	if (ret < 0) {
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
+	idx = set_cert(xcred, &server_ca3_key, &server_ca3_localhost_cert);
+	verify_written_cert(xcred, idx, &server_ca3_localhost_cert, 1);
+	assert(idx == 1);
 
-	compare(&tcert, server_cert_pem);
-
-	ret = gnutls_certificate_get_crt_raw(xcred, 0, 1, &tcert);
-	if (ret < 0) {
-		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
-		exit(1);
-	}
-	compare(&tcert, server_cert_pem+2);
-
-	remove(certfile);
+	success("Tested store of %d\n", idx);
 
 	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL); /* the DNS name of the first cert */
+
+	idx = set_cert(xcred, &server_key, &server_cert);
+	verify_written_cert(xcred, idx, &server_cert, 2);
+	assert(idx == 2);
+
+	success("Tested store of %d\n", idx);
+
+	for (i=0;i<16;i++) {
+		idx = set_cert(xcred, &server_ecc_key, &server_ecc_cert);
+		verify_written_cert(xcred, idx, &server_ecc_cert, 1);
+		assert(idx == 3+i);
+		success("Tested store of %d\n", idx);
+	}
 
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_certificate_free_credentials(clicred);
 	gnutls_global_deinit();
+	delete_temp_files();
 }

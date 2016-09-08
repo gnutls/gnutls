@@ -79,6 +79,8 @@ void test_cli_serv(gnutls_certificate_credentials_t server_cred,
 
 #define TMPNAME_SIZE 128
 char *get_tmpname(char s[TMPNAME_SIZE]);
+void track_temp_files(void);
+void delete_temp_files(void);
 
 /* This must be implemented elsewhere. */
 extern void doit(void);
