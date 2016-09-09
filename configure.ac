@@ -203,7 +203,7 @@ AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
 dnl check for getrandom()
-enable_getrandom=no
+rnd_variant="auto-detect"
 AC_MSG_CHECKING([for getrandom])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([
 	   #include <linux/random.h>],[
@@ -211,7 +211,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([
 		  ])],
 		  [AC_MSG_RESULT(yes)
 		   AC_DEFINE([HAVE_LINUX_GETRANDOM], 1, [Enable the Linux getrandom function])
-		   enable_getrandom=getrandom],
+		   rnd_variant=getrandom],
 		  [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for getentropy])
@@ -225,10 +225,10 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([
 		  ])],
 		  [AC_MSG_RESULT(yes)
 		   AC_DEFINE([HAVE_GETENTROPY], 1, [Enable the OpenBSD getentropy function])
-		   enable_getrandom=getentropy],
+		   rnd_variant=getentropy],
 		  [AC_MSG_RESULT(no)])
 
-AM_CONDITIONAL(HAVE_GETENTROPY, test "$enable_getrandom" = "getentropy")
+AM_CONDITIONAL(HAVE_GETENTROPY, test "$rnd_variant" = "getentropy")
 
 dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
@@ -970,7 +970,7 @@ AC_MSG_NOTICE([External hardware support:
   /dev/crypto:          $enable_cryptodev
   Hardware accel:       $hw_accel
   Padlock accel:        $use_padlock
-  getrandom variant:    $enable_getrandom
+  Random gen. variant:  $rnd_variant
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
 ])
