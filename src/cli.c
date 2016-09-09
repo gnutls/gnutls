@@ -673,14 +673,23 @@ gnutls_session_t init_tls_session(const char *host)
 	} else
 		gnutls_init(&session, init_flags);
 
-	if ((ret =
-	     gnutls_priority_set_direct(session, priorities, &err)) < 0) {
-		if (ret == GNUTLS_E_INVALID_REQUEST)
-			fprintf(stderr, "Syntax error at: %s\n", err);
-		else
-			fprintf(stderr, "Error in priorities: %s\n",
-				gnutls_strerror(ret));
-		exit(1);
+	if (priorities == NULL) {
+		ret = gnutls_set_default_priority(session);
+		if (ret < 0) {
+			fprintf(stderr, "Error in setting priorities: %s\n",
+					gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		ret = gnutls_priority_set_direct(session, priorities, &err);
+		if (ret < 0) {
+			if (ret == GNUTLS_E_INVALID_REQUEST)
+				fprintf(stderr, "Syntax error at: %s\n", err);
+			else
+				fprintf(stderr, "Error in priorities: %s\n",
+					gnutls_strerror(ret));
+			exit(1);
+		}
 	}
 
 	/* allow the use of private ciphersuites.
