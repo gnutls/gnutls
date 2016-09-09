@@ -319,7 +319,6 @@ $ echo 'ca' >> ca.tmpl
 $ echo 'cert_signing_key' >> ca.tmpl
 $ certtool --generate-self-signed --load-privkey x509-ca-key.pem \
   --template ca.tmpl --outfile x509-ca.pem
-...
 @end example
 
 Then generate a server certificate.  Remember to change the dns_name
@@ -337,7 +336,6 @@ $ echo 'dns_name = test.gnutls.org' >> server.tmpl
 $ certtool --generate-certificate --load-privkey x509-server-key.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
   --template server.tmpl --outfile x509-server.pem
-...
 @end example
 
 For use in the client, you may want to generate a client certificate
@@ -352,7 +350,6 @@ $ echo 'signing_key' >> client.tmpl
 $ certtool --generate-certificate --load-privkey x509-client-key.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
   --template client.tmpl --outfile x509-client.pem
-...
 @end example
 
 To be able to import the client key/certificate into some
@@ -374,7 +371,6 @@ $ certtool --generate-proxy --load-privkey x509-proxy-key.pem \
   --load-ca-certificate x509-client.pem --load-ca-privkey x509-client-key.pem \
   --load-certificate x509-client.pem --template proxy.tmpl \
   --outfile x509-proxy.pem
-...
 @end example
 
 Then start the server again:
@@ -398,14 +394,13 @@ $ certtool --generate-privkey --dsa > x509-server-key-dsa.pem
 $ certtool --generate-certificate --load-privkey x509-server-key-dsa.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
   --template server.tmpl --outfile x509-server-dsa.pem
-...
 @end example
 
 The next step is to create OpenPGP credentials for the server.
 
 @example
 gpg --gen-key
-...enter whatever details you want, use 'test.gnutls.org' as name...
+Enter whatever details you want, use 'test.gnutls.org' as name...
 @end example
 
 Make a note of the OpenPGP key identifier of the newly generated key,
