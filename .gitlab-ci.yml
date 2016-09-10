@@ -1,8 +1,8 @@
 image: fedora:24
 
-Compile minimal library and openssl compat:
+Fedora/x86_64/minimal:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && ./configure --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
@@ -15,9 +15,10 @@ Compile minimal library and openssl compat:
   - shared
   except:
   - tags
-Build and Check with C99 and ubsan:
+
+Fedora/x86_64/ubsan:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --enable-code-coverage
@@ -33,9 +34,9 @@ Build and Check with C99 and ubsan:
       - tests/*.log
       - tests/*/*.log
 
-Build and Check - without SSL 3.0:
+Fedora/x86_64/no-SSL-3.0:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
@@ -53,9 +54,9 @@ Build and Check - without SSL 3.0:
       - build/tests/*/*.log
 
 # Needs gnutls' headers due to some abi-checker issue with resolving deps
-Build with ABI-check (x86-64):
+Fedora/x86_64/ABI-check:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - dnf install -y gnutls-devel
   - make autoreconf && mkdir -p build && cd build &&
@@ -71,9 +72,9 @@ Build with ABI-check (x86-64):
       - build/logs/gnutls-dane/*/log.txt
       - build/logs/gnutls/*/log.txt
 
-Build and Check - clang:
+Fedora/x86_64/clang:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && 
     CC=clang ./configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
@@ -90,9 +91,9 @@ Build and Check - clang:
       - tests/*.log
       - tests/*/*.log
 
-Build and Check in FIPS140-2 mode:
+Fedora/x86_64/FIPS140-2:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-non-suiteb-curves --enable-fips140-mode --enable-code-coverage --disable-doc --disable-valgrind-tests &&
@@ -108,9 +109,9 @@ Build and Check in FIPS140-2 mode:
       - build/tests/*.log
       - build/tests/*/*.log
 
-Build and Check with valgrind:
+Fedora/x86_64/valgrind:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
     --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j4 && make check -j4 && make local-code-coverage-output
@@ -125,9 +126,9 @@ Build and Check with valgrind:
       - tests/*.log
       - tests/*/*.log
 
-Build and Check with asan:
+Fedora/x86_64/asan:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man net-tools
   - dnf install -y clang libasan-static nodejs softhsm datefudge lcov openssl-devel libasan dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp
   - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
@@ -143,59 +144,89 @@ Build and Check with asan:
       - tests/*.log
       - tests/*/*.log
 
-Release build for windows32 DLLs:
+MinGW32/DLLs:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
-  - dnf install -y wine.i686 mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
+  - dnf install -y wine.i686 mingw32-p11-kit mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
-  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
+    mingw32-configure --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j4 && mingw32-make -C tests check -j4
+# Combine generated apps and DLLs.
+#libintl and iconv are a dependency of libidn
+#libwinpthread is required by libgcc
+#libffi is required by libp11-kit
+  - mkdir -p win32-build/bin && mkdir -p win32-build/lib/includes &&
+    cp lib/.libs/*.dll src/.libs/*.exe win32-build/bin &&
+    i686-w64-mingw32-strip --strip-unneeded win32-build/bin/*.dll &&
+    i686-w64-mingw32-strip win32-build/bin/*.exe &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libtasn1-*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libidn-*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libintl-*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/iconv*.dll win32-build/bin &&
+    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win32-build/bin &&
+    cp lib/.libs/*.a lib/*.def lib/gnutls.pc win32-build/lib &&
+    cp lib/includes/gnutls/*.h win32-build/lib/includes
   tags:
   - shared
   only:
   - tags
   artifacts:
-    expire_in: 6 months
     paths:
-      - src/*.exe
-      - lib/.libs/*.dll
-      - lib/.libs/*.a
-      - lib/*.def
-      - lib/includes/gnutls/*.h
-      - lib/gnutls.pc
+      - win32-build/
 
-Release build for windows64 DLLs:
+MinGW64/DLLs:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
-  - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux
+  - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-p11-kit mingw64-gcc mingw64-gmp mingw64-libidn util-linux
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
-  - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw64-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+  - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
+    mingw64-configure --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j4 && mingw64-make -C tests check -j4
+# Combine generated apps and DLLs.
+#libintl and iconv are a dependency of libidn
+#libwinpthread is required by libgcc
+#libffi is required by libp11-kit
+  - mkdir -p win64-build/bin && mkdir -p win64-build/lib/includes &&
+    cp lib/.libs/*.dll src/.libs/*.exe win64-build/bin &&
+    x86_64-w64-mingw32-strip --strip-unneeded win64-build/bin/*.dll &&
+    x86_64-w64-mingw32-strip win64-build/bin/*.exe &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libtasn1-*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn-*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libintl-*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/iconv*.dll win64-build/bin &&
+    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win64-build/bin &&
+    cp lib/.libs/*.a lib/*.def lib/gnutls.pc win64-build/lib &&
+    cp lib/includes/gnutls/*.h win64-build/lib/includes
   tags:
   - shared
   only:
   - tags
   artifacts:
-    expire_in: 6 months
     paths:
-      - src/*.exe
-      - lib/.libs/*.dll
-      - lib/.libs/*.a
-      - lib/*.def
-      - lib/includes/gnutls/*.h
-      - lib/gnutls.pc
+      - win64-build/
 
-Build and Check for windows64 in separate build dir:
+MinGW64:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
-  - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux
+  - dnf install -y wine mingw64-nettle mingw64-p11-kit mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux
   - dnf install -y "http://people.redhat.com/nmavrogi/fedora/mingw64-libcmocka-1.0.1-1.fc24.noarch.rpm"
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
@@ -214,11 +245,11 @@ Build and Check for windows64 in separate build dir:
       - build/tests/*.log
       - build/tests/*/*.log
 
-Build and Check for windows32 in separate build dir:
+MinGW32:
   script:
-  - dnf install -y git autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
-  - dnf install -y wine.i686 mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
+  - dnf install -y wine.i686 mingw32-p11-kit mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
   - dnf install -y "http://people.redhat.com/nmavrogi/fedora/mingw32-libcmocka-1.0.1-1.fc24.noarch.rpm"
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
@@ -237,7 +268,7 @@ Build and Check for windows32 in separate build dir:
       - build/tests/*.log
       - build/tests/*/*.log
 
-Build and Check on FreeBSD:
+FreeBSD10/x86_64:
   script:
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
     --disable-guile --disable-doc --disable-valgrind-tests && gmake -j4 && gmake check -j4
@@ -253,7 +284,7 @@ Build and Check on FreeBSD:
       - tests/*/*.log
 
 # We need a clean 32-bit fedora for testing
-Build and Check - separate build dir (x86):
+Fedora/x86:
   image: nickcis/fedora-32:23
   script:
   - linux32 dnf install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind 
