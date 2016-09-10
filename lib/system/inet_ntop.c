@@ -121,7 +121,7 @@ inet_ntop4 (const unsigned char *src, char *dst, unsigned size)
   if (len < 0)
     return NULL;
 
-  if (len > size)
+  if ((unsigned)len > size)
     {
       errno = ENOSPC;
       return NULL;
