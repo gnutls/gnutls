@@ -302,7 +302,7 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
 		return GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR;
 	}
 
-	data_size -= (unsigned long int) rdata - (unsigned long int) data;
+	data_size -= MEMSUB(rdata, data);
 
 	if (data_size < 4 + strlen(bottom)) {
 		gnutls_assert();
@@ -319,7 +319,7 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 	data_size -= strlen(ENDSTR);
-	data_size -= (unsigned long int) kdata - (unsigned long int) rdata;
+	data_size -= MEMSUB(kdata, rdata);
 
 	rdata = kdata + strlen(ENDSTR);
 
@@ -333,7 +333,7 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
 
 	/* position of kdata is before the ----END--- footer 
 	 */
-	rdata_size = (unsigned long int) kdata - (unsigned long int) rdata;
+	rdata_size = MEMSUB(kdata, rdata);
 
 	if (rdata_size < 4) {
 		gnutls_assert();
