@@ -45,6 +45,7 @@
 #include "x509/x509_int.h"
 #include <str_array.h>
 #include <gnutls/x509.h>
+#include "gnutls-idna.h"
 #include "read-file.h"
 #include "system-keys.h"
 #include "urls.h"
@@ -396,6 +397,25 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	return 0;
 }
 
+static int str_array_append_idna(gnutls_str_array_t * head, const char *name, size_t size)
+{
+	int rc, ret;
+	char *a_hostname;
+
+	/* convert the provided hostname to ACE-Labels domain. */
+	rc = idna_to_ascii_8z(name, &a_hostname, 0);
+	if (rc != IDNA_SUCCESS) {
+		_gnutls_debug_log("unable to convert hostname %s to IDNA format: %s\n", name, idna_strerror (rc));
+		/* insert the raw name */
+		return _gnutls_str_array_append(head, name, size);
+	}
+
+	ret = _gnutls_str_array_append(head, a_hostname, strlen(a_hostname));
+	idn_free(a_hostname);
+
+	return ret;
+}
+
 /* Returns the name of the certificate of a null name
  */
 static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
@@ -415,8 +435,8 @@ static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
 			have_dns_name = 1;
 
 			ret2 =
-			    _gnutls_str_array_append(names, name,
-						     max_size);
+			    str_array_append_idna(names, name,
+						  max_size);
 			if (ret2 < 0) {
 				_gnutls_str_array_clear(names);
 				return gnutls_assert_val(ret2);
@@ -430,7 +450,7 @@ static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
 		    gnutls_x509_crt_get_dn_by_oid(crt, OID_X520_COMMON_NAME, 0, 0,
 						  name, &max_size);
 		if (ret >= 0) {
-			ret = _gnutls_str_array_append(names, name, max_size);
+			ret = str_array_append_idna(names, name, max_size);
 			if (ret < 0) {
 				_gnutls_str_array_clear(names);
 				return gnutls_assert_val(ret);
@@ -1329,7 +1349,7 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 	if (names != NULL && names_size > 0) {
 		for (i = 0; i < names_size; i++) {
 			ret =
-			    _gnutls_str_array_append(&str_names, names[i],
+			    str_array_append_idna(&str_names, names[i],
 						     strlen(names[i]));
 			if (ret < 0) {
 				ret = gnutls_assert_val(ret);
