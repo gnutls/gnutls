@@ -1202,10 +1202,11 @@ Catch all are VERS-ALL, VERS-TLS-ALL and VERS-DTLS-ALL, and will enable
 all protocols from NORMAL priority.
 
 @item Signature algorithms @tab
-SIGN-RSA-SHA1, SIGN-RSA-SHA224, 
-SIGN-RSA-SHA256, SIGN-RSA-SHA384, SIGN-RSA-SHA512, SIGN-DSA-SHA1, 
-SIGN-DSA-SHA224, SIGN-DSA-SHA256, SIGN-RSA-MD5. Catch all
-which enables all algorithms from NORMAL priority is SIGN-ALL.
+SIGN-RSA-SHA1, SIGN-RSA-SHA224,
+SIGN-RSA-SHA256, SIGN-RSA-SHA384, SIGN-RSA-SHA512, SIGN-DSA-SHA1,
+SIGN-DSA-SHA224, SIGN-DSA-SHA256, SIGN-RSA-MD5, SIGN-ECDSA-SHA1,
+SIGN-ECDSA-SHA224, SIGN-ECDSA-SHA256, SIGN-ECDSA-SHA384, SIGN-ECDSA-SHA512.
+Catch all which enables all algorithms from NORMAL priority is SIGN-ALL.
 This option is only considered for TLS 1.2 and later.
 
 @item Elliptic curves @tab
