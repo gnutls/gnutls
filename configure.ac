@@ -259,7 +259,7 @@ if test "$ac_cv_func_vasprintf" != "yes";then
 	va_list b;
 	va_copy(b,a);
 	va_end(b);])],
-	[AC_DEFINE(HAVE_VA_COPY, 1, [Have va_copy()])
+	[AC_DEFINE([HAVE_VA_COPY], 1, [Have va_copy()])
 	AC_MSG_RESULT(va_copy)],
 	[AC_LINK_IFELSE([AC_LANG_PROGRAM([
 		#include <stdarg.h>
@@ -267,7 +267,7 @@ if test "$ac_cv_func_vasprintf" != "yes";then
 		va_list b;
 		__va_copy(b,a);
 		va_end(b);])],
-		[AC_DEFINE(HAVE___VA_COPY, 1, [Have __va_copy()])
+		[AC_DEFINE([HAVE___VA_COPY], 1, [Have __va_copy()])
 		AC_MSG_RESULT(__va_copy)],
 		[AC_MSG_RESULT(no)
 		AC_MSG_ERROR([Your system lacks vasprintf() and va_copy()])])
@@ -628,7 +628,7 @@ AC_ARG_WITH(trousers-lib, AS_HELP_STRING([--with-trousers-lib=LIB],
                                  [set the location of the trousers library]),
             ac_trousers_lib=$withval, ac_trousers_lib=$default_trousers_lib)
 
-AC_DEFINE_UNQUOTED(TROUSERS_LIB, ["$ac_trousers_lib"], [the location of the trousers library])
+AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the trousers library])
 AC_SUBST(TROUSERS_LIB)
 
 included_libopts=no
