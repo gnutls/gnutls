@@ -35,7 +35,6 @@
 #include <unistd.h>
 #ifndef _WIN32
 # include <arpa/inet.h>
-# include <signal.h>
 #else
 # undef endservent
 # define endservent()
