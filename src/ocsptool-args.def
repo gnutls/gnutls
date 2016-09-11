@@ -265,7 +265,7 @@ $ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem \
 @end example
 
 The request is sent via HTTP to the OCSP server address specified. If the
-address is ommited ocsptool will use the address stored in the certificate.
+address is omitted ocsptool will use the address stored in the certificate.
 
 _EOF_;
 };

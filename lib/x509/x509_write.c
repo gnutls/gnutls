@@ -571,7 +571,7 @@ gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt, unsigned int usage)
  * extension. This function assumes that data can be expressed as a null
  * terminated string.
  *
- * The name of the function is unfortunate since it is incosistent with
+ * The name of the function is unfortunate since it is inconsistent with
  * gnutls_x509_crt_get_subject_alt_name().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
