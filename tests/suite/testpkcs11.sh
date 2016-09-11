@@ -44,7 +44,7 @@ P11TOOL="${VALGRIND} ${P11TOOL} --batch"
 rm -f "${TMPFILE}"
 
 exit_error () {
-	echo "Check ${TMPFILE} for additional debugging information"
+	echo "check ${TMPFILE} for additional debugging information"
 	echo ""
 	echo ""
 	tail "${TMPFILE}"

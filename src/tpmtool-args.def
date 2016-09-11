@@ -14,7 +14,7 @@ flag = {
     name      = generate-rsa;
     descrip   = "Generate an RSA private-public key pair";
     doc = "Generates an RSA private-public key pair in the TPM chip. 
-The key may be stored in filesystem and protected by a PIN, or stored (registered)
+The key may be stored in file system and protected by a PIN, or stored (registered)
 in the TPM chip flash.";
 };
 
@@ -135,7 +135,7 @@ doc-section = {
   ds-type = 'EXAMPLES';
   ds-format = 'texi';
   ds-text   = <<-_EOT_
-To generate a key that is to be stored in filesystem use:
+To generate a key that is to be stored in file system use:
 @example
 $ tpmtool --generate-rsa --bits 2048 --outfile tpmkey.pem
 @end example
@@ -151,7 +151,7 @@ $ tpmtool --pubkey tpmkey:uuid=58ad734b-bde6-45c7-89d8-756a55ad1891;storage=user
           --outfile pubkey.pem
 @end example
 
-or if the key is stored in the filesystem:
+or if the key is stored in the file system:
 @example
 $ tpmtool --pubkey tpmkey:file=tmpkey.pem --outfile pubkey.pem
 @end example
