@@ -221,7 +221,7 @@ int gnutls_x509_cidr_to_rfc5280(const char *cidr, gnutls_datum_t *cidr_rfc5280)
 		unsigned length = p-cidr+1;
 		cidr_tmp = gnutls_malloc(length);
 		if (cidr_tmp == NULL) {
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);;
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
 		memcpy(cidr_tmp, cidr, length);
 		cidr_tmp[length-1] = 0;
