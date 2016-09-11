@@ -1101,8 +1101,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsInit)(CK_SESSION_HANDLE hSession, CK_ATTR
 
 		if (CKA_LABEL == pTemplate[i].type)
 		{
-			if (mock_session->find_label)
-				free(mock_session->find_label);
+			free(mock_session->find_label);
 			mock_session->find_label = strndup(pTemplate[i].pValue, pTemplate[i].ulValueLen);
 		}
 		else if (CKA_CLASS == pTemplate[i].type)
