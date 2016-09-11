@@ -740,7 +740,7 @@ verify_ee(const gnutls_datum_t * raw_crt,
  * @chain_size: The size of the chain
  * @chain_type: The type of the certificate chain
  * @r: DANE data to check against
- * @sflags: Flags for the the initialization of @s (if NULL)
+ * @sflags: Flags for the initialization of @s (if NULL)
  * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
@@ -834,7 +834,7 @@ dane_verify_crt_raw(dane_state_t s,
  * @hostname: The hostname associated with the chain
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
- * @sflags: Flags for the the initialization of @s (if NULL)
+ * @sflags: Flags for the initialization of @s (if NULL)
  * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
@@ -906,7 +906,7 @@ dane_verify_crt(dane_state_t s,
  * @hostname: The hostname associated with the chain
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
- * @sflags: Flags for the the initialization of @s (if NULL)
+ * @sflags: Flags for the initialization of @s (if NULL)
  * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
  * @verify: An OR'ed list of %dane_verify_status_t.
  *

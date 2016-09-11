@@ -82,7 +82,7 @@ const char scm_gnutls_array_error_message[] =
 /* Weak-key hash table.  */
 static SCM weak_refs;
 
-/* Register a weak reference from FROM to TO, such that the lifetime of TO is
+/* Register a weak reference from @FROM to @TO, such that the lifetime of TO is
    greater than or equal to that of FROM.  */
 static void
 register_weak_reference (SCM from, SCM to)

@@ -376,7 +376,7 @@ See the function @funcref{gnutls_check_version}.
 
 On the other hand, it is often desirable to support more than one
 versions of the library. In that case you could utilize compile-time 
-feature checks using the the @code{GNUTLS_VERSION_NUMBER} macro. 
+feature checks using the @code{GNUTLS_VERSION_NUMBER} macro. 
 For example, to conditionally add code for GnuTLS 3.2.1 or later, you may use:
 @example
 #if GNUTLS_VERSION_NUMBER >= 0x030201

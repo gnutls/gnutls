@@ -81,7 +81,7 @@ be prefixed with an underscore. E.g. ```_gnutls_handshake_begin()```
 Internal structures should not be exported. Especially pointers to
 internal data. Doing so harms future reorganization/rewrite of subsystems.
 
-All exported functions must be listed in libgnutls.map.in
+All exported functions must be listed in libgnutls.map.in,
 in order to be exported.
 
 
