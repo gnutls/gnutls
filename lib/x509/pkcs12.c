@@ -1403,9 +1403,9 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
  * @chain: the corresponding to key certificate chain (may be %NULL)
  * @chain_len: will be updated with the number of additional (may be %NULL)
  * @extra_certs: optional pointer to receive an array of additional
- *               certificates found in the PKCS12 structure (may be %NULL).
+ *	       certificates found in the PKCS12 structure (may be %NULL).
  * @extra_certs_len: will be updated with the number of additional
- *                   certs (may be %NULL).
+ *		   certs (may be %NULL).
  * @crl: an optional structure to store the parsed CRL (may be %NULL).
  * @flags: should be zero or one of GNUTLS_PKCS12_SP_*
  *

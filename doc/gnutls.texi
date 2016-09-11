@@ -16,8 +16,8 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GnuTLS.
 
-Copyright @copyright{} 2001-2015 Free Software Foundation, Inc.\\
-Copyright @copyright{} 2001-2015 Nikos Mavrogiannopoulos
+Copyright @copyright{} 2001-2016 Free Software Foundation, Inc.\\
+Copyright @copyright{} 2001-2016 Nikos Mavrogiannopoulos
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document

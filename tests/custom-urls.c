@@ -150,7 +150,7 @@ static void server(int fd)
 	 */
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	ret = gnutls_certificate_set_x509_key_file(x509_cred, "nomyurl:cert", "nomyurl:key",
-					     	  GNUTLS_X509_FMT_PEM);
+						   GNUTLS_X509_FMT_PEM);
 	if (ret != GNUTLS_E_FILE_ERROR) {
 		fail("server: gnutls_certificate_set_x509_key_file unexpected error (%s)\n\n",
 		     gnutls_strerror(ret));
@@ -158,7 +158,7 @@ static void server(int fd)
 	}
 
 	ret = gnutls_certificate_set_x509_key_file(x509_cred, "myurl:cert", "myurl:key",
-					     	  GNUTLS_X509_FMT_PEM);
+						   GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("server: gnutls_certificate_set_x509_key_file (%s)\n\n",
 		     gnutls_strerror(ret));

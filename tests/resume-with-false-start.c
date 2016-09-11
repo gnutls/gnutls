@@ -81,7 +81,7 @@ void doit(void)
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 	gnutls_set_default_priority(server);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -101,7 +101,7 @@ void doit(void)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	if (ret < 0)
 		exit(1);
 

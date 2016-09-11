@@ -241,7 +241,7 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 			   gnutls_datum_t * rpubkey);
 
 int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt,
-                           gnutls_datum_t * rpubkey);
+			   gnutls_datum_t * rpubkey);
 
 typedef void (*gnutls_cert_vfunc)(gnutls_x509_crt_t);
 

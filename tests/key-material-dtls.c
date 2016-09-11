@@ -170,7 +170,7 @@ static void client(int fd)
 	block_size = 2*hash_size + 2*key_size + 2 *iv_size;
 
 	ret = gnutls_prf(session, 13, "key expansion", 1, 0, NULL, block_size,
-                         (void*)key_material);
+			 (void*)key_material);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		gnutls_perror(ret);

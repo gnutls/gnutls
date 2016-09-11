@@ -651,8 +651,8 @@ void gnutls_x509_crl_iter_deinit(gnutls_x509_crl_iter_t iter)
 int
 gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
 				gnutls_x509_crl_iter_t *iter,
-			        unsigned char *serial,
-			        size_t * serial_size, time_t * t)
+				unsigned char *serial,
+				size_t * serial_size, time_t * t)
 {
 
 	int result, _serial_size;

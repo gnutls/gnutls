@@ -107,7 +107,7 @@ void doit(void)
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 	gnutls_priority_set_direct(server,
 				   "NORMAL:-CIPHER-ALL:+AES-128-CBC",
 				   NULL);
@@ -119,7 +119,7 @@ void doit(void)
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	gnutls_priority_set_direct(client, "NORMAL", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);

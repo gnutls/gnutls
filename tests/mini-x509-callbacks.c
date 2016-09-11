@@ -231,13 +231,13 @@ void doit(void)
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 	gnutls_priority_set_direct(server, "NORMAL", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 	gnutls_certificate_set_verify_function(serverx509cred,
-					       server_callback);
+						server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	gnutls_handshake_set_post_client_hello_function(server,
 							post_client_hello_callback);
@@ -250,13 +250,13 @@ void doit(void)
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	gnutls_priority_set_direct(client, "NORMAL", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 	gnutls_certificate_set_verify_function(clientx509cred,
-					       client_callback);
+						client_callback);
 	append_alpn(client);
 
 	HANDSHAKE(client, server);

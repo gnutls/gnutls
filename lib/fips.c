@@ -350,7 +350,7 @@ int _gnutls_fips_perform_self_checks2(void)
 		gnutls_assert();
 		goto error;
 	}
-        
+	
 	ret = _gnutls_rnd_ops.self_test();
 	if (ret < 0) {
 		gnutls_assert();

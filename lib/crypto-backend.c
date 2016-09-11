@@ -98,8 +98,8 @@ _algo_register(algo_list * al, int algorithm, int priority, void *s, int free_s)
 
 	return 0;
  cleanup:
- 	if (free_s) gnutls_free(s);
- 	return ret;
+	if (free_s) gnutls_free(s);
+	return ret;
 }
 
 static const void *_get_algo(algo_list * al, int algo)

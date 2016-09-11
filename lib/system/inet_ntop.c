@@ -79,7 +79,7 @@ static const char *inet_ntop6 (const unsigned char *src, char *dst, unsigned siz
  */
 const char *
 inet_ntop (int af, const void *restrict src,
-           char *restrict dst, unsigned cnt)
+	   char *restrict dst, unsigned cnt)
 {
   switch (af)
     {
@@ -171,26 +171,26 @@ inet_ntop6 (const unsigned char *src, char *dst, unsigned size)
   for (i = 0; i < (NS_IN6ADDRSZ / NS_INT16SZ); i++)
     {
       if (words[i] == 0)
-        {
-          if (cur.base == -1)
-            cur.base = i, cur.len = 1;
-          else
-            cur.len++;
-        }
+	{
+	  if (cur.base == -1)
+	    cur.base = i, cur.len = 1;
+	  else
+	    cur.len++;
+	}
       else
-        {
-          if (cur.base != -1)
-            {
-              if (best.base == -1 || cur.len > best.len)
-                best = cur;
-              cur.base = -1;
-            }
-        }
+	{
+	  if (cur.base != -1)
+	    {
+	      if (best.base == -1 || cur.len > best.len)
+		best = cur;
+	      cur.base = -1;
+	    }
+	}
     }
   if (cur.base != -1)
     {
       if (best.base == -1 || cur.len > best.len)
-        best = cur;
+	best = cur;
     }
   if (best.base != -1 && best.len < 2)
     best.base = -1;
@@ -203,28 +203,28 @@ inet_ntop6 (const unsigned char *src, char *dst, unsigned size)
     {
       /* Are we inside the best run of 0x00's? */
       if (best.base != -1 && i >= best.base && i < (best.base + best.len))
-        {
-          if (i == best.base)
-            *tp++ = ':';
-          continue;
-        }
+	{
+	  if (i == best.base)
+	    *tp++ = ':';
+	  continue;
+	}
       /* Are we following an initial run of 0x00s or any real hex? */
       if (i != 0)
-        *tp++ = ':';
+	*tp++ = ':';
       /* Is this address an encapsulated IPv4? */
       if (i == 6 && best.base == 0 &&
-          (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
-        {
-          if (!inet_ntop4 (src + 12, tp, sizeof tmp - (tp - tmp)))
-            return (NULL);
-          tp += strlen (tp);
-          break;
-        }
+	  (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
+	{
+	  if (!inet_ntop4 (src + 12, tp, sizeof tmp - (tp - tmp)))
+	    return (NULL);
+	  tp += strlen (tp);
+	  break;
+	}
       {
-        int len = sprintf (tp, "%x", words[i]);
-        if (len < 0)
-          return NULL;
-        tp += len;
+	int len = sprintf (tp, "%x", words[i]);
+	if (len < 0)
+	  return NULL;
+	tp += len;
       }
     }
   /* Was it a trailing run of 0x00's? */

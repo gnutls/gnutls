@@ -1264,7 +1264,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 		}
 
 	ret = call_hook_func(session, type, GNUTLS_HOOK_PRE, 0,
-		             _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
+			     _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
 	if (ret < 0) {
 		gnutls_assert();
 		_mbuffer_xfree(&bufel);
@@ -1281,7 +1281,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 	}
 
 	ret = call_hook_func(session, type, GNUTLS_HOOK_POST, 0, 
-	                      _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
+			      _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1707,8 +1707,8 @@ client_check_if_resuming(gnutls_session_t session,
 
 		memcpy(session->security_parameters.cipher_suite,
 			session->internals.resumed_security_parameters.cipher_suite, 2);
-                session->security_parameters.compression_method =
-		        session->internals.resumed_security_parameters.compression_method;
+		session->security_parameters.compression_method =
+			session->internals.resumed_security_parameters.compression_method;
 
 		_gnutls_epoch_set_cipher_suite
 		    (session, EPOCH_NEXT,
@@ -2344,37 +2344,37 @@ recv_hello_verify_request(gnutls_session_t session,
 
 /* The packets in gnutls_handshake (it's more broad than original TLS handshake)
  *
- *     Client                                               Server
+ *     Client					       Server
  *
- *     ClientHello                  -------->
- *                                  <--------         ServerHello
+ *     ClientHello		  -------->
+ *				  <--------	 ServerHello
  *
- *                                                    Certificate*
- *                                              ServerKeyExchange*
- *                                  <--------   CertificateRequest*
+ *						    Certificate*
+ *					      ServerKeyExchange*
+ *				  <--------   CertificateRequest*
  *
- *                                  <--------      ServerHelloDone
+ *				  <--------      ServerHelloDone
  *     Certificate*
  *     ClientKeyExchange
  *     CertificateVerify*
  *     [ChangeCipherSpec]
- *     Finished                     -------->
- *                                                NewSessionTicket
- *                                              [ChangeCipherSpec]
- *                                  <--------             Finished
+ *     Finished		     -------->
+ *						NewSessionTicket
+ *					      [ChangeCipherSpec]
+ *				  <--------	     Finished
  *
  * (*): means optional packet.
  */
 
 /* Handshake when resumming session:
- *      Client                                                Server
+ *      Client						Server
  *
- *      ClientHello                   -------->
- *                                                      ServerHello
- *                                               [ChangeCipherSpec]
- *                                   <--------             Finished
+ *      ClientHello		   -------->
+ *						      ServerHello
+ *					       [ChangeCipherSpec]
+ *				   <--------	     Finished
  *     [ChangeCipherSpec]
- *     Finished                      -------->
+ *     Finished		      -------->
  * 
  */
 
@@ -2570,7 +2570,7 @@ int gnutls_handshake(gnutls_session_t session)
 		if (session->internals.handshake_timeout_ms &&
 		    session->internals.handshake_endtime == 0)
 			    session->internals.handshake_endtime = session->internals.handshake_start_time.tv_sec +
-			    	session->internals.handshake_timeout_ms / 1000;
+			    session->internals.handshake_timeout_ms / 1000;
 	}
 
 	if (session->internals.recv_state == RECV_STATE_FALSE_START) {
@@ -2677,7 +2677,7 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 			session->internals.handshake_large_loops++; \
 			return ret; \
 		} \
-                /* a warning alert might interrupt handshake */ \
+		/* a warning alert might interrupt handshake */ \
 		if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \

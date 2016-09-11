@@ -125,17 +125,17 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey,
-					       sign_algo, 0,
-					       hash_data, &signature);
+						sign_algo, 0,
+						hash_data, &signature);
 		if (ret < 0)
 			ERR(__LINE__);
 
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey,
-					       sign_algo, 0,
-					       &invalid_hash_data,
-					       &signature);
+						sign_algo, 0,
+						&invalid_hash_data,
+						&signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
 			ERR(__LINE__);
 
@@ -145,15 +145,15 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
-					       hash_data, &signature);
+						hash_data, &signature);
 		if (ret < 0)
 			ERR(__LINE__);
 
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
-					       &invalid_hash_data,
-					       &signature);
+						&invalid_hash_data,
+						&signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
 			ERR(__LINE__);
 
@@ -178,10 +178,10 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 
 			ret =
 			    gnutls_pubkey_verify_hash2(pubkey,
-						       sign_algo,
-						       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
-						       hash_data,
-						       &signature);
+							sign_algo,
+							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
+							hash_data,
+							&signature);
 			if (ret < 0)
 				ERR(__LINE__);
 

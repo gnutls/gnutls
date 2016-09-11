@@ -60,7 +60,7 @@ static const gnutls_sec_params_entry sec_params[] = {
 
 #define GNUTLS_SEC_PARAM_LOOP(b) \
 	{ const gnutls_sec_params_entry *p; \
-                for(p = sec_params; p->name != NULL; p++) { b ; } }
+		for(p = sec_params; p->name != NULL; p++) { b ; } }
 
 /**
  * gnutls_sec_param_to_pk_bits:

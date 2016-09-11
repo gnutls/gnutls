@@ -2665,7 +2665,7 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 		result = asn1_read_value(c2, nptr, tmpoid, &len);
 		if (result == ASN1_VALUE_NOT_FOUND
 		    || result == ASN1_ELEMENT_NOT_FOUND) {
-		        ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+			ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 			break;
 		}
 
@@ -3141,7 +3141,7 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 	ret = 0;
 	goto cleanup;
  fail:
- 	memset(out, 0, sizeof(*out));
+	memset(out, 0, sizeof(*out));
  cleanup:
 	asn1_delete_structure(&c2);
 	return ret;

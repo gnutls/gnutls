@@ -288,7 +288,7 @@ struct list {
 	memset (__t, 0, (l).item_size);							\
 	__t->prev = (void *) p;								\
 	__t->next = (void *) q;								\
-        q->prev = (void *) __t;								\
+	q->prev = (void *) __t;								\
 	p->next = (void *) __t;								\
 	(l).length++;									\
     }

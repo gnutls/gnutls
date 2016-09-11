@@ -54,7 +54,7 @@ void _dtls_reset_window(struct record_parameters_st *rp);
       if (r != GNUTLS_E_INTERRUPTED) _rr = GNUTLS_E_AGAIN; \
       else _rr = r; \
       if (!(session->internals.flags & GNUTLS_NONBLOCK)) \
-        millisleep(50); \
+	millisleep(50); \
       return gnutls_assert_val(_rr); \
     } \
   }

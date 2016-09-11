@@ -127,9 +127,9 @@ P_hash(gnutls_mac_algorithm_t algorithm,
  */
 static int
 _gnutls_PRF_raw(gnutls_mac_algorithm_t mac,
-	    	const uint8_t * secret, unsigned int secret_size,
-	    	const char *label, int label_size, const uint8_t * seed,
-	    	int seed_size, int total_bytes, void *ret)
+		const uint8_t * secret, unsigned int secret_size,
+		const char *label, int label_size, const uint8_t * seed,
+		int seed_size, int total_bytes, void *ret)
 {
 	int l_s, s_seed_size;
 	const uint8_t *s1, *s2;
@@ -155,7 +155,7 @@ _gnutls_PRF_raw(gnutls_mac_algorithm_t mac,
 	if (mac != GNUTLS_MAC_UNKNOWN) {
 		result =
 		    P_hash(mac, secret, secret_size,
-		    	   s_seed, s_seed_size,
+			   s_seed, s_seed_size,
 			   total_bytes, ret);
 		if (result < 0) {
 			gnutls_assert();
@@ -230,10 +230,10 @@ _gnutls_PRF(gnutls_session_t session,
 #ifdef ENABLE_FIPS140
 int
 _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
-	        size_t master_size, const void *master,
-	        size_t label_size, const char *label,
-	        size_t seed_size, const char *seed, size_t outsize,
-	        char *out);
+		size_t master_size, const void *master,
+		size_t label_size, const char *label,
+		size_t seed_size, const char *seed, size_t outsize,
+		char *out);
 
 /*-
  * _gnutls_prf_raw:
@@ -254,10 +254,10 @@ _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
  -*/
 int
 _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
-	        size_t master_size, const void *master,
-	        size_t label_size, const char *label,
-	        size_t seed_size, const char *seed, size_t outsize,
-	        char *out)
+		size_t master_size, const void *master,
+		size_t label_size, const char *label,
+		size_t seed_size, const char *seed, size_t outsize,
+		char *out)
 {
 	return _gnutls_PRF_raw(mac,
 			  master, master_size,

@@ -306,7 +306,7 @@ static void server(int fd, int server_init)
 					ret = gnutls_handshake(session);
 				}
 				while (ret < 0
-				       && gnutls_error_is_fatal(ret) == 0);
+					&& gnutls_error_is_fatal(ret) == 0);
 				if (ret == 0)
 					break;
 			}
@@ -319,7 +319,7 @@ static void server(int fd, int server_init)
 			do {
 				ret =
 				    gnutls_record_send(session, buffer,
-						       strlen(buffer));
+							strlen(buffer));
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		}

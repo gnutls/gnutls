@@ -85,8 +85,8 @@ void doit(void)
 
 	ret =
 	    gnutls_pkcs12_simple_parse(pkcs12, password, &pkey, &chain,
-				       &chain_size, &extras, &extras_size,
-				       NULL, 0);
+					&chain_size, &extras, &extras_size,
+					NULL, 0);
 	if (ret < 0)
 		fail("pkcs12_simple_parse failed %d: %s\n", ret,
 		     gnutls_strerror(ret));

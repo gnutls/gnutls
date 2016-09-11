@@ -118,7 +118,7 @@ static int has_embedded_null(const char *str, unsigned size)
  **/
 unsigned
 gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
-			        const char *hostname, unsigned int flags)
+				const char *hostname, unsigned int flags)
 {
 	char dnsname[MAX_CN];
 	size_t dnsnamesize;
@@ -262,8 +262,8 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	 */
 	ret = 0;
  cleanup:
- 	if (a_hostname != hostname) {
- 		idn_free(a_hostname);
+	if (a_hostname != hostname) {
+		idn_free(a_hostname);
 	}
- 	return ret;
+	return ret;
 }

@@ -539,14 +539,14 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 				return res;
 
 			memcpy(res.data, cache_db[i].session_data,
-			       res.size);
+				res.size);
 
 			if (debug) {
 				unsigned j;
 				printf("data:\n");
 				for (j = 0; j < res.size; j++) {
 					printf("%02x ",
-					       res.data[j] & 0xFF);
+						res.data[j] & 0xFF);
 					if ((j + 1) % 16 == 0)
 						printf("\n");
 				}

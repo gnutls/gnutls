@@ -954,7 +954,7 @@ static const char *nc_good0[] = {
     "-----END CERTIFICATE-----\n",
     NULL,
     /* Name constraints (critical):
-       Permitted: DNSname: example.com */
+	Permitted: DNSname: example.com */
     "-----BEGIN CERTIFICATE-----\n"
     "MIIC/zCCAeegAwIBAgIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
     "MCIYDzIwMTUwMzI1MDc1ODQ5WhgPOTk5OTEyMzEyMzU5NTlaMA8xDTALBgNVBAMT\n"
@@ -2788,9 +2788,9 @@ static struct
   { "ecc cert ok", ecc_cert, &ecc_cert[1], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_HIGH), 0, NULL},
   { "ecc cert ok", ecc_cert, &ecc_cert[1], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB128), 0, NULL},
   { "ecc cert not ok (due to profile)", ecc_cert, &ecc_cert[1], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA), 
-  	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL},
+	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL},
   { "ecc cert not ok (due to profile)", ecc_cert, &ecc_cert[1], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB192), 
-  	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL},
+	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL},
   { "name constraints: empty CN, empty SAN, permitted dns range", nc_good0, &nc_good0[2], 0, 0, 0, 1427270515},
   { "name constraints: dns in permitted range", nc_good1, &nc_good1[4], 0, 0, NULL, 1412850586},
   { "name constraints: ipv6 in permitted range", nc_good2, &nc_good2[4], 0, 0, NULL, 1467193927},

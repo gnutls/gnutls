@@ -101,7 +101,7 @@ _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
 
 	ret = 0;
  cleanup:
- 	gnutls_free(tmp);
+	gnutls_free(tmp);
 	asn1_delete_structure(&sig);
 	return ret;
 }
@@ -321,8 +321,8 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
  */
 int
 encode_ber_digest_info(const mac_entry_st * e,
-		        const gnutls_datum_t * digest,
-		        gnutls_datum_t * output)
+			const gnutls_datum_t * digest,
+			gnutls_datum_t * output)
 {
 	ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
 	int result;

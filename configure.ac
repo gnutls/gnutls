@@ -522,7 +522,7 @@ if test "$enable_dane" != "no"; then
 		   AC_DEFINE([HAVE_DANE], 1, [Enable the DANE library])
 		   enable_dane=yes],
 		  [AC_MSG_RESULT(no)
-   	           AC_MSG_WARN([[
+		   AC_MSG_WARN([[
 *** 
 *** libunbound was not found. Libdane will not be built.
 *** ]])
@@ -539,7 +539,7 @@ if test "$have_win" = yes; then
     unbound_root_key_file="C:\\Program Files\\Unbound\\root.key"
 else
     if test -f /var/lib/unbound/root.key;then
-    	unbound_root_key_file="/var/lib/unbound/root.key"
+	unbound_root_key_file="/var/lib/unbound/root.key"
     else
         if test -f /usr/share/dns/root.key;then
 	    unbound_root_key_file="/usr/share/dns/root.key"
@@ -608,7 +608,7 @@ if test "$with_tpm" != "no"; then
 		   AC_DEFINE([HAVE_TROUSERS], 1, [Enable TPM])
 		   with_tpm=yes],
 		  [AC_MSG_RESULT(no)
-   	           AC_MSG_WARN([[
+		   AC_MSG_WARN([[
 *** 
 *** trousers was not found. TPM support will be disabled.
 *** ]])

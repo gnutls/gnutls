@@ -35,12 +35,12 @@ void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter)
 
 int
 gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
-			        unsigned cert_type,
-			        char **cert_url,
-			        char **key_url,
-			        char **label,
-			        gnutls_datum_t *der,
-			        unsigned int flags)
+				unsigned cert_type,
+				char **cert_url,
+				char **key_url,
+				char **label,
+				gnutls_datum_t *der,
+				unsigned int flags)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
@@ -58,7 +58,7 @@ int gnutls_system_key_add_x509(gnutls_x509_crt_t crt, gnutls_x509_privkey_t priv
 
 int
 _gnutls_privkey_import_system_url(gnutls_privkey_t pkey,
-			          const char *url)
+				  const char *url)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }

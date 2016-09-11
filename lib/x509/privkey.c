@@ -555,8 +555,8 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 				if (key->pk_algorithm == GNUTLS_PK_UNKNOWN && left >= sizeof(PEM_KEY_PKCS8)) {
 					if (memcmp(ptr, PEM_KEY_PKCS8, sizeof(PEM_KEY_PKCS8)-1) == 0) {
 						result =
-						    _gnutls_fbase64_decode(PEM_KEY_PKCS8, begin_ptr,
-							   	   left, &_data);
+							_gnutls_fbase64_decode(PEM_KEY_PKCS8,
+								begin_ptr, left, &_data);
 						if (result >= 0) {
 							/* signal for PKCS #8 keys */
 							key->pk_algorithm = -1;
@@ -758,7 +758,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 				if (memcmp(ptr, PEM_KEY_RSA, sizeof(PEM_KEY_RSA)-1) == 0 ||
 				    memcmp(ptr, PEM_KEY_ECC, sizeof(PEM_KEY_ECC)-1) == 0 ||
 				    memcmp(ptr, PEM_KEY_DSA, sizeof(PEM_KEY_DSA)-1) == 0) {
-				    	head_enc = 0;
+					head_enc = 0;
 				}
 			}
 		}
@@ -788,7 +788,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 		    /* use the callback if any */
 			ret = _gnutls_retrieve_pin(&key->pin, "key:", "", 0, pin, sizeof(pin));
 			if (ret == 0) {
-		    		password = pin;
+				password = pin;
 			}
 
 			ret =
@@ -1784,17 +1784,17 @@ int cmp_rsa_key(gnutls_x509_privkey_t key1, gnutls_x509_privkey_t key2)
 
 	ret = 0;
  cleanup:
-      	gnutls_free(m1.data);
-      	gnutls_free(e1.data);
-      	gnutls_free(d1.data);
-      	gnutls_free(p1.data);
-      	gnutls_free(q1.data);
-      	gnutls_free(m2.data);
-      	gnutls_free(e2.data);
-      	gnutls_free(d2.data);
-      	gnutls_free(p2.data);
-      	gnutls_free(q2.data);
- 	return ret;
+	gnutls_free(m1.data);
+	gnutls_free(e1.data);
+	gnutls_free(d1.data);
+	gnutls_free(p1.data);
+	gnutls_free(q1.data);
+	gnutls_free(m2.data);
+	gnutls_free(e2.data);
+	gnutls_free(d2.data);
+	gnutls_free(p2.data);
+	gnutls_free(q2.data);
+	return ret;
 }
 
 static
@@ -1836,13 +1836,13 @@ int cmp_dsa_key(gnutls_x509_privkey_t key1, gnutls_x509_privkey_t key2)
 
 	ret = 0;
  cleanup:
-      	gnutls_free(g1.data);
-      	gnutls_free(p1.data);
-      	gnutls_free(q1.data);
-      	gnutls_free(g2.data);
-      	gnutls_free(p2.data);
-      	gnutls_free(q2.data);
- 	return ret;
+	gnutls_free(g1.data);
+	gnutls_free(p1.data);
+	gnutls_free(q1.data);
+	gnutls_free(g2.data);
+	gnutls_free(p2.data);
+	gnutls_free(q2.data);
+	return ret;
 }
 
 /**
@@ -1909,7 +1909,7 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 		ret = cmp_dsa_key(key, okey);
 
       cleanup:
-        gnutls_x509_privkey_deinit(okey);
+	gnutls_x509_privkey_deinit(okey);
 
 	return ret;
 }
@@ -2224,7 +2224,7 @@ void gnutls_x509_privkey_set_pin_function(gnutls_x509_privkey_t privkey,
  *
  **/
 void gnutls_x509_privkey_set_flags(gnutls_x509_privkey_t key,
- 			      	   unsigned int flags)
+				   unsigned int flags)
 {
 	key->flags |= flags;
 }

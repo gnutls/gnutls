@@ -301,7 +301,7 @@ static void server(int fd, const char *prio, unsigned etm)
 		do {
 			ret =
 			    gnutls_record_send(session, buffer,
-					       sizeof(buffer));
+						sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN
 			 || ret == GNUTLS_E_INTERRUPTED);
 

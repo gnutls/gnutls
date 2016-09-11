@@ -142,7 +142,7 @@ static void client(int sd)
 	/* put the anonymous credentials to the current session
 	 */
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
 
@@ -260,7 +260,7 @@ static void server(int sd)
 				   NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 
 	gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
 

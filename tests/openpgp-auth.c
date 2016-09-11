@@ -217,7 +217,7 @@ void doit(void)
 
 			sent =
 			    gnutls_record_send(session, message,
-					       sizeof(message));
+						sizeof(message));
 			if (sent != sizeof(message))
 				fail("client sent %li vs. %li\n",
 				     (long) sent, (long) sizeof(message));
@@ -248,7 +248,7 @@ void doit(void)
 
 			if (debug)
 				printf("server process %i (child %i)\n",
-				       getpid(), child);
+					getpid(), child);
 
 			err = gnutls_init(&session, GNUTLS_SERVER);
 			if (err != 0)
@@ -317,14 +317,14 @@ void doit(void)
 					stored_cli_cert.data =
 					    gnutls_malloc(d[0].size);
 					memcpy(stored_cli_cert.data,
-					       d[0].data, d[0].size);
+						d[0].data, d[0].size);
 					stored_cli_cert.size = d[0].size;
 				}
 			}
 
 			received =
 			    gnutls_record_recv(session, greetings,
-					       sizeof(greetings));
+						sizeof(greetings));
 			if (received != sizeof(message)
 			    || memcmp(greetings, message, sizeof(message)))
 				fail("server received %li vs. %li\n",

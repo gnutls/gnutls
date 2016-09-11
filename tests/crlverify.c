@@ -242,7 +242,7 @@ void doit(void)
 
 		if (debug)
 			printf("Chain '%s' (%d)...\n", crl_list[i].name,
-			       (int) i);
+				(int) i);
 
 		if (debug > 2)
 			printf("\tAdding CRL...");
@@ -277,7 +277,7 @@ void doit(void)
 				      &tmp);
 		if (debug)
 			printf("\tCRL: %.*s\n", 
-			       tmp.size, tmp.data);
+				tmp.size, tmp.data);
 		gnutls_free(tmp.data);
 
 		if (debug > 2)
@@ -307,7 +307,7 @@ void doit(void)
 		gnutls_x509_crt_print(ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
 		if (debug)
 			printf("\tCA Certificate: %.*s\n", tmp.size,
-			       tmp.data);
+				tmp.data);
 		gnutls_free(tmp.data);
 
 		if (debug)

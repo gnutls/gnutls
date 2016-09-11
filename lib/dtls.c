@@ -3,7 +3,7 @@
  * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Authors: Jonathan Bastien-Filiatrault
- *          Nikos Mavrogiannopoulos
+ *	  Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
  *

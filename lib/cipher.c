@@ -400,10 +400,9 @@ compressed_to_ciphertext(gnutls_session_t session,
 
 			memset(nonce, 0, 4);
 			memcpy(&nonce[4],
-			       UINT64DATA(params->write.sequence_number),
-			       8);
+			       UINT64DATA(params->write.sequence_number), 8);
 
- 			memxor(nonce, params->write.IV.data, 12);
+			memxor(nonce, params->write.IV.data, 12);
 		}
 	}
 
@@ -602,7 +601,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 			memset(nonce, 0, 4);
 			memcpy(&nonce[4], UINT64DATA(*sequence), 8);
 
- 			memxor(nonce, params->read.IV.data, 12);
+			memxor(nonce, params->read.IV.data, 12);
 		}
 
 		length =

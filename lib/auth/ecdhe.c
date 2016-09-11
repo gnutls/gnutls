@@ -191,8 +191,8 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
-cleanup:
-      	gnutls_pk_params_clear(&session->key.ecdh_params);
+ cleanup:
+	gnutls_pk_params_clear(&session->key.ecdh_params);
 	return ret;
 }
 
@@ -271,8 +271,8 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 	} else if (pk == GNUTLS_PK_ECDHX) {
 		ret =
 		    _gnutls_buffer_append_data_prefix(data, 8,
-		    			session->key.ecdh_params.raw_pub.data,
-		    			session->key.ecdh_params.raw_pub.size);
+					session->key.ecdh_params.raw_pub.data,
+					session->key.ecdh_params.raw_pub.size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -287,8 +287,8 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 	}
 
 	ret = data->length;
-cleanup:
-      	gnutls_pk_params_clear(&session->key.ecdh_params);
+ cleanup:
+	gnutls_pk_params_clear(&session->key.ecdh_params);
 	return ret;
 }
 
@@ -451,9 +451,9 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 
 	} else if (pk == GNUTLS_PK_ECDHX) {
 		ret =
-		    _gnutls_buffer_append_data_prefix(data, 8,
-		    				session->key.ecdh_params.raw_pub.data,
-		    				session->key.ecdh_params.raw_pub.size);
+			_gnutls_buffer_append_data_prefix(data, 8,
+					session->key.ecdh_params.raw_pub.data,
+					session->key.ecdh_params.raw_pub.size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}

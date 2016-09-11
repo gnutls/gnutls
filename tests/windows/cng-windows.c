@@ -151,7 +151,7 @@ void test_sig(void)
 
  /* test the raw interface DigestInfo
   */
-  	ret = gnutls_encode_ber_digest_info(GNUTLS_DIG_SHA256, &sha256_hash_data, &digest_info);
+	ret = gnutls_encode_ber_digest_info(GNUTLS_DIG_SHA256, &sha256_hash_data, &digest_info);
 	assert(ret >= 0);
 
 	ret =

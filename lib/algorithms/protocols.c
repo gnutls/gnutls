@@ -129,8 +129,8 @@ static const version_entry_st sup_versions[] = {
 };
 
 #define GNUTLS_VERSION_LOOP(b) \
-        const version_entry_st *p; \
-                for(p = sup_versions; p->name != NULL; p++) { b ; }
+	const version_entry_st *p; \
+		for(p = sup_versions; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_VERSION_ALG_LOOP(a) \
 	GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })

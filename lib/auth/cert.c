@@ -714,7 +714,7 @@ static int gen_x509_crt(gnutls_session_t session, gnutls_buffer_st * data)
 	/* if no certificates were found then send:
 	 * 0B 00 00 03 00 00 00    // Certificate with no certs
 	 * instead of:
-	 * 0B 00 00 00          // empty certificate handshake
+	 * 0B 00 00 00	  // empty certificate handshake
 	 *
 	 * ( the above is the whole handshake message, not 
 	 * the one produced here )

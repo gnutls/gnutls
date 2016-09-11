@@ -159,8 +159,8 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 	 */
 	ret = 0;
  cleanup:
- 	if (a_email != email) {
- 		idn_free(a_email);
+	if (a_email != email) {
+		idn_free(a_email);
 	}
- 	return ret;
+	return ret;
 }

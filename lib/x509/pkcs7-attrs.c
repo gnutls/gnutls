@@ -51,7 +51,8 @@
  * Since: 3.4.2
  **/
 int
-gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t *list, const char *oid, gnutls_datum_t *data, unsigned flags)
+gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t * list, const char *oid,
+		      gnutls_datum_t * data, unsigned flags)
 {
 	int ret;
 	gnutls_pkcs7_attrs_st *r;
@@ -62,7 +63,8 @@ gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t *list, const char *oid, gnutls_datum_
 
 	if (flags & GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING) {
 		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
-			data->data, data->size, &r->data);
+						 data->data, data->size,
+						 &r->data);
 	} else {
 		ret = _gnutls_set_datum(&r->data, data->data, data->size);
 	}
@@ -78,12 +80,12 @@ gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t *list, const char *oid, gnutls_datum_
 
 	return 0;
  fail:
- 	if (r) {
-	 	gnutls_free(r->data.data);
-	 	gnutls_free(r);
+	if (r) {
+		gnutls_free(r->data.data);
+		gnutls_free(r);
 	}
- 	gnutls_pkcs7_attrs_deinit(*list);
- 	return GNUTLS_E_MEMORY_ERROR;
+	gnutls_pkcs7_attrs_deinit(*list);
+	return GNUTLS_E_MEMORY_ERROR;
 
 }
 
@@ -106,13 +108,14 @@ gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t *list, const char *oid, gnutls_datum_
  * Since: 3.4.2
  **/
 int
-gnutls_pkcs7_get_attr(gnutls_pkcs7_attrs_t list, unsigned idx, char **oid, gnutls_datum_t *data, unsigned flags)
+gnutls_pkcs7_get_attr(gnutls_pkcs7_attrs_t list, unsigned idx, char **oid,
+		      gnutls_datum_t * data, unsigned flags)
 {
 	unsigned i;
 	gnutls_pkcs7_attrs_st *p = list;
 	int ret;
 
-	for (i=0;i<idx;i++) {
+	for (i = 0; i < idx; i++) {
 		p = p->next;
 		if (p == NULL)
 			break;
@@ -125,7 +128,8 @@ gnutls_pkcs7_get_attr(gnutls_pkcs7_attrs_t list, unsigned idx, char **oid, gnutl
 
 	if (flags & GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING) {
 		ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
-			p->data.data, p->data.size, data, 1);
+						 p->data.data, p->data.size,
+						 data, 1);
 	} else {
 		ret = _gnutls_set_datum(data, p->data.data, p->data.size);
 	}
@@ -143,12 +147,11 @@ gnutls_pkcs7_get_attr(gnutls_pkcs7_attrs_t list, unsigned idx, char **oid, gnutl
  *
  * Since: 3.4.2
  **/
-void
-gnutls_pkcs7_attrs_deinit(gnutls_pkcs7_attrs_t list)
+void gnutls_pkcs7_attrs_deinit(gnutls_pkcs7_attrs_t list)
 {
 	gnutls_pkcs7_attrs_st *r = list, *next;
 
-	while(r) {
+	while (r) {
 		next = r->next;
 
 		gnutls_free(r->data.data);

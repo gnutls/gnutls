@@ -213,7 +213,7 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 		/* move to first ':' */
 		i = 0;
 		while ((i < line_size) && (line[i] != ':')
-                       && (line[i] != '\0')) {
+		       && (line[i] != '\0')) {
 			i++;
 		}
 

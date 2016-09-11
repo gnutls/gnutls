@@ -162,12 +162,12 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 		id_size = sizeof(id);
 		ret = gnutls_x509_crt_get_subject_key_id(crt, id, &id_size, NULL);
 		if (ret < 0) {
-		        id_size = sizeof(id);
+			id_size = sizeof(id);
 			ret = gnutls_x509_crt_get_key_id(crt, 0, id, &id_size);
 			if (ret < 0) {
 			  gnutls_assert();
 			  goto cleanup;
-	                }
+			}
 		}
 
 		a[1].value = id;
@@ -494,7 +494,7 @@ gnutls_pkcs11_copy_pubkey(const char *token_url,
 	ret = 0;
 
       cleanup:
-      	clean_pubkey(a, a_val);
+	clean_pubkey(a, a_val);
 	pkcs11_close_session(&sinfo);
 	return ret;
 
@@ -980,8 +980,8 @@ struct delete_data_st {
 
 static int
 delete_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
-	          struct ck_token_info *tinfo,
-	          struct ck_info *lib_info, void *input)
+		  struct ck_token_info *tinfo,
+		  struct ck_info *lib_info, void *input)
 {
 	struct delete_data_st *find_data = input;
 	struct ck_attribute a[4];

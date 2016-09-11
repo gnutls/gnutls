@@ -50,17 +50,17 @@ typedef struct {
   From RFC 6066.  Client sends:
 
       struct {
-          CertificateStatusType status_type;
-          select (status_type) {
-              case ocsp: OCSPStatusRequest;
-          } request;
+	  CertificateStatusType status_type;
+	  select (status_type) {
+	      case ocsp: OCSPStatusRequest;
+	  } request;
       } CertificateStatusRequest;
 
       enum { ocsp(1), (255) } CertificateStatusType;
 
       struct {
-          ResponderID responder_id_list<0..2^16-1>;
-          Extensions  request_extensions;
+	  ResponderID responder_id_list<0..2^16-1>;
+	  Extensions  request_extensions;
       } OCSPStatusRequest;
 
       opaque ResponderID<1..2^16-1>;

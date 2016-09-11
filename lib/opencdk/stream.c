@@ -50,9 +50,9 @@ struct stream_filter_s *filter_add(cdk_stream_t s, filter_fnct_t fnc,
 
 
 /* FIXME: The read/write/putc/getc function cannot directly
-          return an error code. It is stored in an error variable
-          inside the string. Right now there is no code to
-          return the error code or to reset it. */
+	  return an error code. It is stored in an error variable
+	  inside the string. Right now there is no code to
+	  return the error code or to reset it. */
 
 /**
  * cdk_stream_open:

@@ -122,7 +122,7 @@ void doit(void)
 					      GNUTLS_CRT_PRINT_ONELINE, &tmp);
 			if (debug)
 				printf("\tCertificate %d: %.*s\n", (int)j,
-				       tmp.size, tmp.data);
+					tmp.size, tmp.data);
 			gnutls_free(tmp.data);
 		}
 
@@ -217,11 +217,11 @@ void doit(void)
 
 			ret =
 			    gnutls_x509_trust_list_verify_crt2(tl, certs, j,
-							       vdata, 1,
-							       chains
-							       [i].verify_flags,
-							       &verify_status1,
-							       NULL);
+								vdata, 1,
+								chains
+								[i].verify_flags,
+								&verify_status1,
+								NULL);
 		} else {
 			ret =
 			    gnutls_x509_trust_list_verify_crt(tl, certs, j,

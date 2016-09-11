@@ -22,7 +22,7 @@
  */
 
 /* This file contains the functions needed for RSA/DSA public key
- * encryption and signatures. 
+ * encryption and signatures.
  */
 
 #include "gnutls_int.h"
@@ -66,17 +66,17 @@ static void rnd_func(void *_ctx, size_t length, uint8_t * data)
 static void
 ecc_scalar_zclear (struct ecc_scalar *s)
 {
-        zeroize_key(s->p, ecc_size(s->ecc)*sizeof(mp_limb_t));
-        ecc_scalar_clear(s);
+	zeroize_key(s->p, ecc_size(s->ecc)*sizeof(mp_limb_t));
+	ecc_scalar_clear(s);
 }
 
-static void 
+static void
 ecc_point_zclear (struct ecc_point *p)
 {
-        zeroize_key(p->p, ecc_size_a(p->ecc)*sizeof(mp_limb_t));
-        ecc_point_clear(p);
+	zeroize_key(p->p, ecc_size_a(p->ecc)*sizeof(mp_limb_t));
+	ecc_point_clear(p);
 }
-  
+ 
 static void
 _dsa_params_get(const gnutls_pk_params_st * pk_params,
 		struct dsa_params *pub)
@@ -175,7 +175,7 @@ ecc_shared_secret(struct ecc_scalar *private_key,
 #define DH_EXPONENT_SIZE(p_size) (2*_gnutls_pk_bits_to_subgroup_bits(p_size))
 
 /* This is used for DH or ECDH key derivation. In DH for example
- * it is given the peers Y and our x, and calculates Y^x 
+ * it is given the peers Y and our x, and calculates Y^x
  */
 static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				  gnutls_datum_t * out,
@@ -204,7 +204,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
-		/* check if f==0,1, or f >= p-1. 
+		/* check if f==0,1, or f >= p-1.
 		 * or (ff=f+1) equivalently ff==1,2, ff >= p */
 		if ((_gnutls_mpi_cmp_ui(ff, 2) == 0)
 		    || (_gnutls_mpi_cmp_ui(ff, 1) == 0)
@@ -852,18 +852,14 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 
 				if (params->seed_size) {
 					ret =
-					    _dsa_generate_dss_pqg(&pub, &cert,
-				    			 index,
-							 params->seed_size, params->seed, 
-							 NULL, NULL,
-							 level, q_bits);
+						_dsa_generate_dss_pqg(&pub, &cert,
+							index, params->seed_size, params->seed,
+							NULL, NULL, level, q_bits);
 				} else {
 					ret =
-					    dsa_generate_dss_pqg(&pub, &cert,
-				    			 index,
-							 NULL, rnd_func, 
-							 NULL, NULL,
-							 level, q_bits);
+						dsa_generate_dss_pqg(&pub, &cert,
+							index, NULL, rnd_func,
+							NULL, NULL, level, q_bits);
 				}
 				if (ret != 1) {
 					gnutls_assert();
@@ -1000,11 +996,11 @@ int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
 	ret = 0;
 	goto cleanup;
  fail:
- 	gnutls_free(pub_key->data);
- 	gnutls_free(priv_key->data);
+	gnutls_free(pub_key->data);
+	gnutls_free(priv_key->data);
  cleanup:
- 	gnutls_pk_params_clear(&params);
- 	return ret;
+	gnutls_pk_params_clear(&params);
+	return ret;
 }
 
 /* Note that the value of Z will have the leading bytes stripped if they are zero -
@@ -1052,9 +1048,9 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 
 	ret = 0;
  cleanup:
- 	gnutls_pk_params_clear(&pub);
- 	gnutls_pk_params_clear(&priv);
- 	return ret;
+	gnutls_pk_params_clear(&pub);
+	gnutls_pk_params_clear(&priv);
+	return ret;
 }
 
 int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
@@ -1101,12 +1097,12 @@ int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
 	ret = 0;
 	goto cleanup;
  fail:
- 	gnutls_free(y->data);
- 	gnutls_free(x->data);
- 	gnutls_free(k->data);
+	gnutls_free(y->data);
+	gnutls_free(x->data);
+	gnutls_free(k->data);
  cleanup:
- 	gnutls_pk_params_clear(&params);
- 	return ret;
+	gnutls_pk_params_clear(&params);
+	return ret;
 }
 
 int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
@@ -1181,9 +1177,9 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 
 	ret = 0;
  cleanup:
- 	gnutls_pk_params_clear(&pub);
- 	gnutls_pk_params_clear(&priv);
- 	return ret;
+	gnutls_pk_params_clear(&pub);
+	gnutls_pk_params_clear(&priv);
+	return ret;
 }
 #endif
 
@@ -1216,7 +1212,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			ret =
 			    dsa_generate_dss_keypair(&pub, y, x,
-						 NULL, rnd_func, 
+						 NULL, rnd_func,
 						 NULL, NULL);
 			if (ret != 1) {
 				gnutls_assert();
@@ -1410,7 +1406,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			ecdsa_generate_keypair(&pub, &key, NULL, rnd_func);
 
-			ret = _gnutls_mpi_init_multi(&params->params[ECC_X], &params->params[ECC_Y], 
+			ret = _gnutls_mpi_init_multi(&params->params[ECC_X], &params->params[ECC_Y],
 					&params->params[ECC_K], NULL);
 			if (ret < 0) {
 				gnutls_assert();

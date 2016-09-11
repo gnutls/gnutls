@@ -95,32 +95,32 @@ const gnutls_datum_t server_key = { server_key_pem,
 
 static int client_pull_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
-        fd_set rfds;
-        struct timeval tv;
-        int ret;
-        int fd = (long int)ptr;
+	fd_set rfds;
+	struct timeval tv;
+	int ret;
+	int fd = (long int)ptr;
 
-        FD_ZERO(&rfds);
-        FD_SET(fd, &rfds);
+	FD_ZERO(&rfds);
+	FD_SET(fd, &rfds);
 
-        tv.tv_sec = 0;
-        tv.tv_usec = ms * 1000;
+	tv.tv_sec = 0;
+	tv.tv_usec = ms * 1000;
 
-        while (tv.tv_usec >= 1000000) {
-                tv.tv_usec -= 1000000;
-                tv.tv_sec++;
-        }
+	while (tv.tv_usec >= 1000000) {
+		tv.tv_usec -= 1000000;
+		tv.tv_sec++;
+	}
 
-        ret = select(fd + 1, &rfds, NULL, NULL, &tv);
-        if (ret <= 0)
-                return ret;
+	ret = select(fd + 1, &rfds, NULL, NULL, &tv);
+	if (ret <= 0)
+		return ret;
 
-        return ret;
+	return ret;
 }
 
 static ssize_t client_pull(gnutls_transport_ptr_t ptr, void *data, size_t len)
 {
-        int fd = (long int)ptr;
+	int fd = (long int)ptr;
 	ssize_t ret;
 
 	ret = recv(fd, data, len, 0);
@@ -165,7 +165,7 @@ static void client(int fd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
-        gnutls_transport_set_pull_function(session, client_pull);
+	gnutls_transport_set_pull_function(session, client_pull);
 	gnutls_transport_set_pull_timeout_function(session, client_pull_timeout);
 
 	/* Perform the TLS handshake

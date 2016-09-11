@@ -76,11 +76,11 @@ static const gnutls_cred_map cred_mappings[] = {
 };
 
 #define GNUTLS_KX_MAP_LOOP(b) \
-        const gnutls_cred_map *p; \
-                for(p = cred_mappings; p->algorithm != 0; p++) { b ; }
+	const gnutls_cred_map *p; \
+		for(p = cred_mappings; p->algorithm != 0; p++) { b ; }
 
 #define GNUTLS_KX_MAP_ALG_LOOP_SERVER(a) \
-                        GNUTLS_KX_MAP_LOOP( if(p->server_type == type) { a; break; })
+			GNUTLS_KX_MAP_LOOP( if(p->server_type == type) { a; break; })
 
 struct gnutls_kx_algo_entry {
 	const char *name;
@@ -134,11 +134,11 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 };
 
 #define GNUTLS_KX_LOOP(b) \
-        const gnutls_kx_algo_entry *p; \
-                for(p = _gnutls_kx_algorithms; p->name != NULL; p++) { b ; }
+	const gnutls_kx_algo_entry *p; \
+		for(p = _gnutls_kx_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_KX_ALG_LOOP(a) \
-                        GNUTLS_KX_LOOP( if(p->algorithm == algorithm) { a; break; } )
+			GNUTLS_KX_LOOP( if(p->algorithm == algorithm) { a; break; } )
 
 
 /* Key EXCHANGE functions */

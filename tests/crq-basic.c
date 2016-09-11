@@ -130,7 +130,7 @@ void doit(void)
 
 		if (debug)
 			printf("Chain '%s' (%d)...\n", crq_list[i].name,
-			       (int) i);
+				(int) i);
 
 		if (debug > 2)
 			printf("\tAdding CRL...");
@@ -165,7 +165,7 @@ void doit(void)
 				      &tmp);
 		if (debug)
 			printf("\tCRL: %.*s\n", 
-			       tmp.size, tmp.data);
+				tmp.size, tmp.data);
 		gnutls_free(tmp.data);
 
 		ret = gnutls_x509_crq_get_signature_algorithm(crq);

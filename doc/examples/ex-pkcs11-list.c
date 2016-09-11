@@ -39,7 +39,7 @@ int main(int argc, char **argv)
         }
 
         for (i = 0; i < obj_list_size; i++)
-        	gnutls_pkcs11_obj_deinit(obj_list[i]);
+                gnutls_pkcs11_obj_deinit(obj_list[i]);
 	gnutls_free(obj_list);
 
         return 0;

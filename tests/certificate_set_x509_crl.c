@@ -81,21 +81,21 @@ int main(void)
 	rc = gnutls_x509_crl_init(&crl);
 	if (rc) {
 		printf("gnutls_x509_crl_init rc %d: %s\n", rc,
-		       gnutls_strerror(rc));
+			gnutls_strerror(rc));
 		return 1;
 	}
 
 	rc = gnutls_x509_crl_import(crl, &crldatum, GNUTLS_X509_FMT_PEM);
 	if (rc) {
 		printf("gnutls_x509_crl_import rc %d: %s\n", rc,
-		       gnutls_strerror(rc));
+			gnutls_strerror(rc));
 		return 1;
 	}
 
 	rc = gnutls_certificate_set_x509_crl(crt, &crl, 1);
 	if (rc < 0) {
 		printf("gnutls_certificate_set_x509_crl rc %d: %s\n",
-		       rc, gnutls_strerror(rc));
+			rc, gnutls_strerror(rc));
 		return 1;
 	}
 

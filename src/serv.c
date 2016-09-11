@@ -470,21 +470,21 @@ gnutls_session_t initialize_session(int dtls)
 					GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 
 #ifdef ENABLE_DTLS_SRTP
-        if (HAVE_OPT(SRTP_PROFILES)) {
-                ret =
-                    gnutls_srtp_set_profile_direct(session,
-                                                   OPT_ARG(SRTP_PROFILES),
-                                                   &err);
-                if (ret == GNUTLS_E_INVALID_REQUEST)
-                        fprintf(stderr, "Syntax error at: %s\n", err);
-                else if (ret != 0)
-                        fprintf(stderr, "Error in profiles: %s\n",
-                                gnutls_strerror(ret));
-                else fprintf(stderr,"DTLS profile set to %s\n",
-                             OPT_ARG(SRTP_PROFILES));
+	if (HAVE_OPT(SRTP_PROFILES)) {
+		ret =
+		    gnutls_srtp_set_profile_direct(session,
+						   OPT_ARG(SRTP_PROFILES),
+						   &err);
+		if (ret == GNUTLS_E_INVALID_REQUEST)
+			fprintf(stderr, "Syntax error at: %s\n", err);
+		else if (ret != 0)
+			fprintf(stderr, "Error in profiles: %s\n",
+				gnutls_strerror(ret));
+		else fprintf(stderr,"DTLS profile set to %s\n",
+			     OPT_ARG(SRTP_PROFILES));
 
-                if (ret != 0) exit(1);
-        }
+		if (ret != 0) exit(1);
+	}
 #endif
 
 
@@ -739,7 +739,7 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 	if (getnameinfo(sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) !=
 	    0) {	
 		return "(error)";
-        }
+	}
 
 	l = strlen(buf);
 	buf += l;
@@ -755,7 +755,7 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 	if (getnameinfo(sa, salen, NULL, 0, buf, buflen, NI_NUMERICSERV) !=
 	    0) {
 		snprintf(buf, buflen, "%s", " unknown");
-        }
+	}
 
 	return save_buf;
 }
@@ -1485,7 +1485,7 @@ static void tcp_server(const char *name, int port)
 						if (r == GNUTLS_E_HEARTBEAT_PING_RECEIVED) {
 							gnutls_heartbeat_pong(j->tls_session, 0);
 						} else if (r == GNUTLS_E_REHANDSHAKE) {
-						    	try_rehandshake(j);
+							try_rehandshake(j);
 						} else {
 							j->http_state = HTTP_STATE_CLOSING;
 							if (r < 0) {

@@ -64,7 +64,7 @@ static const int MONTHDAYS[] = {
 
     /* Whether a given year is a leap year. */
 #define ISLEAP(year) \
-        (((year) % 4) == 0 && (((year) % 100) != 0 || ((year) % 400) == 0))
+	(((year) % 4) == 0 && (((year) % 100) != 0 || ((year) % 400) == 0))
 
 /*
  **  Given a struct tm representing a calendar time in UTC, convert it to
@@ -234,10 +234,10 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsig
 		|| gtime >= 253402210800
 #endif
 	 ) {
-        	if (tag)
-        		*tag = ASN1_TAG_GENERALIZEDTime;
-        	snprintf(str_time, str_time_size, "99991231235959Z");
-        	return 0;
+		if (tag)
+			*tag = ASN1_TAG_GENERALIZEDTime;
+		snprintf(str_time, str_time_size, "99991231235959Z");
+		return 0;
 	}
 
 	if (!gmtime_r(&gtime, &_tm)) {
@@ -247,11 +247,11 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsig
 
 	if (_tm.tm_year >= 150) {
 		if (tag)
-        		*tag = ASN1_TAG_GENERALIZEDTime;
+			*tag = ASN1_TAG_GENERALIZEDTime;
 		ret = strftime(str_time, str_time_size, "%Y%m%d%H%M%SZ", &_tm);
 	} else {
 		if (tag)
-        		*tag = ASN1_TAG_UTCTime;
+			*tag = ASN1_TAG_UTCTime;
 		ret = strftime(str_time, str_time_size, "%y%m%d%H%M%SZ", &_tm);
 	}
 	if (!ret) {
@@ -273,8 +273,8 @@ gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
 		|| gtime >= 253402210800
 #endif
 	 ) {
-        	snprintf(str_time, str_time_size, "99991231235959Z");
-        	return 0;
+		snprintf(str_time, str_time_size, "99991231235959Z");
+		return 0;
 	}
 
 	if (!gmtime_r(&gtime, &_tm)) {

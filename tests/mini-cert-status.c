@@ -134,8 +134,8 @@ static void client(int fd)
 	/* Use default priorities */
 	ret =
 	    gnutls_priority_set_direct(session,
-				       "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
-				       &p);
+					"NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
+					&p);
 	if (ret < 0) {
 		fail("error in setting priority: %s\n", p);
 		exit(1);

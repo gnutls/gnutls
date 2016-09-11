@@ -304,7 +304,7 @@ static cdk_error_t armor_decode(void *data, FILE * in, FILE * out)
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 
 			ret = base64_decode_update(&ctx, &crcbuf_size, crcbuf,
-					           len-1, (uint8_t*)buf+1);
+						   len-1, (uint8_t*)buf+1);
 			if (ret == 0)
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 
@@ -323,7 +323,7 @@ static cdk_error_t armor_decode(void *data, FILE * in, FILE * out)
 			if ((ssize_t)raw_size < BASE64_DECODE_LENGTH(len))
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 			ret = base64_decode_update(&ctx, &raw_size, raw,
-					           len, (uint8_t*)buf);
+						   len, (uint8_t*)buf);
 			if (ret == 0)
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 

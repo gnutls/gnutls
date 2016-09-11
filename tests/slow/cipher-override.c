@@ -145,11 +145,11 @@ static void myaes_gcm_deinit(void *_ctx)
 
 static int
 myaes_gcm_encrypt(void *_ctx,
-			const void *nonce, size_t nonce_size,
-			const void *auth, size_t auth_size,
-			size_t tag_size,
-			const void *plain, size_t plain_size,
-		   	void *encr, size_t encr_size)
+		  const void *nonce, size_t nonce_size,
+		  const void *auth, size_t auth_size,
+		  size_t tag_size,
+		  const void *plain, size_t plain_size,
+		  void *encr, size_t encr_size)
 {
 	/* proper AEAD cipher */
 	struct myaes_gcm_ctx *ctx = _ctx;
@@ -168,11 +168,11 @@ myaes_gcm_encrypt(void *_ctx,
 
 static int
 myaes_gcm_decrypt(void *_ctx,
-			const void *nonce, size_t nonce_size,
-			const void *auth, size_t auth_size,
-			size_t tag_size,
-		   	const void *encr, size_t encr_size,
-			void *plain, size_t plain_size)
+		  const void *nonce, size_t nonce_size,
+		  const void *auth, size_t auth_size,
+		  size_t tag_size,
+		  const void *encr, size_t encr_size,
+		  void *plain, size_t plain_size)
 {
 	uint8_t tag[16];
 	struct myaes_gcm_ctx *ctx = _ctx;

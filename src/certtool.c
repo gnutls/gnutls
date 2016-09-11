@@ -58,7 +58,7 @@ void pkcs7_info(common_info_st *);
 void pkcs7_sign(common_info_st *, unsigned embed);
 void pkcs7_generate(common_info_st *);
 void pkcs8_info(void);
-void pkcs8_info_int(gnutls_datum_t *data, unsigned format, 
+void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 			unsigned ignore_err, FILE *out, const char *tab);
 void crq_info(void);
 void smime_to_pkcs7(void);
@@ -2324,14 +2324,14 @@ static gnutls_x509_trust_list_t load_tl(common_info_st * cinfo)
 		}
 
 		ret =
-		    gnutls_x509_trust_list_add_trust_mem(list, &tmp, 
-		    				tmp2.data?&tmp2:NULL,
-						cinfo->incert_format,
-						0, 0);
+			gnutls_x509_trust_list_add_trust_mem(list, &tmp,
+							 tmp2.data?&tmp2:NULL,
+							 cinfo->incert_format,
+							 0, 0);
 		if (ret < 0) {
 			int ret2 =
-			    gnutls_x509_trust_list_add_trust_mem(list, &tmp, 
-			    				tmp2.data?&tmp2:NULL,
+				gnutls_x509_trust_list_add_trust_mem(list, &tmp,
+							tmp2.data?&tmp2:NULL,
 							GNUTLS_X509_FMT_PEM,
 							0, 0);
 			if (ret2 >= 0)
@@ -2519,7 +2519,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 						       vflags,
 						       &output,
 						       detailed_verification);
-	} else { 
+	} else {
 		ret =
 		    gnutls_x509_trust_list_verify_crt(list, x509_cert_list,
 						      x509_ncerts,
@@ -2595,7 +2595,7 @@ static void verify_chain(void)
 	buf[size] = 0;
 
 	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(VERIFY_PURPOSE),
-	                 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
+			 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
 	free(buf);
 }
 
@@ -2736,8 +2736,8 @@ static void print_dn(const char *prefix, const gnutls_datum_t *raw)
 	fprintf(outfile, "%s: %s\n", prefix, str.data);
 
  cleanup:
- 	gnutls_x509_dn_deinit(dn);
- 	gnutls_free(str.data);
+	gnutls_x509_dn_deinit(dn);
+	gnutls_free(str.data);
 }
 
 static void print_raw(const char *prefix, const gnutls_datum_t *raw)
@@ -3448,7 +3448,7 @@ void pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, FILE *out)
 	const char *str;
 	char *oid = NULL;
 
-	ret = gnutls_pkcs12_bag_enc_info(bag, 
+	ret = gnutls_pkcs12_bag_enc_info(bag,
 		&schema, &cipher, salt, &salt_size, &iter_count, &oid);
 	if (ret == GNUTLS_E_UNKNOWN_CIPHER_TYPE) {
 		fprintf(out, "\tSchema: unsupported (%s)\n", oid);
@@ -3623,7 +3623,7 @@ void pkcs12_info(common_info_st * cinfo)
 	}
 }
 
-void pkcs8_info_int(gnutls_datum_t *data, unsigned format, 
+void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 		    unsigned ignore_err, FILE *out, const char *tab)
 {
 	int ret;

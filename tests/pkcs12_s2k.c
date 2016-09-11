@@ -135,9 +135,9 @@ void doit(void)
 
 			if (debug)
 				printf("ij: %d.%d: %s\n", i, j,
-				       _gnutls_bin2hex(key, sizeof(key),
-						       tmp, sizeof(tmp),
-						       NULL));
+					_gnutls_bin2hex(key, sizeof(key),
+							tmp, sizeof(tmp),
+							NULL));
 			x++;
 		}
 	}
@@ -159,8 +159,8 @@ void doit(void)
 
 		if (debug)
 			printf("tv[%d]: %s\n", i,
-			       _gnutls_bin2hex(key, tv[i].keylen, tmp,
-					       sizeof(tmp), NULL));
+				_gnutls_bin2hex(key, tv[i].keylen, tmp,
+						sizeof(tmp), NULL));
 	}
 	if (debug)
 		printf("\n");

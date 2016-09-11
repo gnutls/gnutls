@@ -165,7 +165,7 @@ static gnutls_datum_t sess_id =
 #define TRY(label_size, label, extra_size, extra, size, exp) \
 	{ \
 	ret = gnutls_prf_rfc5705(session, label_size, label, extra_size, extra, size, \
-                         (void*)key_material); \
+			 (void*)key_material); \
 	if (ret < 0) { \
 		fprintf(stderr, "gnutls_prf_rfc5705: error in %d\n", __LINE__); \
 		gnutls_perror(ret); \
@@ -182,7 +182,7 @@ static gnutls_datum_t sess_id =
 #define TRY_OLD(label_size, label, extra_size, extra, size, exp) \
 	{ \
 	ret = gnutls_prf(session, label_size, label, 1, extra_size, extra, size, \
-                         (void*)key_material); \
+			 (void*)key_material); \
 	if (ret < 0) { \
 		fprintf(stderr, "gnutls_prf: error in %d\n", __LINE__); \
 		gnutls_perror(ret); \
@@ -211,7 +211,7 @@ static void check_prfs(gnutls_session_t session)
 
 	/* check whether gnutls_prf matches gnutls_prf_rfc5705 when no context is given */
 	ret = gnutls_prf(session, 4, "aaaa", 0, 0, NULL, 64,
-                         (void*)key_material);
+			 (void*)key_material);
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_prf: error in %d\n", __LINE__);
 		gnutls_perror(ret);
@@ -219,7 +219,7 @@ static void check_prfs(gnutls_session_t session)
 	}
 
 	ret = gnutls_prf_rfc5705(session, 4, "aaaa", 0, NULL, 64,
-                         (void*)key_material2);
+			 (void*)key_material2);
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_prf_rfc5705: error in %d\n", __LINE__);
 		gnutls_perror(ret);
@@ -275,7 +275,7 @@ static void client(int fd)
 	}
 
 	ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -379,7 +379,7 @@ static void server(int fd)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 
 	gnutls_handshake_set_random(session, &hsrnd);
 	gnutls_transport_set_int(session, fd);

@@ -42,7 +42,7 @@ struct record_parameters_st {
 };
 
 typedef struct {
-        unsigned char i[8];
+	unsigned char i[8];
 } uint64;
 #define gnutls_assert_val(x) x
 

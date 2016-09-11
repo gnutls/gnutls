@@ -100,21 +100,21 @@ struct nettle_cipher_ctx {
 
 static void
 _stream_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
-                const uint8_t * src)
+		const uint8_t * src)
 {
 	ctx->cipher->encrypt_block(ctx->ctx_ptr, length, dst, src);
 }
 
 static void
 _stream_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
-                const uint8_t * src)
+		const uint8_t * src)
 {
 	ctx->cipher->decrypt_block(ctx->ctx_ptr, length, dst, src);
 }
 
 static void
 _cbc_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
-                const uint8_t * src)
+		const uint8_t * src)
 {
 	cbc_encrypt(ctx->ctx_ptr, ctx->cipher->encrypt_block,
 		    ctx->iv_size, ctx->iv,
@@ -123,7 +123,7 @@ _cbc_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 
 static void
 _cbc_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
-                const uint8_t * src)
+		const uint8_t * src)
 {
 	cbc_decrypt(ctx->ctx_ptr, ctx->cipher->decrypt_block,
 		    ctx->iv_size, ctx->iv,
@@ -160,11 +160,11 @@ _ccm_decrypt(struct nettle_cipher_ctx *ctx,
 
 static void
 _chacha_poly1305_set_nonce (struct chacha_poly1305_ctx *ctx,
-                   size_t length, const uint8_t *nonce)
+		   size_t length, const uint8_t *nonce)
 {
 	chacha_poly1305_set_nonce(ctx, nonce);
 }
-                   
+		   
 struct gcm_cast_st { struct gcm_key key; struct gcm_ctx gcm; unsigned long xx[1]; };
 #define GCM_CTX_GET_KEY(ptr) (&((struct gcm_cast_st*)ptr)->key)
 #define GCM_CTX_GET_CTX(ptr) (&((struct gcm_cast_st*)ptr)->gcm)
@@ -172,7 +172,7 @@ struct gcm_cast_st { struct gcm_key key; struct gcm_ctx gcm; unsigned long xx[1]
 
 static void
 _gcm_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
-                 const uint8_t * src)
+		 const uint8_t * src)
 {
 	gcm_encrypt(GCM_CTX_GET_CTX(ctx->ctx_ptr), GCM_CTX_GET_KEY(ctx->ctx_ptr),
 		    GCM_CTX_GET_CIPHER(ctx->ctx_ptr), ctx->cipher->encrypt_block,
@@ -181,7 +181,7 @@ _gcm_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 
 static void
 _gcm_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
-                 const uint8_t * src)
+		 const uint8_t * src)
 {
 	gcm_decrypt(GCM_CTX_GET_CTX(ctx->ctx_ptr), GCM_CTX_GET_KEY(ctx->ctx_ptr),
 		    GCM_CTX_GET_CIPHER(ctx->ctx_ptr), ctx->cipher->encrypt_block,
@@ -620,7 +620,7 @@ wrap_nettle_cipher_aead_encrypt(void *_ctx,
 				const void *auth, size_t auth_size,
 				size_t tag_size,
 				const void *plain, size_t plain_size,
-			   	void *encr, size_t encr_size)
+				void *encr, size_t encr_size)
 {
 	struct nettle_cipher_ctx *ctx = _ctx;
 
@@ -652,7 +652,7 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 				const void *nonce, size_t nonce_size,
 				const void *auth, size_t auth_size,
 				size_t tag_size,
-			   	const void *encr, size_t encr_size,
+				const void *encr, size_t encr_size,
 				void *plain, size_t plain_size)
 {
 	struct nettle_cipher_ctx *ctx = _ctx;

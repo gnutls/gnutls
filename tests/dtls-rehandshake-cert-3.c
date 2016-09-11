@@ -322,7 +322,7 @@ static void server(int fd)
 			do {
 				ret =
 				    gnutls_record_send(session, buffer,
-						       strlen(buffer));
+							strlen(buffer));
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		}

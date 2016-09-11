@@ -173,9 +173,9 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	else
 		gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_SRP,
-			       server_srp_cred);
+				server_srp_cred);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       server_x509_cred);
+				server_x509_cred);
 
 	gnutls_priority_set_direct(server,
 				   prio,
@@ -209,7 +209,7 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       client_x509_cred);
+				client_x509_cred);
 	if (ret < 0)
 		exit(1);
 

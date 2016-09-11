@@ -63,7 +63,7 @@ _gnutls_dumbfw_send_params(gnutls_session_t session,
 	} else {
 		/* 256 <= extdata->length < 512 */
 		pad_size = 512 - extdata->length;
-	        memset(pad, 0, pad_size);
+		memset(pad, 0, pad_size);
 
 		ret =
 		    gnutls_buffer_append_data(extdata, pad,

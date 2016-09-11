@@ -751,21 +751,21 @@ gnutls_session_t init_tls_session(const char *host)
 					GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 
 #ifdef ENABLE_DTLS_SRTP
-        if (HAVE_OPT(SRTP_PROFILES)) {
-                ret =
-                    gnutls_srtp_set_profile_direct(session,
-                                                   OPT_ARG(SRTP_PROFILES),
-                                                   &err);
-                if (ret == GNUTLS_E_INVALID_REQUEST)
-                        fprintf(stderr, "Syntax error at: %s\n", err);
-                else if (ret != 0)
-                        fprintf(stderr, "Error in profiles: %s\n",
-                                gnutls_strerror(ret));
-                else fprintf(stderr,"DTLS profile set to %s\n",
-                             OPT_ARG(SRTP_PROFILES));
+	if (HAVE_OPT(SRTP_PROFILES)) {
+		ret =
+		    gnutls_srtp_set_profile_direct(session,
+						   OPT_ARG(SRTP_PROFILES),
+						   &err);
+		if (ret == GNUTLS_E_INVALID_REQUEST)
+			fprintf(stderr, "Syntax error at: %s\n", err);
+		else if (ret != 0)
+			fprintf(stderr, "Error in profiles: %s\n",
+				gnutls_strerror(ret));
+		else fprintf(stderr,"DTLS profile set to %s\n",
+			     OPT_ARG(SRTP_PROFILES));
 
-                if (ret != 0) exit(1);
-        }
+		if (ret != 0) exit(1);
+	}
 #endif
 
 

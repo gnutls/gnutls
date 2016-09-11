@@ -215,14 +215,14 @@ void binprint(const void *_str, size_t len)
 	printf("\t;; ");
 	for (i = 0; i < len; i++) {
 		printf("%d%d%d%d%d%d%d%d ",
-		       (str[i] & 0xFF) & 0x80 ? 1 : 0,
-		       (str[i] & 0xFF) & 0x40 ? 1 : 0,
-		       (str[i] & 0xFF) & 0x20 ? 1 : 0,
-		       (str[i] & 0xFF) & 0x10 ? 1 : 0,
-		       (str[i] & 0xFF) & 0x08 ? 1 : 0,
-		       (str[i] & 0xFF) & 0x04 ? 1 : 0,
-		       (str[i] & 0xFF) & 0x02 ? 1 : 0,
-		       (str[i] & 0xFF) & 0x01 ? 1 : 0);
+			(str[i] & 0xFF) & 0x80 ? 1 : 0,
+			(str[i] & 0xFF) & 0x40 ? 1 : 0,
+			(str[i] & 0xFF) & 0x20 ? 1 : 0,
+			(str[i] & 0xFF) & 0x10 ? 1 : 0,
+			(str[i] & 0xFF) & 0x08 ? 1 : 0,
+			(str[i] & 0xFF) & 0x04 ? 1 : 0,
+			(str[i] & 0xFF) & 0x02 ? 1 : 0,
+			(str[i] & 0xFF) & 0x01 ? 1 : 0);
 		if ((i + 1) % 3 == 0)
 			printf(" ");
 		if ((i + 1) % 6 == 0 && i + 1 < len)
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 
 	if (debug || error_count > 0)
 		printf("Self test `%s' finished with %d errors\n", argv[0],
-		       error_count);
+			error_count);
 
 	return error_count ? 1 : 0;
 }

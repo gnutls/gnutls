@@ -40,8 +40,8 @@
 
 // for documentation see the implementation
 static int name_constraints_intersect_nodes(name_constraints_node_st * nc1,
-                                            name_constraints_node_st * nc2,
-                                            name_constraints_node_st ** intersection);
+					    name_constraints_node_st * nc2,
+					    name_constraints_node_st ** intersection);
 
 /*-
  * is_nc_empty:
@@ -92,7 +92,7 @@ static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc, unsigned type
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  -*/
 static int validate_name_constraints_node(gnutls_x509_subject_alt_name_t type,
-                                          const gnutls_datum_t* name)
+					  const gnutls_datum_t* name)
 {
 	if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME &&
 		type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI &&
@@ -209,8 +209,8 @@ void _gnutls_name_constraints_node_free(name_constraints_node_st *node)
  * Returns: Pointer to newly allocated node or NULL in case of memory error.
  -*/
 static name_constraints_node_st* name_constraints_node_new(unsigned type,
-                                                           unsigned char *data,
-                                                           unsigned int size)
+							   unsigned char *data,
+							   unsigned int size)
 {
 	name_constraints_node_st *tmp = gnutls_malloc(sizeof(struct name_constraints_node_st));
 	if (tmp == NULL)
@@ -250,8 +250,8 @@ static name_constraints_node_st* name_constraints_node_new(unsigned type,
  -*/
 static
 int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
-                                       name_constraints_node_st * _nc2,
-                                       name_constraints_node_st ** _nc_excluded)
+				       name_constraints_node_st * _nc2,
+				       name_constraints_node_st ** _nc_excluded)
 {
 	name_constraints_node_st *nc, *nc2, *t, *tmp, *dest = NULL, *prev = NULL;
 	int ret, type, used;
@@ -335,7 +335,7 @@ int _gnutls_name_constraints_intersect(name_constraints_node_st ** _nc,
 		}
 		// if the node from nc2 was not used for intersection, copy it to DEST
 		// Beware: also copies nodes other than DNS, email, IP,
-		//         since their counterpart may have been moved in phase 1.
+		//	 since their counterpart may have been moved in phase 1.
 		if (!used) {
 			tmp = name_constraints_node_new(nc2->type, nc2->name.data, nc2->name.size);
 			if (tmp == NULL) {
@@ -451,9 +451,9 @@ static int _gnutls_name_constraints_append(name_constraints_node_st **_nc,
  * Since: 3.3.0
  **/
 int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
-                                         gnutls_x509_name_constraints_t nc,
-                                         unsigned int flags,
-                                         unsigned int *critical)
+					 gnutls_x509_name_constraints_t nc,
+					 unsigned int flags,
+					 unsigned int *critical)
 {
 	int ret;
 	gnutls_datum_t der = { NULL, 0 };
@@ -526,9 +526,9 @@ int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc)
 
 static
 int name_constraints_add(gnutls_x509_name_constraints_t nc,
-                         gnutls_x509_subject_alt_name_t type,
-                         const gnutls_datum_t * name,
-                         unsigned permitted)
+			 gnutls_x509_subject_alt_name_t type,
+			 const gnutls_datum_t * name,
+			 unsigned permitted)
 {
 	struct name_constraints_node_st * tmp, *prev = NULL;
 	int ret;
@@ -581,7 +581,7 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
  * Since: 3.5.0
  -*/
 int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
-                                        gnutls_x509_name_constraints_t nc2)
+					gnutls_x509_name_constraints_t nc2)
 {
 	int ret;
 
@@ -621,8 +621,8 @@ int _gnutls_x509_name_constraints_merge(gnutls_x509_name_constraints_t nc,
  * Since: 3.3.0
  **/
 int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc,
-                                               gnutls_x509_subject_alt_name_t type,
-                                               const gnutls_datum_t * name)
+					       gnutls_x509_subject_alt_name_t type,
+					       const gnutls_datum_t * name)
 {
 	return name_constraints_add(nc, type, name, 1);
 }
@@ -645,8 +645,8 @@ int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc
  * Since: 3.3.0
  **/
 int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
-                                              gnutls_x509_subject_alt_name_t type,
-                                              const gnutls_datum_t * name)
+					      gnutls_x509_subject_alt_name_t type,
+					      const gnutls_datum_t * name)
 {
 	return name_constraints_add(nc, type, name, 0);
 }
@@ -666,8 +666,8 @@ int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
  * Since: 3.3.0
  **/
 int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt, 
-                                         gnutls_x509_name_constraints_t nc,
-                                         unsigned int critical)
+					 gnutls_x509_name_constraints_t nc,
+					 unsigned int critical)
 {
 int ret;
 gnutls_datum_t der;
@@ -760,7 +760,7 @@ static unsigned email_matches(const gnutls_datum_t *name, const gnutls_datum_t *
  * @nc1: name constraints node 1
  * @nc2: name constraints node 2
  * @_intersection: newly allocated node with intersected constraints,
- *                 NULL if the intersection is empty
+ *		 NULL if the intersection is empty
  *
  * Inspect 2 name constraints nodes (of possibly different types) and allocate
  * a new node with intersection of given constraints.
@@ -769,8 +769,8 @@ static unsigned email_matches(const gnutls_datum_t *name, const gnutls_datum_t *
  -*/
 static int
 name_constraints_intersect_nodes(name_constraints_node_st * nc1,
-                                 name_constraints_node_st * nc2,
-                                 name_constraints_node_st ** _intersection)
+				 name_constraints_node_st * nc2,
+				 name_constraints_node_st ** _intersection)
 {
 	// presume empty intersection
 	name_constraints_node_st *intersection = NULL;
@@ -1029,8 +1029,8 @@ unsigned check_ip_constraints(gnutls_x509_name_constraints_t nc,
  * Since: 3.3.0
  **/
 unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
-                                            gnutls_x509_subject_alt_name_t type,
-                                            const gnutls_datum_t * name)
+					    gnutls_x509_subject_alt_name_t type,
+					    const gnutls_datum_t * name)
 {
 	if (type == GNUTLS_SAN_DNSNAME)
 		return check_dns_constraints(nc, name);
@@ -1049,8 +1049,8 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
  * is present in the CA, _and_ the name in the end certificate contains
  * the constrained element. */
 static int check_unsupported_constraint2(gnutls_x509_crt_t cert, 
-                                         gnutls_x509_name_constraints_t nc,
-                                         gnutls_x509_subject_alt_name_t type)
+					 gnutls_x509_name_constraints_t nc,
+					 gnutls_x509_subject_alt_name_t type)
 {
 	unsigned idx, found_one;
 	char name[MAX_CN];
@@ -1102,8 +1102,8 @@ static int check_unsupported_constraint2(gnutls_x509_crt_t cert,
  * Since: 3.3.0
  **/
 unsigned gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
-                                                gnutls_x509_subject_alt_name_t type,
-                                                gnutls_x509_crt_t cert)
+						gnutls_x509_subject_alt_name_t type,
+						gnutls_x509_crt_t cert)
 {
 char name[MAX_CN];
 size_t name_size;
@@ -1212,7 +1212,7 @@ unsigned found_one;
 			/* ensure there is only a single CN, according to rfc6125 */
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
-				 			    1, 0, name, &name_size);
+							    1, 0, name, &name_size);
 			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				return gnutls_assert_val(0);
 
@@ -1300,8 +1300,8 @@ unsigned found_one;
  * Since: 3.3.0
  **/
 int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc,
-                                               unsigned idx,
-                                               unsigned *type, gnutls_datum_t * name)
+					       unsigned idx,
+					       unsigned *type, gnutls_datum_t * name)
 {
 	unsigned int i;
 	struct name_constraints_node_st * tmp = nc->permitted;
@@ -1344,8 +1344,8 @@ int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc
  * Since: 3.3.0
  **/
 int gnutls_x509_name_constraints_get_excluded(gnutls_x509_name_constraints_t nc,
-                                              unsigned idx,
-                                              unsigned *type, gnutls_datum_t * name)
+					      unsigned idx,
+					      unsigned *type, gnutls_datum_t * name)
 {
 	unsigned int i;
 	struct name_constraints_node_st * tmp = nc->excluded;

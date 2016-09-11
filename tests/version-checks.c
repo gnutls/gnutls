@@ -84,7 +84,7 @@ static void try(const char *client_prio, int expected)
 
 	gnutls_init(&server, GNUTLS_SERVER|flags);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 
 	assert(gnutls_priority_set_direct(server,
 				   server_prio,
@@ -109,7 +109,7 @@ static void try(const char *client_prio, int expected)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	if (ret < 0)
 		exit(1);
 

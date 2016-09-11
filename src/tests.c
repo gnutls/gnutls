@@ -465,7 +465,7 @@ test_code_t test_dhe_group(gnutls_session_t session)
 		print = raw_to_string(prime.data, prime.size);
 		if (print) {
 			fprintf(fp, " Prime [%d bits]: %s\n", prime.size * 8,
-		        	print);
+				print);
 		}
 
 		gnutls_dh_get_pubkey(session, &pubkey2);

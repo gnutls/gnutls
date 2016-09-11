@@ -609,7 +609,7 @@ struct record_state_st {
    0x0000-0xffff. */
 #define EPOCH_READ_CURRENT  70000
 #define EPOCH_WRITE_CURRENT 70001
-#define EPOCH_NEXT          70002
+#define EPOCH_NEXT	  70002
 
 struct record_parameters_st {
 	uint16_t epoch;
@@ -694,12 +694,12 @@ struct gnutls_priority_st {
 #define DEFAULT_MAX_EMPTY_RECORDS 200
 
 #define ENABLE_COMPAT(x) \
-              (x)->allow_large_records = 1; \
-              (x)->no_etm = 1; \
-              (x)->no_ext_master_secret = 1; \
-              (x)->allow_key_usage_violation = 1; \
-              (x)->allow_wrong_pms = 1; \
-              (x)->dumbfw = 1
+	      (x)->allow_large_records = 1; \
+	      (x)->no_etm = 1; \
+	      (x)->no_ext_master_secret = 1; \
+	      (x)->allow_key_usage_violation = 1; \
+	      (x)->allow_wrong_pms = 1; \
+	      (x)->dumbfw = 1
 
 /* DH and RSA parameters types.
  */

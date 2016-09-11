@@ -264,7 +264,7 @@ static void server(int fd, const char *prio)
 	do {
 		ret =
 		    gnutls_record_send(session, buffer,
-				       gnutls_dtls_get_data_mtu(session));
+					gnutls_dtls_get_data_mtu(session));
 	} while (ret == GNUTLS_E_AGAIN
 		 || ret == GNUTLS_E_INTERRUPTED);
 	if (ret < 0) {

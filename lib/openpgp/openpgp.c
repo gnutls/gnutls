@@ -191,8 +191,8 @@ gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials_t res,
  */
 int
 gnutls_certificate_get_openpgp_key(gnutls_certificate_credentials_t res,
-                                   unsigned index,
-                                   gnutls_openpgp_privkey_t *key)
+				   unsigned index,
+				   gnutls_openpgp_privkey_t *key)
 {
 	if (index >= res->ncerts) {
 		gnutls_assert();
@@ -230,9 +230,9 @@ gnutls_certificate_get_openpgp_key(gnutls_certificate_credentials_t res,
  */
 int
 gnutls_certificate_get_openpgp_crt(gnutls_certificate_credentials_t res,
-                                   unsigned index,
-                                   gnutls_openpgp_crt_t **crt_list,
-                                   unsigned *crt_list_size)
+				   unsigned index,
+				   gnutls_openpgp_crt_t **crt_list,
+				   unsigned *crt_list_size)
 {
 	int ret;
 	unsigned i;

@@ -144,7 +144,7 @@ void doit(void)
 		crq_key_id_len = 0;
 		ret =
 		    gnutls_x509_crq_get_key_id(crq, 0, crq_key_id,
-					       &crq_key_id_len);
+						&crq_key_id_len);
 		if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			fail("gnutls_x509_crq_get_key_id incorrectly returns %d: %s\n", ret, gnutls_strerror(ret));
 		}
@@ -153,7 +153,7 @@ void doit(void)
 		    malloc(sizeof(unsigned char) * crq_key_id_len);
 		ret =
 		    gnutls_x509_crq_get_key_id(crq, 0, crq_key_id,
-					       &crq_key_id_len);
+						&crq_key_id_len);
 		if (ret != GNUTLS_E_SUCCESS) {
 			fail("gnutls_x509_crq_get_key_id incorrectly returns %d: %s\n", ret, gnutls_strerror(ret));
 		}

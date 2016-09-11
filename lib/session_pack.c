@@ -274,7 +274,7 @@ _gnutls_session_unpack(gnutls_session_t session,
 /* Format: 
  *      1 byte the credentials type
  *      4 bytes the size of the whole structure
- *        DH stuff
+ *	DH stuff
  *      2 bytes the size of secret key in bits
  *      4 bytes the size of the prime
  *      x bytes the prime
@@ -282,12 +282,12 @@ _gnutls_session_unpack(gnutls_session_t session,
  *      x bytes the generator
  *      4 bytes the size of the public key
  *      x bytes the public key
- *        RSA stuff
+ *	RSA stuff
  *      4 bytes the size of the modulus
  *      x bytes the modulus
  *      4 bytes the size of the exponent
  *      x bytes the exponent
- *        CERTIFICATES
+ *	CERTIFICATES
  *      4 bytes the length of the certificate list
  *      4 bytes the size of first certificate
  *      x bytes the certificate
@@ -712,8 +712,8 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
  *
  *      4 bytes the new record padding flag
  *      4 bytes the ECC curve
- *            -------------------
- *                MAX: 169 bytes
+ *	    -------------------
+ *		MAX: 169 bytes
  *
  */
 static int

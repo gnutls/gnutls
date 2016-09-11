@@ -211,7 +211,7 @@ static int parse_commitment_line(char *line,
 	/* hash and hex encode */
 	ret =
 	    _gnutls_hash_fast((gnutls_digest_algorithm_t)hash_algo->id, 
-	    			skey->data, skey->size, phash);
+				skey->data, skey->size, phash);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -728,8 +728,8 @@ int gnutls_tdb_init(gnutls_tdb_t * tdb)
  * trust storage structure. The function is of the following form.
  *
  * int gnutls_tdb_store_func(const char* db_name, const char* host,
- *                       const char* service, time_t expiration,
- *                       const gnutls_datum_t* pubkey);
+ *		       const char* service, time_t expiration,
+ *		       const gnutls_datum_t* pubkey);
  *
  * The @db_name should be used to pass any private data to this function.
  *
@@ -749,8 +749,8 @@ void gnutls_tdb_set_store_func(gnutls_tdb_t tdb,
  * trust storage structure. The function is of the following form.
  *
  * int gnutls_tdb_store_commitment_func(const char* db_name, const char* host,
- *                       const char* service, time_t expiration,
- *                       gnutls_digest_algorithm_t, const gnutls_datum_t* hash);
+ *		       const char* service, time_t expiration,
+ *		       gnutls_digest_algorithm_t, const gnutls_datum_t* hash);
  *
  * The @db_name should be used to pass any private data to this function.
  *
@@ -771,7 +771,7 @@ void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
  * trust storage structure. The function is of the following form.
  *
  * int gnutls_tdb_verify_func(const char* db_name, const char* host,
- *                      const char* service, const gnutls_datum_t* pubkey);
+ *		      const char* service, const gnutls_datum_t* pubkey);
  *
  * The verify function should return zero on a match, %GNUTLS_E_CERTIFICATE_KEY_MISMATCH
  * if there is a mismatch and any other negative error code otherwise.

@@ -62,11 +62,11 @@ static const mac_entry_st hash_algorithms[] = {
 
 
 #define GNUTLS_HASH_LOOP(b) \
-        const mac_entry_st *p; \
-                for(p = hash_algorithms; p->name != NULL; p++) { b ; }
+	const mac_entry_st *p; \
+		for(p = hash_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_HASH_ALG_LOOP(a) \
-                        GNUTLS_HASH_LOOP( if(p->id == algorithm) { a; break; } )
+			GNUTLS_HASH_LOOP( if(p->id == algorithm) { a; break; } )
 
 const mac_entry_st *_gnutls_mac_to_entry(gnutls_mac_algorithm_t c)
 {
@@ -172,7 +172,7 @@ gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name)
 	GNUTLS_HASH_LOOP(
 		if (strcasecmp(p->name, name) == 0) {
 			if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
-  				ret = p->id;
+				ret = p->id;
 			break;
 		}
 	);

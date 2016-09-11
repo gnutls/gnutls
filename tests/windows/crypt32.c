@@ -67,7 +67,7 @@ __declspec(dllexport)
 PCCERT_CONTEXT WINAPI CertFindCertificateInStore(
 	HCERTSTORE hCertStore, DWORD dwCertEncodingType,
 	DWORD dwFindFlags, DWORD dwFindType,
-        const void *pvFindPara, PCCERT_CONTEXT pPrevCertContext)
+	const void *pvFindPara, PCCERT_CONTEXT pPrevCertContext)
 {
 	//CRYPT_HASH_BLOB *blob = (void*)pvFindPara;
 
@@ -163,7 +163,7 @@ BOOL WINAPI CryptAcquireContextW(HCRYPTPROV *phProv, LPCWSTR szContainer,
 
 __declspec(dllexport)
 BOOL WINAPI CryptDecrypt(HCRYPTKEY hKey, HCRYPTHASH hHash, BOOL Final,
-		         DWORD dwFlags, BYTE *pbData, DWORD *pdwDataLen)
+			 DWORD dwFlags, BYTE *pbData, DWORD *pdwDataLen)
 {
 	return 0;
 }

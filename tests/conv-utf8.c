@@ -38,7 +38,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 			 gnutls_datum_t * output);
 
 int _gnutls_ucs2_to_utf8(const void *data, size_t size,
-                         gnutls_datum_t * output, unsigned be);
+			 gnutls_datum_t * output, unsigned be);
 
 #define DEBUG
 

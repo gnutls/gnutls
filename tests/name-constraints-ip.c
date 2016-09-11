@@ -271,7 +271,7 @@ static void check_simple_intersection(void **glob_state)
 	/* 4: simple intersection
 	 * --------P:203.0.113.0/24--------
 	 * --P:203.0.113.0/26--
-	 *      A                   B          C
+	 *      A		   B	  C
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;
@@ -307,8 +307,8 @@ static void check_empty_intersection(void **glob_state)
 {
 	/* 5: empty intersection
 	 * --P:127.0.113.0/24--
-	 *                            --P:255.0.113.0/24--
-	 *      A                 B          C
+	 *			    --P:255.0.113.0/24--
+	 *      A		 B	  C
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;
@@ -344,8 +344,8 @@ static void check_mediocre_intersection(void **glob_state)
 {
 	/* 6: mediocre intersection
 	 * --------P:127.0.113.0/24--------
-	 * --P:127.0.113.0/26--                    --P:255.0.113.0/24--
-	 *      A                 B          C            D
+	 * --P:127.0.113.0/26--		    --P:255.0.113.0/24--
+	 *      A		 B	  C	    D
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;
@@ -390,7 +390,7 @@ static void check_difficult_intersection(void **glob_state)
 	/* 7: difficult intersection
 	 * --------P:0.0.0.0/3---------------     --P:88.0.0.0/5--
 	 * --P:0.0.0.0/5-- --P:16.0.0.0/5--   ----P:64.0.0.0/3----
-	 *      A         B       C        D E  F         G        H
+	 *      A	 B	C	D E  F	 G	H
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;
@@ -461,7 +461,7 @@ static void check_ipv6_intersection(void **glob_state)
 	/* 8: IPv6 intersection
 	 *   --------P:affb::/16-----   --P:affd:0000::/20--
 	 *     --P:affb:aa00::/24--
-	 * A  B        C           D  E     F                G
+	 * A  B	C	   D  E     F		G
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;
@@ -521,11 +521,11 @@ static void check_empty_ipv4_intersection_ipv6_remains(void **glob_state)
 	/* 9: IPv4 and IPv6 in a common test case
 	 *    IPv4 with empty intersection, but IPv6 gets restricted as well
 	 * --P:127.0.113.0/24--
-	 *                            --P:255.0.113.0/24--
-	 *      A                 B          C
+	 *			    --P:255.0.113.0/24--
+	 *      A		 B	  C
 	 *
 	 * --P:bfa6::/16--
-	 *    D           E
+	 *    D	   E
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;
@@ -575,12 +575,12 @@ static void check_empty_ipv4v6_intersections(void **glob_state)
 	/* 10: IPv4 and IPv6 in a common test case
 	 *     both IPv4 and IPv6 have empty intersection
 	 * --P:127.0.113.0/24--
-	 *                            --P:255.0.113.0/24--
-	 *      A                 B          C
+	 *			    --P:255.0.113.0/24--
+	 *      A		 B	  C
 	 *
 	 * --P:bfa6::/16--
-	 *                          --P:cfa6::/16--
-	 *    D           E             F
+	 *			  --P:cfa6::/16--
+	 *    D	   E	     F
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;
@@ -638,10 +638,10 @@ static void check_ipv4v6_single_constraint_each(void **glob_state)
 	/* 11: 1 IPv4 range and 1 IPv6 range in a common test case
 	 *     (no overlap)
 	 * --P:127.0.113.0/24--
-	 *      A               B
+	 *      A		B
 	 *
 	 * --P:bfa6::/16--
-	 *    C           D
+	 *    C	   D
 	 */
 	int ret;
 	gnutls_x509_name_constraints_t nc =  ((test_vars_t*)*glob_state)->nc;

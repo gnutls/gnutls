@@ -32,7 +32,7 @@ _gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url);
 
 int
 _gnutls_privkey_import_system_url(gnutls_privkey_t pkey,
-			          const char *url);
+				  const char *url);
 
 void _gnutls_system_key_deinit(void);
 int _gnutls_system_key_init(void);

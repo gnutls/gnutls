@@ -77,8 +77,8 @@ void doit(void)
 		    GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	ret =
 	    gnutls_priority_set_direct(server,
-				       "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				       NULL);
+					"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+					NULL);
 	if (ret < 0)
 		exit(1);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
@@ -94,8 +94,8 @@ void doit(void)
 		    GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NONBLOCK);
 	cret =
 	    gnutls_priority_set_direct(client,
-				       "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				       NULL);
+					"NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+					NULL);
 	if (cret < 0)
 		exit(1);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);

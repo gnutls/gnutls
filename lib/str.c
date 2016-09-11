@@ -475,7 +475,7 @@ char *_gnutls_bin2hex(const void *_old, size_t oldlen,
  * @hex_size: size of hex data
  * @bin_data: output array with binary data
  * @bin_size: when calling should hold maximum size of @bin_data,
- *            on return will hold actual length of @bin_data.
+ *	    on return will hold actual length of @bin_data.
  *
  * Convert a buffer with hex data to binary data. This function
  * unlike gnutls_hex_decode() can parse hex data with separators

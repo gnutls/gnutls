@@ -377,16 +377,16 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int flags,
 
 	ret = gnutls_pkcs11_obj_export3(obj, info->outcert_format, &t);
 	if (ret < 0) {
-        	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-                exit(1);
-        }
+		exit(1);
+	}
 
 	fwrite(t.data, 1, t.size, outfile);
 	gnutls_free(t.data);
 
 	if (info->outcert_format == GNUTLS_X509_FMT_PEM)
-        	fputs("\n\n", outfile);
+		fputs("\n\n", outfile);
 
 	gnutls_pkcs11_obj_deinit(obj);
 
@@ -432,62 +432,62 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
 
 	ret = gnutls_x509_crt_import_pkcs11(xcrt, obj);
 	if (ret < 0) {
-        	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-                exit(1);
-        }
+		exit(1);
+	}
 
 	ret = gnutls_pkcs11_obj_export3(obj, GNUTLS_X509_FMT_PEM, &t);
 	if (ret < 0) {
-        	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-                exit(1);
-        }
+		exit(1);
+	}
 	fwrite(t.data, 1, t.size, outfile);
-       	fputs("\n\n", outfile);
-        gnutls_free(t.data);
+	fputs("\n\n", outfile);
+	gnutls_free(t.data);
 
-        gnutls_pkcs11_obj_deinit(obj);
-        
-        do {
-                ret = gnutls_pkcs11_get_raw_issuer(url, xcrt, &t, GNUTLS_X509_FMT_PEM, 0);
-        	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	                break;
-        	if (ret < 0) {
-                	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-		        		__LINE__, gnutls_strerror(ret));
-                        exit(1);
-                }
-                
-        	fwrite(t.data, 1, t.size, outfile);
-               	fputs("\n\n", outfile);
+	gnutls_pkcs11_obj_deinit(obj);
 
-               	gnutls_x509_crt_deinit(xcrt);
+	do {
+		ret = gnutls_pkcs11_get_raw_issuer(url, xcrt, &t, GNUTLS_X509_FMT_PEM, 0);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+					__LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
 
-               	ret = gnutls_x509_crt_init(&xcrt);
-        	if (ret < 0) {
-                	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-		        		__LINE__, gnutls_strerror(ret));
-                        exit(1);
-                }
+		fwrite(t.data, 1, t.size, outfile);
+		fputs("\n\n", outfile);
 
-               	ret = gnutls_x509_crt_import(xcrt, &t, GNUTLS_X509_FMT_PEM);
-        	if (ret < 0) {
-                	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-		        		__LINE__, gnutls_strerror(ret));
-                        exit(1);
-                }
+		gnutls_x509_crt_deinit(xcrt);
 
-                gnutls_free(t.data);
-                
-                ret = gnutls_x509_crt_check_issuer(xcrt, xcrt);
-                if (ret != 0) {
-                        /* self signed */
-                        break;
-                }
-                
-        } while(1);
-        
+		ret = gnutls_x509_crt_init(&xcrt);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+					__LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ret = gnutls_x509_crt_import(xcrt, &t, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+					__LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		gnutls_free(t.data);
+
+		ret = gnutls_x509_crt_check_issuer(xcrt, xcrt);
+		if (ret != 0) {
+			/* self signed */
+			break;
+		}
+
+	} while(1);
+
 	UNFIX;
 	return;
 }
@@ -840,8 +840,8 @@ pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int
 
 	ret =
 	    gnutls_pkcs11_privkey_export_pubkey(pkey,
-					        GNUTLS_X509_FMT_PEM, &pubkey,
-					        flags);
+						GNUTLS_X509_FMT_PEM, &pubkey,
+						flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));

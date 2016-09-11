@@ -107,7 +107,7 @@ static void client(int fd, int server_init)
 				   NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 
 	gnutls_transport_set_int(session, fd);
 	gnutls_transport_set_push_function(session, push);
@@ -237,7 +237,7 @@ static void server(int fd, int server_init)
 				   NULL) >= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 
 	gnutls_transport_set_int(session, fd);
 	gnutls_transport_set_push_function(session, push);
@@ -310,7 +310,7 @@ static void server(int fd, int server_init)
 					ret = gnutls_handshake(session);
 				}
 				while (ret < 0
-				       && gnutls_error_is_fatal(ret) == 0);
+					&& gnutls_error_is_fatal(ret) == 0);
 				if (ret == 0)
 					break;
 			}
@@ -323,7 +323,7 @@ static void server(int fd, int server_init)
 			do {
 				ret =
 				    gnutls_record_send(session, buffer,
-						       strlen(buffer));
+							strlen(buffer));
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		}

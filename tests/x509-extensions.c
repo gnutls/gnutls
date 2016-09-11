@@ -725,7 +725,7 @@ void doit(void)
 		oid_len = sizeof(oid);
 		ret =
 		    gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_len,
-						       &critical);
+							&critical);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			if (i != 9) {
 				fail("unexpected number of extensions: %d\n",

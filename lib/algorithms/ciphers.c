@@ -176,7 +176,7 @@ static const cipher_entry_st algorithms[] = {
 	  .explicit_iv = 8,
 	  .cipher_iv = 12,
 	  .tagsize = 16},
-        { .name = "3DES-CBC", 
+	{ .name = "3DES-CBC", 
 	  .id = GNUTLS_CIPHER_3DES_CBC,
 	  .blocksize = 8,
 	  .keysize = 24,
@@ -212,11 +212,11 @@ static const cipher_entry_st algorithms[] = {
 };
 
 #define GNUTLS_CIPHER_LOOP(b) \
-        const cipher_entry_st *p; \
-                for(p = algorithms; p->name != NULL; p++) { b ; }
+	const cipher_entry_st *p; \
+		for(p = algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_ALG_LOOP(a) \
-                        GNUTLS_CIPHER_LOOP( if(p->id == algorithm) { a; break; } )
+			GNUTLS_CIPHER_LOOP( if(p->id == algorithm) { a; break; } )
 
 /* CIPHER functions */
 

@@ -904,6 +904,6 @@ _gnutls_x509_ext_gen_auth_key_id(const void *id, size_t id_size,
 	ret = 0;
 
  cleanup:
- 	gnutls_x509_aki_deinit(aki);
- 	return ret;
+	gnutls_x509_aki_deinit(aki);
+	return ret;
 }

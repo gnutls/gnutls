@@ -144,8 +144,8 @@ void doit(void)
 
 	ret =
 	    gnutls_x509_privkey_export2(get_key,
-	                                GNUTLS_X509_FMT_PEM,
-	                                &get_datum);
+					GNUTLS_X509_FMT_PEM,
+					&get_datum);
 	if (ret < 0)
 		fail("gnutls_x509_privkey_export2");
 
@@ -190,13 +190,13 @@ void doit(void)
 	n_get_ca_crts = 0;
 	trust_iter = NULL;
 	while (gnutls_x509_trust_list_iter_get_ca(trust_list,
-	                                          &trust_iter,
-	                                          &get_ca_crt) !=
-	       GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+						  &trust_iter,
+						  &get_ca_crt) !=
+		GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		ret =
 		    gnutls_x509_crt_export2(get_ca_crt,
-		                            GNUTLS_X509_FMT_PEM,
-		                            &get_datum);
+					    GNUTLS_X509_FMT_PEM,
+					    &get_datum);
 		if (ret < 0)
 			fail("gnutls_x509_crt_export2");
 

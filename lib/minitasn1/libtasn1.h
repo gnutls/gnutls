@@ -377,7 +377,7 @@ extern "C"
   extern ASN1_API int
     asn1_get_object_id_der (const unsigned char *der,
                             int der_len, int *ret_len,
-		 	    char *str, int str_size);
+                            char *str, int str_size);
 
 /* Compatibility types */
 

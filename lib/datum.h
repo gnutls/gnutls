@@ -29,7 +29,7 @@ int _gnutls_set_datum(gnutls_datum_t * dat, const void *data,
 		      size_t data_size);
 
 int _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data,
-		         size_t data_size);
+			 size_t data_size);
 
 int _gnutls_datum_append(gnutls_datum_t * dat, const void *data,
 			 size_t data_size);
@@ -54,7 +54,7 @@ void _gnutls_free_temp_key_datum(gnutls_datum_t * dat)
 	if (dat->data != NULL) {
 		zeroize_temp_key(dat->data, dat->size);
 		gnutls_free(dat->data);
-        }
+	}
 
 	dat->data = NULL;
 	dat->size = 0;
@@ -66,7 +66,7 @@ void _gnutls_free_key_datum(gnutls_datum_t * dat)
 	if (dat->data != NULL) {
 		zeroize_key(dat->data, dat->size);
 		gnutls_free(dat->data);
-        }
+	}
 
 	dat->data = NULL;
 	dat->size = 0;

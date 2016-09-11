@@ -119,7 +119,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 			unsigned int ms);
 
 #define _gnutls_handshake_io_buffer_clear( session) \
-        _mbuffer_head_clear( &session->internals.handshake_send_buffer); \
-        _gnutls_handshake_recv_buffer_clear( session);
+	_mbuffer_head_clear( &session->internals.handshake_send_buffer); \
+	_gnutls_handshake_recv_buffer_clear( session);
 
 #endif

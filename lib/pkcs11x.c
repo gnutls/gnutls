@@ -149,12 +149,12 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 
 	ret = 0;
  cleanup:
- 	if (crt != NULL)
-	 	gnutls_x509_crt_deinit(crt);
+	if (crt != NULL)
+		gnutls_x509_crt_deinit(crt);
 	if (finalize != 0)
 		pkcs11_find_objects_final(sinfo);
- 	gnutls_free(ext_data);
- 	return ret;
+	gnutls_free(ext_data);
+	return ret;
 
 }
 
@@ -225,7 +225,7 @@ find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 
 	ret = 0;
  cleanup:
- 	pkcs11_find_objects_final(sinfo);
+	pkcs11_find_objects_final(sinfo);
 	return ret;
 }
 
@@ -292,8 +292,8 @@ gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
 
 	ret = 0;
  cleanup:
- 	if (deinit_spki)
- 		gnutls_free(spki.data);
+	if (deinit_spki)
+		gnutls_free(spki.data);
 	return ret;
 }
 

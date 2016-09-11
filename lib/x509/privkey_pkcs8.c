@@ -70,7 +70,7 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	case GNUTLS_PK_EC:
 		ret =
 		    gnutls_x509_privkey_export2(pkey, GNUTLS_X509_FMT_DER,
-					        raw);
+						raw);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;

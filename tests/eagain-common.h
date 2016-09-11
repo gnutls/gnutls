@@ -7,17 +7,17 @@ extern const char *side;
   do \
     { \
       if (cret == GNUTLS_E_AGAIN) \
-        { \
-          side = "client"; \
-          cret = gnutls_handshake (c); \
-          if (cret == GNUTLS_E_INTERRUPTED) cret = GNUTLS_E_AGAIN; \
-        } \
+	{ \
+	  side = "client"; \
+	  cret = gnutls_handshake (c); \
+	  if (cret == GNUTLS_E_INTERRUPTED) cret = GNUTLS_E_AGAIN; \
+	} \
       if (sret == GNUTLS_E_AGAIN) \
-        { \
-          side = "server"; \
-          sret = gnutls_handshake (s); \
-          if (sret == GNUTLS_E_INTERRUPTED) sret = GNUTLS_E_AGAIN; \
-        } \
+	{ \
+	  side = "server"; \
+	  sret = gnutls_handshake (s); \
+	  if (sret == GNUTLS_E_INTERRUPTED) sret = GNUTLS_E_AGAIN; \
+	} \
     } \
   while ((cret == GNUTLS_E_AGAIN || (cret == 0 && sret == GNUTLS_E_AGAIN)) && (sret == GNUTLS_E_AGAIN || (sret == 0 && cret == GNUTLS_E_AGAIN))); \
   if (cret != clierr || sret != serverr) \
@@ -36,25 +36,25 @@ extern const char *side;
   do \
     { \
       if (cret == GNUTLS_E_LARGE_PACKET) \
-        { \
-          unsigned int mtu = gnutls_dtls_get_mtu(s); \
-          gnutls_dtls_set_mtu(s, mtu/2); \
-        } \
+	{ \
+	  unsigned int mtu = gnutls_dtls_get_mtu(s); \
+	  gnutls_dtls_set_mtu(s, mtu/2); \
+	} \
       if (cret < 0 && gnutls_error_is_fatal(cret) == 0) \
-        { \
-          side = "client"; \
-          cret = gnutls_handshake (c); \
-        } \
+	{ \
+	  side = "client"; \
+	  cret = gnutls_handshake (c); \
+	} \
       if (sret == GNUTLS_E_LARGE_PACKET) \
-        { \
-          unsigned int mtu = gnutls_dtls_get_mtu(s); \
-          gnutls_dtls_set_mtu(s, mtu/2); \
-        } \
+	{ \
+	  unsigned int mtu = gnutls_dtls_get_mtu(s); \
+	  gnutls_dtls_set_mtu(s, mtu/2); \
+	} \
       if (sret < 0 && gnutls_error_is_fatal(sret) == 0) \
-        { \
-          side = "server"; \
-          sret = gnutls_handshake (s); \
-        } \
+	{ \
+	  side = "server"; \
+	  sret = gnutls_handshake (s); \
+	} \
     } \
   while (((gnutls_error_is_fatal(cret) == 0 && gnutls_error_is_fatal(sret) == 0)) && (cret < 0 || sret < 0)); \
   if (cret != clierr || sret != serverr) \
@@ -80,54 +80,54 @@ extern const char *side;
   do \
     { \
       do \
-        { \
-          side = "server"; \
-          ret = gnutls_record_recv (s, buf, buflen); \
-        } \
+	{ \
+	  side = "server"; \
+	  ret = gnutls_record_recv (s, buf, buflen); \
+	} \
       while(ret == GNUTLS_E_AGAIN); \
       if (ret == 0) \
-        fail ("server: didn't receive any data\n"); \
+	fail ("server: didn't receive any data\n"); \
       else if (ret < 0) \
-        { \
-          fail ("server: error: %s\n", gnutls_strerror (ret)); \
-        } \
+	{ \
+	  fail ("server: error: %s\n", gnutls_strerror (ret)); \
+	} \
       else \
-        { \
-          transferred += ret; \
-        } \
+	{ \
+	  transferred += ret; \
+	} \
       side = "server"; \
       ns = record_send_loop (server, msg, msglen, retry_send_with_null); \
       if (ns < 0) fail ("server send error: %s\n", gnutls_strerror (ret)); \
       do \
-        { \
-          side = "client"; \
-          ret = gnutls_record_recv (client, buf, buflen); \
-        } \
+	{ \
+	  side = "client"; \
+	  ret = gnutls_record_recv (client, buf, buflen); \
+	} \
       while(ret == GNUTLS_E_AGAIN); \
       if (ret == 0) \
-        { \
-          fail ("client: Peer has closed the TLS connection\n"); \
-        } \
+	{ \
+	  fail ("client: Peer has closed the TLS connection\n"); \
+	} \
       else if (ret < 0) \
-        { \
-          if (debug) \
-            fputs ("!", stdout); \
-          fail ("client: Error: %s\n", gnutls_strerror (ret)); \
-        } \
+	{ \
+	  if (debug) \
+	    fputs ("!", stdout); \
+	  fail ("client: Error: %s\n", gnutls_strerror (ret)); \
+	} \
       else \
-        { \
-          if (msglen != ret || memcmp (buf, msg, msglen) != 0) \
-            { \
-              fail ("client: Transmitted data do not match\n"); \
-            } \
-          /* echo back */ \
-          side = "client"; \
-          ns = record_send_loop (client, buf, msglen, retry_send_with_null); \
-          if (ns < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
-          transferred += ret; \
-          if (debug) \
-            fputs (".", stdout); \
-        } \
+	{ \
+	  if (msglen != ret || memcmp (buf, msg, msglen) != 0) \
+	    { \
+	      fail ("client: Transmitted data do not match\n"); \
+	    } \
+	  /* echo back */ \
+	  side = "client"; \
+	  ns = record_send_loop (client, buf, msglen, retry_send_with_null); \
+	  if (ns < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
+	  transferred += ret; \
+	  if (debug) \
+	    fputs (".", stdout); \
+	} \
     } \
   while (transferred < 70000)
 
@@ -325,7 +325,7 @@ inline static int record_send_loop(gnutls_session_t session,
 	while (ret == GNUTLS_E_AGAIN) {
 		ret =
 		    gnutls_record_send(session, retry_data,
-				       retry_sizeofdata);
+					retry_sizeofdata);
 	}
 
 	return ret;

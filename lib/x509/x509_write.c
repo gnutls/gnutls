@@ -335,8 +335,8 @@ gnutls_x509_crt_set_crq_extensions(gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_set_crq_extension_by_oid(gnutls_x509_crt_t crt,
-				         gnutls_x509_crq_t crq, const char *oid,
-				         unsigned flags)
+					 gnutls_x509_crq_t crq, const char *oid,
+					 unsigned flags)
 {
 	size_t i;
 
@@ -835,10 +835,9 @@ gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
 	/* generate the extension.
 	 */
 	result =
-	    _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
-	    					  encoded_data.data, encoded_data.size,
-						  &prev_der_data,
-						  &der_data);
+		_gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
+						      encoded_data.data, encoded_data.size,
+						      &prev_der_data, &der_data);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -926,11 +925,9 @@ gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
 	/* generate the extension.
 	 */
 	result =
-	    _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
-	    					  encoded_data.data, encoded_data.size,
-						  &prev_der_data,
-						  &der_data);
-
+		_gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
+						      encoded_data.data, encoded_data.size,
+						      &prev_der_data, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		goto finish;
@@ -1818,9 +1815,9 @@ gnutls_x509_crt_set_authority_info_access(gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 
-      cleanup:
-      	if (aia_ctx != NULL)
-      		gnutls_x509_aia_deinit(aia_ctx);
+ cleanup:
+	if (aia_ctx != NULL)
+		gnutls_x509_aia_deinit(aia_ctx);
 	_gnutls_free_datum(&new_der);
 	_gnutls_free_datum(&der);
 
@@ -1899,8 +1896,8 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
 						&der_data, 0);
 
  cleanup:
- 	if (policies != NULL)
-	 	gnutls_x509_policies_deinit(policies);
+	if (policies != NULL)
+		gnutls_x509_policies_deinit(policies);
 	_gnutls_free_datum(&prev_der_data);
 	_gnutls_free_datum(&der_data);
 

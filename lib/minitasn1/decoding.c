@@ -1141,8 +1141,8 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 	      if (result != ASN1_SUCCESS)
 	        {
                   warn();
-  		  goto cleanup;
-  		}
+                  goto cleanup;
+                }
 
 	      DECR_LEN(ider_len, len2);
 
@@ -1186,15 +1186,15 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
                     dflags |= DECODE_FLAG_INDEFINITE;
 
                   result = _asn1_decode_simple_ber(type_field (p->type), der+counter, ider_len, &ptmp, &vlen, &ber_len, dflags);
-  	          if (result != ASN1_SUCCESS)
+                  if (result != ASN1_SUCCESS)
 	            {
                       warn();
 		      goto cleanup;
 		    }
 
-    	          DECR_LEN(ider_len, ber_len);
+		  DECR_LEN(ider_len, ber_len);
 
-    	          _asn1_set_value_lv (p, ptmp, vlen);
+		  _asn1_set_value_lv (p, ptmp, vlen);
 
 	          counter += ber_len;
 	          free(ptmp);
@@ -1434,8 +1434,8 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 		  if (result != ASN1_SUCCESS)
 		    {
                       warn();
-  		      goto cleanup;
-  		    }
+                      goto cleanup;
+                    }
 
 	          DECR_LEN(ider_len, len2);
 		  _asn1_set_value_lv (p, der + counter, len2);
@@ -1470,7 +1470,7 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 
       if (p)
         {
-      	  p->end = counter - 1;
+          p->end = counter - 1;
         }
 
       if (p == node && move != DOWN)
@@ -2250,8 +2250,8 @@ _asn1_decode_simple_ber (unsigned int etype, const unsigned char *der,
 	  if (p[0] == 0 && p[1] == 0) /* EOC */
 	    {
               if (ber_len) *ber_len += 2;
-  	      break;
-  	    }
+              break;
+            }
 
           /* no EOC */
           der_len += 2;

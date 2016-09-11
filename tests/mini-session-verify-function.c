@@ -137,26 +137,26 @@ void test_success(void)
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 	gnutls_priority_set_direct(server, "NORMAL", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 	gnutls_session_set_verify_function(server,
-					       server_callback);
+						server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	gnutls_priority_set_direct(client, "NORMAL", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 	gnutls_session_set_verify_function(client,
-					       client_callback);
+						client_callback);
 
 	HANDSHAKE(client, server);
 
@@ -204,26 +204,26 @@ void test_failure_client(void)
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 	gnutls_priority_set_direct(server, "NORMAL", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 	gnutls_session_set_verify_function(server,
-					       server_callback);
+						server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	gnutls_priority_set_direct(client, "NORMAL", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 	gnutls_session_set_verify_function(client,
-					       client_callback);
+						client_callback);
 
 	HANDSHAKE_EXPECT(client, server, GNUTLS_E_CERTIFICATE_ERROR, GNUTLS_E_AGAIN);
 
@@ -265,26 +265,26 @@ void test_failure_server(void)
 					    GNUTLS_X509_FMT_PEM);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 	gnutls_priority_set_direct(server, "NORMAL", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 	gnutls_session_set_verify_function(server,
-					       server_callback);
+						server_callback);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	/* Init client */
 	gnutls_certificate_allocate_credentials(&clientx509cred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	gnutls_priority_set_direct(client, "NORMAL", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 	gnutls_session_set_verify_function(client,
-					       client_callback);
+						client_callback);
 
 	HANDSHAKE_EXPECT(client, server, GNUTLS_E_AGAIN, GNUTLS_E_CERTIFICATE_ERROR);
 

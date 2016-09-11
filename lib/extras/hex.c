@@ -10,11 +10,11 @@ static bool char_to_hex(unsigned char *val, char c)
 		*val = c - '0';
 		return true;
 	}
- 	if (c >= 'a' && c <= 'f') {
+	if (c >= 'a' && c <= 'f') {
 		*val = c - 'a' + 10;
 		return true;
 	}
- 	if (c >= 'A' && c <= 'F') {
+	if (c >= 'A' && c <= 'F') {
 		*val = c - 'A' + 10;
 		return true;
 	}

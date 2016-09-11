@@ -98,7 +98,7 @@ TESTS = $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"				\
-	VALGRIND="$(VALGRIND)" 			\
+	VALGRIND="$(VALGRIND)"			\
 	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"

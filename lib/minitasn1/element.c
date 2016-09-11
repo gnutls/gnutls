@@ -932,7 +932,7 @@ asn1_read_value_type (asn1_node root, const char *name, void *ivalue,
 	{
 	  *len = 0;
 	  if (value)
-	  	value[0] = 0;
+	    value[0] = 0;
 	  p = node->down;
 	  while (p)
 	    {

@@ -168,7 +168,7 @@ static void tls_log_func(int level, const char *str)
 }
 
 static int hsk_hook_cb(gnutls_session_t session, unsigned int htype, unsigned post,
-		       unsigned int incoming, const gnutls_datum_t *_msg)
+			unsigned int incoming, const gnutls_datum_t *_msg)
 {
 	unsigned size;
 	gnutls_datum msg = {_msg->data, _msg->size};
@@ -823,7 +823,7 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 				return res;
 
 			memcpy(res.data, cache_db[i].session_data,
-			       res.size);
+				res.size);
 
 #ifdef DEBUG_CACHE
 			if (debug) {
@@ -831,7 +831,7 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 				printf("data:\n");
 				for (j = 0; j < res.size; j++) {
 					printf("%02x ",
-					       res.data[j] & 0xFF);
+						res.data[j] & 0xFF);
 					if ((j + 1) % 16 == 0)
 						printf("\n");
 				}

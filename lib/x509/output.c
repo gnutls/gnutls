@@ -580,7 +580,7 @@ static void print_crldist(gnutls_buffer_st * str, gnutls_datum_t *der)
 		print_name(str, "\t\t\t", type, &dist, 0);
 	}
  cleanup:
- 	gnutls_x509_crl_dist_points_deinit(dp);
+	gnutls_x509_crl_dist_points_deinit(dp);
 }
 
 static void

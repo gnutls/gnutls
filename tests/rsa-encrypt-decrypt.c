@@ -117,7 +117,7 @@ void doit(void)
 
 		ret =
 		    gnutls_x509_privkey_import(key, &key_dat[i],
-					       GNUTLS_X509_FMT_PEM);
+						GNUTLS_X509_FMT_PEM);
 		if (ret < 0)
 			fail("gnutls_x509_privkey_import\n");
 
@@ -150,7 +150,7 @@ void doit(void)
 
 		ret =
 		    gnutls_pubkey_encrypt_data(pubkey, 0, &hash_data,
-					       &out);
+						&out);
 		if (ret < 0)
 			fail("gnutls_pubkey_encrypt_data\n");
 

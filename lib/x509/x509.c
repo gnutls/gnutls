@@ -73,7 +73,7 @@ static int crt_reinit(gnutls_x509_crt_t crt)
  * Since: 3.5.0
  **/
 unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1,
-			        gnutls_x509_crt_t cert2)
+				gnutls_x509_crt_t cert2)
 {
 	int ret;
 	bool result;
@@ -305,12 +305,12 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 	/* handle equally empty parameters with missing parameters */
 	if (sp1.size == 2 && memcmp(sp1.data, "\x05\x00", 2) == 0) {
 		empty1 = 1;
-	 	_gnutls_free_datum(&sp1);
+		_gnutls_free_datum(&sp1);
 	}
 
 	if (sp2.size == 2 && memcmp(sp2.data, "\x05\x00", 2) == 0) {
 		empty2 = 1;
-	 	_gnutls_free_datum(&sp2);
+		_gnutls_free_datum(&sp2);
 	}
 
 	if (empty1 != empty2 || 
@@ -322,9 +322,9 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 
 	ret = 0;
  cleanup:
- 	_gnutls_free_datum(&sp1);
- 	_gnutls_free_datum(&sp2);
- 	return ret;
+	_gnutls_free_datum(&sp1);
+	_gnutls_free_datum(&sp2);
+	return ret;
 }
 
 /**
@@ -889,8 +889,8 @@ gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
 
 	ret = 0;
  cleanup:
- 	gnutls_free(dsig.data);
- 	return ret;
+	gnutls_free(dsig.data);
+	return ret;
 }
 
 /**
@@ -1225,10 +1225,10 @@ gnutls_x509_crt_get_authority_key_gn_serial(gnutls_x509_crt_t cert,
 
 	ret = 0;
  cleanup:
- 	if (aki != NULL)
- 		gnutls_x509_aki_deinit(aki);
- 	gnutls_free(der.data);
- 	return ret;
+	if (aki != NULL)
+		gnutls_x509_aki_deinit(aki);
+	gnutls_free(der.data);
+	return ret;
 }
 
 /**
@@ -1311,10 +1311,10 @@ gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt_t cert, void *id,
 
 	ret = 0;
  cleanup:
- 	if (aki != NULL)
- 		gnutls_x509_aki_deinit(aki);
- 	gnutls_free(der.data);
- 	return ret;
+	if (aki != NULL)
+		gnutls_x509_aki_deinit(aki);
+	gnutls_free(der.data);
+	return ret;
 }
 
 /**
@@ -2139,8 +2139,8 @@ gnutls_x509_crt_get_policy(gnutls_x509_crt_t crt, unsigned indx,
 	ret = 0;
 
  cleanup:
- 	if (policies != NULL)
- 		gnutls_x509_policies_deinit(policies);
+	if (policies != NULL)
+		gnutls_x509_policies_deinit(policies);
 	_gnutls_free_datum(&tmpd);
 
 	return ret;
@@ -2846,8 +2846,8 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 	return 0;		/* not revoked. */
 
  fail:
- 	gnutls_x509_crl_iter_deinit(iter);
- 	return ret;
+	gnutls_x509_crl_iter_deinit(iter);
+	return ret;
 }
 
 
@@ -2919,7 +2919,7 @@ gnutls_x509_crt_get_preferred_hash_algorithm(gnutls_x509_crt_t crt,
 	}
 
  cleanup:
- 	gnutls_pubkey_deinit(pubkey);
+	gnutls_pubkey_deinit(pubkey);
 	return ret;
 }
 
@@ -3090,9 +3090,9 @@ gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
 	ret = 0;
 
  cleanup:
- 	gnutls_free(ext.data);
- 	if (p!=NULL)
- 		gnutls_x509_key_purpose_deinit(p);
+	gnutls_free(ext.data);
+	if (p!=NULL)
+		gnutls_x509_key_purpose_deinit(p);
 	return ret;
 }
 
@@ -3137,7 +3137,7 @@ gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt_t crt,
 	}
 
  cleanup:
- 	gnutls_pubkey_deinit(pubkey);
+	gnutls_pubkey_deinit(pubkey);
 	return ret;
 }
 
@@ -3186,7 +3186,7 @@ gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
 	}
 
  cleanup:
- 	gnutls_pubkey_deinit(pubkey);
+	gnutls_pubkey_deinit(pubkey);
 	return ret;
 }
 
@@ -3234,7 +3234,7 @@ gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
 	}
 
  cleanup:
- 	gnutls_pubkey_deinit(pubkey);
+	gnutls_pubkey_deinit(pubkey);
 	return ret;
 }
 

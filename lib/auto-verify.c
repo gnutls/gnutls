@@ -31,26 +31,26 @@
 /* The actual verification callback. */
 static int auto_verify_cb(gnutls_session_t session)
 {
-        unsigned int status;
-        int ret;
+	unsigned int status;
+	int ret;
 
-        if (session->internals.vc_elements == 0) {
-        	ret = gnutls_certificate_verify_peers2(session, &status);
+	if (session->internals.vc_elements == 0) {
+		ret = gnutls_certificate_verify_peers2(session, &status);
 	} else {
-	        ret = gnutls_certificate_verify_peers(session, session->internals.vc_data,
+		ret = gnutls_certificate_verify_peers(session, session->internals.vc_data,
 						      session->internals.vc_elements, &status);
-        }
-        if (ret < 0) {
-                return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
-        }
+	}
+	if (ret < 0) {
+		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+	}
 
-        session->internals.vc_status = status;
+	session->internals.vc_status = status;
 
-        if (status != 0)        /* Certificate is not trusted */
-                return gnutls_assert_val(GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR);
+	if (status != 0)	/* Certificate is not trusted */
+		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR);
 
-        /* notify gnutls to continue handshake normally */
-        return 0;
+	/* notify gnutls to continue handshake normally */
+	return 0;
 }
 
 /**

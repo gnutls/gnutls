@@ -85,7 +85,7 @@ _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 	if (unlikely(e == NULL || e->id == GNUTLS_CIPHER_NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-        FAIL_IF_LIB_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	handle->e = e;
 	handle->handle = NULL;
@@ -183,7 +183,7 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 	if (unlikely(e == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-        FAIL_IF_LIB_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	memset(handle, 0, sizeof(*handle));
 	handle->etm = etm;
@@ -308,9 +308,9 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 			l = (textlen / blocksize) * blocksize;
 			if (l > 0) {
 				ret =
-			    	_gnutls_cipher_encrypt2(&handle->cipher, text,
-						    l, ciphertext,
-						    ciphertextlen);
+					_gnutls_cipher_encrypt2(&handle->cipher, text,
+							    l, ciphertext,
+							    ciphertextlen);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 
@@ -353,9 +353,9 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 				MAC(handle, ciphertext, textlen);
 
 				ret =
-				    _gnutls_auth_cipher_tag(handle,
-						    	    ciphertext + textlen,
-						    	    handle->tag_size);
+					_gnutls_auth_cipher_tag(handle,
+							ciphertext + textlen,
+							handle->tag_size);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 			}

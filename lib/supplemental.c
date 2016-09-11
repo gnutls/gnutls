@@ -267,7 +267,7 @@ _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
  **/
 int
 gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_type_t type,
-                             gnutls_supp_recv_func recv_func, gnutls_supp_send_func send_func)
+			     gnutls_supp_recv_func recv_func, gnutls_supp_send_func send_func)
 {
 	gnutls_supplemental_entry tmp_entry;
 	int ret;

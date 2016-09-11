@@ -82,7 +82,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 
 #define GNUTLS_ECC_CURVE_LOOP(b) \
 	{ const gnutls_ecc_curve_entry_st *p; \
-                for(p = ecc_curves; p->name != NULL; p++) { b ; } }
+		for(p = ecc_curves; p->name != NULL; p++) { b ; } }
 
 
 /* Returns the TLS id of the given curve

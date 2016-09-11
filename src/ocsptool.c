@@ -323,7 +323,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 	}
 
 	if (nonce) {
-	        gnutls_datum_t rnonce;
+		gnutls_datum_t rnonce;
 
 		ret = gnutls_ocsp_resp_get_nonce(resp, NULL, &rnonce);
 		if (ret < 0) {
@@ -338,7 +338,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 			exit(1);
 		}
 
-	        gnutls_free(rnonce.data);
+		gnutls_free(rnonce.data);
 	}
 
 	if (HAVE_OPT(LOAD_TRUST)) {

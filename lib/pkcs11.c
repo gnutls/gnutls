@@ -52,7 +52,7 @@ struct gnutls_pkcs11_provider_st {
 	struct ck_function_list *module;
 	unsigned active;
 	unsigned trusted; /* in the sense of p11-kit trusted:
-	                   * it can be used for verification */
+			   * it can be used for verification */
 	struct ck_info info;
 };
 
@@ -511,8 +511,8 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
 
 	ret = 0;
  cleanup:
- 	pkcs11_close_session(&sinfo);
- 	return ret;
+	pkcs11_close_session(&sinfo);
+	return ret;
 }
 
 /**
@@ -1341,14 +1341,12 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			}
 
 			if (info != NULL) {
-    			    if (!p11_kit_uri_match_token_info
-	    		        (info, &l_tinfo)
-	    		        || !p11_kit_uri_match_module_info(info,
-							      &providers
+				if (!p11_kit_uri_match_token_info(info, &l_tinfo) ||
+				    !p11_kit_uri_match_module_info(info, &providers
 							      [x].info)) {
 				continue;
-                            }
-                        }
+			    }
+			}
 
 			rv = (module)->C_OpenSession(slots[z],
 						     ((flags & SESSION_WRITE) ? CKF_RW_SESSION : 0)
@@ -1772,7 +1770,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
 
 	a[0].type = CKA_UNWRAP;
 	a[0].value = &b;
@@ -1780,7 +1778,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
 
 	a[0].type = CKA_PRIVATE;
 	a[0].value = &b;
@@ -1788,7 +1786,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
 
 	a[0].type = CKA_TRUSTED;
 	a[0].value = &b;
@@ -1796,7 +1794,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 
 	a[0].type = CKA_SENSITIVE;
 	a[0].value = &b;
@@ -1804,7 +1802,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
 
 	a[0].type = CKA_EXTRACTABLE;
 	a[0].value = &b;
@@ -1812,7 +1810,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE;
 
 	a[0].type = CKA_NEVER_EXTRACTABLE;
 	a[0].value = &b;
@@ -1820,7 +1818,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE;
 
 	a[0].type = CKA_CERTIFICATE_CATEGORY;
 	a[0].value = &category;
@@ -1828,7 +1826,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && category == 2)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
 
 	a[0].type = CKA_ALWAYS_AUTHENTICATE;
 	a[0].value = &b;
@@ -1836,7 +1834,7 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH;
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH;
 
 	/* now recover the object label/id */
 	a[0].type = CKA_LABEL;
@@ -1902,8 +1900,8 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 
 	ret = 0;
  cleanup:
- 	gnutls_free(data.data);
- 	return ret;
+	gnutls_free(data.data);
+	return ret;
 }
 
 static int
@@ -2059,8 +2057,8 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 
 static int
 find_token_num_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
-	          struct ck_token_info *tinfo,
-	          struct ck_info *lib_info, void *input)
+		  struct ck_token_info *tinfo,
+		  struct ck_info *lib_info, void *input)
 {
 	struct find_token_num *find_data = input;
 
@@ -2860,8 +2858,8 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	while (pkcs11_find_objects
 	       (sinfo->module, sinfo->pks, ctx, OBJECTS_A_TIME, &count) == CKR_OK
 	       && count > 0) {
-	        unsigned j;
-	        gnutls_datum_t id;
+		unsigned j;
+		gnutls_datum_t id;
 
 		find_data->p_list = gnutls_realloc_fast(find_data->p_list, (find_data->current+count)*sizeof(find_data->p_list[0]));
 		if (find_data->p_list == NULL) {
@@ -2869,7 +2867,7 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 			goto fail;
 		}
 
-	        for (j=0;j<count;j++) {
+		for (j=0;j<count;j++) {
 			a[0].type = CKA_ID;
 			a[0].value = certid_tmp;
 			a[0].value_len = sizeof certid_tmp;
@@ -2905,8 +2903,8 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 						/* not found */
 						continue;
 					}
- 				}
- 			}
+				}
+			}
 
 			ret =
 			    gnutls_pkcs11_obj_init(&find_data->p_list
@@ -2926,7 +2924,7 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 			}
 
 			find_data->current++;
- 		}
+		}
 	}
 
 	pkcs11_find_objects_final(sinfo);

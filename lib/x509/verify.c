@@ -660,8 +660,8 @@ verify_crt(gnutls_x509_crt_t cert,
 		if (issuer_version < 0) {
 			MARK_INVALID(0);
 		} else if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
-	                   ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT)
-	                    || issuer_version != 1)) {
+			   ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT)
+			    || issuer_version != 1)) {
 			if (check_if_ca(cert, issuer, &vparams->max_path, flags) != 1) {
 				MARK_INVALID(GNUTLS_CERT_SIGNER_NOT_CA);
 			}
@@ -687,11 +687,11 @@ verify_crt(gnutls_x509_crt_t cert,
 		if (me == NULL) {
 			MARK_INVALID(0);
 		} else if (cert_signed_data.data != NULL &&
-		           cert_signature.data != NULL) {
+			   cert_signature.data != NULL) {
 			ret =
 			    _gnutls_x509_verify_data(me,
 						     &cert_signed_data,
-		        	                     &cert_signature,
+						     &cert_signature,
 						     issuer);
 			if (ret == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 				MARK_INVALID(GNUTLS_CERT_SIGNATURE_FAILURE);
@@ -1123,8 +1123,8 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 
 	/* check against issuer */
 	ret = gnutls_pkcs11_get_raw_issuer(url, certificate_list[clist_size - 1],
-			 		   &raw_issuer, GNUTLS_X509_FMT_DER,
-			 		   GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT|GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
+					   &raw_issuer, GNUTLS_X509_FMT_DER,
+					   GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT|GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 	if (ret < 0) {
 		gnutls_assert();
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && clist_size > 2) {
@@ -1132,7 +1132,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 			/* check if the last certificate in the chain is present
 			 * in our trusted list, and if yes, verify against it. */
 			ret = gnutls_pkcs11_crt_is_known(url, certificate_list[clist_size - 1],
-			 	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_COMPARE);
+				GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_COMPARE);
 			if (ret != 0) {
 				return _gnutls_verify_crt_status(certificate_list, clist_size,
 					&certificate_list[clist_size - 1], 1, flags,

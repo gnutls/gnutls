@@ -174,7 +174,7 @@ void doit(void)
 
 		ret =
 		    gnutls_x509_privkey_import(key, &key_dat[i],
-					       GNUTLS_X509_FMT_PEM);
+						GNUTLS_X509_FMT_PEM);
 		if (ret < 0)
 			fail("gnutls_x509_privkey_import\n");
 
@@ -191,12 +191,12 @@ void doit(void)
 			fail("gnutls_privkey_import_x509\n");
 
 		ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA1, 0,
-					       &hash_data, &signature2);
+						&hash_data, &signature2);
 		if (ret < 0)
 			fail("gnutls_privkey_sign_hash\n");
 
 		ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0,
-					       &raw_data, &signature);
+						&raw_data, &signature);
 		if (ret < 0)
 			fail("gnutls_x509_privkey_sign_hash\n");
 
@@ -245,15 +245,15 @@ void doit(void)
 
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
-					       &hash_data, &signature2);
+						&hash_data, &signature2);
 		if (ret < 0)
 			fail("gnutls_x509_pubkey_verify_hash2-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
-					       &invalid_hash_data,
-					       &signature2);
+						&invalid_hash_data,
+						&signature2);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
 			fail("gnutls_x509_pubkey_verify_hash2-2 (hashed data)\n");
 
@@ -280,9 +280,9 @@ void doit(void)
 
 			ret =
 			    gnutls_pubkey_verify_hash2(pubkey, sign_algo,
-						       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
-						       &hash_data,
-						       &signature);
+							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
+							&hash_data,
+							&signature);
 			if (ret < 0)
 				fail("gnutls_pubkey_verify_hash-3 (raw hashed data)\n");
 
@@ -290,17 +290,17 @@ void doit(void)
 			/* test the legacy API */
 			ret =
 			    gnutls_privkey_sign_raw_data(privkey, 0,
-						         &hash_data,
-						         &signature);
+							 &hash_data,
+							 &signature);
 			if (ret < 0)
 				fail("gnutls_privkey_sign_raw_data: %s\n",
 				     gnutls_strerror(ret));
 
 			ret =
 			    gnutls_pubkey_verify_hash2(pubkey, sign_algo,
-						       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
-						       &hash_data,
-						       &signature);
+							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
+							&hash_data,
+							&signature);
 			if (ret < 0)
 				fail("gnutls_pubkey_verify_hash-4 (legacy raw hashed data)\n");
 		}

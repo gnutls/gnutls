@@ -47,18 +47,18 @@
 		int retries = 0; \
 		int rret; \
 		ret = find_object (&key->sinfo, &key->pin, &key->ref, key->uinfo, \
-		                          SESSION_LOGIN); \
+					  SESSION_LOGIN); \
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) { \
 			if (_gnutls_token_func) \
 			  { \
 			    rret = pkcs11_call_token_func (key->uinfo, retries++); \
 			    if (rret == 0) continue; \
-                          } \
+			  } \
 			return gnutls_assert_val(ret); \
 		} else if (ret < 0) { \
-                        return gnutls_assert_val(ret); \
-                } \
-                break; \
+			return gnutls_assert_val(ret); \
+		} \
+		break; \
 	} while (1);
 
 struct gnutls_pkcs11_privkey_st {
@@ -85,7 +85,7 @@ struct gnutls_pkcs11_privkey_st {
  **/
 int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 {
-        FAIL_IF_LIB_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_privkey_st));
 	if (*key == NULL) {
@@ -273,7 +273,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	if (key->reauth) {
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
-		    		 key->uinfo, 0, 1);
+				 key->uinfo, 0, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
@@ -480,8 +480,8 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		p11_kit_uri_free(pkey->uinfo);
 		pkey->uinfo = NULL;
 	}
-      	gnutls_free(pkey->url);
-      	pkey->url = NULL;
+	gnutls_free(pkey->url);
+	pkey->url = NULL;
 
 	return ret;
 }
@@ -531,7 +531,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	if (key->reauth) {
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
-		    		 key->uinfo, 0, 1);
+				 key->uinfo, 0, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
@@ -1081,7 +1081,7 @@ static int load_pubkey_obj(gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t pub)
 	ret = gnutls_pubkey_import_x509(pub, crt, 0);
 
  cleanup:
- 	gnutls_x509_crt_deinit(crt);
+	gnutls_x509_crt_deinit(crt);
 	return ret;
 }
 
@@ -1173,8 +1173,8 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
  **/
 int
 gnutls_pkcs11_privkey_export_pubkey(gnutls_pkcs11_privkey_t pkey,
-                                     gnutls_x509_crt_fmt_t fmt,
-                                     gnutls_datum_t * data,
+				     gnutls_x509_crt_fmt_t fmt,
+				     gnutls_datum_t * data,
 				     unsigned int flags)
 {
 	int ret;

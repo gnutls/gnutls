@@ -177,7 +177,7 @@ static void client(int fd, unsigned test)
 			do {
 				ret =
 				    gnutls_record_recv(session, buffer,
-						       MAX_BUF);
+							MAX_BUF);
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		} while (ret > 0);
@@ -193,7 +193,7 @@ static void client(int fd, unsigned test)
 			do {
 				ret =
 				    gnutls_record_recv(session, buffer,
-						       MAX_BUF);
+							MAX_BUF);
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		} while (ret > 0);
@@ -313,7 +313,7 @@ static void server(int fd, unsigned test)
 			do {
 				ret =
 				    gnutls_record_recv(session, buffer,
-						       MAX_BUF);
+							MAX_BUF);
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		} while (ret > 0);
@@ -363,7 +363,7 @@ static void server(int fd, unsigned test)
 			do {
 				ret =
 				    gnutls_record_recv(session, buffer,
-						       MAX_BUF);
+							MAX_BUF);
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
 		} while (ret > 0);

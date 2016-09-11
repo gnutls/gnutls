@@ -40,7 +40,7 @@ void
 test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
 	      const char *prio, const char *host, 
-              void *priv, callback_func *client_cb, callback_func *server_cb)
+	      void *priv, callback_func *client_cb, callback_func *server_cb)
 {
 	int exit_code = EXIT_SUCCESS;
 	int ret;
@@ -57,7 +57,7 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	/* Init server */
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       server_cred);
+				server_cred);
 	gnutls_priority_set_direct(server, prio, NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -71,7 +71,7 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	assert(gnutls_server_name_set(client, GNUTLS_NAME_DNS, host, strlen(host))>=0);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       client_cred);
+				client_cred);
 	if (ret < 0)
 		exit(1);
 

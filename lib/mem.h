@@ -39,15 +39,15 @@ unsigned _gnutls_mem_is_zero(const uint8_t *ptr, unsigned size);
 inline static
 int safe_memcmp(const void *s1, const void *s2, size_t n)
 {
-        if (n == 0)
-                return 0;
-        return memcmp(s1, s2, n);
+	if (n == 0)
+		return 0;
+	return memcmp(s1, s2, n);
 }
 
 #define zrelease_mpi_key(mpi) if (*mpi!=NULL) { \
-                _gnutls_mpi_clear(*mpi); \
-                _gnutls_mpi_release(mpi); \
-        }
+		_gnutls_mpi_clear(*mpi); \
+		_gnutls_mpi_release(mpi); \
+	}
 
 #define zeroize_key(x, size) gnutls_memset(x, 0, size)
 

@@ -205,9 +205,9 @@ _gnutls_supported_compression_methods(gnutls_session_t session,
 
 	for (i = j = 0; i < SUPPORTED_COMPRESSION_METHODS; i++) {
 		if (IS_DTLS(session) && session->internals.priorities.compression.priority[i] != GNUTLS_COMP_NULL) {
-		        gnutls_assert();
-		        continue;
-                }
+			gnutls_assert();
+			continue;
+		}
 
 		tmp =
 		    _gnutls_compression_get_num(session->

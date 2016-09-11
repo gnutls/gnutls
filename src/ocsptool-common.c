@@ -409,7 +409,7 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	}
 
 	if (nonce) {
-	        gnutls_datum_t rnonce;
+		gnutls_datum_t rnonce;
 
 		ret = gnutls_ocsp_resp_get_nonce(resp, NULL, &rnonce);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
@@ -430,7 +430,7 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 			exit(1);
 		}
 
-	        gnutls_free(rnonce.data);
+		gnutls_free(rnonce.data);
 	}
 
  finish_ok:

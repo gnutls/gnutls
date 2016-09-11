@@ -177,7 +177,7 @@ void doit(void)
 
 		if (debug)
 			printf("server process %i (child %i)\n", getpid(),
-			       child);
+				child);
 
 		err = gnutls_init(&session, GNUTLS_SERVER);
 		if (err != 0)
@@ -229,7 +229,7 @@ void doit(void)
 
 		received =
 		    gnutls_record_recv(session, greetings,
-				       sizeof(greetings));
+					sizeof(greetings));
 		if (received != sizeof(g_message)
 		    || memcmp(greetings, g_message, sizeof(g_message)))
 			fail("server received %li vs. %li\n",

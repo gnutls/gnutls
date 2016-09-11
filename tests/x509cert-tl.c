@@ -320,7 +320,7 @@ void doit(void)
 	vdata.size = NAME_SIZE;
 	ret =
 	    gnutls_x509_trust_list_verify_crt2(tl, &server_crt, 1, &vdata, 1,
-					       0, &status, NULL);
+						0, &status, NULL);
 	if (ret < 0 || status != 0)
 		fail("gnutls_x509_trust_list_verify_crt2 - 1: status: %x\n", status);
 
@@ -329,7 +329,7 @@ void doit(void)
 	vdata.size = NAME_SIZE-2;
 	ret =
 	    gnutls_x509_trust_list_verify_crt2(tl, &server_crt, 1, &vdata, 1,
-					       0, &status, NULL);
+						0, &status, NULL);
 	if (ret < 0 || status == 0)
 		fail("gnutls_x509_trust_list_verify_crt2 - 2: status: %x\n", status);
 

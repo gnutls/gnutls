@@ -372,8 +372,8 @@ static void dane_check(const char *host, const char *proto,
 
 			cstr = dane_match_type_name(match);
 			if (cstr == NULL) cstr= "Unknown";
-			fprintf(outfile, "Contents:          %s (%.2x)\n", cstr, match);
-			fprintf(outfile, "Data:              %s\n", lbuffer);
+			fprintf(outfile, "Contents:	  %s (%.2x)\n", cstr, match);
+			fprintf(outfile, "Data:	      %s\n", lbuffer);
 		}
 
 		/* Verify the DANE data */

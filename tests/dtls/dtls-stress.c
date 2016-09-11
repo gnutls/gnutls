@@ -25,27 +25,27 @@
  *
  * **** Available parameters ****
  *
- *	-nb                 enable nonblocking operations on sessions
- *	-batch              read test identifiers from stdin and run them
- *	-d                  increase debug level by one
- *	-r                  replay messages (very crude replay mechanism)
- *	-d <n>              set debug level to <n>
- *	-die                don't start new tests after the first detected failure
- *	-timeout <n>        set handshake timeout to <n> seconds. Tests that don't make progress
- *	                    within twice this time will be forcibly killed. (default: 120)
+ *	-nb		 enable nonblocking operations on sessions
+ *	-batch	      read test identifiers from stdin and run them
+ *	-d		  increase debug level by one
+ *	-r		  replay messages (very crude replay mechanism)
+ *	-d <n>	      set debug level to <n>
+ *	-die		don't start new tests after the first detected failure
+ *	-timeout <n>	set handshake timeout to <n> seconds. Tests that don't make progress
+ *			    within twice this time will be forcibly killed. (default: 120)
  *	-retransmit <n>     set retransmit timeout to <n> milliseconds (default: 100)
- *	-j <n>              run up to <n> tests in parallel
- *	-full               use full handshake with mutual certificate authentication
- *	-resume             use resumed handshake
+ *	-j <n>	      run up to <n> tests in parallel
+ *	-full	       use full handshake with mutual certificate authentication
+ *	-resume	     use resumed handshake
  *	-shello <perm>      run only one test, with the server hello flight permuted as <perm>
  *	-sfinished <perm>   run only one test, with the server finished flight permuted as <perm>
  *	-cfinished <perm>   run only one test, with the client finished flight permuted as <perm>
  *	<packet name>       run only one test, drop <packet name> three times
- *	                    valid values for <packet name> are:
- *	                        SHello, SCertificate, SKeyExchange, SCertificateRequest, SHelloDone,
- *	                        CCertificate, CKeyExchange, CCertificateVerify, CChangeCipherSpec,
- *	                        CFinished, SChangeCipherSpec, SFinished
- *	                    using *Certificate* without -full will yield unexpected results
+ *			    valid values for <packet name> are:
+ *				SHello, SCertificate, SKeyExchange, SCertificateRequest, SHelloDone,
+ *				CCertificate, CKeyExchange, CCertificateVerify, CChangeCipherSpec,
+ *				CFinished, SChangeCipherSpec, SFinished
+ *			    using *Certificate* without -full will yield unexpected results
  *
  * 
  * **** Permutation handling ****

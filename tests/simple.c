@@ -48,7 +48,7 @@ void doit(void)
 	if (debug) {
 		printf("GnuTLS header version %s.\n", GNUTLS_VERSION);
 		printf("GnuTLS library version %s.\n",
-		       gnutls_check_version(NULL));
+			gnutls_check_version(NULL));
 	}
 
 	if (!gnutls_check_version_numeric(GNUTLS_VERSION_MAJOR, GNUTLS_VERSION_MINOR, GNUTLS_VERSION_PATCH)) {
@@ -79,11 +79,11 @@ void doit(void)
 		for (i = 0; algs[i]; i++) {
 			if (debug)
 				printf("pk_list[%d] = %d = %s = %d\n",
-				       (int) i, algs[i],
-				       gnutls_pk_algorithm_get_name(algs
+					(int) i, algs[i],
+					gnutls_pk_algorithm_get_name(algs
 								    [i]),
-				       gnutls_pk_get_id
-				       (gnutls_pk_algorithm_get_name
+					gnutls_pk_get_id
+					(gnutls_pk_algorithm_get_name
 					(algs[i])));
 			if (gnutls_pk_get_id
 			    (gnutls_pk_algorithm_get_name(algs[i]))
@@ -111,11 +111,11 @@ void doit(void)
 		for (i = 0; algs[i]; i++) {
 			if (debug)
 				printf("sign_list[%d] = %d = %s = %d\n",
-				       (int) i, algs[i],
-				       gnutls_sign_algorithm_get_name(algs
+					(int) i, algs[i],
+					gnutls_sign_algorithm_get_name(algs
 								      [i]),
-				       gnutls_sign_get_id
-				       (gnutls_sign_algorithm_get_name
+					gnutls_sign_get_id
+					(gnutls_sign_algorithm_get_name
 					(algs[i])));
 			if (gnutls_sign_get_id
 			    (gnutls_sign_algorithm_get_name(algs[i])) !=

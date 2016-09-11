@@ -1690,7 +1690,7 @@ gnutls_x509_crq_get_extension_data2(gnutls_x509_crq_t crq,
 	ret = 0;
  cleanup:
 	asn1_delete_structure(&c2);
- 	gnutls_free(extensions);
+	gnutls_free(extensions);
 	return ret;
 }
 

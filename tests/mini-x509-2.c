@@ -216,7 +216,7 @@ void doit(void)
 
 	ret =
 	    gnutls_x509_privkey_import(pkey, &server_key,
-				       GNUTLS_X509_FMT_PEM);
+					GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -232,7 +232,7 @@ void doit(void)
 
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 	gnutls_priority_set_direct(server,
 				   "NORMAL:-CIPHER-ALL:+AES-128-GCM",
 				   NULL);
@@ -252,15 +252,15 @@ void doit(void)
 		exit(1);
 
 	ret = gnutls_certificate_set_x509_key_mem(clientx509cred,
-					    	  &cli_cert, &cli_key,
-					    	  GNUTLS_X509_FMT_PEM);
+						  &cli_cert, &cli_key,
+						  GNUTLS_X509_FMT_PEM);
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
 	if (ret < 0)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	if (ret < 0)
 		exit(1);
 

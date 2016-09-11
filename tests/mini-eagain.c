@@ -78,8 +78,8 @@ void doit(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	ret =
 	    gnutls_priority_set_direct(server,
-				       "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				       NULL);
+					"NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+					NULL);
 	if (ret < 0)
 		exit(1);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
@@ -92,8 +92,8 @@ void doit(void)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	ret =
 	    gnutls_priority_set_direct(client,
-				       "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				       NULL);
+					"NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+					NULL);
 	if (ret < 0)
 		exit(1);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);

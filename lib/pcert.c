@@ -107,8 +107,8 @@ int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
  * Since: 3.4.0
  **/
 int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
-			     	  gnutls_x509_crt_t *crt, unsigned *ncrt,
-			     	  unsigned int flags)
+				  gnutls_x509_crt_t *crt, unsigned *ncrt,
+				  unsigned int flags)
 {
 	int ret;
 	unsigned i;
@@ -145,10 +145,10 @@ int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
 	return 0;
 
  cleanup:
- 	for (i=0;i<current;i++) {
- 		gnutls_pcert_deinit(&pcert[i]);
- 	}
- 	return ret;
+	for (i=0;i<current;i++) {
+		gnutls_pcert_deinit(&pcert[i]);
+	}
+	return ret;
 
 }
 
@@ -422,7 +422,7 @@ int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
  * Since: 3.4.0
  */
 int gnutls_pcert_export_x509(gnutls_pcert_st * pcert,
-                             gnutls_x509_crt_t * crt)
+			     gnutls_x509_crt_t * crt)
 {
 	int ret;
 
@@ -464,7 +464,7 @@ int gnutls_pcert_export_x509(gnutls_pcert_st * pcert,
  * Since: 3.4.0
  */
 int gnutls_pcert_export_openpgp(gnutls_pcert_st * pcert,
-                                gnutls_openpgp_crt_t * crt)
+				gnutls_openpgp_crt_t * crt)
 {
 	int ret;
 

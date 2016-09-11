@@ -96,7 +96,7 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 	else
 		gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_PSK,
-			       serverpskcred);
+				serverpskcred);
 
 	gnutls_priority_set_direct(server,
 				   prio,
@@ -126,7 +126,7 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_PSK,
-			       clientpskcred);
+				clientpskcred);
 	if (ret < 0)
 		exit(1);
 
@@ -149,7 +149,7 @@ static void try(const char *prio, gnutls_kx_algorithm_t kx, unsigned allow_chang
 
 	/* switch client's username and rehandshake */
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_PSK,
-			       clientpskcred2);
+				clientpskcred2);
 	if (ret < 0)
 		exit(1);
 

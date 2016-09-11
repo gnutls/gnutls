@@ -1126,7 +1126,7 @@ typedef struct mbuffer_st *gnutls_packet_t;
 
 ssize_t
 gnutls_record_recv_packet(gnutls_session_t session, 
-		   	  gnutls_packet_t *packet);
+			  gnutls_packet_t *packet);
 
 void gnutls_packet_get(gnutls_packet_t packet, gnutls_datum_t *data, unsigned char *sequence);
 void gnutls_packet_deinit(gnutls_packet_t packet);

@@ -41,19 +41,19 @@ typedef struct krb5_principal_data {
 
 extern const asn1_static_node krb5_asn1_tab[];
 
-static void cleanup_principal(krb5_principal_data *princ)
+static void cleanup_principal(krb5_principal_data * princ)
 {
- 	unsigned i;
- 	if (princ) {
- 		gnutls_free(princ->realm);
- 		for (i=0;i<princ->length;i++)
- 			gnutls_free(princ->data[i]);
+	unsigned i;
+	if (princ) {
+		gnutls_free(princ->realm);
+		for (i = 0; i < princ->length; i++)
+			gnutls_free(princ->data[i]);
 		memset(princ, 0, sizeof(*princ));
 		gnutls_free(princ);
- 	}
+	}
 }
 
-static krb5_principal_data* name_to_principal(const char *_name)
+static krb5_principal_data *name_to_principal(const char *_name)
 {
 	krb5_principal_data *princ;
 	char *p, *p2, *sp;
@@ -78,7 +78,7 @@ static krb5_principal_data* name_to_principal(const char *_name)
 		goto fail;
 	}
 
-	princ->realm = gnutls_strdup(p+1);
+	princ->realm = gnutls_strdup(p + 1);
 	if (princ->realm == NULL) {
 		gnutls_assert();
 		goto fail;
@@ -87,9 +87,11 @@ static krb5_principal_data* name_to_principal(const char *_name)
 
 	if (p == p2) {
 		p = strtok_r(name, "/", &sp);
-		while(p) {
+		while (p) {
 			if (pos == MAX_COMPONENTS) {
-				_gnutls_debug_log("%s: Cannot parse names with more than %d components\n", __func__, MAX_COMPONENTS);
+				_gnutls_debug_log
+				    ("%s: Cannot parse names with more than %d components\n",
+				     __func__, MAX_COMPONENTS);
 				goto fail;
 			}
 
@@ -105,12 +107,13 @@ static krb5_principal_data* name_to_principal(const char *_name)
 			p = strtok_r(NULL, "/", &sp);
 		}
 
-		if ((princ->length == 2) && (strcmp (princ->data[0], "krbtgt") == 0)) {
-			princ->type = 2; /* KRB_NT_SRV_INST */
+		if ((princ->length == 2)
+		    && (strcmp(princ->data[0], "krbtgt") == 0)) {
+			princ->type = 2;	/* KRB_NT_SRV_INST */
 		} else {
-			princ->type = 1; /* KRB_NT_PRINCIPAL */
+			princ->type = 1;	/* KRB_NT_PRINCIPAL */
 		}
-	} else { /* enterprise */
+	} else {		/* enterprise */
 		princ->data[0] = gnutls_strdup(name);
 		if (princ->data[0] == NULL) {
 			gnutls_assert();
@@ -118,13 +121,13 @@ static krb5_principal_data* name_to_principal(const char *_name)
 		}
 
 		princ->length++;
-		princ->type = 10; /* KRB_NT_ENTERPRISE */
+		princ->type = 10;	/* KRB_NT_ENTERPRISE */
 	}
 
 	goto cleanup;
  fail:
- 	cleanup_principal(princ);
- 	princ = NULL;
+	cleanup_principal(princ);
+	princ = NULL;
 
  cleanup:
 	gnutls_free(name);
@@ -135,7 +138,7 @@ int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 {
 	int ret, result;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	krb5_principal_data * princ;
+	krb5_principal_data *princ;
 	unsigned i;
 
 	princ = name_to_principal(name);
@@ -145,7 +148,9 @@ int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 		goto cleanup;
 	}
 
-	result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.KRB5PrincipalName", &c2);
+	result =
+	    asn1_create_element(_gnutls_get_gnutls_asn(),
+				"GNUTLS.KRB5PrincipalName", &c2);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
@@ -161,8 +166,7 @@ int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 	}
 
 	result =
-	    asn1_write_value(c2, "principalName.name-type", &princ->type,
-			     1);
+	    asn1_write_value(c2, "principalName.name-type", &princ->type, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
@@ -171,8 +175,7 @@ int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 
 	for (i = 0; i < princ->length; i++) {
 		result =
-		    asn1_write_value(c2, "principalName.name-string",
-				     "NEW", 1);
+		    asn1_write_value(c2, "principalName.name-string", "NEW", 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(result);
@@ -203,10 +206,10 @@ int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der)
 	return ret;
 }
 
-static int principal_to_str(ASN1_TYPE c2, gnutls_buffer_st *str)
+static int principal_to_str(ASN1_TYPE c2, gnutls_buffer_st * str)
 {
-	gnutls_datum_t realm = {NULL, 0};
-	gnutls_datum_t component = {NULL, 0};
+	gnutls_datum_t realm = { NULL, 0 };
+	gnutls_datum_t component = { NULL, 0 };
 	unsigned char name_type[2];
 	int ret, result, len;
 	unsigned i;
@@ -219,29 +222,33 @@ static int principal_to_str(ASN1_TYPE c2, gnutls_buffer_st *str)
 	}
 
 	len = sizeof(name_type);
-	result = asn1_read_value(c2, "principalName.name-type", name_type, &len);
+	result =
+	    asn1_read_value(c2, "principalName.name-type", name_type, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if (len != 1 || (name_type[0] != 1 && name_type[0] != 2 && name_type[0] != 10)) {
+	if (len != 1
+	    || (name_type[0] != 1 && name_type[0] != 2 && name_type[0] != 10)) {
 		ret = GNUTLS_E_INVALID_REQUEST;
 		goto cleanup;
 	}
 
-	for (i=0;;i++) {
-		snprintf(val, sizeof(val), "principalName.name-string.?%u", i+1);
+	for (i = 0;; i++) {
+		snprintf(val, sizeof(val), "principalName.name-string.?%u",
+			 i + 1);
 		ret = _gnutls_x509_read_value(c2, val, &component);
-		if (ret == GNUTLS_E_ASN1_VALUE_NOT_FOUND || ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+		if (ret == GNUTLS_E_ASN1_VALUE_NOT_FOUND
+		    || ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
 			break;
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-		if (i>0) {
+		if (i > 0) {
 			ret = _gnutls_buffer_append_data(str, "/", 1);
 			if (ret < 0) {
 				gnutls_assert();
@@ -249,7 +256,9 @@ static int principal_to_str(ASN1_TYPE c2, gnutls_buffer_st *str)
 			}
 		}
 
-		ret = _gnutls_buffer_append_data(str, component.data, component.size);
+		ret =
+		    _gnutls_buffer_append_data(str, component.data,
+					       component.size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -273,11 +282,12 @@ static int principal_to_str(ASN1_TYPE c2, gnutls_buffer_st *str)
 	ret = 0;
  cleanup:
 	_gnutls_free_datum(&component);
- 	gnutls_free(realm.data);
- 	return ret;
+	gnutls_free(realm.data);
+	return ret;
 }
 
-int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der, gnutls_datum_t *name)
+int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der,
+				  gnutls_datum_t * name)
 {
 	int ret, result;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -285,7 +295,9 @@ int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der, gnutls_datum_t *na
 
 	_gnutls_buffer_init(&str);
 
-	result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.KRB5PrincipalName", &c2);
+	result =
+	    asn1_create_element(_gnutls_get_gnutls_asn(),
+				"GNUTLS.KRB5PrincipalName", &c2);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
@@ -318,7 +330,7 @@ int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der, gnutls_datum_t *na
 	return _gnutls_buffer_to_datum(&str, name, 1);
 
  cleanup:
- 	_gnutls_buffer_clear(&str);
+	_gnutls_buffer_clear(&str);
 	asn1_delete_structure(&c2);
 	return ret;
 }

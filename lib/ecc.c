@@ -86,8 +86,8 @@ _gnutls_ecc_ansi_x963_export(gnutls_ecc_curve_t curve, bigint_t x,
 	/* pad and store y */
 	return 0;
  cleanup:
- 	_gnutls_free_datum(out);
- 	return ret;
+	_gnutls_free_datum(out);
+	return ret;
 }
 
 

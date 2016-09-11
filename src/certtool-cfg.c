@@ -73,7 +73,7 @@ struct cfg_options {
 	unsigned type;
 
 	/* used when parsing */
-	unsigned found; 
+	unsigned found;
 };
 
 static struct cfg_options available_options[] = {
@@ -237,12 +237,12 @@ void cfg_init(void)
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       do { \
-        if (val && !strcmp(val->pzName, name)==0) \
-          continue; \
-        s_name[i] = strdup(val->v.strVal); \
-        i++; \
-          if (i>=MAX_ENTRIES) \
-            break; \
+	if (val && !strcmp(val->pzName, name)==0) \
+	  continue; \
+	s_name[i] = strdup(val->v.strVal); \
+	i++; \
+	  if (i>=MAX_ENTRIES) \
+	    break; \
       } while((val = optionNextValue(pov, val)) != NULL); \
       s_name[i] = NULL; \
     } \
@@ -259,31 +259,31 @@ void cfg_init(void)
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       do { \
-        if (val && !strcmp(val->pzName, name)==0) \
-          continue; \
-        len = strlen(val->v.strVal); \
-        if (sizeof(str) > len) { \
-        	strcpy(str, val->v.strVal); \
+	if (val && !strcmp(val->pzName, name)==0) \
+	  continue; \
+	len = strlen(val->v.strVal); \
+	if (sizeof(str) > len) { \
+		strcpy(str, val->v.strVal); \
 	} else { \
-        	memcpy(str, val->v.strVal, sizeof(str)-1); \
-        	str[sizeof(str)-1] = 0; \
+		memcpy(str, val->v.strVal, sizeof(str)-1); \
+		str[sizeof(str)-1] = 0; \
 	} \
-        if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
-          fprintf(stderr, "Error parsing %s\n", name); \
-          exit(1); \
-        } \
-        p[0] = 0; \
-        p++; \
-        s_name[i] = strdup(str); \
-        while(*p==' ' || *p == '\t') p++; \
-        if (p[0] == 0) { \
-          fprintf(stderr, "Error (2) parsing %s\n", name); \
-          exit(1); \
-        } \
-        s_name[i+1] = strdup(p); \
-        i+=2; \
-        if (i>=MAX_ENTRIES) \
-          break; \
+	if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
+	  fprintf(stderr, "Error parsing %s\n", name); \
+	  exit(1); \
+	} \
+	p[0] = 0; \
+	p++; \
+	s_name[i] = strdup(str); \
+	while(*p==' ' || *p == '\t') p++; \
+	if (p[0] == 0) { \
+	  fprintf(stderr, "Error (2) parsing %s\n", name); \
+	  exit(1); \
+	} \
+	s_name[i+1] = strdup(p); \
+	i+=2; \
+	if (i>=MAX_ENTRIES) \
+	  break; \
       } while((val = optionNextValue(pov, val)) != NULL); \
       s_name[i] = NULL; \
     } \
@@ -299,8 +299,8 @@ void cfg_init(void)
 /* READ_NUMERIC only returns a long */
 #define CHECK_LONG_OVERFLOW(x) \
       if (x == LONG_MAX) { \
-      	fprintf(stderr, "overflow in number\n"); \
-      	exit(1); \
+        fprintf(stderr, "overflow in number\n"); \
+        exit(1); \
       }
 
 #define READ_NUMERIC(name, s_name) \
@@ -308,9 +308,9 @@ void cfg_init(void)
   if (val != NULL) \
     { \
       if (val->valType == OPARG_TYPE_NUMERIC) \
-        s_name = val->v.longVal; \
+	s_name = val->v.longVal; \
       else if (val->valType == OPARG_TYPE_STRING) \
-        s_name = strtol(val->v.strVal, NULL, 10); \
+	s_name = strtol(val->v.strVal, NULL, 10); \
     }
 
 #define HEX_DECODE(hex, output, output_size) \
@@ -339,7 +339,7 @@ unsigned len, cmp;
 			cmp = strcasecmp(val->pzName, available_options[j].name);
 
 		if (cmp == 0) {
-			if (available_options[j].type != OPTION_MULTI_LINE && 
+			if (available_options[j].type != OPTION_MULTI_LINE &&
 			    available_options[j].found != 0) {
 			    fprintf(stderr, "Warning: multiple options found for '%s'; only the first will be taken into account.\n", available_options[j].name);
 			}
@@ -1463,18 +1463,18 @@ time_t get_date(const char* date)
 	struct timespec r;
 
 	if (date==NULL || parse_datetime(&r, date, NULL) == 0) {
-	        fprintf(stderr, "Cannot parse date: %s\n", date);
-	        exit(1);
-        }
-        
-        return r.tv_sec;
+		fprintf(stderr, "Cannot parse date: %s\n", date);
+		exit(1);
+	}
+
+	return r.tv_sec;
 }
 
 time_t get_activation_date(void)
 {
 
 	if (batch && cfg.activation_date != NULL) {
-       		return get_date(cfg.activation_date);
+		return get_date(cfg.activation_date);
 	}
 
 	return time(NULL);
@@ -1484,7 +1484,7 @@ time_t get_crl_revocation_date(void)
 {
 
 	if (batch && cfg.revocation_date != NULL) {
-       		return get_date(cfg.revocation_date);
+		return get_date(cfg.revocation_date);
 	}
 
 	return time(NULL);
@@ -1494,7 +1494,7 @@ time_t get_crl_this_update_date(void)
 {
 
 	if (batch && cfg.this_update_date != NULL) {
-       		return get_date(cfg.this_update_date);
+		return get_date(cfg.this_update_date);
 	}
 
 	return time(NULL);
@@ -1506,26 +1506,26 @@ time_t days_to_secs(int days)
 time_t secs = days;
 time_t now = time(NULL);
 
-       	if (secs != (time_t)-1) {
-      	        if (INT_MULTIPLY_OVERFLOW(secs, 24*60*60)) {
-                        goto overflow;
-	        } else {
-    	                secs *= 24*60*60;
-      	        }
-        }
-                                
-        if (secs != (time_t)-1) {
-                if (INT_ADD_OVERFLOW(secs, now)) {
-                        goto overflow;
-                } else {
-                        secs += now;
-                }
-        }
-        
-        return secs;
+	if (secs != (time_t)-1) {
+		if (INT_MULTIPLY_OVERFLOW(secs, 24*60*60)) {
+			goto overflow;
+		} else {
+			secs *= 24*60*60;
+		}
+	}
+
+	if (secs != (time_t)-1) {
+		if (INT_ADD_OVERFLOW(secs, now)) {
+			goto overflow;
+		} else {
+			secs += now;
+		}
+	}
+
+	return secs;
  overflow:
- 	fprintf(stderr, "Overflow while parsing days\n");
- 	exit(1);
+	fprintf(stderr, "Overflow while parsing days\n");
+	exit(1);
 }
 
 static
@@ -1533,13 +1533,13 @@ time_t get_int_date(const char *txt_val, int int_val, const char *msg)
 {
 	if (batch) {
 		if (txt_val == NULL) {
-		        time_t secs;
-		        
-        		if (int_val == 0 || int_val < -2)
-        		        secs = days_to_secs(365);
-                        else {
-                                secs = days_to_secs(int_val);
-                        }
+			time_t secs;
+
+			if (int_val == 0 || int_val < -2)
+				secs = days_to_secs(365);
+			else {
+				secs = days_to_secs(int_val);
+			}
 
 			return secs;
 		} else

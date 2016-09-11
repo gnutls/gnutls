@@ -78,7 +78,7 @@ static void try(void)
 	gnutls_init(&server, GNUTLS_SERVER|GNUTLS_ALLOW_ID_CHANGE);
 	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 
 	gnutls_priority_set_direct(server,
 				   "NORMAL",
@@ -118,7 +118,7 @@ static void try(void)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	if (ret < 0)
 		exit(1);
 
@@ -139,7 +139,7 @@ static void try(void)
 
 	/* switch server's certificate and rehandshake */
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred2);
+				clientx509cred2);
 
 	HANDSHAKE(client, server);
 

@@ -214,7 +214,7 @@ int gnutls_x509_crt_set_tlsfeatures(gnutls_x509_crt_t crt,
  * Since: 3.5.1
  **/
 unsigned gnutls_x509_tlsfeatures_check_crt(gnutls_x509_tlsfeatures_t feat,
-				           gnutls_x509_crt_t cert)
+					   gnutls_x509_crt_t cert)
 {
 	int ret;
 	gnutls_x509_tlsfeatures_t cfeat;

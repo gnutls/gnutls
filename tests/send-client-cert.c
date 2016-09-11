@@ -103,7 +103,7 @@ static void try(unsigned expect, unsigned ca_type)
 
 
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 
 	gnutls_priority_set_direct(server,
 				   "NORMAL",
@@ -138,7 +138,7 @@ static void try(unsigned expect, unsigned ca_type)
 		exit(1);
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 	if (ret < 0)
 		exit(1);
 

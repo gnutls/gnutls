@@ -364,8 +364,8 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	}
 
 	ret =
-	    check_ocsp_response(session, peer_certificate_list[0], cred->tlist, cand_issuers,
-	    			cand_issuers_size, &resp, &ocsp_status);
+		check_ocsp_response(session, peer_certificate_list[0], cred->tlist, cand_issuers,
+				    cand_issuers_size, &resp, &ocsp_status);
 
 	if (ret < 0) {
 		CLEAR_CERTS;
@@ -820,11 +820,11 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 
 	/* Try to load the whole certificate chain from the PKCS #11 token */
 	for (i=0;i<MAX_PKCS11_CERT_CHAIN;i++) {
-       	        ret = gnutls_x509_crt_check_issuer(crt, crt);
-                if (i > 0 && ret != 0) {
-                	/* self signed */
-       	                break;
-                }
+		ret = gnutls_x509_crt_check_issuer(crt, crt);
+		if (i > 0 && ret != 0) {
+			/* self signed */
+			break;
+		}
 
 		ret = gnutls_pcert_import_x509(&ccert[i], crt, 0);
 		if (ret < 0) {
@@ -1149,8 +1149,8 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 	}
 
 	ret =
-	    gnutls_pcert_import_x509_list(pcerts, cert_list, (unsigned int*)&cert_list_size,
-	    				  GNUTLS_X509_CRT_LIST_SORT);
+		gnutls_pcert_import_x509_list(pcerts, cert_list, (unsigned int*)&cert_list_size,
+					      GNUTLS_X509_CRT_LIST_SORT);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1174,7 +1174,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 	return 0;
 
       cleanup:
-        gnutls_free(pcerts);
+	gnutls_free(pcerts);
 	_gnutls_str_array_clear(&names);
 	return ret;
 }
@@ -1203,8 +1203,8 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
  */
 int
 gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
-                                unsigned index,
-                                gnutls_x509_privkey_t *key)
+				unsigned index,
+				gnutls_x509_privkey_t *key)
 {
 	if (index >= res->ncerts) {
 		gnutls_assert();
@@ -1242,9 +1242,9 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
  */
 int
 gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
-                                unsigned index,
-                                gnutls_x509_crt_t **crt_list,
-                                unsigned *crt_list_size)
+				unsigned index,
+				gnutls_x509_crt_t **crt_list,
+				unsigned *crt_list_size)
 {
 	int ret;
 	unsigned i;
@@ -1433,7 +1433,7 @@ gnutls_certificate_set_trust_list(gnutls_certificate_credentials_t res,
  **/
 void
 gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
-                                  gnutls_x509_trust_list_t *tlist)
+				  gnutls_x509_trust_list_t *tlist)
 {
 	*tlist = res->tlist;
 }

@@ -107,9 +107,9 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 	}
 
 	ret = 0;
-error:
+ error:
 	_gnutls_mpi_release(&session->key.client_Y);
-      	gnutls_pk_params_clear(&session->key.dh_params);
+	gnutls_pk_params_clear(&session->key.dh_params);
 
 	return ret;
 }
@@ -173,8 +173,8 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 
 	ret = data->length;
 
-      error:
-      	gnutls_pk_params_clear(&session->key.dh_params);
+ error:
+	gnutls_pk_params_clear(&session->key.dh_params);
 	return ret;
 }
 

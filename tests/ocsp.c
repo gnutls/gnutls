@@ -899,8 +899,8 @@ static void req_parse(void)
 	if (strlen(REQ1INFO) != d.size ||
 	    memcmp(REQ1INFO, d.data, strlen(REQ1INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
-		       strlen(REQ1INFO), REQ1INFO, (int) d.size,
-		       (int) d.size, d.data);
+			strlen(REQ1INFO), REQ1INFO, (int) d.size,
+			(int) d.size, d.data);
 		fail("ocsp request print failed\n");
 		exit(1);
 	}
@@ -1093,8 +1093,8 @@ static void req_addcert_id(void)
 	if (strlen(REQ1INFO) != d.size ||
 	    memcmp(REQ1INFO, d.data, strlen(REQ1INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
-		       strlen(REQ1INFO), REQ1INFO, (int) d.size,
-		       (int) d.size, d.data);
+			strlen(REQ1INFO), REQ1INFO, (int) d.size,
+			(int) d.size, d.data);
 		fail("ocsp request print failed\n");
 		exit(1);
 	}
@@ -1185,7 +1185,7 @@ static void req_addcert(void)
 		}
 
 		ret = gnutls_ocsp_req_add_cert(req, GNUTLS_DIG_SHA1,
-					       issuer, subject);
+						issuer, subject);
 		if (ret != 0) {
 			fail("gnutls_ocsp_add_cert %d\n", ret);
 			exit(1);
@@ -1206,8 +1206,8 @@ static void req_addcert(void)
 	if (strlen(REQ1INFO) != d.size ||
 	    memcmp(REQ1INFO, d.data, strlen(REQ1INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
-		       strlen(REQ1INFO), REQ1INFO, (int) d.size,
-		       (int) d.size, d.data);
+			strlen(REQ1INFO), REQ1INFO, (int) d.size,
+			(int) d.size, d.data);
 		fail("ocsp request print failed\n");
 		exit(1);
 	}
@@ -1308,8 +1308,8 @@ static void resp_import(void)
 	if (strlen(RESP1INFO) != d.size ||
 	    memcmp(RESP1INFO, d.data, strlen(RESP1INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
-		       strlen(RESP1INFO), RESP1INFO, (int) d.size,
-		       (int) d.size, d.data);
+			strlen(RESP1INFO), RESP1INFO, (int) d.size,
+			(int) d.size, d.data);
 		fail("ocsp response print failed\n");
 		exit(1);
 	}
@@ -1334,8 +1334,8 @@ static void resp_import(void)
 
 	if (memcmp(RESP2INFO, d.data, strlen(RESP2INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
-		       strlen(RESP2INFO), RESP2INFO, (int) d.size,
-		       (int) d.size, d.data);
+			strlen(RESP2INFO), RESP2INFO, (int) d.size,
+			(int) d.size, d.data);
 		fail("ocsp response print failed\n");
 		exit(1);
 	}
@@ -1369,8 +1369,8 @@ static void resp_import(void)
 
 	if (memcmp(RESP3INFO, d.data, strlen(RESP3INFO)) != 0) {
 		printf("expected (len %ld):\n%s\ngot (len %d):\n%.*s\n",
-		       strlen(RESP3INFO), RESP3INFO, (int) d.size,
-		       (int) d.size, d.data);
+			strlen(RESP3INFO), RESP3INFO, (int) d.size,
+			(int) d.size, d.data);
 		fail("ocsp response 3 print failed\n");
 		exit(1);
 	}

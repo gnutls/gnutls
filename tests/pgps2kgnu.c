@@ -4,8 +4,8 @@
  * Author: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
 
  * pgps2kgnu: test GNU extensions to the OpenPGP S2K specification.
- *            at the moment, we just test the "GNU dummy" S2K
- *            extension.
+ *	    at the moment, we just test the "GNU dummy" S2K
+ *	    extension.
 
  *
  * This file is part of GnuTLS.
@@ -66,7 +66,7 @@ static char dummy_key[] =
 
 /* Test capability of reading the gnu-dummy OpenPGP S2K extension. 
    See: doc/DETAILS from gnupg
-        http://lists.gnu.org/archive/html/gnutls-devel/2008-08/msg00023.html
+	http://lists.gnu.org/archive/html/gnutls-devel/2008-08/msg00023.html
 */
 
 static void tls_log_func(int level, const char *str)
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 	rc = gnutls_openpgp_privkey_init(&key);
 	if (rc) {
 		printf("gnutls_openpgp_privkey_init rc %d: %s\n",
-		       rc, gnutls_strerror(rc));
+			rc, gnutls_strerror(rc));
 		return 1;
 	}
 
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
 					   0);
 	if (rc) {
 		printf("gnutls_openpgp_privkey_import rc %d: %s\n",
-		       rc, gnutls_strerror(rc));
+			rc, gnutls_strerror(rc));
 		return 1;
 	}
 

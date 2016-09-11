@@ -100,7 +100,7 @@ static void client(int sd)
 	 */
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       clientx509cred);
+				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
 
@@ -253,7 +253,7 @@ static void server(int sd)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       serverx509cred);
+				serverx509cred);
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);

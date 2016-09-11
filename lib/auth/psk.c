@@ -292,9 +292,9 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
  *
  * struct {
  *     select (KeyExchangeAlgorithm) {
- *         // other cases for rsa, diffie_hellman, etc.
- *         case psk:  // NEW
- *             uint8_t psk_identity_hint<0..2^16-1>;
+ *	 // other cases for rsa, diffie_hellman, etc.
+ *	 case psk:  // NEW
+ *	     uint8_t psk_identity_hint<0..2^16-1>;
  *     };
  * } ServerKeyExchange;
  *

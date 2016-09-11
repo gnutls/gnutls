@@ -179,7 +179,7 @@ static void client(int sds[])
 		/* put the x509 credentials to the current session
 		 */
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				       xcred);
+					xcred);
 
 		gnutls_transport_set_int(session, sd);
 

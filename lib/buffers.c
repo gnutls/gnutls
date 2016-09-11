@@ -266,7 +266,7 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 		int err = get_errno(session);
 
 		_gnutls_read_log("READ: %d returned from %p, errno=%d\n",
-		     		 (int) i, fd, err);
+				 (int) i, fd, err);
 
 		ret = errno_to_gerr(err, 1);
 		goto cleanup;
@@ -459,9 +459,9 @@ _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
 		}
 
 		if (ret == -1) {
-		        gnutls_assert();
+			gnutls_assert();
 			break;
-                }
+		}
 
 		total += ret;
 

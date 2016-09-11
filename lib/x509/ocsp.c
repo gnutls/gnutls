@@ -406,11 +406,11 @@ int gnutls_ocsp_req_get_version(gnutls_ocsp_req_t req)
  * corresponds to the CertID structure:
  *
  * <informalexample><programlisting>
- *    CertID          ::=     SEQUENCE {
- *        hashAlgorithm       AlgorithmIdentifier,
- *        issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
- *        issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
- *        serialNumber        CertificateSerialNumber }
+ *    CertID	  ::=     SEQUENCE {
+ *	hashAlgorithm       AlgorithmIdentifier,
+ *	issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
+ *	issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
+ *	serialNumber	CertificateSerialNumber }
  * </programlisting></informalexample>
  *
  * Each of the pointers to output variables may be NULL to indicate
@@ -522,11 +522,11 @@ gnutls_ocsp_req_get_cert_id(gnutls_ocsp_req_t req,
  * The information needed corresponds to the CertID structure:
  *
  * <informalexample><programlisting>
- *    CertID          ::=     SEQUENCE {
- *        hashAlgorithm       AlgorithmIdentifier,
- *        issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
- *        issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
- *        serialNumber        CertificateSerialNumber }
+ *    CertID	  ::=     SEQUENCE {
+ *	hashAlgorithm       AlgorithmIdentifier,
+ *	issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
+ *	issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
+ *	serialNumber	CertificateSerialNumber }
  * </programlisting></informalexample>
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a

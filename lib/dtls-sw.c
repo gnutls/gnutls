@@ -2,7 +2,7 @@
  * Copyright (C) 2016 Red Hat, Inc.
  *
  * Authors: Fridolin Pokorny
- *          Nikos Mavrogiannopoulos
+ *	  Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
  *

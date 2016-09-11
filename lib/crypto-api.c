@@ -763,11 +763,11 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	ret = _gnutls_aead_cipher_encrypt(&h->ctx_enc,
-				     	  nonce, nonce_len,
-				     	  auth, auth_len,
-				     	  tag_size,
-				     	  ptext, ptext_len,
-				     	  ctext, *ctext_len);
+					  nonce, nonce_len,
+					  auth, auth_len,
+					  tag_size,
+					  ptext, ptext_len,
+					  ctext, *ctext_len);
 	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 

@@ -190,7 +190,7 @@ static gnutls_session_t initialize_tls_session(const char *prio)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_SRP, s_srp_cred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-			       s_x509_cred);
+				s_x509_cred);
 
 	return session;
 }
@@ -220,7 +220,7 @@ static void server(int fd, const char *prio)
 
 	gnutls_srp_allocate_server_credentials(&s_srp_cred);
 	gnutls_srp_set_server_credentials_file(s_srp_cred, "tpasswd",
-					       "tpasswd.conf");
+						"tpasswd.conf");
 
 	gnutls_certificate_allocate_credentials(&s_x509_cred);
 	gnutls_certificate_set_x509_key_mem(s_x509_cred,

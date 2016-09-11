@@ -71,80 +71,80 @@ void doit(void)
 	if (ret < 0)
 		fail("init %d\n", ret);
 
-        /* init and write >1 features
-         */
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	/* init and write >1 features
+	 */
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        assert(gnutls_x509_tlsfeatures_add(feat, 2) >= 0);
-        assert(gnutls_x509_tlsfeatures_add(feat, 3) >= 0);
-        assert(gnutls_x509_tlsfeatures_add(feat, 5) >= 0);
-        assert(gnutls_x509_tlsfeatures_add(feat, 7) >= 0);
-        assert(gnutls_x509_tlsfeatures_add(feat, 11) >= 0);
+	assert(gnutls_x509_tlsfeatures_add(feat, 2) >= 0);
+	assert(gnutls_x509_tlsfeatures_add(feat, 3) >= 0);
+	assert(gnutls_x509_tlsfeatures_add(feat, 5) >= 0);
+	assert(gnutls_x509_tlsfeatures_add(feat, 7) >= 0);
+	assert(gnutls_x509_tlsfeatures_add(feat, 11) >= 0);
 
-        assert(gnutls_x509_ext_export_tlsfeatures(feat, &der) >= 0);
+	assert(gnutls_x509_ext_export_tlsfeatures(feat, &der) >= 0);
 
-        gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_x509_tlsfeatures_deinit(feat);
 
-        /* re-load and read
-         */
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	/* re-load and read
+	 */
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        assert(gnutls_x509_ext_import_tlsfeatures(&der, feat, 0) >= 0);
+	assert(gnutls_x509_ext_import_tlsfeatures(&der, feat, 0) >= 0);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 0, &out) >= 0);
-        assert(out == 2);
+	assert(gnutls_x509_tlsfeatures_get(feat, 0, &out) >= 0);
+	assert(out == 2);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 1, &out) >= 0);
-        assert(out == 3);
+	assert(gnutls_x509_tlsfeatures_get(feat, 1, &out) >= 0);
+	assert(out == 3);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 2, &out) >= 0);
-        assert(out == 5);
+	assert(gnutls_x509_tlsfeatures_get(feat, 2, &out) >= 0);
+	assert(out == 5);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 3, &out) >= 0);
-        assert(out == 7);
+	assert(gnutls_x509_tlsfeatures_get(feat, 3, &out) >= 0);
+	assert(out == 7);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 4, &out) >= 0);
-        assert(out == 11);
+	assert(gnutls_x509_tlsfeatures_get(feat, 4, &out) >= 0);
+	assert(out == 11);
 
-        gnutls_x509_tlsfeatures_deinit(feat);
-        gnutls_free(der.data);
+	gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_free(der.data);
 
-        /* check whether no feature is acceptable */
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	/* check whether no feature is acceptable */
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        assert(gnutls_x509_ext_export_tlsfeatures(feat, &der) >= 0);
+	assert(gnutls_x509_ext_export_tlsfeatures(feat, &der) >= 0);
 
-        gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_x509_tlsfeatures_deinit(feat);
 
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        assert(gnutls_x509_ext_import_tlsfeatures(&der, feat, 0) >= 0);
+	assert(gnutls_x509_ext_import_tlsfeatures(&der, feat, 0) >= 0);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 0, &out) == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	assert(gnutls_x509_tlsfeatures_get(feat, 0, &out) == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-        gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_x509_tlsfeatures_deinit(feat);
 
-        gnutls_free(der.data);
+	gnutls_free(der.data);
 
-        /* check whether we can add a reasonable number of features */
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	/* check whether we can add a reasonable number of features */
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        for (i=0;i<128;i++) {
-                ret = gnutls_x509_tlsfeatures_add(feat, i);
-                if (ret < 0) {
-                        assert(i>=32);
-                        assert(ret == GNUTLS_E_INTERNAL_ERROR);
-                }
-        }
+	for (i=0;i<128;i++) {
+		ret = gnutls_x509_tlsfeatures_add(feat, i);
+		if (ret < 0) {
+			assert(i>=32);
+			assert(ret == GNUTLS_E_INTERNAL_ERROR);
+		}
+	}
 
-        gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_x509_tlsfeatures_deinit(feat);
 
-        /* check whether we can import a very long list */
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	/* check whether we can import a very long list */
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        assert(gnutls_x509_ext_import_tlsfeatures(&der_long, feat, 0) == GNUTLS_E_INTERNAL_ERROR);
+	assert(gnutls_x509_ext_import_tlsfeatures(&der_long, feat, 0) == GNUTLS_E_INTERNAL_ERROR);
 
-        gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_x509_tlsfeatures_deinit(feat);
 
 	gnutls_global_deinit();
 }

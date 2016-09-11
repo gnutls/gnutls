@@ -61,39 +61,39 @@ void doit(void)
 	if (ret < 0)
 		fail("init %d\n", ret);
 
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
-        assert(gnutls_x509_crt_init(&crt) >= 0);
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	assert(gnutls_x509_crt_init(&crt) >= 0);
 
-        assert(gnutls_x509_crt_import(crt, &server_cert, GNUTLS_X509_FMT_PEM) >= 0);
+	assert(gnutls_x509_crt_import(crt, &server_cert, GNUTLS_X509_FMT_PEM) >= 0);
 
 
-        assert(gnutls_x509_crt_get_tlsfeatures(crt, feat, 0, &critical) >= 0);
-        assert(critical == 0);
+	assert(gnutls_x509_crt_get_tlsfeatures(crt, feat, 0, &critical) >= 0);
+	assert(critical == 0);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 0, &out) >= 0);
-        assert(out == 5);
+	assert(gnutls_x509_tlsfeatures_get(feat, 0, &out) >= 0);
+	assert(out == 5);
 
-        assert(gnutls_x509_tlsfeatures_get(feat, 1, &out) == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	assert(gnutls_x509_tlsfeatures_get(feat, 1, &out) == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-        assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) != 0);
+	assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) != 0);
 
-        /* append more features */
-        assert(gnutls_x509_tlsfeatures_add(feat, 6) >= 0);
-        assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) == 0);
+	/* append more features */
+	assert(gnutls_x509_tlsfeatures_add(feat, 6) >= 0);
+	assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) == 0);
 
-        assert(gnutls_x509_tlsfeatures_add(feat, 8) >= 0);
-        assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) == 0);
+	assert(gnutls_x509_tlsfeatures_add(feat, 8) >= 0);
+	assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) == 0);
 
-        gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_x509_tlsfeatures_deinit(feat);
 
-        /* check whether a single TLSFeat with another value will fail verification */
-        assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
+	/* check whether a single TLSFeat with another value will fail verification */
+	assert(gnutls_x509_tlsfeatures_init(&feat) >= 0);
 
-        assert(gnutls_x509_tlsfeatures_add(feat, 8) >= 0);
-        assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) == 0);
+	assert(gnutls_x509_tlsfeatures_add(feat, 8) >= 0);
+	assert(gnutls_x509_tlsfeatures_check_crt(feat, crt) == 0);
 
-        gnutls_x509_tlsfeatures_deinit(feat);
-        gnutls_x509_crt_deinit(crt);
+	gnutls_x509_tlsfeatures_deinit(feat);
+	gnutls_x509_crt_deinit(crt);
 	gnutls_global_deinit();
 }
 

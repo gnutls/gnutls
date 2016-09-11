@@ -346,7 +346,7 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 
 static int
 advance_iter(gnutls_x509_trust_list_t list,
-             gnutls_x509_trust_list_iter_t iter)
+	     gnutls_x509_trust_list_iter_t iter)
 {
 	int ret;
 
@@ -408,8 +408,8 @@ advance_iter(gnutls_x509_trust_list_t list,
  **/
 int
 gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
-                                   gnutls_x509_trust_list_iter_t *iter,
-                                   gnutls_x509_crt_t *crt)
+				   gnutls_x509_trust_list_iter_t *iter,
+				   gnutls_x509_crt_t *crt)
 {
 	int ret;
 
@@ -745,9 +745,9 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 					if (gnutls_x509_crl_get_this_update(crl_list[i]) >=
 					    gnutls_x509_crl_get_this_update(list->node[hash].crls[x])) {
 
-					    	gnutls_x509_crl_deinit(list->node[hash].crls[x]);
-					    	list->node[hash].crls[x] = crl_list[i];
-					    	goto next;
+						gnutls_x509_crl_deinit(list->node[hash].crls[x]);
+						list->node[hash].crls[x] = crl_list[i];
+						goto next;
 					} else {
 						/* The new is older, discard it */
 						gnutls_x509_crl_deinit(crl_list[i]);

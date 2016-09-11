@@ -175,7 +175,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		    gnutls_record_send(client, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
 			myfail("%d: error sending false start data: %s\n",
-			       __LINE__, gnutls_strerror(ret));
+				__LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -184,7 +184,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		ret = gnutls_record_recv(server, buffer, sizeof(buffer));
 		if (ret < 0) {
 			myfail("%d: error receiving data: %s\n", __LINE__,
-			       gnutls_strerror(ret));
+				gnutls_strerror(ret));
 		}
 
 		if (ret != sizeof(TESTDATA) - 1) {
@@ -200,7 +200,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
 			myfail("%d: error sending false start data: %s\n",
-			       __LINE__, gnutls_strerror(ret));
+				__LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -211,7 +211,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0) {
 			myfail("%d: error receiving data: %s\n", __LINE__,
-			       gnutls_strerror(ret));
+				gnutls_strerror(ret));
 		}
 	} else if (testno == TEST_RECV_SEND) {
 		side = "server";
@@ -219,7 +219,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
 			myfail("%d: error sending false start data: %s\n",
-			       __LINE__, gnutls_strerror(ret));
+				__LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -228,7 +228,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		ret = gnutls_record_recv(client, buffer, sizeof(buffer));
 		if (ret < 0) {
 			myfail("%d: error receiving data: %s\n", __LINE__,
-			       gnutls_strerror(ret));
+				gnutls_strerror(ret));
 		}
 
 		if (ret != sizeof(TESTDATA) - 1) {
@@ -255,14 +255,14 @@ static void try(const char *name, unsigned testno, unsigned fs,
 	ret = gnutls_bye(server, GNUTLS_SHUT_WR);
 	if (ret < 0) {
 		myfail("%d: error in server bye: %s\n", __LINE__,
-		       gnutls_strerror(ret));
+			gnutls_strerror(ret));
 	}
 
 	side = "client";
 	ret = gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
 		myfail("%d: error in client bye: %s\n", __LINE__,
-		       gnutls_strerror(ret));
+			gnutls_strerror(ret));
 	}
 
 	success("%5s%s \tok\n", dtls?"dtls-":"", name);
