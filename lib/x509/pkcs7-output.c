@@ -27,7 +27,6 @@
 #include <num.h>
 #include "errors.h"
 #include <extras/randomart.h>
-#include <c-ctype.h>
 #include <gnutls-idna.h>
 
 #define addf _gnutls_buffer_append_printf

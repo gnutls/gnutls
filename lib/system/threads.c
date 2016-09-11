@@ -30,7 +30,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <c-ctype.h>
 
 #ifdef _WIN32
 # include <windows.h>

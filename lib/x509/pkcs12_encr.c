@@ -24,7 +24,6 @@
 #include <mpi.h>
 #include "errors.h"
 #include <x509_int.h>
-#include <c-ctype.h>
 #include <algorithms.h>
 
 #define MAX_PASS_LEN 256

@@ -28,7 +28,6 @@
 #include <common.h>
 #include <x509.h>
 #include <x509_b64.h>
-#include <c-ctype.h>
 #include "x509_ext_int.h"
 #include "virt-san.h"
 #include <gnutls/x509-ext.h>

@@ -33,7 +33,6 @@
 #include "x509_int.h"
 #include "extras/hex.h"
 #include <common.h>
-#include <c-ctype.h>
 
 /* TIME functions 
  * Convertions between generalized or UTC time to time_t

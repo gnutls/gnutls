@@ -29,7 +29,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <c-ctype.h>
 
 /* Get TCP_FASTOPEN */
 #ifdef HAVE_NETINET_TCP_H
