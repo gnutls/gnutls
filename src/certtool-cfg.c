@@ -254,14 +254,20 @@ void cfg_init(void)
   { \
     char str[512]; \
     char * p; \
+    int len; \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       do { \
         if (val && !strcmp(val->pzName, name)==0) \
           continue; \
-        strncpy(str, val->v.strVal, sizeof(str)-1); \
-        str[sizeof(str)-1] = 0; \
+        len = strlen(val->v.strVal); \
+        if (sizeof(str) > len) { \
+        	strcpy(str, val->v.strVal); \
+	} else { \
+        	memcpy(str, val->v.strVal, sizeof(str)-1); \
+        	str[sizeof(str)-1] = 0; \
+	} \
         if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
           fprintf(stderr, "Error parsing %s\n", name); \
           exit(1); \

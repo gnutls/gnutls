@@ -60,7 +60,7 @@ void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src)
 		strcpy(dest, src);
 	} else {
 		if (dest_tot_size > 0) {
-			strncpy(dest, src, (dest_tot_size) - 1);
+			memcpy(dest, src, (dest_tot_size) - 1);
 			dest[dest_tot_size - 1] = 0;
 		}
 	}
