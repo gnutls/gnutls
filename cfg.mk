@@ -52,7 +52,8 @@ exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|
 exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
 exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$
 exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html$$
-exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|tests/nist-pkits/|tests/suite/x509paths/.*$$
+exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|\.crl|\.pdf|\.zip|tests/nist-pkits/|tests/suite/x509paths/.*$$
+_makefile_at_at_check_exceptions = ' && !/CODE_COVERAGE_RULES/ && !/VERSION/'
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \
@@ -88,21 +89,6 @@ glimport:
 
 # Code Coverage
 
-pre-coverage:
-	./configure --disable-cxx
-	ln -s . gl/tests/glthread/glthread
-	ln -sf /usr/local/share/gaa/gaa.skel src/gaa.skel
-
-web-coverage:
-	rm -fv `find $(htmldir)/coverage -type f | grep -v CVS`
-	cp -rv doc/coverage/* $(htmldir)/coverage/
-
-upload-web-coverage:
-	cd $(htmldir) && \
-		cvs commit -m "Update." coverage
-
-# Clang
-
 clang:
 	make clean
 	scan-build ./configure
@@ -114,12 +100,6 @@ clang-copy:
 	mkdir -p $(htmldir)/clang/
 	cp -rv scan.tmp/*/* $(htmldir)/clang/
 
-clang-upload:
-	cd $(htmldir) && \
-		cvs add clang || true && \
-		cvs add clang/*.css clang/*.js clang/*.html || true && \
-		cvs commit -m "Update." clang
-
 # Release
 
 ChangeLog:
@@ -127,29 +107,21 @@ ChangeLog:
 	cat .clcopying >> ChangeLog
 
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
-htmldir = ../www-$(PACKAGE)
 
-release: syntax-check prepare upload web upload-web
+release: syntax-check prepare upload-tarballs
 
 prepare:
 	! git tag -l $(tag) | grep $(PACKAGE) > /dev/null
-	rm -f ChangeLog
-	$(MAKE) ChangeLog distcheck
-	$(MAKE) -C doc/manpages/ manpages-update
-	git commit -m Generated. ChangeLog
-	git tag -u b565716f! -m $(VERSION) $(tag)
+	git tag -u 96865171! -m $(VERSION) $(tag)
 
-upload-tarballs:
-	git push
-	git push --tags
-	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.xz
-	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.lz
-	cp $(distdir).tar.xz $(distdir).tar.xz.sig ../releases/$(PACKAGE)/
-	cp $(distdir).tar.lz $(distdir).tar.lz.sig ../releases/$(PACKAGE)/
-
+upload-tarballs: dist
+	gpg --sign --detached $(distdir).tar.xz
+	scp $(distdir).tar.xz* trithemius.gnupg.org:/home/ftp/gcrypt/gnutls/v$(MAJOR_VERSION).$(MINOR_VERSION)
 
 web:
 	echo generating documentation for $(PACKAGE)
+	mkdir -p $(htmldir)/manual
+	mkdir -p $(htmldir)/reference
 	make -C doc gnutls.html
 	cd doc && cp gnutls.html *.png ../$(htmldir)/manual/
 	cd doc && makeinfo --html --split=node -o ../$(htmldir)/manual/html_node/ --css-include=./texinfo.css gnutls.texi
@@ -160,14 +132,8 @@ web:
 	make -C doc gnutls-guile.html gnutls-guile.pdf
 	cd doc && makeinfo --html --split=node -o ../$(htmldir)/manual/gnutls-guile/ --css-include=./texinfo.css gnutls-guile.texi
 	cd doc && cp gnutls-guile.pdf gnutls-guile.html ../$(htmldir)/manual/
-	#cd doc/doxygen && doxygen && cd ../.. && cp -v doc/doxygen/html/* $(htmldir)/devel/doxygen/ && cd doc/doxygen/latex && make refman.pdf && cd ../../../ && cp doc/doxygen/latex/refman.pdf $(htmldir)/devel/doxygen/$(PACKAGE).pdf
-	-cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp doc/reference/html/*.css $(htmldir)/reference/
-	#cp -v doc/cyclo/cyclo-$(PACKAGE).html $(htmldir)/cyclo/
-
-upload-web:
-	cd $(htmldir) && \
-		cvs commit -m "Update." manual/ reference/ \
-			doxygen/ devel/ cyclo/
+	-cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp* doc/reference/html/*.css $(htmldir)/reference/
+	cd www && $(MAKE)
 
 ASM_SOURCES_XXX := \
 	lib/accelerated/x86/XXX/cpuid-x86_64.s \
