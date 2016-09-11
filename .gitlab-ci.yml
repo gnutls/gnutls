@@ -23,7 +23,8 @@ Fedora/x86_64/ubsan:
   script:
   - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --enable-code-coverage
-    && make -j4 && make check -j4 && make local-code-coverage-output
+    && make -j4 && make check -j4
+  - make local-code-coverage-output || true
   tags:
   - shared
   except:
@@ -39,7 +40,8 @@ Fedora/x86_64/no-SSL-3.0:
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
-    make -j4 && make check -j4 && make local-code-coverage-output
+    make -j4 && make check -j4
+  - make local-code-coverage-output || true
   tags:
   - shared
   except:
@@ -99,7 +101,8 @@ Fedora/x86_64/FIPS140-2:
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-non-suiteb-curves --enable-fips140-mode --enable-code-coverage --disable-doc --disable-valgrind-tests &&
-    make -j4 && make check -j4 && make local-code-coverage-output
+    make -j4 && make check -j4
+  - make local-code-coverage-output || true
   tags:
   - shared
   except:
@@ -114,7 +117,8 @@ Fedora/x86_64/FIPS140-2:
 Fedora/x86_64/valgrind:
   script:
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
-    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j4 && make check -j4 && make local-code-coverage-output
+    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j4 && make check -j4
+  - make local-code-coverage-output || true
   tags:
   - shared
   except:
@@ -130,7 +134,8 @@ Fedora/x86_64/asan:
   script:
   - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
-    make -j4 && make check -j4 && make local-code-coverage-output
+    make -j4 && make check -j4
+  - make local-code-coverage-output || true
   tags:
   - shared
   except:
@@ -284,7 +289,8 @@ Fedora/x86:
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
-    make -j4 && make check -j4 && make local-code-coverage-output
+    make -j4 && make check -j4
+  - make local-code-coverage-output || true
   tags:
   - shared
   except:
