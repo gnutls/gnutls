@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <assert.h>
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>

@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <unistd.h>
 
 #define CONFIG_NAME "softhsm-pubkey-import-rsa"
