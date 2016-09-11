@@ -16,6 +16,7 @@ Fedora/x86_64/minimal:
   except:
   - tags
 
+# Check with strict C99 and undefined sanitizer
 Fedora/x86_64/ubsan:
   script:
   - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
@@ -71,6 +72,18 @@ Fedora/x86_64/ABI-check:
     paths:
       - build/logs/gnutls-dane/*/log.txt
       - build/logs/gnutls/*/log.txt
+
+Fedora/x86_64/syntax-check:
+  script:
+  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y clang libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
+  - dnf install -y gnutls-devel
+  - make autoreconf && mkdir -p build && cd build &&
+    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make syntax-check
+  tags:
+  - shared
+  except:
+  - tags
 
 Fedora/x86_64/clang:
   script:
