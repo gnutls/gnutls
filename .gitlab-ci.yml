@@ -83,8 +83,9 @@ Fedora/x86_64/syntax-check:
 Fedora/x86_64/clang:
   script:
   - make autoreconf && 
-    CC=clang ./configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
+    CC=clang ./configure --disable-non-suiteb-curves --enable-code-coverage --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -C tests -j4
+  - make local-code-coverage-output || true
   tags:
   - shared
   except:
