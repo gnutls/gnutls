@@ -3,6 +3,16 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.4.16 (unreleased)
+
+** libgnutls: Ensure proper cleanups on gnutls_certificate_set_*key()
+   failures due to key mismatch. This prevents leaks or double freeing
+   on such failures.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.4.15 (released 2016-09-08)
 
 ** libgnutls: Corrected the comparison of the serial size in OCSP response.
