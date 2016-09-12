@@ -3,6 +3,25 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.5 (unreleased)
+
+** libgnutls: Ensure proper cleanups on gnutls_certificate_set_*key()
+   failures due to key mismatch. This prevents leaks or double freeing
+   on such failures.
+
+** libgnutls: enhanced gnutls_certificate_set_ocsp_status_request_file()
+   to allow importing multiple OCSP request files, one for each chain
+   provided.
+
+** libgnutls: The gnutls_certificate_set_key* functions return an
+   index of the added chain. That index can be used either with
+   gnutls_certificate_set_ocsp_status_request_file(), or with
+   gnutls_certificate_get_crt_raw() and friends.
+
+** API and ABI modifications:
+gnutls_certificate_set_ocsp_status_request_function2: Added
+
+
 * Version 3.5.4 (released 2016-09-08)
 
 ** libgnutls: Corrected the comparison of the serial size in OCSP response.
