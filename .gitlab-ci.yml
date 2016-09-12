@@ -264,6 +264,8 @@ MinGW32:
       - build/tests/*.log
       - build/tests/*/*.log
 
+# That is a specific runner that we cannot enable universally.
+# We restrict it to builds under the gnutls/gnutls project.
 FreeBSD10/x86_64:
   image:
   before_script:
@@ -273,6 +275,8 @@ FreeBSD10/x86_64:
     --disable-guile --disable-doc --disable-valgrind-tests && gmake -j4 && gmake check -j4
   tags:
   - freebsd
+  only:
+  - branches@gnutls/gnutls
   except:
   - tags
   artifacts:
