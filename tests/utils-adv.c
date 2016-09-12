@@ -34,6 +34,11 @@
 #include "utils.h"
 #include "eagain-common.h"
 
+/* internal function */
+int _gnutls_server_name_set_raw(gnutls_session_t session,
+				gnutls_server_name_type_t type,
+				const void *name, size_t name_length);
+
 const char *side = NULL;
 
 /* if @host is NULL certificate check is skipped */
@@ -68,8 +73,14 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	if (ret < 0)
 		exit(1);
 
-	if (host)
-		assert(gnutls_server_name_set(client, GNUTLS_NAME_DNS, host, strlen(host))>=0);
+	if (host) {
+		if (strncmp(host, "raw:", 4) == 0) {
+			assert(_gnutls_server_name_set_raw(client, GNUTLS_NAME_DNS, host+4, strlen(host+4))>=0);
+			host += 4;
+		} else {
+			assert(gnutls_server_name_set(client, GNUTLS_NAME_DNS, host, strlen(host))>=0);
+		}
+	}
 
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				client_cred);
