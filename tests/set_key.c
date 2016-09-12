@@ -158,6 +158,56 @@ static void basic(void)
 		success("success");
 }
 
+static void failure_mode(void)
+{
+	gnutls_certificate_credentials_t x509_cred;
+	gnutls_pcert_st pcert_list[16];
+	gnutls_privkey_t key;
+	unsigned pcert_list_size;
+	const char *names[] = {"localhost", "localhost2"};
+	int ret;
+
+	/* this must be called once in the program
+	 */
+	global_init();
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(6);
+
+	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
+	assert(gnutls_privkey_init(&key)>=0);
+
+	pcert_list_size = sizeof(pcert_list)/sizeof(pcert_list[0]);
+	ret = gnutls_pcert_list_import_x509_raw(pcert_list, &pcert_list_size,
+		&server_cert, GNUTLS_X509_FMT_PEM, 0);
+	if (ret < 0) {
+		fail("error in gnutls_pcert_list_import_x509_raw: %s\n", gnutls_strerror(ret));
+	}
+
+	ret = gnutls_privkey_import_x509_raw(key, &server_ecc_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	if (ret < 0) {
+		fail("error in key import: %s\n", gnutls_strerror(ret));
+	}
+
+	ret = gnutls_certificate_set_key(x509_cred, names, 2, pcert_list,
+				pcert_list_size, key);
+	if (ret < 0) {
+		success("expected error in gnutls_certificate_set_key: %s\n", gnutls_strerror(ret));
+		goto cleanup;
+	}
+
+	fail("gnutls_certificate_set_key succeeded unexpectedly\n");
+
+ cleanup:
+	gnutls_certificate_free_credentials(x509_cred);
+
+	gnutls_global_deinit();
+
+	if (debug)
+		success("success");
+}
+
 static void auto_parse(void)
 {
 	gnutls_certificate_credentials_t x509_cred, clicred;
@@ -244,5 +294,6 @@ static void auto_parse(void)
 void doit(void)
 {
 	basic();
+//	failure_mode();
 	auto_parse();
 }

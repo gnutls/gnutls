@@ -84,7 +84,7 @@ static void compare(const gnutls_datum_t *der, const void *ipem)
 	return;
 }
 
-static unsigned import_key(gnutls_certificate_credentials_t xcred, const gnutls_datum_t *skey, const gnutls_datum_t *cert)
+static int import_key(gnutls_certificate_credentials_t xcred, const gnutls_datum_t *skey, const gnutls_datum_t *cert)
 {
 	gnutls_x509_privkey_t key;
 	gnutls_x509_crt_t *crt_list;
@@ -107,8 +107,9 @@ static unsigned import_key(gnutls_certificate_credentials_t xcred, const gnutls_
 	ret = gnutls_certificate_set_x509_key(xcred, crt_list,
 				crt_list_size, key);
 	if (ret < 0) {
-		fail("error in gnutls_certificate_set_x509_key: %s\n", gnutls_strerror(ret));
-		exit(1);
+		success("error in gnutls_certificate_set_x509_key: %s\n", gnutls_strerror(ret));
+		idx = ret;
+		goto cleanup;
 	}
 
 	/* return index */
@@ -125,6 +126,7 @@ static unsigned import_key(gnutls_certificate_credentials_t xcred, const gnutls_
 		compare(&tcert, cert->data+i);
 	}
 
+ cleanup:
 	gnutls_x509_privkey_deinit(key);
 	for (i=0;i<crt_list_size;i++) {
 		gnutls_x509_crt_deinit(crt_list[i]);
@@ -134,7 +136,7 @@ static unsigned import_key(gnutls_certificate_credentials_t xcred, const gnutls_
 	return idx;
 }
 
-void doit(void)
+static void basic(void)
 {
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_certificate_credentials_t clicred;
@@ -178,3 +180,38 @@ void doit(void)
 		success("success");
 }
 
+static void failure_mode(void)
+{
+	gnutls_certificate_credentials_t x509_cred;
+	int ret;
+
+	/* this must be called once in the program
+	 */
+	global_init();
+
+	gnutls_global_set_time_function(mytime);
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(6);
+
+	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
+
+	ret = import_key(x509_cred, &server_key, &server_ecc_cert);
+	if (ret >= 0) {
+		fail("gnutls_certificate_set_x509_key: succeeded!\n");
+	}
+
+	gnutls_certificate_free_credentials(x509_cred);
+
+	gnutls_global_deinit();
+
+	if (debug)
+		success("success");
+}
+
+void doit(void)
+{
+	basic();
+	failure_mode();
+}
