@@ -1085,9 +1085,12 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 
 	res->ncerts++;
 
+	/* after this point we do not deinitialize anything on failure to avoid
+	 * double freeing. We intentionally keep everything as the credentials state
+	 * is documented to be on undefined state. */
 	if ((ret = _gnutls_check_key_cert_match(res)) < 0) {
 		gnutls_assert();
-		goto cleanup;
+		return ret;
 	}
 
 	return 0;
@@ -1300,9 +1303,15 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 
 	res->ncerts++;
 
+	/* Unlike gnutls_certificate_set_x509_key, we deinitialize everything
+	 * local after a failure. That is because the caller is responsible for
+	 * freeing these values after a failure, and if we keep references we
+	 * lead to double freeing */
 	if ((ret = _gnutls_check_key_cert_match(res)) < 0) {
 		gnutls_assert();
-		return ret;
+		gnutls_free(new_pcert_list);
+		res->ncerts--;
+		goto cleanup;
 	}
 
 	return 0;
