@@ -57,7 +57,7 @@ static void tls_log_func(int level, const char *str)
 
 static time_t mytime(time_t * t)
 {
-	time_t then = 1461671166;
+	time_t then = 1473673819;
 	if (t)
 		*t = then;
 
@@ -227,7 +227,7 @@ static void auto_parse(void)
 	 */
 	global_init();
 
-	gnutls_global_set_time_function(time);
+	gnutls_global_set_time_function(mytime);
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
