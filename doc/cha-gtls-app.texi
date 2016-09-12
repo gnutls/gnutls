@@ -1182,7 +1182,7 @@ priority.
 
 @item Key exchange @tab
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
-PSK, DHE-PSK, ECDHE-RSA, ANON-ECDH, ANON-DH. The
+PSK, DHE-PSK, ECDHE-RSA, ECDHE-ECDSA, ECDHE-PSK, ANON-ECDH, ANON-DH. The
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
 priority.
 
