@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 3.3.25 (unreleased)
 
+** libgnutls: Ensure proper cleanups on gnutls_certificate_set_*key()
+   failures due to key mismatch. This prevents leaks or double freeing
+   on such failures.
+
 ** libgnutls: Corrected the comparison of the serial size in OCSP response.
    Previously the OCSP certificate check wouldn't verify the serial length
    and could succeed in cases it shouldn't (GNUTLS-SA-2016-3).
