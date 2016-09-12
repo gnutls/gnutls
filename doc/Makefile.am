@@ -527,7 +527,7 @@ gnutls.xml: epub.texi
 
 gnutls.epub: gnutls.xml
 	dbtoepub $<
-	epub-fix --delete-unmanifested gnutls.epub
+	-epub-fix --delete-unmanifested gnutls.epub
 
 ENUMS =
 ENUMS += enums/dane_cert_type_t
