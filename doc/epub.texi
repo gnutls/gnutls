@@ -138,21 +138,23 @@ Documentation License''.
 
 @include cha-intro-tls.texi
 
-@include cha-cert-auth.texi
+@include cha-auth.texi
 
-@include cha-shared-key.texi
-
-@include cha-cert-auth2.texi
+@include cha-tokens.texi
 
 @include cha-gtls-app.texi
 
 @include cha-gtls-examples.texi
+
+@include cha-crypto.texi
 
 @include cha-programs.texi
 
 @include cha-internals.texi
 
 @c appendices
+
+@include cha-upgrade.texi
 
 @include cha-support.texi
 
