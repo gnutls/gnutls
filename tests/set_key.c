@@ -166,6 +166,7 @@ static void failure_mode(void)
 	unsigned pcert_list_size;
 	const char *names[] = {"localhost", "localhost2"};
 	int ret;
+	unsigned i;
 
 	/* this must be called once in the program
 	 */
@@ -200,6 +201,10 @@ static void failure_mode(void)
 	fail("gnutls_certificate_set_key succeeded unexpectedly\n");
 
  cleanup:
+	for (i=0;i<pcert_list_size;i++) {
+		gnutls_pcert_deinit(&pcert_list[i]);
+	}
+	gnutls_privkey_deinit(key);
 	gnutls_certificate_free_credentials(x509_cred);
 
 	gnutls_global_deinit();
@@ -294,6 +299,6 @@ static void auto_parse(void)
 void doit(void)
 {
 	basic();
-//	failure_mode();
+	failure_mode();
 	auto_parse();
 }
