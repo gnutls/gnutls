@@ -83,6 +83,21 @@ Fedora/x86_64/syntax-check:
   except:
   - tags
 
+Fedora/dist:
+  script:
+  - git submodule update --init
+  - yum install -y gtk-doc texinfo texinfo-tex texlive texlive-supertabular texlive-framed texlive-morefloats texlive-quotchap docbook5-style-xsl docbook-style-xsl ruby zip gnutls-devel
+  - make autoreconf && ./configure --disable-non-suiteb-curves --enable-gtk-doc --enable-fips140-mode
+  - make -j4
+  - make -C doc gnutls.html 
+  - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.78.1/epub/bin/" make -C doc gnutls.epub
+  - make -C doc/latex gnutls.pdf
+  - make dist
+  tags:
+  - shared
+  except:
+  - tags
+
 Fedora/x86_64/clang:
   script:
   - make autoreconf && 
