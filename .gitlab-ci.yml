@@ -1,7 +1,7 @@
 image: fedora:24
 
 before_script:
-  - dnf install -y git which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git coreutils which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - dnf install -y clang compiler-rt libseccomp-devel libasan libasan-static libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
 
 Fedora/x86_64/minimal:
@@ -12,7 +12,7 @@ Fedora/x86_64/minimal:
     --disable-anon-authentication --disable-dhe --disable-ecdhe --disable-openpgp-authentication
     --disable-ocsp --disable-session-tickets --disable-non-suiteb-curves
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
-    --disable-ssl3-support --disable-ssl2-support --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j4
+    --disable-ssl3-support --disable-ssl2-support --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j$(nproc)
   tags:
   - shared
   except:
@@ -23,7 +23,7 @@ Fedora/x86_64/ubsan:
   script:
   - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -std=c99
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --enable-code-coverage
-    && make -j4 && make check -j4
+    && make -j$(nproc) && make check -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -40,7 +40,7 @@ Fedora/x86_64/no-SSL-3.0:
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
-    make -j4 && make check -j4
+    make -j$(nproc) && make check -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -59,7 +59,7 @@ Fedora/x86_64/ABI-check:
   script:
   - dnf install -y gnutls-devel binutils elfutils
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4
+    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j$(nproc)
   - make abi-check
 #check whether it contains position dependent code
   - make pic-check
@@ -88,7 +88,7 @@ Fedora/dist:
   - git submodule update --init
   - yum install -y gtk-doc texinfo texinfo-tex texlive texlive-supertabular texlive-framed texlive-morefloats texlive-quotchap docbook5-style-xsl docbook-style-xsl ruby zip gnutls-devel
   - make autoreconf && ./configure --disable-non-suiteb-curves --enable-gtk-doc --enable-fips140-mode
-  - make -j4
+  - make -j$(nproc)
   - make -C doc gnutls.html 
   - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.78.1/epub/bin/" make -C doc gnutls.epub
   - make -C doc/latex gnutls.pdf
@@ -102,7 +102,7 @@ Fedora/x86_64/clang:
   script:
   - make autoreconf && 
     CC=clang ./configure --disable-non-suiteb-curves --enable-code-coverage --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
-    make -j4 && make check -C tests -j4
+    make -j$(nproc) && make check -C tests -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -120,7 +120,7 @@ Fedora/x86_64/FIPS140-2:
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-non-suiteb-curves --enable-fips140-mode --enable-code-coverage --disable-doc --disable-valgrind-tests &&
-    make -j4 && make check -j4
+    make -j$(nproc) && make check -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -136,7 +136,7 @@ Fedora/x86_64/FIPS140-2:
 Fedora/x86_64/valgrind:
   script:
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
-    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j4 && make check -j4
+    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j$(nproc) && make check -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -153,7 +153,7 @@ Fedora/x86_64/asan:
   script:
   - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --enable-code-coverage --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
-    make -j4 && make check -j4
+    make -j$(nproc) && make check -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -173,7 +173,7 @@ MinGW32/DLLs:
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
     mingw32-configure --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
-    mingw32-make -j4 && mingw32-make -C tests check -j4
+    mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libintl and iconv are a dependency of libidn
 #libwinpthread is required by libgcc
@@ -210,7 +210,7 @@ MinGW64/DLLs:
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
     mingw64-configure --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
-    mingw64-make -j4 && mingw64-make -C tests check -j4
+    mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libintl and iconv are a dependency of libidn
 #libwinpthread is required by libgcc
@@ -248,7 +248,7 @@ MinGW64:
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw64-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
-    mingw64-make -j4 && mingw64-make -C tests check -j4
+    mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   tags:
   - shared
   except:
@@ -269,7 +269,7 @@ MinGW32:
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
-    mingw32-make -j4 && mingw32-make -C tests check -j4
+    mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   tags:
   - shared
   except:
@@ -290,7 +290,7 @@ FreeBSD10/x86_64:
   - /usr/bin/true
   script:
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
-    --disable-guile --disable-doc --disable-valgrind-tests && gmake -j4 && gmake check -j4
+    --disable-guile --disable-doc --disable-valgrind-tests && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
   only:
@@ -312,8 +312,8 @@ Fedora/x86:
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
-    make -j4
-  - make check -j4
+    make -j$(nproc)
+  - make check -j$(nproc)
   - make pic-check
   - make local-code-coverage-output || true
   tags:
