@@ -161,6 +161,7 @@ APIMANS += gnutls_certificate_set_flags.3
 APIMANS += gnutls_certificate_set_key.3
 APIMANS += gnutls_certificate_set_ocsp_status_request_file.3
 APIMANS += gnutls_certificate_set_ocsp_status_request_function.3
+APIMANS += gnutls_certificate_set_ocsp_status_request_function2.3
 APIMANS += gnutls_certificate_set_openpgp_key.3
 APIMANS += gnutls_certificate_set_openpgp_key_file.3
 APIMANS += gnutls_certificate_set_openpgp_key_file2.3
