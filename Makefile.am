@@ -95,7 +95,7 @@ dist-hook: abi-check
 	@echo "symbols.last"
 	@echo "*****************************************************************"
 	objdump -T $(srcdir)/lib/.libs/libgnutls.so.30  | grep -v ' \*UND\*' | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE |  sort -u >symbols.last.tmp
-	diff -u symbols.last symbols.last.tmp >/dev/null 2>&1
+	diff -u symbols.last symbols.last.tmp 2>&1
 	rm -f symbols.last.tmp
 	rm -f ChangeLog
 	make ChangeLog
