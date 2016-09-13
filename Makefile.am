@@ -57,6 +57,13 @@ EXTRA_DIST = cfg.mk maint.mk .clcopying CONTRIBUTING.md README.md LICENSE AUTHOR
 
 TMPFILE="abi-temp.xml"
 
+pic-check:
+	@echo "Checking for position dependent code"
+	readelf -d $(builddir)/lib/.libs/libgnutls.so|grep TEXTREL; if test $$? = 0;then \
+	eu-findtextrel $(builddir)/lib/.libs/libgnutls.so; \
+	false; \
+	fi
+
 abi-check:
 	@rm -f $(TMPFILE)
 	@echo "Checking libgnutls ABI"
