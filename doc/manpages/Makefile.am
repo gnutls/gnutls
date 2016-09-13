@@ -1207,6 +1207,7 @@ compare-makefile:
 	grep -v -e '^APIMANS += ' Makefile.am | \
 		perl -p -e "s/^APIMANS =/APIMANS =$$MANS/" > tmp-$@; \
 	diff -u $(srcdir)/Makefile.am tmp-$@
+	rm -f tmp-$@
 
 stamp_mans: $(HEADER_FILES)
 	@echo $(ECHO_N) "Creating man pages for gnutls.h..." && \
