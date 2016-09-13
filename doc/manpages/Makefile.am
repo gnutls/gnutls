@@ -216,7 +216,6 @@ APIMANS += gnutls_cipher_get_name.3
 APIMANS += gnutls_cipher_get_tag_size.3
 APIMANS += gnutls_cipher_init.3
 APIMANS += gnutls_cipher_list.3
-APIMANS += gnutls_cipher_self_test.3
 APIMANS += gnutls_cipher_set_iv.3
 APIMANS += gnutls_cipher_suite_get_name.3
 APIMANS += gnutls_cipher_suite_info.3
@@ -265,7 +264,6 @@ APIMANS += gnutls_digest_get_id.3
 APIMANS += gnutls_digest_get_name.3
 APIMANS += gnutls_digest_get_oid.3
 APIMANS += gnutls_digest_list.3
-APIMANS += gnutls_digest_self_test.3
 APIMANS += gnutls_dtls_cookie_send.3
 APIMANS += gnutls_dtls_cookie_verify.3
 APIMANS += gnutls_dtls_get_data_mtu.3
@@ -347,7 +345,6 @@ APIMANS += gnutls_mac_get_key_size.3
 APIMANS += gnutls_mac_get_name.3
 APIMANS += gnutls_mac_get_nonce_size.3
 APIMANS += gnutls_mac_list.3
-APIMANS += gnutls_mac_self_test.3
 APIMANS += gnutls_memcmp.3
 APIMANS += gnutls_memset.3
 APIMANS += gnutls_ocsp_req_add_cert.3
@@ -598,7 +595,6 @@ APIMANS += gnutls_pk_get_id.3
 APIMANS += gnutls_pk_get_name.3
 APIMANS += gnutls_pk_get_oid.3
 APIMANS += gnutls_pk_list.3
-APIMANS += gnutls_pk_self_test.3
 APIMANS += gnutls_pk_to_sign.3
 APIMANS += gnutls_prf.3
 APIMANS += gnutls_prf_raw.3
@@ -1199,7 +1195,7 @@ compare-makefile:
 	@echo "******************************************************************************"
 	@echo "If the following step fails use 'make files-update'"
 	@echo "******************************************************************************"
-	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h $(top_srcdir)/libdane/includes/gnutls/*.h| $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
+	FUNCS=`cat $(HEADER_FILES)| $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
 	MANS=""; \
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nAPIMANS += $$i.3"; \
