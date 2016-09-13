@@ -80,23 +80,40 @@ abi-check:
 	test ! -f "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" || abi-compliance-checker -abi -lib gnutls-dane -old "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" -new $(TMPFILE)
 	@rm -f $(TMPFILE)
 
+symbol-check:
+	@objdump -T $(srcdir)/lib/.libs/libgnutls.so  | grep -v ' \*UND\*' | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE |  sort -u >symbols.last.tmp
+	@diff -u symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
+		diff -u symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
+		if grep -e '^-' symbols.diff.tmp;then \
+			echo "*******************************************"; \
+			echo "Symbols were removed from the library."; \
+			echo "Check symbols.diff.tmp for more information"; \
+			echo "*******************************************"; \
+			false; \
+		else \
+			echo "*************************************************************"; \
+			echo "Symbols were added in the library; check symbols.diff.tmp for"; \
+			echo "correctness and then copy symbols.last.tmp over symbols.last"; \
+			echo "*************************************************************"; \
+			false; \
+		fi \
+	else \
+		test -f symbols.diff.tmp && cat symbols.diff.tmp; \
+		echo "**************************"; \
+		echo "No symbol changes detected"; \
+		echo "**************************"; \
+	fi
+	rm -f symbols.last.tmp symbols.diff.tmp
+
 @CODE_COVERAGE_RULES@
 
 local-code-coverage-output: code-coverage-capture
 	cat GnuTLS-$(VERSION)-coverage/index.html|grep headerCovTableEntryLo|head -1|sed 's/^.*>\([0-9]\+\.[0-9]\+\s*%\)<.*$$/ coverage lines: \1/' || true
 
-dist-hook: abi-check
+dist-hook: symbol-check abi-check
 	make -C doc/ compare-makefile
 	make -C doc/ compare-exported
 	make -C doc/manpages compare-makefile
-	@echo "*****************************************************************"
-	@echo "Checking symbol changes. If the next step fails, verify that the"
-	@echo "symbols added or removed are correct and copy symbols.last.tmp as"
-	@echo "symbols.last"
-	@echo "*****************************************************************"
-	objdump -T $(srcdir)/lib/.libs/libgnutls.so.30  | grep -v ' \*UND\*' | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE |  sort -u >symbols.last.tmp
-	diff -u symbols.last symbols.last.tmp 2>&1
-	rm -f symbols.last.tmp
 	rm -f ChangeLog
 	make ChangeLog
 	cp -f ChangeLog $(distdir)/
