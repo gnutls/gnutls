@@ -93,7 +93,7 @@ symbol-check:
 		else \
 			echo "*************************************************************"; \
 			echo "Symbols were added in the library; check symbols.diff.tmp for"; \
-			echo "correctness and then copy symbols.last.tmp over symbols.last"; \
+			echo "correctness; then use 'make files-update'"; \
 			echo "*************************************************************"; \
 			false; \
 		fi \
@@ -109,6 +109,14 @@ symbol-check:
 
 local-code-coverage-output: code-coverage-capture
 	cat GnuTLS-$(VERSION)-coverage/index.html|grep headerCovTableEntryLo|head -1|sed 's/^.*>\([0-9]\+\.[0-9]\+\s*%\)<.*$$/ coverage lines: \1/' || true
+
+files-update:
+	make -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
+	make -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
+	make -C . symbol-check || mv symbols.last.tmp symbols.last
+	echo "******************************************************************************************"
+	echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
+	echo "******************************************************************************************"
 
 dist-hook: symbol-check abi-check
 	make -C doc/ compare-makefile

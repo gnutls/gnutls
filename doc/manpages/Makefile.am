@@ -1197,7 +1197,7 @@ $(APIMANS): stamp_mans
 
 compare-makefile:
 	@echo "******************************************************************************"
-	@echo "If the following step fails copy $(srcdir)/doc/manpages/tmp-compare-makefile to doc/manpages/Makefile.am"
+	@echo "If the following step fails use 'make files-update'"
 	@echo "******************************************************************************"
 	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h $(top_srcdir)/libdane/includes/gnutls/*.h| $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
 	MANS=""; \
