@@ -18,6 +18,10 @@ See the end for copying conditions.
    gnutls_certificate_set_ocsp_status_request_file(), or with
    gnutls_certificate_get_crt_raw() and friends.
 
+** libgnutls: Reverted AESNI code on x86 to earlier version as the
+   latest version was creating position depending code. Added checks
+   in the CI to detect positions depending code early.
+
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function2: Added
 
