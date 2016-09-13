@@ -57,9 +57,12 @@ Fedora/x86_64/no-SSL-3.0:
 # Needs gnutls' headers due to some abi-checker issue with resolving deps
 Fedora/x86_64/ABI-check:
   script:
-  - dnf install -y gnutls-devel
+  - dnf install -y gnutls-devel binutils elfutils
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4 && make abi-check
+    ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j4
+  - make abi-check
+#check whether it contains position dependent code
+  - make pic-check
   tags:
   - shared
   except:
@@ -290,11 +293,13 @@ FreeBSD10/x86_64:
 Fedora/x86:
   image: nickcis/fedora-32:23
   before_script:
-  - linux32 dnf install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind 
+  - linux32 dnf install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind binutils elfutils
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
-    make -j4 && make check -j4
+    make -j4
+  - make check -j4
+  - make pic-check
   - make local-code-coverage-output || true
   tags:
   - shared
