@@ -75,7 +75,9 @@ abi-check:
 		abi-compliance-checker -abi -lib gnutls -old "$(srcdir)/devel/ABI-$$(uname -m).dump" -new $(TMPFILE) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols 
 	@echo "Checking libgnutls-dane ABI"
 	@echo "<version>$(VERSION)</version>" >$(TMPFILE)
-	@echo "<headers>$(srcdir)/libdane/includes/gnutls</headers>" >>$(TMPFILE)
+	@echo "<headers>$(srcdir)/libdane/includes/gnutls" >>$(TMPFILE)
+	@echo "$(srcdir)/lib/includes/gnutls" >>$(TMPFILE)
+	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(TMPFILE)
 	@echo "<libs>$(builddir)/libdane/.libs</libs>" >>$(TMPFILE)
 	test ! -f "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" || abi-compliance-checker -abi -lib gnutls-dane -old "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" -new $(TMPFILE)
 	@rm -f $(TMPFILE)
