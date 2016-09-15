@@ -57,7 +57,7 @@ Fedora/x86_64/no-SSL-3.0:
 # Needs gnutls' headers due to some abi-checker issue with resolving deps
 Fedora/x86_64/ABI-check:
   script:
-  - dnf install -y gnutls-devel binutils elfutils
+  - dnf install -y binutils elfutils
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-doc --disable-cxx --disable-guile --disable-non-suiteb-curves && make -j$(nproc)
   - make abi-check
@@ -86,7 +86,7 @@ Fedora/x86_64/syntax-check:
 Fedora/dist:
   script:
   - git submodule update --init
-  - yum install -y gtk-doc texinfo texinfo-tex texlive texlive-supertabular texlive-framed texlive-morefloats texlive-quotchap docbook5-style-xsl docbook-style-xsl ruby zip gnutls-devel
+  - yum install -y gtk-doc texinfo texinfo-tex texlive texlive-supertabular texlive-framed texlive-morefloats texlive-quotchap docbook5-style-xsl docbook-style-xsl ruby zip
   - make autoreconf && ./configure --disable-non-suiteb-curves --enable-gtk-doc --enable-fips140-mode
   - make -j$(nproc)
   - make -C doc gnutls.html 
