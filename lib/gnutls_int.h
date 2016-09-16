@@ -111,7 +111,7 @@ typedef struct {
 /* The size of a handshake message should not
  * be larger than this value.
  */
-#define MAX_HANDSHAKE_PACKET_SIZE 48*1024
+#define MAX_HANDSHAKE_PACKET_SIZE 128*1024
 
 #define TLS_MAX_SESSION_ID_SIZE 32
 
