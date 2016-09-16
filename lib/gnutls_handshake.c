@@ -3324,11 +3324,14 @@ _gnutls_recv_hello_request(gnutls_session_t session, void *data,
  * This function will set the maximum size of all handshake messages.
  * Handshakes over this size are rejected with
  * %GNUTLS_E_HANDSHAKE_TOO_LARGE error code.  The default value is
- * 48kb which is typically large enough.  Set this to 0 if you do not
+ * 128kb which is typically large enough.  Set this to 0 if you do not
  * want to set an upper limit.
  *
  * The reason for restricting the handshake message sizes are to
  * limit Denial of Service attacks.
+ *
+ * Note that the maximum handshake size was increased to 128kb
+ * from 48kb in GnuTLS 3.4.16.
  **/
 void
 gnutls_handshake_set_max_packet_length(gnutls_session_t session,

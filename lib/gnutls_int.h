@@ -109,7 +109,7 @@ typedef struct {
 /* The size of a handshake message should not
  * be larger than this value.
  */
-#define MAX_HANDSHAKE_PACKET_SIZE 48*1024
+#define MAX_HANDSHAKE_PACKET_SIZE 128*1024
 
 /* The maximum digest size of hash algorithms. 
  */
