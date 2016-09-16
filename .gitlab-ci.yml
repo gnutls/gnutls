@@ -4,6 +4,27 @@ before_script:
   - yum install -y git coreutils which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
   - yum install -y libasan libasan-static nodejs softhsm datefudge lcov openssl-devel openssl libcmocka-devel xz valgrind
 
+Centos6/build:
+  image: centos:6
+  before_script:
+  - yum install -y epel-release
+  - yum install -y git coreutils which autoconf libtool datefudge gettext-devel automake libgcrypt-devel p11-kit-devel guile-devel libtasn1-devel gawk libtasn1-tools bison help2man xz net-tools
+  script:
+  - sed -i 's/AM_PROG_AR//g' configure.ac lib/configure.ac libextra/configure.ac
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
+    --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-guile --disable-valgrind-tests --with-libgcrypt --disable-doc && make && make check
+  - cat tests/test-suite.log
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/tests/*.log
+      - build/tests/*/*.log
+
 Centos7/build:
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
