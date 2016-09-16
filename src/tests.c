@@ -113,7 +113,7 @@ char prio_str[256] = "";
 #define ALL_COMP "+COMP-NULL"
 #define ALL_MACS "+SHA1:+MD5"
 #define ALL_CERTTYPES "+CTYPE-X509"
-#define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+RSA-EXPORT"
+#define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH"
 #define INIT_STR "NONE:"
 char rest[128] = "%UNSAFE_RENEGOTIATION";
 
@@ -181,81 +181,7 @@ test_server (gnutls_session_t session)
 
 
 static int export_true = 0;
-static gnutls_datum_t exp = { NULL, 0 }, mod =
-
-{
-NULL, 0};
-
-test_code_t
-test_export (gnutls_session_t session)
-{
-  int ret;
-
-  sprintf (prio_str, INIT_STR
-           "+ARCFOUR-40:+RSA-EXPORT:" ALL_COMP ":" ALL_CERTTYPES ":%s:"
-           ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
-  _gnutls_priority_set_direct (session, prio_str);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-
-  ret = do_handshake (session);
-
-  if (ret == TEST_SUCCEED)
-    {
-      export_true = 1;
-      gnutls_rsa_export_get_pubkey (session, &exp, &mod);
-    }
-
-  return ret;
-}
-
-test_code_t
-test_export_info (gnutls_session_t session)
-{
-  int ret2, ret;
-  gnutls_datum_t exp2, mod2;
-  const char *print;
-
-  if (verbose == 0 || export_true == 0)
-    return TEST_IGNORE;
-
-  sprintf (prio_str, INIT_STR
-           "+ARCFOUR-40:+RSA-EXPORT:" ALL_COMP ":" ALL_CERTTYPES ":%s:"
-           ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
-  _gnutls_priority_set_direct (session, prio_str);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-
-  ret = do_handshake (session);
-
-  if (ret == TEST_SUCCEED)
-    {
-      ret2 = gnutls_rsa_export_get_pubkey (session, &exp2, &mod2);
-      if (ret2 >= 0)
-        {
-          printf ("\n");
-
-          print = raw_to_string (exp2.data, exp2.size);
-          if (print)
-            printf (" Exponent [%d bits]: %s\n", exp2.size * 8, print);
-
-          print = raw_to_string (mod2.data, mod2.size);
-          if (print)
-            printf (" Modulus [%d bits]: %s\n", mod2.size * 8, print);
-
-          if (mod2.size != mod.size || exp2.size != exp.size ||
-              memcmp (mod2.data, mod.data, mod.size) != 0 ||
-              memcmp (exp2.data, exp.data, exp.size) != 0)
-            {
-              printf
-                (" (server uses different public keys per connection)\n");
-            }
-        }
-    }
-
-  return ret;
-
-}
+static gnutls_datum_t exp = { NULL, 0 }, mod = {NULL, 0};
 
 static gnutls_datum_t pubkey = { NULL, 0 };
 
@@ -595,22 +521,6 @@ test_arcfour (gnutls_session_t session)
            INIT_STR "+ARCFOUR-128:" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
            ":" ALL_KX ":%s", protocol_str, rest);
   _gnutls_priority_set_direct (session, prio_str);
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-
-  ret = do_handshake (session);
-  return ret;
-}
-
-test_code_t
-test_arcfour_40 (gnutls_session_t session)
-{
-  int ret;
-
-  sprintf (prio_str,
-           INIT_STR "+ARCFOUR-40:" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
-           ":" "+RSA-EXPORT" ":%s", protocol_str, rest);
-  _gnutls_priority_set_direct (session, prio_str);
-
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
   ret = do_handshake (session);

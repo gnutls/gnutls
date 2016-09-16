@@ -117,9 +117,6 @@ static const TLS_TEST tls_tests[] = {
    */
   {"whether the server supports session resumption",
    test_session_resume2, "yes", "no", "dunno"},
-  {"for export-grade ciphersuite support", test_export, "yes", "no",
-   "dunno"},
-  {"RSA-export ciphersuite info", test_export_info, "", "N/A", "N/A"},
 #ifdef ENABLE_ANON
   {"for anonymous authentication support", test_anonymous, "yes", "no",
    "dunno"},
@@ -138,8 +135,6 @@ static const TLS_TEST tls_tests[] = {
 #endif
   {"for 3DES cipher support", test_3des, "yes", "no", "dunno"},
   {"for ARCFOUR 128 cipher support", test_arcfour, "yes", "no", "dunno"},
-  {"for ARCFOUR 40 cipher support", test_arcfour_40, "yes", "no",
-   "dunno"},
   {"for MD5 MAC support", test_md5, "yes", "no", "dunno"},
   {"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 #ifdef HAVE_LIBZ
