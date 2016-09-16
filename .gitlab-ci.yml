@@ -1,10 +1,16 @@
-Build and Check - separate build dir:
+image: centos:7
+
+before_script:
+  - yum install -y git coreutils which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - yum install -y libasan libasan-static nodejs softhsm datefudge lcov openssl-devel openssl libcmocka-devel xz valgrind
+
+Centos7/build:
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
     --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-guile --disable-valgrind-tests --disable-doc && make && make check
   - cat tests/test-suite.log
   tags:
-  - nettle2
+  - shared
   except:
   - tags
   artifacts:
@@ -13,14 +19,14 @@ Build and Check - separate build dir:
     paths:
       - build/tests/*.log
       - build/tests/*/*.log
-Build and Check with valgrind:
+
+Centos7/valgrind:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
     --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc --disable-guile && make && make check
   - cat tests/test-suite.log
   tags:
-  - x86-64
-  - nettle2
+  - shared
   except:
   - tags
   artifacts:
@@ -29,15 +35,15 @@ Build and Check with valgrind:
     paths:
       - tests/*.log
       - tests/*/*.log
-Build and Check with asan:
+
+Centos7/asan:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make && make check
   - cat tests/test-suite.log
   tags:
-  - x86-64
-  - nettle2
+  - shared
   except:
   - tags
   artifacts:
