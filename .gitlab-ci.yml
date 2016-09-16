@@ -13,7 +13,6 @@ Centos6/build:
   - sed -i 's/AM_PROG_AR//g' configure.ac lib/configure.ac libextra/configure.ac
   - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
     --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-guile --disable-valgrind-tests --with-libgcrypt --disable-doc && make && make check
-  - cat tests/test-suite.log
   tags:
   - shared
   except:
@@ -29,7 +28,6 @@ Centos7/build:
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
     --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-guile --disable-valgrind-tests --disable-doc && make && make check
-  - cat tests/test-suite.log
   tags:
   - shared
   except:
@@ -45,7 +43,6 @@ Centos7/valgrind:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
     --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc --disable-guile && make && make check
-  - cat tests/test-suite.log
   tags:
   - shared
   except:
@@ -62,7 +59,6 @@ Centos7/asan:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make && make check
-  - cat tests/test-suite.log
   tags:
   - shared
   except:
