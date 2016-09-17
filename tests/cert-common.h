@@ -31,6 +31,7 @@
  * IPv6 server: server_ca3_localhost6_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_utf8_cert, server_ca3_key - UTF8 names
+ * IPv4 server: insecure key: server_ca3_localhost_insecure_key, server_ca3_localhost_insecure_cert
  */
 
 
@@ -932,6 +933,50 @@ const gnutls_datum_t server_ca3_localhost_cert = { (void*)server_localhost_ca3_c
 const gnutls_datum_t server_ca3_localhost_cert_chain = {
 	(void*)server_localhost_ca3_cert_chain_pem,
 	sizeof(server_localhost_ca3_cert_chain_pem)-1
+};
+
+/* shares server_ca3 key */
+static char server_localhost_insecure_ca3_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDFzCCAX+gAwIBAgIIV90eOyTzpOcwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNjA5MTcxMDQzMDhaGA85OTk5MTIzMTIzNTk1OVowHjEcMBoG\n"
+	"A1UEAxMTSW5zZWN1cmUgKDc2OCBiaXRzKTB8MA0GCSqGSIb3DQEBAQUAA2sAMGgC\n"
+	"YQCuxKP0RG8KHAp7HnqaFpcWnPVl72vmkLvBgC0h3gnVUO3a41//kkLOG0HGUOi6\n"
+	"77cLNOzRRll9NPi1RwMNTKayA0cv+pJBsoNq/byOeWKJkKOgwTZD6Vi6X3MDtj7e\n"
+	"3SECAwEAAaOBjTCBijAMBgNVHRMBAf8EAjAAMBQGA1UdEQQNMAuCCWxvY2FsaG9z\n"
+	"dDATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQW\n"
+	"BBS4eSAgXUnLYP8HfA9SmoXjOAYLoDAfBgNVHSMEGDAWgBT5qIYZY7akFBNgdg8B\n"
+	"mjU27/G0rzANBgkqhkiG9w0BAQsFAAOCAYEAFa7J4+vJ7V+4y+CaaATD/WATc9ZV\n"
+	"ZUITpI6irjWneRPz0u0/3BLprKoCbO0m5QjoBaji1wUbVWpJir+N7QS577ufjwh0\n"
+	"ViGFn1b3eU0wGPgz8n0B0vo6NifaQl1Df5PBN3Mfa+r0aUK3QYxnlHsXxanYaKzj\n"
+	"9lpXUq57fpJJFSFASSzGSwkg8xiwlFBre/9jJ8sf1Blhu8M50NkOCdRdwpg/rbMI\n"
+	"Oukh0pvJQYQfQsgxc/hySWfEtN0TThXLRFMRRcFFeRHK2LXyAo/sNzWJMIou7hBQ\n"
+	"p1LNlCoUc3TGRKMQToEi+GIgjJx17zADze+1hHHE3aEEVGU9n3Gkj+hxy46LN5ke\n"
+	"hDox4AzBf4+KaA/vdHGRvZjzhajaMdL6w8FJgmUc26L+kH/rsTuev+PrvqXuuy1W\n"
+	"c2QqW3gu7oUy+g99TQFeXgyJHqv/cu/M0vhUV9wwHQJdj1bFCEaFW40MmQArXz5D\n"
+	"F92lL9akoGYmyehqQHeRQsrVRKcCOiv8lgVF\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_localhost_insecure_cert = { (void*)server_localhost_insecure_ca3_cert_pem,
+	sizeof(server_localhost_insecure_ca3_cert_pem)-1
+};
+
+static char server_ca3_localhost_insecure_key_pem[] =
+	"-----BEGIN RSA PRIVATE KEY-----\n"
+	"MIIBywIBAAJhAK7Eo/REbwocCnseepoWlxac9WXva+aQu8GALSHeCdVQ7drjX/+S\n"
+	"Qs4bQcZQ6Lrvtws07NFGWX00+LVHAw1MprIDRy/6kkGyg2r9vI55YomQo6DBNkPp\n"
+	"WLpfcwO2Pt7dIQIDAQABAmBd9Md0Dcpoc/TKhfNBnb1yYcWoHJQ0q0DVYXRiDb3Z\n"
+	"mZ2WHMFCY75YkdzFoj/MKAyrl+n6SJy5V2gwqEEW84pHH2AaAseWsF16rSRz958b\n"
+	"7seVpNi304tOk4PS7B6+RAUCMQDXiT23wggUir6uVrx0UfHJUcsRltK0qco6Q7o3\n"
+	"b+uwrIAbaNNg+aAqAXXU5XWdBpcCMQDPlBKn42C/XkAZ11zflbzjrq22ie0gaLKZ\n"
+	"j92rCaU0/qX4VR8KK6J9PL6ZLoTWqQcCMQCzazhoLmoBh5nBkMxh3BD08FSluLJ/\n"
+	"19NS+ywZl95P/NjLeFB1qnbsYLjQ1443f9MCMDE/w3FbzC97MCAxbZKKl0c5wXNG\n"
+	"pCEFViKC9KfI4Q6CwGP75iJmmeW2zM3RMKkxbwIxAIAViD0cQjNL9keUVjtN68pK\n"
+	"dD2lxHfq5Q1QxCSjl8EnBnjnbFJN9WmK9ztkK00Avg==\n"
+	"-----END RSA PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_localhost_insecure_key = { (void*)server_ca3_localhost_insecure_key_pem,
+	sizeof(server_ca3_localhost_insecure_key_pem)-1
 };
 
 static char unknown_ca_cert_pem[] =

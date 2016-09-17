@@ -42,11 +42,12 @@ int _gnutls_server_name_set_raw(gnutls_session_t session,
 const char *side = NULL;
 
 /* if @host is NULL certificate check is skipped */
-void
-test_cli_serv(gnutls_certificate_credentials_t server_cred,
+static int
+_test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
-	      const char *prio, const char *host, 
-	      void *priv, callback_func *client_cb, callback_func *server_cb)
+	      const char *prio, const char *host,
+	      void *priv, callback_func *client_cb, callback_func *server_cb,
+	      unsigned expect_verification_failure)
 {
 	int exit_code = EXIT_SUCCESS;
 	int ret;
@@ -113,6 +114,13 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 			exit(1);
 		}
 
+		if (expect_verification_failure && status != 0) {
+			ret = status;
+			goto cleanup;
+		} else if (expect_verification_failure && status == 0) {
+			fail("expected verification failure but verification succeeded!\n");
+		}
+
 		if (status != 0) {
 			gnutls_datum_t t;
 			assert(gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509, &t, 0)>=0);
@@ -137,6 +145,8 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		}
 	}
 
+	ret = 0;
+ cleanup:
 	if (client_cb)
 		client_cb(client, priv);
 	if (server_cb)
@@ -154,4 +164,25 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		else
 			puts("Self-test failed");
 	}
+
+	return ret;
+}
+
+/* An expected to succeed run */
+void
+test_cli_serv(gnutls_certificate_credentials_t server_cred,
+	      gnutls_certificate_credentials_t client_cred,
+	      const char *prio, const char *host,
+	      void *priv, callback_func *client_cb, callback_func *server_cb)
+{
+	_test_cli_serv(server_cred, client_cred, prio, host, priv, client_cb, server_cb, 0);
+}
+
+/* An expected to fail verification run. Returns verification status */
+unsigned
+test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
+	      gnutls_certificate_credentials_t client_cred,
+	      const char *prio, const char *host)
+{
+	return _test_cli_serv(server_cred, client_cred, prio, host, NULL, NULL, NULL, 1);
 }

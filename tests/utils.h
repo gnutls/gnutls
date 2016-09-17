@@ -77,6 +77,11 @@ void test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		   void *priv,
 		   callback_func * client_cb, callback_func * server_cb);
 
+unsigned
+test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
+	      gnutls_certificate_credentials_t client_cred,
+	      const char *prio, const char *host);
+
 #define TMPNAME_SIZE 128
 char *get_tmpname(char s[TMPNAME_SIZE]);
 void track_temp_files(void);
