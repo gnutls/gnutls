@@ -391,6 +391,10 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_IDNA_ERROR),
 	ERROR_ENTRY(N_("Cannot obtain resumption parameters while handshake is incomplete."),
 		    GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE),
+	ERROR_ENTRY(N_("The obtained public key is invalid."),
+		    GNUTLS_E_PK_INVALID_PUBKEY),
+	ERROR_ENTRY(N_("The private key is invalid."),
+		    GNUTLS_E_PK_INVALID_PRIVKEY),
 	{NULL, NULL, 0}
 };
 

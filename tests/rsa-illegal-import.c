@@ -93,7 +93,7 @@ int check_x509_privkey(void)
 		fail("error: %s\n", gnutls_strerror(ret));
 
 	ret = gnutls_x509_privkey_import(key, &rsa_key, GNUTLS_X509_FMT_PEM);
-	if (ret != GNUTLS_E_ILLEGAL_PARAMETER)
+	if (ret != GNUTLS_E_PK_INVALID_PRIVKEY)
 		fail("error: %s\n", gnutls_strerror(ret));
 
 	gnutls_x509_privkey_deinit(key);
@@ -114,7 +114,7 @@ int check_pkcs8_privkey1(void)
 		fail("error: %s\n", gnutls_strerror(ret));
 
 	ret = gnutls_x509_privkey_import_pkcs8(key, &p8_rsa_key, GNUTLS_X509_FMT_PEM, "1234", 0);
-	if (ret != GNUTLS_E_ILLEGAL_PARAMETER)
+	if (ret != GNUTLS_E_PK_INVALID_PRIVKEY)
 		fail("error: %s\n", gnutls_strerror(ret));
 
 	gnutls_x509_privkey_deinit(key);
@@ -135,7 +135,7 @@ int check_pkcs8_privkey2(void)
 		fail("error: %s\n", gnutls_strerror(ret));
 
 	ret = gnutls_privkey_import_x509_raw(key, &p8_rsa_key, GNUTLS_X509_FMT_PEM, "1234", 0);
-	if (ret != GNUTLS_E_ILLEGAL_PARAMETER)
+	if (ret != GNUTLS_E_PK_INVALID_PRIVKEY)
 		fail("error: %s\n", gnutls_strerror(ret));
 
 	gnutls_privkey_deinit(key);

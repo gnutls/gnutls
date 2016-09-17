@@ -113,7 +113,7 @@ _rsa_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 	memcpy(pub->n, pk_params->params[RSA_MODULUS], SIZEOF_MPZT);
 	memcpy(pub->e, pk_params->params[RSA_PUB], SIZEOF_MPZT);
 	if (rsa_public_key_prepare(pub) == 0)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY);
 
 	return 0;
 }
@@ -126,7 +126,7 @@ _ecc_params_to_privkey(const gnutls_pk_params_st * pk_params,
 	ecc_scalar_init(priv, curve);
 	if (ecc_scalar_set(priv, pk_params->params[ECC_K]) == 0) {
 		ecc_scalar_clear(priv);
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 	}
 
 	return 0;
@@ -140,7 +140,7 @@ _ecc_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 	if (ecc_point_set
 	    (pub, pk_params->params[ECC_X], pk_params->params[ECC_Y]) == 0) {
 		ecc_point_clear(pub);
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY);
 	}
 
 	return 0;
@@ -348,9 +348,7 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0) {
-				ret =
-				    gnutls_assert_val
-				    (GNUTLS_E_ENCRYPTION_FAILED);
+				gnutls_assert();
 				goto cleanup;
 			}
 
@@ -413,9 +411,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0)
 				return
-				    gnutls_assert_val
-				    (GNUTLS_E_DECRYPTION_FAILED);
-
+				    gnutls_assert_val(ret);
 
 			if (ciphertext->size != pub.size)
 				return
@@ -590,8 +586,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0)
 				return
-				    gnutls_assert_val
-				    (GNUTLS_E_PK_SIGN_FAILED);
+				    gnutls_assert_val(ret);
 
 			mpz_init(s);
 
@@ -731,8 +726,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0)
 				return
-				    gnutls_assert_val
-				    (GNUTLS_E_PK_SIG_VERIFY_FAILED);
+				    gnutls_assert_val(ret);
 
 			if (signature->size != pub.size)
 				return
@@ -1816,12 +1810,12 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 		if (mpz_cmp_ui(TOMPZ(params->params[RSA_PRIME1]), 0) == 0)
-			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 
 		if (mpz_invert(TOMPZ(params->params[RSA_COEF]),
 			       TOMPZ(params->params[RSA_PRIME2]),
 			       TOMPZ(params->params[RSA_PRIME1])) == 0)
-			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 
 		/* calculate exp1 [6] and exp2 [7] */
 		zrelease_mpi_key(&params->params[RSA_E1]);
@@ -1837,7 +1831,7 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		_rsa_params_to_privkey(params, &priv);
 		ret = rsa_private_key_prepare(&priv);
 		if (ret == 0) {
-			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 		}
 	}
 
