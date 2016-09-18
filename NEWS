@@ -40,8 +40,7 @@ Version 2.12.24 (unreleased)
 ** libgnutls: Disabled random padding in the TLS protocol to improve compatibility
    with various broken servers.
 
-** libgnutls: ARCFOUR-128 was prioritized lower than any other cipher. Was
-   removed from the algorithms when the SECURE priority string is specified.
+** libgnutls: the ARCFOUR-128 cipher was removed from the default priority lists.
 
 ** libgnutls: Do not call the post client hello callback twice when resuming
    using session tickets.
