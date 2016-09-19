@@ -112,7 +112,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 };
 
 static
-void test_success(void)
+void test_success1(void)
 {
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -307,7 +307,7 @@ void doit(void)
 
 	test_failure_client();
 	test_failure_server();
-	test_success();
+	test_success1();
 
 	gnutls_global_deinit();
 }

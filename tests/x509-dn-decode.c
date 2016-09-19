@@ -34,9 +34,6 @@
 
 #include "utils.h"
 
-#define myfail(fmt, ...) \
-	fail("%s: "fmt, test_name, ##__VA_ARGS__)
-
 static void decode(const char *test_name, const gnutls_datum_t *raw, const char *expected)
 {
 	int ret;
@@ -45,29 +42,29 @@ static void decode(const char *test_name, const gnutls_datum_t *raw, const char 
 
 	ret = gnutls_x509_dn_init(&dn);
 	if (ret < 0) {
-		myfail("%s\n", gnutls_strerror(ret));
+		test_fail("%s\n", gnutls_strerror(ret));
 	}
 
 	ret = gnutls_x509_dn_import(dn, raw);
 	if (ret < 0) {
-		myfail("%s\n", gnutls_strerror(ret));
+		test_fail("%s\n", gnutls_strerror(ret));
 	}
 
 	ret = gnutls_x509_dn_get_str(dn, &out);
 	if (ret < 0) {
-		myfail("%s\n", gnutls_strerror(ret));
+		test_fail("%s\n", gnutls_strerror(ret));
 	}
 
 	if (out.size != strlen(expected)) {
-		myfail("The length of the output (%d) doesn't match the expected (%d)\n", (int)out.size, (int)strlen(expected));
+		test_fail("The length of the output (%d) doesn't match the expected (%d)\n", (int)out.size, (int)strlen(expected));
 	}
 
 	if (memcmp(out.data, expected, out.size) != 0) {
-		myfail("The string output (%s) doesn't match the expected (%s)\n", (char*)out.data, expected);
+		test_fail("The string output (%s) doesn't match the expected (%s)\n", (char*)out.data, expected);
 	}
 
 	if (out.data[out.size] != 0) {
-		myfail("The string output isn't null terminated\n");
+		test_fail("The string output isn't null terminated\n");
 	}
 
 	gnutls_free(out.data);
@@ -85,7 +82,7 @@ static void encode(const char *test_name, const gnutls_datum_t *raw, const char 
 
 	ret = gnutls_x509_dn_init(&dn);
 	if (ret < 0) {
-		myfail("%s\n", gnutls_strerror(ret));
+		test_fail("%s\n", gnutls_strerror(ret));
 	}
 
 	ret = gnutls_x509_dn_set_str(dn, str, &err);
@@ -95,18 +92,18 @@ static void encode(const char *test_name, const gnutls_datum_t *raw, const char 
 			goto cleanup;
 
 		if (ret == GNUTLS_E_PARSING_ERROR)
-			myfail("error: %s: %s\n", gnutls_strerror(ret), err);
+			test_fail("error: %s: %s\n", gnutls_strerror(ret), err);
 		else
-			myfail("%s\n", gnutls_strerror(ret));
+			test_fail("%s\n", gnutls_strerror(ret));
 	}
 
 	if (ret != exp_error) {
-		myfail("unexpected success in encoding (got: %d, exp: %d)\n", ret, exp_error);
+		test_fail("unexpected success in encoding (got: %d, exp: %d)\n", ret, exp_error);
 	}
 
 	ret = gnutls_x509_dn_export2(dn, GNUTLS_X509_FMT_DER, &out);
 	if (ret < 0) {
-		myfail("%s\n", gnutls_strerror(ret));
+		test_fail("%s\n", gnutls_strerror(ret));
 	}
 
 	if (out.size != raw->size) {
@@ -117,7 +114,7 @@ static void encode(const char *test_name, const gnutls_datum_t *raw, const char 
 				fprintf(stderr, "\\x%.2x", (unsigned)out.data[i]);
 			fprintf(stderr, "\n");
 		}
-		myfail("The length of the output (%d) doesn't match the expected (%d)\n", (int)out.size, (int)raw->size);
+		test_fail("The length of the output (%d) doesn't match the expected (%d)\n", (int)out.size, (int)raw->size);
 	}
 
 	if (memcmp(out.data, raw->data, out.size) != 0) {
@@ -128,7 +125,7 @@ static void encode(const char *test_name, const gnutls_datum_t *raw, const char 
 				fprintf(stderr, "\\x%.2x", (unsigned)out.data[i]);
 			fprintf(stderr, "\n");
 		}
-		myfail("The raw output doesn't match the expected\n");
+		test_fail("The raw output doesn't match the expected\n");
 	}
 
 	gnutls_free(out.data);

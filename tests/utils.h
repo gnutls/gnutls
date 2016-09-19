@@ -63,6 +63,13 @@ extern void fail_ignore(const char *format, ...)
 extern void success(const char *format, ...)
     __attribute__ ((format(printf, 1, 2)));
 
+/* assumes test_name is defined */
+#define test_fail(fmt, ...) \
+	fail("%s: "fmt, test_name, ##__VA_ARGS__)
+
+#define test_success(fmt, ...) \
+	success("%s: "fmt, test_name, ##__VA_ARGS__)
+
 extern void c_print(const unsigned char *str, size_t len);
 extern void escapeprint(const char *str, size_t len);
 extern void hexprint(const void *str, size_t len);
