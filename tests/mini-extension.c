@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 #include <sys/socket.h>
 #if !defined(_WIN32)
 #include <sys/wait.h>
+#include <signal.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
@@ -145,6 +146,7 @@ static void client(int sd)
 				clientx509cred);
 
 	gnutls_transport_set_int(session, sd);
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	gnutls_ext_register("ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
 
@@ -265,6 +267,8 @@ static void server(int sd)
 	gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
 
 	gnutls_transport_set_int(session, sd);
+	gnutls_handshake_set_timeout(session, 20 * 1000);
+
 	ret = gnutls_handshake(session);
 	if (ret < 0) {
 		close(sd);
@@ -309,6 +313,8 @@ void doit(void)
 	int sockets[2];
 	int err;
 
+	signal(SIGPIPE, SIG_IGN);
+
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
 		perror("socketpair");
@@ -326,10 +332,13 @@ void doit(void)
 	if (child) {
 		int status;
 		/* parent */
+		close(sockets[1]);
 		server(sockets[0]);
 		wait(&status);
-	} else
+	} else {
+		close(sockets[0]);
 		client(sockets[1]);
+	}
 }
 
 #endif				/* _WIN32 */
