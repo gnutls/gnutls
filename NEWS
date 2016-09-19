@@ -31,6 +31,10 @@ See the end for copying conditions.
 
 ** libgnutls: backported X.509 unique ID functionality from later versions.
 
+** libgnutls: Increased the maximum size of the handshake message hash.
+   This will allow the library to cope better with larger packets, as
+   the ones offered by current TLS 1.3 drafts.
+
 ** API and ABI modifications:
 gnutls_x509_crt_set_issuer_unique_id: Added
 gnutls_x509_crt_set_subject_unique_id: Added
