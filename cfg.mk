@@ -133,7 +133,6 @@ web:
 	cd doc && makeinfo --html --split=node -o ../$(htmldir)/manual/gnutls-guile/ --css-include=./texinfo.css gnutls-guile.texi
 	cd doc && cp gnutls-guile.pdf gnutls-guile.html ../$(htmldir)/manual/
 	-cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp* doc/reference/html/*.css $(htmldir)/reference/
-	cd www && $(MAKE)
 
 ASM_SOURCES_XXX := \
 	lib/accelerated/x86/XXX/cpuid-x86_64.s \
