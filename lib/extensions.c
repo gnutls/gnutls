@@ -347,6 +347,9 @@ _gnutls_gen_extensions(gnutls_session_t session,
 	/* remove any initial data, and the size of the header */
 	size = extdata->length - init_size - 2;
 
+	if (size > UINT16_MAX) /* sent too many extensions */
+		return gnutls_assert_val(GNUTLS_E_HANDSHAKE_TOO_LARGE);
+
 	if (size > 0)
 		_gnutls_write_uint16(size, &extdata->data[pos]);
 	else if (size == 0)
