@@ -9,6 +9,10 @@ See the end for copying conditions.
    failures due to key mismatch. This prevents leaks or double freeing
    on such failures.
 
+** libgnutls: Increased the maximum size of the handshake message hash.
+   This will allow the library to cope better with larger packets, as
+   the ones offered by current TLS 1.3 drafts.
+
 ** API and ABI modifications:
 No changes since last version.
 
