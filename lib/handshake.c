@@ -1318,8 +1318,10 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 #define CHECK_SIZE(ll) \
   if ((session->internals.max_handshake_data_buffer_size > 0) && \
       (((ll) + session->internals.handshake_hash_buffer.length) > \
-       session->internals.max_handshake_data_buffer_size)) \
-    return gnutls_assert_val(GNUTLS_E_HANDSHAKE_TOO_LARGE)
+       session->internals.max_handshake_data_buffer_size)) { \
+    _gnutls_debug_log("Handshake buffer length is %u (max: %u)\n", (unsigned)((ll) + session->internals.handshake_hash_buffer.length), (unsigned)session->internals.max_handshake_data_buffer_size); \
+    return gnutls_assert_val(GNUTLS_E_HANDSHAKE_TOO_LARGE); \
+    }
 
 /* This function add the handshake headers and the
  * handshake data to the handshake hash buffers. Needed
