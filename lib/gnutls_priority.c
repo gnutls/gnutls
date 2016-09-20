@@ -435,6 +435,17 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   return 0;
 }
 
+static unsigned is_legacy(const char *prio)
+{
+  if (strncasecmp (prio, "ARCFOUR-40", 10) == 0)
+    return 1;
+  else if (strncasecmp (prio, "RSA-EXPORT", 10) == 0)
+    return 1;
+  else if (strncasecmp (prio, "CURVE-ALL", 9) == 0)
+    return 1;
+
+  return 0;
+}
 
 #define MAX_ELEMENTS 48
 
@@ -698,7 +709,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                   bulk_fn (&(*priority_cache)->kx,
                                 kx_priority_secure);
             }
-          else if (strncasecmp (&broken_list[i][1], "CURVE-ALL", 9) == 0)
+          else if (is_legacy (&broken_list[i][1]))
             {
               continue;
             }
