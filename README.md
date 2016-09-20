@@ -79,8 +79,8 @@ and polarssl.
 
 Debian/Ubuntu:
 ```
-apt-get install -y valgrind libasan1 libubsan0 nodejs softhsm datefudge lcov libssl-dev libcmocka-dev
-apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker socat
+apt-get install -y valgrind libasan1 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev
+apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker socat net-tools ppp
 ```
 
 Fedora/RHEL:
