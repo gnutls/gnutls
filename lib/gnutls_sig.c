@@ -63,7 +63,7 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 	const version_entry_st *ver = get_version(session);
 	const mac_entry_st *hash_algo;
 
-	*sign_algo = _gnutls_session_get_sign_algo(session, cert);
+	*sign_algo = _gnutls_session_get_sign_algo(session, cert, 0);
 	if (*sign_algo == GNUTLS_SIGN_UNKNOWN) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
@@ -522,7 +522,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	if (sign_algo == GNUTLS_SIGN_UNKNOWN || 
 	    _gnutls_session_sign_algo_enabled(session, sign_algo) < 0) {
 
-		sign_algo = _gnutls_session_get_sign_algo(session, cert);
+		sign_algo = _gnutls_session_get_sign_algo(session, cert, 1);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_PK_ALGORITHM;

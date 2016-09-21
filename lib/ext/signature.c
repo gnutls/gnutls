@@ -255,10 +255,15 @@ _gnutls_signature_algorithm_send_params(gnutls_session_t session,
 
 /* Returns a requested by the peer signature algorithm that
  * matches the given certificate's public key algorithm. 
+ *
+ * When the @client_cert flag is not set, then this function will
+ * also check whether the signature algorithm is allowed to be
+ * used in that session. Otherwise GNUTLS_SIGN_UNKNOWN is
+ * returned.
  */
 gnutls_sign_algorithm_t
 _gnutls_session_get_sign_algo(gnutls_session_t session,
-			      gnutls_pcert_st * cert)
+			      gnutls_pcert_st * cert, unsigned client_cert)
 {
 	unsigned i;
 	int ret;
@@ -283,7 +288,8 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 		/* none set, allow SHA-1 only */
 	{
 		ret = gnutls_pk_to_sign(cert_algo, GNUTLS_DIG_SHA1);
-		if (_gnutls_session_sign_algo_enabled(session, ret) < 0)
+
+		if (!client_cert && _gnutls_session_sign_algo_enabled(session, ret) < 0)
 			goto fail;
 		return ret;
 	}
@@ -296,7 +302,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 			     priv->sign_algorithms[i]) < 0)
 				continue;
 
-			if (_gnutls_session_sign_algo_enabled
+			if (!client_cert && _gnutls_session_sign_algo_enabled
 			    (session, priv->sign_algorithms[i]) < 0)
 				continue;
 
