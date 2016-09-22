@@ -3105,6 +3105,11 @@ void generate_pkcs12(common_info_st * cinfo)
 	crts = load_cert_list(0, &ncrts, cinfo);
 	ca_crt = load_ca_cert(0, cinfo);
 
+	if (keys == NULL && crts == NULL && ca_crt == NULL) {
+		fprintf(stderr, "You must specify one of\n\t--load-privkey\n\t--load-certificate\n\t--load-ca-certificate\n");
+		exit(1);
+	}
+
 	if (HAVE_OPT(P12_NAME)) {
 		name = OPT_ARG(P12_NAME);
 	} else {

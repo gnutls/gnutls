@@ -408,7 +408,6 @@ flag = {
     name      = to-p12;
     descrip   = "Generate a PKCS #12 structure";
     doc = "It requires a certificate, a private key and possibly a CA certificate to be specified.";
-    flags-must = load-certificate;
 };
 
 flag = {
