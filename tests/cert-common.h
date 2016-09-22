@@ -30,6 +30,7 @@
  * TLS client: cli_ca3_cert, cli_ca3_key
  * IPv6 server: server_ca3_localhost6_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_cert, server_ca3_key
+ * IPv4 server: server_ca3_localhost_ecc_cert, server_ca3_ecc_key
  * IPv4 server: server_ca3_localhost_utf8_cert, server_ca3_key - UTF8 names
  * IPv4 server: insecure key: server_ca3_localhost_insecure_key, server_ca3_localhost_insecure_cert
  */
@@ -421,6 +422,7 @@ static char ca3_cert_pem[] =
 	"fD9yskUMFPBhfj8BvXg=\n"
 	"-----END CERTIFICATE-----\n";
 
+
 static char ca3_key_pem[] =
 	"-----BEGIN RSA PRIVATE KEY-----\n"
 	"MIIG4gIBAAKCAYEAtt3GeIb7bA/8415l+9HsAlqRWjl14UogdVOKIFbCGD4dKN3i\n"
@@ -727,6 +729,17 @@ const gnutls_datum_t clidsa_ca3_cert = { (void*)clidsa_ca3_cert_pem,
 	sizeof(clidsa_ca3_cert_pem)-1
 };
 
+static char server_ca3_ecc_key_pem[] =
+	"-----BEGIN EC PRIVATE KEY-----\n"
+	"MHgCAQEEIQDn1XFX7QxTKXl2ekfSrEARsq+06ySEeeOB+N0igwcNLqAKBggqhkjO\n"
+	"PQMBB6FEA0IABG1J5VZy+PMTNJSuog4R3KmhbmIejOZZgPNtxkJcIubJIIO68kkd\n"
+	"GK04pl/ReivZAwibv+85lpT4sm/9RBVhLZM=\n"
+	"-----END EC PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_ecc_key = { (void*)server_ca3_ecc_key_pem,
+	sizeof(server_ca3_ecc_key_pem)-1
+};
+
 static char server_ca3_key_pem[] =
 	"-----BEGIN RSA PRIVATE KEY-----\n"
 	"MIIG5AIBAAKCAYEA2T14maos98C7s/geGZybgqYSxF+5NeTXKWpi9/vXmuIF8n3h\n"
@@ -894,6 +907,30 @@ static char server_localhost_utf8_ca3_cert_pem[] =
 const gnutls_datum_t server_ca3_localhost_utf8_cert = { (void*)server_localhost_utf8_ca3_cert_pem,
 	sizeof(server_localhost_utf8_ca3_cert_pem)-1
 };
+
+/* server_ca3_ecc_key */
+static char server_localhost_ca3_ecc_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIC8zCCAVugAwIBAgIIV+OO5zqFDkowDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNjA5MjIwNzU3MjhaGA85OTk5MTIzMTIzNTk1OVowHTEbMBkG\n"
+	"A1UEAxMSc2VydmVyIGNlcnRpZmljYXRlMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\n"
+	"QgAEbUnlVnL48xM0lK6iDhHcqaFuYh6M5lmA823GQlwi5skgg7rySR0YrTimX9F6\n"
+	"K9kDCJu/7zmWlPiyb/1EFWEtk6OBjTCBijAMBgNVHRMBAf8EAjAAMBQGA1UdEQQN\n"
+	"MAuCCWxvY2FsaG9zdDATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMD\n"
+	"B4AAMB0GA1UdDgQWBBTaH7JGYwVXx31AqONpQsb3l20EqDAfBgNVHSMEGDAWgBT5\n"
+	"qIYZY7akFBNgdg8BmjU27/G0rzANBgkqhkiG9w0BAQsFAAOCAYEATWsYCToPsxxU\n"
+	"f1zJv3+FKcIGI+8U7akTlnJEk3l9/Gkmkp0tsudtpZb+//rXIem9XVMKDYBEzRxQ\n"
+	"du3YleqR0Yj13S7piDHPl52PHJGvSHtLg4ooU74ZQcPFxoRxxNahYPb2Mhn0XqKh\n"
+	"Yc7JHkW53UVusanRmBCQIxI6tVuDO3rB/tQM4ygD9wDeT16xnDhfwemKaskHKM44\n"
+	"SMJJ9pY2zK1MvX5AZePTikMQqvc3aVfoE8Lv+4SGE/GyzvzaDOSzlwzNM6KBxerw\n"
+	"1qwnVO/lphUG09X4oXXtOqlAHaIfUmRMqgMPZEtWMszIQo9XimPfoLW3xKVqDWjN\n"
+	"EhHRLE0CCA/ip3lQ1bUt5EXhC1efPiOdEEYS5mHW7WAMAVi5aS1TzNLoJ4nahBwu\n"
+	"EeGtmSH4rDZlHTNsiXwvxV3XqWc39TqlgY+NGToyU1tA4+tVtalJ08Q37sFxSUvJ\n"
+	"Li9LPzU70EyX6WF+9FM45E4/Gt9Oh8btrYyjbyH/K2VI8qPRz5cW\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_localhost_ecc_cert = { (void*)server_localhost_ca3_ecc_cert_pem,
+	sizeof(server_localhost_ca3_ecc_cert_pem)-1};
 
 /* shares server_ca3 key */
 static char server_localhost_ca3_cert_pem[] =
