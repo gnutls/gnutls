@@ -134,9 +134,9 @@
 use POSIX qw(strftime);
 
 # match expressions used to find embedded type information
-$type_constant = "\\\%([A-Za-z0-9_]+)";
+$type_constant = '(?<!\%)\%([A-Za-z0-9_]+)';
 $type_func = "([A-Za-z0-9_]+\\(\\))";
-$type_param = '\@([A-Za-z0-9_]+)\s*';
+$type_param = '(?<!\@)\@([A-Za-z0-9_]+)\s*';
 $type_struct = "\\\#([A-Za-z0-9_]+)";
 $type_env = "(\\\$[A-Za-z0-9_]+)";
 
@@ -148,13 +148,16 @@ $type_env = "(\\\$[A-Za-z0-9_]+)";
 @highlights_html = ( [$type_constant, '"<i>$1</i>"'],
 		     [$type_func, '"<b>$1</b>"'],
 		     [$type_struct, '"<i>$1</i>"'],
-		     [$type_param, '" <tt><b>$1</b></tt> "'] );
+		     [$type_param, '" <tt><b>$1</b></tt> "'],
+		     ['\%\%', '"\%"']
+		     );
 $blankline_html = "<p>";
 
 @highlights_texinfo = ( [$type_param, '" \@code{$1} "'],
 			[$type_constant, '"\@code{$1} "'],
 			[$type_func, '"\@code{$1} "'],
 			[$type_struct, '"\@code{$1} "'],
+			['\%\%', '"\%"'],
 			 );
 $blankline_texinfo = "";
 
@@ -162,6 +165,7 @@ $blankline_texinfo = "";
 		[$type_constant, '"{\\\it $1}"'],
 		[$type_func, '"{\\\bf $1}"'],
 		[$type_struct, '"{\\\it $1}"'],
+		['\@\@', '"\@"']
 		      );
 $blankline_tex = "\\\\";
 
@@ -177,14 +181,18 @@ $blankline_sgml = "</para><para>\n";
 @highlights_man = ( [$type_constant, '"\\\fB$1\\\fP"'],
 		    [$type_func, '"\\\fB$1\\\fP"'],
 		    [$type_struct, '"\\\fB$1\\\fP"'],
-		    [$type_param, '" \\\fI$1\\\fP "'] );
+		    [$type_param, '" \\\fI$1\\\fP "'],
+		    ['\%\%', '"\%"'],
+		    ['\@\@', '"\@"']);
 $blankline_man = "";
 
 # text-mode
 @highlights_text = ( [$type_constant, '"$1"'],
 		     [$type_func, '"$1"'],
 		     [$type_struct, '"$1"'],
-		     [$type_param, '"$1 "'] );
+		     [$type_param, '"$1 "'],
+		     ['\%\%', '"\%"'],
+		     ['\@\@', '"\@"']);
 $blankline_text = "";
 my $lineprefix = "";
 
