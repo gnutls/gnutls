@@ -268,7 +268,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	unsigned int cert_algo;
 
 	if (unlikely(ver == NULL))
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		return gnutls_assert_val(GNUTLS_SIGN_UNKNOWN);
 
 	cert_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 
