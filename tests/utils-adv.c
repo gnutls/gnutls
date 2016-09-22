@@ -45,9 +45,11 @@ const char *side = NULL;
 static int
 _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
-	      const char *prio, const char *host,
+	      const char *serv_prio, const char *cli_prio,
+	      const char *host,
 	      void *priv, callback_func *client_cb, callback_func *server_cb,
-	      unsigned expect_verification_failure)
+	      unsigned expect_verification_failure,
+	      unsigned require_cert)
 {
 	int exit_code = EXIT_SUCCESS;
 	int ret;
@@ -65,10 +67,13 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				server_cred);
-	gnutls_priority_set_direct(server, prio, NULL);
+	gnutls_priority_set_direct(server, serv_prio, NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
+
+	if (require_cert)
+		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
 	if (ret < 0)
@@ -88,7 +93,7 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, prio, NULL);
+	gnutls_priority_set_direct(client, cli_prio, NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -175,7 +180,15 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      const char *prio, const char *host,
 	      void *priv, callback_func *client_cb, callback_func *server_cb)
 {
-	_test_cli_serv(server_cred, client_cred, prio, host, priv, client_cb, server_cb, 0);
+	_test_cli_serv(server_cred, client_cred, prio, prio, host, priv, client_cb, server_cb, 0, 0);
+}
+
+void
+test_cli_serv_cert(gnutls_certificate_credentials_t server_cred,
+	      gnutls_certificate_credentials_t client_cred,
+	      const char *cli_prio, const char *serv_prio, const char *host)
+{
+	_test_cli_serv(server_cred, client_cred, cli_prio, serv_prio, host, NULL, NULL, NULL, 0, 1);
 }
 
 /* An expected to fail verification run. Returns verification status */
@@ -184,5 +197,5 @@ test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
 	      const char *prio, const char *host)
 {
-	return _test_cli_serv(server_cred, client_cred, prio, host, NULL, NULL, NULL, 1);
+	return _test_cli_serv(server_cred, client_cred, prio, prio, host, NULL, NULL, NULL, 1, 0);
 }
