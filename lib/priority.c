@@ -1122,7 +1122,7 @@ finish:
  * to common preferences.
  *
  * Unless there is a special need, use the "NORMAL" keyword to
- * apply a reasonable security level, or "NORMAL:%COMPAT" for compatibility.
+ * apply a reasonable security level, or "NORMAL:%%COMPAT" for compatibility.
  *
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
  * limited to 128 bit ciphers and sorted by terms of speed
@@ -1194,7 +1194,7 @@ finish:
  *
  * "SECURE256:+SECURE128",
  *
- * Note that "NORMAL:%COMPAT" is the most compatible mode.
+ * Note that "NORMAL:%%COMPAT" is the most compatible mode.
  *
  * A %NULL @priorities string indicates the default priorities to be
  * used (this is available since GnuTLS 3.3.0).
