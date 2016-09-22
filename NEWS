@@ -26,6 +26,11 @@ See the end for copying conditions.
    This will allow the library to cope better with larger packets, as
    the ones offered by current TLS 1.3 drafts.
 
+** libgnutls: Allow to use client certificates despite them containing
+   disallowed algorithms for a session. That allows for example a client
+   to use DSA-SHA1 due to his old DSA certificate, without requiring him
+   to enable DSA-SHA1 (and thus make it acceptable for the server's certificate).
+
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function2: Added
 GNUTLS_E_PK_INVALID_PUBKEY: Added
