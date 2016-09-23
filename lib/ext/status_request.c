@@ -216,6 +216,11 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 	status_request_ext_st *priv;
 	int ret;
 
+	/* Do not bother sending the OCSP status request extension
+	 * if we are not using certificate authentication */
+	if (_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL)
+		return 0;
+
 	ret = _gnutls_ext_get_session_data(session,
 					   GNUTLS_EXTENSION_STATUS_REQUEST,
 					   &epriv);
