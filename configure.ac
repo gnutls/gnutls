@@ -153,6 +153,9 @@ hw_accel=none
 use_padlock=no
 if test "$use_accel" != "no"; then
 case $host_cpu in
+  armv8 | aarch64)
+      hw_accel="aarch64"
+  ;;
   i?86 | x86_64 | amd64)
       AC_CHECK_HEADERS(cpuid.h)
       if test "$host_cpu" = "x86_64" || test "$host_cpu" = "amd64"; then
@@ -196,6 +199,7 @@ if test "$use_padlock" != "no"; then
     AC_SUBST([ENABLE_PADLOCK])
 fi
 AM_CONDITIONAL(ENABLE_PADLOCK, test "$use_padlock" = "yes")
+AM_CONDITIONAL(ASM_AARCH64, test x"$hw_accel" = x"aarch64")
 AM_CONDITIONAL(ASM_X86_64, test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(ASM_X86_32, test x"$hw_accel" = x"x86")
 AM_CONDITIONAL(ASM_X86, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-64")
@@ -920,6 +924,7 @@ AC_CONFIG_FILES([
   lib/Makefile
   lib/accelerated/Makefile
   lib/accelerated/x86/Makefile
+  lib/accelerated/aarch64/Makefile
   lib/algorithms/Makefile
   lib/auth/Makefile
   lib/ext/Makefile

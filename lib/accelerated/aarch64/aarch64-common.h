@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -20,26 +20,21 @@
  *
  */
 
-#include <config.h>
-#include <accelerated.h>
-#if defined(ASM_X86)
-# include <x86/aes-x86.h>
-# include <x86/x86-common.h>
-#elif defined(ASM_AARCH64)
-# include <aarch64/aarch64-common.h>
+#if !__ASSEMBLER__
+#define NN_HASH(name, update_func, digest_func, NAME) {	\
+ #name,						\
+ sizeof(struct name##_ctx),			\
+ NAME##_DIGEST_SIZE,				\
+ NAME##_DATA_SIZE,				\
+ (nettle_hash_init_func *) name##_init,		\
+ (nettle_hash_update_func *) update_func,	\
+ (nettle_hash_digest_func *) digest_func	\
+} 
+
+void register_aarch64_crypto(void);
 #endif
 
-void _gnutls_register_accel_crypto(void)
-{
-#if defined(ASM_X86)
-	if (gnutls_have_cpuid() != 0) {
-		register_x86_crypto();
-	}
-#endif
-
-#if defined(ASM_AARCH64)
-	register_aarch64_crypto();
-#endif
-
-	return;
-}
+#define ARMV8_AES       (1<<2)
+#define ARMV8_SHA1      (1<<3)
+#define ARMV8_SHA256    (1<<4)
+#define ARMV8_PMULL     (1<<5)

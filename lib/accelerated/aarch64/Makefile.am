@@ -18,45 +18,28 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+AM_LIBTOOLFLAGS=--tag=CC
+
 include $(top_srcdir)/lib/common.mk
 
-SUBDIRS = 
-AM_CPPFLAGS = \
-	-I$(srcdir)/../../gl		\
-	-I$(builddir)/../../gl		\
-	-I$(srcdir)/../includes		\
-	-I$(builddir)/../../gl		\
-	-I$(builddir)/../includes	\
-	-I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/../../../gl		\
+	-I$(builddir)/../../../gl		\
+	-I$(srcdir)/../../includes	\
+	-I$(builddir)/../../includes	\
+	-I$(srcdir)/../../ \
+	-I$(srcdir)/../
 
 if ENABLE_MINITASN1
-AM_CPPFLAGS += -I$(srcdir)/../minitasn1
+AM_CPPFLAGS += -I$(srcdir)/../../minitasn1
 endif
 
-noinst_LTLIBRARIES = libaccelerated.la
+EXTRA_DIST = README
 
-EXTRA_DIST = accelerated.h cryptodev.h
-libaccelerated_la_SOURCES = accelerated.c cryptodev.c cryptodev-gcm.c
-libaccelerated_la_LIBADD =
+noinst_LTLIBRARIES = libaarch64.la
 
-if ENABLE_NETTLE
-if ASM_X86
-SUBDIRS += x86
-AM_CFLAGS += -DASM_X86
-libaccelerated_la_LIBADD += x86/libx86.la
-endif
+libaarch64_la_SOURCES = aarch64-common.c aarch64-common.h sha-aarch64.h sha-aarch64.c
 
 if ASM_AARCH64
-SUBDIRS += aarch64
-AM_CFLAGS += -DASM_AARCH64
-libaccelerated_la_LIBADD += aarch64/libaarch64.la
-endif
-endif
+libaarch64_la_SOURCES += elf/sha1-armv8.s elf/sha512-armv8.s elf/sha256-armv8.s
 
-if ASM_X86_32
-AM_CFLAGS += -DASM_X86_32
-endif
-
-if ASM_X86_64
-AM_CFLAGS += -DASM_X86_64
-endif
+endif #ASM_AARCH64
