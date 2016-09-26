@@ -1796,6 +1796,14 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 	if (rv == CKR_OK && b != 0)
 		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 
+	a[0].type = CKA_X_DISTRUSTED;
+	a[0].value = &b;
+	a[0].value_len = sizeof(b);
+
+	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
+	if (rv == CKR_OK && b != 0)
+		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED;
+
 	a[0].type = CKA_SENSITIVE;
 	a[0].value = &b;
 	a[0].value_len = sizeof(b);
@@ -2754,7 +2762,6 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 			type = CKC_X_509;
 	}
 
-
 	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_CRT) {
 		class = CKO_CERTIFICATE;
 
@@ -2801,6 +2808,15 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 		a[tot_values].value_len = sizeof trusted;
 		tot_values++;
 		_gnutls_assert_log("p11 attrs: CKA_TRUSTED\n");
+	}
+
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED) {
+		trusted = 1;
+		a[tot_values].type = CKA_X_DISTRUSTED;
+		a[tot_values].value = &trusted;
+		a[tot_values].value_len = sizeof trusted;
+		tot_values++;
+		_gnutls_assert_log("p11 attrs: CKA_X_DISTRUSTED\n");
 	}
 
 	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_CA) {
@@ -4116,6 +4132,9 @@ char *gnutls_pkcs11_obj_flags_get_str(unsigned int flags)
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)
 		_gnutls_buffer_append_str(&str, "CKA_TRUSTED; ");
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED)
+		_gnutls_buffer_append_str(&str, "CKA_X_DISTRUSTED; ");
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE)
 		_gnutls_buffer_append_str(&str, "CKA_EXTRACTABLE; ");

@@ -44,6 +44,13 @@ static void mark_flags(unsigned flags, struct ck_attribute *a, unsigned *a_val)
 		(*a_val)++;
 	}
 
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED) {
+		a[*a_val].type = CKA_X_DISTRUSTED;
+		a[*a_val].value = (void *) &tval;
+		a[*a_val].value_len = sizeof(tval);
+		(*a_val)++;
+	}
+
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
 		a[*a_val].type = CKA_TRUSTED;
 		a[*a_val].value = (void *) &tval;
