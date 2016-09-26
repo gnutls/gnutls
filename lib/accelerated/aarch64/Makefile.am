@@ -38,9 +38,10 @@ EXTRA_DIST = README
 noinst_LTLIBRARIES = libaarch64.la
 
 libaarch64_la_SOURCES = aarch64-common.c aarch64-common.h sha-aarch64.h sha-aarch64.c \
-	hmac-sha-aarch64.c
+	hmac-sha-aarch64.c aes-cbc-aarch64.c aes-gcm-aarch64.c aes-aarch64.h
 
 if ASM_AARCH64
-libaarch64_la_SOURCES += elf/sha1-armv8.s elf/sha512-armv8.s elf/sha256-armv8.s
+libaarch64_la_SOURCES += elf/sha1-armv8.s elf/sha512-armv8.s elf/sha256-armv8.s \
+	elf/aes-aarch64.s
 
 endif #ASM_AARCH64

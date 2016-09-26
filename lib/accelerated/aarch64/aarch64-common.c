@@ -33,6 +33,7 @@
 #ifdef HAVE_LIBNETTLE
 # include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
 # include "sha-aarch64.h"
+# include "aes-aarch64.h"
 #endif
 #include "aarch64-common.h"
 
@@ -184,6 +185,40 @@ void _register_aarch64_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_mac_register
 		    (GNUTLS_MAC_SHA512, 80, &_gnutls_hmac_sha_aarch64, 0);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+	}
+
+	if (_gnutls_arm_cpuid_s & ARMV8_AES) {
+		_gnutls_debug_log("Aarch64 AES was detected\n");
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_128_GCM, 90,
+		     &_gnutls_aes_gcm_aarch64, 0);
+			if (ret < 0) {
+				gnutls_assert();
+			}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_GCM, 90,
+		     &_gnutls_aes_gcm_aarch64, 0);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_cbc_aarch64, 0);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_cbc_aarch64, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
