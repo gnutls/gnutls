@@ -88,9 +88,14 @@ unsigned opt_to_flags(common_info_st *cinfo, unsigned *key_usage)
 		/* else set the defaults of the token */
 	}
 
-	if (ENABLED_OPT(MARK_TRUSTED))
+	if (HAVE_OPT(MARK_DISTRUSTED)) {
 		flags |=
-		    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
+		    GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED;
+	} else {
+		if (ENABLED_OPT(MARK_TRUSTED))
+			flags |=
+			    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
+	}
 
 	if (ENABLED_OPT(MARK_SIGN))
 		*key_usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;

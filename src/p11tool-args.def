@@ -259,6 +259,14 @@ flag = {
     disabled;
     descrip   = "Marks the object to be written as trusted";
     doc = "Marks the object to be generated/written with the CKA_TRUST flag.";
+    flags_cant = mark-distrusted;
+};
+
+flag = {
+    name      = mark-distrusted;
+    descrip   = "When retrieving objects, it requires the objects to be distrusted (blacklisted)";
+    doc = "Ensures that the objects retrieved have the CKA_X_TRUST flag.";
+    flags_cant = mark-trusted;
 };
 
 flag = {
@@ -295,6 +303,11 @@ flag = {
 flag = {
     name      = trusted;
     aliases   = mark-trusted;
+};
+
+flag = {
+    name      = distrusted;
+    aliases   = mark-distrusted;
 };
 
 flag = {
