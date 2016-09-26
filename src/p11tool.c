@@ -284,6 +284,8 @@ static void cmd_parser(int argc, char **argv)
 			    flags, detailed_url, &cinfo);
 	} else if (HAVE_OPT(EXPORT)) {
 		pkcs11_export(outfile, url, flags, &cinfo);
+	} else if (HAVE_OPT(EXPORT_STAPLED)) {
+		pkcs11_export(outfile, url, flags|GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT, &cinfo);
 	} else if (HAVE_OPT(EXPORT_CHAIN)) {
 		pkcs11_export_chain(outfile, url, flags, &cinfo);
 	} else if (HAVE_OPT(WRITE)) {

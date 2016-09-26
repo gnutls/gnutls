@@ -113,18 +113,36 @@ flag = {
     name      = export;
     descrip   = "Export the object specified by the URL";
     doc = "";
+    flags-cant = export-stapled;
+    flags-cant = export-chain;
+    flags-cant = export-pubkey;
+};
+
+flag = {
+    name      = export-stapled;
+    descrip   = "Export the certificate object specified by the URL";
+    doc = "Exports the certificate specified by the URL while including any attached extensions to it.";
+    flags-cant = export;
+    flags-cant = export-chain;
+    flags-cant = export-pubkey;
 };
 
 flag = {
     name      = export-chain;
     descrip   = "Export the certificate specified by the URL and its chain of trust";
     doc = "Exports the certificate specified by the URL and generates its chain of trust based on the stored certificates in the module.";
+    flags-cant = export-stapled;
+    flags-cant = export;
+    flags-cant = export-pubkey;
 };
 
 flag = {
     name      = export-pubkey;
     descrip   = "Export the public key for a private key";
     doc = "Exports the public key for the specified private key";
+    flags-cant = export-stapled;
+    flags-cant = export;
+    flags-cant = export-chain;
 };
 
 flag = {
