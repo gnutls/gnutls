@@ -1,7 +1,7 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010-2014 Free Software Foundation, Inc.
- * Copyright (C) 2014 Red Hat
+ * Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat
  * 
  * Authors: Nikos Mavrogiannopoulos
  *
@@ -61,11 +61,14 @@ static int override_ext(gnutls_x509_crt_t crt, gnutls_datum_t *ext)
 	return ret;
 }
 
+/* This function re-encodes a certificate to contain its stapled extensions.
+ * That assumes that the certificate is not in the distrusted list.
+ */
 int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t *spki, gnutls_datum_t *der)
 {
 	int ret;
 	gnutls_datum_t new_der = {NULL, 0};
-	struct ck_attribute a[2];
+	struct ck_attribute a[3];
 	struct ck_attribute b[1];
 	unsigned long count;
 	unsigned ext_data_size = der->size;
@@ -75,6 +78,7 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 	unsigned finalize = 0;
 	ck_rv_t rv;
 	ck_object_handle_t obj;
+	ck_bool_t tfalse = 0;
 
 	/* retrieve the extensions */
 	class = CKO_X_CERTIFICATE_EXTENSION;
@@ -86,7 +90,11 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 	a[1].value = spki->data;
 	a[1].value_len = spki->size;
 
-	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a, 2);
+	a[2].type = CKA_X_DISTRUSTED;
+	a[2].value = &tfalse;
+	a[2].value_len = sizeof(tfalse);
+
+	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a, 3);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log

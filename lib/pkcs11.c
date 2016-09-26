@@ -3634,7 +3634,8 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 		finalized = 1;
 
 		if (found != 0) {
-			if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT && data.size > 0) {
+			if (!(priv->flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) &&
+			    (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT) && data.size > 0) {
 				gnutls_datum_t spki;
 				rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, ctx, CKA_PUBLIC_KEY_INFO, &spki);
 				if (rv == CKR_OK) {
