@@ -159,7 +159,7 @@ gnutls_ecc_curve_t gnutls_oid_to_ecc_curve(const char *oid)
 	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
 	GNUTLS_ECC_CURVE_LOOP(
-		if (strcasecmp(p->oid, oid) == 0 && _gnutls_pk_curve_exists(p->id)) {
+		if (p->oid && strcasecmp(p->oid, oid) == 0 && _gnutls_pk_curve_exists(p->id)) {
 			ret = p->id;
 			break;
 		}
