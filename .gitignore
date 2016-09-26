@@ -38,6 +38,7 @@ configure
 doc/Makefile
 doc/Makefile.in
 doc/abstract-api.texi
+doc/socket-api.texi
 doc/dane-api.texi
 doc/algorithms.texi
 doc/compat-api.texi
@@ -377,6 +378,7 @@ guile/modules/gnutls/extra.go
 lib/Makefile
 lib/Makefile.in
 lib/accelerated/libaccelerated.la
+lib/accelerated/aarch64/libaarch64.la
 lib/accelerated/x86/libx86.la
 lib/algorithms/libgnutls_alg.la
 lib/auth/libgnutls_auth.la
@@ -505,6 +507,7 @@ src/tpmtool
 stamp-h1
 tags
 tests/*/out
+tests/pkcs11-privkey-raw
 tests/alpn-server-prec
 tests/dh-params
 tests/dtls-handshake-versions
@@ -897,3 +900,14 @@ tests/slow/cipher-compat
 tests/x509-dn
 tests/x509-dn-decode
 config.cache
+tests/set_x509_key_file_ocsp_multi
+tests/set_x509_key_file_ocsp_multi2
+tests/set_x509_key_utf8
+tests/set_key_utf8
+tests/set_key
+tests/server_ecdsa_key
+tests/rsa-illegal-import
+tests/pkcs11/pkcs11-ec-privkey-test
+tests/insecure_key
+tests/handshake-large-packet
+tests/srp
