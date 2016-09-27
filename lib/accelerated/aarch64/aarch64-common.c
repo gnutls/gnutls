@@ -193,20 +193,24 @@ void _register_aarch64_crypto(unsigned capabilities)
 	if (_gnutls_arm_cpuid_s & ARMV8_AES) {
 		_gnutls_debug_log("Aarch64 AES was detected\n");
 
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_GCM, 90,
-		     &_gnutls_aes_gcm_aarch64, 0);
+		if (_gnutls_arm_cpuid_s & ARMV8_PMULL) {
+			_gnutls_debug_log("Aarch64 PMULL was detected\n");
+
+			ret =
+			    gnutls_crypto_single_cipher_register
+			    (GNUTLS_CIPHER_AES_128_GCM, 90,
+			     &_gnutls_aes_gcm_aarch64, 0);
+			if (ret < 0) {
+					gnutls_assert();
+				}
+
+			ret =
+			    gnutls_crypto_single_cipher_register
+			    (GNUTLS_CIPHER_AES_256_GCM, 90,
+			     &_gnutls_aes_gcm_aarch64, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
-
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_GCM, 90,
-		     &_gnutls_aes_gcm_aarch64, 0);
-		if (ret < 0) {
-			gnutls_assert();
 		}
 
 		ret =

@@ -135,6 +135,7 @@ web:
 	-cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp* doc/reference/html/*.css $(htmldir)/reference/
 
 ASM_SOURCES_XXX := \
+	lib/accelerated/aarch64/XXX/ghash-aarch64.s \
 	lib/accelerated/aarch64/XXX/aes-aarch64.s \
 	lib/accelerated/aarch64/XXX/sha1-armv8.s \
 	lib/accelerated/aarch64/XXX/sha256-armv8.s \
