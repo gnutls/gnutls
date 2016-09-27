@@ -121,7 +121,9 @@ flag = {
 flag = {
     name      = export-stapled;
     descrip   = "Export the certificate object specified by the URL";
-    doc = "Exports the certificate specified by the URL while including any attached extensions to it.";
+    doc = "Exports the certificate specified by the URL while including any attached extensions to it.
+Since attached extensions are a p11-kit extension, this option is only
+available on p11-kit registered trust modules.";
     flags-cant = export;
     flags-cant = export-chain;
     flags-cant = export-pubkey;
@@ -265,7 +267,9 @@ flag = {
 flag = {
     name      = mark-distrusted;
     descrip   = "When retrieving objects, it requires the objects to be distrusted (blacklisted)";
-    doc = "Ensures that the objects retrieved have the CKA_X_TRUST flag.";
+    doc = "Ensures that the objects retrieved have the CKA_X_TRUST flag.
+This is p11-kit trust module extension, thus this flag is only valid with
+p11-kit registered trust modules.";
     flags_cant = mark-trusted;
 };
 
