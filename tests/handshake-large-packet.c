@@ -83,7 +83,7 @@ static int ext_recv_client_params(gnutls_session_t session, const unsigned char 
 
 static int ext_send_client_params(gnutls_session_t session, gnutls_buffer_t extdata)
 {
-	unsigned char *data = gnutls_malloc(MAX_SIZE);
+	unsigned char *data = gnutls_calloc(1, MAX_SIZE);
 	if (data == NULL)
 		return -1;
 
@@ -99,7 +99,7 @@ static int ext_recv_server_params(gnutls_session_t session, const unsigned char 
 
 static int ext_send_server_params(gnutls_session_t session, gnutls_buffer_t extdata)
 {
-	unsigned char *data = gnutls_malloc(MAX_SIZE);
+	unsigned char *data = gnutls_calloc(1, MAX_SIZE);
 	if (data == NULL)
 		return -1;
 
