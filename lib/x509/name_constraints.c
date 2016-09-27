@@ -777,6 +777,7 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 	*_intersection = NULL;
 	name_constraints_node_st *to_copy = NULL;
 	unsigned iplength = 0;
+	unsigned byte;
 
 	if (nc1->type != nc2->type) {
 		return GNUTLS_E_SUCCESS;
@@ -796,7 +797,7 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 		if (nc1->name.size != nc2->name.size)
 			return GNUTLS_E_SUCCESS;
 		iplength = nc1->name.size/2;
-		for (unsigned byte = 0; byte < iplength; byte++) {
+		for (byte = 0; byte < iplength; byte++) {
 			if (((nc1->name.data[byte]^nc2->name.data[byte]) // XOR of addresses
 				 & nc1->name.data[byte+iplength]  // AND mask from nc1
 				 & nc2->name.data[byte+iplength]) // AND mask from nc2
@@ -813,6 +814,8 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 	}
 	// copy existing node if applicable
 	if (to_copy != NULL) {
+		unsigned byte;
+
 		*_intersection = name_constraints_node_new(to_copy->type, to_copy->name.data, to_copy->name.size);
 		if (*_intersection == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -822,7 +825,7 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 			_gnutls_mask_ip(intersection->name.data, intersection->name.data+iplength, iplength);
 			_gnutls_mask_ip(nc1->name.data, nc1->name.data+iplength, iplength);
 			// update intersection, if necessary (we already know one is subset of other)
-			for (unsigned byte = 0; byte < 2 * iplength; byte++) {
+			for (byte = 0; byte < 2 * iplength; byte++) {
 				intersection->name.data[byte] |= nc1->name.data[byte];
 			}
 		}

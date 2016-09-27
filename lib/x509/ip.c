@@ -175,10 +175,13 @@ static void prefix_to_mask(unsigned prefix, unsigned char *mask, size_t mask_siz
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  -*/
-int _gnutls_mask_ip(unsigned char *ip, const unsigned char *mask, unsigned ipsize) {
+int _gnutls_mask_ip(unsigned char *ip, const unsigned char *mask, unsigned ipsize)
+{
+	unsigned i;
+
 	if (ipsize != 4 && ipsize != 16)
 		return GNUTLS_E_MALFORMED_CIDR;
-	for (unsigned i = 0;i  < ipsize; i++)
+	for (i = 0; i < ipsize; i++)
 		ip[i] &= mask[i];
 	return GNUTLS_E_SUCCESS;
 }
