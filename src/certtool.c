@@ -132,12 +132,25 @@ generate_private_key_int(common_info_st * cinfo)
 
 	bits = get_bits(key_type, cinfo->bits, cinfo->sec_param, 1);
 
-	fprintf(stdlog, "Generating a %d bit %s private key...\n",
-		bits, gnutls_pk_algorithm_get_name(key_type));
+	if (key_type == GNUTLS_PK_EC) {
+		int ecc_bits;
 
-	if (bits < 256 && key_type == GNUTLS_PK_EC)
-		fprintf(stderr,
-			"Note that ECDSA keys with size less than 256 are not widely supported.\n\n");
+		if (GNUTLS_BITS_ARE_CURVE(bits)) {
+			gnutls_ecc_curve_t curve = GNUTLS_BITS_TO_CURVE(bits);
+			ecc_bits = gnutls_ecc_curve_get_size(curve) * 8;
+		} else {
+			ecc_bits = bits;
+		}
+		fprintf(stdlog, "Generating a %d bit %s private key...\n",
+			ecc_bits, gnutls_pk_algorithm_get_name(key_type));
+
+		if (ecc_bits < 256)
+			fprintf(stderr,
+				"Note that ECDSA keys with size less than 256 are not widely supported.\n\n");
+	} else {
+		fprintf(stdlog, "Generating a %d bit %s private key...\n",
+			bits, gnutls_pk_algorithm_get_name(key_type));
+	}
 
 	if (provable && (key_type != GNUTLS_PK_RSA && key_type != GNUTLS_PK_DSA)) {
 		fprintf(stderr,
