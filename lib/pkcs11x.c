@@ -80,6 +80,11 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 	ck_object_handle_t obj;
 	ck_bool_t tfalse = 0;
 
+	if (sinfo->trusted == 0) {
+		_gnutls_debug_log("p11: cannot override extensions on a non-p11-kit trust module\n");
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
 	/* retrieve the extensions */
 	class = CKO_X_CERTIFICATE_EXTENSION;
 	a[0].type = CKA_CLASS;

@@ -237,6 +237,7 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
 	active_providers++;
 	providers[active_providers - 1].module = module;
 	providers[active_providers - 1].active = 1;
+	providers[active_providers - 1].trusted = 0;
 
 	if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED ||
 		(params != NULL && strstr(params, "trusted") != 0))
@@ -1189,7 +1190,8 @@ int
 pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 		 struct p11_kit_uri *info,
 		 struct ck_token_info *_tinfo,
-		 struct ck_slot_info *_slot_info)
+		 struct ck_slot_info *_slot_info,
+		 unsigned int *trusted)
 {
 	unsigned int x, z;
 	int ret;
@@ -1235,6 +1237,9 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 			*module = providers[x].module;
 			*slot = slots[z];
 
+			if (trusted)
+				*trusted = providers[x].trusted;
+
 			if (_tinfo != NULL)
 				memcpy(_tinfo, &tinfo, sizeof(tinfo));
 
@@ -1261,7 +1266,11 @@ pkcs11_open_session(struct pkcs11_session_info *sinfo,
 	ck_slot_id_t slot;
 	struct ck_token_info tinfo;
 
-	ret = pkcs11_find_slot(&module, &slot, info, &tinfo, &sinfo->slot_info);
+	memset(sinfo, 0, sizeof(*sinfo));
+
+	ret = pkcs11_find_slot(&module, &slot, info, &tinfo,
+				&sinfo->slot_info,
+				&sinfo->trusted);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1356,9 +1365,12 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 				continue;
 			}
 
+			memset(&sinfo, 0, sizeof(sinfo));
 			sinfo.module = module;
 			sinfo.pks = pks;
 			sinfo.sid = slots[z];
+			sinfo.trusted = providers[x].trusted;
+
 			memcpy(&sinfo.tinfo, &l_tinfo, sizeof(sinfo.tinfo));
 			memcpy(&sinfo.slot_info, &l_sinfo, sizeof(sinfo.slot_info));
 
@@ -1796,13 +1808,15 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 	if (rv == CKR_OK && b != 0)
 		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 
-	a[0].type = CKA_X_DISTRUSTED;
-	a[0].value = &b;
-	a[0].value_len = sizeof(b);
+	if (sinfo->trusted) { /* only p11-kit "trusted" modules support this flag */
+		a[0].type = CKA_X_DISTRUSTED;
+		a[0].value = &b;
+		a[0].value_len = sizeof(b);
 
-	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
-	if (rv == CKR_OK && b != 0)
-		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED;
+		rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
+		if (rv == CKR_OK && b != 0)
+			pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED;
+	}
 
 	a[0].type = CKA_SENSITIVE;
 	a[0].value = &b;
@@ -2811,6 +2825,11 @@ find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	}
 
 	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_DISTRUSTED) {
+		if (!sinfo->trusted) { /* only p11-kit trust modules support this */
+			gnutls_assert();
+			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		}
+
 		trusted = 1;
 		a[tot_values].type = CKA_X_DISTRUSTED;
 		a[tot_values].value = &trusted;
@@ -3364,7 +3383,7 @@ gnutls_pkcs11_token_get_mechanism(const char *url, unsigned int idx,
 		return ret;
 	}
 
-	ret = pkcs11_find_slot(&module, &slot, info, &tinfo, NULL);
+	ret = pkcs11_find_slot(&module, &slot, info, &tinfo, NULL, NULL);
 	p11_kit_uri_free(info);
 
 	if (ret < 0) {
@@ -3549,6 +3568,9 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 		}
 
 		if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) {
+			if (!sinfo->trusted) /* only p11-kit "trusted" modules support this flag */
+				return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
 			a[a_vals].type = CKA_X_DISTRUSTED;
 			a[a_vals].value = &trusted;
 			a[a_vals].value_len = sizeof trusted;
