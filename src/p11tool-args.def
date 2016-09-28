@@ -154,6 +154,16 @@ flag = {
 };
 
 flag = {
+    name      = trusted;
+    aliases   = mark-trusted;
+};
+
+flag = {
+    name      = distrusted;
+    aliases   = mark-distrusted;
+};
+
+flag = {
     name = keygen_related_options;
     documentation;
     descrip = "Key generation";
@@ -162,25 +172,31 @@ flag = {
 flag = {
     name      = generate-rsa;
     descrip   = "Generate an RSA private-public key pair";
-    doc = "Generates an RSA private-public key pair on the specified token.";
+    doc = "Generates an RSA private-public key pair on the specified token.
+Should be combined with --sec-param or --bits.";
 };
 
 flag = {
     name      = generate-dsa;
     descrip   = "Generate a DSA private-public key pair";
-    doc = "Generates a DSA private-public key pair on the specified token.";
+    doc = "Generates a DSA private-public key pair on the specified token.
+Should be combined with --sec-param or --bits.";
 };
+
 flag = {
     name      = generate-ecc;
     descrip   = "Generate an ECDSA private-public key pair";
-    doc = "Generates an ECDSA private-public key pair on the specified token.";
+    doc = "Generates an ECDSA private-public key pair on the specified token.
+Should be combined with --curve, --sec-param or --bits.";
 };
 
 flag = {
     name      = bits;
     arg-type  = number;
-    descrip   = "Specify the number of bits for key generate";
-    doc      = "";
+    descrip   = "Specify the number of bits for the key generate";
+    doc      = "For applications which have no key-size restrictions the
+--sec-param option is recommended, as the sec-param levels will adapt
+to the acceptable security levels with the new versions of gnutls.";
 };
 
 flag = {
@@ -224,7 +240,8 @@ flag = {
 flag = {
     name      = write;
     descrip   = "Writes the loaded objects to a PKCS #11 token";
-    doc = "It can be used to write private keys, certificates or secret keys to a token. Must be combined with a --load option.";
+    doc = "It can be used to write private, public keys, certificates or secret keys to a token. Must be combined with
+    one of --load-privkey, --load-pubkey, --load-certificate option.";
 };
 
 flag = {
@@ -302,16 +319,6 @@ flag = {
     disable   = "no";
     descrip   = "Marks the object to be written as private";
     doc = "Marks the object to be generated/written with the CKA_PRIVATE flag. The written object will require a PIN to be used.";
-};
-
-flag = {
-    name      = trusted;
-    aliases   = mark-trusted;
-};
-
-flag = {
-    name      = distrusted;
-    aliases   = mark-distrusted;
 };
 
 flag = {
