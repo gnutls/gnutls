@@ -24,7 +24,7 @@ void aes_v8_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *
 void aes_v8_decrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_aarch64;
-
 extern const gnutls_crypto_cipher_st _gnutls_aes_cbc_aarch64;
+extern const gnutls_crypto_cipher_st _gnutls_aes_ccm_aarch64;
 
 #endif
