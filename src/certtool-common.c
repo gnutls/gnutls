@@ -270,7 +270,7 @@ gnutls_privkey_t load_private_key(int mand, common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-privkey: %s\n",
+		fprintf(stderr, "error reading --load-privkey: %s\n",
 			info->privkey);
 		exit(1);
 	}
@@ -313,7 +313,7 @@ load_x509_private_key(int mand, common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-privkey: %s\n",
+		fprintf(stderr, "error reading --load-privkey: %s\n",
 			info->privkey);
 		exit(1);
 	}
@@ -512,7 +512,7 @@ gnutls_x509_crq_t load_request(common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-request: %s\n",
+		fprintf(stderr, "error reading --load-request: %s\n",
 			info->request);
 		exit(1);
 	}
@@ -553,7 +553,7 @@ gnutls_privkey_t load_ca_private_key(common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-ca-privkey: %s\n",
+		fprintf(stderr, "error reading --load-ca-privkey: %s\n",
 			info->ca_privkey);
 		exit(1);
 	}
@@ -640,7 +640,7 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-pubkey: %s\n", info->pubkey);
+		fprintf(stderr, "error reading --load-pubkey: %s\n", info->pubkey);
 		exit(1);
 	}
 

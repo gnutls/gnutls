@@ -224,7 +224,7 @@ static gnutls_x509_crt_t load_signer(void)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-signer: %s\n",
+		fprintf(stderr, "error reading --load-signer: %s\n",
 			OPT_ARG(LOAD_SIGNER));
 		exit(1);
 	}
@@ -262,7 +262,7 @@ static gnutls_x509_crt_t load_cert(void)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-cert: %s\n",
+		fprintf(stderr, "error reading --load-cert: %s\n",
 			OPT_ARG(LOAD_CERT));
 		exit(1);
 	}
@@ -345,7 +345,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		dat.data =
 		    (void *) read_binary_file(OPT_ARG(LOAD_TRUST), &size);
 		if (dat.data == NULL) {
-			fprintf(stderr, "reading --load-trust: %s\n",
+			fprintf(stderr, "error reading --load-trust: %s\n",
 				OPT_ARG(LOAD_TRUST));
 			exit(1);
 		}
