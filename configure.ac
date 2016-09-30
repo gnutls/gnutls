@@ -339,13 +339,6 @@ if test "$ac_have_unicode" != "yes";then
   fi
 fi
 
-SUITE_FILE="${srcdir}/tests/suite/mini-eagain2.c"
-if test -f "$SUITE_FILE";then
-	can_do_valgrind_tests=yes
-else
-	can_do_valgrind_tests=no
-fi
-
 dnl Note that g*l_INIT are run after we check for library capabilities,
 dnl to prevent issues from caching lib dependencies. See discussion
 dnl in https://bugs.gentoo.org/show_bug.cgi?id=494940 and
@@ -353,13 +346,24 @@ dnl http://gnu-autoconf.7623.n7.nabble.com/Correct-way-to-check-for-clock-gettim
 gl_INIT
 ggl_INIT
 
-if test "$can_do_valgrind_tests" != "yes";then
+# disable the extended test suite at tests/suite if asked, or if we are not running in git master
+AC_ARG_ENABLE(full-test-suite,
+  AS_HELP_STRING([--disable-full-test-suite], [disable running very slow components of test suite]),
+    full_test_suite=$enableval, full_test_suite=yes)
+
+# test if we are in git master
+SUITE_FILE="${srcdir}/tests/suite/mini-eagain2.c"
+if test "$full_test_suite" = yes && test ! -f "$SUITE_FILE";then
+	full_test_suite=no
+fi
+
+if test "$full_test_suite" != "yes";then
 	VALGRIND=""
 	AC_SUBST(VALGRIND, [])
 	opt_valgrind_tests=no
 fi
 
-AM_CONDITIONAL(WANT_TEST_SUITE, [test -f "$SUITE_FILE"])
+AM_CONDITIONAL(WANT_TEST_SUITE, test "$full_test_suite" = "yes")
 
 dnl GCC warnings to enable
 

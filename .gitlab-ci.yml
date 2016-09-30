@@ -136,7 +136,7 @@ Fedora/x86_64/FIPS140-2:
 Fedora/x86_64/valgrind:
   script:
   - make autoreconf && ./configure
-    --disable-non-suiteb-curves --enable-code-coverage --disable-doc && make -j$(nproc) && make check -j$(nproc)
+    --disable-non-suiteb-curves --enable-code-coverage --disable-doc --disable-full-test-suite && make -j$(nproc) && make check -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
