@@ -490,6 +490,8 @@ void gnutls_deinit(gnutls_session_t session)
 
 	_gnutls_free_datum(&session->internals.resumption_data);
 
+	gnutls_free(session->internals.rexts);
+
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
 
