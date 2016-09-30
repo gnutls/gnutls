@@ -31,6 +31,9 @@ See the end for copying conditions.
    to use DSA-SHA1 due to his old DSA certificate, without requiring him
    to enable DSA-SHA1 (and thus make it acceptable for the server's certificate).
 
+** libgnutls: Added SHA*, AES-GCM, AES-CCM and AES-CBC optimized implementations
+   for the aarch64 architecture. Uses Andy Polyakov's assembly code.
+
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function2: Added
 GNUTLS_E_PK_INVALID_PUBKEY: Added
