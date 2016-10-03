@@ -2597,7 +2597,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	}
 	while (rv == CKR_PIN_INCORRECT);
 
-	_gnutls_debug_log("p11: Login result = %lu\n", rv);
+	_gnutls_debug_log("p11: Login result = %s (%lu)\n", (rv==0)?"ok":p11_kit_strerror(rv), rv);
 
 
 	ret = (rv == CKR_OK
