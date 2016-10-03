@@ -879,6 +879,7 @@ tests/pkcs11/pkcs11-is-known
 tests/pkcs11/pkcs11-privkey
 tests/pkcs11/pkcs11-pubkey-import-ecdsa
 tests/pkcs11/pkcs11-pubkey-import-rsa
+tests/pkcs11/pkcs11-privkey-always-auth
 tests/softhsm-*.db/
 tests/status-request-missing
 tests/slow/cipher-openssl-compat

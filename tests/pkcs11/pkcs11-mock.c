@@ -116,6 +116,7 @@ const char mock_pubkey[] =
 
 CK_BBOOL pkcs11_mock_initialized = CK_FALSE;
 CK_BBOOL pkcs11_mock_session_opened = CK_FALSE;
+CK_BBOOL pkcs11_mock_session_reauth = CK_FALSE;
 
 static session_ptr_st *mock_session = NULL;
 
@@ -702,8 +703,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
 	if ((CK_FALSE == pkcs11_mock_session_opened) || (PKCS11_MOCK_CK_SESSION_ID != hSession))
 		return CKR_SESSION_HANDLE_INVALID;
 
-	if ((CKU_SO != userType) && (CKU_USER != userType))
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) {
+		if ((CKU_CONTEXT_SPECIFIC != userType) && (CKU_SO != userType) && (CKU_USER != userType))
+			return CKR_USER_TYPE_INVALID;
+	} else if ((CKU_SO != userType) && (CKU_USER != userType)) {
 		return CKR_USER_TYPE_INVALID;
+	}
 
 	if (NULL == pPin)
 		return CKR_ARGUMENTS_BAD;
@@ -742,6 +747,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
 			break;
 	}
 
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH && rv == CKR_USER_ALREADY_LOGGED_IN) {
+		rv = 0;
+	}
+
+	pkcs11_mock_session_reauth = 1;
 	return rv;
 }
 
@@ -929,6 +939,19 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 
 			t = CKK_RSA;
 			memcpy(pTemplate[i].pValue, &t, sizeof(CK_KEY_TYPE));
+		}
+		else if (CKA_ALWAYS_AUTHENTICATE == pTemplate[i].type)
+		{
+			CK_BBOOL t;
+			if (pTemplate[i].ulValueLen != sizeof(CK_BBOOL))
+				return CKR_ARGUMENTS_BAD;
+
+			if (!(pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH)) {
+				t = CK_FALSE;
+			} else {
+				t = CK_TRUE;
+			}
+			memcpy(pTemplate[i].pValue, &t, sizeof(CK_BBOOL));
 		}
 		else if (CKA_ID == pTemplate[i].type)
 		{
@@ -1445,6 +1468,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 	if ((CK_FALSE == pkcs11_mock_session_opened) || (PKCS11_MOCK_CK_SESSION_ID != hSession))
 		return CKR_SESSION_HANDLE_INVALID;
 
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) {
+		if (!pkcs11_mock_session_reauth) {
+			return CKR_USER_NOT_LOGGED_IN;
+		}
+		pkcs11_mock_session_reauth = 0;
+	}
+
 	if (NULL == pMechanism)
 		return CKR_ARGUMENTS_BAD;
 
@@ -1821,6 +1851,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
 
 	if ((CK_FALSE == pkcs11_mock_session_opened) || (PKCS11_MOCK_CK_SESSION_ID != hSession))
 		return CKR_SESSION_HANDLE_INVALID;
+
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) {
+		if (!pkcs11_mock_session_reauth) {
+			return CKR_USER_NOT_LOGGED_IN;
+		}
+		pkcs11_mock_session_reauth = 0;
+	}
 
 	if (NULL == pMechanism)
 		return CKR_ARGUMENTS_BAD;
