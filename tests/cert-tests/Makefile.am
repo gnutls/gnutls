@@ -62,8 +62,12 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
-	provable-dh userid sha2-test sha2-dsa-test provable-dh-default provable-privkey-dsa2048 \
+	provable-dh userid sha2-test sha2-dsa-test provable-privkey-dsa2048 \
 	provable-privkey-rsa2048 provable-privkey-gen-default
+
+if WANT_TEST_SUITE
+dist_check_SCRIPTS += provable-dh-default
+endif
 
 if !ENABLE_FIPS140
 dist_check_SCRIPTS += pkcs12
