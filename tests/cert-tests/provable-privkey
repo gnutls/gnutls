@@ -30,21 +30,13 @@ if ! test -z "${VALGRIND}"; then
 fi
 
 #RSA keys
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/provable2048.pem"
-rc=$?
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/provable2048.pem" &
+PID1=$!
 
-if test "${rc}" != "0"; then
-	echo "Could not verify the 2048-bit key"
-	exit 1
-fi
 
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/provable3072.pem"
-rc=$?
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/provable3072.pem" &
+PID2=$!
 
-if test "${rc}" != "0"; then
-	echo "Could not verify the 3072-bit key"
-	exit 1
-fi
 
 if test "${FIPS140}" = 1;then
 SEED="30:EC:33:4F:97:DB:C0:BA:9C:86:52:A7:B5:D3:F7:B2:DB:BB:48:A4:84:2E:19:0D:21:0E:01:DA:BD:53:59:81:50:37:55:EE:96:A2:70:A5:98:E9:D9:1B:22:54:66:91:69:EB:DF:45:99:D9:F7:2A:CA"
@@ -55,10 +47,29 @@ DSAFILE=provable-dsa2048.pem
 fi
 
 #DSA keys
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/${DSAFILE}"
-rc=$?
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/data/${DSAFILE}" &
+PID3=$!
 
-if test "${rc}" != "0"; then
+wait $PID1
+rc1=$?
+
+wait $PID2
+rc2=$?
+
+wait $PID3
+rc3=$?
+
+if test "${rc1}" != "0"; then
+	echo "Could not verify the 2048-bit key"
+	exit 1
+fi
+
+if test "${rc2}" != "0"; then
+	echo "Could not verify the 3072-bit key"
+	exit 1
+fi
+
+if test "${rc3}" != "0"; then
 	echo "Could not verify the 2048-bit DSA key"
 	exit 1
 fi
