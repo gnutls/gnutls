@@ -49,7 +49,7 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 
 	cred_type = gnutls_auth_get_type(session);
 	if (cred_type == GNUTLS_CRD_PSK || cred_type == GNUTLS_CRD_SRP) {
-		const char *username;
+		const char *username = NULL;
 
 		if (cred_type == GNUTLS_CRD_PSK) {
 			psk_auth_info_t ai;
@@ -68,6 +68,9 @@ int _gnutls_check_id_for_change(gnutls_session_t session)
 			username = ai->username;
 #endif
 		}
+
+		if (username == NULL)
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		if (session->internals.saved_username_set) {
 			if (strcmp(session->internals.saved_username, username) != 0) {
