@@ -25,7 +25,7 @@
 #include <extensions.h>
 
 typedef struct {
-	uint8_t name[MAX_SERVER_NAME_SIZE];
+	uint8_t name[MAX_SERVER_NAME_SIZE+1];
 	unsigned name_length;
 	gnutls_server_name_type_t type;
 } server_name_st;

@@ -419,9 +419,12 @@ _gnutls_server_name_set_raw(gnutls_session_t session,
 		server_names = MAX_SERVER_NAME_EXTENSIONS;
 
 	priv->server_names[server_names - 1].type = type;
-	memcpy(priv->server_names[server_names - 1].name, name,
-	       name_length);
-	priv->server_names[server_names - 1].name[name_length] = 0;
+
+	if (name_length > 0) {
+		memcpy(priv->server_names[server_names - 1].name, name,
+		       name_length);
+		priv->server_names[server_names - 1].name[name_length] = 0;
+	}
 	priv->server_names[server_names - 1].name_length = name_length;
 
 	priv->server_names_size = server_names;
