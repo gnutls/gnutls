@@ -814,8 +814,6 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 	}
 	// copy existing node if applicable
 	if (to_copy != NULL) {
-		unsigned byte;
-
 		*_intersection = name_constraints_node_new(to_copy->type, to_copy->name.data, to_copy->name.size);
 		if (*_intersection == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
