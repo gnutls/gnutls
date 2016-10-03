@@ -29,20 +29,12 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-if test "${FIPS140}" = 1;then
-SEED="30EC334F97DBC0BA9C8652A7B5D3F7B2DBBB48A4842E190D210E01DABD535981503755EE96A270A598E9D91B2254669169EBDF4599D9F72ACA"
-DSAFILE=provable-dsa2048-fips.pem
-else
-SEED="5A0EA041779B0AB765BE2509C4DE90E5A0E7DAADAE6E49D35938F91333A8E1FE509DD2DFE1967CD0045428103497D00388C8CE36290FE9379F8003CBF8FDA4DA27"
-DSAFILE=provable-dsa2048.pem
-fi
-
-#DH parameters
-${VALGRIND} "${CERTTOOL}" --generate-dh-params --provable --bits 2048 --seed "$SEED" --outfile "$OUTFILE"
+#DH parameters - no seed
+${VALGRIND} "${CERTTOOL}" --generate-dh-params --provable --outfile "$OUTFILE"
 rc=$?
 
 if test "${rc}" != "0"; then
-	echo "test1: Could not generate a 2048-bit DSA key"
+	echo "test2: Could not generate DH parameters"
 	exit 1
 fi
 
@@ -50,15 +42,7 @@ ${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "$OUTFILE"
 rc=$?
 
 if test "${rc}" != "0"; then
-	echo "test1: Could not generate DH parameters"
-	exit 1
-fi
-
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "$OUTFILE" --seed "$SEED"
-rc=$?
-
-if test "${rc}" != "0"; then
-	echo "test1: Could not verify the generated parameters"
+	echo "test2: Could not verify the generated parameters"
 	exit 1
 fi
 
