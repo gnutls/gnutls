@@ -46,7 +46,34 @@
 
 #define DYN_NCRYPT
 
-#include <ncrypt.h>
+#ifdef __MINGW32__
+# include <_mingw.h>
+# ifdef __MINGW64_VERSION_MAJOR
+/* MinGW64 */
+#  include <ncrypt.h>
+# else
+/* mingw.org's MinGW */
+# include <security.h>
+# define BCRYPT_PAD_PKCS1 0x00000002
+# define BCRYPT_RSA_ALGORITHM L"RSA"
+# define BCRYPT_DSA_ALGORITHM L"DSA"
+# define BCRYPT_SHA1_ALGORITHM L"SHA1"
+# define BCRYPT_SHA256_ALGORITHM L"SHA256"
+# define BCRYPT_SHA384_ALGORITHM L"SHA384"
+# define BCRYPT_SHA512_ALGORITHM L"SHA512"
+# define BCRYPT_ECDSA_P256_ALGORITHM L"ECDSA_P256"
+# define BCRYPT_ECDSA_P384_ALGORITHM L"ECDSA_P384"
+# define BCRYPT_ECDSA_P521_ALGORITHM L"ECDSA_P521"
+typedef ULONG_PTR NCRYPT_HANDLE;
+typedef ULONG_PTR NCRYPT_PROV_HANDLE;
+typedef ULONG_PTR NCRYPT_KEY_HANDLE;
+typedef struct _BCRYPT_PKCS1_PADDING_INFO {
+	LPCWSTR pszAlgId;
+} BCRYPT_PKCS1_PADDING_INFO;
+# endif
+#else /* non-mingw */
+# include <ncrypt.h>
+#endif
 
 // MinGW headers may not have these defines
 #ifndef NCRYPT_SHA1_ALGORITHM
