@@ -153,5 +153,8 @@ static void auto_parse(void)
 
 void doit(void)
 {
+#ifndef HAVE_LIBIDN
+	exit(77);
+#endif
 	auto_parse();
 }

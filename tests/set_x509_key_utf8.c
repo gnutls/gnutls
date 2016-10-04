@@ -143,6 +143,10 @@ void doit(void)
 	int ret;
 	unsigned idx;
 
+#ifndef HAVE_LIBIDN
+	exit(77);
+#endif
+
 	/* this must be called once in the program
 	 */
 	global_init();
