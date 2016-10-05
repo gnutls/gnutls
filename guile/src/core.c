@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,7 @@
    License along with GnuTLS; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA  */
 
-/* Written by Ludovic Courtès <ludo@gnu.org>.  */
+/* Written by Ludovic CourtÃ¨s <ludo@gnu.org>.  */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -782,8 +782,18 @@ SCM_DEFINE (scm_gnutls_record_receive_x, "record-receive!", 2, 0, 0,
 #undef FUNC_NAME
 
 
-/* The session record port type.  */
+/* Whether we're using Guile < 2.2.  */
+#define USING_GUILE_BEFORE_2_2					\
+  (SCM_MAJOR_VERSION < 2					\
+   || (SCM_MAJOR_VERSION == 2 && SCM_MINOR_VERSION == 0))
+
+/* The session record port type.  Guile 2.1.4 introduced a brand new port API,
+   so we have a separate implementation for these newer versions.  */
+#if USING_GUILE_BEFORE_2_2
 static scm_t_bits session_record_port_type;
+#else
+static scm_t_port_type *session_record_port_type;
+#endif
 
 /* Return the session associated with PORT.  */
 #define SCM_GNUTLS_SESSION_RECORD_PORT_SESSION(_port) \
@@ -839,6 +849,8 @@ free_session_record_port (SCM port)
 
 #endif /* SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8 */
 
+
+#if USING_GUILE_BEFORE_2_2
 
 /* Data passed to `do_fill_port ()'.  */
 typedef struct
@@ -937,7 +949,7 @@ write_to_session_record_port (SCM port, const void *data, size_t size)
 #undef FUNC_NAME
 
 /* Return a new session port for SESSION.  */
-static inline SCM
+static SCM
 make_session_record_port (SCM session)
 {
   SCM port;
@@ -972,6 +984,67 @@ make_session_record_port (SCM session)
   return (port);
 }
 
+#else  /* !USING_GUILE_BEFORE_2_2 */
+
+static size_t
+read_from_session_record_port (SCM port, SCM dst, size_t start, size_t count)
+#define FUNC_NAME "read_from_session_record_port"
+{
+  SCM session;
+  gnutls_session_t c_session;
+  char *read_buf;
+  ssize_t result;
+
+  session = SCM_GNUTLS_SESSION_RECORD_PORT_SESSION (port);
+  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
+
+  read_buf = (char *) SCM_BYTEVECTOR_CONTENTS (dst) + start;
+
+  /* XXX: Leave guile mode when SCM_GNUTLS_SESSION_TRANSPORT_IS_FD is
+     true?  */
+  result = gnutls_record_recv (c_session, read_buf, count);
+  if (EXPECT_FALSE (result < 0))
+    /* FIXME: Silently swallowed! */
+    scm_gnutls_error (result, FUNC_NAME);
+
+  return result;
+}
+#undef FUNC_NAME
+
+static size_t
+write_to_session_record_port (SCM port, SCM src, size_t start, size_t count)
+#define FUNC_NAME "write_to_session_record_port"
+{
+  SCM session;
+  gnutls_session_t c_session;
+  char *data;
+  ssize_t result;
+
+  session = SCM_GNUTLS_SESSION_RECORD_PORT_SESSION (port);
+  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
+  data = (char *) SCM_BYTEVECTOR_CONTENTS (src) + start;
+
+  result = gnutls_record_send (c_session, data, count);
+
+  if (EXPECT_FALSE (result < 0))
+    scm_gnutls_error (result, FUNC_NAME);
+
+  return result;
+}
+#undef FUNC_NAME
+
+/* Return a new session port for SESSION.  */
+static SCM
+make_session_record_port (SCM session)
+{
+  return scm_c_make_port (session_record_port_type,
+			  SCM_OPN | SCM_RDNG | SCM_WRTNG | SCM_BUF0,
+			  SCM_UNPACK (session));
+}
+
+#endif	/* !USING_GUILE_BEFORE_2_2 */
+
+
 SCM_DEFINE (scm_gnutls_session_record_port, "session-record-port", 1, 0, 0,
             (SCM session),
             "Return a read-write port that may be used to communicate over "
@@ -999,12 +1072,16 @@ SCM_DEFINE (scm_gnutls_session_record_port, "session-record-port", 1, 0, 0,
 #undef FUNC_NAME
 
 /* Create the session port type.  */
-static inline void
+static void
 scm_init_gnutls_session_record_port_type (void)
 {
   session_record_port_type =
     scm_make_port_type ("gnutls-session-port",
+#if USING_GUILE_BEFORE_2_2
                         fill_session_record_port_input,
+#else
+                        read_from_session_record_port,
+#endif
                         write_to_session_record_port);
 
   /* Guile >= 1.9.3 doesn't need a custom mark procedure, and doesn't need a
