@@ -182,7 +182,7 @@ endif
 if HAVE_LD_OUTPUT_DEF
 libgnutls_la_LDFLAGS += -Wl,--output-def,libgnutls-$(DLL_VERSION).def
 libgnutls-$(DLL_VERSION).def: libgnutls.la
-defexecdir = $(bindir)
+defexecdir = $(libdir)
 defexec_DATA = libgnutls-$(DLL_VERSION).def
 DISTCLEANFILES += $(defexec_DATA)
 endif

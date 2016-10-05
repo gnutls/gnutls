@@ -39,7 +39,7 @@ endif
 
 SUBDIRS = includes
 
-defexecdir = $(bindir)
+defexecdir = $(libdir)
 defexec_DATA = 
 
 
