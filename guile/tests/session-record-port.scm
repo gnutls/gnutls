@@ -83,7 +83,7 @@
        (let ((server (make-session connection-end/server)))
          (set-session-priorities! server priorities)
 
-         (set-session-transport-port! server (cdr socket-pair))
+         (set-session-transport-fd! server (fileno (cdr socket-pair)))
          (let ((cred (make-anonymous-server-credentials))
                (dh-params (import-dh-params "dh-parameters.pem")))
            ;; Note: DH parameter generation can take some time.
