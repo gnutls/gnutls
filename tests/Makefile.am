@@ -86,7 +86,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu \
 	 mini-dtls-record-asym openpgp-callback key-import-export \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
-	 strict-der mini-extension mini-supplementaldata mini-dtls0-9 \
+	 strict-der tls-ext-register mini-supplementaldata mini-dtls0-9 \
 	 mini-record-retvals mini-server-name mini-etm x509-cert-callback \
 	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen \
 	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
@@ -113,7 +113,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5 \
 	 rsa-illegal-import set_x509_key_file_ocsp_multi set_key set_x509_key_file_ocsp_multi2 \
 	 set_key_utf8 set_x509_key_utf8 insecure_key handshake-large-packet \
-	 client_dsa_key server_ecdsa_key
+	 client_dsa_key server_ecdsa_key tls-session-ext-register
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
