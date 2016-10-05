@@ -125,7 +125,7 @@ static ssize_t client_pull(gnutls_transport_ptr_t ptr, void *data, size_t len)
 
 	ret = recv(fd, data, len, 0);
 	if (ret > SERVER_MTU) {
-		fail("client: packet size beyond server MTU, got %zd bytes, expect max. %d bytes\n", ret, SERVER_MTU);
+		fail("client: packet size beyond server MTU, got %d bytes, expect max. %d bytes\n", (int)ret, SERVER_MTU);
 		exit(1);
 	}
 

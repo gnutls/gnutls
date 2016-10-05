@@ -213,7 +213,7 @@ void doit(void)
 	if (result != GNUTLS_E_SHORT_MEMORY_BUFFER)
 		fail("get_issuer_unique_id short error %d\n", result);
 	if (buf_size != 16)
-		fail("get_issuer_unique_id buf size %zd\n", buf_size);
+		fail("get_issuer_unique_id buf size %d\n", (int)buf_size);
 
 	buf_size = 16;
 	result =
@@ -229,7 +229,7 @@ void doit(void)
 	if (result != GNUTLS_E_SHORT_MEMORY_BUFFER)
 		fail("get_subject_unique_id short error %d\n", result);
 	if (buf_size != 16)
-		fail("get_subject_unique_id buf size %zd\n", buf_size);
+		fail("get_subject_unique_id buf size %d\n", (int)buf_size);
 
 	buf_size = 16;
 	result =
