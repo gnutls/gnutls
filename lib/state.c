@@ -492,6 +492,8 @@ void gnutls_deinit(gnutls_session_t session)
 
 	gnutls_free(session->internals.rexts);
 
+	gnutls_free(session->internals.rsup);
+
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
 

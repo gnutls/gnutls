@@ -1106,6 +1106,7 @@ GNUTLS_3_4
 	gnutls_oid_to_mac;
 	gnutls_certificate_set_ocsp_status_request_function2;
 	gnutls_session_ext_register;
+	gnutls_session_supplemental_register;
  local:
 	*;
 };

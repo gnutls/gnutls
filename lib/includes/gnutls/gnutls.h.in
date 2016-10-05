@@ -2554,6 +2554,12 @@ int gnutls_supplemental_register(const char *name,
 				gnutls_supp_recv_func supp_recv_func,
 				gnutls_supp_send_func supp_send_func);
 
+int gnutls_session_supplemental_register(gnutls_session_t session, const char *name,
+				gnutls_supplemental_data_format_type_t type, 
+				gnutls_supp_recv_func supp_recv_func,
+				gnutls_supp_send_func supp_send_func,
+				unsigned int flags);
+
 void gnutls_supplemental_recv(gnutls_session_t session, unsigned do_recv_supplemental);
 
 void gnutls_supplemental_send(gnutls_session_t session, unsigned do_send_supplemental);

@@ -1037,6 +1037,9 @@ typedef struct {
 	/* Needed for TCP Fast Open (TFO), set by gnutls_transport_set_fastopen() */
 	tfo_st tfo;
 
+	struct gnutls_supplemental_entry_st *rsup;
+	unsigned rsup_size;
+
 	struct extension_entry_st *rexts;
 	unsigned rexts_size;
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
