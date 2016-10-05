@@ -45,10 +45,12 @@
 
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #elif HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
 #endif
+
+/* From gnulib for inet_pton() */
+#include <arpa/inet.h>
 
 /* Gnulib portability files. */
 #include <getpass.h>
