@@ -86,6 +86,8 @@ AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
+AC_CHECK_FUNCS([__register_atfork],,)
+
 dnl Check for p11-kit
 AC_ARG_WITH(p11-kit,
 	AS_HELP_STRING([--without-p11-kit],
