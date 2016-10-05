@@ -128,7 +128,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 	unsigned i;
 	int len = 0;
 	char *dst = NULL;
-	static unsigned flags = 0;
+	static unsigned flags = MB_PRECOMPOSED;
 	static int checked = 0;
 	uint8_t tmp;
 
@@ -138,7 +138,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 		    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
 				"\xff\xff\xff\xff\xff\xff\x00", -1, NULL, 0);
 		if (ret > 0)
-			flags = MB_ERR_INVALID_CHARS;
+			flags |= MB_ERR_INVALID_CHARS;
 		checked = 1;
 	}
 
