@@ -64,6 +64,8 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Used when creating the Windows libgnutls-XX.def files.
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
+  DLL_SSL_VERSION=`expr ${LT_SSL_CURRENT} - ${LT_SSL_AGE}`
+  AC_SUBST(DLL_SSL_VERSION)
 
   PKG_CHECK_MODULES(NETTLE, [nettle >= 3.1], [cryptolib="nettle"], [
 AC_MSG_ERROR([[

@@ -68,9 +68,9 @@ libgnutls_openssl_la_LIBADD += $(LIBSOCKET)
 
 if HAVE_LD_OUTPUT_DEF
 libgnutls_openssl_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-openssl-$(DLL_VERSION).def
-libgnutls-openssl-$(DLL_VERSION).def: libgnutls-openssl.la
-defexec_DATA += libgnutls-openssl-$(DLL_VERSION).def
+	-Wl,--output-def,libgnutls-openssl-$(DLL_SSL_VERSION).def
+libgnutls-openssl-$(DLL_SSL_VERSION).def: libgnutls-openssl.la
+defexec_DATA += libgnutls-openssl-$(DLL_SSL_VERSION).def
 endif
 endif
 
