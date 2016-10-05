@@ -116,9 +116,9 @@ files-update:
 	make -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
 	make -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
 	make -C . symbol-check || mv symbols.last.tmp symbols.last
-	echo "******************************************************************************************"
-	echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
-	echo "******************************************************************************************"
+	@echo "******************************************************************************************"
+	@echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
+	@echo "******************************************************************************************"
 
 dist-hook: symbol-check abi-check
 	make -C doc/ compare-makefile
