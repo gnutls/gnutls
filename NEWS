@@ -36,6 +36,8 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function2: Added
+gnutls_session_ext_register: Added
+gnutls_session_supplemental_register: Added
 GNUTLS_E_PK_INVALID_PUBKEY: Added
 GNUTLS_E_PK_INVALID_PRIVKEY: Added
 
