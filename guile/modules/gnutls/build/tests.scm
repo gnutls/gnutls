@@ -70,7 +70,8 @@ process exits upon failure."
 
   (else                                           ;2.0 and 2.2
    (use-modules (rnrs io ports)
-                (rnrs bytevectors))
+                (rnrs bytevectors)
+                (ice-9 match))
 
    (define-syntax-rule (define-replacement (name args ...) body ...)
      ;; Define a compatibility replacement for NAME, if needed.
@@ -84,8 +85,10 @@ process exits upon failure."
    ;; and absent in 2.2.
 
    (define-replacement (uniform-vector-read! buf port)
-     (get-bytevector-n! port buf
-                        0 (bytevector-length buf)))
+     (match (get-bytevector-n! port buf
+                               0 (bytevector-length buf))
+       ((? eof-object?) 0)
+       ((? integer? n)  n)))
 
    (define-replacement (uniform-vector-write buf port)
      (put-bytevector port buf))))
