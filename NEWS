@@ -18,6 +18,12 @@ See the end for copying conditions.
    to use DSA-SHA1 due to his old DSA certificate, without requiring him
    to enable DSA-SHA1 (and thus make it acceptable for the server's certificate).
 
+** guile: Backported all improvements from 3.5.x branch.
+
+** guile: Update code to the I/O port API of Guile >= 2.1.4
+   This makes sure the GnuTLS bindings will work with the forthcoming 2.2
+   stable series of Guile, of which 2.1 is a preview.
+
 ** API and ABI modifications:
 No changes since last version.
 
