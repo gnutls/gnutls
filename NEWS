@@ -34,6 +34,10 @@ See the end for copying conditions.
 ** libgnutls: Added SHA*, AES-GCM, AES-CCM and AES-CBC optimized implementations
    for the aarch64 architecture. Uses Andy Polyakov's assembly code.
 
+** guile: Update code to the I/O port API of Guile >= 2.1.4
+   This makes sure the GnuTLS bindings will work with the forthcoming 2.2
+   stable series of Guile, of which 2.1 is a preview.
+
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function2: Added
 gnutls_session_ext_register: Added
