@@ -67,21 +67,20 @@ static void print_dn(gnutls_buffer_st * str, const char *prefix,
 static void print_raw(gnutls_buffer_st * str, const char *prefix,
 		      const gnutls_datum_t * raw)
 {
-	char data[512];
-	size_t data_size;
+	gnutls_datum_t result;
 	int ret;
 
 	if (raw->data == NULL || raw->size == 0)
 		return;
 
-	data_size = sizeof(data);
-	ret = gnutls_hex_encode(raw, data, &data_size);
+	ret = gnutls_hex_encode2(raw, &result);
 	if (ret < 0) {
 		addf(str, "%s: [error]\n", prefix);
 		return;
 	}
 
-	addf(str, "%s: %s\n", prefix, data);
+	addf(str, "%s: %s\n", prefix, result.data);
+	gnutls_free(result.data);
 }
 
 static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
