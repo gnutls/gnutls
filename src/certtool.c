@@ -54,7 +54,7 @@
 static FILE *stdlog = NULL;
 
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
-void pkcs7_info(common_info_st *);
+void pkcs7_info(common_info_st *cinfo, unsigned display_data);
 void pkcs7_sign(common_info_st *, unsigned embed);
 void pkcs7_generate(common_info_st *);
 void pkcs8_info(void);
@@ -1298,7 +1298,7 @@ static void cmd_parser(int argc, char **argv)
 	else if (HAVE_OPT(CRL_INFO))
 		crl_info();
 	else if (HAVE_OPT(P7_INFO))
-		pkcs7_info(&cinfo);
+		pkcs7_info(&cinfo, ENABLED_OPT(P7_SHOW_DATA));
 	else if (HAVE_OPT(P7_GENERATE))
 		pkcs7_generate(&cinfo);
 	else if (HAVE_OPT(P7_SIGN))
@@ -3716,16 +3716,16 @@ void pkcs8_info(void)
 	free(data.data);
 }
 
-void pkcs7_info(common_info_st *cinfo)
+void pkcs7_info(common_info_st *cinfo, unsigned display_data)
 {
 	gnutls_pkcs7_t pkcs7;
-	int result;
+	int ret;
 	size_t size;
 	gnutls_datum_t data, str;
 
-	result = gnutls_pkcs7_init(&pkcs7);
-	if (result < 0) {
-		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(result));
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -3737,23 +3737,42 @@ void pkcs7_info(common_info_st *cinfo)
 		exit(1);
 	}
 
-	result = gnutls_pkcs7_import(pkcs7, &data, incert_format);
+	ret = gnutls_pkcs7_import(pkcs7, &data, incert_format);
 	free(data.data);
-	if (result < 0) {
+	if (ret < 0) {
 		fprintf(stderr, "import error: %s\n",
-			gnutls_strerror(result));
+			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	result = gnutls_pkcs7_print(pkcs7, GNUTLS_CRT_PRINT_FULL, &str);
-	if (result < 0) {
-		fprintf(stderr, "printing error: %s\n",
-			gnutls_strerror(result));
-		exit(1);
+	if (display_data) {
+		gnutls_datum_t tmp;
+
+		ret = gnutls_pkcs7_get_embedded_data(pkcs7, 0, &tmp);
+		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			if (ret < 0) {
+				fprintf(stderr, "error getting embedded data: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+
+			fwrite(tmp.data, 1, tmp.size, outfile);
+			gnutls_free(tmp.data);
+		} else {
+			fprintf(stderr, "no embedded data are available\n");
+			exit(1);
+		}
+	} else {
+		ret = gnutls_pkcs7_print(pkcs7, GNUTLS_CRT_PRINT_FULL, &str);
+		if (ret < 0) {
+			fprintf(stderr, "printing error: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "%s", str.data);
+		gnutls_free(str.data);
 	}
 
-	fprintf(outfile, "%s", str.data);
-	gnutls_free(str.data);
 
 	gnutls_pkcs7_deinit(pkcs7);
 }
