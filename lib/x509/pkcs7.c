@@ -50,23 +50,22 @@ static const uint8_t one = 1;
  * data are copied (they are locally allocated) there.
  */
 static int
-_decode_pkcs7_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
+_decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 {
-	char oid[MAX_OID_SIZE];
 	ASN1_TYPE c2;
-	gnutls_datum_t tmp = {NULL, 0};
 	int len, result;
+	gnutls_datum_t tmp = {NULL, 0};
 
-	len = sizeof(oid) - 1;
-	result = asn1_read_value(pkcs7, "contentType", oid, &len);
+	len = MAX_OID_SIZE - 1;
+	result = asn1_read_value(pkcs7->pkcs7, "contentType", pkcs7->encap_data_oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	if (strcmp(oid, SIGNED_DATA_OID) != 0) {
+	if (strcmp(pkcs7->encap_data_oid, SIGNED_DATA_OID) != 0) {
 		gnutls_assert();
-		_gnutls_debug_log("Unknown PKCS7 Content OID '%s'\n", oid);
+		_gnutls_debug_log("Unknown PKCS7 Content OID '%s'\n", pkcs7->encap_data_oid);
 		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
 	}
 
@@ -80,15 +79,11 @@ _decode_pkcs7_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 	/* the Signed-data has been created, so
 	 * decode them.
 	 */
-	result = _gnutls_x509_read_value(pkcs7, "content", &tmp);
+	result = _gnutls_x509_read_value(pkcs7->pkcs7, "content", &tmp);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	/* tmp, tmp_size hold the data and the size of the CertificateSet structure
-	 * actually the ANY stuff.
-	 */
 
 	/* Step 1. In case of a signed structure extract certificate set.
 	 */
@@ -101,30 +96,65 @@ _decode_pkcs7_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 	}
 
 	/* read the encapsulated content */
-	len = sizeof(oid) - 1;
-	result = asn1_read_value(c2, "encapContentInfo.eContentType", oid, &len);
+	len = MAX_OID_SIZE - 1;
+	result =
+	    asn1_read_value(c2, "encapContentInfo.eContentType", pkcs7->encap_data_oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if (strcmp(oid, PLAIN_DATA_OID) != 0 && strcmp(oid, DIGESTED_DATA_OID) != 0) {
-		gnutls_assert();
-		_gnutls_debug_log("Unknown or unexpected PKCS7 Encapsulated Content OID '%s'\n", oid);
-		result = GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
-		goto cleanup;
+	if (strcmp(pkcs7->encap_data_oid, PLAIN_DATA_OID) != 0
+	    && strcmp(pkcs7->encap_data_oid, DIGESTED_DATA_OID) != 0) {
+		_gnutls_debug_log
+		    ("Unknown PKCS#7 Encapsulated Content OID '%s'; treating as raw data\n",
+		     pkcs7->encap_data_oid);
 	}
 
-	*sdata = c2;
+	/* Try reading as octet string according to rfc5652. If that fails, attempt
+	 * a raw read according to rfc2315 */
+	result = _gnutls_x509_read_string(c2, "encapContentInfo.eContent", &pkcs7->der_signed_data, ASN1_ETYPE_OCTET_STRING, 0);
+	if (result < 0) {
+		result = _gnutls_x509_read_value(c2, "encapContentInfo.eContent", &pkcs7->der_signed_data);
+		if (result < 0) {
+			pkcs7->der_signed_data.data = NULL;
+			pkcs7->der_signed_data.size = 0;
+		} else {
+			int tag_len, len_len;
+			unsigned char cls;
+			unsigned long tag;
 
+			/* we skip the embedded element's tag and length - uncharted territorry - used by MICROSOFT_CERT_TRUST_LIST */
+			result = asn1_get_tag_der(pkcs7->der_signed_data.data, pkcs7->der_signed_data.size, &cls, &tag_len, &tag);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				result = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+
+			result = asn1_get_length_der(pkcs7->der_signed_data.data+tag_len, pkcs7->der_signed_data.size-tag_len, &len_len);
+			if (result < 0) {
+				gnutls_assert();
+				result = GNUTLS_E_ASN1_DER_ERROR;
+				goto cleanup;
+			}
+
+			tag_len += len_len;
+			memmove(pkcs7->der_signed_data.data, &pkcs7->der_signed_data.data[tag_len], pkcs7->der_signed_data.size-tag_len);
+			pkcs7->der_signed_data.size-=tag_len;
+		}
+	}
+
+	pkcs7->signed_data = c2;
 	gnutls_free(tmp.data);
+
 	return 0;
 
-      cleanup:
+ cleanup:
+	gnutls_free(tmp.data);
 	if (c2)
 		asn1_delete_structure(&c2);
-	gnutls_free(tmp.data);
 	return result;
 }
 
@@ -189,6 +219,8 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7_t pkcs7)
 
 	if (pkcs7->signed_data)
 		asn1_delete_structure(&pkcs7->signed_data);
+
+	_gnutls_free_datum(&pkcs7->der_signed_data);
 
 	gnutls_free(pkcs7);
 }
@@ -255,7 +287,7 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 
 	/* Decode the signed data.
 	 */
-	result = _decode_pkcs7_signed_data(pkcs7->pkcs7, &pkcs7->signed_data);
+	result = _decode_pkcs7_signed_data(pkcs7);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -720,21 +752,10 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 	hash_size = gnutls_hash_get_len(hash);
 
 	if (data == NULL || data->data == NULL) {
-		ret = _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", &tmp);
-		if (ret < 0) {
-			if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-				ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-			gnutls_assert();
-			return ret;
-		}
-		data = &tmp;
+		data = &pkcs7->der_signed_data;
 	}
 
 	ret = gnutls_hash_fast(hash, data->data, data->size, hash_output);
-
-	gnutls_free(tmp.data);
-	tmp.data = NULL;
-
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -760,6 +781,8 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 
 			if (tmp2.size == hash_size && memcmp(hash_output, tmp2.data, tmp2.size) == 0) {
 				msg_digest_ok = 1;
+			} else {
+				gnutls_assert();
 			}
 		} else if (strcmp(oid, ATTR_CONTENT_TYPE) == 0) {
 			if (num_cont_types > 0) {
@@ -783,10 +806,11 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 				goto cleanup;
 			}
 		}
-	 	gnutls_free(tmp.data);
-	 	tmp.data = NULL;
-	 	gnutls_free(tmp2.data);
-	 	tmp2.data = NULL;
+
+		gnutls_free(tmp.data);
+		tmp.data = NULL;
+		gnutls_free(tmp2.data);
+		tmp2.data = NULL;
 	}
 
 	if (msg_digest_ok)
@@ -829,12 +853,7 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
 
 	/* We have no signedAttrs. Use the provided data, or the encapsulated */
 	if (data == NULL || data->data == NULL) {
-		ret = _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", sigdata);
-		if (ret < 0) {
-			gnutls_assert();
-			return gnutls_assert_val(ret);
-		}
-		return 0;
+		return _gnutls_set_datum(sigdata, pkcs7->der_signed_data.data, pkcs7->der_signed_data.size);
 	}
 
 	return _gnutls_set_datum(sigdata, data->data, data->size);
@@ -843,7 +862,7 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
 /**
  * gnutls_pkcs7_get_embedded_data:
  * @pkcs7: should contain a gnutls_pkcs7_t type
- * @idx: the index of the signature info to get the data from
+ * @flags: must be zero
  * @data: will hold the embedded data in the provided structure
  *
  * This function will return the data embedded in the signature of
@@ -860,44 +879,38 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
  * Since: 3.4.8
  **/
 int
-gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_datum_t *data)
+gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned flags,
+			       gnutls_datum_t *data)
 {
-	int count, ret;
-	gnutls_datum_t tmpdata = {NULL, 0};
-	gnutls_pkcs7_signature_info_st info;
-	char root[128];
-
-	memset(&info, 0, sizeof(info));
-
 	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	ret = asn1_number_of_elements(pkcs7->signed_data, "signerInfos", &count);
-	if (ret != ASN1_SUCCESS || idx+1 > (unsigned)count) {
-		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
+	if (pkcs7->der_signed_data.size == 0)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	ret = gnutls_pkcs7_get_signature_info(pkcs7, idx, &info);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	return _gnutls_set_datum(data, pkcs7->der_signed_data.data, pkcs7->der_signed_data.size);
+}
 
-	snprintf(root, sizeof(root), "signerInfos.?%u", idx + 1);
-	ret = figure_pkcs7_sigdata(pkcs7, root, NULL, info.algo, data);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+/**
+ * gnutls_pkcs7_get_embedded_data_oid:
+ * @pkcs7: should contain a gnutls_pkcs7_t type
+ *
+ * This function will return the OID of the data embedded in the signature of
+ * the PKCS7 structure. If no data are available then %NULL will be
+ * returned. The returned value will be valid during the lifetime
+ * of the @pkcs7 structure.
+ *
+ * Returns: On success, a pointer to an OID string, %NULL on error.
+ *
+ * Since: 3.5.5
+ **/
+const char *
+gnutls_pkcs7_get_embedded_data_oid(gnutls_pkcs7_t pkcs7)
+{
+	if (pkcs7 == NULL || pkcs7->encap_data_oid[0] == 0)
+		return NULL;
 
-	ret = 0;
-
- cleanup:
-	gnutls_free(tmpdata.data);
-	gnutls_pkcs7_signature_info_deinit(&info);
-
-	return ret;
+	return pkcs7->encap_data_oid;
 }
 
 /**
@@ -928,10 +941,9 @@ gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_datum_
  * Since: 3.4.2
  **/
 int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
-			gnutls_x509_crt_t signer,
-			unsigned idx,
-			const gnutls_datum_t *data,
-			unsigned flags)
+			       gnutls_x509_crt_t signer,
+			       unsigned idx,
+			       const gnutls_datum_t *data, unsigned flags)
 {
 	int count, ret;
 	gnutls_datum_t tmpdata = {NULL, 0};
@@ -1132,11 +1144,10 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
  **/
 int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 			gnutls_x509_trust_list_t tl,
-			gnutls_typed_vdata_st * vdata,
+			gnutls_typed_vdata_st *vdata,
 			unsigned int vdata_size,
 			unsigned idx,
-			const gnutls_datum_t *data,
-			unsigned flags)
+			const gnutls_datum_t *data, unsigned flags)
 {
 	int count, ret;
 	gnutls_datum_t tmpdata = {NULL, 0};
@@ -2083,10 +2094,12 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	if (flags & GNUTLS_PKCS7_EMBED_DATA && data->data) { /* embed data */
-		result = asn1_write_value(pkcs7->signed_data, "encapContentInfo.eContent", data->data, data->size);
-		if (result != ASN1_SUCCESS) {
-			ret = _gnutls_asn2err(result);
+	if (flags & GNUTLS_PKCS7_EMBED_DATA && data->data) {	/* embed data */
+		ret =
+		    _gnutls_x509_write_string(pkcs7->signed_data,
+				     "encapContentInfo.eContent", data,
+				     ASN1_ETYPE_OCTET_STRING);
+		if (ret < 0) {
 			goto cleanup;
 		}
 	}

@@ -247,7 +247,7 @@ const asn1_static_node pkix_asn1_tab[] = {
   { NULL, 2, "AlgorithmIdentifier"},
   { "pkcs-7-EncapsulatedContentInfo", 1610612741, NULL },
   { "eContentType", 1073741826, "pkcs-7-ContentType"},
-  { "eContent", 536895495, NULL },
+  { "eContent", 536895501, NULL },
   { NULL, 2056, "0"},
   { "pkcs-7-CertificateRevocationLists", 1610612751, NULL },
   { NULL, 13, NULL },

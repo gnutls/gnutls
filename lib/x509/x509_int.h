@@ -97,6 +97,10 @@ typedef struct gnutls_pkcs7_attrs_st {
 
 typedef struct gnutls_pkcs7_int {
 	ASN1_TYPE pkcs7;
+
+	char encap_data_oid[MAX_OID_SIZE];
+
+	gnutls_datum_t der_signed_data;
 	ASN1_TYPE signed_data;
 	unsigned expanded;
 } gnutls_pkcs7_int;

@@ -1062,6 +1062,7 @@ GNUTLS_3_4
 	_gnutls_global_init_skip;
 	gnutls_certificate_set_flags;
 	gnutls_pkcs7_get_embedded_data;
+	gnutls_pkcs7_get_embedded_data_oid;
  local:
 	*;
 };
