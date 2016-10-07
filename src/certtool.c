@@ -1949,11 +1949,15 @@ void generate_request(common_info_st * cinfo)
 		exit(1);
 	}
 
-
 	/* Load the private key.
 	 */
 	pkey = load_private_key(0, cinfo);
 	if (!pkey) {
+		if (HAVE_OPT(LOAD_PUBKEY)) {
+			fprintf(stderr, "--load-pubkey was specified without corresponding --load-privkey\n");
+			exit(1);
+		}
+
 		ret = gnutls_privkey_init(&pkey);
 		if (ret < 0) {
 			fprintf(stderr, "privkey_init: %s\n",
