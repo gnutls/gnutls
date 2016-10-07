@@ -30,7 +30,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
 
-EXTRA_DIST = crl/long.crl crl/long.pem
+EXTRA_DIST = crl/long.crl crl/long.pem data/test1.cat data/test2.cat \
+	data/test1.cat.data data/test2.cat.data \
+	data/test1.cat.out data/test2.cat.out data/ca.pem
 
 check_PROGRAMS = rng
 AM_LDFLAGS = -no-install
@@ -87,7 +89,7 @@ EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common
 	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm
 nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
 	testpkcs11.sh testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
-	testrandom.sh
+	testrandom.sh pkcs7-cat
 
 if ENABLE_PKCS11
 nodist_check_SCRIPTS += testpkcs11.sh crl-test
