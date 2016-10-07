@@ -27,6 +27,7 @@
 #include <num.h>
 #include "errors.h"
 #include <extras/randomart.h>
+#include <pkcs7_int.h>
 #include <gnutls-idna.h>
 
 #define addf _gnutls_buffer_append_printf
@@ -177,8 +178,19 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 	int count, ret, i;
 	gnutls_pkcs7_signature_info_st info;
 	gnutls_buffer_st str;
+	const char *oid;
 
 	_gnutls_buffer_init(&str);
+
+	/* For backwards compatibility with structures using the default OID,
+	 * we don't print the eContent Type explicitly */
+	oid = gnutls_pkcs7_get_embedded_data_oid(pkcs7);
+	if (oid) {
+		if (strcmp(oid, DATA_OID) != 0
+		    && strcmp(oid, DIGESTED_DATA_OID) != 0) {
+			addf(&str, "eContent Type: %s\n", oid);
+		}
+	}
 
 	for (i = 0;; i++) {
 		if (i == 0)

@@ -31,6 +31,9 @@
 #define DATA_OID "1.2.840.113549.1.7.1"
 #define ENC_DATA_OID "1.2.840.113549.1.7.6"
 
+#define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
+#define DIGESTED_DATA_OID "1.2.840.113549.1.7.5"
+
 
 typedef enum schema_id {
 	PBES2_GENERIC=1,	/* when the algorithm is unknown, temporal use when reading only */

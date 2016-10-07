@@ -32,12 +32,9 @@
 #include "errors.h"
 #include <common.h>
 #include <x509_b64.h>
+#include <pkcs7_int.h>
 #include <gnutls/abstract.h>
 #include <gnutls/pkcs7.h>
-
-#define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
-#define PLAIN_DATA_OID "1.2.840.113549.1.7.1"
-#define DIGESTED_DATA_OID "1.2.840.113549.1.7.5"
 
 #define ATTR_MESSAGE_DIGEST "1.2.840.113549.1.9.4"
 #define ATTR_SIGNING_TIME "1.2.840.113549.1.9.5"
@@ -104,7 +101,7 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 		goto cleanup;
 	}
 
-	if (strcmp(pkcs7->encap_data_oid, PLAIN_DATA_OID) != 0
+	if (strcmp(pkcs7->encap_data_oid, DATA_OID) != 0
 	    && strcmp(pkcs7->encap_data_oid, DIGESTED_DATA_OID) != 0) {
 		_gnutls_debug_log
 		    ("Unknown PKCS#7 Encapsulated Content OID '%s'; treating as raw data\n",
@@ -2155,7 +2152,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 
 	result =
 	    asn1_write_value(pkcs7->signed_data,
-			     "encapContentInfo.eContentType", PLAIN_DATA_OID,
+			     "encapContentInfo.eContentType", DATA_OID,
 			     0);
 	if (result != ASN1_SUCCESS) {
 		ret = _gnutls_asn2err(result);
