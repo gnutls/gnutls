@@ -325,7 +325,7 @@ flag = {
     disable   = "no";
     disabled;
     descrip   = "Will show the embedded data in the PKCS #7 structure";
-    doc       = "This option can be combined with --p7-verify and will display the embedded signed data in the PKCS #7 structure.";
+    doc       = "This option can be combined with --p7-verify or --p7-info and will display the embedded signed data in the PKCS #7 structure.";
 };
 
 flag = {
