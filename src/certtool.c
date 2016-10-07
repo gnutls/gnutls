@@ -2820,22 +2820,21 @@ static void print_dn(const char *prefix, const gnutls_datum_t *raw)
 
 static void print_raw(const char *prefix, const gnutls_datum_t *raw)
 {
-	char data[512];
-	size_t data_size;
 	int ret;
+	gnutls_datum_t tmp;
 
 	if (raw->data == NULL || raw->size == 0)
 		return;
 
-	data_size = sizeof(data);
-	ret = gnutls_hex_encode(raw, data, &data_size);
+	ret = gnutls_hex_encode2(raw, &tmp);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_hex_encode: %s\n",
+		fprintf(stderr, "gnutls_hex_encode2: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	fprintf(outfile, "%s: %s\n", prefix, data);
+	fprintf(outfile, "%s: %s\n", prefix, tmp.data);
+	gnutls_free(tmp.data);
 }
 
 static void print_pkcs7_sig_info(gnutls_pkcs7_signature_info_st *info, common_info_st *cinfo)
