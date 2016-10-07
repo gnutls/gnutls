@@ -349,9 +349,12 @@ pkcs-7-SignedData ::= SEQUENCE {
 
 pkcs-7-DigestAlgorithmIdentifiers ::= SET OF AlgorithmIdentifier
 
+-- rfc5652: eContent [0] EXPLICIT OCTET STRING OPTIONAL
+-- rfc2315: content [0] EXPLICIT ANY DEFINED BY contentType OPTIONAL
+
 pkcs-7-EncapsulatedContentInfo ::= SEQUENCE {
   eContentType pkcs-7-ContentType,
-  eContent [0] EXPLICIT OCTET STRING OPTIONAL }
+  eContent [0] EXPLICIT ANY OPTIONAL }
 
 -- We don't use CertificateList here since we only want
 -- to read the raw data.

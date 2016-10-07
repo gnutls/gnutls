@@ -57,6 +57,9 @@ int gnutls_pkcs7_export2(gnutls_pkcs7_t pkcs7,
 int gnutls_pkcs7_get_signature_count(gnutls_pkcs7_t pkcs7);
 int gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_datum_t *data);
 
+const char *
+gnutls_pkcs7_get_embedded_data_oid(gnutls_pkcs7_t pkcs7);
+
 int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7);
 int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7, unsigned indx,
 			     void *certificate, size_t * certificate_size);
