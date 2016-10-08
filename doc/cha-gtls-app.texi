@@ -111,6 +111,8 @@ See @ref{Error codes}, for a description of the available error codes.
 
 @node Common types
 @subsection Common types
+@cindex gnutls_datum_t
+@cindex giovec_t
 
 All strings that are to provided as input to @acronym{GnuTLS} functions
 should be in UTF-8 unless otherwise specified. Output strings are also
