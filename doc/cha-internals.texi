@@ -124,8 +124,8 @@ the process to do so is not difficult.  Here are the steps you need to
 follow if you wish to do this yourself.  For sake of discussion, let's
 consider adding support for the hypothetical TLS extension
 @code{foobar}. The following section is about adding an extension to GnuTLS,
-for custom application extensions you should check the exported function
-@funcref{gnutls_ext_register}.
+for custom application extensions you should check the exported functions
+@funcref{gnutls_session_ext_register} or @funcref{gnutls_ext_register}.
 
 @subsubheading Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
@@ -425,8 +425,8 @@ _foobar_supp_send_params(gnutls_session_t session, gnutls_buffer_t buf)
 @}
 @end example
 
-Afterwards, register the new supplemental data using @funcref{gnutls_supplemental_register},
-at some point in your program.
+Afterwards, register the new supplemental data using @funcref{gnutls_session_supplemental_register},
+or @funcref{gnutls_supplemental_register} at some point in your program.
 
 @node Cryptographic Backend
 @section Cryptographic Backend
