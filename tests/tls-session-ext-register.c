@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
- * Author: Thierry Quemerais
+ * Author: Thierry Quemerais, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -61,11 +61,13 @@ static void tls_log_func(int level, const char *str)
 }
 
 #define TLSEXT_TYPE_SAMPLE 0xF1
+#define TLSEXT_TYPE_IGN 0xF2
 
 static int TLSEXT_TYPE_client_sent		= 0;
 static int TLSEXT_TYPE_client_received		= 0;
 static int TLSEXT_TYPE_server_sent		= 0;
 static int TLSEXT_TYPE_server_received		= 0;
+static int ign_extension_called = 0;
 
 static const unsigned char ext_data[] =
 {	
@@ -93,6 +95,17 @@ static int ext_send_client_params(gnutls_session_t session, gnutls_buffer_t extd
 	TLSEXT_TYPE_client_sent = 1;
 	gnutls_buffer_append_data(extdata, ext_data, sizeof(ext_data));
 	return sizeof(ext_data);
+}
+
+static int ext_recv_client_ign_params(gnutls_session_t session, const unsigned char *buf, size_t buflen)
+{
+	return 0;
+}
+
+static int ext_send_client_ign_params(gnutls_session_t session, gnutls_buffer_t extdata)
+{
+	ign_extension_called = 1;
+	return 0;
 }
 
 static int ext_recv_server_params(gnutls_session_t session, const unsigned char *buf, size_t buflen)
@@ -147,7 +160,13 @@ static void client(int sd)
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	gnutls_session_ext_register(session, "ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
+	ret = gnutls_session_ext_register(session, "ext_ign", TLSEXT_TYPE_IGN, GNUTLS_EXT_TLS, ext_recv_client_ign_params, ext_send_client_ign_params, NULL, NULL, NULL, 0);
+	if (ret < 0)
+		fail("client: register extension\n");
+
+	ret = gnutls_session_ext_register(session, "ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
+	if (ret < 0)
+		fail("client: register extension\n");
 
 	/* Perform the TLS handshake
 	 */
@@ -172,6 +191,10 @@ static void client(int sd)
 
 	if (p != session) {
 		fail("client: gnutls_ext_get_data failed\n");
+	}
+
+	if (ign_extension_called == 0) {
+		fail("registered ign extension was not called\n");
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
