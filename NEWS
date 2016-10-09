@@ -5,10 +5,6 @@ See the end for copying conditions.
 
 * Version 3.5.5 (unreleased)
 
-** libgnutls: Ensure proper cleanups on gnutls_certificate_set_*key()
-   failures due to key mismatch. This prevents leaks or double freeing
-   on such failures.
-
 ** libgnutls: enhanced gnutls_certificate_set_ocsp_status_request_file()
    to allow importing multiple OCSP request files, one for each chain
    provided.
@@ -18,9 +14,12 @@ See the end for copying conditions.
    gnutls_certificate_set_ocsp_status_request_file(), or with
    gnutls_certificate_get_crt_raw() and friends.
 
-** libgnutls: Reverted AESNI code on x86 to earlier version as the
-   latest version was creating position depending code. Added checks
-   in the CI to detect position depending code early.
+** libgnutls: Added SHA*, AES-GCM, AES-CCM and AES-CBC optimized implementations
+   for the aarch64 architecture. Uses Andy Polyakov's assembly code.
+
+** libgnutls: Ensure proper cleanups on gnutls_certificate_set_*key()
+   failures due to key mismatch. This prevents leaks or double freeing
+   on such failures.
 
 ** libgnutls: Increased the maximum size of the handshake message hash.
    This will allow the library to cope better with larger packets, as
@@ -31,8 +30,9 @@ See the end for copying conditions.
    to use DSA-SHA1 due to his old DSA certificate, without requiring him
    to enable DSA-SHA1 (and thus make it acceptable for the server's certificate).
 
-** libgnutls: Added SHA*, AES-GCM, AES-CCM and AES-CBC optimized implementations
-   for the aarch64 architecture. Uses Andy Polyakov's assembly code.
+** libgnutls: Reverted AESNI code on x86 to earlier version as the
+   latest version was creating position depending code. Added checks
+   in the CI to detect position depending code early.
 
 ** guile: Update code to the I/O port API of Guile >= 2.1.4
    This makes sure the GnuTLS bindings will work with the forthcoming 2.2
