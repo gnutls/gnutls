@@ -1,4 +1,6 @@
 GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
+Bug numbers referenced in this log correspond to bug numbers at our issue tracker,
+available at https://gitlab.com/gnutls/gnutls/issues
 Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
