@@ -3,7 +3,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.5.5 (unreleased)
+* Version 3.5.5 (released 2016-10-09)
 
 ** libgnutls: enhanced gnutls_certificate_set_ocsp_status_request_file()
    to allow importing multiple OCSP request files, one for each chain
