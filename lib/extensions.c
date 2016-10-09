@@ -240,8 +240,6 @@ _gnutls_parse_extensions(gnutls_session_t session,
 				gnutls_assert();
 				return ret;
 			}
-		} else {
-			_gnutls_extension_list_add(session, type);
 		}
 
 		DECR_LENGTH_RET(next, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
@@ -259,6 +257,11 @@ _gnutls_parse_extensions(gnutls_session_t session,
 			     gnutls_ext_get_name(type), type);
 
 			continue;
+		}
+
+		/* only store the extension number if we support it */
+		if (session->security_parameters.entity == GNUTLS_SERVER) {
+			_gnutls_extension_list_add(session, type);
 		}
 
 		_gnutls_handshake_log
@@ -279,8 +282,11 @@ _gnutls_parse_extensions(gnutls_session_t session,
 }
 
 /* Adds the extension we want to send in the extensions list.
- * This list is used to check whether the (later) received
+ * This list is used in client side to check whether the (later) received
  * extensions are the ones we requested.
+ *
+ * In server side, this list is used to ensure we don't send
+ * extensions that we didn't receive a corresponding value.
  */
 void _gnutls_extension_list_add(gnutls_session_t session, uint16_t type)
 {
