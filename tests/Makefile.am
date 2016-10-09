@@ -118,6 +118,8 @@ endif
 endif
 endif
 
+gc_LDADD = $(LDADD) -lnettle
+
 if ENABLE_OCSP
 ctests += ocsp
 endif
