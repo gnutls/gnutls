@@ -150,11 +150,11 @@ thirdparty_libadd += $(LTLIBRT)
 endif
 
 if ENABLE_FIPS140
-thirdparty_libadd += $(FIPS140_LIBS)
+thirdparty_libadd += $(FIPS140_LIBS) $(LTLIBDL)
 endif
 
 if ENABLE_TROUSERS
-thirdparty_libadd += $(LIBDL)
+thirdparty_libadd += $(LTLIBDL)
 endif
 
 if ENABLE_OPENPGP
