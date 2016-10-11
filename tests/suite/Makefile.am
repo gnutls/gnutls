@@ -34,13 +34,14 @@ EXTRA_DIST = crl/long.crl crl/long.pem data/test1.cat data/test2.cat \
 	data/test1.cat.data data/test2.cat.data \
 	data/test1.cat.out data/test2.cat.out data/ca.pem
 
-check_PROGRAMS = rng
+check_PROGRAMS = rng prime-check
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
 	../libutils.la \
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
+prime_check_LDADD = $(LDADD) -lhogweed -lgmp
 
 libecore_la_CPPFLAGS = -I$(top_srcdir)/tests/suite/ecore/		\
 	-I$(top_srcdir)/tests/suite/ecore/src/include			\
@@ -128,7 +129,7 @@ nodist_check_SCRIPTS += eagain.sh
 endif
 endif
 
-TESTS = $(nodist_check_SCRIPTS)
+TESTS = $(nodist_check_SCRIPTS) prime-check
 
 TEST_EXTENSIONS = .sh
 
