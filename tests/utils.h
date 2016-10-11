@@ -82,6 +82,11 @@ test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
 	      gnutls_anon_client_credentials_t client_cred,
 	      const char *prio);
 
+int
+test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
+	      gnutls_psk_client_credentials_t client_cred,
+	      const char *prio);
+
 typedef void callback_func(gnutls_session_t, void *priv);
 void test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		   gnutls_certificate_credentials_t client_cred,
