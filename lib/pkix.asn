@@ -328,15 +328,13 @@ CommonName ::= PrintableString
 -- Cryptographic Message Syntax
 
 pkcs-7-ContentInfo ::= SEQUENCE {
-  contentType pkcs-7-ContentType,
+  contentType OBJECT IDENTIFIER,
   content [0] EXPLICIT ANY DEFINED BY contentType }
 
 pkcs-7-DigestInfo ::= SEQUENCE {
   digestAlgorithm AlgorithmIdentifier,
   digest OCTET STRING 
 }
-
-pkcs-7-ContentType ::= OBJECT IDENTIFIER
 
 pkcs-7-SignedData ::= SEQUENCE {
   version INTEGER,
@@ -353,7 +351,7 @@ pkcs-7-DigestAlgorithmIdentifiers ::= SET OF AlgorithmIdentifier
 -- rfc2315: content [0] EXPLICIT ANY DEFINED BY contentType OPTIONAL
 
 pkcs-7-EncapsulatedContentInfo ::= SEQUENCE {
-  eContentType pkcs-7-ContentType,
+  eContentType OBJECT IDENTIFIER,
   eContent [0] EXPLICIT ANY OPTIONAL }
 
 -- We don't use CertificateList here since we only want
@@ -540,7 +538,7 @@ pkcs-7-EncryptedData ::= SEQUENCE {
     unprotectedAttrs [1] IMPLICIT pkcs-7-UnprotectedAttributes OPTIONAL }
 
 pkcs-7-EncryptedContentInfo ::= SEQUENCE {
-    contentType pkcs-7-ContentType,
+    contentType OBJECT IDENTIFIER,
     contentEncryptionAlgorithm pkcs-7-ContentEncryptionAlgorithmIdentifier,
     encryptedContent [0] IMPLICIT OCTET STRING OPTIONAL }
 
