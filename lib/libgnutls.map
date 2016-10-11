@@ -1120,6 +1120,9 @@ GNUTLS_3_4
 	gnutls_ffdhe_4096_key_bits;
 	gnutls_ffdhe_2048_key_bits;
 	gnutls_ffdhe_3072_key_bits;
+	gnutls_certificate_set_known_dh_params;
+	gnutls_anon_set_server_known_dh_params;
+	gnutls_psk_set_server_known_dh_params;
  local:
 	*;
 };

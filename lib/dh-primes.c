@@ -25,6 +25,8 @@
 
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 
+#include "dh.h"
+
 static const unsigned char ffdhe_params_2048[] = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
 	0xFF, 0xAD, 0xF8, 0x54, 0x58, 0xA2, 0xBB, 
@@ -388,4 +390,53 @@ const gnutls_datum_t gnutls_ffdhe_8192_group_prime = {
 };
 const unsigned int gnutls_ffdhe_8192_key_bits = 512;
 
+
+int _gnutls_set_cred_dh_params(gnutls_dh_params_t *cparams, gnutls_sec_param_t sec_param)
+{
+	gnutls_dh_params_t tmp_params;
+	const gnutls_datum_t *p, *g;
+	unsigned key_bits, est_bits;
+	unsigned bits;
+	int ret;
+
+	bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, sec_param);
+
+	if (bits <= 2048) {
+		p = &gnutls_ffdhe_2048_group_prime;
+		g = &gnutls_ffdhe_2048_group_generator;
+		key_bits = gnutls_ffdhe_2048_key_bits;
+	} else if (bits <= 3072) {
+		p = &gnutls_ffdhe_3072_group_prime;
+		g = &gnutls_ffdhe_3072_group_generator;
+		key_bits = gnutls_ffdhe_3072_key_bits;
+	} else if (bits <= 4096) {
+		p = &gnutls_ffdhe_4096_group_prime;
+		g = &gnutls_ffdhe_4096_group_generator;
+		key_bits = gnutls_ffdhe_4096_key_bits;
+	} else {
+		p = &gnutls_ffdhe_8192_group_prime;
+		g = &gnutls_ffdhe_8192_group_generator;
+		key_bits = gnutls_ffdhe_8192_key_bits;
+	}
+
+	/* if our estimation of subgroup bits is better/larger than
+	 * the one provided by the rfc7919, use that one */
+	est_bits = _gnutls_pk_bits_to_subgroup_bits(bits);
+	if (key_bits < est_bits)
+		key_bits = est_bits;
+
+	ret = gnutls_dh_params_init(&tmp_params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_dh_params_import_raw2(tmp_params, p, g, key_bits);
+	if (ret < 0) {
+		gnutls_dh_params_deinit(tmp_params);
+		return gnutls_assert_val(ret);
+	}
+
+	*cparams = tmp_params;
+
+	return 0;
+}
 #endif

@@ -26,6 +26,8 @@
 
 typedef struct gnutls_anon_server_credentials_st {
 	gnutls_dh_params_t dh_params;
+	unsigned deinit_dh_params;
+
 	/* this callback is used to retrieve the DH or RSA
 	 * parameters.
 	 */

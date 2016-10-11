@@ -40,7 +40,9 @@
 void
 gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
 {
-
+	if (sc->deinit_dh_params) {
+		gnutls_dh_params_deinit(sc->dh_params);
+	}
 	gnutls_free(sc);
 }
 
@@ -111,7 +113,49 @@ void
 gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
 				 gnutls_dh_params_t dh_params)
 {
+	if (res->deinit_dh_params) {
+		res->deinit_dh_params = 0;
+		gnutls_dh_params_deinit(res->dh_params);
+		res->dh_params = NULL;
+	}
+
 	res->dh_params = dh_params;
+}
+
+/**
+ * gnutls_anon_set_server_known_dh_params:
+ * @res: is a gnutls_anon_server_credentials_t type
+ * @dh_params: The Diffie-Hellman parameters.
+ *
+ * This function will set the Diffie-Hellman parameters for an
+ * anonymous server to use.  These parameters will be used in
+ * Anonymous Diffie-Hellman cipher suites and will be selected from
+ * the FFDHE set of RFC7919 according to the security level provided.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.6
+ **/
+int
+gnutls_anon_set_server_known_dh_params(gnutls_anon_server_credentials_t res,
+					gnutls_sec_param_t sec_param)
+{
+	int ret;
+
+	if (res->deinit_dh_params) {
+		res->deinit_dh_params = 0;
+		gnutls_dh_params_deinit(res->dh_params);
+		res->dh_params = NULL;
+	}
+
+	ret = _gnutls_set_cred_dh_params(&res->dh_params, sec_param);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	res->deinit_dh_params = 1;
+
+	return 0;
 }
 
 /**

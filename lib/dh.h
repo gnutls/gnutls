@@ -30,4 +30,6 @@ _gnutls_get_dh_params(gnutls_dh_params_t dh_params,
 		      gnutls_params_function * func,
 		      gnutls_session_t session);
 
+int _gnutls_set_cred_dh_params(gnutls_dh_params_t *cparams, gnutls_sec_param_t sec_param);
+
 #endif

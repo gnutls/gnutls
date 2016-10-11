@@ -1594,6 +1594,10 @@ gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t
 void gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
 				      gnutls_dh_params_t dh_params);
 
+int
+gnutls_anon_set_server_known_dh_params(gnutls_anon_server_credentials_t res,
+					gnutls_sec_param_t sec_param);
+
 void
 gnutls_anon_set_server_params_function(gnutls_anon_server_credentials_t
 				       res, gnutls_params_function * func);
@@ -1641,6 +1645,9 @@ void gnutls_certificate_free_crls(gnutls_certificate_credentials_t sc);
 
 void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
 				      gnutls_dh_params_t dh_params);
+
+int gnutls_certificate_set_known_dh_params(gnutls_certificate_credentials_t res,
+					   gnutls_sec_param_t sec_param);
 void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
 					 res, unsigned int flags);
 unsigned int
@@ -2011,6 +2018,7 @@ extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1024_group_generator;
 
 /* The static parameters defined in rfc7919
  */
+
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_prime;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_generator;
 extern _SYM_EXPORT const unsigned int gnutls_ffdhe_8192_key_bits;
@@ -2140,6 +2148,10 @@ int gnutls_hex_decode2(const gnutls_datum_t * data, gnutls_datum_t *result);
 void
 gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
 				gnutls_dh_params_t dh_params);
+
+int
+gnutls_psk_set_server_known_dh_params(gnutls_psk_server_credentials_t res,
+				      gnutls_sec_param_t sec_param);
 
 void
 gnutls_psk_set_server_params_function(gnutls_psk_server_credentials_t

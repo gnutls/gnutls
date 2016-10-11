@@ -34,6 +34,7 @@
 #include <file.h>
 #include <datum.h>
 #include "debug.h"
+#include "dh.h"
 
 /**
  * gnutls_psk_free_client_credentials:
@@ -154,6 +155,10 @@ gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
  **/
 void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
 {
+	if (sc->deinit_dh_params) {
+		gnutls_dh_params_deinit(sc->dh_params);
+	}
+
 	gnutls_free(sc->password_file);
 	gnutls_free(sc->hint);
 	gnutls_free(sc);
@@ -372,6 +377,42 @@ gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
 				gnutls_dh_params_t dh_params)
 {
 	res->dh_params = dh_params;
+}
+
+/**
+ * gnutls_psk_set_server_known_dh_params:
+ * @res: is a gnutls_psk_server_credentials_t type
+ * @sec_param: is an option of the %gnutls_sec_param_t enumeration
+ *
+ * This function will set the Diffie-Hellman parameters for a
+ * PSK server to use. These parameters will be used in
+ * Ephemeral Diffie-Hellman cipher suites and will be selected from
+ * the FFDHE set of RFC7919 according to the security level provided.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.6
+ **/
+int
+gnutls_psk_set_server_known_dh_params(gnutls_psk_server_credentials_t res,
+				       gnutls_sec_param_t sec_param)
+{
+	int ret;
+
+	if (res->deinit_dh_params) {
+		res->deinit_dh_params = 0;
+		gnutls_dh_params_deinit(res->dh_params);
+		res->dh_params = NULL;
+	}
+
+	ret = _gnutls_set_cred_dh_params(&res->dh_params, sec_param);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	res->deinit_dh_params = 1;
+
+	return 0;
 }
 
 /**

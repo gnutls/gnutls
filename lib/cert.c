@@ -43,7 +43,7 @@
 #ifdef ENABLE_OPENPGP
 #include "openpgp/openpgp.h"
 #endif
-#include "str.h"
+#include "dh.h"
 
 /**
  * gnutls_certificate_free_keys:
@@ -205,6 +205,9 @@ gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 #ifdef ENABLE_OPENPGP
 	gnutls_openpgp_keyring_deinit(sc->keyring);
 #endif
+	if (sc->deinit_dh_params) {
+		gnutls_dh_params_deinit(sc->dh_params);
+	}
 
 	gnutls_free(sc);
 }
@@ -237,6 +240,7 @@ gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t *
 	}
 	(*res)->verify_bits = DEFAULT_MAX_VERIFY_BITS;
 	(*res)->verify_depth = DEFAULT_MAX_VERIFY_DEPTH;
+
 
 	return 0;
 }
@@ -1016,7 +1020,50 @@ void
 gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
 				 gnutls_dh_params_t dh_params)
 {
+	if (res->deinit_dh_params) {
+		res->deinit_dh_params = 0;
+		gnutls_dh_params_deinit(res->dh_params);
+		res->dh_params = NULL;
+	}
+
 	res->dh_params = dh_params;
+}
+
+
+/**
+ * gnutls_certificate_set_known_dh_params:
+ * @res: is a gnutls_certificate_credentials_t type
+ * @sec_param: is an option of the %gnutls_sec_param_t enumeration
+ *
+ * This function will set the Diffie-Hellman parameters for a
+ * certificate server to use. These parameters will be used in
+ * Ephemeral Diffie-Hellman cipher suites and will be selected from
+ * the FFDHE set of RFC7919 according to the security level provided.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.6
+ **/
+int
+gnutls_certificate_set_known_dh_params(gnutls_certificate_credentials_t res,
+				       gnutls_sec_param_t sec_param)
+{
+	int ret;
+
+	if (res->deinit_dh_params) {
+		res->deinit_dh_params = 0;
+		gnutls_dh_params_deinit(res->dh_params);
+		res->dh_params = NULL;
+	}
+
+	ret = _gnutls_set_cred_dh_params(&res->dh_params, sec_param);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	res->deinit_dh_params = 1;
+
+	return 0;
 }
 
 #endif				/* DH */
