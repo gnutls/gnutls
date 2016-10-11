@@ -26,9 +26,10 @@ CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
+TMPFILE=long.$$.pem.tmp
 
-rm -f tmp-long.pem
-${VALGRIND} "${CERTTOOL}" --crl-info --inder --infile "${srcdir}/crl/long.crl" --outfile tmp-long.pem
+rm -f $TMPFILE
+${VALGRIND} "${CERTTOOL}" --crl-info --inder --infile "${srcdir}/crl/long.crl" --outfile $TMPFILE
 rc=$?
 
 # We're done.
@@ -37,7 +38,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} "${srcdir}/crl/long.pem" "tmp-long.pem" || ${DIFF} --strip-trailing-cr "${srcdir}/crl/long.pem" tmp-long.pem
+${DIFF} "${srcdir}/crl/long.pem" "$TMPFILE" || ${DIFF} --strip-trailing-cr "${srcdir}/crl/long.pem" $TMPFILE
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -45,6 +46,6 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-long.pem
+rm -f $TMPFILE
 
 exit 0
