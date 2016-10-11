@@ -27,26 +27,6 @@
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
-#define DH_BITS 1024
-
-/* These are global */
-static gnutls_dh_params_t dh_params;
-
-static int generate_dh_params(void)
-{
-
-        /* Generate Diffie-Hellman parameters - for use with DHE
-         * kx algorithms. When short bit length is used, it might
-         * be wise to regenerate parameters.
-         *
-         * Check the ex-serv-export.c example for using static
-         * parameters.
-         */
-        gnutls_dh_params_init(&dh_params);
-        gnutls_dh_params_generate2(dh_params, DH_BITS);
-
-        return 0;
-}
 
 static int
 pskfunc(gnutls_session_t session, const char *username,
@@ -99,13 +79,11 @@ int main(void)
         gnutls_psk_allocate_server_credentials(&psk_cred);
         gnutls_psk_set_server_credentials_function(psk_cred, pskfunc);
 
-        generate_dh_params();
-
         gnutls_priority_init(&priority_cache,
                              "NORMAL:+PSK:+ECDHE-PSK:+DHE-PSK",
                              NULL);
 
-        gnutls_certificate_set_dh_params(x509_cred, dh_params);
+        gnutls_certificate_set_known_dh_params(x509_cred, GNUTLS_SEC_PARAM_MEDIUM);
 
         /* Socket operations
          */

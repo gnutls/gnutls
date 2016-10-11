@@ -66,6 +66,11 @@ P. Hallam-Baker, "X.509v3 Transport Layer Security (TLS) Feature Extension",
 October 2015, Available from
 @url{http://www.ietf.org/rfc/rfc7633.txt}.
 
+@item @anchor{RFC7919}[RFC7919]
+D. Gillmor, "Negotiated Finite Field Diffie-Hellman Ephemeral Parameters for Transport Layer Security (TLS)",
+August 2016, Available from
+@url{http://www.ietf.org/rfc/rfc7919.txt}.
+
 @item @anchor{RFC4514}[RFC4514]
 Kurt D.  Zeilenga, "Lightweight Directory Access Protocol (LDAP): String Representation of Distinguished Names",
 June 2006, Available from

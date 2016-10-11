@@ -1688,36 +1688,32 @@ the discussion in @ref{Safe renegotiation}).
 Several TLS ciphersuites require additional parameters that
 need to be generated or provided by the application. The
 Diffie-Hellman based ciphersuites (ANON-DH or DHE), require
-the group parameters to be provided. Those can either be
-be generated on the fly using @funcref{gnutls_dh_params_generate2}
-or imported from pregenerated data using @funcref{gnutls_dh_params_import_pkcs3}.
-The parameters can be used in a @acronym{TLS} session by calling
-@funcref{gnutls_certificate_set_dh_params} or
-@funcref{gnutls_anon_set_server_dh_params} for anonymous sessions.
+the group parameters to be provided. 
+These parameters can be specified in a @acronym{TLS} credentials
+structure by calling
+@funcref{gnutls_certificate_set_known_dh_params},
+@funcref{gnutls_anon_set_server_known_dh_params}, or
+@funcref{gnutls_psk_set_server_known_dh_params}, depending on the type
+of the credentials.
 
-@showfuncD{gnutls_dh_params_generate2,gnutls_dh_params_import_pkcs3,gnutls_certificate_set_dh_params,gnutls_anon_set_server_dh_params}
+@showfuncC{gnutls_certificate_set_known_dh_params,gnutls_anon_set_server_known_dh_params,gnutls_psk_set_server_known_dh_params}
 
-Due to the time-consuming calculations required for the generation
-of Diffie-Hellman parameters we suggest against performing generation
-of them within an application. The @code{certtool} tool can be used to 
-generate or export known safe values that can be stored in code
-or in a configuration file to provide the ability to replace. We also
-recommend the usage of @funcref{gnutls_sec_param_to_pk_bits} 
-(see @ref{Selecting cryptographic key sizes}) to determine
-the bit size of the generated parameters.
+The functions above will set DH parameters pre-configured in the library
+based on the security level provided. The GnuTLS' included parameters are
+the FFDHE parameters from @xcite{RFC7919}.
 
-Note that the information stored in the generated PKCS #3 structure
-changed with GnuTLS 3.0.9. Since that version the @code{privateValueLength}
-member of the structure is set, allowing the server utilizing the
-parameters to use keys of the size of the security parameter. This
-provides better performance in key exchange.
+@subsubsection Legacy parameter generation
+Note that older than 3.5.6 versions of GnuTLS provided functions
+to generate or import arbitrary DH parameters from a file. This
+practice is still supported but discouraged in current versions.
 
-To allow renewal of the parameters within an application without
-accessing the credentials, which are a shared structure,
-an alternative interface is available using a callback function.  
+@showfuncC{gnutls_dh_params_generate2,gnutls_dh_params_import_pkcs3,gnutls_certificate_set_dh_params}
 
-@showfuncdesc{gnutls_certificate_set_params_function}
-
+For old applications which require explicit DH parameters, we recommend
+using @code{certtool} (of GnuTLS 3.5.6) with the @code{--get-dh-params}
+option to obtain the FFDHE parameters descussed above. The output
+parameters of the tool are in PKCS#3 format and can be imported by
+most existing applications.
 
 @node Deriving keys for other applications/protocols
 @subsection Deriving keys for other applications/protocols

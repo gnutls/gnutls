@@ -38,24 +38,6 @@
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
 
-/* These are global */
-static gnutls_dh_params_t dh_params;
-
-static int generate_dh_params(void)
-{
-        unsigned int bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH,
-                                                        GNUTLS_SEC_PARAM_MEDIUM);
-
-        /* Generate Diffie-Hellman parameters - for use with DHE
-         * kx algorithms. When short bit length is used, it might
-         * be wise to regenerate parameters often.
-         */
-        CHECK(gnutls_dh_params_init(&dh_params));
-        CHECK(gnutls_dh_params_generate2(dh_params, bits));
-
-        return 0;
-}
-
 int main(void)
 {
         int listen_sd;
@@ -90,12 +72,12 @@ int main(void)
                                                               OCSP_STATUS_FILE,
                                                               0));
 
-        generate_dh_params();
-
         CHECK(gnutls_priority_init(&priority_cache,
                                    "PERFORMANCE:%SERVER_PRECEDENCE", NULL));
 
-        gnutls_certificate_set_dh_params(x509_cred, dh_params);
+        /* only available since GnuTLS 3.5.6, on previous versions see
+         * gnutls_certificate_set_dh_params(). */
+        gnutls_certificate_set_known_dh_params(x509_cred, GNUTLS_SEC_PARAM_MEDIUM);
 
         /* Socket operations
          */

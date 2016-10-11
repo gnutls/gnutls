@@ -45,13 +45,11 @@ static ssize_t pull_func(gnutls_transport_ptr_t p, void *data,
 static const char *human_addr(const struct sockaddr *sa, socklen_t salen,
                               char *buf, size_t buflen);
 static int wait_for_connection(int fd);
-static int generate_dh_params(void);
 
 /* Use global credentials and parameters to simplify
  * the example. */
 static gnutls_certificate_credentials_t x509_cred;
 static gnutls_priority_t priority_cache;
-static gnutls_dh_params_t dh_params;
 
 int main(void)
 {
@@ -88,9 +86,7 @@ int main(void)
                 exit(1);
         }
 
-        generate_dh_params();
-
-        gnutls_certificate_set_dh_params(x509_cred, dh_params);
+        gnutls_certificate_set_known_dh_params(x509_cred, GNUTLS_SEC_PARAM_MEDIUM);
 
         gnutls_priority_init(&priority_cache,
                              "PERFORMANCE:-VERS-TLS-ALL:+VERS-DTLS1.0:%SERVER_PRECEDENCE",
@@ -422,17 +418,3 @@ static const char *human_addr(const struct sockaddr *sa, socklen_t salen,
         return save_buf;
 }
 
-static int generate_dh_params(void)
-{
-        int bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH,
-                                               GNUTLS_SEC_PARAM_LEGACY);
-
-        /* Generate Diffie-Hellman parameters - for use with DHE
-         * kx algorithms. When short bit length is used, it might
-         * be wise to regenerate parameters often.
-         */
-        gnutls_dh_params_init(&dh_params);
-        gnutls_dh_params_generate2(dh_params, bits);
-
-        return 0;
-}

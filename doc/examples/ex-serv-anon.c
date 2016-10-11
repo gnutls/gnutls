@@ -23,24 +23,6 @@
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
 
-/* These are global */
-static gnutls_dh_params_t dh_params;
-
-static int generate_dh_params(void)
-{
-        unsigned int bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH,
-                                                        GNUTLS_SEC_PARAM_LEGACY);
-        /* Generate Diffie-Hellman parameters - for use with DHE
-         * kx algorithms. These should be discarded and regenerated
-         * once a day, once a week or once a month. Depending on the
-         * security requirements.
-         */
-        gnutls_dh_params_init(&dh_params);
-        gnutls_dh_params_generate2(dh_params, bits);
-
-        return 0;
-}
-
 int main(void)
 {
         int err, listen_sd;
@@ -64,9 +46,7 @@ int main(void)
 
         gnutls_anon_allocate_server_credentials(&anoncred);
 
-        generate_dh_params();
-
-        gnutls_anon_set_server_dh_params(anoncred, dh_params);
+        gnutls_anon_set_server_known_dh_params(anoncred, GNUTLS_SEC_PARAM_MEDIUM);
 
         /* Socket operations
          */
