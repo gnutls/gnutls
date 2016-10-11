@@ -79,7 +79,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c			\
 	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
 	safe-memfuncs.c system/inet_pton.c atfork.c atfork.h randomart.c \
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
-	cert-session.c handshake-checks.c dtls-sw.c
+	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c
 
 if WINDOWS
 COBJECTS += system/keys-win.c

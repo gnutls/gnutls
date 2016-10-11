@@ -2009,6 +2009,24 @@ extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1536_group_generator;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1024_group_prime;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1024_group_generator;
 
+/* The static parameters defined in rfc7919
+ */
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_generator;
+extern _SYM_EXPORT const unsigned int gnutls_ffdhe_8192_key_bits;
+
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_4096_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_4096_group_generator;
+extern _SYM_EXPORT const unsigned int gnutls_ffdhe_4096_key_bits;
+
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_3072_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_3072_group_generator;
+extern _SYM_EXPORT const unsigned int gnutls_ffdhe_3072_key_bits;
+
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_2048_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_2048_group_generator;
+extern _SYM_EXPORT const unsigned int gnutls_ffdhe_2048_key_bits;
+
 typedef int gnutls_srp_server_credentials_function(gnutls_session_t,
 						   const char *username,
 						   gnutls_datum_t * salt,
