@@ -500,8 +500,14 @@ AM_CONDITIONAL(HAVE_BUGGY_LIBIDN, test "$with_buggy_libidn" = "yes")
 AC_ARG_ENABLE(non-suiteb-curves,
   AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
     enable_non_suiteb=$enableval, enable_non_suiteb=yes)
-if [ test "$enable_non_suiteb" = "yes" ];then
-  AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
+
+if test "$enable_non_suiteb" = "yes";then
+	dnl nettle_secp_192r1 is not really a function
+	AC_CHECK_LIB(hogweed, nettle_secp_192r1,, enable_non_suiteb=no, [$HOGWEED_LIBS])
+
+	if test "$enable_non_suiteb" = "yes";then
+		AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
+	fi
 fi
 AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
