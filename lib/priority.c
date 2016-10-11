@@ -945,7 +945,8 @@ static void _gnutls_update_system_priorities(void)
 		return;
 	}
 
-	if (sb.st_mtime == system_priority_last_mod) {
+	if (system_priority_buf != NULL &&
+	    sb.st_mtime == system_priority_last_mod) {
 		_gnutls_debug_log("system priority %s has not changed\n",
 				  system_priority_file);
 		return;
