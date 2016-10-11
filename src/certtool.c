@@ -2887,8 +2887,10 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_
 			break;
 
 		if (!display_data) {
-			if (i==0)
+			if (i==0) {
+				fprintf(outfile, "eContent Type: %s\n", gnutls_pkcs7_get_embedded_data_oid(pkcs7));
 				fprintf(outfile, "Signers:\n");
+			}
 			print_pkcs7_sig_info(&info, cinfo);
 		} else {
 			if (!detached.data) {
