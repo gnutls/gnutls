@@ -470,6 +470,7 @@ gnutls_pkcs7_get_crt_count@GNUTLS_3_4
 gnutls_pkcs7_get_crt_raw2@GNUTLS_3_4
 gnutls_pkcs7_get_crt_raw@GNUTLS_3_4
 gnutls_pkcs7_get_embedded_data@GNUTLS_3_4
+gnutls_pkcs7_get_embedded_data_oid@GNUTLS_3_4
 gnutls_pkcs7_get_signature_count@GNUTLS_3_4
 gnutls_pkcs7_get_signature_info@GNUTLS_3_4
 gnutls_pkcs7_import@GNUTLS_3_4
