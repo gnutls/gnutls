@@ -77,6 +77,11 @@ extern void binprint(const void *str, size_t len);
 int disable_system_calls(void);
 void sec_sleep(int sec);
 
+int
+test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
+	      gnutls_anon_client_credentials_t client_cred,
+	      const char *prio);
+
 typedef void callback_func(gnutls_session_t, void *priv);
 void test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		   gnutls_certificate_credentials_t client_cred,

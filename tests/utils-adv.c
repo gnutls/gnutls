@@ -189,6 +189,66 @@ test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	_test_cli_serv(server_cred, client_cred, prio, prio, host, priv, client_cb, server_cb, 0, 0, 0, 0);
 }
 
+int
+test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
+	      gnutls_anon_client_credentials_t client_cred,
+	      const char *prio)
+{
+	int exit_code = EXIT_SUCCESS;
+	int ret;
+	/* Server stuff. */
+	gnutls_session_t server;
+	int sret = GNUTLS_E_AGAIN;
+	/* Client stuff. */
+	gnutls_session_t client;
+	int cret = GNUTLS_E_AGAIN;
+
+	/* General init. */
+	reset_buffers();
+
+	/* Init server */
+	gnutls_init(&server, GNUTLS_SERVER);
+	gnutls_credentials_set(server, GNUTLS_CRD_ANON,
+				server_cred);
+	gnutls_priority_set_direct(server, prio, NULL);
+	gnutls_transport_set_push_function(server, server_push);
+	gnutls_transport_set_pull_function(server, server_pull);
+	gnutls_transport_set_ptr(server, server);
+
+	ret = gnutls_init(&client, GNUTLS_CLIENT);
+	if (ret < 0)
+		exit(1);
+
+	ret = gnutls_credentials_set(client, GNUTLS_CRD_ANON,
+				client_cred);
+	if (ret < 0)
+		exit(1);
+
+	gnutls_priority_set_direct(client, prio, NULL);
+	gnutls_transport_set_push_function(client, client_push);
+	gnutls_transport_set_pull_function(client, client_pull);
+	gnutls_transport_set_ptr(client, client);
+
+	HANDSHAKE(client, server);
+
+	ret = 0;
+
+	gnutls_bye(client, GNUTLS_SHUT_RDWR);
+	gnutls_bye(server, GNUTLS_SHUT_RDWR);
+
+	gnutls_deinit(client);
+	gnutls_deinit(server);
+
+	if (debug > 0) {
+		if (exit_code == 0)
+			puts("Self-test successful");
+		else
+			puts("Self-test failed");
+	}
+
+	return ret;
+}
+
 void
 test_cli_serv_cert(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
