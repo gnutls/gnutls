@@ -1276,7 +1276,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 	gnutls_dh_params_t dh_params;
 	gnutls_datum_t p, g;
 	int bits = get_bits(GNUTLS_PK_DH, info->bits, info->sec_param, 1);
-	unsigned int q_bits = 0;
+	unsigned int q_bits = 0, key_bits = 0;
 
 	fix_lbuffer(0);
 
@@ -1361,12 +1361,40 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 			exit(1);
 		}
 	} else {
-#ifdef ENABLE_SRP
 		if (info->provable != 0) {
 			fprintf(stderr, "The DH parameters obtained via this option are not provable\n");
 			exit(1);
 		}
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
+		if (bits <= 2048) {
+			p = gnutls_ffdhe_2048_group_prime;
+			g = gnutls_ffdhe_2048_group_generator;
+			key_bits = gnutls_ffdhe_2048_key_bits;
+			bits = 2048;
+		} else if (bits <= 3072) {
+			p = gnutls_ffdhe_3072_group_prime;
+			g = gnutls_ffdhe_3072_group_generator;
+			key_bits = gnutls_ffdhe_3072_key_bits;
+			bits = 3072;
+		} else if (bits <= 4096) {
+			p = gnutls_ffdhe_4096_group_prime;
+			g = gnutls_ffdhe_4096_group_generator;
+			key_bits = gnutls_ffdhe_4096_key_bits;
+			bits = 4096;
+		} else {
+			p = gnutls_ffdhe_8192_group_prime;
+			g = gnutls_ffdhe_8192_group_generator;
+			key_bits = gnutls_ffdhe_8192_key_bits;
+			bits = 8192;
+		}
 
+		ret = gnutls_dh_params_import_raw2(dh_params, &p, &g, key_bits);
+		if (ret < 0) {
+			fprintf(stderr, "Error exporting parameters: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+#elif defined(ENABLE_SRP)
 		if (bits <= 1024) {
 			p = gnutls_srp_1024_group_prime;
 			g = gnutls_srp_1024_group_generator;
