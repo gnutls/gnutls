@@ -891,16 +891,19 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
 /**
  * gnutls_pkcs7_get_embedded_data:
  * @pkcs7: should contain a gnutls_pkcs7_t type
- * @flags: must be zero
+ * @flags: must be zero or %GNUTLS_PKCS7_EDATA_GET_RAW
  * @data: will hold the embedded data in the provided structure
  *
  * This function will return the data embedded in the signature of
  * the PKCS7 structure. If no data are available then
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
- * Note, that since a PKCS#7 structure may contain embedded data
- * for each attached signature, this function accepts and index which
- * corresponds to the signature index to get the data from.
+ * The returned data must be de-allocated using gnutls_free().
+ *
+ * Note, that this function returns the exact same data that are
+ * authenticated. If the %GNUTLS_PKCS7_EDATA_GET_RAW flag is provided,
+ * the returned data will be including the wrapping tag/value as
+ * they are encoded in the structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. 
@@ -917,7 +920,14 @@ gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned flags,
 	if (pkcs7->der_signed_data.size == 0)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	return _gnutls_set_datum(data, pkcs7->der_signed_data.data, pkcs7->der_signed_data.size);
+	if (flags & GNUTLS_PKCS7_EDATA_GET_RAW) {
+		if (pkcs7->signed_data == NULL)
+			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+		return _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", data);
+	} else {
+		return _gnutls_set_datum(data, pkcs7->der_signed_data.data, pkcs7->der_signed_data.size);
+	}
 }
 
 /**
