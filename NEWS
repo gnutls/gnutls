@@ -10,6 +10,8 @@ See the end for copying conditions.
 ** libgnutls: Enhanced the PKCS#7 parser to allow decoding old
    (pre-rfc5652) structures with arbitrary encapsulated content.
 
+** p11tool: improvements in --initialize option.
+
 ** API and ABI modifications:
 gnutls_pkcs7_get_embedded_data_oid: Added
 
