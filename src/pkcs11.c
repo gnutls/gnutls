@@ -712,7 +712,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 
 	strcpy(so_pin, pin);
 
-	if (info->so_pin != NULL) {
+	if (info->pin != NULL) {
 		pin = info->pin;
 	} else {
 		pin = getenv("GNUTLS_PIN");
@@ -722,7 +722,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 			exit(1);
 	}
 
-	if (pin[0] == '\n')
+	if (pin == NULL || pin[0] == '\n')
 		exit(1);
 
 	ret = gnutls_pkcs11_token_init(url, so_pin, label);
