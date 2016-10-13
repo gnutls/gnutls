@@ -415,6 +415,9 @@ gnutls_session_t initialize_session(int dtls)
 	 */
 	gnutls_handshake_set_private_extensions(session, 1);
 
+	gnutls_handshake_set_timeout(session,
+				     GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+
 	if (nodb == 0) {
 		gnutls_db_set_retrieve_function(session, wrap_db_fetch);
 		gnutls_db_set_remove_function(session, wrap_db_delete);
