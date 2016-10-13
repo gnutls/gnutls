@@ -269,7 +269,11 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 		key = load_private_key(0, cinfo);
 
-		pubkey = load_public_key_or_import(1, key, cinfo);
+		pubkey = load_public_key_or_import(0, key, cinfo);
+		if (pubkey == NULL && key == NULL) {
+			fprintf(stderr, "missing --load-privkey\n");
+			exit(1);
+		}
 
 		if (!batch)
 			fprintf(stderr,
