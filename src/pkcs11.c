@@ -697,6 +697,11 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 		exit(1);
 	}
 
+	if (label == NULL) {
+		fprintf(stderr, "error: no label provided for token initialization!\n");
+		exit(1);
+	}
+
 	if (info->so_pin != NULL)
 		pin = info->so_pin;
 	else {
@@ -712,6 +717,16 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 
 	strcpy(so_pin, pin);
 
+	fprintf(stderr, "Initializing token... ");
+	ret = gnutls_pkcs11_token_init(url, so_pin, label);
+	if (ret < 0) {
+		fprintf(stderr, "\nError in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+	fprintf(stderr, "done\n");
+
+	fprintf(stderr, "Setting token's user PIN...\n");
 	if (info->pin != NULL) {
 		pin = info->pin;
 	} else {
@@ -724,13 +739,6 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 
 	if (pin == NULL || pin[0] == '\n')
 		exit(1);
-
-	ret = gnutls_pkcs11_token_init(url, so_pin, label);
-	if (ret < 0) {
-		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
-			gnutls_strerror(ret));
-		exit(1);
-	}
 
 	ret = gnutls_pkcs11_token_set_pin(url, NULL, pin, GNUTLS_PIN_USER);
 	if (ret < 0) {
