@@ -129,6 +129,8 @@ int main(void)
                  */
                 gnutls_certificate_server_set_request(session,
                                                       GNUTLS_CERT_IGNORE);
+                gnutls_handshake_set_timeout(session,
+                                             GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
                 sd = accept(listen_sd, (struct sockaddr *) &sa_cli,
                             &client_len);
