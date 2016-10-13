@@ -914,6 +914,9 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	if (pin == NULL || pin[0] == '\n')
 		exit(1);
 
+	/* do not ask the SO PIN twice */
+	setenv("GNUTLS_SO_PIN", so_pin, 0);
+
 	ret = gnutls_pkcs11_token_set_pin(url, NULL, pin, GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
