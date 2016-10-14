@@ -138,14 +138,18 @@ flag = {
 flag = {
     name      = generate-dh-params;
     descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
-    doc = "";
+    doc = "The will generate random parameters to be used with
+Diffie-Hellman key exchange. The output parameters will be in PKCS #3
+format. Note that it is recommended to use the --get-dh-params option
+instead.";
 };
 
 flag = {
     name      = get-dh-params;
     descrip   = "Get the included PKCS #3 encoded Diffie-Hellman parameters";
-    doc = "Returns stored DH parameters in GnuTLS. Those parameters are used in the SRP protocol. The parameters returned by fresh generation
-are more efficient since GnuTLS 3.0.9.";
+    doc = "Returns stored DH parameters in GnuTLS. Those parameters returned
+are defined in RFC7919, and can be considered standard parameters for a TLS
+key exchange.";
 };
 
 flag = {
