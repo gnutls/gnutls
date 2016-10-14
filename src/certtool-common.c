@@ -679,7 +679,11 @@ gnutls_pubkey_t load_public_key_or_import(int mand,
 
 	if (!privkey || (ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0)) < 0) {	/* could not get (e.g. on PKCS #11 */
 		gnutls_pubkey_deinit(pubkey);
-		return load_pubkey(mand, info);
+		pubkey = load_pubkey(0, info);
+		if (pubkey == NULL && mand) {
+			fprintf(stderr, "You must specify --load-privkey\n");
+			exit(1);
+		}
 	}
 
 	return pubkey;
