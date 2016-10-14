@@ -911,3 +911,15 @@ tests/pkcs11/pkcs11-ec-privkey-test
 tests/insecure_key
 tests/handshake-large-packet
 tests/srp
+tests/multi-alerts
+tests/naked-alerts
+tests/pkcs7-cat-parse
+tests/pkcs11-privkey-always-auth
+tests/dtls-etm
+tests/conv-utf8
+tests/client_dsa_key
+tests/tls-etm
+tests/tls-ext-register
+tests/tls-session-ext-register
+tests/tls-session-supplemental
+tests/tls-supplemental
