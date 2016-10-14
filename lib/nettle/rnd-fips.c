@@ -172,10 +172,6 @@ static int _rngfips_init(void **_ctx)
 	struct fips_ctx *ctx;
 	int ret;
 
-	ret = _rnd_system_entropy_init();
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	ctx = gnutls_calloc(1, sizeof(*ctx));
 	if (ctx == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);

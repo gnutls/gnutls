@@ -218,12 +218,6 @@ static int wrap_nettle_rnd_init(void **ctx)
 		return ret;
 	}
 
-	ret = _rnd_system_entropy_init();
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
 	/* initialize the main RNG */
 	yarrow256_init(&rnd_ctx.yctx, SOURCES, rnd_ctx.ysources);
 

@@ -189,6 +189,7 @@ AM_SUBST_NOTMAKE([DEFINE_IOVEC_T])
 
 dnl Need netinet/tcp.h for TCP_FASTOPEN
 AC_CHECK_HEADERS([netinet/tcp.h])
+AC_CHECK_HEADERS([stdatomic.h])
 
 AC_ARG_ENABLE(padlock,
   AS_HELP_STRING([--disable-padlock], [unconditionally disable padlock acceleration]),

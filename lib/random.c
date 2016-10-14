@@ -26,30 +26,80 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <random.h>
+#include "locks.h"
 #include <fips.h>
 
 void *gnutls_rnd_ctx;
+GNUTLS_STATIC_MUTEX(gnutls_rnd_init_mutex);
 
-int _gnutls_rnd_init(void)
+#ifdef HAVE_STDATOMIC_H
+static atomic_uint rnd_initialized = 0;
+
+inline static int _gnutls_rnd_init(void)
 {
+	if (unlikely(!rnd_initialized)) {
+		if (_gnutls_rnd_ops.init == NULL) {
+			rnd_initialized = 1;
+			return 0;
+		}
+
+		GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_init_mutex);
+		if (!rnd_initialized) {
+			if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
+				gnutls_assert();
+				GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
+				return GNUTLS_E_RANDOM_FAILED;
+			}
+			rnd_initialized = 1;
+		}
+		GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
+	}
+	return 0;
+}
+#else
+static unsigned rnd_initialized = 0;
+
+inline static int _gnutls_rnd_init(void)
+{
+	GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_init_mutex);
+	if (unlikely(!rnd_initialized)) {
+		if (_gnutls_rnd_ops.init == NULL) {
+			rnd_initialized = 1;
+			GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
+			return 0;
+		}
+
+		if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
+			gnutls_assert();
+			GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
+			return GNUTLS_E_RANDOM_FAILED;
+		}
+		rnd_initialized = 1;
+	}
+	GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
+	return 0;
+}
+#endif
+
+int _gnutls_rnd_preinit(void)
+{
+	int ret;
+
 #ifdef ENABLE_FIPS140
 	/* The FIPS140 random generator is only enabled when we are compiled
 	 * with FIPS support, _and_ the system requires FIPS140.
 	 */
 	if (_gnutls_fips_mode_enabled() == 1) {
-		int ret;
-
 		ret = gnutls_crypto_rnd_register(100, &_gnutls_fips_rnd_ops);
 		if (ret < 0)
 			return ret;
 	}
 #endif
 
-	if (_gnutls_rnd_ops.init != NULL) {
-		if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
-			gnutls_assert();
-			return GNUTLS_E_RANDOM_FAILED;
-		}
+	ret = _rnd_system_entropy_init();
+	if (ret < 0) {
+		gnutls_assert();
+		return GNUTLS_E_RANDOM_FAILED;
 	}
 
 	return 0;
@@ -57,9 +107,12 @@ int _gnutls_rnd_init(void)
 
 void _gnutls_rnd_deinit(void)
 {
-	if (_gnutls_rnd_ops.deinit != NULL) {
+	if (rnd_initialized && _gnutls_rnd_ops.deinit != NULL) {
 		_gnutls_rnd_ops.deinit(gnutls_rnd_ctx);
 	}
+	rnd_initialized = 0;
+
+	_rnd_system_entropy_deinit();
 
 	return;
 }
@@ -81,8 +134,17 @@ void _gnutls_rnd_deinit(void)
  **/
 int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
+	int ret;
 	FAIL_IF_LIB_ERROR;
-	return _gnutls_rnd(level, data, len);
+
+	if (unlikely((ret=_gnutls_rnd_init()) < 0))
+		return gnutls_assert_val(ret);
+
+	if (likely(len > 0)) {
+		return _gnutls_rnd_ops.rnd(gnutls_rnd_ctx, level, data,
+					   len);
+	}
+	return 0;
 }
 
 /**
@@ -98,5 +160,6 @@ int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
  **/
 void gnutls_rnd_refresh(void)
 {
-	_gnutls_rnd_refresh();
+	if (rnd_initialized && _gnutls_rnd_ops.rnd_refresh)
+		_gnutls_rnd_ops.rnd_refresh(gnutls_rnd_ctx);
 }

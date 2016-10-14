@@ -303,7 +303,7 @@ static int _gnutls_global_init(unsigned constructor)
 	}
 
 	/* Initialize the random generator */
-	ret = _gnutls_rnd_init();
+	ret = _gnutls_rnd_preinit();
 	if (ret < 0) {
 		gnutls_assert();
 		goto out;
