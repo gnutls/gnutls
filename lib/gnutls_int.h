@@ -976,9 +976,9 @@ typedef struct {
 
 	/* DTLS session state */
 	dtls_st dtls;
-	/* In case of clients that don't handle GNUTLS_E_LARGE_PACKET, don't
-	 * force them into an infinite loop */
-	unsigned handshake_large_loops;
+	/* Protect from infinite loops due to GNUTLS_E_LARGE_PACKET non-handling
+	 * or due to multiple alerts being received. */
+	unsigned handshake_suspicious_loops;
 	/* should be non-zero when a handshake is in progress */
 	bool handshake_in_progress;
 
