@@ -113,7 +113,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5 \
 	 rsa-illegal-import set_x509_key_file_ocsp_multi set_key set_x509_key_file_ocsp_multi2 \
 	 set_key_utf8 set_x509_key_utf8 insecure_key handshake-large-packet \
-	 client_dsa_key server_ecdsa_key tls-session-ext-register tls-session-supplemental
+	 client_dsa_key server_ecdsa_key tls-session-ext-register tls-session-supplemental \
+	 multi-alerts
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
