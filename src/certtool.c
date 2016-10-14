@@ -3755,8 +3755,19 @@ void pkcs7_info(common_info_st *cinfo, unsigned display_data)
 
 		fprintf(outfile, "%s", str.data);
 		gnutls_free(str.data);
-	}
 
+		size = lbuffer_size;
+		ret =
+		    gnutls_pkcs7_export(pkcs7, outcert_format,
+					lbuffer, &size);
+		if (ret < 0) {
+			fprintf(stderr, "export error: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fwrite(lbuffer, 1, size, outfile);
+	}
 
 	gnutls_pkcs7_deinit(pkcs7);
 }
