@@ -87,7 +87,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 fips-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr \
 	 crlverify init_fds mini-rehandshake-2 sign-md5-rep global-init-override \
-	 version-checks mini-server-name naked-alerts
+	 version-checks mini-server-name naked-alerts multi-alerts
 
 if ENABLE_PKCS11
 if !HAVE_BUGGY_P11_KIT
