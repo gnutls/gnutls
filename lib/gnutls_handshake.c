@@ -2649,12 +2649,18 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 			return ret; \
 		if (ret == GNUTLS_E_GOT_APPLICATION_DATA && session->internals.initial_negotiation_completed != 0) \
 			return ret; \
-		if (ret == GNUTLS_E_LARGE_PACKET && session->internals.handshake_large_loops < 16) { \
-			session->internals.handshake_large_loops++; \
-			return ret; \
+		if (session->internals.handshake_suspicious_loops < 16) { \
+			if (ret == GNUTLS_E_LARGE_PACKET) { \
+				session->internals.handshake_suspicious_loops++; \
+				return ret; \
+			} \
+			/* a warning alert might interrupt handshake */ \
+			if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) { \
+				session->internals.handshake_suspicious_loops++; \
+				return ret; \
+			} \
 		} \
                 /* a warning alert might interrupt handshake */ \
-		if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
 		/* do not allow non-fatal errors at this point */ \
