@@ -755,6 +755,12 @@ record_add_to_buffers(gnutls_session_t session,
 			     gnutls_alert_get_name((int) bufel->msg.
 						   data[1]));
 
+			if (!session->internals.initial_negotiation_completed &&
+			    session->internals.handshake_in_progress && STATE == STATE0) { /* handshake hasn't started */
+				ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+				goto unexpected_packet;
+			}
+
 			session->internals.last_alert = bufel->msg.data[1];
 
 			/* if close notify is received and
@@ -771,7 +777,6 @@ record_add_to_buffers(gnutls_session_t session,
 				/* if the alert is FATAL or WARNING
 				 * return the apropriate message
 				 */
-
 				gnutls_assert();
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
 				if (bufel->msg.data[0] == GNUTLS_AL_FATAL) {
