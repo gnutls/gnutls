@@ -242,8 +242,7 @@ MinGW64/DLLs:
 
 MinGW64:
   script:
-  - dnf install -y wine mingw64-nettle mingw64-p11-kit mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux
-  - dnf install -y "http://people.redhat.com/nmavrogi/fedora/mingw64-libcmocka-1.0.1-1.fc24.noarch.rpm"
+  - dnf install -y wine mingw64-nettle mingw64-p11-kit mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux mingw64-cmocka
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
@@ -263,8 +262,7 @@ MinGW64:
 
 MinGW32:
   script:
-  - dnf install -y wine.i686 mingw32-p11-kit mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
-  - dnf install -y "http://people.redhat.com/nmavrogi/fedora/mingw32-libcmocka-1.0.1-1.fc24.noarch.rpm"
+  - dnf install -y wine.i686 mingw32-p11-kit mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux mingw32-cmocka
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
