@@ -54,7 +54,7 @@ static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 
 static void rnd_func(void *_ctx, size_t length, uint8_t * data)
 {
-	if (_gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
+	if (gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
 #ifdef ENABLE_FIPS140
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 #else
@@ -1444,7 +1444,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				goto fail;
 			}
 
-			ret = _gnutls_rnd(GNUTLS_RND_RANDOM, params->raw_priv.data, size);
+			ret = gnutls_rnd(GNUTLS_RND_RANDOM, params->raw_priv.data, size);
 			if (ret < 0) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto fail;

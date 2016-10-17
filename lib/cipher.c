@@ -323,9 +323,9 @@ compressed_to_ciphertext(gnutls_session_t session,
 	/* Calculate the encrypted length (padding etc.)
 	 */
 	if (algo_type == CIPHER_BLOCK) {
-		/* Call _gnutls_rnd() once. Get data used for the IV
+		/* Call gnutls_rnd() once. Get data used for the IV
 		 */
-		ret = _gnutls_rnd(GNUTLS_RND_NONCE, nonce, blocksize);
+		ret = gnutls_rnd(GNUTLS_RND_NONCE, nonce, blocksize);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 

@@ -60,7 +60,7 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 		buf_release = 1;
 	}
 
-	ret = _gnutls_rnd(level, buf, size);
+	ret = gnutls_rnd(level, buf, size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

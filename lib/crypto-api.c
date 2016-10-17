@@ -611,7 +611,7 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = _gnutls_rnd(GNUTLS_RND_RANDOM, key->data, key->size);
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, key->data, key->size);
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_free_datum(key);

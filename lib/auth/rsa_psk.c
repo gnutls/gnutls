@@ -156,7 +156,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	}
 
 	/* Generate random */
-	ret = _gnutls_rnd(GNUTLS_RND_RANDOM, premaster_secret.data,
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, premaster_secret.data,
 			  premaster_secret.size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -370,7 +370,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 
 		/* we do not need strong random numbers here.
 		 */
-		ret = _gnutls_rnd(GNUTLS_RND_NONCE, premaster_secret.data,
+		ret = gnutls_rnd(GNUTLS_RND_NONCE, premaster_secret.data,
 				  premaster_secret.size);
 		if (ret < 0) {
 			gnutls_assert();

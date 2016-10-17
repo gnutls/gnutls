@@ -72,7 +72,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 	}
 
 	/* generate a unique ID */
-	ret = _gnutls_rnd(GNUTLS_RND_NONCE, id, sizeof(id));
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, id, sizeof(id));
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

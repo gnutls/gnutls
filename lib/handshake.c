@@ -204,7 +204,7 @@ static int create_tls_random(uint8_t * dst)
 	_gnutls_write_uint32(tim, dst);
 
 	ret =
-	    _gnutls_rnd(GNUTLS_RND_NONCE, &dst[3], GNUTLS_RANDOM_SIZE - 3);
+	    gnutls_rnd(GNUTLS_RND_NONCE, &dst[3], GNUTLS_RANDOM_SIZE - 3);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -3367,7 +3367,7 @@ int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len)
 	*len = GNUTLS_MAX_SESSION_ID_SIZE;
 
 	ret =
-	    _gnutls_rnd(GNUTLS_RND_NONCE, session_id,
+	    gnutls_rnd(GNUTLS_RND_NONCE, session_id,
 			GNUTLS_MAX_SESSION_ID_SIZE);
 	if (ret < 0) {
 		gnutls_assert();

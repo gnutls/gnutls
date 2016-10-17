@@ -194,7 +194,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 			return gnutls_assert_val(ret);
 
 		ret =
-		    _gnutls_rnd(GNUTLS_RND_NONCE,
+		    gnutls_rnd(GNUTLS_RND_NONCE,
 				session->internals.hb_local_data.data,
 				data_size);
 		if (ret < 0)

@@ -1279,7 +1279,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 	if (password)
 		pass_len = strlen(password);
 
-	ret = _gnutls_rnd(GNUTLS_RND_RANDOM, rnd, 2);
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, rnd, 2);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1301,7 +1301,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _gnutls_rnd(GNUTLS_RND_RANDOM, kdf_params->salt,
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, kdf_params->salt,
 			  kdf_params->salt_size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1329,7 +1329,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 				 kdf_params->key_size, key->data);
 
 		if (enc_params->iv_size) {
-			ret = _gnutls_rnd(GNUTLS_RND_NONCE,
+			ret = gnutls_rnd(GNUTLS_RND_NONCE,
 					  enc_params->iv, enc_params->iv_size);
 			if (ret < 0) {
 				gnutls_assert();

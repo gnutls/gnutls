@@ -31,9 +31,6 @@ extern int crypto_rnd_prio;
 extern void *gnutls_rnd_ctx;
 extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
 
-#define _gnutls_rnd gnutls_rnd
-#define _gnutls_rnd_refresh gnutls_rnd_refresh
-
 void _gnutls_rnd_deinit(void);
 int _gnutls_rnd_preinit(void);
 

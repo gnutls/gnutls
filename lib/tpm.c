@@ -768,7 +768,7 @@ static int randomize_uuid(TSS_UUID * uuid)
 	uint8_t raw_uuid[16];
 	int ret;
 
-	ret = _gnutls_rnd(GNUTLS_RND_NONCE, raw_uuid, sizeof(raw_uuid));
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, raw_uuid, sizeof(raw_uuid));
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1391,7 +1391,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	}
 
 
-	ret = _gnutls_rnd(GNUTLS_RND_RANDOM, buf, sizeof(buf));
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, buf, sizeof(buf));
 	if (ret < 0) {
 		gnutls_assert();
 		goto err_cc;

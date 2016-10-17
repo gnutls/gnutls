@@ -881,7 +881,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 
 	/* Generate the salt.
 	 */
-	result = _gnutls_rnd(GNUTLS_RND_NONCE, salt, sizeof(salt));
+	result = gnutls_rnd(GNUTLS_RND_NONCE, salt, sizeof(salt));
 	if (result < 0) {
 		gnutls_assert();
 		return result;

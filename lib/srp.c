@@ -532,7 +532,7 @@ gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
 		goto cleanup;
 	}
 
-	ret = _gnutls_rnd(GNUTLS_RND_RANDOM, (*sc)->fake_salt_seed.data,
+	ret = gnutls_rnd(GNUTLS_RND_RANDOM, (*sc)->fake_salt_seed.data,
 				DEFAULT_FAKE_SALT_SEED_SIZE);
 
 	if (ret < 0) {
