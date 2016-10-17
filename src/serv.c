@@ -242,38 +242,6 @@ static void read_dh_params(void)
 
 }
 
-static char pkcs3[] =
-    "-----BEGIN DH PARAMETERS-----\n"
-    "MIGGAoGAtkxw2jlsVCsrfLqxrN+IrF/3W8vVFvDzYbLmxi2GQv9s/PQGWP1d9i22\n"
-    "P2DprfcJknWt7KhCI1SaYseOQIIIAYP78CfyIpGScW/vS8khrw0rlQiyeCvQgF3O\n"
-    "GeGOEywcw+oQT4SmFOD7H0smJe2CNyjYpexBXQ/A0mbTF9QKm1cCAQU=\n"
-    "-----END DH PARAMETERS-----\n";
-
-static int static_dh_params(void)
-{
-	gnutls_datum_t params = { (void *) pkcs3, sizeof(pkcs3) };
-	int ret;
-
-	if (gnutls_dh_params_init(&dh_params) < 0) {
-		fprintf(stderr, "Error in dh parameter initialization\n");
-		exit(1);
-	}
-
-	ret = gnutls_dh_params_import_pkcs3(dh_params, &params,
-					    GNUTLS_X509_FMT_PEM);
-
-	if (ret < 0) {
-		fprintf(stderr, "Error parsing dh params: %s\n",
-			safe_strerror(ret));
-		exit(1);
-	}
-
-	printf
-	    ("Set static Diffie-Hellman parameters, consider --dhparams.\n");
-
-	return 0;
-}
-
 static int
 get_params(gnutls_session_t session, gnutls_params_type_t type,
 	   gnutls_params_st * st)
@@ -1012,6 +980,7 @@ int main(int argc, char **argv)
 	int ret, mtu, port;
 	char name[256];
 	int cert_set = 0;
+	unsigned use_static_dh_params = 0;
 
 	cmd_parser(argc, argv);
 
@@ -1075,7 +1044,7 @@ int main(int argc, char **argv)
 	} else if (dh_params_file) {
 		read_dh_params();
 	} else {
-		static_dh_params();
+		use_static_dh_params = 1;
 	}
 
 	if (gnutls_certificate_allocate_credentials(&cert_cred) < 0) {
@@ -1196,10 +1165,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	gnutls_certificate_set_params_function(cert_cred, get_params);
-/*     gnutls_certificate_set_dh_params(cert_cred, dh_params);
- *     gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
- */
+	if (use_static_dh_params) {
+		ret = gnutls_certificate_set_known_dh_params(cert_cred, GNUTLS_SEC_PARAM_MEDIUM);
+		if (ret < 0) {
+			fprintf(stderr, "Error while setting DH parameters: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		gnutls_certificate_set_params_function(cert_cred, get_params);
+	}
 
 	/* this is a password file (created with the included srpcrypt utility) 
 	 * Read README.crypt prior to using SRP.
@@ -1250,16 +1224,31 @@ int main(int argc, char **argv)
 			}
 		}
 
-		gnutls_psk_set_server_params_function(psk_cred,
-						      get_params);
+		if (use_static_dh_params) {
+			ret = gnutls_psk_set_server_known_dh_params(psk_cred, GNUTLS_SEC_PARAM_MEDIUM);
+			if (ret < 0) {
+				fprintf(stderr, "Error while setting DH parameters: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		} else {
+			gnutls_psk_set_server_params_function(psk_cred,
+							      get_params);
+		}
 	}
 #endif
 
 #ifdef ENABLE_ANON
 	gnutls_anon_allocate_server_credentials(&dh_cred);
-	gnutls_anon_set_server_params_function(dh_cred, get_params);
 
-/*      gnutls_anon_set_server_dh_params(dh_cred, dh_params); */
+	if (use_static_dh_params) {
+		ret = gnutls_anon_set_server_known_dh_params(dh_cred, GNUTLS_SEC_PARAM_MEDIUM);
+		if (ret < 0) {
+			fprintf(stderr, "Error while setting DH parameters: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		gnutls_anon_set_server_params_function(dh_cred, get_params);
+	}
 #endif
 
 #ifdef ENABLE_SESSION_TICKETS
