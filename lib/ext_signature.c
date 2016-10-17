@@ -72,7 +72,8 @@ typedef struct
  */
 int
 _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
-                                     size_t max_data_size)
+                                     size_t max_data_size,
+                                     unsigned cert_verify)
 {
   opaque *p = data, *len_p;
   int len, i, j, hash;
@@ -91,13 +92,16 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
 
   for (i = j = 0; j < session->internals.priorities.sign_algo.algorithms; i += 2, j++)
     {
-      /* In gnutls we keep a state of SHA1 and SHA256 and thus cannot
-       * use anything else.
-       */
-      hash = _gnutls_sign_get_hash_algorithm(session->internals.priorities.sign_algo.priority[j]);
-      if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA256)
-        continue;
-      
+      if (cert_verify)
+        {
+          /* In gnutls we keep a state of SHA1 and SHA256 and thus cannot
+           * use anything else.
+           */
+          hash = _gnutls_sign_get_hash_algorithm(session->internals.priorities.sign_algo.priority[j]);
+          if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA256)
+            continue;
+        }
+
       aid =
         _gnutls_sign_to_tls_aid (session->internals.priorities.
                                  sign_algo.priority[j]);
@@ -125,7 +129,7 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
  */
 int
 _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
-                                   const opaque * data, size_t data_size)
+                                   const opaque * data, size_t data_size, unsigned cert_verify)
 {
   int sig, i, hash;
   sig_ext_st *priv;
@@ -156,9 +160,12 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
 
       if (sig != GNUTLS_SIGN_UNKNOWN)
         {
-          hash = _gnutls_sign_get_hash_algorithm(sig);
-          if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA256)
-            continue;
+          if (cert_verify)
+            { /* we cannot handle anything else than SHA1 or SHA256 */
+              hash = _gnutls_sign_get_hash_algorithm(sig);
+              if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA256)
+                continue;
+            }
 
           priv->sign_algorithms[priv->sign_algorithms_size++] = sig;
           if (priv->sign_algorithms_size == MAX_SIGNATURE_ALGORITHMS)
@@ -212,7 +219,7 @@ _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
           len = _gnutls_read_uint16 (data);
           DECR_LEN (data_size, len);
 
-          ret = _gnutls_sign_algorithm_parse_data (session, data + 2, len);
+          ret = _gnutls_sign_algorithm_parse_data (session, data + 2, len, 0);
           if (ret < 0)
             {
               gnutls_assert ();
@@ -240,7 +247,7 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
       if (session->internals.priorities.sign_algo.algorithms > 0)
         {
           ret =
-            _gnutls_sign_algorithm_write_params (session, data, data_size);
+            _gnutls_sign_algorithm_write_params (session, data, data_size, 0);
           if (ret < 0)
             {
               gnutls_assert ();

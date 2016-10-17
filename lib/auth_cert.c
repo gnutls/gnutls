@@ -1476,7 +1476,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
       p += 2;
       DECR_LEN (dsize, hash_num);
 
-      ret = _gnutls_sign_algorithm_parse_data (session, p, hash_num);
+      ret = _gnutls_sign_algorithm_parse_data (session, p, hash_num, 1);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1737,7 +1737,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   if (_gnutls_version_has_selectable_sighash (ver))
     {
       ret =
-        _gnutls_sign_algorithm_write_params (session, pdata, signalgosize);
+        _gnutls_sign_algorithm_write_params (session, pdata, signalgosize, 1);
       if (ret < 0)
         {
           gnutls_assert ();
