@@ -2577,6 +2577,7 @@ int gnutls_fips140_mode_enabled(void);
 #define GNUTLS_E_IDNA_ERROR -404
 
 #define GNUTLS_E_NEED_FALLBACK -405
+#define GNUTLS_E_NOT_YET_ACTIVATED -411
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

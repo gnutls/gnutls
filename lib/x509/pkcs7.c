@@ -913,6 +913,10 @@ gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_datum_
  * provided are NULL then the data in the encapsulatedContent field
  * will be used instead.
  *
+ * Note that, unlike gnutls_pkcs7_verify() this function does not
+ * verify the key purpose of the signer. It is expected for the caller
+ * to verify the intended purpose of the %signer -e.g., via gnutls_x509_crt_get_key_purpose_oid().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. A verification error results to a
  *   %GNUTLS_E_PK_SIG_VERIFY_FAILED and the lack of encapsulated data
@@ -1165,7 +1169,9 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 
 	signer = find_signer(pkcs7, tl, vdata, vdata_size, &info);
 	if (signer) {
-		ret = gnutls_x509_crt_verify_data2(signer, info.algo, flags, &sigdata, &info.sig);
+		ret =
+		    gnutls_x509_crt_verify_data3(signer, info.algo, vdata, vdata_size,
+						 &sigdata, &info.sig, flags);
 		if (ret < 0) {
 			gnutls_assert();
 		}
