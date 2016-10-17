@@ -3862,8 +3862,8 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 	return ret;
 }
 
-/**
- * gnutls_x509_crt_verify_data2:
+/*-
+ * gnutls_x509_crt_verify_data3:
  * @crt: Holds the certificate to verify with
  * @algo: The signature algorithm used
  * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
@@ -3874,16 +3874,19 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
  * parameters from the certificate.
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and zero or positive code on success.
+ * is returned, %GNUTLS_E_EXPIRED or %GNUTLS_E_NOT_YET_ACTIVATED on expired
+ * or not yet activated certificate and zero or positive code on success.
  *
- * Since: 3.4.0
- **/
+ * Since: 3.5.6
+ -*/
 int
-gnutls_x509_crt_verify_data2(gnutls_x509_crt_t crt,
-			   gnutls_sign_algorithm_t algo,
-			   unsigned int flags,
-			   const gnutls_datum_t * data,
-			   const gnutls_datum_t * signature)
+gnutls_x509_crt_verify_data3(gnutls_x509_crt_t crt,
+			     gnutls_sign_algorithm_t algo,
+			     gnutls_typed_vdata_st *vdata,
+			     unsigned int vdata_size,
+			     const gnutls_datum_t *data,
+			     const gnutls_datum_t *signature,
+			     unsigned int flags)
 {
 	int ret;
 	gnutls_pubkey_t pubkey;
@@ -3892,6 +3895,7 @@ gnutls_x509_crt_verify_data2(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
@@ -3904,5 +3908,67 @@ gnutls_x509_crt_verify_data2(gnutls_x509_crt_t crt,
 	ret = gnutls_pubkey_verify_data2(pubkey, algo, flags, data, signature);
 	gnutls_pubkey_deinit(pubkey);
 
+	if (ret >= 0) {
+		time_t now = gnutls_time(0);
+		int res;
+		unsigned usage, i;
+
+		if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) ||
+		    !(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
+			if (now > gnutls_x509_crt_get_expiration_time(crt)) {
+				return gnutls_assert_val(GNUTLS_E_EXPIRED);
+			}
+
+			if (now < gnutls_x509_crt_get_activation_time(crt)) {
+				return gnutls_assert_val(GNUTLS_E_NOT_YET_ACTIVATED);
+			}
+		}
+
+		res = gnutls_x509_crt_get_key_usage(crt, &usage, NULL);
+		if (res >= 0) {
+			if (!(usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+				return gnutls_assert_val(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+			}
+		}
+
+		for (i=0;i<vdata_size;i++) {
+			if (vdata[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
+				res = _gnutls_check_key_purpose(crt, (char *)vdata[i].data, 0);
+				if (res == 0)
+					return gnutls_assert_val(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
+				break;
+			}
+		}
+	}
+
 	return ret;
 }
+
+/**
+ * gnutls_x509_crt_verify_data2:
+ * @crt: Holds the certificate to verify with
+ * @algo: The signature algorithm used
+ * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
+ * @data: holds the signed data
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed data, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, %GNUTLS_E_EXPIRED or %GNUTLS_E_NOT_YET_ACTIVATED on expired
+ * or not yet activated certificate and zero or positive code on success.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_x509_crt_verify_data2(gnutls_x509_crt_t crt,
+			   gnutls_sign_algorithm_t algo,
+			   unsigned int flags,
+			   const gnutls_datum_t *data,
+			   const gnutls_datum_t *signature)
+{
+	return gnutls_x509_crt_verify_data3(crt, algo, NULL, 0,
+				data, signature, flags);
+}
+

@@ -406,6 +406,15 @@ int _gnutls_x509_crq_set_extension(gnutls_x509_crq_t crq,
 				   const gnutls_datum_t * ext_data,
 				   unsigned int critical);
 
+int
+gnutls_x509_crt_verify_data3(gnutls_x509_crt_t crt,
+			     gnutls_sign_algorithm_t algo,
+			     gnutls_typed_vdata_st *vdata,
+			     unsigned int vdata_size,
+			     const gnutls_datum_t *data,
+			     const gnutls_datum_t *signature,
+			     unsigned int flags);
+
 unsigned int
 _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 				int clist_size,
