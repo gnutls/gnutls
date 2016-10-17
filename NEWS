@@ -15,17 +15,21 @@ Version 2.12.24 (unreleased)
 ** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
    Karthikeyan Bhargavan (GNUTLS-SA-2015-2).
 
-** libgnutls: Be less strict in TLS 1.2 signature algorithm adherence.
-   That is because we only support SHA1 and SHA256 for handshake hashes,
-   and if we only accept these two algorithms, we will fail to connect to
-   sites which use other hash algorithms on their certificates.
+** libgnutls: Separated the logic of supported signature algorithms for
+   CertificateRequest message and ClientHello. This allows the former
+   be restricted to SHA1 and SHA256 due to internal limitations, while the
+   latter can utilize any supported algorithms.
+
+** libgnutls: Be less strict in TLS 1.2 signature algorithm adherence. This
+   improves compatibility with sites that have a certificate with an enabled
+   hash algorithm but necessarily enabled for TLS negotiation.
 
 ** libgnutls: No longer set SSL 3.0 as the record layer version by default
    This improves interoperability against broken servers which
    assume that this version is supported by the client.
 
 ** libgnutls: No longer include SSL 3.0 to the default protocol list.
-   SSL 3.0 it must be explicitly enabled using a priority string, to be used.
+   SSL 3.0 it must be explicitly enabled using a priority string.
 
 ** libgnutls: Prohibit DSA2 signatures when used with the libgcrypt
    backend. There are interoperability issues, and these algorithms are
