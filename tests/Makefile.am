@@ -108,7 +108,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange x509-cert-callback-legacy \
 	 keylog-env ssl2-hello tlsfeature-ext dtls-rehandshake-cert-2 \
 	 tlsfeature-crt dtls-rehandshake-cert-3 resume-with-false-start \
-	 set_x509_key_file_ocsp client-fastopen rng-sigint srp \
+	 set_x509_key_file_ocsp client-fastopen rng-sigint srp rng-pthread \
 	 safe-renegotiation/srn0 safe-renegotiation/srn1 safe-renegotiation/srn2 \
 	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5 \
 	 rsa-illegal-import set_x509_key_file_ocsp_multi set_key set_x509_key_file_ocsp_multi2 \
@@ -134,6 +134,7 @@ conv_utf8_LDADD = $(CMOCKA_LDADD)
 endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
+rng_pthread_LDADD = $(LDADD) -lpthread
 
 # These tests need gnulib for memmem()
 resume_psk_CFLAGS = -DUSE_PSK
