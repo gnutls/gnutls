@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <assert.h>
 #if !defined(_WIN32)
 #include <sys/wait.h>
 #endif
@@ -67,7 +68,7 @@ void doit(void)
 			if (fp == NULL)
 				fail("cannot open file");
 
-			gnutls_rnd(i, buf1, sizeof(buf1));
+			assert(gnutls_rnd(i, buf1, sizeof(buf1)) >= 0);
 			if (debug)
 				dump("buf1", buf1, sizeof(buf1));
 
@@ -77,7 +78,7 @@ void doit(void)
 			exit(0);
 		} else {
 			/* daddy */
-			gnutls_rnd(i, buf2, sizeof(buf2));
+			assert(gnutls_rnd(i, buf2, sizeof(buf2)) >= 0);
 			if (debug)
 				dump("buf2", buf2, sizeof(buf2));
 			waitpid(pid, NULL, 0);
