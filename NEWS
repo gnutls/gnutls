@@ -23,6 +23,7 @@ gnutls_pkcs7_get_embedded_data_oid: Added
 gnutls_anon_set_server_known_dh_params: Added
 gnutls_certificate_set_known_dh_params: Added
 gnutls_psk_set_server_known_dh_params: Added
+gnutls_x509_crt_check_key_purpose: Added
 
 
 * Version 3.5.5 (released 2016-10-09)

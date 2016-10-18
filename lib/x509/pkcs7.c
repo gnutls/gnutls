@@ -967,7 +967,8 @@ gnutls_pkcs7_get_embedded_data_oid(gnutls_pkcs7_t pkcs7)
  *
  * Note that, unlike gnutls_pkcs7_verify() this function does not
  * verify the key purpose of the signer. It is expected for the caller
- * to verify the intended purpose of the %signer -e.g., via gnutls_x509_crt_get_key_purpose_oid().
+ * to verify the intended purpose of the %signer -e.g., via gnutls_x509_crt_get_key_purpose_oid(),
+ * or gnutls_x509_crt_check_key_purpose().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. A verification error results to a
