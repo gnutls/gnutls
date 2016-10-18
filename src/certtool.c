@@ -498,6 +498,30 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			}
 		}
 
+		result = get_code_sign_status();
+		if (result) {
+			result =
+			    gnutls_x509_crt_set_key_purpose_oid
+			    (crt, GNUTLS_KP_CODE_SIGNING, 0);
+			if (result < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(result));
+				exit(1);
+			}
+		}
+
+		result = get_time_stamp_status();
+		if (result) {
+			result =
+			    gnutls_x509_crt_set_key_purpose_oid
+			    (crt, GNUTLS_KP_TIME_STAMPING, 0);
+			if (result < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(result));
+				exit(1);
+			}
+		}
+
 		if (ca_status) {
 			result = get_cert_sign_status();
 			if (result)
@@ -507,33 +531,10 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			if (result)
 				usage |= GNUTLS_KEY_CRL_SIGN;
 
-			result = get_code_sign_status();
-			if (result) {
-				result =
-				    gnutls_x509_crt_set_key_purpose_oid
-				    (crt, GNUTLS_KP_CODE_SIGNING, 0);
-				if (result < 0) {
-					fprintf(stderr, "key_kp: %s\n",
-						gnutls_strerror(result));
-					exit(1);
-				}
-			}
 
 			crt_constraints_set(crt);
-
-
-			result = get_time_stamp_status();
-			if (result) {
-				result =
-				    gnutls_x509_crt_set_key_purpose_oid
-				    (crt, GNUTLS_KP_TIME_STAMPING, 0);
-				if (result < 0) {
-					fprintf(stderr, "key_kp: %s\n",
-						gnutls_strerror(result));
-					exit(1);
-				}
-			}
 		}
+
 		get_ocsp_issuer_set(crt);
 		get_ca_issuers_set(crt);
 
@@ -2045,6 +2046,50 @@ void generate_request(common_info_st * cinfo)
 		} else		/* DSA and ECDSA are always signing */
 			usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
+		ret = get_code_sign_status();
+		if (ret) {
+			ret = gnutls_x509_crq_set_key_purpose_oid
+			    (crq, GNUTLS_KP_CODE_SIGNING, 0);
+			if (ret < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		ret = get_time_stamp_status();
+		if (ret) {
+			ret = gnutls_x509_crq_set_key_purpose_oid
+			    (crq, GNUTLS_KP_TIME_STAMPING, 0);
+			if (ret < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		ret = get_ipsec_ike_status();
+		if (ret) {
+			ret = gnutls_x509_crq_set_key_purpose_oid
+			    (crq, GNUTLS_KP_IPSEC_IKE, 0);
+			if (ret < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		ret = get_ocsp_sign_status();
+		if (ret) {
+			ret = gnutls_x509_crq_set_key_purpose_oid
+			    (crq, GNUTLS_KP_OCSP_SIGNING, 0);
+			if (ret < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
 		if (ca_status) {
 			ret = get_cert_sign_status();
 			if (ret)
@@ -2054,49 +2099,7 @@ void generate_request(common_info_st * cinfo)
 			if (ret)
 				usage |= GNUTLS_KEY_CRL_SIGN;
 
-			ret = get_code_sign_status();
-			if (ret) {
-				ret = gnutls_x509_crq_set_key_purpose_oid
-				    (crq, GNUTLS_KP_CODE_SIGNING, 0);
-				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s\n",
-						gnutls_strerror(ret));
-					exit(1);
-				}
-			}
 
-			ret = get_ocsp_sign_status();
-			if (ret) {
-				ret = gnutls_x509_crq_set_key_purpose_oid
-				    (crq, GNUTLS_KP_OCSP_SIGNING, 0);
-				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s\n",
-						gnutls_strerror(ret));
-					exit(1);
-				}
-			}
-
-			ret = get_time_stamp_status();
-			if (ret) {
-				ret = gnutls_x509_crq_set_key_purpose_oid
-				    (crq, GNUTLS_KP_TIME_STAMPING, 0);
-				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s\n",
-						gnutls_strerror(ret));
-					exit(1);
-				}
-			}
-
-			ret = get_ipsec_ike_status();
-			if (ret) {
-				ret = gnutls_x509_crq_set_key_purpose_oid
-				    (crq, GNUTLS_KP_IPSEC_IKE, 0);
-				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s\n",
-						gnutls_strerror(ret));
-					exit(1);
-				}
-			}
 		}
 
 		ret = gnutls_x509_crq_set_key_usage(crq, usage);
