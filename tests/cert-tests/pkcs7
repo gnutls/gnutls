@@ -26,8 +26,12 @@ DIFF="${DIFF:-diff -b -B}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
-OUTFILE=out-pkcs7.tmp
-OUTFILE2=out2-pkcs7.tmp
+OUTFILE=out-pkcs7.$$.tmp
+OUTFILE2=out2-pkcs7.$$.tmp
+
+. ${srcdir}/../scripts/common.sh
+
+check_for_datefudge
 
 for FILE in single-ca.p7b full.p7b; do
 ${VALGRIND} "${CERTTOOL}" --inder --p7-info --infile "${srcdir}/data/${FILE}"|grep -v "Signing time" >"${OUTFILE}"
@@ -49,6 +53,36 @@ done
 # check signatures
 
 for FILE in full.p7b; do
+# check validation with date prior to CA issuance
+datefudge -s "2011-1-10" \
+${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
+rc=$?
+
+if test "${rc}" = "0"; then
+	echo "${FILE}: PKCS7 verification succeeded with invalid date (1)"
+	exit 1
+fi
+
+# check validation with date prior to intermediate cert issuance
+datefudge -s "2011-5-28 08:38:00 UTC" \
+${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
+rc=$?
+
+if test "${rc}" = "0"; then
+	echo "${FILE}: PKCS7 verification succeeded with invalid date (2)"
+	exit 1
+fi
+
+# check validation with date after intermediate cert issuance
+datefudge -s "2038-10-12" \
+${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
+rc=$?
+
+if test "${rc}" = "0"; then
+	echo "${FILE}: PKCS7 verification succeeded with invalid date (3)"
+	exit 1
+fi
+
 ${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
 
