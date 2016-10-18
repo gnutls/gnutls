@@ -3981,6 +3981,9 @@ gnutls_x509_crt_verify_data3(gnutls_x509_crt_t crt,
  * is returned, %GNUTLS_E_EXPIRED or %GNUTLS_E_NOT_YET_ACTIVATED on expired
  * or not yet activated certificate and zero or positive code on success.
  *
+ * Note that since GnuTLS 3.5.6 this function introduces checks in the
+ * end certificate (@crt), including time checks and key usage checks.
+ *
  * Since: 3.4.0
  **/
 int
