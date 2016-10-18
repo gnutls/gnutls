@@ -68,6 +68,16 @@ static char pem1_key[] =
 const gnutls_datum_t cert = {(void *) pem1_cert, sizeof(pem1_cert)-1};
 const gnutls_datum_t key = {(void *) pem1_key, sizeof(pem1_key)-1};
 
+static time_t mytime(time_t * t)
+{
+	time_t then = 1199142000;
+
+	if (t)
+		*t = then;
+
+	return then;
+}
+
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "%s |<%d>| %s", "err", level, str);
@@ -89,6 +99,7 @@ void doit(void)
 	char *oid;
 	gnutls_datum_t data;
 
+	gnutls_global_set_time_function(mytime);
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(6);
