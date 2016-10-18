@@ -2857,7 +2857,7 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
  * @crl_list: should contain a list of gnutls_x509_crl_t types
  * @crl_list_length: the length of the crl_list
  *
- * This function will return check if the given certificate is
+ * This function will check if the given certificate is
  * revoked.  It is assumed that the CRLs have been verified before.
  *
  * Returns: 0 if the certificate is NOT revoked, and 1 if it is.  A
@@ -2870,6 +2870,28 @@ gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 {
 	return _gnutls_x509_crt_check_revocation(cert, crl_list,
 						 crl_list_length, NULL);
+}
+
+/**
+ * gnutls_x509_crt_check_key_purpose:
+ * @cert: should contain a #gnutls_x509_crt_t type
+ * @purpose: a key purpose OID (e.g., %GNUTLS_KP_CODE_SIGNING)
+ * @flags: zero or %GNUTLS_KP_FLAG_DISALLOW_ANY
+ *
+ * This function will check whether the given certificate matches
+ * the provided key purpose. If @flags contains %GNUTLS_KP_FLAG_ALLOW_ANY then
+ * it a certificate marked for any purpose will not match.
+ *
+ * Returns: zero if the key purpose doesn't match, and non-zero otherwise.
+ *
+ * Since: 3.5.6
+ **/
+unsigned
+gnutls_x509_crt_check_key_purpose(gnutls_x509_crt_t cert,
+				 const char *purpose,
+				 unsigned flags)
+{
+	return _gnutls_check_key_purpose(cert, purpose, (flags&GNUTLS_KP_FLAG_DISALLOW_ANY)?1:0);
 }
 
 /**

@@ -1123,6 +1123,7 @@ GNUTLS_3_4
 	gnutls_certificate_set_known_dh_params;
 	gnutls_anon_set_server_known_dh_params;
 	gnutls_psk_set_server_known_dh_params;
+	gnutls_x509_crt_check_key_purpose;
  local:
 	*;
 };
