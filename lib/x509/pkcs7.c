@@ -917,6 +917,9 @@ gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_datum_
  * verify the key purpose of the signer. It is expected for the caller
  * to verify the intended purpose of the %signer -e.g., via gnutls_x509_crt_get_key_purpose_oid().
  *
+ * Note also, that since GnuTLS 3.4.17 this function introduces checks in the
+ * end certificate (@signer), including time checks and key usage checks.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. A verification error results to a
  *   %GNUTLS_E_PK_SIG_VERIFY_FAILED and the lack of encapsulated data
