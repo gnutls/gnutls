@@ -1401,11 +1401,17 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
   /* get server name */
   memset (&hints, 0, sizeof (hints));
   hints.ai_socktype = SOCK_STREAM;
+  hints.ai_family = AF_INET;
   if ((err = getaddrinfo (hostname, service, &hints, &res)))
     {
-      fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,
-               gai_strerror (err));
-      exit (1);
+      memset (&hints, 0, sizeof (hints));
+      hints.ai_socktype = SOCK_STREAM;
+      if ((err = getaddrinfo (hostname, service, &hints, &res)))
+        {
+          fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,
+                   gai_strerror (err));
+          exit (1);
+        }
     }
 
   sd = -1;
