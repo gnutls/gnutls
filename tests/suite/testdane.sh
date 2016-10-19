@@ -36,7 +36,7 @@ echo ""
 echo "*** Testing good HTTPS hosts ***"
 # www.vulcano.cl dane.nox.su
 HOSTS="good.dane.verisignlabs.com www.freebsd.org www.kumari.net torproject.org fedoraproject.org"
-HOSTS="${HOSTS} nohats.ca"
+#HOSTS="${HOSTS} nohats.ca"
 for host in ${HOSTS}; do
 
 	nc -w 5 "${host}" 443 >/dev/null <<_EOF
