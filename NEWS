@@ -42,6 +42,11 @@ See the end for copying conditions.
    that behavior is legal, it creates incompatibility issues with releases in
    the gnutls 3.3.x branch.
 
+** libgnutls: Delayed the initialization of the random generator at
+   the first call of gnutls_rnd(). This allows applications to load
+   on systems which getrandom() would block, without blocking until
+   real random data are needed.
+
 ** certtool: --get-dh-params will output parameters from the RFC7919
    groups.
 
