@@ -942,6 +942,18 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 			pTemplate[i].ulValueLen = (CK_ULONG) sizeof(mock_pubkey)-1;
 			memcpy(pTemplate[i].pValue, mock_pubkey, pTemplate[i].ulValueLen);
 		}
+		else if (CKA_CLASS == pTemplate[i].type)
+		{
+			if (NULL != pTemplate[i].pValue)
+			{
+				if (pTemplate[i].ulValueLen < sizeof(hObject))
+					return CKR_BUFFER_TOO_SMALL;
+				else
+					memcpy(pTemplate[i].pValue, &hObject, sizeof(hObject));
+			}
+
+			pTemplate[i].ulValueLen = sizeof(hObject);
+		}
 		else if (CKA_PUBLIC_EXPONENT == pTemplate[i].type && PKCS11_MOCK_CK_OBJECT_HANDLE_PUBLIC_KEY == hObject)
 		{
 			if (NULL != pTemplate[i].pValue)
