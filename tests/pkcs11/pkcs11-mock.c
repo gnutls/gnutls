@@ -954,7 +954,8 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 
 			pTemplate[i].ulValueLen = sizeof(hObject);
 		}
-		else if (CKA_PUBLIC_EXPONENT == pTemplate[i].type && PKCS11_MOCK_CK_OBJECT_HANDLE_PUBLIC_KEY == hObject)
+		else if (CKA_PUBLIC_EXPONENT == pTemplate[i].type &&
+			(PKCS11_MOCK_CK_OBJECT_HANDLE_PUBLIC_KEY == hObject || PKCS11_MOCK_CK_OBJECT_HANDLE_PRIVATE_KEY == hObject))
 		{
 			if (NULL != pTemplate[i].pValue)
 			{
@@ -966,7 +967,8 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 
 			pTemplate[i].ulValueLen = sizeof(mock_public_exponent)-1;
 		}
-		else if (CKA_MODULUS == pTemplate[i].type &&  PKCS11_MOCK_CK_OBJECT_HANDLE_PUBLIC_KEY == hObject)
+		else if (CKA_MODULUS == pTemplate[i].type &&
+			(PKCS11_MOCK_CK_OBJECT_HANDLE_PUBLIC_KEY == hObject || PKCS11_MOCK_CK_OBJECT_HANDLE_PRIVATE_KEY == hObject))
 		{
 			if (NULL != pTemplate[i].pValue)
 			{
