@@ -1,0 +1,22 @@
+os:
+ - osx
+
+language: c
+compiler:
+  - clang
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        brew install pkg-config autoconf automake autogen libtool nettle valgrind p11-kit libtasn1 unbound libidn gettext;
+    fi
+
+script:
+  - PATH=/usr/local/opt/gettext/bin:$PATH make autoreconf && rm -f tests/suite/mini-eagain2.c
+  - PATH=/usr/local/opt/gettext/bin:$PATH ./configure --disable-valgrind-tests --disable-doc --disable-guile --without-p11-kit --disable-dependency-tracking
+  - make -j4
+  - make -j4 check

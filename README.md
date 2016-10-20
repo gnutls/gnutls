@@ -1,8 +1,10 @@
-Master [![build status](https://gitlab.com/gnutls/gnutls/badges/master/build.svg)](https://gitlab.com/gnutls/gnutls/commits/master)
-  3.4.x [![build status](https://gitlab.com/gnutls/gnutls/badges/gnutls_3_4_x/build.svg)](https://gitlab.com/gnutls/gnutls/commits/gnutls_3_4_x)
-  3.3.x [![build status](https://gitlab.com/gnutls/gnutls/badges/gnutls_3_3_x/build.svg)](https://gitlab.com/gnutls/gnutls/commits/gnutls_3_3_x)
+|Branch|CI system|Status|Coverage|
+|:----:|:-------:|-----:|:------:|
+|Master|Gitlab|[![build status](https://gitlab.com/gnutls/gnutls/badges/master/build.svg)](https://gitlab.com/gnutls/gnutls/commits/master)|[![coverage report](https://gitlab.com/gnutls/gnutls/badges/master/coverage.svg)](https://gitlab.com/gnutls/gnutls/commits/master)|
+|Master|Travis|[![build status](https://travis-ci.org/nmav/gnutls.svg?branch=master)](https://travis-ci.org/nmav/gnutls)|N/A|
+|3.4.x|Gitlab|[![build status](https://gitlab.com/gnutls/gnutls/badges/gnutls_3_4_x/build.svg)](https://gitlab.com/gnutls/gnutls/commits/gnutls_3_4_x)|N/A|
+|3.3.x|Gitlab|[![build status](https://gitlab.com/gnutls/gnutls/badges/gnutls_3_3_x/build.svg)](https://gitlab.com/gnutls/gnutls/commits/gnutls_3_3_x)|N/A|
 
-[![coverage report](https://gitlab.com/gnutls/gnutls/badges/master/coverage.svg)](https://gitlab.com/gnutls/gnutls/commits/master)
 
 # GnuTLS -- Information for developers
 
