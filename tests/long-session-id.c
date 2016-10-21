@@ -105,6 +105,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 static void client(int fd, const char *prio)
 {
 	int ret;
+	unsigned r;
 	gnutls_anon_client_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
@@ -141,7 +142,8 @@ static void client(int fd, const char *prio)
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
-	if (gnutls_ecc_curve_get(session) == 0xffffffff) {
+	r = gnutls_ecc_curve_get(session);
+	if (r == 0xffffffff) {
 		fprintf(stderr, "memory was overwritten\n");
 		kill(getpid(), SIGSEGV);
 	}
