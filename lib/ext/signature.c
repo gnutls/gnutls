@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -150,12 +151,12 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 		     gnutls_sign_get_name(sig));
 
 		if (sig != GNUTLS_SIGN_UNKNOWN) {
-			priv->sign_algorithms[priv->
-					      sign_algorithms_size++] =
-			    sig;
 			if (priv->sign_algorithms_size ==
 			    MAX_SIGNATURE_ALGORITHMS)
 				break;
+			priv->sign_algorithms[priv->
+					      sign_algorithms_size++] =
+			    sig;
 		}
 	}
 
@@ -195,7 +196,7 @@ _gnutls_signature_algorithm_recv_params(gnutls_session_t session,
 	} else {
 		/* SERVER SIDE - we must check if the sent cert type is the right one
 		 */
-		if (data_size > 2) {
+		if (data_size >= 2) {
 			uint16_t len;
 
 			DECR_LEN(data_size, 2);
@@ -283,10 +284,8 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 					 &epriv);
 	priv = epriv;
 
-	if (ret < 0 || !_gnutls_version_has_selectable_sighash(ver)
-	    || priv->sign_algorithms_size == 0)
+	if (ret < 0 || !_gnutls_version_has_selectable_sighash(ver)) {
 		/* none set, allow SHA-1 only */
-	{
 		ret = gnutls_pk_to_sign(cert_algo, GNUTLS_DIG_SHA1);
 
 		if (!client_cert && _gnutls_session_sign_algo_enabled(session, ret) < 0)
