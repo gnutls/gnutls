@@ -907,6 +907,61 @@ print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 	}
 }
 
+static const char *
+gost_param_name(int param)
+{
+	switch(param) {
+	case 0:
+		return "TC26-Z";
+	case 1:
+		return "CryptoPro-A";
+	case 2:
+		return "CryptoPro-B";
+	case 3:
+		return "CryptoPro-C";
+	case 4:
+		return "CryptoPro-D";
+	default:
+		return "unknown";
+	}
+}
+
+void
+print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
+	       gnutls_digest_algorithm_t digest, gnutls_gost_paramset_t paramset,
+	       gnutls_datum_t * k, gnutls_datum_t * x, gnutls_datum_t * y,
+	       int cprint)
+{
+	if (cprint != 0)
+		fprintf(outfile, "/* curve: %s */\n",
+			gnutls_ecc_curve_get_name(curve));
+	else
+		fprintf(outfile, "curve:\t%s\n",
+			gnutls_ecc_curve_get_name(curve));
+
+	if (cprint != 0)
+		fprintf(outfile, "/* digest: %s */\n",
+			gnutls_digest_get_name(digest));
+	else
+		fprintf(outfile, "digest:\t%s\n",
+			gnutls_digest_get_name(digest));
+
+	if (cprint != 0)
+		fprintf(outfile, "/* paramset: %s */\n",
+			gost_param_name(paramset));
+	else
+		fprintf(outfile, "paramset:\t%s\n",
+			gost_param_name(paramset));
+
+	if (k) {
+		print_head(outfile, "private key", k->size, cprint);
+		print_hex_datum(outfile, k, cprint);
+	}
+	print_head(outfile, "x", x->size, cprint);
+	print_hex_datum(outfile, x, cprint);
+	print_head(outfile, "y", y->size, cprint);
+	print_hex_datum(outfile, y, cprint);
+}
 
 void
 print_rsa_pkey(FILE * outfile, gnutls_datum_t * m, gnutls_datum_t * e,
@@ -1228,6 +1283,32 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		else {
 			print_ecc_pkey(outfile, curve, &k, &x, &y,
 				       cinfo->cprint);
+
+			gnutls_free(x.data);
+			gnutls_free(y.data);
+			gnutls_free(k.data);
+		}
+	} else if (key_type == GNUTLS_PK_GOST_01 ||
+		   key_type == GNUTLS_PK_GOST_12_256 ||
+		   key_type == GNUTLS_PK_GOST_12_512) {
+		gnutls_datum_t y, x, k;
+		gnutls_ecc_curve_t curve;
+		gnutls_digest_algorithm_t digest;
+		gnutls_gost_paramset_t paramset;
+
+		ret =
+		    gnutls_x509_privkey_export_gost_raw(key, &curve,
+							&digest,
+							&paramset,
+							&x, &y, &k);
+		if (ret < 0)
+			fprintf(stderr,
+				"Error in key GOST data export: %s\n",
+				gnutls_strerror(ret));
+		else {
+			print_gost_pkey(outfile, curve, digest, paramset,
+					&k, &x, &y,
+					cinfo->cprint);
 
 			gnutls_free(x.data);
 			gnutls_free(y.data);
