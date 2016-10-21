@@ -33,7 +33,7 @@
 extern extension_entry_st ext_mod_sig;
 
 gnutls_sign_algorithm_t
-_gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert);
+_gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert, unsigned client_cert);
 int _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
                                        const opaque * data, size_t data_size, unsigned cert_verify);
 int _gnutls_sign_algorithm_write_params (gnutls_session_t session,

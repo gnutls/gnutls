@@ -292,7 +292,7 @@ unsigned int hash_len;
  * to return the second choice etc.
  */
 gnutls_sign_algorithm_t
-_gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert)
+_gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert, unsigned client_cert)
 {
   unsigned i;
   int ret;
@@ -310,7 +310,10 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert)
       || priv->sign_algorithms_size == 0)
     /* none set, allow SHA-1 only */
     {
-      return _gnutls_x509_pk_to_sign (cert->subject_pk_algorithm, GNUTLS_DIG_SHA1);
+      ret = _gnutls_x509_pk_to_sign (cert->subject_pk_algorithm, GNUTLS_DIG_SHA1);
+      if (!client_cert && _gnutls_session_sign_algo_enabled(session, ret) < 0)
+        goto fail;
+      return ret;
     }
 
   for (i = 0; i < priv->sign_algorithms_size; i++)
@@ -320,10 +323,14 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert)
           if (cert_compatible_with_sig(cert, ver, priv->sign_algorithms[i]) < 0)
             continue;
 
+          if (!client_cert && _gnutls_session_sign_algo_enabled(session, priv->sign_algorithms[i]) < 0)
+            continue;
+
           return priv->sign_algorithms[i];
         }
     }
 
+ fail:
   return GNUTLS_SIGN_UNKNOWN;
 }
 

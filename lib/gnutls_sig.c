@@ -72,7 +72,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
   gnutls_digest_algorithm_t hash_algo;
 
   *sign_algo =
-    _gnutls_session_get_sign_algo (session, cert);
+    _gnutls_session_get_sign_algo (session, cert, 0);
   if (*sign_algo == GNUTLS_SIGN_UNKNOWN)
     {
       gnutls_assert ();
@@ -611,7 +611,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
   digest_hd_st *handshake_td;
 
   sign_algo =
-    _gnutls_session_get_sign_algo (session, cert);
+    _gnutls_session_get_sign_algo (session, cert, 1);
   if (sign_algo == GNUTLS_SIGN_UNKNOWN)
     {
       gnutls_assert ();
