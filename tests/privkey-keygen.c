@@ -119,6 +119,12 @@ void doit(void)
 			    algorithm == GNUTLS_PK_ECDH_X25519)
 				continue;
 
+			/* Unsupported for now */
+			if (algorithm == GNUTLS_PK_GOST_01 ||
+			    algorithm == GNUTLS_PK_GOST_12_256 ||
+			    algorithm == GNUTLS_PK_GOST_12_512)
+				continue;
+
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_init: %d\n",

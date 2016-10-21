@@ -306,6 +306,7 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 
 	dst->pkflags = src->pkflags;
 	dst->curve = src->curve;
+	dst->gost_params = src->gost_params;
 	dst->qbits = src->qbits;
 	dst->algo = src->algo;
 

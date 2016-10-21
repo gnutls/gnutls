@@ -750,6 +750,9 @@ typedef enum gnutls_certificate_print_formats {
  * @GNUTLS_PK_ECDSA: Elliptic curve algorithm. These parameters are compatible with the ECDSA and ECDH algorithm.
  * @GNUTLS_PK_ECDH_X25519: Elliptic curve algorithm, restricted to ECDH as per rfc7748.
  * @GNUTLS_PK_EDDSA_ED25519: Edwards curve Digital signature algorithm. Used with SHA512 on signatures.
+ * @GNUTLS_PK_GOST_01: GOST R 34.10-2001 algorithm.
+ * @GNUTLS_PK_GOST_12_256: GOST R 34.10-2001 algorithm, 256-bit key.
+ * @GNUTLS_PK_GOST_12_512: GOST R 34.10-2001 algorithm, 512-bit key.
  *
  * Enumeration of different public-key algorithms.
  */
@@ -762,7 +765,10 @@ typedef enum {
 	GNUTLS_PK_ECDH_X25519 = 5,
 	GNUTLS_PK_RSA_PSS = 6,
 	GNUTLS_PK_EDDSA_ED25519 = 7,
-	GNUTLS_PK_MAX = GNUTLS_PK_EDDSA_ED25519
+	GNUTLS_PK_GOST_01 = 8,
+	GNUTLS_PK_GOST_12_256 = 9,
+	GNUTLS_PK_GOST_12_512 = 10,
+	GNUTLS_PK_MAX = GNUTLS_PK_GOST_12_512
 } gnutls_pk_algorithm_t;
 
 
@@ -964,6 +970,25 @@ typedef enum {
 	GNUTLS_CB_TLS_UNIQUE
 } gnutls_channel_binding_t;
 
+/**
+ * gnutls_gost_paramset_t:
+ * @GNUTLS_GOST_PARAMSET_UNKNOWN: Unknown/default parameter set
+ * @GNUTLS_GOST_PARAMSET_TC26_Z: Specified by TC26
+ * @GNUTLS_GOST_PARAMSET_CP_A: CryptoPro-A
+ * @GNUTLS_GOST_PARAMSET_CP_B: CryptoPro-B
+ * @GNUTLS_GOST_PARAMSET_CP_C: CryptoPro-C
+ * @GNUTLS_GOST_PARAMSET_CP_D: CryptoPro-D
+ *
+ * Enumeration of different GOST 28147 parameter sets.
+ */
+typedef enum {
+	GNUTLS_GOST_PARAMSET_UNKNOWN = -1,
+	GNUTLS_GOST_PARAMSET_TC26_Z = 0,
+	GNUTLS_GOST_PARAMSET_CP_A,
+	GNUTLS_GOST_PARAMSET_CP_B,
+	GNUTLS_GOST_PARAMSET_CP_C,
+	GNUTLS_GOST_PARAMSET_CP_D
+} gnutls_gost_paramset_t;
 
 /* If you want to change this, then also change the define in
  * gnutls_int.h, and recompile.
