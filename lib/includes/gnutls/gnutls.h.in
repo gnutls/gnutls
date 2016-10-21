@@ -253,6 +253,9 @@ typedef enum {
  * @GNUTLS_MAC_SHA512: HMAC-SHA-512 algorithm.
  * @GNUTLS_MAC_SHA224: HMAC-SHA-224 algorithm.
  * @GNUTLS_MAC_MD5_SHA1: Combined MD5+SHA1 MAC placeholder.
+ * @GNUTLS_MAC_GOSTR_94: HMAC GOST R 34.10-94 algorithm.
+ * @GNUTLS_MAC_STREEBOG_256: HMAC GOST R 34.10-2001 (Streebog) algorithm, 256 bit.
+ * @GNUTLS_MAC_STREEBOG_512: HMAC GOST R 34.10-2001 (Streebog) algorithm, 512 bit.
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
  * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
  * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
@@ -276,6 +279,9 @@ typedef enum {
 	GNUTLS_MAC_SHA3_384 = 12, /* reserved: no implementation */
 	GNUTLS_MAC_SHA3_512 = 13, /* reserved: no implementation */
 	GNUTLS_MAC_MD5_SHA1 = 14, /* reserved: no implementation */
+	GNUTLS_MAC_GOSTR_94 = 15,
+	GNUTLS_MAC_STREEBOG_256 = 16,
+	GNUTLS_MAC_STREEBOG_512 = 17,
 	/* If you add anything here, make sure you align with
 	   gnutls_digest_algorithm_t. */
 	GNUTLS_MAC_AEAD = 200,	/* indicates that MAC is on the cipher */
@@ -300,6 +306,9 @@ typedef enum {
  * @GNUTLS_DIG_SHA3_384: SHA3-384 algorithm.
  * @GNUTLS_DIG_SHA3_512: SHA3-512 algorithm.
  * @GNUTLS_DIG_MD5_SHA1: Combined MD5+SHA1 algorithm.
+ * @GNUTLS_DIG_GOSTR_94: GOST R 34.10-94 algorithm.
+ * @GNUTLS_DIG_STREEBOG_256: GOST R 34.10-2001 (Streebog) algorithm, 256 bit.
+ * @GNUTLS_DIG_STREEBOG_512: GOST R 34.10-2001 (Streebog) algorithm, 512 bit.
  *
  * Enumeration of different digest (hash) algorithms.
  */
@@ -318,7 +327,10 @@ typedef enum {
 	GNUTLS_DIG_SHA3_256 = GNUTLS_MAC_SHA3_256,
 	GNUTLS_DIG_SHA3_384 = GNUTLS_MAC_SHA3_384,
 	GNUTLS_DIG_SHA3_512 = GNUTLS_MAC_SHA3_512,
-	GNUTLS_DIG_MD5_SHA1 = GNUTLS_MAC_MD5_SHA1
+	GNUTLS_DIG_MD5_SHA1 = GNUTLS_MAC_MD5_SHA1,
+	GNUTLS_DIG_GOSTR_94 = GNUTLS_MAC_GOSTR_94,
+	GNUTLS_DIG_STREEBOG_256 = GNUTLS_MAC_STREEBOG_256,
+	GNUTLS_DIG_STREEBOG_512 = GNUTLS_MAC_STREEBOG_512
 	    /* If you add anything here, make sure you align with
 	       gnutls_mac_algorithm_t. */
 } gnutls_digest_algorithm_t;
