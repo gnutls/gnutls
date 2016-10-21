@@ -354,6 +354,7 @@ typedef struct gnutls_ecc_curve_entry_st {
 	gnutls_pk_algorithm_t pk;
 	unsigned size;		/* the size in bytes */
 	unsigned sig_size;	/* the size of curve signatures in bytes (EdDSA) */
+	unsigned gost_curve;
 } gnutls_ecc_curve_entry_st;
 
 const gnutls_ecc_curve_entry_st
