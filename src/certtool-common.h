@@ -155,6 +155,11 @@ void _pubkey_info(FILE * outfile, gnutls_certificate_print_formats_t,
 void print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 		    gnutls_datum_t * k, gnutls_datum_t * x,
 		    gnutls_datum_t * y, int cprint);
+void print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
+		     gnutls_digest_algorithm_t digest,
+		     gnutls_gost_paramset_t paramset,
+		     gnutls_datum_t * k, gnutls_datum_t * x,
+		     gnutls_datum_t * y, int cprint);
 void print_rsa_pkey(FILE * outfile, gnutls_datum_t * m, gnutls_datum_t * e,
 		    gnutls_datum_t * d, gnutls_datum_t * p,
 		    gnutls_datum_t * q, gnutls_datum_t * u,
