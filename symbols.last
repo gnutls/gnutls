@@ -144,6 +144,7 @@ gnutls_db_set_remove_function@GNUTLS_3_4
 gnutls_db_set_retrieve_function@GNUTLS_3_4
 gnutls_db_set_store_function@GNUTLS_3_4
 gnutls_decode_ber_digest_info@GNUTLS_3_4
+gnutls_decode_gost_rs_value@GNUTLS_3_6_3
 gnutls_decode_rs_value@GNUTLS_3_6_0
 gnutls_deinit@GNUTLS_3_4
 gnutls_dh_get_group@GNUTLS_3_4
@@ -184,6 +185,7 @@ gnutls_ecc_curve_get_pk@GNUTLS_3_4
 gnutls_ecc_curve_get_size@GNUTLS_3_4
 gnutls_ecc_curve_list@GNUTLS_3_4
 gnutls_encode_ber_digest_info@GNUTLS_3_4
+gnutls_encode_gost_rs_value@GNUTLS_3_6_3
 gnutls_encode_rs_value@GNUTLS_3_6_0
 gnutls_error_is_fatal@GNUTLS_3_4
 gnutls_error_to_alert@GNUTLS_3_4
@@ -218,6 +220,8 @@ gnutls_global_set_log_level@GNUTLS_3_4
 gnutls_global_set_mem_functions@GNUTLS_3_4
 gnutls_global_set_mutex@GNUTLS_3_4
 gnutls_global_set_time_function@GNUTLS_3_4
+gnutls_gost_paramset_get_name@GNUTLS_3_6_3
+gnutls_gost_paramset_get_oid@GNUTLS_3_6_3
 gnutls_group_get@GNUTLS_3_6_0
 gnutls_group_get_id@GNUTLS_3_6_0
 gnutls_group_get_name@GNUTLS_3_6_0
@@ -318,6 +322,7 @@ gnutls_ocsp_status_request_get@GNUTLS_3_4
 gnutls_ocsp_status_request_is_checked@GNUTLS_3_4
 gnutls_oid_to_digest@GNUTLS_3_4
 gnutls_oid_to_ecc_curve@GNUTLS_3_4
+gnutls_oid_to_gost_paramset@GNUTLS_3_6_3
 gnutls_oid_to_mac@GNUTLS_3_4
 gnutls_oid_to_pk@GNUTLS_3_4
 gnutls_oid_to_sign@GNUTLS_3_4

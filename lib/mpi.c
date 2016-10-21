@@ -270,6 +270,31 @@ _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest,
 	return 0;
 }
 
+/* like _gnutls_mpi_dprint_size, but prints into preallocated byte buffer */
+int
+_gnutls_mpi_bprint_size(const bigint_t a, uint8_t *buf, size_t size)
+{
+	int result;
+	size_t bytes = 0;
+
+	result = _gnutls_mpi_print(a, NULL, &bytes);
+	if (result != GNUTLS_E_SHORT_MEMORY_BUFFER)
+		return gnutls_assert_val(result);
+
+	if (bytes <= size) {
+		unsigned i;
+		size_t diff = size - bytes;
+
+		for (i = 0; i < diff; i++)
+			buf[i] = 0;
+		result = _gnutls_mpi_print(a, &buf[diff], &bytes);
+	} else {
+		result = _gnutls_mpi_print(a, buf, &bytes);
+	}
+
+	return result;
+}
+
 /* Flags for __gnutls_x509_read_int() and __gnutls_x509_write_int */
 #define GNUTLS_X509_INT_OVERWRITE	(1 << 0)
 #define GNUTLS_X509_INT_LE		(1 << 1)

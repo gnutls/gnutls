@@ -1221,6 +1221,11 @@ GNUTLS_3_6_3
 	gnutls_pkcs11_obj_get_ptr;
 	gnutls_session_ticket_send;
 	gnutls_aead_cipher_encryptv;
+	gnutls_gost_paramset_get_name;
+	gnutls_gost_paramset_get_oid;
+	gnutls_oid_to_gost_paramset;
+	gnutls_decode_gost_rs_value;
+	gnutls_encode_gost_rs_value;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {
