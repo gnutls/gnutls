@@ -1187,6 +1187,11 @@ GNUTLS_3_6_0
 	gnutls_base64_encode2;
 	gnutls_base64_decode2;
 	gnutls_privkey_import_ext4;
+	gnutls_gost_paramset_get_name;
+	gnutls_gost_paramset_get_oid;
+	gnutls_oid_to_gost_paramset;
+	gnutls_decode_gost_rs_value;
+	gnutls_encode_gost_rs_value;
  local:
 	*;
 } GNUTLS_3_4;

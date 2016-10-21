@@ -1134,6 +1134,11 @@ const char *
 
 const char *gnutls_sign_get_oid(gnutls_sign_algorithm_t sign) __GNUTLS_CONST__;
 
+const char *
+	gnutls_gost_paramset_get_name(gnutls_gost_paramset_t param) __GNUTLS_CONST__;
+const char *
+	gnutls_gost_paramset_get_oid(gnutls_gost_paramset_t param) __GNUTLS_CONST__;
+
 size_t
 	gnutls_cipher_get_key_size(gnutls_cipher_algorithm_t algorithm) __GNUTLS_CONST__;
 size_t
@@ -1191,6 +1196,8 @@ gnutls_sign_algorithm_t
 	gnutls_oid_to_sign(const char *oid) __GNUTLS_CONST__;
 gnutls_ecc_curve_t
 	gnutls_oid_to_ecc_curve(const char *oid) __GNUTLS_CONST__;
+gnutls_gost_paramset_t
+	gnutls_oid_to_gost_paramset(const char *oid) __GNUTLS_CONST__;
 
   /* list supported algorithms */
 const gnutls_ecc_curve_t *

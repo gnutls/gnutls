@@ -291,6 +291,170 @@ _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 	return 0;
 }
 
+int
+_gnutls_encode_gost_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s,
+		       size_t intsize)
+{
+	uint8_t *data;
+	int result;
+
+	data = gnutls_malloc(intsize * 2);
+	if (data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if ((result = _gnutls_mpi_bprint_size(s, data, intsize)) < 0) {
+		gnutls_assert();
+		gnutls_free(data);
+		return result;
+	}
+
+	if ((result = _gnutls_mpi_bprint_size(r, data + intsize, intsize)) < 0) {
+		gnutls_assert();
+		gnutls_free(data);
+		return result;
+	}
+
+	sig_value->data = data;
+	sig_value->size = intsize * 2;
+
+	return 0;
+}
+
+int
+_gnutls_decode_gost_rs(const gnutls_datum_t * sig_value, bigint_t * r,
+		       bigint_t * s)
+{
+	int ret;
+	unsigned halfsize = sig_value->size >> 1;
+
+	if (sig_value->size % 2 != 0) {
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	}
+
+	ret = _gnutls_mpi_init_scan(s, sig_value->data, halfsize);
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	ret = _gnutls_mpi_init_scan(r, sig_value->data + halfsize, halfsize);
+	if (ret < 0) {
+		_gnutls_mpi_release(s);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_encode_gost_rs_value:
+ * @sig_value: will hold a GOST signature according to RFC 4491 section 2.2.2
+ * @r: must contain the r value
+ * @s: must contain the s value
+ *
+ * This function will encode the provided r and s values, into binary
+ * representation according to RFC 4491 section 2.2.2, used for GOST R
+ * 34.10-2001 (and thus also for GOST R 34.10-2012) signatures.
+ *
+ * The output value should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ */
+int gnutls_encode_gost_rs_value(gnutls_datum_t * sig_value, const gnutls_datum_t * r, const gnutls_datum_t  *s)
+{
+	uint8_t *data;
+	size_t intsize = r->size;
+
+	if (s->size != intsize) {
+		gnutls_assert();
+		return GNUTLS_E_ILLEGAL_PARAMETER;
+	}
+
+	data = gnutls_malloc(intsize * 2);
+	if (data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	memcpy(data, s->data, intsize);
+	memcpy(data + intsize, r->data, intsize);
+
+	sig_value->data = data;
+	sig_value->size = intsize * 2;
+
+	return 0;
+}
+
+/**
+ * gnutls_decode_gost_rs_value:
+ * @sig_value: will holds a GOST signature according to RFC 4491 section 2.2.2
+ * @r: will contain the r value
+ * @s: will contain the s value
+ *
+ * This function will decode the provided @sig_value, into @r and @s elements.
+ * See RFC 4491 section 2.2.2 for the format of signature value.
+ *
+ * The output values may be padded with a zero byte to prevent them
+ * from being interpreted as negative values. The value
+ * should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ */
+int gnutls_decode_gost_rs_value(const gnutls_datum_t * sig_value, gnutls_datum_t * r, gnutls_datum_t * s)
+{
+	int ret;
+	unsigned halfsize = sig_value->size >> 1;
+
+	if (sig_value->size % 2 != 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+	ret = _gnutls_set_datum(s, sig_value->data, halfsize);
+	if (ret != 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_set_datum(r, sig_value->data + halfsize, halfsize);
+	if (ret != 0) {
+		_gnutls_free_datum(s);
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+gnutls_digest_algorithm_t _gnutls_gost_digest(gnutls_pk_algorithm_t pk)
+{
+	if (pk == GNUTLS_PK_GOST_01)
+		return GNUTLS_DIG_GOSTR_94;
+	else if (pk == GNUTLS_PK_GOST_12_256)
+		return GNUTLS_DIG_STREEBOG_256;
+	else if (pk == GNUTLS_PK_GOST_12_512)
+		return GNUTLS_DIG_STREEBOG_512;
+
+	gnutls_assert();
+
+	return GNUTLS_DIG_UNKNOWN;
+}
+
+gnutls_pk_algorithm_t _gnutls_digest_gost(gnutls_digest_algorithm_t digest)
+{
+	if (digest == GNUTLS_DIG_GOSTR_94)
+		return GNUTLS_PK_GOST_01;
+	else if (digest == GNUTLS_DIG_STREEBOG_256)
+		return GNUTLS_PK_GOST_12_256;
+	else if (digest == GNUTLS_DIG_STREEBOG_512)
+		return GNUTLS_PK_GOST_12_512;
+
+	gnutls_assert();
+
+	return GNUTLS_PK_UNKNOWN;
+}
+
 /* some generic pk functions */
 
 int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
@@ -956,6 +1120,9 @@ pk_prepare_hash(gnutls_pk_algorithm_t pk,
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
 		break;
 	default:
 		gnutls_assert();

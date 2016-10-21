@@ -2070,6 +2070,27 @@ const mac_entry_st *_gnutls_dsa_q_to_hash(const gnutls_pk_params_st *
 	return mac_to_entry(ret);
 }
 
+const mac_entry_st *_gnutls_gost_q_to_hash(const gnutls_pk_params_st *
+					   params, unsigned int *hash_len)
+{
+	int bits = 0;
+	int ret;
+
+	bits = gnutls_ecc_curve_get_size(params->curve) * 8;
+
+	if (bits <= 256) {
+		if (hash_len)
+			*hash_len = 32;
+	} else {
+		if (hash_len)
+			*hash_len = 64;
+	}
+
+	ret = _gnutls_gost_digest(params->algo);
+
+	return mac_to_entry(ret);
+}
+
 /**
  * gnutls_pubkey_set_pin_function:
  * @key: A key of type #gnutls_pubkey_t

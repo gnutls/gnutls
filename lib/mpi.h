@@ -83,6 +83,7 @@ int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t * dest);
 int _gnutls_mpi_dprint(const bigint_t a, gnutls_datum_t * dest);
 int _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest,
 			    size_t size);
+int _gnutls_mpi_bprint_size(const bigint_t a, uint8_t *buf, size_t size);
 
 typedef int (*mpi_dprint_func)(const bigint_t a, gnutls_datum_t * dest);
 
