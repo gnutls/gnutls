@@ -322,8 +322,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 						  (session)),
 			 gnutls_certificate_type_get_name(type));
 
-	gnutls_protocol_get_name(get_num_version(session)),
-	    desc = gnutls_malloc(DESC_SIZE);
+	desc = gnutls_malloc(DESC_SIZE);
 	if (desc == NULL)
 		return NULL;
 
