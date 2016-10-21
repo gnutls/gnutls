@@ -356,6 +356,7 @@ typedef enum {
  * @GNUTLS_ALLOW_ID_CHANGE: Allow the peer to replace its certificate, or change its ID during a rehandshake. This change is often used in attacks and thus prohibited by default. Since 3.5.0.
  * @GNUTLS_ENABLE_FALSE_START: Enable the TLS false start on client side if the negotiated ciphersuites allow it. This will enable sending data prior to the handshake being complete, and may introduce a risk of crypto failure when combined with certain key exchanged; for that GnuTLS may not enable that option in ciphersuites that are known to be not safe for false start. Since 3.5.0.
  * @GNUTLS_FORCE_CLIENT_CERT: When in client side and only a single cert is specified, send that certificate irrespective of the issuers expectated by the server. Since 3.5.0.
+ * @GNUTLS_NO_TICKETS: Flag to indicate that the session should not use resumption with session tickets.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
@@ -371,7 +372,8 @@ typedef enum {
 	GNUTLS_NO_SIGNAL = (1<<6),
 	GNUTLS_ALLOW_ID_CHANGE = (1<<7),
 	GNUTLS_ENABLE_FALSE_START = (1<<8),
-	GNUTLS_FORCE_CLIENT_CERT = (1<<9)
+	GNUTLS_FORCE_CLIENT_CERT = (1<<9),
+	GNUTLS_NO_TICKETS = (1<<10)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls
@@ -384,6 +386,9 @@ typedef enum {
 #define GNUTLS_NO_REPLAY_PROTECTION (1<<5)
 #define GNUTLS_NO_SIGNAL (1<<6)
 #define GNUTLS_ALLOW_ID_CHANGE (1<<7)
+#define GNUTLS_ENABLE_FALSE_START (1<<8)
+#define GNUTLS_FORCE_CLIENT_CERT (1<<9)
+#define GNUTLS_NO_TICKETS (1<<10)
 
 /**
  * gnutls_alert_level_t:
