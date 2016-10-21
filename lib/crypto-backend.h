@@ -193,7 +193,8 @@ typedef struct {
 	unsigned int params_nr;	/* the number of parameters */
 	unsigned int pkflags; /* gnutls_pk_flag_t */
 	unsigned int qbits; /* GNUTLS_PK_DH */
-	gnutls_ecc_curve_t curve; /* GNUTLS_PK_EC, GNUTLS_PK_ED25519 */
+	gnutls_ecc_curve_t curve; /* GNUTLS_PK_EC, GNUTLS_PK_ED25519, GNUTLS_PK_GOST* */
+	gnutls_gost_paramset_t gost_params; /* GNUTLS_PK_GOST_* */
 	gnutls_datum_t raw_pub; /* used by x25519 */
 	gnutls_datum_t raw_priv;
 
@@ -230,6 +231,7 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 #define DH_PUBLIC_PARAMS 4
 #define RSA_PUBLIC_PARAMS 2
 #define ECC_PUBLIC_PARAMS 2
+#define GOST_PUBLIC_PARAMS 2
 
 
 #define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS	/* ok for RSA and DSA */
@@ -239,12 +241,17 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 #define DH_PRIVATE_PARAMS 5
 #define RSA_PRIVATE_PARAMS 8
 #define ECC_PRIVATE_PARAMS 3
+#define GOST_PRIVATE_PARAMS 3
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
 #endif
 
 #if MAX_PRIV_PARAMS_SIZE - ECC_PRIVATE_PARAMS < 0
+#error INCREASE MAX_PRIV_PARAMS
+#endif
+
+#if MAX_PRIV_PARAMS_SIZE - GOST_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
 #endif
 
@@ -291,6 +298,10 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 #define ECC_X 0
 #define ECC_Y 1
 #define ECC_K 2
+
+#define GOST_X 0
+#define GOST_Y 1
+#define GOST_K 2
 
 #define DSA_P 0
 #define DSA_Q 1

@@ -552,6 +552,7 @@ ENUMS += enums/gnutls_ecc_curve_t
 ENUMS += enums/gnutls_ext_flags_t
 ENUMS += enums/gnutls_ext_parse_type_t
 ENUMS += enums/gnutls_fips_mode_t
+ENUMS += enums/gnutls_gost_paramset_t
 ENUMS += enums/gnutls_group_t
 ENUMS += enums/gnutls_handshake_description_t
 ENUMS += enums/gnutls_init_flags_t

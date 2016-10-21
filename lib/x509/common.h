@@ -56,6 +56,8 @@
 #define PK_DSA_OID "1.2.840.10040.4.1"
 #define PK_GOST_R3410_94_OID "1.2.643.2.2.20"
 #define PK_GOST_R3410_2001_OID "1.2.643.2.2.19"
+#define PK_GOST_R3410_2012_256_OID "1.2.643.7.1.1.1.1"
+#define PK_GOST_R3410_2012_512_OID "1.2.643.7.1.1.1.2"
 
 /* signature OIDs
  */

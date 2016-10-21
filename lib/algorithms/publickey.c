@@ -126,7 +126,11 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	   .curve = GNUTLS_ECC_CURVE_INVALID },	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
 	{ .name = "DSA", .oid = PK_DSA_OID, .id = GNUTLS_PK_DSA,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
-	{ .name = "GOST R 34.10-2001", .oid = PK_GOST_R3410_2001_OID, .id = GNUTLS_PK_UNKNOWN,
+	{ .name = "GOST R 34.10-2012-512", .oid = PK_GOST_R3410_2012_512_OID, .id = GNUTLS_PK_GOST_12_512,
+	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "GOST R 34.10-2012-256", .oid = PK_GOST_R3410_2012_256_OID, .id = GNUTLS_PK_GOST_12_256,
+	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	{ .name = "GOST R 34.10-2001", .oid = PK_GOST_R3410_2001_OID, .id = GNUTLS_PK_GOST_01,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
 	{ .name = "GOST R 34.10-94", .oid = PK_GOST_R3410_94_OID, .id = GNUTLS_PK_UNKNOWN,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },

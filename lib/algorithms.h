@@ -34,6 +34,10 @@
 #define GNUTLS_FALLBACK_SCSV_MAJOR 0x56
 #define GNUTLS_FALLBACK_SCSV_MINOR 0x00
 
+#define IS_GOSTEC(x) (((x)==GNUTLS_PK_GOST_01)	|| \
+		      ((x)==GNUTLS_PK_GOST_12_256)|| \
+		      ((x)==GNUTLS_PK_GOST_12_512))
+
 #define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDH_X25519)||((x)==GNUTLS_PK_EDDSA_ED25519))
 
 #define SIG_SEM_PRE_TLS12 (1<<1)
