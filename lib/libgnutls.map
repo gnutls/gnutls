@@ -1196,6 +1196,11 @@ GNUTLS_3_6_0
 	gnutls_pubkey_export_gost_raw2;
 	gnutls_pubkey_import_gost_raw;
 	gnutls_x509_crt_get_pk_gost_raw;
+	gnutls_x509_privkey_export_gost_raw;
+	gnutls_x509_privkey_import_gost_raw;
+	gnutls_privkey_export_gost_raw;
+	gnutls_privkey_export_gost_raw2;
+	gnutls_privkey_import_gost_raw;
  local:
 	*;
 } GNUTLS_3_4;

@@ -108,6 +108,15 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 				       gnutls_datum_t * k,
 				       unsigned int flags);
 
+int _gnutls_params_get_gost_raw(const gnutls_pk_params_st* params,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned int flags);
+
 int pk_prepare_hash(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 		    gnutls_datum_t * output);
 int pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,

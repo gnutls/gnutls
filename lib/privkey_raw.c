@@ -260,6 +260,86 @@ int ret;
 }
 
 /**
+ * gnutls_privkey_export_gost_raw:
+ * @key: Holds the public key
+ * @curve: will hold the curve
+ * @digest: will hold the digest
+ * @x: will hold the x coordinate
+ * @y: will hold the y coordinate
+ * @k: will hold the private key
+ *
+ * This function will export the GOST private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_export_gost_raw(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k)
+{
+	return gnutls_privkey_export_gost_raw2(key, curve, digest,
+					       paramset, x, y, k, 0);
+}
+
+/**
+ * gnutls_privkey_export_gost_raw2:
+ * @key: Holds the public key
+ * @curve: will hold the curve
+ * @digest: will hold the digest
+ * @x: will hold the x coordinate
+ * @y: will hold the y coordinate
+ * @k: will hold the private key
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the GOST private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_export_gost_raw2(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned int flags)
+{
+	gnutls_pk_params_st params;
+	int ret;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	gnutls_pk_params_init(&params);
+
+	ret = _gnutls_privkey_get_mpis(key, &params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_params_get_gost_raw(&params, curve, digest, paramset,
+					  x, y, k, flags);
+
+	gnutls_pk_params_release(&params);
+
+	return ret;
+}
+
+/**
  * gnutls_privkey_import_rsa_raw:
  * @key: The structure to store the parsed key
  * @m: holds the modulus
@@ -415,3 +495,55 @@ error:
 	return ret;
 }
 
+/**
+ * gnutls_privkey_import_gost_raw:
+ * @key: The key
+ * @curve: holds the curve
+ * @digest: holds the digest
+ * @x: holds the x
+ * @y: holds the y
+ * @k: holds the k
+ *
+ * This function will convert the given GOST private key's parameters to the
+ * native #gnutls_privkey_t format.  The output will be stored
+ * in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_import_gost_raw(gnutls_privkey_t key,
+				   gnutls_ecc_curve_t curve,
+				   gnutls_digest_algorithm_t digest,
+				   gnutls_gost_paramset_t paramset,
+				   const gnutls_datum_t * x,
+				   const gnutls_datum_t * y,
+				   const gnutls_datum_t * k)
+{
+	int ret;
+	gnutls_x509_privkey_t xkey;
+
+	ret = gnutls_x509_privkey_init(&xkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_x509_privkey_import_gost_raw(xkey, curve, digest, paramset, x, y, k);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = gnutls_privkey_import_x509(key, xkey, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	return 0;
+
+error:
+	gnutls_x509_privkey_deinit(xkey);
+	return ret;
+}
