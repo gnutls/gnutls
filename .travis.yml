@@ -24,4 +24,4 @@ script:
   - PATH=/usr/local/opt/gettext/bin:$PATH make autoreconf && rm -f tests/suite/mini-eagain2.c
   - PATH=/usr/local/opt/gettext/bin:$PATH ./configure --disable-valgrind-tests --disable-doc --disable-guile --without-p11-kit --disable-dependency-tracking
   - make -j4
-  - make check -j4
+  - make -j4 check gl_public_submodule_commit=
