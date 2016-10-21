@@ -78,7 +78,7 @@ const asn1_static_node gnutls_asn1_tab[] = {
   { NULL, 2056, "0"},
   { "principalName", 536879106, "PrincipalName"},
   { NULL, 2056, "1"},
-  { "RSAPSSParameters", 536870917, NULL },
+  { "RSAPSSParameters", 1610612741, NULL },
   { "hashAlgorithm", 1610637314, "AlgorithmIdentifier"},
   { NULL, 2056, "0"},
   { "maskGenAlgorithm", 1610637314, "AlgorithmIdentifier"},
@@ -89,5 +89,11 @@ const asn1_static_node gnutls_asn1_tab[] = {
   { "trailerField", 536911875, NULL },
   { NULL, 1073741833, "1"},
   { NULL, 2056, "3"},
+  { "GOSTParameters", 1610612741, NULL },
+  { "publicKeyParamSet", 1073741836, NULL },
+  { "digestParamSet", 1073741836, NULL },
+  { "encryptionParamSet", 16396, NULL },
+  { "GOSTPrivateKey", 1073741831, NULL },
+  { "GOSTPrivateKeyOld", 3, NULL },
   { NULL, 0, NULL }
 };
