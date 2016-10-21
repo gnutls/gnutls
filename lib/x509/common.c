@@ -130,6 +130,14 @@ static const struct oid_to_string _oid2str[] = {
 	/* rfc3920 section 5.1.1 */
 	ENTRY("1.3.6.1.5.5.7.8.5", "XmppAddr", NULL, ASN1_ETYPE_UTF8_STRING),
 
+	/* Russian things: https://cdnimg.rg.ru/pril/66/91/91/23041_pril.pdf */
+	/* Main state registration number */
+	ENTRY("1.2.643.100.1", "OGRN", NULL, ASN1_ETYPE_NUMERIC_STRING),
+	/* Individual insurance account number */
+	ENTRY("1.2.643.100.3", "SNILS", NULL, ASN1_ETYPE_NUMERIC_STRING),
+	/* VAT identification number */
+	ENTRY("1.2.643.3.131.1.1", "INN", NULL, ASN1_ETYPE_NUMERIC_STRING),
+
 	{NULL, 0, NULL, 0, NULL, 0}
 };
 
