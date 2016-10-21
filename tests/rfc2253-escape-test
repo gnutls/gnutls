@@ -29,7 +29,7 @@ fi
 
 if cat<<EOF \
 	| ${VALGRIND} "${CERTTOOL}" --certificate-info \
-	| grep 'Issuer: O=RFC 2253 escape test,OU=Plus \\+ Comma \\,' > /dev/null
+	| grep 'Issuer: OU=Plus \\+ Comma \\,,O=RFC 2253 escape test' > /dev/null
 -----BEGIN CERTIFICATE-----
 MIICETCCAXygAwIBAgIESnlIMTALBgkqhkiG9w0BAQUwODEdMBsGA1UEChMUUkZD
 IDIyNTMgZXNjYXBlIHRlc3QxFzAVBgNVBAsTDlBsdXMgKyBDb21tYSAsMB4XDTA5

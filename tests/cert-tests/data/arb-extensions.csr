@@ -1,6 +1,6 @@
 PKCS #10 Certificate Request Information:
 	Version: 1
-	Subject: CN=Cindy Lauper,OU=sleeping dept.,O=Koko inc.,ST=Attiki,C=GR,UID=clauper
+	Subject: UID=clauper,C=GR,ST=Attiki,O=Koko inc.,OU=sleeping dept.,CN=Cindy Lauper
 	Subject Public Key Algorithm: RSA
 		Modulus (bits 1024):
 			00:a5:c6:ce:75:43:84:bf:64:9e:02:27:13:f1:03:59

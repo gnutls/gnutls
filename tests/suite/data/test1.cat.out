@@ -1,6 +1,6 @@
 eContent Type: 1.3.6.1.4.1.311.10.1
 Signers:
-	Signer's issuer DN: C=US,ST=Washington,L=Redmond,O=Microsoft Corporation,CN=Microsoft Windows Hardware Compatibility PCA
+	Signer's issuer DN: CN=Microsoft Windows Hardware Compatibility PCA,O=Microsoft Corporation,L=Redmond,ST=Washington,C=US
 	Signer's serial: 330000001e258e7c4251c5d1fa00010000001e
 	Signature Algorithm: RSA-SHA1
 	Signed Attributes:

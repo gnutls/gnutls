@@ -1,6 +1,6 @@
 PKCS #10 Certificate Request Information:
 	Version: 1
-	Subject: CN=Cindy Lauper,OU=sleeping dept.,O=Koko inc.,ST=Attiki,C=GR,UID=clauper,title=Dr.,pseudonym=jackal
+	Subject: pseudonym=jackal,title=Dr.,UID=clauper,C=GR,ST=Attiki,O=Koko inc.,OU=sleeping dept.,CN=Cindy Lauper
 	Subject Public Key Algorithm: RSA
 	Algorithm Security Level: Low (1024 bits)
 		Modulus (bits 1024):

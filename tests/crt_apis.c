@@ -110,7 +110,7 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_key_usage %d\n", ret);
 
-	ret = gnutls_x509_crt_set_dn(crt, "cn = nikos, o = none to\\, mention", &err);
+	ret = gnutls_x509_crt_set_dn(crt, "o = none to\\, mention,cn = nikos", &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_set_dn: %s, %s\n", gnutls_strerror(ret), err);
 	}

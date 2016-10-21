@@ -104,7 +104,7 @@ static gnutls_x509_crq_t generate_crq(void)
 		fail("%d: gnutls_x509_crq_get_challenge_password %d: %s\n",
 		     __LINE__, ret, gnutls_strerror(ret));
 
-	ret = gnutls_x509_crq_set_dn(crq, "cn = nikos, o = none to\\, mention", &err);
+	ret = gnutls_x509_crq_set_dn(crq, "o = none to\\, mention,cn = nikos", &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crq_set_dn: %s, %s\n", gnutls_strerror(ret), err);
 	}
@@ -260,7 +260,7 @@ static void run_set_extensions(gnutls_x509_crq_t crq)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_crq: %s\n", gnutls_strerror(ret));
 
-	ret = gnutls_x509_crt_set_issuer_dn(crt, "cn = my CA, o = big\\, and one", &err);
+	ret = gnutls_x509_crt_set_issuer_dn(crt, "o = big\\, and one, cn = my CA", &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n", gnutls_strerror(ret), err);
 	}
@@ -286,6 +286,7 @@ static void run_set_extensions(gnutls_x509_crq_t crq)
 
 	if (out.size != 41 ||
 	    memcmp(out.data, "\x30\x27\x31\x0e\x30\x0c\x06\x03\x55\x04\x03\x13\x05\x6d\x79\x20\x43\x41\x31\x15\x30\x13\x06\x03\x55\x04\x0a\x13\x0c\x62\x69\x67\x2c\x20\x61\x6e\x64\x20\x6f\x6e\x65", 41) != 0) {
+		hexprint(out.data, out.size);
 		fail("issuer DN comparison failed\n");
 	}
 	gnutls_free(out.data);
@@ -332,7 +333,7 @@ static void run_set_extension_by_oid(gnutls_x509_crq_t crq)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_crq: %s\n", gnutls_strerror(ret));
 
-	ret = gnutls_x509_crt_set_issuer_dn(crt, "cn = my CA, o = big\\, and one", &err);
+	ret = gnutls_x509_crt_set_issuer_dn(crt, "o = big\\, and one,cn = my CA", &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n", gnutls_strerror(ret), err);
 	}

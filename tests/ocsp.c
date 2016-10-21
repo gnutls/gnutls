@@ -96,7 +96,7 @@ static const gnutls_datum_t resp1 =
   "	Response Status: Successful\n"		\
   "	Response Type: Basic OCSP Response\n"	\
   "	Version: 1\n" \
-  "	Responder ID: C=CH,O=Linux strongSwan,OU=OCSP Signing Authority,CN=ocsp.strongswan.org\n" \
+  "	Responder ID: CN=ocsp.strongswan.org,OU=OCSP Signing Authority,O=Linux strongSwan,C=CH\n" \
   "	Produced At: Tue Sep 27 09:54:28 UTC 2011\n" \
   "	Responses:\n" \
   "		Certificate ID:\n" \
