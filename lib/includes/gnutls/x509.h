@@ -1183,6 +1183,13 @@ int gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 				       const gnutls_datum_t * x,
 				       const gnutls_datum_t * y,
 				       const gnutls_datum_t * k);
+int gnutls_x509_privkey_import_gost_raw(gnutls_x509_privkey_t key,
+				       gnutls_ecc_curve_t curve,
+				       gnutls_digest_algorithm_t digest,
+				       gnutls_gost_paramset_t paramset,
+				       const gnutls_datum_t * x,
+				       const gnutls_datum_t * y,
+				       const gnutls_datum_t * k);
 
 int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key);
 
@@ -1287,6 +1294,13 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey_t key,
 				       gnutls_datum_t * u);
 int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
 				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k);
+int gnutls_x509_privkey_export_gost_raw(gnutls_x509_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
 				       gnutls_datum_t * k);

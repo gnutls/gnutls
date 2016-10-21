@@ -900,6 +900,46 @@ cleanup:
 	return ret;
 }
 
+static int
+_gnutls_asn1_encode_gost(ASN1_TYPE * c2, gnutls_pk_params_st * params)
+{
+	int ret;
+	const char *oid;
+
+	oid = gnutls_pk_get_oid(params->algo);
+
+	if (params->params_nr != GOST_PRIVATE_PARAMS || oid == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	/* first make sure that no previously allocated data are leaked */
+	if (*c2 != ASN1_TYPE_EMPTY) {
+		asn1_delete_structure(c2);
+		*c2 = ASN1_TYPE_EMPTY;
+	}
+
+	if ((ret = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.GOSTPrivateKey", c2))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+
+	ret =
+	    _gnutls_x509_write_key_int_le(*c2, "", params->params[GOST_K]);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+
+	return 0;
+
+cleanup:
+	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
+
+	return ret;
+}
 
 /* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
  */
@@ -991,6 +1031,10 @@ int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
 		return _gnutls_asn1_encode_ecc(c2, params);
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		return _gnutls_asn1_encode_gost(c2, params);
 	default:
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}

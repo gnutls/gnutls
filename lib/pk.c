@@ -1075,6 +1075,71 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 
 }
 
+int _gnutls_params_get_gost_raw(const gnutls_pk_params_st* params,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned int flags)
+{
+	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
+
+
+	if (params == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (curve)
+		*curve = params->curve;
+
+	if (digest)
+		*digest = _gnutls_gost_digest(params->algo);
+
+	if (paramset)
+		*paramset = params->gost_params;
+
+	/* X */
+	if (x) {
+		ret = dprint(params->params[GOST_X], x);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+
+	/* Y */
+	if (y) {
+		ret = dprint(params->params[GOST_Y], y);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(x);
+			return ret;
+		}
+	}
+
+
+	/* K */
+	if (k) {
+		ret = dprint(params->params[GOST_K], k);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(x);
+			_gnutls_free_datum(y);
+			return ret;
+		}
+	}
+
+	return 0;
+
+}
+
 int
 pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 	     gnutls_pk_params_st * params,
