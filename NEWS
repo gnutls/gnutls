@@ -23,6 +23,7 @@ See the end for copying conditions.
 ** p11tool: improvements in --initialize option.
 
 ** API and ABI modifications:
+GNUTLS_NO_TICKETS: Added
 gnutls_pkcs7_get_embedded_data_oid: Added
 gnutls_anon_set_server_known_dh_params: Added
 gnutls_certificate_set_known_dh_params: Added
