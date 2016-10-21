@@ -301,13 +301,32 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_EC,
 	 .hash = GNUTLS_DIG_SHA224,
 	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "GOST R 34.10-2001",
+	/* GOST R 34.10-2012-512 */
+	{.name = "GOSTR341012-512",
+	 .oid = SIG_GOST_R3410_2012_512_OID,
+	 .id = GNUTLS_SIGN_GOST_512,
+	 .pk = GNUTLS_PK_GOST_12_512,
+	 .hash = GNUTLS_DIG_STREEBOG_512,
+	 /* XXX: IANA pending */
+	 .aid = {{239, 239}}},
+	/* GOST R 34.10-2012-256 */
+	{.name = "GOSTR341012-256",
+	 .oid = SIG_GOST_R3410_2012_256_OID,
+	 .id = GNUTLS_SIGN_GOST_256,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .hash = GNUTLS_DIG_STREEBOG_256,
+	 /* XXX: IANA pending */
+	 .aid = {{238, 238}}},
+	/* GOST R 34.10-2001 */
+	{.name = "GOSTR341001",
 	 .oid = SIG_GOST_R3410_2001_OID,
-	 .id = 0,
-	 .pk = 0,
-	 .hash = 0,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
-	{.name = "GOST R 34.10-94",
+	 .id = GNUTLS_SIGN_GOST_94,
+	 .pk = GNUTLS_PK_GOST_01,
+	 .hash = GNUTLS_DIG_GOSTR_94,
+	 /* XXX: IANA pending */
+	 .aid = {{237, 237}}},
+	/* GOST R 34.10-94 */
+	{.name = "GOSTR341094",
 	 .oid = SIG_GOST_R3410_94_OID,
 	 .id = 0,
 	 .pk = 0,

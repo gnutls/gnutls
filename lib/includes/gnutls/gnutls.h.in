@@ -814,6 +814,9 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_RSA_PSS_SHA384: Digital signature algorithm RSA with SHA-384, with PSS padding.
  * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding.
  * @GNUTLS_SIGN_EDDSA_ED25519: Digital signature algorithm EdDSA with Ed25519 curve.
+ * @GNUTLS_SIGN_GOST_94: Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-94
+ * @GNUTLS_SIGN_GOST_256: Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-2012 256 bit
+ * @GNUTLS_SIGN_GOST_512: Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-2012 512 bit
  *
  * Enumeration of different digital signature algorithms.
  */
@@ -858,7 +861,11 @@ typedef enum {
 	GNUTLS_SIGN_RSA_PSS_SHA512 = 34,
 	GNUTLS_SIGN_EDDSA_ED25519 = 35,
 	GNUTLS_SIGN_RSA_RAW = 36,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_RAW
+
+	GNUTLS_SIGN_GOST_94 = 37,
+	GNUTLS_SIGN_GOST_256 = 38,
+	GNUTLS_SIGN_GOST_512 = 39,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_GOST_512
 } gnutls_sign_algorithm_t;
 
 /**
