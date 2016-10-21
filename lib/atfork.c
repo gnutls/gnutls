@@ -62,7 +62,7 @@ unsigned int _gnutls_get_forkid(void)
 
 int _gnutls_detect_fork(unsigned int forkid)
 {
-	if (getpid() == forkid)
+	if ((unsigned int)getpid() == forkid)
 		return 0;
 	return 1;
 }

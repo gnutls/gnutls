@@ -1806,7 +1806,8 @@ _pkcs1_rsa_verify_sig(const mac_entry_st * me,
 			return GNUTLS_E_INVALID_REQUEST;
 		}
 
-		ret = _gnutls_hash_fast(me->id, text->data, text->size, md);
+		ret = _gnutls_hash_fast((gnutls_digest_algorithm_t)me->id,
+					text->data, text->size, md);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -1881,7 +1882,8 @@ dsa_verify_data(gnutls_pk_algorithm_t pk,
 	if (algo == NULL)
 		algo = _gnutls_dsa_q_to_hash(pk, params, NULL);
 
-	ret = _gnutls_hash_fast(algo->id, data->data, data->size, _digest);
+	ret = _gnutls_hash_fast((gnutls_digest_algorithm_t)algo->id,
+				data->data, data->size, _digest);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
