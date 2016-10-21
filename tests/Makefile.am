@@ -115,7 +115,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 set_key_utf8 set_x509_key_utf8 insecure_key handshake-large-packet \
 	 client_dsa_key server_ecdsa_key tls-session-ext-register tls-session-supplemental \
 	 multi-alerts naked-alerts pkcs7-cat-parse set_known_dh_params_x509 \
-	 set_known_dh_params_anon set_known_dh_params_psk
+	 set_known_dh_params_anon set_known_dh_params_psk session-tickets-ok \
+	 session-tickets-missing
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
