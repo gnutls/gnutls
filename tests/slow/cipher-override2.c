@@ -8,17 +8,6 @@
 #include <gnutls/crypto.h>
 #include <gnutls/self-test.h>
 
-#ifndef HAVE_LIBNETTLE
-int main(int argc, char **argv)
-{
-	exit(77);
-}
-#else
-
-# include <nettle/aes.h>
-# include <nettle/cbc.h>
-# include <nettle/gcm.h>
-
 /* this tests whether the API to override ciphers works sanely,
  * when GNUTLS_E_NEED_FALLBACK is used.
  */
@@ -157,5 +146,3 @@ int main(int argc, char **argv)
 	gnutls_global_deinit();
 	return 0;
 }
-
-#endif

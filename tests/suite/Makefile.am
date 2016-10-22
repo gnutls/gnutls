@@ -131,6 +131,8 @@ endif
 
 TESTS = $(nodist_check_SCRIPTS) prime-check
 
+prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
+
 TEST_EXTENSIONS = .sh
 
 if WANT_TEST_SUITE

@@ -208,6 +208,9 @@ if ENABLE_DANE
 ctests += dane
 endif
 
+rsa_illegal_import_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
+
+mini_alignment_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 mini_alignment_LDADD = $(LDADD) $(NETTLE_LIBS)
 
 if ENABLE_OPENSSL
@@ -232,6 +235,7 @@ endif
 endif
 
 gc_CPPFLAGS = $(CPPFLAGS) \
+	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
@@ -240,6 +244,7 @@ gc_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 mpi_CPPFLAGS = $(CPPFLAGS) \
+	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
@@ -248,6 +253,7 @@ mpi_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 atfork_CPPFLAGS = $(CPPFLAGS) \
+	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
@@ -256,6 +262,7 @@ atfork_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 pkcs12_s2k_CPPFLAGS = $(CPPFLAGS) \
+	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
@@ -264,6 +271,7 @@ pkcs12_s2k_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
+	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
