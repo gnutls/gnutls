@@ -37,6 +37,21 @@ if test ! -x /usr/bin/socat;then
 	exit 77
 fi
 
+for file in `which chat` /sbin/chat /ust/sbin/chat /ust/local/sbin/chat
+do
+	if test -x "$file"
+	then
+		CHAT="$file"
+		break
+	fi
+done
+
+if test -z "$CHAT"
+then
+	echo "chat not found"
+	exit 77
+fi
+
 . "${srcdir}/scripts/common.sh"
 
 echo "Checking STARTTLS"
@@ -56,7 +71,7 @@ wait
 echo "Checking STARTTLS over SMTP"
 
 eval "${GETPORT}"
-socat TCP-LISTEN:${PORT} EXEC:"chat -e -S -v -f ${srcdir}/starttls-smtp.txt",pty &
+socat TCP-LISTEN:${PORT} EXEC:"$CHAT -e -S -v -f ${srcdir}/starttls-smtp.txt",pty &
 PID=$!
 wait_server ${PID}
 
@@ -71,7 +86,7 @@ wait
 echo "Checking STARTTLS over FTP"
 
 eval "${GETPORT}"
-socat TCP-LISTEN:${PORT} EXEC:"chat -e -S -v -f ${srcdir}/starttls-ftp.txt",pty &
+socat TCP-LISTEN:${PORT} EXEC:"$CHAT -e -S -v -f ${srcdir}/starttls-ftp.txt",pty &
 PID=$!
 wait_server ${PID}
 
