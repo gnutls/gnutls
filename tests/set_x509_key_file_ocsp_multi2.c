@@ -126,6 +126,8 @@ void doit(void)
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
+	gnutls_certificate_set_flags(xcred, GNUTLS_CERTIFICATE_API_V2);
+
 	certfile1 = get_tmpname(certname1);
 
 	/* set cert with localhost name */

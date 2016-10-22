@@ -475,7 +475,8 @@ static int file_ocsp_func(gnutls_session_t session, void *ptr,
  * file accesses.
  *
  * Note: the ability to set multiple OCSP responses per credential
- * structure via @idx was added in version 3.5.5.
+ * structure via @idx was added in version 3.5.6 with the
+ * %GNUTLS_CERTIFICATE_API_V2 flag.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.

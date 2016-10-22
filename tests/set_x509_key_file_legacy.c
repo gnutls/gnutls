@@ -22,7 +22,7 @@
  */
 
 /* This test checks the behavior of gnutls_certificate_set_x509_key_file2()
- * when the GNUTLS_CERTIFICATE_API_V2 is set */
+ * when the GNUTLS_CERTIFICATE_API_V2 is not set */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -139,8 +139,6 @@ void doit(void)
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 
-	gnutls_certificate_set_flags(xcred, GNUTLS_CERTIFICATE_API_V2);
-
 	ret = gnutls_certificate_set_x509_trust_mem(clicred, &subca3_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
@@ -154,23 +152,20 @@ void doit(void)
 	success("Tested store of %d\n", idx);
 
 	idx = set_cert(xcred, &server_ca3_key, &server_ca3_localhost_cert);
-	verify_written_cert(xcred, idx, &server_ca3_localhost_cert, 1);
-	assert(idx == 1);
+	assert(idx == 0);
 
 	success("Tested store of %d\n", idx);
 
 	test_cli_serv(xcred, clicred, "NORMAL", "localhost", NULL, NULL, NULL); /* the DNS name of the first cert */
 
 	idx = set_cert(xcred, &server_key, &server_cert);
-	verify_written_cert(xcred, idx, &server_cert, 2);
-	assert(idx == 2);
+	assert(idx == 0);
 
 	success("Tested store of %d\n", idx);
 
 	for (i=0;i<16;i++) {
 		idx = set_cert(xcred, &server_ecc_key, &server_ecc_cert);
-		verify_written_cert(xcred, idx, &server_ecc_cert, 1);
-		assert(idx == 3+i);
+		assert(idx == 0);
 		success("Tested store of %d\n", idx);
 	}
 

@@ -82,11 +82,23 @@ resumed one, and will share the same session ID with the previous one.
 @node Error handling
 @subsection Error handling
 
-There two types of @acronym{GnuTLS} functions. One type returns
-a boolean true (non-zero) or false (zero) value, which are set
-to return an unsigned integer type. The other type returns a
-signed integer type with zero indicating success and a negative
-value indicating failure. 
+There two types of @acronym{GnuTLS} functions. The first type returns
+a boolean value, true (non-zero) or false (zero) value; these functions
+are defined to return an unsigned integer type. The other type returns a
+signed integer type with zero (or a positive number) indicating
+success and a negative value indicating failure. For the latter
+type it is recommended to check for errors as following.
+@example
+    ret = gnutls_function();
+    if (ret < 0) @{
+        return -1;
+    @}
+@end example
+The above example checks for a failure condition rather than
+for explicit success (e.g., equality to zero). That has the advantage
+that future extensions of the API can be extended to provide
+additional information via positive returned values (see for example
+@funcref{gnutls_certificate_set_x509_key_file}).
 
 For certain operations such as TLS handshake and TLS packet receive
 there is the notion of fatal and non-fatal error codes.

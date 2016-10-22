@@ -156,6 +156,8 @@ static void basic(void)
 	assert(gnutls_certificate_allocate_credentials(&clicred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
 
+	gnutls_certificate_set_flags(x509_cred, GNUTLS_CERTIFICATE_API_V2);
+
 	ret = gnutls_certificate_set_x509_trust_mem(clicred, &ca_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));

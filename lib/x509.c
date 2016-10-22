@@ -57,6 +57,13 @@
  * some x509 certificate parsing functions.
  */
 
+#define CRED_RET_SUCCESS(cred) \
+	if (cred->flags & GNUTLS_CERTIFICATE_API_V2) { \
+		return cred->ncerts-1; \
+	} else { \
+		return 0; \
+	}
+
 /* fifteen days */
 #define MAX_OCSP_VALIDITY_SECS (15*60*60*24)
 #ifdef ENABLE_OCSP
@@ -986,7 +993,12 @@ read_key_file(gnutls_certificate_credentials_t res,
  * The @key may be %NULL if you are using a sign callback, see
  * gnutls_sign_callback_set().
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
+ *
  **/
 int
 gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res,
@@ -1022,7 +1034,11 @@ gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res,
  * The @key may be %NULL if you are using a sign callback, see
  * gnutls_sign_callback_set().
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
  **/
 int
 gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
@@ -1052,8 +1068,7 @@ gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
 		return ret;
 	}
 
-	/* return the index of the chain */
-	return res->ncerts-1;
+	CRED_RET_SUCCESS(res);
 }
 
 int
@@ -1115,7 +1130,11 @@ certificate_credentials_append_pkey(gnutls_certificate_credentials_t res,
  * If that function fails to load the @res type is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
  *
  * Since: 2.4.0
  **/
@@ -1197,7 +1216,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 		return ret;
 	}
 
-	return res->ncerts-1;
+	CRED_RET_SUCCESS(res);
 
       cleanup:
 	gnutls_free(pcerts);
@@ -1219,11 +1238,12 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
  * gnutls_certificate_set_x509_key_mem2(). The returned key must be deallocated
  * with gnutls_x509_privkey_deinit() when no longer needed.
  *
+ * The @index matches the return value of gnutls_certificate_set_x509_key() and friends
+ * functions, when the %GNUTLS_CERTIFICATE_API_V2 flag is set.
+ *
  * If there is no key with the given index,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the key with the
  * given index is not a X.509 key, %GNUTLS_E_INVALID_REQUEST is returned.
- * The @index matches the value gnutls_certificate_set_x509_key() and friends
- * functions.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
@@ -1258,8 +1278,10 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
  * certificate list must be deallocated with gnutls_x509_crt_deinit(), and the
  * list itself must be freed with gnutls_free().
  *
- * The @index matches the value gnutls_certificate_set_x509_key() and friends
- * functions. If there is no certificate with the given index,
+ * The @index matches the return value of gnutls_certificate_set_x509_key() and friends
+ * functions, when the %GNUTLS_CERTIFICATE_API_V2 flag is set.
+ *
+ * If there is no certificate with the given index,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the certificate
  * with the given index is not a X.509 certificate, %GNUTLS_E_INVALID_REQUEST
  * is returned. The returned certificates must be deinitialized after
@@ -1329,7 +1351,11 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
  *
  * Since: 3.0
  **/
@@ -1421,7 +1447,7 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
-	return res->ncerts-1;
+	CRED_RET_SUCCESS(res);
 
       cleanup:
 	_gnutls_str_array_clear(&str_names);
@@ -1502,7 +1528,11 @@ gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
  *
  * Since: 3.1.11
  **/
@@ -1550,7 +1580,11 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
  *
  **/
 int
@@ -1580,7 +1614,7 @@ gnutls_certificate_set_x509_key_file2(gnutls_certificate_credentials_t res,
 		return ret;
 	}
 
-	return res->ncerts-1;
+	CRED_RET_SUCCESS(res);
 }
 
 /* Returns 0 if it's ok to use the gnutls_kx_algorithm_t with this 
@@ -1972,7 +2006,11 @@ int ret;
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
  *
  **/
 int
@@ -2028,7 +2066,11 @@ int
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Returns: An index of the inserted certificate chain on success (greater or equal to zero), or a negative error code.
+ * Note that, this function by default returns zero on success and a negative value on error.
+ * Since 3.5.6, when the flag %GNUTLS_CERTIFICATE_API_V2 is set using gnutls_certificate_set_flags()
+ * it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+ *
+ * Returns: On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
  *
  * Since: 2.8.0
  **/
@@ -2098,7 +2140,10 @@ int
 		}
 	}
 
-	ret = idx;
+	if (res->flags & GNUTLS_CERTIFICATE_API_V2)
+		ret = idx;
+	else
+		ret = 0;
 
       done:
 	if (chain) {

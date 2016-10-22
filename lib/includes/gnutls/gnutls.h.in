@@ -1661,11 +1661,13 @@ gnutls_certificate_get_verify_flags(gnutls_certificate_credentials_t res);
 /**
  * gnutls_certificate_flags:
  * @GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH: Skip the key and certificate matching check.
+ * @GNUTLS_CERTIFICATE_API_V2: If set the gnutls_certificate_set_*key* functions will return an index of the added key pair instead of zero.
  *
  * Enumeration of different certificate credentials flags.
  */
 typedef enum gnutls_certificate_flags {
-	GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH = 1
+	GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH = 1,
+	GNUTLS_CERTIFICATE_API_V2 = (1<<1)
 } gnutls_certificate_flags;
 
 void gnutls_certificate_set_flags(gnutls_certificate_credentials_t,
