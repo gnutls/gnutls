@@ -1777,6 +1777,32 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		}
 	}
 
+	if (IS_GOSTEC(algo)) {
+		unsigned params;
+		int size;
+
+		if (algo == GNUTLS_PK_GOST_01)
+			params = GNUTLS_GOST_PARAMSET_CP_A;
+		else
+			params = GNUTLS_GOST_PARAMSET_TC26_Z;
+
+		if (GNUTLS_BITS_ARE_CURVE(bits))
+			bits = GNUTLS_BITS_TO_CURVE(bits);
+		else
+			bits = _gnutls_ecc_bits_to_curve(algo, bits);
+
+		size = gnutls_ecc_curve_get_size(bits);
+
+		if ((algo == GNUTLS_PK_GOST_01 && size != 32) ||
+		    (algo == GNUTLS_PK_GOST_12_256 && size != 32) ||
+		    (algo == GNUTLS_PK_GOST_12_512 && size != 64)) {
+			_gnutls_debug_log("curve is incompatible with public key algorithm\n");
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+
+		key->params.gost_params = params;
+	}
+
 	if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE) {
 		key->params.pkflags |= GNUTLS_PK_FLAG_PROVABLE;
 	}

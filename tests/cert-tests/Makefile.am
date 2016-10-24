@@ -119,6 +119,10 @@ if ENABLE_DANE
 dist_check_SCRIPTS += dane
 endif
 
+if ENABLE_GOST
+dist_check_SCRIPTS += gost
+endif
+
 dist_check_SCRIPTS += certtool-rsa-pss certtool-eddsa
 
 TESTS = $(dist_check_SCRIPTS)
