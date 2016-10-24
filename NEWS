@@ -17,12 +17,19 @@ See the end for copying conditions.
    in the gnutls_x509_crt_verify_data2() and gnutls_pkcs7_verify_direct()
    functions.
 
+** libgnutls: Reverted the change which made the gnutls_certificate_set_*key* 
+   functions return an index, to avoid affecting programs which explicitly
+   check success of the function as equality to zero. In order for these
+   functions to return an index an explicit call to gnutls_certificate_set_flags
+   with the GNUTLS_CERTIFICATE_API_V2 flag is required.
+
 ** certtool: --get-dh-params will output parameters from the RFC7919
    groups.
 
 ** p11tool: improvements in --initialize option.
 
 ** API and ABI modifications:
+GNUTLS_CERTIFICATE_API_V2: Added
 GNUTLS_NO_TICKETS: Added
 gnutls_pkcs7_get_embedded_data_oid: Added
 gnutls_anon_set_server_known_dh_params: Added
