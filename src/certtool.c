@@ -149,7 +149,11 @@ generate_private_key_int(common_info_st * cinfo)
 
 	bits = get_bits(key_type, cinfo->bits, cinfo->sec_param, 1);
 
-	if (key_type == GNUTLS_PK_ECDSA || key_type == GNUTLS_PK_EDDSA_ED25519) {
+	if (key_type == GNUTLS_PK_ECDSA ||
+	    key_type == GNUTLS_PK_EDDSA_ED25519 ||
+	    key_type == GNUTLS_PK_GOST_01 ||
+	    key_type == GNUTLS_PK_GOST_12_256 ||
+	    key_type == GNUTLS_PK_GOST_12_512) {
 		char name[64];
 		int ecc_bits;
 
@@ -541,7 +545,10 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		}
 
 		if (!ca_status || server) {
-			if (pk == GNUTLS_PK_RSA) {	/* DSA and ECDSA keys can only sign. */
+			if (pk == GNUTLS_PK_RSA ||
+			    pk == GNUTLS_PK_GOST_01 ||
+			    pk == GNUTLS_PK_GOST_12_256 ||
+			    pk == GNUTLS_PK_GOST_12_512)  {	/* DSA and ECDSA keys can only sign. */
 				result = get_sign_status(server);
 				if (result)
 					usage |=
@@ -1879,7 +1886,10 @@ void generate_request(common_info_st * cinfo)
 			app_exit(1);
 		}
 
-		if (pk == GNUTLS_PK_RSA) {
+		if (pk == GNUTLS_PK_RSA ||
+		    pk == GNUTLS_PK_GOST_01 ||
+		    pk == GNUTLS_PK_GOST_12_256 ||
+		    pk == GNUTLS_PK_GOST_12_512) {
 			ret = get_sign_status(1);
 			if (ret)
 				usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;

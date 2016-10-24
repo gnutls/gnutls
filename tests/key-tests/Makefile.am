@@ -35,9 +35,13 @@ EXTRA_DIST = data/key-ca.pem data/key-user.pem \
 	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt
 
 dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa ecdsa illegal-rsa pkcs8-invalid key-invalid \
-	pkcs8-eddsa
+	pkcs8-eddsa gost
 
 TESTS = key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8 pkcs8-eddsa
+
+if ENABLE_GOST
+TESTS += gost
+endif
 
 if !WITH_OLD_NETTLE
 TESTS += illegal-rsa

@@ -263,7 +263,7 @@ void cfg_init(void)
   { \
     char str[512]; \
     char * p; \
-    int len; \
+    size_t len; \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
