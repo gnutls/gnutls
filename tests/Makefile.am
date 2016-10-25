@@ -58,13 +58,15 @@ endif
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
+EXTRA_DIST += cert-common.h
+
 ctests = simple gc set_pkcs12_cred certder certuniqueid mpi			\
 	certificate_set_x509_crl dn parse_ca moredn crypto_rng mini	\
 	hostname-check cve-2008-4989 pkcs12_s2k chainverify	\
 	crq_key_id x509sign-verify cve-2009-1415 cve-2009-1416		\
 	crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain		\
 	nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
-	mini-x509-rehandshake rng-fork x509cert gendh
+	mini-x509-rehandshake rng-fork x509cert gendh naked-alerts multi-alerts
 
 if ENABLE_OPENSSL
 ctests +=  openssl
