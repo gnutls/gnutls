@@ -223,7 +223,7 @@ if called after a successful @ref{gnutls_handshake}.
 
 @node Verifying peer's certificate
 @subsection Verifying Peer's Certificate
-@anchor{ex:verify}
+@anchor{ex-verify}
 
 A @acronym{TLS} session is not secure just after the handshake
 procedure has finished.  It must be considered secure, only after the
@@ -252,7 +252,7 @@ certificate selection callback.
 
 @node Client using a PKCS #11 token with TLS
 @subsection Using a @acronym{PKCS #11} token with TLS
-@anchor{ex:pkcs11-client}
+@anchor{ex-pkcs11-client}
 
 This example will demonstrate how to load keys and certificates
 from a @acronym{PKCS} #11 token, and use it with a TLS connection.
@@ -262,7 +262,7 @@ from a @acronym{PKCS} #11 token, and use it with a TLS connection.
 
 @node Client with Resume capability example
 @subsection Client with Resume Capability Example
-@anchor{ex:resume-client}
+@anchor{ex-resume-client}
 
 This is a modification of the simple client example. Here we
 demonstrate the use of session resumption. The client tries to connect
@@ -368,7 +368,7 @@ current session.
 
 @node X.509 certificate parsing example
 @subsection @acronym{X.509} Certificate Parsing Example
-@anchor{ex:x509-info}
+@anchor{ex-x509-info}
 
 To demonstrate the @acronym{X.509} parsing capabilities an example program is
 listed below.  That program reads the peer's certificate, and prints
@@ -378,7 +378,7 @@ information about it.
 
 @node Certificate request generation
 @subsection Certificate Request Generation
-@anchor{ex:crq}
+@anchor{ex-crq}
 
 The following example is about generating a certificate request, and a
 private key. A certificate request can be later be processed by a CA,
@@ -388,7 +388,7 @@ which should return a signed certificate.
 
 @node PKCS #12 structure generation
 @subsection @acronym{PKCS} #12 Structure Generation
-@anchor{ex:pkcs12}
+@anchor{ex-pkcs12}
 
 The following example is about generating a @acronym{PKCS} #12
 structure.

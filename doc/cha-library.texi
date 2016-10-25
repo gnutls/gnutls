@@ -180,8 +180,8 @@ should allocate and free memory using the functions shown below.
 
 @itemize
 
-@item @ref{gnutls_malloc}
+@item @code{gnutls_malloc}
 
-@item @ref{gnutls_free}
+@item @code{gnutls_free}
 
 @end itemize

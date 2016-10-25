@@ -570,7 +570,7 @@ resuming} is a feature of the @acronym{TLS} protocol which allows a
 client to connect to a server, after a successful handshake, without
 the expensive calculations.  This is achieved by using the previously
 established keys. @acronym{GnuTLS} supports this feature, and the
-example (@pxref{ex:resume-client}) illustrates a typical use of it.
+example (@ref{ex-resume-client}) illustrates a typical use of it.
 
 Keep in mind that sessions are expired after some time, for security
 reasons, thus it may be normal for a server not to resume a session

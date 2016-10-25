@@ -27,7 +27,7 @@ One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
 acceptable.  See the figure above for a typical example.  The API for
 handling @acronym{X.509} certificates is described at section
-@ref{sec:x509api}.  Some examples are listed below.
+@ref{sec-x509api}.  Some examples are listed below.
 
 @menu
 * X.509 certificates::
@@ -125,7 +125,7 @@ private keys with the @code{gnutls_x509_privkey_t} type.  All the
 available functions for @acronym{X.509} certificate handling have
 their prototypes in @file{gnutls/x509.h}. An example program to
 demonstrate the @acronym{X.509} parsing capabilities can be found at
-section @ref{ex:x509-info}.
+section @ref{ex-x509-info}.
 
 @node Verifying X.509 certificate paths
 @subsection Verifying @acronym{X.509} Certificate Paths
@@ -208,7 +208,7 @@ Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
 about the peer's identity. It is required to verify if the
 certificate's owner is the one you expect. For more information
-consult @xcite{RFC2818} and section @ref{ex:verify} for an example.
+consult @xcite{RFC2818} and section @ref{ex-verify} for an example.
 
 @node PKCS #10 certificate requests
 @subsection @acronym{PKCS} #10 Certificate Requests
@@ -224,7 +224,7 @@ such as PKIX's @xcite{RFC4211} are not currently supported.
 
 In @acronym{GnuTLS} the @acronym{PKCS} #10 structures are handled
 using the @code{gnutls_x509_crq_t} type.  An example of a certificate
-request generation can be found at section @ref{ex:crq}.
+request generation can be found at section @ref{ex-crq}.
 
 @node PKCS #12 structures
 @subsection @acronym{PKCS} #12 Structures
@@ -242,7 +242,7 @@ keys or encrypted data.  An Bag of type encrypted should be decrypted
 in order for its data to be accessed.
 
 An example of a @acronym{PKCS} #12 structure generation can be found
-at section @ref{ex:pkcs12}.
+at section @ref{ex-pkcs12}.
 
 @node The OpenPGP trust model
 @section The @acronym{OpenPGP} Trust Model
@@ -321,7 +321,7 @@ MD5.  These algorithms have been broken and should not be trusted.
 
 @node PKCS #11 tokens
 @section @acronym{PKCS #11} tokens
-@anchor{sec:pkcs11}
+@anchor{sec-pkcs11}
 @cindex @acronym{PKCS #11} tokens
 
 @subsection Introduction
@@ -509,7 +509,7 @@ to a token. This can be achieved with the following functions
 @subsection Using a @acronym{PKCS #11} token with TLS
 
 It is possible to use a @acronym{PKCS #11} token to a TLS
-session, as shown in @ref{ex:pkcs11-client}. In addition
+session, as shown in @ref{ex-pkcs11-client}. In addition
 the following functions can be used to load PKCS #11 key and
 certificates.
 
@@ -524,7 +524,7 @@ certificates.
 
 @node Abstract data types
 @section Abstract data types
-@anchor{sec:abstract}
+@anchor{sec-abstract}
 @cindex Abstract types
 
 Since there are many forms of a public or private keys supported by @acronym{GnuTLS} such as

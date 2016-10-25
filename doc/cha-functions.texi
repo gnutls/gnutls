@@ -21,7 +21,7 @@ The prototypes for the following functions lie in
 
 @node X.509 certificate functions
 @section @acronym{X.509} Certificate Functions
-@anchor{sec:x509api}
+@anchor{sec-x509api}
 @cindex @acronym{X.509} Functions
 
 The following functions are to be used for @acronym{X.509} certificate handling.
@@ -42,7 +42,7 @@ lie in @file{gnutls/extra.h}.
 @node OpenPGP functions
 @section @acronym{OpenPGP} Functions
 @cindex @acronym{OpenPGP} functions
-@anchor{sec:openpgpapi}
+@anchor{sec-openpgpapi}
 
 The following functions are to be used for @acronym{OpenPGP}
 certificate handling.  Their prototypes lie in
