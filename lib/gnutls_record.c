@@ -702,6 +702,13 @@ record_check_type (gnutls_session_t session,
             ("REC[%p]: Alert[%d|%d] - %s - was received\n", session,
              data[0], data[1], gnutls_alert_get_name ((int) data[1]));
 
+          if (!session->internals.initial_negotiation_completed &&
+              session->internals.handshake_in_progress && STATE == STATE0)
+            { /* handshake hasn't started */
+              gnutls_assert();
+              return GNUTLS_E_UNEXPECTED_PACKET;
+            }
+
           session->internals.last_alert = data[1];
 
           /* if close notify is received and

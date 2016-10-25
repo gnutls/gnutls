@@ -237,6 +237,7 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
    */
   session->internals.last_handshake_in = -1;
   session->internals.last_handshake_out = -1;
+  session->internals.handshake_suspicious_loops = 0;
 
   session->internals.resumable = RESUME_TRUE;
 }
@@ -247,6 +248,7 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
   _gnutls_handshake_internal_state_init (session);
 
   _gnutls_free_datum (&session->internals.recv_buffer);
+  session->internals.handshake_in_progress = 0;
 
   deinit_internal_params (session);
 

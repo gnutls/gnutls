@@ -2653,6 +2653,11 @@ gnutls_handshake (gnutls_session_t session)
   int ret;
   record_parameters_st *params;
 
+  if (STATE == STATE0)
+    { /* first call */
+      session->internals.handshake_in_progress = 1;
+    }
+
   ret = _gnutls_epoch_get (session, session->security_parameters.epoch_next,
                            &params);
   if (ret < 0)
@@ -2713,8 +2718,14 @@ gnutls_handshake (gnutls_session_t session)
 		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
 			return ret; \
                 /* a warning alert might interrupt handshake */ \
-		if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
-		gnutls_assert(); \
+		if (ret == GNUTLS_E_GOT_APPLICATION_DATA && session->internals.initial_negotiation_completed != 0) \
+		  return ret; \
+                if (session->internals.handshake_suspicious_loops < 16) { \
+                  if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) { \
+                    session->internals.handshake_suspicious_loops++; \
+                    return ret; \
+                  } \
+                } \
 		ERR( str, ret); \
 		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
 		session->internals.invalid_connection = 1; \

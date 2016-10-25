@@ -723,6 +723,8 @@ typedef struct
 
   unsigned int cb_tls_unique_len;
   unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
+  unsigned handshake_suspicious_loops;
+  unsigned handshake_in_progress;
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
