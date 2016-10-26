@@ -3,6 +3,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.26 (unreleased)
+
+** libgnutls: Handle status request responses as optional (following
+   RFC6066).
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.25 (released 2016-10-9)
 
 ** libgnutls: Ensure proper cleanups on gnutls_certificate_set_*key()
