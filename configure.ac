@@ -1042,6 +1042,7 @@ if features are disabled)
   PSK support:          $ac_enable_psk
   DHE support:          $ac_enable_dhe
   ECDHE support:        $ac_enable_ecdhe
+  GOST support:         $ac_enable_gost
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
   IDNA support:         $idna_support
