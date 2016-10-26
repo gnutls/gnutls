@@ -208,6 +208,63 @@ client_recv(gnutls_session_t session,
 	}
 }
 
+
+/*
+ * Servers return a certificate response along with their certificate
+ * by sending a "CertificateStatus" message immediately after the
+ * "Certificate" message (and before any "ServerKeyExchange" or
+ * "CertificateRequest" messages).  If a server returns a
+ * "CertificateStatus" message, then the server MUST have included an
+ * extension of type "status_request" with empty "extension_data" in
+ * the extended server hello.
+ *
+ * According to the description above, as a server we could simply 
+ * return GNUTLS_E_INT_RET_0 on this function. In that case we would
+ * only need to use the callbacks at the time we need to send the data,
+ * and skip the status response packet if no such data are there.
+ * However, that behavior would break gnutls 3.3.x which expects the status 
+ * response to be always send if the extension is present.
+ *
+ * Instead we ensure that this extension is parsed after the CS/certificate
+ * are selected (with the _GNUTLS_EXT_TLS_POST_CS type), and we discover
+ * (or not) the response to send early.
+ */
+static int
+server_send(gnutls_session_t session,
+	    gnutls_buffer_st * extdata, status_request_ext_st * priv)
+{
+	int ret;
+	gnutls_certificate_credentials_t cred;
+	gnutls_status_request_ocsp_func func;
+	void *func_ptr;
+
+	cred = (gnutls_certificate_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL)	/* no certificate authentication */
+		return gnutls_assert_val(0);
+
+	if (session->internals.selected_ocsp_func) {
+		func = session->internals.selected_ocsp_func;
+		func_ptr = session->internals.selected_ocsp_func_ptr;
+	} else if (cred->glob_ocsp_func) {
+		func = cred->glob_ocsp_func;
+		func_ptr = cred->glob_ocsp_func_ptr;
+	} else {
+		return 0;
+	}
+
+	if (func == NULL)
+		return 0;
+
+	ret = func(session, func_ptr, &priv->response);
+	if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS)
+		return 0;
+	else if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return GNUTLS_E_INT_RET_0;
+}
+
 static int
 _gnutls_status_request_send_params(gnutls_session_t session,
 				   gnutls_buffer_st * extdata)
@@ -240,16 +297,7 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 					     GNUTLS_EXTENSION_STATUS_REQUEST,
 					     epriv);
 
-		/*
-		  Servers return a certificate response along with their certificate
-		  by sending a "CertificateStatus" message immediately after the
-		  "Certificate" message (and before any "ServerKeyExchange" or
-		  "CertificateRequest" messages).  If a server returns a
-		  "CertificateStatus" message, then the server MUST have included an
-		  extension of type "status_request" with empty "extension_data" in
-		  the extended server hello.
-		*/
-		return GNUTLS_E_INT_RET_0;
+		return server_send(session, extdata, priv);
 	}
 }
 
@@ -554,7 +602,7 @@ _gnutls_status_request_unpack(gnutls_buffer_st * ps,
 const extension_entry_st ext_mod_status_request = {
 	.name = "OCSP Status Request",
 	.type = GNUTLS_EXTENSION_STATUS_REQUEST,
-	.parse_type = GNUTLS_EXT_TLS,
+	.parse_type = _GNUTLS_EXT_TLS_POST_CS,
 	.recv_func = _gnutls_status_request_recv_params,
 	.send_func = _gnutls_status_request_send_params,
 	.pack_func = _gnutls_status_request_pack,
@@ -572,10 +620,7 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 	int data_size = 0;
 	int ret;
 	extension_priv_data_t epriv;
-	gnutls_datum_t response = {NULL, 0};
-	gnutls_status_request_ocsp_func func;
-	void *func_ptr;
-	gnutls_certificate_credentials_t cred;
+	status_request_ext_st *priv;
 
 	if (again == 0) {
 		ret =
@@ -585,46 +630,26 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 		if (ret < 0)
 			return 0;
 
-		cred = (gnutls_certificate_credentials_t)
-			_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
-		if (cred == NULL)
-			return gnutls_assert_val(0);
+		priv = epriv;
 
-		if (session->internals.selected_ocsp_func) {
-			func = session->internals.selected_ocsp_func;
-			func_ptr = session->internals.selected_ocsp_func_ptr;
-		} else if (cred->glob_ocsp_func) {
-			func = cred->glob_ocsp_func;
-			func_ptr = cred->glob_ocsp_func_ptr;
-		} else
+		if (!priv->response.size)
 			return 0;
 
-		if (func) {
-			ret = func(session, func_ptr, &response);
-			if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS)
-				return 0;
-			else if (ret < 0)
-				return gnutls_assert_val(ret);
-		}
-
-		if (!response.size)
-			return 0;
-
-		data_size = response.size + 4;
+		data_size = priv->response.size + 4;
 		bufel =
 		    _gnutls_handshake_alloc(session, data_size);
 		if (!bufel) {
-			_gnutls_free_datum(&response);
+			_gnutls_free_datum(&priv->response);
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
 
 		data = _mbuffer_get_udata_ptr(bufel);
 
 		data[0] = 0x01;
-		_gnutls_write_uint24(response.size, &data[1]);
-		memcpy(&data[4], response.data, response.size);
+		_gnutls_write_uint24(priv->response.size, &data[1]);
+		memcpy(&data[4], priv->response.data, priv->response.size);
 
-		_gnutls_free_datum(&response);
+		_gnutls_free_datum(&priv->response);
 	}
 	return _gnutls_send_handshake(session, data_size ? bufel : NULL,
 				      GNUTLS_HANDSHAKE_CERTIFICATE_STATUS);

@@ -131,6 +131,11 @@ typedef struct {
  */
 #define MAX_EXT_TYPES 32
 
+/* TLS-internal extension (will be parsed after a ciphersuite is selected).
+ * This amends the gnutls_ext_parse_type_t. Not exported yet to allow more refining
+ * prior to finalizing an API. */
+#define _GNUTLS_EXT_TLS_POST_CS 177
+
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
 #define DEFAULT_HANDSHAKE_TIMEOUT_MS 40*1000

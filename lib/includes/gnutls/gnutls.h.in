@@ -2546,7 +2546,7 @@ typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_t packed_data,
 /**
  * gnutls_ext_parse_type_t:
  * @GNUTLS_EXT_NONE: Never parsed
- * @GNUTLS_EXT_ANY: Any extension type.
+ * @GNUTLS_EXT_ANY: Any extension type (internal use only).
  * @GNUTLS_EXT_APPLICATION: Application extension.
  * @GNUTLS_EXT_TLS: TLS-internal extension.
  * @GNUTLS_EXT_MANDATORY: Extension parsed even if resuming (or extensions are disabled).

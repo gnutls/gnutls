@@ -649,7 +649,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		return 0;
 	}
 
-	/* select an appropriate cipher suite
+	/* select an appropriate cipher suite (as well as certificate)
 	 */
 	ret = _gnutls_server_select_suite(session, suite_ptr, suite_size);
 	if (ret < 0) {
@@ -661,6 +661,15 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	ret =
 	    server_select_comp_method(session, comp_ptr,
 					      comp_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* call extensions that are intended to be parsed after the ciphersuite/cert
+	 * are known. */
+	ret =
+	    _gnutls_parse_extensions(session, _GNUTLS_EXT_TLS_POST_CS, ext_ptr, ext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
