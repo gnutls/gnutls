@@ -305,6 +305,20 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_ECDHE, test "$ac_enable_ecdhe" != "no")
 
+  AC_MSG_CHECKING([whether to disable GOST support])
+  AC_ARG_ENABLE(gost,
+    AS_HELP_STRING([--disable-gost],
+                   [disable the GOST support]),
+    ac_enable_gost=$enableval, ac_enable_gost=yes)
+  if test x$ac_enable_gost != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_GOST], 1, [enable GOST])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ENABLE_GOST, test "$ac_enable_gost" != "no")
+
   # For cryptodev
   AC_MSG_CHECKING([whether to add cryptodev support])
   AC_ARG_ENABLE(cryptodev,
