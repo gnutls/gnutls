@@ -103,7 +103,7 @@ static int calc_ecdh_key(gnutls_session_t session,
 
 	ret =
 	    _gnutls_pk_derive(ecurve->pk, &tmp_dh_key,
-			      &session->key.ecdh_params, &pub);
+			      &session->key.ecdh_params, &pub, NULL);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto cleanup;

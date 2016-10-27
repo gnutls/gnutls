@@ -542,7 +542,7 @@ static int test_dh(void)
 	}
 
 	/* check whether Y^X mod p is the expected value */
-	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &out, &priv, &pub);
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &out, &priv, &pub, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -644,7 +644,7 @@ static int test_ecdh(void)
 	}
 
 	/* check whether Y^X mod p is the expected value */
-	ret = _gnutls_pk_derive(GNUTLS_PK_EC, &out, &priv, &pub);
+	ret = _gnutls_pk_derive(GNUTLS_PK_EC, &out, &priv, &pub, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

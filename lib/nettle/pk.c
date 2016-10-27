@@ -200,7 +200,8 @@ ecc_shared_secret(struct ecc_scalar *private_key,
 static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				  gnutls_datum_t * out,
 				  const gnutls_pk_params_st * priv,
-				  const gnutls_pk_params_st * pub)
+				  const gnutls_pk_params_st * pub,
+				  const gnutls_datum_t * nonce)
 {
 	int ret;
 
@@ -209,6 +210,9 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		bigint_t f, x, prime;
 		bigint_t k = NULL, ff = NULL;
 		unsigned int bits;
+
+		if (nonce != NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		f = pub->params[DH_Y];
 		x = priv->params[DH_X];
@@ -272,6 +276,9 @@ dh_cleanup:
 
 			out->data = NULL;
 
+			if (nonce != NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 			curve = get_supported_nist_curve(priv->curve);
 			if (curve == NULL)
 				return
@@ -312,6 +319,9 @@ dh_cleanup:
 	case GNUTLS_PK_ECDH_X25519:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(priv->curve);
+
+			if (nonce != NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 			/* The point is in pub, while the private part (scalar) in priv. */
 
@@ -1323,7 +1333,7 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 
 	Z->data = NULL;
 
-	ret = _gnutls_pk_derive(GNUTLS_PK_DH, Z, &priv, &pub);
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, Z, &priv, &pub, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1452,7 +1462,7 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 
 	Z->data = NULL;
 
-	ret = _gnutls_pk_derive(GNUTLS_PK_ECDSA, Z, &priv, &pub);
+	ret = _gnutls_pk_derive(GNUTLS_PK_ECDSA, Z, &priv, &pub, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

@@ -84,7 +84,7 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 	peer_pub.params[DH_Y] = session->key.client_Y;
 
 	/* calculate the key after calculating the message */
-	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.dh_params, &peer_pub);
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.dh_params, &peer_pub, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -147,7 +147,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 	peer_pub.params[DH_Y] = session->key.client_Y;
 
 	/* calculate the key after calculating the message */
-	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.dh_params, &peer_pub);
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.dh_params, &peer_pub, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;

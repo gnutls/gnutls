@@ -373,7 +373,8 @@ typedef struct gnutls_crypto_pk {
 					gnutls_pk_params_st *);
 	int (*derive) (gnutls_pk_algorithm_t, gnutls_datum_t * out,
 		       const gnutls_pk_params_st * priv,
-		       const gnutls_pk_params_st * pub);
+		       const gnutls_pk_params_st * pub,
+		       const gnutls_datum_t *nonce);
 
 	int (*curve_exists) (gnutls_ecc_curve_t);	/* true/false */
 } gnutls_crypto_pk_st;
