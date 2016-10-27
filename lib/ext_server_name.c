@@ -331,7 +331,7 @@ gnutls_server_name_get (gnutls_session_t session, void *data,
     }
   else
     {
-      *data_length = priv->server_names[indx].name_length;
+      *data_length = priv->server_names[indx].name_length + 1;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
