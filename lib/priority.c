@@ -114,6 +114,15 @@ static const int _supported_groups_normal[] = {
 	GNUTLS_GROUP_FFDHE3072,
 	GNUTLS_GROUP_FFDHE4096,
 	GNUTLS_GROUP_FFDHE8192,
+#ifdef ENABLE_GOST
+	GNUTLS_GROUP_GOST256CPA,
+	GNUTLS_GROUP_GOST256CPB,
+	GNUTLS_GROUP_GOST256CPC,
+	GNUTLS_GROUP_GOST256CPXA,
+	GNUTLS_GROUP_GOST256CPXB,
+	GNUTLS_GROUP_GOST512A,
+	GNUTLS_GROUP_GOST512B,
+#endif
 	0
 };
 static const int* supported_groups_normal = _supported_groups_normal;
@@ -127,6 +136,15 @@ static const int _supported_groups_secure128[] = {
 	GNUTLS_GROUP_FFDHE3072,
 	GNUTLS_GROUP_FFDHE4096,
 	GNUTLS_GROUP_FFDHE8192,
+#ifdef ENABLE_GOST
+	GNUTLS_GROUP_GOST256CPA,
+	GNUTLS_GROUP_GOST256CPB,
+	GNUTLS_GROUP_GOST256CPC,
+	GNUTLS_GROUP_GOST256CPXA,
+	GNUTLS_GROUP_GOST256CPXB,
+	GNUTLS_GROUP_GOST512A,
+	GNUTLS_GROUP_GOST512B,
+#endif
 	0
 };
 static const int* supported_groups_secure128 = _supported_groups_secure128;
@@ -148,6 +166,10 @@ static const int _supported_groups_secure192[] = {
 	GNUTLS_GROUP_SECP384R1,
 	GNUTLS_GROUP_SECP521R1,
 	GNUTLS_GROUP_FFDHE8192,
+#ifdef ENABLE_GOST
+	GNUTLS_GROUP_GOST512A,
+	GNUTLS_GROUP_GOST512B,
+#endif
 	0
 };
 static const int* supported_groups_secure192 = _supported_groups_secure192;
@@ -196,6 +218,10 @@ static const int _kx_priority_performance[] = {
 #ifdef ENABLE_DHE
 	GNUTLS_KX_DHE_RSA,
 #endif
+#ifdef ENABLE_GOST
+	GNUTLS_KX_VKO_GOST_12,
+	GNUTLS_KX_VKO_GOST_01,
+#endif
 	0
 };
 static const int* kx_priority_performance = _kx_priority_performance;
@@ -234,6 +260,10 @@ static const int _kx_priority_secure[] = {
 #ifdef ENABLE_DHE
 	GNUTLS_KX_DHE_RSA,
 #endif
+#ifdef ENABLE_GOST
+	GNUTLS_KX_VKO_GOST_12,
+	GNUTLS_KX_VKO_GOST_01,
+#endif
 	/* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
 	 */
 	0
@@ -252,6 +282,10 @@ static const int _cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
+#ifdef ENABLE_GOST
+	GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
+	GNUTLS_CIPHER_GOST28147_CPA_CNT,
+#endif
 	0
 };
 
@@ -267,6 +301,10 @@ static const int _cipher_priority_performance_no_aesni[] = {
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
+#ifdef ENABLE_GOST
+	GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
+	GNUTLS_CIPHER_GOST28147_CPA_CNT,
+#endif
 	0
 };
 
@@ -290,6 +328,12 @@ static const int _cipher_priority_normal_default[] = {
 
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
+
+#ifdef ENABLE_GOST
+	GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
+	GNUTLS_CIPHER_GOST28147_CPA_CNT,
+#endif
+
 	0
 };
 
@@ -375,6 +419,12 @@ static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_RSA_SHA1,
 	GNUTLS_SIGN_ECDSA_SHA1,
 
+#ifdef ENABLE_GOST
+	GNUTLS_SIGN_GOST_512,
+	GNUTLS_SIGN_GOST_256,
+	GNUTLS_SIGN_GOST_94,
+#endif
+
 	/* added on the final position for compatibility purposes */
 	GNUTLS_SIGN_RSA_PSS_SHA256,
 	GNUTLS_SIGN_RSA_PSS_SHA384,
@@ -406,6 +456,12 @@ static const int _sign_priority_secure128[] = {
 	GNUTLS_SIGN_RSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SHA512,
 
+#ifdef ENABLE_GOST
+	GNUTLS_SIGN_GOST_512,
+	GNUTLS_SIGN_GOST_256,
+	GNUTLS_SIGN_GOST_94,
+#endif
+
 	/* added on the final position for compatibility purposes */
 	GNUTLS_SIGN_RSA_PSS_SHA256,
 	GNUTLS_SIGN_RSA_PSS_SHA384,
@@ -422,6 +478,10 @@ static const int _sign_priority_secure192[] = {
 	GNUTLS_SIGN_RSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SHA512,
 
+#ifdef ENABLE_GOST
+	GNUTLS_SIGN_GOST_512,
+#endif
+
 	/* added on the final position for compatibility purposes */
 	GNUTLS_SIGN_RSA_PSS_SHA384,
 	GNUTLS_SIGN_RSA_PSS_SHA512,
@@ -434,6 +494,14 @@ static const int mac_priority_normal_default[] = {
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
+
+#ifdef ENABLE_GOST
+	GNUTLS_MAC_STREEBOG_256,
+	GNUTLS_MAC_STREEBOG_512,
+	GNUTLS_MAC_GOSTR_94,
+	GNUTLS_MAC_GOST28147_TC26Z_IMIT,
+	GNUTLS_MAC_GOST28147_CPA_IMIT,
+#endif
 	0
 };
 
@@ -477,6 +545,12 @@ static const int _mac_priority_secure128[] = {
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
+
+#ifdef ENABLE_GOST
+	GNUTLS_MAC_STREEBOG_256,
+	GNUTLS_MAC_STREEBOG_512,
+	GNUTLS_MAC_GOSTR_94,
+#endif
 	0
 };
 static const int* mac_priority_secure128 = _mac_priority_secure128;
@@ -485,6 +559,10 @@ static const int _mac_priority_secure192[] = {
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
+
+#ifdef ENABLE_GOST
+	GNUTLS_MAC_STREEBOG_512,
+#endif
 	0
 };
 static const int* mac_priority_secure192 = _mac_priority_secure192;

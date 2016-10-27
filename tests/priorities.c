@@ -94,16 +94,25 @@ try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers, unsi
 
 void doit(void)
 {
-	const int null = 4;
+	int null = 4;
 	int sec128_cs = 53;
 	int sec256_cs = 22;
 	int normal_cs = 53;
 	int normal_ciphers = 11;
+	int all_ciphers = 11;
 	int pfs_cs = 39;
+
+#ifdef ENABLE_GOST
+	normal_cs += 2;
+	null += 2;
+	normal_ciphers += 2;
+	all_ciphers += 2;
+#endif
 
 	if (gnutls_fips140_mode_enabled()) {
 		normal_cs = 30;
 		normal_ciphers = 6;
+		all_ciphers = 11;
 		pfs_cs = 22;
 		sec256_cs = 11;
 		sec128_cs = 30;
@@ -114,9 +123,9 @@ void doit(void)
 
 	if (!gnutls_fips140_mode_enabled()) {
 		try_prio("PFS", pfs_cs, normal_ciphers, __LINE__);
-		try_prio("NORMAL:+CIPHER-ALL", normal_cs, 11, __LINE__);	/* all (except null) */
+		try_prio("NORMAL:+CIPHER-ALL", normal_cs, normal_ciphers, __LINE__);	/* all (except null) */
 		try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
-		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal_cs + null, 12, __LINE__);	/* should be null + all */
+		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal_cs + null, normal_ciphers + 1, __LINE__);	/* should be null + all */
 		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
 	}
 
@@ -124,7 +133,7 @@ void doit(void)
 	try_prio("SECURE256", sec256_cs, 6, __LINE__);
 	try_prio("SECURE128", sec128_cs, 11, __LINE__);
 	try_prio("SECURE128:+SECURE256", sec128_cs, 11, __LINE__);	/* should be the same as SECURE128 */
-	try_prio("SECURE128:+SECURE256:+NORMAL", normal_cs, 11, __LINE__);	/* should be the same as NORMAL */
+	try_prio("SECURE128:+SECURE256:+NORMAL", normal_cs, all_ciphers, __LINE__);	/* should be the same as NORMAL */
 	try_prio("SUITEB192", 1, 1, __LINE__);
 	try_prio("SUITEB128", 2, 2, __LINE__);
 	/* check legacy strings */
