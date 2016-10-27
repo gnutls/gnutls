@@ -114,6 +114,11 @@ extern "C" {
  * @GNUTLS_CIPHER_SALSA20_256: Salsa20 with 256-bit keys.
  * @GNUTLS_CIPHER_ESTREAM_SALSA20_256: Estream's Salsa20 variant with 256-bit keys.
  * @GNUTLS_CIPHER_CHACHA20_POLY1305: The Chacha20 cipher with the Poly1305 authenticator (AEAD).
+ * @GNUTLS_CIPHER_GOST28147_TC26Z_CFB: GOST 28147-89 (Magma) cipher in CFB mode with TC26 Z S-box.
+ * @GNUTLS_CIPHER_GOST28147_CPA_CFB: GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro A S-box.
+ * @GNUTLS_CIPHER_GOST28147_CPB_CFB: GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro B S-box.
+ * @GNUTLS_CIPHER_GOST28147_CPC_CFB: GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro C S-box.
+ * @GNUTLS_CIPHER_GOST28147_CPD_CFB: GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro D S-box.
  * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode (placeholder - unsupported).
  * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode (placeholder - unsupported).
  * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode (placeholder - unsupported).
@@ -151,6 +156,11 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_AES_128_CCM_8 = 21,
 	GNUTLS_CIPHER_AES_256_CCM_8 = 22,
 	GNUTLS_CIPHER_CHACHA20_POLY1305 = 23,
+	GNUTLS_CIPHER_GOST28147_TC26Z_CFB = 24,
+	GNUTLS_CIPHER_GOST28147_CPA_CFB = 25,
+	GNUTLS_CIPHER_GOST28147_CPB_CFB = 26,
+	GNUTLS_CIPHER_GOST28147_CPC_CFB = 27,
+	GNUTLS_CIPHER_GOST28147_CPD_CFB = 28,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */
@@ -286,7 +296,7 @@ typedef enum {
 	   gnutls_digest_algorithm_t. */
 	GNUTLS_MAC_AEAD = 200,	/* indicates that MAC is on the cipher */
 	GNUTLS_MAC_UMAC_96 = 201,
-	GNUTLS_MAC_UMAC_128 = 202
+	GNUTLS_MAC_UMAC_128 = 202,
 } gnutls_mac_algorithm_t;
 
 /**
