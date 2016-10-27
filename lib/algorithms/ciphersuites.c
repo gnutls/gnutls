@@ -41,6 +41,8 @@
 	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256}
 #define ENTRY_PRF( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf ) \
 	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf}
+#define ENTRY_FLAG( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf, flag ) \
+	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf, flag}
 
 /* RSA with NULL cipher and MD5 MAC
  * for test purposes.
@@ -324,6 +326,14 @@
 #define GNUTLS_ECDHE_PSK_ARCFOUR_128_SHA1 { 0xC0, 0x33 }
 #define GNUTLS_ECDHE_PSK_NULL_SHA256 { 0xC0, 0x3A }
 #define GNUTLS_ECDHE_PSK_NULL_SHA384 { 0xC0, 0x3B }
+
+/* based on GOST R 34.10-2001, from cptls draft */
+#ifdef ENABLE_GOST
+#define GNUTLS_GOSTR341001_28147_CNT_IMIT { 0x00, 0x81 }
+#define GNUTLS_GOSTR341001_NULL_GOSTR3411 { 0x00, 0x83 }
+#define GNUTLS_GOSTR341112_256_28147_CNT_IMIT { 0xff, 0x85 }
+#define GNUTLS_GOSTR341112_256_NULL_GOSTR3411 { 0xff, 0x87 }
+#endif
 
 #define CIPHER_SUITES_COUNT (sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry_st)-1)
 
@@ -1136,6 +1146,31 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 	      GNUTLS_DTLS_VERSION_MIN),
 #endif
 
+#ifdef ENABLE_GOST
+	ENTRY_FLAG(GNUTLS_GOSTR341001_28147_CNT_IMIT,
+		   GNUTLS_CIPHER_GOST28147_CPA_CNT, GNUTLS_KX_VKO_GOST_01,
+		   GNUTLS_MAC_GOST28147_CPA_IMIT, GNUTLS_TLS1,
+		   GNUTLS_VERSION_UNKNOWN, GNUTLS_MAC_GOSTR_94,
+		   GNUTLS_CIPHER_SUITE_CONTINUOUS_MAC),
+
+	ENTRY_FLAG(GNUTLS_GOSTR341001_NULL_GOSTR3411,
+		   GNUTLS_CIPHER_NULL, GNUTLS_KX_VKO_GOST_01,
+		   GNUTLS_MAC_GOSTR_94, GNUTLS_TLS1,
+		   GNUTLS_VERSION_UNKNOWN, GNUTLS_MAC_GOSTR_94,
+		   GNUTLS_CIPHER_SUITE_CONTINUOUS_MAC),
+
+	ENTRY_FLAG(GNUTLS_GOSTR341112_256_28147_CNT_IMIT,
+		   GNUTLS_CIPHER_GOST28147_TC26Z_CNT, GNUTLS_KX_VKO_GOST_12,
+		   GNUTLS_MAC_GOST28147_TC26Z_IMIT, GNUTLS_TLS1,
+		   GNUTLS_VERSION_UNKNOWN, GNUTLS_MAC_STREEBOG_256,
+		   GNUTLS_CIPHER_SUITE_CONTINUOUS_MAC),
+
+	ENTRY_FLAG(GNUTLS_GOSTR341112_256_NULL_GOSTR3411,
+		   GNUTLS_CIPHER_NULL, GNUTLS_KX_VKO_GOST_12,
+		   GNUTLS_MAC_STREEBOG_256, GNUTLS_TLS1,
+		   GNUTLS_VERSION_UNKNOWN, GNUTLS_MAC_STREEBOG_256,
+		   GNUTLS_CIPHER_SUITE_CONTINUOUS_MAC),
+#endif
 
 	{0, {0, 0}, 0, 0, 0, 0, 0, 0}
 };
