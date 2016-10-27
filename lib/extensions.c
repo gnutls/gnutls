@@ -44,6 +44,7 @@
 #include <ext/alpn.h>
 #include <ext/dumbfw.h>
 #include <ext/etm.h>
+#include <ext/cryptopro.h>
 #include <num.h>
 
 static void
@@ -79,6 +80,7 @@ static extension_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 #ifdef ENABLE_ALPN
 	&ext_mod_alpn,
 #endif
+	&ext_mod_cryptopro,
 	/* This must be the last extension registered.
 	 */
 	&ext_mod_dumbfw,
@@ -161,7 +163,7 @@ _gnutls_extension_list_check(gnutls_session_t session, uint16_t type)
  *
  * Returns zero if failed, non-zero on success.
  */
-static unsigned _gnutls_extension_list_add(gnutls_session_t session, const struct extension_entry_st *e, unsigned check_dup)
+unsigned _gnutls_extension_list_add(gnutls_session_t session, const struct extension_entry_st *e, unsigned check_dup)
 {
 	unsigned i;
 

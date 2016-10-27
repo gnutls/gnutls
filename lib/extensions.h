@@ -34,6 +34,9 @@ int _gnutls_gen_extensions(gnutls_session_t session,
 int _gnutls_ext_init(void);
 void _gnutls_ext_deinit(void);
 
+unsigned _gnutls_extension_list_add(gnutls_session_t session,
+				    const struct extension_entry_st *e,
+				    unsigned check_dup);
 void _gnutls_extension_list_add_sr(gnutls_session_t session);
 int _gnutls_extension_list_check(gnutls_session_t session, uint16_t type);
 

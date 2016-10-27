@@ -40,7 +40,8 @@ libgnutls_ext_la_SOURCES = max_record.c \
 	session_ticket.h signature.h safe_renegotiation.h \
 	session_ticket.c srp.c ecc.c ecc.h heartbeat.c heartbeat.h \
 	status_request.h status_request.c dumbfw.c dumbfw.h \
-	ext_master_secret.c ext_master_secret.h etm.h etm.c
+	ext_master_secret.c ext_master_secret.h etm.h etm.c \
+	cryptopro.c
 
 if ENABLE_ALPN
 libgnutls_ext_la_SOURCES += alpn.c alpn.h
