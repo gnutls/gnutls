@@ -210,6 +210,7 @@ gnutls_error_to_alert (int err, int *level)
     case GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM:
     case GNUTLS_E_SAFE_RENEGOTIATION_FAILED:
     case GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL:
+    case GNUTLS_E_UNKNOWN_PK_ALGORITHM:
       ret = GNUTLS_A_HANDSHAKE_FAILURE;
       _level = GNUTLS_AL_FATAL;
       break;

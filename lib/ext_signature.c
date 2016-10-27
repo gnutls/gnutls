@@ -167,9 +167,9 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
                 continue;
             }
 
-          priv->sign_algorithms[priv->sign_algorithms_size++] = sig;
           if (priv->sign_algorithms_size == MAX_SIGNATURE_ALGORITHMS)
             break;
+          priv->sign_algorithms[priv->sign_algorithms_size++] = sig;
         }
     }
 
@@ -211,7 +211,7 @@ _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
     {
       /* SERVER SIDE - we must check if the sent cert type is the right one
        */
-      if (data_size > 2)
+      if (data_size >= 2)
         {
           uint16_t len;
 
@@ -306,8 +306,7 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert, unsi
                                   &epriv);
   priv = epriv.ptr;
 
-  if (ret < 0 || !_gnutls_version_has_selectable_sighash (ver)
-      || priv->sign_algorithms_size == 0)
+  if (ret < 0 || !_gnutls_version_has_selectable_sighash (ver))
     /* none set, allow SHA-1 only */
     {
       ret = _gnutls_x509_pk_to_sign (cert->subject_pk_algorithm, GNUTLS_DIG_SHA1);
