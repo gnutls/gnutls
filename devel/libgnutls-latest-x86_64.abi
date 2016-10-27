@@ -1522,6 +1522,7 @@
       <enumerator name='GNUTLS_KX_ECDHE_ECDSA' value='13'/>
       <enumerator name='GNUTLS_KX_ECDHE_PSK' value='14'/>
       <enumerator name='GNUTLS_KX_RSA_PSK' value='15'/>
+      <enumerator name='GNUTLS_KX_VKO_GOST_12' value='16'/>
     </enum-decl>
     <typedef-decl name='gnutls_kx_algorithm_t' type-id='type-id-43' id='type-id-30'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-44'>

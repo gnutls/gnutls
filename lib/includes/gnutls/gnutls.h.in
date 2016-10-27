@@ -206,6 +206,7 @@ typedef enum gnutls_cipher_algorithm {
  * @GNUTLS_KX_DHE_PSK: DHE-PSK key-exchange algorithm.
  * @GNUTLS_KX_ECDHE_PSK: ECDHE-PSK key-exchange algorithm.
  * @GNUTLS_KX_RSA_PSK: RSA-PSK key-exchange algorithm.
+ * @GNUTLS_KX_VKO_GOST_12: VKO GOST R 34.10-2012 key-exchange algorithm.
  *
  * Enumeration of different key exchange algorithms.
  */
@@ -225,7 +226,8 @@ typedef enum {
 	GNUTLS_KX_ECDHE_RSA = 12,
 	GNUTLS_KX_ECDHE_ECDSA = 13,
 	GNUTLS_KX_ECDHE_PSK = 14,
-	GNUTLS_KX_RSA_PSK = 15
+	GNUTLS_KX_RSA_PSK = 15,
+	GNUTLS_KX_VKO_GOST_12 = 16
 } gnutls_kx_algorithm_t;
 
 /**
