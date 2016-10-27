@@ -9,8 +9,12 @@ See the end for copying conditions.
    in the gnutls_x509_crt_verify_data2() and gnutls_pkcs7_verify_direct()
    functions.
 
+** libgnutls: Introduced time and constraints checks in the end certificate
+   in the gnutls_x509_crt_verify_data2() and gnutls_pkcs7_verify_direct()
+   functions.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs7_get_embedded_data_oid: Added
 
 
 * Version 3.4.16 (released 2016-10-09)
