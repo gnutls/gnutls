@@ -18,10 +18,16 @@ See the end for copying conditions.
    functions.
 
 ** libgnutls: Reverted the change which made the gnutls_certificate_set_*key* 
-   functions return an index, to avoid affecting programs which explicitly
-   check success of the function as equality to zero. In order for these
-   functions to return an index an explicit call to gnutls_certificate_set_flags
-   with the GNUTLS_CERTIFICATE_API_V2 flag is required.
+   functions return an index (introduced in 3.5.5), to avoid affecting programs
+   which explicitly check success of the function as equality to zero. In order
+   for these functions to return an index an explicit call to gnutls_certificate_set_flags
+   with the GNUTLS_CERTIFICATE_API_V2 flag is now required.
+
+** libgnutls: Reverted the behavior of sending a status request extension even
+   without a response (introduced in 3.5.5). That is, we no longer reply to a
+   client's hello with a status request, with a status request extension. Although
+   that behavior is legal, it creates incompatibility issues with releases in
+   the gnutls 3.3.x branch.
 
 ** certtool: --get-dh-params will output parameters from the RFC7919
    groups.
