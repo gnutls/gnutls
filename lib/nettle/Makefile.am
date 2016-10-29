@@ -43,12 +43,12 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c
 
 if WINDOWS
-libcrypto_la_SOURCES += rnd-windows.c
+libcrypto_la_SOURCES += sysrng-windows.c
 else
 if HAVE_GETENTROPY
-libcrypto_la_SOURCES += rnd-getentropy.c
+libcrypto_la_SOURCES += sysrng-getentropy.c
 else
-libcrypto_la_SOURCES += rnd-linux.c
+libcrypto_la_SOURCES += sysrng-linux.c
 endif
 endif
 

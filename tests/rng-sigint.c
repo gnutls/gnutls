@@ -50,7 +50,7 @@ typedef int (*get_entropy_func)(void* rnd, size_t size);
 get_entropy_func _rnd_get_system_entropy;
 
 #define RND_NO_INCLUDES
-#include "../lib/nettle/rnd-linux.c"
+#include "../lib/nettle/sysrng-linux.c"
 
 static volatile int stop_loop = 0;
 

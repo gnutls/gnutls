@@ -146,6 +146,10 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 	return 0;
 }
 
+/* This is called when gnutls_global_init() is called for second time.
+ * It must check whether any resources are still available.
+ * The particular problem it solves is to verify that the urandom fd is still
+ * open (for applications that for some reason closed all fds */
 int _rnd_system_entropy_check(void)
 {
 	int ret;
