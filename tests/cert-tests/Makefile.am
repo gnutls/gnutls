@@ -59,7 +59,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/srv-public-localhost-signed.gpg data/selfsigs/alice-mallory-badsig18.pub \
 	data/selfsigs/alice-mallory-irrelevantsig.pub data/selfsigs/alice-mallory-nosig18.pub \
 	data/selfsigs/alice.pub data/key-utf8-1.p12 data/key-utf8-2.p12 \
-	data/code-signing-ca.pem data/code-signing-cert.pem
+	data/code-signing-ca.pem data/code-signing-cert.pem data/multi-value-dn.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \

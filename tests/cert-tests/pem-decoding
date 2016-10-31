@@ -53,7 +53,7 @@ if test "${rc}" != "0"; then
 fi
 
 #FIXME: the output string differs in windows and linux on the last char.
-${DIFF} "${srcdir}/data/bmpstring.pem" ${TMPFILE} || ${DIFF} --strip-trailing-cr "${srcdir}/data/bmpstring.pem" ${TMPFILE}
+${DIFF} -I 'Algorithm Security Level' "${srcdir}/data/bmpstring.pem" ${TMPFILE} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${srcdir}/data/bmpstring.pem" ${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -72,7 +72,7 @@ fi
 
 cat "${srcdir}/data/complex-cert.pem" |grep -v "Not After:" >${TMPFILE1}
 cat ${TMPFILE} |grep -v "Not After:" >${TMPFILE2}
-${DIFF} ${TMPFILE1} ${TMPFILE2} || ${DIFF} --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
+${DIFF} -I 'Algorithm Security Level' ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -91,7 +91,7 @@ fi
 
 cat "${srcdir}/data/xmpp-othername.pem" |grep -v "Not After:" >${TMPFILE1}
 cat ${TMPFILE} |grep -v "Not After:" >${TMPFILE2}
-${DIFF} ${TMPFILE1} ${TMPFILE2} || ${DIFF} --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
+${DIFF} -I 'Algorithm Security Level' ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -109,7 +109,7 @@ fi
 
 cat ${TMPFILE} |grep "KRB5Principal:" >${TMPFILE1}
 cat "${srcdir}/data/template-krb5name-full.pem" |grep "KRB5Principal:" >${TMPFILE2}
-${DIFF} -u ${TMPFILE1} ${TMPFILE2} || ${DIFF} -u --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
+${DIFF} -I 'Algorithm Security Level' -u ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' -u --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -127,11 +127,27 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} ${TMPFILE} "${srcdir}/data/gost-cert.pem" || ${DIFF} --strip-trailing-cr "${TMPFILE}" "${srcdir}/data/gost-cert.pem"
+${DIFF} -I 'Algorithm Security Level' ${TMPFILE} "${srcdir}/data/gost-cert.pem" || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${TMPFILE}" "${srcdir}/data/gost-cert.pem"
 rc=$?
 
 if test "${rc}" != "0"; then
 	echo "GOST cert decoding failed 2"
+	exit ${rc}
+fi
+
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/multi-value-dn.pem" >${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "MV-DN cert decoding failed 1"
+	exit ${rc}
+fi
+
+${DIFF} -I 'Algorithm Security Level' ${TMPFILE} "${srcdir}/data/multi-value-dn.pem" || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${TMPFILE}" "${srcdir}/data/multi-value-dn.pem"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "MV-DN cert decoding failed 2"
 	exit ${rc}
 fi
 
