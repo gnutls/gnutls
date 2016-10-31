@@ -226,15 +226,6 @@ static void _rngfips_deinit(void *_ctx)
 	free(ctx);
 }
 
-/* This is called when gnutls_global_init() is called for second time.
- * It must check whether any resources are still available.
- * The particular problem it solves is to verify that the urandom fd is still
- * open (for applications that for some reason closed all fds */
-static int _rndfips_check(void **ctx)
-{
-	return _rnd_system_entropy_check();
-}
-
 static void _rngfips_refresh(void *_ctx)
 {
 	/* this is predictable RNG. Don't refresh */
@@ -260,7 +251,6 @@ static int selftest_kat(void)
 
 gnutls_crypto_rnd_st _gnutls_fips_rnd_ops = {
 	.init = _rngfips_init,
-	.check = _rndfips_check,
 	.deinit = _rngfips_deinit,
 	.rnd = _rngfips_rnd,
 	.rnd_refresh = _rngfips_refresh,

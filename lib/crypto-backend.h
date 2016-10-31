@@ -73,8 +73,7 @@ typedef struct {
 } gnutls_crypto_digest_st;
 
 typedef struct gnutls_crypto_rnd {
-	int (*init) (void **ctx);
-	int (*check) (void **ctx);
+	int (*init) (void **ctx); /* called prior to first usage of randomness */
 	int (*rnd) (void *ctx, int level, void *data, size_t datasize);
 	void (*rnd_refresh) (void *ctx);
 	void (*deinit) (void *ctx);

@@ -25,6 +25,7 @@
 
 #include <gnutls/crypto.h>
 #include <crypto-backend.h>
+#include "nettle/rnd-common.h"
 
 extern int crypto_rnd_prio;
 extern void *gnutls_rnd_ctx;
@@ -50,10 +51,7 @@ int _gnutls_rnd_init(void);
 
 inline static int _gnutls_rnd_check(void)
 {
-	if (_gnutls_rnd_ops.check)
-		return _gnutls_rnd_ops.check(gnutls_rnd_ctx);
-	else
-		return 0;
+	return _rnd_system_entropy_check();
 }
 
 #ifndef _WIN32
