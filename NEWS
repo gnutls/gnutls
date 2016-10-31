@@ -13,6 +13,11 @@ See the end for copying conditions.
 ** libgnutls: Introduced a function group to set known DH parameters
    using groups from RFC7919.
 
+** libgnutls: Added more strict RFC4514 textual DN encoding and decoding.
+   Now the generated textual DN is in reverse order according to RFC4514,
+   and functions which generate a DN from strings such gnutls_x509_crt_set_*dn()
+   set the expected DN (reverse of the provided string).
+
 ** libgnutls: Introduced time and constraints checks in the end certificate
    in the gnutls_x509_crt_verify_data2() and gnutls_pkcs7_verify_direct()
    functions.
