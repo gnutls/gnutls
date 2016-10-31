@@ -88,15 +88,19 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 
 		/* unescape */
 		for (j=i=0;i<tmp.size;i++) {
-			if (1+j!=val->size && val->data[j] == '\\' &&
-			    (val->data[j+1] == ',' || val->data[j+1] == '#' ||
-			     val->data[j+1] == ' ' || val->data[j+1] == '+' ||
-			     val->data[j+1] == '"' || val->data[j+1] == '<' ||
-			     val->data[j+1] == '>' || val->data[j+1] == ';' ||
-			     val->data[j+1] == '\\' || val->data[j+1] == '=')) {
-				tmp.data[i] = val->data[j+1];
-				j+=2;
-				tmp.size--;
+			if (1+j!=val->size && val->data[j] == '\\') {
+				if (val->data[j+1] == ',' || val->data[j+1] == '#' ||
+				    val->data[j+1] == ' ' || val->data[j+1] == '+' ||
+				    val->data[j+1] == '"' || val->data[j+1] == '<' ||
+				    val->data[j+1] == '>' || val->data[j+1] == ';' ||
+				    val->data[j+1] == '\\' || val->data[j+1] == '=') {
+					tmp.data[i] = val->data[j+1];
+					j+=2;
+					tmp.size--;
+				} else {
+					ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+					goto fail;
+				}
 			} else {
 				tmp.data[i] = val->data[j++];
 			}
@@ -105,12 +109,15 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 	}
 
 	ret = f(crt, oid, is_raw, tmp.data, tmp.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	ret = 0;
+ fail:
 	gnutls_free(tmp.data);
-
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	return 0;
+	return ret;
 }
 
 static int read_attr_and_val(const char **ptr,
