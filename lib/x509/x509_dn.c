@@ -109,7 +109,8 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 }
 
 static int read_attr_and_val(const char **ptr,
-			     gnutls_datum_t * name, gnutls_datum_t * val, unsigned *is_raw)
+			     gnutls_datum_t *name, gnutls_datum_t *val,
+			     unsigned *is_raw)
 {
 	const unsigned char *p = (void *) *ptr;
 
@@ -164,6 +165,30 @@ static int read_attr_and_val(const char **ptr,
 	return 0;
 }
 
+typedef struct elem_list_st {
+	gnutls_datum_t name;
+	gnutls_datum_t val;
+	const char *pos;
+	unsigned is_raw;
+	struct elem_list_st *next;
+} elem_list_st;
+
+static int add_new_elem(elem_list_st **head, const gnutls_datum_t *name, const gnutls_datum_t *val, const char *pos, unsigned is_raw)
+{
+	elem_list_st *elem = gnutls_malloc(sizeof(*elem));
+	if (elem == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	memcpy(&elem->name, name, sizeof(*name));
+	memcpy(&elem->val, val, sizeof(*val));
+	elem->pos = pos;
+	elem->is_raw = is_raw;
+	elem->next = *head;
+	*head = elem;
+
+	return 0;
+}
+
 static int
 crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
 {
@@ -171,9 +196,14 @@ crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
 	int ret;
 	gnutls_datum_t name, val;
 	unsigned is_raw;
+	elem_list_st *list = NULL, *plist, *next;
 
 	if (crt == NULL || dn == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	/* We parse the string and set all elements to a linked list in
+	 * reverse order. That way we can encode in reverse order,
+	 * the way RFC4514 requires. */
 
 	/* For each element */
 	while (*p != 0 && *p != '\n') {
@@ -182,27 +212,49 @@ crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
 
 		is_raw = 0;
 		ret = read_attr_and_val(&p, &name, &val, &is_raw);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
 
 		/* skip spaces and look for comma */
 		while (c_isspace(*p))
 			p++;
 
-		ret = dn_attr_crt_set(f, crt, &name, &val, is_raw);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		ret = add_new_elem(&list, &name, &val, p, is_raw);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
 
-		if (err)
-			*err = p;
-
-		if (*p != ',' && *p != 0 && *p != '\n')
-			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		if (*p != ',' && *p != 0 && *p != '\n') {
+			ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+			goto fail;
+		}
 		if (*p == ',')
 			p++;
 	}
 
-	return 0;
+	plist = list;
+	while(plist) {
+		if (err)
+			*err = plist->pos;
+		ret = dn_attr_crt_set(f, crt, &plist->name, &plist->val, plist->is_raw);
+		if (ret < 0)
+			goto fail;
+
+		plist = plist->next;
+	}
+
+	ret = 0;
+fail:
+	plist = list;
+	while(plist) {
+		next = plist->next;
+		gnutls_free(plist);
+		plist = next;
+	}
+	return ret;
 }
 
 
