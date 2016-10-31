@@ -86,9 +86,14 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		}
 
+		/* unescape */
 		for (j=i=0;i<tmp.size;i++) {
 			if (1+j!=val->size && val->data[j] == '\\' &&
-			    (val->data[j+1] == ',' || val->data[j+1] == '#' || val->data[j+1] == ' ')) {
+			    (val->data[j+1] == ',' || val->data[j+1] == '#' ||
+			     val->data[j+1] == ' ' || val->data[j+1] == '+' ||
+			     val->data[j+1] == '"' || val->data[j+1] == '<' ||
+			     val->data[j+1] == '>' || val->data[j+1] == ';' ||
+			     val->data[j+1] == '\\' || val->data[j+1] == '=')) {
 				tmp.data[i] = val->data[j+1];
 				j+=2;
 				tmp.size--;
@@ -149,6 +154,15 @@ static int read_attr_and_val(const char **ptr,
 		p++;
 	}
 	val->size = p - (val->data);
+	*ptr = (void*)p;
+
+	p = val->data;
+	/* check for unescaped '+' - we do not support them */
+	while (*p != 0) {
+		if (*p == '+' && (*(p - 1) != '\\'))
+			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		p++;
+	}
 
 	/* remove spaces from the end */
 	while(val->size > 0 && c_isspace(val->data[val->size-1])) {
@@ -159,8 +173,6 @@ static int read_attr_and_val(const char **ptr,
 
 	if (val->size == 0 || name->size == 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-
-	*ptr = (void *) p;
 
 	return 0;
 }
