@@ -188,6 +188,21 @@ struct encode_tests_st encode_tests[] = {
 		.failure = GNUTLS_E_PARSING_ERROR,
 	},
 	{
+		.name = "invalid DN3",
+		.str = "CN,O=Koko",
+		.failure = GNUTLS_E_PARSING_ERROR,
+	},
+	{
+		.name = "DN containing '+'",
+		.str = "CN=Cindy Lauper,UID=clauper+OU=sleeping dept.,O=Koko inc.,ST=Attiki,C=GR",
+		.failure = GNUTLS_E_PARSING_ERROR,
+	},
+	{
+		.name = "DN containing unsupported escaped chars",
+		.str = "CN=\\CD\\AB\\19",
+		.failure = GNUTLS_E_PARSING_ERROR,
+	},
+	{
 		.name = "encode C",
 		.str = "C=ES",
 		.raw = {(void*)"\x30\x0d\x31\x0b\x30\x09\x06\x03\x55\x04\x06\x13\x02\x45\x53", 15},
@@ -215,6 +230,18 @@ struct encode_tests_st encode_tests[] = {
 		.name = "encode with comma",
 		.str = "C=\\,\\ ",
 		.raw = {(void*)"\x30\x0d\x31\x0b\x30\x09\x06\x03\x55\x04\x06\x13\x02\x2c\x20", 15},
+		.failure = 0
+	},
+	{
+		.name = "encode with escaped plus",
+		.str = "C=\\+\\ ",
+		.raw = {(void*)"\x30\x0d\x31\x0b\x30\x09\x06\x03\x55\x04\x06\x13\x02\x2b\x20", 15},
+		.failure = 0
+	},
+	{
+		.name = "encode with escaped string",
+		.str = "C=\\,\\+\\;\\<\\>\\\\",
+		.raw = {(void*)"\x30\x11\x31\x0f\x30\x0d\x06\x03\x55\x04\x06\x13\x06\x2c\x2b\x3b\x3c\x3e\x5c", 19},
 		.failure = 0
 	},
 	{
