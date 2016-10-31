@@ -10,9 +10,10 @@
 ## How reproducible:
 
 Steps to Reproduce:
-1.
-2.
-3.
+
+ * one
+ * two
+ * three
 
 ## Actual results:
 
