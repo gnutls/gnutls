@@ -1169,8 +1169,11 @@ allowed.
 
 The order with which every algorithm or protocol
 is specified is significant. Algorithms specified before others
-will take precedence. The supported algorithms and protocols
-are shown in @ref{tab:prio-algorithms}. 
+will take precedence. The supported in the GnuTLS version corresponding
+to this document algorithms and protocols are shown in @ref{tab:prio-algorithms};
+to list the supported algorithms in your currently using version use
+@code{gnutls-cli -l}.
+
 To avoid collisions in order to specify a compression algorithm in
 the priority string you have to prefix it with "COMP-", protocol versions
 with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". 
@@ -1189,10 +1192,9 @@ appended with an algorithm will add this algorithm.
 @multitable @columnfractions .20 .70
 @headitem Type @tab Keywords
 @item Ciphers @tab
-AES-128-CBC, AES-256-CBC, AES-128-GCM, CAMELLIA-128-CBC,
-CAMELLIA-256-CBC, ARCFOUR-128, 3DES-CBC. Catch all
-name is CIPHER-ALL which will add all the algorithms from NORMAL
-priority.
+Examples are AES-128-GCM, AES-256-GCM, AES-256-CBC; see also
+@ref{tab:ciphers} for more options. Catch all name is CIPHER-ALL which will add
+all the algorithms from NORMAL priority.
 
 @item Key exchange @tab
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,

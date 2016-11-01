@@ -114,46 +114,47 @@ The supported in @acronym{GnuTLS} ciphers and MAC algorithms are shown in @ref{t
 @ref{tab:macs}.
 
 @float Table,tab:ciphers
-@multitable @columnfractions .20 .70
+@multitable @columnfractions .30 .60
 @headitem Algorithm @tab Description
-@item AES_@-CBC @tab
+@item AES-128-CBC, AES-256-CBC @tab
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
-DES algorithm.  Has 128 bits block size and is used in CBC mode.
+DES algorithm.  It has 128 bits block size and is used in CBC mode.
 
-@item AES_@-GCM @tab
+@item AES-128-GCM, AES-256-GCM @tab
 This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
-@item AES_@-CCM @tab
+@item AES-128-CCM, AES-256-CCM @tab
 This is the AES algorithm in the authenticated encryption CCM mode.
 This mode combines message authentication and encryption and is
 often used by systems without AES or GCM acceleration support.
 
-@item AES_@-CCM_@-8 @tab
+@item AES-128-CCM-8, AES-256-CCM-8 @tab
 This is the AES algorithm in the authenticated encryption CCM mode
 with a truncated to 64-bit authentication tag. This mode is for
 communication with restricted systems.
 
-@item CAMELLIA_@-CBC @tab
+@item CAMELLIA-128-CBC, CAMELLIA-256-CBC @tab
 This is an 128-bit block cipher developed by Mitsubishi and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
 
-@item CHACHA20_@-POLY1305 @tab
+@item CHACHA20-POLY1305 @tab
 CHACHA20-POLY1305 is an authenticated encryption algorithm based on CHACHA20 cipher and
 POLY1305 MAC. CHACHA20 is a refinement of SALSA20 algorithm, an approved cipher by
 the European ESTREAM project. POLY1305 is Wegman-Carter, one-time authenticator. The
 combination provides a fast stream cipher suitable for systems where a hardware AES
 accelerator is not available.
 
-@item 3DES_@-CBC @tab
+@item 3DES-CBC @tab
 This is the DES block cipher algorithm used with triple
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
-@item ARCFOUR_@-128 @tab
+@item ARCFOUR-128 @tab
 ARCFOUR-128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
-secret. It is a fast cipher but considered weak today, and thus it is not enabled by default.
+secret. It is a considered to be broken, and is only used for compatibility
+purposed. For this reason it is not enabled by default.
 
 @end multitable
 @caption{Supported ciphers in TLS.}
@@ -163,21 +164,21 @@ secret. It is a fast cipher but considered weak today, and thus it is not enable
 @float Table,tab:macs
 @multitable @columnfractions .20 .70
 @headitem Algorithm @tab Description
-@item MAC_@-MD5 @tab
+@item MAC-MD5 @tab
 This is an HMAC based on MD5 a cryptographic hash algorithm designed 
 by Ron Rivest. Outputs 128 bits of data.
 
-@item MAC_@-SHA1 @tab
+@item MAC-SHA1 @tab
 An HMAC based on the SHA1 cryptographic hash algorithm 
 designed by NSA. Outputs 160 bits of data.
 
-@item MAC_@-SHA256 @tab
+@item MAC-SHA256 @tab
 An HMAC based on SHA2-256. Outputs 256 bits of data.
 
-@item MAC_@-SHA384 @tab
+@item MAC-SHA384 @tab
 An HMAC based on SHA2-384. Outputs 384 bits of data.
 
-@item MAC_@-AEAD @tab
+@item MAC-AEAD @tab
 This indicates that an authenticated encryption algorithm, such as
 GCM, is in use.
 
