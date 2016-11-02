@@ -8,6 +8,14 @@ See the end for copying conditions.
 ** libgnutls: Handle status request responses as optional (following
    RFC6066).
 
+** libgnutls: Set limits on the maximum number of alerts handled. That is,
+   applications using gnutls could be tricked into an busy loop if the
+   peer sends continuously alert messages. Applications which set a maximum
+   handshake time (via gnutls_handshake_set_timeout) will eventually recover
+   but others may remain in a busy loops indefinitely. This is related but
+   not identical to CVE-2016-8610, due to the difference in alert handling
+   of the libraries (gnutls delegates that handling to applications).
+
 ** API and ABI modifications:
 No changes since last version.
 
