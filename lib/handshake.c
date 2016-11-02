@@ -2018,6 +2018,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 			gnutls_assert();
 			goto cleanup;
 		}
+		_gnutls_handshake_log("HSK[%p]: Adv. version: %u.%u\n", session,
+				      (unsigned)tver[0], (unsigned)tver[1]);
 
 		/* Set the version we advertized as maximum 
 		 * (RSA uses it).
