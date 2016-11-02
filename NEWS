@@ -22,6 +22,14 @@ See the end for copying conditions.
    in the gnutls_x509_crt_verify_data2() and gnutls_pkcs7_verify_direct()
    functions.
 
+** libgnutls: Set limits on the maximum number of alerts handled. That is,
+   applications using gnutls could be tricked into an busy loop if the
+   peer sends continuously alert messages. Applications which set a maximum
+   handshake time (via gnutls_handshake_set_timeout) will eventually recover
+   but others may remain in a busy loops indefinitely. This is related but
+   not identical to CVE-2016-8610, due to the difference in alert handling
+   of the libraries (gnutls delegates that handling to applications).
+
 ** libgnutls: Reverted the change which made the gnutls_certificate_set_*key* 
    functions return an index (introduced in 3.5.5), to avoid affecting programs
    which explicitly check success of the function as equality to zero. In order
