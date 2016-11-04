@@ -331,6 +331,7 @@ static const int* cipher_priority_suiteb192 = _cipher_priority_suiteb192;
 static const int _cipher_priority_secure128[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_256_GCM,
+	GNUTLS_CIPHER_CHACHA20_POLY1305,
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_AES_256_CCM,
@@ -348,6 +349,7 @@ static const int *cipher_priority_secure128 = _cipher_priority_secure128;
 static const int _cipher_priority_secure192[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_256_GCM,
+	GNUTLS_CIPHER_CHACHA20_POLY1305,
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_AES_256_CCM,
