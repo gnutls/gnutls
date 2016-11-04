@@ -1,5 +1,4 @@
 @
-@.init
 GNUTLS_3_4@GNUTLS_3_4
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
