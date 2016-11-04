@@ -95,7 +95,7 @@ void doit(void)
 {
 	const int normal = 57;
 	const int null = 5;
-	const int sec128 = 50;
+	const int sec128 = 53;
 
 	try_prio("PFS", 42, 12, __LINE__);
 	try_prio("NORMAL", normal, 12, __LINE__);
@@ -107,9 +107,9 @@ void doit(void)
 	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
 #endif
 	try_prio("PERFORMANCE", normal, 12, __LINE__);
-	try_prio("SECURE256", 19, 5, __LINE__);
-	try_prio("SECURE128", sec128, 10, __LINE__);
-	try_prio("SECURE128:+SECURE256", sec128, 10, __LINE__);	/* should be the same as SECURE128 */
+	try_prio("SECURE256", 22, 6, __LINE__);
+	try_prio("SECURE128", sec128, 11, __LINE__);
+	try_prio("SECURE128:+SECURE256", sec128, 11, __LINE__);	/* should be the same as SECURE128 */
 	try_prio("SECURE128:+SECURE256:+NORMAL", normal, 12, __LINE__);	/* should be the same as NORMAL */
 	try_prio("SUITEB192", 1, 1, __LINE__);
 	try_prio("SUITEB128", 2, 2, __LINE__);
