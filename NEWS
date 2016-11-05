@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Include CHACHA20-POLY1305 ciphersuites in the SECURE128
    and SECURE256 priority strings.
 
+** libgnutls: Require libtasn1 4.9; this ensures gnutls will correctly
+   operate with OIDs which have elements that exceed 2^32.
+
 ** API and ABI modifications:
 No changes since last version.
 
