@@ -172,7 +172,7 @@ MinGW32/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
-    mingw32-configure --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-configure --with-included-libtasn1 --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libintl and iconv are a dependency of libidn
@@ -182,7 +182,6 @@ MinGW32/DLLs:
     cp lib/.libs/*.dll src/.libs/*.exe win32-build/bin &&
     i686-w64-mingw32-strip --strip-unneeded win32-build/bin/*.dll &&
     i686-w64-mingw32-strip win32-build/bin/*.exe &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libtasn1-*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win32-build/bin &&
@@ -209,7 +208,7 @@ MinGW64/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
-    mingw64-configure --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw64-configure --with-included-libtasn1 --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libintl and iconv are a dependency of libidn
@@ -219,7 +218,6 @@ MinGW64/DLLs:
     cp lib/.libs/*.dll src/.libs/*.exe win64-build/bin &&
     x86_64-w64-mingw32-strip --strip-unneeded win64-build/bin/*.dll &&
     x86_64-w64-mingw32-strip win64-build/bin/*.exe &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libtasn1-*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win64-build/bin &&
@@ -246,7 +244,7 @@ MinGW64:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw64-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw64-configure --with-included-libtasn1 --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   tags:
   - shared
@@ -266,7 +264,7 @@ MinGW32:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-configure --with-included-libtasn1 --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   tags:
   - shared
@@ -288,7 +286,7 @@ FreeBSD10/x86_64:
   - /usr/bin/true
   script:
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
-    --disable-guile --disable-doc --disable-valgrind-tests && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
+    --with-included-libtasn1 --disable-guile --disable-doc --disable-valgrind-tests && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
   only:
