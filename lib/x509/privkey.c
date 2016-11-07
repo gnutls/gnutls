@@ -1471,95 +1471,6 @@ gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
 	return _gnutls_params_get_dsa_raw(&key->params, p, q, g, y, x);
 }
 
-#ifdef ENABLE_FIPS140
-static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
-{
-int ret;
-gnutls_datum_t sig = {NULL, 0};
-const char const_data[20] = "onetwothreefourfive";
-gnutls_datum_t ddata, tmp = {NULL,0};
-char* gen_data = NULL;
-
-	if (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_EC) {
-		unsigned hash_len;
-
-		_gnutls_dsa_q_to_hash(algo, params, &hash_len);
-		gen_data = gnutls_malloc(hash_len);
-		gnutls_rnd(GNUTLS_RND_NONCE, gen_data, hash_len);
-
-		ddata.data = (void*)gen_data;
-		ddata.size = hash_len;
-	} else {
-		ddata.data = (void*)const_data;
-		ddata.size = sizeof(const_data);
-	}
-
-	switch (algo) {
-	case GNUTLS_PK_RSA:
-		ret = _gnutls_pk_encrypt(algo, &sig, &ddata, params);
-		if (ret < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			goto cleanup;
-		}
-
-		if (ddata.size == sig.size && memcmp(ddata.data, sig.data, sig.size) == 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = _gnutls_pk_decrypt(algo, &tmp, &sig, params);
-		if (ret < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		if (tmp.size != ddata.size || memcmp(tmp.data, ddata.data, tmp.size) != 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		free(sig.data);
-		sig.data = NULL;
-
-		/* Here we don't know the purpose of the key. Check both
-		 * signing and encryption.
-		 */
-	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
-	case GNUTLS_PK_DSA:
-		ret = _gnutls_pk_sign(algo, &sig, &ddata, params);
-		if (ret < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			goto cleanup;
-		}
-
-		ret = _gnutls_pk_verify(algo, &ddata, &sig, params);
-		if (ret < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
-			gnutls_assert();
-			goto cleanup;
-		}
-		break;
-
-	default:
-		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-		goto cleanup;
-	}
-
-	ret = 0;
-cleanup:
-	if (ret == GNUTLS_E_PK_GENERATION_ERROR) {
-		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-	}
-	gnutls_free(gen_data);
-	gnutls_free(sig.data);
-	gnutls_free(tmp.data);
-	return ret;
-}
-#endif
-
 /**
  * gnutls_x509_privkey_generate:
  * @key: an initialized key
@@ -1665,11 +1576,8 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		gnutls_assert();
 		goto cleanup;
 	}
-#ifndef ENABLE_FIPS140
+
 	ret = _gnutls_pk_verify_priv_params(algo, &key->params);
-#else
-	ret = pct_test(algo, &key->params);
-#endif
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
