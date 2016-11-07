@@ -857,6 +857,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 
 	_gnutls_mpi_release(&tmp[0]);
 	_gnutls_mpi_release(&tmp[1]);
+	FAIL_IF_LIB_ERROR;
 	return ret;
 }
 
