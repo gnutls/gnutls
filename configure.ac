@@ -293,11 +293,6 @@ AM_CONDITIONAL(HAVE_SECCOMP_TESTS, test "$seccomp_tests" = "yes")
 AC_LIB_HAVE_LINKFLAGS(seccomp,, [#include <seccomp.h>  
 ], [seccomp_init(0);])
 
-AC_LIB_HAVE_LINKFLAGS(unistring,, [#include <uninorm.h>  
-], [u8_normalize(0, 0, 0, 0, 0);])
-
-AM_CONDITIONAL(HAVE_LIBUNISTRING, test "$HAVE_LIBUNISTRING" = "yes")
-
 # check for libcrypto - used in test programs
 AC_LIB_HAVE_LINKFLAGS(crypto,, [#include <openssl/evp.h>  
 ], [EVP_CIPHER_CTX_init(NULL);])
@@ -329,21 +324,31 @@ if test "$ac_cv_func_clock_gettime" != "yes";then
   gnutls_needs_librt=yes
 fi
 
+AC_LIB_HAVE_LINKFLAGS(unistring,, [#include <uninorm.h>], [u8_normalize(0, 0, 0, 0, 0);])
+
 ac_have_unicode=no
-if test "$ac_cv_func_iconv" != "yes";then
-  AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
-  if test "$HAVE_LIBICONV" = "yes";then
-    ac_have_unicode=yes
-  fi
-else
+if test "$HAVE_LIBUNISTRING" = "yes";then
   ac_have_unicode=yes
+  ac_have_unistring=yes
+else
+  if test "$ac_cv_func_iconv" != "yes";then
+    AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
+  fi
+
+  if test "$ac_cv_func_iconv" = "yes" || test "$HAVE_LIBICONV" = "yes";then
+    ac_have_unicode="partial (iconv)"
+  else
+    ac_have_unicode=no
+  fi
 fi
 
 if test "$ac_have_unicode" != "yes";then
   if test "$have_win" = "yes";then
-    ac_have_unicode=yes
+    ac_have_unicode="partial (winapi)"
   fi
 fi
+
+AM_CONDITIONAL(HAVE_LIBUNISTRING, test "$ac_have_unistring" = "yes")
 
 dnl Note that g*l_INIT are run after we check for library capabilities,
 dnl to prevent issues from caching lib dependencies. See discussion
@@ -496,6 +501,7 @@ else
 *** libidn was not found. IDNA support will be disabled.
 *** ]])
 fi
+
 else
 	with_libidn=no
 fi
