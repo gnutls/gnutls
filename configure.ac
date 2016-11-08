@@ -293,6 +293,11 @@ AM_CONDITIONAL(HAVE_SECCOMP_TESTS, test "$seccomp_tests" = "yes")
 AC_LIB_HAVE_LINKFLAGS(seccomp,, [#include <seccomp.h>  
 ], [seccomp_init(0);])
 
+AC_LIB_HAVE_LINKFLAGS(unistring,, [#include <uninorm.h>  
+], [u8_normalize(0, 0, 0, 0, 0);])
+
+AM_CONDITIONAL(HAVE_LIBUNISTRING, test "$HAVE_LIBUNISTRING" = "yes")
+
 # check for libcrypto - used in test programs
 AC_LIB_HAVE_LINKFLAGS(crypto,, [#include <openssl/evp.h>  
 ], [EVP_CIPHER_CTX_init(NULL);])

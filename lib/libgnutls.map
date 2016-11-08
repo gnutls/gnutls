@@ -1131,6 +1131,7 @@ GNUTLS_3_4
 	gnutls_x509_dn_get_str2;
 	gnutls_x509_crl_get_issuer_dn3;
 	gnutls_x509_crq_get_dn3;
+	gnutls_utf8_password_normalize;
  local:
 	*;
 };

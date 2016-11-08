@@ -36,6 +36,10 @@
 # define N_(String) String
 #endif
 
+#define NORM_INTERNAL 1
+int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_len,
+				   gnutls_datum_t *out, unsigned flags);
+
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
 void _gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
 		     size_t src_size);

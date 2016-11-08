@@ -2518,6 +2518,9 @@ typedef struct gnutls_buffer_st *gnutls_buffer_t;
 
 int gnutls_buffer_append_data(gnutls_buffer_t, const void *data, size_t data_size);
 
+int gnutls_utf8_password_normalize(const unsigned char *password, unsigned password_len,
+				   gnutls_datum_t *out, unsigned flags);
+
 /* Public extensions related functions */
 
 typedef void *gnutls_ext_priv_data_t;
