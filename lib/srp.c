@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -285,7 +286,7 @@ error:
  * The output is exactly 20 bytes
  */
 static int
-_gnutls_calc_srp_sha(const char *username, const char *password,
+_gnutls_calc_srp_sha(const char *username, const char *_password,
 		     uint8_t * salt, int salt_size, size_t * size,
 		     void *digest)
 {
@@ -293,12 +294,20 @@ _gnutls_calc_srp_sha(const char *username, const char *password,
 	uint8_t res[MAX_HASH_SIZE];
 	int ret;
 	const mac_entry_st *me = mac_to_entry(GNUTLS_MAC_SHA1);
+	char *password;
+	gnutls_datum_t pout;
 
 	*size = 20;
 
+	ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+	password = (char*)pout.data;
+
 	ret = _gnutls_hash_init(&td, me);
 	if (ret < 0) {
-		return GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
 	}
 	_gnutls_hash(&td, username, strlen(username));
 	_gnutls_hash(&td, ":", 1);
@@ -308,15 +317,19 @@ _gnutls_calc_srp_sha(const char *username, const char *password,
 
 	ret = _gnutls_hash_init(&td, me);
 	if (ret < 0) {
-		return GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
 	}
 
 	_gnutls_hash(&td, salt, salt_size);
 	_gnutls_hash(&td, res, 20);	/* 20 bytes is the output of sha1 */
 
 	_gnutls_hash_deinit(&td, digest);
+	ret = 0;
 
-	return 0;
+ cleanup:
+	gnutls_free(password);
+	return ret;
 }
 
 int
