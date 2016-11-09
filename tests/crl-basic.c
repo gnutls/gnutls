@@ -126,7 +126,7 @@ static struct
     .this_update = 1274996231,
     .next_update = 1277588231
   },
-  { NULL, NULL, NULL, 0}
+  { NULL, NULL, 0, 0}
 };
 
 static void tls_log_func(int level, const char *str)

@@ -128,7 +128,6 @@ static void check_generation_reading_basic_checking(void **glob_state)
 	unsigned int i, num_permitted, num_excluded, type;
 	gnutls_x509_crt_t crt;
 	gnutls_datum_t name;
-	char ip_out[60];
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(2);
@@ -704,7 +703,7 @@ static int teardown(void **state) {
 	return 0;
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test_setup_teardown(check_generation_reading_basic_checking, setup, teardown),
