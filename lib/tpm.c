@@ -366,14 +366,25 @@ static TSS_RESULT myTspi_Policy_SetSecret(TSS_HPOLICY hPolicy,
 
 #define SAFE_LEN(x) (x==NULL?0:strlen(x))
 
-static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
+static int tpm_open_session(struct tpm_ctx_st *s, const char *_srk_password)
 {
 	int err, ret;
+	char *password = NULL;
 
 	err = pTspi_Context_Create(&s->tpm_ctx);
 	if (err) {
 		gnutls_assert();
 		return tss_err(err);
+	}
+
+	if (_srk_password != NULL) {
+		gnutls_datum_t pout;
+		ret = _gnutls_utf8_password_normalize(_srk_password, strlen(_srk_password), &pout);
+		if (ret < 0) {
+			gnutls_assert();
+			goto out_tspi_ctx;
+		}
+		password = (char*)pout.data;
 	}
 
 	err = pTspi_Context_Connect(s->tpm_ctx, NULL);
@@ -401,8 +412,8 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
 	}
 
 	err = myTspi_Policy_SetSecret(s->srk_policy,
-				      SAFE_LEN(srk_password),
-				      (BYTE *) srk_password);
+				      SAFE_LEN(password),
+				      (BYTE *) password);
 	if (err) {
 		gnutls_assert();
 		ret = tss_err(err);
@@ -420,6 +431,7 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
       out_tspi_ctx:
 	pTspi_Context_Close(s->tpm_ctx);
 	s->tpm_ctx = 0;
+	gnutls_free(password);
 	return ret;
 
 }
@@ -556,24 +568,36 @@ static int load_key(TSS_HCONTEXT tpm_ctx, TSS_HKEY srk,
 	return ret;
 }
 
-
 static int
 import_tpm_key(gnutls_privkey_t pkey,
 	       const gnutls_datum_t * fdata,
 	       gnutls_tpmkey_fmt_t format,
 	       TSS_UUID * uuid,
 	       TSS_FLAG storage,
-	       const char *srk_password, const char *key_password)
+	       const char *srk_password, const char *_key_password)
 {
 	int err, ret;
 	struct tpm_ctx_st *s;
 	gnutls_datum_t tmp_sig;
+	char *key_password = NULL;
 
 	s = gnutls_malloc(sizeof(*s));
 	if (s == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
+	if (_key_password != NULL) {
+		gnutls_datum_t pout;
+		ret = _gnutls_utf8_password_normalize(_key_password, strlen(_key_password), &pout);
+		if (ret < 0) {
+			gnutls_assert();
+			goto out_ctx;
+		}
+		key_password = (char*)pout.data;
+	}
+
+	/* normalization of srk_password happens in tpm_open_session() */
 
 	ret = tpm_open_session(s, srk_password);
 	if (ret < 0) {
@@ -654,6 +678,8 @@ import_tpm_key(gnutls_privkey_t pkey,
 		goto out_session;
 	}
 
+	gnutls_free(key_password);
+
 	return 0;
       out_key_policy:
 	pTspi_Context_CloseObject(s->tpm_ctx, s->tpm_key_policy);
@@ -665,6 +691,7 @@ import_tpm_key(gnutls_privkey_t pkey,
 	tpm_close_session(s);
       out_ctx:
 	gnutls_free(s);
+	gnutls_free(key_password);
 	return ret;
 }
 
@@ -1423,6 +1450,9 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 
 	/* set the password of the actual key */
 	if (key_password) {
+		gnutls_datum_t pout;
+		char *password = NULL;
+
 		tssret =
 		    pTspi_GetPolicyObject(key_ctx, TSS_POLICY_USAGE,
 					 &key_policy);
@@ -1432,9 +1462,17 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 			goto err_sa;
 		}
 
+		ret = _gnutls_utf8_password_normalize(key_password, strlen(key_password), &pout);
+		if (ret < 0) {
+			gnutls_assert();
+			goto err_sa;
+		}
+		password = (char*)pout.data;
+
 		tssret = myTspi_Policy_SetSecret(key_policy,
-						 SAFE_LEN(key_password),
-						 (void *) key_password);
+						 SAFE_LEN(password),
+						 (void *)password);
+		gnutls_free(password);
 		if (tssret != 0) {
 			gnutls_assert();
 			ret = tss_err(tssret);
