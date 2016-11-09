@@ -40,7 +40,7 @@
  * to the normalization rules in RFC7613. If GnuTLS is compiled without
  * unicode support this function will return %GNUTLS_E_UNIMPLEMENTED_FEATURE.
  *
- * Returns: %GNUTLS_E_PARSING_ERROR on invalid UTF-8 data, or 0 on success.
+ * Returns: %GNUTLS_E_INVALID_UTF8_STRING on invalid UTF-8 data, or 0 on success.
  **/
 int gnutls_utf8_password_normalize(const unsigned char *password, unsigned password_len,
 				   gnutls_datum_t *out, unsigned flags)
@@ -66,7 +66,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
 	/* check for invalid UTF-8 */
 	if (u8_check((uint8_t*)password, plen) != NULL) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_INVALID_UTF8_STRING;
 	}
 
 	/* convert to UTF-32 */

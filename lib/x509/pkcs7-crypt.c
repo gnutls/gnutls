@@ -994,37 +994,48 @@ _gnutls_read_pkcs_schema_params(schema_id * schema, const char *password,
 
 int
 _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
-			      const char *root, const char *password,
+			      const char *root, const char *_password,
 			      const struct pbkdf2_params *kdf_params,
 			      const struct pbe_enc_params *enc_params,
 			      gnutls_datum_t * decrypted_data)
 {
-	int result;
 	gnutls_datum_t enc = { NULL, 0 };
 	uint8_t *key = NULL;
 	gnutls_datum_t dkey, d_iv;
 	cipher_hd_st ch;
 	int ch_init = 0;
-	int key_size;
+	int key_size, ret;
 	unsigned int pass_len = 0;
 	const struct pkcs_cipher_schema_st *p;
 	unsigned block_size;
 	const cipher_entry_st *ce;
+	char *password;
 
-	if (password)
-		pass_len = strlen(password);
+	if (_password) {
+		gnutls_datum_t pout;
+		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	result = _gnutls_x509_read_value(pkcs8_asn, root, &enc);
-	if (result < 0) {
+		password = (char*)pout.data;
+		pass_len = pout.size;
+	} else {
+		password = NULL;
+		pass_len = 0;
+	}
+
+	ret = _gnutls_x509_read_value(pkcs8_asn, root, &enc);
+	if (ret < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
 	if (schema == PBES1_DES_MD5) {
-		return _gnutls_decrypt_pbes1_des_md5_data(password, pass_len,
+		ret = _gnutls_decrypt_pbes1_des_md5_data(password, pass_len,
 							  kdf_params,
 							  enc_params, &enc,
 							  decrypted_data);
+		goto cleanup;
 	}
 
 	if (kdf_params->key_size == 0) {
@@ -1035,7 +1046,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	key = gnutls_malloc(key_size);
 	if (key == NULL) {
 		gnutls_assert();
-		result = GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
 		goto error;
 	}
 
@@ -1054,12 +1065,12 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 					   kdf_params->salt_size,
 					   kdf_params->salt, key_size, key);
 		else {
-			result =
+			ret =
 			    gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 			goto error;
 		}
 	} else if (p != NULL) {	/* PKCS 12 schema */
-		result =
+		ret =
 		    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
 						 1 /*KEY*/,
 						 kdf_params->salt,
@@ -1067,13 +1078,13 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 						 kdf_params->iter_count,
 						 password, key_size, key);
 
-		if (result < 0) {
+		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
 	} else {
 		gnutls_assert();
-		result = GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		ret = GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 		goto error;
 	}
 
@@ -1082,7 +1093,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	if (ce->type == CIPHER_BLOCK && (enc.size % block_size != 0)) {
 		gnutls_assert();
-		result = GNUTLS_E_ILLEGAL_PARAMETER;
+		ret = GNUTLS_E_ILLEGAL_PARAMETER;
 		goto error;
 	}
 
@@ -1093,21 +1104,22 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	d_iv.data = (uint8_t *) enc_params->iv;
 	d_iv.size = enc_params->iv_size;
-	result =
+
+	ret =
 	    _gnutls_cipher_init(&ch, ce, &dkey, &d_iv, 0);
 
 	gnutls_free(key);
 	key = NULL;
 
-	if (result < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	ch_init = 1;
 
-	result = _gnutls_cipher_decrypt(&ch, enc.data, enc.size);
-	if (result < 0) {
+	ret = _gnutls_cipher_decrypt(&ch, enc.data, enc.size);
+	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -1120,7 +1132,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 		if (pslen > block_size || pslen >= enc.size  || pslen == 0) {
 			gnutls_assert();
-			result = GNUTLS_E_ILLEGAL_PARAMETER;
+			ret = GNUTLS_E_ILLEGAL_PARAMETER;
 			goto error;
 		}
 
@@ -1129,7 +1141,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 		for (i=0;i<pslen;i++) {
 			if (enc.data[enc.size-1-i] != pslen) {
 				gnutls_assert();
-				result = GNUTLS_E_ILLEGAL_PARAMETER;
+				ret = GNUTLS_E_ILLEGAL_PARAMETER;
 				goto error;
 			}
 		}
@@ -1139,14 +1151,20 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	_gnutls_cipher_deinit(&ch);
 
-	return 0;
+	ret = 0;
+
+ cleanup:
+	gnutls_free(password);
+
+	return ret;
 
  error:
+	gnutls_free(password);
 	gnutls_free(enc.data);
 	gnutls_free(key);
 	if (ch_init != 0)
 		_gnutls_cipher_deinit(&ch);
-	return result;
+	return ret;
 }
 
 /* Writes the PBKDF2 parameters.
@@ -1314,7 +1332,7 @@ write_pbes2_enc_params(ASN1_TYPE pasn, const struct pbe_enc_params *params)
  */
 int
 _gnutls_pkcs_generate_key(schema_id schema,
-			  const char *password,
+			  const char *_password,
 			  struct pbkdf2_params *kdf_params,
 			  struct pbe_enc_params *enc_params,
 			  gnutls_datum_t * key)
@@ -1323,14 +1341,25 @@ _gnutls_pkcs_generate_key(schema_id schema,
 	unsigned int pass_len = 0;
 	int ret;
 	const struct pkcs_cipher_schema_st *p;
+	char *password = NULL;
 
-	if (password)
-		pass_len = strlen(password);
+	if (_password) {
+		gnutls_datum_t pout;
+		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		password = (char*)pout.data;
+		pass_len = pout.size;
+	} else {
+		password = NULL;
+		pass_len = 0;
+	}
 
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, rnd, 2);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	/* generate salt */
@@ -1346,14 +1375,15 @@ _gnutls_pkcs_generate_key(schema_id schema,
 		kdf_params->salt_size = 8;
 	} else {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
 	ret = gnutls_rnd(GNUTLS_RND_RANDOM, kdf_params->salt,
 			  kdf_params->salt_size);
 	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_RANDOM_FAILED;
+		goto cleanup;
 	}
 
 	kdf_params->iter_count = 5 * 1024 + rnd[0];
@@ -1364,7 +1394,8 @@ _gnutls_pkcs_generate_key(schema_id schema,
 	key->data = gnutls_malloc(key->size);
 	if (key->data == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
 	}
 
 	/* now generate the key. 
@@ -1381,7 +1412,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 					  enc_params->iv, enc_params->iv_size);
 			if (ret < 0) {
 				gnutls_assert();
-				return ret;
+				goto cleanup;
 			}
 		}
 	} else {		/* PKCS 12 schema */
@@ -1396,7 +1427,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 						 key->data);
 		if (ret < 0) {
 			gnutls_assert();
-			return ret;
+			goto cleanup;
 		}
 
 		/* Now generate the IV
@@ -1414,12 +1445,16 @@ _gnutls_pkcs_generate_key(schema_id schema,
 							 enc_params->iv);
 			if (ret < 0) {
 				gnutls_assert();
-				return ret;
+				goto cleanup;
 			}
 		}
 	}
 
-	return 0;
+	ret = 0;
+
+ cleanup:
+	gnutls_free(password);
+	return ret;
 }
 
 /* Encodes the parameters to be written in the encryptionAlgorithm.parameters

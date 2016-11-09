@@ -272,6 +272,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE),
 	ERROR_ENTRY(N_("The given password contains invalid characters."),
 		    GNUTLS_E_INVALID_PASSWORD),
+	ERROR_ENTRY(N_("The given string contains invalid UTF-8 characters."),
+		    GNUTLS_E_INVALID_UTF8_STRING),
 	ERROR_ENTRY(N_
 		    ("The Message Authentication Code verification failed."),
 		    GNUTLS_E_MAC_VERIFY_FAILED),
