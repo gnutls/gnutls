@@ -33,6 +33,7 @@ Fedora/x86_64/ubsan:
     expire_in: 1 week
     when: on_failure
     paths:
+      - ./*.log
       - tests/*.log
       - tests/*/*.log
 
@@ -52,6 +53,7 @@ Fedora/x86_64/no-SSL-3.0:
     paths:
       - build/guile/tests/*.log
       - build/tests/*.log
+      - build/*.log
       - build/tests/*/*.log
 
 # Needs gnutls' headers due to some abi-checker issue with resolving deps
@@ -112,6 +114,7 @@ Fedora/x86_64/clang:
     expire_in: 1 week
     when: on_failure
     paths:
+      - ./*.log
       - guile/tests/*.log
       - tests/*.log
       - tests/*/*.log
@@ -146,6 +149,7 @@ Fedora/x86_64/valgrind:
     expire_in: 1 week
     when: on_failure
     paths:
+      - ./*.log
       - tests/*.log
       - tests/*/*.log
 
@@ -163,6 +167,7 @@ Fedora/x86_64/asan:
     expire_in: 1 week
     when: on_failure
     paths:
+      - ./*.log
       - tests/*.log
       - tests/*/*.log
 
@@ -297,6 +302,7 @@ FreeBSD10/x86_64:
     expire_in: 1 week
     when: on_failure
     paths:
+      - ./*.log
       - tests/*.log
       - tests/*/*.log
 
@@ -342,5 +348,6 @@ Debian/x86_64:
     when: on_failure
     paths:
       - guile/tests/*.log
+      - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
