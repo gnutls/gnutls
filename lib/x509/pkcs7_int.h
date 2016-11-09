@@ -42,6 +42,11 @@ typedef enum schema_id {
 	PBES2_AES_128,
 	PBES2_AES_192,
 	PBES2_AES_256,
+	PBES2_GOST28147_89_TC26Z,
+	PBES2_GOST28147_89_CPA,
+	PBES2_GOST28147_89_CPB,
+	PBES2_GOST28147_89_CPC,
+	PBES2_GOST28147_89_CPD,
 	PKCS12_3DES_SHA1,	/* the stuff in PKCS #12 */
 	PKCS12_ARCFOUR_SHA1,
 	PKCS12_RC2_40_SHA1,
@@ -57,6 +62,7 @@ struct pkcs_cipher_schema_st {
 	const char *cipher_oid;
 	const char *write_oid;
 	const char *desc;
+	const char *iv;
 	unsigned decrypt_only;
 };
 
