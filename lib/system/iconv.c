@@ -215,6 +215,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 #elif defined(HAVE_LIBUNISTRING)
 
 #include <unistr.h>
+#include <uninorm.h>
 #include "num.h"
 
 int _gnutls_ucs2_to_utf8(const void *data, size_t size,
@@ -278,19 +279,26 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 			 gnutls_datum_t * output)
 {
 	int ret;
-	size_t dstlen = 0;
+	size_t dstlen, nrm_size = 0, tmp_size = 0;
 	uint16_t *tmp_dst = NULL;
+	uint16_t *nrm_dst = NULL;
 	uint8_t *dst = NULL;
 
 	if (size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	dstlen = 0;
-	tmp_dst = u8_to_u16(data, size, NULL, &dstlen);
+	tmp_dst = u8_to_u16(data, size, NULL, &tmp_size);
 	if (tmp_dst == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	dstlen *= 2; /* convert to bytes */
+	nrm_dst = u16_normalize(UNINORM_NFC, tmp_dst, tmp_size, NULL, &nrm_size);
+	if (nrm_dst == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto fail;
+	}
+
+	dstlen = nrm_size * 2; /* convert to bytes */
 
 	dst = gnutls_malloc(dstlen+2);
 	if (dst == NULL) {
@@ -299,7 +307,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 		goto fail;
 	}
 
-	/* convert to BE if needed */
+	/* convert to BE */
 	change_u16_endianness(dst, (uint8_t*)tmp_dst, dstlen, 1);
 	dst[dstlen] = 0;
 	dst[dstlen+1] = 0;
@@ -315,6 +323,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 
  cleanup:
 	free(tmp_dst);
+	free(nrm_dst);
 
 	return ret;
 }
