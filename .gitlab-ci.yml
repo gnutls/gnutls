@@ -1,7 +1,7 @@
 image: fedora:24
 
 before_script:
-  - dnf install -y git coreutils which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools
+  - dnf install -y git coreutils which autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel libunistring-devel bison help2man xz net-tools
   - dnf install -y clang compiler-rt libseccomp-devel libasan libasan-static libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind
 
 Fedora/x86_64/minimal:
@@ -25,6 +25,24 @@ Fedora/x86_64/ubsan:
     -O2" LDFLAGS="-static-libubsan" ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --enable-code-coverage
     && make -j$(nproc) && make check -j$(nproc)
   - make local-code-coverage-output || true
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - tests/*.log
+      - tests/*/*.log
+
+# Check with no-unistring available
+Fedora/x86_64/no-unistring:
+  script:
+  - dnf remove -y libunistring-devel
+  - make autoreconf && ./configure --disable-doc --disable-full-test-suite --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
+    && make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
   except:
@@ -310,7 +328,7 @@ FreeBSD10/x86_64:
 Fedora/x86:
   image: nickcis/fedora-32:23
   before_script:
-  - linux32 dnf install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel socat xz ppp abi-compliance-checker valgrind binutils elfutils
+  - linux32 dnf install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel libunistring-devel socat xz ppp abi-compliance-checker valgrind binutils elfutils
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
@@ -334,7 +352,7 @@ Debian/x86_64:
   image: debian:stretch
   before_script:
   - apt-get update -qq -y
-  - apt-get install -y git-core autoconf libtool gettext autopoint automake autogen nettle-dev libp11-kit-dev libtspi-dev guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf git2cl libunbound-dev dns-root-data bison help2man valgrind libasan2 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev dieharder openssl abi-compliance-checker socat net-tools ppp
+  - apt-get install -y git-core autoconf libtool gettext autopoint automake autogen nettle-dev libp11-kit-dev libtspi-dev guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf git2cl libunbound-dev dns-root-data bison help2man valgrind libasan2 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev libunistring-dev dieharder openssl abi-compliance-checker socat net-tools ppp
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --enable-code-coverage --disable-doc --disable-valgrind-tests
