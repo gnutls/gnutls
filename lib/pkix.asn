@@ -368,6 +368,12 @@ pkcs-5-aes128-CBC-params ::= OCTET STRING (SIZE(16))
 pkcs-5-aes192-CBC-params ::= OCTET STRING (SIZE(16))
 pkcs-5-aes256-CBC-params ::= OCTET STRING (SIZE(16))
 
+-- GOST extension
+Gost28147-89-Parameters ::= SEQUENCE {
+	iv OCTET STRING, -- (SIZE (8))
+	encryptionParamSet OBJECT IDENTIFIER
+}
+
 pkcs-5-PBE-params ::= SEQUENCE {
   salt OCTET STRING,
   iterationCount INTEGER }
