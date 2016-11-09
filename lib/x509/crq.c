@@ -1072,6 +1072,7 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 				       const char *pass)
 {
 	int result;
+	char *password = NULL;
 
 	if (crq == NULL) {
 		gnutls_assert();
@@ -1089,16 +1090,29 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_encode_and_write_attribute
-	    ("1.2.840.113549.1.9.7", crq->crq,
-	     "certificationRequestInfo.attributes.?LAST", pass,
-	     strlen(pass), 1);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
+	if (pass) {
+		gnutls_datum_t out;
+		result = _gnutls_utf8_password_normalize(pass, strlen(pass), &out);
+		if (result < 0)
+			return gnutls_assert_val(result);
+
+		password = (char*)out.data;
 	}
 
-	return 0;
+	result = _gnutls_x509_encode_and_write_attribute
+	    ("1.2.840.113549.1.9.7", crq->crq,
+	     "certificationRequestInfo.attributes.?LAST", password,
+	     strlen(password), 1);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = 0;
+
+ cleanup:
+	gnutls_free(password);
+	return result;
 }
 
 /**
