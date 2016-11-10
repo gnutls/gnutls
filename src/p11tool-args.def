@@ -50,6 +50,18 @@ flag = {
 };
 
 flag = {
+    name      = initialize-pin;
+    descrip   = "Initializes/Resets a PKCS #11 token user PIN";
+    doc = "";
+};
+
+flag = {
+    name      = initialize-so-pin;
+    descrip   = "Initializes/Resets a PKCS #11 token security officer PIN";
+    doc = "";
+};
+
+flag = {
     name      = set-pin;
     arg-type  = string;
     descrip   = "Specify the PIN to use on token initialization";

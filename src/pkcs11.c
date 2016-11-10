@@ -906,7 +906,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	} else {
 		pin = getenv("GNUTLS_PIN");
 		if (pin == NULL && info->batch == 0)
-			pin = getpass("Enter new User's PIN: ");
+			pin = getpass("Enter User's new PIN: ");
 		if (pin == NULL)
 			exit(1);
 	}
@@ -918,6 +918,56 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	setenv("GNUTLS_SO_PIN", so_pin, 0);
 
 	ret = gnutls_pkcs11_token_set_pin(url, NULL, pin, GNUTLS_PIN_USER);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	return;
+}
+
+void
+pkcs11_set_pin(FILE * outfile, const char *url, common_info_st * info, unsigned so)
+{
+	int ret;
+	const char *pin;
+
+	pkcs11_common(info);
+
+	if (url == NULL) {
+		fprintf(stderr, "error: no token URL given to initialize!\n");
+		exit(1);
+	}
+
+	fprintf(stderr, "Setting token's user PIN...\n");
+
+	if (so) {
+		if (info->so_pin != NULL) {
+			pin = info->so_pin;
+		} else {
+			pin = getenv("GNUTLS_SO_PIN");
+			if (pin == NULL && info->batch == 0)
+				pin = getpass("Enter Administrators's new PIN: ");
+			if (pin == NULL)
+				exit(1);
+		}
+	} else {
+		if (info->pin != NULL) {
+			pin = info->pin;
+		} else {
+			pin = getenv("GNUTLS_PIN");
+			if (pin == NULL && info->batch == 0)
+				pin = getpass("Enter User's new PIN: ");
+			if (pin == NULL)
+				exit(1);
+		}
+	}
+
+	if (pin == NULL || pin[0] == '\n')
+		exit(1);
+
+	ret = gnutls_pkcs11_token_set_pin(url, NULL, pin, (so!=0)?GNUTLS_PIN_SO:GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));

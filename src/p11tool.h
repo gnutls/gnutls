@@ -49,6 +49,7 @@ void pkcs11_delete(FILE * outfile, const char *pkcs11_url,
 		   unsigned int flags, common_info_st *);
 void pkcs11_init(FILE * outfile, const char *pkcs11_url, const char *label,
 		 common_info_st *);
+void pkcs11_set_pin(FILE * outfile, const char *pkcs11_url, common_info_st *, unsigned so);
 void pkcs11_generate(FILE * outfile, const char *url,
 		     gnutls_pk_algorithm_t type, unsigned int bits,
 		     const char *label, const char *id, int detailed,
