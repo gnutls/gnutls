@@ -900,29 +900,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	}
 	fprintf(stderr, "done\n");
 
-	fprintf(stderr, "Setting token's user PIN...\n");
-	if (info->pin != NULL) {
-		pin = info->pin;
-	} else {
-		pin = getenv("GNUTLS_PIN");
-		if (pin == NULL && info->batch == 0)
-			pin = getpass("Enter User's new PIN: ");
-		if (pin == NULL)
-			exit(1);
-	}
-
-	if (pin == NULL || pin[0] == '\n')
-		exit(1);
-
-	/* do not ask the SO PIN twice */
-	setenv("GNUTLS_SO_PIN", so_pin, 0);
-
-	ret = gnutls_pkcs11_token_set_pin(url, NULL, pin, GNUTLS_PIN_USER);
-	if (ret < 0) {
-		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
-			gnutls_strerror(ret));
-		exit(1);
-	}
+	fprintf(stderr, "\nToken was successfully initialized; use --initialize-pin and --initialize-so-pin to set or reset PINs\n");
 
 	return;
 }
