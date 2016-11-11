@@ -254,14 +254,15 @@ int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsig
 	if (str->length == 0) {
 		data->data = NULL;
 		data->size = 0;
-		_gnutls_buffer_clear(str);
-		return 0;
+		ret = 0;
+		goto fail;
 	}
 
 	if (is_str) {
 		ret = _gnutls_buffer_append_data(str, "\x00", 1);
 		if (ret < 0) {
-			return gnutls_assert_val(ret);
+			gnutls_assert();
+			goto fail;
 		}
 	}
 
@@ -269,8 +270,8 @@ int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsig
 		data->data = gnutls_malloc(str->length);
 		if (data->data == NULL) {
 			gnutls_assert();
-			_gnutls_buffer_clear(str);
-			return GNUTLS_E_MEMORY_ERROR;
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto fail;
 		}
 		memcpy(data->data, str->data, str->length);
 		data->size = str->length;
@@ -286,6 +287,9 @@ int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsig
 	}
 
 	return 0;
+ fail:
+	_gnutls_buffer_clear(str);
+	return ret;
 }
 
 /* returns data from a string in a constant buffer.
