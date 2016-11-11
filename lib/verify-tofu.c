@@ -543,6 +543,13 @@ int store_commitment(const char *db_name, const char *host,
  * the storage of entries. If it is NULL then the
  * default file backend will be used.
  *
+ * Unless an alternative @tdb is provided, the storage format is a textual format
+ * consisting of a line for each host with fields separated by '|'. The contents of
+ * the fields are a format-identifier which is set to 'g0', the hostname that the
+ * rest of the data applies to, the numeric port or host name, the expiration
+ * time in seconds since the epoch (0 for no expiration), and a base64
+ * encoding of the raw (DER) public key information (SPKI) of the peer.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
