@@ -13,11 +13,24 @@ See the end for copying conditions.
 ** libgnutls: Require libtasn1 4.9; this ensures gnutls will correctly
    operate with OIDs which have elements that exceed 2^32.
 
+** libgnutls: The DN decoding functions output the traditional DN format
+   rather than the strict RFC4514 compliant textual DN. This reverts the
+   3.5.6 introduced change, and allows applications which depended on the
+   previous format to continue to function. Introduced new functions which
+   output the strict format by default, and can revert to the old one using
+   a flag.
+
 ** p11tool: Introduced the --initialize-pin and --initialize-so-pin
    options.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_ocsp_resp_get_responder2: Added
+gnutls_x509_crt_get_issuer_dn3: Added
+gnutls_x509_crt_get_dn3: Added
+gnutls_x509_rdn_get2: Added
+gnutls_x509_dn_get_str2: Added
+gnutls_x509_crl_get_issuer_dn3: Added
+gnutls_x509_crq_get_dn3: Added
 
 
 * Version 3.5.6 (released 2016-11-04)
