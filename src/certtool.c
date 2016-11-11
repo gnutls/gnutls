@@ -2171,29 +2171,25 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 				 gnutls_x509_crl_t crl,
 				 unsigned int verification_output)
 {
-	char name[512];
 	char tmp[255];
-	char issuer_name[512];
-	size_t name_size;
-	size_t issuer_name_size;
+	size_t tmp_size;
+	gnutls_datum_t name = {NULL,0}, issuer_name = {NULL,0};
+	gnutls_datum_t serial = {NULL,0};
 	int ret;
 
-	issuer_name_size = sizeof(issuer_name);
 	ret =
-	    gnutls_x509_crt_get_issuer_dn(cert, issuer_name,
-					  &issuer_name_size);
+	    gnutls_x509_crt_get_issuer_dn3(cert, &issuer_name, 0);
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_x509_crt_get_issuer_dn: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	name_size = sizeof(name);
-	ret = gnutls_x509_crt_get_dn(cert, name, &name_size);
+	ret = gnutls_x509_crt_get_dn3(cert, &name, 0);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			name[0] = 0;
-			name_size = 0;
+			name.data = 0;
+			name.size = 0;
 		} else {
 			fprintf(stderr, "gnutls_x509_crt_get_dn: %s\n",
 				gnutls_strerror(ret));
@@ -2201,14 +2197,13 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 		}
 	}
 
-	fprintf(outfile, "\tSubject: %s\n", name);
-	fprintf(outfile, "\tIssuer: %s\n", issuer_name);
+	fprintf(outfile, "\tSubject: %s\n", name.data);
+	fprintf(outfile, "\tIssuer: %s\n", issuer_name.data);
 
 	if (issuer != NULL) {
-		issuer_name_size = sizeof(issuer_name);
+		gnutls_free(issuer_name.data);
 		ret =
-		    gnutls_x509_crt_get_dn(issuer, issuer_name,
-					   &issuer_name_size);
+		    gnutls_x509_crt_get_dn3(issuer, &issuer_name, 0);
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crt_get_issuer_dn: %s\n",
@@ -2216,16 +2211,15 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 			exit(1);
 		}
 
-		fprintf(outfile, "\tChecked against: %s\n", issuer_name);
+		fprintf(outfile, "\tChecked against: %s\n", issuer_name.data);
 	}
 
 	if (crl != NULL) {
 		gnutls_datum_t data;
+		gnutls_free(issuer_name.data);
 
-		issuer_name_size = sizeof(issuer_name);
 		ret =
-		    gnutls_x509_crl_get_issuer_dn(crl, issuer_name,
-						  &issuer_name_size);
+		    gnutls_x509_crl_get_issuer_dn3(crl, &issuer_name, 0);
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crl_get_issuer_dn: %s\n",
@@ -2233,17 +2227,16 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 			exit(1);
 		}
 
-		name_size = sizeof(tmp);
+		tmp_size = sizeof(tmp);
 		ret =
-		    gnutls_x509_crl_get_number(crl, tmp, &name_size, NULL);
-		if (ret < 0)
-			strcpy(name, "unnumbered");
-		else {
+		    gnutls_x509_crl_get_number(crl, tmp, &tmp_size, NULL);
+		if (ret < 0) {
+			serial.data = (void*)gnutls_strdup("unnumbered");
+		} else {
 			data.data = (void *) tmp;
-			data.size = name_size;
+			data.size = tmp_size;
 
-			name_size = sizeof(name);
-			ret = gnutls_hex_encode(&data, name, &name_size);
+			ret = gnutls_hex_encode2(&data, &serial);
 			if (ret < 0) {
 				fprintf(stderr, "gnutls_hex_encode: %s\n",
 					gnutls_strerror(ret));
@@ -2251,13 +2244,17 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 			}
 		}
 		fprintf(outfile, "\tChecked against CRL[%s] of: %s\n",
-			name, issuer_name);
+			serial.data, issuer_name.data);
 	}
 
 	fprintf(outfile, "\tOutput: ");
 	print_verification_res(outfile, verification_output);
 
 	fputs("\n\n", outfile);
+
+	gnutls_free(serial.data);
+	gnutls_free(name.data);
+	gnutls_free(issuer_name.data);
 
 	return 0;
 }
@@ -2662,8 +2659,8 @@ static void verify_certificate(common_info_st * cinfo)
 
 void verify_crl(common_info_st * cinfo)
 {
-	size_t size, dn_size;
-	char dn[128];
+	size_t size;
+	gnutls_datum_t dn;
 	unsigned int output;
 	int ret;
 	gnutls_datum_t pem, pout;
@@ -2674,14 +2671,13 @@ void verify_crl(common_info_st * cinfo)
 
 	fprintf(outfile, "\nCA certificate:\n");
 
-	dn_size = sizeof(dn);
-	ret = gnutls_x509_crt_get_dn(issuer, dn, &dn_size);
+	ret = gnutls_x509_crt_get_dn3(issuer, &dn, 0);
 	if (ret < 0) {
 		fprintf(stderr, "crt_get_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	fprintf(outfile, "\tSubject: %s\n\n", dn);
+	fprintf(outfile, "\tSubject: %s\n\n", dn.data);
 
 	ret = gnutls_x509_crl_init(&crl);
 	if (ret < 0) {
@@ -2749,7 +2745,7 @@ static void print_dn(const char *prefix, const gnutls_datum_t *raw)
 	if (ret < 0)
 		goto cleanup;
 
-	ret = gnutls_x509_dn_get_str(dn, &str);
+	ret = gnutls_x509_dn_get_str2(dn, &str, 0);
 	if (ret < 0)
 		goto cleanup;
 
