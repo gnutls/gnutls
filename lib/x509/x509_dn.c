@@ -662,5 +662,36 @@ gnutls_x509_dn_get_str(gnutls_x509_dn_t dn, gnutls_datum_t *str)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_get_dn(dn->asn, "rdnSequence", str);
+	return _gnutls_x509_get_dn(dn->asn, "rdnSequence", str, GNUTLS_X509_DN_FLAG_COMPAT);
+}
+
+/**
+ * gnutls_x509_dn_get_str:
+ * @dn: a pointer to DN
+ * @str: a datum that will hold the name
+ * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
+ *
+ * This function will allocate buffer and copy the name in the provided DN.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * When the flag %GNUTLS_X509_DN_FLAG_COMPAT is specified, the output
+ * format will match the format output by previous to 3.5.6 versions of GnuTLS
+ * which was not not fully RFC4514-compliant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.7
+ **/
+int
+gnutls_x509_dn_get_str2(gnutls_x509_dn_t dn, gnutls_datum_t *str, unsigned flags)
+{
+	if (dn == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn(dn->asn, "rdnSequence", str, flags);
 }

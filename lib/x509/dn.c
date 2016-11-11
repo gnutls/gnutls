@@ -33,21 +33,176 @@
  * Name (you need a parser just to read a name in the X.509 protocols!!!)
  */
 
-int
-_gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
-		    const char *asn1_rdn_name, gnutls_datum_t * dn)
+static int append_elements(ASN1_TYPE asn1_struct, const char *asn1_rdn_name, gnutls_buffer_st *str, int k1, unsigned last)
 {
-	gnutls_buffer_st out_str;
-	int k2, k1, result, max_k2;
+	int k2, result, max_k2;
+	int len;
+	uint8_t value[MAX_STRING_LEN];
 	char tmpbuffer1[ASN1_MAX_NAME_SIZE];
 	char tmpbuffer2[ASN1_MAX_NAME_SIZE];
 	char tmpbuffer3[ASN1_MAX_NAME_SIZE];
-	uint8_t value[MAX_STRING_LEN];
-	gnutls_datum_t td = { NULL, 0 }, tvd = {
-	NULL, 0};
 	const char *ldap_desc;
 	char oid[MAX_OID_SIZE];
-	int len;
+	gnutls_datum_t td = { NULL, 0 };
+	gnutls_datum_t tvd = { NULL, 0 };
+
+	/* create a string like "tbsCertList.issuer.rdnSequence.?1"
+	 */
+	if (asn1_rdn_name[0] != 0)
+		snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%u",
+			 asn1_rdn_name, k1);
+	else
+		snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%u",
+			 k1);
+
+	len = sizeof(value) - 1;
+	result =
+	    asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
+
+	if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS) { /* expected */
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	k2 = 0;
+
+	result = asn1_number_of_elements(asn1_struct, tmpbuffer1, &max_k2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	do {		/* Move to the attibute type and values
+				 */
+		k2++;
+
+		if (tmpbuffer1[0] != 0)
+			snprintf(tmpbuffer2, sizeof(tmpbuffer2),
+				 "%s.?%u", tmpbuffer1, k2);
+		else
+			snprintf(tmpbuffer2, sizeof(tmpbuffer2),
+				 "?%u", k2);
+
+		/* Try to read the RelativeDistinguishedName attributes.
+		 */
+
+		len = sizeof(value) - 1;
+		result =
+		    asn1_read_value(asn1_struct, tmpbuffer2, value,
+				    &len);
+
+		if (result == ASN1_ELEMENT_NOT_FOUND)
+			break;
+		if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS) { /* expected */
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		/* Read the OID 
+		 */
+		_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
+				tmpbuffer2);
+		_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3),
+				".type");
+
+		len = sizeof(oid) - 1;
+		result =
+		    asn1_read_value(asn1_struct, tmpbuffer3, oid,
+				    &len);
+
+		if (result == ASN1_ELEMENT_NOT_FOUND)
+			break;
+		else if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		/* Read the Value 
+		 */
+		_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
+				tmpbuffer2);
+		_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3),
+				".value");
+
+		len = 0;
+
+		result =
+		    _gnutls_x509_read_value(asn1_struct,
+					    tmpbuffer3, &tvd);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+#define STR_APPEND(y) if ((result=_gnutls_buffer_append_str( str, y)) < 0) { \
+	gnutls_assert(); \
+	goto cleanup; \
+}
+#define DATA_APPEND(x,y) if ((result=_gnutls_buffer_append_data( str, x,y)) < 0) { \
+	gnutls_assert(); \
+	goto cleanup; \
+}
+		/*   The encodings of adjoining RelativeDistinguishedNames are separated
+		 *   by a comma character (',' ASCII 44).
+		 */
+
+		ldap_desc =
+		    gnutls_x509_dn_oid_name(oid,
+					    GNUTLS_X509_DN_OID_RETURN_OID);
+
+		STR_APPEND(ldap_desc);
+		STR_APPEND("=");
+
+		result =
+		    _gnutls_x509_dn_to_string(oid, tvd.data,
+					      tvd.size, &td);
+		if (result < 0) {
+			gnutls_assert();
+			_gnutls_debug_log
+			    ("Cannot parse OID: '%s' with value '%s'\n",
+			     oid, _gnutls_bin2hex(tvd.data,
+						  tvd.size,
+						  tmpbuffer3,
+						  sizeof
+						  (tmpbuffer3),
+						  NULL));
+			goto cleanup;
+		}
+
+		DATA_APPEND(td.data, td.size);
+		_gnutls_free_datum(&td);
+		_gnutls_free_datum(&tvd);
+
+		/*   Where there is a multi-valued RDN, the outputs from adjoining
+		 *   AttributeTypeAndValues are separated by a plus ('+' ASCII 43)
+		 *   character.
+		 */
+		if (k2 < max_k2) {
+			STR_APPEND("+");
+		} else if (!last) {
+			STR_APPEND(",");
+		}
+	}
+	while (1);
+
+	result = 0;
+
+ cleanup:
+	_gnutls_free_datum(&td);
+	_gnutls_free_datum(&tvd);
+	return result;
+}
+
+int
+_gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
+		    const char *asn1_rdn_name, gnutls_datum_t * dn,
+		    unsigned flags)
+{
+	gnutls_buffer_st out_str;
+	int i, k1, result;
 
 	_gnutls_buffer_init(&out_str);
 
@@ -64,163 +219,29 @@ _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
 		goto cleanup;
 	}
 
-	while (k1 > 0) {
-		/* create a string like "tbsCertList.issuer.rdnSequence.?1"
-		 */
-		if (asn1_rdn_name[0] != 0)
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "%s.?%u",
-				 asn1_rdn_name, k1);
-		else
-			snprintf(tmpbuffer1, sizeof(tmpbuffer1), "?%u",
-				 k1);
-		k1--;
-
-		len = sizeof(value) - 1;
-		result =
-		    asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
-
-		if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS) { /* expected */
-			gnutls_assert();
-			result = _gnutls_asn2err(result);
-			goto cleanup;
-		}
-
-		k2 = 0;
-
-		result = asn1_number_of_elements(asn1_struct, tmpbuffer1, &max_k2);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			result = _gnutls_asn2err(result);
-			goto cleanup;
-		}
-
-		do {		/* Move to the attibute type and values
-				 */
-			k2++;
-
-			if (tmpbuffer1[0] != 0)
-				snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-					 "%s.?%u", tmpbuffer1, k2);
-			else
-				snprintf(tmpbuffer2, sizeof(tmpbuffer2),
-					 "?%u", k2);
-
-			/* Try to read the RelativeDistinguishedName attributes.
-			 */
-
-			len = sizeof(value) - 1;
-			result =
-			    asn1_read_value(asn1_struct, tmpbuffer2, value,
-					    &len);
-
-			if (result == ASN1_ELEMENT_NOT_FOUND)
-				break;
-			if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS) { /* expected */
-				gnutls_assert();
-				result = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			/* Read the OID 
-			 */
-			_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
-					tmpbuffer2);
-			_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3),
-					".type");
-
-			len = sizeof(oid) - 1;
-			result =
-			    asn1_read_value(asn1_struct, tmpbuffer3, oid,
-					    &len);
-
-			if (result == ASN1_ELEMENT_NOT_FOUND)
-				break;
-			else if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				result = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			/* Read the Value 
-			 */
-			_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
-					tmpbuffer2);
-			_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3),
-					".value");
-
-			len = 0;
-
-			result =
-			    _gnutls_x509_read_value(asn1_struct,
-						    tmpbuffer3, &tvd);
+	if (flags & GNUTLS_X509_DN_FLAG_COMPAT) {
+		for (i=0;i<k1;i++) {
+			result = append_elements(asn1_struct, asn1_rdn_name, &out_str, i+1, (i==(k1-1))?1:0);
 			if (result < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
-#define STR_APPEND(y) if ((result=_gnutls_buffer_append_str( &out_str, y)) < 0) { \
-	gnutls_assert(); \
-	goto cleanup; \
-}
-#define DATA_APPEND(x,y) if ((result=_gnutls_buffer_append_data( &out_str, x,y)) < 0) { \
-	gnutls_assert(); \
-	goto cleanup; \
-}
-			/*   The encodings of adjoining RelativeDistinguishedNames are separated
-			 *   by a comma character (',' ASCII 44).
-			 */
-
-			ldap_desc =
-			    gnutls_x509_dn_oid_name(oid,
-						    GNUTLS_X509_DN_OID_RETURN_OID);
-
-			STR_APPEND(ldap_desc);
-			STR_APPEND("=");
-
-			result =
-			    _gnutls_x509_dn_to_string(oid, tvd.data,
-						      tvd.size, &td);
+		}
+	} else {
+		while (k1 > 0) {
+			result = append_elements(asn1_struct, asn1_rdn_name, &out_str, k1, k1==1?1:0);
 			if (result < 0) {
 				gnutls_assert();
-				_gnutls_debug_log
-				    ("Cannot parse OID: '%s' with value '%s'\n",
-				     oid, _gnutls_bin2hex(tvd.data,
-							  tvd.size,
-							  tmpbuffer3,
-							  sizeof
-							  (tmpbuffer3),
-							  NULL));
 				goto cleanup;
 			}
-
-			DATA_APPEND(td.data, td.size);
-			_gnutls_free_datum(&td);
-			_gnutls_free_datum(&tvd);
-
-			/*   Where there is a multi-valued RDN, the outputs from adjoining
-			 *   AttributeTypeAndValues are separated by a plus ('+' ASCII 43)
-			 *   character.
-			 */
-			if (k2 < max_k2) {
-				STR_APPEND("+");
-			} else if (k1 > 0) {
-				STR_APPEND(",");
-			}
-
+			k1--;
 		}
-		while (1);
 	}
 
-	result = _gnutls_buffer_to_datum(&out_str, dn, 1);
-	if (result < 0)
-		gnutls_assert();
+	return _gnutls_buffer_to_datum(&out_str, dn, 1);
 
-	goto cleanup1;
-
-      cleanup:
+ cleanup:
 	_gnutls_buffer_clear(&out_str);
-      cleanup1:
-	_gnutls_free_datum(&td);
-	_gnutls_free_datum(&tvd);
 	return result;
 
 }
@@ -235,7 +256,7 @@ _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
 int
 _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		      const char *asn1_rdn_name, char *buf,
-		      size_t * buf_size)
+		      size_t * buf_size, unsigned flags)
 {
 	int ret;
 	gnutls_datum_t dn = {NULL, 0};
@@ -250,7 +271,7 @@ _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	else
 		*buf_size = 0;
 
-	ret = _gnutls_x509_get_dn(asn1_struct, asn1_rdn_name, &dn);
+	ret = _gnutls_x509_get_dn(asn1_struct, asn1_rdn_name, &dn, flags);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -760,6 +781,9 @@ _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
  * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
  * RFC4514.
  *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_rdn_get2().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
  * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@buf_size is
  * updated if the provided buffer is not long enough, otherwise a
@@ -796,7 +820,56 @@ gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_parse_dn(dn, "rdnSequence", buf, buf_size);
+	result = _gnutls_x509_parse_dn(dn, "rdnSequence", buf, buf_size, GNUTLS_X509_DN_FLAG_COMPAT);
+
+	asn1_delete_structure(&dn);
+	return result;
+
+}
+
+/**
+ * gnutls_x509_rdn_get2:
+ * @idn: should contain a DER encoded RDN sequence
+ * @buf: a pointer to a structure to hold the peer's name
+ * @buf_size: holds the size of @buf
+ * @flags: 
+ *
+ * This function will return the name of the given RDN sequence.  The
+ * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
+ * RFC4514.
+ *
+ * When the flag %GNUTLS_X509_DN_FLAG_COMPAT is specified, the output
+ * format will match the format output by previous to 3.5.6 versions of GnuTLS
+ * which was not not fully RFC4514-compliant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@buf_size is
+ * updated if the provided buffer is not long enough, otherwise a
+ * negative error value.
+ **/
+int
+gnutls_x509_rdn_get2(const gnutls_datum_t * idn,
+		     gnutls_datum_t *str, unsigned flags)
+{
+	int result;
+	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+				 "PKIX1.Name", &dn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_get_dn(dn, "rdnSequence", str, flags);
 
 	asn1_delete_structure(&dn);
 	return result;

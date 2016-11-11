@@ -171,6 +171,8 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert,
 				  char *buf, size_t * buf_size);
 int gnutls_x509_crt_get_issuer_dn2(gnutls_x509_crt_t cert,
 				   gnutls_datum_t * dn);
+int gnutls_x509_crt_get_issuer_dn3(gnutls_x509_crt_t cert,
+				   gnutls_datum_t * dn, unsigned flags);
 int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
 				      unsigned indx, void *oid,
 				      size_t * oid_size);
@@ -178,9 +180,12 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
 					 const char *oid, unsigned indx,
 					 unsigned int raw_flag,
 					 void *buf, size_t * buf_size);
+
 int gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
 			   size_t * buf_size);
 int gnutls_x509_crt_get_dn2(gnutls_x509_crt_t cert, gnutls_datum_t * dn);
+int gnutls_x509_crt_get_dn3(gnutls_x509_crt_t cert, gnutls_datum_t * dn, unsigned flags);
+
 int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt_t cert, unsigned indx,
 			       void *oid, size_t * oid_size);
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert,
@@ -663,6 +668,10 @@ int gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert,
  */
 int gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 			char *buf, size_t * sizeof_buf);
+int
+gnutls_x509_rdn_get2(const gnutls_datum_t * idn,
+                     gnutls_datum_t *str, unsigned flags);
+
 int gnutls_x509_rdn_get_oid(const gnutls_datum_t * idn,
 			    unsigned indx, void *buf, size_t * sizeof_buf);
 
@@ -687,6 +696,10 @@ int gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn, int irdn,
 			       int iava, gnutls_x509_ava_st * ava);
 
 int gnutls_x509_dn_get_str(gnutls_x509_dn_t dn, gnutls_datum_t *str);
+
+#define GNUTLS_X509_DN_FLAG_COMPAT 1
+int gnutls_x509_dn_get_str2(gnutls_x509_dn_t dn, gnutls_datum_t *str, unsigned flags);
+
 int
 gnutls_x509_dn_set_str(gnutls_x509_dn_t dn, const char *str, const char **err);
 
@@ -728,6 +741,9 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl_t crl,
 				  char *buf, size_t * sizeof_buf);
 int gnutls_x509_crl_get_issuer_dn2(gnutls_x509_crl_t crl,
 				   gnutls_datum_t * dn);
+int gnutls_x509_crl_get_issuer_dn3(gnutls_x509_crl_t crl,
+				   gnutls_datum_t * dn, unsigned flags);
+
 int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl_t crl,
 					 const char *oid, unsigned indx,
 					 unsigned int raw_flag,
@@ -1231,6 +1247,7 @@ int gnutls_x509_crq_get_private_key_usage_period(gnutls_x509_crq_t
 int gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf,
 			   size_t * sizeof_buf);
 int gnutls_x509_crq_get_dn2(gnutls_x509_crq_t crq, gnutls_datum_t * dn);
+int gnutls_x509_crq_get_dn3(gnutls_x509_crq_t crq, gnutls_datum_t * dn, unsigned flags);
 int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq_t crq, unsigned indx,
 			       void *oid, size_t * sizeof_oid);
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq_t crq,

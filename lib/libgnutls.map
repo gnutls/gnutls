@@ -1124,6 +1124,13 @@ GNUTLS_3_4
 	gnutls_anon_set_server_known_dh_params;
 	gnutls_psk_set_server_known_dh_params;
 	gnutls_x509_crt_check_key_purpose;
+	gnutls_ocsp_resp_get_responder2;
+	gnutls_x509_crt_get_issuer_dn3;
+	gnutls_x509_crt_get_dn3;
+	gnutls_x509_rdn_get2;
+	gnutls_x509_dn_get_str2;
+	gnutls_x509_crl_get_issuer_dn3;
+	gnutls_x509_crq_get_dn3;
  local:
 	*;
 };

@@ -482,6 +482,9 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
  *
  * If @buf is null then only the size will be filled. 
  *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crt_get_issuer_dn3().
+ *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated
  *   with the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if
@@ -498,7 +501,7 @@ gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
 
 	return _gnutls_x509_parse_dn(cert->cert,
 				     "tbsCertificate.issuer.rdnSequence",
-				     buf, buf_size);
+				     buf, buf_size, GNUTLS_X509_DN_FLAG_COMPAT);
 }
 
 /**
@@ -510,6 +513,9 @@ gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
  * described in RFC4514. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
+ *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crt_get_issuer_dn3().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -526,7 +532,40 @@ gnutls_x509_crt_get_issuer_dn2(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 
 	return _gnutls_x509_get_dn(cert->cert,
 				   "tbsCertificate.issuer.rdnSequence",
-				   dn);
+				   dn, GNUTLS_X509_DN_FLAG_COMPAT);
+}
+
+/**
+ * gnutls_x509_crt_get_issuer_dn3:
+ * @cert: should contain a #gnutls_x509_crt_t type
+ * @dn: a pointer to a structure to hold the name
+ * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
+ *
+ * This function will allocate buffer and copy the name of issuer of the Certificate.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * When the flag %GNUTLS_X509_DN_FLAG_COMPAT is specified, the output
+ * format will match the format output by previous to 3.5.6 versions of GnuTLS
+ * which was not not fully RFC4514-compliant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.7
+ **/
+int
+gnutls_x509_crt_get_issuer_dn3(gnutls_x509_crt_t cert, gnutls_datum_t *dn, unsigned flags)
+{
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn(cert->cert,
+				   "tbsCertificate.issuer.rdnSequence",
+				   dn, flags);
 }
 
 /**
@@ -627,6 +666,9 @@ gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
  *
  * If @buf is null then only the size will be filled. 
  *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crt_get_dn3().
+ *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated
  *   with the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if
@@ -643,7 +685,7 @@ gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
 
 	return _gnutls_x509_parse_dn(cert->cert,
 				     "tbsCertificate.subject.rdnSequence",
-				     buf, buf_size);
+				     buf, buf_size, GNUTLS_X509_DN_FLAG_COMPAT);
 }
 
 /**
@@ -655,6 +697,9 @@ gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
  * described in RFC4514. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
+ *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crt_get_dn3().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -670,7 +715,39 @@ int gnutls_x509_crt_get_dn2(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 
 	return _gnutls_x509_get_dn(cert->cert,
 				   "tbsCertificate.subject.rdnSequence",
-				   dn);
+				   dn, GNUTLS_X509_DN_FLAG_COMPAT);
+}
+
+/**
+ * gnutls_x509_crt_get_dn3:
+ * @cert: should contain a #gnutls_x509_crt_t type
+ * @dn: a pointer to a structure to hold the name
+ * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
+ *
+ * This function will allocate buffer and copy the name of the Certificate.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * When the flag %GNUTLS_X509_DN_FLAG_COMPAT is specified, the output
+ * format will match the format output by previous to 3.5.6 versions of GnuTLS
+ * which was not not fully RFC4514-compliant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.7
+ **/
+int gnutls_x509_crt_get_dn3(gnutls_x509_crt_t cert, gnutls_datum_t *dn, unsigned flags)
+{
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn(cert->cert,
+				   "tbsCertificate.subject.rdnSequence",
+				   dn, flags);
 }
 
 /**
@@ -1461,7 +1538,7 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 		}
 	} else if (type == GNUTLS_SAN_DN) {
 		_gnutls_str_cat(nptr, sizeof(nptr), ".directoryName");
-		ret = _gnutls_x509_get_dn(src, nptr, dname);
+		ret = _gnutls_x509_get_dn(src, nptr, dname, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

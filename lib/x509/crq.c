@@ -255,6 +255,9 @@ gnutls_x509_crq_get_private_key_usage_period(gnutls_x509_crq_t crq,
  * @buf will be ASCII or UTF-8 encoded, depending on the certificate
  * data.
  *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crq_get_dn3().
+ *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the *@buf_size will be updated with
  *   the required size.  On success 0 is returned.
@@ -269,7 +272,7 @@ gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf, size_t * buf_size)
 
 	return _gnutls_x509_parse_dn(crq->crq,
 				     "certificationRequestInfo.subject.rdnSequence",
-				     buf, buf_size);
+				     buf, buf_size, GNUTLS_X509_DN_FLAG_COMPAT);
 }
 
 /**
@@ -281,6 +284,9 @@ gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf, size_t * buf_size)
  * request. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
  * described in RFC4514. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
+ *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crq_get_dn3().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. and a negative error code on error.
@@ -296,7 +302,39 @@ int gnutls_x509_crq_get_dn2(gnutls_x509_crq_t crq, gnutls_datum_t * dn)
 
 	return _gnutls_x509_get_dn(crq->crq,
 				   "certificationRequestInfo.subject.rdnSequence",
-				   dn);
+				   dn, GNUTLS_X509_DN_FLAG_COMPAT);
+}
+
+/**
+ * gnutls_x509_crq_get_dn3:
+ * @crq: should contain a #gnutls_x509_crq_t type
+ * @dn: a pointer to a structure to hold the name
+ * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
+ *
+ * This function will allocate buffer and copy the name of the Certificate 
+ * request. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * When the flag %GNUTLS_X509_DN_FLAG_COMPAT is specified, the output
+ * format will match the format output by previous to 3.5.6 versions of GnuTLS
+ * which was not not fully RFC4514-compliant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
+ *
+ * Since: 3.5.7
+ **/
+int gnutls_x509_crq_get_dn3(gnutls_x509_crq_t crq, gnutls_datum_t * dn, unsigned flags)
+{
+	if (crq == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn(crq->crq,
+				   "certificationRequestInfo.subject.rdnSequence",
+				   dn, flags);
 }
 
 /**

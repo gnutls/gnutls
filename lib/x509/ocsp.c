@@ -1103,16 +1103,58 @@ int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp)
  * The caller needs to deallocate memory by calling gnutls_free() on
  * @dn->data.
  *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_ocsp_resp_get_responder2().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error code is returned.
+ *   negative error code is returned. When no data exist it will
+ *   return success and set @dn elements to zero.
  **/
 int
 gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 			       gnutls_datum_t * dn)
 {
 	int ret;
-	size_t l = 0;
 
+	ret = gnutls_ocsp_resp_get_responder2(resp, dn, GNUTLS_X509_DN_FLAG_COMPAT);
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		dn->data = NULL;
+		dn->size = 0;
+		return 0; /* for backwards compatibility */
+	}
+
+	return ret;
+}
+
+/**
+ * gnutls_ocsp_resp_get_responder2:
+ * @resp: should contain a #gnutls_ocsp_resp_t type
+ * @dn: newly allocated buffer with name
+ * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
+ *
+ * This function will extract the name of the Basic OCSP Response in
+ * the provided buffer. The name will be in the form
+ * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
+ * will be ASCII or UTF-8 encoded, depending on the certificate data.
+ *
+ * If the responder ID is not a name but a hash, this function
+ * will return zero and the @dn elements will be set to %NULL.
+ *
+ * The caller needs to deallocate memory by calling gnutls_free() on
+ * @dn->data.
+ *
+ * When the flag %GNUTLS_X509_DN_FLAG_COMPAT is specified, the output
+ * format will match the format output by previous to 3.5.6 versions of GnuTLS
+ * which was not not fully RFC4514-compliant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code is returned. When no data exist it will return
+ *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+ **/
+int
+gnutls_ocsp_resp_get_responder2(gnutls_ocsp_resp_t resp,
+			        gnutls_datum_t * dn, unsigned flags)
+{
 	if (resp == NULL || dn == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -1121,33 +1163,9 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 	dn->data = NULL;
 	dn->size = 0;
 
-	ret = _gnutls_x509_parse_dn
-	    (resp->basicresp, "tbsResponseData.responderID.byName",
-	     NULL, &l);
-	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-			return 0; /* for backwards compatibility */
-		gnutls_assert();
-		return ret;
-	}
-
-	dn->data = gnutls_malloc(l);
-	if (dn->data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	ret = _gnutls_x509_parse_dn
-	    (resp->basicresp, "tbsResponseData.responderID.byName",
-	     (char *) dn->data, &l);
-	if (ret != GNUTLS_E_SUCCESS) {
-		gnutls_assert();
-		return ret;
-	}
-
-	dn->size = l;
-
-	return GNUTLS_E_SUCCESS;
+	return _gnutls_x509_get_dn(resp->basicresp,
+				  "tbsResponseData.responderID.byName",
+				  dn, flags);
 }
 
 /**

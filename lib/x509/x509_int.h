@@ -165,11 +165,13 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 
 int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			  const char *asn1_rdn_name, char *buf,
-			  size_t * sizeof_buf);
+			  size_t * sizeof_buf,
+			  unsigned flags);
 
 int
 _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
-		    const char *asn1_rdn_name, gnutls_datum_t * dn);
+		    const char *asn1_rdn_name, gnutls_datum_t * dn,
+		    unsigned flags);
 
 int
 _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,

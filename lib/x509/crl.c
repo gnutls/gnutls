@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -194,6 +195,9 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
  *
  * If buf is %NULL then only the size will be filled.
  *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crl_get_issuer_dn3().
+ *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
  * not long enough, and in that case the sizeof_buf will be updated
  * with the required size, and 0 on success.
@@ -210,7 +214,7 @@ gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl_t crl, char *buf,
 
 	return _gnutls_x509_parse_dn(crl->crl,
 				     "tbsCertList.issuer.rdnSequence",
-				     buf, sizeof_buf);
+				     buf, sizeof_buf, GNUTLS_X509_DN_FLAG_COMPAT);
 }
 
 /**
@@ -303,6 +307,9 @@ gnutls_x509_crl_get_dn_oid(gnutls_x509_crl_t crl,
  * described in RFC4514. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
  *
+ * This function does not output a fully RFC4514 compliant string, if
+ * that is required see gnutls_x509_crl_get_issuer_dn3().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -317,7 +324,41 @@ gnutls_x509_crl_get_issuer_dn2(gnutls_x509_crl_t crl, gnutls_datum_t * dn)
 	}
 
 	return _gnutls_x509_get_dn(crl->crl,
-				   "tbsCertList.issuer.rdnSequence", dn);
+				   "tbsCertList.issuer.rdnSequence",
+				   dn, GNUTLS_X509_DN_FLAG_COMPAT);
+}
+
+/**
+ * gnutls_x509_crl_get_issuer_dn3:
+ * @crl: should contain a #gnutls_x509_crl_t type
+ * @dn: a pointer to a structure to hold the name
+ * @flags: zero or %GNUTLS_X509_DN_FLAG_COMPAT
+ *
+ * This function will allocate buffer and copy the name of the CRL issuer.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * When the flag %GNUTLS_X509_DN_FLAG_COMPAT is specified, the output
+ * format will match the format output by previous to 3.5.6 versions of GnuTLS
+ * which was not not fully RFC4514-compliant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.7
+ **/
+int
+gnutls_x509_crl_get_issuer_dn3(gnutls_x509_crl_t crl, gnutls_datum_t * dn, unsigned flags)
+{
+	if (crl == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn(crl->crl,
+				   "tbsCertList.issuer.rdnSequence",
+				   dn, flags);
 }
 
 /**
