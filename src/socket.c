@@ -475,10 +475,12 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 			hd->app_proto = NULL;
 		}
 
-		hd->session = init_tls_session(hostname);
-		if (hd->session == NULL && !(flags & SOCKET_FLAG_RAW)) {
-			fprintf(stderr, "error initializing session\n");
-			exit(1);
+		if (!(flags & SOCKET_FLAG_SKIP_INIT)) {
+			hd->session = init_tls_session(hostname);
+			if (hd->session == NULL) {
+				fprintf(stderr, "error initializing session\n");
+				exit(1);
+			}
 		}
 
 		if (hd->session) {
@@ -489,7 +491,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 			gnutls_transport_set_int(hd->session, sd);
 		}
 
-		if (!(flags & SOCKET_FLAG_RAW)) {
+		if (!(flags & SOCKET_FLAG_RAW) && !(flags & SOCKET_FLAG_SKIP_INIT)) {
 			err = do_handshake(hd);
 			if (err == GNUTLS_E_PUSH_ERROR) { /* failed connecting */
 				gnutls_deinit(hd->session);
@@ -517,7 +519,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 		exit(1);
 	}
 
-	if (flags & SOCKET_FLAG_RAW)
+	if ((flags & SOCKET_FLAG_RAW) || (flags & SOCKET_FLAG_SKIP_INIT))
 		hd->secure = 0;
 	else
 		hd->secure = 1;
