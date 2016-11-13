@@ -19,7 +19,7 @@
  */
 
 typedef enum {
-	TEST_SUCCEED, TEST_FAILED, TEST_UNSURE, TEST_IGNORE
+	TEST_SUCCEED, TEST_FAILED, TEST_UNSURE, TEST_IGNORE/*keep socket*/, TEST_IGNORE2/*destroy socket*/
 } test_code_t;
 
 test_code_t test_chain_order(gnutls_session_t session);

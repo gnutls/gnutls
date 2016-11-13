@@ -296,7 +296,7 @@ test_code_t test_rfc7507(gnutls_session_t session)
 
 	ret = do_handshake(session);
 	if (ret < 0)
-		return TEST_IGNORE;
+		return TEST_IGNORE2;
 
 	if (handshake_output < 0)
 		return TEST_SUCCEED;
@@ -1354,12 +1354,12 @@ test_code_t test_chain_order(gnutls_session_t session)
 		return ret;
 
 	if (gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
-		return TEST_IGNORE;
+		return TEST_IGNORE2;
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 	if (cert_list_size == 0) {
 		ext_text = "No certificates found!";
-		return TEST_IGNORE;
+		return TEST_IGNORE2;
 	}
 
 	if (cert_list_size == 1)

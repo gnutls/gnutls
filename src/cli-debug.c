@@ -285,7 +285,7 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		socket_open(&hd, hostname, portname, app_proto, SOCKET_FLAG_STARTTLS, NULL, NULL);
+		socket_open(&hd, hostname, portname, app_proto, SOCKET_FLAG_STARTTLS|SOCKET_FLAG_RAW, NULL, NULL);
 		hd.verbose = verbose;
 
 		do {
@@ -296,7 +296,7 @@ int main(int argc, char **argv)
 
 			ret = tls_tests[i].func(hd.session);
 
-			if (ret != TEST_IGNORE) {
+			if (ret != TEST_IGNORE && ret != TEST_IGNORE2) {
 				printf("%58s...", tls_tests[i].test_name);
 				fflush(stdout);
 			}
