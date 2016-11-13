@@ -321,7 +321,8 @@ const char *starttls_proto_to_service(const char *app_proto)
 void socket_bye(socket_st * socket, unsigned polite)
 {
 	int ret;
-	if (socket->secure) {
+
+	if (socket->secure && socket->session) {
 		if (polite) {
 			do
 				ret = gnutls_bye(socket->session, GNUTLS_SHUT_WR);
