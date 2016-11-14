@@ -1008,6 +1008,8 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	int key_size;
 	unsigned int pass_len = 0;
 	const struct pkcs_cipher_schema_st *p;
+	unsigned block_size;
+	const cipher_entry_st *ce;
 
 	if (password)
 		pass_len = strlen(password);
@@ -1073,6 +1075,15 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 		goto error;
 	}
 
+	ce = cipher_to_entry(enc_params->cipher);
+	block_size = _gnutls_cipher_get_block_size(ce);
+
+	if (ce->type == CIPHER_BLOCK && (enc.size % block_size != 0)) {
+		gnutls_assert();
+		result = GNUTLS_E_ILLEGAL_PARAMETER;
+		goto error;
+	}
+
 	/* do the decryption.
 	 */
 	dkey.data = key;
@@ -1081,8 +1092,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	d_iv.data = (uint8_t *) enc_params->iv;
 	d_iv.size = enc_params->iv_size;
 	result =
-	    _gnutls_cipher_init(&ch, cipher_to_entry(enc_params->cipher),
-				&dkey, &d_iv, 0);
+	    _gnutls_cipher_init(&ch, ce, &dkey, &d_iv, 0);
 
 	gnutls_free(key);
 	key = NULL;
@@ -1102,7 +1112,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	decrypted_data->data = enc.data;
 
-	if (gnutls_cipher_get_block_size(enc_params->cipher) != 1)
+	if (block_size != 1)
 		decrypted_data->size = enc.size - enc.data[enc.size - 1];
 	else
 		decrypted_data->size = enc.size;
