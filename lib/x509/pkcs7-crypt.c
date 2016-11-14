@@ -647,6 +647,11 @@ read_pbkdf2_params(ASN1_TYPE pasn,
 	}
 	_gnutls_hard_log("salt.specified.size: %d\n", params->salt_size);
 
+	if (params->salt_size < 0) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	/* read the iteration count 
 	 */
 	result =
@@ -656,6 +661,12 @@ read_pbkdf2_params(ASN1_TYPE pasn,
 		gnutls_assert();
 		goto error;
 	}
+
+	if (params->iter_count >= INT_MAX || params->iter_count == 0) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
 
 	/* read the keylength, if it is set.
@@ -665,6 +676,12 @@ read_pbkdf2_params(ASN1_TYPE pasn,
 	if (result < 0) {
 		params->key_size = 0;
 	}
+
+	if (params->key_size > MAX_CIPHER_KEY_SIZE) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	_gnutls_hard_log("keyLength: %d\n", params->key_size);
 
 	len = sizeof(oid);
@@ -705,28 +722,29 @@ static int read_pkcs12_kdf_params(ASN1_TYPE pasn, struct pbkdf2_params *params)
 	    asn1_read_value(pasn, "salt", params->salt, &params->salt_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
+		return _gnutls_asn2err(result);
 	}
+
+	if (params->salt_size < 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
 	_gnutls_hard_log("salt.size: %d\n", params->salt_size);
 
 	/* read the iteration count 
 	 */
 	result =
 	    _gnutls_x509_read_uint(pasn, "iterations", &params->iter_count);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
+	if (result < 0)
+		return gnutls_assert_val(result);
+
+	if (params->iter_count >= INT_MAX || params->iter_count == 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
 
 	params->key_size = 0;
 
 	return 0;
-
- error:
-	return result;
-
 }
 
 /* Writes the PBE parameters for PKCS-12 schemas.

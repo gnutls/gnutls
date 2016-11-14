@@ -116,8 +116,8 @@ typedef struct gnutls_pkcs7_int {
 struct pbkdf2_params {
 	uint8_t salt[32];
 	int salt_size;
-	unsigned int iter_count;
-	unsigned int key_size;
+	unsigned iter_count;
+	unsigned key_size;
 	gnutls_mac_algorithm_t mac;
 };
 
