@@ -1053,9 +1053,11 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 					   kdf_params->iter_count,
 					   kdf_params->salt_size,
 					   kdf_params->salt, key_size, key);
-		else
-			return
+		else {
+			result =
 			    gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+			goto error;
+		}
 	} else if (p != NULL) {	/* PKCS 12 schema */
 		result =
 		    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
