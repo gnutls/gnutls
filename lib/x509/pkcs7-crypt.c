@@ -1114,9 +1114,15 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	decrypted_data->data = enc.data;
 
-	if (block_size != 1)
+	if (block_size != 1) {
+		if (enc.data[enc.size - 1] >= enc.size) {
+			gnutls_assert();
+			result = GNUTLS_E_ILLEGAL_PARAMETER;
+			goto error;
+		}
+
 		decrypted_data->size = enc.size - enc.data[enc.size - 1];
-	else
+	} else
 		decrypted_data->size = enc.size;
 
 	_gnutls_cipher_deinit(&ch);
