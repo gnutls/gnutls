@@ -13,6 +13,9 @@ See the end for copying conditions.
 ** libgnutls: Require libtasn1 4.9; this ensures gnutls will correctly
    operate with OIDs which have elements that exceed 2^32.
 
+** p11tool: Introduced the --initialize-pin and --initialize-so-pin
+   options.
+
 ** API and ABI modifications:
 No changes since last version.
 
