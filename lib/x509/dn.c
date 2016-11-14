@@ -208,8 +208,12 @@ _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
 
 	result = asn1_number_of_elements(asn1_struct, asn1_rdn_name, &k1);
 	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
+		if (result == ASN1_ELEMENT_NOT_FOUND || result == ASN1_VALUE_NOT_FOUND) {
+			result = gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		} else {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+		}
 		goto cleanup;
 	}
 
