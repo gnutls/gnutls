@@ -20,10 +20,19 @@ See the end for copying conditions.
    output the strict format by default, and can revert to the old one using
    a flag.
 
+** libgnutls: In all functions accepting UTF-8 passwords, ensure that
+   passwords are normalized according to RFC7613. When invalid UTF-8
+   passwords are detected, they are only tolerated for decryption.
+   This introduces a libunistring dependency on GnuTLS. A version of
+   libunistring is included in the library for the platforms that do
+   not ship it; it can be used with the '--with-included-unistring'
+   option to configure script.
+
 ** p11tool: Introduced the --initialize-pin and --initialize-so-pin
    options.
 
 ** API and ABI modifications:
+gnutls_utf8_password_normalize: Added
 gnutls_ocsp_resp_get_responder2: Added
 gnutls_x509_crt_get_issuer_dn3: Added
 gnutls_x509_crt_get_dn3: Added
