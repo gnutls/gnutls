@@ -1114,16 +1114,28 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	decrypted_data->data = enc.data;
 
-	if (block_size != 1) {
-		if (enc.data[enc.size - 1] >= enc.size) {
+	if (ce->type == CIPHER_BLOCK && block_size != 1) {
+		unsigned pslen = (uint8_t)enc.data[enc.size - 1];
+		unsigned i;
+
+		if (pslen > block_size || pslen >= enc.size  || pslen == 0) {
 			gnutls_assert();
 			result = GNUTLS_E_ILLEGAL_PARAMETER;
 			goto error;
 		}
 
-		decrypted_data->size = enc.size - enc.data[enc.size - 1];
-	} else
+		/* verify padding according to rfc2898 */
+		decrypted_data->size = enc.size - pslen;
+		for (i=0;i<pslen;i++) {
+			if (enc.data[enc.size-1-i] != pslen) {
+				gnutls_assert();
+				result = GNUTLS_E_ILLEGAL_PARAMETER;
+				goto error;
+			}
+		}
+	} else {
 		decrypted_data->size = enc.size;
+	}
 
 	_gnutls_cipher_deinit(&ch);
 
