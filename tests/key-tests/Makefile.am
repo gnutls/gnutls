@@ -26,7 +26,7 @@ EXTRA_DIST = README key-ca.pem key-user.pem \
 
 dist_check_SCRIPTS = key-id pkcs8
 
-TESTS = key-id pkcs8
+TESTS = key-id pkcs8 pkcs8-invalid
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
