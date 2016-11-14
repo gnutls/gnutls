@@ -27,12 +27,11 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lock-tests --avoid=lseek-tests --lgpl=2 --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files --lgpl=2 alloca byteswap c-ctype extensions func gendocs getline gettext-h gettimeofday hash-pjw-bare havelib iconv intprops lib-msvc-compat lib-symbol-versions maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in pmccabe2html read-file secure_getenv snprintf stdint strcase strndup strtok_r strverscmp sys_socket sys_stat time_r unistd valgrind-tests vasprintf vsnprintf warnings
+#   gnulib-tool --import --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lock-tests --avoid=lseek-tests --lgpl=2 --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files alloca byteswap c-ctype extensions func gendocs getline gettext-h gettimeofday hash-pjw-bare havelib iconv intprops lib-msvc-compat lib-symbol-versions maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in pmccabe2html read-file secure_getenv snprintf stdint strcase strndup strtok_r strverscmp sys_socket sys_stat time_r unistd valgrind-tests vasprintf vsnprintf warnings
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
 gl_MODULES([
-  --lgpl=2
   alloca
   byteswap
   c-ctype
