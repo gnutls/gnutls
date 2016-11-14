@@ -117,12 +117,31 @@ void doit(void)
 	if (ret < 0)
 		fail("get_subject %d\n", ret);
 
+	/* test the original function behavior */
 	ret = gnutls_x509_dn_get_str(xdn, &strdn);
 	if (ret < 0)
 		fail("gnutls_x509_dn_get_str %d\n", ret);
 
-	if (strdn.size != 44 || strcmp((char*)strdn.data, "EMAIL=simon@josefsson.org,CN=CAcert WoT User") != 0) {
+	if (strdn.size != 44 || strcmp((char*)strdn.data, "CN=CAcert WoT User,EMAIL=simon@josefsson.org") != 0) {
 		fail("gnutls_x509_dn_get_str string comparison failed: '%s'/%d\n", strdn.data, strdn.size);
+	}
+	gnutls_free(strdn.data);
+
+	/* test the new function behavior */
+	ret = gnutls_x509_dn_get_str2(xdn, &strdn, 0);
+	if (ret < 0)
+		fail("gnutls_x509_dn_get_str2 %d\n", ret);
+	if (strdn.size != 44 || strcmp((char*)strdn.data, "EMAIL=simon@josefsson.org,CN=CAcert WoT User") != 0) {
+		fail("gnutls_x509_dn_get_str2 string comparison failed: '%s'/%d\n", strdn.data, strdn.size);
+	}
+	gnutls_free(strdn.data);
+
+	/* test the new/compat function behavior */
+	ret = gnutls_x509_dn_get_str2(xdn, &strdn, GNUTLS_X509_DN_FLAG_COMPAT);
+	if (ret < 0)
+		fail("gnutls_x509_dn_get_str2 %d\n", ret);
+	if (strdn.size != 44 || strcmp((char*)strdn.data, "CN=CAcert WoT User,EMAIL=simon@josefsson.org") != 0) {
+		fail("gnutls_x509_dn_get_str2 string comparison failed: '%s'/%d\n", strdn.data, strdn.size);
 	}
 	gnutls_free(strdn.data);
 
