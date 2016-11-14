@@ -52,7 +52,7 @@ static void print_dn(gnutls_buffer_st * str, const char *prefix,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_dn_get_str(dn, &output);
+	ret = gnutls_x509_dn_get_str2(dn, &output, 0);
 	if (ret < 0) {
 		addf(str, "%s: [error]\n", prefix);
 		goto cleanup;
