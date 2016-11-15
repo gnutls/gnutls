@@ -146,6 +146,18 @@ mingw32-make
 mingw32-make check
 ```
 
+# Continuous Integration (CI)
+
+We utilize two continuous integration systems, the gitlab-ci and travis.
+Gitlab-CI is used to test most of the Linux systems (see .gitlab-ci.yml),
+and is split in two phases, build image creation and compilation/test. The
+build image creation is done at the gnutls/build-images subproject and
+uploads the image at the gitlab.com container registry. The compilation/test
+phase is on every commit to gnutls project.
+
+The Travis based CI, is used to test compilation on MacOSX based systems.
+
+
 # Contributing
 
 If you wish to contribute, you may read more about our [coding style](CONTRIBUTING.md).
