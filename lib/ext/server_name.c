@@ -240,6 +240,8 @@ _gnutls_server_name_send_params(gnutls_session_t session,
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 
+				_gnutls_debug_log("HSK[%p]: sent server name: '%s'\n", session, priv->server_names[i].name);
+
 				ret =
 				    _gnutls_buffer_append_data_prefix
 				    (extdata, 16,
