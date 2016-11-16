@@ -131,7 +131,8 @@ static
 int subject_alt_names_set(struct name_st **names,
 			  unsigned int *size,
 			  unsigned int san_type,
-			  gnutls_datum_t * san, char *othername_oid)
+			  gnutls_datum_t * san, char *othername_oid,
+			  unsigned raw)
 {
 	void *tmp;
 	int ret;
@@ -142,7 +143,7 @@ int subject_alt_names_set(struct name_st **names,
 	}
 	*names = tmp;
 
-	ret = _gnutls_alt_name_assign_virt_type(&(*names)[*size], san_type, san, othername_oid);
+	ret = _gnutls_alt_name_assign_virt_type(&(*names)[*size], san_type, san, othername_oid, raw);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -159,6 +160,9 @@ int subject_alt_names_set(struct name_st **names,
  *
  * This function will store the specified alternative name in
  * the @sans.
+ *
+ * Since version 3.5.7 the %GNUTLS_SAN_RFC822NAME, %GNUTLS_SAN_DNSNAME, and
+ * %GNUTLS_SAN_OTHERNAME_XMPP are converted to ACE format when necessary.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0), otherwise a negative error value.
  *
@@ -182,7 +186,7 @@ int gnutls_subject_alt_names_set(gnutls_subject_alt_names_t sans,
 	else
 		ooc = NULL;
 	ret = subject_alt_names_set(&sans->names, &sans->size,
-				    san_type, &copy, ooc);
+				    san_type, &copy, ooc, 0);
 	if (ret < 0) {
 		gnutls_free(copy.data);
 		return gnutls_assert_val(ret);
@@ -257,7 +261,7 @@ int gnutls_x509_ext_import_subject_alt_names(const gnutls_datum_t * ext,
 
 		ret = subject_alt_names_set(&sans->names, &sans->size,
 					    type, &san,
-					    (char *)othername_oid.data);
+					    (char *)othername_oid.data, 1);
 		if (ret < 0)
 			break;
 
@@ -773,15 +777,18 @@ int gnutls_x509_aki_set_id(gnutls_x509_aki_t aki, const gnutls_datum_t * id)
  * to be stored in the @aki type. When storing multiple names, the serial
  * should be set on the first call, and subsequent calls should use a %NULL serial.
  *
+ * Since version 3.5.7 the %GNUTLS_SAN_RFC822NAME, %GNUTLS_SAN_DNSNAME, and
+ * %GNUTLS_SAN_OTHERNAME_XMPP are converted to ACE format when necessary.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
  * Since: 3.3.0
  **/
 int gnutls_x509_aki_set_cert_issuer(gnutls_x509_aki_t aki,
 				    unsigned int san_type,
-				    const gnutls_datum_t * san,
+				    const gnutls_datum_t *san,
 				    const char *othername_oid,
-				    const gnutls_datum_t * serial)
+				    const gnutls_datum_t *serial)
 {
 	int ret;
 	gnutls_datum_t t_san, t_othername_oid = { NULL, 0 };
@@ -808,7 +815,7 @@ int gnutls_x509_aki_set_cert_issuer(gnutls_x509_aki_t aki,
 	ret =
 	    subject_alt_names_set(&aki->cert_issuer.names,
 				  &aki->cert_issuer.size, san_type, &t_san,
-				  (char *)t_othername_oid.data);
+				  (char *)t_othername_oid.data, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -934,7 +941,7 @@ int gnutls_x509_ext_import_authority_key_id(const gnutls_datum_t * ext,
 		ret = subject_alt_names_set(&aki->cert_issuer.names,
 					    &aki->cert_issuer.size,
 					    type, &san,
-					    (char *)othername_oid.data);
+					    (char *)othername_oid.data, 1);
 		if (ret < 0)
 			break;
 

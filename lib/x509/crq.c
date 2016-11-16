@@ -2152,6 +2152,9 @@ gnutls_x509_crq_get_extension_by_oid2(gnutls_x509_crq_t crq,
  *
  * %GNUTLS_SAN_OTHERNAME_XMPP: as a UTF8 string
  *
+ * Since version 3.5.7 the %GNUTLS_SAN_RFC822NAME, %GNUTLS_SAN_DNSNAME, and
+ * %GNUTLS_SAN_OTHERNAME_XMPP are converted to ACE format when necessary.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *

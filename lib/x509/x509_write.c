@@ -574,6 +574,8 @@ gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt, unsigned int usage)
  * The name of the function is unfortunate since it is inconsistent with
  * gnutls_x509_crt_get_subject_alt_name().
  *
+ * See gnutls_x509_crt_set_subject_alt_name() for more information.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
@@ -612,6 +614,9 @@ gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt,
  * %GNUTLS_SAN_RFC822NAME as a text string, %GNUTLS_SAN_URI as a text string,
  * %GNUTLS_SAN_IPADDRESS as a binary IP address (4 or 16 bytes),
  * %GNUTLS_SAN_OTHERNAME_XMPP as a UTF8 string (since 3.5.0).
+ *
+ * Since version 3.5.7 the %GNUTLS_SAN_RFC822NAME, %GNUTLS_SAN_DNSNAME, and
+ * %GNUTLS_SAN_OTHERNAME_XMPP are converted to ACE format when necessary.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -690,6 +695,9 @@ gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
  *
  * This function will set the issuer alternative name certificate
  * extension. It can set the same types as gnutls_x509_crt_set_subject_alt_name().
+ *
+ * Since version 3.5.7 the %GNUTLS_SAN_RFC822NAME, %GNUTLS_SAN_DNSNAME, and
+ * %GNUTLS_SAN_OTHERNAME_XMPP are converted to ACE format when necessary.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

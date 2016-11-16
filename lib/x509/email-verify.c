@@ -58,7 +58,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 	gnutls_datum_t out;
 
 	/* convert the provided email to ACE-Labels domain. */
-	ret = gnutls_idna_map(email, strlen(email), &out, 0);
+	ret = _gnutls_idna_email_map(email, strlen(email), &out);
 	if (ret < 0) {
 		_gnutls_debug_log("unable to convert email %s to IDNA format\n", email);
 		a_email = (char*)email;
@@ -94,7 +94,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 				continue;
 			}
 
-			ret = gnutls_idna_map(rfc822name, rfc822namesize, &out, 0);
+			ret = _gnutls_idna_email_map(rfc822name, rfc822namesize, &out);
 			if (ret < 0) {
 				_gnutls_debug_log("unable to convert rfc822name %s to IDNA format\n", rfc822name);
 				continue;
@@ -142,7 +142,7 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		ret = gnutls_idna_map (rfc822name, rfc822namesize, &out, 0);
+		ret = _gnutls_idna_email_map (rfc822name, rfc822namesize, &out);
 		if (ret < 0) {
 			_gnutls_debug_log("unable to convert EMAIL %s to IDNA format\n", rfc822name);
 			ret = 0;

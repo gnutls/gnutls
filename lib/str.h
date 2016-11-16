@@ -27,6 +27,8 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include <datum.h>
+#include <c-ctype.h>
+#include "errors.h"
 
 #ifdef HAVE_DCGETTEXT
 # include "gettext.h"
@@ -43,6 +45,8 @@ int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_le
 #define _gnutls_utf8_password_normalize(p, plen, out, ignore_errs) \
 	gnutls_utf8_password_normalize((unsigned char*)p, plen, out, \
 		ignore_errs?(GNUTLS_UTF8_IGNORE_ERRS):0)
+
+int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *output);
 
 #ifndef HAVE_LIBIDN
 inline static
@@ -61,6 +65,16 @@ int __gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, uns
 # define gnutls_idna_map _gnutls_idna_map
 int _gnutls_idna_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
 #endif
+
+inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
+{
+	unsigned i;
+	for (i=0;i<size;i++) {
+		if (!c_isprint(str[i]))
+			return 0;
+	}
+	return 1;
+}
 
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
 void _gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,

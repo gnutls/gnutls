@@ -57,15 +57,40 @@ const char * virtual_to_othername_oid(unsigned type)
 	}
 }
 
-int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutls_datum_t *san, const char *othername_oid)
+int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutls_datum_t *san, const char *othername_oid, unsigned raw)
 {
 	gnutls_datum_t encoded = {NULL, 0};
+	gnutls_datum_t xmpp = {NULL,0};
 	int ret;
 
 	if (type < 1000) {
 		name->type = type;
-		name->san.data = san->data;
-		name->san.size = san->size;
+		if (type == GNUTLS_SAN_DNSNAME && !raw) {
+			ret = gnutls_idna_map((char*)san->data, san->size, &name->san, 0);
+			if (ret < 0) {
+				return gnutls_assert_val(ret);
+			}
+			gnutls_free(san->data);
+			san->data = NULL;
+		} else if (type == GNUTLS_SAN_RFC822NAME && !raw) {
+			ret = _gnutls_idna_email_map((char*)san->data, san->size, &name->san);
+			if (ret < 0) {
+				return gnutls_assert_val(ret);
+			}
+			gnutls_free(san->data);
+			san->data = NULL;
+		} else if (type == GNUTLS_SAN_URI && !raw) {
+			if (!_gnutls_str_is_print((char*)san->data, san->size)) {
+				_gnutls_debug_log("non-ASCII URIs are not supported\n");
+				return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+			} else {
+				name->san.data = san->data;
+				name->san.size = san->size;
+			}
+		} else {
+			name->san.data = san->data;
+			name->san.size = san->size;
+		}
 
 		if (othername_oid) {
 			name->othername_oid.data = (uint8_t *) othername_oid;
@@ -83,8 +108,15 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutl
 
 		switch(type) {
 			case GNUTLS_SAN_OTHERNAME_XMPP:
+
+				ret = gnutls_idna_map((char*)san->data, san->size, &xmpp, 0);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
 				ret = _gnutls_x509_encode_string(ASN1_ETYPE_UTF8_STRING,
-					san->data, san->size, &encoded);
+					xmpp.data, xmpp.size, &encoded);
+
+				gnutls_free(xmpp.data);
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 
