@@ -58,7 +58,7 @@ unsigned i;
 	     || type == GNUTLS_SAN_RFC822NAME
 	     || type == GNUTLS_SAN_URI) && sname != NULL && strlen(sname) != name->size) {
 		adds(str,
-		     _("warning: generalName contains an embedded NUL, "
+		     _("warning: SAN contains an embedded NUL, "
 			      "replacing with '!'\n"));
 		while (strlen(sname) < name->size)
 			name->data[strlen(sname)] = '!';
