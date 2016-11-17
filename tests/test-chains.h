@@ -3773,6 +3773,76 @@ static const char *tls_feat_superset[] = {
 	NULL
 };
 
+#ifdef ENABLE_GOST
+static const char *gost01[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBfTCCASqgAwIBAgICASIwCgYGKoUDAgIDBQAwNzELMAkGA1UEBhMCUlUxKDAm\n"
+	"BgNVBAMMH0NBIGNlcnRpZmljYXRlIChQS0NTMTIgZXhhbXBsZSkwHhcNMTIwNjE0\n"
+	"MTkzMDE5WhcNMTcwNjE0MTkzMDE5WjA5MQswCQYDVQQGEwJSVTEqMCgGA1UEAwwh\n"
+	"VGVzdCBjZXJ0aWZpY2F0ZSAoUEtDUzEyIGV4YW1wbGUpMGMwHAYGKoUDAgITMBIG\n"
+	"ByqFAwICIwEGByqFAwICHgEDQwAEQHlSMCMAJZgoHUCIFmn+eqOgYlQy8h7SfjZ2\n"
+	"kMkJ4xTae8jtZYxHLq3P+qJeismsHdmqdqSBbOGGdOaJNNPbAZKjGjAYMAkGA1Ud\n"
+	"EwQCMAAwCwYDVR0PBAQDAgWgMAoGBiqFAwICAwUAA0EArslfUeqhW9eFkspn89+C\n"
+	"OQEJX6JoghiOjFYlky0XmaaDl3D6EcbID+B6cBEmcXF21xxIEeYJIAqGzOEnMXdT\n"
+	"cg==\n"
+	"-----END CERTIFICATE-----\n",
+	NULL,
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBfTCCASqgAwIBAgIBADAKBgYqhQMCAgMFADA3MQswCQYDVQQGEwJSVTEoMCYG\n"
+	"A1UEAwwfQ0EgY2VydGlmaWNhdGUgKFBLQ1MxMiBleGFtcGxlKTAeFw0xMjA2MTQx\n"
+	"MzEyMzFaFw0xNzA2MTQxMzEyMzFaMDcxCzAJBgNVBAYTAlJVMSgwJgYDVQQDDB9D\n"
+	"QSBjZXJ0aWZpY2F0ZSAoUEtDUzEyIGV4YW1wbGUpMGMwHAYGKoUDAgITMBIGByqF\n"
+	"AwICIwEGByqFAwICHgEDQwAEQHxF7QOkGNDlnKWiBwdD80gToowegPcHR1Y1r2ZR\n"
+	"RQqB610f3uEWN/EikI7exYVRR0dmCyILLMmgRxX+KU4qmgejHTAbMAwGA1UdEwQF\n"
+	"MAMBAf8wCwYDVR0PBAQDAgEGMAoGBiqFAwICAwUAA0EAFnvKPRo2tQkI/iqu/CkP\n"
+	"YQJPW43KnRMqkmB/NnGOC5+wdivIA5yJaGbT2sQ1r+n6qyJnG32yV44DrSe7b2DV\n"
+	"OA==\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
+static const char *gost12_256[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICYjCCAg+gAwIBAgIBATAKBggqhQMHAQEDAjBWMSkwJwYJKoZIhvcNAQkBFhpH\n"
+	"b3N0UjM0MTAtMjAxMkBleGFtcGxlLmNvbTEpMCcGA1UEAxMgR29zdFIzNDEwLTIw\n"
+	"MTIgKDI1NiBiaXQpIGV4YW1wbGUwHhcNMTMxMTA1MTQwMjM3WhcNMzAxMTAxMTQw\n"
+	"MjM3WjBWMSkwJwYJKoZIhvcNAQkBFhpHb3N0UjM0MTAtMjAxMkBleGFtcGxlLmNv\n"
+	"bTEpMCcGA1UEAxMgR29zdFIzNDEwLTIwMTIgKDI1NiBiaXQpIGV4YW1wbGUwZjAf\n"
+	"BggqhQMHAQEBATATBgcqhQMCAiQABggqhQMHAQECAgNDAARAut/Qw1MUq9KPqkdH\n"
+	"C2xAF3K7TugHfo9n525D2s5mFZdD5pwf90/i4vF0mFmr9nfRwMYP4o0Pg1mOn5Rl\n"
+	"aXNYraOBwDCBvTAdBgNVHQ4EFgQU1fIeN1HaPbw+XWUzbkJ+kHJUT0AwCwYDVR0P\n"
+	"BAQDAgHGMA8GA1UdEwQIMAYBAf8CAQEwfgYDVR0BBHcwdYAU1fIeN1HaPbw+XWUz\n"
+	"bkJ+kHJUT0ChWqRYMFYxKTAnBgkqhkiG9w0BCQEWGkdvc3RSMzQxMC0yMDEyQGV4\n"
+	"YW1wbGUuY29tMSkwJwYDVQQDEyBHb3N0UjM0MTAtMjAxMiAoMjU2IGJpdCkgZXhh\n"
+	"bXBsZYIBATAKBggqhQMHAQEDAgNBAF5bm4BbARR6hJLEoWJkOsYV3Hd7kXQQjz3C\n"
+	"dqQfmHrz6TI6Xojdh/t8ckODv/587NS5/6KsM77vc6Wh90NAT2s=\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
+static const char *gost12_512[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIC6DCCAlSgAwIBAgIBATAKBggqhQMHAQEDAzBWMSkwJwYJKoZIhvcNAQkBFhpH\n"
+	"b3N0UjM0MTAtMjAxMkBleGFtcGxlLmNvbTEpMCcGA1UEAxMgR29zdFIzNDEwLTIw\n"
+	"MTIgKDUxMiBiaXQpIGV4YW1wbGUwHhcNMTMxMDA0MDczNjA0WhcNMzAxMDAxMDcz\n"
+	"NjA0WjBWMSkwJwYJKoZIhvcNAQkBFhpHb3N0UjM0MTAtMjAxMkBleGFtcGxlLmNv\n"
+	"bTEpMCcGA1UEAxMgR29zdFIzNDEwLTIwMTIgKDUxMiBiaXQpIGV4YW1wbGUwgaow\n"
+	"IQYIKoUDBwEBAQIwFQYJKoUDBwECAQICBggqhQMHAQECAwOBhAAEgYATGQ9VCiM5\n"
+	"FRGCQ8MEz2F1dANqhaEuywa8CbxOnTvaGJpFQVXQwkwvLFAKh7hk542vOEtxpKtT\n"
+	"CXfGf84nRhMH/Q9bZeAc2eO/yhxrsQhTBufa1Fuou2oe/jUOaG6RAtUUvRzhNTpp\n"
+	"RGGl1+EIY2vzzUua9j9Ol/gAoy/LNKQIfqOBwDCBvTAdBgNVHQ4EFgQUPcbTRXJZ\n"
+	"nHtjj+eBP7b5lcTMekIwCwYDVR0PBAQDAgHGMA8GA1UdEwQIMAYBAf8CAQEwfgYD\n"
+	"VR0BBHcwdYAUPcbTRXJZnHtjj+eBP7b5lcTMekKhWqRYMFYxKTAnBgkqhkiG9w0B\n"
+	"CQEWGkdvc3RSMzQxMC0yMDEyQGV4YW1wbGUuY29tMSkwJwYDVQQDEyBHb3N0UjM0\n"
+	"MTAtMjAxMiAoNTEyIGJpdCkgZXhhbXBsZYIBATAKBggqhQMHAQEDAwOBgQBObS7o\n"
+	"ppPTXzHyVR1DtPa8b57nudJzI4czhsfeX5HDntOq45t9B/qSs8dC6eGxbhHZ9zCO\n"
+	"SFtxWYdmg0au8XI9Xb8vTC1qdwWID7FFjMWDNQZb6lYh/J+8F2xKylvB5nIlRZqO\n"
+	"o3eUNFkNyHJwQCk2WoOlO16zwGk2tdKH4KmD5w==\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+#endif
+
 static struct
 {
   const char *name;
@@ -3782,6 +3852,7 @@ static struct
   unsigned int expected_verify_result;
   const char *purpose;
   time_t expected_time;
+  unsigned notfips;
 } chains[] =
 {
   { "CVE-2014-0092", cve_2014_0092_check, &cve_2014_0092_check[1],
@@ -3923,6 +3994,13 @@ static struct
   { "rsa pss: chain with increasing salt size - ok", rsa_pss_chain_increasing_salt_size_ok, &rsa_pss_chain_increasing_salt_size_ok[3], 0, 0, 0, 1501159136},
   { "rsa pss: chain with alternating signatures - ok", rsa_pss_chain_pkcs11_pss_pkcs1_ok, &rsa_pss_chain_pkcs11_pss_pkcs1_ok[3], 0, 0, 0, 1501159136},
   { "rsa pss: chain with changing hashes - ok", rsa_pss_chain_sha512_sha384_sha256_ok, &rsa_pss_chain_sha512_sha384_sha256_ok[3], 0, 0, 0, 1501159136},
+#ifdef ENABLE_GOST
+  { "gost 34.10-01 - ok", gost01, &gost01[2], 0, 0, 0, 1466612070, 1},
+  { "gost 34.10-01 - not ok (due to profile)", gost01, &gost01[2], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA),
+	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1466612070, 1},
+  { "gost 34.10-12-256 - ok", gost12_256, &gost12_256[0], 0, 0, 0, 1466612070, 1},
+  { "gost 34.10-12-512 - ok", gost12_512, &gost12_512[0], 0, 0, 0, 1466612070, 1},
+#endif
   { NULL, NULL, NULL, 0, 0}
 };
 /* *INDENT-ON* */
