@@ -288,7 +288,7 @@ error:
 static int
 _gnutls_calc_srp_sha(const char *username, const char *_password,
 		     uint8_t * salt, int salt_size, size_t * size,
-		     void *digest)
+		     void *digest, unsigned allow_invalid_pass)
 {
 	digest_hd_st td;
 	uint8_t res[MAX_HASH_SIZE];
@@ -299,7 +299,7 @@ _gnutls_calc_srp_sha(const char *username, const char *_password,
 
 	*size = 20;
 
-	ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout);
+	ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout, allow_invalid_pass);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 	password = (char*)pout.data;
@@ -338,7 +338,7 @@ _gnutls_calc_srp_x(char *username, char *password, uint8_t * salt,
 {
 
 	return _gnutls_calc_srp_sha(username, password, salt,
-				    salt_size, size, digest);
+				    salt_size, size, digest, 1);
 }
 
 
@@ -747,7 +747,7 @@ gnutls_srp_verifier(const char *username, const char *password,
 	uint8_t digest[20];
 
 	ret = _gnutls_calc_srp_sha(username, password, salt->data,
-				   salt->size, &digest_size, digest);
+				   salt->size, &digest_size, digest, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

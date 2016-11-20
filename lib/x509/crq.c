@@ -1092,7 +1092,7 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 
 	if (pass) {
 		gnutls_datum_t out;
-		result = _gnutls_utf8_password_normalize(pass, strlen(pass), &out);
+		result = _gnutls_utf8_password_normalize(pass, strlen(pass), &out, 0);
 		if (result < 0)
 			return gnutls_assert_val(result);
 

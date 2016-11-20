@@ -2518,6 +2518,7 @@ typedef struct gnutls_buffer_st *gnutls_buffer_t;
 
 int gnutls_buffer_append_data(gnutls_buffer_t, const void *data, size_t data_size);
 
+#define GNUTLS_UTF8_IGNORE_ERRS 1
 int gnutls_utf8_password_normalize(const unsigned char *password, unsigned password_len,
 				   gnutls_datum_t *out, unsigned flags);
 

@@ -40,7 +40,12 @@
  * to the normalization rules in RFC7613. If GnuTLS is compiled without
  * unicode support this function will return %GNUTLS_E_UNIMPLEMENTED_FEATURE.
  *
+ * If the flag %GNUTLS_UTF8_IGNORE_ERRS is specified, any UTF-8 encoding
+ * errors will be ignored, and in that case the output will be a copy of the input.
+ *
  * Returns: %GNUTLS_E_INVALID_UTF8_STRING on invalid UTF-8 data, or 0 on success.
+ *
+ * Since: 3.5.7
  **/
 int gnutls_utf8_password_normalize(const unsigned char *password, unsigned password_len,
 				   gnutls_datum_t *out, unsigned flags)
@@ -66,7 +71,17 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
 	/* check for invalid UTF-8 */
 	if (u8_check((uint8_t*)password, plen) != NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_UTF8_STRING;
+		if (flags & GNUTLS_UTF8_IGNORE_ERRS) {
+			out->data = gnutls_malloc(password_len+1);
+			if (out->data == NULL)
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			out->size = password_len;
+			memcpy(out->data, password, password_len);
+			out->data[password_len] = 0;
+			return 0;
+		} else {
+			return GNUTLS_E_INVALID_UTF8_STRING;
+		}
 	}
 
 	/* convert to UTF-32 */
@@ -132,7 +147,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
 int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_len,
 				   gnutls_datum_t *out, unsigned flags)
 {
-	if (!(flags & NORM_INTERNAL))
+	if (!(flags & GNUTLS_UTF8_NORM_INTERNAL))
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	out->data = gnutls_malloc(password_len+1);

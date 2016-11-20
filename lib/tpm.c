@@ -3,7 +3,7 @@
  *
  * Copyright © 2012 Free Software Foundation.
  * Copyright © 2008-2012 Intel Corporation.
- * Copyright © 2015 Red Hat, Inc.
+ * Copyright © 2015-2016 Red Hat, Inc.
  *
  * Author: David Woodhouse <dwmw2@infradead.org>
  * Author: Nikos Mavrogiannopoulos
@@ -366,7 +366,7 @@ static TSS_RESULT myTspi_Policy_SetSecret(TSS_HPOLICY hPolicy,
 
 #define SAFE_LEN(x) (x==NULL?0:strlen(x))
 
-static int tpm_open_session(struct tpm_ctx_st *s, const char *_srk_password)
+static int tpm_open_session(struct tpm_ctx_st *s, const char *_srk_password, unsigned allow_invalid_pass)
 {
 	int err, ret;
 	char *password = NULL;
@@ -379,7 +379,7 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *_srk_password)
 
 	if (_srk_password != NULL) {
 		gnutls_datum_t pout;
-		ret = _gnutls_utf8_password_normalize(_srk_password, strlen(_srk_password), &pout);
+		ret = _gnutls_utf8_password_normalize(_srk_password, strlen(_srk_password), &pout, allow_invalid_pass);
 		if (ret < 0) {
 			gnutls_assert();
 			goto out_tspi_ctx;
@@ -589,7 +589,7 @@ import_tpm_key(gnutls_privkey_t pkey,
 
 	if (_key_password != NULL) {
 		gnutls_datum_t pout;
-		ret = _gnutls_utf8_password_normalize(_key_password, strlen(_key_password), &pout);
+		ret = _gnutls_utf8_password_normalize(_key_password, strlen(_key_password), &pout, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto out_ctx;
@@ -599,7 +599,7 @@ import_tpm_key(gnutls_privkey_t pkey,
 
 	/* normalization of srk_password happens in tpm_open_session() */
 
-	ret = tpm_open_session(s, srk_password);
+	ret = tpm_open_session(s, srk_password, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto out_ctx;
@@ -1123,7 +1123,7 @@ import_tpm_pubkey(gnutls_pubkey_t pkey,
 	int err, ret;
 	struct tpm_ctx_st s;
 
-	ret = tpm_open_session(&s, srk_password);
+	ret = tpm_open_session(&s, srk_password, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1403,7 +1403,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	else
 		tpm_flags |= TSS_KEY_SIZE_16384;
 
-	ret = tpm_open_session(&s, srk_password);
+	ret = tpm_open_session(&s, srk_password, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1462,7 +1462,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 			goto err_sa;
 		}
 
-		ret = _gnutls_utf8_password_normalize(key_password, strlen(key_password), &pout);
+		ret = _gnutls_utf8_password_normalize(key_password, strlen(key_password), &pout, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto err_sa;
@@ -1770,7 +1770,7 @@ int gnutls_tpm_privkey_delete(const char *url, const char *srk_password)
 	if (durl.uuid_set == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = tpm_open_session(&s, srk_password);
+	ret = tpm_open_session(&s, srk_password, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

@@ -1013,7 +1013,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	if (_password) {
 		gnutls_datum_t pout;
-		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout);
+		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout, 1);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -1345,7 +1345,7 @@ _gnutls_pkcs_generate_key(schema_id schema,
 
 	if (_password) {
 		gnutls_datum_t pout;
-		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout);
+		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout, 0);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 

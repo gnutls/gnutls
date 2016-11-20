@@ -45,7 +45,7 @@ openssl_hash_password(const char *_password, gnutls_datum_t * key,
 
 	if (_password != NULL) {
 		gnutls_datum_t pout;
-		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout);
+		ret = _gnutls_utf8_password_normalize(_password, strlen(_password), &pout, 1);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
