@@ -49,6 +49,21 @@ static void fname(void **glob_state) \
 	gnutls_free(out.data); \
 }
 
+#define INVALID_MATCH_FUNC(fname, password, normalized) \
+static void inv_##fname(void **glob_state) \
+{ \
+	gnutls_datum_t out; \
+	int ret = gnutls_utf8_password_normalize((uint8_t*)password, strlen(password), &out, GNUTLS_UTF8_IGNORE_ERRS); \
+	if (normalized == NULL) { \
+		assert_int_not_equal(ret, 0); \
+		return; \
+	} else { \
+		assert_int_equal(ret, 0); \
+	} \
+	assert_int_equal(strcmp((char*)out.data, (char*)normalized), 0); \
+	gnutls_free(out.data); \
+}
+
 MATCH_FUNC(test_ascii, "correct horse battery staple", "correct horse battery staple");
 MATCH_FUNC(test_capitals, "Correct Horse Battery Staple", "Correct Horse Battery Staple");
 MATCH_FUNC(test_multilang, "\xCF\x80\xC3\x9F\xC3\xA5", "πßå");
@@ -56,6 +71,10 @@ MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73"
 MATCH_FUNC(test_space_replacement, "foo bar", "foo bar");
 MATCH_FUNC(test_invalid, "my cat is a \x09by", NULL);
 MATCH_FUNC(test_normalization1, "char \x49\xCC\x87", "char \xC4\xB0");
+
+INVALID_MATCH_FUNC(test_ascii, "correct horse battery staple", "correct horse battery staple");
+INVALID_MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73", "Jack of ♦s");
+INVALID_MATCH_FUNC(test_invalid, "my cat is a \x09by", "my cat is a \x09by");
 
 int main(void)
 {
@@ -66,7 +85,10 @@ int main(void)
 		cmocka_unit_test(test_special_char),
 		cmocka_unit_test(test_space_replacement),
 		cmocka_unit_test(test_invalid),
-		cmocka_unit_test(test_normalization1)
+		cmocka_unit_test(test_normalization1),
+		cmocka_unit_test(inv_test_ascii),
+		cmocka_unit_test(inv_test_special_char),
+		cmocka_unit_test(inv_test_invalid)
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
