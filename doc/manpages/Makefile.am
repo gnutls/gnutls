@@ -846,6 +846,7 @@ APIMANS += gnutls_transport_set_pull_timeout_function.3
 APIMANS += gnutls_transport_set_push_function.3
 APIMANS += gnutls_transport_set_vec_push_function.3
 APIMANS += gnutls_url_is_supported.3
+APIMANS += gnutls_utf8_password_normalize.3
 APIMANS += gnutls_verify_stored_pubkey.3
 APIMANS += gnutls_x509_aia_deinit.3
 APIMANS += gnutls_x509_aia_get.3
