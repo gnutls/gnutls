@@ -1162,6 +1162,16 @@ int cipher_to_flags(const char *cipher)
 		return GNUTLS_PKCS_USE_PBES2_AES_256;
 	} else if (strcasecmp(cipher, "rc2-40") == 0) {
 		return GNUTLS_PKCS_USE_PKCS12_RC2_40;
+	} else if (strcasecmp(cipher, "gost28147-tc26z") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_TC26Z;
+	} else if (strcasecmp(cipher, "gost28147-cpa") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPA;
+	} else if (strcasecmp(cipher, "gost28147-cpb") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPB;
+	} else if (strcasecmp(cipher, "gost28147-cpc") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPC;
+	} else if (strcasecmp(cipher, "gost28147-cpd") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPD;
 	}
 
 	fprintf(stderr, "unknown cipher %s\n", cipher);
