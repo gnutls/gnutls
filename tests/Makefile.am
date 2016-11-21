@@ -125,13 +125,14 @@ endif
 
 if HAVE_CMOCKA
 CMOCKA_LDADD = $(COMMON_LDADD) $(CMOCKA_LIBS)
-ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode
+ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna
 
 dtls_sliding_window_LDADD = $(CMOCKA_LDADD)
 ip_utils_LDADD = $(CMOCKA_LDADD)
 name_constraints_ip_LDADD = $(CMOCKA_LDADD)
 conv_utf8_LDADD = $(CMOCKA_LDADD)
 str_unicode_LDADD = $(CMOCKA_LDADD)
+str_idna_LDADD = $(CMOCKA_LDADD)
 
 endif
 
