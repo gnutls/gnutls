@@ -115,7 +115,7 @@ LIBTASN1_MINIMUM=4.9
     if test "$included_libtasn1" = yes; then
       AC_MSG_ERROR([[
   *** 
-  *** Libtasn1 $LIBTASN1_MINIMUM was not found. To use the included on use --with-included-libtasn1
+  *** Libtasn1 $LIBTASN1_MINIMUM was not found. To use the included one, use --with-included-libtasn1
   ]])
     fi
   fi
