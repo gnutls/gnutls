@@ -41,7 +41,7 @@ Fedora/x86_64/ubsan:
 Fedora/x86_64/no-unistring:
   script:
   - dnf remove -y libunistring-devel
-  - make autoreconf && ./configure --disable-doc --disable-full-test-suite --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
+  - make autoreconf && ./configure --disable-doc --with-included-unistring --disable-full-test-suite --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
@@ -196,7 +196,7 @@ MinGW32/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
-    mingw32-configure --with-included-libtasn1 --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-configure --with-included-libtasn1 --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libintl and iconv are a dependency of libidn
@@ -232,7 +232,7 @@ MinGW64/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
-    mingw64-configure --with-included-libtasn1 --disable-nls --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw64-configure --with-included-libtasn1 --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libintl and iconv are a dependency of libidn
@@ -268,7 +268,7 @@ MinGW64:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw64-configure --with-included-libtasn1 --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw64-configure --with-included-libtasn1 --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   tags:
   - shared
@@ -288,7 +288,7 @@ MinGW32:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw32-configure --with-included-libtasn1 --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-configure --with-included-libtasn1 --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   tags:
   - shared
@@ -310,7 +310,7 @@ FreeBSD10/x86_64:
   - /usr/bin/true
   script:
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
-    --with-included-libtasn1 --disable-guile --disable-doc --disable-valgrind-tests && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
+    --with-included-libtasn1 --disable-guile --with-included-unistring --disable-doc --disable-valgrind-tests && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
   only:
