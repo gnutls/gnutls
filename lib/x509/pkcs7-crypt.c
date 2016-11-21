@@ -37,6 +37,9 @@
 #include <random.h>
 #include <pk.h>
 #include <nettle/pbkdf2.h>
+#if ENABLE_GOST && !HAVE_NETTLE_GOST
+#include "../nettle/gost/pbkdf2-gost.h"
+#endif
 
 #define PBES1_DES_MD5_OID "1.2.840.113549.1.5.3"
 
@@ -1104,6 +1107,47 @@ _gnutls_read_pkcs_schema_params(schema_id * schema, const char *password,
 	return result;
 }
 
+static int
+_gnutls_pbes2_string_to_key(unsigned int pass_len, const char *password,
+			    const struct pbkdf2_params *kdf_params,
+			    int key_size, uint8_t *key)
+{
+	int result = 0;
+
+	if (kdf_params->mac == GNUTLS_MAC_SHA1)
+		pbkdf2_hmac_sha1(pass_len, (uint8_t *) password,
+				 kdf_params->iter_count,
+				 kdf_params->salt_size,
+				 kdf_params->salt, key_size, key);
+	else if (kdf_params->mac == GNUTLS_MAC_SHA256)
+		pbkdf2_hmac_sha256(pass_len, (uint8_t *) password,
+				   kdf_params->iter_count,
+				   kdf_params->salt_size,
+				   kdf_params->salt, key_size, key);
+#if ENABLE_GOST
+	else if (kdf_params->mac == GNUTLS_MAC_GOSTR_94)
+		pbkdf2_hmac_gosthash94cp(pass_len, (uint8_t *) password,
+					 kdf_params->iter_count,
+					 kdf_params->salt_size,
+					 kdf_params->salt, key_size, key);
+	else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_256)
+		pbkdf2_hmac_streebog256(pass_len, (uint8_t *) password,
+					kdf_params->iter_count,
+					kdf_params->salt_size,
+					kdf_params->salt, key_size, key);
+	else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_512)
+		pbkdf2_hmac_streebog512(pass_len, (uint8_t *) password,
+					kdf_params->iter_count,
+					kdf_params->salt_size,
+					kdf_params->salt, key_size, key);
+#endif
+	else
+		result =
+		    gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
+	return result;
+}
+
 int
 _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 			      const char *root, const char *_password,
@@ -1169,36 +1213,11 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	 */
 	p = _gnutls_pkcs_schema_get(schema);
 	if (p != NULL && p->pbes2 != 0) {	/* PBES2 */
-		if (kdf_params->mac == GNUTLS_MAC_SHA1)
-			pbkdf2_hmac_sha1(pass_len, (uint8_t *) password,
-					 kdf_params->iter_count,
-					 kdf_params->salt_size,
-					 kdf_params->salt, key_size, key);
-		else if (kdf_params->mac == GNUTLS_MAC_SHA256)
-			pbkdf2_hmac_sha256(pass_len, (uint8_t *) password,
-					   kdf_params->iter_count,
-					   kdf_params->salt_size,
-					   kdf_params->salt, key_size, key);
-#if HAVE_NETTLE_GOST
-		else if (kdf_params->mac == GNUTLS_MAC_GOSTR_94)
-			pbkdf2_hmac_gosthash94cp(pass_len, (uint8_t *) password,
-						 kdf_params->iter_count,
-						 kdf_params->salt_size,
-						 kdf_params->salt, key_size, key);
-		else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_256)
-			pbkdf2_hmac_streebog256(pass_len, (uint8_t *) password,
-						kdf_params->iter_count,
-						kdf_params->salt_size,
-						kdf_params->salt, key_size, key);
-		else if (kdf_params->mac == GNUTLS_MAC_STREEBOG_512)
-			pbkdf2_hmac_streebog512(pass_len, (uint8_t *) password,
-						kdf_params->iter_count,
-						kdf_params->salt_size,
-						kdf_params->salt, key_size, key);
-#endif
-		else {
-			ret =
-			    gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+		ret = _gnutls_pbes2_string_to_key(pass_len, password,
+						     kdf_params,
+						     key_size, key);
+		if (ret < 0) {
+			gnutls_assert();
 			goto error;
 		}
 	} else if (p != NULL) {	/* PKCS 12 schema */
@@ -1317,6 +1336,7 @@ write_pbkdf2_params(ASN1_TYPE pasn, const struct pbkdf2_params *kdf_params)
 	int result;
 	ASN1_TYPE pbkdf2_asn = ASN1_TYPE_EMPTY;
 	uint8_t tmp[MAX_OID_SIZE];
+	const mac_entry_st *me;
 
 	/* Write the key derivation algorithm
 	 */
@@ -1379,9 +1399,22 @@ write_pbkdf2_params(ASN1_TYPE pasn, const struct pbkdf2_params *kdf_params)
 		goto error;
 	}
 
-	/* We write an emptry prf.
-	 */
-	result = asn1_write_value(pbkdf2_asn, "prf", NULL, 0);
+	me = _gnutls_mac_to_entry(kdf_params->mac);
+	if (!me || !me->mac_oid) {
+		gnutls_assert();
+		result = GNUTLS_E_INTERNAL_ERROR;
+		goto error;
+	}
+
+	result = asn1_write_value(pbkdf2_asn, "prf.algorithm",
+				  me->mac_oid, strlen(me->mac_oid));
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	result = asn1_write_value(pbkdf2_asn, "prf.parameters", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -1564,10 +1597,19 @@ _gnutls_pkcs_generate_key(schema_id schema,
 	 */
 
 	if (p->pbes2 != 0) {
-		pbkdf2_hmac_sha1(pass_len, (uint8_t *) password,
-				 kdf_params->iter_count,
-				 kdf_params->salt_size, kdf_params->salt,
-				 kdf_params->key_size, key->data);
+		if (p->schema == PBES2_GOST28147_89_TC26Z ||
+		    p->schema == PBES2_GOST28147_89_CPA)
+			kdf_params->mac = GNUTLS_MAC_GOSTR_94;
+		else
+			kdf_params->mac = GNUTLS_MAC_SHA1;
+		ret = _gnutls_pbes2_string_to_key(pass_len, password,
+						  kdf_params,
+						  kdf_params->key_size,
+						  key->data);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
 		if (enc_params->iv_size) {
 			ret = gnutls_rnd(GNUTLS_RND_NONCE,
