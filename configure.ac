@@ -256,7 +256,7 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime iconv localtime fmemopen vasprintf mmap],,)
+AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime localtime fmemopen vasprintf mmap],,)
 if test "$ac_cv_func_vasprintf" != "yes";then
   AC_MSG_CHECKING([for va_copy])
   AC_LINK_IFELSE([AC_LANG_PROGRAM([
@@ -325,27 +325,24 @@ if test "$ac_cv_func_clock_gettime" != "yes";then
   gnutls_needs_librt=yes
 fi
 
-AC_LIB_HAVE_LINKFLAGS(unistring,, [#include <uninorm.h>], [u8_normalize(0, 0, 0, 0, 0);])
+AC_ARG_WITH(included-unistring, AS_HELP_STRING([--with-included-unistring],
+                                 [disable linking with system libunistring]),
+            included_unistring="$withval", 
+            included_unistring=no)
 
-ac_have_unicode=no
-if test "$HAVE_LIBUNISTRING" = "yes";then
-  ac_have_unicode=yes
-  ac_have_unistring=yes
+if test "$included_unistring" = yes;then
+  ac_have_unistring=no
 else
-  if test "$ac_cv_func_iconv" != "yes";then
-    AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
-  fi
+  AC_LIB_HAVE_LINKFLAGS(unistring,, [#include <uninorm.h>], [u8_normalize(0, 0, 0, 0, 0);])
 
-  if test "$ac_cv_func_iconv" = "yes" || test "$HAVE_LIBICONV" = "yes";then
-    ac_have_unicode="partial (iconv)"
+  if test "$HAVE_LIBUNISTRING" = "yes";then
+    included_unistring=no
+    ac_have_unistring=yes
   else
-    ac_have_unicode=no
-  fi
-fi
-
-if test "$ac_have_unicode" != "yes";then
-  if test "$have_win" = "yes";then
-    ac_have_unicode="partial (winapi)"
+      AC_MSG_ERROR([[
+  ***
+  *** Libunistring was not found. To use the included one, use --with-included-unistring
+  ]])
   fi
 fi
 
@@ -991,6 +988,7 @@ AC_MSG_NOTICE([summary of build options:
   Library types:        Shared=${enable_shared}, Static=${enable_static}
   Local libopts:        ${included_libopts}
   Local libtasn1:       ${included_libtasn1}
+  Local unistring:      ${included_unistring}
   Use nettle-mini:      ${mini_nettle}
   Documentation:        ${enable_doc} (manpages: ${enable_manpages})
 ])
@@ -1028,7 +1026,6 @@ if features are disabled)
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
   IDNA support:         $with_libidn
-  Unicode support:      $ac_have_unicode
   Self checks:          $enable_self_checks
   Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips

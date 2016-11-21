@@ -36,13 +36,12 @@
 # define N_(String) String
 #endif
 
-#define GNUTLS_UTF8_NORM_INTERNAL (1<<16)
 int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_len,
 				   gnutls_datum_t *out, unsigned flags);
 
 #define _gnutls_utf8_password_normalize(p, plen, out, ignore_errs) \
 	gnutls_utf8_password_normalize((unsigned char*)p, plen, out, \
-		ignore_errs?(GNUTLS_UTF8_NORM_INTERNAL|GNUTLS_UTF8_IGNORE_ERRS):GNUTLS_UTF8_NORM_INTERNAL)
+		ignore_errs?(GNUTLS_UTF8_IGNORE_ERRS):0)
 
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
 void _gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,

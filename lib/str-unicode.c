@@ -23,8 +23,6 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "str.h"
-
-#if defined(HAVE_LIBUNISTRING)
 #include <uninorm.h>
 #include <unistr.h>
 #include <unictype.h>
@@ -37,8 +35,7 @@
  * @flags: should be zero
  *
  * This function will convert the provided UTF-8 password according
- * to the normalization rules in RFC7613. If GnuTLS is compiled without
- * unicode support this function will return %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ * to the normalization rules in RFC7613.
  *
  * If the flag %GNUTLS_UTF8_IGNORE_ERRS is specified, any UTF-8 encoding
  * errors will be ignored, and in that case the output will be a copy of the input.
@@ -143,19 +140,3 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
 	gnutls_free(nrmu8);
 	return ret;
 }
-#else
-int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_len,
-				   gnutls_datum_t *out, unsigned flags)
-{
-	if (!(flags & GNUTLS_UTF8_NORM_INTERNAL))
-		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-
-	out->data = gnutls_malloc(password_len+1);
-	if (out->data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-	memcpy(out->data, password, password_len);
-	out->data[password_len] = 0;
-	out->size = password_len;
-	return 0;
-}
-#endif

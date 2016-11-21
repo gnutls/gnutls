@@ -29,10 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
-
-#if defined(HAVE_LIBUNISTRING)
-
-# include <cmocka.h>
+#include <cmocka.h>
 
 #define MATCH_FUNC(fname, password, normalized) \
 static void fname(void **glob_state) \
@@ -92,13 +89,3 @@ int main(void)
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
-#else
-int main(void)
-{
-	gnutls_datum_t out;
-	int ret = gnutls_utf8_password_normalize((uint8_t*)"xxx", strlen("xxx"), &out, 0);
-	if (ret != GNUTLS_E_UNIMPLEMENTED_FEATURE)
-		exit(1);
-	exit(77);
-}
-#endif
