@@ -51,6 +51,11 @@ SUBDIRS += openpgp
 AM_CPPFLAGS += -I$(srcdir)/opencdk
 endif
 
+if !HAVE_LIBUNISTRING
+SUBDIRS += unistring
+AM_CPPFLAGS += -I$(srcdir)/unistring/ -I$(builddir)/unistring/
+endif
+
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/minitasn1
 endif
@@ -139,6 +144,8 @@ endif
 
 if HAVE_LIBUNISTRING
 thirdparty_libadd += $(LTLIBUNISTRING)
+else
+libgnutls_la_LIBADD += unistring/libunistring.la
 endif
 
 if ENABLE_NETTLE

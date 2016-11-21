@@ -39,6 +39,7 @@ PKG_PROG_PKG_CONFIG
 AC_PROG_CC
 gl_EARLY
 ggl_EARLY
+unistring_EARLY
 AM_PROG_AS
 AM_PROG_AR
 AC_PROG_CXX
@@ -356,6 +357,7 @@ dnl in https://bugs.gentoo.org/show_bug.cgi?id=494940 and
 dnl http://gnu-autoconf.7623.n7.nabble.com/Correct-way-to-check-for-clock-gettime-td12276.html
 gl_INIT
 ggl_INIT
+unistring_INIT
 
 # disable the extended test suite at tests/suite if asked, or if we are not running in git master
 AC_ARG_ENABLE(full-test-suite,
@@ -959,6 +961,7 @@ AC_CONFIG_FILES([
   lib/opencdk/Makefile
   lib/openpgp/Makefile
   lib/x509/Makefile
+  lib/unistring/Makefile
   po/Makefile.in
   src/Makefile
   src/gl/Makefile
