@@ -923,3 +923,12 @@ tests/tls-ext-register
 tests/tls-session-ext-register
 tests/tls-session-supplemental
 tests/tls-supplemental
+lib/unistring/libunistring.la
+lib/unistring/limits.h
+lib/unistring/sys/
+lib/unistring/unictype.h
+lib/unistring/unictype/categ_byname.h
+lib/unistring/uninorm.h
+lib/unistring/unistr.h
+lib/unistring/unitypes.h
+lib/unistring/unused-parameter.h
