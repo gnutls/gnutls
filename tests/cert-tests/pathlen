@@ -28,9 +28,10 @@ DIFF="${DIFF:-diff -b -B}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
-
+TMPFILE1=ca-no-pathlen-$$.tmp
+TMPFILE2=no-ca-or-pathlen-$$.tmp
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/ca-no-pathlen.pem" \
-	|grep -v "Algorithm Security Level" > new-ca-no-pathlen.pem
+	|grep -v "Algorithm Security Level" > $TMPFILE1
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -39,7 +40,7 @@ if test "${rc}" != "0"; then
 fi
 
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/no-ca-or-pathlen.pem" \
-	|grep -v "Algorithm Security Level" > new-no-ca-or-pathlen.pem
+	|grep -v "Algorithm Security Level" > $TMPFILE2
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -47,9 +48,9 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} "${srcdir}/data/ca-no-pathlen.pem" new-ca-no-pathlen.pem
+${DIFF} "${srcdir}/data/ca-no-pathlen.pem" $TMPFILE1
 rc1=$?
-${DIFF} "${srcdir}/data/no-ca-or-pathlen.pem" new-no-ca-or-pathlen.pem
+${DIFF} "${srcdir}/data/no-ca-or-pathlen.pem" $TMPFILE2
 rc2=$?
 
 
@@ -58,6 +59,6 @@ if test "${rc1}" != "0"; then
 	exit ${rc1}
 fi
 
-rm -f new-ca-no-pathlen.pem new-no-ca-or-pathlen.pem
+rm -f $TMPFILE1 $TMPFILE2
 
 exit ${rc2}

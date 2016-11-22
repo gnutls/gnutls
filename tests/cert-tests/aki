@@ -24,13 +24,14 @@ set -e
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+TMPFILE=aki-$$.tmp
 DIFF="${DIFF:-diff -b -B}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/aki-cert.pem" \
-	|grep -v "Algorithm Security Level" > tmp-aki.pem
+	|grep -v "Algorithm Security Level" > $TMPFILE
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -38,8 +39,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-
-${DIFF} "${srcdir}/data/aki-cert.pem" tmp-aki.pem
+${DIFF} "${srcdir}/data/aki-cert.pem" $TMPFILE
 rc=$?
 
 # We're done.
@@ -47,6 +47,6 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-aki.pem
+rm -f $TMPFILE
 
 exit 0
