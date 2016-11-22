@@ -264,7 +264,7 @@ void cfg_init(void)
 	if (val && !strcmp(val->pzName, name)==0) \
 	  continue; \
 	len = strlen(val->v.strVal); \
-	if (sizeof(str) > len) { \
+	if (sizeof(str) > (unsigned)len) { \
 		strcpy(str, val->v.strVal); \
 	} else { \
 		memcpy(str, val->v.strVal, sizeof(str)-1); \
