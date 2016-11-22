@@ -1556,22 +1556,33 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 }
 
 static void
-print_fingerprint(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
-		  gnutls_digest_algorithm_t algo)
+print_fingerprint(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
 	int err;
 	char buffer[MAX_HASH_SIZE];
 	size_t size = sizeof(buffer);
 
-	err = gnutls_x509_crt_get_fingerprint(cert, algo, buffer, &size);
+	adds(str, _("\tFingerprint:\n"));
+
+	err = gnutls_x509_crt_get_fingerprint(cert, GNUTLS_DIG_SHA1, buffer, &size);
 	if (err < 0) {
 		addf(str, "error: get_fingerprint: %s\n",
 		     gnutls_strerror(err));
 		return;
 	}
 
-	addf(str, _("\t%s fingerprint:\n\t\t"), gnutls_mac_get_name((gnutls_mac_algorithm_t)algo));
+	adds(str, _("\t\tsha1:"));
+	_gnutls_buffer_hexprint(str, buffer, size);
+	adds(str, "\n");
 
+	size = sizeof(buffer);
+	err = gnutls_x509_crt_get_fingerprint(cert, GNUTLS_DIG_SHA256, buffer, &size);
+	if (err < 0) {
+		addf(str, "error: get_fingerprint: %s\n",
+		     gnutls_strerror(err));
+		return;
+	}
+	adds(str, _("\t\tsha256:"));
 	_gnutls_buffer_hexprint(str, buffer, size);
 	adds(str, "\n");
 }
@@ -1667,8 +1678,7 @@ print_other(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 	    gnutls_certificate_print_formats_t format)
 {
 	if (format != GNUTLS_CRT_PRINT_UNSIGNED_FULL) {
-		print_fingerprint(str, cert, GNUTLS_DIG_SHA1);
-		print_fingerprint(str, cert, GNUTLS_DIG_SHA256);
+		print_fingerprint(str, cert);
 	}
 	print_keyid(str, cert);
 }
@@ -1820,17 +1830,16 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	}
 
 	{
-		char buffer[20];
+		unsigned char buffer[MAX_HASH_SIZE];
 		size_t size = sizeof(buffer);
 
-		err =
-		    gnutls_x509_crt_get_fingerprint(cert, GNUTLS_DIG_SHA1,
-						    buffer, &size);
+		err = gnutls_x509_crt_get_key_id(cert, GNUTLS_KEYID_USE_SHA256,
+						 buffer, &size);
 		if (err < 0) {
-			addf(str, "unknown fingerprint (%s)",
+			addf(str, "key ID error (%s)",
 			     gnutls_strerror(err));
 		} else {
-			addf(str, "SHA-1 fingerprint `");
+			addf(str, "key-ID `sha256:");
 			_gnutls_buffer_hexprint(str, buffer, size);
 			adds(str, "'");
 		}
