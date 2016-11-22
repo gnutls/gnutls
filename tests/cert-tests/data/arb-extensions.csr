@@ -47,7 +47,8 @@ PKCS #10 Certificate Request Information:
 				Digital signature.
 Other Information:
 	Public Key ID:
-		5d40adf0ce9440958b7e99941d925422ca72365f
+		sha1:5d40adf0ce9440958b7e99941d925422ca72365f
+		sha256:472f7ef457b70a57a585094b285fdaef7ad72553495701ecd4f2a6dcb477b50e
 
 -----BEGIN NEW CERTIFICATE REQUEST-----
 MIIDIjCCAosCAQAwezEVMBMGA1UEAxMMQ2luZHkgTGF1cGVyMRcwFQYDVQQLEw5z
