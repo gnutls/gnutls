@@ -1576,27 +1576,54 @@ print_fingerprint(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 	adds(str, "\n");
 }
 
-static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
-{
-	int err;
-	unsigned char buffer[32];
-	size_t size = sizeof(buffer);
-	const char *name;
-	char *p;
-	unsigned int bits;
+typedef int get_id_func(void *obj, unsigned, unsigned char*, size_t*);
 
-	err = gnutls_x509_crt_get_key_id(cert, 0, buffer, &size);
+static void print_obj_id(gnutls_buffer_st *str, const char *prefix, void *obj, get_id_func *get_id)
+{
+	unsigned char sha1_buffer[MAX_HASH_SIZE];
+	unsigned char sha2_buffer[MAX_HASH_SIZE];
+	int err;
+	size_t sha1_size, sha2_size;
+
+	sha1_size = sizeof(sha1_buffer);
+	err = get_id(obj, GNUTLS_KEYID_USE_SHA1, sha1_buffer, &sha1_size);
 	if (err == GNUTLS_E_UNIMPLEMENTED_FEATURE) /* unsupported algo */
 		return;
 
 	if (err < 0) {
-		addf(str, "error: get_key_id: %s\n", gnutls_strerror(err));
+		addf(str, "error: get_key_id(sha1): %s\n", gnutls_strerror(err));
 		return;
 	}
 
-	adds(str, _("\tPublic Key ID:\n\t\t"));
-	_gnutls_buffer_hexprint(str, buffer, size);
+	sha2_size = sizeof(sha2_buffer);
+	err = get_id(obj, GNUTLS_KEYID_USE_SHA256, sha2_buffer, &sha2_size);
+	if (err == GNUTLS_E_UNIMPLEMENTED_FEATURE) /* unsupported algo */
+		return;
+
+	if (err < 0) {
+		addf(str, "error: get_key_id(sha256): %s\n", gnutls_strerror(err));
+		return;
+	}
+
+	addf(str, _("%sPublic Key ID:\n\t\tsha1:"), prefix);
+	_gnutls_buffer_hexprint(str, sha1_buffer, sha1_size);
+	addf(str, "\n%s\tsha256:", prefix);
+	_gnutls_buffer_hexprint(str, sha2_buffer, sha2_size);
 	adds(str, "\n");
+
+	return;
+}
+
+static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
+{
+	int err;
+	const char *name;
+	char *p;
+	unsigned int bits;
+	unsigned char sha1_buffer[MAX_HASH_SIZE];
+	size_t sha1_size;
+
+	print_obj_id(str, "\t", cert, (get_id_func*)gnutls_x509_crt_get_key_id);
 
 	err = gnutls_x509_crt_get_pk_algorithm(cert, &bits);
 	if (err < 0)
@@ -1614,10 +1641,16 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	} else {
 		name = gnutls_pk_get_name(err);
 	}
+
 	if (name == NULL)
 		return;
 
-	p = _gnutls_key_fingerprint_randomart(buffer, size, name, bits,
+	sha1_size = sizeof(sha1_buffer);
+	err = gnutls_x509_crt_get_key_id(cert, GNUTLS_KEYID_USE_SHA1, sha1_buffer, &sha1_size);
+	if (err == GNUTLS_E_UNIMPLEMENTED_FEATURE) /* unsupported algo */
+		return;
+
+	p = _gnutls_key_fingerprint_randomart(sha1_buffer, sha1_size, name, bits,
 					      "\t\t");
 	if (p == NULL)
 		return;
@@ -2427,36 +2460,7 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 
 static void print_crq_other(gnutls_buffer_st * str, gnutls_x509_crq_t crq)
 {
-	int err;
-	size_t size = 0;
-	unsigned char *buffer = NULL;
-
-	err = gnutls_x509_crq_get_key_id(crq, 0, buffer, &size);
-	if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		addf(str, "error: get_key_id: %s\n", gnutls_strerror(err));
-		return;
-	}
-
-	buffer = gnutls_malloc(size);
-	if (!buffer) {
-		addf(str, "error: malloc: %s\n",
-		     gnutls_strerror(GNUTLS_E_MEMORY_ERROR));
-		return;
-	}
-
-	err = gnutls_x509_crq_get_key_id(crq, 0, buffer, &size);
-	if (err < 0) {
-		gnutls_free(buffer);
-		addf(str, "error: get_key_id2: %s\n",
-		     gnutls_strerror(err));
-		return;
-	}
-
-	adds(str, _("\tPublic Key ID:\n\t\t"));
-	_gnutls_buffer_hexprint(str, buffer, size);
-	adds(str, "\n");
-
-	gnutls_free(buffer);
+	print_obj_id(str, "\t", crq, (get_id_func*)gnutls_x509_crq_get_key_id);
 }
 
 /**
@@ -2500,8 +2504,6 @@ static void
 print_pubkey_other(gnutls_buffer_st * str, gnutls_pubkey_t pubkey,
 		   gnutls_certificate_print_formats_t format)
 {
-	uint8_t buffer[MAX_HASH_SIZE];
-	size_t size = sizeof(buffer);
 	int ret;
 	unsigned int usage;
 
@@ -2516,16 +2518,7 @@ print_pubkey_other(gnutls_buffer_st * str, gnutls_pubkey_t pubkey,
 	adds(str, _("Public Key Usage:\n"));
 	print_key_usage2(str, "\t", pubkey->key_usage);
 
-	ret = gnutls_pubkey_get_key_id(pubkey, 0, buffer, &size);
-	if (ret < 0) {
-		addf(str, "error: get_key_id: %s\n", gnutls_strerror(ret));
-		return;
-	}
-
-	adds(str, "\n");
-	adds(str, _("Public Key ID: "));
-	_gnutls_buffer_hexprint(str, buffer, size);
-	adds(str, "\n");
+	print_obj_id(str, "", pubkey, (get_id_func*)gnutls_pubkey_get_key_id);
 }
 
 /**

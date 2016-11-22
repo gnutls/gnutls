@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -1183,15 +1184,24 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 	}
 
 	size = lbuffer_size;
-	if ((ret =
-	     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1, lbuffer, &size)) < 0) {
+	ret =
+	     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA256, lbuffer, &size);
+	if (ret < 0) {
 		fprintf(stderr, "Error in key id calculation: %s\n",
 			gnutls_strerror(ret));
 	} else {
 		gnutls_datum_t art;
 
-		fprintf(outfile, "Public Key ID: %s\n",
+		fprintf(outfile, "Public Key ID:\n\tsha256:%s\n",
 			raw_to_string(lbuffer, size));
+
+		size = lbuffer_size;
+		ret =
+		     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1, lbuffer, &size);
+		if (ret >= 0) {
+			fprintf(outfile, "\tsha1:%s\n",
+				raw_to_string(lbuffer, size));
+		}
 
 		ret =
 		    gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint,
