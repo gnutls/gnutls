@@ -28,6 +28,12 @@ See the end for copying conditions.
    not ship it; it can be used with the '--with-included-unistring'
    option to configure script.
 
+** libgnutls: GNUTLS_CRT_PRINT_ONELINE flag on gnutls_x509_crt_print()
+   will print the SHA256 key-ID instead of a certificate fingerprint.
+
+** certtool: Include the SHA-256 variant of key ID in --certificate-info
+   options.
+
 ** p11tool: Introduced the --initialize-pin and --initialize-so-pin
    options.
 
