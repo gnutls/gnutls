@@ -128,7 +128,9 @@ See @ref{Error codes}, for a description of the available error codes.
 
 All strings that are to provided as input to @acronym{GnuTLS} functions
 should be in UTF-8 unless otherwise specified. Output strings are also
-in UTF-8 format unless otherwise specified.
+in UTF-8 format unless otherwise specified. When functions take as input
+passwords, they will normalize them using @xcite{rfc7613} rules (since
+GnuTLS 3.5.7).
 
 When data of a fixed size are provided to @acronym{GnuTLS} functions then
 the helper structure @code{gnutls_datum_t} is often used. Its definition is

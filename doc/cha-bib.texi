@@ -41,6 +41,11 @@ Adam Langley, "A Transport Layer Security (TLS) ClientHello Padding Extension",
 October 2015, Available from
 @url{http://www.ietf.org/rfc/rfc7685.txt}.
 
+@item @anchor{RFC7613}[RFC7613]
+Peter Saint-Andre and Alexey Melnikov, "Preparation, Enforcement, and Comparison of Internationalized Strings Representing Usernames and Passwords",
+August 2015, Available from
+@url{http://www.ietf.org/rfc/rfc7613.txt}.
+
 @item @anchor{RFC2246}[RFC2246]
 Tim Dierks and Christopher Allen, "The TLS Protocol Version 1.0",
 January 1999, Available from
