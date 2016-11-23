@@ -28,7 +28,6 @@
 #include "errors.h"
 #include <extras/randomart.h>
 #include <pkcs7_int.h>
-#include <gnutls-idna.h>
 
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str

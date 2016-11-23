@@ -26,6 +26,10 @@
 #include <uninorm.h>
 #include <unistr.h>
 #include <unictype.h>
+#ifdef HAVE_LIBIDN
+# include <idna.h>
+# include <idn-free.h>
+#endif
 
 /**
  * gnutls_utf8_password_normalize:
@@ -140,3 +144,71 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
 	gnutls_free(nrmu8);
 	return ret;
 }
+
+#ifdef HAVE_LIBIDN
+/*-
+ * gnutls_idna_map:
+ * @input: contain the UTF-8 formatted domain name
+ * @ilen: the length of the provided string
+ * @out: the result in an null-terminated allocated string
+ * @flags: should be zero
+ *
+ * This function will convert the provided UTF-8 domain name, to
+ * its IDNA2003 mapping.
+ *
+ * If GnuTLS is compiled without libidn2 support, then this function
+ * will return %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Returns: %GNUTLS_E_INVALID_UTF8_STRING on invalid UTF-8 data, or 0 on success.
+ *
+ * Since: 3.5.7
+ -*/
+int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+{
+	char *idna = NULL;
+	int rc, ret;
+	gnutls_datum_t istr;
+
+	if (ilen == 0) {
+		out->data = (uint8_t*)gnutls_strdup("");
+		out->size = 0;
+		if (out->data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		return 0;
+	}
+
+	ret = _gnutls_set_strdatum(&istr, input, ilen);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	rc = idna_to_ascii_8z((char*)istr.data, &idna, 0);
+	if (rc != IDNA_SUCCESS) {
+		gnutls_assert();
+		_gnutls_debug_log("unable to convert name '%s' to IDNA format: %s\n", istr.data, idna_strerror(rc));
+		ret = GNUTLS_E_INVALID_UTF8_STRING;
+		goto fail;
+	}
+
+	if (gnutls_malloc != malloc) {
+		ret = _gnutls_set_strdatum(out, idna, strlen(idna));
+	} else  {
+		out->data = (unsigned char*)idna;
+		out->size = strlen(idna);
+		idna = NULL;
+		ret = 0;
+	}
+ fail:
+	idn_free(idna);
+	gnutls_free(istr.data);
+	return ret;
+}
+#else
+
+# undef gnutls_idna_map
+int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+{
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+}
+#endif /* HAVE_LIBIDN2 */

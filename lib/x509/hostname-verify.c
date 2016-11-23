@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  * Copyright (C) 2002 Andrew McDonald
  *
  * This file is part of GnuTLS.
@@ -25,7 +26,6 @@
 #include <common.h>
 #include "errors.h"
 #include <system.h>
-#include <gnutls-idna.h>
 
 /**
  * gnutls_x509_crt_check_hostname:
@@ -123,12 +123,13 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	char dnsname[MAX_CN];
 	size_t dnsnamesize;
 	int found_dnsname = 0;
-	int ret = 0, rc;
+	int ret = 0;
 	int i = 0;
 	struct in_addr ipv4;
 	char *p = NULL;
 	char *a_hostname;
 	char *a_dnsname;
+	gnutls_datum_t out;
 
 	/* check whether @hostname is an ip address */
 	if ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0) {
@@ -156,10 +157,12 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 
  hostname_fallback:
 	/* convert the provided hostname to ACE-Labels domain. */
-	rc = idna_to_ascii_8z (hostname, &a_hostname, 0);
-	if (rc != IDNA_SUCCESS) {
-		_gnutls_debug_log("unable to convert hostname %s to IDNA format: %s\n", hostname, idna_strerror (rc));
+	ret = gnutls_idna_map (hostname, strlen(hostname), &out, 0);
+	if (ret < 0) {
+		_gnutls_debug_log("unable to convert hostname %s to IDNA format\n", hostname);
 		a_hostname = (char*)hostname;
+	} else {
+		a_hostname = (char*)out.data;
 	}
 
 	/* try matching against:
@@ -192,14 +195,16 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				continue;
 			}
 
-			rc = idna_to_ascii_8z (dnsname, &a_dnsname, 0);
-			if (rc != IDNA_SUCCESS) {
-				_gnutls_debug_log("unable to convert dnsname %s to IDNA format: %s\n", dnsname, idna_strerror (rc));
+			ret = gnutls_idna_map (dnsname, dnsnamesize, &out, 0);
+			if (ret < 0) {
+				_gnutls_debug_log("unable to convert dnsname %s to IDNA format\n", dnsname);
 				continue;
 			}
 
+			a_dnsname = (char*)out.data;
+
 			ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
-			idn_free(a_dnsname);
+			gnutls_free(a_dnsname);
 
 			if (ret != 0) {
 				ret = 1;
@@ -241,16 +246,18 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		rc = idna_to_ascii_8z (dnsname, &a_dnsname, 0);
-		if (rc != IDNA_SUCCESS) {
-			_gnutls_debug_log("unable to convert CN %s to IDNA format: %s\n", dnsname, idna_strerror (rc));
+		ret = gnutls_idna_map (dnsname, dnsnamesize, &out, 0);
+		if (ret < 0) {
+			_gnutls_debug_log("unable to convert CN %s to IDNA format\n", dnsname);
 			ret = 0;
 			goto cleanup;
 		}
 
+		a_dnsname = (char*)out.data;
+
 		ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
 
-		idn_free(a_dnsname);
+		gnutls_free(a_dnsname);
 
 		if (ret != 0) {
 			ret = 1;
@@ -263,7 +270,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	ret = 0;
  cleanup:
 	if (a_hostname != hostname) {
-		idn_free(a_hostname);
+		gnutls_free(a_hostname);
 	}
 	return ret;
 }

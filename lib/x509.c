@@ -45,7 +45,6 @@
 #include "x509/x509_int.h"
 #include <str_array.h>
 #include <gnutls/x509.h>
-#include "gnutls-idna.h"
 #include "read-file.h"
 #include "system-keys.h"
 #include "urls.h"
@@ -406,19 +405,19 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 static int str_array_append_idna(gnutls_str_array_t * head, const char *name, size_t size)
 {
-	int rc, ret;
-	char *a_hostname;
+	int ret;
+	gnutls_datum_t ahost;
 
 	/* convert the provided hostname to ACE-Labels domain. */
-	rc = idna_to_ascii_8z(name, &a_hostname, 0);
-	if (rc != IDNA_SUCCESS) {
-		_gnutls_debug_log("unable to convert hostname %s to IDNA format: %s\n", name, idna_strerror (rc));
+	ret = gnutls_idna_map(name, size, &ahost, 0);
+	if (ret < 0) {
+		_gnutls_debug_log("unable to convert hostname %s to IDNA format\n", name);
 		/* insert the raw name */
 		return _gnutls_str_array_append(head, name, size);
 	}
 
-	ret = _gnutls_str_array_append(head, a_hostname, strlen(a_hostname));
-	idn_free(a_hostname);
+	ret = _gnutls_str_array_append(head, (char*)ahost.data, ahost.size);
+	gnutls_free(ahost.data);
 
 	return ret;
 }

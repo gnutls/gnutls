@@ -32,7 +32,6 @@
 #include "errors.h"
 #include <extras/randomart.h>
 #include <c-ctype.h>
-#include <gnutls-idna.h>
 #include "extensions.h"
 #include "ip.h"
 
@@ -52,6 +51,7 @@ unsigned non_ascii = 0;
 #ifdef HAVE_LIBIDN
 unsigned i;
 #endif
+int ret;
 
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP
 	     || type == GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL
@@ -76,16 +76,15 @@ unsigned i;
 #endif
 
 		if (non_ascii != 0) {
-			char *s;
-			int rc;
+			gnutls_datum_t out;
 
-			rc = idna_to_ascii_8z((char*)name->data, &s, 0);
-			if (rc == IDNA_SUCCESS) {
-				addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), s);
-				idn_free(s);
-			} else {
+			ret = gnutls_idna_map((char*)name->data, name->size, &out, 0);
+			if (ret < 0) {
 				adds(str, _("note: DNSname is not in UTF-8.\n"));
 				addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+			} else {
+				addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), (char*)out.data);
+				gnutls_free(out.data);
 			}
 		} else {
 			addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));

@@ -36,7 +36,6 @@ libgnutls_x509_la_SOURCES =	\
 	common.c key_encode.c	\
 	common.h key_decode.c	\
 	time.c			\
-	gnutls-idna.h		\
 	crl.c			\
 	crl_write.c		\
 	crq.c			\
