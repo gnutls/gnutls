@@ -2603,6 +2603,37 @@ int gnutls_x509_aia_get(gnutls_x509_aia_t aia, unsigned int seq,
 	return 0;
 }
 
+int _gnutls_alt_name_process(gnutls_datum_t *out, unsigned type, const gnutls_datum_t *san, unsigned raw)
+{
+	int ret;
+	if (type == GNUTLS_SAN_DNSNAME && !raw) {
+		ret = gnutls_idna_map((char*)san->data, san->size, out, 0);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+	} else if (type == GNUTLS_SAN_RFC822NAME && !raw) {
+		ret = _gnutls_idna_email_map((char*)san->data, san->size, out);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+	} else if (type == GNUTLS_SAN_URI && !raw) {
+		if (!_gnutls_str_is_print((char*)san->data, san->size)) {
+			_gnutls_debug_log("non-ASCII URIs are not supported\n");
+			return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+		} else {
+			ret = _gnutls_set_strdatum(out, san->data, san->size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
+	} else {
+		ret = _gnutls_set_strdatum(out, san->data, san->size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_x509_aia_set:
  * @aia: The authority info access
@@ -2616,6 +2647,9 @@ int gnutls_x509_aia_get(gnutls_x509_aia_t aia, unsigned int seq,
  *
  * Typically the value for @oid should be %GNUTLS_OID_AD_OCSP, or
  * %GNUTLS_OID_AD_CAISSUERS.
+ *
+ * Since version 3.5.7 the %GNUTLS_SAN_RFC822NAME, and %GNUTLS_SAN_DNSNAME,
+ * are converted to ACE format when necessary.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0), otherwise a negative error value.
  *
@@ -2646,7 +2680,7 @@ int gnutls_x509_aia_set(gnutls_x509_aia_t aia,
 		aia->aia[indx].oid.size = 0;
 	}
 
-	ret = _gnutls_set_datum(&aia->aia[indx].san, san->data, san->size);
+	ret = _gnutls_alt_name_process(&aia->aia[indx].san, san_type, san, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

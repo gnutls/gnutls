@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2015 Nikos Mavrogiannopoulos
- * Copyright (C) 2015 Red Hat, Inc.
+ * Copyright (C) 2015-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -25,6 +25,7 @@
 
 #include "gnutls_int.h"
 #include "x509_int.h"
+#include "x509_ext_int.h"
 #include "common.h"
 #include "krb5.h"
 #include "virt-san.h"
@@ -65,32 +66,11 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutl
 
 	if (type < 1000) {
 		name->type = type;
-		if (type == GNUTLS_SAN_DNSNAME && !raw) {
-			ret = gnutls_idna_map((char*)san->data, san->size, &name->san, 0);
-			if (ret < 0) {
-				return gnutls_assert_val(ret);
-			}
-			gnutls_free(san->data);
-			san->data = NULL;
-		} else if (type == GNUTLS_SAN_RFC822NAME && !raw) {
-			ret = _gnutls_idna_email_map((char*)san->data, san->size, &name->san);
-			if (ret < 0) {
-				return gnutls_assert_val(ret);
-			}
-			gnutls_free(san->data);
-			san->data = NULL;
-		} else if (type == GNUTLS_SAN_URI && !raw) {
-			if (!_gnutls_str_is_print((char*)san->data, san->size)) {
-				_gnutls_debug_log("non-ASCII URIs are not supported\n");
-				return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-			} else {
-				name->san.data = san->data;
-				name->san.size = san->size;
-			}
-		} else {
-			name->san.data = san->data;
-			name->san.size = san->size;
-		}
+		ret = _gnutls_alt_name_process(&name->san, type, san, raw);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+		gnutls_free(san->data);
+		san->data = NULL;
 
 		if (othername_oid) {
 			name->othername_oid.data = (uint8_t *) othername_oid;
@@ -99,7 +79,6 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutl
 			name->othername_oid.data = NULL;
 			name->othername_oid.size = 0;
 		}
-
 	} else { /* virtual types */
 		const char *oid = virtual_to_othername_oid(type);
 

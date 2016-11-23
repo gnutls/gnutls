@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Free Software Foundation
+ * Copyright (C) 2014-2016 Free Software Foundation
+ * Copyright (C) 2014-2016 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -27,5 +28,7 @@ struct name_st {
 	gnutls_datum_t san;
 	gnutls_datum_t othername_oid;
 };
+
+int _gnutls_alt_name_process(gnutls_datum_t *out, unsigned type, const gnutls_datum_t *san, unsigned raw);
 
 #endif
