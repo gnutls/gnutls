@@ -31,14 +31,44 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <assert.h>
 
 #include "utils.h"
 
 #include "cert-common.h"
 
+static unsigned char saved_crt_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICSzCCAbSgAwIBAgIDChEAMA0GCSqGSIb3DQEBCwUAMCsxDjAMBgNVBAMTBW5p\n"
+	"a29zMRkwFwYDVQQKExBub25lIHRvLCBtZW50aW9uMCAXDTA4MDMzMTIyMDAwMFoY\n"
+	"Dzk5OTkxMjMxMjM1OTU5WjArMQ4wDAYDVQQDEwVuaWtvczEZMBcGA1UEChMQbm9u\n"
+	"ZSB0bywgbWVudGlvbjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAu2ZD9fLF\n"
+	"17aMzMXf9Yg7sclLag6hrSBQQAiAoU9co9D4bM/mPPfsBHYTF4tkiSJbwN1TfDvt\n"
+	"fAS7gLkovo6bxo6gpRLL9Vceoue7tzNJn+O7Sq5qTWj/yRHiMo3OPYALjXXv2ACB\n"
+	"jygEA6AijWEEB/q2N30hB0nSCWFpmJCjWKkCAwEAAaN7MHkwDAYDVR0TAQH/BAIw\n"
+	"ADAPBgNVHQ8BAf8EBQMDB4AAMDYGA1UdEQQvMC2CA2FwYYIReG4tLW14YWE0YXM2\n"
+	"ZC5jb22BE3Rlc3RAeG4tLWt4YXdoay5vcmcwIAYDVR0lAQH/BBYwFAYIKwYBBQUH\n"
+	"AwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBCwUAA4GBACul+Ucf1gADG6diSZA7hOPG\n"
+	"4g1hngzNWP1uObfICizlo791+KGrbIh9aIntcE1GYWHUP25SUKDaQD9n5f92Jm7U\n"
+	"EVAMxrp6c9b5GAH9818KL6aYuvgWlAeofW5t3sFrdzeEIVXrQsZWiSKtiC89JFG9\n"
+	"a7c3rdNqKrfzkop8NIgc\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t saved_crt = { saved_crt_pem, sizeof(saved_crt_pem)-1 };
+
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
+}
+
+static time_t mytime(time_t * t)
+{
+	time_t then = 1207000800;
+
+	if (t)
+		*t = then;
+
+	return then;
 }
 
 void doit(void)
@@ -55,6 +85,7 @@ void doit(void)
 	if (ret < 0)
 		fail("global_init\n");
 
+	gnutls_global_set_time_function(mytime);
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(4711);
@@ -93,7 +124,7 @@ void doit(void)
 	if (ret != 0)
 		fail("error\n");
 
-	ret = gnutls_x509_crt_set_activation_time(crt, time(0));
+	ret = gnutls_x509_crt_set_activation_time(crt, mytime(0));
 	if (ret != 0)
 		fail("error\n");
 
@@ -126,6 +157,12 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
+	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME,
+						   "ινβάλιντ@bar.org", strlen("ινβάλιντ@bar.org"), 1);
+	if (ret != GNUTLS_E_INVALID_UTF8_EMAIL)
+		fail("gnutls_x509_crt_set_subject_alt_name\n");
+
+
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_IPADDRESS,
 						   "\xc1\x5c\x96\x3", 4, 1);
 	if (ret != 0)
@@ -138,6 +175,16 @@ void doit(void)
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME,
 						   "apa", 3, 0);
+	if (ret != 0)
+		fail("gnutls_x509_crt_set_subject_alt_name\n");
+
+	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME,
+						   "απαλό.com", strlen("απαλό.com"), 1);
+	if (ret != 0)
+		fail("gnutls_x509_crt_set_subject_alt_name\n");
+
+	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME,
+						   "test@νίκο.org", strlen("test@νίκο.org"), 1);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
@@ -226,6 +273,12 @@ void doit(void)
 	if (ret != 0) {
 		fail("equality test failed\n");
 	}
+	assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM, &out) >= 0);
+
+	assert(out.size == saved_crt.size);
+	assert(memcmp(out.data, saved_crt.data, out.size)==0);
+
+	gnutls_free(out.data);
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_crt_deinit(crt2);
