@@ -17,6 +17,9 @@ See the end for copying conditions.
    not identical to CVE-2016-8610, due to the difference in alert handling
    of the libraries (gnutls delegates that handling to applications).
 
+** libgnutls: Enhanced the PKCS#7 parser to allow decoding old
+   (pre-rfc5652) structures with arbitrary encapsulated content.
+
 ** libgnutls: Backported cipher priorities order from 3.5.x branch. That
    adds CHACHA20-POLY1305 ciphersuite to SECURE priority strings.
 
