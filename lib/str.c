@@ -722,7 +722,7 @@ _gnutls_hostname_compare(const char *certname,
 	unsigned i;
 
 	for (i=0;i<certnamesize;i++) {
-		if (c_isascii(certname[i]) == 0)
+		if (c_isprint(certname[i]) == 0)
 			return hostname_compare_raw(certname, certnamesize, hostname);
 	}
 

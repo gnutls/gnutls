@@ -68,7 +68,7 @@ int ret;
 	case GNUTLS_SAN_DNSNAME:
 #ifdef HAVE_LIBIDN
 		for (i=0;i<name->size;i++) {
-			if (c_isascii(name->data[i]) == 0) {
+			if (c_isprint(name->data[i]) == 0) {
 				non_ascii = 1;
 				break;
 			}

@@ -299,7 +299,7 @@ make_printable_string(unsigned etype, const gnutls_datum_t * input,
 		 * characters then treat it as printable.
 		 */
 		for (i = 0; i < input->size; i++)
-			if (!c_isascii(input->data[i]))
+			if (!c_isprint(input->data[i]))
 				ascii = 1;
 
 		if (ascii == 0) {
