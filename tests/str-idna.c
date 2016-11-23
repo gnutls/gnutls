@@ -31,13 +31,13 @@
 #include <gnutls/gnutls.h>
 #include <cmocka.h>
 
-int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
+int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
 
 #define MATCH_FUNC(fname, str, normalized) \
 static void fname(void **glob_state) \
 { \
 	gnutls_datum_t out; \
-	int ret = gnutls_idna_map(str, strlen(str), &out, 0); \
+	int ret = _gnutls_idna_map(str, strlen(str), &out, 0); \
 	if (normalized == NULL) { /* expect failure */ \
 		assert_int_not_equal(ret, 0); \
 		return; \
@@ -86,7 +86,7 @@ int main(void)
 		cmocka_unit_test(test_dots)
 	};
 
-	ret = gnutls_idna_map("x", 1, &tmp, 0);
+	ret = _gnutls_idna_map("x", 1, &tmp, 0);
 	if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE)
 		exit(77);
 	gnutls_free(tmp.data);

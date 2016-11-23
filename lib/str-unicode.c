@@ -147,7 +147,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
 
 #ifdef HAVE_LIBIDN
 /*-
- * gnutls_idna_map:
+ * _gnutls_idna_map:
  * @input: contain the UTF-8 formatted domain name
  * @ilen: the length of the provided string
  * @out: the result in an null-terminated allocated string
@@ -163,7 +163,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
  *
  * Since: 3.5.7
  -*/
-int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
 	char *idna = NULL;
 	int rc, ret;
@@ -207,7 +207,7 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 #else
 
 # undef gnutls_idna_map
-int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
