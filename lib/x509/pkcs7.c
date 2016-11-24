@@ -1068,7 +1068,7 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 
 	for (i=0;i<(unsigned)count;i++) {
 		/* Try to find the signer in the appended list. */
-		ret = gnutls_pkcs7_get_crt_raw2(pkcs7, 0, &tmp);
+		ret = gnutls_pkcs7_get_crt_raw2(pkcs7, i, &tmp);
 		if (ret < 0) {
 			gnutls_assert();
 			goto fail;
