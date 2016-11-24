@@ -1254,6 +1254,7 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 		    gnutls_x509_crt_verify_data3(signer, info.algo, vdata, vdata_size,
 						 &sigdata, &info.sig, flags);
 		if (ret < 0) {
+			_gnutls_cert_log("failed struct verification with", signer);
 			gnutls_assert();
 		}
 		gnutls_x509_crt_deinit(signer);
