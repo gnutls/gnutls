@@ -1035,6 +1035,7 @@ static
 gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 			      gnutls_typed_vdata_st * vdata,
 			      unsigned vdata_size,
+			      unsigned vflags,
 			      gnutls_pkcs7_signature_info_st * info)
 {
 	gnutls_x509_crt_t issuer = NULL, crt = NULL;
@@ -1152,7 +1153,7 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 		_gnutls_cert_log("verifying with", crt);
 		ret =
 		    gnutls_x509_trust_list_verify_crt2(tl, &crt, 1, vdata,
-						       vdata_size, 0, &vtmp,
+						       vdata_size, vflags, &vtmp,
 						       NULL);
 		if (ret < 0 || vtmp != 0) {
 			gnutls_assert();	/* maybe next one is trusted */
@@ -1247,7 +1248,7 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	signer = find_signer(pkcs7, tl, vdata, vdata_size, &info);
+	signer = find_signer(pkcs7, tl, vdata, vdata_size, flags, &info);
 	if (signer) {
 		ret =
 		    gnutls_x509_crt_verify_data3(signer, info.algo, vdata, vdata_size,
