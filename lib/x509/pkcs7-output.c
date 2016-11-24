@@ -95,7 +95,8 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 	size_t max;
 	int ret;
 
-	print_dn(str, "\tSigner's issuer DN", &info->issuer_dn);
+	if (info->issuer_dn.size > 0)
+		print_dn(str, "\tSigner's issuer DN", &info->issuer_dn);
 	print_raw(str, "\tSigner's serial", &info->signer_serial);
 	print_raw(str, "\tSigner's issuer key ID", &info->issuer_keyid);
 	if (info->signing_time != -1) {
