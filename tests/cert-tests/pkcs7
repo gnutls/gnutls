@@ -33,7 +33,7 @@ OUTFILE2=out2-pkcs7.$$.tmp
 
 check_for_datefudge
 
-for FILE in single-ca.p7b full.p7b; do
+for FILE in single-ca.p7b full.p7b openssl.p7b; do
 ${VALGRIND} "${CERTTOOL}" --inder --p7-info --infile "${srcdir}/data/${FILE}"|grep -v "Signing time" >"${OUTFILE}"
 rc=$?
 
@@ -52,7 +52,7 @@ done
 
 # check signatures
 
-for FILE in full.p7b; do
+for FILE in full.p7b openssl.p7b; do
 # check validation with date prior to CA issuance
 datefudge -s "2011-1-10" \
 ${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
@@ -90,6 +90,11 @@ if test "${rc}" != "0"; then
 	echo "${FILE}: PKCS7 verification failed"
 	exit ${rc}
 fi
+done
+
+
+#check key purpose verification
+for FILE in full.p7b; do
 
 ${VALGRIND} "${CERTTOOL}" --verify-purpose=1.3.6.1.5.5.7.3.1 --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
