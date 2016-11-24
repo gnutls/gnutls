@@ -1140,13 +1140,16 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 			goto fail;
 		}
 
+
 		if (serial_size != info->signer_serial.size
 		    || memcmp(info->signer_serial.data, serial,
 			      serial_size) != 0) {
+			_gnutls_cert_log("doesn't match serial", crt);
 			gnutls_assert();
 			goto skip;
 		}
 
+		_gnutls_cert_log("verifying with", crt);
 		ret =
 		    gnutls_x509_trust_list_verify_crt2(tl, &crt, 1, vdata,
 						       vdata_size, 0, &vtmp,
