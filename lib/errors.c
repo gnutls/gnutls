@@ -149,6 +149,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_SRP_PWD_PARSING_ERROR),
 	ERROR_ENTRY(N_("The requested data were not available."),
 		    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE),
+	ERROR_ENTRY(N_("There are no embedded data in the structure."),
+		    GNUTLS_E_NO_EMBEDDED_DATA),
 	ERROR_ENTRY(N_("Error in the pull function."), GNUTLS_E_PULL_ERROR),
 	ERROR_ENTRY(N_("Error in the push function."), GNUTLS_E_PUSH_ERROR),
 	ERROR_ENTRY(N_

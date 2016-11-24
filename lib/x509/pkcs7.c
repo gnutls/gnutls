@@ -776,6 +776,10 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 		data = &pkcs7->der_signed_data;
 	}
 
+	if (data->size == 0) {
+		return gnutls_assert_val(GNUTLS_E_NO_EMBEDDED_DATA);
+	}
+
 	ret = gnutls_hash_fast(hash, data->data, data->size, hash_output);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -846,7 +850,7 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 	if (msg_digest_ok)
 		ret = 0;
 	else
-		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
 
  cleanup:
 	gnutls_free(tmp.data);
