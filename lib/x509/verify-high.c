@@ -225,7 +225,7 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 
 #ifdef ENABLE_PKCS11
 /* Keeps the provided certificate in a structure that will be
- * deallocated on deinit. This is to handle get_issuer() with 
+ * deallocated on deinit. This is to handle get_issuer() with
  * pkcs11 trust modules when the GNUTLS_TL_GET_COPY flag isn't
  * given. It is not thread safe. */
 static int
@@ -592,7 +592,7 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 		}
 
 		/* Add the CA (or plain) certificate to the black list as well.
-		 * This will prevent a subordinate CA from being valid, and 
+		 * This will prevent a subordinate CA from being valid, and
 		 * ensure that a server certificate will also get rejected.
 		 */
 		list->blacklisted =
@@ -1184,24 +1184,27 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * @voutput: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.
  *
- * This function will attempt to verify the given certificate and return
+ * This function will attempt to verify the given certificate chain and return
  * its status. The @voutput parameter will hold an OR'ed sequence of
- * %gnutls_certificate_status_t flags. When a chain of @cert_list_size with 
- * more than one certificates is provided, the verification status will apply
- * to the first certificate in the chain that failed verification. The
- * verification process starts from the end of the chain (from CA to end
- * certificate).
+ * %gnutls_certificate_status_t flags.
+ *
+ * When a certificate chain of @cert_list_size with more than one certificates is
+ * provided, the verification status will apply to the first certificate in the chain
+ * that failed verification. The verification process starts from the end of the chain
+ * (from CA to end certificate). The first certificate in the chain must be the end-certificate
+ * while the rest of the members may be sorted or not.
  *
  * Additionally a certificate verification profile can be specified
  * from the ones in %gnutls_certificate_verification_profiles_t by
  * ORing the result of GNUTLS_PROFILE_TO_VFLAGS() to the verification
  * flags.
  *
- * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
+ * Additional verification parameters are possible via the @data types; the
+ * acceptable types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
  * The former accepts as data a null-terminated hostname, and the latter a null-terminated
  * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
  * If a DNS hostname is provided then this function will compare
- * the hostname in the certificate against the given. If names do not match the 
+ * the hostname in the end certificate against the given. If names do not match the
  * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set. In addition it
  * will consider certificates provided with gnutls_x509_trust_list_add_named_crt().
  *
