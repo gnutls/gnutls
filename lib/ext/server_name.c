@@ -321,7 +321,7 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 
 	ret = gnutls_idna_map((char*)priv->server_names[indx].name, priv->server_names[indx].name_length, &idn_name, 0);
 	if (ret < 0) {
-		 _gnutls_debug_log("unable to convert name %s to IDNA2008 format\n", (char*)priv->server_names[indx].name);
+		 _gnutls_debug_log("unable to convert name %s to IDNA2003 format\n", (char*)priv->server_names[indx].name);
 		 return GNUTLS_E_IDNA_ERROR;
 	}
 
@@ -445,7 +445,7 @@ gnutls_server_name_set(gnutls_session_t session,
 
 	ret = gnutls_idna_map(name, name_length, &idn_name, 0);
 	if (ret < 0) {
-		 _gnutls_debug_log("unable to convert name %s to IDNA2008 format\n", (char*)name);
+		 _gnutls_debug_log("unable to convert name %s to IDNA2003 format\n", (char*)name);
 		 return ret;
 	}
 
