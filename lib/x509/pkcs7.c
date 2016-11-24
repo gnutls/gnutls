@@ -42,7 +42,7 @@
 
 static const uint8_t one = 1;
 
-/* Decodes the PKCS #7 signed data, and returns an ASN1_TYPE, 
+/* Decodes the PKCS #7 signed data, and returns an ASN1_TYPE,
  * which holds them. If raw is non null then the raw decoded
  * data are copied (they are locally allocated) there.
  */
@@ -327,7 +327,7 @@ gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
 	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	/* Step 2. Parse the CertificateSet 
+	/* Step 2. Parse the CertificateSet
 	 */
 	snprintf(root2, sizeof(root2), "certificates.?%u", indx + 1);
 
@@ -346,7 +346,7 @@ gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	/* if 'Certificate' is the choice found: 
+	/* if 'Certificate' is the choice found:
 	 */
 	if (strcmp(oid, "certificate") == 0) {
 		int start, end;
@@ -906,7 +906,7 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
  * they are encoded in the structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. 
+ *   negative error value.
  *
  * Since: 3.4.8
  **/
@@ -1031,92 +1031,110 @@ int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
 	return ret;
 }
 
-static
-gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
-			      gnutls_typed_vdata_st * vdata,
-			      unsigned vdata_size,
-			      unsigned vflags,
-			      gnutls_pkcs7_signature_info_st * info)
+/* Finds the issuer of the given certificate (@cert) in the
+ * included in PKCS#7 list of certificates */
+static gnutls_x509_crt_t find_verified_issuer_of(gnutls_pkcs7_t pkcs7,
+					gnutls_x509_crt_t cert,
+					const char *purpose,
+					unsigned vflags)
 {
-	gnutls_x509_crt_t issuer = NULL, crt = NULL;
+	gnutls_x509_crt_t issuer = NULL;
 	int ret, count;
-	uint8_t serial[128];
-	size_t serial_size;
 	gnutls_datum_t tmp = { NULL, 0 };
 	unsigned i, vtmp;
-
-	if (info->issuer_dn.data) {
-		ret =
-		    gnutls_x509_trust_list_get_issuer_by_dn(tl,
-							    &info->issuer_dn,
-							    &issuer, 0);
-		if (ret < 0) {
-			gnutls_assert();
-			issuer = NULL;
-		}
-	}
-
-	if (info->issuer_keyid.data && issuer == NULL) {
-		ret =
-		    gnutls_x509_trust_list_get_issuer_by_subject_key_id(tl,
-									NULL,
-									&info->
-									issuer_keyid,
-									&issuer,
-									0);
-		if (ret < 0) {
-			gnutls_assert();
-			issuer = NULL;
-		}
-	}
-
-	if (issuer == NULL) {
-		/* the issuer of the signer is not trusted. Too bad. */
-		return NULL;
-	}
-
-	/* check issuer's key purpose */
-	for (i = 0; i < vdata_size; i++) {
-		if (vdata[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
-			ret =
-			    _gnutls_check_key_purpose(issuer,
-						      (char *)vdata[i].data, 0);
-			if (ret == 0) {
-				gnutls_assert();
-				goto fail;
-			} else {
-				break;
-			}
-		}
-	}
-
-	/* if the serial number of the issuer matches the one in the cert,
-	 * then the issuer is the signer */
-	if (info->signer_serial.data) {
-		serial_size = sizeof(serial);
-		ret = gnutls_x509_crt_get_serial(issuer, serial, &serial_size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fail;
-		}
-
-		if (serial_size == info->signer_serial.size
-		    && memcmp(info->signer_serial.data, serial,
-			      serial_size) == 0) {
-			/* issuer == signer */
-			return issuer;
-		}
-	}
 
 	count = gnutls_pkcs7_get_crt_count(pkcs7);
 	if (count < 0) {
 		gnutls_assert();
-		goto fail;
+		return NULL;
 	}
 
 	for (i = 0; i < (unsigned)count; i++) {
 		/* Try to find the signer in the appended list. */
 		ret = gnutls_pkcs7_get_crt_raw2(pkcs7, i, &tmp);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		ret = gnutls_x509_crt_init(&issuer);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		ret = gnutls_x509_crt_import(issuer, &tmp, GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		if (!gnutls_x509_crt_check_issuer(cert, issuer)) {
+			gnutls_assert();
+			goto skip;
+		}
+
+		ret = gnutls_x509_crt_verify(cert, &issuer, 1, vflags|GNUTLS_VERIFY_DO_NOT_ALLOW_SAME, &vtmp);
+		if (ret < 0 || vtmp != 0 ||
+		    (purpose != NULL && !_gnutls_check_key_purpose(issuer, purpose, 0))) {
+			gnutls_assert();	/* maybe next one is trusted */
+			_gnutls_cert_log("failed verification with", issuer);
+ skip:
+			gnutls_x509_crt_deinit(issuer);
+			issuer = NULL;
+			gnutls_free(tmp.data);
+			tmp.data = NULL;
+			continue;
+		}
+
+		_gnutls_cert_log("issued by", issuer);
+
+		/* we found a signer we trust. let's return it */
+		break;
+	}
+
+	if (issuer == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	goto cleanup;
+
+ fail:
+	if (issuer) {
+		gnutls_x509_crt_deinit(issuer);
+		issuer = NULL;
+	}
+
+ cleanup:
+	gnutls_free(tmp.data);
+
+	return issuer;
+}
+
+/* Finds a certificate that is issued by @issuer -if given-, and matches
+ * either the serial number or the key ID (both in @info) .
+ */
+static gnutls_x509_crt_t find_child_of_with_serial(gnutls_pkcs7_t pkcs7,
+						   gnutls_x509_crt_t issuer,
+						   const char *purpose,
+						   gnutls_pkcs7_signature_info_st *info)
+{
+	gnutls_x509_crt_t crt = NULL;
+	int ret, count;
+	uint8_t tmp[128];
+	size_t tmp_size;
+	gnutls_datum_t tmpdata = { NULL, 0 };
+	unsigned i;
+
+	count = gnutls_pkcs7_get_crt_count(pkcs7);
+	if (count < 0) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	for (i = 0; i < (unsigned)count; i++) {
+		/* Try to find the crt in the appended list. */
+		ret = gnutls_pkcs7_get_crt_raw2(pkcs7, i, &tmpdata);
 		if (ret < 0) {
 			gnutls_assert();
 			goto fail;
@@ -1128,62 +1146,232 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 			goto fail;
 		}
 
-		ret = gnutls_x509_crt_import(crt, &tmp, GNUTLS_X509_FMT_DER);
+		ret = gnutls_x509_crt_import(crt, &tmpdata, GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
 			goto fail;
 		}
 
-		serial_size = sizeof(serial);
-		ret = gnutls_x509_crt_get_serial(crt, serial, &serial_size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fail;
+		if (issuer != NULL) {
+			if (!gnutls_x509_crt_check_issuer(crt, issuer)) {
+				gnutls_assert();
+				goto skip;
+			}
 		}
 
-
-		if (serial_size != info->signer_serial.size
-		    || memcmp(info->signer_serial.data, serial,
-			      serial_size) != 0) {
-			_gnutls_cert_log("doesn't match serial", crt);
-			gnutls_assert();
-			goto skip;
+		if (purpose) {
+			ret =
+			    _gnutls_check_key_purpose(crt, purpose, 0);
+			if (ret == 0) {
+				_gnutls_cert_log("key purpose unacceptable", crt);
+				goto skip;
+			}
 		}
 
-		_gnutls_cert_log("verifying with", crt);
-		ret =
-		    gnutls_x509_trust_list_verify_crt2(tl, &crt, 1, vdata,
-						       vdata_size, vflags, &vtmp,
-						       NULL);
-		if (ret < 0 || vtmp != 0) {
-			gnutls_assert();	/* maybe next one is trusted */
+		if (info->signer_serial.size > 0) {
+			tmp_size = sizeof(tmp);
+			ret = gnutls_x509_crt_get_serial(crt, tmp, &tmp_size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto skip;
+			}
+
+			if (tmp_size != info->signer_serial.size
+			    || memcmp(info->signer_serial.data, tmp,
+				      tmp_size) != 0) {
+				_gnutls_cert_log("doesn't match serial", crt);
+				gnutls_assert();
+				goto skip;
+			}
+		} else if (info->issuer_keyid.size > 0) {
+			tmp_size = sizeof(tmp);
+			ret = gnutls_x509_crt_get_subject_key_id(crt, tmp, &tmp_size, NULL);
+			if (ret < 0) {
+				gnutls_assert();
+				goto skip;
+			}
+
+			if (tmp_size != info->issuer_keyid.size
+			    || memcmp(info->issuer_keyid.data, tmp,
+				      tmp_size) != 0) {
+				_gnutls_cert_log("doesn't match key ID", crt);
+				gnutls_assert();
  skip:
-			gnutls_x509_crt_deinit(crt);
-			crt = NULL;
-			gnutls_free(tmp.data);
-			tmp.data = NULL;
-			continue;
+				gnutls_x509_crt_deinit(crt);
+				crt = NULL;
+				gnutls_free(tmpdata.data);
+				tmpdata.data = NULL;
+				continue;
+			}
+		} else {
+			gnutls_assert();
+			ret = GNUTLS_E_PARSING_ERROR;
+			goto fail;
 		}
 
-		/* we found a signer we trust. let's return it */
+		_gnutls_cert_log("signer is", crt);
+
+		/* we found the child with the given serial or key ID */
 		break;
 	}
 
-	/* ok a trusted certificate was found. This is the signer */
-	goto cleanup;
+	if (crt == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 
+	goto cleanup;
  fail:
-	if (crt != NULL) {
+	if (crt) {
 		gnutls_x509_crt_deinit(crt);
 		crt = NULL;
 	}
 
  cleanup:
-	gnutls_free(tmp.data);
-	if (issuer)
-		gnutls_x509_crt_deinit(issuer);
+	gnutls_free(tmpdata.data);
 
 	return crt;
+}
+
+static
+gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
+			      gnutls_typed_vdata_st * vdata,
+			      unsigned vdata_size,
+			      unsigned vflags,
+			      gnutls_pkcs7_signature_info_st * info)
+{
+	gnutls_x509_crt_t issuer = NULL;
+	gnutls_x509_crt_t signer = NULL;
+	int ret;
+	gnutls_datum_t tmp = { NULL, 0 };
+	unsigned i, vtmp;
+	const char *purpose = NULL;
+
+	if (info->issuer_keyid.data) {
+		ret =
+		    gnutls_x509_trust_list_get_issuer_by_subject_key_id(tl,
+									NULL,
+									&info->
+									issuer_keyid,
+									&signer,
+									0);
+		if (ret < 0) {
+			gnutls_assert();
+			signer = NULL;
+		}
+	}
+
+	/* get key purpose */
+	for (i = 0; i < vdata_size; i++) {
+		if (vdata[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
+			purpose = (char *)vdata[i].data;
+			break;
+		}
+	}
+
+	/* this will give us the issuer of the signer (wtf) */
+	if (info->issuer_dn.data && signer == NULL) {
+		ret =
+		    gnutls_x509_trust_list_get_issuer_by_dn(tl,
+							    &info->issuer_dn,
+							    &issuer, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			signer = NULL;
+		}
+
+		if (issuer) {
+			/* try to find the actual signer in the list of
+			 * certificates */
+			signer = find_child_of_with_serial(pkcs7, issuer, purpose, info);
+			if (signer == NULL) {
+				gnutls_assert();
+				goto fail;
+			}
+
+			gnutls_x509_crt_deinit(issuer);
+			issuer = NULL;
+		}
+	}
+
+	if (signer == NULL) {
+		/* get the signer from the pkcs7 list; the one that matches serial
+		 * or key ID */
+		signer = find_child_of_with_serial(pkcs7, NULL, purpose, info);
+		if (signer == NULL) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		/* if the signer cannot be verified from our trust list, make a chain of certificates
+		 * starting from the identified signer, to a root we know. */
+		ret = gnutls_x509_trust_list_verify_crt2(tl, &signer, 1, vdata, vdata_size, vflags, &vtmp, NULL);
+		if (ret < 0 || vtmp != 0) {
+			gnutls_x509_crt_t prev = NULL;
+
+			issuer = signer;
+			/* construct a chain */
+			do {
+				if (prev && prev != signer) {
+					gnutls_x509_crt_deinit(prev);
+				}
+				prev = issuer;
+
+				issuer = find_verified_issuer_of(pkcs7, issuer, purpose, vflags);
+
+				if (issuer != NULL && gnutls_x509_crt_check_issuer(issuer, issuer))
+					break;
+			} while(issuer != NULL);
+
+			issuer = prev; /* the last we have seen */
+
+			if (issuer == NULL) {
+				gnutls_assert();
+				goto fail;
+			}
+
+			ret = gnutls_x509_trust_list_verify_crt2(tl, &issuer, 1, vdata, vdata_size, vflags, &vtmp, NULL);
+			if (ret < 0 || vtmp != 0) {
+				/* could not construct a valid chain */
+				_gnutls_reason_log("signer's chain failed trust list verification", vtmp);
+				gnutls_assert();
+				goto fail;
+			}
+		}
+	} else {
+		/* verify that the signer we got is trusted */
+		ret = gnutls_x509_trust_list_verify_crt2(tl, &signer, 1, vdata, vdata_size, vflags, &vtmp, NULL);
+		if (ret < 0 || vtmp != 0) {
+			/* could not construct a valid chain */
+			_gnutls_reason_log("signer failed trust list verification", vtmp);
+			gnutls_assert();
+			goto fail;
+		}
+	}
+
+	if (signer == NULL) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	goto cleanup;
+
+ fail:
+	if (signer != NULL) {
+		if (issuer == signer)
+			issuer = NULL;
+		gnutls_x509_crt_deinit(signer);
+		signer = NULL;
+	}
+
+ cleanup:
+	if (issuer != NULL) {
+		gnutls_x509_crt_deinit(issuer);
+		issuer = NULL;
+	}
+	gnutls_free(tmp.data);
+
+	return signer;
 }
 
 /**
@@ -1630,12 +1818,12 @@ gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	/* Step 2. Parse the CertificateSet 
+	/* Step 2. Parse the CertificateSet
 	 */
 
 	snprintf(root2, sizeof(root2), "crls.?%u", indx + 1);
 
-	/* Get the raw CRL 
+	/* Get the raw CRL
 	 */
 	result =
 	    asn1_der_decoding_startEnd(pkcs7->signed_data, tmp.data, tmp.size,
@@ -2126,14 +2314,14 @@ static int write_attributes(ASN1_TYPE c2, const char *root,
  * This function will add a signature in the provided PKCS #7 structure
  * for the provided data. Multiple signatures can be made with different
  * signers.
- * 
+ *
  * The available flags are:
  *  %GNUTLS_PKCS7_EMBED_DATA, %GNUTLS_PKCS7_INCLUDE_TIME, %GNUTLS_PKCS7_INCLUDE_CERT,
  *  and %GNUTLS_PKCS7_WRITE_SPKI. They are explained in the #gnutls_pkcs7_sign_flags
  *  definition.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. 
+ *   negative error value.
  *
  * Since: 3.4.2
  **/
