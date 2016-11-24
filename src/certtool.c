@@ -2870,12 +2870,10 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_
 		load_data(cinfo, &detached);
 
 	if (purpose) {
-		if (purpose) {
-			vdata[vdata_size].type = GNUTLS_DT_KEY_PURPOSE_OID;
-			vdata[vdata_size].data = (void*)purpose;
-			vdata[vdata_size].size = strlen(purpose);
-			vdata_size++;
-		}
+		vdata[vdata_size].type = GNUTLS_DT_KEY_PURPOSE_OID;
+		vdata[vdata_size].data = (void*)purpose;
+		vdata[vdata_size].size = strlen(purpose);
+		vdata_size++;
 	}
 
 	ecode = 1;
