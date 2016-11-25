@@ -27,12 +27,14 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --local-dir=lib/unistring/override --lib=libunistring --source-base=lib/unistring --m4-base=lib/unistring/m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --lgpl=3orGPLv2 --no-conditional-dependencies --libtool --macro-prefix=unistring unictype/category-all uninorm/nfc uninorm/nfkc uninorm/u16-normalize uninorm/u32-normalize uninorm/u8-normalize unistr/u16-to-u8 unistr/u32-to-u8 unistr/u8-check unistr/u8-to-u16 unistr/u8-to-u32
+#   gnulib-tool --import --local-dir=lib/unistring/override --lib=libunistring --source-base=lib/unistring --m4-base=lib/unistring/m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --lgpl=3orGPLv2 --no-conditional-dependencies --libtool --macro-prefix=unistring unictype/category-all unictype/property-default-ignorable-code-point unictype/property-not-a-character uninorm/nfc uninorm/nfkc uninorm/u16-normalize uninorm/u32-normalize uninorm/u8-normalize unistr/u16-to-u8 unistr/u32-to-u8 unistr/u8-check unistr/u8-to-u16 unistr/u8-to-u32
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([lib/unistring/override])
 gl_MODULES([
   unictype/category-all
+  unictype/property-default-ignorable-code-point
+  unictype/property-not-a-character
   uninorm/nfc
   uninorm/nfkc
   uninorm/u16-normalize

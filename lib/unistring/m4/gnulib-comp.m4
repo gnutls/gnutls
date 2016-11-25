@@ -105,6 +105,8 @@ AC_DEFUN([unistring_EARLY],
   # Code from module unictype/category-test:
   # Code from module unictype/category-test-withtable:
   # Code from module unictype/combining-class:
+  # Code from module unictype/property-default-ignorable-code-point:
+  # Code from module unictype/property-not-a-character:
   # Code from module uninorm/base:
   # Code from module uninorm/canonical-decomposition:
   # Code from module uninorm/compat-decomposition:
@@ -212,6 +214,10 @@ AC_DEFUN([unistring_INIT],
   AC_REQUIRE([AC_C_INLINE])
   gl_LIBUNISTRING_MODULE([0.9.5], [unictype/category-test])
   gl_LIBUNISTRING_MODULE([0.9.6], [unictype/combining-class])
+  AC_REQUIRE([AC_C_INLINE])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/property-default-ignorable-code-point])
+  AC_REQUIRE([AC_C_INLINE])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/property-not-a-character])
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [uninorm.h])
   gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/canonical-decomposition])
   gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/composition])
@@ -486,6 +492,10 @@ AC_DEFUN([unistring_FILE_LIST], [
   lib/unictype/categ_test.c
   lib/unictype/combiningclass.c
   lib/unictype/combiningclass.h
+  lib/unictype/pr_default_ignorable_code_point.c
+  lib/unictype/pr_default_ignorable_code_point.h
+  lib/unictype/pr_not_a_character.c
+  lib/unictype/pr_not_a_character.h
   lib/uninorm.in.h
   lib/uninorm/canonical-decomposition.c
   lib/uninorm/compat-decomposition.c
