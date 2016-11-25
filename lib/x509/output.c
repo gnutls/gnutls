@@ -47,7 +47,9 @@ char *sname = (char*)name->data;
 char str_ip[64];
 const char *p;
 unsigned printable = 1;
+unsigned is_printed;
 int ret;
+gnutls_datum_t out;
 
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP
 	     || type == GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL
@@ -67,20 +69,28 @@ int ret;
 			printable = 0;
 #endif
 
+		is_printed = 0;
 		if (!printable) {
-			gnutls_datum_t out;
-
 			ret = gnutls_idna_map((char*)name->data, name->size, &out, 0);
-			if (ret < 0) {
-				adds(str, _("note: DNSname is not in UTF-8.\n"));
-				addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
-			} else {
+			if (ret >= 0) {
 				addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), (char*)out.data);
 				gnutls_free(out.data);
+				is_printed = 1;
 			}
 		} else {
-			addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+			if (strstr((char*)name->data, "xn--") != NULL) {
+				ret = _gnutls_idna_reverse_map((char*)name->data, name->size, &out, 0);
+				if (ret >= 0) {
+					addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), out.data);
+					gnutls_free(out.data);
+					is_printed = 1;
+				}
+			}
+
 		}
+		if (!is_printed)
+			addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+
 		break;
 
 	case GNUTLS_SAN_RFC822NAME:
