@@ -66,12 +66,12 @@ MATCH_FUNC(test_capitals, "Correct Horse Battery Staple", "Correct Horse Battery
 MATCH_FUNC(test_multilang, "\xCF\x80\xC3\x9F\xC3\xA5", "πßå");
 MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73", "Jack of ♦s");
 MATCH_FUNC(test_space_replacement, "foo bar", "foo bar");
-MATCH_FUNC(test_invalid, "my cat is a \x09by", NULL);
+MATCH_FUNC(test_invalid, "my cat is a \x09 by", NULL);
 MATCH_FUNC(test_normalization1, "char \x49\xCC\x87", "char \xC4\xB0");
 
 INVALID_MATCH_FUNC(test_ascii, "correct horse battery staple", "correct horse battery staple");
 INVALID_MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73", "Jack of ♦s");
-INVALID_MATCH_FUNC(test_invalid, "my cat is a \x09by", "my cat is a \x09by");
+INVALID_MATCH_FUNC(test_invalid, "my cat is a \x09 by", "my cat is a \x09 by");
 
 int main(void)
 {
