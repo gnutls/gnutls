@@ -68,6 +68,13 @@ MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73"
 MATCH_FUNC(test_space_replacement, "foo bar", "foo bar");
 MATCH_FUNC(test_invalid, "my cat is a \x09 by", NULL);
 MATCH_FUNC(test_normalization1, "char \x49\xCC\x87", "char \xC4\xB0");
+MATCH_FUNC(test_other_chars, "char \xc2\xbc", "char \xC2\xbc");
+MATCH_FUNC(test_spaces, "char \xe2\x80\x89\xe2\x80\x88 ", "char    ");
+MATCH_FUNC(test_symbols, "char \xe2\x98\xa3 \xe2\x99\xa3", "char \xe2\x98\xa3 \xe2\x99\xa3");
+MATCH_FUNC(test_compatibility, "char \xcf\x90\xe2\x84\xb5", "char \xcf\x90\xe2\x84\xb5");
+MATCH_FUNC(test_invalid_ignorable1, "my ignorable char is \xe2\x80\x8f", NULL);
+MATCH_FUNC(test_invalid_ignorable2, "my ignorable char is \xe1\x85\x9f", NULL);
+MATCH_FUNC(test_invalid_ignorable3, "my ignorable char is \xef\xbf\xbf", NULL);
 
 INVALID_MATCH_FUNC(test_ascii, "correct horse battery staple", "correct horse battery staple");
 INVALID_MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73", "Jack of ♦s");
@@ -85,7 +92,14 @@ int main(void)
 		cmocka_unit_test(test_normalization1),
 		cmocka_unit_test(inv_test_ascii),
 		cmocka_unit_test(inv_test_special_char),
-		cmocka_unit_test(inv_test_invalid)
+		cmocka_unit_test(inv_test_invalid),
+		cmocka_unit_test(test_other_chars),
+		cmocka_unit_test(test_spaces),
+		cmocka_unit_test(test_compatibility),
+		cmocka_unit_test(test_symbols),
+		cmocka_unit_test(test_invalid_ignorable1),
+		cmocka_unit_test(test_invalid_ignorable2),
+		cmocka_unit_test(test_invalid_ignorable3),
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
