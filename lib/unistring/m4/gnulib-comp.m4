@@ -55,16 +55,67 @@ AC_DEFUN([unistring_EARLY],
   # Code from module stdint:
   # Code from module sys_types:
   # Code from module unictype/base:
+  # Code from module unictype/category-C:
+  # Code from module unictype/category-Cc:
+  # Code from module unictype/category-Cf:
+  # Code from module unictype/category-Cn:
+  # Code from module unictype/category-Co:
+  # Code from module unictype/category-Cs:
+  # Code from module unictype/category-L:
+  # Code from module unictype/category-LC:
+  # Code from module unictype/category-Ll:
+  # Code from module unictype/category-Lm:
+  # Code from module unictype/category-Lo:
+  # Code from module unictype/category-Lt:
+  # Code from module unictype/category-Lu:
+  # Code from module unictype/category-M:
+  # Code from module unictype/category-Mc:
+  # Code from module unictype/category-Me:
+  # Code from module unictype/category-Mn:
+  # Code from module unictype/category-N:
+  # Code from module unictype/category-Nd:
+  # Code from module unictype/category-Nl:
+  # Code from module unictype/category-No:
+  # Code from module unictype/category-P:
+  # Code from module unictype/category-Pc:
+  # Code from module unictype/category-Pd:
+  # Code from module unictype/category-Pe:
+  # Code from module unictype/category-Pf:
+  # Code from module unictype/category-Pi:
+  # Code from module unictype/category-Po:
+  # Code from module unictype/category-Ps:
+  # Code from module unictype/category-S:
+  # Code from module unictype/category-Sc:
+  # Code from module unictype/category-Sk:
+  # Code from module unictype/category-Sm:
+  # Code from module unictype/category-So:
+  # Code from module unictype/category-Z:
+  # Code from module unictype/category-Zl:
+  # Code from module unictype/category-Zp:
   # Code from module unictype/category-Zs:
+  # Code from module unictype/category-all:
+  # Code from module unictype/category-and:
+  # Code from module unictype/category-and-not:
+  # Code from module unictype/category-byname:
+  # Code from module unictype/category-longname:
+  # Code from module unictype/category-name:
+  # Code from module unictype/category-none:
+  # Code from module unictype/category-of:
+  # Code from module unictype/category-or:
   # Code from module unictype/category-test:
+  # Code from module unictype/category-test-withtable:
   # Code from module unictype/combining-class:
   # Code from module uninorm/base:
   # Code from module uninorm/canonical-decomposition:
+  # Code from module uninorm/compat-decomposition:
   # Code from module uninorm/composition:
   # Code from module uninorm/decompose-internal:
+  # Code from module uninorm/decomposition:
   # Code from module uninorm/decomposition-table:
   # Code from module uninorm/nfc:
   # Code from module uninorm/nfd:
+  # Code from module uninorm/nfkc:
+  # Code from module uninorm/nfkd:
   # Code from module uninorm/u16-normalize:
   # Code from module uninorm/u32-normalize:
   # Code from module uninorm/u8-normalize:
@@ -111,16 +162,65 @@ AC_DEFUN([unistring_INIT],
   gl_SYS_TYPES_H
   AC_PROG_MKDIR_P
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [unictype.h])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-C])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cc])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cf])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cn])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Co])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Cs])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-L])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-LC])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Ll])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lm])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lo])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lt])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Lu])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-M])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Mc])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Me])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Mn])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-N])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Nd])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Nl])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-No])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-P])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pc])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pd])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pe])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pf])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Pi])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Po])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Ps])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-S])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Sc])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Sk])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Sm])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-So])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Z])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Zl])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Zp])
   gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-Zs])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-and])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-and-not])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-byname])
+  gl_LIBUNISTRING_MODULE([0.9.5], [unictype/category-longname])
+  gl_LIBUNISTRING_MODULE([0.9], [unictype/category-name])
+  gl_LIBUNISTRING_MODULE([0.9.5], [unictype/category-none])
+  AC_REQUIRE([AC_C_INLINE])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-of])
+  gl_LIBUNISTRING_MODULE([0.9.6], [unictype/category-or])
   AC_REQUIRE([AC_C_INLINE])
   gl_LIBUNISTRING_MODULE([0.9.5], [unictype/category-test])
   gl_LIBUNISTRING_MODULE([0.9.6], [unictype/combining-class])
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [uninorm.h])
   gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/canonical-decomposition])
   gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/composition])
+  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/decomposition])
   AC_REQUIRE([AC_C_INLINE])
   gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfc])
   gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfd])
+  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfkc])
+  gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/nfkd])
   gl_MODULE_INDICATOR_FOR_TESTS([uninorm/u16-normalize])
   gl_LIBUNISTRING_MODULE([0.9.6], [uninorm/u16-normalize])
   gl_MODULE_INDICATOR_FOR_TESTS([uninorm/u32-normalize])
@@ -297,13 +397,98 @@ AC_DEFUN([unistring_FILE_LIST], [
   lib/sys_types.in.h
   lib/unictype.in.h
   lib/unictype/bitmap.h
+  lib/unictype/categ_C.c
+  lib/unictype/categ_C.h
+  lib/unictype/categ_Cc.c
+  lib/unictype/categ_Cc.h
+  lib/unictype/categ_Cf.c
+  lib/unictype/categ_Cf.h
+  lib/unictype/categ_Cn.c
+  lib/unictype/categ_Cn.h
+  lib/unictype/categ_Co.c
+  lib/unictype/categ_Co.h
+  lib/unictype/categ_Cs.c
+  lib/unictype/categ_Cs.h
+  lib/unictype/categ_L.c
+  lib/unictype/categ_L.h
+  lib/unictype/categ_LC.c
+  lib/unictype/categ_LC.h
+  lib/unictype/categ_Ll.c
+  lib/unictype/categ_Ll.h
+  lib/unictype/categ_Lm.c
+  lib/unictype/categ_Lm.h
+  lib/unictype/categ_Lo.c
+  lib/unictype/categ_Lo.h
+  lib/unictype/categ_Lt.c
+  lib/unictype/categ_Lt.h
+  lib/unictype/categ_Lu.c
+  lib/unictype/categ_Lu.h
+  lib/unictype/categ_M.c
+  lib/unictype/categ_M.h
+  lib/unictype/categ_Mc.c
+  lib/unictype/categ_Mc.h
+  lib/unictype/categ_Me.c
+  lib/unictype/categ_Me.h
+  lib/unictype/categ_Mn.c
+  lib/unictype/categ_Mn.h
+  lib/unictype/categ_N.c
+  lib/unictype/categ_N.h
+  lib/unictype/categ_Nd.c
+  lib/unictype/categ_Nd.h
+  lib/unictype/categ_Nl.c
+  lib/unictype/categ_Nl.h
+  lib/unictype/categ_No.c
+  lib/unictype/categ_No.h
+  lib/unictype/categ_P.c
+  lib/unictype/categ_P.h
+  lib/unictype/categ_Pc.c
+  lib/unictype/categ_Pc.h
+  lib/unictype/categ_Pd.c
+  lib/unictype/categ_Pd.h
+  lib/unictype/categ_Pe.c
+  lib/unictype/categ_Pe.h
+  lib/unictype/categ_Pf.c
+  lib/unictype/categ_Pf.h
+  lib/unictype/categ_Pi.c
+  lib/unictype/categ_Pi.h
+  lib/unictype/categ_Po.c
+  lib/unictype/categ_Po.h
+  lib/unictype/categ_Ps.c
+  lib/unictype/categ_Ps.h
+  lib/unictype/categ_S.c
+  lib/unictype/categ_S.h
+  lib/unictype/categ_Sc.c
+  lib/unictype/categ_Sc.h
+  lib/unictype/categ_Sk.c
+  lib/unictype/categ_Sk.h
+  lib/unictype/categ_Sm.c
+  lib/unictype/categ_Sm.h
+  lib/unictype/categ_So.c
+  lib/unictype/categ_So.h
+  lib/unictype/categ_Z.c
+  lib/unictype/categ_Z.h
+  lib/unictype/categ_Zl.c
+  lib/unictype/categ_Zl.h
+  lib/unictype/categ_Zp.c
+  lib/unictype/categ_Zp.h
   lib/unictype/categ_Zs.c
   lib/unictype/categ_Zs.h
+  lib/unictype/categ_and.c
+  lib/unictype/categ_and_not.c
+  lib/unictype/categ_byname.c
+  lib/unictype/categ_byname.gperf
+  lib/unictype/categ_longname.c
+  lib/unictype/categ_name.c
+  lib/unictype/categ_none.c
+  lib/unictype/categ_of.c
+  lib/unictype/categ_of.h
+  lib/unictype/categ_or.c
   lib/unictype/categ_test.c
   lib/unictype/combiningclass.c
   lib/unictype/combiningclass.h
   lib/uninorm.in.h
   lib/uninorm/canonical-decomposition.c
+  lib/uninorm/compat-decomposition.c
   lib/uninorm/composition-table.gperf
   lib/uninorm/composition.c
   lib/uninorm/decompose-internal.c
@@ -312,8 +497,11 @@ AC_DEFUN([unistring_FILE_LIST], [
   lib/uninorm/decomposition-table.h
   lib/uninorm/decomposition-table1.h
   lib/uninorm/decomposition-table2.h
+  lib/uninorm/decomposition.c
   lib/uninorm/nfc.c
   lib/uninorm/nfd.c
+  lib/uninorm/nfkc.c
+  lib/uninorm/nfkd.c
   lib/uninorm/normalize-internal.h
   lib/uninorm/u-normalize-internal.h
   lib/uninorm/u16-normalize.c

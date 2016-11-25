@@ -86,7 +86,7 @@ config:
 bootstrap: autoreconf .submodule.stamp
 
 UNISTRING_MODULES = "unistr/u8-check unistr/u8-to-u16 unistr/u8-to-u32 unistr/u32-to-u8 \
-	unistr/u16-to-u8 uninorm/nfc uninorm/u8-normalize uninorm/u16-normalize \
+	unistr/u16-to-u8 uninorm/nfc uninorm/nfkc uninorm/u8-normalize uninorm/u16-normalize \
 	uninorm/u32-normalize unictype/category-all"
 
 unistringimport:
