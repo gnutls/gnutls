@@ -177,6 +177,10 @@ int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsi
 		return 0;
 	}
 
+	if (_gnutls_str_is_print(input, ilen)) {
+		return _gnutls_set_strdatum(out, input, ilen);
+	}
+
 	ret = _gnutls_set_strdatum(&istr, input, ilen);
 	if (ret < 0) {
 		gnutls_assert();
