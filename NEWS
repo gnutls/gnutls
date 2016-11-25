@@ -28,6 +28,10 @@ See the end for copying conditions.
    not ship it; it can be used with the '--with-included-unistring'
    option to configure script.
 
+** libgnutls: When setting a subject alternative name in a certificate
+   which is in UTF-8 format, it will transparently be converted to IDNA form
+   prior to storing.
+
 ** libgnutls: GNUTLS_CRT_PRINT_ONELINE flag on gnutls_x509_crt_print()
    will print the SHA256 key-ID instead of a certificate fingerprint.
 
