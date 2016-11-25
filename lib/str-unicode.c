@@ -209,10 +209,73 @@ int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsi
 	return ret;
 }
 
+/*-
+ * _gnutls_idna_reverse_map:
+ * @input: contain the ACE (IDNA) formatted domain name
+ * @ilen: the length of the provided string
+ * @out: the result in an null-terminated allocated UTF-8 string
+ * @flags: should be zero
+ *
+ * This function will convert the IDNA2003 ACE name to a UTF-8 domain name.
+ *
+ * If GnuTLS is compiled without libidn2 support, then this function
+ * will return %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Returns: A negative error code on error, or 0 on success.
+ *
+ * Since: 3.5.7
+ -*/
+int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+{
+	char *u8 = NULL;
+	int rc, ret;
+	gnutls_datum_t istr;
+
+	if (ilen == 0) {
+		out->data = (uint8_t*)gnutls_strdup("");
+		out->size = 0;
+		if (out->data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		return 0;
+	}
+
+	ret = _gnutls_set_strdatum(&istr, input, ilen);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	rc = idna_to_unicode_8z8z((char*)istr.data, &u8, IDNA_ALLOW_UNASSIGNED);
+	if (rc != IDNA_SUCCESS) {
+		gnutls_assert();
+		_gnutls_debug_log("unable to convert ACE name '%s' to UTF-8 format: %s\n", istr.data, idna_strerror(rc));
+		ret = GNUTLS_E_INVALID_UTF8_STRING;
+		goto fail;
+	}
+
+	if (gnutls_malloc != malloc) {
+		ret = _gnutls_set_strdatum(out, u8, strlen(u8));
+	} else  {
+		out->data = (unsigned char*)u8;
+		out->size = strlen(u8);
+		u8 = NULL;
+		ret = 0;
+	}
+ fail:
+	idn_free(u8);
+	gnutls_free(istr.data);
+	return ret;
+}
+
 #else
 
 # undef gnutls_idna_map
 int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+{
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+}
+
+int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }

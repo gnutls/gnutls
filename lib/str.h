@@ -66,6 +66,8 @@ int __gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, uns
 int _gnutls_idna_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
 #endif
 
+int _gnutls_idna_reverse_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
+
 inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
 {
 	unsigned i;
