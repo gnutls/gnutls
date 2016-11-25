@@ -31,7 +31,6 @@
 #include <num.h>
 #include "errors.h"
 #include <extras/randomart.h>
-#include <c-ctype.h>
 #include "extensions.h"
 #include "ip.h"
 
@@ -47,10 +46,7 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 char *sname = (char*)name->data;
 char str_ip[64];
 const char *p;
-unsigned non_ascii = 0;
-#ifdef HAVE_LIBIDN
-unsigned i;
-#endif
+unsigned printable = 1;
 int ret;
 
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP
@@ -67,15 +63,11 @@ int ret;
 	switch (type) {
 	case GNUTLS_SAN_DNSNAME:
 #ifdef HAVE_LIBIDN
-		for (i=0;i<name->size;i++) {
-			if (c_isprint(name->data[i]) == 0) {
-				non_ascii = 1;
-				break;
-			}
-		}
+		if (!_gnutls_str_is_print((char*)name->data, name->size))
+			printable = 0;
 #endif
 
-		if (non_ascii != 0) {
+		if (!printable) {
 			gnutls_datum_t out;
 
 			ret = gnutls_idna_map((char*)name->data, name->size, &out, 0);
