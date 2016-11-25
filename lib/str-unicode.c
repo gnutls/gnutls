@@ -34,7 +34,7 @@
 /**
  * gnutls_utf8_password_normalize:
  * @password: contain the UTF-8 formatted password
- * @password_len: the length of the provided password
+ * @plen: the length of the provided password
  * @out: the result in an null-terminated allocated string
  * @flags: should be zero
  *
@@ -48,10 +48,9 @@
  *
  * Since: 3.5.7
  **/
-int gnutls_utf8_password_normalize(const unsigned char *password, unsigned password_len,
+int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
 				   gnutls_datum_t *out, unsigned flags)
 {
-	size_t plen = strlen((char*)password);
 	size_t ucs4_size = 0, nrm_size = 0;
 	size_t final_size = 0;
 	uint8_t *final = NULL;
@@ -73,12 +72,12 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned passw
 	if (u8_check((uint8_t*)password, plen) != NULL) {
 		gnutls_assert();
 		if (flags & GNUTLS_UTF8_IGNORE_ERRS) {
-			out->data = gnutls_malloc(password_len+1);
+			out->data = gnutls_malloc(plen+1);
 			if (out->data == NULL)
 				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-			out->size = password_len;
-			memcpy(out->data, password, password_len);
-			out->data[password_len] = 0;
+			out->size = plen;
+			memcpy(out->data, password, plen);
+			out->data[plen] = 0;
 			return 0;
 		} else {
 			return GNUTLS_E_INVALID_UTF8_STRING;
