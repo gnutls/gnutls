@@ -341,48 +341,25 @@ _gnutls_finished(gnutls_session_t session, int type, void *ret,
 		 int sending)
 {
 	const int siz = TLS_MSG_LEN;
-	uint8_t concat[MAX_HASH_SIZE + 16 /*MD5 */ ];
+	uint8_t concat[MAX_HASH_SIZE];
 	size_t hash_len;
 	const char *mesg;
-	int rc, len;
+	int rc, len, algorithm;
 
 	if (sending)
 		len = session->internals.handshake_hash_buffer.length;
 	else
 		len = session->internals.handshake_hash_buffer_prev_len;
 
-	if (!_gnutls_version_has_selectable_prf(get_version(session))) {
-		rc = _gnutls_hash_fast(GNUTLS_DIG_SHA1,
-				       session->internals.
-				       handshake_hash_buffer.data, len,
-				       &concat[16]);
-		if (rc < 0)
-			return gnutls_assert_val(rc);
+	algorithm = session->security_parameters.prf_mac;
+	rc = _gnutls_hash_fast(algorithm,
+			       session->internals.
+			       handshake_hash_buffer.data, len,
+			       concat);
+	if (rc < 0)
+		return gnutls_assert_val(rc);
 
-		rc = _gnutls_hash_fast(GNUTLS_DIG_MD5,
-				       session->internals.
-				       handshake_hash_buffer.data, len,
-				       concat);
-		if (rc < 0)
-			return gnutls_assert_val(rc);
-
-		hash_len = 20 + 16;
-	} else {
-		int algorithm =
-		    _gnutls_cipher_suite_get_prf(session->
-						 security_parameters.
-						 cipher_suite);
-
-		rc = _gnutls_hash_fast(algorithm,
-				       session->internals.
-				       handshake_hash_buffer.data, len,
-				       concat);
-		if (rc < 0)
-			return gnutls_assert_val(rc);
-
-		hash_len =
-		    _gnutls_hash_get_algo_len(mac_to_entry(algorithm));
-	}
+	hash_len = _gnutls_hash_get_algo_len(mac_to_entry(algorithm));
 
 	if (type == GNUTLS_SERVER) {
 		mesg = SERVER_MSG;
@@ -3477,8 +3454,6 @@ int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t 
 	int ret;
 	const mac_entry_st *me;
 	uint8_t concat[2*MAX_HASH_SIZE];
-	digest_hd_st td_md5;
-	digest_hd_st td_sha;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -3489,50 +3464,18 @@ int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t 
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	if (_gnutls_version_has_selectable_prf(ver)) { /* TLS 1.2+ */
-		gnutls_mac_algorithm_t prf;
+	me = mac_to_entry(session->security_parameters.prf_mac);
+	if (me == NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		prf = _gnutls_cipher_suite_get_prf(session->security_parameters.cipher_suite);
-		if (prf == GNUTLS_MAC_UNKNOWN)
-			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+	ret =
+	    _gnutls_hash_fast((gnutls_digest_algorithm_t)me->id,
+			      session->internals.handshake_hash_buffer.
+			      data,
+			      session->internals.handshake_hash_buffer_client_kx_len,
+			      concat);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-		me = mac_to_entry(prf);
-
-		ret =
-		    _gnutls_hash_fast((gnutls_digest_algorithm_t)me->id,
-				      session->internals.handshake_hash_buffer.
-				      data,
-				      session->internals.handshake_hash_buffer_client_kx_len,
-				      concat);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		return _gnutls_set_datum(shash, concat, me->output_size);
-	} else {
-		ret = _gnutls_hash_init(&td_sha, hash_to_entry(GNUTLS_DIG_SHA1));
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
-		_gnutls_hash(&td_sha,
-			     session->internals.handshake_hash_buffer.data,
-			     session->internals.handshake_hash_buffer_client_kx_len);
-
-		_gnutls_hash_deinit(&td_sha, &concat[16]);
-
-		ret =
-		    _gnutls_hash_init(&td_md5,
-				      hash_to_entry(GNUTLS_DIG_MD5));
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		_gnutls_hash(&td_md5,
-			     session->internals.handshake_hash_buffer.data,
-			     session->internals.handshake_hash_buffer_client_kx_len);
-
-		_gnutls_hash_deinit(&td_md5, concat);
-
-		return _gnutls_set_datum(shash, concat, 36);
-	}
+	return _gnutls_set_datum(shash, concat, me->output_size);
 }

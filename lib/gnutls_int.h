@@ -559,6 +559,7 @@ typedef struct {
 	 */
 	uint8_t cipher_suite[2];
 	gnutls_compression_method_t compression_method;
+	gnutls_mac_algorithm_t prf_mac;
 	uint8_t master_secret[GNUTLS_MASTER_SIZE];
 	uint8_t client_random[GNUTLS_RANDOM_SIZE];
 	uint8_t server_random[GNUTLS_RANDOM_SIZE];

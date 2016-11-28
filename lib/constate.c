@@ -265,6 +265,15 @@ _gnutls_epoch_set_cipher_suite(gnutls_session_t session,
 	if (_gnutls_mac_priority(session, mac_algo->id) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
+	if (_gnutls_version_has_selectable_prf(get_version(session))) {
+		if (cs->prf == GNUTLS_MAC_UNKNOWN ||
+		    _gnutls_mac_is_ok(mac_to_entry(cs->prf)) == 0)
+			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+		session->security_parameters.prf_mac = cs->prf;
+	} else {
+		session->security_parameters.prf_mac = GNUTLS_MAC_MD5_SHA1;
+	}
+
 	params->cipher = cipher_algo;
 	params->mac = mac_algo;
 

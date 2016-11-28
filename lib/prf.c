@@ -206,25 +206,13 @@ _gnutls_PRF(gnutls_session_t session,
 	    const char *label, int label_size, const uint8_t * seed,
 	    int seed_size, int total_bytes, void *ret)
 {
-	const version_entry_st *ver = get_version(session);
-
-	if (_gnutls_version_has_selectable_prf(ver)) {
-		return _gnutls_PRF_raw(
-			_gnutls_cipher_suite_get_prf(session->security_parameters.cipher_suite),
+	return _gnutls_PRF_raw(
+			session->security_parameters.prf_mac,
 			secret, secret_size,
 			label, label_size,
 			seed, seed_size,
 			total_bytes,
 			ret);
-	} else {
-		return _gnutls_PRF_raw(
-			GNUTLS_MAC_MD5_SHA1,
-			secret, secret_size,
-			label, label_size,
-			seed, seed_size,
-			total_bytes,
-			ret);
-	}
 }
 
 #ifdef ENABLE_FIPS140
