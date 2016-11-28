@@ -84,6 +84,10 @@ MATCH_FUNC(test_invalid_join_control, "my exception is \xe2\x80\x8d", NULL);
 INVALID_MATCH_FUNC(test_ascii, "correct horse battery staple", "correct horse battery staple");
 INVALID_MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73", "Jack of ♦s");
 INVALID_MATCH_FUNC(test_invalid, "my cat is a \x09 by", "my cat is a \x09 by");
+INVALID_MATCH_FUNC(test_invalid_exception1, "my exception is \xc2\xb7", "my exception is ·");
+INVALID_MATCH_FUNC(test_invalid_exception3, "my exception is \xd9\xa2", "my exception is \xd9\xa2");
+INVALID_MATCH_FUNC(test_invalid_exception4, "my exception is \xe3\x80\xae", "my exception is \xe3\x80\xae"); /* CONTEXT0/DISALLOWED */
+INVALID_MATCH_FUNC(test_invalid_join_control, "my exception is \xe2\x80\x8d", "my exception is \xe2\x80\x8d");
 
 int main(void)
 {
@@ -109,7 +113,11 @@ int main(void)
 		cmocka_unit_test(test_invalid_exception2),
 		cmocka_unit_test(test_invalid_exception3),
 		cmocka_unit_test(test_invalid_exception4),
-		cmocka_unit_test(test_invalid_join_control)
+		cmocka_unit_test(test_invalid_join_control),
+		cmocka_unit_test(inv_test_invalid_exception1),
+		cmocka_unit_test(inv_test_invalid_exception3),
+		cmocka_unit_test(inv_test_invalid_exception4),
+		cmocka_unit_test(inv_test_invalid_join_control)
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
