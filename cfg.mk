@@ -54,6 +54,10 @@ exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$
 exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html$$
 exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|\.crl|\.pdf|\.zip|tests/nist-pkits/|tests/suite/x509paths/.*$$
 _makefile_at_at_check_exceptions = ' && !/CODE_COVERAGE_RULES/ && !/VERSION/'
+exclude_file_name_regexp--sc_m4_quote_check='lib/unistring/m4/absolute-header.m4'
+exclude_file_name_regexp--sc_makefile_at_at_check='lib/unistring/Makefile.am'
+exclude_file_name_regexp--sc_prohibit_stddef_without_use='u*-normalize.c'
+exclude_file_name_regexp--sc_prohibit_strncpy='unistr.in.h'
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \
