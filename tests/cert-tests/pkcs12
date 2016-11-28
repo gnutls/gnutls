@@ -37,7 +37,7 @@ TMPFILE_PEM=pkcs12.$$.pem.tmp
 DEBUG="1"
 
 ret=0
-for p12 in "client.p12 foobar" "noclient.p12" "unclient.p12" "pkcs12_2certs.p12"; do
+for p12 in "client.p12 foobar" "openssl.p12 CaudFocwijRupogDoicsApfiHadManUgNa" "noclient.p12" "unclient.p12" "pkcs12_2certs.p12"; do
 	set -- ${p12}
 	file="$1"
 	passwd="$2"
