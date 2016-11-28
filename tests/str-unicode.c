@@ -75,6 +75,11 @@ MATCH_FUNC(test_compatibility, "char \xcf\x90\xe2\x84\xb5", "char \xcf\x90\xe2\x
 MATCH_FUNC(test_invalid_ignorable1, "my ignorable char is \xe2\x80\x8f", NULL);
 MATCH_FUNC(test_invalid_ignorable2, "my ignorable char is \xe1\x85\x9f", NULL);
 MATCH_FUNC(test_invalid_ignorable3, "my ignorable char is \xef\xbf\xbf", NULL);
+MATCH_FUNC(test_invalid_exception1, "my exception is \xc2\xb7", NULL); /* CONTEXTO - disallowed */
+MATCH_FUNC(test_invalid_exception2, "my exception is \xcf\x82", "my exception is ς"); /* PVALID */
+MATCH_FUNC(test_invalid_exception3, "my exception is \xd9\xa2", NULL); /* CONTEXT0/PVALID */
+MATCH_FUNC(test_invalid_exception4, "my exception is \xe3\x80\xae", NULL); /* CONTEXT0/DISALLOWED */
+MATCH_FUNC(test_invalid_join_control, "my exception is \xe2\x80\x8d", NULL);
 
 INVALID_MATCH_FUNC(test_ascii, "correct horse battery staple", "correct horse battery staple");
 INVALID_MATCH_FUNC(test_special_char, "\x4A\x61\x63\x6B\x20\x6F\x66\x20\xE2\x99\xA6\x73", "Jack of ♦s");
@@ -100,6 +105,11 @@ int main(void)
 		cmocka_unit_test(test_invalid_ignorable1),
 		cmocka_unit_test(test_invalid_ignorable2),
 		cmocka_unit_test(test_invalid_ignorable3),
+		cmocka_unit_test(test_invalid_exception1),
+		cmocka_unit_test(test_invalid_exception2),
+		cmocka_unit_test(test_invalid_exception3),
+		cmocka_unit_test(test_invalid_exception4),
+		cmocka_unit_test(test_invalid_join_control)
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
