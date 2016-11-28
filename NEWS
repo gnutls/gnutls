@@ -16,6 +16,9 @@ See the end for copying conditions.
    not identical to CVE-2016-8610, due to the difference in alert handling
    of the libraries (gnutls delegates that handling to applications).
 
+** libgnutls: Fixed issue in PKCS#12 password encoding, which truncated
+   passwords over 32-characters. Reported by Mario Klebsch.
+
 ** API and ABI modifications:
 No changes since last version.
 
