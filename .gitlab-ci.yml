@@ -366,7 +366,7 @@ Debian/x86_64:
   artifacts:
     when: on_failure
     paths:
-      - guile/tests/*.log
+      - build/guile/tests/*.log
       - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
