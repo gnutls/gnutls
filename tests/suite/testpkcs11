@@ -194,6 +194,56 @@ export_pubkey_of_privkey () {
 
 # $1: token
 # $2: PIN
+change_id_of_privkey () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+
+	echo -n "* Change the CKA_ID of generated private key... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-id "01a1b103" "${token};object=gnutls-client;id=%00%01%02%03%04%05;object-type=private" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client;object-type=private;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo "ID didn't change"
+		exit_error
+	fi
+
+	echo ok
+}
+
+# $1: token
+# $2: PIN
+change_label_of_privkey () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+
+	echo -n "* Change the CKA_LABEL of generated private key... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-label "new-label" "${token};object=gnutls-client;object-type=private" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=new-label;object-type=private" 2>&1 |grep 'Label: new-label' >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo "label didn't change"
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-label "gnutls-client" "${token};object=new-label;object-type=private" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	echo ok
+}
+
+# $1: token
+# $2: PIN
 # $3: bits
 generate_temp_ecc_privkey () {
 	export GNUTLS_PIN=$2
@@ -395,6 +445,8 @@ delete_temp_privkey $TOKEN $GNUTLS_PIN
 #export_pubkey_of_privkey $TOKEN $GNUTLS_PIN
 
 generate_rsa_privkey $TOKEN $GNUTLS_PIN 1024
+change_id_of_privkey $TOKEN $GNUTLS_PIN
+change_label_of_privkey $TOKEN $GNUTLS_PIN
 
 write_certificate_test $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/ca.key" "$srcdir/pkcs11-certs/ca.crt" tmp-client.pub
 
