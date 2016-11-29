@@ -143,6 +143,13 @@ flag = {
 };
 
 flag = {
+    name      = id;
+    arg-type  = string;
+    descrip   = "Sets an ID for the write operation";
+    doc       = "Sets the CKA_ID to be set by the write operation. The ID should be specified in hexadecimal format without a '0x' prefix.";
+};
+
+flag = {
     name      = mark-wrap;
     disable   = "no";
     disabled;
