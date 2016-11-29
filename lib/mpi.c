@@ -153,6 +153,28 @@ _gnutls_mpi_init_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 	return 0;
 }
 
+int
+_gnutls_mpi_init_scan_le(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+{
+	bigint_t r;
+	int ret;
+
+	ret = _gnutls_mpi_init(&r);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_mpi_scan_le(r, buffer, nbytes);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_mpi_release(&r);
+		return ret;
+	}
+
+	*ret_mpi = r;
+
+	return 0;
+}
+
 /* Always has the first bit zero */
 int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t * dest)
 {
@@ -254,7 +276,8 @@ _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest,
  */
 static int
 __gnutls_x509_read_int(ASN1_TYPE node, const char *value,
-		      bigint_t * ret_mpi, int overwrite)
+		      bigint_t * ret_mpi, int overwrite,
+		      int le)
 {
 	int result;
 	uint8_t *tmpstr = NULL;
@@ -280,7 +303,12 @@ __gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_mpi_init_scan(ret_mpi, tmpstr, tmpstr_size);
+	if (le)
+		result = _gnutls_mpi_init_scan_le(ret_mpi, tmpstr,
+						  tmpstr_size);
+	else
+		result = _gnutls_mpi_init_scan(ret_mpi, tmpstr,
+					       tmpstr_size);
 
 	if (overwrite)
 		zeroize_key(tmpstr, tmpstr_size);
@@ -298,21 +326,28 @@ int
 _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 		      bigint_t * ret_mpi)
 {
-	return __gnutls_x509_read_int(node, value, ret_mpi, 0);
+	return __gnutls_x509_read_int(node, value, ret_mpi, 0, 0);
 }
 
 int
 _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 		      bigint_t * ret_mpi)
 {
-	return __gnutls_x509_read_int(node, value, ret_mpi, 1);
+	return __gnutls_x509_read_int(node, value, ret_mpi, 1, 0);
+}
+
+int
+_gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
+			     bigint_t * ret_mpi)
+{
+	return __gnutls_x509_read_int(node, value, ret_mpi, 1, 1);
 }
 
 /* Writes the specified integer into the specified node.
  */
 static int
 __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
-		       int lz, int overwrite)
+		       int lz, int overwrite, int le)
 {
 	uint8_t *tmpstr;
 	size_t s_len;
@@ -321,6 +356,8 @@ __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 	s_len = 0;
 	if (lz)
 		result = _gnutls_mpi_print_lz(mpi, NULL, &s_len);
+	else if (le)
+		result = _gnutls_mpi_print_le(mpi, NULL, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, NULL, &s_len);
 
@@ -337,6 +374,8 @@ __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 
 	if (lz)
 		result = _gnutls_mpi_print_lz(mpi, tmpstr, &s_len);
+	else if (le)
+		result = _gnutls_mpi_print_le(mpi, tmpstr, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, tmpstr, &s_len);
 
@@ -365,12 +404,18 @@ int
 _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 		       int lz)
 {
-	return __gnutls_x509_write_int(node, value, mpi, lz, 0);
+	return __gnutls_x509_write_int(node, value, mpi, lz, 0, 0);
 }
 
 int
 _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 		       int lz)
 {
-	return __gnutls_x509_write_int(node, value, mpi, lz, 1);
+	return __gnutls_x509_write_int(node, value, mpi, lz, 1, 0);
+}
+
+int
+_gnutls_x509_write_key_int_le(ASN1_TYPE node, const char *value, bigint_t mpi)
+{
+	return __gnutls_x509_write_int(node, value, mpi, 0, 1, 1);
 }
