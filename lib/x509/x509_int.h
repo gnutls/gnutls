@@ -379,6 +379,11 @@ int _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 			   int lz);
 
+int _gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
+				 bigint_t * ret_mpi);
+int _gnutls_x509_write_key_int_le(ASN1_TYPE node, const char *value,
+				  bigint_t mpi);
+
 int _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
 				  gnutls_x509_spki_st *params, unsigned is_sig);
 int _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,

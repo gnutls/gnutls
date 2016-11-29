@@ -94,7 +94,9 @@ typedef enum {
 	/* raw unsigned integer format */
 	GNUTLS_MPI_FORMAT_USG = 0,
 	/* raw signed integer format - always a leading zero when positive */
-	GNUTLS_MPI_FORMAT_STD = 1
+	GNUTLS_MPI_FORMAT_STD = 1,
+	/* raw unsigned integer format, little endian format */
+	GNUTLS_MPI_FORMAT_ULE = 2
 } gnutls_bigint_format_t;
 
 /* Multi precision integer arithmetic */
