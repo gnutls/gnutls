@@ -27,6 +27,9 @@ CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 TMPFILE1=rsa-md5.$$.tmp
 TMPFILE2=rsa-md5-2.$$.tmp
 
+. ${srcdir}/scripts/common.sh
+check_for_datefudge
+
 "${CERTTOOL}" --inder --certificate-info \
 	--infile "${srcdir}/rsa-md5-collision/TargetCollidingCertificate1.cer" > $TMPFILE1
 "${CERTTOOL}" --inder --certificate-info \
@@ -37,8 +40,10 @@ TMPFILE2=rsa-md5-2.$$.tmp
 "${CERTTOOL}" --inder --certificate-info \
 	--infile "${srcdir}/rsa-md5-collision/MD5CollisionCA.cer" >> $TMPFILE2
 
+datefudge -s "2016-10-1" \
 "${CERTTOOL}" --verify-chain < $TMPFILE1 | \
 	grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
+datefudge -s "2016-10-1" \
 "${CERTTOOL}" --verify-chain < $TMPFILE2 | \
 	grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
 
