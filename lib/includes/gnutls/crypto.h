@@ -208,6 +208,7 @@ typedef void (*gnutls_mac_deinit_func) (void *ctx);
 typedef int (*gnutls_mac_fast_func) (gnutls_mac_algorithm_t, const void *nonce,
 		     size_t nonce_size, const void *key, size_t keysize,
 		     const void *text, size_t textsize, void *digest);
+typedef void *(*gnutls_mac_copy_func) (const void *ctx);
 
 int
 gnutls_crypto_register_mac(gnutls_mac_algorithm_t mac,

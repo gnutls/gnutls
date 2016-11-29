@@ -225,6 +225,7 @@ _gnutls_mac_init(mac_hd_st * mac, const mac_entry_st * e,
 		mac->setnonce = cc->setnonce;
 		mac->output = cc->output;
 		mac->deinit = cc->deinit;
+		mac->copy = cc->copy;
 
 		return 0;
 	}
@@ -239,12 +240,27 @@ _gnutls_mac_init(mac_hd_st * mac, const mac_entry_st * e,
 	mac->setnonce = _gnutls_mac_ops.setnonce;
 	mac->output = _gnutls_mac_ops.output;
 	mac->deinit = _gnutls_mac_ops.deinit;
+	mac->copy = _gnutls_mac_ops.copy;
 
 	if (_gnutls_mac_ops.setkey(mac->handle, key, keylen) < 0) {
 		gnutls_assert();
 		mac->deinit(mac->handle);
 		return GNUTLS_E_HASH_FAILED;
 	}
+
+	return 0;
+}
+
+int _gnutls_mac_copy(const mac_hd_st * handle, mac_hd_st * dst)
+{
+	if (handle->copy == NULL)
+		return gnutls_assert_val(GNUTLS_E_HASH_FAILED);
+
+	*dst = *handle; /* copy data */
+	dst->handle = handle->copy(handle->handle);
+
+	if (dst->handle == NULL)
+		return GNUTLS_E_HASH_FAILED;
 
 	return 0;
 }
