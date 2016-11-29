@@ -19,8 +19,14 @@ See the end for copying conditions.
 ** libgnutls: Fixed issue in PKCS#12 password encoding, which truncated
    passwords over 32-characters. Reported by Mario Klebsch.
 
+** libgnutls: Backported functionality allowing to manipulate the IDs
+   of PKCS#11 objects.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_obj_set_info: Added
+gnutls_pkcs11_privkey_generate3: Added
+gnutls_pkcs11_copy_x509_privkey2: Added
+gnutls_pkcs11_copy_x509_crt2: Added
 
 
 * Version 3.3.25 (released 2016-10-9)
