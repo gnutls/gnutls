@@ -769,3 +769,4 @@ tests/mini-server-name
 tests/mini-x509-cert-callback
 tests/sign-md5-rep
 tests/slow/cipher-override2
+src/*.stamp
