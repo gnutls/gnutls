@@ -948,3 +948,4 @@ tests/pkcs11-privkey-export
 tests/dtls1-2-mtu-check
 doc/gendocs_template_min
 build/
+src/*.stamp
