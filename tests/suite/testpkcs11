@@ -119,7 +119,7 @@ generate_rsa_privkey () {
 	bits=$3
 
 	echo -n "* Generating RSA private key ($bits)... "
-	$P11TOOL $ADDITIONAL_PARAM --login --label gnutls-client --generate-rsa --bits $bits "$token" --outfile tmp-client.pub >>$TMPFILE 2>&1
+	$P11TOOL $ADDITIONAL_PARAM --login --id 000102030405 --label gnutls-client --generate-rsa --bits $bits "$token" --outfile tmp-client.pub >>$TMPFILE 2>&1
 	if test $? = 0;then
 		echo ok
 	else
@@ -238,13 +238,21 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Writing client certificate... "
-	$P11TOOL $ADDITIONAL_PARAM --login --write --label gnutls-client --load-certificate tmp-client.crt "$token" >>$TMPFILE 2>&1
+	$P11TOOL $ADDITIONAL_PARAM --login --write --id "01a1b103" --label gnutls-client --load-certificate tmp-client.crt "$token" >>$TMPFILE 2>&1
 	if test $? = 0;then
 		echo ok
 	else
 		echo failed
 		exit_error
 	fi
+
+	echo -n "* Checking whether ID was correctly set... "
+	$P11TOOL $ADDITIONAL_PARAM --login --list-certs "$token;object=gnutls-client;object-type=private;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>$TMPFILE 2>&1
+	if test $? != 0;then
+		echo "ID was not set on copy"
+		exit_error
+	fi
+	echo ok
 
 	echo -n "* Writing certificate of client's CA... "
 	$P11TOOL $ADDITIONAL_PARAM --login --ca --write --trusted --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
