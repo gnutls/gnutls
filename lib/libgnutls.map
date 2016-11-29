@@ -1027,6 +1027,9 @@ GNUTLS_3_1_0 {
 	_gnutls_global_init_skip;
 	gnutls_x509_crt_set_subject_unique_id;
 	gnutls_x509_crt_set_issuer_unique_id;
+	gnutls_pkcs11_copy_x509_crt2;
+	gnutls_pkcs11_copy_x509_privkey2;
+	gnutls_pkcs11_privkey_generate3;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
