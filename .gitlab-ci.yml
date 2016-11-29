@@ -353,7 +353,7 @@ Debian/x86_64:
   image: debian:stretch
   before_script:
   - apt-get update -qq -y
-  - apt-get install -y git-core autoconf libtool gettext autopoint automake autogen nettle-dev libp11-kit-dev libtspi-dev guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf git2cl libunbound-dev dns-root-data bison help2man valgrind libasan2 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev libunistring-dev dieharder openssl abi-compliance-checker socat net-tools ppp
+  - apt-get install -y git-core autoconf libtool gettext autopoint automake autogen nettle-dev libp11-kit-dev libtspi-dev guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf git2cl libunbound-dev dns-root-data bison help2man valgrind libasan2 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev libunistring-dev dieharder openssl abi-compliance-checker socat net-tools ppp zlib1g-dev
   script:
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --enable-code-coverage --disable-doc --disable-valgrind-tests
