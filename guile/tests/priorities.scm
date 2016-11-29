@@ -32,7 +32,7 @@
   ;; Valid priority strings (from the manual).
   '("NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
     "NORMAL:-ARCFOUR-128"
-    "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE"
+    "SECURE128:-VERS-SSL3.0:+COMP-NULL"
     "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1"))
 
 (define %invalid-priority-strings
