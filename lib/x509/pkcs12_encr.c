@@ -105,7 +105,7 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	}
 
 	/* Store salt and password in BUF_I */
-	p_size = (((2*pwlen) / 64) * 64) + 64;
+	p_size = (((2*(pwlen+1)) / 64) * 64) + 64;
 
 	if (p_size > sizeof(buf_i) - 64)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
