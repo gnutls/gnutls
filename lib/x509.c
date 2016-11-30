@@ -1626,7 +1626,7 @@ _gnutls_check_key_usage(const gnutls_pcert_st * cert,
 	unsigned int key_usage = 0;
 	int encipher_type;
 
-	if (cert == NULL) {
+	if (cert == NULL || alg == GNUTLS_KX_UNKNOWN) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
