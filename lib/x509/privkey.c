@@ -141,8 +141,6 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 
 	gnutls_pk_params_init(&pkey->params);
 
-	pkey->params.algo = GNUTLS_PK_RSA;
-
 	if ((result =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
 				 "GNUTLS.RSAPrivateKey",
@@ -224,6 +222,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	pkey->params.params_nr++;
 
 	pkey->params.params_nr = RSA_PRIVATE_PARAMS;
+	pkey->params.algo = GNUTLS_PK_RSA;
 
 	tmp_size = sizeof(tmp);
 	result = asn1_read_value(pkey_asn, "otherInfo", tmp, &tmp_size);
@@ -273,7 +272,6 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 
 	gnutls_pk_params_init(&pkey->params);
 
-	pkey->params.algo = GNUTLS_PK_EC;
 	if ((ret =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
 				 "GNUTLS.ECPrivateKey",
@@ -359,6 +357,7 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 		goto error;
 	}
 	pkey->params.params_nr++;
+	pkey->params.algo = GNUTLS_PK_EC;
 
 	return 0;
 
@@ -390,7 +389,6 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 
 	gnutls_pk_params_init(&pkey->params);
 
-	pkey->params.algo = GNUTLS_PK_DSA;
 
 	result =
 	    _asn1_strict_der_decode(&dsa_asn, raw_key->data, raw_key->size,
@@ -439,6 +437,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 	pkey->params.params_nr++;
+	pkey->params.algo = GNUTLS_PK_DSA;
 
 	oid_size = sizeof(oid);
 	result = asn1_read_value(dsa_asn, "seed.algorithm", oid, &oid_size);
