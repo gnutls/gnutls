@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Red Hat, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -238,11 +238,11 @@ cert_callback(gnutls_session_t session,
 	gnutls_pcert_st *p;
 	gnutls_privkey_t lkey;
 
-	p = gnutls_malloc(sizeof(*p));
-	if (p==NULL)
-		return -1;
-
 	if (g_pkey == NULL) {
+		p = gnutls_malloc(sizeof(*p));
+		if (p==NULL)
+			return -1;
+
 		ret = gnutls_pcert_import_x509_raw(p, &server_cert, GNUTLS_X509_FMT_PEM, 0);
 		if (ret < 0)
 			return -1;
@@ -260,7 +260,6 @@ cert_callback(gnutls_session_t session,
 
 		*pcert = p;
 		*pcert_length = 1;
-		*pkey = lkey;
 	} else {
 		*pcert = g_pcert;
 		*pcert_length = 1;
@@ -351,5 +350,14 @@ void client_check(void)
 void doit(void)
 {
 	server_check();
+ 	reset_buffers();
 	client_check();
+
+	if (g_pcert) {
+		gnutls_pcert_deinit(g_pcert);
+		gnutls_free(g_pcert);
+	}
+	if (g_pkey) {
+		gnutls_privkey_deinit(g_pkey);
+	}
 }

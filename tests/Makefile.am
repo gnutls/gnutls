@@ -92,7 +92,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok status-request-missing \
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
-	 key-usage mini-session-verify-function auto-verify \
+	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
 	 mini-x509-dual global-init-override tlsext-decoding \
 	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
