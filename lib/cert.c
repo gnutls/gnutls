@@ -310,7 +310,7 @@ _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 				   int *alg_size)
 {
 	unsigned kx;
-	gnutls_pk_algorithm_t pk, cert_pk;
+	gnutls_pk_algorithm_t cert_pk;
 	gnutls_pcert_st *cert;
 	int i;
 
@@ -324,8 +324,7 @@ _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 	i = 0;
 
 	for (kx = 0; kx < MAX_ALGOS; kx++) {
-		pk = _gnutls_map_kx_get_pk(kx);
-		if (pk == cert_pk) {
+		if (_gnutls_kx_supports_pk(kx, cert_pk)) {
 			/* then check key usage */
 			if (check_key_usage(cert, kx) == 0 ||
 			    unlikely(session->internals.priorities.allow_server_key_usage_violation != 0)) {

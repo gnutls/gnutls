@@ -64,15 +64,12 @@ static const gnutls_pk_map pk_mappings[] = {
 			GNUTLS_PK_MAP_LOOP( if(p->kx_algorithm == kx_algorithm) { a; break; })
 
 
-/* returns the gnutls_pk_algorithm_t which is compatible with
- * the given gnutls_kx_algorithm_t.
- */
-gnutls_pk_algorithm_t
-_gnutls_map_kx_get_pk(gnutls_kx_algorithm_t kx_algorithm)
+int
+_gnutls_kx_supports_pk(gnutls_kx_algorithm_t kx_algorithm,
+		       gnutls_pk_algorithm_t pk_algorithm)
 {
-	gnutls_pk_algorithm_t ret = -1;
-
-	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm) return ret;
+	GNUTLS_PK_MAP_LOOP(if (p->kx_algorithm == kx_algorithm && p->pk_algorithm == pk_algorithm) { return 1; })
+	return 0;
 }
 
 /* pk algorithms;

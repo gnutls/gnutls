@@ -270,7 +270,6 @@ inline static int _gnutls_cipher_get_tag_size(const cipher_entry_st * e)
 /* Functions for key exchange. */
 bool _gnutls_kx_needs_dh_params(gnutls_kx_algorithm_t algorithm);
 bool _gnutls_kx_allows_false_start(gnutls_session_t session);
-int _gnutls_kx_cert_pk_params(gnutls_kx_algorithm_t algorithm);
 mod_auth_st *_gnutls_kx_auth_struct(gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_is_ok(gnutls_kx_algorithm_t algorithm);
 
@@ -283,11 +282,9 @@ gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
 						  algorithm, int server);
 
 /* KX to PK mapping. */
-
-/* DSA + RSA + ECC */
-#define GNUTLS_DISTINCT_PK_ALGORITHMS 3
-gnutls_pk_algorithm_t _gnutls_map_kx_get_pk(gnutls_kx_algorithm_t
-					    kx_algorithm);
+int
+_gnutls_kx_supports_pk(gnutls_kx_algorithm_t kx_algorithm,
+		       gnutls_pk_algorithm_t pk_algorithm);
 
 enum encipher_type { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };
 

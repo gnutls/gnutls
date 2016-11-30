@@ -831,9 +831,6 @@ static int _gnutls_recv_finished(gnutls_session_t session)
 	return ret;
 }
 
-/* returns PK_RSA if the given cipher suite list only supports,
- * RSA algorithms, PK_DSA if DSS, and PK_ANY for both or PK_NONE for none.
- */
 static int
 server_find_pk_algos_in_ciphersuites(const uint8_t *
 				     data, unsigned int datalen,
@@ -854,9 +851,13 @@ server_find_pk_algos_in_ciphersuites(const uint8_t *
 	*algos_size = 0;
 	for (j = 0; j < datalen; j += 2) {
 		kx = _gnutls_cipher_suite_get_kx_algo(&data[j]);
-		if (_gnutls_map_kx_get_cred(kx, 1) ==
-		    GNUTLS_CRD_CERTIFICATE) {
-			pk = _gnutls_map_kx_get_pk(kx);
+		if (_gnutls_map_kx_get_cred(kx, 1) !=
+		    GNUTLS_CRD_CERTIFICATE)
+			continue;
+
+		for (pk = GNUTLS_PK_UNKNOWN; pk <= GNUTLS_PK_MAX; pk++) {
+			if (!_gnutls_kx_supports_pk(kx, pk))
+				continue;
 			found = 0;
 			for (x = 0; x < *algos_size; x++) {
 				if (algos[x] == pk) {
@@ -866,8 +867,7 @@ server_find_pk_algos_in_ciphersuites(const uint8_t *
 			}
 
 			if (found == 0) {
-				algos[(*algos_size)++] =
-				    _gnutls_map_kx_get_pk(kx);
+				algos[(*algos_size)++] = pk;
 				if ((*algos_size) >= max)
 					return 0;
 			}

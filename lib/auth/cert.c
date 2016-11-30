@@ -941,7 +941,6 @@ static
 int check_pk_compat(gnutls_session_t session, gnutls_pubkey_t pubkey)
 {
 	unsigned cert_pk;
-	unsigned req_cert_pk;
 	unsigned kx;
 
 	if (session->security_parameters.entity != GNUTLS_CLIENT)
@@ -956,12 +955,8 @@ int check_pk_compat(gnutls_session_t session, gnutls_pubkey_t pubkey)
 	kx = _gnutls_cipher_suite_get_kx_algo(session->
 					      security_parameters.cipher_suite);
 
-	req_cert_pk = _gnutls_kx_cert_pk_params(kx);
-
-	if (req_cert_pk == GNUTLS_PK_UNKNOWN)	/* doesn't matter */
-		return 0;
-
-	if (req_cert_pk != cert_pk) {
+	if (_gnutls_map_kx_get_cred(kx, 1) == GNUTLS_CRD_CERTIFICATE &&
+	    !_gnutls_kx_supports_pk(kx, cert_pk)) {
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_ERROR;
 	}
