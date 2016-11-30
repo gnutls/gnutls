@@ -64,9 +64,14 @@ _gnutls_selected_certs_set(gnutls_session_t session,
 			   gnutls_status_request_ocsp_func ocsp_func,
 			   void *ocsp_func_ptr);
 
-#define MAX_CLIENT_SIGN_ALGOS 3
+#define MAX_CLIENT_SIGN_ALGOS 6
 #define CERTTYPE_SIZE (MAX_CLIENT_SIGN_ALGOS+1)
-typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64
+typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64,
+	/* XXX: IANA pending */
+#ifdef ENABLE_GOST
+	GOSTR34102001_SIGN = 22, GOSTR34102012_256_SIGN = 238,
+	GOSTR34102012_512_SIGN = 239
+#endif
 } CertificateSigType;
 
 /* Copies data from a internal certificate struct (gnutls_pcert_st) to 
@@ -892,6 +897,14 @@ inline static int _gnutls_check_supported_sign_algo(CertificateSigType algo)
 		return GNUTLS_PK_DSA;
 	case ECDSA_SIGN:
 		return GNUTLS_PK_EC;
+#ifdef ENABLE_GOST
+	case GOSTR34102001_SIGN:
+		return GNUTLS_PK_GOST_01;
+	case GOSTR34102012_256_SIGN:
+		return GNUTLS_PK_GOST_12_256;
+	case GOSTR34102012_512_SIGN:
+		return GNUTLS_PK_GOST_12_512;
+#endif
 	}
 
 	return -1;
@@ -1145,7 +1158,7 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 				 gnutls_buffer_st * data)
 {
 	gnutls_certificate_credentials_t cred;
-	int ret;
+	int ret, i;
 	uint8_t tmp_data[CERTTYPE_SIZE];
 	const version_entry_st *ver = get_version(session);
 
@@ -1164,12 +1177,18 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	tmp_data[0] = CERTTYPE_SIZE - 1;
-	tmp_data[1] = RSA_SIGN;
-	tmp_data[2] = DSA_SIGN;
-	tmp_data[3] = ECDSA_SIGN;	/* only these for now */
+	i = 1;
+	tmp_data[i++] = RSA_SIGN;
+	tmp_data[i++] = DSA_SIGN;
+	tmp_data[i++] = ECDSA_SIGN;
+#ifdef ENABLE_GOST
+	tmp_data[i++] = GOSTR34102001_SIGN;
+	tmp_data[i++] = GOSTR34102012_256_SIGN;
+	tmp_data[i++] = GOSTR34102012_512_SIGN;
+#endif
+	tmp_data[0] = i - 1;
 
-	ret = _gnutls_buffer_append_data(data, tmp_data, CERTTYPE_SIZE);
+	ret = _gnutls_buffer_append_data(data, tmp_data, i);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
