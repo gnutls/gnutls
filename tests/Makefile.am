@@ -274,49 +274,49 @@ endif
 endif
 
 gc_CPPFLAGS = $(CPPFLAGS) \
-	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
 
 mpi_CPPFLAGS = $(CPPFLAGS) \
-	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
 
 atfork_CPPFLAGS = $(CPPFLAGS) \
-	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
 
 pkcs12_s2k_CPPFLAGS = $(CPPFLAGS) \
-	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
 
 name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
-	$(NETTLE_CFLAGS)			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
-	-I$(top_builddir)/gl
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
 
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh \
