@@ -194,7 +194,7 @@ MinGW32/DLLs:
   script:
   - dnf install -y wine.i686 mingw32-p11-kit mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register || true
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
     mingw32-configure --with-included-libtasn1 --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
@@ -230,7 +230,7 @@ MinGW64/DLLs:
   script:
   - dnf install -y wine mingw64-nettle mingw64-libtasn1 mingw64-p11-kit mingw64-gcc mingw64-gmp mingw64-libidn util-linux
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register || true
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && 
     mingw64-configure --with-included-libtasn1 --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
@@ -266,7 +266,7 @@ MinGW64:
   script:
   - dnf install -y wine mingw64-nettle mingw64-p11-kit mingw64-libtasn1 mingw64-gcc mingw64-gmp mingw64-libidn util-linux mingw64-cmocka
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-  - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
+  - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register || true
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw64-configure --with-included-libtasn1 --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
@@ -286,7 +286,7 @@ MinGW32:
   script:
   - dnf install -y wine.i686 mingw32-p11-kit mingw32-nettle mingw32-libtasn1 mingw32-gcc mingw32-gmp mingw32-libidn util-linux mingw32-cmocka
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
-  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register || true
   - make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw32-configure --with-included-libtasn1 --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
