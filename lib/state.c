@@ -126,7 +126,12 @@ gnutls_certificate_type_get(gnutls_session_t session)
  **/
 gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 {
-	return session->security_parameters.kx_algorithm;
+	if (session->internals.handshake_in_progress) {
+		/* This allows early call during handshake */
+		return _gnutls_cipher_suite_get_kx_algo(session->security_parameters.cipher_suite);
+	} else {
+		return session->security_parameters.kx_algorithm;
+	}
 }
 
 /**
