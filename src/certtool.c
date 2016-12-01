@@ -2609,8 +2609,6 @@ static void verify_chain(void)
 		exit(1);
 	}
 
-	buf[size] = 0;
-
 	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(VERIFY_PURPOSE),
 			 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
 	free(buf);
@@ -2636,15 +2634,12 @@ static void verify_certificate(common_info_st * cinfo)
 			exit(1);
 		}
 
-		cert[cert_size] = 0;
-
 		cas = (void *) fread_file(ca_file, &ca_size);
 		if (cas == NULL) {
 			fprintf(stderr, "Error reading CA list");
 			exit(1);
 		}
 
-		cas[ca_size] = 0;
 		fclose(ca_file);
 	}
 
