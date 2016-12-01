@@ -220,6 +220,7 @@ MinGW32/DLLs:
     cp lib/includes/gnutls/*.h win32-build/lib/includes
   tags:
   - shared
+  - docker
   only:
   - tags
   artifacts:
@@ -256,6 +257,7 @@ MinGW64/DLLs:
     cp lib/includes/gnutls/*.h win64-build/lib/includes
   tags:
   - shared
+  - docker
   only:
   - tags
   artifacts:
@@ -272,6 +274,7 @@ MinGW64:
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   tags:
   - shared
+  - docker
   except:
   - tags
   artifacts:
@@ -292,6 +295,7 @@ MinGW32:
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   tags:
   - shared
+  - docker
   except:
   - tags
   artifacts:
