@@ -1377,7 +1377,10 @@ find_crl_issuer(gnutls_x509_crl_t crl,
  * function is success (i.e, failure to trust a CRL a certificate does not imply 
  * a negative return value).
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ * Before GnuTLS 3.5.7 this function would return zero or a positive
+ * number on success.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0), otherwise a
  *   negative error value.
  **/
 int
@@ -1483,6 +1486,8 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 			if (verify)
 				*verify |= GNUTLS_CERT_INVALID;
 			goto cleanup;
+		} else if (result >= 0) {
+			result = 0; /* everything ok */
 		}
 	}
 
