@@ -332,7 +332,7 @@ Fedora/x86:
   - linux32 dnf install -y autoconf libtool gettext-devel automake autogen nettle-devel p11-kit-devel autogen-libopts-devel trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl libtasn1-tools unbound-devel bison help2man xz net-tools libseccomp-devel libubsan libubsan-static nodejs softhsm datefudge lcov openssl-devel dieharder mbedtls-utils openssl libcmocka-devel libunistring-devel socat xz ppp abi-compliance-checker valgrind binutils elfutils
   script:
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
+    ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --enable-local-libopts --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-valgrind-tests --enable-code-coverage &&
     make -j$(nproc)
   - make check -j$(nproc)
   - make pic-check
