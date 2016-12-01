@@ -158,18 +158,29 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 }
 
 static
-int check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage)
+int check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage, unsigned our_cert)
 {
+	const char *lstr;
+	unsigned allow_key_usage_violation;
+
+	if (our_cert) {
+		lstr = "Local";
+		allow_key_usage_violation = session->internals.priorities.allow_server_key_usage_violation;
+	} else {
+		lstr = "Peer's";
+		allow_key_usage_violation = session->internals.priorities.allow_key_usage_violation;
+	}
+
 	if (key_usage != 0) {
 		if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
 			gnutls_assert();
-			if (session->internals.priorities.allow_key_usage_violation == 0) {
+			if (likely(allow_key_usage_violation == 0)) {
 				_gnutls_audit_log(session,
-					  "Peer's certificate does not allow digital signatures. Key usage violation detected.\n");
+					  "%s certificate does not allow digital signatures. Key usage violation detected.\n", lstr);
 				return GNUTLS_E_KEY_USAGE_VIOLATION;
 			} else {
 				_gnutls_audit_log(session,
-					  "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
+					  "%s certificate does not allow digital signatures. Key usage violation detected (ignored).\n", lstr);
 			}
 		}
 	}
@@ -195,7 +206,7 @@ sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
 	if (cert != NULL) {
 		gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-		ret = check_key_usage_for_sig(session, key_usage);
+		ret = check_key_usage_for_sig(session, key_usage, 1);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -228,7 +239,7 @@ verify_tls_hash(gnutls_session_t session,
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-	ret = check_key_usage_for_sig(session, key_usage);
+	ret = check_key_usage_for_sig(session, key_usage, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
