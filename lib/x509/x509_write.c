@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1066,6 +1067,10 @@ gnutls_x509_crt_set_private_key_usage_period(gnutls_x509_crt_t crt,
  * This must be the last step in a certificate generation since all
  * the previously set parameters are now signed.
  *
+ * A known limitation of this function is, that a newly-signed certificate will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
@@ -1713,6 +1718,10 @@ gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
  *
  * This must be the last step in a certificate generation since all
  * the previously set parameters are now signed.
+ *
+ * A known limitation of this function is, that a newly-signed certificate will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -85,6 +86,10 @@ gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
  *
  * This must be the last step in a certificate CRL since all
  * the previously set parameters are now signed.
+ *
+ * A known limitation of this function is, that a newly-signed CRL will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -454,6 +459,10 @@ gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  *
  * This must be the last step in a certificate CRL since all
  * the previously set parameters are now signed.
+ *
+ * A known limitation of this function is, that a newly-signed CRL will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
