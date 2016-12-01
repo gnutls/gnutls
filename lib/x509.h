@@ -33,9 +33,6 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 #define PEM_CRL_SEP "-----BEGIN X509 CRL"
 
-int _gnutls_check_key_usage(const gnutls_pcert_st * cert,
-			    gnutls_kx_algorithm_t alg);
-
 int _gnutls_x509_raw_privkey_to_gkey(gnutls_privkey_t * privkey,
 				     const gnutls_datum_t * raw_key,
 				     gnutls_x509_crt_fmt_t type);

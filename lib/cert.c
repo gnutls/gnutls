@@ -245,6 +245,58 @@ gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t *
 	return 0;
 }
 
+/* Returns 0 if it's ok to use the gnutls_kx_algorithm_t with this 
+ * certificate (uses the KeyUsage field). 
+ */
+static int
+check_key_usage(const gnutls_pcert_st * cert,
+		gnutls_kx_algorithm_t alg)
+{
+	unsigned int key_usage = 0;
+	int encipher_type;
+
+	if (cert == NULL || alg == GNUTLS_KX_UNKNOWN) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	if (_gnutls_map_kx_get_cred(alg, 1) == GNUTLS_CRD_CERTIFICATE ||
+	    _gnutls_map_kx_get_cred(alg, 0) == GNUTLS_CRD_CERTIFICATE) {
+
+		gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
+
+		encipher_type = _gnutls_kx_encipher_type(alg);
+
+		if (key_usage != 0 && encipher_type != CIPHER_IGN) {
+			/* If key_usage has been set in the certificate
+			 */
+
+			if (encipher_type == CIPHER_ENCRYPT) {
+				/* If the key exchange method requires an encipher
+				 * type algorithm, and key's usage does not permit
+				 * encipherment, then fail.
+				 */
+				if (!(key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)) {
+					gnutls_assert();
+					return
+					    GNUTLS_E_KEY_USAGE_VIOLATION;
+				}
+			}
+
+			if (encipher_type == CIPHER_SIGN) {
+				/* The same as above, but for sign only keys
+				 */
+				if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+					gnutls_assert();
+					return
+					    GNUTLS_E_KEY_USAGE_VIOLATION;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 
 /* returns the KX algorithms that are supported by a
  * certificate. (Eg a certificate with RSA params, supports
@@ -275,7 +327,7 @@ _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 		pk = _gnutls_map_kx_get_pk(kx);
 		if (pk == cert_pk) {
 			/* then check key usage */
-			if (_gnutls_check_key_usage(cert, kx) == 0 ||
+			if (check_key_usage(cert, kx) == 0 ||
 			    unlikely(session->internals.priorities.allow_server_key_usage_violation != 0)) {
 				alg[i] = kx;
 				i++;

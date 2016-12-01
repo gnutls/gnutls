@@ -1094,13 +1094,6 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	if ((ret =
-	     _gnutls_check_key_usage(&peer_certificate_list[0],
-				     gnutls_kx_get(session))) < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
 	ret = 0;
 
  cleanup:
@@ -1285,13 +1278,6 @@ _gnutls_proc_openpgp_server_crt(gnutls_session_t session,
 	    copy_certificate_auth_info(info,
 				       peer_certificate_list, 1, subkey_id);
 	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	if ((ret =
-	     _gnutls_check_key_usage(&peer_certificate_list[0],
-				     gnutls_kx_get(session))) < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
