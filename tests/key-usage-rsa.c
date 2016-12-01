@@ -350,7 +350,7 @@ void client_check(void)
 void doit(void)
 {
 	server_check();
- 	reset_buffers();
+	reset_buffers();
 	client_check();
 
 	if (g_pcert) {
