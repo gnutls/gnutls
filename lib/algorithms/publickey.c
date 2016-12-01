@@ -68,7 +68,7 @@ static const gnutls_pk_map pk_mappings[] = {
  * the given gnutls_kx_algorithm_t.
  */
 gnutls_pk_algorithm_t
-_gnutls_map_pk_get_pk(gnutls_kx_algorithm_t kx_algorithm)
+_gnutls_map_kx_get_pk(gnutls_kx_algorithm_t kx_algorithm)
 {
 	gnutls_pk_algorithm_t ret = -1;
 

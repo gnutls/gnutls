@@ -272,7 +272,7 @@ _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 	i = 0;
 
 	for (kx = 0; kx < MAX_ALGOS; kx++) {
-		pk = _gnutls_map_pk_get_pk(kx);
+		pk = _gnutls_map_kx_get_pk(kx);
 		if (pk == cert_pk) {
 			/* then check key usage */
 			if (_gnutls_check_key_usage(cert, kx) == 0 ||

@@ -286,7 +286,7 @@ gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
 
 /* DSA + RSA + ECC */
 #define GNUTLS_DISTINCT_PK_ALGORITHMS 3
-gnutls_pk_algorithm_t _gnutls_map_pk_get_pk(gnutls_kx_algorithm_t
+gnutls_pk_algorithm_t _gnutls_map_kx_get_pk(gnutls_kx_algorithm_t
 					    kx_algorithm);
 
 enum encipher_type { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };

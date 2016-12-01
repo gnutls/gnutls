@@ -879,7 +879,7 @@ server_find_pk_algos_in_ciphersuites(const uint8_t *
 		kx = _gnutls_cipher_suite_get_kx_algo(&data[j]);
 		if (_gnutls_map_kx_get_cred(kx, 1) ==
 		    GNUTLS_CRD_CERTIFICATE) {
-			pk = _gnutls_map_pk_get_pk(kx);
+			pk = _gnutls_map_kx_get_pk(kx);
 			found = 0;
 			for (x = 0; x < *algos_size; x++) {
 				if (algos[x] == pk) {
@@ -890,7 +890,7 @@ server_find_pk_algos_in_ciphersuites(const uint8_t *
 
 			if (found == 0) {
 				algos[(*algos_size)++] =
-				    _gnutls_map_pk_get_pk(kx);
+				    _gnutls_map_kx_get_pk(kx);
 				if ((*algos_size) >= max)
 					return 0;
 			}
