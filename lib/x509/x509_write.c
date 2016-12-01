@@ -1057,7 +1057,7 @@ gnutls_x509_crt_set_private_key_usage_period(gnutls_x509_crt_t crt,
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
- * @dig: The message digest to use, %GNUTLS_DIG_SHA1 is a safe choice
+ * @dig: The message digest to use, %GNUTLS_DIG_SHA256 is a safe choice
  * @flags: must be 0
  *
  * This function will sign the certificate with the issuer's private key, and
@@ -1705,7 +1705,7 @@ gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
- * @dig: The message digest to use, %GNUTLS_DIG_SHA1 is a safe choice
+ * @dig: The message digest to use, %GNUTLS_DIG_SHA256 is a safe choice
  * @flags: must be 0
  *
  * This function will sign the certificate with the issuer's private key, and

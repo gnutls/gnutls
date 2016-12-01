@@ -77,7 +77,7 @@ gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
  * @crl: should contain a gnutls_x509_crl_t type
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
- * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
+ * @dig: The message digest to use. GNUTLS_DIG_SHA256 is the safe choice unless you know what you're doing.
  * @flags: must be 0
  *
  * This function will sign the CRL with the issuer's private key, and
@@ -446,7 +446,7 @@ gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  * @crl: should contain a gnutls_x509_crl_t type
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
- * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
+ * @dig: The message digest to use. GNUTLS_DIG_SHA256 is the safe choice unless you know what you're doing.
  * @flags: must be 0
  *
  * This function will sign the CRL with the issuer's private key, and
