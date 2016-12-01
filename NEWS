@@ -20,6 +20,14 @@ See the end for copying conditions.
    output the strict format by default, and can revert to the old one using
    a flag.
 
+** libgnutls: [added missing news entry since 3.5.0]
+   No longer tolerate certificate key usage violations for
+   TLS signature verification, and decryption. That is GnuTLS will fail
+   to connect to servers which incorrectly use a restricted to signing certificate
+   for decryption, or vice-versa. This reverts the lax behavior introduced
+   in 3.1.0, due to several such broken servers being available. The %COMPAT
+   priority keyword can be used to work-around connecting on these servers.
+
 ** libgnutls: In all functions accepting UTF-8 passwords, ensure that
    passwords are normalized according to RFC7613. When invalid UTF-8
    passwords are detected, they are only tolerated for decryption.
@@ -339,6 +347,13 @@ gnutls_ext_get_name: Added
    by a rehandshake which switches the peer's identity. Applications can
    disable this protection by using the %GNUTLS_ALLOW_ID_CHANGE flag in
    gnutls_init().
+
+** libgnutls: No longer tolerate certificate key usage violations for
+   TLS signature verification, and decryption. That is GnuTLS will fail
+   to connect to servers which incorrectly use a restricted to signing certificate
+   for decryption, or vice-versa. This reverts the lax behavior introduced
+   in 3.1.0, due to several such broken servers being available. The %COMPAT
+   priority keyword can be used to work-around connecting on these servers.
 
 ** libgnutls: Be strict in TLS extension decoding. That is, do not tolerate
    parsing errors in the extensions field and treat it as a typical Hello
