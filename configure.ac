@@ -643,15 +643,23 @@ fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
-if test -f "/usr/lib64/libtspi.so.1";then
-default_trousers_lib="/usr/lib64/libtspi.so.1"
-else
-default_trousers_lib="/usr/lib/libtspi.so.1"
-fi
+for l in /usr/lib /usr/lib64 /lib /lib64; do
+    if test -f "${l}/libtspi.so.1";then
+        default_trousers_lib="${l}/libtspi.so.1"
+    fi
+done
 
 AC_ARG_WITH(trousers-lib, AS_HELP_STRING([--with-trousers-lib=LIB],
                                  [set the location of the trousers library]),
             ac_trousers_lib=$withval, ac_trousers_lib=$default_trousers_lib)
+
+if test "$with_tpm" != "no" && test -z "$ac_trousers_lib"; then
+    AC_MSG_ERROR([[
+  ***
+  *** unable to find trousers library, please specify with --with-trousers-lib=<lib file>
+  ***
+  ]])
+fi
 
 AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the trousers library])
 AC_SUBST(TROUSERS_LIB)
