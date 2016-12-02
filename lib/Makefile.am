@@ -136,7 +136,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
-	$(LTLIBICONV) $(P11_KIT_LIBS) $(LIB_SELECT)
+	$(P11_KIT_LIBS) $(LIB_SELECT)
 
 if HAVE_LIBIDN
 thirdparty_libadd += $(LIBIDN_LIBS)

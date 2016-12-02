@@ -2,7 +2,7 @@
 # This Makefile fragment tries to be general-purpose enough to be
 # used by many projects via the gnulib maintainer-makefile module.
 
-## Copyright (C) 2001-2015 Free Software Foundation, Inc.
+## Copyright (C) 2001-2016 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -437,17 +437,26 @@ sc_require_config_h:
 	halt='the above files do not include <config.h>'		\
 	  $(_sc_search_regexp)
 
+# Print each file name for which the first #include does not match
+# $(config_h_header).  Like grep -m 1, this only looks at the first match.
+perl_config_h_first_ =							\
+  -e 'BEGIN {$$ret = 0}'						\
+  -e 'if (/^\# *include\b/) {'						\
+  -e '  if (not m{^\# *include $(config_h_header)}) {'			\
+  -e '    print "$$ARGV\n";'						\
+  -e '    $$ret = 1;'							\
+  -e '  }'								\
+  -e '  \# Move on to next file after first include'			\
+  -e '  close ARGV;'							\
+  -e '}'								\
+  -e 'END {exit $$ret}'
+
 # You must include <config.h> before including any other header file.
 # This can possibly be via a package-specific header, if given by cfg.mk.
 sc_require_config_h_first:
 	@if $(VC_LIST_EXCEPT) | grep '\.c$$' > /dev/null; then		\
-	  fail=0;							\
-	  for i in $$($(VC_LIST_EXCEPT) | grep '\.c$$'); do		\
-	    grep '^# *include\>' $$i | $(SED) 1q			\
-		| grep -E '^# *include $(config_h_header)' > /dev/null	\
-	      || { echo $$i; fail=1; };					\
-	  done;								\
-	  test $$fail = 1 &&						\
+	  files=$$($(VC_LIST_EXCEPT) | grep '\.c$$') &&			\
+	  perl -n $(perl_config_h_first_) $$files ||			\
 	    { echo '$(ME): the above files include some other header'	\
 		'before <config.h>' 1>&2; exit 1; } || :;		\
 	else :;								\
@@ -651,8 +660,7 @@ sc_prohibit_strings_without_use:
 # Get the list of symbol names with this:
 # perl -lne '/^# *define ([A-Z]\w+)\(/ and print $1' lib/intprops.h|fmt
 _intprops_names =							\
-  TYPE_IS_INTEGER TYPE_TWOS_COMPLEMENT TYPE_ONES_COMPLEMENT		\
-  TYPE_SIGNED_MAGNITUDE TYPE_SIGNED TYPE_MINIMUM TYPE_MAXIMUM		\
+  TYPE_IS_INTEGER TYPE_SIGNED TYPE_MINIMUM TYPE_MAXIMUM			\
   INT_BITS_STRLEN_BOUND INT_STRLEN_BOUND INT_BUFSIZE_BOUND		\
   INT_ADD_RANGE_OVERFLOW INT_SUBTRACT_RANGE_OVERFLOW			\
   INT_NEGATE_RANGE_OVERFLOW INT_MULTIPLY_RANGE_OVERFLOW			\
@@ -706,15 +714,6 @@ sc_changelog:
 	@prohibit='^[^12	]'					\
 	in_vc_files='^ChangeLog$$'					\
 	halt='found unexpected prefix in a ChangeLog'			\
-	  $(_sc_search_regexp)
-
-# Ensure that each .c file containing a "main" function also
-# calls set_program_name.
-sc_program_name:
-	@require='set_program_name *\(.*\);'				\
-	in_vc_files='\.c$$'						\
-	containing='\<main *('						\
-	halt='the above files do not call set_program_name'		\
 	  $(_sc_search_regexp)
 
 # Ensure that each .c file containing a "main" function also
@@ -954,8 +953,13 @@ perl_filename_lineno_text_ =						\
     -e '    print "$$ARGV:$$n:$$v\n";'					\
     -e '  }'
 
+prohibit_doubled_words_ = \
+    the then in an on if is it but for or at and do to
+# expand the regex before running the check to avoid using expensive captures
+prohibit_doubled_word_expanded_ = \
+    $(join $(prohibit_doubled_words_),$(addprefix \s+,$(prohibit_doubled_words_)))
 prohibit_doubled_word_RE_ ?= \
-  /\b(then?|[iao]n|i[fst]|but|f?or|at|and|[dt]o)\s+\1\b/gims
+    /\b(?:$(subst $(_sp),|,$(prohibit_doubled_word_expanded_)))\b/gims
 prohibit_doubled_word_ =						\
     -e 'while ($(prohibit_doubled_word_RE_))'				\
     $(perl_filename_lineno_text_)
@@ -1124,6 +1128,21 @@ fix_po_file_diag = \
 'you have changed the set of files with translatable diagnostics;\n\
 apply the above patch\n'
 
+# Generate a list of files in which to search for translatable strings.
+perl_translatable_files_list_ =						\
+  -e 'foreach $$file (@ARGV) {'						\
+  -e '	\# Consider only file extensions with one or two letters'	\
+  -e '	$$file =~ /\...?$$/ or next;'					\
+  -e '	\# Ignore m4 and mk files'					\
+  -e '	$$file =~ /\.m[4k]$$/ and next;'				\
+  -e '	\# Ignore a .c or .h file with a corresponding .l or .y file'	\
+  -e '	$$file =~ /(.+)\.[ch]$$/ && (-e "$${1}.l" || -e "$${1}.y")'	\
+  -e '	  and next;'							\
+  -e '	\# Skip unreadable files'					\
+  -e '	-r $$file or next;'						\
+  -e '	print "$$file ";'						\
+  -e '}'
+
 # Verify that all source files using _() (more specifically, files that
 # match $(_gl_translatable_string_re)) are listed in po/POTFILES.in.
 po_file ?= $(srcdir)/po/POTFILES.in
@@ -1133,21 +1152,8 @@ sc_po_check:
 	@if test -f $(po_file); then					\
 	  grep -E -v '^(#|$$)' $(po_file)				\
 	    | grep -v '^src/false\.c$$' | sort > $@-1;			\
-	  files=;							\
-	  for file in $$($(VC_LIST_EXCEPT)) $(generated_files); do	\
-	    test -r $$file || continue;					\
-	    case $$file in						\
-	      *.m4|*.mk) continue ;;					\
-	      *.?|*.??) ;;						\
-	      *) continue;;						\
-	    esac;							\
-	    case $$file in						\
-	    *.[ch])							\
-	      base=`expr " $$file" : ' \(.*\)\..'`;			\
-	      { test -f $$base.l || test -f $$base.y; } && continue;;	\
-	    esac;							\
-	    files="$$files $$file";					\
-	  done;								\
+	  files=$$(perl $(perl_translatable_files_list_)		\
+	    $$($(VC_LIST_EXCEPT)) $(generated_files));			\
 	  grep -E -l '$(_gl_translatable_string_re)' $$files		\
 	    | $(SED) 's|^$(_dot_escaped_srcdir)/||' | sort -u > $@-2;	\
 	  diff -u -L $(po_file) -L $(po_file) $@-1 $@-2			\
@@ -1600,7 +1606,7 @@ ifeq (a,b)
 # do not need to be marked.  Symbols matching '__.*' are
 # reserved by the compiler, so are automatically excluded below.
 _gl_TS_unmarked_extern_functions ?= main usage
-_gl_TS_function_match ?= /^(?:$(_gl_TS_extern)) +.*?(\S+) *\(/
+_gl_TS_function_match ?= /^(?:$(_gl_TS_extern)) +.*?(\w+) *\(/
 
 # If your project uses a macro like "XTERN", then put
 # the following in cfg.mk to override this default:
@@ -1633,6 +1639,7 @@ _gl_TS_other_headers ?= *.h
 
 .PHONY: _gl_tight_scope
 _gl_tight_scope: $(bin_PROGRAMS)
+	sed_wrap='s/^/^_?/;s/$$/$$/';					\
 	t=exceptions-$$$$;						\
 	trap 's=$$?; rm -f $$t; exit $$s' 0;				\
 	for sig in 1 2 3 13 15; do					\
@@ -1642,19 +1649,19 @@ _gl_tight_scope: $(bin_PROGRAMS)
 	       test -f $$f && d= || d=$(srcdir)/; echo $$d$$f; done`;	\
 	hdr=`for f in $(_gl_TS_headers); do				\
 	       test -f $$f && d= || d=$(srcdir)/; echo $$d$$f; done`;	\
-	( printf '^%s$$\n' '__.*' $(_gl_TS_unmarked_extern_functions);	\
+	( printf '%s\n' '__.*' $(_gl_TS_unmarked_extern_functions);	\
 	  grep -h -A1 '^extern .*[^;]$$' $$src				\
-	    | grep -vE '^(extern |--)' | $(SED) 's/ .*//';		\
+	    | grep -vE '^(extern |--|#)' | $(SED) 's/ .*//; /^$$/d';	\
 	  perl -lne							\
-	     '$(_gl_TS_function_match) and print "^$$1\$$"' $$hdr;	\
-	) | sort -u > $$t;						\
+	     '$(_gl_TS_function_match) and print $$1' $$hdr;		\
+	) | sort -u | $(SED) "$$sed_wrap" > $$t;			\
 	nm -g $(_gl_TS_obj_files)|$(SED) -n 's/.* T //p'|grep -Ev -f $$t \
 	  && { echo the above functions should have static scope >&2;	\
 	       exit 1; } || : ;						\
-	( printf '^%s$$\n' '__.*' $(_gl_TS_unmarked_extern_vars);	\
-	  perl -lne '$(_gl_TS_var_match) and print "^$$1\$$"'		\
+	( printf '%s\n' '__.*' main $(_gl_TS_unmarked_extern_vars);	\
+	  perl -lne '$(_gl_TS_var_match) and print $$1'			\
 		$$hdr $(_gl_TS_other_headers)				\
-	) | sort -u > $$t;						\
+	) | sort -u | $(SED) "$$sed_wrap" > $$t;			\
 	nm -g $(_gl_TS_obj_files) | $(SED) -n 's/.* [BCDGRS] //p'	\
             | sort -u | grep -Ev -f $$t					\
 	  && { echo the above variables should have static scope >&2;	\

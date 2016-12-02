@@ -92,8 +92,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module gnumakefile:
   # Code from module hash-pjw-bare:
   # Code from module havelib:
-  # Code from module iconv:
-  # Code from module iconv-tests:
   # Code from module include_next:
   # Code from module intprops:
   # Code from module intprops-tests:
@@ -104,6 +102,8 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_SYS_LARGEFILE])
   # Code from module lib-msvc-compat:
   # Code from module lib-symbol-versions:
+  # Code from module limits-h:
+  # Code from module limits-h-tests:
   # Code from module lseek:
   # Code from module maintainer-makefile:
   # Code from module malloc-posix:
@@ -268,12 +268,10 @@ AC_SUBST([LTALLOCA])
           m4_defn([m4_PACKAGE_VERSION])), [1], [],
         [AC_CONFIG_LINKS([$GNUmakefile:$GNUmakefile], [],
           [GNUmakefile=$GNUmakefile])])
-  AM_ICONV
-  m4_ifdef([gl_ICONV_MODULE_INDICATOR],
-    [gl_ICONV_MODULE_INDICATOR([iconv])])
   AC_REQUIRE([gl_LARGEFILE])
   gl_LD_OUTPUT_DEF
   gl_LD_VERSION_SCRIPT
+  gl_LIMITS_H
   gl_FUNC_LSEEK
   if test $REPLACE_LSEEK = 1; then
     AC_LIBOBJ([lseek])
@@ -602,6 +600,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/hash-pjw-bare.h
   lib/intprops.h
   lib/itold.c
+  lib/limits.in.h
   lib/lseek.c
   lib/malloc.c
   lib/memchr.c
@@ -682,7 +681,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getpagesize.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4
-  m4/iconv.m4
   m4/include_next.m4
   m4/intmax_t.m4
   m4/inttypes-pri.m4
@@ -694,6 +692,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/limits-h.m4
   m4/longlong.m4
   m4/lseek.m4
   m4/malloc.m4
@@ -783,10 +782,10 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getdelim.c
   tests/test-getline.c
   tests/test-gettimeofday.c
-  tests/test-iconv.c
   tests/test-init.sh
   tests/test-intprops.c
   tests/test-inttypes.c
+  tests/test-limits-h.c
   tests/test-memchr.c
   tests/test-netdb.c
   tests/test-netinet_in.c

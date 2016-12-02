@@ -319,16 +319,6 @@ EXTRA_DIST += signature.h test-gettimeofday.c
 
 ## end   gnulib module gettimeofday-tests
 
-## begin gnulib module iconv-tests
-
-TESTS += test-iconv
-check_PROGRAMS += test-iconv
-test_iconv_LDADD = $(LDADD) @LIBICONV@
-
-EXTRA_DIST += test-iconv.c signature.h macros.h
-
-## end   gnulib module iconv-tests
-
 ## begin gnulib module intprops-tests
 
 TESTS += test-intprops
@@ -389,6 +379,14 @@ check_PROGRAMS += test-inttypes
 EXTRA_DIST += test-inttypes.c
 
 ## end   gnulib module inttypes-tests
+
+## begin gnulib module limits-h-tests
+
+TESTS += test-limits-h
+check_PROGRAMS += test-limits-h
+EXTRA_DIST += test-limits-h.c
+
+## end   gnulib module limits-h-tests
 
 ## begin gnulib module memchr-tests
 
