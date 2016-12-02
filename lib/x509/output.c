@@ -1617,7 +1617,7 @@ static void print_obj_id(gnutls_buffer_st *str, const char *prefix, void *obj, g
 		return;
 	}
 
-	addf(str, _("%sPublic Key ID:\n\t\tsha1:"), prefix);
+	addf(str, _("%sPublic Key ID:\n%s\tsha1:"), prefix, prefix);
 	_gnutls_buffer_hexprint(str, sha1_buffer, sha1_size);
 	addf(str, "\n%s\tsha256:", prefix);
 	_gnutls_buffer_hexprint(str, sha2_buffer, sha2_size);
