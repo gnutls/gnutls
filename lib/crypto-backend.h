@@ -434,4 +434,18 @@ _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
 		size_t seed_size, const uint8_t *seed, size_t outsize,
 		char *out);
 
+int _gnutls_gost_key_wrap(gnutls_gost_paramset_t gost_params,
+			  const gnutls_datum_t *kek,
+			  const gnutls_datum_t *ukm,
+			  const gnutls_datum_t *cek,
+			  gnutls_datum_t *enc,
+			  gnutls_datum_t *imit);
+
+int _gnutls_gost_key_unwrap(gnutls_gost_paramset_t gost_params,
+			    const gnutls_datum_t *kek,
+			    const gnutls_datum_t *ukm,
+			    const gnutls_datum_t *enc,
+			    const gnutls_datum_t *imit,
+			    gnutls_datum_t *cek);
+
 #endif /* GNUTLS_LIB_CRYPTO_BACKEND_H */
