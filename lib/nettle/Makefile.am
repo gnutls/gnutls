@@ -89,4 +89,6 @@ libcrypto_la_SOURCES += \
 	gost/ecc-gostdsa-sign.c gost/ecc-gostdsa-verify.c \
 	gost/gostdsa-sign.c gost/gostdsa-verify.c gost/gostdsa-vko.c \
 	gost/gostdsa.h gost/ecc-gost-curve.h gost/ecc-gost-hash.c
+
+libcrypto_la_SOURCES += gost_keywrap.c
 endif

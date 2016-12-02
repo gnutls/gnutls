@@ -81,6 +81,10 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c			\
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c
 
+if ENABLE_GOST
+COBJECTS += vko.c
+endif
+
 if WINDOWS
 COBJECTS += system/keys-win.c
 else
@@ -114,6 +118,10 @@ HFILES = abstract_int.h debug.h cipher.h	\
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h pkcs11x.h
+endif
+
+if ENABLE_GOST
+HFILES += vko.h
 endif
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
