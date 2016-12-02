@@ -205,6 +205,9 @@ _gnutls_init_record_state(record_parameters_st * params,
 		if (_gnutls_cipher_type(params->cipher) == CIPHER_BLOCK)
 			iv = &state->IV;
 	}
+	if (_gnutls_cipher_type(params->cipher) == CIPHER_STREAM &&
+	    _gnutls_cipher_get_implicit_iv_size(params->cipher) != 0)
+		iv = &state->IV;
 
 	ret = _gnutls_auth_cipher_init(&state->cipher_state,
 				       params->cipher, &state->key, iv,
