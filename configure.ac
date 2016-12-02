@@ -667,22 +667,13 @@ AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the tr
 AC_SUBST(TROUSERS_LIB)
 
 included_libopts=no
+create_libopts_links=no
 if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
 	LIBOPTS_CHECK([src/libopts])
 	if test "$NEED_LIBOPTS_DIR" = "true";then
 		dnl replace libopts-generated files with distributed backups, if present
-		missing_baks=
-		for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
-			nam=`echo $i|sed 's/.bak//g'`
-			if test -f $i;then
-				cp -f $i $nam
-			else
-				missing_baks=true
-			fi
-		done
-		if test -z "$missing_baks"; then
-			AC_SUBST([AUTOGEN], [/bin/true])
-		fi
+		create_libopts_links=yes
+		AC_SUBST([AUTOGEN], [/bin/true])
 		included_libopts=yes
 	fi
 else
@@ -926,6 +917,14 @@ AC_DEFINE([read_binary_file], [_gnutls_read_binary_file], [static lib rename])
 dnl Some variables needed in makefiles
 YEAR=`date +%Y`
 AC_SUBST([YEAR], $YEAR)
+
+for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
+	nam=$(basename $i|sed 's/.bak//g')
+	rm -f "src/$nam"
+	if test "$create_libopts_links" = "yes";then
+		AC_CONFIG_LINKS([src/$nam:$i])
+	fi
+done
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
