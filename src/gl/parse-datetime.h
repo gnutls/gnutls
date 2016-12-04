@@ -1,6 +1,6 @@
 /* Parse a string into an internal time stamp.
 
-   Copyright (C) 1995, 1997-1998, 2003-2004, 2007, 2009-2015 Free Software
+   Copyright (C) 1995, 1997-1998, 2003-2004, 2007, 2009-2016 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -20,3 +20,10 @@
 #include <time.h>
 
 bool parse_datetime (struct timespec *, char const *, struct timespec const *);
+
+/* parse_datetime2 flag: if set, print debug/progress information to STDERR */
+#define PARSE_DATETIME_DEBUG 1
+
+/* same as above, supporting additional flags */
+bool parse_datetime2 (struct timespec *, char const *, struct timespec const *,
+                      unsigned int flags);

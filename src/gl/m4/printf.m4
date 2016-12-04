@@ -1,5 +1,5 @@
 # printf.m4 serial 52
-dnl Copyright (C) 2003, 2007-2015 Free Software Foundation, Inc.
+dnl Copyright (C) 2003, 2007-2016 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -38,6 +38,8 @@ int main ()
   if (sprintf (buf, "%ju %d", (uintmax_t) 12345671, 33, 44, 55) < 0
       || strcmp (buf, "12345671 33") != 0)
     result |= 1;
+#else
+  result |= 1;
 #endif
   buf[0] = '\0';
   if (sprintf (buf, "%zu %d", (size_t) 12345672, 33, 44, 55) < 0
