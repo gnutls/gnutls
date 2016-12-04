@@ -688,6 +688,7 @@ import_tpm_key(gnutls_privkey_t pkey,
 	pTspi_Context_CloseObject(s->tpm_ctx, s->tpm_key);
 	s->tpm_key = 0;
       out_session:
+	_gnutls_privkey_cleanup(pkey);
 	tpm_close_session(s);
       out_ctx:
 	gnutls_free(s);

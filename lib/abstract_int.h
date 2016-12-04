@@ -82,6 +82,8 @@ struct gnutls_pubkey_st {
 int _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
 				    gnutls_pk_params_st *);
 
+void _gnutls_privkey_cleanup(gnutls_privkey_t key);
+
 unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params);
 int _gnutls_pubkey_compatible_with_sig(gnutls_session_t,
 				       gnutls_pubkey_t pubkey,
