@@ -283,3 +283,6 @@ systemkey-args.c: systemkey-args.stamp
 systemkey-args.stamp: $(srcdir)/systemkey-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
 	touch $@
+
+clean-local:
+	rm -f *.stamp
