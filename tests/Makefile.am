@@ -117,7 +117,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 multi-alerts naked-alerts pkcs7-cat-parse set_known_dh_params_x509 \
 	 set_known_dh_params_anon set_known_dh_params_psk session-tickets-ok \
 	 session-tickets-missing set_x509_key_file_legacy status-request-ext \
-	 rng-no-onload dtls1-2-mtu-check
+	 rng-no-onload dtls1-2-mtu-check crl_apis
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
