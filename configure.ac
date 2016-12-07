@@ -58,6 +58,7 @@ if test "$ac_cv_prog_cc_c99" = "no"; then
 fi
 
 AX_CODE_COVERAGE
+AM_MAINTAINER_MODE([enable])
 
 AC_ARG_ENABLE(doc,
   AS_HELP_STRING([--disable-doc], [don't generate any documentation]),

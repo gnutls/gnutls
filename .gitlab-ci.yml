@@ -308,7 +308,7 @@ Fedora/x86_64/build:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init &&
-    make autoreconf && CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --enable-code-coverage --enable-gtk-doc
+    make autoreconf && CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --enable-code-coverage --enable-gtk-doc --disable-maintainer-mode
     && make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   tags:
   - shared
