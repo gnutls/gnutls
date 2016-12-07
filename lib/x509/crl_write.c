@@ -184,6 +184,11 @@ int gnutls_x509_crl_set_this_update(gnutls_x509_crl_t crl, time_t act_time)
  * @exp_time: The actual time
  *
  * This function will set the time this CRL will be updated.
+ * This is an optional value to be set on a CRL and this call
+ * can be omitted when generating a CRL.
+ *
+ * Prior to GnuTLS 3.5.7, setting a nextUpdate field was required
+ * in order to generate a CRL.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
