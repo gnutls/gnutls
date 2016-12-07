@@ -49,7 +49,7 @@ static void tls_log_func(int level, const char *str)
 
 void doit(void)
 {
-	gnutls_x509_privkey_t pkey;
+	gnutls_x509_privkey_t pkey, dst;
 	int ret, algorithm, i;
 
 	ret = global_init();
@@ -67,6 +67,12 @@ void doit(void)
 				continue;
 
 			ret = gnutls_x509_privkey_init(&pkey);
+			if (ret < 0) {
+				fail("gnutls_x509_privkey_init: %d\n",
+				     ret);
+			}
+
+			ret = gnutls_x509_privkey_init(&dst);
 			if (ret < 0) {
 				fail("gnutls_x509_privkey_init: %d\n",
 				     ret);
@@ -92,7 +98,19 @@ void doit(void)
 				fail("gnutls_x509_privkey_generate (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
 			}
 
+			/* include test of cpy */
+			ret = gnutls_x509_privkey_cpy(dst, pkey);
+			if (ret < 0) {
+				fail("gnutls_x509_privkey_cpy (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
+			}
+
+			ret = gnutls_x509_privkey_verify_params(pkey);
+			if (ret < 0) {
+				fail("gnutls_x509_privkey_generate after cpy (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
+			}
+
 			gnutls_x509_privkey_deinit(pkey);
+			gnutls_x509_privkey_deinit(dst);
 		}
 	}
 
