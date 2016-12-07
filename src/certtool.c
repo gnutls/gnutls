@@ -1708,10 +1708,10 @@ static void print_crq_info(gnutls_x509_crq_t crq, FILE * out)
 
 	ret = gnutls_x509_crq_verify(crq, 0);
 	if (ret < 0) {
-		fprintf(outcert_format == GNUTLS_X509_FMT_DER ? out : stderr,
+		fprintf(outcert_format == GNUTLS_X509_FMT_PEM ? out : stderr,
 			"Self signature: FAILED\n\n");
 	} else {
-		fprintf(outcert_format == GNUTLS_X509_FMT_DER ? out : stderr,
+		fprintf(outcert_format == GNUTLS_X509_FMT_PEM ? out : stderr,
 			"Self signature: verified\n\n");
 	}
 
