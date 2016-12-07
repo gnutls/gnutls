@@ -20,13 +20,9 @@ See the end for copying conditions.
    output the strict format by default, and can revert to the old one using
    a flag.
 
-** libgnutls: [added missing news entry since 3.5.0]
-   No longer tolerate certificate key usage violations for
-   TLS signature verification, and decryption. That is GnuTLS will fail
-   to connect to servers which incorrectly use a restricted to signing certificate
-   for decryption, or vice-versa. This reverts the lax behavior introduced
-   in 3.1.0, due to several such broken servers being available. The %COMPAT
-   priority keyword can be used to work-around connecting on these servers.
+** libgnutls: Improved TPM key handling. Check authorization requirements
+   prior to using a key and fix issue on loop for PIN input. Patches by 
+   James Bottomley.
 
 ** libgnutls: In all functions accepting UTF-8 passwords, ensure that
    passwords are normalized according to RFC7613. When invalid UTF-8
@@ -47,8 +43,19 @@ See the end for copying conditions.
    signers that are not discoverable using the trust list or input, use
    the stored list as pool to generate a trusted chain to the signer.
 
-** libgnutls: Improved MTU calculation for the CBC ciphersuites under
-   DTLS.
+** libgnutls: Improved MTU calculation precision for the CBC ciphersuites
+   under DTLS.
+
+** libgnutls: [added missing news entry since 3.5.0]
+   No longer tolerate certificate key usage violations for
+   TLS signature verification, and decryption. That is GnuTLS will fail
+   to connect to servers which incorrectly use a restricted to signing certificate
+   for decryption, or vice-versa. This reverts the lax behavior introduced
+   in 3.1.0, due to several such broken servers being available. The %COMPAT
+   priority keyword can be used to work-around connecting on these servers.
+
+** certtool: When exporting a CRQ in DER format ensure no text data are
+   intermixed. Patch by Dmitry Eremin-Solenikov.
 
 ** certtool: Include the SHA-256 variant of key ID in --certificate-info
    options.
