@@ -646,6 +646,7 @@ AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 for l in /usr/lib64 /usr/lib /lib64 /lib /usr/lib/x86_64-linux-gnu/; do
     if test -f "${l}/libtspi.so.1";then
         default_trousers_lib="${l}/libtspi.so.1"
+        break
     fi
 done
 
