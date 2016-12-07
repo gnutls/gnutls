@@ -20,8 +20,6 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-set -e
-
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 TMPFILE1=rsa-md5.$$.tmp
@@ -30,22 +28,32 @@ TMPFILE2=rsa-md5-2.$$.tmp
 . ${srcdir}/scripts/common.sh
 check_for_datefudge
 
-"${CERTTOOL}" --inder --certificate-info \
-	--infile "${srcdir}/rsa-md5-collision/TargetCollidingCertificate1.cer" > $TMPFILE1
-"${CERTTOOL}" --inder --certificate-info \
-	--infile "${srcdir}/rsa-md5-collision/TargetCollidingCertificate2.cer" > $TMPFILE2
+datefudge -s "2006-10-1" \
+"${CERTTOOL}" --verify-chain --outfile "$TMPFILE1" --infile "${srcdir}/rsa-md5-collision/colliding-chain-md5-1.pem"
+if test $? = 0;then
+	echo "Verification on chain1 succeeded"
+	exit 1
+fi
 
-"${CERTTOOL}" --inder --certificate-info \
-	--infile "${srcdir}/rsa-md5-collision/MD5CollisionCA.cer" >> $TMPFILE1
-"${CERTTOOL}" --inder --certificate-info \
-	--infile "${srcdir}/rsa-md5-collision/MD5CollisionCA.cer" >> $TMPFILE2
+grep 'Not verified.' $TMPFILE1| grep 'insecure algorithm'
+if test $? != 0;then
+	echo "Output on chain1 doesn't match the expected"
+	exit 1
+fi
 
-datefudge -s "2016-10-1" \
-"${CERTTOOL}" --verify-chain < $TMPFILE1 | \
-	grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
-datefudge -s "2016-10-1" \
-"${CERTTOOL}" --verify-chain < $TMPFILE2 | \
-	grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
+
+datefudge -s "2006-10-1" \
+"${CERTTOOL}" --verify-chain --outfile "$TMPFILE2" --infile "${srcdir}/rsa-md5-collision/colliding-chain-md5-2.pem"
+if test $? = 0;then
+	echo "Verification on chain2 succeeded"
+	exit 1
+fi
+
+grep 'Not verified.' $TMPFILE2| grep 'insecure algorithm'
+if test $? != 0;then
+	echo "Output on chain2 doesn't match the expected"
+	exit 1
+fi
 
 rm -f $TMPFILE1 $TMPFILE2
 
