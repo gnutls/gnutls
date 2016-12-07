@@ -98,29 +98,24 @@ int
 gnutls_x509_privkey_cpy(gnutls_x509_privkey_t dst,
 			gnutls_x509_privkey_t src)
 {
-	unsigned int i;
 	int ret;
 
 	if (!src || !dst)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	for (i = 0; i < src->params.params_nr; i++) {
-		dst->params.params[i] =
-		    _gnutls_mpi_copy(src->params.params[i]);
-		if (dst->params.params[i] == NULL)
-			return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	dst->params.params_nr = src->params.params_nr;
-	dst->params.flags = src->params.flags;
-
 	dst->pk_algorithm = src->pk_algorithm;
+
+	ret = _gnutls_pk_params_copy(&dst->params, &src->params);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
 
 	ret =
 	    _gnutls_asn1_encode_privkey(dst->pk_algorithm, &dst->key,
 					&dst->params, src->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
 		gnutls_assert();
+		gnutls_pk_params_release(&dst->params);
 		return ret;
 	}
 
