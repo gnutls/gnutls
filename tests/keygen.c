@@ -30,6 +30,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
+#include <assert.h>
 
 #include "utils.h"
 
@@ -45,6 +46,47 @@ static int sec_param[MAX_TRIES] =
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "%s |<%d>| %s", "crq_key_id", level, str);
+}
+
+const gnutls_datum_t raw_data = {
+	(void *) "hello there",
+	11
+};
+
+static void sign_verify_data(gnutls_x509_privkey_t pkey)
+{
+	int ret;
+	gnutls_privkey_t privkey;
+	gnutls_pubkey_t pubkey;
+	gnutls_datum_t signature;
+
+	/* sign arbitrary data */
+	assert(gnutls_privkey_init(&privkey) >= 0);
+
+	ret = gnutls_privkey_import_x509(privkey, pkey, 0);
+	if (ret < 0)
+		fail("gnutls_privkey_import_x509\n");
+
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0,
+					&raw_data, &signature);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_sign_data\n");
+
+	/* verify data */
+	assert(gnutls_pubkey_init(&pubkey) >= 0);
+
+	ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
+	if (ret < 0)
+		fail("gnutls_pubkey_import_privkey\n");
+
+	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm(pubkey, NULL),GNUTLS_DIG_SHA256),
+				0, &raw_data, &signature);
+	if (ret < 0)
+		fail("gnutls_pubkey_verify_data2\n");
+
+	gnutls_pubkey_deinit(pubkey);
+	gnutls_privkey_deinit(privkey);
+	gnutls_free(signature.data);
 }
 
 void doit(void)
@@ -109,8 +151,12 @@ void doit(void)
 				fail("gnutls_x509_privkey_generate after cpy (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
 			}
 
+			sign_verify_data(pkey);
+			sign_verify_data(dst);
+
 			gnutls_x509_privkey_deinit(pkey);
 			gnutls_x509_privkey_deinit(dst);
+			success("Generated key with %s-%d\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_sec_param_to_pk_bits(algorithm,sec_param[i]));
 		}
 	}
 
