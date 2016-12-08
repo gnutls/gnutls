@@ -571,6 +571,7 @@ APIMANS += gnutls_pkcs7_get_crt_count.3
 APIMANS += gnutls_pkcs7_get_crt_raw.3
 APIMANS += gnutls_pkcs7_get_crt_raw2.3
 APIMANS += gnutls_pkcs7_get_embedded_data.3
+APIMANS += gnutls_pkcs7_get_embedded_data_oid.3
 APIMANS += gnutls_pkcs7_get_signature_count.3
 APIMANS += gnutls_pkcs7_get_signature_info.3
 APIMANS += gnutls_pkcs7_import.3
