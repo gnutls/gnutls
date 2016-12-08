@@ -470,6 +470,8 @@ and the underlying protocol type, i.e., datagram (UDP) or reliable (TCP).
 
 @showfuncdesc{gnutls_init}
 
+@showenumdesc{gnutls_init_flags_t,The @code{gnutls_init_@-flags_t} enumeration.}
+
 After the session initialization details on the allowed ciphersuites
 and protocol versions should be set using the priority functions
 such as @funcref{gnutls_priority_set_direct}. We elaborate on them
