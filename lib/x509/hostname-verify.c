@@ -128,7 +128,6 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	struct in_addr ipv4;
 	char *p = NULL;
 	char *a_hostname;
-	char *a_dnsname;
 	gnutls_datum_t out;
 
 	/* check whether @hostname is an ip address */
@@ -195,17 +194,12 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				continue;
 			}
 
-			ret = gnutls_idna_map (dnsname, dnsnamesize, &out, 0);
-			if (ret < 0) {
-				_gnutls_debug_log("unable to convert dnsname %s to IDNA format\n", dnsname);
+			if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
+				_gnutls_debug_log("invalid (non-ASCII) name in certificate %.*s", (int)dnsnamesize, dnsname);
 				continue;
 			}
 
-			a_dnsname = (char*)out.data;
-
-			ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
-			gnutls_free(a_dnsname);
-
+			ret = _gnutls_hostname_compare(dnsname, dnsnamesize, a_hostname, flags);
 			if (ret != 0) {
 				ret = 1;
 				goto cleanup;
@@ -246,19 +240,13 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		ret = gnutls_idna_map (dnsname, dnsnamesize, &out, 0);
-		if (ret < 0) {
-			_gnutls_debug_log("unable to convert CN %s to IDNA format\n", dnsname);
+		if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
+			_gnutls_debug_log("invalid (non-ASCII) name in certificate CN %.*s", (int)dnsnamesize, dnsname);
 			ret = 0;
 			goto cleanup;
 		}
 
-		a_dnsname = (char*)out.data;
-
-		ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
-
-		gnutls_free(a_dnsname);
-
+		ret = _gnutls_hostname_compare(dnsname, dnsnamesize, a_hostname, flags);
 		if (ret != 0) {
 			ret = 1;
 			goto cleanup;

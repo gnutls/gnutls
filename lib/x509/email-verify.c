@@ -54,7 +54,6 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 	int ret = 0;
 	int i = 0;
 	char *a_email;
-	char *a_rfc822name;
 	gnutls_datum_t out;
 
 	/* convert the provided email to ACE-Labels domain. */
@@ -94,17 +93,12 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 				continue;
 			}
 
-			ret = _gnutls_idna_email_map(rfc822name, rfc822namesize, &out);
-			if (ret < 0) {
-				_gnutls_debug_log("unable to convert rfc822name %s to IDNA format\n", rfc822name);
+			if (!_gnutls_str_is_print(rfc822name, rfc822namesize)) {
+				_gnutls_debug_log("invalid (non-ASCII) email in certificate %.*s", (int)rfc822namesize, rfc822name);
 				continue;
 			}
 
-			a_rfc822name = (char*)out.data;
-
-			ret = _gnutls_hostname_compare(a_rfc822name, strlen(a_rfc822name), a_email, GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
-			gnutls_free(a_rfc822name);
-
+			ret = _gnutls_hostname_compare(rfc822name, rfc822namesize, a_email, GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
 			if (ret != 0) {
 				ret = 1;
 				goto cleanup;
@@ -142,19 +136,13 @@ gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		ret = _gnutls_idna_email_map (rfc822name, rfc822namesize, &out);
-		if (ret < 0) {
-			_gnutls_debug_log("unable to convert EMAIL %s to IDNA format\n", rfc822name);
+		if (!_gnutls_str_is_print(rfc822name, rfc822namesize)) {
+			_gnutls_debug_log("invalid (non-ASCII) email in certificate DN %.*s", (int)rfc822namesize, rfc822name);
 			ret = 0;
 			goto cleanup;
 		}
 
-		a_rfc822name = (char*)out.data;
-
-		ret = _gnutls_hostname_compare(a_rfc822name, strlen(a_rfc822name), a_email, GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
-
-		gnutls_free(a_rfc822name);
-
+		ret = _gnutls_hostname_compare(rfc822name, rfc822namesize, a_email, GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
 		if (ret != 0) {
 			ret = 1;
 			goto cleanup;
