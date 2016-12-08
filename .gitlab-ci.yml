@@ -15,7 +15,7 @@ Fedora/x86_64/minimal:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - dnf remove -y libunistring-devel libtasn1-devel &&
+  - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
     make autoreconf && ./configure --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
