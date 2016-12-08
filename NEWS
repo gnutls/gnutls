@@ -3,7 +3,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.4.17 (unreleased)
+* Version 3.4.17 (released 2016-12-8)
 
 ** libgnutls: Introduced time and constraints checks in the end certificate
    in the gnutls_x509_crt_verify_data2() and gnutls_pkcs7_verify_direct()
