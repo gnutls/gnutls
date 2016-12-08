@@ -23,6 +23,9 @@ See the end for copying conditions.
 ** libgnutls: Backported cipher priorities order from 3.5.x branch. That
    adds CHACHA20-POLY1305 ciphersuite to SECURE priority strings.
 
+** certtool: When exporting a CRQ in DER format ensure no text data are
+   intermixed. Patch by Dmitry Eremin-Solenikov.
+
 ** API and ABI modifications:
 gnutls_pkcs7_get_embedded_data_oid: Added
 
