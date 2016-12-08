@@ -1,8 +1,9 @@
 #!/bin/sh
 
 # Copyright (C) 2006, 2008, 2010, 2012 Free Software Foundation, Inc.
+# Copyright (C) 2016, Red Hat, Inc.
 #
-# Author: Simon Josefsson
+# Author: Simon Josefsson, Nikos Mavrogiannopoulos
 #
 # This file is part of GnuTLS.
 #
@@ -27,6 +28,10 @@ TMPFILE2=rsa-md5-2.$$.tmp
 
 . ${srcdir}/scripts/common.sh
 check_for_datefudge
+
+# Disable leak detection
+ASAN_OPTIONS="detect_leaks=0"
+export ASAN_OPTIONS
 
 datefudge -s "2006-10-1" \
 "${CERTTOOL}" --verify-chain --outfile "$TMPFILE1" --infile "${srcdir}/rsa-md5-collision/colliding-chain-md5-1.pem"
