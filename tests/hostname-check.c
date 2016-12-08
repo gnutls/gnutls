@@ -785,32 +785,6 @@ char multi_cns[] = "\n"
 	"MUjE\n"
 	"-----END CERTIFICATE-----\n";
 
-char pem_utf8_dns[] = "\n"
-	"	Subject Alternative Name (not critical):\n"
-	"			DNSname: γγγ.τόστ.gr\n"
-	"			DNSname: τέστ.gr\n"
-	"			DNSname: *.teχ.gr\n"
-	"-----BEGIN CERTIFICATE-----\n"
-	"MIIDWzCCAkOgAwIBAgIMU/SjEDp2nsS3kX9vMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
-	"BgNVBAMTBENBLTAwIhgPMjAxNDA4MjAxMzMwNTZaGA85OTk5MTIzMTIzNTk1OVow\n"
-	"EzERMA8GA1UEAxMIc2VydmVyLTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK\n"
-	"AoIBAQDggz41h9PcOjL7UOqx0FfZNtqoRhYQn6bVQqCehwERMDlR4QOqK3LRqE2B\n"
-	"cYyVlcdS63tnNFjYCLCz3/CV4rcJBNI3hfFZHUza70iFQ72xMvcgFPyl7UmXqIne\n"
-	"8swJ9jLMKou350ztPhshhXORqKxaDHBMcgD/Ade3Yxo2N1smsyINK+riged7A4QD\n"
-	"O9IgR9eERQbFrHGz+WgUUgoLFLF4DN1ANpWuZcOV1f9bRB8ADPyKo1yZY1sJj1gE\n"
-	"JRRsiOZLSLZ9D/1MLM7BXPuxWmWlJAGfNvrcXX/7FHe6QxC5gi1C6ZUEIZCne+Is\n"
-	"HpDNoz/A9vDn6iXZJBFXKyijNpVfAgMBAAGjga4wgaswDAYDVR0TAQH/BAIwADA1\n"
-	"BgNVHREELjAsghLOs86zzrMuz4TPjM+Dz4QuZ3KCC8+Ezq3Pg8+ELmdyggkqLnRl\n"
-	"z4cuZ3IwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDwYDVR0PAQH/BAUDAwegADAdBgNV\n"
-	"HQ4EFgQUvjD8gT+By/Xj/n+SGCVvL/KVElMwHwYDVR0jBBgwFoAUhU7w94kERpAh\n"
-	"6DEIh3nEVJnwSaUwDQYJKoZIhvcNAQELBQADggEBAIKuSREAd6ZdcS+slbx+hvew\n"
-	"IRBz5QGlCCjR4Oj5arIwFGnh0GdvAgzPa3qn6ReG1gvpe8k3X6Z2Yevw+DubLZNG\n"
-	"9CsfLfDIg2wUm05cuQdQG+gTSBVqw56jWf/JFXXwzhnbjX3c2QtepFsvkOnlWGFE\n"
-	"uVX6AiPfiNChVxnb4e1xpxOt6W/su19ar5J7rdDrdyVVm/ioSKvXhbBXI4f8NF2x\n"
-	"wTEzbtl99HyjbLIRRCWpUU277khHLr8SSFqdSr100zIkdiB72LfPXAHVld1onV2z\n"
-	"PPFYVMsnY+fuxIsTVErX3bLj6v67Bs3BNzagFUlyJl5rBGwn73UafNWz3BYDyxY=\n"
-	"-----END CERTIFICATE-----\n";
-
 void doit(void)
 {
 	gnutls_x509_crt_t x509;
@@ -1117,57 +1091,6 @@ void doit(void)
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example3.com");
 	if (ret)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
-
-	if (debug)
-		success("Testing pem_utf8_dns...\n");
-	data.data = (unsigned char *) pem_utf8_dns;
-	data.size = strlen(pem_utf8_dns);
-
-	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
-	if (ret < 0)
-		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "example.com");
-	if (ret)
-		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "τεστ.gr");
-	if (ret)
-		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "τoστ.gr");
-	if (ret)
-		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "γαβ.τόστ.gr");
-	if (ret)
-		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "www.in.teχ.gr");
-	if (ret)
-		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
-
-#ifdef HAVE_LIBIDN
-	ret = gnutls_x509_crt_check_hostname(x509, "www.teχ.gr");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "γγγ.τόστ.gr");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "γΓγ.τόΣτ.gr");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "τέστ.gr");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
-
-	ret = gnutls_x509_crt_check_hostname(x509, "ΤΈΣΤ.gr");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
-#endif
 
 #ifdef ENABLE_OPENPGP
 	if (debug)
