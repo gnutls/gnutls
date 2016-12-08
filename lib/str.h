@@ -52,9 +52,10 @@ int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *out
 inline static
 int __gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
+	/* no call to gnutls_assert() due to header dependency issues */
 	out->data = gnutls_malloc(ilen+1);
 	if (out->data == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		return GNUTLS_E_MEMORY_ERROR;
 	out->size = ilen;
 	memcpy(out->data, input, ilen);
 	out->data[ilen] = 0;
