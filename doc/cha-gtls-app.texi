@@ -243,26 +243,15 @@ waiting for a return value of zero.
 
 The random generator of the cryptographic back-end, utilizes mutex locks (e.g., pthreads on GNU/Linux and CriticalSection on Windows)
 which are setup by @acronym{GnuTLS} on library initialization. Prior to version 3.3.0
-they were setup by calling @funcref{gnutls_global_init}. On special systems
+they were setup by calling @funcref{gnutls_global_init}.@footnote{On special systems
 you could manually specify the locking system using
 the function @funcref{gnutls_global_set_mutex} before calling any other
-GnuTLS function. Setting mutexes manually is not recommended.
-An example of non-native thread usage is shown below.
-
-@example
-#include <gnutls/gnutls.h>
-
-int main()
-@{
-   /* When the system mutexes are not to be used 
-    * gnutls_global_set_mutex() must be called explicitly
-    */
-   gnutls_global_set_mutex (mutex_init, mutex_deinit, 
-                            mutex_lock, mutex_unlock);
-@}
-@end example
-
-@showfuncdesc{gnutls_global_set_mutex}
+GnuTLS function. Setting mutexes manually is not recommended.}
+Note that, on Glibc systems the GnuTLS library does not link with the libpthread
+library by default, it utilizes the Glibc mutex stubs, which allows Glibc to
+use the non-multithreaded (and optimized) variants of its algorithms.
+That, however, for applications using GnuTLS that may potentially utilize mutexes,
+requires them to explicitly link with libpthread.
 
 @node Running in a sandbox
 @subsection Running in a sandbox
