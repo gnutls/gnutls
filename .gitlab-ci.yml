@@ -199,7 +199,6 @@ MinGW32/DLLs:
     mingw32-configure --with-included-libtasn1 --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
-#libintl and iconv are a dependency of libidn
 #libwinpthread is required by libgcc
 #libffi is required by libp11-kit
   - mkdir -p win32-build/bin && mkdir -p win32-build/lib/includes &&
@@ -213,7 +212,6 @@ MinGW32/DLLs:
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libidn-*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libintl-*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/iconv*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win32-build/bin &&
     cp lib/.libs/*.a lib/*.def lib/gnutls.pc win32-build/lib &&
@@ -236,7 +234,6 @@ MinGW64/DLLs:
     mingw64-configure --with-included-libtasn1 --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
-#libintl and iconv are a dependency of libidn
 #libwinpthread is required by libgcc
 #libffi is required by libp11-kit
   - mkdir -p win64-build/bin && mkdir -p win64-build/lib/includes &&
@@ -250,7 +247,6 @@ MinGW64/DLLs:
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn-*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libintl-*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/iconv*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win64-build/bin &&
     cp lib/.libs/*.a lib/*.def lib/gnutls.pc win64-build/lib &&
