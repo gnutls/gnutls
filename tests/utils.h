@@ -105,6 +105,7 @@ test_cli_serv_expect(gnutls_certificate_credentials_t server_cred,
 	      const char *serv_prio, const char *cli_prio, const char *host,
 	      int serv_err, int cli_err);
 
+/* verification failed */
 unsigned
 test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
