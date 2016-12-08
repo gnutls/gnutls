@@ -37,7 +37,7 @@ if test ! -x /usr/bin/socat;then
 	exit 77
 fi
 
-for file in `which chat` /sbin/chat /ust/sbin/chat /ust/local/sbin/chat
+for file in `which chat` /sbin/chat /usr/sbin/chat /usr/local/sbin/chat
 do
 	if test -x "$file"
 	then
