@@ -44,7 +44,7 @@ static int has_embedded_null(const char *str, unsigned size)
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
-int
+unsigned
 gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 			    const char *email, unsigned int flags)
 {
