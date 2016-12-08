@@ -448,8 +448,10 @@ void doit(void)
 
 	assert(gnutls_x509_crq_export2(crq, GNUTLS_X509_FMT_PEM, &out) >= 0);
 
+#ifdef HAVE_LIBIDN
 	assert(out.size == saved_crq.size);
 	assert(memcmp(out.data, saved_crq.data, out.size)==0);
+#endif
 
 	gnutls_free(out.data);
 	gnutls_x509_crq_deinit(crq);

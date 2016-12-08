@@ -183,10 +183,12 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 
+#ifdef HAVE_LIBIDN
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME,
 						   "test@νίκο.org", strlen("test@νίκο.org"), 1);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
+#endif
 
 	s = 0;
 	ret = gnutls_x509_crt_get_key_purpose_oid(crt, 0, NULL, &s, NULL);
@@ -275,8 +277,10 @@ void doit(void)
 	}
 	assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM, &out) >= 0);
 
+#ifdef HAVE_LIBIDN
 	assert(out.size == saved_crt.size);
 	assert(memcmp(out.data, saved_crt.data, out.size)==0);
+#endif
 
 	gnutls_free(out.data);
 
