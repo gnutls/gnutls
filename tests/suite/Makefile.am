@@ -97,10 +97,11 @@ nodist_check_SCRIPTS += testpkcs11.sh crl-test
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
-	LC_ALL="C"					\
-	VALGRIND="$(VALGRIND)"				\
-	top_builddir="$(top_builddir)"			\
-	srcdir="$(srcdir)"				\
+	LC_ALL="C"			\
+	VALGRIND="$(VALGRIND)"		\
+	top_builddir="$(top_builddir)"	\
+	srcdir="$(srcdir)"		\
+	ASAN_OPTIONS="detect_leaks=0"	\
 	OPENSSL_ia32cap=0x00000000
 
 if ENABLE_NON_SUITEB_CURVES
