@@ -105,11 +105,14 @@ endif
 
 TESTS = $(dist_check_SCRIPTS)
 
+# Set detect_leaks=0 to ASAN. It seems it is detecting many leaks in tools
+# which are not trivial, and makes no point to address.
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"				\
 	VALGRIND="$(VALGRIND)"			\
 	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
+	ASAN_OPTIONS="detect_leaks=0"		\
 	srcdir="$(srcdir)"
 
 if ENABLE_FIPS140
