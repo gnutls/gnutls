@@ -1169,6 +1169,17 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		goto cleanup;
 	}
 
+	/* check if the raw issuer is blacklisted (it can happen if
+	 * the issuer is both in the trusted list and the blacklisted)
+	 */
+	if (gnutls_pkcs11_crt_is_known (url, issuer,
+		GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
+		GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) != 0) {
+		status |= GNUTLS_CERT_INVALID;
+		status |= GNUTLS_CERT_SIGNER_NOT_FOUND; /* if the signer is revoked - it is as if it doesn't exist */
+		goto cleanup;
+	}
+
 	/* security modules that provide trust, bundle all certificates (of all purposes)
 	 * together. In software that doesn't specify any purpose assume the default to
 	 * be www-server. */
