@@ -1797,7 +1797,7 @@ read_server_hello(gnutls_session_t session,
 
 	if (len < session_id_len || session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
 		gnutls_assert();
-		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+		return GNUTLS_E_ILLEGAL_PARAMETER;
 	}
 	DECR_LEN(len, session_id_len);
 
