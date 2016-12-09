@@ -488,6 +488,28 @@ fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
+for l in /usr/lib64 /usr/lib /lib64 /lib /usr/lib/x86_64-linux-gnu/; do
+    if test -f "${l}/libtspi.so.1";then
+        default_trousers_lib="${l}/libtspi.so.1"
+        break
+    fi
+done
+
+AC_ARG_WITH(trousers-lib, AS_HELP_STRING([--with-trousers-lib=LIB],
+                                 [set the location of the trousers library]),
+            ac_trousers_lib=$withval, ac_trousers_lib=$default_trousers_lib)
+
+if test "$with_tpm" != "no" && test -z "$ac_trousers_lib"; then
+    AC_MSG_ERROR([[
+  ***
+  *** unable to find trousers library, please specify with --with-trousers-lib=<lib file>
+  ***
+  ]])
+fi
+
+AC_DEFINE_UNQUOTED(TROUSERS_LIB, ["$ac_trousers_lib"], [the location of the trousers library])
+AC_SUBST(TROUSERS_LIB)
+
 LIBOPTS_CHECK([src/libopts])
 if test "$NEED_LIBOPTS_DIR" = "true";then
 	dnl replace libopts-generated files with distributed backups, if present
@@ -871,6 +893,11 @@ AC_MSG_NOTICE([External hardware support:
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
 ])
+if test -n "$ac_trousers_lib";then
+AC_MSG_NOTICE([
+  TPM library:          $ac_trousers_lib
+])
+fi
 
 AC_MSG_NOTICE([Optional features:
 (note that included applications might not compile properly

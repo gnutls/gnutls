@@ -3,6 +3,7 @@
  *
  * Copyright © 2012 Free Software Foundation.
  * Copyright © 2008-2012 Intel Corporation.
+ * Copyright © 2015 Red Hat, Inc.
  *
  * Author: David Woodhouse <dwmw2@infradead.org>
  * Author: Nikos Mavrogiannopoulos
@@ -43,8 +44,136 @@
 #include <pin.h>
 #include <c-ctype.h>
 
+#include <dlfcn.h>
 #include <trousers/tss.h>
 #include <trousers/trousers.h>
+
+typedef char *(*Trspi_Error_Layer_func)(TSS_RESULT);
+typedef char *(*Trspi_Error_String_func)(TSS_RESULT);
+typedef TSS_RESULT (*Trspi_Error_Code_func)(TSS_RESULT);
+
+typedef TSS_RESULT (*Tspi_Context_CloseObject_func)(TSS_HCONTEXT, TSS_HOBJECT);
+typedef TSS_RESULT (*Tspi_Context_Close_func)(TSS_HCONTEXT);
+typedef TSS_RESULT (*Tspi_Context_CreateObject_func)(TSS_HCONTEXT, TSS_FLAG, TSS_FLAG, TSS_HOBJECT*);
+typedef TSS_RESULT (*Tspi_Context_FreeMemory_func)(TSS_HCONTEXT, BYTE*);
+typedef TSS_RESULT (*Tspi_Context_GetTpmObject_func)(TSS_HCONTEXT, TSS_HTPM*);
+typedef TSS_RESULT (*Tspi_Context_LoadKeyByUUID_func)(TSS_HCONTEXT, TSS_FLAG, TSS_UUID, TSS_HKEY*);
+typedef TSS_RESULT (*Tspi_Context_RegisterKey_func)(TSS_HCONTEXT, TSS_HKEY, TSS_FLAG, TSS_UUID, TSS_FLAG, TSS_UUID);
+typedef TSS_RESULT (*Tspi_Context_UnregisterKey_func)(TSS_HCONTEXT, TSS_FLAG, TSS_UUID, TSS_HKEY*);
+typedef TSS_RESULT (*Tspi_Key_CreateKey_func)(TSS_HKEY, TSS_HKEY, TSS_HPCRS);
+typedef TSS_RESULT (*Tspi_Hash_SetHashValue_func)(TSS_HHASH, UINT32, BYTE*);
+typedef TSS_RESULT (*Tspi_Hash_Sign_func)(TSS_HHASH, TSS_HKEY, UINT32*, BYTE**);
+typedef TSS_RESULT (*Tspi_Policy_SetSecret_func)(TSS_HPOLICY, TSS_FLAG, UINT32, BYTE*);
+typedef TSS_RESULT (*Tspi_Context_Create_func)(TSS_HCONTEXT*);
+typedef TSS_RESULT (*Tspi_Context_Connect_func)(TSS_HCONTEXT, TSS_UNICODE*);
+typedef TSS_RESULT (*Tspi_GetPolicyObject_func)(TSS_HOBJECT, TSS_FLAG, TSS_HPOLICY*);
+typedef TSS_RESULT (*Tspi_DecodeBER_TssBlob_func)(UINT32, BYTE*, UINT32*, UINT32*, BYTE*);
+typedef TSS_RESULT (*Tspi_Context_LoadKeyByBlob_func)(TSS_HCONTEXT, TSS_HKEY, UINT32, BYTE*, TSS_HKEY*);
+typedef TSS_RESULT (*Tspi_Policy_AssignToObject_func)(TSS_HPOLICY, TSS_HOBJECT);
+typedef TSS_RESULT (*Tspi_GetAttribData_func)(TSS_HOBJECT, TSS_FLAG, TSS_FLAG, UINT32*, BYTE**);
+typedef TSS_RESULT (*Tspi_GetAttribUint32_func)(TSS_HOBJECT, TSS_FLAG, TSS_FLAG, UINT32*);
+typedef TSS_RESULT (*Tspi_Context_GetTpmObject_func)(TSS_HCONTEXT, TSS_HTPM*);
+typedef TSS_RESULT (*Tspi_TPM_StirRandom_func)(TSS_HTPM, UINT32, BYTE*);
+typedef TSS_RESULT (*Tspi_SetAttribUint32_func)(TSS_HOBJECT, TSS_FLAG, TSS_FLAG, UINT32);
+typedef TSS_RESULT (*Tspi_EncodeDER_TssBlob_func)(UINT32, BYTE*, UINT32, UINT32*, BYTE*);
+typedef TSS_RESULT (*Tspi_Context_GetRegisteredKeysByUUID2_func)(TSS_HCONTEXT, TSS_FLAG, TSS_UUID*, UINT32*, TSS_KM_KEYINFO2**);
+
+static Tspi_Context_CloseObject_func pTspi_Context_CloseObject;
+static Tspi_Context_Close_func pTspi_Context_Close;
+static Tspi_Context_CreateObject_func pTspi_Context_CreateObject;
+static Tspi_Context_FreeMemory_func pTspi_Context_FreeMemory;
+static Tspi_Context_GetTpmObject_func pTspi_Context_GetTpmObject;
+static Tspi_Context_LoadKeyByUUID_func pTspi_Context_LoadKeyByUUID;
+static Tspi_Context_RegisterKey_func pTspi_Context_RegisterKey;
+static Tspi_Context_UnregisterKey_func pTspi_Context_UnregisterKey;
+static Tspi_Key_CreateKey_func pTspi_Key_CreateKey;
+static Tspi_Hash_SetHashValue_func pTspi_Hash_SetHashValue;
+static Tspi_Hash_Sign_func pTspi_Hash_Sign;
+static Tspi_Policy_SetSecret_func pTspi_Policy_SetSecret;
+static Tspi_Context_Create_func pTspi_Context_Create;
+static Tspi_Context_Connect_func pTspi_Context_Connect;
+static Tspi_GetPolicyObject_func pTspi_GetPolicyObject;
+static Tspi_DecodeBER_TssBlob_func pTspi_DecodeBER_TssBlob;
+static Tspi_Context_LoadKeyByBlob_func pTspi_Context_LoadKeyByBlob;
+static Tspi_Policy_AssignToObject_func pTspi_Policy_AssignToObject;
+static Tspi_GetAttribData_func pTspi_GetAttribData;
+static Tspi_GetAttribUint32_func pTspi_GetAttribUint32;
+static Tspi_Context_GetTpmObject_func pTspi_Context_GetTpmObject;
+static Tspi_TPM_StirRandom_func pTspi_TPM_StirRandom;
+static Tspi_SetAttribUint32_func pTspi_SetAttribUint32;
+static Tspi_EncodeDER_TssBlob_func pTspi_EncodeDER_TssBlob;
+static Tspi_Context_GetRegisteredKeysByUUID2_func pTspi_Context_GetRegisteredKeysByUUID2;
+
+static Trspi_Error_Layer_func pTrspi_Error_Layer;
+static Trspi_Error_String_func pTrspi_Error_String;
+static Trspi_Error_Code_func pTrspi_Error_Code;
+
+static void *tpm_dl = NULL;
+
+#define _DLSYM(dl, sym) \
+	p##sym = dlsym(dl, #sym); \
+	if (p##sym == NULL) { \
+		dlclose(dl); \
+		dl = NULL; \
+		return -1; \
+	}
+
+static int check_init(void)
+{
+	if (tpm_dl == NULL) {
+		tpm_dl = dlopen(TROUSERS_LIB, RTLD_LAZY);
+		if (tpm_dl == NULL) {
+			_gnutls_debug_log("couldn't open %s\n", TROUSERS_LIB);
+			return -1;
+		}
+
+		_DLSYM(tpm_dl,Tspi_Context_CloseObject);
+		_DLSYM(tpm_dl,Tspi_Context_Close);
+		_DLSYM(tpm_dl,Tspi_Context_CreateObject);
+		_DLSYM(tpm_dl,Tspi_Context_FreeMemory);
+		_DLSYM(tpm_dl,Tspi_Context_GetTpmObject);
+		_DLSYM(tpm_dl,Tspi_Context_LoadKeyByUUID);
+		_DLSYM(tpm_dl,Tspi_Context_RegisterKey);
+		_DLSYM(tpm_dl,Tspi_Context_UnregisterKey);
+		_DLSYM(tpm_dl,Tspi_Key_CreateKey);
+		_DLSYM(tpm_dl,Tspi_Hash_SetHashValue);
+		_DLSYM(tpm_dl,Tspi_Hash_Sign);
+		_DLSYM(tpm_dl,Tspi_Policy_SetSecret);
+		_DLSYM(tpm_dl,Tspi_Context_Create);
+		_DLSYM(tpm_dl,Tspi_Context_Connect);
+		_DLSYM(tpm_dl,Tspi_GetPolicyObject);
+		_DLSYM(tpm_dl,Tspi_DecodeBER_TssBlob);
+		_DLSYM(tpm_dl,Tspi_Context_LoadKeyByBlob);
+		_DLSYM(tpm_dl,Tspi_Policy_AssignToObject);
+		_DLSYM(tpm_dl,Tspi_GetAttribData);
+		_DLSYM(tpm_dl,Tspi_GetAttribUint32);
+		_DLSYM(tpm_dl,Tspi_Context_GetTpmObject);
+		_DLSYM(tpm_dl,Tspi_TPM_StirRandom);
+		_DLSYM(tpm_dl,Tspi_SetAttribUint32);
+		_DLSYM(tpm_dl,Tspi_EncodeDER_TssBlob);
+		_DLSYM(tpm_dl,Tspi_Context_GetRegisteredKeysByUUID2);
+
+		_DLSYM(tpm_dl,Trspi_Error_Layer);
+		_DLSYM(tpm_dl,Trspi_Error_String);
+		_DLSYM(tpm_dl,Trspi_Error_Code);
+	}
+
+	return 0;
+}
+
+#define CHECK_INIT \
+		if (check_init() < 0) return gnutls_assert_val(GNUTLS_E_TPM_NO_LIB)
+
+#define CHECK_INIT_VOID \
+		if (check_init() < 0) return
+
+void _gnutls_tpm_global_deinit(void)
+{
+	if (tpm_dl) {
+		dlclose(tpm_dl);
+		tpm_dl = NULL;
+	}
+}
 
 struct tpm_ctx_st {
 	TSS_HCONTEXT tpm_ctx;
@@ -83,8 +212,8 @@ static int encode_tpmkey_url(char **url, const TSS_UUID * uuid,
 static int tss_err_pwd(TSS_RESULT err, int pwd_error)
 {
 	_gnutls_debug_log("TPM (%s) error: %s (%x)\n",
-			  Trspi_Error_Layer(err), Trspi_Error_String(err),
-			  (unsigned int) Trspi_Error_Code(err));
+			  pTrspi_Error_Layer(err), pTrspi_Error_String(err),
+			  (unsigned int) pTrspi_Error_Code(err));
 
 	switch (ERROR_LAYER(err)) {
 	case TSS_LAYER_TPM:
@@ -121,8 +250,8 @@ static void tpm_deinit_fn(gnutls_privkey_t key, void *_s)
 {
 	struct tpm_ctx_st *s = _s;
 
-	Tspi_Context_CloseObject(s->tpm_ctx, s->tpm_key_policy);
-	Tspi_Context_CloseObject(s->tpm_ctx, s->tpm_key);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->tpm_key_policy);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->tpm_key);
 
 	tpm_close_session(s);
 	gnutls_free(s);
@@ -140,31 +269,31 @@ tpm_sign_fn(gnutls_privkey_t key, void *_s,
 			  data->size);
 
 	err =
-	    Tspi_Context_CreateObject(s->tpm_ctx,
+	    pTspi_Context_CreateObject(s->tpm_ctx,
 				      TSS_OBJECT_TYPE_HASH, TSS_HASH_OTHER,
 				      &hash);
 	if (err) {
 		gnutls_assert();
 		_gnutls_debug_log("Failed to create TPM hash object: %s\n",
-				  Trspi_Error_String(err));
+				  pTrspi_Error_String(err));
 		return GNUTLS_E_PK_SIGN_FAILED;
 	}
-	err = Tspi_Hash_SetHashValue(hash, data->size, data->data);
+	err = pTspi_Hash_SetHashValue(hash, data->size, data->data);
 	if (err) {
 		gnutls_assert();
 		_gnutls_debug_log
 		    ("Failed to set value in TPM hash object: %s\n",
-		     Trspi_Error_String(err));
-		Tspi_Context_CloseObject(s->tpm_ctx, hash);
+		     pTrspi_Error_String(err));
+		pTspi_Context_CloseObject(s->tpm_ctx, hash);
 		return GNUTLS_E_PK_SIGN_FAILED;
 	}
-	err = Tspi_Hash_Sign(hash, s->tpm_key, &sig->size, &sig->data);
-	Tspi_Context_CloseObject(s->tpm_ctx, hash);
+	err = pTspi_Hash_Sign(hash, s->tpm_key, &sig->size, &sig->data);
+	pTspi_Context_CloseObject(s->tpm_ctx, hash);
 	if (err) {
 		if (s->tpm_key_policy || err != TPM_E_AUTHFAIL)
 			_gnutls_debug_log
 			    ("TPM hash signature failed: %s\n",
-			     Trspi_Error_String(err));
+			     pTrspi_Error_String(err));
 		if (err == TPM_E_AUTHFAIL)
 			return GNUTLS_E_TPM_KEY_PASSWORD_ERROR;
 		else
@@ -236,13 +365,13 @@ static TSS_RESULT myTspi_Policy_SetSecret(TSS_HPOLICY hPolicy,
 {
 	if (rgbSecret == NULL) {
 		/* Well known NULL key */
-		return Tspi_Policy_SetSecret(hPolicy,
+		return pTspi_Policy_SetSecret(hPolicy,
 					     TSS_SECRET_MODE_SHA1,
 					     sizeof(nullpass),
 					     (BYTE *) nullpass);
 	} else {		/* key is given */
 
-		return Tspi_Policy_SetSecret(hPolicy,
+		return pTspi_Policy_SetSecret(hPolicy,
 					     TSS_SECRET_MODE_PLAIN,
 					     ulSecretLength, rgbSecret);
 	}
@@ -254,13 +383,13 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
 {
 	int err, ret;
 
-	err = Tspi_Context_Create(&s->tpm_ctx);
+	err = pTspi_Context_Create(&s->tpm_ctx);
 	if (err) {
 		gnutls_assert();
 		return tss_err(err);
 	}
 
-	err = Tspi_Context_Connect(s->tpm_ctx, NULL);
+	err = pTspi_Context_Connect(s->tpm_ctx, NULL);
 	if (err) {
 		gnutls_assert();
 		ret = tss_err(err);
@@ -268,7 +397,7 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
 	}
 
 	err =
-	    Tspi_Context_LoadKeyByUUID(s->tpm_ctx, TSS_PS_TYPE_SYSTEM,
+	    pTspi_Context_LoadKeyByUUID(s->tpm_ctx, TSS_PS_TYPE_SYSTEM,
 				       srk_uuid, &s->srk);
 	if (err) {
 		gnutls_assert();
@@ -277,7 +406,7 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
 	}
 
 	err =
-	    Tspi_GetPolicyObject(s->srk, TSS_POLICY_USAGE, &s->srk_policy);
+	    pTspi_GetPolicyObject(s->srk, TSS_POLICY_USAGE, &s->srk_policy);
 	if (err) {
 		gnutls_assert();
 		ret = tss_err(err);
@@ -296,13 +425,13 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
 	return 0;
 
       out_srkpol:
-	Tspi_Context_CloseObject(s->tpm_ctx, s->srk_policy);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->srk_policy);
 	s->srk_policy = 0;
       out_srk:
-	Tspi_Context_CloseObject(s->tpm_ctx, s->srk);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->srk);
 	s->srk = 0;
       out_tspi_ctx:
-	Tspi_Context_Close(s->tpm_ctx);
+	pTspi_Context_Close(s->tpm_ctx);
 	s->tpm_ctx = 0;
 	return ret;
 
@@ -310,11 +439,11 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *srk_password)
 
 static void tpm_close_session(struct tpm_ctx_st *s)
 {
-	Tspi_Context_CloseObject(s->tpm_ctx, s->srk_policy);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->srk_policy);
 	s->srk_policy = 0;
-	Tspi_Context_CloseObject(s->tpm_ctx, s->srk);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->srk);
 	s->srk = 0;
-	Tspi_Context_Close(s->tpm_ctx);
+	pTspi_Context_Close(s->tpm_ctx);
 	s->tpm_ctx = 0;
 }
 
@@ -412,7 +541,7 @@ static int load_key(TSS_HCONTEXT tpm_ctx, TSS_HKEY srk,
 
 		tint2 = asn1.size;
 		err =
-		    Tspi_DecodeBER_TssBlob(fdata->size, fdata->data, &type,
+		    pTspi_DecodeBER_TssBlob(fdata->size, fdata->data, &type,
 					   &tint2, asn1.data);
 		if (err != 0) {
 			gnutls_assert();
@@ -424,7 +553,7 @@ static int load_key(TSS_HCONTEXT tpm_ctx, TSS_HKEY srk,
 	}
 
 	/* ... we get it here instead. */
-	err = Tspi_Context_LoadKeyByBlob(tpm_ctx, srk,
+	err = pTspi_Context_LoadKeyByBlob(tpm_ctx, srk,
 					 asn1.size, asn1.data, tpm_key);
 	if (err != 0) {
 		gnutls_assert();
@@ -452,6 +581,7 @@ import_tpm_key(gnutls_privkey_t pkey,
 	int err, ret;
 	struct tpm_ctx_st *s;
 	gnutls_datum_t tmp_sig;
+	uint32_t authusage;
 
 	s = gnutls_malloc(sizeof(*s));
 	if (s == NULL) {
@@ -475,7 +605,7 @@ import_tpm_key(gnutls_privkey_t pkey,
 		}
 	} else if (uuid) {
 		err =
-		    Tspi_Context_LoadKeyByUUID(s->tpm_ctx, storage,
+		    pTspi_Context_LoadKeyByUUID(s->tpm_ctx, storage,
 					       *uuid, &s->tpm_key);
 
 		if (err) {
@@ -487,6 +617,50 @@ import_tpm_key(gnutls_privkey_t pkey,
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;
 		goto out_session;
+	}
+
+	err = pTspi_GetAttribUint32(s->tpm_key, TSS_TSPATTRIB_KEY_INFO,
+				    TSS_TSPATTRIB_KEYINFO_AUTHUSAGE,
+				    &authusage);
+	if (err) {
+		gnutls_assert();
+		ret = tss_err(err);
+		goto out_session;
+	}
+
+	if (authusage) {
+		if (!key_password) {
+			ret = GNUTLS_E_TPM_KEY_PASSWORD_ERROR;
+			goto out_session;
+		}
+
+		err = pTspi_Context_CreateObject(s->tpm_ctx,
+						 TSS_OBJECT_TYPE_POLICY,
+						 TSS_POLICY_USAGE,
+						 &s->tpm_key_policy);
+		if (err) {
+			gnutls_assert();
+			ret = tss_err(err);
+			goto out_key;
+		}
+
+		err = pTspi_Policy_AssignToObject(s->tpm_key_policy,
+						       s->tpm_key);
+		if (err) {
+			gnutls_assert();
+			ret = tss_err(err);
+			goto out_key_policy;
+		}
+
+		err = myTspi_Policy_SetSecret(s->tpm_key_policy,
+					      SAFE_LEN(key_password),
+					      (void *) key_password);
+
+		if (err) {
+			gnutls_assert();
+			ret = tss_err_key(err);
+			goto out_key_policy;
+		}
 	}
 
 	ret =
@@ -501,51 +675,20 @@ import_tpm_key(gnutls_privkey_t pkey,
 	ret =
 	    gnutls_privkey_sign_data(pkey, GNUTLS_DIG_SHA1, 0, &nulldata,
 				     &tmp_sig);
-	if (ret == GNUTLS_E_TPM_KEY_PASSWORD_ERROR) {
-		if (!s->tpm_key_policy) {
-			err = Tspi_Context_CreateObject(s->tpm_ctx,
-							TSS_OBJECT_TYPE_POLICY,
-							TSS_POLICY_USAGE,
-							&s->
-							tpm_key_policy);
-			if (err) {
-				gnutls_assert();
-				ret = tss_err(err);
-				goto out_key;
-			}
-
-			err =
-			    Tspi_Policy_AssignToObject(s->tpm_key_policy,
-						       s->tpm_key);
-			if (err) {
-				gnutls_assert();
-				ret = tss_err(err);
-				goto out_key_policy;
-			}
-		}
-
-		err = myTspi_Policy_SetSecret(s->tpm_key_policy,
-					      SAFE_LEN(key_password),
-					      (void *) key_password);
-
-		if (err) {
-			gnutls_assert();
-			ret = tss_err_key(err);
-			goto out_key_policy;
-		}
-	} else if (ret < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		goto out_session;
 	}
 
 	return 0;
       out_key_policy:
-	Tspi_Context_CloseObject(s->tpm_ctx, s->tpm_key_policy);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->tpm_key_policy);
 	s->tpm_key_policy = 0;
       out_key:
-	Tspi_Context_CloseObject(s->tpm_ctx, s->tpm_key);
+	pTspi_Context_CloseObject(s->tpm_ctx, s->tpm_key);
 	s->tpm_key = 0;
       out_session:
+	_gnutls_privkey_cleanup(pkey);
 	tpm_close_session(s);
       out_ctx:
 	gnutls_free(s);
@@ -579,6 +722,8 @@ gnutls_privkey_import_tpm_raw(gnutls_privkey_t pkey,
 			      const char *srk_password,
 			      const char *key_password, unsigned int flags)
 {
+	CHECK_INIT;
+
 	if (flags & GNUTLS_PRIVKEY_DISABLE_CALLBACKS)
 		return import_tpm_key(pkey, fdata, format, NULL, 0,
 				      srk_password, key_password);
@@ -855,6 +1000,8 @@ gnutls_privkey_import_tpm_url(gnutls_privkey_t pkey,
 	gnutls_datum_t fdata = { NULL, 0 };
 	int ret;
 
+	CHECK_INIT;
+
 	ret = decode_tpmkey_url(url, &durl);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -924,7 +1071,7 @@ static int read_pubkey(gnutls_pubkey_t pub, TSS_HKEY key_ctx,
 
 	/* read the public key */
 
-	tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
+	tssret = pTspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
 				    TSS_TSPATTRIB_KEYINFO_RSA_MODULUS,
 				    &tint, (void *) &tdata);
 	if (tssret != 0) {
@@ -935,12 +1082,12 @@ static int read_pubkey(gnutls_pubkey_t pub, TSS_HKEY key_ctx,
 	m.data = tdata;
 	m.size = tint;
 
-	tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
+	tssret = pTspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
 				    TSS_TSPATTRIB_KEYINFO_RSA_EXPONENT,
 				    &tint, (void *) &tdata);
 	if (tssret != 0) {
 		gnutls_assert();
-		Tspi_Context_FreeMemory(key_ctx, m.data);
+		pTspi_Context_FreeMemory(key_ctx, m.data);
 		return tss_err(tssret);
 	}
 
@@ -949,8 +1096,8 @@ static int read_pubkey(gnutls_pubkey_t pub, TSS_HKEY key_ctx,
 
 	ret = gnutls_pubkey_import_rsa_raw(pub, &m, &e);
 
-	Tspi_Context_FreeMemory(key_ctx, m.data);
-	Tspi_Context_FreeMemory(key_ctx, e.data);
+	pTspi_Context_FreeMemory(key_ctx, m.data);
+	pTspi_Context_FreeMemory(key_ctx, e.data);
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -986,7 +1133,7 @@ import_tpm_pubkey(gnutls_pubkey_t pkey,
 		}
 	} else if (uuid) {
 		err =
-		    Tspi_Context_LoadKeyByUUID(s.tpm_ctx, storage,
+		    pTspi_Context_LoadKeyByUUID(s.tpm_ctx, storage,
 					       *uuid, &s.tpm_key);
 		if (err) {
 			gnutls_assert();
@@ -1074,6 +1221,8 @@ gnutls_pubkey_import_tpm_raw(gnutls_pubkey_t pkey,
 			     gnutls_tpmkey_fmt_t format,
 			     const char *srk_password, unsigned int flags)
 {
+	CHECK_INIT;
+
 	if (flags & GNUTLS_PUBKEY_DISABLE_CALLBACKS)
 		return import_tpm_pubkey_cb(pkey, fdata, format, NULL, 0,
 					    srk_password);
@@ -1112,6 +1261,8 @@ gnutls_pubkey_import_tpm_url(gnutls_pubkey_t pkey,
 	struct tpmkey_url_st durl;
 	gnutls_datum_t fdata = { NULL, 0 };
 	int ret;
+
+	CHECK_INIT;
 
 	ret = decode_tpmkey_url(url, &durl);
 	if (ret < 0)
@@ -1220,6 +1371,8 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	TSS_HTPM htpm;
 	uint8_t buf[32];
 
+	CHECK_INIT;
+
 	privkey->data = NULL;
 	if (pubkey != NULL)
 		pubkey->data = NULL;
@@ -1254,7 +1407,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	/* put some randomness into TPM. 
 	 * Let's not trust it completely.
 	 */
-	tssret = Tspi_Context_GetTpmObject(s.tpm_ctx, &htpm);
+	tssret = pTspi_Context_GetTpmObject(s.tpm_ctx, &htpm);
 	if (tssret != 0) {
 		gnutls_assert();
 		ret = tss_err(tssret);
@@ -1268,13 +1421,13 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 		goto err_cc;
 	}
 
-	tssret = Tspi_TPM_StirRandom(htpm, sizeof(buf), buf);
+	tssret = pTspi_TPM_StirRandom(htpm, sizeof(buf), buf);
 	if (tssret) {
 		gnutls_assert();
 	}
 
 	tssret =
-	    Tspi_Context_CreateObject(s.tpm_ctx, TSS_OBJECT_TYPE_RSAKEY,
+	    pTspi_Context_CreateObject(s.tpm_ctx, TSS_OBJECT_TYPE_RSAKEY,
 				      tpm_flags, &key_ctx);
 	if (tssret != 0) {
 		gnutls_assert();
@@ -1283,7 +1436,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	}
 
 	tssret =
-	    Tspi_SetAttribUint32(key_ctx, TSS_TSPATTRIB_KEY_INFO,
+	    pTspi_SetAttribUint32(key_ctx, TSS_TSPATTRIB_KEY_INFO,
 				 TSS_TSPATTRIB_KEYINFO_SIGSCHEME,
 				 TSS_SS_RSASSAPKCS1V15_DER);
 	if (tssret != 0) {
@@ -1295,7 +1448,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	/* set the password of the actual key */
 	if (key_password) {
 		tssret =
-		    Tspi_GetPolicyObject(key_ctx, TSS_POLICY_USAGE,
+		    pTspi_GetPolicyObject(key_ctx, TSS_POLICY_USAGE,
 					 &key_policy);
 		if (tssret != 0) {
 			gnutls_assert();
@@ -1313,7 +1466,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 		}
 	}
 
-	tssret = Tspi_Key_CreateKey(key_ctx, s.srk, 0);
+	tssret = pTspi_Key_CreateKey(key_ctx, s.srk, 0);
 	if (tssret != 0) {
 		gnutls_assert();
 		ret = tss_err(tssret);
@@ -1330,7 +1483,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 		}
 
 		tssret =
-		    Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx,
+		    pTspi_Context_RegisterKey(s.tpm_ctx, key_ctx,
 					     storage_type, key_uuid,
 					     TSS_PS_TYPE_SYSTEM, srk_uuid);
 		if (tssret != 0) {
@@ -1345,7 +1498,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 		if (ret < 0) {
 			TSS_HKEY tkey;
 
-			Tspi_Context_UnregisterKey(s.tpm_ctx, storage_type,
+			pTspi_Context_UnregisterKey(s.tpm_ctx, storage_type,
 						   key_uuid, &tkey);
 			gnutls_assert();
 			goto err_sa;
@@ -1356,7 +1509,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 
 
 		tssret =
-		    Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_KEY_BLOB,
+		    pTspi_GetAttribData(key_ctx, TSS_TSPATTRIB_KEY_BLOB,
 				       TSS_TSPATTRIB_KEYBLOB_BLOB, &tint,
 				       (void *) &tdata);
 		if (tssret != 0) {
@@ -1397,7 +1550,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 
 			tint2 = tmpkey.size;
 			tssret =
-			    Tspi_EncodeDER_TssBlob(tint, tdata,
+			    pTspi_EncodeDER_TssBlob(tint, tdata,
 						   TSS_BLOB_TYPE_PRIVATEKEY,
 						   &tint2, tmpkey.data);
 			if (tssret != 0) {
@@ -1462,7 +1615,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	gnutls_free(tmpkey.data);
 	tmpkey.data = NULL;
       err_sa:
-	Tspi_Context_CloseObject(s.tpm_ctx, key_ctx);
+	pTspi_Context_CloseObject(s.tpm_ctx, key_ctx);
       err_cc:
 	tpm_close_session(&s);
 	return ret;
@@ -1479,8 +1632,10 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
  **/
 void gnutls_tpm_key_list_deinit(gnutls_tpm_key_list_t list)
 {
+	CHECK_INIT_VOID;
+
 	if (list->tpm_ctx != 0)
-		Tspi_Context_Close(list->tpm_ctx);
+		pTspi_Context_Close(list->tpm_ctx);
 	gnutls_free(list);
 }
 
@@ -1505,6 +1660,8 @@ int
 gnutls_tpm_key_list_get_url(gnutls_tpm_key_list_t list, unsigned int idx,
 			    char **url, unsigned int flags)
 {
+	CHECK_INIT;
+
 	if (idx >= list->size)
 		return
 		    gnutls_assert_val
@@ -1531,18 +1688,20 @@ int gnutls_tpm_get_registered(gnutls_tpm_key_list_t * list)
 	TSS_RESULT tssret;
 	int ret;
 
+	CHECK_INIT;
+
 	*list = gnutls_calloc(1, sizeof(struct tpm_key_list_st));
 	if (*list == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	tssret = Tspi_Context_Create(&(*list)->tpm_ctx);
+	tssret = pTspi_Context_Create(&(*list)->tpm_ctx);
 	if (tssret) {
 		gnutls_assert();
 		ret = tss_err(tssret);
 		goto cleanup;
 	}
 
-	tssret = Tspi_Context_Connect((*list)->tpm_ctx, NULL);
+	tssret = pTspi_Context_Connect((*list)->tpm_ctx, NULL);
 	if (tssret) {
 		gnutls_assert();
 		ret = tss_err(tssret);
@@ -1550,7 +1709,7 @@ int gnutls_tpm_get_registered(gnutls_tpm_key_list_t * list)
 	}
 
 	tssret =
-	    Tspi_Context_GetRegisteredKeysByUUID2((*list)->tpm_ctx,
+	    pTspi_Context_GetRegisteredKeysByUUID2((*list)->tpm_ctx,
 						  TSS_PS_TYPE_SYSTEM, NULL,
 						  &(*list)->size,
 						  &(*list)->ki);
@@ -1588,6 +1747,8 @@ int gnutls_tpm_privkey_delete(const char *url, const char *srk_password)
 	TSS_HKEY tkey;
 	int ret;
 
+	CHECK_INIT;
+
 	ret = decode_tpmkey_url(url, &durl);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -1600,7 +1761,7 @@ int gnutls_tpm_privkey_delete(const char *url, const char *srk_password)
 		return gnutls_assert_val(ret);
 
 	tssret =
-	    Tspi_Context_UnregisterKey(s.tpm_ctx, durl.storage, durl.uuid,
+	    pTspi_Context_UnregisterKey(s.tpm_ctx, durl.storage, durl.uuid,
 				       &tkey);
 	if (tssret != 0) {
 		gnutls_assert();

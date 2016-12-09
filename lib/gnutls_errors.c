@@ -290,6 +290,8 @@ static const gnutls_error_entry error_entries[] = {
 
 	ERROR_ENTRY(N_("TPM error."),
 		    GNUTLS_E_TPM_ERROR),
+	ERROR_ENTRY(N_("The TPM library (trousers) cannot be found."),
+		    GNUTLS_E_TPM_NO_LIB),
 	ERROR_ENTRY(N_("TPM is not initialized."),
 		    GNUTLS_E_TPM_UNINITIALIZED),
 	ERROR_ENTRY(N_("TPM key was not found in persistent storage."),

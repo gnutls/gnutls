@@ -387,6 +387,9 @@ static void _gnutls_global_deinit(unsigned destructor)
 			gnutls_pkcs11_deinit();
 		}
 #endif
+#ifdef HAVE_TROUSERS
+		_gnutls_tpm_global_deinit();
+#endif
 
 		gnutls_mutex_deinit(&_gnutls_file_mutex);
 		gnutls_mutex_deinit(&_gnutls_pkcs11_mutex);
