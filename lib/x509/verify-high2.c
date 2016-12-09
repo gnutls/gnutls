@@ -52,7 +52,7 @@
  * @cas: A buffer containing a list of CAs (optional)
  * @crls: A buffer containing a list of CRLs (optional)
  * @type: The format of the certificates
- * @tl_flags: GNUTLS_TL_*
+ * @tl_flags: flags from %gnutls_trust_list_flags_t
  * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
  *
  * This function will add the given certificate authorities
@@ -286,7 +286,7 @@ int remove_pkcs11_object_url(gnutls_x509_trust_list_t list, const char *url)
  * @ca_file: A file containing a list of CAs (optional)
  * @crl_file: A file containing a list of CRLs (optional)
  * @type: The format of the certificates
- * @tl_flags: GNUTLS_TL_*
+ * @tl_flags: flags from %gnutls_trust_list_flags_t
  * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
  *
  * This function will add the given certificate authorities
@@ -420,7 +420,7 @@ int load_dir_certs(const char *dirname,
  * @ca_dir: A directory containing the CAs (optional)
  * @crl_dir: A directory containing a list of CRLs (optional)
  * @type: The format of the certificates
- * @tl_flags: GNUTLS_TL_*
+ * @tl_flags: flags from %gnutls_trust_list_flags_t
  * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
  *
  * This function will add the given certificate authorities

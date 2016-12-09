@@ -254,7 +254,7 @@ trust_list_add_compat(gnutls_x509_trust_list_t list,
  * @list: The list
  * @clist: A list of CAs
  * @clist_size: The length of the CA list
- * @flags: should be 0 or an or'ed sequence of %GNUTLS_TL options.
+ * @flags: flags from %gnutls_trust_list_flags_t
  *
  * This function will add the given certificate authorities
  * to the trusted list. The list of CAs must not be deinitialized
@@ -680,7 +680,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
  * @list: The list
  * @crl_list: A list of CRLs
  * @crl_size: The length of the CRL list
- * @flags: if GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before being added.
+ * @flags: flags from %gnutls_trust_list_flags_t
  * @verification_flags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
  *
  * This function will add the given certificate revocation lists
@@ -692,6 +692,8 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
  * is given, then any provided CRLs that are a duplicate, will be deinitialized
  * and not added to the list (that assumes that gnutls_x509_trust_list_deinit()
  * will be called with all=1).
+ *
+ * If GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before being added.
  *
  * Returns: The number of added elements is returned.
  *
@@ -929,7 +931,7 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
  * @list: The list
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any. Should be treated as constant.
- * @flags: Use zero or %GNUTLS_TL_GET_COPY
+ * @flags: flags from %gnutls_trust_list_flags_t (%GNUTLS_TL_GET_COPY is applicable)
  *
  * This function will find the issuer of the given certificate.
  * If the flag %GNUTLS_TL_GET_COPY is specified a copy of the issuer

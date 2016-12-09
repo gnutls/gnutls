@@ -1429,12 +1429,37 @@ int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t
 				      const gnutls_datum_t *spki,
 				      gnutls_x509_crt_t *issuer,
 				      unsigned int flags);
-
+/**
+ * gnutls_trust_list_flags_t:
+ * @GNUTLS_TL_VERIFY_CRL: If any CRLs are provided they will be verified for validity
+ *   prior to be added. The CA certificates that will be used for verification are the
+ *   ones already added in the trusted list.
+ * @GNUTLS_TL_USE_IN_TLS: Internal flag used by GnuTLS. If provided the trust list
+ *   structure will cache a copy of CA DNs to be used in the certificate request
+ *   TLS message.
+ * @GNUTLS_TL_NO_DUPLICATES: If this flag is specified, a function adding certificates
+ *   will check and eliminate any duplicates.
+ * @GNUTLS_TL_NO_DUPLICATE_KEY: If this flag is specified, a certificate sharing the
+ *   same key as a previously added on will not be added.
+ * @GNUTLS_TL_GET_COPY: The semantics of this flag are documented to the functions which
+ *   are applicable. In general, on returned value, the function will provide a copy
+ *   if this flag is provided, rather than a pointer to internal data.
+ *
+ * Enumeration of different certificate trust list flags.
+ */
+typedef enum gnutls_trust_list_flags_t {
+	GNUTLS_TL_VERIFY_CRL = 1,
 #define GNUTLS_TL_VERIFY_CRL 1
+	GNUTLS_TL_USE_IN_TLS = (1<<1),
 #define GNUTLS_TL_USE_IN_TLS (1<<1)
+	GNUTLS_TL_NO_DUPLICATES = (1<<2),
 #define GNUTLS_TL_NO_DUPLICATES (1<<2)
+	GNUTLS_TL_NO_DUPLICATE_KEY = (1<<3),
 #define GNUTLS_TL_NO_DUPLICATE_KEY (1<<3)
+	GNUTLS_TL_GET_COPY = (1<<4)
 #define GNUTLS_TL_GET_COPY (1<<4)
+} gnutls_trust_list_flags_t;
+
 int
 gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			       const gnutls_x509_crt_t * clist,
