@@ -123,14 +123,14 @@ flag = {
     name      = load-request;
     descrip   = "Loads a certificate request file";
     arg-type  = string;
-    doc = "";
+    doc = "This option can be used with a file";
 };
 
 flag = {
     name      = load-certificate;
     descrip   = "Loads a certificate file";
     arg-type  = string;
-    doc = "This can be either a file or a PKCS #11 URL";
+    doc = "This option can be used with a file";
 };
 
 flag = {
@@ -144,7 +144,7 @@ flag = {
     name      = load-ca-certificate;
     descrip   = "Loads the certificate authority's certificate file";
     arg-type  = string;
-    doc = "This can be either a file or a PKCS #11 URL";
+    doc = "This option can be used with a file";
 };
 
 flag = {
