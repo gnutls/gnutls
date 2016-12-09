@@ -197,7 +197,7 @@ flag = {
     name      = load-ca-certificate;
     descrip   = "Loads the certificate authority's certificate file";
     arg-type  = string;
-    doc = "This option can be used with a file";
+    doc = "This can be either a file or a PKCS #11 URL";
 };
 
 flag = {
