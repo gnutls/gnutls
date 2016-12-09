@@ -590,6 +590,16 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 		exit(1);
 	}
 
+	if (gnutls_url_is_supported(info->ca) != 0) {
+		ret = gnutls_x509_crt_import_url(crt, info->ca, 0);
+		if (ret < 0) {
+			fprintf(stderr, "error importing --load-ca-certificate: %s: %s\n",
+				info->ca, gnutls_strerror(ret));
+			exit(1);
+		}
+		return crt;
+	}
+
 	dat.data = (void *) read_binary_file(info->ca, &size);
 	dat.size = size;
 
@@ -602,7 +612,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 	ret = gnutls_x509_crt_import(crt, &dat, info->incert_format);
 	free(dat.data);
 	if (ret < 0) {
-		fprintf(stderr, "importing --load-ca-certificate: %s: %s\n",
+		fprintf(stderr, "error importing --load-ca-certificate: %s: %s\n",
 			info->ca, gnutls_strerror(ret));
 		exit(1);
 	}
