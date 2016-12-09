@@ -22,6 +22,11 @@ See the end for copying conditions.
 ** libgnutls: Backported functionality allowing to manipulate the IDs
    of PKCS#11 objects.
 
+** libgnutls: Link to trousers (TPM library) dynamically. Backported TPM
+   key handling improvements from master branch.
+
+** tpmtool: backported the --test-sign option.
+
 ** API and ABI modifications:
 gnutls_pkcs11_obj_set_info: Added
 gnutls_pkcs11_privkey_generate3: Added
