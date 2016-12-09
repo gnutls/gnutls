@@ -98,7 +98,7 @@ static struct
     .pk_oid = "1.2.840.113549.1.1.1",
     .version = 1,
   },
-  { NULL, NULL, NULL, 0}
+  { NULL, NULL, 0, 0}
 };
 
 static void tls_log_func(int level, const char *str)
