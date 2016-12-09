@@ -106,7 +106,6 @@ static void client(int fd, const char *prio)
 {
 	int ret;
 	unsigned r;
-	gnutls_anon_client_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
 	/* Need to enable anonymous KX specifically. */
@@ -118,7 +117,6 @@ static void client(int fd, const char *prio)
 		gnutls_global_set_log_level(7);
 	}
 
-	gnutls_anon_allocate_client_credentials(&anoncred);
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
 	/* Initialize TLS session
@@ -128,9 +126,6 @@ static void client(int fd, const char *prio)
 	/* Use default priorities */
 	gnutls_priority_set_direct(session, prio, NULL);
 
-	/* put the anonymous credentials to the current session
-	 */
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
@@ -148,20 +143,19 @@ static void client(int fd, const char *prio)
 		kill(getpid(), SIGSEGV);
 	}
 
-	if (ret < 0) {
-		fprintf(stderr, "client: Handshake failed (expected)\n");
-		gnutls_perror(ret);
-		exit(0);
+	if (ret == GNUTLS_E_ILLEGAL_PARAMETER) {
+		fprintf(stderr, "client: Handshake failed (expected): %s\n", gnutls_strerror(ret));
+		goto cleanup;
 	} else {
-		if (debug)
-			fprintf(stderr, "client: Handshake was completed\n");
+		fprintf(stderr, "client: Handshake was completed or failed with unknown error code(%d): %s\n", ret, gnutls_strerror(ret));
+		kill(getpid(), SIGSEGV);
 	}
 
+ cleanup:
 	close(fd);
 
 	gnutls_deinit(session);
 
-	gnutls_anon_free_client_credentials(anoncred);
 	gnutls_certificate_free_credentials(x509_cred);
 
 	gnutls_global_deinit();
@@ -175,9 +169,9 @@ static void server(int fd, const char *prio)
 {
 	int ret;
 	uint8_t id[255];
-	uint8_t buffer[] = "\x16\x03\x00\x01\x25"
+	uint8_t buffer[] = "\x16\x03\x01\x01\x25"
 		"\x02\x00\x01\x21"
-		"\x03\x00"/*Server Version */
+		"\x03\x01"/*Server Version */
 		/*Random*/"\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00\x00\x00\x01\x00\x00"
 		/*SessionID*/"\xfe";
 
