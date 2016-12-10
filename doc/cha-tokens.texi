@@ -268,12 +268,6 @@ it allows operations on private key objects such as decryption
 and signing without exposing the key. In GnuTLS the PKCS #11 functionality is
 available in @code{gnutls/pkcs11.h}.
 
-Moreover @acronym{PKCS} #11 can be (ab)used to allow all applications in the same operating system to access
-shared cryptographic keys and certificates in a uniform way, as in @ref{fig-pkcs11-vision}.
-That way applications could load their trusted certificate list, as well as user
-certificates from a common PKCS #11 module. Such a provider is the p11-kit trust
-storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}.
-
 @float Figure,fig-pkcs11-vision
 @image{pkcs11-vision,9cm}
 @caption{PKCS #11 module usage.}
@@ -286,6 +280,7 @@ storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
 * Reading objects::
 * Writing objects::
 * Using a PKCS11 token with TLS::
+* Verifying certificates over PKCS11::
 * p11tool Invocation::
 @end menu
 
@@ -478,7 +473,28 @@ the following functions can be used to load PKCS #11 key and
 certificates by specifying a PKCS #11 URL instead of a filename.
 
 @showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file2}
-@showfuncdesc{gnutls_certificate_set_x509_system_trust}
+
+
+@node Verifying certificates over PKCS11
+@subsection Verifying certificates over @acronym{PKCS} #11
+
+The @acronym{PKCS} #11 API can be used to allow all applications in the
+same operating system to access shared cryptographic keys and certificates in a
+uniform way, as in @ref{fig-pkcs11-vision}. That way applications could load their
+trusted certificate list, as well as user certificates from a common PKCS #11 module.
+Such a provider is the p11-kit trust storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
+and it provides access to the trusted Root CA certificates in a system. That
+provides a more dynamic list of Root CA certificates, as opposed to a static
+list in a file or directory.
+
+That store, allows for blacklisting of CAs or certificates, as well as
+categorization of the Root CAs (Web verification, Code signing, etc.), in
+addition to restricting their purpose via stapled extensions@footnote{See
+the 'Restricting the scope of CA certificates' post at @url{http://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html}}.
+GnuTLS will utilize the p11-kit trust module as the default trust store
+if configured to; i.e., if '--with-default-trust-store-pkcs11=pkcs11:' is given to 
+the configure script.
+
 
 @include invoke-p11tool.texi
 

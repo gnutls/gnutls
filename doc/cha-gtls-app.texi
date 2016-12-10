@@ -634,8 +634,11 @@ signed by server's acceptable signers.
 Certificate verification is possible by loading the trusted
 authorities into the credentials structure by using
 the following functions, applicable to X.509 and OpenPGP certificates.
+In modern systems it is recommended to utilize @funcref{gnutls_certificate_set_x509_system_trust}
+which will load the trusted authorities from the system store.
 
-@showfuncD{gnutls_certificate_set_x509_system_trust,gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_trust_dir,gnutls_certificate_set_openpgp_keyring_file}
+@showfuncdesc{gnutls_certificate_set_x509_system_trust}
+@showfuncC{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_trust_dir,gnutls_certificate_set_openpgp_keyring_file}
 
 The peer's certificate will be automatically verified if
 @funcref{gnutls_session_set_verify_cert} is called prior to handshake.
