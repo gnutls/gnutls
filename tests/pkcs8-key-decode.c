@@ -26,8 +26,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-# define PRIVATE_KEY                                              \
-    "-----BEGIN PRIVATE KEY-----\n"                               \
+#include "utils.h"
+
+# define PRIVATE_KEY					      \
+    "-----BEGIN PRIVATE KEY-----\n"				\
     "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBALVcr\n"     \
     "BL40Tm6yq88FBhJNw1aaoCjmtg0l4dWQZ/e9Fimx4ARxFpT+ji4FE\n"     \
     "Cgl9s/SGqC+1nvlkm9ViSo0j7MKDbnDB+VRHDvMAzQhA2X7e8M0n9\n"     \
@@ -46,8 +48,8 @@
     "dcrhrkJn2sa/+O8OKvdrPSeeu/N5WwYhJf61+CPoenMp7IFci\n"         \
     "-----END PRIVATE KEY-----\n"
 
-
-int main(void) {
+static int test_load(void)
+{
   gnutls_x509_privkey_t key;
   const gnutls_datum_t data = {
     (unsigned char *)PRIVATE_KEY,
@@ -56,19 +58,23 @@ int main(void) {
   int err;
 
   if ((err = gnutls_x509_privkey_init(&key)) < 0) {
-    fprintf(stderr, "Failed to init key %s\n", gnutls_strerror(err));
+    fail("Failed to init key %s\n", gnutls_strerror(err));
     exit(1);
   }
 
   if ((err = gnutls_x509_privkey_import(key, &data,
 					GNUTLS_X509_FMT_PEM)) < 0) {
-    fprintf(stderr, "Failed to import key %s\n", gnutls_strerror(err));
+    fail("Failed to import key %s\n", gnutls_strerror(err));
     exit(1);
   }
 
-#if 0
-  fprintf(stderr, "Loaded key\n%s", PRIVATE_KEY);
-#endif
+  success("Loaded key\n%s", PRIVATE_KEY);
+
   gnutls_x509_privkey_deinit(key);
   return 0;
+}
+
+void doit(void)
+{
+	test_load();
 }
