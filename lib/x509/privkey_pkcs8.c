@@ -711,6 +711,7 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 			 &kdf_params, &enc_params, &tmp);
 	if (result < 0) {
 		gnutls_assert();
+		result = GNUTLS_E_DECRYPTION_FAILED;
 		goto error;
 	}
 
