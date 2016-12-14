@@ -135,17 +135,14 @@ static int resume_copy_required_values(gnutls_session_t session)
 	 * That is because the client must see these in our
 	 * hello message.
 	 */
-	memcpy(session->security_parameters.cipher_suite,
-	       session->internals.resumed_security_parameters.cipher_suite,
-	       2);
 	session->security_parameters.compression_method =
 	    session->internals.resumed_security_parameters.
 	    compression_method;
 
-	ret = _gnutls_epoch_set_cipher_suite(session, EPOCH_NEXT,
-					     session->internals.
-					     resumed_security_parameters.
-					     cipher_suite);
+	ret = _gnutls_set_cipher_suite(session,
+				       session->internals.
+				       resumed_security_parameters.
+				       cipher_suite);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -987,17 +984,9 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 					     session,
 					     _gnutls_cipher_suite_get_name
 					     (&data[j]));
-					memcpy(session->
-					       security_parameters.
-					       cipher_suite,
-					       &cipher_suites[i], 2);
-					_gnutls_epoch_set_cipher_suite
-					    (session, EPOCH_NEXT,
-					     session->security_parameters.
-					     cipher_suite);
+					retval = _gnutls_set_cipher_suite
+					    (session, &data[j]);
 
-
-					retval = 0;
 					goto finish;
 				}
 			}
@@ -1013,17 +1002,9 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 					     session,
 					     _gnutls_cipher_suite_get_name
 					     (&data[j]));
-					memcpy(session->
-					       security_parameters.
-					       cipher_suite,
-					       &cipher_suites[i], 2);
-					_gnutls_epoch_set_cipher_suite
-					    (session, EPOCH_NEXT,
-					     session->security_parameters.
-					     cipher_suite);
+					retval = _gnutls_set_cipher_suite
+					    (session, &data[j]);
 
-
-					retval = 0;
 					goto finish;
 				}
 			}
@@ -1546,6 +1527,7 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
 	int cipher_suite_size;
 	int i;
+	int ret;
 
 	z = 1;
 	cipher_suite_size =
@@ -1572,10 +1554,9 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 		return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 	}
 
-	memcpy(session->security_parameters.cipher_suite, suite, 2);
-	_gnutls_epoch_set_cipher_suite(session, EPOCH_NEXT,
-				       session->security_parameters.
-				       cipher_suite);
+	ret = _gnutls_set_cipher_suite(session, suite);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	_gnutls_handshake_log("HSK[%p]: Selected cipher suite: %s\n",
 			      session,
@@ -1668,6 +1649,7 @@ client_check_if_resuming(gnutls_session_t session,
 				 uint8_t * session_id, int session_id_len)
 {
 	char buf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
+	int ret;
 
 	_gnutls_handshake_log("HSK[%p]: SessionID length: %d\n", session,
 			      session_id_len);
@@ -1693,15 +1675,17 @@ client_check_if_resuming(gnutls_session_t session,
 		       session->security_parameters.client_random,
 		       GNUTLS_RANDOM_SIZE);
 
-		memcpy(session->security_parameters.cipher_suite,
-			session->internals.resumed_security_parameters.cipher_suite, 2);
 		session->security_parameters.compression_method =
 			session->internals.resumed_security_parameters.compression_method;
 
-		_gnutls_epoch_set_cipher_suite
-		    (session, EPOCH_NEXT,
+		ret = _gnutls_set_cipher_suite
+		    (session,
 		     session->internals.resumed_security_parameters.
 		     cipher_suite);
+		if (ret < 0) {
+			gnutls_assert();
+			goto no_resume;
+		}
 		_gnutls_epoch_set_compression(session, EPOCH_NEXT,
 					      session->internals.
 					      resumed_security_parameters.
@@ -1711,6 +1695,7 @@ client_check_if_resuming(gnutls_session_t session,
 
 		return 0;
 	} else {
+no_resume:
 		/* keep the new session id */
 		session->internals.resumed = RESUME_FALSE;	/* we are not resuming */
 		session->security_parameters.session_id_size =

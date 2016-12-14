@@ -231,8 +231,8 @@ _gnutls_init_record_state(record_parameters_st * params,
 }
 
 int
-_gnutls_epoch_set_cipher_suite(gnutls_session_t session,
-			       int epoch_rel, const uint8_t suite[2])
+_gnutls_set_cipher_suite(gnutls_session_t session,
+			 const uint8_t suite[2])
 {
 	const cipher_entry_st *cipher_algo;
 	const mac_entry_st *mac_algo;
@@ -240,7 +240,7 @@ _gnutls_epoch_set_cipher_suite(gnutls_session_t session,
 	const gnutls_cipher_suite_entry_st *cs;
 	int ret;
 
-	ret = _gnutls_epoch_get(session, epoch_rel, &params);
+	ret = _gnutls_epoch_get(session, EPOCH_NEXT, &params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -274,6 +274,7 @@ _gnutls_epoch_set_cipher_suite(gnutls_session_t session,
 		session->security_parameters.prf_mac = GNUTLS_MAC_MD5_SHA1;
 	}
 
+	memcpy(session->security_parameters.cipher_suite, suite, 2);
 	params->cipher = cipher_algo;
 	params->mac = mac_algo;
 
