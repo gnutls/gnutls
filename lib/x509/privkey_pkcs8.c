@@ -1598,6 +1598,11 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	}
 	_gnutls_hard_log("salt.specified.size: %d\n", params->salt_size);
 
+	if (params->salt_size < 0) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	/* read the iteration count 
 	 */
 	result =
@@ -1607,6 +1612,12 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 		gnutls_assert();
 		goto error;
 	}
+
+	if (params->iter_count >= INT_MAX || params->iter_count == 0) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
 
 	/* read the keylength, if it is set.
@@ -1617,6 +1628,12 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	if (result < 0) {
 		params->key_size = 0;
 	}
+
+	if (params->key_size > MAX_CIPHER_KEY_SIZE) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	_gnutls_hard_log("keyLength: %d\n", params->key_size);
 
 	len = sizeof(oid);
@@ -1661,9 +1678,12 @@ read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn, struct pbkdf2_params *params)
 			    &params->salt_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
+		return _gnutls_asn2err(result);
 	}
+
+	if (params->salt_size < 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
 	_gnutls_hard_log("salt.size: %d\n", params->salt_size);
 
 	/* read the iteration count 
@@ -1671,19 +1691,17 @@ read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn, struct pbkdf2_params *params)
 	result =
 	    _gnutls_x509_read_uint(pbes2_asn, "iterations",
 				   &params->iter_count);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		goto error;
-	}
+	if (result < 0)
+		return gnutls_assert_val(result);
+
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
+
+	if (params->iter_count >= INT_MAX || params->iter_count == 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	params->key_size = 0;
 
 	return 0;
-
-      error:
-	return result;
-
 }
 
 /* Writes the PBE parameters for PKCS-12 schemas.
