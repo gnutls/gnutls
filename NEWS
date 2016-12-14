@@ -5,6 +5,16 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.8 (unreleased)
+
+** libgnutls: Ensure that GNUTLS_E_DECRYPTION_FAIL will be returned
+   by PKCS#8 decryption functions when an invalid key is provided. This
+   addresses regression on decrypting certain PKCS#8 keys.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.5.7 (released 2016-12-8)
 
 ** libgnutls: Include CHACHA20-POLY1305 ciphersuites in the SECURE128
