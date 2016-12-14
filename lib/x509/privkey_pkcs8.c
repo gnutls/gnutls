@@ -1729,9 +1729,15 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	decrypted_data->data = data;
 
-	if (block_size != 1)
+	if (block_size != 1) {
+		if (data[data_size - 1] >= data_size) {
+			gnutls_assert();
+			result = GNUTLS_E_ILLEGAL_PARAMETER;
+			goto error;
+		}
+
 		decrypted_data->size = data_size - data[data_size - 1];
-	else
+	} else
 		decrypted_data->size = data_size;
 
 	_gnutls_cipher_deinit(&ch);
