@@ -1909,7 +1909,7 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	if (ce->type == CIPHER_BLOCK && (enc.size % block_size != 0)) {
 		gnutls_assert();
-		result = GNUTLS_E_ILLEGAL_PARAMETER;
+		result = GNUTLS_E_DECRYPTION_FAILED;
 		goto error;
 	}
 
@@ -1928,6 +1928,7 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	if (result < 0) {
 		gnutls_assert();
+		result = GNUTLS_E_DECRYPTION_FAILED;
 		goto error;
 	}
 
@@ -1947,7 +1948,7 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 		if (pslen > block_size || pslen >= enc.size  || pslen == 0) {
 			gnutls_assert();
-			result = GNUTLS_E_ILLEGAL_PARAMETER;
+			result = GNUTLS_E_DECRYPTION_FAILED;
 			goto error;
 		}
 
@@ -1956,7 +1957,7 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 		for (i=0;i<pslen;i++) {
 			if (enc.data[enc.size-1-i] != pslen) {
 				gnutls_assert();
-				result = GNUTLS_E_ILLEGAL_PARAMETER;
+				result = GNUTLS_E_DECRYPTION_FAILED;
 				goto error;
 			}
 		}
