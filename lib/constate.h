@@ -25,8 +25,8 @@
 
 int _gnutls_set_cipher_suite(gnutls_session_t session,
 			     const uint8_t suite[2]);
-int _gnutls_epoch_set_compression(gnutls_session_t session, int epoch_rel,
-				  gnutls_compression_method_t comp_algo);
+int _gnutls_set_compression(gnutls_session_t session,
+			    gnutls_compression_method_t comp_algo);
 int _gnutls_epoch_get_compression(gnutls_session_t session, int epoch_rel);
 void _gnutls_epoch_set_null_algos(gnutls_session_t session,
 				  record_parameters_st * params);

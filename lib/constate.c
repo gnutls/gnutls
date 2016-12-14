@@ -282,14 +282,13 @@ _gnutls_set_cipher_suite(gnutls_session_t session,
 }
 
 int
-_gnutls_epoch_set_compression(gnutls_session_t session,
-			      int epoch_rel,
-			      gnutls_compression_method_t comp_algo)
+_gnutls_set_compression(gnutls_session_t session,
+			gnutls_compression_method_t comp_algo)
 {
 	record_parameters_st *params;
 	int ret;
 
-	ret = _gnutls_epoch_get(session, epoch_rel, &params);
+	ret = _gnutls_epoch_get(session, EPOCH_NEXT, &params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -302,6 +301,7 @@ _gnutls_epoch_set_compression(gnutls_session_t session,
 		    gnutls_assert_val
 		    (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
 
+	session->security_parameters.compression_method = comp_algo;
 	params->compression_algorithm = comp_algo;
 
 	return 0;

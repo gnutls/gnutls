@@ -135,10 +135,6 @@ static int resume_copy_required_values(gnutls_session_t session)
 	 * That is because the client must see these in our
 	 * hello message.
 	 */
-	session->security_parameters.compression_method =
-	    session->internals.resumed_security_parameters.
-	    compression_method;
-
 	ret = _gnutls_set_cipher_suite(session,
 				       session->internals.
 				       resumed_security_parameters.
@@ -146,10 +142,10 @@ static int resume_copy_required_values(gnutls_session_t session)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_epoch_set_compression(session, EPOCH_NEXT,
-					    session->internals.
-					    resumed_security_parameters.
-					    compression_method);
+	ret = _gnutls_set_compression(session,
+				      session->internals.
+				      resumed_security_parameters.
+				      compression_method);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1058,6 +1054,7 @@ server_select_comp_method(gnutls_session_t session,
 {
 	int x, i, j;
 	uint8_t comps[MAX_ALGOS];
+	int ret;
 
 	x = _gnutls_supported_compression_methods(session, comps,
 						  MAX_ALGOS);
@@ -1075,10 +1072,10 @@ server_select_comp_method(gnutls_session_t session,
 					    _gnutls_compression_get_id
 					    (comps[i]);
 
-					_gnutls_epoch_set_compression
-					    (session, EPOCH_NEXT, method);
-					session->security_parameters.
-					    compression_method = method;
+					ret = _gnutls_set_compression
+					    (session, method);
+					if (ret < 0)
+						return gnutls_assert_val(ret);
 
 					_gnutls_handshake_log
 					    ("HSK[%p]: Selected Compression Method: %s\n",
@@ -1098,10 +1095,10 @@ server_select_comp_method(gnutls_session_t session,
 					    _gnutls_compression_get_id
 					    (comps[i]);
 
-					_gnutls_epoch_set_compression
-					    (session, EPOCH_NEXT, method);
-					session->security_parameters.
-					    compression_method = method;
+					ret = _gnutls_set_compression
+					    (session, method);
+					if (ret < 0)
+						return gnutls_assert_val(ret);
 
 					_gnutls_handshake_log
 					    ("HSK[%p]: Selected Compression Method: %s\n",
@@ -1609,6 +1606,7 @@ set_client_comp_method(gnutls_session_t session,
 	uint8_t compression_methods[MAX_ALGOS];
 	int id = _gnutls_compression_get_id(comp_method);
 	int i;
+	int ret;
 
 	_gnutls_handshake_log
 	    ("HSK[%p]: Selected compression method: %s (%d)\n", session,
@@ -1634,8 +1632,9 @@ set_client_comp_method(gnutls_session_t session,
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
 
-	session->security_parameters.compression_method = id;
-	_gnutls_epoch_set_compression(session, EPOCH_NEXT, id);
+	ret = _gnutls_set_compression(session, id);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
@@ -1675,9 +1674,6 @@ client_check_if_resuming(gnutls_session_t session,
 		       session->security_parameters.client_random,
 		       GNUTLS_RANDOM_SIZE);
 
-		session->security_parameters.compression_method =
-			session->internals.resumed_security_parameters.compression_method;
-
 		ret = _gnutls_set_cipher_suite
 		    (session,
 		     session->internals.resumed_security_parameters.
@@ -1686,10 +1682,14 @@ client_check_if_resuming(gnutls_session_t session,
 			gnutls_assert();
 			goto no_resume;
 		}
-		_gnutls_epoch_set_compression(session, EPOCH_NEXT,
-					      session->internals.
-					      resumed_security_parameters.
-					      compression_method);
+		ret = _gnutls_set_compression(session,
+					session->internals.
+					resumed_security_parameters.
+					compression_method);
+		if (ret < 0) {
+			gnutls_assert();
+			goto no_resume;
+		}
 
 		session->internals.resumed = RESUME_TRUE;	/* we are resuming */
 

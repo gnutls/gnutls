@@ -249,9 +249,9 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		session->internals.resumed = RESUME_FALSE;
 	}
 
-	_gnutls_epoch_set_compression(session, EPOCH_NEXT,
-				      GNUTLS_COMP_NULL);
-	session->security_parameters.compression_method = GNUTLS_COMP_NULL;
+	ret = _gnutls_set_compression(session, GNUTLS_COMP_NULL);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return sret;
 }
