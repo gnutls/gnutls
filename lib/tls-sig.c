@@ -71,8 +71,12 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 
 	gnutls_sign_algorithm_set_server(session, *sign_algo);
 
-	hash_algo =
-	    hash_to_entry(gnutls_sign_get_hash_algorithm(*sign_algo));
+	if (!_gnutls_version_has_selectable_sighash(ver) &&
+	    gnutls_privkey_get_pk_algorithm(pkey, NULL) == GNUTLS_PK_RSA)
+		hash_algo = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
+	else
+		hash_algo = hash_to_entry(
+				gnutls_sign_get_hash_algorithm(*sign_algo));
 	if (hash_algo == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 
@@ -92,59 +96,10 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 		     GNUTLS_RANDOM_SIZE);
 	_gnutls_hash(&td_sha, params->data, params->size);
 
-	switch (gnutls_privkey_get_pk_algorithm(pkey, NULL)) {
-	case GNUTLS_PK_RSA:
-		if (!_gnutls_version_has_selectable_sighash(ver)) {
-			digest_hd_st td_md5;
+	_gnutls_hash_deinit(&td_sha, concat);
 
-			ret =
-			    _gnutls_hash_init(&td_md5,
-					      hash_to_entry
-					      (GNUTLS_DIG_MD5));
-			if (ret < 0) {
-				gnutls_assert();
-				return ret;
-			}
-
-			_gnutls_hash(&td_md5,
-				     session->security_parameters.
-				     client_random, GNUTLS_RANDOM_SIZE);
-			_gnutls_hash(&td_md5,
-				     session->security_parameters.
-				     server_random, GNUTLS_RANDOM_SIZE);
-			_gnutls_hash(&td_md5, params->data, params->size);
-
-			_gnutls_hash_deinit(&td_md5, concat);
-			_gnutls_hash_deinit(&td_sha, &concat[16]);
-
-			dconcat.data = concat;
-			dconcat.size = 36;
-		} else {	/* TLS 1.2 way */
-
-			_gnutls_hash_deinit(&td_sha, concat);
-
-			dconcat.data = concat;
-			dconcat.size =
-			    _gnutls_hash_get_algo_len(hash_algo);
-		}
-		break;
-	case GNUTLS_PK_DSA:
-	case GNUTLS_PK_EC:
-		_gnutls_hash_deinit(&td_sha, concat);
-
-		if (!IS_SHA((gnutls_digest_algorithm_t)hash_algo->id)) {
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
-		dconcat.data = concat;
-		dconcat.size = _gnutls_hash_get_algo_len(hash_algo);
-		break;
-
-	default:
-		gnutls_assert();
-		_gnutls_hash_deinit(&td_sha, NULL);
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
+	dconcat.data = concat;
+	dconcat.size = _gnutls_hash_get_algo_len(hash_algo);
 
 	ret =
 	    sign_tls_hash(session, hash_algo, cert, pkey, &dconcat,
@@ -584,9 +539,92 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	return sign_algo;
 }
 
+#ifdef ENABLE_SSL3
+static int
+_gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
+				 gnutls_pcert_st * cert,
+				 gnutls_privkey_t pkey,
+				 gnutls_datum_t * signature)
+{
+	gnutls_datum_t dconcat;
+	int ret;
+	uint8_t concat[MAX_SIG_SIZE];
+	digest_hd_st td_sha;
+	const version_entry_st *ver = get_version(session);
+	gnutls_pk_algorithm_t pk =
+	    gnutls_privkey_get_pk_algorithm(pkey, NULL);
 
-/* Generates a signature of all the previous sent packets in the 
- * handshake procedure. 
+	ret = _gnutls_generate_master(session, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* ensure 1024 bit DSA keys are used */
+	ret =
+	    _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver,
+					       GNUTLS_SIGN_UNKNOWN);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	dconcat.data = concat;
+	dconcat.size = 0;
+
+	if (pk == GNUTLS_PK_RSA) {
+		digest_hd_st td_md5;
+		ret =
+		    _gnutls_hash_init(&td_md5,
+				      hash_to_entry(GNUTLS_DIG_MD5));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		_gnutls_hash(&td_md5,
+			     session->internals.handshake_hash_buffer.data,
+			     session->internals.handshake_hash_buffer.
+			     length);
+
+		ret = _gnutls_mac_deinit_ssl3_handshake(&td_md5,
+							dconcat.data,
+							session->security_parameters.
+							master_secret,
+							GNUTLS_MASTER_SIZE);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		dconcat.size = 16;
+	}
+
+	ret = _gnutls_hash_init(&td_sha, hash_to_entry(GNUTLS_DIG_SHA1));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	_gnutls_hash(&td_sha,
+		     session->internals.handshake_hash_buffer.data,
+		     session->internals.handshake_hash_buffer.length);
+	ret =
+		_gnutls_mac_deinit_ssl3_handshake(&td_sha,
+				dconcat.data + dconcat.size,
+				session->security_parameters.
+				master_secret,
+				GNUTLS_MASTER_SIZE);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	dconcat.size += 20;
+
+	ret = sign_tls_hash(session, NULL, cert, pkey, &dconcat, signature);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+	return ret;
+}
+#endif
+
+/* Generates a signature of all the previous sent packets in the
+ * handshake procedure.
  * 20040227: now it works for SSL 3.0 as well
  * 20091031: works for TLS 1.2 too!
  *
@@ -602,11 +640,11 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 	gnutls_datum_t dconcat;
 	int ret;
 	uint8_t concat[MAX_SIG_SIZE];
-	digest_hd_st td_md5;
 	digest_hd_st td_sha;
 	const version_entry_st *ver = get_version(session);
 	gnutls_pk_algorithm_t pk =
 	    gnutls_privkey_get_pk_algorithm(pkey, NULL);
+	const mac_entry_st *me;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -615,7 +653,18 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 		return _gnutls_handshake_sign_crt_vrfy12(session, cert,
 							 pkey, signature);
 
-	ret = _gnutls_hash_init(&td_sha, hash_to_entry(GNUTLS_DIG_SHA1));
+#ifdef ENABLE_SSL3
+	if (ver->id == GNUTLS_SSL3)
+		return _gnutls_handshake_sign_crt_vrfy3(session, cert,
+							pkey, signature);
+#endif
+
+	if (pk == GNUTLS_PK_RSA)
+		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
+	else
+		me = hash_to_entry(GNUTLS_DIG_SHA1);
+
+	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -625,25 +674,11 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 		     session->internals.handshake_hash_buffer.data,
 		     session->internals.handshake_hash_buffer.length);
 
-#ifdef ENABLE_SSL3
-	if (ver->id == GNUTLS_SSL3) {
-		ret = _gnutls_generate_master(session, 1);
-		if (ret < 0) {
-			gnutls_assert();
-			_gnutls_hash_deinit(&td_sha, NULL);
-			return ret;
-		}
+	_gnutls_hash_deinit(&td_sha, concat);
 
-		ret =
-		    _gnutls_mac_deinit_ssl3_handshake(&td_sha, &concat[16],
-						      session->security_parameters.
-						      master_secret,
-						      GNUTLS_MASTER_SIZE);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-	} else
-#endif
-		_gnutls_hash_deinit(&td_sha, &concat[16]);
+	dconcat.data = concat;
+	dconcat.size = _gnutls_hash_get_algo_len(me);
+
 
 	/* ensure 1024 bit DSA keys are used */
 	ret =
@@ -652,46 +687,6 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	switch (pk) {
-	case GNUTLS_PK_RSA:
-		ret =
-		    _gnutls_hash_init(&td_md5,
-				      hash_to_entry(GNUTLS_DIG_MD5));
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		_gnutls_hash(&td_md5,
-			     session->internals.handshake_hash_buffer.data,
-			     session->internals.handshake_hash_buffer.
-			     length);
-
-#ifdef ENABLE_SSL3
-		if (ver->id == GNUTLS_SSL3) {
-			ret =
-			    _gnutls_mac_deinit_ssl3_handshake(&td_md5,
-							      concat,
-							      session->security_parameters.
-							      master_secret,
-							      GNUTLS_MASTER_SIZE);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-		} else
-#endif
-			_gnutls_hash_deinit(&td_md5, concat);
-
-		dconcat.data = concat;
-		dconcat.size = 36;
-		break;
-	case GNUTLS_PK_DSA:
-	case GNUTLS_PK_EC:
-
-		dconcat.data = &concat[16];
-		dconcat.size = 20;
-		break;
-
-	default:
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-	}
 	ret =
 	    sign_tls_hash(session, NULL, cert, pkey, &dconcat, signature);
 	if (ret < 0) {
