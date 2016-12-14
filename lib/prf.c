@@ -123,7 +123,7 @@ P_hash(gnutls_mac_algorithm_t algorithm,
 /* This function operates as _gnutls_PRF(), but does not require
  * a pointer to the current session. It takes the @mac algorithm
  * explicitly. For legacy TLS/SSL sessions before TLS 1.2 the MAC
- * must be set to %GNUTLS_MAC_UNKNOWN.
+ * must be set to %GNUTLS_MAC_MD5_SHA1.
  */
 static int
 _gnutls_PRF_raw(gnutls_mac_algorithm_t mac,
@@ -152,7 +152,7 @@ _gnutls_PRF_raw(gnutls_mac_algorithm_t mac,
 	memcpy(s_seed, label, label_size);
 	memcpy(&s_seed[label_size], seed, seed_size);
 
-	if (mac != GNUTLS_MAC_UNKNOWN) {
+	if (mac != GNUTLS_MAC_MD5_SHA1) {
 		result =
 		    P_hash(mac, secret, secret_size,
 			   s_seed, s_seed_size,
@@ -218,7 +218,7 @@ _gnutls_PRF(gnutls_session_t session,
 			ret);
 	} else {
 		return _gnutls_PRF_raw(
-			GNUTLS_MAC_UNKNOWN,
+			GNUTLS_MAC_MD5_SHA1,
 			secret, secret_size,
 			label, label_size,
 			seed, seed_size,
@@ -237,7 +237,7 @@ _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
 
 /*-
  * _gnutls_prf_raw:
- * @mac: the MAC algorithm to use, set to %GNUTLS_MAC_UNKNOWN for the TLS1.0 mac
+ * @mac: the MAC algorithm to use, set to %GNUTLS_MAC_MD5_SHA1 for the TLS1.0 mac
  * @master_size: length of the @master variable.
  * @master: the master secret used in PRF computation
  * @label_size: length of the @label variable.
