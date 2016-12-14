@@ -443,18 +443,6 @@ int _gnutls_connection_state_init(gnutls_session_t session)
 	return 0;
 }
 
-int _gnutls_epoch_get_compression(gnutls_session_t session, int epoch)
-{
-	record_parameters_st *params;
-	int ret;
-
-	ret = _gnutls_epoch_get(session, epoch, &params);
-	if (ret < 0)
-		return GNUTLS_COMP_UNKNOWN;
-
-	return params->compression_algorithm;
-}
-
 /* Initializes the read connection session
  * (read encrypted data)
  */
