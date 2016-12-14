@@ -25,6 +25,9 @@ See the end for copying conditions.
 ** libgnutls: Link to trousers (TPM library) dynamically. Backported TPM
    key handling improvements from master branch.
 
+** libgnutls: Backported several fixes in PKCS#8 decryption (related to
+   gitlab issue #148).
+
 ** tpmtool: backported the --test-sign option.
 
 ** API and ABI modifications:
