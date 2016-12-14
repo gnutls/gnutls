@@ -252,6 +252,7 @@ typedef enum {
  * @GNUTLS_MAC_SHA384: HMAC-SHA-384 algorithm.
  * @GNUTLS_MAC_SHA512: HMAC-SHA-512 algorithm.
  * @GNUTLS_MAC_SHA224: HMAC-SHA-224 algorithm.
+ * @GNUTLS_MAC_MD5_SHA1: Combined MD5+SHA1 MAC placeholder.
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
  * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
  * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
@@ -274,6 +275,7 @@ typedef enum {
 	GNUTLS_MAC_SHA3_256 = 11, /* reserved: no implementation */
 	GNUTLS_MAC_SHA3_384 = 12, /* reserved: no implementation */
 	GNUTLS_MAC_SHA3_512 = 13, /* reserved: no implementation */
+	GNUTLS_MAC_MD5_SHA1 = 14, /* reserved: no implementation */
 	/* If you add anything here, make sure you align with
 	   gnutls_digest_algorithm_t. */
 	GNUTLS_MAC_AEAD = 200,	/* indicates that MAC is on the cipher */
@@ -297,6 +299,7 @@ typedef enum {
  * @GNUTLS_DIG_SHA3_256: SHA3-256 algorithm.
  * @GNUTLS_DIG_SHA3_384: SHA3-384 algorithm.
  * @GNUTLS_DIG_SHA3_512: SHA3-512 algorithm.
+ * @GNUTLS_DIG_MD5_SHA1: Combined MD5+SHA1 algorithm.
  *
  * Enumeration of different digest (hash) algorithms.
  */
@@ -314,7 +317,8 @@ typedef enum {
 	GNUTLS_DIG_SHA3_224 = GNUTLS_MAC_SHA3_224,
 	GNUTLS_DIG_SHA3_256 = GNUTLS_MAC_SHA3_256,
 	GNUTLS_DIG_SHA3_384 = GNUTLS_MAC_SHA3_384,
-	GNUTLS_DIG_SHA3_512 = GNUTLS_MAC_SHA3_512
+	GNUTLS_DIG_SHA3_512 = GNUTLS_MAC_SHA3_512,
+	GNUTLS_DIG_MD5_SHA1 = GNUTLS_MAC_MD5_SHA1
 	    /* If you add anything here, make sure you align with
 	       gnutls_mac_algorithm_t. */
 } gnutls_digest_algorithm_t;

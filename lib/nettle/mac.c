@@ -42,6 +42,11 @@ typedef void (*set_nonce_func) (void *, size_t, const uint8_t *);
 static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo,
 				 void **_ctx);
 
+struct md5_sha1_ctx {
+	struct md5_ctx md5;
+	struct sha1_ctx sha1;
+};
+
 struct nettle_hash_ctx {
 	union {
 		struct md5_ctx md5;
@@ -55,6 +60,7 @@ struct nettle_hash_ctx {
 		struct sha3_512_ctx sha3_512;
 		struct sha1_ctx sha1;
 		struct md2_ctx md2;
+		struct md5_sha1_ctx md5_sha1;
 	} ctx;
 	void *ctx_ptr;
 	gnutls_digest_algorithm_t algo;
@@ -325,6 +331,7 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 	switch (algo) {
 	case GNUTLS_DIG_MD5:
 	case GNUTLS_DIG_SHA1:
+	case GNUTLS_DIG_MD5_SHA1:
 
 	case GNUTLS_DIG_SHA224:
 	case GNUTLS_DIG_SHA256:
@@ -350,6 +357,26 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 	}
 }
 
+static void _md5_sha1_update(void *_ctx, size_t len, const uint8_t *data)
+{
+	struct md5_sha1_ctx *ctx = _ctx;
+
+	md5_update(&ctx->md5, len, data);
+	sha1_update(&ctx->sha1, len, data);
+}
+
+static void _md5_sha1_digest(void *_ctx, size_t len, uint8_t *digest)
+{
+	struct md5_sha1_ctx *ctx = _ctx;
+
+	md5_digest(&ctx->md5, len <= MD5_DIGEST_SIZE ? len : MD5_DIGEST_SIZE,
+		   digest);
+
+	if (len > MD5_DIGEST_SIZE)
+		sha1_digest(&ctx->sha1, len - MD5_DIGEST_SIZE,
+			    digest + MD5_DIGEST_SIZE);
+}
+
 static int _ctx_init(gnutls_digest_algorithm_t algo,
 		     struct nettle_hash_ctx *ctx)
 {
@@ -367,6 +394,14 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->digest = (digest_func) sha1_digest;
 		ctx->ctx_ptr = &ctx->ctx.sha1;
 		ctx->length = SHA1_DIGEST_SIZE;
+		break;
+	case GNUTLS_DIG_MD5_SHA1:
+		md5_init(&ctx->ctx.md5_sha1.md5);
+		sha1_init(&ctx->ctx.md5_sha1.sha1);
+		ctx->update = (update_func) _md5_sha1_update;
+		ctx->digest = (digest_func) _md5_sha1_digest;
+		ctx->ctx_ptr = &ctx->ctx.md5_sha1;
+		ctx->length = MD5_DIGEST_SIZE + SHA1_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA224:
 		sha224_init(&ctx->ctx.sha224);
