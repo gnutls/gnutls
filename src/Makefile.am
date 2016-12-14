@@ -256,7 +256,7 @@ cli-debug-args.stamp: $(srcdir)/cli-debug-args.def $(srcdir)/args-std.def
 
 cli-args.h: cli-args.stamp
 cli-args.c: cli-args.stamp
-cli-args.stamp cli-args.h: $(srcdir)/cli-args.def $(srcdir)/args-std.def
+cli-args.stamp: $(srcdir)/cli-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
 	touch $@
 
