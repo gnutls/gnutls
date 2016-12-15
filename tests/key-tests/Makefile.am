@@ -32,6 +32,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
 	VALGRIND="$(VALGRIND)"					\
 	top_builddir="$(top_builddir)"				\
+	ASAN_OPTIONS="detect_leaks=0"				\
 	srcdir="$(srcdir)"
 
 if WANT_TEST_SUITE
