@@ -1,8 +1,9 @@
 #!/bin/sh
 
 # Copyright (C) 2006, 2008, 2010, 2012 Free Software Foundation, Inc.
+# Copyright (C) 2016, Red Hat, Inc.
 #
-# Author: Simon Josefsson
+# Author: Simon Josefsson, Nikos Mavrogiannopoulos
 #
 # This file is part of GnuTLS.
 #
@@ -20,28 +21,50 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-set -e
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+TMPFILE1=rsa-md5.$$.tmp
+TMPFILE2=rsa-md5-2.$$.tmp
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+. ${srcdir}/../scripts/common.sh
+TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
+if test "${TSTAMP}" != "1158969600"; then
+	echo "You need datefudge to run this test"
+	exit 77
+fi
 
-$CERTTOOL --inder --certificate-info \
-    --infile $srcdir/MD5CollisionCA.cer > ca.pem
-$CERTTOOL --inder --certificate-info \
-    --infile $srcdir/TargetCollidingCertificate1.cer > client1.pem
-$CERTTOOL --inder --certificate-info \
-	  --infile $srcdir/TargetCollidingCertificate2.cer > client2.pem
+# Disable leak detection
+ASAN_OPTIONS="detect_leaks=0"
+export ASAN_OPTIONS
 
-cat client1.pem ca.pem > chain1.pem
-cat client2.pem ca.pem > chain2.pem
+datefudge -s "2006-10-1" \
+"${CERTTOOL}" --verify-chain --outfile "$TMPFILE1" --infile "${srcdir}/colliding-chain-md5-1.pem"
+if test $? = 0;then
+	echo "Verification on chain1 succeeded"
+	exit 1
+fi
 
-$CERTTOOL --verify-chain < chain1.pem | \
-    grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
-$CERTTOOL --verify-chain < chain2.pem | \
-    grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
+grep 'Not verified.' $TMPFILE1| grep 'insecure algorithm'
+if test $? != 0;then
+	echo "Output on chain1 doesn't match the expected"
+	exit 1
+fi
 
-rm -f ca.pem client1.pem client2.pem \
-   chain1.pem chain2.pem \
+
+datefudge -s "2006-10-1" \
+"${CERTTOOL}" --verify-chain --outfile "$TMPFILE2" --infile "${srcdir}/colliding-chain-md5-2.pem"
+if test $? = 0;then
+	echo "Verification on chain2 succeeded"
+	exit 1
+fi
+
+grep 'Not verified.' $TMPFILE2| grep 'insecure algorithm'
+if test $? != 0;then
+	echo "Output on chain2 doesn't match the expected"
+	exit 1
+fi
+
+rm -f $TMPFILE1 $TMPFILE2
 
 # We're done.
 exit 0
