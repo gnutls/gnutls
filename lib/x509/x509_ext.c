@@ -1432,7 +1432,7 @@ int gnutls_x509_ext_export_basic_constraints(unsigned int ca, int pathlen,
  *   field and the actual value, -1 indicate that the field is absent.
  * @policyLanguage: output variable with OID of policy language
  * @policy: output variable with policy data
- * @sizeof_policy: output variable size of policy data
+ * @sizeof_policy: output variable with size of policy data
  *
  * This function will return the information from a proxy certificate
  * extension. It reads the ProxyCertInfo X.509 extension (1.3.6.1.5.5.7.1.14).
