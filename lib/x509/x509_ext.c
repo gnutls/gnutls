@@ -1449,7 +1449,8 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
-	gnutls_datum_t value = { NULL, 0 };
+	gnutls_datum_t value1 = { NULL, 0 };
+	gnutls_datum_t value2 = { NULL, 0 };
 
 	if ((result = asn1_create_element
 	     (_gnutls_get_pkix(), "PKIX1.ProxyCertInfo",
@@ -1479,20 +1480,18 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 	}
 
 	result = _gnutls_x509_read_value(c2, "proxyPolicy.policyLanguage",
-					 &value);
+					 &value1);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	if (policyLanguage) {
-		*policyLanguage = (char *)value.data;
-	} else {
-		gnutls_free(value.data);
-		value.data = NULL;
+		*policyLanguage = (char *)value1.data;
+		value1.data = NULL;
 	}
 
-	result = _gnutls_x509_read_value(c2, "proxyPolicy.policy", &value);
+	result = _gnutls_x509_read_value(c2, "proxyPolicy.policy", &value2);
 	if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
 		if (policy)
 			*policy = NULL;
@@ -1503,16 +1502,17 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 		goto cleanup;
 	} else {
 		if (policy) {
-			*policy = (char *)value.data;
-			value.data = NULL;
+			*policy = (char *)value2.data;
+			value2.data = NULL;
 		}
 		if (sizeof_policy)
-			*sizeof_policy = value.size;
+			*sizeof_policy = value2.size;
 	}
 
 	result = 0;
  cleanup:
-	gnutls_free(value.data);
+	gnutls_free(value1.data);
+	gnutls_free(value2.data);
 	asn1_delete_structure(&c2);
 
 	return result;
