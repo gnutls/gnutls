@@ -19,9 +19,9 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = MD5CollisionCA.cer \
-	TargetCollidingCertificate1.cer \
-	TargetCollidingCertificate2.cer \
+EXTRA_DIST = \
+	colliding-chain-md5-1.pem \
+	colliding-chain-md5-2.pem \
 	README
 
 dist_check_SCRIPTS = rsa-md5-collision
