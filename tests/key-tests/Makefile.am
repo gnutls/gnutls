@@ -26,12 +26,13 @@ EXTRA_DIST = README key-ca.pem key-user.pem \
 
 dist_check_SCRIPTS = key-id pkcs8
 
-TESTS = key-id pkcs8
+TESTS = key-id pkcs8 pkcs8-invalid
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
 	VALGRIND="$(VALGRIND)"					\
 	top_builddir="$(top_builddir)"				\
+	ASAN_OPTIONS="detect_leaks=0"				\
 	srcdir="$(srcdir)"
 
 if WANT_TEST_SUITE

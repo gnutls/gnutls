@@ -1034,6 +1034,7 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 			 &kdf_params, &enc_params, &tmp);
 	if (result < 0) {
 		gnutls_assert();
+		result = GNUTLS_E_DECRYPTION_FAILED;
 		goto error;
 	}
 
@@ -1598,6 +1599,11 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	}
 	_gnutls_hard_log("salt.specified.size: %d\n", params->salt_size);
 
+	if (params->salt_size < 0) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	/* read the iteration count 
 	 */
 	result =
@@ -1607,6 +1613,12 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 		gnutls_assert();
 		goto error;
 	}
+
+	if (params->iter_count >= INT_MAX || params->iter_count == 0) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
 
 	/* read the keylength, if it is set.
@@ -1617,6 +1629,12 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	if (result < 0) {
 		params->key_size = 0;
 	}
+
+	if (params->key_size > MAX_CIPHER_KEY_SIZE) {
+		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		goto error;
+	}
+
 	_gnutls_hard_log("keyLength: %d\n", params->key_size);
 
 	len = sizeof(oid);
@@ -1661,9 +1679,12 @@ read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn, struct pbkdf2_params *params)
 			    &params->salt_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
+		return _gnutls_asn2err(result);
 	}
+
+	if (params->salt_size < 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
 	_gnutls_hard_log("salt.size: %d\n", params->salt_size);
 
 	/* read the iteration count 
@@ -1671,19 +1692,17 @@ read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn, struct pbkdf2_params *params)
 	result =
 	    _gnutls_x509_read_uint(pbes2_asn, "iterations",
 				   &params->iter_count);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		goto error;
-	}
+	if (result < 0)
+		return gnutls_assert_val(result);
+
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
+
+	if (params->iter_count >= INT_MAX || params->iter_count == 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	params->key_size = 0;
 
 	return 0;
-
-      error:
-	return result;
-
 }
 
 /* Writes the PBE parameters for PKCS-12 schemas.
@@ -1823,6 +1842,8 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	int key_size;
 	unsigned int pass_len = 0;
 	const struct pbes2_schema_st *p;
+	unsigned block_size;
+	const cipher_entry_st *ce;
 
 	if (password)
 		pass_len = strlen(password);
@@ -1860,7 +1881,10 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 					 kdf_params->iter_count,
 					 kdf_params->salt_size, kdf_params->salt,
 					 key_size, key);
-		else return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+		else {
+			result = gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+			goto error;
+		}
 	} else if (p != NULL) { /* PKCS 12 schema */
 		result =
 		    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
@@ -1880,6 +1904,15 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 		goto error;
 	}
 
+	ce = cipher_to_entry(enc_params->cipher);
+	block_size = _gnutls_cipher_get_block_size(ce);
+
+	if (ce->type == CIPHER_BLOCK && (enc.size % block_size != 0)) {
+		gnutls_assert();
+		result = GNUTLS_E_DECRYPTION_FAILED;
+		goto error;
+	}
+
 	/* do the decryption.
 	 */
 	dkey.data = key;
@@ -1888,14 +1921,14 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	d_iv.data = (uint8_t *) enc_params->iv;
 	d_iv.size = enc_params->iv_size;
 	result =
-	    _gnutls_cipher_init(&ch, cipher_to_entry(enc_params->cipher),
-				&dkey, &d_iv, 0);
+	    _gnutls_cipher_init(&ch, ce, &dkey, &d_iv, 0);
 
 	gnutls_free(key);
 	key = NULL;
 
 	if (result < 0) {
 		gnutls_assert();
+		result = GNUTLS_E_DECRYPTION_FAILED;
 		goto error;
 	}
 
@@ -1909,10 +1942,28 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	decrypted_data->data = enc.data;
 
-	if (gnutls_cipher_get_block_size(enc_params->cipher) != 1)
-		decrypted_data->size = enc.size - enc.data[enc.size - 1];
-	else
+	if (ce->type == CIPHER_BLOCK && block_size != 1) {
+		unsigned pslen = (uint8_t)enc.data[enc.size - 1];
+		unsigned i;
+
+		if (pslen > block_size || pslen >= enc.size  || pslen == 0) {
+			gnutls_assert();
+			result = GNUTLS_E_DECRYPTION_FAILED;
+			goto error;
+		}
+
+		/* verify padding according to rfc2898 */
+		decrypted_data->size = enc.size - pslen;
+		for (i=0;i<pslen;i++) {
+			if (enc.data[enc.size-1-i] != pslen) {
+				gnutls_assert();
+				result = GNUTLS_E_DECRYPTION_FAILED;
+				goto error;
+			}
+		}
+	} else {
 		decrypted_data->size = enc.size;
+	}
 
 	_gnutls_cipher_deinit(&ch);
 

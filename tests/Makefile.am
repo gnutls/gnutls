@@ -93,7 +93,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 status-request status-request-ok fallback-scsv pkcs8-key-decode \
 	 mini-session-verify-function auto-verify mini-x509-default-prio \
 	 global-init-override pcert-list keylog-env pkcs7-cat-parse \
-	 multi-alerts naked-alerts
+	 multi-alerts naked-alerts pkcs8-key-decode-encrypted
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
