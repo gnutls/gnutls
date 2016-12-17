@@ -903,6 +903,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 			addf(str,
 			     "error: certificate policies import: %s\n",
 			     gnutls_strerror(err));
+			gnutls_x509_policies_deinit(policies);
 			return;
 		}
 
