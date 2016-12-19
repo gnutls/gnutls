@@ -70,6 +70,9 @@ static int auto_verify_cb(gnutls_session_t session)
  * will be performed. For a more advanced verification function check
  * gnutls_session_set_verify_cert2().
  *
+ * If @flags is provided which contain a profile, this function should be
+ * called after any session priority setting functions.
+ *
  * The gnutls_session_set_verify_cert() function is intended to be used by TLS
  * clients to verify the server's certificate.
  *
@@ -109,6 +112,9 @@ void gnutls_session_set_verify_cert(gnutls_session_t session,
  * The acceptable typed data are the same as in gnutls_certificate_verify_peers(),
  * and once set must remain valid for the lifetime of the session. More precisely
  * they should be available during any subsequent handshakes.
+ *
+ * If @flags is provided which contain a profile, this function should be
+ * called after any session priority setting functions.
  *
  * Since: 3.4.6
  **/
