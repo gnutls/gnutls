@@ -24,24 +24,22 @@
 
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    gnutls_datum_t raw;
-    gnutls_x509_privkey_t key;
-    gnutls_datum_t out;
+    gnutls_datum_t out, raw;
+    gnutls_x509_dn_t dn;
     int ret;
 
     raw.data = (unsigned char *)data;
     raw.size = size;
 
-    ret = gnutls_x509_privkey_init(&key);
+    ret = gnutls_x509_dn_init(&dn);
     assert(ret >= 0);
 
-    ret = gnutls_x509_privkey_import_pkcs8(key, &raw, GNUTLS_X509_FMT_DER, "password", 0);
-    if (ret < 0) {
+    ret = gnutls_x509_dn_import(dn, &raw);
+    if (ret < 0)
         goto cleanup;
-    }
 
-    /* If properly loaded, try to re-export */
-    ret = gnutls_x509_privkey_export2(key, GNUTLS_X509_FMT_DER, &out);
+    /* If properly loaded, try to re-export in string */
+    ret = gnutls_x509_dn_get_str(dn, &out);
     if (ret < 0) {
         goto cleanup;
     }
@@ -49,6 +47,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     gnutls_free(out.data);
 
  cleanup:
-    gnutls_x509_privkey_deinit(key);
+    gnutls_x509_dn_deinit(dn);
     return 0;
 }
