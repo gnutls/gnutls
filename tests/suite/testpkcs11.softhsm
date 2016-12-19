@@ -35,7 +35,7 @@ init_card () {
 	PUK="$2"
 
 	if test -x "/usr/bin/softhsm2-util"; then
-		export SOFTHSM2_CONF="softhsm-testpkcs11.config"
+		export SOFTHSM2_CONF="softhsm-testpkcs11.$$.config.tmp"
 		SOFTHSM_TOOL="/usr/bin/softhsm2-util"
 		${SOFTHSM_TOOL} --version|grep "2.0.0" >/dev/null 2>&1
 		if test $? = 0; then
@@ -45,7 +45,7 @@ init_card () {
 	fi
 
 	if test -x "/usr/bin/softhsm"; then
-		export SOFTHSM_CONF="softhsm-testpkcs11.config"
+		export SOFTHSM_CONF="softhsm-testpkcs11.$$.config.tmp"
 		SOFTHSM_TOOL="/usr/bin/softhsm"
 	fi
 
@@ -55,13 +55,13 @@ init_card () {
 	fi
 
 	if test -z "${SOFTHSM_CONF}"; then
-		rm -rf ./softhsm-testpkcs11.db
-		mkdir -p ./softhsm-testpkcs11.db
+		rm -rf ./softhsm-testpkcs11.$$.tmp
+		mkdir -p ./softhsm-testpkcs11.$$.tmp
 		echo "objectstore.backend = file" > "${SOFTHSM2_CONF}"
-		echo "directories.tokendir = ./softhsm-testpkcs11.db" >> "${SOFTHSM2_CONF}"
+		echo "directories.tokendir = ./softhsm-testpkcs11.$$.tmp" >> "${SOFTHSM2_CONF}"
 	else
-		rm -rf ./softhsm-testpkcs11.db
-		echo "0:./softhsm-testpkcs11.db" > "${SOFTHSM_CONF}"
+		rm -rf ./softhsm-testpkcs11.$$.tmp
+		echo "0:./softhsm-testpkcs11.$$.tmp" > "${SOFTHSM_CONF}"
 	fi
 
 

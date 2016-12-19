@@ -65,7 +65,7 @@ void smime_to_pkcs7(void);
 void pkcs12_info(common_info_st *);
 void generate_pkcs12(common_info_st *);
 void generate_pkcs8(common_info_st *);
-static void verify_chain(void);
+static void verify_chain(common_info_st * cinfo);
 void verify_crl(common_info_st * cinfo);
 void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_data);
 void pubkey_info(gnutls_x509_crt_t crt, common_info_st *);
@@ -1269,7 +1269,7 @@ static void cmd_parser(int argc, char **argv)
 	else if (HAVE_OPT(VERIFY_PROVABLE_PRIVKEY))
 		verify_provable_privkey(&cinfo);
 	else if (HAVE_OPT(VERIFY_CHAIN))
-		verify_chain();
+		verify_chain(&cinfo);
 	else if (HAVE_OPT(VERIFY))
 		verify_certificate(&cinfo);
 	else if (HAVE_OPT(VERIFY_CRL))
@@ -2284,10 +2284,6 @@ static gnutls_x509_trust_list_t load_tl(common_info_st * cinfo)
 {
 	gnutls_x509_trust_list_t list;
 	int ret;
-	FILE *fp;
-	gnutls_datum_t tmp = {NULL, 0}, tmp2 = {NULL, 0};
-	char *cas, *crls;
-	size_t ca_size, crl_size;
 
 	ret = gnutls_x509_trust_list_init(&list, 0);
 	if (ret < 0) {
@@ -2305,67 +2301,93 @@ static gnutls_x509_trust_list_t load_tl(common_info_st * cinfo)
 		}
 		fprintf(stderr, "Loaded system trust (%d CAs available)\n", ret);
 	} else if (cinfo->ca != NULL) {
-		fp = fopen(cinfo->ca, "r");
-		if (fp == NULL) {
-			fprintf(stderr, "Could not open %s\n", cinfo->ca);
-			exit(1);
-		}
-
-		cas = (void *) fread_file(fp, &ca_size);
-		if (cas == NULL) {
-			fprintf(stderr, "Error reading CA list");
-			exit(1);
-		}
-
-		tmp.data = (void *) cas;
-		tmp.size = ca_size;
-		fclose(fp);
-
-		if (cinfo->crl) {
-			fp = fopen(cinfo->crl, "r");
-			if (fp == NULL) {
-				fprintf(stderr, "Could not open %s\n", cinfo->crl);
-				exit(1);
-			}
-
-			crls = (void *) fread_file(fp, &crl_size);
-			if (crls == NULL) {
-				fprintf(stderr, "Error reading CRL list");
-				exit(1);
-			}
-
-			fclose(fp);
-
-			tmp2.data = (void *) crls;
-			tmp2.size = crl_size;
-		}
-
-		ret =
-			gnutls_x509_trust_list_add_trust_mem(list, &tmp,
-							 tmp2.data?&tmp2:NULL,
-							 cinfo->incert_format,
-							 0, 0);
+		ret = gnutls_x509_trust_list_add_trust_file(list, cinfo->ca, cinfo->crl, cinfo->incert_format, 0, 0);
 		if (ret < 0) {
-			int ret2 =
-				gnutls_x509_trust_list_add_trust_mem(list, &tmp,
-							tmp2.data?&tmp2:NULL,
-							GNUTLS_X509_FMT_PEM,
-							0, 0);
+			int ret2 = gnutls_x509_trust_list_add_trust_file(list, cinfo->ca, cinfo->crl, GNUTLS_X509_FMT_PEM, 0, 0);
 			if (ret2 >= 0)
 				ret = ret2;
 		}
 
 		if (ret < 0) {
-			fprintf(stderr, "gnutls_x509_trust_add_trust_mem: %s\n",
+			fprintf(stderr, "gnutls_x509_trust_add_trust_file: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
 
-		free(tmp.data);
-		free(tmp2.data);
-
 		fprintf(stderr, "Loaded CAs (%d available)\n", ret);
 	}
+
+	return list;
+}
+
+/* Loads from a certificate chain, the last certificate on the
+ * trusted list. In addition it will load any CRLs if present.
+ */
+static gnutls_x509_trust_list_t load_tl_from_cert_chain(const char *cert, int cert_size)
+{
+	gnutls_datum_t tmp;
+	gnutls_x509_crt_t *x509_cert_list = NULL;
+	gnutls_x509_crl_t *x509_crl_list = NULL;
+	unsigned x509_ncerts, x509_ncrls = 0;
+	unsigned i;
+	int ret;
+	gnutls_x509_trust_list_t list;
+
+	/* otherwise load the certificates in the trust list */
+	ret = gnutls_x509_trust_list_init(&list, 0);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_x509_trust_list_init: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	tmp.data = (void *) cert;
+	tmp.size = cert_size;
+
+	ret = gnutls_x509_crt_list_import2(&x509_cert_list, &x509_ncerts, &tmp, GNUTLS_X509_FMT_PEM, 0);
+	if (ret < 0 || x509_ncerts < 1) {
+		fprintf(stderr, "error parsing CRTs: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret =
+	    gnutls_x509_crl_list_import2(&x509_crl_list,
+					 &x509_ncrls, &tmp,
+					 GNUTLS_X509_FMT_PEM, 0);
+	if (ret < 0) {
+		x509_crl_list = NULL;
+		x509_ncrls = 0;
+	}
+
+	/* add CAs */
+	ret =
+	    gnutls_x509_trust_list_add_cas(list, &x509_cert_list[x509_ncerts - 1],
+					   1, 0);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_x509_trust_add_cas: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	/* add CRLs */
+	if (x509_ncrls > 0) {
+		ret =
+		    gnutls_x509_trust_list_add_crls(list, x509_crl_list,
+						    x509_ncrls, 0, 0);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_x509_trust_add_crls: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+	}
+
+	if (x509_ncerts > 1) {
+		for (i=0;i<x509_ncerts-1;i++)
+			gnutls_x509_crt_deinit(x509_cert_list[i]);
+	}
+	gnutls_free(x509_cert_list);
+	gnutls_free(x509_crl_list);
 
 	return list;
 }
@@ -2377,127 +2399,45 @@ static gnutls_x509_trust_list_t load_tl(common_info_st * cinfo)
  * If @system is non-zero then the system's CA will be used.
  */
 static int
-_verify_x509_mem(const void *cert, int cert_size, const void *ca,
-		 int ca_size, unsigned system, const char *purpose,
+_verify_x509_mem(const void *cert, int cert_size, common_info_st *cinfo,
+		 unsigned use_system_trust, /* if ca_file == NULL */
+		 const char *purpose,
 		 const char *hostname, const char *email)
 {
 	int ret;
 	unsigned i;
 	gnutls_datum_t tmp;
 	gnutls_x509_crt_t *x509_cert_list = NULL;
-	gnutls_x509_crt_t *x509_ca_list = NULL;
-	gnutls_x509_crt_t *pca_list = NULL;
-	gnutls_x509_crl_t *x509_crl_list = NULL;
-	unsigned int x509_ncerts, x509_ncrls = 0, x509_ncas = 0;
+	unsigned int x509_ncerts;
 	gnutls_x509_trust_list_t list;
 	unsigned int output;
 	unsigned vflags;
 
-	ret = gnutls_x509_trust_list_init(&list, 0);
-	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_trust_list_init: %s\n",
-			gnutls_strerror(ret));
-		exit(1);
-	}
-
-	if (system != 0) {
-		ret = gnutls_x509_trust_list_add_system_trust(list, 0, 0);
-		if (ret < 0) {
-			fprintf(stderr, "Error loading system trust: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-		fprintf(stderr, "Loaded system trust (%d CAs available)\n", ret);
-
-		x509_ncas = ret;
-
-		tmp.data = (void *) cert;
-		tmp.size = cert_size;
-
-		/* ignore errors. CRLs might not be given */
-		ret =
-		    gnutls_x509_crt_list_import2(&x509_cert_list,
-						 &x509_ncerts, &tmp,
-						 GNUTLS_X509_FMT_PEM, 0);
-		if (ret < 0 || x509_ncerts < 1) {
-			fprintf(stderr, "error parsing CRTs: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
+	if (use_system_trust != 0 || cinfo->ca != NULL) {
+		list = load_tl(cinfo);
+		if (list == NULL) {
+			fprintf(stderr, "error loading trust list\n");
 		}
 
 	} else {
-		if (ca == NULL) {
-			tmp.data = (void *) cert;
-			tmp.size = cert_size;
-		} else {
-			tmp.data = (void *) ca;
-			tmp.size = ca_size;
-
-			/* Load CAs */
-			ret =
-			    gnutls_x509_crt_list_import2(&x509_ca_list,
-							 &x509_ncas, &tmp,
-							 GNUTLS_X509_FMT_PEM,
-							 0);
-			if (ret < 0 || x509_ncas < 1) {
-				fprintf(stderr, "error parsing CAs: %s\n",
-					gnutls_strerror(ret));
-				exit(1);
-			}
+		list = load_tl_from_cert_chain(cert, cert_size);
+		if (list == NULL) {
+			fprintf(stderr, "error loading trust list\n");
 		}
-		pca_list = x509_ca_list;
-
-		ret =
-		    gnutls_x509_crl_list_import2(&x509_crl_list,
-						 &x509_ncrls, &tmp,
-						 GNUTLS_X509_FMT_PEM, 0);
-		if (ret < 0) {
-			x509_crl_list = NULL;
-			x509_ncrls = 0;
-		}
-
-
-		tmp.data = (void *) cert;
-		tmp.size = cert_size;
-
-		/* ignore errors. CRLs might not be given */
-		ret =
-		    gnutls_x509_crt_list_import2(&x509_cert_list,
-						 &x509_ncerts, &tmp,
-						 GNUTLS_X509_FMT_PEM, 0);
-		if (ret < 0 || x509_ncerts < 1) {
-			fprintf(stderr, "error parsing CRTs: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		if (ca == NULL) {
-			pca_list = &x509_cert_list[x509_ncerts - 1];
-			x509_ncas = 1;
-		}
-
-		ret =
-		    gnutls_x509_trust_list_add_cas(list, pca_list,
-						   x509_ncas, 0);
-		if (ret < 0) {
-			fprintf(stderr, "gnutls_x509_trust_add_cas: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		ret =
-		    gnutls_x509_trust_list_add_crls(list, x509_crl_list,
-						    x509_ncrls, 0, 0);
-		if (ret < 0) {
-			fprintf(stderr, "gnutls_x509_trust_add_crls: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
 	}
 
-	fprintf(stdout, "Loaded %d certificates, %d CAs and %d CRLs\n\n",
-		x509_ncerts, x509_ncas, x509_ncrls);
+	tmp.data = (void *) cert;
+	tmp.size = cert_size;
+
+	ret =
+	    gnutls_x509_crt_list_import2(&x509_cert_list,
+					 &x509_ncerts, &tmp,
+					 GNUTLS_X509_FMT_PEM, 0);
+	if (ret < 0 || x509_ncerts < 1) {
+		fprintf(stderr, "error parsing CRTs: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
 
 	vflags = GNUTLS_VERIFY_DO_NOT_ALLOW_SAME;
 
@@ -2555,18 +2495,10 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 
 	fprintf(outfile, "\n\n");
 
-	gnutls_x509_trust_list_deinit(list, 0);
+	gnutls_x509_trust_list_deinit(list, 1);
 	for (i=0;i<x509_ncerts;i++)
 		gnutls_x509_crt_deinit(x509_cert_list[i]);
 	gnutls_free(x509_cert_list);
-	if (x509_ca_list != NULL) {
-		for (i=0;i<x509_ncas;i++)
-			gnutls_x509_crt_deinit(x509_ca_list[i]);
-		gnutls_free(x509_ca_list);
-	}
-	for (i=0;i<x509_ncrls;i++)
-		gnutls_x509_crl_deinit(x509_crl_list[i]);
-	gnutls_free(x509_crl_list);
 
 	if (output != 0)
 		exit(EXIT_FAILURE);
@@ -2598,10 +2530,15 @@ static void print_verification_res(FILE * out, unsigned int output)
 	gnutls_free(pout.data);
 }
 
-static void verify_chain(void)
+static void verify_chain(common_info_st * cinfo)
 {
 	char *buf;
 	size_t size;
+
+	if (cinfo->ca != NULL) {
+		fprintf(stderr, "This option cannot be combined with --load-ca-certificate\n");
+		exit(1);
+	}
 
 	buf = (void *) fread_file(infile, &size);
 	if (buf == NULL) {
@@ -2609,7 +2546,7 @@ static void verify_chain(void)
 		exit(1);
 	}
 
-	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(VERIFY_PURPOSE),
+	_verify_x509_mem(buf, size, cinfo, 0, OPT_ARG(VERIFY_PURPOSE),
 			 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
 	free(buf);
 }
@@ -2618,8 +2555,7 @@ static void verify_certificate(common_info_st * cinfo)
 {
 	char *cert;
 	char *cas = NULL;
-	size_t cert_size, ca_size = 0;
-	FILE *ca_file;
+	size_t cert_size;
 
 	cert = (void *) fread_file(infile, &cert_size);
 	if (cert == NULL) {
@@ -2627,24 +2563,8 @@ static void verify_certificate(common_info_st * cinfo)
 		exit(1);
 	}
 
-	if (cinfo->ca != NULL) {
-		ca_file = fopen(cinfo->ca, "r");
-		if (ca_file == NULL) {
-			fprintf(stderr, "Could not open %s\n", cinfo->ca);
-			exit(1);
-		}
-
-		cas = (void *) fread_file(ca_file, &ca_size);
-		if (cas == NULL) {
-			fprintf(stderr, "Error reading CA list");
-			exit(1);
-		}
-
-		fclose(ca_file);
-	}
-
-	_verify_x509_mem(cert, cert_size, cas, ca_size,
-			 (cinfo->ca != NULL) ? 0 : 1, OPT_ARG(VERIFY_PURPOSE),
+	_verify_x509_mem(cert, cert_size, cinfo, 1,
+			 OPT_ARG(VERIFY_PURPOSE),
 			 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
 	free(cert);
 	free(cas);
