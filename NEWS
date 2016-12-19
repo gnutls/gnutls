@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.6.0 (unreleased)
 
+** certtool: the option '--load-ca-certificate' can now accept PKCS#11
+   URLs in addition to files.
+
 ** API and ABI modifications:
 No changes since last version.
 
