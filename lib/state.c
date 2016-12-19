@@ -1016,6 +1016,8 @@ gnutls_handshake_set_post_client_hello_function(gnutls_session_t session,
  *
  * Note that this function must be called after any call to gnutls_priority
  * functions.
+ *
+ * Since: 2.1.4
  **/
 void gnutls_session_enable_compatibility_mode(gnutls_session_t session)
 {
