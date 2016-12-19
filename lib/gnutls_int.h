@@ -1030,6 +1030,16 @@ typedef struct {
 	unsigned vc_status;
 	unsigned int additional_verify_flags; /* may be set by priorities or the vc functions */
 
+	/* we append the verify flags because these can be set,
+	 * either by this function or by gnutls_session_set_verify_cert().
+	 * However, we ensure that a single profile is set. */
+#define ADD_PROFILE_VFLAGS(session, vflags) do { \
+	if ((session->internals.additional_verify_flags & GNUTLS_VFLAGS_PROFILE_MASK) && \
+	    (vflags & GNUTLS_VFLAGS_PROFILE_MASK)) \
+		session->internals.additional_verify_flags &= ~GNUTLS_VFLAGS_PROFILE_MASK; \
+	session->internals.additional_verify_flags |= vflags; \
+	} while(0)
+
 	/* the SHA256 hash of the peer's certificate */
 	uint8_t cert_hash[32];
 	bool cert_hash_set;
