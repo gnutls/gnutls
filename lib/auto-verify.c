@@ -91,8 +91,9 @@ void gnutls_session_set_verify_cert(gnutls_session_t session,
 		session->internals.vc_elements = 0;
 	}
 
-	if (flags)
-		session->internals.additional_verify_flags |= flags;
+	if (flags) {
+		ADD_PROFILE_VFLAGS(session, flags);
+	}
 
 	gnutls_session_set_verify_function(session, auto_verify_cb);
 }
