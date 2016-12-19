@@ -543,7 +543,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	    session->internals.priorities.compression.algorithms == 0)
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
-	session->internals.additional_verify_flags |= priority->additional_verify_flags;
+	ADD_PROFILE_VFLAGS(session, priority->additional_verify_flags);
 
 	return 0;
 }
