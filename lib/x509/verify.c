@@ -365,20 +365,24 @@ int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
 		hash = gnutls_sign_get_hash_algorithm(sigalg); \
 		entry = mac_to_entry(hash); \
 		if (hash <= 0 || entry == NULL) { \
+			_gnutls_cert_log("cert", crt); \
 			_gnutls_debug_log(#level": certificate's signature hash is unknown\n"); \
 			return gnutls_assert_val(0); \
 		} \
 		if (entry->secure == 0 || entry->output_size*8/2 < sym_bits) { \
+			_gnutls_cert_log("cert", crt); \
 			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", entry->output_size*8/2, sym_bits); \
 			return gnutls_assert_val(0); \
 		} \
 		sp = gnutls_pk_bits_to_sec_param(pkalg, bits); \
 		if (sp < level) { \
+			_gnutls_cert_log("cert", crt); \
 			_gnutls_debug_log(#level": certificate's security level is unacceptable\n"); \
 			return gnutls_assert_val(0); \
 		} \
 		sp = gnutls_pk_bits_to_sec_param(issuer_pkalg, issuer_bits); \
 		if (sp < level) { \
+			_gnutls_cert_log("issuer", issuer); \
 			_gnutls_debug_log(#level": certificate's issuer security level is unacceptable\n"); \
 			return gnutls_assert_val(0); \
 		} \
@@ -396,14 +400,13 @@ static unsigned is_level_acceptable(
 	gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 	gnutls_sign_algorithm_t sigalg, unsigned flags)
 {
-gnutls_certificate_verification_profiles_t profile = GNUTLS_VFLAGS_TO_PROFILE(flags);
-const mac_entry_st *entry;
-int issuer_pkalg, pkalg, ret;
-unsigned bits = 0, issuer_bits = 0, sym_bits = 0;
-gnutls_pk_params_st params;
-gnutls_sec_param_t sp;
-
-int hash;
+	gnutls_certificate_verification_profiles_t profile = GNUTLS_VFLAGS_TO_PROFILE(flags);
+	const mac_entry_st *entry;
+	int issuer_pkalg, pkalg, ret;
+	unsigned bits = 0, issuer_bits = 0, sym_bits = 0;
+	gnutls_pk_params_st params;
+	gnutls_sec_param_t sp;
+	int hash;
 
 	if (profile == 0)
 		return 1;
