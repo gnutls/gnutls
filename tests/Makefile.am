@@ -120,7 +120,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 set_known_dh_params_anon set_known_dh_params_psk session-tickets-ok \
 	 session-tickets-missing set_x509_key_file_legacy status-request-ext \
 	 rng-no-onload dtls1-2-mtu-check crl_apis cert_verify_inv_utf8 \
-	 hostname-check-utf8 pkcs8-key-decode-encrypted
+	 hostname-check-utf8 pkcs8-key-decode-encrypted priority-mix
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
