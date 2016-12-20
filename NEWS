@@ -6,7 +6,8 @@ See the end for copying conditions.
 * Version 3.3.26 (unreleased)
 
 ** libgnutls: Handle status request responses as optional (following
-   RFC6066).
+   RFC6066). This improves compatibility with implementations not sending
+   these messages (including specific versions on the GnuTLS 3.5.x branch).
 
 ** libgnutls: Set limits on the maximum number of alerts handled. That is,
    applications using gnutls could be tricked into an busy loop if the
