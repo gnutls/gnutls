@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.5.8 (unreleased)
 
+** libgnutls: Ensure that multiple calls to the gnutls_set_priority_*
+   functions will not leave the verification profiles field to an
+   undefined state. The last call will take precedence.
+
 ** libgnutls: Ensure that GNUTLS_E_DECRYPTION_FAIL will be returned
    by PKCS#8 decryption functions when an invalid key is provided. This
    addresses regression on decrypting certain PKCS#8 keys.
