@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** libgnutls: Backported several fixes in PKCS#8 decryption (related to
    gitlab issue #148).
 
+** libgnutls: Ensure that multiple calls to the gnutls_set_priority_*
+   functions will not leave the verification profiles field to an
+   undefined state. The last call will take precedence.
+
 ** API and ABI modifications:
 No changes since last version.
 
