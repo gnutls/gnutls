@@ -588,6 +588,12 @@ system_priority_file="/etc/gnutls/default-priorities"
 AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
   ["$system_priority_file"], [The system priority file])
 
+AC_ARG_WITH(default-priority-string, AS_HELP_STRING([--with-default-priority-string],
+                                 [specify the default priority string (e.g. @SYSTEM)]),
+            prio_string="$withval", 
+            prio_string="NORMAL")
+
+AC_DEFINE_UNQUOTED([DEFAULT_PRIORITY_STRING], ["$prio_string"], [The default priority string])
 
 dnl Check for p11-kit
 P11_KIT_MINIMUM=0.23.1

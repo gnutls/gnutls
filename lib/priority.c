@@ -1236,7 +1236,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->min_record_version = 1;
 
 	if (priorities == NULL)
-		priorities = "NORMAL";
+		priorities = DEFAULT_PRIORITY_STRING;
 
 	darg = _gnutls_resolve_priorities(priorities);
 	if (darg == NULL) {
