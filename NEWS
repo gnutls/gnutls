@@ -15,6 +15,11 @@ See the end for copying conditions.
    by PKCS#8 decryption functions when an invalid key is provided. This
    addresses regression on decrypting certain PKCS#8 keys.
 
+** libgnutls: Introduced option to override the default priority string
+   used by the library. The intention is to allow support of system-wide
+   priority strings (as set with --with-system-priority-file). The
+   configure option is --with-default-priority-string.
+
 ** API and ABI modifications:
 No changes since last version.
 
