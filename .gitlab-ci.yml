@@ -120,6 +120,7 @@ Release build for windows32 DLLs:
     mingw32-make -j4 && mingw32-make -C tests check -j4
   tags:
   - shared
+  - docker
   only:
   - tags
   artifacts:
@@ -144,6 +145,7 @@ Release build for windows64 DLLs:
     mingw64-make -j4 && mingw64-make -C tests check -j4
   tags:
   - shared
+  - docker
   only:
   - tags
   artifacts:
@@ -168,6 +170,7 @@ Build and Check for windows64 in separate build dir:
     mingw64-make -j4 && mingw64-make -C tests check -j4
   tags:
   - shared
+  - docker
   except:
   - tags
   artifacts:
@@ -190,6 +193,7 @@ Build and Check for windows32 in separate build dir:
     mingw32-make -j4 && mingw32-make -C tests check -j4
   tags:
   - shared
+  - docker
   except:
   - tags
   artifacts:
