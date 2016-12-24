@@ -244,7 +244,6 @@ static const int _cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
-	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
 
@@ -260,7 +259,6 @@ static const int _cipher_priority_performance_no_aesni[] = {
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
-	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
 
@@ -284,8 +282,6 @@ static const int _cipher_priority_normal_default[] = {
 
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
-
-	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
 
@@ -297,7 +293,6 @@ static const int cipher_priority_performance_fips[] = {
 
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
 
@@ -309,7 +304,6 @@ static const int cipher_priority_normal_fips[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_AES_128_CCM,
-	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
 
