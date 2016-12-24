@@ -10,6 +10,10 @@ See the end for copying conditions.
 ** libgnutls: Refuse gnutls_record_send() and gnutls_record_recv()
    calls prior to handshake being complete. Addresses gitlab issue #158.
 
+** libgnutls: 3DES-CBC is no longer included in the default priorities
+   list. It has to be explicitly enabled, e.g., with a string like
+   "NORMAL:+3DES-CBC".
+
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
