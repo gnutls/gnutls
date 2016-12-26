@@ -41,8 +41,13 @@
 static int
 stream_read(cdk_stream_t s, void *buf, size_t buflen, size_t * r_nread)
 {
-	*r_nread = cdk_stream_read(s, buf, buflen);
-	return *r_nread > 0 ? 0 : _cdk_stream_get_errno(s);
+	int res = cdk_stream_read(s, buf, buflen);
+	if (res > 0) {
+		*r_nread = res;
+		return 0;
+	} else {
+		return (cdk_stream_eof(s) ? EOF : _cdk_stream_get_errno(s));
+	}
 }
 
 
@@ -874,18 +879,22 @@ read_new_length(cdk_stream_t inp,
 
 
 /* Skip the current packet body. */
-static void skip_packet(cdk_stream_t inp, size_t pktlen)
+static cdk_error_t skip_packet(cdk_stream_t inp, size_t pktlen)
 {
 	byte buf[BUFSIZE];
 	size_t nread, buflen = DIM(buf);
 
 	while (pktlen > 0) {
-		stream_read(inp, buf, pktlen > buflen ? buflen : pktlen,
+		cdk_error_t rc;
+		rc = stream_read(inp, buf, pktlen > buflen ? buflen : pktlen,
 			    &nread);
+		if (rc)
+			return rc;
 		pktlen -= nread;
 	}
 
 	assert(pktlen == 0);
+	return 0;
 }
 
 
@@ -1086,7 +1095,9 @@ cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt)
 
 	default:
 		/* Skip all packets we don't understand */
-		skip_packet(inp, pktlen);
+		rc = skip_packet(inp, pktlen);
+		if (rc)
+			return gnutls_assert_val(rc);
 		break;
 	}
 
