@@ -81,6 +81,7 @@ if ENABLE_OPENPGP
 # The selftest is disabled until we can make it work under Wine and
 # under Debian buildds (problem with 127.0.0.2?).
 dist_check_SCRIPTS += openpgp-selfsigs
+dist_check_SCRIPTS += openpgp-cert-parser
 if !WINDOWS
 dist_check_SCRIPTS += openpgp-certs
 endif
