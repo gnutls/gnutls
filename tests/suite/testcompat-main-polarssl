@@ -428,10 +428,16 @@ run_server_suite() {
 	wait
 }
 
+WAITPID=""
 for mod in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
 	run_server_suite $mod &
+	WAITPID="$WAITPID $!"
 done
-wait
+
+for i in "$WAITPID";do
+	wait $i
+	test $? != 0 && exit 1
+done
 
 rm -f "${LOGFILE}"
 
