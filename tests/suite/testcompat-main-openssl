@@ -409,10 +409,16 @@ run_client_suite() {
 	fi
 }
 
+WAITPID=""
 for mod in "" ":%COMPAT" ":%NO_ETM"; do #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
 	run_client_suite $mod &
+	WAITPID="$WAITPID $!"
 done
-wait
+
+for i in "$WAITPID";do
+	wait $i
+	test $? != 0 && exit 1
+done
 
 echo "${PREFIX}Client mode tests were successfully completed"
 echo "${PREFIX}"
@@ -778,9 +784,16 @@ run_server_suite() {
 	kill ${PID}
 	wait
 }
+
+WAITPID=""
 for mod in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"; do
 	run_server_suite $mod &
+	WAITPID="$WAITPID $!"
 done
-wait
+
+for i in "$WAITPID";do
+	wait $i
+	test $? != 0 && exit 1
+done
 
 exit 0
