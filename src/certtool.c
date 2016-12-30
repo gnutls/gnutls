@@ -3649,6 +3649,10 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 		fprintf(out, "\tSchema: unsupported (%s)\n", oid);
 		gnutls_free(oid);
 		return;
+	} else if (ret == GNUTLS_E_INVALID_REQUEST) {
+		fprintf(out, "PKCS #8 information:\n");
+		fprintf(out, "\tSchema: unencrypted key\n");
+		return;
 	}
 
 	if (ret < 0) {
