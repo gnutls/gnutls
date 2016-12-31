@@ -539,7 +539,7 @@ run_server_suite() {
 		PID=$!
 		wait_server ${PID}
 
-		${OPENSSL_CLI} s_client -host localhost -tls1 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		${OPENSSL_CLI} s_client -host localhost -cipher ALL -tls1 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -649,7 +649,7 @@ run_server_suite() {
 			PID=$!
 			wait_server ${PID}
 
-			${OPENSSL_CLI} s_client -host localhost -tls1_2 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+			${OPENSSL_CLI} s_client -host localhost -cipher ALL -tls1_2 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 				fail ${PID} "Failed"
 
 			kill ${PID}
@@ -790,7 +790,7 @@ run_server_suite() {
 	wait_udp_server ${PID}
 
 
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -dtls1 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cipher ALL -dtls1 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
 	kill ${PID}
