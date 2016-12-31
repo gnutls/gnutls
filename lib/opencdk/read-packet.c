@@ -509,8 +509,10 @@ read_attribute(cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t attr,
 	p++;
 	len--;
 
-	if (len >= pktlen)
+	if (len >= pktlen) {
+		cdk_free(buf);
 		return CDK_Inv_Packet;
+	}
 	attr->attrib_img = cdk_calloc(1, len);
 	if (!attr->attrib_img) {
 		cdk_free(buf);
