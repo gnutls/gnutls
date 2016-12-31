@@ -71,6 +71,9 @@ HAVE_SSL3=$?
 ${SERV} ciphers -v ALL 2>&1|grep -e CAMELLIA >/dev/null 2>&1
 NO_CAMELLIA=$?
 
+${SERV} ciphers -v ALL 2>&1|grep -e 3DES >/dev/null 2>&1
+NO_3DES=$?
+
 ${SERV} ciphers -v ALL 2>&1|grep -e DSS >/dev/null 2>&1
 NO_DSS=$?
 
@@ -158,9 +161,11 @@ run_client_suite() {
 	wait_server ${PID}
 
 	# Test TLS 1.0 with RSA ciphersuite
-	echo "${PREFIX}Checking TLS 1.0 with RSA and 3DES-CBC..."
-	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
-		fail ${PID} "Failed"
+	if test "${NO_3DES}" != 1; then
+		echo "${PREFIX}Checking TLS 1.0 with RSA and 3DES-CBC..."
+		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+			fail ${PID} "Failed"
+	fi
 
 	echo "${PREFIX}Checking TLS 1.0 with RSA and AES-128-CBC..."
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
