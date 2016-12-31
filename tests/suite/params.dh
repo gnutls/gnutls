@@ -1,35 +1,11 @@
-
-Generator: 05
-
-Prime: c9:e9:2d:fc:94:15:1a:10:4f:3c:b5:16
-	7e:34:10:7d:eb:3d:d5:7d:61:ff:b0:ce
-	da:7f:6e:0c:ea:db:b4:87:f6:c6:34:a8
-	3c:f8:84:52:14:59:ab:17:5c:d0:f0:86
-	c4:02:93:dc:09:83:57:16:98:21:d0:42
-	8e:33:fc:48:69:e6:04:0d:4e:50:09:33
-	2e:28:60:4f:05:08:7c:ce:2f:a6:1a:4c
-	41:d1:a3:dd:f6:37:56:44:1d:b0:54:af
-	f7:4a:a0:c2:19:5d:ce:62:b0:7a:1b:e1
-	5c:7f:bb:4d:7e:9e:28:48:00:a4:9a:86
-	3e:6e:6e:9c:57:41:c7:ec:bf:7f:09:fc
-	da:25:c2:1e:e0:52:dc:65:8c:40:a3:6e
-	bd:99:4e:0b:1a:04:e0:23:20:46:5a:d0
-	3f:b3:a4:d6:76:73:b7:cc:61:33:11:54
-	a6:32:ff:94:08:d5:66:36:fd:99:69:21
-	cc:28:5d:11:52:32:48:b6:a5:b5:c3:b0
-	21:3f:f9:69:25:83:b1:3d:79:a6:ed:ae
-	db:95:62:fc:72:ca:ad:46:fc:b6:b1:ea
-	98:68:97:ba:f2:54:aa:86:ed:62:b1:78
-	5f:d5:19:80:ce:41:ee:98:a1:71:9f:fa
-	5b:6b:d8:5e:7e:b3:18:0a:f0:4c:96:76
-	6c:0c:b0:a3
-
-
 -----BEGIN DH PARAMETERS-----
-MIIBCAKCAQEAyekt/JQVGhBPPLUWfjQQfes91X1h/7DO2n9uDOrbtIf2xjSoPPiE
-UhRZqxdc0PCGxAKT3AmDVxaYIdBCjjP8SGnmBA1OUAkzLihgTwUIfM4vphpMQdGj
-3fY3VkQdsFSv90qgwhldzmKwehvhXH+7TX6eKEgApJqGPm5unFdBx+y/fwn82iXC
-HuBS3GWMQKNuvZlOCxoE4CMgRlrQP7Ok1nZzt8xhMxFUpjL/lAjVZjb9mWkhzChd
-EVIySLaltcOwIT/5aSWDsT15pu2u25Vi/HLKrUb8trHqmGiXuvJUqobtYrF4X9UZ
-gM5B7pihcZ/6W2vYXn6zGArwTJZ2bAywowIBBQ==
+MIIBjAKCAYEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz
++8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a
+87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7
+YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi
+7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD
+ssbzSibBsu/6iGtCOGEfz9zeNVs7ZRkDW7w09N75nAI4YbRvydbmyQd62R0mkff3
+7lmMsPrBhtkcrv4TCYUTknC0EwyTvEN5RPT9RFLi103TZPLiHnH1S/9croKrnJ32
+nuhtK8UiNjoNq8Uhl5sN6todv5pC1cRITgq80Gv6U93vPBsg7j/VnXwl5B0rZsYu
+N///////////AgECAgIBFA==
 -----END DH PARAMETERS-----
