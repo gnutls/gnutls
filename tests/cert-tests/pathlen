@@ -25,9 +25,15 @@ set -e
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
+
 TMPFILE1=ca-no-pathlen-$$.tmp
 TMPFILE2=no-ca-or-pathlen-$$.tmp
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/ca-no-pathlen.pem" \

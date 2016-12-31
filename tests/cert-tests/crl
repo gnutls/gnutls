@@ -25,9 +25,15 @@ export TZ="UTC"
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
+
 OUTFILE=out-crl.$$.tmp
 INFOFILE=out-crl-info.$$.tmp
 OUTFILE2=out2-crl.$$.tmp

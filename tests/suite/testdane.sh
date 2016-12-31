@@ -22,6 +22,10 @@ srcdir="${srcdir:-.}"
 DANETOOL="${DANETOOL:-../../src/danetool${EXEEXT}}"
 unset RETCODE
 
+if ! test -x "${DANETOOL}"; then
+	exit 77
+fi
+
 # Unfortunately it is extremely fragile and fails 99% of the
 # time.
 if test "${WINDIR}" != ""; then

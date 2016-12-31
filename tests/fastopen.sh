@@ -21,9 +21,17 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}} -q"
+SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
 CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
 unset RETCODE
+
+if ! test -x "${SERV}"; then
+	exit 77
+fi
+
+if ! test -x "${CLI}"; then
+	exit 77
+fi
 
 if test "${WINDIR}" != ""; then
 	exit 77
@@ -33,6 +41,8 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 
+
+SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 

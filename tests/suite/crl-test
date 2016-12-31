@@ -23,9 +23,15 @@
 srcdir="${srcdir:-.}"
 DIFF="${DIFF:-diff}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
+
 TMPFILE=long.$$.pem.tmp
 
 rm -f $TMPFILE

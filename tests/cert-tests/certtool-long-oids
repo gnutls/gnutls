@@ -28,6 +28,10 @@ DIFF="${DIFF:-diff -b -B}"
 OUTFILE="out.$$.pem"
 TMPFILE1="out1.$$.pem"
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
 fi

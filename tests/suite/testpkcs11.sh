@@ -22,9 +22,25 @@ srcdir="${srcdir:-.}"
 P11TOOL="${P11TOOL:-../../src/p11tool${EXEEXT}}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
-SERV="${SERV:-../../src/gnutls-serv${EXEEXT}} -q"
+SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
 CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
 RETCODE=0
+
+if ! test -x "${P11TOOL}"; then
+	exit 77
+fi
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
+if ! test -x "${SERV}"; then
+	exit 77
+fi
+
+if ! test -x "${CLI}"; then
+	exit 77
+fi
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute valgrind --leak-check=full"
@@ -38,6 +54,7 @@ if test "${WINDIR}" != ""; then
 fi 
 
 P11TOOL="${VALGRIND} ${P11TOOL} --batch"
+SERV="${SERV} -q"
 
 . ${srcdir}/../scripts/common.sh
 

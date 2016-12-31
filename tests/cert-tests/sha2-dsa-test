@@ -31,6 +31,10 @@ TMPFILE=sha2-dsa.$$.tmp
 USERFILE=user-dsa.$$.tmp
 VERIFYFILE=verify-dsa.$$.tmp
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 echo ca > $TEMPLFILE
 echo "cn = SHA 256 CA" >> $TEMPLFILE
 
