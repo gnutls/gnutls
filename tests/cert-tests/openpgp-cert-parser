@@ -38,4 +38,8 @@ echo "Checking OpenPGP certificate parsing"
 	| grep "^import error: Error in parsing" > /dev/null) || \
 	fail "Parsing should have errored"
 
+("${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/attribute-leak-1.pub" 2>&1 \
+	| grep "^import error:" > /dev/null) || \
+	fail "Parsing should have errored"
+
 exit ${RETCODE:-0}
