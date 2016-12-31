@@ -97,7 +97,7 @@ run_server_suite() {
 	#TLS 1.0
 
 	echo "${PREFIX}Check TLS 1.0 with DHE-RSA ciphersuite"
-	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
+	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -108,7 +108,7 @@ run_server_suite() {
 	wait
 
 	#echo "${PREFIX}Check TLS 1.0 with DHE-DSS ciphersuite"
-	#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
+	#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${DH_PARAMS}"
 	#PID=$!
 	#wait_server ${PID}
 
@@ -239,7 +239,7 @@ run_server_suite() {
 
 	eval "${GETPORT}"
 	echo "${PREFIX}Check TLS 1.2 with DHE-RSA ciphersuite"
-	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
+	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -251,7 +251,7 @@ run_server_suite() {
 
 	eval "${GETPORT}"
 	echo "${PREFIX}Check TLS 1.2 with CAMELLIA-128-GCM-DHE-RSA ciphersuite"
-	launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-128-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
+	launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-128-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -263,7 +263,7 @@ run_server_suite() {
 
 	eval "${GETPORT}"
 	echo "${PREFIX}Check TLS 1.2 with CAMELLIA-256-GCM-DHE-RSA ciphersuite"
-	launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
+	launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -275,7 +275,7 @@ run_server_suite() {
 
 	eval "${GETPORT}"
 	echo "${PREFIX}Check TLS 1.2 with AES-128-CCM-DHE-RSA ciphersuite"
-	launch_server $$  --priority "NONE:-CIPHER-ALL:+AES-128-CCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
+	launch_server $$  --priority "NONE:-CIPHER-ALL:+AES-128-CCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -287,7 +287,7 @@ run_server_suite() {
 
 	eval "${GETPORT}"
 	echo "${PREFIX}Check TLS 1.2 with AES-128-CCM-8-DHE-RSA ciphersuite"
-	launch_server $$  --priority "NONE:-CIPHER-ALL:+AES-128-CCM-8:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${srcdir}/params.dh"
+	launch_server $$  --priority "NONE:-CIPHER-ALL:+AES-128-CCM-8:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -298,7 +298,7 @@ run_server_suite() {
 	wait
 
 	#echo "${PREFIX}Check TLS 1.2 with DHE-DSS ciphersuite"
-	#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${srcdir}/params.dh"
+	#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${DH_PARAMS}"
 	#PID=$!
 	#wait_server ${PID}
 	#
