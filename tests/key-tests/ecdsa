@@ -34,6 +34,10 @@ TMPTEMPL=template.$$.tmp
 TMPUSER=user.$$.tmp
 VERIFYOUT=verify.$$.tmp
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 echo ca > $TMPTEMPL
 echo "cn = ECDSA SHA 256 CA" >> $TMPTEMPL
 

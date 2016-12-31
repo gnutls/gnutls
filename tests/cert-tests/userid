@@ -23,6 +23,10 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/userid.pem" >out 2>&1
 RET=$?
 if [ ${RET} !=  0 ]; then

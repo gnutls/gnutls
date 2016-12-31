@@ -21,12 +21,17 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv} -q"
+SERV="${SERV:-../../src/gnutls-serv}"
 CLI="${CLI:-../../src/gnutls-cli}"
 DEBUG=""
 unset RETCODE
 
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
@@ -34,6 +39,8 @@ fi
 if test "${WINDIR}" != ""; then
 	exit 77
 fi 
+
+SERV="${SERV} -q"
 
 . "${srcdir}/../scripts/common.sh"
 

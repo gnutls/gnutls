@@ -28,6 +28,10 @@ if ! test -z "${VALGRIND}"; then
 fi
 OUTFILE=out-pkcs7.$$.tmp
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 . ${srcdir}/../scripts/common.sh
 
 check_for_datefudge
