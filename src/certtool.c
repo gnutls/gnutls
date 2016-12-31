@@ -1053,7 +1053,7 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(OUTFILE)) {
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), privkey_op);
 		if (outfile == NULL) {
-			fprintf(stderr, "%s", OPT_ARG(OUTFILE));
+			fprintf(stderr, "Cannot open %s for writing\n", OPT_ARG(OUTFILE));
 			exit(1);
 		}
 	} else
@@ -1067,7 +1067,7 @@ static void cmd_parser(int argc, char **argv)
 
 		infile = fopen(OPT_ARG(INFILE), "rb");
 		if (infile == NULL) {
-			fprintf(stderr, "%s", OPT_ARG(INFILE));
+			fprintf(stderr, "Cannot open %s for reading\n", OPT_ARG(INFILE));
 			exit(1);
 		}
 	} else
