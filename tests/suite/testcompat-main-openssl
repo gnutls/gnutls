@@ -89,7 +89,7 @@ run_client_suite() {
 		PREFIX="$(echo $ADD|sed 's/://g'): "
 	fi
 
-	if test "${HAVE_SSL3}" != 1 && test "{ENABLE_SSL3}" = 1; then
+	if test "${HAVE_SSL3}" != 1 && test "${ENABLE_SSL3}" = 1; then
 		# It seems debian disabled SSL 3.0 completely on openssl
 
 		eval "${GETPORT}"
@@ -436,7 +436,7 @@ run_server_suite() {
 		PREFIX="$(echo $ADD|sed 's/://g'): "
 	fi
 
-	if test "${HAVE_SSL3}" != 1 && test "{ENABLE_SSL3}" = 1; then
+	if test "${HAVE_SSL3}" != 1 && test "${ENABLE_SSL3}" = 1; then
 
 		echo "${PREFIX}Check SSL 3.0 with RSA ciphersuite"
 		eval "${GETPORT}"
