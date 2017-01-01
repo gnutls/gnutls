@@ -596,8 +596,10 @@ read_subpkt(cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
 	node->size--;
 	rc = stream_read(inp, node->d, node->size, &nread);
 	n += nread;
-	if (rc)
+	if (rc) {
+		cdk_subpkt_free(node);
 		return rc;
+	}
 	*r_nbytes = n;
 	if (!*r_ctx)
 		*r_ctx = node;
