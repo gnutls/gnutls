@@ -233,6 +233,9 @@ static void wrap_nettle_mpi_clear(bigint_t a)
 
 static int wrap_nettle_mpi_modm(bigint_t r, const bigint_t a, const bigint_t b)
 {
+	if (mpz_cmp_ui(TOMPZ(b), 0) == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	mpz_mod(TOMPZ(r), TOMPZ(a), TOMPZ(b));
 	
 	return 0;
