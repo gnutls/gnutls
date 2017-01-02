@@ -526,17 +526,19 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 			memcpy(salt, kdf.salt, kdf.salt_size);
 		} else {
 			*salt_size = kdf.salt_size;
-			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+			ret = gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+			goto cleanup;
 		}
 	}
 
 	if (salt_size)
 		*salt_size = kdf.salt_size;
 
-
 	return 0;
 
-      cleanup:
+ cleanup:
+	if (oid)
+		gnutls_free(*oid);
 	if (need_free)
 		_gnutls_free_datum(&_data);
 	return ret;
