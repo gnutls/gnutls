@@ -161,14 +161,8 @@ The Travis based CI, is used to test compilation on MacOSX based systems.
 
 # Contributing
 
-If you wish to contribute, you may read more about our [coding style](CONTRIBUTING.md).
-Note that when contributing code that is not assigned to FSF, you will
-need to assert that the contribution is in accordance to the "Developer's
-Certificate of Origin" as found in the file [DCO.txt](doc/DCO.txt).
-That can be done by sending a mail with your real name to the gnutls-devel
-mailing list. Then just make sure that your contributions (patches),
-contain a "Signed-off-by" line, with your name and e-mail address. 
-To automate the process use "git am -s" to produce patches.
+See [the contributing document](CONTRIBUTING.md).
+
 
 Happy hacking!
 

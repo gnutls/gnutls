@@ -11,10 +11,18 @@ try to follow them too.
 
 # Git commits:
 
-  The original author of the changes should be the author of the commit.
-The "Signed-off-by" git flag is used to by committers to indicate they
-agreed with project's DCO as described in [DCO.txt](doc/DCO.txt). Note 
-that we no longer require FSF copyright assignment.
+Note that when contributing code you will need to assert that the contribution is
+in accordance to the "Developer's Certificate of Origin" as found in the 
+file [DCO.txt](doc/DCO.txt).
+
+To indicate that, make sure that your contributions (patches or merge requests),
+contain a "Signed-off-by" line, with your real name and e-mail address. 
+To automate the process use "git am -s" to produce patches and/or set the
+a template to simplify this process, as follows.
+
+```
+git config commit.template devel/git-template
+```
 
 # Test suite:
 
