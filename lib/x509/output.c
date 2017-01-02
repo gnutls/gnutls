@@ -691,7 +691,7 @@ print_altname(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *der)
 	if (err < 0) {
 		addf(str, "error: gnutls_x509_ext_import_subject_alt_names: %s\n",
 		     gnutls_strerror(err));
-		return;
+		goto cleanup;
 	}
 
 	for (altname_idx = 0;; altname_idx++) {
@@ -735,6 +735,8 @@ print_altname(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *der)
 			print_name(str, pfx, type, &san, 0);
 		}
 	}
+
+ cleanup:
 	gnutls_subject_alt_names_deinit(names);
 }
 
