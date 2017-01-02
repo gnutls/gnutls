@@ -106,6 +106,9 @@ static int cryptodev_setiv(void *_ctx, const void *iv, size_t iv_size)
 {
 	struct cryptodev_ctx *ctx = _ctx;
 
+	if (iv_size > EALG_MAX_BLOCK_LEN)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	memcpy(ctx->iv, iv, iv_size);
 
 	return 0;

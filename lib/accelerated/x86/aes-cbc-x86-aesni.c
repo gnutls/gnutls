@@ -84,6 +84,9 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 {
 	struct aes_ctx *ctx = _ctx;
 
+	if (iv_size != 16)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	memcpy(ctx->iv, iv, 16);
 	return 0;
 }
