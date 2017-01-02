@@ -3653,12 +3653,11 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 	if (ret == GNUTLS_E_UNKNOWN_CIPHER_TYPE) {
 		fprintf(out, "PKCS #8 information:\n");
 		fprintf(out, "\tSchema: unsupported (%s)\n", oid);
-		gnutls_free(oid);
-		return;
+		goto cleanup;
 	} else if (ret == GNUTLS_E_INVALID_REQUEST) {
 		fprintf(out, "PKCS #8 information:\n");
 		fprintf(out, "\tSchema: unencrypted key\n");
-		return;
+		goto cleanup;
 	}
 
 	if (ret < 0) {
@@ -3668,15 +3667,15 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 			gnutls_strerror(ret));
 		exit(1);
 	}
-	gnutls_free(oid);
 
 	fprintf(out, "%sPKCS #8 information:\n", tab);
 	fprintf(out, "%s\tCipher: %s\n", tab, gnutls_cipher_get_name(cipher));
 
 	str = gnutls_pkcs_schema_get_name(schema);
 	if (str != NULL) {
-		fprintf(out, "%s\tSchema: %s (%s)\n", tab, str, gnutls_pkcs_schema_get_oid(schema));
+		fprintf(out, "%s\tSchema: %s (%s)\n", tab, str,  gnutls_pkcs_schema_get_oid(schema));
 	}
+
 
 	bin.data = salt;
 	bin.size = salt_size;
@@ -3690,6 +3689,9 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 	fprintf(out, "%s\tSalt: %s\n", tab, hex);
 	fprintf(out, "%s\tSalt size: %u\n", tab, salt_size);
 	fprintf(out, "%s\tIteration count: %u\n\n", tab, iter_count);
+
+ cleanup:
+	gnutls_free(oid);
 }
 
 void pkcs8_info(void)
