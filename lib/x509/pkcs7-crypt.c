@@ -1091,10 +1091,19 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	ce = cipher_to_entry(enc_params->cipher);
 	block_size = _gnutls_cipher_get_block_size(ce);
 
-	if (ce->type == CIPHER_BLOCK && (enc.size % block_size != 0)) {
-		gnutls_assert();
-		ret = GNUTLS_E_DECRYPTION_FAILED;
-		goto error;
+	if (ce->type == CIPHER_BLOCK) {
+		if (enc.size % block_size != 0 || (unsigned)enc_params->iv_size != block_size) {
+			gnutls_assert();
+			ret = GNUTLS_E_DECRYPTION_FAILED;
+			goto error;
+		}
+	} else {
+		unsigned iv_size = _gnutls_cipher_get_iv_size(ce);
+		if (iv_size > (unsigned)enc_params->iv_size) {
+			gnutls_assert();
+			ret = GNUTLS_E_DECRYPTION_FAILED;
+			goto error;
+		}
 	}
 
 	/* do the decryption.
