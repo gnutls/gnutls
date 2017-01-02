@@ -124,7 +124,9 @@ void _gnutls_rnd_deinit(void)
  * @len: The requested size
  *
  * This function will generate random data and store it to output
- * buffer.
+ * buffer. The value of @level should be one of %GNUTLS_RND_NONCE,
+ * %GNUTLS_RND_RANDOM and %GNUTLS_RND_KEY. See the manual and
+ * %gnutls_rnd_level_t for detailed information.
  *
  * This function is thread-safe and also fork-safe.
  *
