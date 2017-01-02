@@ -113,7 +113,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	VALGRIND="$(VALGRIND)"			\
 	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
-	ASAN_OPTIONS="detect_leaks=0"		\
+	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	srcdir="$(srcdir)"
 
 if ENABLE_FIPS140
