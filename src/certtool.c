@@ -1903,7 +1903,10 @@ void privkey_info(common_info_st * cinfo)
 	if (ret == GNUTLS_E_DECRYPTION_FAILED) {
 		fprintf(stderr, "Encrypted structure detected...\n");
 
-		pkcs8_info_int(&pem, incert_format, 1, outfile, "");
+		if (outcert_format == GNUTLS_X509_FMT_DER)
+			pkcs8_info_int(&pem, incert_format, 1, stderr, "");
+		else
+			pkcs8_info_int(&pem, incert_format, 1, outfile, "");
 
 		pass = get_password(cinfo, &flags, 0);
 
@@ -3378,7 +3381,10 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 		}
 
 		if (type == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY) {
-			pkcs8_info_int(&cdata, GNUTLS_X509_FMT_DER, 1, outfile, "\t");
+			if (outcert_format == GNUTLS_X509_FMT_DER)
+				pkcs8_info_int(&cdata, GNUTLS_X509_FMT_DER, 1, stderr, "\t");
+			else
+				pkcs8_info_int(&cdata, GNUTLS_X509_FMT_DER, 1, outfile, "\t");
 		}
 
 		name = NULL;
