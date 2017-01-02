@@ -29,6 +29,10 @@ See the end for copying conditions.
 ** libgnutls: Backported several fixes in PKCS#8 decryption (related to
    gitlab issue #148).
 
+** libgnutls: Fix double free in certificate information printing. If the PKIX
+   extension proxy was set with a policy language set but no policy specified,
+   that could lead to a double free.
+
 ** tpmtool: backported the --test-sign option.
 
 ** API and ABI modifications:
