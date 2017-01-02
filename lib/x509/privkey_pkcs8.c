@@ -455,7 +455,7 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
  * structures whether supported or not. It must be deinitialized using gnutls_free().
  * The other variables are only set on supported structures.
  *
- * Returns: %GNUTLS_E_INVALID_REQUEST if the provided structure isn't encrypted,
+ * Returns: %GNUTLS_E_INVALID_REQUEST if the provided structure isn't an encrypted key,
  *  %GNUTLS_E_UNKNOWN_CIPHER_TYPE if the structure's encryption isn't supported, or
  *  another negative error code in case of a failure. Zero on success.
  **/
@@ -730,6 +730,33 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 	return result;
 }
 
+static int check_for_decrypted(const gnutls_datum_t *der)
+{
+	int result;
+	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+				 "PKIX1.pkcs-8-PrivateKeyInfo",
+				 &pkcs8_asn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _asn1_strict_der_decode(&pkcs8_asn, der->data, der->size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	result = 0;
+ error:
+	asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
+	return result;
+
+}
+
 static
 int pkcs8_key_info(const gnutls_datum_t * raw_key,
 		   const struct pkcs_cipher_schema_st **p,
@@ -742,6 +769,10 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 	struct pbe_enc_params enc_params;
 	schema_id schema;
 	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+
+	result = check_for_decrypted(raw_key);
+	if (result == 0)
+		return GNUTLS_E_INVALID_REQUEST;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -758,7 +789,6 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
-		CHECK_ERR_FOR_ENCRYPTED(result);
 		goto error;
 	}
 
