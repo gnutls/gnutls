@@ -29,11 +29,11 @@ EXTRA_DIST = data/key-ca.pem data/key-user.pem \
 	data/cert.dsa.1024.pem data/cert.dsa.2048.pem data/cert.dsa.3072.pem \
 	data/dsa.1024.pem data/dsa.2048.pem data/dsa.3072.pem data/dsa-pubkey-1018.pem \
 	data/bad-key.pem data/p8key-illegal.pem data/key-illegal.pem data/pkcs8-pbes2-sha256.pem \
-	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der
+	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der
 
 dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa ecdsa illegal-rsa pkcs8-invalid
 
-TESTS = key-id pkcs8 pkcs8-decode ecdsa pkcs8-invalid
+TESTS = key-id pkcs8 pkcs8-decode ecdsa pkcs8-invalid key-invalid
 
 if !WITH_OLD_NETTLE
 TESTS += illegal-rsa
@@ -44,6 +44,7 @@ TESTS += dsa
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	ASAN_OPTIONS="exitcode=6"				\
 	LC_ALL="C"						\
 	VALGRIND="$(VALGRIND)"					\
 	top_builddir="$(top_builddir)"				\
