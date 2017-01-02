@@ -20,6 +20,16 @@ See the end for copying conditions.
    priority strings (as set with --with-system-priority-file). The
    configure option is --with-default-priority-string.
 
+** libgnutls: Require a valid IV size on all ciphers for PKCS#8 decryption.
+   This prevents crashes when decrypting malformed PKCS#8 keys.
+
+** libgnutls: Fix crash on the loading of malformed private keys with certain
+   parameters set to zero.
+
+** libgnutls: Fix double free in certificate information printing. If the PKIX
+   extension proxy was set with a policy language set but no policy specified,
+   that could lead to a double free.
+
 ** API and ABI modifications:
 No changes since last version.
 
