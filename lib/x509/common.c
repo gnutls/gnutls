@@ -1305,7 +1305,8 @@ _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
 
 	return 0;
 
-      cleanup:
+ cleanup:
+	gnutls_free(signature->data);
 	return result;
 }
 
