@@ -28,7 +28,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --password 1234 --infile "${srcdir}/data/p8key-illegal.pem" 2>/dev/null
+${VALGRIND} "${CERTTOOL}" -k --password 1234 --infile "${srcdir}/data/p8key-illegal.pem"
 rc=$?
 # We're done.
 if test "${rc}" != "1"; then
@@ -37,7 +37,7 @@ if test "${rc}" != "1"; then
 fi
 
 #check invalid RSA pem key. The key has even prime factor.
-${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/data/key-illegal.pem" 2>/dev/null
+${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/data/key-illegal.pem"
 rc=$?
 # We're done.
 if test "${rc}" != "1"; then
