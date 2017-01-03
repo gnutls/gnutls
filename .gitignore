@@ -4,6 +4,7 @@
 *.lo
 *.log
 *.o
+*.out
 *.plist
 *.swp
 *.tmp
@@ -221,6 +222,7 @@ gl/getopt.h
 gl/glthread/.dirstamp
 gl/iconv.h
 gl/libgnu.la
+gl/limits.h
 gl/math.h
 gl/netdb.h
 gl/signal.h
@@ -311,6 +313,7 @@ gl/tests/test-ioctl
 gl/tests/test-isnand-nolibm
 gl/tests/test-isnanf-nolibm
 gl/tests/test-isnanl-nolibm
+gl/tests/test-limits-h
 gl/tests/test-listen
 gl/tests/test-locale
 gl/tests/test-localename
@@ -444,6 +447,7 @@ lib/openpgp/pgp-api.texi
 lib/priority_options.h
 lib/unistring/libunistring.la
 lib/unistring/limits.h
+lib/unistring/stdint.h
 lib/unistring/sys/
 lib/unistring/unictype.h
 lib/unistring/unictype/categ_byname.h
@@ -550,11 +554,13 @@ src/gl/arpa/
 src/gl/c++defs.h
 src/gl/libgnu_gpl.a
 src/gl/libgnu_gpl.la
+src/gl/limits.h
 src/gl/netdb.h
 src/gl/netinet/
 src/gl/parse-datetime.c
 src/gl/signal.h
 src/gl/stddef.h
+src/gl/stdint.h
 src/gl/stdio.h
 src/gl/stdlib.h
 src/gl/string.h
@@ -611,7 +617,9 @@ tests/anonself
 tests/atfork
 tests/auto-verify
 tests/base64
+tests/cert
 tests/cert-key-exchange
+tests/cert_verify_inv_utf8
 tests/certder
 tests/certificate_set_x509_crl
 tests/certuniqueid
@@ -622,6 +630,7 @@ tests/client-fastopen
 tests/client_dsa_key
 tests/conv-utf8
 tests/crl-basic
+tests/crl_apis
 tests/crlverify
 tests/crq-basic
 tests/crq_apis
@@ -664,6 +673,7 @@ tests/handshake-large-packet
 tests/handshake-versions
 tests/hex
 tests/hostname-check
+tests/hostname-check-utf8
 tests/infoaccess
 tests/init_fds
 tests/init_roundtrip
@@ -676,6 +686,8 @@ tests/key-material-dtls
 tests/key-material-set-dtls
 tests/key-openssl
 tests/key-usage
+tests/key-usage-ecdhe-rsa
+tests/key-usage-rsa
 tests/keygen
 tests/keylog-env
 tests/libpkcs11mock1.la
@@ -799,8 +811,10 @@ tests/pkcs7-gen
 tests/pkcs8-decode/Makefile
 tests/pkcs8-decode/Makefile.in
 tests/pkcs8-key-decode
+tests/pkcs8-key-decode-encrypted
 tests/prf
 tests/priorities
+tests/priority-mix
 tests/psk-file
 tests/pskself
 tests/record-sizes
@@ -946,6 +960,6 @@ tests/x509self
 tests/x509sign-verify
 tests/x509sign-verify2
 tests/x509signself
-tmp-compare-makefile
+tmp-*
 win32
 win64
