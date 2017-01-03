@@ -689,18 +689,23 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 	data_size = buf.length;
 
 	/* minimum message is type (1) + response (3) + data */
-	if (data_size == 0)
-		return 0;
-	else if (data_size < 4)
-		return
+	if (data_size == 0) {
+		ret = 0;
+		goto error;
+	} else if (data_size < 4) {
+		ret =
 		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		goto error;
+	}
 
 	if (data[0] != 0x01) {
 		gnutls_assert();
 		_gnutls_handshake_log("EXT[%p]: unknown status_type %d\n",
 				      session, data[0]);
-		return 0;
+		ret = 0;
+		goto error;
 	}
+
 	DECR_LENGTH_COM(data_size, 1, ret =
 			GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 			goto error);
