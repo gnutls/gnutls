@@ -26,7 +26,10 @@
 #include <gnutls/gnutls.h>
 
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+#ifdef __cplusplus
+extern "C"
+#endif
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     int res;
     gnutls_session_t session;
     gnutls_certificate_credentials_t xcred;
