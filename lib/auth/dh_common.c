@@ -262,8 +262,11 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 
 	if (_gnutls_mpi_init_scan_nz(&session->key.dh_params.params[DH_P], data_p, _n_p) != 0) {
 		gnutls_assert();
+		/* we release now because session->key.dh_params.params_nr is not yet set */
+		_gnutls_mpi_release(&session->key.dh_params.params[DH_G]);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+
 	session->key.dh_params.params_nr = 3; /* include empty q */
 	session->key.dh_params.algo = GNUTLS_PK_DH;
 
