@@ -1706,8 +1706,9 @@ void gnutls_x509_policies_deinit(gnutls_x509_policies_t policies)
 {
 	unsigned i;
 
-	for (i = 0; i < policies->size; i++)
+	for (i = 0; i < policies->size; i++) {
 		gnutls_x509_policy_release(&policies->policy[i]);
+	}
 	gnutls_free(policies);
 }
 
@@ -1846,7 +1847,7 @@ int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 		/* create a string like "?1"
 		 */
 		snprintf(tmpstr, sizeof(tmpstr), "?%u.policyIdentifier", j + 1);
-		current = j;
+		current = j+1;
 
 		ret = _gnutls_x509_read_value(c2, tmpstr, &tmpd);
 		if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
@@ -1876,7 +1877,7 @@ int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 			if (ret != ASN1_SUCCESS) {
 				gnutls_assert();
 				ret = _gnutls_asn2err(ret);
-				goto cleanup;
+				goto full_cleanup;
 			}
 
 			if (strcmp(tmpoid, "1.3.6.1.5.5.7.2.1") == 0) {
