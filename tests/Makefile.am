@@ -36,7 +36,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
-	certs-interesting/cert6.der certs-interesting/cert7.der \
+	certs-interesting/cert6.der certs-interesting/cert7.der certs-interesting/cert8.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der pkcs7-interesting/pkcs7-1.der \
 	pkcs7-interesting/pkcs7-1.der.err pkcs7-interesting/pkcs7-2.der pkcs7-interesting/pkcs7-2.der.err \
 	client-interesting/client1.raw client-interesting/client2.raw client-interesting/client3.disabled
