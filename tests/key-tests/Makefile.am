@@ -44,7 +44,7 @@ TESTS += dsa
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
-	ASAN_OPTIONS="exitcode=6"				\
+	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	LC_ALL="C"						\
 	VALGRIND="$(VALGRIND)"					\
 	top_builddir="$(top_builddir)"				\
