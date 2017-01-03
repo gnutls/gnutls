@@ -349,7 +349,7 @@ static void print_aia(gnutls_buffer_st * str, const gnutls_datum_t *der)
 	if (err < 0) {
 		addf(str, "error: get_aia: %s\n",
 		     gnutls_strerror(err));
-		return;
+		goto cleanup;
 	}
 
 	for (seq=0;;seq++) {
@@ -374,7 +374,6 @@ static void print_aia(gnutls_buffer_st * str, const gnutls_datum_t *der)
 		print_name(str, "", san_type, &san, 0);
 	}
 
-	return;
 cleanup:
 	gnutls_x509_aia_deinit(aia);
 }
