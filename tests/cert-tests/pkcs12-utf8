@@ -25,8 +25,7 @@
 # line. This seems not to work under windows.
 
 srcdir="${srcdir:-.}"
-top_builddir="${top_builddir:-../..}"
-CERTTOOL="${CERTTOOL:-${top_builddir}/src/certtool${EXEEXT}}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
