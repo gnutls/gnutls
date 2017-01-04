@@ -33,6 +33,9 @@ See the end for copying conditions.
    extension proxy was set with a policy language set but no policy specified,
    that could lead to a double free.
 
+** libgnutls: Addressed memory leak in server side error path
+   (issue found using oss-fuzz project)
+
 ** tpmtool: backported the --test-sign option.
 
 ** API and ABI modifications:
