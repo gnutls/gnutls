@@ -30,6 +30,12 @@ See the end for copying conditions.
    extension proxy was set with a policy language set but no policy specified,
    that could lead to a double free.
 
+** libgnutls: Addressed memory leaks in client and server side error paths
+   (issues found using oss-fuzz project)
+
+** libgnutls: Addressed memory leaks in X.509 certificate printing error paths
+   (issues found using oss-fuzz project)
+
 ** API and ABI modifications:
 No changes since last version.
 
