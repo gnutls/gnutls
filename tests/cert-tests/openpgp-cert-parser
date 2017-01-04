@@ -64,4 +64,10 @@ if test $rc != 1;then
 	fail "Parsing should have errored"
 fi
 
+${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/openpgp-invalid2.pub" 2>&1
+rc=$?
+if test $rc != 1;then
+	fail "Parsing should have errored"
+fi
+
 exit ${RETCODE:-0}
