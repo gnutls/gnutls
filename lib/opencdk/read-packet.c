@@ -42,6 +42,7 @@ static int
 stream_read(cdk_stream_t s, void *buf, size_t buflen, size_t * r_nread)
 {
 	int res = cdk_stream_read(s, buf, buflen);
+
 	if (res > 0) {
 		*r_nread = res;
 		return 0;
@@ -55,13 +56,13 @@ stream_read(cdk_stream_t s, void *buf, size_t buflen, size_t * r_nread)
 static u32 read_32(cdk_stream_t s)
 {
 	byte buf[4];
-	size_t nread;
+	size_t nread = 0;
 
 	assert(s != NULL);
 
 	stream_read(s, buf, 4, &nread);
 	if (nread != 4)
-		return (u32) - 1;
+		return (u32) -1;
 	return buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
 }
 
@@ -70,7 +71,7 @@ static u32 read_32(cdk_stream_t s)
 static u16 read_16(cdk_stream_t s)
 {
 	byte buf[2];
-	size_t nread;
+	size_t nread = 0;
 
 	assert(s != NULL);
 
@@ -572,7 +573,7 @@ read_user_id(cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t user_id)
 static cdk_error_t
 read_subpkt(cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
 {
-	byte c, c1;
+	int c, c1;
 	size_t size, nread, n;
 	cdk_subpkt_t node;
 	cdk_error_t rc;
@@ -587,11 +588,18 @@ read_subpkt(cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
 	*r_nbytes = 0;
 	c = cdk_stream_getc(inp);
 	n++;
+
 	if (c == 255) {
 		size = read_32(inp);
+		if (size == (u32)-1)
+			return CDK_Inv_Packet;
+
 		n += 4;
 	} else if (c >= 192 && c < 255) {
 		c1 = cdk_stream_getc(inp);
+		if (c1 == EOF)
+			return CDK_Inv_Packet;
+
 		n++;
 		if (c1 == 0)
 			return 0;
@@ -858,17 +866,29 @@ static void
 read_old_length(cdk_stream_t inp, int ctb, size_t * r_len, size_t * r_size)
 {
 	int llen = ctb & 0x03;
+	int c;
 
 	if (llen == 0) {
-		*r_len = cdk_stream_getc(inp);
+		c = cdk_stream_getc(inp);
+		if (c == EOF)
+			goto fail;
+
+		*r_len = c;
 		(*r_size)++;
 	} else if (llen == 1) {
 		*r_len = read_16(inp);
+		if (*r_len == (u16)-1)
+			goto fail;
 		(*r_size) += 2;
 	} else if (llen == 2) {
 		*r_len = read_32(inp);
+		if (*r_len == (u32)-1) {
+			goto fail;
+		}
+
 		(*r_size) += 4;
 	} else {
+ fail:
 		*r_len = 0;
 		*r_size = 0;
 	}
@@ -883,15 +903,25 @@ read_new_length(cdk_stream_t inp,
 	int c, c1;
 
 	c = cdk_stream_getc(inp);
+	if (c == EOF)
+		return;
+
 	(*r_size)++;
 	if (c < 192)
 		*r_len = c;
 	else if (c >= 192 && c <= 223) {
 		c1 = cdk_stream_getc(inp);
+		if (c1 == EOF)
+			return;
+
 		(*r_size)++;
 		*r_len = ((c - 192) << 8) + c1 + 192;
 	} else if (c == 255) {
 		*r_len = read_32(inp);
+		if (*r_len == (u32)-1) {
+			return;
+		}
+
 		(*r_size) += 4;
 	} else {
 		*r_len = 1 << (c & 0x1f);
