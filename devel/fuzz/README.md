@@ -37,6 +37,7 @@ sufficient:
 
 |---------------------------|-------------------------|
 |gnutls_client_fuzzer       | tests/client-interesting|
+|gnutls_server_fuzzer       | tests/server-interesting|
 |gnutls_pkcs7_parser_fuzzer | tests/pkcs7-interesting |
 |gnutls_x509_parser_fuzzer  | tests/certs-interesting |
 |---------------------------|-------------------------|
@@ -49,5 +50,4 @@ table below.
 |gnutls_openpgp_cert_parser_fuzzer|tests/cert-tests/openpgp-cert-parser                      |
 |gnutls_pkcs8_key_parser_fuzzer   |tests/key-tests/pkcs8-invalid,tests/key-tests/pkcs8-decode|
 |gnutls_private_key_parser_fuzzer |tests/key-tests/key-invalid                               |
-|gnutls_server_fuzzer             |none atm (should duplicate the client fuzzer)             |
 |---------------------------------|----------------------------------------------------------|

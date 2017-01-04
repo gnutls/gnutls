@@ -194,7 +194,11 @@ static const uint8_t kRSAPrivateKeyDER[] = {
     0x98, 0x46, 0x89, 0x82, 0x40,
 };
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+#ifdef __cplusplus
+extern "C"
+#endif
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     int res;
     gnutls_datum_t cert, key;
     gnutls_session_t session;
