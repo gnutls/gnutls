@@ -40,40 +40,13 @@ fail() {
 
 echo "Checking OpenPGP certificate parsing"
 
-${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/truncated.pub" 2>&1
-rc=$?
-if test $rc != 1;then
-	fail "Parsing should have errored"
-fi
-
-${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/attribute-leak-1.pub" 2>&1
-rc=$?
-if test $rc != 1;then
-	fail "Parsing should have errored"
-fi
-
-${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/subpkt-leak.pub" 2>&1
-rc=$?
-if test $rc != 1;then
-	fail "Parsing should have errored"
-fi
-
-${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/openpgp-invalid1.pub" 2>&1
-rc=$?
-if test $rc != 1;then
-	fail "Parsing should have errored"
-fi
-
-${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/openpgp-invalid2.pub" 2>&1
-rc=$?
-if test $rc != 1;then
-	fail "Parsing should have errored"
-fi
-
-${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/openpgp-invalid3.pub" 2>&1
-rc=$?
-if test $rc != 1;then
-	fail "Parsing should have errored"
-fi
+for i in "truncated.pub" "attribute-leak-1.pub" "subpkt-leak.pub" "openpgp-invalid1.pub" \
+	"openpgp-invalid2.pub" "openpgp-invalid3.pub" "openpgp-invalid4.pub";do
+	${VALGRIND} "${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/data/${i}"
+	rc=$?
+	if test $rc != 1;then
+		fail "$i: Parsing should have errored ($rc)"
+	fi
+done
 
 exit ${RETCODE:-0}
