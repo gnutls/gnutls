@@ -1025,6 +1025,9 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
+	pkey->params.algo = GNUTLS_PK_DSA;
+	pkey->params.params_nr = DSA_PRIVATE_PARAMS;
+
 	ret =
 	    _gnutls_asn1_encode_privkey(GNUTLS_PK_DSA, &pkey->key,
 					&pkey->params, pkey->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
@@ -1033,12 +1036,11 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
-	pkey->params.algo = GNUTLS_PK_DSA;
-	pkey->params.params_nr = DSA_PRIVATE_PARAMS;
+	return 0;
 
-	ret = 0;
-
-      error:
+ error:
+	if (pkey->params.params_nr != DSA_PRIVATE_PARAMS)
+		_gnutls_mpi_release(&pkey->params.params[4]);
 	return ret;
 }
 
