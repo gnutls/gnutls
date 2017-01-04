@@ -1101,12 +1101,14 @@ decode_private_key_info(const gnutls_datum_t * der,
 		result = _decode_pkcs8_dsa_key(pkcs8_asn, pkey);
 	else if (pkey->pk_algorithm == GNUTLS_PK_EC)
 		result = _decode_pkcs8_ecc_key(pkcs8_asn, pkey);
-	else
-		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	else {
+		result = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+		goto error;
+	}
 
 	if (result < 0) {
 		gnutls_assert();
-		return result;
+		goto error;
 	}
 
 	result = 0;
