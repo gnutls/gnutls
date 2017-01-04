@@ -61,7 +61,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/selfsigs/alice.pub data/key-utf8-1.p12 data/key-utf8-2.p12 \
 	data/code-signing-ca.pem data/code-signing-cert.pem data/multi-value-dn.pem \
 	data/pkcs7-cat-ca.pem data/pkcs7-cat.p7 data/openssl.p7b data/openssl.p7b.out \
-	data/openssl-keyid.p7b data/openssl-keyid.p7b.out data/openssl.p12
+	data/openssl-keyid.p7b data/openssl-keyid.p7b.out data/openssl.p12 \
+	data/openpgp-invalid1.pub
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
