@@ -91,25 +91,6 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 
 	/* Read the algorithm's parameters
 	 */
-	_asnstr_append_name(name, sizeof(name), root, ".subjectPublicKey");
-	result = _gnutls_x509_read_value(asn, name, &tmp);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	if ((result =
-	     _gnutls_x509_read_pubkey(pk_algorithm, tmp.data, tmp.size,
-				      params)) < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* Now read the parameters
-	 */
-	_gnutls_free_datum(&tmp);
-
 	_asnstr_append_name(name, sizeof(name), root,
 			    ".algorithm.parameters");
 
@@ -132,11 +113,29 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 			gnutls_assert();
 			goto error;
 		}
+
+		_gnutls_free_datum(&tmp);
+	}
+
+	/* Now read the public key */
+	_asnstr_append_name(name, sizeof(name), root, ".subjectPublicKey");
+
+	result = _gnutls_x509_read_value(asn, name, &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	if ((result =
+	     _gnutls_x509_read_pubkey(pk_algorithm, tmp.data, tmp.size,
+				      params)) < 0) {
+		gnutls_assert();
+		goto error;
 	}
 
 	result = 0;
 
-      error:
+ error:
 	if (result < 0)
 		gnutls_pk_params_release(params);
 	_gnutls_free_datum(&tmp);

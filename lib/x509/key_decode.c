@@ -173,6 +173,9 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 
 	asn1_delete_structure(&spk);
 
+	params->params_nr = 3; /* public key is missing */
+	params->algo = GNUTLS_PK_DSA;
+
 	return 0;
 
 }
@@ -231,6 +234,8 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 
 }
 
+/* This function must be called after _gnutls_x509_read_params()
+ */
 int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 			     int dersize, gnutls_pk_params_st * params)
 {
@@ -245,6 +250,9 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 		}
 		break;
 	case GNUTLS_PK_DSA:
+		if (params->params_nr != 3) /* _gnutls_x509_read_pubkey_params must have been called */
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 		ret = _gnutls_x509_read_dsa_pubkey(der, dersize, params);
 		if (ret >= 0) {
 			params->algo = GNUTLS_PK_DSA;
@@ -265,6 +273,8 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 	return ret;
 }
 
+/* This function must be called prior to _gnutls_x509_read_pubkey()
+ */
 int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 				    uint8_t * der, int dersize,
 				    gnutls_pk_params_st * params)
@@ -289,7 +299,5 @@ int
 _gnutls_x509_read_dsa_pubkey(uint8_t * der, int dersize,
 			     gnutls_pk_params_st * params)
 {
-	/* do not set a number */
-	params->params_nr = 0;
 	return _gnutls_x509_read_der_int(der, dersize, &params->params[3]);
 }
