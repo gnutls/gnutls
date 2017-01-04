@@ -29,7 +29,8 @@ EXTRA_DIST = data/key-ca.pem data/key-user.pem \
 	data/cert.dsa.1024.pem data/cert.dsa.2048.pem data/cert.dsa.3072.pem \
 	data/dsa.1024.pem data/dsa.2048.pem data/dsa.3072.pem data/dsa-pubkey-1018.pem \
 	data/bad-key.pem data/p8key-illegal.pem data/key-illegal.pem data/pkcs8-pbes2-sha256.pem \
-	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der
+	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der \
+	data data/pkcs8-invalid9.der
 
 dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa ecdsa illegal-rsa pkcs8-invalid
 

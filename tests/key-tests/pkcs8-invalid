@@ -35,7 +35,8 @@ fi
 
 ret=0
 for p8 in "pkcs8-invalid1.der 1234" "pkcs8-invalid2.der 1234" "pkcs8-invalid3.der 1234" "pkcs8-invalid4.der 1234" \
-	"pkcs8-invalid5.der 1234" "pkcs8-invalid6.der 1234" "pkcs8-invalid7.der 1234" "pkcs8-invalid8.der password";do
+	"pkcs8-invalid5.der 1234" "pkcs8-invalid6.der 1234" "pkcs8-invalid7.der 1234" "pkcs8-invalid8.der password" \
+	"pkcs8-invalid9.der password";do
 	set -- ${p8}
 	file="$1"
 	passwd="$2"
