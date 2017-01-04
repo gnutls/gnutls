@@ -112,7 +112,7 @@ static int
 proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		   size_t _data_size)
 {
-	gnutls_datum_t plaintext;
+	gnutls_datum_t plaintext = {NULL, 0};
 	gnutls_datum_t ciphertext;
 	int ret, dsize;
 	int randomize_key = 0;
@@ -150,6 +150,11 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		_gnutls_audit_log(session,
 				  "auth_rsa: Possible PKCS #1 format attack\n");
 		randomize_key = 1;
+
+		if (ret >= 0) {
+			gnutls_free(plaintext.data);
+			plaintext.data = NULL;
+		}
 	} else {
 		/* If the secret was properly formatted, then
 		 * check the version number.
