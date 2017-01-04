@@ -111,9 +111,15 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 		goto cleanup;
 	}
 
-	p = buf_i;
-	for (i = 0; i < 64; i++)
-		*p++ = salt[i % salt_size];
+
+	if (salt_size > 0) {
+		p = buf_i;
+		for (i = 0; i < 64; i++)
+			*p++ = salt[i % salt_size];
+	} else {
+		memset(buf_i, 0, 64);
+		p = buf_i + 64;
+	}
 
 	if (pw) {
 		for (i = j = 0; i < p_size; i += 2) {
