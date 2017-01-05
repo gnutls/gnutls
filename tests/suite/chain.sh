@@ -20,6 +20,8 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+srcdir="${srcdir:-.}"
+mkdir -p x509paths
 cd x509paths
 
 CERTTOOL="${CERTTOOL:-../../../src/certtool${EXEEXT}}"
@@ -36,7 +38,7 @@ SUCCESS=" 1 4 7 12 15 16 17 18 24 26 27 30 33 56 57 62 63 "
 FAILURE=" 2 3 5 6 8 9 10 11 13 14 19 20 21 22 23 25 28 29 31 32 54 55 58 59 60 61 "
 KNOWN_BUGS=" 15 16 17 18 19 31 32 "
 
-test -d X509tests || tar xfz x509tests.tgz
+test -d X509tests || tar xfz "${srcdir}/x509tests.tgz"
 mkdir -p chains
 RET=0
 
