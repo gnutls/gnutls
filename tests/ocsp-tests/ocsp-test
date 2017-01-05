@@ -24,6 +24,10 @@ srcdir="${srcdir:-.}"
 OCSPTOOL="${OCSPTOOL:-../../src/ocsptool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 
+if ! test -x "${OCSPTOOL}"; then
+	exit 77
+fi
+
 export TZ="UTC"
 
 # Check for datefudge

@@ -26,6 +26,10 @@ set -e
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 export TZ="UTC"
 
 # Check for datefudge

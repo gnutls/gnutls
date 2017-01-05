@@ -24,6 +24,11 @@ srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 TMPFILE=sha3.$$.tmp
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh

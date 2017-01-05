@@ -33,6 +33,11 @@
 srcdir="${srcdir:-.}"
 CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
 unset RETCODE
+
+if ! test -x "${CLI}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
