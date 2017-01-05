@@ -26,6 +26,10 @@ CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 TMPFILE1=rsa-md5.$$.tmp
 TMPFILE2=rsa-md5-2.$$.tmp
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 . ${srcdir}/scripts/common.sh
 check_for_datefudge
 

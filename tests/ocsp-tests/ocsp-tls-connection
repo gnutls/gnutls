@@ -30,6 +30,22 @@ DIFF="${DIFF:-diff}"
 TEMPLATE_FILE="out.$$.tmpl.tmp"
 SERVER_CERT_FILE="cert.$$.pem.tmp"
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
+if ! test -x "${OCSPTOOL}"; then
+	exit 77
+fi
+
+if ! test -x "${GNUTLS_SERV}"; then
+	exit 77
+fi
+
+if ! test -x "${GNUTLS_CLI}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi

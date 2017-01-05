@@ -26,6 +26,10 @@ DIFF="${DIFF:-diff}"
 OUTFILE=tmp-krb5name.pem
 TMPLFILE=tmp-krb5name.tmpl
 
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh

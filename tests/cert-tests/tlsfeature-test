@@ -25,6 +25,11 @@ CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 TMPFILE=tlsfeature.$$.tmp
 TMPFILE2=tlsfeature-2.$$.tmp
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh

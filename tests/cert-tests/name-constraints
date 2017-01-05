@@ -23,9 +23,15 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
+
 TMPFILE=tmp.$$.pem
 
 . ${srcdir}/../scripts/common.sh
