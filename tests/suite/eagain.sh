@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copyright (C) 2006-2008, 2010, 2012 Free Software Foundation, Inc.
 #
