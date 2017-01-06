@@ -4,9 +4,8 @@
 
 The most known authentication method of @acronym{TLS} are certificates.
 The PKIX @xcite{PKIX} public key infrastructure is daily used by anyone
-using a browser today. @acronym{GnuTLS} supports both 
-@acronym{X.509} certificates @xcite{PKIX} and @acronym{OpenPGP}
-certificates using a common API.
+using a browser today. @acronym{GnuTLS} provides a simple API to 
+use the @acronym{X.509} certificates @xcite{PKIX}.
 
 The key exchange algorithms supported by certificate authentication are
 shown in @ref{tab:key-exchange}.
@@ -465,137 +464,17 @@ other verification functions which do not allow setting a purpose, would operate
 @subsection @acronym{OpenPGP} certificates
 @cindex OpenPGP certificates
 
-The @acronym{OpenPGP} key authentication relies on a distributed trust
-model, called the ``web of trust''. The ``web of trust'' uses a
-decentralized system of trusted introducers, which are the same as a
-CA. @acronym{OpenPGP} allows anyone to sign anyone else's public
-key. When Alice signs Bob's key, she is introducing Bob's key to
-anyone who trusts Alice. If someone trusts Alice to introduce keys,
-then Alice is a trusted introducer in the mind of that observer.
-For example in @ref{fig-openpgp}, David trusts Alice to be an introducer and Alice
-signed Bob's key thus Dave trusts Bob's key to be the real one.
+Previous versions of GnuTLS supported limited @acronym{OpenPGP} key
+authentication. That functionality has been deprecated and although
+is still made available, it is no longer recommended to use.
+The reason is that, supporting alternative authentication
+methods, when X.509 and PKIX were new and not well established, seemed like a
+good idea, in today's internet X.509 is unquestionably the main
+container for certificates. As such supporting more options with no clear
+use-cases, is a distraction that consumes considerable resources for
+improving and testing. For that we have decided to mark this functionality
+as deprecated, and will be dropped in one of the next GnuTLS major releases.
 
-@float Figure,fig-openpgp
-@image{gnutls-pgp,8cm}
-@caption{An example of the OpenPGP trust model.}
-@end float
-
-There are some key points that are important in that model. In the
-example Alice has to sign Bob's key, only if she is sure that the key
-belongs to Bob. Otherwise she may also make Dave falsely believe that
-this is Bob's key. Dave has also the responsibility to know who to
-trust.  This model is similar to real life relations.
-
-Just see how Charlie behaves in the previous example. Although he has
-signed Bob's key - because he knows, somehow, that it belongs to Bob -
-he does not trust Bob to be an introducer. Charlie decided to trust
-only Kevin, for some reason. A reason could be that Bob is lazy
-enough, and signs other people's keys without being sure that they
-belong to the actual owner.
-
-@float Table,tab:openpgp-certificate
-@multitable @columnfractions .2 .7
-
-@headitem Field @tab Description
-
-@item version @tab
-The field that indicates the version of the OpenPGP structure.
-
-@item user ID @tab
-An RFC 2822 string that identifies the owner of the key. There may be
-multiple user identifiers in a key.
-
-@item public key @tab
-The main public key of the certificate.
-
-@item expiration @tab
-The expiration time of the main public key.
-
-@item public subkey @tab
-An additional public key of the certificate. There may be multiple subkeys
-in a certificate.
-
-@item public subkey expiration @tab
-The expiration time of the subkey.
-
-@end multitable
-@caption{OpenPGP certificate fields.}
-@end float
-
-
-@subsubsection @acronym{OpenPGP} certificate structure
-
-In @acronym{GnuTLS} the @acronym{OpenPGP} certificate structures
-@xcite{RFC2440} are handled using the @code{gnutls_openpgp_crt_t} type.
-A typical certificate contains the user ID, which is an RFC 2822
-mail and name address, a public key, possibly a number of additional
-public keys (called subkeys), and a number of signatures. The various
-fields are shown in @ref{tab:openpgp-certificate}.
-
-The additional subkeys may provide key for various different purposes,
-e.g. one key to encrypt mail, and another to sign a TLS key exchange.
-Each subkey is identified by a unique key ID.
-The keys that are to be used in a TLS key exchange that requires
-signatures are called authentication keys in the OpenPGP jargon.
-The mapping of TLS key exchange methods to public keys is shown in
-@ref{tab:openpgp-key-exchange}.
-
-@float Table,tab:openpgp-key-exchange
-@multitable @columnfractions .2 .7
-
-@headitem Key exchange @tab Public key requirements
-
-@item RSA @tab
-An RSA public key that allows encryption.
-
-@item DHE_@-RSA @tab
-An RSA public key that is marked for authentication.
-
-@item ECDHE_@-RSA @tab
-An RSA public key that is marked for authentication.
-
-@item DHE_@-DSS @tab
-A DSA public key that is marked for authentication.
-
-@end multitable
-@caption{The types of (sub)keys required for the various TLS key exchange methods.}
-@end float
-
-The corresponding private keys are stored in the
-@code{gnutls_openpgp_privkey_t} type. All the prototypes for the key
-handling functions can be found in @file{gnutls/openpgp.h}.
-
-@subsubsection Verifying an @acronym{OpenPGP} certificate
-
-The verification functions of @acronym{OpenPGP} keys, included in
-@acronym{GnuTLS}, are simple ones, and do not use the features of the
-``web of trust''.  For that reason, if the verification needs are
-complex, the assistance of external tools like @acronym{GnuPG} and
-GPGME@footnote{@url{http://www.gnupg.org/related_software/gpgme/}} is
-recommended.
-
-In GnuTLS there is a verification function for OpenPGP certificates,
-the @funcref{gnutls_openpgp_crt_verify_ring}.  This checks an
-@acronym{OpenPGP} key against a given set of public keys (keyring) and
-returns the key status. The key verification status is the same as in
-@acronym{X.509} certificates, although the meaning and interpretation
-are different. For example an @acronym{OpenPGP} key may be valid, if
-the self signature is ok, even if no signers were found.  The meaning
-of verification status flags is the same as in the @acronym{X.509} certificates
-(see @ref{gnutls_certificate_verify_flags}).
-
-@showfuncdesc{gnutls_openpgp_crt_verify_ring}
-
-@showfuncdesc{gnutls_openpgp_crt_verify_self}
-
-@subsubsection Verifying a certificate in the context of a TLS session
-
-Similarly with X.509 certificates, one needs to specify
-the OpenPGP keyring file in the credentials structure. The certificates
-in this file will be  used by @funcref{gnutls_certificate_verify_peers3}
-to verify the signatures in the certificate sent by the peer.
-
-@showfuncdesc{gnutls_certificate_set_openpgp_keyring_file}
 
 @node Advanced certificate verification
 @subsection Advanced certificate verification

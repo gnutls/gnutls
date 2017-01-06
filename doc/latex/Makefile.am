@@ -155,24 +155,12 @@ dane-api.tex: $(srcdir)/../../libdane/*.c
 	rm -f $@-tmp
 	mv -f $@-tmp2 $@
 
-pgp-api.tex: $(srcdir)/../../lib/openpgp/*.c
-	echo "" > $@-tmp
-	for i in $^; do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../scripts/gdoc -tex $$i >> $@-tmp && \
-		echo "ok"; \
-	done
-	$(srcdir)/../scripts/sort1.pl < $@-tmp > $@-tmp2
-	$(srcdir)/../scripts/split.pl functions < $@-tmp 
-	rm -f $@-tmp
-	mv -f $@-tmp2 $@
-
-SOURCE_GEN_FILES =  pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex dane-api.tex
+SOURCE_GEN_FILES =  x509-api.tex gnutls-api.tex gnutls-enums.tex dane-api.tex
 
 PDF_FILES = gnutls-client-server-use-case.pdf gnutls-crypto-layers.pdf \
 	gnutls-handshake-sequence.pdf gnutls-handshake-state.pdf \
 	gnutls-internals.pdf gnutls-layers.pdf gnutls-logo.pdf \
-	gnutls-modauth.pdf gnutls-pgp.pdf gnutls-x509.pdf pkcs11-vision.pdf
+	gnutls-modauth.pdf gnutls-x509.pdf pkcs11-vision.pdf
 
 gnutls.pdf: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
 	$(MAKE) -C .. errcodes printlist alert-printlist
@@ -187,7 +175,7 @@ gnutls.pdf: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
 PNG_FILES = gnutls-client-server-use-case.png gnutls-crypto-layers.png \
 	gnutls-handshake-sequence.png gnutls-handshake-state.png \
 	gnutls-internals.png gnutls-layers.png gnutls-logo.png \
-	gnutls-modauth.png gnutls-pgp.png gnutls-x509.png pkcs11-vision.png
+	gnutls-modauth.png gnutls-x509.png pkcs11-vision.png
 
 epub.html: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
 	$(MAKE) -C .. errcodes printlist alert-printlist
