@@ -166,7 +166,6 @@ gnutls_TEXINFOS += gnutls-layers.dia gnutls-layers.eps			\
                    gnutls-layers.png
 gnutls_TEXINFOS += gnutls-crypto-layers.dia gnutls-crypto-layers.eps	\
                    gnutls-crypto-layers.png
-gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png
 gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png
 gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png
 gnutls_TEXINFOS += pkcs11-vision.dia pkcs11-vision.eps pkcs11-vision.png
@@ -185,7 +184,7 @@ gnutls_TEXINFOS += gnutls-modauth.dia gnutls-modauth.eps	\
 imagesdir = $(infodir)
 images_DATA = \
 	gnutls-handshake-state.png	\
-	gnutls-layers.png gnutls-modauth.png gnutls-pgp.png	\
+	gnutls-layers.png gnutls-modauth.png \
 	gnutls-client-server-use-case.png			\
 	gnutls-handshake-sequence.png gnutls-internals.png	\
 	gnutls-logo.png gnutls-x509.png	\
@@ -215,6 +214,17 @@ gnutls_TEXINFOS += $(API_FILES)
 MAINTAINERCLEANFILES += $(API_FILES)
 
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
@@ -259,18 +269,6 @@ x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includ
 	done
 	rm -f $@-tmp2
 	mv -f $@-tmp $@
-
-pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
-	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
-		echo $(ECHO_N) "Creating documentation for $$i... " && \
-		$(srcdir)/scripts/gdoc -texinfo \
-			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
-		echo "ok"; \
-	done
-	mv -f $@-tmp $@
-
 
 pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 	echo "" > $@-tmp
