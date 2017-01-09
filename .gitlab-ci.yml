@@ -64,6 +64,7 @@ Build and Check - separate build dir (x86):
     make -j4 && make check -j4 
   tags:
   - shared
+  - docker
   except:
   - tags
   artifacts:
