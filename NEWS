@@ -36,6 +36,12 @@ See the end for copying conditions.
 ** libgnutls: Addressed memory leak in server side error path
    (issue found using oss-fuzz project)
 
+** libgnutls: Addressed memory leaks and an infinite loop in OpenPGP certificate
+   parsing. Fixes by Alex Gaynor. (issues found using oss-fuzz project)
+
+** libgnutls: Addressed invalid memory accesses in OpenPGP certificate parsing.
+   (issues found using oss-fuzz project)
+
 ** tpmtool: backported the --test-sign option.
 
 ** API and ABI modifications:
