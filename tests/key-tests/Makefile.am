@@ -32,7 +32,7 @@ EXTRA_DIST = data/key-ca.pem data/key-user.pem \
 	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der \
 	data data/pkcs8-invalid9.der data/key-invalid2.der
 
-dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa ecdsa illegal-rsa pkcs8-invalid
+dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa ecdsa illegal-rsa pkcs8-invalid key-invalid
 
 TESTS = key-id pkcs8 pkcs8-decode ecdsa pkcs8-invalid key-invalid
 
