@@ -24,7 +24,7 @@ EXTRA_DIST = README key-ca.pem key-user.pem \
 	key-ca-1234.p8 key-ca-empty.p8 key-ca-null.p8 \
 	openssl-key-ecc.p8 key-ecc.p8 key-ecc.pem
 
-dist_check_SCRIPTS = key-id pkcs8
+dist_check_SCRIPTS = key-id pkcs8 pkcs8-invalid
 
 TESTS = key-id pkcs8 pkcs8-invalid
 
