@@ -21,7 +21,9 @@ To automate the process use "git am -s" to produce patches and/or set the
 a template to simplify this process, as follows.
 
 ```
-git config commit.template devel/git-template
+$ cp devel/git-template ~/.git-template
+[edit]
+$ git config commit.template ~/.git-template
 ```
 
 # Test suite:
