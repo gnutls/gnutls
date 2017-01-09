@@ -3,7 +3,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.26 (unreleased)
+* Version 3.3.26 (released 2016-01-09)
 
 ** libgnutls: Handle status request responses as optional (following
    RFC6066). This improves compatibility with implementations not sending
