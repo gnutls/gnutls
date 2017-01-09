@@ -49,6 +49,7 @@ TESTS += dane
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	LC_ALL="C"				\
 	VALGRIND="$(VALGRIND)"			\
 	LIBTOOL="$(LIBTOOL)"			\

@@ -29,6 +29,7 @@ dist_check_SCRIPTS = key-id pkcs8 pkcs8-invalid
 TESTS = key-id pkcs8 pkcs8-invalid
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	LC_ALL="C"						\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
