@@ -716,3 +716,4 @@ tests/crlverify
 tests/dane
 tests/suite/pkcs11-is-known
 tests/suite/pkcs11-combo
+src/*.stamp
