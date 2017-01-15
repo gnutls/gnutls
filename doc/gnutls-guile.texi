@@ -313,9 +313,6 @@ in the PEM format can be done as follows:
       (uniform-vector-write pem port))))
 @end example
 
-For an example of OpenPGP key import from a file, see @ref{Importing
-OpenPGP Keys Guile Example}.
-
 
 @node Input and Output
 @section Input and Output
@@ -457,8 +454,6 @@ This chapter provides examples that illustrate common use cases.
 
 @menu
 * Anonymous Authentication Guile Example::    Simplest client and server.
-* OpenPGP Authentication Guile Example::      Using OpenPGP-based authentication.
-* Importing OpenPGP Keys Guile Example::      Importing keys from files.
 @end menu
 
 @node Anonymous Authentication Guile Example
@@ -540,119 +535,6 @@ The corresponding server would look like this (again, assuming
 @end example
 
 This is it!
-
-
-@node OpenPGP Authentication Guile Example
-@section OpenPGP Authentication Guile Example
-
-GnuTLS allows users to authenticate using OpenPGP certificates.
-Using OpenPGP-based authentication is not more complicated than using
-anonymous authentication.  It requires a bit of extra work, though, to
-import the OpenPGP public and private key of the client/server.  Key
-import is omitted here and is left as an exercise to the reader
-(@pxref{Importing OpenPGP Keys Guile Example}).
-
-Assuming @var{some-socket} is bound to an open socket port and
-@var{pub} and @var{sec} are bound to the client's OpenPGP public and
-secret key, respectively, client-side code would look like this:
-
-@vindex certificate-type/openpgp
-
-@example
-;; Client-side.
-
-(define %certs (list certificate-type/openpgp))
-
-(let ((client (make-session connection-end/client))
-      (cred   (make-certificate-credentials)))
-  (set-session-default-priority! client)
-
-  ;; Choose OpenPGP certificates.
-  (set-session-certificate-type-priority! client %certs)
-
-  ;; Prepare appropriate client credentials.
-  (set-certificate-credentials-openpgp-keys! cred pub sec)
-  (set-session-credentials! client cred)
-
-  ;; Specify the underlying transport socket.
-  (set-session-transport-fd! client (fileno some-socket))
-
-  (handshake client)
-  (write "hello, world!" (session-record-port client))
-  (bye client close-request/rdwr))
-@end example
-
-Similarly, server-side code would be along these lines:
-
-@example
-;; Server-side.
-
-(define %certs (list certificate-type/openpgp))
-
-(let ((server (make-session connection-end/server))
-      (dh     (make-dh-parameters 1024)))
-  (set-session-default-priority! server)
-
-  ;; Choose OpenPGP certificates.
-  (set-session-certificate-type-priority! server %certs)
-
-  (let ((cred (make-certificate-credentials)))
-    ;; Prepare credentials with Diffie-Hellman parameters.
-    (set-certificate-credentials-dh-parameters! cred dh)
-    (set-certificate-credentials-openpgp-keys! cred pub sec)
-    (set-session-credentials! server cred))
-
-  (set-session-transport-fd! server (fileno some-socket))
-
-  (handshake server)
-  (let ((msg (read (session-record-port server))))
-    (format #t "received: ~a~%" msg)
-
-    (bye server close-request/rdwr)))
-@end example
-
-
-@node Importing OpenPGP Keys Guile Example
-@section Importing OpenPGP Keys Guile Example
-
-The following example provides a simple way of importing
-``ASCII-armored'' OpenPGP keys from files, using the
-@code{import-openpgp-certificate} and @code{import-openpgp-private-key}
-procedures.
-
-@vindex openpgp-certificate-format/base64
-@vindex openpgp-certificate-format/raw
-
-@example
-(use-modules (srfi srfi-4)
-             (gnutls))
-
-(define (import-key-from-file import-proc file)
-  ;; Import OpenPGP key from FILE using IMPORT-PROC.
-
-  ;; Prepare a u8vector large enough to hold the raw
-  ;; key contents.
-  (let* ((size (stat:size (stat path)))
-         (raw  (make-u8vector size)))
-
-    ;; Fill in the u8vector with the contents of FILE.
-    (uniform-vector-read! raw (open-input-file file))
-
-    ;; Pass the u8vector to the import procedure.
-    (import-proc raw openpgp-certificate-format/base64)))
-
-
-(define (import-public-key-from-file file)
-  (import-key-from-file import-openpgp-certificate file))
-
-(define (import-private-key-from-file file)
-  (import-key-from-file import-openpgp-private-key file))
-@end example
-
-The procedures @code{import-public-key-from-file} and
-@code{import-private-key-from-file} can be passed a file name.  They
-return an OpenPGP public key and private key object, respectively
-(@pxref{Guile Reference, OpenPGP key objects}).
 
 
 @c *********************************************************************
