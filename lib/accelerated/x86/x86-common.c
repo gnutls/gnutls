@@ -64,6 +64,11 @@ unsigned int _gnutls_x86_cpuid_s[4];
 # define bit_AVX 0x10000000
 #endif
 
+#ifndef OSXSAVE_MASK
+/* OSXSAVE|FMA|MOVBE */
+# define OSXSAVE_MASK (0x8000000|0x1000|0x400000)
+#endif
+
 #ifndef bit_MOVBE
 # define bit_MOVBE 0x00400000
 #endif
@@ -82,6 +87,26 @@ unsigned int _gnutls_x86_cpuid_s[4];
 #define VIA_PADLOCK (1<<20)
 #define VIA_PADLOCK_PHE (1<<21)
 #define VIA_PADLOCK_PHE_SHA512 (1<<22)
+
+/* Based on the example in "How to detect New Instruction support in
+ * the 4th generation Intel Core processor family.
+ * https://software.intel.com/en-us/articles/how-to-detect-new-instruction-support-in-the-4th-generation-intel-core-processor-family
+ */
+static unsigned check_4th_gen_intel_features(unsigned ecx)
+{
+	uint32_t xcr0;
+
+	if ((ecx & OSXSAVE_MASK) != OSXSAVE_MASK)
+		return 0;
+
+#if defined(_MSC_VER)
+	xcr0 = _xgetbv(0);
+#else
+	__asm__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx");
+#endif
+	/* Check if xmm and ymm state are enabled in XCR0. */
+	return (xcr0 & 6) == 6;
+}
 
 static void capabilities_to_intel_cpuid(unsigned capabilities)
 {
@@ -114,7 +139,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	}
 
 	if (capabilities & INTEL_AVX) {
-		if ((b & bit_AVX) && (b & bit_MOVBE)) {
+		if ((b & bit_AVX) && check_4th_gen_intel_features(b)) {
 			_gnutls_x86_cpuid_s[1] |= bit_AVX|bit_MOVBE;
 		} else {
 			_gnutls_debug_log
@@ -133,6 +158,7 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 
 }
 
+
 static unsigned check_optimized_aes(void)
 {
 	return (_gnutls_x86_cpuid_s[1] & bit_AES);
@@ -146,7 +172,10 @@ static unsigned check_ssse3(void)
 #ifdef ASM_X86_64
 static unsigned check_avx_movbe(void)
 {
-	return ((_gnutls_x86_cpuid_s[1] & bit_AVX) && (_gnutls_x86_cpuid_s[1] & bit_MOVBE));
+	if (check_4th_gen_intel_features(_gnutls_x86_cpuid_s[1]) == 0)
+		return 0;
+
+	return ((_gnutls_x86_cpuid_s[1] & bit_AVX));
 }
 
 static unsigned check_pclmul(void)
