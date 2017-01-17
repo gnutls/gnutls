@@ -918,11 +918,12 @@ read_new_length(cdk_stream_t inp,
 		(*r_size)++;
 		*r_len = ((c - 192) << 8) + c1 + 192;
 	} else if (c == 255) {
-		*r_len = read_32(inp);
-		if (*r_len == (u32)-1) {
+		c1 = read_32(inp);
+		if (c1 == (u32)-1) {
 			return;
 		}
 
+		*r_len = c1;
 		(*r_size) += 4;
 	} else {
 		*r_len = 1 << (c & 0x1f);
