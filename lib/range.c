@@ -220,7 +220,7 @@ _gnutls_range_fragment(size_t data_size, gnutls_range_st cur,
  * padding, and hence length hiding, use the gnutls_record_can_use_length_hiding()
  * function.
  *
- * Note: This function currently is only limited to blocking sockets.
+ * Note: This function currently is limited to blocking sockets.
  *
  * Returns: The number of bytes sent (that is data_size in a successful invocation),
  * or a negative error code.

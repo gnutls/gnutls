@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.6.0 (unreleased)
 
+** libgnutls: Refuse gnutls_record_send() and gnutls_record_recv()
+   calls prior to handshake being complete. Addresses gitlab issue #158.
+
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
