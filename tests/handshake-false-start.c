@@ -161,12 +161,12 @@ static void try(const char *name, unsigned testno, unsigned fs,
 
 	if ((gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START)
 	    && !fs) {
-		myfail("%d: false start occurred but not expected\n", __LINE__);
+		myfail("false start occurred but not expected\n");
 	}
 
 	if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_FALSE_START)
 	    && fs) {
-		myfail("%d: false start expected but not happened\n", __LINE__);
+		myfail("false start expected but not happened\n");
 	}
 
 	if (testno == TEST_SEND_RECV) {
@@ -174,8 +174,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		ret =
 		    gnutls_record_send(client, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
-			myfail("%d: error sending false start data: %s\n",
-				__LINE__, gnutls_strerror(ret));
+			myfail("error sending false start data: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -183,24 +183,24 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		/* verify whether the server received the expected data */
 		ret = gnutls_record_recv(server, buffer, sizeof(buffer));
 		if (ret < 0) {
-			myfail("%d: error receiving data: %s\n", __LINE__,
+			myfail("error receiving data: %s\n",
 				gnutls_strerror(ret));
 		}
 
 		if (ret != sizeof(TESTDATA) - 1) {
-			myfail("%d: error in received data size\n", __LINE__);
+			myfail("error in received data size\n");
 		}
 
 		if (memcmp(buffer, TESTDATA, ret) != 0) {
-			myfail("%d: error in received data\n", __LINE__);
+			myfail("error in received data\n");
 		}
 
 		/* check handshake completion */
 		ret =
 		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
-			myfail("%d: error sending false start data: %s\n",
-				__LINE__, gnutls_strerror(ret));
+			myfail("error sending false start data: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -210,7 +210,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 			    gnutls_record_recv(client, buffer, sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0) {
-			myfail("%d: error receiving data: %s\n", __LINE__,
+			myfail("error receiving data: %s\n",
 				gnutls_strerror(ret));
 		}
 	} else if (testno == TEST_RECV_SEND) {
@@ -218,8 +218,8 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		ret =
 		    gnutls_record_send(server, TESTDATA, sizeof(TESTDATA) - 1);
 		if (ret < 0) {
-			myfail("%d: error sending false start data: %s\n",
-				__LINE__, gnutls_strerror(ret));
+			myfail("error sending false start data: %s\n",
+				gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -227,24 +227,24 @@ static void try(const char *name, unsigned testno, unsigned fs,
 		/* verify whether the server received the expected data */
 		ret = gnutls_record_recv(client, buffer, sizeof(buffer));
 		if (ret < 0) {
-			myfail("%d: error receiving data: %s\n", __LINE__,
+			myfail("error receiving data: %s\n",
 				gnutls_strerror(ret));
 		}
 
 		if (ret != sizeof(TESTDATA) - 1) {
-			myfail("%d: error in received data size\n", __LINE__);
+			myfail("error in received data size\n");
 		}
 
 		if (memcmp(buffer, TESTDATA, ret) != 0) {
-			myfail("%d: error in received data\n", __LINE__);
+			myfail("error in received data\n");
 		}
 	} else if (testno == TEST_HANDSHAKE_CALL) {
 		/* explicit completion by caller */
 		ret = gnutls_handshake(client);
 		if (ret != GNUTLS_E_HANDSHAKE_DURING_FALSE_START) {
 			myfail
-			    ("%d: error in explicit handshake after false start: %s\n",
-			     __LINE__, gnutls_strerror(ret));
+			    ("error in explicit handshake after false start: %s\n",
+			     gnutls_strerror(ret));
 			exit(1);
 		}
 
@@ -254,14 +254,14 @@ static void try(const char *name, unsigned testno, unsigned fs,
 	side = "server";
 	ret = gnutls_bye(server, GNUTLS_SHUT_WR);
 	if (ret < 0) {
-		myfail("%d: error in server bye: %s\n", __LINE__,
+		myfail("error in server bye: %s\n",
 			gnutls_strerror(ret));
 	}
 
 	side = "client";
 	ret = gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
-		myfail("%d: error in client bye: %s\n", __LINE__,
+		myfail("error in client bye: %s\n",
 			gnutls_strerror(ret));
 	}
 
