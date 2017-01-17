@@ -1624,6 +1624,14 @@ ssize_t
 gnutls_record_send(gnutls_session_t session, const void *data,
 		   size_t data_size)
 {
+	if (unlikely(!session->internals.initial_negotiation_completed)) {
+		/* this is to protect buggy applications from sending unencrypted
+		 * data. We allow sending however, if we are in false start handshake
+		 * state. */
+		if (session->internals.recv_state != RECV_STATE_FALSE_START)
+			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
+	}
+
 	if (session->internals.record_flush_mode == RECORD_FLUSH) {
 		return _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
 					-1, EPOCH_WRITE_CURRENT, data,
