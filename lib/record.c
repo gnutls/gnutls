@@ -1771,6 +1771,14 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 ssize_t
 gnutls_record_recv(gnutls_session_t session, void *data, size_t data_size)
 {
+	if (unlikely(!session->internals.initial_negotiation_completed)) {
+		/* this is to protect buggy applications from sending unencrypted
+		 * data. We allow sending however, if we are in false start handshake
+		 * state. */
+		if (session->internals.recv_state != RECV_STATE_FALSE_START)
+			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
+	}
+
 	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA,
 				data, data_size, NULL,
 				session->internals.record_timeout_ms);
