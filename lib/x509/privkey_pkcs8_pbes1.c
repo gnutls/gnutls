@@ -142,9 +142,13 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 	gnutls_datum_t dkey, d_iv;
 	cipher_hd_st ch;
 	uint8_t key[16];
+	const unsigned block_size = 8;
 
 	if (enc_params->cipher != GNUTLS_CIPHER_DES_CBC)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	if (encrypted_data->size % block_size != 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	/* generate the key
 	 */
