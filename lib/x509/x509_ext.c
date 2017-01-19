@@ -2723,18 +2723,24 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 		}
 		aia->aia = tmp;
 
-		aia->aia[indx].oid.data = (void*)gnutls_strdup(tmpoid);
-		aia->aia[indx].oid.size = strlen(tmpoid);
-
 		snprintf(nptr, sizeof(nptr), "?%u.accessLocation", i);
+
 
 		ret = _gnutls_parse_general_name2(c2, nptr, -1, &aia->aia[indx].san, 
 			&aia->aia[indx].san_type, 0);
 		if (ret < 0)
 			break;
 
+		/* we do the strdup after parsing to avoid a memory leak */
+		aia->aia[indx].oid.data = (void*)gnutls_strdup(tmpoid);
+		aia->aia[indx].oid.size = strlen(tmpoid);
+
 		aia->size++;
 
+		if (aia->aia[indx].oid.data == NULL) {
+			gnutls_assert();
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
 	}
 	
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
@@ -2754,7 +2760,7 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
  * extension from the provided DER-encoded data; see RFC 5280 section 4.2.2.1 
  * for more information on the extension.  The
  * AIA extension holds a sequence of AccessDescription (AD) data.
- * 
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
  * Since: 3.3.0
