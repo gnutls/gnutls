@@ -1011,6 +1011,12 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
+	if (_gnutls_mpi_cmp_ui(pkey->params.params[0], 0) == 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_ILLEGAL_PARAMETER;
+		goto error;
+	}
+
 	/* the public key can be generated as g^x mod p */
 	ret = _gnutls_mpi_init(&pkey->params.params[3]);
 	if (ret < 0) {
