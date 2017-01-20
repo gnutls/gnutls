@@ -59,6 +59,7 @@ init_card () {
 		mkdir -p ./softhsm-testpkcs11.$$.tmp
 		echo "objectstore.backend = file" > "${SOFTHSM2_CONF}"
 		echo "directories.tokendir = ./softhsm-testpkcs11.$$.tmp" >> "${SOFTHSM2_CONF}"
+
 	else
 		rm -rf ./softhsm-testpkcs11.$$.tmp
 		echo "0:./softhsm-testpkcs11.$$.tmp" > "${SOFTHSM_CONF}"

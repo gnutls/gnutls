@@ -517,6 +517,168 @@ write_certificate_test () {
 	fi
 }
 
+# $1: token
+# $2: PIN
+# $3: cakey: ${srcdir}/pkcs11-certs/ca.key
+# $4: cacert: ${srcdir}/pkcs11-certs/ca.crt
+#
+# Tests writing a certificate which corresponds to the given key,
+# and verifies whether the ID is the same. Should utilize the
+# ID of the public key.
+write_certificate_id_test_rsa () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+	cakey="$3"
+	cacert="$4"
+
+	echo -n "* Generating RSA private key on HSM... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --label xxx1-rsa --generate-rsa --bits 1024 "${token}" >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		echo ok
+	else
+		echo failed
+		exit 1
+	fi
+
+	echo -n "* Checking whether right ID is set on copy... "
+	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
+	--template ${srcdir}/pkcs11-certs/client-tmpl --load-privkey "${token};object=xxx1-rsa;object-type=private" \
+	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
+
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	id=$(${P11TOOL} ${ADDITIONAL_PARAM} --list-all "${token};object=xxx1-rsa;object-type=public" 2>&1 | grep 'ID: '|sed -e 's/ID://' -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx1-rsa --load-certificate tmp-client.crt "${token}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx1-rsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo "ID '$id' was not set on copy"
+		exit_error
+	fi
+	echo ok
+}
+
+# $1: token
+# $2: PIN
+# $3: cakey: ${srcdir}/pkcs11-certs/ca.key
+# $4: cacert: ${srcdir}/pkcs11-certs/ca.crt
+#
+# Tests writing a certificate which corresponds to the given key,
+# and verifies whether the ID is the same. Should utilize the
+# ID of the private key.
+write_certificate_id_test_rsa2 () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+	cakey="$3"
+	cacert="$4"
+	tmpkey="key.$$.tmp"
+
+	echo -n "* Generating RSA private key... "
+	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --bits 1024 --outfile ${tmpkey} >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		echo ok
+	else
+		echo failed
+		exit 1
+	fi
+
+	echo -n "* Checking whether right ID is set on copy... "
+	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
+	--template ${srcdir}/pkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
+	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
+
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label xxx2-rsa --load-privkey ${tmpkey} "${token}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	id=$(${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all "${token};object=xxx2-rsa;object-type=private" 2>&1 | grep 'ID: '|sed -e 's/ID://' -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+
+	rm -f ${tmpkey}
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx2-rsa --load-certificate tmp-client.crt "${token}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx2-rsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo "ID '$id' was not set on copy"
+		exit_error
+	fi
+	echo ok
+}
+
+# $1: token
+# $2: PIN
+# $3: cakey: ${srcdir}/pkcs11-certs/ca.key
+# $4: cacert: ${srcdir}/pkcs11-certs/ca.crt
+#
+# Tests writing a certificate which corresponds to the given key,
+# and verifies whether the ID is the same. Should utilize the
+# ID of the private key.
+write_certificate_id_test_ecdsa () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+	cakey="$3"
+	cacert="$4"
+	tmpkey="key.$$.tmp"
+
+	echo -n "* Generating ECDSA private key... "
+	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --ecdsa --outfile ${tmpkey} >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		echo ok
+	else
+		echo failed
+		exit 1
+	fi
+
+	echo -n "* Checking whether right ID is set on copy... "
+	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
+	--template ${srcdir}/pkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
+	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
+
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label xxx-ecdsa --load-privkey ${tmpkey} "${token}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	id=$(${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all "${token};object=xxx-ecdsa;object-type=private" 2>&1 | grep 'ID: '|sed -e 's/ID://' -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+
+	rm -f ${tmpkey}
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx-ecdsa --load-certificate tmp-client.crt "${token}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx-ecdsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${TMPFILE}" 2>&1
+	if test $? != 0; then
+		echo "ID '$id' was not set on copy"
+		exit_error
+	fi
+	echo ok
+}
+
 test_sign () {
 	export GNUTLS_PIN="$2"
 	token="$1"
@@ -656,6 +818,10 @@ test_sign "${TOKEN}" "${GNUTLS_PIN}"
 use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/pkcs11-certs/ca.crt" "full URLs"
 
 use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/pkcs11-certs/ca.crt" "abbrv URLs"
+
+write_certificate_id_test_rsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
+write_certificate_id_test_rsa2 "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
+write_certificate_id_test_ecdsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
 
 if test ${RETCODE} = 0; then
 	echo "* All smart cards tests succeeded"
