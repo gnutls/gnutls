@@ -244,9 +244,6 @@ LIBGNUTLS_EXTRA_HOOKS
 AC_ARG_ENABLE(tests,
   AS_HELP_STRING([--disable-tests], [don't compile or run any tests]),
     enable_tests=$enableval, enable_tests=$enable_tools)
-if test "$enable_tests" = "yes" && test "$enable_tools" = "no"; then
-  true #AC_MSG_ERROR([Cannot enable tests while disabling tools])
-fi
 AM_CONDITIONAL(ENABLE_TESTS, test "$enable_tests" != "no")
 
 GTK_DOC_CHECK(1.1)
