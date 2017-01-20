@@ -607,7 +607,6 @@ src/tpmtool
 src/tpmtool-args.c
 src/tpmtool-args.h
 stamp-h1
-suppressions.valgrind
 tags
 tests/*/out
 tests/Makefile
