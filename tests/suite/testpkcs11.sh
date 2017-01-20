@@ -598,7 +598,7 @@ if test -z "${type}"; then
 		echo ""
 		type=softhsm
 	else
-		exit 77
+		exit 1
 	fi
 
 fi
