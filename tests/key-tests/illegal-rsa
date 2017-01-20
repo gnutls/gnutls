@@ -22,11 +22,15 @@ srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 GREP="${GREP:-grep}"
 
-TMPFILE=tmp-key.$$.p8
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
 fi
+
+TMPFILE=tmp-key.$$.p8
 
 ${VALGRIND} "${CERTTOOL}" -k --password 1234 --infile "${srcdir}/data/p8key-illegal.pem"
 rc=$?
