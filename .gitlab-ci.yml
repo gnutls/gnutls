@@ -104,6 +104,24 @@ Fedora/x86_64/valgrind:
       - tests/*.log
       - tests/*/*.log
 
+Fedora/x86_64/no-tools:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - make autoreconf && ./configure
+    --disable-non-suiteb-curves --disable-valgrind-tests --disable-doc --disable-guile --disable-tools --enable-tests && make -j$(nproc) && make -j$(nproc) check
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - tests/*.log
+      - tests/*/*.log
+
 Fedora/x86_64/asan:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
