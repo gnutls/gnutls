@@ -261,15 +261,23 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
  * @bits: is the prime's number of bits
  *
  * This function will generate a new pair of prime and generator for use in
- * the Diffie-Hellman key exchange. The new parameters will be allocated using
- * gnutls_malloc() and will be stored in the appropriate datum.
- * This function is normally slow.
+ * the Diffie-Hellman key exchange. This may take long time.
  *
- * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits() to
- * get bits for %GNUTLS_PK_DSA.
+ * It is recommended not to set the number of bits directly, but 
+ * use gnutls_sec_param_to_pk_bits() instead.
+
  * Also note that the DH parameters are only useful to servers.
  * Since clients use the parameters sent by the server, it's of
  * no use to call this in client side.
+ *
+ * The parameters generated are of the DSA form. It also is possible
+ * to generate provable parameters (following the Shawe-Taylor
+ * algorithm), using gnutls_x509_privkey_generate2() with DSA option
+ * and the %GNUTLS_PRIVKEY_FLAG_PROVABLE flag set. These can the
+ * be imported with gnutls_dh_params_import_dsa().
+ *
+ * It is no longer recommended for applications to generate parameters.
+ * See the "Parameter generation" section in the manual.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.

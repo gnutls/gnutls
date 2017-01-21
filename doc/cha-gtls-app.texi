@@ -1693,11 +1693,11 @@ the discussion in @ref{Safe renegotiation}).
 @cindex parameter generation
 @cindex generating parameters
 
-Several TLS ciphersuites require additional parameters that
-need to be generated or provided by the application. The
-Diffie-Hellman based ciphersuites (ANON-DH or DHE), require
+Few TLS ciphersuites require additional parameters that
+need to be generated or provided by the application. In particular,
+the Diffie-Hellman based ciphersuites (ANON-DH or DHE), require
 the group parameters to be provided. 
-These parameters can be specified in a @acronym{TLS} credentials
+Applications can specify these parameters in a @acronym{TLS} credentials
 structure by calling
 @funcref{gnutls_certificate_set_known_dh_params},
 @funcref{gnutls_anon_set_server_known_dh_params}, or
@@ -1714,14 +1714,22 @@ the FFDHE parameters from @xcite{RFC7919}.
 Note that older than 3.5.6 versions of GnuTLS provided functions
 to generate or import arbitrary DH parameters from a file. This
 practice is still supported but discouraged in current versions.
+There is no known advantage from using random parameters, while there
+have been several occasions where applications were utilizing incorrect,
+or insecure parameters. This is the main reason GnuTLS includes the
+well-known parameters of @xcite{RFC7919} and recommends to applications
+utilizing them.
 
-@showfuncC{gnutls_dh_params_generate2,gnutls_dh_params_import_pkcs3,gnutls_certificate_set_dh_params}
-
-For old applications which require explicit DH parameters, we recommend
-using @code{certtool} (of GnuTLS 3.5.6) with the @code{--get-dh-params}
+In older applications which require to specify explicit DH parameters, we recommend
+using @code{certtool} (of GnuTLS 3.5.6 or later) with the @code{--get-dh-params}
 option to obtain the FFDHE parameters descussed above. The output
 parameters of the tool are in PKCS#3 format and can be imported by
 most existing applications.
+
+The following functions are still supported but considered obsolete.
+
+@showfuncC{gnutls_dh_params_generate2,gnutls_dh_params_import_pkcs3,gnutls_certificate_set_dh_params}
+
 
 @node Deriving keys for other applications/protocols
 @subsection Deriving keys for other applications/protocols
