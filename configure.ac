@@ -475,31 +475,49 @@ if ! $PKG_CONFIG --atleast-version=3.3 nettle; then
 fi
 AM_CONDITIONAL(WITH_OLD_NETTLE, test "$with_old_nettle" != "no")
 
+idna_support=no
+with_libidn2=no
+with_libidn=no
 if test "$try_libidn" = yes;then
-PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
-if test "$with_libidn" != "no";then
-        if ! $PKG_CONFIG --atleast-version=1.31 libidn; then
-	    with_buggy_libidn=yes
-        fi
+  AC_SEARCH_LIBS(idn2_lookup_u8, idn2, [
+      with_libidn2=yes;
+      idna_support="IDNA 2008"
+      AC_DEFINE([HAVE_LIBIDN2], 1, [Define if IDNA 2008 support is enabled.])
+      AC_SUBST([LIBIDN_LIBS], [-lidn2])
+      if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+        GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn2"
+      else
+        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libidn2"
+      fi
+    ],[
+      with_libidn2=no;
+      AC_MSG_WARN(*** LIBIDN2 was not found. You will not be able to use IDN2008 support)
+    ])
 
-	AC_DEFINE([HAVE_LIBIDN], 1, [Build IDNA support])
-	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
-		GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn"
-	else
-		GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libidn"
-	fi
-else
-        with_libidn=no
-        AC_MSG_WARN([[
+  if test "$with_libidn2" = "no"; then
+    PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
+    if test "$with_libidn" != "no";then
+      idna_support="IDNA 2003"
+      if ! $PKG_CONFIG --atleast-version=1.31 libidn; then
+	     with_buggy_libidn=yes
+      fi
+
+      AC_DEFINE([HAVE_LIBIDN], 1, [Build IDNA support])
+      if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+        GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn"
+      else
+        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libidn"
+      fi
+    else
+      AC_MSG_WARN([[
 *** 
 *** libidn was not found. IDNA support will be disabled.
 *** ]])
+    fi
+  fi
 fi
 
-else
-	with_libidn=no
-fi
-
+AM_CONDITIONAL(HAVE_LIBIDN2, test "$with_libidn2" != "no")
 AM_CONDITIONAL(HAVE_LIBIDN, test "$with_libidn" != "no")
 AM_CONDITIONAL(HAVE_BUGGY_LIBIDN, test "$with_buggy_libidn" = "yes")
 
@@ -1034,7 +1052,7 @@ if features are disabled)
   ECDHE support:        $ac_enable_ecdhe
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
-  IDNA support:         $with_libidn
+  IDNA support:         $idna_support
   Self checks:          $enable_self_checks
   Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips

@@ -138,6 +138,10 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) $(LTLIBNSL) \
 	$(P11_KIT_LIBS) $(LIB_SELECT)
 
+if HAVE_LIBIDN2
+thirdparty_libadd += -lidn2
+endif
+
 if HAVE_LIBIDN
 thirdparty_libadd += $(LIBIDN_LIBS)
 endif

@@ -48,7 +48,7 @@ int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_le
 
 int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *output);
 
-#ifndef HAVE_LIBIDN
+#if !defined HAVE_LIBIDN2 && !defined HAVE_LIBIDN
 inline static
 int __gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
