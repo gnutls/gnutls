@@ -43,7 +43,9 @@
 #include <c-ctype.h>
 #include "sockets.h"
 
-#ifdef HAVE_LIBIDN
+#ifdef HAVE_LIBIDN2
+#include <idn2.h>
+#elif defined HAVE_LIBIDN
 #include <idna.h>
 #include <idn-free.h>
 #endif
@@ -398,7 +400,26 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 		hd->rdata.size = rdata->size;
 	}
 
-#ifdef HAVE_LIBIDN
+#ifdef HAVE_LIBIDN2
+#if IDN2_VERSION_NUMBER >= 0x00140000
+	/* IDN2_NONTRANSITIONAL automatically converts to lowercase
+	 * IDN2_NFC_INPUT converts to NFC before toASCII conversion
+	 *
+	 * Since IDN2_NONTRANSITIONAL implicitely does NFC conversion, we don't need
+	 * the additional IDN2_NFC_INPUT. But just for the unlikely case that the linked
+	 * library is not matching the headers when building and it doesn't support TR46,
+	 * we provide IDN2_NFC_INPUT. */
+
+	err = idn2_lookup_u8((uint8_t *)hostname, (uint8_t **)&a_hostname, IDN2_NFC_INPUT | IDN2_NONTRANSITIONAL);
+#else
+	err = idn2_lookup_u8((uint8_t *)hostname, (uint8_t **)&a_hostname, IDN2_NFC_INPUT);
+#endif
+	if (err != IDN2_OK) {
+		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname,
+			idn2_strerror(err));
+		exit(1);
+	}
+#elif defined HAVE_LIBIDN
 	err = idna_to_ascii_8z(hostname, &a_hostname, IDNA_ALLOW_UNASSIGNED);
 	if (err != IDNA_SUCCESS) {
 		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname,

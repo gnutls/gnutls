@@ -26,7 +26,9 @@
 #include <uninorm.h>
 #include <unistr.h>
 #include <unictype.h>
-#ifdef HAVE_LIBIDN
+#ifdef HAVE_LIBIDN2
+# include <idn2.h>
+#elif defined HAVE_LIBIDN
 # include <idna.h>
 # include <idn-free.h>
 #endif
@@ -292,7 +294,7 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
 	return ret;
 }
 
-#ifdef HAVE_LIBIDN
+#if defined HAVE_LIBIDN2 || defined HAVE_LIBIDN
 /*-
  * _gnutls_idna_map:
  * @input: contain the UTF-8 formatted domain name
@@ -334,6 +336,27 @@ int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsi
 		return ret;
 	}
 
+#ifdef HAVE_LIBIDN2
+#if IDN2_VERSION_NUMBER >= 0x00140000
+	/* IDN2_NONTRANSITIONAL automatically converts to lowercase
+	 * IDN2_NFC_INPUT converts to NFC before toASCII conversion
+	 *
+	 * Since IDN2_NONTRANSITIONAL implicitely does NFC conversion, we don't need
+	 * the additional IDN2_NFC_INPUT. But just for the unlikely case that the linked
+	 * library is not matching the headers when building and it doesn't support TR46,
+	 * we provide IDN2_NFC_INPUT. */
+
+	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT | IDN2_NONTRANSITIONAL);
+#else
+	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT);
+#endif
+	if (rc != IDN2_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("unable to convert name '%s' to IDNA format: %s\n", istr.data, idn2_strerror(rc));
+		ret = GNUTLS_E_INVALID_UTF8_STRING;
+		goto fail;
+	}
+#else
 	rc = idna_to_ascii_8z((char*)istr.data, &idna, 0);
 	if (rc != IDNA_SUCCESS) {
 		gnutls_assert();
@@ -341,6 +364,7 @@ int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsi
 		ret = GNUTLS_E_INVALID_UTF8_STRING;
 		goto fail;
 	}
+#endif
 
 	if (gnutls_malloc != malloc) {
 		ret = _gnutls_set_strdatum(out, idna, strlen(idna));
@@ -351,10 +375,84 @@ int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsi
 		ret = 0;
 	}
  fail:
+#ifdef HAVE_LIBIDN2
+	idn2_free(idna);
+#else
 	idn_free(idna);
+#endif
 	gnutls_free(istr.data);
 	return ret;
 }
+
+#ifdef HAVE_LIBIDN2
+int _idn2_punycode_decode(
+	size_t input_length,
+	const char input[],
+	size_t *output_length,
+	uint32_t output[],
+	unsigned char case_flags[]);
+
+static int _idn2_to_unicode_8z8z(const char *src, char **dst)
+{
+	int rc, run;
+	size_t out_len = 0;
+	const char *e, *s;
+	char *p = NULL;
+
+	for (run = 0; run < 2; run++) {
+		if (run) {
+			p = malloc(out_len + 1);
+			if (!p)
+				return IDN2_MALLOC;
+			*dst = p;
+		}
+
+		out_len = 0;
+		for (e = s = src; *e; s = e) {
+			while (*e && *e != '.')
+				e++;
+
+			if (e - s > 4 && s[0] == 'x' && s[1] == 'n' && s[2] == '-' && s[3] == '-') {
+				size_t u32len = IDN2_LABEL_MAX_LENGTH * 4;
+				uint32_t u32[IDN2_LABEL_MAX_LENGTH * 4];
+				uint8_t u8[IDN2_LABEL_MAX_LENGTH + 1];
+				size_t u8len;
+
+				rc = _idn2_punycode_decode(e - s - 4, s + 4, &u32len, u32, NULL);
+				if (rc != IDN2_OK)
+					return rc;
+
+				if (rc != IDN2_OK)
+					return rc;
+
+				u8len = sizeof(u8);
+				if (u32_to_u8(u32, u32len, u8, &u8len) == NULL)
+					return IDN2_ENCODING_ERROR;
+				u8[u8len] = '\0';
+
+				if (run)
+					memcpy(*dst + out_len, u8, u8len);
+				out_len += u8len;
+			} else {
+				if (run)
+					memcpy(*dst + out_len, s, e - s);
+				out_len += e - s;
+			}
+
+			if (*e) {
+				e++;
+				if (run)
+					(*dst)[out_len] = '.';
+				out_len++;
+			}
+		}
+	}
+
+	(*dst)[out_len] = 0;
+
+	return IDN2_OK;
+}
+#endif
 
 /*-
  * _gnutls_idna_reverse_map:
@@ -392,6 +490,16 @@ int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *o
 		return ret;
 	}
 
+#ifdef HAVE_LIBIDN2
+	/* currently libidn2 just converts single labels, thus a wrapper function */
+	rc = _idn2_to_unicode_8z8z((char*)istr.data, &u8);
+	if (rc != IDN2_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("unable to convert ACE name '%s' to UTF-8 format: %s\n", istr.data, idn2_strerror(rc));
+		ret = GNUTLS_E_INVALID_UTF8_STRING;
+		goto fail;
+	}
+#else
 	rc = idna_to_unicode_8z8z((char*)istr.data, &u8, IDNA_ALLOW_UNASSIGNED);
 	if (rc != IDNA_SUCCESS) {
 		gnutls_assert();
@@ -399,6 +507,7 @@ int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *o
 		ret = GNUTLS_E_INVALID_UTF8_STRING;
 		goto fail;
 	}
+#endif
 
 	if (gnutls_malloc != malloc) {
 		ret = _gnutls_set_strdatum(out, u8, strlen(u8));
@@ -409,7 +518,11 @@ int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *o
 		ret = 0;
 	}
  fail:
+#ifdef HAVE_LIBIDN2
+	idn2_free(u8);
+#else
 	idn_free(u8);
+#endif
 	gnutls_free(istr.data);
 	return ret;
 }

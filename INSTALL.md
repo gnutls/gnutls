@@ -45,7 +45,8 @@ Optionally it may use the following libraries:
 * libtspi: for Trusted Platform Module (TPM) support, http://trousers.sourceforge.net/
 * libunbound: For DNSSEC/DANE support, http://unbound.net/
 * libz: For compression support, http://www.zlib.net/
-* libidn: For supporting internationalized DNS names, http://www.gnu.org/software/libidn/
+* libidn: For supporting internationalized DNS names (IDNA 2003), http://www.gnu.org/software/libidn/
+* libidn2: For supporting internationalized DNS names (IDNA 2008), https://www.gnu.org/software/libidn/#libidn2
 
 To configure libnettle for installation and use by GnuTLS, a typical
 command sequence would be:

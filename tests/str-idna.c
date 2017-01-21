@@ -70,17 +70,25 @@ static void fname(void **glob_state) \
 MATCH_FUNC(test_ascii, "localhost", "localhost", 1);
 MATCH_FUNC(test_ascii_caps, "LOCALHOST", "LOCALHOST", 1);
 MATCH_FUNC(test_greek1, "βόλοσ.com", "xn--nxasmq6b.com", 1);
-MATCH_FUNC(test_greek2, "βόλος.com", "xn--nxasmq6b.com", 0);
 MATCH_FUNC(test_cap_greek3, "ΒΌΛΟΣ.com", "xn--nxasmq6b.com", 0);
 MATCH_FUNC(test_mix, "简体中文.εξτρα.com", "xn--fiqu1az03c18t.xn--mxah1amo.com", 1);
-MATCH_FUNC(test_german1, "faß.de", "fass.de", 0);
-MATCH_FUNC(test_caps_german2, "Faß.de", "fass.de", 0);
 MATCH_FUNC(test_caps_german3, "Ü.ü", "xn--tda.xn--tda", 0);
 MATCH_FUNC(test_caps_german4, "Bücher.de", "xn--bcher-kva.de", 0);
 MATCH_FUNC(test_german4, "bücher.de", "xn--bcher-kva.de", 1);
 MATCH_FUNC(test_u1, "夡夞夜夙", "xn--bssffl", 1);
 MATCH_FUNC(test_jp2, "日本語.jp", "xn--wgv71a119e.jp", 1);
 MATCH_FUNC(test_dots, "a.b.c。d。", "a.b.c.d.", 0);
+#ifdef HAVE_LIBIDN2
+MATCH_FUNC(test_greek2, "βόλος.com", "xn--nxasmm1c.com", 0);
+MATCH_FUNC(test_german1, "faß.de", "xn--fa-hia.de", 0);
+#if IDN2_VERSION_NUMBER >= 0x00140000
+MATCH_FUNC(test_caps_german2, "Faß.de", "xn--fa-hia.de", 0);
+#endif
+#else
+MATCH_FUNC(test_greek2, "βόλος.com", "xn--nxasmq6b.com", 0);
+MATCH_FUNC(test_german1, "faß.de", "fass.de", 0);
+MATCH_FUNC(test_caps_german2, "Faß.de", "fass.de", 0);
+#endif
 
 int main(void)
 {
