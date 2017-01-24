@@ -48,27 +48,6 @@ int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_le
 
 int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *output);
 
-#if !defined HAVE_LIBIDN2 && !defined HAVE_LIBIDN
-inline static
-int __gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
-{
-	/* no call to gnutls_assert() due to header dependency issues */
-	out->data = gnutls_malloc(ilen+1);
-	if (out->data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-	out->size = ilen;
-	memcpy(out->data, input, ilen);
-	out->data[ilen] = 0;
-	return 0;
-}
-# define gnutls_idna_map __gnutls_idna_map
-#else
-# define gnutls_idna_map _gnutls_idna_map
-int _gnutls_idna_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
-#endif
-
-int _gnutls_idna_reverse_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
-
 inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
 {
 	unsigned i;

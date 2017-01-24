@@ -79,7 +79,7 @@ gnutls_datum_t out;
 			}
 		} else {
 			if (strstr((char*)name->data, "xn--") != NULL) {
-				ret = _gnutls_idna_reverse_map((char*)name->data, name->size, &out, 0);
+				ret = gnutls_idna_reverse_map((char*)name->data, name->size, &out, 0);
 				if (ret >= 0) {
 					addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), out.data);
 					gnutls_free(out.data);

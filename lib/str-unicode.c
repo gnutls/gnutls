@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016, 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -295,24 +295,31 @@ int gnutls_utf8_password_normalize(const unsigned char *password, unsigned plen,
 }
 
 #if defined HAVE_LIBIDN2 || defined HAVE_LIBIDN
-/*-
- * _gnutls_idna_map:
+/**
+ * gnutls_idna_map:
  * @input: contain the UTF-8 formatted domain name
  * @ilen: the length of the provided string
  * @out: the result in an null-terminated allocated string
  * @flags: should be zero
  *
  * This function will convert the provided UTF-8 domain name, to
- * its IDNA2003 mapping.
+ * its IDNA mapping in an allocated variable. Note that depending on the flags the used gnutls
+ * library was compiled with, the output of this function may vary (i.e.,
+ * may be IDNA2008, or IDNA2003).
  *
- * If GnuTLS is compiled without libidn2 support, then this function
- * will return %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ * To force IDNA2008 specify the flag %GNUTLS_IDNA_FORCE_2008. In
+ * the case GnuTLS is not compiled with the necessary dependencies,
+ * %GNUTLS_E_UNIMPLEMENTED_FEATURE will be returned to indicate that
+ * gnutls is unable to perform the requested conversion.
+ *
+ * Note also, that this function will return an empty string if an
+ * empty string is provided as input.
  *
  * Returns: %GNUTLS_E_INVALID_UTF8_STRING on invalid UTF-8 data, or 0 on success.
  *
- * Since: 3.5.7
- -*/
-int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+ * Since: 3.5.8
+ **/
+int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
 	char *idna = NULL;
 	int rc, ret;
@@ -329,6 +336,11 @@ int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsi
 	if (_gnutls_str_is_print(input, ilen)) {
 		return _gnutls_set_strdatum(out, input, ilen);
 	}
+
+#ifndef HAVE_LIBIDN2
+	if (flags & GNUTLS_IDNA_FORCE_2008)
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+#endif
 
 	ret = _gnutls_set_strdatum(&istr, input, ilen);
 	if (ret < 0) {
@@ -454,23 +466,26 @@ static int _idn2_to_unicode_8z8z(const char *src, char **dst)
 }
 #endif
 
-/*-
- * _gnutls_idna_reverse_map:
+/**
+ * gnutls_idna_reverse_map:
  * @input: contain the ACE (IDNA) formatted domain name
  * @ilen: the length of the provided string
  * @out: the result in an null-terminated allocated UTF-8 string
  * @flags: should be zero
  *
- * This function will convert the IDNA2003 ACE name to a UTF-8 domain name.
+ * This function will convert an ACE (ASCII-encoded) domain name to a UTF-8 domain name.
  *
- * If GnuTLS is compiled without libidn2 support, then this function
+ * If GnuTLS is compiled without IDNA support, then this function
  * will return %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Note also, that this function will return an empty string if an
+ * empty string is provided as input.
  *
  * Returns: A negative error code on error, or 0 on success.
  *
- * Since: 3.5.7
- -*/
-int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+ * Since: 3.5.8
+ **/
+int gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
 	char *u8 = NULL;
 	int rc, ret;
@@ -530,12 +545,16 @@ int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *o
 #else
 
 # undef gnutls_idna_map
-int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	if (!_gnutls_str_is_print(input, ilen)) {
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	}
+
+	return _gnutls_set_strdatum(out, input, ilen);
 }
 
-int _gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
+int gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)
 {
 	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
@@ -560,7 +579,7 @@ int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *out
 		int ret;
 		gnutls_datum_t domain;
 
-		ret = _gnutls_idna_map(p+1, ilen-name_part-1, &domain, 0);
+		ret = gnutls_idna_map(p+1, ilen-name_part-1, &domain, 0);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
