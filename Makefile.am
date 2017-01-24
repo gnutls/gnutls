@@ -64,6 +64,12 @@ pic-check:
 	false; \
 	fi
 
+abi-dump:
+	@abi-dumper lib/.libs/libgnutls.so -lver $(VERSION) -o "./devel/ABI-$(VERSION)-$$(uname -m).dump" -public-headers lib/includes/gnutls/
+	@echo "*******************************************************************************"
+	@echo "You need to modify Makefile.am abi-check rule if you need to check this release"
+	@echo "*******************************************************************************"
+
 abi-check:
 	@rm -f $(TMPFILE)
 	@echo "Checking libgnutls ABI"
@@ -71,8 +77,10 @@ abi-check:
 	@echo "<headers>$(srcdir)/lib/includes/gnutls" >>$(TMPFILE)
 	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(TMPFILE)
 	@echo "<libs>$(builddir)/lib/.libs</libs>" >>$(TMPFILE)
-	test ! -f "$(srcdir)/devel/ABI-$$(uname -m).dump" || \
-		abi-compliance-checker -abi -lib gnutls -old "$(srcdir)/devel/ABI-$$(uname -m).dump" -new $(TMPFILE) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols 
+	for i in 3.4.0 3.4.17 3.5.8;do \
+	test ! -f "$(srcdir)/devel/ABI-$$i-$$(uname -m).dump" || \
+		abi-compliance-checker -abi -lib gnutls -old "$(srcdir)/devel/ABI-$$i-$$(uname -m).dump" -new $(TMPFILE) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols; \
+	done
 	@echo "Checking libgnutls-dane ABI"
 	@echo "<version>$(VERSION)</version>" >$(TMPFILE)
 	@echo "<headers>$(srcdir)/libdane/includes/gnutls" >>$(TMPFILE)
@@ -149,4 +157,4 @@ dist-hook: symbol-check abi-check
 	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
-.PHONY: abi-check
+.PHONY: abi-check abi-dump pic-check
