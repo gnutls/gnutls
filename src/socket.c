@@ -385,10 +385,12 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	struct addrinfo hints, *res, *ptr;
 	int sd, err = 0;
 	int udp = flags & SOCKET_FLAG_UDP;
+	int ret;
 	int fastopen = flags & SOCKET_FLAG_FASTOPEN;
 	char buffer[MAX_BUF + 1];
 	char portname[16] = { 0 };
-	char *a_hostname = (char*)hostname;
+	gnutls_datum_t idna;
+	char *a_hostname;
 
 	memset(hd, 0, sizeof(*hd));
 
@@ -400,37 +402,17 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 		hd->rdata.size = rdata->size;
 	}
 
-#ifdef HAVE_LIBIDN2
-#if IDN2_VERSION_NUMBER >= 0x00140000
-	/* IDN2_NONTRANSITIONAL automatically converts to lowercase
-	 * IDN2_NFC_INPUT converts to NFC before toASCII conversion
-	 *
-	 * Since IDN2_NONTRANSITIONAL implicitely does NFC conversion, we don't need
-	 * the additional IDN2_NFC_INPUT. But just for the unlikely case that the linked
-	 * library is not matching the headers when building and it doesn't support TR46,
-	 * we provide IDN2_NFC_INPUT. */
+	ret = gnutls_idna_map(hostname, strlen(hostname), &idna, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname, gnutls_strerror(ret));
+		exit(1);
+	}
 
-	err = idn2_lookup_u8((uint8_t *)hostname, (uint8_t **)&a_hostname, IDN2_NFC_INPUT | IDN2_NONTRANSITIONAL);
-#else
-	err = idn2_lookup_u8((uint8_t *)hostname, (uint8_t **)&a_hostname, IDN2_NFC_INPUT);
-#endif
-	if (err != IDN2_OK) {
-		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname,
-			idn2_strerror(err));
-		exit(1);
-	}
-#elif defined HAVE_LIBIDN
-	err = idna_to_ascii_8z(hostname, &a_hostname, IDNA_ALLOW_UNASSIGNED);
-	if (err != IDNA_SUCCESS) {
-		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname,
-			idna_strerror(err));
-		exit(1);
-	}
-#endif
 	hd->hostname = strdup(hostname);
+	a_hostname = (char*)idna.data;
 
 	if (msg != NULL)
-		printf("Resolving '%s:%s'...\n", a_hostname,service);
+		printf("Resolving '%s:%s'...\n", a_hostname, service);
 
 	/* get server name */
 	memset(&hints, 0, sizeof(hints));
@@ -551,9 +533,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	hd->ptr = ptr;
 	hd->addr_info = res;
 	hd->rdata.data = NULL;
-#ifdef HAVE_LIBIDN
-	idn_free(a_hostname);
-#endif
+	gnutls_free(idna.data);
 	return;
 }
 
