@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016, 2017 Red Hat, Inc.
  *
  * Authors: Nikos Mavrogiannopoulos
  *
@@ -34,19 +34,7 @@
 int _gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
 int _gnutls_idna_reverse_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
 
-#define MATCH_FUNC(fname, str, normalized, reverse) \
-static void fname##_reverse(void **glob_state) \
-{ \
-	gnutls_datum_t out; \
-	int ret; \
-	if (normalized == NULL) \
-		return; \
-	ret = _gnutls_idna_reverse_map(normalized, strlen(normalized), &out, 0); \
-	assert_int_equal(ret, 0); \
-	\
-	assert_int_equal(strcmp((char*)out.data, (char*)str), 0); \
-	gnutls_free(out.data); \
-} \
+#define MATCH_FUNC(fname, str, normalized) \
 static void fname(void **glob_state) \
 { \
 	gnutls_datum_t out; \
@@ -59,35 +47,55 @@ static void fname(void **glob_state) \
 	} \
 	assert_int_equal(strcmp((char*)out.data, (char*)normalized), 0); \
 	gnutls_free(out.data); \
-	if (reverse) fname##_reverse(glob_state); \
 }
 
+#define MATCH_FUNC_TWO_WAY(fname, str, normalized) \
+static void fname##_reverse(void **glob_state) \
+{ \
+	gnutls_datum_t out; \
+	int ret; \
+	if (normalized == NULL) \
+		return; \
+	ret = _gnutls_idna_reverse_map(normalized, strlen(normalized), &out, 0); \
+	assert_int_equal(ret, 0); \
+	\
+	assert_int_equal(strcmp((char*)out.data, (char*)str), 0); \
+	gnutls_free(out.data); \
+} \
+MATCH_FUNC(fname, str, normalized)
 
-/* vectors taken from:
+
+/* some vectors taken from:
  * http://www.unicode.org/Public/idna/9.0.0/IdnaTest.txt
  */
 
-MATCH_FUNC(test_ascii, "localhost", "localhost", 1);
-MATCH_FUNC(test_ascii_caps, "LOCALHOST", "LOCALHOST", 1);
-MATCH_FUNC(test_greek1, "βόλοσ.com", "xn--nxasmq6b.com", 1);
-MATCH_FUNC(test_cap_greek3, "ΒΌΛΟΣ.com", "xn--nxasmq6b.com", 0);
-MATCH_FUNC(test_mix, "简体中文.εξτρα.com", "xn--fiqu1az03c18t.xn--mxah1amo.com", 1);
-MATCH_FUNC(test_caps_german3, "Ü.ü", "xn--tda.xn--tda", 0);
-MATCH_FUNC(test_caps_german4, "Bücher.de", "xn--bcher-kva.de", 0);
-MATCH_FUNC(test_german4, "bücher.de", "xn--bcher-kva.de", 1);
-MATCH_FUNC(test_u1, "夡夞夜夙", "xn--bssffl", 1);
-MATCH_FUNC(test_jp2, "日本語.jp", "xn--wgv71a119e.jp", 1);
-MATCH_FUNC(test_dots, "a.b.c。d。", "a.b.c.d.", 0);
-#ifdef HAVE_LIBIDN2
-MATCH_FUNC(test_greek2, "βόλος.com", "xn--nxasmm1c.com", 0);
-MATCH_FUNC(test_german1, "faß.de", "xn--fa-hia.de", 0);
-#if IDN2_VERSION_NUMBER >= 0x00140000
-MATCH_FUNC(test_caps_german2, "Faß.de", "xn--fa-hia.de", 0);
-#endif
-#else
-MATCH_FUNC(test_greek2, "βόλος.com", "xn--nxasmq6b.com", 0);
-MATCH_FUNC(test_german1, "faß.de", "fass.de", 0);
-MATCH_FUNC(test_caps_german2, "Faß.de", "fass.de", 0);
+MATCH_FUNC_TWO_WAY(test_ascii, "localhost", "localhost");
+MATCH_FUNC_TWO_WAY(test_ascii_caps, "LOCALHOST", "LOCALHOST");
+MATCH_FUNC_TWO_WAY(test_greek1, "βόλοσ.com", "xn--nxasmq6b.com");
+MATCH_FUNC(test_caps_greek, "ΒΌΛΟΣ.com", "xn--nxasmq6b.com");
+MATCH_FUNC_TWO_WAY(test_mix, "简体中文.εξτρα.com", "xn--fiqu1az03c18t.xn--mxah1amo.com");
+MATCH_FUNC(test_caps_german1, "Ü.ü", "xn--tda.xn--tda");
+MATCH_FUNC(test_caps_german2, "Bücher.de", "xn--bcher-kva.de");
+MATCH_FUNC_TWO_WAY(test_german4, "bücher.de", "xn--bcher-kva.de");
+MATCH_FUNC_TWO_WAY(test_u1, "夡夞夜夙", "xn--bssffl");
+MATCH_FUNC_TWO_WAY(test_jp2, "日本語.jp", "xn--wgv71a119e.jp");
+MATCH_FUNC(test_dots, "a.b.c。d。", "a.b.c.d.");
+
+#ifdef HAVE_LIBIDN2 /* IDNA 2008 */
+MATCH_FUNC_TWO_WAY(test_greek2, "βόλος.com", "xn--nxasmm1c.com");
+MATCH_FUNC_TWO_WAY(test_german1, "faß.de", "xn--fa-hia.de");
+# if IDN2_VERSION_NUMBER >= 0x00140000
+MATCH_FUNC(test_caps_german3, "Faß.de", "xn--fa-hia.de");
+# else
+static void test_caps_german3(void **glob_state)
+{
+	return;
+}
+# endif
+#else /* IDNA 2003 */
+MATCH_FUNC(test_greek2, "βόλος.com", "xn--nxasmq6b.com");
+MATCH_FUNC(test_german1, "faß.de", "fass.de");
+MATCH_FUNC(test_caps_german3, "Faß.de", "fass.de");
 #endif
 
 int main(void)
@@ -95,19 +103,30 @@ int main(void)
 	gnutls_datum_t tmp;
 	int ret;
 	const struct CMUnitTest tests[] = {
+#ifdef HAVE_LIBIDN2 /* IDNA 2008 */
+		cmocka_unit_test(test_greek2_reverse),
+		cmocka_unit_test(test_german1_reverse),
+#endif
 		cmocka_unit_test(test_ascii),
+		cmocka_unit_test(test_ascii_reverse),
 		cmocka_unit_test(test_ascii_caps),
+		cmocka_unit_test(test_ascii_caps_reverse),
 		cmocka_unit_test(test_greek1),
+		cmocka_unit_test(test_greek1_reverse),
 		cmocka_unit_test(test_greek2),
-		cmocka_unit_test(test_cap_greek3),
+		cmocka_unit_test(test_caps_greek),
 		cmocka_unit_test(test_mix),
+		cmocka_unit_test(test_mix_reverse),
 		cmocka_unit_test(test_german1),
+		cmocka_unit_test(test_caps_german1),
 		cmocka_unit_test(test_caps_german2),
 		cmocka_unit_test(test_caps_german3),
-		cmocka_unit_test(test_caps_german4),
 		cmocka_unit_test(test_german4),
+		cmocka_unit_test(test_german4_reverse),
 		cmocka_unit_test(test_u1),
+		cmocka_unit_test(test_u1_reverse),
 		cmocka_unit_test(test_jp2),
+		cmocka_unit_test(test_jp2_reverse),
 		cmocka_unit_test(test_dots)
 	};
 
