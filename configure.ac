@@ -362,13 +362,11 @@ AC_ARG_ENABLE(full-test-suite,
   AS_HELP_STRING([--disable-full-test-suite], [disable running very slow components of test suite]),
     full_test_suite=$enableval, full_test_suite=yes)
 
-# test if we are in git master
+# test if we are in git master or in release build. In release
+# builds we do not use valgrind.
 SUITE_FILE="${srcdir}/tests/suite/mini-eagain2.c"
 if test "$full_test_suite" = yes && test ! -f "$SUITE_FILE";then
 	full_test_suite=no
-fi
-
-if test "$full_test_suite" != "yes";then
 	VALGRIND=""
 	AC_SUBST(VALGRIND, [])
 	opt_valgrind_tests=no
