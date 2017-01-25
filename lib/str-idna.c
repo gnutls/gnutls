@@ -33,6 +33,13 @@
 #endif
 
 #if defined HAVE_LIBIDN2 || defined HAVE_LIBIDN
+
+#ifdef HAVE_LIBIDN2
+# define IDN_FREE idn2_free
+#else
+# define IDN_FREE idn_free
+#endif
+
 /**
  * gnutls_idna_map:
  * @input: contain the UTF-8 formatted domain name
@@ -87,7 +94,7 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	}
 
 #ifdef HAVE_LIBIDN2
-#if IDN2_VERSION_NUMBER >= 0x00140000
+# if IDN2_VERSION_NUMBER >= 0x00140000
 	/* IDN2_NONTRANSITIONAL automatically converts to lowercase
 	 * IDN2_NFC_INPUT converts to NFC before toASCII conversion
 	 *
@@ -97,11 +104,12 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	 * we provide IDN2_NFC_INPUT. */
 
 	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT | IDN2_NONTRANSITIONAL);
-#else
+# else
 	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT);
-#endif
+# endif
 	if (rc != IDN2_OK) {
 		gnutls_assert();
+		idna = NULL; /* in case idn2_lookup_u8 modifies &idna */
 		_gnutls_debug_log("unable to convert name '%s' to IDNA format: %s\n", istr.data, idn2_strerror(rc));
 		ret = GNUTLS_E_INVALID_UTF8_STRING;
 		goto fail;
@@ -116,7 +124,7 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	}
 #endif
 
-	if (gnutls_malloc != malloc) {
+	if (gnutls_free != IDN_FREE) {
 		ret = _gnutls_set_strdatum(out, idna, strlen(idna));
 	} else  {
 		out->data = (unsigned char*)idna;
@@ -124,12 +132,9 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 		idna = NULL;
 		ret = 0;
 	}
+
  fail:
-#ifdef HAVE_LIBIDN2
-	idn2_free(idna);
-#else
-	idn_free(idna);
-#endif
+	IDN_FREE(idna);
 	gnutls_free(istr.data);
 	return ret;
 }
