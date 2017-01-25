@@ -128,7 +128,7 @@ _asn1_convert_integer (const unsigned char *value, unsigned char *value_out,
   return ASN1_SUCCESS;
 }
 
-/* Appends a new element into the sequent (or set) defined by this
+/* Appends a new element into the sequence (or set) defined by this
  * node. The new element will have a name of '?number', where number
  * is a monotonically increased serial number.
  *
