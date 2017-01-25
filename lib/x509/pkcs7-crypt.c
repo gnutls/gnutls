@@ -1027,6 +1027,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	ret = _gnutls_x509_read_value(pkcs8_asn, root, &enc);
 	if (ret < 0) {
 		gnutls_assert();
+		enc.data = NULL;
 		goto cleanup;
 	}
 
@@ -1035,6 +1036,8 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 							  kdf_params,
 							  enc_params, &enc,
 							  decrypted_data);
+		if (ret < 0)
+			goto error;
 		goto cleanup;
 	}
 
