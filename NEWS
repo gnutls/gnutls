@@ -15,6 +15,11 @@ See the end for copying conditions.
    when the instruction was available on the host, but not on a VM running
    gnutls, detection could fail causing illegal instruction usage.
 
+** p11tool: re-use ID from corresponding objects when writing certificates.
+   That is, when writing a certificate which has a corresponding public key,
+   or private key in the token, ensure that we use the same ID for the
+   certificate.
+
 ** API and ABI modifications:
 No changes since last version.
 
