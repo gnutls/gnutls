@@ -238,6 +238,8 @@ gnutls_hmac_get_len@GNUTLS_3_4
 gnutls_hmac_init@GNUTLS_3_4
 gnutls_hmac_output@GNUTLS_3_4
 gnutls_hmac_set_nonce@GNUTLS_3_4
+gnutls_idna_map@GNUTLS_3_4
+gnutls_idna_reverse_map@GNUTLS_3_4
 gnutls_init@GNUTLS_3_4
 gnutls_key_generate@GNUTLS_3_4
 gnutls_kx_get@GNUTLS_3_4
