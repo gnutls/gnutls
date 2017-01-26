@@ -22,8 +22,6 @@
  */
 
 /* This file implements the TLS heartbeat extension.
- * It was originally implemented during Google SoC 2012 by by Olga Smolenchuk,
- * and later rewritten by Nikos Mavrogiannopoulos.
  */
 
 #include "errors.h"
@@ -150,6 +148,9 @@ heartbeat_send_data(gnutls_session_t session, const void *data,
  * Note that it is highly recommended to use this function with the
  * flag %GNUTLS_HEARTBEAT_WAIT, or you need to handle retransmissions
  * and timeouts manually.
+ *
+ * The total TLS data transmitted as part of the ping message are given by
+ * the following formula: MAX(16, @data_size)+gnutls_record_overhead_size()+3.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
