@@ -15,13 +15,19 @@ See the end for copying conditions.
    when the instruction was available on the host, but not on a VM running
    gnutls, detection could fail causing illegal instruction usage.
 
+** libgnutls: Added support for IDNA2008 for internationalized DNS names.
+   If gnutls is compiled using libidn2 (the latest version is recommended),
+   it will support IDNA2008 instead of the now obsolete IDNA2003 standard.
+   Resolves gitlab issue #150. Based on patch by Tim Ruehsen.
+
 ** p11tool: re-use ID from corresponding objects when writing certificates.
    That is, when writing a certificate which has a corresponding public key,
    or private key in the token, ensure that we use the same ID for the
    certificate.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_idna_map: Added
+gnutls_idna_reverse_map: Added
 
 
 * Version 3.5.8 (released 2016-01-09)
