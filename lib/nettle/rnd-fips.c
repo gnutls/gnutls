@@ -39,11 +39,6 @@
  * seeding.
  */
 
-#define RND_LOCK if (gnutls_mutex_lock(&rnd_mutex)!=0) abort()
-#define RND_UNLOCK if (gnutls_mutex_unlock(&rnd_mutex)!=0) abort()
-
-static void *rnd_mutex;
-
 struct fips_ctx {
 	struct drbg_aes_ctx nonce_context;
 	struct drbg_aes_ctx normal_context;
@@ -167,7 +162,7 @@ static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 /* Initialize this random subsystem. */
 static int _rngfips_init(void **_ctx)
 {
-/* Basic initialization is required to initialize mutexes and
+/* Basic initialization is required to
    do a few checks on the implementation.  */
 	struct fips_ctx *ctx;
 	int ret;
@@ -176,13 +171,11 @@ static int _rngfips_init(void **_ctx)
 	if (ctx == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	ret = gnutls_mutex_init(&rnd_mutex);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	ret = _rngfips_ctx_init(ctx);
-	if (ret < 0)
+	if (ret < 0) {
+		gnutls_free(ctx);
 		return gnutls_assert_val(ret);
+	}
 
 	*_ctx = ctx;
 
@@ -194,7 +187,6 @@ static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 	struct fips_ctx *ctx = _ctx;
 	int ret;
 
-	RND_LOCK;
 	switch (level) {
 	case GNUTLS_RND_RANDOM:
 		ret = get_random(&ctx->normal_context, ctx, buffer, length);
@@ -206,7 +198,6 @@ static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 		ret = get_random(&ctx->nonce_context, ctx, buffer, length);
 		break;
 	}
-	RND_UNLOCK;
 
 	return ret;
 }
@@ -214,9 +205,6 @@ static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 static void _rngfips_deinit(void *_ctx)
 {
 	struct fips_ctx *ctx = _ctx;
-
-	gnutls_mutex_deinit(&rnd_mutex);
-	rnd_mutex = NULL;
 
 	zeroize_key(ctx, sizeof(*ctx));
 	free(ctx);
@@ -232,9 +220,7 @@ static int selftest_kat(void)
 {
 	int ret;
 
-	RND_LOCK;
 	ret = drbg_aes_self_test();
-	RND_UNLOCK;
 
 	if (ret == 0) {
 		_gnutls_debug_log("DRBG-AES self test failed\n");
