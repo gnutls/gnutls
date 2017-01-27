@@ -28,7 +28,6 @@
 #include "nettle/rnd-common.h"
 
 extern int crypto_rnd_prio;
-extern void *gnutls_rnd_ctx;
 extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
 
 void _gnutls_rnd_deinit(void);

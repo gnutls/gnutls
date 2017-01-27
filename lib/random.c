@@ -29,57 +29,34 @@
 #include "locks.h"
 #include <fips.h>
 
-void *gnutls_rnd_ctx;
-GNUTLS_STATIC_MUTEX(gnutls_rnd_init_mutex);
-
-#ifdef HAVE_STDATOMIC_H
-static atomic_uint rnd_initialized = 0;
-
-inline static int _gnutls_rnd_init(void)
-{
-	if (unlikely(!rnd_initialized)) {
-		if (_gnutls_rnd_ops.init == NULL) {
-			rnd_initialized = 1;
-			return 0;
-		}
-
-		GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_init_mutex);
-		if (!rnd_initialized) {
-			if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
-				gnutls_assert();
-				GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
-				return GNUTLS_E_RANDOM_FAILED;
-			}
-			rnd_initialized = 1;
-		}
-		GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
-	}
-	return 0;
-}
+#ifdef HAVE_THREADS_H
+# include <threads.h>
+#elif defined(__GNUC__)
+# define _Thread_local __thread
 #else
-static unsigned rnd_initialized = 0;
+# error Unsupported platform
+#endif
+
+static _Thread_local void *gnutls_rnd_ctx;
+
+static _Thread_local unsigned rnd_initialized = 0;
 
 inline static int _gnutls_rnd_init(void)
 {
-	GNUTLS_STATIC_MUTEX_LOCK(gnutls_rnd_init_mutex);
 	if (unlikely(!rnd_initialized)) {
 		if (_gnutls_rnd_ops.init == NULL) {
 			rnd_initialized = 1;
-			GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
 			return 0;
 		}
 
 		if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
 			gnutls_assert();
-			GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
 			return GNUTLS_E_RANDOM_FAILED;
 		}
 		rnd_initialized = 1;
 	}
-	GNUTLS_STATIC_MUTEX_UNLOCK(gnutls_rnd_init_mutex);
 	return 0;
 }
-#endif
 
 int _gnutls_rnd_preinit(void)
 {
