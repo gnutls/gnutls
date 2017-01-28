@@ -164,11 +164,8 @@ static int _idn2_to_unicode_8z8z(const char *src, char **dst)
 
 		out_len = 0;
 		for (e = s = src; *e; s = e) {
-			while (*e && *e != '.') {
-				if ((unsigned char)*e >= 0x80)
-					return IDN2_ENCODING_ERROR;
+			while (*e && *e != '.')
 				e++;
-			}
 
 			if (e - s > 4 && (s[0] == 'x' || s[0] == 'X') && (s[1] == 'n' || s[1] == 'N') && s[2] == '-' && s[3] == '-') {
 				size_t u32len = IDN2_LABEL_MAX_LENGTH * 4;
