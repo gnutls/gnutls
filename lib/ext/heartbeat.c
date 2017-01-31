@@ -71,7 +71,7 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
   *
   * Since: 3.1.2
   **/
-int gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
+unsigned gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
 {
 	extension_priv_data_t epriv;
 
