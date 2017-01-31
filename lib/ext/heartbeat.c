@@ -40,7 +40,8 @@
   *
   * If this function is called with the %GNUTLS_HB_PEER_ALLOWED_TO_SEND
   * @type, GnuTLS will allow heartbeat messages to be received. Moreover it also
-  * request the peer to accept heartbeat messages.
+  * request the peer to accept heartbeat messages. This function
+  * must be called prior to TLS handshake.
   *
   * If the @type used is %GNUTLS_HB_LOCAL_ALLOWED_TO_SEND, then the peer
   * will be asked to accept heartbeat messages but not send ones.
