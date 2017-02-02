@@ -538,7 +538,7 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
 {
 }
 
-int gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
+unsigned gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
 {
 	return 0;
 }
