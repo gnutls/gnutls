@@ -80,7 +80,7 @@ if test "${rc}" = "0"; then
 fi
 
 # check validation with date after intermediate cert issuance
-datefudge -s "2038-10-12" \
+datefudge -s "2038-10-13" \
 ${VALGRIND} "${CERTTOOL}" --inder --p7-verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${srcdir}/data/${FILE}" >"${OUTFILE}"
 rc=$?
 
