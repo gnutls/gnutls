@@ -85,6 +85,10 @@ typedef struct gnutls_x509_crt_int {
 
 	gnutls_datum_t der;
 
+	/* this cached value allows fast access to alt names */
+	gnutls_subject_alt_names_t san;
+	gnutls_subject_alt_names_t ian;
+
 	/* backwards compatibility for gnutls_x509_crt_get_subject()
 	 * and gnutls_x509_crt_get_issuer() */
 	gnutls_x509_dn_st dn;
