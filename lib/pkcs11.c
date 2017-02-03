@@ -3138,6 +3138,7 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 	if (ret < 0) {
 		gnutls_assert();
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			*p_list = NULL;
 			*n_list = 0;
 			ret = 0;
 		}
