@@ -66,8 +66,8 @@ static inline size_t hex_str_size(size_t bytes)
  *
  *	hex_decode(str, strlen(str), buf, sizeof(buf));
  */
-static inline size_t hex_data_size(size_t strlen)
+static inline size_t hex_data_size(size_t slen)
 {
-	return strlen / 2;
+	return slen / 2;
 }
 #endif /* PETTYCOIN_HEX_H */
