@@ -180,8 +180,13 @@ void doit(void)
 
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME,
 						   "απαλό.com", strlen("απαλό.com"), 1);
+#if defined(HAVE_LIBIDN) || defined(HAVE_LIBIDN2)
 	if (ret != 0)
-		fail("gnutls_x509_crt_set_subject_alt_name\n");
+		fail("gnutls_x509_crt_set_subject_alt_name: %s\n", gnutls_strerror(ret));
+#else
+	if (ret != GNUTLS_E_UNIMPLEMENTED_FEATURE)
+		fail("gnutls_x509_crt_set_subject_alt_name: %s\n", gnutls_strerror(ret));
+#endif
 
 #ifdef HAVE_LIBIDN
 	ret = gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_RFC822NAME,
@@ -189,7 +194,6 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_subject_alt_name\n");
 #endif
-
 	s = 0;
 	ret = gnutls_x509_crt_get_key_purpose_oid(crt, 0, NULL, &s, NULL);
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)

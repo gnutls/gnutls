@@ -188,7 +188,7 @@ void doit(void)
 	if (ret)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
-#ifdef HAVE_LIBIDN
+#if defined(HAVE_LIBIDN) || defined(HAVE_LIBIDN2)
 	ret = gnutls_x509_crt_check_hostname(x509, "www.teχ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
@@ -197,17 +197,19 @@ void doit(void)
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
-	ret = gnutls_x509_crt_check_hostname(x509, "γΓγ.τόΣτ.gr");
+	ret = gnutls_x509_crt_check_hostname(x509, "τέστ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
-	ret = gnutls_x509_crt_check_hostname(x509, "τέστ.gr");
+#if defined(HAVE_LIBIDN) /* There are IDNA2003 */
+	ret = gnutls_x509_crt_check_hostname(x509, "γΓγ.τόΣτ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "ΤΈΣΤ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+#endif
 #endif
 
 	gnutls_x509_crt_deinit(x509);
