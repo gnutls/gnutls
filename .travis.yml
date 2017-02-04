@@ -25,3 +25,7 @@ script:
   - PATH=/usr/local/opt/gettext/bin:$PATH ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-dependency-tracking
   - make -j$(sysctl -n hw.ncpu)
   - make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
+
+after_failure:
+  - for i in tests/*.log;do echo "" && echo $i && cat $i;done
+
