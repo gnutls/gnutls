@@ -16,12 +16,12 @@ notifications:
 
 before_install:
   - git submodule update --init
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-        brew install pkg-config autoconf automake autogen libtool nettle valgrind p11-kit libtasn1 unbound libidn gettext;
+  - if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then
+        brew install pkg-config autoconf automake autogen libtool nettle valgrind p11-kit libtasn1 gettext;
     fi
 
 script:
-  - PATH=/usr/local/opt/gettext/bin:$PATH make autoreconf && rm -f tests/suite/mini-eagain2.c
-  - PATH=/usr/local/opt/gettext/bin:$PATH ./configure --disable-valgrind-tests --disable-doc --disable-guile --without-p11-kit --disable-dependency-tracking
+  - PATH=/usr/local/opt/gettext/bin:$PATH make autoreconf
+  - PATH=/usr/local/opt/gettext/bin:$PATH ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-dependency-tracking
   - make -j$(sysctl -n hw.ncpu)
   - make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
