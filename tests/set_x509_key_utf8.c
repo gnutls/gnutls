@@ -143,7 +143,7 @@ void doit(void)
 	int ret;
 	unsigned idx;
 
-#ifndef HAVE_LIBIDN
+#if !defined(HAVE_LIBIDN) && !defined(HAVE_LIBIDN2)
 	exit(77);
 #endif
 
@@ -173,8 +173,10 @@ void doit(void)
 	assert(idx == 1);
 
 	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL);
+#if defined(HAVE_LIBIDN) /* IDNA2003 */
 	test_cli_serv(x509_cred, clicred, "NORMAL", "www.νίκος.com", NULL, NULL, NULL); /* the DNS name of second cert */
 	test_cli_serv(x509_cred, clicred, "NORMAL", "raw:www.νίκος.com", NULL, NULL, NULL); /* the DNS name of second cert */
+#endif
 	test_cli_serv(x509_cred, clicred, "NORMAL", "www.xn--kxawhku.com", NULL, NULL, NULL); /* the previous name in IDNA format */
 	test_cli_serv(x509_cred, clicred, "NORMAL", "简体中文.εξτρα.com", NULL, NULL, NULL); /* the second DNS name of cert */
 	test_cli_serv(x509_cred, clicred, "NORMAL", "raw:简体中文.εξτρα.com", NULL, NULL, NULL); /* the second DNS name of cert */

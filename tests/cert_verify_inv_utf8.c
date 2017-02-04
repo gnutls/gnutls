@@ -150,7 +150,7 @@ static void auto_parse(void)
 
 void doit(void)
 {
-#ifndef HAVE_LIBIDN
+#if !defined(HAVE_LIBIDN) && !defined(HAVE_LIBIDN2)
 	exit(77);
 #endif
 	auto_parse();
