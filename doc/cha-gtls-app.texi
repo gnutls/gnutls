@@ -1050,9 +1050,24 @@ are listed in @ref{The Alert Protocol}.
 @section Priority strings
 @cindex Priority strings
 
+@subheading How to use Priority Strings
+
 The GnuTLS priority strings specify the TLS session's handshake
-algorithms and options in a compact, easy-to-use format.  That string
-may contain a single initial keyword such as in
+algorithms and options in a compact, easy-to-use format. These
+strings are intended as a user-specified override of the library defaults.
+
+That is, applications should use the default settings
+(c.f. @funcref{gnutls_set_default_priority}), and provide the user 
+with access to priority strings for overriding the default behavior,
+on configuration files, or other UI. Following such a principle,
+makes the GnuTLS library as the default settings provider. That is
+necessary and a good practice, because TLS protocol hardening and
+phasing out of legacy algorithms, is easier to co-ordinate when happens
+in a single library.
+
+@subheading Using Priority Strings
+
+A priority string string may contain a single initial keyword such as in
 @ref{tab:prio-keywords} and may be followed by additional algorithm or
 special keywords. Note that their description is intentionally avoiding
 specific algorithm details, as the priority strings are not constant between
