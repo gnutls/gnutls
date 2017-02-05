@@ -5,6 +5,19 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.10 (unreleased)
+
+** libgnutls: optimized access to subject alternative names (SANs) in parsed
+   certificates. The previous implementation assumed a small number of
+   SANs in a certificate, with repeated calls to ASN.1 decoding of the extension
+   without any intermediate caching. That caused delays in certificates with
+   a long list of names in functions such as gnutls_x509_crt_check_hostname().
+   With the current code, the SANs are parsed once on certificate import.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.5.9 (released 2017-02-12)
 
 ** libgnutls: Removed any references to OpenPGP functionality in documentation,
