@@ -26,7 +26,9 @@
 #include <gnutls/gnutls.h>
 #include <libguile.h>
 
+#ifdef HAVE_ALLOCA_H
 #include <alloca.h>
+#endif
 
 #include "enums.h"
 #include "errors.h"
