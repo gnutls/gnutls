@@ -24,6 +24,14 @@ EXTRA_DIST = TODO certtool.cfg gnutls.pdf gnutls.html	\
 	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions \
 	doc.mk COPYING COPYING.LESSER
 
+IMAGES = \
+	gnutls-handshake-state.png	\
+	gnutls-layers.png gnutls-modauth.png \
+	gnutls-client-server-use-case.png			\
+	gnutls-handshake-sequence.png gnutls-internals.png	\
+	gnutls-logo.png gnutls-x509.png	\
+	pkcs11-vision.png
+
 SUBDIRS = examples cyclo scripts credentials latex
 if ENABLE_GTK_DOC
 SUBDIRS += reference
@@ -181,14 +189,9 @@ gnutls_TEXINFOS += gnutls-handshake-state.dia			\
 gnutls_TEXINFOS += gnutls-modauth.dia gnutls-modauth.eps	\
 	gnutls-modauth.png
 
-imagesdir = $(infodir)
-images_DATA = \
-	gnutls-handshake-state.png	\
-	gnutls-layers.png gnutls-modauth.png \
-	gnutls-client-server-use-case.png			\
-	gnutls-handshake-sequence.png gnutls-internals.png	\
-	gnutls-logo.png gnutls-x509.png	\
-	pkcs11-vision.png
+infoimagesdir = $(infodir)
+infoimages_DATA = $(IMAGES)
+html_DATA = $(IMAGES)
 
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
