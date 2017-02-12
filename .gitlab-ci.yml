@@ -1,4 +1,5 @@
 stages:
+  - initialization
   - stage1-testing
   - stage2-testing
 
@@ -10,35 +11,131 @@ variables:
   DEBIAN_BUILD: buildenv-debian-stretch
   FEDORA_BUILD: buildenv-f25
   FEDORA_X86_BUILD: buildenv-f23-x86
+  GET_SOURCES_ATTEMPTS: "3"
 
-Fedora/x86_64/minimal:
+################
+# Initialization
+################
+
+init/Fedora/x86_64:
+  stage: initialization
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - git submodule update --init &&
+    make autoreconf
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    untracked: true
+    expire_in: 1 day
+
+
+########################################
+# Stage 1, syntax and simple build+check
+########################################
+
+# Main build (used in stage2) - compile with C99
+ABI-check/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
+    && make -j$(nproc)
+  - make abi-check
+  - make pic-check
+  tags:
+  - shared
+  except:
+  - tags
+  dependencies:
+  - init/Fedora/x86_64
+  artifacts:
+    untracked: true
+    expire_in: 1 day
+
+syntax-check/Fedora/x86_64:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --disable-maintainer-mode --disable-guile 
+  - make syntax-check
+  tags:
+  - shared
+  dependencies:
+  - init/Fedora/x86_64
+  except:
+  - tags
+
+##################################################
+# Stage 2, documentation, and advanced checks
+##################################################
+
+dist/Fedora:
+  stage: stage2-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - git submodule update --init
+  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --enable-code-coverage --enable-gtk-doc --disable-maintainer-mode
+    && make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
+  - make -C doc gnutls.html
+  - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
+    make -C doc/latex gnutls.pdf
+  - make dist
+  tags:
+  - shared
+  dependencies:
+  - init/Fedora/x86_64
+  except:
+  - tags
+
+coverage/Fedora:
+  stage: stage2-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - make -j$(nproc) check
+  - make local-code-coverage-output || true
+  tags:
+  - shared
+  dependencies:
+  - init/Fedora/x86_64
+  except:
+  - tags
+
+
+minimal/Fedora/x86_64:
+  stage: stage2-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
-    make autoreconf && ./configure --with-included-libtasn1
+    ./configure --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe --disable-openpgp-authentication
     --disable-ocsp --disable-session-tickets --disable-non-suiteb-curves --with-included-unistring
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
     --disable-ssl3-support --disable-ssl2-support --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j$(nproc)
+  dependencies:
+  - init/Fedora/x86_64
   tags:
   - shared
   except:
   - tags
 
-Fedora/x86_64/no-SSL-3.0:
-  stage: stage1-testing
+no-SSL-3.0/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc  --disable-guile --disable-valgrind-tests &&
+  - mkdir -p build && cd build &&
+    ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile --disable-valgrind-tests &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -48,17 +145,18 @@ Fedora/x86_64/no-SSL-3.0:
       - build/*.log
       - build/tests/*/*.log
 
-Fedora/x86_64/clang:
-  stage: stage1-testing
+clang/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && 
-    CC=clang ./configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc  --disable-guile --disable-valgrind-tests &&
+  - CC=clang ./configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc  --disable-guile --disable-valgrind-tests &&
     make -j$(nproc) && make check -C tests -j$(nproc)
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -68,17 +166,19 @@ Fedora/x86_64/clang:
       - tests/*.log
       - tests/*/*.log
 
-Fedora/x86_64/FIPS140-2:
-  stage: stage1-testing
+FIPS140-2/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && mkdir -p build && cd build &&
+  - mkdir -p build && cd build &&
     ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc  --disable-guile --disable-valgrind-tests &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     when: on_failure
     paths:
@@ -86,17 +186,19 @@ Fedora/x86_64/FIPS140-2:
       - build/tests/*.log
       - build/tests/*/*.log
 
-Fedora/x86_64/IDNA2003:
-  stage: stage1-testing
+IDNA2003/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && mkdir -p build && cd build &&
+  - mkdir -p build && cd build &&
     ../configure --without-libidn2 --disable-doc --disable-guile --disable-full-test-suite --disable-valgrind-tests &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     when: on_failure
     paths:
@@ -104,16 +206,18 @@ Fedora/x86_64/IDNA2003:
       - build/tests/*.log
       - build/tests/*/*.log
 
-Fedora/x86_64/valgrind:
-  stage: stage1-testing
+valgrind/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && ./configure
+  - ./configure
     --disable-non-suiteb-curves --disable-doc  --disable-guile --disable-full-test-suite && make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -122,16 +226,18 @@ Fedora/x86_64/valgrind:
       - tests/*.log
       - tests/*/*.log
 
-Fedora/x86_64/no-tools:
-  stage: stage1-testing
+no-tools/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && ./configure
+  - ./configure
     --disable-non-suiteb-curves --disable-valgrind-tests --disable-doc --disable-guile --disable-tools --enable-tests && make -j$(nproc) && make -j$(nproc) check
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -140,17 +246,19 @@ Fedora/x86_64/no-tools:
       - tests/*.log
       - tests/*/*.log
 
-Fedora/x86_64/asan:
-  stage: stage1-testing
+asan/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
+  - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -160,12 +268,12 @@ Fedora/x86_64/asan:
       - tests/*/*.log
 
 MinGW32/DLLs:
-  stage: stage1-testing
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    make autoreconf && rm -f tests/suite/mini-eagain2.c && 
+    rm -f tests/suite/mini-eagain2.c && 
     mingw32-configure --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
@@ -186,6 +294,8 @@ MinGW32/DLLs:
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win32-build/bin &&
     cp lib/.libs/*.a lib/*.def lib/gnutls.pc win32-build/lib &&
     cp lib/includes/gnutls/*.h win32-build/lib/includes
+  dependencies:
+  - init/Fedora/x86_64
   tags:
   - shared
   - docker
@@ -196,12 +306,12 @@ MinGW32/DLLs:
       - win32-build/
 
 MinGW64/DLLs:
-  stage: stage1-testing
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    make autoreconf && rm -f tests/suite/mini-eagain2.c && 
+    rm -f tests/suite/mini-eagain2.c && 
     mingw64-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
@@ -227,17 +337,19 @@ MinGW64/DLLs:
   - docker
   only:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     paths:
       - win64-build/
 
 MinGW64:
-  stage: stage1-testing
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
-    make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
+    rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw64-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   tags:
@@ -245,6 +357,8 @@ MinGW64:
   - docker
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -254,12 +368,12 @@ MinGW64:
       - build/tests/*/*.log
 
 MinGW32:
-  stage: stage1-testing
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
+    rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw32-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   tags:
@@ -267,6 +381,8 @@ MinGW32:
   - docker
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -278,7 +394,7 @@ MinGW32:
 # That is a specific runner that we cannot enable universally.
 # We restrict it to builds under the $BUILD_IMAGES_PROJECT project.
 FreeBSD10/x86_64:
-  stage: stage1-testing
+  stage: stage2-testing
   image:
   before_script:
   - /usr/bin/true
@@ -301,7 +417,7 @@ FreeBSD10/x86_64:
 
 # We need a clean 32-bit fedora for testing
 Fedora/x86:
-  stage: stage1-testing
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
   script:
   - make autoreconf && mkdir -p build && cd build &&
@@ -311,6 +427,7 @@ Fedora/x86:
   - shared
   except:
   - tags
+  dependencies: []
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -319,17 +436,19 @@ Fedora/x86:
       - build/tests/*.log
       - build/tests/*/*.log
 
-# Check with undefined sanitizer
-Fedora/x86_64/ubsan:
-  stage: stage1-testing
+# Check with undefined sanitizer + obtain coverage output
+ubsan/Fedora/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf && CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --disable-doc
+  - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --disable-doc
     && make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
   except:
   - tags
+  dependencies:
+  - init/Fedora/x86_64
   artifacts:
     when: on_failure
     paths:
@@ -338,24 +457,8 @@ Fedora/x86_64/ubsan:
       - build/tests/*.log
       - build/tests/*/*.log
 
-# Main build (used in stage2) - compile with C99
-Fedora/x86_64/build:
-  stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - git submodule update --init &&
-    make autoreconf && CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --enable-code-coverage --enable-gtk-doc --disable-maintainer-mode
-    && make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
-  tags:
-  - shared
-  except:
-  - tags
-  artifacts:
-    untracked: true
-    expire_in: 1 day
-
-Debian/x86_64/build:
-  stage: stage1-testing
+build/Debian/x86_64:
+  stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
   - make autoreconf && mkdir -p build && cd build &&
@@ -365,6 +468,7 @@ Debian/x86_64/build:
   - shared
   except:
   - tags
+  dependencies: []
   artifacts:
     when: on_failure
     paths:
@@ -372,62 +476,3 @@ Debian/x86_64/build:
       - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
-
-Fedora/x86_64/coverage:
-  stage: stage2-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - make -C tests check -j$(nproc) && ( make local-code-coverage-output || true )
-  tags:
-  - shared
-  dependencies:
-  - Fedora/x86_64/build
-  except:
-  - tags
-
-Fedora/x86_64/ABI-check:
-  stage: stage2-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - make abi-check && make pic-check
-  tags:
-  - shared
-  dependencies:
-  - Fedora/x86_64/build
-  except:
-  - tags
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - build/logs/gnutls-dane/*/log.txt
-      - build/logs/gnutls/*/log.txt
-
-Fedora/x86_64/syntax-check:
-  stage: stage2-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - make syntax-check
-  tags:
-  - shared
-  dependencies:
-  - Fedora/x86_64/build
-  except:
-  - tags
-
-Fedora/dist:
-  stage: stage2-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - git submodule update --init &&
-    make -C doc gnutls.html &&
-    PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
-    make -C doc/latex gnutls.pdf &&
-    make dist
-  tags:
-  - shared
-  dependencies:
-  - Fedora/x86_64/build
-  except:
-  - tags
-
