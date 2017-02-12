@@ -1969,7 +1969,7 @@ int gnutls_random_art(gnutls_random_art_t type,
 
 /* IDNA */
 #define GNUTLS_IDNA_FORCE_2008 (1<<1)
-int gnutls_idna_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);;
+int gnutls_idna_map(const char * input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
 int gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags);
 
 /* SRP 
