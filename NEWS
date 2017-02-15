@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.5.10 (unreleased)
 
+** gnutls.pc: do not include libidn2 in Requires.private. The libidn2 versions
+   available do not include libidn2.pc, thus the inclusion was causing pkg-config
+   issues. Instead we include -lidn2 in Libs.private when compiled against libidn2.
+
 ** libgnutls: optimized access to subject alternative names (SANs) in parsed
    certificates. The previous implementation assumed a small number of
    SANs in a certificate, with repeated calls to ASN.1 decoding of the extension
