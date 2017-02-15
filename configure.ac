@@ -492,11 +492,13 @@ if test "$try_libidn" = yes;then
       idna_support="IDNA 2008 (libidn2)"
       AC_DEFINE([HAVE_LIBIDN2], 1, [Define if IDNA 2008 support is enabled.])
       AC_SUBST([LIBIDN_LIBS], [-lidn2])
-      if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
-        GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn2"
-      else
-        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libidn2"
-      fi
+      AC_SUBST([LIBIDN2_LIBS], [-lidn2]) dnl used in gnutls.pc.in
+dnl enable once libidn2.pc is widespread; and remove LIBIDN2_LIBS from gnutls.pc.in (Libs.private)
+dnl      if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+dnl        GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn2"
+dnl      else
+dnl        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libidn2"
+dnl      fi
     ],[
       with_libidn2=no;
       AC_MSG_WARN(*** LIBIDN2 was not found. You will not be able to use IDN2008 support)
