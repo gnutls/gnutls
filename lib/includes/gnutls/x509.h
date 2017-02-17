@@ -131,6 +131,19 @@ typedef enum gnutls_certificate_import_flags {
 int gnutls_x509_crt_init(gnutls_x509_crt_t * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert);
 
+/**
+ * gnutls_certificate_import_flags:
+ * @GNUTLS_X509_CRT_FLAG_IGNORE_SANITY: Ignore any sanity checks at the
+ *   import of the certificate; i.e., ignore checks such as version/field
+ *   matching and strict time field checks. Intended to be used for debugging.
+ *
+ * Enumeration of different certificate flags.
+ */
+typedef enum gnutls_x509_crt_flags {
+	GNUTLS_X509_CRT_FLAG_IGNORE_SANITY = 1
+} gnutls_x509_crt_flags;
+void gnutls_x509_crt_set_flags(gnutls_x509_crt_t cert, unsigned flags);
+
 unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 unsigned gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1, gnutls_datum_t * der);
 

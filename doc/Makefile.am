@@ -580,6 +580,7 @@ ENUMS += enums/gnutls_supplemental_data_format_type_t
 ENUMS += enums/gnutls_tpmkey_fmt_t
 ENUMS += enums/gnutls_vdata_types_t
 ENUMS += enums/gnutls_x509_crl_reason_t
+ENUMS += enums/gnutls_x509_crt_flags
 ENUMS += enums/gnutls_x509_crt_fmt_t
 ENUMS += enums/gnutls_x509_subject_alt_name_t
 

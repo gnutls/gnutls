@@ -1134,6 +1134,7 @@ GNUTLS_3_4
 	gnutls_utf8_password_normalize;
 	gnutls_idna_map;
 	gnutls_idna_reverse_map;
+	gnutls_x509_crt_set_flags;
  local:
 	*;
 };

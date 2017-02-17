@@ -74,6 +74,7 @@ typedef struct gnutls_x509_crt_int {
 	int use_extensions;
 	unsigned expanded; /* a certificate has been expanded */
 	unsigned modified; /* the cached values below may no longer be valid */
+	unsigned flags;
 
 	struct pin_info_st pin;
 

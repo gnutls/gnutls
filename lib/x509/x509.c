@@ -399,6 +399,9 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 	int result = 0, version;
 	gnutls_datum_t exts;
 
+	if (cert->flags & GNUTLS_X509_CRT_FLAG_IGNORE_SANITY)
+		return 0;
+
 	/* enforce the rule that only version 3 certificates carry extensions */
 	result = gnutls_x509_crt_get_version(cert);
 	if (result < 0) {
@@ -4176,3 +4179,20 @@ gnutls_x509_crt_verify_data2(gnutls_x509_crt_t crt,
 				data, signature, flags);
 }
 
+/**
+ * gnutls_x509_crt_set_flags:
+ * @cert: A type #gnutls_x509_crt_t
+ * @flags: flags from the %gnutls_x509_crt_flags
+ *
+ * This function will set flags for the specified certificate.
+ * Currently this is useful for the %GNUTLS_X509_CRT_FLAG_IGNORE_SANITY
+ * which allows importing certificates even if they have known issues.
+ *
+ * Since: 3.6.0
+ *
+ **/
+void gnutls_x509_crt_set_flags(gnutls_x509_crt_t cert,
+				   unsigned int flags)
+{
+	cert->flags = flags;
+}

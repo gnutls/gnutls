@@ -979,6 +979,7 @@ APIMANS += gnutls_x509_crt_set_dn.3
 APIMANS += gnutls_x509_crt_set_dn_by_oid.3
 APIMANS += gnutls_x509_crt_set_expiration_time.3
 APIMANS += gnutls_x509_crt_set_extension_by_oid.3
+APIMANS += gnutls_x509_crt_set_flags.3
 APIMANS += gnutls_x509_crt_set_issuer_alt_name.3
 APIMANS += gnutls_x509_crt_set_issuer_alt_othername.3
 APIMANS += gnutls_x509_crt_set_issuer_dn.3
