@@ -50,6 +50,12 @@ if test "${rc}" != 1; then
 	exit 1
 fi
 
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/x509-v3-with-fractional-time.pem"
+rc=$?
 
+if test "${rc}" != 1; then
+	echo "X509v3 certificate with fractional time was accepted"
+	exit 1
+fi
 
 exit 0
