@@ -207,8 +207,13 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 
 	if (strchr(ttime, 'Z') == 0) {
 		gnutls_assert();
-		/* sorry we don't support it yet
-		 */
+		/* required to be in GMT */
+		return (time_t) - 1;
+	}
+
+	if (strchr(ttime, '.') != 0) {
+		gnutls_assert();
+		/* no fractional seconds allowed */
 		return (time_t) - 1;
 	}
 	xx[4] = 0;
