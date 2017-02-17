@@ -3593,6 +3593,7 @@ gnutls_x509_crt_list_import(gnutls_x509_crt_t * certs,
 			    gnutls_x509_crt_import(certs[count], &tmp,
 						   GNUTLS_X509_FMT_PEM);
 			if (ret < 0) {
+				count++;
 				gnutls_assert();
 				goto error;
 			}
