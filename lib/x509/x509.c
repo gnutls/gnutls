@@ -393,6 +393,57 @@ static int cache_alt_names(gnutls_x509_crt_t cert)
 
 	return 0;
 }
+
+static int check_cert_sanity(gnutls_x509_crt_t cert)
+{
+	int result = 0, version;
+	gnutls_datum_t exts;
+
+	/* enforce the rule that only version 3 certificates carry extensions */
+	result = gnutls_x509_crt_get_version(cert);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	version = result;
+	if (version < 3) {
+		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
+			"tbsCertificate.extensions", &exts);
+		if (result >= 0 && exts.size > 0) {
+			gnutls_assert();
+			_gnutls_debug_log("error: extensions present in certificate with version %d\n", version);
+			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+			goto cleanup;
+		}
+	}
+
+	if (version < 2) {
+		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
+			"tbsCertificate.subjectUniqueID", &exts);
+		if (result >= 0 && exts.size > 0) {
+			gnutls_assert();
+			_gnutls_debug_log("error: subjectUniqueID present in certificate with version %d\n", version);
+			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+			goto cleanup;
+		}
+
+		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
+			"tbsCertificate.issuerUniqueID", &exts);
+		if (result >= 0 && exts.size > 0) {
+			gnutls_assert();
+			_gnutls_debug_log("error: issuerUniqueID present in certificate with version %d\n", version);
+			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+			goto cleanup;
+		}
+	}
+
+	result = 0;
+
+ cleanup:
+	return result;
+}
+
 /**
  * gnutls_x509_crt_import:
  * @cert: The data to store the parsed certificate.
@@ -414,8 +465,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		       const gnutls_datum_t * data,
 		       gnutls_x509_crt_fmt_t format)
 {
-	int result = 0;
-	int version;
+	int result;
 
 	if (cert == NULL) {
 		gnutls_assert();
@@ -509,24 +559,10 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	/* enforce the rule that only version 3 certificates carry extensions */
-	result = gnutls_x509_crt_get_version(cert);
+	result = check_cert_sanity(cert);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
-	}
-
-	version = result;
-	if (version < 3) {
-		gnutls_datum_t exts;
-		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
-			"tbsCertificate.extensions", &exts);
-		if (result >= 0 && exts.size > 0) {
-			gnutls_assert();
-			_gnutls_debug_log("error: extensions present in certificate with version %d\n", version);
-			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
-			goto cleanup;
-		}
 	}
 
 	/* Since we do not want to disable any extension
