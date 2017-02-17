@@ -440,6 +440,8 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 				gnutls_verify_output_function func);
 #endif
 
+int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert);
+
 int
 _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				  const gnutls_x509_crl_t * crl_list,

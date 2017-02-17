@@ -394,7 +394,7 @@ static int cache_alt_names(gnutls_x509_crt_t cert)
 	return 0;
 }
 
-static int check_cert_sanity(gnutls_x509_crt_t cert)
+int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 {
 	int result = 0, version;
 	gnutls_datum_t exts;
@@ -407,32 +407,45 @@ static int check_cert_sanity(gnutls_x509_crt_t cert)
 	}
 
 	version = result;
+
 	if (version < 3) {
-		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
-			"tbsCertificate.extensions", &exts);
-		if (result >= 0 && exts.size > 0) {
-			gnutls_assert();
-			_gnutls_debug_log("error: extensions present in certificate with version %d\n", version);
-			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
-			goto cleanup;
+		if (!cert->modified) {
+			result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
+				"tbsCertificate.extensions", &exts);
+			if (result >= 0 && exts.size > 0) {
+				gnutls_assert();
+				_gnutls_debug_log("error: extensions present in certificate with version %d\n", version);
+				result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+				goto cleanup;
+			}
+		} else {
+			if (cert->use_extensions) {
+				gnutls_assert();
+				_gnutls_debug_log("error: extensions set in certificate with version %d\n", version);
+				result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+				goto cleanup;
+			}
 		}
 	}
 
 	if (version < 2) {
-		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
-			"tbsCertificate.subjectUniqueID", &exts);
-		if (result >= 0 && exts.size > 0) {
+		char id[128];
+		size_t id_size;
+
+		id_size = sizeof(id);
+		result = gnutls_x509_crt_get_subject_unique_id(cert, id, &id_size);
+		if (result >= 0 || result == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			gnutls_assert();
 			_gnutls_debug_log("error: subjectUniqueID present in certificate with version %d\n", version);
 			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
 			goto cleanup;
 		}
 
-		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
-			"tbsCertificate.issuerUniqueID", &exts);
-		if (result >= 0 && exts.size > 0) {
+		id_size = sizeof(id);
+		result = gnutls_x509_crt_get_issuer_unique_id(cert, id, &id_size);
+		if (result >= 0 || result == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			gnutls_assert();
-			_gnutls_debug_log("error: issuerUniqueID present in certificate with version %d\n", version);
+			_gnutls_debug_log("error: subjectUniqueID present in certificate with version %d\n", version);
 			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
 			goto cleanup;
 		}
@@ -559,7 +572,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	result = check_cert_sanity(cert);
+	result = _gnutls_check_cert_sanity(cert);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;

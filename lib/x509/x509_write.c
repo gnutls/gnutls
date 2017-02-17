@@ -1746,6 +1746,12 @@ gnutls_x509_crt_privkey_sign(gnutls_x509_crt_t crt,
 	 */
 	disable_optional_stuff(crt);
 
+	result = _gnutls_check_cert_sanity(crt);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
 	result = _gnutls_x509_pkix_sign(crt->cert, "tbsCertificate",
 					dig, issuer, issuer_key);
 	if (result < 0) {
