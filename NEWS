@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.6.0 (unreleased)
 
+** libgnutls: Refuse to import certificates which have fractional seconds
+   in Time fields, and X.509v1 certificates which have the unique identifiers
+   set. Both sets are prohibited by RFC5280.
+
 ** libgnutls: Refuse gnutls_record_send() and gnutls_record_recv()
    calls prior to handshake being complete. Addresses gitlab issue #158.
 
