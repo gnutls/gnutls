@@ -1440,7 +1440,7 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		adds(str, _("\tValidity:\n"));
 
 		tim = gnutls_x509_crt_get_activation_time(cert);
-		{
+		if (tim != -1) {
 			char s[42];
 			size_t max = sizeof(s);
 			struct tm t;
@@ -1455,10 +1455,12 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 				     (unsigned long) tim);
 			else
 				addf(str, _("\t\tNot Before: %s\n"), s);
+		} else {
+			addf(str, _("\t\tNot Before: %s\n"), _("unknown"));
 		}
 
 		tim = gnutls_x509_crt_get_expiration_time(cert);
-		{
+		if (tim != -1) {
 			char s[42];
 			size_t max = sizeof(s);
 			struct tm t;
@@ -1473,6 +1475,8 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 				     (unsigned long) tim);
 			else
 				addf(str, _("\t\tNot After: %s\n"), s);
+		} else {
+			addf(str, _("\t\tNot After: %s\n"), _("unknown"));
 		}
 	}
 
