@@ -455,7 +455,7 @@ int _gnutls_check_cert_sanity(gnutls_x509_crt_t cert)
 	    gnutls_x509_crt_get_activation_time(cert) == -1) {
 		gnutls_assert();
 		_gnutls_debug_log("error: invalid expiration or activation time in certificate\n");
-		result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+		result = GNUTLS_E_CERTIFICATE_TIME_ERROR;
 		goto cleanup;
 	}
 
