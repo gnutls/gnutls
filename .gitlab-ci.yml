@@ -40,7 +40,7 @@ ABI-check/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
+  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
     && make -j$(nproc)
   - make abi-check
   - make pic-check
@@ -76,7 +76,7 @@ dist/Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init
-  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --enable-code-coverage --enable-gtk-doc --disable-maintainer-mode
+  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
     && make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   - make -C doc gnutls.html
   - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
@@ -98,7 +98,7 @@ coverage/Fedora:
   tags:
   - shared
   dependencies:
-  - init/Fedora/x86_64
+  - ABI-check/Fedora/x86_64
   except:
   - tags
 
