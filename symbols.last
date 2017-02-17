@@ -1,4 +1,3 @@
-@
 GNUTLS_3_4@GNUTLS_3_4
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
@@ -967,6 +966,7 @@ gnutls_x509_crt_set_dn@GNUTLS_3_4
 gnutls_x509_crt_set_dn_by_oid@GNUTLS_3_4
 gnutls_x509_crt_set_expiration_time@GNUTLS_3_4
 gnutls_x509_crt_set_extension_by_oid@GNUTLS_3_4
+gnutls_x509_crt_set_flags@GNUTLS_3_4
 gnutls_x509_crt_set_issuer_alt_name@GNUTLS_3_4
 gnutls_x509_crt_set_issuer_alt_othername@GNUTLS_3_4
 gnutls_x509_crt_set_issuer_dn@GNUTLS_3_4
