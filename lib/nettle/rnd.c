@@ -144,7 +144,6 @@ static int do_device_source(struct rnd_ctx_st *ctx, int init, struct event_st *e
 static void wrap_nettle_rnd_deinit(void *_ctx)
 {
 	struct ext_ctx_st *ctx = _ctx;
-	_rnd_system_entropy_deinit();
 	gnutls_free(ctx);
 }
 
