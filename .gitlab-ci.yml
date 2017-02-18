@@ -21,8 +21,7 @@ init/Fedora/x86_64:
   stage: initialization
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - git submodule update --init &&
-    make autoreconf
+  - make autoreconf
   tags:
   - shared
   except:
