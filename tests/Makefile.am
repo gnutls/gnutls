@@ -32,6 +32,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
 	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
 	rsa-md5-collision/README safe-renegotiation/README starttls-smtp.txt starttls-ftp.txt \
+	starttls-lmtp.txt starttls-pop3.txt starttls-nntp.txt starttls-sieve.txt \
 	rsa-md5-collision/colliding-chain-md5-2.pem rsa-md5-collision/colliding-chain-md5-1.pem \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \

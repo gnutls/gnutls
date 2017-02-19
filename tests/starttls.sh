@@ -108,4 +108,56 @@ fi
 kill ${PID}
 wait
 
+eval "${GETPORT}"
+socat TCP-LISTEN:${PORT} EXEC:"$CHAT -e -S -v -f ${srcdir}/starttls-lmtp.txt",pty &
+PID=$!
+wait_server ${PID}
+
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls-proto lmtp --verbose </dev/null >/dev/null
+if test $? != 1;then
+	fail ${PID} "connect should have failed with error code 1"
+fi
+
+kill ${PID}
+wait
+
+eval "${GETPORT}"
+socat TCP-LISTEN:${PORT} EXEC:"$CHAT -e -S -v -f ${srcdir}/starttls-pop3.txt",pty &
+PID=$!
+wait_server ${PID}
+
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls-proto pop3 --verbose </dev/null >/dev/null
+if test $? != 1;then
+	fail ${PID} "connect should have failed with error code 1"
+fi
+
+kill ${PID}
+wait
+
+eval "${GETPORT}"
+socat TCP-LISTEN:${PORT} EXEC:"$CHAT -e -S -v -f ${srcdir}/starttls-nntp.txt",pty &
+PID=$!
+wait_server ${PID}
+
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls-proto nntp --verbose </dev/null >/dev/null
+if test $? != 1;then
+	fail ${PID} "connect should have failed with error code 1"
+fi
+
+kill ${PID}
+wait
+
+eval "${GETPORT}"
+socat TCP-LISTEN:${PORT} EXEC:"$CHAT -e -S -v -f ${srcdir}/starttls-sieve.txt",pty &
+PID=$!
+wait_server ${PID}
+
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls-proto sieve --verbose </dev/null >/dev/null
+if test $? != 1;then
+	fail ${PID} "connect should have failed with error code 1"
+fi
+
+kill ${PID}
+wait
+
 exit 0

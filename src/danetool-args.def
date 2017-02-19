@@ -97,7 +97,7 @@ flag = {
 
 flag = {
     name      = starttls-proto;
-    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp)";
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)";
     arg-type  = string;
     doc = "When the server's certificate isn't provided danetool will connect to the server to obtain the certificate. In that case it is required to know the protocol to talk with the server prior to initiating the TLS handshake.";
 };

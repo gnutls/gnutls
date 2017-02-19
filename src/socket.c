@@ -272,6 +272,44 @@ socket_starttls(socket_st * socket)
 		wait_for_text(socket, "211 ", 4);
 		send_line(socket, "AUTH TLS\r\n");
 		wait_for_text(socket, "234", 3);
+	} else if (strcasecmp(socket->app_proto, "lmtp") == 0) {
+		if (socket->verbose)
+			printf("Negotiating LMTP STARTTLS\n");
+
+		wait_for_text(socket, "220 ", 4);
+		snprintf(buf, sizeof(buf), "LHLO %s\r\n", socket->hostname);
+		send_line(socket, buf);
+		wait_for_text(socket, "250 ", 4);
+		send_line(socket, "STARTTLS\r\n");
+		wait_for_text(socket, "220 ", 4);
+	} else if (strcasecmp(socket->app_proto, "pop3") == 0) {
+		if (socket->verbose)
+			printf("Negotiating POP3 STARTTLS\n");
+
+		wait_for_text(socket, "+OK", 3);
+		send_line(socket, "STLS\r\n");
+		wait_for_text(socket, "+OK", 3);
+	} else if (strcasecmp(socket->app_proto, "nntp") == 0) {
+		if (socket->verbose)
+			printf("Negotiating NNTP STARTTLS\n");
+
+		wait_for_text(socket, "200 ", 4);
+		send_line(socket, "STARTTLS\r\n");
+		wait_for_text(socket, "382 ", 4);
+	} else if (strcasecmp(socket->app_proto, "sieve") == 0) {
+		if (socket->verbose)
+			printf("Negotiating Sieve STARTTLS\n");
+
+		wait_for_text(socket, "OK ", 3);
+		send_line(socket, "STARTTLS\r\n");
+		wait_for_text(socket, "OK ", 3);
+	} else if (strcasecmp(socket->app_proto, "postgres") == 0 || strcasecmp(socket->app_proto, "postgresql") == 0) {
+		if (socket->verbose)
+			printf("Negotiating PostgreSQL STARTTLS\n");
+
+#define POSTGRES_STR "\x00\x00\x00\x08\x04\xD2\x16\x2F"
+		send(socket->fd, POSTGRES_STR, sizeof(POSTGRES_STR)-1, 0);
+		wait_for_text(socket, NULL, 0);
 	} else {
 		if (!c_isdigit(socket->app_proto[0])) {
 			static int warned = 0;
