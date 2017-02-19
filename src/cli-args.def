@@ -94,7 +94,7 @@ flag = {
 
 flag = {
     name      = starttls-proto;
-    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp)";
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)";
     arg-type  = string;
     doc       = "Specify the application layer protocol for STARTTLS. If the protocol is supported, gnutls-cli will proceed to the TLS negotiation.";
     flags-cant = starttls;
