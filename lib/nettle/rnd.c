@@ -49,7 +49,7 @@ enum {
 
 struct nonce_ctx_st {
 	struct salsa20_ctx ctx;
-	unsigned int counter;
+	size_t counter;
 	unsigned int forkid;
 };
 
@@ -59,7 +59,7 @@ struct rnd_ctx_st {
 	struct timespec device_last_read;
 	time_t trivia_previous_time;
 	time_t trivia_time_count;
-	unsigned forkid;
+	unsigned int forkid;
 };
 
 struct ext_ctx_st {
