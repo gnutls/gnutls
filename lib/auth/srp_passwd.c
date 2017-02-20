@@ -400,7 +400,7 @@ static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = gnutls_rnd(GNUTLS_RND_RANDOM, entry->v.data, 20);
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, entry->v.data, 20);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
