@@ -120,8 +120,9 @@ int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
  * @GNUTLS_RND_NONCE: Non-predictable random number.  Fatal in parts
  *   of session if broken, i.e., vulnerable to statistical analysis.
  * @GNUTLS_RND_RANDOM: Pseudo-random cryptographic random number.
- *   Fatal in session if broken.
- * @GNUTLS_RND_KEY: Fatal in many sessions if broken.
+ *   Fatal in session if broken. Example use: temporal keys.
+ * @GNUTLS_RND_KEY: Fatal in many sessions if broken. Example use:
+ *   Long-term keys.
  *
  * Enumeration of random quality levels.
  */
