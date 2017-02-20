@@ -52,7 +52,29 @@
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 
-static void rnd_func(void *_ctx, size_t length, uint8_t * data)
+static void rnd_key_func(void *_ctx, size_t length, uint8_t * data)
+{
+	if (gnutls_rnd(GNUTLS_RND_KEY, data, length) < 0) {
+#ifdef ENABLE_FIPS140
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+#else
+		abort();
+#endif
+	}
+}
+
+static void rnd_tmpkey_func(void *_ctx, size_t length, uint8_t * data)
+{
+	if (gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
+#ifdef ENABLE_FIPS140
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+#else
+		abort();
+#endif
+	}
+}
+
+static void rnd_nonce_func(void *_ctx, size_t length, uint8_t * data)
 {
 	if (gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
 #ifdef ENABLE_FIPS140
@@ -353,7 +375,7 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			}
 
 			ret =
-			    rsa_encrypt(&pub, NULL, rnd_func,
+			    rsa_encrypt(&pub, NULL, rnd_tmpkey_func,
 					plaintext->size, plaintext->data,
 					p);
 			if (ret == 0) {
@@ -437,7 +459,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			}
 
 			ret =
-			    rsa_decrypt_tr(&pub, &priv, NULL, rnd_func,
+			    rsa_decrypt_tr(&pub, &priv, NULL, rnd_nonce_func,
 					   &length, plaintext->data,
 					   TOMPZ(c));
 			_gnutls_mpi_release(&c);
@@ -513,7 +535,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				hash_len = vdata->size;
 			}
 
-			ecdsa_sign(&priv, NULL, rnd_func, hash_len,
+			ecdsa_sign(&priv, NULL, rnd_tmpkey_func, hash_len,
 				   vdata->data, &sig);
 
 			ret =
@@ -555,7 +577,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			}
 
 			ret =
-			    dsa_sign(&pub, TOMPZ(priv), NULL, rnd_func,
+			    dsa_sign(&pub, TOMPZ(priv), NULL, rnd_tmpkey_func,
 				     hash_len, vdata->data, &sig);
 			if (ret == 0) {
 				gnutls_assert();
@@ -591,7 +613,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			mpz_init(s);
 
 			ret =
-			    rsa_pkcs1_sign_tr(&pub, &priv, NULL, rnd_func,
+			    rsa_pkcs1_sign_tr(&pub, &priv, NULL, rnd_tmpkey_func,
 					      vdata->size, vdata->data, s);
 			if (ret == 0) {
 				gnutls_assert();
@@ -853,7 +875,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 				} else {
 					ret =
 						dsa_generate_dss_pqg(&pub, &cert,
-							index, NULL, rnd_func,
+							index, NULL, rnd_key_func,
 							NULL, NULL, level, q_bits);
 				}
 				if (ret != 1) {
@@ -878,7 +900,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 				if (q_bits < 160)
 					q_bits = 160;
 
-				ret = dsa_generate_params(&pub, NULL, rnd_func,
+				ret = dsa_generate_params(&pub, NULL, rnd_key_func,
 							  NULL, NULL, level, q_bits);
 				if (ret != 1) {
 					gnutls_assert();
@@ -1295,7 +1317,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			ret =
 			    dsa_generate_dss_keypair(&pub, y, x,
-						 NULL, rnd_func,
+						 NULL, rnd_key_func,
 						 NULL, NULL);
 			if (ret != 1) {
 				gnutls_assert();
@@ -1352,13 +1374,13 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				if (have_q) {
 					mpz_set(r, pub.q);
 					mpz_sub_ui(r, r, 2);
-					nettle_mpz_random(x, NULL, rnd_func, r);
+					nettle_mpz_random(x, NULL, rnd_tmpkey_func, r);
 					mpz_add_ui(x, x, 1);
 				} else {
 					unsigned size = mpz_sizeinbase(pub.p, 2);
 					if (level == 0)
 						level = MIN(size, DH_EXPONENT_SIZE(size));
-					nettle_mpz_random_size(x, NULL, rnd_func, level);
+					nettle_mpz_random_size(x, NULL, rnd_tmpkey_func, level);
 
 					if (level >= size)
 						mpz_mod(x, x, pub.p);
@@ -1423,14 +1445,14 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					params->seed_size = sizeof(params->seed);
 					ret =
 					    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
-							 rnd_func, NULL, NULL,
+							 rnd_key_func, NULL, NULL,
 							 &params->seed_size, params->seed,
 							 level);
 				}
 			} else {
 				ret =
 				    rsa_generate_keypair(&pub, &priv, NULL,
-						 rnd_func, NULL, NULL,
+						 rnd_key_func, NULL, NULL,
 						 level, 0);
 			}
 			if (ret != 1) {
@@ -1487,7 +1509,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			ecc_scalar_init(&key, curve);
 			ecc_point_init(&pub, curve);
 
-			ecdsa_generate_keypair(&pub, &key, NULL, rnd_func);
+			ecdsa_generate_keypair(&pub, &key, NULL, rnd_key_func);
 
 			ret = _gnutls_mpi_init_multi(&params->params[ECC_X], &params->params[ECC_Y],
 					&params->params[ECC_K], NULL);
