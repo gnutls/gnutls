@@ -3046,7 +3046,7 @@ gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
 				  const char *url,
 				  unsigned int flags)
 {
-	gnutls_pkcs11_obj_t *list1;
+	gnutls_pkcs11_obj_t *list1 = NULL;
 	unsigned int n_list1, i;
 	int ret;
 
@@ -3064,7 +3064,7 @@ gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
 	}
 
 	*n_list = n_list1;
-	if (p_list)
+	if (p_list && list1)
 		memcpy(p_list, list1, n_list1*sizeof(p_list[0]));
 	gnutls_free(list1);
 
