@@ -383,7 +383,7 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
 				 void *output_data,
 				 size_t * output_data_size)
 {
-	ASN1_TYPE pkcs8_asn, pkey_info;
+	ASN1_TYPE pkcs8_asn = NULL, pkey_info;
 	int ret;
 	gnutls_datum_t tmp;
 	schema_id schema;
@@ -470,6 +470,8 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 	gnutls_datum_t _data;
 	const struct pkcs_cipher_schema_st *p = NULL;
 	struct pbkdf2_params kdf;
+
+	memset(&kdf, 0, sizeof(kdf));
 
 	if (oid)
 		*oid = NULL;
@@ -579,7 +581,7 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 				  const char *password,
 				  unsigned int flags, gnutls_datum_t * out)
 {
-	ASN1_TYPE pkcs8_asn, pkey_info;
+	ASN1_TYPE pkcs8_asn = NULL, pkey_info;
 	int ret;
 	gnutls_datum_t tmp;
 	schema_id schema;

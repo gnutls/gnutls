@@ -939,7 +939,7 @@ int cdk_stream_read(cdk_stream_t s, void *buf, size_t buflen)
 
 int cdk_stream_getc(cdk_stream_t s)
 {
-	unsigned char buf[2];
+	unsigned char buf[2] = {0};
 	int nread;
 
 	if (!s) {

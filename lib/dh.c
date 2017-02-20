@@ -442,7 +442,7 @@ gnutls_dh_params_export_pkcs3(gnutls_dh_params_t params,
 			      unsigned char *params_data,
 			      size_t * params_data_size)
 {
-	gnutls_datum_t out;
+	gnutls_datum_t out = {NULL, 0};
 	int ret;
 
 	ret = gnutls_dh_params_export2_pkcs3(params, format, &out);

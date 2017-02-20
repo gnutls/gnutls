@@ -936,7 +936,7 @@ _gnutls_x509_der_encode_and_copy(ASN1_TYPE src, const char *src_name,
 				 int str)
 {
 	int result;
-	gnutls_datum_t encoded;
+	gnutls_datum_t encoded = {NULL, 0};
 
 	result = _gnutls_x509_der_encode(src, src_name, &encoded, str);
 
@@ -1240,7 +1240,7 @@ int
 _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
 {
 	int result;
-	gnutls_datum_t sa;
+	gnutls_datum_t sa = {NULL, 0};
 
 	/* Read the signature algorithm. Note that parameters are not
 	 * read. They will be read from the issuer's certificate if needed.

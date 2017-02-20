@@ -85,7 +85,7 @@ static u16 read_16(cdk_stream_t s)
 /* read about S2K at http://tools.ietf.org/html/rfc4880#section-3.7.1 */
 static cdk_error_t read_s2k(cdk_stream_t inp, cdk_s2k_t s2k)
 {
-	size_t nread;
+	size_t nread = 0;
 
 	s2k->mode = cdk_stream_getc(inp);
 	s2k->hash_algo = cdk_stream_getc(inp);
@@ -219,7 +219,7 @@ read_pubkey_enc(cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_enc_t pke)
 
 static cdk_error_t read_mdc(cdk_stream_t inp, cdk_pkt_mdc_t mdc)
 {
-	size_t n;
+	size_t n = 0;
 	cdk_error_t rc;
 
 	if (!inp || !mdc)
@@ -319,7 +319,7 @@ read_public_subkey(cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_t pk)
 static cdk_error_t
 read_secret_key(cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
 {
-	size_t p1, p2, nread;
+	size_t p1, p2, nread = 0;
 	int i, nskey;
 	int rc;
 
@@ -574,7 +574,7 @@ static cdk_error_t
 read_subpkt(cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
 {
 	int c, c1;
-	size_t size, nread, n;
+	size_t size, nread = 0, n;
 	cdk_subpkt_t node;
 	cdk_error_t rc;
 
@@ -620,11 +620,12 @@ read_subpkt(cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
 	n++;
 	node->size--;
 	rc = stream_read(inp, node->d, node->size, &nread);
-	n += nread;
 	if (rc) {
 		cdk_subpkt_free(node);
 		return rc;
 	}
+
+	n += nread;
 	*r_nbytes = n;
 	if (!*r_ctx)
 		*r_ctx = node;
@@ -821,7 +822,7 @@ read_literal(cdk_stream_t inp, size_t pktlen,
 	     cdk_pkt_literal_t * ret_pt, int is_partial)
 {
 	cdk_pkt_literal_t pt = *ret_pt;
-	size_t nread;
+	size_t nread = 0;
 	cdk_error_t rc;
 
 	if (!inp || !pt)
@@ -935,7 +936,7 @@ read_new_length(cdk_stream_t inp,
 static cdk_error_t skip_packet(cdk_stream_t inp, size_t pktlen)
 {
 	byte buf[BUFSIZE];
-	size_t nread, buflen = DIM(buf);
+	size_t nread = 0, buflen = DIM(buf);
 
 	while (pktlen > 0) {
 		cdk_error_t rc;
