@@ -950,6 +950,7 @@ static cdk_error_t skip_packet(cdk_stream_t inp, size_t pktlen)
 	return 0;
 }
 
+#define MAX_PACKET_LEN (1<<24)
 
 /**
  * cdk_pkt_read:
@@ -1002,6 +1003,13 @@ cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt)
 	else
 		read_old_length(inp, ctb, &pktlen, &pktsize);
 
+	/* enforce limits to ensure that the following calculations
+	 * do not overflow */
+	if (pktlen >= MAX_PACKET_LEN || pktsize >= MAX_PACKET_LEN) {
+		_cdk_log_info("cdk_pkt_read: too long packet\n");
+		return gnutls_assert_val(CDK_Inv_Packet);
+	}
+
 	pkt->pkttype = pkttype;
 	pkt->pktlen = pktlen;
 	pkt->pktsize = pktsize + pktlen;
@@ -1026,6 +1034,7 @@ cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt)
 		break;
 
 	case CDK_PKT_USER_ID:
+
 		pkt->pkt.user_id = cdk_calloc(1, sizeof *pkt->pkt.user_id
 					      + pkt->pktlen + 1);
 		if (!pkt->pkt.user_id)
