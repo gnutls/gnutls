@@ -18,6 +18,9 @@ See the end for copying conditions.
    a long list of names in functions such as gnutls_x509_crt_check_hostname().
    With the current code, the SANs are parsed once on certificate import.
 
+** libgnutls: Addressed invalid memory access in OpenPGP certificate parsing.
+   (issue found using oss-fuzz project)
+
 ** gnutls-cli: Added LMTP, POP3, NNTP, Sieve and PostgreSQL support to the
    starttls-proto command. Patch by Robert Scheck.
 
