@@ -285,6 +285,15 @@ make_printable_string(unsigned etype, const gnutls_datum_t * input,
 	int printable = 0;
 	int ret;
 
+	/* empty input strings result to a null string */
+	if (input->data == NULL || input->size == 0) {
+		out->data = gnutls_calloc(1, 1);
+		if (out->data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		out->size = 0;
+		return 0;
+	}
+
 	if (etype == ASN1_ETYPE_BMP_STRING) {
 		ret = _gnutls_ucs2_to_utf8(input->data, input->size, out, 1);
 		if (ret < 0) {
@@ -398,6 +407,8 @@ decode_complex_string(const struct oid_to_string *oentry, void *value,
 		out->size = td.size;
 		/* _gnutls_x509_read_value always null terminates */
 	}
+
+	assert(out->data != NULL);
 
 	/* Refuse to deal with strings containing NULs. */
 	if (strlen((void *) out->data) != (size_t) out->size) {
