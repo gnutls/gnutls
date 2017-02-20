@@ -1209,7 +1209,7 @@ static gnutls_x509_crt_t find_child_of_with_serial(gnutls_pkcs7_t pkcs7,
 			}
 		} else {
 			gnutls_assert();
-			ret = GNUTLS_E_PARSING_ERROR;
+			crt = NULL;
 			goto fail;
 		}
 
@@ -2061,7 +2061,7 @@ static int write_signer_id(ASN1_TYPE c2, const char *root,
 		const uint8_t ver = 3;
 
 		snprintf(name, sizeof(name), "%s.version", root);
-		result = asn1_write_value(c2, name, &ver, 1);
+		asn1_write_value(c2, name, &ver, 1);
 
 		snprintf(name, sizeof(name), "%s.sid", root);
 		result = asn1_write_value(c2, name, "subjectKeyIdentifier", 1);
@@ -2213,9 +2213,8 @@ static int write_attributes(ASN1_TYPE c2, const char *root,
 
 		snprintf(name, sizeof(name), "%s.?LAST.values.?1", root);
 		ret = _gnutls_x509_set_raw_time(c2, name, gnutls_time(0));
-		if (result != ASN1_SUCCESS) {
+		if (ret < 0) {
 			gnutls_assert();
-			ret = _gnutls_asn2err(result);
 			return ret;
 		}
 
@@ -2271,8 +2270,6 @@ static int write_attributes(ASN1_TYPE c2, const char *root,
 			ret = _gnutls_asn2err(result);
 			return ret;
 		}
-
-		already_set = 1;
 
 		/* If we add any attribute we should add them all */
 		/* Add hash */
