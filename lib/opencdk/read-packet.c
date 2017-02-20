@@ -1016,7 +1016,6 @@ cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt)
 	pkt->pktsize = pktsize + pktlen;
 	pkt->old_ctb = is_newctb ? 0 : 1;
 
-	rc = 0;
 	switch (pkt->pkttype) {
 	case CDK_PKT_ATTRIBUTE:
 #define NAME_SIZE (pkt->pktlen + 16 + 1)

@@ -3025,7 +3025,6 @@ int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
 
 		ret = _gnutls_x509_read_value(c2, tmpstr, &oid);
 		if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
-			ret = 0;
 			break;
 		}
 

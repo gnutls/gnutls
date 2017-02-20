@@ -366,7 +366,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 						  cipher_state, data_ptr,
 						  blocksize);
 
-			data_ptr += blocksize;
+			/*data_ptr += blocksize;*/
 			cipher_data += blocksize;
 		}
 	} else { /* AEAD */
@@ -392,7 +392,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 			memcpy(data_ptr, &nonce[imp_iv_size],
 			       exp_iv_size);
 
-			data_ptr += exp_iv_size;
+			/*data_ptr += exp_iv_size;*/
 			cipher_data += exp_iv_size;
 		} else { /* XOR nonce with IV */
 			if (unlikely(params->write.IV.size != 12 || imp_iv_size != 12 || exp_iv_size != 0))

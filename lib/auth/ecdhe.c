@@ -245,7 +245,6 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	if (pk == GNUTLS_PK_EC) {
 		ret =
 		    _gnutls_ecc_ansi_x963_export(curve,
@@ -430,7 +429,6 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	if (pk == GNUTLS_PK_EC) {
 		ret =
 		    _gnutls_ecc_ansi_x963_export(curve,
@@ -456,7 +454,10 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 					session->key.ecdh_params.raw_pub.size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+	} else {
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
+
 
 	return data->length;
 }

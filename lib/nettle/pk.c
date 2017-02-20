@@ -913,7 +913,6 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 		}
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_EC:
-		ret = 0;
 		break;
 	default:
 		gnutls_assert();

@@ -252,7 +252,6 @@ _gnutls_handshake_verify_data(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
 		hash_algo = gnutls_sign_get_hash_algorithm(sign_algo);
 	} else {
 		pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);

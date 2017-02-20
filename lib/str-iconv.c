@@ -130,7 +130,6 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 	if (size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	dstlen = 0;
 	tmp_dst = u8_to_u16(data, size, NULL, &tmp_size);
 	if (tmp_dst == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);

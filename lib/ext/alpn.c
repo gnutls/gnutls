@@ -123,7 +123,7 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 				break;
 			}
 		}
-		p += len1;
+		/*p += len1;*/
 	}
 
 	if (priv->selected_protocol == NULL
