@@ -67,6 +67,27 @@ syntax-check/Fedora/x86_64:
   except:
   - tags
 
+cppcheck/Fedora/x86_64:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --disable-maintainer-mode --disable-guile
+  - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring
+  - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/
+  tags:
+  - shared
+  except:
+  - tags
+  dependencies:
+  - init/Fedora/x86_64
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - tests/*.log
+      - tests/*/*.log
+
 ##################################################
 # Stage 2, documentation, and advanced checks
 ##################################################
