@@ -1099,6 +1099,8 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 		password = (char*)out.data;
 	}
 
+	assert(password != NULL);
+
 	result = _gnutls_x509_encode_and_write_attribute
 	    ("1.2.840.113549.1.9.7", crq->crq,
 	     "certificationRequestInfo.attributes.?LAST", password,

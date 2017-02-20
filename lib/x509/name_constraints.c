@@ -774,10 +774,11 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 {
 	// presume empty intersection
 	name_constraints_node_st *intersection = NULL;
-	*_intersection = NULL;
 	name_constraints_node_st *to_copy = NULL;
 	unsigned iplength = 0;
 	unsigned byte;
+
+	*_intersection = NULL;
 
 	if (nc1->type != nc2->type) {
 		return GNUTLS_E_SUCCESS;
@@ -812,12 +813,16 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 		// for other types, we don't know how to do the intersection, assume empty
 		return GNUTLS_E_SUCCESS;
 	}
+
 	// copy existing node if applicable
 	if (to_copy != NULL) {
 		*_intersection = name_constraints_node_new(to_copy->type, to_copy->name.data, to_copy->name.size);
 		if (*_intersection == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		intersection = *_intersection;
+
+		assert(intersection->name.data != NULL);
+
 		if (intersection->type == GNUTLS_SAN_IPADDRESS) {
 			// make sure both IP addresses are correctly masked
 			_gnutls_mask_ip(intersection->name.data, intersection->name.data+iplength, iplength);
@@ -828,6 +833,7 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 			}
 		}
 	}
+
 	return GNUTLS_E_SUCCESS;
 }
 

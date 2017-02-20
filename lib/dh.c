@@ -456,6 +456,7 @@ gnutls_dh_params_export_pkcs3(gnutls_dh_params_t params,
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
+	assert(out.data != NULL);
 	*params_data_size = out.size;
 	if (params_data) {
 		memcpy(params_data, out.data, out.size);

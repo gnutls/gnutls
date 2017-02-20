@@ -166,13 +166,15 @@ sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
 			return gnutls_assert_val(ret);
 	}
 
-	if (!_gnutls_version_has_selectable_sighash(ver))
+	if (!_gnutls_version_has_selectable_sighash(ver)) {
 		return gnutls_privkey_sign_raw_data(pkey, 0, hash_concat,
 						    signature);
-	else
+	} else {
+		assert(hash_algo != NULL);
 		return gnutls_privkey_sign_hash(pkey, 
 						(gnutls_digest_algorithm_t)hash_algo->id,
 						0, hash_concat, signature);
+	}
 }
 
 static int

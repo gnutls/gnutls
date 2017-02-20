@@ -110,6 +110,7 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 
 static void align_allocd_with_data(gnutls_buffer_st * dest)
 {
+	assert(dest->allocd != NULL);
 	if (dest->length)
 		memmove(dest->allocd, dest->data, dest->length);
 	dest->data = dest->allocd;
@@ -343,6 +344,8 @@ _gnutls_buffer_insert_data(gnutls_buffer_st * dest, int pos,
 	ret = _gnutls_buffer_resize(dest, dest->length + str_size);	/* resize to make space */
 	if (ret < 0)
 		return ret;
+
+	assert(dest->data != NULL);
 
 	memmove(&dest->data[pos + str_size], &dest->data[pos],
 		orig_length - pos);

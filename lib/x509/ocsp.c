@@ -1949,6 +1949,7 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 				goto quit;
 			}
 		} else {
+			assert(riddn.data != NULL);
 			if ((certs[i]->raw_dn.size == riddn.size)
 			    && memcmp(riddn.data, certs[i]->raw_dn.data, riddn.size) == 0) {
 				signercert = certs[i];

@@ -77,7 +77,7 @@ gnutls_datum_t out;
 				gnutls_free(out.data);
 				is_printed = 1;
 			}
-		} else {
+		} else if (name->data != NULL) {
 			if (strstr((char*)name->data, "xn--") != NULL) {
 				ret = gnutls_idna_reverse_map((char*)name->data, name->size, &out, 0);
 				if (ret >= 0) {

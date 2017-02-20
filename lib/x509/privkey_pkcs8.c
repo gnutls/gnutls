@@ -509,6 +509,8 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 		goto cleanup;
 	}
 
+	assert(p != NULL);
+
 	if (need_free)
 		_gnutls_free_datum(&_data);
 

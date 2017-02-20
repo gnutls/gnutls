@@ -305,6 +305,7 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 			    ciphertextlen)
 				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+			assert(blocksize != 0);
 			l = (textlen / blocksize) * blocksize;
 			if (l > 0) {
 				ret =
