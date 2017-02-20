@@ -136,6 +136,8 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	i_size = 64 + p_size;
 	mac_len = _gnutls_mac_get_algo_len(me);
 
+	assert(mac_len != 0);
+
 	for (;;) {
 		rc = _gnutls_hash_init(&md, me);
 		if (rc < 0) {

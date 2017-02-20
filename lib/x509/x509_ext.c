@@ -1604,7 +1604,7 @@ static int decode_user_notice(const void *data, size_t size,
 	int ret, len;
 	char choice_type[64];
 	char name[128];
-	gnutls_datum_t td, utd;
+	gnutls_datum_t td = {NULL,0}, utd;
 
 	ret = asn1_create_element(_gnutls_get_pkix(), "PKIX1.UserNotice", &c2);
 	if (ret != ASN1_SUCCESS) {
@@ -2024,7 +2024,7 @@ int gnutls_x509_ext_export_policies(gnutls_x509_policies_t policies,
 {
 	int result;
 	unsigned i, j;
-	gnutls_datum_t der_data, tmpd;
+	gnutls_datum_t der_data = {NULL, 0}, tmpd;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	const char *oid;
 

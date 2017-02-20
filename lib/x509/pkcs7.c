@@ -1880,6 +1880,8 @@ gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
+	assert(tmp.data != NULL);
+
 	*crl_size = tmp.size;
 	if (crl)
 		memcpy(crl, tmp.data, tmp.size);

@@ -203,6 +203,7 @@ _gnutls_gen_psk_client_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
+	assert(username.data != NULL);
 	memcpy(info->username, username.data, username.size);
 	info->username[username.size] = 0;
 
