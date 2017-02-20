@@ -919,7 +919,7 @@ read_new_length(cdk_stream_t inp,
 		*r_len = ((c - 192) << 8) + c1 + 192;
 	} else if (c == 255) {
 		c1 = read_32(inp);
-		if (c1 == (u32)-1) {
+		if (c1 == -1) {
 			return;
 		}
 
