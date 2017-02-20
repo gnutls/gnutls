@@ -165,27 +165,6 @@ no-SSL-3.0/Fedora/x86_64:
       - build/*.log
       - build/tests/*/*.log
 
-clang/Fedora/x86_64:
-  stage: stage2-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - CC=clang ./configure --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc  --disable-guile --disable-valgrind-tests &&
-    make -j$(nproc) && make check -C tests -j$(nproc)
-  tags:
-  - shared
-  except:
-  - tags
-  dependencies:
-  - init/Fedora/x86_64
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - ./*.log
-      - guile/tests/*.log
-      - tests/*.log
-      - tests/*/*.log
-
 FIPS140-2/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
@@ -286,6 +265,28 @@ asan/Fedora/x86_64:
       - ./*.log
       - tests/*.log
       - tests/*/*.log
+
+clang-analyzer/Fedora/x86_64:
+  stage: stage2-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - scan-build ./configure --disable-doc --disable-guile
+  - rm -rf scan-build
+  - make -j$(nproc) -C gl
+  - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
+  - scan-build --status-bugs -o scan-build-libdane make -j$(nproc) -C libdane
+  tags:
+  - shared
+  except:
+  - tags
+  dependencies:
+  - init/Fedora/x86_64
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - scan-build-lib/*
+      - scan-build-libdane/*
 
 MinGW32/DLLs:
   stage: stage2-testing
