@@ -142,12 +142,19 @@ static int wrap_nettle_rnd_init(void **_ctx)
 	return ret;
 }
 
-
 static int
-run_prng(struct prng_ctx_st *prng_ctx, void *data, size_t datasize)
+wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 {
+	struct generators_ctx_st *ctx = _ctx;
+	struct prng_ctx_st *prng_ctx;
 	int ret, reseed = 0;
-	uint8_t new_key[PRNG_KEY_SIZE];
+
+	if (level == GNUTLS_RND_RANDOM)
+		prng_ctx = &ctx->normal;
+	else if (level == GNUTLS_RND_KEY)
+		prng_ctx = &ctx->strong;
+	else
+		prng_ctx = &ctx->nonce;
 
 	/* we don't really need memset here, but otherwise we
 	 * get filled with valgrind warnings */
@@ -158,8 +165,16 @@ run_prng(struct prng_ctx_st *prng_ctx, void *data, size_t datasize)
 	}
 
 	if (reseed != 0 || prng_ctx->counter > PRNG_RESEED_BYTES) {
-		/* reseed nonce */
-		ret = _rnd_get_system_entropy(new_key, sizeof(new_key));
+		uint8_t new_key[PRNG_KEY_SIZE];
+
+		if (level == GNUTLS_RND_NONCE) {
+			ret = wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, new_key, sizeof(new_key));
+		} else {
+			/* we use the system entropy for KEY and RANDOM to reduce
+			 * the impact of a temporal state compromise for these two levels. */
+			ret = _rnd_get_system_entropy(new_key, sizeof(new_key));
+		}
+
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -183,20 +198,6 @@ cleanup:
 	return ret;
 }
 
-
-static int
-wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
-{
-	struct generators_ctx_st *ctx = _ctx;
-
-	if (level == GNUTLS_RND_RANDOM)
-		return run_prng(&ctx->normal, data, datasize);
-	else if (level == GNUTLS_RND_KEY)
-		return run_prng(&ctx->strong, data, datasize);
-	else
-		return run_prng(&ctx->nonce, data, datasize);
-}
-
 static void wrap_nettle_rnd_refresh(void *_ctx)
 {
 	struct generators_ctx_st *ctx = _ctx;
@@ -206,10 +207,10 @@ static void wrap_nettle_rnd_refresh(void *_ctx)
 	ctx->nonce.counter = PRNG_RESEED_BYTES+1;
 	ctx->normal.counter = PRNG_RESEED_BYTES+1;
 	ctx->strong.counter = PRNG_RESEED_BYTES+1;
- 
-	run_prng(&ctx->nonce, &tmp, 1);
-	run_prng(&ctx->normal, &tmp, 1);
-	run_prng(&ctx->strong, &tmp, 1);
+
+	wrap_nettle_rnd(_ctx, GNUTLS_RND_NONCE, &tmp, 1);
+	wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, &tmp, 1);
+	wrap_nettle_rnd(_ctx, GNUTLS_RND_KEY, &tmp, 1);
 
 	return;
 }
