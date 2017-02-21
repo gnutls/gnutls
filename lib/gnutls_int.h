@@ -36,6 +36,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
 /* For some reason gnulib likes to provide alternatives for
  * functions it doesn't include. Even worse these functions seem
