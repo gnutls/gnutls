@@ -60,12 +60,10 @@ AlgorithmIdentifier ::= SEQUENCE  {
 
 DigestInfo ::= SEQUENCE {
      digestAlgorithm DigestAlgorithmIdentifier,
-     digest Digest 
+     digest OCTET STRING
 }
 
 DigestAlgorithmIdentifier ::= AlgorithmIdentifier
-
-Digest ::= OCTET STRING
 
 DSAPublicKey ::= INTEGER
 
@@ -98,8 +96,6 @@ DHParameter ::= SEQUENCE {
 }
 
 -- ECC from RFC5480
-ECPoint ::= OCTET STRING
-
 ECParameters ::= CHOICE {
   namedCurve         OBJECT IDENTIFIER
 }
