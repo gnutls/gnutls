@@ -52,36 +52,29 @@
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 
+/* When these callbacks are used for a nettle operation, the
+ * caller must check the macro HAVE_LIB_ERROR() after the operation
+ * is complete. If the macro is true, the operation is to be considered
+ * failed (meaning the random generation failed).
+ */
 static void rnd_key_func(void *_ctx, size_t length, uint8_t * data)
 {
 	if (gnutls_rnd(GNUTLS_RND_KEY, data, length) < 0) {
-#ifdef ENABLE_FIPS140
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-#else
-		abort();
-#endif
 	}
 }
 
 static void rnd_tmpkey_func(void *_ctx, size_t length, uint8_t * data)
 {
 	if (gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
-#ifdef ENABLE_FIPS140
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-#else
-		abort();
-#endif
 	}
 }
 
 static void rnd_nonce_func(void *_ctx, size_t length, uint8_t * data)
 {
 	if (gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
-#ifdef ENABLE_FIPS140
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
-#else
-		abort();
-#endif
 	}
 }
 
@@ -378,7 +371,7 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			    rsa_encrypt(&pub, NULL, rnd_tmpkey_func,
 					plaintext->size, plaintext->data,
 					p);
-			if (ret == 0) {
+			if (ret == 0 || HAVE_LIB_ERROR()) {
 				ret =
 				    gnutls_assert_val
 				    (GNUTLS_E_ENCRYPTION_FAILED);
@@ -465,7 +458,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			_gnutls_mpi_release(&c);
 			plaintext->size = length;
 
-			if (ret == 0) {
+			if (ret == 0 || HAVE_LIB_ERROR()) {
 				ret =
 				    gnutls_assert_val
 				    (GNUTLS_E_DECRYPTION_FAILED);
@@ -538,10 +531,17 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			ecdsa_sign(&priv, NULL, rnd_tmpkey_func, hash_len,
 				   vdata->data, &sig);
 
+			/* prevent memory leaks */
+			if (HAVE_LIB_ERROR()) {
+				ret = GNUTLS_E_LIB_IN_ERROR_STATE;
+				goto ecdsa_cleanup;
+			}
+
 			ret =
 			    _gnutls_encode_ber_rs(signature, &sig.r,
 						  &sig.s);
 
+ ecdsa_cleanup:
 			dsa_signature_clear(&sig);
 			ecc_scalar_zclear(&priv);
 
@@ -579,7 +579,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			ret =
 			    dsa_sign(&pub, TOMPZ(priv), NULL, rnd_tmpkey_func,
 				     hash_len, vdata->data, &sig);
-			if (ret == 0) {
+			if (ret == 0 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_SIGN_FAILED;
 				goto dsa_fail;
@@ -589,7 +589,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			    _gnutls_encode_ber_rs(signature, &sig.r,
 						  &sig.s);
 
-		      dsa_fail:
+ dsa_fail:
 			dsa_signature_clear(&sig);
 
 			if (ret < 0) {
@@ -615,7 +615,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			ret =
 			    rsa_pkcs1_sign_tr(&pub, &priv, NULL, rnd_tmpkey_func,
 					      vdata->size, vdata->data, s);
-			if (ret == 0) {
+			if (ret == 0 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_SIGN_FAILED;
 				goto rsa_fail;
@@ -878,7 +878,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 							index, NULL, rnd_key_func,
 							NULL, NULL, level, q_bits);
 				}
-				if (ret != 1) {
+				if (ret != 1 || HAVE_LIB_ERROR()) {
 					gnutls_assert();
 					ret = GNUTLS_E_PK_GENERATION_ERROR;
 					goto dsa_fail;
@@ -902,7 +902,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 
 				ret = dsa_generate_params(&pub, NULL, rnd_key_func,
 							  NULL, NULL, level, q_bits);
-				if (ret != 1) {
+				if (ret != 1 || HAVE_LIB_ERROR()) {
 					gnutls_assert();
 					ret = GNUTLS_E_PK_GENERATION_ERROR;
 					goto dsa_fail;
@@ -1319,7 +1319,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			    dsa_generate_dss_keypair(&pub, y, x,
 						 NULL, rnd_key_func,
 						 NULL, NULL);
-			if (ret != 1) {
+			if (ret != 1 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_GENERATION_ERROR;
 				goto dsa_fail;
@@ -1394,6 +1394,12 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					ret = GNUTLS_E_RANDOM_FAILED;
 					goto dh_fail;
 				}
+
+				if (HAVE_LIB_ERROR()) {
+					gnutls_assert();
+					ret = GNUTLS_E_LIB_IN_ERROR_STATE;
+					goto dh_fail;
+				}
 			} while(mpz_cmp_ui(y, 1) == 0);
 
 			ret = _gnutls_mpi_init_multi(&params->params[DSA_Y], &params->params[DSA_X], NULL);
@@ -1455,7 +1461,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 						 rnd_key_func, NULL, NULL,
 						 level, 0);
 			}
-			if (ret != 1) {
+			if (ret != 1 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_GENERATION_ERROR;
 				goto rsa_fail;
@@ -1510,6 +1516,10 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			ecc_point_init(&pub, curve);
 
 			ecdsa_generate_keypair(&pub, &key, NULL, rnd_key_func);
+			if (HAVE_LIB_ERROR()) {
+				ret = gnutls_assert_val(GNUTLS_E_LIB_IN_ERROR_STATE);
+				goto ecc_fail;
+			}
 
 			ret = _gnutls_mpi_init_multi(&params->params[ECC_X], &params->params[ECC_Y],
 					&params->params[ECC_K], NULL);

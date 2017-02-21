@@ -63,10 +63,10 @@ unsigned _gnutls_fips_mode_enabled(void);
 # define _gnutls_fips_mode_enabled() 0
 #endif
 
+# define HAVE_LIB_ERROR() unlikely(_gnutls_get_lib_state() != LIB_STATE_OPERATIONAL && _gnutls_get_lib_state() != LIB_STATE_SELFTEST)
+
 # define FAIL_IF_LIB_ERROR \
-	if (_gnutls_get_lib_state() != LIB_STATE_OPERATIONAL && \
-	  _gnutls_get_lib_state() != LIB_STATE_SELFTEST) \
-	return GNUTLS_E_LIB_IN_ERROR_STATE
+	if (HAVE_LIB_ERROR()) return GNUTLS_E_LIB_IN_ERROR_STATE
 
 void _gnutls_switch_lib_state(gnutls_lib_state_t state);
 
