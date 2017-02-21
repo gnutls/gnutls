@@ -71,5 +71,6 @@ unsigned _gnutls_fips_mode_enabled(void);
 void _gnutls_switch_lib_state(gnutls_lib_state_t state);
 
 void _gnutls_lib_simulate_error(void);
+void _gnutls_lib_force_operational(void);
 
 #endif /* FIPS_H */

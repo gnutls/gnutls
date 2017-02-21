@@ -418,3 +418,8 @@ void _gnutls_lib_simulate_error(void)
 {
 	_gnutls_switch_lib_state(LIB_STATE_ERROR);
 }
+
+void _gnutls_lib_force_operational(void)
+{
+	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
+}

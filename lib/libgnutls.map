@@ -1172,6 +1172,7 @@ GNUTLS_PRIVATE_3_4 {
 
 	# Internal symbols used by fips-test
 	_gnutls_lib_simulate_error;
+	_gnutls_lib_force_operational;
 	#symbols needed for crypto-selftests
 	_gnutls_log_level;
 	_gnutls_digest_exists;
