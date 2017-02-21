@@ -139,6 +139,27 @@ error codes are defined in gnutls.h and a description
 is available in gnutls_errors.c
 
 
+# Usage of assert()
+
+ The assert() macro --not to be confused with gnutls_assert()-- is used
+exceptionally on impossible situations to assist static analysis tools.
+That is, it should be used when the static analyzer used in CI (currently
+clang analyzer), detects an error which is on an impossible situation.
+In these cases assert() is used to rule out that case.
+
+For example in the situation where a pointer is known to be non-null,
+but the static analyzer cannot rule it out, we use code like the following:
+```
+assert(ptr != NULL);
+ptr->deref = 3;
+```
+
+Since GnuTLS is a library no other uses of assert() macro are acceptable.
+
+The NDEBUG macro is not used in GnuTLS compilation, so the assert() macros
+are always active.
+
+
 # Guile bindings:
 
  Parts of the Guile bindings, such as types (aka. "SMOBs"), enum values,
