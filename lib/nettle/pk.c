@@ -90,7 +90,7 @@ _dsa_params_get(const gnutls_pk_params_st * pk_params,
 	memcpy(pub->p, pk_params->params[DSA_P], SIZEOF_MPZT);
 
 	if (pk_params->params[DSA_Q])
-		memcpy(&pub->q, pk_params->params[DSA_Q], sizeof(mpz_t));
+		memcpy(&pub->q, pk_params->params[DSA_Q], SIZEOF_MPZT);
 	memcpy(pub->g, pk_params->params[DSA_G], SIZEOF_MPZT);
 }
 #else
@@ -101,7 +101,7 @@ _dsa_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 	memcpy(pub->p, pk_params->params[DSA_P], SIZEOF_MPZT);
 
 	if (pk_params->params[DSA_Q])
-		memcpy(&pub->q, pk_params->params[DSA_Q], sizeof(mpz_t));
+		memcpy(&pub->q, pk_params->params[DSA_Q], SIZEOF_MPZT);
 	memcpy(pub->g, pk_params->params[DSA_G], SIZEOF_MPZT);
 
 	if (pk_params->params[DSA_Y] != NULL)
