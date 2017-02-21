@@ -31,20 +31,6 @@
 
 #include <fips.h>
 
-struct event_st {
-		struct timespec now; /* current time */
-#ifdef HAVE_GETRUSAGE
-		struct rusage rusage;
-#endif
-#ifdef HAVE_GETPID
-		pid_t pid;	/* the process PID */
-#endif
-		unsigned count; /* a running counter */
-		unsigned err; /* the last errno */
-};
-
-void _rnd_get_event(struct event_st *e);
-
 int _rnd_system_entropy_init(void);
 int _rnd_system_entropy_check(void);
 void _rnd_system_entropy_deinit(void);

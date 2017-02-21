@@ -47,6 +47,8 @@
 #include <sys/time.h>
 #include <fcntl.h>
 
+get_entropy_func _rnd_get_system_entropy = NULL;
+
 static int _rnd_get_system_entropy_simple(void* _rnd, size_t size)
 {
 	if (getentropy(_rnd, size) < 0) {

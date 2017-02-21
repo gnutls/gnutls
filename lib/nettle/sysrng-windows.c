@@ -48,6 +48,8 @@
 #include <windows.h>
 #include <wincrypt.h>
 
+get_entropy_func _rnd_get_system_entropy = NULL;
+
 static HCRYPTPROV device_fd = 0;
 
 static

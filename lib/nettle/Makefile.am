@@ -38,7 +38,7 @@ endif
 noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
-	gnettle.h rnd-common.h rnd-common.c \
+	gnettle.h rnd-common.h \
 	rnd.c int/rsa-fips.h int/rsa-keygen-fips186.c int/provable-prime.c \
 	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c
 
