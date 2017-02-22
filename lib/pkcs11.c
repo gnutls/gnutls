@@ -2367,6 +2367,25 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 
 	*pin = NULL;
 
+#ifdef P11_KIT_HAS_PIN_VALUE
+	/* First check for pin-value field */
+	pinfile = p11_kit_uri_get_pin_value(info);
+	if (pinfile != NULL) {
+		_gnutls_debug_log("p11: Using pin-value to retrieve PIN\n");
+		*pin = p11_kit_pin_new_for_string(pinfile);
+		if (*pin != NULL)
+			ret = 0;
+	} else { /* try pin-source */
+		/* Check if a pinfile is specified, and use that if possible */
+		pinfile = p11_kit_uri_get_pin_source(info);
+		if (pinfile != NULL) {
+			_gnutls_debug_log("p11: Using pin-source to retrieve PIN\n");
+			ret =
+			    retrieve_pin_from_source(pinfile, token_info, attempts,
+						     user_type, pin);
+		}
+	}
+#else
 	/* Check if a pinfile is specified, and use that if possible */
 	pinfile = p11_kit_uri_get_pinfile(info);
 	if (pinfile != NULL) {
@@ -2375,6 +2394,7 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 		    retrieve_pin_from_source(pinfile, token_info, attempts,
 					     user_type, pin);
 	}
+#endif
 
 	/* The global gnutls pin callback */
 	if (ret < 0)

@@ -447,6 +447,9 @@ if test "$with_p11_kit" != "no"; then
 		if ! $PKG_CONFIG --atleast-version=0.22.0 p11-kit-1; then
 			with_buggy_p11_kit=yes
 		fi
+		if $PKG_CONFIG --atleast-version=0.23.1 p11-kit-1; then
+			AC_DEFINE([P11_KIT_HAS_PIN_VALUE], 1, [p11-kit supports p11_kit_uri_get_pin_value()])
+		fi
 	else
 	        with_p11_kit=no
 	        AC_MSG_WARN([[
