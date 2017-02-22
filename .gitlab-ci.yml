@@ -472,10 +472,10 @@ ubsan/Fedora/x86_64:
   artifacts:
     when: on_failure
     paths:
-      - build/guile/tests/*.log
-      - build/*.log
-      - build/tests/*.log
-      - build/tests/*/*.log
+      - guile/tests/*.log
+      - ./*.log
+      - tests/*.log
+      - tests/*/*.log
 
 build/Debian/x86_64:
   stage: stage2-testing
