@@ -64,7 +64,7 @@ static char pem[] =
     "/do1TDFI0vSl5+M=\n" "-----END CERTIFICATE-----\n";
 
 static const char *info =
-    "subject `CN=www.gmx.de,O=GMX GmbH,street=Frankfurter Ring 129,L=Muenchen,ST=Bavaria,postalCode=80807,C=DE,serialNumber=HRB 144261,businessCategory=V1.0\\, Clause 5.(b),jurisdictionOfIncorporationLocalityName=Muenchen,jurisdictionOfIncorporationCountryName=DE', issuer `CN=VeriSign Class 3 Extended Validation SSL SGC CA,OU=Terms of use at https://www.verisign.com/rpa (c)06,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US', serial 0x48eca1e3c658be04c547c1eca67a6433, RSA key 1024 bits, signed using RSA-SHA1, activated `2008-11-13 00:00:00 UTC', expires `2009-11-13 23:59:59 UTC', key-ID `sha256:b158e5a008a2a936ce793909598b55c1e35a54f8a32cffd7f792fdea024e4af9'";
+    "subject `CN=www.gmx.de,O=GMX GmbH,street=Frankfurter Ring 129,L=Muenchen,ST=Bavaria,postalCode=80807,C=DE,serialNumber=HRB 144261,businessCategory=V1.0\\, Clause 5.(b),jurisdictionOfIncorporationLocalityName=Muenchen,jurisdictionOfIncorporationCountryName=DE', issuer `CN=VeriSign Class 3 Extended Validation SSL SGC CA,OU=Terms of use at https://www.verisign.com/rpa (c)06,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US', serial 0x48eca1e3c658be04c547c1eca67a6433, RSA key 1024 bits, signed using RSA-SHA1, activated `2008-11-13 00:00:00 UTC', expires `2009-11-13 23:59:59 UTC', pin-sha256=\"sVjloAiiqTbOeTkJWYtVweNaVPijLP/X95L96gJOSvk=\"";
 
 void doit(void)
 {
