@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 3.3.27 (unreleased)
 
+** libgnutls: read the pin-value attribute if the p11-kit version allows it.
+
 ** libgnutls: Addressed invalid memory access in OpenPGP certificate parsing.
    (issue found using oss-fuzz project)
 
