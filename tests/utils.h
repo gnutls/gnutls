@@ -61,4 +61,9 @@ extern void binprint(const void *str, size_t len);
 extern void doit(void);
 void sec_sleep(int sec);
 
+#define TMPNAME_SIZE 128
+char *get_tmpname(char s[TMPNAME_SIZE]);
+void track_temp_files(void);
+void delete_temp_files(void);
+
 #endif				/* UTILS_H */
