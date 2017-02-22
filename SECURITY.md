@@ -15,10 +15,17 @@ issues are handled with the normal release process.
 
 # Committing a fix
 
-The fix when is made available, preferrably within 3 months of the report,
+The fix when is made available, preferrably within 1 month of the report,
 is pushed to the repository using a detailed message on all supported
 branches which are affected. The commit message must refer to the bug
 report addressed (e.g., our issue tracker or some external issue tracker).
+
+For issues reported by third parties which request an embargo time, the
+general aim to have embargo dates which are two weeks or less in duration.
+In exceptional circumstances longer initial embargoes may be negotiated by
+mutual agreement between members of the security team and other relevant
+parties to the problem. Any such extended embargoes will aim to be at most
+one month in duration.
 
 # Releasing
 
