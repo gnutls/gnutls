@@ -30,16 +30,17 @@ unset RETCODE
 
 SERV="${SERV} -q"
 
-echo "Checking STARTTLS"
+echo "Checking STARTTLS over FTP"
 
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ANON-ECDH"
+socat TCP-LISTEN:${PORT} EXEC:"$CHAT -e -S -v -f ${srcdir}/starttls-ftp.txt",pty &
 PID=$!
 wait_server ${PID}
 
-${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls </dev/null >/dev/null || \
-	fail ${PID} "starttls connect should have succeeded!"
-
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls-proto ftp --verbose </dev/null >/dev/null
+if test $? != 1;then
+	fail ${PID} "connect should have failed with error code 1"
+fi
 
 kill ${PID}
 wait

@@ -20,28 +20,38 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
-unset RETCODE
+if ! test -x "${SERV}"; then
+	exit 77
+fi
 
-. "${srcdir}/scripts/common.sh"
-. "${srcdir}/scripts/starttls-common.sh"
+if ! test -x "${CLI}"; then
+	exit 77
+fi
 
-SERV="${SERV} -q"
+if test "${WINDIR}" != ""; then
+	exit 77
+fi 
 
-echo "Checking STARTTLS"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
 
-eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ANON-ECDH"
-PID=$!
-wait_server ${PID}
+if test ! -x /usr/bin/socat;then
+	exit 77
+fi
 
-${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-ECDH --insecure --starttls </dev/null >/dev/null || \
-	fail ${PID} "starttls connect should have succeeded!"
+for file in `which chat` /sbin/chat /usr/sbin/chat /usr/local/sbin/chat
+do
+	if test -x "$file"
+	then
+		CHAT="$file"
+		break
+	fi
+done
 
+if test -z "$CHAT"
+then
+	echo "chat not found"
+	exit 77
+fi
 
-kill ${PID}
-wait
-
-exit 0
