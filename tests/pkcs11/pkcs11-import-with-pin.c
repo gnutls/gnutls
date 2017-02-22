@@ -83,10 +83,6 @@ void doit(void)
 	gnutls_privkey_t pkey;
 	char file[TMPNAME_SIZE];
 
-#ifndef P11_KIT_HAS_PIN_VALUE
-	exit(77);
-#endif
-
 	bin = softhsm_bin();
 
 	lib = softhsm_lib();
