@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . cert-tests ocsp-tests key-tests scripts slow dtls windows
+SUBDIRS = . cert-tests ocsp-tests key-tests slow dtls windows
 
 if WANT_TEST_SUITE
 SUBDIRS += suite
@@ -37,7 +37,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
-	certs-interesting/cert6.der certs-interesting/cert7.der certs-interesting/cert8.der
+	certs-interesting/cert6.der certs-interesting/cert7.der certs-interesting/cert8.der \
+	scripts/common.sh scripts/starttls-common.sh
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -292,7 +293,8 @@ check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
 
 if !WINDOWS
-dist_check_SCRIPTS += fastopen.sh starttls.sh
+dist_check_SCRIPTS += fastopen.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
+	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
