@@ -113,7 +113,8 @@ pkcs11_import_url_privkey_LDADD = $(LDADD) $(LIBDL)
 
 ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts \
 	pkcs11/pkcs11-chainverify pkcs11/pkcs11-get-issuer pkcs11/pkcs11-is-known \
-	pkcs11/pkcs11-combo pkcs11-import-url-privkey pkcs11/pkcs11-pubkey-import-rsa
+	pkcs11/pkcs11-combo pkcs11-import-url-privkey pkcs11/pkcs11-pubkey-import-rsa \
+	pkcs11/pkcs11-import-with-pin
 
 endif
 endif
