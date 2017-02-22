@@ -1847,12 +1847,12 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		err = gnutls_x509_crt_get_key_id(cert, GNUTLS_KEYID_USE_SHA256,
 						 buffer, &size);
 		if (err < 0) {
-			addf(str, "key ID error (%s)",
+			addf(str, "key PIN error (%s)",
 			     gnutls_strerror(err));
 		} else {
-			addf(str, "key-ID `sha256:");
-			_gnutls_buffer_hexprint(str, buffer, size);
-			adds(str, "'");
+			addf(str, "pin-sha256=\"");
+			_gnutls_buffer_base64print(str, buffer, size);
+			adds(str, "\"");
 		}
 	}
 
