@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <c-ctype.h>
 #include <intprops.h>
+#include <nettle/base64.h>
 #include "vasprintf.h"
 #include "extras/hex.h"
 
@@ -916,6 +917,26 @@ _gnutls_buffer_hexprint(gnutls_buffer_st * str,
 			_gnutls_buffer_append_printf(str, "%.2x",
 						     (unsigned) data[j]);
 	}
+}
+
+int
+_gnutls_buffer_base64print(gnutls_buffer_st * str,
+			   const void *_data, size_t len)
+{
+	const unsigned char *data = _data;
+	unsigned b64len = BASE64_ENCODE_RAW_LENGTH(len);
+	int ret;
+
+	ret = _gnutls_buffer_resize(str, str->length+b64len+1);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	base64_encode_raw(&str->data[str->length], len, data);
+	str->length += b64len;
+	str->data[str->length] = 0;
+
+	return 0;
 }
 
 void

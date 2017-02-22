@@ -134,6 +134,8 @@ int _gnutls_buffer_append_printf(gnutls_buffer_st * dest, const char *fmt,
 
 void _gnutls_buffer_hexprint(gnutls_buffer_st * str,
 			     const void *data, size_t len);
+int _gnutls_buffer_base64print(gnutls_buffer_st * str,
+			        const void *data, size_t len);
 void _gnutls_buffer_hexdump(gnutls_buffer_st * str, const void *data,
 			    size_t len, const char *spc);
 void _gnutls_buffer_asciiprint(gnutls_buffer_st * str,
