@@ -2021,7 +2021,9 @@ static int wrap_nettle_hash_algorithm(gnutls_pk_algorithm_t pk,
 			break;
 		}
 
-		_rsa_params_to_pubkey(issuer_params, &pub);
+		ret = _rsa_params_to_pubkey(issuer_params, &pub);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
 		digest_size = sizeof(digest);
 
