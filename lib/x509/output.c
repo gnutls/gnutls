@@ -1625,6 +1625,10 @@ static void print_obj_id(gnutls_buffer_st *str, const char *prefix, void *obj, g
 	_gnutls_buffer_hexprint(str, sha2_buffer, sha2_size);
 	adds(str, "\n");
 
+	addf(str, _("%sPublic Key PIN:\n%s\tpin-sha256:"), prefix, prefix);
+	_gnutls_buffer_base64print(str, sha2_buffer, sha2_size);
+	adds(str, "\n");
+
 	return;
 }
 
