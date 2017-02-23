@@ -336,8 +336,9 @@ starttls_proto_to_port(const char *app_proto)
 
 	s = getservbyname(app_proto, NULL);
 	if (s != NULL) {
-		return s->s_port;
+		return ntohs(s->s_port);
 	}
+
 	endservent();
 
 	return 443;
