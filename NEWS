@@ -18,8 +18,13 @@ See the end for copying conditions.
    a long list of names in functions such as gnutls_x509_crt_check_hostname().
    With the current code, the SANs are parsed once on certificate import.
 
-** libgnutls: Addressed invalid memory access in OpenPGP certificate parsing.
-   (issue found using oss-fuzz project)
+** libgnutls: Addressed integer overflow resulting to invalid memory write
+   in OpenPGP certificate parsing (issue found using oss-fuzz project:
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=420 )
+
+** libgnutls: Addressed read of 1 byte past the end of buffer in OpenPGP
+   certificate parsing (issue found using oss-fuzz project:
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=391 )
 
 ** libgnutls: Print the key PIN value used by the HPKP protocol as per RFC7469
    when printing certificate information.
