@@ -103,6 +103,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "add_extension", .type = OPTION_MULTI_LINE },
 	{ .name = "add_critical_extension", .type = OPTION_MULTI_LINE },
 	{ .name = "crl_dist_points", .type = OPTION_MULTI_LINE },
+	{ .name = "uri", .type = OPTION_MULTI_LINE },
 	{ .name = "ocsp_uri", .type = OPTION_MULTI_LINE },
 	{ .name = "ca_issuers_uri", .type = OPTION_MULTI_LINE },
 	{ .name = "locality", .type = OPTION_STRING },
