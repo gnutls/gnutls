@@ -31,7 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     if (ret < 0)
         goto cleanup;
 
-    printf("%s\n", (char*)out.data);
+    assert(out.size == strlen(out.data));
     gnutls_free(out.data);
 
  cleanup:
