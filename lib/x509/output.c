@@ -1640,7 +1640,6 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
 	int err;
 	const char *name;
-	char *p;
 	unsigned int bits;
 	unsigned char sha1_buffer[MAX_HASH_SIZE];
 	size_t sha1_size;
@@ -1671,17 +1670,6 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	err = gnutls_x509_crt_get_key_id(cert, GNUTLS_KEYID_USE_SHA1, sha1_buffer, &sha1_size);
 	if (err == GNUTLS_E_UNIMPLEMENTED_FEATURE) /* unsupported algo */
 		return;
-
-	p = _gnutls_key_fingerprint_randomart(sha1_buffer, sha1_size, name, bits,
-					      "\t\t");
-	if (p == NULL)
-		return;
-
-	adds(str, _("\tPublic key's random art:\n"));
-	adds(str, p);
-	adds(str, "\n");
-
-	gnutls_free(p);
 }
 
 static void
