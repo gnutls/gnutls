@@ -180,7 +180,7 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 	result = _gnutls_x509_read_int(sig, "s", s);
 	if (result < 0) {
 		gnutls_assert();
-		_gnutls_mpi_release(s);
+		_gnutls_mpi_release(r);
 		asn1_delete_structure(&sig);
 		return result;
 	}
