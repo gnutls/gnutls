@@ -30,11 +30,11 @@
 #include <system.h>
 #include <atfork.h>
 #include <errno.h>
+#include <minmax.h>
 
 #define PRNG_KEY_SIZE CHACHA_KEY_SIZE
 /* after this number of bytes PRNG will rekey */
 #define PRNG_RESEED_BYTES (1048576)
-
 
 struct prng_ctx_st {
 	struct chacha_ctx ctx;
@@ -67,23 +67,23 @@ static int single_prng_init(struct prng_ctx_st *ctx,
 			    unsigned init)
 {
 	uint8_t nonce[CHACHA_NONCE_SIZE];
-	int ret;
+
+	memset(nonce, 0, sizeof(nonce)); /* to prevent valgrind from whinning */
 
 	if (init == 0) {
 		/* use the previous key to generate IV as well */
-		memset(nonce, 0, sizeof(nonce)); /* to prevent valgrind from whinning */
 		chacha_crypt(&ctx->ctx, sizeof(nonce), nonce, nonce);
 
 		/* Add key continuity by XORing the new key with data generated
 		 * from the old key */
 		chacha_crypt(&ctx->ctx, new_key_size, new_key, new_key);
 	} else {
+		struct timespec now; /* current time */
+
 		ctx->forkid = _gnutls_get_forkid();
 
-		/* when initializing read the IV from the system randomness source */
-		ret = _rnd_get_system_entropy(nonce, sizeof(nonce));
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		gettime(&now);
+		memcpy(nonce, &now, MIN(sizeof(nonce), sizeof(now)));
 	}
 
 	chacha_set_key(&ctx->ctx, new_key);
