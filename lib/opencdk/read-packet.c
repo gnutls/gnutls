@@ -514,7 +514,7 @@ read_attribute(cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t attr,
 		pktlen--;
 	}
 
-	if (!len || *p != 1) {		/* Currently only 1, meaning an image, is defined. */
+	if (!len || pktlen == 0 || *p != 1) {	/* Currently only 1, meaning an image, is defined. */
 		rc = CDK_Inv_Packet;
 		goto error;
 	}
