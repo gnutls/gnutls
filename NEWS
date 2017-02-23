@@ -21,6 +21,9 @@ See the end for copying conditions.
 ** libgnutls: Addressed invalid memory access in OpenPGP certificate parsing.
    (issue found using oss-fuzz project)
 
+** libgnutls: Print the key PIN value used by the HPKP protocol as per RFC7469
+   when printing certificate information.
+
 ** gnutls-cli: Added LMTP, POP3, NNTP, Sieve and PostgreSQL support to the
    starttls-proto command. Patch by Robert Scheck.
 
