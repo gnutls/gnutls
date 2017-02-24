@@ -373,7 +373,7 @@ int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
 			_gnutls_debug_log(#level": certificate's signature hash is unknown\n"); \
 			return gnutls_assert_val(0); \
 		} \
-		if (entry->secure == 0 || entry->output_size*8/2 < sym_bits) { \
+		if (entry->output_size*8/2 < sym_bits) { \
 			_gnutls_cert_log("cert", crt); \
 			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", entry->output_size*8/2, sym_bits); \
 			return gnutls_assert_val(0); \
