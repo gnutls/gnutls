@@ -29,6 +29,16 @@ See the end for copying conditions.
 ** libgnutls: Print the key PIN value used by the HPKP protocol as per RFC7469
    when printing certificate information.
 
+** libgnutls: gnutls_ocsp_resp_verify_direct() and gnutls_ocsp_resp_verify()
+   flags can be set from the gnutls_certificate_verify_flags enumeration.
+   This allows the functions to pass the same flags available for certificates
+   to the verification function (e.g., GNUTLS_VERIFY_DISABLE_TIME_CHECKS or
+   GNUTLS_VERIFY_ALLOW_BROKEN).
+
+** libgnutls: gnutls_store_commitment() can accept flag
+   GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN. This is to allow the function to operate
+   in applications which use SHA1 for example, after SHA1 is deprecated.
+
 ** gnutls-cli: Added LMTP, POP3, NNTP, Sieve and PostgreSQL support to the
    starttls-proto command. Patch by Robert Scheck.
 
