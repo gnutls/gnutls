@@ -350,11 +350,15 @@ static unsigned int check_time_status(gnutls_x509_crt_t crt, time_t now)
 static
 int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
 {
+	/* the first two are for backwards compatibility */
 	if ((sig == GNUTLS_SIGN_RSA_MD2)
 	    && (flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2))
 		return 1;
 	if ((sig == GNUTLS_SIGN_RSA_MD5)
 	    && (flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5))
+		return 1;
+	/* we no longer have individual flags - but rather a catch all */
+	if ((flags & GNUTLS_VERIFY_ALLOW_BROKEN) == GNUTLS_VERIFY_ALLOW_BROKEN)
 		return 1;
 	return 0;
 }
