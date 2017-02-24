@@ -298,7 +298,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 		exit(1);
 	}
 
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data, &sig);
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot sign data: %s\n",
 			gnutls_strerror(ret));
@@ -308,7 +308,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
 
 	fprintf(stderr, "Verifying against private key parameters... ");
-	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
+	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256),
 		0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
@@ -337,7 +337,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	}
 
 	fprintf(stderr, "Verifying against public key in the token... ");
-	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
+	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256),
 		0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
