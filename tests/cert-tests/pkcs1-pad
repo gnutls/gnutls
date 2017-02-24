@@ -46,8 +46,8 @@ TMPFILE2=pkcs1-pad-2.$$.tmp
 
 EXPECT1=2002
 
-datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok.pem" | tee $TMPFILE1 >/dev/null 2>&1
-datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken.pem" | tee $TMPFILE2 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-ok.pem" | tee $TMPFILE1 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-allow-broken --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken.pem" | tee $TMPFILE2 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' $TMPFILE1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' $TMPFILE2 | wc -l | tr -d " "`

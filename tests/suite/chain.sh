@@ -50,7 +50,7 @@ while test -d X509tests/test${i}; do
 		find X509tests/test${i} -name I*.crt -print0 |sort -r -z|xargs -n1 --null ${VALGRIND}  "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 
 	fi
 	find X509tests/test${i} -name T*.crt -print0 |sort -r -z|xargs -n1 --null ${VALGRIND}  "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 
-	${VALGRIND} "${CERTTOOL}" -e --infile chains/chain${i}.pem > out
+	${VALGRIND} "${CERTTOOL}" --verify-allow-broken -e --infile chains/chain${i}.pem > out
 	rc=$?
 	if test $rc != 0 && test $rc != 1; then
 		echo "Chain ${i} FATAL failure."

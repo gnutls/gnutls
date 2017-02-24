@@ -44,7 +44,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} "${srcdir}/crl/long.pem" "$TMPFILE" || ${DIFF} --strip-trailing-cr "${srcdir}/crl/long.pem" $TMPFILE
+${DIFF} -I ^warning "${srcdir}/crl/long.pem" "$TMPFILE" || ${DIFF} -I ^warning --strip-trailing-cr "${srcdir}/crl/long.pem" $TMPFILE
 rc=$?
 
 if test "${rc}" != "0"; then

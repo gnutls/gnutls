@@ -116,7 +116,7 @@ void doit(void)
 
 	/* verify whether the stored hash verification succeeeds */
 	ret = gnutls_store_commitment(TMP_FILE, NULL, "localhost", "https",
-				      GNUTLS_DIG_SHA1, &hash, 0, 0);
+				      GNUTLS_DIG_SHA1, &hash, 0, GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
 	if (ret != 0) {
 		fail("commitment storage: %s\n", gnutls_strerror(ret));
 		goto fail;

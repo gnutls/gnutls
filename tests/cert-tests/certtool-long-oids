@@ -36,7 +36,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
 fi
 
-${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/long-oids.pem"|grep -v "Not After:" >$OUTFILE
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/long-oids.pem"|grep -v "Not After:"|grep -v ^warning >$OUTFILE
 rc=$?
 
 if test "${rc}" != 0;then
@@ -44,7 +44,7 @@ if test "${rc}" != 0;then
 	exit 1
 fi
 
-cat "${srcdir}/data/long-oids.pem" |grep -v "Not After:" >${TMPFILE1}
+cat "${srcdir}/data/long-oids.pem" |grep -v "Not After:"|grep -v ^warning >${TMPFILE1}
 $DIFF ${TMPFILE1} ${OUTFILE}
 if test $? != 0;then
 	echo "Error in parsing cert with long OIDs"

@@ -96,7 +96,7 @@ fi
 
 cat "${srcdir}/data/xmpp-othername.pem" |grep -v "Not After:" >${TMPFILE1}
 cat ${TMPFILE} |grep -v "Not After:" >${TMPFILE2}
-${DIFF} -I 'Algorithm Security Level' ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
+${DIFF} -I ^warning -I 'Algorithm Security Level' ${TMPFILE1} ${TMPFILE2} || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr ${TMPFILE1} ${TMPFILE2}
 rc=$?
 
 if test "${rc}" != "0"; then
