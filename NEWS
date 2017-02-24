@@ -42,6 +42,15 @@ See the end for copying conditions.
    gnutls_x509_crt_set_serial(), will fail on input considered to be invalid
    in RFC5280.
 
+** libgnutls: SHA1 was removed from the trusted set of hashes. Verification
+   and other operations relying on SHA1 is now considered insecure and will
+   fail, unless flags intended to enable broken algorithms are set. This
+   can be reverted on compile time with the configure flag --enable-sha1-support.
+
+** libgnutls: Introduced the %VERIFY_ALLOW_BROKEN and %VERIFY_ALLOW_SIGN_WITH_SHA1
+   priority string options. These allows enabling all broken and SHA1-based signature
+   algorithms in certificate verification, respectively.
+
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
@@ -52,6 +61,7 @@ See the end for copying conditions.
 gnutls_x509_crt_set_flags: Added
 GNUTLS_X509_CRT_FLAG_IGNORE_SANITY: Added
 GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS: Added
+GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1: Added
 GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS: Added
 
 
