@@ -2017,7 +2017,7 @@ _ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 		goto done;
 	}
 
-	rc = gnutls_pubkey_verify_data2(pubkey, sigalg, 0, &data, &sig);
+	rc = gnutls_pubkey_verify_data2(pubkey, sigalg, flags, &data, &sig);
 	if (rc == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 		gnutls_assert();
 		*verify = GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE;
@@ -2089,7 +2089,7 @@ static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
  * @resp: should contain a #gnutls_ocsp_resp_t type
  * @issuer: certificate believed to have signed the response
  * @verify: output variable with verification status, an #gnutls_ocsp_verify_reason_t
- * @flags: verification flags, 0 for now.
+ * @flags: verification flags from #gnutls_certificate_verify_flags
  *
  * Verify signature of the Basic OCSP Response against the public key
  * in the @issuer certificate.
@@ -2130,7 +2130,7 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 
 		unsigned int vtmp;
 
-		rc = gnutls_x509_crt_verify(signercert, &issuer, 1, 0,
+		rc = gnutls_x509_crt_verify(signercert, &issuer, 1, flags,
 					    &vtmp);
 		if (rc != GNUTLS_E_SUCCESS) {
 			gnutls_assert();
@@ -2167,7 +2167,7 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
  * @resp: should contain a #gnutls_ocsp_resp_t type
  * @trustlist: trust anchors as a #gnutls_x509_trust_list_t type
  * @verify: output variable with verification status, an #gnutls_ocsp_verify_reason_t
- * @flags: verification flags, 0 for now.
+ * @flags: verification flags from #gnutls_certificate_verify_flags
  *
  * Verify signature of the Basic OCSP Response against the public key
  * in the certificate of a trusted signer.  The @trustlist should be
@@ -2249,7 +2249,7 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 			rc = gnutls_x509_trust_list_verify_crt2(trustlist,
 								&signercert, 1,
 								&vdata, 1,
-								0, &vtmp, NULL);
+								flags, &vtmp, NULL);
 			if (rc != GNUTLS_E_SUCCESS) {
 				gnutls_assert();
 				goto done;
