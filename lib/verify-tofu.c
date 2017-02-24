@@ -623,7 +623,7 @@ gnutls_store_pubkey(const char *db_name,
  * @hash_algo: The hash algorithm type
  * @hash: The raw hash
  * @expiration: The expiration time (use 0 to disable expiration)
- * @flags: should be 0.
+ * @flags: should be 0 or %GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN.
  *
  * This function will store the provided hash commitment to 
  * the list of stored public keys. The key with the given
@@ -653,8 +653,11 @@ gnutls_store_commitment(const char *db_name,
 	char local_file[MAX_FILENAME];
 	const mac_entry_st *me = hash_to_entry(hash_algo);
 
-	if (me == NULL || _gnutls_digest_is_secure(me) == 0)
+	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
+	if (!(flags & GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN) && _gnutls_digest_is_secure(me) == 0)
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 
 	if (_gnutls_hash_get_algo_len(me) != hash->size)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
