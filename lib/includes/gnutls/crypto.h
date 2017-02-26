@@ -23,6 +23,8 @@
 #ifndef GNUTLS_CRYPTO_H
 #define GNUTLS_CRYPTO_H
 
+#include <gnutls/gnutls.h>
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 extern "C" {
