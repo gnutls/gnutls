@@ -53,8 +53,8 @@ endif
 
 
 dist_check_SCRIPTS = test-ciphers.sh override-ciphers test-hash-large test-ciphers-common.sh
-check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override cipher-override2 hash-large
-TESTS = $(ctests) test-ciphers.sh override-ciphers test-hash-large
+check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override cipher-override2 hash-large crypto
+TESTS = $(ctests) test-ciphers.sh override-ciphers test-hash-large crypto
 
 if HAVE_LIBCRYPTO
 cipher_openssl_compat_LDFLAGS = $(LDADD) $(LIBCRYPTO)
