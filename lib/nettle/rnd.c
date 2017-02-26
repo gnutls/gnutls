@@ -34,7 +34,12 @@
 
 #define PRNG_KEY_SIZE CHACHA_KEY_SIZE
 /* after this number of bytes PRNG will rekey */
-#define PRNG_RESEED_BYTES (1048576)
+
+static const unsigned prng_reseed_limits[] = {
+	[GNUTLS_RND_NONCE] = 1024*1024, /* 1 MB */
+	[GNUTLS_RND_RANDOM] = 16*1024, /* 16 kb */
+	[GNUTLS_RND_KEY] = 1024 /* 1 kb */
+};
 
 struct prng_ctx_st {
 	struct chacha_ctx ctx;
@@ -153,8 +158,11 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 		prng_ctx = &ctx->normal;
 	else if (level == GNUTLS_RND_KEY)
 		prng_ctx = &ctx->strong;
-	else
+	else if (level == GNUTLS_RND_NONCE)
 		prng_ctx = &ctx->nonce;
+	else
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+
 
 	/* we don't really need memset here, but otherwise we
 	 * get filled with valgrind warnings */
@@ -164,7 +172,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 		reseed = 1;
 	}
 
-	if (reseed != 0 || prng_ctx->counter > PRNG_RESEED_BYTES) {
+	if (reseed != 0 || prng_ctx->counter > prng_reseed_limits[level]) {
 		uint8_t new_key[PRNG_KEY_SIZE];
 
 		if (level == GNUTLS_RND_NONCE) {
@@ -204,9 +212,9 @@ static void wrap_nettle_rnd_refresh(void *_ctx)
 	char tmp;
 
 	/* force reseed */
-	ctx->nonce.counter = PRNG_RESEED_BYTES+1;
-	ctx->normal.counter = PRNG_RESEED_BYTES+1;
-	ctx->strong.counter = PRNG_RESEED_BYTES+1;
+	ctx->nonce.counter = prng_reseed_limits[GNUTLS_RND_NONCE]+1;
+	ctx->normal.counter = prng_reseed_limits[GNUTLS_RND_RANDOM]+1;
+	ctx->strong.counter = prng_reseed_limits[GNUTLS_RND_KEY]+1;
 
 	wrap_nettle_rnd(_ctx, GNUTLS_RND_NONCE, &tmp, 1);
 	wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, &tmp, 1);
