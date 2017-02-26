@@ -875,7 +875,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 				} else {
 					ret =
 						dsa_generate_dss_pqg(&pub, &cert,
-							index, NULL, rnd_key_func,
+							index, NULL, rnd_tmpkey_func,
 							NULL, NULL, level, q_bits);
 				}
 				if (ret != 1 || HAVE_LIB_ERROR()) {
@@ -900,7 +900,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 				if (q_bits < 160)
 					q_bits = 160;
 
-				ret = dsa_generate_params(&pub, NULL, rnd_key_func,
+				ret = dsa_generate_params(&pub, NULL, rnd_tmpkey_func,
 							  NULL, NULL, level, q_bits);
 				if (ret != 1 || HAVE_LIB_ERROR()) {
 					gnutls_assert();
