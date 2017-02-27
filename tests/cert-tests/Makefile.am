@@ -66,13 +66,14 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/x509-v1-with-sid.pem data/x509-v1-with-iid.pem data/x509-v3-with-fractional-time.pem \
 	data/openpgp-invalid5.pub data/openpgp-invalid6.pub templates/template-long-dns.tmpl \
 	data/long-dns.pem data/template-long-dns-crq.pem data/openpgp-invalid7.pub \
-	data/openpgp-invalid8.pub
+	data/openpgp-invalid8.pub data/chain-with-critical-on-root.pem \
+	data/chain-with-critical-on-intermediate.pem data/chain-with-critical-on-endcert.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
 	provable-dh userid sha2-test sha2-dsa-test provable-privkey-dsa2048 \
 	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
-	pkcs7-constraints2 certtool-long-oids pkcs7-cat cert-sanity
+	pkcs7-constraints2 certtool-long-oids pkcs7-cat cert-sanity cert-critical
 
 if WANT_TEST_SUITE
 dist_check_SCRIPTS += provable-dh-default
