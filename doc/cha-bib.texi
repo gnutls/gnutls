@@ -17,6 +17,10 @@ Peter Gutmann, "Everything you never wanted to know about PKI but were
 forced to find out", Available from
 @url{http://www.cs.auckland.ac.nz/~pgut001/}.
 
+@item @anchor{PRNGATTACKS}[PRNGATTACKS]
+John Kelsey and Bruce Schneier, "Cryptanalytic Attacks on Pseudorandom Number Generators",
+Available from @url{https://www.schneier.com/academic/paperfiles/paper-prngs.pdf}.
+
 @item @anchor{KEYPIN}[KEYPIN]
 Chris Evans and Chris Palmer, "Public Key Pinning Extension for HTTP", 
 Available from @url{http://tools.ietf.org/html/draft-ietf-websec-key-pinning-01}.

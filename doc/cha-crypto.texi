@@ -108,6 +108,109 @@ function. It allows obtaining random data of various levels.
 @showenumdesc{gnutls_rnd_level_t,The random number levels.}
 @showfuncdesc{gnutls_rnd}
 
+@subsection Inner workings
+
+The random number levels map to three CHACHA-based random generators which
+are initially seeded using the OS random device, e.g., @code{/dev/urandom}
+or @code{getrandom()}. These random generators are unique per thread, and
+are automatically re-seeded when a fork is detected.
+
+The reason the CHACHA cipher was selected for the GnuTLS' PRNG is the fact
+that CHACHA is considered a secure and fast stream cipher, and is already
+defined for use in TLS protocol. As such, the utilization of it would
+not stress the CPU caches, and would allow for better performance on busy
+servers, irrespective of their architecture (e.g., even if AES is not
+available with an optimized instruction set).
+
+The generators are unique per thread to allow lock-free operation. That
+induces a cost of around 140-bytes for the state of the generators per
+thread, on threads that would utilize @funcref{gnutls_rnd}. At the same time
+it allows fast and lock-free access to the generators. That benefits servers 
+which utilize more than 4 threads, while imposes no cost on single threaded
+processes.
+
+On the first call to @funcref{gnutls_rnd} they are seeded with three independent
+keys obtained from the OS random device. Their seed is used to output a fixed amount
+of bytes. The lower the level of the random generator the more bytes the
+generator will output without reseeding, providing it better performance.
+For the @code{GNUTLS_RND_KEY} and @code{GNUTLS_RND_RANDOM} levels, a
+re-seed xor's data obtained from the OS random device with the old key,
+while the @code{GNUTLS_RND_NONCE} levels utilizes
+the generator of the @code{GNUTLS_RND_RANDOM} level to obtain a new seed
+(which is also combined with the old key to produce the new).
+That is, the @code{GNUTLS_RND_NONCE}
+level is re-seeded using the @code{GNUTLS_RND_RANDOM}, and
+@code{GNUTLS_RND_RANDOM}, @code{GNUTLS_RND_KEY} using the system random
+generator.
+
+@subsection Defense against PRNG attacks
+
+This section describes the counter-measures available in the Pseudo-random number generator (PRNG)
+of GnuTLS for known attacks as described in @xcite{PRNGATTACKS}. Note that, the attacks on a PRNG such as
+state-compromise, assume a quite powerful adversary which has in practice
+access to the PRNG state.
+
+@subsubheading Cryptanalytic
+
+To defend against cryptanalytic attacks GnuTLS' PRNG is a stream cipher
+designed to defend against the same attacks. As such, GnuTLS' PRNG strength
+with regards to this attack relies on the underlying crypto block,
+which at the time of writing is CHACHA. That is easily replaceable in
+the future if required.
+
+@subsubheading Input-based attacks
+
+These attacks assume that the attacker can influence the input that is used
+to form the state of the PRNG. To counter these attacks GnuTLS does not
+gather input from the system environment but rather relies on the OS
+provided random generator. That is the @code{/dev/urandom} or
+@code{getentropy}/@code{getrandom} system calls. As such, GnuTLS' PRNG
+is as strong as the system random generator can ensure with regards to
+input-based attacks.
+
+@subsubheading State-compromise: Backtracking
+
+A backtracking attack, assumes that an adversary obtains at some point of time
+access to the generator state, and wants to recover past bytes. As the
+GnuTLS generator is fine-tuned to provide multiple levels, such an attack
+mainly concerns levels @code{GNUTLS_RND_RANDOM} and @code{GNUTLS_RND_KEY},
+since @code{GNUTLS_RND_NONCE} is intended to output non-secret data.
+The @code{GNUTLS_RND_RANDOM} generator at the time of writing can output
+16kb prior to being re-seeded thus this is its upper bound for previously
+generated data recovered using this attack. That assumes that the state
+of the system random generator is unknown to the attacker
+
+That attack reflects a real world scenario where application's memory is
+temporarily compromised, while kernel's memory is inaccessible.
+
+@subsubheading State-compromise: Permanent Compromise Attack
+
+A permanent compromise attack implies that once an attacker compromises the
+state of GnuTLS' random generator on specific time, all future and past
+outputs from the generator can be compromised. For past outputs the
+previous paragraph applies. For future outputs, both the @code{GNUTLS_RND_RANDOM}
+and the @code{GNUTLS_RND_KEY} with recover on 16kb or 1kb respectively
+have been generated. The @code{GNUTLS_RND_NONCE} level generator
+will recover after several megabytes of output is generated.
+As the nonce level is intended for non-secret but unpredictable output,
+the above is a compromise to improve performance.
+
+@subsubheading State-compromise: Iterative guessing
+
+This attack assumes that after an attacker obtained the PRNG state
+at some point, is able to recover the state at a later time by observing
+outputs of the PRNG. That is countered by switching the key to generators
+using a combination of a fresh key and the old one (using XOR), at
+re-seed time. All levels are immune to such attack.
+
+@subsubheading State-compromise: Meet-in-the-Middle
+
+This attack assumes that the attacker obtained the PRNG state at
+two distinct times, and being able to recover the state at the third time
+after observing the output of the PRNG. Given the approach described
+on the above paragraph, all levels are immune to such attack.
+
+
 @node Overriding algorithms
 @section Overriding algorithms
 @cindex overriding algorithms
