@@ -73,7 +73,7 @@ static void rnd_tmpkey_func(void *_ctx, size_t length, uint8_t * data)
 
 static void rnd_nonce_func(void *_ctx, size_t length, uint8_t * data)
 {
-	if (gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
+	if (gnutls_rnd(GNUTLS_RND_NONCE, data, length) < 0) {
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
 }
