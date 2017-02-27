@@ -2491,7 +2491,8 @@ gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert, unsigned indx,
  * If the buffer provided is not long enough to hold the output, then
  * @oid_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned. The @oid returned will be null terminated, although 
- * @oid_size will not account for the trailing null.
+ * @oid_size will not account for the trailing null (the latter is not
+ * true for GnuTLS prior to 3.6.0).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.  If you have reached the
@@ -2526,6 +2527,10 @@ gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert, unsigned indx,
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
+
+	/* remove any trailing null */
+	if (oid && len > 0 && ((uint8_t*)oid)[len-1] == 0)
+		(*oid_size)--;
 
 	snprintf(name, sizeof(name),
 		 "tbsCertificate.extensions.?%u.critical", indx + 1);
