@@ -837,6 +837,9 @@ name_constraints_intersect_nodes(name_constraints_node_st * nc1,
 	return GNUTLS_E_SUCCESS;
 }
 
+/*
+ * Returns: true if the certification is acceptable, and false otherwise.
+ */
 static
 unsigned check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
 									  gnutls_x509_subject_alt_name_t type)
@@ -1054,10 +1057,13 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 /* This function checks for unsupported constraints, that we also
  * know their structure. That is it will fail only if the constraint
  * is present in the CA, _and_ the name in the end certificate contains
- * the constrained element. */
-static int check_unsupported_constraint2(gnutls_x509_crt_t cert, 
-					 gnutls_x509_name_constraints_t nc,
-					 gnutls_x509_subject_alt_name_t type)
+ * the constrained element.
+ *
+ * Returns: true if the certification is acceptable, and false otherwise
+ */
+static unsigned check_unsupported_constraint2(gnutls_x509_crt_t cert, 
+					      gnutls_x509_name_constraints_t nc,
+					      gnutls_x509_subject_alt_name_t type)
 {
 	unsigned idx, found_one;
 	char name[MAX_CN];
