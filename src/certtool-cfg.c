@@ -1219,7 +1219,7 @@ void get_extensions_crt_set(int type, void *crt)
 
 	if (batch) {
 		if (!cfg.extensions)
-			return;
+			goto check_critical;
 		for (i = 0; cfg.extensions[i] != NULL; i += 2) {
 			if (cfg.extensions[i + 1] == NULL) {
 				fprintf(stderr,
@@ -1250,6 +1250,7 @@ void get_extensions_crt_set(int type, void *crt)
 			}
 		}
 
+ check_critical:
 		if (!cfg.crit_extensions)
 			return;
 		for (i = 0; cfg.crit_extensions[i] != NULL; i += 2) {
