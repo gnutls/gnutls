@@ -552,6 +552,7 @@ const char
  * @GNUTLS_CERT_PURPOSE_MISMATCH: The certificate or an intermediate does not match the intended purpose (extended key usage).
  * @GNUTLS_CERT_MISSING_OCSP_STATUS: The certificate requires the server to send the certifiate status, but no status was received.
  * @GNUTLS_CERT_INVALID_OCSP_STATUS: The received OCSP status response is invalid.
+ * @GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS: The certificate has extensions marked as critical which are not supported.
  *
  * Enumeration of certificate status codes.  Note that the status
  * bits may have different meanings in OpenPGP keys and X.509
@@ -573,7 +574,8 @@ typedef enum {
 	GNUTLS_CERT_MISMATCH = 1 << 17,
 	GNUTLS_CERT_PURPOSE_MISMATCH = 1 << 18,
 	GNUTLS_CERT_MISSING_OCSP_STATUS = 1 << 19,
-	GNUTLS_CERT_INVALID_OCSP_STATUS = 1 << 20
+	GNUTLS_CERT_INVALID_OCSP_STATUS = 1 << 20,
+	GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS = 1 << 21
 } gnutls_certificate_status_t;
 
 /**

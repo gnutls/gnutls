@@ -1052,6 +1052,11 @@ gnutls_certificate_verification_status_print(unsigned int status,
 					  _
 					  ("The received OCSP status response is invalid. "));
 
+	if (status & GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The certificate contains an unknown critical extension. "));
+
 	return _gnutls_buffer_to_datum(&str, out, 1);
 }
 

@@ -237,3 +237,4 @@ gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 priority_options.h: $(srcdir)/priority_options.gperf
 	-gperf --global-table -t $^ > $@-tmp && mv $@-tmp $@
 
+

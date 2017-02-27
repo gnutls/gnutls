@@ -37,6 +37,7 @@
 #include <x509_int.h>
 #include <common.h>
 #include <pk.h>
+#include "supported_exts.h"
 
 /* Checks if two certs have the same name and the same key.  Return 1 on match. 
  * If @is_ca is zero then this function is identical to gnutls_x509_crt_equals()
@@ -88,6 +89,45 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 	return ret;
 }
 
+/* checks whether there are present unknown/unsupported critical extensions.
+ *
+ * Returns true if they are present.
+ */
+static unsigned check_for_unknown_exts(gnutls_x509_crt_t cert)
+{
+	unsigned i;
+	char oid[MAX_OID_SIZE];
+	size_t oid_size;
+	unsigned critical;
+	int ret;
+
+	for (i=0;;i++) {
+		oid_size = sizeof(oid);
+		oid[0] = 0;
+		critical = 0;
+
+		ret = gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_size, &critical);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			return 0;
+		} else if (ret < 0) {
+			gnutls_assert();
+			/* could not decode? */
+			_gnutls_debug_log("Could not decode extension %d\n", i);
+			return 1;
+		}
+
+		if (critical == 0)
+			continue;
+
+		if (is_ext_oid_supported(oid, oid_size) == NULL) {
+			gnutls_assert();
+			_gnutls_debug_log("Unsupported critical extension: %s\n", oid);
+			return 1;
+		}
+	}
+
+	return 0;
+}
 
 /* Checks if the issuer of a certificate is a
  * Certificate Authority, or if the certificate is the same
@@ -708,6 +748,18 @@ verify_crt(gnutls_x509_crt_t cert,
 		}
 	}
 
+	/* we always check the issuer for unsupported critical extensions */
+	if (issuer && check_for_unknown_exts(issuer) != 0) {
+		MARK_INVALID(GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS);
+	}
+
+	/* we only check the end-certificate for critical extensions; that
+	 * way do not perform this check twice on the certificates when
+	 * verifying a large list */
+	if (end_cert && check_for_unknown_exts(cert) != 0) {
+		MARK_INVALID(GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS);
+	}
+
 	if (sigalg >= 0) {
 		if (is_level_acceptable(cert, issuer, sigalg, flags) == 0) {
 			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
@@ -961,6 +1013,7 @@ cleanup:
 	gnutls_x509_tlsfeatures_deinit(vparams.tls_feat);
 	return status;
 }
+
 
 #define PURPOSE_NSSGC "2.16.840.1.113730.4.1"
 #define PURPOSE_VSGC "2.16.840.1.113733.1.8.1"

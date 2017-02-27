@@ -30,6 +30,9 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1
 endif
 
+EXTRA_DIST = supported_exts.gperf
+BUILT_SOURCES = supported_exts.h
+
 noinst_LTLIBRARIES = libgnutls_x509.la
 
 libgnutls_x509_la_SOURCES =	\
@@ -71,8 +74,12 @@ libgnutls_x509_la_SOURCES =	\
 	x509_ext_int.h		\
 	tls_features.c		\
 	krb5.c krb5.h		\
-	ip.c ip.h ip-in-cidr.h
+	ip.c ip.h ip-in-cidr.h  \
+	supported_exts.h
 
 if ENABLE_OCSP
 libgnutls_x509_la_SOURCES += ocsp.c ocsp_output.c
 endif
+
+supported_exts.h: $(srcdir)/supported_exts.gperf
+	-gperf --global-table -t $^ > $@-tmp && mv $@-tmp $@
