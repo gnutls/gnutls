@@ -29,6 +29,7 @@ if ! test -x "${CERTTOOL}"; then
 fi
 
 export TZ="UTC"
+TMPFILE=tmp-tt.pem.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
@@ -42,9 +43,9 @@ datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-test.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-test.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -53,15 +54,15 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-utf8.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-utf8.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-utf8.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -70,15 +71,15 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-dn.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-dn.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -87,13 +88,13 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-dn-err.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 rc=$?
 
 if test "${rc}" = "0"; then
@@ -101,15 +102,15 @@ if test "${rc}" = "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-overflow.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-overflow.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -118,7 +119,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 # The following test works in 64-bit systems
 if test "$(getconf LONG_BIT)" = "64"; then
@@ -127,9 +128,9 @@ datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-overflow2.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-overflow2.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-overflow2.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -138,16 +139,16 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 fi
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-date.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-date.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-date.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -156,7 +157,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 # Test name constraints generation
 
@@ -164,9 +165,9 @@ datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-nc.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-nc.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-nc.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -175,7 +176,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 
 # Test the GeneralizedTime support
@@ -185,9 +186,9 @@ if test "$(getconf LONG_BIT)" = "64"; then
 			"${CERTTOOL}" --generate-self-signed \
 				--load-privkey "${srcdir}/data/template-test.key" \
 				--template "${srcdir}/templates/template-generalized.tmpl" \
-				--outfile tmp-tt.pem 2>/dev/null
+				--outfile ${TMPFILE} 2>/dev/null
 
-	${DIFF} "${srcdir}/data/template-generalized.pem" tmp-tt.pem >/dev/null 2>&1
+	${DIFF} "${srcdir}/data/template-generalized.pem" ${TMPFILE} >/dev/null 2>&1
 	rc=$?
 
 	# We're done.
@@ -197,7 +198,7 @@ if test "$(getconf LONG_BIT)" = "64"; then
 	fi
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
 
 # Test unique ID field generation
 
@@ -205,9 +206,9 @@ datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-unique.tmpl" \
-		--outfile tmp-tt.pem 2>/dev/null
+		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-unique.pem" tmp-tt.pem >/dev/null 2>&1
+${DIFF} "${srcdir}/data/template-unique.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -216,6 +217,25 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-rm -f tmp-tt.pem
+rm -f ${TMPFILE}
+
+# Test generation with very long dns names
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-long-dns.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+
+${DIFF} "${srcdir}/data/long-dns.pem" ${TMPFILE} >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 10 (long dns) failed"
+	exit ${rc}
+fi
+
+rm -f ${TMPFILE}
 
 exit 0
