@@ -556,48 +556,86 @@ int template_parse(const char *template)
 #define IS_NEWLINE(x) ((x[0] == '\n') || (x[0] == '\r'))
 #define MAX_INPUT_SIZE 512
 
+static size_t strip_nl(char *str, size_t str_size)
+{
+	if ((str_size > 0) && (str[str_size - 1] == '\n')) {
+		str_size--;
+		str[str_size] = 0;
+	}
+	if ((str_size > 0) && (str[str_size - 1] == '\r')) {
+		str_size--;
+		str[str_size] = 0;
+	}
+	return str_size;
+}
+
+static int copystr_without_nl(char *out, size_t out_size, const char *in, size_t in_size)
+{
+	if (in_size+1 >= out_size) {
+		fprintf(stderr, "Too long line to parse in interactive mode; please use templates.\n");
+		exit(1);
+	}
+	memcpy(out, in, in_size+1); /* copy terminating null */
+	strip_nl(out, in_size);
+	return 0;
+}
+
 void
 read_crt_set(gnutls_x509_crt_t crt, const char *input_str, const char *oid)
 {
-	char input[MAX_INPUT_SIZE];
-	int ret;
+	ssize_t ret;
+	char *lineptr = NULL;
+	size_t linesize = 0;
 
 	fputs(input_str, stderr);
-	if (fgets(input, sizeof(input), stdin) == NULL)
+	ret = getline(&lineptr, &linesize, stdin);
+	if (ret == -1)
 		return;
 
-	if (IS_NEWLINE(input))
+	if (IS_NEWLINE(lineptr)) {
+		free(lineptr);
 		return;
+	}
+
+	linesize = strip_nl(lineptr, ret);
 
 	ret =
-	    gnutls_x509_crt_set_dn_by_oid(crt, oid, 0, input,
-					  strlen(input) - 1);
+	    gnutls_x509_crt_set_dn_by_oid(crt, oid, 0, lineptr,
+					  linesize);
 	if (ret < 0) {
 		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+	free(lineptr);
 }
 
 void
 read_crq_set(gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 {
-	char input[MAX_INPUT_SIZE];
-	int ret;
+	ssize_t ret;
+	char *lineptr = NULL;
+	size_t linesize = 0;
 
 	fputs(input_str, stderr);
-	if (fgets(input, sizeof(input), stdin) == NULL)
+	ret = getline(&lineptr, &linesize, stdin);
+	if (ret == -1)
 		return;
 
-	if (IS_NEWLINE(input))
+	if (IS_NEWLINE(lineptr)) {
+		free(lineptr);
 		return;
+	}
+
+	linesize = strip_nl(lineptr, ret);
 
 	ret =
-	    gnutls_x509_crq_set_dn_by_oid(crq, oid, 0, input,
-					  strlen(input) - 1);
+	    gnutls_x509_crq_set_dn_by_oid(crq, oid, 0, lineptr,
+					  linesize);
 	if (ret < 0) {
 		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+	free(lineptr);
 }
 
 /* The input_str should contain %d or %u to print the default.
@@ -663,18 +701,23 @@ int64_t read_int(const char *input_str)
 const char *read_str(const char *input_str)
 {
 	static char input[MAX_INPUT_SIZE];
-	int len;
+	ssize_t ret;
+	char *lineptr = NULL;
+	size_t linesize = 0;
 
 	fputs(input_str, stderr);
-	if (fgets(input, sizeof(input), stdin) == NULL)
+	ret = getline(&lineptr, &linesize, stdin);
+	if (ret == -1)
+		return NULL;
+
+	ret = copystr_without_nl(input, sizeof(input), lineptr, ret);
+	free(lineptr);
+	if (ret < 0)
 		return NULL;
 
 	if (IS_NEWLINE(input))
 		return NULL;
 
-	len = strlen(input);
-	if ((len > 0) && (input[len - 1] == '\n'))
-		input[len - 1] = 0;
 	if (input[0] == 0)
 		return NULL;
 
