@@ -47,6 +47,7 @@ int gnutls_utf8_password_normalize(const uint8_t *password, unsigned password_le
 		ignore_errs?(GNUTLS_UTF8_IGNORE_ERRS):0)
 
 int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *output);
+int _gnutls_idna_email_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *output);
 
 inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
 {

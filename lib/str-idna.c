@@ -342,3 +342,39 @@ int _gnutls_idna_email_map(const char *input, unsigned ilen, gnutls_datum_t *out
 		return gnutls_assert_val(GNUTLS_E_INVALID_UTF8_EMAIL);
 	}
 }
+
+int _gnutls_idna_email_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *output)
+{
+	const char *p = input;
+
+	while(*p != 0 && *p != '@') {
+		if (!c_isprint(*p))
+			return gnutls_assert_val(GNUTLS_E_INVALID_UTF8_EMAIL);
+		p++;
+	}
+
+	if (*p == '@') {
+		unsigned name_part = p-input;
+		int ret;
+		gnutls_datum_t domain;
+
+		ret = gnutls_idna_reverse_map(p+1, ilen-name_part-1, &domain, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		output->data = gnutls_malloc(name_part+1+domain.size+1);
+		if (output->data == NULL) {
+			gnutls_free(domain.data);
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+		memcpy(output->data, input, name_part);
+		output->data[name_part] = '@';
+		memcpy(&output->data[name_part+1], domain.data, domain.size);
+		output->data[name_part+domain.size+1] = 0;
+		output->size = name_part+domain.size+1;
+		gnutls_free(domain.data);
+		return 0;
+	} else {
+		return gnutls_assert_val(GNUTLS_E_INVALID_UTF8_EMAIL);
+	}
+}

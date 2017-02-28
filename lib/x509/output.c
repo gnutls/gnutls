@@ -70,6 +70,36 @@ static void print_idn_name(gnutls_buffer_st *str, const char *prefix, const char
 	}
 }
 
+static void print_idn_email(gnutls_buffer_st *str, const char *prefix, const char *type, gnutls_datum_t *name)
+{
+	unsigned printable = 1;
+	unsigned is_printed = 0;
+	gnutls_datum_t out = {NULL, 0};
+	int ret;
+
+	if (!_gnutls_str_is_print((char*)name->data, name->size))
+		printable = 0;
+
+	is_printed = 0;
+	if (!printable) {
+		addf(str,  _("%s%s: %.*s (contains illegal chars)\n"), prefix, type, name->size, NON_NULL(name->data));
+		is_printed = 1;
+	} else if (name->data != NULL) {
+		if (strstr((char*)name->data, "xn--") != NULL) {
+			ret = _gnutls_idna_email_reverse_map((char*)name->data, name->size, &out);
+			if (ret >= 0) {
+				addf(str,  _("%s%s: %.*s (%s)\n"), prefix, type, name->size, NON_NULL(name->data), out.data);
+				is_printed = 1;
+				gnutls_free(out.data);
+			}
+		}
+	}
+
+	if (is_printed == 0) {
+		addf(str,  _("%s%s: %.*s\n"), prefix, type, name->size, NON_NULL(name->data));
+	}
+}
+
 static void
 print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datum_t *name, unsigned ip_is_cidr)
 {
@@ -94,7 +124,7 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 		break;
 
 	case GNUTLS_SAN_RFC822NAME:
-		addf(str,  _("%sRFC822Name: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+		print_idn_email(str, prefix, "RFC822Name", name);
 		break;
 
 	case GNUTLS_SAN_URI:
