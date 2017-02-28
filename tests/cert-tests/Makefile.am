@@ -65,7 +65,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/openpgp-invalid1.pub data/openpgp-invalid2.pub data/openpgp-invalid3.pub \
 	data/x509-v1-with-sid.pem data/x509-v1-with-iid.pem data/x509-v3-with-fractional-time.pem \
 	data/openpgp-invalid5.pub data/openpgp-invalid6.pub templates/template-long-dns.tmpl \
-	data/long-dns.pem
+	data/long-dns.pem data/template-long-dns-crq.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \

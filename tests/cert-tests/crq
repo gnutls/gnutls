@@ -34,6 +34,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 
+TMPFILE=crq.$$.tmp
 OUTFILE=out.$$.tmp
 OUTFILE2=out2.$$.tmp
 
@@ -84,5 +85,54 @@ if test "${rc}" != "0"; then
 fi
 
 rm -f "${OUTFILE}" "${OUTFILE2}"
+
+
+# Test interactive CRQ creation with very long input
+cat >$TMPFILE <<__EOF__
+super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
+
+
+
+
+
+
+
+super-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long.com
+
+
+
+
+
+
+
+
+N
+Y
+Y
+N
+N
+N
+N
+N
+N
+__EOF__
+
+setsid \
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" -q \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--outfile "${OUTFILE}" <$TMPFILE 2>/dev/null
+
+${DIFF} "${srcdir}/data/template-long-dns-crq.pem" "${OUTFILE}" >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Certificate request generation with long DNS failed"
+	echo $OUTFILE
+	exit ${rc}
+fi
+
+rm -f "${OUTFILE}" "${OUTFILE2}" "${TMPFILE}"
 
 exit 0
