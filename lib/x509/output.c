@@ -40,16 +40,42 @@
 #define NON_NULL(x) (((x)!=NULL)?((char*)(x)):"")
 #define ERROR_STR (char*) "(error)"
 
+static void print_idn_name(gnutls_buffer_st *str, const char *prefix, const char *type, gnutls_datum_t *name)
+{
+	unsigned printable = 1;
+	unsigned is_printed = 0;
+	gnutls_datum_t out = {NULL, 0};
+	int ret;
+
+	if (!_gnutls_str_is_print((char*)name->data, name->size))
+		printable = 0;
+
+	is_printed = 0;
+	if (!printable) {
+		addf(str,  _("%s%s: %.*s (contains illegal chars)\n"), prefix, type, name->size, NON_NULL(name->data));
+		is_printed = 1;
+	} else if (name->data != NULL) {
+		if (strstr((char*)name->data, "xn--") != NULL) {
+			ret = gnutls_idna_reverse_map((char*)name->data, name->size, &out, 0);
+			if (ret >= 0) {
+				addf(str,  _("%s%s: %.*s (%s)\n"), prefix, type, name->size, NON_NULL(name->data), out.data);
+				is_printed = 1;
+				gnutls_free(out.data);
+			}
+		}
+	}
+
+	if (is_printed == 0) {
+		addf(str,  _("%s%s: %.*s\n"), prefix, type, name->size, NON_NULL(name->data));
+	}
+}
+
 static void
 print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datum_t *name, unsigned ip_is_cidr)
 {
-char *sname = (char*)name->data;
-char str_ip[64];
-const char *p;
-unsigned printable = 1;
-unsigned is_printed;
-int ret;
-gnutls_datum_t out;
+	char *sname = (char*)name->data;
+	char str_ip[64];
+	const char *p;
 
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP
 	     || type == GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL
@@ -64,33 +90,7 @@ gnutls_datum_t out;
 
 	switch (type) {
 	case GNUTLS_SAN_DNSNAME:
-#ifdef HAVE_LIBIDN
-		if (!_gnutls_str_is_print((char*)name->data, name->size))
-			printable = 0;
-#endif
-
-		is_printed = 0;
-		if (!printable) {
-			ret = gnutls_idna_map((char*)name->data, name->size, &out, 0);
-			if (ret >= 0) {
-				addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), (char*)out.data);
-				gnutls_free(out.data);
-				is_printed = 1;
-			}
-		} else {
-			if (strstr((char*)name->data, "xn--") != NULL) {
-				ret = gnutls_idna_reverse_map((char*)name->data, name->size, &out, 0);
-				if (ret >= 0) {
-					addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), out.data);
-					gnutls_free(out.data);
-					is_printed = 1;
-				}
-			}
-
-		}
-		if (!is_printed)
-			addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
-
+		print_idn_name(str, prefix, "DNSname", name);
 		break;
 
 	case GNUTLS_SAN_RFC822NAME:
