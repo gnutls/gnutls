@@ -12,8 +12,8 @@
 # GnuTLS -- Information for developers
 
 GnuTLS implements the TLS/SSL (Transport Layer Security aka Secure
-Sockets Layer) protocol.  GnuTLS is a GNU project.  Additional
-information can be found at <http://www.gnutls.org/>.
+Sockets Layer) protocol.  Additional information can be found at
+[www.gnutls.org](http://www.gnutls.org/).
 
 This file contains instructions for developers and advanced users that
 want to build from version controlled sources. See [INSTALL.md](INSTALL.md)
