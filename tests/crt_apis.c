@@ -220,6 +220,8 @@ void doit(void)
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_key_purpose_oid2 %d\n", ret);
 
+	/* in the end this will be ignored as the issuer will be set
+	 * by gnutls_x509_crt_sign2() */
 	ret = gnutls_x509_crt_set_issuer_dn(crt, "cn = my CA, o = big\\, and one", &err);
 	if (ret < 0) {
 		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n", gnutls_strerror(ret), err);
