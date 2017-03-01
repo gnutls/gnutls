@@ -23,12 +23,19 @@ See the end for copying conditions.
    list. It has to be explicitly enabled, e.g., with a string like
    "NORMAL:+3DES-CBC".
 
+** libgnutls: PKIX certificates with unknown critical extensions are rejected
+   on verification with status GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS. This
+   behavior can be overriden by providing the flag GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS
+   to verification functions. Resolves gitlab issue #177.
+
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
 ** API and ABI modifications:
 gnutls_x509_crt_set_flags: Added
 GNUTLS_X509_CRT_FLAG_IGNORE_SANITY: Added
+GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS: Added
+GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS: Added
 
 
 * Version 3.5.7 (released 2016-12-8)
