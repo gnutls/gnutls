@@ -19,12 +19,18 @@ See the end for copying conditions.
    With the current code, the SANs are parsed once on certificate import.
 
 ** libgnutls: Addressed integer overflow resulting to invalid memory write
-   in OpenPGP certificate parsing (issue found using oss-fuzz project:
-   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=420 )
+   in OpenPGP certificate parsing. Issue found using oss-fuzz project:
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=420
 
 ** libgnutls: Addressed read of 1 byte past the end of buffer in OpenPGP
-   certificate parsing (issue found using oss-fuzz project:
-   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=391 )
+   certificate parsing. Issue found using oss-fuzz project:
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=391
+
+** libgnutls: Addressed crashes in OpenPGP certificate parsing, related
+   to private key parser. No longer allow OpenPGP certificates (public keys)
+   to contain private key sub-packets. Issue found using oss-fuzz project:
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=354
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=360
 
 ** libgnutls: Print the key PIN value used by the HPKP protocol as per RFC7469
    when printing certificate information.
@@ -38,6 +44,9 @@ See the end for copying conditions.
 ** libgnutls: gnutls_store_commitment() can accept flag
    GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN. This is to allow the function to operate
    in applications which use SHA1 for example, after SHA1 is deprecated.
+
+** certtool: No longer ignore the 'add_critical_extension' template option if
+   the 'add_extension' option is not present.
 
 ** gnutls-cli: Added LMTP, POP3, NNTP, Sieve and PostgreSQL support to the
    starttls-proto command. Patch by Robert Scheck.
