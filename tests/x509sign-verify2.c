@@ -195,13 +195,22 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 
 void doit(void)
 {
+	unsigned rsa_size1, rsa_size2;
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
 		gnutls_global_set_log_level(6);
 
-	test_sig(GNUTLS_PK_RSA, GNUTLS_DIG_SHA1, 512);
-	test_sig(GNUTLS_PK_RSA, GNUTLS_DIG_SHA256, 1024);
+	if (gnutls_fips140_mode_enabled()) {
+		rsa_size1 = 2048; /* minimum allowed */
+		rsa_size2 = 2048; /* minimum allowed */
+	} else {
+		rsa_size1 = 512;
+		rsa_size2 = 1024;
+	}
+
+	test_sig(GNUTLS_PK_RSA, GNUTLS_DIG_SHA1, rsa_size1);
+	test_sig(GNUTLS_PK_RSA, GNUTLS_DIG_SHA256, rsa_size2);
 	test_sig(GNUTLS_PK_EC, GNUTLS_DIG_SHA1, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1));
 	test_sig(GNUTLS_PK_EC, GNUTLS_DIG_SHA256, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1));
 	test_sig(GNUTLS_PK_EC, GNUTLS_DIG_SHA256, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1));

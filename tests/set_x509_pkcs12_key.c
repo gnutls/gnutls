@@ -62,6 +62,10 @@ void doit(void)
 	gnutls_datum_t tcert;
 	FILE *fp;
 
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
+
 	global_init();
 	assert(gnutls_certificate_allocate_credentials(&xcred) >= 0);
 
