@@ -882,6 +882,20 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 			if (all == 0 || ret < 0) \
 				return ret
 
+#define NON_FIPS_CASE(x, func, vectors) case x: \
+			if (_gnutls_fips_mode_enabled() == 0) { \
+				ret = func(x, V(vectors)); \
+				if (all == 0 || ret < 0) \
+					return ret; \
+			}
+
+#define FIPS_STARTUP_ONLY_TEST_CASE(x, func, vectors) case x: \
+			if (_gnutls_fips_mode_enabled() != 1) { \
+				ret = func(x, V(vectors)); \
+				if (all == 0 || ret < 0) \
+					return ret; \
+			}
+
 /*-
  * gnutls_cipher_self_test:
  * @all: if non-zero then tests to all ciphers are performed.
@@ -915,13 +929,13 @@ int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
 		     aes256_cbc_vectors);
 		CASE(GNUTLS_CIPHER_3DES_CBC, test_cipher,
 		     tdes_cbc_vectors);
-		CASE(GNUTLS_CIPHER_ARCFOUR_128, test_cipher,
+		NON_FIPS_CASE(GNUTLS_CIPHER_ARCFOUR_128, test_cipher,
 		     arcfour_vectors);
 		CASE(GNUTLS_CIPHER_AES_128_GCM, test_cipher_aead,
 		     aes128_gcm_vectors);
 		CASE(GNUTLS_CIPHER_AES_256_GCM, test_cipher_aead,
 		     aes256_gcm_vectors);
-		CASE(GNUTLS_CIPHER_CHACHA20_POLY1305, test_cipher_aead,
+		NON_FIPS_CASE(GNUTLS_CIPHER_CHACHA20_POLY1305, test_cipher_aead,
 		     chacha_poly1305_vectors);
 		break;
 	default:
@@ -951,7 +965,7 @@ int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac)
 
 	switch (mac) {
 	case GNUTLS_MAC_UNKNOWN:
-		CASE(GNUTLS_MAC_MD5, test_mac, hmac_md5_vectors);
+		FIPS_STARTUP_ONLY_TEST_CASE(GNUTLS_MAC_MD5, test_mac, hmac_md5_vectors);
 		CASE(GNUTLS_MAC_SHA1, test_mac, hmac_sha1_vectors);
 		CASE(GNUTLS_MAC_SHA224, test_mac, hmac_sha224_vectors);
 		CASE(GNUTLS_MAC_SHA256, test_mac, hmac_sha256_vectors);
@@ -986,7 +1000,7 @@ int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest)
 
 	switch (digest) {
 	case GNUTLS_DIG_UNKNOWN:
-		CASE(GNUTLS_DIG_MD5, test_digest, md5_vectors);
+		FIPS_STARTUP_ONLY_TEST_CASE(GNUTLS_DIG_MD5, test_digest, md5_vectors);
 		CASE(GNUTLS_DIG_SHA1, test_digest, sha1_vectors);
 		CASE(GNUTLS_DIG_SHA224, test_digest, sha224_vectors);
 		CASE(GNUTLS_DIG_SHA256, test_digest, sha256_vectors);
