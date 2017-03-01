@@ -757,6 +757,54 @@ void print_list(const char *priorities, int verbose)
 		}
 
 		{
+			ret = gnutls_priority_cipher_list(pcache, &list);
+
+			printf("Ciphers: ");
+			if (ret == 0)
+				printf("none\n");
+			for (i = 0; i < (unsigned) ret; i++) {
+				printf("%s",
+				       gnutls_cipher_get_name(list[i]));
+				if (i + 1 != (unsigned) ret)
+					printf(", ");
+				else
+					printf("\n");
+			}
+		}
+
+		{
+			ret = gnutls_priority_mac_list(pcache, &list);
+
+			printf("MACs: ");
+			if (ret == 0)
+				printf("none\n");
+			for (i = 0; i < (unsigned) ret; i++) {
+				printf("%s",
+				       gnutls_mac_get_name(list[i]));
+				if (i + 1 != (unsigned) ret)
+					printf(", ");
+				else
+					printf("\n");
+			}
+		}
+
+		{
+			ret = gnutls_priority_kx_list(pcache, &list);
+
+			printf("Key Exchange Algorithms: ");
+			if (ret == 0)
+				printf("none\n");
+			for (i = 0; i < (unsigned) ret; i++) {
+				printf("%s",
+				       gnutls_kx_get_name(list[i]));
+				if (i + 1 != (unsigned) ret)
+					printf(", ");
+				else
+					printf("\n");
+			}
+		}
+
+		{
 			ret =
 			    gnutls_priority_compression_list(pcache,
 							     &list);

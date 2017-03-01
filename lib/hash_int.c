@@ -174,6 +174,10 @@ int _gnutls_mac_exists(gnutls_mac_algorithm_t algo)
 {
 	const gnutls_crypto_mac_st *cc = NULL;
 
+	/* exceptionally it exists, as it is not a real MAC */
+	if (algo == GNUTLS_MAC_AEAD)
+		return 1;
+
 	cc = _gnutls_get_crypto_mac(algo);
 	if (cc != NULL)
 		return 1;
