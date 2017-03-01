@@ -902,6 +902,8 @@ int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  *   check in the verification, do not consider any wildcards.
  * @GNUTLS_VERIFY_USE_TLS1_RSA: This indicates that a (raw) RSA signature is provided
  *   as in the TLS 1.0 protocol. Not all functions accept this flag.
+ * @GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS: This signals the verification
+ *   process, not to fail on unknown critical extensions.
  *
  * Enumeration of different certificate verify flags. Additional
  * verification profiles can be set using GNUTLS_PROFILE_TO_VFLAGS()
@@ -920,7 +922,8 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1 << 10,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1 << 11,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
-	GNUTLS_VERIFY_USE_TLS1_RSA = 1 << 13
+	GNUTLS_VERIFY_USE_TLS1_RSA = 1 << 13,
+	GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS = 1 << 14
 	/* cannot exceed 2^24 due to GNUTLS_PROFILE_TO_VFLAGS() */
 } gnutls_certificate_verify_flags;
 

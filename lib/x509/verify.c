@@ -566,9 +566,9 @@ typedef struct verify_state_st {
 	gnutls_verify_output_function *func;
 } verify_state_st;
 
-#define MARK_INVALID(x) gnutls_assert(); \
+#define MARK_INVALID(x) { gnutls_assert(); \
 	out |= (x|GNUTLS_CERT_INVALID); \
-	result = 0
+	result = 0; }
 
 /* 
  * Verifies the given certificate against a certificate list of
@@ -750,14 +750,18 @@ verify_crt(gnutls_x509_crt_t cert,
 
 	/* we always check the issuer for unsupported critical extensions */
 	if (issuer && check_for_unknown_exts(issuer) != 0) {
-		MARK_INVALID(GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS);
+		if (!(flags & GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS)) {
+			MARK_INVALID(GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS);
+		}
 	}
 
 	/* we only check the end-certificate for critical extensions; that
 	 * way do not perform this check twice on the certificates when
 	 * verifying a large list */
 	if (end_cert && check_for_unknown_exts(cert) != 0) {
-		MARK_INVALID(GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS);
+		if (!(flags & GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS)) {
+			MARK_INVALID(GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS);
+		}
 	}
 
 	if (sigalg >= 0) {
