@@ -1674,7 +1674,12 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 		    && cs_algorithms[i].mac_algorithm ==
 		    pcache->mac.priority[mac_idx]) {
 			*sidx = i;
-			return 0;
+
+			if (_gnutls_cipher_exists(cs_algorithms[i].block_algorithm) &&
+			    _gnutls_mac_exists(cs_algorithms[i].mac_algorithm))
+				return 0;
+			else
+				break;
 		}
 	}
 	return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
