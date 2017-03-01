@@ -181,7 +181,8 @@ void doit(void)
 
 	/* check non-CBC ciphers */
 	dtls_mtu_try("DTLS 1.2 with AES-128-GCM", "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-GCM", 1500, 1463);
-	dtls_mtu_try("DTLS 1.2 with CHACHA20-POLY1305", "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+CHACHA20-POLY1305", 1500, 1471);
+	if (!gnutls_fips140_mode_enabled())
+		dtls_mtu_try("DTLS 1.2 with CHACHA20-POLY1305", "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+CHACHA20-POLY1305", 1500, 1471);
 
 	/* check EtM CBC */
 	dtls_mtu_try("DTLS 1.2/EtM with AES-128-CBC-HMAC-SHA1", "NORMAL:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1500, 1439);
