@@ -273,6 +273,7 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 		dst->seed_size = src->seed_size;
 		memcpy(dst->seed, src->seed, src->seed_size);
 	}
+	dst->palgo = src->palgo;
 
 	return 0;
 
