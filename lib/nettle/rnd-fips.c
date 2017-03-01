@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Red Hat
+ * Copyright (C) 2013-2017 Red Hat
  *
  * This file is part of GnuTLS.
  *
@@ -42,7 +42,6 @@
 struct fips_ctx {
 	struct drbg_aes_ctx nonce_context;
 	struct drbg_aes_ctx normal_context;
-	struct drbg_aes_ctx strong_context;
 	unsigned int forkid;
 };
 
@@ -115,11 +114,6 @@ static int _rngfips_ctx_init(struct fips_ctx *fctx)
 {
 	int ret;
 
-	/* strong */
-	ret = drbg_init(&fctx->strong_context);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	/* normal */
 	ret = drbg_init(&fctx->normal_context);
 	if (ret < 0)
@@ -138,11 +132,6 @@ static int _rngfips_ctx_init(struct fips_ctx *fctx)
 static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 {
 	int ret;
-
-	/* strong */
-	ret = drbg_reseed(&fctx->strong_context);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
 
 	/* normal */
 	ret = drbg_reseed(&fctx->normal_context);
@@ -189,10 +178,11 @@ static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 
 	switch (level) {
 	case GNUTLS_RND_RANDOM:
-		ret = get_random(&ctx->normal_context, ctx, buffer, length);
-		break;
 	case GNUTLS_RND_KEY:
-		ret = get_random(&ctx->strong_context, ctx, buffer, length);
+		/* Unlike the chacha generator in rnd.c we do not need
+		 * to explicitly protect against backtracking in GNUTLS_RND_KEY
+		 * level. This protection is part of the DRBG generator. */
+		ret = get_random(&ctx->normal_context, ctx, buffer, length);
 		break;
 	default:
 		ret = get_random(&ctx->nonce_context, ctx, buffer, length);
