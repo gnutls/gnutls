@@ -186,7 +186,7 @@ gnutls_openpgp_privkey_import(gnutls_openpgp_privkey_t key,
 		armor = 1;
 
 	rc = cdk_kbnode_read_from_mem(&key->knode, armor, data->data,
-				      data->size);
+				      data->size, 0);
 	if (rc != 0) {
 		rc = _gnutls_map_cdk_rc(rc);
 		gnutls_assert();
