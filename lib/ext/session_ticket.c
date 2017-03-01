@@ -506,7 +506,27 @@ session_ticket_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
  **/
 int gnutls_session_ticket_key_generate(gnutls_datum_t * key)
 {
-	return gnutls_key_generate(key, SESSION_KEY_SIZE);
+	if (_gnutls_fips_mode_enabled()) {
+		int ret;
+		/* in FIPS140-2 mode gnutls_key_generate imposes
+		 * some limits on allowed key size, thus it is not
+		 * used. These limits do not affect this function as
+		 * it does not generate a "key" but rather key material
+		 * that includes nonces and other stuff. */
+		key->data = gnutls_malloc(SESSION_KEY_SIZE);
+		if (key->data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		key->size = SESSION_KEY_SIZE;
+		ret = gnutls_rnd(GNUTLS_RND_RANDOM, key->data, key->size);
+		if (ret < 0) {
+			gnutls_free(key->data);
+			return ret;
+		}
+		return 0;
+	} else {
+		return gnutls_key_generate(key, SESSION_KEY_SIZE);
+	}
 }
 
 /**
