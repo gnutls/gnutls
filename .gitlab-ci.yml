@@ -192,8 +192,10 @@ FIPS140-2/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mkdir -p build && cd build &&
-    ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc  --disable-guile --disable-valgrind-tests &&
-    make -j$(nproc) && make check -j$(nproc)
+    ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile --disable-valgrind-tests
+  - make -j$(nproc)
+  - GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1 make check -j$(nproc)
+  - make check -j$(nproc)
   tags:
   - shared
   except:
