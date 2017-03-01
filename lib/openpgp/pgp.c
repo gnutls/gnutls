@@ -99,7 +99,7 @@ gnutls_openpgp_crt_import(gnutls_openpgp_crt_t key,
 		armor = 1;
 
 	rc = cdk_kbnode_read_from_mem(&key->knode, armor, data->data,
-				      data->size);
+				      data->size, 1);
 	if (rc) {
 		rc = _gnutls_map_cdk_rc(rc);
 		gnutls_assert();

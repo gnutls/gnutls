@@ -959,7 +959,7 @@ static cdk_error_t skip_packet(cdk_stream_t inp, size_t pktlen)
  *
  * Parse the next packet on the @inp stream and return its contents in @pkt.
  **/
-cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt)
+cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt, unsigned public)
 {
 	int ctb, is_newctb;
 	int pkttype;
@@ -1067,6 +1067,10 @@ cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt)
 		break;
 
 	case CDK_PKT_SECRET_KEY:
+		if (public) {
+			/* read secret key when expecting public */
+			return gnutls_assert_val(CDK_Inv_Packet);
+		}
 		pkt->pkt.secret_key =
 		    cdk_calloc(1, sizeof *pkt->pkt.secret_key);
 		if (!pkt->pkt.secret_key)
@@ -1082,6 +1086,10 @@ cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt)
 		break;
 
 	case CDK_PKT_SECRET_SUBKEY:
+		if (public) {
+			/* read secret key when expecting public */
+			return gnutls_assert_val(CDK_Inv_Packet);
+		}
 		pkt->pkt.secret_key =
 		    cdk_calloc(1, sizeof *pkt->pkt.secret_key);
 		if (!pkt->pkt.secret_key)
