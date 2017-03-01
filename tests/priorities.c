@@ -91,29 +91,43 @@ try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers, unsi
 	}
 }
 
+
 void doit(void)
 {
-	const int normal = 53;
 	const int null = 5;
-	const int sec128 = 53;
+	int sec128_cs = 53;
+	int sec256_cs = 22;
+	int normal_cs = 53;
+	int normal_ciphers = 11;
+	int pfs_cs = 39;
 
-	try_prio("PFS", 39, 11, __LINE__);
-	try_prio("NORMAL", normal, 11, __LINE__);
-	try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal, 11, __LINE__);
+#ifdef ENABLE_FIPS140
+	if (gnutls_fips140_mode_enabled()) {
+		normal_cs = 30;
+		normal_ciphers = 6;
+		pfs_cs = 22;
+		sec256_cs = 11;
+		sec128_cs = 30;
+	}
+#endif
+
+	try_prio("NORMAL", normal_cs, normal_ciphers, __LINE__);
+	try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal_cs, normal_ciphers, __LINE__);
 #ifndef ENABLE_FIPS140
-	try_prio("NORMAL:+CIPHER-ALL", normal, 11, __LINE__);	/* all (except null) */
+	try_prio("PFS", pfs_cs, normal_ciphers, __LINE__);
+	try_prio("NORMAL:+CIPHER-ALL", normal_cs, 11, __LINE__);	/* all (except null) */
 	try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
-	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal + null, 12, __LINE__);	/* should be null + all */
+	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal_cs + null, 12, __LINE__);	/* should be null + all */
 	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
 #endif
-	try_prio("PERFORMANCE", normal, 11, __LINE__);
-	try_prio("SECURE256", 22, 6, __LINE__);
-	try_prio("SECURE128", sec128, 11, __LINE__);
-	try_prio("SECURE128:+SECURE256", sec128, 11, __LINE__);	/* should be the same as SECURE128 */
-	try_prio("SECURE128:+SECURE256:+NORMAL", normal, 11, __LINE__);	/* should be the same as NORMAL */
+	try_prio("PERFORMANCE", normal_cs, normal_ciphers, __LINE__);
+	try_prio("SECURE256", sec256_cs, 6, __LINE__);
+	try_prio("SECURE128", sec128_cs, 11, __LINE__);
+	try_prio("SECURE128:+SECURE256", sec128_cs, 11, __LINE__);	/* should be the same as SECURE128 */
+	try_prio("SECURE128:+SECURE256:+NORMAL", normal_cs, 11, __LINE__);	/* should be the same as NORMAL */
 	try_prio("SUITEB192", 1, 1, __LINE__);
 	try_prio("SUITEB128", 2, 2, __LINE__);
 	/* check legacy strings */
-	try_prio("NORMAL:+RSA-EXPORT:+ARCFOUR-40", normal, 11, __LINE__);
+	try_prio("NORMAL:+RSA-EXPORT:+ARCFOUR-40", normal_cs, normal_ciphers, __LINE__);
 }
 
