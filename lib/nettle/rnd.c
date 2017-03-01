@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
- * Copyright (C) 2000, 2001, 2008 Niels Möller
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -33,12 +33,17 @@
 #include <minmax.h>
 
 #define PRNG_KEY_SIZE CHACHA_KEY_SIZE
-/* after this number of bytes PRNG will rekey */
 
+/* For a high level description see the documentation and
+ * the 'Random number generation' section of chapter
+ * 'Using GnuTLS as a cryptographic library'.
+ */
+
+/* after this number of bytes PRNG will rekey */
 static const unsigned prng_reseed_limits[] = {
 	[GNUTLS_RND_NONCE] = 1024*1024, /* 1 MB */
 	[GNUTLS_RND_RANDOM] = 16*1024, /* 16 kb */
-	[GNUTLS_RND_KEY] = 1024 /* 1 kb */
+	[GNUTLS_RND_KEY] = 16*1024 /* same as GNUTLS_RND_RANDOM */
 };
 
 struct prng_ctx_st {
@@ -50,7 +55,6 @@ struct prng_ctx_st {
 struct generators_ctx_st {
 	struct prng_ctx_st nonce;  /* GNUTLS_RND_NONCE */
 	struct prng_ctx_st normal; /* GNUTLS_RND_RANDOM */
-	struct prng_ctx_st strong; /* GNUTLS_RND_KEY */
 };
 
 
@@ -106,7 +110,7 @@ static int single_prng_init(struct prng_ctx_st *ctx,
 static int wrap_nettle_rnd_init(void **_ctx)
 {
 	int ret;
-	uint8_t new_key[PRNG_KEY_SIZE*3];
+	uint8_t new_key[PRNG_KEY_SIZE*2];
 	struct generators_ctx_st *ctx;
 
 	ctx = calloc(1, sizeof(*ctx));
@@ -126,14 +130,8 @@ static int wrap_nettle_rnd_init(void **_ctx)
 		goto fail;
 	}
 
-	/* initialize the normal RNG */
+	/* initialize the random/key RNG */
 	ret = single_prng_init(&ctx->normal, new_key+PRNG_KEY_SIZE, PRNG_KEY_SIZE, 1);
-	if (ret < 0) {
-		gnutls_assert();
-		goto fail;
-	}
-
-	ret = single_prng_init(&ctx->strong, new_key+2*PRNG_KEY_SIZE, PRNG_KEY_SIZE, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
@@ -153,11 +151,10 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	struct generators_ctx_st *ctx = _ctx;
 	struct prng_ctx_st *prng_ctx;
 	int ret, reseed = 0;
+	uint8_t new_key[PRNG_KEY_SIZE];
 
-	if (level == GNUTLS_RND_RANDOM)
+	if (level == GNUTLS_RND_RANDOM || level == GNUTLS_RND_KEY)
 		prng_ctx = &ctx->normal;
-	else if (level == GNUTLS_RND_KEY)
-		prng_ctx = &ctx->strong;
 	else if (level == GNUTLS_RND_NONCE)
 		prng_ctx = &ctx->nonce;
 	else
@@ -173,8 +170,6 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	}
 
 	if (reseed != 0 || prng_ctx->counter > prng_reseed_limits[level]) {
-		uint8_t new_key[PRNG_KEY_SIZE];
-
 		if (level == GNUTLS_RND_NONCE) {
 			ret = wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, new_key, sizeof(new_key));
 		} else {
@@ -200,6 +195,20 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	chacha_crypt(&prng_ctx->ctx, datasize, data, data);
 	prng_ctx->counter += datasize;
 
+	if (level == GNUTLS_RND_KEY) { /* prevent backtracking */
+		ret = wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, new_key, sizeof(new_key));
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = single_prng_init(prng_ctx, new_key, sizeof(new_key), 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
 	ret = 0;
 
 cleanup:
@@ -214,11 +223,9 @@ static void wrap_nettle_rnd_refresh(void *_ctx)
 	/* force reseed */
 	ctx->nonce.counter = prng_reseed_limits[GNUTLS_RND_NONCE]+1;
 	ctx->normal.counter = prng_reseed_limits[GNUTLS_RND_RANDOM]+1;
-	ctx->strong.counter = prng_reseed_limits[GNUTLS_RND_KEY]+1;
 
 	wrap_nettle_rnd(_ctx, GNUTLS_RND_NONCE, &tmp, 1);
 	wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, &tmp, 1);
-	wrap_nettle_rnd(_ctx, GNUTLS_RND_KEY, &tmp, 1);
 
 	return;
 }
