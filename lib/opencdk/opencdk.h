@@ -553,7 +553,7 @@ extern "C" {
 	void cdk_pkt_release(cdk_packet_t pkt);
 
 /* Read or write the given output from or to the stream. */
-	cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt);
+	cdk_error_t cdk_pkt_read(cdk_stream_t inp, cdk_packet_t pkt, unsigned public);
 	cdk_error_t cdk_pkt_write(cdk_stream_t out, cdk_packet_t pkt);
 
 /* Sub packet routines */
@@ -814,7 +814,8 @@ extern "C" {
 /* Try to read the next key block from the given input stream.
    The key will be returned in @RET_KEY on success. */
 	cdk_error_t cdk_keydb_get_keyblock(cdk_stream_t inp,
-					   cdk_kbnode_t * ret_key);
+					   cdk_kbnode_t * ret_key,
+					   unsigned public);
 
 /* Rebuild the key db index if possible. */
 	cdk_error_t cdk_keydb_idx_rebuild(cdk_keydb_hd_t db,
@@ -848,7 +849,7 @@ extern "C" {
 	cdk_error_t cdk_kbnode_read_from_mem(cdk_kbnode_t * ret_node,
 					     int armor,
 					     const unsigned char *buf,
-					     size_t buflen);
+					     size_t buflen, unsigned public);
 	cdk_error_t cdk_kbnode_write_to_mem(cdk_kbnode_t node,
 					    unsigned char *buf,
 					    size_t * r_nbytes);

@@ -67,7 +67,7 @@ static cdk_error_t literal_decode(void *data, FILE * in, FILE * out)
 		return rc;
 
 	cdk_pkt_new(&pkt);
-	rc = cdk_pkt_read(si, pkt);
+	rc = cdk_pkt_read(si, pkt, 1);
 	if (rc || pkt->pkttype != CDK_PKT_LITERAL) {
 		cdk_pkt_release(pkt);
 		cdk_stream_close(si);

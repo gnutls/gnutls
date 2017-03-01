@@ -108,7 +108,7 @@ static cdk_error_t keydb_idx_build(const char *file)
 	while (!cdk_stream_eof(inp)) {
 		off_t pos = cdk_stream_tell(inp);
 
-		rc = cdk_pkt_read(inp, pkt);
+		rc = cdk_pkt_read(inp, pkt, 1);
 		if (rc) {
 			_cdk_log_debug
 			    ("index build failed packet off=%lu\n",
@@ -816,7 +816,7 @@ cdk_keydb_search(cdk_keydb_search_t st, cdk_keydb_hd_t hd,
 
 		pos = cdk_stream_tell(kr);
 
-		rc = cdk_keydb_get_keyblock(kr, &knode);
+		rc = cdk_keydb_get_keyblock(kr, &knode, 1);
 
 		if (rc) {
 			if (rc == CDK_EOF)
@@ -1679,7 +1679,7 @@ add_key_usage(cdk_kbnode_t knode, u32 keyid[2], unsigned int usage)
 }
 
 cdk_error_t
-cdk_keydb_get_keyblock(cdk_stream_t inp, cdk_kbnode_t * r_knode)
+cdk_keydb_get_keyblock(cdk_stream_t inp, cdk_kbnode_t * r_knode, unsigned public)
 {
 	cdk_packet_t pkt;
 	cdk_kbnode_t knode, node;
@@ -1706,7 +1706,7 @@ cdk_keydb_get_keyblock(cdk_stream_t inp, cdk_kbnode_t * r_knode)
 	while (!cdk_stream_eof(inp)) {
 		cdk_pkt_new(&pkt);
 		old_off = cdk_stream_tell(inp);
-		rc = cdk_pkt_read(inp, pkt);
+		rc = cdk_pkt_read(inp, pkt, public);
 		if (rc) {
 			cdk_pkt_release(pkt);
 			if (rc == CDK_EOF)
@@ -2126,7 +2126,7 @@ cdk_error_t cdk_keydb_check_sk(cdk_keydb_hd_t hd, u32 * keyid)
 		return rc;
 	}
 	cdk_pkt_new(&pkt);
-	while (!cdk_pkt_read(db, pkt)) {
+	while (!cdk_pkt_read(db, pkt, 0)) {
 		if (pkt->pkttype != CDK_PKT_SECRET_KEY &&
 		    pkt->pkttype != CDK_PKT_SECRET_SUBKEY) {
 			cdk_pkt_free(pkt);
@@ -2241,14 +2241,14 @@ cdk_error_t cdk_listkey_next(cdk_listkey_t ctx, cdk_kbnode_t * ret_key)
 	}
 
 	if (ctx->type && ctx->u.patt[0] == '*')
-		return cdk_keydb_get_keyblock(ctx->inp, ret_key);
+		return cdk_keydb_get_keyblock(ctx->inp, ret_key, 1);
 	else if (ctx->type) {
 		cdk_kbnode_t node;
 		struct cdk_keydb_search_s ks;
 		cdk_error_t rc;
 
 		for (;;) {
-			rc = cdk_keydb_get_keyblock(ctx->inp, &node);
+			rc = cdk_keydb_get_keyblock(ctx->inp, &node, 1);
 			if (rc) {
 				gnutls_assert();
 				return rc;

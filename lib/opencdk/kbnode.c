@@ -369,12 +369,14 @@ cdk_packet_t cdk_kbnode_get_packet(cdk_kbnode_t node)
  * @armor: whether base64 or not
  * @buf: the buffer which stores the key sequence
  * @buflen: the length of the buffer
+ * @public: non-zero if reading a public key
  *
  * Tries to read a key node from the memory buffer @buf.
  **/
 cdk_error_t
 cdk_kbnode_read_from_mem(cdk_kbnode_t * ret_node,
-			 int armor, const byte * buf, size_t buflen)
+			 int armor, const byte * buf, size_t buflen,
+			 unsigned public)
 {
 	cdk_stream_t inp;
 	cdk_error_t rc;
@@ -393,7 +395,7 @@ cdk_kbnode_read_from_mem(cdk_kbnode_t * ret_node,
 	if (armor)
 		cdk_stream_set_armor_flag(inp, 0);
 
-	rc = cdk_keydb_get_keyblock(inp, ret_node);
+	rc = cdk_keydb_get_keyblock(inp, ret_node, public);
 	if (rc)
 		gnutls_assert();
 	cdk_stream_close(inp);
