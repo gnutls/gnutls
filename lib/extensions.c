@@ -229,6 +229,11 @@ _gnutls_parse_extensions(gnutls_session_t session,
 
 	DECR_LENGTH_RET(data_size, next, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 
+	if (next == 0 && data_size == 0) /* field is present, but has zero length? Ignore it. */
+		return 0;
+	else if (data_size > 0) /* forbid unaccounted data */
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
+
 	do {
 		DECR_LENGTH_RET(next, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 		type = _gnutls_read_uint16(&data[pos]);
@@ -273,9 +278,12 @@ _gnutls_parse_extensions(gnutls_session_t session,
 			gnutls_assert();
 			return ret;
 		}
-
 	}
 	while (next > 2);
+
+	/* forbid leftovers */
+	if (next > 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 
 	return 0;
 
