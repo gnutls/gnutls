@@ -77,7 +77,7 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 
 	if (_gnutls_mpi_init_scan_nz(&session->key.client_Y, &data[2], _n_Y)) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER; /* most likely zero or illegal size */
 	}
 
 	_gnutls_dh_set_peer_public(session, session->key.client_Y);
@@ -252,19 +252,19 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 
 	if (_gnutls_mpi_init_scan_nz(&session->key.client_Y, data_Y, _n_Y) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 	if (_gnutls_mpi_init_scan_nz(&session->key.dh_params.params[DH_G], data_g, _n_g) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 	if (_gnutls_mpi_init_scan_nz(&session->key.dh_params.params[DH_P], data_p, _n_p) != 0) {
 		gnutls_assert();
 		/* we release now because session->key.dh_params.params_nr is not yet set */
 		_gnutls_mpi_release(&session->key.dh_params.params[DH_G]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 	session->key.dh_params.params_nr = 3; /* include empty q */

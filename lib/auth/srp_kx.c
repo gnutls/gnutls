@@ -162,21 +162,21 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 	tmp_size = pwd_entry->g.size;
 	if (_gnutls_mpi_init_scan_nz(&G, pwd_entry->g.data, tmp_size) < 0) {
 		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto cleanup;
 	}
 
 	tmp_size = pwd_entry->n.size;
 	if (_gnutls_mpi_init_scan_nz(&N, pwd_entry->n.data, tmp_size) < 0) {
 		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto cleanup;
 	}
 
 	tmp_size = pwd_entry->v.size;
 	if (_gnutls_mpi_init_scan_nz(&V, pwd_entry->v.data, tmp_size) < 0) {
 		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto cleanup;
 	}
 
@@ -355,7 +355,7 @@ _gnutls_proc_srp_client_kx(gnutls_session_t session, uint8_t * data,
 	DECR_LEN(data_size, _n_A);
 	if (_gnutls_mpi_init_scan_nz(&A, &data[2], _n_A) || A == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 	_gnutls_mpi_log("SRP A: ", A);
@@ -914,17 +914,17 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 
 	if (_gnutls_mpi_init_scan_nz(&N, data_n, _n_n) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 	if (_gnutls_mpi_init_scan_nz(&G, data_g, _n_g) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 	if (_gnutls_mpi_init_scan_nz(&B, data_b, _n_b) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 
@@ -961,7 +961,7 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 
 	if (_gnutls_mpi_init_scan_nz(&session->key.x, hd, _n_g) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 
