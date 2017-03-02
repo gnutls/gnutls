@@ -212,6 +212,7 @@ int gnutls_error_to_alert(int err, int *level)
 		break;
 	case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
 	case GNUTLS_E_ILLEGAL_SRP_USERNAME:
+	case GNUTLS_E_PK_INVALID_PUBKEY:
 		ret = GNUTLS_A_ILLEGAL_PARAMETER;
 		_level = GNUTLS_AL_FATAL;
 		break;
