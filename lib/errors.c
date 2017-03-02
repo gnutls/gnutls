@@ -66,6 +66,9 @@ static const gnutls_error_entry error_entries[] = {
 	ERROR_ENTRY(N_
 		    ("A TLS packet with unexpected length was received."),
 		    GNUTLS_E_UNEXPECTED_PACKET_LENGTH),
+	ERROR_ENTRY(N_
+		    ("A TLS packet with unexpected length was received."),
+		    GNUTLS_E_RECORD_OVERFLOW),
 	ERROR_ENTRY(N_("The TLS connection was non-properly terminated."),
 		    GNUTLS_E_PREMATURE_TERMINATION),
 	ERROR_ENTRY(N_

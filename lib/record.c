@@ -1104,7 +1104,7 @@ static int recv_headers(gnutls_session_t session,
 		    (session, "Received packet with illegal length: %u\n",
 		     (unsigned int) record->length);
 		return
-		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		    gnutls_assert_val(GNUTLS_E_RECORD_OVERFLOW);
 	}
 
 	_gnutls_record_log
@@ -1368,6 +1368,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	if (IS_DTLS(session) && (ret == GNUTLS_E_DECRYPTION_FAILED ||
 		ret == GNUTLS_E_UNSUPPORTED_VERSION_PACKET ||
 		ret == GNUTLS_E_UNEXPECTED_PACKET_LENGTH ||
+		ret == GNUTLS_E_RECORD_OVERFLOW ||
 		ret == GNUTLS_E_UNEXPECTED_PACKET ||
 		ret == GNUTLS_E_ERROR_IN_FINISHED_PACKET ||
 		ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)) {

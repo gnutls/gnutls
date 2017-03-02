@@ -201,6 +201,7 @@ int gnutls_error_to_alert(int err, int *level)
 		ret = GNUTLS_A_BAD_RECORD_MAC;
 		_level = GNUTLS_AL_FATAL;
 		break;
+	case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
 	case GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH:
 		ret = GNUTLS_A_DECODE_ERROR;
 		_level = GNUTLS_AL_FATAL;
@@ -273,7 +274,7 @@ int gnutls_error_to_alert(int err, int *level)
 		ret = GNUTLS_A_UNSUPPORTED_CERTIFICATE;
 		_level = GNUTLS_AL_FATAL;
 		break;
-	case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
+	case GNUTLS_E_RECORD_OVERFLOW:
 		ret = GNUTLS_A_RECORD_OVERFLOW;
 		_level = GNUTLS_AL_FATAL;
 		break;
