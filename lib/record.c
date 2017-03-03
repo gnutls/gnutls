@@ -894,6 +894,7 @@ record_add_to_buffers(gnutls_session_t session,
 			 */
 			if (session->security_parameters.entity ==
 			    GNUTLS_SERVER
+			    && session->internals.handshake_in_progress == 0
 			    && bufel->htype ==
 			    GNUTLS_HANDSHAKE_CLIENT_HELLO) {
 				gnutls_assert();
