@@ -1216,9 +1216,25 @@ gnutls_x509_crt_set_serial(gnutls_x509_crt_t cert, const void *serial,
 			   size_t serial_size)
 {
 	int ret;
+	unsigned all_zero, i;
+	const unsigned char *pserial = serial;
 
 	if (cert == NULL) {
 		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* check for non-zero serial */
+	all_zero = 1;
+	for (i=0;i<serial_size;i++) {
+		if (pserial[i] != 0) {
+			all_zero = 0;
+			break;
+		}
+	}
+
+	if (all_zero) {
+		_gnutls_debug_log("error: certificate serial is zero\n");
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
