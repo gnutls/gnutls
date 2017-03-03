@@ -37,7 +37,7 @@ fi
 
 PARAMS="--generate-certificate --load-privkey '${srcdir}/data/key-user.pem' --load-ca-privkey '${srcdir}/data/key-ca.pem' --template $TEMPLFILE"
 
-echo "serial = 0" > $TEMPLFILE
+echo "serial = 1" > $TEMPLFILE
 
 #eval "${CERTTOOL}" ${PARAMS} --load-ca-certificate $srcdir/ca-gnutls-keyid.pem \
 #    --outfile user-gnutls-keyid.pem 2> /dev/null
