@@ -128,7 +128,7 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 	sig_ext_st *priv;
 	extension_priv_data_t epriv;
 
-	if (data_size % 2 != 0)
+	if (data_size == 0 || data_size % 2 != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	priv = gnutls_calloc(1, sizeof(*priv));
