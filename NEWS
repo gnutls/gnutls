@@ -7,9 +7,10 @@ See the end for copying conditions.
 
 * Version 3.6.0 (unreleased)
 
-** libgnutls: Refuse to import certificates which have fractional seconds
-   in Time fields, and X.509v1 certificates which have the unique identifiers
-   set. Both sets are prohibited by RFC5280.
+** libgnutls: Introduced various sanity checks on certificate import. Refuse
+   to import certificates which have fractional seconds in Time fields, X.509v1
+   certificates which have the unique identifiers set, and certificates with illegal
+   version numbers. All of these are prohibited by RFC5280.
 
 ** libgnutls: Introduced gnutls_x509_crt_set_flags(). This function can set flags
    in the crt structure. The only flag supported at the moment is
@@ -27,6 +28,11 @@ See the end for copying conditions.
    on verification with status GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS. This
    behavior can be overriden by providing the flag GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS
    to verification functions. Resolves gitlab issue #177.
+
+** libgnutls: Refuse to generate a certificate with an illegal version, or an
+   illegal serial number. That is, gnutls_x509_crt_set_version() and
+   gnutls_x509_crt_set_serial(), will fail on input considered to be invalid
+   in RFC5280.
 
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
