@@ -188,7 +188,7 @@ gnutls_x509_crt_set_version(gnutls_x509_crt_t crt, unsigned int version)
 	int result;
 	unsigned char null = version;
 
-	if (crt == NULL) {
+	if (crt == NULL || version == 0 || version >= 0x80) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
