@@ -518,12 +518,18 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	suite_size = _gnutls_read_uint16(&data[pos]);
 	pos += 2;
 
+	if (suite_size == 0 || (suite_size % 2) != 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 	suite_ptr = &data[pos];
 	DECR_LEN(len, suite_size);
 	pos += suite_size;
 
 	DECR_LEN(len, 1);
 	comp_size = data[pos++]; /* the number of compression methods */
+
+	if (comp_size == 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	comp_ptr = &data[pos];
 	DECR_LEN(len, comp_size);

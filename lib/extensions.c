@@ -222,8 +222,10 @@ _gnutls_parse_extensions(gnutls_session_t session,
 							[i]));
 		}
 #endif
+	if (data_size == 0)
+		return 0;
 
-	DECR_LENGTH_RET(data_size, 2, 0);
+	DECR_LENGTH_RET(data_size, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 	next = _gnutls_read_uint16(data);
 	pos += 2;
 
