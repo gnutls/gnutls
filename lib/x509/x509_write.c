@@ -1204,6 +1204,10 @@ gnutls_x509_crt_set_expiration_time(gnutls_x509_crt_t cert,
  * with the X.509/PKIX specifications the provided @serial should be 
  * a big-endian positive number (i.e. it's leftmost bit should be zero).
  *
+ * The size of the serial is restricted to 20 bytes maximum by RFC5280.
+ * This function allows writing more than 20 bytes but the generated
+ * certificates in that case may be rejected by other implementations.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
