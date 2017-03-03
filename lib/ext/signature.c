@@ -203,6 +203,9 @@ _gnutls_signature_algorithm_recv_params(gnutls_session_t session,
 			len = _gnutls_read_uint16(data);
 			DECR_LEN(data_size, len);
 
+			if (data_size > 0)
+				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 			ret =
 			    _gnutls_sign_algorithm_parse_data(session,
 							      data + 2,
