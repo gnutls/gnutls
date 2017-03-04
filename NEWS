@@ -20,7 +20,7 @@ See the end for copying conditions.
 
 ** libgnutls: Addressed integer overflow resulting to invalid memory write
    in OpenPGP certificate parsing. Issue found using oss-fuzz project:
-   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=420
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=420 [GNUTLS-SA-2017-3A]
 
 ** libgnutls: Addressed read of 1 byte past the end of buffer in OpenPGP
    certificate parsing. Issue found using oss-fuzz project:
@@ -30,7 +30,7 @@ See the end for copying conditions.
    to private key parser. No longer allow OpenPGP certificates (public keys)
    to contain private key sub-packets. Issue found using oss-fuzz project:
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=354
-   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=360
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=360 [GNUTLS-SA-2017-3B]
 
 ** libgnutls: Print the key PIN value used by the HPKP protocol as per RFC7469
    when printing certificate information.
