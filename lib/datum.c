@@ -49,12 +49,14 @@ _gnutls_set_datum(gnutls_datum_t * dat, const void *data, size_t data_size)
 	return 0;
 }
 
-/* ensures that the data set are null-terminated */
+/* ensures that the data set are null-terminated
+ * The function always returns an allocated string in @dat on success.
+ */
 int
 _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data, size_t data_size)
 {
 	if (data_size == 0 || data == NULL) {
-		dat->data = NULL;
+		dat->data = gnutls_calloc(1, 1);
 		dat->size = 0;
 		return 0;
 	}
