@@ -570,6 +570,9 @@ read_user_id(cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t user_id)
 }
 
 
+#define MAX_PACKET_LEN (1<<24)
+
+
 static cdk_error_t
 read_subpkt(cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
 {
@@ -608,6 +611,10 @@ read_subpkt(cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
 		size = c;
 	else
 		return CDK_Inv_Packet;
+
+	if (size >= MAX_PACKET_LEN) {
+		return CDK_Inv_Packet;
+	}
 
 	node = cdk_subpkt_new(size);
 	if (!node)
@@ -949,8 +956,6 @@ static cdk_error_t skip_packet(cdk_stream_t inp, size_t pktlen)
 	assert(pktlen == 0);
 	return 0;
 }
-
-#define MAX_PACKET_LEN (1<<24)
 
 /**
  * cdk_pkt_read:
