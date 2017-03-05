@@ -32,6 +32,11 @@ See the end for copying conditions.
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=354
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=360 [GNUTLS-SA-2017-3B]
 
+** libgnutls: Addressed large allocation in OpenPGP certificate parsing, that
+   could lead in out-of-memory condition. Issue found using oss-fuzz project,
+   and was fixed by Alex Gaynor:
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=392 [GNUTLS-SA-2017-3C]
+
 ** libgnutls: Print the key PIN value used by the HPKP protocol as per RFC7469
    when printing certificate information.
 
