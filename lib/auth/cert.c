@@ -1073,6 +1073,7 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 		if (ret < 0) {
 			gnutls_assert();
 			peer_certificate_list_size = j;
+			ret = GNUTLS_E_CERTIFICATE_ERROR;
 			goto cleanup;
 		}
 
