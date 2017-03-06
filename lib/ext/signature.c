@@ -214,6 +214,8 @@ _gnutls_signature_algorithm_recv_params(gnutls_session_t session,
 				gnutls_assert();
 				return ret;
 			}
+		} else {
+			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		}
 	}
 
