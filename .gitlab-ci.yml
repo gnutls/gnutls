@@ -24,8 +24,6 @@ init/Fedora/x86_64:
   - make autoreconf
   tags:
   - shared
-  except:
-  - tags
   artifacts:
     untracked: true
     expire_in: 1 day
@@ -295,8 +293,8 @@ MinGW32/DLLs:
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    rm -f tests/suite/mini-eagain2.c && 
-    mingw32-configure --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    rm -f tests/suite/mini-eagain2.c
+  - mingw32-configure --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
@@ -333,8 +331,8 @@ MinGW64/DLLs:
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    rm -f tests/suite/mini-eagain2.c && 
-    mingw64-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    rm -f tests/suite/mini-eagain2.c
+  - mingw64-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
