@@ -24,6 +24,10 @@ See the end for copying conditions.
    list. It has to be explicitly enabled, e.g., with a string like
    "NORMAL:+3DES-CBC".
 
+** libgnutls: Introduced a lock-free random generator which operates per-thread
+   and eliminates random-generator related bottlenecks in multi-threaded operation.
+   Resolves gitlab issue #141.
+
 ** libgnutls: PKIX certificates with unknown critical extensions are rejected
    on verification with status GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS. This
    behavior can be overriden by providing the flag GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS
