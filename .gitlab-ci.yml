@@ -163,6 +163,7 @@ no-SSL-3.0/Fedora/x86_64:
       - build/tests/*.log
       - build/*.log
       - build/tests/*/*.log
+      - build/tests/suite/*/*.log
 
 FIPS140-2/Fedora/x86_64:
   stage: stage2-testing
@@ -266,6 +267,7 @@ asan/Fedora/x86_64:
       - ./*.log
       - tests/*.log
       - tests/*/*.log
+      - tests/suite/*/*.log
 
 clang-analyzer/Fedora/x86_64:
   stage: stage2-testing
@@ -456,6 +458,7 @@ Fedora/x86:
       - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
+      - build/tests/suite/*/*.log
 
 # Check with undefined sanitizer + obtain coverage output
 ubsan/Fedora/x86_64:
@@ -477,6 +480,7 @@ ubsan/Fedora/x86_64:
       - ./*.log
       - tests/*.log
       - tests/*/*.log
+      - tests/suite/*/*.log
 
 build/Debian/x86_64:
   stage: stage2-testing
@@ -497,3 +501,4 @@ build/Debian/x86_64:
       - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
+      - build/tests/suite/*/*.log
