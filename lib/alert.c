@@ -203,6 +203,7 @@ int gnutls_error_to_alert(int err, int *level)
 		break;
 	case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
 	case GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH:
+	case GNUTLS_E_NO_CERTIFICATE_FOUND:
 		ret = GNUTLS_A_DECODE_ERROR;
 		_level = GNUTLS_AL_FATAL;
 		break;
@@ -294,7 +295,6 @@ int gnutls_error_to_alert(int err, int *level)
 		_level = GNUTLS_AL_FATAL;
 		break;
 	case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
-	case GNUTLS_E_NO_CERTIFICATE_FOUND:
 	case GNUTLS_E_SESSION_USER_ID_CHANGED:
 		ret = GNUTLS_A_INSUFFICIENT_SECURITY;
 		_level = GNUTLS_AL_FATAL;
