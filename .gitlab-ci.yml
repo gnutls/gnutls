@@ -112,6 +112,7 @@ coverage/Fedora:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - git submodule update --init
   - make -j$(nproc) check
   - GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1 make -C tests check -j$(nproc)
   - make local-code-coverage-output || true
@@ -147,7 +148,7 @@ no-SSL-3.0/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mkdir -p build && cd build &&
-    ../configure --disable-ssl3-support --disable-ssl2-support --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile --disable-valgrind-tests &&
+    ../configure --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile --disable-valgrind-tests &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
@@ -211,8 +212,9 @@ valgrind/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - ./configure
-    --disable-non-suiteb-curves --disable-doc  --disable-guile --disable-full-test-suite && make -j$(nproc) && make check -j$(nproc)
+  - ./configure --disable-doc  --disable-guile --disable-full-test-suite
+  - make -j$(nproc)
+  - make check -j$(nproc)
   tags:
   - shared
   except:
@@ -231,8 +233,9 @@ no-tools/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - ./configure
-    --disable-non-suiteb-curves --disable-valgrind-tests --disable-doc --disable-guile --disable-tools --enable-tests && make -j$(nproc) && make -j$(nproc) check
+  - ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-tools --enable-tests
+  - make -j$(nproc)
+  - make -j$(nproc) check
   tags:
   - shared
   except:
@@ -251,9 +254,11 @@ asan/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - git submodule update --init
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
-    ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile &&
-    make -j$(nproc) && make check -j$(nproc)
+    ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
+  - make -j$(nproc)
+  - make check -j$(nproc)
   tags:
   - shared
   except:
@@ -443,6 +448,7 @@ Fedora/x86:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
   script:
+  - git submodule update --init
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --enable-local-libopts --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile --disable-valgrind-tests &&
     make -j$(nproc) && make check -j$(nproc) && make pic-check
@@ -465,8 +471,10 @@ ubsan/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - git submodule update --init
   - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --disable-doc
-    && make -j$(nproc) && make check -j$(nproc)
+  - make -j$(nproc)
+  - make check -j$(nproc)
   tags:
   - shared
   except:
@@ -486,6 +494,7 @@ build/Debian/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
+  - git submodule update --init
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-doc --disable-guile --disable-valgrind-tests &&
     make -j$(nproc) && make check -j$(nproc)
