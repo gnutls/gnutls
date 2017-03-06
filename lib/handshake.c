@@ -448,7 +448,8 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 {
 	uint8_t session_id_len;
 	int pos = 0, ret;
-	uint16_t suite_size, comp_size, ext_size;
+	uint16_t suite_size, comp_size;
+	int ext_size;
 	gnutls_protocol_t adv_version;
 	int neg_version, sret = 0;
 	int len = datalen;
