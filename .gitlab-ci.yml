@@ -38,7 +38,7 @@ ABI-check/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
+  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc --enable-fips140-mode
     && make -j$(nproc)
   - make abi-check
   - make pic-check
@@ -113,6 +113,7 @@ coverage/Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - make -j$(nproc) check
+  - GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1 make -C tests check -j$(nproc)
   - make local-code-coverage-output || true
   tags:
   - shared
