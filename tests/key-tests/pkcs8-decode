@@ -29,6 +29,11 @@ if ! test -x "${CERTTOOL}"; then
 	exit 77
 fi
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
