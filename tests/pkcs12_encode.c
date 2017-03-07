@@ -128,11 +128,12 @@ void doit(void)
 	}
 
 	/* Generate and add PKCS#12 cert bags. */
-#ifndef ENABLE_FIPS140
-	tests = 2; /* include RC2 */
-#else
-	tests = 1;
-#endif
+	if (!gnutls_fips140_mode_enabled()) {
+		tests = 2; /* include RC2 */
+	} else {
+		tests = 1;
+	}
+
 	for (i = 0; i < tests; i++) {
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {

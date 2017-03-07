@@ -34,6 +34,11 @@ srcdir="${srcdir:-.}"
 
 export TZ="UTC"
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 # Check for datefudge
 TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
 if test "${TSTAMP}" != "1158969600"; then

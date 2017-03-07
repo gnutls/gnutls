@@ -32,6 +32,11 @@
 
 srcdir="${srcdir:-.}"
 
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	echo "Cannot run in FIPS140-2 mode"
+	exit 77
+fi
+
 if ! test -x /usr/bin/openssl; then
 	echo "You need openssl to run this test"
 	exit 77

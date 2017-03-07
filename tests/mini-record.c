@@ -413,9 +413,9 @@ void doit(void)
 	start(AES_GCM);
 	start(AES_CCM);
 	start(AES_CCM_8);
-#ifndef ENABLE_FIPS140
-	start(CHACHA_POLY1305);
-#endif
+	if (!gnutls_fips140_mode_enabled()) {
+		start(CHACHA_POLY1305);
+	}
 }
 
 #endif				/* _WIN32 */

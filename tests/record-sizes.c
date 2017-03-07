@@ -43,8 +43,6 @@ static void tls_log_func(int level, const char *str)
 /* This test attempts to transfer various sizes using ARCFOUR-128.
  */
 
-#ifndef ENABLE_FIPS140
-
 #define MAX_BUF 16384
 static char b1[MAX_BUF + 1];
 static char buffer[MAX_BUF + 1];
@@ -65,6 +63,10 @@ void doit(void)
 	/* Need to enable anonymous KX specifically. */
 	ssize_t ns;
 	int ret, transferred = 0;
+
+	if (gnutls_fips140_mode_enabled()) {
+		exit(77);
+	}
 
 	/* General init. */
 	global_init();
@@ -159,9 +161,3 @@ void doit(void)
 	gnutls_global_deinit();
 }
 
-#else
-void doit(void)
-{
-	exit(77);
-}
-#endif

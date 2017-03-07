@@ -101,7 +101,6 @@ void doit(void)
 	int normal_ciphers = 11;
 	int pfs_cs = 39;
 
-#ifdef ENABLE_FIPS140
 	if (gnutls_fips140_mode_enabled()) {
 		normal_cs = 30;
 		normal_ciphers = 6;
@@ -109,17 +108,18 @@ void doit(void)
 		sec256_cs = 11;
 		sec128_cs = 30;
 	}
-#endif
 
 	try_prio("NORMAL", normal_cs, normal_ciphers, __LINE__);
 	try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal_cs, normal_ciphers, __LINE__);
-#ifndef ENABLE_FIPS140
-	try_prio("PFS", pfs_cs, normal_ciphers, __LINE__);
-	try_prio("NORMAL:+CIPHER-ALL", normal_cs, 11, __LINE__);	/* all (except null) */
-	try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
-	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal_cs + null, 12, __LINE__);	/* should be null + all */
-	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
-#endif
+
+	if (!gnutls_fips140_mode_enabled()) {
+		try_prio("PFS", pfs_cs, normal_ciphers, __LINE__);
+		try_prio("NORMAL:+CIPHER-ALL", normal_cs, 11, __LINE__);	/* all (except null) */
+		try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
+		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal_cs + null, 12, __LINE__);	/* should be null + all */
+		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
+	}
+
 	try_prio("PERFORMANCE", normal_cs, normal_ciphers, __LINE__);
 	try_prio("SECURE256", sec256_cs, 6, __LINE__);
 	try_prio("SECURE128", sec128_cs, 11, __LINE__);

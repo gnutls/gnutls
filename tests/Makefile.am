@@ -231,10 +231,8 @@ mini_alignment_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 mini_alignment_LDADD = $(LDADD) $(NETTLE_LIBS)
 
 if ENABLE_OPENSSL
-if !ENABLE_FIPS140
 ctests +=  openssl
 openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
-endif
 endif
 
 if ENABLE_OPENPGP

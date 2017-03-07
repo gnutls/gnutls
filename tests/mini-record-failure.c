@@ -380,16 +380,16 @@ void doit(void)
 	start(AES_CCM, 0);
 	start(AES_CCM_8, 0);
 
-#ifndef ENABLE_FIPS140
-	start(NULL_SHA1, 0);
+	if (!gnutls_fips140_mode_enabled()) {
+		start(NULL_SHA1, 0);
 
-	start(ARCFOUR_SHA1, 0);
-	start(ARCFOUR_MD5, 0);
+		start(ARCFOUR_SHA1, 0);
+		start(ARCFOUR_MD5, 0);
 
 # ifdef HAVE_LIBZ
-	start(ARCFOUR_SHA1_ZLIB, 0);
+		start(ARCFOUR_SHA1_ZLIB, 0);
 # endif
-#endif
+	}
 
 #ifdef HAVE_LIBZ
 	start(AES_GCM_ZLIB, 0);
@@ -399,16 +399,16 @@ void doit(void)
 	start(AES_CBC_SHA256 NO_ETM, 1);
 	start(AES_GCM NO_ETM, 0);
 
-#ifndef ENABLE_FIPS140
-	start(NULL_SHA1 NO_ETM, 0);
+	if (!gnutls_fips140_mode_enabled()) {
+		start(NULL_SHA1 NO_ETM, 0);
 
-	start(ARCFOUR_SHA1 NO_ETM, 0);
-	start(ARCFOUR_MD5 NO_ETM, 0);
+		start(ARCFOUR_SHA1 NO_ETM, 0);
+		start(ARCFOUR_MD5 NO_ETM, 0);
 
 # ifdef HAVE_LIBZ
-	start(ARCFOUR_SHA1_ZLIB NO_ETM, 0);
+		start(ARCFOUR_SHA1_ZLIB NO_ETM, 0);
 # endif
-#endif
+	}
 
 #ifdef HAVE_LIBZ
 	start(AES_GCM_ZLIB NO_ETM, 0);
