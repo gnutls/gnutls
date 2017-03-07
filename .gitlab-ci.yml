@@ -189,7 +189,7 @@ FIPS140-2/Fedora/x86_64:
   artifacts:
     when: on_failure
     paths:
-      - guile/tests/*.log
+      - build/guile/tests/*.log
       - build/tests/*.log
       - build/tests/*/*.log
 
@@ -209,9 +209,32 @@ IDNA2003/Fedora/x86_64:
   artifacts:
     when: on_failure
     paths:
-      - guile/tests/*.log
+      - build/guile/tests/*.log
       - build/tests/*.log
       - build/tests/*/*.log
+
+no-openpgp/Fedora/x86_64:
+  stage: stage2-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - mkdir -p build && cd build &&
+    ../configure --disable-openpgp-authentication --disable-doc --disable-guile --disable-full-test-suite --disable-valgrind-tests
+  - make -j$(nproc)
+  - make abi-check
+  - make check -j$(nproc)
+  tags:
+  - shared
+  except:
+  - tags
+  dependencies:
+  - init/Fedora/x86_64
+  artifacts:
+    when: on_failure
+    paths:
+      - build/guile/tests/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+      - build/compat_reports/*
 
 valgrind/Fedora/x86_64:
   stage: stage2-testing
