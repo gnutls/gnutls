@@ -43,7 +43,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	pkcs7-interesting/pkcs7-1.der.err pkcs7-interesting/pkcs7-2.der pkcs7-interesting/pkcs7-2.der.err \
 	client-interesting/client1.raw client-interesting/client2.raw client-interesting/client3.disabled \
 	server-interesting/server1.raw scripts/common.sh scripts/starttls-common.sh \
-	client-interesting/client3.raw rng-op.c
+	client-interesting/client3.raw rng-op.c x509sign-verify-common.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -99,7 +99,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 strict-der tls-ext-register tls-supplemental mini-dtls0-9 \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
 	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
-	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
+	 x509sign-verify-rsa x509sign-verify-ecdsa mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok status-request-missing \
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
