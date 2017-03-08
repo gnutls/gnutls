@@ -94,7 +94,7 @@ try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers, unsi
 
 void doit(void)
 {
-	const int null = 5;
+	const int null = 4;
 	int sec128_cs = 53;
 	int sec256_cs = 22;
 	int normal_cs = 53;
