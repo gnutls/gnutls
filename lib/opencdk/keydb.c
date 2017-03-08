@@ -1400,7 +1400,7 @@ keydb_parse_allsigs(cdk_kbnode_t knode, cdk_keydb_hd_t hd, int check)
 							    signature->
 							    hashed,
 							    CDK_SIGSUBPKT_KEY_EXPIRE);
-					if (s) {
+					if (s && s->size == 4) {
 						expiredate =
 						    _cdk_buftou32(s->d);
 						pk->expiredate =
