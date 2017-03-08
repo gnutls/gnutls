@@ -33,7 +33,34 @@ const gnutls_datum_t raw_data = {
 	5
 };
 
-#define ERR(x) fail("Failure at %d: %s (%s-%s) (iter: %d)\n", __LINE__, gnutls_sign_get_name(sign_algo), gnutls_pk_get_name(pk), gnutls_digest_get_name(hash), j);
+
+static void print_keys(gnutls_privkey_t privkey, gnutls_pubkey_t pubkey)
+{
+	gnutls_x509_privkey_t xkey;
+	gnutls_datum_t out;
+	int ret = gnutls_privkey_export_x509(privkey, &xkey);
+
+	if (ret < 0)
+		fail("error in privkey export\n");
+
+	ret = gnutls_x509_privkey_export2(xkey, GNUTLS_X509_FMT_PEM, &out);
+	if (ret < 0)
+		fail("error in privkey export\n");
+
+	fprintf(stderr, "%s\n", out.data);
+	gnutls_free(out.data);
+
+	ret = gnutls_pubkey_export2(pubkey, GNUTLS_X509_FMT_PEM, &out);
+	if (ret < 0)
+		fail("error in pubkey export\n");
+
+	fprintf(stderr, "%s\n", out.data);
+	gnutls_free(out.data);
+
+	gnutls_x509_privkey_deinit(xkey);
+}
+
+#define ERR fail("Failure at: %s (%s-%s) (iter: %d)\n", gnutls_sign_get_name(sign_algo), gnutls_pk_get_name(pk), gnutls_digest_get_name(hash), j);
 static
 void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 {
@@ -58,33 +85,35 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 	for (j = 0; j < 100; j++) {
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
-			ERR(__LINE__);
+			ERR;
 
 		ret = gnutls_privkey_init(&privkey);
 		if (ret < 0)
-			ERR(__LINE__);
+			ERR;
 
 		ret = gnutls_privkey_generate(privkey, pk, bits, 0);
 		if (ret < 0)
-			ERR(__LINE__);
+			ERR;
 
 		ret =
 		    gnutls_privkey_sign_hash(privkey, hash,
 					     0, hash_data,
 					     &signature);
 		if (ret < 0)
-			ERR(__LINE__);
+			ERR;
 
 		ret = gnutls_pubkey_import_privkey(pubkey, privkey, GNUTLS_KEY_DIGITAL_SIGNATURE, 0);
 		if (ret < 0)
-			ERR(__LINE__);
+			ERR;
 
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey,
 						sign_algo, 0,
 						hash_data, &signature);
-		if (ret < 0)
-			ERR(__LINE__);
+		if (ret < 0) {
+			print_keys(privkey, pubkey);
+			ERR;
+		}
 
 		/* should fail */
 		ret =
@@ -92,8 +121,10 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 						sign_algo, 0,
 						&invalid_hash_data,
 						&signature);
-		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			ERR(__LINE__);
+		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
+			print_keys(privkey, pubkey);
+			ERR;
+		}
 
 		sign_algo =
 		    gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm
@@ -103,15 +134,17 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
 						hash_data, &signature);
 		if (ret < 0)
-			ERR(__LINE__);
+			ERR;
 
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
 						&invalid_hash_data,
 						&signature);
-		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-			ERR(__LINE__);
+		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
+			print_keys(privkey, pubkey);
+			ERR;
+		}
 
 		/* test the raw interface */
 		gnutls_free(signature.data);
@@ -125,7 +158,7 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 						     hash_data,
 						     &signature);
 			if (ret < 0)
-				ERR(__LINE__);
+				ERR;
 
 			sign_algo =
 			    gnutls_pk_to_sign
@@ -138,8 +171,10 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
 							hash_data,
 							&signature);
-			if (ret < 0)
-				ERR(__LINE__);
+			if (ret < 0) {
+				print_keys(privkey, pubkey);
+				ERR;
+			}
 
 		}
 		gnutls_free(signature.data);
