@@ -40,7 +40,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	templates/template-unique.tmpl data/template-unique.pem \
 	templates/template-othername.tmpl data/template-othername.pem \
 	templates/template-othername-xmpp.tmpl data/template-othername-xmpp.pem \
-	templates/template-krb5name.tmpl \
+	templates/template-krb5name.tmpl data/crl-demo1.pem data/crl-demo2.pem data/crl-demo3.pem \
 	data/template-krb5name.pem data/template-krb5name-full.pem data/template-test-ecc.key \
 	data/template-rsa-sha3-256.pem data/template-rsa-sha3-512.pem data/template-rsa-sha3-224.pem \
 	data/template-rsa-sha3-384.pem data/long-oids.pem \
@@ -75,7 +75,7 @@ dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	provable-dh userid sha2-test sha2-dsa-test provable-privkey-dsa2048 \
 	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
 	pkcs7-constraints2 certtool-long-oids pkcs7-cat cert-sanity cert-critical \
-	pkcs12
+	pkcs12 certtool-crl-decoding
 
 if WANT_TEST_SUITE
 dist_check_SCRIPTS += provable-dh-default
