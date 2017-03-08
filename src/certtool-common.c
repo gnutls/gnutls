@@ -477,6 +477,9 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 	dat.size = size;
 
 	ret = gnutls_x509_crl_list_import2(&crl, &crl_max, &dat, GNUTLS_X509_FMT_PEM, 0);
+	if (ret == GNUTLS_E_BASE64_DECODING_ERROR) {
+		ret = gnutls_x509_crl_list_import2(&crl, &crl_max, &dat, GNUTLS_X509_FMT_DER, 0);
+	}
 	if (ret < 0) {
 		fprintf(stderr, "Error loading CRLs: %s\n", gnutls_strerror(ret));
 		exit(1);

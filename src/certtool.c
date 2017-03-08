@@ -3007,6 +3007,7 @@ void generate_pkcs8(common_info_st * cinfo)
 void generate_pkcs12(common_info_st * cinfo)
 {
 	gnutls_pkcs12_t pkcs12;
+	gnutls_x509_crl_t *crls;
 	gnutls_x509_crt_t *crts, ca_crt;
 	gnutls_x509_privkey_t *keys;
 	int result;
@@ -3020,6 +3021,7 @@ void generate_pkcs12(common_info_st * cinfo)
 	int indx;
 	size_t ncrts;
 	size_t nkeys;
+	size_t ncrls;
 
 	fprintf(stderr, "Generating a PKCS #12 structure...\n");
 
@@ -3027,8 +3029,10 @@ void generate_pkcs12(common_info_st * cinfo)
 	crts = load_cert_list(0, &ncrts, cinfo);
 	ca_crt = load_ca_cert(0, cinfo);
 
-	if (keys == NULL && crts == NULL && ca_crt == NULL) {
-		fprintf(stderr, "You must specify one of\n\t--load-privkey\n\t--load-certificate\n\t--load-ca-certificate\n");
+	crls = load_crl_list(0, &ncrls, cinfo);
+
+	if (keys == NULL && crts == NULL && ca_crt == NULL && crls == NULL) {
+		fprintf(stderr, "You must specify one of\n\t--load-privkey\n\t--load-certificate\n\t--load-ca-certificate\n\t--load-crl\n");
 		exit(1);
 	}
 
@@ -3094,6 +3098,40 @@ void generate_pkcs12(common_info_st * cinfo)
 		result = gnutls_pkcs12_bag_set_key_id(bag, indx, &key_id);
 		if (result < 0) {
 			fprintf(stderr, "bag_set_key_id: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		result = gnutls_pkcs12_bag_encrypt(bag, pass, flags);
+		if (result < 0) {
+			fprintf(stderr, "bag_encrypt: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		result = gnutls_pkcs12_set_bag(pkcs12, bag);
+		if (result < 0) {
+			fprintf(stderr, "set_bag: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+		gnutls_pkcs12_bag_deinit(bag);
+	}
+
+	/* add any CRLs */
+	for (i = 0; i < ncrls; i++) {
+		gnutls_pkcs12_bag_t bag;
+
+		result = gnutls_pkcs12_bag_init(&bag);
+		if (result < 0) {
+			fprintf(stderr, "bag_init: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		result = gnutls_pkcs12_bag_set_crl(bag, crls[i]);
+		if (result < 0) {
+			fprintf(stderr, "set_crl[%d]: %s\n", i,
 				gnutls_strerror(result));
 			exit(1);
 		}
