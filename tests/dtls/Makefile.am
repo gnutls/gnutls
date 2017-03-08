@@ -30,6 +30,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/extra/includes	\
 	-I$(top_builddir)/extra/includes	\
 	-I$(top_srcdir)/lib			\
+	-I$(top_srcdir)/tests			\
 	-I$(top_srcdir)/doc/examples
 
 AM_LDFLAGS = -no-install
