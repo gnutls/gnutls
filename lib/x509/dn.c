@@ -797,38 +797,20 @@ int
 gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 		    char *buf, size_t * buf_size)
 {
-	int result;
-	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+	int ret;
+	gnutls_datum_t out;
 
-	if (buf_size == 0) {
+	ret = gnutls_x509_rdn_get2(idn, &out, GNUTLS_X509_DN_FLAG_COMPAT);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_copy_string(&out, (void*)buf, buf_size);
+	gnutls_free(out.data);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (buf)
-		buf[0] = 0;
-
-
-	if ((result =
-	     asn1_create_element(_gnutls_get_pkix(),
-				 "PKIX1.Name", &dn)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		asn1_delete_structure(&dn);
-		return _gnutls_asn2err(result);
-	}
-
-	result = _gnutls_x509_parse_dn(dn, "rdnSequence", buf, buf_size, GNUTLS_X509_DN_FLAG_COMPAT);
-
-	asn1_delete_structure(&dn);
-	return result;
-
+	return ret;
 }
 
 /**
@@ -855,29 +837,29 @@ int
 gnutls_x509_rdn_get2(const gnutls_datum_t * idn,
 		     gnutls_datum_t *str, unsigned flags)
 {
-	int result;
-	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+	int ret;
+	gnutls_x509_dn_t dn;
 
-	if ((result =
-	     asn1_create_element(_gnutls_get_pkix(),
-				 "PKIX1.Name", &dn)) != ASN1_SUCCESS) {
+	ret = gnutls_x509_dn_init(&dn);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_x509_dn_import(dn, idn);
+	if (ret < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
-	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
+	ret = gnutls_x509_dn_get_str2(dn, str, flags);
+	if (ret < 0) {
 		gnutls_assert();
-		asn1_delete_structure(&dn);
-		return _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
-	result = _gnutls_x509_get_dn(dn, "rdnSequence", str, flags);
-
-	asn1_delete_structure(&dn);
-	return result;
-
+	ret = 0;
+ cleanup:
+	gnutls_x509_dn_deinit(dn);
+	return ret;
 }
 
 /**
