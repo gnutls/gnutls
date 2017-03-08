@@ -414,7 +414,6 @@ static const int mac_priority_normal_default[] = {
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
-	GNUTLS_MAC_MD5,
 	0
 };
 
