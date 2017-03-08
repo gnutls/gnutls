@@ -101,6 +101,7 @@
 #include <errno.h>
 #include <poll.h>
 #include <time.h>
+#include <assert.h>
 #include <sys/wait.h>
 
 #if _POSIX_TIMERS && (_POSIX_TIMERS - 200112L) >= 0
@@ -232,56 +233,7 @@ static const char *filter_names_full[12]
 	"SFinished"
 };
 
-static const unsigned char PUBKEY[] =
-    "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
-    "\n"
-    "mI0ETz0XRAEEAKXSU/tg2yGvoKf/r1pdzj7dnfPHeS+BRiT34763uUhibAbTgMkp\n"
-    "v44OlBPiAaZ54uuXVkz8e4pgvrBgQwIRtNp3xPaWF1CfC4F+V4LdZV8l8IG+AfES\n"
-    "K0GbfUS4q8vjnPJ0TyxnXE2KtbcRdzZzWBshJ8KChKwbH2vvrMrlmEeZABEBAAG0\n"
-    "CHRlc3Qga2V5iLgEEwECACIFAk89F0QCGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4B\n"
-    "AheAAAoJEMNjhmkfkLY9J/YD+wYZ2BD/0/c5gkkDP2NlVvrLGyFmEwQcR7DcaQYB\n"
-    "P3/Teq2gnscZ5Xm/z1qgGEpwmaVfVHY8mfEj8bYI8jAu0v1C1jCtJPUTmxf9tmkZ\n"
-    "QYFNR8T+F5Xae2XseOH70lSN/AEiW02BEBFlGBx0a3T30muFfqi/KawaE7KKn2e4\n"
-    "uNWvuI0ETz0XRAEEAKgZExsb7Lf9P3DmwJSvNVdkGVny7wr4/M1s0CDX20NkO7Y1\n"
-    "Ao9g+qFo5MlCOEuzjVaEYmM+rro7qyxmDKsaNIzZF1VN5UeYgPFyLcBK7C+QwUqw\n"
-    "1PUl/w4dFq8neQyqIPUVGRwQPlwpkkabRPNT3t/7KgDJvYzV9uu+cXCyfqErABEB\n"
-    "AAGInwQYAQIACQUCTz0XRAIbDAAKCRDDY4ZpH5C2PTBtBACVsR6l4HtuzQb5WFQt\n"
-    "sD/lQEk6BEY9aVfK957Oj+A4alGEGObToqVJFo/nq+P7aWExIXucJQRL8lYnC7u+\n"
-    "GjPVCun5TYzKMiryxHPkQr9NBx4hh8JjkDCc8nAgI3il49uPYkmsv70CgqJFFtT8\n"
-    "NfM+8fS537I+XA+hfjt20NUFIA==\n"
-    "=oD3a\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
-
-static const unsigned char PRIVKEY[] =
-    "-----BEGIN PGP PRIVATE KEY BLOCK-----\n"
-    "\n"
-    "lQHYBE89F0QBBACl0lP7YNshr6Cn/69aXc4+3Z3zx3kvgUYk9+O+t7lIYmwG04DJ\n"
-    "Kb+ODpQT4gGmeeLrl1ZM/HuKYL6wYEMCEbTad8T2lhdQnwuBfleC3WVfJfCBvgHx\n"
-    "EitBm31EuKvL45zydE8sZ1xNirW3EXc2c1gbISfCgoSsGx9r76zK5ZhHmQARAQAB\n"
-    "AAP6A6VhRVi22MHE1YzQrTr8yvMSgwayynGcOjndHxdpEodferLx1Pp/BL+bT+ib\n"
-    "Qq7RZ363Xg/7I2rHJpenQYdkI5SI4KrXIV57p8G+isyTtsxU38SY84WoB5os8sfT\n"
-    "YhxG+edoTfDzXkRSWFB8EUjRaLa2b//nvLpxNRyqDSzzUxECAMtEnL5H/8gHbpZf\n"
-    "D98TSJVxdAl9rBAQaVMgrFgcU/IlmxCyVEh9eh/P261tefgOnyVcGFYHxdZvJ3td\n"
-    "miM+DNUCANDW1S9t7IiqflDpQIS2wGTZ/rLKPoE1F3285EaYAd0FQUq0O4/Nu31D\n"
-    "5pz/S7D+PfXn9oEZH3Dvl3EVIDyq4bUB+QEzFc3BsH2uueD3g42RoBfMGl6m3LI9\n"
-    "yWOnrUmIW+h9Fu8W9mcU6y82Q1G7OPIxA1me/Qtzo20lGQa8jAyzLhuit7QIdGVz\n"
-    "dCBrZXmIuAQTAQIAIgUCTz0XRAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AA\n"
-    "CgkQw2OGaR+Qtj0n9gP7BhnYEP/T9zmCSQM/Y2VW+ssbIWYTBBxHsNxpBgE/f9N6\n"
-    "raCexxnleb/PWqAYSnCZpV9UdjyZ8SPxtgjyMC7S/ULWMK0k9RObF/22aRlBgU1H\n"
-    "xP4Xldp7Zex44fvSVI38ASJbTYEQEWUYHHRrdPfSa4V+qL8prBoTsoqfZ7i41a+d\n"
-    "AdgETz0XRAEEAKgZExsb7Lf9P3DmwJSvNVdkGVny7wr4/M1s0CDX20NkO7Y1Ao9g\n"
-    "+qFo5MlCOEuzjVaEYmM+rro7qyxmDKsaNIzZF1VN5UeYgPFyLcBK7C+QwUqw1PUl\n"
-    "/w4dFq8neQyqIPUVGRwQPlwpkkabRPNT3t/7KgDJvYzV9uu+cXCyfqErABEBAAEA\n"
-    "A/4wX+brqkGZQTv8lateHn3PRHM3O34nPjgiNeo/SV9EKZg1e1PdRx9ZTAJrGK9y\n"
-    "uZ03BKn7vZIy7fD4ufVzV/s/BaypVmvwjZud8fdMgsMQAJYtoMhozbOtUelCFpja\n"
-    "I1xAbDBx1PAAbS8Sh022/0jvOGnZhvkgZMG90z7AEANUYQIAwzywU087TcJk8Bzd\n"
-    "37JGWyE4f3iYFGA+r8BoIOrxvvgfUHKxdhG0gaT8SDeRAwNY6D43dCBZkG7Uel1F\n"
-    "x9MlLQIA3Goaz58hEN0fdm4TM7A8crtMB+f8/h87EneBgMl+Yj/3sklhyahR6Itm\n"
-    "lGuAAGTAOmD7i8OmS/a1ac5MtHAGtwH6A0B5GjaL8VnLQo4vFnuR7JuCQaLqGadV\n"
-    "mBmKxVHElduLf/VauBQPD5KZA+egpg+laJ4JLVXMmKIZGqRzopcIWZnKiJ8EGAEC\n"
-    "AAkFAk89F0QCGwwACgkQw2OGaR+Qtj0wbQQAlbEepeB7bs0G+VhULbA/5UBJOgRG\n"
-    "PWlXyveezo/gOGpRhBjm06KlSRaP56vj+2lhMSF7nCUES/JWJwu7vhoz1Qrp+U2M\n"
-    "yjIq8sRz5EK/TQceIYfCY5AwnPJwICN4pePbj2JJrL+9AoKiRRbU/DXzPvH0ud+y\n"
-    "PlwPoX47dtDVBSA=\n" "=EVlv\n" "-----END PGP PRIVATE KEY BLOCK-----\n";
+#include "cert-common.h"
 
 // }}}
 
@@ -736,13 +688,10 @@ static void await(int fd, int timeout)
 
 static void cred_init(void)
 {
-	gnutls_datum_t key = { (unsigned char *)PUBKEY, sizeof(PUBKEY) };
-	gnutls_datum_t sec = { (unsigned char *)PRIVKEY, sizeof(PRIVKEY) };
+	assert(gnutls_certificate_allocate_credentials(&cred)>=0);
 
-	gnutls_certificate_allocate_credentials(&cred);
-
-	gnutls_certificate_set_openpgp_key_mem(cred, &key, &sec,
-					       GNUTLS_OPENPGP_FMT_BASE64);
+	gnutls_certificate_set_x509_key_mem(cred, &cli_ca3_cert, &cli_ca3_key,
+					       GNUTLS_X509_FMT_PEM);
 }
 
 static void session_init(int sock, int server)
@@ -751,7 +700,7 @@ static void session_init(int sock, int server)
 		    GNUTLS_DATAGRAM | (server ? GNUTLS_SERVER : GNUTLS_CLIENT)
 		    | GNUTLS_NONBLOCK * nonblock);
 	gnutls_priority_set_direct(session,
-				   "+CTYPE-OPENPGP:+CIPHER-ALL:+MAC-ALL:+ECDHE-RSA:+ANON-ECDH",
+				   "NORMAL:+ECDHE-RSA:+ANON-ECDH",
 				   0);
 	gnutls_transport_set_int(session, sock);
 
@@ -763,11 +712,11 @@ static void session_init(int sock, int server)
 		}
 	} else if (server) {
 		gnutls_anon_server_credentials_t acred;
-		gnutls_anon_allocate_server_credentials(&acred);
+		assert(gnutls_anon_allocate_server_credentials(&acred)>=0);
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, acred);
 	} else {
 		gnutls_anon_client_credentials_t acred;
-		gnutls_anon_allocate_client_credentials(&acred);
+		assert(gnutls_anon_allocate_client_credentials(&acred)>=0);
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, acred);
 	}
 
