@@ -64,10 +64,10 @@ static const gnutls_error_entry error_entries[] = {
 		    ("The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."),
 		    GNUTLS_E_DH_PRIME_UNACCEPTABLE),
 	ERROR_ENTRY(N_
-		    ("A TLS packet with unexpected length was received."),
+		    ("Error decoding the received TLS packet."),
 		    GNUTLS_E_UNEXPECTED_PACKET_LENGTH),
 	ERROR_ENTRY(N_
-		    ("A TLS packet with unexpected length was received."),
+		    ("A TLS record packet with invalid length was received."),
 		    GNUTLS_E_RECORD_OVERFLOW),
 	ERROR_ENTRY(N_("The TLS connection was non-properly terminated."),
 		    GNUTLS_E_PREMATURE_TERMINATION),
