@@ -45,7 +45,6 @@ TMPFILE_PEM=pkcs12.$$.pem.tmp
 
 DEBUG="1"
 
-ret=0
 for p12 in "cert-with-crl.p12 password" "client.p12 foobar" "openssl.p12 CaudFocwijRupogDoicsApfiHadManUgNa" "noclient.p12" "unclient.p12" "pkcs12_2certs.p12"; do
 	set -- ${p12}
 	file="$1"
@@ -109,36 +108,4 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-# test whether we can encode a certificate, a key and a CA
-${VALGRIND} "${CERTTOOL}" --to-p12 --password 123456 --p12-name "my-key" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outder --outfile $TMPFILE >/dev/null
-rc=$?
-if test ${rc} != 0; then
-	echo "PKCS12 FATAL encoding 2"
-	exit 1
-fi
-
-${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 123456 --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
-rc=$?
-if test ${rc} != 0; then
-	echo "PKCS12 FATAL decrypting/decoding 2"
-	exit 1
-fi
-
-grep "BEGIN ENCRYPTED PRIVATE KEY" ${TMPFILE_PEM} >/dev/null 2>&1
-rc=$?
-
-if test "${rc}" != "0"; then
-	exit ${rc}
-fi
-
-count=`grep -c "BEGIN CERTIFICATE" ${TMPFILE_PEM}`
-
-if test "$count" != "2"; then
-	echo "Only one certificate was included"
-	exit 1
-fi
-
-rm -f ${TMPFILE_PEM} $TMPFILE
-
-#echo "NEON PKCS12 DONE (rc ${ret})"
-exit ${ret}
+exit 0
