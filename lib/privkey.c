@@ -755,8 +755,9 @@ gnutls_privkey_import_x509(gnutls_privkey_t pkey,
  * @key: Location for the key to be exported.
  *
  * Converts the given abstract private key to a #gnutls_x509_privkey_t
- * type. The key must be of type %GNUTLS_PRIVKEY_X509. The key returned
- * in @key must be deinitialized with gnutls_x509_privkey_deinit().
+ * type. The abstract key must be of type %GNUTLS_PRIVKEY_X509. The input
+ * @key must not be initialized. The key returned in @key should be deinitialized
+ * using gnutls_x509_privkey_deinit().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
