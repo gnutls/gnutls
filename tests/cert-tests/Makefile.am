@@ -45,7 +45,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/template-rsa-sha3-256.pem data/template-rsa-sha3-512.pem data/template-rsa-sha3-224.pem \
 	data/template-rsa-sha3-384.pem data/long-oids.pem \
 	data/name-constraints-ip2.pem data/chain-md5.pem data/gost-cert.pem \
-	templates/template-tlsfeature.tmpl data/userid.pem \
+	templates/template-tlsfeature.tmpl data/userid.pem data/cert-with-crl.p12 \
 	data/template-tlsfeature.pem data/template-tlsfeature.csr \
 	templates/template-tlsfeature-crq.tmpl templates/arb-extensions.tmpl data/arb-extensions.pem \
 	data/arb-extensions.csr data/pkcs1-pad-ok.pem data/pkcs1-pad-broken.pem \
