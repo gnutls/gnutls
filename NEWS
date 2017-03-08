@@ -41,6 +41,9 @@ See the end for copying conditions.
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
+** certtool: the option '--load-crl' can now be used when generating PKCS#12
+   files (i.e., in conjunction with '--to-p12' option).
+
 ** API and ABI modifications:
 gnutls_x509_crt_set_flags: Added
 GNUTLS_X509_CRT_FLAG_IGNORE_SANITY: Added
