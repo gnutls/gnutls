@@ -26,6 +26,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/extra/includes	\
 	-I$(top_builddir)/extra/includes	\
 	-I$(top_srcdir)/lib			\
+	-I$(top_srcdir)/tests			\
 	-I$(top_srcdir)/doc/examples	\
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
@@ -34,7 +35,7 @@ EXTRA_DIST = crl/long.crl crl/long.pem data/test1.cat data/test2.cat \
 	data/test1.cat.data data/test2.cat.data \
 	data/test1.cat.out data/test2.cat.out data/ca.pem
 
-check_PROGRAMS = rng prime-check
+check_PROGRAMS = rng prime-check cert-coverage
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
