@@ -35,7 +35,7 @@ EXTRA_DIST = crl/long.crl crl/long.pem data/test1.cat data/test2.cat \
 	data/test1.cat.data data/test2.cat.data \
 	data/test1.cat.out data/test2.cat.out data/ca.pem
 
-check_PROGRAMS = rng prime-check cert-coverage
+check_PROGRAMS = rng prime-check cert-coverage ocsp-coverage
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
@@ -131,7 +131,7 @@ nodist_check_SCRIPTS += eagain.sh
 endif
 endif
 
-TESTS = $(nodist_check_SCRIPTS) prime-check
+TESTS = $(nodist_check_SCRIPTS) prime-check cert-coverage ocsp-coverage
 
 prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 
