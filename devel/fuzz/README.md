@@ -9,6 +9,23 @@ assume they are fuzzers it should run.
 The initial values for each parser fuzzer are taken from the $NAME.in
 directory.
 
+
+# Running a fuzzer using AFL
+
+Use the following commands on top dir:
+
+```
+$ CC="afl-gcc" ./configure
+$ make -j$(nproc)
+$ cd devel/fuzz
+$ make gnutls_pkcs7_parser_fuzzer
+$ ./run-afl.sh gnutls_pkcs7_parser_fuzzer
+```
+
+This will execute AFL (which runs indefinitely until CTRL+C is pressed) and
+provide its output in a "gnutls_pkcs7_parser_fuzzer.PID.out" directory.
+
+
 # Reproducing a specific issue
 
 Assuming an issue on the "gnutls_pkcs7_parser_fuzzer" was found, and the
