@@ -50,6 +50,8 @@ static int _gnutls_urandom_fd = -1;
 static ino_t _gnutls_urandom_fd_ino = 0;
 static dev_t _gnutls_urandom_fd_rdev = 0;
 
+get_entropy_func _rnd_get_system_entropy = NULL;
+
 #if defined(__linux__)
 # ifdef HAVE_LINUX_GETRANDOM
 #  include <linux/random.h>
@@ -63,7 +65,6 @@ static dev_t _gnutls_urandom_fd_rdev = 0;
 #  endif
 # endif
 
-get_entropy_func _rnd_get_system_entropy = NULL;
 
 static unsigned have_getrandom(void)
 {
