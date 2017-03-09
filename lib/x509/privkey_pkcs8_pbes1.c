@@ -74,7 +74,7 @@ int _gnutls_read_pbkdf1_params(const uint8_t * data, int data_size,
 		goto error;
 	}
 
-	if (kdf_params->iter_count >= INT_MAX || kdf_params->iter_count == 0) {
+	if (kdf_params->iter_count >= MAX_ITER_COUNT || kdf_params->iter_count == 0) {
 		ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 		goto error;
 	}

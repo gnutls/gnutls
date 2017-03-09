@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -29,6 +30,9 @@
 #include <fips.h>
 
 #define MAX_STRING_LEN 512
+/* Set a maximum iteration count over which we refuse to
+ * decode a file. That is to prevent DoS. */
+#define MAX_ITER_COUNT (10*1024*1024)
 
 #define GNUTLS_XML_SHOW_ALL 1
 

@@ -662,7 +662,7 @@ read_pbkdf2_params(ASN1_TYPE pasn,
 		goto error;
 	}
 
-	if (params->iter_count >= INT_MAX || params->iter_count == 0) {
+	if (params->iter_count >= MAX_ITER_COUNT || params->iter_count == 0) {
 		result = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 		goto error;
 	}
@@ -737,7 +737,7 @@ static int read_pkcs12_kdf_params(ASN1_TYPE pasn, struct pbkdf2_params *params)
 	if (result < 0)
 		return gnutls_assert_val(result);
 
-	if (params->iter_count >= INT_MAX || params->iter_count == 0)
+	if (params->iter_count >= MAX_ITER_COUNT || params->iter_count == 0)
 		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	_gnutls_hard_log("iterationCount: %d\n", params->iter_count);
