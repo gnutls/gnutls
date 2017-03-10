@@ -36,13 +36,9 @@
 /* In case of a fork, it will invalidate the open session
  * in the privkey and start another */
 #define PKCS11_CHECK_INIT_PRIVKEY(k) \
-	ret = _gnutls_pkcs11_check_init(); \
+	ret = _gnutls_pkcs11_check_init(k, reopen_privkey_session); \
 	if (ret < 0) \
-		return gnutls_assert_val(ret); \
-	if (ret == 1) { \
-		memset(&k->sinfo, 0, sizeof(k->sinfo)); \
-		FIND_OBJECT(k); \
-	}
+		return gnutls_assert_val(ret)
 
 #define FIND_OBJECT(key) \
 	do { \
@@ -240,7 +236,21 @@ find_object(struct pkcs11_session_info *sinfo,
 	return ret;
 }
 
+/* callback function to be passed in _gnutls_pkcs11_check_init().
+ * It is run, only when a fork has been detected, and data have
+ * been re-initialized. In that case we reset the session and re-open
+ * the object. */
+static int reopen_privkey_session(void * _privkey)
+{
+	int ret;
+	gnutls_pkcs11_privkey_t privkey = _privkey;
 
+	memset(&privkey->sinfo, 0, sizeof(privkey->sinfo));
+	privkey->ref = 0;
+	FIND_OBJECT(privkey);
+
+	return 0;
+}
 
 /*-
  * _gnutls_pkcs11_privkey_sign_hash:

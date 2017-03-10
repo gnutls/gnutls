@@ -62,8 +62,10 @@ struct gnutls_pkcs11_obj_st {
 };
 
 /* This must be called on every function that uses a PKCS #11 function
- * directly */
-int _gnutls_pkcs11_check_init(void);
+ * directly. It can be provided a callback function to run when a reinitialization
+ * occurs. */
+typedef int (*pkcs11_reinit_function)(void *priv);
+int _gnutls_pkcs11_check_init(void *priv, pkcs11_reinit_function cb);
 
 #define FIX_KEY_USAGE(pk, usage) \
 	if (usage == 0) { \
@@ -74,12 +76,12 @@ int _gnutls_pkcs11_check_init(void);
 	}
 
 #define PKCS11_CHECK_INIT \
-	ret = _gnutls_pkcs11_check_init(); \
+	ret = _gnutls_pkcs11_check_init(NULL, NULL); \
 	if (ret < 0) \
 		return gnutls_assert_val(ret)
 
 #define PKCS11_CHECK_INIT_RET(x) \
-	ret = _gnutls_pkcs11_check_init(); \
+	ret = _gnutls_pkcs11_check_init(NULL, NULL); \
 	if (ret < 0) \
 		return gnutls_assert_val(x)
 

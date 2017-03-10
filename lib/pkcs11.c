@@ -3,7 +3,7 @@
  * Copyright (C) 2010-2014 Free Software Foundation, Inc.
  * Copyright (C) 2008 Joe Orton <joe@manyfish.co.uk>
  * Copyright (C) 2013 Nikos Mavrogiannopoulos
- * Copyright (C) 2014 Red Hat
+ * Copyright (C) 2014-2017 Red Hat
  * 
  * Authors: Nikos Mavrogiannopoulos, Stef Walter
  *
@@ -108,6 +108,8 @@ static struct gnutls_pkcs11_provider_st providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
 static unsigned int providers_initialized = 0;
 static unsigned int pkcs11_forkid = 0;
+
+static int _gnutls_pkcs11_reinit(void);
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
@@ -251,9 +253,12 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
 /* Returns:
  *  - negative error code on error,
  *  - 0 on success
- *  - 1 on success (and a fork was detected)
- */
-int _gnutls_pkcs11_check_init(void)
+ *  - 1 on success (and a fork was detected - cb was run)
+ *
+ * The output value of the callback will be returned if it is
+ * a negative one (indicating failure).
+*/
+int _gnutls_pkcs11_check_init(void *priv, pkcs11_reinit_function cb)
 {
 	int ret;
 
@@ -266,9 +271,16 @@ int _gnutls_pkcs11_check_init(void)
 
 		if (_gnutls_detect_fork(pkcs11_forkid)) {
 			/* if we are initialized but a fork is detected */
-			ret = gnutls_pkcs11_reinit();
-			if (ret == 0)
+			ret = _gnutls_pkcs11_reinit();
+			if (ret == 0) {
 				ret = 1;
+				if (cb) {
+					int ret2 = cb(priv);
+					if (ret2 < 0)
+						ret = ret2;
+				}
+				pkcs11_forkid = _gnutls_get_forkid();
+			}
 		}
 
 		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
@@ -794,29 +806,10 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 	return 0;
 }
 
-/**
- * gnutls_pkcs11_reinit:
- *
- * This function will reinitialize the PKCS 11 subsystem in gnutls. 
- * This is required by PKCS 11 when an application uses fork(). The
- * reinitialization function must be called on the child.
- *
- * Note that since GnuTLS 3.3.0, the reinitialization of the PKCS #11
- * subsystem occurs automatically after fork.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
- * Since: 3.0
- **/
-int gnutls_pkcs11_reinit(void)
+static int _gnutls_pkcs11_reinit(void)
 {
 	unsigned i;
 	ck_rv_t rv;
-
-	/* make sure that we don't call more than once after a fork */
-	if (_gnutls_detect_fork(pkcs11_forkid) == 0)
-		return 0;
 
 	for (i = 0; i < active_providers; i++) {
 		if (providers[i].module != NULL) {
@@ -834,9 +827,37 @@ int gnutls_pkcs11_reinit(void)
 		}
 	}
 
+	return 0;
+}
+
+/**
+ * gnutls_pkcs11_reinit:
+ *
+ * This function will reinitialize the PKCS 11 subsystem in gnutls. 
+ * This is required by PKCS 11 when an application uses fork(). The
+ * reinitialization function must be called on the child.
+ *
+ * Note that since GnuTLS 3.3.0, the reinitialization of the PKCS #11
+ * subsystem occurs automatically after fork.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0
+ **/
+int gnutls_pkcs11_reinit(void)
+{
+	int ret;
+
+	/* make sure that we don't call more than once after a fork */
+	if (_gnutls_detect_fork(pkcs11_forkid) == 0)
+		return 0;
+
+	ret = _gnutls_pkcs11_reinit();
+
 	pkcs11_forkid = _gnutls_get_forkid();
 
-	return 0;
+	return ret;
 }
 
 /**
