@@ -1202,6 +1202,11 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 		if (providers[x].active == 0)
 			continue;
 
+		if (!p11_kit_uri_match_module_info(info,
+					      &providers[x].info)) {
+			continue;
+		}
+
 		nslots = sizeof(slots) / sizeof(slots[0]);
 		ret = scan_slots(&providers[x], slots, &nslots);
 		if (ret < 0) {
@@ -1219,17 +1224,12 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 				continue;
 			}
 
-			if (pkcs11_get_slot_info
-			    (providers[x].module, slots[z],
-			     &sinfo) != CKR_OK) {
+			if (!p11_kit_uri_match_token_info(info, &tinfo)) {
 				continue;
 			}
 
-			if (!p11_kit_uri_match_token_info
-			    (info, &tinfo)
-			    || !p11_kit_uri_match_module_info(info,
-							      &providers
-							      [x].info)) {
+			if (pkcs11_get_slot_info
+			    (providers[x].module, slots[z], &sinfo) != CKR_OK) {
 				continue;
 			}
 
@@ -1327,6 +1327,10 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 		if (flags & SESSION_TRUSTED && providers[x].trusted == 0)
 			continue;
 
+		if (info && !p11_kit_uri_match_module_info(info, &providers[x].info)) {
+			continue;
+		}
+
 		nslots = sizeof(slots) / sizeof(slots[0]);
 		ret = scan_slots(&providers[x], slots, &nslots);
 		if (ret < 0) {
@@ -1344,17 +1348,13 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 				continue;
 			}
 
-			if (pkcs11_get_slot_info(module, slots[z],
-						 &l_sinfo) != CKR_OK) {
+			if (info && !p11_kit_uri_match_token_info(info, &l_tinfo)) {
 				continue;
 			}
 
-			if (info != NULL) {
-				if (!p11_kit_uri_match_token_info(info, &l_tinfo) ||
-				    !p11_kit_uri_match_module_info(info, &providers
-							      [x].info)) {
+			if (pkcs11_get_slot_info(module, slots[z],
+						 &l_sinfo) != CKR_OK) {
 				continue;
-			    }
 			}
 
 			rv = (module)->C_OpenSession(slots[z],
