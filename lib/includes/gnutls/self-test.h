@@ -27,9 +27,6 @@
 
  /* Self checking functions */
  
- /* The functions are not part of the main API, and are conditionally
-  * enabled. */
-
 int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher);
 int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac);
 int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest);

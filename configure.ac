@@ -431,20 +431,14 @@ LT_INIT([disable-static,win32-dll,shared])
 
 
 
-AC_ARG_ENABLE(self-checks,
-  AS_HELP_STRING([--enable-self-checks], [enable self checking functionality]),
-    enable_self_checks=$enableval, enable_self_checks=no)
-
 AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dladdr (0, 0);])
 
 AC_ARG_ENABLE(fips140-mode,
-  AS_HELP_STRING([--enable-fips140-mode], [enable FIPS140-2 mode (implies self checks)]),
+  AS_HELP_STRING([--enable-fips140-mode], [enable FIPS140-2 mode]),
     enable_fips=$enableval, enable_fips=no)
 AM_CONDITIONAL(ENABLE_FIPS140, test "$enable_fips" = "yes")
 if [ test "$enable_fips" = "yes" ];then
   if test "x$HAVE_LIBDL" = "xyes";then
-    enable_self_checks=yes
-
     AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
     AC_SUBST([FIPS140_LIBS], $LIBDL)
     AC_ARG_WITH(fips140-key, AS_HELP_STRING([--with-fips140-key],
@@ -549,11 +543,6 @@ if test "$enable_non_suiteb" = "yes";then
 	fi
 fi
 AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
-
-AM_CONDITIONAL(ENABLE_SELF_CHECKS, test "$enable_self_checks" = "yes")
-if [ test "$enable_self_checks" = "yes" ];then
-   AC_DEFINE([ENABLE_SELF_CHECKS], 1, [Self checks are included in the library])
-fi
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
@@ -1066,7 +1055,6 @@ if features are disabled)
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
   IDNA support:         $idna_support
-  Self checks:          $enable_self_checks
   Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips
 ])

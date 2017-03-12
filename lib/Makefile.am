@@ -84,7 +84,8 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c			\
 	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
 	safe-memfuncs.c system/inet_pton.c atfork.c atfork.h randomart.c \
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
-	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c
+	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
+	crypto-selftests.c crypto-selftests-pk.c
 
 if WINDOWS
 COBJECTS += system/keys-win.c
@@ -92,9 +93,6 @@ else
 COBJECTS += system/keys-dummy.c
 endif
 
-if ENABLE_SELF_CHECKS
-COBJECTS += crypto-selftests.c crypto-selftests-pk.c
-endif
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \

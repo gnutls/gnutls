@@ -34,13 +34,8 @@ LDADD = ../libutils.la \
 	../../gl/libgnu.la \
 	$(top_builddir)/lib/libgnutls.la $(LIBSOCKET)
 
-if !ENABLE_SELF_CHECKS
-cipher_test_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS) -I$(top_builddir)/lib/
-cipher_override2_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS) -I$(top_builddir)/lib/
-else
 cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
 cipher_override2_CPPFLAGS = $(AM_CPPFLAGS)
-endif
 
 ctests = gendh
 
