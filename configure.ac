@@ -1007,7 +1007,6 @@ AC_CONFIG_FILES([
   tests/Makefile
   tests/windows/Makefile
   tests/cert-tests/Makefile
-  tests/ocsp-tests/Makefile
   tests/dtls/Makefile
   tests/key-tests/Makefile
   tests/slow/Makefile

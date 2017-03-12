@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . cert-tests ocsp-tests key-tests slow dtls windows
+SUBDIRS = . cert-tests key-tests slow dtls windows
 
 if WANT_TEST_SUITE
 SUBDIRS += suite
@@ -43,7 +43,11 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	pkcs7-interesting/pkcs7-1.der.err pkcs7-interesting/pkcs7-2.der pkcs7-interesting/pkcs7-2.der.err \
 	client-interesting/client1.raw client-interesting/client2.raw client-interesting/client3.disabled \
 	server-interesting/server1.raw scripts/common.sh scripts/starttls-common.sh \
-	client-interesting/client3.raw rng-op.c x509sign-verify-common.h
+	client-interesting/client3.raw rng-op.c x509sign-verify-common.h \
+	ocsp-tests/certs/ca.key ocsp-tests/certs/ca.pem ocsp-tests/certs/ocsp-server.key ocsp-tests/certs/ocsp-server.pem ocsp-tests/response1.der \
+	ocsp-tests/response2.der ocsp-tests/certs/ocsp_index.txt ocsp-tests/certs/ocsp_index.txt.attr \
+	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
+	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -298,11 +302,12 @@ name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
+dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh ocsp-tests/ocsp-test
 
 if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
-	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh
+	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
+	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
@@ -329,6 +334,10 @@ TESTS_ENVIRONMENT =						\
 	builddir="$(builddir)"					\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
+
+if WINDOWS
+TESTS_ENVIRONMENT += WINDOWS=1
+endif
 
 if WANT_TEST_SUITE
 
