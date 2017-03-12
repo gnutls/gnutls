@@ -8,9 +8,10 @@ See the end for copying conditions.
 * Version 3.5.11 (unreleased)
 
 ** libgnutls: Addressed read of 4 bytes past the end of buffer in OpenPGP
-   certificate parsing. Issue found using oss-fuzz project and was fixed
+   certificate parsing. Issues found using oss-fuzz project and were fixed
    by Alex Gaynor:
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=737
+   https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=824
 
 ** API and ABI modifications:
 No changes since last version.
