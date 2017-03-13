@@ -53,11 +53,13 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/doc/examples
 
 AM_LDFLAGS = -no-install
-COMMON_LDADD = ../lib/libgnutls.la \
-	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) $(LIBSECCOMP)
+COMMON_GNUTLS_LDADD = ../lib/libgnutls.la
+COMMON_DEPS_LDADD = $(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) $(LIBSECCOMP)
+COMMON_LDADD = $(COMMON_GNUTLS_LDADD) $(COMMON_DEPS_LDADD)
 
-LDADD = $(COMMON_LDADD) \
-	libutils.la
+LDADD = $(COMMON_GNUTLS_LDADD) \
+	libutils.la \
+	$(COMMON_DEPS_LDADD)
 
 dane_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
 
