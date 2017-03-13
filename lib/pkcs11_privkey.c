@@ -252,6 +252,14 @@ static int reopen_privkey_session(void * _privkey)
 	return 0;
 }
 
+#define REPEAT_ON_INVALID_HANDLE(expr) \
+	if ((expr) == CKR_SESSION_HANDLE_INVALID) { \
+		ret = reopen_privkey_session(key); \
+		if (ret < 0) \
+			return gnutls_assert_val(ret); \
+		expr; \
+	}
+
 /*-
  * _gnutls_pkcs11_privkey_sign_hash:
  * @key: Holds the key
@@ -291,7 +299,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	/* Initialize signing operation; using the private key discovered
 	 * earlier. */
-	rv = pkcs11_sign_init(sinfo->module, sinfo->pks, &mech, key->ref);
+	REPEAT_ON_INVALID_HANDLE(rv = pkcs11_sign_init(sinfo->module, sinfo->pks, &mech, key->ref));
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
@@ -392,7 +400,7 @@ unsigned gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 	
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
-	rv = (key->sinfo.module)->C_GetSessionInfo(key->sinfo.pks, &session_info);
+	REPEAT_ON_INVALID_HANDLE(rv = (key->sinfo.module)->C_GetSessionInfo(key->sinfo.pks, &session_info));
 	if (rv != CKR_OK) {
 		ret = 0;
 		goto cleanup;
@@ -554,7 +562,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 
 	/* Initialize signing operation; using the private key discovered
 	 * earlier. */
-	rv = pkcs11_decrypt_init(key->sinfo.module, key->sinfo.pks, &mech, key->ref);
+	REPEAT_ON_INVALID_HANDLE(rv = pkcs11_decrypt_init(key->sinfo.module, key->sinfo.pks, &mech, key->ref));
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
