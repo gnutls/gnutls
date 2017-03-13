@@ -26,7 +26,7 @@ This will execute AFL (which runs indefinitely until CTRL+C is pressed) and
 provide its output in a "gnutls_pkcs7_parser_fuzzer.PID.out" directory.
 
 
-# Reproducing a specific issue
+# Reproducing a reported issue from oss-fuzz
 
 Assuming an issue on the "gnutls_pkcs7_parser_fuzzer" was found, and the
 reproducer is placed in $FILE, to reproduce locally use the following commands

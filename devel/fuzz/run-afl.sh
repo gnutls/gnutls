@@ -23,6 +23,7 @@ cat ${srcdir}/../../config.log|grep afl-gcc >/dev/null 2>&1
 if test $? != 0;then
 	echo "compile first library as:"
 	echo "CC=afl-gcc ./configure"
+	exit 1
 fi
 
 if test -z "$1";then

@@ -16,8 +16,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-CC?="gcc"
-CFLAGS?=-g -fsanitize=address -fsanitize=undefined
+CC?="afl-gcc"
+#CFLAGS?=-g -fsanitize=address -fsanitize=undefined
 COMMON=-I../../lib/includes -L../../lib/.libs -Wl,-rpath=../../lib/.libs -lgnutls
 
 all: gnutls_pkcs7_parser_fuzzer gnutls_client_fuzzer gnutls_dn_parser_fuzzer \
