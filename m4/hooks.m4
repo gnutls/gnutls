@@ -142,6 +142,20 @@ LIBTASN1_MINIMUM=4.9
     AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
   ])
 
+  ac_allow_sha1=no
+  AC_MSG_CHECKING([whether to allow SHA1 as an acceptable hash for digital signatures])
+  AC_ARG_ENABLE(sha1-support,
+    AS_HELP_STRING([--enable-sha1-support],
+                   [allow SHA1 as an acceptable hash for digital signatures]),
+    ac_allow_sha1=$enableval)
+  if test x$ac_allow_sha1 != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ALLOW_SHA1], 1, [allow SHA1 as an acceptable hash for digital signatures])
+  else
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ALLOW_SHA1, test "$ac_allow_sha1" != "no")
+
   ac_enable_ssl3=yes
   AC_MSG_CHECKING([whether to disable the SSL 3.0 protocol])
   AC_ARG_ENABLE(ssl3-support,
