@@ -93,7 +93,7 @@ PID=$!
 wait_server ${PID}
 
 # give the server a chance to initialize
-echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null || \
+echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 || \
 	fail ${PID} "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
 
 ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.2 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
