@@ -2975,6 +2975,8 @@ static struct
     GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID, NULL},
   { "rsa-md5 ok", mayfirst_chain, &mayfirst_chain[1],
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5, 0, NULL},
+  { "rsa-md5 ok - allow broken", mayfirst_chain, &mayfirst_chain[1],
+    GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_ALLOW_BROKEN, 0, NULL},
   { "v1ca fail", v1ca, &v1ca[2],
     GNUTLS_VERIFY_ALLOW_BROKEN|GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID, NULL},
 
@@ -2996,8 +2998,11 @@ static struct
   { "v1ca expired", v1ca, &v1ca[2],
     GNUTLS_VERIFY_ALLOW_BROKEN,
     GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID , NULL},
-  { "v1ca ok", v1ca, &v1ca[2],
+  { "v1ca (sha1) ok - allow broken", v1ca, &v1ca[2], /* check GNUTLS_VERIFY_ALLOW_BROKEN */
     GNUTLS_VERIFY_ALLOW_BROKEN|GNUTLS_VERIFY_DISABLE_TIME_CHECKS,
+    0, NULL},
+  { "v1ca (sha1) ok - allow sha1", v1ca, &v1ca[2], /* check GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 */
+    GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1|GNUTLS_VERIFY_DISABLE_TIME_CHECKS,
     0, NULL},
   { "v1ca2 expired", v1ca, &v1ca[2],
     GNUTLS_VERIFY_ALLOW_BROKEN|GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT,
