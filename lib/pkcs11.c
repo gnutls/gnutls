@@ -540,6 +540,9 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
  * stored. When output is text it returns null terminated string
  * although @output_size contains the size of the actual data only.
  *
+ * In versions previously to 3.6.0 this function included the null terminator
+ * to @output_size. After 3.6.0 the output size doesn't include the terminator character.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  *
  * Since: 2.12.0
@@ -660,7 +663,7 @@ pkcs11_get_info(struct p11_kit_uri *info,
 			if (terminate)
 				((unsigned char *) output)[length] = '\0';
 		}
-		*output_size = length + terminate;
+		*output_size = length;
 	}
 
 	return 0;
