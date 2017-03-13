@@ -207,6 +207,10 @@ pkcs11_privkey_fork_reinit_SOURCES = pkcs11/pkcs11-privkey-fork-reinit.c
 pkcs11_privkey_fork_reinit_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_privkey_fork_reinit_LDADD = $(LDADD) $(LIBDL)
 
+pkcs11_mechanisms_SOURCES = pkcs11/pkcs11-mechanisms.c
+pkcs11_mechanisms_DEPENDENCIES = libpkcs11mock1.la libutils.la
+pkcs11_mechanisms_LDADD = $(LDADD) $(LIBDL)
+
 pkcs11_privkey_export_SOURCES = pkcs11/pkcs11-privkey-export.c
 pkcs11_privkey_export_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_privkey_export_LDADD = $(LDADD) $(LIBDL)
@@ -223,7 +227,7 @@ ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
 	pkcs11-import-url-privkey pkcs11-privkey-fork pkcs11/pkcs11-ec-privkey-test \
 	pkcs11-privkey-always-auth pkcs11-privkey-export pkcs11/pkcs11-import-with-pin \
 	pkcs11/pkcs11-privkey-pthread pkcs11/pkcs11-pin-func pkcs11/pkcs11-obj-import \
-	pkcs11-privkey-fork-reinit
+	pkcs11-privkey-fork-reinit pkcs11-mechanisms
 
 
 endif
