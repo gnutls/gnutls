@@ -48,7 +48,7 @@ if test "${rc}" != 0;then
 	exit 1
 fi
 
-$DIFF ${OUTFILE} "${srcdir}/data/$i"
+$DIFF -I 'warning:' ${OUTFILE} "${srcdir}/data/$i"
 if test $? != 0;then
 	echo "Error in parsing cert with long OIDs"
 	exit 1
