@@ -1355,6 +1355,10 @@ client hello.  Note that this should be set only by applications that
 try to reconnect with a downgraded protocol version. See RFC7507 for
 details.
 
+@item %VERIFY_ALLOW_BROKEN @tab
+will allow signatures with known to be broken algorithms (such as MD5 or
+SHA1) in certificate chains.
+
 @item %VERIFY_ALLOW_SIGN_RSA_MD5 @tab
 will allow RSA-MD5 signatures in certificate chains.
 

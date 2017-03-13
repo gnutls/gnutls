@@ -631,6 +631,7 @@ certificate chain, you can call
 @itemize
 @item @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2}
 @item @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5}
+@item @code{GNUTLS_VERIFY_ALLOW_BROKEN}
 @end itemize
 as in the following example:
 
