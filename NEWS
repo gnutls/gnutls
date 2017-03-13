@@ -13,6 +13,10 @@ See the end for copying conditions.
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=737
    https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=824
 
+** libgnutls: Introduced locks in gnutls_pkcs11_privkey_t structure access.
+   That allows PKCS#11 operations such as signing to be performed with the
+   same object from multiple threads.
+
 ** API and ABI modifications:
 No changes since last version.
 
