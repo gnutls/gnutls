@@ -891,6 +891,8 @@ int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  *   using the broken MD2 algorithm.
  * @GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5: Allow certificates to be signed
  *   using the broken MD5 algorithm.
+ * @GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1: Allow certificates to be signed
+ *   using the broken SHA1 hash algorithm.
  * @GNUTLS_VERIFY_ALLOW_BROKEN: Allow certificates to be signed
  *   using any broken algorithm.
  * @GNUTLS_VERIFY_DISABLE_TIME_CHECKS: Disable checking of activation
@@ -923,7 +925,8 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1 << 11,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
 	GNUTLS_VERIFY_USE_TLS1_RSA = 1 << 13,
-	GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS = 1 << 14
+	GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS = 1 << 14,
+	GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 = 1 << 15,
 	/* cannot exceed 2^24 due to GNUTLS_PROFILE_TO_VFLAGS() */
 } gnutls_certificate_verify_flags;
 

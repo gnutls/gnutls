@@ -1362,6 +1362,9 @@ SHA1) in certificate chains.
 @item %VERIFY_ALLOW_SIGN_RSA_MD5 @tab
 will allow RSA-MD5 signatures in certificate chains.
 
+@item %VERIFY_ALLOW_SIGN_WITH_SHA1 @tab
+will allow signatures with SHA1 hash algorithm in certificate chains.
+
 @item %VERIFY_DISABLE_CRL_CHECKS @tab
 will disable CRL or OCSP checks in the verification of the certificate chain.
 
