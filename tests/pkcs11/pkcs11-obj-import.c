@@ -66,7 +66,7 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 
 void doit(void)
 {
-	char buf[128];
+	static char buf[1024];
 	int ret;
 	const char *lib, *bin;
 	gnutls_x509_crt_t crt;
@@ -170,6 +170,16 @@ void doit(void)
 	assert(tmp2.size == tmp.size);
 	assert(memcmp(tmp.data, tmp2.data, tmp.size) == 0);
 	gnutls_free(tmp2.data);
+
+	/* check gnutls_pkcs11_obj_export */
+	buf_size = 4;
+	assert(gnutls_pkcs11_obj_export(obj, buf, &buf_size) == GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+	buf_size = sizeof(buf);
+	assert(gnutls_pkcs11_obj_export(obj, buf, &buf_size)>=0);
+	assert(buf_size == tmp.size);
+	assert(memcmp(buf, tmp.data, tmp.size) == 0);
+
 	gnutls_free(tmp.data);
 
 	/* The ID is constant and copied from the certificate */
