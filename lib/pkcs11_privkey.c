@@ -78,7 +78,13 @@ struct gnutls_pkcs11_privkey_st {
  * gnutls_pkcs11_privkey_init:
  * @key: A pointer to the type to be initialized
  *
- * This function will initialize an private key structure.
+ * This function will initialize an private key structure. This
+ * structure can be used for accessing an underlying PKCS#11 object.
+ *
+ * In versions of GnuTLS later than 3.5.11 the object is protected
+ * using locks and a single %gnutls_pkcs11_privkey_t can be re-used
+ * by many threads. However, for performance it is recommended to utilize
+ * one object per key per thread.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -386,7 +392,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
  *
  * Checks the status of the private key token.
  *
- * Returns: this function will return non-zero if the token 
+ * Returns: this function will return non-zero if the token
  * holding the private key is still available (inserted), and zero otherwise.
  * 
  * Since: 3.1.9

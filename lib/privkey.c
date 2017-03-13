@@ -300,7 +300,16 @@ _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
  * gnutls_privkey_init:
  * @key: A pointer to the type to be initialized
  *
- * This function will initialize a private key.
+ * This function will initialize a private key object. The object can
+ * be used to generate, import, and perform cryptographic operations
+ * on the associated private key.
+ *
+ * Note that when the underlying private key is a PKCS#11 key (i.e.,
+ * when imported with a PKCS#11 URI), the limitations of gnutls_pkcs11_privkey_init()
+ * apply to this object as well. In versions of GnuTLS later than 3.5.11 the object
+ * is protected using locks and a single %gnutls_privkey_t can be re-used
+ * by many threads. However, for performance it is recommended to utilize
+ * one object per key per thread.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
