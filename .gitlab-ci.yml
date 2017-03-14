@@ -38,7 +38,7 @@ ABI-check/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
+  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
     && make -j$(nproc)
   - make abi-check
   - make pic-check
@@ -56,7 +56,7 @@ syntax-check/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --disable-maintainer-mode --disable-guile 
+  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --disable-maintainer-mode --disable-guile
   - make syntax-check
   tags:
   - shared
@@ -69,7 +69,7 @@ cppcheck/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --disable-maintainer-mode --disable-guile --enable-fips140-mode
+  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --disable-maintainer-mode --disable-guile --enable-fips140-mode
   - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring
   - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/
   tags:
@@ -95,7 +95,7 @@ dist/Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init
-  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-valgrind-tests --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
+  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
     && make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   - make -C doc gnutls.html
   - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
@@ -133,7 +133,7 @@ minimal/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
-    ./configure --with-included-libtasn1
+    ./configure --with-included-libtasn1 --enable-valgrind-tests
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe --disable-openpgp-authentication
@@ -152,7 +152,7 @@ no-SSL-3.0/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mkdir -p build && cd build &&
-    ../configure --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile --disable-valgrind-tests &&
+    ../configure --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
@@ -175,7 +175,7 @@ FIPS140-2/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mkdir -p build && cd build &&
-    ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile --disable-valgrind-tests
+    ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
   - make -j$(nproc)
   - GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1 make check -j$(nproc)
   - make check -j$(nproc)
@@ -197,7 +197,7 @@ IDNA2003/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mkdir -p build && cd build &&
-    ../configure --without-libidn2 --disable-doc --disable-guile --disable-full-test-suite --disable-valgrind-tests &&
+    ../configure --without-libidn2 --disable-doc --disable-guile --disable-full-test-suite &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared
@@ -217,7 +217,7 @@ no-openpgp/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mkdir -p build && cd build &&
-    ../configure --disable-openpgp-authentication --disable-doc --disable-guile --disable-full-test-suite --disable-valgrind-tests
+    ../configure --disable-openpgp-authentication --disable-doc --disable-guile --disable-full-test-suite
   - make -j$(nproc)
   - make abi-check
   - make check -j$(nproc)
@@ -239,7 +239,7 @@ valgrind/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - ./configure --disable-doc  --disable-guile --disable-full-test-suite
+  - ./configure --disable-doc  --disable-guile --disable-full-test-suite --enable-valgrind-tests
   - make -j$(nproc)
   - make check -j$(nproc)
   tags:
@@ -260,7 +260,7 @@ no-tools/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-tools --enable-tests
+  - ./configure --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
   - make -j$(nproc)
   - make -j$(nproc) check
   tags:
@@ -283,7 +283,7 @@ asan/Fedora/x86_64:
   script:
   - git submodule update --init
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
-    ./configure --disable-doc --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
+    ./configure --disable-doc --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
   - make check -j$(nproc)
   tags:
@@ -305,7 +305,7 @@ clang-analyzer/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - scan-build ./configure --disable-doc --disable-guile --enable-fips140-mode
+  - scan-build ./configure --disable-doc --disable-guile --enable-fips140-mode --enable-valgrind-tests
   - make -j$(nproc) -C gl
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
   - scan-build --status-bugs -o scan-build-libdane make -j$(nproc) -C libdane
@@ -329,7 +329,7 @@ MinGW32/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c
-  - mingw32-configure --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+  - mingw32-configure --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
@@ -367,7 +367,7 @@ MinGW64/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c
-  - mingw64-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+  - mingw64-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
@@ -405,7 +405,7 @@ MinGW64:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw64-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw64-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   tags:
   - shared
@@ -429,7 +429,7 @@ MinGW32:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw32-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
+    mingw32-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   tags:
   - shared
@@ -455,7 +455,7 @@ FreeBSD10/x86_64:
   - /usr/bin/true
   script:
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
-    --with-included-libtasn1 --disable-guile --with-included-unistring --disable-doc --disable-valgrind-tests && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
+    --with-included-libtasn1 --disable-guile --with-included-unistring --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
   only:
@@ -477,7 +477,7 @@ Fedora/x86:
   script:
   - git submodule update --init
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --enable-local-libopts --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile --disable-valgrind-tests &&
+    ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --enable-local-libopts --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc) && make pic-check
   tags:
   - shared
@@ -498,7 +498,7 @@ ubsan-Werror/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init
-  - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --disable-doc
+  - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-non-suiteb-curves --disable-guile --disable-doc
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
   - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g"
@@ -525,7 +525,7 @@ build/Debian/x86_64:
   script:
   - git submodule update --init
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --disable-doc --disable-guile --disable-valgrind-tests &&
+    ../configure --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   tags:
   - shared

@@ -366,9 +366,6 @@ AC_ARG_ENABLE(full-test-suite,
 SUITE_FILE="${srcdir}/tests/suite/mini-eagain2.c"
 if test "$full_test_suite" = yes && test ! -f "$SUITE_FILE";then
 	full_test_suite=no
-	VALGRIND=""
-	AC_SUBST(VALGRIND, [])
-	opt_valgrind_tests=no
 fi
 
 AM_CONDITIONAL(WANT_TEST_SUITE, test "$full_test_suite" = "yes")
