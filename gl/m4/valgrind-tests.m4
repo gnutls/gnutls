@@ -14,7 +14,7 @@ AC_DEFUN([gl_VALGRIND_TESTS],
   AC_ARG_ENABLE(valgrind-tests,
     AS_HELP_STRING([--disable-valgrind-tests],
                    [don't try to run self tests under valgrind]),
-    [opt_valgrind_tests=$enableval], [opt_valgrind_tests=yes])
+    [opt_valgrind_tests=$enableval], [opt_valgrind_tests=no])
 
   # Run self-tests under valgrind?
   if test "$opt_valgrind_tests" = "yes" && test "$cross_compiling" = no; then
