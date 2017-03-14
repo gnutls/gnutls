@@ -307,8 +307,8 @@ clang-analyzer/Fedora/x86_64:
   script:
   - scan-build ./configure --disable-doc --disable-guile --enable-fips140-mode
   - make -j$(nproc) -C gl
-  - scan-build --status-bugs -o scan-build-lib make CFLAGS="-Werror -O2" -j$(nproc) -C lib
-  - scan-build --status-bugs -o scan-build-libdane make CFLAGS="-Werror -O2" -j$(nproc) -C libdane
+  - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
+  - scan-build --status-bugs -o scan-build-libdane make -j$(nproc) -C libdane
   tags:
   - shared
   except:
