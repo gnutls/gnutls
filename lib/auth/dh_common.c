@@ -133,7 +133,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 
 	ret =
 	    _gnutls_pk_generate_keys(GNUTLS_PK_DH, 0,
-				     &session->key.dh_params);
+				     &session->key.dh_params, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -322,7 +322,7 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 	/* Y=g^x mod p */
 	ret =
 	    _gnutls_pk_generate_keys(GNUTLS_PK_DH, q_bits,
-				     &session->key.dh_params);
+				     &session->key.dh_params, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

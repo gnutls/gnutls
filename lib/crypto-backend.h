@@ -324,7 +324,7 @@ typedef struct gnutls_crypto_pk {
 	int (*verify_pub_params) (gnutls_pk_algorithm_t,
 			      const gnutls_pk_params_st * pub);
 	int (*generate_keys) (gnutls_pk_algorithm_t, unsigned int nbits,
-			 gnutls_pk_params_st *);
+			 gnutls_pk_params_st *, unsigned ephemeral);
 	int (*generate_params) (gnutls_pk_algorithm_t, unsigned int nbits,
 			 gnutls_pk_params_st *);
 	/* this function should convert params to ones suitable

@@ -990,7 +990,7 @@ int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
 	priv_key->data = NULL;
 	pub_key->data = NULL;
 
-	ret = _gnutls_pk_generate_keys(GNUTLS_PK_DH, dh_params->q_bits, &params);
+	ret = _gnutls_pk_generate_keys(GNUTLS_PK_DH, dh_params->q_bits, &params, 0);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
@@ -1084,7 +1084,7 @@ int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
 	y->data = NULL;
 	k->data = NULL;
 
-	ret = _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve, &params);
+	ret = _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve, &params, 0);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
@@ -1295,10 +1295,21 @@ cleanup:
 static int
 wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			       unsigned int level /*bits or curve */ ,
-			       gnutls_pk_params_st * params)
+			       gnutls_pk_params_st * params,
+			       unsigned ephemeral /*non-zero if they are ephemeral keys */)
 {
 	int ret;
 	unsigned int i;
+	unsigned rnd_level;
+	nettle_random_func *rnd_func;
+
+	if (ephemeral) {
+		rnd_level = GNUTLS_RND_RANDOM;
+		rnd_func = rnd_tmpkey_func;
+	} else {
+		rnd_func = rnd_key_func;
+		rnd_level = GNUTLS_RND_KEY;
+	}
 
 	switch (algo) {
 	case GNUTLS_PK_DSA:
@@ -1317,7 +1328,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			ret =
 			    dsa_generate_dss_keypair(&pub, y, x,
-						 NULL, rnd_key_func,
+						 NULL, rnd_func,
 						 NULL, NULL);
 			if (ret != 1 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
@@ -1374,13 +1385,13 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				if (have_q) {
 					mpz_set(r, pub.q);
 					mpz_sub_ui(r, r, 2);
-					nettle_mpz_random(x, NULL, rnd_tmpkey_func, r);
+					nettle_mpz_random(x, NULL, rnd_func, r);
 					mpz_add_ui(x, x, 1);
 				} else {
 					unsigned size = mpz_sizeinbase(pub.p, 2);
 					if (level == 0)
 						level = MIN(size, DH_EXPONENT_SIZE(size));
-					nettle_mpz_random_size(x, NULL, rnd_tmpkey_func, level);
+					nettle_mpz_random_size(x, NULL, rnd_func, level);
 
 					if (level >= size)
 						mpz_mod(x, x, pub.p);
@@ -1451,14 +1462,14 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					params->seed_size = sizeof(params->seed);
 					ret =
 					    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
-							 rnd_key_func, NULL, NULL,
+							 rnd_func, NULL, NULL,
 							 &params->seed_size, params->seed,
 							 level);
 				}
 			} else {
 				ret =
 				    rsa_generate_keypair(&pub, &priv, NULL,
-						 rnd_key_func, NULL, NULL,
+						 rnd_func, NULL, NULL,
 						 level, 0);
 			}
 			if (ret != 1 || HAVE_LIB_ERROR()) {
@@ -1515,7 +1526,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			ecc_scalar_init(&key, curve);
 			ecc_point_init(&pub, curve);
 
-			ecdsa_generate_keypair(&pub, &key, NULL, rnd_key_func);
+			ecdsa_generate_keypair(&pub, &key, NULL, rnd_func);
 			if (HAVE_LIB_ERROR()) {
 				ret = gnutls_assert_val(GNUTLS_E_LIB_IN_ERROR_STATE);
 				goto ecc_fail;
@@ -1565,7 +1576,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				goto fail;
 			}
 
-			ret = gnutls_rnd(GNUTLS_RND_RANDOM, params->raw_priv.data, size);
+			ret = gnutls_rnd(rnd_level, params->raw_priv.data, size);
 			if (ret < 0) {
 				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 				goto fail;

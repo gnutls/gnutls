@@ -1565,7 +1565,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		return ret;
 	}
 
-	ret = _gnutls_pk_generate_keys(algo, bits, &key->params);
+	ret = _gnutls_pk_generate_keys(algo, bits, &key->params, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
