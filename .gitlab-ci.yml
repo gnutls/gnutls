@@ -493,12 +493,15 @@ Fedora/x86:
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
 
-ubsan/Fedora/x86_64:
+ubsan-Werror/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init
   - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile --disable-doc
+  - make -j$(nproc) -C gl
+  - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
+  - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g"
   - make -j$(nproc)
   - make check -j$(nproc)
   tags:
