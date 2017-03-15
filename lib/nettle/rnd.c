@@ -39,22 +39,33 @@
  * 'Using GnuTLS as a cryptographic library'.
  */
 
-/* after this number of bytes PRNG will rekey */
+/* We have two "refresh" operations for the PRNG:
+ *  re-seed: the random generator obtains a new key from the system or another PRNG
+ *           (occurs when a time or data-based limit is reached for the GNUTLS_RND_RANDOM
+ *            and GNUTLS_RND_KEY levels and data-based for the nonce level)
+ *  re-key:  the random generator obtains a new key by utilizing its own output.
+ *           This only happens for the GNUTLS_RND_KEY level, on every operation.
+ */
+
+/* after this number of bytes PRNG will rekey using the system RNG */
 static const unsigned prng_reseed_limits[] = {
-	[GNUTLS_RND_NONCE] = 1024*1024, /* 1 MB */
-	[GNUTLS_RND_RANDOM] = 16*1024, /* 16 kb */
-	[GNUTLS_RND_KEY] = 16*1024 /* same as GNUTLS_RND_RANDOM */
+	[GNUTLS_RND_NONCE] = 16*1024*1024, /* 16 MB - we re-seed using the GNUTLS_RND_RANDOM output */
+	[GNUTLS_RND_RANDOM] = 2*1024*1024, /* 2MB - we re-seed by time as well */
+	[GNUTLS_RND_KEY] = 2*1024*1024 /* same as GNUTLS_RND_RANDOM - but we re-key on every operation */
 };
+
+#define NON_NONCE_PRNG_RESEED_TIME 7200
 
 struct prng_ctx_st {
 	struct chacha_ctx ctx;
 	size_t counter;
 	unsigned int forkid;
+	time_t last_reseed;
 };
 
 struct generators_ctx_st {
 	struct prng_ctx_st nonce;  /* GNUTLS_RND_NONCE */
-	struct prng_ctx_st normal; /* GNUTLS_RND_RANDOM */
+	struct prng_ctx_st normal; /* GNUTLS_RND_RANDOM, GNUTLS_RND_KEY */
 };
 
 
@@ -93,6 +104,7 @@ static int single_prng_init(struct prng_ctx_st *ctx,
 
 		gettime(&now);
 		memcpy(nonce, &now, MIN(sizeof(nonce), sizeof(now)));
+		ctx->last_reseed = now.tv_sec;
 	}
 
 	chacha_set_key(&ctx->ctx, new_key);
@@ -161,20 +173,33 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 
 
-	/* we don't really need memset here, but otherwise we
-	 * get filled with valgrind warnings */
+	/* Two reasons for this memset():
+	 *  1. avoid getting filled with valgrind warnings
+	 *  2. avoid a cipher/PRNG failure to expose stack data
+	 */
 	memset(data, 0, datasize);
 
 	if (_gnutls_detect_fork(prng_ctx->forkid)) {
 		reseed = 1;
+
+	} else if (level != GNUTLS_RND_NONCE) {
+		/* for KEY and RANDOM levels we re-seed based on time in
+		 * addition to data. That is, to prevent a temporal state
+		 * compromise to become permanent for low traffic sites */
+		time_t now = gnutls_time(0);
+		if (now > prng_ctx->last_reseed + NON_NONCE_PRNG_RESEED_TIME) {
+			reseed = 1;
+			prng_ctx->last_reseed = now;
+		}
 	}
 
 	if (reseed != 0 || prng_ctx->counter > prng_reseed_limits[level]) {
 		if (level == GNUTLS_RND_NONCE) {
 			ret = wrap_nettle_rnd(_ctx, GNUTLS_RND_RANDOM, new_key, sizeof(new_key));
 		} else {
-			/* we use the system entropy for KEY and RANDOM to reduce
-			 * the impact of a temporal state compromise for these two levels. */
+
+			/* we also use the system entropy to reduce the impact
+			 * of a temporal state compromise for these two levels. */
 			ret = _rnd_get_system_entropy(new_key, sizeof(new_key));
 		}
 
