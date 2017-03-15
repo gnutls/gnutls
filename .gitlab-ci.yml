@@ -94,7 +94,7 @@ dist/Fedora:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - git submodule update --init
+  - git submodule update --init --no-fetch
   - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
     && make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   - make -C doc gnutls.html
@@ -112,7 +112,7 @@ coverage/Fedora:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - git submodule update --init
+  - git submodule update --init --no-fetch
   - make -j$(nproc) check
   - make local-code-coverage-output || true
   tags:
@@ -281,7 +281,7 @@ asan/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - git submodule update --init
+  - git submodule update --init --no-fetch
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
@@ -475,7 +475,7 @@ Fedora/x86:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
   script:
-  - git submodule update --init
+  - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --enable-local-libopts --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc) && make pic-check
@@ -497,7 +497,7 @@ ubsan-Werror/Fedora/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - git submodule update --init
+  - git submodule update --init --no-fetch
   - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-non-suiteb-curves --disable-guile --disable-doc
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
@@ -523,7 +523,7 @@ build/Debian/x86_64:
   stage: stage2-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
-  - git submodule update --init
+  - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
     ../configure --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
