@@ -528,7 +528,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				hash_len = vdata->size;
 			}
 
-			ecdsa_sign(&priv, NULL, rnd_tmpkey_func, hash_len,
+			ecdsa_sign(&priv, NULL, rnd_nonce_func, hash_len,
 				   vdata->data, &sig);
 
 			/* prevent memory leaks */
@@ -577,7 +577,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			}
 
 			ret =
-			    dsa_sign(&pub, TOMPZ(priv), NULL, rnd_tmpkey_func,
+			    dsa_sign(&pub, TOMPZ(priv), NULL, rnd_nonce_func,
 				     hash_len, vdata->data, &sig);
 			if (ret == 0 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
@@ -613,7 +613,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			mpz_init(s);
 
 			ret =
-			    rsa_pkcs1_sign_tr(&pub, &priv, NULL, rnd_tmpkey_func,
+			    rsa_pkcs1_sign_tr(&pub, &priv, NULL, rnd_nonce_func,
 					      vdata->size, vdata->data, s);
 			if (ret == 0 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
