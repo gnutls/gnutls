@@ -92,7 +92,7 @@ AC_MSG_ERROR([[
   AC_ARG_VAR(GMP_CFLAGS, [C compiler flags for gmp])
   AC_ARG_VAR(GMP_LIBS, [linker flags for gmp])
   if test "$mini_nettle" != no;then
-    GMP_CLFLAGS=""
+    GMP_CFLAGS=""
     GMP_LIBS=""
   else
     if test x$GMP_LIBS = x; then
