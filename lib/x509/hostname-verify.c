@@ -49,7 +49,7 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 }
 
 static int
-check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flags)
+check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size)
 {
 	char temp[16];
 	size_t temp_size;
@@ -89,6 +89,27 @@ static int has_embedded_null(const char *str, unsigned size)
 	if (strlen(str) != size)
 		return 1;
 	return 0;
+}
+
+/**
+ * gnutls_x509_crt_check_ip:
+ * @cert: should contain an gnutls_x509_crt_t type
+ * @ip: A pointer to the raw IP address
+ * @ip_size: the number of bytes in ip (4 or 16)
+ * @flags: should be zero
+ *
+ * This function will check if the IP allowed IP addresses in 
+ * the certificate's subject alternative name match the provided
+ * IP address.
+ *
+ * Returns: non-zero for a successful match, and zero on failure.
+ **/
+unsigned
+gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
+			 const unsigned char *ip, unsigned int ip_size,
+			 unsigned int flags)
+{
+	return check_ip(cert, ip, ip_size);
 }
 
 /**
@@ -141,9 +162,9 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				gnutls_assert();
 				goto hostname_fallback;
 			}
-			ret = check_ip(cert, &ipv6, 16, flags);
+			ret = check_ip(cert, &ipv6, 16);
 		} else {
-			ret = check_ip(cert, &ipv4, 4, flags);
+			ret = check_ip(cert, &ipv4, 4);
 		}
 
 		if (ret != 0)

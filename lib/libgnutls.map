@@ -1135,6 +1135,7 @@ GNUTLS_3_4
 	gnutls_idna_map;
 	gnutls_idna_reverse_map;
 	gnutls_x509_crt_set_flags;
+	gnutls_x509_crt_check_ip;
  local:
 	*;
 };

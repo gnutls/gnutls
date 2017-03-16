@@ -213,6 +213,11 @@ unsigned
 gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
 			    const char *email, unsigned int flags);
 
+unsigned
+gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
+			 const unsigned char *ip, unsigned int ip_size,
+			 unsigned int flags);
+
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
 				  char *sig, size_t * sizeof_sig);
