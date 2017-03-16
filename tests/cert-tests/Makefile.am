@@ -76,7 +76,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/invalid-date-secs.der data/invalid-date-month.der data/invalid-date-day.der \
 	data/mem-leak.p12 data/alt-chain-new-ca.pem data/alt-chain-old-ca.pem \
 	data/alt-chain.pem data/pkcs7-chain.pem data/pkcs7-chain-root.pem \
-	data/pkcs7-chain-endcert-key.pem
+	data/pkcs7-chain-endcert-key.pem data/cert-rsa-pss.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -104,12 +104,14 @@ dist_check_SCRIPTS += certtool-utf8 crq
 
 if !WINDOWS
 dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
-	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8
+	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8 rsa-pss-pad
 endif
 
 if ENABLE_DANE
 dist_check_SCRIPTS += dane
 endif
+
+dist_check_SCRIPTS += certtool-rsa-pss
 
 TESTS = $(dist_check_SCRIPTS)
 

@@ -116,7 +116,7 @@ cdk_pk_verify(cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
 	for (i = 0; i < params.params_nr; i++)
 		params.params[i] = pk->mpi[i];
 	params.flags = 0;
-	ret = _gnutls_pk_verify(algo, &di, &s_sig, &params);
+	ret = _gnutls_pk_verify(algo, &di, &s_sig, &params, &params.sign);
 
 	if (ret < 0) {
 		gnutls_assert();

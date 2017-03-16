@@ -62,6 +62,7 @@ void doit(void)
 
 	test_sig(GNUTLS_PK_RSA, GNUTLS_DIG_SHA1, rsa_size1);
 	test_sig(GNUTLS_PK_RSA, GNUTLS_DIG_SHA256, rsa_size2);
+	test_sig(GNUTLS_PK_RSA_PSS, GNUTLS_DIG_SHA256, rsa_size2);
 
 	gnutls_global_deinit();
 }

@@ -413,8 +413,28 @@ time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_get_serial(gnutls_x509_crt_t cert,
 			       void *result, size_t * result_size);
 
+typedef struct gnutls_x509_spki_st *gnutls_x509_spki_t;
+
+int gnutls_x509_spki_init(gnutls_x509_spki_t *spki);
+void gnutls_x509_spki_deinit(gnutls_x509_spki_t spki);
+int gnutls_x509_spki_get_pk_algorithm(gnutls_x509_spki_t spki);
+void gnutls_x509_spki_set_pk_algorithm(gnutls_x509_spki_t spki,
+				       gnutls_pk_algorithm_t pk);
+int gnutls_x509_spki_get_digest_algorithm(gnutls_x509_spki_t spki);
+void gnutls_x509_spki_set_digest_algorithm(gnutls_x509_spki_t spki,
+					   gnutls_digest_algorithm_t dig);
+int gnutls_x509_spki_get_salt_size(gnutls_x509_spki_t spki);
+void gnutls_x509_spki_set_salt_size(gnutls_x509_spki_t spki,
+				    unsigned int salt_size);
+
 int gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
 				     unsigned int *bits);
+int gnutls_x509_crt_set_pk_algorithm(gnutls_x509_crt_t crt,
+				     gnutls_x509_spki_t spki,
+				     unsigned int flags);
+int gnutls_x509_crt_get_pk_algorithm2(gnutls_x509_crt_t cert,
+				      gnutls_x509_spki_t spki,
+				      unsigned int *bits);
 int gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt_t crt,
 				   gnutls_datum_t * m, gnutls_datum_t * e);
 int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
@@ -945,6 +965,7 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_USE_TLS1_RSA = 1 << 13,
 	GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS = 1 << 14,
 	GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 = 1 << 15,
+	GNUTLS_VERIFY_USE_RSA_PSS = 1 << 16
 	/* cannot exceed 2^24 due to GNUTLS_PROFILE_TO_VFLAGS() */
 } gnutls_certificate_verify_flags;
 
@@ -1167,6 +1188,9 @@ int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey_t key);
 int gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t
 					  key, unsigned int *bits);
+int gnutls_x509_privkey_get_pk_algorithm3(gnutls_x509_privkey_t key,
+					  gnutls_x509_spki_t spki,
+					  unsigned int *bits);
 int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
 				   unsigned int flags,
 				   unsigned char *output_data,
@@ -1391,6 +1415,12 @@ int gnutls_x509_crq_get_attribute_info(gnutls_x509_crq_t crq,
 				       size_t * sizeof_oid);
 int gnutls_x509_crq_get_pk_algorithm(gnutls_x509_crq_t crq,
 				     unsigned int *bits);
+int gnutls_x509_crq_get_pk_algorithm2(gnutls_x509_crq_t crq,
+				      gnutls_x509_spki_t spki,
+				      unsigned int *bits);
+int gnutls_x509_crq_set_pk_algorithm(gnutls_x509_crq_t crq,
+				     gnutls_x509_spki_t spki,
+				     unsigned int flags);
 
 int gnutls_x509_crq_get_signature_oid(gnutls_x509_crq_t crq, char *oid, size_t *oid_size);
 int gnutls_x509_crq_get_pk_oid(gnutls_x509_crq_t crq, char *oid, size_t *oid_size);

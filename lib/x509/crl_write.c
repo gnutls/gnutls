@@ -499,7 +499,7 @@ gnutls_x509_crl_privkey_sign(gnutls_x509_crl_t crl,
 	disable_optional_stuff(crl);
 
 	result = _gnutls_x509_pkix_sign(crl->crl, "tbsCertList",
-					dig, issuer, issuer_key);
+					dig, 0, issuer, issuer_key);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

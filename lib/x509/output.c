@@ -1231,6 +1231,7 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 				       (err, bits)), bits);
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		{
 			gnutls_datum_t m, e;
 
@@ -1394,6 +1395,59 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 }
 
 static int
+print_crt_sig_params(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
+		     gnutls_certificate_print_formats_t format)
+{
+	int ret;
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st params;
+	gnutls_sign_algorithm_t sign;
+
+	sign = gnutls_x509_crt_get_signature_algorithm(crt);
+	pk = gnutls_sign_get_pk_algorithm(sign);
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = _gnutls_x509_read_sign_params(crt->cert,
+						    "signatureAlgorithm",
+						    &params);
+		if (ret < 0) {
+			addf(str, "error: read_pss_params: %s\n",
+			     gnutls_strerror(ret));
+		} else
+			addf(str, "\t\tSalt Length: %d\n", params.salt_size);
+	}
+
+	return 0;
+}
+
+static int
+print_crt_pubkey_params(gnutls_buffer_st * str, const char *key_name,
+			gnutls_x509_crt_t crt,
+			gnutls_certificate_print_formats_t format)
+{
+	int ret;
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st params;
+
+	ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
+	if (ret < 0)
+		return ret;
+
+	pk = ret;
+
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = _gnutls_x509_crt_read_sign_params(crt, &params);
+		if (ret < 0)
+			return ret;
+		addf(str, _("\t%sPublic Key Parameters:\n"), key_name);
+		addf(str, "\t\tHash Algorithm: %s\n",
+		     gnutls_digest_get_name(params.dig));
+		addf(str, "\t\tSalt Length: %d\n", params.salt_size);
+	}
+
+	return 0;
+}
+
+static int
 print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 		 gnutls_certificate_print_formats_t format)
 {
@@ -1409,6 +1463,7 @@ print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 		goto cleanup;
 
 	print_pubkey(str, _("Subject "), pubkey, format);
+	print_crt_pubkey_params(str, _("Subject "), crt, format);
 	ret = 0;
 
       cleanup:
@@ -1572,6 +1627,8 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 
 		addf(str, _("\tSignature Algorithm: %s\n"), p);
 		gnutls_free(name);
+
+		print_crt_sig_params(str, cert, format);
 
 		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
 			adds(str,
@@ -2287,6 +2344,58 @@ gnutls_x509_crl_print(gnutls_x509_crl_t crl,
 }
 
 static int
+print_crq_sig_params(gnutls_buffer_st * str, gnutls_x509_crq_t crt,
+		     gnutls_certificate_print_formats_t format)
+{
+	int ret;
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st params;
+	gnutls_sign_algorithm_t sign;
+
+	sign = gnutls_x509_crq_get_signature_algorithm(crt);
+	pk = gnutls_sign_get_pk_algorithm(sign);
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = _gnutls_x509_read_sign_params(crt->crq,
+						    "signatureAlgorithm",
+						    &params);
+		if (ret < 0) {
+			addf(str, "error: read_pss_params: %s\n",
+			     gnutls_strerror(ret));
+		} else
+			addf(str, "\t\tSalt Length: %d\n", params.salt_size);
+	}
+
+	return 0;
+}
+static int
+print_crq_pubkey_params(gnutls_buffer_st * str, const char *key_name,
+			gnutls_x509_crq_t crt,
+			gnutls_certificate_print_formats_t format)
+{
+	int ret;
+	gnutls_pk_algorithm_t pk;
+	gnutls_x509_spki_st params;
+
+	ret = gnutls_x509_crq_get_pk_algorithm(crt, NULL);
+	if (ret < 0)
+		return ret;
+
+	pk = ret;
+
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = _gnutls_x509_crq_read_sign_params(crt, &params);
+		if (ret < 0)
+			return ret;
+		addf(str, _("\t%sPublic Key Parameters:\n"), key_name);
+		addf(str, "\t\tHash Algorithm: %s\n",
+		     gnutls_digest_get_name(params.dig));
+		addf(str, "\t\tSalt Length: %d\n", params.salt_size);
+	}
+
+	return 0;
+}
+
+static int
 print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 		 gnutls_certificate_print_formats_t format)
 {
@@ -2302,6 +2411,7 @@ print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 		goto cleanup;
 
 	print_pubkey(str, _("Subject "), pubkey, format);
+	print_crq_pubkey_params(str, _("Subject "), crq, format);
 	ret = 0;
 
       cleanup:
@@ -2369,6 +2479,8 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 		addf(str, _("\tSignature Algorithm: %s\n"), p);
 
 		gnutls_free(name);
+
+		print_crq_sig_params(str, cert, format);
 	}
 
 	/* parse attributes */

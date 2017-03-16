@@ -1202,11 +1202,35 @@ int
 gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t key,
 				      unsigned int *bits)
 {
+	return gnutls_x509_privkey_get_pk_algorithm3(key, NULL, bits);
+}
+
+/**
+ * gnutls_x509_privkey_get_pk_algorithm3:
+ * @key: should contain a #gnutls_x509_privkey_t type
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
+ * @bits: The number of bits in the public key algorithm
+ *
+ * This function will return the public key algorithm of a private
+ * key.
+ *
+ * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
+ *   success, or a negative error code on error.
+ **/
+int
+gnutls_x509_privkey_get_pk_algorithm3(gnutls_x509_privkey_t key,
+				      gnutls_x509_spki_t spki,
+				      unsigned int *bits)
+{
 	int ret;
 
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (spki) {
+		memcpy(spki, &key->params.sign, sizeof (gnutls_x509_spki_st));
 	}
 
 	if (bits) {
@@ -1221,7 +1245,7 @@ gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t key,
 
 static const char *set_msg(gnutls_x509_privkey_t key)
 {
-	if (key->pk_algorithm == GNUTLS_PK_RSA) {
+	if (GNUTLS_PK_IS_RSA(key->pk_algorithm)) {
 		if (key->params.seed_size > 0 && !(key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT))
 			return PEM_KEY_RSA_PROVABLE;
 		else
@@ -1563,6 +1587,30 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
+	}
+
+	if (algo == GNUTLS_PK_RSA_PSS) {
+		const mac_entry_st *me;
+
+		key->params.sign.pk = GNUTLS_PK_RSA_PSS;
+		if (key->params.palgo != GNUTLS_DIG_UNKNOWN)
+			key->params.sign.dig = key->params.palgo;
+		else
+			key->params.sign.dig = GNUTLS_DIG_SHA256;
+
+		me = hash_to_entry(key->params.sign.dig);
+		if (unlikely(me == NULL)) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
+
+		if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE)
+			key->params.sign.salt_size = 0;
+		else {
+			key->params.sign.salt_size =
+			    _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+		}
 	}
 
 	ret = _gnutls_pk_generate_keys(algo, bits, &key->params, 0);
@@ -1930,7 +1978,7 @@ _gnutls_x509_privkey_sign_hash2(gnutls_x509_privkey_t signer,
 
 	ret =
 	    _gnutls_pk_sign(signer->pk_algorithm, signature, &digest,
-			    &signer->params);
+			    &signer->params, &signer->params.sign);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1974,7 +2022,7 @@ gnutls_x509_privkey_sign_hash(gnutls_x509_privkey_t key,
 
 	result =
 	    _gnutls_pk_sign(key->pk_algorithm, signature, hash,
-			    &key->params);
+			    &key->params, &key->params.sign);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -2129,4 +2177,67 @@ void gnutls_x509_privkey_set_flags(gnutls_x509_privkey_t key,
 				   unsigned int flags)
 {
 	key->flags |= flags;
+}
+
+int
+_gnutls_x509_privkey_get_sign_params(gnutls_x509_privkey_t key,
+				     gnutls_x509_spki_st *params)
+{
+	memcpy(params, &key->params.sign, sizeof(gnutls_x509_spki_st));
+	params->pk = gnutls_x509_privkey_get_pk_algorithm2(key, NULL);
+	return 0;
+}
+
+int
+_gnutls_x509_privkey_find_sign_params(gnutls_x509_privkey_t key,
+				      gnutls_pk_algorithm_t pk,
+				      gnutls_digest_algorithm_t dig,
+				      unsigned flags,
+				      gnutls_x509_spki_st *params)
+{
+	unsigned salt_size = 0;
+	gnutls_pk_algorithm_t key_pk;
+	unsigned bits;
+
+	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS) {
+		if (!GNUTLS_PK_IS_RSA(pk))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		pk = GNUTLS_PK_RSA_PSS;
+	}
+
+	key_pk = gnutls_x509_privkey_get_pk_algorithm2(key, &bits);
+	if (!(key_pk == pk ||
+	      (key_pk == GNUTLS_PK_RSA && pk == GNUTLS_PK_RSA_PSS))) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (pk == GNUTLS_PK_RSA_PSS) {
+		const mac_entry_st *me;
+
+		me = hash_to_entry(dig);
+		if (unlikely(me == NULL))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		if (params->pk == GNUTLS_PK_RSA)
+			salt_size = 0;
+		else if (params->pk == GNUTLS_PK_RSA_PSS) {
+			if (dig != params->dig) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
+
+			salt_size = params->salt_size;
+		}
+
+		if ((flags & GNUTLS_PRIVKEY_SIGN_FLAG_REPRODUCIBLE) == 0)
+			salt_size = _gnutls_find_rsa_pss_salt_size(bits, me,
+								   salt_size);
+	}
+
+	params->pk = pk;
+	params->dig = dig;
+	params->salt_size = salt_size;
+
+	return 0;
 }

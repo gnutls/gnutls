@@ -71,6 +71,7 @@ libgnutls_x509_la_SOURCES =	\
 	pkcs7-output.c		\
 	virt-san.c		\
 	virt-san.h		\
+	spki.c			\
 	x509_ext_int.h		\
 	tls_features.c		\
 	krb5.c krb5.h		\

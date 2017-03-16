@@ -166,6 +166,20 @@ typedef struct gnutls_crypto_bigint {
 			     gnutls_bigint_format_t format);
 } gnutls_crypto_bigint_st;
 
+/* additional information about the public key
+ */
+typedef struct gnutls_x509_spki_st {
+	gnutls_pk_algorithm_t pk;
+	gnutls_digest_algorithm_t dig;
+
+	/* the size of salt used by RSA-PSS */
+	unsigned int salt_size;
+
+	/* if non-zero, the legacy value for PKCS#7 signatures will be
+	 * written for RSA signatures. */
+	unsigned int legacy;
+} gnutls_x509_spki_st;
+
 #define GNUTLS_MAX_PK_PARAMS 16
 
 typedef struct {
@@ -178,6 +192,7 @@ typedef struct {
 	unsigned int seed_size;
 	uint8_t seed[MAX_PVP_SEED_SIZE];
 	gnutls_digest_algorithm_t palgo;
+	gnutls_x509_spki_st sign;
 
 	gnutls_pk_algorithm_t algo;
 } gnutls_pk_params_st;
@@ -314,10 +329,12 @@ typedef struct gnutls_crypto_pk {
 
 	int (*sign) (gnutls_pk_algorithm_t, gnutls_datum_t * signature,
 		     const gnutls_datum_t * data,
-		     const gnutls_pk_params_st * priv);
+		     const gnutls_pk_params_st *priv,
+		     const gnutls_x509_spki_st *sign);
 	int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
 		       const gnutls_datum_t * sig,
-		       const gnutls_pk_params_st * pub);
+		       const gnutls_pk_params_st *pub,
+		       const gnutls_x509_spki_st *sign);
 	/* sanity checks the public key parameters */
 	int (*verify_priv_params) (gnutls_pk_algorithm_t,
 			      const gnutls_pk_params_st * priv);

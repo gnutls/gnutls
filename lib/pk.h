@@ -28,8 +28,8 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 
 #define _gnutls_pk_encrypt( algo, ciphertext, plaintext, params) _gnutls_pk_ops.encrypt( algo, ciphertext, plaintext, params)
 #define _gnutls_pk_decrypt( algo, ciphertext, plaintext, params) _gnutls_pk_ops.decrypt( algo, ciphertext, plaintext, params)
-#define _gnutls_pk_sign( algo, sig, data, params) _gnutls_pk_ops.sign( algo, sig, data, params)
-#define _gnutls_pk_verify( algo, data, sig, params) _gnutls_pk_ops.verify( algo, data, sig, params)
+#define _gnutls_pk_sign( algo, sig, data, params, sign_params) _gnutls_pk_ops.sign( algo, sig, data, params, sign_params)
+#define _gnutls_pk_verify( algo, data, sig, params, sign_params) _gnutls_pk_ops.verify( algo, data, sig, params, sign_params)
 #define _gnutls_pk_verify_priv_params( algo, params) _gnutls_pk_ops.verify_priv_params( algo, params)
 #define _gnutls_pk_verify_pub_params( algo, params) _gnutls_pk_ops.verify_pub_params( algo, params)
 #define _gnutls_pk_derive( algo, out, pub, priv) _gnutls_pk_ops.derive( algo, out, pub, priv)
@@ -100,5 +100,8 @@ int pk_prepare_hash(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 int pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 		 gnutls_pk_params_st * params, const gnutls_datum_t * data,
 		 gnutls_datum_t * digest);
+
+unsigned _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
+					unsigned salt_size);
 
 #endif				/* GNUTLS_PK_H */

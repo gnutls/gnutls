@@ -86,6 +86,7 @@ static void verify_certificate(common_info_st * cinfo);
 
 static void pubkey_keyid(common_info_st * cinfo);
 static void certificate_fpr(common_info_st * cinfo);
+static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt);
 
 FILE *outfile;
 static const char *outfile_name = NULL; /* to delete on exit */
@@ -165,7 +166,7 @@ generate_private_key_int(common_info_st * cinfo)
 			bits, gnutls_pk_algorithm_get_name(key_type));
 	}
 
-	if (provable && (key_type != GNUTLS_PK_RSA && key_type != GNUTLS_PK_DSA)) {
+	if (provable && (!GNUTLS_PK_IS_RSA(key_type) && key_type != GNUTLS_PK_DSA)) {
 		fprintf(stderr,
 			"The --provable parameter cannot be used with ECDSA keys.\n");
 		app_exit(1);
@@ -175,7 +176,7 @@ generate_private_key_int(common_info_st * cinfo)
 		fprintf(stderr,
 			"Note that DSA keys with size over 1024 may cause incompatibility problems when used with earlier than TLS 1.2 versions.\n\n");
 
-	if ((HAVE_OPT(SEED) || provable) && key_type == GNUTLS_PK_RSA) {
+	if ((HAVE_OPT(SEED) || provable) && GNUTLS_PK_IS_RSA(key_type)) {
 		if (bits != 2048 && bits != 3072) {
 			fprintf(stderr, "Note that the FIPS 186-4 key generation restricts keys to 2048 and 3072 bits\n");
 		}
@@ -188,7 +189,7 @@ generate_private_key_int(common_info_st * cinfo)
 		data.data = (void*)cinfo->seed;
 		data.size = cinfo->seed_size;
 
-		if (key_type == GNUTLS_PK_RSA) {
+		if (GNUTLS_PK_IS_RSA(key_type)) {
 			if ((bits == 3072 && cinfo->seed_size != 32) || (bits == 2048 && cinfo->seed_size != 28)) {
 				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)cinfo->seed_size);
 			}
@@ -200,9 +201,14 @@ generate_private_key_int(common_info_st * cinfo)
 
 		ret = gnutls_x509_privkey_generate2(key, key_type, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
 	} else {
+		gnutls_keygen_data_st data;
+
+		data.type = GNUTLS_KEYGEN_DIGEST;
+		data.size = default_dig;
+
 		if (provable)
 			flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
-		ret = gnutls_x509_privkey_generate(key, key_type, bits, flags);
+		ret = gnutls_x509_privkey_generate2(key, key_type, bits, flags, &data, 1);
 	}
 	if (ret < 0) {
 		fprintf(stderr, "privkey_generate: %s\n",
@@ -672,6 +678,30 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		app_exit(1);
 	}
 
+	/* Algorithm restriction.
+	 */
+	if (req_key_type == GNUTLS_PK_RSA_PSS) {
+		gnutls_x509_spki_t spki;
+
+		result = gnutls_x509_spki_init(&spki);
+		if (result < 0) {
+			fprintf(stderr, "spki_init: %s\n",
+				gnutls_strerror(result));
+			app_exit(1);
+		}
+
+		gnutls_x509_spki_set_pk_algorithm(spki, GNUTLS_PK_RSA_PSS);
+		gnutls_x509_spki_set_digest_algorithm(spki, get_dig(crt));
+
+		result = gnutls_x509_crt_set_pk_algorithm(crt, spki, 0);
+		gnutls_x509_spki_deinit(spki);
+		if (result < 0) {
+			fprintf(stderr, "error setting signing algorithm: %s\n",
+				gnutls_strerror(result));
+			app_exit(1);
+		}
+	}
+
 	*ret_key = key;
 	return crt;
 
@@ -840,6 +870,7 @@ void generate_self_signed(common_info_st * cinfo)
 	gnutls_privkey_t key;
 	size_t size;
 	int result;
+	unsigned int flags = 0;
 
 	fprintf(stdlog, "Generating a self signed certificate...\n");
 
@@ -854,8 +885,11 @@ void generate_self_signed(common_info_st * cinfo)
 
 	fprintf(stdlog, "\n\nSigning certificate...\n");
 
+	if (cinfo->rsa_pss_sign)
+		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+
 	result =
-	    gnutls_x509_crt_privkey_sign(crt, crt, key, get_dig(crt), 0);
+	    gnutls_x509_crt_privkey_sign(crt, crt, key, get_dig(crt), flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		app_exit(1);
@@ -883,6 +917,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	int result;
 	gnutls_privkey_t ca_key;
 	gnutls_x509_crt_t ca_crt;
+	unsigned int flags = 0;
 
 	fprintf(stdlog, "Generating a signed certificate...\n");
 
@@ -901,9 +936,12 @@ static void generate_signed_certificate(common_info_st * cinfo)
 
 	fprintf(stdlog, "\n\nSigning certificate...\n");
 
+	if (cinfo->rsa_pss_sign)
+		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
-					 get_dig(ca_crt), 0);
+					 get_dig(ca_crt), flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		app_exit(1);
@@ -931,6 +969,7 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 	gnutls_privkey_t key, eekey;
 	size_t size;
 	int result;
+	unsigned int flags = 0;
 
 	fprintf(stdlog, "Generating a proxy certificate...\n");
 
@@ -943,9 +982,12 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 
 	fprintf(stdlog, "\n\nSigning certificate...\n");
 
+	if (cinfo->rsa_pss_sign)
+		flags = GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, eecrt, eekey, get_dig(eecrt),
-					 0);
+					 flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		app_exit(1);
@@ -1005,6 +1047,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 	gnutls_privkey_t ca_key;
 	gnutls_x509_crt_t ca_crt;
 	time_t tim;
+	unsigned int flags = 0;
 
 	fprintf(stdlog, "Generating a signed certificate...\n");
 
@@ -1033,9 +1076,12 @@ static void update_signed_certificate(common_info_st * cinfo)
 
 	fprintf(stderr, "\n\nSigning certificate...\n");
 
+	if (cinfo->rsa_pss_sign)
+		flags = GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
-					 get_dig(ca_crt), 0);
+					 get_dig(ca_crt), flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		app_exit(1);
@@ -1116,6 +1162,8 @@ static void cmd_parser(int argc, char **argv)
 		req_key_type = GNUTLS_PK_DSA;
 	else if (HAVE_OPT(ECC))
 		req_key_type = GNUTLS_PK_ECC;
+	else if (HAVE_OPT(RSA_PSS))
+		req_key_type = GNUTLS_PK_RSA_PSS;
 	else
 		req_key_type = GNUTLS_PK_RSA;
 
@@ -1278,6 +1326,9 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.empty_password = 1;
 		cinfo.password = "";
 	}
+
+	if (HAVE_OPT(RSA_PSS_SIGN))
+		cinfo.rsa_pss_sign = 1;
 
 	if (HAVE_OPT(GENERATE_SELF_SIGNED))
 		generate_self_signed(&cinfo);

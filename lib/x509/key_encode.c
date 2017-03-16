@@ -144,6 +144,8 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,
 		memcpy(der->data, ASN1_NULL, ASN1_NULL_SIZE);
 		der->size = ASN1_NULL_SIZE;
 		return 0;
+	case GNUTLS_PK_RSA_PSS:
+		return _gnutls_x509_write_rsa_pss_params(&params->sign, der);
 	case GNUTLS_PK_EC:
 		return _gnutls_x509_write_ecc_params(params->flags, der);
 	default:
@@ -160,6 +162,7 @@ _gnutls_x509_write_pubkey(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_write_dsa_pubkey(params, der);
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_x509_write_rsa_pubkey(params, der);
 	case GNUTLS_PK_EC:
 		return _gnutls_x509_write_ecc_pubkey(params, der);
@@ -281,6 +284,117 @@ _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 	result = 0;
 
       cleanup:
+	asn1_delete_structure(&spk);
+	return result;
+}
+
+int
+_gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
+				  gnutls_datum_t *der)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	const char *oid;
+	gnutls_datum_t tmp = { NULL, 0 };
+
+	der->data = NULL;
+	der->size = 0;
+
+	if ((result = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPSSParameters", &spk))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	oid = gnutls_digest_get_oid(params->dig);
+
+	if ((result = asn1_write_value(spk, "hashAlgorithm.algorithm", oid, 1))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(spk, "hashAlgorithm.parameters", NULL, 0))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result =
+	     asn1_write_value(spk, "maskGenAlgorithm.algorithm",
+			      PKIX1_RSA_PSS_MGF1_OID, 1))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_create_element
+	     (_gnutls_get_pkix(), "PKIX1.AlgorithmIdentifier", &c2))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(c2, "algorithm", oid, 1))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(c2, "parameters", NULL, 0))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode(c2, "", &tmp, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if ((result =
+	     asn1_write_value(spk, "maskGenAlgorithm.parameters",
+			      tmp.data, tmp.size))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_write_uint32(spk, "saltLength",
+					   params->salt_size);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_write_uint32(spk, "trailerField", 1);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode(spk, "", der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = 0;
+
+      cleanup:
+	_gnutls_free_datum(&tmp);
+	asn1_delete_structure(&c2);
 	asn1_delete_structure(&spk);
 	return result;
 }
@@ -681,6 +795,7 @@ int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_asn1_encode_rsa(c2, params, compat);
 	case GNUTLS_PK_DSA:
 		return _gnutls_asn1_encode_dsa(c2, params, compat);

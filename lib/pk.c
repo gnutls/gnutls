@@ -332,6 +332,8 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 	}
 	dst->palgo = src->palgo;
 
+	memcpy(&dst->sign, &src->sign, sizeof(gnutls_x509_spki_st));
+
 	return 0;
 
 fail:
@@ -372,6 +374,24 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
 		gnutls_memset(p->raw_priv.data, 0, p->raw_priv.size);
 		p->raw_priv.size = 0;
 	}
+}
+
+unsigned
+_gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
+			       unsigned salt_size)
+{
+	unsigned max_salt_size, digest_size;
+
+	digest_size = _gnutls_hash_get_algo_len(me);
+	max_salt_size = (bits + 7) / 8 - digest_size - 2;
+
+	if (salt_size < digest_size)
+		salt_size = digest_size;
+
+	if (salt_size > max_salt_size)
+		salt_size = max_salt_size;
+
+	return salt_size;
 }
 
 /* Writes the digest information and the digest in a DER encoded
@@ -596,7 +616,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (params->algo != GNUTLS_PK_RSA) {
+	if (!GNUTLS_PK_IS_RSA(params->algo)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -890,6 +910,7 @@ pk_prepare_hash(gnutls_pk_algorithm_t pk,
 
 		_gnutls_free_datum(&old_digest);
 		break;
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_EC:
 		break;

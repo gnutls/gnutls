@@ -67,6 +67,7 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 
 	switch (pkey->pk_algorithm) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_EC:
 		ret =
 		    gnutls_x509_privkey_export2(pkey, GNUTLS_X509_FMT_DER,
@@ -939,6 +940,44 @@ _decode_pkcs8_rsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	return ret;
 }
 
+/* Decodes an RSA-PSS privateKey from a PKCS8 structure.
+ */
+static int
+_decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
+{
+	int ret;
+	gnutls_datum_t tmp;
+	gnutls_x509_spki_st params;
+
+	ret = _gnutls_x509_read_value(pkcs8_asn,
+				      "privateKeyAlgorithm.parameters", &tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = _gnutls_x509_read_rsa_pss_params(tmp.data, tmp.size, &params);
+	_gnutls_free_key_datum(&tmp);
+
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = _decode_pkcs8_rsa_key(pkcs8_asn, pkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	memcpy(&pkey->params.sign, &params, sizeof(gnutls_x509_spki_st));
+
+	ret = 0;
+
+      error:
+	return ret;
+}
+
 /* Decodes an ECC privateKey from a PKCS8 structure.
  */
 static int
@@ -1120,6 +1159,8 @@ decode_private_key_info(const gnutls_datum_t * der,
 
 	if (pkey->pk_algorithm == GNUTLS_PK_RSA)
 		result = _decode_pkcs8_rsa_key(pkcs8_asn, pkey);
+	else if (pkey->pk_algorithm == GNUTLS_PK_RSA_PSS)
+		result = _decode_pkcs8_rsa_pss_key(pkcs8_asn, pkey);
 	else if (pkey->pk_algorithm == GNUTLS_PK_DSA)
 		result = _decode_pkcs8_dsa_key(pkcs8_asn, pkey);
 	else if (pkey->pk_algorithm == GNUTLS_PK_EC)

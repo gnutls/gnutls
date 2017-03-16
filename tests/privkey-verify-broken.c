@@ -45,12 +45,13 @@ const gnutls_datum_t raw_data = {
 	11
 };
 
-static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned vflags)
+static int sign_verify_data2(gnutls_x509_privkey_t pkey, unsigned algo, unsigned sflags, unsigned vflags)
 {
 	int ret;
 	gnutls_privkey_t privkey;
 	gnutls_pubkey_t pubkey;
 	gnutls_datum_t signature;
+	gnutls_pk_algorithm_t pk;
 
 	/* sign arbitrary data */
 	assert(gnutls_privkey_init(&privkey) >= 0);
@@ -59,7 +60,7 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned 
 	if (ret < 0)
 		fail("gnutls_pubkey_import_x509\n");
 
-	ret = gnutls_privkey_sign_data(privkey, algo, 0,
+	ret = gnutls_privkey_sign_data(privkey, algo, sflags,
 					&raw_data, &signature);
 	if (ret < 0) {
 		ret = -1;
@@ -73,7 +74,12 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned 
 	if (ret < 0)
 		fail("gnutls_pubkey_import_privkey\n");
 
-	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm(pubkey, NULL),algo),
+	if (sflags & GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS)
+		pk = GNUTLS_PK_RSA_PSS;
+	else
+		pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+
+	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, algo),
 				vflags, &raw_data, &signature);
 	if (ret < 0) {
 		ret = -1;
@@ -87,6 +93,11 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned 
 	gnutls_free(signature.data);
 
 	return ret;
+}
+
+static int sign_verify_data(gnutls_x509_privkey_t pkey, unsigned algo, unsigned vflags)
+{
+	return sign_verify_data2(pkey, algo, 0, vflags);
 }
 
 void doit(void)
@@ -123,7 +134,7 @@ void doit(void)
 		fail("failed verification with SHA1 and override flags2!\n");
 
 	if (sign_verify_data(pkey, GNUTLS_DIG_MD5, 0) >= 0)
-		fail("succeeded verification with SHA1!\n");
+		fail("succeeded verification with MD5!\n");
 
 	if (!gnutls_fips140_mode_enabled()) {
 		if (sign_verify_data(pkey, GNUTLS_DIG_MD5, GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5) < 0)
@@ -141,6 +152,9 @@ void doit(void)
 
 	if (sign_verify_data(pkey, GNUTLS_DIG_SHA3_256, 0) < 0)
 		fail("failed verification with SHA3-256!\n");
+
+	if (sign_verify_data2(pkey, GNUTLS_DIG_SHA256, GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS, GNUTLS_VERIFY_USE_RSA_PSS) < 0)
+		fail("failed verification with SHA256 with PSS!\n");
 
 	gnutls_x509_privkey_deinit(pkey);
 

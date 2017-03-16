@@ -46,6 +46,7 @@
 /* public key algorithm's OIDs
  */
 #define PK_PKIX1_RSA_OID "1.2.840.113549.1.1.1"
+#define PK_PKIX1_RSA_PSS_OID "1.2.840.113549.1.1.10"
 #define PK_X509_RSA_OID "2.5.8.1.1"
 #define PK_DSA_OID "1.2.840.10040.4.1"
 #define PK_GOST_R3410_94_OID "1.2.643.2.2.20"
@@ -89,6 +90,7 @@
 
 #define XMPP_OID "1.3.6.1.5.5.7.8.5"
 #define KRB5_PRINCIPAL_OID "1.3.6.1.5.2.2"
+#define PKIX1_RSA_PSS_MGF1_OID "1.2.840.113549.1.1.8"
 
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2

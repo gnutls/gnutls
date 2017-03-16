@@ -1240,19 +1240,48 @@ int
 _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
 {
 	int result;
+	char name[128];
 	gnutls_datum_t sa = {NULL, 0};
 
-	/* Read the signature algorithm. Note that parameters are not
-	 * read. They will be read from the issuer's certificate if needed.
-	 */
-	result = _gnutls_x509_read_value(src, src_name, &sa);
+	_gnutls_str_cpy(name, sizeof(name), src_name);
+	_gnutls_str_cat(name, sizeof(name), ".algorithm");
+
+	/* Read the signature algorithm */
+	result = _gnutls_x509_read_value(src, name, &sa);
 
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	result = gnutls_oid_to_sign((char *) sa.data);
+	/* Read the signature parameters. Unless the algorithm is
+	 * RSA-PSS, parameters are not read. They will be read from
+	 * the issuer's certificate if needed.
+	 */
+	if (sa.data && strcmp ((char *) sa.data, PK_PKIX1_RSA_PSS_OID) == 0) {
+		gnutls_datum_t der = {NULL, 0};
+		gnutls_x509_spki_st params;
+
+		_gnutls_str_cpy(name, sizeof(name), src_name);
+		_gnutls_str_cat(name, sizeof(name), ".parameters");
+
+		result = _gnutls_x509_read_value(src, name, &der);
+		if (result < 0) {
+			_gnutls_free_datum(&sa);
+			return gnutls_assert_val(result);
+		}
+
+		result = _gnutls_x509_read_rsa_pss_params(der.data, der.size,
+							  &params);
+		_gnutls_free_datum(&der);
+
+		if (result == 0)
+			result = gnutls_pk_to_sign(params.pk, params.dig);
+		else if (result == GNUTLS_E_UNKNOWN_ALGORITHM)
+			result = GNUTLS_SIGN_UNKNOWN;
+	} else {
+		result = gnutls_oid_to_sign((char *) sa.data);
+	}
 
 	_gnutls_free_datum(&sa);
 

@@ -2348,6 +2348,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	gnutls_datum_t signature = { NULL, 0 };
 	const mac_entry_st *me = hash_to_entry(dig);
 	unsigned pk, sigalgo;
+	gnutls_x509_spki_st key_params, params;
 
 	if (pkcs7 == NULL || me == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
@@ -2485,15 +2486,35 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	/* write the signature algorithm */
 	pk = gnutls_x509_crt_get_pk_algorithm(signer, NULL);
 
+	ret = _gnutls_privkey_get_sign_params(signer_key, &key_params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_x509_crt_get_sign_params(signer, &key_params, &params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_privkey_find_sign_params(signer_key, pk, dig, 0,
+						  &params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
 	/* RFC5652 is silent on what the values would be and initially I assumed that
 	 * typical signature algorithms should be set. However RFC2315 (PKCS#7) mentions
 	 * that a generic RSA OID should be used. We switch to this "unexpected" value
 	 * because some implementations cannot cope with the "expected" signature values.
 	 */
+	params.legacy = 1;
 	ret =
-	    _gnutls_x509_write_sig_params(pkcs7->signed_data,
-					  "signerInfos.?LAST.signatureAlgorithm",
-					  pk, dig, 1);
+	    _gnutls_x509_write_sign_params(pkcs7->signed_data,
+					   "signerInfos.?LAST.signatureAlgorithm",
+					   &params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2515,8 +2536,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	ret =
-	    gnutls_privkey_sign_data(signer_key, dig, 0, &sigdata, &signature);
+	ret = privkey_sign_data(signer_key, &sigdata, &signature, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

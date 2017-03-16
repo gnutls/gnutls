@@ -579,6 +579,12 @@ typedef struct verify_state_st {
 	out |= (x|GNUTLS_CERT_INVALID); \
 	result = 0; }
 
+static int _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
+				    const gnutls_datum_t * data,
+				    const gnutls_datum_t * signature,
+				    gnutls_x509_crt_t cert,
+				    gnutls_x509_crt_t issuer);
+
 /* 
  * Verifies the given certificate against a certificate list of
  * trusted CAs.
@@ -602,9 +608,8 @@ verify_crt(gnutls_x509_crt_t cert,
 	gnutls_datum_t cert_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_x509_crt_t issuer = NULL;
-	int issuer_version, hash_algo;
+	int issuer_version;
 	unsigned result = 1;
-	const mac_entry_st * me;
 	unsigned int out = 0, usage;
 	int sigalg, ret;
 
@@ -639,7 +644,7 @@ verify_crt(gnutls_x509_crt_t cert,
 
 	ret =
 	    _gnutls_x509_get_signature_algorithm(cert->cert,
-						 "signatureAlgorithm.algorithm");
+						 "signatureAlgorithm");
 	if (ret < 0) {
 		MARK_INVALID(0);
 	}
@@ -733,22 +738,17 @@ verify_crt(gnutls_x509_crt_t cert,
 			}
 		}
 
-		if (sigalg >= 0) {
-			hash_algo = gnutls_sign_get_hash_algorithm(sigalg);
-			me = mac_to_entry(hash_algo);
-		} else {
-			me = NULL;
-		}
-
-		if (me == NULL) {
+		if (sigalg < 0) {
 			MARK_INVALID(0);
 		} else if (cert_signed_data.data != NULL &&
-			   cert_signature.data != NULL) {
+		    cert_signature.data != NULL) {
 			ret =
-			    _gnutls_x509_verify_data(me,
+			    _gnutls_x509_verify_data(sigalg,
 						     &cert_signed_data,
 						     &cert_signature,
+						     cert,
 						     issuer);
+
 			if (ret == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 				MARK_INVALID(GNUTLS_CERT_SIGNATURE_FAILURE);
 			} else if (ret < 0) {
@@ -1273,6 +1273,45 @@ cleanup:
 }
 #endif
 
+static int
+_gnutls_x509_validate_sign_params(gnutls_pk_algorithm_t pk_algorithm,
+				  ASN1_TYPE cert,
+				  const char *name,
+				  gnutls_x509_spki_st *sig_params)
+{
+	/* The signature parameter validation is only needed for RSA-PSS */
+	if (pk_algorithm == GNUTLS_PK_RSA_PSS) {
+		int result;
+		gnutls_x509_spki_st params;
+
+		result = _gnutls_x509_read_sign_params(cert, name, &params);
+		if (result < 0) {
+			/* If parameters field is absent, no parameter
+			 * validation is needed */
+			if (result != GNUTLS_E_ASN1_ELEMENT_NOT_FOUND &&
+			    result != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+				gnutls_assert();
+				return result;
+			}
+		} else {
+			/* Check if the underlying hash algorithms are same.  */
+			if (sig_params->dig != params.dig) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
+
+			/* The salt length used to generate the
+			 * signature must be equal to or larger than
+			 * the one in the key parameter. */
+			if (sig_params->salt_size < params.salt_size) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
+		}
+	}
+	return 0;
+}
+
 /* verifies if the certificate is properly signed.
  * returns GNUTLS_E_PK_VERIFY_SIG_FAILED on failure and 1 on success.
  * 
@@ -1280,33 +1319,71 @@ cleanup:
  * 'signature' is the signature!
  */
 int
-_gnutls_x509_verify_data(const mac_entry_st * me,
+_gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 			 const gnutls_datum_t * data,
 			 const gnutls_datum_t * signature,
+			 gnutls_x509_crt_t cert,
 			 gnutls_x509_crt_t issuer)
 {
-	gnutls_pk_params_st issuer_params;
+	gnutls_pk_params_st params;
+	gnutls_pk_algorithm_t issuer_pk;
 	int ret;
+	gnutls_x509_spki_st sign_params;
+	const mac_entry_st * me;
 
 	/* Read the MPI parameters from the issuer's certificate.
 	 */
-	ret = _gnutls_x509_crt_get_mpis(issuer, &issuer_params);
+	ret = _gnutls_x509_crt_get_mpis(issuer, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret =
-	    pubkey_verify_data(gnutls_x509_crt_get_pk_algorithm
-			       (issuer, NULL), me, data, signature,
-			       &issuer_params);
+	issuer_pk = gnutls_x509_crt_get_pk_algorithm(issuer, NULL);
+
+	if (cert != NULL) {
+		ret = _gnutls_x509_read_sign_params(cert->cert,
+						    "signatureAlgorithm",
+						    &sign_params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _gnutls_x509_validate_sign_params(issuer_pk,
+							issuer->cert,
+							"tbsCertificate."
+							"subjectPublicKeyInfo."
+							"algorithm",
+							&sign_params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else {
+		memcpy(&sign_params, &params.sign,
+		       sizeof(gnutls_x509_spki_st));
+		sign_params.pk = gnutls_sign_get_pk_algorithm(sign);
+		sign_params.dig = gnutls_sign_get_hash_algorithm(sign);
+	}
+
+	me = hash_to_entry(sign_params.dig);
+	if (unlikely(me == NULL)) {
+		gnutls_assert();
+		ret = GNUTLS_E_CERTIFICATE_ERROR;
+		goto cleanup;
+	}
+
+	ret = pubkey_verify_data(sign_params.pk, me, data, signature, &params,
+				 &sign_params);
 	if (ret < 0) {
 		gnutls_assert();
 	}
 
+ cleanup:
 	/* release all allocated MPIs
 	 */
-	gnutls_pk_params_release(&issuer_params);
+	gnutls_pk_params_release(&params);
 
 	return ret;
 }
@@ -1477,7 +1554,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 	gnutls_datum_t crl_signed_data = { NULL, 0 };
 	gnutls_datum_t crl_signature = { NULL, 0 };
 	gnutls_x509_crt_t issuer = NULL;
-	int result, hash_algo;
+	int result, sigalg;
 	time_t now = gnutls_time(0);
 	unsigned int usage;
 
@@ -1507,17 +1584,15 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 		goto cleanup;
 	}
 
-	result =
+	sigalg =
 	    _gnutls_x509_get_signature_algorithm(crl->crl,
-						 "signatureAlgorithm.algorithm");
-	if (result < 0) {
+						 "signatureAlgorithm");
+	if (sigalg < 0) {
 		gnutls_assert();
 		if (verify)
 			*verify |= GNUTLS_CERT_INVALID;
 		goto cleanup;
 	}
-
-	hash_algo = gnutls_sign_get_hash_algorithm(result);
 
 	/* issuer is not in trusted certificate
 	 * authorities.
@@ -1556,8 +1631,9 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 		}
 
 		result =
-		    _gnutls_x509_verify_data(mac_to_entry(hash_algo),
+		    _gnutls_x509_verify_data(sigalg,
 					     &crl_signed_data, &crl_signature,
+					     NULL,
 					     issuer);
 		if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 			gnutls_assert();
@@ -1576,8 +1652,6 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 	}
 
 	{
-		int sigalg;
-
 		sigalg = gnutls_x509_crl_get_signature_algorithm(crl);
 
 		if (((sigalg == GNUTLS_SIGN_RSA_MD2) &&

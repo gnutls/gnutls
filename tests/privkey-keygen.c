@@ -103,9 +103,10 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	for (i = 0; i < MAX_TRIES; i++) {
-		for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_EC;
+		for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_RSA_PSS;
 		     algorithm++) {
-			if (algorithm == GNUTLS_PK_DH)
+			if (algorithm == GNUTLS_PK_DH ||
+			    algorithm == GNUTLS_PK_ECDHX)
 				continue;
 
 			ret = gnutls_x509_privkey_init(&pkey);

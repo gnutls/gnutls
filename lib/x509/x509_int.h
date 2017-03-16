@@ -156,8 +156,12 @@ int _gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
 			 gnutls_datum_t * tbs);
 int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 			   gnutls_digest_algorithm_t,
+			   unsigned int flags,
 			   gnutls_x509_crt_t issuer,
 			   gnutls_privkey_t issuer_key);
+int _gnutls_x509_crt_get_sign_params(gnutls_x509_crt_t issuer,
+				     const gnutls_x509_spki_st *key_params,
+				     gnutls_x509_spki_st *params);
 
 /* dn.c */
 #define OID_X520_COUNTRY_NAME		"2.5.4.6"
@@ -229,11 +233,6 @@ _gnutls_x509_verify_algorithm(gnutls_digest_algorithm_t * hash,
 			      gnutls_pk_algorithm_t pk,
 			      gnutls_pk_params_st * issuer_params);
 
-int _gnutls_x509_verify_data(const mac_entry_st * me,
-			     const gnutls_datum_t * data,
-			     const gnutls_datum_t * signature,
-			     gnutls_x509_crt_t issuer);
-
 /* privkey.h */
 void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key);
 
@@ -251,6 +250,19 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 
 int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
 				gnutls_pk_params_st * params, unsigned compat);
+
+int _gnutls_x509_privkey_get_sign_params(gnutls_x509_privkey_t key,
+					 gnutls_x509_spki_st * params);
+int _gnutls_x509_privkey_find_sign_params(gnutls_x509_privkey_t key,
+					  gnutls_pk_algorithm_t pk,
+					  gnutls_digest_algorithm_t dig,
+					  unsigned flags,
+					  gnutls_x509_spki_st *params);
+
+int _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
+				     gnutls_x509_spki_st * params);
+int _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st * params,
+				      gnutls_datum_t * der);
 
 /* extensions.c */
 int _gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl,
@@ -312,12 +324,23 @@ int _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
 int _gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert,
 			      gnutls_pk_params_st * params);
 
+int _gnutls_x509_crt_read_sign_params(gnutls_x509_crt_t crt,
+				      gnutls_x509_spki_st *params);
+int _gnutls_x509_crq_read_sign_params(gnutls_x509_crq_t crt,
+				      gnutls_x509_spki_st *params);
+
 int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t, uint8_t * der,
 				    int dersize,
 				    gnutls_pk_params_st * params);
+int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
+				     gnutls_pk_params_st * params);
 
 int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t, uint8_t * der,
 			     int dersize, gnutls_pk_params_st * params);
+
+int _gnutls_x509_read_pubkey_signature_params(gnutls_pk_algorithm_t algo,
+					      uint8_t * der, int dersize,
+					      gnutls_pk_params_st * params);
 
 int _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 				  gnutls_datum_t * der);
@@ -352,9 +375,10 @@ int _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 			   int lz);
 
-int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
-				  gnutls_pk_algorithm_t pk_algorithm,
-				  gnutls_digest_algorithm_t, unsigned legacy);
+int _gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
+				  gnutls_x509_spki_st *params);
+int _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
+				   gnutls_x509_spki_st *params);
 
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>

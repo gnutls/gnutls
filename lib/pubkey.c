@@ -43,6 +43,7 @@ unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params)
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_mpi_get_nbits(params->params[RSA_MODULUS]);
 	case GNUTLS_PK_DSA:
 		return _gnutls_mpi_get_nbits(params->params[DSA_P]);
@@ -294,6 +295,7 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 		ret = 0;
 		break;
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		if (hash)
 			*hash = GNUTLS_DIG_SHA256;
 		ret = 0;
@@ -371,6 +373,7 @@ gnutls_pubkey_import_pkcs11(gnutls_pubkey_t key,
 
 	switch (obj->pk_algorithm) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		ret = gnutls_pubkey_import_rsa_raw(key, &obj->pubkey[0],
 						   &obj->pubkey[1]);
 		break;
@@ -838,7 +841,7 @@ gnutls_pubkey_export_rsa_raw(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (key->pk_algorithm != GNUTLS_PK_RSA) {
+	if (!GNUTLS_PK_IS_RSA(key->pk_algorithm)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -1611,6 +1614,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 {
 	int ret;
 	const mac_entry_st *me;
+	gnutls_x509_spki_st params;
 
 	if (pubkey == NULL) {
 		gnutls_assert();
@@ -1620,12 +1624,32 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	if (flags & OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA || flags & GNUTLS_VERIFY_USE_TLS1_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	me = hash_to_entry(gnutls_sign_get_hash_algorithm(algo));
+	memcpy(&params, &pubkey->params.sign, sizeof(gnutls_x509_spki_st));
+
+	params.pk = pubkey->pk_algorithm;
+	params.dig = gnutls_sign_get_hash_algorithm(algo);
+	me = hash_to_entry(params.dig);
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = pubkey_verify_data(pubkey->pk_algorithm, me,
-				 data, signature, &pubkey->params);
+	if (flags & GNUTLS_VERIFY_USE_RSA_PSS) {
+		unsigned bits;
+
+		if (!GNUTLS_PK_IS_RSA(pubkey->pk_algorithm))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		/* The requested sign algorithm is RSA-PSS, while the
+		 * pubkey doesn't include parameter information. Fill
+		 * it with the same way as gnutls_privkey_sign*. */
+		if (pubkey->pk_algorithm == GNUTLS_PK_RSA) {
+			gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
+			params.salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+		}
+		params.pk = GNUTLS_PK_RSA_PSS;
+	}
+
+	ret = pubkey_verify_data(params.pk, me, data, signature, &pubkey->params,
+				 &params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1664,20 +1688,54 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 			   const gnutls_datum_t * signature)
 {
 	const mac_entry_st *me;
+	gnutls_x509_spki_st params;
 
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	memcpy(&params, &key->params.sign, sizeof(gnutls_x509_spki_st));
+
 	if (flags & OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA || flags & GNUTLS_VERIFY_USE_TLS1_RSA) {
-		return _gnutls_pk_verify(GNUTLS_PK_RSA, hash, signature,
-					 &key->params);
+		params.pk = GNUTLS_PK_RSA;
+		return _gnutls_pk_verify(params.pk, hash, signature,
+					 &key->params, &params);
 	} else {
-		me = hash_to_entry(gnutls_sign_get_hash_algorithm(algo));
-		return pubkey_verify_hashed_data(key->pk_algorithm, me,
+		params.pk = key->pk_algorithm;
+		params.dig = gnutls_sign_get_hash_algorithm(algo);
+		/* This can be NULL here, if pubkey is DSA. For RSA it
+		 * is checked below. */
+		me = hash_to_entry(params.dig);
+
+		if (flags & GNUTLS_VERIFY_USE_RSA_PSS) {
+			int ret;
+			gnutls_pk_algorithm_t pk;
+			unsigned bits;
+
+			ret = gnutls_pubkey_get_pk_algorithm(key, &bits);
+			if (ret < 0) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
+
+			pk = ret;
+
+			/* The requested sign algorithm is RSA-PSS, while the
+			 * pubkey doesn't include parameter information */
+			if (pk == GNUTLS_PK_RSA) {
+				if (me == NULL)
+					return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				params.salt_size =
+				    _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+			}
+			params.pk = GNUTLS_PK_RSA_PSS;
+		}
+
+		return pubkey_verify_hashed_data(params.pk, me,
 						 hash, signature,
-						 &key->params);
+						 &key->params,
+						 &params);
 	}
 }
 
@@ -1785,7 +1843,8 @@ _pkcs1_rsa_verify_sig(const mac_entry_st * me,
 		      const gnutls_datum_t * text,
 		      const gnutls_datum_t * prehash,
 		      const gnutls_datum_t * signature,
-		      gnutls_pk_params_st * params)
+		      gnutls_pk_params_st * params,
+		      gnutls_x509_spki_st * sign_params)
 {
 	int ret;
 	uint8_t md[MAX_HASH_SIZE], *cmp;
@@ -1823,7 +1882,8 @@ _pkcs1_rsa_verify_sig(const mac_entry_st * me,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_pk_verify(GNUTLS_PK_RSA, &di, signature, params);
+	ret = _gnutls_pk_verify(GNUTLS_PK_RSA, &di, signature, params,
+				sign_params);
 	_gnutls_free_datum(&di);
 
 	return ret;
@@ -1836,7 +1896,8 @@ dsa_verify_hashed_data(gnutls_pk_algorithm_t pk,
 		       const mac_entry_st * algo,
 		       const gnutls_datum_t * hash,
 		       const gnutls_datum_t * signature,
-		       gnutls_pk_params_st * params)
+		       gnutls_pk_params_st * params,
+		       gnutls_x509_spki_st * sign_params)
 {
 	gnutls_datum_t digest;
 	unsigned int hash_len;
@@ -1863,7 +1924,7 @@ dsa_verify_hashed_data(gnutls_pk_algorithm_t pk,
 	digest.data = hash->data;
 	digest.size = hash->size;
 
-	return _gnutls_pk_verify(pk, &digest, signature, params);
+	return _gnutls_pk_verify(pk, &digest, signature, params, sign_params);
 }
 
 static int
@@ -1871,7 +1932,8 @@ dsa_verify_data(gnutls_pk_algorithm_t pk,
 		const mac_entry_st * algo,
 		const gnutls_datum_t * data,
 		const gnutls_datum_t * signature,
-		gnutls_pk_params_st * params)
+		gnutls_pk_params_st * params,
+		gnutls_x509_spki_st * sign_params)
 {
 	int ret;
 	uint8_t _digest[MAX_HASH_SIZE];
@@ -1888,7 +1950,7 @@ dsa_verify_data(gnutls_pk_algorithm_t pk,
 	digest.data = _digest;
 	digest.size = _gnutls_hash_get_algo_len(algo);
 
-	return _gnutls_pk_verify(pk, &digest, signature, params);
+	return _gnutls_pk_verify(pk, &digest, signature, params, sign_params);
 }
 
 /* Verifies the signature data, and returns GNUTLS_E_PK_SIG_VERIFY_FAILED if 
@@ -1896,17 +1958,16 @@ dsa_verify_data(gnutls_pk_algorithm_t pk,
  */
 int
 pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
-			  const mac_entry_st * hash_algo,
+			  const mac_entry_st *hash_algo,
 			  const gnutls_datum_t * hash,
 			  const gnutls_datum_t * signature,
-			  gnutls_pk_params_st * issuer_params)
+			  gnutls_pk_params_st * params,
+			  gnutls_x509_spki_st * sign_params)
 {
-
 	switch (pk) {
 	case GNUTLS_PK_RSA:
-
 		if (_pkcs1_rsa_verify_sig
-		    (hash_algo, NULL, hash, signature, issuer_params) != 0)
+		    (hash_algo, NULL, hash, signature, params, sign_params) != 0)
 		{
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -1915,10 +1976,11 @@ pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
 		return 1;
 		break;
 
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_EC:
 	case GNUTLS_PK_DSA:
 		if (dsa_verify_hashed_data
-		    (pk, hash_algo, hash, signature, issuer_params) != 0) {
+		    (pk, hash_algo, hash, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
@@ -1940,14 +2002,13 @@ pubkey_verify_data(gnutls_pk_algorithm_t pk,
 		   const mac_entry_st * me,
 		   const gnutls_datum_t * data,
 		   const gnutls_datum_t * signature,
-		   gnutls_pk_params_st * issuer_params)
+		   gnutls_pk_params_st * params,
+		   gnutls_x509_spki_st * sign_params)
 {
-
 	switch (pk) {
 	case GNUTLS_PK_RSA:
-
 		if (_pkcs1_rsa_verify_sig
-		    (me, data, NULL, signature, issuer_params) != 0) {
+		    (me, data, NULL, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
@@ -1955,10 +2016,11 @@ pubkey_verify_data(gnutls_pk_algorithm_t pk,
 		return 1;
 		break;
 
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_EC:
 	case GNUTLS_PK_DSA:
-		if (dsa_verify_data(pk, me, data, signature, issuer_params)
-		    != 0) {
+		if (dsa_verify_data
+		    (pk, me, data, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}

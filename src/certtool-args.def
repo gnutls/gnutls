@@ -458,6 +458,18 @@ flag = {
 };
 
 flag = {
+    name      = rsa-pss;
+    descrip   = "Generate RSA-PSS key or certificate";
+    doc = "This option can be combined with --generate-privkey or --generate-certificate, to generate private key or certificate restricted to the use with the RSA-PSS padding scheme.";
+};
+
+flag = {
+    name      = rsa-pss-sign;
+    descrip   = "Sign certificate with RSA-PSS";
+    doc = "This option can be combined with --generate-certificate, to sign the certificate with the RSA-PSS padding scheme.";
+};
+
+flag = {
     name      = hash;
     arg-type  = string;
     descrip   = "Hash algorithm to use for signing";

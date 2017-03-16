@@ -701,6 +701,7 @@ typedef enum gnutls_certificate_print_formats {
  * gnutls_pk_algorithm_t:
  * @GNUTLS_PK_UNKNOWN: Unknown public-key algorithm.
  * @GNUTLS_PK_RSA: RSA public-key algorithm.
+ * @GNUTLS_PK_RSA_PSS: RSA public-key algorithm, with PSS padding.
  * @GNUTLS_PK_DSA: DSA public-key algorithm.
  * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
  * @GNUTLS_PK_ECDSA: Elliptic curve algorithm. These parameters are compatible with the ECDSA and ECDH algorithm.
@@ -715,7 +716,8 @@ typedef enum {
 	GNUTLS_PK_DH = 3,
 	GNUTLS_PK_ECDSA = 4,
 	GNUTLS_PK_ECDHX = 5,
-	GNUTLS_PK_MAX = GNUTLS_PK_ECDHX
+	GNUTLS_PK_RSA_PSS = 6,
+	GNUTLS_PK_MAX = GNUTLS_PK_RSA_PSS
 } gnutls_pk_algorithm_t;
 
 
@@ -756,6 +758,9 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_RSA_SHA3_256: Digital signature algorithm RSA with SHA3-256.
  * @GNUTLS_SIGN_RSA_SHA3_384: Digital signature algorithm RSA with SHA3-384.
  * @GNUTLS_SIGN_RSA_SHA3_512: Digital signature algorithm RSA with SHA3-512.
+ * @GNUTLS_SIGN_RSA_PSS_SHA256: Digital signature algorithm RSA with SHA-256, with PSS padding.
+ * @GNUTLS_SIGN_RSA_PSS_SHA384: Digital signature algorithm RSA with SHA-384, with PSS padding.
+ * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding.
  *
  * Enumeration of different digital signature algorithms.
  */
@@ -794,7 +799,11 @@ typedef enum {
 	GNUTLS_SIGN_RSA_SHA3_256 = 29,
 	GNUTLS_SIGN_RSA_SHA3_384 = 30,
 	GNUTLS_SIGN_RSA_SHA3_512 = 31,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_SHA3_512
+
+	GNUTLS_SIGN_RSA_PSS_SHA256 = 32,
+	GNUTLS_SIGN_RSA_PSS_SHA384 = 33,
+	GNUTLS_SIGN_RSA_PSS_SHA512 = 34,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_PSS_SHA512
 } gnutls_sign_algorithm_t;
 
 /**

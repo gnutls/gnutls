@@ -50,6 +50,9 @@
 #include <nettle/curve25519.h>
 #include <gnettle.h>
 #include <fips.h>
+#ifndef HAVE_NETTLE_RSA_PSS
+#include "rsa-pss.h"
+#endif
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 
@@ -484,13 +487,80 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 	return ret;
 }
 
+static int
+_rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
+			const struct rsa_public_key *pub,
+			const struct rsa_private_key *priv,
+			void *rnd_ctx, nettle_random_func *rnd_func,
+			size_t salt_size,
+			const uint8_t *digest,
+			mpz_t s)
+{
+	int (*sign_func)(const struct rsa_public_key *,
+			const struct rsa_private_key *,
+			void *, nettle_random_func *,
+			size_t, const uint8_t *,
+			const uint8_t *,
+			mpz_t);
+	uint8_t *salt = NULL;
+	size_t hash_size;
+	int ret;
+
+	switch (dig) {
+	case GNUTLS_DIG_SHA256:
+		sign_func = rsa_pss_sha256_sign_digest_tr;
+		hash_size = 32;
+		break;
+	case GNUTLS_DIG_SHA384:
+		sign_func = rsa_pss_sha384_sign_digest_tr;
+		hash_size = 48;
+		break;
+	case GNUTLS_DIG_SHA512:
+		sign_func = rsa_pss_sha512_sign_digest_tr;
+		hash_size = 64;
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ALGORITHM;
+	}
+
+	/* This is also checked in pss_encode_mgf1, but error out earlier.  */
+	if (hash_size + salt_size + 2 > pub->size)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
+	if (salt_size > 0) {
+		salt = gnutls_malloc(salt_size);
+		if (salt == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		ret = gnutls_rnd(GNUTLS_RND_NONCE, salt, salt_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	ret = sign_func(pub, priv, rnd_ctx, rnd_func, salt_size, salt,
+			digest, s);
+	if (ret == 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_PK_SIGN_FAILED;
+	} else
+		ret = 0;
+
+ cleanup:
+	gnutls_free(salt);
+	return ret;
+}
+
 /* in case of DSA puts into data, r,s
  */
 static int
 _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		     gnutls_datum_t * signature,
 		     const gnutls_datum_t * vdata,
-		     const gnutls_pk_params_st * pk_params)
+		     const gnutls_pk_params_st * pk_params,
+		     const gnutls_x509_spki_st * sign_params)
 {
 	int ret;
 	unsigned int hash_len;
@@ -636,6 +706,46 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			break;
 		}
+	case GNUTLS_PK_RSA_PSS:
+		{
+			struct rsa_private_key priv;
+			struct rsa_public_key pub;
+			mpz_t s;
+
+			_rsa_params_to_privkey(pk_params, &priv);
+			ret = _rsa_params_to_pubkey(pk_params, &pub);
+			if (ret < 0)
+				return
+				    gnutls_assert_val(ret);
+
+			mpz_init(s);
+
+			ret =
+			    _rsa_pss_sign_digest_tr(sign_params->dig,
+						    &pub, &priv,
+						    NULL, rnd_nonce_func,
+						    sign_params->salt_size,
+						    vdata->data, s);
+			if (ret < 0) {
+				gnutls_assert();
+				ret = GNUTLS_E_PK_SIGN_FAILED;
+				goto rsa_pss_fail;
+			}
+
+			ret =
+			    _gnutls_mpi_dprint_size(s, signature,
+						    pub.size);
+
+		      rsa_pss_fail:
+			mpz_clear(s);
+
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			break;
+		}
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INTERNAL_ERROR;
@@ -651,10 +761,49 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 }
 
 static int
+_rsa_pss_verify_digest(gnutls_digest_algorithm_t dig,
+		       const struct rsa_public_key *pub,
+		       size_t salt_size,
+		       const uint8_t *digest,
+		       size_t digest_size,
+		       const mpz_t s)
+{
+	int (*verify_func) (const struct rsa_public_key *,
+			    size_t,
+			    const uint8_t *,
+			    const mpz_t);
+	size_t hash_size;
+
+	switch (dig) {
+	case GNUTLS_DIG_SHA256:
+		verify_func = rsa_pss_sha256_verify_digest;
+		hash_size = 32;
+		break;
+	case GNUTLS_DIG_SHA384:
+		verify_func = rsa_pss_sha384_verify_digest;
+		hash_size = 48;
+		break;
+	case GNUTLS_DIG_SHA512:
+		verify_func = rsa_pss_sha512_verify_digest;
+		hash_size = 64;
+		break;
+	default:
+		gnutls_assert();
+		return 0;
+	}
+
+	if (digest_size != hash_size)
+		return 0;
+
+	return verify_func(pub, salt_size, digest, s);
+}
+
+static int
 _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		       const gnutls_datum_t * vdata,
 		       const gnutls_datum_t * signature,
-		       const gnutls_pk_params_st * pk_params)
+		       const gnutls_pk_params_st * pk_params,
+		       const gnutls_x509_spki_st * sign_params)
 {
 	int ret;
 	unsigned int hash_len;
@@ -767,6 +916,42 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			ret =
 			    rsa_pkcs1_verify(&pub, vdata->size,
 					     vdata->data, TOMPZ(tmp[0]));
+			if (ret == 0)
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_PK_SIG_VERIFY_FAILED);
+			else
+				ret = 0;
+
+			break;
+		}
+	case GNUTLS_PK_RSA_PSS:
+		{
+			struct rsa_public_key pub;
+
+			ret = _rsa_params_to_pubkey(pk_params, &pub);
+			if (ret < 0)
+				return
+				    gnutls_assert_val(ret);
+
+			if (signature->size != pub.size)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_PK_SIG_VERIFY_FAILED);
+
+			ret =
+			    _gnutls_mpi_init_scan_nz(&tmp[0], signature->data,
+						     signature->size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			ret = _rsa_pss_verify_digest(sign_params->dig,
+						     &pub,
+						     sign_params->salt_size,
+						     vdata->data, vdata->size,
+						     TOMPZ(tmp[0]));
 			if (ret == 0)
 				ret =
 				    gnutls_assert_val
@@ -934,6 +1119,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 
 			break;
 		}
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_EC:
 		break;
@@ -1204,6 +1390,9 @@ static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* param
 int ret;
 gnutls_datum_t sig = {NULL, 0};
 const char const_data[20] = "onetwothreefourfive";
+const char const_data_sha256[32] = "onetwothreefourfivesixseveneight";
+const char const_data_sha384[48] = "onetwothreefourfivesixseveneightnineteneleventwe";
+const char const_data_sha512[64] = "onetwothreefourfivesixseveneightnineteneleventwelvethirteenfourt";
 gnutls_datum_t ddata, tmp = {NULL,0};
 char* gen_data = NULL;
 
@@ -1216,6 +1405,24 @@ char* gen_data = NULL;
 
 		ddata.data = (void*)gen_data;
 		ddata.size = hash_len;
+	} else if (algo == GNUTLS_PK_RSA_PSS) {
+		switch (params->sign.dig) {
+		case GNUTLS_DIG_SHA256:
+			ddata.data = (void*)const_data_sha256;
+			ddata.size = sizeof(const_data_sha256);
+			break;
+		case GNUTLS_DIG_SHA384:
+			ddata.data = (void*)const_data_sha384;
+			ddata.size = sizeof(const_data_sha384);
+			break;
+		case GNUTLS_DIG_SHA512:
+			ddata.data = (void*)const_data_sha512;
+			ddata.size = sizeof(const_data_sha512);
+			break;
+		default:
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+			goto cleanup;
+		}
 	} else {
 		ddata.data = (void*)const_data;
 		ddata.size = sizeof(const_data);
@@ -1256,13 +1463,14 @@ char* gen_data = NULL;
 		 */
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
 	case GNUTLS_PK_DSA:
-		ret = _gnutls_pk_sign(algo, &sig, &ddata, params);
+	case GNUTLS_PK_RSA_PSS:
+		ret = _gnutls_pk_sign(algo, &sig, &ddata, params, &params->sign);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			goto cleanup;
 		}
 
-		ret = _gnutls_pk_verify(algo, &ddata, &sig, params);
+		ret = _gnutls_pk_verify(algo, &ddata, &sig, params, &params->sign);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			gnutls_assert();
@@ -1436,6 +1644,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			break;
 		}
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA:
 		{
 			struct rsa_public_key pub;
@@ -1628,6 +1837,7 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		{
 			bigint_t t1 = NULL, t2 = NULL;
 
@@ -1833,6 +2043,7 @@ wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_DSA:
 		return 0;
 	case GNUTLS_PK_EC:

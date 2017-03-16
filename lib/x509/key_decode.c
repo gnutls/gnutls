@@ -234,6 +234,144 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 
 }
 
+/* Reads RSA-PSS parameters.
+ */
+int
+_gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
+				 gnutls_x509_spki_st * params)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	gnutls_digest_algorithm_t digest;
+	char oid[MAX_OID_SIZE];
+	int size;
+	unsigned int trailer;
+	gnutls_datum_t value = { NULL, 0 };
+
+	if ((result = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPSSParameters", &spk))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _asn1_strict_der_decode(&spk, der, dersize, NULL);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	size = sizeof(oid);
+	result = asn1_read_value(spk, "hashAlgorithm.algorithm", oid, &size);
+	if (result == ASN1_SUCCESS)
+		digest = gnutls_oid_to_digest(oid);
+	else if (result == ASN1_ELEMENT_NOT_FOUND)
+		/* The default hash algorithm is SHA-1 */
+		digest = GNUTLS_DIG_SHA1;
+	else {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	size = sizeof(oid);
+	result = asn1_read_value(spk, "maskGenAlgorithm.algorithm", oid, &size);
+	if (result == ASN1_SUCCESS) {
+		gnutls_digest_algorithm_t digest2;
+
+		/* Error out if algorithm other than mgf1 is specified */
+		if (strcmp(oid, PKIX1_RSA_PSS_MGF1_OID) != 0) {
+			gnutls_assert();
+			result = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
+
+		/* Check if maskGenAlgorithm.parameters does exist and
+		 * is identical to hashAlgorithm */
+		result = _gnutls_x509_read_value(spk, "maskGenAlgorithm.parameters", &value);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if ((result = asn1_create_element
+		     (_gnutls_get_pkix(), "PKIX1.AlgorithmIdentifier", &c2))
+		    != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		result = _asn1_strict_der_decode(&c2, value.data, value.size, NULL);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		size = sizeof(oid);
+		result = asn1_read_value(c2, "algorithm", oid, &size);
+		if (result == ASN1_SUCCESS)
+			digest2 = gnutls_oid_to_digest(oid);
+		else if (result == ASN1_ELEMENT_NOT_FOUND)
+			/* The default hash algorithm for mgf1 is SHA-1 */
+			digest2 = GNUTLS_DIG_SHA1;
+		else {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		if (digest != digest2) {
+			gnutls_assert();
+			result = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
+	} else if (result != ASN1_ELEMENT_NOT_FOUND) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	memset(params, 0, sizeof(gnutls_x509_spki_st));
+	params->pk = GNUTLS_PK_RSA_PSS;
+	params->dig = digest;
+
+	result = _gnutls_x509_read_uint(spk, "saltLength", &params->salt_size);
+	if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ||
+	    result == GNUTLS_E_ASN1_VALUE_NOT_FOUND)
+		params->salt_size = 20;
+	else if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_read_uint(spk, "trailerField", &trailer);
+	if (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND ||
+	    result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+		trailer = 1;
+	else if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	if (trailer != 1) {
+		gnutls_assert();
+		result = GNUTLS_E_CERTIFICATE_ERROR;
+		goto cleanup;
+	}
+
+	result = 0;
+ cleanup:
+	_gnutls_free_datum(&value);
+	asn1_delete_structure(&c2);
+	asn1_delete_structure(&spk);
+	return result;
+}
+
 /* This function must be called after _gnutls_x509_read_params()
  */
 int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
@@ -243,9 +381,10 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		ret = _gnutls_x509_read_rsa_pubkey(der, dersize, params);
 		if (ret >= 0) {
-			params->algo = GNUTLS_PK_RSA;
+			params->algo = algo;
 			params->params_nr = RSA_PUBLIC_PARAMS;
 		}
 		break;
@@ -282,10 +421,40 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_RSA:
 		return 0;
+	case GNUTLS_PK_RSA_PSS:
+		return _gnutls_x509_read_rsa_pss_params(der, dersize, &params->sign);
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_read_dsa_params(der, dersize, params);
 	case GNUTLS_PK_EC:
 		return _gnutls_x509_read_ecc_params(der, dersize, &params->flags);
+	default:
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	}
+}
+
+/* This function must be called after _gnutls_x509_read_pubkey()
+ */
+int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
+				     gnutls_pk_params_st * params)
+{
+	switch (algo) {
+	case GNUTLS_PK_RSA_PSS: {
+		unsigned bits = pubkey_to_bits(algo, params);
+		const mac_entry_st *me = hash_to_entry(params->sign.dig);
+		size_t hash_size;
+
+		if (unlikely(me == NULL))
+			return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+
+		hash_size = _gnutls_hash_get_algo_len(me);
+		if (hash_size + params->sign.salt_size + 2 > (bits + 7) / 8)
+			return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+		return 0;
+	}
+	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_EC:
+		return 0;
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}

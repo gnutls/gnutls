@@ -82,7 +82,24 @@ struct gnutls_pubkey_st {
 int _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
 				    gnutls_pk_params_st *);
 
+int _gnutls_privkey_get_sign_params(gnutls_privkey_t key,
+				    gnutls_x509_spki_st * params);
+int _gnutls_privkey_find_sign_params(gnutls_privkey_t key,
+				     gnutls_pk_algorithm_t pk,
+				     gnutls_digest_algorithm_t dig,
+				     unsigned flags,
+				     gnutls_x509_spki_st *params);
+
 void _gnutls_privkey_cleanup(gnutls_privkey_t key);
+
+int privkey_sign_data(gnutls_privkey_t signer,
+		      const gnutls_datum_t * data,
+		      gnutls_datum_t * signature,
+		      gnutls_x509_spki_st *params);
+int privkey_sign_hash(gnutls_privkey_t signer,
+		      const gnutls_datum_t * hash_data,
+		      gnutls_datum_t * signature,
+		      gnutls_x509_spki_st * params);
 
 unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params);
 int _gnutls_pubkey_compatible_with_sig(gnutls_session_t,
@@ -97,13 +114,15 @@ pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
 			  const mac_entry_st * algo,
 			  const gnutls_datum_t * hash,
 			  const gnutls_datum_t * signature,
-			  gnutls_pk_params_st * issuer_params);
+			  gnutls_pk_params_st * params,
+			  gnutls_x509_spki_st * sign_params);
 
 int pubkey_verify_data(gnutls_pk_algorithm_t pk,
 		       const mac_entry_st * algo,
 		       const gnutls_datum_t * data,
 		       const gnutls_datum_t * signature,
-		       gnutls_pk_params_st * issuer_params);
+		       gnutls_pk_params_st * params,
+		       gnutls_x509_spki_st * sign_params);
 
 
 

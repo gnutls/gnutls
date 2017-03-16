@@ -1353,7 +1353,7 @@ gnutls_openpgp_privkey_sign_hash(gnutls_openpgp_privkey_t key,
 	}
 
 
-	result = _gnutls_pk_sign(pk_algorithm, signature, hash, &params);
+	result = _gnutls_pk_sign(pk_algorithm, signature, hash, &params, &params.sign);
 
 	gnutls_pk_params_clear(&params);
 	gnutls_pk_params_release(&params);

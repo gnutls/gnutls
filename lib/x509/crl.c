@@ -373,32 +373,13 @@ gnutls_x509_crl_get_issuer_dn3(gnutls_x509_crl_t crl, gnutls_datum_t * dn, unsig
  **/
 int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl_t crl)
 {
-	int result;
-	gnutls_datum_t sa;
-
 	if (crl == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	/* Read the signature algorithm. Note that parameters are not
-	 * read. They will be read from the issuer's certificate if needed.
-	 */
-
-	result =
-	    _gnutls_x509_read_value(crl->crl,
-				    "signatureAlgorithm.algorithm", &sa);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	result = gnutls_oid_to_sign((const char *) sa.data);
-
-	_gnutls_free_datum(&sa);
-
-	return result;
+	return _gnutls_x509_get_signature_algorithm(crl->crl,
+						    "signatureAlgorithm");
 }
 
 /**

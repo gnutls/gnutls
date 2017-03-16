@@ -118,4 +118,12 @@ KRB5PrincipalName ::= SEQUENCE {
 	principalName           [1] PrincipalName
 }
 
+-- from RFC4055
+RSAPSSParameters ::= SEQUENCE {
+	hashAlgorithm		[0] AlgorithmIdentifier OPTIONAL, -- sha1Identifier
+	maskGenAlgorithm	[1] AlgorithmIdentifier OPTIONAL, -- mgf1SHA1Identifier
+	saltLength		[2] INTEGER DEFAULT 20,
+	trailerField		[3] INTEGER DEFAULT 1
+}
+
 END

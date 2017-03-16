@@ -35,6 +35,7 @@
 #include <x509_b64.h>
 #include "x509_int.h"
 #include <libtasn1.h>
+#include <pk.h>
 
 static void disable_optional_stuff(gnutls_x509_crt_t cert);
 
@@ -1815,7 +1816,7 @@ gnutls_x509_crt_privkey_sign(gnutls_x509_crt_t crt,
 	}
 
 	result = _gnutls_x509_pkix_sign(crt->cert, "tbsCertificate",
-					dig, issuer, issuer_key);
+					dig, flags, issuer, issuer_key);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -1989,3 +1990,102 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
 	return ret;
 }
 
+/**
+ * gnutls_x509_crt_set_pk_algorithm:
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
+ * @flags: must be zero
+ *
+ * This function will set the certificate's subject public key
+ * information explicitly. This is intended to be used in the cases
+ * where a single public key (e.g., RSA) can be used for multiple
+ * signature algorithms (RSA PKCS1-1.5, and RSA-PSS).
+ *
+ * To export the public key (i.e., the SubjectPublicKeyInfo part), check
+ * gnutls_pubkey_import_x509().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_x509_crt_set_pk_algorithm(gnutls_x509_crt_t crt,
+				 gnutls_x509_spki_t spki,
+				 unsigned int flags)
+{
+	int result;
+	gnutls_pk_algorithm_t crt_pk;
+	gnutls_x509_spki_st params;
+	unsigned bits;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt_pk = result;
+
+	if (spki->pk != GNUTLS_PK_RSA_PSS) {
+		if (crt_pk == spki->pk)
+			return 0;
+
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (crt_pk == GNUTLS_PK_RSA) {
+		const mac_entry_st *me;
+
+		me = hash_to_entry(spki->dig);
+		if (unlikely(me == NULL)) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+
+		memset(&params, 0, sizeof(gnutls_x509_spki_st));
+		params.pk = spki->pk;
+		params.dig = spki->dig;
+
+		/* If salt size is zero, find the optimal salt size. */
+		if (spki->salt_size == 0) {
+			params.salt_size =
+			    _gnutls_find_rsa_pss_salt_size(bits, me,
+							   spki->salt_size);
+		} else
+			params.salt_size = spki->salt_size;
+	} else if (crt_pk == GNUTLS_PK_RSA_PSS) {
+		result = _gnutls_x509_crt_read_sign_params(crt, &params);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		if (params.dig != spki->dig ||
+		    params.salt_size > spki->salt_size) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+
+		params.salt_size = spki->salt_size;
+	}
+
+	MODIFIED(crt);
+
+	result = _gnutls_x509_write_sign_params(crt->cert,
+						"tbsCertificate."
+						"subjectPublicKeyInfo.algorithm",
+						&params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}

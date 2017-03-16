@@ -293,6 +293,8 @@ typedef enum content_type_t {
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t)-1
 #define GNUTLS_PK_NONE (gnutls_pk_algorithm_t)-2
 
+#define GNUTLS_PK_IS_RSA(pk) ((pk) == GNUTLS_PK_RSA || (pk) == GNUTLS_PK_RSA_PSS)
+
 /* Message buffers (mbuffers) structures */
 
 /* this is actually the maximum number of distinct handshake

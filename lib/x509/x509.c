@@ -303,14 +303,14 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 	unsigned empty1 = 0, empty2 = 0;
 
 	ret = _gnutls_x509_get_signature_algorithm(cert->cert,
-						      "signatureAlgorithm.algorithm");
+						      "signatureAlgorithm");
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
 	s2 = _gnutls_x509_get_signature_algorithm(cert->cert,
-						  "tbsCertificate.signature.algorithm");
+						  "tbsCertificate.signature");
 	if (ret != s2) {
 		_gnutls_debug_log("signatureAlgorithm.algorithm differs from tbsCertificate.signature.algorithm: %s, %s\n",
 			gnutls_sign_get_name(ret), gnutls_sign_get_name(s2));
@@ -982,7 +982,7 @@ gnutls_x509_crt_get_dn_oid(gnutls_x509_crt_t cert,
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert)
 {
 	return _gnutls_x509_get_signature_algorithm(cert->cert,
-						    "signatureAlgorithm.algorithm");
+						    "signatureAlgorithm");
 }
 
 /**
@@ -1548,6 +1548,37 @@ int
 gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
 				 unsigned int *bits)
 {
+	return gnutls_x509_crt_get_pk_algorithm2(cert, NULL, bits);
+}
+
+/**
+ * gnutls_x509_crt_get_pk_algorithm2:
+ * @cert: a certificate of type #gnutls_x509_crt_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
+ * @bits: if bits is non null it will hold the size of the parameters' in bits
+ *
+ * This function will return the public key algorithm of an X.509
+ * certificate.
+ *
+ * If @spki is non null, it should have enough size to hold the
+ * parameters.
+ *
+ * If @bits is non null, it should have enough size to hold the
+ * parameters size in bits. For RSA the bits returned is the modulus.
+ * For DSA the bits returned are of the public exponent.
+ *
+ * Unknown/unsupported algorithms are mapped to %GNUTLS_PK_UNKNOWN.
+ *
+ * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
+ * success, or a negative error code on error.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_x509_crt_get_pk_algorithm2(gnutls_x509_crt_t cert,
+				  gnutls_x509_spki_t spki,
+				  unsigned int *bits)
+{
 	int result;
 
 	if (cert == NULL) {
@@ -1568,8 +1599,24 @@ gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
 		return result;
 	}
 
-	return result;
+	if (spki) {
+		gnutls_x509_spki_st params;
 
+		spki->pk = result;
+
+		result = _gnutls_x509_crt_read_sign_params(cert, &params);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		spki->dig = params.dig;
+		spki->salt_size = params.salt_size;
+
+		return spki->pk;
+	}
+
+	return result;
 }
 
 /* returns the type and the name on success.
@@ -4255,3 +4302,4 @@ void gnutls_x509_crt_set_flags(gnutls_x509_crt_t cert,
 {
 	cert->flags = flags;
 }
+

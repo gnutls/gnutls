@@ -89,6 +89,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	 * we want to return OID from is first */
 	{"UNKNOWN", NULL, GNUTLS_PK_UNKNOWN},
 	{"RSA", PK_PKIX1_RSA_OID, GNUTLS_PK_RSA},
+	{"RSA-PSS", PK_PKIX1_RSA_PSS_OID, GNUTLS_PK_RSA_PSS},
 	{"RSA (X.509)", PK_X509_RSA_OID, GNUTLS_PK_RSA},	/* some certificates use this OID for RSA */
 	{"RSA-MD5", SIG_RSA_MD5_OID, GNUTLS_PK_RSA},	/* some other broken certificates set RSA with MD5 as an indicator of RSA */
 	{"RSA-SHA1", SIG_RSA_SHA1_OID, GNUTLS_PK_RSA},	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */

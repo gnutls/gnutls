@@ -73,6 +73,8 @@ typedef struct common_info {
 
 	/* set to non zero when no compatibility structs need to be exported */
 	unsigned no_compat;
+
+	unsigned rsa_pss_sign;
 } common_info_st;
 
 /* this must be provided by the app */
@@ -141,5 +143,7 @@ extern unsigned long lbuffer_size;
 void fix_lbuffer(unsigned long);
 
 void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size);
+
+#define GNUTLS_PK_IS_RSA(pk) ((pk) == GNUTLS_PK_RSA || (pk) == GNUTLS_PK_RSA_PSS)
 
 #endif

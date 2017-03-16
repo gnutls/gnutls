@@ -134,7 +134,7 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 	 * then the issuer's parameters should be used. This is not
 	 * done yet.
 	 */
-	if (pk_algorithm != GNUTLS_PK_RSA) {	/* RSA doesn't use parameters */
+	if (pk_algorithm != GNUTLS_PK_RSA) { /* RSA doesn't use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
 		if (result < 0) {
 			gnutls_assert();
@@ -165,6 +165,12 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 	if ((result =
 	     _gnutls_x509_read_pubkey(pk_algorithm, tmp.data, tmp.size,
 				      params)) < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	result = _gnutls_x509_check_pubkey_params(pk_algorithm, params);
+	if (result < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -205,16 +211,89 @@ _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
 }
 
 /*
- * This function writes and encodes the parameters for DSS or RSA keys.
+ * This function reads and decodes the parameters for DSS or RSA keys.
  * This is the "signatureAlgorithm" fields.
- *
- * If @legacy is non-zero then the legacy value for PKCS#7 signatures
- * will be written for RSA signatures.
  */
 int
-_gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
-			      gnutls_pk_algorithm_t pk_algorithm,
-			      gnutls_digest_algorithm_t dig, unsigned legacy)
+_gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
+			      gnutls_x509_spki_st *params)
+{
+	int result;
+	char name[128];
+	char oid[MAX_OID_SIZE];
+	int oid_size;
+
+	_gnutls_str_cpy(name, sizeof(name), src_name);
+	_gnutls_str_cat(name, sizeof(name), ".algorithm");
+
+	oid_size = sizeof(oid);
+	result = asn1_read_value(src, name, oid, &oid_size);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (strcmp (oid, PK_PKIX1_RSA_PSS_OID) == 0) {
+		gnutls_datum_t tmp = { NULL, 0 };
+
+		_gnutls_str_cpy(name, sizeof(name), src_name);
+		_gnutls_str_cat(name, sizeof(name), ".parameters");
+
+		result = _gnutls_x509_read_value(src, name, &tmp);
+		if (result < 0 &&
+		    result != GNUTLS_E_ASN1_ELEMENT_NOT_FOUND &&
+		    result != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+			_gnutls_free_datum(&tmp);
+			return gnutls_assert_val(result);
+		}
+
+		result = _gnutls_x509_read_rsa_pss_params(tmp.data, tmp.size,
+							  params);
+		_gnutls_free_datum(&tmp);
+
+		if (result < 0)
+			gnutls_assert();
+
+		return result;
+	} else {
+		memset(params, 0, sizeof(gnutls_x509_spki_st));
+
+		result = gnutls_oid_to_sign(oid);
+		if (result != GNUTLS_SIGN_UNKNOWN) {
+			params->pk = gnutls_sign_get_pk_algorithm(result);
+			params->dig = gnutls_sign_get_hash_algorithm(result);
+		}
+	}
+
+	return 0;
+}
+
+int
+_gnutls_x509_crt_read_sign_params(gnutls_x509_crt_t crt,
+				  gnutls_x509_spki_st *params)
+{
+	return _gnutls_x509_read_sign_params(crt->cert,
+					     "tbsCertificate."
+					     "subjectPublicKeyInfo."
+					     "algorithm",
+					     params);
+}
+
+int
+_gnutls_x509_crq_read_sign_params(gnutls_x509_crq_t crt,
+				  gnutls_x509_spki_st *params)
+{
+	return _gnutls_x509_read_sign_params(crt->crq,
+					     "certificationRequestInfo."
+					     "subjectPKInfo."
+					     "algorithm",
+					     params);
+}
+
+int
+_gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
+			       gnutls_x509_spki_st *params)
 {
 	int result;
 	char name[128];
@@ -223,15 +302,18 @@ _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
 	_gnutls_str_cpy(name, sizeof(name), dst_name);
 	_gnutls_str_cat(name, sizeof(name), ".algorithm");
 
-	if (legacy && pk_algorithm == GNUTLS_PK_RSA)
+	if (params->legacy && params->pk == GNUTLS_PK_RSA)
 		oid = PK_PKIX1_RSA_OID;
+	else if (params->pk == GNUTLS_PK_RSA_PSS)
+		oid = PK_PKIX1_RSA_PSS_OID;
 	else
-		oid = gnutls_sign_get_oid(gnutls_pk_to_sign(pk_algorithm, dig));
+		oid = gnutls_sign_get_oid(gnutls_pk_to_sign(params->pk,
+							    params->dig));
 	if (oid == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log
 		    ("Cannot find OID for sign algorithm pk: %d dig: %d\n",
-		     (int) pk_algorithm, (int) dig);
+		     (int) params->pk, (int) params->dig);
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
@@ -247,10 +329,24 @@ _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
 	_gnutls_str_cpy(name, sizeof(name), dst_name);
 	_gnutls_str_cat(name, sizeof(name), ".parameters");
 
-	if (pk_algorithm == GNUTLS_PK_RSA)
+	if (params->pk == GNUTLS_PK_RSA)
 		result =
 		    asn1_write_value(dst, name, ASN1_NULL, ASN1_NULL_SIZE);
-	else
+	else if (params->pk == GNUTLS_PK_RSA_PSS) {
+		gnutls_datum_t tmp = { NULL, 0 };
+
+		if (params == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+
+		result = _gnutls_x509_write_rsa_pss_params(params, &tmp);
+		if (result < 0)
+			return gnutls_assert_val(result);
+
+		result = asn1_write_value(dst, name, tmp.data, tmp.size);
+		_gnutls_free_datum(&tmp);
+	} else
 		result = asn1_write_value(dst, name, NULL, 0);
 
 	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
