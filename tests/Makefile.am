@@ -137,7 +137,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 rng-no-onload dtls1-2-mtu-check crl_apis cert_verify_inv_utf8 \
 	 hostname-check-utf8 pkcs8-key-decode-encrypted priority-mix pkcs7 \
 	 send-data-before-handshake recv-data-before-handshake crt_inv_write \
-	 x509sign-verify-error rng-op-nonce rng-op-random rng-op-key x509-dn-decode-compat
+	 x509sign-verify-error rng-op-nonce rng-op-random rng-op-key x509-dn-decode-compat \
+	 ip-check
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
