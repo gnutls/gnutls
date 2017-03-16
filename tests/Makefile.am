@@ -71,6 +71,7 @@ LDADD = $(COMMON_GNUTLS_LDADD) \
 	$(COMMON_DEPS_LDADD)
 
 dane_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
+dane_strcodes_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
@@ -92,7 +93,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities	\
-	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time \
+	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
 	 mini-cert-status mini-rsa-psk global-init sec-params \
 	 fips-test mini-global-load name-constraints x509-extensions \
@@ -240,7 +241,7 @@ ctests += ocsp
 endif
 
 if ENABLE_DANE
-ctests += dane
+ctests += dane dane-strcodes
 endif
 
 rsa_illegal_import_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
