@@ -538,30 +538,33 @@ available with an optimized instruction set).
 The generators are unique per thread to allow lock-free operation. That
 induces a cost of around 140-bytes for the state of the generators per
 thread, on threads that would utilize @funcref{gnutls_rnd}. At the same time
-it allows fast and lock-free access to the generators. That benefits servers 
-which utilize more than 4 threads, while imposes no cost on single threaded
-processes.
+it allows fast and lock-free access to the generators. The lock-free access
+benefits servers which utilize more than 4 threads, while imposes no cost on
+single threaded processes.
 
 On the first call to @funcref{gnutls_rnd} the generators are seeded with two independent
 keys obtained from the OS random device. Their seed is used to output a fixed amount
 of bytes before re-seeding; the number of bytes output varies per generator.
-The lower the level of the random generator the more bytes the
-generator will output without re-seeding, providing it better performance.
-For the @code{GNUTLS_RND_KEY} and @code{GNUTLS_RND_RANDOM} levels, a
-re-seed mixes data obtained from the OS random device with the previous key,
-while the @code{GNUTLS_RND_NONCE} level utilizes
-the generator of the @code{GNUTLS_RND_RANDOM} level to obtain a new seed
-(which is similarly mixed with the old key to produce the new).
-That is, the @code{GNUTLS_RND_NONCE}
-level is re-seeded using the @code{GNUTLS_RND_RANDOM}, and
-@code{GNUTLS_RND_RANDOM}, @code{GNUTLS_RND_KEY} using the system random
-generator. 
 
-The PRNG used to provide the @code{GNUTLS_RND_RANDOM} and 
-@code{GNUTLS_RND_KEY} levels is identical.
-However, the use of @code{GNUTLS_RND_KEY} level enforces
-a re-seed on the PRNG, to ensure that the recovery of the PRNG state
-is not sufficient to recover previously generated values.
+One generator is dedicated for the @code{GNUTLS_RND_NONCE} level, and the
+second is shared for the @code{GNUTLS_RND_KEY} and @code{GNUTLS_RND_RANDOM}
+levels. For the rest of this section we refer to the first as the nonce
+generator and the second as the key generator.
+
+The nonce generator will reseed after outputing a fixed amount of bytes
+(typically few megabytes) prior to re-seeding. It is being re-seed using
+the key generator to obtain a new key which is mixed with its old one.
+
+The key generator on the other hand, will also re-seed after a fixed amount
+of bytes is generated (typically less than the nonce), but will also re-seed
+based on time, i.e., after few hours of operation without reaching the limit
+for a re-seed. For its re-seed it mixes mixes data obtained from the OS random
+device with the previous key.
+
+Although the key generator used to provide data for the @code{GNUTLS_RND_RANDOM}
+and @code{GNUTLS_RND_KEY} levels is identical, when used with the @code{GNUTLS_RND_KEY} level
+a re-key of the PRNG is additionally performed. That ensures that the recovery of the PRNG state
+will not be sufficient to recover previously generated values.
 
 
 @subheading Defense against PRNG attacks
@@ -597,9 +600,9 @@ GnuTLS generator is fine-tuned to provide multiple levels, such an attack
 mainly concerns levels @code{GNUTLS_RND_RANDOM} and @code{GNUTLS_RND_KEY},
 since @code{GNUTLS_RND_NONCE} is intended to output non-secret data.
 The @code{GNUTLS_RND_RANDOM} generator at the time of writing can output
-16kb prior to being re-seeded thus this is its upper bound for previously
+2MB prior to being re-seeded thus this is its upper bound for previously
 generated data recovered using this attack. That assumes that the state
-of the system random generator is unknown to the attacker, and we carry that
+of the operating system random generator is unknown to the attacker, and we carry that
 assumption on the next paragraphs. The usage of @code{GNUTLS_RND_KEY} level
 ensures that no backtracking is possible for all output data, by re-keying
 the PRNG using its own output.
@@ -613,9 +616,9 @@ A permanent compromise attack implies that once an attacker compromises the
 state of GnuTLS' random generator at a specific time, future and past
 outputs from the generator are compromised. For past outputs the
 previous paragraph applies. For future outputs, both the @code{GNUTLS_RND_RANDOM}
-and the @code{GNUTLS_RND_KEY} will recover after 16kb of data have been generated.
-The @code{GNUTLS_RND_NONCE} level generator
-will recover after several megabytes of output is generated.
+and the @code{GNUTLS_RND_KEY} will recover after 2MB of data have been generated
+or few hours have passed (two at the time of writing). The @code{GNUTLS_RND_NONCE}
+level generator will recover after several megabytes of output is generated.
 That threatens the unpredictability of the output of the nonce level, in a
 scenario like that, and is compromise to improve operational performance.
 
