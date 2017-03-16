@@ -31,7 +31,7 @@
 /* This test checks whether an invalid extensions field will lead
  * to a GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH. */
 
-#if defined(_WIN32) || !defined(HAVE_LIBSECCOMP)
+#if defined(_WIN32)
 
 int main()
 {
