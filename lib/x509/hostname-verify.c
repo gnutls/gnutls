@@ -134,6 +134,10 @@ gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
  * wildcards are considered. Otherwise they are only considered if the
  * domain name consists of three components or more, and the wildcard
  * starts at the leftmost position.
+
+ * When the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES is specified,
+ * the input will be treated as a DNS name, and matching of textual IP addresses
+ * against the IPAddress part of the alternative name will not be allowed.
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
@@ -152,7 +156,8 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	gnutls_datum_t out;
 
 	/* check whether @hostname is an ip address */
-	if ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0) {
+	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES) &&
+	    ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0)) {
 
 		if (p != NULL) {
 			struct in6_addr ipv6;

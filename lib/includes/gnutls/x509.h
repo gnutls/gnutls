@@ -907,6 +907,9 @@ int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  *   using certificate revocation lists or the available OCSP data.
  * @GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS: When including a hostname
  *   check in the verification, do not consider any wildcards.
+ * @GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES: When verifying a hostname
+ *   prevent textual IP addresses from matching IP addresses in the
+ *   certificate. Treat the input only as a DNS name.
  * @GNUTLS_VERIFY_USE_TLS1_RSA: This indicates that a (raw) RSA signature is provided
  *   as in the TLS 1.0 protocol. Not all functions accept this flag.
  * @GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS: This signals the verification
@@ -918,6 +921,7 @@ int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  */
 typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DISABLE_CA_SIGN = 1 << 0,
+	GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES = 1<<1,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 1 << 2,
 	GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 1 << 3,
 	GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 1 << 4,
