@@ -889,6 +889,7 @@ APIMANS += gnutls_x509_crq_verify.3
 APIMANS += gnutls_x509_crt_check_email.3
 APIMANS += gnutls_x509_crt_check_hostname.3
 APIMANS += gnutls_x509_crt_check_hostname2.3
+APIMANS += gnutls_x509_crt_check_ip.3
 APIMANS += gnutls_x509_crt_check_issuer.3
 APIMANS += gnutls_x509_crt_check_key_purpose.3
 APIMANS += gnutls_x509_crt_check_revocation.3
