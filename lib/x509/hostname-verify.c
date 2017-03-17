@@ -112,6 +112,13 @@ gnutls_x509_crt_check_ip(gnutls_x509_crt_t cert,
 	return check_ip(cert, ip, ip_size);
 }
 
+/* whether gnutls_x509_crt_check_hostname2() will consider these
+ * alternative name types. This is to satisfy RFC6125 requirement
+ * that we do not fallback to CN-ID if we encounter a supported name
+ * type.
+ */
+#define IS_SAN_SUPPORTED(san) (san==GNUTLS_SAN_DNSNAME||san==GNUTLS_SAN_IPADDRESS)
+
 /**
  * gnutls_x509_crt_check_hostname2:
  * @cert: should contain an gnutls_x509_crt_t type
@@ -153,6 +160,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	struct in_addr ipv4;
 	char *p = NULL;
 	char *a_hostname;
+	unsigned have_other_addresses = 0;
 	gnutls_datum_t out;
 
 	/* check whether @hostname is an ip address */
@@ -230,10 +238,13 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				ret = 1;
 				goto cleanup;
 			}
+		} else {
+			if (IS_SAN_SUPPORTED(ret))
+				have_other_addresses = 1;
 		}
 	}
 
-	if (!found_dnsname && _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0) {
+	if (!have_other_addresses && !found_dnsname && _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0) {
 		/* did not get the necessary extension, use CN instead, if the
 		 * certificate would have been acceptable for a TLS WWW server purpose.
 		 * That is because only for that purpose the CN is a valid field to
