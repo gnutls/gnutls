@@ -1067,6 +1067,19 @@ void doit(void)
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
+	/* test flag GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES */
+	ret = gnutls_x509_crt_check_hostname2(x509, "127.0.0.1", GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname2(x509, "::1", GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname2(x509, "127.0.0.2", GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
 	if (debug)
 		success("Testing multi-cns...\n");
 	data.data = (unsigned char *) multi_cns;
