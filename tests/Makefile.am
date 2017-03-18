@@ -298,7 +298,7 @@ check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
 
 if !WINDOWS
-dist_check_SCRIPTS += fastopen.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
+dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
 	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
@@ -308,6 +308,7 @@ endif
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT =						\
+	CFLAGS="$(CFLAGS)"					\
 	LC_ALL="C"						\
 	LSAN_OPTIONS=suppressions=gnutls-asan.supp		\
 	CAFILE=$(srcdir)/cert-tests/data/ca-certs.pem		\
