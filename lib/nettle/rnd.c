@@ -168,7 +168,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	struct prng_ctx_st *prng_ctx;
 	int ret, reseed = 0;
 	uint8_t new_key[PRNG_KEY_SIZE];
-	time_t now;
+	struct timespec now; /* current time */
 
 	if (level == GNUTLS_RND_RANDOM || level == GNUTLS_RND_KEY)
 		prng_ctx = &ctx->normal;
@@ -183,7 +183,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	 */
 	memset(data, 0, datasize);
 
-	now = gnutls_time(0);
+	gettime(&now);
 
 	/* We re-seed based on time in addition to output data. That is,
 	 * to prevent a temporal state compromise to become permanent for low
@@ -191,7 +191,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	if (unlikely(_gnutls_detect_fork(prng_ctx->forkid))) {
 		reseed = 1;
 	} else {
-		if (now > prng_ctx->last_reseed + prng_reseed_time[level])
+		if (now.tv_sec > prng_ctx->last_reseed + prng_reseed_time[level])
 			reseed = 1;
 	}
 
@@ -216,7 +216,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 			goto cleanup;
 		}
 
-		prng_ctx->last_reseed = now;
+		prng_ctx->last_reseed = now.tv_sec;
 		prng_ctx->forkid = _gnutls_get_forkid();
 	}
 
