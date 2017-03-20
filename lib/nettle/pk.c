@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
- * Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
+ * Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -368,7 +369,7 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			}
 
 			ret =
-			    rsa_encrypt(&pub, NULL, rnd_tmpkey_func,
+			    rsa_encrypt(&pub, NULL, rnd_nonce_func,
 					plaintext->size, plaintext->data,
 					p);
 			if (ret == 0 || HAVE_LIB_ERROR()) {
