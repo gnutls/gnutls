@@ -552,19 +552,21 @@ levels. For the rest of this section we refer to the first as the nonce
 generator and the second as the key generator.
 
 The nonce generator will reseed after outputing a fixed amount of bytes
-(typically few megabytes) prior to re-seeding. It is being re-seed using
-the key generator to obtain a new key which is mixed with its old one.
+(typically few megabytes), or after few hours of operation without reaching
+the limit has passed. It is being re-seed using
+the key generator to obtain a new key for the CHACHA cipher, which is mixed
+with its old one.
 
-The key generator on the other hand, will also re-seed after a fixed amount
-of bytes is generated (typically less than the nonce), but will also re-seed
+Similarly, the key generator, will also re-seed after a fixed amount
+of bytes is generated (typically less than the nonce), and will also re-seed
 based on time, i.e., after few hours of operation without reaching the limit
 for a re-seed. For its re-seed it mixes mixes data obtained from the OS random
 device with the previous key.
 
 Although the key generator used to provide data for the @code{GNUTLS_RND_RANDOM}
 and @code{GNUTLS_RND_KEY} levels is identical, when used with the @code{GNUTLS_RND_KEY} level
-a re-key of the PRNG is additionally performed. That ensures that the recovery of the PRNG state
-will not be sufficient to recover previously generated values.
+a re-key of the PRNG using its own output, is additionally performed. That ensures that
+the recovery of the PRNG state will not be sufficient to recover previously generated values.
 
 
 @subheading Defense against PRNG attacks
@@ -617,10 +619,9 @@ state of GnuTLS' random generator at a specific time, future and past
 outputs from the generator are compromised. For past outputs the
 previous paragraph applies. For future outputs, both the @code{GNUTLS_RND_RANDOM}
 and the @code{GNUTLS_RND_KEY} will recover after 2MB of data have been generated
-or few hours have passed (two at the time of writing). The @code{GNUTLS_RND_NONCE}
-level generator will recover after several megabytes of output is generated.
-That threatens the unpredictability of the output of the nonce level, in a
-scenario like that, and is compromise to improve operational performance.
+or few hours have passed (two at the time of writing). Similarly the @code{GNUTLS_RND_NONCE}
+level generator will recover after several megabytes of output is generated,
+or its re-key time is reached.
 
 @subsubheading State-compromise: Iterative guessing
 
