@@ -979,3 +979,8 @@ tests/x509_altname
 tmp-*
 win32
 win64
+lib/x509/supported_exts.h
+tests/tls-rehandshake-cert-3
+tests/dane-strcodes
+tests/gnutls-strcodes
+tests/ip-check
