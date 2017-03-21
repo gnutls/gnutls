@@ -24,6 +24,7 @@
 #define UTILS_H
 
 #include <string.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs11.h>
@@ -65,5 +66,32 @@ void sec_sleep(int sec);
 char *get_tmpname(char s[TMPNAME_SIZE]);
 void track_temp_files(void);
 void delete_temp_files(void);
+
+/* calls fail() if status indicates an error  */
+inline static void _check_wait_status(int status, unsigned sigonly)
+{
+#if defined WEXITSTATUS && defined WIFSIGNALED
+	if (WEXITSTATUS(status) != 0 ||
+	    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {
+		if (WIFSIGNALED(status)) {
+			fail("Child died with signal %d\n", WTERMSIG(status));
+		} else {
+			if (!sigonly)
+				fail("Child died with status %d\n",
+				     WEXITSTATUS(status));
+		}
+	}
+#endif
+}
+
+inline static void check_wait_status(int status)
+{
+	_check_wait_status(status, 0);
+}
+
+inline static void check_wait_status_for_sig(int status)
+{
+	_check_wait_status(status, 1);
+}
 
 #endif				/* UTILS_H */
