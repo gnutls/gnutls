@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.5.11 (unreleased)
 
+** libgnutls: Fixed issue when rehandshaking without a client certificate in
+   a session which initially used one. Reported by Frantisek Sumsal.
+
 ** libgnutls: Addressed read of 4 bytes past the end of buffer in OpenPGP
    certificate parsing. Issues found using oss-fuzz project and were fixed
    by Alex Gaynor:
