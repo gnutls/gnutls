@@ -387,8 +387,7 @@ static unsigned int check_time_status(gnutls_x509_crt_t crt, time_t now)
 	return 0;
 }
 
-static
-int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
+unsigned _gnutls_is_broken_sig_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
 {
 	gnutls_digest_algorithm_t hash;
 
@@ -782,7 +781,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		 * really matter.
 		 */
 		if (gnutls_sign_is_secure(sigalg) == 0 &&
-		    is_broken_allowed(sigalg, flags) == 0 &&
+		    _gnutls_is_broken_sig_allowed(sigalg, flags) == 0 &&
 		    is_issuer(cert, cert) == 0) {
 			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
 		}
