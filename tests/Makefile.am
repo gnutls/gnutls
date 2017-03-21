@@ -105,7 +105,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
 	 strict-der tls-ext-register tls-supplemental mini-dtls0-9 \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
-	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
+	 sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok status-request-missing \
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
