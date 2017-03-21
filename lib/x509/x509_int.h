@@ -470,4 +470,6 @@ struct gnutls_x509_tlsfeatures_st {
 	unsigned int size;
 };
 
+unsigned _gnutls_is_broken_sig_allowed(gnutls_sign_algorithm_t sig, unsigned int flags);
+
 #endif

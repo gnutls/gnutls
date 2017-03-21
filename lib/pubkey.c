@@ -1631,10 +1631,8 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 		return ret;
 	}
 
-	if (!(flags & GNUTLS_VERIFY_ALLOW_BROKEN)) {
-		if (gnutls_sign_is_secure(algo) == 0) {
-			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
-		}
+	if (gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
 
 	return 0;
