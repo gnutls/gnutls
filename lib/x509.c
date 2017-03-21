@@ -74,6 +74,7 @@
 static int
 check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		    gnutls_x509_trust_list_t tl,
+		    unsigned verify_flags,
 		    gnutls_x509_crt_t *cand_issuers, unsigned cand_issuers_size,
 		    gnutls_datum_t * data, unsigned int *ostatus)
 {
@@ -111,10 +112,11 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	}
 
 	/* Attempt to verify against our trusted list */
-	ret = gnutls_ocsp_resp_verify(resp, tl, &status, 0);
+	ret = gnutls_ocsp_resp_verify(resp, tl, &status, verify_flags);
 	if ((ret < 0 || status != 0) && cand_issuers_size > 0) {
 		/* Attempt to verify against the certificate list provided by the server */
-		ret = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[0], &status, 0);
+
+		ret = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[0], &status, verify_flags);
 		/* if verification fails attempt to find whether any of the other
 		 * bundled CAs is an issuer of the OCSP response */
 		if ((ret < 0 || status != 0) && cand_issuers_size > 1) {
@@ -122,7 +124,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 			unsigned status2, i;
 
 			for (i=1;i<cand_issuers_size;i++) {
-				ret2 = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[i], &status2, 0);
+				ret2 = gnutls_ocsp_resp_verify_direct(resp, cand_issuers[i], &status2, verify_flags);
 				if (ret2 >= 0 && status2 == 0) {
 					status = status2;
 					ret = ret2;
@@ -371,8 +373,9 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	}
 
 	ret =
-		check_ocsp_response(session, peer_certificate_list[0], cred->tlist, cand_issuers,
-				    cand_issuers_size, &resp, &ocsp_status);
+		check_ocsp_response(session, peer_certificate_list[0], cred->tlist, 
+				verify_flags, cand_issuers,
+				cand_issuers_size, &resp, &ocsp_status);
 
 	if (ret < 0) {
 		CLEAR_CERTS;
