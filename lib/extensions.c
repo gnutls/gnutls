@@ -244,6 +244,8 @@ _gnutls_parse_extensions(gnutls_session_t session,
 		if (session->security_parameters.entity == GNUTLS_CLIENT) {
 			if ((ret =
 			     _gnutls_extension_list_check(session, type)) < 0) {
+				_gnutls_debug_log("EXT[%p]: Received unexpected extension '%s/%d'\n", session,
+						gnutls_ext_get_name(type), (int)type);
 				gnutls_assert();
 				return ret;
 			}
