@@ -2577,6 +2577,7 @@ int gnutls_handshake(gnutls_session_t session)
 			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 		session->internals.extensions_sent_size = 0;
+		session->internals.crt_requested = 0;
 		session->internals.handshake_in_progress = 1;
 		session->internals.vc_status = -1;
 		gettime(&session->internals.handshake_start_time);

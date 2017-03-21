@@ -420,15 +420,6 @@ struct gnutls_key_st {
 
 	auth_cred_st *cred;	/* used to specify keys/certificates etc */
 
-	int crt_requested;
-	/* some ciphersuites use this
-	 * to provide client authentication.
-	 * 1 if client auth was requested
-	 * by the peer, 0 otherwise
-	 *** In case of a server this
-	 * holds 1 if we should wait
-	 * for a client certificate verify
-	 */
 };
 typedef struct gnutls_key_st gnutls_key_st;
 
@@ -1001,6 +992,11 @@ typedef struct {
 	time_t handshake_endtime;	/* end time in seconds */
 	unsigned int handshake_timeout_ms;	/* timeout in milliseconds */
 	unsigned int record_timeout_ms;	/* timeout in milliseconds */
+
+	unsigned crt_requested; /* 1 if client auth was requested (i.e., client cert).
+	 * In case of a server this holds 1 if we should wait
+	 * for a client certificate verify
+	 */
 
 	gnutls_buffer_st hb_local_data;
 	gnutls_buffer_st hb_remote_data;

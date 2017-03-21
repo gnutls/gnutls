@@ -143,14 +143,15 @@ int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
  * gnutls_certificate_client_get_request_status:
  * @session: is a gnutls session
  *
- * Get whether client certificate is requested or not.
+ * Get whether client certificate was requested on the last
+ * handshake or not.
  *
  * Returns: 0 if the peer (server) did not request client
  *   authentication or 1 otherwise.
  **/
 int gnutls_certificate_client_get_request_status(gnutls_session_t session)
 {
-	return session->key.crt_requested;
+	return session->internals.crt_requested;
 }
 
 /**
