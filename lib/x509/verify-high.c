@@ -1202,7 +1202,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * flags.
  *
  * Additional verification parameters are possible via the @data types; the
- * acceptable types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
+ * acceptable types are %GNUTLS_DT_DNS_HOSTNAME, %GNUTLS_DT_IP_ADDRESS and %GNUTLS_DT_KEY_PURPOSE_OID.
  * The former accepts as data a null-terminated hostname, and the latter a null-terminated
  * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
  * If a DNS hostname is provided then this function will compare
@@ -1237,6 +1237,8 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
 	const char *hostname = NULL, *purpose = NULL, *email = NULL;
 	unsigned hostname_size = 0;
+	unsigned have_set_name = 0;
+	gnutls_datum_t ip = {NULL, 0};
 
 	if (cert_list == NULL || cert_list_size < 1)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1247,10 +1249,22 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 			if (data[i].size > 0) {
 				hostname_size = data[i].size;
 			}
-			if (email != NULL) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			if (have_set_name != 0) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			have_set_name = 1;
+		} else if (data[i].type == GNUTLS_DT_IP_ADDRESS) {
+			if (data[i].size > 0) {
+				ip.data = data[i].data;
+				ip.size = data[i].size;
+			}
+
+			if (have_set_name != 0) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			have_set_name = 1;
 		} else if (data[i].type == GNUTLS_DT_RFC822NAME) {
 			email = (void*)data[i].data;
-			if (hostname != NULL) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			if (have_set_name != 0) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			have_set_name = 1;
 		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
 			purpose = (void*)data[i].data;
 		}
@@ -1349,15 +1363,28 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	if (hostname) {
 		ret =
 		    gnutls_x509_crt_check_hostname2(cert_list[0], hostname, flags);
-		if (ret == 0)
+		if (ret == 0) {
+			gnutls_assert();
 			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+		}
+	}
+
+	if (ip.data) {
+		ret =
+		    gnutls_x509_crt_check_ip(cert_list[0], ip.data, ip.size, flags);
+		if (ret == 0) {
+			gnutls_assert();
+			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+		}
 	}
 
 	if (email) {
 		ret =
 		    gnutls_x509_crt_check_email(cert_list[0], email, 0);
-		if (ret == 0)
+		if (ret == 0) {
+			gnutls_assert();
 			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+		}
 	}
 
 	/* CRL checks follow */

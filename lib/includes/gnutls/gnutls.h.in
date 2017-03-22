@@ -1417,6 +1417,7 @@ void gnutls_session_set_verify_function(gnutls_session_t session, gnutls_certifi
  * @GNUTLS_DT_UNKNOWN: Unknown data type.
  * @GNUTLS_DT_DNS_HOSTNAME: The data contain a null-terminated DNS hostname; the hostname will be 
  *   matched using the RFC6125 rules.
+ * @GNUTLS_DT_IP_ADDRESS: The data contain a raw IP address (4 or 16 bytes) - since 3.6.0
  * @GNUTLS_DT_RFC822NAME: The data contain a null-terminated email address; the email will be
  *   matched against the RFC822Name field of the certificate, or the EMAIL DN component if the
  *   former isn't available. Prior to matching the email address will be converted to ACE
@@ -1426,13 +1427,16 @@ void gnutls_session_set_verify_function(gnutls_session_t session, gnutls_certifi
  *
  * Enumeration of different typed-data options. They are used as input to certificate
  * verification functions to provide information about the name and purpose of the
- * certificate. Only a single option of a type can be provided to the relevant functions.
+ * certificate. Only a single option of a type can be provided to the relevant functions
+ * (i.e., options %GNUTLS_DT_DNS_HOSTNAME, %GNUTLS_DT_IP_ADDRESS and
+ * %GNUTLS_DT_RFC822NAME cannot be combined).
  */
 typedef enum {
 	GNUTLS_DT_UNKNOWN = 0,
 	GNUTLS_DT_DNS_HOSTNAME = 1,
 	GNUTLS_DT_KEY_PURPOSE_OID = 2,
-	GNUTLS_DT_RFC822NAME = 3
+	GNUTLS_DT_RFC822NAME = 3,
+	GNUTLS_DT_IP_ADDRESS = 4
 } gnutls_vdata_types_t;
 
 typedef struct {
