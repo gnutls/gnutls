@@ -754,10 +754,13 @@ if test x$ac_zlib != xno; then
     else
       GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
     fi
+    LIBZ_PC=""
+  else
+    LIBZ_PC=$LIBZ
   fi
 fi
+AC_SUBST(LIBZ_PC)
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
-
 
 
 AC_ARG_WITH([default-trust-store-pkcs11],
