@@ -23,13 +23,11 @@ while test ${counter} -lt ${NUM}; do
 	else
 		name="CA-${counter}"
 	fi
-	serial="${counter}"
 
 	"${CERTTOOL}" --generate-privkey >"${OUTPUT}/${name}.key" 2>/dev/null
 	if test ${counter} = 0; then
 	# ROOT CA
 		echo "cn = ${name}" >"${TEMPLATE}"
-		echo "serial = ${serial}" >>"${TEMPLATE}"
 		echo "ca" >>"${TEMPLATE}"
 		echo "expiration_days = -1" >>"${TEMPLATE}"
 		echo "cert_signing_key" >>"${TEMPLATE}"
@@ -37,7 +35,6 @@ while test ${counter} -lt ${NUM}; do
 		"${CERTTOOL}" --generate-self-signed --load-privkey "${OUTPUT}/${name}.key" --outfile \
 			"${OUTPUT}/${name}.crt" --template "${TEMPLATE}" 2>/dev/null
 
-		echo "serial = ${serial}" >"${TEMPLATE}"
 		echo "expiration_days = -1" >>"${TEMPLATE}"
 		"${CERTTOOL}" --generate-crl --load-ca-privkey "${OUTPUT}/${name}.key" --load-ca-certificate "${OUTPUT}/${name}.crt" --outfile \
 			"${OUTPUT}/${name}.crl" --template "${TEMPLATE}" 2>/dev/null
@@ -56,7 +53,6 @@ while test ${counter} -lt ${NUM}; do
 		else
 		# intermediate CA
 			echo "cn = ${name}" >"${TEMPLATE}"
-			echo "serial = ${serial}" >>"${TEMPLATE}"
 			echo "ca" >>"${TEMPLATE}"
 			echo "expiration_days = -1" >>"${TEMPLATE}"
 			echo "cert_signing_key" >>"${TEMPLATE}"
