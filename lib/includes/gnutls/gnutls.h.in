@@ -1,6 +1,6 @@
 /* -*- c -*-
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1416,10 +1416,13 @@ void gnutls_session_set_verify_function(gnutls_session_t session, gnutls_certifi
  * gnutls_vdata_types_t:
  * @GNUTLS_DT_UNKNOWN: Unknown data type.
  * @GNUTLS_DT_DNS_HOSTNAME: The data contain a null-terminated DNS hostname; the hostname will be 
- *   matched using the RFC6125 rules.
- * @GNUTLS_DT_IP_ADDRESS: The data contain a raw IP address (4 or 16 bytes) - since 3.6.0
+ *   matched using the RFC6125 rules. If the data contain a textual IP (v4 or v6) address it will
+ *   be marched against the IPAddress Alternative name, unless the verification flag %GNUTLS_VERIFY_DO_NOT_ALLOW_IP_MATCHES
+ *   is specified.
+ * @GNUTLS_DT_IP_ADDRESS: The data contain a raw IP address (4 or 16 bytes). If will be matched
+ *   against the IPAddress Alternative name; option available since 3.6.0.
  * @GNUTLS_DT_RFC822NAME: The data contain a null-terminated email address; the email will be
- *   matched against the RFC822Name field of the certificate, or the EMAIL DN component if the
+ *   matched against the RFC822Name Alternative name of the certificate, or the EMAIL DN component if the
  *   former isn't available. Prior to matching the email address will be converted to ACE
  *   (ASCII-compatible-encoding).
  * @GNUTLS_DT_KEY_PURPOSE_OID: The data contain a null-terminated key purpose OID. It will be matched

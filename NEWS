@@ -60,6 +60,7 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_x509_crt_set_flags: Added
 gnutls_x509_crt_check_ip: Added
+GNUTLS_DT_IP_ADDRESS: Added
 GNUTLS_X509_CRT_FLAG_IGNORE_SANITY: Added
 GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS: Added
 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1: Added
