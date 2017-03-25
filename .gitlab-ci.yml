@@ -50,7 +50,7 @@ ABI-check/Fedora/x86_64:
   - init/Fedora/x86_64
   artifacts:
     untracked: true
-    expire_in: 1 day
+    expire_in: 4 days
 
 syntax-check/Fedora/x86_64:
   stage: stage1-testing
