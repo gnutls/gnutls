@@ -315,12 +315,13 @@ name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh ocsp-tests/ocsp-test
+dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
 
 if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
 	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
-	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection
+	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
+	ocsp-tests/ocsp-test
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
