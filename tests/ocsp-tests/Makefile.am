@@ -24,10 +24,10 @@ EXTRA_DIST = certs/ca.key certs/ca.pem certs/ocsp-server.key certs/ocsp-server.p
 	certs/server_good.key certs/server_bad.key certs/server_good.template \
 	certs/server_bad.template certs/ocsp-staple-unrelated.der suppressions.valgrind
 
-dist_check_SCRIPTS = ocsp-test
+dist_check_SCRIPTS =
 
 if !WINDOWS
-dist_check_SCRIPTS += ocsp-tls-connection ocsp-must-staple-connection
+dist_check_SCRIPTS += ocsp-tls-connection ocsp-must-staple-connection ocsp-test
 endif
 
 TESTS = $(dist_check_SCRIPTS)
