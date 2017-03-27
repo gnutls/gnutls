@@ -1411,7 +1411,8 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
  *
  * This function parses a PKCS12 structure in @pkcs12 and extracts the
  * private key, the corresponding certificate chain, any additional
- * certificates and a CRL.
+ * certificates and a CRL. The structures in @key, @chain @crl, and @extra_certs
+ * must not be initialized.
  *
  * The @extra_certs and @extra_certs_len parameters are optional
  * and both may be set to %NULL. If either is non-%NULL, then both must
