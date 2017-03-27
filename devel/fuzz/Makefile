@@ -24,42 +24,9 @@ all: gnutls_pkcs7_parser_fuzzer gnutls_client_fuzzer gnutls_dn_parser_fuzzer \
 	gnutls_openpgp_cert_parser_fuzzer gnutls_pkcs7_parser_fuzzer gnutls_pkcs8_key_parser_fuzzer \
 	gnutls_private_key_parser_fuzzer gnutls_server_fuzzer gnutls_x509_parser_fuzzer \
 	gnutls_reverse_idna_parser_fuzzer gnutls_idna_parser_fuzzer gnutls_ocsp_resp_parser_fuzzer \
-	gnutls_ocsp_req_parser_fuzzer
+	gnutls_ocsp_req_parser_fuzzer gnutls_pkcs12_key_parser_fuzzer
 
-gnutls_ocsp_req_parser_fuzzer: gnutls_ocsp_req_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_ocsp_resp_parser_fuzzer: gnutls_ocsp_resp_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_pkcs7_parser_fuzzer: gnutls_pkcs7_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_client_fuzzer: gnutls_client_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_dn_parser_fuzzer: gnutls_dn_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_openpgp_cert_parser_fuzzer: gnutls_openpgp_cert_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_pkcs8_key_parser_fuzzer: gnutls_pkcs8_key_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_private_key_parser_fuzzer: gnutls_private_key_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_server_fuzzer: gnutls_server_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_x509_parser_fuzzer: gnutls_x509_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_idna_parser_fuzzer: gnutls_idna_parser_fuzzer.cc
-	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
-
-gnutls_reverse_idna_parser_fuzzer: gnutls_reverse_idna_parser_fuzzer.cc
+%: %.cc
 	$(CC) $(CFLAGS) main.c $^ $(COMMON) -o $@
 
 clean:
