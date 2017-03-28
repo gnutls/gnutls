@@ -31,6 +31,8 @@ TMPFILE=tls-fuzzer-cert.$$.tmp
 #eval "${GETPORT}"
 PORT=4433
 
+$LOCKFILE
+
 pushd tls-fuzzer
 
 if ! test -d tlsfuzzer;then
@@ -65,4 +67,5 @@ rm -f ${TMPFILE}
 
 popd
 
+$UNLOCKFILE
 exit $retval
