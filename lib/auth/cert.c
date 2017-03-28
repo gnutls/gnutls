@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1011,10 +1012,14 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 	size = _gnutls_read_uint24(p);
 	p += 3;
 
+	/* ensure no discrepancy in data */
+	if (size != dsize)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 	/* some implementations send 0B 00 00 06 00 00 03 00 00 00
 	 * instead of just 0B 00 00 03 00 00 00 as an empty certificate message.
 	 */
-	if (size == 0 || size == 3) {
+	if (size == 0 || (size == 3 && memcmp(p, "\x00\x00\x00", 3) == 0)) {
 		gnutls_assert();
 		/* no certificate was sent */
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
