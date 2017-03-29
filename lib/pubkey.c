@@ -39,10 +39,6 @@
 #include <ecc.h>
 
 
-#define OPENPGP_KEY_PRIMARY 2
-#define OPENPGP_KEY_SUBKEY 1
-
-
 unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params)
 {
 	switch (pk) {
@@ -404,6 +400,10 @@ gnutls_pubkey_import_pkcs11(gnutls_pubkey_t key,
 #endif				/* ENABLE_PKCS11 */
 
 #ifdef ENABLE_OPENPGP
+
+#define OPENPGP_KEY_PRIMARY 2
+#define OPENPGP_KEY_SUBKEY 1
+
 
 /**
  * gnutls_pubkey_import_openpgp:

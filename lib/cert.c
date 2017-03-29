@@ -749,8 +749,6 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 				unsigned int *status)
 {
 	cert_auth_info_t info;
-	const char *hostname = NULL;
-	unsigned i, type = 0;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -768,7 +766,10 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 		return _gnutls_x509_cert_verify_peers(session, data, elements,
 						      status);
 #ifdef ENABLE_OPENPGP
-	case GNUTLS_CRT_OPENPGP:
+	case GNUTLS_CRT_OPENPGP: {
+		const char *hostname = NULL;
+		unsigned i, type = 0;
+
 		for (i=0;i<elements;i++) {
 			if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
 				hostname = (char*)data[i].data;
@@ -784,6 +785,7 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 							type,
 							hostname,
 							status);
+	}
 #endif
 	default:
 		return GNUTLS_E_INVALID_REQUEST;
