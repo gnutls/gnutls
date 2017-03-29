@@ -1377,7 +1377,7 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 
 		if (entry == NULL)
 			continue;
-		
+
 		/* finds the key exchange algorithm in
 		 * the ciphersuite
 		 */
@@ -1650,10 +1650,12 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 				       unsigned int *sidx)
 {
 	int mac_idx, cipher_idx, kx_idx;
-	unsigned int i;
+	unsigned int i, j;
 	unsigned int total =
 	    pcache->mac.algorithms * pcache->cipher.algorithms *
 	    pcache->kx.algorithms;
+	unsigned max_tls = 0;
+	unsigned max_dtls = 0;
 
 	if (idx >= total)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -1666,6 +1668,17 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 	idx /= pcache->cipher.algorithms;
 	kx_idx = idx % pcache->kx.algorithms;
 
+	/* find max_tls and max_dtls */
+	for (j=0;j<pcache->protocol.algorithms;j++) {
+		if (pcache->protocol.priority[j] <= GNUTLS_TLS_VERSION_MAX &&
+		    pcache->protocol.priority[j] >= max_tls) {
+			max_tls = pcache->protocol.priority[j];
+		} else if (pcache->protocol.priority[j] <= GNUTLS_DTLS_VERSION_MAX &&
+			   pcache->protocol.priority[j] >= max_dtls) {
+			max_dtls = pcache->protocol.priority[j];
+		}
+	}
+
 	for (i = 0; i < CIPHER_SUITES_COUNT; i++) {
 		if (cs_algorithms[i].kx_algorithm ==
 		    pcache->kx.priority[kx_idx]
@@ -1676,9 +1689,14 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 			*sidx = i;
 
 			if (_gnutls_cipher_exists(cs_algorithms[i].block_algorithm) &&
-			    _gnutls_mac_exists(cs_algorithms[i].mac_algorithm))
-				return 0;
-			else
+			    _gnutls_mac_exists(cs_algorithms[i].mac_algorithm)) {
+
+				if (max_tls >= cs_algorithms[i].min_version) {
+					return 0;
+				} else if (max_dtls >= cs_algorithms[i].min_dtls_version) {
+					return 0;
+				}
+			} else
 				break;
 		}
 	}
