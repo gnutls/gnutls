@@ -33,9 +33,10 @@ See the end for copying conditions.
    behavior can be overriden by providing the flag GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS
    to verification functions. Resolves gitlab issue #177.
 
-** libgnutls: The --disable-openpgp-authentication configure option will provide
-   an ABI-compatible library, with the openpgp functionality implemented as stubs.
-   The stubs are functions which only return an error on call.
+** libgnutls: OpenPGP authentication is disabled by default, and the resulting
+   library is ABI compatible (will openpgp related functions being stubs that fail
+   on invocation). The flag --enable-openpgp-authentication to configure will
+   enable OpenPGP authentication support.
 
 ** libgnutls: Refuse to generate a certificate with an illegal version, or an
    illegal serial number. That is, gnutls_x509_crt_set_version() and
