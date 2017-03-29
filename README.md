@@ -43,7 +43,6 @@ We require several tools to check out and build the software, including:
 * [Libidn2](https://www.gnu.org/software/libidn/#libidn2) (optional, for internationalization of DNS, IDNA 2008)
 * [Libunistring](http://www.gnu.org/software/libunistring/) (optional, for internationalization)
 * [AWK](http://www.gnu.org/software/awk/) (for make dist, pmccabe2html)
-* [git2cl](http://savannah.nongnu.org/projects/git2cl/) (for make dist, ChangeLog)
 * [bison](http://www.gnu.org/software/bison) (for datetime parser in certtool)
 * [libunbound](https://unbound.net/) (for DANE support)
 * [abi-compliance-checker](http://ispras.linuxbase.org/index.php/ABI_compliance_checker) (for make dist)
@@ -56,7 +55,7 @@ Debian/Ubuntu:
 ```
 apt-get install -y git-core autoconf libtool gettext autopoint
 apt-get install -y automake autogen nettle-dev libp11-kit-dev libtspi-dev libunistring-dev
-apt-get install -y guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf git2cl
+apt-get install -y guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf
 apt-get install -y libunbound-dev dns-root-data bison help2man gtk-doc-tools
 apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-utils
 ```
@@ -65,7 +64,7 @@ Fedora/RHEL:
 ```
 yum install -y git autoconf libtool gettext-devel automake autogen
 yum install -y nettle-devel p11-kit-devel autogen-libopts-devel libunistring-devel
-yum install -y trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl
+yum install -y trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf
 yum install -y libtasn1-tools unbound-devel bison help2man gtk-doc texinfo texlive
 ```
 

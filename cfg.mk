@@ -120,8 +120,7 @@ clang-copy:
 # Release
 
 ChangeLog:
-	git log --pretty --numstat --summary --since="2014 November 07" -- | git2cl > ChangeLog
-	cat .clcopying >> ChangeLog
+	git log --no-merges --no-decorate --pretty  --since="2014 November 07"|grep -v ^'commit' > ChangeLog
 
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
 
