@@ -47,7 +47,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/ca.key ocsp-tests/certs/ca.pem ocsp-tests/certs/ocsp-server.key ocsp-tests/certs/ocsp-server.pem ocsp-tests/response1.der \
 	ocsp-tests/response2.der ocsp-tests/certs/ocsp_index.txt ocsp-tests/certs/ocsp_index.txt.attr \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
-	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind
+	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
+	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
+	data/listings-SSL3.0-TLS1.1
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -321,7 +323,7 @@ if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
 	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
-	ocsp-tests/ocsp-test
+	ocsp-tests/ocsp-test cipher-listings.sh
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
@@ -352,6 +354,12 @@ TESTS_ENVIRONMENT =						\
 
 if WINDOWS
 TESTS_ENVIRONMENT += WINDOWS=1
+endif
+
+if ENABLE_SSL3
+TESTS_ENVIRONMENT += ENABLE_SSL3=1
+else
+TESTS_ENVIRONMENT += ENABLE_SSL3=0
 endif
 
 if WANT_TEST_SUITE
