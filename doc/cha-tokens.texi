@@ -1,5 +1,5 @@
 @node Hardware security modules and abstract key types
-@chapter Abstract keys types and Hardware security modules
+@chapter Abstract key types and Hardware security modules
 
 In several cases storing the long term cryptographic keys in a hard disk or
 even in memory poses a significant risk. Once the system they are stored
