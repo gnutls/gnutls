@@ -458,6 +458,8 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
  * Returns: %GNUTLS_E_INVALID_REQUEST if the provided structure isn't an encrypted key,
  *  %GNUTLS_E_UNKNOWN_CIPHER_TYPE if the structure's encryption isn't supported, or
  *  another negative error code in case of a failure. Zero on success.
+ *
+ * Since: 3.4.0
  **/
 int
 gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
@@ -541,8 +543,10 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 	return 0;
 
  cleanup:
-	if (oid)
+	if (ret != GNUTLS_E_UNKNOWN_CIPHER_TYPE && oid) {
 		gnutls_free(*oid);
+		*oid = NULL;
+	}
 	if (need_free)
 		_gnutls_free_datum(&_data);
 	return ret;
