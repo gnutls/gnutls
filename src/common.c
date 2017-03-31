@@ -857,6 +857,7 @@ void print_list(const char *priorities, int verbose)
 			}
 		}
 
+		gnutls_priority_deinit(pcache);
 		return;
 	}
 
