@@ -56,3 +56,10 @@ if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \
 	int/drbg-aes.c int/drbg-aes.h
 endif
+
+if !HAVE_NETTLE_RSA_PSS
+libcrypto_la_SOURCES += int/pss-mgf1.c int/pss-mgf1.h int/pss.c int/pss.h \
+	int/rsa-pss.c int/rsa-pss.h \
+	int/rsa-pss-sha256-sign-tr.c int/rsa-pss-sha256-verify.c \
+	int/rsa-pss-sha512-sign-tr.c int/rsa-pss-sha512-verify.c
+endif
