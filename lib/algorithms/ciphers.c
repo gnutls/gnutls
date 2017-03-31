@@ -261,6 +261,9 @@ unsigned gnutls_cipher_get_block_size(gnutls_cipher_algorithm_t algorithm)
  * gnutls_cipher_get_tag_size:
  * @algorithm: is an encryption algorithm
  *
+ * This function returns the tag size of an authenticated encryption
+ * algorithm. For non-AEAD algorithms, it returns zero.
+ *
  * Returns: the tag size of the authenticated encryption algorithm.
  *
  * Since: 3.2.2
