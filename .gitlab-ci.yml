@@ -81,6 +81,11 @@ minimal/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - echo "No tools build"
+  - ./configure --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
+  - make -j$(nproc)
+  - make -j$(nproc) check
+  - echo "Minimal build"
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
     ./configure --with-included-libtasn1 --enable-valgrind-tests
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
@@ -191,27 +196,6 @@ valgrind/Fedora/x86_64:
   - ./configure --disable-doc  --disable-guile --disable-full-test-suite --enable-valgrind-tests
   - make -j$(nproc)
   - make check -j$(nproc)
-  tags:
-  - shared
-  except:
-  - tags
-  dependencies:
-  - init/Fedora/x86_64
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - ./*.log
-      - tests/*.log
-      - tests/*/*.log
-
-no-tools/Fedora/x86_64:
-  stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - ./configure --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
-  - make -j$(nproc)
-  - make -j$(nproc) check
   tags:
   - shared
   except:
