@@ -35,7 +35,7 @@ init/Fedora/x86_64:
 # Stage 1, documentation, and advanced checks
 ##################################################
 
-dist/Fedora:
+doc-dist/Fedora:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
