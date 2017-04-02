@@ -483,7 +483,7 @@ SSL_METHOD *SSLv23_client_method(void)
 		return NULL;
 
 	strcpy(m->priority_string,
-	       "NONE:+VERS-TLS1.0:+VERS-SSL3.0:+CIPHER-ALL:+COMP-ALL:+RSA:+DHE-RSA:+DHE-DSS:+MAC-ALL");
+	       "NORMAL");
 
 	m->connend = GNUTLS_CLIENT;
 
@@ -498,7 +498,7 @@ SSL_METHOD *SSLv23_server_method(void)
 		return NULL;
 
 	strcpy(m->priority_string,
-	       "NONE:+VERS-TLS1.0:+VERS-SSL3.0:+CIPHER-ALL:+COMP-ALL:+RSA:+DHE-RSA:+DHE-DSS:+MAC-ALL");
+	       "NORMAL");
 	m->connend = GNUTLS_SERVER;
 
 	return m;
