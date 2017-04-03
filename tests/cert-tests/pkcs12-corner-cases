@@ -56,7 +56,27 @@ for p12 in "key-corpus-rc2-1.p12" "key-corpus-rc2-2.p12" "key-corpus-rc2-3.p12";
 	rc=$?
 	if test ${rc} != 0 && test ${rc} != 1; then
 		cat ${TMPFILE}
-		echo "PKCS12 FATAL ${p12}"
+		echo "PKCS12 FATAL ${file}"
+		exit 1
+	fi
+done
+
+for p12 in "key-corpus-rc2-1.p12";do
+	set -- ${p12}
+	file="$1"
+	"${CERTTOOL}" --p12-info --inder --password "${cpassword}" \
+		--infile "${srcdir}/data/${file}" >${TMPFILE} 2>/dev/null
+	rc=$?
+	if test ${rc} != 0 && test ${rc} != 1; then
+		cat ${TMPFILE}
+		echo "Error in output from ${file}"
+		exit 1
+	fi
+
+	${DIFF} --strip-trailing-cr ${TMPFILE} "${srcdir}/data/${file}.out"
+	rc=$?
+	if test ${rc} != 0;then
+		echo "Output differs in ${file}.out ${TMPFILE}"
 		exit 1
 	fi
 done
