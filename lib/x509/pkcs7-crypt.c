@@ -791,22 +791,21 @@ read_pbes2_enc_params(ASN1_TYPE pasn,
 	int params_start, params_end;
 	int params_len, len, result;
 	ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
-	char oid[MAX_OID_SIZE];
 	const struct pkcs_cipher_schema_st *p;
 
 	memset(params, 0, sizeof(*params));
 
 	/* Check the encryption algorithm
 	 */
-	len = sizeof(oid);
-	result = asn1_read_value(pasn, "encryptionScheme.algorithm", oid, &len);
+	len = sizeof(params->pbes2_oid);
+	result = asn1_read_value(pasn, "encryptionScheme.algorithm", params->pbes2_oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
-	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", oid);
+	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", params->pbes2_oid);
 
-	if ((result = pbes2_cipher_oid_to_algo(oid, &params->cipher)) < 0) {
+	if ((result = pbes2_cipher_oid_to_algo(params->pbes2_oid, &params->cipher)) < 0) {
 		gnutls_assert();
 		return result;
 	}

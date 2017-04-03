@@ -66,6 +66,7 @@ struct pbe_enc_params {
 	gnutls_cipher_algorithm_t cipher;
 	uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
 	int iv_size;
+	char pbes2_oid[MAX_OID_SIZE]; /* when reading params, the OID is stored for info purposes */
 };
 
 int

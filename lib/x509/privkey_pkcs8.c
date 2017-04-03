@@ -774,11 +774,13 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 		   char **oid)
 {
 	int result, len;
-	char enc_oid[MAX_OID_SIZE];
+	char enc_oid[MAX_OID_SIZE*2];
 	int params_start, params_end, params_len;
 	struct pbe_enc_params enc_params;
 	schema_id schema;
 	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+
+	memset(&enc_params, 0, sizeof(enc_params));
 
 	result = check_for_decrypted(raw_key);
 	if (result == 0)
@@ -845,6 +847,11 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 
 	if (result < 0) {
 		gnutls_assert();
+		if (oid && enc_params.pbes2_oid[0] != 0) {
+			snprintf(enc_oid, sizeof(enc_oid), "%s/%s", *oid, enc_params.pbes2_oid);
+			gnutls_free(*oid);
+			*oid = gnutls_strdup(enc_oid);
+		}
 		goto error;
 	}
 
