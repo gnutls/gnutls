@@ -103,11 +103,15 @@ gnutls_transport_set_pull_function(gnutls_session_t session,
  * int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
  *
  * This callback is necessary when gnutls_handshake_set_timeout() or 
- * gnutls_record_set_timeout() are set. It will not be used when 
- * non-blocking sockets are in use. That is, this function will
- * not operate when %GNUTLS_NONBLOCK is specified in gnutls_init(), 
- * or a custom pull function is registered without updating the 
- * pull timeout function.
+ * gnutls_record_set_timeout() are set, and for calculating the DTLS mode
+ * timeouts.
+ *
+ * In short, this callback should be set when a custom pull function is
+ * registered. The callback will not be used when the session is in TLS mode with
+ * non-blocking sockets. That is, when %GNUTLS_NONBLOCK is specified for a TLS
+ * session in gnutls_init(). For compatibility with future GnuTLS versions
+ * it is recommended to always set this function when a custom pull function
+ * is registered.
  *
  * The helper function gnutls_system_recv_timeout() is provided to
  * simplify writing callbacks. 
