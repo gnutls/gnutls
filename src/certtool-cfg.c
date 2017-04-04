@@ -123,6 +123,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "crl_this_update_date", .type = OPTION_STRING },
 	{ .name = "crl_next_update_date", .type = OPTION_STRING },
 	{ .name = "policy*", .type = OPTION_MULTI_LINE }, /* not a multi-line but there are multi as it is a wildcard */
+	{ .name = "inhibit_anypolicy_skip_certs", .type = OPTION_NUMERIC },
 	{ .name = "pkcs12_key_name", .type = OPTION_STRING },
 	{ .name = "proxy_policy_language", .type = OPTION_STRING },
 	{ .name = "serial", .type = OPTION_NUMERIC },
@@ -196,6 +197,7 @@ typedef struct _cfg_ctx {
 	char *next_update_date;
 	int64_t serial;
 	int expiration_days;
+	int skip_certs; /* from inhibit anypolicy */
 	int ca;
 	int path_len;
 	int tls_www_client;
@@ -230,6 +232,7 @@ void cfg_init(void)
 	cfg.path_len = -1;
 	cfg.crl_number = -1;
 	cfg.serial = -1;
+	cfg.skip_certs = -1;
 }
 
 #define READ_MULTI_LINE(name, s_name) \
@@ -453,6 +456,8 @@ int template_parse(const char *template)
 	val = optionGetValue(pov, "crl_next_update_date");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
 		cfg.next_update_date = strdup(val->v.strVal);
+
+	READ_NUMERIC("inhibit_anypolicy_skip_certs", cfg.skip_certs);
 
 	for (i = 0; i < MAX_POLICIES; i++) {
 		snprintf(tmpstr, sizeof(tmpstr), "policy%d", i + 1);
@@ -2223,6 +2228,14 @@ void get_policy_set(gnutls_x509_crt_t crt)
 	gnutls_x509_policy_st policy;
 
 	if (batch) {
+		if (cfg.skip_certs >= 0) {
+			ret = gnutls_x509_crt_set_inhibit_anypolicy(crt, cfg.skip_certs);
+			if (ret < 0) {
+				fprintf(stderr, "error setting inhibit anypolicy: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
 		if (!cfg.policy_oid)
 			return;
 

@@ -965,6 +965,10 @@ encryption_key
 #policy2_txt = "This is a short policy"
 #policy2_url = http://www.example.com/another-policy-to-read
 
+# The number of additional certificates that may appear in a
+# path before the anyPolicy is no longer acceptable.
+#inhibit_anypolicy_skip_certs 1
+
 # Name constraints
 
 # DNS
