@@ -142,25 +142,6 @@ FIPS140-2/Fedora/x86_64:
       - build/tests/*.log
       - build/tests/*/*.log
 
-IDNA2003/Fedora/x86_64:
-  stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - make autoreconf
-  - mkdir -p build && cd build &&
-    ../configure --without-libidn2 --disable-doc --disable-guile --disable-full-test-suite &&
-    make -j$(nproc) && make check -j$(nproc)
-  tags:
-  - shared
-  except:
-  - tags
-  artifacts:
-    when: on_failure
-    paths:
-      - build/guile/tests/*.log
-      - build/tests/*.log
-      - build/tests/*/*.log
-
 openpgp/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD

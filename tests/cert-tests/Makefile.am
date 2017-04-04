@@ -98,9 +98,7 @@ dist_check_SCRIPTS += openpgp-certs
 endif
 endif
 
-if !HAVE_BUGGY_LIBIDN
 dist_check_SCRIPTS += certtool-utf8
-endif
 
 if ENABLE_NON_SUITEB_CURVES
 dist_check_SCRIPTS += crq

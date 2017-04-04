@@ -341,7 +341,7 @@ void doit(void)
 	start("empty", 0, "", 0, "", 0);
 	start("test.example.com", 0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"));
 	start("longtest.example.com", 0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"));
-#if defined(HAVE_LIBIDN) || defined(HAVE_LIBIDN2)
+#if defined(HAVE_LIBIDN2)
 	/* test invalid UTF8 */
 	start("invalid-utf8", 1, "invalid\xff.example.com.", sizeof("invalid\xff.example.com")-1, NULL, 0);
 #endif

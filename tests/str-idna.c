@@ -32,11 +32,7 @@
 #include <gnutls/gnutls.h>
 #include <cmocka.h>
 
-#ifdef HAVE_LIBIDN2
-# define GLOBAL_FLAGS GNUTLS_IDNA_FORCE_2008
-#else
 # define GLOBAL_FLAGS 0
-#endif
 
 #define MATCH_FUNC(fname, str, normalized) \
 static void fname(void **glob_state) \
@@ -84,13 +80,12 @@ MATCH_FUNC_TWO_WAY(test_u1, "夡夞夜夙", "xn--bssffl");
 MATCH_FUNC_TWO_WAY(test_jp2, "日本語.jp", "xn--wgv71a119e.jp");
 /* invalid (✌️) symbol in IDNA2008 but valid in IDNA2003. Browsers
  * fallback to IDNA2003, and we do too, so that should work */
-#if defined(HAVE_LIBIDN) || IDN2_VERSION_NUMBER >= 0x02000002
+#if IDN2_VERSION_NUMBER >= 0x02000002
 MATCH_FUNC_TWO_WAY(test_valid_idna2003, "\xe2\x9c\x8c\xef\xb8\x8f.com", "xn--7bi.com");
 #else
 EMPTY_FUNC(test_valid_idna2003);
 #endif
 
-#ifdef HAVE_LIBIDN2 /* IDNA 2008 */
 MATCH_FUNC_TWO_WAY(test_greek2, "βόλος.com", "xn--nxasmm1c.com");
 MATCH_FUNC_TWO_WAY(test_german1, "faß.de", "xn--fa-hia.de");
 # if IDN2_VERSION_NUMBER >= 0x00140000
@@ -106,25 +101,14 @@ EMPTY_FUNC(test_caps_german3);
 EMPTY_FUNC(test_caps_greek);
 EMPTY_FUNC(test_dots);
 # endif
-#else /* IDNA 2003 */
-MATCH_FUNC(test_caps_greek, "ΒΌΛΟΣ.com", "xn--nxasmq6b.com");
-MATCH_FUNC(test_greek2, "βόλος.com", "xn--nxasmq6b.com");
-MATCH_FUNC(test_german1, "faß.de", "fass.de");
-MATCH_FUNC(test_caps_german1, "Ü.ü", "xn--tda.xn--tda");
-MATCH_FUNC(test_caps_german2, "Bücher.de", "xn--bcher-kva.de");
-MATCH_FUNC(test_caps_german3, "Faß.de", "fass.de");
-MATCH_FUNC(test_dots, "a.b.c。d。", "a.b.c.d.");
-#endif
 
 int main(void)
 {
 	gnutls_datum_t tmp;
 	int ret;
 	const struct CMUnitTest tests[] = {
-#ifdef HAVE_LIBIDN2 /* IDNA 2008 */
 		cmocka_unit_test(test_greek2_reverse),
 		cmocka_unit_test(test_german1_reverse),
-#endif
 		cmocka_unit_test(test_ascii),
 		cmocka_unit_test(test_ascii_reverse),
 		cmocka_unit_test(test_ascii_caps),

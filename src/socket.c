@@ -43,13 +43,6 @@
 #include <c-ctype.h>
 #include "sockets.h"
 
-#ifdef HAVE_LIBIDN2
-#include <idn2.h>
-#elif defined HAVE_LIBIDN
-#include <idna.h>
-#include <idn-free.h>
-#endif
-
 #define MAX_BUF 4096
 
 /* Functions to manipulate sockets

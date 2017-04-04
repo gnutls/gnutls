@@ -25,19 +25,16 @@
 #include "errors.h"
 #include "str.h"
 #include <unistr.h>
+
 #ifdef HAVE_LIBIDN2
+
 # include <idn2.h>
-#elif defined HAVE_LIBIDN
-# include <idna.h>
-# include <idn-free.h>
-#endif
 
-#if defined HAVE_LIBIDN2 || defined HAVE_LIBIDN
-
-#ifdef HAVE_LIBIDN2
-# define IDN_FREE idn2_free
+#if IDN2_VERSION_NUMBER < 0x02000000
+# define idn2_to_ascii_8z idn2_lookup_u8
+# define ICAST uint8_t
 #else
-# define IDN_FREE idn_free
+# define ICAST char
 #endif
 
 /**
@@ -69,6 +66,20 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	char *idna = NULL;
 	int rc, ret;
 	gnutls_datum_t istr;
+	unsigned int idn2_flags = IDN2_NFC_INPUT;
+	unsigned int idn2_tflags = IDN2_NFC_INPUT;
+
+#if IDN2_VERSION_NUMBER >= 0x00140000
+	/* IDN2_NONTRANSITIONAL automatically converts to lowercase
+	 * IDN2_NFC_INPUT converts to NFC before toASCII conversion
+	 *
+	 * Since IDN2_NONTRANSITIONAL implicitely does NFC conversion, we don't need
+	 * the additional IDN2_NFC_INPUT. But just for the unlikely case that the linked
+	 * library is not matching the headers when building and it doesn't support TR46,
+	 * we provide IDN2_NFC_INPUT. */
+	idn2_flags |= IDN2_NONTRANSITIONAL;
+	idn2_tflags |= IDN2_TRANSITIONAL;
+#endif
 
 	if (ilen == 0) {
 		out->data = (uint8_t*)gnutls_strdup("");
@@ -82,37 +93,16 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 		return _gnutls_set_strdatum(out, input, ilen);
 	}
 
-#ifndef HAVE_LIBIDN2
-	if (flags & GNUTLS_IDNA_FORCE_2008)
-		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-#endif
-
 	ret = _gnutls_set_strdatum(&istr, input, ilen);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-#ifdef HAVE_LIBIDN2
-# if IDN2_VERSION_NUMBER >= 0x00140000
-	/* IDN2_NONTRANSITIONAL automatically converts to lowercase
-	 * IDN2_NFC_INPUT converts to NFC before toASCII conversion
-	 *
-	 * Since IDN2_NONTRANSITIONAL implicitely does NFC conversion, we don't need
-	 * the additional IDN2_NFC_INPUT. But just for the unlikely case that the linked
-	 * library is not matching the headers when building and it doesn't support TR46,
-	 * we provide IDN2_NFC_INPUT. 
-	 *
-	 * The reason we fallback to transitional encoding on disallowed characters is
-	 * to support domains which existed in IDNA2003, but were invalid with IDNA2008.
-	 */
-
-	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT | IDN2_NONTRANSITIONAL);
+	rc = idn2_to_ascii_8z((ICAST*)istr.data, (ICAST**)&idna, idn2_flags);
 	if (rc == IDN2_DISALLOWED && !(flags & GNUTLS_IDNA_FORCE_2008))
-		rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT | IDN2_TRANSITIONAL);
-# else
-	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT);
-# endif
+		rc = idn2_to_ascii_8z((ICAST*)istr.data, (ICAST**)&idna, idn2_tflags);
+
 	if (rc != IDN2_OK) {
 		gnutls_assert();
 		idna = NULL; /* in case idn2_lookup_u8 modifies &idna */
@@ -120,17 +110,8 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 		ret = GNUTLS_E_INVALID_UTF8_STRING;
 		goto fail;
 	}
-#else
-	rc = idna_to_ascii_8z((char*)istr.data, &idna, 0);
-	if (rc != IDNA_SUCCESS) {
-		gnutls_assert();
-		_gnutls_debug_log("unable to convert name '%s' to IDNA format: %s\n", istr.data, idna_strerror(rc));
-		ret = GNUTLS_E_INVALID_UTF8_STRING;
-		goto fail;
-	}
-#endif
 
-	if (gnutls_free != IDN_FREE) {
+	if (gnutls_free != idn2_free) {
 		ret = _gnutls_set_strdatum(out, idna, strlen(idna));
 	} else  {
 		out->data = (unsigned char*)idna;
@@ -140,12 +121,12 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	}
 
  fail:
-	IDN_FREE(idna);
+	idn2_free(idna);
 	gnutls_free(istr.data);
 	return ret;
 }
 
-#ifdef HAVE_LIBIDN2
+#if IDN2_VERSION_NUMBER < 0x02000000
 int _idn2_punycode_decode(
 	size_t input_length,
 	const char input[],
@@ -153,7 +134,7 @@ int _idn2_punycode_decode(
 	uint32_t output[],
 	unsigned char case_flags[]);
 
-static int _idn2_to_unicode_8z8z(const char *src, char **dst)
+static int idn2_to_unicode_8z8z(const char *src, char **dst, unsigned flags)
 {
 	int rc, run;
 	size_t out_len = 0;
@@ -251,24 +232,14 @@ int gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *ou
 		return ret;
 	}
 
-#ifdef HAVE_LIBIDN2
 	/* currently libidn2 just converts single labels, thus a wrapper function */
-	rc = _idn2_to_unicode_8z8z((char*)istr.data, &u8);
+	rc = idn2_to_unicode_8z8z((char*)istr.data, &u8, 0);
 	if (rc != IDN2_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("unable to convert ACE name '%s' to UTF-8 format: %s\n", istr.data, idn2_strerror(rc));
 		ret = GNUTLS_E_INVALID_UTF8_STRING;
 		goto fail;
 	}
-#else
-	rc = idna_to_unicode_8z8z((char*)istr.data, &u8, IDNA_ALLOW_UNASSIGNED);
-	if (rc != IDNA_SUCCESS) {
-		gnutls_assert();
-		_gnutls_debug_log("unable to convert ACE name '%s' to UTF-8 format: %s\n", istr.data, idna_strerror(rc));
-		ret = GNUTLS_E_INVALID_UTF8_STRING;
-		goto fail;
-	}
-#endif
 
 	if (gnutls_malloc != malloc) {
 		ret = _gnutls_set_strdatum(out, u8, strlen(u8));
@@ -279,16 +250,12 @@ int gnutls_idna_reverse_map(const char *input, unsigned ilen, gnutls_datum_t *ou
 		ret = 0;
 	}
  fail:
-#ifdef HAVE_LIBIDN2
 	idn2_free(u8);
-#else
-	idn_free(u8);
-#endif
 	gnutls_free(istr.data);
 	return ret;
 }
 
-#else
+#else /* no HAVE_LIBIDN2 */
 
 # undef gnutls_idna_map
 int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsigned flags)

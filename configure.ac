@@ -465,26 +465,19 @@ AM_CONDITIONAL(WITH_OLD_NETTLE, test "$with_old_nettle" != "no")
 
 
 AC_ARG_WITH(idn, AS_HELP_STRING([--without-idn],
-                                 [disable support for libidn]),
-            try_libidn="$withval", 
-            try_libidn=yes)
-
-AC_ARG_WITH(libidn2, AS_HELP_STRING([--without-libidn2],
-                                 [force support for libidn instead of libidn2]),
+                                [disable support for IDNA]),
             try_libidn2="$withval", 
             try_libidn2=yes)
 
 idna_support=no
 with_libidn2=no
-with_libidn=no
-if test "$try_libidn" = yes;then
 
-  if test "$try_libidn2" = yes;then
+if test "$try_libidn2" = yes;then
   AC_SEARCH_LIBS(idn2_lookup_u8, idn2, [
       with_libidn2=yes;
       idna_support="IDNA 2008 (libidn2)"
       AC_DEFINE([HAVE_LIBIDN2], 1, [Define if IDNA 2008 support is enabled.])
-      AC_SUBST([LIBIDN_LIBS], [-lidn2])
+      AC_SUBST([LIBIDN2_CFLAGS], [])
       AC_SUBST([LIBIDN2_LIBS], [-lidn2]) dnl used in gnutls.pc.in
 dnl enable once libidn2.pc is widespread; and remove LIBIDN2_LIBS from gnutls.pc.in (Libs.private)
 dnl      if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
@@ -496,36 +489,11 @@ dnl      fi
       with_libidn2=no;
       AC_MSG_WARN(*** LIBIDN2 was not found. You will not be able to use IDN2008 support)
     ])
-  else
+else
     with_libidn2=no
-  fi
-
-  if test "$with_libidn2" = "no"; then
-    PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
-    if test "$with_libidn" != "no";then
-      idna_support="IDNA 2003 (libidn)"
-      if ! $PKG_CONFIG --atleast-version=1.31 libidn; then
-	     with_buggy_libidn=yes
-      fi
-
-      AC_DEFINE([HAVE_LIBIDN], 1, [Build IDNA support])
-      if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
-        GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn"
-      else
-        GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libidn"
-      fi
-    else
-      AC_MSG_WARN([[
-*** 
-*** libidn was not found. IDNA support will be disabled.
-*** ]])
-    fi
-  fi
 fi
 
 AM_CONDITIONAL(HAVE_LIBIDN2, test "$with_libidn2" != "no")
-AM_CONDITIONAL(HAVE_LIBIDN, test "$with_libidn" != "no")
-AM_CONDITIONAL(HAVE_BUGGY_LIBIDN, test "$with_buggy_libidn" = "yes")
 
 AC_ARG_ENABLE(non-suiteb-curves,
   AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
