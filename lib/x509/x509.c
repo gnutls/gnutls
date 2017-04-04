@@ -2136,7 +2136,7 @@ gnutls_x509_crt_get_ca_status(gnutls_x509_crt_t cert,
  * %GNUTLS_KEY_KEY_CERT_SIGN, %GNUTLS_KEY_CRL_SIGN,
  * %GNUTLS_KEY_ENCIPHER_ONLY, %GNUTLS_KEY_DECIPHER_ONLY.
  *
- * Returns: the certificate key usage, or a negative error code in case of
+ * Returns: zero on success, or a negative error code in case of
  *   parsing error.  If the certificate does not contain the keyUsage
  *   extension %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be
  *   returned.
@@ -2171,6 +2171,60 @@ gnutls_x509_crt_get_key_usage(gnutls_x509_crt_t cert,
 	if (result < 0) {
 		gnutls_assert();
 		return result;
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_crt_get_inhibit_anypolicy:
+ * @cert: should contain a #gnutls_x509_crt_t type
+ * @skipcerts: will hold the number of certificates after which anypolicy is no longer acceptable.
+ * @critical: will be non-zero if the extension is marked as critical
+ *
+ * This function will return certificate's value of the SkipCerts, i.e.,
+ * the Inhibit anyPolicy X.509 extension (2.5.29.54).
+ *
+ * The returned value is the number of additional certificates that
+ * may appear in the path before the anyPolicy is no longer acceptable.
+
+ * Returns: zero on success, or a negative error code in case of
+ *   parsing error.  If the certificate does not contain the Inhibit anyPolicy
+ *   extension %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be
+ *   returned.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_x509_crt_get_inhibit_anypolicy(gnutls_x509_crt_t cert,
+			      unsigned int *skipcerts,
+			      unsigned int *critical)
+{
+	int ret;
+	gnutls_datum_t ext;
+
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if ((ret =
+	     _gnutls_x509_crt_get_extension(cert, "2.5.29.54", 0,
+					    &ext, critical)) < 0) {
+		return ret;
+	}
+
+	if (ext.size == 0 || ext.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	ret = gnutls_x509_ext_import_key_usage(&ext, skipcerts);
+	_gnutls_free_datum(&ext);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	return 0;

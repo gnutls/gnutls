@@ -479,6 +479,12 @@ int gnutls_x509_crt_set_authority_info_access(gnutls_x509_crt_t
 					      crt, int what,
 					      gnutls_datum_t * data);
 
+int gnutls_x509_crt_get_inhibit_anypolicy(gnutls_x509_crt_t cert,
+				  unsigned int *skipcerts,
+				  unsigned int *critical);
+int
+gnutls_x509_crt_set_inhibit_anypolicy(gnutls_x509_crt_t crt, unsigned int skipcerts);
+
 int gnutls_x509_crt_get_proxy(gnutls_x509_crt_t cert,
 			      unsigned int *critical,
 			      int *pathlen,

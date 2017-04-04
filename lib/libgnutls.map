@@ -1138,6 +1138,8 @@ GNUTLS_3_4
 	gnutls_x509_crt_check_ip;
 	gnutls_x509_ext_import_inhibit_anypolicy;
 	gnutls_x509_ext_export_inhibit_anypolicy;
+	gnutls_x509_crt_get_inhibit_anypolicy;
+	gnutls_x509_crt_set_inhibit_anypolicy;
  local:
 	*;
 };

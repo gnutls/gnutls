@@ -563,6 +563,48 @@ gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt, unsigned int usage)
 }
 
 /**
+ * gnutls_x509_crt_set_inhibit_anypolicy:
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @skipcerts: number of certificates after which anypolicy is no longer acceptable.
+ *
+ * This function will set the Inhibit anyPolicy certificate extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_inhibit_anypolicy(gnutls_x509_crt_t crt, unsigned int skipcerts)
+{
+	int ret;
+	gnutls_datum_t der_data;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	ret =
+	    gnutls_x509_ext_export_inhibit_anypolicy(skipcerts, &der_data);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret =
+	    _gnutls_x509_crt_set_extension(crt, "2.5.29.54", &der_data, 1);
+	_gnutls_free_datum(&der_data);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_x509_crt_set_subject_alternative_name:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
