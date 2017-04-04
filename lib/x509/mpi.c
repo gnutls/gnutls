@@ -28,6 +28,7 @@
 #include "common.h"
 #include "x509_int.h"
 #include <num.h>
+#include <limits.h>
 
 /* Reads an Integer from the DER encoded data
  */
@@ -319,12 +320,17 @@ _gnutls_x509_read_uint(ASN1_TYPE node, const char *value,
 int
 _gnutls_x509_write_uint32(ASN1_TYPE node, const char *value, uint32_t num)
 {
-	uint8_t tmpstr[4];
+	uint8_t tmpstr[5];
 	int result;
 
-	_gnutls_write_uint32(num, tmpstr);
+	tmpstr[0] = 0;
+	_gnutls_write_uint32(num, tmpstr+1);
 
-	result = asn1_write_value(node, value, tmpstr, 4);
+	if (tmpstr[1] > SCHAR_MAX) {
+		result = asn1_write_value(node, value, tmpstr, 5);
+	} else {
+		result = asn1_write_value(node, value, tmpstr+1, 4);
+	}
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
