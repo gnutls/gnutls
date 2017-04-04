@@ -975,6 +975,23 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 			}
 		}
 		gnutls_x509_policies_deinit(policies);
+	} else if (strcmp(oid, "2.5.29.54") == 0) {
+		unsigned int skipcerts;
+
+		err = gnutls_x509_ext_import_inhibit_anypolicy(der, &skipcerts);
+		if (err < 0) {
+			addf(str,
+			     "error: certificate inhibit any policy import: %s\n",
+			     gnutls_strerror(err));
+			return;
+		}
+
+		addf(str,
+		     "%s\t\tInhibit anyPolicy skip certs: %u (%s)\n",
+			     prefix, skipcerts,
+			     critical ? _("critical") :
+			     _("not critical"));
+
 	} else if (strcmp(oid, "2.5.29.35") == 0) {
 
 		if (idx->aki) {
