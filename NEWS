@@ -47,6 +47,9 @@ See the end for copying conditions.
    fail, unless flags intended to enable broken algorithms are set. This
    can be reverted on compile time with the configure flag --enable-sha1-support.
 
+** libgnutls: Added support for PKCS#12 files with no (zero length) salt used in their
+   password encoding, and PKCS#12 files using SHA384 and SHA512 as MAC.
+
 ** libgnutls: Introduced the %VERIFY_ALLOW_BROKEN and %VERIFY_ALLOW_SIGN_WITH_SHA1
    priority string options. These allows enabling all broken and SHA1-based signature
    algorithms in certificate verification, respectively.
