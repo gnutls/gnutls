@@ -107,6 +107,8 @@ extern "C" {
 #define GNUTLS_X509EXT_OID_PROXY_CRT_INFO "1.3.6.1.5.5.7.1.14"
 #define GNUTLS_X509EXT_OID_TLSFEATURES "1.3.6.1.5.5.7.1.24"
 
+#define GNUTLS_X509_OID_POLICY_ANY "2.5.29.54"
+
 /* Certificate handling functions.
  */
 

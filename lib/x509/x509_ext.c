@@ -1181,6 +1181,83 @@ int gnutls_x509_ext_export_key_usage(unsigned int usage, gnutls_datum_t * ext)
 }
 
 /**
+ * gnutls_x509_ext_import_inhibit_anypolicy:
+ * @ext: the DER encoded extension data
+ * @skipcerts: will hold the number of certificates after which anypolicy is no longer acceptable.
+ *
+ * This function will return certificate's value of SkipCerts,
+ * by reading the DER data of the Inhibit anyPolicy X.509 extension (2.5.29.54).
+ *
+ * The @skipcerts value is the number of additional certificates that
+ * may appear in the path before the anyPolicy (%GNUTLS_X509_OID_POLICY_ANY)
+ * is no longer acceptable.
+ *
+ * Returns: zero, or a negative error code in case of
+ *   parsing error.  If the certificate does not contain the Inhibit anyPolicy
+ *   extension %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be
+ *   returned.
+ *
+ * Since: 3.6.0
+ **/
+int gnutls_x509_ext_import_inhibit_anypolicy(const gnutls_datum_t * ext,
+				  unsigned int *skipcerts)
+{
+	int ret;
+
+	ret = _gnutls_x509_read_der_uint(ext->data, ext->size, skipcerts);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+	return ret;
+}
+
+/**
+ * gnutls_x509_ext_export_inhibit_anypolicy:
+ * @skipcerts: number of certificates after which anypolicy is no longer acceptable.
+ * @ext: The DER-encoded extension data; must be freed using gnutls_free().
+ *
+ * This function will convert the @skipcerts value to a DER
+ * encoded Inhibit AnyPolicy PKIX extension. The @ext data will be allocated using
+ * gnutls_malloc().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int gnutls_x509_ext_export_inhibit_anypolicy(unsigned int skipcerts, gnutls_datum_t * ext)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result, ret;
+
+	result = asn1_create_element(_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	ret = _gnutls_x509_write_uint32(c2, "", skipcerts);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_x509_der_encode(c2, "", ext, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+
+ cleanup:
+	asn1_delete_structure(&c2);
+
+	return ret;
+}
+
+/**
  * gnutls_x509_ext_import_private_key_usage_period:
  * @ext: the DER encoded extension data
  * @activation: Will hold the activation time

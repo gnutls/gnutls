@@ -67,6 +67,41 @@ int _gnutls_x509_read_der_int(uint8_t * der, int dersize, bigint_t * out)
 
 }
 
+int _gnutls_x509_read_der_uint(uint8_t * der, int dersize, unsigned int *out)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+	/* == INTEGER */
+	if ((result = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey",
+	      &spk)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _asn1_strict_der_decode(&spk, der, dersize, NULL);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&spk);
+		return _gnutls_asn2err(result);
+	}
+
+	/* Read Y */
+
+	if ((result = _gnutls_x509_read_uint(spk, "", out)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(&spk);
+		return _gnutls_asn2err(result);
+	}
+
+	asn1_delete_structure(&spk);
+
+	return 0;
+
+}
+
 
 /* Extracts DSA and RSA parameters from a certificate.
  */
