@@ -32,6 +32,7 @@
 #define MAX_CRQ_EXTENSIONS_SIZE 8*1024
 #define MAX_OID_SIZE 128
 #define MAX_KEY_ID_SIZE 128
+#define MAX_SALT_SIZE 256
 
 #define HASH_OID_SHA1 "1.3.14.3.2.26"
 #define HASH_OID_MD5 "1.2.840.113549.2.5"
@@ -119,7 +120,7 @@ typedef struct gnutls_pkcs7_int {
 } gnutls_pkcs7_int;
 
 struct pbkdf2_params {
-	uint8_t salt[32];
+	uint8_t salt[MAX_SALT_SIZE];
 	int salt_size;
 	unsigned iter_count;
 	unsigned key_size;
