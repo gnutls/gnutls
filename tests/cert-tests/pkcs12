@@ -45,7 +45,7 @@ TMPFILE_PEM=pkcs12.$$.pem.tmp
 
 DEBUG="1"
 
-for p12 in "no-salt.p12 Red%20Hat%20Enterprise%20Linux%207.4" "cert-with-crl.p12 password" "client.p12 foobar" "openssl.p12 CaudFocwijRupogDoicsApfiHadManUgNa" "noclient.p12" "unclient.p12" "pkcs12_2certs.p12"; do
+for p12 in "no-salt.p12 Red%20Hat%20Enterprise%20Linux%207.4" "mac-sha512.p12 Red%20Hat%20Enterprise%20Linux%207.4" "cert-with-crl.p12 password" "client.p12 foobar" "openssl.p12 CaudFocwijRupogDoicsApfiHadManUgNa" "noclient.p12" "unclient.p12" "pkcs12_2certs.p12"; do
 	set -- ${p12}
 	file="$1"
 	passwd=$(echo $2|sed 's/%20/ /g')

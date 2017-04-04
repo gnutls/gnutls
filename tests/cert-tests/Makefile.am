@@ -70,7 +70,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/chain-with-critical-on-intermediate.pem data/chain-with-critical-on-endcert.pem \
 	templates/crit-extensions.tmpl data/crit-extensions.pem data/x509-with-zero-version.pem \
 	data/key-corpus-rc2-1.p12 data/key-corpus-rc2-2.p12 data/key-corpus-rc2-3.p12 \
-	data/key-corpus-rc2-1.p12.out data/no-salt.p12
+	data/key-corpus-rc2-1.p12.out data/no-salt.p12 data/mac-sha512.p12
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
