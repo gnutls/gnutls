@@ -1,6 +1,7 @@
 /* minip12.c - A mini pkcs-12 implementation (modified for gnutls)
  *
  * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -52,7 +53,8 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	uint8_t hash[MAX_HASH_SIZE], buf_b[64], buf_i[MAX_PASS_LEN + 64], *p;
 	uint8_t d[64];
 	size_t cur_keylen;
-	size_t n, m, p_size, i_size;
+	size_t n, m, plen, i_size;
+	size_t slen;
 	gnutls_datum_t ucs2 = {NULL, 0};
 	unsigned mac_len;
 	const uint8_t buf_512[] =	/* 2^64 */
@@ -104,25 +106,21 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	}
 
 	/* Store salt and password in BUF_I */
-	p_size = ((pwlen / 64) * 64) + 64;
+	slen = ((salt_size+63)/64) * 64;
+	plen = ((pwlen+63)/64) * 64;
+	i_size = slen + plen;
 
-	if (p_size > sizeof(buf_i) - 64) {
+	if (i_size > sizeof(buf_i)) {
 		rc = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		goto cleanup;
 	}
 
-
-	if (salt_size > 0) {
-		p = buf_i;
-		for (i = 0; i < 64; i++)
-			*p++ = salt[i % salt_size];
-	} else {
-		memset(buf_i, 0, 64);
-		p = buf_i + 64;
-	}
+	p = buf_i;
+	for (i = 0; i < slen; i++)
+		*p++ = salt[i % salt_size];
 
 	if (pw) {
-		for (i = j = 0; i < p_size; i += 2) {
+		for (i = j = 0; i < plen; i += 2) {
 			*p++ = pw[j];
 			*p++ = pw[j+1];
 			j+=2;
@@ -130,12 +128,10 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 				j = 0;
 		}
 	} else {
-		memset(p, 0, p_size);
+		memset(p, 0, plen);
 	}
 
-	i_size = 64 + p_size;
 	mac_len = _gnutls_mac_get_algo_len(me);
-
 	assert(mac_len != 0);
 
 	for (;;) {
@@ -146,7 +142,7 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 		}
 		memset(d, id & 0xff, 64);
 		_gnutls_hash(&md, d, 64);
-		_gnutls_hash(&md, buf_i, pw ? i_size : 64);
+		_gnutls_hash(&md, buf_i, i_size);
 		_gnutls_hash_deinit(&md, hash);
 		for (i = 1; i < iter; i++) {
 			rc = _gnutls_hash_fast((gnutls_digest_algorithm_t)me->id,
@@ -179,7 +175,7 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 			goto cleanup;
 		}
 
-		for (i = 0; i < 128; i += 64) {
+		for (i = 0; i < i_size; i += 64) {
 			n = 64;
 			rc = _gnutls_mpi_init_scan(&num_ij, buf_i + i, n);
 			if (rc < 0) {

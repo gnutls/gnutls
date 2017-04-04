@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  * Copyright (C) 2012 Nikos Mavrogiannopoulos
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1061,7 +1062,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	/* Read the salt from the structure.
 	 */
 	result =
-	    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.macSalt",
+	    _gnutls_x509_read_null_value(pkcs12->pkcs12, "macData.macSalt",
 				    &salt);
 	if (result < 0) {
 		gnutls_assert();
@@ -1897,7 +1898,7 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 		/* Read the salt from the structure.
 		 */
 		ret =
-		    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.macSalt",
+		    _gnutls_x509_read_null_value(pkcs12->pkcs12, "macData.macSalt",
 					    &dsalt);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1906,7 +1907,8 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 
 		if (*salt_size >= (unsigned)dsalt.size) {
 			*salt_size = dsalt.size;
-			memcpy(salt, dsalt.data, dsalt.size);
+			if (dsalt.size > 0)
+				memcpy(salt, dsalt.data, dsalt.size);
 		} else {
 			*salt_size = dsalt.size;
 			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
