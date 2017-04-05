@@ -32,7 +32,7 @@
  * Returns 0 on success, or -1 if the uint64 max limit
  * has been reached.
  */
-int _gnutls_uint64pp(uint64 * x)
+int _gnutls_uint64pp(gnutls_uint64 * x)
 {
 	register int i, y = 0;
 
@@ -57,7 +57,7 @@ int _gnutls_uint64pp(uint64 * x)
  * Returns 0 on success, or -1 if the uint48 max limit
  * has been reached.
  */
-int _gnutls_uint48pp(uint64 * x)
+int _gnutls_uint48pp(gnutls_uint64 * x)
 {
 	register int i, y = 0;
 

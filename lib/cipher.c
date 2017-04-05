@@ -53,7 +53,7 @@ static int ciphertext_to_compressed(gnutls_session_t session,
 				    gnutls_datum_t * compressed,
 				    uint8_t type,
 				    record_parameters_st * params,
-				    uint64 * sequence);
+				    gnutls_uint64 * sequence);
 
 inline static int is_write_comp_null(record_parameters_st * record_params)
 {
@@ -151,7 +151,7 @@ _gnutls_decrypt(gnutls_session_t session,
 		gnutls_datum_t * ciphertext,
 		gnutls_datum_t * output,
 		content_type_t type,
-		record_parameters_st * params, uint64 * sequence)
+		record_parameters_st * params, gnutls_uint64 * sequence)
 {
 	int ret;
 
@@ -499,7 +499,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 			 gnutls_datum_t * ciphertext,
 			 gnutls_datum_t * compressed,
 			 uint8_t type, record_parameters_st * params,
-			 uint64 * sequence)
+			 gnutls_uint64 * sequence)
 {
 	uint8_t tag[MAX_HASH_SIZE];
 	uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
