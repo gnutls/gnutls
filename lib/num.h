@@ -28,8 +28,8 @@
 #include <minmax.h>
 #include <byteswap.h>
 
-int _gnutls_uint64pp(uint64 *);
-int _gnutls_uint48pp(uint64 *);
+int _gnutls_uint64pp(gnutls_uint64 *);
+int _gnutls_uint48pp(gnutls_uint64 *);
 
 #define UINT64DATA(x) ((x).i)
 
@@ -150,7 +150,7 @@ inline static uint16_t _gnutls_conv_uint16(uint16_t data)
 #endif
 }
 
-inline static uint32_t _gnutls_uint64touint32(const uint64 * num)
+inline static uint32_t _gnutls_uint64touint32(const gnutls_uint64 * num)
 {
 	uint32_t ret;
 

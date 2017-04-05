@@ -88,7 +88,7 @@ typedef int ssize_t;
  */
 typedef struct {
 	unsigned char i[8];
-} uint64;
+} gnutls_uint64;
 
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
@@ -346,7 +346,7 @@ typedef struct mbuffer_st {
 	content_type_t type;
 
 	/* record layer sequence */
-	uint64 record_sequence;
+	gnutls_uint64 record_sequence;
 
 	/* Filled in by handshake layer on send:
 	 * type, epoch, htype, handshake_sequence
@@ -596,7 +596,7 @@ struct record_state_st {
 	gnutls_datum_t key;
 	auth_cipher_hd_st cipher_state;
 	comp_hd_st compression_state;
-	uint64 sequence_number;
+	gnutls_uint64 sequence_number;
 };
 
 

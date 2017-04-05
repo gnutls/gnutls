@@ -63,7 +63,7 @@ void _dtls_reset_window(struct record_parameters_st *rp)
  * packet is detected it returns a negative value (but no sensible error code).
  * Otherwise zero.
  */
-int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
+int _dtls_record_check(struct record_parameters_st *rp, gnutls_uint64 * _seq)
 {
 	uint64_t seq_num = 0;
 

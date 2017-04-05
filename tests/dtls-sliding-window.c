@@ -43,11 +43,11 @@ struct record_parameters_st {
 
 typedef struct {
 	unsigned char i[8];
-} uint64;
+} gnutls_uint64;
 #define gnutls_assert_val(x) x
 
 void _dtls_reset_window(struct record_parameters_st *rp);
-int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq);
+int _dtls_record_check(struct record_parameters_st *rp, gnutls_uint64 * _seq);
 
 /* taken from nettle */
 #ifdef WORDS_BIGENDIAN
@@ -67,7 +67,7 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq);
 #define DTLS_SW_NO_INCLUDES
 #include "../lib/dtls-sw.c"
 
-static void uint64_set(uint64* t, uint64_t v)
+static void uint64_set(gnutls_uint64* t, uint64_t v)
 {
 	memcpy(t->i, &v, 8);
 }
@@ -85,7 +85,7 @@ static void uint64_set(uint64* t, uint64_t v)
 static void check_dtls_window_uninit_0(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
@@ -98,7 +98,7 @@ static void check_dtls_window_uninit_0(void **glob_state)
 static void check_dtls_window_uninit_large(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 
@@ -110,7 +110,7 @@ static void check_dtls_window_uninit_large(void **glob_state)
 static void check_dtls_window_uninit_very_large(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 
@@ -122,7 +122,7 @@ static void check_dtls_window_uninit_very_large(void **glob_state)
 static void check_dtls_window_12(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
@@ -136,7 +136,7 @@ static void check_dtls_window_12(void **glob_state)
 static void check_dtls_window_19(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
@@ -150,7 +150,7 @@ static void check_dtls_window_19(void **glob_state)
 static void check_dtls_window_skip1(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 	unsigned i;
 
 	RESET_WINDOW;
@@ -166,7 +166,7 @@ static void check_dtls_window_skip1(void **glob_state)
 static void check_dtls_window_skip3(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 	unsigned i;
 
 	RESET_WINDOW;
@@ -182,7 +182,7 @@ static void check_dtls_window_skip3(void **glob_state)
 static void check_dtls_window_21(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
@@ -196,7 +196,7 @@ static void check_dtls_window_21(void **glob_state)
 static void check_dtls_window_91(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
@@ -210,7 +210,7 @@ static void check_dtls_window_91(void **glob_state)
 static void check_dtls_window_large_21(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
@@ -224,7 +224,7 @@ static void check_dtls_window_large_21(void **glob_state)
 static void check_dtls_window_large_12(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
@@ -238,7 +238,7 @@ static void check_dtls_window_large_12(void **glob_state)
 static void check_dtls_window_large_91(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
@@ -252,7 +252,7 @@ static void check_dtls_window_large_91(void **glob_state)
 static void check_dtls_window_large_19(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
@@ -266,7 +266,7 @@ static void check_dtls_window_large_19(void **glob_state)
 static void check_dtls_window_very_large_12(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
@@ -280,7 +280,7 @@ static void check_dtls_window_very_large_12(void **glob_state)
 static void check_dtls_window_very_large_91(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
@@ -294,7 +294,7 @@ static void check_dtls_window_very_large_91(void **glob_state)
 static void check_dtls_window_very_large_19(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
@@ -308,7 +308,7 @@ static void check_dtls_window_very_large_19(void **glob_state)
 static void check_dtls_window_outside(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(0);
@@ -322,7 +322,7 @@ static void check_dtls_window_outside(void **glob_state)
 static void check_dtls_window_large_outside(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT);
@@ -336,7 +336,7 @@ static void check_dtls_window_large_outside(void **glob_state)
 static void check_dtls_window_very_large_outside(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(INT_OVER_32_BITS);
@@ -350,7 +350,7 @@ static void check_dtls_window_very_large_outside(void **glob_state)
 static void check_dtls_window_dup1(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
@@ -372,7 +372,7 @@ static void check_dtls_window_dup1(void **glob_state)
 static void check_dtls_window_dup2(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
@@ -394,7 +394,7 @@ static void check_dtls_window_dup2(void **glob_state)
 static void check_dtls_window_dup3(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
@@ -422,7 +422,7 @@ static void check_dtls_window_dup3(void **glob_state)
 static void check_dtls_window_out_of_order(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
@@ -462,7 +462,7 @@ static void check_dtls_window_out_of_order(void **glob_state)
 static void check_dtls_window_epoch_higher(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	SET_WINDOW_NEXT(LARGE_INT-1);
@@ -478,7 +478,7 @@ static void check_dtls_window_epoch_higher(void **glob_state)
 static void check_dtls_window_epoch_lower(void **glob_state)
 {
 	struct record_parameters_st state;
-	uint64 t;
+	gnutls_uint64 t;
 
 	RESET_WINDOW;
 	uint64_set(&t, BSWAP64(0x1000000000000LL));
