@@ -39,8 +39,8 @@ static void tls_log_func(int level, const char *str)
 
 static unsigned page_size = 4096;
 
-#define ALLOC(x) x=malloc(step+64)
-#define ALLOCM(x, mem) x=malloc(mem); assert(gnutls_rnd(GNUTLS_RND_NONCE, x, mem) >= 0)
+#define ALLOC(x) {x=malloc(step+64);assert(x!=NULL);}
+#define ALLOCM(x, mem) {x=malloc(mem); assert(x!=NULL); assert(gnutls_rnd(GNUTLS_RND_NONCE, x, mem) >= 0);}
 #define FREE(x) free(x)
 #define INC(orig, x, s) x+=page_size; if ((x+step) >= (((unsigned char*)orig) + MAX_MEM)) { x = orig; }
 
@@ -114,10 +114,10 @@ static void cipher_mac_bench(int algo, int mac_algo, int size)
 	gnutls_hmac_deinit(mac_ctx, NULL);
 
 	stop_benchmark(&st, NULL, 1);
-	FREE(input);
-	FREE(output);
 
       leave:
+	FREE(input);
+	FREE(output);
 	free(_key);
 	free(_iv);
 }
@@ -154,8 +154,10 @@ static void cipher_bench(int algo, int size, int aead)
 	memset(_key, 0xf0, keysize);
 
 	_iv = malloc(ivsize);
-	if (_iv == NULL)
+	if (_iv == NULL) {
+		free(_key);
 		return;
+	}
 	memset(_iv, 0xf0, ivsize);
 
 	iv.data = _iv;
