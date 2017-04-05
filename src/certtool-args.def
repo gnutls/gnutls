@@ -640,11 +640,25 @@ $ certtool --load-ca-certificate ca.pem \
   --to-p12 --outder --outfile key.p12
 @end example
 
-@subheading Diffie-Hellman parameter generation
-To generate parameters for Diffie-Hellman key exchange, use the command:
+@subheading Obtaining Diffie-Hellman parameters
+To obtain the RFC7919 parameters for Diffie-Hellman key exchange, use the command:
 @example
-$ certtool --generate-dh-params --outfile dh.pem --sec-param medium
+$ certtool --get-dh-params --outfile dh.pem --sec-param medium
 @end example
+
+@subheading Verifying a certificate
+To verify a certificate in a file against the system's CA trust store
+use the following command:
+@example
+$ certtool --verify --infile cert.pem
+@end example
+
+It is also possible to simulate hostname verification with the following
+options:
+@example
+$ certtool --verify --verify-hostname www.example.com --infile cert.pem
+@end example
+
 
 @subheading Proxy certificate generation
 Proxy certificate can be used to delegate your credential to a
