@@ -57,10 +57,8 @@ bigint_t _gnutls_mpi_random_modp(bigint_t, bigint_t p,
 #define _gnutls_prime_check _gnutls_mpi_ops.bigint_prime_check
 #define _gnutls_mpi_print(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_USG)
 #define _gnutls_mpi_print_lz(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_STD)
-#define _gnutls_mpi_print_pgp(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_PGP)
 #define _gnutls_mpi_copy _gnutls_mpi_ops.bigint_copy
 #define _gnutls_mpi_scan(r, b, s) _gnutls_mpi_ops.bigint_scan(r, b, s, GNUTLS_MPI_FORMAT_USG)
-#define _gnutls_mpi_scan_pgp(r, b, s) _gnutls_mpi_ops.bigint_scan(r, b, s, GNUTLS_MPI_FORMAT_PGP)
 
 inline static
 void _gnutls_mpi_release(bigint_t * x)
@@ -76,8 +74,13 @@ int _gnutls_mpi_init_scan(bigint_t * ret_mpi, const void *buffer,
 		     size_t nbytes);
 int _gnutls_mpi_init_scan_nz(bigint_t * ret_mpi, const void *buffer,
 			size_t nbytes);
+
+#ifdef ENABLE_OPENPGP
+#define _gnutls_mpi_print_pgp(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_PGP)
+#define _gnutls_mpi_scan_pgp(r, b, s) _gnutls_mpi_ops.bigint_scan(r, b, s, GNUTLS_MPI_FORMAT_PGP)
 int _gnutls_mpi_init_scan_pgp(bigint_t * ret_mpi, const void *buffer,
 			 size_t nbytes);
+#endif
 
 int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t * dest);
 int _gnutls_mpi_dprint(const bigint_t a, gnutls_datum_t * dest);
