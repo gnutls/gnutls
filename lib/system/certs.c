@@ -44,6 +44,12 @@
 # endif
 #endif
 
+#ifdef __APPLE__
+# include <CoreFoundation/CoreFoundation.h>
+# include <Security/Security.h>
+# include <Availability.h>
+#endif
+
 /* System specific function wrappers for certificate stores.
  */
 
@@ -267,6 +273,72 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 	if (ret >= 0)
 		r += ret;
 # endif
+
+	return r;
+}
+#elif defined(__APPLE__) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
+static
+int osstatus_error(status)
+{
+	CFStringRef err_str = SecCopyErrorMessageString(status, NULL);
+	_gnutls_debug_log("Error loading system root certificates: %s\n",
+			  CFStringGetCStringPtr(err_str, kCFStringEncodingUTF8));
+	CFRelease(err_str);
+	return GNUTLS_E_FILE_ERROR;
+}
+
+static
+int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
+		     unsigned int tl_vflags)
+{
+	int r=0;
+
+	SecTrustSettingsDomain domain[] = { kSecTrustSettingsDomainUser,
+					    kSecTrustSettingsDomainAdmin,
+					    kSecTrustSettingsDomainSystem };
+	for (size_t d=0; d<sizeof(domain)/sizeof(*domain); d++) {
+		CFArrayRef certs = NULL;
+		OSStatus status = SecTrustSettingsCopyCertificates(domain[d],
+								   &certs);
+		if (status == errSecNoTrustSettings)
+			continue;
+		if (status != errSecSuccess)
+			return osstatus_error(status);
+
+		int cert_count = CFArrayGetCount(certs);
+		for (int i=0; i<cert_count; i++) {
+			SecCertificateRef cert =
+				(void*)CFArrayGetValueAtIndex(certs, i);
+			CFDataRef der;
+			status = SecItemExport(cert, kSecFormatX509Cert, 0,
+					       NULL, &der);
+			if (status != errSecSuccess) {
+				CFRelease(der);
+				CFRelease(certs);
+				return osstatus_error(status);
+			}
+
+			if (gnutls_x509_trust_list_add_trust_mem(list,
+								 &(gnutls_datum_t) {
+									.data = (void*)CFDataGetBytePtr(der),
+									.size = CFDataGetLength(der),
+								 },
+								 NULL,
+			                                         GNUTLS_X509_FMT_DER,
+								 tl_flags,
+								 tl_vflags) > 0)
+				r++;
+			CFRelease(der);
+		}
+		CFRelease(certs);
+	}
+
+#ifdef DEFAULT_BLACKLIST_FILE
+	ret = gnutls_x509_trust_list_remove_trust_file(list, DEFAULT_BLACKLIST_FILE, GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		_gnutls_debug_log("Could not load blacklist file '%s'\n", DEFAULT_BLACKLIST_FILE);
+	}
+#endif
 
 	return r;
 }
