@@ -890,7 +890,7 @@ static void strip(char *data)
 
 	for (i = 0; i < len; i++) {
 		if (data[i] == '\r' && data[i + 1] == '\n'
-		    && data[i + 1] == 0) {
+		    && data[i + 2] == 0) {
 			data[i] = '\n';
 			data[i + 1] = 0;
 			break;
