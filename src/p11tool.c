@@ -51,8 +51,18 @@
 static void cmd_parser(int argc, char **argv);
 
 static FILE *outfile;
+static const char *outfile_name = NULL;
 int batch = 0;
 int ask_pass = 0;
+
+void app_exit(int val)
+{
+	if (val != 0) {
+		if (outfile_name)
+			remove(outfile_name);
+	}
+	exit(val);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -150,7 +160,7 @@ static void cmd_parser(int argc, char **argv)
 
 	if ((ret = gnutls_global_init()) < 0) {
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (HAVE_OPT(PROVIDER)) {
@@ -165,7 +175,7 @@ static void cmd_parser(int argc, char **argv)
 			if (ret < 0) {
 				fprintf(stderr, "pkcs11_add_provider: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 		}
 	} else {
@@ -179,8 +189,9 @@ static void cmd_parser(int argc, char **argv)
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), 0);
 		if (outfile == NULL) {
 			fprintf(stderr, "cannot open %s\n", OPT_ARG(OUTFILE));
-			exit(1);
+			app_exit(1);
 		}
+		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
 

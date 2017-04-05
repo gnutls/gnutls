@@ -75,6 +75,12 @@ typedef struct common_info {
 	unsigned no_compat;
 } common_info_st;
 
+/* this must be provided by the app */
+void app_exit(int val)
+#ifdef __GNUC__
+__attribute__ ((noreturn))
+#endif
+;
 int cipher_to_flags(const char *cipher);
 
 void

@@ -54,9 +54,19 @@ static gnutls_x509_crt_fmt_t incert_format, outcert_format;
 static gnutls_x509_crt_fmt_t inkey_format, outkey_format;
 
 static FILE *outfile;
+static const char *outfile_name = NULL;
 static FILE *infile;
 int batch = 0;
 int ask_pass = 0;
+
+void app_exit(int val)
+{
+	if (val != 0) {
+		if (outfile_name)
+			remove(outfile_name);
+	}
+	exit(val);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -108,8 +118,9 @@ static void cmd_parser(int argc, char **argv)
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), 0);
 		if (outfile == NULL) {
 			fprintf(stderr, "%s", OPT_ARG(OUTFILE));
-			exit(1);
+			app_exit(1);
 		}
+		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
 
@@ -117,7 +128,7 @@ static void cmd_parser(int argc, char **argv)
 		infile = fopen(OPT_ARG(INFILE), "rb");
 		if (infile == NULL) {
 			fprintf(stderr, "%s", OPT_ARG(INFILE));
-			exit(1);
+			app_exit(1);
 		}
 	} else
 		infile = stdin;
@@ -142,7 +153,7 @@ static void systemkey_delete(const char *url, FILE * out)
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_systemkey_privkey_delete: %s",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(out, "Key %s deleted\n", url);
@@ -164,7 +175,7 @@ static void systemkey_list(FILE * out)
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		fprintf(stderr, "gnutls_system_key_iter_get_url: %s",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	gnutls_system_key_iter_deinit(iter);
 	fputs("\n", out);

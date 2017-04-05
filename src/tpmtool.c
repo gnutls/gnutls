@@ -59,9 +59,20 @@ static gnutls_x509_crt_fmt_t incert_format, outcert_format;
 static gnutls_tpmkey_fmt_t inkey_format, outkey_format;
 
 static FILE *outfile;
+static const char *outfile_name = NULL;
 static FILE *infile;
 int batch = 0;
 int ask_pass = 0;
+
+void app_exit(int val)
+{
+	if (val != 0) {
+		if (outfile_name != NULL) {
+			remove(outfile_name);
+		}
+	}
+	exit(val);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -134,6 +145,7 @@ static void cmd_parser(int argc, char **argv)
 			fprintf(stderr, "%s\n", OPT_ARG(OUTFILE));
 			exit(1);
 		}
+		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
 

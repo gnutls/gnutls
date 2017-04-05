@@ -82,7 +82,7 @@ void fix_lbuffer(unsigned long size)
 
 	if (lbuffer == NULL) {
 		fprintf(stderr, "memory error");
-		exit(1);
+		app_exit(1);
 	}
 }
 
@@ -118,7 +118,7 @@ gnutls_datum_t *load_secret_key(int mand, common_info_st * info)
 	if (info->secret_key == NULL) {
 		if (mand) {
 			fprintf(stderr, "missing --secret-key\n");
-			exit(1);
+			app_exit(1);
 		} else
 			return NULL;
 	}
@@ -129,7 +129,7 @@ gnutls_datum_t *load_secret_key(int mand, common_info_st * info)
 	ret = gnutls_hex_decode(&hex_key, raw_key, &raw_key_size);
 	if (ret < 0) {
 		fprintf(stderr, "hex_decode: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	key.data = (void *) raw_key;
@@ -173,7 +173,7 @@ static gnutls_privkey_t _load_privkey(gnutls_datum_t * dat,
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0) {
 		fprintf(stderr, "privkey_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret =
@@ -191,13 +191,13 @@ static gnutls_privkey_t _load_privkey(gnutls_datum_t * dat,
 		fprintf(stderr,
 			"import error: could not find a valid PEM header; "
 			"check if your key is PKCS #12 encoded\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	if (ret < 0) {
 		fprintf(stderr, "error loading file at --load-privkey: %s: %s\n",
 			info->privkey, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	return key;
@@ -211,14 +211,14 @@ static gnutls_privkey_t _load_url_privkey(const char *url)
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0) {
 		fprintf(stderr, "privkey_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_privkey_import_url(key, url, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error importing key at %s: %s\n",
 			url, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	return key;
@@ -234,14 +234,14 @@ static gnutls_pubkey_t _load_url_pubkey(const char *url)
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_import_url(pubkey, url, obj_flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s: %s\n", __func__,
 			__LINE__, gnutls_strerror(ret), url);
-		exit(1);
+		app_exit(1);
 	}
 
 	return pubkey;
@@ -261,7 +261,7 @@ gnutls_privkey_t load_private_key(int mand, common_info_st * info)
 
 	if (info->privkey == NULL) {
 		fprintf(stderr, "missing --load-privkey\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	if (gnutls_url_is_supported(info->privkey) != 0)
@@ -273,7 +273,7 @@ gnutls_privkey_t load_private_key(int mand, common_info_st * info)
 	if (!dat.data) {
 		fprintf(stderr, "error reading file at --load-privkey: %s\n",
 			info->privkey);
-		exit(1);
+		app_exit(1);
 	}
 
 	key = _load_privkey(&dat, info);
@@ -301,13 +301,13 @@ load_x509_private_key(int mand, common_info_st * info)
 
 	if (info->privkey == NULL) {
 		fprintf(stderr, "missing --load-privkey\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
 		fprintf(stderr, "privkey_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	dat.data = (void *) read_binary_file(info->privkey, &size);
@@ -316,7 +316,7 @@ load_x509_private_key(int mand, common_info_st * info)
 	if (!dat.data) {
 		fprintf(stderr, "error reading file at --load-privkey: %s\n",
 			info->privkey);
-		exit(1);
+		app_exit(1);
 	}
 
 	if (info->pkcs8) {
@@ -346,13 +346,13 @@ load_x509_private_key(int mand, common_info_st * info)
 		fprintf(stderr,
 			"import error: could not find a valid PEM header; "
 			"check if your key is PEM encoded\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	if (ret < 0) {
 		fprintf(stderr, "error importing private key: %s: %s\n",
 			info->privkey, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	return key;
@@ -400,7 +400,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 	if (info->cert == NULL) {
 		if (mand) {
 			fprintf(stderr, "missing --load-certificate\n");
-			exit(1);
+			app_exit(1);
 		} else
 			return NULL;
 	}
@@ -408,7 +408,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 	fd = fopen(info->cert, "r");
 	if (fd == NULL) {
 		fprintf(stderr, "Could not open %s\n", info->cert);
-		exit(1);
+		app_exit(1);
 	}
 
 	fix_lbuffer(file_size(fd));
@@ -424,7 +424,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 	ret = gnutls_x509_crt_list_import2(&crt, &crt_max, &dat, GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 		fprintf(stderr, "Error loading certificates: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	*crt_size = crt_max;
@@ -455,7 +455,7 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 	if (info->crl == NULL) {
 		if (mand) {
 			fprintf(stderr, "missing --load-crl\n");
-			exit(1);
+			app_exit(1);
 		} else
 			return NULL;
 	}
@@ -463,7 +463,7 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 	fd = fopen(info->crl, "r");
 	if (fd == NULL) {
 		fprintf(stderr, "Could not open %s\n", info->crl);
-		exit(1);
+		app_exit(1);
 	}
 
 	fix_lbuffer(file_size(fd));
@@ -482,7 +482,7 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 	}
 	if (ret < 0) {
 		fprintf(stderr, "Error loading CRLs: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	*crl_size = crl_max;
@@ -509,7 +509,7 @@ gnutls_x509_crq_t load_request(common_info_st * info)
 	ret = gnutls_x509_crq_init(&crq);
 	if (ret < 0) {
 		fprintf(stderr, "crq_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	dat.data = (void *) read_binary_file(info->request, &size);
@@ -518,21 +518,21 @@ gnutls_x509_crq_t load_request(common_info_st * info)
 	if (!dat.data) {
 		fprintf(stderr, "error reading file at --load-request: %s\n",
 			info->request);
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_x509_crq_import(crq, &dat, info->incert_format);
 	if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
 		fprintf(stderr,
 			"import error: could not find a valid PEM header\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	free(dat.data);
 	if (ret < 0) {
 		fprintf(stderr, "error importing certificate request: %s: %s\n",
 			info->request, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	return crq;
 }
@@ -547,7 +547,7 @@ gnutls_privkey_t load_ca_private_key(common_info_st * info)
 
 	if (info->ca_privkey == NULL) {
 		fprintf(stderr, "missing --load-ca-privkey\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	if (gnutls_url_is_supported(info->ca_privkey) != 0)
@@ -559,7 +559,7 @@ gnutls_privkey_t load_ca_private_key(common_info_st * info)
 	if (!dat.data) {
 		fprintf(stderr, "error reading file at --load-ca-privkey: %s\n",
 			info->ca_privkey);
-		exit(1);
+		app_exit(1);
 	}
 
 	key = _load_privkey(&dat, info);
@@ -584,13 +584,13 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 
 	if (info->ca == NULL) {
 		fprintf(stderr, "missing --load-ca-certificate\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0) {
 		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (gnutls_url_is_supported(info->ca) != 0) {
@@ -598,7 +598,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 		if (ret < 0) {
 			fprintf(stderr, "error importing CA certificate: %s: %s\n",
 				info->ca, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		return crt;
 	}
@@ -609,7 +609,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 	if (!dat.data) {
 		fprintf(stderr, "error reading file at --load-ca-certificate: %s\n",
 			info->ca);
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_x509_crt_import(crt, &dat, info->incert_format);
@@ -617,7 +617,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 	if (ret < 0) {
 		fprintf(stderr, "error importing CA certificate: %s: %s\n",
 			info->ca, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	return crt;
@@ -638,7 +638,7 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 
 	if (info->pubkey == NULL) {
 		fprintf(stderr, "missing --load-pubkey\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	if (gnutls_url_is_supported(info->pubkey) != 0)
@@ -647,7 +647,7 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 	ret = gnutls_pubkey_init(&key);
 	if (ret < 0) {
 		fprintf(stderr, "privkey_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	dat.data = (void *) read_binary_file(info->pubkey, &size);
@@ -655,7 +655,7 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 
 	if (!dat.data) {
 		fprintf(stderr, "error reading file at --load-pubkey: %s\n", info->pubkey);
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_import(key, &dat, info->incert_format);
@@ -665,12 +665,12 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 			fprintf(stderr,
 				"import error: could not find a valid PEM header; "
 				"check if your key has the PUBLIC KEY header\n");
-			exit(1);
+			app_exit(1);
 		}
 	} else if (ret < 0) {
 		fprintf(stderr, "importing public key: %s: %s\n",
 			info->pubkey, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	free(dat.data);
@@ -688,7 +688,7 @@ gnutls_pubkey_t load_public_key_or_import(int mand,
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_pubkey_init: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (!privkey || (ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0)) < 0) {	/* could not get (e.g. on PKCS #11 */
@@ -696,7 +696,7 @@ gnutls_pubkey_t load_public_key_or_import(int mand,
 		pubkey = load_pubkey(0, info);
 		if (pubkey == NULL && mand) {
 			fprintf(stderr, "You must specify --load-privkey\n");
-			exit(1);
+			app_exit(1);
 		}
 	}
 
@@ -760,7 +760,7 @@ gnutls_sec_param_t str_to_sec_param(const char *str)
 	} else {
 		fprintf(stderr, "Unknown security parameter string: %s\n",
 			str);
-		exit(1);
+		app_exit(1);
 	}
 
 }
@@ -869,7 +869,7 @@ const gnutls_ecc_curve_t *list, *p;
 		       gnutls_ecc_curve_get_name(*p));
 		p++;
 	}
-	exit(1);
+	app_exit(1);
 }
 
 void
@@ -937,7 +937,7 @@ void _pubkey_info(FILE * outfile,
 	if (ret < 0) {
 		fprintf(stderr, "pubkey_print error: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(outfile, "%s\n", data.data);
@@ -949,7 +949,7 @@ void _pubkey_info(FILE * outfile,
 				 &size);
 	if (ret < 0) {
 		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(outfile, "\n%s\n", lbuffer);
@@ -1013,7 +1013,7 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 
 	if (gnutls_dh_params_init(&dh_params) < 0) {
 		fprintf(stderr, "Error in dh parameter initialization\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	params.data = (void *) fread_file(infile, &size);
@@ -1028,7 +1028,7 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 		if (ret2 < 0) {
 			fprintf(stderr, "Error parsing dh params: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 	}
 
@@ -1036,7 +1036,7 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 	if (ret < 0) {
 		fprintf(stderr, "Error exporting parameters: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (ci->outcert_format == GNUTLS_X509_FMT_PEM)
@@ -1092,7 +1092,7 @@ int cipher_to_flags(const char *cipher)
 	}
 
 	fprintf(stderr, "unknown cipher %s\n", cipher);
-	exit(1);
+	app_exit(1);
 }
 
 static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
@@ -1251,7 +1251,7 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 		if (ret < 0) {
 			fprintf(stderr, "privkey_export: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		if (cinfo->no_compat == 0 && gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
@@ -1265,7 +1265,7 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 			if (ret < 0) {
 				fprintf(stderr, "privkey_export: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 		}
 
@@ -1284,7 +1284,7 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 		if (ret < 0) {
 			fprintf(stderr, "privkey_export_pkcs8: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 	}
 
@@ -1322,7 +1322,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				fprintf(stderr,
 					"Error initializing key: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			if (info->seed_size > 0) {
@@ -1330,7 +1330,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 
 				if (info->seed_size < 32) {
 					fprintf(stderr, "For DH parameter generation a 32-byte seed value or larger is expected (have: %d); use -d 2 for more information.\n", (int)info->seed_size);
-					exit(1);
+					app_exit(1);
 				}
 
 				data.type = GNUTLS_KEYGEN_SEED;
@@ -1346,7 +1346,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				fprintf(stderr,
 					"Error generating DSA parameters: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			if (info->outcert_format == GNUTLS_X509_FMT_PEM) {
@@ -1361,7 +1361,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				fprintf(stderr,
 					"Error importing DSA parameters: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			gnutls_x509_privkey_deinit(pkey);
@@ -1371,7 +1371,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 				fprintf(stderr,
 					"Error generating parameters: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 		}
 
@@ -1381,12 +1381,12 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 		if (ret < 0) {
 			fprintf(stderr, "Error exporting parameters: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 	} else {
 		if (info->provable != 0) {
 			fprintf(stderr, "The DH parameters obtained via this option are not provable\n");
-			exit(1);
+			app_exit(1);
 		}
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		if (bits <= 2048) {
@@ -1415,7 +1415,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 		if (ret < 0) {
 			fprintf(stderr, "Error exporting parameters: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 #elif defined(ENABLE_SRP)
 		if (bits <= 1024) {
@@ -1444,12 +1444,12 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 		if (ret < 0) {
 			fprintf(stderr, "Error exporting parameters: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 #else
 		fprintf(stderr,
 			"Parameters unavailable as SRP is disabled.\n");
-		exit(1);
+		app_exit(1);
 #endif
 	}
 
@@ -1497,14 +1497,14 @@ void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size)
 
 	if (seed->data == NULL) {
 		fprintf(stderr, "memory error\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	seed_size = hex_size;
 	ret = gnutls_hex2bin(hex, hex_size, seed->data, &seed_size);
 	if (ret < 0) {
 		fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	seed->size = seed_size;
 

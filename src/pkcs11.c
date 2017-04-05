@@ -50,7 +50,7 @@ static char *_saved_url = NULL;
 		if (url == NULL) { \
 			fprintf(stderr, "warning: no token URL was provided for this operation; the available tokens are:\n\n"); \
 			pkcs11_token_list(out, det, info, 1); \
-			exit(1); \
+			app_exit(1); \
 		} \
 		_saved_url = (void*)url; \
 	}
@@ -82,7 +82,7 @@ pkcs11_delete(FILE * outfile, const char *url,
 		    ("Are you sure you want to delete those objects? (y/N): ",
 		     0);
 		if (ret == 0) {
-			exit(1);
+			app_exit(1);
 		}
 	}
 
@@ -90,7 +90,7 @@ pkcs11_delete(FILE * outfile, const char *url,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(outfile, "\n%d objects deleted\n", ret);
@@ -144,12 +144,12 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Error in crt_list_import (1): %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (crt_list_size == 0) {
 		fprintf(stderr, "No matching objects found\n");
-		exit(2);
+		app_exit(2);
 	}
 
 	for (i = 0; i < crt_list_size; i++) {
@@ -163,7 +163,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		if (info->only_urls) {
@@ -187,7 +187,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		fprintf(outfile, "\tLabel: %s\n", buf);
 
@@ -196,7 +196,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		str = gnutls_pkcs11_obj_flags_get_str(oflags);
 		if (str != NULL) {
@@ -212,7 +212,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		fprintf(outfile, "\tID: %s\n", buf);
 
@@ -274,35 +274,35 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 			__LINE__, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 			__LINE__, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_privkey_import_url(privkey, url, flags);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot import private key: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_import_privkey(pubkey, privkey, GNUTLS_KEY_DIGITAL_SIGNATURE, flags);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot import public key: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot sign data: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
@@ -313,7 +313,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(stderr, "ok\n");
@@ -324,7 +324,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 			__LINE__, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_import_url(pubkey, url, flags);
@@ -332,8 +332,8 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 		fprintf(stderr, "Cannot find a corresponding public key object in token: %s\n",
 			gnutls_strerror(ret));
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-			exit(0);
-		exit(1);
+			app_exit(0);
+		app_exit(1);
 	}
 
 	fprintf(stderr, "Verifying against public key in the token... ");
@@ -342,7 +342,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(stderr, "ok\n");
@@ -370,21 +370,21 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pkcs11_obj_import_url(obj, url, obj_flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pkcs11_obj_export3(obj, info->outcert_format, &t);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fwrite(t.data, 1, t.size, outfile);
@@ -417,14 +417,14 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pkcs11_obj_import_url(obj, url, obj_flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	/* make a crt */
@@ -432,21 +432,21 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_x509_crt_import_pkcs11(xcrt, obj);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pkcs11_obj_export3(obj, GNUTLS_X509_FMT_PEM, &t);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	fwrite(t.data, 1, t.size, outfile);
 	fputs("\n\n", outfile);
@@ -461,7 +461,7 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 					__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		fwrite(t.data, 1, t.size, outfile);
@@ -473,14 +473,14 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 					__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		ret = gnutls_x509_crt_import(xcrt, &t, GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 					__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		gnutls_free(t.data);
@@ -565,7 +565,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		if (brief != 0) {
@@ -583,7 +583,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		fprintf(outfile, "\tLabel: %s\n", buf);
@@ -604,7 +604,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		fprintf(outfile, "\tManufacturer: %s\n", buf);
@@ -617,7 +617,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		fprintf(outfile, "\tModel: %s\n", buf);
@@ -630,7 +630,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		fprintf(outfile, "\tSerial: %s\n", buf);
@@ -668,7 +668,7 @@ static void find_same_pubkey_with_id(const char *url, gnutls_x509_crt_t crt, gnu
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
 		fprintf(stderr, "memory error\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
@@ -691,7 +691,7 @@ static void find_same_pubkey_with_id(const char *url, gnutls_x509_crt_t crt, gnu
 	if (ret < 0) {
 		fprintf(stderr, "Error in obj_list_import (1): %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (obj_list_size == 0)
@@ -730,14 +730,14 @@ static void find_same_pubkey_with_id(const char *url, gnutls_x509_crt_t crt, gnu
 			if (ret < 0) {
 				fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 					__LINE__, gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			cid->data = gnutls_malloc(size);
 			cid->size = size;
 			if (cid->data == NULL) {
 				fprintf(stderr, "memory error\n");
-				exit(1);
+				app_exit(1);
 			}
 
 			memcpy(cid->data, buf, size);
@@ -772,7 +772,7 @@ static void find_same_privkey_with_id(const char *url, gnutls_x509_crt_t crt, gn
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
 		fprintf(stderr, "memory error\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
@@ -795,7 +795,7 @@ static void find_same_privkey_with_id(const char *url, gnutls_x509_crt_t crt, gn
 	if (ret < 0) {
 		fprintf(stderr, "Error in obj_list_import (1): %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (obj_list_size == 0)
@@ -822,7 +822,7 @@ static void find_same_privkey_with_id(const char *url, gnutls_x509_crt_t crt, gn
 		ret = gnutls_privkey_init(&privkey);
 		if (ret < 0) {
 			fprintf(stderr, "memory error\n");
-			exit(1);
+			app_exit(1);
 		}
 
 		ret = gnutls_privkey_import_url(privkey, purl, 0);
@@ -839,7 +839,7 @@ static void find_same_privkey_with_id(const char *url, gnutls_x509_crt_t crt, gn
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0) {
 			fprintf(stderr, "memory error\n");
-			exit(1);
+			app_exit(1);
 		}
 
 		ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
@@ -866,14 +866,14 @@ static void find_same_privkey_with_id(const char *url, gnutls_x509_crt_t crt, gn
 			if (ret < 0) {
 				fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 					__LINE__, gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			cid->data = gnutls_malloc(size);
 			cid->size = size;
 			if (cid->data == NULL) {
 				fprintf(stderr, "memory error\n");
-				exit(1);
+				app_exit(1);
 			}
 
 			memcpy(cid->data, buf, size);
@@ -921,7 +921,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		ret = gnutls_hex2bin(id, strlen(id), raw_id, &raw_id_size);
 		if (ret < 0) {
 			fprintf(stderr, "Error converting hex: %s\n", gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		cid.data = raw_id;
 		cid.size = raw_id_size;
@@ -937,7 +937,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 	}
 
@@ -959,7 +959,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 				ret = gnutls_hex_encode2(&cid, &hex);
 				if (ret < 0) {
 					fprintf(stderr, "Error converting hex: %s\n", gnutls_strerror(ret));
-					exit(1);
+					app_exit(1);
 				}
 				fprintf(stderr, "note: will re-use ID %s from corresponding public key\n", hex.data);
 				gnutls_free(hex.data);
@@ -970,7 +970,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 					ret = gnutls_hex_encode2(&cid, &hex);
 					if (ret < 0) {
 						fprintf(stderr, "Error converting hex: %s\n", gnutls_strerror(ret));
-						exit(1);
+						app_exit(1);
 					}
 					fprintf(stderr, "note: will re-use ID %s from corresponding private key\n", hex.data);
 					gnutls_free(hex.data);
@@ -985,7 +985,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 			     (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)) && 
 			    (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO) == 0)
 				fprintf(stderr, "note: some tokens may require security officer login for this operation\n");
-			exit(1);
+			app_exit(1);
 		}
 
 		gnutls_x509_crt_get_key_usage(xcrt, &key_usage, NULL);
@@ -1002,7 +1002,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		gnutls_x509_privkey_deinit(xkey);
 	}
@@ -1016,7 +1016,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		gnutls_pubkey_deinit(xpubkey);
 	}
@@ -1024,7 +1024,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	if (xkey == NULL && xcrt == NULL && secret_key == NULL && xpubkey == NULL) {
 		fprintf(stderr,
 			"You must use --load-privkey, --load-certificate, --load-pubkey or --secret-key to load the file to be copied\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	UNFIX;
@@ -1053,7 +1053,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 		ret = gnutls_hex2bin(id, strlen(id), raw_id, &raw_id_size);
 		if (ret < 0) {
 			fprintf(stderr, "Error converting hex: %s\n", gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 		cid.data = raw_id;
 		cid.size = raw_id_size;
@@ -1078,7 +1078,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 		if (bits != 1024 && pk == GNUTLS_PK_RSA)
 			fprintf(stderr,
 				"note: several smart cards do not support arbitrary size keys; try --bits 1024 or 2048.\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	fwrite(pubkey.data, 1, pubkey.size, outfile);
@@ -1109,14 +1109,14 @@ pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pkcs11_privkey_import_url(pkey, url, 0);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret =
@@ -1126,7 +1126,7 @@ pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	gnutls_pkcs11_privkey_deinit(pkey);
 
@@ -1149,12 +1149,12 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 
 	if (url == NULL) {
 		fprintf(stderr, "error: no token URL given to initialize!\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	if (label == NULL) {
 		fprintf(stderr, "error: no label provided for token initialization!\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	if (info->so_pin != NULL)
@@ -1164,11 +1164,11 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 		if (pin == NULL && info->batch == 0)
 			pin = getpass("Enter Security Officer's PIN: ");
 		if (pin == NULL)
-			exit(1);
+			app_exit(1);
 	}
 
 	if (strlen(pin) >= sizeof(so_pin) || pin[0] == '\n')
-		exit(1);
+		app_exit(1);
 
 	strcpy(so_pin, pin);
 
@@ -1177,7 +1177,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	if (ret < 0) {
 		fprintf(stderr, "\nError in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	fprintf(stderr, "done\n");
 
@@ -1196,7 +1196,7 @@ pkcs11_set_pin(FILE * outfile, const char *url, common_info_st * info, unsigned 
 
 	if (url == NULL) {
 		fprintf(stderr, "error: no token URL given to initialize!\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	fprintf(stderr, "Setting token's user PIN...\n");
@@ -1209,7 +1209,7 @@ pkcs11_set_pin(FILE * outfile, const char *url, common_info_st * info, unsigned 
 			if (pin == NULL && info->batch == 0)
 				pin = getpass("Enter Administrators's new PIN: ");
 			if (pin == NULL)
-				exit(1);
+				app_exit(1);
 		}
 	} else {
 		if (info->pin != NULL) {
@@ -1219,18 +1219,18 @@ pkcs11_set_pin(FILE * outfile, const char *url, common_info_st * info, unsigned 
 			if (pin == NULL && info->batch == 0)
 				pin = getpass("Enter User's new PIN: ");
 			if (pin == NULL)
-				exit(1);
+				app_exit(1);
 		}
 	}
 
 	if (pin == NULL || pin[0] == '\n')
-		exit(1);
+		app_exit(1);
 
 	ret = gnutls_pkcs11_token_set_pin(url, NULL, pin, (so!=0)?GNUTLS_PIN_SO:GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	return;
@@ -1498,14 +1498,14 @@ pkcs11_get_random(FILE * outfile, const char *url, unsigned bytes,
 	output = malloc(bytes);
 	if (output == NULL) {
 		fprintf(stderr, "Memory error\n");
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pkcs11_token_get_random(url, output, bytes);
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_pkcs11_token_get_random: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	fwrite(output, 1, bytes, outfile);
@@ -1531,14 +1531,14 @@ void pkcs11_set_val(FILE * outfile, const char *url, int detailed,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_pkcs11_obj_import_url(obj, url, flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret =
@@ -1546,7 +1546,7 @@ void pkcs11_set_val(FILE * outfile, const char *url, int detailed,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 	gnutls_pkcs11_obj_deinit(obj);
 
