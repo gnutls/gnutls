@@ -279,12 +279,16 @@ A field in CA certificates that restricts the scope of the name of
 issued certificates.
 
 @item CRL distribution points @tab 2.5.29.31 @tab
-This extension is set by the CA, in order to inform about the issued
-CRLs.
+This extension is set by the CA, in order to inform about the
+location of issued Certificate Revocation Lists.
 
 @item Certificate policy @tab 2.5.29.32 @tab
 This extension is set to indicate the certificate policy as object
 identifier and may contain a descriptive string or URL.
+
+@item Extended key usage @tab 2.5.29.54 @tab
+Inhibit any policy extension. Constraints the any policy OID
+(@code{GNUTLS_X509_OID_POLICY_ANY}) use in the policy extension.
 
 @item Authority key identifier @tab 2.5.29.35 @tab
 An identifier of the key of the issuer of the certificate. That is
