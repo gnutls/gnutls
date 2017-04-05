@@ -177,9 +177,6 @@ static int _idn2_to_unicode_8z8z(const char *src, char **dst)
 				if (rc != IDN2_OK)
 					return rc;
 
-				if (rc != IDN2_OK)
-					return rc;
-
 				u8len = sizeof(u8);
 				if (u32_to_u8(u32, u32len, u8, &u8len) == NULL)
 					return IDN2_ENCODING_ERROR;
