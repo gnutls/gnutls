@@ -813,15 +813,25 @@ void get_crl_dist_point_set(gnutls_x509_crt_t crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter the URI of the CRL distribution point: ");
+			if (counter == 0) {
+				p = read_str
+				    ("Enter the URI of the CRL distribution point: ");
+			} else {
+				p = read_str
+				    ("Enter an additional URI of the CRL distribution point: ");
+			}
 			if (!p)
 				return;
 
 			ret = gnutls_x509_crt_set_crl_dist_points
 			    (crt, GNUTLS_SAN_URI, p, 0);
+			if (ret < 0)
+				break;
+
+			counter++;
 		}
 		while (p);
 	}
@@ -1879,10 +1889,16 @@ void get_dc_set(int type, void *crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter the subject's domain component (DC): ");
+			if (counter == 0) {
+				p = read_str
+				    ("Enter the subject's domain component (DC): ");
+			} else {
+				p = read_str
+				    ("Enter an additional domain component (DC): ");
+			}
 			if (!p)
 				return;
 
@@ -1900,6 +1916,9 @@ void get_dc_set(int type, void *crt)
 								  0, p,
 								  strlen
 								  (p));
+			counter++;
+			if (ret < 0)
+				break;
 		}
 		while (p != NULL);
 	}
@@ -1940,10 +1959,14 @@ void get_dns_name_set(int type, void *crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter a dnsName of the subject of the certificate: ");
+			if (counter == 0) {
+				p = read_str("Enter a dnsName of the subject of the certificate: ");
+			} else {
+				p = read_str("Enter an additional dnsName of the subject of the certificate: ");
+			}
 			if (!p)
 				return;
 
@@ -1955,8 +1978,8 @@ void get_dns_name_set(int type, void *crt)
 				ret = gnutls_x509_crq_set_subject_alt_name
 				    (crt, GNUTLS_SAN_DNSNAME, p, strlen(p),
 				     GNUTLS_FSAN_APPEND);
-		}
-		while (p);
+			counter++;
+		} while (p);
 	}
 
 	if (ret < 0) {
@@ -2266,10 +2289,16 @@ void get_uri_set(int type, void *crt)
 		}
 	} else {
 		const char *p;
+		unsigned int counter = 0;
 
 		do {
-			p = read_str
-			    ("Enter a URI of the subject of the certificate: ");
+			if (counter == 0) {
+				p = read_str
+				    ("Enter a URI of the subject of the certificate: ");
+			} else {
+				p = read_str
+				    ("Enter an additional URI of the subject of the certificate: ");
+			}
 			if (!p)
 				return;
 
@@ -2281,6 +2310,9 @@ void get_uri_set(int type, void *crt)
 				ret = gnutls_x509_crq_set_subject_alt_name
 				    (crt, GNUTLS_SAN_URI, p, strlen(p),
 				     GNUTLS_FSAN_APPEND);
+			counter++;
+			if (ret < 0)
+				break;
 		}
 		while (p);
 	}

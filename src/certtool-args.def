@@ -6,8 +6,9 @@ detail    = "Tool to parse and generate X.509 certificates, requests and private
 It can be used interactively or non interactively by
 specifying the template command line option.
 
-The tool accepts files or URLs supported by GnuTLS. In case PIN is required for the URL
-access you can provide it using the environment variables GNUTLS_PIN and GNUTLS_SO_PIN.
+The tool accepts files or supported URIs via the --infile option. In case PIN
+is required for URI access you can provide it using the environment variables GNUTLS_PIN 
+and GNUTLS_SO_PIN.
 ";
 short-usage   = "certtool [options]\ncerttool --help for usage instructions.\n";
 explain       = "";
@@ -40,7 +41,7 @@ flag = {
 flag = {
     name      = generate-crl;
     descrip   = "Generate a CRL";
-    doc = "This option generates a CRL. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).";
+    doc = "This option generates a Certificate Revocation List. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).";
 };
 
 flag = {
@@ -88,21 +89,24 @@ flag = {
     name      = verify-chain;
     value     = e;
     descrip   = "Verify a PEM encoded certificate chain";
-    doc = "The last certificate in the chain must be a self signed one. It can be combined with --verify-purpose or --verify-hostname.";
+    doc = "Verifies the validity of a certificate chain. That is, an ordered set of
+    certificates where each one is the issuer of the previous, and the first is
+    the end-certificate to be validated. In a proper chain the last certificate
+    is a self signed one. It can be combined with --verify-purpose or --verify-hostname.";
 };
 
 flag = {
     name      = verify;
-    descrip   = "Verify a PEM encoded certificate chain using a trusted list";
+    descrip   = "Verify a PEM encoded certificate (chain) against a trusted set";
     doc = "The trusted certificate list can be loaded with --load-ca-certificate. If no
-certificate list is provided, then the system's certificate list is used. Note that
+certificate list is provided, then the system's trusted certificate list is used. Note that
 during verification multiple paths may be explored. On a successful verification
 the successful path will be the last one. It can be combined with --verify-purpose or --verify-hostname.";
 };
 
 flag = {
     name      = verify-crl;
-    descrip   = "Verify a CRL using a trusted list";
+    descrip   = "Verify a Certificate Revocation List using a trusted list";
     doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
     flags-must = load-ca-certificate;
 };

@@ -195,7 +195,7 @@ static gnutls_privkey_t _load_privkey(gnutls_datum_t * dat,
 	}
 
 	if (ret < 0) {
-		fprintf(stderr, "importing --load-privkey: %s: %s\n",
+		fprintf(stderr, "error loading file at --load-privkey: %s: %s\n",
 			info->privkey, gnutls_strerror(ret));
 		exit(1);
 	}
@@ -216,7 +216,7 @@ static gnutls_privkey_t _load_url_privkey(const char *url)
 
 	ret = gnutls_privkey_import_url(key, url, 0);
 	if (ret < 0) {
-		fprintf(stderr, "importing key: %s: %s\n",
+		fprintf(stderr, "error importing key at %s: %s\n",
 			url, gnutls_strerror(ret));
 		exit(1);
 	}
@@ -271,7 +271,7 @@ gnutls_privkey_t load_private_key(int mand, common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading --load-privkey: %s\n",
+		fprintf(stderr, "error reading file at --load-privkey: %s\n",
 			info->privkey);
 		exit(1);
 	}
@@ -314,7 +314,7 @@ load_x509_private_key(int mand, common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading --load-privkey: %s\n",
+		fprintf(stderr, "error reading file at --load-privkey: %s\n",
 			info->privkey);
 		exit(1);
 	}
@@ -350,7 +350,7 @@ load_x509_private_key(int mand, common_info_st * info)
 	}
 
 	if (ret < 0) {
-		fprintf(stderr, "importing --load-privkey: %s: %s\n",
+		fprintf(stderr, "error importing private key: %s: %s\n",
 			info->privkey, gnutls_strerror(ret));
 		exit(1);
 	}
@@ -516,7 +516,7 @@ gnutls_x509_crq_t load_request(common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading --load-request: %s\n",
+		fprintf(stderr, "error reading file at --load-request: %s\n",
 			info->request);
 		exit(1);
 	}
@@ -530,7 +530,7 @@ gnutls_x509_crq_t load_request(common_info_st * info)
 
 	free(dat.data);
 	if (ret < 0) {
-		fprintf(stderr, "importing --load-request: %s: %s\n",
+		fprintf(stderr, "error importing certificate request: %s: %s\n",
 			info->request, gnutls_strerror(ret));
 		exit(1);
 	}
@@ -557,7 +557,7 @@ gnutls_privkey_t load_ca_private_key(common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading --load-ca-privkey: %s\n",
+		fprintf(stderr, "error reading file at --load-ca-privkey: %s\n",
 			info->ca_privkey);
 		exit(1);
 	}
@@ -596,7 +596,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 	if (gnutls_url_is_supported(info->ca) != 0) {
 		ret = gnutls_x509_crt_import_url(crt, info->ca, 0);
 		if (ret < 0) {
-			fprintf(stderr, "error importing --load-ca-certificate: %s: %s\n",
+			fprintf(stderr, "error importing CA certificate: %s: %s\n",
 				info->ca, gnutls_strerror(ret));
 			exit(1);
 		}
@@ -607,7 +607,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading --load-ca-certificate: %s\n",
+		fprintf(stderr, "error reading file at --load-ca-certificate: %s\n",
 			info->ca);
 		exit(1);
 	}
@@ -615,7 +615,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 	ret = gnutls_x509_crt_import(crt, &dat, info->incert_format);
 	free(dat.data);
 	if (ret < 0) {
-		fprintf(stderr, "error importing --load-ca-certificate: %s: %s\n",
+		fprintf(stderr, "error importing CA certificate: %s: %s\n",
 			info->ca, gnutls_strerror(ret));
 		exit(1);
 	}
@@ -654,7 +654,7 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "error reading --load-pubkey: %s\n", info->pubkey);
+		fprintf(stderr, "error reading file at --load-pubkey: %s\n", info->pubkey);
 		exit(1);
 	}
 
@@ -668,7 +668,7 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 			exit(1);
 		}
 	} else if (ret < 0) {
-		fprintf(stderr, "importing --load-pubkey: %s: %s\n",
+		fprintf(stderr, "importing public key: %s: %s\n",
 			info->pubkey, gnutls_strerror(ret));
 		exit(1);
 	}
