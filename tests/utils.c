@@ -277,7 +277,7 @@ static void append(const char *file)
 	p = calloc(1, sizeof(*p));
 
 	assert(p != NULL);
-	strcpy(p->file, file);
+	snprintf(p->file, sizeof(p->file), "%s", file);
 	p->next = temp_files;
 	temp_files = p;
 }
