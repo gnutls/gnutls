@@ -292,7 +292,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 			gnutls_assert();
 			return ret;
 		}
-		/* fallthrough */
+		/* fall through */
 	case BYE_STATE1:
 		ret =
 		    gnutls_alert_send(session, GNUTLS_AL_WARNING,
@@ -302,7 +302,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 			gnutls_assert();
 			return ret;
 		}
-
+		/* fall through */
 	case BYE_STATE2:
 		BYE_STATE = BYE_STATE2;
 		if (how == GNUTLS_SHUT_RDWR) {
