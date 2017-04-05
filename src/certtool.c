@@ -3781,6 +3781,7 @@ void smime_to_pkcs7(void)
 	}
 	while (strcmp(lineptr, "\r\n") != 0 && strcmp(lineptr, "\n") != 0);
 
+	/* skip newlines */
 	do {
 		len = getline(&lineptr, &linesize, infile);
 		if (len == -1) {
@@ -3789,7 +3790,7 @@ void smime_to_pkcs7(void)
 			app_exit(1);
 		}
 	}
-	while (strcmp(lineptr, "\r\n") == 0 && strcmp(lineptr, "\n") == 0);
+	while (strcmp(lineptr, "\r\n") == 0 || strcmp(lineptr, "\n") == 0);
 
 	fprintf(outfile, "%s", "-----BEGIN PKCS7-----\n");
 
