@@ -43,6 +43,8 @@
 # include <signal.h>
 #endif
 
+#include <assert.h>
+
 /* Gnulib portability files. */
 #include <read-file.h>
 
@@ -2850,8 +2852,10 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_
 					ret = GNUTLS_E_CONSTRAINT_ERROR;
 			}
 
-		} else
+		} else {
+			assert(tl != NULL);
 			ret = gnutls_pkcs7_verify(pkcs7, tl, vdata, vdata_size, i, detached.data!=NULL?&detached:NULL, flags);
+		}
 		if (ret < 0) {
 			fprintf(stderr, "\tSignature status: verification failed: %s\n", gnutls_strerror(ret));
 			ecode = 1;
