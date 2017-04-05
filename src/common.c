@@ -88,7 +88,12 @@ static void print_x509_info_compact(gnutls_session_t session)
 		return;
 	}
 
-	gnutls_x509_crt_init(&crt);
+	ret = gnutls_x509_crt_init(&crt);
+	if (ret < 0) {
+		fprintf(stderr, "Memory error\n");
+		return;
+	}
+
 	ret =
 	    gnutls_x509_crt_import(crt, &cert_list[0],
 				   GNUTLS_X509_FMT_DER);
@@ -128,7 +133,12 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
 	for (j = 0; j < cert_list_size; j++) {
 		gnutls_datum_t cinfo;
 
-		gnutls_x509_crt_init(&crt);
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			fprintf(stderr, "Memory error\n");
+			return;
+		}
+
 		ret =
 		    gnutls_x509_crt_import(crt, &cert_list[j],
 					   GNUTLS_X509_FMT_DER);

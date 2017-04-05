@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
  * Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -132,6 +132,7 @@ static gnutls_privkey_t x509_key = NULL;
 static gnutls_pcert_st pgp_crt;
 static gnutls_privkey_t pgp_key = NULL;
 
+#ifdef ENABLE_OPENPGP
 static void get_keyid(gnutls_openpgp_keyid_t keyid, const char *str)
 {
 	size_t keyid_size = GNUTLS_OPENPGP_KEYID_SIZE;
@@ -149,6 +150,7 @@ static void get_keyid(gnutls_openpgp_keyid_t keyid, const char *str)
 
 	return;
 }
+#endif
 
 /* Load the certificate and the private key.
  */
@@ -159,13 +161,19 @@ static void load_keys(void)
 	unsigned int i;
 	gnutls_datum_t data = { NULL, 0 };
 	gnutls_x509_crt_t crt_list[MAX_CRT];
+#ifdef ENABLE_OPENPGP
 	unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+#endif
 
 	if (x509_certfile != NULL && x509_keyfile != NULL) {
 #ifdef ENABLE_PKCS11
 		if (strncmp(x509_certfile, "pkcs11:", 7) == 0) {
 			crt_num = 1;
-			gnutls_x509_crt_init(&crt_list[0]);
+			ret = gnutls_x509_crt_init(&crt_list[0]);
+			if (ret < 0) {
+				fprintf(stderr, "Memory error\n");
+				exit(1);
+			}
 			gnutls_x509_crt_set_pin_function(crt_list[0],
 							 pin_callback,
 							 NULL);
@@ -1737,9 +1745,9 @@ psk_callback(gnutls_session_t session, char **username,
 
 		printf("Enter PSK identity: ");
 		fflush(stdout);
-		getline(&p, &n, stdin);
+		ret = getline(&p, &n, stdin);
 
-		if (p == NULL) {
+		if (ret == -1 || p == NULL) {
 			fprintf(stderr,
 				"No username given, aborting...\n");
 			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -1785,7 +1793,11 @@ psk_callback(gnutls_session_t session, char **username,
 	if (HAVE_OPT(DEBUG)) {
 		char hexkey[41];
 		res_size = sizeof(hexkey);
-		gnutls_hex_encode(key, hexkey, &res_size);
+		ret = gnutls_hex_encode(key, hexkey, &res_size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in hex encoding: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
 		fprintf(stderr, "PSK username: %s\n", *username);
 		fprintf(stderr, "PSK hint: %s\n", hint);
 		fprintf(stderr, "PSK key: %s\n", hexkey);
@@ -1939,7 +1951,13 @@ static int cert_verify_ocsp(gnutls_session_t session)
 	for (it = 0; it < cert_list_size; it++) {
 		if (deinit_cert)
 			gnutls_x509_crt_deinit(cert);
-		gnutls_x509_crt_init(&cert);
+
+		ret = gnutls_x509_crt_init(&cert);
+		if (ret < 0) {
+			fprintf(stderr, "Memory error: %s\n", gnutls_strerror(ret));
+			goto cleanup;
+		}
+
 		deinit_cert = 1;
 		ret = gnutls_x509_crt_import(cert, &cert_list[it], GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
@@ -1954,7 +1972,11 @@ static int cert_verify_ocsp(gnutls_session_t session)
 
 		ret = gnutls_certificate_get_issuer(xcred, cert, &issuer, 0);
 		if (ret < 0 && cert_list_size - it > 1) {
-			gnutls_x509_crt_init(&issuer);
+			ret = gnutls_x509_crt_init(&issuer);
+			if (ret < 0) {
+				fprintf(stderr, "Memory error: %s\n", gnutls_strerror(ret));
+				goto cleanup;
+			}
 			deinit_issuer = 1;
 			ret = gnutls_x509_crt_import(issuer, &cert_list[it + 1], GNUTLS_X509_FMT_DER);
 			if (ret < 0) {
