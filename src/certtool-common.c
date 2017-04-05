@@ -63,7 +63,10 @@ static unsigned long file_size(FILE *fp)
 		return 0;
 
 	size = ftell(fp);
-	fseek(fp, cur, SEEK_SET);
+	if (fseek(fp, cur, SEEK_SET) == -1) {
+		fprintf(stderr, "Error reading file size\n");
+		app_exit(1);
+	}
 	return size;
 }
 
@@ -1018,6 +1021,11 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 
 	params.data = (void *) fread_file(infile, &size);
 	params.size = size;
+
+	if (params.data == NULL) {
+		fprintf(stderr, "Could not read input\n");
+		app_exit(1);
+	}
 
 	ret =
 	    gnutls_dh_params_import_pkcs3(dh_params, &params,

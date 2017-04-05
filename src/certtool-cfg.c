@@ -39,6 +39,7 @@
 #include <intprops.h>
 #include <gnutls/crypto.h>
 #include <libtasn1.h>
+#include <assert.h>
 
 /* for inet_pton */
 #include <sys/types.h>
@@ -1475,7 +1476,7 @@ void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, c
 		serial[6] = (ts.tv_nsec >> 8) & 0xff;
 		serial[7] = (ts.tv_nsec) & 0xff;
 		serial[0] &= 0x7F;
-		gnutls_rnd(GNUTLS_RND_NONCE, &serial[8], 4);
+		assert(gnutls_rnd(GNUTLS_RND_NONCE, &serial[8], 4) >= 0);
 		*size = 12;
 		return;
 	}
@@ -2235,9 +2236,6 @@ void get_policy_set(gnutls_x509_crt_t crt)
 				exit(1);
 			}
 		}
-
-		if (!cfg.policy_oid)
-			return;
 
 		for (i = 0; cfg.policy_oid[i] != NULL; i++) {
 			memset(&policy, 0, sizeof(policy));

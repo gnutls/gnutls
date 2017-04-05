@@ -3080,6 +3080,7 @@ void generate_pkcs12(common_info_st * cinfo)
 			app_exit(1);
 		}
 
+		assert(crts[i] != NULL);
 		result = gnutls_pkcs12_bag_set_crt(bag, crts[i]);
 		if (result < 0) {
 			fprintf(stderr, "set_crt[%d]: %s\n", i,
@@ -3410,9 +3411,12 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 		}
 
 		if (str != NULL) {
-			gnutls_pem_base64_encode_alloc(str, &cdata, &out);
+			result = gnutls_pem_base64_encode_alloc(str, &cdata, &out);
+			if (result < 0) {
+				fprintf(stderr, "Error in base64 encoding: %s\n", gnutls_strerror(result));
+				app_exit(1);
+			}
 			fprintf(outfile, "%s\n", out.data);
-
 			gnutls_free(out.data);
 		}
 
