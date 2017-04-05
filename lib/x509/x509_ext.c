@@ -1799,6 +1799,8 @@ void gnutls_x509_policies_deinit(gnutls_x509_policies_t policies)
  * the @policies type. The returned values should be treated as constant
  * and valid for the lifetime of @policies.
  *
+ * The any policy OID is available as the %GNUTLS_X509_OID_POLICY_ANY macro.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the index is out of bounds, otherwise a negative error value.
  *
