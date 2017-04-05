@@ -1074,7 +1074,7 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 	int result;
 	char *password = NULL;
 
-	if (crq == NULL) {
+	if (crq == NULL || pass == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
