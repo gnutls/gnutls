@@ -453,7 +453,7 @@ static unsigned is_level_acceptable(
 {
 	gnutls_certificate_verification_profiles_t profile = GNUTLS_VFLAGS_TO_PROFILE(flags);
 	const mac_entry_st *entry;
-	int issuer_pkalg, pkalg, ret;
+	int issuer_pkalg = 0, pkalg, ret;
 	unsigned bits = 0, issuer_bits = 0, sym_bits = 0;
 	gnutls_pk_params_st params;
 	gnutls_sec_param_t sp;
@@ -466,9 +466,11 @@ static unsigned is_level_acceptable(
 	if (pkalg < 0)
 		return gnutls_assert_val(0);
 
-	issuer_pkalg = gnutls_x509_crt_get_pk_algorithm(crt, &issuer_bits);
-	if (issuer_pkalg < 0)
-		return gnutls_assert_val(0);
+	if (issuer) {
+		issuer_pkalg = gnutls_x509_crt_get_pk_algorithm(issuer, &issuer_bits);
+		if (issuer_pkalg < 0)
+			return gnutls_assert_val(0);
+	}
 
 	switch (profile) {
 		CASE_SEC_PARAM(GNUTLS_PROFILE_VERY_WEAK, GNUTLS_SEC_PARAM_VERY_WEAK);
