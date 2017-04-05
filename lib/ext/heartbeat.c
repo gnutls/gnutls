@@ -228,6 +228,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 		}
 
 		session->internals.hb_state = SHB_RECV;
+		/* fallthrough */
 
 	case SHB_RECV:
 		ret =
