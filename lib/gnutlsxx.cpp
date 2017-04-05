@@ -217,7 +217,7 @@ namespace gnutls
   {
     int ret = gnutls_session_is_resumed (s);
 
-      return (ret != 0);
+    return (ret != 0);
   }
 
   bool session::get_peers_certificate (std::vector < gnutls_datum_t >
@@ -226,7 +226,7 @@ namespace gnutls
     const gnutls_datum_t *certs;
     unsigned int certs_size;
 
-      certs = gnutls_certificate_get_peers (s, &certs_size);
+    certs = gnutls_certificate_get_peers (s, &certs_size);
 
     if (certs == NULL)
       return false;
@@ -234,7 +234,7 @@ namespace gnutls
     for (unsigned int i = 0; i < certs_size; i++)
       out_certs.push_back (certs[i]);
 
-      return true;
+    return true;
   }
 
   bool session::get_peers_certificate (const gnutls_datum_t ** certs,
@@ -251,10 +251,11 @@ namespace gnutls
   {
     const gnutls_datum_t *d;
 
-      d = gnutls_certificate_get_ours (s);
+    d = gnutls_certificate_get_ours (s);
     if (d == NULL)
       throw (exception (GNUTLS_E_INVALID_REQUEST));
-      cert = *d;
+
+    cert = *d;
   }
 
   time_t session::get_peers_certificate_activation_time () const
