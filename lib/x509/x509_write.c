@@ -1329,16 +1329,16 @@ static void disable_optional_stuff(gnutls_x509_crt_t cert)
 	}
 
 	if (remove_issuer_unique_id)
-		asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID", NULL,
+		(void)asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID", NULL,
 				 0);
 
 	if (remove_subject_unique_id)
-		asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID",
+		(void)asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID",
 				 NULL, 0);
 
 	if (cert->use_extensions == 0) {
 		_gnutls_debug_log("Disabling X.509 extensions.\n");
-		asn1_write_value(cert->cert, "tbsCertificate.extensions",
+		(void)asn1_write_value(cert->cert, "tbsCertificate.extensions",
 				 NULL, 0);
 	}
 

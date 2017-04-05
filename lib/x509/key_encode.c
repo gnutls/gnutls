@@ -658,7 +658,7 @@ _gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params, unsigned c
 			goto cleanup;
 		}
 	} else {
-		asn1_write_value(*c2, "seed", NULL, 0);
+		(void)asn1_write_value(*c2, "seed", NULL, 0);
 	}
 
 	if ((result =

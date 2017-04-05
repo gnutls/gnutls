@@ -478,7 +478,7 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 	}
 
 	if (nc->permitted == NULL) {
-		asn1_write_value(c2, "permittedSubtrees", NULL, 0);
+		(void)asn1_write_value(c2, "permittedSubtrees", NULL, 0);
 	} else {
 		tmp = nc->permitted;
 		do {
@@ -525,7 +525,7 @@ int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 	}
 
 	if (nc->excluded == NULL) {
-		asn1_write_value(c2, "excludedSubtrees", NULL, 0);
+		(void)asn1_write_value(c2, "excludedSubtrees", NULL, 0);
 	} else {
 		tmp = nc->excluded;
 		do {
@@ -1022,7 +1022,7 @@ int gnutls_x509_ext_export_authority_key_id(gnutls_x509_aki_t aki,
 			goto cleanup;
 		}
 	} else {
-		asn1_write_value(c2, "keyIdentifier", NULL, 0);
+		(void)asn1_write_value(c2, "keyIdentifier", NULL, 0);
 	}
 
 	if (aki->serial.data != NULL) {
@@ -1035,11 +1035,11 @@ int gnutls_x509_ext_export_authority_key_id(gnutls_x509_aki_t aki,
 			goto cleanup;
 		}
 	} else {
-		asn1_write_value(c2, "authorityCertSerialNumber", NULL, 0);
+		(void)asn1_write_value(c2, "authorityCertSerialNumber", NULL, 0);
 	}
 
 	if (aki->cert_issuer.size == 0) {
-		asn1_write_value(c2, "authorityCertIssuer", NULL, 0);
+		(void)asn1_write_value(c2, "authorityCertIssuer", NULL, 0);
 	} else {
 		for (i = 0; i < aki->cert_issuer.size; i++) {
 			ret =
