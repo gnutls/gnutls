@@ -320,7 +320,7 @@ gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
 			  unsigned indx, gnutls_datum_t * cert)
 {
 	int result, len;
-	char root2[ASN1_MAX_NAME_SIZE];
+	char root2[MAX_NAME_SIZE];
 	char oid[MAX_OID_SIZE];
 	gnutls_datum_t tmp = { NULL, 0 };
 
@@ -1764,7 +1764,7 @@ int gnutls_pkcs7_set_crt(gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
 int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx)
 {
 	int result;
-	char root2[ASN1_MAX_NAME_SIZE];
+	char root2[MAX_NAME_SIZE];
 
 	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
@@ -1809,7 +1809,7 @@ gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
 			  unsigned indx, gnutls_datum_t * crl)
 {
 	int result;
-	char root2[ASN1_MAX_NAME_SIZE];
+	char root2[MAX_NAME_SIZE];
 	gnutls_datum_t tmp = { NULL, 0 };
 	int start, end;
 
@@ -2028,7 +2028,7 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl)
 int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx)
 {
 	int result;
-	char root2[ASN1_MAX_NAME_SIZE];
+	char root2[MAX_NAME_SIZE];
 
 	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;

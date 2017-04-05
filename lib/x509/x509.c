@@ -1588,7 +1588,7 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 			   unsigned int *ret_type, int othername_oid)
 {
 	int len, ret;
-	char nptr[ASN1_MAX_NAME_SIZE];
+	char nptr[MAX_NAME_SIZE];
 	int result;
 	gnutls_datum_t tmp = {NULL, 0};
 	char choice_type[128];
@@ -2560,7 +2560,7 @@ gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert, unsigned indx,
 {
 	int result;
 	char str_critical[10];
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int len;
 
 	if (!cert) {
@@ -2632,7 +2632,7 @@ gnutls_x509_crt_get_extension_data(gnutls_x509_crt_t cert, unsigned indx,
 				   void *data, size_t * sizeof_data)
 {
 	int result, len;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 
 	if (!cert) {
 		gnutls_assert();
@@ -3839,7 +3839,7 @@ legacy_parse_aia(ASN1_TYPE src,
 		  unsigned int seq, int what, gnutls_datum_t * data)
 {
 	int len;
-	char nptr[ASN1_MAX_NAME_SIZE];
+	char nptr[MAX_NAME_SIZE];
 	int result;
 	gnutls_datum_t d;
 	const char *oid = NULL;

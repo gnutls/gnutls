@@ -429,8 +429,8 @@ parse_attribute(ASN1_TYPE asn1_struct,
 		int raw, gnutls_datum_t * out)
 {
 	int k1, result;
-	char tmpbuffer1[ASN1_MAX_NAME_SIZE];
-	char tmpbuffer3[ASN1_MAX_NAME_SIZE];
+	char tmpbuffer1[MAX_NAME_SIZE];
+	char tmpbuffer3[MAX_NAME_SIZE];
 	char value[200];
 	gnutls_datum_t td;
 	char oid[MAX_OID_SIZE];
@@ -578,7 +578,7 @@ add_attribute(ASN1_TYPE asn, const char *root, const char *attribute_id,
 	      const gnutls_datum_t * ext_data)
 {
 	int result;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 
 	snprintf(name, sizeof(name), "%s", root);
 
@@ -624,7 +624,7 @@ static int
 overwrite_attribute(ASN1_TYPE asn, const char *root, unsigned indx,
 		    const gnutls_datum_t * ext_data)
 {
-	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
 	int result;
 
 	snprintf(name, sizeof(name), "%s.?%u", root, indx);
@@ -648,7 +648,7 @@ set_attribute(ASN1_TYPE asn, const char *root,
 {
 	int result;
 	int k, len;
-	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
 	char extnID[MAX_OID_SIZE];
 
 	/* Find the index of the given attribute.
@@ -1403,7 +1403,7 @@ gnutls_x509_crq_get_attribute_info(gnutls_x509_crq_t crq, unsigned indx,
 				   void *oid, size_t * sizeof_oid)
 {
 	int result;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int len;
 
 	if (!crq) {
@@ -1457,7 +1457,7 @@ gnutls_x509_crq_get_attribute_data(gnutls_x509_crq_t crq, unsigned indx,
 				   void *data, size_t * sizeof_data)
 {
 	int result, len;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 
 	if (!crq) {
 		gnutls_assert();
@@ -1514,7 +1514,7 @@ gnutls_x509_crq_get_extension_info(gnutls_x509_crq_t crq, unsigned indx,
 {
 	int result;
 	char str_critical[10];
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	char *extensions = NULL;
 	size_t extensions_size = 0;
 	ASN1_TYPE c2;
@@ -1675,7 +1675,7 @@ gnutls_x509_crq_get_extension_data2(gnutls_x509_crq_t crq,
 			       unsigned indx, gnutls_datum_t * data)
 {
 	int ret, result;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	unsigned char *extensions = NULL;
 	size_t extensions_size = 0;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -2487,7 +2487,7 @@ gnutls_x509_crq_get_key_purpose_oid(gnutls_x509_crq_t crq,
 				    size_t * sizeof_oid,
 				    unsigned int *critical)
 {
-	char tmpstr[ASN1_MAX_NAME_SIZE];
+	char tmpstr[MAX_NAME_SIZE];
 	int result, len;
 	gnutls_datum_t prev = { NULL, 0 };
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;

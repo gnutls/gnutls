@@ -38,9 +38,9 @@ static int append_elements(ASN1_TYPE asn1_struct, const char *asn1_rdn_name, gnu
 	int k2, result, max_k2;
 	int len;
 	uint8_t value[MAX_STRING_LEN];
-	char tmpbuffer1[ASN1_MAX_NAME_SIZE];
-	char tmpbuffer2[ASN1_MAX_NAME_SIZE];
-	char tmpbuffer3[ASN1_MAX_NAME_SIZE];
+	char tmpbuffer1[MAX_NAME_SIZE];
+	char tmpbuffer2[MAX_NAME_SIZE];
+	char tmpbuffer3[MAX_NAME_SIZE];
 	const char *ldap_desc;
 	char oid[MAX_OID_SIZE];
 	gnutls_datum_t td = { NULL, 0 };
@@ -318,9 +318,9 @@ _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 			  unsigned int raw_flag, gnutls_datum_t * out)
 {
 	int k2, k1, result;
-	char tmpbuffer1[ASN1_MAX_NAME_SIZE];
-	char tmpbuffer2[ASN1_MAX_NAME_SIZE];
-	char tmpbuffer3[ASN1_MAX_NAME_SIZE];
+	char tmpbuffer1[MAX_NAME_SIZE];
+	char tmpbuffer2[MAX_NAME_SIZE];
+	char tmpbuffer3[MAX_NAME_SIZE];
 	gnutls_datum_t td;
 	uint8_t value[256];
 	char oid[MAX_OID_SIZE];
@@ -479,9 +479,9 @@ _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
 			int indx, void *_oid, size_t * sizeof_oid)
 {
 	int k2, k1, result;
-	char tmpbuffer1[ASN1_MAX_NAME_SIZE];
-	char tmpbuffer2[ASN1_MAX_NAME_SIZE];
-	char tmpbuffer3[ASN1_MAX_NAME_SIZE];
+	char tmpbuffer1[MAX_NAME_SIZE];
+	char tmpbuffer2[MAX_NAME_SIZE];
+	char tmpbuffer3[MAX_NAME_SIZE];
 	char value[256];
 	char oid[MAX_OID_SIZE];
 	int len;
@@ -704,7 +704,7 @@ _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
 			int raw_flag, const char *name, int sizeof_name)
 {
 	int result;
-	char tmp[ASN1_MAX_NAME_SIZE], asn1_rdn_name[ASN1_MAX_NAME_SIZE];
+	char tmp[MAX_NAME_SIZE], asn1_rdn_name[MAX_NAME_SIZE];
 
 	if (sizeof_name == 0 || name == NULL) {
 		gnutls_assert();
