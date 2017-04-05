@@ -63,7 +63,7 @@ void app_exit(int val)
 {
 	if (val != 0) {
 		if (outfile_name)
-			remove(outfile_name);
+			(void)remove(outfile_name);
 	}
 	exit(val);
 }

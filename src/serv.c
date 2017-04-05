@@ -821,7 +821,7 @@ int listen_socket(const char *name, int listen_port, int socktype)
 			yes = 1;
 			/* avoid listen on ipv6 addresses failing
 			 * because already listening on ipv4 addresses: */
-			setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY,
+			(void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY,
 				   (const void *) &yes, sizeof(yes));
 		}
 #endif

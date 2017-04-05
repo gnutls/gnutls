@@ -574,7 +574,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		if (fd == NULL) {
 			fprintf(stderr, "Cannot open '%s' for write\n",
 				tpasswd);
-			remove(tmpname);
+			(void)remove(tmpname);
 			return -1;
 		}
 
@@ -582,7 +582,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		if (fd2 == NULL) {
 			fprintf(stderr, "Cannot open '%s' for read\n",
 				tmpname);
-			remove(tmpname);
+			(void)remove(tmpname);
 			return -1;
 		}
 
@@ -615,7 +615,7 @@ crypt_int(const char *username, const char *passwd, int salt_size,
 		fclose(fd);
 		fclose(fd2);
 
-		remove(tmpname);
+		(void)remove(tmpname);
 
 	}
 

@@ -213,14 +213,14 @@ write_key(const char *username, const char *key, int key_size,
 	if (fd == NULL) {
 		fprintf(stderr, "Cannot open '%s' for write\n",
 			passwd_file);
-		remove(tmpname);
+		(void)remove(tmpname);
 		return -1;
 	}
 
 	fd2 = fopen(tmpname, "r");
 	if (fd2 == NULL) {
 		fprintf(stderr, "Cannot open '%s' for read\n", tmpname);
-		remove(tmpname);
+		(void)remove(tmpname);
 		fclose(fd);
 		return -1;
 	}
@@ -253,7 +253,7 @@ write_key(const char *username, const char *key, int key_size,
 	fclose(fd);
 	fclose(fd2);
 
-	remove(tmpname);
+	(void)remove(tmpname);
 
 
 	return 0;

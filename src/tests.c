@@ -433,7 +433,7 @@ test_code_t test_dhe_group(gnutls_session_t session)
 	const char *print;
 	FILE *fp;
 
-	remove("debug-dh.out");
+	(void)remove("debug-dh.out");
 
 	if (verbose == 0 || pubkey.data == NULL)
 		return TEST_IGNORE;
@@ -1304,7 +1304,7 @@ test_code_t test_certificate(gnutls_session_t session)
 	int ret;
 	FILE *fp;
 
-	remove("debug-certs.out");
+	(void)remove("debug-certs.out");
 
 	if (verbose == 0)
 		return TEST_IGNORE;
@@ -1455,7 +1455,7 @@ test_code_t test_server_cas(gnutls_session_t session)
 {
 	int ret;
 
-	remove("debug-cas.out");
+	(void)remove("debug-cas.out");
 	if (verbose == 0)
 		return TEST_IGNORE;
 

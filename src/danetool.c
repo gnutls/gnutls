@@ -75,7 +75,7 @@ void app_exit(int val)
 {
 	if (val != 0) {
 		if (outfile_name)
-			remove(outfile_name);
+			(void)remove(outfile_name);
 	}
 	exit(val);
 }
@@ -444,7 +444,7 @@ static void dane_check(const char *host, const char *proto,
 
  error:
 	if (del != 0 && cinfo->cert) {
-		remove(cinfo->cert);
+		(void)remove(cinfo->cert);
 	}
 
 	app_exit(retcode);
