@@ -206,6 +206,10 @@ if WINDOWS
 thirdparty_libadd += -lcrypt32
 endif
 
+if MACOSX
+libgnutls_la_LDFLAGS += -framework Security -framework CoreFoundation
+endif
+
 libgnutls_la_LIBADD += $(thirdparty_libadd)
 
 # C++ library
