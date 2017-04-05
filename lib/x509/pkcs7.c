@@ -1471,13 +1471,13 @@ static void disable_opt_fields(gnutls_pkcs7_t pkcs7)
 	/* disable the optional fields */
 	result = asn1_number_of_elements(pkcs7->signed_data, "crls", &count);
 	if (result != ASN1_SUCCESS || count == 0) {
-		asn1_write_value(pkcs7->signed_data, "crls", NULL, 0);
+		(void)asn1_write_value(pkcs7->signed_data, "crls", NULL, 0);
 	}
 
 	result =
 	    asn1_number_of_elements(pkcs7->signed_data, "certificates", &count);
 	if (result != ASN1_SUCCESS || count == 0) {
-		asn1_write_value(pkcs7->signed_data, "certificates", NULL, 0);
+		(void)asn1_write_value(pkcs7->signed_data, "certificates", NULL, 0);
 	}
 
 	return;
@@ -2063,7 +2063,11 @@ static int write_signer_id(ASN1_TYPE c2, const char *root,
 		const uint8_t ver = 3;
 
 		snprintf(name, sizeof(name), "%s.version", root);
-		asn1_write_value(c2, name, &ver, 1);
+		result = asn1_write_value(c2, name, &ver, 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 
 		snprintf(name, sizeof(name), "%s.sid", root);
 		result = asn1_write_value(c2, name, "subjectKeyIdentifier", 1);
@@ -2131,7 +2135,7 @@ static int add_attrs(ASN1_TYPE c2, const char *root, gnutls_pkcs7_attrs_t attrs,
 	if (attrs == NULL) {
 		/* if there are no other attributes delete that field */
 		if (already_set == 0)
-			asn1_write_value(c2, root, NULL, 0);
+			(void)asn1_write_value(c2, root, NULL, 0);
 	} else {
 		while (p != NULL) {
 			result = asn1_write_value(c2, root, "NEW", 1);
@@ -2357,12 +2361,16 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		}
 
 		if (!(flags & GNUTLS_PKCS7_EMBED_DATA)) {
-			asn1_write_value(pkcs7->signed_data,
+			(void)asn1_write_value(pkcs7->signed_data,
 					 "encapContentInfo.eContent", NULL, 0);
 		}
 	}
 
-	asn1_write_value(pkcs7->signed_data, "version", &one, 1);
+	result = asn1_write_value(pkcs7->signed_data, "version", &one, 1);
+	if (result != ASN1_SUCCESS) {
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
 
 	result =
 	    asn1_write_value(pkcs7->signed_data,
@@ -2409,7 +2417,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
-	asn1_write_value(pkcs7->signed_data,
+
+	(void)asn1_write_value(pkcs7->signed_data,
 			 "digestAlgorithms.?LAST.parameters", NULL, 0);
 
 	/* append signer's info */
@@ -2438,7 +2447,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
-	asn1_write_value(pkcs7->signed_data,
+
+	(void)asn1_write_value(pkcs7->signed_data,
 			 "signerInfos.?LAST.digestAlgorithm.parameters", NULL,
 			 0);
 

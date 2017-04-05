@@ -317,11 +317,11 @@ static void disable_optional_stuff(gnutls_x509_crl_t crl)
 
 	t = _gnutls_x509_get_time(crl->crl, "tbsCertList.nextUpdate", 0);
 	if (t == (time_t)-1) {
-		asn1_write_value(crl->crl, "tbsCertList.nextUpdate", NULL, 0);
+		(void)asn1_write_value(crl->crl, "tbsCertList.nextUpdate", NULL, 0);
 	}
 
 	if (crl->use_extensions == 0) {
-		asn1_write_value(crl->crl, "tbsCertList.crlExtensions",
+		(void)asn1_write_value(crl->crl, "tbsCertList.crlExtensions",
 				 NULL, 0);
 	}
 
