@@ -364,7 +364,7 @@ int
 _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 			     gnutls_pkcs12_bag_t bag)
 {
-	char oid[MAX_OID_SIZE], root[ASN1_MAX_NAME_SIZE];
+	char oid[MAX_OID_SIZE], root[MAX_NAME_SIZE];
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int len, result;
 	int bag_type;
@@ -606,7 +606,7 @@ gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len;
-	char root2[ASN1_MAX_NAME_SIZE];
+	char root2[MAX_NAME_SIZE];
 	char oid[MAX_OID_SIZE];
 
 	if (pkcs12 == NULL) {

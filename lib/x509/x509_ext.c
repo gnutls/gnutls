@@ -2317,7 +2317,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 {
 	int result;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int len, ret;
 	uint8_t reasons[2];
 	unsigned i, type, rflags, j;
@@ -2694,7 +2694,7 @@ int gnutls_x509_aia_set(gnutls_x509_aia_t aia,
 static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 {
 	int len;
-	char nptr[ASN1_MAX_NAME_SIZE];
+	char nptr[MAX_NAME_SIZE];
 	int ret, result;
 	char tmpoid[MAX_OID_SIZE];
 	void * tmp;
@@ -2988,7 +2988,7 @@ int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
 				     gnutls_x509_key_purposes_t p,
 				     unsigned int flags)
 {
-	char tmpstr[ASN1_MAX_NAME_SIZE];
+	char tmpstr[MAX_NAME_SIZE];
 	int result, ret;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	gnutls_datum_t oid = {NULL, 0};
@@ -3194,7 +3194,7 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
  */
 static int parse_tlsfeatures(ASN1_TYPE c2, gnutls_x509_tlsfeatures_t f, unsigned flags)
 {
-	char nptr[ASN1_MAX_NAME_SIZE];
+	char nptr[MAX_NAME_SIZE];
 	int result;
 	unsigned i, indx, j;
 	unsigned int feature;

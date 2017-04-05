@@ -39,7 +39,7 @@ _gnutls_get_extension(ASN1_TYPE asn, const char *root,
 	      gnutls_datum_t * ret, unsigned int *_critical)
 {
 	int k, result, len;
-	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
 	char str_critical[10];
 	int critical = 0;
 	char extnID[MAX_OID_SIZE];
@@ -135,7 +135,7 @@ static int
 get_indx_extension(ASN1_TYPE asn, const char *root,
 	      int indx, gnutls_datum_t * out)
 {
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int ret;
 
 	out->data = NULL;
@@ -231,7 +231,7 @@ static int get_extension_oid(ASN1_TYPE asn, const char *root,
 		  unsigned indx, void *oid, size_t * sizeof_oid)
 {
 	int k, result, len;
-	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
 	char extnID[MAX_OID_SIZE];
 	unsigned indx_counter = 0;
 
@@ -319,7 +319,7 @@ add_extension(ASN1_TYPE asn, const char *root, const char *extension_id,
 {
 	int result;
 	const char *str;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 
 	snprintf(name, sizeof(name), "%s", root);
 
@@ -379,7 +379,7 @@ static int
 overwrite_extension(ASN1_TYPE asn, const char *root, unsigned int indx,
 		    const gnutls_datum_t * ext_data, unsigned int critical)
 {
-	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
 	const char *str;
 	int result;
 
@@ -421,7 +421,7 @@ _gnutls_set_extension(ASN1_TYPE asn, const char *root,
 {
 	int result = 0;
 	int k, len;
-	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
 	char extnID[MAX_OID_SIZE];
 
 	/* Find the index of the given extension.

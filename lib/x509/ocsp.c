@@ -430,7 +430,7 @@ gnutls_ocsp_req_get_cert_id(gnutls_ocsp_req_t req,
 			    gnutls_datum_t * serial_number)
 {
 	gnutls_datum_t sa;
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int ret;
 
 	if (req == NULL) {
@@ -737,7 +737,7 @@ gnutls_ocsp_req_get_extension(gnutls_ocsp_req_t req,
 {
 	int ret;
 	char str_critical[10];
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int len;
 
 	if (!req) {
@@ -1414,7 +1414,7 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 			    time_t * revocation_time,
 			    unsigned int *revocation_reason)
 {
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int ret, result;
 	char oidtmp[MAX_OID_SIZE];
 	int len;
@@ -1625,7 +1625,7 @@ gnutls_ocsp_resp_get_extension(gnutls_ocsp_resp_t resp,
 {
 	int ret;
 	char str_critical[10];
-	char name[ASN1_MAX_NAME_SIZE];
+	char name[MAX_NAME_SIZE];
 	int len;
 
 	if (!resp) {
@@ -1827,7 +1827,7 @@ gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_t resp,
 	}
 
 	for (;;) {
-		char name[ASN1_MAX_NAME_SIZE];
+		char name[MAX_NAME_SIZE];
 
 		snprintf(name, sizeof(name), "certs.?%u",
 			 (unsigned int) (ctr + 1));

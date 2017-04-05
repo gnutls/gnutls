@@ -563,7 +563,7 @@ gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn,
 	ASN1_DATA_NODE vnode;
 	long len;
 	int lenlen, remlen, ret;
-	char rbuf[ASN1_MAX_NAME_SIZE];
+	char rbuf[MAX_NAME_SIZE];
 	unsigned char cls;
 	const unsigned char *ptr;
 
