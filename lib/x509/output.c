@@ -30,7 +30,6 @@
 #include <x509_int.h>
 #include <num.h>
 #include "errors.h"
-#include <extras/randomart.h>
 #include "extensions.h"
 #include "ip.h"
 
