@@ -381,7 +381,7 @@ FreeBSD10/x86_64:
   tags:
   - freebsd
   only:
-  - branches@$BUILD_IMAGES_PROJECT
+  - branches@gnutls/gnutls
   except:
   - tags
   artifacts:
