@@ -15,7 +15,7 @@
 #
 ################################################################################
 */
-
+#include <config.h>
 #include <assert.h>
 #include <stdint.h>
 
@@ -24,6 +24,7 @@
 
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+#ifdef ENABLE_OPENPGP
     gnutls_datum_t raw;
     gnutls_datum_t out;
     gnutls_openpgp_crt_t crt;
@@ -43,5 +44,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
 
     gnutls_openpgp_crt_deinit(crt);
+#endif
     return 0;
 }
