@@ -74,6 +74,26 @@ const char *raw_to_string(const unsigned char *raw, size_t raw_size)
 	return buf;
 }
 
+const char *raw_to_base64(const unsigned char *raw, size_t raw_size)
+{
+	static char buf[1024];
+	gnutls_datum_t data = {(unsigned char*)raw, raw_size};
+	size_t buf_size;
+	int ret;
+
+	if (raw_size == 0)
+		return "(empty)";
+
+	buf_size = sizeof(buf);
+	ret = gnutls_pem_base64_encode(NULL, &data, buf, &buf_size);
+	if (ret < 0)
+		return "(error)";
+
+	buf[sizeof(buf) - 1] = '\0';
+
+	return buf;
+}
+
 static void print_x509_info_compact(gnutls_session_t session)
 {
 	gnutls_x509_crt_t crt;

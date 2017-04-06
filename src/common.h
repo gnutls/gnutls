@@ -67,6 +67,7 @@ void print_list(const char *priorities, int verbose);
 int cert_verify(gnutls_session_t session, const char *hostname, const char *purpose);
 
 const char *raw_to_string(const unsigned char *raw, size_t raw_size);
+const char *raw_to_base64(const unsigned char *raw, size_t raw_size);
 int check_command(gnutls_session_t session, const char *str);
 
 int
