@@ -53,23 +53,25 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 	char top[80];
 	char bottom[80];
 	size_t size, max, bytes;
-	int pos, top_len, bottom_len;
+	int pos, top_len = 0, bottom_len = 0;
 
-	if (msg == NULL || strlen(msg) > 50) {
-		gnutls_assert();
-		return GNUTLS_E_BASE64_ENCODING_ERROR;
+	if (msg != NULL) {
+		if (strlen(msg) > 50) {
+			gnutls_assert();
+			return GNUTLS_E_BASE64_ENCODING_ERROR;
+		}
+
+		_gnutls_str_cpy(top, sizeof(top), "-----BEGIN ");
+		_gnutls_str_cat(top, sizeof(top), msg);
+		_gnutls_str_cat(top, sizeof(top), "-----\n");
+
+		_gnutls_str_cpy(bottom, sizeof(bottom), "-----END ");
+		_gnutls_str_cat(bottom, sizeof(bottom), msg);
+		_gnutls_str_cat(bottom, sizeof(bottom), "-----\n");
+
+		top_len = strlen(top);
+		bottom_len = strlen(bottom);
 	}
-
-	_gnutls_str_cpy(top, sizeof(top), "-----BEGIN ");
-	_gnutls_str_cat(top, sizeof(top), msg);
-	_gnutls_str_cat(top, sizeof(top), "-----\n");
-
-	_gnutls_str_cpy(bottom, sizeof(bottom), "-----END ");
-	_gnutls_str_cat(bottom, sizeof(bottom), msg);
-	_gnutls_str_cat(bottom, sizeof(bottom), "-----\n");
-
-	top_len = strlen(top);
-	bottom_len = strlen(bottom);
 
 	max = B64FSIZE(top_len + bottom_len, data_size);
 
@@ -102,9 +104,13 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 
 		memcpy(ptr, tmpres, size);
 		ptr += size;
-		*ptr++ = '\n';
-
-		pos += size + 1;
+		pos += size;
+		if (msg != NULL) {
+			*ptr++ = '\n';
+			pos++;
+		} else {
+			bytes--;
+		}
 	}
 
 	INCR(bytes, bottom_len, max);
@@ -118,7 +124,7 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 
 /**
  * gnutls_pem_base64_encode:
- * @msg: is a message to be put in the header
+ * @msg: is a message to be put in the header (may be %NULL)
  * @data: contain the raw data
  * @result: the place where base64 data will be copied
  * @result_size: holds the size of the result
@@ -126,7 +132,7 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
  * This function will convert the given data to printable data, using
  * the base64 encoding. This is the encoding used in PEM messages.
  *
- * The output string will be null terminated, although the size will
+ * The output string will be null terminated, although the output size will
  * not include the terminating null.
  *
  * Returns: On success %GNUTLS_E_SUCCESS (0) is returned,
@@ -159,7 +165,7 @@ gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
 
 /**
  * gnutls_pem_base64_encode2:
- * @msg: is a message to be put in the encoded header
+ * @msg: is a message to be put in the encoded header (may be %NULL)
  * @data: contains the raw data
  * @result: will hold the newly allocated encoded data
  *
