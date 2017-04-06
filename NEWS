@@ -22,6 +22,13 @@ See the end for copying conditions.
    That allows PKCS#11 operations such as signing to be performed with the
    same object from multiple threads.
 
+** libgnutls: Added support for MacOSX key chain for obtaining trust store's
+   root CA certificates. That is, gnutls_x509_trust_list_add_system_trust() and
+   gnutls_certificate_set_x509_system_trust() will load the certificates from
+   the key chain. That also means that we no longer check for a default trust
+   store file in configure when building on MacOSX (unless explicitly asked to).
+   Patch by David Caldwell.
+
 ** API and ABI modifications:
 No changes since last version.
 
