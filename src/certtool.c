@@ -1619,17 +1619,6 @@ void pgp_privkey_info(void)
 
 			fprintf(outfile, "Fingerprint: %s\n",
 				raw_to_string(lbuffer, size));
-
-			ret =
-			    gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH,
-					      cprint, bits, lbuffer, size,
-					      &art);
-			if (ret >= 0) {
-				fprintf(outfile,
-					"Fingerprint's random art:\n%s\n\n",
-					art.data);
-				gnutls_free(art.data);
-			}
 		}
 	}
 

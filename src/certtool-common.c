@@ -1190,7 +1190,8 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		fprintf(stderr, "Error in key id calculation: %s\n",
 			gnutls_strerror(ret));
 	} else {
-		gnutls_datum_t art;
+		fprintf(outfile, "Public Key PIN:\n\tpin-sha256:%s\n",
+			raw_to_base64(lbuffer, size));
 
 		fprintf(outfile, "Public Key ID:\n\tsha256:%s\n",
 			raw_to_string(lbuffer, size));
@@ -1202,16 +1203,6 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 			fprintf(outfile, "\tsha1:%s\n",
 				raw_to_string(lbuffer, size));
 		}
-
-		ret =
-		    gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint,
-				      bits, lbuffer, size, &art);
-		if (ret >= 0) {
-			fprintf(outfile, "Public key's random art:\n%s\n",
-				art.data);
-			gnutls_free(art.data);
-		}
-
 	}
 	fprintf(outfile, "\n");
 
