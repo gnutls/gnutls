@@ -2531,8 +2531,10 @@ print_pubkey_other(gnutls_buffer_st * str, gnutls_pubkey_t pubkey,
 	}
 
 	adds(str, "\n");
-	adds(str, _("Public Key Usage:\n"));
-	print_key_usage2(str, "\t", pubkey->key_usage);
+	if (pubkey->key_usage) {
+		adds(str, _("Public Key Usage:\n"));
+		print_key_usage2(str, "\t", pubkey->key_usage);
+	}
 
 	print_obj_id(str, "", pubkey, (get_id_func*)gnutls_pubkey_get_key_id);
 }
