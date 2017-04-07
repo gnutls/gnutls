@@ -816,9 +816,8 @@ gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 /**
  * gnutls_x509_rdn_get2:
  * @idn: should contain a DER encoded RDN sequence
- * @buf: a pointer to a structure to hold the peer's name
- * @buf_size: holds the size of @buf
- * @flags: 
+ * @str: a datum that will hold the name
+ * @flags: zero of %GNUTLS_X509_DN_FLAG_COMPAT
  *
  * This function will return the name of the given RDN sequence.  The
  * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in

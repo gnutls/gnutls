@@ -2975,7 +2975,7 @@ gnutls_x509_crq_set_private_key_usage_period(gnutls_x509_crq_t crq,
 
 /**
  * gnutls_x509_crq_get_tlsfeatures:
- * @crt: A X.509 certificate request
+ * @crq: An X.509 certificate request
  * @features: If the function succeeds, the
  *   features will be stored in this variable.
  * @flags: zero or %GNUTLS_EXT_FLAG_APPEND
@@ -3037,7 +3037,7 @@ int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
 
 /**
  * gnutls_x509_crq_set_tlsfeatures:
- * @crt: A X.509 certificate request
+ * @crq: An X.509 certificate request
  * @features: If the function succeeds, the
  *   features will be added to the certificate
  *   request.
@@ -3051,7 +3051,7 @@ int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
  * Since: 3.5.1
  **/
 int gnutls_x509_crq_set_tlsfeatures(gnutls_x509_crq_t crq,
-								   gnutls_x509_tlsfeatures_t features)
+				    gnutls_x509_tlsfeatures_t features)
 {
 	int ret;
 	gnutls_datum_t der;
