@@ -55,6 +55,9 @@ See the end for copying conditions.
    priority string options. These allows enabling all broken and SHA1-based signature
    algorithms in certificate verification, respectively.
 
+** libgnutls: gnutls_pem_base64_encode/2() and gnutls_pem_base64_decode/2() can
+   be used to decode arbitrary base64 data if the header parameter is set to NULL.
+
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
