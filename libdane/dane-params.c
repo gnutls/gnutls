@@ -116,7 +116,7 @@ const char *dane_match_type_name(dane_match_type_t type)
 
 /**
  * dane_cert_usage_name:
- * @type: is a DANE match type
+ * @usage: is a DANE certificate usage
  *
  * Convert a #dane_cert_usage_t value to a string.
  *

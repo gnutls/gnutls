@@ -125,7 +125,7 @@ gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
 /**
  * gnutls_anon_set_server_known_dh_params:
  * @res: is a gnutls_anon_server_credentials_t type
- * @dh_params: The Diffie-Hellman parameters.
+ * @sec_param: is an option of the %gnutls_sec_param_t enumeration
  *
  * This function will set the Diffie-Hellman parameters for an
  * anonymous server to use.  These parameters will be used in

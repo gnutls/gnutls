@@ -207,7 +207,7 @@ gnutls_certificate_get_openpgp_key(gnutls_certificate_credentials_t res,
  * @res: is a #gnutls_certificate_credentials_t type.
  * @index: The index of the certificate list to obtain.
  * @crt_list: Where to store the certificate list.
- * @key: Will hold the number of certificates.
+ * @crt_list_size: Will hold the number of certificates.
  *
  * Obtains a X.509 certificate list that has been stored in @res with one of
  * gnutls_certificate_set_openpgp_key(),

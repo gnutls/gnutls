@@ -379,7 +379,7 @@ gnutls_supplemental_recv(gnutls_session_t session, unsigned do_recv_supplemental
 /**
  * gnutls_supplemental_send:
  * @session: is a #gnutls_session_t type.
- * @do_recv_supplemental: non-zero in order to expect supplemental data
+ * @do_send_supplemental: non-zero in order to send supplemental data
  *
  * This function is to be called by an extension handler to
  * instruct gnutls to send supplemental data during the handshake process.
