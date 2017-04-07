@@ -173,8 +173,11 @@ static void systemkey_list(FILE * out)
 	} while(ret >= 0);
 
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-		fprintf(stderr, "gnutls_system_key_iter_get_url: %s",
-			gnutls_strerror(ret));
+		if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE) {
+			fprintf(stderr, "Native key store is not supported, or not present on this system\n");
+		} else {
+			fprintf(stderr, "Error: %s\n", gnutls_strerror(ret));
+		}
 		app_exit(1);
 	}
 	gnutls_system_key_iter_deinit(iter);
