@@ -53,7 +53,7 @@ doc-dist/Fedora:
   except:
   - tags
 
-# ABI check + coverage (two runs one under normal, and under the pkcs11 trust store)
+# ABI check + coverage
 abi-coverage/Fedora:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
@@ -65,9 +65,6 @@ abi-coverage/Fedora:
   - make abi-check
   - make pic-check
   - make -j$(nproc) check
-  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc --with-default-trust-store-pkcs11="pkcs11:"
-    && make -j$(nproc)
-  - make -C tests check -j$(nproc) TESTS=trust-store SUBDIRS=.
   - make local-code-coverage-output || true
   tags:
   - shared
