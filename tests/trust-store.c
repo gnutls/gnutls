@@ -47,7 +47,7 @@ void doit(void)
 	gnutls_certificate_credentials_t x509_cred;
 	int ret;
 
-	global_init();
+	gnutls_global_init();
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
