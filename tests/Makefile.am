@@ -317,7 +317,7 @@ name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
+dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
 if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
