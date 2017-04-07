@@ -125,7 +125,8 @@ invoke-p11tool.texi: $(top_srcdir)/src/p11tool-args.def invoke-psktool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	$(SED) -e 's/@subheading/@subsection/g' \
+	$(SED) \
+	    -e 's/@subsection/@subsubheading/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -136,9 +137,11 @@ invoke-tpmtool.texi: $(top_srcdir)/src/tpmtool-args.def invoke-p11tool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	$(SED) -e 's/@subheading/@subsection/g' \
+	$(SED) \
+	    -e 's/@subsection/@subsubheading/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
+
 
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
