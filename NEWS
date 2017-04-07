@@ -30,7 +30,7 @@ See the end for copying conditions.
    Patch by David Caldwell.
 
 ** libgnutls: when disabling OpenPGP authentication, the resulting library
-   is ABI compatible (will openpgp related functions being stubs that fail
+   is ABI compatible (with openpgp related functions being stubs that fail
    on invocation).
 
 ** API and ABI modifications:
