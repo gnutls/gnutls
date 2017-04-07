@@ -53,7 +53,7 @@ doc-dist/Fedora:
   except:
   - tags
 
-# ABI check + coverage
+# ABI check + coverage (two runs one under normal, and under the pkcs11 trust store)
 abi-coverage/Fedora:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
@@ -65,6 +65,9 @@ abi-coverage/Fedora:
   - make abi-check
   - make pic-check
   - make -j$(nproc) check
+  - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc --with-default-trust-store-pkcs11="pkcs11:"
+    && make -j$(nproc)
+  - make -C tests check -j$(nproc) TESTS=trust-store SUBDIRS=.
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -203,6 +206,7 @@ valgrind/Fedora/x86_64:
       - tests/*.log
       - tests/*/*.log
 
+# Two runs, one with normal backend and another with pkcs11 trust store
 asan/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
@@ -213,6 +217,10 @@ asan/Fedora/x86_64:
     ./configure --disable-doc --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
   - make check -j$(nproc)
+  - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
+    ./configure --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --disable-guile
+  - make -j$(nproc)
+  - make -C tests check -j$(nproc) TESTS=trust-store SUBDIRS=.
   tags:
   - shared
   except:
@@ -414,6 +422,7 @@ Fedora/x86:
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
 
+# Two runs, one with normal backend and another with pkcs11 trust store
 ubsan-Werror/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
@@ -426,6 +435,9 @@ ubsan-Werror/Fedora/x86_64:
   - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g"
   - make -j$(nproc)
   - make check -j$(nproc)
+  - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-non-suiteb-curves --disable-guile --disable-doc --with-default-trust-store-pkcs11="pkcs11:"
+  - make -j$(nproc)
+  - make -C tests check -j$(nproc) TESTS=trust-store SUBDIRS=.
   tags:
   - shared
   except:
