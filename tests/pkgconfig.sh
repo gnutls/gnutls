@@ -34,6 +34,13 @@ ${PKGCONFIG} --version >/dev/null || exit 77
 PKG_CONFIG_PATH=${top_builddir}/lib
 export PKG_CONFIG_PATH
 
+OTHER=$(${PKGCONFIG} --libs --static libidn)
+OTHER="${OTHER} $(${PKGCONFIG} --libs --static p11-kit-1)"
+if test -n "${OTHER}" && test "${OTHER#*-R}" != "$OTHER";then
+	echo "Found invalid string in libidn flags: ${OTHER}"
+	exit 77
+fi
+
 set -e
 
 cat >$TMPFILE <<__EOF__
