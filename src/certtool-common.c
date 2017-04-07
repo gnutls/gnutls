@@ -1194,14 +1194,14 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 			raw_to_base64(lbuffer, size));
 
 		fprintf(outfile, "Public Key ID:\n\tsha256:%s\n",
-			raw_to_string(lbuffer, size));
+			raw_to_hex(lbuffer, size));
 
 		size = lbuffer_size;
 		ret =
 		     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1, lbuffer, &size);
 		if (ret >= 0) {
 			fprintf(outfile, "\tsha1:%s\n",
-				raw_to_string(lbuffer, size));
+				raw_to_hex(lbuffer, size));
 		}
 	}
 	fprintf(outfile, "\n");
