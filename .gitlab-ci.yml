@@ -23,12 +23,13 @@ init/Fedora/x86_64:
   - make autoreconf
   - ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --disable-maintainer-mode --disable-guile
   - make syntax-check
-  - make distclean
   tags:
   - shared
   artifacts:
-    untracked: true
-    expire_in: 4 days
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
 
 
 ##################################################
@@ -40,6 +41,7 @@ doc-dist/Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
+  - make autoreconf
   - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
     && make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   - make -C doc gnutls.html
@@ -48,8 +50,6 @@ doc-dist/Fedora:
   - make dist
   tags:
   - shared
-  dependencies:
-  - init/Fedora/x86_64
   except:
   - tags
 
@@ -59,6 +59,7 @@ abi-coverage/Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
+  - make autoreconf
   - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
     && make -j$(nproc)
   - make abi-check
@@ -67,8 +68,6 @@ abi-coverage/Fedora:
   - make local-code-coverage-output || true
   tags:
   - shared
-  dependencies:
-  - init/Fedora/x86_64
   except:
   - tags
   artifacts:
@@ -82,6 +81,7 @@ minimal/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - echo "No tools build"
+  - make autoreconf
   - ./configure --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
   - make -j$(nproc)
   - make -j$(nproc) check
@@ -94,8 +94,6 @@ minimal/Fedora/x86_64:
     --disable-ocsp --disable-session-tickets --disable-non-suiteb-curves --with-included-unistring
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
     --disable-ssl3-support --disable-ssl2-support --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j$(nproc)
-  dependencies:
-  - init/Fedora/x86_64
   tags:
   - shared
   except:
@@ -105,6 +103,7 @@ no-SSL-3.0/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - mkdir -p build && cd build &&
     ../configure --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
@@ -112,8 +111,6 @@ no-SSL-3.0/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -128,6 +125,7 @@ FIPS140-2/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - mkdir -p build && cd build &&
     ../configure --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
   - make -j$(nproc)
@@ -137,8 +135,6 @@ FIPS140-2/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     when: on_failure
     paths:
@@ -150,6 +146,7 @@ IDNA2003/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - mkdir -p build && cd build &&
     ../configure --without-libidn2 --disable-doc --disable-guile --disable-full-test-suite &&
     make -j$(nproc) && make check -j$(nproc)
@@ -157,8 +154,6 @@ IDNA2003/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     when: on_failure
     paths:
@@ -170,6 +165,7 @@ openpgp/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - mkdir -p build && cd build &&
     ../configure --enable-openpgp-authentication --disable-doc --disable-guile --disable-full-test-suite
   - make -j$(nproc)
@@ -179,8 +175,6 @@ openpgp/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     when: on_failure
     paths:
@@ -193,6 +187,7 @@ valgrind/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - ./configure --disable-doc  --disable-guile --disable-full-test-suite --enable-valgrind-tests
   - make -j$(nproc)
   - make check -j$(nproc)
@@ -200,8 +195,6 @@ valgrind/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -215,6 +208,7 @@ asan/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
+  - make autoreconf
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
@@ -223,8 +217,6 @@ asan/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -238,6 +230,7 @@ static-analyzers/Fedora/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - scan-build ./configure --disable-doc --disable-guile --enable-fips140-mode --enable-valgrind-tests
   - make -j$(nproc) -C gl
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
@@ -248,8 +241,6 @@ static-analyzers/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -264,6 +255,7 @@ MinGW32/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c
+  - make autoreconf
   - mingw32-configure --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
@@ -284,8 +276,6 @@ MinGW32/DLLs:
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win32-build/bin &&
     cp lib/.libs/*.a lib/*.def lib/gnutls.pc win32-build/lib &&
     cp lib/includes/gnutls/*.h win32-build/lib/includes
-  dependencies:
-  - init/Fedora/x86_64
   tags:
   - shared
   - docker
@@ -302,6 +292,7 @@ MinGW64/DLLs:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c
+  - make autoreconf
   - mingw64-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
@@ -327,8 +318,6 @@ MinGW64/DLLs:
   - docker
   only:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     paths:
       - win64-build/
@@ -337,6 +326,7 @@ MinGW64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
@@ -347,8 +337,6 @@ MinGW64:
   - docker
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -361,6 +349,7 @@ MinGW32:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
+  - make autoreconf
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
@@ -371,8 +360,6 @@ MinGW32:
   - docker
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -418,7 +405,6 @@ Fedora/x86:
   - shared
   except:
   - tags
-  dependencies: []
   artifacts:
     expire_in: 1 week
     when: on_failure
@@ -433,6 +419,7 @@ ubsan-Werror/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
+  - make autoreconf
   - CFLAGS="-fsanitize=undefined -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-non-suiteb-curves --disable-guile --disable-doc
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
@@ -443,8 +430,6 @@ ubsan-Werror/Fedora/x86_64:
   - shared
   except:
   - tags
-  dependencies:
-  - init/Fedora/x86_64
   artifacts:
     when: on_failure
     paths:
@@ -466,7 +451,6 @@ build/Debian/x86_64:
   - shared
   except:
   - tags
-  dependencies: []
   artifacts:
     when: on_failure
     paths:
