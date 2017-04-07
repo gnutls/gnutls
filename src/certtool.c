@@ -1382,8 +1382,8 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 
 	if (count > 1 && outcert_format == GNUTLS_X509_FMT_DER) {
 		fprintf(stderr,
-			"cannot output multiple certificates in DER format; "
-			"using PEM instead");
+			"Cannot output multiple certificates in DER format; "
+			"using PEM instead\n");
 		outcert_format = GNUTLS_X509_FMT_PEM;
 	}
 
