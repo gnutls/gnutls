@@ -85,6 +85,10 @@ static time_t mktime_utc(const struct fake_tm *tm)
 	if (tm->tm_mon < 0 || tm->tm_mon > 11 || tm->tm_year < 1970)
 		return (time_t) - 1;
 
+	/* Check for "obvious" mistakes in dates */
+	if (tm->tm_sec > 60 || tm->tm_min > 59 || tm->tm_mday > 31 || tm->tm_mday < 1 || tm->tm_hour > 23)
+		return (time_t) - 1;
+
 /* Convert to a time_t. 
  */
 	for (i = 1970; i < tm->tm_year; i++)
