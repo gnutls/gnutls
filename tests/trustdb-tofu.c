@@ -29,6 +29,7 @@
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
+#include <unistd.h>
 #include "utils.h"
 
 /* This will test whether the default public key storage backend
@@ -76,7 +77,9 @@ static char client_pem[] =
 const gnutls_datum_t client_cert =
     { (void *) client_pem, sizeof(client_pem) };
 
-#define TMP_FILE "mini-tdb-tmp"
+#define TMP_FILE "mini-tdb.tmp"
+#define HOSTS_DIR ".gnutls/"
+#define HOSTS_FILE HOSTS_DIR"known_hosts"
 
 #define SHA1_HASH "\x53\x4b\x3b\xdc\x5e\xc8\x44\x4c\x02\x20\xbf\x39\x48\x6f\x4c\xfe\xcd\x25\x52\x10"
 
@@ -85,6 +88,7 @@ void doit(void)
 	gnutls_datum_t der_cert, der_cert2;
 	int ret;
 	gnutls_datum_t hash;
+	char path[512];
 
 	/* the sha1 hash of the server's pubkey */
 	hash.data = (void *) SHA1_HASH;
@@ -112,6 +116,7 @@ void doit(void)
 		goto fail;
 	}
 
+	remove(HOSTS_FILE);
 	remove(TMP_FILE);
 
 	/* verify whether the stored hash verification succeeeds */
@@ -140,6 +145,36 @@ void doit(void)
 	if (debug)
 		success("Commitment verification: passed\n");
 
+	/* Verify access to home dir */
+#ifndef _WIN32
+	setenv("HOME", getcwd(path, sizeof(path)), 1);
+
+	/* verify whether the stored hash verification succeeeds */
+	ret = gnutls_store_commitment(NULL, NULL, "localhost", "https",
+				      GNUTLS_DIG_SHA1, &hash, 0, GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
+	if (ret != 0) {
+		fail("commitment storage: %s\n", gnutls_strerror(ret));
+		goto fail;
+	}
+
+	if (debug)
+		success("Commitment storage: passed\n");
+
+	ret =
+	    gnutls_verify_stored_pubkey(NULL, NULL, "localhost",
+					"https", GNUTLS_CRT_X509,
+					&der_cert, 0);
+
+	if (ret != 0) {
+		fail("commitment verification: %s\n",
+		     gnutls_strerror(ret));
+		goto fail;
+	}
+
+	if (debug)
+		success("Commitment from homedir verification: passed\n");
+#endif
+
 	/* verify whether the stored pubkey verification succeeeds */
 	ret = gnutls_store_pubkey(TMP_FILE, NULL, "localhost", "https",
 				  GNUTLS_CRT_X509, &der_cert, 0, 0);
@@ -164,7 +199,6 @@ void doit(void)
 	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
 					"https", GNUTLS_CRT_X509,
 					&der_cert2, 0);
-	remove(TMP_FILE);
 	if (ret == 0) {
 		fail("verification succeed when shouldn't!\n");
 		goto fail;
@@ -178,6 +212,9 @@ void doit(void)
 	if (debug)
 		success("Public key verification: passed\n");
 
+	remove(HOSTS_FILE);
+	remove(TMP_FILE);
+	rmdir(HOSTS_DIR);
 
 	gnutls_global_deinit();
 	gnutls_free(der_cert.data);
@@ -185,6 +222,8 @@ void doit(void)
 
 	return;
       fail:
+	remove(HOSTS_FILE);
 	remove(TMP_FILE);
+	rmdir(HOSTS_DIR);
 	exit(1);
 }

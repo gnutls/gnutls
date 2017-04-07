@@ -91,7 +91,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
 	 tls-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify \
-	 mini-tdb dtls-rehandshake-anon mini-alpn mini-dtls-large \
+	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities	\
