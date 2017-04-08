@@ -29,9 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-/* This program tests anonymous authentication as well as the gnutls_record_recv_packet.
- */
+#include "cert-common.h"
 
 #if defined(_WIN32)
 
@@ -45,7 +43,6 @@ int main(int argc, char **argv)
 
 #include <string.h>
 #include <sys/types.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
 #if !defined(_WIN32)
 #include <sys/wait.h>
@@ -55,43 +52,58 @@ int main(int argc, char **argv)
 
 #include "utils.h"
 
+#include "ex-session-info.c"
+#include "ex-x509-info.c"
+
+pid_t child;
+
 static void tls_log_func(int level, const char *str)
 {
-	fprintf(stderr, "|<%d>| %s", level, str);
+	fprintf(stderr, "%s |<%d>| %s", child ? "server" : "client", level,
+		str);
 }
+
+/* A very basic TLS client, with anonymous authentication.
+ */
+
 
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
+
 
 static void client(int sd)
 {
 	int ret, ii;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
-	gnutls_datum_t dh_pubkey;
-	gnutls_anon_client_credentials_t anoncred;
-	/* Need to enable anonymous KX specifically. */
+	gnutls_certificate_credentials_t xcred;
+	gnutls_certificate_credentials_t tst_cred;
 
 	global_init();
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
-		gnutls_global_set_log_level(4711);
+		gnutls_global_set_log_level(6);
 
-	gnutls_anon_allocate_client_credentials(&anoncred);
+	gnutls_certificate_allocate_credentials(&xcred);
+
+	/* sets the trusted cas file
+	 */
+	gnutls_certificate_set_x509_trust_mem(xcred, &ca3_cert,
+					      GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_x509_key_mem(xcred, &cli_ca3_cert, &cli_ca3_key,
+					    GNUTLS_X509_FMT_PEM);
 
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				   NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+DHE-RSA", NULL);
 
-	/* put the anonymous credentials to the current session
+	/* put the x509 credentials to the current session
 	 */
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	gnutls_transport_set_int(session, sd);
 
@@ -103,50 +115,59 @@ static void client(int sd)
 		fail("client: Handshake failed\n");
 		gnutls_perror(ret);
 		goto end;
-	} else {
-		if (debug)
-			success("client: Handshake was completed\n");
+	} else if (debug) {
+		success("client: Handshake was completed\n");
 	}
-
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("client: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("client: too small secret key size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_pubkey(session, &dh_pubkey);
-	if (ret < 0) {
-		fail("error retrieving the public key\n");
-	}
-
-	if (dh_pubkey.size == 0) {
-		fail("retrieved pubkey is empty!\n");
-	}
-
-	printf("pubkey: \n");
-	for (ii=0;ii<(int)dh_pubkey.size;ii++) {
-		printf("%.2x", (unsigned)dh_pubkey.data[ii]);
-	}
-	printf("\n");
-
-	gnutls_free(dh_pubkey.data);
 
 	if (debug)
 		success("client: TLS version is: %s\n",
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	ret = gnutls_record_send(session, MSG, sizeof(MSG)-1);
-	if (ret != sizeof(MSG)-1) {
-		fail("return value of gnutls_record_send() is bogus\n");
-		exit(1);
+	/* see the Getting peer's information example */
+	if (debug)
+		print_info(session);
+
+	print_dh_params_info(session);
+
+	ret = gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE, (void**)&tst_cred);
+	if (ret < 0) {
+		fail("client: gnutls_credentials_get failed: %s\n", gnutls_strerror(ret));
+	}
+	if (tst_cred != xcred) {
+		fail("client: gnutls_credentials_get returned invalid value\n");
+	}
+
+	ret = gnutls_record_send(session, MSG, strlen(MSG));
+
+	if (ret == strlen(MSG)) {
+		if (debug)
+			success("client: sent record.\n");
+	} else {
+		fail("client: failed to send record.\n");
+		gnutls_perror(ret);
+		goto end;
 	}
 
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
+
+	if (debug)
+		success("client: recv returned %d.\n", ret);
+
+	if (ret == GNUTLS_E_REHANDSHAKE) {
+		if (debug)
+			success("client: doing handshake!\n");
+		ret = gnutls_handshake(session);
+		if (ret == 0) {
+			if (debug)
+				success
+				    ("client: handshake complete, reading again.\n");
+			ret = gnutls_record_recv(session, buffer, MAX_BUF);
+		} else {
+			fail("client: handshake failed.\n");
+		}
+	}
+
 	if (ret == 0) {
 		if (debug)
 			success
@@ -154,12 +175,6 @@ static void client(int sd)
 		goto end;
 	} else if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
-		goto end;
-	}
-
-	if (ret != sizeof(MSG)-1 || memcmp(buffer, MSG, ret) != 0) {
-		fail("client: received data of different size! (expected: %d, have: %d)\n", 
-			(int)strlen(MSG), ret);
 		goto end;
 	}
 
@@ -179,19 +194,19 @@ static void client(int sd)
 
 	gnutls_deinit(session);
 
-	gnutls_anon_free_client_credentials(anoncred);
+	gnutls_certificate_free_credentials(xcred);
 
 	gnutls_global_deinit();
 }
 
-/* This is a sample TLS 1.0 echo server, for anonymous authentication only.
+/* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
 #define MAX_BUF 1024
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
+gnutls_certificate_credentials_t x509_cred;
 
 static gnutls_session_t initialize_tls_session(void)
 {
@@ -202,12 +217,15 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				   NULL);
-
+	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+DHE-RSA", NULL);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+
+	/* request client certificate if any.
+	   Moved to later on to be able to test re-handshakes.
+	   gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+	 */
 
 	gnutls_dh_set_prime_bits(session, DH_BITS);
 
@@ -230,28 +248,33 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
+
 static void server(int sd)
 {
-	gnutls_packet_t packet;
-	gnutls_datum_t dh_pubkey;
-	int ii;
-
 	/* this must be called once in the program
 	 */
+	
 	global_init();
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
-		gnutls_global_set_log_level(4711);
+		gnutls_global_set_log_level(6);
 
-	gnutls_anon_allocate_server_credentials(&anoncred);
+	gnutls_certificate_allocate_credentials(&x509_cred);
+	gnutls_certificate_set_x509_trust_mem(x509_cred, &ca3_cert,
+					      GNUTLS_X509_FMT_PEM);
+
+	gnutls_certificate_set_x509_key_mem(x509_cred,
+					    &server_ca3_localhost_cert,
+					    &server_ca3_key,
+					    GNUTLS_X509_FMT_PEM);
 
 	if (debug)
 		success("Launched, generating DH parameters...\n");
 
 	generate_dh_params();
 
-	gnutls_anon_set_server_dh_params(anoncred, dh_params);
+	gnutls_certificate_set_dh_params(x509_cred, dh_params);
 
 	session = initialize_tls_session();
 
@@ -264,47 +287,24 @@ static void server(int sd)
 		     gnutls_strerror(ret));
 		return;
 	}
-	if (debug)
+	if (debug) {
 		success("server: Handshake was completed\n");
-
-	if (debug)
 		success("server: TLS version is: %s\n",
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
-
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
 	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_pubkey(session, &dh_pubkey);
-	if (ret < 0) {
-		fail("error retrieving the public key\n");
-	}
-
-	if (dh_pubkey.size == 0) {
-		fail("retrieved pubkey is empty!\n");
-	}
-
-	printf("pubkey: \n");
-	for (ii=0;ii<(int)dh_pubkey.size;ii++) {
-		printf("%.2x", (unsigned)dh_pubkey.data[ii]);
-	}
-	printf("\n");
 
 	/* see the Getting peer's information example */
-	/* print_info(session); */
+	if (debug)
+		print_info(session);
+
+	print_dh_params_info(session);
 
 	for (;;) {
-		ret = gnutls_record_recv_packet(session, &packet);
+		memset(buffer, 0, MAX_BUF + 1);
+		ret = gnutls_record_recv(session, buffer, MAX_BUF);
 
 		if (ret == 0) {
-			gnutls_packet_deinit(packet);
 			if (debug)
 				success
 				    ("server: Peer has closed the GnuTLS connection\n");
@@ -313,16 +313,37 @@ static void server(int sd)
 			fail("server: Received corrupted data(%d). Closing...\n", ret);
 			break;
 		} else if (ret > 0) {
-			gnutls_datum_t pdata;
+			gnutls_certificate_server_set_request(session,
+							      GNUTLS_CERT_REQUEST);
 
-			gnutls_packet_get(packet, &pdata, NULL);
+			if (debug)
+				success
+				    ("server: got data, forcing rehandshake.\n");
+
+			ret = gnutls_rehandshake(session);
+			if (ret < 0) {
+				fail("server: rehandshake failed\n");
+				gnutls_perror(ret);
+				break;
+			}
+
+			ret = gnutls_handshake(session);
+			if (ret < 0) {
+				fail("server: (re)handshake failed\n");
+				gnutls_perror(ret);
+				break;
+			}
+
+			if (debug)
+				success("server: rehandshake complete.\n");
+
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, pdata.data,
-					   pdata.size);
-			gnutls_packet_deinit(packet);
+			gnutls_record_send(session, buffer,
+					   strlen(buffer));
 		}
 	}
+
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -330,7 +351,7 @@ static void server(int sd)
 	close(sd);
 	gnutls_deinit(session);
 
-	gnutls_anon_free_server_credentials(anoncred);
+	gnutls_certificate_free_credentials(x509_cred);
 
 	gnutls_dh_params_deinit(dh_params);
 
@@ -340,9 +361,9 @@ static void server(int sd)
 		success("server: finished\n");
 }
 
+
 void doit(void)
 {
-	pid_t child;
 	int sockets[2];
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
@@ -361,7 +382,7 @@ void doit(void)
 
 	if (child) {
 		int status;
-		/* parent */
+
 		server(sockets[0]);
 		wait(&status);
 	} else
