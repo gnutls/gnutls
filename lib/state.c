@@ -506,8 +506,6 @@ void gnutls_deinit(gnutls_session_t session)
 	gnutls_free(session);
 }
 
-/* Returns the minimum prime bits that are acceptable.
- */
 int _gnutls_dh_set_peer_public(gnutls_session_t session, bigint_t public)
 {
 	dh_info_st *dh;
