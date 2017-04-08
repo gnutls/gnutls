@@ -106,15 +106,7 @@ static void client(int sd)
 			success("client: Handshake was completed\n");
 	}
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
+	print_dh_params_info(session);
 
 	gnutls_record_send(session, MSG, strlen(MSG));
 
@@ -168,6 +160,7 @@ static gnutls_session_t initialize_tls_session(void)
 	 */
 	gnutls_priority_set_direct(session, "NORMAL:+DHE-PSK", NULL);
 
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
 	return session;
@@ -240,15 +233,7 @@ static void server(int sd)
 	if (debug)
 		success("server: Handshake was completed\n");
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
+	print_dh_params_info(session);
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
