@@ -334,3 +334,57 @@ test_cli_serv_vf(gnutls_certificate_credentials_t server_cred,
 {
 	return _test_cli_serv(server_cred, client_cred, prio, prio, host, NULL, NULL, NULL, 1, 0, 0, 0);
 }
+
+void print_dh_params_info(gnutls_session_t session)
+{
+	unsigned i;
+	int ret;
+	gnutls_datum_t pubkey, gen, prime;
+
+	ret = gnutls_dh_get_prime_bits(session);
+	if (ret < 512) {
+		fail("client: too small prime size: %d\n", ret);
+	}
+
+	ret = gnutls_dh_get_secret_bits(session);
+	if (ret < 256) {
+		fail("client: too small secret key size: %d\n", ret);
+	}
+
+	ret = gnutls_dh_get_pubkey(session, &pubkey);
+	if (ret < 0) {
+		fail("error retrieving the public key\n");
+	}
+
+	if (pubkey.size == 0) {
+		fail("retrieved pubkey is empty!\n");
+	}
+
+	printf("pubkey: \n");
+	for (i=0;i<pubkey.size;i++) {
+		printf("%.2x", (unsigned)pubkey.data[i]);
+	}
+	printf("\n");
+
+	gnutls_free(pubkey.data);
+
+	ret = gnutls_dh_get_group(session, &gen, &prime);
+	if (ret < 0 || gen.size == 0 || prime.size == 0) {
+		fail("error retrieving the group info\n");
+	}
+
+	printf("prime: \n");
+	for (i=0;i<prime.size;i++) {
+		printf("%.2x", (unsigned)prime.data[i]);
+	}
+	printf("\n");
+
+	printf("generator: \n");
+	for (i=0;i<gen.size;i++) {
+		printf("%.2x", (unsigned)gen.data[i]);
+	}
+	printf("\n");
+	gnutls_free(gen.data);
+	gnutls_free(prime.data);
+}
+

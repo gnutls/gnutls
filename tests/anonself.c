@@ -68,7 +68,6 @@ static void client(int sd)
 	int ret, ii;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
-	gnutls_datum_t dh_pubkey;
 	gnutls_anon_client_credentials_t anoncred;
 	/* Need to enable anonymous KX specifically. */
 
@@ -108,32 +107,7 @@ static void client(int sd)
 			success("client: Handshake was completed\n");
 	}
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("client: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("client: too small secret key size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_pubkey(session, &dh_pubkey);
-	if (ret < 0) {
-		fail("error retrieving the public key\n");
-	}
-
-	if (dh_pubkey.size == 0) {
-		fail("retrieved pubkey is empty!\n");
-	}
-
-	printf("pubkey: \n");
-	for (ii=0;ii<(int)dh_pubkey.size;ii++) {
-		printf("%.2x", (unsigned)dh_pubkey.data[ii]);
-	}
-	printf("\n");
-
-	gnutls_free(dh_pubkey.data);
+	print_dh_params_info(session);
 
 	if (debug)
 		success("client: TLS version is: %s\n",
@@ -233,8 +207,6 @@ int optval = 1;
 static void server(int sd)
 {
 	gnutls_packet_t packet;
-	gnutls_datum_t dh_pubkey;
-	int ii;
 
 	/* this must be called once in the program
 	 */
@@ -272,33 +244,7 @@ static void server(int sd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	ret = gnutls_dh_get_prime_bits(session);
-	if (ret < 512) {
-		fail("server: too small prime size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
-		fail("server: too small secret key size: %d\n", ret);
-	}
-
-	ret = gnutls_dh_get_pubkey(session, &dh_pubkey);
-	if (ret < 0) {
-		fail("error retrieving the public key\n");
-	}
-
-	if (dh_pubkey.size == 0) {
-		fail("retrieved pubkey is empty!\n");
-	}
-
-	printf("pubkey: \n");
-	for (ii=0;ii<(int)dh_pubkey.size;ii++) {
-		printf("%.2x", (unsigned)dh_pubkey.data[ii]);
-	}
-	printf("\n");
-
-	/* see the Getting peer's information example */
-	/* print_info(session); */
+	print_dh_params_info(session);
 
 	for (;;) {
 		ret = gnutls_record_recv_packet(session, &packet);

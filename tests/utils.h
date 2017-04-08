@@ -94,6 +94,8 @@ void test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		   void *priv,
 		   callback_func * client_cb, callback_func * server_cb);
 
+void print_dh_params_info(gnutls_session_t);
+
 void
 test_cli_serv_cert(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
