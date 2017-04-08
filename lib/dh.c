@@ -234,7 +234,7 @@ void gnutls_dh_params_deinit(gnutls_dh_params_t dh_params)
  * @src: Is the source parameters
  *
  * This function will copy the DH parameters structure from source
- * to destination.
+ * to destination. The destination should be already initialized.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.

@@ -34,7 +34,8 @@
  * @art: The returned random art
  *
  * This function will convert a given fingerprint to an "artistic"
- * image. The returned image is allocated using gnutls_malloc().
+ * image. The returned image is allocated using gnutls_malloc(), is
+ * null-terminated but art->size will not account the terminating null.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
