@@ -168,7 +168,7 @@ gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 	dh_info_st *dh;
 	anon_auth_info_t anon_info;
 	cert_auth_info_t cert_info;
-	cert_auth_info_t psk_info;
+	psk_auth_info_t psk_info;
 
 	switch (gnutls_auth_get_type(session)) {
 	case GNUTLS_CRD_ANON:
