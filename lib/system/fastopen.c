@@ -35,6 +35,13 @@
 # include <netinet/tcp.h>
 #endif
 
+/* TCP Fast Open on OSX behaves differently from Linux, so define these helpers */
+#if defined __APPLE__ && defined __MACH__ && defined CONNECT_DATA_IDEMPOTENT && defined CONNECT_RESUME_ON_READ_WRITE
+# define TCP_FASTOPEN_OSX
+#elif defined TCP_FASTOPEN && defined MSG_FASTOPEN
+# define TCP_FASTOPEN_LINUX
+#endif
+
 /* Do not use the gnulib functions for sending and receiving data.
  * Using them makes gnutls only working with gnulib applications.
  */
@@ -85,7 +92,7 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 	if (likely(!p->connect_addrlen))
 		return sendmsg(fd, &hdr, p->flags);
 
-#ifdef MSG_FASTOPEN
+# if defined(TCP_FASTOPEN_LINUX)
 	if (!p->connect_only) {
 		if (setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &on, sizeof(on)) == -1)
 			_gnutls_debug_log("Failed to set socket option FASTOPEN\n");
@@ -106,9 +113,7 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 				goto connect_only;
 			}
 		}
-	} else
-#endif
-	{
+	} else {
  connect_only:
 		ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
 		if (errno == ENOTCONN || errno == EINPROGRESS) {
@@ -119,6 +124,23 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 		if (ret == 0)
 			p->connect_only = 0;
 	}
+# elif defined(TCP_FASTOPEN_OSX)
+	{
+		sa_endpoints_t endpoints = { .sae_dstaddr = (struct sockaddr*)&p->connect_addr, .sae_dstaddrlen = p->connect_addrlen };
+
+		ret = connectx(fd, &endpoints, SAE_ASSOCID_ANY, CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL, NULL);
+		if (errno == ENOTCONN || errno == EINPROGRESS) {
+			gnutls_assert();
+			errno = EAGAIN;
+		}
+	}
+# else
+	ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
+	if (errno == ENOTCONN || errno == EINPROGRESS) {
+		gnutls_assert();
+		errno = EAGAIN;
+	}
+# endif
 
 	if (ret == 0 || errno != EAGAIN) {
 		/* This has to be called just once, connect info not needed any more */
@@ -127,7 +149,7 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 
 	return ret;
 }
-#endif
+#endif /* sendmsg */
 
 static
 int tfo_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
