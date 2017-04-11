@@ -7,6 +7,8 @@ See the end for copying conditions.
 
 * Version 3.5.11 (unreleased)
 
+** libgnutls: enabled TCP Fast open for MacOSX. Patch by Tim Ruehsen.
+
 ** certtool: made printing of key ID and key PIN consistent between certificates,
    public keys, and private keys. That is the private key printing now uses the
    same format as the rest.
