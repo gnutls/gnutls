@@ -15,7 +15,6 @@
 #
 ################################################################################
 */
-#include <config.h>
 #include <assert.h>
 #include <stdint.h>
 
@@ -24,7 +23,6 @@
 
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-#ifdef ENABLE_OPENPGP
     gnutls_datum_t raw;
     gnutls_datum_t out;
     gnutls_openpgp_crt_t crt;
@@ -34,6 +32,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     raw.size = size;
 
     ret = gnutls_openpgp_crt_init(&crt);
+    if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE)
+        return 0;
     assert(ret >= 0);
 
     ret = gnutls_openpgp_crt_import(crt, &raw, GNUTLS_OPENPGP_FMT_RAW);
@@ -44,6 +44,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
 
     gnutls_openpgp_crt_deinit(crt);
-#endif
     return 0;
 }
