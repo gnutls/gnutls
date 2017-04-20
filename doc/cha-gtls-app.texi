@@ -352,15 +352,16 @@ library.
 The GnuTLS library is initialized on load; prior to 3.3.0 was initialized by calling @funcref{gnutls_global_init}@footnote{
 The original behavior of requiring explicit initialization can obtained by setting the
 GNUTLS_NO_EXPLICIT_INIT environment variable to 1, or by using the macro GNUTLS_SKIP_GLOBAL_INIT
-in a global section of your program.}. 
+in a global section of your program --the latter works in systems with
+support for weak symbols only.}. 
 The initialization typically enables CPU-specific acceleration, performs any required
 precalculations needed, opens any required system devices (e.g., /dev/urandom on Linux)
 and initializes subsystems that could be used later.
 
 The resources allocated by the initialization process will be released 
-on library deinitialization, or explicitly by calling @funcref{gnutls_global_deinit}.
+on library deinitialization.
 
-Note that during initialization file descriptors may be kept open by
+Note that on certain systems file descriptors may be kept open by
 GnuTLS (e.g. /dev/urandom) on library load. Applications closing all unknown file
 descriptors must immediately call @funcref{gnutls_global_init}, after that, to
 ensure they don't disrupt GnuTLS' operation.

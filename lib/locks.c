@@ -43,6 +43,10 @@
  * unless really needed to. GnuTLS will use the appropriate locks for the running
  * system.
  *
+ * Note that since the move to implicit initialization of GnuTLS on library
+ * load, calling this function will deinitialize the library, and re-initialize
+ * it after the new locking functions are set.
+ *
  * This function must be called prior to any other gnutls function.
  * 
  * Since: 2.12.0
