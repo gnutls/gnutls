@@ -112,6 +112,34 @@ static void decode(const char *test_name, const gnutls_datum_t *raw, const char 
 
 	gnutls_free(out.data);
 
+	/* decode with null argument */
+	in.data = (void*)hex;
+	in.size = strlen(hex);
+	ret = gnutls_pem_base64_decode2(NULL, &in, &out);
+	if (ret < 0) {
+		if (res == ret) /* expected */
+			return;
+		fail("%s: gnutls_pem_base64_decode2: %d/%s\n", test_name, ret, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (res != 0) {
+		fail("%s: gnutls_pem_base64_decode2: expected failure, but succeeded!\n", test_name);
+		exit(1);
+	}
+
+	if (raw->size!=out.size) {
+		fail("%s: gnutls_pem_base64_decode2: output has incorrect size (%d, expected %d)\n", test_name, out.size, raw->size);
+		exit(1);
+	}
+
+	if (memcmp(raw->data, out.data, out.size) != 0) {
+		fail("%s: gnutls_pem_base64_decode2: output does not match the expected\n", test_name);
+		exit(1);
+	}
+
+	gnutls_free(out.data);
+
 	return;
 }
 
