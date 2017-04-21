@@ -302,19 +302,12 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
 	int rdata_size;
 	char pem_header[128];
 
-	if (header == NULL) {
-		if ((ret = _gnutls_base64_decode(data, data_size, result)) < 0) {
-			gnutls_assert();
-			return GNUTLS_E_BASE64_DECODING_ERROR;
-		}
-		return 0;
-	}
-
 	_gnutls_str_cpy(pem_header, sizeof(pem_header), top);
 	if (header != NULL)
 		_gnutls_str_cat(pem_header, sizeof(pem_header), header);
 
 	rdata = memmem(data, data_size, pem_header, strlen(pem_header));
+
 	if (rdata == NULL) {
 		gnutls_assert();
 		_gnutls_hard_log("Could not find '%s'\n", pem_header);
@@ -379,10 +372,6 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
  * and decode only this part.  Otherwise it will decode the first PEM
  * packet found.
  *
- * To decode data from any arbitrary header set the null string as header.
- * Since 3.6.0 this function will decode arbitrary base64 without any
- * headers when %NULL is given as header.
- *
  * Returns: On success %GNUTLS_E_SUCCESS (0) is returned,
  *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned if the buffer given is
  *   not long enough, or 0 on success.
@@ -431,10 +420,6 @@ gnutls_pem_base64_decode(const char *header,
  * Note, that prior to GnuTLS 3.4.0 this function was available
  * under the name gnutls_pem_base64_decode_alloc(). There is
  * compatibility macro pointing to this function.
- *
- * To decode data from any arbitrary header set the null string as header.
- * Since 3.6.0 this function will decode arbitrary base64 without any
- * headers when %NULL is given as header.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
