@@ -263,8 +263,10 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 	size = BASE64_DECODE_LENGTH(data_size);
 
 	result->data = gnutls_malloc(size);
-	if (result->data == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	if (result->data == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
+	}
 
 	ret = base64_decode_update(&ctx, &size, result->data,
 				   pdata.size, pdata.data); 
@@ -277,8 +279,10 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 	}
 
 	ret = base64_decode_final(&ctx);
-	if (ret != 1)
-		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	if (ret != 1) {
+		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		goto cleanup;
+	}
 
 	result->size = size;
 
