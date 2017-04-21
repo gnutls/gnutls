@@ -61,7 +61,7 @@ static void encode(const char *test_name, const gnutls_datum_t *raw, const char 
 
 	in.data = (void*)expected;
 	in.size = strlen(expected);
-	ret = gnutls_pem_base64_decode2(NULL, &in, &out);
+	ret = gnutls_pem_base64_decode2("", &in, &out);
 	if (ret < 0) {
 		fail("%s: gnutls_pem_base64_decode2: %s\n", test_name, gnutls_strerror(ret));
 		exit(1);
@@ -89,7 +89,7 @@ static void decode(const char *test_name, const gnutls_datum_t *raw, const char 
 
 	in.data = (void*)hex;
 	in.size = strlen(hex);
-	ret = gnutls_pem_base64_decode2(NULL, &in, &out);
+	ret = gnutls_pem_base64_decode2("", &in, &out);
 	if (ret < 0) {
 		if (res == ret) /* expected */
 			return;

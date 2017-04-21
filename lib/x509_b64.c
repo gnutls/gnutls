@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -54,8 +55,12 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 	char bottom[80];
 	size_t size, max, bytes;
 	int pos, top_len = 0, bottom_len = 0;
+	unsigned raw_encoding = 0;
 
-	if (msg != NULL) {
+	if (msg == NULL || msg[0] == 0)
+		raw_encoding = 1;
+
+	if (!raw_encoding) {
 		if (strlen(msg) > 50) {
 			gnutls_assert();
 			return GNUTLS_E_BASE64_ENCODING_ERROR;
@@ -105,7 +110,7 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 		memcpy(ptr, tmpres, size);
 		ptr += size;
 		pos += size;
-		if (msg != NULL) {
+		if (!raw_encoding) {
 			*ptr++ = '\n';
 			pos++;
 		} else {
@@ -168,7 +173,7 @@ gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
 
 /**
  * gnutls_pem_base64_encode2:
- * @msg: is a message to be put in the encoded header (may be %NULL)
+ * @header: is a message to be put in the encoded header (may be %NULL)
  * @data: contains the raw data
  * @result: will hold the newly allocated encoded data
  *
@@ -183,8 +188,8 @@ gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
  * under the name gnutls_pem_base64_encode_alloc(). There is
  * compatibility macro pointing to this function.
  *
- * Since GnuTLS 3.6.0 this function when provided a %NULL msg will
- * provide a raw base64 output of the input data.
+ * Since GnuTLS 3.6.0 this function when provided a %NULL or empty @header
+ * will provide the raw base64 output of the input data.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -192,7 +197,7 @@ gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
  * Since: 3.4.0
  **/
 int
-gnutls_pem_base64_encode2(const char *msg,
+gnutls_pem_base64_encode2(const char *header,
 			       const gnutls_datum_t * data,
 			       gnutls_datum_t * result)
 {
@@ -201,7 +206,7 @@ gnutls_pem_base64_encode2(const char *msg,
 	if (result == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = _gnutls_fbase64_encode(msg, data->data, data->size, result);
+	ret = _gnutls_fbase64_encode(header, data->data, data->size, result);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -302,12 +307,19 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
 	int rdata_size;
 	char pem_header[128];
 
+	if (header && header[0] == 0) {
+		if ((ret = _gnutls_base64_decode(data, data_size, result)) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_BASE64_DECODING_ERROR;
+		}
+		return 0;
+	}
+
 	_gnutls_str_cpy(pem_header, sizeof(pem_header), top);
 	if (header != NULL)
 		_gnutls_str_cat(pem_header, sizeof(pem_header), header);
 
 	rdata = memmem(data, data_size, pem_header, strlen(pem_header));
-
 	if (rdata == NULL) {
 		gnutls_assert();
 		_gnutls_hard_log("Could not find '%s'\n", pem_header);
@@ -368,9 +380,13 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
  * @result_size: holds the size of the result
  *
  * This function will decode the given encoded data.  If the header
- * given is non null this function will search for "-----BEGIN header"
+ * given is non %NULL this function will search for "-----BEGIN header"
  * and decode only this part.  Otherwise it will decode the first PEM
  * packet found.
+ *
+ * To decode data from any arbitrary header set the null string as header.
+ * Since 3.6.0 this function will decode arbitrary base64 without any
+ * headers when the empty string "" is given as header.
  *
  * Returns: On success %GNUTLS_E_SUCCESS (0) is returned,
  *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned if the buffer given is
@@ -420,6 +436,10 @@ gnutls_pem_base64_decode(const char *header,
  * Note, that prior to GnuTLS 3.4.0 this function was available
  * under the name gnutls_pem_base64_decode_alloc(). There is
  * compatibility macro pointing to this function.
+ *
+ * To decode data from any arbitrary header set the null string as header.
+ * Since 3.6.0 this function will decode arbitrary base64 without any
+ * headers when %NULL is given as header.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
