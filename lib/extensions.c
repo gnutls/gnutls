@@ -838,11 +838,16 @@ gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_ty
  * @deinit_func: a function deinitialize any private data
  * @pack_func: a function which serializes the extension's private data (used on session packing for resumption)
  * @unpack_func: a function which will deserialize the extension's private data
- * @flags: must be zero
+ * @flags: must be zero or flags from %gnutls_ext_flags_t
  *
  * This function will register a new extension type. The extension will be
  * only usable within the registered session. If the extension type
- * is already registered then %GNUTLS_E_ALREADY_REGISTERED will be returned.
+ * is already registered then %GNUTLS_E_ALREADY_REGISTERED will be returned,
+ * unless the flag %GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL is specified. The latter
+ * flag when specified can be used to override certain extensions introduced
+ * after 3.5.12. It is expected to be used by applications which handle
+ * custom extensions that are not currently supported in GnuTLS, but direct
+ * support for them may be added in the future.
  *
  * Each registered extension can store temporary data into the gnutls_session_t
  * structure using gnutls_ext_set_data(), and they can be retrieved using
@@ -863,6 +868,7 @@ gnutls_session_ext_register(gnutls_session_t session,
 	extension_entry_st *exts;
 	unsigned i;
 
+	/* FIXME: handle GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL for new exts */
 	for (i = 0; extfunc[i] != NULL; i++) {
 		if (extfunc[i]->type == type)
 			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
