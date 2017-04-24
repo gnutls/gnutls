@@ -638,7 +638,7 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
  * @status: is the output of the verification
  *
  * This function will verify the peer's certificate and store
- * the status in the @status variable as a bitwise or'd gnutls_certificate_status_t
+ * the status in the @status variable as a bitwise OR of gnutls_certificate_status_t
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
@@ -674,7 +674,7 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * @status: is the output of the verification
  *
  * This function will verify the peer's certificate and store the
- * status in the @status variable as a bitwise or'd gnutls_certificate_status_t
+ * the status in the @status variable as a bitwise OR of gnutls_certificate_status_t
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
@@ -717,7 +717,7 @@ gnutls_typed_vdata_st data;
  * @status: is the output of the verification
  *
  * This function will verify the peer's certificate and store the
- * status in the @status variable as a bitwise or'd gnutls_certificate_status_t
+ * the status in the @status variable as a bitwise OR of gnutls_certificate_status_t
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
