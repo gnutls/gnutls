@@ -357,6 +357,12 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 		goto cleanup;
 	}
 
+	/* check whether d > 2^(nlen/2) -- FIPS186-4 5.3.1 */
+	if (mpz_sizeinbase(key->d, 2) < n_size/2) {
+		ret = 0;
+		goto cleanup;
+	}
+
 	/* Done! Almost, we must compute the auxillary private values. */
 	/* a = d % (p-1) */
 	mpz_fdiv_r(key->a, key->d, p1);
