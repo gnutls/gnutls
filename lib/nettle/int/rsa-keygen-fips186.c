@@ -27,7 +27,6 @@
 #include "config.h"
 #endif
 
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -337,10 +336,16 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 
 	mpz_mul(pub->n, key->p, key->q);
 
-	assert(mpz_sizeinbase(pub->n, 2) == n_size);
+	if (mpz_sizeinbase(pub->n, 2) != n_size) {
+		ret = 0;
+		goto cleanup;
+	}
 
 	/* c = q^{-1} (mod p) */
-	assert(mpz_invert(key->c, key->q, key->p) != 0);
+	if (mpz_invert(key->c, key->q, key->p) == 0) {
+		ret = 0;
+		goto cleanup;
+	}
 
 	mpz_sub_ui(p1, key->p, 1);
 	mpz_sub_ui(q1, key->q, 1);
@@ -362,7 +367,10 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	/* c was computed earlier */
 
 	pub->size = key->size = (n_size + 7) / 8;
-	assert(pub->size >= RSA_MINIMUM_N_OCTETS);
+	if (pub->size < RSA_MINIMUM_N_OCTETS) {
+		ret = 0;
+		goto cleanup;
+	}
 
 	ret = 1;
  cleanup:
