@@ -24,7 +24,7 @@
 #ifndef DSA_FIPS_H_INCLUDED
 #define DSA_FIPS_H_INCLUDED
 
-#include <gmp.h>
+#include <nettle/bignum.h> /* includes gmp.h */
 #include <nettle/dsa.h>
 #include <nettle/sha2.h>
 #include <fips.h>
