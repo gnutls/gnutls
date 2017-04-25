@@ -80,13 +80,17 @@ static void encode(const char *test_name, const gnutls_datum_t *raw, const char 
 	return;
 }
 
-static void decode(const char *test_name, const gnutls_datum_t *raw, const char *hex, int res)
+static void decode(const char *test_name, const gnutls_datum_t *raw, const char *hex, unsigned hex_size, int res)
 {
 	int ret;
 	gnutls_datum_t out, in;
 
 	in.data = (void*)hex;
-	in.size = strlen(hex);
+	if (hex_size == 0)
+		in.size = strlen(hex);
+	else
+		in.size = hex_size;
+
 	ret = gnutls_pem_base64_decode2(test_name, &in, &out);
 	if (ret < 0) {
 		if (res == ret) /* expected */
@@ -170,6 +174,7 @@ struct decode_tests_st {
 	const char *name;
 	gnutls_datum_t raw;
 	const char *pem;
+	unsigned pem_size;
 	int res;
 };
 
@@ -215,6 +220,13 @@ struct decode_tests_st decode_tests[] = {
 		.res = GNUTLS_E_BASE64_DECODING_ERROR
 	},
 	{
+		.name = "leak1",
+		.pem = "-----BEGIN leak1-----E-\x00\x00-----END ",
+		.pem_size = 34,
+		.raw = {(void*)"", 0},
+		.res = GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR
+	},
+	{
 		.name = "dec-invalid-suffix",
 		.pem = "-----BEGIN dec-invalid-suffix-----\n"
 			"LJ/7hUZ3TtPIz2dlc5+YvELe+Q==XXX\n"
@@ -233,7 +245,7 @@ void doit(void)
 	}
 
 	for (i=0;i<sizeof(decode_tests)/sizeof(decode_tests[0]);i++) {
-		decode(decode_tests[i].name, &decode_tests[i].raw, decode_tests[i].pem, decode_tests[i].res);
+		decode(decode_tests[i].name, &decode_tests[i].raw, decode_tests[i].pem, decode_tests[i].pem_size, decode_tests[i].res);
 	}
 }
 
