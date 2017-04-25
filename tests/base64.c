@@ -224,7 +224,7 @@ struct decode_tests_st decode_tests[] = {
 		.pem = "-----BEGIN leak1-----E-\x00\x00-----END ",
 		.pem_size = 34,
 		.raw = {(void*)"", 0},
-		.res = GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR
+		.res = GNUTLS_E_BASE64_DECODING_ERROR
 	},
 	{
 		.name = "dec-invalid-suffix",
