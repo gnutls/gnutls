@@ -1486,8 +1486,11 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 		}
 
 		ret = gnutls_pkcs12_get_bag(p12, idx, bag);
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			gnutls_pkcs12_bag_deinit(bag);
+			bag = NULL;
 			break;
+		}
 		if (ret < 0) {
 			gnutls_assert();
 			goto done;
@@ -1588,6 +1591,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 		idx++;
 		gnutls_pkcs12_bag_deinit(bag);
+		bag = NULL;
 
 		if (privkey_ok != 0)	/* private key was found */
 			break;
@@ -1611,8 +1615,11 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 		}
 
 		ret = gnutls_pkcs12_get_bag(p12, idx, bag);
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			gnutls_pkcs12_bag_deinit(bag);
+			bag = NULL;
 			break;
+		}
 		if (ret < 0) {
 			gnutls_assert();
 			goto done;
@@ -1758,6 +1765,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 		idx++;
 		gnutls_pkcs12_bag_deinit(bag);
+		bag = NULL;
 	}
 
 	if (chain != NULL) {
