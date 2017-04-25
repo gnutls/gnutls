@@ -3554,6 +3554,7 @@ void pkcs12_info(common_info_st * cinfo)
 		if (result < 0) {
 			fprintf(stderr, "bag_count: %s\n",
 				gnutls_strerror(result));
+			gnutls_pkcs12_bag_deinit(bag);
 			app_exit(1);
 		}
 
@@ -3563,6 +3564,7 @@ void pkcs12_info(common_info_st * cinfo)
 		if (result < 0) {
 			fprintf(stderr, "bag_init: %s\n",
 				gnutls_strerror(result));
+			gnutls_pkcs12_bag_deinit(bag);
 			app_exit(1);
 		}
 
@@ -3577,6 +3579,7 @@ void pkcs12_info(common_info_st * cinfo)
 				fail = 1;
 				fprintf(stderr, "bag_decrypt: %s\n",
 					gnutls_strerror(result));
+				gnutls_pkcs12_bag_deinit(bag);
 				continue;
 			}
 
@@ -3584,6 +3587,7 @@ void pkcs12_info(common_info_st * cinfo)
 			if (result < 0) {
 				fprintf(stderr, "encrypted bag_count: %s\n",
 					gnutls_strerror(result));
+				gnutls_pkcs12_bag_deinit(bag);
 				app_exit(1);
 			}
 		}
