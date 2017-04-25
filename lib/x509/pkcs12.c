@@ -502,10 +502,10 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
+					_gnutls_free_datum(&bag->element[i].local_key_id);
 					bag->element[i].local_key_id.data = t.data;
 					bag->element[i].local_key_id.size = t.size;
-				} else if (strcmp(oid, FRIENDLY_NAME_OID)
-					   == 0) {
+				} else if (strcmp(oid, FRIENDLY_NAME_OID) == 0 && bag->element[i].friendly_name == NULL) {
 					result =
 					    _gnutls_x509_decode_string
 					    (ASN1_ETYPE_BMP_STRING,
@@ -521,6 +521,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
+					gnutls_free(bag->element[i].friendly_name);
 					bag->element[i].friendly_name = (char *) t.data;
 				} else {
 					_gnutls_free_datum(&attr_val);

@@ -73,7 +73,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/key-corpus-rc2-1.p12.out data/no-salt.p12 data/mac-sha512.p12 data/pbes1-no-salt.p12 \
 	templates/inhibit-anypolicy.tmpl data/inhibit-anypolicy.pem data/aes-128.p12 \
 	data/pkcs7.smime data/invalid-date-hour.der data/invalid-date-mins.der \
-	data/invalid-date-secs.der data/invalid-date-month.der data/invalid-date-day.der
+	data/invalid-date-secs.der data/invalid-date-month.der data/invalid-date-day.der \
+	data/mem-leak.p12
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
