@@ -492,6 +492,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 					    (ASN1_ETYPE_OCTET_STRING,
 					     attr_val.data, attr_val.size,
 					     &t, 1);
+
 					_gnutls_free_datum(&attr_val);
 					if (result < 0) {
 						gnutls_assert();
@@ -501,11 +502,8 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
-					attr_val.data = t.data;
-					attr_val.size = t.size;
-
-					bag->element[i].local_key_id =
-					    attr_val;
+					bag->element[i].local_key_id.data = t.data;
+					bag->element[i].local_key_id.size = t.size;
 				} else if (strcmp(oid, FRIENDLY_NAME_OID)
 					   == 0) {
 					result =
@@ -513,6 +511,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 					    (ASN1_ETYPE_BMP_STRING,
 					     attr_val.data, attr_val.size,
 					     &t, 1);
+
 					_gnutls_free_datum(&attr_val);
 					if (result < 0) {
 						gnutls_assert();
@@ -522,11 +521,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 						continue;
 					}
 
-					attr_val.data = t.data;
-					attr_val.size = t.size;
-
-					bag->element[i].friendly_name =
-					    (char *) t.data;
+					bag->element[i].friendly_name = (char *) t.data;
 				} else {
 					_gnutls_free_datum(&attr_val);
 					_gnutls_debug_log
@@ -540,10 +535,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 
 	}
 
-	asn1_delete_structure(&c2);
-
-
-	return 0;
+	result = 0;
 
       cleanup:
 	if (c2)
