@@ -53,10 +53,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     	gnutls_x509_privkey_deinit(key);
     	if (crl)
 	    	gnutls_x509_crl_deinit(crl);
-	for (i=0;i<extras_len;i++)
-		gnutls_x509_crt_deinit(extras[i]);
-	for (i=0;i<chain_len;i++)
-		gnutls_x509_crt_deinit(chain[i]);
+	if (extras_len > 0) {
+		for (i=0;i<extras_len;i++)
+			gnutls_x509_crt_deinit(extras[i]);
+		gnutls_free(extras);
+	}
+	if (chain_len > 0) {
+		for (i=0;i<chain_len;i++)
+			gnutls_x509_crt_deinit(chain[i]);
+		gnutls_free(chain);
+	}
     }
 
  cleanup:
