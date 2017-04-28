@@ -224,8 +224,8 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	 */
 	ret =
 	    _gnutls_buffer_append_data_prefix(data, 16,
-					      cred->username.data,
-					      cred->username.size);
+					      username.data,
+					      username.size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
