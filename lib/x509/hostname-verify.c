@@ -105,16 +105,21 @@ static int has_embedded_null(const char *str, unsigned size)
  * IPv4 addresses are accepted by this function in the dotted-decimal
  * format (e.g, ddd.ddd.ddd.ddd), and IPv6 addresses in the hexadecimal
  * x:x:x:x:x:x:x:x format. For them the IPAddress subject alternative
- * name extension is consulted, as well as the DNSNames in case of a non-match.
- * The latter fallback exists due to misconfiguration of many servers
- * which place an IPAddress inside the DNSName extension.
+ * name extension is consulted. Previous versions to 3.6.0 of GnuTLS
+ * in case of a non-match would consult (in a non-standard extension)
+ * the DNSname and CN fields. This is no longer the case.
  *
  * When the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS is specified no
  * wildcards are considered. Otherwise they are only considered if the
  * domain name consists of three components or more, and the wildcard
  * starts at the leftmost position.
  *
+ * The function gnutls_x509_crt_check_ip() is available for matching
+ * IP addresses.
+ *
  * Returns: non-zero for a successful match, and zero on failure.
+ *
+ * Since: 3.3.0
  **/
 unsigned
 gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
@@ -146,12 +151,9 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			ret = check_ip(cert, &ipv4, 4, flags);
 		}
 
-		if (ret != 0)
-			return ret;
-
-		/* There are several misconfigured servers, that place their IP
-		 * in the DNS field of subjectAlternativeName. Don't break these
-		 * configurations and verify the IP as it would have been a DNS name. */
+		/* Prior to 3.6.0 we were accepting misconfigured servers, that place their IP
+		 * in the DNS field of subjectAlternativeName. That is no longer the case. */
+		return ret;
 	}
 
  hostname_fallback:
