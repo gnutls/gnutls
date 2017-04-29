@@ -101,9 +101,15 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	 * Since IDN2_NONTRANSITIONAL implicitely does NFC conversion, we don't need
 	 * the additional IDN2_NFC_INPUT. But just for the unlikely case that the linked
 	 * library is not matching the headers when building and it doesn't support TR46,
-	 * we provide IDN2_NFC_INPUT. */
+	 * we provide IDN2_NFC_INPUT. 
+	 *
+	 * The reason we fallback to transitional encoding on disallowed characters is
+	 * to support domains which existed in IDNA2003, but were invalid with IDNA2008.
+	 */
 
 	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT | IDN2_NONTRANSITIONAL);
+	if (rc == IDN2_DISALLOWED && !(flags & GNUTLS_IDNA_FORCE_2008))
+		rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT | IDN2_TRANSITIONAL);
 # else
 	rc = idn2_lookup_u8((uint8_t *)istr.data, (uint8_t **)&idna, IDN2_NFC_INPUT);
 # endif
