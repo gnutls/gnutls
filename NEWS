@@ -9,6 +9,15 @@ See the end for copying conditions.
 
 ** libgnutls: enabled TCP Fast open for MacOSX. Patch by Tim Ruehsen.
 
+** libgnutls: gnutls_x509_crt_check_hostname2() no longer matches IP addresses
+   against DNS fields of certificate (CN or DNSname). The previous behavior
+   was to tolerate some misconfigured servers, but that was non-standard
+   and skipped any IP constraints present in higher level certificates.
+
+** libgnutls: when converting to IDNA2008, fallback to IDNA2003 (i.e., transitional
+   encoding) if the domain cannot be converted. That provides maximum compatibility
+   with browsers like firefox that perform the same conversion.
+
 ** certtool: made printing of key ID and key PIN consistent between certificates,
    public keys, and private keys. That is the private key printing now uses the
    same format as the rest.
