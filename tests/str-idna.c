@@ -32,11 +32,7 @@
 #include <gnutls/gnutls.h>
 #include <cmocka.h>
 
-#ifdef HAVE_LIBIDN2
-# define GLOBAL_FLAGS GNUTLS_IDNA_FORCE_2008
-#else
-# define GLOBAL_FLAGS 0
-#endif
+#define GLOBAL_FLAGS 0
 
 #define MATCH_FUNC(fname, str, normalized) \
 static void fname(void **glob_state) \
