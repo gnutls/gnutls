@@ -785,6 +785,53 @@ char multi_cns[] = "\n"
 	"MUjE\n"
 	"-----END CERTIFICATE-----\n";
 
+char txt_ip_in_names[] = 
+	"Subject: CN=172.15.1.1\n"
+	"Subject Alternative Name (not critical):\n"
+	"	DNSname: 172.15.2.1\n"
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEJDCCAoygAwIBAgIMWQXA/TIEZUXpwL2dMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
+	"BgNVBAMTBENBLTEwIBcNMTcwNDMwMTA0ODI5WhgPOTk5OTEyMzEyMzU5NTlaMBUx\n"
+	"EzARBgNVBAMTCjE3Mi4xNS4xLjEwggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGK\n"
+	"AoIBgQDP3DsT65aY+fHi6FivWbypF71T9UjAGYcho7XXPUCvBr6xQbyERZjb08qn\n"
+	"RPvVDaiLeDfVve44gSho70t+fxMsCYZqkf9HN4aUzuxx2fHgMBCwyrhgm9zZ/zgA\n"
+	"D92oXOPem2mKNjPavXtthqvgvwu6HmpJDd+YYR7FFbkgZswrqjd+lg0z+PGt5Xee\n"
+	"LW3amPZINyc5Rai+LMlYIU29YK9G+CM3XVPQ8ygsQva+4/YoU1DVQRXFYTO1ERdn\n"
+	"QDV9kmJKvQOxbjchNkLLMdBWee/WpJtBDE4KcidAsbd/6eUIINVAD7Nm5uE39mDv\n"
+	"2ld4vup4j4A5dQNVhUd6iIYfkkwp9NnGMNGpgvSudPSHH8sFlfxXD8ysbD2wHeXL\n"
+	"S0Q4Ejypij7tEzy5KdUWqft1QqClHawc2hZ9KKnCHW3xoUsAWxcTIlsgqUUJOkXR\n"
+	"Qij2N+0SKrn6M6DSOiklCCunLUCUCceM7fiwYndhNFm5YvZq+m+Afnvxk5V7RnBu\n"
+	"DLoxPxkCAwEAAaN4MHYwDAYDVR0TAQH/BAIwADAVBgNVHREEDjAMggoxNzIuMTUu\n"
+	"Mi4xMA8GA1UdDwEB/wQFAwMHoAAwHQYDVR0OBBYEFFqnqgPcjDWmHm0PJNxKNeEx\n"
+	"Msk1MB8GA1UdIwQYMBaAFOnh1ZODb8QbrqHBHpWyyrEVTpanMA0GCSqGSIb3DQEB\n"
+	"CwUAA4IBgQArsZSxJdZ1W+y3m+y6f1Me3FB/XUscpHQ9cS0wlaikeqBvIru5zp7U\n"
+	"tLT8qRS7Q8fxsL6LWiOmW5Izi4A51DYJQ9bUEqSIbp9SIV78u5v0oO1bnb7d5SV+\n"
+	"BZm/zYuox2uTT9PSoB+iqQXUJ7brWdKe0NdPAzRpM928CqWJLPw0gn41GOIPN6wS\n"
+	"IH29CvqRABkxzIsI8IcxHb3/F+DxTnq6aICoWe2XPeL+RqB7moP6YAC9W/r+hds2\n"
+	"m8Gok+rGuG3VXk2vc/j1LRnGZfpCQV2L7e7b5eLyQ2Ce46fnxkQSTt4tc0//FTfr\n"
+	"6X9624hAOV6MSlkPHNBwVE42z8KsxJfPxeHX+YzFBXqBiQ/r/TvOHDt5Tsny6lXh\n"
+	"TDqlJ3NwdS/K9PAlLqhDiZwwakUS9lEY6IC7biP7mxNM8npzlqogfS07XTJgGxgb\n"
+	"FtcITJKW0NPA8cnyEAt9jcgaDWw/xbVV+pIytFuGL8pjHEQ4H9Ymu6ifLNlkyu/e\n"
+	"3XYCeqo17QE=\n"
+	"-----END CERTIFICATE-----\n";
+
+char txt_ip_in_cn[] =
+	"CN=172.15.1.1\n"
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIICCDCCAXGgAwIBAgIMWQXCYQfV3T9BXL4hMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
+	"BgNVBAMTBENBLTEwIBcNMTcwNDMwMTA1NDI1WhgPOTk5OTEyMzEyMzU5NTlaMBUx\n"
+	"EzARBgNVBAMTCjE3Mi4xNS4xLjEwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGB\n"
+	"AM5hibrtVPezTZ018YR3DG+r71pTmfxVD1hWMAywQTMdut11Cg16dBtU/WJ6X3YF\n"
+	"b3MAtrJf7eHnaxPneY7j590eOcqiDmb0skUATuZrX4Su0QMP4ygTcXlzMAxOFYwQ\n"
+	"pd3d9LQiUxCVlg7fPI7BiqyWA1igBB34OaVbV0GHuJBVAgMBAAGjYTBfMAwGA1Ud\n"
+	"EwEB/wQCMAAwDwYDVR0PAQH/BAUDAwegADAdBgNVHQ4EFgQUSXWLgTdjnYj1kv1g\n"
+	"TEGZep6b0MMwHwYDVR0jBBgwFoAU3rLZPebH2OG+u4iAlJ+zbDif4GYwDQYJKoZI\n"
+	"hvcNAQELBQADgYEAifPWTjcErYbxCqRZW5JhwaosOFHCJVboPsLrIM8W0HEJgqet\n"
+	"TwarBBiE0mzQKU3GtjGj1ZSxUI/jBg9bzC+fs25VtdlC9nIxi5tSDI/HOoBBgXNr\n"
+	"f0+Un2eHAxFcRZPWdPy1/mn83NUMnjquuA/HHcju+pcoZrEwAI3PPQHgsGQ=\n"
+	"-----END CERTIFICATE-----\n";
+
+
 void doit(void)
 {
 	gnutls_x509_crt_t x509;
@@ -1108,6 +1155,44 @@ void doit(void)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example3.com");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	if (debug)
+		success("Testing textual IPs...\n");
+	data.data = (unsigned char *) txt_ip_in_names;
+	data.size = strlen(txt_ip_in_names);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.com");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "172.15.1.1");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "172.15.2.1");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	if (debug)
+		success("Testing textual IPs (CN)...\n");
+	data.data = (unsigned char *) txt_ip_in_cn;
+	data.size = strlen(txt_ip_in_cn);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.com");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "172.15.1.1");
 	if (ret)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
