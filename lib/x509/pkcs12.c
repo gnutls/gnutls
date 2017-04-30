@@ -1670,6 +1670,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				if (ret < 0) {
 					gnutls_assert();
 					gnutls_x509_crt_deinit(this_cert);
+					this_cert = NULL;
 					goto done;
 				}
 
@@ -1682,6 +1683,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				if (ret < 0) {
 					gnutls_assert();
 					gnutls_x509_crt_deinit(this_cert);
+					this_cert = NULL;
 					goto done;
 				}
 
@@ -1721,6 +1723,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 					} else {
 						gnutls_x509_crt_deinit
 						    (this_cert);
+						this_cert = NULL;
 					}
 				}
 				break;
@@ -1743,6 +1746,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				if (ret < 0) {
 					gnutls_assert();
 					gnutls_x509_crl_deinit(*crl);
+					*crl = NULL;
 					goto done;
 				}
 				break;
