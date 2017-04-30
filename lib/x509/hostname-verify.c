@@ -231,7 +231,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			}
 
 			if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
-				_gnutls_debug_log("invalid (non-ASCII) name in certificate %.*s", (int)dnsnamesize, dnsname);
+				_gnutls_debug_log("invalid (non-ASCII) name in certificate %.*s\n", (int)dnsnamesize, dnsname);
 				continue;
 			}
 
@@ -280,7 +280,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		}
 
 		if (!_gnutls_str_is_print(dnsname, dnsnamesize)) {
-			_gnutls_debug_log("invalid (non-ASCII) name in certificate CN %.*s", (int)dnsnamesize, dnsname);
+			_gnutls_debug_log("invalid (non-ASCII) name in certificate CN %.*s\n", (int)dnsnamesize, dnsname);
 			ret = 0;
 			goto cleanup;
 		}
