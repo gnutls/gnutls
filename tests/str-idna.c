@@ -82,6 +82,13 @@ MATCH_FUNC_TWO_WAY(test_mix, "简体中文.εξτρα.com", "xn--fiqu1az03c18t.x
 MATCH_FUNC_TWO_WAY(test_german4, "bücher.de", "xn--bcher-kva.de");
 MATCH_FUNC_TWO_WAY(test_u1, "夡夞夜夙", "xn--bssffl");
 MATCH_FUNC_TWO_WAY(test_jp2, "日本語.jp", "xn--wgv71a119e.jp");
+/* invalid (✌️) symbol in IDNA2008 but valid in IDNA2003. Browsers
+ * fallback to IDNA2003, and we do too, so that should work */
+#if defined(HAVE_LIBIDN) || IDN2_VERSION_NUMBER >= 0x02000002
+MATCH_FUNC_TWO_WAY(test_valid_idna2003, "\xe2\x9c\x8c\xef\xb8\x8f.com", "xn--7bi.com");
+#else
+EMPTY_FUNC(test_valid_idna2003);
+#endif
 
 #ifdef HAVE_LIBIDN2 /* IDNA 2008 */
 MATCH_FUNC_TWO_WAY(test_greek2, "βόλος.com", "xn--nxasmm1c.com");
@@ -138,7 +145,8 @@ int main(void)
 		cmocka_unit_test(test_u1_reverse),
 		cmocka_unit_test(test_jp2),
 		cmocka_unit_test(test_jp2_reverse),
-		cmocka_unit_test(test_dots)
+		cmocka_unit_test(test_dots),
+		cmocka_unit_test(test_valid_idna2003)
 	};
 
 	ret = gnutls_idna_map("β", strlen("β"), &tmp, GLOBAL_FLAGS);
