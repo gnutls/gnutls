@@ -58,6 +58,9 @@ See the end for copying conditions.
 ** libgnutls: gnutls_pem_base64_encode/2() and gnutls_pem_base64_decode/2() can
    be used to decode arbitrary base64 data if the header parameter is set to NULL.
 
+** libgnutls: removed support for libidn; gnutls can now be compiled only with
+   libidn2.
+
 ** certtool: the option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
