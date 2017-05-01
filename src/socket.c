@@ -229,10 +229,10 @@ socket_starttls(socket_st * socket)
 			printf("Negotiating SMTP STARTTLS\n");
 
 		wait_for_text(socket, "220 ", 4);
-		snprintf(buf, sizeof(buf), "EHLO %s\n", socket->hostname);
+		snprintf(buf, sizeof(buf), "EHLO %s\r\n", socket->hostname);
 		send_line(socket, buf);
 		wait_for_text(socket, "250 ", 4);
-		send_line(socket, "STARTTLS\n");
+		send_line(socket, "STARTTLS\r\n");
 		wait_for_text(socket, "220 ", 4);
 	} else if (strcasecmp(socket->app_proto, "imap") == 0 || strcasecmp(socket->app_proto, "imap2") == 0) {
 		if (socket->verbose)
