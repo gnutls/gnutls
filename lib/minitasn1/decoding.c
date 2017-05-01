@@ -329,7 +329,7 @@ _asn1_get_time_der (unsigned type, const unsigned char *der, int der_len, int *r
   if (str_len < 8)
     {
       warn();
-      return ASN1_DER_ERROR;
+      return ASN1_TIME_ENCODING_ERROR;
     }
 
   if (flags & ASN1_DECODE_FLAG_STRICT_DER)
@@ -359,14 +359,14 @@ _asn1_get_time_der (unsigned type, const unsigned char *der, int der_len, int *r
                  }
 
                warn();
-               return ASN1_DER_ERROR;
+               return ASN1_TIME_ENCODING_ERROR;
              }
          }
 
       if (sign_count == 0 && p[str_len-1] != 'Z')
         {
           warn();
-          return ASN1_DER_ERROR;
+          return ASN1_TIME_ENCODING_ERROR;
         }
     }
   memcpy (str, der + len_len, str_len);
