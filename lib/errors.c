@@ -410,6 +410,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_PK_INVALID_PUBKEY),
 	ERROR_ENTRY(N_("The private key is invalid."),
 		    GNUTLS_E_PK_INVALID_PRIVKEY),
+	ERROR_ENTRY(N_("The DER time encoding is invalid."),
+		    GNUTLS_E_ASN1_TIME_ERROR),
 	{NULL, NULL, 0}
 };
 
@@ -564,6 +566,10 @@ const char *gnutls_strerror_name(int error)
 int _gnutls_asn2err(int asn_err)
 {
 	switch (asn_err) {
+#ifdef ASN1_TIME_ENCODING_ERROR
+	case ASN1_TIME_ENCODING_ERROR:
+		return GNUTLS_E_ASN1_TIME_ERROR;
+#endif
 	case ASN1_FILE_NOT_FOUND:
 		return GNUTLS_E_FILE_ERROR;
 	case ASN1_ELEMENT_NOT_FOUND:
