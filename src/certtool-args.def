@@ -325,14 +325,14 @@ flag = {
 flag = {
     name      = p7-sign;
     descrip   = "Signs using a PKCS #7 structure";
-    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The data are stored within the structure. The signer certificate has to be specified using --load-certificate and --load-privkey.";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The data are stored within the structure. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
 };
 
 
 flag = {
     name      = p7-detached-sign;
     descrip   = "Signs using a detached PKCS #7 structure";
-    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The signer certificate has to be specified using --load-certificate and --load-privkey.";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
 };
 
 flag = {
