@@ -2896,7 +2896,9 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 	size_t size;
 	gnutls_datum_t data;
 	unsigned flags = 0;
-	gnutls_x509_crt_t signer;
+	gnutls_x509_crt_t *crts;
+	size_t crt_size;
+	size_t i;
 
 	if (ENABLED_OPT(P7_TIME))
 		flags |= GNUTLS_PKCS7_INCLUDE_TIME;
@@ -2918,17 +2920,26 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 		app_exit(1);
 	}
 
-	signer = load_cert(1, cinfo);
+	crts = load_cert_list(1, &crt_size, cinfo);
 	key = load_private_key(1, cinfo);
 
 	if (embed)
 		flags |= GNUTLS_PKCS7_EMBED_DATA;
 
-	ret = gnutls_pkcs7_sign(pkcs7, signer, key, &data, NULL, NULL, get_dig(signer), flags);
+	ret = gnutls_pkcs7_sign(pkcs7, *crts, key, &data, NULL, NULL, get_dig(*crts), flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error signing: %s\n", gnutls_strerror(ret));
 		app_exit(1);
 	}
+
+	for (i=1;i<crt_size;i++) {
+		ret = gnutls_pkcs7_set_crt(pkcs7, crts[i]);
+		if (ret < 0) {
+			fprintf(stderr, "Error adding cert: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	}
+
 
 	size = lbuffer_size;
 	ret =
@@ -2941,7 +2952,10 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 	fwrite(lbuffer, 1, size, outfile);
 
 	gnutls_privkey_deinit(key);
-	gnutls_x509_crt_deinit(signer);
+	for (i=0;i<crt_size;i++) {
+		gnutls_x509_crt_deinit(crts[i]);
+	}
+	gnutls_free(crts);
 	gnutls_pkcs7_deinit(pkcs7);
 	app_exit(0);
 }
