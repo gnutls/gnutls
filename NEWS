@@ -18,6 +18,10 @@ See the end for copying conditions.
    encoding) if the domain cannot be converted. That provides maximum compatibility
    with browsers like firefox that perform the same conversion.
 
+** certtool: introduced the email_protection_key option.  This option was introduced
+   in documentation for certtool without an implementation of it. It is a shortcut
+   for option 'key_purpose_oid = 1.3.6.1.5.5.7.3.4'.
+
 ** certtool: made printing of key ID and key PIN consistent between certificates,
    public keys, and private keys. That is the private key printing now uses the
    same format as the rest.
