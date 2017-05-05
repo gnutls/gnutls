@@ -66,6 +66,7 @@ time_t get_crl_next_update(void);
 time_t get_crl_revocation_date(void);
 time_t get_crl_this_update_date(void);
 int get_time_stamp_status(void);
+int get_email_protection_status(void);
 int get_ocsp_sign_status(void);
 int get_code_sign_status(void);
 int get_crl_sign_status(void);
