@@ -142,6 +142,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "code_signing_key", .type = OPTION_BOOLEAN },
 	{ .name = "ocsp_signing_key", .type = OPTION_BOOLEAN },
 	{ .name = "time_stamping_key", .type = OPTION_BOOLEAN },
+	{ .name = "email_protection_key", .type = OPTION_BOOLEAN },
 	{ .name = "ipsec_ike_key", .type = OPTION_BOOLEAN },
 	{ .name = "key_agreement", .type = OPTION_BOOLEAN },
 	{ .name = "data_encipherment", .type = OPTION_BOOLEAN },
@@ -210,6 +211,7 @@ typedef struct _cfg_ctx {
 	int code_sign_key;
 	int ocsp_sign_key;
 	int time_stamping_key;
+	int email_protection_key;
 	int ipsec_ike_key;
 	char **key_purpose_oids;
 	int crl_next_update;
@@ -540,6 +542,7 @@ int template_parse(const char *template)
 	READ_BOOLEAN("code_signing_key", cfg.code_sign_key);
 	READ_BOOLEAN("ocsp_signing_key", cfg.ocsp_sign_key);
 	READ_BOOLEAN("time_stamping_key", cfg.time_stamping_key);
+	READ_BOOLEAN("email_protection_key", cfg.email_protection_key);
 	READ_BOOLEAN("ipsec_ike_key", cfg.ipsec_ike_key);
 
 	READ_BOOLEAN("data_encipherment", cfg.data_encipherment);
@@ -2371,6 +2374,18 @@ int get_time_stamp_status(void)
 		return
 		    read_yesno
 		    ("Will the certificate be used for time stamping? (y/N): ",
+		     0);
+	}
+}
+
+int get_email_protection_status(void)
+{
+	if (batch) {
+		return cfg.email_protection_key;
+	} else {
+		return
+		    read_yesno
+		    ("Will the certificate be used for email protection? (y/N): ",
 		     0);
 	}
 }

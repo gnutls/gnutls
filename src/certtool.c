@@ -568,6 +568,18 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			}
 		}
 
+		result = get_email_protection_status();
+		if (result) {
+			result =
+			    gnutls_x509_crt_set_key_purpose_oid
+			    (crt, GNUTLS_KP_EMAIL_PROTECTION, 0);
+			if (result < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(result));
+				exit(1);
+			}
+		}
+
 		if (ca_status) {
 			result = get_cert_sign_status();
 			if (result)
@@ -2061,6 +2073,18 @@ void generate_request(common_info_st * cinfo)
 		if (ret) {
 			ret = gnutls_x509_crq_set_key_purpose_oid
 			    (crq, GNUTLS_KP_TIME_STAMPING, 0);
+			if (ret < 0) {
+				fprintf(stderr, "key_kp: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		ret = get_email_protection_status();
+		if (ret) {
+			ret =
+			    gnutls_x509_crq_set_key_purpose_oid
+			    (crq, GNUTLS_KP_EMAIL_PROTECTION, 0);
 			if (ret < 0) {
 				fprintf(stderr, "key_kp: %s\n",
 					gnutls_strerror(ret));
