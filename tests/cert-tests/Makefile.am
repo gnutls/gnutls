@@ -98,11 +98,7 @@ dist_check_SCRIPTS += openpgp-certs
 endif
 endif
 
-dist_check_SCRIPTS += certtool-utf8
-
-if ENABLE_NON_SUITEB_CURVES
-dist_check_SCRIPTS += crq
-endif
+dist_check_SCRIPTS += certtool-utf8 crq
 
 if !WINDOWS
 dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
