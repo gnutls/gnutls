@@ -113,7 +113,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
-	 mini-x509-dual global-init-override tlsext-decoding \
+	 mini-x509-dual global-init-override tlsext-decoding rsa-psk-cb \
 	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
 	 rehandshake-switch-cert-client-allow handshake-versions dtls-handshake-versions \
 	 dtls-max-record tls-max-record alpn-server-prec ocsp-filename-memleak \
