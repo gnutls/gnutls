@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  * Copyright (C) 2013 Adam Sampson <ats@offog.org>
- * Copyright (C) 2013 Nikos Mavrogiannopoulos
+ * Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -44,12 +44,11 @@ int main(int argc, char **argv)
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#if !defined(_WIN32)
 #include <sys/wait.h>
-#endif
 #include <unistd.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
-
+#include "cert-common.h"
 #include "utils.h"
 
 /* A very basic TLS client, with PSK authentication.
@@ -102,6 +101,7 @@ static void client(int sd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
 
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 	gnutls_transport_set_int(session, sd);
 
 	/* Perform the TLS handshake
@@ -157,54 +157,19 @@ static void client(int sd)
 
 #define MAX_BUF 1024
 
-static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
-
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
-
-static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
-    "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
-    "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
-    "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
-    "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
-    "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
-    "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
-    "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
-    "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
-    "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
-    "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
-    "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
-    "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
-    "-----END RSA PRIVATE KEY-----\n";
-
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
-
 static int
-pskfunc(gnutls_session_t session, const char *username,
+psk_server_func(gnutls_session_t session, const char *username,
 	gnutls_datum_t * key)
 {
 	if (debug)
 		printf("psk: username %s\n", username);
+
+	if (strcmp(username, "test") != 0) {
+		fail("error in received username: '%s'\n", username);
+	}
+
 	key->data = gnutls_malloc(4);
+	assert(key->data != NULL);
 	key->data[0] = 0xDE;
 	key->data[1] = 0xAD;
 	key->data[2] = 0xBE;
@@ -235,7 +200,7 @@ static void server(int sd)
 
 	gnutls_psk_allocate_server_credentials(&server_pskcred);
 	gnutls_psk_set_server_credentials_function(server_pskcred,
-						   pskfunc);
+						   psk_server_func);
 	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 	gnutls_certificate_set_x509_key_mem(serverx509cred,
@@ -255,6 +220,7 @@ static void server(int sd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
 	if (ret < 0) {
