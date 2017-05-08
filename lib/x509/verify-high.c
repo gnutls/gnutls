@@ -52,7 +52,6 @@ struct node_st {
 	/* The trusted CRLs */
 	gnutls_x509_crl_t *crls;
 	unsigned int crl_size;
-
 };
 
 struct gnutls_x509_trust_list_iter {
@@ -1175,6 +1174,15 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 						  NULL, 0, flags, voutput, func);
 }
 
+#define LAST_DN cert_list[cert_list_size-1]->raw_dn
+#define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
+/* This macro is introduced to detect a verification output
+ * which indicates an unknown signer, or a signer which uses
+ * an insecure algorithm (e.g., sha1), something that indicates
+ * a superceded signer */
+#define SIGNER_OLD_OR_UNKNOWN(output) ((output & GNUTLS_CERT_SIGNER_NOT_FOUND) || (output & GNUTLS_CERT_INSECURE_ALGORITHM))
+#define SIGNER_WAS_KNOWN(output) (!(output & GNUTLS_CERT_SIGNER_NOT_FOUND))
+
 /**
  * gnutls_x509_trust_list_verify_crt2:
  * @list: The list
@@ -1238,6 +1246,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	const char *hostname = NULL, *purpose = NULL, *email = NULL;
 	unsigned hostname_size = 0;
 	unsigned have_set_name = 0;
+	unsigned saved_output;
 	gnutls_datum_t ip = {NULL, 0};
 
 	if (cert_list == NULL || cert_list_size < 1)
@@ -1313,11 +1322,9 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 					    list->
 					    node[hash].trusted_ca_size,
 					    flags, purpose, func);
+	saved_output = *voutput;
 
-#define LAST_DN cert_list[cert_list_size-1]->raw_dn
-#define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
-
-	if ((*voutput) & GNUTLS_CERT_SIGNER_NOT_FOUND &&
+	if (SIGNER_OLD_OR_UNKNOWN(*voutput) &&
 		(LAST_DN.size != LAST_IDN.size ||
 		 memcmp(LAST_DN.data, LAST_IDN.data, LAST_IDN.size) != 0)) {
 
@@ -1329,16 +1336,25 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 			  data, cert_list[cert_list_size - 1]->raw_dn.size);
 		hash %= list->size;
 
+		 _gnutls_debug_log("issuer in verification was not found or insecure; trying against trust list\n");
+
 		*voutput =
 		    _gnutls_verify_crt_status(cert_list, cert_list_size,
 					    list->node[hash].trusted_cas,
 					    list->
 					    node[hash].trusted_ca_size,
 					    flags, purpose, func);
+		if (*voutput != 0) {
+			if (SIGNER_WAS_KNOWN(saved_output))
+				*voutput = saved_output;
+			gnutls_assert();
+		}
 	}
 
+	saved_output = *voutput;
+
 #ifdef ENABLE_PKCS11
-	if ((*voutput & GNUTLS_CERT_SIGNER_NOT_FOUND) && list->pkcs11_token) {
+	if (SIGNER_OLD_OR_UNKNOWN(*voutput) && list->pkcs11_token) {
 		/* use the token for verification */
 
 		*voutput = _gnutls_pkcs11_verify_crt_status(list->pkcs11_token,
@@ -1346,6 +1362,8 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 								purpose,
 								flags, func);
 		if (*voutput != 0) {
+			if (SIGNER_WAS_KNOWN(saved_output))
+				*voutput = saved_output;
 			gnutls_assert();
 		}
 	}
