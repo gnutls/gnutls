@@ -81,6 +81,13 @@ flag = {
 };
 
 flag = {
+    name      = sni-hostname;
+    descrip   = "Server's hostname for server name indication extension";
+    arg-type  = string;
+    doc      = "Set explicitly the server name used in the TLS server name indication extension. That is useful when testing with servers setup on different DNS name than the intended. If not specified, the provided hostname is used.";
+};
+
+flag = {
     name      = starttls;
     value     = s;
     descrip   = "Connect, establish a plain session and start TLS";
