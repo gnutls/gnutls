@@ -61,7 +61,7 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a);
 
 #define _gnutls_cert_log(str, cert) \
 	do { \
-		if (unlikely(_gnutls_log_level >= 3)) { \
+		if (unlikely(_gnutls_log_level >= 3 && cert != NULL)) { \
 			gnutls_datum_t _cl_out; int _cl_ret; \
 			_cl_ret = gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE, &_cl_out); \
 			if (_cl_ret >= 0) { \
