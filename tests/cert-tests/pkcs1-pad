@@ -92,7 +92,7 @@ echo "PKCS1-PAD2 OK"
 # by Andrei Pyshkin, Erik Tews and Ralf-Philipp Weinmann.
 
 
-EXPECT3=02
+EXPECT3=03
 
 datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken3.pem" | tee $TMPFILE1 >/dev/null 2>&1
 
