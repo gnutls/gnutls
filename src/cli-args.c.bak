@@ -63,7 +63,7 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for gnutls-cli options
  */
-static char const gnutls_cli_opt_strs[4694] =
+static char const gnutls_cli_opt_strs[4810] =
 /*     0 */ "gnutls-cli @VERSION@\n"
             "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
@@ -110,157 +110,160 @@ static char const gnutls_cli_opt_strs[4694] =
 /*  1393 */ "Establish a session and rehandshake\0"
 /*  1429 */ "REHANDSHAKE\0"
 /*  1441 */ "rehandshake\0"
-/*  1453 */ "Connect, establish a plain session and start TLS\0"
-/*  1502 */ "STARTTLS\0"
-/*  1511 */ "starttls\0"
-/*  1520 */ "an alias for the 'starttls-proto' option\0"
-/*  1561 */ "app-proto\0"
-/*  1571 */ "The application protocol to be used to obtain the server's certificate\n"
-            "(https, ftp, smtp, imap, ldap, xmpp)\0"
-/*  1679 */ "STARTTLS_PROTO\0"
-/*  1694 */ "starttls-proto\0"
-/*  1709 */ "Use DTLS (datagram TLS) over UDP\0"
-/*  1742 */ "UDP\0"
-/*  1746 */ "udp\0"
-/*  1750 */ "Set MTU for datagram TLS\0"
-/*  1775 */ "MTU\0"
-/*  1779 */ "mtu\0"
-/*  1783 */ "Send CR LF instead of LF\0"
-/*  1808 */ "CRLF\0"
-/*  1813 */ "crlf\0"
-/*  1818 */ "Enable TCP Fast Open\0"
-/*  1839 */ "FASTOPEN\0"
-/*  1848 */ "fastopen\0"
-/*  1857 */ "Use DER format for certificates to read from\0"
-/*  1902 */ "X509FMTDER\0"
-/*  1913 */ "x509fmtder\0"
-/*  1924 */ "Send the openpgp fingerprint, instead of the key\0"
-/*  1973 */ "FINGERPRINT\0"
-/*  1985 */ "fingerprint\0"
-/*  1997 */ "Print peer's certificate in PEM format\0"
-/*  2036 */ "PRINT_CERT\0"
-/*  2047 */ "print-cert\0"
-/*  2058 */ "Save the peer's certificate chain in the specified file in PEM format\0"
-/*  2128 */ "SAVE_CERT\0"
-/*  2138 */ "save-cert\0"
-/*  2148 */ "Save the peer's OCSP status response in the provided file\0"
-/*  2206 */ "SAVE_OCSP\0"
-/*  2216 */ "save-ocsp\0"
-/*  2226 */ "The minimum number of bits allowed for DH\0"
-/*  2268 */ "DH_BITS\0"
-/*  2276 */ "dh-bits\0"
-/*  2284 */ "Priorities string\0"
-/*  2302 */ "PRIORITY\0"
-/*  2311 */ "priority\0"
-/*  2320 */ "Certificate file or PKCS #11 URL to use\0"
-/*  2360 */ "X509CAFILE\0"
-/*  2371 */ "x509cafile\0"
-/*  2382 */ "CRL file to use\0"
-/*  2398 */ "X509CRLFILE\0"
-/*  2410 */ "x509crlfile\0"
-/*  2422 */ "PGP Key file to use\0"
-/*  2442 */ "PGPKEYFILE\0"
-/*  2453 */ "pgpkeyfile\0"
-/*  2464 */ "PGP Key ring file to use\0"
-/*  2489 */ "PGPKEYRING\0"
-/*  2500 */ "pgpkeyring\0"
-/*  2511 */ "PGP Public Key (certificate) file to use\0"
-/*  2552 */ "PGPCERTFILE\0"
-/*  2564 */ "pgpcertfile\0"
-/*  2576 */ "X.509 key file or PKCS #11 URL to use\0"
-/*  2614 */ "X509KEYFILE\0"
-/*  2626 */ "x509keyfile\0"
-/*  2638 */ "X.509 Certificate file or PKCS #11 URL to use\0"
-/*  2684 */ "X509CERTFILE\0"
-/*  2697 */ "x509certfile\0"
-/*  2710 */ "PGP subkey to use (hex or auto)\0"
-/*  2742 */ "PGPSUBKEY\0"
-/*  2752 */ "pgpsubkey\0"
-/*  2762 */ "SRP username to use\0"
-/*  2782 */ "SRPUSERNAME\0"
-/*  2794 */ "srpusername\0"
-/*  2806 */ "SRP password to use\0"
-/*  2826 */ "SRPPASSWD\0"
-/*  2836 */ "srppasswd\0"
-/*  2846 */ "PSK username to use\0"
-/*  2866 */ "PSKUSERNAME\0"
-/*  2878 */ "pskusername\0"
-/*  2890 */ "PSK key (in hex) to use\0"
-/*  2914 */ "PSKKEY\0"
-/*  2921 */ "pskkey\0"
-/*  2928 */ "The port or service to connect to\0"
-/*  2962 */ "PORT\0"
-/*  2967 */ "port\0"
-/*  2972 */ "Don't abort program if server certificate can't be validated\0"
-/*  3033 */ "INSECURE\0"
-/*  3042 */ "insecure\0"
-/*  3051 */ "Use length-hiding padding to prevent traffic analysis\0"
-/*  3105 */ "RANGES\0"
-/*  3112 */ "ranges\0"
-/*  3119 */ "Benchmark individual ciphers\0"
-/*  3148 */ "BENCHMARK_CIPHERS\0"
-/*  3166 */ "benchmark-ciphers\0"
-/*  3184 */ "Benchmark TLS key exchange methods\0"
-/*  3219 */ "BENCHMARK_TLS_KX\0"
-/*  3236 */ "benchmark-tls-kx\0"
-/*  3253 */ "Benchmark TLS ciphers\0"
-/*  3275 */ "BENCHMARK_TLS_CIPHERS\0"
-/*  3297 */ "benchmark-tls-ciphers\0"
-/*  3319 */ "Print a list of the supported algorithms and modes\0"
-/*  3370 */ "LIST\0"
-/*  3375 */ "list\0"
-/*  3380 */ "Print a list of the supported priority strings\0"
-/*  3427 */ "PRIORITY_LIST\0"
-/*  3441 */ "priority-list\0"
-/*  3455 */ "Don't allow session tickets\0"
-/*  3483 */ "NOTICKET\0"
-/*  3492 */ "noticket\0"
-/*  3501 */ "Offer SRTP profiles\0"
-/*  3521 */ "SRTP_PROFILES\0"
-/*  3535 */ "srtp-profiles\0"
-/*  3549 */ "Application layer protocol\0"
-/*  3576 */ "ALPN\0"
-/*  3581 */ "alpn\0"
-/*  3586 */ "Activate heartbeat support\0"
-/*  3613 */ "HEARTBEAT\0"
-/*  3623 */ "heartbeat\0"
-/*  3633 */ "The maximum record size to advertize\0"
-/*  3670 */ "RECORDSIZE\0"
-/*  3681 */ "recordsize\0"
-/*  3692 */ "Do not send a Server Name Indication (SNI)\0"
-/*  3735 */ "DISABLE_SNI\0"
-/*  3747 */ "disable-sni\0"
-/*  3759 */ "Disable all the TLS extensions\0"
-/*  3790 */ "DISABLE_EXTENSIONS\0"
-/*  3809 */ "disable-extensions\0"
-/*  3828 */ "Inline commands of the form ^<cmd>^\0"
-/*  3864 */ "INLINE_COMMANDS\0"
-/*  3880 */ "inline-commands\0"
-/*  3896 */ "Change the default delimiter for inline commands.\0"
-/*  3946 */ "INLINE_COMMANDS_PREFIX\0"
-/*  3969 */ "inline-commands-prefix\0"
-/*  3992 */ "Specify the PKCS #11 provider library\0"
-/*  4030 */ "PROVIDER\0"
-/*  4039 */ "provider\0"
-/*  4048 */ "Reports the status of the FIPS140-2 mode in gnutls library\0"
-/*  4107 */ "FIPS140_MODE\0"
-/*  4120 */ "fips140-mode\0"
-/*  4133 */ "display extended usage information and exit\0"
-/*  4177 */ "help\0"
-/*  4182 */ "extended usage information passed thru pager\0"
-/*  4227 */ "more-help\0"
-/*  4237 */ "output version information and exit\0"
-/*  4273 */ "version\0"
-/*  4281 */ "GNUTLS_CLI\0"
-/*  4292 */ "gnutls-cli - GnuTLS client\n"
+/*  1453 */ "Server's hostname for server name indication extension\0"
+/*  1508 */ "SNI_HOSTNAME\0"
+/*  1521 */ "sni-hostname\0"
+/*  1534 */ "Connect, establish a plain session and start TLS\0"
+/*  1583 */ "STARTTLS\0"
+/*  1592 */ "starttls\0"
+/*  1601 */ "an alias for the 'starttls-proto' option\0"
+/*  1642 */ "app-proto\0"
+/*  1652 */ "The application protocol to be used to obtain the server's certificate\n"
+            "(https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)\0"
+/*  1795 */ "STARTTLS_PROTO\0"
+/*  1810 */ "starttls-proto\0"
+/*  1825 */ "Use DTLS (datagram TLS) over UDP\0"
+/*  1858 */ "UDP\0"
+/*  1862 */ "udp\0"
+/*  1866 */ "Set MTU for datagram TLS\0"
+/*  1891 */ "MTU\0"
+/*  1895 */ "mtu\0"
+/*  1899 */ "Send CR LF instead of LF\0"
+/*  1924 */ "CRLF\0"
+/*  1929 */ "crlf\0"
+/*  1934 */ "Enable TCP Fast Open\0"
+/*  1955 */ "FASTOPEN\0"
+/*  1964 */ "fastopen\0"
+/*  1973 */ "Use DER format for certificates to read from\0"
+/*  2018 */ "X509FMTDER\0"
+/*  2029 */ "x509fmtder\0"
+/*  2040 */ "Send the openpgp fingerprint, instead of the key\0"
+/*  2089 */ "FINGERPRINT\0"
+/*  2101 */ "fingerprint\0"
+/*  2113 */ "Print peer's certificate in PEM format\0"
+/*  2152 */ "PRINT_CERT\0"
+/*  2163 */ "print-cert\0"
+/*  2174 */ "Save the peer's certificate chain in the specified file in PEM format\0"
+/*  2244 */ "SAVE_CERT\0"
+/*  2254 */ "save-cert\0"
+/*  2264 */ "Save the peer's OCSP status response in the provided file\0"
+/*  2322 */ "SAVE_OCSP\0"
+/*  2332 */ "save-ocsp\0"
+/*  2342 */ "The minimum number of bits allowed for DH\0"
+/*  2384 */ "DH_BITS\0"
+/*  2392 */ "dh-bits\0"
+/*  2400 */ "Priorities string\0"
+/*  2418 */ "PRIORITY\0"
+/*  2427 */ "priority\0"
+/*  2436 */ "Certificate file or PKCS #11 URL to use\0"
+/*  2476 */ "X509CAFILE\0"
+/*  2487 */ "x509cafile\0"
+/*  2498 */ "CRL file to use\0"
+/*  2514 */ "X509CRLFILE\0"
+/*  2526 */ "x509crlfile\0"
+/*  2538 */ "PGP Key file to use\0"
+/*  2558 */ "PGPKEYFILE\0"
+/*  2569 */ "pgpkeyfile\0"
+/*  2580 */ "PGP Key ring file to use\0"
+/*  2605 */ "PGPKEYRING\0"
+/*  2616 */ "pgpkeyring\0"
+/*  2627 */ "PGP Public Key (certificate) file to use\0"
+/*  2668 */ "PGPCERTFILE\0"
+/*  2680 */ "pgpcertfile\0"
+/*  2692 */ "X.509 key file or PKCS #11 URL to use\0"
+/*  2730 */ "X509KEYFILE\0"
+/*  2742 */ "x509keyfile\0"
+/*  2754 */ "X.509 Certificate file or PKCS #11 URL to use\0"
+/*  2800 */ "X509CERTFILE\0"
+/*  2813 */ "x509certfile\0"
+/*  2826 */ "PGP subkey to use (hex or auto)\0"
+/*  2858 */ "PGPSUBKEY\0"
+/*  2868 */ "pgpsubkey\0"
+/*  2878 */ "SRP username to use\0"
+/*  2898 */ "SRPUSERNAME\0"
+/*  2910 */ "srpusername\0"
+/*  2922 */ "SRP password to use\0"
+/*  2942 */ "SRPPASSWD\0"
+/*  2952 */ "srppasswd\0"
+/*  2962 */ "PSK username to use\0"
+/*  2982 */ "PSKUSERNAME\0"
+/*  2994 */ "pskusername\0"
+/*  3006 */ "PSK key (in hex) to use\0"
+/*  3030 */ "PSKKEY\0"
+/*  3037 */ "pskkey\0"
+/*  3044 */ "The port or service to connect to\0"
+/*  3078 */ "PORT\0"
+/*  3083 */ "port\0"
+/*  3088 */ "Don't abort program if server certificate can't be validated\0"
+/*  3149 */ "INSECURE\0"
+/*  3158 */ "insecure\0"
+/*  3167 */ "Use length-hiding padding to prevent traffic analysis\0"
+/*  3221 */ "RANGES\0"
+/*  3228 */ "ranges\0"
+/*  3235 */ "Benchmark individual ciphers\0"
+/*  3264 */ "BENCHMARK_CIPHERS\0"
+/*  3282 */ "benchmark-ciphers\0"
+/*  3300 */ "Benchmark TLS key exchange methods\0"
+/*  3335 */ "BENCHMARK_TLS_KX\0"
+/*  3352 */ "benchmark-tls-kx\0"
+/*  3369 */ "Benchmark TLS ciphers\0"
+/*  3391 */ "BENCHMARK_TLS_CIPHERS\0"
+/*  3413 */ "benchmark-tls-ciphers\0"
+/*  3435 */ "Print a list of the supported algorithms and modes\0"
+/*  3486 */ "LIST\0"
+/*  3491 */ "list\0"
+/*  3496 */ "Print a list of the supported priority strings\0"
+/*  3543 */ "PRIORITY_LIST\0"
+/*  3557 */ "priority-list\0"
+/*  3571 */ "Don't allow session tickets\0"
+/*  3599 */ "NOTICKET\0"
+/*  3608 */ "noticket\0"
+/*  3617 */ "Offer SRTP profiles\0"
+/*  3637 */ "SRTP_PROFILES\0"
+/*  3651 */ "srtp-profiles\0"
+/*  3665 */ "Application layer protocol\0"
+/*  3692 */ "ALPN\0"
+/*  3697 */ "alpn\0"
+/*  3702 */ "Activate heartbeat support\0"
+/*  3729 */ "HEARTBEAT\0"
+/*  3739 */ "heartbeat\0"
+/*  3749 */ "The maximum record size to advertize\0"
+/*  3786 */ "RECORDSIZE\0"
+/*  3797 */ "recordsize\0"
+/*  3808 */ "Do not send a Server Name Indication (SNI)\0"
+/*  3851 */ "DISABLE_SNI\0"
+/*  3863 */ "disable-sni\0"
+/*  3875 */ "Disable all the TLS extensions\0"
+/*  3906 */ "DISABLE_EXTENSIONS\0"
+/*  3925 */ "disable-extensions\0"
+/*  3944 */ "Inline commands of the form ^<cmd>^\0"
+/*  3980 */ "INLINE_COMMANDS\0"
+/*  3996 */ "inline-commands\0"
+/*  4012 */ "Change the default delimiter for inline commands.\0"
+/*  4062 */ "INLINE_COMMANDS_PREFIX\0"
+/*  4085 */ "inline-commands-prefix\0"
+/*  4108 */ "Specify the PKCS #11 provider library\0"
+/*  4146 */ "PROVIDER\0"
+/*  4155 */ "provider\0"
+/*  4164 */ "Reports the status of the FIPS140-2 mode in gnutls library\0"
+/*  4223 */ "FIPS140_MODE\0"
+/*  4236 */ "fips140-mode\0"
+/*  4249 */ "display extended usage information and exit\0"
+/*  4293 */ "help\0"
+/*  4298 */ "extended usage information passed thru pager\0"
+/*  4343 */ "more-help\0"
+/*  4353 */ "output version information and exit\0"
+/*  4389 */ "version\0"
+/*  4397 */ "GNUTLS_CLI\0"
+/*  4408 */ "gnutls-cli - GnuTLS client\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]... [hostname]\n\0"
-/*  4388 */ "@PACKAGE_BUGREPORT@\0"
-/*  4408 */ "\n\0"
-/*  4410 */ "Simple client program to set up a TLS connection to some other computer.  It\n"
+/*  4504 */ "@PACKAGE_BUGREPORT@\0"
+/*  4524 */ "\n\0"
+/*  4526 */ "Simple client program to set up a TLS connection to some other computer.  It\n"
             "sets up a TLS connection and forwards data from the standard input to the\n"
             "secured socket and vice versa.\n\0"
-/*  4593 */ "gnutls-cli @VERSION@\0"
-/*  4614 */ "Usage: gnutls-cli [options] hostname\n"
+/*  4709 */ "gnutls-cli @VERSION@\0"
+/*  4730 */ "Usage: gnutls-cli [options] hostname\n"
             "gnutls-cli --help for usage instructions.\n";
 
 /**
@@ -409,14 +412,27 @@ static char const gnutls_cli_opt_strs[4694] =
 #define REHANDSHAKE_FLAGS     (OPTST_DISABLED)
 
 /**
+ *  sni-hostname option description:
+ */
+/** Descriptive text for the sni-hostname option */
+#define SNI_HOSTNAME_DESC      (gnutls_cli_opt_strs+1453)
+/** Upper-cased name for the sni-hostname option */
+#define SNI_HOSTNAME_NAME      (gnutls_cli_opt_strs+1508)
+/** Name string for the sni-hostname option */
+#define SNI_HOSTNAME_name      (gnutls_cli_opt_strs+1521)
+/** Compiled in flag settings for the sni-hostname option */
+#define SNI_HOSTNAME_FLAGS     (OPTST_DISABLED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+
+/**
  *  starttls option description:
  */
 /** Descriptive text for the starttls option */
-#define STARTTLS_DESC      (gnutls_cli_opt_strs+1453)
+#define STARTTLS_DESC      (gnutls_cli_opt_strs+1534)
 /** Upper-cased name for the starttls option */
-#define STARTTLS_NAME      (gnutls_cli_opt_strs+1502)
+#define STARTTLS_NAME      (gnutls_cli_opt_strs+1583)
 /** Name string for the starttls option */
-#define STARTTLS_name      (gnutls_cli_opt_strs+1511)
+#define STARTTLS_name      (gnutls_cli_opt_strs+1592)
 /** Compiled in flag settings for the starttls option */
 #define STARTTLS_FLAGS     (OPTST_DISABLED)
 
@@ -424,10 +440,10 @@ static char const gnutls_cli_opt_strs[4694] =
  *  app-proto option description:
  */
 /** Descriptive text for the app-proto option */
-#define APP_PROTO_DESC    (gnutls_cli_opt_strs+1520)
+#define APP_PROTO_DESC    (gnutls_cli_opt_strs+1601)
 #define APP_PROTO_NAME    NULL
 /** Unmodified name string for the app-proto option */
-#define APP_PROTO_name    (gnutls_cli_opt_strs+1561)
+#define APP_PROTO_name    (gnutls_cli_opt_strs+1642)
 /** Compiled in flag settings for the app-proto option */
 #define APP_PROTO_FLAGS     (STARTTLS_PROTO_FLAGS | OPTST_ALIAS)
 
@@ -436,11 +452,11 @@ static char const gnutls_cli_opt_strs[4694] =
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the starttls-proto option */
-#define STARTTLS_PROTO_DESC      (gnutls_cli_opt_strs+1571)
+#define STARTTLS_PROTO_DESC      (gnutls_cli_opt_strs+1652)
 /** Upper-cased name for the starttls-proto option */
-#define STARTTLS_PROTO_NAME      (gnutls_cli_opt_strs+1679)
+#define STARTTLS_PROTO_NAME      (gnutls_cli_opt_strs+1795)
 /** Name string for the starttls-proto option */
-#define STARTTLS_PROTO_name      (gnutls_cli_opt_strs+1694)
+#define STARTTLS_PROTO_name      (gnutls_cli_opt_strs+1810)
 /** Other options that appear in conjunction with the starttls-proto option */
 static int const aStarttls_ProtoCantList[] = {
     INDEX_OPT_STARTTLS, NO_EQUIVALENT };
@@ -452,11 +468,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  udp option description:
  */
 /** Descriptive text for the udp option */
-#define UDP_DESC      (gnutls_cli_opt_strs+1709)
+#define UDP_DESC      (gnutls_cli_opt_strs+1825)
 /** Upper-cased name for the udp option */
-#define UDP_NAME      (gnutls_cli_opt_strs+1742)
+#define UDP_NAME      (gnutls_cli_opt_strs+1858)
 /** Name string for the udp option */
-#define UDP_name      (gnutls_cli_opt_strs+1746)
+#define UDP_name      (gnutls_cli_opt_strs+1862)
 /** Compiled in flag settings for the udp option */
 #define UDP_FLAGS     (OPTST_DISABLED)
 
@@ -464,11 +480,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  mtu option description:
  */
 /** Descriptive text for the mtu option */
-#define MTU_DESC      (gnutls_cli_opt_strs+1750)
+#define MTU_DESC      (gnutls_cli_opt_strs+1866)
 /** Upper-cased name for the mtu option */
-#define MTU_NAME      (gnutls_cli_opt_strs+1775)
+#define MTU_NAME      (gnutls_cli_opt_strs+1891)
 /** Name string for the mtu option */
-#define MTU_name      (gnutls_cli_opt_strs+1779)
+#define MTU_name      (gnutls_cli_opt_strs+1895)
 /** Compiled in flag settings for the mtu option */
 #define MTU_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -477,11 +493,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  crlf option description:
  */
 /** Descriptive text for the crlf option */
-#define CRLF_DESC      (gnutls_cli_opt_strs+1783)
+#define CRLF_DESC      (gnutls_cli_opt_strs+1899)
 /** Upper-cased name for the crlf option */
-#define CRLF_NAME      (gnutls_cli_opt_strs+1808)
+#define CRLF_NAME      (gnutls_cli_opt_strs+1924)
 /** Name string for the crlf option */
-#define CRLF_name      (gnutls_cli_opt_strs+1813)
+#define CRLF_name      (gnutls_cli_opt_strs+1929)
 /** Compiled in flag settings for the crlf option */
 #define CRLF_FLAGS     (OPTST_DISABLED)
 
@@ -489,11 +505,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  fastopen option description:
  */
 /** Descriptive text for the fastopen option */
-#define FASTOPEN_DESC      (gnutls_cli_opt_strs+1818)
+#define FASTOPEN_DESC      (gnutls_cli_opt_strs+1934)
 /** Upper-cased name for the fastopen option */
-#define FASTOPEN_NAME      (gnutls_cli_opt_strs+1839)
+#define FASTOPEN_NAME      (gnutls_cli_opt_strs+1955)
 /** Name string for the fastopen option */
-#define FASTOPEN_name      (gnutls_cli_opt_strs+1848)
+#define FASTOPEN_name      (gnutls_cli_opt_strs+1964)
 /** Compiled in flag settings for the fastopen option */
 #define FASTOPEN_FLAGS     (OPTST_DISABLED)
 
@@ -501,11 +517,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  x509fmtder option description:
  */
 /** Descriptive text for the x509fmtder option */
-#define X509FMTDER_DESC      (gnutls_cli_opt_strs+1857)
+#define X509FMTDER_DESC      (gnutls_cli_opt_strs+1973)
 /** Upper-cased name for the x509fmtder option */
-#define X509FMTDER_NAME      (gnutls_cli_opt_strs+1902)
+#define X509FMTDER_NAME      (gnutls_cli_opt_strs+2018)
 /** Name string for the x509fmtder option */
-#define X509FMTDER_name      (gnutls_cli_opt_strs+1913)
+#define X509FMTDER_name      (gnutls_cli_opt_strs+2029)
 /** Compiled in flag settings for the x509fmtder option */
 #define X509FMTDER_FLAGS     (OPTST_DISABLED)
 
@@ -513,11 +529,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  fingerprint option description:
  */
 /** Descriptive text for the fingerprint option */
-#define FINGERPRINT_DESC      (gnutls_cli_opt_strs+1924)
+#define FINGERPRINT_DESC      (gnutls_cli_opt_strs+2040)
 /** Upper-cased name for the fingerprint option */
-#define FINGERPRINT_NAME      (gnutls_cli_opt_strs+1973)
+#define FINGERPRINT_NAME      (gnutls_cli_opt_strs+2089)
 /** Name string for the fingerprint option */
-#define FINGERPRINT_name      (gnutls_cli_opt_strs+1985)
+#define FINGERPRINT_name      (gnutls_cli_opt_strs+2101)
 /** Compiled in flag settings for the fingerprint option */
 #define FINGERPRINT_FLAGS     (OPTST_DISABLED)
 
@@ -525,11 +541,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  print-cert option description:
  */
 /** Descriptive text for the print-cert option */
-#define PRINT_CERT_DESC      (gnutls_cli_opt_strs+1997)
+#define PRINT_CERT_DESC      (gnutls_cli_opt_strs+2113)
 /** Upper-cased name for the print-cert option */
-#define PRINT_CERT_NAME      (gnutls_cli_opt_strs+2036)
+#define PRINT_CERT_NAME      (gnutls_cli_opt_strs+2152)
 /** Name string for the print-cert option */
-#define PRINT_CERT_name      (gnutls_cli_opt_strs+2047)
+#define PRINT_CERT_name      (gnutls_cli_opt_strs+2163)
 /** Compiled in flag settings for the print-cert option */
 #define PRINT_CERT_FLAGS     (OPTST_DISABLED)
 
@@ -537,11 +553,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  save-cert option description:
  */
 /** Descriptive text for the save-cert option */
-#define SAVE_CERT_DESC      (gnutls_cli_opt_strs+2058)
+#define SAVE_CERT_DESC      (gnutls_cli_opt_strs+2174)
 /** Upper-cased name for the save-cert option */
-#define SAVE_CERT_NAME      (gnutls_cli_opt_strs+2128)
+#define SAVE_CERT_NAME      (gnutls_cli_opt_strs+2244)
 /** Name string for the save-cert option */
-#define SAVE_CERT_name      (gnutls_cli_opt_strs+2138)
+#define SAVE_CERT_name      (gnutls_cli_opt_strs+2254)
 /** Compiled in flag settings for the save-cert option */
 #define SAVE_CERT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -550,11 +566,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  save-ocsp option description:
  */
 /** Descriptive text for the save-ocsp option */
-#define SAVE_OCSP_DESC      (gnutls_cli_opt_strs+2148)
+#define SAVE_OCSP_DESC      (gnutls_cli_opt_strs+2264)
 /** Upper-cased name for the save-ocsp option */
-#define SAVE_OCSP_NAME      (gnutls_cli_opt_strs+2206)
+#define SAVE_OCSP_NAME      (gnutls_cli_opt_strs+2322)
 /** Name string for the save-ocsp option */
-#define SAVE_OCSP_name      (gnutls_cli_opt_strs+2216)
+#define SAVE_OCSP_name      (gnutls_cli_opt_strs+2332)
 /** Compiled in flag settings for the save-ocsp option */
 #define SAVE_OCSP_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -563,11 +579,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  dh-bits option description:
  */
 /** Descriptive text for the dh-bits option */
-#define DH_BITS_DESC      (gnutls_cli_opt_strs+2226)
+#define DH_BITS_DESC      (gnutls_cli_opt_strs+2342)
 /** Upper-cased name for the dh-bits option */
-#define DH_BITS_NAME      (gnutls_cli_opt_strs+2268)
+#define DH_BITS_NAME      (gnutls_cli_opt_strs+2384)
 /** Name string for the dh-bits option */
-#define DH_BITS_name      (gnutls_cli_opt_strs+2276)
+#define DH_BITS_name      (gnutls_cli_opt_strs+2392)
 /** Compiled in flag settings for the dh-bits option */
 #define DH_BITS_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -576,11 +592,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  priority option description:
  */
 /** Descriptive text for the priority option */
-#define PRIORITY_DESC      (gnutls_cli_opt_strs+2284)
+#define PRIORITY_DESC      (gnutls_cli_opt_strs+2400)
 /** Upper-cased name for the priority option */
-#define PRIORITY_NAME      (gnutls_cli_opt_strs+2302)
+#define PRIORITY_NAME      (gnutls_cli_opt_strs+2418)
 /** Name string for the priority option */
-#define PRIORITY_name      (gnutls_cli_opt_strs+2311)
+#define PRIORITY_name      (gnutls_cli_opt_strs+2427)
 /** Compiled in flag settings for the priority option */
 #define PRIORITY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -589,11 +605,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  x509cafile option description:
  */
 /** Descriptive text for the x509cafile option */
-#define X509CAFILE_DESC      (gnutls_cli_opt_strs+2320)
+#define X509CAFILE_DESC      (gnutls_cli_opt_strs+2436)
 /** Upper-cased name for the x509cafile option */
-#define X509CAFILE_NAME      (gnutls_cli_opt_strs+2360)
+#define X509CAFILE_NAME      (gnutls_cli_opt_strs+2476)
 /** Name string for the x509cafile option */
-#define X509CAFILE_name      (gnutls_cli_opt_strs+2371)
+#define X509CAFILE_name      (gnutls_cli_opt_strs+2487)
 /** Compiled in flag settings for the x509cafile option */
 #define X509CAFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -602,11 +618,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  x509crlfile option description:
  */
 /** Descriptive text for the x509crlfile option */
-#define X509CRLFILE_DESC      (gnutls_cli_opt_strs+2382)
+#define X509CRLFILE_DESC      (gnutls_cli_opt_strs+2498)
 /** Upper-cased name for the x509crlfile option */
-#define X509CRLFILE_NAME      (gnutls_cli_opt_strs+2398)
+#define X509CRLFILE_NAME      (gnutls_cli_opt_strs+2514)
 /** Name string for the x509crlfile option */
-#define X509CRLFILE_name      (gnutls_cli_opt_strs+2410)
+#define X509CRLFILE_name      (gnutls_cli_opt_strs+2526)
 /** Compiled in flag settings for the x509crlfile option */
 #define X509CRLFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -615,11 +631,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  pgpkeyfile option description:
  */
 /** Descriptive text for the pgpkeyfile option */
-#define PGPKEYFILE_DESC      (gnutls_cli_opt_strs+2422)
+#define PGPKEYFILE_DESC      (gnutls_cli_opt_strs+2538)
 /** Upper-cased name for the pgpkeyfile option */
-#define PGPKEYFILE_NAME      (gnutls_cli_opt_strs+2442)
+#define PGPKEYFILE_NAME      (gnutls_cli_opt_strs+2558)
 /** Name string for the pgpkeyfile option */
-#define PGPKEYFILE_name      (gnutls_cli_opt_strs+2453)
+#define PGPKEYFILE_name      (gnutls_cli_opt_strs+2569)
 /** Compiled in flag settings for the pgpkeyfile option */
 #define PGPKEYFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -628,11 +644,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  pgpkeyring option description:
  */
 /** Descriptive text for the pgpkeyring option */
-#define PGPKEYRING_DESC      (gnutls_cli_opt_strs+2464)
+#define PGPKEYRING_DESC      (gnutls_cli_opt_strs+2580)
 /** Upper-cased name for the pgpkeyring option */
-#define PGPKEYRING_NAME      (gnutls_cli_opt_strs+2489)
+#define PGPKEYRING_NAME      (gnutls_cli_opt_strs+2605)
 /** Name string for the pgpkeyring option */
-#define PGPKEYRING_name      (gnutls_cli_opt_strs+2500)
+#define PGPKEYRING_name      (gnutls_cli_opt_strs+2616)
 /** Compiled in flag settings for the pgpkeyring option */
 #define PGPKEYRING_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -642,11 +658,11 @@ static int const aStarttls_ProtoCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the pgpcertfile option */
-#define PGPCERTFILE_DESC      (gnutls_cli_opt_strs+2511)
+#define PGPCERTFILE_DESC      (gnutls_cli_opt_strs+2627)
 /** Upper-cased name for the pgpcertfile option */
-#define PGPCERTFILE_NAME      (gnutls_cli_opt_strs+2552)
+#define PGPCERTFILE_NAME      (gnutls_cli_opt_strs+2668)
 /** Name string for the pgpcertfile option */
-#define PGPCERTFILE_name      (gnutls_cli_opt_strs+2564)
+#define PGPCERTFILE_name      (gnutls_cli_opt_strs+2680)
 /** Other options that are required by the pgpcertfile option */
 static int const aPgpcertfileMustList[] = {
     INDEX_OPT_PGPKEYFILE, NO_EQUIVALENT };
@@ -658,11 +674,11 @@ static int const aPgpcertfileMustList[] = {
  *  x509keyfile option description:
  */
 /** Descriptive text for the x509keyfile option */
-#define X509KEYFILE_DESC      (gnutls_cli_opt_strs+2576)
+#define X509KEYFILE_DESC      (gnutls_cli_opt_strs+2692)
 /** Upper-cased name for the x509keyfile option */
-#define X509KEYFILE_NAME      (gnutls_cli_opt_strs+2614)
+#define X509KEYFILE_NAME      (gnutls_cli_opt_strs+2730)
 /** Name string for the x509keyfile option */
-#define X509KEYFILE_name      (gnutls_cli_opt_strs+2626)
+#define X509KEYFILE_name      (gnutls_cli_opt_strs+2742)
 /** Compiled in flag settings for the x509keyfile option */
 #define X509KEYFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -672,11 +688,11 @@ static int const aPgpcertfileMustList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the x509certfile option */
-#define X509CERTFILE_DESC      (gnutls_cli_opt_strs+2638)
+#define X509CERTFILE_DESC      (gnutls_cli_opt_strs+2754)
 /** Upper-cased name for the x509certfile option */
-#define X509CERTFILE_NAME      (gnutls_cli_opt_strs+2684)
+#define X509CERTFILE_NAME      (gnutls_cli_opt_strs+2800)
 /** Name string for the x509certfile option */
-#define X509CERTFILE_name      (gnutls_cli_opt_strs+2697)
+#define X509CERTFILE_name      (gnutls_cli_opt_strs+2813)
 /** Other options that are required by the x509certfile option */
 static int const aX509certfileMustList[] = {
     INDEX_OPT_X509KEYFILE, NO_EQUIVALENT };
@@ -688,11 +704,11 @@ static int const aX509certfileMustList[] = {
  *  pgpsubkey option description:
  */
 /** Descriptive text for the pgpsubkey option */
-#define PGPSUBKEY_DESC      (gnutls_cli_opt_strs+2710)
+#define PGPSUBKEY_DESC      (gnutls_cli_opt_strs+2826)
 /** Upper-cased name for the pgpsubkey option */
-#define PGPSUBKEY_NAME      (gnutls_cli_opt_strs+2742)
+#define PGPSUBKEY_NAME      (gnutls_cli_opt_strs+2858)
 /** Name string for the pgpsubkey option */
-#define PGPSUBKEY_name      (gnutls_cli_opt_strs+2752)
+#define PGPSUBKEY_name      (gnutls_cli_opt_strs+2868)
 /** Compiled in flag settings for the pgpsubkey option */
 #define PGPSUBKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -701,11 +717,11 @@ static int const aX509certfileMustList[] = {
  *  srpusername option description:
  */
 /** Descriptive text for the srpusername option */
-#define SRPUSERNAME_DESC      (gnutls_cli_opt_strs+2762)
+#define SRPUSERNAME_DESC      (gnutls_cli_opt_strs+2878)
 /** Upper-cased name for the srpusername option */
-#define SRPUSERNAME_NAME      (gnutls_cli_opt_strs+2782)
+#define SRPUSERNAME_NAME      (gnutls_cli_opt_strs+2898)
 /** Name string for the srpusername option */
-#define SRPUSERNAME_name      (gnutls_cli_opt_strs+2794)
+#define SRPUSERNAME_name      (gnutls_cli_opt_strs+2910)
 /** Compiled in flag settings for the srpusername option */
 #define SRPUSERNAME_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -714,11 +730,11 @@ static int const aX509certfileMustList[] = {
  *  srppasswd option description:
  */
 /** Descriptive text for the srppasswd option */
-#define SRPPASSWD_DESC      (gnutls_cli_opt_strs+2806)
+#define SRPPASSWD_DESC      (gnutls_cli_opt_strs+2922)
 /** Upper-cased name for the srppasswd option */
-#define SRPPASSWD_NAME      (gnutls_cli_opt_strs+2826)
+#define SRPPASSWD_NAME      (gnutls_cli_opt_strs+2942)
 /** Name string for the srppasswd option */
-#define SRPPASSWD_name      (gnutls_cli_opt_strs+2836)
+#define SRPPASSWD_name      (gnutls_cli_opt_strs+2952)
 /** Compiled in flag settings for the srppasswd option */
 #define SRPPASSWD_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -727,11 +743,11 @@ static int const aX509certfileMustList[] = {
  *  pskusername option description:
  */
 /** Descriptive text for the pskusername option */
-#define PSKUSERNAME_DESC      (gnutls_cli_opt_strs+2846)
+#define PSKUSERNAME_DESC      (gnutls_cli_opt_strs+2962)
 /** Upper-cased name for the pskusername option */
-#define PSKUSERNAME_NAME      (gnutls_cli_opt_strs+2866)
+#define PSKUSERNAME_NAME      (gnutls_cli_opt_strs+2982)
 /** Name string for the pskusername option */
-#define PSKUSERNAME_name      (gnutls_cli_opt_strs+2878)
+#define PSKUSERNAME_name      (gnutls_cli_opt_strs+2994)
 /** Compiled in flag settings for the pskusername option */
 #define PSKUSERNAME_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -740,11 +756,11 @@ static int const aX509certfileMustList[] = {
  *  pskkey option description:
  */
 /** Descriptive text for the pskkey option */
-#define PSKKEY_DESC      (gnutls_cli_opt_strs+2890)
+#define PSKKEY_DESC      (gnutls_cli_opt_strs+3006)
 /** Upper-cased name for the pskkey option */
-#define PSKKEY_NAME      (gnutls_cli_opt_strs+2914)
+#define PSKKEY_NAME      (gnutls_cli_opt_strs+3030)
 /** Name string for the pskkey option */
-#define PSKKEY_name      (gnutls_cli_opt_strs+2921)
+#define PSKKEY_name      (gnutls_cli_opt_strs+3037)
 /** Compiled in flag settings for the pskkey option */
 #define PSKKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -753,11 +769,11 @@ static int const aX509certfileMustList[] = {
  *  port option description:
  */
 /** Descriptive text for the port option */
-#define PORT_DESC      (gnutls_cli_opt_strs+2928)
+#define PORT_DESC      (gnutls_cli_opt_strs+3044)
 /** Upper-cased name for the port option */
-#define PORT_NAME      (gnutls_cli_opt_strs+2962)
+#define PORT_NAME      (gnutls_cli_opt_strs+3078)
 /** Name string for the port option */
-#define PORT_name      (gnutls_cli_opt_strs+2967)
+#define PORT_name      (gnutls_cli_opt_strs+3083)
 /** Compiled in flag settings for the port option */
 #define PORT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -766,11 +782,11 @@ static int const aX509certfileMustList[] = {
  *  insecure option description:
  */
 /** Descriptive text for the insecure option */
-#define INSECURE_DESC      (gnutls_cli_opt_strs+2972)
+#define INSECURE_DESC      (gnutls_cli_opt_strs+3088)
 /** Upper-cased name for the insecure option */
-#define INSECURE_NAME      (gnutls_cli_opt_strs+3033)
+#define INSECURE_NAME      (gnutls_cli_opt_strs+3149)
 /** Name string for the insecure option */
-#define INSECURE_name      (gnutls_cli_opt_strs+3042)
+#define INSECURE_name      (gnutls_cli_opt_strs+3158)
 /** Compiled in flag settings for the insecure option */
 #define INSECURE_FLAGS     (OPTST_DISABLED)
 
@@ -778,11 +794,11 @@ static int const aX509certfileMustList[] = {
  *  ranges option description:
  */
 /** Descriptive text for the ranges option */
-#define RANGES_DESC      (gnutls_cli_opt_strs+3051)
+#define RANGES_DESC      (gnutls_cli_opt_strs+3167)
 /** Upper-cased name for the ranges option */
-#define RANGES_NAME      (gnutls_cli_opt_strs+3105)
+#define RANGES_NAME      (gnutls_cli_opt_strs+3221)
 /** Name string for the ranges option */
-#define RANGES_name      (gnutls_cli_opt_strs+3112)
+#define RANGES_name      (gnutls_cli_opt_strs+3228)
 /** Compiled in flag settings for the ranges option */
 #define RANGES_FLAGS     (OPTST_DISABLED)
 
@@ -790,11 +806,11 @@ static int const aX509certfileMustList[] = {
  *  benchmark-ciphers option description:
  */
 /** Descriptive text for the benchmark-ciphers option */
-#define BENCHMARK_CIPHERS_DESC      (gnutls_cli_opt_strs+3119)
+#define BENCHMARK_CIPHERS_DESC      (gnutls_cli_opt_strs+3235)
 /** Upper-cased name for the benchmark-ciphers option */
-#define BENCHMARK_CIPHERS_NAME      (gnutls_cli_opt_strs+3148)
+#define BENCHMARK_CIPHERS_NAME      (gnutls_cli_opt_strs+3264)
 /** Name string for the benchmark-ciphers option */
-#define BENCHMARK_CIPHERS_name      (gnutls_cli_opt_strs+3166)
+#define BENCHMARK_CIPHERS_name      (gnutls_cli_opt_strs+3282)
 /** Compiled in flag settings for the benchmark-ciphers option */
 #define BENCHMARK_CIPHERS_FLAGS     (OPTST_DISABLED)
 
@@ -802,11 +818,11 @@ static int const aX509certfileMustList[] = {
  *  benchmark-tls-kx option description:
  */
 /** Descriptive text for the benchmark-tls-kx option */
-#define BENCHMARK_TLS_KX_DESC      (gnutls_cli_opt_strs+3184)
+#define BENCHMARK_TLS_KX_DESC      (gnutls_cli_opt_strs+3300)
 /** Upper-cased name for the benchmark-tls-kx option */
-#define BENCHMARK_TLS_KX_NAME      (gnutls_cli_opt_strs+3219)
+#define BENCHMARK_TLS_KX_NAME      (gnutls_cli_opt_strs+3335)
 /** Name string for the benchmark-tls-kx option */
-#define BENCHMARK_TLS_KX_name      (gnutls_cli_opt_strs+3236)
+#define BENCHMARK_TLS_KX_name      (gnutls_cli_opt_strs+3352)
 /** Compiled in flag settings for the benchmark-tls-kx option */
 #define BENCHMARK_TLS_KX_FLAGS     (OPTST_DISABLED)
 
@@ -814,11 +830,11 @@ static int const aX509certfileMustList[] = {
  *  benchmark-tls-ciphers option description:
  */
 /** Descriptive text for the benchmark-tls-ciphers option */
-#define BENCHMARK_TLS_CIPHERS_DESC      (gnutls_cli_opt_strs+3253)
+#define BENCHMARK_TLS_CIPHERS_DESC      (gnutls_cli_opt_strs+3369)
 /** Upper-cased name for the benchmark-tls-ciphers option */
-#define BENCHMARK_TLS_CIPHERS_NAME      (gnutls_cli_opt_strs+3275)
+#define BENCHMARK_TLS_CIPHERS_NAME      (gnutls_cli_opt_strs+3391)
 /** Name string for the benchmark-tls-ciphers option */
-#define BENCHMARK_TLS_CIPHERS_name      (gnutls_cli_opt_strs+3297)
+#define BENCHMARK_TLS_CIPHERS_name      (gnutls_cli_opt_strs+3413)
 /** Compiled in flag settings for the benchmark-tls-ciphers option */
 #define BENCHMARK_TLS_CIPHERS_FLAGS     (OPTST_DISABLED)
 
@@ -827,11 +843,11 @@ static int const aX509certfileMustList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the list option */
-#define LIST_DESC      (gnutls_cli_opt_strs+3319)
+#define LIST_DESC      (gnutls_cli_opt_strs+3435)
 /** Upper-cased name for the list option */
-#define LIST_NAME      (gnutls_cli_opt_strs+3370)
+#define LIST_NAME      (gnutls_cli_opt_strs+3486)
 /** Name string for the list option */
-#define LIST_name      (gnutls_cli_opt_strs+3375)
+#define LIST_name      (gnutls_cli_opt_strs+3491)
 /** Other options that appear in conjunction with the list option */
 static int const aListCantList[] = {
     INDEX_OPT_PORT, NO_EQUIVALENT };
@@ -842,11 +858,11 @@ static int const aListCantList[] = {
  *  priority-list option description:
  */
 /** Descriptive text for the priority-list option */
-#define PRIORITY_LIST_DESC      (gnutls_cli_opt_strs+3380)
+#define PRIORITY_LIST_DESC      (gnutls_cli_opt_strs+3496)
 /** Upper-cased name for the priority-list option */
-#define PRIORITY_LIST_NAME      (gnutls_cli_opt_strs+3427)
+#define PRIORITY_LIST_NAME      (gnutls_cli_opt_strs+3543)
 /** Name string for the priority-list option */
-#define PRIORITY_LIST_name      (gnutls_cli_opt_strs+3441)
+#define PRIORITY_LIST_name      (gnutls_cli_opt_strs+3557)
 /** Compiled in flag settings for the priority-list option */
 #define PRIORITY_LIST_FLAGS     (OPTST_DISABLED)
 
@@ -854,11 +870,11 @@ static int const aListCantList[] = {
  *  noticket option description:
  */
 /** Descriptive text for the noticket option */
-#define NOTICKET_DESC      (gnutls_cli_opt_strs+3455)
+#define NOTICKET_DESC      (gnutls_cli_opt_strs+3571)
 /** Upper-cased name for the noticket option */
-#define NOTICKET_NAME      (gnutls_cli_opt_strs+3483)
+#define NOTICKET_NAME      (gnutls_cli_opt_strs+3599)
 /** Name string for the noticket option */
-#define NOTICKET_name      (gnutls_cli_opt_strs+3492)
+#define NOTICKET_name      (gnutls_cli_opt_strs+3608)
 /** Compiled in flag settings for the noticket option */
 #define NOTICKET_FLAGS     (OPTST_DISABLED)
 
@@ -866,11 +882,11 @@ static int const aListCantList[] = {
  *  srtp_profiles option description:
  */
 /** Descriptive text for the srtp_profiles option */
-#define SRTP_PROFILES_DESC      (gnutls_cli_opt_strs+3501)
+#define SRTP_PROFILES_DESC      (gnutls_cli_opt_strs+3617)
 /** Upper-cased name for the srtp_profiles option */
-#define SRTP_PROFILES_NAME      (gnutls_cli_opt_strs+3521)
+#define SRTP_PROFILES_NAME      (gnutls_cli_opt_strs+3637)
 /** Name string for the srtp_profiles option */
-#define SRTP_PROFILES_name      (gnutls_cli_opt_strs+3535)
+#define SRTP_PROFILES_name      (gnutls_cli_opt_strs+3651)
 /** Compiled in flag settings for the srtp_profiles option */
 #define SRTP_PROFILES_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -879,11 +895,11 @@ static int const aListCantList[] = {
  *  alpn option description:
  */
 /** Descriptive text for the alpn option */
-#define ALPN_DESC      (gnutls_cli_opt_strs+3549)
+#define ALPN_DESC      (gnutls_cli_opt_strs+3665)
 /** Upper-cased name for the alpn option */
-#define ALPN_NAME      (gnutls_cli_opt_strs+3576)
+#define ALPN_NAME      (gnutls_cli_opt_strs+3692)
 /** Name string for the alpn option */
-#define ALPN_name      (gnutls_cli_opt_strs+3581)
+#define ALPN_name      (gnutls_cli_opt_strs+3697)
 /** Compiled in flag settings for the alpn option */
 #define ALPN_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -892,11 +908,11 @@ static int const aListCantList[] = {
  *  heartbeat option description:
  */
 /** Descriptive text for the heartbeat option */
-#define HEARTBEAT_DESC      (gnutls_cli_opt_strs+3586)
+#define HEARTBEAT_DESC      (gnutls_cli_opt_strs+3702)
 /** Upper-cased name for the heartbeat option */
-#define HEARTBEAT_NAME      (gnutls_cli_opt_strs+3613)
+#define HEARTBEAT_NAME      (gnutls_cli_opt_strs+3729)
 /** Name string for the heartbeat option */
-#define HEARTBEAT_name      (gnutls_cli_opt_strs+3623)
+#define HEARTBEAT_name      (gnutls_cli_opt_strs+3739)
 /** Compiled in flag settings for the heartbeat option */
 #define HEARTBEAT_FLAGS     (OPTST_DISABLED)
 
@@ -904,11 +920,11 @@ static int const aListCantList[] = {
  *  recordsize option description:
  */
 /** Descriptive text for the recordsize option */
-#define RECORDSIZE_DESC      (gnutls_cli_opt_strs+3633)
+#define RECORDSIZE_DESC      (gnutls_cli_opt_strs+3749)
 /** Upper-cased name for the recordsize option */
-#define RECORDSIZE_NAME      (gnutls_cli_opt_strs+3670)
+#define RECORDSIZE_NAME      (gnutls_cli_opt_strs+3786)
 /** Name string for the recordsize option */
-#define RECORDSIZE_name      (gnutls_cli_opt_strs+3681)
+#define RECORDSIZE_name      (gnutls_cli_opt_strs+3797)
 /** Compiled in flag settings for the recordsize option */
 #define RECORDSIZE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -917,11 +933,11 @@ static int const aListCantList[] = {
  *  disable-sni option description:
  */
 /** Descriptive text for the disable-sni option */
-#define DISABLE_SNI_DESC      (gnutls_cli_opt_strs+3692)
+#define DISABLE_SNI_DESC      (gnutls_cli_opt_strs+3808)
 /** Upper-cased name for the disable-sni option */
-#define DISABLE_SNI_NAME      (gnutls_cli_opt_strs+3735)
+#define DISABLE_SNI_NAME      (gnutls_cli_opt_strs+3851)
 /** Name string for the disable-sni option */
-#define DISABLE_SNI_name      (gnutls_cli_opt_strs+3747)
+#define DISABLE_SNI_name      (gnutls_cli_opt_strs+3863)
 /** Compiled in flag settings for the disable-sni option */
 #define DISABLE_SNI_FLAGS     (OPTST_DISABLED)
 
@@ -929,11 +945,11 @@ static int const aListCantList[] = {
  *  disable-extensions option description:
  */
 /** Descriptive text for the disable-extensions option */
-#define DISABLE_EXTENSIONS_DESC      (gnutls_cli_opt_strs+3759)
+#define DISABLE_EXTENSIONS_DESC      (gnutls_cli_opt_strs+3875)
 /** Upper-cased name for the disable-extensions option */
-#define DISABLE_EXTENSIONS_NAME      (gnutls_cli_opt_strs+3790)
+#define DISABLE_EXTENSIONS_NAME      (gnutls_cli_opt_strs+3906)
 /** Name string for the disable-extensions option */
-#define DISABLE_EXTENSIONS_name      (gnutls_cli_opt_strs+3809)
+#define DISABLE_EXTENSIONS_name      (gnutls_cli_opt_strs+3925)
 /** Compiled in flag settings for the disable-extensions option */
 #define DISABLE_EXTENSIONS_FLAGS     (OPTST_DISABLED)
 
@@ -941,11 +957,11 @@ static int const aListCantList[] = {
  *  inline-commands option description:
  */
 /** Descriptive text for the inline-commands option */
-#define INLINE_COMMANDS_DESC      (gnutls_cli_opt_strs+3828)
+#define INLINE_COMMANDS_DESC      (gnutls_cli_opt_strs+3944)
 /** Upper-cased name for the inline-commands option */
-#define INLINE_COMMANDS_NAME      (gnutls_cli_opt_strs+3864)
+#define INLINE_COMMANDS_NAME      (gnutls_cli_opt_strs+3980)
 /** Name string for the inline-commands option */
-#define INLINE_COMMANDS_name      (gnutls_cli_opt_strs+3880)
+#define INLINE_COMMANDS_name      (gnutls_cli_opt_strs+3996)
 /** Compiled in flag settings for the inline-commands option */
 #define INLINE_COMMANDS_FLAGS     (OPTST_DISABLED)
 
@@ -953,11 +969,11 @@ static int const aListCantList[] = {
  *  inline-commands-prefix option description:
  */
 /** Descriptive text for the inline-commands-prefix option */
-#define INLINE_COMMANDS_PREFIX_DESC      (gnutls_cli_opt_strs+3896)
+#define INLINE_COMMANDS_PREFIX_DESC      (gnutls_cli_opt_strs+4012)
 /** Upper-cased name for the inline-commands-prefix option */
-#define INLINE_COMMANDS_PREFIX_NAME      (gnutls_cli_opt_strs+3946)
+#define INLINE_COMMANDS_PREFIX_NAME      (gnutls_cli_opt_strs+4062)
 /** Name string for the inline-commands-prefix option */
-#define INLINE_COMMANDS_PREFIX_name      (gnutls_cli_opt_strs+3969)
+#define INLINE_COMMANDS_PREFIX_name      (gnutls_cli_opt_strs+4085)
 /** Compiled in flag settings for the inline-commands-prefix option */
 #define INLINE_COMMANDS_PREFIX_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -966,11 +982,11 @@ static int const aListCantList[] = {
  *  provider option description:
  */
 /** Descriptive text for the provider option */
-#define PROVIDER_DESC      (gnutls_cli_opt_strs+3992)
+#define PROVIDER_DESC      (gnutls_cli_opt_strs+4108)
 /** Upper-cased name for the provider option */
-#define PROVIDER_NAME      (gnutls_cli_opt_strs+4030)
+#define PROVIDER_NAME      (gnutls_cli_opt_strs+4146)
 /** Name string for the provider option */
-#define PROVIDER_name      (gnutls_cli_opt_strs+4039)
+#define PROVIDER_name      (gnutls_cli_opt_strs+4155)
 /** Compiled in flag settings for the provider option */
 #define PROVIDER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -979,22 +995,22 @@ static int const aListCantList[] = {
  *  fips140-mode option description:
  */
 /** Descriptive text for the fips140-mode option */
-#define FIPS140_MODE_DESC      (gnutls_cli_opt_strs+4048)
+#define FIPS140_MODE_DESC      (gnutls_cli_opt_strs+4164)
 /** Upper-cased name for the fips140-mode option */
-#define FIPS140_MODE_NAME      (gnutls_cli_opt_strs+4107)
+#define FIPS140_MODE_NAME      (gnutls_cli_opt_strs+4223)
 /** Name string for the fips140-mode option */
-#define FIPS140_MODE_name      (gnutls_cli_opt_strs+4120)
+#define FIPS140_MODE_name      (gnutls_cli_opt_strs+4236)
 /** Compiled in flag settings for the fips140-mode option */
 #define FIPS140_MODE_FLAGS     (OPTST_DISABLED)
 
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (gnutls_cli_opt_strs+4133)
-#define HELP_name       (gnutls_cli_opt_strs+4177)
+#define HELP_DESC       (gnutls_cli_opt_strs+4249)
+#define HELP_name       (gnutls_cli_opt_strs+4293)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (gnutls_cli_opt_strs+4182)
-#define MORE_HELP_name  (gnutls_cli_opt_strs+4227)
+#define MORE_HELP_DESC  (gnutls_cli_opt_strs+4298)
+#define MORE_HELP_name  (gnutls_cli_opt_strs+4343)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -1007,8 +1023,8 @@ static int const aListCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (gnutls_cli_opt_strs+4237)
-#define VER_name        (gnutls_cli_opt_strs+4273)
+#define VER_DESC        (gnutls_cli_opt_strs+4353)
+#define VER_name        (gnutls_cli_opt_strs+4389)
 /**
  *  Declare option callback procedures
  */
@@ -1150,8 +1166,20 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ REHANDSHAKE_DESC, REHANDSHAKE_NAME, REHANDSHAKE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 10, VALUE_OPT_STARTTLS,
-     /* equiv idx, value */ 10, VALUE_OPT_STARTTLS,
+  {  /* entry idx, value */ 10, VALUE_OPT_SNI_HOSTNAME,
+     /* equiv idx, value */ 10, VALUE_OPT_SNI_HOSTNAME,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ SNI_HOSTNAME_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --sni-hostname */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ SNI_HOSTNAME_DESC, SNI_HOSTNAME_NAME, SNI_HOSTNAME_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 11, VALUE_OPT_STARTTLS,
+     /* equiv idx, value */ 11, VALUE_OPT_STARTTLS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ STARTTLS_FLAGS, 0,
@@ -1162,8 +1190,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ STARTTLS_DESC, STARTTLS_NAME, STARTTLS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 11, VALUE_OPT_APP_PROTO,
-     /* equiv idx, value */ 11, VALUE_OPT_APP_PROTO,
+  {  /* entry idx, value */ 12, VALUE_OPT_APP_PROTO,
+     /* equiv idx, value */ 12, VALUE_OPT_APP_PROTO,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ APP_PROTO_FLAGS, 0,
@@ -1174,8 +1202,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ APP_PROTO_DESC, APP_PROTO_NAME, APP_PROTO_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 12, VALUE_OPT_STARTTLS_PROTO,
-     /* equiv idx, value */ 12, VALUE_OPT_STARTTLS_PROTO,
+  {  /* entry idx, value */ 13, VALUE_OPT_STARTTLS_PROTO,
+     /* equiv idx, value */ 13, VALUE_OPT_STARTTLS_PROTO,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ STARTTLS_PROTO_FLAGS, 0,
@@ -1186,8 +1214,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ STARTTLS_PROTO_DESC, STARTTLS_PROTO_NAME, STARTTLS_PROTO_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 13, VALUE_OPT_UDP,
-     /* equiv idx, value */ 13, VALUE_OPT_UDP,
+  {  /* entry idx, value */ 14, VALUE_OPT_UDP,
+     /* equiv idx, value */ 14, VALUE_OPT_UDP,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ UDP_FLAGS, 0,
@@ -1198,8 +1226,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ UDP_DESC, UDP_NAME, UDP_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 14, VALUE_OPT_MTU,
-     /* equiv idx, value */ 14, VALUE_OPT_MTU,
+  {  /* entry idx, value */ 15, VALUE_OPT_MTU,
+     /* equiv idx, value */ 15, VALUE_OPT_MTU,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MTU_FLAGS, 0,
@@ -1210,8 +1238,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MTU_DESC, MTU_NAME, MTU_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 15, VALUE_OPT_CRLF,
-     /* equiv idx, value */ 15, VALUE_OPT_CRLF,
+  {  /* entry idx, value */ 16, VALUE_OPT_CRLF,
+     /* equiv idx, value */ 16, VALUE_OPT_CRLF,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ CRLF_FLAGS, 0,
@@ -1222,8 +1250,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ CRLF_DESC, CRLF_NAME, CRLF_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 16, VALUE_OPT_FASTOPEN,
-     /* equiv idx, value */ 16, VALUE_OPT_FASTOPEN,
+  {  /* entry idx, value */ 17, VALUE_OPT_FASTOPEN,
+     /* equiv idx, value */ 17, VALUE_OPT_FASTOPEN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ FASTOPEN_FLAGS, 0,
@@ -1234,8 +1262,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ FASTOPEN_DESC, FASTOPEN_NAME, FASTOPEN_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 17, VALUE_OPT_X509FMTDER,
-     /* equiv idx, value */ 17, VALUE_OPT_X509FMTDER,
+  {  /* entry idx, value */ 18, VALUE_OPT_X509FMTDER,
+     /* equiv idx, value */ 18, VALUE_OPT_X509FMTDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ X509FMTDER_FLAGS, 0,
@@ -1246,8 +1274,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ X509FMTDER_DESC, X509FMTDER_NAME, X509FMTDER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 18, VALUE_OPT_FINGERPRINT,
-     /* equiv idx, value */ 18, VALUE_OPT_FINGERPRINT,
+  {  /* entry idx, value */ 19, VALUE_OPT_FINGERPRINT,
+     /* equiv idx, value */ 19, VALUE_OPT_FINGERPRINT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ FINGERPRINT_FLAGS, 0,
@@ -1258,8 +1286,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ FINGERPRINT_DESC, FINGERPRINT_NAME, FINGERPRINT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 19, VALUE_OPT_PRINT_CERT,
-     /* equiv idx, value */ 19, VALUE_OPT_PRINT_CERT,
+  {  /* entry idx, value */ 20, VALUE_OPT_PRINT_CERT,
+     /* equiv idx, value */ 20, VALUE_OPT_PRINT_CERT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PRINT_CERT_FLAGS, 0,
@@ -1270,8 +1298,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PRINT_CERT_DESC, PRINT_CERT_NAME, PRINT_CERT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 20, VALUE_OPT_SAVE_CERT,
-     /* equiv idx, value */ 20, VALUE_OPT_SAVE_CERT,
+  {  /* entry idx, value */ 21, VALUE_OPT_SAVE_CERT,
+     /* equiv idx, value */ 21, VALUE_OPT_SAVE_CERT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SAVE_CERT_FLAGS, 0,
@@ -1282,8 +1310,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SAVE_CERT_DESC, SAVE_CERT_NAME, SAVE_CERT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 21, VALUE_OPT_SAVE_OCSP,
-     /* equiv idx, value */ 21, VALUE_OPT_SAVE_OCSP,
+  {  /* entry idx, value */ 22, VALUE_OPT_SAVE_OCSP,
+     /* equiv idx, value */ 22, VALUE_OPT_SAVE_OCSP,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SAVE_OCSP_FLAGS, 0,
@@ -1294,8 +1322,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SAVE_OCSP_DESC, SAVE_OCSP_NAME, SAVE_OCSP_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 22, VALUE_OPT_DH_BITS,
-     /* equiv idx, value */ 22, VALUE_OPT_DH_BITS,
+  {  /* entry idx, value */ 23, VALUE_OPT_DH_BITS,
+     /* equiv idx, value */ 23, VALUE_OPT_DH_BITS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DH_BITS_FLAGS, 0,
@@ -1306,8 +1334,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DH_BITS_DESC, DH_BITS_NAME, DH_BITS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 23, VALUE_OPT_PRIORITY,
-     /* equiv idx, value */ 23, VALUE_OPT_PRIORITY,
+  {  /* entry idx, value */ 24, VALUE_OPT_PRIORITY,
+     /* equiv idx, value */ 24, VALUE_OPT_PRIORITY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PRIORITY_FLAGS, 0,
@@ -1318,8 +1346,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PRIORITY_DESC, PRIORITY_NAME, PRIORITY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 24, VALUE_OPT_X509CAFILE,
-     /* equiv idx, value */ 24, VALUE_OPT_X509CAFILE,
+  {  /* entry idx, value */ 25, VALUE_OPT_X509CAFILE,
+     /* equiv idx, value */ 25, VALUE_OPT_X509CAFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ X509CAFILE_FLAGS, 0,
@@ -1330,8 +1358,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ X509CAFILE_DESC, X509CAFILE_NAME, X509CAFILE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 25, VALUE_OPT_X509CRLFILE,
-     /* equiv idx, value */ 25, VALUE_OPT_X509CRLFILE,
+  {  /* entry idx, value */ 26, VALUE_OPT_X509CRLFILE,
+     /* equiv idx, value */ 26, VALUE_OPT_X509CRLFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ X509CRLFILE_FLAGS, 0,
@@ -1342,8 +1370,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ X509CRLFILE_DESC, X509CRLFILE_NAME, X509CRLFILE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 26, VALUE_OPT_PGPKEYFILE,
-     /* equiv idx, value */ 26, VALUE_OPT_PGPKEYFILE,
+  {  /* entry idx, value */ 27, VALUE_OPT_PGPKEYFILE,
+     /* equiv idx, value */ 27, VALUE_OPT_PGPKEYFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PGPKEYFILE_FLAGS, 0,
@@ -1354,8 +1382,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PGPKEYFILE_DESC, PGPKEYFILE_NAME, PGPKEYFILE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 27, VALUE_OPT_PGPKEYRING,
-     /* equiv idx, value */ 27, VALUE_OPT_PGPKEYRING,
+  {  /* entry idx, value */ 28, VALUE_OPT_PGPKEYRING,
+     /* equiv idx, value */ 28, VALUE_OPT_PGPKEYRING,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PGPKEYRING_FLAGS, 0,
@@ -1366,8 +1394,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PGPKEYRING_DESC, PGPKEYRING_NAME, PGPKEYRING_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 28, VALUE_OPT_PGPCERTFILE,
-     /* equiv idx, value */ 28, VALUE_OPT_PGPCERTFILE,
+  {  /* entry idx, value */ 29, VALUE_OPT_PGPCERTFILE,
+     /* equiv idx, value */ 29, VALUE_OPT_PGPCERTFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PGPCERTFILE_FLAGS, 0,
@@ -1378,8 +1406,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PGPCERTFILE_DESC, PGPCERTFILE_NAME, PGPCERTFILE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 29, VALUE_OPT_X509KEYFILE,
-     /* equiv idx, value */ 29, VALUE_OPT_X509KEYFILE,
+  {  /* entry idx, value */ 30, VALUE_OPT_X509KEYFILE,
+     /* equiv idx, value */ 30, VALUE_OPT_X509KEYFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ X509KEYFILE_FLAGS, 0,
@@ -1390,8 +1418,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ X509KEYFILE_DESC, X509KEYFILE_NAME, X509KEYFILE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 30, VALUE_OPT_X509CERTFILE,
-     /* equiv idx, value */ 30, VALUE_OPT_X509CERTFILE,
+  {  /* entry idx, value */ 31, VALUE_OPT_X509CERTFILE,
+     /* equiv idx, value */ 31, VALUE_OPT_X509CERTFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ X509CERTFILE_FLAGS, 0,
@@ -1402,8 +1430,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ X509CERTFILE_DESC, X509CERTFILE_NAME, X509CERTFILE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 31, VALUE_OPT_PGPSUBKEY,
-     /* equiv idx, value */ 31, VALUE_OPT_PGPSUBKEY,
+  {  /* entry idx, value */ 32, VALUE_OPT_PGPSUBKEY,
+     /* equiv idx, value */ 32, VALUE_OPT_PGPSUBKEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PGPSUBKEY_FLAGS, 0,
@@ -1414,8 +1442,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PGPSUBKEY_DESC, PGPSUBKEY_NAME, PGPSUBKEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 32, VALUE_OPT_SRPUSERNAME,
-     /* equiv idx, value */ 32, VALUE_OPT_SRPUSERNAME,
+  {  /* entry idx, value */ 33, VALUE_OPT_SRPUSERNAME,
+     /* equiv idx, value */ 33, VALUE_OPT_SRPUSERNAME,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SRPUSERNAME_FLAGS, 0,
@@ -1426,8 +1454,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SRPUSERNAME_DESC, SRPUSERNAME_NAME, SRPUSERNAME_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 33, VALUE_OPT_SRPPASSWD,
-     /* equiv idx, value */ 33, VALUE_OPT_SRPPASSWD,
+  {  /* entry idx, value */ 34, VALUE_OPT_SRPPASSWD,
+     /* equiv idx, value */ 34, VALUE_OPT_SRPPASSWD,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SRPPASSWD_FLAGS, 0,
@@ -1438,8 +1466,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SRPPASSWD_DESC, SRPPASSWD_NAME, SRPPASSWD_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 34, VALUE_OPT_PSKUSERNAME,
-     /* equiv idx, value */ 34, VALUE_OPT_PSKUSERNAME,
+  {  /* entry idx, value */ 35, VALUE_OPT_PSKUSERNAME,
+     /* equiv idx, value */ 35, VALUE_OPT_PSKUSERNAME,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PSKUSERNAME_FLAGS, 0,
@@ -1450,8 +1478,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PSKUSERNAME_DESC, PSKUSERNAME_NAME, PSKUSERNAME_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 35, VALUE_OPT_PSKKEY,
-     /* equiv idx, value */ 35, VALUE_OPT_PSKKEY,
+  {  /* entry idx, value */ 36, VALUE_OPT_PSKKEY,
+     /* equiv idx, value */ 36, VALUE_OPT_PSKKEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PSKKEY_FLAGS, 0,
@@ -1462,8 +1490,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PSKKEY_DESC, PSKKEY_NAME, PSKKEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 36, VALUE_OPT_PORT,
-     /* equiv idx, value */ 36, VALUE_OPT_PORT,
+  {  /* entry idx, value */ 37, VALUE_OPT_PORT,
+     /* equiv idx, value */ 37, VALUE_OPT_PORT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PORT_FLAGS, 0,
@@ -1474,8 +1502,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PORT_DESC, PORT_NAME, PORT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 37, VALUE_OPT_INSECURE,
-     /* equiv idx, value */ 37, VALUE_OPT_INSECURE,
+  {  /* entry idx, value */ 38, VALUE_OPT_INSECURE,
+     /* equiv idx, value */ 38, VALUE_OPT_INSECURE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INSECURE_FLAGS, 0,
@@ -1486,8 +1514,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INSECURE_DESC, INSECURE_NAME, INSECURE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 38, VALUE_OPT_RANGES,
-     /* equiv idx, value */ 38, VALUE_OPT_RANGES,
+  {  /* entry idx, value */ 39, VALUE_OPT_RANGES,
+     /* equiv idx, value */ 39, VALUE_OPT_RANGES,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ RANGES_FLAGS, 0,
@@ -1498,8 +1526,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ RANGES_DESC, RANGES_NAME, RANGES_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 39, VALUE_OPT_BENCHMARK_CIPHERS,
-     /* equiv idx, value */ 39, VALUE_OPT_BENCHMARK_CIPHERS,
+  {  /* entry idx, value */ 40, VALUE_OPT_BENCHMARK_CIPHERS,
+     /* equiv idx, value */ 40, VALUE_OPT_BENCHMARK_CIPHERS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ BENCHMARK_CIPHERS_FLAGS, 0,
@@ -1510,8 +1538,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ BENCHMARK_CIPHERS_DESC, BENCHMARK_CIPHERS_NAME, BENCHMARK_CIPHERS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 40, VALUE_OPT_BENCHMARK_TLS_KX,
-     /* equiv idx, value */ 40, VALUE_OPT_BENCHMARK_TLS_KX,
+  {  /* entry idx, value */ 41, VALUE_OPT_BENCHMARK_TLS_KX,
+     /* equiv idx, value */ 41, VALUE_OPT_BENCHMARK_TLS_KX,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ BENCHMARK_TLS_KX_FLAGS, 0,
@@ -1522,8 +1550,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ BENCHMARK_TLS_KX_DESC, BENCHMARK_TLS_KX_NAME, BENCHMARK_TLS_KX_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 41, VALUE_OPT_BENCHMARK_TLS_CIPHERS,
-     /* equiv idx, value */ 41, VALUE_OPT_BENCHMARK_TLS_CIPHERS,
+  {  /* entry idx, value */ 42, VALUE_OPT_BENCHMARK_TLS_CIPHERS,
+     /* equiv idx, value */ 42, VALUE_OPT_BENCHMARK_TLS_CIPHERS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ BENCHMARK_TLS_CIPHERS_FLAGS, 0,
@@ -1534,8 +1562,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ BENCHMARK_TLS_CIPHERS_DESC, BENCHMARK_TLS_CIPHERS_NAME, BENCHMARK_TLS_CIPHERS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 42, VALUE_OPT_LIST,
-     /* equiv idx, value */ 42, VALUE_OPT_LIST,
+  {  /* entry idx, value */ 43, VALUE_OPT_LIST,
+     /* equiv idx, value */ 43, VALUE_OPT_LIST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LIST_FLAGS, 0,
@@ -1546,8 +1574,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LIST_DESC, LIST_NAME, LIST_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 43, VALUE_OPT_PRIORITY_LIST,
-     /* equiv idx, value */ 43, VALUE_OPT_PRIORITY_LIST,
+  {  /* entry idx, value */ 44, VALUE_OPT_PRIORITY_LIST,
+     /* equiv idx, value */ 44, VALUE_OPT_PRIORITY_LIST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PRIORITY_LIST_FLAGS, 0,
@@ -1558,8 +1586,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PRIORITY_LIST_DESC, PRIORITY_LIST_NAME, PRIORITY_LIST_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 44, VALUE_OPT_NOTICKET,
-     /* equiv idx, value */ 44, VALUE_OPT_NOTICKET,
+  {  /* entry idx, value */ 45, VALUE_OPT_NOTICKET,
+     /* equiv idx, value */ 45, VALUE_OPT_NOTICKET,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ NOTICKET_FLAGS, 0,
@@ -1570,8 +1598,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ NOTICKET_DESC, NOTICKET_NAME, NOTICKET_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 45, VALUE_OPT_SRTP_PROFILES,
-     /* equiv idx, value */ 45, VALUE_OPT_SRTP_PROFILES,
+  {  /* entry idx, value */ 46, VALUE_OPT_SRTP_PROFILES,
+     /* equiv idx, value */ 46, VALUE_OPT_SRTP_PROFILES,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SRTP_PROFILES_FLAGS, 0,
@@ -1582,8 +1610,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SRTP_PROFILES_DESC, SRTP_PROFILES_NAME, SRTP_PROFILES_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 46, VALUE_OPT_ALPN,
-     /* equiv idx, value */ 46, VALUE_OPT_ALPN,
+  {  /* entry idx, value */ 47, VALUE_OPT_ALPN,
+     /* equiv idx, value */ 47, VALUE_OPT_ALPN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ ALPN_FLAGS, 0,
@@ -1594,8 +1622,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ALPN_DESC, ALPN_NAME, ALPN_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 47, VALUE_OPT_HEARTBEAT,
-     /* equiv idx, value */ 47, VALUE_OPT_HEARTBEAT,
+  {  /* entry idx, value */ 48, VALUE_OPT_HEARTBEAT,
+     /* equiv idx, value */ 48, VALUE_OPT_HEARTBEAT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ HEARTBEAT_FLAGS, 0,
@@ -1606,8 +1634,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ HEARTBEAT_DESC, HEARTBEAT_NAME, HEARTBEAT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 48, VALUE_OPT_RECORDSIZE,
-     /* equiv idx, value */ 48, VALUE_OPT_RECORDSIZE,
+  {  /* entry idx, value */ 49, VALUE_OPT_RECORDSIZE,
+     /* equiv idx, value */ 49, VALUE_OPT_RECORDSIZE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ RECORDSIZE_FLAGS, 0,
@@ -1618,8 +1646,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ RECORDSIZE_DESC, RECORDSIZE_NAME, RECORDSIZE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 49, VALUE_OPT_DISABLE_SNI,
-     /* equiv idx, value */ 49, VALUE_OPT_DISABLE_SNI,
+  {  /* entry idx, value */ 50, VALUE_OPT_DISABLE_SNI,
+     /* equiv idx, value */ 50, VALUE_OPT_DISABLE_SNI,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DISABLE_SNI_FLAGS, 0,
@@ -1630,8 +1658,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DISABLE_SNI_DESC, DISABLE_SNI_NAME, DISABLE_SNI_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 50, VALUE_OPT_DISABLE_EXTENSIONS,
-     /* equiv idx, value */ 50, VALUE_OPT_DISABLE_EXTENSIONS,
+  {  /* entry idx, value */ 51, VALUE_OPT_DISABLE_EXTENSIONS,
+     /* equiv idx, value */ 51, VALUE_OPT_DISABLE_EXTENSIONS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DISABLE_EXTENSIONS_FLAGS, 0,
@@ -1642,8 +1670,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DISABLE_EXTENSIONS_DESC, DISABLE_EXTENSIONS_NAME, DISABLE_EXTENSIONS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 51, VALUE_OPT_INLINE_COMMANDS,
-     /* equiv idx, value */ 51, VALUE_OPT_INLINE_COMMANDS,
+  {  /* entry idx, value */ 52, VALUE_OPT_INLINE_COMMANDS,
+     /* equiv idx, value */ 52, VALUE_OPT_INLINE_COMMANDS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INLINE_COMMANDS_FLAGS, 0,
@@ -1654,8 +1682,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INLINE_COMMANDS_DESC, INLINE_COMMANDS_NAME, INLINE_COMMANDS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 52, VALUE_OPT_INLINE_COMMANDS_PREFIX,
-     /* equiv idx, value */ 52, VALUE_OPT_INLINE_COMMANDS_PREFIX,
+  {  /* entry idx, value */ 53, VALUE_OPT_INLINE_COMMANDS_PREFIX,
+     /* equiv idx, value */ 53, VALUE_OPT_INLINE_COMMANDS_PREFIX,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INLINE_COMMANDS_PREFIX_FLAGS, 0,
@@ -1666,8 +1694,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INLINE_COMMANDS_PREFIX_DESC, INLINE_COMMANDS_PREFIX_NAME, INLINE_COMMANDS_PREFIX_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 53, VALUE_OPT_PROVIDER,
-     /* equiv idx, value */ 53, VALUE_OPT_PROVIDER,
+  {  /* entry idx, value */ 54, VALUE_OPT_PROVIDER,
+     /* equiv idx, value */ 54, VALUE_OPT_PROVIDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PROVIDER_FLAGS, 0,
@@ -1678,8 +1706,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PROVIDER_DESC, PROVIDER_NAME, PROVIDER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 54, VALUE_OPT_FIPS140_MODE,
-     /* equiv idx, value */ 54, VALUE_OPT_FIPS140_MODE,
+  {  /* entry idx, value */ 55, VALUE_OPT_FIPS140_MODE,
+     /* equiv idx, value */ 55, VALUE_OPT_FIPS140_MODE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ FIPS140_MODE_FLAGS, 0,
@@ -1732,21 +1760,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of gnutls-cli. */
-#define zPROGNAME       (gnutls_cli_opt_strs+4281)
+#define zPROGNAME       (gnutls_cli_opt_strs+4397)
 /** Reference to the title line for gnutls-cli usage. */
-#define zUsageTitle     (gnutls_cli_opt_strs+4292)
+#define zUsageTitle     (gnutls_cli_opt_strs+4408)
 /** There is no gnutls-cli configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for gnutls-cli config files. */
 #define apzHomeList     NULL
 /** The gnutls-cli program bug email address. */
-#define zBugsAddr       (gnutls_cli_opt_strs+4388)
+#define zBugsAddr       (gnutls_cli_opt_strs+4504)
 /** Clarification/explanation of what gnutls-cli does. */
-#define zExplain        (gnutls_cli_opt_strs+4408)
+#define zExplain        (gnutls_cli_opt_strs+4524)
 /** Extra detail explaining what gnutls-cli does. */
-#define zDetail         (gnutls_cli_opt_strs+4410)
+#define zDetail         (gnutls_cli_opt_strs+4526)
 /** The full version string for gnutls-cli. */
-#define zFullVersion    (gnutls_cli_opt_strs+4593)
+#define zFullVersion    (gnutls_cli_opt_strs+4709)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -1758,7 +1786,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define gnutls_cli_full_usage (NULL)
-#define gnutls_cli_short_usage (gnutls_cli_opt_strs+4614)
+#define gnutls_cli_short_usage (gnutls_cli_opt_strs+4730)
 
 #endif /* not defined __doxygen__ */
 
@@ -2089,7 +2117,7 @@ tOptions gnutls_cliOptions = {
       NO_EQUIVALENT, /* '-#' option index */
       NO_EQUIVALENT /* index of default opt */
     },
-    58 /* full option count */, 55 /* user option count */,
+    59 /* full option count */, 56 /* user option count */,
     gnutls_cli_full_usage, gnutls_cli_short_usage,
     NULL, NULL,
     PKGDATADIR, gnutls_cli_packager_info
@@ -2273,6 +2301,9 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
   puts(_("Establish a session and rehandshake"));
 
   /* referenced via gnutls_cliOptions.pOptDesc->pzText */
+  puts(_("Server's hostname for server name indication extension"));
+
+  /* referenced via gnutls_cliOptions.pOptDesc->pzText */
   puts(_("Connect, establish a plain session and start TLS"));
 
   /* referenced via gnutls_cliOptions.pOptDesc->pzText */
@@ -2280,7 +2311,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
 
   /* referenced via gnutls_cliOptions.pOptDesc->pzText */
   puts(_("The application protocol to be used to obtain the server's certificate\n\
-(https, ftp, smtp, imap, ldap, xmpp)"));
+(https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)"));
 
   /* referenced via gnutls_cliOptions.pOptDesc->pzText */
   puts(_("Use DTLS (datagram TLS) over UDP"));

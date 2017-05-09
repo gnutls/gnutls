@@ -63,7 +63,7 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for danetool options
  */
-static char const danetool_opt_strs[2849] =
+static char const danetool_opt_strs[2884] =
 /*     0 */ "danetool @VERSION@\n"
             "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
@@ -127,53 +127,53 @@ static char const danetool_opt_strs[2849] =
 /*  1583 */ "an alias for the 'starttls-proto' option\0"
 /*  1624 */ "app-proto\0"
 /*  1634 */ "The application protocol to be used to obtain the server's certificate\n"
-            "(https, ftp, smtp, imap, ldap, xmpp)\0"
-/*  1742 */ "STARTTLS_PROTO\0"
-/*  1757 */ "starttls-proto\0"
-/*  1772 */ "Whether the provided certificate or public key is a Certificate\n"
+            "(https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)\0"
+/*  1777 */ "STARTTLS_PROTO\0"
+/*  1792 */ "starttls-proto\0"
+/*  1807 */ "Whether the provided certificate or public key is a Certificate\n"
             "Authority\0"
-/*  1846 */ "CA\0"
-/*  1849 */ "ca\0"
-/*  1852 */ "Use the hash of the X.509 certificate, rather than the public key\0"
-/*  1918 */ "X509\0"
-/*  1923 */ "x509\0"
-/*  1928 */ "an alias for the 'domain' option\0"
-/*  1961 */ "local\0"
-/*  1967 */ "The provided certificate or public key is issued by the local domain\0"
-/*  2036 */ "DOMAIN\0"
-/*  2043 */ "no-domain\0"
-/*  2053 */ "no\0"
-/*  2056 */ "Use the local DNS server for DNSSEC resolving\0"
-/*  2102 */ "LOCAL_DNS\0"
-/*  2112 */ "no-local-dns\0"
-/*  2125 */ "Do not verify any DNSSEC signature\0"
-/*  2160 */ "INSECURE\0"
-/*  2169 */ "insecure\0"
-/*  2178 */ "Use DER format for input certificates and private keys\0"
-/*  2233 */ "INDER\0"
-/*  2239 */ "no-inder\0"
-/*  2248 */ "an alias for the 'inder' option\0"
-/*  2280 */ "inraw\0"
-/*  2286 */ "Print the received DANE data in raw format\0"
-/*  2329 */ "PRINT_RAW\0"
-/*  2339 */ "no-print-raw\0"
-/*  2352 */ "Suppress several informational messages\0"
-/*  2392 */ "QUIET\0"
-/*  2398 */ "quiet\0"
-/*  2404 */ "display extended usage information and exit\0"
-/*  2448 */ "help\0"
-/*  2453 */ "extended usage information passed thru pager\0"
-/*  2498 */ "more-help\0"
-/*  2508 */ "output version information and exit\0"
-/*  2544 */ "version\0"
-/*  2552 */ "DANETOOL\0"
-/*  2561 */ "danetool - GnuTLS DANE tool\n"
+/*  1881 */ "CA\0"
+/*  1884 */ "ca\0"
+/*  1887 */ "Use the hash of the X.509 certificate, rather than the public key\0"
+/*  1953 */ "X509\0"
+/*  1958 */ "x509\0"
+/*  1963 */ "an alias for the 'domain' option\0"
+/*  1996 */ "local\0"
+/*  2002 */ "The provided certificate or public key is issued by the local domain\0"
+/*  2071 */ "DOMAIN\0"
+/*  2078 */ "no-domain\0"
+/*  2088 */ "no\0"
+/*  2091 */ "Use the local DNS server for DNSSEC resolving\0"
+/*  2137 */ "LOCAL_DNS\0"
+/*  2147 */ "no-local-dns\0"
+/*  2160 */ "Do not verify any DNSSEC signature\0"
+/*  2195 */ "INSECURE\0"
+/*  2204 */ "insecure\0"
+/*  2213 */ "Use DER format for input certificates and private keys\0"
+/*  2268 */ "INDER\0"
+/*  2274 */ "no-inder\0"
+/*  2283 */ "an alias for the 'inder' option\0"
+/*  2315 */ "inraw\0"
+/*  2321 */ "Print the received DANE data in raw format\0"
+/*  2364 */ "PRINT_RAW\0"
+/*  2374 */ "no-print-raw\0"
+/*  2387 */ "Suppress several informational messages\0"
+/*  2427 */ "QUIET\0"
+/*  2433 */ "quiet\0"
+/*  2439 */ "display extended usage information and exit\0"
+/*  2483 */ "help\0"
+/*  2488 */ "extended usage information passed thru pager\0"
+/*  2533 */ "more-help\0"
+/*  2543 */ "output version information and exit\0"
+/*  2579 */ "version\0"
+/*  2587 */ "DANETOOL\0"
+/*  2596 */ "danetool - GnuTLS DANE tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  2647 */ "@PACKAGE_BUGREPORT@\0"
-/*  2667 */ "\n\0"
-/*  2669 */ "Tool to generate and check DNS resource records for the DANE protocol.\n\0"
-/*  2741 */ "danetool @VERSION@\0"
-/*  2760 */ "danetool --[tlsa-rr|check] [options]\n"
+/*  2682 */ "@PACKAGE_BUGREPORT@\0"
+/*  2702 */ "\n\0"
+/*  2704 */ "Tool to generate and check DNS resource records for the DANE protocol.\n\0"
+/*  2776 */ "danetool @VERSION@\0"
+/*  2795 */ "danetool --[tlsa-rr|check] [options]\n"
             "danetool --help for additional usage instructions.\n";
 
 /**
@@ -388,9 +388,9 @@ static int const aTlsa_RrMustList[] = {
 /** Descriptive text for the starttls-proto option */
 #define STARTTLS_PROTO_DESC      (danetool_opt_strs+1634)
 /** Upper-cased name for the starttls-proto option */
-#define STARTTLS_PROTO_NAME      (danetool_opt_strs+1742)
+#define STARTTLS_PROTO_NAME      (danetool_opt_strs+1777)
 /** Name string for the starttls-proto option */
-#define STARTTLS_PROTO_name      (danetool_opt_strs+1757)
+#define STARTTLS_PROTO_name      (danetool_opt_strs+1792)
 /** Compiled in flag settings for the starttls-proto option */
 #define STARTTLS_PROTO_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -399,11 +399,11 @@ static int const aTlsa_RrMustList[] = {
  *  ca option description:
  */
 /** Descriptive text for the ca option */
-#define CA_DESC      (danetool_opt_strs+1772)
+#define CA_DESC      (danetool_opt_strs+1807)
 /** Upper-cased name for the ca option */
-#define CA_NAME      (danetool_opt_strs+1846)
+#define CA_NAME      (danetool_opt_strs+1881)
 /** Name string for the ca option */
-#define CA_name      (danetool_opt_strs+1849)
+#define CA_name      (danetool_opt_strs+1884)
 /** Compiled in flag settings for the ca option */
 #define CA_FLAGS     (OPTST_DISABLED)
 
@@ -411,11 +411,11 @@ static int const aTlsa_RrMustList[] = {
  *  x509 option description:
  */
 /** Descriptive text for the x509 option */
-#define X509_DESC      (danetool_opt_strs+1852)
+#define X509_DESC      (danetool_opt_strs+1887)
 /** Upper-cased name for the x509 option */
-#define X509_NAME      (danetool_opt_strs+1918)
+#define X509_NAME      (danetool_opt_strs+1953)
 /** Name string for the x509 option */
-#define X509_name      (danetool_opt_strs+1923)
+#define X509_name      (danetool_opt_strs+1958)
 /** Compiled in flag settings for the x509 option */
 #define X509_FLAGS     (OPTST_DISABLED)
 
@@ -423,10 +423,10 @@ static int const aTlsa_RrMustList[] = {
  *  local option description:
  */
 /** Descriptive text for the local option */
-#define LOCAL_DESC    (danetool_opt_strs+1928)
+#define LOCAL_DESC    (danetool_opt_strs+1963)
 #define LOCAL_NAME    NULL
 /** Unmodified name string for the local option */
-#define LOCAL_name    (danetool_opt_strs+1961)
+#define LOCAL_name    (danetool_opt_strs+1996)
 /** Compiled in flag settings for the local option */
 #define LOCAL_FLAGS     (DOMAIN_FLAGS | OPTST_ALIAS)
 
@@ -434,13 +434,13 @@ static int const aTlsa_RrMustList[] = {
  *  domain option description:
  */
 /** Descriptive text for the domain option */
-#define DOMAIN_DESC      (danetool_opt_strs+1967)
+#define DOMAIN_DESC      (danetool_opt_strs+2002)
 /** Upper-cased name for the domain option */
-#define DOMAIN_NAME      (danetool_opt_strs+2036)
+#define DOMAIN_NAME      (danetool_opt_strs+2071)
 /** disablement name for the domain option */
-#define NOT_DOMAIN_name  (danetool_opt_strs+2043)
+#define NOT_DOMAIN_name  (danetool_opt_strs+2078)
 /** disablement prefix for the domain option */
-#define NOT_DOMAIN_PFX   (danetool_opt_strs+2053)
+#define NOT_DOMAIN_PFX   (danetool_opt_strs+2088)
 /** Name string for the domain option */
 #define DOMAIN_name      (NOT_DOMAIN_name + 3)
 /** Compiled in flag settings for the domain option */
@@ -450,13 +450,13 @@ static int const aTlsa_RrMustList[] = {
  *  local-dns option description:
  */
 /** Descriptive text for the local-dns option */
-#define LOCAL_DNS_DESC      (danetool_opt_strs+2056)
+#define LOCAL_DNS_DESC      (danetool_opt_strs+2091)
 /** Upper-cased name for the local-dns option */
-#define LOCAL_DNS_NAME      (danetool_opt_strs+2102)
+#define LOCAL_DNS_NAME      (danetool_opt_strs+2137)
 /** disablement name for the local-dns option */
-#define NOT_LOCAL_DNS_name  (danetool_opt_strs+2112)
+#define NOT_LOCAL_DNS_name  (danetool_opt_strs+2147)
 /** disablement prefix for the local-dns option */
-#define NOT_LOCAL_DNS_PFX   (danetool_opt_strs+2053)
+#define NOT_LOCAL_DNS_PFX   (danetool_opt_strs+2088)
 /** Name string for the local-dns option */
 #define LOCAL_DNS_name      (NOT_LOCAL_DNS_name + 3)
 /** Compiled in flag settings for the local-dns option */
@@ -466,11 +466,11 @@ static int const aTlsa_RrMustList[] = {
  *  insecure option description:
  */
 /** Descriptive text for the insecure option */
-#define INSECURE_DESC      (danetool_opt_strs+2125)
+#define INSECURE_DESC      (danetool_opt_strs+2160)
 /** Upper-cased name for the insecure option */
-#define INSECURE_NAME      (danetool_opt_strs+2160)
+#define INSECURE_NAME      (danetool_opt_strs+2195)
 /** Name string for the insecure option */
-#define INSECURE_name      (danetool_opt_strs+2169)
+#define INSECURE_name      (danetool_opt_strs+2204)
 /** Compiled in flag settings for the insecure option */
 #define INSECURE_FLAGS     (OPTST_DISABLED)
 
@@ -478,13 +478,13 @@ static int const aTlsa_RrMustList[] = {
  *  inder option description:
  */
 /** Descriptive text for the inder option */
-#define INDER_DESC      (danetool_opt_strs+2178)
+#define INDER_DESC      (danetool_opt_strs+2213)
 /** Upper-cased name for the inder option */
-#define INDER_NAME      (danetool_opt_strs+2233)
+#define INDER_NAME      (danetool_opt_strs+2268)
 /** disablement name for the inder option */
-#define NOT_INDER_name  (danetool_opt_strs+2239)
+#define NOT_INDER_name  (danetool_opt_strs+2274)
 /** disablement prefix for the inder option */
-#define NOT_INDER_PFX   (danetool_opt_strs+2053)
+#define NOT_INDER_PFX   (danetool_opt_strs+2088)
 /** Name string for the inder option */
 #define INDER_name      (NOT_INDER_name + 3)
 /** Compiled in flag settings for the inder option */
@@ -494,10 +494,10 @@ static int const aTlsa_RrMustList[] = {
  *  inraw option description:
  */
 /** Descriptive text for the inraw option */
-#define INRAW_DESC    (danetool_opt_strs+2248)
+#define INRAW_DESC    (danetool_opt_strs+2283)
 #define INRAW_NAME    NULL
 /** Unmodified name string for the inraw option */
-#define INRAW_name    (danetool_opt_strs+2280)
+#define INRAW_name    (danetool_opt_strs+2315)
 /** Compiled in flag settings for the inraw option */
 #define INRAW_FLAGS     (INDER_FLAGS | OPTST_ALIAS)
 
@@ -505,13 +505,13 @@ static int const aTlsa_RrMustList[] = {
  *  print-raw option description:
  */
 /** Descriptive text for the print-raw option */
-#define PRINT_RAW_DESC      (danetool_opt_strs+2286)
+#define PRINT_RAW_DESC      (danetool_opt_strs+2321)
 /** Upper-cased name for the print-raw option */
-#define PRINT_RAW_NAME      (danetool_opt_strs+2329)
+#define PRINT_RAW_NAME      (danetool_opt_strs+2364)
 /** disablement name for the print-raw option */
-#define NOT_PRINT_RAW_name  (danetool_opt_strs+2339)
+#define NOT_PRINT_RAW_name  (danetool_opt_strs+2374)
 /** disablement prefix for the print-raw option */
-#define NOT_PRINT_RAW_PFX   (danetool_opt_strs+2053)
+#define NOT_PRINT_RAW_PFX   (danetool_opt_strs+2088)
 /** Name string for the print-raw option */
 #define PRINT_RAW_name      (NOT_PRINT_RAW_name + 3)
 /** Compiled in flag settings for the print-raw option */
@@ -521,22 +521,22 @@ static int const aTlsa_RrMustList[] = {
  *  quiet option description:
  */
 /** Descriptive text for the quiet option */
-#define QUIET_DESC      (danetool_opt_strs+2352)
+#define QUIET_DESC      (danetool_opt_strs+2387)
 /** Upper-cased name for the quiet option */
-#define QUIET_NAME      (danetool_opt_strs+2392)
+#define QUIET_NAME      (danetool_opt_strs+2427)
 /** Name string for the quiet option */
-#define QUIET_name      (danetool_opt_strs+2398)
+#define QUIET_name      (danetool_opt_strs+2433)
 /** Compiled in flag settings for the quiet option */
 #define QUIET_FLAGS     (OPTST_DISABLED)
 
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (danetool_opt_strs+2404)
-#define HELP_name       (danetool_opt_strs+2448)
+#define HELP_DESC       (danetool_opt_strs+2439)
+#define HELP_name       (danetool_opt_strs+2483)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (danetool_opt_strs+2453)
-#define MORE_HELP_name  (danetool_opt_strs+2498)
+#define MORE_HELP_DESC  (danetool_opt_strs+2488)
+#define MORE_HELP_name  (danetool_opt_strs+2533)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -549,8 +549,8 @@ static int const aTlsa_RrMustList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (danetool_opt_strs+2508)
-#define VER_name        (danetool_opt_strs+2544)
+#define VER_DESC        (danetool_opt_strs+2543)
+#define VER_name        (danetool_opt_strs+2579)
 /**
  *  Declare option callback procedures
  */
@@ -937,21 +937,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of danetool. */
-#define zPROGNAME       (danetool_opt_strs+2552)
+#define zPROGNAME       (danetool_opt_strs+2587)
 /** Reference to the title line for danetool usage. */
-#define zUsageTitle     (danetool_opt_strs+2561)
+#define zUsageTitle     (danetool_opt_strs+2596)
 /** There is no danetool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for danetool config files. */
 #define apzHomeList     NULL
 /** The danetool program bug email address. */
-#define zBugsAddr       (danetool_opt_strs+2647)
+#define zBugsAddr       (danetool_opt_strs+2682)
 /** Clarification/explanation of what danetool does. */
-#define zExplain        (danetool_opt_strs+2667)
+#define zExplain        (danetool_opt_strs+2702)
 /** Extra detail explaining what danetool does. */
-#define zDetail         (danetool_opt_strs+2669)
+#define zDetail         (danetool_opt_strs+2704)
 /** The full version string for danetool. */
-#define zFullVersion    (danetool_opt_strs+2741)
+#define zFullVersion    (danetool_opt_strs+2776)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -963,7 +963,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define danetool_full_usage (NULL)
-#define danetool_short_usage (danetool_opt_strs+2760)
+#define danetool_short_usage (danetool_opt_strs+2795)
 
 #endif /* not defined __doxygen__ */
 
@@ -1363,7 +1363,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
 
   /* referenced via danetoolOptions.pOptDesc->pzText */
   puts(_("The application protocol to be used to obtain the server's certificate\n\
-(https, ftp, smtp, imap, ldap, xmpp)"));
+(https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)"));
 
   /* referenced via danetoolOptions.pOptDesc->pzText */
   puts(_("Whether the provided certificate or public key is a Certificate\n\
