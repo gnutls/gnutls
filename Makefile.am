@@ -112,15 +112,28 @@ symbol-check:
 local-code-coverage-output: code-coverage-capture
 	cat GnuTLS-$(VERSION)-coverage/index.html|grep headerCovTableEntryLo|head -1|sed 's/^.*>\([0-9]\+\.[0-9]\+\s*%\)<.*$$/ coverage lines: \1/' || true
 
-files-update:
+libopts-check:
+	@echo "*****************************************************************"
+	@echo "Checking whether included libopts matches the system's. If the"
+	@echo "check fails upgrade the included libopts."
+	@echo "*****************************************************************"
+	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
+
+files-update: libopts-check
 	make -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
 	make -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
 	make -C . symbol-check || mv symbols.last.tmp symbols.last
 	@echo "******************************************************************************************"
+	@echo "updating autogen files in src/"
+	@echo "******************************************************************************************"
+	cd $(srcdir)/src/ && for i in *-args.c *-args.h;do \
+		test -h $$i || cp $$i $$i.bak; \
+	done
+	@echo "******************************************************************************************"
 	@echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
 	@echo "******************************************************************************************"
 
-dist-hook: symbol-check abi-check
+dist-hook: libopts-check symbol-check abi-check
 	make -C doc/ compare-makefile
 	make -C doc/ compare-exported
 	make -C doc/manpages compare-makefile
@@ -142,11 +155,6 @@ dist-hook: symbol-check abi-check
 	cd $(distdir)/src/ && for i in *-args.c *-args.h;do \
 		mv $$i $$i.bak; \
 	done
-	@echo "*****************************************************************"
-	@echo "Checking whether included libopts matches the system's. If the"
-	@echo "check fails upgrade the included libopts."
-	@echo "*****************************************************************"
-	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
-.PHONY: abi-check
+.PHONY: abi-check pic-check libopts-check symbol-check
