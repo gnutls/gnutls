@@ -911,6 +911,7 @@ AC_SUBST([YEAR], $YEAR)
 for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
 	nam=$(basename $i|sed 's/.bak//g')
 	if test "$create_libopts_links" = "yes";then
+		rm -f "src/$nam.stamp"
 		rm -f "src/$nam"
 		AC_CONFIG_LINKS([src/$nam:$i])
 	fi
