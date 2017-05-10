@@ -49,7 +49,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
-	data/listings-SSL3.0-TLS1.1
+	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit \
+	p11-kit-trust-data/Example_Root_CA.pem
+
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -317,7 +319,8 @@ name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
 	-I$(top_builddir)/gl
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
+dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh \
+	p11-kit-trust.sh
 
 if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
