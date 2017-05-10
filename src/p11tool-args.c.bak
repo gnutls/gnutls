@@ -63,7 +63,7 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for p11tool options
  */
-static char const p11tool_opt_strs[5676] =
+static char const p11tool_opt_strs[5757] =
 /*     0 */ "p11tool @VERSION@\n"
             "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
@@ -256,27 +256,30 @@ static char const p11tool_opt_strs[5676] =
 /*  4560 */ "Specify the PKCS #11 provider library\0"
 /*  4598 */ "PROVIDER\0"
 /*  4607 */ "provider\0"
-/*  4616 */ "Print detailed URLs\0"
-/*  4636 */ "DETAILED_URL\0"
-/*  4649 */ "no-detailed-url\0"
-/*  4665 */ "Print a compact listing using only the URLs\0"
-/*  4709 */ "ONLY_URLS\0"
-/*  4719 */ "only-urls\0"
-/*  4729 */ "Disable all interaction with the tool\0"
-/*  4767 */ "BATCH\0"
-/*  4773 */ "batch\0"
-/*  4779 */ "display extended usage information and exit\0"
-/*  4823 */ "help\0"
-/*  4828 */ "extended usage information passed thru pager\0"
-/*  4873 */ "more-help\0"
-/*  4883 */ "output version information and exit\0"
-/*  4919 */ "version\0"
-/*  4927 */ "P11TOOL\0"
-/*  4935 */ "p11tool - GnuTLS PKCS #11 tool\n"
+/*  4616 */ "Specify parameters for the PKCS #11 provider library\0"
+/*  4669 */ "PROVIDER_OPTS\0"
+/*  4683 */ "provider-opts\0"
+/*  4697 */ "Print detailed URLs\0"
+/*  4717 */ "DETAILED_URL\0"
+/*  4730 */ "no-detailed-url\0"
+/*  4746 */ "Print a compact listing using only the URLs\0"
+/*  4790 */ "ONLY_URLS\0"
+/*  4800 */ "only-urls\0"
+/*  4810 */ "Disable all interaction with the tool\0"
+/*  4848 */ "BATCH\0"
+/*  4854 */ "batch\0"
+/*  4860 */ "display extended usage information and exit\0"
+/*  4904 */ "help\0"
+/*  4909 */ "extended usage information passed thru pager\0"
+/*  4954 */ "more-help\0"
+/*  4964 */ "output version information and exit\0"
+/*  5000 */ "version\0"
+/*  5008 */ "P11TOOL\0"
+/*  5016 */ "p11tool - GnuTLS PKCS #11 tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]... [url]\n\0"
-/*  5030 */ "@PACKAGE_BUGREPORT@\0"
-/*  5050 */ "\n\0"
-/*  5052 */ "Program that allows operations on PKCS #11 smart cards and security\n"
+/*  5111 */ "@PACKAGE_BUGREPORT@\0"
+/*  5131 */ "\n\0"
+/*  5133 */ "Program that allows operations on PKCS #11 smart cards and security\n"
             "modules.\n\n"
             "To use PKCS #11 tokens with GnuTLS the p11-kit configuration files need to\n"
             "be setup.  That is create a .module file in /etc/pkcs11/modules with the\n"
@@ -285,8 +288,8 @@ static char const p11tool_opt_strs[5676] =
             "the form 'load=/usr/lib/opensc-pkcs11.so'.\n\n"
             "You can provide the PIN to be used for the PKCS #11 operations with the\n"
             "environment variables GNUTLS_PIN and GNUTLS_SO_PIN.\n\0"
-/*  5594 */ "p11tool @VERSION@\0"
-/*  5612 */ "p11tool [options] [url]\n"
+/*  5675 */ "p11tool @VERSION@\0"
+/*  5693 */ "p11tool [options] [url]\n"
             "p11tool --help for usage instructions.\n";
 
 /**
@@ -1134,14 +1137,27 @@ static int const aMark_DistrustedCantList[] = {
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
 
 /**
+ *  provider-opts option description:
+ */
+/** Descriptive text for the provider-opts option */
+#define PROVIDER_OPTS_DESC      (p11tool_opt_strs+4616)
+/** Upper-cased name for the provider-opts option */
+#define PROVIDER_OPTS_NAME      (p11tool_opt_strs+4669)
+/** Name string for the provider-opts option */
+#define PROVIDER_OPTS_name      (p11tool_opt_strs+4683)
+/** Compiled in flag settings for the provider-opts option */
+#define PROVIDER_OPTS_FLAGS     (OPTST_DISABLED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+
+/**
  *  detailed-url option description:
  */
 /** Descriptive text for the detailed-url option */
-#define DETAILED_URL_DESC      (p11tool_opt_strs+4616)
+#define DETAILED_URL_DESC      (p11tool_opt_strs+4697)
 /** Upper-cased name for the detailed-url option */
-#define DETAILED_URL_NAME      (p11tool_opt_strs+4636)
+#define DETAILED_URL_NAME      (p11tool_opt_strs+4717)
 /** disablement name for the detailed-url option */
-#define NOT_DETAILED_URL_name  (p11tool_opt_strs+4649)
+#define NOT_DETAILED_URL_name  (p11tool_opt_strs+4730)
 /** disablement prefix for the detailed-url option */
 #define NOT_DETAILED_URL_PFX   (p11tool_opt_strs+3191)
 /** Name string for the detailed-url option */
@@ -1153,11 +1169,11 @@ static int const aMark_DistrustedCantList[] = {
  *  only-urls option description:
  */
 /** Descriptive text for the only-urls option */
-#define ONLY_URLS_DESC      (p11tool_opt_strs+4665)
+#define ONLY_URLS_DESC      (p11tool_opt_strs+4746)
 /** Upper-cased name for the only-urls option */
-#define ONLY_URLS_NAME      (p11tool_opt_strs+4709)
+#define ONLY_URLS_NAME      (p11tool_opt_strs+4790)
 /** Name string for the only-urls option */
-#define ONLY_URLS_name      (p11tool_opt_strs+4719)
+#define ONLY_URLS_name      (p11tool_opt_strs+4800)
 /** Compiled in flag settings for the only-urls option */
 #define ONLY_URLS_FLAGS     (OPTST_DISABLED)
 
@@ -1165,22 +1181,22 @@ static int const aMark_DistrustedCantList[] = {
  *  batch option description:
  */
 /** Descriptive text for the batch option */
-#define BATCH_DESC      (p11tool_opt_strs+4729)
+#define BATCH_DESC      (p11tool_opt_strs+4810)
 /** Upper-cased name for the batch option */
-#define BATCH_NAME      (p11tool_opt_strs+4767)
+#define BATCH_NAME      (p11tool_opt_strs+4848)
 /** Name string for the batch option */
-#define BATCH_name      (p11tool_opt_strs+4773)
+#define BATCH_name      (p11tool_opt_strs+4854)
 /** Compiled in flag settings for the batch option */
 #define BATCH_FLAGS     (OPTST_DISABLED)
 
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (p11tool_opt_strs+4779)
-#define HELP_name       (p11tool_opt_strs+4823)
+#define HELP_DESC       (p11tool_opt_strs+4860)
+#define HELP_name       (p11tool_opt_strs+4904)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (p11tool_opt_strs+4828)
-#define MORE_HELP_name  (p11tool_opt_strs+4873)
+#define MORE_HELP_DESC  (p11tool_opt_strs+4909)
+#define MORE_HELP_name  (p11tool_opt_strs+4954)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -1193,8 +1209,8 @@ static int const aMark_DistrustedCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (p11tool_opt_strs+4883)
-#define VER_name        (p11tool_opt_strs+4919)
+#define VER_DESC        (p11tool_opt_strs+4964)
+#define VER_name        (p11tool_opt_strs+5000)
 /**
  *  Declare option callback procedures
  */
@@ -1998,8 +2014,20 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PROVIDER_DESC, PROVIDER_NAME, PROVIDER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 65, VALUE_OPT_DETAILED_URL,
-     /* equiv idx, value */ 65, VALUE_OPT_DETAILED_URL,
+  {  /* entry idx, value */ 65, VALUE_OPT_PROVIDER_OPTS,
+     /* equiv idx, value */ 65, VALUE_OPT_PROVIDER_OPTS,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ PROVIDER_OPTS_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --provider-opts */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ PROVIDER_OPTS_DESC, PROVIDER_OPTS_NAME, PROVIDER_OPTS_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 66, VALUE_OPT_DETAILED_URL,
+     /* equiv idx, value */ 66, VALUE_OPT_DETAILED_URL,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DETAILED_URL_FLAGS, 0,
@@ -2010,8 +2038,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DETAILED_URL_DESC, DETAILED_URL_NAME, DETAILED_URL_name,
      /* disablement strs */ NOT_DETAILED_URL_name, NOT_DETAILED_URL_PFX },
 
-  {  /* entry idx, value */ 66, VALUE_OPT_ONLY_URLS,
-     /* equiv idx, value */ 66, VALUE_OPT_ONLY_URLS,
+  {  /* entry idx, value */ 67, VALUE_OPT_ONLY_URLS,
+     /* equiv idx, value */ 67, VALUE_OPT_ONLY_URLS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ ONLY_URLS_FLAGS, 0,
@@ -2022,8 +2050,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ONLY_URLS_DESC, ONLY_URLS_NAME, ONLY_URLS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 67, VALUE_OPT_BATCH,
-     /* equiv idx, value */ 67, VALUE_OPT_BATCH,
+  {  /* entry idx, value */ 68, VALUE_OPT_BATCH,
+     /* equiv idx, value */ 68, VALUE_OPT_BATCH,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ BATCH_FLAGS, 0,
@@ -2076,21 +2104,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of p11tool. */
-#define zPROGNAME       (p11tool_opt_strs+4927)
+#define zPROGNAME       (p11tool_opt_strs+5008)
 /** Reference to the title line for p11tool usage. */
-#define zUsageTitle     (p11tool_opt_strs+4935)
+#define zUsageTitle     (p11tool_opt_strs+5016)
 /** There is no p11tool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for p11tool config files. */
 #define apzHomeList     NULL
 /** The p11tool program bug email address. */
-#define zBugsAddr       (p11tool_opt_strs+5030)
+#define zBugsAddr       (p11tool_opt_strs+5111)
 /** Clarification/explanation of what p11tool does. */
-#define zExplain        (p11tool_opt_strs+5050)
+#define zExplain        (p11tool_opt_strs+5131)
 /** Extra detail explaining what p11tool does. */
-#define zDetail         (p11tool_opt_strs+5052)
+#define zDetail         (p11tool_opt_strs+5133)
 /** The full version string for p11tool. */
-#define zFullVersion    (p11tool_opt_strs+5594)
+#define zFullVersion    (p11tool_opt_strs+5675)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -2102,7 +2130,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define p11tool_full_usage (NULL)
-#define p11tool_short_usage (p11tool_opt_strs+5612)
+#define p11tool_short_usage (p11tool_opt_strs+5693)
 
 #endif /* not defined __doxygen__ */
 
@@ -2467,7 +2495,7 @@ tOptions p11toolOptions = {
       NO_EQUIVALENT, /* '-#' option index */
       NO_EQUIVALENT /* index of default opt */
     },
-    71 /* full option count */, 68 /* user option count */,
+    72 /* full option count */, 69 /* user option count */,
     p11tool_full_usage, p11tool_short_usage,
     NULL, NULL,
     PKGDATADIR, p11tool_packager_info
@@ -2815,6 +2843,9 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
 
   /* referenced via p11toolOptions.pOptDesc->pzText */
   puts(_("Specify the PKCS #11 provider library"));
+
+  /* referenced via p11toolOptions.pOptDesc->pzText */
+  puts(_("Specify parameters for the PKCS #11 provider library"));
 
   /* referenced via p11toolOptions.pOptDesc->pzText */
   puts(_("Print detailed URLs"));

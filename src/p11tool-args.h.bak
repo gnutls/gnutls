@@ -126,15 +126,16 @@ typedef enum {
     INDEX_OPT_OUTDER                        = 62,
     INDEX_OPT_OUTRAW                        = 63,
     INDEX_OPT_PROVIDER                      = 64,
-    INDEX_OPT_DETAILED_URL                  = 65,
-    INDEX_OPT_ONLY_URLS                     = 66,
-    INDEX_OPT_BATCH                         = 67,
-    INDEX_OPT_VERSION                       = 68,
-    INDEX_OPT_HELP                          = 69,
-    INDEX_OPT_MORE_HELP                     = 70
+    INDEX_OPT_PROVIDER_OPTS                 = 65,
+    INDEX_OPT_DETAILED_URL                  = 66,
+    INDEX_OPT_ONLY_URLS                     = 67,
+    INDEX_OPT_BATCH                         = 68,
+    INDEX_OPT_VERSION                       = 69,
+    INDEX_OPT_HELP                          = 70,
+    INDEX_OPT_MORE_HELP                     = 71
 } teOptIndex;
 /** count of all options for p11tool */
-#define OPTION_CT    71
+#define OPTION_CT    72
 /** p11tool version */
 #define P11TOOL_VERSION       "@VERSION@"
 /** Full p11tool version text */
@@ -255,9 +256,10 @@ typedef enum {
 #define VALUE_OPT_OUTDER         0x1038
 #define VALUE_OPT_OUTRAW         0x1039
 #define VALUE_OPT_PROVIDER       0x103A
-#define VALUE_OPT_DETAILED_URL   0x103B
-#define VALUE_OPT_ONLY_URLS      0x103C
-#define VALUE_OPT_BATCH          0x103D
+#define VALUE_OPT_PROVIDER_OPTS  0x103B
+#define VALUE_OPT_DETAILED_URL   0x103C
+#define VALUE_OPT_ONLY_URLS      0x103D
+#define VALUE_OPT_BATCH          0x103E
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
