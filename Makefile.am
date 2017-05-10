@@ -157,4 +157,4 @@ dist-hook: symbol-check abi-check
 	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
-.PHONY: abi-check abi-dump pic-check
+.PHONY: abi-check abi-dump pic-check symbol-check local-code-coverage-output files-update
