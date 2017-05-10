@@ -63,7 +63,7 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for gnutls-cli-debug options
  */
-static char const gnutls_cli_debug_opt_strs[2021] =
+static char const gnutls_cli_debug_opt_strs[2056] =
 /*     0 */ "gnutls-cli-debug @VERSION@\n"
             "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
@@ -91,28 +91,28 @@ static char const gnutls_cli_debug_opt_strs[2021] =
 /*  1016 */ "an alias for the 'starttls-proto' option\0"
 /*  1057 */ "app-proto\0"
 /*  1067 */ "The application protocol to be used to obtain the server's certificate\n"
-            "(https, ftp, smtp, imap, ldap, xmpp)\0"
-/*  1175 */ "STARTTLS_PROTO\0"
-/*  1190 */ "starttls-proto\0"
-/*  1205 */ "display extended usage information and exit\0"
-/*  1249 */ "help\0"
-/*  1254 */ "extended usage information passed thru pager\0"
-/*  1299 */ "more-help\0"
-/*  1309 */ "output version information and exit\0"
-/*  1345 */ "version\0"
-/*  1353 */ "GNUTLS_CLI_DEBUG\0"
-/*  1370 */ "gnutls-cli-debug - GnuTLS debug client\n"
+            "(https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)\0"
+/*  1210 */ "STARTTLS_PROTO\0"
+/*  1225 */ "starttls-proto\0"
+/*  1240 */ "display extended usage information and exit\0"
+/*  1284 */ "help\0"
+/*  1289 */ "extended usage information passed thru pager\0"
+/*  1334 */ "more-help\0"
+/*  1344 */ "output version information and exit\0"
+/*  1380 */ "version\0"
+/*  1388 */ "GNUTLS_CLI_DEBUG\0"
+/*  1405 */ "gnutls-cli-debug - GnuTLS debug client\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \n\0"
-/*  1468 */ "@PACKAGE_BUGREPORT@\0"
-/*  1488 */ "\n\0"
-/*  1490 */ "TLS debug client.  It sets up multiple TLS connections to a server and\n"
+/*  1503 */ "@PACKAGE_BUGREPORT@\0"
+/*  1523 */ "\n\0"
+/*  1525 */ "TLS debug client.  It sets up multiple TLS connections to a server and\n"
             "queries its capabilities.  It was created to assist in debugging GnuTLS,\n"
             "but it might be useful to extract a TLS server's capabilities.  It connects\n"
             "to a TLS server, performs tests and print the server's capabilities.  If\n"
             "called with the `-v' parameter more checks will be performed.  Can be used\n"
             "to check for servers with special needs or bugs.\n\0"
-/*  1908 */ "gnutls-cli-debug @VERSION@\0"
-/*  1935 */ "Usage: gnutls-cli-debug [options] hostname\n"
+/*  1943 */ "gnutls-cli-debug @VERSION@\0"
+/*  1970 */ "Usage: gnutls-cli-debug [options] hostname\n"
             "gnutls-cli --help for usage instructions.\n";
 
 /**
@@ -170,9 +170,9 @@ static char const gnutls_cli_debug_opt_strs[2021] =
 /** Descriptive text for the starttls-proto option */
 #define STARTTLS_PROTO_DESC      (gnutls_cli_debug_opt_strs+1067)
 /** Upper-cased name for the starttls-proto option */
-#define STARTTLS_PROTO_NAME      (gnutls_cli_debug_opt_strs+1175)
+#define STARTTLS_PROTO_NAME      (gnutls_cli_debug_opt_strs+1210)
 /** Name string for the starttls-proto option */
-#define STARTTLS_PROTO_name      (gnutls_cli_debug_opt_strs+1190)
+#define STARTTLS_PROTO_name      (gnutls_cli_debug_opt_strs+1225)
 /** Compiled in flag settings for the starttls-proto option */
 #define STARTTLS_PROTO_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -180,11 +180,11 @@ static char const gnutls_cli_debug_opt_strs[2021] =
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (gnutls_cli_debug_opt_strs+1205)
-#define HELP_name       (gnutls_cli_debug_opt_strs+1249)
+#define HELP_DESC       (gnutls_cli_debug_opt_strs+1240)
+#define HELP_name       (gnutls_cli_debug_opt_strs+1284)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (gnutls_cli_debug_opt_strs+1254)
-#define MORE_HELP_name  (gnutls_cli_debug_opt_strs+1299)
+#define MORE_HELP_DESC  (gnutls_cli_debug_opt_strs+1289)
+#define MORE_HELP_name  (gnutls_cli_debug_opt_strs+1334)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -197,8 +197,8 @@ static char const gnutls_cli_debug_opt_strs[2021] =
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (gnutls_cli_debug_opt_strs+1309)
-#define VER_name        (gnutls_cli_debug_opt_strs+1345)
+#define VER_DESC        (gnutls_cli_debug_opt_strs+1344)
+#define VER_name        (gnutls_cli_debug_opt_strs+1380)
 /**
  *  Declare option callback procedures
  */
@@ -320,21 +320,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of gnutls-cli-debug. */
-#define zPROGNAME       (gnutls_cli_debug_opt_strs+1353)
+#define zPROGNAME       (gnutls_cli_debug_opt_strs+1388)
 /** Reference to the title line for gnutls-cli-debug usage. */
-#define zUsageTitle     (gnutls_cli_debug_opt_strs+1370)
+#define zUsageTitle     (gnutls_cli_debug_opt_strs+1405)
 /** There is no gnutls-cli-debug configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for gnutls-cli-debug config files. */
 #define apzHomeList     NULL
 /** The gnutls-cli-debug program bug email address. */
-#define zBugsAddr       (gnutls_cli_debug_opt_strs+1468)
+#define zBugsAddr       (gnutls_cli_debug_opt_strs+1503)
 /** Clarification/explanation of what gnutls-cli-debug does. */
-#define zExplain        (gnutls_cli_debug_opt_strs+1488)
+#define zExplain        (gnutls_cli_debug_opt_strs+1523)
 /** Extra detail explaining what gnutls-cli-debug does. */
-#define zDetail         (gnutls_cli_debug_opt_strs+1490)
+#define zDetail         (gnutls_cli_debug_opt_strs+1525)
 /** The full version string for gnutls-cli-debug. */
-#define zFullVersion    (gnutls_cli_debug_opt_strs+1908)
+#define zFullVersion    (gnutls_cli_debug_opt_strs+1943)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -346,7 +346,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define gnutls_cli_debug_full_usage (NULL)
-#define gnutls_cli_debug_short_usage (gnutls_cli_debug_opt_strs+1935)
+#define gnutls_cli_debug_short_usage (gnutls_cli_debug_opt_strs+1970)
 
 #endif /* not defined __doxygen__ */
 
@@ -689,7 +689,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
 
   /* referenced via gnutls_cli_debugOptions.pOptDesc->pzText */
   puts(_("The application protocol to be used to obtain the server's certificate\n\
-(https, ftp, smtp, imap, ldap, xmpp)"));
+(https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)"));
 
   /* referenced via gnutls_cli_debugOptions.pOptDesc->pzText */
   puts(_("display extended usage information and exit"));
