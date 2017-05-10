@@ -68,7 +68,7 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 {
 	int ret;
 	gnutls_datum_t new_der = {NULL, 0};
-	struct ck_attribute a[3];
+	struct ck_attribute a[2];
 	struct ck_attribute b[1];
 	unsigned long count;
 	unsigned ext_data_size = der->size;
@@ -78,7 +78,6 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 	unsigned finalize = 0;
 	ck_rv_t rv;
 	ck_object_handle_t obj;
-	ck_bool_t tfalse = 0;
 
 	if (sinfo->trusted == 0) {
 		_gnutls_debug_log("p11: cannot override extensions on a non-p11-kit trust module\n");
@@ -95,11 +94,7 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 	a[1].value = spki->data;
 	a[1].value_len = spki->size;
 
-	a[2].type = CKA_X_DISTRUSTED;
-	a[2].value = &tfalse;
-	a[2].value_len = sizeof(tfalse);
-
-	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a, 3);
+	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a, 2);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log
