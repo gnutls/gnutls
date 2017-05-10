@@ -29,6 +29,9 @@ See the end for copying conditions.
    public keys, and private keys. That is the private key printing now uses the
    same format as the rest.
 
+** gnutls-cli: introduced the --sni-hostname option. This allows overriding the
+   hostname advertised to the peer.
+
 ** API and ABI modifications:
 No changes since last version.
 
