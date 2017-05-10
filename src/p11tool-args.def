@@ -460,6 +460,14 @@ flag = {
 };
 
 flag = {
+    name      = provider-opts;
+    arg-type  = string;
+    descrip   = "Specify parameters for the PKCS #11 provider library";
+    doc      = "This is a PKCS#11 internal option used by few modules.
+    Mainly for testing PKCS#11 modules.";
+};
+
+flag = {
     name      = detailed-url;
     descrip   = "Print detailed URLs";
     disabled;

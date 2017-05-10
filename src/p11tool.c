@@ -164,6 +164,11 @@ static void cmd_parser(int argc, char **argv)
 	}
 
 	if (HAVE_OPT(PROVIDER)) {
+		const char *params = NULL;
+
+		if (HAVE_OPT(PROVIDER_OPTS))
+			params = OPT_ARG(PROVIDER_OPTS);
+
 		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
 		if (ret < 0)
 			fprintf(stderr, "pkcs11_init: %s\n",
@@ -171,7 +176,7 @@ static void cmd_parser(int argc, char **argv)
 		else {
 			ret =
 			    gnutls_pkcs11_add_provider(OPT_ARG(PROVIDER),
-						       NULL);
+						       params);
 			if (ret < 0) {
 				fprintf(stderr, "pkcs11_add_provider: %s\n",
 					gnutls_strerror(ret));
