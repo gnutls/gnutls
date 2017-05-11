@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_WIN32) || !defined(ENABLED_OPENPGP)
+#if defined(_WIN32) || !defined(ENABLE_OPENPGP)
 
 /* socketpair isn't supported on Win32. */
 int main(int argc, char **argv)
