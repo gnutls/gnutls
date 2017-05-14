@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed issue when rehandshaking without a client certificate in
    a session which initially used one. Reported by Frantisek Sumsal.
 
+** libgnutls: fix issue in RSA-PSK client callback which resulted in no username
+   being sent to the peer. Patch by Nicolas Dufresne.
+
 ** API and ABI modifications:
 No changes since last version.
 
