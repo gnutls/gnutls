@@ -51,7 +51,11 @@ check()
 	name=$1
 	echo checking $prio
 	"${CLI}" --list --priority $prio|grep -v ^Certificate|grep -v ^Ciphers|grep -v ^MACs|grep -v ^Key|grep -v Compression|grep -v ^Groups|grep -v ^Elliptic|sed -e 's/\tSSL3.0$//g' -e 's/\tTLS1.0$//g'|grep -v ^PK>$TMPFILE
-	cat ${srcdir}/data/listings-$name|sed 's/\tSSL3.0$//g' >$TMPFILE2
+	if test "${ENABLE_GOST}" = "1";then
+		cat ${srcdir}/data/listings-$name|sed -e 's/\tSSL3.0$//g' -e 's/\tTLS1.0$//g' >$TMPFILE2
+	else
+		cat ${srcdir}/data/listings-$name|sed -e 's/\tSSL3.0$//g' -e 's/\tTLS1.0$//g' | grep -v GOST >$TMPFILE2
+	fi
 	${DIFF} ${TMPFILE} ${TMPFILE2}
 	if test $? != 0;then
 		echo Error checking $prio with $name
