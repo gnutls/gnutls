@@ -694,6 +694,7 @@ typedef struct gnutls_group_entry_st {
 } gnutls_group_entry_st;
 
 #define GNUTLS_MAC_FLAG_PREIMAGE_INSECURE	1  /* if this algorithm should not be trusted for pre-image attacks */
+#define GNUTLS_MAC_FLAG_CONTINUOUS_MAC		(1 << 1) /* if this MAC should be used in a 'continuous' way in TLS */
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {
