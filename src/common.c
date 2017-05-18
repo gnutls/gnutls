@@ -660,6 +660,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 			for (i = 0; i < cb.size; i++)
 				printf("%02x", cb.data[i]);
 			printf("\n");
+			gnutls_free(cb.data);
 		}
 	}
 

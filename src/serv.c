@@ -509,7 +509,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		    gnutls_certificate_get_peers(session, &cert_list_size);
 
 		for (i = 0; i < cert_list_size; i++) {
-			gnutls_x509_crt_t cert;
+			gnutls_x509_crt_t cert = NULL;
 			gnutls_datum_t info;
 
 			if (gnutls_x509_crt_init(&cert) == 0 &&
@@ -539,6 +539,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 				crtinfo[ncrtinfo] = '\0';
 				gnutls_free(info.data);
 			}
+			gnutls_x509_crt_deinit(cert);
 		}
 	}
 
