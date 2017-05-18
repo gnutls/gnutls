@@ -70,6 +70,20 @@ int check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage, unsign
 	return 0;
 }
 
+#if ENABLE_GOST
+static void
+gost_swap_signature(gnutls_datum_t * signature)
+{
+	unsigned u;
+
+	for (u = 0; u < signature->size / 2; u ++) {
+		uint8_t t = signature->data[u];
+		signature->data[u] = signature->data[signature->size - 1 - u];
+		signature->data[signature->size - 1 - u] = t;
+	}
+}
+#endif
+
 /* Generates a signature of all the random data and the parameters.
  * Used in *DHE_* ciphersuites for TLS 1.2.
  */
@@ -525,6 +539,12 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
 
+#if ENABLE_GOST
+	/* See comment above */
+	if (IS_GOST(pk_algo))
+		gost_swap_signature(signature);
+#endif
+
 	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo,
 					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1|verify_flags,
 					 &dconcat, signature);
@@ -730,6 +750,14 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 		gnutls_assert();
 		return ret;
 	}
+
+#if ENABLE_GOST
+	/* CertificateVerify is the only place, where they got signature byte
+	 * order different from the rest of the GOST DSA usage. Invert here,
+	 * rather than hacking pk_sign/pk_verify. */
+	if (IS_GOST(pk))
+		gost_swap_signature(signature);
+#endif
 
 	return GNUTLS_SIGN_UNKNOWN;
 }
