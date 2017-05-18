@@ -250,7 +250,7 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 	    || _gnutls_mac_is_ok(mac_algo) == 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
-	if (_gnutls_version_has_selectable_prf(get_version(session))) {
+	if (_gnutls_use_cs_prf(get_version(session), cs)) {
 		if (cs->prf == GNUTLS_MAC_UNKNOWN ||
 		    _gnutls_mac_is_ok(mac_to_entry(cs->prf)) == 0)
 			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);

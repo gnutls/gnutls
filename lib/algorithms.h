@@ -58,12 +58,21 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 				  const ciphersuite_list_st *peer_clist,
 				  const gnutls_cipher_suite_entry_st **ce);
 
-inline static int
-_gnutls_version_has_selectable_prf(const version_entry_st * ver)
+inline static unsigned int
+_gnutls_use_cs_prf(const version_entry_st * ver,
+		   const gnutls_cipher_suite_entry_st *cs)
 {
-	if (unlikely(ver == NULL))
-		return 0;
-	return ver->selectable_prf;
+	unsigned int ver_prf = 0, cs_prf = 0;
+
+	if (likely(ver != NULL))
+		ver_prf = ver->selectable_prf;
+
+	if (likely(cs != NULL))
+		cs_prf = (cs->prf == GNUTLS_MAC_GOSTR_94 ||
+			  cs->prf == GNUTLS_MAC_STREEBOG_256 ||
+			  cs->prf == GNUTLS_MAC_STREEBOG_512);
+
+	return ver_prf || cs_prf;
 }
 
 inline static int
