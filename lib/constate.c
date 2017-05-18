@@ -216,6 +216,9 @@ _gnutls_init_record_state(record_parameters_st * params,
 #ifdef ENABLE_SSL3
 				       (ver->id == GNUTLS_SSL3) ? 1 : 0,
 #endif
+#ifdef ENABLE_GOST
+				       params->continuous_mac,
+#endif
 				       1 - read /*1==encrypt */ );
 	if (ret < 0 && params->cipher->id != GNUTLS_CIPHER_NULL)
 		return gnutls_assert_val(ret);
@@ -259,6 +262,9 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 	session->security_parameters.cs = cs;
 	params->cipher = cipher_algo;
 	params->mac = mac_algo;
+#ifdef ENABLE_GOST
+	params->continuous_mac = cs->flags & GNUTLS_CIPHER_SUITE_CONTINUOUS_MAC;
+#endif
 
 	return 0;
 }

@@ -463,6 +463,7 @@ typedef struct cipher_entry_st {
 	bool only_aead; /* When set, this cipher is only available through the new AEAD API */
 } cipher_entry_st;
 
+#define GNUTLS_CIPHER_SUITE_CONTINUOUS_MAC	1
 typedef struct gnutls_cipher_suite_entry_st {
 	const char *name;
 	const uint8_t id[2];
@@ -474,6 +475,7 @@ typedef struct gnutls_cipher_suite_entry_st {
 					 */
 	gnutls_protocol_t min_dtls_version;	/* DTLS min version */
 	gnutls_mac_algorithm_t prf;
+	unsigned flags;
 } gnutls_cipher_suite_entry_st;
 
 
@@ -658,6 +660,9 @@ struct record_parameters_st {
 	   under this epoch's parameters.
 	 */
 	int usage_cnt;
+#ifdef ENABLE_GOST
+	unsigned continuous_mac;
+#endif
 };
 
 typedef struct {

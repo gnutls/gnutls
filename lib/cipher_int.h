@@ -196,6 +196,9 @@ typedef struct {
 #ifdef ENABLE_SSL3
 	unsigned int ssl_hmac:1;
 #endif
+#ifdef ENABLE_GOST
+	unsigned int continuous_mac:1;
+#endif
 	unsigned int non_null:1;
 	unsigned int etm:1;
 	size_t tag_size;
@@ -210,6 +213,9 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 			     unsigned etm,
 #ifdef ENABLE_SSL3
 			     unsigned ssl_hmac,
+#endif
+#ifdef ENABLE_GOST
+			     unsigned continuous_mac,
 #endif
 			     int enc);
 
