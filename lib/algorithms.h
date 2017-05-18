@@ -338,6 +338,7 @@ int _gnutls_version_mark_disabled(const char *name);
 gnutls_protocol_t _gnutls_protocol_get_id_if_supported(const char *name);
 
 #define GNUTLS_SIGN_FLAG_TLS13_OK	1 /* if it is ok to use under TLS1.3 */
+#define GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE (1 << 1) /* reverse order of bytes in CrtVrfy signature */
 struct gnutls_sign_entry_st {
 	const char *name;
 	const char *oid;

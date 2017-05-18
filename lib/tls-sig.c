@@ -351,6 +351,34 @@ _gnutls_handshake_verify_data(gnutls_session_t session,
 /* Client certificate verify calculations
  */
 
+static void
+_gnutls_reverse_datum(gnutls_datum_t * d)
+{
+	unsigned i;
+
+	for (i = 0; i < d->size / 2; i ++) {
+		uint8_t t = d->data[i];
+		d->data[i] = d->data[d->size - 1 - i];
+		d->data[d->size - 1 - i] = t;
+	}
+}
+
+static int
+_gnutls_create_reverse(const gnutls_datum_t *src, gnutls_datum_t *dst)
+{
+	unsigned int i;
+
+	dst->size = src->size;
+	dst->data = gnutls_malloc(dst->size);
+	if (!dst->data)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	for (i = 0; i < dst->size; i++)
+		dst->data[i] = src->data[dst->size - 1 - i];
+
+	return 0;
+}
+
 /* this is _gnutls_handshake_verify_crt_vrfy for TLS 1.2
  */
 static int
@@ -363,6 +391,7 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 	int ret;
 	gnutls_datum_t dconcat;
 	const gnutls_sign_entry_st *se = _gnutls_sign_to_entry(sign_algo);
+	gnutls_datum_t sig_rev = {NULL, 0};
 
 	ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
 	if (ret < 0)
@@ -374,6 +403,12 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
+	if (se->flags & GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE) {
+		ret = _gnutls_create_reverse(signature, &sig_rev);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
 	dconcat.data = session->internals.handshake_hash_buffer.data;
 	dconcat.size = session->internals.handshake_hash_buffer_prev_len;
 
@@ -381,7 +416,9 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 	 * because we have checked whether the currently used signature
 	 * algorithm is allowed in the session. */
 	ret = gnutls_pubkey_verify_data2(cert->pubkey, sign_algo, verify_flags|GNUTLS_VERIFY_ALLOW_BROKEN,
-					 &dconcat, signature);
+					 &dconcat,
+					 sig_rev.data ? &sig_rev : signature);
+	_gnutls_free_datum(&sig_rev);
 	if (ret < 0)
 		gnutls_assert();
 
@@ -587,6 +624,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 {
 	gnutls_datum_t dconcat;
 	gnutls_sign_algorithm_t sign_algo;
+	const gnutls_sign_entry_st *se;
 	int ret;
 
 	sign_algo = _gnutls_session_get_sign_algo(session, cert, pkey, 1);
@@ -594,6 +632,10 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_UNWANTED_ALGORITHM;
 	}
+
+	se = _gnutls_sign_to_entry(sign_algo);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	gnutls_sign_algorithm_set_client(session, sign_algo);
 
@@ -612,6 +654,9 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 		gnutls_assert();
 		return ret;
 	}
+
+	if (se->flags & GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE)
+		_gnutls_reverse_datum(signature);
 
 	return sign_algo;
 }

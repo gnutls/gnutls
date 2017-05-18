@@ -353,6 +353,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_GOST_512,
 	 .pk = GNUTLS_PK_GOST_12_512,
 	 .hash = GNUTLS_DIG_STREEBOG_512,
+	 .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
 	 .aid = {{8, 65}, SIG_SEM_PRE_TLS12}},
 	/* GOST R 34.10-2012-256 */
 	{.name = "GOSTR341012-256",
@@ -360,6 +361,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_GOST_256,
 	 .pk = GNUTLS_PK_GOST_12_256,
 	 .hash = GNUTLS_DIG_STREEBOG_256,
+	 .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
 	 .aid = {{8, 64}, SIG_SEM_PRE_TLS12}},
 	/* GOST R 34.10-2001 */
 	{.name = "GOSTR341001",
@@ -367,6 +369,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_GOST_94,
 	 .pk = GNUTLS_PK_GOST_01,
 	 .hash = GNUTLS_DIG_GOSTR_94,
+	 .flags = GNUTLS_SIGN_FLAG_CRT_VRFY_REVERSE,
 	 .aid = TLS_SIGN_AID_UNKNOWN},
 	/* GOST R 34.10-94 */
 	{.name = "GOSTR341094",
