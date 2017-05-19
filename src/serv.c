@@ -70,12 +70,10 @@ const char *srp_passwd_conf = NULL;
 const char *pgp_keyring = NULL;
 const char *pgp_keyfile = NULL;
 const char *pgp_certfile = NULL;
-const char *x509_keyfile = NULL;
-const char *x509_certfile = NULL;
-const char *x509_dsakeyfile = NULL;
-const char *x509_dsacertfile = NULL;
-const char *x509_ecckeyfile = NULL;
-const char *x509_ecccertfile = NULL;
+const char **x509_keyfile = NULL;
+const char **x509_certfile = NULL;
+unsigned x509_certfile_size = 0;
+unsigned x509_keyfile_size = 0;
 const char *x509_cafile = NULL;
 const char *dh_params_file = NULL;
 const char *x509_crlfile = NULL;
@@ -1109,45 +1107,21 @@ int main(int argc, char **argv)
 	}
 #endif
 
-	if (x509_certfile != NULL && x509_keyfile != NULL) {
-		ret = gnutls_certificate_set_x509_key_file
-		    (cert_cred, x509_certfile, x509_keyfile, x509ctype);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error reading '%s' or '%s'\n",
-				x509_certfile, x509_keyfile);
-			GERR(ret);
-			exit(1);
-		} else
-			cert_set = 1;
-	}
+	if (x509_certfile_size > 0 && x509_keyfile_size > 0) {
+		unsigned i;
 
-	if (x509_dsacertfile != NULL && x509_dsakeyfile != NULL) {
-		ret = gnutls_certificate_set_x509_key_file
-		    (cert_cred, x509_dsacertfile, x509_dsakeyfile,
-		     x509ctype);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error reading '%s' or '%s'\n",
-				x509_dsacertfile, x509_dsakeyfile);
-			GERR(ret);
-			exit(1);
-		} else
-			cert_set = 1;
-	}
-
-	if (x509_ecccertfile != NULL && x509_ecckeyfile != NULL) {
-		ret = gnutls_certificate_set_x509_key_file
-		    (cert_cred, x509_ecccertfile, x509_ecckeyfile,
-		     x509ctype);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error reading '%s' or '%s'\n",
-				x509_ecccertfile, x509_ecckeyfile);
-			GERR(ret);
-			exit(1);
-		} else
-			cert_set = 1;
+		for (i = 0; i < x509_certfile_size; i++) {
+			ret = gnutls_certificate_set_x509_key_file
+			    (cert_cred, x509_certfile[i], x509_keyfile[i], x509ctype);
+			if (ret < 0) {
+				fprintf(stderr,
+						"Error reading '%s' or '%s'\n",
+						x509_certfile[i], x509_keyfile[i]);
+				GERR(ret);
+				exit(1);
+			} else
+				cert_set = 1;
+		}
 	}
 
 	if (cert_set == 0) {
@@ -1678,21 +1652,20 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(DHPARAMS))
 		dh_params_file = OPT_ARG(DHPARAMS);
 
-	if (HAVE_OPT(X509KEYFILE))
-		x509_keyfile = OPT_ARG(X509KEYFILE);
-	if (HAVE_OPT(X509CERTFILE))
-		x509_certfile = OPT_ARG(X509CERTFILE);
+	if (HAVE_OPT(X509KEYFILE)) {
+		x509_keyfile = STACKLST_OPT(X509KEYFILE);
+		x509_keyfile_size = STACKCT_OPT(X509KEYFILE);
+	}
 
-	if (HAVE_OPT(X509DSAKEYFILE))
-		x509_dsakeyfile = OPT_ARG(X509DSAKEYFILE);
-	if (HAVE_OPT(X509DSACERTFILE))
-		x509_dsacertfile = OPT_ARG(X509DSACERTFILE);
+	if (HAVE_OPT(X509CERTFILE)) {
+		x509_certfile = STACKLST_OPT(X509CERTFILE);
+		x509_certfile_size = STACKCT_OPT(X509CERTFILE);
+	}
 
-
-	if (HAVE_OPT(X509ECCKEYFILE))
-		x509_ecckeyfile = OPT_ARG(X509ECCKEYFILE);
-	if (HAVE_OPT(X509ECCCERTFILE))
-		x509_ecccertfile = OPT_ARG(X509ECCCERTFILE);
+	if (x509_certfile_size != x509_keyfile_size) {
+		fprintf(stderr, "The certificate number provided (%u) doesn't match the keys (%u)\n",
+			x509_certfile_size, x509_keyfile_size);
+	}
 
 	if (HAVE_OPT(X509CAFILE))
 		x509_cafile = OPT_ARG(X509CAFILE);

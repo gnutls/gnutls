@@ -178,42 +178,52 @@ flag = {
     name      = x509keyfile;
     arg-type  = string;
     descrip   = "X.509 key file or PKCS #11 URL to use";
-    doc      = "";
+    doc      = "Specify the private key file or URI to use; it must correspond to
+the certificate specified in --x509certfile. Multiple keys and certificates
+can be specified with this option and in that case each occurence of keyfile
+must be followed by the corresponding x509certfile or vice-versa.";
+    stack-arg;
+    max       = NOLIMIT;
 };
 
 flag = {
     name      = x509certfile;
     arg-type  = string;
     descrip   = "X.509 Certificate file or PKCS #11 URL to use";
-    doc      = "";
+    doc      = "Specify the certificate file or URI to use; it must correspond to
+the key specified in --x509keyfile. Multiple keys and certificates
+can be specified with this option and in that case each occurence of keyfile
+must be followed by the corresponding x509certfile or vice-versa.";
+    stack-arg;
+    max       = NOLIMIT;
 };
 
 flag = {
     name      = x509dsakeyfile;
-    arg-type  = string;
+    aliases   = x509keyfile;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
     name      = x509dsacertfile;
-    arg-type  = string;
+    aliases   = x509certfile;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
     name      = x509ecckeyfile;
-    arg-type  = string;
+    aliases   = x509keyfile;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
     name      = x509ecccertfile;
-    arg-type  = string;
+    aliases   = x509certfile;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
-    doc      = "";
+    deprecated;
 };
 
 flag = {
