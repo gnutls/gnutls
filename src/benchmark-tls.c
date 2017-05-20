@@ -51,10 +51,7 @@ const char *side = "";
 #define PRIO_RSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 
-#define PRIO_ARCFOUR_128_SHA1 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
-
 #define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_ARCFOUR_128_MD5 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_AES_CCM "NONE:+VERS-TLS1.2:+AES-128-CCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_CHACHA_POLY1305 "NONE:+VERS-TLS1.2:+CHACHA20-POLY1305:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-ALL"
@@ -502,8 +499,6 @@ void benchmark_tls(int debug_level, int ciphers)
 		    ("Testing throughput in cipher/MAC combinations (payload: %d bytes)\n",
 		     size);
 
-		test_ciphersuite(PRIO_ARCFOUR_128_SHA1, size);
-		test_ciphersuite(PRIO_ARCFOUR_128_MD5, size);
 		test_ciphersuite(PRIO_AES_GCM, size);
 		test_ciphersuite(PRIO_AES_CCM, size);
 		test_ciphersuite(PRIO_CHACHA_POLY1305, size);
@@ -514,8 +509,6 @@ void benchmark_tls(int debug_level, int ciphers)
 		printf
 		    ("\nTesting throughput in cipher/MAC combinations (payload: %d bytes)\n",
 		     size);
-		test_ciphersuite(PRIO_ARCFOUR_128_SHA1, size);
-		test_ciphersuite(PRIO_ARCFOUR_128_MD5, size);
 		test_ciphersuite(PRIO_AES_GCM, size);
 		test_ciphersuite(PRIO_AES_CCM, size);
 		test_ciphersuite(PRIO_CHACHA_POLY1305, size);

@@ -294,7 +294,6 @@ void benchmark_cipher(int debug_level)
 	printf("\nChecking ciphers, payload size: %u\n", size * 1024);
 	cipher_bench(GNUTLS_CIPHER_3DES_CBC, size, 0);
 	cipher_bench(GNUTLS_CIPHER_AES_128_CBC, size, 0);
-	cipher_bench(GNUTLS_CIPHER_ARCFOUR, size, 0);
 	cipher_bench(GNUTLS_CIPHER_SALSA20_256, size, 0);
 
 	gnutls_global_deinit();
