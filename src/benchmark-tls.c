@@ -505,7 +505,7 @@ void benchmark_tls(int debug_level, int ciphers)
 		test_ciphersuite(PRIO_AES_CBC_SHA1, size);
 		test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
 
-		size = 15 * 1024;
+		size = 16 * 1024;
 		printf
 		    ("\nTesting throughput in cipher/MAC combinations (payload: %d bytes)\n",
 		     size);
