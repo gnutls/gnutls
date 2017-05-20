@@ -160,6 +160,14 @@ The NDEBUG macro is not used in GnuTLS compilation, so the assert() macros
 are always active.
 
 
+# Auto-generated files:
+ Several parts of the documentation and the command line tools parameters
+files (.def) are auto-generated. Normally when introducing new functions,
+or adding new command line options to tools you need to run 'make
+files-update', review the output (when feasible) and commit it separately,
+e.g., with a message: "auto-generated files update".
+
+
 # Guile bindings:
 
  Parts of the Guile bindings, such as types (aka. "SMOBs"), enum values,
