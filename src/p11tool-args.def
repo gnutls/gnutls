@@ -465,6 +465,7 @@ flag = {
     descrip   = "Specify parameters for the PKCS #11 provider library";
     doc      = "This is a PKCS#11 internal option used by few modules.
     Mainly for testing PKCS#11 modules.";
+    deprecated;
 };
 
 flag = {
