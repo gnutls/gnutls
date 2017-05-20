@@ -53,8 +53,8 @@ static dev_t _gnutls_urandom_fd_rdev = 0;
 get_entropy_func _rnd_get_system_entropy = NULL;
 
 #if defined(__linux__)
-# ifdef HAVE_LINUX_GETRANDOM
-#  include <linux/random.h>
+# ifdef HAVE_GETRANDOM
+#  include <sys/random.h>
 # else
 #  include <sys/syscall.h>
 #  undef getrandom
