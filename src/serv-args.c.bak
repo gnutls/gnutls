@@ -63,7 +63,7 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for gnutls-serv options
  */
-static char const gnutls_serv_opt_strs[3374] =
+static char const gnutls_serv_opt_strs[3307] =
 /*     0 */ "gnutls-serv @VERSION@\n"
             "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
@@ -157,57 +157,53 @@ static char const gnutls_serv_opt_strs[3374] =
 /*  2185 */ "X.509 Certificate file or PKCS #11 URL to use\0"
 /*  2231 */ "X509CERTFILE\0"
 /*  2244 */ "x509certfile\0"
-/*  2257 */ "Alternative X.509 key file or PKCS #11 URL to use\0"
-/*  2307 */ "X509DSAKEYFILE\0"
-/*  2322 */ "x509dsakeyfile\0"
-/*  2337 */ "Alternative X.509 Certificate file or PKCS #11 URL to use\0"
-/*  2395 */ "X509DSACERTFILE\0"
-/*  2411 */ "x509dsacertfile\0"
-/*  2427 */ "X509ECCKEYFILE\0"
-/*  2442 */ "x509ecckeyfile\0"
-/*  2457 */ "X509ECCCERTFILE\0"
-/*  2473 */ "x509ecccertfile\0"
-/*  2489 */ "PGP subkey to use (hex or auto)\0"
-/*  2521 */ "PGPSUBKEY\0"
-/*  2531 */ "pgpsubkey\0"
-/*  2541 */ "SRP password file to use\0"
-/*  2566 */ "SRPPASSWD\0"
-/*  2576 */ "srppasswd\0"
-/*  2586 */ "SRP password configuration file to use\0"
-/*  2625 */ "SRPPASSWDCONF\0"
-/*  2639 */ "srppasswdconf\0"
-/*  2653 */ "PSK password file to use\0"
-/*  2678 */ "PSKPASSWD\0"
-/*  2688 */ "pskpasswd\0"
-/*  2698 */ "PSK identity hint to use\0"
-/*  2723 */ "PSKHINT\0"
-/*  2731 */ "pskhint\0"
-/*  2739 */ "The OCSP response to send to client\0"
-/*  2775 */ "OCSP_RESPONSE\0"
-/*  2789 */ "ocsp-response\0"
-/*  2803 */ "The port to connect to\0"
-/*  2826 */ "PORT\0"
-/*  2831 */ "port\0"
-/*  2836 */ "Print a list of the supported algorithms and modes\0"
-/*  2887 */ "LIST\0"
-/*  2892 */ "list\0"
-/*  2897 */ "Specify the PKCS #11 provider library\0"
-/*  2935 */ "PROVIDER\0"
-/*  2944 */ "provider\0"
-/*  2953 */ "display extended usage information and exit\0"
-/*  2997 */ "help\0"
-/*  3002 */ "extended usage information passed thru pager\0"
-/*  3047 */ "more-help\0"
-/*  3057 */ "output version information and exit\0"
-/*  3093 */ "version\0"
-/*  3101 */ "GNUTLS_SERV\0"
-/*  3113 */ "gnutls-serv - GnuTLS server\n"
+/*  2257 */ "an alias for the 'x509keyfile' option (deprecated)\0"
+/*  2308 */ "x509dsakeyfile\0"
+/*  2323 */ "an alias for the 'x509certfile' option (deprecated)\0"
+/*  2375 */ "x509dsacertfile\0"
+/*  2391 */ "x509ecckeyfile\0"
+/*  2406 */ "x509ecccertfile\0"
+/*  2422 */ "PGP subkey to use (hex or auto)\0"
+/*  2454 */ "PGPSUBKEY\0"
+/*  2464 */ "pgpsubkey\0"
+/*  2474 */ "SRP password file to use\0"
+/*  2499 */ "SRPPASSWD\0"
+/*  2509 */ "srppasswd\0"
+/*  2519 */ "SRP password configuration file to use\0"
+/*  2558 */ "SRPPASSWDCONF\0"
+/*  2572 */ "srppasswdconf\0"
+/*  2586 */ "PSK password file to use\0"
+/*  2611 */ "PSKPASSWD\0"
+/*  2621 */ "pskpasswd\0"
+/*  2631 */ "PSK identity hint to use\0"
+/*  2656 */ "PSKHINT\0"
+/*  2664 */ "pskhint\0"
+/*  2672 */ "The OCSP response to send to client\0"
+/*  2708 */ "OCSP_RESPONSE\0"
+/*  2722 */ "ocsp-response\0"
+/*  2736 */ "The port to connect to\0"
+/*  2759 */ "PORT\0"
+/*  2764 */ "port\0"
+/*  2769 */ "Print a list of the supported algorithms and modes\0"
+/*  2820 */ "LIST\0"
+/*  2825 */ "list\0"
+/*  2830 */ "Specify the PKCS #11 provider library\0"
+/*  2868 */ "PROVIDER\0"
+/*  2877 */ "provider\0"
+/*  2886 */ "display extended usage information and exit\0"
+/*  2930 */ "help\0"
+/*  2935 */ "extended usage information passed thru pager\0"
+/*  2980 */ "more-help\0"
+/*  2990 */ "output version information and exit\0"
+/*  3026 */ "version\0"
+/*  3034 */ "GNUTLS_SERV\0"
+/*  3046 */ "gnutls-serv - GnuTLS server\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  3199 */ "@PACKAGE_BUGREPORT@\0"
-/*  3219 */ "\n\0"
-/*  3221 */ "Server program that listens to incoming TLS connections.\n\0"
-/*  3279 */ "gnutls-serv @VERSION@\0"
-/*  3301 */ "Usage: gnutls-serv [options]\n"
+/*  3132 */ "@PACKAGE_BUGREPORT@\0"
+/*  3152 */ "\n\0"
+/*  3154 */ "Server program that listens to incoming TLS connections.\n\0"
+/*  3212 */ "gnutls-serv @VERSION@\0"
+/*  3234 */ "Usage: gnutls-serv [options]\n"
             "gnutls-serv --help for usage instructions.\n";
 
 /**
@@ -519,7 +515,7 @@ static char const gnutls_serv_opt_strs[3374] =
 /** Name string for the x509keyfile option */
 #define X509KEYFILE_name      (gnutls_serv_opt_strs+2173)
 /** Compiled in flag settings for the x509keyfile option */
-#define X509KEYFILE_FLAGS     (OPTST_DISABLED \
+#define X509KEYFILE_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
 
 /**
@@ -532,70 +528,62 @@ static char const gnutls_serv_opt_strs[3374] =
 /** Name string for the x509certfile option */
 #define X509CERTFILE_name      (gnutls_serv_opt_strs+2244)
 /** Compiled in flag settings for the x509certfile option */
-#define X509CERTFILE_FLAGS     (OPTST_DISABLED \
+#define X509CERTFILE_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
 
 /**
  *  x509dsakeyfile option description:
  */
 /** Descriptive text for the x509dsakeyfile option */
-#define X509DSAKEYFILE_DESC      (gnutls_serv_opt_strs+2257)
-/** Upper-cased name for the x509dsakeyfile option */
-#define X509DSAKEYFILE_NAME      (gnutls_serv_opt_strs+2307)
-/** Name string for the x509dsakeyfile option */
-#define X509DSAKEYFILE_name      (gnutls_serv_opt_strs+2322)
+#define X509DSAKEYFILE_DESC    (gnutls_serv_opt_strs+2257)
+#define X509DSAKEYFILE_NAME    NULL
+/** Unmodified name string for the x509dsakeyfile option */
+#define X509DSAKEYFILE_name    (gnutls_serv_opt_strs+2308)
 /** Compiled in flag settings for the x509dsakeyfile option */
-#define X509DSAKEYFILE_FLAGS     (OPTST_DISABLED \
-        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+#define X509DSAKEYFILE_FLAGS     (X509KEYFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
 /**
  *  x509dsacertfile option description:
  */
 /** Descriptive text for the x509dsacertfile option */
-#define X509DSACERTFILE_DESC      (gnutls_serv_opt_strs+2337)
-/** Upper-cased name for the x509dsacertfile option */
-#define X509DSACERTFILE_NAME      (gnutls_serv_opt_strs+2395)
-/** Name string for the x509dsacertfile option */
-#define X509DSACERTFILE_name      (gnutls_serv_opt_strs+2411)
+#define X509DSACERTFILE_DESC    (gnutls_serv_opt_strs+2323)
+#define X509DSACERTFILE_NAME    NULL
+/** Unmodified name string for the x509dsacertfile option */
+#define X509DSACERTFILE_name    (gnutls_serv_opt_strs+2375)
 /** Compiled in flag settings for the x509dsacertfile option */
-#define X509DSACERTFILE_FLAGS     (OPTST_DISABLED \
-        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+#define X509DSACERTFILE_FLAGS     (X509CERTFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
 /**
  *  x509ecckeyfile option description:
  */
 /** Descriptive text for the x509ecckeyfile option */
-#define X509ECCKEYFILE_DESC      (gnutls_serv_opt_strs+2257)
-/** Upper-cased name for the x509ecckeyfile option */
-#define X509ECCKEYFILE_NAME      (gnutls_serv_opt_strs+2427)
-/** Name string for the x509ecckeyfile option */
-#define X509ECCKEYFILE_name      (gnutls_serv_opt_strs+2442)
+#define X509ECCKEYFILE_DESC    (gnutls_serv_opt_strs+2257)
+#define X509ECCKEYFILE_NAME    NULL
+/** Unmodified name string for the x509ecckeyfile option */
+#define X509ECCKEYFILE_name    (gnutls_serv_opt_strs+2391)
 /** Compiled in flag settings for the x509ecckeyfile option */
-#define X509ECCKEYFILE_FLAGS     (OPTST_DISABLED \
-        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+#define X509ECCKEYFILE_FLAGS     (X509KEYFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
 /**
  *  x509ecccertfile option description:
  */
 /** Descriptive text for the x509ecccertfile option */
-#define X509ECCCERTFILE_DESC      (gnutls_serv_opt_strs+2337)
-/** Upper-cased name for the x509ecccertfile option */
-#define X509ECCCERTFILE_NAME      (gnutls_serv_opt_strs+2457)
-/** Name string for the x509ecccertfile option */
-#define X509ECCCERTFILE_name      (gnutls_serv_opt_strs+2473)
+#define X509ECCCERTFILE_DESC    (gnutls_serv_opt_strs+2323)
+#define X509ECCCERTFILE_NAME    NULL
+/** Unmodified name string for the x509ecccertfile option */
+#define X509ECCCERTFILE_name    (gnutls_serv_opt_strs+2406)
 /** Compiled in flag settings for the x509ecccertfile option */
-#define X509ECCCERTFILE_FLAGS     (OPTST_DISABLED \
-        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+#define X509ECCCERTFILE_FLAGS     (X509CERTFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
 /**
  *  pgpsubkey option description:
  */
 /** Descriptive text for the pgpsubkey option */
-#define PGPSUBKEY_DESC      (gnutls_serv_opt_strs+2489)
+#define PGPSUBKEY_DESC      (gnutls_serv_opt_strs+2422)
 /** Upper-cased name for the pgpsubkey option */
-#define PGPSUBKEY_NAME      (gnutls_serv_opt_strs+2521)
+#define PGPSUBKEY_NAME      (gnutls_serv_opt_strs+2454)
 /** Name string for the pgpsubkey option */
-#define PGPSUBKEY_name      (gnutls_serv_opt_strs+2531)
+#define PGPSUBKEY_name      (gnutls_serv_opt_strs+2464)
 /** Compiled in flag settings for the pgpsubkey option */
 #define PGPSUBKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -604,11 +592,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  srppasswd option description:
  */
 /** Descriptive text for the srppasswd option */
-#define SRPPASSWD_DESC      (gnutls_serv_opt_strs+2541)
+#define SRPPASSWD_DESC      (gnutls_serv_opt_strs+2474)
 /** Upper-cased name for the srppasswd option */
-#define SRPPASSWD_NAME      (gnutls_serv_opt_strs+2566)
+#define SRPPASSWD_NAME      (gnutls_serv_opt_strs+2499)
 /** Name string for the srppasswd option */
-#define SRPPASSWD_name      (gnutls_serv_opt_strs+2576)
+#define SRPPASSWD_name      (gnutls_serv_opt_strs+2509)
 /** Compiled in flag settings for the srppasswd option */
 #define SRPPASSWD_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -617,11 +605,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  srppasswdconf option description:
  */
 /** Descriptive text for the srppasswdconf option */
-#define SRPPASSWDCONF_DESC      (gnutls_serv_opt_strs+2586)
+#define SRPPASSWDCONF_DESC      (gnutls_serv_opt_strs+2519)
 /** Upper-cased name for the srppasswdconf option */
-#define SRPPASSWDCONF_NAME      (gnutls_serv_opt_strs+2625)
+#define SRPPASSWDCONF_NAME      (gnutls_serv_opt_strs+2558)
 /** Name string for the srppasswdconf option */
-#define SRPPASSWDCONF_name      (gnutls_serv_opt_strs+2639)
+#define SRPPASSWDCONF_name      (gnutls_serv_opt_strs+2572)
 /** Compiled in flag settings for the srppasswdconf option */
 #define SRPPASSWDCONF_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -630,11 +618,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  pskpasswd option description:
  */
 /** Descriptive text for the pskpasswd option */
-#define PSKPASSWD_DESC      (gnutls_serv_opt_strs+2653)
+#define PSKPASSWD_DESC      (gnutls_serv_opt_strs+2586)
 /** Upper-cased name for the pskpasswd option */
-#define PSKPASSWD_NAME      (gnutls_serv_opt_strs+2678)
+#define PSKPASSWD_NAME      (gnutls_serv_opt_strs+2611)
 /** Name string for the pskpasswd option */
-#define PSKPASSWD_name      (gnutls_serv_opt_strs+2688)
+#define PSKPASSWD_name      (gnutls_serv_opt_strs+2621)
 /** Compiled in flag settings for the pskpasswd option */
 #define PSKPASSWD_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -643,11 +631,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  pskhint option description:
  */
 /** Descriptive text for the pskhint option */
-#define PSKHINT_DESC      (gnutls_serv_opt_strs+2698)
+#define PSKHINT_DESC      (gnutls_serv_opt_strs+2631)
 /** Upper-cased name for the pskhint option */
-#define PSKHINT_NAME      (gnutls_serv_opt_strs+2723)
+#define PSKHINT_NAME      (gnutls_serv_opt_strs+2656)
 /** Name string for the pskhint option */
-#define PSKHINT_name      (gnutls_serv_opt_strs+2731)
+#define PSKHINT_name      (gnutls_serv_opt_strs+2664)
 /** Compiled in flag settings for the pskhint option */
 #define PSKHINT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -656,11 +644,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  ocsp-response option description:
  */
 /** Descriptive text for the ocsp-response option */
-#define OCSP_RESPONSE_DESC      (gnutls_serv_opt_strs+2739)
+#define OCSP_RESPONSE_DESC      (gnutls_serv_opt_strs+2672)
 /** Upper-cased name for the ocsp-response option */
-#define OCSP_RESPONSE_NAME      (gnutls_serv_opt_strs+2775)
+#define OCSP_RESPONSE_NAME      (gnutls_serv_opt_strs+2708)
 /** Name string for the ocsp-response option */
-#define OCSP_RESPONSE_name      (gnutls_serv_opt_strs+2789)
+#define OCSP_RESPONSE_name      (gnutls_serv_opt_strs+2722)
 /** Compiled in flag settings for the ocsp-response option */
 #define OCSP_RESPONSE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -669,11 +657,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  port option description:
  */
 /** Descriptive text for the port option */
-#define PORT_DESC      (gnutls_serv_opt_strs+2803)
+#define PORT_DESC      (gnutls_serv_opt_strs+2736)
 /** Upper-cased name for the port option */
-#define PORT_NAME      (gnutls_serv_opt_strs+2826)
+#define PORT_NAME      (gnutls_serv_opt_strs+2759)
 /** Name string for the port option */
-#define PORT_name      (gnutls_serv_opt_strs+2831)
+#define PORT_name      (gnutls_serv_opt_strs+2764)
 /** Compiled in flag settings for the port option */
 #define PORT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -682,11 +670,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  list option description:
  */
 /** Descriptive text for the list option */
-#define LIST_DESC      (gnutls_serv_opt_strs+2836)
+#define LIST_DESC      (gnutls_serv_opt_strs+2769)
 /** Upper-cased name for the list option */
-#define LIST_NAME      (gnutls_serv_opt_strs+2887)
+#define LIST_NAME      (gnutls_serv_opt_strs+2820)
 /** Name string for the list option */
-#define LIST_name      (gnutls_serv_opt_strs+2892)
+#define LIST_name      (gnutls_serv_opt_strs+2825)
 /** Compiled in flag settings for the list option */
 #define LIST_FLAGS     (OPTST_DISABLED)
 
@@ -694,11 +682,11 @@ static char const gnutls_serv_opt_strs[3374] =
  *  provider option description:
  */
 /** Descriptive text for the provider option */
-#define PROVIDER_DESC      (gnutls_serv_opt_strs+2897)
+#define PROVIDER_DESC      (gnutls_serv_opt_strs+2830)
 /** Upper-cased name for the provider option */
-#define PROVIDER_NAME      (gnutls_serv_opt_strs+2935)
+#define PROVIDER_NAME      (gnutls_serv_opt_strs+2868)
 /** Name string for the provider option */
-#define PROVIDER_name      (gnutls_serv_opt_strs+2944)
+#define PROVIDER_name      (gnutls_serv_opt_strs+2877)
 /** Compiled in flag settings for the provider option */
 #define PROVIDER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -706,11 +694,11 @@ static char const gnutls_serv_opt_strs[3374] =
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (gnutls_serv_opt_strs+2953)
-#define HELP_name       (gnutls_serv_opt_strs+2997)
+#define HELP_DESC       (gnutls_serv_opt_strs+2886)
+#define HELP_name       (gnutls_serv_opt_strs+2930)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (gnutls_serv_opt_strs+3002)
-#define MORE_HELP_name  (gnutls_serv_opt_strs+3047)
+#define MORE_HELP_DESC  (gnutls_serv_opt_strs+2935)
+#define MORE_HELP_name  (gnutls_serv_opt_strs+2980)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -723,8 +711,8 @@ static char const gnutls_serv_opt_strs[3374] =
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (gnutls_serv_opt_strs+3057)
-#define VER_name        (gnutls_serv_opt_strs+3093)
+#define VER_DESC        (gnutls_serv_opt_strs+2990)
+#define VER_name        (gnutls_serv_opt_strs+3026)
 /**
  *  Declare option callback procedures
  */
@@ -734,11 +722,12 @@ extern tOptProc
     optionStackArg,     optionTimeDate,     optionTimeVal,
     optionUnstackArg,   optionVendorOption;
 static tOptProc
-    doOptDebug,         doOptDhparams,      doOptMtu,
-    doOptOcsp_Response, doOptPgpcertfile,   doOptPgpkeyfile,
-    doOptPgpkeyring,    doOptProvider,      doOptPskpasswd,
-    doOptSrppasswd,     doOptSrppasswdconf, doOptX509crlfile,
-    doUsageOpt;
+    doOptDebug,           doOptDhparams,        doOptMtu,
+    doOptOcsp_Response,   doOptPgpcertfile,     doOptPgpkeyfile,
+    doOptPgpkeyring,      doOptProvider,        doOptPskpasswd,
+    doOptSrppasswd,       doOptSrppasswdconf,   doOptX509crlfile,
+    doOptX509dsacertfile, doOptX509dsakeyfile,  doOptX509ecccertfile,
+    doOptX509ecckeyfile,  doUsageOpt;
 #define VER_PROC        optionPrintVersion
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1039,24 +1028,24 @@ static tOptDesc optDesc[OPTION_CT] = {
   {  /* entry idx, value */ 24, VALUE_OPT_X509KEYFILE,
      /* equiv idx, value */ 24, VALUE_OPT_X509KEYFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
+     /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ X509KEYFILE_FLAGS, 0,
      /* last opt argumnt */ { NULL }, /* --x509keyfile */
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ NULL,
+     /* option proc      */ optionStackArg,
      /* desc, NAME, name */ X509KEYFILE_DESC, X509KEYFILE_NAME, X509KEYFILE_name,
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ 25, VALUE_OPT_X509CERTFILE,
      /* equiv idx, value */ 25, VALUE_OPT_X509CERTFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
+     /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ X509CERTFILE_FLAGS, 0,
      /* last opt argumnt */ { NULL }, /* --x509certfile */
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ NULL,
+     /* option proc      */ optionStackArg,
      /* desc, NAME, name */ X509CERTFILE_DESC, X509CERTFILE_NAME, X509CERTFILE_name,
      /* disablement strs */ NULL, NULL },
 
@@ -1068,9 +1057,9 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* last opt argumnt */ { NULL }, /* --x509dsakeyfile */
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ NULL,
+     /* option proc      */ doOptX509dsakeyfile,
      /* desc, NAME, name */ X509DSAKEYFILE_DESC, X509DSAKEYFILE_NAME, X509DSAKEYFILE_name,
-     /* disablement strs */ NULL, NULL },
+     /* disablement strs */ 0, 0 },
 
   {  /* entry idx, value */ 27, VALUE_OPT_X509DSACERTFILE,
      /* equiv idx, value */ 27, VALUE_OPT_X509DSACERTFILE,
@@ -1080,9 +1069,9 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* last opt argumnt */ { NULL }, /* --x509dsacertfile */
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ NULL,
+     /* option proc      */ doOptX509dsacertfile,
      /* desc, NAME, name */ X509DSACERTFILE_DESC, X509DSACERTFILE_NAME, X509DSACERTFILE_name,
-     /* disablement strs */ NULL, NULL },
+     /* disablement strs */ 0, 0 },
 
   {  /* entry idx, value */ 28, VALUE_OPT_X509ECCKEYFILE,
      /* equiv idx, value */ 28, VALUE_OPT_X509ECCKEYFILE,
@@ -1092,9 +1081,9 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* last opt argumnt */ { NULL }, /* --x509ecckeyfile */
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ NULL,
+     /* option proc      */ doOptX509ecckeyfile,
      /* desc, NAME, name */ X509ECCKEYFILE_DESC, X509ECCKEYFILE_NAME, X509ECCKEYFILE_name,
-     /* disablement strs */ NULL, NULL },
+     /* disablement strs */ 0, 0 },
 
   {  /* entry idx, value */ 29, VALUE_OPT_X509ECCCERTFILE,
      /* equiv idx, value */ 29, VALUE_OPT_X509ECCCERTFILE,
@@ -1104,9 +1093,9 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* last opt argumnt */ { NULL }, /* --x509ecccertfile */
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ NULL,
+     /* option proc      */ doOptX509ecccertfile,
      /* desc, NAME, name */ X509ECCCERTFILE_DESC, X509ECCCERTFILE_NAME, X509ECCCERTFILE_name,
-     /* disablement strs */ NULL, NULL },
+     /* disablement strs */ 0, 0 },
 
   {  /* entry idx, value */ 30, VALUE_OPT_PGPSUBKEY,
      /* equiv idx, value */ 30, VALUE_OPT_PGPSUBKEY,
@@ -1258,21 +1247,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of gnutls-serv. */
-#define zPROGNAME       (gnutls_serv_opt_strs+3101)
+#define zPROGNAME       (gnutls_serv_opt_strs+3034)
 /** Reference to the title line for gnutls-serv usage. */
-#define zUsageTitle     (gnutls_serv_opt_strs+3113)
+#define zUsageTitle     (gnutls_serv_opt_strs+3046)
 /** There is no gnutls-serv configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for gnutls-serv config files. */
 #define apzHomeList     NULL
 /** The gnutls-serv program bug email address. */
-#define zBugsAddr       (gnutls_serv_opt_strs+3199)
+#define zBugsAddr       (gnutls_serv_opt_strs+3132)
 /** Clarification/explanation of what gnutls-serv does. */
-#define zExplain        (gnutls_serv_opt_strs+3219)
+#define zExplain        (gnutls_serv_opt_strs+3152)
 /** Extra detail explaining what gnutls-serv does. */
-#define zDetail         (gnutls_serv_opt_strs+3221)
+#define zDetail         (gnutls_serv_opt_strs+3154)
 /** The full version string for gnutls-serv. */
-#define zFullVersion    (gnutls_serv_opt_strs+3279)
+#define zFullVersion    (gnutls_serv_opt_strs+3212)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -1284,7 +1273,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define gnutls_serv_full_usage (NULL)
-#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3301)
+#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3234)
 
 #endif /* not defined __doxygen__ */
 
@@ -1498,6 +1487,70 @@ doOptPgpcertfile(tOptions* pOptions, tOptDesc* pOptDesc)
      * This function handles special invalid values for "pOptions"
      */
     optionFileCheck(pOptions, pOptDesc, type, mode);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the x509dsakeyfile option.
+ *
+ * @param[in] pOptions the gnutls-serv options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
+ */
+static void
+doOptX509dsakeyfile(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    int res = optionAlias(pOptions, pOptDesc, INDEX_OPT_X509KEYFILE);
+    if ((res != 0) && ((pOptions->fOptSet & OPTPROC_ERRSTOP) != 0))
+        USAGE(GNUTLS_SERV_EXIT_USAGE_ERROR);
+
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the x509dsacertfile option.
+ *
+ * @param[in] pOptions the gnutls-serv options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
+ */
+static void
+doOptX509dsacertfile(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    int res = optionAlias(pOptions, pOptDesc, INDEX_OPT_X509CERTFILE);
+    if ((res != 0) && ((pOptions->fOptSet & OPTPROC_ERRSTOP) != 0))
+        USAGE(GNUTLS_SERV_EXIT_USAGE_ERROR);
+
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the x509ecckeyfile option.
+ *
+ * @param[in] pOptions the gnutls-serv options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
+ */
+static void
+doOptX509ecckeyfile(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    int res = optionAlias(pOptions, pOptDesc, INDEX_OPT_X509KEYFILE);
+    if ((res != 0) && ((pOptions->fOptSet & OPTPROC_ERRSTOP) != 0))
+        USAGE(GNUTLS_SERV_EXIT_USAGE_ERROR);
+
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the x509ecccertfile option.
+ *
+ * @param[in] pOptions the gnutls-serv options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
+ */
+static void
+doOptX509ecccertfile(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    int res = optionAlias(pOptions, pOptDesc, INDEX_OPT_X509CERTFILE);
+    if ((res != 0) && ((pOptions->fOptSet & OPTPROC_ERRSTOP) != 0))
+        USAGE(GNUTLS_SERV_EXIT_USAGE_ERROR);
+
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1915,16 +1968,16 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
   puts(_("X.509 Certificate file or PKCS #11 URL to use"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
-  puts(_("Alternative X.509 key file or PKCS #11 URL to use"));
+  puts(_("an alias for the 'x509keyfile' option (deprecated)"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
-  puts(_("Alternative X.509 Certificate file or PKCS #11 URL to use"));
+  puts(_("an alias for the 'x509certfile' option (deprecated)"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
-  puts(_("Alternative X.509 key file or PKCS #11 URL to use"));
+  puts(_("an alias for the 'x509keyfile' option (deprecated)"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
-  puts(_("Alternative X.509 Certificate file or PKCS #11 URL to use"));
+  puts(_("an alias for the 'x509certfile' option (deprecated)"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
   puts(_("PGP subkey to use (hex or auto)"));
