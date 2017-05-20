@@ -51,8 +51,8 @@ static ino_t _gnutls_urandom_fd_ino = 0;
 static dev_t _gnutls_urandom_fd_rdev = 0;
 
 #if defined(__linux__)
-# ifdef HAVE_LINUX_GETRANDOM
-#  include <linux/random.h>
+# ifdef HAVE_GETRANDOM
+#  include <sys/random.h>
 # else
 #  include <sys/syscall.h>
 #  undef getrandom
