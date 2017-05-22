@@ -153,12 +153,36 @@ gcm_ghash(struct aes_gcm_ctx *ctx, const uint8_t * src, size_t src_size)
 }
 
 static void
+ctr32_encrypt_blocks_inplace(const unsigned char *in, unsigned char *out,
+			     size_t blocks, const AES_KEY *key,
+			     const unsigned char ivec[16])
+{
+	unsigned i;
+	uint8_t ctr[16];
+	uint8_t tmp[16];
+
+	memcpy(ctr, ivec, 16);
+
+	for (i=0;i<blocks;i++) {
+		aes_v8_encrypt(ctr, tmp, key);
+		memxor3(out, tmp, in, 16);
+
+		out += 16;
+		in += 16;
+		INCREMENT(16, ctr);
+	}
+}
+
+static void
 ctr32_encrypt_blocks(const unsigned char *in, unsigned char *out,
 		     size_t blocks, const AES_KEY *key,
 		     const unsigned char ivec[16])
 {
 	unsigned i;
 	uint8_t ctr[16];
+
+	if (in == out)
+		return ctr32_encrypt_blocks_inplace(in, out, blocks, key, ivec);
 
 	memcpy(ctr, ivec, 16);
 
