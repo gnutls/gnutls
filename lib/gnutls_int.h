@@ -445,7 +445,8 @@ typedef struct cipher_entry_st {
 	uint16_t explicit_iv;	/* the size of explicit IV - the IV stored in record */
 	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
 	uint16_t tagsize;
-	bool	xor_nonce;	/* In this TLS AEAD cipher xor the implicit_iv with the nonce */
+	bool xor_nonce;	/* In this TLS AEAD cipher xor the implicit_iv with the nonce */
+	bool only_aead; /* When set, this cipher is only available through the new AEAD API */
 } cipher_entry_st;
 
 typedef struct gnutls_cipher_suite_entry_st {
