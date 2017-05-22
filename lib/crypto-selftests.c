@@ -1089,40 +1089,40 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 
 #define CASE(x, func, vectors) case x: \
 			ret = func(x, V(vectors)); \
-			if (all == 0 || ret < 0) \
+			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
 				return ret
 
 #define NON_FIPS_CASE(x, func, vectors) case x: \
 			if (_gnutls_fips_mode_enabled() == 0) { \
 				ret = func(x, V(vectors)); \
-				if (all == 0 || ret < 0) \
+				if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
 					return ret; \
 			}
 
 #define FIPS_STARTUP_ONLY_TEST_CASE(x, func, vectors) case x: \
 			if (_gnutls_fips_mode_enabled() != 1) { \
 				ret = func(x, V(vectors)); \
-				if (all == 0 || ret < 0) \
+				if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
 					return ret; \
 			}
 
 /*-
  * gnutls_cipher_self_test:
- * @all: if non-zero then tests to all ciphers are performed.
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
  * @cipher: the encryption algorithm to use
  *
  * This function will run self tests on the provided cipher or all
- * available ciphers if @all is non-zero.
+ * available ciphers if @flags is %GNUTLS_SELF_TEST_FLAG_ALL.
  *
  * Returns: Zero or a negative error code on error.
  *
  * Since: 3.3.0-FIPS140
  -*/
-int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
+int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 {
 	int ret;
 
-	if (all != 0)
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
 		cipher = GNUTLS_CIPHER_UNKNOWN;
 
 	switch (cipher) {
@@ -1157,7 +1157,7 @@ int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
 
 /*-
  * gnutls_mac_self_test:
- * @all: if non-zero then tests to all ciphers are performed.
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
  * @mac: the message authentication algorithm to use
  *
  * This function will run self tests on the provided mac.
@@ -1166,11 +1166,11 @@ int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
  *
  * Since: 3.3.0-FIPS140
  -*/
-int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac)
+int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 {
 	int ret;
 
-	if (all != 0)
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
 		mac = GNUTLS_MAC_UNKNOWN;
 
 	switch (mac) {
@@ -1192,7 +1192,7 @@ int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac)
 
 /*-
  * gnutls_digest_self_test:
- * @all: if non-zero then tests to all ciphers are performed.
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
  * @digest: the digest algorithm to use
  *
  * This function will run self tests on the provided digest.
@@ -1201,11 +1201,11 @@ int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac)
  *
  * Since: 3.3.0-FIPS140
  -*/
-int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest)
+int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest)
 {
 	int ret;
 
-	if (all != 0)
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
 		digest = GNUTLS_DIG_UNKNOWN;
 
 	switch (digest) {

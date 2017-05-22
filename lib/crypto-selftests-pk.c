@@ -475,7 +475,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 				gnutls_assert(); \
 				goto cleanup; \
 			} \
-			if (all == 0) \
+			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL)) \
 				return 0
 
 #define PK_KNOWN_TEST(pk, det, bits, dig, pkey, sig) \
@@ -484,7 +484,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 				gnutls_assert(); \
 				goto cleanup; \
 			} \
-			if (all == 0) \
+			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL)) \
 				return 0
 
 
@@ -683,7 +683,7 @@ cleanup:
 
 /*-
  * gnutls_pk_self_test:
- * @all: if non-zero then tests to all public key algorithms are performed.
+ * @flags: GNUTLS_SELF_TEST_FLAG flags
  * @pk: the algorithm to use
  *
  * This function will run self tests on the provided public key algorithm.
@@ -692,11 +692,11 @@ cleanup:
  *
  * Since: 3.3.0-FIPS140
  -*/
-int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
+int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 {
 	int ret;
 
-	if (all != 0)
+	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
 		pk = GNUTLS_PK_UNKNOWN;
 
 	switch (pk) {
@@ -710,7 +710,7 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 			goto cleanup;
 		}
 
-		if (all == 0)
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 #endif
 	case GNUTLS_PK_RSA:
@@ -731,7 +731,7 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 			goto cleanup;
 		}
 
-		if (all == 0)
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 #endif
 
