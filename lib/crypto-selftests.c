@@ -375,7 +375,7 @@ const struct cipher_vectors_st arcfour_vectors[] = { /* RFC6229 */
 
 static int test_cipher(gnutls_cipher_algorithm_t cipher,
 		       const struct cipher_vectors_st *vectors,
-		       size_t vectors_size)
+		       size_t vectors_size, unsigned flags)
 {
 	gnutls_cipher_hd_t hd;
 	int ret;
@@ -665,7 +665,7 @@ static int test_cipher_aead_compat(gnutls_cipher_algorithm_t cipher,
 /* AEAD modes */
 static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 			    const struct cipher_aead_vectors_st *vectors,
-			    size_t vectors_size)
+			    size_t vectors_size, unsigned flags)
 {
 	gnutls_aead_cipher_hd_t hd;
 	int ret;
@@ -795,7 +795,10 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 	     gnutls_cipher_get_name(cipher));
 
 	/* test the compatibility APIs */
-	return test_cipher_aead_compat(cipher, vectors, vectors_size);
+	if (flags & GNUTLS_SELF_TEST_FLAG_NO_COMPAT)
+		return 0;
+	else
+		return test_cipher_aead_compat(cipher, vectors, vectors_size);
 }
 
 
@@ -911,7 +914,7 @@ const struct hash_vectors_st sha3_512_vectors[] = {
 /* SHA1 and other hashes */
 static int test_digest(gnutls_digest_algorithm_t dig,
 		       const struct hash_vectors_st *vectors,
-		       size_t vectors_size)
+		       size_t vectors_size, unsigned flags)
 {
 	uint8_t data[HASH_DATA_SIZE];
 	unsigned int i;
@@ -1033,7 +1036,7 @@ const struct mac_vectors_st hmac_sha512_vectors[] = {
 
 static int test_mac(gnutls_mac_algorithm_t mac,
 		    const struct mac_vectors_st *vectors,
-		    size_t vectors_size)
+		    size_t vectors_size, unsigned flags)
 {
 	uint8_t data[HASH_DATA_SIZE];
 	unsigned int i;
@@ -1088,20 +1091,20 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 }
 
 #define CASE(x, func, vectors) case x: \
-			ret = func(x, V(vectors)); \
+			ret = func(x, V(vectors), flags); \
 			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
 				return ret
 
 #define NON_FIPS_CASE(x, func, vectors) case x: \
 			if (_gnutls_fips_mode_enabled() == 0) { \
-				ret = func(x, V(vectors)); \
+				ret = func(x, V(vectors), flags); \
 				if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
 					return ret; \
 			}
 
 #define FIPS_STARTUP_ONLY_TEST_CASE(x, func, vectors) case x: \
 			if (_gnutls_fips_mode_enabled() != 1) { \
-				ret = func(x, V(vectors)); \
+				ret = func(x, V(vectors), flags); \
 				if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
 					return ret; \
 			}

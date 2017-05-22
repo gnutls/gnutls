@@ -30,6 +30,7 @@
  /* The functions are not part of the main API, and are conditionally
   * enabled. */
 #define GNUTLS_SELF_TEST_FLAG_ALL 1
+#define GNUTLS_SELF_TEST_FLAG_NO_COMPAT (1<<1)
 
 int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher);
 int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac);
