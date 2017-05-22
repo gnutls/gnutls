@@ -1987,7 +1987,7 @@ gnutls_x509_privkey_sign_hash(gnutls_x509_privkey_t key,
 /**
  * gnutls_x509_privkey_sign_data:
  * @key: a key
- * @digest: should be MD5 or SHA1
+ * @digest: should be a digest algorithm
  * @flags: should be 0 for now
  * @data: holds the data to be signed
  * @signature: will contain the signature
