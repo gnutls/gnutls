@@ -230,7 +230,7 @@ int main(int argc, char **argv)
 
 	global_init();
 
-	if (gnutls_cipher_self_test(1, 0) < 0)
+	if (gnutls_cipher_self_test(GNUTLS_SELF_TEST_FLAG_ALL|GNUTLS_SELF_TEST_FLAG_NO_COMPAT, 0) < 0)
 		return 1;
 
 	if (used == 0) {
