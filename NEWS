@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.5.13 (unreleased)
 
+** libgnutls: fixed issue with AES-GCM in-place encryption and decryption in
+   aarch64. Resolves gitlab issue #204.
+
 ** certtool: allow multiple certificates to be used in --p7-sign with
    the --load-certificate option. Patch by Karl Tarbe.
 
