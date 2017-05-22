@@ -62,7 +62,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 	const cipher_entry_st* e;
 
 	e = cipher_to_entry(cipher);
-	if (e == NULL)
+	if (e == NULL || e->only_aead)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	*handle = gnutls_calloc(1, sizeof(api_cipher_hd_st));
