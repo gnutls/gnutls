@@ -586,8 +586,8 @@ static int test_cipher_aead_compat(gnutls_cipher_algorithm_t cipher,
 			}
 		}
 
-		/* check inplace encryption */
 		if (vectors[i].plaintext_size > 0) {
+			/* check inplace encryption */
 			gnutls_cipher_set_iv(hd, (void*)vectors[i].iv, vectors[i].iv_size);
 			memcpy(tmp2, vectors[i].plaintext, vectors[i].plaintext_size);
 
@@ -601,9 +601,7 @@ static int test_cipher_aead_compat(gnutls_cipher_algorithm_t cipher,
 				_gnutls_debug_log("compat: %s vector %d in-place encryption failed!\n", gnutls_cipher_get_name(cipher), i);
 				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 			}
-		}
 
-		{
 			/* check decryption with separate buffers */
 			gnutls_cipher_set_iv(hd, (void*)vectors[i].iv, vectors[i].iv_size);
 
