@@ -38,9 +38,6 @@
 #ifdef ENABLE_OCSP
 
 typedef struct {
-	gnutls_datum_t *responder_id;
-	size_t responder_id_size;
-	gnutls_datum_t request_extensions;
 	gnutls_datum_t response;
 
 	unsigned int expect_cstatus;
@@ -72,48 +69,17 @@ static int
 client_send(gnutls_session_t session,
 	    gnutls_buffer_st * extdata, status_request_ext_st * priv)
 {
-	int ret_len = 1 + 2;
+	const uint8_t data[5] = "\x01\x00\x00\x00\x00";
+	const int len = 5;
 	int ret;
-	size_t i;
 
-	ret = _gnutls_buffer_append_prefix(extdata, 8, 1);
+	/* We do not support setting either ResponderID or Extensions */
+
+	ret = _gnutls_buffer_append_data(extdata, data, len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_buffer_append_prefix(extdata, 16,
-					 priv->responder_id_size);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	for (i = 0; i < priv->responder_id_size; i++) {
-		if (priv->responder_id[i].size <= 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-		ret = _gnutls_buffer_append_data_prefix(extdata, 16,
-							priv->
-							responder_id[i].
-							data,
-							priv->
-							responder_id[i].
-							size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		ret_len += 2 + priv->responder_id[i].size;
-	}
-
-	ret = _gnutls_buffer_append_data_prefix(extdata, 16,
-						priv->request_extensions.
-						data,
-						priv->request_extensions.
-						size);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret_len += 2 + priv->request_extensions.size;
-
-	return ret_len;
+	return len;
 }
 
 static int
@@ -288,21 +254,18 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
 /**
  * gnutls_ocsp_status_request_enable_client:
  * @session: is a #gnutls_session_t type.
- * @responder_id: array with #gnutls_datum_t with DER data of responder id
- * @responder_id_size: number of members in @responder_id array
- * @extensions: a #gnutls_datum_t with DER encoded OCSP extensions
+ * @responder_id: ignored, must be %NULL
+ * @responder_id_size: ignored, must be zero
+ * @extensions: ignored, must be %NULL
  *
  * This function is to be used by clients to request OCSP response
  * from the server, using the "status_request" TLS extension.  Only
  * OCSP status type is supported.
  *
- * The @responder_id array, its containing elements as well as
- * the data of @extensions, must be allocated using gnutls_malloc(). They
- * will be deinitialized on session cleanup.
- *
- * Due to the difficult semantics of the @responder_id and @extensions
- * parameters, it is recommended to only call this function with these
- * parameters set to %NULL.
+ * Previous versions of GnuTLS supported setting @responder_id and
+ * @extensions fields, but due to the difficult semantics of the
+ * parameter usage, and other issues, this support was removed
+ * since 3.6.0 and these parameters must be set to %NULL.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -324,13 +287,6 @@ gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 	epriv = priv = gnutls_calloc(1, sizeof(*priv));
 	if (priv == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	priv->responder_id = responder_id;
-	priv->responder_id_size = responder_id_size;
-	if (extensions) {
-		priv->request_extensions.data = extensions->data;
-		priv->request_extensions.size = extensions->size;
-	}
 
 	_gnutls_ext_set_session_data(session,
 				     GNUTLS_EXTENSION_STATUS_REQUEST,
@@ -520,19 +476,10 @@ gnutls_certificate_set_ocsp_status_request_file
 static void _gnutls_status_request_deinit_data(extension_priv_data_t epriv)
 {
 	status_request_ext_st *priv = epriv;
-	unsigned i;
 
 	if (priv == NULL)
 		return;
 
-	if (priv->responder_id != NULL) {
-		for (i = 0; i < priv->responder_id_size; i++)
-			gnutls_free(priv->responder_id[i].data);
-
-		gnutls_free(priv->responder_id);
-	}
-
-	gnutls_free(priv->request_extensions.data);
 	gnutls_free(priv->response.data);
 	gnutls_free(priv);
 }
