@@ -118,7 +118,7 @@ symbol-check:
 @CODE_COVERAGE_RULES@
 
 local-code-coverage-output: code-coverage-capture
-	cat GnuTLS-$(VERSION)-coverage/index.html|grep headerCovTableEntryLo|head -1|sed 's/^.*>\([0-9]\+\.[0-9]\+\s*%\)<.*$$/ coverage lines: \1/' || true
+	cat GnuTLS-$(VERSION)-coverage/index.html|grep headerCovTableEntry|grep '%'|head -1|sed 's/^.*>\([0-9]\+\.[0-9]\+\s*%\)<.*$$/ coverage lines: \1/' || true
 
 libopts-check:
 	@echo "*****************************************************************"
