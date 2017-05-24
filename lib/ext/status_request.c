@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2012-2016 Free Software Foundation, Inc.
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2012-2017 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
@@ -67,21 +67,6 @@ typedef struct {
       opaque Extensions<0..2^16-1>;
 */
 
-static void deinit_responder_id(status_request_ext_st *priv)
-{
-	unsigned i;
-
-	if (priv->responder_id == NULL)
-		return;
-
-	for (i = 0; i < priv->responder_id_size; i++)
-		gnutls_free(priv->responder_id[i].data);
-
-	gnutls_free(priv->responder_id);
-	priv->responder_id = NULL;
-	priv->responder_id_size = 0;
-}
-
 
 static int
 client_send(gnutls_session_t session,
@@ -136,9 +121,8 @@ server_recv(gnutls_session_t session,
 	    status_request_ext_st * priv,
 	    const uint8_t * data, size_t size)
 {
-	size_t i;
 	ssize_t data_size = size;
-	unsigned responder_ids = 0;
+	unsigned rid_bytes = 0;
 
 	/* minimum message is type (1) + responder_id_list (2) +
 	   request_extension (2) = 5 */
@@ -157,43 +141,16 @@ server_recv(gnutls_session_t session,
 	DECR_LEN(data_size, 1);
 	data++;
 
-	responder_ids = _gnutls_read_uint16(data);
+	rid_bytes = _gnutls_read_uint16(data);
 
 	DECR_LEN(data_size, 2);
-	data += 2;
+	/*data += 2;*/
 
-	if (data_size <= (ssize_t) (responder_ids * 2))
+	/* sanity check only, we don't use any of the data below */
+
+	if (data_size < (ssize_t)rid_bytes)
 		return
 		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-
-	deinit_responder_id(priv);
-
-	priv->responder_id = gnutls_calloc(1, responder_ids
-					   * sizeof(*priv->responder_id));
-	if (priv->responder_id == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	priv->responder_id_size = responder_ids;
-
-	for (i = 0; i < priv->responder_id_size; i++) {
-		size_t l;
-
-		DECR_LEN(data_size, 2);
-
-		l = _gnutls_read_uint16(data);
-		data += 2;
-
-		DECR_LEN(data_size, l);
-
-		priv->responder_id[i].data = gnutls_malloc(l);
-		if (priv->responder_id[i].data == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-		memcpy(priv->responder_id[i].data, data, l);
-		priv->responder_id[i].size = l;
-
-		data += l;
-	}
 
 	return 0;
 }
@@ -557,11 +514,18 @@ gnutls_certificate_set_ocsp_status_request_file
 static void _gnutls_status_request_deinit_data(extension_priv_data_t epriv)
 {
 	status_request_ext_st *priv = epriv;
+	unsigned i;
 
 	if (priv == NULL)
 		return;
 
-	deinit_responder_id(priv);
+	if (priv->responder_id != NULL) {
+		for (i = 0; i < priv->responder_id_size; i++)
+			gnutls_free(priv->responder_id[i].data);
+
+		gnutls_free(priv->responder_id);
+	}
+
 	gnutls_free(priv->request_extensions.data);
 	gnutls_free(priv->response.data);
 	gnutls_free(priv);
