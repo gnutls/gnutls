@@ -1098,3 +1098,12 @@ AC_MSG_WARN([[
 *** to generate or update it.
 *** ]])
 fi
+
+if test "${enable_static}" != no;then
+AC_MSG_WARN([[
+*** GnuTLS will be build as a static library. That means that library
+*** constructors for gnutls_global_init will not be made available to
+*** linking applications. If you are building that library for arbitrary
+*** applications to link, do not enable static linking.
+]])
+fi
