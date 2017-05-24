@@ -11,6 +11,12 @@ See the end for copying conditions.
 ** libgnutls: fix issue in RSA-PSK client callback which resulted in no username
    being sent to the peer. Patch by Nicolas Dufresne.
 
+** libgnutls: no longer parse the ResponseID field of the status response
+   TLS extension. The field is not used by GnuTLS nor is made available to
+   calling applications. That addresses a null pointer dereference on server
+   side caused by packets containing the ResponseID field. Reported
+   by Hubert Kario.
+
 ** API and ABI modifications:
 No changes since last version.
 
