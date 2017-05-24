@@ -294,9 +294,15 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
  *
  * This function is to be used by clients to request OCSP response
  * from the server, using the "status_request" TLS extension.  Only
- * OCSP status type is supported. A typical server has a single
- * OCSP response cached, so @responder_id and @extensions
- * should be null.
+ * OCSP status type is supported.
+ *
+ * The @responder_id array, its containing elements as well as
+ * the data of @extensions, must be allocated using gnutls_malloc(). They
+ * will be deinitialized on session cleanup.
+ *
+ * Due to the difficult semantics of the @responder_id and @extensions
+ * parameters, it is recommended to only call this function with these
+ * parameters set to %NULL.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
