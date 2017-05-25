@@ -134,6 +134,7 @@ gnutls_db_set_remove_function@GNUTLS_3_4
 gnutls_db_set_retrieve_function@GNUTLS_3_4
 gnutls_db_set_store_function@GNUTLS_3_4
 gnutls_decode_ber_digest_info@GNUTLS_3_4
+gnutls_decode_rs_value@GNUTLS_3_4
 gnutls_deinit@GNUTLS_3_4
 gnutls_dh_get_group@GNUTLS_3_4
 gnutls_dh_get_peers_public_bits@GNUTLS_3_4
@@ -173,6 +174,7 @@ gnutls_ecc_curve_get_pk@GNUTLS_3_4
 gnutls_ecc_curve_get_size@GNUTLS_3_4
 gnutls_ecc_curve_list@GNUTLS_3_4
 gnutls_encode_ber_digest_info@GNUTLS_3_4
+gnutls_encode_rs_value@GNUTLS_3_4
 gnutls_error_is_fatal@GNUTLS_3_4
 gnutls_error_to_alert@GNUTLS_3_4
 gnutls_est_record_overhead_size@GNUTLS_3_4
