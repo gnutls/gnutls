@@ -191,6 +191,10 @@ int gnutls_error_to_alert(int err, int *level)
 	int ret, _level = -1;
 
 	switch (err) {		/* send appropriate alert */
+	case GNUTLS_E_PK_SIG_VERIFY_FAILED:
+		ret = GNUTLS_A_DECRYPT_ERROR;
+		_level = GNUTLS_AL_FATAL;
+		break;
 	case GNUTLS_E_DECRYPTION_FAILED:
 		/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
 		 * it is not defined in SSL3. Note that we must
@@ -234,7 +238,6 @@ int gnutls_error_to_alert(int err, int *level)
 	case GNUTLS_E_ASN1_DER_OVERFLOW:
 	case GNUTLS_E_CERTIFICATE_ERROR:
 	case GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR:
-	case GNUTLS_E_PK_SIG_VERIFY_FAILED:
 		ret = GNUTLS_A_BAD_CERTIFICATE;
 		_level = GNUTLS_AL_FATAL;
 		break;
