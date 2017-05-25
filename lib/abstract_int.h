@@ -96,10 +96,6 @@ int privkey_sign_data(gnutls_privkey_t signer,
 		      const gnutls_datum_t * data,
 		      gnutls_datum_t * signature,
 		      gnutls_x509_spki_st *params);
-int privkey_sign_hash(gnutls_privkey_t signer,
-		      const gnutls_datum_t * hash_data,
-		      gnutls_datum_t * signature,
-		      gnutls_x509_spki_st * params);
 
 unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params);
 int _gnutls_pubkey_compatible_with_sig(gnutls_session_t,
