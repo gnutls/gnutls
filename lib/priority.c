@@ -372,6 +372,11 @@ static const int _sign_priority_default[] = {
 
 	GNUTLS_SIGN_RSA_SHA1,
 	GNUTLS_SIGN_ECDSA_SHA1,
+
+	/* added on the final position for compatibility purposes */
+	GNUTLS_SIGN_RSA_PSS_SHA256,
+	GNUTLS_SIGN_RSA_PSS_SHA384,
+	GNUTLS_SIGN_RSA_PSS_SHA512,
 	0
 };
 static const int* sign_priority_default = _sign_priority_default;
@@ -396,6 +401,11 @@ static const int _sign_priority_secure128[] = {
 	GNUTLS_SIGN_ECDSA_SHA384,
 	GNUTLS_SIGN_RSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SHA512,
+
+	/* added on the final position for compatibility purposes */
+	GNUTLS_SIGN_RSA_PSS_SHA256,
+	GNUTLS_SIGN_RSA_PSS_SHA384,
+	GNUTLS_SIGN_RSA_PSS_SHA512,
 	0
 };
 static const int* sign_priority_secure128 = _sign_priority_secure128;
@@ -405,6 +415,10 @@ static const int _sign_priority_secure192[] = {
 	GNUTLS_SIGN_ECDSA_SHA384,
 	GNUTLS_SIGN_RSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SHA512,
+
+	/* added on the final position for compatibility purposes */
+	GNUTLS_SIGN_RSA_PSS_SHA384,
+	GNUTLS_SIGN_RSA_PSS_SHA512,
 	0
 };
 static const int* sign_priority_secure192 = _sign_priority_secure192;
