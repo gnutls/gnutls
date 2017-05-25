@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -37,7 +38,34 @@
 #include <random.h>
 #include <gnutls/crypto.h>
 
-/* encodes the Dss-Sig-Value structure
+/**
+ * gnutls_encode_rs_value:
+ * @sig_value: will hold a Dss-Sig-Value DER encoded structure
+ * @r: must contain the r value
+ * @s: must contain the s value
+ *
+ * This function will encode the provided r and s values, 
+ * into a Dss-Sig-Value structure, used for DSA and ECDSA
+ * signatures.
+ *
+ * The output value should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ *
+ **/
+int
+gnutls_encode_rs_value(gnutls_datum_t * sig_value,
+			const gnutls_datum_t * r,
+			const gnutls_datum_t * s)
+{
+	return _gnutls_encode_ber_rs_raw(sig_value, r, s);
+}
+
+/* same as gnutls_encode_rs_value(), but kept since it used
+ * to be exported for FIPS140 CAVS testing.
  */
 int
 _gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
@@ -190,6 +218,35 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 	return 0;
 }
 
+/**
+ * gnutls_decode_rs_value:
+ * @sig_value: holds a Dss-Sig-Value DER or BER encoded structure
+ * @r: will contain the r value
+ * @s: will contain the s value
+ *
+ * This function will decode the provided @sig_value, 
+ * into @r and @s elements. The Dss-Sig-Value is used for DSA and ECDSA
+ * signatures.
+ *
+ * The output values may be padded with a zero byte to prevent them
+ * from being interpreted as negative values. The value
+ * should be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ *
+ **/
+int gnutls_decode_rs_value(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
+			   gnutls_datum_t *s)
+{
+	return _gnutls_decode_ber_rs_raw(sig_value, r, s);
+}
+
+/* same as gnutls_decode_rs_value(), but kept since it used
+ * to be exported for FIPS140 CAVS testing.
+ */
 int
 _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 			  gnutls_datum_t *s)

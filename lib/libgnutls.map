@@ -1140,6 +1140,8 @@ GNUTLS_3_4
 	gnutls_x509_ext_export_inhibit_anypolicy;
 	gnutls_x509_crt_get_inhibit_anypolicy;
 	gnutls_x509_crt_set_inhibit_anypolicy;
+	gnutls_decode_rs_value;
+	gnutls_encode_rs_value;
  local:
 	*;
 };

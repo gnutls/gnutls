@@ -236,6 +236,9 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 			      gnutls_digest_algorithm_t *hash,
 			      unsigned char *digest, unsigned int *digest_size);
 
+int gnutls_decode_rs_value(const gnutls_datum_t * sig_value, gnutls_datum_t *r, gnutls_datum_t *s);
+int gnutls_encode_rs_value(gnutls_datum_t * sig_value, const gnutls_datum_t * r, const gnutls_datum_t * s);
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }
