@@ -35,7 +35,6 @@
 #include <gnutls/dtls.h>
 #include "utils.h"
 #include "eagain-common.h"
-#include "cert-common.h"
 #include "common-cert-key-exchange.h"
 
 const char *side;
@@ -47,11 +46,14 @@ static void tls_log_func(int level, const char *str)
 
 #define MSG "hello there ppl"
 
-
-void try(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
+void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,
 		gnutls_sign_algorithm_t client_sign_algo,
-		unsigned client_cert)
+		const gnutls_datum_t *serv_cert,
+		const gnutls_datum_t *serv_key,
+		const gnutls_datum_t *client_cert,
+		const gnutls_datum_t *client_key,
+		unsigned cert_flags)
 {
 	int ret;
 	char buffer[256];
@@ -79,15 +81,9 @@ void try(const char *name, const char *client_prio, gnutls_kx_algorithm_t client
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
-	if (client_kx == GNUTLS_KX_ECDHE_ECDSA) {
-		gnutls_certificate_set_x509_key_mem(serverx509cred,
-						    &server_ecc_cert, &server_ecc_key,
-						    GNUTLS_X509_FMT_PEM);
-	} else {
-		gnutls_certificate_set_x509_key_mem(serverx509cred,
-						    &server_cert, &server_key,
-						    GNUTLS_X509_FMT_PEM);
-	}
+	gnutls_certificate_set_x509_key_mem(serverx509cred,
+					    serv_cert, serv_key,
+					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
@@ -112,19 +108,20 @@ void try(const char *name, const char *client_prio, gnutls_kx_algorithm_t client
 	if (ret < 0)
 		exit(1);
 
-	if (client_cert == USE_CERT) {
+	if (cert_flags == USE_CERT) {
 		gnutls_certificate_set_x509_key_mem(clientx509cred,
-						    &cli_cert, &cli_key,
+						    client_cert, client_key,
 						    GNUTLS_X509_FMT_PEM);
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
-	} else if (client_cert == ASK_CERT) {
+	} else if (cert_flags == ASK_CERT) {
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	}
 
+#if 0
 	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
-
+#endif
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
 	if (ret < 0)
 		exit(1);
@@ -210,10 +207,14 @@ void try(const char *name, const char *client_prio, gnutls_kx_algorithm_t client
 	gnutls_dh_params_deinit(dh_params);
 }
 
-void dtls_try(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
+void dtls_try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,
 		gnutls_sign_algorithm_t client_sign_algo,
-		unsigned client_cert)
+		const gnutls_datum_t *serv_cert,
+		const gnutls_datum_t *serv_key,
+		const gnutls_datum_t *client_cert,
+		const gnutls_datum_t *client_key,
+		unsigned cert_flags)
 {
 	int ret;
 	char buffer[256];
@@ -241,15 +242,9 @@ void dtls_try(const char *name, const char *client_prio, gnutls_kx_algorithm_t c
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
-	if (client_kx == GNUTLS_KX_ECDHE_ECDSA) {
-		gnutls_certificate_set_x509_key_mem(serverx509cred,
-						    &server_ecc_cert, &server_ecc_key,
-						    GNUTLS_X509_FMT_PEM);
-	} else {
-		gnutls_certificate_set_x509_key_mem(serverx509cred,
-						    &server_cert, &server_key,
-						    GNUTLS_X509_FMT_PEM);
-	}
+	gnutls_certificate_set_x509_key_mem(serverx509cred,
+					    serv_cert, serv_key,
+					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
@@ -275,18 +270,20 @@ void dtls_try(const char *name, const char *client_prio, gnutls_kx_algorithm_t c
 	if (ret < 0)
 		exit(1);
 
-	if (client_cert == USE_CERT) {
+	if (cert_flags == USE_CERT) {
 		gnutls_certificate_set_x509_key_mem(clientx509cred,
-						    &cli_cert, &cli_key,
+						    client_cert, client_key,
 						    GNUTLS_X509_FMT_PEM);
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
-	} else if (client_cert == ASK_CERT) {
+	} else if (cert_flags == ASK_CERT) {
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	}
 
+#if 0
 	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
+#endif
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_DATAGRAM|GNUTLS_NONBLOCK);
 	if (ret < 0)
