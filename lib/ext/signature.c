@@ -299,8 +299,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	}
 
 	for (i = 0; i < priv->sign_algorithms_size; i++) {
-		if (gnutls_sign_get_pk_algorithm(priv->sign_algorithms[i])
-		    == cert_algo) {
+		if (gnutls_sign_supports_pk_algorithm(priv->sign_algorithms[i], cert_algo) != 0) {
 			if (_gnutls_pubkey_compatible_with_sig
 			    (session, cert->pubkey, ver,
 			     priv->sign_algorithms[i]) < 0)
