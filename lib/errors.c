@@ -412,6 +412,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_PK_INVALID_PRIVKEY),
 	ERROR_ENTRY(N_("The DER time encoding is invalid."),
 		    GNUTLS_E_ASN1_TIME_ERROR),
+	ERROR_ENTRY(N_("The signature is incompatible with the public key."),
+		    GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY),
 	{NULL, NULL, 0}
 };
 

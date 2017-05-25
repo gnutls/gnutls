@@ -1702,34 +1702,34 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		return _gnutls_pk_verify(params.pk, hash, signature,
 					 &key->params, &params);
 	} else {
-		params.pk = key->pk_algorithm;
-		params.dig = gnutls_sign_get_hash_algorithm(algo);
-		/* This can be NULL here, if pubkey is DSA. For RSA it
-		 * is checked below. */
-		me = hash_to_entry(params.dig);
+		if (algo == GNUTLS_SIGN_UNKNOWN) {
+			params.pk = key->pk_algorithm;
+			me = NULL;
+		} else {
+			params.pk = gnutls_sign_get_pk_algorithm(algo);
+			params.dig = gnutls_sign_get_hash_algorithm(algo);
 
-		if (flags & GNUTLS_VERIFY_USE_RSA_PSS) {
-			int ret;
-			gnutls_pk_algorithm_t pk;
-			unsigned bits;
+			me = hash_to_entry(params.dig);
 
-			ret = gnutls_pubkey_get_pk_algorithm(key, &bits);
-			if (ret < 0) {
-				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+			if (params.pk != key->pk_algorithm) {
+				if (!gnutls_sign_supports_pk_algorithm(algo, key->pk_algorithm)) {
+					_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
+						gnutls_pk_get_name(key->pk_algorithm), key->pk_algorithm,
+						gnutls_sign_get_name(algo), algo);
+					return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+				}
 			}
+		}
 
-			pk = ret;
-
+		if (params.pk == GNUTLS_PK_RSA_PSS) {
 			/* The requested sign algorithm is RSA-PSS, while the
 			 * pubkey doesn't include parameter information */
-			if (pk == GNUTLS_PK_RSA) {
+			if (key->pk_algorithm == GNUTLS_PK_RSA) {
 				if (me == NULL)
 					return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 				params.salt_size =
-				    _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+				    _gnutls_find_rsa_pss_salt_size(key->bits, me, 0);
 			}
-			params.pk = GNUTLS_PK_RSA_PSS;
 		}
 
 		return pubkey_verify_hashed_data(params.pk, me,
@@ -1839,7 +1839,8 @@ _gnutls_pubkey_get_mpis(gnutls_pubkey_t key, gnutls_pk_params_st * params)
  * params[1] is public key
  */
 static int
-_pkcs1_rsa_verify_sig(const mac_entry_st * me,
+_pkcs1_rsa_verify_sig(gnutls_pk_algorithm_t pk,
+		      const mac_entry_st * me,
 		      const gnutls_datum_t * text,
 		      const gnutls_datum_t * prehash,
 		      const gnutls_datum_t * signature,
@@ -1876,15 +1877,20 @@ _pkcs1_rsa_verify_sig(const mac_entry_st * me,
 	d.data = cmp;
 	d.size = digest_size;
 
-	/* decrypted is a BER encoded data of type DigestInfo
-	 */
-	ret = encode_ber_digest_info(me, &d, &di);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (pk == GNUTLS_PK_RSA) {
+		/* decrypted is a BER encoded data of type DigestInfo
+		 */
+		ret = encode_ber_digest_info(me, &d, &di);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	ret = _gnutls_pk_verify(GNUTLS_PK_RSA, &di, signature, params,
-				sign_params);
-	_gnutls_free_datum(&di);
+		ret = _gnutls_pk_verify(pk, &di, signature, params,
+					sign_params);
+		_gnutls_free_datum(&di);
+	} else {
+		ret = _gnutls_pk_verify(pk, &d, signature, params,
+					sign_params);
+	}
 
 	return ret;
 }
@@ -1966,8 +1972,9 @@ pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		if (_pkcs1_rsa_verify_sig
-		    (hash_algo, NULL, hash, signature, params, sign_params) != 0)
+		    (pk, hash_algo, NULL, hash, signature, params, sign_params) != 0)
 		{
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -1976,7 +1983,6 @@ pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
 		return 1;
 		break;
 
-	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_EC:
 	case GNUTLS_PK_DSA:
 		if (dsa_verify_hashed_data
@@ -2007,8 +2013,9 @@ pubkey_verify_data(gnutls_pk_algorithm_t pk,
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_RSA_PSS:
 		if (_pkcs1_rsa_verify_sig
-		    (me, data, NULL, signature, params, sign_params) != 0) {
+		    (pk, me, data, NULL, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
@@ -2016,7 +2023,6 @@ pubkey_verify_data(gnutls_pk_algorithm_t pk,
 		return 1;
 		break;
 
-	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_EC:
 	case GNUTLS_PK_DSA:
 		if (dsa_verify_data
