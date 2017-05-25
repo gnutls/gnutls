@@ -40,7 +40,9 @@
 #include <abstract_int.h>
 
 static int
-sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
+sign_tls_hash(gnutls_session_t session,
+	      gnutls_pk_algorithm_t pk,
+	      const mac_entry_st * hash_algo,
 	      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
 	      const gnutls_datum_t * hash_concat,
 	      gnutls_datum_t * signature);
@@ -62,6 +64,7 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 	uint8_t concat[MAX_SIG_SIZE];
 	const version_entry_st *ver = get_version(session);
 	const mac_entry_st *hash_algo;
+	gnutls_pk_algorithm_t pk_algo;
 
 	*sign_algo = _gnutls_session_get_sign_algo(session, cert, 0);
 	if (*sign_algo == GNUTLS_SIGN_UNKNOWN) {
@@ -79,6 +82,10 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 				gnutls_sign_get_hash_algorithm(*sign_algo));
 	if (hash_algo == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
+	pk_algo = gnutls_sign_get_pk_algorithm(*sign_algo);
+	if (pk_algo == GNUTLS_PK_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
 	_gnutls_handshake_log
 	    ("HSK[%p]: signing handshake data: using %s\n", session,
@@ -102,7 +109,7 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 	dconcat.size = _gnutls_hash_get_algo_len(hash_algo);
 
 	ret =
-	    sign_tls_hash(session, hash_algo, cert, pkey, &dconcat,
+	    sign_tls_hash(session, pk_algo, hash_algo, cert, pkey, &dconcat,
 			  signature);
 	if (ret < 0) {
 		gnutls_assert();
@@ -147,13 +154,16 @@ int check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage, unsign
  * it supports signing.
  */
 static int
-sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
+sign_tls_hash(gnutls_session_t session, 
+	      gnutls_pk_algorithm_t pk,
+	      const mac_entry_st * hash_algo,
 	      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
 	      const gnutls_datum_t * hash_concat,
 	      gnutls_datum_t * signature)
 {
 	const version_entry_st *ver = get_version(session);
 	unsigned int key_usage = 0;
+	unsigned flags = 0;
 	int ret;
 
 	/* If our certificate supports signing
@@ -171,9 +181,12 @@ sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
 						    signature);
 	} else {
 		assert(hash_algo != NULL);
+		if (pk == GNUTLS_PK_RSA_PSS)
+			flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+
 		return gnutls_privkey_sign_hash(pkey, 
 						(gnutls_digest_algorithm_t)hash_algo->id,
-						0, hash_concat, signature);
+						flags, hash_concat, signature);
 	}
 }
 
@@ -502,6 +515,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	uint8_t concat[MAX_SIG_SIZE];
 	gnutls_sign_algorithm_t sign_algo;
 	const mac_entry_st *me;
+	gnutls_pk_algorithm_t pk_algo;
 
 	sign_algo = _gnutls_privkey_get_preferred_sign_algo(pkey);
 	if (sign_algo == GNUTLS_SIGN_UNKNOWN || 
@@ -513,6 +527,10 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 			return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 		}
 	}
+
+	pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
+	if (pk_algo == GNUTLS_PK_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
 	gnutls_sign_algorithm_set_client(session, sign_algo);
 
@@ -534,7 +552,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
 
-	ret = sign_tls_hash(session, me, cert, pkey, &dconcat, signature);
+	ret = sign_tls_hash(session, pk_algo, me, cert, pkey, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -618,7 +636,7 @@ _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 
 	dconcat.size += 20;
 
-	ret = sign_tls_hash(session, NULL, cert, pkey, &dconcat, signature);
+	ret = sign_tls_hash(session, 0, NULL, cert, pkey, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -692,7 +710,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	ret =
-	    sign_tls_hash(session, NULL, cert, pkey, &dconcat, signature);
+	    sign_tls_hash(session, 0, NULL, cert, pkey, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 	}
