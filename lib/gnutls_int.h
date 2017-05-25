@@ -515,7 +515,7 @@ typedef struct {
  * structures also - see SRP).
  */
 
-#define MAX_SIGNATURE_ALGORITHMS 16
+#define MAX_SIGNATURE_ALGORITHMS GNUTLS_MAX_ALGORITHM_NUM
 #define MAX_SIGN_ALGO_SIZE (2 + MAX_SIGNATURE_ALGORITHMS * 2)
 
 #define MAX_VERIFY_DATA_SIZE 36	/* in SSL 3.0, 12 in TLS 1.0 */
