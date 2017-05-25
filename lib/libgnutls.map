@@ -1155,6 +1155,7 @@ GNUTLS_3_4
 	gnutls_x509_crq_get_pk_algorithm2;
 	gnutls_x509_crq_set_pk_algorithm;
 	gnutls_x509_privkey_get_pk_algorithm3;
+	gnutls_sign_supports_pk_algorithm;
  local:
 	*;
 };

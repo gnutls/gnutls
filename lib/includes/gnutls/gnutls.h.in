@@ -1018,6 +1018,9 @@ gnutls_sign_algorithm_t
 	gnutls_pk_to_sign(gnutls_pk_algorithm_t pk,
 		  gnutls_digest_algorithm_t hash) __GNUTLS_CONST__;
 
+unsigned
+gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign, gnutls_pk_algorithm_t pk) __GNUTLS_CONST__;
+
 #define gnutls_sign_algorithm_get_name gnutls_sign_get_name
 
 gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name) __GNUTLS_CONST__;
