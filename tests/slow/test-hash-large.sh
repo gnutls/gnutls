@@ -26,6 +26,9 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
+srcdir="${srcdir:-.}"
+. "${srcdir}/../scripts/common.sh"
+
 ${PROG}
 ret=$?
 if test $ret != 0; then
@@ -39,6 +42,8 @@ if test $ret != 0; then
 	echo "included cipher tests failed"
 	exit $ret
 fi
+
+exit_if_non_x86
 
 GNUTLS_CPUID_OVERRIDE=0x4 ${PROG}
 ret=$?
