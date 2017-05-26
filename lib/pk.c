@@ -299,7 +299,7 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 	unsigned int i, j;
 	dst->params_nr = 0;
 
-	if (src == NULL || src->params_nr == 0) {
+	if (src == NULL || (src->params_nr == 0 && src->raw_pub.size == 0)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -832,6 +832,31 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 	if (curve)
 		*curve = params->flags;
 
+	if (curve_is_eddsa(params->flags)) {
+		if (x) {
+			ret = _gnutls_set_datum(x, params->raw_pub.data, params->raw_pub.size);
+			if (ret < 0) {
+				return gnutls_assert_val(ret);
+			}
+		}
+
+		if (y) {
+			y->data = NULL;
+			y->size = 0;
+		}
+
+		if (k) {
+			ret = _gnutls_set_datum(k, params->raw_priv.data, params->raw_priv.size);
+			if (ret < 0) {
+				_gnutls_free_datum(x);
+				return gnutls_assert_val(ret);
+			}
+		}
+
+		return 0;
+	}
+
+
 	/* X */
 	if (x) {
 		ret = dprint(params->params[ECC_X], x);
@@ -926,7 +951,8 @@ pk_prepare_hash(gnutls_pk_algorithm_t pk,
 		break;
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_DSA:
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
+	case GNUTLS_PK_EDDSA_ED25519:
 		break;
 	default:
 		gnutls_assert();

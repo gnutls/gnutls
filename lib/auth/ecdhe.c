@@ -141,7 +141,7 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 {
 	ssize_t data_size = _data_size;
 	int ret, i = 0;
-	int point_size;
+	unsigned point_size;
 	const gnutls_ecc_curve_entry_st *ecurve = _gnutls_ecc_curve_get_params(curve);
 
 	if (curve == GNUTLS_ECC_CURVE_INVALID || ecurve == NULL)
@@ -314,7 +314,8 @@ int
 _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 				   uint8_t * data, size_t _data_size)
 {
-	int i, ret, point_size;
+	int i, ret;
+	unsigned point_size;
 	gnutls_ecc_curve_t curve;
 	ssize_t data_size = _data_size;
 	const gnutls_ecc_curve_entry_st *ecurve;

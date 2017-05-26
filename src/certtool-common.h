@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -78,6 +79,18 @@ typedef struct common_info {
 	unsigned rsa_pss_sign;
 	unsigned sort_chain;
 } common_info_st;
+
+static inline
+void switch_to_pkcs8_when_needed(common_info_st *cinfo, unsigned key_type)
+{
+	if ((key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519) && !cinfo->pkcs8) {
+		fprintf(stderr, "Assuming --pkcs8 is given; %s private keys can only be exported in PKCS#8 format\n",
+			gnutls_pk_algorithm_get_name(key_type));
+		cinfo->pkcs8 = 1;
+		if (cinfo->password == NULL)
+			cinfo->password = "";
+	}
+}
 
 /* this must be provided by the app */
 const char *get_pass(void);

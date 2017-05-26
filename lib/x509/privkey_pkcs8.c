@@ -66,9 +66,19 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
 	switch (pkey->pk_algorithm) {
+	case GNUTLS_PK_EDDSA_ED25519:
+		/* we encode as octet string (which is going to be stored inside
+		 * another octet string). No comments. */
+		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
+					 pkey->params.raw_priv.data, pkey->params.raw_priv.size,
+					 raw);
+		if (ret < 0)
+			gnutls_assert();
+		return ret;
+
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
 		ret =
 		    gnutls_x509_privkey_export2(pkey, GNUTLS_X509_FMT_DER,
 						raw);
@@ -999,6 +1009,7 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	if (result == ASN1_SUCCESS) {
 		ret = _gnutls_x509_read_ecc_params(oid, len, &curve);
 		if (ret < 0) {
+			_gnutls_debug_log("PKCS#8: unknown curve OID %s\n", oid);
 			curve = GNUTLS_ECC_CURVE_INVALID;
 		}
 	}
@@ -1021,6 +1032,41 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 
       error:
 	return ret;
+}
+
+static int
+_decode_pkcs8_eddsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const char *oid)
+{
+	int ret;
+	gnutls_datum_t tmp;
+	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
+	const gnutls_ecc_curve_entry_st *ce;
+
+	curve = gnutls_oid_to_ecc_curve(oid);
+	if (curve == GNUTLS_ECC_CURVE_INVALID) {
+		_gnutls_debug_log("PKCS#8: unknown curve OID %s\n", oid);
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
+
+	ce = _gnutls_ecc_curve_get_params(curve);
+	if (_curve_is_eddsa(ce)) {
+		ret = _gnutls_x509_read_string(pkcs8_asn, "privateKey", &tmp, ASN1_ETYPE_OCTET_STRING, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			return gnutls_assert_val(ret);
+		}
+
+		gnutls_free(pkey->params.raw_priv.data);
+		pkey->params.algo = GNUTLS_PK_EDDSA_ED25519;
+		pkey->params.raw_priv.data = tmp.data;
+		pkey->params.raw_priv.size = tmp.size;
+		pkey->params.flags = curve;
+
+		tmp.data = NULL;
+		return 0;
+	} else {
+		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
 }
 
 /* Decodes an DSA privateKey and params from a PKCS8 structure.
@@ -1157,17 +1203,25 @@ decode_private_key_info(const gnutls_datum_t * der,
 	/* Get the DER encoding of the actual private key.
 	 */
 
-	if (pkey->pk_algorithm == GNUTLS_PK_RSA)
-		result = _decode_pkcs8_rsa_key(pkcs8_asn, pkey);
-	else if (pkey->pk_algorithm == GNUTLS_PK_RSA_PSS)
-		result = _decode_pkcs8_rsa_pss_key(pkcs8_asn, pkey);
-	else if (pkey->pk_algorithm == GNUTLS_PK_DSA)
-		result = _decode_pkcs8_dsa_key(pkcs8_asn, pkey);
-	else if (pkey->pk_algorithm == GNUTLS_PK_EC)
-		result = _decode_pkcs8_ecc_key(pkcs8_asn, pkey);
-	else {
-		result = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-		goto error;
+	switch(pkey->pk_algorithm) {
+		case GNUTLS_PK_RSA:
+			result = _decode_pkcs8_rsa_key(pkcs8_asn, pkey);
+			break;
+		case GNUTLS_PK_RSA_PSS:
+			result = _decode_pkcs8_rsa_pss_key(pkcs8_asn, pkey);
+			break;
+		case GNUTLS_PK_DSA:
+			result = _decode_pkcs8_dsa_key(pkcs8_asn, pkey);
+			break;
+		case GNUTLS_PK_ECDSA:
+			result = _decode_pkcs8_ecc_key(pkcs8_asn, pkey);
+			break;
+		case GNUTLS_PK_EDDSA_ED25519:
+			result = _decode_pkcs8_eddsa_key(pkcs8_asn, pkey, oid);
+			break;
+		default:
+			result = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+			goto error;
 	}
 
 	if (result < 0) {

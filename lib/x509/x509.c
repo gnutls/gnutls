@@ -1592,6 +1592,7 @@ gnutls_x509_crt_get_pk_algorithm2(gnutls_x509_crt_t cert,
 	result =
 	    _gnutls_x509_get_pk_algorithm(cert->cert,
 					  "tbsCertificate.subjectPublicKeyInfo",
+					  NULL,
 					  bits);
 
 	if (result < 0) {
@@ -3019,6 +3020,7 @@ gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt, unsigned int flags,
 		return pk;
 	}
 
+	/* initializes params */
 	ret = _gnutls_x509_crt_get_mpis(crt, &params);
 	if (ret < 0) {
 		gnutls_assert();

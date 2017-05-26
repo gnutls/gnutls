@@ -706,6 +706,7 @@ typedef enum gnutls_certificate_print_formats {
  * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
  * @GNUTLS_PK_ECDSA: Elliptic curve algorithm. These parameters are compatible with the ECDSA and ECDH algorithm.
  * @GNUTLS_PK_ECDHX: Elliptic curve algorithm, restricted to ECDH as per rfc7748.
+ * @GNUTLS_PK_EDDSA_ED25519: Edwards curve Digital signature algorithm.
  *
  * Enumeration of different public-key algorithms.
  */
@@ -717,7 +718,8 @@ typedef enum {
 	GNUTLS_PK_ECDSA = 4,
 	GNUTLS_PK_ECDHX = 5,
 	GNUTLS_PK_RSA_PSS = 6,
-	GNUTLS_PK_MAX = GNUTLS_PK_RSA_PSS
+	GNUTLS_PK_EDDSA_ED25519 = 7,
+	GNUTLS_PK_MAX = GNUTLS_PK_EDDSA_ED25519
 } gnutls_pk_algorithm_t;
 
 
@@ -761,6 +763,7 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_RSA_PSS_SHA256: Digital signature algorithm RSA with SHA-256, with PSS padding.
  * @GNUTLS_SIGN_RSA_PSS_SHA384: Digital signature algorithm RSA with SHA-384, with PSS padding.
  * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding.
+ * @GNUTLS_SIGN_EDDSA_ED25519: Digital signature algorithm EdDSA with Ed25519 curve.
  *
  * Enumeration of different digital signature algorithms.
  */
@@ -803,7 +806,8 @@ typedef enum {
 	GNUTLS_SIGN_RSA_PSS_SHA256 = 32,
 	GNUTLS_SIGN_RSA_PSS_SHA384 = 33,
 	GNUTLS_SIGN_RSA_PSS_SHA512 = 34,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_PSS_SHA512
+	GNUTLS_SIGN_EDDSA_ED25519 = 35,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_EDDSA_ED25519
 } gnutls_sign_algorithm_t;
 
 /**
@@ -815,6 +819,7 @@ typedef enum {
  * @GNUTLS_ECC_CURVE_SECP384R1: the SECP384R1 curve
  * @GNUTLS_ECC_CURVE_SECP521R1: the SECP521R1 curve
  * @GNUTLS_ECC_CURVE_X25519: the X25519 curve (ECDH only)
+ * @GNUTLS_ECC_CURVE_ED25519: the Ed25519 curve
  *
  * Enumeration of ECC curves.
  */
@@ -826,7 +831,8 @@ typedef enum {
 	GNUTLS_ECC_CURVE_SECP521R1,
 	GNUTLS_ECC_CURVE_SECP192R1,
 	GNUTLS_ECC_CURVE_X25519,
-	GNUTLS_ECC_CURVE_MAX = GNUTLS_ECC_CURVE_X25519
+	GNUTLS_ECC_CURVE_ED25519,
+	GNUTLS_ECC_CURVE_MAX = GNUTLS_ECC_CURVE_ED25519
 } gnutls_ecc_curve_t;
 
 /* macros to allow specifying a specific curve in gnutls_privkey_generate()

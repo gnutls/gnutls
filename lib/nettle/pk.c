@@ -48,6 +48,7 @@
 #include <nettle/ecdsa.h>
 #include <nettle/ecc-curve.h>
 #include <nettle/curve25519.h>
+#include <nettle/eddsa.h>
 #include <gnettle.h>
 #include <fips.h>
 #ifndef HAVE_NETTLE_RSA_PSS
@@ -566,8 +567,42 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	unsigned int hash_len;
 	const mac_entry_st *me;
 
+	if (IS_EC(algo)) {
+		/* check if the curve relates to the algorithm used */
+		if (gnutls_ecc_curve_get_pk(pk_params->flags) != algo)
+			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
+
 	switch (algo) {
-	case GNUTLS_PK_EC:	/* we do ECDSA */
+	case GNUTLS_PK_EDDSA_ED25519:	/* we do EdDSA */
+		{
+			const gnutls_ecc_curve_entry_st *e;
+
+			if (pk_params->flags != GNUTLS_ECC_CURVE_ED25519)
+				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			e = _gnutls_ecc_curve_get_params(pk_params->flags);
+			if (e == NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			signature->data = gnutls_malloc(e->sig_size);
+			if (signature->data == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto cleanup;
+			}
+
+			signature->size = e->sig_size;
+
+			if (pk_params->raw_pub.size != e->size || pk_params->raw_priv.size != e->size)
+				return gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+
+			ed25519_sha512_sign(pk_params->raw_pub.data,
+			                    pk_params->raw_priv.data,
+			                    vdata->size, vdata->data, signature->data);
+
+			break;
+		}
+	case GNUTLS_PK_ECDSA:	/* we do ECDSA */
 		{
 			struct ecc_scalar priv;
 			struct dsa_signature sig;
@@ -809,8 +844,40 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	unsigned int hash_len;
 	bigint_t tmp[2] = { NULL, NULL };
 
+	if (IS_EC(algo)) {
+		/* check if the curve relates to the algorithm used */
+		if (gnutls_ecc_curve_get_pk(pk_params->flags) != algo)
+			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
+
 	switch (algo) {
-	case GNUTLS_PK_EC:	/* ECDSA */
+	case GNUTLS_PK_EDDSA_ED25519:	/* we do EdDSA */
+		{
+			const gnutls_ecc_curve_entry_st *e;
+
+			if (pk_params->flags != GNUTLS_ECC_CURVE_ED25519)
+				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			e = _gnutls_ecc_curve_get_params(pk_params->flags);
+			if (e == NULL)
+				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			if (signature->size != e->sig_size)
+				return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+
+			if (pk_params->raw_pub.size != e->size)
+				return gnutls_assert_val(GNUTLS_E_PK_SIGN_FAILED);
+
+			ret = ed25519_sha512_verify(pk_params->raw_pub.data, vdata->size, vdata->data, signature->data);
+			if (ret == 0) {
+				gnutls_assert();
+				ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+			} else {
+				ret = 0;
+			}
+			break;
+		}
+	case GNUTLS_PK_ECDSA:	/* ECDSA */
 		{
 			struct ecc_point pub;
 			struct dsa_signature sig;
@@ -998,6 +1065,7 @@ static inline const struct ecc_curve *get_supported_nist_curve(int curve)
 static int _wrap_nettle_pk_curve_exists(gnutls_ecc_curve_t curve)
 {
 	switch (curve) {
+		case GNUTLS_ECC_CURVE_ED25519:
 		case GNUTLS_ECC_CURVE_X25519:
 			return 1;
 		default:
@@ -1008,7 +1076,7 @@ static int _wrap_nettle_pk_curve_exists(gnutls_ecc_curve_t curve)
 /* Generates algorithm's parameters. That is:
  *  For DSA: p, q, and g are generated.
  *  For RSA: nothing
- *  For ECDSA: just checks the curve is ok
+ *  For ECDSA/EDDSA: nothing
  */
 static int
 wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
@@ -1121,7 +1189,8 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 		}
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_RSA:
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
+	case GNUTLS_PK_EDDSA_ED25519:
 		break;
 	default:
 		gnutls_assert();
@@ -1265,13 +1334,13 @@ int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
 
 	gnutls_pk_params_init(&params);
 	params.flags = curve;
-	params.algo = GNUTLS_PK_EC;
+	params.algo = GNUTLS_PK_ECDSA;
 
 	x->data = NULL;
 	y->data = NULL;
 	k->data = NULL;
 
-	ret = _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve, &params, 0);
+	ret = _gnutls_pk_generate_keys(GNUTLS_PK_ECDSA, curve, &params, 0);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
@@ -1320,7 +1389,7 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 	gnutls_pk_params_init(&pub);
 	gnutls_pk_params_init(&priv);
 
-	pub.algo = GNUTLS_PK_EC;
+	pub.algo = GNUTLS_PK_ECDSA;
 	pub.flags = curve;
 
 	if (_gnutls_mpi_init_scan_nz
@@ -1367,12 +1436,12 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 
 
 	priv.params_nr = 3;
-	priv.algo = GNUTLS_PK_EC;
+	priv.algo = GNUTLS_PK_ECDSA;
 	priv.flags = curve;
 
 	Z->data = NULL;
 
-	ret = _gnutls_pk_derive(GNUTLS_PK_EC, Z, &priv, &pub);
+	ret = _gnutls_pk_derive(GNUTLS_PK_ECDSA, Z, &priv, &pub);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1462,6 +1531,7 @@ char* gen_data = NULL;
 		 * signing and encryption.
 		 */
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
+	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_RSA_PSS:
 		ret = _gnutls_pk_sign(algo, &sig, &ddata, params, &params->sign);
@@ -1511,6 +1581,12 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	unsigned int i;
 	unsigned rnd_level;
 	nettle_random_func *rnd_func;
+
+	if (IS_EC(algo)) {
+		/* check if the curve relates to the algorithm used */
+		if (gnutls_ecc_curve_get_pk(level) != algo)
+			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+	}
 
 	if (ephemeral) {
 		rnd_level = GNUTLS_RND_RANDOM;
@@ -1718,7 +1794,44 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			break;
 		}
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_EDDSA_ED25519:
+		{
+			unsigned size = gnutls_ecc_curve_get_size(level);
+
+			if (params->flags & GNUTLS_PK_FLAG_PROVABLE)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			if (level != GNUTLS_ECC_CURVE_ED25519)
+				return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			if (size == 0)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			params->flags = level;
+
+			params->raw_priv.data = gnutls_malloc(size);
+			if (params->raw_priv.data == NULL)
+				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+			params->raw_pub.data = gnutls_malloc(size);
+			if (params->raw_pub.data == NULL) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto fail;
+			}
+
+			ret = gnutls_rnd(rnd_level, params->raw_priv.data, size);
+			if (ret < 0) {
+				ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+				goto fail;
+			}
+			params->raw_pub.size = size;
+			params->raw_priv.size = size;
+
+			ed25519_sha512_public_key(params->raw_pub.data, params->raw_priv.data);
+
+			break;
+		}
+	case GNUTLS_PK_ECDSA:
 		if (params->flags & GNUTLS_PK_FLAG_PROVABLE)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -1809,6 +1922,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		goto fail;
 	}
 #endif
+
+	params->algo = algo;
 
 	FAIL_IF_LIB_ERROR;
 	return 0;
@@ -1955,7 +2070,7 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		}
 
 		break;
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
 		{
 			struct ecc_point r, pub;
 			struct ecc_scalar priv;
@@ -2028,6 +2143,9 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 			mpz_clear(y2);
 		}
 		break;
+	case GNUTLS_PK_EDDSA_ED25519:
+		ret = 0;
+		break;
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -2045,8 +2163,9 @@ wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_EDDSA_ED25519:
 		return 0;
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
 		{
 			/* just verify that x and y lie on the curve */
 			struct ecc_point r, pub;
@@ -2186,7 +2305,21 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		if (ret == 0) {
 			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 		}
+	} else if (algo == GNUTLS_PK_EDDSA_ED25519) {
+		if (params->flags != GNUTLS_ECC_CURVE_ED25519)
+			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+		if (params->raw_pub.data == NULL) {
+			params->raw_pub.data = gnutls_malloc(params->raw_priv.size);
+		}
+
+		if (params->raw_pub.data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		ed25519_sha512_public_key(params->raw_pub.data, params->raw_priv.data);
+		params->raw_pub.size = params->raw_priv.size;
 	}
+
 
 	return 0;
 }

@@ -354,7 +354,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	}
 
 
-	if (key->pk_algorithm == GNUTLS_PK_EC
+	if (key->pk_algorithm == GNUTLS_PK_ECDSA
 	    || key->pk_algorithm == GNUTLS_PK_DSA) {
 		unsigned int hlen = siglen / 2;
 		gnutls_datum_t r, s;
@@ -961,7 +961,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		}
 
 		break;
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
 		p[p_val].type = CKA_SIGN;
 		if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE) {
 			p[p_val].value = (void *) &tval;
@@ -980,7 +980,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		if (GNUTLS_BITS_ARE_CURVE(bits)) {
 			bits = GNUTLS_BITS_TO_CURVE(bits);
 		} else {
-			bits = _gnutls_ecc_bits_to_curve(bits);
+			bits = _gnutls_ecc_bits_to_curve(pk, bits);
 		}
 
 		ret = _gnutls_x509_write_ecc_params(bits, &der);

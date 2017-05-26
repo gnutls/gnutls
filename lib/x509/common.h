@@ -88,6 +88,8 @@
 #define SIG_RSA_SHA3_384_OID "2.16.840.1.101.3.4.3.15"
 #define SIG_RSA_SHA3_512_OID "2.16.840.1.101.3.4.3.16"
 
+#define SIG_EDDSA_SHA512_OID "1.3.101.112"
+
 #define XMPP_OID "1.3.6.1.5.5.7.8.5"
 #define KRB5_PRINCIPAL_OID "1.3.6.1.5.2.2"
 #define PKIX1_RSA_PSS_MGF1_OID "1.2.840.113549.1.1.8"
@@ -165,6 +167,7 @@ int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct,
 					   int multi, int octet);
 
 int _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
+				  gnutls_ecc_curve_t *curve,
 				  unsigned int *bits);
 
 int

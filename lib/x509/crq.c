@@ -1314,7 +1314,7 @@ gnutls_x509_crq_get_pk_algorithm2(gnutls_x509_crq_t crq,
 	}
 
 	result = _gnutls_x509_get_pk_algorithm
-	    (crq->crq, "certificationRequestInfo.subjectPKInfo", bits);
+	    (crq->crq, "certificationRequestInfo.subjectPKInfo", NULL, bits);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -2862,7 +2862,7 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 		return result;
 	}
 
-	result = privkey_sign_data(key, &tbs, &signature, &params);
+	result = privkey_sign_and_hash_data(key, &tbs, &signature, &params);
 	gnutls_free(tbs.data);
 
 	if (result < 0) {

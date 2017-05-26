@@ -46,7 +46,8 @@
  *
  * This function will export the RSA private key's parameters found
  * in the given structure. The new parameters will be allocated using
- * gnutls_malloc() and will be stored in the appropriate datum.
+ * gnutls_malloc() and will be stored in the appropriate datum. For
+ * EdDSA keys, the @y value should be %NULL.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *

@@ -1036,13 +1036,13 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					pk_algorithm,
 					gnutls_pk_params_st * params)
 {
-	const char *pk;
+	const char *oid;
 	gnutls_datum_t der = { NULL, 0 };
 	int result;
 	char name[128];
 
-	pk = gnutls_pk_get_oid(pk_algorithm);
-	if (pk == NULL) {
+	oid = gnutls_pk_get_oid(pk_algorithm);
+	if (oid == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 	}
@@ -1052,7 +1052,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 	_asnstr_append_name(name, sizeof(name), dst_name,
 			    ".algorithm.algorithm");
 
-	result = asn1_write_value(dst, name, pk, 1);
+	result = asn1_write_value(dst, name, oid, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -1141,16 +1141,15 @@ _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
  */
 int
 _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
+			      gnutls_ecc_curve_t *curve,
 			      unsigned int *bits)
 {
 	int result;
 	int algo;
 	char oid[64];
 	int len;
-	gnutls_pk_params_st params;
+	gnutls_ecc_curve_t lcurve = GNUTLS_ECC_CURVE_INVALID;
 	char name[128];
-
-	gnutls_pk_params_init(&params);
 
 	_asnstr_append_name(name, sizeof(name), src_name,
 			    ".algorithm.algorithm");
@@ -1162,12 +1161,15 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
 		return _gnutls_asn2err(result);
 	}
 
-	algo = gnutls_oid_to_pk(oid);
+	algo = _gnutls_oid_to_pk_and_curve(oid, &lcurve);
 	if (algo == GNUTLS_PK_UNKNOWN) {
 		_gnutls_debug_log
 		    ("%s: unknown public key algorithm: %s\n", __func__,
 		     oid);
 	}
+
+	if (curve)
+		*curve = lcurve;
 
 	if (bits == NULL) {
 		return algo;
@@ -1175,13 +1177,20 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
 
 	/* Now read the parameters' bits 
 	 */
-	result = _gnutls_get_asn_mpis(src, src_name, &params);
-	if (result < 0)
-		return gnutls_assert_val(result);
+	if (lcurve != GNUTLS_ECC_CURVE_INVALID) { /* curve present */
+		bits[0] = gnutls_ecc_curve_get_size(lcurve)*8;
+	} else {
+		gnutls_pk_params_st params;
+		gnutls_pk_params_init(&params);
 
-	bits[0] = pubkey_to_bits(algo, &params);
+		result = _gnutls_get_asn_mpis(src, src_name, &params);
+		if (result < 0)
+			return gnutls_assert_val(result);
 
-	gnutls_pk_params_release(&params);
+		bits[0] = pubkey_to_bits(algo, &params);
+		gnutls_pk_params_release(&params);
+	}
+
 	return algo;
 }
 

@@ -437,6 +437,12 @@ flag = {
 };
 
 flag = {
+    name      = eddsa;
+    descrip   = "Generate EdDSA key";
+    doc = "When combined with --generate-privkey generates an elliptic curve private key to be used with EdDSA.";
+};
+
+flag = {
     name      = rsa-pss;
     descrip   = "Generate RSA-PSS key or certificate";
     doc = "This option can be combined with --generate-privkey or --generate-certificate, to generate private key or certificate restricted to the use with the RSA-PSS padding scheme.";

@@ -182,7 +182,7 @@ typedef struct gnutls_x509_spki_st {
 typedef struct {
 	bigint_t params[GNUTLS_MAX_PK_PARAMS];
 	unsigned int params_nr;	/* the number of parameters */
-	unsigned int flags;
+	unsigned int flags; /* curve */
 	gnutls_datum_t raw_pub; /* used by x25519 */
 	gnutls_datum_t raw_priv;
 

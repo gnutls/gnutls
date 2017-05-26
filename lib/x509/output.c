@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2007-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
@@ -1279,7 +1279,8 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 		}
 		break;
 
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_ECDSA:
 		{
 			gnutls_datum_t x, y;
 			gnutls_ecc_curve_t curve;
@@ -1287,10 +1288,10 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 			err =
 			    gnutls_pubkey_get_pk_ecc_raw(pubkey, &curve,
 							 &x, &y);
-			if (err < 0)
+			if (err < 0) {
 				addf(str, "error: get_pk_ecc_raw: %s\n",
 				     gnutls_strerror(err));
-			else {
+			} else {
 				addf(str, _("\t\tCurve:\t%s\n"),
 				     gnutls_ecc_curve_get_name(curve));
 				if (format ==
@@ -1300,20 +1301,24 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 								x.data,
 								x.size);
 					adds(str, "\n");
-					adds(str, _("\t\tY: "));
-					_gnutls_buffer_hexprint(str,
-								y.data,
-								y.size);
-					adds(str, "\n");
+					if (y.size > 0) {
+						adds(str, _("\t\tY: "));
+						_gnutls_buffer_hexprint(str,
+									y.data,
+									y.size);
+						adds(str, "\n");
+					}
 				} else {
 					adds(str, _("\t\tX:\n"));
 					_gnutls_buffer_hexdump(str, x.data,
 							       x.size,
 							       "\t\t\t");
-					adds(str, _("\t\tY:\n"));
-					_gnutls_buffer_hexdump(str, y.data,
-							       y.size,
-							       "\t\t\t");
+					if (y.size > 0) {
+						adds(str, _("\t\tY:\n"));
+						_gnutls_buffer_hexdump(str, y.data,
+								       y.size,
+								       "\t\t\t");
+					}
 				}
 
 				gnutls_free(x.data);
@@ -1753,7 +1758,7 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 
 	print_obj_id(str, "\t", cert, (get_id_func*)gnutls_x509_crt_get_key_id);
 
-	if (err == GNUTLS_PK_EC) {
+	if (IS_EC(err)) {
 		gnutls_ecc_curve_t curve;
 
 		err = gnutls_x509_crt_get_pk_ecc_raw(cert, &curve, NULL, NULL);

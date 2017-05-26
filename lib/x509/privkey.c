@@ -267,6 +267,10 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 	int oid_size;
 	gnutls_datum_t out;
 
+	if (curve_is_eddsa(curve)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
 	gnutls_pk_params_init(&pkey->params);
 
 	if ((ret =
@@ -1102,7 +1106,7 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
  *
  * This function will convert the given elliptic curve parameters to the
  * native #gnutls_x509_privkey_t format.  The output will be stored
- * in @key.
+ * in @key. For EdDSA keys, the @x and @k values will be read.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1124,6 +1128,26 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 	}
 
 	key->params.flags = curve;
+
+	if (curve_is_eddsa(curve)) {
+		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
+
+		ret = _gnutls_set_datum(&key->params.raw_pub, x->data, x->size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _gnutls_set_datum(&key->params.raw_priv, k->data, k->size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		key->pk_algorithm = key->params.algo;
+
+		return 0;
+	}
 
 	if (_gnutls_mpi_init_scan_nz
 	    (&key->params.params[ECC_X], x->data, x->size)) {
@@ -1149,15 +1173,14 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 	}
 	key->params.params_nr++;
 
+	key->params.algo = key->pk_algorithm = GNUTLS_PK_EC;
+
 	ret =
 	    _gnutls_pk_fixup(GNUTLS_PK_EC, GNUTLS_IMPORT, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	key->pk_algorithm = GNUTLS_PK_EC;
-	key->params.algo = key->pk_algorithm;
 
 	return 0;
 
@@ -1388,6 +1411,7 @@ gnutls_sec_param_t gnutls_x509_privkey_sec_param(gnutls_x509_privkey_t key)
  * This function will export the ECC private key's parameters found
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
+ * For EdDSA keys, the @y value should be %NULL.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1574,11 +1598,16 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		}
 	}
 
-	if (algo == GNUTLS_PK_EC) {
+	if (IS_EC(algo)) {
 		if (GNUTLS_BITS_ARE_CURVE(bits))
 			bits = GNUTLS_BITS_TO_CURVE(bits);
 		else
-			bits = _gnutls_ecc_bits_to_curve(bits);
+			bits = _gnutls_ecc_bits_to_curve(algo, bits);
+
+		if (gnutls_ecc_curve_get_pk(bits) != algo) {
+			_gnutls_debug_log("curve is incompatible with public key algorithm\n");
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
 	}
 
 	if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE) {

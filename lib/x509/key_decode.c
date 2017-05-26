@@ -37,6 +37,8 @@ static int _gnutls_x509_read_dsa_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);
 static int _gnutls_x509_read_ecc_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);
+static int _gnutls_x509_read_eddsa_pubkey(uint8_t * der, int dersize,
+					gnutls_pk_params_st * params);
 
 static int
 _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
@@ -109,6 +111,11 @@ _gnutls_x509_read_ecc_pubkey(uint8_t * der, int dersize,
 					    &params->params[ECC_Y]);
 }
 
+int _gnutls_x509_read_eddsa_pubkey(uint8_t * der, int dersize,
+				   gnutls_pk_params_st * params)
+{
+	return _gnutls_set_datum(&params->raw_pub, der, dersize);
+}
 
 /* reads p,q and g 
  * from the certificate (subjectPublicKey BIT STRING).
@@ -398,12 +405,15 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 			params->params_nr = DSA_PUBLIC_PARAMS;
 		}
 		break;
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
 		ret = _gnutls_x509_read_ecc_pubkey(der, dersize, params);
 		if (ret >= 0) {
 			params->algo = GNUTLS_PK_ECDSA;
 			params->params_nr = ECC_PUBLIC_PARAMS;
 		}
+		break;
+	case GNUTLS_PK_EDDSA_ED25519:
+		ret = _gnutls_x509_read_eddsa_pubkey(der, dersize, params);
 		break;
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
@@ -420,6 +430,7 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 {
 	switch (algo) {
 	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_EDDSA_ED25519:
 		return 0;
 	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_x509_read_rsa_pss_params(der, dersize, &params->sign);
@@ -453,7 +464,8 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
 	}
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_DSA:
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
+	case GNUTLS_PK_EDDSA_ED25519:
 		return 0;
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);

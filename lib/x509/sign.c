@@ -168,7 +168,11 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 		return result;
 	}
 
-	result = privkey_sign_data(issuer_key, &tbs, &signature, &params);
+	if (_gnutls_pk_is_not_prehashed(issuer_key->pk_algorithm)) {
+		result = privkey_sign_raw_data(issuer_key, &tbs, &signature, &params);
+	} else {
+		result = privkey_sign_and_hash_data(issuer_key, &tbs, &signature, &params);
+	}
 	gnutls_free(tbs.data);
 
 	if (result < 0) {

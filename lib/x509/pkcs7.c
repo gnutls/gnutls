@@ -2536,7 +2536,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	ret = privkey_sign_data(signer_key, &sigdata, &signature, &params);
+	ret = privkey_sign_and_hash_data(signer_key, &sigdata, &signature, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

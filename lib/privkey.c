@@ -38,16 +38,10 @@
 #include <abstract_int.h>
 
 static int
-privkey_sign_hash(gnutls_privkey_t signer,
+privkey_sign_prehashed(gnutls_privkey_t signer,
 		  const gnutls_datum_t * hash_data,
 		  gnutls_datum_t * signature,
 		  gnutls_x509_spki_st * params, unsigned flags);
-
-static int
-_gnutls_privkey_sign_raw_data(gnutls_privkey_t key,
-			     const gnutls_datum_t * data,
-			     gnutls_datum_t * signature,
-			     gnutls_x509_spki_st * params);
 
 /**
  * gnutls_privkey_get_type:
@@ -134,10 +128,10 @@ int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key, unsigned int *bits)
 							      bits);
 #endif
 	case GNUTLS_PRIVKEY_X509:
-		if (bits)
-			*bits =
-			    _gnutls_mpi_get_nbits(key->key.x509->
-						  params.params[0]);
+		if (bits) {
+			*bits = pubkey_to_bits(key->key.x509->pk_algorithm, &key->key.x509->params);
+		}
+
 		return gnutls_x509_privkey_get_pk_algorithm(key->key.x509);
 	case GNUTLS_PRIVKEY_EXT:
 		if (bits)
@@ -191,7 +185,7 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 		}
 
 		break;
-	case GNUTLS_PK_EC:
+	case GNUTLS_PK_ECDSA:
 		pub->params[ECC_X] = _gnutls_mpi_copy(priv->params[ECC_X]);
 		pub->params[ECC_Y] = _gnutls_mpi_copy(priv->params[ECC_Y]);
 
@@ -202,6 +196,12 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 			ret = GNUTLS_E_MEMORY_ERROR;
 			goto cleanup;
 		}
+
+		break;
+	case GNUTLS_PK_EDDSA_ED25519:
+		ret = _gnutls_set_datum(&pub->raw_pub, priv->raw_pub.data, priv->raw_pub.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
 		break;
 	default:
@@ -1007,7 +1007,11 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_data(signer, data, signature, &params);
+	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm)) {
+		return privkey_sign_raw_data(signer, data, signature, &params);
+	} else {
+		return privkey_sign_and_hash_data(signer, data, signature, &params);
+	}
 }
 
 /**
@@ -1059,7 +1063,7 @@ gnutls_privkey_sign_data2(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_data(signer, data, signature, &params);
+	return privkey_sign_and_hash_data(signer, data, signature, &params);
 }
 
 /**
@@ -1082,7 +1086,7 @@ gnutls_privkey_sign_data2(gnutls_privkey_t signer,
  * In the former case this function will ignore @hash_algo and perform a raw PKCS1 signature,
  * and in the latter an RSA-PSS signature will be generated.
  *
- * Note that, not all algorithm support signing already signed data. When
+ * Note that, not all algorithm support signing already hashed data. When
  * signing with Ed25519, gnutls_privkey_sign_data() should be used.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -1118,14 +1122,14 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_hash(signer, hash_data, signature, &params, flags);
+	return privkey_sign_prehashed(signer, hash_data, signature, &params, flags);
 }
 
 int
-privkey_sign_data(gnutls_privkey_t signer,
-		  const gnutls_datum_t * data,
-		  gnutls_datum_t * signature,
-		  gnutls_x509_spki_st * params)
+privkey_sign_and_hash_data(gnutls_privkey_t signer,
+			   const gnutls_datum_t * data,
+			   gnutls_datum_t * signature,
+			   gnutls_x509_spki_st * params)
 {
 	int ret;
 	gnutls_datum_t digest;
@@ -1146,7 +1150,7 @@ privkey_sign_data(gnutls_privkey_t signer,
 		goto cleanup;
 	}
 
-	ret = _gnutls_privkey_sign_raw_data(signer, &digest, signature, params);
+	ret = privkey_sign_raw_data(signer, &digest, signature, params);
 	_gnutls_free_datum(&digest);
 
 	if (ret < 0) {
@@ -1178,8 +1182,12 @@ privkey_sign_data(gnutls_privkey_t signer,
  * You may use gnutls_pubkey_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
  *
- * Note that if %GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA flag is specified this function
- * will ignore @hash_algo and perform a raw PKCS1 signature.
+ * The flags may be %GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA or %GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS.
+ * In the former case this function will ignore @hash_algo and perform a raw PKCS1 signature,
+ * and in the latter an RSA-PSS signature will be generated.
+ *
+ * Note that, not all algorithm support signing already hashed data. When
+ * signing with Ed25519, gnutls_privkey_sign_data() should be used.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1209,11 +1217,11 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_hash(signer, hash_data, signature, &params, flags);
+	return privkey_sign_prehashed(signer, hash_data, signature, &params, flags);
 }
 
 static int
-privkey_sign_hash(gnutls_privkey_t signer,
+privkey_sign_prehashed(gnutls_privkey_t signer,
 		  const gnutls_datum_t * hash_data,
 		  gnutls_datum_t * signature,
 		  gnutls_x509_spki_st * params,
@@ -1223,9 +1231,13 @@ privkey_sign_hash(gnutls_privkey_t signer,
 	gnutls_datum_t digest;
 
 	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
-		return _gnutls_privkey_sign_raw_data(signer,
-						     hash_data, signature,
-						     params);
+		return privkey_sign_raw_data(signer,
+					     hash_data, signature,
+					     params);
+
+	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm)) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	digest.data = gnutls_malloc(hash_data->size);
 	if (digest.data == NULL) {
@@ -1241,9 +1253,9 @@ privkey_sign_hash(gnutls_privkey_t signer,
 		goto cleanup;
 	}
 
-	ret = _gnutls_privkey_sign_raw_data(signer,
-					    &digest, signature,
-					    params);
+	ret = privkey_sign_raw_data(signer,
+				    &digest, signature,
+				    params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1257,7 +1269,7 @@ privkey_sign_hash(gnutls_privkey_t signer,
 }
 
 /*-
- * gnutls_privkey_sign_raw_data:
+ * privkey_sign_raw_data:
  * @key: Holds the key
  * @data: holds the data to be signed
  * @signature: will contain the signature allocated with gnutls_malloc()
@@ -1277,11 +1289,11 @@ privkey_sign_hash(gnutls_privkey_t signer,
  *
  * Since: 3.1.10
  -*/
-static int
-_gnutls_privkey_sign_raw_data(gnutls_privkey_t key,
-			     const gnutls_datum_t * data,
-			     gnutls_datum_t * signature,
-			     gnutls_x509_spki_st * params)
+int
+privkey_sign_raw_data(gnutls_privkey_t key,
+		     const gnutls_datum_t * data,
+		     gnutls_datum_t * signature,
+		     gnutls_x509_spki_st * params)
 {
 	switch (key->type) {
 #ifdef ENABLE_PKCS11

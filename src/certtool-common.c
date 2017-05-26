@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -891,14 +891,20 @@ print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 		fprintf(outfile, "curve:\t%s\n",
 			gnutls_ecc_curve_get_name(curve));
 
-	if (k) {
+	if (k && k->data) {
 		print_head(outfile, "private key", k->size, cprint);
 		print_hex_datum(outfile, k, cprint);
 	}
-	print_head(outfile, "x", x->size, cprint);
-	print_hex_datum(outfile, x, cprint);
-	print_head(outfile, "y", y->size, cprint);
-	print_hex_datum(outfile, y, cprint);
+
+	if (x && x->data) {
+		print_head(outfile, "x", x->size, cprint);
+		print_hex_datum(outfile, x, cprint);
+	}
+
+	if (y && y->data) {
+		print_head(outfile, "y", y->size, cprint);
+		print_hex_datum(outfile, y, cprint);
+	}
 }
 
 
@@ -1197,7 +1203,7 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 			gnutls_free(q.data);
 			gnutls_free(g.data);
 		}
-	} else if (key_type == GNUTLS_PK_EC) {
+	} else if (key_type == GNUTLS_PK_ECDSA || key_type == GNUTLS_PK_EDDSA_ED25519) {
 		gnutls_datum_t y, x, k;
 		gnutls_ecc_curve_t curve;
 
@@ -1264,11 +1270,14 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 	if (!key)
 		return;
 
+	/* Only print private key parameters when an unencrypted
+	 * format is used */
+	if (cinfo->outcert_format == GNUTLS_X509_FMT_PEM)
+		privkey_info_int(outfile, cinfo, key);
+
+	switch_to_pkcs8_when_needed(cinfo, gnutls_x509_privkey_get_pk_algorithm(key));
+
 	if (!cinfo->pkcs8) {
-		/* Only print private key parameters when an unencrypted
-		 * format is used */
-		if (cinfo->outcert_format == GNUTLS_X509_FMT_PEM)
-			privkey_info_int(outfile, cinfo, key);
 
 		size = lbuffer_size;
 		ret = gnutls_x509_privkey_export(key, cinfo->outcert_format,

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -128,11 +128,6 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-#define ENABLE_PKCS8(cinfo) \
-		cinfo->pkcs8 = 1; \
-		if (!HAVE_OPT(PASSWORD) && cinfo->password == NULL) \
-			cinfo->password = ""
-
 static gnutls_x509_privkey_t
 generate_private_key_int(common_info_st * cinfo)
 {
@@ -151,22 +146,23 @@ generate_private_key_int(common_info_st * cinfo)
 
 	bits = get_bits(key_type, cinfo->bits, cinfo->sec_param, 1);
 
-	if (key_type == GNUTLS_PK_RSA_PSS && !cinfo->pkcs8) {
-		fprintf(stderr, "Assuming --pkcs8 is given; RSA-PSS private keys can only be exported in PKCS#8 format\n");
-		ENABLE_PKCS8(cinfo);
-	}
+	switch_to_pkcs8_when_needed(cinfo, key_type);
 
-	if (key_type == GNUTLS_PK_EC) {
+	if (key_type == GNUTLS_PK_ECDSA || key_type == GNUTLS_PK_EDDSA_ED25519) {
+		char name[64];
 		int ecc_bits;
 
 		if (GNUTLS_BITS_ARE_CURVE(bits)) {
 			gnutls_ecc_curve_t curve = GNUTLS_BITS_TO_CURVE(bits);
 			ecc_bits = gnutls_ecc_curve_get_size(curve) * 8;
+			snprintf(name, sizeof(name), "(%s)", gnutls_ecc_curve_get_name(curve));
 		} else {
 			ecc_bits = bits;
+			name[0] = 0;
 		}
-		fprintf(stdlog, "Generating a %d bit %s private key...\n",
-			ecc_bits, gnutls_pk_algorithm_get_name(key_type));
+
+		fprintf(stdlog, "Generating a %d bit %s private key %s...\n",
+			ecc_bits, gnutls_pk_algorithm_get_name(key_type), name);
 
 		if (ecc_bits < 256)
 			fprintf(stderr,
@@ -1182,7 +1178,9 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(DSA))
 		req_key_type = GNUTLS_PK_DSA;
 	else if (HAVE_OPT(ECC))
-		req_key_type = GNUTLS_PK_ECC;
+		req_key_type = GNUTLS_PK_ECDSA;
+	else if (HAVE_OPT(EDDSA))
+		req_key_type = GNUTLS_PK_EDDSA_ED25519;
 	else if (HAVE_OPT(RSA_PSS))
 		req_key_type = GNUTLS_PK_RSA_PSS;
 	else

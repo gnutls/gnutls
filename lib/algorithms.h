@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -31,7 +32,7 @@
 #define GNUTLS_FALLBACK_SCSV_MAJOR 0x56
 #define GNUTLS_FALLBACK_SCSV_MINOR 0x00
 
-#define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDHX))
+#define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDHX)||((x)==GNUTLS_PK_EDDSA_ED25519))
 
 #define TLS_SIGN_AID_UNKNOWN {{255, 255}}
 #define HAVE_UNKNOWN_SIGAID(aid) ((aid)->id[0] == 255 && (aid)->id[1] == 255)
@@ -321,6 +322,8 @@ const sign_algorithm_st *_gnutls_sign_to_tls_aid(gnutls_sign_algorithm_t
 
 unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits);
 
+bool _gnutls_pk_is_not_prehashed(gnutls_pk_algorithm_t algorithm);
+
 /* ECC */
 struct gnutls_ecc_curve_entry_st {
 	const char *name;
@@ -328,7 +331,8 @@ struct gnutls_ecc_curve_entry_st {
 	gnutls_ecc_curve_t id;
 	gnutls_pk_algorithm_t pk;
 	int tls_id;		/* The RFC4492 namedCurve ID */
-	int size;		/* the size in bytes */
+	unsigned size;		/* the size in bytes */
+	unsigned sig_size;	/* the size of curve signatures in bytes (EdDSA) */
 };
 typedef struct gnutls_ecc_curve_entry_st gnutls_ecc_curve_entry_st;
 
@@ -337,8 +341,26 @@ const gnutls_ecc_curve_entry_st
 gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name);
 int _gnutls_tls_id_to_ecc_curve(int num);
 int _gnutls_ecc_curve_get_tls_id(gnutls_ecc_curve_t supported_ecc);
-gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(int bits);
+gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(gnutls_pk_algorithm_t pk, int bits);
 #define MAX_ECC_CURVE_SIZE 66
+
+gnutls_pk_algorithm_t _gnutls_oid_to_pk_and_curve(const char *oid, gnutls_ecc_curve_t *curve);
+
+inline static int _curve_is_eddsa(const gnutls_ecc_curve_entry_st * e)
+{
+	size_t ret = 0;
+	if (unlikely(e == NULL))
+		return ret;
+	if (e->pk == GNUTLS_PK_EDDSA_ED25519)
+		return 1;
+	return 0;
+}
+
+inline static int curve_is_eddsa(gnutls_ecc_curve_t id)
+{
+	const gnutls_ecc_curve_entry_st *e = _gnutls_ecc_curve_get_params(id);
+	return _curve_is_eddsa(e);
+}
 
 static inline int _gnutls_kx_is_ecc(gnutls_kx_algorithm_t kx)
 {

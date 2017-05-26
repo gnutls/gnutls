@@ -114,16 +114,18 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 	char name[256];
 	gnutls_datum_t tmp = { NULL, 0 };
 	gnutls_pk_algorithm_t pk_algorithm;
+	gnutls_ecc_curve_t curve;
 
 	gnutls_pk_params_init(params);
 
-	result = _gnutls_x509_get_pk_algorithm(asn, root, NULL);
+	result = _gnutls_x509_get_pk_algorithm(asn, root, &curve, NULL);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
 	pk_algorithm = result;
+	params->flags = curve;
 
 	/* Read the algorithm's parameters
 	 */
@@ -132,9 +134,10 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 
 	/* FIXME: If the parameters are not included in the certificate
 	 * then the issuer's parameters should be used. This is not
-	 * done yet.
+	 * needed in practice though.
 	 */
-	if (pk_algorithm != GNUTLS_PK_RSA) { /* RSA doesn't use parameters */
+	if (pk_algorithm != GNUTLS_PK_RSA && pk_algorithm != GNUTLS_PK_EDDSA_ED25519 && pk_algorithm != GNUTLS_PK_ECDHX) {
+		/* RSA and EdDSA do not use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
 		if (result < 0) {
 			gnutls_assert();

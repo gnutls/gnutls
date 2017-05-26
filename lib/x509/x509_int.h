@@ -244,6 +244,11 @@ int _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t *
 					 gnutls_x509_privkey_t pkey,
 					 gnutls_ecc_curve_t curve);
 
+int _gnutls_privkey_decode_eddsa_key(ASN1_TYPE* pkey_asn,
+		const gnutls_datum_t *raw_key,
+		gnutls_x509_privkey_t pkey,
+		gnutls_ecc_curve_t curve);
+
 int
 _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 			     unsigned int *curve);
@@ -341,6 +346,9 @@ int _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 				  gnutls_datum_t * der);
 int _gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
 				  gnutls_datum_t * der);
+
+int _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
+				    gnutls_datum_t * der);
 
 int
 _gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,

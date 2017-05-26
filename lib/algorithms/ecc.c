@@ -77,6 +77,14 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .pk = GNUTLS_PK_ECDHX,
 	 .size = 32,
 	},
+	{
+	 .name = "Ed25519",
+	 .oid = SIG_EDDSA_SHA512_OID,
+	 .id = GNUTLS_ECC_CURVE_ED25519,
+	 .pk = GNUTLS_PK_EDDSA_ED25519,
+	 .size = 32,
+	 .sig_size = 64
+	},
 	{0, 0, 0}
 };
 
@@ -159,7 +167,7 @@ gnutls_ecc_curve_t gnutls_oid_to_ecc_curve(const char *oid)
 	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
 	GNUTLS_ECC_CURVE_LOOP(
-		if (p->oid && strcasecmp(p->oid, oid) == 0 && _gnutls_pk_curve_exists(p->id)) {
+		if (p->oid != NULL && strcasecmp(p->oid, oid) == 0 && _gnutls_pk_curve_exists(p->id)) {
 			ret = p->id;
 			break;
 		}
@@ -200,12 +208,17 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)
  * Returns: return a #gnutls_ecc_curve_t value corresponding to
  *   the specified bit length, or %GNUTLS_ECC_CURVE_INVALID on error.
  -*/
-gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(int bits)
+gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(gnutls_pk_algorithm_t pk, int bits)
 {
-	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_SECP256R1;
+	gnutls_ecc_curve_t ret;
+
+	if (pk == GNUTLS_PK_ECDSA)
+		ret = GNUTLS_ECC_CURVE_SECP256R1;
+	else
+		ret = GNUTLS_ECC_CURVE_ED25519;
 
 	GNUTLS_ECC_CURVE_LOOP(
-		if (8 * p->size >= bits && _gnutls_pk_curve_exists(p->id)) {
+		if (pk == p->pk && 8 * p->size >= (unsigned)bits && _gnutls_pk_curve_exists(p->id)) {
 			ret = p->id;
 			break;
 		}
