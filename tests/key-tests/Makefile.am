@@ -31,11 +31,12 @@ EXTRA_DIST = data/key-ca.pem data/key-user.pem \
 	data/bad-key.pem data/p8key-illegal.pem data/key-illegal.pem data/pkcs8-pbes2-sha256.pem \
 	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der \
 	data data/pkcs8-invalid9.der data/key-invalid2.der data/pkcs8-invalid10.der \
-	data/key-invalid3.der
+	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt
 
-dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa ecdsa illegal-rsa pkcs8-invalid key-invalid
+dist_check_SCRIPTS = key-id pkcs8 pkcs8-decode dsa ecdsa illegal-rsa pkcs8-invalid key-invalid \
+	pkcs8-eddsa
 
-TESTS = key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8
+TESTS = key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8 pkcs8-eddsa
 
 if !WITH_OLD_NETTLE
 TESTS += illegal-rsa
