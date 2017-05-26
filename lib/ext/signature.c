@@ -63,7 +63,7 @@ const extension_entry_st ext_mod_sig = {
 
 typedef struct {
 	/* TLS 1.2 signature algorithms */
-	gnutls_sign_algorithm_t sign_algorithms[MAX_SIGNATURE_ALGORITHMS];
+	gnutls_sign_algorithm_t sign_algorithms[MAX_ALGOS];
 	uint16_t sign_algorithms_size;
 } sig_ext_st;
 
@@ -152,7 +152,7 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 
 		if (sig != GNUTLS_SIGN_UNKNOWN) {
 			if (priv->sign_algorithms_size ==
-			    MAX_SIGNATURE_ALGORITHMS)
+			    MAX_ALGOS)
 				break;
 			priv->sign_algorithms[priv->
 					      sign_algorithms_size++] =
