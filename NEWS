@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Bug numbers referenced in this log correspond to bug numbers at our issue tracker,
 available at https://gitlab.com/gnutls/gnutls/issues
 Copyright (C) 2000-2016 Free Software Foundation, Inc.
-Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
+Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
 * Version 3.6.0 (unreleased)
@@ -11,6 +11,9 @@ See the end for copying conditions.
    to import certificates which have fractional seconds in Time fields, X.509v1
    certificates which have the unique identifiers set, and certificates with illegal
    version numbers. All of these are prohibited by RFC5280.
+
+** libgnutls: Added support for RSA-PSS signing in certificates, and TLS key
+   exchange. Patches by Daiki Ueno.
 
 ** libgnutls: Introduced gnutls_x509_crt_set_flags(). This function can set flags
    in the crt structure. The only flag supported at the moment is
