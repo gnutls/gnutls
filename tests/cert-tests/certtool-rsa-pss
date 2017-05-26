@@ -49,6 +49,13 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
+${VALGRIND} "${CERTTOOL}" -k --password '' --infile "$OUTFILE"
+rc=$?
+if test "${rc}" != "0"; then
+	echo "Could not read generated an RSA-PSS key ($i)"
+	exit 1
+fi
+
 # Create an RSA-PSS certificate from an RSA-PSS private key
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
 	--pkcs8 --load-privkey "$OUTFILE" --password '' \
