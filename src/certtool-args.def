@@ -279,12 +279,14 @@ flag = {
     name      = pgp-certificate-info;
     descrip   = "Print information on the given OpenPGP certificate";
     doc       = "";
+    deprecated;
 };
 
 flag = {
     name      = pgp-ring-info;
     descrip   = "Print information on the given OpenPGP keyring structure";
     doc       = "";
+    deprecated;
 };
 
 flag = {
@@ -398,6 +400,7 @@ flag = {
     name      = pgp-key-info;
     descrip   = "Print information on an OpenPGP private key";
     doc = "";
+    deprecated;
 };
 
 flag = {
@@ -515,6 +518,7 @@ flag = {
     name      = disable-quick-random;
     descrip   = "No effect";
     doc      = "";
+    deprecated;
 };
 
 flag = {
