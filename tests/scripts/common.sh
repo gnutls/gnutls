@@ -83,6 +83,18 @@ fail() {
    exit 1
 }
 
+exit_if_non_x86()
+{
+which lscpu >/dev/null 2>&1
+if test $? = 0;then
+        $(which lscpu)|grep Architecture|grep x86
+        if test $? != 0;then
+                echo "non-x86 CPU detected"
+                exit 0
+        fi
+fi
+}
+
 wait_for_port()
 {
 	local ret
