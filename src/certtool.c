@@ -146,6 +146,11 @@ generate_private_key_int(common_info_st * cinfo)
 
 	bits = get_bits(key_type, cinfo->bits, cinfo->sec_param, 1);
 
+	if (key_type == GNUTLS_PK_RSA_PSS && !cinfo->pkcs8) {
+		fprintf(stderr, "Assuming --pkcs8 is given; RSA-PSS private keys can only be exported in PKCS#8 format\n");
+		cinfo->pkcs8 = 1;
+	}
+
 	if (key_type == GNUTLS_PK_EC) {
 		int ecc_bits;
 
