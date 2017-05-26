@@ -66,6 +66,7 @@ retval=$?
 rm -f ${TMPFILE}
 
 popd
+popd
 
 $UNLOCKFILE
 exit $retval
