@@ -17,9 +17,7 @@
           },
          {"name" : "test-certificate-verify-malformed.py",
           "arguments" : ["-k", "tests/clientX509Key.pem",
-                         "-c", "tests/clientX509Cert.pem"],
-          "comment" : "for some reason tlsfuzzer does require decryption error alert",
-          "exp_pass" : false
+                         "-c", "tests/clientX509Cert.pem"]
           },
          {"name" : "test-certificate-verify-malformed-sig.py",
           "arguments" : ["-k", "tests/clientX509Key.pem",
