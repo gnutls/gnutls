@@ -2508,12 +2508,11 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 
 	_gnutls_debug_log("p11: Login result = %lu\n", rv);
 
-
 	ret = (rv == CKR_OK
 	       || rv ==
 	       CKR_USER_ALREADY_LOGGED_IN) ? 0 : pkcs11_rv_to_err(rv);
 
-      cleanup:
+ cleanup:
 	return ret;
 }
 
