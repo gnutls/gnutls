@@ -2581,6 +2581,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		return 0;
 	}
 
+ retry_login:
 	/* For a token with a "protected" (out-of-band) authentication
 	 * path, calling login with a NULL username is all that is
 	 * required. */
@@ -2594,8 +2595,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 			gnutls_assert();
 			_gnutls_debug_log
 			    ("p11: Protected login failed.\n");
-			ret = GNUTLS_E_PKCS11_ERROR;
-			goto cleanup;
+			goto login_finished;
 		}
 	}
 
@@ -2649,14 +2649,21 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	}
 	while (rv == CKR_PIN_INCORRECT);
 
+ login_finished:
 	_gnutls_debug_log("p11: Login result = %s (%lu)\n", (rv==0)?"ok":p11_kit_strerror(rv), rv);
 
+	if (rv == CKR_USER_TYPE_INVALID && user_type == CKU_CONTEXT_SPECIFIC) {
+		_gnutls_debug_log("p11: Retrying login with CKU_USER\n");
+		/* PKCS#11 v2.10 don't know about CKU_CONTEXT_SPECIFIC */
+		user_type = CKU_USER;
+		goto retry_login;
+	}
 
 	ret = (rv == CKR_OK
 	       || rv ==
 	       CKR_USER_ALREADY_LOGGED_IN) ? 0 : pkcs11_rv_to_err(rv);
 
-      cleanup:
+ cleanup:
 	return ret;
 }
 

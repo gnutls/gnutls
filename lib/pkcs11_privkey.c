@@ -290,6 +290,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	gnutls_datum_t tmp = { NULL, 0 };
 	unsigned long siglen;
 	struct pkcs11_session_info *sinfo;
+	unsigned retried_login = 0;
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
@@ -312,7 +313,8 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 		goto cleanup;
 	}
 
-	if (key->reauth) {
+ retry_login:
+	if (key->reauth || retried_login) {
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
 				 key->uinfo, 0, 1);
@@ -326,6 +328,11 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	/* Work out how long the signature must be: */
 	rv = pkcs11_sign(sinfo->module, sinfo->pks, hash->data, hash->size,
 			 NULL, &siglen);
+	if (unlikely(rv == CKR_USER_NOT_LOGGED_IN && retried_login == 0)) {
+		retried_login = 1;
+		goto retry_login;
+	}
+
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
@@ -552,6 +559,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	int ret;
 	struct ck_mechanism mech;
 	unsigned long siglen;
+	unsigned retried_login = 0;
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
@@ -575,7 +583,8 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 		goto cleanup;
 	}
 
-	if (key->reauth) {
+ retry_login:
+	if (key->reauth || retried_login) {
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
 				 key->uinfo, 0, 1);
@@ -589,6 +598,11 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	/* Work out how long the plaintext must be: */
 	rv = pkcs11_decrypt(key->sinfo.module, key->sinfo.pks, ciphertext->data,
 			    ciphertext->size, NULL, &siglen);
+	if (unlikely(rv == CKR_USER_NOT_LOGGED_IN && retried_login == 0)) {
+		retried_login = 1;
+		goto retry_login;
+	}
+
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
