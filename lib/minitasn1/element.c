@@ -128,7 +128,7 @@ _asn1_convert_integer (const unsigned char *value, unsigned char *value_out,
   return ASN1_SUCCESS;
 }
 
-/* Appends a new element into the sequent (or set) defined by this
+/* Appends a new element into the sequence (or set) defined by this
  * node. The new element will have a name of '?number', where number
  * is a monotonically increased serial number.
  *
@@ -753,7 +753,8 @@ asn1_write_value (asn1_node node_root, const char *name,
  *   %ASN1_VALUE_NOT_FOUND if there isn't any value for the element
  *   selected, and %ASN1_MEM_ERROR if The value vector isn't big enough
  *   to store the result, and in this case @len will contain the number of
- *   bytes needed.
+ *   bytes needed. On the occasion that the stored data are of zero-length
+ *   this function may return %ASN1_SUCCESS even if the provided @len is zero.
  **/
 int
 asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
@@ -826,7 +827,8 @@ asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
  *   %ASN1_VALUE_NOT_FOUND if there isn't any value for the element
  *   selected, and %ASN1_MEM_ERROR if The value vector isn't big enough
  *   to store the result, and in this case @len will contain the number of
- *   bytes needed.
+ *   bytes needed. On the occasion that the stored data are of zero-length
+ *   this function may return %ASN1_SUCCESS even if the provided @len is zero.
  **/
 int
 asn1_read_value_type (asn1_node root, const char *name, void *ivalue,

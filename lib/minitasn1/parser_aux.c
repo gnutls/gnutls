@@ -120,6 +120,9 @@ asn1_find_node (asn1_node pointer, const char *name)
       if (n_end)
 	{
 	  nsize = n_end - n_start;
+	  if (nsize >= sizeof(n))
+		return NULL;
+
 	  memcpy (n, n_start, nsize);
 	  n[nsize] = 0;
 	  n_start = n_end;
@@ -158,6 +161,9 @@ asn1_find_node (asn1_node pointer, const char *name)
       if (n_end)
 	{
 	  nsize = n_end - n_start;
+	  if (nsize >= sizeof(n))
+		return NULL;
+
 	  memcpy (n, n_start, nsize);
 	  n[nsize] = 0;
 	  n_start = n_end;
@@ -551,29 +557,33 @@ _asn1_delete_list_and_nodes (void)
 char *
 _asn1_ltostr (int64_t v, char str[LTOSTR_MAX_SIZE])
 {
-  int64_t d, r;
+  uint64_t d, r;
   char temp[LTOSTR_MAX_SIZE];
   int count, k, start;
+  uint64_t val;
 
   if (v < 0)
     {
       str[0] = '-';
       start = 1;
-      v = -v;
+      val = -((uint64_t)v);
     }
   else
-    start = 0;
+    {
+      val = v;
+      start = 0;
+    }
 
   count = 0;
   do
     {
-      d = v / 10;
-      r = v - d * 10;
+      d = val / 10;
+      r = val - d * 10;
       temp[start + count] = '0' + (char) r;
       count++;
-      v = d;
+      val = d;
     }
-  while (v && ((start+count) < LTOSTR_MAX_SIZE-1));
+  while (val && ((start+count) < LTOSTR_MAX_SIZE-1));
 
   for (k = 0; k < count; k++)
     str[k + start] = temp[start + count - k - 1];
