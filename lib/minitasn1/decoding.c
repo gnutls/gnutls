@@ -332,7 +332,7 @@ _asn1_get_time_der (unsigned type, const unsigned char *der, int der_len, int *r
       return ASN1_TIME_ENCODING_ERROR;
     }
 
-  if (flags & ASN1_DECODE_FLAG_STRICT_DER)
+  if ((flags & ASN1_DECODE_FLAG_STRICT_DER) && !(flags & ASN1_DECODE_FLAG_ALLOW_INCORRECT_TIME))
     {
       p = &der[len_len];
       for (i=0;i<(unsigned)(str_len-1);i++)
