@@ -16,6 +16,8 @@ See the end for copying conditions.
    side caused by packets containing the ResponseID field. Reported
    by Hubert Kario.
 
+** minitasn1: updated to libtasn1 4.11.
+
 ** certtool: allow multiple certificates to be used in --p7-sign with
    the --load-certificate option. Patch by Karl Tarbe.
 
