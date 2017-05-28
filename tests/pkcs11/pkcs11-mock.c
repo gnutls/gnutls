@@ -372,6 +372,10 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetTokenInfo)(CK_SLOT_ID slotID, CK_TOKEN_INFO_PTR p
 	memset(pInfo->serialNumber, ' ', sizeof(pInfo->serialNumber));
 	memcpy(pInfo->serialNumber, PKCS11_MOCK_CK_TOKEN_INFO_SERIAL_NUMBER, strlen(PKCS11_MOCK_CK_TOKEN_INFO_SERIAL_NUMBER));
 	pInfo->flags = CKF_RNG | CKF_LOGIN_REQUIRED | CKF_USER_PIN_INITIALIZED | CKF_TOKEN_INITIALIZED;
+
+	if (pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH)
+		pInfo->flags &= ~CKF_LOGIN_REQUIRED;
+
 	pInfo->ulMaxSessionCount = CK_EFFECTIVELY_INFINITE;
 	pInfo->ulSessionCount = (CK_TRUE == pkcs11_mock_session_opened) ? 1 : 0;
 	pInfo->ulMaxRwSessionCount = CK_EFFECTIVELY_INFINITE;
@@ -725,7 +729,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
 	if ((CK_FALSE == pkcs11_mock_session_opened) || (PKCS11_MOCK_CK_SESSION_ID != hSession))
 		return CKR_SESSION_HANDLE_INVALID;
 
-	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) {
+	if ((pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) && userType == CKU_CONTEXT_SPECIFIC) {
+		return CKR_USER_TYPE_INVALID;
+	}
+
+	if ((pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) || (pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH)) {
 		if ((CKU_CONTEXT_SPECIFIC != userType) && (CKU_SO != userType) && (CKU_USER != userType))
 			return CKR_USER_TYPE_INVALID;
 	} else if ((CKU_SO != userType) && (CKU_USER != userType)) {
@@ -769,7 +777,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
 			break;
 	}
 
-	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH && rv == CKR_USER_ALREADY_LOGGED_IN) {
+	if ((pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH || pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) && rv == CKR_USER_ALREADY_LOGGED_IN) {
 		rv = 0;
 	}
 
@@ -1015,6 +1023,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 		else if (CKA_ALWAYS_AUTHENTICATE == pTemplate[i].type)
 		{
 			CK_BBOOL t;
+			if (pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH)
+				return CKR_ATTRIBUTE_TYPE_INVALID;
+
 			if (pTemplate[i].ulValueLen != sizeof(CK_BBOOL))
 				return CKR_ARGUMENTS_BAD;
 
@@ -1540,10 +1551,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 		(PKCS11_MOCK_CK_OPERATION_VERIFY != mock_session->find_op.active_operation))
 		return CKR_OPERATION_ACTIVE;
 
-	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) {
-		if (!pkcs11_mock_session_reauth) {
-			return CKR_USER_NOT_LOGGED_IN;
-		}
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH || pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) {
 		pkcs11_mock_session_reauth = 0;
 	}
 
@@ -1628,6 +1636,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
 
 	if (PKCS11_MOCK_CK_OPERATION_DECRYPT != mock_session->find_op.active_operation)
 		return CKR_OPERATION_NOT_INITIALIZED;
+
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH || pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) {
+		if (!pkcs11_mock_session_reauth) {
+			return CKR_USER_NOT_LOGGED_IN;
+		}
+		if ((pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) && pData != NULL)
+			pkcs11_mock_session_reauth = 0;
+	}
 
 	if (NULL == pEncryptedData)
 		return CKR_ARGUMENTS_BAD;
@@ -1924,10 +1940,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
 		(PKCS11_MOCK_CK_OPERATION_ENCRYPT != mock_session->find_op.active_operation))
 		return CKR_OPERATION_ACTIVE;
 
-	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) {
-		if (!pkcs11_mock_session_reauth) {
-			return CKR_USER_NOT_LOGGED_IN;
-		}
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH || pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) {
 		pkcs11_mock_session_reauth = 0;
 	}
 
@@ -1968,6 +1981,16 @@ CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData,
 
 	if ((CK_FALSE == pkcs11_mock_session_opened) || (PKCS11_MOCK_CK_SESSION_ID != hSession))
 		return CKR_SESSION_HANDLE_INVALID;
+
+	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH || pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) {
+		if (!pkcs11_mock_session_reauth) {
+			return CKR_USER_NOT_LOGGED_IN;
+		}
+
+		if ((pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) && pSignature != NULL) {
+			pkcs11_mock_session_reauth = 0;
+		}
+	}
 
 	if (NULL == pData)
 		return CKR_ARGUMENTS_BAD;
