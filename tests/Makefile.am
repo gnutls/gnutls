@@ -202,6 +202,10 @@ pkcs11_privkey_always_auth_SOURCES = pkcs11/pkcs11-privkey-always-auth.c
 pkcs11_privkey_always_auth_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_privkey_always_auth_LDADD = $(LDADD) $(LIBDL)
 
+pkcs11_privkey_safenet_always_auth_SOURCES = pkcs11/pkcs11-privkey-safenet-always-auth.c
+pkcs11_privkey_safenet_always_auth_DEPENDENCIES = libpkcs11mock1.la libutils.la
+pkcs11_privkey_safenet_always_auth_LDADD = $(LDADD) $(LIBDL)
+
 pkcs11_pkcs11_privkey_pthread_LDADD = $(LDADD) -lpthread
 
 ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts \
@@ -209,7 +213,7 @@ ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
 	pkcs11/pkcs11-combo pkcs11/pkcs11-privkey pkcs11/pkcs11-pubkey-import-rsa pkcs11/pkcs11-pubkey-import-ecdsa \
 	pkcs11-import-url-privkey pkcs11-privkey-fork pkcs11/pkcs11-ec-privkey-test \
 	pkcs11-privkey-always-auth pkcs11-privkey-export pkcs11/pkcs11-import-with-pin \
-	pkcs11/pkcs11-privkey-pthread
+	pkcs11/pkcs11-privkey-pthread pkcs11-privkey-safenet-always-auth
 
 
 endif
