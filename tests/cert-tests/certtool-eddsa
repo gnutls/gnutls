@@ -1,0 +1,119 @@
+#!/bin/sh
+
+# Copyright (C) 2014 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+DIFF="${DIFF:-diff -b -B}"
+KEYFILE=eddsa-privkey.$$.tmp
+TMPFILE=eddsa.$$.tmp
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
+if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
+	exit 77
+fi
+
+# Test certificate in internet draft
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/cert-eddsa.pem" --outfile "${TMPFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "There was an issue parsing the certificate"
+	exit 1
+fi
+
+$DIFF -I 'Not After:' ${TMPFILE} "${srcdir}/data/cert-eddsa.pem"
+if test $? != 0;then
+	echo "Error in parsing EdDSA cert"
+	exit 1
+fi
+
+
+# Create an RSA-PSS private key, restricted to the use with RSA-PSS
+${VALGRIND} "${CERTTOOL}" --generate-privkey --pkcs8 --password '' \
+        --eddsa --outfile "$KEYFILE"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not generate an EdDSA key"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" -k --password '' --infile "$KEYFILE"
+rc=$?
+if test "${rc}" != "0"; then
+	echo "Could not read generated an EdDSA key"
+	exit 1
+fi
+
+# Create an EdDSA certificate from an EdDSA private key
+${VALGRIND} "${CERTTOOL}" --generate-self-signed \
+	--pkcs8 --load-privkey "$KEYFILE" --password '' \
+	--template "${srcdir}/templates/template-test.tmpl" \
+	--outfile "${TMPFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not generate an EdDSA certificate from an EdDSA key"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --verify --load-ca-certificate "${TMPFILE}" --infile "${TMPFILE}"
+rc=$?
+if test "${rc}" != "0"; then
+	echo "There was an issue verifying the generated certificate (1)"
+	exit 1
+fi
+
+# Create an EdDSA certificate from an RSA key
+${VALGRIND} "${CERTTOOL}" --generate-certificate --eddsa \
+	    --load-privkey ${KEYFILE} \
+	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+	    --template "${srcdir}/templates/template-test.tmpl" \
+	    --outfile "${TMPFILE}" 2>/dev/null
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not generate an EdDSA certificate $i"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --verify --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" --infile "${TMPFILE}"
+rc=$?
+if test "${rc}" != "0"; then
+	echo "There was an issue verifying the generated certificate (2)"
+	exit 1
+fi
+
+
+
+rm -f "${TMPFILE}"
+rm -f "${KEYFILE}"
+
+exit 0
