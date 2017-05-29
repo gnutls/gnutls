@@ -128,6 +128,11 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+#define ENABLE_PKCS8(cinfo) \
+		cinfo->pkcs8 = 1; \
+		if (!HAVE_OPT(PASSWORD) && cinfo->password == NULL) \
+			cinfo->password = ""
+
 static gnutls_x509_privkey_t
 generate_private_key_int(common_info_st * cinfo)
 {
@@ -148,7 +153,7 @@ generate_private_key_int(common_info_st * cinfo)
 
 	if (key_type == GNUTLS_PK_RSA_PSS && !cinfo->pkcs8) {
 		fprintf(stderr, "Assuming --pkcs8 is given; RSA-PSS private keys can only be exported in PKCS#8 format\n");
-		cinfo->pkcs8 = 1;
+		ENABLE_PKCS8(cinfo);
 	}
 
 	if (key_type == GNUTLS_PK_EC) {
