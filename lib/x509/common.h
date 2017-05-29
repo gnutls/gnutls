@@ -256,7 +256,12 @@ int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr);
 inline static int _asn1_strict_der_decode (asn1_node * element, const void *ider,
 		       int len, char *errorDescription)
 {
-	return asn1_der_decoding2(element, ider, &len, ASN1_DECODE_FLAG_STRICT_DER, errorDescription);
+#ifdef ASN1_DECODE_FLAG_ALLOW_INCORRECT_TIME
+# define _ASN1_DER_FLAGS ASN1_DECODE_FLAG_ALLOW_INCORRECT_TIME|ASN1_DECODE_FLAG_STRICT_DER
+#else
+# define _ASN1_DER_FLAGS ASN1_DECODE_FLAG_STRICT_DER
+#endif
+	return asn1_der_decoding2(element, ider, &len, _ASN1_DER_FLAGS, errorDescription);
 }
 
 #endif
