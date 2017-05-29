@@ -85,7 +85,7 @@ void doit(void)
 		gnutls_global_set_log_level(6);
 
 	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
-		if (tests[i].pk == GNUTLS_PK_DSA)
+		if (tests[i].pk == GNUTLS_PK_DSA || tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
 			continue;
 
 		if (debug)

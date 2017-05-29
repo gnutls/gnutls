@@ -144,7 +144,7 @@ void doit(void)
 		if (debug)
 			success("loop %d: %s\n", (int) i, tests[i].name);
 
-		if (tests[i].pk == GNUTLS_PK_RSA_PSS)
+		if (tests[i].pk == GNUTLS_PK_RSA_PSS || tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
 			continue;
 
 		if (tests[i].digest == GNUTLS_DIG_SHA1) {

@@ -30,6 +30,7 @@
  * TLS client (RSA PSS): cli_ca3_rsa_pss_cert, cli_ca3_rsa_pss_key
  * IPv4 server (SAN: IPAddr: 127.0.0.1): server_ca3_ipaddr_cert, server_ca3_key
  * IPv4 server (RSA-PSS, SAN: localhost IPAddr: 127.0.0.1): server_ca3_rsa_pss_cert, server_ca3_rsa_pss_key
+ * IPv4 server (EdDSA, SAN: localhost IPAddr: 127.0.0.1): server_ca3_eddsa_cert, server_ca3_eddsa_key
  * IPv6 server: server_ca3_localhost6_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_ecc_cert, server_ca3_ecc_key
@@ -884,6 +885,30 @@ const gnutls_datum_t cli_ca3_rsa_pss_cert = { (void*)cli_ca3_rsa_pss_cert_pem,
 };
 
 #define cli_ca3_rsa_pss_key server_ca3_rsa_pss_key
+
+/* server EdDSA key */
+static char server_ca3_eddsa_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MC4CAQAwBQYDK2VwBCIEIBypI9w1qP3WLaiYuWB7zhA99GTG5UsKZVZqPHNlUaIv\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_eddsa_key = { (void*)server_ca3_eddsa_key_pem,
+	sizeof(server_ca3_eddsa_key_pem)-1
+};
+
+static char server_ca3_eddsa_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBEzCBxqADAgECAgxZLBvYDjrxFhfqLoIwBQYDK2VwMA0xCzAJBgNVBAYTAkdS\n"
+	"MB4XDTA0MDIyOTE1MjE0MloXDTI0MDIyOTE1MjE0MVowDTELMAkGA1UEBhMCR1Iw\n"
+	"KjAFBgMrZXADIQCrr5izw0GNQSIhwYanuHD7RG7HfiCHe9kipF3SlwnVSKNAMD4w\n"
+	"DAYDVR0TAQH/BAIwADAPBgNVHQ8BAf8EBQMDB4AAMB0GA1UdDgQWBBSJg0wiKtJf\n"
+	"jqv1BmHV8w0JD5X2BjAFBgMrZXADQQB94NbYtwGCvyI6EvBZk5xgOyWNdKVy9peh\n"
+	"KKn/PNiAq4fPNEupyzC3AzE1xLzKLRArAFFDDUjPCwy3OR4js3MF\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_eddsa_cert = { (void*)server_ca3_eddsa_cert_pem,
+	sizeof(server_ca3_eddsa_cert_pem)-1
+};
 
 /* shares server_ca3 key */
 static char server_localhost6_ca3_cert_pem[] =

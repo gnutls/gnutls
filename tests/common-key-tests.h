@@ -68,5 +68,13 @@ struct _key_tests_st common_key_tests[] = {
 		.digest = GNUTLS_DIG_SHA256,
 		.sign_flags = GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS,
 		.sigalgo = GNUTLS_SIGN_RSA_PSS_SHA256
+	},
+	{
+		.name = "eddsa key",
+		.key = {(void *) server_ca3_eddsa_key_pem, sizeof(server_ca3_eddsa_key_pem)-1},
+		.cert = {(void *) server_ca3_eddsa_cert_pem, sizeof(server_ca3_eddsa_cert_pem)-1},
+		.pk = GNUTLS_PK_EDDSA_ED25519,
+		.digest = GNUTLS_DIG_SHA512,
+		.sigalgo = GNUTLS_SIGN_EDDSA_ED25519
 	}
 };

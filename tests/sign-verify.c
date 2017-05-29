@@ -109,6 +109,9 @@ void doit(void)
 		if (debug)
 			success("loop %d\n", (int) i);
 
+		if (tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
+			continue;
+
 		if (tests[i].digest == GNUTLS_DIG_SHA1) {
 			hash_data = &sha1_hash_data;
 			invalid_hash_data = &sha1_invalid_hash_data;
