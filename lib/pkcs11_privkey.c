@@ -291,7 +291,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	unsigned long siglen;
 	struct pkcs11_session_info *sinfo;
 	unsigned retried_login = 0;
-	unsigned flags = SESSION_LOGIN;
+	unsigned flags = SESSION_LOGIN|SESSION_CONTEXT_SPECIFIC;
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
@@ -320,7 +320,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 			flags |= SESSION_FORCE_LOGIN;
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
-				 key->uinfo, flags, 1);
+				 key->uinfo, flags);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
@@ -563,7 +563,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	struct ck_mechanism mech;
 	unsigned long siglen;
 	unsigned retried_login = 0;
-	unsigned login_flags = SESSION_LOGIN;
+	unsigned login_flags = SESSION_LOGIN|SESSION_CONTEXT_SPECIFIC;
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
@@ -593,7 +593,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 			login_flags |= SESSION_FORCE_LOGIN;
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
-				 key->uinfo, login_flags, 1);
+				 key->uinfo, login_flags);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");

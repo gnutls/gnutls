@@ -111,8 +111,7 @@ int pkcs11_get_info(struct p11_kit_uri *info,
 		    size_t * output_size);
 int pkcs11_login(struct pkcs11_session_info *sinfo,
 		 struct pin_info_st *pin_info,
-		 struct p11_kit_uri *info, unsigned so,
-		 unsigned reauth);
+		 struct p11_kit_uri *info, unsigned flags);
 
 int pkcs11_call_token_func(struct p11_kit_uri *info, const unsigned retry);
 
@@ -132,6 +131,7 @@ _gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 #define SESSION_SO (1<<2)	/* security officer session */
 #define SESSION_TRUSTED (1<<3) /* session on a marked as trusted (p11-kit) module */
 #define SESSION_FORCE_LOGIN (1<<4) /* force login even when CFK_LOGIN_REQUIRED is not set */
+#define SESSION_CONTEXT_SPECIFIC (1<<5)
 
 int pkcs11_open_session(struct pkcs11_session_info *sinfo,
 			struct pin_info_st *pin_info,
