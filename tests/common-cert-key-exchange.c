@@ -70,6 +70,7 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 	gnutls_anon_client_credentials_t c_anoncred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN, version;
+	const char *err;
 
 	/* General init. */
 	gnutls_global_set_log_function(tls_log_func);
@@ -99,7 +100,7 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519",
+				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -140,8 +141,10 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 
-	ret = gnutls_priority_set_direct(client, client_prio, NULL);
+	ret = gnutls_priority_set_direct(client, client_prio, &err);
 	if (ret < 0) {
+		if (ret == GNUTLS_E_INVALID_REQUEST)
+			fprintf(stderr, "Error in %s\n", err);
 		exit(1);
 	}
 	success("negotiating %s\n", name);

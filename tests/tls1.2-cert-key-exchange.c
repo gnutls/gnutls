@@ -52,6 +52,8 @@ void doit(void)
 	try_with_key("TLS 1.2 with ecdhe rsa-pss/rsa-pss no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_SHA256, GNUTLS_SIGN_UNKNOWN,
 		&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, NULL, NULL, 0);
 	try("TLS 1.2 with rsa no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN);
+	try_with_key("TLS 1.2 with ecdhe x25519 ed25519 no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA:-CURVE-ALL:+CURVE-X25519:-SIGN-ALL:+SIGN-EDDSA-ED25519", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_EDDSA_ED25519, GNUTLS_SIGN_UNKNOWN,
+		&server_ca3_eddsa_cert, &server_ca3_eddsa_key, NULL, NULL, 0);
 
 	try_cli("TLS 1.2 with dhe-rsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_RSA_SHA256, USE_CERT);
 	try_cli("TLS 1.2 with ecdhe-rsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_RSA_SHA256, USE_CERT);
@@ -61,6 +63,9 @@ void doit(void)
 	try_cli("TLS 1.2 with ecdhe-rsa-pss cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_SHA256, GNUTLS_SIGN_RSA_SHA256, USE_CERT);
 	try_with_key("TLS 1.2 with ecdhe-rsa-pss/rsa-pss cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_PSS_SHA256, GNUTLS_SIGN_RSA_PSS_SHA256,
 		&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, &cli_ca3_rsa_pss_cert, &cli_ca3_rsa_pss_key, USE_CERT);
+
+	try_with_key("TLS 1.2 with ecdhe x25519 ed25519 cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA:-CURVE-ALL:+CURVE-X25519:-SIGN-ALL:+SIGN-EDDSA-ED25519", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_EDDSA_ED25519, GNUTLS_SIGN_EDDSA_ED25519,
+		&server_ca3_eddsa_cert, &server_ca3_eddsa_key, &server_ca3_eddsa_cert, &server_ca3_eddsa_key, USE_CERT);
 
 	try_cli("TLS 1.2 with dhe-rsa ask cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
 	try_cli("TLS 1.2 with ecdhe-rsa ask cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
