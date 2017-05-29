@@ -93,7 +93,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
 	 mini-dtls-record-asym openpgp-callback key-import-export \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
-	 strict-der tls-ext-register tls-supplemental mini-dtls0-9 \
+	 tls-ext-register tls-supplemental mini-dtls0-9 \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
 	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
