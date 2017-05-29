@@ -45,11 +45,13 @@ int _gnutls_handshake_sign_data(gnutls_session_t session,
 				gnutls_sign_algorithm_t * algo);
 
 int _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
+				      unsigned verify_flags,
 				      gnutls_pcert_st * cert,
 				      gnutls_datum_t * signature,
 				      gnutls_sign_algorithm_t);
 
 int _gnutls_handshake_verify_data(gnutls_session_t session,
+				  unsigned verify_flags,
 				  gnutls_pcert_st * cert,
 				  const gnutls_datum_t * params,
 				  gnutls_datum_t * signature,

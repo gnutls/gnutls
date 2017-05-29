@@ -1756,7 +1756,7 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		}
 	}
 
-	if (gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
+	if (algo != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
 

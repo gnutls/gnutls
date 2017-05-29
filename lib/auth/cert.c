@@ -1527,12 +1527,23 @@ _gnutls_proc_cert_client_crt_vrfy(gnutls_session_t session,
 	gnutls_pcert_st peer_cert;
 	gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
 	const version_entry_st *ver = get_version(session);
+	gnutls_certificate_credentials_t cred;
+	unsigned vflags;
 
 	if (unlikely(info == NULL || info->ncerts == 0 || ver == NULL)) {
 		gnutls_assert();
 		/* we need this in order to get peer's certificate */
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
+
+	cred = (gnutls_certificate_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+	vflags = cred->verify_flags | session->internals.additional_verify_flags;
 
 	if (_gnutls_version_has_selectable_sighash(ver)) {
 		sign_algorithm_st aid;
@@ -1572,7 +1583,7 @@ _gnutls_proc_cert_client_crt_vrfy(gnutls_session_t session,
 	}
 
 	if ((ret =
-	     _gnutls_handshake_verify_crt_vrfy(session, &peer_cert, &sig,
+	     _gnutls_handshake_verify_crt_vrfy(session, vflags, &peer_cert, &sig,
 					       sign_algo)) < 0) {
 		gnutls_assert();
 		gnutls_pcert_deinit(&peer_cert);
@@ -2171,12 +2182,23 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 	gnutls_pcert_st peer_cert;
 	gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
 	const version_entry_st *ver = get_version(session);
+	gnutls_certificate_credentials_t cred;
+	unsigned vflags;
 
 	if (unlikely(info == NULL || info->ncerts == 0 || ver == NULL)) {
 		gnutls_assert();
 		/* we need this in order to get peer's certificate */
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
+
+	cred = (gnutls_certificate_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+	vflags = cred->verify_flags | session->internals.additional_verify_flags;
 
 	/* VERIFY SIGNATURE */
 	if (_gnutls_version_has_selectable_sighash(ver)) {
@@ -2212,7 +2234,7 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 	}
 
 	ret =
-	    _gnutls_handshake_verify_data(session, &peer_cert, vparams,
+	    _gnutls_handshake_verify_data(session, vflags, &peer_cert, vparams,
 					  &signature, sign_algo);
 
 	gnutls_pcert_deinit(&peer_cert);

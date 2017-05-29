@@ -177,6 +177,8 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_pcert_st peer_cert;
 	uint8_t *p;
 	gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
+	gnutls_certificate_credentials_t cred;
+	unsigned vflags;
 	const version_entry_st *ver = get_version(session);
 
 	if (unlikely(ver == NULL))
@@ -187,6 +189,15 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 		return ret;
 
 	data_size = _data_size - ret;
+
+	cred = (gnutls_certificate_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+	vflags = cred->verify_flags | session->internals.additional_verify_flags;
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL || info->ncerts == 0) {
@@ -236,7 +247,7 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 	}
 
 	ret =
-	    _gnutls_handshake_verify_data(session, &peer_cert, &vparams,
+	    _gnutls_handshake_verify_data(session, vflags, &peer_cert, &vparams,
 					  &signature, sign_algo);
 
 	gnutls_pcert_deinit(&peer_cert);
