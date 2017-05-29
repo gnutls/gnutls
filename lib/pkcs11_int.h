@@ -131,6 +131,8 @@ _gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 #define SESSION_LOGIN (1<<1)
 #define SESSION_SO (1<<2)	/* security officer session */
 #define SESSION_TRUSTED (1<<3) /* session on a marked as trusted (p11-kit) module */
+#define SESSION_FORCE_LOGIN (1<<4) /* force login even when CFK_LOGIN_REQUIRED is not set */
+
 int pkcs11_open_session(struct pkcs11_session_info *sinfo,
 			struct pin_info_st *pin_info,
 			struct p11_kit_uri *info, unsigned int flags);
