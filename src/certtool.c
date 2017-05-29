@@ -988,7 +988,7 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 	fprintf(stdlog, "\n\nSigning certificate...\n");
 
 	if (cinfo->rsa_pss_sign)
-		flags = GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
 
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, eecrt, eekey, get_dig(eecrt),
@@ -1082,7 +1082,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 	fprintf(stderr, "\n\nSigning certificate...\n");
 
 	if (cinfo->rsa_pss_sign)
-		flags = GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
 
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
@@ -1103,6 +1103,18 @@ static void update_signed_certificate(common_info_st * cinfo)
 	fwrite(lbuffer, 1, size, outfile);
 
 	gnutls_x509_crt_deinit(crt);
+}
+
+static
+void sign_params_to_flags(common_info_st *cinfo, const char *params)
+{
+	if (strcasecmp(params, "rsa-pss") == 0) {
+		cinfo->rsa_pss_sign = 1;
+		return;
+	}
+
+	fprintf(stderr, "Unknown signature parameters: %s\n", params);
+	app_exit(1);
 }
 
 static void cmd_parser(int argc, char **argv)
@@ -1332,8 +1344,8 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.password = "";
 	}
 
-	if (HAVE_OPT(RSA_PSS_SIGN))
-		cinfo.rsa_pss_sign = 1;
+	if (HAVE_OPT(SIGN_PARAMS))
+		sign_params_to_flags(&cinfo, OPT_ARG(SIGN_PARAMS));
 
 	if (HAVE_OPT(GENERATE_SELF_SIGNED))
 		generate_self_signed(&cinfo);

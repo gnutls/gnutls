@@ -98,7 +98,7 @@ if test "${rc}" != "0"; then
 fi
 
 # Create an RSA certificate from an RSA key, and sign it with RSA-PSS
-${VALGRIND} "${CERTTOOL}" --generate-certificate --rsa --rsa-pss-sign \
+${VALGRIND} "${CERTTOOL}" --generate-certificate --rsa --sign-params rsa-pss \
 	    --load-privkey "${srcdir}/../../doc/credentials/x509/key-rsa.pem" \
 	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \

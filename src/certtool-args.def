@@ -464,10 +464,12 @@ flag = {
 };
 
 flag = {
-    name      = rsa-pss-sign;
-    descrip   = "Sign certificate with RSA-PSS";
-    doc = "This option can be combined with --generate-certificate, to sign the certificate with the RSA-PSS padding scheme.
-That is required when the signer does not have a certificate which is marked for RSA-PSS use only.";
+    name      = sign-params;
+    arg-type  = string;
+    descrip   = "Sign a certificate with a specific signature algorithm";
+    doc = "This option can be combined with --generate-certificate, to sign the certificate with
+a specific signature algorithm variant. The only option supported is
+'RSA-PSS', and should be specified when the signer does not have a certificate which is marked for RSA-PSS use only.";
 };
 
 flag = {
