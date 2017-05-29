@@ -135,26 +135,28 @@ typedef enum {
     INDEX_OPT_DSA                      = 66,
     INDEX_OPT_ECC                      = 67,
     INDEX_OPT_ECDSA                    = 68,
-    INDEX_OPT_HASH                     = 69,
-    INDEX_OPT_INDER                    = 70,
-    INDEX_OPT_INRAW                    = 71,
-    INDEX_OPT_OUTDER                   = 72,
-    INDEX_OPT_OUTRAW                   = 73,
-    INDEX_OPT_BITS                     = 74,
-    INDEX_OPT_CURVE                    = 75,
-    INDEX_OPT_SEC_PARAM                = 76,
-    INDEX_OPT_DISABLE_QUICK_RANDOM     = 77,
-    INDEX_OPT_TEMPLATE                 = 78,
-    INDEX_OPT_STDOUT_INFO              = 79,
-    INDEX_OPT_ASK_PASS                 = 80,
-    INDEX_OPT_PKCS_CIPHER              = 81,
-    INDEX_OPT_PROVIDER                 = 82,
-    INDEX_OPT_VERSION                  = 83,
-    INDEX_OPT_HELP                     = 84,
-    INDEX_OPT_MORE_HELP                = 85
+    INDEX_OPT_RSA_PSS                  = 69,
+    INDEX_OPT_SIGN_PARAMS              = 70,
+    INDEX_OPT_HASH                     = 71,
+    INDEX_OPT_INDER                    = 72,
+    INDEX_OPT_INRAW                    = 73,
+    INDEX_OPT_OUTDER                   = 74,
+    INDEX_OPT_OUTRAW                   = 75,
+    INDEX_OPT_BITS                     = 76,
+    INDEX_OPT_CURVE                    = 77,
+    INDEX_OPT_SEC_PARAM                = 78,
+    INDEX_OPT_DISABLE_QUICK_RANDOM     = 79,
+    INDEX_OPT_TEMPLATE                 = 80,
+    INDEX_OPT_STDOUT_INFO              = 81,
+    INDEX_OPT_ASK_PASS                 = 82,
+    INDEX_OPT_PKCS_CIPHER              = 83,
+    INDEX_OPT_PROVIDER                 = 84,
+    INDEX_OPT_VERSION                  = 85,
+    INDEX_OPT_HELP                     = 86,
+    INDEX_OPT_MORE_HELP                = 87
 } teOptIndex;
 /** count of all options for certtool */
-#define OPTION_CT    86
+#define OPTION_CT    88
 /** certtool version */
 #define CERTTOOL_VERSION       "@VERSION@"
 /** Full certtool version text */
@@ -280,22 +282,24 @@ typedef enum {
 #define VALUE_OPT_DSA            0x1037
 #define VALUE_OPT_ECC            0x1038
 #define VALUE_OPT_ECDSA          0x1039
-#define VALUE_OPT_HASH           0x103A
-#define VALUE_OPT_INDER          0x103B
-#define VALUE_OPT_INRAW          0x103C
-#define VALUE_OPT_OUTDER         0x103D
-#define VALUE_OPT_OUTRAW         0x103E
-#define VALUE_OPT_BITS           0x103F
+#define VALUE_OPT_RSA_PSS        0x103A
+#define VALUE_OPT_SIGN_PARAMS    0x103B
+#define VALUE_OPT_HASH           0x103C
+#define VALUE_OPT_INDER          0x103D
+#define VALUE_OPT_INRAW          0x103E
+#define VALUE_OPT_OUTDER         0x103F
+#define VALUE_OPT_OUTRAW         0x1040
+#define VALUE_OPT_BITS           0x1041
 
 #define OPT_VALUE_BITS           (DESC(BITS).optArg.argInt)
-#define VALUE_OPT_CURVE          0x1040
-#define VALUE_OPT_SEC_PARAM      0x1041
-#define VALUE_OPT_DISABLE_QUICK_RANDOM 0x1042
-#define VALUE_OPT_TEMPLATE       0x1043
-#define VALUE_OPT_STDOUT_INFO    0x1044
-#define VALUE_OPT_ASK_PASS       0x1045
-#define VALUE_OPT_PKCS_CIPHER    0x1046
-#define VALUE_OPT_PROVIDER       0x1047
+#define VALUE_OPT_CURVE          0x1042
+#define VALUE_OPT_SEC_PARAM      0x1043
+#define VALUE_OPT_DISABLE_QUICK_RANDOM 0x1044
+#define VALUE_OPT_TEMPLATE       0x1045
+#define VALUE_OPT_STDOUT_INFO    0x1046
+#define VALUE_OPT_ASK_PASS       0x1047
+#define VALUE_OPT_PKCS_CIPHER    0x1048
+#define VALUE_OPT_PROVIDER       0x1049
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
