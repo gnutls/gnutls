@@ -1684,7 +1684,9 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
  * You can use gnutls_pk_to_sign() to get the appropriate value.
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and zero or positive code on success.
+ * is returned, and zero or positive code on success. For known to be insecure
+ * signatures this function will return %GNUTLS_E_INSUFFICIENT_SECURITY unless
+ * the flag %GNUTLS_VERIFY_ALLOW_BROKEN is specified.
  *
  * Since: 3.0
  **/
@@ -1697,6 +1699,7 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 {
 	const mac_entry_st *me;
 	gnutls_x509_spki_st params;
+	int ret;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1707,6 +1710,7 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 
 	if (flags & OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA || flags & GNUTLS_VERIFY_USE_TLS1_RSA) {
 		params.pk = GNUTLS_PK_RSA;
+		/* we do not check for insecure algorithms with this flag */
 		return _gnutls_pk_verify(params.pk, hash, signature,
 					 &key->params, &params);
 	} else {
@@ -1740,11 +1744,21 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 			}
 		}
 
-		return pubkey_verify_hashed_data(params.pk, me,
+		ret = pubkey_verify_hashed_data(params.pk, me,
 						 hash, signature,
 						 &key->params,
 						 &params);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
+
+	if (gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
+	}
+
+	return 0;
 }
 
 /**
