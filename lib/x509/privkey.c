@@ -1930,68 +1930,6 @@ gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
 }
 
 
-/*-
- * _gnutls_x509_privkey_sign_hash2:
- * @signer: Holds the signer's key
- * @hash_algo: The hash algorithm used
- * @hash_data: holds the data to be signed
- * @signature: will contain newly allocated signature
- * @flags: (0) for now
- *
- * This function will sign the given hashed data using a signature algorithm
- * supported by the private key. Signature algorithms are always used
- * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-1,SHA-224 and SHA-256 
- * for the DSA keys, depending on their bit size.
- *
- * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
- * the hash algorithm.
- *
- * The RSA algorithm is used in PKCS #1 v1.5 mode.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- -*/
-static int
-_gnutls_x509_privkey_sign_hash2(gnutls_x509_privkey_t signer,
-				const mac_entry_st * me,
-				unsigned int flags,
-				const gnutls_datum_t * hash_data,
-				gnutls_datum_t * signature)
-{
-	int ret;
-	gnutls_datum_t digest;
-
-	digest.data = gnutls_malloc(hash_data->size);
-	if (digest.data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	digest.size = hash_data->size;
-	memcpy(digest.data, hash_data->data, digest.size);
-
-	ret = pk_prepare_hash(signer->pk_algorithm, me, &digest);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret =
-	    _gnutls_pk_sign(signer->pk_algorithm, signature, &digest,
-			    &signer->params, &signer->params.sign);
-
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = 0;
-
-      cleanup:
-	_gnutls_free_datum(&digest);
-	return ret;
-}
-
 /**
  * gnutls_x509_privkey_sign_hash:
  * @key: a key
@@ -2002,6 +1940,10 @@ _gnutls_x509_privkey_sign_hash2(gnutls_x509_privkey_t signer,
  * use this function directly unless you know what it is. Typical signing
  * requires the data to be hashed and stored in special formats 
  * (e.g. BER Digest-Info for RSA).
+ *
+ * This API is provided only for backwards compatibility, and thus
+ * restricted to RSA, DSA and ECDSA key types. For other key types please
+ * use gnutls_privkey_sign_hash() and gnutls_privkey_sign_data().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -2016,6 +1958,13 @@ gnutls_x509_privkey_sign_hash(gnutls_x509_privkey_t key,
 	int result;
 
 	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (key->pk_algorithm != GNUTLS_PK_RSA && key->pk_algorithm != GNUTLS_PK_ECDSA &&
+	    key->pk_algorithm != GNUTLS_PK_DSA) {
+		/* too primitive API - use only with legacy types */
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -2064,47 +2013,40 @@ gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
 			      const gnutls_datum_t * data,
 			      void *signature, size_t * signature_size)
 {
-	int result;
-	gnutls_datum_t sig = { NULL, 0 };
-	gnutls_datum_t hash;
-	const mac_entry_st *me = hash_to_entry(digest);
+	gnutls_privkey_t privkey;
+	gnutls_datum_t sig = {NULL, 0};
+	int ret;
 
-	if (key == NULL) {
+	ret = gnutls_privkey_init(&privkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_privkey_import_x509(privkey, key, 0);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
-	result =
-	    pk_hash_data(key->pk_algorithm, me, &key->params, data, &hash);
-	if (result < 0) {
+	ret = gnutls_privkey_sign_data(privkey, digest, flags, data, &sig);
+	if (ret < 0) {
 		gnutls_assert();
-		return result;
-	}
-
-	result =
-	    _gnutls_x509_privkey_sign_hash2(key, me, flags, &hash, &sig);
-
-	_gnutls_free_datum(&hash);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
+		goto cleanup;
 	}
 
 	if (*signature_size < sig.size) {
 		*signature_size = sig.size;
-		_gnutls_free_datum(&sig);
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto cleanup;
 	}
 
 	*signature_size = sig.size;
 	memcpy(signature, sig.data, sig.size);
 
+cleanup:
 	_gnutls_free_datum(&sig);
-
-	return 0;
+	gnutls_privkey_deinit(privkey);
+	return ret;
 }
-
 
 /**
  * gnutls_x509_privkey_fix:
