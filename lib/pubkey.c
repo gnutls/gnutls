@@ -1626,13 +1626,22 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 
 	memcpy(&params, &pubkey->params.sign, sizeof(gnutls_x509_spki_st));
 
-	params.pk = pubkey->pk_algorithm;
+	params.pk = gnutls_sign_get_pk_algorithm(algo);
 	params.dig = gnutls_sign_get_hash_algorithm(algo);
 	me = hash_to_entry(params.dig);
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (flags & GNUTLS_VERIFY_USE_RSA_PSS) {
+	if (params.pk != pubkey->pk_algorithm) {
+		if (!gnutls_sign_supports_pk_algorithm(algo, pubkey->pk_algorithm)) {
+			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
+					gnutls_pk_get_name(pubkey->pk_algorithm), pubkey->pk_algorithm,
+					gnutls_sign_get_name(algo), algo);
+			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+		}
+	}
+
+	if (params.pk == GNUTLS_PK_RSA_PSS) {
 		unsigned bits;
 
 		if (!GNUTLS_PK_IS_RSA(pubkey->pk_algorithm))
@@ -1645,7 +1654,6 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 			gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
 			params.salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
 		}
-		params.pk = GNUTLS_PK_RSA_PSS;
 	}
 
 	ret = pubkey_verify_data(params.pk, me, data, signature, &pubkey->params,

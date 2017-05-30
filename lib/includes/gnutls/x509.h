@@ -964,8 +964,7 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
 	GNUTLS_VERIFY_USE_TLS1_RSA = 1 << 13,
 	GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS = 1 << 14,
-	GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 = 1 << 15,
-	GNUTLS_VERIFY_USE_RSA_PSS = 1 << 16
+	GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1 = 1 << 15
 	/* cannot exceed 2^24 due to GNUTLS_PROFILE_TO_VFLAGS() */
 } gnutls_certificate_verify_flags;
 

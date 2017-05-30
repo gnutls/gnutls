@@ -52,7 +52,6 @@ typedef enum gnutls_pubkey_flags {
 } gnutls_pubkey_flags_t;
 
 #define GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA GNUTLS_VERIFY_USE_TLS1_RSA
-#define GNUTLS_PUBKEY_VERIFY_FLAG_RSA_PSS GNUTLS_VERIFY_USE_RSA_PSS
 
 typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
 					 void *userdata,
