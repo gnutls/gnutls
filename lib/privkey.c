@@ -689,6 +689,10 @@ gnutls_privkey_import_ext(gnutls_privkey_t pkey,
 					  decrypt_func, NULL, flags);
 }
 
+#define CHECK_EXT_PK(pk) \
+	if (pk != GNUTLS_PK_RSA && pk != GNUTLS_PK_ECDSA && pk != GNUTLS_PK_DSA) \
+		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR)
+
 /**
  * gnutls_privkey_import_ext2:
  * @pkey: The private key
@@ -732,6 +736,8 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
 		gnutls_assert();
 		return ret;
 	}
+
+	CHECK_EXT_PK(pk);
 
 	if (sign_fn == NULL && decrypt_fn == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -812,6 +818,8 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 	pkey->flags = flags;
 
 	pkey->pk_algorithm = pkey->key.ext.info_func(pkey, GNUTLS_PRIVKEY_INFO_PK_ALGO, pkey->key.ext.userdata);
+
+	CHECK_EXT_PK(pkey->pk_algorithm);
 
 	/* Ensure gnutls_privkey_deinit() calls the deinit_func */
 	if (deinit_fn)
