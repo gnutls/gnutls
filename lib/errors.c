@@ -414,6 +414,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_ASN1_TIME_ERROR),
 	ERROR_ENTRY(N_("The signature is incompatible with the public key."),
 		    GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY),
+	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
+		    GNUTLS_E_INSUFFICIENT_SECURITY),
 	{NULL, NULL, 0}
 };
 
@@ -432,8 +434,7 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
 	ERROR_ENTRY(N_("Function was interrupted."), GNUTLS_E_INTERRUPTED),
 	ERROR_ENTRY(N_("Rehandshake was requested by the peer."),
 		    GNUTLS_E_REHANDSHAKE),
-	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
-		    GNUTLS_E_INSUFFICIENT_SECURITY),
+	/* Only non fatal (for handshake) errors here */
 	{NULL, NULL, 0}
 };
 
