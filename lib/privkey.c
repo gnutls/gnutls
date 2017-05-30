@@ -1257,7 +1257,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 	}
 
 	ret = _gnutls_privkey_find_sign_params(signer, signer->pk_algorithm,
-					       hash_algo, 0, &params);
+					       hash_algo, flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1267,20 +1267,6 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		return _gnutls_privkey_sign_raw_data(signer,
 						     hash_data, signature,
 						     &params);
-	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS) {
-		const mac_entry_st *me = hash_to_entry(hash_algo);
-		unsigned pk;
-		unsigned bits;
-
-		pk = gnutls_privkey_get_pk_algorithm(signer, &bits);
-
-		if (me == NULL || !GNUTLS_PK_IS_RSA(pk))
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-		params.pk = GNUTLS_PK_RSA_PSS;
-		params.salt_size =
-		    _gnutls_find_rsa_pss_salt_size(bits, me, 0);
-	}
 
 	return privkey_sign_hash(signer, hash_data, signature, &params);
 }
