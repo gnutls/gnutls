@@ -38,7 +38,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
 	exit 77
 fi
 
-# Test certificate in internet draft
+# Test certificate in draft-ietf-curdle-pkix-04
 ${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/cert-eddsa.pem" --outfile "${TMPFILE}"
 rc=$?
 
@@ -50,6 +50,20 @@ fi
 $DIFF -I 'Not After:' ${TMPFILE} "${srcdir}/data/cert-eddsa.pem"
 if test $? != 0;then
 	echo "Error in parsing EdDSA cert"
+	exit 1
+fi
+
+# Test public key in draft-ietf-curdle-pkix-04
+${VALGRIND} "${CERTTOOL}" --pubkey-info --infile "${srcdir}/data/pubkey-eddsa.pem" --outfile "${TMPFILE}"
+rc=$?
+if test "${rc}" != "0"; then
+	echo "Could not read an EdDSA public key"
+	exit 1
+fi
+
+$DIFF ${TMPFILE} "${srcdir}/data/pubkey-eddsa.pem"
+if test $? != 0;then
+	echo "Error in parsing EdDSA public key"
 	exit 1
 fi
 
@@ -70,6 +84,7 @@ if test "${rc}" != "0"; then
 	echo "Could not read generated an EdDSA key"
 	exit 1
 fi
+
 
 # Create an EdDSA certificate from an EdDSA private key
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
