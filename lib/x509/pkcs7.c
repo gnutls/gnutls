@@ -2498,7 +2498,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	result = _gnutls_privkey_find_sign_params(signer_key, pk, dig, 0,
+	result = _gnutls_privkey_update_sign_params(signer_key, pk, dig, 0,
 						  &params);
 	if (result < 0) {
 		gnutls_assert();

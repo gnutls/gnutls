@@ -253,11 +253,6 @@ int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
 
 int _gnutls_x509_privkey_get_sign_params(gnutls_x509_privkey_t key,
 					 gnutls_x509_spki_st * params);
-int _gnutls_x509_privkey_find_sign_params(gnutls_x509_privkey_t key,
-					  gnutls_pk_algorithm_t pk,
-					  gnutls_digest_algorithm_t dig,
-					  unsigned flags,
-					  gnutls_x509_spki_st *params);
 
 int _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 				     gnutls_x509_spki_st * params);

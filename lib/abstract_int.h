@@ -84,7 +84,7 @@ int _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
 
 int _gnutls_privkey_get_sign_params(gnutls_privkey_t key,
 				    gnutls_x509_spki_st * params);
-int _gnutls_privkey_find_sign_params(gnutls_privkey_t key,
+int _gnutls_privkey_update_sign_params(gnutls_privkey_t key,
 				     gnutls_pk_algorithm_t pk,
 				     gnutls_digest_algorithm_t dig,
 				     unsigned flags,

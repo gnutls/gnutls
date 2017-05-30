@@ -128,7 +128,7 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 		return result;
 	}
 
-	result = _gnutls_privkey_find_sign_params(issuer_key, pk, dig, flags,
+	result = _gnutls_privkey_update_sign_params(issuer_key, pk, dig, flags,
 						  &params);
 	if (result < 0) {
 		gnutls_assert();

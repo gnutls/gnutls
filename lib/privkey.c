@@ -335,7 +335,7 @@ _gnutls_privkey_get_sign_params(gnutls_privkey_t key,
  * with PK and DIG. PARAMS must be initialized with
  * _gnutls_privkey_get_sign_params in advance. */
 int
-_gnutls_privkey_find_sign_params(gnutls_privkey_t key,
+_gnutls_privkey_update_sign_params(gnutls_privkey_t key,
 				 gnutls_pk_algorithm_t pk,
 				 gnutls_digest_algorithm_t dig,
 				 unsigned flags,
@@ -350,12 +350,51 @@ _gnutls_privkey_find_sign_params(gnutls_privkey_t key,
 	case GNUTLS_PRIVKEY_PKCS11:
 		break;
 #endif
-	case GNUTLS_PRIVKEY_X509:
-		return _gnutls_x509_privkey_find_sign_params(key->key.x509,
-							     pk,
-							     dig,
-							     flags,
-							     params);
+	case GNUTLS_PRIVKEY_X509: {
+		unsigned salt_size = 0;
+		gnutls_pk_algorithm_t key_pk;
+		unsigned bits;
+
+		if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS) {
+			if (!GNUTLS_PK_IS_RSA(pk))
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			pk = GNUTLS_PK_RSA_PSS;
+		}
+
+		key_pk = gnutls_x509_privkey_get_pk_algorithm2(key->key.x509, &bits);
+		if (!(key_pk == pk ||
+		      (key_pk == GNUTLS_PK_RSA && pk == GNUTLS_PK_RSA_PSS))) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+
+		if (pk == GNUTLS_PK_RSA_PSS) {
+			const mac_entry_st *me;
+
+			me = hash_to_entry(dig);
+			if (unlikely(me == NULL))
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			if (params->pk == GNUTLS_PK_RSA)
+				salt_size = 0;
+			else if (params->pk == GNUTLS_PK_RSA_PSS) {
+				if (dig != params->dig) {
+					gnutls_assert();
+					return GNUTLS_E_INVALID_REQUEST;
+				}
+
+				salt_size = params->salt_size;
+			}
+
+			if (!(flags & GNUTLS_PRIVKEY_SIGN_FLAG_REPRODUCIBLE))
+				salt_size = _gnutls_find_rsa_pss_salt_size(bits, me,
+									   salt_size);
+		}
+
+		params->salt_size = salt_size;
+
+		break;
+	}
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -1166,7 +1205,7 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	ret = _gnutls_privkey_find_sign_params(signer, signer->pk_algorithm,
+	ret = _gnutls_privkey_update_sign_params(signer, signer->pk_algorithm,
 					       hash, flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1256,7 +1295,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	ret = _gnutls_privkey_find_sign_params(signer, signer->pk_algorithm,
+	ret = _gnutls_privkey_update_sign_params(signer, signer->pk_algorithm,
 					       hash_algo, flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
