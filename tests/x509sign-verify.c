@@ -209,22 +209,23 @@ void doit(void)
 			testfail("gnutls_x509_pubkey_import\n");
 
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, 0, hash_data,
+		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, hash_data,
 					      &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_hash2\n");
 
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, 0, hash_data,
+		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, hash_data,
 					      &signature2);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_hash-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, 0,
-					      invalid_hash_data,
-					      &signature2);
+		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo,
+					       GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
+					       invalid_hash_data,
+					       &signature2);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
 			testfail("gnutls_x509_pubkey_verify_hash-2 (hashed data)\n");
 
@@ -233,14 +234,14 @@ void doit(void)
 				      (pubkey, NULL), tests[i].digest);
 
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
+		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
 						hash_data, &signature2);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_hash2-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
+		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1,
 						invalid_hash_data,
 						&signature2);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)

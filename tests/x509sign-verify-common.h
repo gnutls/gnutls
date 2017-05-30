@@ -71,10 +71,12 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 	const gnutls_datum_t *hash_data;
 	int ret;
 	unsigned j;
+	unsigned vflags = 0;
 
-	if (hash == GNUTLS_DIG_SHA1)
+	if (hash == GNUTLS_DIG_SHA1) {
 		hash_data = &sha1_data;
-	else if (hash == GNUTLS_DIG_SHA256)
+		vflags |= GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1;
+	} else if (hash == GNUTLS_DIG_SHA256)
 		hash_data = &sha256_data;
 	else
 		abort();
@@ -108,7 +110,7 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey,
-						sign_algo, 0,
+						sign_algo, vflags,
 						hash_data, &signature);
 		if (ret < 0) {
 			print_keys(privkey, pubkey);
@@ -118,7 +120,7 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 		/* should fail */
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey,
-						sign_algo, 0,
+						sign_algo, vflags,
 						&invalid_hash_data,
 						&signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
@@ -131,14 +133,14 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 				      (pubkey, NULL), hash);
 
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
+		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, vflags,
 						hash_data, &signature);
 		if (ret < 0)
 			ERR;
 
 		/* should fail */
 		ret =
-		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, 0,
+		    gnutls_pubkey_verify_hash2(pubkey, sign_algo, vflags,
 						&invalid_hash_data,
 						&signature);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
@@ -168,7 +170,7 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 			ret =
 			    gnutls_pubkey_verify_hash2(pubkey,
 							sign_algo,
-							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
+							vflags|GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
 							hash_data,
 							&signature);
 			if (ret < 0) {

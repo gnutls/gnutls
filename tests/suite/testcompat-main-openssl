@@ -302,7 +302,7 @@ run_client_suite() {
 
 		if test "${NO_DSS}" != 1; then
 			echo "${PREFIX}Checking TLS 1.2 with DHE-DSS..."
-			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA1:%VERIFY_ALLOW_SIGN_WITH_SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 				fail ${PID} "Failed"
 		fi
 
@@ -650,7 +650,7 @@ run_server_suite() {
 		if test "${NO_DSS}" != 1; then
 			echo "${PREFIX}Check TLS 1.2 with DHE-DSS ciphersuite"
 			eval "${GETPORT}"
-			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${DH_PARAMS}"
+			launch_server $$ --priority "NONE:+CIPHER-ALL:%VERIFY_ALLOW_SIGN_WITH_SHA1:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${DH_PARAMS}"
 			PID=$!
 			wait_server ${PID}
 

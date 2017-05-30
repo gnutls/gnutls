@@ -84,6 +84,7 @@ void doit(void)
 	/* test gnutls_certificate_flags() */
 	gnutls_certificate_allocate_credentials(&serv_cred);
 	gnutls_certificate_set_flags(serv_cred, GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH);
+	gnutls_certificate_set_verify_flags(serv_cred, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1);
 
 	ret = gnutls_certificate_set_x509_trust_mem(serv_cred, &ca3_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)

@@ -174,7 +174,7 @@ static void client(int sds[])
 
 		/* Use default priorities */
 		gnutls_priority_set_direct(session,
-					   "NORMAL:+CTYPE-OPENPGP:+DHE-DSS:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256", NULL);
+					   "NORMAL:+CTYPE-OPENPGP:+DHE-DSS:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256:%VERIFY_ALLOW_SIGN_WITH_SHA1", NULL);
 
 		/* put the x509 credentials to the current session
 		 */
@@ -182,6 +182,7 @@ static void client(int sds[])
 					xcred);
 
 		gnutls_transport_set_int(session, sd);
+		gnutls_handshake_set_timeout(session, 20 * 1000);
 
 		/* Perform the TLS handshake
 		 */
@@ -258,7 +259,7 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256:%VERIFY_ALLOW_SIGN_WITH_SHA1", NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, pgp_cred);
 
@@ -517,6 +518,8 @@ static void server(int sds[])
 		session = initialize_tls_session();
 
 		gnutls_transport_set_int(session, sd);
+		gnutls_handshake_set_timeout(session, 20 * 1000);
+
 		ret = gnutls_handshake(session);
 		if (ret < 0) {
 			close(sd);
