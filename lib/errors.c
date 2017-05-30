@@ -405,6 +405,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_PK_INVALID_PUBKEY),
 	ERROR_ENTRY(N_("The private key is invalid."),
 		    GNUTLS_E_PK_INVALID_PRIVKEY),
+	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
+		    GNUTLS_E_INSUFFICIENT_SECURITY),
 	{NULL, NULL, 0}
 };
 
@@ -423,8 +425,7 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
 	ERROR_ENTRY(N_("Function was interrupted."), GNUTLS_E_INTERRUPTED),
 	ERROR_ENTRY(N_("Rehandshake was requested by the peer."),
 		    GNUTLS_E_REHANDSHAKE),
-	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
-		    GNUTLS_E_INSUFFICIENT_SECURITY),
+	/* Only non fatal (for handshake) errors here */
 	{NULL, NULL, 0}
 };
 
