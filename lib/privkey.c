@@ -318,6 +318,8 @@ _gnutls_privkey_get_sign_params(gnutls_privkey_t key,
 	case GNUTLS_PRIVKEY_PKCS11:
 		break;
 #endif
+	case GNUTLS_PRIVKEY_EXT:
+		break;
 	case GNUTLS_PRIVKEY_X509:
 		return _gnutls_x509_privkey_get_sign_params(key->key.x509,
 							    params);
@@ -350,6 +352,8 @@ _gnutls_privkey_update_sign_params(gnutls_privkey_t key,
 	case GNUTLS_PRIVKEY_PKCS11:
 		break;
 #endif
+	case GNUTLS_PRIVKEY_EXT:
+		break;
 	case GNUTLS_PRIVKEY_X509: {
 		unsigned salt_size = 0;
 		gnutls_pk_algorithm_t key_pk;
