@@ -136,7 +136,7 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 	 * then the issuer's parameters should be used. This is not
 	 * needed in practice though.
 	 */
-	if (pk_algorithm != GNUTLS_PK_RSA && pk_algorithm != GNUTLS_PK_EDDSA_ED25519 && pk_algorithm != GNUTLS_PK_ECDHX) {
+	if (pk_algorithm != GNUTLS_PK_RSA && pk_algorithm != GNUTLS_PK_EDDSA_ED25519 && pk_algorithm != GNUTLS_PK_ECDH_X25519) {
 		/* RSA and EdDSA do not use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
 		if (result < 0) {

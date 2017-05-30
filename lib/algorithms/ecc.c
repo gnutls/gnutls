@@ -74,7 +74,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .name = "X25519",
 	 .id = GNUTLS_ECC_CURVE_X25519,
 	 .tls_id = 29,
-	 .pk = GNUTLS_PK_ECDHX,
+	 .pk = GNUTLS_PK_ECDH_X25519,
 	 .size = 32,
 	},
 	{

@@ -162,7 +162,7 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 			gnutls_assert();
 			goto cleanup;
 		}
-	} else if (ecurve->pk == GNUTLS_PK_ECDHX) {
+	} else if (ecurve->pk == GNUTLS_PK_ECDH_X25519) {
 		if (ecurve->size != point_size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
@@ -267,7 +267,7 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 			gnutls_assert();
 			goto cleanup;
 		}
-	} else if (pk == GNUTLS_PK_ECDHX) {
+	} else if (pk == GNUTLS_PK_ECDH_X25519) {
 		ret =
 		    _gnutls_buffer_append_data_prefix(data, 8,
 					session->key.ecdh_params.raw_pub.data,
@@ -367,7 +367,7 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-	} else if (ecurve->pk == GNUTLS_PK_ECDHX) {
+	} else if (ecurve->pk == GNUTLS_PK_ECDH_X25519) {
 		if (ecurve->size != point_size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
@@ -448,7 +448,7 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-	} else if (pk == GNUTLS_PK_ECDHX) {
+	} else if (pk == GNUTLS_PK_ECDH_X25519) {
 		ret =
 			_gnutls_buffer_append_data_prefix(data, 8,
 					session->key.ecdh_params.raw_pub.data,

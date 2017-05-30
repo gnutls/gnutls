@@ -32,7 +32,7 @@
 #define GNUTLS_FALLBACK_SCSV_MAJOR 0x56
 #define GNUTLS_FALLBACK_SCSV_MINOR 0x00
 
-#define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDHX)||((x)==GNUTLS_PK_EDDSA_ED25519))
+#define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDH_X25519)||((x)==GNUTLS_PK_EDDSA_ED25519))
 
 #define TLS_SIGN_AID_UNKNOWN {{255, 255}}
 #define HAVE_UNKNOWN_SIGAID(aid) ((aid)->id[0] == 255 && (aid)->id[1] == 255)

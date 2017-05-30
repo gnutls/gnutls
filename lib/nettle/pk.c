@@ -309,7 +309,7 @@ dh_cleanup:
 				goto cleanup;
 			break;
 		}
-	case GNUTLS_PK_ECDHX:
+	case GNUTLS_PK_ECDH_X25519:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(priv->flags);
 
@@ -1548,7 +1548,7 @@ char* gen_data = NULL;
 		}
 		break;
 	case GNUTLS_PK_DH:
-	case GNUTLS_PK_ECDHX:
+	case GNUTLS_PK_ECDH_X25519:
 		ret = 0;
 		goto cleanup;
 	default:
@@ -1880,7 +1880,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			break;
 		}
-	case GNUTLS_PK_ECDHX:
+	case GNUTLS_PK_ECDH_X25519:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(level);
 

@@ -106,7 +106,7 @@ void doit(void)
 		for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_RSA_PSS;
 		     algorithm++) {
 			if (algorithm == GNUTLS_PK_DH ||
-			    algorithm == GNUTLS_PK_ECDHX)
+			    algorithm == GNUTLS_PK_ECDH_X25519)
 				continue;
 
 			ret = gnutls_x509_privkey_init(&pkey);

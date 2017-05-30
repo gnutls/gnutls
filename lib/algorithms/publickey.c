@@ -136,7 +136,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	  .curve = GNUTLS_ECC_CURVE_ED25519, .no_prehashed = 1 },
 	{ .name = "DH", .oid = NULL, .id = GNUTLS_PK_DH,
 	   .curve = GNUTLS_ECC_CURVE_INVALID },
-	{ .name = "ECDH (X25519)", .oid = "1.3.101.110", .id = GNUTLS_PK_ECDHX,
+	{ .name = "ECDH (X25519)", .oid = "1.3.101.110", .id = GNUTLS_PK_ECDH_X25519,
 	  .curve = GNUTLS_ECC_CURVE_X25519 },
 	{ .name = "UNKNOWN", .oid = NULL, .id = GNUTLS_PK_UNKNOWN, 
 	  .curve = GNUTLS_ECC_CURVE_INVALID },
