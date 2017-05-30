@@ -1605,7 +1605,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			goto cleanup;
 		}
 
-		if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE)
+		if (flags & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE)
 			key->params.sign.salt_size = 0;
 		else {
 			key->params.sign.salt_size =

@@ -268,7 +268,7 @@ int gnutls_privkey_status(gnutls_privkey_t key);
  * gnutls_privkey_flags:
  * @GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA: Make an RSA signature on the hashed data as in the TLS protocol.
  * @GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS: Make an RSA signature on the hashed data with the PSS padding.
- * @GNUTLS_PRIVKEY_SIGN_FLAG_REPRODUCIBLE: Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
+ * @GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE: Make an RSA-PSS signature on the hashed data with reproducible parameters (zero salt).
  * @GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE: When importing a private key, automatically
  *   release it when the structure it was imported is released.
  * @GNUTLS_PRIVKEY_IMPORT_COPY: Copy required values during import.
@@ -289,7 +289,7 @@ typedef enum gnutls_privkey_flags {
 	GNUTLS_PRIVKEY_FLAG_PROVABLE = 1 << 5,
 	GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT = 1 << 6,
 	GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS = 1 << 7,
-	GNUTLS_PRIVKEY_SIGN_FLAG_REPRODUCIBLE = GNUTLS_PRIVKEY_FLAG_PROVABLE /* save a flag, they are not overlapping */
+	GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE = 1 << 8
 } gnutls_privkey_flags_t;
 
 int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
