@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -404,6 +405,12 @@ int gnutls_privkey_sign_data(gnutls_privkey_t signer,
 			     const gnutls_datum_t * data,
 			     gnutls_datum_t * signature);
 
+int gnutls_privkey_sign_data2(gnutls_privkey_t signer,
+			      gnutls_sign_algorithm_t algo,
+			      unsigned int flags,
+			      const gnutls_datum_t * data,
+			      gnutls_datum_t * signature);
+
 #define gnutls_privkey_sign_raw_data(key, flags, data, sig) \
 	gnutls_privkey_sign_hash ( key, 0, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA, data, sig)
 
@@ -412,6 +419,12 @@ int gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 			     unsigned int flags,
 			     const gnutls_datum_t * hash_data,
 			     gnutls_datum_t * signature);
+
+int gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
+			      gnutls_sign_algorithm_t algo,
+			      unsigned int flags,
+			      const gnutls_datum_t * hash_data,
+			      gnutls_datum_t * signature);
 
 
 int gnutls_privkey_decrypt_data(gnutls_privkey_t key,

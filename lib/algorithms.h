@@ -292,6 +292,21 @@ enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm_t
 					    algorithm);
 
 /* Functions for sign algorithms. */
+
+struct gnutls_sign_entry_st {
+	const char *name;
+	const char *oid;
+	gnutls_sign_algorithm_t id;
+	gnutls_pk_algorithm_t pk;
+	gnutls_digest_algorithm_t hash;
+	/* See RFC 5246 HashAlgorithm and SignatureAlgorithm
+	   for values to use in aid struct. */
+	const sign_algorithm_st aid;
+};
+typedef struct gnutls_sign_entry_st gnutls_sign_entry_st;
+
+const gnutls_sign_entry_st *_gnutls_sign_to_entry(gnutls_sign_algorithm_t sign);
+
 gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk(gnutls_sign_algorithm_t
 					      sign);
 const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t,
