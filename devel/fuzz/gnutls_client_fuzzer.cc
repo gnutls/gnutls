@@ -38,7 +38,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     res = socketpair(AF_UNIX, SOCK_STREAM, 0, socket_fds);
     assert(res >= 0);
     ssize_t send_res = send(socket_fds[1], data, size, 0);
-    assert(send_res == size);
+    assert((size_t)send_res == size);
     res = shutdown(socket_fds[1], SHUT_WR);
     assert(res == 0);
 

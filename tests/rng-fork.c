@@ -54,7 +54,6 @@ void doit(void)
 	unsigned char buf1[64];
 	unsigned char buf2[64];
 	pid_t pid;
-	unsigned char *tmp;
 	int ret;
 	FILE *fp;
 	unsigned i;
