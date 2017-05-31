@@ -37,7 +37,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
-#include "cert-common.h"
+#include "common-key-tests.h"
 #include "utils.h"
 
 /* verifies whether the sign-data and verify-data APIs
@@ -63,44 +63,7 @@ const gnutls_datum_t invalid_raw_data = {
 	20
 };
 
-struct tests_st {
-	const char *name;
-	gnutls_datum_t key;
-	gnutls_datum_t cert;
-	gnutls_pk_algorithm_t pk;
-	unsigned digest;
-	unsigned sigalgo;
-	unsigned sign_flags;
-};
-
-struct tests_st tests[] = {
-	{
-		.name = "rsa key",
-		.cert = {(void *) cli_ca3_cert_pem, sizeof(cli_ca3_cert_pem)-1},
-		.key = {(void *) cli_ca3_key_pem, sizeof(cli_ca3_key_pem)-1},
-		.pk = GNUTLS_PK_RSA,
-		.digest = GNUTLS_DIG_SHA256,
-		.sigalgo = GNUTLS_SIGN_RSA_SHA256
-	},
-	{
-		.name = "ecdsa key",
-		.key = {(void *) server_ca3_ecc_key_pem, sizeof(server_ca3_ecc_key_pem)-1},
-		.cert = {(void *) server_localhost_ca3_ecc_cert_pem, sizeof(server_localhost_ca3_ecc_cert_pem)-1},
-		.pk = GNUTLS_PK_ECDSA,
-		.digest = GNUTLS_DIG_SHA256,
-		.sigalgo = GNUTLS_SIGN_ECDSA_SHA256
-	},
-	{
-		.name = "rsa pss key",
-		.key = {(void *) server_ca3_rsa_pss_key_pem, sizeof(server_ca3_rsa_pss_key_pem)-1},
-		.cert = {(void *) server_ca3_rsa_pss_cert_pem, sizeof(server_ca3_rsa_pss_cert_pem)-1},
-		.pk = GNUTLS_PK_RSA_PSS,
-		.digest = GNUTLS_DIG_SHA256,
-		.sign_flags = GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS,
-		.sigalgo = GNUTLS_SIGN_RSA_PSS_SHA256
-	}
-};
-
+#define tests common_key_tests
 #define testfail(fmt, ...) \
 	fail("%s: "fmt, tests[i].name, ##__VA_ARGS__)
 
@@ -124,6 +87,8 @@ void doit(void)
 		if (debug)
 			success("loop %d\n", (int) i);
 
+		if (tests[i].pk == GNUTLS_PK_DSA)
+			continue;
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
 			testfail("gnutls_privkey_init\n");

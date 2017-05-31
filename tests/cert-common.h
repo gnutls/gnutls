@@ -22,7 +22,6 @@
 
 #include <gnutls/gnutls.h>
 
-
 /* This file contains a lot of common parameters used by legacy and new
  * tests. The recommended to use for new tests are:
  *

@@ -43,7 +43,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	pkcs7-interesting/pkcs7-1.der.err pkcs7-interesting/pkcs7-2.der pkcs7-interesting/pkcs7-2.der.err \
 	client-interesting/client1.raw client-interesting/client2.raw client-interesting/client3.disabled \
 	server-interesting/server1.raw scripts/common.sh scripts/starttls-common.sh \
-	client-interesting/client3.raw rng-op.c x509sign-verify-common.h \
+	client-interesting/client3.raw rng-op.c x509sign-verify-common.h common-key-tests.h \
 	ocsp-tests/certs/ca.key ocsp-tests/certs/ca.pem ocsp-tests/certs/ocsp-server.key ocsp-tests/certs/ocsp-server.pem ocsp-tests/response1.der \
 	ocsp-tests/response2.der ocsp-tests/certs/ocsp_index.txt ocsp-tests/certs/ocsp_index.txt.attr \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
