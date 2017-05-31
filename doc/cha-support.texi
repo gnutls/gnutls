@@ -26,37 +26,8 @@ Bug reports should be sent to @email{bugs@@gnutls.org}, see
 @node Commercial Support
 @section Commercial Support
 
-Commercial support is available for users of GnuTLS.  The kind of
-support that can be purchased may include:
-
-@itemize
-
-@item Implement new features.
-Such as a new TLS extension.
-
-@item Port GnuTLS to new platforms.
-This could include porting to an embedded platforms that may need
-memory or size optimization.
-
-@item Integrating TLS as a security environment in your existing project.
-
-@item System design of components related to TLS.
-
-@end itemize
-
-If you are interested, please write to:
-
-@verbatim
-Simon Josefsson Datakonsult
-Hagagatan 24
-113 47 Stockholm
-Sweden
-
-E-mail: simon@josefsson.org
-@end verbatim
-
-If your company provides support related to GnuTLS and would like to
-be mentioned here, contact the authors.
+Commercial support is available for users of GnuTLS. See
+@url{http://www.gnutls.org/commercial.html} for more information.
 
 
 @node Bug Reports
