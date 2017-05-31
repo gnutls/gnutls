@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2002-2015 Free Software Foundation, Inc.
  * Copyright (C) 2014-2015 Nikos Mavrogiannopoulos
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -30,172 +31,6 @@
 #include <state.h>
 #include <algorithms.h>
 
-#define MAX_PRF_BYTES 200
-#define MAX_SEED_SIZE 200
-
-inline static int
-_gnutls_cal_PRF_A(const mac_entry_st * me,
-		  const void *secret, int secret_size,
-		  const void *seed, int seed_size, void *result)
-{
-	int ret;
-
-	ret =
-	    _gnutls_mac_fast(me->id, secret, secret_size, seed, seed_size,
-			     result);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	return 0;
-}
-
-/* Produces "total_bytes" bytes using the hash algorithm specified.
- * (used in the PRF function)
- */
-static int
-P_hash(gnutls_mac_algorithm_t algorithm,
-       const uint8_t * secret, int secret_size,
-       const uint8_t * seed, int seed_size, int total_bytes, uint8_t * ret)
-{
-
-	mac_hd_st td2;
-	int i, times, how, blocksize, A_size;
-	uint8_t final[MAX_HASH_SIZE], Atmp[MAX_SEED_SIZE];
-	int output_bytes, result;
-	const mac_entry_st *me = mac_to_entry(algorithm);
-
-	blocksize = _gnutls_mac_get_algo_len(me);
-
-	if (seed_size > MAX_SEED_SIZE || total_bytes <= 0 || blocksize == 0) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	output_bytes = 0;
-	do {
-		output_bytes += blocksize;
-	}
-	while (output_bytes < total_bytes);
-
-	/* calculate A(0) */
-
-	memcpy(Atmp, seed, seed_size);
-	A_size = seed_size;
-
-	times = output_bytes / blocksize;
-
-	for (i = 0; i < times; i++) {
-		result = _gnutls_mac_init(&td2, me, secret, secret_size);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		/* here we calculate A(i+1) */
-		if ((result =
-		     _gnutls_cal_PRF_A(me, secret, secret_size, Atmp,
-				       A_size, Atmp)) < 0) {
-			gnutls_assert();
-			_gnutls_mac_deinit(&td2, final);
-			return result;
-		}
-
-		A_size = blocksize;
-
-		_gnutls_mac(&td2, Atmp, A_size);
-		_gnutls_mac(&td2, seed, seed_size);
-		_gnutls_mac_deinit(&td2, final);
-
-		if ((1 + i) * blocksize < total_bytes) {
-			how = blocksize;
-		} else {
-			how = total_bytes - (i) * blocksize;
-		}
-
-		if (how > 0) {
-			memcpy(&ret[i * blocksize], final, how);
-		}
-	}
-
-	return 0;
-}
-
-/* This function operates as _gnutls_PRF(), but does not require
- * a pointer to the current session. It takes the @mac algorithm
- * explicitly. For legacy TLS/SSL sessions before TLS 1.2 the MAC
- * must be set to %GNUTLS_MAC_MD5_SHA1.
- */
-static int
-_gnutls_PRF_raw(gnutls_mac_algorithm_t mac,
-		const uint8_t * secret, unsigned int secret_size,
-		const char *label, int label_size, const uint8_t * seed,
-		int seed_size, int total_bytes, void *ret)
-{
-	int l_s, s_seed_size;
-	const uint8_t *s1, *s2;
-	uint8_t s_seed[MAX_SEED_SIZE];
-	uint8_t o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
-	int result;
-
-	if (total_bytes > MAX_PRF_BYTES) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-	/* label+seed = s_seed */
-	s_seed_size = seed_size + label_size;
-
-	if (s_seed_size > MAX_SEED_SIZE) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	memcpy(s_seed, label, label_size);
-	memcpy(&s_seed[label_size], seed, seed_size);
-
-	if (mac != GNUTLS_MAC_MD5_SHA1) {
-		result =
-		    P_hash(mac, secret, secret_size,
-			   s_seed, s_seed_size,
-			   total_bytes, ret);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-	} else {
-		l_s = secret_size / 2;
-
-		s1 = &secret[0];
-		s2 = &secret[l_s];
-
-		if (secret_size % 2 != 0) {
-			l_s++;
-		}
-
-		result =
-		    P_hash(GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size,
-			   total_bytes, o1);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		result =
-		    P_hash(GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
-			   total_bytes, o2);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		memxor(o1, o2, total_bytes);
-
-		memcpy(ret, o1, total_bytes);
-	}
-
-	return 0;		/* ok */
-}
-
-
 /* The PRF function expands a given secret 
  * needed by the TLS specification. ret must have a least total_bytes
  * available.
@@ -206,55 +41,12 @@ _gnutls_PRF(gnutls_session_t session,
 	    const char *label, int label_size, const uint8_t * seed,
 	    int seed_size, int total_bytes, void *ret)
 {
-	return _gnutls_PRF_raw(
-			session->security_parameters.prf_mac,
-			secret, secret_size,
-			label, label_size,
-			seed, seed_size,
-			total_bytes,
-			ret);
+	return _gnutls_prf_raw(session->security_parameters.prf_mac,
+			       secret_size, secret,
+			       label_size, label,
+			       seed_size, seed,
+			       total_bytes, ret);
 }
-
-#ifdef ENABLE_FIPS140
-int
-_gnutls_prf_raw(gnutls_mac_algorithm_t mac,
-		size_t master_size, const void *master,
-		size_t label_size, const char *label,
-		size_t seed_size, const char *seed, size_t outsize,
-		char *out);
-
-/*-
- * _gnutls_prf_raw:
- * @mac: the MAC algorithm to use, set to %GNUTLS_MAC_MD5_SHA1 for the TLS1.0 mac
- * @master_size: length of the @master variable.
- * @master: the master secret used in PRF computation
- * @label_size: length of the @label variable.
- * @label: label used in PRF computation, typically a short string.
- * @seed_size: length of the @seed variable.
- * @seed: optional extra data to seed the PRF with.
- * @outsize: size of pre-allocated output buffer to hold the output.
- * @out: pre-allocated buffer to hold the generated data.
- *
- * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
- * and the provided data.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
- -*/
-int
-_gnutls_prf_raw(gnutls_mac_algorithm_t mac,
-		size_t master_size, const void *master,
-		size_t label_size, const char *label,
-		size_t seed_size, const char *seed, size_t outsize,
-		char *out)
-{
-	return _gnutls_PRF_raw(mac,
-			  master, master_size,
-			  label, label_size,
-			  (uint8_t *) seed, seed_size,
-			  outsize, out);
-
-}
-#endif
 
 /**
  * gnutls_prf_raw:

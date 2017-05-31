@@ -380,4 +380,12 @@ int gnutls_crypto_pk_register(int priority, const gnutls_crypto_pk_st * s);
 int gnutls_crypto_bigint_register(int priority,
 				  const gnutls_crypto_bigint_st * s);
 
+/* Provided by crypto-backend */
+int
+_gnutls_prf_raw(gnutls_mac_algorithm_t mac,
+		size_t master_size, const void *master,
+		size_t label_size, const char *label,
+		size_t seed_size, const uint8_t *seed, size_t outsize,
+		char *out);
+
 #endif
