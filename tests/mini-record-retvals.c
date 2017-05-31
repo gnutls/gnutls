@@ -446,6 +446,7 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
+	start(AES_CBC, 0);
 	start(AES_CBC_SHA256, 0);
 	start(AES_GCM, 0);
 
