@@ -27,7 +27,7 @@ endif
 
 EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
-	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
+	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem hex.h \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
 	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
@@ -151,7 +151,8 @@ endif
 
 if HAVE_CMOCKA
 CMOCKA_LDADD = $(COMMON_LDADD) $(CMOCKA_LIBS)
-ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna
+ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna \
+	tls10-prf tls12-prf
 
 dtls_sliding_window_LDADD = $(CMOCKA_LDADD)
 ip_utils_LDADD = $(CMOCKA_LDADD)
@@ -159,6 +160,8 @@ name_constraints_ip_LDADD = $(CMOCKA_LDADD)
 conv_utf8_LDADD = $(CMOCKA_LDADD)
 str_unicode_LDADD = $(CMOCKA_LDADD)
 str_idna_LDADD = $(CMOCKA_LDADD)
+tls10_prf_LDADD = $(CMOCKA_LDADD)
+tls12_prf_LDADD = $(CMOCKA_LDADD)
 
 endif
 
