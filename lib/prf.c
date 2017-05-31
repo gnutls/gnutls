@@ -31,23 +31,6 @@
 #include <state.h>
 #include <algorithms.h>
 
-/* The PRF function expands a given secret 
- * needed by the TLS specification. ret must have a least total_bytes
- * available.
- */
-int
-_gnutls_PRF(gnutls_session_t session,
-	    const uint8_t * secret, unsigned int secret_size,
-	    const char *label, int label_size, const uint8_t * seed,
-	    int seed_size, int total_bytes, void *ret)
-{
-	return _gnutls_prf_raw(session->security_parameters.prf_mac,
-			       secret_size, secret,
-			       label_size, label,
-			       seed_size, seed,
-			       total_bytes, ret);
-}
-
 /**
  * gnutls_prf_raw:
  * @session: is a #gnutls_session_t type.
@@ -86,12 +69,11 @@ gnutls_prf_raw(gnutls_session_t session,
 {
 	int ret;
 
-	ret = _gnutls_PRF(session,
-			  session->security_parameters.master_secret,
-			  GNUTLS_MASTER_SIZE,
-			  label,
-			  label_size, (uint8_t *) seed, seed_size, outsize,
-			  out);
+	ret = _gnutls_prf_raw(session->security_parameters.prf_mac,
+			  GNUTLS_MASTER_SIZE, session->security_parameters.master_secret,
+			  label_size, label,
+			  seed_size, (uint8_t *) seed,
+			  outsize, out);
 
 	return ret;
 }
@@ -228,10 +210,11 @@ gnutls_prf(gnutls_session_t session,
 	}
 
 	ret =
-	    _gnutls_PRF(session,
-			session->security_parameters.master_secret,
-			GNUTLS_MASTER_SIZE, label, label_size, seed,
-			seedsize, outsize, out);
+	    _gnutls_prf_raw(session->security_parameters.prf_mac,
+			GNUTLS_MASTER_SIZE, session->security_parameters.master_secret,
+			label_size, label,
+			seedsize, seed,
+			outsize, out);
 
 	gnutls_free(seed);
 

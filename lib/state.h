@@ -85,10 +85,17 @@ int _gnutls_session_is_psk(gnutls_session_t session);
 
 int _gnutls_openpgp_send_fingerprint(gnutls_session_t session);
 
-int _gnutls_PRF(gnutls_session_t session,
-		const uint8_t * secret, unsigned int secret_size,
-		const char *label, int label_size,
-		const uint8_t * seed, int seed_size,
-		int total_bytes, void *ret);
+inline static int
+_gnutls_PRF(gnutls_session_t session,
+	    const uint8_t * secret, unsigned int secret_size,
+	    const char *label, int label_size, const uint8_t * seed,
+	    int seed_size, int total_bytes, void *ret)
+{
+	return _gnutls_prf_raw(session->security_parameters.prf_mac,
+			       secret_size, secret,
+			       label_size, label,
+			       seed_size, seed,
+			       total_bytes, ret);
+}
 
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509
