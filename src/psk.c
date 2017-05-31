@@ -85,10 +85,10 @@ int main(int argc, char **argv)
 	argc -= optct;
 	argv += optct;
 
-	if (!HAVE_OPT(PASSWD))
+	if (!HAVE_OPT(PSKFILE))
 		passwd = (char *) KPASSWD;
 	else
-		passwd = OPT_ARG(PASSWD);
+		passwd = OPT_ARG(PSKFILE);
 
 	if (!HAVE_OPT(USERNAME)) {
 #ifndef _WIN32
