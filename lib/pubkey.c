@@ -1709,6 +1709,8 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 	memcpy(&params, &key->params.sign, sizeof(gnutls_x509_spki_st));
 
 	if (flags & OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA || flags & GNUTLS_VERIFY_USE_TLS1_RSA) {
+		if (!GNUTLS_PK_IS_RSA(key->pk_algorithm))
+			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 		params.pk = GNUTLS_PK_RSA;
 		/* we do not check for insecure algorithms with this flag */
 		return _gnutls_pk_verify(params.pk, hash, signature,
