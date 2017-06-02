@@ -15,6 +15,9 @@ See the end for copying conditions.
 ** libgnutls: Added support for RSA-PSS signing in certificates, and TLS key
    exchange. Patches by Daiki Ueno.
 
+** libgnutls: Added support for Ed25519 signing in certificates and TLS key
+   exchange.
+
 ** libgnutls: Introduced gnutls_x509_crt_set_flags(). This function can set flags
    in the crt structure. The only flag supported at the moment is
    GNUTLS_X509_CRT_FLAG_IGNORE_SANITY which skips the certificate sanity
