@@ -277,47 +277,27 @@ endif
 
 endif
 
-gc_CPPFLAGS = $(CPPFLAGS) \
-	-I$(top_srcdir)/lib/includes		\
-	-I$(top_builddir)/lib/includes		\
-	-I$(top_srcdir)/lib/minitasn1		\
-	-I$(top_srcdir)/lib			\
+gc_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
-mpi_CPPFLAGS = $(CPPFLAGS) \
-	-I$(top_srcdir)/lib/includes		\
-	-I$(top_builddir)/lib/includes		\
-	-I$(top_srcdir)/lib/minitasn1		\
-	-I$(top_srcdir)/lib			\
+mpi_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
-atfork_CPPFLAGS = $(CPPFLAGS) \
-	-I$(top_srcdir)/lib/includes		\
-	-I$(top_builddir)/lib/includes		\
-	-I$(top_srcdir)/lib/minitasn1		\
-	-I$(top_srcdir)/lib			\
+atfork_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
-pkcs12_s2k_CPPFLAGS = $(CPPFLAGS) \
-	-I$(top_srcdir)/lib/includes		\
-	-I$(top_builddir)/lib/includes		\
-	-I$(top_srcdir)/lib/minitasn1		\
-	-I$(top_srcdir)/lib			\
+pkcs12_s2k_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
-name_constraints_merge_CPPFLAGS = $(CPPFLAGS) \
-	-I$(top_srcdir)/lib/includes		\
-	-I$(top_builddir)/lib/includes		\
-	-I$(top_srcdir)/lib/minitasn1		\
-	-I$(top_srcdir)/lib			\
+name_constraints_merge_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
