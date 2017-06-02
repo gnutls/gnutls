@@ -83,6 +83,9 @@ unsigned char ecc_x[] = "\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x3
 unsigned char ecc_y[] = "\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
 unsigned char ecc_k[] = "\x00\xfd\x2b\x00\x80\xf3\x36\x5f\x11\x32\x65\xe3\x8d\x30\x33\x3b\x47\xf5\xce\xf8\x13\xe5\x4c\xc2\xcf\xfd\xe8\x05\x6a\xca\xc9\x41\xb1";
 
+unsigned char ed25519_x[] = "\xab\xaf\x98\xb3\xc3\x41\x8d\x41\x22\x21\xc1\x86\xa7\xb8\x70\xfb\x44\x6e\xc7\x7e\x20\x87\x7b\xd9\x22\xa4\x5d\xd2\x97\x09\xd5\x48";
+unsigned char ed25519_k[] = "\x1c\xa9\x23\xdc\x35\xa8\xfd\xd6\x2d\xa8\x98\xb9\x60\x7b\xce\x10\x3d\xf4\x64\xc6\xe5\x4b\x0a\x65\x56\x6a\x3c\x73\x65\x51\xa2\x2f";
+
 gnutls_datum_t _dsa_p = {dsa_p, sizeof(dsa_p)-1};
 gnutls_datum_t _dsa_q = {dsa_q, sizeof(dsa_q)-1};
 gnutls_datum_t _dsa_g = {dsa_g, sizeof(dsa_g)-1};
@@ -101,6 +104,9 @@ gnutls_datum_t _rsa_e2 = {rsa_e2, sizeof(rsa_e2)-1};
 gnutls_datum_t _ecc_x = {ecc_x, sizeof(ecc_x)-1};
 gnutls_datum_t _ecc_y = {ecc_y, sizeof(ecc_y)-1};
 gnutls_datum_t _ecc_k = {ecc_k, sizeof(ecc_k)-1};
+
+gnutls_datum_t _ed25519_x = {ed25519_x, sizeof(ed25519_x)-1};
+gnutls_datum_t _ed25519_k = {ed25519_k, sizeof(ed25519_k)-1};
 
 unsigned char ecc_params[] = "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
 unsigned char ecc_point[] = "\x04\x41\x04\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x38\x0d\x30\x5c\xe4\x3f\x55\xcb\xd9\x17\x15\x46\x72\x71\x92\xc1\xf8\xc6\x33\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
@@ -389,6 +395,28 @@ int check_privkey_import_export(void)
 	gnutls_free(p.data);
 	gnutls_privkey_deinit(key);
 
+	/* Ed25519 */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519, &_ed25519_x, NULL, &_ed25519_k);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_ecc_raw(key, &curve, &x, NULL, &p);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_ED25519) {
+		fail("unexpected curve value: %d\n", (int)curve);
+	}
+	CMP("x", &x, ed25519_x);
+	CMP("k", &p, ed25519_k);
+	gnutls_free(x.data);
+	gnutls_free(p.data);
+	gnutls_privkey_deinit(key);
+
 	return 0;
 }
 
@@ -638,6 +666,88 @@ int check_ecc(void)
 	return 0;
 }
 
+static
+int check_ed25519(void)
+{
+	gnutls_privkey_t key;
+	gnutls_pubkey_t pub;
+	gnutls_datum_t y, x, k;
+	gnutls_ecc_curve_t curve;
+	int ret;
+
+	/* ECC */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_init(&pub);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_x509_raw(key, &server_ca3_eddsa_key, GNUTLS_X509_FMT_PEM, 0, 0);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_export_ecc_raw(pub, &curve, &x, NULL);
+	if (ret < 0)
+		fail("error\n");
+	gnutls_free(x.data);
+
+	ret = gnutls_pubkey_export_ecc_raw(pub, &curve, &x, &y);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_ED25519) {
+		fail("unexpected curve value: %d\n", (int)curve);
+	}
+	CMP("x", &x, ed25519_x);
+
+	if (y.data != NULL) {
+		fail("expected NULL value in Y\n");
+	}
+	gnutls_free(x.data);
+
+
+	/* check the private key export */
+	ret = gnutls_privkey_export_ecc_raw(key, &curve, &x, NULL, &k);
+	if (ret < 0)
+		fail("error\n");
+	gnutls_free(x.data);
+	gnutls_free(k.data);
+
+	ret = gnutls_privkey_export_ecc_raw(key, &curve, &x, &y, &k);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_ED25519) {
+		fail("unexpected curve value: %d\n", (int)curve);
+	}
+	CMP("x", &x, ed25519_x);
+	CMP("k", &k, ed25519_k);
+	gnutls_free(x.data);
+	gnutls_free(k.data);
+
+	if (y.data != NULL) {
+		fail("expected NULL value in Y\n");
+	}
+
+	gnutls_privkey_deinit(key);
+
+	/* More public key ops */
+
+	ret = gnutls_pubkey_export_ecc_x962(pub, &x, &y);
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("error\n");
+
+	gnutls_pubkey_deinit(pub);
+
+	return 0;
+}
+
 void doit(void)
 {
 	if (check_x509_privkey() != 0) {
@@ -651,17 +761,20 @@ void doit(void)
 	}
 
 	if (check_dsa() != 0) {
-		fail("error in pubkey check\n");
+		fail("error in DSA check\n");
 		exit(1);
 	}
 
 	if (check_rsa() != 0) {
-		fail("error in pubkey check\n");
+		fail("error in RSA check\n");
 		exit(1);
 	}
 
 	if (check_ecc() != 0) {
-		fail("error in pubkey check\n");
-		exit(1);
+		fail("error in ecdsa check\n");
+	}
+
+	if (check_ed25519() != 0) {
+		fail("error in ed25519 check\n");
 	}
 }
