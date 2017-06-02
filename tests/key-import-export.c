@@ -32,16 +32,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
 
-static unsigned char ecc_key_pem[] =
-  "-----BEGIN EC PRIVATE KEY-----\n"
-  "MHcCAQEEIPEqEyB2AnCoPL/9U/YDHvdqXYbIogTywwyp6/UfDw6noAoGCCqGSM49\n"
-  "AwEHoUQDQgAEN8xW2XYJHlpyPsdZLf8gbu58+QaRdNCtFLX3aCJZYpJO5QDYIxH/\n"
-  "6i/SNF1dFr2KiMJrdw1VzYoqDvoByLTt/w==\n"
-  "-----END EC PRIVATE KEY-----\n";
-
-const gnutls_datum_t ecc_key = { ecc_key_pem,
-	sizeof(ecc_key_pem)
-};
+#include "cert-common.h"
 
 static char rsa_key_pem[] =
     "-----BEGIN RSA PRIVATE KEY-----\n"
@@ -62,23 +53,6 @@ static char rsa_key_pem[] =
 
 const gnutls_datum_t rsa_key = { (void*)rsa_key_pem,
 	sizeof(rsa_key_pem)
-};
-
-static char dsa_key_pem[] =
-    "-----BEGIN DSA PRIVATE KEY-----\n"
-    "MIIBugIBAAKBgQC5hPVagb4aDcWKc48Mmy+btg5Lw3Qaf2StnfMoxaBHvJtXVvGX\n"
-    "1X43A+nyTPTji38wo10vu6GiN8LqNY8fsV+mol8B8SM2K+RPLy3dndU6pjmvelF8\n"
-    "0iWOl3TPHsV7S3ZDgQcfBhS4blgS4ZDiN2/SG+xoxVji5jDgal4sY3jsBwIVAJ9W\n"
-    "jEhkL/6NqnptltsEXRbvCKVxAoGAYgZ+5Fx2CLdGGl3Xl9QqIfsfMcnS9Po52CfR\n"
-    "m/wnXacKpxr8U8EvQ8I3yIV/PUyrXYEy+x1eHlQRFiDGgFrZjJtD8N1roPTD8oqc\n"
-    "OdIcew/v+iiTj9KhIuvc4IqLrSgOz+8Jhek2vYt6UNV79yUNbGARxO9wkM/WG+u7\n"
-    "jsY+OpcCgYAPiodX8tHC3KzfS4sPi7op9+ED5FX6spgH1v0SsYC89bq0UNR/oA5D\n"
-    "55/JeBFf5eQMLGtqpDXcvVTlYDaaMdGKWW5rHLq9LrrrfIfv2sjdoeukg+aLrfr6\n"
-    "jlvXN8gyPpbCPvRD2n2RAg+3vPjvj/dBAF6W3w8IltzqsukGgq/SLwIUS5/r/2ya\n"
-    "AoNBXjeBjgCGMei2m8E=\n" "-----END DSA PRIVATE KEY-----\n";
-
-const gnutls_datum_t dsa_key = { (void*)dsa_key_pem,
-	sizeof(dsa_key_pem)
 };
 
 static void dump(const char *name, unsigned char *buf, int buf_size)
@@ -105,9 +79,9 @@ unsigned char rsa_u[] = "\x4a\x74\x5c\x95\x83\x54\xa3\xb0\x71\x35\xba\x02\x3a\x7
 unsigned char rsa_e1[] = "\x45\x20\x96\x5e\x1b\x28\x68\x34\x46\xf1\x06\x6b\x09\x28\xc1\xc5\xfc\xd3\x0a\xa6\x43\x65\x7b\x65\xf3\x4e\xf2\x98\x28\xa9\x80\x99\xba\xd0\xb8\x80\xb7\x42\x4b\xaf\x82\xe2\xb9\xc0\x2c\x31\x9c\xfa\xfa\x3f\xaa\xb9\x06\xd2\x6a\x46\xc5\x08\x00\x81\xf1\x22\xd5\xd5";
 unsigned char rsa_e2[] = "\x00\xa6\x50\x60\xa7\xfe\x10\xf3\x6d\x9e\x6b\x5a\xfe\xb4\x4a\x2a\xfc\x92\xb2\x2d\xc6\x41\x96\x4d\xf8\x3b\x77\xab\x4a\xf4\xf7\x85\xe0\x79\x3b\x00\xaa\xba\xae\x8d\x53\x5f\x3e\x14\xcc\x78\xfe\x2a\x11\x50\x57\xfe\x25\x57\xd9\xc9\x8c\x4d\x28\x77\xc3\x7c\xfc\x31\xa1";
 
-unsigned char ecc_x[] = "\x37\xcc\x56\xd9\x76\x09\x1e\x5a\x72\x3e\xc7\x59\x2d\xff\x20\x6e\xee\x7c\xf9\x06\x91\x74\xd0\xad\x14\xb5\xf7\x68\x22\x59\x62\x92";
-unsigned char ecc_y[] = "\x4e\xe5\x00\xd8\x23\x11\xff\xea\x2f\xd2\x34\x5d\x5d\x16\xbd\x8a\x88\xc2\x6b\x77\x0d\x55\xcd\x8a\x2a\x0e\xfa\x01\xc8\xb4\xed\xff";
-unsigned char ecc_k[] = "\x00\xf1\x2a\x13\x20\x76\x02\x70\xa8\x3c\xbf\xfd\x53\xf6\x03\x1e\xf7\x6a\x5d\x86\xc8\xa2\x04\xf2\xc3\x0c\xa9\xeb\xf5\x1f\x0f\x0e\xa7";
+unsigned char ecc_x[] = "\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x38\x0d\x30\x5c\xe4\x3f\x55\xcb\xd9\x17\x15\x46\x72\x71\x92\xc1\xf8\xc6\x33";
+unsigned char ecc_y[] = "\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
+unsigned char ecc_k[] = "\x00\xfd\x2b\x00\x80\xf3\x36\x5f\x11\x32\x65\xe3\x8d\x30\x33\x3b\x47\xf5\xce\xf8\x13\xe5\x4c\xc2\xcf\xfd\xe8\x05\x6a\xca\xc9\x41\xb1";
 
 gnutls_datum_t _dsa_p = {dsa_p, sizeof(dsa_p)-1};
 gnutls_datum_t _dsa_q = {dsa_q, sizeof(dsa_q)-1};
@@ -129,7 +103,7 @@ gnutls_datum_t _ecc_y = {ecc_y, sizeof(ecc_y)-1};
 gnutls_datum_t _ecc_k = {ecc_k, sizeof(ecc_k)-1};
 
 unsigned char ecc_params[] = "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
-unsigned char ecc_point[] = "\x04\x41\x04\x37\xcc\x56\xd9\x76\x09\x1e\x5a\x72\x3e\xc7\x59\x2d\xff\x20\x6e\xee\x7c\xf9\x06\x91\x74\xd0\xad\x14\xb5\xf7\x68\x22\x59\x62\x92\x4e\xe5\x00\xd8\x23\x11\xff\xea\x2f\xd2\x34\x5d\x5d\x16\xbd\x8a\x88\xc2\x6b\x77\x0d\x55\xcd\x8a\x2a\x0e\xfa\x01\xc8\xb4\xed\xff";
+unsigned char ecc_point[] = "\x04\x41\x04\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x38\x0d\x30\x5c\xe4\x3f\x55\xcb\xd9\x17\x15\x46\x72\x71\x92\xc1\xf8\xc6\x33\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
 
 #define CMP(name, dat, v) cmp(name, __LINE__, dat, v, sizeof(v)-1)
 static int cmp(const char *name, int line, gnutls_datum_t *v1, unsigned char *v2, unsigned size)
@@ -221,7 +195,7 @@ int check_x509_privkey(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_x509_privkey_import(key, &ecc_key, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_privkey_import(key, &server_ecc_key, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("error\n");
 
@@ -475,7 +449,7 @@ int check_ecc(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_privkey_import_x509_raw(key, &ecc_key, GNUTLS_X509_FMT_PEM, 0, 0);
+	ret = gnutls_privkey_import_x509_raw(key, &server_ecc_key, GNUTLS_X509_FMT_PEM, 0, 0);
 	if (ret < 0)
 		fail("error\n");
 
