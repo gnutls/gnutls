@@ -41,7 +41,7 @@ fi
 
 # Create an RSA-PSS private key, restricted to the use with RSA-PSS
 ${VALGRIND} "${CERTTOOL}" --generate-privkey --pkcs8 --password '' \
-        --rsa-pss --hash $i --outfile "$OUTFILE"
+        --key-type rsa-pss --hash $i --outfile "$OUTFILE"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -84,7 +84,7 @@ fi
 done
 
 # Create an RSA-PSS certificate from an RSA key
-${VALGRIND} "${CERTTOOL}" --generate-certificate --rsa-pss \
+${VALGRIND} "${CERTTOOL}" --generate-certificate --key-type rsa-pss \
 	    --load-privkey "${srcdir}/../../doc/credentials/x509/key-rsa.pem" \
 	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \

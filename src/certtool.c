@@ -1120,15 +1120,15 @@ void sign_params_to_flags(common_info_st *cinfo, const char *params)
 
 static void figure_key_type(const char *key_type)
 {
-	if (strcasecmp(key_type, "rsa"))
+	if (strcasecmp(key_type, "rsa") == 0)
 		req_key_type = GNUTLS_PK_RSA;
-	else if (strcasecmp(key_type, "rsa-pss"))
+	else if (strcasecmp(key_type, "rsa-pss") == 0)
 		req_key_type = GNUTLS_PK_RSA_PSS;
-	else if (strcasecmp(key_type, "ed25519") || strcasecmp(key_type, "eddsa"))
+	else if (strcasecmp(key_type, "ed25519") == 0 || strcasecmp(key_type, "eddsa") == 0)
 		req_key_type = GNUTLS_PK_EDDSA_ED25519;
-	else if (strcasecmp(key_type, "dsa"))
+	else if (strcasecmp(key_type, "dsa") == 0)
 		req_key_type = GNUTLS_PK_DSA;
-	else if (strcasecmp(key_type, "ecdsa"))
+	else if (strcasecmp(key_type, "ecdsa") == 0 || strcasecmp(key_type, "ecc") == 0)
 		req_key_type = GNUTLS_PK_ECDSA;
 	else {
 		fprintf(stderr, "unknown key type: %s\n", key_type);

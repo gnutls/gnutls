@@ -70,7 +70,7 @@ fi
 
 # Create an RSA-PSS private key, restricted to the use with RSA-PSS
 ${VALGRIND} "${CERTTOOL}" --generate-privkey --pkcs8 --password '' \
-        --eddsa --outfile "$KEYFILE"
+        --key-type eddsa --outfile "$KEYFILE"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -106,7 +106,7 @@ if test "${rc}" != "0"; then
 fi
 
 # Create an EdDSA certificate from an RSA key
-${VALGRIND} "${CERTTOOL}" --generate-certificate --eddsa \
+${VALGRIND} "${CERTTOOL}" --generate-certificate --key-type eddsa \
 	    --load-privkey ${KEYFILE} \
 	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \

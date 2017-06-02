@@ -43,7 +43,7 @@ check_for_datefudge
 
 for i in sha256 sha384 sha512;do
 datefudge -s "2007-04-22" \
-"${CERTTOOL}" --generate-self-signed --rsa-pss \
+"${CERTTOOL}" --generate-self-signed --key-type rsa-pss \
 		--load-privkey "${srcdir}/data/template-test.key" \
 		--template "${srcdir}/templates/template-test.tmpl" \
 		--outfile "${TMPFILE}" --hash $i 2>/dev/null
