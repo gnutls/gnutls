@@ -417,18 +417,21 @@ flag = {
     name      = rsa;
     descrip   = "Generate RSA key";
     doc = "When combined with --generate-privkey generates an RSA private key.";
+    description = "This option is equivalent to '--key-type rsa'.";
 };
 
 flag = {
     name      = dsa;
     descrip   = "Generate DSA key";
     doc = "When combined with --generate-privkey generates a DSA private key.";
+    description = "This option is equivalent to '--key-type dsa'.";
 };
 
 flag = {
     name      = ecc;
     descrip   = "Generate ECC (ECDSA) key";
     doc = "When combined with --generate-privkey generates an elliptic curve private key to be used with ECDSA.";
+    description = "This option is equivalent to '--key-type ecdsa'.";
 };
 
 flag = {
@@ -437,15 +440,12 @@ flag = {
 };
 
 flag = {
-    name      = eddsa;
-    descrip   = "Generate EdDSA key";
-    doc = "When combined with --generate-privkey generates an elliptic curve private key to be used with EdDSA.";
-};
-
-flag = {
-    name      = rsa-pss;
-    descrip   = "Generate RSA-PSS key or certificate";
-    doc = "This option can be combined with --generate-privkey or --generate-certificate, to generate private key or certificate restricted to the use with the RSA-PSS padding scheme.";
+    name      = key-type;
+    arg-type  = string;
+    descrip   = "Specify the key type to use on key generation";
+    doc = "This option can be combined with --generate-privkey, to specify
+    the key type to be generated. Valid options are, 'rsa', 'rsa-pss',
+'dsa', 'ecdsa', and 'ed25519'.";
 };
 
 flag = {

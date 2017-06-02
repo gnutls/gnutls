@@ -94,7 +94,7 @@ static const char *outfile_name = NULL; /* to delete on exit */
 FILE *infile;
 static gnutls_digest_algorithm_t default_dig;
 static unsigned int incert_format, outcert_format;
-static unsigned int req_key_type;
+static unsigned int req_key_type = GNUTLS_PK_RSA;
 gnutls_certificate_print_formats_t full_format = GNUTLS_CRT_PRINT_FULL;
 
 /* non interactive operation if set
@@ -1118,6 +1118,24 @@ void sign_params_to_flags(common_info_st *cinfo, const char *params)
 	app_exit(1);
 }
 
+static void figure_key_type(const char *key_type)
+{
+	if (strcasecmp(key_type, "rsa"))
+		req_key_type = GNUTLS_PK_RSA;
+	else if (strcasecmp(key_type, "rsa-pss"))
+		req_key_type = GNUTLS_PK_RSA_PSS;
+	else if (strcasecmp(key_type, "ed25519") || strcasecmp(key_type, "eddsa"))
+		req_key_type = GNUTLS_PK_EDDSA_ED25519;
+	else if (strcasecmp(key_type, "dsa"))
+		req_key_type = GNUTLS_PK_DSA;
+	else if (strcasecmp(key_type, "ecdsa"))
+		req_key_type = GNUTLS_PK_ECDSA;
+	else {
+		fprintf(stderr, "unknown key type: %s\n", key_type);
+		exit(1);
+	}
+}
+
 static void cmd_parser(int argc, char **argv)
 {
 	int ret, privkey_op = 0;
@@ -1175,16 +1193,15 @@ static void cmd_parser(int argc, char **argv)
 	else
 		outcert_format = GNUTLS_X509_FMT_PEM;
 
-	if (HAVE_OPT(DSA))
+	/* legacy options */
+	if (HAVE_OPT(DSA)) {
 		req_key_type = GNUTLS_PK_DSA;
-	else if (HAVE_OPT(ECC))
+	} else if (HAVE_OPT(ECC)) {
 		req_key_type = GNUTLS_PK_ECDSA;
-	else if (HAVE_OPT(EDDSA))
-		req_key_type = GNUTLS_PK_EDDSA_ED25519;
-	else if (HAVE_OPT(RSA_PSS))
-		req_key_type = GNUTLS_PK_RSA_PSS;
-	else
-		req_key_type = GNUTLS_PK_RSA;
+	}
+
+	if (HAVE_OPT(KEY_TYPE))
+		figure_key_type(OPT_ARG(KEY_TYPE));
 
 	default_dig = GNUTLS_DIG_UNKNOWN;
 	if (HAVE_OPT(HASH)) {
