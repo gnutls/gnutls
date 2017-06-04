@@ -429,7 +429,7 @@ ubsan-Werror/Fedora/x86_64:
       - tests/*/*.log
       - tests/suite/*/*.log
 
-build/Debian/x86_64:
+Debian/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
@@ -449,3 +449,27 @@ build/Debian/x86_64:
       - build/tests/*.log
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
+
+Debian/aarch64:
+  stage: stage1-testing
+  image:
+  before_script:
+  - /bin/true
+  script:
+  - make autoreconf && mkdir -p build && cd build &&
+    ../configure --disable-doc --disable-guile --disable-full-test-suite &&
+    make -j$(nproc) && make check -j$(nproc)
+  tags:
+  - aarch64
+  only:
+  - branches@gnutls/gnutls
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - tests/*.log
+      - tests/*/*.log
+
