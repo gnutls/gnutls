@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!HAVE_OPT(KEYSIZE) || OPT_VALUE_KEYSIZE < 1)
-		key_size = 16;
+		key_size = 32;
 	else
 		key_size = OPT_VALUE_KEYSIZE;
 
