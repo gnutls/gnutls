@@ -16,6 +16,13 @@ See the end for copying conditions.
    side caused by packets containing the ResponseID field. Reported
    by Hubert Kario.
 
+** libgnutls: tolerate certificates which do not have strict DER time encoding.
+   It is possible using 3rd party tools to generate certificates with the time fields
+   that do not conform to DER requirements. Since 3.4.x these certificates are rejected
+   and cannot be used with GnuTLS, however that caused problems with existing private
+   certificate infrastructures, which were relying on such certificates (see gitlab
+   issue #196). Tolerate reading and using these certificates.
+
 ** minitasn1: updated to libtasn1 4.11.
 
 ** certtool: allow multiple certificates to be used in --p7-sign with
