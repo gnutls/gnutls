@@ -330,7 +330,8 @@ if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
 	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
-	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh
+	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
+	psktool.sh
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
