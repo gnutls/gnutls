@@ -430,10 +430,6 @@ static void start(const char *prio, int ign)
 
 #define NULL_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+NULL:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+RSA:+CURVE-ALL"
 
-#define ARCFOUR_SHA1_ZLIB "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-DEFLATE:+ANON-ECDH:+CURVE-ALL"
-
-#define AES_GCM_ZLIB "NONE:+VERS-TLS1.2:-CIPHER-ALL:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-DEFLATE:+RSA:+CURVE-ALL"
-
 static void ch_handler(int sig)
 {
 	int status = 0;
@@ -455,15 +451,7 @@ void doit(void)
 
 		start(ARCFOUR_SHA1, 0);
 		start(ARCFOUR_MD5, 0);
-
-# ifdef HAVE_LIBZ
-		start(ARCFOUR_SHA1_ZLIB, 0);
-# endif
 	}
-
-#ifdef HAVE_LIBZ
-	start(AES_GCM_ZLIB, 0);
-#endif
 }
 
 #endif				/* _WIN32 */
