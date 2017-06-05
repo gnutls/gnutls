@@ -28,7 +28,6 @@
 #include "dh.h"
 #include "debug.h"
 #include "algorithms.h"
-#include "compress.h"
 #include "cipher.h"
 #include "buffers.h"
 #include "kx.h"
@@ -248,10 +247,6 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 					    session_id_size);
 		session->internals.resumed = RESUME_FALSE;
 	}
-
-	ret = _gnutls_set_compression(session, GNUTLS_COMP_NULL);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
 
 	return sret;
 }

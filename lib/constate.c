@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -219,14 +220,6 @@ _gnutls_init_record_state(record_parameters_st * params,
 	if (ret < 0 && params->cipher->id != GNUTLS_CIPHER_NULL)
 		return gnutls_assert_val(ret);
 
-	ret =
-	    _gnutls_comp_init(&state->compression_state,
-			      params->compression_algorithm,
-			      read /*1==decompress */ );
-
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	return 0;
 }
 
@@ -281,32 +274,6 @@ _gnutls_set_cipher_suite(gnutls_session_t session,
 	return 0;
 }
 
-int
-_gnutls_set_compression(gnutls_session_t session,
-			gnutls_compression_method_t comp_algo)
-{
-	record_parameters_st *params;
-	int ret;
-
-	ret = _gnutls_epoch_get(session, EPOCH_NEXT, &params);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	if (params->initialized
-	    || params->compression_algorithm != GNUTLS_COMP_UNKNOWN)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	if (_gnutls_compression_is_ok(comp_algo) != 0)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
-
-	session->security_parameters.compression_method = comp_algo;
-	params->compression_algorithm = comp_algo;
-
-	return 0;
-}
-
 void
 _gnutls_epoch_set_null_algos(gnutls_session_t session,
 			     record_parameters_st * params)
@@ -321,7 +288,6 @@ _gnutls_epoch_set_null_algos(gnutls_session_t session,
 
 	params->cipher = cipher_to_entry(GNUTLS_CIPHER_NULL);
 	params->mac = mac_to_entry(GNUTLS_MAC_NULL);
-	params->compression_algorithm = GNUTLS_COMP_NULL;
 	params->initialized = 1;
 }
 
@@ -330,7 +296,6 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	int hash_size;
 	int IV_size;
 	int key_size;
-	gnutls_compression_method_t comp_algo;
 	record_parameters_st *params;
 	int ret;
 	const version_entry_st *ver = get_version(session);
@@ -348,8 +313,6 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	_gnutls_record_log
 	    ("REC[%p]: Initializing epoch #%u\n", session, params->epoch);
 
-	comp_algo = params->compression_algorithm;
-
 	if (_gnutls_cipher_is_ok(params->cipher) == 0
 	    || _gnutls_mac_is_ok(params->mac) == 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
@@ -359,11 +322,6 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 
 	if (_gnutls_mac_priority(session, params->mac->id) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-
-	if (_gnutls_compression_is_ok(comp_algo) != 0)
-		return
-		    gnutls_assert_val
-		    (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
 
 	if (!_gnutls_version_has_explicit_iv(ver) &&
 	    _gnutls_cipher_type(params->cipher) == CIPHER_BLOCK) {
@@ -408,7 +366,6 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	memcpy( dst->session_id, src->session_id, GNUTLS_MAX_SESSION_ID_SIZE); \
 	dst->session_id_size = src->session_id_size; \
 	dst->cert_type = src->cert_type; \
-	dst->compression_method = src->compression_method; \
 	dst->timestamp = src->timestamp; \
 	dst->ext_master_secret = src->ext_master_secret; \
 	dst->etm = src->etm; \
@@ -627,7 +584,6 @@ _gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
 	(*slot)->epoch = epoch;
 	(*slot)->cipher = NULL;
 	(*slot)->mac = NULL;
-	(*slot)->compression_algorithm = GNUTLS_COMP_UNKNOWN;
 
 	if (IS_DTLS(session))
 		_gnutls_write_uint16(epoch,
@@ -721,9 +677,6 @@ static inline void free_record_state(record_state_st * state, int d)
 	_gnutls_free_datum(&state->key);
 
 	_gnutls_auth_cipher_deinit(&state->cipher_state);
-
-	if (state->compression_state.handle != NULL)
-		_gnutls_comp_deinit(&state->compression_state, d);
 }
 
 void

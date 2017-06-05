@@ -691,11 +691,9 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
  *      1 byte the key exchange algorithm used
  *      1 byte the read cipher algorithm
  *      1 byte the read mac algorithm
- *      1 byte the read compression algorithm
  *
  *      1 byte the write cipher algorithm
  *      1 byte the write mac algorithm
- *      1 byte the write compression algorithm
  *
  *      1 byte the certificate type
  *      1 byte the protocol version
@@ -747,8 +745,6 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_APPEND_NUM(ps, session->security_parameters.entity);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.kx_algorithm);
 	BUFFER_APPEND(ps, session->security_parameters.cipher_suite, 2);
-	BUFFER_APPEND_NUM(ps,
-			  session->security_parameters.compression_method);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.cert_type);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.pversion->id);
 
@@ -818,9 +814,6 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP(ps,
 		   session->internals.resumed_security_parameters.
 		   cipher_suite, 2);
-	BUFFER_POP_NUM(ps,
-		       session->internals.resumed_security_parameters.
-		       compression_method);
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       cert_type);
@@ -904,7 +897,7 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
  * @kx: the key exchange method
  * @cipher: the cipher
  * @mac: the MAC algorithm
- * @comp: the compression method
+ * @comp: the compression method (ignored)
  * @master: the master key to use
  * @session_id: the session identifier
  *
@@ -942,8 +935,6 @@ gnutls_session_set_premaster(gnutls_session_t session, unsigned int entity,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	session->internals.resumed_security_parameters.compression_method =
-	    comp;
 	session->internals.resumed_security_parameters.cert_type =
 	    DEFAULT_CERT_TYPE;
 	session->internals.resumed_security_parameters.pversion =

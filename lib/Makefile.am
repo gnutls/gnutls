@@ -97,7 +97,7 @@ if ENABLE_NETTLE
 SUBDIRS += nettle
 endif
 
-HFILES = abstract_int.h debug.h compress.h cipher.h	\
+HFILES = abstract_int.h debug.h cipher.h	\
 	buffers.h errors.h gnutls_int.h dtls.h	\
 	handshake.h num.h algorithms.h		\
 	dh.h kx.h hash_int.h cipher_int.h	\

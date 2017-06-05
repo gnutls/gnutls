@@ -349,12 +349,6 @@ static const int _cipher_priority_secure192[] = {
 };
 static const int* cipher_priority_secure192 = _cipher_priority_secure192;
 
-static const int comp_priority[] = {
-	/* compression should be explicitly requested to be enabled */
-	GNUTLS_COMP_NULL,
-	0
-};
-
 static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_RSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA256,
@@ -536,7 +530,7 @@ static void prio_add(priority_st * priority_list, unsigned int algo)
  * @priority: is a #gnutls_priority_t type.
  *
  * Sets the priorities to use on the ciphers, key exchange methods,
- * macs and compression methods.
+ * and macs.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
@@ -570,8 +564,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	if (session->internals.priorities.protocol.algorithms == 0 ||
 	    session->internals.priorities.cipher.algorithms == 0 ||
 	    session->internals.priorities.mac.algorithms == 0 ||
-	    session->internals.priorities.kx.algorithms == 0 ||
-	    session->internals.priorities.compression.algorithms == 0)
+	    session->internals.priorities.kx.algorithms == 0)
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	ADD_PROFILE_VFLAGS(session, priority->additional_verify_flags);
@@ -777,10 +770,6 @@ static void enable_no_etm(gnutls_priority_t c)
 static void enable_no_tickets(gnutls_priority_t c)
 {
 	c->no_tickets = 1;
-}
-static void enable_stateless_compression(gnutls_priority_t c)
-{
-	c->stateless_compression = 1;
 }
 static void disable_wildcards(gnutls_priority_t c)
 {
@@ -1124,8 +1113,8 @@ finish:
  * @priorities: is a string describing priorities (may be %NULL)
  * @err_pos: In case of an error this will have the position in the string the error occurred
  *
- * Sets priorities for the ciphers, key exchange methods, macs and
- * compression methods. The @priority_cache should be deinitialized
+ * Sets priorities for the ciphers, key exchange methods, and macs.
+ * The @priority_cache should be deinitialized
  * using gnutls_priority_deinit().
  *
  * The #priorities option allows you to specify a colon
@@ -1164,8 +1153,7 @@ finish:
  * "SUITEB192" means all the NSA SuiteB ciphersuites with security level
  * of 192.
  *
- * "NONE" means nothing is enabled.  This disables even protocols and
- * compression methods.
+ * "NONE" means nothing is enabled.  This disables everything, including protocols.
  *
  * "@@KEYWORD1,KEYWORD2,..." The system administrator imposed settings.
  * The provided keyword(s) will be expanded from a configuration-time
@@ -1197,8 +1185,8 @@ finish:
  *
  * "NORMAL:+ARCFOUR-128" means normal ciphers plus ARCFOUR-128.
  *
- * "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE" means that only secure ciphers are
- * enabled, SSL3.0 is disabled, and libz compression enabled.
+ * "SECURE128:-VERS-SSL3.0" means that only secure ciphers are
+ * and enabled, SSL3.0 is disabled.
  *
  * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", 
  *
@@ -1254,14 +1242,11 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	}
 
 	break_list(darg, broken_list, &broken_list_size);
-	/* This is our default set of protocol version, certificate types and
-	 * compression methods.
+	/* This is our default set of protocol version, certificate types.
 	 */
 	if (strcasecmp(broken_list[0], LEVEL_NONE) != 0) {
 		_set_priority(&(*priority_cache)->protocol,
 			      protocol_priority);
-		_set_priority(&(*priority_cache)->compression,
-			      comp_priority);
 		_set_priority(&(*priority_cache)->cert_type,
 			      cert_type_priority_default);
 		_set_priority(&(*priority_cache)->sign_algo,
@@ -1344,22 +1329,8 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			} /* now check if the element is something like -ALGO */
 			else if (strncasecmp
 				 (&broken_list[i][1], "COMP-", 5) == 0) {
-				if (strncasecmp
-				    (&broken_list[i][1], "COMP-ALL",
-				     8) == 0) {
-					bulk_fn(&(*priority_cache)->
-						compression,
-						comp_priority);
-				} else {
-					if ((algo =
-					     gnutls_compression_get_id
-					     (&broken_list[i][6])) !=
-					    GNUTLS_COMP_UNKNOWN)
-						fn(&(*priority_cache)->
-						   compression, algo);
-					else
-						goto error;
-				}
+				/* ignore all compression methods */
+				continue;
 			} /* now check if the element is something like -ALGO */
 			else if (strncasecmp
 				 (&broken_list[i][1], "CURVE-", 6) == 0) {
@@ -1465,7 +1436,7 @@ void gnutls_priority_deinit(gnutls_priority_t priority_cache)
  * @err_pos: In case of an error this will have the position in the string the error occurred
  *
  * Sets the priorities to use on the ciphers, key exchange methods,
- * macs and compression methods.  This function avoids keeping a
+ * and macs.  This function avoids keeping a
  * priority cache and is used to directly set string priorities to a
  * TLS session.  For documentation check the gnutls_priority_init().
  *
@@ -1533,7 +1504,7 @@ break_list(char *list,
  * @session: is a #gnutls_session_t type.
  *
  * Sets the default priority on the ciphers, key exchange methods,
- * macs and compression methods. This is the recommended method of
+ * and macs. This is the recommended method of
  * setting the defaults, in order to promote consistency between applications
  * using GnuTLS, and to allow GnuTLS using applications to update settings
  * in par with the library. For client applications which require
@@ -1657,11 +1628,10 @@ int
 gnutls_priority_compression_list(gnutls_priority_t pcache,
 				 const unsigned int **list)
 {
-	if (pcache->compression.algorithms == 0)
-		return 0;
+	static const unsigned int priority[1] = {GNUTLS_COMP_NULL};
 
-	*list = pcache->compression.priority;
-	return pcache->compression.algorithms;
+	*list = priority;
+	return 1;
 }
 
 /**

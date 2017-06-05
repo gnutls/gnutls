@@ -32,7 +32,6 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "debug.h"
-#include "compress.h"
 #include "cipher.h"
 #include "buffers.h"
 #include "mbuffers.h"

@@ -697,37 +697,6 @@ AC_CHECK_TYPE(ssize_t,
 AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
 
-AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
-                                 [disable zlib compression support]),
-            ac_zlib=$withval, ac_zlib=yes)
-AC_MSG_CHECKING([whether to include zlib compression support])
-if test x$ac_zlib != xno; then
- AC_MSG_RESULT(yes)
- AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
- if test x$ac_cv_libz != xyes; then
-   AC_MSG_WARN(
-*** 
-*** ZLIB was not found. You will not be able to use ZLIB compression.)
- fi
-else
- AC_MSG_RESULT(no)
-fi
-
-PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
-
-if test x$ac_zlib != xno; then
-  if test "$ZLIB_HAS_PKGCONFIG" = "y" ; then
-    if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
-      GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
-    else
-      GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
-    fi
-    LIBZ_PC=""
-  else
-    LIBZ_PC=$LIBZ
-  fi
-fi
-AC_SUBST(LIBZ_PC)
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
 
 

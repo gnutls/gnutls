@@ -495,7 +495,6 @@ void gnutls_dtls_set_mtu(gnutls_session_t session, unsigned int mtu)
 
 static int record_overhead(const cipher_entry_st * cipher,
 			   const mac_entry_st * mac,
-			   gnutls_compression_method_t comp,
 			   unsigned etm,
 			   unsigned est_data)
 {
@@ -517,9 +516,6 @@ static int record_overhead(const cipher_entry_st * cipher,
 		hash_len = ret;
 		total += hash_len;
 	}
-
-	if (comp != GNUTLS_COMP_NULL)
-		total += EXTRA_COMP_SIZE;
 
 	/* This must be last */
 	if (_gnutls_cipher_type(cipher) == CIPHER_BLOCK) {
@@ -554,7 +550,7 @@ static int record_overhead(const cipher_entry_st * cipher,
  * @version: is a #gnutls_protocol_t value
  * @cipher: is a #gnutls_cipher_algorithm_t value
  * @mac: is a #gnutls_mac_algorithm_t value
- * @comp: is a #gnutls_compression_method_t value
+ * @comp: is a #gnutls_compression_method_t value (ignored)
  * @flags: must be zero
  *
  * This function will return the set size in bytes of the overhead
@@ -595,7 +591,7 @@ size_t gnutls_est_record_overhead_size(gnutls_protocol_t version,
 	else
 		total = DTLS_RECORD_HEADER_SIZE;
 
-	total += record_overhead(c, m, comp, 0, 0);
+	total += record_overhead(c, m, 0, 0);
 
 	return total;
 }
@@ -622,7 +618,7 @@ static int record_overhead_rt(gnutls_session_t session, unsigned est_data)
 		return gnutls_assert_val(ret);
 
 	return record_overhead(params->cipher, params->mac,
-			       params->compression_algorithm, params->etm, est_data);
+			       params->etm, est_data);
 }
 
 /**

@@ -164,7 +164,7 @@ typedef enum record_flush_t {
  * when receiving we use a different way as there are implementations that
  * store more data than allowed.
  */
-#define MAX_RECORD_SEND_OVERHEAD(session) (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+((gnutls_compression_get(session)!=GNUTLS_COMP_NULL)?(EXTRA_COMP_SIZE):(0))+MAX_HASH_SIZE/*MAC*/)
+#define MAX_RECORD_SEND_OVERHEAD(session) (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+MAX_HASH_SIZE/*MAC*/)
 #define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)? \
 	(MIN((size_t)gnutls_dtls_get_mtu(session), (size_t)session->security_parameters.max_record_send_size+MAX_RECORD_SEND_OVERHEAD(session))): \
 	((size_t)session->security_parameters.max_record_send_size+MAX_RECORD_SEND_OVERHEAD(session)))
@@ -503,7 +503,6 @@ typedef struct {
 
 #include <hash_int.h>
 #include <cipher_int.h>
-#include <compress.h>
 
 typedef struct {
 	uint8_t hash_algorithm;
@@ -552,7 +551,6 @@ typedef struct {
 	 * on resume;
 	 */
 	uint8_t cipher_suite[2];
-	gnutls_compression_method_t compression_method;
 	gnutls_mac_algorithm_t prf_mac;
 	uint8_t master_secret[GNUTLS_MASTER_SIZE];
 	uint8_t client_random[GNUTLS_RANDOM_SIZE];
@@ -598,7 +596,6 @@ struct record_state_st {
 	gnutls_datum_t IV;
 	gnutls_datum_t key;
 	auth_cipher_hd_st cipher_state;
-	comp_hd_st compression_state;
 	gnutls_uint64 sequence_number;
 };
 
@@ -614,8 +611,6 @@ struct record_state_st {
 struct record_parameters_st {
 	uint16_t epoch;
 	int initialized;
-
-	gnutls_compression_method_t compression_algorithm;
 
 	const cipher_entry_st *cipher;
 	bool etm;
@@ -653,7 +648,6 @@ struct gnutls_priority_st {
 	priority_st cipher;
 	priority_st mac;
 	priority_st kx;
-	priority_st compression;
 	priority_st protocol;
 	priority_st cert_type;
 	priority_st sign_algo;
@@ -673,8 +667,6 @@ struct gnutls_priority_st {
 	bool no_tickets;
 	bool no_etm;
 	bool have_cbc;
-	/* Whether stateless compression will be used */
-	bool stateless_compression;
 	unsigned int additional_verify_flags;
 
 	/* The session's expected security level.

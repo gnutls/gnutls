@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -29,7 +29,6 @@
 #include "dh.h"
 #include "debug.h"
 #include "algorithms.h"
-#include "compress.h"
 #include "cipher.h"
 #include "buffers.h"
 #include "mbuffers.h"
@@ -64,7 +63,7 @@
 #define TRUE 1
 #define FALSE 0
 
-static int server_select_comp_method(gnutls_session_t session,
+static int check_if_null_comp_present(gnutls_session_t session,
 					     uint8_t * data, int datalen);
 static int handshake_client(gnutls_session_t session);
 static int handshake_server(gnutls_session_t session);
@@ -140,13 +139,6 @@ static int resume_copy_required_values(gnutls_session_t session)
 				       session->internals.
 				       resumed_security_parameters.
 				       cipher_suite);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = _gnutls_set_compression(session,
-				      session->internals.
-				      resumed_security_parameters.
-				      compression_method);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -637,7 +629,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	/* select appropriate compression method */
 	ret =
-	    server_select_comp_method(session, comp_ptr,
+	    check_if_null_comp_present(session, comp_ptr,
 					      comp_size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1054,72 +1046,20 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 }
 
 
-/* This selects the best supported compression method from the ones provided 
+/* This checks whether the null compression method is present.
  */
 static int
-server_select_comp_method(gnutls_session_t session,
+check_if_null_comp_present(gnutls_session_t session,
 			  uint8_t * data, int datalen)
 {
-	int x, i, j;
-	uint8_t comps[MAX_ALGOS];
-	int ret;
+	int j;
 
-	x = _gnutls_supported_compression_methods(session, comps,
-						  MAX_ALGOS);
-	if (x < 0) {
-		gnutls_assert();
-		return x;
+	for (j = 0; j < datalen; j++) {
+		if (data[j] == 0)
+			return 0;
 	}
 
-	if (session->internals.priorities.server_precedence == 0) {
-		for (j = 0; j < datalen; j++) {
-			for (i = 0; i < x; i++) {
-				if (comps[i] == data[j]) {
-					gnutls_compression_method_t method
-					    =
-					    _gnutls_compression_get_id
-					    (comps[i]);
-
-					ret = _gnutls_set_compression
-					    (session, method);
-					if (ret < 0)
-						return gnutls_assert_val(ret);
-
-					_gnutls_handshake_log
-					    ("HSK[%p]: Selected Compression Method: %s\n",
-					     session,
-					     gnutls_compression_get_name
-					     (method));
-					return 0;
-				}
-			}
-		}
-	} else {
-		for (i = 0; i < x; i++) {
-			for (j = 0; j < datalen; j++) {
-				if (comps[i] == data[j]) {
-					gnutls_compression_method_t method
-					    =
-					    _gnutls_compression_get_id
-					    (comps[i]);
-
-					ret = _gnutls_set_compression
-					    (session, method);
-					if (ret < 0)
-						return gnutls_assert_val(ret);
-
-					_gnutls_handshake_log
-					    ("HSK[%p]: Selected Compression Method: %s\n",
-					     session,
-					     gnutls_compression_get_name
-					     (method));
-					return 0;
-				}
-			}
-		}
-	}
-
-	/* we were not able to find a compatible compression
+	/* we were not able to find a the NULL compression
 	 * algorithm
 	 */
 	gnutls_assert();
@@ -1604,49 +1544,6 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	return 0;
 }
 
-/* This function sets the given comp method to the session.
- */
-static int
-set_client_comp_method(gnutls_session_t session,
-			       uint8_t comp_method)
-{
-	int comp_methods_num;
-	uint8_t compression_methods[MAX_ALGOS];
-	int id = _gnutls_compression_get_id(comp_method);
-	int i;
-	int ret;
-
-	_gnutls_handshake_log
-	    ("HSK[%p]: Selected compression method: %s (%d)\n", session,
-	     gnutls_compression_get_name(id), (int) comp_method);
-
-	comp_methods_num = _gnutls_supported_compression_methods(session,
-								 compression_methods,
-								 MAX_ALGOS);
-	if (comp_methods_num < 0) {
-		gnutls_assert();
-		return comp_methods_num;
-	}
-
-	for (i = 0; i < comp_methods_num; i++) {
-		if (compression_methods[i] == comp_method) {
-			comp_methods_num = 0;
-			break;
-		}
-	}
-
-	if (comp_methods_num != 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-	}
-
-	ret = _gnutls_set_compression(session, id);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	return 0;
-}
-
 /* This function returns 0 if we are resuming a session or -1 otherwise.
  * This also sets the variables in the session. Used only while reading a server
  * hello.
@@ -1686,14 +1583,6 @@ client_check_if_resuming(gnutls_session_t session,
 		    (session,
 		     session->internals.resumed_security_parameters.
 		     cipher_suite);
-		if (ret < 0) {
-			gnutls_assert();
-			goto no_resume;
-		}
-		ret = _gnutls_set_compression(session,
-					session->internals.
-					resumed_security_parameters.
-					compression_method);
 		if (ret < 0) {
 			gnutls_assert();
 			goto no_resume;
@@ -1806,12 +1695,7 @@ read_server_hello(gnutls_session_t session,
 	/* move to compression 
 	 */
 	DECR_LEN(len, 1);
-
-	ret = set_client_comp_method(session, data[pos++]);
-	if (ret < 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-	}
+	pos++;
 
 	/* Parse extensions.
 	 */
@@ -1899,30 +1783,15 @@ copy_ciphersuites(gnutls_session_t session,
  * Needed in hello messages. Returns the new data length.
  */
 static int
-copy_comp_methods(gnutls_session_t session,
+append_null_comp(gnutls_session_t session,
 			  gnutls_buffer_st * cdata)
 {
-	int ret;
-	uint8_t compression_methods[MAX_ALGOS], comp_num;
+	uint8_t compression_methods[2] = {0x01, 0x00};
 	size_t init_length = cdata->length;
+	int ret;
 
 	ret =
-	    _gnutls_supported_compression_methods(session,
-						  compression_methods,
-						  MAX_ALGOS);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	comp_num = ret;
-
-	/* put the number of compression methods */
-	ret = _gnutls_buffer_append_prefix(cdata, 8, comp_num);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret =
-	    _gnutls_buffer_append_data(cdata, compression_methods,
-				       comp_num);
+	    _gnutls_buffer_append_data(cdata, compression_methods, 2);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -2089,7 +1958,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		/* Copy the compression methods.
 		 */
-		ret = copy_comp_methods(session, &extdata);
+		ret = append_null_comp(session, &extdata);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -2150,7 +2019,6 @@ static int send_server_hello(gnutls_session_t session, int again)
 	gnutls_buffer_st extdata;
 	int pos = 0;
 	int datalen, ret = 0;
-	uint8_t comp;
 	uint8_t session_id_len =
 	    session->security_parameters.session_id_size;
 	char buf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
@@ -2211,11 +2079,7 @@ static int send_server_hello(gnutls_session_t session, int again)
 		       session->security_parameters.cipher_suite, 2);
 		pos += 2;
 
-		comp =
-		    _gnutls_compression_get_num(session->
-						security_parameters.
-						compression_method);
-		data[pos++] = comp;
+		data[pos++] = 0x00;
 
 		if (extdata.length > 0) {
 			memcpy(&data[pos], extdata.data, extdata.length);
