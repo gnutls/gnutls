@@ -61,14 +61,16 @@ See the end for copying conditions.
 ** libgnutls: gnutls_pem_base64_encode/2() and gnutls_pem_base64_decode/2() can
    be used to decode arbitrary base64 data if the header parameter is set to NULL.
 
-** libgnutls: removed support for libidn; gnutls can now be compiled only with
+** libgnutls: Removed support for libidn; gnutls can now be compiled only with
    libidn2.
 
-** certtool: the option '--load-ca-certificate' can now accept PKCS#11
+** certtool: The option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
-** certtool: the option '--load-crl' can now be used when generating PKCS#12
+** certtool: The option '--load-crl' can now be used when generating PKCS#12
    files (i.e., in conjunction with '--to-p12' option).
+
+** psktool: Generate 256-bit keys by default.
 
 ** API and ABI modifications:
 gnutls_x509_crt_set_flags: Added
