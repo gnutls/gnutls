@@ -14,7 +14,7 @@ flag = {
     value     = s;
     arg-type  = number;
     arg-range = "0 -> 512";
-    descrip   = "specify the key size in bytes";
+    descrip   = "Specify the key size in bytes (default is 32-bytes or 256-bits)";
     doc = "";
 };
 
@@ -22,7 +22,7 @@ flag = {
     name      = username;
     value     = u;
     arg-type  = string;
-    descrip   = "specify a username";
+    descrip   = "Specify the username to use";
     doc = "";
 };
 
