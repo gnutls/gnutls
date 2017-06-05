@@ -59,7 +59,6 @@ int main(int argc, char **argv)
 static int write_key(const char *username, const char *key, int key_size,
 		     const char *passwd_file);
 
-#define KPASSWD "/etc/passwd.psk"
 #define MAX_KEY_SIZE 64
 int main(int argc, char **argv)
 {
@@ -85,9 +84,10 @@ int main(int argc, char **argv)
 	argc -= optct;
 	argv += optct;
 
-	if (!HAVE_OPT(PSKFILE))
-		passwd = (char *) KPASSWD;
-	else
+	if (!HAVE_OPT(PSKFILE)) {
+		fprintf(stderr, "You need to specify a PSK key file\n");
+		exit(1);
+	} else
 		passwd = OPT_ARG(PSKFILE);
 
 	if (!HAVE_OPT(USERNAME)) {
