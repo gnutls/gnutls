@@ -67,6 +67,8 @@ See the end for copying conditions.
 ** libgnutls: Removed support for libidn; gnutls can now be compiled only with
    libidn2.
 
+** libgnutls: Removed support for DEFLATE, or any other compression method.
+
 ** certtool: The option '--load-ca-certificate' can now accept PKCS#11
    URLs in addition to files.
 
