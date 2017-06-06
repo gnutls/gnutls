@@ -47,7 +47,6 @@ struct gnutls_privkey_st {
 	} key;
 
 	unsigned int flags;
-	gnutls_sign_algorithm_t preferred_sign_algo;
 	struct pin_info_st pin;
 };
 

@@ -1704,5 +1704,5 @@ _gnutls_privkey_get_preferred_sign_algo(gnutls_privkey_t key)
 		if (key->key.ext.info_func)
 			return key->key.ext.info_func(key, GNUTLS_PRIVKEY_INFO_SIGN_ALGO, key->key.ext.userdata);
 	}
-	return key->preferred_sign_algo;
+	return GNUTLS_SIGN_UNKNOWN;
 }
