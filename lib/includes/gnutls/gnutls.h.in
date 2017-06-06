@@ -962,8 +962,6 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session);
 gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session);
 gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session);
-gnutls_compression_method_t
-gnutls_compression_get(gnutls_session_t session);
 gnutls_certificate_type_t
 gnutls_certificate_type_get(gnutls_session_t session);
 
@@ -985,9 +983,6 @@ const char *
 const char *
 	gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST__;
 
-const char *
-gnutls_compression_get_name(gnutls_compression_method_t
-			    algorithm) __GNUTLS_CONST__;
 const char *
 	gnutls_kx_get_name(gnutls_kx_algorithm_t algorithm) __GNUTLS_CONST__;
 const char *
@@ -1026,8 +1021,6 @@ gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign, gnutls_pk_algori
 gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name) __GNUTLS_CONST__;
 gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name) __GNUTLS_CONST__;
 
-gnutls_compression_method_t
-	gnutls_compression_get_id(const char *name) __GNUTLS_CONST__;
 gnutls_cipher_algorithm_t
 	gnutls_cipher_get_id(const char *name) __GNUTLS_CONST__;
 
@@ -1064,8 +1057,6 @@ const gnutls_mac_algorithm_t *
 	gnutls_mac_list(void) __GNUTLS_PURE__;
 const gnutls_digest_algorithm_t *
 	gnutls_digest_list(void) __GNUTLS_PURE__;
-const gnutls_compression_method_t *
-	gnutls_compression_list(void) __GNUTLS_PURE__;
 const gnutls_protocol_t *
 	gnutls_protocol_list(void) __GNUTLS_PURE__;
 const gnutls_certificate_type_t *
@@ -1374,8 +1365,6 @@ int gnutls_priority_sign_list(gnutls_priority_t pcache,
 			      const unsigned int **list);
 int gnutls_priority_protocol_list(gnutls_priority_t pcache,
 				  const unsigned int **list);
-int gnutls_priority_compression_list(gnutls_priority_t pcache,
-				     const unsigned int **list);
 int gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
 				   const unsigned int **list);
 
