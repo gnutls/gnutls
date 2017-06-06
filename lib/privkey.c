@@ -1007,11 +1007,7 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm)) {
-		return privkey_sign_raw_data(signer, data, signature, &params);
-	} else {
-		return privkey_sign_and_hash_data(signer, data, signature, &params);
-	}
+	return privkey_sign_and_hash_data(signer, data, signature, &params);
 }
 
 /**
@@ -1133,8 +1129,12 @@ privkey_sign_and_hash_data(gnutls_privkey_t signer,
 {
 	int ret;
 	gnutls_datum_t digest;
-	const mac_entry_st *me = hash_to_entry(params->dig);
+	const mac_entry_st *me;
 
+	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm))
+		return privkey_sign_raw_data(signer, data, signature, params);
+
+	me = hash_to_entry(params->dig);
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
