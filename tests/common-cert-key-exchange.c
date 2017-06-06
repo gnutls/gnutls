@@ -81,9 +81,12 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
+	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
 					    serv_cert, serv_key,
 					    GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
+	}
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
@@ -242,9 +245,12 @@ void dtls_try_with_key(const char *name, const char *client_prio, gnutls_kx_algo
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
+	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
 					    serv_cert, serv_key,
 					    GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
+	}
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
@@ -271,9 +277,12 @@ void dtls_try_with_key(const char *name, const char *client_prio, gnutls_kx_algo
 		exit(1);
 
 	if (cert_flags == USE_CERT) {
-		gnutls_certificate_set_x509_key_mem(clientx509cred,
+		ret = gnutls_certificate_set_x509_key_mem(clientx509cred,
 						    client_cert, client_key,
 						    GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
+		}
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
 	} else if (cert_flags == ASK_CERT) {
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
