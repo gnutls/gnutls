@@ -81,21 +81,10 @@ _gnutls_handshake_sign_data12(gnutls_session_t session,
 {
 	gnutls_datum_t dconcat;
 	int ret;
-	const mac_entry_st *hash_algo;
-	gnutls_pk_algorithm_t pk_algo;
-	unsigned flags = 0;
-
-	hash_algo = hash_to_entry(gnutls_sign_get_hash_algorithm(sign_algo));
-	if (hash_algo == NULL)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
-
-	pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
-	if (pk_algo == GNUTLS_PK_UNKNOWN)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
 
 	_gnutls_handshake_log
-	    ("HSK[%p]: signing TLS 1.2 handshake data: using %s/%s\n", session,
-	     gnutls_pk_get_name(pk_algo), gnutls_sign_algorithm_get_name(sign_algo));
+	    ("HSK[%p]: signing TLS 1.2 handshake data: using %s\n", session,
+	     gnutls_sign_algorithm_get_name(sign_algo));
 
 	dconcat.size = GNUTLS_RANDOM_SIZE*2 + params->size;
 	dconcat.data = gnutls_malloc(dconcat.size);
@@ -106,11 +95,8 @@ _gnutls_handshake_sign_data12(gnutls_session_t session,
 	memcpy(dconcat.data+GNUTLS_RANDOM_SIZE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 	memcpy(dconcat.data+GNUTLS_RANDOM_SIZE*2, params->data, params->size);
 
-	if (pk_algo == GNUTLS_PK_RSA_PSS)
-		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
-
-	ret = gnutls_privkey_sign_data(pkey, (gnutls_digest_algorithm_t)hash_algo->id,
-					flags, &dconcat, signature);
+	ret = gnutls_privkey_sign_data2(pkey, sign_algo,
+					0, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -551,9 +537,6 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 {
 	gnutls_datum_t dconcat;
 	gnutls_sign_algorithm_t sign_algo;
-	const mac_entry_st *me;
-	gnutls_pk_algorithm_t pk_algo;
-	unsigned flags = 0;
 	int ret;
 
 	sign_algo = _gnutls_privkey_get_preferred_sign_algo(pkey);
@@ -567,28 +550,16 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 		}
 	}
 
-	pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
-	if (pk_algo == GNUTLS_PK_UNKNOWN)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-
 	gnutls_sign_algorithm_set_client(session, sign_algo);
 
-	me = hash_to_entry(gnutls_sign_get_hash_algorithm(sign_algo));
-	if (me == NULL)
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
-
-	_gnutls_debug_log("sign handshake cert vrfy: picked %s with %s\n",
-			  gnutls_sign_algorithm_get_name(sign_algo),
-			  _gnutls_mac_get_name(me));
+	_gnutls_debug_log("sign handshake cert vrfy: picked %s\n",
+			  gnutls_sign_algorithm_get_name(sign_algo));
 
 	dconcat.data = session->internals.handshake_hash_buffer.data;
 	dconcat.size = session->internals.handshake_hash_buffer.length;
 
-	if (pk_algo == GNUTLS_PK_RSA_PSS)
-		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
-
-	ret = gnutls_privkey_sign_data(pkey, (gnutls_digest_algorithm_t)me->id,
-					flags, &dconcat, signature);
+	ret = gnutls_privkey_sign_data2(pkey, sign_algo,
+					0, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
