@@ -44,13 +44,14 @@
 
 const char *side = "";
 
-#define PRIO_DH "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
-#define PRIO_ECDH "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
-#define PRIO_ECDH_X25519 "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
-#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
-#define PRIO_ECDH_X25519_ECDSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
+#define PRIO_DHE_RSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
+#define PRIO_ECDH "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
+#define PRIO_ECDH_X25519 "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
+#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
+#define PRIO_ECDH_X25519_ECDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
 #define PRIO_ECDH_X25519_EDDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-EDDSA-ED25519:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
-#define PRIO_RSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_RSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_ECDH_RSA_PSS "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-RSA-PSS-SHA256:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
 
 
 #define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
@@ -83,6 +84,36 @@ const char *pkcs3 =
     "Be6/w7WHHspV4fwIOfWUD5G0c++NxED+JwDyc8aU/qVOXVikOXwVTB/2oyatkoBX\n"
     "r8Y+1FUiZGhRCT9dbgICAQA=\n"
     "-----END DH PARAMETERS-----\n";
+
+static unsigned char server_rsa_pss_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIErTCCAuWgAwIBAgIIWTZrqjOeCfIwPQYJKoZIhvcNAQEKMDCgDTALBglghkgB\n"
+	"ZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJYIZIAWUDBAIBogMCASAwFzEVMBMGA1UE\n"
+	"AxMMcnNhLXBzcyBjZXJ0MCAXDTE3MDYwNjA4NDUzMVoYDzk5OTkxMjMxMjM1OTU5\n"
+	"WjAXMRUwEwYDVQQDEwxyc2EtcHNzIGNlcnQwggHSMD0GCSqGSIb3DQEBCjAwoA0w\n"
+	"CwYJYIZIAWUDBAIBoRowGAYJKoZIhvcNAQEIMAsGCWCGSAFlAwQCAaIDAgEgA4IB\n"
+	"jwAwggGKAoIBgQDswF+JIWGcyu+JfjTcM8UDRKaxOuLVY0SODV1uaXPB5ZW9nEX/\n"
+	"FFYIG+ldSKCyz5JF5ThrdvwqO+GVByuvETJdM7N4i8fzGHU8WIsj/CABAV+SaDT/\n"
+	"xb+h1ar9dIehKelBmXQADVFX+xvu9OM5Ft3P/wyO9gWWrR7e/MU/SVzWzMT69+5Y\n"
+	"oE4QkrYYCuEBtlVHDo2mmNWGSQ5tUVIWARgXbqsmj4voWkutE/CiT0+g6GQilMAR\n"
+	"kROElIhO5NH+u3/Lt2wRQO5tEP1JmSoqvrMOmF16txze8qMzvKg1Eafijv9DR4Nc\n"
+	"Cc6s8+g+CZbyODSdAybiyKsC7JCIrQjsnAjgPKKBLuZ1NTmu5liuXO05XsdcBoKD\n"
+	"bKNAQdJCz4uxfqTr4CGFgHQk48Nhmq01EGmpwAeA/BOCB5qsWzqURtMX8EVB1Zdo\n"
+	"3LD5Vwz18mm+ZdeLPlYy3L/FBpVPDbYoZlFgINUNCQvGgvzqGJAQrKR4w8X/Y6HH\n"
+	"9R8sv+U8kNtQI90CAwEAAaNrMGkwDAYDVR0TAQH/BAIwADAUBgNVHREEDTALggls\n"
+	"b2NhbGhvc3QwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDwYDVR0PAQH/BAUDAweAADAd\n"
+	"BgNVHQ4EFgQU1TmyUrkZZn4yMf4asV5OKq8bZ1gwPQYJKoZIhvcNAQEKMDCgDTAL\n"
+	"BglghkgBZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJYIZIAWUDBAIBogMCASADggGB\n"
+	"AGxMPB+Z6pgmWNRw5NjIJgnvJfdMWmQib0II5kdU9I1UybrVRUGpI6tFjIB/pRWU\n"
+	"SiD8wTZpxfTHkRHUn+Wyhh14XOg2Pdad5Ek2XU/QblL2k4kh1sHdOcCRFbDzP5k8\n"
+	"LKIzFcndgnKTRun5368H+NLcXRx/KAi7s9zi4swp9dPxRvNvp8HjQyVhdFi5pK6n\n"
+	"pN1Sw/QD22CE1fRVJ3OYxq4sqCEZANhRv6h/M3AcetGt4LR8ErwuzP1fdtuXeumw\n"
+	"T0deQ2hhSYZmbkk/S+qHA8as6J224ry7Zr5bhB9hr52yum9yC9SjFy0XEV/895jJ\n"
+	"0MDIM33DmPUdnn90Btt+Oq+bgZqTIolifSmcs0sPH10SuxDOnXwkbR44Wu9NbCzx\n"
+	"h3VzhlxAdgcnOYSmJnXKWXog4N1BPFrB4rFqXWFF0Avqs4euK81W4IQ4Sk7fYT7C\n"
+	"tyrDILPqBhN80Q9Me70y7KRsek6yFn4Jd0Lok6vetaeWtSW0929bhU49b1hkdSzt\n"
+	"kw==\n"
+	"-----END CERTIFICATE-----\n";
 
 static unsigned char server_cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
@@ -194,6 +225,10 @@ static unsigned char server_ed25519_cert_pem[] =
 
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
+};
+
+const gnutls_datum_t server_rsa_pss_cert = { server_rsa_pss_cert_pem,
+	sizeof(server_rsa_pss_cert_pem)
 };
 
 const gnutls_datum_t server_key = { server_key_pem,
@@ -415,9 +450,15 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 	gnutls_certificate_set_dh_params(s_certcred, dh_params);
 
-	ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_cert,
-					    &server_key,
-					    GNUTLS_X509_FMT_PEM);
+	ret = 0;
+	if (pk == GNUTLS_PK_RSA_PSS)
+		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_rsa_pss_cert,
+						    &server_key,
+						    GNUTLS_X509_FMT_PEM);
+	else if (pk == GNUTLS_PK_RSA)
+		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_cert,
+						    &server_key,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
@@ -553,9 +594,10 @@ void benchmark_tls(int debug_level, int ciphers)
 		printf
 		    ("Testing key exchanges (RSA/DH bits: %d, EC bits: %d)\n\n",
 		     rsa_bits, ec_bits);
-		test_ciphersuite_kx(PRIO_DH, GNUTLS_PK_UNKNOWN);
-		test_ciphersuite_kx(PRIO_ECDH, GNUTLS_PK_UNKNOWN);
-		test_ciphersuite_kx(PRIO_ECDH_X25519, GNUTLS_PK_UNKNOWN);
+		test_ciphersuite_kx(PRIO_DHE_RSA, GNUTLS_PK_RSA);
+		test_ciphersuite_kx(PRIO_ECDH_RSA_PSS, GNUTLS_PK_RSA_PSS);
+		test_ciphersuite_kx(PRIO_ECDH, GNUTLS_PK_RSA);
+		test_ciphersuite_kx(PRIO_ECDH_X25519, GNUTLS_PK_RSA);
 		test_ciphersuite_kx(PRIO_ECDHE_ECDSA, GNUTLS_PK_ECC);
 		test_ciphersuite_kx(PRIO_ECDH_X25519_ECDSA, GNUTLS_PK_ECC);
 		test_ciphersuite_kx(PRIO_ECDH_X25519_EDDSA, GNUTLS_PK_EDDSA_ED25519);
