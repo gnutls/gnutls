@@ -1148,17 +1148,16 @@ with an 192 bit security level, as well as the enabling of the corresponding
 verification profile.
 
 @item NONE @tab
-Means nothing is enabled.  This disables even protocols and
-compression methods. It should be followed by the
-algorithms to be enabled.
+Means nothing is enabled.  This disables even protocol versions.
+It should be followed by the algorithms to be enabled.
 
 @end multitable
 @caption{Supported initial keywords.}
 @end float
 
 Unless the initial keyword is "NONE" the defaults (in preference
-order) are for TLS protocols TLS 1.2, TLS1.1, TLS1.0; for
-compression NULL; for certificate types X.509.
+order) are for TLS protocols TLS 1.2, TLS1.1, TLS1.0;
+for certificate types X.509.
 In key exchange algorithms when in NORMAL or SECURE levels the
 perfect forward secrecy algorithms take precedence of the other
 protocols.  In all cases all the supported key exchange algorithms
@@ -1184,8 +1183,7 @@ to this document algorithms and protocols are shown in @ref{tab:prio-algorithms}
 to list the supported algorithms in your currently using version use
 @code{gnutls-cli -l}.
 
-To avoid collisions in order to specify a compression algorithm in
-the priority string you have to prefix it with "COMP-", protocol versions
+To avoid collisions in order to specify a protocol version
 with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". 
 All other algorithms don't need a prefix. Each specified keyword (except
 for @emph{special keywords}) can be prefixed with any of the following
@@ -1313,11 +1311,7 @@ will use the latest TLS version record version in client hello.
 @headitem Keyword @tab Description
 
 @item %STATELESS_COMPRESSION @tab
-will disable keeping state across records when compressing. This may
-help to mitigate attacks when compression is used but an attacker
-is in control of input data. This has to be used only when the
-data that are possibly controlled by an attacker are placed in
-separate records.
+ignored; no longer used.
 
 @item %DISABLE_WILDCARDS @tab
 will disable matching wildcards when comparing hostnames
@@ -1404,8 +1398,8 @@ Specifying RSA with AES-128-CBC:
 Specifying the defaults plus ARCFOUR-128:
     "NORMAL:+ARCFOUR-128"
 
-Enabling the 128-bit secure ciphers, while disabling TLS 1.0 and enabling compression:
-    "SECURE128:-VERS-TLS1.0:+COMP-DEFLATE"
+Enabling the 128-bit secure ciphers, while disabling TLS 1.0:
+    "SECURE128:-VERS-TLS1.0"
 
 Enabling the 128-bit and 192-bit secure ciphers, while disabling all TLS versions 
 except TLS 1.2:

@@ -38,8 +38,10 @@ noted otherwise.
 @acronym{TLS} is a layered protocol, and consists of the record
 protocol, the handshake protocol and the alert protocol. The record
 protocol is to serve all other protocols and is above the transport
-layer.  The record protocol offers symmetric encryption, data
-authenticity, and optionally compression.
+layer.  The record protocol offers symmetric encryption, and data
+authenticity@footnote{In early versions of TLS compression was optionally
+available as well. This is no longer the case in recent versions of the
+protocol.}.
 The alert protocol offers some signaling to the other protocols. It
 can help informing the peer for the cause of failures and other error
 conditions.  @xref{The Alert Protocol}, for more information.  The
@@ -73,7 +75,7 @@ by providing callbacks for @acronym{GnuTLS} to access the transport layer
 @cindex record protocol
 
 The record protocol is the secure communications provider. Its purpose
-is to encrypt, authenticate and ---optionally--- compress packets.
+is to encrypt, and authenticate packets.
 The record layer functions can be called at any time after
 the handshake process is finished, when there is need to receive
 or send data. In @acronym{DTLS} however, due to re-transmission
@@ -91,7 +93,7 @@ just after the handshake protocol has finished.
 
 @menu
 * Encryption algorithms used in the record layer::
-* Compression algorithms used in the record layer::
+* Compression algorithms and the record layer::
 * Weaknesses and countermeasures::
 * On Record Padding::
 @end menu
@@ -200,30 +202,15 @@ GCM, is in use.
 @end float
 
 
-@node Compression algorithms used in the record layer
-@subsection Compression algorithms used in the record layer
+@node Compression algorithms and the record layer
+@subsection Compression algorithms and the record layer
 @cindex compression algorithms
 
-The TLS record layer also supports compression.  The algorithms
-implemented in @acronym{GnuTLS} can be found in the table below.
-The included algorithms perform really good when text, or other
-compressible data are to be transferred, but offer nothing on already
-compressed data, such as compressed images, zipped archives etc.
-These compression algorithms, may be useful in high bandwidth TLS
-tunnels, and in cases where network usage has to be minimized. It
-should be noted however that compression increases latency.
-
-The record layer compression in @acronym{GnuTLS} is implemented based
-on @xcite{RFC3749}. The supported algorithms are shown below.
-
-@showenumdesc{gnutls_compression_method_t,Supported compression algorithms}
-
-Note that compression enables attacks such as traffic analysis, or even
-plaintext recovery under certain circumstances. To avoid some of these
-attacks GnuTLS allows each record to be compressed independently (i.e.,
-stateless compression), by using the "%STATELESS_COMPRESSION" priority string,
-in order to be used in cases where the attacker controlled data are
-pt in separate records.
+In early versions of TLS the record layer supported compression. However,
+that proved to be problematic in many ways, and enabled several attacks
+based on traffic analysis on the transported data. For that newer versions of the protocol no longer
+offer compression, and @acronym{GnuTLS} since 3.6.0 no longer implements any
+support for compression.
 
 @node Weaknesses and countermeasures
 @subsection Weaknesses and countermeasures

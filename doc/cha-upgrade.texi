@@ -182,3 +182,21 @@ however, several deprecated functions were removed, and are listed below.
 @tab @funcref{gnutls_privkey_sign_hash} with the flag GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
 
 @end multitable
+
+@heading Upgrading to 3.6.x from 3.5.x
+
+GnuTLS 3.6.x is source and binary compatible with GnuTLS 3.5.x releases;
+however, there are minor differences, listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item The priority string "+COMP" are a no-op
+@tab Compression will no longer be available.
+
+@item The compression-related functions are deprecated
+@tab No longer use @funcintref{gnutls_compression_get},
+@funcintref{gnutls_compression_get_name}, @funcintref{gnutls_compression_list},
+and @funcintref{gnutls_compression_get_id}.
+
+@end multitable
