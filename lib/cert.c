@@ -888,6 +888,7 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	gnutls_datum_t test = {(void*)TEST_TEXT, sizeof(TEST_TEXT)-1};
 	gnutls_datum_t sig = {NULL, 0};
 	int pk, pk2, ret;
+	unsigned sign_flags = 0;
 
 	if (res->flags & GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH)
 		return 0;
@@ -899,8 +900,18 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	    gnutls_privkey_get_pk_algorithm(res->pkey[res->ncerts - 1],
 					    NULL);
 
-	if (pk2 != pk) {
+	if (GNUTLS_PK_IS_RSA(pk) && GNUTLS_PK_IS_RSA(pk2)) {
+		if (pk2 == GNUTLS_PK_RSA_PSS && pk == GNUTLS_PK_RSA) {
+			_gnutls_debug_log("you cannot mix an RSA-PSS key with an RSA certificate\n");
+			return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
+		}
+
+		if (pk == GNUTLS_PK_RSA_PSS)
+			sign_flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+	} else if (pk2 != pk) {
 		gnutls_assert();
+		_gnutls_debug_log("key is %s, certificate is %s\n", gnutls_pk_get_name(pk2),
+			gnutls_pk_get_name(pk));
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
 
@@ -908,7 +919,7 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	 * because we cannot always obtain the parameters from the abstract
 	 * keys (e.g. PKCS #11). */
 	ret = gnutls_privkey_sign_data(res->pkey[res->ncerts - 1],
-		GNUTLS_DIG_SHA256, 0, &test, &sig);
+		GNUTLS_DIG_SHA256, sign_flags, &test, &sig);
 	if (ret < 0) {
 		/* for some reason we couldn't sign that. That shouldn't have
 		 * happened, but since it did, report the issue and do not
