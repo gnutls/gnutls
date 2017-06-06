@@ -270,13 +270,14 @@ void gnutls_session_force_valid(gnutls_session_t session)
 char *gnutls_session_get_desc(gnutls_session_t session)
 {
 	gnutls_kx_algorithm_t kx;
-	const char *kx_str;
+	const char *kx_str, *sign_str;
 	unsigned type;
-	char kx_name[32];
+	char kx_name[64];
 	char proto_name[32];
 	const char *curve_name = NULL;
 	unsigned dh_bits = 0;
 	unsigned mac_id;
+	unsigned sign_algo;
 	char *desc;
 
 	if (session->internals.initial_negotiation_completed == 0)
@@ -296,20 +297,40 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 #endif
 	}
 
+	/* Key exchange    - Signature algorithm */
+	/* DHE-3072        - RSA-PSS-2048        */
+	/* ECDHE-SECP256R1 - ECDSA-SECP256R1     */
+
+	sign_algo = gnutls_sign_algorithm_get(session);
+	sign_str = gnutls_sign_get_name(sign_algo);
+
 	kx_str = gnutls_kx_get_name(kx);
 	if (kx_str) {
-		if (curve_name != NULL)
-			snprintf(kx_name, sizeof(kx_name), "%s-%s",
-				 kx_str, curve_name);
-		else if (dh_bits != 0)
-			snprintf(kx_name, sizeof(kx_name), "%s-%u",
-				 kx_str, dh_bits);
-		else
-			snprintf(kx_name, sizeof(kx_name), "%s",
+		if (kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ECDHE_RSA || 
+		    kx == GNUTLS_KX_ECDHE_PSK) {
+			if (sign_str)
+				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
+					 curve_name, sign_str);
+			else
+				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)",
+					 curve_name);
+		} else if (kx == GNUTLS_KX_DHE_DSS || kx == GNUTLS_KX_DHE_RSA || 
+		    kx == GNUTLS_KX_DHE_PSK) {
+			if (sign_str)
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%u)-(%s)", dh_bits, sign_str);
+			else
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%u)", dh_bits);
+		} else if (kx == GNUTLS_KX_RSA) {
+			/* Possible enhancement: include the certificate bits */
+			snprintf(kx_name, sizeof(kx_name), "(RSA)");
+		} else {
+			snprintf(kx_name, sizeof(kx_name), "(%s)",
 				 kx_str);
+		}
 	} else {
-		strcpy(kx_name, "NULL");
+		strcpy(kx_name, "(NULL)");
 	}
+
 
 	type = gnutls_certificate_type_get(session);
 	if (type == GNUTLS_CRT_X509)
@@ -329,13 +350,13 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	mac_id = gnutls_mac_get(session);
 	if (mac_id == GNUTLS_MAC_AEAD) { /* no need to print */
 		snprintf(desc, DESC_SIZE,
-			 "(%s)-(%s)-(%s)",
+			 "(%s)-%s-(%s)",
 			 proto_name,
 			 kx_name,
 			 gnutls_cipher_get_name(gnutls_cipher_get(session)));
 	} else {
 		snprintf(desc, DESC_SIZE,
-			 "(%s)-(%s)-(%s)-(%s)",
+			 "(%s)-%s-(%s)-(%s)",
 			 proto_name,
 			 kx_name,
 			 gnutls_cipher_get_name(gnutls_cipher_get(session)),
