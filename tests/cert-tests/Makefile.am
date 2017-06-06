@@ -74,7 +74,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/mem-leak.p12 data/alt-chain-new-ca.pem data/alt-chain-old-ca.pem \
 	data/alt-chain.pem data/pkcs7-chain.pem data/pkcs7-chain-root.pem \
 	data/pkcs7-chain-endcert-key.pem data/cert-rsa-pss.pem data/openssl-invalid-time-format.pem \
-	data/cert-eddsa.pem data/pubkey-eddsa.pem
+	data/cert-eddsa.pem data/pubkey-eddsa.pem data/pkcs7-eddsa-sig.p7s
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -82,7 +82,7 @@ dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
 	pkcs7-constraints2 certtool-long-oids pkcs7-cat cert-sanity cert-critical \
 	pkcs12 certtool-crl-decoding pkcs12-encode pkcs12-corner-cases inhibit-anypolicy \
-	smime cert-time alt-chain pkcs7-list-sign
+	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa
 
 if WANT_TEST_SUITE
 dist_check_SCRIPTS += provable-dh-default

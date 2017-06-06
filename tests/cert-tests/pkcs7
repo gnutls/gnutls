@@ -142,7 +142,11 @@ fi
 # Test cert combination
 
 FILE="p7-combined"
-cat "${srcdir}/../certs"/cert*.pem >"${OUTFILE2}"
+
+rm -f "${OUTFILE2}"
+for i in cert-ecc256.pem cert-ecc521.pem cert-ecc384.pem cert-ecc.pem cert-rsa-2432.pem;do
+	cat "${srcdir}/../certs"/$i >>"${OUTFILE2}"
+done
 ${VALGRIND} "${CERTTOOL}" --p7-generate --load-certificate "${OUTFILE2}" >"${OUTFILE}"
 rc=$?
 
