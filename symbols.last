@@ -551,7 +551,9 @@ gnutls_privkey_import_x509_raw@GNUTLS_3_4
 gnutls_privkey_init@GNUTLS_3_4
 gnutls_privkey_set_flags@GNUTLS_3_4
 gnutls_privkey_set_pin_function@GNUTLS_3_4
+gnutls_privkey_sign_data2@GNUTLS_3_4
 gnutls_privkey_sign_data@GNUTLS_3_4
+gnutls_privkey_sign_hash2@GNUTLS_3_4
 gnutls_privkey_sign_hash@GNUTLS_3_4
 gnutls_privkey_status@GNUTLS_3_4
 gnutls_privkey_verify_params@GNUTLS_3_4

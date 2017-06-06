@@ -266,8 +266,6 @@ const asn1_static_node pkix_asn1_tab[] = {
   { "privateKey", 1073741831, NULL },
   { "attributes", 536895490, "Attributes"},
   { NULL, 4104, "0"},
-  { "pkcs-8-Attributes", 1610612751, NULL },
-  { NULL, 2, "Attribute"},
   { "pkcs-8-EncryptedPrivateKeyInfo", 1610612741, NULL },
   { "encryptionAlgorithm", 1073741826, "AlgorithmIdentifier"},
   { "encryptedData", 2, "pkcs-8-EncryptedData"},
