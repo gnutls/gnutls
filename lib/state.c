@@ -967,7 +967,7 @@ gnutls_session_channel_binding(gnutls_session_t session,
  * gnutls_ecc_curve_get:
  * @session: is a #gnutls_session_t type.
  *
- * Returns the currently used elliptic curve. Only valid
+ * Returns the currently used elliptic curve for key exchange. Only valid
  * when using an elliptic curve ciphersuite.
  *
  * Returns: the currently used curve, a #gnutls_ecc_curve_t
