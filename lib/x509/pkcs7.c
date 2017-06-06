@@ -2385,7 +2385,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	if (flags & GNUTLS_PKCS7_EMBED_DATA && data->data) {	/* embed data */
+	if ((flags & GNUTLS_PKCS7_EMBED_DATA) && data->data) {	/* embed data */
 		ret =
 		    _gnutls_x509_write_string(pkcs7->signed_data,
 				     "encapContentInfo.eContent", data,
