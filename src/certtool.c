@@ -3841,15 +3841,17 @@ void pkcs7_info(common_info_st *cinfo, unsigned display_data)
 			app_exit(1);
 		}
 	} else {
-		ret = gnutls_pkcs7_print(pkcs7, GNUTLS_CRT_PRINT_FULL, &str);
-		if (ret < 0) {
-			fprintf(stderr, "printing error: %s\n",
-				gnutls_strerror(ret));
-			app_exit(1);
-		}
+		if (outcert_format == GNUTLS_X509_FMT_PEM) {
+			ret = gnutls_pkcs7_print(pkcs7, GNUTLS_CRT_PRINT_FULL, &str);
+			if (ret < 0) {
+				fprintf(stderr, "printing error: %s\n",
+					gnutls_strerror(ret));
+				app_exit(1);
+			}
 
-		fprintf(outfile, "%s", str.data);
-		gnutls_free(str.data);
+			fprintf(outfile, "%s", str.data);
+			gnutls_free(str.data);
+		}
 
 		size = lbuffer_size;
 		ret =
