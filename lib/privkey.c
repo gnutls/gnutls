@@ -1131,6 +1131,9 @@ privkey_sign_and_hash_data(gnutls_privkey_t signer,
 	gnutls_datum_t digest;
 	const mac_entry_st *me;
 
+	if (gnutls_pk_to_sign(params->pk, params->dig) == GNUTLS_SIGN_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm))
 		return privkey_sign_raw_data(signer, data, signature, params);
 
