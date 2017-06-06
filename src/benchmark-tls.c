@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,9 +46,10 @@ const char *side = "";
 
 #define PRIO_DH "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
 #define PRIO_ECDH "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
-#define PRIO_ECDHX "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
+#define PRIO_ECDH_X25519 "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
 #define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
-#define PRIO_ECDHX_ECDSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
+#define PRIO_ECDH_X25519_ECDSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
+#define PRIO_ECDH_X25519_EDDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-EDDSA-ED25519:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
 #define PRIO_RSA "NONE:+VERS-TLS1.2:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 
@@ -171,6 +173,25 @@ static unsigned char server_ecc_cert_pem[] =
     "cBE=\n"
     "-----END CERTIFICATE-----\n";
 
+static unsigned char server_ed25519_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MC4CAQAwBQYDK2VwBCIEIOXDJXOU6J6XdXx4WfcyPILPYJDH5bRfm9em+DYMkllw\n"
+	"-----END PRIVATE KEY-----\n";
+
+static unsigned char server_ed25519_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBwTCCAWagAwIBAgIIWTZasQWGNVEwCgYIKoZIzj0EAwIwfTELMAkGA1UEBhMC\n"
+	"QkUxDzANBgNVBAoTBkdudVRMUzElMCMGA1UECxMcR251VExTIGNlcnRpZmljYXRl\n"
+	"IGF1dGhvcml0eTEPMA0GA1UECBMGTGV1dmVuMSUwIwYDVQQDExxHbnVUTFMgY2Vy\n"
+	"dGlmaWNhdGUgYXV0aG9yaXR5MCAXDTE3MDYwNjA3MzMwNVoYDzk5OTkxMjMxMjM1\n"
+	"OTU5WjAZMRcwFQYDVQQDEw5FZDI1NTE5IHNpZ25lcjAqMAUGAytlcAMhAPMF++lz\n"
+	"LIzfyCX0v0B7LIabZWZ/dePW9HexIbW3tYmHo2EwXzAMBgNVHRMBAf8EAjAAMA8G\n"
+	"A1UdDwEB/wQFAwMHgAAwHQYDVR0OBBYEFONSSnOdGLzpv3xNcci8ZiKKqzyqMB8G\n"
+	"A1UdIwQYMBaAFPC0gf6YEr+1KLlkQAPLzB9mTigDMAoGCCqGSM49BAMCA0kAMEYC\n"
+	"IQDHGfSgM44DVZfrP5CF8LSNlFN55ti3Z69YJ0SK8Fy9eQIhAN2UKeX3l8A9Ckcm\n"
+	"7barRoh+qx7ZVYpe+5w3JYuxy16w\n"
+	"-----END CERTIFICATE-----\n";
+
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
 };
@@ -185,6 +206,14 @@ const gnutls_datum_t server_ecc_cert = { server_ecc_cert_pem,
 
 const gnutls_datum_t server_ecc_key = { server_ecc_key_pem,
 	sizeof(server_ecc_key_pem)
+};
+
+const gnutls_datum_t server_ed25519_cert = { server_ed25519_cert_pem,
+	sizeof(server_ed25519_cert_pem)
+};
+
+const gnutls_datum_t server_ed25519_key = { server_ed25519_key_pem,
+	sizeof(server_ed25519_key_pem)
 };
 
 char buffer[64 * 1024];
@@ -347,7 +376,7 @@ double calc_sstdev(unsigned int *diffs, unsigned int diffs_size,
 unsigned int diffs[32 * 1024];
 unsigned int diffs_size = 0;
 
-static void test_ciphersuite_kx(const char *cipher_prio)
+static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 {
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
@@ -395,9 +424,15 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 		exit(1);
 	}
 
-	ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_ecc_cert,
-					    &server_ecc_key,
-					    GNUTLS_X509_FMT_PEM);
+	ret = 0;
+	if (pk == GNUTLS_PK_ECDSA)
+		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_ecc_cert,
+						    &server_ecc_key,
+						    GNUTLS_X509_FMT_PEM);
+	else if (pk == GNUTLS_PK_EDDSA_ED25519)
+		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_ed25519_cert,
+						    &server_ed25519_key,
+						    GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
@@ -516,14 +551,15 @@ void benchmark_tls(int debug_level, int ciphers)
 		test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
 	} else {
 		printf
-		    ("Testing key exchanges (RSA/DH bits: %d, EC bits: %d)\n",
+		    ("Testing key exchanges (RSA/DH bits: %d, EC bits: %d)\n\n",
 		     rsa_bits, ec_bits);
-		test_ciphersuite_kx(PRIO_DH);
-		test_ciphersuite_kx(PRIO_ECDH);
-		test_ciphersuite_kx(PRIO_ECDHX);
-		test_ciphersuite_kx(PRIO_ECDHE_ECDSA);
-		test_ciphersuite_kx(PRIO_ECDHX_ECDSA);
-		test_ciphersuite_kx(PRIO_RSA);
+		test_ciphersuite_kx(PRIO_DH, GNUTLS_PK_UNKNOWN);
+		test_ciphersuite_kx(PRIO_ECDH, GNUTLS_PK_UNKNOWN);
+		test_ciphersuite_kx(PRIO_ECDH_X25519, GNUTLS_PK_UNKNOWN);
+		test_ciphersuite_kx(PRIO_ECDHE_ECDSA, GNUTLS_PK_ECC);
+		test_ciphersuite_kx(PRIO_ECDH_X25519_ECDSA, GNUTLS_PK_ECC);
+		test_ciphersuite_kx(PRIO_ECDH_X25519_EDDSA, GNUTLS_PK_EDDSA_ED25519);
+		test_ciphersuite_kx(PRIO_RSA, GNUTLS_PK_RSA);
 	}
 
 	gnutls_global_deinit();
