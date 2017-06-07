@@ -38,6 +38,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
 	exit 77
 fi
 
+
 # Test certificate in draft-ietf-curdle-pkix-04
 ${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/cert-eddsa.pem" --outfile "${TMPFILE}"
 rc=$?
@@ -126,9 +127,22 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-
-
 rm -f "${TMPFILE}"
 rm -f "${KEYFILE}"
+
+
+. ${srcdir}/../scripts/common.sh
+check_for_datefudge
+
+# Test certificate chain using Ed25519
+datefudge "2017-7-6" \
+${VALGRIND} "${CERTTOOL}" --verify-chain --infile ${srcdir}/data/chain-eddsa.pem
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "There was an issue verifying the Ed25519 chain"
+	exit 1
+fi
+
 
 exit 0
