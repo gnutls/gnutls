@@ -2,10 +2,10 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Bug numbers referenced in this log correspond to bug numbers at our issue tracker,
 available at https://gitlab.com/gnutls/gnutls/issues
 Copyright (C) 2000-2016 Free Software Foundation, Inc.
-Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
+Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.5.13 (unreleased)
+* Version 3.5.13 (released 2017-06-07)
 
 ** libgnutls: fixed issue with AES-GCM in-place encryption and decryption in
    aarch64. Resolves gitlab issue #204.
@@ -14,11 +14,11 @@ See the end for copying conditions.
    TLS extension. The field is not used by GnuTLS nor is made available to
    calling applications. That addresses a null pointer dereference on server
    side caused by packets containing the ResponseID field. Reported
-   by Hubert Kario.
+   by Hubert Kario. [GNUTLS-SA-2017-4]
 
 ** libgnutls: tolerate certificates which do not have strict DER time encoding.
-   It is possible using 3rd party tools to generate certificates with the time fields
-   that do not conform to DER requirements. Since 3.4.x these certificates are rejected
+   It is possible using 3rd party tools to generate certificates with time fields
+   that do not conform to DER requirements. Since 3.4.x these certificates were rejected
    and cannot be used with GnuTLS, however that caused problems with existing private
    certificate infrastructures, which were relying on such certificates (see gitlab
    issue #196). Tolerate reading and using these certificates.
