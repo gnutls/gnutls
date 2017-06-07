@@ -362,8 +362,6 @@ pkcs-8-PrivateKeyInfo ::= SEQUENCE {
   privateKey OCTET STRING,
   attributes [0] Attributes OPTIONAL }
 
-pkcs-8-Attributes ::= SET OF Attribute
-
 -- Encrypted private-key information syntax
 
 pkcs-8-EncryptedPrivateKeyInfo ::= SEQUENCE {
