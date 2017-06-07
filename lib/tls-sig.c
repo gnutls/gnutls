@@ -178,7 +178,7 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 	*sign_algo = _gnutls_session_get_sign_algo(session, cert, 0);
 	if (*sign_algo == GNUTLS_SIGN_UNKNOWN) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+		return GNUTLS_E_UNWANTED_ALGORITHM;
 	}
 
 	gnutls_sign_algorithm_set_server(session, *sign_algo);
@@ -552,7 +552,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 		sign_algo = _gnutls_session_get_sign_algo(session, cert, 1);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+			return GNUTLS_E_UNWANTED_ALGORITHM;
 		}
 	}
 
