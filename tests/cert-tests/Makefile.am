@@ -66,7 +66,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/openpgp-invalid4.pub data/openpgp-invalid5.pub \
 	data/openpgp-invalid5.pub data/openpgp-invalid6.pub \
 	data/openpgp-invalid7.pub data/openpgp-invalid8.pub \
-	data/key-corpus-rc2-1.p12 data/key-corpus-rc2-2.p12 data/key-corpus-rc2-3.p12
+	data/key-corpus-rc2-1.p12 data/key-corpus-rc2-2.p12 data/key-corpus-rc2-3.p12 \
 	data/pkcs7-chain.pem data/pkcs7-chain-root.pem \
 	data/pkcs7-chain-endcert-key.pem data/openssl-invalid-time-format.pem
 
