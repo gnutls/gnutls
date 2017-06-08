@@ -35,6 +35,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <string.h>
 
 #include "pss.h"
@@ -148,6 +149,9 @@ pss_verify_mgf1(const mpz_t m, size_t bits,
   if (key_size < hash->digest_size + salt_length + 2)
     goto cleanup;
 
+  if (mpz_sizeinbase(m, 2) > bits)
+    goto cleanup;
+
   nettle_mpz_get_str_256(key_size, em, m);
 
   /* Check the trailer field.  */
@@ -157,10 +161,10 @@ pss_verify_mgf1(const mpz_t m, size_t bits,
   /* Extract H.  */
   h = em + (key_size - hash->digest_size - 1);
 
-  /* Check if the leftmost 8 * emLen - emBits bits of the leftmost
-   * octet of EM are all equal to zero. */
-  if ((*em & ~pss_masks[(8 * key_size - bits)]) != 0)
-    goto cleanup;
+  /* The leftmost 8 * emLen - emBits bits of the leftmost octet of EM
+   * must all equal to zero. Always true here, thanks to the above
+   * check on the bit size of m. */
+  assert((*em & ~pss_masks[(8 * key_size - bits)]) == 0);
 
   /* Compute dbMask.  */
   hash->init(state);
