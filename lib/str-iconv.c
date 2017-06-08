@@ -66,7 +66,7 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 {
 	int ret;
 	size_t dstlen;
-	uint8_t *src;
+	void *src;
 	uint8_t *tmp_dst = NULL;
 	uint8_t *dst = NULL;
 
