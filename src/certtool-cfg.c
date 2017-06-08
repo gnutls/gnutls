@@ -242,7 +242,7 @@ void cfg_init(void)
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       do { \
-	if (val && !strcmp(val->pzName, name)==0) \
+	if (val && strcmp(val->pzName, name)!=0) \
 	  continue; \
 	s_name[i] = strdup(val->v.strVal); \
 	i++; \
@@ -264,7 +264,7 @@ void cfg_init(void)
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       do { \
-	if (val && !strcmp(val->pzName, name)==0) \
+	if (val && strcmp(val->pzName, name)!=0) \
 	  continue; \
 	len = strlen(val->v.strVal); \
 	if (sizeof(str) > (unsigned)len) { \
