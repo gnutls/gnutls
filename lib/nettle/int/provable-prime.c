@@ -1191,7 +1191,7 @@ st_provable_prime(mpz_t p,
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, bits - 1);	/* r = 2^(bits-1) */
 
-	mpz_mod_2exp(tmp, tmp, bits - 1);
+	mpz_fdiv_r_2exp(tmp, tmp, bits - 1);
 	mpz_add(tmp, tmp, r);	/* tmp = x */
 
 	/* Generate candidate prime c in [2^(bits-1), 2^bits] */
@@ -1212,7 +1212,7 @@ st_provable_prime(mpz_t p,
 	if (mpz_cmp(c, r) > 0) {
 		/* t = 2^(bits-1)/2c0 */
 
-		mpz_div_2exp(r, r, 1); /* r = 2^(bits-1) */
+		mpz_fdiv_q_2exp(r, r, 1); /* r = 2^(bits-1) */
 		mpz_cdiv_q(t, r, dc0);
 
 		/* c = t* 2c0 + 1 */

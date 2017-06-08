@@ -155,7 +155,7 @@ _dsa_generate_dss_pq(struct dsa_params *params,
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, p_bits - 1);
 
-	mpz_mod_2exp(tmp, tmp, p_bits - 1);
+	mpz_fdiv_r_2exp(tmp, tmp, p_bits - 1);
 	mpz_add(tmp, tmp, r);
 
 	/* Generate candidate prime p in [2^(bits-1), 2^bits] */
