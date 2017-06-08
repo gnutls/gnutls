@@ -1535,21 +1535,6 @@ const char *gnutls_cipher_suite_info(size_t idx,
 	return cs_algorithms[idx].name + sizeof("GNU") - 1;
 }
 
-
-static inline int _gnutls_cipher_suite_is_ok(const uint8_t suite[2])
-{
-	size_t ret;
-	const char *name = NULL;
-
-	CIPHER_SUITE_ALG_LOOP(name = p->name, suite);
-	if (name != NULL)
-		ret = 0;
-	else
-		ret = 1;
-	return ret;
-
-}
-
 /*-
  * _gnutls_supported_ciphersuites: 
  * @session: a TLS session
