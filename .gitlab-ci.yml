@@ -74,6 +74,9 @@ abi-coverage/Fedora:
     expire_in: 1 week
     when: always
     paths:
+      - tests/*.log
+      - tests/*/*.log
+      - tests/suite/*/*.log
       - GnuTLS*-coverage/*
 
 minimal/Fedora/x86_64:
