@@ -64,6 +64,8 @@ void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
 {
 	gnutls_pk_params_clear(&key->params);
 	gnutls_pk_params_release(&key->params);
+	/* avoid re-use of fields which may have had some sensible value */
+	memset(&key->params, 0, sizeof(key->params));
 	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 	key->key = ASN1_TYPE_EMPTY;
 }
