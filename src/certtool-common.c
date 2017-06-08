@@ -682,7 +682,7 @@ gnutls_pubkey_t load_public_key_or_import(int mand,
 		gnutls_pubkey_deinit(pubkey);
 		pubkey = load_pubkey(0, info);
 		if (pubkey == NULL && mand) {
-			fprintf(stderr, "You must specify --load-privkey\n");
+			fprintf(stderr, "Could not determine the public key for the operation.\nYou must specify --load-privkey or --load-pubkey if missing.\n");
 			exit(1);
 		}
 	}
