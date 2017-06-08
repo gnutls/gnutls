@@ -92,7 +92,7 @@ struct nettle_cipher_st {
 
 struct nettle_cipher_ctx {
 	const struct nettle_cipher_st *cipher;
-	uint8_t *ctx_ptr;
+	void *ctx_ptr; /* always 16-aligned */
 	uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
 	unsigned iv_size;
 
@@ -517,6 +517,7 @@ wrap_nettle_cipher_init(gnutls_cipher_algorithm_t algo, void **_ctx,
 	ptrdiff_t cur_alignment;
 	int idx = -1;
 	unsigned i;
+	uint8_t *ctx_ptr;
 
 	for (i=0;i<sizeof(builtin_ciphers)/sizeof(builtin_ciphers[0]);i++) {
 		if (algo == builtin_ciphers[i].algo) {
@@ -538,12 +539,13 @@ wrap_nettle_cipher_init(gnutls_cipher_algorithm_t algo, void **_ctx,
 	}
 
 	ctx->enc = enc;
-	ctx->ctx_ptr = ((uint8_t*)ctx) + sizeof(*ctx);
+	ctx_ptr = ((uint8_t*)ctx) + sizeof(*ctx);
 
-	cur_alignment = ((ptrdiff_t)ctx->ctx_ptr) % 16;
+	cur_alignment = ((ptrdiff_t)ctx_ptr) % 16;
 	if (cur_alignment > 0)
-		ctx->ctx_ptr += 16 - cur_alignment;
+		ctx_ptr += 16 - cur_alignment;
 
+	ctx->ctx_ptr = ctx_ptr;
 	ctx->cipher = &builtin_ciphers[idx];
 
 	*_ctx = ctx;
