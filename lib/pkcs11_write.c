@@ -279,6 +279,19 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	return gnutls_pkcs11_copy_x509_privkey2(token_url, key, label, NULL, key_usage, flags);
 }
 
+static void skip_leading_zeros(gnutls_datum_t *d)
+{
+	unsigned nr = 0;
+
+	while(nr < d->size && d->data[nr] == 0)
+		nr++;
+	if (nr > 0) {
+		d->size -= nr;
+		if (d->size > 0)
+			memmove(d->data, &d->data[nr], d->size);
+	}
+}
+
 /**
  * gnutls_pkcs11_copy_x509_privkey2:
  * @token_url: A PKCS #11 URL specifying a token
@@ -447,6 +460,15 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 			type = CKK_RSA;
 
+			skip_leading_zeros(&m);
+			skip_leading_zeros(&e);
+			skip_leading_zeros(&d);
+			skip_leading_zeros(&p);
+			skip_leading_zeros(&q);
+			skip_leading_zeros(&u);
+			skip_leading_zeros(&exp1);
+			skip_leading_zeros(&exp2);
+
 			a[a_val].type = CKA_MODULUS;
 			a[a_val].value = m.data;
 			a[a_val].value_len = m.size;
@@ -501,6 +523,12 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 			type = CKK_DSA;
 
+			skip_leading_zeros(&p);
+			skip_leading_zeros(&q);
+			skip_leading_zeros(&g);
+			skip_leading_zeros(&y);
+			skip_leading_zeros(&x);
+
 			a[a_val].type = CKA_PRIME;
 			a[a_val].value = p.data;
 			a[a_val].value_len = p.size;
@@ -534,8 +562,8 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 			}
 
 			ret =
-			    _gnutls_mpi_dprint_lz(key->params.
-						  params[ECC_K], &x);
+			    _gnutls_mpi_dprint(key->params.
+						params[ECC_K], &x);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
