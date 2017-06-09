@@ -117,7 +117,7 @@ subjectPublicKeyInfo object.
 
 To export the key-specific parameters, or obtain a unique key ID the following functions are provided.
 
-@showfuncD{gnutls_pubkey_export_rsa_raw,gnutls_pubkey_export_dsa_raw,gnutls_pubkey_export_ecc_raw,gnutls_pubkey_export_ecc_x962}
+@showfuncD{gnutls_pubkey_export_rsa_raw2,gnutls_pubkey_export_dsa_raw2,gnutls_pubkey_export_ecc_raw2,gnutls_pubkey_export_ecc_x962}
 
 @node Abstract private keys
 @subsection Private keys
@@ -144,6 +144,11 @@ This allows for a simple extensibility API without
 resorting to @acronym{PKCS} #11.
 
 @showfuncdesc{gnutls_privkey_import_ext3}
+
+On the private keys where exporting of parameters is possible (i.e.,
+software keys), the following functions are also available.
+
+@showfuncC{gnutls_privkey_export_rsa_raw2,gnutls_privkey_export_dsa_raw2,gnutls_privkey_export_ecc_raw2}
 
 @node Operations
 @subsection Operations
