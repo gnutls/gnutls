@@ -62,6 +62,39 @@ gnutls_privkey_export_rsa_raw(gnutls_privkey_t key,
 				    gnutls_datum_t * e1,
 				    gnutls_datum_t * e2)
 {
+	return gnutls_privkey_export_rsa_raw2(key, m, e, d, p, q, u, e1, e2, 0);
+}
+
+/**
+ * gnutls_privkey_export_rsa_raw2:
+ * @key: Holds the certificate
+ * @m: will hold the modulus
+ * @e: will hold the public exponent
+ * @d: will hold the private exponent
+ * @p: will hold the first prime (p)
+ * @q: will hold the second prime (q)
+ * @u: will hold the coefficient
+ * @e1: will hold e1 = d mod (p-1)
+ * @e2: will hold e2 = d mod (q-1)
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the RSA private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_export_rsa_raw2(gnutls_privkey_t key,
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u,
+				    gnutls_datum_t * e1,
+				    gnutls_datum_t * e2,
+				    unsigned int flags)
+{
 gnutls_pk_params_st params;
 int ret;
 
@@ -76,7 +109,7 @@ int ret;
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_params_get_rsa_raw(&params, m, e, d, p, q, u, e1, e2);
+	ret = _gnutls_params_get_rsa_raw(&params, m, e, d, p, q, u, e1, e2, flags);
 
 	gnutls_pk_params_release(&params);
 
@@ -106,6 +139,33 @@ gnutls_privkey_export_dsa_raw(gnutls_privkey_t key,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
 			     gnutls_datum_t * x)
 {
+	return gnutls_privkey_export_dsa_raw2(key, p, q, g, y, x, 0);
+}
+
+/**
+ * gnutls_privkey_export_dsa_raw2:
+ * @key: Holds the public key
+ * @p: will hold the p
+ * @q: will hold the q
+ * @g: will hold the g
+ * @y: will hold the y
+ * @x: will hold the x
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the DSA private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_export_dsa_raw2(gnutls_privkey_t key,
+			     gnutls_datum_t * p, gnutls_datum_t * q,
+			     gnutls_datum_t * g, gnutls_datum_t * y,
+			     gnutls_datum_t * x, unsigned int flags)
+{
 gnutls_pk_params_st params;
 int ret;
 
@@ -120,7 +180,7 @@ int ret;
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_params_get_dsa_raw(&params, p, q, g, y, x);
+	ret = _gnutls_params_get_dsa_raw(&params, p, q, g, y, x, flags);
 
 	gnutls_pk_params_release(&params);
 
@@ -151,6 +211,34 @@ gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
 				       gnutls_datum_t * y,
 				       gnutls_datum_t * k)
 {
+	return gnutls_privkey_export_ecc_raw2(key, curve, x, y, k, 0);
+}
+
+/**
+ * gnutls_privkey_export_ecc_raw2:
+ * @key: Holds the public key
+ * @curve: will hold the curve
+ * @x: will hold the x coordinate
+ * @y: will hold the y coordinate
+ * @k: will hold the private key
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the ECC private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_export_ecc_raw2(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned int flags)
+{
 gnutls_pk_params_st params;
 int ret;
 
@@ -165,7 +253,7 @@ int ret;
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_params_get_ecc_raw(&params, curve, x, y, k);
+	ret = _gnutls_params_get_ecc_raw(&params, curve, x, y, k, flags);
 
 	gnutls_pk_params_release(&params);
 

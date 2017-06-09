@@ -81,19 +81,21 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 				    gnutls_datum_t * d, gnutls_datum_t * p,
 				    gnutls_datum_t * q, gnutls_datum_t * u,
 				    gnutls_datum_t * e1,
-				    gnutls_datum_t * e2);
+				    gnutls_datum_t * e2,
+				    unsigned int flags);
 
 int
 _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
-			     gnutls_datum_t * x);
+			     gnutls_datum_t * x, unsigned int flags);
 
 int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 				       gnutls_ecc_curve_t * curve,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
-				       gnutls_datum_t * k);
+				       gnutls_datum_t * k,
+				       unsigned int flags);
 
 int pk_prepare_hash(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 		    gnutls_datum_t * output);

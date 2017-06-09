@@ -1405,7 +1405,7 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_params_get_ecc_raw(&key->params, curve, x, y, k);
+	return _gnutls_params_get_ecc_raw(&key->params, curve, x, y, k, 0);
 }
 
 /**
@@ -1431,7 +1431,7 @@ gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey_t key,
 				   gnutls_datum_t * d, gnutls_datum_t * p,
 				   gnutls_datum_t * q, gnutls_datum_t * u)
 {
-	return _gnutls_params_get_rsa_raw(&key->params, m, e, d, p, q, u, NULL, NULL);
+	return _gnutls_params_get_rsa_raw(&key->params, m, e, d, p, q, u, NULL, NULL, 0);
 }
 
 /**
@@ -1463,7 +1463,7 @@ gnutls_x509_privkey_export_rsa_raw2(gnutls_x509_privkey_t key,
 				    gnutls_datum_t * e1,
 				    gnutls_datum_t * e2)
 {
-	return _gnutls_params_get_rsa_raw(&key->params, m, e, d, p, q, u, e1, e2);
+	return _gnutls_params_get_rsa_raw(&key->params, m, e, d, p, q, u, e1, e2, 0);
 }
 
 /**
@@ -1488,7 +1488,7 @@ gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
 				   gnutls_datum_t * g, gnutls_datum_t * y,
 				   gnutls_datum_t * x)
 {
-	return _gnutls_params_get_dsa_raw(&key->params, p, q, g, y, x);
+	return _gnutls_params_get_dsa_raw(&key->params, p, q, g, y, x, 0);
 }
 
 /**

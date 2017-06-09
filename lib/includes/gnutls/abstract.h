@@ -52,6 +52,16 @@ typedef enum gnutls_pubkey_flags {
 	GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT = 1 << 3
 } gnutls_pubkey_flags_t;
 
+/**
+ * gnutls_abstract_export_flags:
+ * @GNUTLS_EXPORT_FLAG_NO_LZ: do not prepend a leading zero to exported values
+ *
+ * Enumeration of different certificate import flags.
+ */
+typedef enum gnutls_abstract_export_flags {
+	GNUTLS_EXPORT_FLAG_NO_LZ = 1
+} gnutls_abstract_export_flags_t;
+
 #define GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA GNUTLS_VERIFY_USE_TLS1_RSA
 
 typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
@@ -139,11 +149,26 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 int gnutls_pubkey_export_rsa_raw(gnutls_pubkey_t key,
 				 gnutls_datum_t * m, gnutls_datum_t * e);
 
+int gnutls_pubkey_export_rsa_raw2(gnutls_pubkey_t key,
+				  gnutls_datum_t * m, gnutls_datum_t * e,
+				  unsigned flags);
+
 #define gnutls_pubkey_get_pk_dsa_raw gnutls_pubkey_export_dsa_raw
 int gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 				 gnutls_datum_t * p,
 				 gnutls_datum_t * q,
 				 gnutls_datum_t * g, gnutls_datum_t * y);
+
+int gnutls_pubkey_export_dsa_raw2(gnutls_pubkey_t key,
+				 gnutls_datum_t * p,
+				 gnutls_datum_t * q,
+				 gnutls_datum_t * g, gnutls_datum_t * y,
+				 unsigned flags);
+
+int gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
+				 gnutls_ecc_curve_t * curve,
+				 gnutls_datum_t * x, gnutls_datum_t * y,
+				 unsigned flags);
 
 #define gnutls_pubkey_get_pk_ecc_raw gnutls_pubkey_export_ecc_raw
 int gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
@@ -441,10 +466,24 @@ gnutls_privkey_export_rsa_raw(gnutls_privkey_t key,
 				    gnutls_datum_t * e2);
 
 int
+gnutls_privkey_export_rsa_raw2(gnutls_privkey_t key,
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u,
+				    gnutls_datum_t * e1,
+				    gnutls_datum_t * e2, unsigned flags);
+
+int
 gnutls_privkey_export_dsa_raw(gnutls_privkey_t key,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
 			     gnutls_datum_t * x);
+
+int
+gnutls_privkey_export_dsa_raw2(gnutls_privkey_t key,
+			     gnutls_datum_t * p, gnutls_datum_t * q,
+			     gnutls_datum_t * g, gnutls_datum_t * y,
+			     gnutls_datum_t * x, unsigned flags);
 
 int
 gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
@@ -453,6 +492,13 @@ gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
 				       gnutls_datum_t * y,
 				       gnutls_datum_t * k);
 
+int
+gnutls_privkey_export_ecc_raw2(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned flags);
 
 int gnutls_x509_crt_privkey_sign(gnutls_x509_crt_t crt,
 				 gnutls_x509_crt_t issuer,

@@ -87,6 +87,8 @@ int _gnutls_mpi_dprint(const bigint_t a, gnutls_datum_t * dest);
 int _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest,
 			    size_t size);
 
+typedef int (*mpi_dprint_func)(const bigint_t a, gnutls_datum_t * dest);
+
 #define _gnutls_mpi_generate_group( gg, bits) _gnutls_mpi_ops.bigint_generate_group( gg, bits)
 
 #endif

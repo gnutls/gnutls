@@ -815,6 +815,64 @@ gnutls_pubkey_get_key_id(gnutls_pubkey_t key, unsigned int flags,
 }
 
 /**
+ * gnutls_pubkey_export_rsa_raw2:
+ * @key: Holds the certificate
+ * @m: will hold the modulus (may be %NULL)
+ * @e: will hold the public exponent (may be %NULL)
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the RSA public key's parameters found in
+ * the given structure.  The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * This function allows for %NULL parameters since 3.4.1.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_pubkey_export_rsa_raw2(gnutls_pubkey_t key,
+			     gnutls_datum_t * m, gnutls_datum_t * e,
+			     unsigned flags)
+{
+	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (!GNUTLS_PK_IS_RSA(key->pk_algorithm)) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (m) {
+		ret = dprint(key->params.params[0], m);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+
+	if (e) {
+		ret = dprint(key->params.params[1], e);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(m);
+			return ret;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_pubkey_export_rsa_raw:
  * @key: Holds the certificate
  * @m: will hold the modulus (may be %NULL)
@@ -834,36 +892,7 @@ int
 gnutls_pubkey_export_rsa_raw(gnutls_pubkey_t key,
 			     gnutls_datum_t * m, gnutls_datum_t * e)
 {
-	int ret;
-
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	if (!GNUTLS_PK_IS_RSA(key->pk_algorithm)) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	if (m) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[0], m);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-	}
-
-	if (e) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[1], e);
-		if (ret < 0) {
-			gnutls_assert();
-			_gnutls_free_datum(m);
-			return ret;
-		}
-	}
-
-	return 0;
+	return gnutls_pubkey_export_rsa_raw2(key, m, e, 0);
 }
 
 
@@ -890,7 +919,39 @@ gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y)
 {
+	return gnutls_pubkey_export_dsa_raw2(key, p, q, g, y, 0);
+}
+
+/**
+ * gnutls_pubkey_export_dsa_raw2:
+ * @key: Holds the public key
+ * @p: will hold the p (may be %NULL)
+ * @q: will hold the q (may be %NULL)
+ * @g: will hold the g (may be %NULL)
+ * @y: will hold the y (may be %NULL)
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the DSA public key's parameters found in
+ * the given certificate.  The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * This function allows for %NULL parameters since 3.4.1.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_pubkey_export_dsa_raw2(gnutls_pubkey_t key,
+			     gnutls_datum_t * p, gnutls_datum_t * q,
+			     gnutls_datum_t * g, gnutls_datum_t * y,
+			     unsigned flags)
+{
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -904,7 +965,7 @@ gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 
 	/* P */
 	if (p) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[0], p);
+		ret = dprint(key->params.params[0], p);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -913,7 +974,7 @@ gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 
 	/* Q */
 	if (q) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[1], q);
+		ret = dprint(key->params.params[1], q);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -923,7 +984,7 @@ gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 
 	/* G */
 	if (g) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[2], g);
+		ret = dprint(key->params.params[2], g);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -934,7 +995,7 @@ gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 
 	/* Y */
 	if (y) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[3], y);
+		ret = dprint(key->params.params[3], y);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -969,7 +1030,38 @@ gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
 			     gnutls_ecc_curve_t * curve,
 			     gnutls_datum_t * x, gnutls_datum_t * y)
 {
+	return gnutls_pubkey_export_ecc_raw2(key, curve, x, y, 0);
+}
+
+/**
+ * gnutls_pubkey_export_ecc_raw2:
+ * @key: Holds the public key
+ * @curve: will hold the curve (may be %NULL)
+ * @x: will hold x (may be %NULL)
+ * @y: will hold y (may be %NULL)
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the ECC public key's parameters found in
+ * the given key.  The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * This function allows for %NULL parameters since 3.4.1.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
+			     gnutls_ecc_curve_t * curve,
+			     gnutls_datum_t * x, gnutls_datum_t * y,
+			     unsigned int flags)
+{
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -986,7 +1078,7 @@ gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
 
 	/* X */
 	if (x) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[ECC_X], x);
+		ret = dprint(key->params.params[ECC_X], x);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -995,7 +1087,7 @@ gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
 
 	/* Y */
 	if (y) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[ECC_Y], y);
+		ret = dprint(key->params.params[ECC_Y], y);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(x);

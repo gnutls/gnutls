@@ -607,9 +607,14 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 				    gnutls_datum_t * d, gnutls_datum_t * p,
 				    gnutls_datum_t * q, gnutls_datum_t * u,
 				    gnutls_datum_t * e1,
-				    gnutls_datum_t * e2)
+				    gnutls_datum_t * e2,
+				    unsigned int flags)
 {
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (params == NULL) {
 		gnutls_assert();
@@ -622,7 +627,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 	}
 
 	if (m) {
-		ret = _gnutls_mpi_dprint_lz(params->params[0], m);
+		ret = dprint(params->params[0], m);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -631,7 +636,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* E */
 	if (e) {
-		ret = _gnutls_mpi_dprint_lz(params->params[1], e);
+		ret = dprint(params->params[1], e);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -640,7 +645,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* D */
 	if (d && params->params[2]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[2], d);
+		ret = dprint(params->params[2], d);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -652,7 +657,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* P */
 	if (p && params->params[3]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[3], p);
+		ret = dprint(params->params[3], p);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -664,7 +669,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* Q */
 	if (q && params->params[4]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[4], q);
+		ret = dprint(params->params[4], q);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -676,7 +681,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* U */
 	if (u && params->params[5]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[5], u);
+		ret = dprint(params->params[5], u);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -688,7 +693,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* E1 */
 	if (e1 && params->params[6]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[6], e1);
+		ret = dprint(params->params[6], e1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -700,7 +705,7 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 
 	/* E2 */
 	if (e2 && params->params[7]) {
-		ret = _gnutls_mpi_dprint_lz(params->params[7], e2);
+		ret = dprint(params->params[7], e2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
@@ -728,9 +733,13 @@ int
 _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
-			     gnutls_datum_t * x)
+			     gnutls_datum_t * x, unsigned int flags)
 {
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (params == NULL) {
 		gnutls_assert();
@@ -744,7 +753,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* P */
 	if (p) {
-		ret = _gnutls_mpi_dprint_lz(params->params[0], p);
+		ret = dprint(params->params[0], p);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -753,7 +762,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* Q */
 	if (q) {
-		ret = _gnutls_mpi_dprint_lz(params->params[1], q);
+		ret = dprint(params->params[1], q);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -764,7 +773,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* G */
 	if (g) {
-		ret = _gnutls_mpi_dprint_lz(params->params[2], g);
+		ret = dprint(params->params[2], g);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -776,7 +785,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* Y */
 	if (y) {
-		ret = _gnutls_mpi_dprint_lz(params->params[3], y);
+		ret = dprint(params->params[3], y);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(p);
@@ -788,7 +797,7 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 	/* X */
 	if (x) {
-		ret = _gnutls_mpi_dprint_lz(params->params[4], x);
+		ret = dprint(params->params[4], x);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(y);
@@ -806,9 +815,14 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 				       gnutls_ecc_curve_t * curve,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
-				       gnutls_datum_t * k)
+				       gnutls_datum_t * k,
+				       unsigned int flags)
 {
 	int ret;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
 
 	if (params == NULL) {
 		gnutls_assert();
@@ -820,7 +834,7 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 
 	/* X */
 	if (x) {
-		ret = _gnutls_mpi_dprint_lz(params->params[ECC_X], x);
+		ret = dprint(params->params[ECC_X], x);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -829,7 +843,7 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 
 	/* Y */
 	if (y) {
-		ret = _gnutls_mpi_dprint_lz(params->params[ECC_Y], y);
+		ret = dprint(params->params[ECC_Y], y);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(x);
@@ -840,7 +854,7 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 
 	/* K */
 	if (k) {
-		ret = _gnutls_mpi_dprint_lz(params->params[ECC_K], k);
+		ret = dprint(params->params[ECC_K], k);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_free_datum(x);
