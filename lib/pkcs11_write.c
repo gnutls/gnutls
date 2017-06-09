@@ -27,6 +27,7 @@
 #include <pkcs11_int.h>
 #include "pkcs11x.h"
 #include <x509/common.h>
+#include "pk.h"
 
 static const ck_bool_t tval = 1;
 static const ck_bool_t fval = 0;
@@ -282,11 +283,15 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 	case GNUTLS_PK_RSA: {
 		gnutls_datum_t m, e;
 
-		ret = gnutls_pubkey_export_rsa_raw(pubkey, &m, &e);
+		/* PKCS#11 defines integers as unsigned having most significant byte
+		 * first, e.g., 32768 = 0x80 0x00. This is interpreted literraly by
+		 * some HSMs which do not accept an integer with a leading zero */
+		ret = gnutls_pubkey_export_rsa_raw2(pubkey, &m, &e, GNUTLS_EXPORT_FLAG_NO_LZ);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
+
 
 		a[*a_val].type = CKA_MODULUS;
 		a[*a_val].value = m.data;
@@ -302,7 +307,7 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 	case GNUTLS_PK_DSA: {
 		gnutls_datum_t p, q, g, y;
 
-		ret = gnutls_pubkey_export_dsa_raw(pubkey, &p, &q, &g, &y);
+		ret = gnutls_pubkey_export_dsa_raw2(pubkey, &p, &q, &g, &y, GNUTLS_EXPORT_FLAG_NO_LZ);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -792,12 +797,9 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	case GNUTLS_PK_RSA:
 		{
 
-			ret =
-			    gnutls_x509_privkey_export_rsa_raw2(key, &m,
-								&e, &d, &p,
-								&q, &u,
-								&exp1,
-								&exp2);
+			ret = _gnutls_params_get_rsa_raw(&key->params, &m, &e, &d, &p,
+							 &q, &u, &exp1, &exp2,
+							 GNUTLS_EXPORT_FLAG_NO_LZ);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -849,9 +851,8 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 		}
 	case GNUTLS_PK_DSA:
 		{
-			ret =
-			    gnutls_x509_privkey_export_dsa_raw(key, &p, &q,
-							       &g, &y, &x);
+			ret = _gnutls_params_get_dsa_raw(&key->params, &p, &q, &g, &y, &x,
+							 GNUTLS_EXPORT_FLAG_NO_LZ);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -892,8 +893,8 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 			}
 
 			ret =
-			    _gnutls_mpi_dprint_lz(key->params.
-						  params[ECC_K], &x);
+			    _gnutls_mpi_dprint(key->params.
+						params[ECC_K], &x);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
