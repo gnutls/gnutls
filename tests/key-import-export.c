@@ -124,6 +124,35 @@ static int cmp(const char *name, int line, gnutls_datum_t *v1, unsigned char *v2
 	return 0;
 }
 
+/* leading zero on v2 is ignored */
+#define CMP_NO_LZ(name, dat, v) cmp_no_lz(name, __LINE__, dat, v, sizeof(v)-1)
+static int cmp_no_lz(const char *name, int line, gnutls_datum_t *v1, unsigned char *i2, unsigned size)
+{
+	gnutls_datum_t v2;
+	if (size > 0 && i2[0] == 0) {
+		v2.data = &i2[1];
+		v2.size = size-1;
+	} else {
+		v2.data = i2;
+		v2.size = size;
+	}
+
+	if (v2.size != v1->size) {
+		fprintf(stderr, "error in %s:%d size\n", name, line);
+		dump("expected", v2.data, v2.size);
+		dump("got", v1->data, v1->size);
+		exit(1);
+	}
+
+	if (memcmp(v1->data, v2.data, v2.size) != 0) {
+		fprintf(stderr, "error in %s:%d\n", name, line);
+		dump("expected", v2.data, v2.size);
+		dump("got", v1->data, v1->size);
+		exit(1);
+	}
+	return 0;
+}
+
 static
 int check_x509_privkey(void)
 {
@@ -237,7 +266,7 @@ int check_privkey_import_export(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_privkey_export_dsa_raw(key, &p, &q, &g, &y, &x);
+	ret = gnutls_privkey_export_dsa_raw2(key, &p, &q, &g, &y, &x, 0);
 	if (ret < 0)
 		fail("error: %s\n", gnutls_strerror(ret));
 
@@ -246,6 +275,21 @@ int check_privkey_import_export(void)
 	CMP("g", &g, dsa_g);
 	CMP("y", &y, dsa_y);
 	CMP("x", &x, dsa_x);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(g.data);
+	gnutls_free(y.data);
+	gnutls_free(x.data);
+
+	ret = gnutls_privkey_export_dsa_raw2(key, &p, &q, &g, &y, &x, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error: %s\n", gnutls_strerror(ret));
+
+	CMP_NO_LZ("p", &p, dsa_p);
+	CMP_NO_LZ("q", &q, dsa_q);
+	CMP_NO_LZ("g", &g, dsa_g);
+	CMP_NO_LZ("y", &y, dsa_y);
+	CMP_NO_LZ("x", &x, dsa_x);
 	gnutls_free(p.data);
 	gnutls_free(q.data);
 	gnutls_free(g.data);
@@ -262,7 +306,7 @@ int check_privkey_import_export(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_privkey_export_rsa_raw(key, &m, &e, &d, &p, &q, &u, &e1, &e2);
+	ret = gnutls_privkey_export_rsa_raw2(key, &m, &e, &d, &p, &q, &u, &e1, &e2, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -282,6 +326,27 @@ int check_privkey_import_export(void)
 	gnutls_free(u.data);
 	gnutls_free(e1.data);
 	gnutls_free(e2.data);
+
+	ret = gnutls_privkey_export_rsa_raw2(key, &m, &e, &d, &p, &q, &u, &e1, &e2, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error\n");
+
+	CMP_NO_LZ("m", &m, rsa_m);
+	CMP_NO_LZ("e", &e, rsa_e);
+	CMP_NO_LZ("d", &d, rsa_d);
+	CMP_NO_LZ("p", &p, rsa_p);
+	CMP_NO_LZ("q", &q, rsa_q);
+	CMP_NO_LZ("u", &u, rsa_u);
+	CMP_NO_LZ("e1", &e1, rsa_e1);
+	CMP_NO_LZ("e2", &e2, rsa_e2);
+	gnutls_free(m.data);
+	gnutls_free(e.data);
+	gnutls_free(d.data);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(u.data);
+	gnutls_free(e1.data);
+	gnutls_free(e2.data);
 	gnutls_privkey_deinit(key);
 
 	/* ECC */
@@ -293,7 +358,7 @@ int check_privkey_import_export(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_privkey_export_ecc_raw(key, &curve, &x, &y, &p);
+	ret = gnutls_privkey_export_ecc_raw2(key, &curve, &x, &y, &p, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -304,6 +369,21 @@ int check_privkey_import_export(void)
 	CMP("x", &x, ecc_x);
 	CMP("y", &y, ecc_y);
 	CMP("k", &p, ecc_k);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+	gnutls_free(p.data);
+
+	ret = gnutls_privkey_export_ecc_raw2(key, &curve, &x, &y, &p, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_SECP256R1) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	CMP_NO_LZ("x", &x, ecc_x);
+	CMP_NO_LZ("y", &y, ecc_y);
+	CMP_NO_LZ("k", &p, ecc_k);
 	gnutls_free(x.data);
 	gnutls_free(y.data);
 	gnutls_free(p.data);
@@ -338,7 +418,7 @@ int check_dsa(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_pubkey_export_dsa_raw(pub, &p, &q, &g, &y);
+	ret = gnutls_pubkey_export_dsa_raw2(pub, &p, &q, &g, &y, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -346,6 +426,19 @@ int check_dsa(void)
 	CMP("q", &q, dsa_q);
 	CMP("g", &g, dsa_g);
 	CMP("y", &y, dsa_y);
+	gnutls_free(p.data);
+	gnutls_free(q.data);
+	gnutls_free(g.data);
+	gnutls_free(y.data);
+
+	ret = gnutls_pubkey_export_dsa_raw2(pub, &p, &q, &g, &y, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error\n");
+
+	CMP_NO_LZ("p", &p, dsa_p);
+	CMP_NO_LZ("q", &q, dsa_q);
+	CMP_NO_LZ("g", &g, dsa_g);
+	CMP_NO_LZ("y", &y, dsa_y);
 	gnutls_free(p.data);
 	gnutls_free(q.data);
 	gnutls_free(g.data);
@@ -395,12 +488,21 @@ int check_rsa(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_pubkey_export_rsa_raw(pub, &m, &e);
+	ret = gnutls_pubkey_export_rsa_raw2(pub, &m, &e, 0);
 	if (ret < 0)
 		fail("error\n");
 
 	CMP("m", &m, rsa_m);
 	CMP("e", &e, rsa_e);
+	gnutls_free(m.data);
+	gnutls_free(e.data);
+
+	ret = gnutls_pubkey_export_rsa_raw2(pub, &m, &e, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error\n");
+
+	CMP_NO_LZ("m", &m, rsa_m);
+	CMP_NO_LZ("e", &e, rsa_e);
 	gnutls_free(m.data);
 	gnutls_free(e.data);
 
@@ -457,7 +559,7 @@ int check_ecc(void)
 	if (ret < 0)
 		fail("error\n");
 
-	ret = gnutls_pubkey_export_ecc_raw(pub, &curve, &x, &y);
+	ret = gnutls_pubkey_export_ecc_raw2(pub, &curve, &x, &y, 0);
 	if (ret < 0)
 		fail("error\n");
 
@@ -467,6 +569,19 @@ int check_ecc(void)
 	}
 	CMP("x", &x, ecc_x);
 	CMP("y", &y, ecc_y);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+
+	ret = gnutls_pubkey_export_ecc_raw2(pub, &curve, &x, &y, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_SECP256R1) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	CMP_NO_LZ("x", &x, ecc_x);
+	CMP_NO_LZ("y", &y, ecc_y);
 	gnutls_free(x.data);
 	gnutls_free(y.data);
 
