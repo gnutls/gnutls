@@ -334,7 +334,7 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 	}
 
 	ret =
-	    _gnutls_ecc_ansi_x963_import(out.data, out.size,
+	    _gnutls_ecc_ansi_x962_import(out.data, out.size,
 					 &pkey->params.params[ECC_X],
 					 &pkey->params.params[ECC_Y]);
 

@@ -104,7 +104,7 @@ _gnutls_x509_read_ecc_pubkey(uint8_t * der, int dersize,
 	/* RFC5480 defines the public key to be an ECPoint (i.e. OCTET STRING),
 	 * Then it says that the OCTET STRING _value_ is converted to BIT STRING.
 	 * That means that the value we place there is the raw X9.62 one. */
-	return _gnutls_ecc_ansi_x963_import(der, dersize,
+	return _gnutls_ecc_ansi_x962_import(der, dersize,
 					    &params->params[ECC_X],
 					    &params->params[ECC_Y]);
 }

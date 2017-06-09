@@ -155,7 +155,7 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 
 	if (ecurve->pk == GNUTLS_PK_EC) {
 		ret =
-		    _gnutls_ecc_ansi_x963_import(&data[i], point_size,
+		    _gnutls_ecc_ansi_x962_import(&data[i], point_size,
 					 &session->key.ecdh_x,
 					 &session->key.ecdh_y);
 		if (ret < 0) {
@@ -247,7 +247,7 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 
 	if (pk == GNUTLS_PK_EC) {
 		ret =
-		    _gnutls_ecc_ansi_x963_export(curve,
+		    _gnutls_ecc_ansi_x962_export(curve,
 						 session->key.ecdh_params.
 						 params[ECC_X] /* x */ ,
 						 session->key.ecdh_params.
@@ -360,7 +360,7 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 
 	if (ecurve->pk == GNUTLS_PK_EC) {
 		ret =
-		    _gnutls_ecc_ansi_x963_import(&data[i], point_size,
+		    _gnutls_ecc_ansi_x962_import(&data[i], point_size,
 						 &session->key.ecdh_x,
 						 &session->key.ecdh_y);
 		if (ret < 0)
@@ -431,7 +431,7 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 
 	if (pk == GNUTLS_PK_EC) {
 		ret =
-		    _gnutls_ecc_ansi_x963_export(curve,
+		    _gnutls_ecc_ansi_x962_export(curve,
 						 session->key.ecdh_params.
 						 params[ECC_X] /* x */ ,
 						 session->key.ecdh_params.

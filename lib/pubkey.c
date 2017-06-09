@@ -1586,7 +1586,7 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 
-	ret = _gnutls_ecc_ansi_x963_import(raw_point.data, raw_point.size,
+	ret = _gnutls_ecc_ansi_x962_import(raw_point.data, raw_point.size,
 					   &key->params.params[ECC_X],
 					   &key->params.params[ECC_Y]);
 	if (ret < 0) {
