@@ -63,7 +63,7 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 	}
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		extension_priv_data_t epriv;
+		gnutls_ext_priv_data_t epriv;
 
 		if (session->internals.priorities.no_etm != 0)
 			return 0;
@@ -106,7 +106,7 @@ _gnutls_ext_etm_send_params(gnutls_session_t session,
 	} else { /* server side */
 		const cipher_entry_st *c;
 		int ret;
-		extension_priv_data_t epriv;
+		gnutls_ext_priv_data_t epriv;
 
 		c = _gnutls_cipher_suite_get_cipher_algo(session->security_parameters.cipher_suite);
 		if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))

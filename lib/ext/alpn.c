@@ -30,7 +30,7 @@ static int _gnutls_alpn_recv_params(gnutls_session_t session,
 static int _gnutls_alpn_send_params(gnutls_session_t session,
 				    gnutls_buffer_st * extdata);
 
-static void _gnutls_alpn_deinit_data(extension_priv_data_t priv);
+static void _gnutls_alpn_deinit_data(gnutls_ext_priv_data_t priv);
 
 
 const extension_entry_st ext_mod_alpn = {
@@ -54,7 +54,7 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 	unsigned len1, len;
 	ssize_t data_size = _data_size;
 	alpn_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int selected_protocol_index;
 
 	ret =
@@ -140,7 +140,7 @@ _gnutls_alpn_send_params(gnutls_session_t session,
 	unsigned i;
 	int total_size = 0, ret;
 	alpn_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
 	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_ALPN,
@@ -229,7 +229,7 @@ gnutls_alpn_get_selected_protocol(gnutls_session_t session,
 {
 	alpn_ext_st *priv;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
 	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_ALPN,
@@ -277,7 +277,7 @@ gnutls_alpn_set_protocols(gnutls_session_t session,
 {
 	int ret;
 	alpn_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	unsigned i;
 
 	ret =
@@ -313,7 +313,7 @@ gnutls_alpn_set_protocols(gnutls_session_t session,
 }
 
 
-static void _gnutls_alpn_deinit_data(extension_priv_data_t priv)
+static void _gnutls_alpn_deinit_data(gnutls_ext_priv_data_t priv)
 {
 	gnutls_free(priv);
 }

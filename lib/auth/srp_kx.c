@@ -123,7 +123,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 	SRP_PWD_ENTRY *pwd_entry;
 	srp_server_auth_info_t info;
 	size_t tmp_size;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 
 	ret =
@@ -246,7 +246,7 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 	int ret;
 	char *username, *password;
 	gnutls_srp_client_credentials_t cred;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 
 	ret =
@@ -833,7 +833,7 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 	char *username, *password;
 	ssize_t data_size = _data_size;
 	gnutls_srp_client_credentials_t cred;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 
 	ret =

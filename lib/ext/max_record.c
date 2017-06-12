@@ -36,8 +36,8 @@ static int _gnutls_max_record_send_params(gnutls_session_t session,
 					  gnutls_buffer_st * extdata);
 
 static int _gnutls_max_record_unpack(gnutls_buffer_st * ps,
-				     extension_priv_data_t * _priv);
-static int _gnutls_max_record_pack(extension_priv_data_t _priv,
+				     gnutls_ext_priv_data_t * _priv);
+static int _gnutls_max_record_pack(gnutls_ext_priv_data_t _priv,
 				   gnutls_buffer_st * ps);
 
 /* Maps record size to numbers according to the
@@ -75,7 +75,7 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 {
 	ssize_t new_size;
 	ssize_t data_size = _data_size;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -140,7 +140,7 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 
 	/* this function sends the client extension data (dnsname) */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		extension_priv_data_t epriv;
+		gnutls_ext_priv_data_t epriv;
 
 		ret = _gnutls_ext_get_session_data(session,
 						   GNUTLS_EXTENSION_MAX_RECORD_SIZE,
@@ -180,7 +180,7 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 
 
 static int
-_gnutls_max_record_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
+_gnutls_max_record_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	int ret;
 
@@ -192,9 +192,9 @@ _gnutls_max_record_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 
 static int
 _gnutls_max_record_unpack(gnutls_buffer_st * ps,
-			  extension_priv_data_t * _priv)
+			  gnutls_ext_priv_data_t * _priv)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	BUFFER_POP_CAST_NUM(ps, epriv);
@@ -287,7 +287,7 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
 ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 {
 	ssize_t new_size;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return GNUTLS_E_INVALID_REQUEST;

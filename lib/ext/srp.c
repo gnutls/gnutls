@@ -33,10 +33,10 @@
 #include <extensions.h>
 
 static int _gnutls_srp_unpack(gnutls_buffer_st * ps,
-			      extension_priv_data_t * _priv);
-static int _gnutls_srp_pack(extension_priv_data_t epriv,
+			      gnutls_ext_priv_data_t * _priv);
+static int _gnutls_srp_pack(gnutls_ext_priv_data_t epriv,
 			    gnutls_buffer_st * ps);
-static void _gnutls_srp_deinit_data(extension_priv_data_t epriv);
+static void _gnutls_srp_deinit_data(gnutls_ext_priv_data_t epriv);
 static int _gnutls_srp_recv_params(gnutls_session_t state,
 				   const uint8_t * data, size_t data_size);
 static int _gnutls_srp_send_params(gnutls_session_t state,
@@ -61,7 +61,7 @@ _gnutls_srp_recv_params(gnutls_session_t session, const uint8_t * data,
 {
 	uint8_t len;
 	ssize_t data_size = _data_size;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -107,7 +107,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 {
 	unsigned len;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv = NULL;
 	char *username = NULL, *password = NULL;
 
@@ -206,7 +206,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 	return ret;
 }
 
-static void _gnutls_srp_deinit_data(extension_priv_data_t epriv)
+static void _gnutls_srp_deinit_data(gnutls_ext_priv_data_t epriv)
 {
 	srp_ext_st *priv = epriv;
 
@@ -216,7 +216,7 @@ static void _gnutls_srp_deinit_data(extension_priv_data_t epriv)
 }
 
 static int
-_gnutls_srp_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
+_gnutls_srp_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	srp_ext_st *priv = epriv;
 	int ret;
@@ -235,11 +235,11 @@ _gnutls_srp_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 }
 
 static int
-_gnutls_srp_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
+_gnutls_srp_unpack(gnutls_buffer_st * ps, gnutls_ext_priv_data_t * _priv)
 {
 	srp_ext_st *priv;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	gnutls_datum_t username = { NULL, 0 };
 	gnutls_datum_t password = { NULL, 0 };
 

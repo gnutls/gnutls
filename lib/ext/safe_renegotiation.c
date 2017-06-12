@@ -29,7 +29,7 @@ static int _gnutls_sr_recv_params(gnutls_session_t state,
 				  const uint8_t * data, size_t data_size);
 static int _gnutls_sr_send_params(gnutls_session_t state,
 				  gnutls_buffer_st *);
-static void _gnutls_sr_deinit_data(extension_priv_data_t priv);
+static void _gnutls_sr_deinit_data(gnutls_ext_priv_data_t priv);
 
 const extension_entry_st ext_mod_sr = {
 	.name = "Safe Renegotiation",
@@ -49,7 +49,7 @@ _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 {
 	int ret;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->internals.priorities.sr == SR_DISABLED) {
 		return 0;
@@ -93,7 +93,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 {
 	int ret;
 	sr_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->internals.priorities.sr == SR_DISABLED) {
 		gnutls_assert();
@@ -198,7 +198,7 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 {
 	int ret, set = 0;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret = _gnutls_ext_get_session_data(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
@@ -233,7 +233,7 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 {
 	int ret, set = 0;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret = _gnutls_ext_get_session_data(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
@@ -266,7 +266,7 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 	unsigned int len;
 	ssize_t data_size = _data_size;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int set = 0, ret;
 
 	if (data_size == 0)
@@ -346,7 +346,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 	 */
 	sr_ext_st *priv;
 	int ret, set = 0, len;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	size_t init_length = extdata->length;
 
 	if (session->internals.priorities.sr == SR_DISABLED) {
@@ -410,7 +410,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 	return extdata->length - init_length;
 }
 
-static void _gnutls_sr_deinit_data(extension_priv_data_t priv)
+static void _gnutls_sr_deinit_data(gnutls_ext_priv_data_t priv)
 {
 	gnutls_free(priv);
 }
@@ -431,7 +431,7 @@ unsigned gnutls_safe_renegotiation_status(gnutls_session_t session)
 {
 	int ret;
 	sr_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret = _gnutls_ext_get_session_data(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,

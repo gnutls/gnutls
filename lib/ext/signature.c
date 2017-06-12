@@ -43,11 +43,11 @@ static int _gnutls_signature_algorithm_send_params(gnutls_session_t
 						   session,
 						   gnutls_buffer_st *
 						   extdata);
-static void signature_algorithms_deinit_data(extension_priv_data_t priv);
-static int signature_algorithms_pack(extension_priv_data_t epriv,
+static void signature_algorithms_deinit_data(gnutls_ext_priv_data_t priv);
+static int signature_algorithms_pack(gnutls_ext_priv_data_t epriv,
 				     gnutls_buffer_st * ps);
 static int signature_algorithms_unpack(gnutls_buffer_st * ps,
-				       extension_priv_data_t * _priv);
+				       gnutls_ext_priv_data_t * _priv);
 
 const extension_entry_st ext_mod_sig = {
 	.name = "Signature Algorithms",
@@ -126,7 +126,7 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 {
 	unsigned int sig, i;
 	sig_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (data_size == 0 || data_size % 2 != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
@@ -275,7 +275,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	int ret;
 	const version_entry_st *ver = get_version(session);
 	sig_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	unsigned int cert_algo;
 
 	if (unlikely(ver == NULL))
@@ -346,13 +346,13 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 	return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 }
 
-static void signature_algorithms_deinit_data(extension_priv_data_t priv)
+static void signature_algorithms_deinit_data(gnutls_ext_priv_data_t priv)
 {
 	gnutls_free(priv);
 }
 
 static int
-signature_algorithms_pack(extension_priv_data_t epriv,
+signature_algorithms_pack(gnutls_ext_priv_data_t epriv,
 			  gnutls_buffer_st * ps)
 {
 	sig_ext_st *priv = epriv;
@@ -367,11 +367,11 @@ signature_algorithms_pack(extension_priv_data_t epriv,
 
 static int
 signature_algorithms_unpack(gnutls_buffer_st * ps,
-			    extension_priv_data_t * _priv)
+			    gnutls_ext_priv_data_t * _priv)
 {
 	sig_ext_st *priv;
 	int i, ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	priv = gnutls_calloc(1, sizeof(*priv));
 	if (priv == NULL) {
@@ -424,7 +424,7 @@ gnutls_sign_algorithm_get_requested(gnutls_session_t session,
 {
 	const version_entry_st *ver = get_version(session);
 	sig_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	if (unlikely(ver == NULL))

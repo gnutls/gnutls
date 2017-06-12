@@ -197,7 +197,7 @@ static int
 _gnutls_status_request_send_params(gnutls_session_t session,
 				   gnutls_buffer_st * extdata)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	status_request_ext_st *priv;
 	int ret;
 
@@ -233,7 +233,7 @@ static int
 _gnutls_status_request_recv_params(gnutls_session_t session,
 				   const uint8_t * data, size_t size)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	status_request_ext_st *priv;
 	int ret;
 
@@ -279,7 +279,7 @@ gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 					 gnutls_datum_t * extensions)
 {
 	status_request_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -315,7 +315,7 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
 			       gnutls_datum_t * response)
 {
 	status_request_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER)
@@ -473,7 +473,7 @@ gnutls_certificate_set_ocsp_status_request_file
 	return 0;
 }
 
-static void _gnutls_status_request_deinit_data(extension_priv_data_t epriv)
+static void _gnutls_status_request_deinit_data(gnutls_ext_priv_data_t epriv)
 {
 	status_request_ext_st *priv = epriv;
 
@@ -485,7 +485,7 @@ static void _gnutls_status_request_deinit_data(extension_priv_data_t epriv)
 }
 
 static int
-_gnutls_status_request_pack(extension_priv_data_t epriv,
+_gnutls_status_request_pack(gnutls_ext_priv_data_t epriv,
 			    gnutls_buffer_st * ps)
 {
 	status_request_ext_st *priv = epriv;
@@ -499,7 +499,7 @@ _gnutls_status_request_pack(extension_priv_data_t epriv,
 
 static int
 _gnutls_status_request_unpack(gnutls_buffer_st * ps,
-			      extension_priv_data_t * epriv)
+			      gnutls_ext_priv_data_t * epriv)
 {
 	status_request_ext_st *priv;
 	int ret;
@@ -541,7 +541,7 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 	uint8_t *data;
 	int data_size = 0;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	status_request_ext_st *priv;
 
 	if (again == 0) {
@@ -585,7 +585,7 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 	gnutls_buffer_st buf;
 	int ret;
 	status_request_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
 	    _gnutls_ext_get_session_data(session,

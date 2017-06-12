@@ -34,10 +34,10 @@ static int _gnutls_server_name_send_params(gnutls_session_t session,
 					   gnutls_buffer_st * extdata);
 
 static int _gnutls_server_name_unpack(gnutls_buffer_st * ps,
-				      extension_priv_data_t * _priv);
-static int _gnutls_server_name_pack(extension_priv_data_t _priv,
+				      gnutls_ext_priv_data_t * _priv);
+static int _gnutls_server_name_pack(gnutls_ext_priv_data_t _priv,
 				    gnutls_buffer_st * ps);
-static void _gnutls_server_name_deinit_data(extension_priv_data_t priv);
+static void _gnutls_server_name_deinit_data(gnutls_ext_priv_data_t priv);
 
 int
 _gnutls_server_name_set_raw(gnutls_session_t session,
@@ -75,7 +75,7 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 	int server_names = 0;
 	server_name_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		DECR_LENGTH_RET(data_size, 2, 0);
@@ -181,7 +181,7 @@ _gnutls_server_name_send_params(gnutls_session_t session,
 	unsigned i;
 	int total_size = 0, ret;
 	server_name_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
 	    _gnutls_ext_get_session_data(session,
@@ -295,7 +295,7 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 	server_name_ext_st *priv;
 	int ret;
 	gnutls_datum_t idn_name = {NULL,0};
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		gnutls_assert();
@@ -353,7 +353,7 @@ _gnutls_server_name_set_raw(gnutls_session_t session,
 {
 	int server_names, ret;
 	server_name_ext_st *priv;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int set = 0;
 
 	if (name_length > MAX_SERVER_NAME_SIZE) {
@@ -458,13 +458,13 @@ gnutls_server_name_set(gnutls_session_t session,
 	return ret;
 }
 
-static void _gnutls_server_name_deinit_data(extension_priv_data_t priv)
+static void _gnutls_server_name_deinit_data(gnutls_ext_priv_data_t priv)
 {
 	gnutls_free(priv);
 }
 
 static int
-_gnutls_server_name_pack(extension_priv_data_t epriv,
+_gnutls_server_name_pack(gnutls_ext_priv_data_t epriv,
 			 gnutls_buffer_st * ps)
 {
 	server_name_ext_st *priv = epriv;
@@ -482,12 +482,12 @@ _gnutls_server_name_pack(extension_priv_data_t epriv,
 
 static int
 _gnutls_server_name_unpack(gnutls_buffer_st * ps,
-			   extension_priv_data_t * _priv)
+			   gnutls_ext_priv_data_t * _priv)
 {
 	server_name_ext_st *priv;
 	unsigned int i;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	priv = gnutls_calloc(1, sizeof(*priv));
 	if (priv == NULL) {

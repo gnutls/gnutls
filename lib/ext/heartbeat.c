@@ -53,7 +53,7 @@
   **/
 void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	epriv = (void*)(intptr_t)type;
 	_gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_HEARTBEAT,
@@ -74,7 +74,7 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
   **/
 unsigned gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (session->internals.handshake_in_progress != 0)
 		return 0; /* not allowed */
@@ -442,7 +442,7 @@ _gnutls_heartbeat_recv_params(gnutls_session_t session,
 			      const uint8_t * data, size_t _data_size)
 {
 	unsigned policy;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (_gnutls_ext_get_session_data
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0) {
@@ -477,7 +477,7 @@ static int
 _gnutls_heartbeat_send_params(gnutls_session_t session,
 			      gnutls_buffer_st * extdata)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	uint8_t p;
 
 	if (_gnutls_ext_get_session_data
@@ -496,7 +496,7 @@ _gnutls_heartbeat_send_params(gnutls_session_t session,
 }
 
 static int
-_gnutls_heartbeat_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
+_gnutls_heartbeat_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	int ret;
 
@@ -508,9 +508,9 @@ _gnutls_heartbeat_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 
 static int
 _gnutls_heartbeat_unpack(gnutls_buffer_st * ps,
-			 extension_priv_data_t * _priv)
+			 gnutls_ext_priv_data_t * _priv)
 {
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	BUFFER_POP_CAST_NUM(ps, epriv);

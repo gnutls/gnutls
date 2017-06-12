@@ -54,10 +54,10 @@ static int session_ticket_recv_params(gnutls_session_t session,
 static int session_ticket_send_params(gnutls_session_t session,
 				      gnutls_buffer_st * extdata);
 static int session_ticket_unpack(gnutls_buffer_st * ps,
-				 extension_priv_data_t * _priv);
-static int session_ticket_pack(extension_priv_data_t _priv,
+				 gnutls_ext_priv_data_t * _priv);
+static int session_ticket_pack(gnutls_ext_priv_data_t _priv,
 			       gnutls_buffer_st * ps);
-static void session_ticket_deinit_data(extension_priv_data_t priv);
+static void session_ticket_deinit_data(gnutls_ext_priv_data_t priv);
 
 const extension_entry_st ext_mod_session_ticket = {
 	.name = "Session Ticket",
@@ -291,7 +291,7 @@ session_ticket_recv_params(gnutls_session_t session,
 {
 	ssize_t data_size = _data_size;
 	session_ticket_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	ret =
@@ -389,7 +389,7 @@ session_ticket_send_params(gnutls_session_t session,
 			   gnutls_buffer_st * extdata)
 {
 	session_ticket_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	int ret;
 
 	ret =
@@ -439,7 +439,7 @@ session_ticket_send_params(gnutls_session_t session,
 }
 
 
-static void session_ticket_deinit_data(extension_priv_data_t epriv)
+static void session_ticket_deinit_data(gnutls_ext_priv_data_t epriv)
 {
 	session_ticket_ext_st *priv = epriv;
 
@@ -448,7 +448,7 @@ static void session_ticket_deinit_data(extension_priv_data_t epriv)
 }
 
 static int
-session_ticket_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
+session_ticket_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	session_ticket_ext_st *priv = epriv;
 	int ret;
@@ -461,11 +461,11 @@ session_ticket_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 }
 
 static int
-session_ticket_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
+session_ticket_unpack(gnutls_buffer_st * ps, gnutls_ext_priv_data_t * _priv)
 {
 	session_ticket_ext_st *priv = NULL;
 	int ret;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	gnutls_datum_t ticket;
 
 	priv = gnutls_calloc(1, sizeof(*priv));
@@ -544,7 +544,7 @@ int gnutls_session_ticket_key_generate(gnutls_datum_t * key)
 int gnutls_session_ticket_enable_client(gnutls_session_t session)
 {
 	session_ticket_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (!session) {
 		gnutls_assert();
@@ -586,7 +586,7 @@ gnutls_session_ticket_enable_server(gnutls_session_t session,
 				    const gnutls_datum_t * key)
 {
 	session_ticket_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	if (!session || !key || key->size != SESSION_KEY_SIZE) {
 		gnutls_assert();
@@ -619,7 +619,7 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 	struct ticket_st ticket;
 	uint16_t ticket_len;
 	session_ticket_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 	uint16_t epoch_saved = session->security_parameters.epoch_write;
 
 	if (again == 0) {
@@ -711,7 +711,7 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 	uint16_t ticket_len;
 	int ret;
 	session_ticket_ext_st *priv = NULL;
-	extension_priv_data_t epriv;
+	gnutls_ext_priv_data_t epriv;
 
 	ret =
 	    _gnutls_ext_get_session_data(session,
