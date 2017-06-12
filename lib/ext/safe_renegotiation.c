@@ -219,7 +219,7 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 
 	priv->safe_renegotiation_received = 1;
 	priv->connection_using_safe_renegotiation = 1;
-	_gnutls_extension_list_add(session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
+	_gnutls_extension_list_add_sr(session);
 
 	if (set != 0)
 		_gnutls_ext_set_session_data(session,

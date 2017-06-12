@@ -85,6 +85,7 @@ handshake_hash_buffer_empty(gnutls_session_t session)
 
 	_gnutls_buffers_log("BUF[HSK]: Emptied buffer\n");
 
+	session->internals.used_exts_size = 0;
 	session->internals.handshake_hash_buffer_prev_len = 0;
 	session->internals.handshake_hash_buffer.length = 0;
 	return;
@@ -2074,8 +2075,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 			    copy_ciphersuites(session, &extdata,
 					      TRUE);
 			if (session->security_parameters.entity == GNUTLS_CLIENT)
-				_gnutls_extension_list_add(session,
-						   GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
+				_gnutls_extension_list_add_sr(session);
 		} else
 #endif
 			ret =
@@ -2545,7 +2545,7 @@ int gnutls_handshake(gnutls_session_t session)
 		if (session->internals.priorities.protocol.algorithms == 0)
 			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
-		session->internals.extensions_sent_size = 0;
+		session->internals.used_exts_size = 0;
 		session->internals.crt_requested = 0;
 		session->internals.handshake_in_progress = 1;
 		session->internals.vc_status = -1;

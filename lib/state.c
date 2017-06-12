@@ -397,8 +397,6 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 	_gnutls_handshake_internal_state_init(*session);
 
-	(*session)->internals.extensions_sent_size = 0;
-
 	/* emulate old gnutls behavior for old applications that do not use the priority_*
 	 * functions.
 	 */

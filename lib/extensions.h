@@ -34,7 +34,7 @@ int _gnutls_gen_extensions(gnutls_session_t session,
 int _gnutls_ext_init(void);
 void _gnutls_ext_deinit(void);
 
-void _gnutls_extension_list_add(gnutls_session_t session, uint16_t type);
+void _gnutls_extension_list_add_sr(gnutls_session_t session);
 int _gnutls_extension_list_check(gnutls_session_t session, uint16_t type);
 
 void _gnutls_ext_free_session_data(gnutls_session_t session);

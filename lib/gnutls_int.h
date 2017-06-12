@@ -892,11 +892,6 @@ typedef struct {
 	gnutls_status_request_ocsp_func selected_ocsp_func;
 	void *selected_ocsp_func_ptr;
 
-	/* In case of a client holds the extensions we sent to the peer;
-	 * otherwise the extensions we received from the client.
-	 */
-	uint16_t extensions_sent[MAX_EXT_TYPES];
-	uint16_t extensions_sent_size;
 
 	/* is 0 if we are to send the whole PGP key, or non zero
 	 * if the fingerprint is to be sent.
@@ -1057,6 +1052,13 @@ typedef struct {
 
 	struct extension_entry_st *rexts;
 	unsigned rexts_size;
+
+	/* In case of a client holds the extensions we sent to the peer;
+	 * otherwise the extensions we received from the client.
+	 */
+	const struct extension_entry_st *used_exts[MAX_EXT_TYPES];
+	unsigned used_exts_size;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } internals_st;
