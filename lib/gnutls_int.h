@@ -955,17 +955,6 @@ typedef struct {
 	/* A handshake process has been completed */
 	bool initial_negotiation_completed;
 
-	struct {
-		uint16_t type;
-		gnutls_ext_priv_data_t priv;
-		bool set;
-	} extension_int_data[MAX_EXT_TYPES];
-
-	struct {
-		uint16_t type;
-		gnutls_ext_priv_data_t priv;
-		bool set;
-	} resumed_extension_int_data[MAX_EXT_TYPES];
 	/* The type of transport protocol; stream or datagram */
 	transport_t transport;
 
@@ -1056,6 +1045,19 @@ typedef struct {
 	/* In case of a client holds the extensions we sent to the peer;
 	 * otherwise the extensions we received from the client.
 	 */
+
+	struct {
+		uint16_t type;
+		gnutls_ext_priv_data_t priv;
+		bool set;
+	} extension_int_data[MAX_EXT_TYPES];
+
+	struct {
+		uint16_t type;
+		gnutls_ext_priv_data_t priv;
+		bool set;
+	} resumed_extension_int_data[MAX_EXT_TYPES];
+
 	const struct extension_entry_st *used_exts[MAX_EXT_TYPES];
 	unsigned used_exts_size;
 
