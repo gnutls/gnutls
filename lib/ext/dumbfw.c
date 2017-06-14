@@ -45,6 +45,7 @@ const extension_entry_st ext_mod_dumbfw = {
 	.pack_func = NULL,
 	.unpack_func = NULL,
 	.deinit_func = NULL,
+	.cannot_be_overriden = 0
 };
 
 static int

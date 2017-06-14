@@ -42,6 +42,7 @@ const extension_entry_st ext_mod_alpn = {
 	.recv_func = _gnutls_alpn_recv_params,
 	.send_func = _gnutls_alpn_send_params,
 	.deinit_func = _gnutls_alpn_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 static int

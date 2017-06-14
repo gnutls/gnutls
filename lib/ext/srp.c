@@ -51,7 +51,8 @@ const extension_entry_st ext_mod_srp = {
 	.send_func = _gnutls_srp_send_params,
 	.pack_func = _gnutls_srp_pack,
 	.unpack_func = _gnutls_srp_unpack,
-	.deinit_func = _gnutls_srp_deinit_data
+	.deinit_func = _gnutls_srp_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 

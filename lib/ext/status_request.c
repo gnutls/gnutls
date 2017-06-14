@@ -529,7 +529,8 @@ const extension_entry_st ext_mod_status_request = {
 	.send_func = _gnutls_status_request_send_params,
 	.pack_func = _gnutls_status_request_pack,
 	.unpack_func = _gnutls_status_request_unpack,
-	.deinit_func = _gnutls_status_request_deinit_data
+	.deinit_func = _gnutls_status_request_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 /* Functions to be called from handshake */

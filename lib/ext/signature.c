@@ -59,6 +59,7 @@ const extension_entry_st ext_mod_sig = {
 	.pack_func = signature_algorithms_pack,
 	.unpack_func = signature_algorithms_unpack,
 	.deinit_func = signature_algorithms_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 typedef struct {

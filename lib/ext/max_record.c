@@ -56,7 +56,8 @@ const extension_entry_st ext_mod_max_record_size = {
 	.send_func = _gnutls_max_record_send_params,
 	.pack_func = _gnutls_max_record_pack,
 	.unpack_func = _gnutls_max_record_unpack,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 0
 };
 
 /* 

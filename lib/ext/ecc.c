@@ -54,7 +54,8 @@ const extension_entry_st ext_mod_supported_ecc = {
 	.send_func = _gnutls_supported_ecc_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 const extension_entry_st ext_mod_supported_ecc_pf = {

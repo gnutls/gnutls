@@ -54,6 +54,7 @@ const extension_entry_st ext_mod_server_name = {
 	.pack_func = _gnutls_server_name_pack,
 	.unpack_func = _gnutls_server_name_unpack,
 	.deinit_func = _gnutls_server_name_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 /*

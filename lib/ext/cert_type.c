@@ -53,7 +53,8 @@ const extension_entry_st ext_mod_cert_type = {
 	.send_func = _gnutls_cert_type_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 /* 

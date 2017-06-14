@@ -41,6 +41,7 @@ const extension_entry_st ext_mod_sr = {
 	.pack_func = NULL,
 	.unpack_func = NULL,
 	.deinit_func = _gnutls_sr_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 int

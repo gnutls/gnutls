@@ -531,7 +531,8 @@ const extension_entry_st ext_mod_heartbeat = {
 	.send_func = _gnutls_heartbeat_send_params,
 	.pack_func = _gnutls_heartbeat_pack,
 	.unpack_func = _gnutls_heartbeat_unpack,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 #else

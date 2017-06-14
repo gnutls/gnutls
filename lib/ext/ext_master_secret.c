@@ -44,7 +44,8 @@ const extension_entry_st ext_mod_ext_master_secret = {
 	.send_func = _gnutls_ext_master_secret_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 #ifdef ENABLE_SSL3

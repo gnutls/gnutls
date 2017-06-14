@@ -69,6 +69,7 @@ const extension_entry_st ext_mod_session_ticket = {
 	.pack_func = session_ticket_pack,
 	.unpack_func = session_ticket_unpack,
 	.deinit_func = session_ticket_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 #define SESSION_KEY_SIZE (KEY_NAME_SIZE+CIPHER_KEY_SIZE+MAC_SECRET_SIZE)

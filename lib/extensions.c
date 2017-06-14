@@ -823,31 +823,18 @@ gnutls_session_ext_register(gnutls_session_t session,
 
 	/* reject handling any extensions which modify the TLS handshake
 	 * in any way, or are mapped to an exported API. */
-	switch(type) {
-		case GNUTLS_EXTENSION_SRP:
-		case GNUTLS_EXTENSION_ALPN:
-		case GNUTLS_EXTENSION_STATUS_REQUEST:
-		case GNUTLS_EXTENSION_CERT_TYPE:
-		case GNUTLS_EXTENSION_SUPPORTED_ECC:
-		case GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS:
-		case GNUTLS_EXTENSION_ETM:
-		case GNUTLS_EXTENSION_EXT_MASTER_SECRET:
-		case GNUTLS_EXTENSION_SESSION_TICKET:
-		case GNUTLS_EXTENSION_SAFE_RENEGOTIATION:
-		case GNUTLS_EXTENSION_HEARTBEAT:
-		case GNUTLS_EXTENSION_SRTP:
-		case GNUTLS_EXTENSION_SERVER_NAME:
-			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
-	}
-
-	if (!flags & GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL) {
-		for (i = 0; extfunc[i] != NULL; i++) {
-			if (extfunc[i]->type == type)
+	for (i = 0; extfunc[i] != NULL; i++) {
+		if (extfunc[i]->type == type) {
+			if (!flags & GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL) {
 				return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
+			} else if (extfunc[i]->cannot_be_overriden) {
+				return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
+			}
+			break;
 		}
 	}
 
-	tmp_mod.name = NULL;
+	memset(&tmp_mod, 0, sizeof(extension_entry_st));
 	tmp_mod.free_struct = 1;
 	tmp_mod.type = type;
 	tmp_mod.parse_type = parse_type;

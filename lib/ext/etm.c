@@ -44,7 +44,8 @@ const extension_entry_st ext_mod_etm = {
 	.send_func = _gnutls_ext_etm_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
-	.deinit_func = NULL
+	.deinit_func = NULL,
+	.cannot_be_overriden = 1
 };
 
 /* 

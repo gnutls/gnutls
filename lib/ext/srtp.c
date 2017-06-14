@@ -49,6 +49,7 @@ const extension_entry_st ext_mod_srtp = {
 	.pack_func = _gnutls_srtp_pack,
 	.unpack_func = _gnutls_srtp_unpack,
 	.deinit_func = _gnutls_srtp_deinit_data,
+	.cannot_be_overriden = 1
 };
 
 typedef struct {

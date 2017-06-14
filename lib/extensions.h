@@ -83,6 +83,12 @@ typedef struct extension_entry_st {
 							 */
 	gnutls_ext_pack_func pack_func;	/* packs internal data to machine independent format */
 	gnutls_ext_unpack_func unpack_func;	/* unpacks internal data */
+
+	/* non-zero if that extension cannot be overriden by the applications.
+	 * That should be set to extensions which allocate data early, e.g., on
+	 * gnutls_init(), or modify the TLS protocol in a way that the application
+	 * cannot control. */
+	unsigned cannot_be_overriden;
 } extension_entry_st;
 
 int _gnutls_ext_register(extension_entry_st *);
