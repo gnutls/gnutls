@@ -356,27 +356,27 @@ MinGW32:
 
 # That is a specific runner that we cannot enable universally.
 # We restrict it to builds under the $BUILD_IMAGES_PROJECT project.
-FreeBSD10/x86_64:
-  stage: stage1-testing
-  image:
-  before_script:
-  - /usr/bin/true
-  script:
-  - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
-    --with-included-libtasn1 --disable-guile --with-included-unistring --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
-  tags:
-  - freebsd
-  only:
-  - branches@gnutls/gnutls
-  except:
-  - tags
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - ./*.log
-      - tests/*.log
-      - tests/*/*.log
+#FreeBSD10/x86_64:
+#  stage: stage1-testing
+#  image:
+#  before_script:
+#  - /usr/bin/true
+#  script:
+#  - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
+#    --with-included-libtasn1 --disable-guile --with-included-unistring --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
+#  tags:
+#  - freebsd
+#  only:
+#  - branches@gnutls/gnutls
+#  except:
+#  - tags
+#  artifacts:
+#    expire_in: 1 week
+#    when: on_failure
+#    paths:
+#      - ./*.log
+#      - tests/*.log
+#      - tests/*/*.log
 
 # We need a clean 32-bit fedora for testing
 Fedora/x86:
