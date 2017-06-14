@@ -8,6 +8,7 @@
      "tests" : [
          {"name" : "test-ocsp-stapling.py",
           "arguments" : ["--no-status"] },
+         {"name" : "test-chacha20.py"},
          {"name" : "test-aes-gcm-nonces.py" },
          {"name" : "test-atypical-padding.py" },
          {"name" : "test-bleichenbacher-workaround.py" },
