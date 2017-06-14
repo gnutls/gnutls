@@ -179,24 +179,36 @@ _gnutls_extension_list_check(gnutls_session_t session, uint16_t type)
  *
  * In server side, this list is used to ensure we don't send
  * extensions that we didn't receive a corresponding value.
+ *
+ * Returns zero if failed, non-zero on success.
  */
-static void _gnutls_extension_list_add(gnutls_session_t session, const struct extension_entry_st *e)
+static unsigned _gnutls_extension_list_add(gnutls_session_t session, const struct extension_entry_st *e, unsigned check_dup)
 {
+	unsigned i;
+
+	if (check_dup) {
+		for (i=0;i<session->internals.used_exts_size;i++) {
+			if (session->internals.used_exts[i]->type == e->type)
+				return 0;
+		}
+	}
 
 	if (session->internals.used_exts_size < MAX_EXT_TYPES) {
 		session->internals.used_exts[session->
 						   internals.used_exts_size]
 		    = e;
 		session->internals.used_exts_size++;
+		return 1;
 	} else {
 		_gnutls_handshake_log
 		    ("extensions: Increase MAX_EXT_TYPES\n");
+		return 0;
 	}
 }
 
 void _gnutls_extension_list_add_sr(gnutls_session_t session)
 {
-	_gnutls_extension_list_add(session, &ext_mod_sr);
+	_gnutls_extension_list_add(session, &ext_mod_sr, 1);
 }
 
 
@@ -272,9 +284,10 @@ _gnutls_parse_extensions(gnutls_session_t session,
 			continue;
 		}
 
-		/* only store the extension number if we support it */
 		if (session->security_parameters.entity == GNUTLS_SERVER) {
-			_gnutls_extension_list_add(session, ext);
+			ret = _gnutls_extension_list_add(session, ext, 1);
+			if (ret == 0)
+				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 		}
 
 		_gnutls_handshake_log
@@ -346,7 +359,7 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 		/* add this extension to the extension list
 		 */
 		if (session->security_parameters.entity == GNUTLS_CLIENT)
-			_gnutls_extension_list_add(session, p);
+			_gnutls_extension_list_add(session, p, 0);
 
 		_gnutls_handshake_log
 			    ("EXT[%p]: Sending extension %s (%d bytes)\n",
