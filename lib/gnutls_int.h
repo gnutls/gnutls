@@ -1050,13 +1050,9 @@ typedef struct {
 		uint16_t type;
 		gnutls_ext_priv_data_t priv;
 		bool set;
-	} extension_int_data[MAX_EXT_TYPES];
-
-	struct {
-		uint16_t type;
-		gnutls_ext_priv_data_t priv;
-		bool set;
-	} resumed_extension_int_data[MAX_EXT_TYPES];
+		gnutls_ext_priv_data_t resumed_priv;
+		bool resumed_set;
+	} ext_data[MAX_EXT_TYPES];
 
 	const struct extension_entry_st *used_exts[MAX_EXT_TYPES];
 	unsigned used_exts_size;
