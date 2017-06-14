@@ -494,11 +494,11 @@ decrypt_packet(gnutls_session_t session,
 		 */
 		if (unlikely(_gnutls_auth_cipher_is_aead(&params->read.
 						   cipher_state) == 0))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 
 		if (unlikely(ciphertext->size < (tag_size + exp_iv_size)))
-			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 		if (params->cipher->xor_nonce == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
@@ -507,7 +507,7 @@ decrypt_packet(gnutls_session_t session,
 			    (params->read.IV.data == NULL
 			     || params->read.IV.size != 4))
 				return
-				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				    gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 			memcpy(nonce, params->read.IV.data,
 			       imp_iv_size);
@@ -519,7 +519,7 @@ decrypt_packet(gnutls_session_t session,
 			ciphertext->size -= exp_iv_size;
 		} else { /* XOR nonce with IV */
 			if (unlikely(params->read.IV.size != 12 || imp_iv_size != 12 || exp_iv_size != 0))
-				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 			memset(nonce, 0, 4);
 			memcpy(&nonce[4], UINT64DATA(*sequence), 8);
@@ -726,7 +726,7 @@ decrypt_packet(gnutls_session_t session,
 		}
 		break;
 	default:
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	}
 
 	/* STREAM or BLOCK arrive here */
