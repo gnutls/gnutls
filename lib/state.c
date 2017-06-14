@@ -273,11 +273,9 @@ inline static void deinit_internal_params(gnutls_session_t session)
 	       sizeof(session->internals.params));
 }
 
-/* This function will clear all the variables in internals
- * structure within the session, which depend on the current handshake.
- * This is used to allow further handshakes.
- */
-static void _gnutls_handshake_internal_state_init(gnutls_session_t session)
+/* An internal version of _gnutls_handshake_internal_state_clear(),
+ * it will not attempt to deallocate, only initialize */
+static void handshake_internal_state_clear1(gnutls_session_t session)
 {
 	/* by default no selected certificate */
 	session->internals.adv_version_major = 0;
@@ -297,9 +295,13 @@ static void _gnutls_handshake_internal_state_init(gnutls_session_t session)
 	session->internals.dtls.hsk_write_seq = 0;
 }
 
+/* This function will clear all the variables in internals
+ * structure within the session, which depend on the current handshake.
+ * This is used to allow further handshakes.
+ */
 void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 {
-	_gnutls_handshake_internal_state_init(session);
+	handshake_internal_state_clear1(session);
 
 	deinit_internal_params(session);
 	deinit_keys(session);
@@ -395,7 +397,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	 * as NULL or 0. This is why calloc is used.
 	 */
 
-	_gnutls_handshake_internal_state_init(*session);
+	handshake_internal_state_clear1(*session);
 
 	/* emulate old gnutls behavior for old applications that do not use the priority_*
 	 * functions.
