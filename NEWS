@@ -37,7 +37,7 @@ See the end for copying conditions.
    to verification functions. Resolves gitlab issue #177.
 
 ** libgnutls: OpenPGP authentication is disabled by default, and the resulting
-   library is ABI compatible (will openpgp related functions being stubs that fail
+   library is ABI compatible (with openpgp related functions being stubs that fail
    on invocation). The flag --enable-openpgp-authentication to configure will
    enable OpenPGP authentication support.
 
