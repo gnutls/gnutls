@@ -22,8 +22,10 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/ocsp.h>
 
-
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+#ifdef __cplusplus
+extern "C"
+#endif
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     gnutls_datum_t raw;
     gnutls_datum_t out;
     gnutls_ocsp_resp_t resp;

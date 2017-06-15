@@ -50,7 +50,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
 	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit \
-	p11-kit-trust-data/Example_Root_CA.pem
+	p11-kit-trust-data/Example_Root_CA.pem ocsp-resp-interesting/1492.der
 
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
@@ -90,7 +90,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
 	 crq_key_id x509sign-verify sign-verify cve-2009-1415 cve-2009-1416		\
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain	tls-rehandshake-cert-3 \
-	 nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
+	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	ocsp-resp \
 	 tls-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
