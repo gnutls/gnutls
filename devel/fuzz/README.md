@@ -52,12 +52,13 @@ sudo docker run --rm -e ASAN_OPTIONS="detect_leaks=0" -ti -v $FILE:/testcase oss
 For the following tests dropping a file to a subdirectory in tests is
 sufficient:
 
-| Fuzzer                    | Directory               |
-|:-------------------------:|:-----------------------:|
-|gnutls_client_fuzzer       | tests/client-interesting|
-|gnutls_server_fuzzer       | tests/server-interesting|
-|gnutls_pkcs7_parser_fuzzer | tests/pkcs7-interesting |
-|gnutls_x509_parser_fuzzer  | tests/certs-interesting |
+| Fuzzer                       | Directory                  |
+|:----------------------------:|:--------------------------:|
+|gnutls_client_fuzzer          | tests/client-interesting   |
+|gnutls_server_fuzzer          | tests/server-interesting   |
+|gnutls_pkcs7_parser_fuzzer    | tests/pkcs7-interesting    |
+|gnutls_x509_parser_fuzzer     | tests/certs-interesting    |
+|gnutls_ocsp_resp_parser_fuzzer| tests/ocsp-resp-interesting|
 
 The following require modifying a test case. Mappings are shown in the
 table below.
