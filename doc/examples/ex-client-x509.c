@@ -29,13 +29,10 @@ int main(void)
 {
         int ret, sd, ii;
         gnutls_session_t session;
-        char buffer[MAX_BUF + 1];
+        char buffer[MAX_BUF + 1], *desc;
         gnutls_datum_t out;
         int type;
         unsigned status;
-#if 0
-        const char *err;
-#endif
         gnutls_certificate_credentials_t xcred;
 
         if (gnutls_check_version("3.4.6") == NULL) {
@@ -56,8 +53,7 @@ int main(void)
 
         /* If client holds a certificate it can be set using the following:
          *
-         gnutls_certificate_set_x509_key_file (xcred, 
-         "cert.pem", "key.pem", 
+         gnutls_certificate_set_x509_key_file (xcred, "cert.pem", "key.pem", 
          GNUTLS_X509_FMT_PEM); 
          */
 
@@ -70,17 +66,6 @@ int main(void)
 
         /* It is recommended to use the default priorities */
         CHECK(gnutls_set_default_priority(session));
-#if 0
-	/* if more fine-graned control is required */
-        ret = gnutls_priority_set_direct(session, 
-                                         "NORMAL", &err);
-        if (ret < 0) {
-                if (ret == GNUTLS_E_INVALID_REQUEST) {
-                        fprintf(stderr, "Syntax error at: %s\n", err);
-                }
-                exit(1);
-        }
-#endif
 
         /* put the x509 credentials to the current session
          */
@@ -114,8 +99,6 @@ int main(void)
                 fprintf(stderr, "*** Handshake failed: %s\n", gnutls_strerror(ret));
                 goto end;
         } else {
-                char *desc;
-
                 desc = gnutls_session_get_desc(session);
                 printf("- Session info: %s\n", desc);
                 gnutls_free(desc);
