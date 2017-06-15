@@ -981,6 +981,9 @@ int gnutls_ocsp_resp_get_status(gnutls_ocsp_resp_t resp)
 		return _gnutls_asn2err(ret);
 	}
 
+	if (len != 1)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+
 	switch (str[0]) {
 	case GNUTLS_OCSP_RESP_SUCCESSFUL:
 	case GNUTLS_OCSP_RESP_MALFORMEDREQUEST:
@@ -990,7 +993,7 @@ int gnutls_ocsp_resp_get_status(gnutls_ocsp_resp_t resp)
 	case GNUTLS_OCSP_RESP_UNAUTHORIZED:
 		break;
 	default:
-		return GNUTLS_E_UNEXPECTED_PACKET;
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 	}
 
 	return (int) str[0];
