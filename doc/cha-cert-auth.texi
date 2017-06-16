@@ -469,15 +469,14 @@ other verification functions which do not allow setting a purpose, would operate
 @cindex OpenPGP certificates
 
 Previous versions of GnuTLS supported limited @acronym{OpenPGP} key
-authentication. That functionality has been deprecated and although
-is still made available, it is no longer recommended to use.
-The reason is that, supporting alternative authentication
-methods, when X.509 and PKIX were new and not well established, seemed like a
-good idea, in today's internet X.509 is unquestionably the main
+authentication. That functionality has been deprecated and is no longer
+made available. The reason is that, supporting alternative authentication
+methods, when X.509 and PKIX were new on the Internet and not well established, seemed like a
+good idea, in today's Internet X.509 is unquestionably the main
 container for certificates. As such supporting more options with no clear
 use-cases, is a distraction that consumes considerable resources for
-improving and testing. For that we have decided to mark this functionality
-as deprecated, and will be dropped in one of the next GnuTLS major releases.
+improving and testing the library. For that we have decided to drop
+this functionality completely in 3.6.0.
 
 
 @node Advanced certificate verification

@@ -372,7 +372,7 @@ The available authentication methods in @acronym{GnuTLS} follow.
 
 @itemize
 
-@item Certificate authentication: Authenticated key exchange using public key infrastructure and certificates (X.509 or OpenPGP).
+@item Certificate authentication: Authenticated key exchange using public key infrastructure and X.509 certificates.
 @item @acronym{SRP} authentication: Authenticated key exchange using a password.
 @item @acronym{PSK} authentication: Authenticated key exchange using a pre-shared key.
 @item Anonymous authentication: Key exchange without peer authentication.

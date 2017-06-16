@@ -19,7 +19,7 @@ include:
 
 @item Support for Datagram TLS 1.0 and 1.2.
 
-@item Support for handling and verification of @acronym{X.509} and @acronym{OpenPGP} certificates.
+@item Support for handling and verification of @acronym{X.509} certificates.
 
 @item Support for password authentication using @acronym{TLS-SRP}.
 
@@ -97,7 +97,6 @@ options are given.
 --disable-srp-authentication
 --disable-psk-authentication
 --disable-anon-authentication
---disable-openpgp-authentication
 --disable-dhe
 --disable-ecdhe
 --disable-openssl-compatibility

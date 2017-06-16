@@ -1242,7 +1242,7 @@ CURVE-SECP521R1, and CURVE-X25519.
 Catch all which enables all curves from NORMAL priority is CURVE-ALL.
 
 @item Certificate type @tab
-The options CTYPE-OPENPGP (deprecated), and CTYPE-X509 are available. Catch all is CTYPE-ALL.
+The only option currently is CTYPE-X509. Catch all is CTYPE-ALL.
 
 @end multitable
 @caption{The supported algorithm keywords in priority strings.}
