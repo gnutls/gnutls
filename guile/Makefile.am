@@ -104,13 +104,6 @@ TESTS =						\
   tests/x509-auth.scm				\
   tests/priorities.scm
 
-if ENABLE_OPENPGP
-TESTS +=					\
-  tests/openpgp-keys.scm			\
-  tests/openpgp-keyring.scm			\
-  tests/openpgp-auth.scm
-endif
-
 if ENABLE_SRP
 TESTS +=					\
   tests/srp-base64.scm
@@ -125,12 +118,6 @@ LOG_COMPILER = $(top_builddir)/guile/pre-inst-guile -L $(srcdir)/tests
 
 EXTRA_DIST +=					\
   $(TESTS)					\
-  tests/openpgp-pub.asc				\
-  tests/openpgp-sec.asc				\
-  tests/openpgp-elg-pub.asc			\
-  tests/openpgp-elg-sec.asc			\
-  tests/openpgp-keyring.gpg			\
-  tests/openpgp-keyring.asc			\
   tests/rsa-parameters.pem			\
   tests/dh-parameters.pem			\
   tests/x509-certificate.pem			\
