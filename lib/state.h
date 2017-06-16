@@ -25,9 +25,6 @@
 
 #include "gnutls_int.h"
 
-void _gnutls_session_cert_type_set(gnutls_session_t session,
-				   gnutls_certificate_type_t);
-
 inline static gnutls_ecc_curve_t
 _gnutls_session_ecc_curve_get(gnutls_session_t session)
 {
@@ -59,8 +56,6 @@ _gnutls_hello_set_default_version(gnutls_session_t session,
 
 #endif
 
-int _gnutls_session_cert_type_supported(gnutls_session_t,
-					gnutls_certificate_type_t);
 int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits);
 
 int _gnutls_dh_set_peer_public(gnutls_session_t session, bigint_t public);

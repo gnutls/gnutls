@@ -488,11 +488,6 @@ static const int cert_type_priority_default[] = {
 	0
 };
 
-static const int cert_type_priority_all[] = {
-	GNUTLS_CRT_X509,
-	0
-};
-
 typedef void (rmadd_func) (priority_st * priority_list, unsigned int alg);
 
 static void prio_remove(priority_st * priority_list, unsigned int algo)
@@ -1386,27 +1381,10 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					else
 						goto error;
 				}
-			} /* now check if the element is something like -ALGO */
-			else if (strncasecmp
+			} else if (strncasecmp
 				 (&broken_list[i][1], "CTYPE-", 6) == 0) {
-				if (strncasecmp
-				    (&broken_list[i][1], "CTYPE-ALL",
-				     9) == 0) {
-					bulk_fn(&(*priority_cache)->
-						cert_type,
-						cert_type_priority_all);
-				} else {
-					if ((algo =
-					     gnutls_certificate_type_get_id
-					     (&broken_list[i][7])) !=
-					    GNUTLS_CRT_UNKNOWN)
-						fn(&(*priority_cache)->
-						   cert_type, algo);
-					else
-						goto error;
-				}
-			} /* now check if the element is something like -ALGO */
-			else if (strncasecmp
+				continue;
+			} else if (strncasecmp
 				 (&broken_list[i][1], "SIGN-", 5) == 0) {
 				if (strncasecmp
 				    (&broken_list[i][1], "SIGN-ALL",
@@ -1424,19 +1402,16 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					else
 						goto error;
 				}
-			} else
-			    if (strncasecmp
+			} else if (strncasecmp
 				(&broken_list[i][1], "MAC-ALL", 7) == 0) {
 				bulk_fn(&(*priority_cache)->mac,
 					mac_priority_normal);
-			} else
-			    if (strncasecmp
+			} else if (strncasecmp
 				(&broken_list[i][1], "CIPHER-ALL",
 				 10) == 0) {
 				bulk_fn(&(*priority_cache)->cipher,
 					cipher_priority_normal);
-			} else
-			    if (strncasecmp
+			} else if (strncasecmp
 				(&broken_list[i][1], "KX-ALL", 6) == 0) {
 				bulk_fn(&(*priority_cache)->kx,
 					kx_priority_secure);
