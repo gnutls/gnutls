@@ -5,6 +5,26 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.14 (unreleased)
+
+** libgnutls: Handle specially HSMs which request explicit authentication.
+   There are HSMs which return CKR_USER_NOT_LOGGED_IN on the first private key
+   operation. Detect that state and try to login.
+
+** libgnutls: the GNUTLS_PKCS11_OBJ_FLAG_LOGIN will force a login on HSMs.
+   That is, even in tokens which do not have a CKF_LOGIN_REQUIRED flag
+   a login will be forced. This improves operation on certain Safenet HSMs.
+
+** libgnutls: do not set leading zeros when copying integers on HSMs.
+   PKCS#11 defines integers as unsigned having most significant byte
+   first, e.g., 32768 = 0x80 0x00. This is interpreted literraly by
+   some HSMs which do not accept an integer with a leading zero. This
+   improves operation with certain Atos HSMs.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.5.13 (released 2017-06-07)
 
 ** libgnutls: fixed issue with AES-GCM in-place encryption and decryption in
