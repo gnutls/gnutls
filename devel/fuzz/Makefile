@@ -21,7 +21,7 @@ CC?="afl-gcc"
 COMMON=-I../../lib/includes -L../../lib/.libs -Wl,-rpath=../../lib/.libs -lgnutls
 
 all: gnutls_pkcs7_parser_fuzzer gnutls_client_fuzzer gnutls_dn_parser_fuzzer \
-	gnutls_openpgp_cert_parser_fuzzer gnutls_pkcs7_parser_fuzzer gnutls_pkcs8_key_parser_fuzzer \
+	gnutls_pkcs7_parser_fuzzer gnutls_pkcs8_key_parser_fuzzer \
 	gnutls_private_key_parser_fuzzer gnutls_server_fuzzer gnutls_x509_parser_fuzzer \
 	gnutls_reverse_idna_parser_fuzzer gnutls_idna_parser_fuzzer gnutls_ocsp_resp_parser_fuzzer \
 	gnutls_ocsp_req_parser_fuzzer gnutls_pkcs12_key_parser_fuzzer gnutls_base64_decoder_fuzzer \
@@ -32,7 +32,7 @@ all: gnutls_pkcs7_parser_fuzzer gnutls_client_fuzzer gnutls_dn_parser_fuzzer \
 
 clean:
 	rm -f gnutls_pkcs7_parser_fuzzer gnutls_client_fuzzer gnutls_dn_parser_fuzzer \
-	gnutls_openpgp_cert_parser_fuzzer gnutls_pkcs7_parser_fuzzer gnutls_pkcs8_key_parser_fuzzer \
+	gnutls_pkcs7_parser_fuzzer gnutls_pkcs8_key_parser_fuzzer \
 	gnutls_private_key_parser_fuzzer gnutls_server_fuzzer gnutls_x509_parser_fuzzer \
 	gnutls_idna_parser_fuzzer gnutls_reverse_idna_parser_fuzzer gnutls_ocsp_resp_parser_fuzzer \
 	gnutls_ocsp_req_parser_fuzzer gnutls_base64_decoder_fuzzer \

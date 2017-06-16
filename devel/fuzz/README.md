@@ -66,6 +66,5 @@ table below.
 | Fuzzer                          | Test case                                                |
 |:-------------------------------:|:--------------------------------------------------------:|
 |gnutls_dn_parser_fuzzer          |tests/x509-dn-decode.c                                    |
-|gnutls_openpgp_cert_parser_fuzzer|tests/cert-tests/openpgp-cert-parser                      |
 |gnutls_pkcs8_key_parser_fuzzer   |tests/key-tests/pkcs8-invalid,tests/key-tests/pkcs8-decode|
 |gnutls_private_key_parser_fuzzer |tests/key-tests/key-invalid                               |
