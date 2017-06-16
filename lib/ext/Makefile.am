@@ -26,8 +26,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
 	-I$(builddir)/../../gl          \
-	-I$(srcdir)/..			\
-	-I$(srcdir)/../opencdk
+	-I$(srcdir)/..
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1
@@ -35,9 +34,9 @@ endif
 
 noinst_LTLIBRARIES = libgnutls_ext.la
 
-libgnutls_ext_la_SOURCES = max_record.c cert_type.c \
+libgnutls_ext_la_SOURCES = max_record.c \
 	server_name.c signature.c safe_renegotiation.c \
-	max_record.h cert_type.h server_name.h srp.h \
+	max_record.h server_name.h srp.h \
 	session_ticket.h signature.h safe_renegotiation.h \
 	session_ticket.c srp.c ecc.c ecc.h heartbeat.c heartbeat.h \
 	status_request.h status_request.c dumbfw.c dumbfw.h \

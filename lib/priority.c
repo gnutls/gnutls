@@ -490,7 +490,6 @@ static const int cert_type_priority_default[] = {
 
 static const int cert_type_priority_all[] = {
 	GNUTLS_CRT_X509,
-	GNUTLS_CRT_OPENPGP,
 	0
 };
 

@@ -302,21 +302,6 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_ECDHE, test "$ac_enable_ecdhe" != "no")
 
-  ac_enable_openpgp=no
-  AC_MSG_CHECKING([whether to enable OpenPGP Certificate authentication support])
-  AC_ARG_ENABLE(openpgp-authentication,
-    AS_HELP_STRING([--enable-openpgp-authentication],
-                   [enable the OpenPGP authentication support]),
-    ac_enable_openpgp=$enableval)
-  if test x$ac_enable_openpgp = xno; then
-   AC_MSG_RESULT(yes)
-   ac_full=0
-  else
-   AC_DEFINE([ENABLE_OPENPGP], 1, [use openpgp authentication])
-   AC_MSG_RESULT(no)
-  fi
-  AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
-
   # For cryptodev
   AC_MSG_CHECKING([whether to add cryptodev support])
   AC_ARG_ENABLE(cryptodev,

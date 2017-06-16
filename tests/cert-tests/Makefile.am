@@ -15,9 +15,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this file; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem \
 	data/template-test.key data/template-test.pem templates/template-test.tmpl \
@@ -62,11 +61,9 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/code-signing-ca.pem data/code-signing-cert.pem data/multi-value-dn.pem \
 	data/pkcs7-cat-ca.pem data/pkcs7-cat.p7 data/openssl.p7b data/openssl.p7b.out \
 	data/openssl-keyid.p7b data/openssl-keyid.p7b.out data/openssl.p12 \
-	data/openpgp-invalid1.pub data/openpgp-invalid2.pub data/openpgp-invalid3.pub \
 	data/x509-v1-with-sid.pem data/x509-v1-with-iid.pem data/x509-v3-with-fractional-time.pem \
-	data/openpgp-invalid5.pub data/openpgp-invalid6.pub templates/template-long-dns.tmpl \
-	data/long-dns.pem data/template-long-dns-crq.pem data/openpgp-invalid7.pub \
-	data/openpgp-invalid8.pub data/chain-with-critical-on-root.pem \
+	templates/template-long-dns.tmpl \
+	data/long-dns.pem data/template-long-dns-crq.pem data/chain-with-critical-on-root.pem \
 	data/chain-with-critical-on-intermediate.pem data/chain-with-critical-on-endcert.pem \
 	templates/crit-extensions.tmpl data/crit-extensions.pem data/x509-with-zero-version.pem \
 	data/key-corpus-rc2-1.p12 data/key-corpus-rc2-2.p12 data/key-corpus-rc2-3.p12 \
@@ -88,16 +85,6 @@ dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 
 if WANT_TEST_SUITE
 dist_check_SCRIPTS += provable-dh-default
-endif
-
-if ENABLE_OPENPGP
-# The selftest is disabled until we can make it work under Wine and
-# under Debian buildds (problem with 127.0.0.2?).
-dist_check_SCRIPTS += openpgp-selfsigs
-dist_check_SCRIPTS += openpgp-cert-parser
-if !WINDOWS
-dist_check_SCRIPTS += openpgp-certs
-endif
 endif
 
 dist_check_SCRIPTS += certtool-utf8 crq

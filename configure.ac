@@ -930,7 +930,6 @@ AC_CONFIG_FILES([
   Makefile
   doc/Makefile
   doc/credentials/Makefile
-  doc/credentials/openpgp/Makefile
   doc/credentials/srp/Makefile
   doc/credentials/x509/Makefile
   doc/cyclo/Makefile
@@ -963,8 +962,6 @@ AC_CONFIG_FILES([
   lib/includes/gnutls/gnutls.h
   lib/minitasn1/Makefile
   lib/nettle/Makefile
-  lib/opencdk/Makefile
-  lib/openpgp/Makefile
   lib/x509/Makefile
   lib/unistring/Makefile
   po/Makefile.in
@@ -1025,7 +1022,6 @@ if features are disabled)
   ALPN support:         $ac_enable_alpn
   OCSP support:         $ac_enable_ocsp
   Ses. ticket support:  $ac_enable_session_tickets
-  OpenPGP support:      $ac_enable_openpgp
   SRP support:          $ac_enable_srp
   PSK support:          $ac_enable_psk
   DHE support:          $ac_enable_dhe

@@ -28,8 +28,6 @@
 #include <gnutls/openpgp.h>
 #include <gnutls/abstract.h>
 
-#ifndef ENABLE_OPENPGP
-
 int gnutls_openpgp_crt_init(gnutls_openpgp_crt_t * key)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -699,4 +697,3 @@ gnutls_openpgp_privkey_sign_hash(gnutls_openpgp_privkey_t key,
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
-#endif

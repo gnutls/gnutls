@@ -40,9 +40,6 @@
 #include <str_array.h>
 #include <x509/verify-high.h>
 #include "x509/x509_int.h"
-#ifdef ENABLE_OPENPGP
-#include "openpgp/openpgp.h"
-#endif
 #include "dh.h"
 
 /**
@@ -202,9 +199,7 @@ gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 	gnutls_x509_trust_list_deinit(sc->tlist, 1);
 	gnutls_certificate_free_keys(sc);
 	memset(sc->pin_tmp, 0, sizeof(sc->pin_tmp));
-#ifdef ENABLE_OPENPGP
-	gnutls_openpgp_keyring_deinit(sc->keyring);
-#endif
+
 	if (sc->deinit_dh_params) {
 		gnutls_dh_params_deinit(sc->dh_params);
 	}
@@ -564,73 +559,6 @@ _gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum_t * cert)
 	return result;
 }
 
-#ifdef ENABLE_OPENPGP
-/*-
- * _gnutls_openpgp_crt_verify_peers - return the peer's certificate status
- * @session: is a gnutls session
- *
- * This function will try to verify the peer's certificate and return its status (TRUSTED, INVALID etc.).
- * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
- -*/
-static int
-_gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
-				 gnutls_x509_subject_alt_name_t type,
-				 const char *hostname,
-				 unsigned int *status)
-{
-	cert_auth_info_t info;
-	gnutls_certificate_credentials_t cred;
-	int peer_certificate_list_size, ret;
-	unsigned int verify_flags;
-
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
-	if (info == NULL)
-		return GNUTLS_E_INVALID_REQUEST;
-
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
-
-	if (info->raw_certificate_list == NULL || info->ncerts == 0) {
-		gnutls_assert();
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-	}
-
-	verify_flags = cred->verify_flags | session->internals.additional_verify_flags;
-
-	/* generate a list of gnutls_certs based on the auth info
-	 * raw certs.
-	 */
-	peer_certificate_list_size = info->ncerts;
-
-	if (peer_certificate_list_size != 1) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	/* Verify certificate 
-	 */
-	ret =
-	    _gnutls_openpgp_verify_key(cred, type, hostname,
-				       &info->raw_certificate_list[0],
-				       peer_certificate_list_size,
-				       verify_flags,
-				       status);
-
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return 0;
-}
-#endif
-
 /**
  * gnutls_certificate_verify_peers2:
  * @session: is a gnutls session
@@ -764,28 +692,6 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 	case GNUTLS_CRT_X509:
 		return _gnutls_x509_cert_verify_peers(session, data, elements,
 						      status);
-#ifdef ENABLE_OPENPGP
-	case GNUTLS_CRT_OPENPGP: {
-		const char *hostname = NULL;
-		unsigned i, type = 0;
-
-		for (i=0;i<elements;i++) {
-			if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
-				hostname = (char*)data[i].data;
-				type = GNUTLS_SAN_DNSNAME;
-				break;
-			} else if (data[i].type == GNUTLS_DT_RFC822NAME) {
-				hostname = (char*)data[i].data;
-				type = GNUTLS_SAN_RFC822NAME;
-				break;
-			}
-		}
-		return _gnutls_openpgp_crt_verify_peers(session,
-							type,
-							hostname,
-							status);
-	}
-#endif
 	default:
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -823,12 +729,6 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session)
 		    _gnutls_x509_get_raw_crt_expiration_time(&info->
 							     raw_certificate_list
 							     [0]);
-#ifdef ENABLE_OPENPGP
-	case GNUTLS_CRT_OPENPGP:
-		return
-		    _gnutls_openpgp_get_raw_key_expiration_time
-		    (&info->raw_certificate_list[0]);
-#endif
 	default:
 		return (time_t) - 1;
 	}
@@ -839,7 +739,6 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session)
  * @session: is a gnutls session
  *
  * This function will return the peer's certificate activation time.
- * This is the creation time for openpgp keys.
  *
  * Returns: (time_t)-1 on error.
  *
@@ -867,13 +766,6 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session_t session)
 		    _gnutls_x509_get_raw_crt_activation_time(&info->
 							     raw_certificate_list
 							     [0]);
-#ifdef ENABLE_OPENPGP
-	case GNUTLS_CRT_OPENPGP:
-		return
-		    _gnutls_openpgp_get_raw_key_creation_time(&info->
-							      raw_certificate_list
-							      [0]);
-#endif
 	default:
 		return (time_t) - 1;
 	}
@@ -1007,16 +899,6 @@ gnutls_certificate_verification_status_print(unsigned int status,
 			_gnutls_buffer_append_str(&str,
 						  _
 						  ("The certificate issuer is not a CA. "));
-	} else if (type == GNUTLS_CRT_OPENPGP) {
-		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("Could not find a signer of the certificate. "));
-
-		if (status & GNUTLS_CERT_REVOKED)
-			_gnutls_buffer_append_str(&str,
-						  _
-						  ("The certificate is revoked. "));
 	}
 
 	if (status & GNUTLS_CERT_INSECURE_ALGORITHM)

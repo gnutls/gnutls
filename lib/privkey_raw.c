@@ -27,8 +27,6 @@
 #include <gnutls/abstract.h>
 #include <pk.h>
 #include <x509_int.h>
-#include <openpgp/openpgp_int.h>
-#include <openpgp/openpgp.h>
 #include <tls-sig.h>
 #include <algorithms.h>
 #include <fips.h>

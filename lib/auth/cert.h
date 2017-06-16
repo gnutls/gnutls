@@ -25,7 +25,6 @@
 #include "auth.h"
 #include <auth/dh_common.h>
 #include <x509/x509_int.h>
-#include <openpgp/openpgp_int.h>
 #include <gnutls/abstract.h>
 #include <gnutls/compat.h>
 #include <str_array.h>
@@ -60,11 +59,6 @@ typedef struct gnutls_certificate_credentials_st {
 	 * keys. pkey[i] corresponds to certificate in
 	 * cert_list[i][0].
 	 */
-
-#ifdef ENABLE_OPENPGP
-	/* OpenPGP specific stuff */
-	gnutls_openpgp_keyring_t keyring;
-#endif
 
 	/* X509 specific stuff */
 	gnutls_x509_trust_list_t tlist;
@@ -111,9 +105,6 @@ typedef struct cert_auth_info_st {
 	unsigned int ncerts;	/* holds the size of the list above */
 
 	gnutls_certificate_type_t cert_type;
-#ifdef ENABLE_OPENPGP
-	uint8_t subkey_id[GNUTLS_OPENPGP_KEYID_SIZE];
-#endif
 } *cert_auth_info_t;
 
 typedef struct cert_auth_info_st cert_auth_info_st;

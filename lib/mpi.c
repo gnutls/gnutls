@@ -153,31 +153,6 @@ _gnutls_mpi_init_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 	return 0;
 }
 
-#ifdef ENABLE_OPENPGP
-int
-_gnutls_mpi_init_scan_pgp(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
-{
-bigint_t r;
-int ret;
-
-	ret = _gnutls_mpi_init(&r);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret =
-	    _gnutls_mpi_scan_pgp(r, buffer, nbytes);
-	if (ret < 0) {
-		gnutls_assert();
-		_gnutls_mpi_release(&r);
-		return ret;
-	}
-
-	*ret_mpi = r;
-
-	return 0;
-}
-#endif
-
 /* Always has the first bit zero */
 int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t * dest)
 {

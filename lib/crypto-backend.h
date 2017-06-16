@@ -87,7 +87,6 @@ typedef void *bigint_t;
  * @GNUTLS_MPI_FORMAT_USG: Raw unsigned integer format.
  * @GNUTLS_MPI_FORMAT_STD: Raw signed integer format, always a leading
  *   zero when positive.
- * @GNUTLS_MPI_FORMAT_PGP: The pgp integer format.
  *
  * Enumeration of different bignum integer encoding formats.
  */
@@ -95,9 +94,7 @@ typedef enum {
 	/* raw unsigned integer format */
 	GNUTLS_MPI_FORMAT_USG = 0,
 	/* raw signed integer format - always a leading zero when positive */
-	GNUTLS_MPI_FORMAT_STD = 1,
-	/* the pgp integer format */
-	GNUTLS_MPI_FORMAT_PGP = 2
+	GNUTLS_MPI_FORMAT_STD = 1
 } gnutls_bigint_format_t;
 
 /* Multi precision integer arithmetic */

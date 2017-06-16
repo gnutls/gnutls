@@ -107,38 +107,6 @@ const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
 	return info->raw_certificate_list;
 }
 
-#ifdef ENABLE_OPENPGP
-/**
- * gnutls_certificate_get_peers_subkey_id:
- * @session: is a gnutls session
- * @id: will contain the ID
- *
- * Get the peer's subkey ID when OpenPGP certificates are
- * used. The returned @id should be treated as constant.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
- *   an error code is returned.
- *
- * Since: 3.1.3
- **/
-int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
-					   gnutls_datum_t * id)
-{
-	cert_auth_info_t info;
-
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
-	if (info == NULL)
-		return GNUTLS_E_INVALID_REQUEST;
-
-	id->data = info->subkey_id;
-	id->size = GNUTLS_OPENPGP_KEYID_SIZE;
-
-	return 0;
-}
-#endif
-
 /**
  * gnutls_certificate_client_get_request_status:
  * @session: is a gnutls session

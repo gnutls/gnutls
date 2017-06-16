@@ -34,9 +34,6 @@ struct gnutls_privkey_st {
 #ifdef ENABLE_PKCS11
 		gnutls_pkcs11_privkey_t pkcs11;
 #endif
-#ifdef ENABLE_OPENPGP
-		gnutls_openpgp_privkey_t openpgp;
-#endif
 		struct {
 			gnutls_privkey_sign_func sign_func;
 			gnutls_privkey_decrypt_func decrypt_func;
@@ -64,14 +61,6 @@ struct gnutls_pubkey_st {
 	 *      [3] is public key
 	 */
 	gnutls_pk_params_st params;
-
-#ifdef ENABLE_OPENPGP
-	uint8_t openpgp_key_id[GNUTLS_OPENPGP_KEYID_SIZE];
-	unsigned int openpgp_key_id_set;
-
-	uint8_t openpgp_key_fpr[GNUTLS_OPENPGP_V4_FINGERPRINT_SIZE];
-	unsigned int openpgp_key_fpr_set:1;
-#endif
 
 	unsigned int key_usage;	/* bits from GNUTLS_KEY_* */
 

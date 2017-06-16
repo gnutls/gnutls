@@ -669,25 +669,6 @@ _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 	return 0;
 }
 
-#ifdef ENABLE_OPENPGP
-/**
- * gnutls_openpgp_send_cert:
- * @session: a #gnutls_session_t type.
- * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
- *
- * This function will order gnutls to send the key fingerprint
- * instead of the key in the initial handshake procedure. This should
- * be used with care and only when there is indication or knowledge
- * that the server can obtain the client's key.
- **/
-void
-gnutls_openpgp_send_cert(gnutls_session_t session,
-			 gnutls_openpgp_crt_status_t status)
-{
-	session->internals.pgp_fingerprint = status;
-}
-#endif
-
 /**
  * gnutls_certificate_send_x509_rdn_sequence:
  * @session: a #gnutls_session_t type.
@@ -708,13 +689,6 @@ gnutls_certificate_send_x509_rdn_sequence(gnutls_session_t session,
 {
 	session->internals.ignore_rdn_sequence = status;
 }
-
-#ifdef ENABLE_OPENPGP
-int _gnutls_openpgp_send_fingerprint(gnutls_session_t session)
-{
-	return session->internals.pgp_fingerprint;
-}
-#endif
 
 /*-
  * _gnutls_record_set_default_version - Used to set the default version for the first record packet

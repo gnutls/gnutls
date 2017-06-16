@@ -30,7 +30,6 @@
 #include "extensions.h"
 #include "errors.h"
 #include "ext/max_record.h"
-#include <ext/cert_type.h>
 #include <ext/server_name.h>
 #include <ext/srp.h>
 #include <ext/heartbeat.h>
@@ -59,9 +58,6 @@ static extension_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 	&ext_mod_etm,
 #ifdef ENABLE_OCSP
 	&ext_mod_status_request,
-#endif
-#ifdef ENABLE_OPENPGP
-	&ext_mod_cert_type,
 #endif
 	&ext_mod_server_name,
 	&ext_mod_sr,

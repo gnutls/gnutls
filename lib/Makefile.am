@@ -45,12 +45,6 @@ AM_CPPFLAGS = \
 	$(LIBTASN1_CFLAGS)			\
 	$(P11_KIT_CFLAGS)
 
-if ENABLE_OPENPGP
-SUBDIRS += opencdk
-SUBDIRS += openpgp
-AM_CPPFLAGS += -I$(srcdir)/opencdk
-endif
-
 if !HAVE_LIBUNISTRING
 SUBDIRS += unistring
 AM_CPPFLAGS += -I$(srcdir)/unistring/ -I$(builddir)/unistring/
@@ -164,11 +158,6 @@ endif
 
 if ENABLE_TROUSERS
 thirdparty_libadd += $(LTLIBDL)
-endif
-
-if ENABLE_OPENPGP
-libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
-libgnutls_la_LIBADD += opencdk/libminiopencdk.la
 endif
 
 if HAVE_LD_VERSION_SCRIPT

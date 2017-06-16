@@ -105,7 +105,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 crlverify mini-dtls-discard init_fds mini-record-failure \
 	 tls-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
-	 mini-dtls-record-asym openpgp-callback key-import-export \
+	 mini-dtls-record-asym key-import-export \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
@@ -263,18 +263,9 @@ ctests +=  openssl
 openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
 endif
 
-if ENABLE_OPENPGP
-ctests += openpgp-auth openpgp-auth2 openpgp-keyring pgps2kgnu
-endif
-
 if HAVE_FORK
 ctests += x509self x509dn anonself pskself dhepskself	\
 	setcredcrash resume-x509 resume-psk resume-anon
-
-if ENABLE_OPENPGP
-ctests += openpgpself 
-endif
-
 endif
 
 gc_CPPFLAGS = $(AM_CPPFLAGS) \

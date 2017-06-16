@@ -41,8 +41,6 @@ const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t
 
 	if (type == GNUTLS_CRT_X509)
 		ret = "X.509";
-	if (type == GNUTLS_CRT_OPENPGP)
-		ret = "OPENPGP";
 
 	return ret;
 }
@@ -63,15 +61,12 @@ gnutls_certificate_type_t gnutls_certificate_type_get_id(const char *name)
 	if (strcasecmp(name, "X.509") == 0
 	    || strcasecmp(name, "X509") == 0)
 		return GNUTLS_CRT_X509;
-	if (strcasecmp(name, "OPENPGP") == 0)
-		return GNUTLS_CRT_OPENPGP;
 
 	return ret;
 }
 
 static const gnutls_certificate_type_t supported_certificate_types[] = {
 	GNUTLS_CRT_X509,
-	GNUTLS_CRT_OPENPGP,
 	0
 };
 

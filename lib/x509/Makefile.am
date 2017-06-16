@@ -23,8 +23,7 @@ AM_CPPFLAGS = \
 	-I$(builddir)/../../gl		\
 	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
-	-I$(srcdir)/..			\
-	$(LIBOPENCDK_CFLAGS)
+	-I$(srcdir)/..	
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1

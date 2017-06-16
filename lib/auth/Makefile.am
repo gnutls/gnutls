@@ -26,8 +26,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
 	-I$(builddir)/../../gl          \
-	-I$(srcdir)/..			\
-	-I$(srcdir)/../opencdk
+	-I$(srcdir)/..
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1

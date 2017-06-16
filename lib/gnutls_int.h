@@ -893,11 +893,6 @@ typedef struct {
 	void *selected_ocsp_func_ptr;
 
 
-	/* is 0 if we are to send the whole PGP key, or non zero
-	 * if the fingerprint is to be sent.
-	 */
-	bool pgp_fingerprint;
-
 	/* This holds the default version that our first
 	 * record packet will have. */
 	uint8_t default_record_version[2];
@@ -914,11 +909,6 @@ typedef struct {
 	 * receiving, and non zero otherwise.
 	 */
 	bool direction;
-
-	/* This callback will be used (if set) to receive an
-	 * openpgp key. (if the peer sends a fingerprint)
-	 */
-	gnutls_openpgp_recv_key_func openpgp_recv_key_func;
 
 	/* If non zero the server will not advertise the CA's he
 	 * trusts (do not send an RDN sequence).
