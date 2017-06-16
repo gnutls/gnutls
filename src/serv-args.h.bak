@@ -88,29 +88,26 @@ typedef enum {
     INDEX_OPT_X509CAFILE           = 19,
     INDEX_OPT_X509CRLFILE          = 20,
     INDEX_OPT_PGPKEYFILE           = 21,
-    INDEX_OPT_PGPKEYRING           = 22,
-    INDEX_OPT_PGPCERTFILE          = 23,
-    INDEX_OPT_X509KEYFILE          = 24,
-    INDEX_OPT_X509CERTFILE         = 25,
-    INDEX_OPT_X509DSAKEYFILE       = 26,
-    INDEX_OPT_X509DSACERTFILE      = 27,
-    INDEX_OPT_X509ECCKEYFILE       = 28,
-    INDEX_OPT_X509ECCCERTFILE      = 29,
-    INDEX_OPT_PGPSUBKEY            = 30,
-    INDEX_OPT_SRPPASSWD            = 31,
-    INDEX_OPT_SRPPASSWDCONF        = 32,
-    INDEX_OPT_PSKPASSWD            = 33,
-    INDEX_OPT_PSKHINT              = 34,
-    INDEX_OPT_OCSP_RESPONSE        = 35,
-    INDEX_OPT_PORT                 = 36,
-    INDEX_OPT_LIST                 = 37,
-    INDEX_OPT_PROVIDER             = 38,
-    INDEX_OPT_VERSION              = 39,
-    INDEX_OPT_HELP                 = 40,
-    INDEX_OPT_MORE_HELP            = 41
+    INDEX_OPT_X509KEYFILE          = 22,
+    INDEX_OPT_X509CERTFILE         = 23,
+    INDEX_OPT_X509DSAKEYFILE       = 24,
+    INDEX_OPT_X509DSACERTFILE      = 25,
+    INDEX_OPT_X509ECCKEYFILE       = 26,
+    INDEX_OPT_X509ECCCERTFILE      = 27,
+    INDEX_OPT_SRPPASSWD            = 28,
+    INDEX_OPT_SRPPASSWDCONF        = 29,
+    INDEX_OPT_PSKPASSWD            = 30,
+    INDEX_OPT_PSKHINT              = 31,
+    INDEX_OPT_OCSP_RESPONSE        = 32,
+    INDEX_OPT_PORT                 = 33,
+    INDEX_OPT_LIST                 = 34,
+    INDEX_OPT_PROVIDER             = 35,
+    INDEX_OPT_VERSION              = 36,
+    INDEX_OPT_HELP                 = 37,
+    INDEX_OPT_MORE_HELP            = 38
 } teOptIndex;
 /** count of all options for gnutls-serv */
-#define OPTION_CT    42
+#define OPTION_CT    39
 /** gnutls-serv version */
 #define GNUTLS_SERV_VERSION       "@VERSION@"
 /** Full gnutls-serv version text */
@@ -191,25 +188,22 @@ typedef enum {
 #define VALUE_OPT_X509CAFILE     0x100D
 #define VALUE_OPT_X509CRLFILE    0x100E
 #define VALUE_OPT_PGPKEYFILE     0x100F
-#define VALUE_OPT_PGPKEYRING     0x1010
-#define VALUE_OPT_PGPCERTFILE    0x1011
-#define VALUE_OPT_X509KEYFILE    0x1012
-#define VALUE_OPT_X509CERTFILE   0x1013
-#define VALUE_OPT_X509DSAKEYFILE 0x1014
-#define VALUE_OPT_X509DSACERTFILE 0x1015
-#define VALUE_OPT_X509ECCKEYFILE 0x1016
-#define VALUE_OPT_X509ECCCERTFILE 0x1017
-#define VALUE_OPT_PGPSUBKEY      0x1018
-#define VALUE_OPT_SRPPASSWD      0x1019
-#define VALUE_OPT_SRPPASSWDCONF  0x101A
-#define VALUE_OPT_PSKPASSWD      0x101B
-#define VALUE_OPT_PSKHINT        0x101C
-#define VALUE_OPT_OCSP_RESPONSE  0x101D
+#define VALUE_OPT_X509KEYFILE    0x1010
+#define VALUE_OPT_X509CERTFILE   0x1011
+#define VALUE_OPT_X509DSAKEYFILE 0x1012
+#define VALUE_OPT_X509DSACERTFILE 0x1013
+#define VALUE_OPT_X509ECCKEYFILE 0x1014
+#define VALUE_OPT_X509ECCCERTFILE 0x1015
+#define VALUE_OPT_SRPPASSWD      0x1016
+#define VALUE_OPT_SRPPASSWDCONF  0x1017
+#define VALUE_OPT_PSKPASSWD      0x1018
+#define VALUE_OPT_PSKHINT        0x1019
+#define VALUE_OPT_OCSP_RESPONSE  0x101A
 #define VALUE_OPT_PORT           'p'
 
 #define OPT_VALUE_PORT           (DESC(PORT).optArg.argInt)
 #define VALUE_OPT_LIST           'l'
-#define VALUE_OPT_PROVIDER       0x101E
+#define VALUE_OPT_PROVIDER       0x101B
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
