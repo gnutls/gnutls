@@ -50,7 +50,6 @@
 #include <gnutls/abstract.h>
 #include <gnutls/dtls.h>
 #include <gnutls/x509.h>
-#include <gnutls/openpgp.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/crypto.h>
 #include <gnutls/socket.h>
@@ -82,7 +81,6 @@ int resume, starttls, insecure, ranges, rehandshake, udp, mtu,
 char *hostname = NULL;
 char service[32]="";
 int record_max_size;
-int fingerprint;
 int crlf;
 int fastopen;
 unsigned int verbose = 0;
@@ -90,9 +88,6 @@ int print_cert;
 
 const char *srp_passwd = NULL;
 const char *srp_username = NULL;
-const char *pgp_keyfile = NULL;
-const char *pgp_certfile = NULL;
-const char *pgp_keyring = NULL;
 const char *x509_keyfile = NULL;
 const char *x509_certfile = NULL;
 const char *x509_cafile = NULL;
@@ -129,29 +124,6 @@ static unsigned int x509_crt_size;
 static gnutls_pcert_st x509_crt[MAX_CRT];
 static gnutls_privkey_t x509_key = NULL;
 
-static gnutls_pcert_st pgp_crt;
-static gnutls_privkey_t pgp_key = NULL;
-
-#ifdef ENABLE_OPENPGP
-static void get_keyid(gnutls_openpgp_keyid_t keyid, const char *str)
-{
-	size_t keyid_size = GNUTLS_OPENPGP_KEYID_SIZE;
-
-	if (strlen(str) != 16) {
-		fprintf(stderr,
-			"The OpenPGP subkey ID has to be 16 hexadecimal characters.\n");
-		exit(1);
-	}
-
-	if (gnutls_hex2bin(str, strlen(str), keyid, &keyid_size) < 0) {
-		fprintf(stderr, "Error converting hex string: %s.\n", str);
-		exit(1);
-	}
-
-	return;
-}
-#endif
-
 /* Load the certificate and the private key.
  */
 static void load_keys(void)
@@ -161,9 +133,6 @@ static void load_keys(void)
 	unsigned int i;
 	gnutls_datum_t data = { NULL, 0 };
 	gnutls_x509_crt_t crt_list[MAX_CRT];
-#ifdef ENABLE_OPENPGP
-	unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
-#endif
 
 	if (x509_certfile != NULL && x509_keyfile != NULL) {
 #ifdef ENABLE_PKCS11
@@ -288,91 +257,6 @@ static void load_keys(void)
 			"Processed %d client X.509 certificates...\n",
 			x509_crt_size);
 	}
-
-#ifdef ENABLE_OPENPGP
-	if (HAVE_OPT(PGPSUBKEY)) {
-		get_keyid(keyid, OPT_ARG(PGPSUBKEY));
-	}
-
-	if (pgp_certfile != NULL && pgp_keyfile != NULL) {
-		gnutls_openpgp_crt_t tmp_pgp_crt;
-
-		ret = gnutls_load_file(pgp_certfile, &data);
-		if (ret < 0) {
-			fprintf(stderr,
-				"*** Error loading PGP cert file.\n");
-			exit(1);
-		}
-
-		gnutls_openpgp_crt_init(&tmp_pgp_crt);
-
-		ret =
-		    gnutls_pcert_import_openpgp_raw(&pgp_crt, &data,
-						    GNUTLS_OPENPGP_FMT_BASE64,
-						    HAVE_OPT(PGPSUBKEY) ?
-						    keyid : NULL, 0);
-		if (ret < 0) {
-			fprintf(stderr,
-				"*** Error loading PGP cert file: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		gnutls_free(data.data);
-
-		ret = gnutls_privkey_init(&pgp_key);
-		if (ret < 0) {
-			fprintf(stderr, "*** Error initializing key: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		gnutls_privkey_set_pin_function(pgp_key, pin_callback,
-						NULL);
-
-		if (gnutls_url_is_supported(pgp_keyfile)) {
-			ret =
-			    gnutls_privkey_import_url(pgp_key, pgp_keyfile,
-						      0);
-			if (ret < 0) {
-				fprintf(stderr,
-					"*** Error loading url: %s\n",
-					gnutls_strerror(ret));
-				exit(1);
-			}
-		} else {
-			ret = gnutls_load_file(pgp_keyfile, &data);
-			if (ret < 0) {
-				fprintf(stderr,
-					"*** Error loading key file.\n");
-				exit(1);
-			}
-
-			if (HAVE_OPT(PGPSUBKEY))
-				ret =
-				    gnutls_privkey_import_openpgp_raw
-				    (pgp_key, &data, x509ctype, keyid,
-				     NULL);
-			else
-				ret =
-				    gnutls_privkey_import_openpgp_raw
-				    (pgp_key, &data, x509ctype, NULL,
-				     NULL);
-			if (ret < 0) {
-				fprintf(stderr,
-					"*** Error loading url: %s\n",
-					gnutls_strerror(ret));
-				exit(1);
-			}
-
-			gnutls_free(data.data);
-		}
-
-
-		fprintf(stdout, "Processed 1 client PGP certificate...\n");
-	}
-#endif
-
 }
 
 #define IS_NEWLINE(x) ((x[0] == '\n') || (x[0] == '\r'))
@@ -649,14 +533,6 @@ cert_callback(gnutls_session_t session,
 			*pcert_length = x509_crt_size;
 			*pcert = x509_crt;
 		}
-
-	} else if (cert_type == GNUTLS_CRT_OPENPGP) {
-		if (pgp_key != NULL) {
-			*pkey = pgp_key;
-
-			*pcert_length = 1;
-			*pcert = &pgp_crt;
-		}
 	}
 
 	printf("- Successfully sent %u certificate(s) to server.\n",
@@ -736,13 +612,6 @@ gnutls_session_t init_tls_session(const char *host)
 	gnutls_certificate_set_retrieve_function2(xcred, cert_callback);
 	gnutls_certificate_set_verify_function(xcred,
 					       cert_verify_callback);
-
-	/* send the fingerprint */
-#ifdef ENABLE_OPENPGP
-	if (fingerprint != 0)
-		gnutls_openpgp_send_cert(session,
-					 GNUTLS_OPENPGP_CERT_FINGERPRINT);
-#endif
 
 	/* use the max record size extension */
 	if (record_max_size > 0 && disable_extensions == 0) {
@@ -1590,8 +1459,6 @@ static void cmd_parser(int argc, char **argv)
 
 	record_max_size = OPT_VALUE_RECORDSIZE;
 
-	fingerprint = HAVE_OPT(FINGERPRINT);
-
 	if (HAVE_OPT(X509FMTDER))
 		x509ctype = GNUTLS_X509_FMT_DER;
 	else
@@ -1615,12 +1482,6 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(X509CERTFILE))
 		x509_certfile = OPT_ARG(X509CERTFILE);
 
-	if (HAVE_OPT(PGPKEYFILE))
-		pgp_keyfile = OPT_ARG(PGPKEYFILE);
-
-	if (HAVE_OPT(PGPCERTFILE))
-		pgp_certfile = OPT_ARG(PGPCERTFILE);
-
 	if (HAVE_OPT(PSKUSERNAME))
 		psk_username = OPT_ARG(PSKUSERNAME);
 
@@ -1629,9 +1490,6 @@ static void cmd_parser(int argc, char **argv)
 		psk_key.size = strlen(OPT_ARG(PSKKEY));
 	} else
 		psk_key.size = 0;
-
-	if (HAVE_OPT(PGPKEYRING))
-		pgp_keyring = OPT_ARG(PGPKEYRING);
 
 	crlf = HAVE_OPT(CRLF);
 
@@ -1700,7 +1558,7 @@ int do_handshake(socket_st * socket)
 
 	if (ret == 0) {
 		/* print some information */
-		print_info(socket->session, verbose, (HAVE_OPT(X509CERTFILE)||HAVE_OPT(PGPCERTFILE))?P_WAIT_FOR_CERT:0);
+		print_info(socket->session, verbose, HAVE_OPT(X509CERTFILE)?P_WAIT_FOR_CERT:0);
 		socket->secure = 1;
 	} else {
 		gnutls_alert_send_appropriate(socket->session, ret);
@@ -1870,19 +1728,6 @@ static void init_global_tls_stuff(void)
 	}
 
 	load_keys();
-
-#ifdef ENABLE_OPENPGP
-	if (pgp_keyring != NULL) {
-		ret =
-		    gnutls_certificate_set_openpgp_keyring_file(xcred,
-								pgp_keyring,
-								GNUTLS_OPENPGP_FMT_BASE64);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error setting the OpenPGP keyring file\n");
-		}
-	}
-#endif
 
 #ifdef ENABLE_SRP
 	if (srp_username && srp_passwd) {

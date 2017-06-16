@@ -34,7 +34,6 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
-#include <gnutls/openpgp.h>
 #include <sys/time.h>
 #include <sys/select.h>
 #include <fcntl.h>
@@ -67,9 +66,6 @@ int disable_client_cert;
 const char *psk_passwd = NULL;
 const char *srp_passwd = NULL;
 const char *srp_passwd_conf = NULL;
-const char *pgp_keyring = NULL;
-const char *pgp_keyfile = NULL;
-const char *pgp_certfile = NULL;
 const char **x509_keyfile = NULL;
 const char **x509_certfile = NULL;
 unsigned x509_certfile_size = 0;
@@ -1073,39 +1069,6 @@ int main(int argc, char **argv)
 			printf("Processed %d CRL(s).\n", ret);
 		}
 	}
-#ifdef ENABLE_OPENPGP
-	if (pgp_keyring != NULL) {
-		ret =
-		    gnutls_certificate_set_openpgp_keyring_file(cert_cred,
-								pgp_keyring,
-								GNUTLS_OPENPGP_FMT_BASE64);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error setting the OpenPGP keyring file\n");
-			GERR(ret);
-		}
-	}
-
-	if (pgp_certfile != NULL && pgp_keyfile != NULL) {
-		if (HAVE_OPT(PGPSUBKEY))
-			ret = gnutls_certificate_set_openpgp_key_file2
-			    (cert_cred, pgp_certfile, pgp_keyfile,
-			     OPT_ARG(PGPSUBKEY),
-			     GNUTLS_OPENPGP_FMT_BASE64);
-		else
-			ret = gnutls_certificate_set_openpgp_key_file
-			    (cert_cred, pgp_certfile, pgp_keyfile,
-			     GNUTLS_OPENPGP_FMT_BASE64);
-
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
-				ret, pgp_certfile, pgp_keyfile);
-			GERR(ret);
-		} else
-			cert_set = 1;
-	}
-#endif
 
 	if (x509_certfile_size > 0 && x509_keyfile_size > 0) {
 		unsigned i;
@@ -1671,14 +1634,6 @@ static void cmd_parser(int argc, char **argv)
 		x509_cafile = OPT_ARG(X509CAFILE);
 	if (HAVE_OPT(X509CRLFILE))
 		x509_crlfile = OPT_ARG(X509CRLFILE);
-
-	if (HAVE_OPT(PGPKEYFILE))
-		pgp_keyfile = OPT_ARG(PGPKEYFILE);
-	if (HAVE_OPT(PGPCERTFILE))
-		pgp_certfile = OPT_ARG(PGPCERTFILE);
-
-	if (HAVE_OPT(PGPKEYRING))
-		pgp_keyring = OPT_ARG(PGPKEYRING);
 
 	if (HAVE_OPT(SRPPASSWD))
 		srp_passwd = OPT_ARG(SRPPASSWD);

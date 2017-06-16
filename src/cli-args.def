@@ -141,13 +141,6 @@ flag = {
 };
 
 flag = {
-    name      = fingerprint;
-    value     = f;
-    descrip   = "Send the openpgp fingerprint, instead of the key";
-    doc      = "";
-};
-
-flag = {
     name      = print-cert;
     descrip   = "Print peer's certificate in PEM format";
     doc      = "";
@@ -202,31 +195,6 @@ flag = {
 };
 
 flag = {
-    name      = pgpkeyfile;
-    arg-type  = file;
-    file-exists = yes;
-    descrip   = "PGP Key file to use";
-    doc      = "";
-};
-
-flag = {
-    name      = pgpkeyring;
-    arg-type  = file;
-    file-exists = yes;
-    descrip   = "PGP Key ring file to use";
-    doc      = "";
-};
-
-flag = {
-    name      = pgpcertfile;
-    arg-type  = file;
-    file-exists = yes;
-    descrip   = "PGP Public Key (certificate) file to use";
-    doc      = "";
-    flags-must = pgpkeyfile;
-};
-
-flag = {
     name      = x509keyfile;
     arg-type  = string;
     descrip   = "X.509 key file or PKCS #11 URL to use";
@@ -239,13 +207,6 @@ flag = {
     descrip   = "X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
     flags-must = x509keyfile;
-};
-
-flag = {
-    name      = pgpsubkey;
-    arg-type  = string;
-    descrip   = "PGP subkey to use (hex or auto)";
-    doc      = "";
 };
 
 flag = {

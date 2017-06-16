@@ -276,20 +276,6 @@ flag = {
 };
 
 flag = {
-    name      = pgp-certificate-info;
-    descrip   = "Print information on the given OpenPGP certificate";
-    doc       = "";
-    deprecated;
-};
-
-flag = {
-    name      = pgp-ring-info;
-    descrip   = "Print information on the given OpenPGP keyring structure";
-    doc       = "";
-    deprecated;
-};
-
-flag = {
     name      = crl-info;
     value     = l;
     descrip   = "Print information on the given CRL structure";
@@ -394,13 +380,6 @@ flag = {
     value     = k;
     descrip   = "Print information on a private key";
     doc = "";
-};
-
-flag = {
-    name      = pgp-key-info;
-    descrip   = "Print information on an OpenPGP private key";
-    doc = "";
-    deprecated;
 };
 
 flag = {

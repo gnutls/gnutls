@@ -33,7 +33,6 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#include <gnutls/openpgp.h>
 #include <gnutls/crypto.h>
 #include <time.h>
 #include <common.h>
@@ -235,110 +234,6 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
 		gnutls_x509_crt_deinit(crt);
 	}
 }
-
-#ifdef ENABLE_OPENPGP
-static void print_openpgp_info_compact(gnutls_session_t session)
-{
-
-	gnutls_openpgp_crt_t crt;
-	const gnutls_datum_t *cert_list;
-	unsigned int cert_list_size = 0;
-	int ret;
-
-	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
-
-	if (cert_list_size > 0) {
-		gnutls_datum_t cinfo;
-
-		gnutls_openpgp_crt_init(&crt);
-		ret = gnutls_openpgp_crt_import(crt, &cert_list[0],
-						GNUTLS_OPENPGP_FMT_RAW);
-		if (ret < 0) {
-			fprintf(stderr, "Decoding error: %s\n",
-				gnutls_strerror(ret));
-			return;
-		}
-
-		ret =
-		    gnutls_openpgp_crt_print(crt, GNUTLS_CRT_PRINT_COMPACT,
-					     &cinfo);
-		if (ret == 0) {
-			printf("- OpenPGP cert: %s\n", cinfo.data);
-			gnutls_free(cinfo.data);
-		}
-
-		gnutls_openpgp_crt_deinit(crt);
-	}
-}
-
-static void
-print_openpgp_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
-{
-
-	gnutls_openpgp_crt_t crt;
-	const gnutls_datum_t *cert_list;
-	unsigned int cert_list_size = 0;
-	int ret;
-
-	fprintf(out, "- Certificate type: OpenPGP\n");
-
-	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
-
-	if (cert_list_size > 0) {
-		gnutls_datum_t cinfo;
-
-		gnutls_openpgp_crt_init(&crt);
-		ret = gnutls_openpgp_crt_import(crt, &cert_list[0],
-						GNUTLS_OPENPGP_FMT_RAW);
-		if (ret < 0) {
-			fprintf(stderr, "Decoding error: %s\n",
-				gnutls_strerror(ret));
-			return;
-		}
-
-		ret = gnutls_openpgp_crt_print(crt, flag, &cinfo);
-		if (ret == 0) {
-			fprintf(out, "- %s\n", cinfo.data);
-			gnutls_free(cinfo.data);
-		}
-
-		if (print_cert) {
-			size_t size = 0;
-			char *p = NULL;
-
-			ret =
-			    gnutls_openpgp_crt_export(crt,
-						      GNUTLS_OPENPGP_FMT_BASE64,
-						      p, &size);
-			if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-				p = malloc(size);
-				if (!p) {
-					fprintf(stderr, "gnutls_malloc\n");
-					exit(1);
-				}
-
-				ret =
-				    gnutls_openpgp_crt_export(crt,
-							      GNUTLS_OPENPGP_FMT_BASE64,
-							      p, &size);
-			}
-			if (ret < 0) {
-				fprintf(stderr, "Encoding error: %s\n",
-					gnutls_strerror(ret));
-				return;
-			}
-
-			fputs(p, out);
-			fputs("\n", out);
-
-			gnutls_free(p);
-		}
-
-		gnutls_openpgp_crt_deinit(crt);
-	}
-}
-
-#endif
 
 /* returns false (0) if not verified, or true (1) otherwise 
  */
@@ -694,11 +589,6 @@ void print_cert_info2(gnutls_session_t session, int verbose, FILE *out, int prin
 	case GNUTLS_CRT_X509:
 		print_x509_info(session, out, flag, print_cert);
 		break;
-#ifdef ENABLE_OPENPGP
-	case GNUTLS_CRT_OPENPGP:
-		print_openpgp_info(session, out, flag, print_cert);
-		break;
-#endif
 	default:
 		printf("Unknown type\n");
 		break;
@@ -715,11 +605,6 @@ void print_cert_info_compact(gnutls_session_t session)
 	case GNUTLS_CRT_X509:
 		print_x509_info_compact(session);
 		break;
-#ifdef ENABLE_OPENPGP
-	case GNUTLS_CRT_OPENPGP:
-		print_openpgp_info_compact(session);
-		break;
-#endif
 	default:
 		printf("Unknown type\n");
 		break;
