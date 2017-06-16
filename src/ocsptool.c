@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -30,17 +31,41 @@
 #include <gnutls/x509.h>
 #include <gnutls/crypto.h>
 
+#include <unistd.h> /* getpass */
+
 /* Gnulib portability files. */
 #include <read-file.h>
 #include <socket.h>
+#include <minmax.h>
 
 #include <ocsptool-common.h>
 #include <ocsptool-args.h>
+#include "certtool-common.h"
 
 FILE *outfile;
+static const char *outfile_name = NULL; /* to delete on exit */
 FILE *infile;
 static unsigned int encoding;
 unsigned int verbose = 0;
+
+const char *get_pass(void)
+{
+	return getpass("Enter password: ");
+}
+
+const char *get_confirmed_pass(bool ign)
+{
+	return getpass("Enter password: ");
+}
+
+void app_exit(int val)
+{
+	if (val != 0) {
+		if (outfile_name)
+			(void)remove(outfile_name);
+	}
+	exit(val);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -67,7 +92,7 @@ static void request_info(void)
 	ret = gnutls_ocsp_req_init(&req);
 	if (ret < 0) {
 		fprintf(stderr, "ocsp_req_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (HAVE_OPT(LOAD_REQUEST))
@@ -78,7 +103,7 @@ static void request_info(void)
 		dat.data = (void *) fread_file(infile, &size);
 	if (dat.data == NULL) {
 		fprintf(stderr, "error reading request\n");
-		exit(1);
+		app_exit(1);
 	}
 	dat.size = size;
 
@@ -87,14 +112,14 @@ static void request_info(void)
 	if (ret < 0) {
 		fprintf(stderr, "error importing request: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_ocsp_req_print(req, GNUTLS_OCSP_PRINT_FULL, &dat);
 	if (ret != 0) {
 		fprintf(stderr, "ocsp_req_print: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	printf("%.*s", dat.size, dat.data);
@@ -109,18 +134,23 @@ static void _response_info(const gnutls_datum_t * data)
 	int ret;
 	gnutls_datum_t buf;
 
+	if (data->size == 0) {
+		fprintf(stderr, "Received empty response\n");
+		app_exit(1);
+	}
+
 	ret = gnutls_ocsp_resp_init(&resp);
 	if (ret < 0) {
 		fprintf(stderr, "ocsp_resp_init: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_ocsp_resp_import(resp, data);
 	if (ret < 0) {
 		fprintf(stderr, "importing response: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (ENABLED_OPT(VERBOSE))
@@ -134,7 +164,7 @@ static void _response_info(const gnutls_datum_t * data)
 	if (ret != 0) {
 		fprintf(stderr, "ocsp_resp_print: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	printf("%.*s", buf.size, buf.data);
@@ -156,7 +186,7 @@ static void response_info(void)
 		dat.data = (void *) fread_file(infile, &size);
 	if (dat.data == NULL) {
 		fprintf(stderr, "error reading response\n");
-		exit(1);
+		app_exit(1);
 	}
 	dat.size = size;
 
@@ -164,127 +194,31 @@ static void response_info(void)
 	gnutls_free(dat.data);
 }
 
-static gnutls_x509_crt_t load_issuer(void)
-{
-	gnutls_x509_crt_t crt;
-	int ret;
-	gnutls_datum_t dat;
-	size_t size;
-
-	if (!HAVE_OPT(LOAD_ISSUER)) {
-		fprintf(stderr, "missing --load-issuer\n");
-		exit(1);
-	}
-
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}
-
-	dat.data = (void *) read_binary_file(OPT_ARG(LOAD_ISSUER), &size);
-	dat.size = size;
-
-	if (!dat.data) {
-		fprintf(stderr, "error reading --load-issuer: %s\n",
-			OPT_ARG(LOAD_ISSUER));
-		exit(1);
-	}
-
-	ret = gnutls_x509_crt_import(crt, &dat, encoding);
-	free(dat.data);
-	if (ret < 0) {
-		fprintf(stderr, "error importing --load-issuer: %s: %s\n",
-			OPT_ARG(LOAD_ISSUER), gnutls_strerror(ret));
-		exit(1);
-	}
-
-	return crt;
-}
-
-static gnutls_x509_crt_t load_signer(void)
-{
-	gnutls_x509_crt_t crt;
-	int ret;
-	gnutls_datum_t dat;
-	size_t size;
-
-	if (!HAVE_OPT(LOAD_SIGNER)) {
-		fprintf(stderr, "missing --load-signer\n");
-		exit(1);
-	}
-
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}
-
-	dat.data = (void *) read_binary_file(OPT_ARG(LOAD_SIGNER), &size);
-	dat.size = size;
-
-	if (!dat.data) {
-		fprintf(stderr, "error reading --load-signer: %s\n",
-			OPT_ARG(LOAD_SIGNER));
-		exit(1);
-	}
-
-	ret = gnutls_x509_crt_import(crt, &dat, encoding);
-	free(dat.data);
-	if (ret < 0) {
-		fprintf(stderr, "importing --load-signer: %s: %s\n",
-			OPT_ARG(LOAD_SIGNER), gnutls_strerror(ret));
-		exit(1);
-	}
-
-	return crt;
-}
-
-static gnutls_x509_crt_t load_cert(void)
-{
-	gnutls_x509_crt_t crt;
-	int ret;
-	gnutls_datum_t dat;
-	size_t size;
-
-	if (!HAVE_OPT(LOAD_CERT)) {
-		fprintf(stderr, "missing --load-cert\n");
-		exit(1);
-	}
-
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}
-
-	dat.data = (void *) read_binary_file(OPT_ARG(LOAD_CERT), &size);
-	dat.size = size;
-
-	if (!dat.data) {
-		fprintf(stderr, "error reading --load-cert: %s\n",
-			OPT_ARG(LOAD_CERT));
-		exit(1);
-	}
-
-	ret = gnutls_x509_crt_import(crt, &dat, encoding);
-	free(dat.data);
-	if (ret < 0) {
-		fprintf(stderr, "importing --load-cert: %s: %s\n",
-			OPT_ARG(LOAD_CERT), gnutls_strerror(ret));
-		exit(1);
-	}
-
-	return crt;
-}
-
 static void generate_request(gnutls_datum_t *nonce)
 {
 	gnutls_datum_t dat;
 	gnutls_x509_crt_t cert, issuer;
+	common_info_st info;
 
-	cert = load_cert();
-	issuer = load_issuer();
+	memset(&info, 0, sizeof(info));
+	info.verbose = verbose;
+	if (!HAVE_OPT(LOAD_CERT)) {
+		fprintf(stderr, "Missing option --load-cert\n");
+		app_exit(1);
+	}
+	info.cert = OPT_ARG(LOAD_CERT);
+
+	cert = load_cert(1, &info);
+
+	memset(&info, 0, sizeof(info));
+	info.verbose = verbose;
+	if (!HAVE_OPT(LOAD_ISSUER)) {
+		fprintf(stderr, "Missing option --load-issuer\n");
+		app_exit(1);
+	}
+	info.cert = OPT_ARG(LOAD_ISSUER);
+
+	issuer = load_cert(1, &info);
 
 	_generate_request(cert, issuer, &dat, nonce);
 
@@ -312,14 +246,14 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 	if (ret < 0) {
 		fprintf(stderr, "ocsp_resp_init: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	ret = gnutls_ocsp_resp_import(resp, data);
 	if (ret < 0) {
 		fprintf(stderr, "importing response: %s\n",
 			gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	if (nonce) {
@@ -329,13 +263,13 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		if (ret < 0) {
 			fprintf(stderr, "could not read response's nonce: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		if (rnonce.size != nonce->size || memcmp(nonce->data, rnonce.data,
 			nonce->size) != 0) {
 			fprintf(stderr, "nonce in the response doesn't match\n");
-			exit(1);
+			app_exit(1);
 		}
 
 		gnutls_free(rnonce.data);
@@ -347,7 +281,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		if (dat.data == NULL) {
 			fprintf(stderr, "error reading --load-trust: %s\n",
 				OPT_ARG(LOAD_TRUST));
-			exit(1);
+			app_exit(1);
 		}
 		dat.size = size;
 
@@ -355,7 +289,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_x509_trust_list_init: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		ret =
@@ -365,7 +299,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		if (ret < 0 || x509_ncas < 1) {
 			fprintf(stderr, "error parsing CAs: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		if (HAVE_OPT(VERBOSE)) {
@@ -382,7 +316,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 					fprintf(stderr,
 						"gnutls_x509_crt_print: %s\n",
 						gnutls_strerror(ret));
-					exit(1);
+					app_exit(1);
 				}
 
 				printf("%d: %.*s\n", i, out.size,
@@ -398,7 +332,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_x509_trust_add_cas: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 
 		if (HAVE_OPT(VERBOSE))
@@ -409,7 +343,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_ocsp_resp_verify: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 	} else if (signer) {
 		if (HAVE_OPT(VERBOSE)) {
@@ -423,7 +357,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 				fprintf(stderr,
 					"gnutls_x509_crt_print: %s\n",
 					gnutls_strerror(ret));
-				exit(1);
+				app_exit(1);
 			}
 
 			printf("Signer: %.*s\n", out.size, out.data);
@@ -436,16 +370,16 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 						   0);
 		if (ret < 0) {
 			fprintf(stderr,
-				"gnutls_ocsp_resp_verify_direct: %s\n",
+				"\nVerifying OCSP Response: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			app_exit(1);
 		}
 	} else {
 		fprintf(stderr, "missing --load-trust or --load-signer\n");
-		exit(1);
+		app_exit(1);
 	}
 
-	printf("Verifying OCSP Response: ");
+	printf("\nVerifying OCSP Response: ");
 	print_ocsp_verify_res(verify);
 	printf(".\n");
 
@@ -459,6 +393,7 @@ static void verify_response(gnutls_datum_t *nonce)
 	gnutls_datum_t dat;
 	size_t size;
 	gnutls_x509_crt_t signer;
+	common_info_st info;
 	int v;
 
 	if (HAVE_OPT(LOAD_RESPONSE))
@@ -469,11 +404,19 @@ static void verify_response(gnutls_datum_t *nonce)
 		dat.data = (void *) fread_file(infile, &size);
 	if (dat.data == NULL) {
 		fprintf(stderr, "error reading response\n");
-		exit(1);
+		app_exit(1);
 	}
 	dat.size = size;
 
-	signer = load_signer();
+	memset(&info, 0, sizeof(info));
+	info.verbose = verbose;
+	if (!HAVE_OPT(LOAD_SIGNER)) {
+		fprintf(stderr, "Missing option --load-signer\n");
+		app_exit(1);
+	}
+	info.cert = OPT_ARG(LOAD_SIGNER);
+
+	signer = load_cert(1, &info);
 
 	v = _verify_response(&dat, nonce, signer);
 
@@ -481,65 +424,140 @@ static void verify_response(gnutls_datum_t *nonce)
 	free(dat.data);
 
 	if (v && !HAVE_OPT(IGNORE_ERRORS))
-		exit(1);
+		app_exit(1);
 }
+
+#define MAX_CHAIN_SIZE 8
+
+static
+unsigned load_chain(gnutls_x509_crt_t chain[MAX_CHAIN_SIZE])
+{
+	if (HAVE_OPT(LOAD_CHAIN)) {
+		common_info_st info;
+		size_t list_size;
+
+		memset(&info, 0, sizeof(info));
+		gnutls_x509_crt_t *list;
+		unsigned i;
+
+		info.verbose = verbose;
+		info.cert = OPT_ARG(LOAD_CHAIN);
+		list = load_cert_list(1, &list_size, &info);
+
+		if (list_size > MAX_CHAIN_SIZE) {
+			fprintf(stderr, "Too many certificates in chain\n");
+			app_exit(1);
+		}
+
+		for (i=0;i<list_size;i++)
+			chain[i] = list[i];
+		gnutls_free(list);
+		return list_size;
+	} else {
+		common_info_st info;
+
+		memset(&info, 0, sizeof(info));
+		info.verbose = verbose;
+		if (!HAVE_OPT(LOAD_CERT)) {
+			fprintf(stderr, "Missing option --load-cert\n");
+			app_exit(1);
+		}
+		info.cert = OPT_ARG(LOAD_CERT);
+
+		chain[0] = load_cert(1, &info);
+
+		memset(&info, 0, sizeof(info));
+		info.verbose = verbose;
+		if (!HAVE_OPT(LOAD_ISSUER)) {
+			fprintf(stderr, "Missing option --load-issuer\n");
+			app_exit(1);
+		}
+		info.cert = OPT_ARG(LOAD_ISSUER);
+
+		chain[1] = load_cert(1, &info);
+		return 2;
+	}
+}
+
+
 
 static void ask_server(const char *url)
 {
 	gnutls_datum_t resp_data;
-	int ret, v = 0;
-	gnutls_x509_crt_t cert, issuer;
+	int ret, v = 0, total_v = 0;
 	unsigned char noncebuf[23];
 	gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
 	gnutls_datum_t *n;
+	gnutls_x509_crt_t chain[MAX_CHAIN_SIZE];
+	unsigned chain_size, counter;
+	unsigned idx = 0;
+	common_info_st info;
 
-	cert = load_cert();
-	issuer = load_issuer();
+	chain_size = load_chain(chain);
 
-	if (ENABLED_OPT(NONCE)) {
-		ret =
-		    gnutls_rnd(GNUTLS_RND_NONCE, nonce.data, nonce.size);
-		if (ret < 0) {
-			fprintf(stderr, "gnutls_rnd: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
+	if (chain_size > 2 && HAVE_OPT(OUTFILE)) {
+		fprintf(stderr, "You cannot combine --outfile when more than 2 certificates are found in a chain\n");
+		app_exit(1);
+	}
+
+	counter = chain_size;
+	while(counter > 1) {
+		if (ENABLED_OPT(NONCE)) {
+			ret =
+			    gnutls_rnd(GNUTLS_RND_NONCE, nonce.data, nonce.size);
+			if (ret < 0) {
+				fprintf(stderr, "gnutls_rnd: %s\n",
+					gnutls_strerror(ret));
+				app_exit(1);
+			}
+			n = &nonce;
+		} else {
+			n = NULL;
 		}
-		n = &nonce;
 
-	} else {
-		n = NULL;
+		ret =
+		    send_ocsp_request(url, chain[idx], chain[idx+1], &resp_data, n);
+		if (ret < 0) {
+			fprintf(stderr, "Cannot send OCSP request\n");
+			app_exit(1);
+		}
+
+		if (HAVE_OPT(OUTFILE)) {
+			fwrite(resp_data.data, 1, resp_data.size, outfile);
+		}
+
+		_response_info(&resp_data);
+
+		if (HAVE_OPT(LOAD_TRUST)) {
+			v = _verify_response(&resp_data, n, NULL);
+		} else if (HAVE_OPT(LOAD_SIGNER)) {
+			memset(&info, 0, sizeof(info));
+			info.verbose = verbose;
+			info.cert = OPT_ARG(LOAD_SIGNER);
+
+			v = _verify_response(&resp_data, n, load_cert(1, &info));
+		} else {
+			if (!HAVE_OPT(LOAD_CHAIN))
+				fprintf(stderr,
+					"\nAssuming response's signer = issuer (use --load-signer to override).\n");
+
+			v = _verify_response(&resp_data, n, chain[idx+1]);
+		}
+
+		total_v += v;
+
+		free(resp_data.data);
+		idx++;
+		counter--;
+		printf("\n");
 	}
 
-	ret =
-	    send_ocsp_request(url, cert, issuer, &resp_data, n);
-	if (ret < 0) {
-		fprintf(stderr, "Cannot send OCSP request\n");
-		exit(1);
+	for (idx = 0;idx<chain_size;idx++) {
+		gnutls_x509_crt_deinit(chain[idx]);
 	}
 
-	_response_info(&resp_data);
-
-	if (HAVE_OPT(LOAD_TRUST)) {
-		v = _verify_response(&resp_data, n, NULL);
-	} else if (HAVE_OPT(LOAD_SIGNER)) {
-		v = _verify_response(&resp_data, n, load_signer());
-	} else {
-		fprintf(stderr,
-			"\nAssuming response's signer = issuer (use --load-signer to override).\n");
-
-		v = _verify_response(&resp_data, n, issuer);
-	}
-
-	if (HAVE_OPT(OUTFILE) && (v == 0 || HAVE_OPT(IGNORE_ERRORS))) {
-		fwrite(resp_data.data, 1, resp_data.size, outfile);
-	}
-
-	free(resp_data.data);
-	gnutls_x509_crt_deinit(issuer);
-	gnutls_x509_crt_deinit(cert);
-
-	if (v && !HAVE_OPT(IGNORE_ERRORS))
-		exit(1);
+	if (total_v && !HAVE_OPT(IGNORE_ERRORS))
+		app_exit(1);
 }
 
 int main(int argc, char **argv)
@@ -548,7 +566,7 @@ int main(int argc, char **argv)
 
 	if ((ret = gnutls_global_init()) < 0) {
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		app_exit(1);
 	}
 
 	optionProcess(&ocsptoolOptions, argc, argv);
@@ -560,8 +578,9 @@ int main(int argc, char **argv)
 		outfile = fopen(OPT_ARG(OUTFILE), "wb");
 		if (outfile == NULL) {
 			fprintf(stderr, "%s\n", OPT_ARG(OUTFILE));
-			exit(1);
+			app_exit(1);
 		}
+		outfile_name = OPT_ARG(OUTFILE);
 	} else
 		outfile = stdout;
 
@@ -569,7 +588,7 @@ int main(int argc, char **argv)
 		infile = fopen(OPT_ARG(INFILE), "rb");
 		if (infile == NULL) {
 			fprintf(stderr, "%s\n", OPT_ARG(INFILE));
-			exit(1);
+			app_exit(1);
 		}
 	} else
 		infile = stdin;
@@ -587,9 +606,13 @@ int main(int argc, char **argv)
 		generate_request(NULL);
 	else if (HAVE_OPT(VERIFY_RESPONSE))
 		verify_response(NULL);
-	else if (HAVE_OPT(ASK))
+	else if (HAVE_OPT(ASK)) {
+		if ((!HAVE_OPT(LOAD_CERT)) && (!HAVE_OPT(LOAD_CHAIN))) {
+			fprintf(stderr, "This option required --load-chain or --load-cert\n");
+			app_exit(1);
+		}
 		ask_server(OPT_ARG(ASK));
-	else {
+	} else {
 		USAGE(1);
 	}
 

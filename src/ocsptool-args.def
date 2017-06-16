@@ -19,8 +19,6 @@ flag = {
     arg-name  = "server name|url";
     arg-optional;
     descrip   = "Ask an OCSP/HTTP server on a certificate validity";
-    flags-must = load-cert;
-    flags-must = load-issuer;
     doc = "Connects to the specified HTTP OCSP server and queries on the validity of the loaded certificate.";
 };
 
@@ -57,6 +55,14 @@ flag = {
     disabled  = yes;
     disable   = "no";
     descrip   = "Use (or not) a nonce to OCSP request";
+    doc = "";
+};
+
+flag = {
+    name      = load-chain;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read certificate and issuer chain from file";
     doc = "";
 };
 
@@ -236,18 +242,12 @@ copy of the server certificate chain.  The server is not required to
 send this information, but this particular one is configured to do so.
 
 @example
-$ echo | gnutls-cli -p 443 blog.josefsson.org --print-cert > chain.pem
+$ echo | gnutls-cli -p 443 blog.josefsson.org --save-cert chain.pem
 @end example
 
-Use a text editor on @code{chain.pem} to create three files for each
-separate certificates, called @code{cert.pem} for the first
-certificate for the domain itself, secondly @code{issuer.pem} for the
-intermediate certificate and @code{root.pem} for the final root
-certificate.
-
-The domain certificate normally contains a pointer to where the OCSP
+The saved certificates normally contain a pointer to where the OCSP
 responder is located, in the Authority Information Access Information
-extension.  For example, from @code{certtool -i < cert.pem} there is
+extension.  For example, from @code{certtool -i < chain.pem} there is
 this information:
 
 @example
@@ -256,16 +256,17 @@ this information:
 			Access Location URI: http://ocsp.CAcert.org/
 @end example
 
-This means the CA support OCSP queries over HTTP.  We are now ready to
-create a OCSP request for the certificate.
+This means that ocsptool can discover the servers to contact over HTTP.
+We can now request information on the chain certificates.
 
 @example
-$ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem \
-           --load-cert cert.pem --outfile ocsp-response.der
+$ ocsptool --ask --load-chain chain.pem
 @end example
 
-The request is sent via HTTP to the OCSP server address specified. If the
-address is omitted ocsptool will use the address stored in the certificate.
+The request is sent via HTTP to the OCSP server address found in
+the certificates. It is possible to override the address of the
+OCSP server as well as ask information on a particular certificate
+using --load-cert and --load-issuer.
 
 _EOF_;
 };

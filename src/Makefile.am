@@ -95,7 +95,7 @@ libcmd_psk_la_SOURCES = psktool-args.def psktool-args.c psktool-args.h
 
 if ENABLE_OCSP
 
-ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c \
+ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c certtool-common.c \
 	socket.c common.c common.h socket.h
 ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la $(LIBOPTS) ../gl/libgnu.la 
 ocsptool_LDADD += $(LTLIBINTL) $(GETADDRINFO_LIB) gl/libgnu_gpl.la $(LIBIDN_LIBS)

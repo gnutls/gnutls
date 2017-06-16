@@ -23,6 +23,7 @@
 
 #include <gnutls/x509.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define TYPE_CRT 1
 #define TYPE_CRQ 2
@@ -78,6 +79,8 @@ typedef struct common_info {
 } common_info_st;
 
 /* this must be provided by the app */
+const char *get_pass(void);
+const char *get_confirmed_pass(bool empty_ok);
 void app_exit(int val)
 #ifdef __GNUC__
 __attribute__ ((noreturn))
