@@ -2583,7 +2583,6 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		return 0;
 	}
 
- retry_login:
 	/* For a token with a "protected" (out-of-band) authentication
 	 * path, calling login with a NULL username is all that is
 	 * required. */
@@ -2597,7 +2596,8 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 			gnutls_assert();
 			_gnutls_debug_log
 			    ("p11: Protected login failed.\n");
-			goto login_finished;
+			ret = GNUTLS_E_PKCS11_ERROR;
+			goto cleanup;
 		}
 	}
 
@@ -2607,16 +2607,18 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 
 		memcpy(&tinfo, &sinfo->tinfo, sizeof(tinfo));
 
-		/* Check whether the session is already logged in, and if so, just skip */
-		rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
-						       &session_info);
-		if (rv == CKR_OK && !(flags & SESSION_CONTEXT_SPECIFIC) &&
-		    (session_info.state == CKS_RO_USER_FUNCTIONS
-			|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
-			ret = 0;
-			_gnutls_debug_log
-			    ("p11: Already logged in\n");
-			goto cleanup;
+		if (!(flags & SESSION_CONTEXT_SPECIFIC)) {
+			/* Check whether the session is already logged in, and if so, just skip */
+			rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
+							       &session_info);
+			if (rv == CKR_OK &&
+			    (session_info.state == CKS_RO_USER_FUNCTIONS
+				|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
+				ret = 0;
+				_gnutls_debug_log
+				    ("p11: Already logged in\n");
+				goto cleanup;
+			}
 		}
 
 		/* If login has been attempted once already, check the token
@@ -2651,15 +2653,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	}
 	while (rv == CKR_PIN_INCORRECT);
 
- login_finished:
 	_gnutls_debug_log("p11: Login result = %s (%lu)\n", (rv==0)?"ok":p11_kit_strerror(rv), rv);
-
-	if (unlikely(rv == CKR_USER_TYPE_INVALID && user_type == CKU_CONTEXT_SPECIFIC)) {
-		_gnutls_debug_log("p11: Retrying login with CKU_USER\n");
-		/* PKCS#11 v2.10 don't know about CKU_CONTEXT_SPECIFIC */
-		user_type = CKU_USER;
-		goto retry_login;
-	}
 
 	ret = (rv == CKR_OK || rv ==
 	       CKR_USER_ALREADY_LOGGED_IN) ? 0 : pkcs11_rv_to_err(rv);

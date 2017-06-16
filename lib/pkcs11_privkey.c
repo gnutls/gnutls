@@ -290,8 +290,8 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	gnutls_datum_t tmp = { NULL, 0 };
 	unsigned long siglen;
 	struct pkcs11_session_info *sinfo;
-	unsigned retried_login = 0;
-	unsigned flags = SESSION_LOGIN|SESSION_CONTEXT_SPECIFIC;
+	unsigned req_login = 0;
+	unsigned login_flags = SESSION_LOGIN|SESSION_CONTEXT_SPECIFIC;
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
@@ -315,12 +315,12 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	}
 
  retry_login:
-	if (key->reauth || retried_login) {
-		if (retried_login)
-			flags |= SESSION_FORCE_LOGIN;
+	if (key->reauth || req_login) {
+		if (req_login)
+			login_flags = SESSION_FORCE_LOGIN|SESSION_LOGIN;
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
-				 key->uinfo, flags);
+				 key->uinfo, login_flags);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
@@ -331,8 +331,8 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	/* Work out how long the signature must be: */
 	rv = pkcs11_sign(sinfo->module, sinfo->pks, hash->data, hash->size,
 			 NULL, &siglen);
-	if (unlikely(rv == CKR_USER_NOT_LOGGED_IN && retried_login == 0)) {
-		retried_login = 1;
+	if (unlikely(rv == CKR_USER_NOT_LOGGED_IN && req_login == 0)) {
+		req_login = 1;
 		goto retry_login;
 	}
 
@@ -562,7 +562,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	int ret;
 	struct ck_mechanism mech;
 	unsigned long siglen;
-	unsigned retried_login = 0;
+	unsigned req_login = 0;
 	unsigned login_flags = SESSION_LOGIN|SESSION_CONTEXT_SPECIFIC;
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
@@ -588,9 +588,9 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	}
 
  retry_login:
-	if (key->reauth || retried_login) {
-		if (retried_login)
-			login_flags |= SESSION_FORCE_LOGIN;
+	if (key->reauth || req_login) {
+		if (req_login)
+			login_flags = SESSION_FORCE_LOGIN|SESSION_LOGIN;
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
 				 key->uinfo, login_flags);
@@ -604,8 +604,8 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	/* Work out how long the plaintext must be: */
 	rv = pkcs11_decrypt(key->sinfo.module, key->sinfo.pks, ciphertext->data,
 			    ciphertext->size, NULL, &siglen);
-	if (unlikely(rv == CKR_USER_NOT_LOGGED_IN && retried_login == 0)) {
-		retried_login = 1;
+	if (unlikely(rv == CKR_USER_NOT_LOGGED_IN && req_login == 0)) {
+		req_login = 1;
 		goto retry_login;
 	}
 
