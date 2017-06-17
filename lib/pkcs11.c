@@ -2596,7 +2596,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 			gnutls_assert();
 			_gnutls_debug_log
 			    ("p11: Protected login failed.\n");
-			ret = GNUTLS_E_PKCS11_ERROR;
+			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
 	}
@@ -2611,26 +2611,35 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 			/* Check whether the session is already logged in, and if so, just skip */
 			rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
 							       &session_info);
-			if (rv == CKR_OK &&
-			    (session_info.state == CKS_RO_USER_FUNCTIONS
-				|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
-				ret = 0;
-				_gnutls_debug_log
-				    ("p11: Already logged in\n");
-				goto cleanup;
+			if (rv == CKR_OK) {
+				if (flags & SESSION_SO) {
+					if (session_info.state == CKS_RW_SO_FUNCTIONS) {
+						ret = 0;
+						_gnutls_debug_log
+						    ("p11: Already logged in as SO\n");
+						goto cleanup;
+					}
+				} else if (session_info.state == CKS_RO_USER_FUNCTIONS
+					|| session_info.state == CKS_RW_USER_FUNCTIONS) {
+					ret = 0;
+					_gnutls_debug_log
+					    ("p11: Already logged in as user\n");
+					goto cleanup;
+				}
 			}
 		}
 
 		/* If login has been attempted once already, check the token
 		 * status again, the flags might change. */
 		if (attempt) {
-			if (pkcs11_get_token_info
-			    (sinfo->module, sinfo->sid,
-			     &tinfo) != CKR_OK) {
+			rv = pkcs11_get_token_info(sinfo->module, sinfo->sid,
+				     &tinfo);
+			if (rv != CKR_OK) {
 				gnutls_assert();
 				_gnutls_debug_log
 				    ("p11: GetTokenInfo failed\n");
-				ret = GNUTLS_E_PKCS11_ERROR;
+
+				ret = pkcs11_rv_to_err(rv);
 				goto cleanup;
 			}
 		}
