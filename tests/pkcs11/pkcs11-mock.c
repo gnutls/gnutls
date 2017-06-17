@@ -1552,6 +1552,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 		return CKR_OPERATION_ACTIVE;
 
 	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH || pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) {
+		mock_session->state = CKS_RO_PUBLIC_SESSION;
 		pkcs11_mock_session_reauth = 0;
 	}
 
@@ -1641,8 +1642,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
 		if (!pkcs11_mock_session_reauth) {
 			return CKR_USER_NOT_LOGGED_IN;
 		}
-		if ((pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) && pData != NULL)
+		if ((pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH) && pData != NULL) {
 			pkcs11_mock_session_reauth = 0;
+		}
 	}
 
 	if (NULL == pEncryptedData)
@@ -1941,6 +1943,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
 		return CKR_OPERATION_ACTIVE;
 
 	if (pkcs11_mock_flags & MOCK_FLAG_ALWAYS_AUTH || pkcs11_mock_flags & MOCK_FLAG_SAFENET_ALWAYS_AUTH) {
+		mock_session->state = CKS_RO_PUBLIC_SESSION;
 		pkcs11_mock_session_reauth = 0;
 	}
 
