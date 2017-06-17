@@ -1257,7 +1257,7 @@ pkcs11_open_session(struct pkcs11_session_info *sinfo,
 
 	ret =
 	    pkcs11_login(sinfo, pin_info, info,
-			 flags, 0);
+			 flags);
 	if (ret < 0) {
 		gnutls_assert();
 		pkcs11_close_session(sinfo);
@@ -1337,7 +1337,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 
 			ret =
 			    pkcs11_login(&sinfo, pin_info,
-					 info, flags, 0);
+					 info, flags);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;
@@ -2415,8 +2415,7 @@ int
 pkcs11_login(struct pkcs11_session_info *sinfo,
 	     struct pin_info_st *pin_info,
 	     struct p11_kit_uri *info,
-	     unsigned flags,
-	     unsigned reauth)
+	     unsigned flags)
 {
 	struct ck_session_info session_info;
 	int attempt = 0, ret;
@@ -2428,18 +2427,18 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		return 0;
 	}
 
-	if (!(flags & SESSION_SO)) {
-		if (reauth == 0)
-			user_type = CKU_USER;
-		else
-			user_type = CKU_CONTEXT_SPECIFIC;
-	} else
+	if (flags & SESSION_SO) {
 		user_type = CKU_SO;
+	} else if (flags & SESSION_CONTEXT_SPECIFIC) {
+		user_type = CKU_CONTEXT_SPECIFIC;
+	} else {
+		user_type = CKU_USER;
+	}
 
 	if (!(flags & (SESSION_FORCE_LOGIN|SESSION_SO)) &&
 	    !(sinfo->tinfo.flags & CKF_LOGIN_REQUIRED)) {
 		gnutls_assert();
-		_gnutls_debug_log("p11: No login required.\n");
+		_gnutls_debug_log("p11: No login required in token.\n");
 		return 0;
 	}
 
@@ -2470,11 +2469,17 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		/* Check whether the session is already logged in, and if so, just skip */
 		rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
 						       &session_info);
-		if (rv == CKR_OK && reauth == 0 &&
-		    (session_info.state == CKS_RO_USER_FUNCTIONS
-			|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
-			ret = 0;
-			goto cleanup;
+		if (!(flags & SESSION_CONTEXT_SPECIFIC)) {
+			rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
+							       &session_info);
+			if (rv == CKR_OK &&
+				(session_info.state == CKS_RO_USER_FUNCTIONS
+				|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
+				ret = 0;
+				_gnutls_debug_log
+				    ("p11: Already logged in\n");
+				goto cleanup;
+			}
 		}
 
 		/* If login has been attempted once already, check the token
