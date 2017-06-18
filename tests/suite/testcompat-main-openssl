@@ -61,11 +61,17 @@ if test ${SV} != 0; then
 	exit 77
 fi
 
-${SERV} ecparam -list_curves|grep X25519 >/dev/null 2>&1
-NO_X25519=$?
+test $FIPS_CURVES = 1 && echo "Running with FIPS140-2 enabled curves enabled"
+
+${SERV} version|grep -e '1\.[1-9]\..' >/dev/null 2>&1
+HAVE_X25519=$?
+
+test $HAVE_X25519 != 0 && echo "Disabling interop tests for x25519"
 
 ${SERV} version|grep -e '[1-9]\.[0-9]\.[0-9]' >/dev/null 2>&1
 NO_TLS1_2=$?
+
+test $NO_TLS1_2 = 0 && echo "Disabling interop tests for TLS 1.2"
 
 ${SERV} version|grep -e '[1-9]\.[1-9]\.[0-9]' >/dev/null 2>&1
 NO_DH_PARAMS=$?
@@ -73,17 +79,27 @@ NO_DH_PARAMS=$?
 ${SERV} s_server -help 2>&1|grep -e -ssl3 >/dev/null 2>&1
 HAVE_SSL3=$?
 
+test $HAVE_SSL3 = 0 && echo "Disabling interop tests for SSL 3.0"
+
 ${SERV} ciphers -v ALL 2>&1|grep -e CAMELLIA >/dev/null 2>&1
 NO_CAMELLIA=$?
+
+test $NO_CAMELLIA = 0 && echo "Disabling interop tests for Camellia ciphersuites"
 
 ${SERV} ciphers -v ALL 2>&1|grep -e 3DES >/dev/null 2>&1
 NO_3DES=$?
 
+test $NO_3DES = 0 && echo "Disabling interop tests for 3DES ciphersuites"
+
 ${SERV} ciphers -v ALL 2>&1|grep -e DSS >/dev/null 2>&1
 NO_DSS=$?
 
+test $NO_DSS = 0 && echo "Disabling interop tests for DSS ciphersuites"
+
 ${SERV} ciphers -v ALL 2>&1|grep -e NULL >/dev/null 2>&1
 NO_NULL=$?
+
+test $NO_NULL = 0 && echo "Disabling interop tests for NULL ciphersuites"
 
 . "${srcdir}/testcompat-common"
 
@@ -210,7 +226,7 @@ run_client_suite() {
 	kill ${PID}
 	wait
 
-	if test "${FIPS}" != 1; then
+	if test "${FIPS_CURVES}" != 1; then
 		eval "${GETPORT}"
 		launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1 -key "${RSA_KEY}" -cert "${RSA_CERT}" -named_curve prime192v1 -CAfile "${CA_CERT}"
 		PID=$!
@@ -313,9 +329,9 @@ run_client_suite() {
 		kill ${PID}
 		wait
 
-		if test "${NO_X25519}" = 0 && test "${FIPS}" != 1; then
+		if test "${HAVE_X25519}" = 0; then
 			eval "${GETPORT}"
-			launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1_2 -key "${RSA_KEY}" -cert "${RSA_CERT}" -named_curve X25519 -CAfile "${CA_CERT}"
+			launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1_2 -key "${RSA_KEY}" -cert "${RSA_CERT}" -curves X25519 -CAfile "${CA_CERT}"
 			PID=$!
 			wait_server ${PID}
 
@@ -327,7 +343,7 @@ run_client_suite() {
 			wait
 		fi
 
-		if test "${FIPS}" != 1; then
+		if test "${FIPS_CURVES}" != 1; then
 			#-cipher ECDHE-ECDSA-AES128-SHA
 			eval "${GETPORT}"
 			launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1_2 -key "${ECC224_KEY}" -cert "${ECC224_CERT}" -Verify 1 -named_curve secp224r1 -CAfile "${CA_ECC_CERT}"
@@ -355,7 +371,7 @@ run_client_suite() {
 		kill ${PID}
 		wait
 
-		if test "${FIPS}" != 1; then
+		if test "${FIPS_CURVES}" != 1; then
 			#-cipher ECDHE-ECDSA-AES128-SHA
 			eval "${GETPORT}"
 			launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -tls1_2 -key "${ECC521_KEY}" -cert "${ECC521_CERT}" -Verify 1 -named_curve secp521r1 -CAfile "${CA_ECC_CERT}"
@@ -368,7 +384,7 @@ run_client_suite() {
 
 			kill ${PID}
 			wait
-		fi #FIPS
+		fi #FIPS_CURVES
 	fi #NO_TLS1_2
 
 	#-cipher PSK
@@ -564,7 +580,7 @@ run_server_suite() {
 	kill ${PID}
 	wait
 
-	if test "${FIPS}" != 1; then
+	if test "${FIPS_CURVES}" != 1; then
 		echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}"
@@ -605,7 +621,7 @@ run_server_suite() {
 	kill ${PID}
 	wait
 
-	if test "${FIPS}" != 1; then
+	if test "${FIPS_CURVES}" != 1; then
 		echo "${PREFIX}Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP521R1)"
 		eval "${GETPORT}"
 		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" --x509cafile "${CA_ECC_CERT}"
@@ -674,7 +690,7 @@ run_server_suite() {
 		kill ${PID}
 		wait
 
-		if test "${NO_X22519}" = 0 && test "${FIPS}" != 1; then
+		if test "${HAVE_X22519}" = 0; then
 			echo "${PREFIX}Check TLS 1.2 with ECDHE-RSA ciphersuite (X25519)"
 			eval "${GETPORT}"
 			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-X25519${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
@@ -688,7 +704,7 @@ run_server_suite() {
 			wait
 		fi
 
-		if test "${FIPS}" != 1; then
+		if test "${FIPS_CURVES}" != 1; then
 			echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
 			eval "${GETPORT}"
 			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-SECP224R1:+CURVE-ALL${ADD}" --x509certfile "${ECC224_CERT}" --x509keyfile "${ECC224_KEY}" --x509cafile "${CA_ECC_CERT}"
@@ -729,7 +745,7 @@ run_server_suite() {
 		kill ${PID}
 		wait
 
-		if test "${FIPS}" != 1; then
+		if test "${FIPS_CURVES}" != 1; then
 			echo "${PREFIX}Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP521R1)"
 			eval "${GETPORT}"
 			launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL${ADD}" --x509certfile "${ECC521_CERT}" --x509keyfile "${ECC521_KEY}" --x509cafile "${CA_ECC_CERT}"

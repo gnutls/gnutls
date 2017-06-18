@@ -44,9 +44,9 @@ fi
 
 /usr/bin/openssl version|grep fips >/dev/null 2>&1
 if test $? = 0 || test "${ENABLE_NON_SUITEB_CURVES}" != "1"; then
-	export FIPS=1
+	export FIPS_CURVES=1
 else
-	export FIPS=0
+	export FIPS_CURVES=0
 fi
 
 export TZ="UTC"
