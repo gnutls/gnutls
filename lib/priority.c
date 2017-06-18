@@ -108,6 +108,7 @@ static const int _supported_ecc_normal[] = {
 	GNUTLS_ECC_CURVE_SECP256R1,
 	GNUTLS_ECC_CURVE_SECP384R1,
 	GNUTLS_ECC_CURVE_SECP521R1,
+	GNUTLS_ECC_CURVE_X25519, /* draft-ietf-tls-rfc4492bis */
 #ifdef ENABLE_NON_SUITEB_CURVES
 	GNUTLS_ECC_CURVE_SECP224R1,
 	GNUTLS_ECC_CURVE_SECP192R1,
@@ -120,6 +121,7 @@ static const int _supported_ecc_secure128[] = {
 	GNUTLS_ECC_CURVE_SECP256R1,
 	GNUTLS_ECC_CURVE_SECP384R1,
 	GNUTLS_ECC_CURVE_SECP521R1,
+	GNUTLS_ECC_CURVE_X25519, /* draft-ietf-tls-rfc4492bis */
 	0
 };
 static const int* supported_ecc_secure128 = _supported_ecc_secure128;
