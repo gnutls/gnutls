@@ -161,13 +161,18 @@ static const int protocol_priority[] = {
 	0
 };
 
+/* contains all the supported TLS protocols, intended to be used for eliminating them
+ */
 static const int stream_protocol_priority[] = {
+	GNUTLS_TLS1_3,
 	GNUTLS_TLS1_2,
 	GNUTLS_TLS1_1,
 	GNUTLS_TLS1_0,
 	0
 };
 
+/* contains all the supported DTLS protocols, intended to be used for eliminating them
+ */
 static const int dgram_protocol_priority[] = {
 	GNUTLS_DTLS1_2,
 	GNUTLS_DTLS1_0,

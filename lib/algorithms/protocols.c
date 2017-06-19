@@ -27,7 +27,7 @@
 
 /* TLS Versions */
 static const version_entry_st sup_versions[] = {
-	{.name = "SSL3.0", 
+	{.name = "SSL3.0",
 	 .id = GNUTLS_SSL3,
 	 .age = 0,
 	 .major = 3,
@@ -39,9 +39,10 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 1,
+	 .only_extension = 0,
 	 .false_start = 0
 	},
-	{.name = "TLS1.0", 
+	{.name = "TLS1.0",
 	 .id = GNUTLS_TLS1,
 	 .age = 1,
 	 .major = 3,
@@ -53,9 +54,10 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
 	 .false_start = 0
 	},
-	{.name = "TLS1.1", 
+	{.name = "TLS1.1",
 	 .id = GNUTLS_TLS1_1,
 	 .age = 2,
 	 .major = 3,
@@ -67,9 +69,10 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
 	 .false_start = 0
 	},
-	{.name = "TLS1.2", 
+	{.name = "TLS1.2",
 	 .id = GNUTLS_TLS1_2,
 	 .age = 3,
 	 .major = 3,
@@ -81,7 +84,23 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 1,
 	 .selectable_prf = 1,
 	 .obsolete = 0,
+	 .only_extension = 0,
 	 .false_start = 1
+	},
+	{.name = "TLS1.3",
+	 .id = GNUTLS_TLS1_3,
+	 .age = 4,
+	 .major = 3,
+	 .minor = 4,
+	 .transport = GNUTLS_STREAM,
+	 .supported = 1,
+	 .explicit_iv = 1,
+	 .extensions = 1,
+	 .selectable_sighash = 1,
+	 .selectable_prf = 1,
+	 .obsolete = 0,
+	 .only_extension = 1,
+	 .false_start = 0 /* doesn't make sense */
 	},
 	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
 	 .id = GNUTLS_DTLS0_9,
@@ -95,9 +114,10 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
 	 .false_start = 0
 	},
-	{.name = "DTLS1.0", 
+	{.name = "DTLS1.0",
 	 .id = GNUTLS_DTLS1_0,
 	 .age = 201,
 	 .major = 254,
@@ -109,9 +129,10 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 0,
 	 .selectable_prf = 0,
 	 .obsolete = 0,
+	 .only_extension = 0,
 	 .false_start = 0
 	},
-	{.name = "DTLS1.2", 
+	{.name = "DTLS1.2",
 	 .id = GNUTLS_DTLS1_2,
 	 .age = 202,
 	 .major = 254,
@@ -123,6 +144,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_sighash = 1,
 	 .selectable_prf = 1,
 	 .obsolete = 0,
+	 .only_extension = 0,
 	 .false_start = 1
 	},
 	{0, 0, 0, 0, 0}
@@ -198,9 +220,9 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 
 /* Returns the maximum version in the priorities 
  */
-static const version_entry_st *version_max(gnutls_session_t session)
+static const version_entry_st *legacy_version_max(gnutls_session_t session)
 {
-	int max_proto = _gnutls_version_max(session);
+	int max_proto = _gnutls_legacy_version_max(session);
 
 	if (max_proto < 0)
 		return NULL;
@@ -208,19 +230,41 @@ static const version_entry_st *version_max(gnutls_session_t session)
 	return version_to_entry(max_proto);
 }
 
-gnutls_protocol_t _gnutls_version_max(gnutls_session_t session)
+gnutls_protocol_t _gnutls_legacy_version_max(gnutls_session_t session)
 {
 	unsigned int i, max = 0x00;
 	gnutls_protocol_t cur_prot;
+	const version_entry_st *p;
 
 	for (i = 0; i < session->internals.priorities->protocol.algorithms;
 	     i++) {
 		cur_prot =
 		    session->internals.priorities->protocol.priority[i];
 
-		if (cur_prot > max
-		    && _gnutls_version_is_supported(session, cur_prot))
-			max = cur_prot;
+		for (p = sup_versions; p->name != NULL; p++)
+			if(p->id == cur_prot) {
+#ifndef ENABLE_SSL3
+				if (p->obsolete != 0)
+					break;
+#endif
+				if (!p->supported || p->transport != session->internals.transport)
+					break;
+
+				if (p->only_extension != 0) {
+					/* TLS 1.3 or later found */
+					if (p->transport == GNUTLS_STREAM) {
+						return GNUTLS_TLS1_2;
+					} else {
+						return GNUTLS_DTLS1_2;
+					}
+				}
+
+				if (!p->only_extension && cur_prot > max) {
+					max = cur_prot;
+				}
+				break;
+			}
+		}
 	}
 
 	if (max == 0x00)
@@ -235,7 +279,7 @@ unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, ui
 {
 	const version_entry_st *e;
 
-	e = version_max(session);
+	e = legacy_version_max(session);
 	if (e == NULL) /* we don't know; but that means something is unconfigured */
 		return 1;
 

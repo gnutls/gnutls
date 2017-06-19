@@ -181,10 +181,9 @@ int _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd)
 			       resumed_security_parameters.client_random,
 			       GNUTLS_RANDOM_SIZE);
 		} else {
-			ret =
-			    gnutls_rnd(GNUTLS_RND_NONCE,
-			    		session->security_parameters.client_random,
-			    		GNUTLS_RANDOM_SIZE);
+			ret = gnutls_rnd(GNUTLS_RND_NONCE,
+				session->security_parameters.client_random,
+				GNUTLS_RANDOM_SIZE);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		}
@@ -361,11 +360,10 @@ _gnutls_finished(gnutls_session_t session, int type, void *ret,
 /* returns the 0 on success or a negative error code.
  */
 int
-_gnutls_negotiate_version(gnutls_session_t session,
+_gnutls_negotiate_legacy_version(gnutls_session_t session,
 			  gnutls_protocol_t adv_version, uint8_t major, uint8_t minor)
 {
 	int ret;
-
 
 	/* if we do not support that version  */
 	if (adv_version == GNUTLS_VERSION_UNKNOWN || _gnutls_version_is_supported(session, adv_version) == 0) {
@@ -377,7 +375,7 @@ _gnutls_negotiate_version(gnutls_session_t session,
 		/* If he requested something we do not support
 		 * then we send him the highest we support.
 		 */
-		ret = _gnutls_version_max(session);
+		ret = _gnutls_legacy_version_max(session);
 		if (ret == GNUTLS_VERSION_UNKNOWN) {
 			/* this check is not really needed.
 			 */
@@ -419,7 +417,7 @@ _gnutls_user_hello_func(gnutls_session_t session,
 		/* Here we need to renegotiate the version since the callee might
 		 * have disabled some TLS versions.
 		 */
-		ret = _gnutls_negotiate_version(session, adv_version, major, minor);
+		ret = _gnutls_negotiate_legacy_version(session, adv_version, major, minor);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -457,7 +455,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	minor = data[pos+1];
 	set_adv_version(session, major, minor);
 
-	neg_version = _gnutls_negotiate_version(session, adv_version, major, minor);
+	neg_version = _gnutls_negotiate_legacy_version(session, adv_version, major, minor);
 	if (neg_version < 0) {
 		gnutls_assert();
 		return neg_version;
@@ -875,7 +873,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 		/* TLS_FALLBACK_SCSV */
 		if (data[i] == GNUTLS_FALLBACK_SCSV_MAJOR &&
 		    data[i + 1] == GNUTLS_FALLBACK_SCSV_MINOR) {
-			unsigned max = _gnutls_version_max(session);
+			unsigned max = _gnutls_legacy_version_max(session);
 			_gnutls_handshake_log
 			    ("HSK[%p]: Received fallback CS\n",
 			     session);
@@ -1644,7 +1642,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 				hver = get_version(session);
 			else	/* new handshake. just get the max */
 				hver =
-				    version_to_entry(_gnutls_version_max
+				    version_to_entry(_gnutls_legacy_version_max
 						     (session));
 		} else {
 			/* we are resuming a session */

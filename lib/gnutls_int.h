@@ -519,6 +519,7 @@ typedef struct {
 	 * otherwise it prevents this protocol from being set as record version */
 	bool obsolete;
 	bool false_start;	/* That version can be used with false start */
+	bool only_extension;	/* negotiated only with an extension */
 } version_entry_st;
 
 
