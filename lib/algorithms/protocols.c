@@ -273,6 +273,60 @@ gnutls_protocol_t _gnutls_legacy_version_max(gnutls_session_t session)
 	return max;
 }
 
+/* Returns the number of bytes written to buffer or a negative
+ * error code. It will return an error if there is no version
+ * >= TLS 1.3.
+ */
+int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, ssize_t buffer_size)
+{
+	gnutls_protocol_t cur_prot;
+	size_t written_bytes = 0;
+	unsigned at_least_one_new = 0;
+	unsigned i;
+	const version_entry_st *p;
+
+	for (i = 0; i < session->internals.priorities->protocol.algorithms; i++) {
+		cur_prot =
+		    session->internals.priorities->protocol.priority[i];
+
+		for (p = sup_versions; p->name != NULL; p++) {
+			if(p->id == cur_prot) {
+				if (p->obsolete != 0)
+					break;
+
+				if (!p->supported || p->transport != session->internals.transport)
+					break;
+
+				if (p->only_extension)
+					at_least_one_new = 1;
+
+				if (buffer_size > 2) {
+					buffer[0] = p->major;
+					buffer[1] = p->minor;
+					written_bytes += 2;
+					buffer += 2;
+				}
+
+				buffer_size -= 2;
+
+				if (buffer_size <= 0)
+					goto finish;
+
+				break;
+			}
+		}
+	}
+
+ finish:
+	if (written_bytes == 0)
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+
+	if (at_least_one_new == 0)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	return written_bytes;
+}
+
 /* Returns true (1) if the given version is higher than the highest supported
  * and (0) otherwise */
 unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor)

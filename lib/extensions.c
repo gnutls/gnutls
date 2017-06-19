@@ -40,6 +40,7 @@
 #include <ext/ecc.h>
 #include <ext/status_request.h>
 #include <ext/ext_master_secret.h>
+#include <ext/supported_versions.h>
 #include <ext/srtp.h>
 #include <ext/alpn.h>
 #include <ext/dumbfw.h>
@@ -55,6 +56,7 @@ static void unset_resumed_ext_data(gnutls_session_t session, const struct extens
 static extension_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 	&ext_mod_max_record_size,
 	&ext_mod_ext_master_secret,
+	&ext_mod_supported_versions,
 	&ext_mod_etm,
 #ifdef ENABLE_OCSP
 	&ext_mod_status_request,

@@ -48,6 +48,8 @@ int _gnutls_version_is_supported(gnutls_session_t session,
 gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor);
 unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor);
 
+int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, ssize_t buffer_size);
+
 /* Functions for feature checks */
 int
 _gnutls_figure_common_ciphersuite(gnutls_session_t session,
