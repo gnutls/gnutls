@@ -96,6 +96,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	gnutls_protocol_t adv_version;
 	uint8_t rnd[GNUTLS_RANDOM_SIZE], major, minor;
 	int len = datalen;
+	int neg_version;
 	uint16_t challenge;
 	uint8_t session_id[GNUTLS_MAX_SESSION_ID_SIZE];
 
@@ -116,6 +117,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		gnutls_assert();
 		return ret;
 	}
+	neg_version = ret;
 
 	pos += 2;
 
@@ -211,7 +213,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		return gnutls_assert_val(ret);
 
 	/* generate server random value */
-	ret = _gnutls_set_server_random(session, NULL);
+	ret = _gnutls_set_server_random(session, neg_version, NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

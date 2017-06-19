@@ -166,48 +166,14 @@ static int resume_copy_required_values(gnutls_session_t session)
 	return 0;
 }
 
-
-/* this function will produce GNUTLS_RANDOM_SIZE==32 bytes of random data
- * and put it to dst.
- */
-static int create_tls_random(uint8_t * dst)
-{
-	int ret;
-
-	/* Use nonce rng level for the most of the
-	 * buffer except for the first 4 that are the
-	 * system's time.
-	 */
-
-#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
-	/* When fuzzying avoid timing dependencies */
-	memset(dst, 1, 4);
-#else
-	uint32_t tim;
-
-	tim = gnutls_time(NULL);
-	/* generate server random value */
-	_gnutls_write_uint32(tim, dst);
-#endif
-
-	ret =
-	    gnutls_rnd(GNUTLS_RND_NONCE, &dst[3], GNUTLS_RANDOM_SIZE - 3);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return 0;
-}
-
 int _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd)
 {
 	int ret;
 
-	if (rnd != NULL)
+	if (rnd != NULL) { /* server */
 		memcpy(session->security_parameters.client_random, rnd,
 		       GNUTLS_RANDOM_SIZE);
-	else {
+	} else { /* client */
 		/* no random given, we generate. */
 		if (session->internals.sc_random_set != 0) {
 			memcpy(session->security_parameters.client_random,
@@ -216,9 +182,9 @@ int _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd)
 			       GNUTLS_RANDOM_SIZE);
 		} else {
 			ret =
-			    create_tls_random(session->
-					      security_parameters.
-					      client_random);
+			    gnutls_rnd(GNUTLS_RND_NONCE,
+			    		session->security_parameters.client_random,
+			    		GNUTLS_RANDOM_SIZE);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		}
@@ -226,27 +192,58 @@ int _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd)
 	return 0;
 }
 
-int _gnutls_set_server_random(gnutls_session_t session, uint8_t * rnd)
+int _gnutls_set_server_random(gnutls_session_t session, int version, uint8_t * rnd)
 {
 	int ret;
 
-	if (rnd != NULL)
+	if (rnd != NULL) { /* client */
 		memcpy(session->security_parameters.server_random, rnd,
 		       GNUTLS_RANDOM_SIZE);
-	else {
-		/* no random given, we generate. */
+
+		/* check whether the server random value is set according to
+		 * to TLS 1.3. p4.1.3 requirements */
+		if (version <= GNUTLS_TLS1_2 && _gnutls_version_is_supported(session, GNUTLS_TLS1_3)) {
+			if (version == GNUTLS_TLS1_2 &&
+			    memcmp(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+			    "\x44\x4F\x57\x4E\x47\x52\x44\x01", 8) == 0) {
+				_gnutls_audit_log(session,
+					  "Detected downgrade to TLS 1.2 from TLS 1.3\n");
+				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			} else if (version <= GNUTLS_TLS1_1 &&
+				   memcmp(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+				   "\x44\x4F\x57\x4E\x47\x52\x44\x00", 8) == 0) {
+				_gnutls_audit_log(session,
+					  "Detected downgrade to TLS 1.1 or earlier from TLS 1.3\n");
+				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+			}
+		}
+
+	} else { /* server */
 		if (session->internals.sc_random_set != 0) {
 			memcpy(session->security_parameters.server_random,
 			       session->internals.
 			       resumed_security_parameters.server_random,
 			       GNUTLS_RANDOM_SIZE);
 		} else {
-			ret =
-			    create_tls_random(session->
-					      security_parameters.
-					      server_random);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (version == GNUTLS_TLS1_2) {
+				memcpy(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+					"\x44\x4F\x57\x4E\x47\x52\x44\x01", 8);
+				ret =
+				    gnutls_rnd(GNUTLS_RND_NONCE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE-8);
+			} else if (version <= GNUTLS_TLS1_1) {
+				memcpy(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+					"\x44\x4F\x57\x4E\x47\x52\x44\x00", 8);
+				ret =
+				    gnutls_rnd(GNUTLS_RND_NONCE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE-8);
+			} else {
+				ret =
+				    gnutls_rnd(GNUTLS_RND_NONCE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+			}
+
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
 		}
 	}
 	return 0;
@@ -480,7 +477,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	pos += GNUTLS_RANDOM_SIZE;
 
-	ret = _gnutls_set_server_random(session, NULL);
+	ret = _gnutls_set_server_random(session, neg_version, NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1525,7 +1522,7 @@ read_server_hello(gnutls_session_t session,
 	pos += 2;
 
 	DECR_LEN(len, GNUTLS_RANDOM_SIZE);
-	ret = _gnutls_set_server_random(session, &data[pos]);
+	ret = _gnutls_set_server_random(session, version, &data[pos]);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
