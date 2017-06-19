@@ -13,6 +13,8 @@
  *  Please contact JWC s.r.o. at <info@pkcs11interop.net> for more details.
  */
 
+
+#define _POSIX_C_SOURCE 200809
 #include <config.h>
 #include <stdio.h>
 #include <string.h>

@@ -26,5 +26,8 @@
 /* This flag instructs the module to return CKR_OK on sensitive
  * objects */
 #define MOCK_FLAG_BROKEN_GET_ATTRIBUTES 1
+#define MOCK_FLAG_ALWAYS_AUTH (1<<1)
+/* simulate the safenet HSMs always auth behavior */
+#define MOCK_FLAG_SAFENET_ALWAYS_AUTH (1<<2)
 
 #endif
