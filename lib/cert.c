@@ -979,12 +979,12 @@ gnutls_certificate_verification_status_print(unsigned int status,
 		if (status & GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED)
 			_gnutls_buffer_append_str(&str,
 						  _
-						  ("The revocation data are old and have been superseded. "));
+						  ("The revocation or OCSP data are old and have been superseded. "));
 
 		if (status & GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE)
 			_gnutls_buffer_append_str(&str,
 						  _
-						  ("The revocation data are issued with a future date. "));
+						  ("The revocation or OCSP data are issued with a future date. "));
 
 		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
 			_gnutls_buffer_append_str(&str,
