@@ -76,6 +76,7 @@ typedef struct common_info {
 	unsigned no_compat;
 
 	unsigned rsa_pss_sign;
+	unsigned sort_chain;
 } common_info_st;
 
 /* this must be provided by the app */

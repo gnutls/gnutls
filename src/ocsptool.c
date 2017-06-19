@@ -404,6 +404,7 @@ unsigned load_chain(gnutls_x509_crt_t chain[MAX_CHAIN_SIZE])
 
 		info.verbose = verbose;
 		info.cert = OPT_ARG(LOAD_CHAIN);
+		info.sort_chain = 1;
 		list = load_cert_list(1, &list_size, &info);
 
 		if (list_size > MAX_CHAIN_SIZE) {

@@ -395,6 +395,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 	gnutls_datum_t dat;
 	unsigned size;
 	unsigned int crt_max;
+	unsigned flags = 0;
 
 	*crt_size = 0;
 	if (info->verbose)
@@ -424,7 +425,10 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 	dat.data = (void *) lbuffer;
 	dat.size = size;
 
-	ret = gnutls_x509_crt_list_import2(&crt, &crt_max, &dat, GNUTLS_X509_FMT_PEM, 0);
+	if (info->sort_chain)
+		flags |= GNUTLS_X509_CRT_LIST_SORT;
+
+	ret = gnutls_x509_crt_list_import2(&crt, &crt_max, &dat, GNUTLS_X509_FMT_PEM, flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error loading certificates: %s\n", gnutls_strerror(ret));
 		app_exit(1);
