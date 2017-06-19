@@ -388,45 +388,6 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 	return verify;
 }
 
-static void verify_response(gnutls_datum_t *nonce)
-{
-	gnutls_datum_t dat;
-	size_t size;
-	gnutls_x509_crt_t signer;
-	common_info_st info;
-	int v;
-
-	if (HAVE_OPT(LOAD_RESPONSE))
-		dat.data =
-		    (void *) read_binary_file(OPT_ARG(LOAD_RESPONSE),
-					      &size);
-	else
-		dat.data = (void *) fread_file(infile, &size);
-	if (dat.data == NULL) {
-		fprintf(stderr, "error reading response\n");
-		app_exit(1);
-	}
-	dat.size = size;
-
-	memset(&info, 0, sizeof(info));
-	info.verbose = verbose;
-	if (!HAVE_OPT(LOAD_SIGNER)) {
-		fprintf(stderr, "Missing option --load-signer\n");
-		app_exit(1);
-	}
-	info.cert = OPT_ARG(LOAD_SIGNER);
-
-	signer = load_cert(1, &info);
-
-	v = _verify_response(&dat, nonce, signer);
-
-	gnutls_x509_crt_deinit(signer);
-	free(dat.data);
-
-	if (v && !HAVE_OPT(IGNORE_ERRORS))
-		app_exit(1);
-}
-
 #define MAX_CHAIN_SIZE 8
 
 static
@@ -479,7 +440,60 @@ unsigned load_chain(gnutls_x509_crt_t chain[MAX_CHAIN_SIZE])
 	}
 }
 
+static void verify_response(gnutls_datum_t *nonce)
+{
+	gnutls_datum_t dat;
+	size_t size;
+	gnutls_x509_crt_t signer;
+	common_info_st info;
+	int v;
+	gnutls_x509_crt_t chain[MAX_CHAIN_SIZE];
+	unsigned chain_size = 0, i;
 
+	if (HAVE_OPT(LOAD_RESPONSE))
+		dat.data =
+		    (void *) read_binary_file(OPT_ARG(LOAD_RESPONSE),
+					      &size);
+	else
+		dat.data = (void *) fread_file(infile, &size);
+	if (dat.data == NULL) {
+		fprintf(stderr, "error reading response\n");
+		app_exit(1);
+	}
+	dat.size = size;
+
+	if (HAVE_OPT(LOAD_CHAIN)) {
+		chain_size = load_chain(chain);
+
+		if (chain_size <= 1)
+			signer = chain[0];
+		else
+			signer = chain[1];
+	} else {
+		memset(&info, 0, sizeof(info));
+		info.verbose = verbose;
+		if (!HAVE_OPT(LOAD_SIGNER)) {
+			fprintf(stderr, "Missing option --load-signer or --load-chain\n");
+			app_exit(1);
+		}
+		info.cert = OPT_ARG(LOAD_SIGNER);
+
+		signer = load_cert(1, &info);
+	}
+
+	v = _verify_response(&dat, nonce, signer);
+
+	if (chain_size > 0) {
+		for (i=0;i<chain_size;i++)
+			gnutls_x509_crt_deinit(chain[i]);
+	} else {
+		gnutls_x509_crt_deinit(signer);
+	}
+	free(dat.data);
+
+	if (v && !HAVE_OPT(IGNORE_ERRORS))
+		app_exit(1);
+}
 
 static void ask_server(const char *url)
 {
