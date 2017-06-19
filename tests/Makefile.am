@@ -34,6 +34,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	rsa-md5-collision/README safe-renegotiation/README starttls-smtp.txt starttls-ftp.txt \
 	starttls-lmtp.txt starttls-pop3.txt starttls-nntp.txt starttls-sieve.txt \
 	rsa-md5-collision/colliding-chain-md5-2.pem rsa-md5-collision/colliding-chain-md5-1.pem \
+	ocsp-tests/certs/ocsp-amazon.com.der ocsp-tests/certs/chain-amazon.com.pem \
+	ocsp-tests/certs/chain-amazon.com-unsorted.pem \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
@@ -306,7 +308,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
-	psktool.sh
+	psktool.sh ocsp-tests/ocsp-load-chain
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
