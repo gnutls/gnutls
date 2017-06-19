@@ -831,20 +831,19 @@ _gnutls_buffer_append_data_prefix(gnutls_buffer_st * buf,
 				  int pfx_size, const void *data,
 				  size_t data_size)
 {
-	int ret = 0, ret1;
+	int ret;
 
-	ret1 = _gnutls_buffer_append_prefix(buf, pfx_size, data_size);
-	if (ret1 < 0)
-		return gnutls_assert_val(ret1);
+	ret = _gnutls_buffer_append_prefix(buf, pfx_size, data_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	if (data_size > 0) {
 		ret = _gnutls_buffer_append_data(buf, data, data_size);
-
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
 
-	return ret + ret1;
+	return 0;
 }
 
 int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
