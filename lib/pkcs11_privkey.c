@@ -235,18 +235,6 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
- retry_login:
-	if (key->reauth || req_login) {
-		ret =
-		    pkcs11_login(&key->sinfo, &key->pin,
-				  key->uinfo, 0, 1-req_login);
-		if (ret < 0) {
-			gnutls_assert();
-			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
-			/* let's try the operation anyway */
-		}
-	}
-
 	sinfo = &key->sinfo;
 
 	mech.mechanism = pk_to_mech(key->pk_algorithm);
@@ -260,6 +248,18 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
+	}
+
+ retry_login:
+	if (key->reauth || req_login) {
+		ret =
+		    pkcs11_login(&key->sinfo, &key->pin,
+				  key->uinfo, 0, 1-req_login);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
+			/* let's try the operation anyway */
+		}
 	}
 
 	/* Work out how long the signature must be: */
@@ -488,18 +488,6 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	if (key->pk_algorithm != GNUTLS_PK_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
- retry_login:
-	if (key->reauth || req_login) {
-		ret =
-		    pkcs11_login(&key->sinfo, &key->pin,
-				  key->uinfo, 0, 1-req_login);
-		if (ret < 0) {
-			gnutls_assert();
-			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
-			/* let's try the operation anyway */
-		}
-	}
-
 	mech.mechanism = CKM_RSA_PKCS;
 	mech.parameter = NULL;
 	mech.parameter_len = 0;
@@ -511,6 +499,18 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
+	}
+
+ retry_login:
+	if (key->reauth || req_login) {
+		ret =
+		    pkcs11_login(&key->sinfo, &key->pin,
+				  key->uinfo, 0, 1-req_login);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
+			/* let's try the operation anyway */
+		}
 	}
 
 	/* Work out how long the plaintext must be: */
