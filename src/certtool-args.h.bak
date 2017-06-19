@@ -132,7 +132,7 @@ typedef enum {
     INDEX_OPT_DSA                      = 63,
     INDEX_OPT_ECC                      = 64,
     INDEX_OPT_ECDSA                    = 65,
-    INDEX_OPT_RSA_PSS                  = 66,
+    INDEX_OPT_KEY_TYPE                 = 66,
     INDEX_OPT_SIGN_PARAMS              = 67,
     INDEX_OPT_HASH                     = 68,
     INDEX_OPT_INDER                    = 69,
@@ -276,7 +276,7 @@ typedef enum {
 #define VALUE_OPT_DSA            0x1034
 #define VALUE_OPT_ECC            0x1035
 #define VALUE_OPT_ECDSA          0x1036
-#define VALUE_OPT_RSA_PSS        0x1037
+#define VALUE_OPT_KEY_TYPE       0x1037
 #define VALUE_OPT_SIGN_PARAMS    0x1038
 #define VALUE_OPT_HASH           0x1039
 #define VALUE_OPT_INDER          0x103A
