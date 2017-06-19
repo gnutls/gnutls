@@ -47,6 +47,7 @@ static const char *outfile_name = NULL; /* to delete on exit */
 FILE *infile;
 static unsigned int encoding;
 unsigned int verbose = 0;
+static unsigned int vflags = 0;
 
 const char *get_pass(void)
 {
@@ -339,7 +340,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 			fprintf(stdout, "Loaded %d trust anchors\n",
 				x509_ncas);
 
-		ret = gnutls_ocsp_resp_verify(resp, list, &verify, 0);
+		ret = gnutls_ocsp_resp_verify(resp, list, &verify, vflags);
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_ocsp_resp_verify: %s\n",
 				gnutls_strerror(ret));
@@ -367,7 +368,7 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 
 		ret =
 		    gnutls_ocsp_resp_verify_direct(resp, signer, &verify,
-						   0);
+						   vflags);
 		if (ret < 0) {
 			fprintf(stderr,
 				"\nVerifying OCSP Response: %s\n",
@@ -587,6 +588,9 @@ int main(int argc, char **argv)
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(OPT_VALUE_DEBUG);
+
+	if (HAVE_OPT(VERIFY_ALLOW_BROKEN))
+		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
 
 	if (HAVE_OPT(OUTFILE)) {
 		outfile = fopen(OPT_ARG(OUTFILE), "wb");

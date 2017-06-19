@@ -30,6 +30,12 @@ flag = {
 };
 
 flag = {
+    name      = verify-allow-broken;
+    descrip   = "Allow broken algorithms, such as MD5 for verification";
+    doc = "This can be combined with --verify-response.";
+};
+
+flag = {
     name      = request-info;
     value     = i;
     descrip   = "Print information on a OCSP request";
