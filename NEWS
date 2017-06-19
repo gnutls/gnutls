@@ -31,6 +31,10 @@ See the end for copying conditions.
    some HSMs which do not accept an integer with a leading zero. This
    improves operation with certain Atos HSMs.
 
+** libgnutls: Improve check for /dev/urandom uniqueness. Ensure that when
+   gnutls_global_init() is called for a second time that /dev/urandom is
+   re-opened when the inode or device ID has changed.
+
 ** API and ABI modifications:
 No changes since last version.
 
