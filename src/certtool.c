@@ -1493,7 +1493,7 @@ void pgp_privkey_info(void)
 	gnutls_openpgp_privkey_t key;
 	unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 	size_t size;
-	int ret, i, subkeys, bits = 0;
+	int ret, i, subkeys;
 	gnutls_datum_t pem;
 	const char *cprint;
 
@@ -1567,8 +1567,6 @@ void pgp_privkey_info(void)
 				print_rsa_pkey(outfile, &m, &e, &d, &p, &q,
 					       &u, NULL, NULL,
 					       HAVE_OPT(CPRINT));
-
-			bits = m.size * 8;
 		} else if (ret == GNUTLS_PK_DSA) {
 			gnutls_datum_t p, q, g, y, x;
 
@@ -1587,8 +1585,6 @@ void pgp_privkey_info(void)
 			else
 				print_dsa_pkey(outfile, &x, &y, &p, &q, &g,
 					       HAVE_OPT(CPRINT));
-
-			bits = y.size * 8;
 		}
 
 		fprintf(outfile, "\n");
@@ -1627,8 +1623,6 @@ void pgp_privkey_info(void)
 				"Error in fingerprint calculation: %s\n",
 				gnutls_strerror(ret));
 		} else {
-			gnutls_datum_t art;
-
 			fprintf(outfile, "Fingerprint: %s\n",
 				raw_to_string(lbuffer, size));
 		}
