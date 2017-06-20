@@ -510,28 +510,30 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 
 		gnutls_free(oid.data);
 		gnutls_free(data.data);
+
+	}
+
+	ret = gnutls_ocsp_resp_get_signature_algorithm(resp);
+	if (ret < 0)
+		addf(str, "error: get_signature_algorithm: %s\n",
+		     gnutls_strerror(ret));
+	else {
+		const char *name =
+		    gnutls_sign_algorithm_get_name(ret);
+		if (name == NULL)
+			name = _("unknown");
+		addf(str, _("\tSignature Algorithm: %s\n"), name);
+	}
+	if (ret != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(ret) == 0) {
+		adds(str,
+		     _("warning: signed using a broken signature "
+		       "algorithm that can be forged.\n"));
 	}
 
 	/* Signature. */
 	if (format == GNUTLS_OCSP_PRINT_FULL) {
 		gnutls_datum_t sig;
 
-		ret = gnutls_ocsp_resp_get_signature_algorithm(resp);
-		if (ret < 0)
-			addf(str, "error: get_signature_algorithm: %s\n",
-			     gnutls_strerror(ret));
-		else {
-			const char *name =
-			    gnutls_sign_algorithm_get_name(ret);
-			if (name == NULL)
-				name = _("unknown");
-			addf(str, _("\tSignature Algorithm: %s\n"), name);
-		}
-		if (ret != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(ret) == 0) {
-			adds(str,
-			     _("warning: signed using a broken signature "
-			       "algorithm that can be forged.\n"));
-		}
 
 		ret = gnutls_ocsp_resp_get_signature(resp, &sig);
 		if (ret < 0)
