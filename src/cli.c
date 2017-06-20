@@ -1832,7 +1832,8 @@ static int cert_verify_ocsp(gnutls_session_t session)
 				goto cleanup;
 			}
 		} else if (ret < 0) {
-			fprintf(stderr, "Cannot find issuer\n");
+			if (it == 0)
+				fprintf(stderr, "Cannot find issuer: %s\n", gnutls_strerror(ret));
 			goto cleanup;
 		}
 
