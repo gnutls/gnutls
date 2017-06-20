@@ -66,30 +66,32 @@
  *  Enumeration of each option type for ocsptool
  */
 typedef enum {
-    INDEX_OPT_DEBUG             =  0,
-    INDEX_OPT_VERBOSE           =  1,
-    INDEX_OPT_INFILE            =  2,
-    INDEX_OPT_OUTFILE           =  3,
-    INDEX_OPT_ASK               =  4,
-    INDEX_OPT_VERIFY_RESPONSE   =  5,
-    INDEX_OPT_REQUEST_INFO      =  6,
-    INDEX_OPT_RESPONSE_INFO     =  7,
-    INDEX_OPT_GENERATE_REQUEST  =  8,
-    INDEX_OPT_NONCE             =  9,
-    INDEX_OPT_LOAD_ISSUER       = 10,
-    INDEX_OPT_LOAD_CERT         = 11,
-    INDEX_OPT_LOAD_TRUST        = 12,
-    INDEX_OPT_LOAD_SIGNER       = 13,
-    INDEX_OPT_INDER             = 14,
-    INDEX_OPT_LOAD_REQUEST      = 15,
-    INDEX_OPT_LOAD_RESPONSE     = 16,
-    INDEX_OPT_IGNORE_ERRORS     = 17,
-    INDEX_OPT_VERSION           = 18,
-    INDEX_OPT_HELP              = 19,
-    INDEX_OPT_MORE_HELP         = 20
+    INDEX_OPT_DEBUG                =  0,
+    INDEX_OPT_VERBOSE              =  1,
+    INDEX_OPT_INFILE               =  2,
+    INDEX_OPT_OUTFILE              =  3,
+    INDEX_OPT_ASK                  =  4,
+    INDEX_OPT_VERIFY_RESPONSE      =  5,
+    INDEX_OPT_REQUEST_INFO         =  6,
+    INDEX_OPT_RESPONSE_INFO        =  7,
+    INDEX_OPT_GENERATE_REQUEST     =  8,
+    INDEX_OPT_NONCE                =  9,
+    INDEX_OPT_LOAD_CHAIN           = 10,
+    INDEX_OPT_LOAD_ISSUER          = 11,
+    INDEX_OPT_LOAD_CERT            = 12,
+    INDEX_OPT_LOAD_TRUST           = 13,
+    INDEX_OPT_LOAD_SIGNER          = 14,
+    INDEX_OPT_INDER                = 15,
+    INDEX_OPT_LOAD_REQUEST         = 16,
+    INDEX_OPT_LOAD_RESPONSE        = 17,
+    INDEX_OPT_IGNORE_ERRORS        = 18,
+    INDEX_OPT_VERIFY_ALLOW_BROKEN  = 19,
+    INDEX_OPT_VERSION              = 20,
+    INDEX_OPT_HELP                 = 21,
+    INDEX_OPT_MORE_HELP            = 22
 } teOptIndex;
 /** count of all options for ocsptool */
-#define OPTION_CT    21
+#define OPTION_CT    23
 /** ocsptool version */
 #define OCSPTOOL_VERSION       "@VERSION@"
 /** Full ocsptool version text */
@@ -156,14 +158,16 @@ typedef enum {
 #define VALUE_OPT_RESPONSE_INFO  'j'
 #define VALUE_OPT_GENERATE_REQUEST 'q'
 #define VALUE_OPT_NONCE          0x1004
-#define VALUE_OPT_LOAD_ISSUER    0x1005
-#define VALUE_OPT_LOAD_CERT      0x1006
-#define VALUE_OPT_LOAD_TRUST     0x1007
-#define VALUE_OPT_LOAD_SIGNER    0x1008
-#define VALUE_OPT_INDER          0x1009
+#define VALUE_OPT_LOAD_CHAIN     0x1005
+#define VALUE_OPT_LOAD_ISSUER    0x1006
+#define VALUE_OPT_LOAD_CERT      0x1007
+#define VALUE_OPT_LOAD_TRUST     0x1008
+#define VALUE_OPT_LOAD_SIGNER    0x1009
+#define VALUE_OPT_INDER          0x100A
 #define VALUE_OPT_LOAD_REQUEST   'Q'
 #define VALUE_OPT_LOAD_RESPONSE  'S'
-#define VALUE_OPT_IGNORE_ERRORS  0x100A
+#define VALUE_OPT_IGNORE_ERRORS  0x100B
+#define VALUE_OPT_VERIFY_ALLOW_BROKEN 0x100C
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
