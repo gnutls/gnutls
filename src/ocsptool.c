@@ -257,6 +257,18 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		app_exit(1);
 	}
 
+	ret =
+	    gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_COMPACT,
+				   &dat);
+	if (ret < 0) {
+		fprintf(stderr, "ocsp_resp_print: %s\n",
+			gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	printf("%s\n", dat.data);
+	gnutls_free(dat.data);
+
 	if (nonce) {
 		gnutls_datum_t rnonce;
 
