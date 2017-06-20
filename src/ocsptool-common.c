@@ -356,7 +356,7 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 
 	ret = gnutls_ocsp_resp_verify_direct(resp, issuer, &status, 0);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_ocsp_resp_verify_direct: %s",
+		fprintf(stderr, "OCSP verification: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -378,7 +378,7 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 					  &cert_status, &vtime, &ntime,
 					  &rtime, NULL);
 	if (ret < 0) {
-		fprintf(stderr, "reading response: %s",
+		fprintf(stderr, "reading response: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
