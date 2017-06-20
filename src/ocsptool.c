@@ -471,6 +471,13 @@ static void verify_response(gnutls_datum_t *nonce)
 			signer = chain[0];
 		else
 			signer = chain[1];
+
+		v = _verify_response(&dat, nonce, signer);
+
+		for (i=0;i<chain_size;i++)
+			gnutls_x509_crt_deinit(chain[i]);
+	} else if (HAVE_OPT(LOAD_TRUST)) {
+		v = _verify_response(&dat, nonce, NULL);
 	} else {
 		memset(&info, 0, sizeof(info));
 		info.verbose = verbose;
@@ -481,16 +488,11 @@ static void verify_response(gnutls_datum_t *nonce)
 		info.cert = OPT_ARG(LOAD_SIGNER);
 
 		signer = load_cert(1, &info);
-	}
 
-	v = _verify_response(&dat, nonce, signer);
-
-	if (chain_size > 0) {
-		for (i=0;i<chain_size;i++)
-			gnutls_x509_crt_deinit(chain[i]);
-	} else {
+		v = _verify_response(&dat, nonce, signer);
 		gnutls_x509_crt_deinit(signer);
 	}
+
 	free(dat.data);
 
 	if (v && !HAVE_OPT(IGNORE_ERRORS))
