@@ -1153,14 +1153,6 @@ const gnutls_cipher_suite_entry_st *ciphersuite_to_entry(const uint8_t suite[2])
 	return NULL;
 }
 
-const cipher_entry_st *_gnutls_cipher_suite_get_cipher_algo(const uint8_t
-							    suite[2])
-{
-	int ret = 0;
-	CIPHER_SUITE_ALG_LOOP(ret = p->block_algorithm, suite);
-	return cipher_to_entry(ret);
-}
-
 gnutls_kx_algorithm_t
 _gnutls_cipher_suite_get_kx_algo(const uint8_t suite[2])
 {
@@ -1168,24 +1160,6 @@ _gnutls_cipher_suite_get_kx_algo(const uint8_t suite[2])
 
 	CIPHER_SUITE_ALG_LOOP(ret = p->kx_algorithm, suite);
 	return ret;
-
-}
-
-gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf(const uint8_t suite[2])
-{
-	int ret = 0;
-
-	CIPHER_SUITE_ALG_LOOP(ret = p->prf, suite);
-	return ret;
-
-}
-
-const mac_entry_st *_gnutls_cipher_suite_get_mac_algo(const uint8_t
-						      suite[2])
-{				/* In bytes */
-	int ret = 0;
-	CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm, suite);
-	return mac_to_entry(ret);
 
 }
 

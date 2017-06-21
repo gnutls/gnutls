@@ -167,14 +167,8 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 			     size_t pk_algos_size);
 
 const char *_gnutls_cipher_suite_get_name(const uint8_t suite[2]);
-gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf(const uint8_t
-						    suite[2]);
-const cipher_entry_st *_gnutls_cipher_suite_get_cipher_algo(const uint8_t
-							    suite[2]);
 gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo(const uint8_t
 						       suite[2]);
-const mac_entry_st *_gnutls_cipher_suite_get_mac_algo(const uint8_t
-						      suite[2]);
 
 int
 _gnutls_cipher_suite_get_id(gnutls_kx_algorithm_t kx_algorithm,
@@ -275,9 +269,6 @@ int _gnutls_kx_is_ok(gnutls_kx_algorithm_t algorithm);
 
 int _gnutls_kx_get_id(const char *name);
 
-/* Type to KX mappings. */
-gnutls_kx_algorithm_t _gnutls_map_kx_get_kx(gnutls_credentials_type_t type,
-					    int server);
 gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
 						  algorithm, int server);
 

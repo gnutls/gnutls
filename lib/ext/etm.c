@@ -77,13 +77,17 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 		/* don't decide now, decide on send */
 		return 0;
 	} else { /* client */
-		const cipher_entry_st *c;
+		const gnutls_cipher_suite_entry_st *e;
 
-		c = _gnutls_cipher_suite_get_cipher_algo(session->security_parameters.cipher_suite);
-		if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
-			return 0;
+		e = ciphersuite_to_entry(session->security_parameters.cipher_suite);
+		if (e != NULL) {
+			const cipher_entry_st *c;
+			c = cipher_to_entry(e->block_algorithm);
+			if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
+				return 0;
 
-		session->security_parameters.etm = 1;
+			session->security_parameters.etm = 1;
+		}
 	}
 
 	return 0;
@@ -105,22 +109,26 @@ _gnutls_ext_etm_send_params(gnutls_session_t session,
 		else
 			return 0;
 	} else { /* server side */
+		const gnutls_cipher_suite_entry_st *e;
 		const cipher_entry_st *c;
 		int ret;
 		gnutls_ext_priv_data_t epriv;
 
-		c = _gnutls_cipher_suite_get_cipher_algo(session->security_parameters.cipher_suite);
-		if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
-			return 0;
+		e = ciphersuite_to_entry(session->security_parameters.cipher_suite);
+		if (e != NULL) {
+			c = cipher_to_entry(e->block_algorithm);
+			if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
+				return 0;
 
-		ret = _gnutls_ext_get_session_data(session,
-						   GNUTLS_EXTENSION_ETM,
-						   &epriv);
-		if (ret < 0 || ((intptr_t)epriv) == 0)
-			return 0;
+			ret = _gnutls_ext_get_session_data(session,
+							   GNUTLS_EXTENSION_ETM,
+							   &epriv);
+			if (ret < 0 || ((intptr_t)epriv) == 0)
+				return 0;
 
-		session->security_parameters.etm = 1;
-		return GNUTLS_E_INT_RET_0;
+			session->security_parameters.etm = 1;
+			return GNUTLS_E_INT_RET_0;
+		}
 	}
 
 	return 0;
