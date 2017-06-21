@@ -643,6 +643,13 @@ typedef enum {
 	SR_SAFE
 } safe_renegotiation_t;
 
+#define MAX_CIPHERSUITE_SIZE 256
+
+typedef struct ciphersuite_list_st {
+	const gnutls_cipher_suite_entry_st *entry[MAX_CIPHERSUITE_SIZE];
+	unsigned int size;
+} ciphersuite_list_st;
+
 /* For the external api */
 struct gnutls_priority_st {
 	priority_st cipher;
@@ -652,6 +659,9 @@ struct gnutls_priority_st {
 	priority_st cert_type;
 	priority_st sign_algo;
 	priority_st supported_ecc;
+
+	/* the supported ciphersuites */
+	ciphersuite_list_st cs;
 
 	/* to disable record padding */
 	bool no_extensions;

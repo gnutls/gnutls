@@ -31,9 +31,6 @@
 #define GNUTLS_FALLBACK_SCSV_MAJOR 0x56
 #define GNUTLS_FALLBACK_SCSV_MINOR 0x00
 
-/* would allow for 256 ciphersuites */
-#define MAX_CIPHERSUITE_SIZE 512
-
 #define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDHX))
 
 /* Functions for version handling. */
@@ -165,6 +162,11 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 			     int cipher_suites_size,
 			     gnutls_pk_algorithm_t * pk_algos,
 			     size_t pk_algos_size);
+
+const gnutls_cipher_suite_entry_st
+    *cipher_suite_get(gnutls_kx_algorithm_t kx_algorithm,
+		      gnutls_cipher_algorithm_t cipher_algorithm,
+		      gnutls_mac_algorithm_t mac_algorithm);
 
 const char *_gnutls_cipher_suite_get_name(const uint8_t suite[2]);
 gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo(const uint8_t

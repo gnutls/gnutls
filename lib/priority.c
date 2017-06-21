@@ -33,6 +33,7 @@
 #include <extensions.h>
 #include "fips.h"
 #include "errno.h"
+#include <gnutls/gnutls.h>
 
 #define MAX_ELEMENTS 64
 
@@ -1107,6 +1108,29 @@ finish:
 	return ret;
 }
 
+static void set_ciphersuite_list(gnutls_priority_t priority_cache)
+{
+	unsigned i, j, z;
+	const gnutls_cipher_suite_entry_st *ce;
+
+	priority_cache->cs.size = 0;
+
+	for (i = 0; i < priority_cache->kx.algorithms; i++) {
+		for (j=0;j<priority_cache->cipher.algorithms;j++) {
+			for (z=0;z<priority_cache->mac.algorithms;z++) {
+				ce = cipher_suite_get(
+					priority_cache->kx.priority[i],
+					priority_cache->cipher.priority[j],
+					priority_cache->mac.priority[z]);
+
+				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
+					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
+				}
+			}
+		}
+	}
+}
+
 /**
  * gnutls_priority_init:
  * @priority_cache: is a #gnutls_prioritity_t type.
@@ -1400,6 +1424,9 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	}
 
 	free(darg);
+
+	set_ciphersuite_list(*priority_cache);
+
 	return 0;
 
       error:

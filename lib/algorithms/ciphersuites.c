@@ -1174,7 +1174,7 @@ const char *_gnutls_cipher_suite_get_name(const uint8_t suite[2])
 }
 
 
-static const gnutls_cipher_suite_entry_st
+const gnutls_cipher_suite_entry_st
     *cipher_suite_get(gnutls_kx_algorithm_t kx_algorithm,
 		      gnutls_cipher_algorithm_t cipher_algorithm,
 		      gnutls_mac_algorithm_t mac_algorithm)
