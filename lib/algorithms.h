@@ -45,6 +45,10 @@ gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor);
 unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor);
 
 /* Functions for feature checks */
+const gnutls_cipher_suite_entry_st *
+_gnutls_figure_common_ciphersuite(gnutls_session_t session,
+				  const ciphersuite_list_st *peer_clist);
+
 inline static int
 _gnutls_version_has_selectable_prf(const version_entry_st * ver)
 {
@@ -275,9 +279,14 @@ gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
 						  algorithm, int server);
 
 /* KX to PK mapping. */
-int
+unsigned
 _gnutls_kx_supports_pk(gnutls_kx_algorithm_t kx_algorithm,
 		       gnutls_pk_algorithm_t pk_algorithm);
+
+unsigned
+_gnutls_kx_supports_pk_usage(gnutls_kx_algorithm_t kx_algorithm,
+		       gnutls_pk_algorithm_t pk_algorithm,
+		       unsigned key_usage);
 
 enum encipher_type { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };
 

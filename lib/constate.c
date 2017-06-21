@@ -224,13 +224,12 @@ _gnutls_init_record_state(record_parameters_st * params,
 }
 
 int
-_gnutls_set_cipher_suite(gnutls_session_t session,
-			 const uint8_t suite[2])
+_gnutls_set_cipher_suite2(gnutls_session_t session,
+			  const gnutls_cipher_suite_entry_st *cs)
 {
 	const cipher_entry_st *cipher_algo;
 	const mac_entry_st *mac_algo;
 	record_parameters_st *params;
-	const gnutls_cipher_suite_entry_st *cs;
 	int ret;
 
 	ret = _gnutls_epoch_get(session, EPOCH_NEXT, &params);
@@ -239,10 +238,6 @@ _gnutls_set_cipher_suite(gnutls_session_t session,
 
 	if (params->initialized
 	    || params->cipher != NULL || params->mac != NULL)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	cs = ciphersuite_to_entry(suite);
-	if (cs == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	cipher_algo = cipher_to_entry(cs->block_algorithm);
@@ -267,11 +262,25 @@ _gnutls_set_cipher_suite(gnutls_session_t session,
 		session->security_parameters.prf_mac = GNUTLS_MAC_MD5_SHA1;
 	}
 
-	memcpy(session->security_parameters.cipher_suite, suite, 2);
+	session->security_parameters.cipher_suite[0] = cs->id[0];
+	session->security_parameters.cipher_suite[1] = cs->id[1];
 	params->cipher = cipher_algo;
 	params->mac = mac_algo;
 
 	return 0;
+}
+
+int
+_gnutls_set_cipher_suite(gnutls_session_t session,
+			 const uint8_t suite[2])
+{
+	const gnutls_cipher_suite_entry_st *cs;
+
+	cs = ciphersuite_to_entry(suite);
+	if (cs == NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	return _gnutls_set_cipher_suite2(session, cs);
 }
 
 void

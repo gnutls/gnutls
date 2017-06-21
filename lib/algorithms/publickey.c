@@ -66,11 +66,34 @@ static const gnutls_pk_map pk_mappings[] = {
 			GNUTLS_PK_MAP_LOOP( if(p->kx_algorithm == kx_algorithm) { a; break; })
 
 
-int
+unsigned
 _gnutls_kx_supports_pk(gnutls_kx_algorithm_t kx_algorithm,
 		       gnutls_pk_algorithm_t pk_algorithm)
 {
 	GNUTLS_PK_MAP_LOOP(if (p->kx_algorithm == kx_algorithm && p->pk_algorithm == pk_algorithm) { return 1; })
+	return 0;
+}
+
+unsigned
+_gnutls_kx_supports_pk_usage(gnutls_kx_algorithm_t kx_algorithm,
+			     gnutls_pk_algorithm_t pk_algorithm,
+			     unsigned int key_usage)
+{
+	const gnutls_pk_map *p;
+
+	for(p = pk_mappings; p->kx_algorithm != 0; p++) {
+		if (p->kx_algorithm == kx_algorithm && p->pk_algorithm == pk_algorithm) {
+			if (key_usage == 0)
+				return 1;
+			else if (p->encipher_type == CIPHER_SIGN && (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
+				return 1;
+			else if (p->encipher_type == CIPHER_ENCRYPT && (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT))
+				return 1;
+			else
+				return 0;
+		}
+	}
+
 	return 0;
 }
 
@@ -150,7 +173,7 @@ const gnutls_pk_algorithm_t *gnutls_pk_list(void)
 		int i = 0;
 
 		GNUTLS_PK_LOOP(
-			if (p->id != GNUTLS_PK_UNKNOWN && supported_pks[i > 0 ? (i - 1) : 0] != p->id) 
+			if (p->id != GNUTLS_PK_UNKNOWN && supported_pks[i > 0 ? (i - 1) : 0] != p->id)
 				supported_pks[i++] = p->id
 		);
 		supported_pks[i++] = 0;

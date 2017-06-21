@@ -44,6 +44,7 @@
 #include <x509.h>
 #include <x509/verify-high.h>
 #include <gnutls/abstract.h>
+#include "abstract_int.h"
 #include "debug.h"
 
 static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
@@ -1416,6 +1417,32 @@ static void get_server_name(gnutls_session_t session, uint8_t * name,
 	return;
 }
 
+static
+unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
+				     gnutls_pubkey_t pubkey,
+				     gnutls_certificate_type_t cert_type,
+				     const gnutls_cipher_suite_entry_st *cs)
+{
+	unsigned pk = pubkey->pk_algorithm;
+	unsigned key_usage;
+
+	if (session->security_parameters.cert_type != cert_type) {
+		return 0;
+	}
+
+	if (unlikely(session->internals.priorities.allow_server_key_usage_violation)) {
+		key_usage = 0;
+	} else {
+		key_usage = pubkey->key_usage;
+	}
+
+	if (!_gnutls_kx_supports_pk_usage(cs->kx_algorithm, pk, key_usage)) {
+		return 0;
+	}
+
+	return 1;
+}
+
 /* finds the most appropriate certificate in the cert list.
  * The 'appropriate' is defined by the user.
  *
@@ -1427,11 +1454,9 @@ static void get_server_name(gnutls_session_t session, uint8_t * name,
  *
  */
 int
-_gnutls_server_select_cert(gnutls_session_t session,
-			   gnutls_pk_algorithm_t * pk_algos,
-			   size_t pk_algos_size)
+_gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs)
 {
-	unsigned i, j;
+	unsigned i;
 	int idx, ret;
 	gnutls_certificate_credentials_t cred;
 	char server_name[MAX_CN];
@@ -1439,22 +1464,42 @@ _gnutls_server_select_cert(gnutls_session_t session,
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+		gnutls_assert(); /* we don't need to select a cert */
+		return 0;
 	}
 
+	/* When a callback is set, we call it once to get the
+	 * certificate and then check its compatibility with
+	 * the ciphersuites.
+	 */
+
 	/* If the callback which retrieves certificate has been set,
-	 * use it and leave.
+	 * use it and leave. We make sure that this is called once.
 	 */
 	if (cred->get_cert_callback
 	    || cred->get_cert_callback2) {
-		ret = call_get_cert_callback(session, NULL, 0, NULL, 0);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-		return ret;
+
+		if (session->internals.selected_cert_list_length == 0) {
+			ret = call_get_cert_callback(session, NULL, 0, NULL, 0);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			_gnutls_debug_log("Selected (%s) cert\n",
+					  gnutls_pk_get_name(session->internals.selected_cert_list[0].pubkey->pk_algorithm));
+		}
+
+		if (!pubkey_is_compat_with_cs(session,
+					     session->internals.selected_cert_list[0].pubkey,
+					     session->internals.selected_cert_list[0].type,
+					     cs)) {
+			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+		}
+
+		return 0;
 	}
 
-	/* Otherwise... */
+	/* Otherwise... we check the compatibility of the ciphersuite
+	 * with all the certificates available. */
 
 	get_server_name(session, (unsigned char *)server_name,
 			sizeof(server_name));
@@ -1472,65 +1517,44 @@ _gnutls_server_select_cert(gnutls_session_t session,
 			    && _gnutls_str_array_match(cred->certs[i].names,
 						       server_name) != 0) {
 				/* if requested algorithms are also compatible select it */
-				gnutls_pk_algorithm_t pk =
-				    gnutls_pubkey_get_pk_algorithm(cred->certs
-								   [i].cert_list
-								   [0].pubkey,
-								   NULL);
 
-				_gnutls_handshake_log
-				    ("HSK[%p]: Requested server name: '%s', ctype: %s (%d)\n",
-				     session, server_name,
-				     gnutls_certificate_type_get_name
-				     (session->security_parameters.cert_type),
-				     session->security_parameters.cert_type);
-
-				if (session->security_parameters.cert_type ==
-				    cred->certs[i].cert_list[0].type) {
-					for (j = 0; j < pk_algos_size; j++)
-						if (pk_algos[j] == pk) {
-							idx = i;
-							goto finished;
-						}
+				if (pubkey_is_compat_with_cs(session,
+							     cred->certs[i].cert_list[0].pubkey,
+							     cred->certs[i].cert_list[0].type,
+							     cs)) {
+					idx = i;
+					_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
+						  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->pk_algorithm),
+						  (unsigned)cs->id[0],
+						  (unsigned)cs->id[1],
+						  cs->name);
+					goto finished;
 				}
 			}
 		}
 	}
 
-	for (j = 0; j < pk_algos_size; j++) {
+	/* no name match */
+	for (i = 0; i < cred->ncerts; i++) {
 		_gnutls_handshake_log
-		    ("HSK[%p]: Requested PK algorithm: %s (%d) -- ctype: %s (%d)\n",
-		     session, gnutls_pk_get_name(pk_algos[j]), pk_algos[j],
-		     gnutls_certificate_type_get_name
-		     (session->security_parameters.cert_type),
-		     session->security_parameters.cert_type);
+		    ("HSK[%p]: checking compat of %s with certificate[%d] (%s/%s)\n",
+		     session, cs->name, i,
+		     gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->pk_algorithm),
+		     gnutls_certificate_type_get_name(cred->certs
+						      [i].cert_list
+						      [0].type));
 
-		for (i = 0; i < cred->ncerts; i++) {
-			gnutls_pk_algorithm_t pk =
-			    gnutls_pubkey_get_pk_algorithm(cred->certs[i].
-							   cert_list[0].pubkey,
-							   NULL);
-			/* find one compatible certificate
-			 */
-			_gnutls_handshake_log
-			    ("HSK[%p]: certificate[%d] PK algorithm: %s (%d) - ctype: %s (%d)\n",
-			     session, i, gnutls_pk_get_name(pk), pk,
-			     gnutls_certificate_type_get_name(cred->certs
-							      [i].cert_list
-							      [0].type),
-			     cred->certs[i].cert_list[0].type);
-
-			if (pk_algos[j] == pk) {
-				/* if cert type matches
-				 */
-	  /* *INDENT-OFF* */
-	  if (session->security_parameters.cert_type == cred->certs[i].cert_list[0].type)
-	    {
-	      idx = i;
-	      goto finished;
-	    }
-	  /* *INDENT-ON* */
-			}
+		if (pubkey_is_compat_with_cs(session,
+					     cred->certs[i].cert_list[0].pubkey,
+					     cred->certs[i].cert_list[0].type,
+					     cs)) {
+			idx = i;
+			_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
+					  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->pk_algorithm),
+					  (unsigned)cs->id[0],
+					  (unsigned)cs->id[1],
+					  cs->name);
+			goto finished;
 		}
 	}
 

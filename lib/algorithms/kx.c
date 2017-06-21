@@ -79,9 +79,6 @@ static const gnutls_cred_map cred_mappings[] = {
 	const gnutls_cred_map *p; \
 		for(p = cred_mappings; p->algorithm != 0; p++) { b ; }
 
-#define GNUTLS_KX_MAP_ALG_LOOP_SERVER(a) \
-			GNUTLS_KX_MAP_LOOP( if(p->server_type == type) { a; break; })
-
 struct gnutls_kx_algo_entry {
 	const char *name;
 	gnutls_kx_algorithm_t algorithm;

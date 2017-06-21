@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004-2015 Free Software Foundation, Inc.
- * Copyright (C) 2015 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1129,6 +1129,7 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 			}
 		}
 	}
+	_gnutls_debug_log("added %d ciphersuites into priority list\n", priority_cache->cs.size);
 }
 
 /**

@@ -824,52 +824,6 @@ static int _gnutls_recv_finished(gnutls_session_t session)
 	return ret;
 }
 
-static int
-server_find_pk_algos_in_ciphersuites(const uint8_t *
-				     data, unsigned int datalen,
-				     gnutls_pk_algorithm_t * algos,
-				     size_t * algos_size)
-{
-	unsigned int j, x;
-	gnutls_kx_algorithm_t kx;
-	gnutls_pk_algorithm_t pk;
-	unsigned found;
-	unsigned int max = *algos_size;
-
-	if (datalen % 2 != 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
-	*algos_size = 0;
-	for (j = 0; j < datalen; j += 2) {
-		kx = _gnutls_cipher_suite_get_kx_algo(&data[j]);
-		if (_gnutls_map_kx_get_cred(kx, 1) !=
-		    GNUTLS_CRD_CERTIFICATE)
-			continue;
-
-		for (pk = GNUTLS_PK_UNKNOWN; pk <= GNUTLS_PK_MAX; pk++) {
-			if (!_gnutls_kx_supports_pk(kx, pk))
-				continue;
-			found = 0;
-			for (x = 0; x < *algos_size; x++) {
-				if (algos[x] == pk) {
-					found = 1;
-					break;
-				}
-			}
-
-			if (found == 0) {
-				algos[(*algos_size)++] = pk;
-				if ((*algos_size) >= max)
-					return 0;
-			}
-		}
-	}
-
-	return 0;
-}
-
 /* This selects the best supported ciphersuite from the given ones. Then
  * it adds the suite to the session and performs some checks.
  */
@@ -878,13 +832,12 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 			    unsigned int datalen)
 {
 	int ret;
-	unsigned int i, j, cipher_suites_size;
-	size_t pk_algos_size;
-	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
+	unsigned int i;
+	ciphersuite_list_st peer_clist;
+	const gnutls_cipher_suite_entry_st *selected;
 	int retval;
-	gnutls_pk_algorithm_t pk_algos[MAX_ALGOS];	/* will hold the pk algorithms
-							 * supported by the peer.
-							 */
+
+	peer_clist.size = 0;
 
 	for (i = 0; i < datalen; i += 2) {
 #ifdef ENABLE_SSL3 /* No need to support certain SCSV's without SSL 3.0 */
@@ -913,112 +866,32 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 
 			if (gnutls_protocol_get_version(session) != max)
 				return gnutls_assert_val(GNUTLS_E_INAPPROPRIATE_FALLBACK);
+		} else {
+			if (peer_clist.size < MAX_CIPHERSUITE_SIZE) {
+				peer_clist.entry[peer_clist.size] = ciphersuite_to_entry(&data[i]);
+				if (peer_clist.entry[peer_clist.size] != NULL)
+					peer_clist.size++;
+			}
 		}
 	}
 
-	pk_algos_size = MAX_ALGOS;
-	ret =
-	    server_find_pk_algos_in_ciphersuites(data, datalen, pk_algos,
-						 &pk_algos_size);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret =
-	    _gnutls_supported_ciphersuites(session, cipher_suites,
-					   sizeof(cipher_suites));
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	cipher_suites_size = ret;
-
-	/* Here we remove any ciphersuite that does not conform
-	 * the certificate requested, or to the
-	 * authentication requested (e.g. SRP).
-	 */
-	ret =
-	    _gnutls_remove_unwanted_ciphersuites(session, cipher_suites,
-						 cipher_suites_size,
-						 pk_algos, pk_algos_size);
-	if (ret <= 0) {
-		gnutls_assert();
-		if (ret < 0)
-			return ret;
-		else
-			return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
+	selected = _gnutls_figure_common_ciphersuite(session, &peer_clist);
+	if (selected == NULL) {
+		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 	}
-
-	cipher_suites_size = ret;
-
-	/* Data length should be zero mod 2 since
-	 * every ciphersuite is 2 bytes. (this check is needed
-	 * see below).
-	 */
-	if (datalen % 2 != 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
-	memset(session->security_parameters.cipher_suite, 0, 2);
-
-	retval = GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 
 	_gnutls_handshake_log
-	    ("HSK[%p]: Requested cipher suites[size: %d]: \n", session,
-	     (int) datalen);
+		    ("HSK[%p]: Selected cipher suite: %s\n", session, selected->name);
 
-	if (session->internals.priorities.server_precedence == 0) {
-		for (j = 0; j < datalen; j += 2) {
-			_gnutls_handshake_log("\t0x%.2x, 0x%.2x %s\n",
-					      data[j], data[j + 1],
-					      _gnutls_cipher_suite_get_name
-					      (&data[j]));
-			for (i = 0; i < cipher_suites_size; i += 2) {
-				if (memcmp(&cipher_suites[i], &data[j], 2)
-				    == 0) {
-					_gnutls_handshake_log
-					    ("HSK[%p]: Selected cipher suite: %s\n",
-					     session,
-					     _gnutls_cipher_suite_get_name
-					     (&data[j]));
-					retval = _gnutls_set_cipher_suite
-					    (session, &data[j]);
-
-					goto finish;
-				}
-			}
-		}
-	} else {		/* server selects */
-
-		for (i = 0; i < cipher_suites_size; i += 2) {
-			for (j = 0; j < datalen; j += 2) {
-				if (memcmp(&cipher_suites[i], &data[j], 2)
-				    == 0) {
-					_gnutls_handshake_log
-					    ("HSK[%p]: Selected cipher suite: %s\n",
-					     session,
-					     _gnutls_cipher_suite_get_name
-					     (&data[j]));
-					retval = _gnutls_set_cipher_suite
-					    (session, &data[j]);
-
-					goto finish;
-				}
-			}
-		}
-	}
-      finish:
-
-	if (retval != 0) {
+	ret = _gnutls_set_cipher_suite2(session, selected);
+	if (ret < 0) {
 		gnutls_assert();
-		return retval;
+		return ret;
 	}
 
 	/* check if the credentials (username, public key etc.) are ok
 	 */
-	if (_gnutls_get_kx_cred
-	    (session,
-	     _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
-					      cipher_suite)) == NULL) {
+	if (_gnutls_get_kx_cred(session, selected->kx_algorithm) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
@@ -1028,12 +901,8 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 	 * according to the KX algorithm. This is needed since all the
 	 * handshake functions are read from there;
 	 */
-	session->internals.auth_struct =
-	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (session->security_parameters.
-				    cipher_suite));
+	session->internals.auth_struct = _gnutls_kx_auth_struct(selected->kx_algorithm);
 	if (session->internals.auth_struct == NULL) {
-
 		_gnutls_handshake_log
 		    ("HSK[%p]: Cannot find the appropriate handler for the KX algorithm\n",
 		     session);

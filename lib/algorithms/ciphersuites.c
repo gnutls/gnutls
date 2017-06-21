@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1193,24 +1194,23 @@ const gnutls_cipher_suite_entry_st
 	return ret;
 }
 
-/* Returns 1 if the given KX has not the corresponding parameters
- * (DH or RSA) set up. Otherwise returns 0.
+/* Returns 0 if the given KX has not the corresponding parameters
+ * (DH or RSA) set up. Otherwise returns 1.
  */
-inline static int
-check_server_params(gnutls_session_t session,
-		    gnutls_kx_algorithm_t kx,
-		    gnutls_kx_algorithm_t * alg, int alg_size)
+static unsigned
+check_server_dh_params(gnutls_session_t session,
+		    unsigned cred_type,
+		    gnutls_kx_algorithm_t kx)
 {
-	int cred_type;
 	gnutls_dh_params_t dh_params = NULL;
-	int j;
 
-	cred_type = _gnutls_map_kx_get_cred(kx, 1);
+	if (!_gnutls_kx_needs_dh_params(kx)) {
+		return 1;
+	}
 
 	/* Read the Diffie-Hellman parameters, if any.
 	 */
 	if (cred_type == GNUTLS_CRD_CERTIFICATE) {
-		int delete;
 		gnutls_certificate_credentials_t x509_cred =
 		    (gnutls_certificate_credentials_t)
 		    _gnutls_get_cred(session, cred_type);
@@ -1221,20 +1221,6 @@ check_server_params(gnutls_session_t session,
 						  x509_cred->params_func,
 						  session);
 		}
-
-		/* Check also if the certificate supports the
-		 * KX method.
-		 */
-		delete = 1;
-		for (j = 0; j < alg_size; j++) {
-			if (alg[j] == kx) {
-				delete = 0;
-				break;
-			}
-		}
-
-		if (delete == 1)
-			return 1;
 
 #ifdef ENABLE_ANON
 	} else if (cred_type == GNUTLS_CRD_ANON) {
@@ -1262,21 +1248,18 @@ check_server_params(gnutls_session_t session,
 						  session);
 		}
 #endif
-	} else
-		return 0;	/* no need for params */
-
-	/* If the key exchange method needs DH params,
-	 * but they are not set then remove it.
-	 */
-	if (_gnutls_kx_needs_dh_params(kx) != 0) {
-		/* needs DH params. */
-		if (_gnutls_dh_params_to_mpi(dh_params) == NULL) {
-			gnutls_assert();
-			return 1;
-		}
+	} else {
+		return 1;	/* no need for params */
 	}
 
-	return 0;
+	/* If DH params are not set then fail.
+	 */
+	if (_gnutls_dh_params_to_mpi(dh_params) == NULL) {
+		gnutls_assert();
+		return 0;
+	}
+
+	return 1;
 }
 
 /* This function will remove algorithms that are not supported by
@@ -1294,52 +1277,11 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 			     size_t pk_algos_size)
 {
 
-	int ret = 0;
-	gnutls_certificate_credentials_t cert_cred;
 	gnutls_kx_algorithm_t kx;
-	int server =
-	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
-	gnutls_kx_algorithm_t alg[MAX_ALGOS];
-	int alg_size = MAX_ALGOS;
 	uint8_t new_list[cipher_suites_size]; /* it's safe to use that size because it's provided by _gnutls_supported_ciphersuites() */
 	int i, new_list_size = 0;
 	const gnutls_cipher_suite_entry_st *entry;
 	const uint8_t *cp;
-
-	/* if we should use a specific certificate, 
-	 * we should remove all algorithms that are not supported
-	 * by that certificate and are on the same authentication
-	 * method (CERTIFICATE).
-	 */
-	cert_cred =
-	    (gnutls_certificate_credentials_t) _gnutls_get_cred(session,
-								GNUTLS_CRD_CERTIFICATE);
-
-	/* If there are certificate credentials, find an appropriate certificate
-	 * or disable them;
-	 */
-	if (session->security_parameters.entity == GNUTLS_SERVER
-	    && cert_cred != NULL && pk_algos_size > 0) {
-		ret =
-		    _gnutls_server_select_cert(session, pk_algos,
-					       pk_algos_size);
-		if (ret < 0) {
-			gnutls_assert();
-			_gnutls_debug_log
-			    ("Could not find an appropriate certificate: %s\n",
-			     gnutls_strerror(ret));
-		}
-	}
-
-	/* get all the key exchange algorithms that are 
-	 * supported by the X509 certificate parameters.
-	 */
-	if ((ret =
-	     _gnutls_selected_cert_supported_kx(session, alg,
-						&alg_size)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
 
 	/* now remove ciphersuites based on the KX algorithm
 	 */
@@ -1362,20 +1304,6 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 		if (!session->internals.premaster_set &&
 		    _gnutls_get_kx_cred(session, kx) == NULL) {
 			continue;
-		} else {
-			if (server && check_server_params(session, kx, alg,
-							  alg_size) != 0)
-				continue;
-		}
-
-		/* If we have not agreed to a common curve with the peer don't bother
-		 * negotiating ECDH.
-		 */
-		if (server != 0 && _gnutls_kx_is_ecc(kx)) {
-			if (_gnutls_session_ecc_curve_get(session) ==
-			    GNUTLS_ECC_CURVE_INVALID) {
-				continue;
-			}
 		}
 
 		/* These two SRP kx's are marked to require a CRD_CERTIFICATE,
@@ -1406,7 +1334,6 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 
 	return new_list_size;
 }
-
 
 /**
  * gnutls_cipher_suite_get_name:
@@ -1507,6 +1434,109 @@ const char *gnutls_cipher_suite_info(size_t idx,
 		*min_version = cs_algorithms[idx].min_version;
 
 	return cs_algorithms[idx].name + sizeof("GNU") - 1;
+}
+
+#define VERSION_CHECK(entry) \
+			if (is_dtls) { \
+				if (version->id < entry->min_dtls_version) \
+					continue; \
+			} else { \
+				if (version->id < entry->min_version) \
+					continue; \
+			}
+
+#define KX_CHECKS(kx, cred_type, action) \
+	{ \
+	if (_gnutls_session_ecc_curve_get(session) == GNUTLS_ECC_CURVE_INVALID && \
+		_gnutls_kx_is_ecc(kx)) { \
+		action; \
+	} \
+	if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) { \
+		if (!_gnutls_get_cred(session, GNUTLS_CRD_SRP)) { \
+			action; \
+		} \
+	} \
+	if (!check_server_dh_params(session, cred_type, kx)) { \
+		action; \
+	} \
+	}
+
+const gnutls_cipher_suite_entry_st *
+_gnutls_figure_common_ciphersuite(gnutls_session_t session,
+				  const ciphersuite_list_st *peer_clist)
+{
+
+	unsigned int i, j;
+	int ret;
+	const version_entry_st *version = get_version(session);
+	unsigned int is_dtls = IS_DTLS(session), kx, cred_type;
+
+	if (version == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	if (session->internals.priorities.server_precedence == 0) {
+		for (i = 0; i < peer_clist->size; i++) {
+			_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",
+				(unsigned)peer_clist->entry[i]->id[0],
+				(unsigned)peer_clist->entry[i]->id[1],
+				peer_clist->entry[i]->name);
+			VERSION_CHECK(peer_clist->entry[i]);
+
+			kx = peer_clist->entry[i]->kx_algorithm;
+			cred_type = _gnutls_map_kx_get_cred(kx, 1);
+
+			for (j = 0; j < session->internals.priorities.cs.size; j++) {
+				if (session->internals.priorities.cs.entry[j] == peer_clist->entry[i]) {
+					KX_CHECKS(kx, cred_type, continue);
+
+					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
+						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
+						if (ret < 0) {
+							/* couldn't select cert with this ciphersuite */
+							gnutls_assert();
+							break;
+						}
+					}
+					return peer_clist->entry[i];
+				}
+			}
+		}
+	} else {
+		for (j = 0; j < session->internals.priorities.cs.size; j++) {
+			VERSION_CHECK(session->internals.priorities.cs.entry[j]);
+
+			for (i = 0; i < peer_clist->size; i++) {
+				_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",
+					(unsigned)peer_clist->entry[i]->id[0],
+					(unsigned)peer_clist->entry[i]->id[1],
+					peer_clist->entry[i]->name);
+
+				if (session->internals.priorities.cs.entry[j] == peer_clist->entry[i]) {
+					kx = peer_clist->entry[i]->kx_algorithm;
+					cred_type = _gnutls_map_kx_get_cred(kx, 1);
+
+					KX_CHECKS(kx, cred_type, break);
+
+					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
+						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
+						if (ret < 0) {
+							/* couldn't select cert with this ciphersuite */
+							gnutls_assert();
+							break;
+						}
+					}
+					return peer_clist->entry[i];
+				}
+			}
+		}
+
+	}
+
+	/* nothing in common */
+	gnutls_assert();
+	return NULL;
 }
 
 /*-
