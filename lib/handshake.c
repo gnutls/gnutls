@@ -1337,32 +1337,22 @@ _gnutls_recv_handshake(gnutls_session_t session,
 static int
 set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 {
-	uint8_t z;
-	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
-	int cipher_suite_size;
-	int i;
+	unsigned found = 0;
+	unsigned j;
 	int ret;
 
-	z = 1;
-	cipher_suite_size =
-	    _gnutls_supported_ciphersuites(session, cipher_suites,
-					   sizeof(cipher_suites));
-	if (cipher_suite_size < 0) {
-		gnutls_assert();
-		return cipher_suite_size;
-	}
-
-	for (i = 0; i < cipher_suite_size; i += 2) {
-		if (memcmp(&cipher_suites[i], suite, 2) == 0) {
-			z = 0;
+	for (j = 0; j < session->internals.priorities.cs.size; j++) {
+		if (suite[0] == session->internals.priorities.cs.entry[j]->id[0] &&
+		    suite[1] == session->internals.priorities.cs.entry[j]->id[1]) {
+			found = 1;
 			break;
 		}
 	}
 
-	if (z != 0) {
+	if (!found) {
 		gnutls_assert();
 		_gnutls_handshake_log
-		    ("HSK[%p]: unsupported cipher suite %.2X.%.2X\n",
+		    ("HSK[%p]: unsupported cipher suite %.2X.%.2X was negotiated\n",
 		     session, (unsigned int) suite[0],
 		     (unsigned int) suite[1]);
 		return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
@@ -1408,7 +1398,6 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
-
 
 	return 0;
 }
@@ -1579,75 +1568,6 @@ read_server_hello(gnutls_session_t session,
 	return ret;
 }
 
-#define RESERVED_CIPHERSUITES 4
-/* This function copies the appropriate ciphersuites to a locally allocated buffer
- * Needed in client hello messages. Returns the new data length. If add_scsv is
- * true, add the special safe renegotiation CS.
- */
-static int
-copy_ciphersuites(gnutls_session_t session,
-		  gnutls_buffer_st * cdata, int add_scsv)
-{
-	int ret;
-	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE + RESERVED_CIPHERSUITES]; /* allow space for SCSV */
-	int cipher_suites_size;
-	size_t init_length = cdata->length;
-
-	ret =
-	    _gnutls_supported_ciphersuites(session, cipher_suites,
-					   sizeof(cipher_suites) - RESERVED_CIPHERSUITES);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	/* Here we remove any ciphersuite that does not conform
-	 * the certificate requested, or to the
-	 * authentication requested (eg SRP).
-	 */
-	ret =
-	    _gnutls_remove_unwanted_ciphersuites(session, cipher_suites,
-						 ret, NULL, 0);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	/* If no cipher suites were enabled.
-	 */
-	if (ret == 0)
-		return
-		    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
-
-	cipher_suites_size = ret;
-#ifdef ENABLE_SSL3
-	if (add_scsv) {
-		cipher_suites[cipher_suites_size] = 0x00;
-		cipher_suites[cipher_suites_size + 1] = 0xff;
-		cipher_suites_size += 2;
-
-		ret = _gnutls_ext_sr_send_cs(session);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-	}
-#endif
-
-	if (session->internals.priorities.fallback) {
-		cipher_suites[cipher_suites_size] =
-			GNUTLS_FALLBACK_SCSV_MAJOR;
-		cipher_suites[cipher_suites_size + 1] =
-			GNUTLS_FALLBACK_SCSV_MINOR;
-		cipher_suites_size += 2;
-	}
-
-	ret =
-	    _gnutls_buffer_append_data_prefix(cdata, 16, cipher_suites,
-					      cipher_suites_size);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = cdata->length - init_length;
-
-	return ret;
-}
-
-
 /* This function copies the appropriate compression methods, to a locally allocated buffer 
  * Needed in hello messages. Returns the new data length.
  */
@@ -1676,14 +1596,16 @@ static int send_client_hello(gnutls_session_t session, int again)
 	mbuffer_st *bufel = NULL;
 	int type;
 	int ret = 0;
-	const version_entry_st *hver;
+	const version_entry_st *hver, *min_ver;
 	uint8_t tver[2];
 	gnutls_buffer_st extdata;
 	int rehandshake = 0;
+	unsigned add_sr_scsv = 0;
 	uint8_t session_id_len =
 	    session->internals.resumed_security_parameters.session_id_size;
 
 	_gnutls_buffer_init(&extdata);
+
 
 	/* note that rehandshake is different than resuming
 	 */
@@ -1729,6 +1651,13 @@ static int send_client_hello(gnutls_session_t session, int again)
 		_gnutls_handshake_log("HSK[%p]: Adv. version: %u.%u\n", session,
 				      (unsigned)tver[0], (unsigned)tver[1]);
 
+		min_ver = _gnutls_version_lowest(session);
+		if (min_ver == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_NO_PRIORITIES_WERE_SET;
+			goto cleanup;
+		}
+
 		/* Set the version we advertized as maximum 
 		 * (RSA uses it).
 		 */
@@ -1743,15 +1672,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 			 * that do not support TLS 1.2 and don't know
 			 * how 3,3 version of record packets look like.
 			 */
-			const version_entry_st *v = _gnutls_version_lowest(session);
-
-			if (v == NULL) {
-				gnutls_assert();
-				return GNUTLS_E_NO_PRIORITIES_WERE_SET;
-			} else {
-				_gnutls_record_set_default_version(session,
-								   v->major, v->minor);
-			}
+			_gnutls_record_set_default_version(session,
+							   min_ver->major, min_ver->minor);
 		}
 
 		/* In order to know when this session was initiated.
@@ -1809,17 +1731,10 @@ static int send_client_hello(gnutls_session_t session, int again)
 		    session->security_parameters.entity == GNUTLS_CLIENT &&
 		    (hver->id == GNUTLS_SSL3 &&
 		     session->internals.priorities.no_extensions != 0)) {
-			ret =
-			    copy_ciphersuites(session, &extdata,
-					      TRUE);
-			if (session->security_parameters.entity == GNUTLS_CLIENT)
-				_gnutls_extension_list_add_sr(session);
-		} else
+			add_sr_scsv = 1;
+		}
 #endif
-			ret =
-			    copy_ciphersuites(session, &extdata,
-					      FALSE);
-
+		ret = _gnutls_get_client_ciphersuites(session, &extdata, min_ver, hver, add_sr_scsv);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

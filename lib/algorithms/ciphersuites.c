@@ -30,6 +30,7 @@
 #include <auth/cert.h>
 #include <auth/anon.h>
 #include <auth/psk.h>
+#include <ext/safe_renegotiation.h>
 
 #ifndef ENABLE_SSL3
 # define GNUTLS_SSL3 GNUTLS_TLS1
@@ -1262,79 +1263,6 @@ check_server_dh_params(gnutls_session_t session,
 	return 1;
 }
 
-/* This function will remove algorithms that are not supported by
- * the requested authentication method. We remove an algorithm if
- * we have a certificate with keyUsage bits set.
- *
- * This does a more elaborate check than gnutls_supported_ciphersuites(),
- * by checking certificates etc.
- */
-int
-_gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
-			     uint8_t * cipher_suites,
-			     int cipher_suites_size,
-			     gnutls_pk_algorithm_t * pk_algos,
-			     size_t pk_algos_size)
-{
-
-	gnutls_kx_algorithm_t kx;
-	uint8_t new_list[cipher_suites_size]; /* it's safe to use that size because it's provided by _gnutls_supported_ciphersuites() */
-	int i, new_list_size = 0;
-	const gnutls_cipher_suite_entry_st *entry;
-	const uint8_t *cp;
-
-	/* now remove ciphersuites based on the KX algorithm
-	 */
-	for (i = 0; i < cipher_suites_size; i += 2) {
-		entry = NULL;
-		cp = &cipher_suites[i];
-
-		CIPHER_SUITE_ALG_LOOP(entry = p, cp);
-
-		if (entry == NULL)
-			continue;
-
-		/* finds the key exchange algorithm in
-		 * the ciphersuite
-		 */
-		kx = entry->kx_algorithm;
-
-		/* if it is defined but had no credentials 
-		 */
-		if (!session->internals.premaster_set &&
-		    _gnutls_get_kx_cred(session, kx) == NULL) {
-			continue;
-		}
-
-		/* These two SRP kx's are marked to require a CRD_CERTIFICATE,
-		   (see cred_mappings in gnutls_algorithms.c), but it also
-		   requires a SRP credential.  Don't use SRP kx unless we have a
-		   SRP credential too.  */
-		if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) {
-			if (!_gnutls_get_cred
-			    (session, GNUTLS_CRD_SRP)) {
-				continue;
-			}
-		}
-
-		_gnutls_handshake_log
-			    ("HSK[%p]: Keeping ciphersuite: %s (%.2X.%.2X)\n",
-			     session, entry->name,
-			     cipher_suites[i], cipher_suites[i + 1]);
-
-		memcpy(&new_list[new_list_size], &cipher_suites[i], 2);
-		new_list_size += 2;
-	}
-
-	if (new_list_size == 0) {
-		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
-	}
-
-	memcpy(cipher_suites, new_list, new_list_size);
-
-	return new_list_size;
-}
-
 /**
  * gnutls_cipher_suite_get_name:
  * @kx_algorithm: is a Key exchange algorithm
@@ -1445,17 +1373,20 @@ const char *gnutls_cipher_suite_info(size_t idx,
 					continue; \
 			}
 
+#define KX_SRP_CHECKS(kx, action) \
+	if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) { \
+		if (!_gnutls_get_cred(session, GNUTLS_CRD_SRP)) { \
+			action; \
+		} \
+	}
+
 #define KX_CHECKS(kx, cred_type, action) \
 	{ \
 	if (_gnutls_session_ecc_curve_get(session) == GNUTLS_ECC_CURVE_INVALID && \
 		_gnutls_kx_is_ecc(kx)) { \
 		action; \
 	} \
-	if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) { \
-		if (!_gnutls_get_cred(session, GNUTLS_CRD_SRP)) { \
-			action; \
-		} \
-	} \
+	KX_SRP_CHECKS(kx, action); \
 	if (!check_server_dh_params(session, cred_type, kx)) { \
 		action; \
 	} \
@@ -1539,80 +1470,78 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	return NULL;
 }
 
-/*-
- * _gnutls_supported_ciphersuites: 
- * @session: a TLS session
- * @cipher_suites: Where the ciphersuites will be stored (2bytes each)
- * @max_cipher_suite_size: the maximum size of the @cipher_suites buffer.
- *
- * Returns the supported ciphersuites by this session (based on priorities)
- * sorted by order of preference.
- *
- * Returns the size of the @cipher_suites buffer, or a negative value on error.
- *
- -*/
-int
-_gnutls_supported_ciphersuites(gnutls_session_t session,
-			       uint8_t * cipher_suites,
-			       unsigned int max_cipher_suite_size)
-{
-
-	unsigned int i, ret_count, j, z, k = 0;
-	const gnutls_cipher_suite_entry_st *ce;
-	const version_entry_st *version = get_version(session);
-	unsigned int is_dtls = IS_DTLS(session);
-
-	if (version == NULL)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	for (i = 0; i < session->internals.priorities.kx.algorithms; i++)
-		for (j = 0;
-		     j < session->internals.priorities.cipher.algorithms;
-		     j++)
-			for (z = 0;
-			     z <
-			     session->internals.priorities.mac.algorithms;
-			     z++) {
-				ce = cipher_suite_get(session->internals.
-						      priorities.kx.
-						      priority[i],
-						      session->internals.
-						      priorities.cipher.
-						      priority[j],
-						      session->internals.
-						      priorities.mac.
-						      priority[z]);
-
-				if (ce == NULL)
-					continue;
-
-				if (is_dtls) {
-					if (version->id < ce->min_dtls_version)
-						continue;
-				} else {
-					if (version->id < ce->min_version)
-						continue;
-				}
-
-				if (k + 2 > max_cipher_suite_size)
-					return
-					    gnutls_assert_val
-					    (GNUTLS_E_INTERNAL_ERROR);
-
-				memcpy(&cipher_suites[k], ce->id, 2);
-				k += 2;
+#define CLIENT_VERSION_CHECK(minver, maxver, e) \
+			if (is_dtls) { \
+				if (e->min_dtls_version > maxver->id) \
+					continue; \
+			} else { \
+				if (e->min_version > maxver->id) \
+					continue; \
 			}
 
-	ret_count = k;
+#define RESERVED_CIPHERSUITES 4
+int
+_gnutls_get_client_ciphersuites(gnutls_session_t session,
+			 gnutls_buffer_st * cdata,
+			 const version_entry_st *vmin,
+			 const version_entry_st *vmax,
+			 unsigned add_scsv)
+{
 
-	/* This function can no longer return 0 cipher suites.
-	 * It returns an error code instead.
-	 */
-	if (ret_count == 0) {
-		gnutls_assert();
-		return GNUTLS_E_NO_CIPHER_SUITES;
+	unsigned int j;
+	int ret;
+	unsigned int is_dtls = IS_DTLS(session), kx, cred_type;
+	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE*2 + RESERVED_CIPHERSUITES];
+	unsigned cipher_suites_size = 0;
+	size_t init_length = cdata->length;
+
+	for (j = 0; j < session->internals.priorities.cs.size; j++) {
+		CLIENT_VERSION_CHECK(vmin, vmax, session->internals.priorities.cs.entry[j]);
+
+		kx = session->internals.priorities.cs.entry[j]->kx_algorithm;
+		cred_type = _gnutls_map_kx_get_cred(kx, 0);
+
+		if (!session->internals.premaster_set && _gnutls_get_cred(session, cred_type) == NULL)
+			continue;
+
+		KX_SRP_CHECKS(kx, continue);
+
+		_gnutls_debug_log("Keeping ciphersuite %.2x.%.2x (%s)\n",
+				(unsigned)session->internals.priorities.cs.entry[j]->id[0],
+				(unsigned)session->internals.priorities.cs.entry[j]->id[1],
+				session->internals.priorities.cs.entry[j]->name);
+		cipher_suites[cipher_suites_size] = session->internals.priorities.cs.entry[j]->id[0];
+		cipher_suites[cipher_suites_size + 1] = session->internals.priorities.cs.entry[j]->id[1];
+		cipher_suites_size += 2;
+
+		if (cipher_suites_size >= MAX_CIPHERSUITE_SIZE*2)
+			break;
 	}
-	return ret_count;
+#ifdef ENABLE_SSL3
+	if (add_scsv) {
+		cipher_suites[cipher_suites_size] = 0x00;
+		cipher_suites[cipher_suites_size + 1] = 0xff;
+		cipher_suites_size += 2;
+
+		ret = _gnutls_ext_sr_send_cs(session);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		_gnutls_extension_list_add_sr(session);
+	}
+#endif
+
+	if (session->internals.priorities.fallback) {
+		cipher_suites[cipher_suites_size] = GNUTLS_FALLBACK_SCSV_MAJOR;
+		cipher_suites[cipher_suites_size + 1] = GNUTLS_FALLBACK_SCSV_MINOR;
+		cipher_suites_size += 2;
+	}
+
+	ret = _gnutls_buffer_append_data_prefix(cdata, 16, cipher_suites, cipher_suites_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return cdata->length - init_length;
 }
 
 /**

@@ -157,15 +157,13 @@ inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
 }
 
 /* Functions for cipher suites. */
+int _gnutls_get_client_ciphersuites(gnutls_session_t session,
+	gnutls_buffer_st * cdata, const version_entry_st *minver,
+	const version_entry_st *maxver, unsigned add_scsv);
+
 int _gnutls_supported_ciphersuites(gnutls_session_t session,
 				   uint8_t * cipher_suites,
 				   unsigned int max_cipher_suite_size);
-int
-_gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
-			     uint8_t * cipher_suites,
-			     int cipher_suites_size,
-			     gnutls_pk_algorithm_t * pk_algos,
-			     size_t pk_algos_size);
 
 const gnutls_cipher_suite_entry_st
     *cipher_suite_get(gnutls_kx_algorithm_t kx_algorithm,
