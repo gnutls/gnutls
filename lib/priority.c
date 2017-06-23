@@ -1569,7 +1569,7 @@ int gnutls_set_default_priority(gnutls_session_t session)
  * Get a list of available elliptic curves in the priority
  * structure. 
  *
- * Returns: the number of curves, or an error code.
+ * Returns: the number of items, or an error code.
  * Since: 3.0
  **/
 int
@@ -1591,7 +1591,7 @@ gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
  * Get a list of available key exchange methods in the priority
  * structure. 
  *
- * Returns: the number of curves, or an error code.
+ * Returns: the number of items, or an error code.
  * Since: 3.2.3
  **/
 int
@@ -1613,7 +1613,7 @@ gnutls_priority_kx_list(gnutls_priority_t pcache,
  * Get a list of available ciphers in the priority
  * structure. 
  *
- * Returns: the number of curves, or an error code.
+ * Returns: the number of items, or an error code.
  * Since: 3.2.3
  **/
 int
@@ -1635,7 +1635,7 @@ gnutls_priority_cipher_list(gnutls_priority_t pcache,
  * Get a list of available MAC algorithms in the priority
  * structure. 
  *
- * Returns: the number of curves, or an error code.
+ * Returns: the number of items, or an error code.
  * Since: 3.2.3
  **/
 int
