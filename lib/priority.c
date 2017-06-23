@@ -563,9 +563,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	}
 
 	if (session->internals.priorities.protocol.algorithms == 0 ||
-	    session->internals.priorities.cipher.algorithms == 0 ||
-	    session->internals.priorities.mac.algorithms == 0 ||
-	    session->internals.priorities.kx.algorithms == 0)
+	    session->internals.priorities.cs.size == 0)
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	ADD_PROFILE_VFLAGS(session, priority->additional_verify_flags);
@@ -719,9 +717,9 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 			(pgroups[i].alias != NULL && strcasecmp(level, pgroups[i].alias) == 0)) {
 			if (pgroups[i].proto_list != NULL)
 				func(&priority_cache->protocol, *pgroups[i].proto_list);
-			func(&priority_cache->cipher, *pgroups[i].cipher_list);
-			func(&priority_cache->kx, *pgroups[i].kx_list);
-			func(&priority_cache->mac, *pgroups[i].mac_list);
+			func(&priority_cache->_cipher, *pgroups[i].cipher_list);
+			func(&priority_cache->_kx, *pgroups[i].kx_list);
+			func(&priority_cache->_mac, *pgroups[i].mac_list);
 			func(&priority_cache->sign_algo, *pgroups[i].sign_list);
 			func(&priority_cache->supported_ecc, *pgroups[i].ecc_list);
 
@@ -1115,13 +1113,13 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 	priority_cache->cs.size = 0;
 
-	for (i = 0; i < priority_cache->kx.algorithms; i++) {
-		for (j=0;j<priority_cache->cipher.algorithms;j++) {
-			for (z=0;z<priority_cache->mac.algorithms;z++) {
+	for (i = 0; i < priority_cache->_kx.algorithms; i++) {
+		for (j=0;j<priority_cache->_cipher.algorithms;j++) {
+			for (z=0;z<priority_cache->_mac.algorithms;z++) {
 				ce = cipher_suite_get(
-					priority_cache->kx.priority[i],
-					priority_cache->cipher.priority[j],
-					priority_cache->mac.priority[z]);
+					priority_cache->_kx.priority[i],
+					priority_cache->_cipher.priority[j],
+					priority_cache->_mac.priority[z]);
 
 				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
 					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
@@ -1308,10 +1306,10 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			} else if ((algo =
 				    gnutls_mac_get_id(&broken_list[i][1]))
 				   != GNUTLS_MAC_UNKNOWN) {
-				fn(&(*priority_cache)->mac, algo);
+				fn(&(*priority_cache)->_mac, algo);
 			} else if ((centry = cipher_name_to_entry(&broken_list[i][1])) != NULL) {
 				if (_gnutls_cipher_exists(centry->id)) {
-					fn(&(*priority_cache)->cipher, centry->id);
+					fn(&(*priority_cache)->_cipher, centry->id);
 					if (centry->type == CIPHER_BLOCK)
 						(*priority_cache)->have_cbc = 1;
 				}
@@ -1319,7 +1317,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				  _gnutls_kx_get_id(&broken_list[i][1])) !=
 				 GNUTLS_KX_UNKNOWN) {
 				if (algo != GNUTLS_KX_INVALID)
-					fn(&(*priority_cache)->kx, algo);
+					fn(&(*priority_cache)->_kx, algo);
 			} else if (strncasecmp
 				 (&broken_list[i][1], "VERS-", 5) == 0) {
 				if (strncasecmp
@@ -1398,16 +1396,16 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				}
 			} else if (strncasecmp
 				(&broken_list[i][1], "MAC-ALL", 7) == 0) {
-				bulk_fn(&(*priority_cache)->mac,
+				bulk_fn(&(*priority_cache)->_mac,
 					mac_priority_normal);
 			} else if (strncasecmp
 				(&broken_list[i][1], "CIPHER-ALL",
 				 10) == 0) {
-				bulk_fn(&(*priority_cache)->cipher,
+				bulk_fn(&(*priority_cache)->_cipher,
 					cipher_priority_normal);
 			} else if (strncasecmp
 				(&broken_list[i][1], "KX-ALL", 6) == 0) {
-				bulk_fn(&(*priority_cache)->kx,
+				bulk_fn(&(*priority_cache)->_kx,
 					kx_priority_secure);
 			} else
 				goto error;
@@ -1590,11 +1588,11 @@ int
 gnutls_priority_kx_list(gnutls_priority_t pcache,
 			const unsigned int **list)
 {
-	if (pcache->kx.algorithms == 0)
+	if (pcache->_kx.algorithms == 0)
 		return 0;
 
-	*list = pcache->kx.priority;
-	return pcache->kx.algorithms;
+	*list = pcache->_kx.priority;
+	return pcache->_kx.algorithms;
 }
 
 /**
@@ -1612,11 +1610,11 @@ int
 gnutls_priority_cipher_list(gnutls_priority_t pcache,
 			    const unsigned int **list)
 {
-	if (pcache->cipher.algorithms == 0)
+	if (pcache->_cipher.algorithms == 0)
 		return 0;
 
-	*list = pcache->cipher.priority;
-	return pcache->cipher.algorithms;
+	*list = pcache->_cipher.priority;
+	return pcache->_cipher.algorithms;
 }
 
 /**
@@ -1634,11 +1632,11 @@ int
 gnutls_priority_mac_list(gnutls_priority_t pcache,
 			 const unsigned int **list)
 {
-	if (pcache->mac.algorithms == 0)
+	if (pcache->_mac.algorithms == 0)
 		return 0;
 
-	*list = pcache->mac.priority;
-	return pcache->mac.algorithms;
+	*list = pcache->_mac.priority;
+	return pcache->_mac.algorithms;
 }
 
 /**

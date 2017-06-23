@@ -1567,24 +1567,12 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 				       unsigned int idx,
 				       unsigned int *sidx)
 {
-	int mac_idx, cipher_idx, kx_idx;
 	unsigned int i, j;
-	unsigned int total =
-	    pcache->mac.algorithms * pcache->cipher.algorithms *
-	    pcache->kx.algorithms;
 	unsigned max_tls = 0;
 	unsigned max_dtls = 0;
 
-	if (idx >= total)
+	if (idx >= pcache->cs.size)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-
-	mac_idx = idx % pcache->mac.algorithms;
-
-	idx /= pcache->mac.algorithms;
-	cipher_idx = idx % pcache->cipher.algorithms;
-
-	idx /= pcache->cipher.algorithms;
-	kx_idx = idx % pcache->kx.algorithms;
 
 	/* find max_tls and max_dtls */
 	for (j=0;j<pcache->protocol.algorithms;j++) {
@@ -1598,25 +1586,20 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 	}
 
 	for (i = 0; i < CIPHER_SUITES_COUNT; i++) {
-		if (cs_algorithms[i].kx_algorithm ==
-		    pcache->kx.priority[kx_idx]
-		    && cs_algorithms[i].block_algorithm ==
-		    pcache->cipher.priority[cipher_idx]
-		    && cs_algorithms[i].mac_algorithm ==
-		    pcache->mac.priority[mac_idx]) {
-			*sidx = i;
+		if (pcache->cs.entry[idx] != &cs_algorithms[i])
+			continue;
 
-			if (_gnutls_cipher_exists(cs_algorithms[i].block_algorithm) &&
-			    _gnutls_mac_exists(cs_algorithms[i].mac_algorithm)) {
-
-				if (max_tls >= cs_algorithms[i].min_version) {
-					return 0;
-				} else if (max_dtls >= cs_algorithms[i].min_dtls_version) {
-					return 0;
-				}
-			} else
-				break;
-		}
+		*sidx = i;
+		if (_gnutls_cipher_exists(cs_algorithms[i].block_algorithm) &&
+		    _gnutls_mac_exists(cs_algorithms[i].mac_algorithm)) {
+			if (max_tls >= cs_algorithms[i].min_version) {
+				return 0;
+			} else if (max_dtls >= cs_algorithms[i].min_dtls_version) {
+				return 0;
+			}
+		} else
+			break;
 	}
+
 	return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 }

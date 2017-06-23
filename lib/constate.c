@@ -247,12 +247,6 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 	    || _gnutls_mac_is_ok(mac_algo) == 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
-	if (_gnutls_cipher_priority(session, cipher_algo->id) < 0)
-		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-
-	if (_gnutls_mac_priority(session, mac_algo->id) < 0)
-		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-
 	if (_gnutls_version_has_selectable_prf(get_version(session))) {
 		if (cs->prf == GNUTLS_MAC_UNKNOWN ||
 		    _gnutls_mac_is_ok(mac_to_entry(cs->prf)) == 0)
@@ -324,12 +318,6 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 
 	if (_gnutls_cipher_is_ok(params->cipher) == 0
 	    || _gnutls_mac_is_ok(params->mac) == 0)
-		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-
-	if (_gnutls_cipher_priority(session, params->cipher->id) < 0)
-		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-
-	if (_gnutls_mac_priority(session, params->mac->id) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	if (!_gnutls_version_has_explicit_iv(ver) &&
@@ -496,9 +484,6 @@ _gnutls_set_kx(gnutls_session_t session, gnutls_kx_algorithm_t algo)
 		session->security_parameters.kx_algorithm = algo;
 	} else
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	if (_gnutls_kx_priority(session, algo) < 0)
-		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	return 0;
 }

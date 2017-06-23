@@ -294,22 +294,6 @@ unsigned gnutls_cipher_get_iv_size(gnutls_cipher_algorithm_t algorithm)
 	return ret;
 }
 
-
- /* returns the priority */
-int
-_gnutls_cipher_priority(gnutls_session_t session,
-			gnutls_cipher_algorithm_t algorithm)
-{
-	unsigned int i;
-	for (i = 0; i < session->internals.priorities.cipher.algorithms;
-	     i++) {
-		if (session->internals.priorities.cipher.priority[i] ==
-		    algorithm)
-			return i;
-	}
-	return -1;
-}
-
 /**
  * gnutls_cipher_get_key_size:
  * @algorithm: is an encryption algorithm

@@ -146,19 +146,6 @@ mod_auth_st *_gnutls_kx_auth_struct(gnutls_kx_algorithm_t algorithm)
 
 }
 
-int
-_gnutls_kx_priority(gnutls_session_t session,
-		    gnutls_kx_algorithm_t algorithm)
-{
-	unsigned int i;
-	for (i = 0; i < session->internals.priorities.kx.algorithms; i++) {
-		if (session->internals.priorities.kx.priority[i] ==
-		    algorithm)
-			return i;
-	}
-	return -1;
-}
-
 /**
  * gnutls_kx_get_name:
  * @algorithm: is a key exchange algorithm

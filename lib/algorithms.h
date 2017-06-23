@@ -316,13 +316,6 @@ gnutls_sign_algorithm_t _gnutls_tls_aid_to_sign(const sign_algorithm_st *
 const sign_algorithm_st *_gnutls_sign_to_tls_aid(gnutls_sign_algorithm_t
 						 sign);
 
-int _gnutls_mac_priority(gnutls_session_t session,
-			 gnutls_mac_algorithm_t algorithm);
-int _gnutls_cipher_priority(gnutls_session_t session,
-			    gnutls_cipher_algorithm_t a);
-int _gnutls_kx_priority(gnutls_session_t session,
-			gnutls_kx_algorithm_t algorithm);
-
 unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits);
 
 /* ECC */

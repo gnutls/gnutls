@@ -82,19 +82,6 @@ const mac_entry_st *_gnutls_mac_to_entry(gnutls_mac_algorithm_t c)
 	return NULL;
 }
 
-int
-_gnutls_mac_priority(gnutls_session_t session,
-		     gnutls_mac_algorithm_t algorithm)
-{				/* actually returns the priority */
-	unsigned int i;
-	for (i = 0; i < session->internals.priorities.mac.algorithms; i++) {
-		if (session->internals.priorities.mac.priority[i] ==
-		    algorithm)
-			return i;
-	}
-	return -1;
-}
-
 /**
  * gnutls_mac_get_name:
  * @algorithm: is a MAC algorithm
