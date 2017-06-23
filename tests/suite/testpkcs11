@@ -128,6 +128,21 @@ generate_rsa_privkey () {
 	fi
 }
 
+generate_dsa_privkey () {
+	export GNUTLS_PIN=$2
+	token=$1
+	bits=$3
+
+	echo -n "* Generating DSA private key ($bits)... "
+	$P11TOOL $ADDITIONAL_PARAM --login --id 000102030405 --label gnutls-client-dsa --generate-dsa --bits $bits "$token" >>$TMPFILE 2>&1
+	if test $? = 0;then
+		echo ok
+	else
+		echo failed
+		exit 1
+	fi
+}
+
 # $1: token
 # $2: PIN
 # $3: bits
@@ -444,6 +459,7 @@ delete_temp_privkey $TOKEN $GNUTLS_PIN
 
 #export_pubkey_of_privkey $TOKEN $GNUTLS_PIN
 
+generate_dsa_privkey $TOKEN $GNUTLS_PIN 1024
 generate_rsa_privkey $TOKEN $GNUTLS_PIN 1024
 change_id_of_privkey $TOKEN $GNUTLS_PIN
 change_label_of_privkey $TOKEN $GNUTLS_PIN
