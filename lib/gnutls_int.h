@@ -505,8 +505,7 @@ typedef struct {
 #include <cipher_int.h>
 
 typedef struct {
-	uint8_t hash_algorithm;
-	uint8_t sign_algorithm;	/* pk algorithm actually */
+	uint8_t id[2]; /* used to be (in TLS 1.2) hash algorithm , PK algorithm */
 } sign_algorithm_st;
 
 /* This structure holds parameters got from TLS extension

@@ -1032,8 +1032,8 @@ _gnutls_gen_cert_client_crt_vrfy(gnutls_session_t session,
 		if (aid == NULL)
 			return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
 
-		p[0] = aid->hash_algorithm;
-		p[1] = aid->sign_algorithm;
+		p[0] = aid->id[0];
+		p[1] = aid->id[1];
 		ret = _gnutls_buffer_append_data(data, p, 2);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1090,8 +1090,8 @@ _gnutls_proc_cert_client_crt_vrfy(gnutls_session_t session,
 		sign_algorithm_st aid;
 
 		DECR_LEN(dsize, 2);
-		aid.hash_algorithm = pdata[0];
-		aid.sign_algorithm = pdata[1];
+		aid.id[0] = pdata[0];
+		aid.id[1] = pdata[1];
 
 		sign_algo = _gnutls_tls_aid_to_sign(&aid);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
@@ -1636,8 +1636,8 @@ int _gnutls_gen_dhe_signature(gnutls_session_t session,
 			goto cleanup;
 		}
 
-		p[0] = aid->hash_algorithm;
-		p[1] = aid->sign_algorithm;
+		p[0] = aid->id[0];
+		p[1] = aid->id[1];
 
 		ret = _gnutls_buffer_append_data(data, p, 2);
 		if (ret < 0) {
@@ -1695,14 +1695,13 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 		sign_algorithm_st aid;
 
 		DECR_LEN(data_size, 1);
-		aid.hash_algorithm = *data++;
+		aid.id[0] = *data++;
 		DECR_LEN(data_size, 1);
-		aid.sign_algorithm = *data++;
+		aid.id[1] = *data++;
 		sign_algo = _gnutls_tls_aid_to_sign(&aid);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			_gnutls_debug_log("unknown signature %d.%d\n",
-					  aid.sign_algorithm,
-					  aid.hash_algorithm);
+					  aid.id[0], aid.id[1]);
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 		}

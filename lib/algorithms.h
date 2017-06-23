@@ -33,8 +33,8 @@
 
 #define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDHX))
 
-#define TLS_SIGN_AID_UNKNOWN {255, 255}
-#define HAVE_UNKNOWN_SIGAID(aid) ((aid)->sign_algorithm == 255 && (aid)->hash_algorithm == 255)
+#define TLS_SIGN_AID_UNKNOWN {{255, 255}}
+#define HAVE_UNKNOWN_SIGAID(aid) ((aid)->id[0] == 255 && (aid)->id[1] == 255)
 
 /* Functions for version handling. */
 const version_entry_st *version_to_entry(gnutls_protocol_t c);

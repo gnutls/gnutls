@@ -139,8 +139,8 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 			goto cleanup;
 		}
 
-		p[0] = aid->hash_algorithm;
-		p[1] = aid->sign_algorithm;
+		p[0] = aid->id[0];
+		p[1] = aid->id[1];
 
 		ret = _gnutls_buffer_append_data(data, p, 2);
 		if (ret < 0) {
@@ -216,14 +216,13 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 		sign_algorithm_st aid;
 
 		DECR_LEN(data_size, 1);
-		aid.hash_algorithm = *p++;
+		aid.id[0] = *p++;
 		DECR_LEN(data_size, 1);
-		aid.sign_algorithm = *p++;
+		aid.id[1] = *p++;
 		sign_algo = _gnutls_tls_aid_to_sign(&aid);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			_gnutls_debug_log("unknown signature %d.%d\n",
-					  aid.sign_algorithm,
-					  aid.hash_algorithm);
+					  aid.id[0], aid.id[1]);
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 		}
