@@ -67,20 +67,6 @@ void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src)
 	}
 }
 
-void
-_gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
-		size_t src_size)
-{
-
-	if (dest_tot_size >= src_size) {
-		memcpy(dest, src, src_size);
-	} else {
-		if (dest_tot_size > 0) {
-			memcpy(dest, src, dest_tot_size);
-		}
-	}
-}
-
 void _gnutls_buffer_init(gnutls_buffer_st * str)
 {
 	str->data = str->allocd = NULL;
@@ -882,25 +868,6 @@ int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
 	_gnutls_free_datum(&dd);
 
 	return ret;
-}
-
-int
-_gnutls_buffer_pop_data_prefix(gnutls_buffer_st * buf, void *data,
-			       size_t * data_size)
-{
-	size_t size;
-	int ret;
-
-	ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	if (size > 0)
-		_gnutls_buffer_pop_data(buf, data, data_size);
-
-	return 0;
 }
 
 void

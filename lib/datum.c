@@ -72,18 +72,3 @@ _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data, size_t data_size)
 	return 0;
 }
 
-int
-_gnutls_datum_append(gnutls_datum_t * dst, const void *data,
-		     size_t data_size)
-{
-
-	dst->data = gnutls_realloc_fast(dst->data, data_size + dst->size);
-	if (dst->data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-	memcpy(&dst->data[dst->size], data, data_size);
-	dst->size += data_size;
-
-	return 0;
-}
-

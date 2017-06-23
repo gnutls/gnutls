@@ -136,9 +136,6 @@ int _gnutls_mac_output_ssl3(digest_hd_st * handle, void *digest);
 int _gnutls_ssl3_generate_random(void *secret, int secret_len,
 				 void *rnd, int random_len, int bytes,
 				 uint8_t * ret);
-int _gnutls_ssl3_hash_md5(const void *first, int first_len,
-			  const void *second, int second_len,
-			  int ret_len, uint8_t * ret);
 
 int _gnutls_mac_deinit_ssl3_handshake(digest_hd_st * handle, void *digest,
 				      uint8_t * key, uint32_t key_size);

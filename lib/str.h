@@ -60,8 +60,6 @@ inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
 }
 
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
-void _gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
-		     size_t src_size);
 void _gnutls_str_cat(char *dest, size_t dest_tot_size, const char *src);
 
 typedef struct gnutls_buffer_st {
@@ -109,9 +107,6 @@ void _gnutls_buffer_pop_datum(gnutls_buffer_st *, gnutls_datum_t *,
 
 int _gnutls_buffer_pop_prefix(gnutls_buffer_st * buf, size_t * data_size,
 			      int check);
-
-int _gnutls_buffer_pop_data_prefix(gnutls_buffer_st * buf, void *data,
-				   size_t * data_size);
 
 int _gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
 				    gnutls_datum_t * data);

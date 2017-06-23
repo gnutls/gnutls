@@ -51,8 +51,6 @@ int _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
 					 uint16_t type,
 					 gnutls_ext_priv_data_t * data);
 
-void _gnutls_ext_restore_resumed_session(gnutls_session_t session);
-
 /* for session packing */
 int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed);
 int _gnutls_ext_unpack(gnutls_session_t session,

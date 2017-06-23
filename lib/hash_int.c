@@ -468,38 +468,6 @@ ssl3_md5(int i, uint8_t * secret, int secret_len,
 }
 
 int
-_gnutls_ssl3_hash_md5(const void *first, int first_len,
-		      const void *second, int second_len,
-		      int ret_len, uint8_t * ret)
-{
-	uint8_t digest[MAX_HASH_SIZE];
-	digest_hd_st td;
-	int block = MD5_DIGEST_OUTPUT;
-	int rc;
-
-	rc = _gnutls_hash_init(&td, mac_to_entry(GNUTLS_MAC_MD5));
-	if (rc < 0) {
-		gnutls_assert();
-		return rc;
-	}
-
-	_gnutls_hash(&td, first, first_len);
-	_gnutls_hash(&td, second, second_len);
-
-	_gnutls_hash_deinit(&td, digest);
-
-	if (ret_len > block) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	memcpy(ret, digest, ret_len);
-
-	return 0;
-
-}
-
-int
 _gnutls_ssl3_generate_random(void *secret, int secret_len,
 			     void *rnd, int rnd_len,
 			     int ret_bytes, uint8_t * ret)
