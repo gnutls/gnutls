@@ -1169,19 +1169,12 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	if (_gnutls_version_has_selectable_sighash(ver)) {
-		uint8_t p[MAX_SIGN_ALGO_SIZE];
-
 		ret =
-		    _gnutls_sign_algorithm_write_params(session, p,
-							MAX_SIGN_ALGO_SIZE);
+		    _gnutls_sign_algorithm_write_params(session, data);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
-
-		ret = _gnutls_buffer_append_data(data, p, ret);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
 	}
 
 	if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&

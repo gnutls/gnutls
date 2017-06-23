@@ -720,7 +720,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 			func(&priority_cache->_cipher, *pgroups[i].cipher_list);
 			func(&priority_cache->_kx, *pgroups[i].kx_list);
 			func(&priority_cache->_mac, *pgroups[i].mac_list);
-			func(&priority_cache->sign_algo, *pgroups[i].sign_list);
+			func(&priority_cache->_sign_algo, *pgroups[i].sign_list);
 			func(&priority_cache->supported_ecc, *pgroups[i].ecc_list);
 
 			if (pgroups[i].profile != 0) {
@@ -1110,6 +1110,7 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 {
 	unsigned i, j, z;
 	const gnutls_cipher_suite_entry_st *ce;
+	const gnutls_sign_entry_st *se;
 
 	priority_cache->cs.size = 0;
 
@@ -1127,7 +1128,16 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 			}
 		}
 	}
-	_gnutls_debug_log("added %d ciphersuites into priority list\n", priority_cache->cs.size);
+
+	for (i = 0; i < priority_cache->_sign_algo.algorithms; i++) {
+		se = _gnutls_sign_to_entry(priority_cache->_sign_algo.priority[i]);
+		if (se != NULL && priority_cache->sigalg.size < sizeof(priority_cache->sigalg.entry)/sizeof(priority_cache->sigalg.entry[0])) {
+			priority_cache->sigalg.entry[priority_cache->sigalg.size++] = se;
+		}
+	}
+
+	_gnutls_debug_log("added %d ciphersuites and %d sig algos into priority list\n",
+		priority_cache->cs.size, priority_cache->sigalg.size);
 }
 
 /**
@@ -1272,7 +1282,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			      protocol_priority);
 		_set_priority(&(*priority_cache)->cert_type,
 			      cert_type_priority_default);
-		_set_priority(&(*priority_cache)->sign_algo,
+		_set_priority(&(*priority_cache)->_sign_algo,
 			      sign_priority_default);
 		_set_priority(&(*priority_cache)->supported_ecc,
 			      supported_ecc_normal);
@@ -1382,7 +1392,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				    (&broken_list[i][1], "SIGN-ALL",
 				     8) == 0) {
 					bulk_fn(&(*priority_cache)->
-						sign_algo,
+						_sign_algo,
 						sign_priority_default);
 				} else {
 					if ((algo =
@@ -1390,7 +1400,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					     (&broken_list[i][6])) !=
 					    GNUTLS_SIGN_UNKNOWN)
 						fn(&(*priority_cache)->
-						   sign_algo, algo);
+						   _sign_algo, algo);
 					else
 						goto error;
 				}
@@ -1697,11 +1707,11 @@ int
 gnutls_priority_sign_list(gnutls_priority_t pcache,
 			  const unsigned int **list)
 {
-	if (pcache->sign_algo.algorithms == 0)
+	if (pcache->_sign_algo.algorithms == 0)
 		return 0;
 
-	*list = pcache->sign_algo.priority;
-	return pcache->sign_algo.algorithms;
+	*list = pcache->_sign_algo.priority;
+	return pcache->_sign_algo.algorithms;
 }
 
 /**

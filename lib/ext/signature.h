@@ -36,8 +36,7 @@ int _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 				      const uint8_t * data,
 				      size_t data_size);
 int _gnutls_sign_algorithm_write_params(gnutls_session_t session,
-					uint8_t * data,
-					size_t max_data_size);
+					gnutls_buffer_st * extdata);
 int _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 				      gnutls_sign_algorithm_t sig);
 

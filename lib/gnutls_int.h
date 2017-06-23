@@ -514,8 +514,6 @@ typedef struct {
  * structures also - see SRP).
  */
 
-#define MAX_SIGN_ALGO_SIZE (2 + MAX_ALGOS * 2)
-
 #define MAX_VERIFY_DATA_SIZE 36	/* in SSL 3.0, 12 in TLS 1.0 */
 
 /* auth_info_t structures now MAY contain malloced 
@@ -650,11 +648,15 @@ typedef struct ciphersuite_list_st {
 	unsigned int size;
 } ciphersuite_list_st;
 
+typedef struct sign_algo_list_st {
+	const struct gnutls_sign_entry_st *entry[MAX_ALGOS];
+	unsigned int size;
+} sign_algo_list_st;
+
 /* For the external api */
 struct gnutls_priority_st {
 	priority_st protocol;
 	priority_st cert_type;
-	priority_st sign_algo;
 	priority_st supported_ecc;
 
 	/* The following are not necessary to be stored in
@@ -663,6 +665,10 @@ struct gnutls_priority_st {
 	priority_st _cipher;
 	priority_st _mac;
 	priority_st _kx;
+	priority_st _sign_algo;
+
+	/* the supported signature algorithms */
+	sign_algo_list_st sigalg;
 
 	/* the supported ciphersuites */
 	ciphersuite_list_st cs;
