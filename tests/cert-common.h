@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Nikos Mavrogiannopoulos
+ * Copyright (C) 2015-2017 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -36,6 +36,8 @@
  * IPv4 server: server_ca3_localhost_utf8_cert, server_ca3_key - UTF8 names
  * IPv4 server: server_ca3_localhost_inv_utf8_cert, server_ca3_key - invalid UTF8 names
  * IPv4 server: insecure key: server_ca3_localhost_insecure_key, server_ca3_localhost_insecure_cert
+ * IPv4 server: RSA-decrypt key: server_ca3_localhost_rsa_decrypt_cert, server_ca3_key
+ * IPv4 server: RSA-sign-only key: server_ca3_localhost_rsa_sign_cert, server_ca3_key
  */
 
 
@@ -1178,6 +1180,62 @@ static char server_localhost_ca3_cert_pem[] =
 	"6TXY44pCGHMFO6Kr\n"
 	"-----END CERTIFICATE-----\n";
 
+/* Marked as decrypt-only */
+static char server_localhost_ca3_rsa_decrypt_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEITCCAomgAwIBAgIIWU+IEie6JrYwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA2MjUwOTUzMjNaGA85OTk5MTIzMTIzNTk1OVowADCCAaIw\n"
+	"DQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBANk9eJmqLPfAu7P4Hhmcm4KmEsRf\n"
+	"uTXk1ylqYvf715riBfJ94VIdtJqKE9q4FRwMxVsv/B+SHFiIlEJfvCociQkrgSfl\n"
+	"oTNIMNrqkj8IjmVJuJd00MZsUuHlvwa6+F/PLLyUOMU03LdpuR9TbvS2fMVjmaRj\n"
+	"BiCO439GA+qHRvwxxP7FR433Hg+5JdeYwLWve/vLgm4zETxnMYOFbZpArkizpBi/\n"
+	"RYQtLmFW8HwZ0/ldDBMnDgcfmL9gRLtMQ1XZEHLNFjyEVD1JsrlgccaizNUkiUi7\n"
+	"Gbm/w3YiDVxbq3u3cee5lsNhEMIREyISKAHPy8RlnIWwwuDlnsmI0pIb9/4RH0LM\n"
+	"MlceDEFy1X0QRzYqZFPU/0l4j/FlQ6X2UqWNz63ybRSbcCzHl25abi1xmbsV5ydo\n"
+	"mJNcP+0QbripMpa0O6gjv5f0yMd7mW9/aAglPcKgpbbhGfo7V9z2gIKdUCLRXoUs\n"
+	"zhdobnRf00LrrpFUQWReKHxMcDWAL2b00kysPQIDAQABo4GNMIGKMAwGA1UdEwEB\n"
+	"/wQCMAAwFAYDVR0RBA0wC4IJbG9jYWxob3N0MBMGA1UdJQQMMAoGCCsGAQUFBwMB\n"
+	"MA8GA1UdDwEB/wQFAwMHIAAwHQYDVR0OBBYEFDOd4SfTi9X86wX8tceBaU9eO9nW\n"
+	"MB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv8bSvMA0GCSqGSIb3DQEBCwUA\n"
+	"A4IBgQAaq4+vai/FwYQ2fAjOsHsVV0nR5Zq55tT8Fexrj2/e9gr+bMV4HVxETByy\n"
+	"fLtMHGYv+8BENDaI2EOHTyKp5O2DNbITJSN7/ZIO4Rsk+N5m2FyF7DV/sAoxhN7R\n"
+	"mDy/jDtZyeIqKLptOQZbkRv3lf+vtJL3eakpgh5T/j14kT0QjLyJEZB1D9jurUsV\n"
+	"+fxYxQUpv4YInDeEk5aKfvZNdkEpbv56GYNc15mNiKryXoszdm+TKmHSVFH9wUj3\n"
+	"KAXBsQdMmZbd0ZFAEi7QV42Pr2x9+PrSE26bE6K31r02/RcxFQdL9E/3O+85S8eN\n"
+	"yOZoC/PIrm0mKIPn2NBGSKtCG8V1sTHHJyCwqQERp3pkaB7A9biCKExQN1d3Gsbe\n"
+	"C0R9bYimdbkYM6o7qi7OiLRKpYFgdVYaYEG3DRBpB3R3+EAKk91809tc9ow5xzkx\n"
+	"lWryqIzutm6rcClAnqeBIZEZIIvqZH8RcPBQEUajNCWRpBsbwF1xdWvIhP2R3y69\n"
+	"5dOfcuY=\n"
+	"-----END CERTIFICATE-----\n";
+
+/* Marked as sign-only */
+static char server_localhost_ca3_rsa_sign_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIEITCCAomgAwIBAgIIWU+LoyEYfBYwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA2MjUxMDA4MzZaGA85OTk5MTIzMTIzNTk1OVowADCCAaIw\n"
+	"DQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBANk9eJmqLPfAu7P4Hhmcm4KmEsRf\n"
+	"uTXk1ylqYvf715riBfJ94VIdtJqKE9q4FRwMxVsv/B+SHFiIlEJfvCociQkrgSfl\n"
+	"oTNIMNrqkj8IjmVJuJd00MZsUuHlvwa6+F/PLLyUOMU03LdpuR9TbvS2fMVjmaRj\n"
+	"BiCO439GA+qHRvwxxP7FR433Hg+5JdeYwLWve/vLgm4zETxnMYOFbZpArkizpBi/\n"
+	"RYQtLmFW8HwZ0/ldDBMnDgcfmL9gRLtMQ1XZEHLNFjyEVD1JsrlgccaizNUkiUi7\n"
+	"Gbm/w3YiDVxbq3u3cee5lsNhEMIREyISKAHPy8RlnIWwwuDlnsmI0pIb9/4RH0LM\n"
+	"MlceDEFy1X0QRzYqZFPU/0l4j/FlQ6X2UqWNz63ybRSbcCzHl25abi1xmbsV5ydo\n"
+	"mJNcP+0QbripMpa0O6gjv5f0yMd7mW9/aAglPcKgpbbhGfo7V9z2gIKdUCLRXoUs\n"
+	"zhdobnRf00LrrpFUQWReKHxMcDWAL2b00kysPQIDAQABo4GNMIGKMAwGA1UdEwEB\n"
+	"/wQCMAAwFAYDVR0RBA0wC4IJbG9jYWxob3N0MBMGA1UdJQQMMAoGCCsGAQUFBwMB\n"
+	"MA8GA1UdDwEB/wQFAwMHgAAwHQYDVR0OBBYEFDOd4SfTi9X86wX8tceBaU9eO9nW\n"
+	"MB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv8bSvMA0GCSqGSIb3DQEBCwUA\n"
+	"A4IBgQC1cJd/z1CQSyDfUd2uuNDTvA3WXWxNhqHMLitT1GJS6nUez+wCaWT9UfVy\n"
+	"+56z/eMaVasZPQ8dOKYdPRuzL2l65DKUUaKFOyD+NGvOS08qKY+oVGN1Qbmaxbvt\n"
+	"6rvzpW9UHn75zLDOUOMrGDkW5L36mMP8I0Y5AcNBrO5yFBvH8MAHr3zO2VvTSt6T\n"
+	"ZHFrDlV/nL5E+swzrmF6MZXO1mupk/gtelYfRtigwSr51RY+Me3uaGNEQe30JLu6\n"
+	"0gp6/otBns9qJjSgX9qWIj9iTHq4A2CiHZkb4j3+/TNNGB8dkBV+EvV8I4Bqdk33\n"
+	"mz4hSjJBLqg2NYZ4TaztWFsgTvGOYncLGl5e4dIqB94ICEFIrWN32JzS61Mu5xlt\n"
+	"qBh/JOUSdMe6csZrDIw//UhUgLj7KdFO5FhSW3DXEl9PZGWVR+LJ+T3HjomHf+Bb\n"
+	"ATbBQk+9MkHTiDWxD4FbmPuSC/h4Vh+G1VkyrlClTLW6K/+0DmE2LPJvRV5udpux\n"
+	"Ar7fYYU=\n"
+	"-----END CERTIFICATE-----\n";
+
 static char server_localhost_ca3_cert_chain_pem[] =
 	"-----BEGIN CERTIFICATE-----\n"
 	"MIIEKDCCApCgAwIBAgIMV6MdMjbIDKHKsL32MA0GCSqGSIb3DQEBCwUAMBIxEDAO\n"
@@ -1233,6 +1291,12 @@ static char server_localhost_ca3_cert_chain_pem[] =
 #define server_ca3_cert_chain server_ca3_localhost_cert_chain
 const gnutls_datum_t server_ca3_localhost_cert = { (void*)server_localhost_ca3_cert_pem,
 	sizeof(server_localhost_ca3_cert_pem)-1};
+
+const gnutls_datum_t server_ca3_localhost_rsa_decrypt_cert = { (void*)server_localhost_ca3_rsa_decrypt_cert_pem,
+	sizeof(server_localhost_ca3_rsa_decrypt_cert_pem)-1};
+
+const gnutls_datum_t server_ca3_localhost_rsa_sign_cert = { (void*)server_localhost_ca3_rsa_sign_cert_pem,
+	sizeof(server_localhost_ca3_rsa_sign_cert_pem)-1};
 
 const gnutls_datum_t server_ca3_localhost_cert_chain = {
 	(void*)server_localhost_ca3_cert_chain_pem,
