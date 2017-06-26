@@ -674,29 +674,35 @@ struct gnutls_priority_st {
 
 	/* to disable record padding */
 	bool no_extensions;
-	bool no_ext_master_secret;
-	bool allow_large_records;
-	unsigned int dumbfw;
+
+
 	safe_renegotiation_t sr;
 	bool min_record_version;
 	bool server_precedence;
-	bool allow_key_usage_violation;
 	bool allow_server_key_usage_violation; /* for test suite purposes only */
-	bool allow_wrong_pms;
 	bool no_tickets;
-	bool no_etm;
 	bool have_cbc;
 	unsigned int additional_verify_flags;
+
+	/* TLS_FALLBACK_SCSV */
+	bool fallback;
 
 	/* The session's expected security level.
 	 * Will be used to determine the minimum DH bits,
 	 * (or the acceptable certificate security level).
 	 */
 	gnutls_sec_param_t level;
-	unsigned int dh_prime_bits;	/* old (deprecated) variable */
 
-	/* TLS_FALLBACK_SCSV */
-	bool fallback;
+	/* these should be accessed from
+	 * session->internals.VAR names */
+	bool _allow_large_records;
+	bool _no_etm;
+	bool _no_ext_master_secret;
+	bool _allow_key_usage_violation;
+	bool _allow_wrong_pms;
+	bool _dumbfw;
+	unsigned int _dh_prime_bits;	/* old (deprecated) variable */
+
 };
 
 /* Allow around 50KB of length-hiding padding
@@ -711,6 +717,14 @@ struct gnutls_priority_st {
 	      (x)->allow_key_usage_violation = 1; \
 	      (x)->allow_wrong_pms = 1; \
 	      (x)->dumbfw = 1
+
+#define ENABLE_PRIO_COMPAT(x) \
+	      (x)->_allow_large_records = 1; \
+	      (x)->_no_etm = 1; \
+	      (x)->_no_ext_master_secret = 1; \
+	      (x)->_allow_key_usage_violation = 1; \
+	      (x)->_allow_wrong_pms = 1; \
+	      (x)->_dumbfw = 1
 
 /* DH and RSA parameters types.
  */
@@ -808,7 +822,21 @@ typedef struct {
 	int last_handshake_out;
 
 	/* priorities */
-	struct gnutls_priority_st priorities;
+	struct gnutls_priority_st *priorities;
+	/* non-zero if the priorities are assigned only to this session (and
+	 * thus should be freed by it */
+	bool deinit_priorities;
+
+	/* variables directly set when setting the priorities above, or
+	 * when overriding them */
+	bool allow_large_records;
+	bool no_etm;
+	bool no_ext_master_secret;
+	bool allow_key_usage_violation;
+	bool allow_wrong_pms;
+	bool dumbfw;
+	unsigned int dh_prime_bits;	/* old (deprecated) variable */
+
 
 	/* resumed session */
 	bool resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */

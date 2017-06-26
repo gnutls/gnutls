@@ -47,10 +47,10 @@ int check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage, unsign
 
 	if (our_cert) {
 		lstr = "Local";
-		allow_key_usage_violation = session->internals.priorities.allow_server_key_usage_violation;
+		allow_key_usage_violation = session->internals.priorities->allow_server_key_usage_violation;
 	} else {
 		lstr = "Peer's";
-		allow_key_usage_violation = session->internals.priorities.allow_key_usage_violation;
+		allow_key_usage_violation = session->internals.allow_key_usage_violation;
 	}
 
 	if (key_usage != 0) {

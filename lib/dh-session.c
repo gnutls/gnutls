@@ -72,7 +72,7 @@ void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
 		_gnutls_audit_log(session,
 				  "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n",
 				  bits);
-	session->internals.priorities.dh_prime_bits = bits;
+	session->internals.dh_prime_bits = bits;
 }
 
 

@@ -343,7 +343,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		 */
 		if (_gnutls_get_adv_version_major(session) !=
 		    plaintext.data[0]
-		    || (session->internals.priorities.allow_wrong_pms == 0
+		    || (session->internals.allow_wrong_pms == 0
 			&& _gnutls_get_adv_version_minor(session) !=
 			plaintext.data[1])) {
 			/* No error is returned here, if the version number check

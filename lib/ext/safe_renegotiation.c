@@ -52,7 +52,7 @@ _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 	sr_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED) {
 		return 0;
 	}
 
@@ -96,7 +96,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 	sr_ext_st *priv = NULL;
 	gnutls_ext_priv_data_t epriv;
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED) {
 		gnutls_assert();
 		return 0;
 	}
@@ -163,7 +163,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 
 		/* Clients can't tell if it's an initial negotiation */
 		if (session->internals.initial_negotiation_completed) {
-			if (session->internals.priorities.sr < SR_PARTIAL) {
+			if (session->internals.priorities->sr < SR_PARTIAL) {
 				_gnutls_handshake_log
 				    ("HSK[%p]: Allowing unsafe (re)negotiation\n",
 				     session);
@@ -176,7 +176,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 				    GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
 			}
 		} else {
-			if (session->internals.priorities.sr < SR_SAFE) {
+			if (session->internals.priorities->sr < SR_SAFE) {
 				_gnutls_handshake_log
 				    ("HSK[%p]: Allowing unsafe initial negotiation\n",
 				     session);
@@ -277,7 +277,7 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 	DECR_LEN(data_size,
 		 len + 1 /* count the first byte and payload */ );
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED) {
 		gnutls_assert();
 		return 0;
 	}
@@ -350,7 +350,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 	size_t init_length = extdata->length;
 
-	if (session->internals.priorities.sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED) {
 		gnutls_assert();
 		return 0;
 	}

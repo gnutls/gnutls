@@ -83,8 +83,8 @@ _gnutls_sign_algorithm_write_params(gnutls_session_t session,
 	p = buffer;
 	len = 0;
 
-	for (i=0;i<session->internals.priorities.sigalg.size;i++) {
-		aid = &session->internals.priorities.sigalg.entry[i]->aid;
+	for (i=0;i<session->internals.priorities->sigalg.size;i++) {
+		aid = &session->internals.priorities->sigalg.entry[i]->aid;
 
 		if (HAVE_UNKNOWN_SIGAID(aid))
 			continue;
@@ -92,7 +92,7 @@ _gnutls_sign_algorithm_write_params(gnutls_session_t session,
 		_gnutls_handshake_log
 		    ("EXT[%p]: sent signature algo (%d.%d) %s\n", session,
 		     (int)aid->id[0], (int)aid->id[1],
-		     session->internals.priorities.sigalg.entry[i]->name);
+		     session->internals.priorities->sigalg.entry[i]->name);
 
 		len += 2;
 		if (unlikely(len >= sizeof(buffer))) {
@@ -231,7 +231,7 @@ _gnutls_signature_algorithm_send_params(gnutls_session_t session,
 	/* this function sends the client extension data */
 	if (session->security_parameters.entity == GNUTLS_CLIENT
 	    && _gnutls_version_has_selectable_sighash(ver)) {
-		if (session->internals.priorities.sigalg.size > 0) {
+		if (session->internals.priorities->sigalg.size > 0) {
 			ret =
 			    _gnutls_sign_algorithm_write_params(session, extdata);
 			if (ret < 0)
@@ -321,9 +321,9 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 		return 0;
 	}
 
-	for (i = 0; i < session->internals.priorities.sigalg.size;
+	for (i = 0; i < session->internals.priorities->sigalg.size;
 	     i++) {
-		if (session->internals.priorities.sigalg.entry[i]->id ==
+		if (session->internals.priorities->sigalg.entry[i]->id ==
 		    sig) {
 			return 0;	/* ok */
 		}

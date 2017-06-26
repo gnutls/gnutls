@@ -158,9 +158,9 @@ _gnutls_version_priority(gnutls_session_t session,
 {
 	unsigned int i;
 
-	for (i = 0; i < session->internals.priorities.protocol.algorithms;
+	for (i = 0; i < session->internals.priorities->protocol.algorithms;
 	     i++) {
-		if (session->internals.priorities.protocol.priority[i] ==
+		if (session->internals.priorities->protocol.priority[i] ==
 		    version)
 			return i;
 	}
@@ -176,9 +176,9 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 	const version_entry_st *v, *min_v = NULL;
 	const version_entry_st *backup = NULL;
 
-	for (i=0;i < session->internals.priorities.protocol.algorithms;i++) {
+	for (i=0;i < session->internals.priorities->protocol.algorithms;i++) {
 		cur_prot =
-		    session->internals.priorities.protocol.priority[i];
+		    session->internals.priorities->protocol.priority[i];
 		v = version_to_entry(cur_prot);
 
 		if (v != NULL && version_is_valid_for_session(session, v)) {
@@ -216,10 +216,10 @@ gnutls_protocol_t _gnutls_version_max(gnutls_session_t session)
 	unsigned int i, max = 0x00;
 	gnutls_protocol_t cur_prot;
 
-	for (i = 0; i < session->internals.priorities.protocol.algorithms;
+	for (i = 0; i < session->internals.priorities->protocol.algorithms;
 	     i++) {
 		cur_prot =
-		    session->internals.priorities.protocol.priority[i];
+		    session->internals.priorities->protocol.priority[i];
 
 		if (cur_prot > max
 		    && _gnutls_version_is_supported(session, cur_prot))

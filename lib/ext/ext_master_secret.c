@@ -51,8 +51,8 @@ const extension_entry_st ext_mod_ext_master_secret = {
 #ifdef ENABLE_SSL3
 static inline unsigned have_only_ssl3_enabled(gnutls_session_t session)
 {
-	if (session->internals.priorities.protocol.algorithms == 1 &&
-	    session->internals.priorities.protocol.priority[0] == GNUTLS_SSL3)
+	if (session->internals.priorities->protocol.algorithms == 1 &&
+	    session->internals.priorities->protocol.priority[0] == GNUTLS_SSL3)
 	    return 1;
 	return 0;
 }
@@ -70,7 +70,7 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 
 	if ((session->internals.flags & GNUTLS_NO_EXTENSIONS) ||
-	    session->internals.priorities.no_ext_master_secret != 0) {
+	    session->internals.no_ext_master_secret != 0) {
 		return 0;
 	}
 
@@ -102,7 +102,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
 	if ((session->internals.flags & GNUTLS_NO_EXTENSIONS) ||
-	    session->internals.priorities.no_ext_master_secret != 0) {
+	    session->internals.no_ext_master_secret != 0) {
 	    session->security_parameters.ext_master_secret = 0;
 	    return 0;
 	}

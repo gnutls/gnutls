@@ -330,11 +330,6 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 	handshake_internal_state_clear1(*session);
 
-	/* emulate old gnutls behavior for old applications that do not use the priority_*
-	 * functions.
-	 */
-	(*session)->internals.priorities.sr = SR_PARTIAL;
-
 #ifdef HAVE_WRITEV
 #ifdef MSG_NOSIGNAL
 	if (flags & GNUTLS_NO_SIGNAL)
@@ -433,6 +428,10 @@ void gnutls_deinit(gnutls_session_t session)
 
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
+
+	if (session->internals.deinit_priorities &&
+	    session->internals.priorities)
+		gnutls_priority_deinit(session->internals.priorities);
 
 	gnutls_free(session);
 }
@@ -924,7 +923,7 @@ gnutls_handshake_set_post_client_hello_function(gnutls_session_t session,
  **/
 void gnutls_session_enable_compatibility_mode(gnutls_session_t session)
 {
-	ENABLE_COMPAT(&session->internals.priorities);
+	ENABLE_COMPAT(&session->internals);
 }
 
 /**

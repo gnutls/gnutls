@@ -68,7 +68,7 @@ int check_key_usage_for_enc(gnutls_session_t session, unsigned key_usage)
 	if (key_usage != 0) {
 		if (!(key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT) && !(key_usage & GNUTLS_KEY_KEY_AGREEMENT)) {
 			gnutls_assert();
-			if (session->internals.priorities.allow_key_usage_violation == 0) {
+			if (session->internals.allow_key_usage_violation == 0) {
 				_gnutls_audit_log(session,
 					  "Peer's certificate does not allow encryption. Key usage violation detected.\n");
 				return GNUTLS_E_KEY_USAGE_VIOLATION;
@@ -206,7 +206,7 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		 */
 		if (_gnutls_get_adv_version_major(session) !=
 		    plaintext.data[0]
-		    || (session->internals.priorities.allow_wrong_pms == 0
+		    || (session->internals.allow_wrong_pms == 0
 			&& _gnutls_get_adv_version_minor(session) !=
 			plaintext.data[1])) {
 			/* No error is returned here, if the version number check

@@ -1407,7 +1407,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 		return NULL;
 	}
 
-	if (session->internals.priorities.server_precedence == 0) {
+	if (session->internals.priorities->server_precedence == 0) {
 		for (i = 0; i < peer_clist->size; i++) {
 			_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",
 				(unsigned)peer_clist->entry[i]->id[0],
@@ -1418,8 +1418,8 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 			kx = peer_clist->entry[i]->kx_algorithm;
 			cred_type = _gnutls_map_kx_get_cred(kx, 1);
 
-			for (j = 0; j < session->internals.priorities.cs.size; j++) {
-				if (session->internals.priorities.cs.entry[j] == peer_clist->entry[i]) {
+			for (j = 0; j < session->internals.priorities->cs.size; j++) {
+				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
 					KX_CHECKS(kx, cred_type, continue);
 
 					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
@@ -1435,8 +1435,8 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 			}
 		}
 	} else {
-		for (j = 0; j < session->internals.priorities.cs.size; j++) {
-			VERSION_CHECK(session->internals.priorities.cs.entry[j]);
+		for (j = 0; j < session->internals.priorities->cs.size; j++) {
+			VERSION_CHECK(session->internals.priorities->cs.entry[j]);
 
 			for (i = 0; i < peer_clist->size; i++) {
 				_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",
@@ -1444,7 +1444,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 					(unsigned)peer_clist->entry[i]->id[1],
 					peer_clist->entry[i]->name);
 
-				if (session->internals.priorities.cs.entry[j] == peer_clist->entry[i]) {
+				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
 					kx = peer_clist->entry[i]->kx_algorithm;
 					cred_type = _gnutls_map_kx_get_cred(kx, 1);
 
@@ -1495,10 +1495,10 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 	unsigned cipher_suites_size = 0;
 	size_t init_length = cdata->length;
 
-	for (j = 0; j < session->internals.priorities.cs.size; j++) {
-		CLIENT_VERSION_CHECK(vmin, vmax, session->internals.priorities.cs.entry[j]);
+	for (j = 0; j < session->internals.priorities->cs.size; j++) {
+		CLIENT_VERSION_CHECK(vmin, vmax, session->internals.priorities->cs.entry[j]);
 
-		kx = session->internals.priorities.cs.entry[j]->kx_algorithm;
+		kx = session->internals.priorities->cs.entry[j]->kx_algorithm;
 		cred_type = _gnutls_map_kx_get_cred(kx, 0);
 
 		if (!session->internals.premaster_set && _gnutls_get_cred(session, cred_type) == NULL)
@@ -1507,11 +1507,11 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 		KX_SRP_CHECKS(kx, continue);
 
 		_gnutls_debug_log("Keeping ciphersuite %.2x.%.2x (%s)\n",
-				(unsigned)session->internals.priorities.cs.entry[j]->id[0],
-				(unsigned)session->internals.priorities.cs.entry[j]->id[1],
-				session->internals.priorities.cs.entry[j]->name);
-		cipher_suites[cipher_suites_size] = session->internals.priorities.cs.entry[j]->id[0];
-		cipher_suites[cipher_suites_size + 1] = session->internals.priorities.cs.entry[j]->id[1];
+				(unsigned)session->internals.priorities->cs.entry[j]->id[0],
+				(unsigned)session->internals.priorities->cs.entry[j]->id[1],
+				session->internals.priorities->cs.entry[j]->name);
+		cipher_suites[cipher_suites_size] = session->internals.priorities->cs.entry[j]->id[0];
+		cipher_suites[cipher_suites_size + 1] = session->internals.priorities->cs.entry[j]->id[1];
 		cipher_suites_size += 2;
 
 		if (cipher_suites_size >= MAX_CIPHERSUITE_SIZE*2)
@@ -1531,7 +1531,7 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 	}
 #endif
 
-	if (session->internals.priorities.fallback) {
+	if (session->internals.priorities->fallback) {
 		cipher_suites[cipher_suites_size] = GNUTLS_FALLBACK_SCSV_MAJOR;
 		cipher_suites[cipher_suites_size + 1] = GNUTLS_FALLBACK_SCSV_MINOR;
 		cipher_suites_size += 2;

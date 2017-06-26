@@ -1423,7 +1423,7 @@ unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
 		return 0;
 	}
 
-	if (unlikely(session->internals.priorities.allow_server_key_usage_violation)) {
+	if (unlikely(session->internals.priorities->allow_server_key_usage_violation)) {
 		key_usage = 0;
 	} else {
 		key_usage = pubkey->key_usage;

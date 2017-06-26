@@ -64,12 +64,12 @@ int _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 
 static inline int _gnutls_dh_get_min_prime_bits(gnutls_session_t session)
 {
-	if (session->internals.priorities.dh_prime_bits != 0)
-		return session->internals.priorities.dh_prime_bits;
+	if (session->internals.dh_prime_bits != 0)
+		return session->internals.dh_prime_bits;
 	else
 		return gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH,
 						   session->internals.
-						   priorities.level);
+						   priorities->level);
 }
 
 void _gnutls_handshake_internal_state_clear(gnutls_session_t);

@@ -57,7 +57,7 @@ _gnutls_dumbfw_send_params(gnutls_session_t session,
 	unsigned pad_size;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER ||
-	    session->internals.priorities.dumbfw == 0 ||
+	    session->internals.dumbfw == 0 ||
 	    IS_DTLS(session) != 0 ||
 	    (extdata->length < 256 || extdata->length >= 512)) {
 		return 0;

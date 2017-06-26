@@ -533,25 +533,64 @@ static void prio_add(priority_st * priority_list, unsigned int algo)
  * Sets the priorities to use on the ciphers, key exchange methods,
  * and macs.
  *
+ * This is identical to calling gnutls_priority_set2() with
+ * %GNUTLS_PRIORITY_FLAG_COPY.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
+{
+	return gnutls_priority_set2(session, priority, GNUTLS_PRIORITY_FLAG_COPY);
+}
+
+/**
+ * gnutls_priority_set2:
+ * @session: is a #gnutls_session_t type.
+ * @priority: is a #gnutls_priority_t type.
+ * @flags: zero or %GNUTLS_PRIORITY_FLAG_COPY
+ *
+ * Sets the priorities to use on the ciphers, key exchange methods,
+ * and macs.
+ *
+ * Unless %GNUTLS_PRIORITY_FLAG_COPY is specified, the @priority reference
+ * must remain valid for the lifetime of the session.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
+int
+gnutls_priority_set2(gnutls_session_t session, gnutls_priority_t priority, unsigned int flags)
 {
 	if (priority == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_CIPHER_SUITES;
 	}
 
-	memcpy(&session->internals.priorities, priority,
-	       sizeof(struct gnutls_priority_st));
+	if (session->internals.deinit_priorities &&
+	    session->internals.priorities)
+		gnutls_priority_deinit(session->internals.priorities);
+
+	if (flags & GNUTLS_PRIORITY_FLAG_COPY) {
+		session->internals.priorities = gnutls_malloc(sizeof(*session->internals.priorities));
+		if (session->internals.priorities == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		/* it is fine to use memcpy() here since we are only storing
+		 * values and pointers to constant static data. */
+		memcpy(session->internals.priorities, priority, sizeof(*priority));
+
+		session->internals.deinit_priorities = 1;
+	} else {
+		session->internals.priorities = priority;
+		session->internals.deinit_priorities = 0;
+	}
 
 	/* set the current version to the first in the chain.
 	 * This will be overridden later.
 	 */
-	if (session->internals.priorities.protocol.algorithms > 0) {
+	if (session->internals.priorities->protocol.algorithms > 0) {
 		if (_gnutls_set_current_version(session,
-					    session->internals.priorities.
+					    session->internals.priorities->
 					    protocol.priority[0]) < 0) {
 			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 		}
@@ -562,11 +601,22 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SESSION_TICKET);
 	}
 
-	if (session->internals.priorities.protocol.algorithms == 0 ||
-	    session->internals.priorities.cs.size == 0)
+	if (session->internals.priorities->protocol.algorithms == 0 ||
+	    session->internals.priorities->cs.size == 0)
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	ADD_PROFILE_VFLAGS(session, priority->additional_verify_flags);
+
+	/* mirror variables */
+#undef COPY_TO_INTERNALS
+#define COPY_TO_INTERNALS(xx) session->internals.xx = priority->_##xx
+	COPY_TO_INTERNALS(allow_large_records);
+	COPY_TO_INTERNALS(no_etm);
+	COPY_TO_INTERNALS(no_ext_master_secret);
+	COPY_TO_INTERNALS(allow_key_usage_violation);
+	COPY_TO_INTERNALS(allow_wrong_pms);
+	COPY_TO_INTERNALS(dumbfw);
+	COPY_TO_INTERNALS(dh_prime_bits);
 
 	return 0;
 }
@@ -744,7 +794,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 
 static void enable_compat(gnutls_priority_t c)
 {
-	ENABLE_COMPAT(c);
+	ENABLE_PRIO_COMPAT(c);
 }
 static void enable_server_key_usage_violations(gnutls_priority_t c)
 {
@@ -752,7 +802,7 @@ static void enable_server_key_usage_violations(gnutls_priority_t c)
 }
 static void enable_dumbfw(gnutls_priority_t c)
 {
-	c->dumbfw = 1;
+	c->_dumbfw = 1;
 }
 static void enable_no_extensions(gnutls_priority_t c)
 {
@@ -760,11 +810,11 @@ static void enable_no_extensions(gnutls_priority_t c)
 }
 static void enable_no_ext_master_secret(gnutls_priority_t c)
 {
-	c->no_ext_master_secret = 1;
+	c->_no_ext_master_secret = 1;
 }
 static void enable_no_etm(gnutls_priority_t c)
 {
-	c->no_etm = 1;
+	c->_no_etm = 1;
 }
 static void enable_no_tickets(gnutls_priority_t c)
 {
@@ -1500,6 +1550,9 @@ gnutls_priority_set_direct(gnutls_session_t session,
 		gnutls_assert();
 		return ret;
 	}
+
+	/* ensure this priority is deinitialized with the session */
+	session->internals.deinit_priorities = 1;
 
 	gnutls_priority_deinit(prio);
 

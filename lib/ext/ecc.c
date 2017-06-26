@@ -162,11 +162,11 @@ _gnutls_supported_ecc_send_params(gnutls_session_t session,
 	/* this extension is only being sent on client side */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-		if (session->internals.priorities.supported_ecc.
+		if (session->internals.priorities->supported_ecc.
 		    algorithms > 0) {
 
 			len =
-			    session->internals.priorities.supported_ecc.
+			    session->internals.priorities->supported_ecc.
 			    algorithms;
 
 			/* this is a vector!
@@ -180,7 +180,7 @@ _gnutls_supported_ecc_send_params(gnutls_session_t session,
 			for (i = 0; i < len; i++) {
 				p = _gnutls_ecc_curve_get_tls_id(session->
 								 internals.
-								 priorities.supported_ecc.
+								 priorities->supported_ecc.
 								 priority
 								 [i]);
 				ret =
@@ -264,7 +264,7 @@ _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
 	    && !_gnutls_session_is_ecc(session))
 		return 0;
 
-	if (session->internals.priorities.supported_ecc.algorithms > 0) {
+	if (session->internals.priorities->supported_ecc.algorithms > 0) {
 		ret = _gnutls_buffer_append_data(extdata, p, 2);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -284,12 +284,12 @@ _gnutls_session_supports_ecc_curve(gnutls_session_t session,
 {
 	unsigned i;
 
-	if (session->internals.priorities.supported_ecc.algorithms > 0) {
+	if (session->internals.priorities->supported_ecc.algorithms > 0) {
 		for (i = 0;
 		     i <
-		     session->internals.priorities.supported_ecc.
+		     session->internals.priorities->supported_ecc.
 		     algorithms; i++) {
-			if (session->internals.priorities.supported_ecc.
+			if (session->internals.priorities->supported_ecc.
 			    priority[i] == ecc_type)
 				return 0;
 		}

@@ -66,7 +66,7 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		gnutls_ext_priv_data_t epriv;
 
-		if (session->internals.priorities.no_etm != 0)
+		if (session->internals.no_etm != 0)
 			return 0;
 
 		epriv = (void*)(intptr_t)1;
@@ -99,12 +99,12 @@ static int
 _gnutls_ext_etm_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
-	if (session->internals.priorities.no_etm != 0)
+	if (session->internals.no_etm != 0)
 		return 0;
 
 	/* this function sends the client extension data */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if (session->internals.priorities.have_cbc != 0)
+		if (session->internals.priorities->have_cbc != 0)
 			return GNUTLS_E_INT_RET_0;
 		else
 			return 0;

@@ -104,8 +104,8 @@ static unsigned have_srp_ciphersuites(gnutls_session_t session)
 	unsigned j;
 	unsigned kx;
 
-	for (j = 0; j < session->internals.priorities.cs.size; j++) {
-		kx = session->internals.priorities.cs.entry[j]->kx_algorithm;
+	for (j = 0; j < session->internals.priorities->cs.size; j++) {
+		kx = session->internals.priorities->cs.entry[j]->kx_algorithm;
 		if (kx == GNUTLS_KX_SRP || kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS)
 			return 1;
 	}

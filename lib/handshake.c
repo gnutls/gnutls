@@ -842,7 +842,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 	for (i = 0; i < datalen; i += 2) {
 #ifdef ENABLE_SSL3 /* No need to support certain SCSV's without SSL 3.0 */
 		/* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
-		if (session->internals.priorities.sr != SR_DISABLED &&
+		if (session->internals.priorities->sr != SR_DISABLED &&
 		    data[i] == GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR &&
 		    data[i + 1] == GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR) {
 			_gnutls_handshake_log
@@ -1341,10 +1341,10 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	int ret;
 	const gnutls_cipher_suite_entry_st *selected = NULL;
 
-	for (j = 0; j < session->internals.priorities.cs.size; j++) {
-		if (suite[0] == session->internals.priorities.cs.entry[j]->id[0] &&
-		    suite[1] == session->internals.priorities.cs.entry[j]->id[1]) {
-			selected = session->internals.priorities.cs.entry[j];
+	for (j = 0; j < session->internals.priorities->cs.size; j++) {
+		if (suite[0] == session->internals.priorities->cs.entry[j]->id[0] &&
+		    suite[1] == session->internals.priorities->cs.entry[j]->id[1]) {
+			selected = session->internals.priorities->cs.entry[j];
 			break;
 		}
 	}
@@ -1661,7 +1661,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		if (_gnutls_set_current_version(session, hver->id) < 0)
 			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
-		if (session->internals.priorities.min_record_version != 0) {
+		if (session->internals.priorities->min_record_version != 0) {
 			/* Advertize the lowest supported (SSL 3.0) record packet
 			 * version in record packets during the handshake.
 			 * That is to avoid confusing implementations
@@ -1726,7 +1726,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		if (!session->internals.initial_negotiation_completed &&
 		    session->security_parameters.entity == GNUTLS_CLIENT &&
 		    (hver->id == GNUTLS_SSL3 &&
-		     session->internals.priorities.no_extensions != 0)) {
+		     session->internals.priorities->no_extensions != 0)) {
 			add_sr_scsv = 1;
 		}
 #endif
@@ -1746,7 +1746,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		/* Generate and copy TLS extensions.
 		 */
-		if (session->internals.priorities.no_extensions == 0) {
+		if (session->internals.priorities->no_extensions == 0) {
 			if (_gnutls_version_has_extensions(hver)) {
 				type = GNUTLS_EXT_ANY;
 			} else {
@@ -2186,7 +2186,8 @@ int gnutls_handshake(gnutls_session_t session)
 
 	if (STATE == STATE0) {
 		/* first call */
-		if (session->internals.priorities.protocol.algorithms == 0)
+		if (session->internals.priorities == NULL ||
+		    session->internals.priorities->cs.size == 0)
 			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 		session->internals.used_exts_size = 0;
