@@ -1075,7 +1075,7 @@ specific algorithm details, as the priority strings are not constant between
 gnutls versions (they are periodically updated to account for cryptographic
 advances while providing compatibility with old clients and servers).
 
-@showfuncB{gnutls_priority_set_direct,gnutls_priority_set}
+@showfuncB{gnutls_priority_set_direct,gnutls_priority_set2}
 
 @float Table,tab:prio-keywords
 @multitable @columnfractions .20 .70

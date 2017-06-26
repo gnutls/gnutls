@@ -109,7 +109,7 @@ int main(void)
         client_len = sizeof(sa_cli);
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
-                gnutls_priority_set(session, priority_cache);
+                gnutls_priority_set2(session, priority_cache, 0);
                 gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
                                        x509_cred);
                 gnutls_credentials_set(session, GNUTLS_CRD_PSK, psk_cred);

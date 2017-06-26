@@ -174,7 +174,7 @@ int main(void)
                         continue;
 
                 gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-                gnutls_priority_set(session, priority_cache);
+                gnutls_priority_set2(session, priority_cache, 0);
                 gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
                                        x509_cred);
 

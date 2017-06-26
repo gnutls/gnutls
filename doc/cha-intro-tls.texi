@@ -273,7 +273,7 @@ solves the problem by using minimal padding.
 If you implement an application that has a configuration file, we
 recommend that you make it possible for users or administrators to
 specify a GnuTLS protocol priority string, which is used by your
-application via @funcref{gnutls_priority_set}.  To allow the best
+application via @funcref{gnutls_priority_set2}.  To allow the best
 flexibility, make it possible to have a different priority string for
 different incoming IP addresses.
 
