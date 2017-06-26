@@ -66,7 +66,7 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_RSA_SHA224,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA224,
-	 .aid = {{3, 1}}},
+	 .aid = TLS_SIGN_AID_UNKNOWN},
 	{.name = "RSA-SHA256",
 	 .oid = SIG_RSA_SHA256_OID, 
 	 .id = GNUTLS_SIGN_RSA_SHA256,
@@ -111,7 +111,7 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_DSA_SHA224,
 	 .pk = GNUTLS_PK_DSA,
 	 .hash = GNUTLS_DIG_SHA224,
-	 .aid = {{3, 2}}},
+	 .aid = TLS_SIGN_AID_UNKNOWN},
 	{.name = "DSA-SHA256",
 	 .oid = SIG_DSA_SHA256_OID, 
 	 .id = GNUTLS_SIGN_DSA_SHA256,
@@ -151,7 +151,7 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_ECDSA_SHA224,
 	 .pk = GNUTLS_PK_EC,
 	 .hash = GNUTLS_DIG_SHA224,
-	 .aid = {{3, 3}}},
+	 .aid = TLS_SIGN_AID_UNKNOWN},
 	{.name = "ECDSA-SHA256",
 	 .oid = "1.2.840.10045.4.3.2", 
 	 .id = GNUTLS_SIGN_ECDSA_SHA256,
@@ -302,6 +302,7 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA512,
 	 .aid = {{8, 6}}},
+
 	 /* The hash algorithm here is set to be SHA512, although that is
 	  * an internal detail of Ed25519; we set it, because CMS/PKCS#7 requires
 	  * that mapping. */
