@@ -110,7 +110,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 crlverify mini-dtls-discard init_fds mini-record-failure \
 	 tls-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
-	 mini-dtls-record-asym key-import-export \
+	 mini-dtls-record-asym key-import-export priority-set priority-set2 \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
