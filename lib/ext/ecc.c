@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -20,8 +21,8 @@
  *
  */
 
-/* This file contains the code the Certificate Type TLS extension.
- * This extension is currently gnutls specific.
+/* This file contains the code the Negotiated groups TLS 1.3, or
+ * Elliptic curves TLS 1.2 extension.
  */
 
 #include "gnutls_int.h"
@@ -49,7 +50,7 @@ static int _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
 						extdata);
 
 const extension_entry_st ext_mod_supported_ecc = {
-	.name = "Supported curves",
+	.name = "Negotiated Groups",
 	.type = GNUTLS_EXTENSION_SUPPORTED_ECC,
 	.parse_type = GNUTLS_EXT_TLS,
 
