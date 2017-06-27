@@ -1337,19 +1337,19 @@ _gnutls_recv_handshake(gnutls_session_t session,
 static int
 set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 {
-	unsigned found = 0;
 	unsigned j;
 	int ret;
+	const gnutls_cipher_suite_entry_st *selected = NULL;
 
 	for (j = 0; j < session->internals.priorities.cs.size; j++) {
 		if (suite[0] == session->internals.priorities.cs.entry[j]->id[0] &&
 		    suite[1] == session->internals.priorities.cs.entry[j]->id[1]) {
-			found = 1;
+			selected = session->internals.priorities.cs.entry[j];
 			break;
 		}
 	}
 
-	if (!found) {
+	if (!selected) {
 		gnutls_assert();
 		_gnutls_handshake_log
 		    ("HSK[%p]: unsupported cipher suite %.2X.%.2X was negotiated\n",
@@ -1358,15 +1358,13 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 		return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 	}
 
-	ret = _gnutls_set_cipher_suite(session, suite);
+	ret = _gnutls_set_cipher_suite2(session, selected);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_handshake_log("HSK[%p]: Selected cipher suite: %s\n",
 			      session,
-			      _gnutls_cipher_suite_get_name
-			      (session->security_parameters.cipher_suite));
-
+			      selected->name);
 
 	/* check if the credentials (username, public key etc.) are ok.
 	 * Actually checks if they exist.
@@ -1386,9 +1384,7 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	 * handshake functions are read from there;
 	 */
 	session->internals.auth_struct =
-	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (session->security_parameters.
-				    cipher_suite));
+	    _gnutls_kx_auth_struct(selected->kx_algorithm);
 
 	if (session->internals.auth_struct == NULL) {
 
