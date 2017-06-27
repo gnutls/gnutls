@@ -42,6 +42,7 @@ typedef struct gnutls_psk_server_credentials_st {
 	/* For DHE_PSK */
 	gnutls_dh_params_t dh_params;
 	unsigned int deinit_dh_params;
+	gnutls_sec_param_t dh_sec_param;
 	/* this callback is used to retrieve the DH or RSA
 	 * parameters.
 	 */

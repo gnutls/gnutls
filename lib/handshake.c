@@ -875,9 +875,9 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 		}
 	}
 
-	selected = _gnutls_figure_common_ciphersuite(session, &peer_clist);
-	if (selected == NULL) {
-		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
+	ret = _gnutls_figure_common_ciphersuite(session, &peer_clist, &selected);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
 	}
 
 	_gnutls_handshake_log

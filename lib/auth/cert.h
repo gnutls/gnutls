@@ -45,6 +45,7 @@ typedef struct {
 typedef struct gnutls_certificate_credentials_st {
 	gnutls_dh_params_t dh_params;
 	unsigned deinit_dh_params; /* if the internal values are set */
+	gnutls_sec_param_t dh_sec_param; /* used in RFC7919 negotiation */
 
 	/* this callback is used to retrieve the DH or RSA
 	 * parameters.

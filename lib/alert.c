@@ -301,6 +301,7 @@ int gnutls_error_to_alert(int err, int *level)
 		break;
 	case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
 	case GNUTLS_E_SESSION_USER_ID_CHANGED:
+	case GNUTLS_E_INSUFFICIENT_SECURITY:
 		ret = GNUTLS_A_INSUFFICIENT_SECURITY;
 		_level = GNUTLS_AL_FATAL;
 		break;

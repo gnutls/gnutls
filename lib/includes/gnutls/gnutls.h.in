@@ -836,6 +836,40 @@ typedef enum {
 	GNUTLS_ECC_CURVE_MAX = GNUTLS_ECC_CURVE_ED25519
 } gnutls_ecc_curve_t;
 
+/**
+ * gnutls_group_t:
+ * @GNUTLS_GROUP_INVALID: Indicates unknown/invalid group
+ * @GNUTLS_GROUP_SECP192R1: the SECP192R1 curve group (legacy, only for TLS 1.2 compatibility)
+ * @GNUTLS_GROUP_SECP224R1: the SECP224R1 curve group (legacy, only for TLS 1.2 compatibility)
+ * @GNUTLS_GROUP_SECP256R1: the SECP256R1 curve group
+ * @GNUTLS_GROUP_SECP384R1: the SECP384R1 curve group
+ * @GNUTLS_GROUP_SECP521R1: the SECP521R1 curve group
+ * @GNUTLS_GROUP_X25519: the X25519 curve group
+ * @GNUTLS_GROUP_FFDHE2048: the FFDHE2048 group
+ * @GNUTLS_GROUP_FFDHE3072: the FFDHE3072 group
+ * @GNUTLS_GROUP_FFDHE4096: the FFDHE4096 group
+ * @GNUTLS_GROUP_FFDHE8192: the FFDHE8192 group
+ *
+ * Enumeration of supported groups. It is intended to be backwards
+ * compatible with the enumerations in %gnutls_ecc_curve_t for the groups
+ * which are valid elliptic curves.
+ */
+typedef enum {
+	GNUTLS_GROUP_INVALID = 0,
+	GNUTLS_GROUP_SECP192R1 = GNUTLS_ECC_CURVE_SECP192R1,
+	GNUTLS_GROUP_SECP224R1 = GNUTLS_ECC_CURVE_SECP224R1,
+	GNUTLS_GROUP_SECP256R1 = GNUTLS_ECC_CURVE_SECP256R1,
+	GNUTLS_GROUP_SECP384R1 = GNUTLS_ECC_CURVE_SECP384R1,
+	GNUTLS_GROUP_SECP521R1 = GNUTLS_ECC_CURVE_SECP521R1,
+	GNUTLS_GROUP_X25519 = GNUTLS_ECC_CURVE_X25519,
+
+	GNUTLS_GROUP_FFDHE2048 = 256,
+	GNUTLS_GROUP_FFDHE3072,
+	GNUTLS_GROUP_FFDHE4096,
+	GNUTLS_GROUP_FFDHE8192,
+	GNUTLS_GROUP_MAX = GNUTLS_GROUP_FFDHE8192,
+} gnutls_group_t;
+
 /* macros to allow specifying a specific curve in gnutls_privkey_generate()
  * and gnutls_x509_privkey_generate() */
 #define GNUTLS_CURVE_TO_BITS(curve) (unsigned int)(((unsigned int)1<<31)|((unsigned int)(curve)))
@@ -961,9 +995,14 @@ const char *
 const char *
 	gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
 
+const char *
+	gnutls_group_get_name(gnutls_group_t curve) __GNUTLS_CONST__;
+
 int
 	gnutls_ecc_curve_get_size(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
 gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
+
+gnutls_group_t gnutls_group_get(gnutls_session_t session);
 
 /* get information on the current session */
 gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session);
@@ -1050,6 +1089,7 @@ gnutls_sign_algorithm_t
 	gnutls_sign_get_id(const char *name) __GNUTLS_CONST__;
 gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)  __GNUTLS_CONST__;
 gnutls_pk_algorithm_t gnutls_ecc_curve_get_pk(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
+gnutls_group_t gnutls_group_get_id(const char *name);
 
 gnutls_digest_algorithm_t
 	gnutls_oid_to_digest(const char *oid)  __GNUTLS_CONST__;
@@ -1065,6 +1105,8 @@ gnutls_ecc_curve_t
   /* list supported algorithms */
 const gnutls_ecc_curve_t *
 	gnutls_ecc_curve_list(void)  __GNUTLS_PURE__;
+const gnutls_group_t *
+	gnutls_group_list(void)  __GNUTLS_PURE__;
 const gnutls_cipher_algorithm_t *
 	gnutls_cipher_list(void) __GNUTLS_PURE__;
 const gnutls_mac_algorithm_t *
@@ -1382,6 +1424,9 @@ int gnutls_priority_protocol_list(gnutls_priority_t pcache,
 				  const unsigned int **list);
 int gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
 				   const unsigned int **list);
+int
+gnutls_priority_group_list(gnutls_priority_t pcache,
+			   const unsigned int **list);
 
 int gnutls_priority_kx_list(gnutls_priority_t pcache,
 			    const unsigned int **list);

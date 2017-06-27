@@ -252,18 +252,25 @@ bool _gnutls_kx_allows_false_start(gnutls_session_t session)
 	GNUTLS_KX_ALG_LOOP(ret = p->false_start; needs_dh = p->needs_dh_params);
 
 	if (ret != 0) {
+		const gnutls_group_entry_st *e;
+
+		e = _gnutls_id_to_group(session->security_parameters.group);
+
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		if (needs_dh != 0) {
 			bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_HIGH);
 			/* check whether sizes are sufficient */
-			if (gnutls_dh_get_prime_bits(session) < bits)
+			if (e && e->prime) {
+				if (e->prime->size*8 < (unsigned)bits)
+					ret = 0;
+			} else if (gnutls_dh_get_prime_bits(session) < bits)
 				ret = 0;
 		} else 
 #endif
 		if (algorithm == GNUTLS_KX_ECDHE_RSA || algorithm == GNUTLS_KX_ECDHE_ECDSA) {
 			bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_EC, GNUTLS_SEC_PARAM_HIGH);
 
-			if (gnutls_ecc_curve_get_size(session->security_parameters.ecc_curve) * 8 < bits)
+			if (e != NULL && gnutls_ecc_curve_get_size(e->curve) * 8 < bits)
 				ret = 0;
 		}
 	}

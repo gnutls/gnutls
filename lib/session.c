@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -25,6 +25,7 @@
 #include "debug.h"
 #include <session_pack.h>
 #include <datum.h>
+#include "state.h"
 
 /**
  * gnutls_session_get_data:
@@ -274,7 +275,8 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	unsigned type;
 	char kx_name[64];
 	char proto_name[32];
-	const char *curve_name = NULL;
+	char _group_name[24];
+	const char *group_name = NULL;
 	unsigned dh_bits = 0;
 	unsigned mac_id;
 	unsigned sign_algo;
@@ -284,18 +286,14 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 		return NULL;
 
 	kx = session->security_parameters.kx_algorithm;
-
-	if (kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK ||
-	    kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA) {
-		curve_name =
-		    gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
-					      (session));
+	group_name = gnutls_group_get_name(_gnutls_session_group_get(session));
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
-	} else if (kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK
-		   || kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
+	if (group_name == NULL && _gnutls_kx_is_dhe(kx)) {
 		dh_bits = gnutls_dh_get_prime_bits(session);
-#endif
+		snprintf(_group_name, sizeof(_group_name), "CUSTOM%u", dh_bits);
+		group_name = _group_name;
 	}
+#endif
 
 	/* Key exchange    - Signature algorithm */
 	/* DHE-3072        - RSA-PSS-2048        */
@@ -310,16 +308,16 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 		    kx == GNUTLS_KX_ECDHE_PSK) {
 			if (sign_str)
 				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
-					 curve_name, sign_str);
+					 group_name, sign_str);
 			else
 				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)",
-					 curve_name);
+					 group_name);
 		} else if (kx == GNUTLS_KX_DHE_DSS || kx == GNUTLS_KX_DHE_RSA || 
 		    kx == GNUTLS_KX_DHE_PSK) {
 			if (sign_str)
-				snprintf(kx_name, sizeof(kx_name), "(DHE-%u)-(%s)", dh_bits, sign_str);
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)-(%s)", group_name, sign_str);
 			else
-				snprintf(kx_name, sizeof(kx_name), "(DHE-%u)", dh_bits);
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)", group_name);
 		} else if (kx == GNUTLS_KX_RSA) {
 			/* Possible enhancement: include the certificate bits */
 			snprintf(kx_name, sizeof(kx_name), "(RSA)");

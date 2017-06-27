@@ -28,7 +28,7 @@ extern const extension_entry_st ext_mod_supported_ecc;
 extern const extension_entry_st ext_mod_supported_ecc_pf;
 
 int
-_gnutls_session_supports_ecc_curve(gnutls_session_t session,
-				   unsigned int ecc_type);
+_gnutls_session_supports_group(gnutls_session_t session,
+				unsigned int group);
 
 #endif

@@ -54,7 +54,6 @@ void _gnutls_free_dh_info(dh_info_st * dh)
 int
 _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 				 uint8_t * data, size_t _data_size,
-				 bigint_t g, bigint_t p,
 				 gnutls_datum_t * psk_key)
 {
 	uint16_t n_Y;
@@ -178,31 +177,6 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 	return ret;
 }
 
-int _gnutls_set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
-				unsigned q_bits)
-{
-	/* just in case we are resuming a session */
-	gnutls_pk_params_release(&session->key.dh_params);
-
-	gnutls_pk_params_init(&session->key.dh_params);
-
-	session->key.dh_params.params[DH_G] = _gnutls_mpi_copy(g);
-	if (session->key.dh_params.params[DH_G] == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	
-	session->key.dh_params.params[DH_P] = _gnutls_mpi_copy(p);
-	if (session->key.dh_params.params[DH_P] == NULL) {
-		_gnutls_mpi_release(&session->key.dh_params.params[DH_G]);
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-	}
-
-	session->key.dh_params.params_nr = 3; /* include empty q */
-	session->key.dh_params.algo = GNUTLS_PK_DH;
-	session->key.dh_params.flags = q_bits;
-	
-	return 0;
-}
-
 /* Returns the bytes parsed */
 int
 _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
@@ -214,7 +188,9 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	uint8_t *data_g;
 	uint8_t *data_Y;
 	int i, bits, ret, p_bits;
+	unsigned j;
 	ssize_t data_size = _data_size;
+	unsigned used_ffdhe = 0;
 	
 	/* just in case we are resuming a session */
 	gnutls_pk_params_release(&session->key.dh_params);
@@ -255,6 +231,31 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
+	/* if we are doing RFC7919 */
+	if (session->internals.priorities->groups.have_ffdhe != 0) {
+		/* verify whether the received parameters match the advertised, otherwise
+		 * log that. */
+		for (j=0;j<session->internals.priorities->groups.size;j++) {
+			if (session->internals.priorities->groups.entry[j]->generator &&
+			    session->internals.priorities->groups.entry[j]->generator->size == n_g &&
+			    session->internals.priorities->groups.entry[j]->prime->size == n_p &&
+			    memcmp(session->internals.priorities->groups.entry[j]->generator->data,
+				   data_g, n_g) == 0 &&
+			    memcmp(session->internals.priorities->groups.entry[j]->prime->data,
+				   data_p, n_p) == 0) {
+
+				used_ffdhe = 1;
+				_gnutls_session_group_set(session, session->internals.priorities->groups.entry[j]);
+				session->key.dh_params.flags = *session->internals.priorities->groups.entry[j]->q_bits;
+				break;
+			}
+		}
+
+		if (!used_ffdhe) {
+			_gnutls_audit_log(session, "FFDHE groups advertised, but server didn't support it; falling back to server's choice\n");
+		}
+	}
+
 	if (_gnutls_mpi_init_scan_nz(&session->key.dh_params.params[DH_G], data_g, _n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -270,34 +271,36 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	session->key.dh_params.params_nr = 3; /* include empty q */
 	session->key.dh_params.algo = GNUTLS_PK_DH;
 
-	bits = _gnutls_dh_get_min_prime_bits(session);
-	if (bits < 0) {
-		gnutls_assert();
-		return bits;
+	if (used_ffdhe == 0) {
+		bits = _gnutls_dh_get_min_prime_bits(session);
+		if (bits < 0) {
+			gnutls_assert();
+			return bits;
+		}
+
+		p_bits = _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]);
+		if (p_bits < bits) {
+			/* the prime used by the peer is not acceptable
+			 */
+			gnutls_assert();
+			_gnutls_debug_log
+			    ("Received a prime of %u bits, limit is %u\n",
+			     (unsigned) _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]),
+			     (unsigned) bits);
+			return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
+		}
+
+		if (p_bits >= DEFAULT_MAX_VERIFY_BITS) {
+			gnutls_assert();
+			_gnutls_debug_log
+			    ("Received a prime of %u bits, limit is %u\n",
+			     (unsigned) p_bits,
+			     (unsigned) DEFAULT_MAX_VERIFY_BITS);
+			return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
+		}
 	}
 
-	p_bits = _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]);
-	if (p_bits < bits) {
-		/* the prime used by the peer is not acceptable
-		 */
-		gnutls_assert();
-		_gnutls_debug_log
-		    ("Received a prime of %u bits, limit is %u\n",
-		     (unsigned) _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]),
-		     (unsigned) bits);
-		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
-	}
-
-	if (p_bits >= DEFAULT_MAX_VERIFY_BITS) {
-		gnutls_assert();
-		_gnutls_debug_log
-		    ("Received a prime of %u bits, limit is %u\n",
-		     (unsigned) p_bits,
-		     (unsigned) DEFAULT_MAX_VERIFY_BITS);
-		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
-	}
-
-	_gnutls_dh_set_group(session, session->key.dh_params.params[DH_G],
+	_gnutls_dh_save_group(session, session->key.dh_params.params[DH_G],
 			     session->key.dh_params.params[DH_P]);
 	_gnutls_dh_set_peer_public(session, session->key.client_Y);
 

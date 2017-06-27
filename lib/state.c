@@ -58,15 +58,6 @@ void
 _gnutls_rsa_pms_set_version(gnutls_session_t session,
 			    unsigned char major, unsigned char minor);
 
-void
-_gnutls_session_ecc_curve_set(gnutls_session_t session,
-			      gnutls_ecc_curve_t c)
-{
-	_gnutls_handshake_log("HSK[%p]: Selected ECC curve %s (%d)\n",
-			      session, gnutls_ecc_curve_get_name(c), c);
-	session->security_parameters.ecc_curve = c;
-}
-
 /**
  * gnutls_cipher_get:
  * @session: is a #gnutls_session_t type.
@@ -187,23 +178,6 @@ static void deinit_keys(gnutls_session_t session)
 	_gnutls_free_temp_key_datum(&session->key.key);
 }
 
-/* this function deinitializes all the internal parameters stored
- * in a session struct.
- */
-inline static void deinit_internal_params(gnutls_session_t session)
-{
-#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
-	if (session->internals.params.free_dh_params)
-		gnutls_dh_params_deinit(session->internals.params.
-					dh_params);
-#endif
-
-	_gnutls_handshake_hash_buffers_clear(session);
-
-	memset(&session->internals.params, 0,
-	       sizeof(session->internals.params));
-}
-
 /* An internal version of _gnutls_handshake_internal_state_clear(),
  * it will not attempt to deallocate, only initialize */
 static void handshake_internal_state_clear1(gnutls_session_t session)
@@ -224,6 +198,8 @@ static void handshake_internal_state_clear1(gnutls_session_t session)
 	session->internals.handshake_suspicious_loops = 0;
 	session->internals.dtls.hsk_read_seq = 0;
 	session->internals.dtls.hsk_write_seq = 0;
+
+	session->internals.have_ffdhe = 0;
 }
 
 /* This function will clear all the variables in internals
@@ -234,7 +210,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 {
 	handshake_internal_state_clear1(session);
 
-	deinit_internal_params(session);
+	_gnutls_handshake_hash_buffers_clear(session);
 	deinit_keys(session);
 
 	_gnutls_epoch_gc(session);
@@ -530,7 +506,7 @@ int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits)
 /* Sets the prime and the generator in the auth info structure.
  */
 int
-_gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
+_gnutls_dh_save_group(gnutls_session_t session, bigint_t gen,
 		     bigint_t prime)
 {
 	dh_info_st *dh;
@@ -976,7 +952,34 @@ gnutls_session_channel_binding(gnutls_session_t session,
  **/
 gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 {
-	return _gnutls_session_ecc_curve_get(session);
+	const gnutls_group_entry_st *e;
+
+	e = _gnutls_id_to_group(_gnutls_session_group_get(session));
+	if (e == NULL || e->curve == 0)
+		return 0;
+	return e->curve;
+}
+
+/**
+ * gnutls_group_get:
+ * @session: is a #gnutls_session_t type.
+ *
+ * Returns the currently used group for key exchange. Only valid
+ * when using an elliptic curve or DH ciphersuite.
+ *
+ * Returns: the currently used group, a #gnutls_group_t
+ *   type.
+ *
+ * Since: 3.6.0
+ **/
+gnutls_group_t gnutls_group_get(gnutls_session_t session)
+{
+	const gnutls_group_entry_st *e;
+
+	e = _gnutls_id_to_group(_gnutls_session_group_get(session));
+	if (e == NULL)
+		return 0;
+	return e->id;
 }
 
 /**

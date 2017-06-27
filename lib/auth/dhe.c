@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -84,11 +85,8 @@ const mod_auth_st dhe_dss_auth_struct = {
 static int
 gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
-	bigint_t g, p;
-	const bigint_t *mpis;
 	int ret = 0;
 	gnutls_certificate_credentials_t cred;
-	gnutls_dh_params_t dh_params;
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -97,7 +95,6 @@ gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-
 	if ((ret = _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
 					 sizeof(cert_auth_info_st),
 					 1)) < 0) {
@@ -105,23 +102,11 @@ gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return ret;
 	}
 
-	dh_params =
-	    _gnutls_get_dh_params(cred->dh_params, cred->params_func,
-				  session);
-	mpis = _gnutls_dh_params_to_mpi(dh_params);
-	if (mpis == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
-	}
-
-	p = mpis[0];
-	g = mpis[1];
-
-	_gnutls_dh_set_group(session, g, p);
-
-	ret = _gnutls_set_dh_pk_params(session, g, p, dh_params->q_bits);
-	if (ret < 0)
+	ret =
+	    _gnutls_figure_dh_params(session, cred->dh_params, cred->params_func, cred->dh_sec_param);
+	if (ret < 0) {
 		return gnutls_assert_val(ret);
+	}
 
 	ret =
 	    _gnutls_dh_common_print_server_kx(session, data);
@@ -159,28 +144,6 @@ static int
 proc_dhe_client_kx(gnutls_session_t session, uint8_t * data,
 		   size_t _data_size)
 {
-	gnutls_certificate_credentials_t cred;
-	bigint_t p, g;
-	const bigint_t *mpis;
-	gnutls_dh_params_t dh_params;
-
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
-
-	dh_params =
-	    _gnutls_get_dh_params(cred->dh_params, cred->params_func,
-				  session);
-	mpis = _gnutls_dh_params_to_mpi(dh_params);
-	if (mpis == NULL)
-		return gnutls_assert_val(GNUTLS_E_NO_TEMPORARY_DH_PARAMS);
-
-	p = mpis[0];
-	g = mpis[1];
-
 	return _gnutls_proc_dh_common_client_kx(session, data, _data_size,
-						g, p, NULL);
+						NULL);
 }

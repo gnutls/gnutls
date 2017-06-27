@@ -35,4 +35,5 @@ endif
 noinst_LTLIBRARIES = libgnutls_alg.la
 
 libgnutls_alg_la_SOURCES = cert_types.c ciphers.c ciphersuites.c \
-	ecc.c kx.c mac.c protocols.c publickey.c secparams.c sign.c
+	ecc.c kx.c mac.c protocols.c publickey.c secparams.c sign.c \
+	groups.c

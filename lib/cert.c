@@ -873,6 +873,7 @@ gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
 	}
 
 	res->dh_params = dh_params;
+	res->dh_sec_param = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, _gnutls_mpi_get_nbits(dh_params->params[0]));
 }
 
 
@@ -895,19 +896,7 @@ int
 gnutls_certificate_set_known_dh_params(gnutls_certificate_credentials_t res,
 				       gnutls_sec_param_t sec_param)
 {
-	int ret;
-
-	if (res->deinit_dh_params) {
-		res->deinit_dh_params = 0;
-		gnutls_dh_params_deinit(res->dh_params);
-		res->dh_params = NULL;
-	}
-
-	ret = _gnutls_set_cred_dh_params(&res->dh_params, sec_param);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	res->deinit_dh_params = 1;
+	res->dh_sec_param = sec_param;
 
 	return 0;
 }

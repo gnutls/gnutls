@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -37,12 +38,12 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 int
 _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 				   uint8_t * data, size_t _data_size,
-				   gnutls_ecc_curve_t curve,
+				   gnutls_group_t group,
 				   gnutls_datum_t * psk_key);
 
 int _gnutls_ecdh_common_print_server_kx(gnutls_session_t,
 					gnutls_buffer_st * data,
-					gnutls_ecc_curve_t curve);
+					gnutls_group_t group);
 int _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 				       uint8_t * data, size_t _data_size);
 

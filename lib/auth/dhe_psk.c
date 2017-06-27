@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -184,10 +185,7 @@ gen_dhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 static int
 gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
-	bigint_t g, p;
-	const bigint_t *mpis;
 	int ret;
-	gnutls_dh_params_t dh_params;
 	gnutls_psk_server_credentials_t cred;
 	gnutls_datum_t hint = {NULL, 0};
 
@@ -198,18 +196,6 @@ gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	dh_params =
-	    _gnutls_get_dh_params(cred->dh_params, cred->params_func,
-				  session);
-	mpis = _gnutls_dh_params_to_mpi(dh_params);
-	if (mpis == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
-	}
-
-	p = mpis[0];
-	g = mpis[1];
-
 	if ((ret =
 	     _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
 				   sizeof(psk_auth_info_st), 1)) < 0) {
@@ -217,7 +203,12 @@ gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return ret;
 	}
 
-	_gnutls_dh_set_group(session, g, p);
+	ret =
+	    _gnutls_figure_dh_params(session, cred->dh_params, cred->params_func, cred->dh_sec_param);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	if (cred->hint) {
 		hint.data = (uint8_t *) cred->hint;
@@ -225,10 +216,6 @@ gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	}
 
 	ret = _gnutls_buffer_append_data_prefix(data, 16, hint.data, hint.size);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = _gnutls_set_dh_pk_params(session, g, p, dh_params->q_bits);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -272,7 +259,7 @@ gen_ecdhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return gnutls_assert_val(ret);
 
 	ret = _gnutls_ecdh_common_print_server_kx(session, data,
-						  _gnutls_session_ecc_curve_get
+						  _gnutls_session_group_get
 						  (session));
 	if (ret < 0)
 		gnutls_assert();
@@ -286,9 +273,6 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		       size_t _data_size)
 {
 	int ret;
-	bigint_t p, g;
-	gnutls_dh_params_t dh_params;
-	const bigint_t *mpis;
 	gnutls_datum_t psk_key;
 	gnutls_psk_server_credentials_t cred;
 	psk_auth_info_t info;
@@ -309,18 +293,6 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		gnutls_assert();
 		return ret;
 	}
-
-	dh_params =
-	    _gnutls_get_dh_params(cred->dh_params, cred->params_func,
-				  session);
-	mpis = _gnutls_dh_params_to_mpi(dh_params);
-	if (mpis == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
-	}
-
-	p = mpis[0];
-	g = mpis[1];
 
 	DECR_LEN(data_size, 2);
 	username.size = _gnutls_read_uint16(&data[0]);
@@ -354,7 +326,7 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		return gnutls_assert_val(ret);
 
 	ret = _gnutls_proc_dh_common_client_kx(session, data, data_size,
-					       g, p, &psk_key);
+					       &psk_key);
 
 	_gnutls_free_key_datum(&psk_key);
 
@@ -423,7 +395,7 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		return gnutls_assert_val(ret);
 
 	ret = _gnutls_proc_ecdh_common_client_kx(session, data, data_size,
-						 _gnutls_session_ecc_curve_get
+						 _gnutls_session_group_get
 						 (session), &psk_key);
 
 	_gnutls_free_key_datum(&psk_key);

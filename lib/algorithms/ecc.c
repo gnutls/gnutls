@@ -34,7 +34,6 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .name = "SECP192R1",
 	 .oid = "1.2.840.10045.3.1.1",
 	 .id = GNUTLS_ECC_CURVE_SECP192R1,
-	 .tls_id = 19,
 	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 24,
 	},
@@ -42,7 +41,6 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .name = "SECP224R1",
 	 .oid = "1.3.132.0.33",
 	 .id = GNUTLS_ECC_CURVE_SECP224R1,
-	 .tls_id = 21,
 	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 28,
 	},
@@ -50,7 +48,6 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .name = "SECP256R1",
 	 .oid = "1.2.840.10045.3.1.7",
 	 .id = GNUTLS_ECC_CURVE_SECP256R1,
-	 .tls_id = 23,
 	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 32,
 	},
@@ -58,7 +55,6 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .name = "SECP384R1",
 	 .oid = "1.3.132.0.34",
 	 .id = GNUTLS_ECC_CURVE_SECP384R1,
-	 .tls_id = 24,
 	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 48,
 	},
@@ -66,14 +62,12 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .name = "SECP521R1",
 	 .oid = "1.3.132.0.35",
 	 .id = GNUTLS_ECC_CURVE_SECP521R1,
-	 .tls_id = 25,
 	 .pk = GNUTLS_PK_ECDSA,
 	 .size = 66,
 	},
 	{
 	 .name = "X25519",
 	 .id = GNUTLS_ECC_CURVE_X25519,
-	 .tls_id = 29,
 	 .pk = GNUTLS_PK_ECDH_X25519,
 	 .size = 32,
 	},
@@ -92,22 +86,6 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	{ const gnutls_ecc_curve_entry_st *p; \
 		for(p = ecc_curves; p->name != NULL; p++) { b ; } }
 
-
-/* Returns the TLS id of the given curve
- */
-int _gnutls_tls_id_to_ecc_curve(int num)
-{
-	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
-
-	GNUTLS_ECC_CURVE_LOOP(
-		if (p->tls_id == num && _gnutls_pk_curve_exists(p->id)) {
-			ret = p->id; 
-			break;
-		}
-	);
-
-	return ret;
-}
 
 /**
  * gnutls_ecc_curve_list:
@@ -134,23 +112,6 @@ const gnutls_ecc_curve_t *gnutls_ecc_curve_list(void)
 	}
 
 	return supported_curves;
-}
-
-/* Maps numbers to TLS NamedCurve IDs (RFC4492).
- * Returns a negative number on error.
- */
-int _gnutls_ecc_curve_get_tls_id(gnutls_ecc_curve_t supported_ecc)
-{
-	int ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-
-	GNUTLS_ECC_CURVE_LOOP(
-		if (p->id == supported_ecc) {
-			ret = p->tls_id; 
-			break;
-		}
-	);
-
-	return ret;
 }
 
 /**

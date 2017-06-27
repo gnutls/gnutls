@@ -1165,6 +1165,11 @@ GNUTLS_3_4
 	gnutls_privkey_sign_hash2;
 	gnutls_privkey_sign_data2;
 	gnutls_sign_is_secure2;
+	gnutls_group_get_name;
+	gnutls_group_get_id;
+	gnutls_group_list;
+	gnutls_group_get;
+	gnutls_priority_group_list;
  local:
 	*;
 };

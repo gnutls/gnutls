@@ -766,7 +766,7 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_APPEND_NUM(ps,
 			  session->security_parameters.
 			  max_record_recv_size);
-	BUFFER_APPEND_NUM(ps, session->security_parameters.ecc_curve);
+	BUFFER_APPEND_NUM(ps, session->security_parameters.group);
 
 	BUFFER_APPEND_NUM(ps,
 			  session->security_parameters.server_sign_algo);
@@ -853,7 +853,7 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
-		       ecc_curve);
+		       group);
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       server_sign_algo);
@@ -966,8 +966,7 @@ gnutls_session_set_premaster(gnutls_session_t session, unsigned int entity,
 	session->internals.resumed_security_parameters.timestamp =
 	    gnutls_time(0);
 
-	session->internals.resumed_security_parameters.ecc_curve =
-	    GNUTLS_ECC_CURVE_INVALID;
+	session->internals.resumed_security_parameters.group = 0;
 
 	session->internals.premaster_set = 1;
 

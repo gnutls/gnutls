@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -478,6 +478,17 @@ typedef enum hash_security_level_t {
 	_INSECURE
 } hash_security_level_t;
 
+typedef struct gnutls_group_entry_st {
+	const char *name;
+	gnutls_group_t id;
+	const gnutls_datum_t *prime;
+	const gnutls_datum_t *generator;
+	const unsigned *q_bits;
+	gnutls_ecc_curve_t curve;
+	gnutls_pk_algorithm_t pk;
+	unsigned tls_id;		/* The RFC4492 namedCurve ID or TLS 1.3 group ID */
+} gnutls_group_entry_st;
+
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {
@@ -577,7 +588,8 @@ typedef struct {
 	uint16_t max_record_recv_size;
 	/* holds the negotiated certificate type */
 	gnutls_certificate_type_t cert_type;
-	gnutls_ecc_curve_t ecc_curve;	/* holds the first supported ECC curve requested by client */
+
+	gnutls_group_t group; /* holds the EC curve / DH group */
 
 	/* Holds the signature algorithm used in this session - If any */
 	gnutls_sign_algorithm_t server_sign_algo;
@@ -661,6 +673,12 @@ typedef struct ciphersuite_list_st {
 	unsigned int size;
 } ciphersuite_list_st;
 
+typedef struct group_list_st {
+	const gnutls_group_entry_st *entry[MAX_ALGOS];
+	unsigned int size;
+	bool have_ffdhe;
+} group_list_st;
+
 typedef struct sign_algo_list_st {
 	const struct gnutls_sign_entry_st *entry[MAX_ALGOS];
 	unsigned int size;
@@ -672,7 +690,6 @@ typedef struct sign_algo_list_st {
 struct gnutls_priority_st {
 	priority_st protocol;
 	priority_st cert_type;
-	priority_st supported_ecc;
 
 	/* The following are not necessary to be stored in
 	 * the structure; however they are required by the
@@ -681,6 +698,10 @@ struct gnutls_priority_st {
 	priority_st _mac;
 	priority_st _kx;
 	priority_st _sign_algo;
+	priority_st _supported_ecc;
+
+	/* the supported groups */
+	group_list_st groups;
 
 	/* the supported signature algorithms */
 	sign_algo_list_st sigalg;
@@ -752,11 +773,6 @@ typedef struct gnutls_dh_params_int {
 	int q_bits;		/* length of q in bits. If zero then length is unknown.
 				 */
 } dh_params_st;
-
-typedef struct {
-	gnutls_dh_params_t dh_params;
-	int free_dh_params;
-} internal_params_st;
 
 /* DTLS session state
  */
@@ -974,12 +990,6 @@ typedef struct {
 	 */
 	uint8_t rsa_pms_version[2];
 
-	/* Here we cache the DH or RSA parameters got from the
-	 * credentials structure, or from a callback. That is to
-	 * minimize external calls.
-	 */
-	internal_params_st params;
-
 	/* To avoid using global variables, and especially on Windows where
 	 * the application may use a different errno variable than GnuTLS,
 	 * it is possible to use gnutls_transport_set_errno to set a
@@ -1103,6 +1113,8 @@ typedef struct {
 	/* this is not the negotiated max_record_recv_size, but the actual maximum
 	 * receive size */
 	unsigned max_recv_size;
+
+	bool have_ffdhe;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

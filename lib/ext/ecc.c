@@ -31,6 +31,9 @@
 #include <state.h>
 #include <num.h>
 #include <algorithms.h>
+#include "auth/psk.h"
+#include "auth/cert.h"
+#include "auth/anon.h"
 
 static int _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 					     const uint8_t * data,
@@ -70,6 +73,31 @@ const extension_entry_st ext_mod_supported_ecc_pf = {
 	.deinit_func = NULL
 };
 
+static unsigned get_min_dh(gnutls_session_t session)
+{
+	gnutls_certificate_credentials_t cert_cred;
+	gnutls_psk_server_credentials_t psk_cred;
+	gnutls_anon_server_credentials_t anon_cred;
+	unsigned level = 0;
+
+	cert_cred = (gnutls_certificate_credentials_t)_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	psk_cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	anon_cred = (gnutls_anon_server_credentials_t)_gnutls_get_cred(session, GNUTLS_CRD_ANON);
+
+	if (cert_cred) {
+		level = cert_cred->dh_sec_param;
+	} else if (psk_cred) {
+		level = psk_cred->dh_sec_param;
+	} else if (anon_cred) {
+		level = anon_cred->dh_sec_param;
+	}
+
+	if (level)
+		return gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, level);
+
+	return 0;
+}
+
 /* 
  * In case of a server: if a SUPPORTED_ECC extension type is received then it stores
  * into the session security parameters the new value. The server may use gnutls_session_certificate_type_get(),
@@ -82,10 +110,14 @@ static int
 _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 				  const uint8_t * data, size_t _data_size)
 {
-	int new_type = -1, ret, i;
+	int ret, i;
 	ssize_t data_size = _data_size;
 	uint16_t len;
 	const uint8_t *p = data;
+	const gnutls_group_entry_st *group = NULL;
+	unsigned have_ffdhe = 0;
+	unsigned tls_id;
+	unsigned min_dh;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		/* A client shouldn't receive this extension, but of course
@@ -108,33 +140,42 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 
 		DECR_LEN(data_size, len);
 
+		/* we figure what is the minimum DH allowed for this session, if any */
+		min_dh = get_min_dh(session);
+
+		/* This is being processed prior to a ciphersuite being selected */
 		for (i = 0; i < len; i += 2) {
-			new_type =
-			    _gnutls_tls_id_to_ecc_curve(_gnutls_read_uint16
-							(&p[i]));
-			if (new_type < 0)
+			if (have_ffdhe == 0 && p[i] == 0x01) {
+				have_ffdhe = 1;
+			}
+			tls_id = _gnutls_read_uint16(&p[i]);
+			group = _gnutls_tls_id_to_group(tls_id);
+
+			_gnutls_handshake_log("EXT[%p]: Received group %s (0x%x)\n", session, group?group->name:"unknown", tls_id);
+			if (group == NULL)
 				continue;
 
-			/* Check if we support this supported_ecc */
+			/* if a DH group and less than expected ignore */
+			if (min_dh > 0 && group->prime && group->prime->size*8 < min_dh)
+				continue;
+
+			/* Check if we support this group */
 			if ((ret =
-			     _gnutls_session_supports_ecc_curve(session,
-								new_type))
+			     _gnutls_session_supports_group(session,
+							    group->id))
 			    < 0) {
+				group = NULL;
 				continue;
-			} else
+			} else {
 				break;
-			/* new_type is ok */
+			}
 		}
 
-		if (new_type < 0) {
+		session->internals.have_ffdhe = have_ffdhe;
+
+		if (group == NULL) {
 			gnutls_assert();
-			return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		}
-
-		if ((ret =
-		     _gnutls_session_supports_ecc_curve(session,
-							new_type)) < 0) {
-			/* The peer has requested unsupported ecc
+			/* The peer has requested unsupported group
 			 * types. Instead of failing, procceed normally.
 			 * (the ciphersuite selection would fail, or a
 			 * non certificate ciphersuite will be selected).
@@ -142,12 +183,11 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 			return gnutls_assert_val(0);
 		}
 
-		_gnutls_session_ecc_curve_set(session, new_type);
+		_gnutls_session_group_set(session, group);
 	}
 
 	return 0;
 }
-
 
 /* returns data_size or a negative number on failure
  */
@@ -162,15 +202,8 @@ _gnutls_supported_ecc_send_params(gnutls_session_t session,
 	/* this extension is only being sent on client side */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-		if (session->internals.priorities->supported_ecc.
-		    algorithms > 0) {
-
-			len =
-			    session->internals.priorities->supported_ecc.
-			    algorithms;
-
-			/* this is a vector!
-			 */
+		len = session->internals.priorities->groups.size;
+		if (len > 0) {
 			ret =
 			    _gnutls_buffer_append_prefix(extdata, 16,
 							 len * 2);
@@ -178,11 +211,11 @@ _gnutls_supported_ecc_send_params(gnutls_session_t session,
 				return gnutls_assert_val(ret);
 
 			for (i = 0; i < len; i++) {
-				p = _gnutls_ecc_curve_get_tls_id(session->
-								 internals.
-								 priorities->supported_ecc.
-								 priority
-								 [i]);
+				p = session->internals.priorities->groups.entry[i]->tls_id;
+
+				_gnutls_handshake_log("EXT[%p]: sent group %s (0x%x)\n", session,
+					session->internals.priorities->groups.entry[i]->name, (unsigned)p);
+
 				ret =
 				    _gnutls_buffer_append_prefix(extdata,
 								 16, p);
@@ -264,7 +297,7 @@ _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
 	    && !_gnutls_session_is_ecc(session))
 		return 0;
 
-	if (session->internals.priorities->supported_ecc.algorithms > 0) {
+	if (session->internals.priorities->groups.size > 0) {
 		ret = _gnutls_buffer_append_data(extdata, p, 2);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -279,20 +312,14 @@ _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
  * session. A negative error value is returned otherwise.
  */
 int
-_gnutls_session_supports_ecc_curve(gnutls_session_t session,
-				   unsigned int ecc_type)
+_gnutls_session_supports_group(gnutls_session_t session,
+				unsigned int group)
 {
 	unsigned i;
 
-	if (session->internals.priorities->supported_ecc.algorithms > 0) {
-		for (i = 0;
-		     i <
-		     session->internals.priorities->supported_ecc.
-		     algorithms; i++) {
-			if (session->internals.priorities->supported_ecc.
-			    priority[i] == ecc_type)
-				return 0;
-		}
+	for (i = 0; i < session->internals.priorities->groups.size; i++) {
+		if (session->internals.priorities->groups.entry[i]->id == group)
+			return 0;
 	}
 
 	return GNUTLS_E_ECC_UNSUPPORTED_CURVE;

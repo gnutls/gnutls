@@ -49,9 +49,10 @@ gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor);
 unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor);
 
 /* Functions for feature checks */
-const gnutls_cipher_suite_entry_st *
+int
 _gnutls_figure_common_ciphersuite(gnutls_session_t session,
-				  const ciphersuite_list_st *peer_clist);
+				  const ciphersuite_list_st *peer_clist,
+				  const gnutls_cipher_suite_entry_st **ce);
 
 inline static int
 _gnutls_version_has_selectable_prf(const version_entry_st * ver)
@@ -335,22 +336,30 @@ unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits);
 bool _gnutls_pk_is_not_prehashed(gnutls_pk_algorithm_t algorithm);
 
 /* ECC */
-struct gnutls_ecc_curve_entry_st {
+typedef struct gnutls_ecc_curve_entry_st {
 	const char *name;
 	const char *oid;
 	gnutls_ecc_curve_t id;
 	gnutls_pk_algorithm_t pk;
-	int tls_id;		/* The RFC4492 namedCurve ID */
 	unsigned size;		/* the size in bytes */
 	unsigned sig_size;	/* the size of curve signatures in bytes (EdDSA) */
-};
-typedef struct gnutls_ecc_curve_entry_st gnutls_ecc_curve_entry_st;
+} gnutls_ecc_curve_entry_st;
 
 const gnutls_ecc_curve_entry_st
     *_gnutls_ecc_curve_get_params(gnutls_ecc_curve_t curve);
-gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name);
-int _gnutls_tls_id_to_ecc_curve(int num);
-int _gnutls_ecc_curve_get_tls_id(gnutls_ecc_curve_t supported_ecc);
+
+const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num);
+const gnutls_group_entry_st * _gnutls_id_to_group(unsigned id);
+
+inline static const gnutls_ecc_curve_entry_st
+    *_gnutls_group_get_curve_params(gnutls_group_t group)
+{
+	const gnutls_group_entry_st *e = _gnutls_id_to_group(group);
+	if (e)
+		return _gnutls_ecc_curve_get_params(e->curve);
+	return NULL;
+}
+
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(gnutls_pk_algorithm_t pk, int bits);
 #define MAX_ECC_CURVE_SIZE 66
 
@@ -376,6 +385,15 @@ static inline int _gnutls_kx_is_ecc(gnutls_kx_algorithm_t kx)
 {
 	if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA ||
 	    kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK)
+		return 1;
+
+	return 0;
+}
+
+static inline int _gnutls_kx_is_dhe(gnutls_kx_algorithm_t kx)
+{
+	if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS ||
+	    kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK)
 		return 1;
 
 	return 0;

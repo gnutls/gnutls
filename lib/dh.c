@@ -32,40 +32,142 @@
 #include "x509/x509_int.h"
 #include <mpi.h>
 #include "debug.h"
+#include "state.h"
 
-/*-
- * _gnutls_get_dh_params - Returns the DH parameters pointer
- * @dh_params: is an DH parameters type, or NULL.
- * @func: is a callback function to receive the parameters or NULL.
- * @session: a gnutls session.
- *
- * This function will return the dh parameters pointer.
- -*/
-gnutls_dh_params_t
-_gnutls_get_dh_params(gnutls_dh_params_t dh_params,
-		      gnutls_params_function * func,
-		      gnutls_session_t session)
+static
+int set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
+			unsigned q_bits)
+{
+	/* just in case we are resuming a session */
+	gnutls_pk_params_release(&session->key.dh_params);
+
+	gnutls_pk_params_init(&session->key.dh_params);
+
+	session->key.dh_params.params[DH_G] = _gnutls_mpi_copy(g);
+	if (session->key.dh_params.params[DH_G] == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	session->key.dh_params.params[DH_P] = _gnutls_mpi_copy(p);
+	if (session->key.dh_params.params[DH_P] == NULL) {
+		_gnutls_mpi_release(&session->key.dh_params.params[DH_G]);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	session->key.dh_params.params_nr = 3; /* include empty q */
+	session->key.dh_params.algo = GNUTLS_PK_DH;
+	session->key.dh_params.flags = q_bits;
+
+	return 0;
+}
+
+/* Use all available information to decide the DH parameters to use,
+ * that being the negotiated RFC7919 group, the callback, and the
+ * provided parameters structure.
+ */
+int
+_gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
+		      gnutls_params_function * func, gnutls_sec_param_t sec_param)
 {
 	gnutls_params_st params;
+	bigint_t p, g;
+	unsigned free_pg = 0;
 	int ret;
+	unsigned q_bits = 0, i;
 
-	/* if cached return the cached */
-	if (session->internals.params.dh_params)
-		return session->internals.params.dh_params;
+	params.deinit = 0;
+
+	/* if client advertised RFC7919 */
+	if (session->internals.have_ffdhe) {
+		for (i=0;i<session->internals.priorities->groups.size;i++) {
+			if (session->internals.priorities->groups.entry[i]->id == session->security_parameters.group) {
+				ret = _gnutls_mpi_init_scan_nz(&p,
+						session->internals.priorities->groups.entry[i]->prime->data,
+						session->internals.priorities->groups.entry[i]->prime->size);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				free_pg = 1;
+
+				ret = _gnutls_mpi_init_scan_nz(&g,
+						session->internals.priorities->groups.entry[i]->generator->data,
+						session->internals.priorities->groups.entry[i]->generator->size);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+
+				q_bits = *session->internals.priorities->groups.entry[i]->q_bits;
+				goto finished;
+			}
+		}
+
+		/* didn't find anything, that shouldn't have occurred
+		 * as we received that extension */
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	} else if (sec_param) {
+		unsigned bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, sec_param)/8;
+
+		for (i=0;i<session->internals.priorities->groups.size;i++) {
+			if (!session->internals.priorities->groups.entry[i]->prime)
+				continue;
+
+			if (bits <= session->internals.priorities->groups.entry[i]->prime->size) {
+				ret = _gnutls_mpi_init_scan_nz(&p,
+						session->internals.priorities->groups.entry[i]->prime->data,
+						session->internals.priorities->groups.entry[i]->prime->size);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				free_pg = 1;
+
+				ret = _gnutls_mpi_init_scan_nz(&g,
+						session->internals.priorities->groups.entry[i]->generator->data,
+						session->internals.priorities->groups.entry[i]->generator->size);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+
+				q_bits = *session->internals.priorities->groups.entry[i]->q_bits;
+				goto finished;
+			}
+		}
+
+	}
 
 	if (dh_params) {
-		session->internals.params.dh_params = dh_params;
+		p = dh_params->params[0];
+		g = dh_params->params[1];
+		q_bits = dh_params->q_bits;
 	} else if (func) {
 		ret = func(session, GNUTLS_PARAMS_DH, &params);
 		if (ret == 0 && params.type == GNUTLS_PARAMS_DH) {
-			session->internals.params.dh_params =
-			    params.params.dh;
-			session->internals.params.free_dh_params =
-			    params.deinit;
-		}
+			p = params.params.dh->params[0];
+			g = params.params.dh->params[1];
+			q_bits = params.params.dh->q_bits;
+		} else
+			return gnutls_assert_val(GNUTLS_E_NO_TEMPORARY_DH_PARAMS);
+	} else
+		return gnutls_assert_val(GNUTLS_E_NO_TEMPORARY_DH_PARAMS);
+
+ finished:
+	_gnutls_dh_save_group(session, g, p);
+
+	ret = set_dh_pk_params(session, g, p, q_bits);
+	if (ret < 0) {
+		gnutls_assert();
 	}
 
-	return session->internals.params.dh_params;
+ cleanup:
+	if (free_pg) {
+		_gnutls_mpi_release(&p);
+		_gnutls_mpi_release(&g);
+	}
+	if (params.deinit && params.type == GNUTLS_PARAMS_DH)
+		gnutls_dh_params_deinit(params.params.dh);
+
+	return ret;
+
 }
 
 /* returns the prime and the generator of DH params.
@@ -287,9 +389,9 @@ gnutls_dh_params_generate2(gnutls_dh_params_t dparams, unsigned int bits)
 {
 	int ret;
 	gnutls_pk_params_st params;
-	
+
 	gnutls_pk_params_init(&params);
-	
+
 	ret = _gnutls_pk_generate_params(GNUTLS_PK_DH, bits, &params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -299,7 +401,7 @@ gnutls_dh_params_generate2(gnutls_dh_params_t dparams, unsigned int bits)
 	dparams->q_bits = _gnutls_mpi_get_nbits(params.params[DSA_Q]);
 
 	_gnutls_mpi_release(&params.params[DSA_Q]);
-		
+
 	return 0;
 }
 

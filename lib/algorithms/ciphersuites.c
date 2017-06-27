@@ -1203,10 +1203,17 @@ check_server_dh_params(gnutls_session_t session,
 		    unsigned cred_type,
 		    gnutls_kx_algorithm_t kx)
 {
-	gnutls_dh_params_t dh_params = NULL;
+	unsigned have_dh_params = 0;
 
 	if (!_gnutls_kx_needs_dh_params(kx)) {
 		return 1;
+	}
+
+	if (session->internals.have_ffdhe) {
+		/* if the client has advertized FFDHE then it doesn't matter
+		 * whether we have server DH parameters. They are no good. */
+		gnutls_assert();
+		return 0;
 	}
 
 	/* Read the Diffie-Hellman parameters, if any.
@@ -1216,11 +1223,8 @@ check_server_dh_params(gnutls_session_t session,
 		    (gnutls_certificate_credentials_t)
 		    _gnutls_get_cred(session, cred_type);
 
-		if (x509_cred != NULL) {
-			dh_params =
-			    _gnutls_get_dh_params(x509_cred->dh_params,
-						  x509_cred->params_func,
-						  session);
+		if (x509_cred != NULL && (x509_cred->dh_params || x509_cred->params_func || x509_cred->dh_sec_param)) {
+			have_dh_params = 1;
 		}
 
 #ifdef ENABLE_ANON
@@ -1229,11 +1233,8 @@ check_server_dh_params(gnutls_session_t session,
 		    (gnutls_anon_server_credentials_t)
 		    _gnutls_get_cred(session, cred_type);
 
-		if (anon_cred != NULL) {
-			dh_params =
-			    _gnutls_get_dh_params(anon_cred->dh_params,
-						  anon_cred->params_func,
-						  session);
+		if (anon_cred != NULL && (anon_cred->dh_params || anon_cred->params_func || anon_cred->dh_sec_param)) {
+			have_dh_params = 1;
 		}
 #endif
 #ifdef ENABLE_PSK
@@ -1242,25 +1243,15 @@ check_server_dh_params(gnutls_session_t session,
 		    (gnutls_psk_server_credentials_t)
 		    _gnutls_get_cred(session, cred_type);
 
-		if (psk_cred != NULL) {
-			dh_params =
-			    _gnutls_get_dh_params(psk_cred->dh_params,
-						  psk_cred->params_func,
-						  session);
+		if (psk_cred != NULL && (psk_cred->dh_params || psk_cred->params_func || psk_cred->dh_sec_param)) {
+			have_dh_params = 1;
 		}
 #endif
 	} else {
 		return 1;	/* no need for params */
 	}
 
-	/* If DH params are not set then fail.
-	 */
-	if (_gnutls_dh_params_to_mpi(dh_params) == NULL) {
-		gnutls_assert();
-		return 0;
-	}
-
-	return 1;
+	return have_dh_params;
 }
 
 /**
@@ -1380,32 +1371,40 @@ const char *gnutls_cipher_suite_info(size_t idx,
 		} \
 	}
 
-#define KX_CHECKS(kx, cred_type, action) \
+#define KX_CHECKS(kx, group, cred_type, action) \
 	{ \
-	if (_gnutls_session_ecc_curve_get(session) == GNUTLS_ECC_CURVE_INVALID && \
-		_gnutls_kx_is_ecc(kx)) { \
-		action; \
+	if (_gnutls_kx_is_ecc(kx)) { \
+		if (group == NULL || group->curve == 0) { \
+			action; \
+		} \
+	} else if (_gnutls_kx_is_dhe(kx)) { \
+		if (group == NULL || !group->prime) { \
+			if (!check_server_dh_params(session, cred_type, kx)) { \
+				action; \
+			} \
+		} \
 	} \
 	KX_SRP_CHECKS(kx, action); \
-	if (!check_server_dh_params(session, cred_type, kx)) { \
-		action; \
-	} \
 	}
 
-const gnutls_cipher_suite_entry_st *
+int
 _gnutls_figure_common_ciphersuite(gnutls_session_t session,
-				  const ciphersuite_list_st *peer_clist)
+				  const ciphersuite_list_st *peer_clist,
+				  const gnutls_cipher_suite_entry_st **ce)
 {
 
 	unsigned int i, j;
 	int ret;
 	const version_entry_st *version = get_version(session);
 	unsigned int is_dtls = IS_DTLS(session), kx, cred_type;
+	unsigned int no_cert_found = 0;
+	const gnutls_group_entry_st *group;
 
 	if (version == NULL) {
-		gnutls_assert();
-		return NULL;
+		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 	}
+
+	group = _gnutls_id_to_group(_gnutls_session_group_get(session));
 
 	if (session->internals.priorities->server_precedence == 0) {
 		for (i = 0; i < peer_clist->size; i++) {
@@ -1420,17 +1419,19 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 
 			for (j = 0; j < session->internals.priorities->cs.size; j++) {
 				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
-					KX_CHECKS(kx, cred_type, continue);
+					KX_CHECKS(kx, group, cred_type, continue);
 
 					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();
+							no_cert_found = 1;
 							break;
 						}
 					}
-					return peer_clist->entry[i];
+					*ce = peer_clist->entry[i];
+					return 0;
 				}
 			}
 		}
@@ -1448,17 +1449,19 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 					kx = peer_clist->entry[i]->kx_algorithm;
 					cred_type = _gnutls_map_kx_get_cred(kx, 1);
 
-					KX_CHECKS(kx, cred_type, break);
+					KX_CHECKS(kx, group, cred_type, break);
 
 					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();
+							no_cert_found = 1;
 							break;
 						}
 					}
-					return peer_clist->entry[i];
+					*ce = peer_clist->entry[i];
+					return 0;
 				}
 			}
 		}
@@ -1466,8 +1469,16 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	}
 
 	/* nothing in common */
-	gnutls_assert();
-	return NULL;
+
+	/* RFC7919 requires that we reply with insufficient security if we have
+	 * negotiated an FFDHE group, but cannot find a common ciphersuite. However,
+	 * we must also distinguish between not matching a ciphersuite due to an
+	 * incompatible certificate which we traditionally return GNUTLS_E_INSUFFICIENT_SECURITY.
+	 */
+	if (!no_cert_found && session->internals.have_ffdhe && session->internals.priorities->groups.have_ffdhe)
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
+	else
+		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 }
 
 #define CLIENT_VERSION_CHECK(minver, maxver, e) \

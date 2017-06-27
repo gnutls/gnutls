@@ -26,16 +26,22 @@
 #include "gnutls_int.h"
 
 inline static gnutls_ecc_curve_t
-_gnutls_session_ecc_curve_get(gnutls_session_t session)
+_gnutls_session_group_get(gnutls_session_t session)
 {
-	return session->security_parameters.ecc_curve;
+	return session->security_parameters.group;
 }
 
 int _gnutls_session_is_ecc(gnutls_session_t session);
 
-void
-_gnutls_session_ecc_curve_set(gnutls_session_t session,
-			      gnutls_ecc_curve_t c);
+inline static void
+_gnutls_session_group_set(gnutls_session_t session,
+			  const gnutls_group_entry_st *e)
+{
+	_gnutls_handshake_log("HSK[%p]: Selected group %s (%d)\n",
+			      session, e->name, e->id);
+	session->security_parameters.group = e->id;
+}
+
 
 void
 _gnutls_record_set_default_version(gnutls_session_t session,
@@ -59,7 +65,7 @@ _gnutls_hello_set_default_version(gnutls_session_t session,
 int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits);
 
 int _gnutls_dh_set_peer_public(gnutls_session_t session, bigint_t public);
-int _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
+int _gnutls_dh_save_group(gnutls_session_t session, bigint_t gen,
 			 bigint_t prime);
 
 static inline int _gnutls_dh_get_min_prime_bits(gnutls_session_t session)

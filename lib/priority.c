@@ -105,43 +105,52 @@ static void _clear_given_priorities(priority_st * st, const int *list)
 	}
 }
 
-static const int _supported_ecc_normal[] = {
-	GNUTLS_ECC_CURVE_SECP256R1,
-	GNUTLS_ECC_CURVE_SECP384R1,
-	GNUTLS_ECC_CURVE_SECP521R1,
-	GNUTLS_ECC_CURVE_X25519, /* draft-ietf-tls-rfc4492bis */
+static const int _supported_groups_normal[] = {
+	GNUTLS_GROUP_SECP256R1,
+	GNUTLS_GROUP_SECP384R1,
+	GNUTLS_GROUP_SECP521R1,
+	GNUTLS_GROUP_X25519, /* draft-ietf-tls-rfc4492bis */
+	GNUTLS_GROUP_FFDHE2048,
+	GNUTLS_GROUP_FFDHE3072,
+	GNUTLS_GROUP_FFDHE4096,
+	GNUTLS_GROUP_FFDHE8192,
 	0
 };
-static const int* supported_ecc_normal = _supported_ecc_normal;
+static const int* supported_groups_normal = _supported_groups_normal;
 
-static const int _supported_ecc_secure128[] = {
-	GNUTLS_ECC_CURVE_SECP256R1,
-	GNUTLS_ECC_CURVE_SECP384R1,
-	GNUTLS_ECC_CURVE_SECP521R1,
-	GNUTLS_ECC_CURVE_X25519, /* draft-ietf-tls-rfc4492bis */
+static const int _supported_groups_secure128[] = {
+	GNUTLS_GROUP_SECP256R1,
+	GNUTLS_GROUP_SECP384R1,
+	GNUTLS_GROUP_SECP521R1,
+	GNUTLS_GROUP_X25519, /* draft-ietf-tls-rfc4492bis */
+	GNUTLS_GROUP_FFDHE2048,
+	GNUTLS_GROUP_FFDHE3072,
+	GNUTLS_GROUP_FFDHE4096,
+	GNUTLS_GROUP_FFDHE8192,
 	0
 };
-static const int* supported_ecc_secure128 = _supported_ecc_secure128;
+static const int* supported_groups_secure128 = _supported_groups_secure128;
 
-static const int _supported_ecc_suiteb128[] = {
-	GNUTLS_ECC_CURVE_SECP256R1,
-	GNUTLS_ECC_CURVE_SECP384R1,
+static const int _supported_groups_suiteb128[] = {
+	GNUTLS_GROUP_SECP256R1,
+	GNUTLS_GROUP_SECP384R1,
 	0
 };
-static const int* supported_ecc_suiteb128 = _supported_ecc_suiteb128;
+static const int* supported_groups_suiteb128 = _supported_groups_suiteb128;
 
-static const int _supported_ecc_suiteb192[] = {
-	GNUTLS_ECC_CURVE_SECP384R1,
+static const int _supported_groups_suiteb192[] = {
+	GNUTLS_GROUP_SECP384R1,
 	0
 };
-static const int* supported_ecc_suiteb192 = _supported_ecc_suiteb192;
+static const int* supported_groups_suiteb192 = _supported_groups_suiteb192;
 
-static const int _supported_ecc_secure192[] = {
-	GNUTLS_ECC_CURVE_SECP384R1,
-	GNUTLS_ECC_CURVE_SECP521R1,
+static const int _supported_groups_secure192[] = {
+	GNUTLS_GROUP_SECP384R1,
+	GNUTLS_GROUP_SECP521R1,
+	GNUTLS_GROUP_FFDHE8192,
 	0
 };
-static const int* supported_ecc_secure192 = _supported_ecc_secure192;
+static const int* supported_groups_secure192 = _supported_groups_secure192;
 
 static const int protocol_priority[] = {
 	GNUTLS_TLS1_2,
@@ -609,7 +618,7 @@ struct priority_groups_st {
 	const int **mac_list;
 	const int **kx_list;
 	const int **sign_list;
-	const int **ecc_list;
+	const int **group_list;
 	unsigned profile;
 	int sec_param;
 	bool no_tickets;
@@ -622,7 +631,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_normal,
 	 .kx_list = &kx_priority_secure,
 	 .sign_list = &sign_priority_default,
-	 .ecc_list = &supported_ecc_normal,
+	 .group_list = &supported_groups_normal,
 	 .profile = GNUTLS_PROFILE_LOW,
 	 .sec_param = GNUTLS_SEC_PARAM_WEAK
 	},
@@ -631,7 +640,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_secure128,
 	 .kx_list = &kx_priority_pfs,
 	 .sign_list = &sign_priority_default,
-	 .ecc_list = &supported_ecc_normal,
+	 .group_list = &supported_groups_normal,
 	 .profile = GNUTLS_PROFILE_LOW,
 	 .sec_param = GNUTLS_SEC_PARAM_WEAK,
 	 .no_tickets = 1
@@ -642,7 +651,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_secure128,
 	 .kx_list = &kx_priority_secure,
 	 .sign_list = &sign_priority_secure128,
-	 .ecc_list = &supported_ecc_secure128,
+	 .group_list = &supported_groups_secure128,
 		/* The profile should have been HIGH but if we don't allow
 		 * SHA-1 (80-bits) as signature algorithm we are not able
 		 * to connect anywhere with this level */
@@ -655,7 +664,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_secure192,
 	 .kx_list = &kx_priority_secure,
 	 .sign_list = &sign_priority_secure192,
-	 .ecc_list = &supported_ecc_secure192,
+	 .group_list = &supported_groups_secure192,
 	 .profile = GNUTLS_PROFILE_HIGH,
 	 .sec_param = GNUTLS_SEC_PARAM_HIGH
 	},
@@ -665,7 +674,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_suiteb,
 	 .kx_list = &kx_priority_suiteb,
 	 .sign_list = &sign_priority_suiteb128,
-	 .ecc_list = &supported_ecc_suiteb128,
+	 .group_list = &supported_groups_suiteb128,
 	 .profile = GNUTLS_PROFILE_SUITEB128,
 	 .sec_param = GNUTLS_SEC_PARAM_HIGH
 	},
@@ -675,7 +684,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_suiteb,
 	 .kx_list = &kx_priority_suiteb,
 	 .sign_list = &sign_priority_suiteb192,
-	 .ecc_list = &supported_ecc_suiteb192,
+	 .group_list = &supported_groups_suiteb192,
 	 .profile = GNUTLS_PROFILE_SUITEB192,
 	 .sec_param = GNUTLS_SEC_PARAM_ULTRA
 	},
@@ -684,7 +693,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_normal,
 	 .kx_list = &kx_priority_secure,
 	 .sign_list = &sign_priority_default,
-	 .ecc_list = &supported_ecc_normal,
+	 .group_list = &supported_groups_normal,
 	 .sec_param = GNUTLS_SEC_PARAM_VERY_WEAK
 	},
 	{.name = LEVEL_PERFORMANCE,
@@ -692,7 +701,7 @@ static const struct priority_groups_st pgroups[] =
 	 .mac_list = &mac_priority_normal,
 	 .kx_list = &kx_priority_performance,
 	 .sign_list = &sign_priority_default,
-	 .ecc_list = &supported_ecc_normal,
+	 .group_list = &supported_groups_normal,
 	 .profile = GNUTLS_PROFILE_LOW,
 	 .sec_param = GNUTLS_SEC_PARAM_WEAK
 	},
@@ -739,7 +748,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 			func(&priority_cache->_kx, *pgroups[i].kx_list);
 			func(&priority_cache->_mac, *pgroups[i].mac_list);
 			func(&priority_cache->_sign_algo, *pgroups[i].sign_list);
-			func(&priority_cache->supported_ecc, *pgroups[i].ecc_list);
+			func(&priority_cache->_supported_ecc, *pgroups[i].group_list);
 
 			if (pgroups[i].profile != 0) {
 				SET_PROFILE(pgroups[i].profile); /* set certificate level */
@@ -1124,13 +1133,52 @@ finish:
 	return ret;
 }
 
+static void add_ec(gnutls_priority_t priority_cache)
+{
+	const gnutls_group_entry_st *ge;
+	unsigned i;
+
+	for (i = 0; i < priority_cache->_supported_ecc.algorithms; i++) {
+		ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priority[i]);
+		if (ge != NULL && priority_cache->groups.size < sizeof(priority_cache->groups.entry)/sizeof(priority_cache->groups.entry[0])) {
+			/* do not add groups which do not correspond to enabled ciphersuites */
+			if (!ge->curve)
+				continue;
+			priority_cache->groups.entry[priority_cache->groups.size++] = ge;
+		}
+	}
+}
+
+static void add_dh(gnutls_priority_t priority_cache)
+{
+	const gnutls_group_entry_st *ge;
+	unsigned i;
+
+	for (i = 0; i < priority_cache->_supported_ecc.algorithms; i++) {
+		ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priority[i]);
+		if (ge != NULL && priority_cache->groups.size < sizeof(priority_cache->groups.entry)/sizeof(priority_cache->groups.entry[0])) {
+			/* do not add groups which do not correspond to enabled ciphersuites */
+			if (!ge->prime)
+				continue;
+			priority_cache->groups.entry[priority_cache->groups.size++] = ge;
+			priority_cache->groups.have_ffdhe = 1;
+		}
+	}
+}
+
 static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 {
 	unsigned i, j, z;
 	const gnutls_cipher_suite_entry_st *ce;
 	const gnutls_sign_entry_st *se;
+	unsigned have_ec = 0;
+	unsigned have_dh = 0;
+	unsigned ecc_first = 0;
 
 	priority_cache->cs.size = 0;
+	priority_cache->sigalg.size = 0;
+	priority_cache->groups.size = 0;
+	priority_cache->groups.have_ffdhe = 0;
 
 	for (i = 0; i < priority_cache->_kx.algorithms; i++) {
 		for (j=0;j<priority_cache->_cipher.algorithms;j++) {
@@ -1142,6 +1190,13 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
 					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
+					if (!have_ec && _gnutls_kx_is_ecc(ce->kx_algorithm)) {
+						have_ec = 1;
+						if (have_dh == 0)
+							ecc_first = 1;
+					}
+					if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm))
+						have_dh = 1;
 				}
 			}
 		}
@@ -1154,8 +1209,21 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 		}
 	}
 
-	_gnutls_debug_log("added %d ciphersuites and %d sig algos into priority list\n",
-		priority_cache->cs.size, priority_cache->sigalg.size);
+	if (ecc_first) {
+		if (have_ec)
+			add_ec(priority_cache);
+		if (have_dh)
+			add_dh(priority_cache);
+	} else {
+		if (have_dh)
+			add_dh(priority_cache);
+		if (have_ec)
+			add_ec(priority_cache);
+	}
+
+	_gnutls_debug_log("added %d ciphersuites, %d sig algos and %d groups into priority list\n",
+		priority_cache->cs.size, priority_cache->sigalg.size,
+		priority_cache->groups.size);
 }
 
 /**
@@ -1303,8 +1371,8 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			      cert_type_priority_default);
 		_set_priority(&(*priority_cache)->_sign_algo,
 			      sign_priority_default);
-		_set_priority(&(*priority_cache)->supported_ecc,
-			      supported_ecc_normal);
+		_set_priority(&(*priority_cache)->_supported_ecc,
+			      supported_groups_normal);
 		i = 0;
 	} else {
 		ikeyword_set = 1;
@@ -1390,15 +1458,33 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				    (&broken_list[i][1], "CURVE-ALL",
 				     9) == 0) {
 					bulk_fn(&(*priority_cache)->
-						supported_ecc,
-						supported_ecc_normal);
+						_supported_ecc,
+						supported_groups_normal);
 				} else {
 					if ((algo =
 					     gnutls_ecc_curve_get_id
 					     (&broken_list[i][7])) !=
 					    GNUTLS_ECC_CURVE_INVALID)
 						fn(&(*priority_cache)->
-						   supported_ecc, algo);
+						   _supported_ecc, algo);
+					else
+						goto error;
+				}
+			} else if (strncasecmp
+				 (&broken_list[i][1], "GROUP-", 6) == 0) {
+				if (strncasecmp
+				    (&broken_list[i][1], "GROUP-ALL",
+				     9) == 0) {
+					bulk_fn(&(*priority_cache)->
+						_supported_ecc,
+						supported_groups_normal);
+				} else {
+					if ((algo =
+					     gnutls_group_get_id
+					     (&broken_list[i][7])) !=
+					    GNUTLS_GROUP_INVALID)
+						fn(&(*priority_cache)->
+						   _supported_ecc, algo);
 					else
 						goto error;
 				}
@@ -1613,11 +1699,34 @@ int
 gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
 			       const unsigned int **list)
 {
-	if (pcache->supported_ecc.algorithms == 0)
+	if (pcache->_supported_ecc.algorithms == 0)
 		return 0;
 
-	*list = pcache->supported_ecc.priority;
-	return pcache->supported_ecc.algorithms;
+	*list = pcache->_supported_ecc.priority;
+	return pcache->_supported_ecc.algorithms;
+}
+
+/**
+ * gnutls_priority_group_list:
+ * @pcache: is a #gnutls_prioritity_t type.
+ * @list: will point to an integer list
+ *
+ * Get a list of available groups in the priority
+ * structure. 
+ *
+ * Returns: the number of items, or an error code.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_priority_group_list(gnutls_priority_t pcache,
+			       const unsigned int **list)
+{
+	if (pcache->_supported_ecc.algorithms == 0)
+		return 0;
+
+	*list = pcache->_supported_ecc.priority;
+	return pcache->_supported_ecc.algorithms;
 }
 
 /**
