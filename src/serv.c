@@ -270,7 +270,7 @@ int ret;
 		if (!require_cert && gnutls_certificate_get_peers(session, &size) == NULL)
 			return 0;
 
-		if (require_cert || ENABLED_OPT(VERIFY_CLIENT_CERT)) {
+		if (ENABLED_OPT(VERIFY_CLIENT_CERT)) {
 			if (cert_verify(session, NULL, NULL) == 0) {
 				do {
 					ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_ACCESS_DENIED);

@@ -107,7 +107,8 @@ flag = {
     name      = require-client-cert;
     value     = r;
     descrip   = "Require a client certificate";
-    doc      = "";
+    doc      = "This option before 3.6.0 used to imply --verify-client-cert.
+Since 3.6.0 it will no longer verify the certificate by default.";
 };
 
 flag = {
