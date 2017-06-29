@@ -53,7 +53,18 @@ rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
-	echo "Test 1 - Amazon OCSP response verification - failed"
+	echo "Test 2 - Amazon OCSP response verification - failed"
+	exit ${rc}
+fi
+
+# verify an OCSP response using ECDSA
+datefudge -s "2017-06-29" \
+	"${OCSPTOOL}" -d 6 -e --load-chain "${srcdir}/ocsp-tests/certs/chain-akamai.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-akamai.com.der"
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 3 - Akamai (ECDSA) OCSP response verification - failed"
 	exit ${rc}
 fi
 

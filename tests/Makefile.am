@@ -36,6 +36,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	rsa-md5-collision/colliding-chain-md5-2.pem rsa-md5-collision/colliding-chain-md5-1.pem \
 	ocsp-tests/certs/ocsp-amazon.com.der ocsp-tests/certs/chain-amazon.com.pem \
 	ocsp-tests/certs/chain-amazon.com-unsorted.pem \
+	ocsp-tests/certs/chain-akamai.com.pem ocsp-tests/certs/ocsp-akamai.com.der \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
