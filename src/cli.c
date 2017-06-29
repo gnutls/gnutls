@@ -431,6 +431,7 @@ static int cert_verify_callback(gnutls_session_t session)
 	int dane = ENABLED_OPT(DANE);
 	int ca_verify = ENABLED_OPT(CA_VERIFICATION);
 	const char *txt_service;
+	gnutls_datum_t oresp;
 
 	/* On an session with TOFU the PKI/DANE verification
 	 * become advisory.
@@ -440,8 +441,24 @@ static int cert_verify_callback(gnutls_session_t session)
 		ssh = strictssh;
 	}
 
+	/* Save certificate and OCSP response */
 	if (HAVE_OPT(SAVE_CERT)) {
 		try_save_cert(session);
+	}
+
+	rc = gnutls_ocsp_status_request_get(session, &oresp);
+	if (rc < 0) {
+		oresp.data = NULL;
+		oresp.size = 0;
+	}
+
+	if (HAVE_OPT(SAVE_OCSP) && oresp.data) {
+		FILE *fp = fopen(OPT_ARG(SAVE_OCSP), "w");
+
+		if (fp != NULL) {
+			fwrite(oresp.data, 1, oresp.size, fp);
+			fclose(fp);
+		}
 	}
 
 	print_cert_info(session, verbose, print_cert);
@@ -1153,14 +1170,6 @@ print_other_info(gnutls_session_t session)
 		fputs((char*)p.data, stdout);
 	}
 
-	if (HAVE_OPT(SAVE_OCSP) && oresp.data) {
-		FILE *fp = fopen(OPT_ARG(SAVE_OCSP), "w");
-
-		if (fp != NULL) {
-			fwrite(oresp.data, 1, oresp.size, fp);
-			fclose(fp);
-		}
-	}
 }
 
 static void flush_socket(socket_st *hd, unsigned ms)
