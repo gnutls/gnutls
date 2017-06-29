@@ -21,6 +21,9 @@ See the end for copying conditions.
    some HSMs which do not accept an integer with a leading zero. This
    improves operation with certain Atos HSMs.
 
+** gnutls-cli: ensure OCSP responses are saved even if certificate verification
+   fails.
+
 ** API and ABI modifications:
 No changes since last version.
 
