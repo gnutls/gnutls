@@ -303,7 +303,8 @@ dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh
 
 if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
-	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh sni-hostname.sh
+	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh sni-hostname.sh \
+	gnutls-cli-save-data.sh
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
