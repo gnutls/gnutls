@@ -22,12 +22,14 @@
 EXTRA_DIST = certs/ca.key certs/ca.pem certs/ocsp-server.key certs/ocsp-server.pem response1.der \
 	response2.der certs/ocsp_index.txt certs/ocsp_index.txt.attr \
 	certs/server_good.key certs/server_bad.key certs/server_good.template \
-	certs/server_bad.template certs/ocsp-staple-unrelated.der suppressions.valgrind
+	certs/server_bad.template certs/ocsp-staple-unrelated.der suppressions.valgrind \
+	certs/ocsp-akamai.com.der certs/cert-akamai.com.pem
 
 dist_check_SCRIPTS =
 
 if !WINDOWS
-dist_check_SCRIPTS += ocsp-tls-connection ocsp-must-staple-connection ocsp-test
+dist_check_SCRIPTS += ocsp-tls-connection ocsp-must-staple-connection ocsp-test \
+	ocsp-ecdsa-test
 endif
 
 TESTS = $(dist_check_SCRIPTS)
