@@ -21,6 +21,10 @@ See the end for copying conditions.
    some HSMs which do not accept an integer with a leading zero. This
    improves operation with certain Atos HSMs.
 
+** libgnutls: Fixed issue discovering an OCSP signer (relating to public key size),
+   and improved tts discovery of OCSP in the case where the Subject Public Key
+   identifier field matches. Resolves gitlab issue #223.
+
 ** gnutls-cli: ensure OCSP responses are saved even if certificate verification
    fails.
 
