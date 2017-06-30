@@ -1922,14 +1922,17 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 	}
 
 	for (i = 0; i < ncerts; i++) {
+		_gnutls_cert_log("checking whether signed against", certs[i]);
 		if (keyid.data != NULL) {
 			uint8_t digest[20];
 			gnutls_datum_t spki;
 
+			_gnutls_debug_log("checking key ID\n");
 			rc = _gnutls_x509_get_raw_field2(certs[i]->cert, &certs[i]->der,
 					  "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 					  &spki);
 			if (rc < 0 || spki.size < 6) {
+				gnutls_assert();
 				signercert = NULL;
 				goto quit;
 			}
@@ -1951,13 +1954,17 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 				signercert = certs[i];
 				goto quit;
 			}
+			gnutls_assert();
 		} else {
+			_gnutls_debug_log("checking issuer DN\n");
+
 			assert(riddn.data != NULL);
 			if ((certs[i]->raw_dn.size == riddn.size)
 			    && memcmp(riddn.data, certs[i]->raw_dn.data, riddn.size) == 0) {
 				signercert = certs[i];
 				goto quit;
 			}
+			gnutls_assert();
 		}
 	}
 
@@ -2008,6 +2015,8 @@ _ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 		gnutls_assert();
 		goto done;
 	}
+
+	_gnutls_cert_log("ocsp signer", signercert); \
 
 	rc = gnutls_pubkey_import_x509(pubkey, signercert, 0);
 	if (rc != GNUTLS_E_SUCCESS) {
@@ -2142,6 +2151,7 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 		}
 
 		if (vtmp != 0) {
+			_gnutls_reason_log("cert verification", vtmp);
 			*verify = vstatus_to_ocsp_status(vtmp);
 			gnutls_assert();
 			rc = GNUTLS_E_SUCCESS;
