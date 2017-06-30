@@ -348,7 +348,7 @@ void print_dh_params_info(gnutls_session_t session)
 	}
 
 	ret = gnutls_dh_get_secret_bits(session);
-	if (ret < 256) {
+	if (ret < 225) {
 		fail("client: too small secret key size: %d\n", ret);
 	}
 

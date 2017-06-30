@@ -41,14 +41,14 @@ test_case_st tests[] = {
 	{
 		.name = "TLS 1.1 ANON-DH without cred",
 		.client_ret = GNUTLS_E_AGAIN,
-		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.server_ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS,
 		.server_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.1",
 		.client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.1"
 	},
 	{
 		.name = "TLS 1.1 ANON-DH with cred but no DH params",
-		.client_ret = GNUTLS_E_AGAIN,
-		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.server_ret = 0,
+		.client_ret = 0,
 		.have_anon_cred = 1,
 		.server_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.1",
 		.client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.1"
@@ -65,7 +65,7 @@ test_case_st tests[] = {
 	{
 		.name = "TLS 1.1 DHE-RSA without cred",
 		.client_ret = GNUTLS_E_AGAIN,
-		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.server_ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.1",
 		.client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.1"
 	},
@@ -79,8 +79,8 @@ test_case_st tests[] = {
 	},
 	{
 		.name = "TLS 1.1 DHE-RSA with cred and cert but no DH params",
-		.client_ret = GNUTLS_E_AGAIN,
-		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.server_ret = 0,
+		.client_ret = 0,
 		.have_cert_cred = 1,
 		.have_rsa_sign_cert = 1,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.1",
@@ -131,14 +131,14 @@ test_case_st tests[] = {
 	{
 		.name = "TLS 1.1 DHE-PSK without cred",
 		.client_ret = GNUTLS_E_AGAIN,
-		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.server_ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.1",
 		.client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.1"
 	},
 	{
 		.name = "TLS 1.1 DHE-PSK with cred but no DH params",
-		.client_ret = GNUTLS_E_AGAIN,
-		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
+		.server_ret = 0,
+		.client_ret = 0,
 		.have_psk_cred = 1,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.1",
 		.client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.1"
