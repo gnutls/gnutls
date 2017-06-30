@@ -295,6 +295,13 @@ static void
 print_dh_info(gnutls_session_t session, const char *str, int print)
 {
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
+	unsigned group;
+
+	group = gnutls_group_get(session);
+	if (group != 0) {
+		return;
+	}
+
 	printf("- %sDiffie-Hellman parameters\n", str);
 	printf(" - Using prime: %d bits\n",
 	       gnutls_dh_get_prime_bits(session));
