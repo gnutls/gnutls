@@ -1924,10 +1924,24 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 	for (i = 0; i < ncerts; i++) {
 		_gnutls_cert_log("checking whether signed against", certs[i]);
 		if (keyid.data != NULL) {
-			uint8_t digest[20];
+			uint8_t digest[128]; /* to support longer key IDs */
 			gnutls_datum_t spki;
+			size_t digest_size = sizeof(digest);
 
-			_gnutls_debug_log("checking key ID\n");
+			_gnutls_debug_log("checking key ID against SPK identifier\n");
+
+			/* check subject key identifier as well, some certificates
+			 * match that, but not the hash */
+			rc = gnutls_x509_crt_get_subject_key_id(certs[i], digest, &digest_size, NULL);
+			if (rc >= 0 && digest_size == keyid.size &&
+			    memcmp(keyid.data, digest, digest_size) == 0) {
+				signercert = certs[i];
+				goto quit;
+			}
+
+			_gnutls_debug_log("checking key ID against SPKI hash\n");
+
+			/* continue with checking the hash */
 			rc = _gnutls_x509_get_raw_field2(certs[i]->cert, &certs[i]->der,
 					  "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 					  &spki);
