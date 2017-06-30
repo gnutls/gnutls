@@ -514,11 +514,6 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	tmp = SU(gnutls_mac_get_name(gnutls_mac_get(session)));
 	printf("- MAC: %s\n", tmp);
 
-	tmp =
-	    SU(gnutls_compression_get_name
-	       (gnutls_compression_get(session)));
-	printf("- Compression: %s\n", tmp);
-
 	printf("- Options:");
 	if (gnutls_session_ext_master_secret_status(session)!=0)
 		printf(" extended master secret,");
@@ -565,10 +560,6 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 			gnutls_free(cb.data);
 		}
 	}
-
-	/* Warning: Do not print anything more here. The 'Compression:'
-	   output MUST be the last non-verbose output.  This is used by
-	   Emacs starttls.el code. */
 
 	fflush(stdout);
 
