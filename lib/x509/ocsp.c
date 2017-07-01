@@ -1923,9 +1923,10 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 
 	for (i = 0; i < ncerts; i++) {
 		if (keyid.data != NULL) {
-			uint8_t digest[128]; /* to support longer key IDs */
+			uint8_t digest[64]; /* to support longer key IDs */
 			gnutls_datum_t spki;
 			size_t digest_size = sizeof(digest);
+			int len;
 
 			_gnutls_debug_log("checking key ID against SPK identifier\n");
 
@@ -1946,19 +1947,36 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 					  &spki);
 			if (rc < 0 || spki.size < 6) {
 				signercert = NULL;
-				goto quit;
+				continue;
 			}
 
 			/* For some reason the protocol requires we skip the
 			 * tag, length and number of unused bits.
 			 */
-			spki.data += 5;
-			spki.size -= 5;
-			rc = gnutls_hash_fast(GNUTLS_DIG_SHA1, spki.data, spki.size, digest);
+			if (spki.data[0] != 0x03) { /* bit string */
+				gnutls_assert();
+				signercert = NULL;
+				continue;
+			}
+
+			rc = asn1_get_length_der(spki.data+1, spki.size-1, &len);
+			if (rc <= 0) {
+				gnutls_assert();
+				signercert = NULL;
+				continue;
+			}
+			len += 1+1; /* skip unused bits as well */
+			if (len >= (int)spki.size) {
+				gnutls_assert();
+				signercert = NULL;
+				continue;
+			}
+
+			rc = gnutls_hash_fast(GNUTLS_DIG_SHA1, spki.data+len, spki.size-len, digest);
 			if (rc < 0) {
 				gnutls_assert();
 				signercert = NULL;
-				goto quit;
+				continue;
 			}
 
 			if ((20 == keyid.size) &&
