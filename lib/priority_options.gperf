@@ -1,6 +1,5 @@
 %{
 typedef void (*option_set_func)(gnutls_priority_t);
-static const struct priority_options_st *in_word_set(register const char *str, register unsigned int len);
 %}
 %language=ANSI-C
 %readonly-tables
