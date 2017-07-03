@@ -1522,6 +1522,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	}
 
 	if (gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
+		_gnutls_debug_log("signature algorithm %s is insecure\n", gnutls_sign_get_name(algo));
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
 
