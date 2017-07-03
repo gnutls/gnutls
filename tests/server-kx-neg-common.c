@@ -26,11 +26,14 @@ typedef struct test_case_st {
 	int client_ret;
 	unsigned have_anon_cred;
 	unsigned have_anon_dh_params;
+	unsigned have_anon_exp_dh_params;
 	unsigned have_srp_cred;
 	unsigned have_psk_cred;
 	unsigned have_psk_dh_params;
+	unsigned have_psk_exp_dh_params;
 	unsigned have_cert_cred;
 	unsigned have_cert_dh_params;
+	unsigned have_cert_exp_dh_params;
 	unsigned have_rsa_sign_cert;
 	unsigned have_ecc_sign_cert;
 	unsigned have_ed25519_sign_cert;
@@ -109,7 +112,7 @@ serv_srp_func(gnutls_session_t session, const char *username,
 
 static void try(test_case_st *test)
 {
-	int sret, cret;
+	int sret, cret, ret;
 	gnutls_anon_client_credentials_t c_anon_cred;
 	gnutls_anon_server_credentials_t s_anon_cred;
 	gnutls_psk_client_credentials_t c_psk_cred;
@@ -118,6 +121,9 @@ static void try(test_case_st *test)
 	gnutls_certificate_credentials_t c_cert_cred;
 	gnutls_srp_server_credentials_t s_srp_cred;
 	gnutls_srp_client_credentials_t c_srp_cred;
+	const gnutls_datum_t p3_2048 =
+	    { (void *)pkcs3_2048, strlen(pkcs3_2048) };
+	gnutls_dh_params_t dh_params = NULL;
 
 	gnutls_session_t server, client;
 	const gnutls_datum_t pskkey = { (void *) "DEADBEEF", 8 };
@@ -137,6 +143,7 @@ static void try(test_case_st *test)
 	assert(gnutls_srp_allocate_server_credentials(&s_srp_cred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&s_cert_cred) >= 0);
 	assert(gnutls_certificate_allocate_credentials(&c_cert_cred) >= 0);
+	assert(gnutls_dh_params_init(&dh_params) >= 0);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER)>=0);
 	assert(gnutls_init(&client, GNUTLS_CLIENT)>=0);
@@ -145,18 +152,36 @@ static void try(test_case_st *test)
 		gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anon_cred);
 		if (test->have_anon_dh_params)
 			gnutls_anon_set_server_known_dh_params(s_anon_cred, GNUTLS_SEC_PARAM_MEDIUM);
+		else if (test->have_anon_exp_dh_params) {
+			ret = gnutls_dh_params_import_pkcs3(dh_params, &p3_2048,
+							    GNUTLS_X509_FMT_PEM);
+			assert(ret>=0);
+			gnutls_anon_set_server_dh_params(s_anon_cred, dh_params);
+		}
 	}
 
 	if (test->have_cert_cred) {
 		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, s_cert_cred);
 		if (test->have_cert_dh_params)
 			gnutls_certificate_set_known_dh_params(s_cert_cred, GNUTLS_SEC_PARAM_MEDIUM);
+		else if (test->have_cert_exp_dh_params) {
+			ret = gnutls_dh_params_import_pkcs3(dh_params, &p3_2048,
+							    GNUTLS_X509_FMT_PEM);
+			assert(ret>=0);
+			gnutls_certificate_set_dh_params(s_cert_cred, dh_params);
+		}
 	}
 
 	if (test->have_psk_cred) {
 		gnutls_credentials_set(server, GNUTLS_CRD_PSK, s_psk_cred);
 		if (test->have_psk_dh_params)
 			gnutls_psk_set_server_known_dh_params(s_psk_cred, GNUTLS_SEC_PARAM_MEDIUM);
+		else if (test->have_psk_exp_dh_params) {
+			ret = gnutls_dh_params_import_pkcs3(dh_params, &p3_2048,
+							    GNUTLS_X509_FMT_PEM);
+			assert(ret>=0);
+			gnutls_psk_set_server_dh_params(s_psk_cred, dh_params);
+		}
 
 		gnutls_psk_set_server_credentials_function(s_psk_cred, serv_psk_func);
 	}
@@ -215,6 +240,8 @@ static void try(test_case_st *test)
 	gnutls_srp_free_server_credentials(s_srp_cred);
 	gnutls_certificate_free_credentials(s_cert_cred);
 	gnutls_certificate_free_credentials(c_cert_cred);
+	if (dh_params)
+		gnutls_dh_params_deinit(dh_params);
 
 	reset_buffers();
 }

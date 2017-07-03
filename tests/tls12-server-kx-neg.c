@@ -54,11 +54,20 @@ test_case_st tests[] = {
 		.client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2"
 	},
 	{
-		.name = "TLS 1.2 ANON-DH with cred and DH params",
+		.name = "TLS 1.2 ANON-DH with cred and DH params (level)",
 		.server_ret = 0,
 		.client_ret = 0,
 		.have_anon_cred = 1,
 		.have_anon_dh_params = 1,
+		.server_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 ANON-DH with cred and DH params (explicit)",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_anon_cred = 1,
+		.have_anon_exp_dh_params = 1,
 		.server_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2",
 		.client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2"
 	},
@@ -107,12 +116,22 @@ test_case_st tests[] = {
 		.client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2"
 	},
 	{
-		.name = "TLS 1.2 DHE-RSA with cred and cert and DH params",
+		.name = "TLS 1.2 DHE-RSA with cred and cert and DH params (level)",
 		.client_ret = 0,
 		.server_ret = 0,
 		.have_cert_cred = 1,
 		.have_rsa_sign_cert = 1,
 		.have_cert_dh_params = 1,
+		.server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 DHE-RSA with cred and cert and DH params (explicit)",
+		.client_ret = 0,
+		.server_ret = 0,
+		.have_cert_cred = 1,
+		.have_rsa_sign_cert = 1,
+		.have_cert_exp_dh_params = 1,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2",
 		.client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2"
 	},
@@ -144,11 +163,20 @@ test_case_st tests[] = {
 		.client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2"
 	},
 	{
-		.name = "TLS 1.2 DHE-PSK with cred DH params",
+		.name = "TLS 1.2 DHE-PSK with cred and DH params (level)",
 		.client_ret = 0,
 		.server_ret = 0,
 		.have_psk_cred = 1,
 		.have_psk_dh_params = 1,
+		.server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 DHE-PSK with cred and DH params (explicit)",
+		.client_ret = 0,
+		.server_ret = 0,
+		.have_psk_cred = 1,
+		.have_psk_exp_dh_params = 1,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2",
 		.client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2"
 	},
