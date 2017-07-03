@@ -54,7 +54,7 @@ inline static unsigned max_record_recv_size(gnutls_session_t session)
 
 	size = MAX_CIPHER_BLOCK_SIZE /*iv*/ + MAX_PAD_SIZE + MAX_HASH_SIZE/*MAC*/;
 	
-	if (gnutls_compression_get(session)!=GNUTLS_COMP_NULL || session->internals.allow_large_records != 0)
+	if (session->internals.allow_large_records != 0)
 		size += EXTRA_COMP_SIZE;
 
 	size += session->security_parameters.max_record_recv_size + RECORD_HEADER_SIZE(session);
