@@ -253,6 +253,12 @@ flag = {
 };
 
 flag = {
+    name      = verify-allow-broken;
+    descrip   = "Allow broken algorithms, such as MD5 for certificate verification";
+    doc = "";
+};
+
+flag = {
     name      = ranges;
     descrip   = "Use length-hiding padding to prevent traffic analysis";
     doc      = "When possible (e.g., when using CBC ciphersuites), use length-hiding padding to prevent traffic analysis.";

@@ -78,6 +78,7 @@
 /* global stuff here */
 int resume, starttls, insecure, ranges, rehandshake, udp, mtu,
     inline_commands;
+unsigned int global_vflags = 0;
 char *hostname = NULL;
 char service[32]="";
 int record_max_size;
@@ -1454,6 +1455,10 @@ static void cmd_parser(int argc, char **argv)
 	insecure = HAVE_OPT(INSECURE);
 	ranges = HAVE_OPT(RANGES);
 
+	if (insecure || HAVE_OPT(VERIFY_ALLOW_BROKEN)) {
+		global_vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
+	}
+
 	udp = HAVE_OPT(UDP);
 	mtu = OPT_VALUE_MTU;
 
@@ -1705,6 +1710,8 @@ static void init_global_tls_stuff(void)
 		exit(1);
 	}
 	gnutls_certificate_set_pin_function(xcred, pin_callback, NULL);
+
+	gnutls_certificate_set_verify_flags(xcred, global_vflags);
 
 	if (x509_cafile != NULL) {
 		ret = gnutls_certificate_set_x509_trust_file(xcred,
