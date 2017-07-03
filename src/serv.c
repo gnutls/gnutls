@@ -1285,8 +1285,7 @@ static void retry_handshake(listener_item *j)
 	} else if (r < 0) {
 		j->http_state = HTTP_STATE_CLOSING;
 		check_alert(j->tls_session, r);
-		fprintf(stderr, "Error in handshake\n");
-		GERR(r);
+		fprintf(stderr, "Error in handshake: %s\n", gnutls_strerror(r));
 
 		do {
 			ret = gnutls_alert_send_appropriate(j->tls_session, r);
@@ -1325,7 +1324,7 @@ int r, ret;
 		do {
 			ret = gnutls_alert_send_appropriate(j->tls_session, r);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-		GERR(r);
+		fprintf(stderr, "Error in rehandshake: %s\n", gnutls_strerror(r));
 		j->http_state = HTTP_STATE_CLOSING;
 	} else {
 		j->http_state = HTTP_STATE_REQUEST;
@@ -1458,7 +1457,7 @@ static void tcp_server(const char *name, int port)
 
 			if (FD_ISSET(j->fd, &rd) && !j->listen_socket) {
 /* read partial GET request */
-				char buf[1024];
+				char buf[16*1024];
 				int r;
 
 				if (j->handshake_ok == 0) {
@@ -1469,7 +1468,7 @@ static void tcp_server(const char *name, int port)
 					r = gnutls_record_recv(j->
 							       tls_session,
 							       buf,
-							       MIN(1024,
+							       MIN(sizeof(buf),
 								   SMALL_READ_TEST));
 					if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
 						/* do nothing */
