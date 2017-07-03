@@ -286,7 +286,10 @@ _gnutls_handshake_verify_data12(gnutls_session_t session,
 	memcpy(dconcat.data+GNUTLS_RANDOM_SIZE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 	memcpy(dconcat.data+GNUTLS_RANDOM_SIZE*2, params->data, params->size);
 
-	ret = gnutls_pubkey_verify_data2(cert->pubkey, sign_algo, verify_flags,
+	/* Here we intentionally enable flag GNUTLS_VERIFY_ALLOW_BROKEN
+	 * because we have checked whether the currently used signature
+	 * algorithm is allowed in the session. */
+	ret = gnutls_pubkey_verify_data2(cert->pubkey, sign_algo, verify_flags|GNUTLS_VERIFY_ALLOW_BROKEN,
 					 &dconcat, signature);
 	if (ret < 0)
 		gnutls_assert();
@@ -350,7 +353,10 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 	dconcat.data = session->internals.handshake_hash_buffer.data;
 	dconcat.size = session->internals.handshake_hash_buffer_prev_len;
 
-	ret = gnutls_pubkey_verify_data2(cert->pubkey, sign_algo, verify_flags,
+	/* Here we intentionally enable flag GNUTLS_VERIFY_ALLOW_BROKEN
+	 * because we have checked whether the currently used signature
+	 * algorithm is allowed in the session. */
+	ret = gnutls_pubkey_verify_data2(cert->pubkey, sign_algo, verify_flags|GNUTLS_VERIFY_ALLOW_BROKEN,
 					 &dconcat, signature);
 	if (ret < 0)
 		gnutls_assert();
