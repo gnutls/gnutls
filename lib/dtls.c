@@ -493,7 +493,7 @@ void gnutls_dtls_set_mtu(gnutls_session_t session, unsigned int mtu)
 	session->internals.dtls.mtu = MIN(mtu, DEFAULT_MAX_RECORD_SIZE);
 }
 
-static int record_overhead(const cipher_entry_st * cipher,
+int _gnutls_record_overhead(const cipher_entry_st * cipher,
 			   const mac_entry_st * mac,
 			   unsigned etm,
 			   unsigned est_data)
@@ -591,7 +591,7 @@ size_t gnutls_est_record_overhead_size(gnutls_protocol_t version,
 	else
 		total = DTLS_RECORD_HEADER_SIZE;
 
-	total += record_overhead(c, m, 0, 0);
+	total += _gnutls_record_overhead(c, m, 0, 0);
 
 	return total;
 }
@@ -617,7 +617,7 @@ static int record_overhead_rt(gnutls_session_t session, unsigned est_data)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	return record_overhead(params->cipher, params->mac,
+	return _gnutls_record_overhead(params->cipher, params->mac,
 			       params->etm, est_data);
 }
 

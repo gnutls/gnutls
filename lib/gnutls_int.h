@@ -1086,6 +1086,10 @@ typedef struct {
 	const struct extension_entry_st *used_exts[MAX_EXT_TYPES];
 	unsigned used_exts_size;
 
+	/* this is not the negotiated max_record_recv_size, but the actual maximum
+	 * receive size */
+	unsigned max_recv_size;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } internals_st;

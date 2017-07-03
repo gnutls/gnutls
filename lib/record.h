@@ -52,12 +52,13 @@ inline static unsigned max_record_recv_size(gnutls_session_t session)
 {
 	unsigned size;
 
-	size = MAX_CIPHER_BLOCK_SIZE /*iv*/ + MAX_PAD_SIZE + MAX_HASH_SIZE/*MAC*/;
-	
-	if (session->internals.allow_large_records != 0)
-		size += EXTRA_COMP_SIZE;
-
-	size += session->security_parameters.max_record_recv_size + RECORD_HEADER_SIZE(session);
+	if (session->internals.max_recv_size == 0) {
+		size = session->security_parameters.max_record_recv_size + RECORD_HEADER_SIZE(session);
+		if (session->internals.allow_large_records != 0)
+			size += EXTRA_COMP_SIZE;
+	} else {
+		size = session->internals.max_recv_size;
+	}
 
 	return size;
 }

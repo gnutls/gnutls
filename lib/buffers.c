@@ -540,8 +540,8 @@ _gnutls_io_read_buffered(gnutls_session_t session, size_t total,
 	size_t recvdata, readsize;
 
 	if (total > max_record_recv_size(session) || total == 0) {
-		gnutls_assert();	/* internal error */
-		return GNUTLS_E_INVALID_REQUEST;
+		gnutls_assert();
+		return GNUTLS_E_RECORD_OVERFLOW;
 	}
 
 	/* calculate the actual size, ie. get the minimum of the
