@@ -15,7 +15,7 @@ See the end for copying conditions.
    TLS extension. The field is not used by GnuTLS nor is made available to
    calling applications. That addresses a null pointer dereference on server
    side caused by packets containing the ResponseID field. Reported
-   by Hubert Kario.
+   by Hubert Kario. [GNUTLS-SA-2017-4]
 
 ** libgnutls: Handle specially HSMs which request explicit authentication.
    There are HSMs which return CKR_USER_NOT_LOGGED_IN on the first private key
