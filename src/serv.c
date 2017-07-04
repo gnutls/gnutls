@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  * Copyright (C) 2001,2002 Paul Sheer
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  * Portions Copyright (C) 2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
@@ -77,6 +78,9 @@ const char *priorities = NULL;
 const char *status_response_ocsp = NULL;
 const char *sni_hostname = NULL;
 int sni_hostname_fatal = 0;
+
+const char **alpn_protos = NULL;
+unsigned alpn_protos_size = 0;
 
 gnutls_datum_t session_ticket_key;
 static void tcp_server(const char *name, int port);
@@ -359,11 +363,15 @@ end:
 	return ret;
 }
 
+#define MAX_ALPN_PROTOCOLS 16
 gnutls_session_t initialize_session(int dtls)
 {
 	gnutls_session_t session;
 	int ret;
+	unsigned i;
 	const char *err;
+	gnutls_datum_t alpn[MAX_ALPN_PROTOCOLS];
+	unsigned alpn_size;
 
 	if (priorities == NULL)
 		priorities = "NORMAL";
@@ -399,6 +407,18 @@ gnutls_session_t initialize_session(int dtls)
 
 	if (gnutls_priority_set_direct(session, priorities, &err) < 0) {
 		fprintf(stderr, "Syntax error at: %s\n", err);
+		exit(1);
+	}
+
+	alpn_size = MIN(MAX_ALPN_PROTOCOLS,alpn_protos_size);
+	for (i=0;i<alpn_size;i++) {
+		alpn[i].data = (void*)alpn_protos[i];
+		alpn[i].size = strlen(alpn_protos[i]);
+	}
+
+	ret = gnutls_alpn_set_protocols(session, alpn, alpn_size, HAVE_OPT(ALPN_FATAL)?GNUTLS_ALPN_MANDATORY:0);
+	if (ret < 0) {
+		fprintf(stderr, "Error setting ALPN protocols: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1614,6 +1634,11 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(DHPARAMS))
 		dh_params_file = OPT_ARG(DHPARAMS);
+
+	if (HAVE_OPT(ALPN)) {
+		alpn_protos = STACKLST_OPT(ALPN);
+		alpn_protos_size = STACKCT_OPT(ALPN);
+	}
 
 	if (HAVE_OPT(X509KEYFILE)) {
 		x509_keyfile = STACKLST_OPT(X509KEYFILE);

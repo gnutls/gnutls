@@ -22,6 +22,21 @@ flag = {
 };
 
 flag = {
+    name      = alpn;
+    arg-type  = string;
+    descrip   = "Specify ALPN protocol to be enabled by the server";
+    doc      = "Specify the (textual) ALPN protocol for the server to use.";
+    stack-arg;
+    max       = NOLIMIT;
+};
+
+flag = {
+    name      = alpn-fatal;
+    descrip   = "Send fatal alert on non-matching ALPN name";
+    doc      = "";
+};
+
+flag = {
     name      = noticket;
     descrip   = "Don't accept session tickets";
     doc      = "";
@@ -158,6 +173,7 @@ flag = {
     doc      = "";
     deprecated;
 };
+
 
 flag = {
     name      = x509keyfile;
