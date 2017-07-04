@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013 Nikos Mavrogiannopoulos
+ * Copyright (C) 2017 Red Hat, Inc.
  * 
  * This file is part of GnuTLS.
  *
@@ -66,11 +67,11 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 
 	priv = epriv;
 
-	DECR_LENGTH_RET(data_size, 2, 0);
+	DECR_LENGTH_RET(data_size, 2, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	len = _gnutls_read_uint16(p);
 	p += 2;
 
-	if (len > (size_t)data_size)
+	if (len == 0 || len > (size_t)data_size)
 		return
 		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
@@ -78,10 +79,13 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 		selected_protocol_index = MAX_ALPN_PROTOCOLS+1;
 
 		while (data_size > 0) {
-			DECR_LENGTH_RET(data_size, 1, 0);
+			DECR_LENGTH_RET(data_size, 1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 			len1 = *p;
 			p += 1;
-			DECR_LENGTH_RET(data_size, len1, 0);
+			DECR_LENGTH_RET(data_size, len1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+			if (len1 == 0)
+				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 			for (i = 0; i < priv->size; i++) {
 				if (priv->protocol_size[i] == len1
@@ -109,10 +113,10 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 			p += len1;
 		}
 	} else {
-		DECR_LENGTH_RET(data_size, 1, 0);
+		DECR_LENGTH_RET(data_size, 1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		len1 = *p;
 		p += 1;
-		DECR_LENGTH_RET(data_size, len1, 0);
+		DECR_LENGTH_RET(data_size, len1, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		for (i = 0; i < priv->size; i++) {
 			if (priv->protocol_size[i] == len1
