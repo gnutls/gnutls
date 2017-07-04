@@ -3,7 +3,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.28 (unreleased)
+* Version 3.3.28 (released 2017-07-04)
 
 ** libgnutls: Fixed issue when rehandshaking without a client certificate in
    a session which initially used one. Reported by Frantisek Sumsal.
@@ -30,6 +30,8 @@ See the end for copying conditions.
    first, e.g., 32768 = 0x80 0x00. This is interpreted literraly by
    some HSMs which do not accept an integer with a leading zero. This
    improves operation with certain Atos HSMs.
+
+** libgnutls: Backported PKCS#11 key generation functionality for DSA keys.
 
 ** libgnutls: Improve check for /dev/urandom uniqueness. Ensure that when
    gnutls_global_init() is called for a second time that /dev/urandom is
