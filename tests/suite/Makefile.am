@@ -92,7 +92,7 @@ EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common
 nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
 	testrandom.sh pkcs7-cat certtool-pkcs11.sh tls-fuzzer/tls-fuzzer-nocert.sh \
-	tls-fuzzer/tls-fuzzer-cert.sh
+	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh
 
 if ENABLE_PKCS11
 nodist_check_SCRIPTS += testpkcs11.sh crl-test

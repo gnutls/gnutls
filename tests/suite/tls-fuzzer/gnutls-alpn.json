@@ -1,0 +1,20 @@
+[
+    {"server_command": ["@SERVER@", "--http",
+                 "--x509keyfile", "tests/serverX509Key.pem",
+                 "--x509certfile", "tests/serverX509Cert.pem",
+                 "--debug=3",
+                 "--alpn=http/1.1",
+                 "--alpn=http/2",
+                 "--alpn-fatal",
+                 "--priority=@PRIORITY@",
+                 "--disable-client-cert", "--port=@PORT@"],
+     "tests" : [
+	 {"name" : "test-alpn-negotiation.py",
+          "comment" : "we do not not fail when ALPN name changes on resumption",
+          "comment" : "we do not not parse all objects when a match is found",
+          "arguments" : ["-e", "overflow length of last item",
+          "-e", "resumption with alpn change",
+          "-e", "underflow length of protocol_name_list"]}
+     ]
+    }
+]
