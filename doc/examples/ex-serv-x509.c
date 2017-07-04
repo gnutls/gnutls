@@ -77,8 +77,10 @@ int main(void)
                                                               OCSP_STATUS_FILE,
                                                               0));
 
-        CHECK(gnutls_priority_init(&priority_cache,
-                                   "PERFORMANCE:%SERVER_PRECEDENCE", NULL));
+        /* One could use specific priority strings such as "PERFORMANCE:%SERVER_PRECEDENCE"
+         * especially if they are read from a configuration file; otherwise, it
+         * is recommended to use the defaults as shown here. */
+        CHECK(gnutls_priority_init(&priority_cache, NULL, NULL));
 
 #if GNUTLS_VERSION_NUMBER >= 0x030506
         /* only available since GnuTLS 3.5.6, on previous versions see
