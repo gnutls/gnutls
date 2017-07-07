@@ -75,17 +75,6 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t xcred;
 	struct mem_st memdata;
-	uint16_t tag;
-
-	if (size < 2)
-		abort();
-
-	memcpy(&tag, data, 2);
-	data += 2;
-	size -= 2;
-
-	if (tag != 0)		/* ignore */
-		return 0;
 
 	res = gnutls_init(&session, GNUTLS_CLIENT);
 	assert(res >= 0);
