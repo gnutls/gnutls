@@ -37,3 +37,11 @@ clean:
 	gnutls_idna_parser_fuzzer gnutls_reverse_idna_parser_fuzzer gnutls_ocsp_resp_parser_fuzzer \
 	gnutls_ocsp_req_parser_fuzzer gnutls_base64_decoder_fuzzer \
 	gnutls_base64_encoder_fuzzer
+
+update:
+	@git clone --depth=1 https://github.com/openssl/openssl openssl.tmp
+	@cp openssl.tmp/fuzz/corpora/x509/* gnutls_x509_parser.in
+	@cp openssl.tmp/fuzz/corpora/server/* gnutls_server.in
+	@cp openssl.tmp/fuzz/corpora/client/* gnutls_client.in
+	@rm -rf openssl.tmp
+	@echo "Updated corpus/trace files. Use git status to identify them and commit them."

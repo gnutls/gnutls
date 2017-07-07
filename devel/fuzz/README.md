@@ -9,6 +9,9 @@ assume they are fuzzers it should run.
 The initial values for each parser fuzzer are taken from the $NAME.in
 directory.
 
+The command "make update" will update the stored corpus/traces
+using other projects like openssl.
+
 
 # Running a fuzzer using AFL
 
