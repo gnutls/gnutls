@@ -50,7 +50,7 @@ check()
 	prio=$2
 	name=$1
 	echo checking $prio
-	"${CLI}" --list --priority $prio|grep -v ^Certificate|grep -v ^Ciphers|grep -v ^MACs|grep -v ^Key|grep -v Compression|grep -v ^Elliptic|sed -e 's/\tSSL3.0$//g' -e 's/\tTLS1.0$//g'|grep -v ^PK>$TMPFILE
+	"${CLI}" --list --priority $prio|grep -v ^Certificate|grep -v ^Ciphers|grep -v ^MACs|grep -v ^Key|grep -v Compression|grep -v ^Groups|grep -v ^Elliptic|sed -e 's/\tSSL3.0$//g' -e 's/\tTLS1.0$//g'|grep -v ^PK>$TMPFILE
 	cat ${srcdir}/data/listings-$name|sed 's/\tSSL3.0$//g' >$TMPFILE2
 	${DIFF} ${TMPFILE} ${TMPFILE2}
 	if test $? != 0;then
