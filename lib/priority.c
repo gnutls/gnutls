@@ -1692,17 +1692,30 @@ int gnutls_set_default_priority(gnutls_session_t session)
  * Get a list of available elliptic curves in the priority
  * structure. 
  *
+ * Deprecated: This function has been replaced by
+ * gnutls_priority_group_list() since 3.6.0.
+ *
  * Returns: the number of items, or an error code.
+ *
  * Since: 3.0
  **/
 int
 gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
 			       const unsigned int **list)
 {
+	unsigned i;
+
 	if (pcache->_supported_ecc.algorithms == 0)
 		return 0;
 
 	*list = pcache->_supported_ecc.priority;
+
+	/* to ensure we don't confuse the caller, we do not include
+	 * any FFDHE groups. This may return an incomplete list. */
+	for (i=0;i<pcache->_supported_ecc.algorithms;i++)
+		if (pcache->_supported_ecc.priority[i] > GNUTLS_ECC_CURVE_MAX)
+			return i;
+
 	return pcache->_supported_ecc.algorithms;
 }
 
