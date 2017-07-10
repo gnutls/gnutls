@@ -464,8 +464,8 @@ and the underlying protocol type, i.e., datagram (UDP) or reliable (TCP).
 
 After the session initialization details on the allowed ciphersuites
 and protocol versions should be set using the priority functions
-such as @funcref{gnutls_priority_set_direct}. We elaborate on them
-in @ref{Priority Strings}.
+such as @funcref{gnutls_priority_set2} and @funcref{gnutls_priority_set_direct}.
+We elaborate on them in @ref{Priority Strings}.
 The credentials used for the key exchange method, such as certificates 
 or usernames and passwords should also be associated with the session
 current session using @funcref{gnutls_credentials_set}. 
@@ -1057,7 +1057,7 @@ The GnuTLS priority strings specify the TLS session's handshake
 algorithms and options in a compact, easy-to-use format. These
 strings are intended as a user-specified override of the library defaults.
 
-That is, applications should use the default settings
+That is, we recommend applications using the default settings
 (c.f. @funcref{gnutls_set_default_priority}), and provide the user 
 with access to priority strings for overriding the default behavior,
 on configuration files, or other UI. Following such a principle,
@@ -1065,6 +1065,17 @@ makes the GnuTLS library as the default settings provider. That is
 necessary and a good practice, because TLS protocol hardening and
 phasing out of legacy algorithms, is easier to co-ordinate when happens
 in a single library.
+
+@showfuncB{gnutls_set_default_priority,gnutls_priority_set_direct}
+
+The priority string translation to the internal GnuTLS form requires
+processing and the generated internal form also occupies some memory.
+For that, it is recommended to do that processing once in server side,
+and share the generated data across sessions. The following functions
+allow the generation of a "priority cache" and the sharing of it across
+sessions.
+
+@showfuncC{gnutls_priority_init,gnutls_priority_set2,gnutls_priority_deinit}
 
 @subheading Using Priority Strings
 
@@ -1075,7 +1086,6 @@ specific algorithm details, as the priority strings are not constant between
 gnutls versions (they are periodically updated to account for cryptographic
 advances while providing compatibility with old clients and servers).
 
-@showfuncB{gnutls_priority_set_direct,gnutls_priority_set2}
 
 @float Table,tab:prio-keywords
 @multitable @columnfractions .20 .70
