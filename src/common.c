@@ -761,14 +761,14 @@ void print_list(const char *priorities, int verbose)
 
 		{
 			ret =
-			    gnutls_priority_ecc_curve_list(pcache, &list);
+			    gnutls_priority_group_list(pcache, &list);
 
-			printf("Elliptic curves: ");
+			printf("Groups: ");
 			if (ret == 0)
 				printf("none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("CURVE-%s",
-				       gnutls_ecc_curve_get_name(list[i]));
+				printf("GROUP-%s",
+				       gnutls_group_get_name(list[i]));
 				if (i + 1 != (unsigned) ret)
 					printf(", ");
 				else
@@ -908,11 +908,11 @@ void print_list(const char *priorities, int verbose)
 	}
 
 	{
-		const gnutls_ecc_curve_t *p = gnutls_ecc_curve_list();
+		const gnutls_group_t *p = gnutls_group_list();
 
-		printf("Elliptic curves: ");
+		printf("Groups: ");
 		for (; *p; p++) {
-			printf("CURVE-%s", gnutls_ecc_curve_get_name(*p));
+			printf("GROUP-%s", gnutls_group_get_name(*p));
 			if (*(p + 1))
 				printf(", ");
 			else
