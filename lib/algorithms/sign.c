@@ -48,19 +48,19 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_RSA_SHA256,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA256,
-	 .aid = {{4, 1}}},
+	 .aid = {{4, 1}, 0}},
 	{.name = "RSA-SHA384",
 	 .oid = SIG_RSA_SHA384_OID,
 	 .id = GNUTLS_SIGN_RSA_SHA384,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA384,
-	 .aid = {{5, 1}}},
+	 .aid = {{5, 1}, 0}},
 	{.name = "RSA-SHA512",
 	 .oid = SIG_RSA_SHA512_OID,
 	 .id = GNUTLS_SIGN_RSA_SHA512,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = {{6, 1}}},
+	 .aid = {{6, 1}, 0}},
 
 	/* RSA-PSS */
 	{.name = "RSA-PSS-SHA256",
@@ -68,37 +68,37 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_RSA_PSS_SHA256,
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .hash = GNUTLS_DIG_SHA256,
-	 .aid = {{8, 4}}},
+	 .aid = {{8, 4}, 0}},
 	{.name = "RSA-PSS-SHA256",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
 	 .id = GNUTLS_SIGN_RSA_PSS_SHA256,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA256,
-	 .aid = {{8, 4}}},
+	 .aid = {{8, 4}, 0}},
 	{.name = "RSA-PSS-SHA384",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
 	 .id = GNUTLS_SIGN_RSA_PSS_SHA384,
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .hash = GNUTLS_DIG_SHA384,
-	 .aid = {{8, 5}}},
+	 .aid = {{8, 5}, 0}},
 	{.name = "RSA-PSS-SHA384",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
 	 .id = GNUTLS_SIGN_RSA_PSS_SHA384,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA384,
-	 .aid = {{8, 5}}},
+	 .aid = {{8, 5}, 0}},
 	{.name = "RSA-PSS-SHA512",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
 	 .id = GNUTLS_SIGN_RSA_PSS_SHA512,
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = {{8, 6}}},
+	 .aid = {{8, 6}, 0}},
 	{.name = "RSA-PSS-SHA512",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
 	 .id = GNUTLS_SIGN_RSA_PSS_SHA512,
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = {{8, 6}}},
+	 .aid = {{8, 6}, 0}},
 
 	 /* Ed25519: The hash algorithm here is set to be SHA512, although that is
 	  * an internal detail of Ed25519; we set it, because CMS/PKCS#7 requires
@@ -108,27 +108,55 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_EDDSA_ED25519,
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = {{8, 7}}},
+	 .aid = {{8, 7}, 0}},
 
 	 /* ECDSA */
+	 /* The following three signature algorithms
+	  * have different semantics when used under TLS 1.2
+	  * or TLS 1.3. Under the former they behave as the
+	  * as ECDSA signed by SHAXXX by any curve, but under the
+	  * latter they are restricted to a single curve.
+	  * For this reason the ECDSA-SHAXXX algorithms act
+	  * as an alias to them. */
+	 /* we have intentionally the ECDSA-SHAXXX algorithms first
+	  * so that gnutls_pk_to_sign() will return these. */
 	{.name = "ECDSA-SHA256",
 	 .oid = "1.2.840.10045.4.3.2",
 	 .id = GNUTLS_SIGN_ECDSA_SHA256,
-	 .pk = GNUTLS_PK_EC,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .hash = GNUTLS_DIG_SHA256,
-	 .aid = {{4, 3}}},
+	 .aid = {{4, 3}, 0}},
 	{.name = "ECDSA-SHA384",
 	 .oid = "1.2.840.10045.4.3.3",
 	 .id = GNUTLS_SIGN_ECDSA_SHA384,
-	 .pk = GNUTLS_PK_EC,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .hash = GNUTLS_DIG_SHA384,
-	 .aid = {{5, 3}}},
+	 .aid = {{5, 3}, 0}},
 	{.name = "ECDSA-SHA512",
 	 .oid = "1.2.840.10045.4.3.4",
 	 .id = GNUTLS_SIGN_ECDSA_SHA512,
-	 .pk = GNUTLS_PK_EC,
+	 .pk = GNUTLS_PK_ECDSA,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .aid = {{6, 3}}},
+	 .aid = {{6, 3}, 0}},
+
+	{.name = "ECDSA-SECP256R1-SHA256",
+	 .id = GNUTLS_SIGN_ECDSA_SECP256R1_SHA256,
+	 .pk = GNUTLS_PK_ECDSA,
+	 .curve = GNUTLS_ECC_CURVE_SECP256R1,
+	 .hash = GNUTLS_DIG_SHA256,
+	 .aid = {{4, 3}, 1}},
+	{.name = "ECDSA-SECP384R1-SHA384",
+	 .id = GNUTLS_SIGN_ECDSA_SECP384R1_SHA384,
+	 .pk = GNUTLS_PK_ECDSA,
+	 .curve = GNUTLS_ECC_CURVE_SECP384R1,
+	 .hash = GNUTLS_DIG_SHA384,
+	 .aid = {{5, 3}, 1}},
+	{.name = "ECDSA-SECP521R1-SHA512",
+	 .id = GNUTLS_SIGN_ECDSA_SECP521R1_SHA512,
+	 .pk = GNUTLS_PK_ECDSA,
+	 .curve = GNUTLS_ECC_CURVE_SECP521R1,
+	 .hash = GNUTLS_DIG_SHA512,
+	 .aid = {{6, 3}, 1}},
 
 	 /* ECDSA-SHA3 */
 	{.name = "ECDSA-SHA3-224",
@@ -220,14 +248,14 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA1,
 	 .slevel = SHA1_SECURE_VAL,
-	 .aid = {{2, 1}}},
+	 .aid = {{2, 1}, 0}},
 	{.name = "RSA-SHA1",
 	 .oid = ISO_SIG_RSA_SHA1_OID,
 	 .id = GNUTLS_SIGN_RSA_SHA1,
 	 .pk = GNUTLS_PK_RSA,
 	 .slevel = SHA1_SECURE_VAL,
 	 .hash = GNUTLS_DIG_SHA1,
-	 .aid = {{2, 1}}},
+	 .aid = {{2, 1}, 0}},
 	{.name = "RSA-SHA224",
 	 .oid = SIG_RSA_SHA224_OID,
 	 .id = GNUTLS_SIGN_RSA_SHA224,
@@ -294,7 +322,7 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_EC,
 	 .slevel = SHA1_SECURE_VAL,
 	 .hash = GNUTLS_DIG_SHA1,
-	 .aid = {{2, 3}}},
+	 .aid = {{2, 3}, 0}},
 	{.name = "ECDSA-SHA224",
 	 .oid = "1.2.840.10045.4.3.1",
 	 .id = GNUTLS_SIGN_ECDSA_SHA224,
@@ -326,7 +354,12 @@ static const gnutls_sign_entry_st sign_algorithms[] = {
 	 .hash = GNUTLS_DIG_SHA512,
 	 .aid = TLS_SIGN_AID_UNKNOWN},
 
-	{0, 0, 0, 0, 0, TLS_SIGN_AID_UNKNOWN}
+	{.name = 0,
+	 .oid = 0,
+	 .id = 0,
+	 .pk = 0,
+	 .hash = 0,
+	 .aid = TLS_SIGN_AID_UNKNOWN}
 };
 
 #define GNUTLS_SIGN_LOOP(b) \
@@ -598,16 +631,17 @@ gnutls_sign_supports_pk_algorithm(gnutls_sign_algorithm_t sign, gnutls_pk_algori
 }
 
 gnutls_sign_algorithm_t
-_gnutls_tls_aid_to_sign(const sign_algorithm_st * aid)
+_gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st *ver)
 {
 	gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
-	if (HAVE_UNKNOWN_SIGAID(aid))
+	if (id0 == 255 && id1 == 255)
 		return ret;
 
 	GNUTLS_SIGN_LOOP(
-		if (p->aid.id[0] == aid->id[0] && 
-			p->aid.id[1] == aid->id[1]) {
+		if (p->aid.id[0] == id0 && 
+		     p->aid.id[1] == id1 &&
+		     p->aid.tls_sem == ver->tls_sig_sem) {
 
 			ret = p->id;
 			break;

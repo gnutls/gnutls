@@ -100,7 +100,8 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 1,
 	 .obsolete = 0,
 	 .only_extension = 1,
-	 .false_start = 0 /* doesn't make sense */
+	 .false_start = 0, /* doesn't make sense */
+	 .tls_sig_sem = 1
 	},
 	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
 	 .id = GNUTLS_DTLS0_9,

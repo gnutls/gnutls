@@ -34,7 +34,7 @@
 
 #define IS_EC(x) (((x)==GNUTLS_PK_ECDSA)||((x)==GNUTLS_PK_ECDH_X25519)||((x)==GNUTLS_PK_EDDSA_ED25519))
 
-#define TLS_SIGN_AID_UNKNOWN {{255, 255}}
+#define TLS_SIGN_AID_UNKNOWN {{255, 255}, 0}
 #define HAVE_UNKNOWN_SIGAID(aid) ((aid)->id[0] == 255 && (aid)->id[1] == 255)
 
 /* Functions for version handling. */
@@ -314,6 +314,11 @@ struct gnutls_sign_entry_st {
 	gnutls_sign_algorithm_t id;
 	gnutls_pk_algorithm_t pk;
 	gnutls_digest_algorithm_t hash;
+
+	/* if this signature algorithm is restricted to a curve
+	 * under TLS 1.3. */
+	gnutls_ecc_curve_t curve;
+
 	/* See RFC 5246 HashAlgorithm and SignatureAlgorithm
 	   for values to use in aid struct. */
 	const sign_algorithm_st aid;
@@ -331,8 +336,9 @@ gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk(gnutls_sign_algorithm_t
 					      sign);
 const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t,
 				     gnutls_digest_algorithm_t mac);
-gnutls_sign_algorithm_t _gnutls_tls_aid_to_sign(const sign_algorithm_st *
-						aid);
+
+gnutls_sign_algorithm_t
+_gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st *ver);
 const sign_algorithm_st *_gnutls_sign_to_tls_aid(gnutls_sign_algorithm_t
 						 sign);
 

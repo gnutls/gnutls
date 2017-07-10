@@ -77,16 +77,23 @@ _gnutls_sign_algorithm_write_params(gnutls_session_t session,
 {
 	uint8_t *p;
 	unsigned int len, i;
-	const sign_algorithm_st *aid;
+	const sign_algorithm_st *aid, *prev = NULL;
 	uint8_t buffer[MAX_ALGOS*2];
 
 	p = buffer;
 	len = 0;
 
+	/* This generates a list of TLS signature algorithms. It has
+	 * limited duplicate detection, and does not add twice the same
+	 * AID */
+
 	for (i=0;i<session->internals.priorities->sigalg.size;i++) {
 		aid = &session->internals.priorities->sigalg.entry[i]->aid;
 
 		if (HAVE_UNKNOWN_SIGAID(aid))
+			continue;
+
+		if (prev && prev->id[0] == aid->id[0] && prev->id[1] == aid->id[1])
 			continue;
 
 		_gnutls_handshake_log
@@ -104,6 +111,7 @@ _gnutls_sign_algorithm_write_params(gnutls_session_t session,
 		p++;
 		*p = aid->id[1];
 		p++;
+		prev = aid;
 	}
 
 	return _gnutls_buffer_append_data_prefix(extdata, 16, buffer, len);
@@ -120,9 +128,17 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 	unsigned int sig, i;
 	sig_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
+	const version_entry_st *ver = get_version(session);
 
 	if (data_size == 0 || data_size % 2 != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+	if (ver == NULL) { /* assume TLS 1.2 semantics */
+		ver = version_to_entry(GNUTLS_TLS1_2);
+		if (unlikely(ver == NULL)) {
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
+	}
 
 	priv = gnutls_calloc(1, sizeof(*priv));
 	if (priv == NULL) {
@@ -131,16 +147,16 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 	}
 
 	for (i = 0; i < data_size; i += 2) {
-		sign_algorithm_st aid;
+		uint8_t id[2];
 
-		aid.id[0] = data[i];
-		aid.id[1] = data[i + 1];
+		id[0] = data[i];
+		id[1] = data[i + 1];
 
-		sig = _gnutls_tls_aid_to_sign(&aid);
+		sig = _gnutls_tls_aid_to_sign(id[0], id[1], ver);
 
 		_gnutls_handshake_log
 		    ("EXT[%p]: rcvd signature algo (%d.%d) %s\n", session,
-		     aid.id[0], aid.id[1],
+		     (int)id[0], (int)id[1],
 		     gnutls_sign_get_name(sig));
 
 		if (sig != GNUTLS_SIGN_UNKNOWN) {
@@ -287,6 +303,8 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	}
 
 	for (i = 0; i < priv->sign_algorithms_size; i++) {
+		_gnutls_handshake_log("checking cert compat with %s\n", gnutls_sign_algorithm_get_name(priv->sign_algorithms[i]));
+
 		if (_gnutls_privkey_compatible_with_sig(privkey, priv->sign_algorithms[i]) == 0)
 			continue;
 
@@ -342,6 +360,7 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 		}
 	}
 
+	_gnutls_handshake_log("signature algorithm %s is not enabled\n", gnutls_sign_algorithm_get_name(sig));
 	return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 }
 

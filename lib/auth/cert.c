@@ -1092,13 +1092,9 @@ _gnutls_proc_cert_client_crt_vrfy(gnutls_session_t session,
 	vflags = cred->verify_flags | session->internals.additional_verify_flags;
 
 	if (_gnutls_version_has_selectable_sighash(ver)) {
-		sign_algorithm_st aid;
-
 		DECR_LEN(dsize, 2);
-		aid.id[0] = pdata[0];
-		aid.id[1] = pdata[1];
 
-		sign_algo = _gnutls_tls_aid_to_sign(&aid);
+		sign_algo = _gnutls_tls_aid_to_sign(pdata[0], pdata[1], ver);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
@@ -1763,16 +1759,17 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 
 	/* VERIFY SIGNATURE */
 	if (_gnutls_version_has_selectable_sighash(ver)) {
-		sign_algorithm_st aid;
+		uint8_t id[2];
 
 		DECR_LEN(data_size, 1);
-		aid.id[0] = *data++;
+		id[0] = *data++;
 		DECR_LEN(data_size, 1);
-		aid.id[1] = *data++;
-		sign_algo = _gnutls_tls_aid_to_sign(&aid);
+		id[1] = *data++;
+
+		sign_algo = _gnutls_tls_aid_to_sign(id[0], id[1], ver);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			_gnutls_debug_log("unknown signature %d.%d\n",
-					  aid.id[0], aid.id[1]);
+					  (int)id[0], (int)id[1]);
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 		}

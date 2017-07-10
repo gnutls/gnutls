@@ -752,6 +752,9 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_ECDSA_SHA256: Digital signature algorithm ECDSA with SHA-256.
  * @GNUTLS_SIGN_ECDSA_SHA384: Digital signature algorithm ECDSA with SHA-384.
  * @GNUTLS_SIGN_ECDSA_SHA512: Digital signature algorithm ECDSA with SHA-512.
+ * @GNUTLS_SIGN_ECDSA_SECP256R1_SHA256: Digital signature algorithm ECDSA-SECP256R1 with SHA-256 (used in TLS 1.3 but not PKIX).
+ * @GNUTLS_SIGN_ECDSA_SECP384R1_SHA384: Digital signature algorithm ECDSA-SECP384R1 with SHA-384 (used in TLS 1.3 but not PKIX).
+ * @GNUTLS_SIGN_ECDSA_SECP521R1_SHA512: Digital signature algorithm ECDSA-SECP521R1 with SHA-512 (used in TLS 1.3 but not PKIX).
  * @GNUTLS_SIGN_ECDSA_SHA3_224: Digital signature algorithm ECDSA with SHA3-224.
  * @GNUTLS_SIGN_ECDSA_SHA3_256: Digital signature algorithm ECDSA with SHA3-256.
  * @GNUTLS_SIGN_ECDSA_SHA3_384: Digital signature algorithm ECDSA with SHA3-384.
@@ -812,7 +815,11 @@ typedef enum {
 	GNUTLS_SIGN_RSA_PSS_SHA512 = 34,
 	GNUTLS_SIGN_EDDSA_ED25519 = 35,
 	GNUTLS_SIGN_RSA_RAW = 36,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_RAW
+
+	GNUTLS_SIGN_ECDSA_SECP256R1_SHA256 = 37,
+	GNUTLS_SIGN_ECDSA_SECP384R1_SHA384 = 38,
+	GNUTLS_SIGN_ECDSA_SECP521R1_SHA512 = 39,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_ECDSA_SECP521R1_SHA512
 } gnutls_sign_algorithm_t;
 
 /**

@@ -521,6 +521,12 @@ typedef struct {
 	bool obsolete;
 	bool false_start;	/* That version can be used with false start */
 	bool only_extension;	/* negotiated only with an extension */
+	/* 
+	 * TLS versions modify the semantics of signature algorithms. This number
+	 * is there to distinguish signature algorithms semantics between versions
+	 * (maps to sign_algorithm_st->tls_sem)
+	 */
+	uint8_t tls_sig_sem;
 } version_entry_st;
 
 
@@ -531,6 +537,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t id[2]; /* used to be (in TLS 1.2) hash algorithm , PK algorithm */
+	uint8_t tls_sem; /* should match the protocol version's tls_sig_sem. */
 } sign_algorithm_st;
 
 /* This structure holds parameters got from TLS extension
