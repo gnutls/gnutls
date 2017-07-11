@@ -202,7 +202,7 @@ find_x509_client_cert(gnutls_session_t session,
 	       int pk_algos_length, int *indx)
 {
 	unsigned size;
-	gnutls_datum_t odn = { NULL, 0 };
+	gnutls_datum_t odn = { NULL, 0 }, asked_dn;
 	uint8_t *data = _data;
 	ssize_t data_size = _data_size;
 	unsigned i, j;
@@ -225,6 +225,10 @@ find_x509_client_cert(gnutls_session_t session,
 		DECR_LENGTH_RET(data_size, size, 0);
 		data += 2;
 
+		asked_dn.data = data;
+		asked_dn.size = size;
+		_gnutls_dn_log("Peer requested CA", &asked_dn);
+
 		for (i = 0; i < cred->ncerts; i++) {
 			for (j = 0; j < cred->certs[i].cert_list_length; j++) {
 				if ((result =
@@ -235,7 +239,7 @@ find_x509_client_cert(gnutls_session_t session,
 					return result;
 				}
 
-				if (odn.size == 0 || odn.size != size)
+				if (odn.size == 0 || odn.size != asked_dn.size)
 					continue;
 
 				/* If the DN matches and
@@ -248,7 +252,7 @@ find_x509_client_cert(gnutls_session_t session,
 								   [0].pubkey,
 								   NULL);
 
-				if ((memcmp(odn.data, data, size) == 0) &&
+				if ((memcmp(odn.data, asked_dn.data, asked_dn.size) == 0) &&
 				    (check_pk_algo_in_list
 				     (pk_algos, pk_algos_length,
 				      cert_pk) == 0)) {
@@ -351,6 +355,8 @@ get_issuers(gnutls_session_t session,
 
 			issuers_dn[i].data = data;
 			issuers_dn[i].size = size;
+
+			_gnutls_dn_log("Peer requested CA", &issuers_dn[i]);
 
 			data += size;
 		}

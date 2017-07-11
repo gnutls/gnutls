@@ -71,6 +71,18 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a);
 		} \
         } while(0)
 
+#define _gnutls_dn_log(str, dn) \
+	do { \
+		if (unlikely(_gnutls_log_level >= 3)) { \
+			gnutls_datum_t _cl_out; int _cl_ret; \
+			_cl_ret = gnutls_x509_rdn_get2((dn), &_cl_out, 0); \
+			if (_cl_ret >= 0) { \
+				_gnutls_log( 3, "%s: %s\n", str, _cl_out.data); \
+				gnutls_free(_cl_out.data); \
+	                } \
+		} \
+        } while(0)
+
 #define _gnutls_reason_log(str, status) \
 	do { \
 		if (unlikely(_gnutls_log_level >= 3)) { \
