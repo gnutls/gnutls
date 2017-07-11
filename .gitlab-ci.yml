@@ -91,12 +91,13 @@ minimal/Fedora/x86_64:
   - echo "Minimal build"
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
     ./configure --with-included-libtasn1 --enable-valgrind-tests
-    --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
+    --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe
     --disable-ocsp --disable-session-tickets --disable-non-suiteb-curves --with-included-unistring
-    --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
-    --disable-ssl3-support --disable-ssl2-support --without-zlib --disable-doc --disable-tests --enable-openssl-compatibility && make -j$(nproc)
+    --disable-nls --disable-libdane --without-p11-kit --without-tpm
+    --disable-ssl3-support --disable-ssl2-support --disable-doc --enable-openssl-compatibility
+  - make -j$(nproc)
   tags:
   - shared
   except:
