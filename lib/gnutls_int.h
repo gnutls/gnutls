@@ -598,8 +598,12 @@ typedef struct {
 	/* The selected (after server hello EC or DH group */
 	const gnutls_group_entry_st *grp;
 
-	/* Holds the signature algorithm used in this session - If any */
+	/* Holds the signature algorithm that will be used in this session,
+	 * selected by the server at the time of Ciphersuite/certificate
+	 * selection - see select_sign_algorithm() */
 	gnutls_sign_algorithm_t server_sign_algo;
+
+	/* Holds the signature algorithm used in this session - If any */
 	gnutls_sign_algorithm_t client_sign_algo;
 
 	/* Whether the master secret negotiation will be according to

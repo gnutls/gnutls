@@ -175,13 +175,11 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 	unsigned key_usage = 0;
 	int ret;
 
-	*sign_algo = _gnutls_session_get_sign_algo(session, cert, 0);
+	*sign_algo = session->security_parameters.server_sign_algo;
 	if (*sign_algo == GNUTLS_SIGN_UNKNOWN) {
 		gnutls_assert();
 		return GNUTLS_E_UNWANTED_ALGORITHM;
 	}
-
-	gnutls_sign_algorithm_set_server(session, *sign_algo);
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 

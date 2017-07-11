@@ -1441,6 +1441,39 @@ unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
 	return 1;
 }
 
+/* Selects a signature algorithm (if required by the ciphersuite and TLS
+ * version), appropriate for the certificate. If none can be selected
+ * returns an error.
+ */
+static
+int select_sign_algorithm(gnutls_session_t session,
+			  gnutls_pcert_st * cert,
+			  const gnutls_cipher_suite_entry_st *cs)
+{
+	gnutls_sign_algorithm_t algo;
+	const version_entry_st *ver = get_version(session);
+
+	if (_gnutls_kx_encipher_type(cs->kx_algorithm) != CIPHER_SIGN)
+		return 0;
+
+	if (!_gnutls_version_has_selectable_sighash(ver)) {
+		/* For SSL3.0 and TLS1.0 we lie as we cannot express md5-sha1 as
+		 * signature algorithm. */
+		algo = gnutls_pk_to_sign(cert->pubkey->params.algo, GNUTLS_DIG_SHA1);
+		gnutls_sign_algorithm_set_server(session, algo);
+		return 0;
+	}
+
+	algo = _gnutls_session_get_sign_algo(session, cert, 0);
+	if (algo == GNUTLS_SIGN_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+
+	gnutls_sign_algorithm_set_server(session, algo);
+	_gnutls_handshake_log("Selected signature algorithm: %s\n", gnutls_sign_algorithm_get_name(algo));
+
+	return 0;
+}
+
 /* finds the most appropriate certificate in the cert list.
  * The 'appropriate' is defined by the user.
  *
@@ -1493,6 +1526,11 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 		}
 
+		ret = select_sign_algorithm(session, &session->internals.selected_cert_list[0], cs);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
 		return 0;
 	}
 
@@ -1516,18 +1554,26 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 						       server_name) != 0) {
 				/* if requested algorithms are also compatible select it */
 
-				if (pubkey_is_compat_with_cs(session,
+				if (!pubkey_is_compat_with_cs(session,
 							     cred->certs[i].cert_list[0].pubkey,
 							     cred->certs[i].cert_list[0].type,
 							     cs)) {
+					continue;
+				}
+
+				ret = select_sign_algorithm(session, &cred->certs[i].cert_list[0], cs);
+				if (ret >= 0) {
 					idx = i;
 					_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
 						  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->params.algo),
 						  (unsigned)cs->id[0],
 						  (unsigned)cs->id[1],
 						  cs->name);
+					/* found */
 					goto finished;
 				}
+
+
 			}
 		}
 	}
@@ -1542,16 +1588,22 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 						      [i].cert_list
 						      [0].type));
 
-		if (pubkey_is_compat_with_cs(session,
+		if (!pubkey_is_compat_with_cs(session,
 					     cred->certs[i].cert_list[0].pubkey,
 					     cred->certs[i].cert_list[0].type,
 					     cs)) {
+			continue;
+		}
+
+		ret = select_sign_algorithm(session, &cred->certs[i].cert_list[0], cs);
+		if (ret >= 0) {
 			idx = i;
 			_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
 					  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->params.algo),
 					  (unsigned)cs->id[0],
 					  (unsigned)cs->id[1],
 					  cs->name);
+			/* found */
 			goto finished;
 		}
 	}
