@@ -47,6 +47,10 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 			  gnutls_x509_spki_st * sign_params,
 			  unsigned flags);
 
+static
+int pubkey_supports_sig(gnutls_pubkey_t pubkey,
+			const gnutls_sign_entry_st *se);
+
 unsigned pubkey_to_bits(const gnutls_pk_params_st * params)
 {
 	switch (params->algo) {
@@ -1586,6 +1590,11 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	se = _gnutls_sign_to_entry(algo);
 	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = pubkey_supports_sig(pubkey, se);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	params.pk = se->pk;
 
 	me = hash_to_entry(se->hash);
@@ -1657,6 +1666,10 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		if (se == NULL)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+		ret = pubkey_supports_sig(key, se);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		params.pk = se->pk;
 
 		me = hash_to_entry(se->hash);
@@ -1704,6 +1717,33 @@ gnutls_pubkey_encrypt_data(gnutls_pubkey_t key, unsigned int flags,
 				  plaintext, &key->params);
 }
 
+static
+int pubkey_supports_sig(gnutls_pubkey_t pubkey,
+			const gnutls_sign_entry_st *se)
+{
+	if (pubkey->params.algo == GNUTLS_PK_ECDSA && se->curve) {
+		gnutls_ecc_curve_t curve = pubkey->params.curve;
+
+		if (curve != se->curve) {
+			_gnutls_debug_log("have key: ECDSA with %s/%d, with sign %s/%d\n",
+				gnutls_ecc_curve_get_name(curve), (int)curve,
+				se->name, se->id);
+			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+		}
+	}
+
+	if (se->pk != pubkey->params.algo) { /* if the PK algorithm of the signature differs to the one on the pubkey */
+		if (!gnutls_sign_supports_pk_algorithm(se->id, pubkey->params.algo)) {
+			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
+					gnutls_pk_get_name(pubkey->params.algo), pubkey->params.algo,
+					se->name, se->id);
+			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+		}
+	}
+
+	return 0;
+}
+
 /* Checks whether the public key given is compatible with the
  * signature algorithm used. The session is only used for audit logging, and
  * it may be null.
@@ -1733,6 +1773,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 				    (GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
 		} else if (se != NULL) {
 			me = hash_to_entry(se->hash);
+
 			sig_hash_size = _gnutls_hash_get_algo_len(me);
 			if (sig_hash_size < hash_size)
 				_gnutls_audit_log(session,
@@ -1741,14 +1782,13 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 						  hash_size);
 		}
 
-	} else if (pubkey->params.algo == GNUTLS_PK_EC) {
+	} else if (pubkey->params.algo == GNUTLS_PK_ECDSA) {
 		if (_gnutls_version_has_selectable_sighash(ver)
 		    && se != NULL) {
-
-			_gnutls_dsa_q_to_hash(&pubkey->params,
-						   &hash_size);
+			_gnutls_dsa_q_to_hash(&pubkey->params, &hash_size);
 
 			me = hash_to_entry(se->hash);
+
 			sig_hash_size = _gnutls_hash_get_algo_len(me);
 
 			if (sig_hash_size < hash_size)
@@ -1769,6 +1809,9 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
 		}
 	}
+
+	if (se != NULL)
+		return pubkey_supports_sig(pubkey, se);
 
 	return 0;
 }
