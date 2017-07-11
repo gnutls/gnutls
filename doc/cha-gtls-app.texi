@@ -580,7 +580,7 @@ algorithm preferences. To get those preferences use
 @funcref{gnutls_sign_algorithm_get_requested}. Both functions are shown below.
 
 @showfuncC{gnutls_certificate_set_retrieve_function,gnutls_certificate_set_retrieve_function2,gnutls_sign_algorithm_get_requested}
-c
+
 The functions above do not handle the requested server name automatically.
 A server would need to check the name requested by the client
 using @funcref{gnutls_server_name_get}, and serve the appropriate
@@ -627,6 +627,19 @@ signed by server's acceptable signers.
 
 @showfuncdesc{gnutls_certificate_send_x509_rdn_sequence}
 
+On the client side, it needs to set its certificates on the credentials
+structure, similarly to server side from a file, or via a callback. Once the
+certificates are available in the credentials structure, the client will
+send them if during the handshake the server requests a certificate signed
+by the issuer of its CA.
+
+In the case a single certificate is available and the server does not
+specify a signer's list, then that certificate is always sent. It is,
+however possible, to send a certificate even when the advertised CA
+list by the server contains CAs other than its signer. That can be achieved
+using the @code{GNUTLS_FORCE_CLIENT_CERT} flag in @funcref{gnutls_init}.
+
+@showfuncC{gnutls_certificate_set_x509_key_file,gnutls_certificate_set_x509_simple_pkcs12_file,gnutls_certificate_set_retrieve_function2}
 
 @subsubheading Client or server certificate verification
 
