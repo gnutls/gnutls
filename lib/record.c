@@ -354,17 +354,20 @@ inline static int session_is_valid(gnutls_session_t session)
 /* Copies the record version into the headers. The 
  * version must have 2 bytes at least.
  */
-inline static void
+inline static int
 copy_record_version(gnutls_session_t session,
 		    gnutls_handshake_description_t htype,
 		    uint8_t version[2])
 {
 	const version_entry_st *lver;
 
-	if (session->internals.initial_negotiation_completed
-	    || htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
-	    || session->internals.default_record_version[0] == 0) {
-		lver = get_version(session);
+	lver = get_version(session);
+	if (session->internals.initial_negotiation_completed ||
+	    htype != GNUTLS_HANDSHAKE_CLIENT_HELLO ||
+	    session->internals.default_record_version[0] == 0) {
+
+		if (unlikely(lver == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		version[0] = lver->major;
 		version[1] = lver->minor;
@@ -372,6 +375,8 @@ copy_record_version(gnutls_session_t session,
 		version[0] = session->internals.default_record_version[0];
 		version[1] = session->internals.default_record_version[1];
 	}
+
+	return 0;
 }
 
 /* Increments the sequence value
@@ -490,9 +495,13 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 
 		headers = _mbuffer_get_uhead_ptr(bufel);
 		headers[0] = type;
+
 		/* Use the default record version, if it is
 		 * set. */
-		copy_record_version(session, htype, &headers[1]);
+		ret = copy_record_version(session, htype, &headers[1]);
+		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 		/* Adjust header length and add sequence for DTLS */
 		if (IS_DTLS(session))
 			memcpy(&headers[3],

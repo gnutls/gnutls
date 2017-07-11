@@ -1670,6 +1670,9 @@ static int send_client_hello(gnutls_session_t session, int again)
 			 */
 			_gnutls_record_set_default_version(session,
 							   min_ver->major, min_ver->minor);
+		} else {
+			_gnutls_record_set_default_version(session,
+							   hver->major, hver->minor);
 		}
 
 		/* In order to know when this session was initiated.
