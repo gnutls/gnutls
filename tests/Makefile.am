@@ -126,7 +126,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
-	 client-sign-md5-rep \
+	 client-sign-md5-rep tls12-invalid-key-exchanges \
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok status-request-missing sign-verify-ext \
