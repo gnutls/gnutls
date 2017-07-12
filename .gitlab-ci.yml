@@ -451,7 +451,8 @@ Debian/aarch64:
     expire_in: 1 week
     when: on_failure
     paths:
-      - ./*.log
-      - tests/*.log
-      - tests/*/*.log
+      - build/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+      - build/tests/suite/*/*.log
 
