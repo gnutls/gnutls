@@ -107,11 +107,10 @@ void doit(void)
 		gnutls_global_set_log_level(6);
 
 	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
-		if (debug)
-			success("loop %d\n", (int) i);
-
 		if (tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
 			continue;
+
+		success("testing: %s - %s\n", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
 
 		if (tests[i].digest == GNUTLS_DIG_SHA1) {
 			hash_data = &sha1_hash_data;

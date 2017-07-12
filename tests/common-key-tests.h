@@ -62,6 +62,14 @@ struct _key_tests_st common_key_tests[] = {
 		.sigalgo = GNUTLS_SIGN_ECDSA_SHA256
 	},
 	{
+		.name = "ecdsa key",
+		.key = {(void *) server_ca3_ecc_key_pem, sizeof(server_ca3_ecc_key_pem)-1},
+		.cert = {(void *) server_localhost_ca3_ecc_cert_pem, sizeof(server_localhost_ca3_ecc_cert_pem)-1},
+		.pk = GNUTLS_PK_ECDSA,
+		.digest = GNUTLS_DIG_SHA256,
+		.sigalgo = GNUTLS_SIGN_ECDSA_SECP256R1_SHA256
+	},
+	{
 		.name = "rsa pss key",
 		.key = {(void *) server_ca3_rsa_pss_key_pem, sizeof(server_ca3_rsa_pss_key_pem)-1},
 		.cert = {(void *) server_ca3_rsa_pss_cert_pem, sizeof(server_ca3_rsa_pss_cert_pem)-1},

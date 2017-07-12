@@ -84,11 +84,11 @@ void doit(void)
 		gnutls_global_set_log_level(6);
 
 	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
-		if (debug)
-			success("loop %d\n", (int) i);
-
 		if (tests[i].pk == GNUTLS_PK_DSA)
 			continue;
+
+		success("testing: %s - %s\n", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
+
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
 			testfail("gnutls_privkey_init\n");

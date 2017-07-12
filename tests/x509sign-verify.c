@@ -88,8 +88,7 @@ void doit(void)
 		if (tests[i].pk == GNUTLS_PK_DSA || tests[i].pk == GNUTLS_PK_EDDSA_ED25519)
 			continue;
 
-		if (debug)
-			success("loop %d\n", (int) i);
+		success("testing: %s - %s\n", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
 
 		ret = gnutls_x509_privkey_init(&privkey);
 		if (ret < 0)
