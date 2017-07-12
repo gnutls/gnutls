@@ -1747,11 +1747,11 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	unsigned char sha1_buffer[MAX_HASH_SIZE];
 	size_t sha1_size;
 
-	print_obj_id(str, "\t", cert, (get_id_func*)gnutls_x509_crt_get_key_id);
-
 	err = gnutls_x509_crt_get_pk_algorithm(cert, &bits);
 	if (err < 0)
 		return;
+
+	print_obj_id(str, "\t", cert, (get_id_func*)gnutls_x509_crt_get_key_id);
 
 	if (err == GNUTLS_PK_EC) {
 		gnutls_ecc_curve_t curve;
@@ -1937,10 +1937,7 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 
 		err = gnutls_x509_crt_get_key_id(cert, GNUTLS_KEYID_USE_SHA256,
 						 buffer, &size);
-		if (err < 0) {
-			addf(str, "key PIN error (%s)",
-			     gnutls_strerror(err));
-		} else {
+		if (err >= 0) {
 			addf(str, "pin-sha256=\"");
 			_gnutls_buffer_base64print(str, buffer, size);
 			adds(str, "\"");
@@ -2626,6 +2623,13 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 
 static void print_crq_other(gnutls_buffer_st * str, gnutls_x509_crq_t crq)
 {
+	int ret;
+
+	/* on unknown public key algorithms don't print the key ID */
+	ret = gnutls_x509_crq_get_pk_algorithm(crq, NULL);
+	if (ret < 0)
+		return;
+
 	print_obj_id(str, "\t", crq, (get_id_func*)gnutls_x509_crq_get_key_id);
 }
 
@@ -2685,6 +2689,11 @@ print_pubkey_other(gnutls_buffer_st * str, gnutls_pubkey_t pubkey,
 		adds(str, _("Public Key Usage:\n"));
 		print_key_usage2(str, "\t", pubkey->key_usage);
 	}
+
+	/* on unknown public key algorithms don't print the key ID */
+	ret = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+	if (ret < 0)
+		return;
 
 	print_obj_id(str, "", pubkey, (get_id_func*)gnutls_pubkey_get_key_id);
 }
