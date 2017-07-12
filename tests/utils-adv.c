@@ -69,7 +69,10 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				server_cred);
-	gnutls_priority_set_direct(server, serv_prio, NULL);
+	ret = gnutls_priority_set_direct(server, serv_prio, NULL);
+	if (ret < 0) {
+		fail("error in server priority: %s\n", serv_prio);
+	}
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -95,7 +98,10 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, cli_prio, NULL);
+	ret = gnutls_priority_set_direct(client, cli_prio, NULL);
+	if (ret < 0) {
+		fail("error in client priority: %s\n", cli_prio);
+	}
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -157,15 +163,17 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		}
 	}
 
+	if (cret >= 0)
+		gnutls_bye(client, GNUTLS_SHUT_RDWR);
+	if (sret >= 0)
+		gnutls_bye(server, GNUTLS_SHUT_RDWR);
+
 	ret = 0;
  cleanup:
 	if (client_cb)
 		client_cb(client, priv);
 	if (server_cb)
 		server_cb(server, priv);
-
-	gnutls_bye(client, GNUTLS_SHUT_RDWR);
-	gnutls_bye(server, GNUTLS_SHUT_RDWR);
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);
