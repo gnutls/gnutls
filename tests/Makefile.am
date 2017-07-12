@@ -131,9 +131,9 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 system-prio-file name-constraints-merge crl-basic crq-basic \
 	 send-client-cert custom-urls-override hex rehandshake-switch-psk-id \
 	 rehandshake-switch-srp-id base64 srpbase64 pkcs1-digest-info set_x509_key \
-	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls1.2-cert-key-exchange \
-	 tls1.1-cert-key-exchange tls1.0-cert-key-exchange ssl3.0-cert-key-exchange \
-	 dtls1.2-cert-key-exchange dtls1.0-cert-key-exchange x509-cert-callback-legacy \
+	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls12-cert-key-exchange \
+	 tls11-cert-key-exchange tls10-cert-key-exchange ssl30-cert-key-exchange \
+	 dtls12-cert-key-exchange dtls10-cert-key-exchange x509-cert-callback-legacy \
 	 keylog-env ssl2-hello tlsfeature-ext dtls-rehandshake-cert-2 \
 	 tlsfeature-crt dtls-rehandshake-cert-3 resume-with-false-start \
 	 set_x509_key_file_ocsp client-fastopen rng-sigint srp rng-pthread \
@@ -188,12 +188,12 @@ resume_x509_CFLAGS = -DUSE_X509
 resume_x509_SOURCES = resume.c
 resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
 
-dtls1_2_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls1.2-cert-key-exchange.c common-cert-key-exchange.h
-dtls1_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls1.0-cert-key-exchange.c common-cert-key-exchange.h
-tls1_2_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls1.2-cert-key-exchange.c common-cert-key-exchange.h
-tls1_1_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls1.1-cert-key-exchange.c common-cert-key-exchange.h
-tls1_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls1.0-cert-key-exchange.c common-cert-key-exchange.h
-ssl3_0_cert_key_exchange_SOURCES = common-cert-key-exchange.c ssl3.0-cert-key-exchange.c common-cert-key-exchange.h
+dtls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls12-cert-key-exchange.c common-cert-key-exchange.h
+dtls10_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls10-cert-key-exchange.c common-cert-key-exchange.h
+tls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls12-cert-key-exchange.c common-cert-key-exchange.h
+tls11_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls11-cert-key-exchange.c common-cert-key-exchange.h
+tls10_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls10-cert-key-exchange.c common-cert-key-exchange.h
+ssl30_cert_key_exchange_SOURCES = common-cert-key-exchange.c ssl30-cert-key-exchange.c common-cert-key-exchange.h
 
 if ENABLE_PKCS11
 if !WINDOWS
