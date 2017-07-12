@@ -23,8 +23,8 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
-OUTFILE=pss-privkey.tmp
-TMPFILE=pss.$$.tmp
+OUTFILE=cert-pss-privkey.$$.tmp
+TMPFILE=cert-pss.$$.tmp
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
