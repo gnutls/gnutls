@@ -1260,15 +1260,28 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		priority_cache->cs.size, priority_cache->sigalg.size,
 		priority_cache->groups.size);
 
-	if (priority_cache->cs.size == 0) {
-		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+	if (priority_cache->sigalg.size == 0) {
+		/* no signature algorithms; eliminate TLS 1.2 or DTLS 1.2 and later */
+		priority_st newp;
+		newp.algorithms = 0;
+
+		/* we need to eliminate TLS 1.2 or DTLS 1.2 and later protocols */
+		for (i = 0; i < priority_cache->protocol.algorithms; i++) {
+			if (priority_cache->protocol.priority[i] < GNUTLS_TLS1_2) {
+				newp.priority[newp.algorithms++] = priority_cache->protocol.priority[i];
+			} else if (priority_cache->protocol.priority[i] >= GNUTLS_DTLS_VERSION_MIN &&
+				   priority_cache->protocol.priority[i] < GNUTLS_DTLS1_2) {
+				newp.priority[newp.algorithms++] = priority_cache->protocol.priority[i];
+			}
+		}
+		memcpy(&priority_cache->protocol, &newp, sizeof(newp));
+
+		if (priority_cache->protocol.algorithms == 0)
+			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 	}
 
-	if (priority_cache->sigalg.size == 0) {
-		if ((tlsmax && tlsmax->id >= GNUTLS_TLS1_2) || (dtlsmax && dtlsmax->id >= GNUTLS_DTLS1_2)) {
-			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
-		}
-	}
+	if (priority_cache->cs.size == 0)
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	/* when TLS 1.3 is available we must have groups set */
 	if (tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0)
