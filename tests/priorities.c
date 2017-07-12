@@ -91,6 +91,25 @@ try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers, unsi
 	}
 }
 
+static void
+try_prio_err(const char *prio, int err)
+{
+	int ret;
+	gnutls_priority_t p;
+
+	ret = gnutls_priority_init(&p, prio, NULL);
+	if (ret < 0 && ret != err) {
+		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (ret >= 0)
+		gnutls_priority_deinit(p);
+
+	if (debug)
+		success("finished: %s\n", prio);
+}
+
 
 void doit(void)
 {
@@ -129,5 +148,6 @@ void doit(void)
 	try_prio("SUITEB128", 2, 2, __LINE__);
 	/* check legacy strings */
 	try_prio("NORMAL:+RSA-EXPORT:+ARCFOUR-40", normal_cs, normal_ciphers, __LINE__);
-}
 
+	try_prio_err("NORMAL:-VERS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-ECDSA-SECP256R1-SHA256", GNUTLS_E_NO_PRIORITIES_WERE_SET);
+}
