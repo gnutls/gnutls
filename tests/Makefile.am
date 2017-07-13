@@ -44,6 +44,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/ocsp-amazon.com.der ocsp-tests/certs/chain-amazon.com.pem \
 	ocsp-tests/certs/chain-amazon.com-unsorted.pem cipher-neg-common.c \
 	ocsp-tests/certs/chain-akamai.com.pem ocsp-tests/certs/ocsp-akamai.com.der \
+	tls13/ext-parse.h \
 	certs-interesting/README.md certs-interesting/cert1.der certs-interesting/cert1.der.err \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
@@ -95,7 +96,8 @@ libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
 indirect_tests =
-ctests = tls13/supported_versions tls13/tls12-no-tls13-exts
+ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
+	tls13/post-handshake-with-cert tls13/post-handshake-without-cert
 
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
