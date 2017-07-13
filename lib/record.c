@@ -362,10 +362,10 @@ copy_record_version(gnutls_session_t session,
 {
 	const version_entry_st *lver;
 
-	if (session->internals.initial_negotiation_completed
+	lver = get_version(session);
+	if (lver && (session->internals.initial_negotiation_completed
 	    || htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
-	    || session->internals.default_record_version[0] == 0) {
-		lver = get_version(session);
+	    || session->internals.default_record_version[0] == 0)) {
 
 		version[0] = lver->major;
 		version[1] = lver->minor;
