@@ -1108,10 +1108,13 @@ static int recv_headers(gnutls_session_t session,
 	     record_check_version(session, htype, record->version)) < 0)
 		return gnutls_assert_val(ret);
 
-	if (record->length > max_record_recv_size(session)) {
+	if (record->length == 0 || record->length > max_record_recv_size(session)) {
 		_gnutls_audit_log
 		    (session, "Received packet with illegal length: %u\n",
 		     (unsigned int) record->length);
+
+		if (record->length == 0)
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		return
 		    gnutls_assert_val(GNUTLS_E_RECORD_OVERFLOW);
 	}
