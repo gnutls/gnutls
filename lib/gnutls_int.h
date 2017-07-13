@@ -523,6 +523,7 @@ typedef struct {
 	bool compact_hello;	/* The TLS 1.3 client and server hello form */
 	bool false_start;	/* That version can be used with false start */
 	bool only_extension;	/* negotiated only with an extension */
+	bool post_handshake_auth;	/* Supports the TLS 1.3 post handshake auth */
 	/* 
 	 * TLS versions modify the semantics of signature algorithms. This number
 	 * is there to distinguish signature algorithms semantics between versions

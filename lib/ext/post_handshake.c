@@ -53,8 +53,15 @@ static int
 _gnutls_post_handshake_recv_params(gnutls_session_t session,
 			       const uint8_t * data, size_t _data_size)
 {
+	const version_entry_st *vers;
+
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		session->security_parameters.post_handshake_auth = 1;
+		vers = get_version(session);
+		if (unlikely(vers == NULL))
+			return 0;
+
+		if (vers->post_handshake_auth)
+			session->security_parameters.post_handshake_auth = 1;
 	}
 
 	return 0;
@@ -67,6 +74,7 @@ _gnutls_post_handshake_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
 	gnutls_certificate_credentials_t cred;
+	const version_entry_st *max;
 
 	if (session->security_parameters.entity != GNUTLS_CLIENT) {
 		/* not sent on server side */
@@ -78,7 +86,11 @@ _gnutls_post_handshake_send_params(gnutls_session_t session,
 	if (cred == NULL)	/* no certificate authentication */
 		return gnutls_assert_val(0);
 
-	if (cred->ncerts || cred->get_cert_callback2 || cred->get_cert_callback)
+	max = _gnutls_version_max(session);
+	if (unlikely(max == NULL))
+		return gnutls_assert_val(0);
+
+	if (max->post_handshake_auth && (cred->ncerts || cred->get_cert_callback2 || cred->get_cert_callback))
 		return GNUTLS_E_INT_RET_0;
 	else
 		return 0;
