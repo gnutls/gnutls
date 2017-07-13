@@ -286,6 +286,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_EXT_MASTER_SECRET = 23,
 	GNUTLS_EXTENSION_SESSION_TICKET = 35,
 	GNUTLS_EXTENSION_SUPPORTED_VERSIONS = 43,
+	GNUTLS_EXTENSION_POST_HANDSHAKE = 49,
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
 } extensions_t;
 
@@ -589,6 +590,9 @@ typedef struct {
 	uint8_t session_id[GNUTLS_MAX_SESSION_ID_SIZE];
 	uint8_t session_id_size;
 	time_t timestamp;
+
+	/* whether client has agreed in post handshake auth - only set on server side */
+	uint8_t post_handshake_auth;
 
 	/* The send size is the one requested by the programmer.
 	 * The recv size is the one negotiated with the peer.

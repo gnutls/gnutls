@@ -772,6 +772,8 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		BUFFER_APPEND_NUM(ps, 0);
 	}
 
+	BUFFER_APPEND_NUM(ps, session->security_parameters.post_handshake_auth);
+
 	BUFFER_APPEND_NUM(ps,
 			  session->security_parameters.server_sign_algo);
 	BUFFER_APPEND_NUM(ps,
@@ -858,6 +860,8 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP_NUM(ps, ret);
 	session->internals.resumed_security_parameters.grp = _gnutls_id_to_group(ret);
 	/* it can be null */
+
+	BUFFER_POP_NUM(ps, session->security_parameters.post_handshake_auth);
 
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
@@ -973,6 +977,8 @@ gnutls_session_set_premaster(gnutls_session_t session, unsigned int entity,
 	    gnutls_time(0);
 
 	session->internals.resumed_security_parameters.grp = 0;
+
+	session->internals.resumed_security_parameters.post_handshake_auth = 0;
 
 	session->internals.premaster_set = 1;
 
