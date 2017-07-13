@@ -197,17 +197,17 @@ mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
 
 # These tests need gnulib for memmem()
-resume_psk_CFLAGS = -DUSE_PSK
-resume_psk_SOURCES = resume.c
-resume_psk_LDADD = $(LDADD) ../gl/libgnu.la
+tls12_resume_psk_CFLAGS = -DUSE_PSK -DTLS12
+tls12_resume_psk_SOURCES = resume.c
+tls12_resume_psk_LDADD = $(LDADD) ../gl/libgnu.la
 
-resume_anon_CFLAGS = -DUSE_ANON
-resume_anon_SOURCES = resume.c
-resume_anon_LDADD = $(LDADD) ../gl/libgnu.la
+tls12_resume_anon_CFLAGS = -DUSE_ANON -DTLS12
+tls12_resume_anon_SOURCES = resume.c
+tls12_resume_anon_LDADD = $(LDADD) ../gl/libgnu.la
 
-resume_x509_CFLAGS = -DUSE_X509
-resume_x509_SOURCES = resume.c
-resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
+tls12_resume_x509_CFLAGS = -DUSE_X509 -DTLS12
+tls12_resume_x509_SOURCES = resume.c
+tls12_resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
 
 dtls_repro_20170915_SOURCES = dtls-repro-20170915.c common-cert-key-exchange.c cert-repro-20170915.h
 dtls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls12-cert-key-exchange.c common-cert-key-exchange.h
@@ -299,7 +299,7 @@ endif
 
 if HAVE_FORK
 ctests += x509self x509dn anonself pskself dhepskself	\
-	setcredcrash resume-x509 resume-psk resume-anon
+	setcredcrash tls12-resume-x509 tls12-resume-psk tls12-resume-anon
 endif
 
 gc_CPPFLAGS = $(AM_CPPFLAGS) \
