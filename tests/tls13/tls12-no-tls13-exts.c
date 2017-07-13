@@ -47,6 +47,7 @@ int main()
 #include <signal.h>
 
 #include "cert-common.h"
+#include "tls13/ext-parse.h"
 #include "utils.h"
 
 /* This program checks whether any TLS 1.3 extensions are
@@ -80,6 +81,9 @@ static void client(int fd)
 	}
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
+	gnutls_certificate_set_x509_key_mem(x509_cred, &cli_ca3_cert,
+					    &cli_ca3_key,
+					    GNUTLS_X509_FMT_PEM);
 
 	/* Initialize TLS session
 	 */
@@ -115,69 +119,18 @@ static void client(int fd)
 
 static unsigned client_hello_ok = 0;
 
-#define HANDSHAKE_SESSION_ID_POS 34
-#define TLS_EXT_SUPPORTED_VERSIONS 43
-
-#define SKIP16(pos, total) { \
-	uint16_t _s; \
-	if (pos+2 > total) fail("error\n"); \
-	_s = (msg->data[pos] << 8) | msg->data[pos+1]; \
-	if ((size_t)(pos+2+_s) > total) fail("error\n"); \
-	pos += 2+_s; \
-	}
-
-#define SKIP8(pos, total) { \
-	uint8_t _s; \
-	if (pos+1 > total) fail("error\n"); \
-	_s = msg->data[pos]; \
-	if ((size_t)(pos+1+_s) > total) fail("error\n"); \
-	pos += 1+_s; \
-	}
-
 static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
 {
-	ssize_t pos;
-
 	if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO || post != GNUTLS_HOOK_PRE)
 		return 0;
 
-	if (msg->size < HANDSHAKE_SESSION_ID_POS)
-		return -1;
-
-	/* we expect the TLS 1.2 version to be present */
-	if (msg->data[0] != 0x03 || msg->data[1] != 0x03) {
-		fail("ProtocolVersion contains %d.%d\n", (int)msg->data[0], (int)msg->data[1]);
+	if (find_client_extension(msg, TLS_EXT_SUPPORTED_VERSIONS, NULL)) {
+		fail("Found TLS 1.3 supported versions extension in TLS 1.2!\n");
 	}
 
-	pos = HANDSHAKE_SESSION_ID_POS;
-	/* legacy_session_id */
-	SKIP8(pos, msg->size);
-
-	/* CipherSuites */
-	SKIP16(pos, msg->size);
-
-	/* legacy_compression_methods */
-	SKIP8(pos, msg->size);
-
-	pos += 2;
-
-	while (pos < msg->size) {
-		uint16_t type;
-
-		if (pos+4 > msg->size)
-			fail("invalid client hello\n");
-
-		type = (msg->data[pos] << 8) | msg->data[pos+1];
-		pos+=2;
-
-		success("Found extension %d\n", (int)type);
-
-		if (type != TLS_EXT_SUPPORTED_VERSIONS) {
-			SKIP16(pos, msg->size);
-		} else { /* found */
-			fail("Found TLS 1.3 supported versions extension!\n");
-		}
+	if (find_client_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL)) {
+		fail("Found TLS 1.3 supported versions extension in TLS 1.2!\n");
 	}
 
 	client_hello_ok = 1;

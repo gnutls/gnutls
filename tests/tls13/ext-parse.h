@@ -21,6 +21,9 @@
 
 #include "utils.h"
 
+#define TLS_EXT_SUPPORTED_VERSIONS 43
+#define TLS_EXT_POST_HANDSHAKE 49
+
 #define SKIP16(pos, total) { \
 	uint16_t _s; \
 	if (pos+2 > total) fail("error0: at %d total: %d\n", pos+2, total); \
