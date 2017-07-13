@@ -1498,8 +1498,8 @@ read_server_hello(gnutls_session_t session,
 	int ret = 0;
 	gnutls_protocol_t version;
 	int len = datalen;
-
-	if (datalen < 38) {
+	const version_entry_st *vers;
+	if (datalen < GNUTLS_RANDOM_SIZE+2) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
@@ -1517,6 +1517,8 @@ read_server_hello(gnutls_session_t session,
 	if (_gnutls_set_current_version(session, version) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
+	vers = get_version(session);
+
 	pos += 2;
 
 	DECR_LEN(len, GNUTLS_RANDOM_SIZE);
@@ -1526,37 +1528,38 @@ read_server_hello(gnutls_session_t session,
 
 	pos += GNUTLS_RANDOM_SIZE;
 
+	if (!vers->compact_hello) {
+		/* Read session ID
+		 */
+		DECR_LEN(len, 1);
+		session_id_len = data[pos++];
 
-	/* Read session ID
-	 */
-	DECR_LEN(len, 1);
-	session_id_len = data[pos++];
-
-	if (len < session_id_len || session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
-		gnutls_assert();
-		return GNUTLS_E_ILLEGAL_PARAMETER;
-	}
-	DECR_LEN(len, session_id_len);
-
-	/* check if we are resuming and set the appropriate
-	 * values;
-	 */
-	if (client_check_if_resuming
-	    (session, &data[pos], session_id_len) == 0) {
-		pos += session_id_len + 2 + 1;
-		DECR_LEN(len, 2 + 1);
-
-		ret =
-		    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
-					     &data[pos], len);
-		if (ret < 0) {
+		if (len < session_id_len || session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
 			gnutls_assert();
-			return ret;
+			return GNUTLS_E_ILLEGAL_PARAMETER;
 		}
-		return 0;
-	}
+		DECR_LEN(len, session_id_len);
 
-	pos += session_id_len;
+		/* check if we are resuming and set the appropriate
+		 * values;
+		 */
+		if (client_check_if_resuming
+		    (session, &data[pos], session_id_len) == 0) {
+			pos += session_id_len + 2 + 1;
+			DECR_LEN(len, 2 + 1);
+
+			ret =
+			    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
+						     &data[pos], len);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			return 0;
+		}
+
+		pos += session_id_len;
+	}
 
 	/* Check if the given cipher suite is supported and copy
 	 * it to the session.
@@ -1570,10 +1573,12 @@ read_server_hello(gnutls_session_t session,
 	}
 	pos += 2;
 
-	/* move to compression 
-	 */
-	DECR_LEN(len, 1);
-	pos++;
+	if (!vers->compact_hello) {
+		/* move to compression
+		 */
+		DECR_LEN(len, 1);
+		pos++;
+	}
 
 	/* Parse extensions.
 	 */
@@ -1834,7 +1839,10 @@ static int send_server_hello(gnutls_session_t session, int again)
 	_gnutls_buffer_init(&extdata);
 
 	if (again == 0) {
-		datalen = 2 + session_id_len + 1 + GNUTLS_RANDOM_SIZE + 3;
+		vers = get_version(session);
+		if (unlikely(vers == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 		ret =
 		    _gnutls_gen_extensions(session, &extdata,
 					   (session->internals.resumed ==
@@ -1846,19 +1854,20 @@ static int send_server_hello(gnutls_session_t session, int again)
 			goto fail;
 		}
 
+		if (!vers->compact_hello) {
+			datalen = 2 + session_id_len + 1 + GNUTLS_RANDOM_SIZE + 3 + extdata.length;
+		} else {
+			datalen = 2 + GNUTLS_RANDOM_SIZE + 2 + extdata.length;
+		}
+
 		bufel =
-		    _gnutls_handshake_alloc(session,
-					    datalen + extdata.length);
+		    _gnutls_handshake_alloc(session, datalen);
 		if (bufel == NULL) {
 			gnutls_assert();
 			ret = GNUTLS_E_MEMORY_ERROR;
 			goto fail;
 		}
 		data = _mbuffer_get_udata_ptr(bufel);
-
-		vers = get_version(session);
-		if (unlikely(vers == NULL))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		data[pos++] = vers->major;
 		data[pos++] = vers->minor;
@@ -1868,25 +1877,29 @@ static int send_server_hello(gnutls_session_t session, int again)
 		       GNUTLS_RANDOM_SIZE);
 		pos += GNUTLS_RANDOM_SIZE;
 
-		data[pos++] = session_id_len;
-		if (session_id_len > 0) {
-			memcpy(&data[pos],
-			       session->security_parameters.session_id,
-			       session_id_len);
-		}
-		pos += session_id_len;
+		if (!vers->compact_hello) {
+			data[pos++] = session_id_len;
+			if (session_id_len > 0) {
+				memcpy(&data[pos],
+				       session->security_parameters.session_id,
+				       session_id_len);
+			}
+			pos += session_id_len;
 
-		_gnutls_handshake_log("HSK[%p]: SessionID: %s\n", session,
-				      _gnutls_bin2hex(session->
-						      security_parameters.session_id,
-						      session_id_len, buf,
-						      sizeof(buf), NULL));
+			_gnutls_handshake_log("HSK[%p]: SessionID: %s\n", session,
+					      _gnutls_bin2hex(session->
+							      security_parameters.session_id,
+							      session_id_len, buf,
+							      sizeof(buf), NULL));
+		}
 
 		memcpy(&data[pos],
 		       session->security_parameters.cs->id, 2);
 		pos += 2;
 
-		data[pos++] = 0x00;
+		if (!vers->compact_hello) {
+			data[pos++] = 0x00;
+		}
 
 		if (extdata.length > 0) {
 			memcpy(&data[pos], extdata.data, extdata.length);

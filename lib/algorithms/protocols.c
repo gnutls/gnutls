@@ -98,6 +98,7 @@ static const version_entry_st sup_versions[] = {
 	 .extensions = 1,
 	 .selectable_sighash = 1,
 	 .selectable_prf = 1,
+	 .compact_hello = 1,
 	 .obsolete = 0,
 	 .only_extension = 1,
 	 .false_start = 0, /* doesn't make sense */
