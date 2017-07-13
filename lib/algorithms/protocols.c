@@ -222,28 +222,18 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 
 /* Returns the maximum version in the priorities 
  */
-static const version_entry_st *legacy_version_max(gnutls_session_t session)
+const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 {
-	int max_proto = _gnutls_legacy_version_max(session);
-
-	if (max_proto < 0)
-		return NULL;
-
-	return version_to_entry(max_proto);
-}
-
-gnutls_protocol_t _gnutls_legacy_version_max(gnutls_session_t session)
-{
-	unsigned int i, max = 0x00;
+	unsigned int i;
 	gnutls_protocol_t cur_prot;
-	const version_entry_st *p;
+	const version_entry_st *p, *max = NULL;
 
 	for (i = 0; i < session->internals.priorities->protocol.algorithms;
 	     i++) {
 		cur_prot =
 		    session->internals.priorities->protocol.priority[i];
 
-		for (p = sup_versions; p->name != NULL; p++)
+		for (p = sup_versions; p->name != NULL; p++) {
 			if(p->id == cur_prot) {
 #ifndef ENABLE_SSL3
 				if (p->obsolete != 0)
@@ -252,25 +242,30 @@ gnutls_protocol_t _gnutls_legacy_version_max(gnutls_session_t session)
 				if (!p->supported || p->transport != session->internals.transport)
 					break;
 
-				if (p->only_extension != 0) {
-					/* TLS 1.3 or later found */
-					if (p->transport == GNUTLS_STREAM) {
-						return GNUTLS_TLS1_2;
-					} else {
-						return GNUTLS_DTLS1_2;
-					}
+				if (max == NULL || cur_prot > max->id) {
+					max = p;
 				}
 
-				if (!p->only_extension && cur_prot > max) {
-					max = cur_prot;
-				}
 				break;
 			}
 		}
 	}
 
-	if (max == 0x00)
-		return GNUTLS_VERSION_UNKNOWN;	/* unknown version */
+	return max;
+}
+
+const version_entry_st *_gnutls_legacy_version_max(gnutls_session_t session)
+{
+	const version_entry_st *max = _gnutls_version_max(session);
+
+	if (max && max->only_extension != 0) {
+		/* TLS 1.3 or later found */
+		if (max->transport == GNUTLS_STREAM) {
+			return version_to_entry(GNUTLS_TLS1_2);
+		} else {
+			return version_to_entry(GNUTLS_DTLS1_2);
+		}
+	}
 
 	return max;
 }
@@ -335,7 +330,7 @@ unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, ui
 {
 	const version_entry_st *e;
 
-	e = legacy_version_max(session);
+	e = _gnutls_legacy_version_max(session);
 	if (e == NULL) /* we don't know; but that means something is unconfigured */
 		return 1;
 
