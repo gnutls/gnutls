@@ -369,7 +369,7 @@ static void server(int fd, const char *prio, int ign)
 
 	/* do not wait for the peer to close the connection.
 	 */
-	gnutls_bye(session, GNUTLS_SHUT_WR);
+	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
 	close(fd);
 	gnutls_deinit(session);
@@ -383,10 +383,11 @@ static void server(int fd, const char *prio, int ign)
 		success("server: finished\n");
 }
 
-static void start(const char *prio, int ign)
+static void start(const char *name, const char *prio, int ign)
 {
 	int fd[2];
 	int ret;
+	int status;
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -403,8 +404,11 @@ static void start(const char *prio, int ign)
 
 	if (child) {
 		/* parent */
+		success("testing %s\n", name);
 		close(fd[1]);
 		server(fd[0], prio, ign);
+		wait(&status);
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
 		client(fd[1], prio, ign);
@@ -427,9 +431,6 @@ static void start(const char *prio, int ign)
 
 static void ch_handler(int sig)
 {
-	int status;
-	wait(&status);
-	check_wait_status(status);
 	return;
 }
 
@@ -437,18 +438,18 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
-	start(AES_CBC, 1);
-	start(AES_CBC_SHA256, 1);
-	start(AES_GCM, 0);
-	start(AES_CCM, 0);
-	start(AES_CCM_8, 0);
+	start("aes-cbc", AES_CBC, 1);
+	start("aes-cbc-sha256", AES_CBC_SHA256, 1);
+	start("aes-gcm", AES_GCM, 0);
+	start("aes-ccm", AES_CCM, 0);
+	start("aes-ccm-8", AES_CCM_8, 0);
 
 	if (!gnutls_fips140_mode_enabled()) {
-		start(NULL_SHA1, 0);
+		start("null-sha1", NULL_SHA1, 0);
 
-		start(ARCFOUR_SHA1, 0);
-		start(ARCFOUR_MD5, 0);
-		start(CHACHA_POLY1305, 0);
+		start("arcfour-sha1", ARCFOUR_SHA1, 0);
+		start("arcfour-md5", ARCFOUR_MD5, 0);
+		start("chacha20-poly1305", CHACHA_POLY1305, 0);
 	}
 }
 
