@@ -244,7 +244,7 @@ int _gnutls_kx_is_ok(gnutls_kx_algorithm_t algorithm)
 
 bool _gnutls_kx_allows_false_start(gnutls_session_t session)
 {
-	unsigned algorithm = session->security_parameters.kx_algorithm;
+	unsigned algorithm = session->security_parameters.cs->kx_algorithm;
 	bool needs_dh = 0;
 	int bits;
 

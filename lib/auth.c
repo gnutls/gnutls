@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -204,9 +205,8 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 	    session->security_parameters.entity == GNUTLS_SERVER ? 0 : 1;
 
 	return
-	    _gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
-				     cipher_suite), server);
+	    _gnutls_map_kx_get_cred(session->security_parameters.
+				     cs->kx_algorithm, server);
 }
 
 /**
@@ -224,9 +224,8 @@ gnutls_credentials_type_t
 gnutls_auth_server_get_type(gnutls_session_t session)
 {
 	return
-	    _gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
-				     cipher_suite), 1);
+	    _gnutls_map_kx_get_cred(session->security_parameters.
+				     cs->kx_algorithm, 1);
 }
 
 /**
@@ -244,9 +243,8 @@ gnutls_credentials_type_t
 gnutls_auth_client_get_type(gnutls_session_t session)
 {
 	return
-	    _gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
-				     cipher_suite), 0);
+	    _gnutls_map_kx_get_cred(session->security_parameters.
+				     cs->kx_algorithm, 0);
 }
 
 

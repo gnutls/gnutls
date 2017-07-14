@@ -135,10 +135,10 @@ static int resume_copy_required_values(gnutls_session_t session)
 	 * That is because the client must see these in our
 	 * hello message.
 	 */
-	ret = _gnutls_set_cipher_suite(session,
+	ret = _gnutls_set_cipher_suite2(session,
 				       session->internals.
 				       resumed_security_parameters.
-				       cipher_suite);
+				       cs);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1371,9 +1371,7 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	 */
 	if (!session->internals.premaster_set &&
 	    _gnutls_get_kx_cred
-	    (session,
-	     _gnutls_cipher_suite_get_kx_algo
-	     (session->security_parameters.cipher_suite)) == NULL) {
+	    (session, selected->kx_algorithm) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
@@ -1433,10 +1431,10 @@ client_check_if_resuming(gnutls_session_t session,
 		       session->security_parameters.client_random,
 		       GNUTLS_RANDOM_SIZE);
 
-		ret = _gnutls_set_cipher_suite
+		ret = _gnutls_set_cipher_suite2
 		    (session,
 		     session->internals.resumed_security_parameters.
-		     cipher_suite);
+		     cs);
 		if (ret < 0) {
 			gnutls_assert();
 			goto no_resume;
@@ -1859,7 +1857,7 @@ static int send_server_hello(gnutls_session_t session, int again)
 						      sizeof(buf), NULL));
 
 		memcpy(&data[pos],
-		       session->security_parameters.cipher_suite, 2);
+		       session->security_parameters.cs->id, 2);
 		pos += 2;
 
 		data[pos++] = 0x00;

@@ -77,9 +77,8 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 		/* don't decide now, decide on send */
 		return 0;
 	} else { /* client */
-		const gnutls_cipher_suite_entry_st *e;
-
-		e = ciphersuite_to_entry(session->security_parameters.cipher_suite);
+		const gnutls_cipher_suite_entry_st *e = 
+			session->security_parameters.cs;
 		if (e != NULL) {
 			const cipher_entry_st *c;
 			c = cipher_to_entry(e->block_algorithm);
@@ -114,7 +113,7 @@ _gnutls_ext_etm_send_params(gnutls_session_t session,
 		int ret;
 		gnutls_ext_priv_data_t epriv;
 
-		e = ciphersuite_to_entry(session->security_parameters.cipher_suite);
+		e = session->security_parameters.cs;
 		if (e != NULL) {
 			c = cipher_to_entry(e->block_algorithm);
 			if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))

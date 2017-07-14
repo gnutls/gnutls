@@ -703,8 +703,7 @@ int check_pk_compat(gnutls_session_t session, gnutls_pubkey_t pubkey)
 		return GNUTLS_E_CERTIFICATE_ERROR;
 	}
 
-	kx = _gnutls_cipher_suite_get_kx_algo(session->
-					      security_parameters.cipher_suite);
+	kx = session->security_parameters.cs->kx_algorithm;
 
 	if (_gnutls_map_kx_get_cred(kx, 1) == GNUTLS_CRD_CERTIFICATE &&
 	    !_gnutls_kx_supports_pk(kx, cert_pk)) {

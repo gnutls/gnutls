@@ -153,9 +153,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 		goto error;
 	}
 
-	if (_gnutls_cipher_suite_get_kx_algo
-	    (session->security_parameters.cipher_suite)
-	    != GNUTLS_KX_DHE_PSK) {
+	if (session->security_parameters.cs->kx_algorithm != GNUTLS_KX_DHE_PSK) {
 		session->key.key.data = tmp_dh_key.data;
 		session->key.key.size = tmp_dh_key.size;
 	} else {		/* In DHE_PSK the key is set differently */

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -743,8 +744,7 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 
 
 	BUFFER_APPEND_NUM(ps, session->security_parameters.entity);
-	BUFFER_APPEND_NUM(ps, session->security_parameters.kx_algorithm);
-	BUFFER_APPEND(ps, session->security_parameters.cipher_suite, 2);
+	BUFFER_APPEND(ps, session->security_parameters.cs->id, 2);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.cert_type);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.pversion->id);
 
@@ -790,6 +790,7 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	int ret;
 	unsigned version;
 	time_t timestamp;
+	uint8_t cs[2];
 
 	BUFFER_POP_NUM(ps, pack_size);
 
@@ -808,12 +809,11 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       entity);
-	BUFFER_POP_NUM(ps,
-		       session->internals.resumed_security_parameters.
-		       kx_algorithm);
-	BUFFER_POP(ps,
-		   session->internals.resumed_security_parameters.
-		   cipher_suite, 2);
+	BUFFER_POP(ps, cs, 2);
+	session->internals.resumed_security_parameters.cs = ciphersuite_to_entry(cs);
+	if (session->internals.resumed_security_parameters.cs == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       cert_type);
@@ -920,20 +920,21 @@ gnutls_session_set_premaster(gnutls_session_t session, unsigned int entity,
 			     const gnutls_datum_t * session_id)
 {
 	int ret;
+	uint8_t cs[2];
 
 	memset(&session->internals.resumed_security_parameters, 0,
 	       sizeof(session->internals.resumed_security_parameters));
 
 	session->internals.resumed_security_parameters.entity = entity;
-	session->internals.resumed_security_parameters.kx_algorithm = kx;
 
 	ret =
-	    _gnutls_cipher_suite_get_id(kx, cipher, mac,
-					session->internals.
-					resumed_security_parameters.
-					cipher_suite);
+	    _gnutls_cipher_suite_get_id(kx, cipher, mac, cs);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	session->internals.resumed_security_parameters.cs = ciphersuite_to_entry(cs);
+	if (cs == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	session->internals.resumed_security_parameters.cert_type =
 	    DEFAULT_CERT_TYPE;

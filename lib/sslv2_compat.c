@@ -173,8 +173,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	 */
 	if (_gnutls_get_kx_cred
 	    (session,
-	     _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
-					      cipher_suite)) == NULL) {
+	     session->security_parameters.cs->kx_algorithm) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
@@ -184,9 +183,8 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	 * handshake functions are read from there;
 	 */
 	session->internals.auth_struct =
-	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (session->security_parameters.
-				    cipher_suite));
+	    _gnutls_kx_auth_struct(session->security_parameters.
+				    cs->kx_algorithm);
 	if (session->internals.auth_struct == NULL) {
 
 		_gnutls_handshake_log

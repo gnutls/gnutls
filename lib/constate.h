@@ -23,8 +23,6 @@
 #ifndef GNUTLS_CONSTATE_H
 #define GNUTLS_CONSTATE_H
 
-int _gnutls_set_cipher_suite(gnutls_session_t session,
-			     const uint8_t suite[2]);
 int _gnutls_set_cipher_suite2(gnutls_session_t session,
 			     const gnutls_cipher_suite_entry_st *cs);
 void _gnutls_epoch_set_null_algos(gnutls_session_t session,

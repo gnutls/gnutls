@@ -556,7 +556,6 @@ typedef struct {
  */
 typedef struct {
 	unsigned int entity;	/* GNUTLS_SERVER or GNUTLS_CLIENT */
-	gnutls_kx_algorithm_t kx_algorithm;
 
 	/* The epoch used to read and write */
 	uint16_t epoch_read;
@@ -572,7 +571,10 @@ typedef struct {
 	 * moved here from internals in order to be restored
 	 * on resume;
 	 */
-	uint8_t cipher_suite[2];
+	const struct gnutls_cipher_suite_entry_st *cs;
+
+	/* This is kept outside the ciphersuite entry as on certain
+	 * TLS versions we need a separate PRF MAC, i.e., MD5_SHA1. */
 	gnutls_mac_algorithm_t prf_mac;
 	uint8_t master_secret[GNUTLS_MASTER_SIZE];
 	uint8_t client_random[GNUTLS_RANDOM_SIZE];

@@ -285,7 +285,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	if (session->internals.initial_negotiation_completed == 0)
 		return NULL;
 
-	kx = session->security_parameters.kx_algorithm;
+	kx = session->security_parameters.cs->kx_algorithm;
 	group_name = gnutls_group_get_name(_gnutls_session_group_get(session));
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 	if (group_name == NULL && _gnutls_kx_is_dhe(kx)) {

@@ -37,9 +37,6 @@
 #include <buffers.h>
 #include "dtls.h"
 
-static int
-_gnutls_set_kx(gnutls_session_t session, gnutls_kx_algorithm_t algo);
-
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof(keyexp) - 1;
 
@@ -256,25 +253,11 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 		session->security_parameters.prf_mac = GNUTLS_MAC_MD5_SHA1;
 	}
 
-	session->security_parameters.cipher_suite[0] = cs->id[0];
-	session->security_parameters.cipher_suite[1] = cs->id[1];
+	session->security_parameters.cs = cs;
 	params->cipher = cipher_algo;
 	params->mac = mac_algo;
 
 	return 0;
-}
-
-int
-_gnutls_set_cipher_suite(gnutls_session_t session,
-			 const uint8_t suite[2])
-{
-	const gnutls_cipher_suite_entry_st *cs;
-
-	cs = ciphersuite_to_entry(suite);
-	if (cs == NULL)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	return _gnutls_set_cipher_suite2(session, cs);
 }
 
 void
@@ -360,8 +343,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 
 
 #define CPY_COMMON dst->entity = src->entity; \
-	dst->kx_algorithm = src->kx_algorithm; \
-	memcpy( dst->cipher_suite, src->cipher_suite, 2); \
+	dst->cs = src->cs; \
 	memcpy( dst->master_secret, src->master_secret, GNUTLS_MASTER_SIZE); \
 	memcpy( dst->client_random, src->client_random, GNUTLS_RANDOM_SIZE); \
 	memcpy( dst->server_random, src->server_random, GNUTLS_RANDOM_SIZE); \
@@ -414,14 +396,8 @@ int _gnutls_read_connection_state_init(gnutls_session_t session)
 	/* Update internals from CipherSuite selected.
 	 * If we are resuming just copy the connection session
 	 */
-	if (session->internals.resumed == RESUME_FALSE) {
-		ret = _gnutls_set_kx(session,
-				     _gnutls_cipher_suite_get_kx_algo
-				     (session->security_parameters.
-				      cipher_suite));
-		if (ret < 0)
-			return ret;
-	} else if (session->security_parameters.entity == GNUTLS_CLIENT)
+	if (session->internals.resumed != RESUME_FALSE &&
+	    session->security_parameters.entity == GNUTLS_CLIENT)
 		_gnutls_set_resumed_parameters(session);
 
 	ret = _gnutls_epoch_set_keys(session, epoch_next);
@@ -430,8 +406,7 @@ int _gnutls_read_connection_state_init(gnutls_session_t session)
 
 	_gnutls_handshake_log("HSK[%p]: Cipher Suite: %s\n",
 			      session,
-			      _gnutls_cipher_suite_get_name
-			      (session->security_parameters.cipher_suite));
+			      session->security_parameters.cs->name);
 
 	session->security_parameters.epoch_read = epoch_next;
 
@@ -452,14 +427,8 @@ int _gnutls_write_connection_state_init(gnutls_session_t session)
 /* Update internals from CipherSuite selected.
  * If we are resuming just copy the connection session
  */
-	if (session->internals.resumed == RESUME_FALSE) {
-		ret = _gnutls_set_kx(session,
-				     _gnutls_cipher_suite_get_kx_algo
-				     (session->security_parameters.
-				      cipher_suite));
-		if (ret < 0)
-			return ret;
-	} else if (session->security_parameters.entity == GNUTLS_SERVER)
+	if (session->internals.resumed != RESUME_FALSE &&
+	    session->security_parameters.entity == GNUTLS_SERVER)
 		_gnutls_set_resumed_parameters(session);
 
 	ret = _gnutls_epoch_set_keys(session, epoch_next);
@@ -467,28 +436,13 @@ int _gnutls_write_connection_state_init(gnutls_session_t session)
 		return gnutls_assert_val(ret);
 
 	_gnutls_handshake_log("HSK[%p]: Cipher Suite: %s\n", session,
-			      _gnutls_cipher_suite_get_name
-			      (session->security_parameters.cipher_suite));
+			      session->security_parameters.cs->name);
 
 	_gnutls_handshake_log
 	    ("HSK[%p]: Initializing internal [write] cipher sessions\n",
 	     session);
 
 	session->security_parameters.epoch_write = epoch_next;
-
-	return 0;
-}
-
-/* Sets the specified kx algorithm into pending session
- */
-static int
-_gnutls_set_kx(gnutls_session_t session, gnutls_kx_algorithm_t algo)
-{
-
-	if (_gnutls_kx_is_ok(algo) == 0) {
-		session->security_parameters.kx_algorithm = algo;
-	} else
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	return 0;
 }
