@@ -1404,7 +1404,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 	}
 
-	group = _gnutls_id_to_group(_gnutls_session_group_get(session));
+	group = get_group(session);
 
 	if (session->internals.priorities->server_precedence == 0) {
 		for (i = 0; i < peer_clist->size; i++) {

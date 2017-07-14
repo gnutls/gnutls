@@ -24,7 +24,7 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
-
+#include "state.h"
 
 extern mod_auth_st rsa_auth_struct;
 extern mod_auth_st dhe_rsa_auth_struct;
@@ -254,7 +254,7 @@ bool _gnutls_kx_allows_false_start(gnutls_session_t session)
 	if (ret != 0) {
 		const gnutls_group_entry_st *e;
 
-		e = _gnutls_id_to_group(session->security_parameters.group);
+		e = get_group(session);
 
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		if (needs_dh != 0) {

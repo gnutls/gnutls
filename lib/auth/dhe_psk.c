@@ -259,7 +259,7 @@ gen_ecdhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return gnutls_assert_val(ret);
 
 	ret = _gnutls_ecdh_common_print_server_kx(session, data,
-						  _gnutls_session_group_get
+						  get_group
 						  (session));
 	if (ret < 0)
 		gnutls_assert();
@@ -395,7 +395,7 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		return gnutls_assert_val(ret);
 
 	ret = _gnutls_proc_ecdh_common_client_kx(session, data, data_size,
-						 _gnutls_session_group_get
+						 get_group
 						 (session), &psk_key);
 
 	_gnutls_free_key_datum(&psk_key);

@@ -351,15 +351,6 @@ const gnutls_ecc_curve_entry_st
 const gnutls_group_entry_st *_gnutls_tls_id_to_group(unsigned num);
 const gnutls_group_entry_st * _gnutls_id_to_group(unsigned id);
 
-inline static const gnutls_ecc_curve_entry_st
-    *_gnutls_group_get_curve_params(gnutls_group_t group)
-{
-	const gnutls_group_entry_st *e = _gnutls_id_to_group(group);
-	if (e)
-		return _gnutls_ecc_curve_get_params(e->curve);
-	return NULL;
-}
-
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(gnutls_pk_algorithm_t pk, int bits);
 #define MAX_ECC_CURVE_SIZE 66
 

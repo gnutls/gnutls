@@ -591,7 +591,7 @@ typedef struct {
 	/* holds the negotiated certificate type */
 	gnutls_certificate_type_t cert_type;
 
-	gnutls_group_t group; /* holds the EC curve / DH group */
+	const gnutls_group_entry_st *grp; /* holds the EC curve / DH group */
 
 	/* Holds the signature algorithm used in this session - If any */
 	gnutls_sign_algorithm_t server_sign_algo;

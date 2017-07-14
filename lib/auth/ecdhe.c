@@ -137,16 +137,19 @@ static int calc_ecdh_key(gnutls_session_t session,
 
 int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 				       uint8_t * data, size_t _data_size,
-				       gnutls_group_t group,
+				       const struct gnutls_group_entry_st *group,
 				       gnutls_datum_t * psk_key)
 {
 	ssize_t data_size = _data_size;
 	int ret, i = 0;
 	unsigned point_size;
-	const gnutls_ecc_curve_entry_st *ecurve =
-		_gnutls_group_get_curve_params((gnutls_ecc_curve_t)group);
+	const gnutls_ecc_curve_entry_st *ecurve;
 
-	if (group == 0 || ecurve == NULL)
+	if (group == NULL)
+		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
+
+	 ecurve = _gnutls_ecc_curve_get_params(group->curve);
+	if (ecurve == NULL)
 		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
 
 	DECR_LEN(data_size, 1);
@@ -213,7 +216,7 @@ proc_ecdhe_client_kx(gnutls_session_t session,
 
 	return _gnutls_proc_ecdh_common_client_kx(session, data,
 						  _data_size,
-						  _gnutls_session_group_get
+						  get_group
 						  (session), NULL);
 }
 
@@ -231,11 +234,14 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 {
 	int ret;
 	gnutls_datum_t out;
-	gnutls_group_t group = _gnutls_session_group_get(session);
-	const gnutls_ecc_curve_entry_st *ecurve =
-		_gnutls_group_get_curve_params((gnutls_ecc_curve_t)group);
+	const gnutls_group_entry_st *group = get_group(session);
+	const gnutls_ecc_curve_entry_st *ecurve;
 	int pk;
 
+	if (group == NULL)
+		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
+
+	 ecurve = _gnutls_ecc_curve_get_params(group->curve);
 	if (ecurve == NULL)
 		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
 
@@ -243,7 +249,7 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 
 	/* generate temporal key */
 	ret =
-	    _gnutls_pk_generate_keys(pk, (gnutls_ecc_curve_t)group,
+	    _gnutls_pk_generate_keys(pk, ecurve->id,
 				     &session->key.ecdh_params, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -396,15 +402,13 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
  * be inserted */
 int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 					gnutls_buffer_st * data,
-					gnutls_group_t group)
+					const gnutls_group_entry_st *group)
 {
 	uint8_t p;
 	int ret;
 	gnutls_datum_t out;
-	const gnutls_group_entry_st *e;
 
-	e = _gnutls_id_to_group(group);
-	if (e == NULL || e->curve == 0)
+	if (group == NULL || group->curve == 0)
 		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
 
 	/* just in case we are resuming a session */
@@ -421,21 +425,21 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 
 	ret =
 	    _gnutls_buffer_append_prefix(data, 16,
-					 e->tls_id);
+					 group->tls_id);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 
 	/* generate temporal key */
 	ret =
-	    _gnutls_pk_generate_keys(e->pk, group,
+	    _gnutls_pk_generate_keys(group->pk, group->curve,
 				     &session->key.ecdh_params, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (e->pk == GNUTLS_PK_EC) {
+	if (group->pk == GNUTLS_PK_EC) {
 		ret =
-		    _gnutls_ecc_ansi_x962_export(e->curve,
+		    _gnutls_ecc_ansi_x962_export(group->curve,
 						 session->key.ecdh_params.
 						 params[ECC_X] /* x */ ,
 						 session->key.ecdh_params.
@@ -451,7 +455,7 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-	} else if (e->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
 		ret =
 			_gnutls_buffer_append_data_prefix(data, 8,
 					session->key.ecdh_params.raw_pub.data,
@@ -488,7 +492,7 @@ gen_ecdhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	ret =
 	    _gnutls_ecdh_common_print_server_kx(session, data,
-						_gnutls_session_group_get
+						get_group
 						(session));
 	if (ret < 0) {
 		gnutls_assert();

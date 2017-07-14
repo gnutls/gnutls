@@ -25,10 +25,10 @@
 
 #include "gnutls_int.h"
 
-inline static gnutls_ecc_curve_t
-_gnutls_session_group_get(gnutls_session_t session)
+inline static const gnutls_group_entry_st *
+get_group(gnutls_session_t session)
 {
-	return session->security_parameters.group;
+	return session->security_parameters.grp;
 }
 
 int _gnutls_session_is_ecc(gnutls_session_t session);
@@ -39,7 +39,7 @@ _gnutls_session_group_set(gnutls_session_t session,
 {
 	_gnutls_handshake_log("HSK[%p]: Selected group %s (%d)\n",
 			      session, e->name, e->id);
-	session->security_parameters.group = e->id;
+	session->security_parameters.grp = e;
 }
 
 

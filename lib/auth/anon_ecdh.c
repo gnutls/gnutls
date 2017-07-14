@@ -82,7 +82,7 @@ gen_anon_ecdh_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	ret =
 	    _gnutls_ecdh_common_print_server_kx(session, data,
-						_gnutls_session_group_get
+						get_group
 						(session));
 	if (ret < 0) {
 		gnutls_assert();
@@ -107,7 +107,7 @@ proc_anon_ecdh_client_kx(gnutls_session_t session, uint8_t * data,
 
 	return _gnutls_proc_ecdh_common_client_kx(session, data,
 						  _data_size,
-						  _gnutls_session_group_get
+						  get_group
 						  (session), NULL);
 }
 

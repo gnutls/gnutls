@@ -281,12 +281,14 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	unsigned mac_id;
 	unsigned sign_algo;
 	char *desc;
+	const struct gnutls_group_entry_st *group = get_group(session);
 
 	if (session->internals.initial_negotiation_completed == 0)
 		return NULL;
 
 	kx = session->security_parameters.cs->kx_algorithm;
-	group_name = gnutls_group_get_name(_gnutls_session_group_get(session));
+	if (group)
+		group_name = group->name;
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 	if (group_name == NULL && _gnutls_kx_is_dhe(kx)) {
 		dh_bits = gnutls_dh_get_prime_bits(session);

@@ -79,7 +79,7 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 	/* if client advertised RFC7919 */
 	if (session->internals.have_ffdhe) {
 		for (i=0;i<session->internals.priorities->groups.size;i++) {
-			if (session->internals.priorities->groups.entry[i]->id == session->security_parameters.group) {
+			if (session->internals.priorities->groups.entry[i] == get_group(session)) {
 				ret = _gnutls_mpi_init_scan_nz(&p,
 						session->internals.priorities->groups.entry[i]->prime->data,
 						session->internals.priorities->groups.entry[i]->prime->size);

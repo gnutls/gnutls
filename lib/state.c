@@ -949,7 +949,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 {
 	const gnutls_group_entry_st *e;
 
-	e = _gnutls_id_to_group(_gnutls_session_group_get(session));
+	e = get_group(session);
 	if (e == NULL || e->curve == 0)
 		return 0;
 	return e->curve;
@@ -971,7 +971,7 @@ gnutls_group_t gnutls_group_get(gnutls_session_t session)
 {
 	const gnutls_group_entry_st *e;
 
-	e = _gnutls_id_to_group(_gnutls_session_group_get(session));
+	e = get_group(session);
 	if (e == NULL)
 		return 0;
 	return e->id;
