@@ -246,7 +246,13 @@ The @funcintref{_foobar_recv_params} function is responsible for
 parsing incoming extension data (both in the client and server).
 
 The @funcintref{_foobar_send_params} function is responsible for
-sending extension data (both in the client and server).
+sending extension data (both in the client and server). It should
+append data to provided buffer and return a positive (or zero) number on
+success or a negative error code. Previous to 3.6.0 versions of GnuTLS required
+that function to return the number of bytes that were written. If zero
+is returned and no bytes are appended the extension will not be sent.
+If a zero byte extension is to be sent this function must return
+@code{GNUTLS_E_INT_RET_0}.
 
 If you receive length fields that don't match, return
 @code{GNUTLS_E_@-UNEXPECTED_@-PACKET_@-LENGTH}.  If you receive invalid

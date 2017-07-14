@@ -293,7 +293,8 @@ static
 int send_extension(gnutls_session_t session, const extension_entry_st *p,
 		   gnutls_buffer_st *extdata, gnutls_ext_parse_type_t parse_type)
 {
-	int size_pos, size, ret;
+	int size_pos, appended, ret;
+	size_t size_prev;
 
 	if (p->send_func == NULL)
 		return 0;
@@ -323,16 +324,23 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	size = p->send_func(session, extdata);
+	size_prev = extdata->length;
+	ret = p->send_func(session, extdata);
+	if (ret < 0 && ret != GNUTLS_E_INT_RET_0) {
+		return gnutls_assert_val(ret);
+	}
+
 	/* returning GNUTLS_E_INT_RET_0 means to send an empty
 	 * extension of this type.
 	 */
-	if (size > 0 || size == GNUTLS_E_INT_RET_0) {
-		if (size == GNUTLS_E_INT_RET_0)
-			size = 0;
+	appended = extdata->length - size_prev;
+
+	if (appended > 0 || ret == GNUTLS_E_INT_RET_0) {
+		if (ret == GNUTLS_E_INT_RET_0)
+			appended = 0;
 
 		/* write the real size */
-		_gnutls_write_uint16(size,
+		_gnutls_write_uint16(appended,
 				     &extdata->data[size_pos]);
 
 		/* add this extension to the extension list
@@ -342,11 +350,8 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 
 		_gnutls_handshake_log
 			    ("EXT[%p]: Sending extension %s (%d bytes)\n",
-			     session, p->name, size);
-	} else if (size < 0) {
-		gnutls_assert();
-		return size;
-	} else if (size == 0)
+			     session, p->name, appended);
+	} else if (appended == 0)
 		extdata->length -= 4;	/* reset type and size */
 
 	return 0;

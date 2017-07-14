@@ -28,9 +28,6 @@
 #include <mpi.h>
 #include <gnutls/x509.h>
 
-#define GNUTLS_E_INT_RET_0 -1251
-#define GNUTLS_E_INT_CHECK_AGAIN -1252
-
 #ifdef __FILE__
 #ifdef __LINE__
 #define gnutls_assert() _gnutls_assert_log( "ASSERT: %s[%s]:%d\n", __FILE__,__func__,__LINE__);

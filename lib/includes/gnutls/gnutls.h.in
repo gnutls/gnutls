@@ -2939,7 +2939,10 @@ unsigned gnutls_fips140_mode_enabled(void);
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
-
+/* Internal errors of the library; will never be returned
+ * to a calling application */
+#define GNUTLS_E_INT_RET_0 -1251
+#define GNUTLS_E_INT_CHECK_AGAIN -1252
 
 #define GNUTLS_E_APPLICATION_ERROR_MAX -65000
 #define GNUTLS_E_APPLICATION_ERROR_MIN -65500
