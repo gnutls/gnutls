@@ -1595,15 +1595,31 @@ read_server_hello(gnutls_session_t session,
 		pos++;
 	}
 
-	/* Parse extensions.
+	/* Parse extensions in order.
 	 */
 	ret =
-	    _gnutls_parse_extensions(session, GNUTLS_EXT_ANY, &data[pos],
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY, &data[pos],
 				     len);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret =
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_APPLICATION, &data[pos],
+				     len);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret =
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_TLS, &data[pos],
+				     len);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret =
+	    _gnutls_parse_extensions(session, _GNUTLS_EXT_TLS_POST_CS, &data[pos],
+				     len);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return ret;
 }

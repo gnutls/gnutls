@@ -357,9 +357,11 @@ typedef struct gnutls_crypto_pk {
 	int (*pk_fixup_private_params) (gnutls_pk_algorithm_t,
 					gnutls_direction_t,
 					gnutls_pk_params_st *);
+#define PK_DERIVE_TLS13 1
 	int (*derive) (gnutls_pk_algorithm_t, gnutls_datum_t * out,
 		       const gnutls_pk_params_st * priv,
-		       const gnutls_pk_params_st * pub);
+		       const gnutls_pk_params_st * pub,
+		       unsigned int flags);
 
 	int (*curve_exists) (gnutls_ecc_curve_t);	/* true/false */
 } gnutls_crypto_pk_st;

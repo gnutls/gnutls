@@ -45,6 +45,7 @@
 #include <ext/srtp.h>
 #include <ext/alpn.h>
 #include <ext/dumbfw.h>
+#include <ext/key_share.h>
 #include <ext/etm.h>
 #include <num.h>
 
@@ -77,6 +78,7 @@ static extension_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 	&ext_mod_supported_ecc,
 	&ext_mod_supported_ecc_pf,
 	&ext_mod_sig,
+	&ext_mod_key_share,
 #ifdef ENABLE_DTLS_SRTP
 	&ext_mod_srtp,
 #endif

@@ -420,6 +420,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY),
 	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
 		    GNUTLS_E_INSUFFICIENT_SECURITY),
+	ERROR_ENTRY(N_("No common key share with peer."),
+		    GNUTLS_E_NO_COMMON_KEY_SHARE),
 	{NULL, NULL, 0}
 };
 

@@ -153,6 +153,11 @@ static void deinit_keys(gnutls_session_t session)
 {
 	gnutls_pk_params_release(&session->key.ecdh_params);
 	gnutls_pk_params_release(&session->key.dh_params);
+
+	gnutls_pk_params_release(&session->key.kshare_ecdhx_params);
+	gnutls_pk_params_release(&session->key.kshare_ecdh_params);
+	gnutls_pk_params_release(&session->key.kshare_dh_params);
+
 	zrelease_temp_mpi_key(&session->key.ecdh_x);
 	zrelease_temp_mpi_key(&session->key.ecdh_y);
 	_gnutls_free_temp_key_datum(&session->key.ecdhx);

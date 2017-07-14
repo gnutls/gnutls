@@ -200,7 +200,8 @@ ecc_shared_secret(struct ecc_scalar *private_key,
 static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				  gnutls_datum_t * out,
 				  const gnutls_pk_params_st * priv,
-				  const gnutls_pk_params_st * pub)
+				  const gnutls_pk_params_st * pub,
+				  unsigned int flags)
 {
 	int ret;
 
@@ -249,7 +250,14 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
-		ret = _gnutls_mpi_dprint(k, out);
+		if (flags & PK_DERIVE_TLS13) {
+			ret =
+			    _gnutls_mpi_dprint_size(k, out,
+						    (bits+7)/8);
+		} else {
+			ret = _gnutls_mpi_dprint(k, out);
+		}
+
 		if (ret < 0) {
 			gnutls_assert();
 			goto dh_cleanup;

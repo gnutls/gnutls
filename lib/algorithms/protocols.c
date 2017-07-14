@@ -102,6 +102,7 @@ static const version_entry_st sup_versions[] = {
 	 .obsolete = 0,
 	 .only_extension = 1,
 	 .post_handshake_auth = 1,
+	 .key_shares = 1,
 	 .false_start = 0, /* doesn't make sense */
 	 .tls_sig_sem = 1
 	},

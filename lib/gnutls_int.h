@@ -285,6 +285,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_ETM = 22,
 	GNUTLS_EXTENSION_EXT_MASTER_SECRET = 23,
 	GNUTLS_EXTENSION_SESSION_TICKET = 35,
+	GNUTLS_EXTENSION_KEY_SHARE = 40,
 	GNUTLS_EXTENSION_SUPPORTED_VERSIONS = 43,
 	GNUTLS_EXTENSION_POST_HANDSHAKE = 49,
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
@@ -396,8 +397,14 @@ typedef struct auth_cred_st {
 } auth_cred_st;
 
 struct gnutls_key_st {
+	/* TLS 1.3 key share exchange */
+	gnutls_pk_params_st kshare_ecdh_params;
+	gnutls_pk_params_st kshare_ecdhx_params;
+	gnutls_pk_params_st kshare_dh_params;
+
 	/* For ECDH KX */
 	gnutls_pk_params_st ecdh_params; /* private part */
+
 	/* public part */
 	bigint_t ecdh_x;
 	bigint_t ecdh_y;
@@ -434,8 +441,8 @@ struct gnutls_key_st {
 	uint8_t crypt_algo;
 
 	auth_cred_st *cred;	/* used to specify keys/certificates etc */
-
 };
+
 typedef struct gnutls_key_st gnutls_key_st;
 
 struct pin_info_st {
@@ -524,6 +531,7 @@ typedef struct {
 	bool false_start;	/* That version can be used with false start */
 	bool only_extension;	/* negotiated only with an extension */
 	bool post_handshake_auth;	/* Supports the TLS 1.3 post handshake auth */
+	bool key_shares;	/* TLS 1.3 key share key exchange */
 	/* 
 	 * TLS versions modify the semantics of signature algorithms. This number
 	 * is there to distinguish signature algorithms semantics between versions

@@ -2967,6 +2967,8 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_PK_INVALID_PUBKEY_PARAMS -420
 #define GNUTLS_E_PK_NO_VALIDATION_PARAMS -421
 
+#define GNUTLS_E_NO_COMMON_KEY_SHARE -420
+
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
 /* Internal errors of the library; will never be returned
