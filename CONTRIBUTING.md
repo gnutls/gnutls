@@ -139,6 +139,20 @@ error codes are defined in gnutls.h and a description
 is available in gnutls_errors.c
 
 
+Functions which are intended to return a boolean value should return
+a type of bool, and it is recommended to contain the string '_is_'
+on its function name; e.g.,
+```
+bool _gnutls_is_not_prehashed();
+```
+
+That allows the distinguishing functions that return negative errors
+from boolean functions to both the developer and the compiler. Note
+that in the past the 'unsigned' type was used to distinguish boolean functions
+and several of these still exist.
+
+
+
 # Usage of assert()
 
  The assert() macro --not to be confused with gnutls_assert()-- is used
