@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -108,6 +109,9 @@ int _gnutls_buffer_append_prefix(gnutls_buffer_st * buf, int pfx_size,
 
 int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
 			      bigint_t, int lz);
+
+int _gnutls_buffer_append_fixed_mpi(gnutls_buffer_st * buf,
+				    bigint_t mpi, unsigned size);
 
 int _gnutls_buffer_append_data_prefix(gnutls_buffer_st * buf, int pfx_size,
 				      const void *data, size_t data_size);

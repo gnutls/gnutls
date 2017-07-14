@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -866,6 +867,42 @@ int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
 
 	_gnutls_free_datum(&dd);
 
+	return ret;
+}
+
+/* Appends an MPI of fixed-size in bytes left-padded with zeros if necessary */
+int _gnutls_buffer_append_fixed_mpi(gnutls_buffer_st * buf,
+				    bigint_t mpi, unsigned size)
+{
+	gnutls_datum_t dd;
+	unsigned pad, i;
+	int ret;
+
+	ret = _gnutls_mpi_dprint(mpi, &dd);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (size < dd.size) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
+	pad = size - dd.size;
+	for (i=0;i<pad;i++) {
+		ret =
+		    _gnutls_buffer_append_data(buf, "\x00", 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	/* append the rest */
+	ret =
+	    _gnutls_buffer_append_data(buf, dd.data, dd.size);
+
+ cleanup:
+	_gnutls_free_datum(&dd);
 	return ret;
 }
 
