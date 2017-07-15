@@ -518,9 +518,10 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 		/* now we move ptr after the pem header 
 		 */
 		ptr++;
+		size--;
+
 		/* find the next certificate (if any)
 		 */
-		size = input_cert_size - (ptr - input_cert);
 
 		if (size > 0) {
 			char *ptr3;
@@ -533,6 +534,7 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 					      sizeof(PEM_CERT_SEP2) - 1);
 
 			ptr = ptr3;
+			size = input_cert_size - (ptr - input_cert);
 		} else
 			ptr = NULL;
 
