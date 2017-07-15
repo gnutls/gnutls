@@ -83,6 +83,7 @@ unsigned char ecc_x[] = "\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x3
 unsigned char ecc_y[] = "\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
 unsigned char ecc_k[] = "\x00\xfd\x2b\x00\x80\xf3\x36\x5f\x11\x32\x65\xe3\x8d\x30\x33\x3b\x47\xf5\xce\xf8\x13\xe5\x4c\xc2\xcf\xfd\xe8\x05\x6a\xca\xc9\x41\xb1";
 
+unsigned char false_ed25519_x[] = "\xac\xac\x9a\xb3\xc3\x41\x8d\x41\x22\x21\xc1\x84\xa7\xb8\x70\xfb\x44\x6e\xc7\x7e\x20\x87\x7b\xd9\x22\xa4\x5d\xd2\x97\x09\xd5\x48";
 unsigned char ed25519_x[] = "\xab\xaf\x98\xb3\xc3\x41\x8d\x41\x22\x21\xc1\x86\xa7\xb8\x70\xfb\x44\x6e\xc7\x7e\x20\x87\x7b\xd9\x22\xa4\x5d\xd2\x97\x09\xd5\x48";
 unsigned char ed25519_k[] = "\x1c\xa9\x23\xdc\x35\xa8\xfd\xd6\x2d\xa8\x98\xb9\x60\x7b\xce\x10\x3d\xf4\x64\xc6\xe5\x4b\x0a\x65\x56\x6a\x3c\x73\x65\x51\xa2\x2f";
 
@@ -105,6 +106,7 @@ gnutls_datum_t _ecc_x = {ecc_x, sizeof(ecc_x)-1};
 gnutls_datum_t _ecc_y = {ecc_y, sizeof(ecc_y)-1};
 gnutls_datum_t _ecc_k = {ecc_k, sizeof(ecc_k)-1};
 
+gnutls_datum_t _false_ed25519_x = {false_ed25519_x, sizeof(false_ed25519_x)-1};
 gnutls_datum_t _ed25519_x = {ed25519_x, sizeof(ed25519_x)-1};
 gnutls_datum_t _ed25519_k = {ed25519_k, sizeof(ed25519_k)-1};
 
@@ -404,6 +406,10 @@ int check_privkey_import_export(void)
 	if (ret < 0)
 		fail("error\n");
 
+	ret = gnutls_privkey_verify_params(key);
+	if (ret != 0)
+		fail("error: %s\n", gnutls_strerror(ret));
+
 	ret = gnutls_privkey_export_ecc_raw(key, &curve, &x, NULL, &p);
 	if (ret < 0)
 		fail("error\n");
@@ -415,6 +421,21 @@ int check_privkey_import_export(void)
 	CMP("k", &p, ed25519_k);
 	gnutls_free(x.data);
 	gnutls_free(p.data);
+	gnutls_privkey_deinit(key);
+
+	/* Ed25519 with incorrect public key */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519, &_false_ed25519_x, NULL, &_ed25519_k);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_verify_params(key);
+	if (ret != GNUTLS_E_ILLEGAL_PARAMETER)
+		fail("error: %s\n", gnutls_strerror(ret));
+
 	gnutls_privkey_deinit(key);
 
 	return 0;
