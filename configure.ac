@@ -415,6 +415,7 @@ if test "$gl_gcc_warnings" = yes; then
   done
   gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
+  gl_WARN_ADD([-Wno-format-truncation]) # Many warnings with no point
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
