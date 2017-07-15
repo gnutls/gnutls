@@ -2143,9 +2143,23 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 			mpz_clear(y2);
 		}
 		break;
-	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED25519: {
+		uint8_t pub[32];
+
+		if (params->raw_pub.data == NULL) {
+			return 0; /* nothing to verify */
+		}
+
+		if (params->raw_pub.size != 32)
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
+		ed25519_sha512_public_key(pub, params->raw_priv.data);
+		if (memcmp(params->raw_pub.data, pub, 32) != 0)
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
 		ret = 0;
 		break;
+	}
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
