@@ -8,7 +8,7 @@ stages:
 variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-stretch
-  FEDORA_BUILD: buildenv-f25
+  FEDORA_BUILD: buildenv-f26
   FEDORA_X86_BUILD: buildenv-f23-x86
   GET_SOURCES_ATTEMPTS: "3"
 
