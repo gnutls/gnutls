@@ -86,6 +86,11 @@ NO_CAMELLIA=$?
 
 test $NO_CAMELLIA = 0 && echo "Disabling interop tests for Camellia ciphersuites"
 
+${SERV} ciphers -v ALL 2>&1|grep -e RC4 >/dev/null 2>&1
+NO_RC4=$?
+
+test $NO_RC4 = 0 && echo "Disabling interop tests for RC4 ciphersuites"
+
 ${SERV} ciphers -v ALL 2>&1|grep -e 3DES >/dev/null 2>&1
 NO_3DES=$?
 
@@ -146,17 +151,19 @@ run_client_suite() {
 		kill ${PID}
 		wait
 
-		eval "${GETPORT}"
-		launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -ssl3 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -cipher RC4-MD5
-		PID=$!
-		wait_server ${PID}
+		if test "${NO_RC4}" != 1; then
+			eval "${GETPORT}"
+			launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem -ssl3 ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -cipher RC4-MD5
+			PID=$!
+			wait_server ${PID}
 
-		echo "${PREFIX}Checking SSL 3.0 with RSA-RC4-MD5..."
-		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+VERS-SSL3.0:+RSA${ADD}" --insecure </dev/null >/dev/null || \
-			fail ${PID} "Failed"
+			echo "${PREFIX}Checking SSL 3.0 with RSA-RC4-MD5..."
+			${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+VERS-SSL3.0:+RSA${ADD}" --insecure </dev/null >/dev/null || \
+				fail ${PID} "Failed"
 
-		kill ${PID}
-		wait
+			kill ${PID}
+			wait
+		fi
 	fi
 
 	if test "${NO_NULL}" = 0; then
@@ -480,9 +487,11 @@ run_server_suite() {
 		${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -ssl3 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 			fail ${PID} "Failed"
 
-		echo "${PREFIX}Check SSL 3.0 with RSA-RC4-MD5 ciphersuite"
-		${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -ssl3 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" -cipher RC4-MD5 </dev/null 2>&1 | grep "\:error\:" && \
-			fail ${PID} "Failed"
+		if test "${NO_RC4}" != 1; then
+			echo "${PREFIX}Check SSL 3.0 with RSA-RC4-MD5 ciphersuite"
+			${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -ssl3 -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" -cipher RC4-MD5 </dev/null 2>&1 | grep "\:error\:" && \
+				fail ${PID} "Failed"
+		fi
 
 		kill ${PID}
 		wait
