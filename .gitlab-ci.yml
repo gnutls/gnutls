@@ -394,7 +394,8 @@ MinGW32:
 #      - tests/*.log
 #      - tests/*/*.log
 
-# We need a clean 32-bit fedora for testing
+# We need a clean 32-bit fedora for testing. Note that this is also
+# a test for interoperability with openssl 1.0.x.
 Fedora/x86:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
