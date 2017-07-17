@@ -276,7 +276,24 @@ test_case_st tests[] = {
 		.server_prio = "NORMAL:-KX-ALL:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
 		.client_prio = "NORMAL:-KX-ALL:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2"
 	},
-
+	{
+		.name = "TLS 1.2 ECDHE-ECDSA with cred and ed25519 cert",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_ed25519_sign_cert = 1,
+		.server_prio = "NORMAL:-KX-ALL:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
+		.name = "TLS 1.2 ECDHE-ECDSA with cred and cert but incompatible (ed25519) curves",
+		.server_ret = GNUTLS_E_UNWANTED_ALGORITHM,
+		.client_ret = GNUTLS_E_AGAIN,
+		.have_cert_cred = 1,
+		.have_ed25519_sign_cert = 1,
+		.server_prio = "NORMAL:-KX-ALL:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NORMAL:-KX-ALL:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2:-CURVE-ED25519:-SIGN-EDDSA-ED25519"
+	},
 	{
 		.name = "TLS 1.2 ECDHE-PSK without cred",
 		.client_ret = GNUTLS_E_AGAIN,

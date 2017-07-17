@@ -33,6 +33,7 @@ typedef struct test_case_st {
 	unsigned have_cert_dh_params;
 	unsigned have_rsa_sign_cert;
 	unsigned have_ecc_sign_cert;
+	unsigned have_ed25519_sign_cert;
 	unsigned have_rsa_decrypt_cert;
 	unsigned not_on_fips;
 	const char *client_prio;
@@ -172,6 +173,10 @@ static void try(test_case_st *test)
 
 	if (test->have_ecc_sign_cert) {
 		assert(gnutls_certificate_set_x509_key_mem(s_cert_cred, &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, GNUTLS_X509_FMT_PEM) >= 0);
+	}
+
+	if (test->have_ed25519_sign_cert) {
+		assert(gnutls_certificate_set_x509_key_mem(s_cert_cred, &server_ca3_eddsa_cert, &server_ca3_eddsa_key, GNUTLS_X509_FMT_PEM) >= 0);
 	}
 
 	if (test->have_rsa_sign_cert) {
