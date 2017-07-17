@@ -430,6 +430,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	struct benchmark_st st;
 	struct timespec tr_start, tr_stop;
 	double avg, sstddev;
+	gnutls_priority_t priority_cache;
 
 	diffs_size = 0;
 
@@ -486,13 +487,19 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 
 	start_benchmark(&st);
 
+	ret = gnutls_priority_init(&priority_cache, cipher_prio, &str);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s\n", str);
+		exit(1);
+	}
+
 	do {
 
 		gnutls_init(&server, GNUTLS_SERVER);
 		ret =
-		    gnutls_priority_set_direct(server, cipher_prio, &str);
+		    gnutls_priority_set2(server, priority_cache, 0);
 		if (ret < 0) {
-			fprintf(stderr, "Error in %s\n", str);
+			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 		gnutls_credentials_set(server, GNUTLS_CRD_ANON,
@@ -547,6 +554,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	fprintf(stdout, "%38s  ", suite);
 	gnutls_free(suite);
 	stop_benchmark(&st, "transactions", 1);
+	gnutls_priority_deinit(priority_cache);
 
 	avg = calc_avg(diffs, diffs_size);
 	sstddev = calc_sstdev(diffs, diffs_size, avg);
