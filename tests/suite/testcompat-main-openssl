@@ -74,12 +74,11 @@ NO_TLS1_2=$?
 test $NO_TLS1_2 = 0 && echo "Disabling interop tests for TLS 1.2"
 
 ${SERV} version|grep -e '[1-9]\.[1-9]\.[0-9]' >/dev/null 2>&1
-NO_DH_PARAMS=$?
-
-${SERV} s_server -help 2>&1|grep -e -ssl3 >/dev/null 2>&1
-HAVE_SSL3=$?
-
-test $HAVE_SSL3 = 0 && echo "Disabling interop tests for SSL 3.0"
+if test $? = 0;then
+	NO_DH_PARAMS=0
+else
+	NO_DH_PARAMS=1
+fi
 
 ${SERV} ciphers -v ALL 2>&1|grep -e CAMELLIA >/dev/null 2>&1
 NO_CAMELLIA=$?
@@ -114,6 +113,24 @@ else
 	OPENSSL_DH_PARAMS_OPT="-dhparam \"${DH_PARAMS}\""
 fi
 
+${SERV} s_server -help 2>&1|grep -e -ssl3 >/dev/null 2>&1
+HAVE_NOT_SSL3=$?
+
+if test $HAVE_NOT_SSL3 = 0;then
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -cipher ALL -quiet -www -accept "${PORT}" -keyform pem -certform pem -ssl3 -key "${RSA_KEY}" -cert "${RSA_CERT}"
+	PID=$!
+	wait_server ${PID}
+
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -ssl3 </dev/null 2>&1 | grep "\:error\:" && \
+		HAVE_NOT_SSL3=1
+	kill ${PID}
+	wait
+fi
+
+test $HAVE_NOT_SSL3 != 0 && echo "Disabling interop tests for SSL 3.0"
+
+
 echo "#################################################"
 echo "# Client mode tests (gnutls cli-openssl server) #"
 echo "#################################################"
@@ -125,7 +142,7 @@ run_client_suite() {
 		PREFIX="$(echo $ADD|sed 's/://g'): "
 	fi
 
-	if test "${HAVE_SSL3}" != 1 && test "${ENABLE_SSL3}" = 1; then
+	if test "${HAVE_NOT_SSL3}" != 1 && test "${ENABLE_SSL3}" = 1; then
 		# It seems debian disabled SSL 3.0 completely on openssl
 
 		eval "${GETPORT}"
@@ -476,7 +493,7 @@ run_server_suite() {
 		PREFIX="$(echo $ADD|sed 's/://g'): "
 	fi
 
-	if test "${HAVE_SSL3}" != 1 && test "${ENABLE_SSL3}" = 1; then
+	if test "${HAVE_NOT_SSL3}" != 1 && test "${ENABLE_SSL3}" = 1; then
 
 		echo "${PREFIX}Check SSL 3.0 with RSA ciphersuite"
 		eval "${GETPORT}"
