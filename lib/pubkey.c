@@ -1528,7 +1528,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	params.pk = gnutls_sign_get_pk_algorithm(algo);
 	params.dig = gnutls_sign_get_hash_algorithm(algo);
 	me = hash_to_entry(params.dig);
-	if (me == NULL)
+	if (me == NULL && !_gnutls_pk_is_not_prehashed(params.pk))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (params.pk != pubkey->pk_algorithm) {
@@ -1779,6 +1779,9 @@ _pkcs1_rsa_verify_sig(gnutls_pk_algorithm_t pk,
 	uint8_t md[MAX_HASH_SIZE], *cmp;
 	unsigned int digest_size;
 	gnutls_datum_t d, di;
+
+	if (unlikely(me == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	digest_size = _gnutls_hash_get_algo_len(me);
 	if (prehash) {
