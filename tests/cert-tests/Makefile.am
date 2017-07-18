@@ -109,10 +109,6 @@ if WANT_TEST_SUITE
 dist_check_SCRIPTS += provable-dh-default
 endif
 
-if !WITH_OLD_NETTLE
-dist_check_SCRIPTS += illegal-rsa
-endif
-
 if !WINDOWS
 dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
 	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8 rsa-pss-pad dsa

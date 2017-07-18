@@ -14,10 +14,8 @@
 # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU Lesser General Public
-# License along with GnuTLS; if not, write to the Free
-# Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301, USA
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 AC_DEFUN([LIBGNUTLS_EXTRA_HOOKS],
 [
@@ -70,13 +68,13 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_SSL_VERSION=`expr ${LT_SSL_CURRENT} - ${LT_SSL_AGE}`
   AC_SUBST(DLL_SSL_VERSION)
 
-  PKG_CHECK_MODULES(NETTLE, [nettle >= 3.1], [cryptolib="nettle"], [
+  PKG_CHECK_MODULES(NETTLE, [nettle >= 3.3], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
   *** 
-  *** Libnettle 3.1 was not found. 
+  *** Libnettle 3.3 was not found.
 ]])
   ])
-  PKG_CHECK_MODULES(HOGWEED, [hogweed >= 3.1], [], [
+  PKG_CHECK_MODULES(HOGWEED, [hogweed >= 3.3], [], [
 AC_MSG_ERROR([[
   *** 
   *** Libhogweed (nettle's companion library) was not found. Note that you must compile nettle with gmp support.
