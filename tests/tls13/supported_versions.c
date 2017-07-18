@@ -152,7 +152,11 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 		success("server hello:\n\t%d.%d\n",
 			(int)msg->data[pos], (int)msg->data[pos+1]);
 
+#ifdef TLS13_FINAL_VERSION
 		if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x04) {
+#else
+		if (msg->data[pos] != 0x7f || msg->data[pos+1] != 21) {
+#endif
 			fail("fail expected TLS 1.3 in server hello, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
 		}
 
@@ -221,7 +225,11 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 				(int)msg->data[pos+2], (int)msg->data[pos+3], 
 				(int)msg->data[pos+4], (int)msg->data[pos+5]);
 
+#ifdef TLS13_FINAL_VERSION
 			if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x04) {
+#else
+			if (msg->data[pos] != 0x7f || msg->data[pos+1] != 21) {
+#endif
 				fail("fail expected TLS 1.3, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
 			}
 			pos+=2;

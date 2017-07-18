@@ -87,18 +87,19 @@ static const version_entry_st sup_versions[] = {
 	 .only_extension = 0,
 	 .false_start = 1
 	},
+#ifdef TLS13_FINAL_VERSION
 	{.name = "TLS1.3",
 	 .id = GNUTLS_TLS1_3,
-	 .age = 4,
+	 .age = 5,
 	 .major = 3,
 	 .minor = 4,
 	 .transport = GNUTLS_STREAM,
 	 .supported = 1,
-	 .explicit_iv = 1,
+	 .explicit_iv = 0,
 	 .extensions = 1,
 	 .selectable_sighash = 1,
 	 .selectable_prf = 1,
-	 .compact_hello = 1,
+	 .tls13_sem = 1,
 	 .obsolete = 0,
 	 .only_extension = 1,
 	 .post_handshake_auth = 1,
@@ -106,6 +107,27 @@ static const version_entry_st sup_versions[] = {
 	 .false_start = 0, /* doesn't make sense */
 	 .tls_sig_sem = 1
 	},
+#else
+	{.name = "TLS1.3",
+	 .id = GNUTLS_TLS1_3,
+	 .age = 5,
+	 .major = 0x7f,
+	 .minor = 21,
+	 .transport = GNUTLS_STREAM,
+	 .supported = 1,
+	 .explicit_iv = 0,
+	 .extensions = 1,
+	 .selectable_sighash = 1,
+	 .selectable_prf = 1,
+	 .tls13_sem = 1,
+	 .obsolete = 0,
+	 .only_extension = 1,
+	 .post_handshake_auth = 1,
+	 .key_shares = 1,
+	 .false_start = 0, /* doesn't make sense */
+	 .tls_sig_sem = 1
+	},
+#endif
 	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
 	 .id = GNUTLS_DTLS0_9,
 	 .age = 200,
@@ -300,6 +322,7 @@ int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, 
 					at_least_one_new = 1;
 
 				if (buffer_size > 2) {
+					_gnutls_debug_log("Advertizing version %x.%x\n", (int)p->major, (int)p->minor);
 					buffer[0] = p->major;
 					buffer[1] = p->minor;
 					written_bytes += 2;

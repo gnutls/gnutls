@@ -112,7 +112,11 @@ static unsigned find_server_extension(const gnutls_datum_t *msg, unsigned extnr,
 	success("server hello of %d bytes\n", msg->size);
 	/* we expect the legacy version to be present */
 	/* ProtocolVersion legacy_version = 0x0303 */
+#ifdef TLS13_FINAL_VERSION
 	if (msg->data[0] != 0x03) {
+#else
+	if (msg->data[0] != 0x7f) {
+#endif
 		fail("ProtocolVersion contains %d.%d\n", (int)msg->data[0], (int)msg->data[1]);
 	}
 

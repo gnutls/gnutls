@@ -527,7 +527,7 @@ typedef struct {
 	/* if SSL3 is disabled this flag indicates that this protocol is a placeholder,
 	 * otherwise it prevents this protocol from being set as record version */
 	bool obsolete;
-	bool compact_hello;	/* The TLS 1.3 client and server hello form */
+	bool tls13_sem;		/* The TLS 1.3 handshake semantics */
 	bool false_start;	/* That version can be used with false start */
 	bool only_extension;	/* negotiated only with an extension */
 	bool post_handshake_auth;	/* Supports the TLS 1.3 post handshake auth */
