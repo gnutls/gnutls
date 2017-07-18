@@ -672,7 +672,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
  * and initializing encryption. This is the first encrypted message
  * we send.
  */
-static int _gnutls_send_finished(gnutls_session_t session, int again)
+int _gnutls_send_finished(gnutls_session_t session, int again)
 {
 	mbuffer_st *bufel;
 	uint8_t *data;
@@ -757,7 +757,7 @@ static int _gnutls_send_finished(gnutls_session_t session, int again)
 /* This is to be called after sending our finished message. If everything
  * went fine we have negotiated a secure connection 
  */
-static int _gnutls_recv_finished(gnutls_session_t session)
+int _gnutls_recv_finished(gnutls_session_t session)
 {
 	uint8_t data[MAX_VERIFY_DATA_SIZE], *vrfy;
 	gnutls_buffer_st buf;
@@ -1342,6 +1342,7 @@ _gnutls_recv_handshake(gnutls_session_t session,
 	case GNUTLS_HANDSHAKE_CERTIFICATE_PKT:
 	case GNUTLS_HANDSHAKE_CERTIFICATE_STATUS:
 	case GNUTLS_HANDSHAKE_FINISHED:
+	case GNUTLS_HANDSHAKE_ENCRYPTED_EXTENSIONS:
 	case GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE:
 	case GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE:
 	case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
@@ -2339,38 +2340,10 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 	session->internals.handshake_timeout_ms = ms;
 }
 
-
-#define IMED_RET( str, ret, allow_alert) do { \
-	if (ret < 0) { \
-		/* EAGAIN and INTERRUPTED are always non-fatal */ \
-		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
-			return ret; \
-		if (ret == GNUTLS_E_GOT_APPLICATION_DATA && session->internals.initial_negotiation_completed != 0) \
-			return ret; \
-		if (session->internals.handshake_suspicious_loops < 16) { \
-			if (ret == GNUTLS_E_LARGE_PACKET) { \
-				session->internals.handshake_suspicious_loops++; \
-				return ret; \
-			} \
-			/* a warning alert might interrupt handshake */ \
-			if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) { \
-				session->internals.handshake_suspicious_loops++; \
-				return ret; \
-			} \
-		} \
-		gnutls_assert(); \
-		/* do not allow non-fatal errors at this point */ \
-		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
-		session_invalidate(session); \
-		_gnutls_handshake_hash_buffers_clear(session); \
-		return ret; \
-	} } while (0)
-
-
 /* Runs the certificate verification callback.
  * side is either GNUTLS_CLIENT or GNUTLS_SERVER.
  */
-static int run_verify_callback(gnutls_session_t session, unsigned int side)
+int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side)
 {
 	gnutls_certificate_credentials_t cred;
 	int ret, type;
@@ -2437,6 +2410,11 @@ static bool can_send_false_start(gnutls_session_t session)
 static int handshake_client(gnutls_session_t session)
 {
 	int ret = 0;
+	const version_entry_st *ver;
+
+ reset:
+	if (STATE >= STATE100)
+		return _gnutls13_handshake_client(session);
 
 	switch (STATE) {
 	case STATE0:
@@ -2470,6 +2448,12 @@ static int handshake_client(gnutls_session_t session)
 		IMED_RET("recv hello", ret, 1);
 		/* fall through */
 	case STATE4:
+		ver = get_version(session);
+		if (ver->tls13_sem) { /* TLS 1.3 state machine */
+			STATE = STATE100;
+			goto reset;
+		}
+
 		ret = _gnutls_ext_sr_verify(session);
 		STATE = STATE4;
 		IMED_RET("recv hello", ret, 0);
@@ -2500,7 +2484,7 @@ static int handshake_client(gnutls_session_t session)
 #endif
 		/* fall through */
 	case STATE8:
-		ret = run_verify_callback(session, GNUTLS_CLIENT);
+		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
 		STATE = STATE8;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -2840,6 +2824,11 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 static int handshake_server(gnutls_session_t session)
 {
 	int ret = 0;
+	const version_entry_st *ver;
+
+ reset:
+	if (STATE >= STATE100)
+		return _gnutls13_handshake_server(session);
 
 	switch (STATE) {
 	case STATE0:
@@ -2859,6 +2848,7 @@ static int handshake_server(gnutls_session_t session)
 		IMED_RET("recv hello", ret, 1);
 		/* fall through */
 	case STATE2:
+
 		ret = _gnutls_ext_sr_verify(session);
 		STATE = STATE2;
 		IMED_RET("recv hello", ret, 0);
@@ -2867,6 +2857,13 @@ static int handshake_server(gnutls_session_t session)
 		ret = send_server_hello(session, AGAIN(STATE3));
 		STATE = STATE3;
 		IMED_RET("send hello", ret, 1);
+
+		ver = get_version(session);
+		if (ver->tls13_sem) { /* TLS 1.3 state machine */
+			STATE = STATE100;
+			goto reset;
+		}
+
 		/* fall through */
 	case STATE4:
 		if (session->security_parameters.do_send_supplemental) {
@@ -2943,7 +2940,7 @@ static int handshake_server(gnutls_session_t session)
 		IMED_RET("recv client certificate", ret, 1);
 		/* fall through */
 	case STATE12:
-		ret = run_verify_callback(session, GNUTLS_SERVER);
+		ret = _gnutls_run_verify_callback(session, GNUTLS_SERVER);
 		STATE = STATE12;
 		if (ret < 0)
 			return gnutls_assert_val(ret);

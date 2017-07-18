@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -24,6 +25,33 @@
 #define HANDSHAKE_H
 
 #include "errors.h"
+#include "record.h"
+
+#define IMED_RET( str, ret, allow_alert) do { \
+	if (ret < 0) { \
+		/* EAGAIN and INTERRUPTED are always non-fatal */ \
+		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
+			return ret; \
+		if (ret == GNUTLS_E_GOT_APPLICATION_DATA && session->internals.initial_negotiation_completed != 0) \
+			return ret; \
+		if (session->internals.handshake_suspicious_loops < 16) { \
+			if (ret == GNUTLS_E_LARGE_PACKET) { \
+				session->internals.handshake_suspicious_loops++; \
+				return ret; \
+			} \
+			/* a warning alert might interrupt handshake */ \
+			if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) { \
+				session->internals.handshake_suspicious_loops++; \
+				return ret; \
+			} \
+		} \
+		gnutls_assert(); \
+		/* do not allow non-fatal errors at this point */ \
+		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
+		session_invalidate(session); \
+		_gnutls_handshake_hash_buffers_clear(session); \
+		return ret; \
+	} } while (0)
 
 int _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 			   gnutls_handshake_description_t type);
@@ -87,5 +115,12 @@ int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certific
 #define APPLICATION_SERVER_TRAFFIC_LABEL "s ap traffic"
 #define EXPORTER_LABEL "exp master"
 #define RES_LABEL "res master"
+
+int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side);
+int _gnutls_recv_finished(gnutls_session_t session);
+int _gnutls_send_finished(gnutls_session_t session, int again);
+
+int _gnutls13_handshake_client(gnutls_session_t session);
+int _gnutls13_handshake_server(gnutls_session_t session);
 
 #endif
