@@ -1125,7 +1125,7 @@ typedef struct {
 } internals_st;
 
 /* Maximum number of epochs we keep around. */
-#define MAX_EPOCH_INDEX 16
+#define MAX_EPOCH_INDEX 4
 
 struct gnutls_session_int {
 	security_parameters_st security_parameters;
