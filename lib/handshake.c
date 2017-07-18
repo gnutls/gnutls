@@ -69,7 +69,8 @@ static int handshake_client(gnutls_session_t session);
 static int handshake_server(gnutls_session_t session);
 
 static int
-recv_hello(gnutls_session_t session, uint8_t * data, int datalen);
+read_server_hello(gnutls_session_t session,
+		  uint8_t * data, int datalen);
 
 static int
 recv_handshake_final(gnutls_session_t session, int init);
@@ -1251,7 +1252,6 @@ _gnutls_recv_handshake(gnutls_session_t session,
 	switch (hsk.htype) {
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO_V2:
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO:
-	case GNUTLS_HANDSHAKE_SERVER_HELLO:
 #ifdef ENABLE_SSL2
 		if (hsk.htype == GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)
 			ret =
@@ -1260,8 +1260,18 @@ _gnutls_recv_handshake(gnutls_session_t session,
 							 hsk.data.length);
 		else
 #endif
-			ret =
-			    recv_hello(session, hsk.data.data,
+			ret = read_client_hello(session, hsk.data.data,
+						hsk.data.length);
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		break;
+
+	case GNUTLS_HANDSHAKE_SERVER_HELLO:
+		ret = read_server_hello(session, hsk.data.data,
 					hsk.data.length);
 
 		if (ret < 0) {
@@ -1465,7 +1475,7 @@ no_resume:
  */
 static int
 read_server_hello(gnutls_session_t session,
-			  uint8_t * data, int datalen)
+		  uint8_t * data, int datalen)
 {
 	uint8_t session_id_len = 0;
 	int pos = 0;
@@ -1874,47 +1884,6 @@ static int send_server_hello(gnutls_session_t session, int again)
       fail:
 	_gnutls_buffer_clear(&extdata);
 	return ret;
-}
-
-static int send_hello(gnutls_session_t session, int again)
-{
-	int ret;
-
-	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = send_client_hello(session, again);
-
-	} else {		/* SERVER */
-		ret = send_server_hello(session, again);
-	}
-
-	return ret;
-}
-
-/* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake_int only if a
- * hello message is expected. It uses the security_parameters.cipher_suite
- * and internals.compression_method.
- */
-static int
-recv_hello(gnutls_session_t session, uint8_t * data, int datalen)
-{
-	int ret;
-
-	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = read_server_hello(session, data, datalen);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-	} else {		/* Server side reading a client hello */
-
-		ret = read_client_hello(session, data, datalen);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-	}
-
-	return 0;
 }
 
 static int
@@ -2412,7 +2381,7 @@ static int handshake_client(gnutls_session_t session)
 	switch (STATE) {
 	case STATE0:
 	case STATE1:
-		ret = send_hello(session, AGAIN(STATE1));
+		ret = send_client_hello(session, AGAIN(STATE1));
 		STATE = STATE1;
 		IMED_RET("send hello", ret, 1);
 		/* fall through */
@@ -2839,7 +2808,7 @@ static int handshake_server(gnutls_session_t session)
 		IMED_RET("recv hello", ret, 0);
 		/* fall through */
 	case STATE3:
-		ret = send_hello(session, AGAIN(STATE3));
+		ret = send_server_hello(session, AGAIN(STATE3));
 		STATE = STATE3;
 		IMED_RET("send hello", ret, 1);
 		/* fall through */
