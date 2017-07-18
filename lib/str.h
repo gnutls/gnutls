@@ -59,6 +59,16 @@ inline static unsigned _gnutls_str_is_print(const char *str, unsigned size)
 	return 1;
 }
 
+inline static unsigned _gnutls_dnsname_is_valid(const char *str, unsigned size)
+{
+	unsigned i;
+	for (i=0;i<size;i++) {
+		if (!(c_isalnum(str[i]) || str[i] == '-' || str[i] == '.'))
+			return 0;
+	}
+	return 1;
+}
+
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
 void _gnutls_str_cat(char *dest, size_t dest_tot_size, const char *src);
 

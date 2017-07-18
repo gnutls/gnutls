@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,14 +29,6 @@ typedef struct {
 	uint8_t name[MAX_SERVER_NAME_SIZE+1];
 	unsigned name_length;
 	gnutls_server_name_type_t type;
-} server_name_st;
-
-#define MAX_SERVER_NAME_EXTENSIONS 3
-
-typedef struct {
-	server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
-	/* limit server_name extensions */
-	unsigned server_names_size;
 } server_name_ext_st;
 
 extern const extension_entry_st ext_mod_server_name;
