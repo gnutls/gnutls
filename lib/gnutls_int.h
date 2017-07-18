@@ -974,11 +974,6 @@ typedef struct {
 
 	void *user_ptr;
 
-	bool enable_private;	/* non zero to
-					 * enable cipher suites
-					 * which have 0xFF status.
-					 */
-
 	/* Holds 0 if the last called function was interrupted while
 	 * receiving, and non zero otherwise.
 	 */
