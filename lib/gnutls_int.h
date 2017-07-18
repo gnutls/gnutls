@@ -1098,9 +1098,9 @@ typedef struct {
 	struct {
 		uint16_t type;
 		gnutls_ext_priv_data_t priv;
-		bool set;
 		gnutls_ext_priv_data_t resumed_priv;
-		bool resumed_set;
+		uint8_t set;
+		uint8_t resumed_set;
 	} ext_data[MAX_EXT_TYPES];
 
 	/* In case of a client holds the extensions we sent to the peer;
