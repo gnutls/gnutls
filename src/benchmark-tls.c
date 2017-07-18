@@ -17,8 +17,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -44,7 +43,7 @@
 
 const char *side = "";
 
-#define PRIO_DHE_RSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
+#define PRIO_DHE_RSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+DHE-RSA:+GROUP-FFDHE3072"
 #define PRIO_ECDH "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
 #define PRIO_ECDH_X25519 "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
 #define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
@@ -61,29 +60,6 @@ const char *side = "";
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 static const int rsa_bits = 3072, ec_bits = 256;
-
-/* DH of 3072 bits that is pretty close equivalent to 256 bits of ECDH.
- */
-const char *pkcs3 =
-    "-----BEGIN DH PARAMETERS-----\n"
-    "MIIDDQKCAYEAtnlQsMzw6EdzVgv59IvDCNXDz+V5F6S95ies6VuP2najcePLCPa4\n"
-    "yLCcQabhjV+rSpYxvqEo1hHMhAZPPsrHP3CCzFlqkSY2mmryC5LfWnoJnJCA5RSs\n"
-    "kWNlxyJ/fkXWseFKDm+E3W/yZXxBJxf3BevlcF7hMXuOrv5tGOdiltWsCrZglEMC\n"
-    "IO3NcvEwLp7Y/OuHk4J2upJSLJqL2mUoYgOUAwhoM9oh6ucjPJ0Ha/HqNRe0zdup\n"
-    "0wnwSbjBR0xa2HdHv5hr0OPk6sma0Zj1cVNi3u5xlMeiirbtEBuRPfM4mrMkhK8F\n"
-    "YBhVV7YRf+WMw8v9VhfeX+GYuE4oMdv6tJBwWoj0RdhgpD6BMG7uHwM7WOn5ZukA\n"
-    "sn9eGsXRog2gCmckUfOGn5oQWXRk1sv2myeu75GAaIPIsXMWBsJNCfxVBbi7pEU9\n"
-    "IQgi6JoLlRnvXVa2GaoVEdAuH0dl6QSIRmNeZ3VKa0ZCx1DHn/WVIt2ooMec5lCY\n"
-    "JGCqIT3tQUUzAoIBgFYzCrFBoleurEimohHxnFKMY0E0feGA0qLPDUa+Ys/4wsr6\n"
-    "SabuE9X69EHVDu4xGlbS4w9k5sMfXTqgVGIN43jbWuoN1FAdPp8YdbXACB3k+IoN\n"
-    "cCj/Ju90Tc/NOTwHN/4Axsy0LpeP+eknb48eQw6mYsHCvN9ytmLqC8AG11G+aTrF\n"
-    "boVeI7pCbfuls/cRNl4POuSyv+R12Evs1qXLoSW4crPEDvVpbIrgirjQNJbosfZY\n"
-    "5Pxf2Ofpidy1slINQqx8zhILTikl0AdfYAlnBVFEOKg1HF+EnvNbcXW0QDxxnFF/\n"
-    "W+Yv0xQpFw9UDa+hdwEVvdrDopqvuvg9BCwCfxT3vGN300RDqWAVGJUknXN4T5MZ\n"
-    "+fZrtZMhbWDCsOHMcVcUPqul7V5uQX7EAhUnfBKxE1I5NK9J8wtHeUEYioI8f7XY\n"
-    "Be6/w7WHHspV4fwIOfWUD5G0c++NxED+JwDyc8aU/qVOXVikOXwVTB/2oyatkoBX\n"
-    "r8Y+1FUiZGhRCT9dbgICAQA=\n"
-    "-----END DH PARAMETERS-----\n";
 
 static unsigned char server_rsa_pss_cert_pem[] =
 	"-----BEGIN CERTIFICATE-----\n"
@@ -263,8 +239,6 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
 	gnutls_certificate_credentials_t c_certcred, s_certcred;
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
-	static gnutls_dh_params_t dh_params;
 	gnutls_session_t server;
 	int sret, cret;
 	const char *str;
@@ -278,12 +252,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 
 	/* Init server */
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
-	gnutls_dh_params_init(&dh_params);
-	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
-	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
-
 	gnutls_certificate_allocate_credentials(&s_certcred);
-	gnutls_certificate_set_dh_params(s_certcred, dh_params);
 
 	gnutls_certificate_set_x509_key_mem(s_certcred, &server_cert,
 					    &server_key,
@@ -370,9 +339,6 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
-
-	gnutls_dh_params_deinit(dh_params);
-
 }
 
 static
@@ -415,8 +381,6 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 {
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
-	static gnutls_dh_params_t dh_params;
 	gnutls_session_t server;
 	int sret, cret;
 	const char *str;
@@ -437,19 +401,6 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&s_certcred);
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
-	gnutls_dh_params_init(&dh_params);
-
-	ret =
-	     gnutls_dh_params_import_pkcs3(dh_params, &p3,
-					   GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
-		fprintf(stderr, "Error importing the PKCS #3 params: %s\n",
-			gnutls_strerror(ret));
-		exit(1);
-	}
-
-	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
-	gnutls_certificate_set_dh_params(s_certcred, dh_params);
 
 	ret = 0;
 	if (pk == GNUTLS_PK_RSA_PSS)
@@ -564,9 +515,6 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
-
-	gnutls_dh_params_deinit(dh_params);
-
 }
 
 void benchmark_tls(int debug_level, int ciphers)
