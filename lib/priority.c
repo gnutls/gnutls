@@ -1211,6 +1211,19 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		}
 	}
 
+	/* Add TLS 1.3 ciphersuites (no KX) */
+	for (j=0;j<priority_cache->_cipher.algorithms;j++) {
+		for (z=0;z<priority_cache->_mac.algorithms;z++) {
+			ce = cipher_suite_get(
+				0, priority_cache->_cipher.priority[j],
+				priority_cache->_mac.priority[z]);
+
+			if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
+				priority_cache->cs.entry[priority_cache->cs.size++] = ce;
+			}
+		}
+	}
+
 	for (i = 0; i < priority_cache->_kx.algorithms; i++) {
 		for (j=0;j<priority_cache->_cipher.algorithms;j++) {
 			for (z=0;z<priority_cache->_mac.algorithms;z++) {

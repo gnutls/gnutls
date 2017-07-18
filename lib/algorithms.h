@@ -169,7 +169,7 @@ inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
 /* Functions for cipher suites. */
 int _gnutls_get_client_ciphersuites(gnutls_session_t session,
 	gnutls_buffer_st * cdata, const version_entry_st *minver,
-	const version_entry_st *maxver, unsigned add_scsv);
+	unsigned add_scsv);
 
 int _gnutls_supported_ciphersuites(gnutls_session_t session,
 				   uint8_t * cipher_suites,

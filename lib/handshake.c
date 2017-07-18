@@ -1790,7 +1790,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 			add_sr_scsv = 1;
 		}
 #endif
-		ret = _gnutls_get_client_ciphersuites(session, &extdata, min_ver, hver, add_sr_scsv);
+		ret = _gnutls_get_client_ciphersuites(session, &extdata, min_ver, add_sr_scsv);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

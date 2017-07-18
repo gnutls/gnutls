@@ -41,6 +41,15 @@
 	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256}
 #define ENTRY_PRF( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf ) \
 	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf}
+#define ENTRY_TLS13( name, block_algorithm, min_version, prf ) \
+	{ #name, name, block_algorithm, 0, GNUTLS_MAC_AEAD, min_version, GNUTLS_VERSION_UNKNOWN, prf}
+
+/* TLS 1.3 ciphersuites */
+#define GNUTLS_AES_128_GCM_SHA256 { 0x13, 0x01 }
+#define GNUTLS_AES_256_GCM_SHA384 { 0x13, 0x02 }
+#define GNUTLS_CHACHA20_POLY1305_SHA256 { 0x13, 0x03 }
+#define GNUTLS_AES_128_CCM_SHA256 { 0x13, 0x04 }
+#define GNUTLS_AES_128_CCM_8_SHA256 { 0x13,0x05 }
 
 /* RSA with NULL cipher and MD5 MAC
  * for test purposes.
@@ -331,6 +340,32 @@
  * available, the ciphers and MACs must be available to gnutls as well.
  */
 static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
+/* TLS 1.3 */
+	ENTRY_TLS13(GNUTLS_AES_128_GCM_SHA256,
+		    GNUTLS_CIPHER_AES_128_GCM,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
+	ENTRY_TLS13(GNUTLS_AES_256_GCM_SHA384,
+		    GNUTLS_CIPHER_AES_256_GCM,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA384),
+
+	ENTRY_TLS13(GNUTLS_CHACHA20_POLY1305_SHA256,
+		    GNUTLS_CIPHER_CHACHA20_POLY1305,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
+	ENTRY_TLS13(GNUTLS_AES_128_CCM_SHA256,
+		    GNUTLS_CIPHER_AES_128_CCM,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
+	ENTRY_TLS13(GNUTLS_AES_128_CCM_8_SHA256,
+		    GNUTLS_CIPHER_AES_128_CCM_8,
+		    GNUTLS_TLS1_3,
+		    GNUTLS_MAC_SHA256),
+
 	/* RSA-NULL */
 	ENTRY(GNUTLS_RSA_NULL_MD5,
 	      GNUTLS_CIPHER_NULL,
@@ -391,6 +426,8 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 	      GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_RSA,
 	      GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
 	      GNUTLS_DTLS1_2),
+
+
 /* GCM */
 	ENTRY(GNUTLS_RSA_AES_128_GCM_SHA256,
 	      GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA,
@@ -1357,10 +1394,12 @@ const char *gnutls_cipher_suite_info(size_t idx,
 
 #define VERSION_CHECK(entry) \
 			if (is_dtls) { \
-				if (version->id < entry->min_dtls_version) \
+				if (entry->min_dtls_version == GNUTLS_VERSION_UNKNOWN || \
+				    version->id < entry->min_dtls_version) \
 					continue; \
 			} else { \
-				if (version->id < entry->min_version) \
+				if (entry->min_version == GNUTLS_VERSION_UNKNOWN || \
+				    version->id < entry->min_version) \
 					continue; \
 			}
 
@@ -1523,7 +1562,6 @@ int
 _gnutls_get_client_ciphersuites(gnutls_session_t session,
 			 gnutls_buffer_st * cdata,
 			 const version_entry_st *vmin,
-			 const version_entry_st *vmax,
 			 unsigned add_scsv)
 {
 
@@ -1535,17 +1573,24 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE*2 + RESERVED_CIPHERSUITES];
 	unsigned cipher_suites_size = 0;
 	size_t init_length = cdata->length;
+	const version_entry_st *vmax;
+
+	vmax = _gnutls_version_max(session);
+	if (vmax == NULL)
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	for (j = 0; j < session->internals.priorities->cs.size; j++) {
 		CLIENT_VERSION_CHECK(vmin, vmax, session->internals.priorities->cs.entry[j]);
 
 		kx = session->internals.priorities->cs.entry[j]->kx_algorithm;
-		cred_type = _gnutls_map_kx_get_cred(kx, 0);
+		if (kx != GNUTLS_KX_UNKNOWN) { /* In TLS 1.3 ciphersuites don't map to credentials */
+			cred_type = _gnutls_map_kx_get_cred(kx, 0);
 
-		if (!session->internals.premaster_set && _gnutls_get_cred(session, cred_type) == NULL)
-			continue;
+			if (!session->internals.premaster_set && _gnutls_get_cred(session, cred_type) == NULL)
+				continue;
 
-		KX_SRP_CHECKS(kx, continue);
+			KX_SRP_CHECKS(kx, continue);
+		}
 
 		_gnutls_debug_log("Keeping ciphersuite %.2x.%.2x (%s)\n",
 				(unsigned)session->internals.priorities->cs.entry[j]->id[0],
