@@ -515,9 +515,9 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		gnutls_init(&client, GNUTLS_CLIENT);
 
 		ret =
-		    gnutls_priority_set_direct(client, cipher_prio, &str);
+		    gnutls_priority_set2(client, priority_cache, 0);
 		if (ret < 0) {
-			fprintf(stderr, "Error in %s\n", str);
+			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 		gnutls_credentials_set(client, GNUTLS_CRD_ANON,
