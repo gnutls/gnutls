@@ -79,15 +79,12 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		DECR_LENGTH_RET(data_size, 2, 0);
+		DECR_LENGTH_RET(data_size, 2, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		len = _gnutls_read_uint16(data);
 
 		if (len != data_size) {
-			/* This is unexpected packet length, but
-			 * just ignore it, for now.
-			 */
 			gnutls_assert();
-			return 0;
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 
 		p = data + 2;
@@ -105,10 +102,12 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 				DECR_LENGTH_RET(data_size, len, 0);
 				server_names++;
 				p += len;
-			} else
+			} else {
 				_gnutls_handshake_log
 				    ("HSK[%p]: Received (0) size server name (under attack?)\n",
 				     session);
+				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+			}
 
 		}
 
