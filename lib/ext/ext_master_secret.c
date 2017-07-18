@@ -75,7 +75,7 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 	}
 
 	if (data_size != 0) {
-		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	}
 
 #ifdef ENABLE_SSL3
