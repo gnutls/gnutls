@@ -121,15 +121,8 @@ void doit(void)
 		fail("gnutls_privkey_generate: %s\n", gnutls_strerror(ret));
 	}
 
-#ifndef ALLOW_SHA1
-	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA1, 0) >= 0)
-		fail("succeeded verification with SHA1!\n");
-#endif
-	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA1, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1) < 0)
-		fail("failed verification with SHA1 and override flags!\n");
-
-	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA1, GNUTLS_VERIFY_ALLOW_BROKEN) < 0)
-		fail("failed verification with SHA1 and override flags2!\n");
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA1, 0) < 0)
+		fail("failed verification with SHA1!\n");
 
 	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_MD5, 0) >= 0)
 		fail("succeeded verification with MD5!\n");

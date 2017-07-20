@@ -110,7 +110,6 @@ static const gnutls_datum_t resp1 =
   "	Extensions:\n" \
   "		Nonce: 16897d913ab525a445fec9fdc2e508a4\n" \
   "	Signature Algorithm: RSA-SHA1\n" \
-  "warning: signed using a broken signature algorithm that can be forged.\n" \
   "	Signature:\n" \
   "		4e:ad:6b:2b:f7:f2:bf:a9:23:1e:3a:0b:06:db:55:53\n" \
   "		2b:64:54:11:32:bf:60:f7:4f:e0:8e:9b:a0:a2:4c:79\n" \
@@ -152,7 +151,6 @@ static const gnutls_datum_t resp2 =
 "		Next Update: Thu Sep 11 06:04:00 UTC 2014\n" \
 "	Extensions:\n" \
 "	Signature Algorithm: RSA-SHA1\n" \
-"warning: signed using a broken signature algorithm that can be forged.\n" \
 "	Signature:\n" \
 "		6e:5e:5e:81:ff:3f:4d:c7:53:c7:1b:f3:d3:1d:dc:9a\n" \
 "		c7:ce:77:2c:67:56:13:98:91:02:01:76:dc:48:b2:1f\n" \
@@ -1451,7 +1449,7 @@ static void resp_verify(void)
 
 	/* check direct verify with signer (should succeed) */
 
-	ret = gnutls_ocsp_resp_verify_direct(resp, signer, &verify, GNUTLS_VERIFY_ALLOW_BROKEN);
+	ret = gnutls_ocsp_resp_verify_direct(resp, signer, &verify, 0);
 	if (ret < 0) {
 		fail("gnutls_ocsp_resp_verify_direct (signer) %d\n", ret);
 		exit(1);
@@ -1516,7 +1514,7 @@ static void resp_verify(void)
 		exit(1);
 	}
 
-	ret = gnutls_ocsp_resp_verify(resp, list, &verify, GNUTLS_VERIFY_ALLOW_BROKEN);
+	ret = gnutls_ocsp_resp_verify(resp, list, &verify, 0);
 	if (ret < 0) {
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
 		exit(1);
@@ -1582,7 +1580,7 @@ static void resp_verify(void)
 		exit(1);
 	}
 
-	ret = gnutls_ocsp_resp_verify(resp, list, &verify, GNUTLS_VERIFY_ALLOW_BROKEN);
+	ret = gnutls_ocsp_resp_verify(resp, list, &verify, 0);
 	if (ret < 0) {
 		fail("gnutls_ocsp_resp_verify (issuer) %d\n", ret);
 		exit(1);
@@ -1642,7 +1640,7 @@ static void long_resp_check(void)
 
 	/* check direct verify with signer (should succeed) */
 
-	ret = gnutls_ocsp_resp_verify_direct(resp, signer, &verify, GNUTLS_VERIFY_ALLOW_BROKEN);
+	ret = gnutls_ocsp_resp_verify_direct(resp, signer, &verify, 0);
 	if (ret < 0) {
 		fail("gnutls_ocsp_resp_verify_direct (signer) %d\n", ret);
 		exit(1);
