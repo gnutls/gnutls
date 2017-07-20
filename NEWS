@@ -52,10 +52,14 @@ See the end for copying conditions.
    These curves were rarely used for that purpose and provide no advantage over
    x25519.
 
-** libgnutls: SHA1 was removed from the trusted set of hashes. Verification
-   and other operations relying on SHA1 is now considered insecure and will
+** libgnutls: SHA1 was marked as insecure for certificate signatures. Verification
+   of certificates signed with SHA1 is now considered insecure and will
    fail, unless flags intended to enable broken algorithms are set. This
    can be reverted on compile time with the configure flag --enable-sha1-support.
+
+** libgnutls: RIPEMD160 was marked as insecure for certificate signatures. Verification
+   of certificates signed with RIPEMD160 hash algorithm is now considered insecure and
+   will fail, unless flags intended to enable broken algorithms are set.
 
 ** libgnutls: Added support for PKCS#12 files with no (zero length) salt used in their
    password encoding, and PKCS#12 files using SHA384 and SHA512 as MAC.
