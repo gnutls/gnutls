@@ -1010,7 +1010,14 @@ size_t
 size_t
 	gnutls_mac_get_key_size(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
 
-int gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm) __GNUTLS_CONST__;
+unsigned gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm) __GNUTLS_CONST__;
+
+/* It is possible that a signature algorithm is ok to use for short-lived
+ * data (e.g., to sign a TLS session), but not for data that are long-lived
+ * like certificates. This flag is about checking the security of the algorithm
+ * for long-lived data. */
+#define GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS 1
+unsigned gnutls_sign_is_secure2(gnutls_sign_algorithm_t algorithm, unsigned int flags) __GNUTLS_CONST__;
 
 gnutls_digest_algorithm_t
 	gnutls_sign_get_hash_algorithm(gnutls_sign_algorithm_t sign) __GNUTLS_CONST__;

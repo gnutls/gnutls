@@ -171,7 +171,19 @@ const char *gnutls_sign_get_name(gnutls_sign_algorithm_t algorithm)
  *
  * Returns: Non-zero if the provided signature algorithm is considered to be secure.
  **/
-int gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
+unsigned gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
+{
+	return gnutls_sign_is_secure2(algorithm, 0);
+}
+
+/**
+ * gnutls_sign_is_secure2:
+ * @algorithm: is a sign algorithm
+ * @flags: zero or %GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS
+ *
+ * Returns: Non-zero if the provided signature algorithm is considered to be secure.
+ **/
+unsigned gnutls_sign_is_secure2(gnutls_sign_algorithm_t algorithm, unsigned int flags)
 {
 	gnutls_sign_algorithm_t sign = algorithm;
 	gnutls_digest_algorithm_t dig = GNUTLS_DIG_UNKNOWN;
@@ -179,8 +191,12 @@ int gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
 	/* avoid prefix */
 	GNUTLS_SIGN_ALG_LOOP(dig = p->hash);
 
-	if (dig != GNUTLS_DIG_UNKNOWN)
-		return _gnutls_digest_is_secure(hash_to_entry(dig));
+	if (dig != GNUTLS_DIG_UNKNOWN) {
+		if (flags & GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS)
+			return _gnutls_digest_is_secure_for_certs(hash_to_entry(dig));
+		else
+			return _gnutls_digest_is_secure(hash_to_entry(dig));
+	}
 
 	return 0;
 }
