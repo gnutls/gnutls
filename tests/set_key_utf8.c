@@ -136,8 +136,11 @@ static void auto_parse(void)
 
 	test_cli_serv(x509_cred, clicred, "NORMAL", "localhost", NULL, NULL, NULL); /* the DNS name of the first cert */
 	test_cli_serv(x509_cred, clicred, "NORMAL", "简体中文.εξτρα.com", NULL, NULL, NULL); /* the second DNS name of cert */
-	test_cli_serv(x509_cred, clicred, "NORMAL", "raw:简体中文.εξτρα.com", NULL, NULL, NULL); /* the second DNS name of cert */
 	test_cli_serv(x509_cred, clicred, "NORMAL", "xn--fiqu1az03c18t.xn--mxah1amo.com", NULL, NULL, NULL); /* its IDNA equivalent */
+
+	/* the raw DNS should result to verification failure as the advertized name should
+	 * not be considered and the first cert should be provided */
+	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL", "raw:简体中文.εξτρα.com", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, GNUTLS_E_AGAIN);
 
 	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_certificate_free_credentials(clicred);

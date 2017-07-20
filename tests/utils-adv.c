@@ -104,6 +104,7 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 		HANDSHAKE(client, server);
 	} else {
 		HANDSHAKE_EXPECT(client, server, cli_err, serv_err);
+		goto cleanup;
 	}
 
 	/* check the number of certificates received and verify */
