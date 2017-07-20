@@ -1635,7 +1635,7 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 
 		print_crt_sig_params(str, cert, format);
 
-		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure2(err, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
 			       "algorithm that can be forged.\n"));
@@ -1862,7 +1862,7 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		else
 			p = name;
 
-		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure( err) == 0)
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure2(err, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0)
 			addf(str, _("signed using %s (broken!), "), p);
 		else
 			addf(str, _("signed using %s, "), p);
@@ -2279,7 +2279,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 		addf(str, _("\tSignature Algorithm: %s\n"), p);
 		gnutls_free(name);
 
-		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(err) == 0) {
+		if (err != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure2(err, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0) {
 			adds(str,
 			     _("warning: signed using a broken signature "
 			       "algorithm that can be forged.\n"));

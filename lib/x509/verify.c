@@ -782,7 +782,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		 * used are secure. If the certificate is self signed it doesn't
 		 * really matter.
 		 */
-		if (gnutls_sign_is_secure(sigalg) == 0 &&
+		if (gnutls_sign_is_secure2(sigalg, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0 &&
 		    _gnutls_is_broken_sig_allowed(sigalg, flags) == 0 &&
 		    is_issuer(cert, cert) == 0) {
 			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
