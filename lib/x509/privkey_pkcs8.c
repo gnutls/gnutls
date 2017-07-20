@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
- * Copyright (C) 2014-2016 Red Hat
+ * Copyright (C) 2014-2017 Red Hat
  * Copyright (C) 2014-2016 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
@@ -1042,6 +1042,8 @@ _decode_pkcs8_eddsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const c
 	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
 	const gnutls_ecc_curve_entry_st *ce;
 
+	gnutls_pk_params_init(&pkey->params);
+
 	curve = gnutls_oid_to_ecc_curve(oid);
 	if (curve == GNUTLS_ECC_CURVE_INVALID) {
 		_gnutls_debug_log("PKCS#8: unknown curve OID %s\n", oid);
@@ -1080,6 +1082,8 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
 	gnutls_datum_t tmp;
+
+	gnutls_pk_params_init(&pkey->params);
 
 	ret = _gnutls_x509_read_value(pkcs8_asn, "privateKey", &tmp);
 	if (ret < 0) {

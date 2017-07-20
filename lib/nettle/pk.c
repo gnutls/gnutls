@@ -2323,6 +2323,9 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		if (params->flags != GNUTLS_ECC_CURVE_ED25519)
 			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
+		if (params->raw_priv.data == NULL)
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
+
 		if (params->raw_pub.data == NULL) {
 			params->raw_pub.data = gnutls_malloc(params->raw_priv.size);
 		}

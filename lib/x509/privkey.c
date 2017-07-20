@@ -1033,6 +1033,8 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	gnutls_pk_params_init(&key->params);
+
 	siz = p->size;
 	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], p->data, siz)) {
 		gnutls_assert();
@@ -1126,6 +1128,8 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	gnutls_pk_params_init(&key->params);
 
 	key->params.flags = curve;
 
