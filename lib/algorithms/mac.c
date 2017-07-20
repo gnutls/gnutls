@@ -134,6 +134,7 @@ static const mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_RMD160,
 	 .output_size = 20,
 	 .key_size = 20,
+	 .slevel = _INSECURE_FOR_CERTS,
 	 .block_size = 64},
 	{.name = "MAC-NULL",
 	 .id = GNUTLS_MAC_NULL},
