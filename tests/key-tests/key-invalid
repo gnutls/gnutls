@@ -35,7 +35,7 @@ if ! test -z "${VALGRIND}"; then
 fi
 
 ret=0
-for p8 in "key-invalid1.der" "key-invalid2.der" "key-invalid3.der";do
+for p8 in "key-invalid1.der" "key-invalid2.der" "key-invalid3.der" "key-invalid4.der";do
 	set -- ${p8}
 	file="$1"
 	${VALGRIND} "${CERTTOOL}" --inder --key-info \
