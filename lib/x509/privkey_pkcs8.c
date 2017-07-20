@@ -1056,6 +1056,10 @@ _decode_pkcs8_eddsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const c
 			return gnutls_assert_val(ret);
 		}
 
+		if (tmp.size != ce->size) {
+			gnutls_free(tmp.data);
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		}
 		gnutls_free(pkey->params.raw_priv.data);
 		pkey->params.algo = GNUTLS_PK_EDDSA_ED25519;
 		pkey->params.raw_priv.data = tmp.data;
@@ -1334,6 +1338,8 @@ gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
+	/* This part is necessary to get the public key on certain algorithms.
+	 * In the import above we only get the private key. */
 	result =
 	    _gnutls_pk_fixup(key->pk_algorithm, GNUTLS_IMPORT, &key->params);
 	if (result < 0) {
