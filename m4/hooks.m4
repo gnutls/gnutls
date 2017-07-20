@@ -143,10 +143,10 @@ LIBTASN1_MINIMUM=4.9
   ])
 
   ac_allow_sha1=no
-  AC_MSG_CHECKING([whether to allow SHA1 as an acceptable hash for digital signatures])
+  AC_MSG_CHECKING([whether to allow SHA1 as an acceptable hash for cert digital signatures])
   AC_ARG_ENABLE(sha1-support,
     AS_HELP_STRING([--enable-sha1-support],
-                   [allow SHA1 as an acceptable hash for digital signatures]),
+                   [allow SHA1 as an acceptable hash for cert digital signatures]),
     ac_allow_sha1=$enableval)
   if test x$ac_allow_sha1 != xno; then
    AC_MSG_RESULT(no)

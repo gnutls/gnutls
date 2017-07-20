@@ -152,12 +152,22 @@ inline static int _gnutls_mac_get_key_size(const mac_entry_st * e)
 #define _gnutls_digest_get_name _gnutls_mac_get_name
 #define _gnutls_hash_get_algo_len _gnutls_mac_get_algo_len
 
+/* Check generic-purpose security */
 inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
 {
 	if (unlikely(e == NULL))
 		return 0;
 	else
-		return e->secure;
+		return (e->slevel==_SECURE || e->slevel == _INSECURE_FOR_CERTS)?1:0;
+}
+
+/* Check certificate use security */
+inline static int _gnutls_digest_is_secure_for_certs(const mac_entry_st * e)
+{
+	if (unlikely(e == NULL))
+		return 0;
+	else
+		return (e->slevel==_SECURE)?1:0;
 }
 
 /* Functions for cipher suites. */

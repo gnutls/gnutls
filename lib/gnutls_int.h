@@ -471,6 +471,13 @@ typedef struct gnutls_cipher_suite_entry_st {
 	gnutls_mac_algorithm_t prf;
 } gnutls_cipher_suite_entry_st;
 
+
+typedef enum hash_security_level_t {
+	_SECURE,
+	_INSECURE_FOR_CERTS,
+	_INSECURE
+} hash_security_level_t;
+
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {
@@ -482,7 +489,7 @@ typedef struct mac_entry_st {
 	unsigned key_size;
 	unsigned nonce_size;
 	unsigned placeholder;	/* if set, then not a real MAC */
-	unsigned secure;	/* must be set to zero if this hash is known to be broken */
+	hash_security_level_t slevel;	/* contains values of hash_security_level_t */
 	unsigned block_size;	/* internal block size for HMAC */
 } mac_entry_st;
 
