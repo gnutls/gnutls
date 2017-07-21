@@ -517,7 +517,6 @@ gnutls_priority_init@GNUTLS_3_4
 gnutls_priority_kx_list@GNUTLS_3_4
 gnutls_priority_mac_list@GNUTLS_3_4
 gnutls_priority_protocol_list@GNUTLS_3_4
-gnutls_priority_set2@GNUTLS_3_4
 gnutls_priority_set@GNUTLS_3_4
 gnutls_priority_set_direct@GNUTLS_3_4
 gnutls_priority_sign_list@GNUTLS_3_4

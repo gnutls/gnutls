@@ -542,7 +542,6 @@ APIMANS += gnutls_priority_kx_list.3
 APIMANS += gnutls_priority_mac_list.3
 APIMANS += gnutls_priority_protocol_list.3
 APIMANS += gnutls_priority_set.3
-APIMANS += gnutls_priority_set2.3
 APIMANS += gnutls_priority_set_direct.3
 APIMANS += gnutls_priority_sign_list.3
 APIMANS += gnutls_priority_string_list.3
