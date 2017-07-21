@@ -34,6 +34,10 @@
 #include "eagain-common.h"
 #include "cert-common.h"
 
+/* This tests whether a priority which is deinitialized after set
+ * will continue working in a session.
+ */
+
 const char *side;
 
 static void tls_log_func(int level, const char *str)
@@ -84,7 +88,8 @@ void doit(void)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set2(server, cache, 0);
+	gnutls_priority_set(server, cache);
+
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -107,7 +112,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set(client, cache);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

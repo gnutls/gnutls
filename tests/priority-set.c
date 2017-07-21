@@ -34,6 +34,10 @@
 #include "eagain-common.h"
 #include "cert-common.h"
 
+/* This tests whether a priority which is used by multiple sessions,
+ * will be properly deinitialized.
+ */
+
 const char *side;
 
 static void tls_log_func(int level, const char *str)
