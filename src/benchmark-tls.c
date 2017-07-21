@@ -497,7 +497,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 
 		gnutls_init(&server, GNUTLS_SERVER);
 		ret =
-		    gnutls_priority_set2(server, priority_cache, 0);
+		    gnutls_priority_set(server, priority_cache);
 		if (ret < 0) {
 			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -515,7 +515,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		gnutls_init(&client, GNUTLS_CLIENT);
 
 		ret =
-		    gnutls_priority_set2(client, priority_cache, 0);
+		    gnutls_priority_set(client, priority_cache);
 		if (ret < 0) {
 			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
