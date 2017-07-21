@@ -691,6 +691,7 @@ gnutls_sign_get_id@GNUTLS_3_4
 gnutls_sign_get_name@GNUTLS_3_4
 gnutls_sign_get_oid@GNUTLS_3_4
 gnutls_sign_get_pk_algorithm@GNUTLS_3_4
+gnutls_sign_is_secure2@GNUTLS_3_4
 gnutls_sign_is_secure@GNUTLS_3_4
 gnutls_sign_list@GNUTLS_3_4
 gnutls_sign_supports_pk_algorithm@GNUTLS_3_4

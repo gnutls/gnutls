@@ -715,6 +715,7 @@ APIMANS += gnutls_sign_get_name.3
 APIMANS += gnutls_sign_get_oid.3
 APIMANS += gnutls_sign_get_pk_algorithm.3
 APIMANS += gnutls_sign_is_secure.3
+APIMANS += gnutls_sign_is_secure2.3
 APIMANS += gnutls_sign_list.3
 APIMANS += gnutls_sign_supports_pk_algorithm.3
 APIMANS += gnutls_srp_allocate_client_credentials.3
