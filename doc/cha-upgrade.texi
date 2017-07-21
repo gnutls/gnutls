@@ -199,8 +199,4 @@ however, there are minor differences, listed below.
 @funcintref{gnutls_compression_get_name}, @funcintref{gnutls_compression_list},
 and @funcintref{gnutls_compression_get_id}.
 
-@item The @funcref{gnutls_priority_set} has been superseded by @funcref{gnutls_priority_set2}.
-@tab The function @funcref{gnutls_priority_set2} allows for sharing priority
-caches across multiple sessions reducing allocated memory per session.
-
 @end multitable

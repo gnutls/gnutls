@@ -464,7 +464,7 @@ and the underlying protocol type, i.e., datagram (UDP) or reliable (TCP).
 
 After the session initialization details on the allowed ciphersuites
 and protocol versions should be set using the priority functions
-such as @funcref{gnutls_priority_set2} and @funcref{gnutls_priority_set_direct}.
+such as @funcref{gnutls_priority_set} and @funcref{gnutls_priority_set_direct}.
 We elaborate on them in @ref{Priority Strings}.
 The credentials used for the key exchange method, such as certificates 
 or usernames and passwords should also be associated with the session
@@ -1088,7 +1088,7 @@ and share the generated data across sessions. The following functions
 allow the generation of a "priority cache" and the sharing of it across
 sessions.
 
-@showfuncC{gnutls_priority_init,gnutls_priority_set2,gnutls_priority_deinit}
+@showfuncC{gnutls_priority_init,gnutls_priority_set,gnutls_priority_deinit}
 
 @subheading Using Priority Strings
 
@@ -1098,7 +1098,6 @@ special keywords. Note that their description is intentionally avoiding
 specific algorithm details, as the priority strings are not constant between
 gnutls versions (they are periodically updated to account for cryptographic
 advances while providing compatibility with old clients and servers).
-
 
 @float Table,tab:prio-keywords
 @multitable @columnfractions .20 .70

@@ -561,8 +561,6 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
  * must remain valid for the lifetime of the session.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
- *
- * Since: 3.6.0
  **/
 int
 gnutls_priority_set2(gnutls_session_t session, gnutls_priority_t priority, unsigned int flags)
