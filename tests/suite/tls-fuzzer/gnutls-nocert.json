@@ -2,10 +2,13 @@
     {"server_command": ["@SERVER@", "--http",
                  "--x509keyfile", "tests/serverX509Key.pem",
                  "--x509certfile", "tests/serverX509Cert.pem",
+                 "--x509keyfile", "../../../certs/ecc256.pem",
+                 "--x509certfile", "../../../certs/cert-ecc256.pem",
                  "--debug=3",
                  "--priority=@PRIORITY@",
                  "--disable-client-cert", "--port=@PORT@"],
      "tests" : [
+         {"name" : "test-ecdsa-sig-flexibility.py"},
          {"name" : "test-ocsp-stapling.py",
           "arguments" : ["--no-status"] },
          {"name" : "test-encrypt-then-mac-renegotiation.py",
