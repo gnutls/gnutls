@@ -666,6 +666,8 @@ typedef struct sign_algo_list_st {
 	unsigned int size;
 } sign_algo_list_st;
 
+#include "atomic.h"
+
 /* For the external api */
 struct gnutls_priority_st {
 	priority_st protocol;
@@ -717,6 +719,7 @@ struct gnutls_priority_st {
 	bool _dumbfw;
 	unsigned int _dh_prime_bits;	/* old (deprecated) variable */
 
+	DEF_ATOMIC_INT(usage_cnt);
 };
 
 /* Allow around 50KB of length-hiding padding
@@ -837,9 +840,6 @@ typedef struct {
 
 	/* priorities */
 	struct gnutls_priority_st *priorities;
-	/* non-zero if the priorities are assigned only to this session (and
-	 * thus should be freed by it */
-	bool deinit_priorities;
 
 	/* variables directly set when setting the priorities above, or
 	 * when overriding them */

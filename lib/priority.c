@@ -537,57 +537,21 @@ static void prio_add(priority_st * priority_list, unsigned int algo)
  * Sets the priorities to use on the ciphers, key exchange methods,
  * and macs.
  *
- * This is identical to calling gnutls_priority_set2() with
- * %GNUTLS_PRIORITY_FLAG_COPY.
- *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
-{
-	return gnutls_priority_set2(session, priority, GNUTLS_PRIORITY_FLAG_COPY);
-}
-
-/**
- * gnutls_priority_set2:
- * @session: is a #gnutls_session_t type.
- * @priority: is a #gnutls_priority_t type.
- * @flags: zero or %GNUTLS_PRIORITY_FLAG_COPY
- *
- * Sets the priorities to use on the ciphers, key exchange methods,
- * and macs.
- *
- * Unless %GNUTLS_PRIORITY_FLAG_COPY is specified, the @priority reference
- * must remain valid for the lifetime of the session.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
- **/
-int
-gnutls_priority_set2(gnutls_session_t session, gnutls_priority_t priority, unsigned int flags)
 {
 	if (priority == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_CIPHER_SUITES;
 	}
 
-	if (session->internals.deinit_priorities &&
-	    session->internals.priorities)
+	if (session->internals.priorities)
 		gnutls_priority_deinit(session->internals.priorities);
 
-	if (flags & GNUTLS_PRIORITY_FLAG_COPY) {
-		session->internals.priorities = gnutls_malloc(sizeof(*session->internals.priorities));
-		if (session->internals.priorities == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-		/* it is fine to use memcpy() here since we are only storing
-		 * values and pointers to constant static data. */
-		memcpy(session->internals.priorities, priority, sizeof(*priority));
-
-		session->internals.deinit_priorities = 1;
-	} else {
-		session->internals.priorities = priority;
-		session->internals.deinit_priorities = 0;
-	}
+	session->internals.priorities = priority;
+	gnutls_atomic_increment(&priority->usage_cnt);
 
 	/* set the current version to the first in the chain.
 	 * This will be overridden later.
@@ -1318,6 +1282,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	 */
 	(*priority_cache)->sr = SR_PARTIAL;
 	(*priority_cache)->min_record_version = 1;
+	gnutls_atomic_init(&(*priority_cache)->usage_cnt);
 
 	if (priorities == NULL)
 		priorities = DEFAULT_PRIORITY_STRING;
@@ -1500,7 +1465,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 		}
 	}
 	free(darg);
-	gnutls_free(*priority_cache);
+	gnutls_priority_deinit(*priority_cache);
 	*priority_cache = NULL;
 
 	return GNUTLS_E_INVALID_REQUEST;
@@ -1515,7 +1480,24 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
  **/
 void gnutls_priority_deinit(gnutls_priority_t priority_cache)
 {
-	gnutls_free(priority_cache);
+	if (priority_cache == NULL)
+		return;
+
+	/* Note that here we care about the following two cases:
+	 * 1. Multiple sessions or different threads holding a reference + a global reference
+	 * 2. One session holding a reference with a possible global reference
+	 *
+	 * As such, it will never be that two threads reach the
+	 * zero state at the same time, unless the global reference
+	 * is cleared too, which is invalid state.
+	 */
+	if (gnutls_atomic_val(&priority_cache->usage_cnt) == 0) {
+		gnutls_atomic_deinit(&priority_cache->usage_cnt);
+		gnutls_free(priority_cache);
+		return;
+	} else {
+		gnutls_atomic_decrement(&priority_cache->usage_cnt);
+	}
 }
 
 
@@ -1555,9 +1537,7 @@ gnutls_priority_set_direct(gnutls_session_t session,
 		return ret;
 	}
 
-	/* ensure this priority is deinitialized with the session */
-	session->internals.deinit_priorities = 1;
-
+	/* ensure that the session holds the only reference for the struct */
 	gnutls_priority_deinit(prio);
 
 	return 0;

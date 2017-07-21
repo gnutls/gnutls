@@ -1370,10 +1370,6 @@ gnutls_priority_string_list(unsigned iter, unsigned int flags);
 int gnutls_priority_set(gnutls_session_t session,
 			gnutls_priority_t priority);
 
-#define GNUTLS_PRIORITY_FLAG_COPY 1
-int gnutls_priority_set2(gnutls_session_t session,
-			 gnutls_priority_t priority,
-			 unsigned int flags);
 int gnutls_priority_set_direct(gnutls_session_t session,
 			       const char *priorities,
 			       const char **err_pos);

@@ -1164,7 +1164,6 @@ GNUTLS_3_4
 	gnutls_sign_supports_pk_algorithm;
 	gnutls_privkey_sign_hash2;
 	gnutls_privkey_sign_data2;
-	gnutls_priority_set2;
 	gnutls_sign_is_secure2;
  local:
 	*;

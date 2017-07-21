@@ -429,9 +429,8 @@ void gnutls_deinit(gnutls_session_t session)
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
 
-	if (session->internals.deinit_priorities &&
-	    session->internals.priorities)
-		gnutls_priority_deinit(session->internals.priorities);
+	/* we rely on priorities' internal reference counting */
+	gnutls_priority_deinit(session->internals.priorities);
 
 	gnutls_free(session);
 }
