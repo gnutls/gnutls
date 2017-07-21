@@ -39,9 +39,10 @@
 
 static int
 privkey_sign_prehashed(gnutls_privkey_t signer,
-		  const gnutls_datum_t * hash_data,
-		  gnutls_datum_t * signature,
-		  gnutls_x509_spki_st * params, unsigned flags);
+		       const gnutls_sign_entry_st *se,
+		       const gnutls_datum_t * hash_data,
+		       gnutls_datum_t * signature,
+		       gnutls_x509_spki_st * params, unsigned flags);
 
 /**
  * gnutls_privkey_get_type:
@@ -1007,7 +1008,7 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_and_hash_data(signer, data, signature, &params);
+	return privkey_sign_and_hash_data(signer, _gnutls_pk_to_sign_entry(params.pk, hash), data, signature, &params);
 }
 
 /**
@@ -1059,7 +1060,7 @@ gnutls_privkey_sign_data2(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_and_hash_data(signer, data, signature, &params);
+	return privkey_sign_and_hash_data(signer, _gnutls_sign_to_entry(algo), data, signature, &params);
 }
 
 /**
@@ -1099,10 +1100,10 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 {
 	int ret;
 	gnutls_x509_spki_st params;
-	const gnutls_sign_entry_st *e;
+	const gnutls_sign_entry_st *se;
 
-	e = _gnutls_sign_to_entry(algo);
-	if (e == NULL)
+	se = _gnutls_sign_to_entry(algo);
+	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	ret = _gnutls_privkey_get_sign_params(signer, &params);
@@ -1111,18 +1112,19 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	ret = _gnutls_privkey_update_sign_params(signer, e->pk, e->hash,
+	ret = _gnutls_privkey_update_sign_params(signer, se->pk, se->hash,
 					         flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	return privkey_sign_prehashed(signer, hash_data, signature, &params, flags);
+	return privkey_sign_prehashed(signer, se, hash_data, signature, &params, flags);
 }
 
 int
 privkey_sign_and_hash_data(gnutls_privkey_t signer,
+			   const gnutls_sign_entry_st *se,
 			   const gnutls_datum_t * data,
 			   gnutls_datum_t * signature,
 			   gnutls_x509_spki_st * params)
@@ -1131,34 +1133,30 @@ privkey_sign_and_hash_data(gnutls_privkey_t signer,
 	gnutls_datum_t digest;
 	const mac_entry_st *me;
 
-	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm)) {
-		if (params->dig != GNUTLS_DIG_UNKNOWN &&
-		    gnutls_pk_to_sign(params->pk, params->dig) == GNUTLS_SIGN_UNKNOWN)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-		return privkey_sign_raw_data(signer, data, signature, params);
-	}
-
-	if (gnutls_pk_to_sign(params->pk, params->dig) == GNUTLS_SIGN_UNKNOWN)
+	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	me = hash_to_entry(params->dig);
+	if (_gnutls_pk_is_not_prehashed(se->pk)) {
+		return privkey_sign_raw_data(signer, se, data, signature, params);
+	}
+
+	me = hash_to_entry(se->hash);
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = pk_hash_data(params->pk, me, NULL, data, &digest);
+	ret = pk_hash_data(se->pk, me, NULL, data, &digest);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret = pk_prepare_hash(params->pk, me, &digest);
+	ret = pk_prepare_hash(se->pk, me, &digest);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = privkey_sign_raw_data(signer, &digest, signature, params);
+	ret = privkey_sign_raw_data(signer, se, &digest, signature, params);
 	_gnutls_free_datum(&digest);
 
 	if (ret < 0) {
@@ -1225,27 +1223,33 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_prehashed(signer, hash_data, signature, &params, flags);
+	return privkey_sign_prehashed(signer, _gnutls_pk_to_sign_entry(params.pk, hash_algo),
+				      hash_data, signature, &params, flags);
 }
 
 static int
 privkey_sign_prehashed(gnutls_privkey_t signer,
-		  const gnutls_datum_t * hash_data,
-		  gnutls_datum_t * signature,
-		  gnutls_x509_spki_st * params,
-		  unsigned flags)
+		       const gnutls_sign_entry_st *se,
+		       const gnutls_datum_t * hash_data,
+		       gnutls_datum_t * signature,
+		       gnutls_x509_spki_st * params,
+		       unsigned flags)
 {
 	int ret;
 	gnutls_datum_t digest;
 
 	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
 		return privkey_sign_raw_data(signer,
+					     se,
 					     hash_data, signature,
 					     params);
 
 	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
+
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	digest.data = gnutls_malloc(hash_data->size);
 	if (digest.data == NULL) {
@@ -1255,13 +1259,14 @@ privkey_sign_prehashed(gnutls_privkey_t signer,
 	digest.size = hash_data->size;
 	memcpy(digest.data, hash_data->data, digest.size);
 
-	ret = pk_prepare_hash(params->pk, hash_to_entry(params->dig), &digest);
+	ret = pk_prepare_hash(se->pk, hash_to_entry(se->hash), &digest);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = privkey_sign_raw_data(signer,
+				    se,
 				    &digest, signature,
 				    params);
 	if (ret < 0) {
@@ -1299,10 +1304,18 @@ privkey_sign_prehashed(gnutls_privkey_t signer,
  -*/
 int
 privkey_sign_raw_data(gnutls_privkey_t key,
-		     const gnutls_datum_t * data,
-		     gnutls_datum_t * signature,
-		     gnutls_x509_spki_st * params)
+		      const gnutls_sign_entry_st *se,
+		      const gnutls_datum_t * data,
+		      gnutls_datum_t * signature,
+		      gnutls_x509_spki_st * params)
 {
+	gnutls_pk_algorithm_t pk;
+
+	if (se == NULL) /* it can be null when signing raw-rsa */
+		pk = params->pk;
+	else
+		pk = se->pk;
+
 	switch (key->type) {
 #ifdef ENABLE_PKCS11
 	case GNUTLS_PRIVKEY_PKCS11:
@@ -1310,7 +1323,7 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 							data, signature);
 #endif
 	case GNUTLS_PRIVKEY_X509:
-		return _gnutls_pk_sign(params->pk, signature, data,
+		return _gnutls_pk_sign(pk, signature, data,
 				       &key->key.x509->params, params);
 	case GNUTLS_PRIVKEY_EXT:
 		if (key->key.ext.sign_func == NULL)

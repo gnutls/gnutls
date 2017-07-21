@@ -321,6 +321,7 @@ struct gnutls_sign_entry_st {
 typedef struct gnutls_sign_entry_st gnutls_sign_entry_st;
 
 const gnutls_sign_entry_st *_gnutls_sign_to_entry(gnutls_sign_algorithm_t sign);
+const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t, gnutls_digest_algorithm_t);
 
 gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk(gnutls_sign_algorithm_t
 					      sign);

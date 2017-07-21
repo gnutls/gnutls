@@ -111,6 +111,7 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	char name[128];
 	gnutls_pk_algorithm_t pk;
 	gnutls_x509_spki_st key_params, params;
+	const gnutls_sign_entry_st *se;
 
 	pk = gnutls_x509_crt_get_pk_algorithm(issuer, NULL);
 	if (pk == GNUTLS_PK_UNKNOWN)
@@ -168,10 +169,12 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 		return result;
 	}
 
-	if (_gnutls_pk_is_not_prehashed(issuer_key->pk_algorithm)) {
-		result = privkey_sign_raw_data(issuer_key, &tbs, &signature, &params);
+	se = _gnutls_pk_to_sign_entry(params.pk, dig);
+	if (_gnutls_pk_is_not_prehashed(params.pk)) {
+		result = privkey_sign_raw_data(issuer_key, se, &tbs, &signature, &params);
 	} else {
-		result = privkey_sign_and_hash_data(issuer_key, &tbs, &signature, &params);
+		result = privkey_sign_and_hash_data(issuer_key, se,
+						    &tbs, &signature, &params);
 	}
 	gnutls_free(tbs.data);
 

@@ -281,6 +281,17 @@ gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid)
 	return ret;
 }
 
+const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash)
+{
+	GNUTLS_SIGN_LOOP(
+		if (pk == p->pk && hash == p->hash) {
+			return p;
+		}
+	);
+
+	return NULL;
+}
+
 /**
  * gnutls_pk_to_sign:
  * @pk: is a public key algorithm
@@ -294,18 +305,12 @@ gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid)
 gnutls_sign_algorithm_t
 gnutls_pk_to_sign(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash)
 {
-	gnutls_sign_algorithm_t ret = 0;
+	const gnutls_sign_entry_st *e;
 
-	GNUTLS_SIGN_LOOP(
-		if (pk == p->pk && hash == p->hash) {
-			ret = p->id;
-			break;
-		}
-	);
-
-	if (ret == 0)
+	e = _gnutls_pk_to_sign_entry(pk, hash);
+	if (e == NULL)
 		return GNUTLS_SIGN_UNKNOWN;
-	return ret;
+	return e->id;
 }
 
 /**
