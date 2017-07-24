@@ -30,6 +30,7 @@
  * TLS client (RSA PSS): cli_ca3_rsa_pss_cert, cli_ca3_rsa_pss_key
  * IPv4 server (SAN: IPAddr: 127.0.0.1): server_ca3_ipaddr_cert, server_ca3_key
  * IPv4 server (RSA-PSS, SAN: localhost IPAddr: 127.0.0.1): server_ca3_rsa_pss_cert, server_ca3_rsa_pss_key
+ * IPv4 server (RSA-PSS key, SAN: localhost IPAddr: 127.0.0.1): server_ca3_rsa_pss2_cert, server_ca3_rsa_pss2_key
  * IPv4 server (EdDSA, SAN: localhost IPAddr: 127.0.0.1): server_ca3_eddsa_cert, server_ca3_eddsa_key
  * IPv6 server: server_ca3_localhost6_cert, server_ca3_key
  * IPv4 server: server_ca3_localhost_cert, server_ca3_key
@@ -852,6 +853,70 @@ static char server_ca3_rsa_pss_cert_pem[] =
 
 const gnutls_datum_t server_ca3_rsa_pss_cert = { (void*)server_ca3_rsa_pss_cert_pem,
 	sizeof(server_ca3_rsa_pss_cert_pem)-1
+};
+
+static char server_ca3_rsa_pss2_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MIIE7AIBADA9BgkqhkiG9w0BAQowMKANMAsGCWCGSAFlAwQCAaEaMBgGCSqGSIb3\n"
+	"DQEBCDALBglghkgBZQMEAgGiAwIBIASCBKYwggSiAgEAAoIBAQCte+3f4Sgy89/R\n"
+	"LNfx/NazlTgHxL6IXJuL44tutdhxA91vCJt0+ZSShWibsuyF+H09it3G0+3LvE2W\n"
+	"vkU58ha7ljvCWckPf2+YpsFynNQc0Lw6BThRMQdJpJvI54OdxfhoPjhDnTui/EEj\n"
+	"/n9MbLo5rAX5ZDIpWa3Vgpl37Q8czjFINCgQ/f8qsD4WabBSbuSnrYDvuASGez4O\n"
+	"YDAFvM51+4U4GxN7ZKbrDTQcAySU0Fjy+I5eW/BIXd9TeHb6XYJudMQY7rozTijm\n"
+	"6qbZieahke+FUCgm8BnRXghfcVSswUZEJQkCvF+SdUl3iAYlY/UBzVFsGDSFbID2\n"
+	"XRtEvrnvAgMBAAECggEATj8COCL+lZSnU1oNgAiQ8eiQn/heE3TpdzvHLMT5/WdH\n"
+	"3YedTjIvj7J6TxdxVK+SFUrn4oC91VF2EVJ6OLt3A16sT2ldpQ7OT6SOxdn0VZbT\n"
+	"/rtR/lTFu7JxzTiWhXfAJYxCpkRpnIZ3/vsPgXHcwJxVCXnmof3fyNghzhRu54de\n"
+	"V5GUwJ6TT3MMYLYKf5ii8Yt9WqeekQF7Hy/kIwz+4CbgR3fDdRXFnRwdNmA4RG3w\n"
+	"TbwvqR9ApyAictYz4HpZWgYL+cXsH6Fm+/ChZiV9/zvdVVOo+dOAcxx2cWahm/NL\n"
+	"tksGD7hI5kqD9moi2wiAsGHPa+/rkLxIBm0xvF1veQKBgQDVFKujtQyfzJw5DUPL\n"
+	"kTCLp+370ZBTK01daKZrpfgw6QrylYljcIq8n1izauElYm5cZ9krMGzvL5ceg49p\n"
+	"obl1tdCOQJQACrJmLZSuvVfw8TSwHPyOGtRWxhF4miX+ym3yMFqRyN2nXx1iAo5I\n"
+	"Cz+aGmTfT1zSZkLnfQSjYWZFgwKBgQDQbX2wPavLI+1yWARStqrwVWO1mU0Nixbo\n"
+	"jHrRlzrKYqtV+0ea6550LtDG5A/zf9MP6439NNHPqs4rnY910odd+xmLdQj2gocB\n"
+	"IS4nPBE4o1k3L9m+bSw9nyDdJWRkASq4uem6QvyVsQpWUoxzmg5/fwRUlOU8X3pP\n"
+	"ZLSSpz06JQKBgF4b6AbAwtedFe54tlWlRWyY+Zn7n6Or/1pfCwmGXwyzEJu9gdWC\n"
+	"cjQGqLVtYg0R4S48y4SwuZwWR8c5UdDUlcWwTHFXgkZWcx5/ySg4BiwrTBrwYncc\n"
+	"0GWWy0aZxmg23cJWqtmyfnsani6YdGDLXwbf22dpdNSUR75X0AGc1f+jAoGADha4\n"
+	"nkcs66hcDpSghi7O0zwSZ14bdUTnoYSNcMl2MeQFjORVbMVsipH3jtovsdf8HmFf\n"
+	"0bPWUuFK2mvmHKLEf7fPfDvHBVLBaXQiuIg46ckw6KgVYefjS68L+6bhaFkj2CTJ\n"
+	"BcwtYrj65+bgk5fgTwH4+vatoC0cCW3XPuqLGvkCgYAj2NGQAEQ4HkmF55otDocZ\n"
+	"SkAJFfibyrkKEK+PsQ7dRR/HEc93hvkI0PHpsLx8A3FZ370FAPtiKmnmfabHxEsK\n"
+	"TWA2DTacq//MzXQrjsx0CpvGId1dOyVZIrwIFM17KmW5HHE37fY4PFZTZVXHAKf6\n"
+	"nQyUF7m3FUJjavm46KJIhw==\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_rsa_pss2_key = { (void*)server_ca3_rsa_pss2_key_pem,
+	sizeof(server_ca3_rsa_pss2_key_pem)-1
+};
+
+static char server_ca3_rsa_pss2_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIID0TCCAjmgAwIBAgIIWXYEJjkAauMwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA3MjQxNDI4NTVaGA85OTk5MTIzMTIzNTk1OVowADCCAVIw\n"
+	"PQYJKoZIhvcNAQEKMDCgDTALBglghkgBZQMEAgGhGjAYBgkqhkiG9w0BAQgwCwYJ\n"
+	"YIZIAWUDBAIBogMCASADggEPADCCAQoCggEBAK177d/hKDLz39Es1/H81rOVOAfE\n"
+	"vohcm4vji2612HED3W8Im3T5lJKFaJuy7IX4fT2K3cbT7cu8TZa+RTnyFruWO8JZ\n"
+	"yQ9/b5imwXKc1BzQvDoFOFExB0mkm8jng53F+Gg+OEOdO6L8QSP+f0xsujmsBflk\n"
+	"MilZrdWCmXftDxzOMUg0KBD9/yqwPhZpsFJu5KetgO+4BIZ7Pg5gMAW8znX7hTgb\n"
+	"E3tkpusNNBwDJJTQWPL4jl5b8Ehd31N4dvpdgm50xBjuujNOKObqptmJ5qGR74VQ\n"
+	"KCbwGdFeCF9xVKzBRkQlCQK8X5J1SXeIBiVj9QHNUWwYNIVsgPZdG0S+ue8CAwEA\n"
+	"AaOBjTCBijAMBgNVHRMBAf8EAjAAMBQGA1UdEQQNMAuCCWxvY2FsaG9zdDATBgNV\n"
+	"HSUEDDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDB4AAMB0GA1UdDgQWBBQCiLaK\n"
+	"LrqB0vaCnoNP1V8QVLlA8jAfBgNVHSMEGDAWgBT5qIYZY7akFBNgdg8BmjU27/G0\n"
+	"rzANBgkqhkiG9w0BAQsFAAOCAYEANgnTu4nYiv1nH6Iqpnn48CNrGK25ax6FuPvc\n"
+	"HxOyFFa9jomP8KjyNv3EsmmoBcQBkbRdAX8sFdtbyjILqRLoRMFO7D60BmCitGYH\n"
+	"MDjEIkG9QjcCo03YIT93SORwnt1qrWh6paOH7Nme+CsgRyXN7iNNur2LgGSilQ7P\n"
+	"Rs/vr0DdxmlUxUQHDa5GRIvU3FFs4NLC/9sQd3+JGqzDbY7UqLnP5fzn6/PSMKIw\n"
+	"Gc4IzbJrqjFsyfjQkblM2eBwmkUD3SnTFWqYwUsohGlSxBwKSIyVzlyuoD1FXop7\n"
+	"lgG8/a1D/ZFa34q8tj24Wnd9zdr/Jrv2g51OSf0VIbQdP92l2kDouobPS/7DTgPI\n"
+	"D7h52NLVm8cbV1RqxbeS3spZ2OAQn8tLiTwz+abNdsikFjMvfXq61iIv3QASUyUB\n"
+	"VydSB7stwAUd6wys2H7crmeiMMtgxSjZJtB4GDUCb24a+/a4IgpqxFzGDLE9Ur69\n"
+	"D8aQbKGJzzih56a2wwc0ZqA0ilGm\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_rsa_pss2_cert = { (void*)server_ca3_rsa_pss2_cert_pem,
+	sizeof(server_ca3_rsa_pss2_cert_pem)-1
 };
 
 static char cli_ca3_rsa_pss_cert_pem[] =
