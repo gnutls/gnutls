@@ -205,6 +205,10 @@ gnutls_global_set_log_level@GNUTLS_3_4
 gnutls_global_set_mem_functions@GNUTLS_3_4
 gnutls_global_set_mutex@GNUTLS_3_4
 gnutls_global_set_time_function@GNUTLS_3_4
+gnutls_group_get@GNUTLS_3_4
+gnutls_group_get_id@GNUTLS_3_4
+gnutls_group_get_name@GNUTLS_3_4
+gnutls_group_list@GNUTLS_3_4
 gnutls_handshake@GNUTLS_3_4
 gnutls_handshake_description_get_name@GNUTLS_3_4
 gnutls_handshake_get_last_in@GNUTLS_3_4
@@ -513,6 +517,7 @@ gnutls_priority_compression_list@GNUTLS_3_4
 gnutls_priority_deinit@GNUTLS_3_4
 gnutls_priority_ecc_curve_list@GNUTLS_3_4
 gnutls_priority_get_cipher_suite_index@GNUTLS_3_4
+gnutls_priority_group_list@GNUTLS_3_4
 gnutls_priority_init@GNUTLS_3_4
 gnutls_priority_kx_list@GNUTLS_3_4
 gnutls_priority_mac_list@GNUTLS_3_4
