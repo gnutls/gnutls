@@ -1487,6 +1487,42 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 
 #define OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA 1
 
+static
+int set_rsa_pss_params(gnutls_pubkey_t pubkey, const gnutls_sign_entry_st *se,
+		       const mac_entry_st *me, gnutls_x509_spki_st *params)
+{
+	unsigned bits;
+
+	if (se->pk != pubkey->pk_algorithm) {
+		if (!gnutls_sign_supports_pk_algorithm(se->pk, pubkey->pk_algorithm)) {
+			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
+					gnutls_pk_get_name(pubkey->pk_algorithm), pubkey->pk_algorithm,
+					se->name, se->id);
+			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+		}
+	}
+
+	if (params->pk == GNUTLS_PK_RSA_PSS) {
+
+		if (!GNUTLS_PK_IS_RSA(pubkey->pk_algorithm))
+			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+
+		/* The requested sign algorithm is RSA-PSS, while the
+		 * pubkey doesn't include parameter information. Fill
+		 * it with the same way as gnutls_privkey_sign*. */
+		if (pubkey->pk_algorithm == GNUTLS_PK_RSA || params->rsa_pss_dig == 0) {
+			gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
+			params->rsa_pss_dig = se->hash;
+			params->salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+		}
+
+		if (params->rsa_pss_dig != se->hash)
+			return gnutls_assert_val(GNUTLS_E_KEY_USAGE_VIOLATION);
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_pubkey_verify_data2:
  * @pubkey: Holds the public key
@@ -1536,30 +1572,9 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (se->pk != pubkey->pk_algorithm) {
-		if (!gnutls_sign_supports_pk_algorithm(algo, pubkey->pk_algorithm)) {
-			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
-					gnutls_pk_get_name(pubkey->pk_algorithm), pubkey->pk_algorithm,
-					se->name, algo);
-			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
-		}
-	}
-
-	if (params.pk == GNUTLS_PK_RSA_PSS) {
-		unsigned bits;
-
-		if (!GNUTLS_PK_IS_RSA(pubkey->pk_algorithm))
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-		/* The requested sign algorithm is RSA-PSS, while the
-		 * pubkey doesn't include parameter information. Fill
-		 * it with the same way as gnutls_privkey_sign*. */
-		if (pubkey->pk_algorithm == GNUTLS_PK_RSA) {
-			gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
-			params.rsa_pss_dig = se->hash;
-			params.salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
-		}
-	}
+	ret = set_rsa_pss_params(pubkey, se, me, &params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret = pubkey_verify_data(params.pk, me, data, signature, &pubkey->params,
 				 &params);
@@ -1636,31 +1651,14 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 
 		params.pk = se->pk;
 
-		if (params.pk != key->pk_algorithm) {
-			if (!gnutls_sign_supports_pk_algorithm(algo, key->pk_algorithm)) {
-				_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
-					gnutls_pk_get_name(key->pk_algorithm), key->pk_algorithm,
-					se->name, algo);
-				return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
-			}
-		}
-
 		me = hash_to_entry(se->hash);
 		if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-		if (params.pk == GNUTLS_PK_RSA_PSS) {
-			params.rsa_pss_dig = se->hash;
+		ret = set_rsa_pss_params(key, se, me, &params);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-			/* The requested sign algorithm is RSA-PSS, while the
-			 * pubkey doesn't include parameter information */
-			if (key->pk_algorithm == GNUTLS_PK_RSA) {
-				if (me == NULL)
-					return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-				params.salt_size =
-				    _gnutls_find_rsa_pss_salt_size(key->bits, me, 0);
-			}
-		}
 	}
 
 	ret = pubkey_verify_hashed_data(params.pk, me,
