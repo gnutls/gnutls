@@ -266,6 +266,57 @@ static int reopen_privkey_session(void * _privkey)
 		expr; \
 	}
 
+struct hash_mappings_st {
+	gnutls_digest_algorithm_t id;
+	unsigned long phash; /* pkcs11 hash ID */
+	unsigned long mgf_id;
+};
+
+
+#ifndef CKG_MGF1_SHA224
+# define CKG_MGF1_SHA224 0x00000005UL
+# define CKG_MGF1_SHA256 0x00000002UL
+# define CKG_MGF1_SHA384 0x00000003UL
+# define CKG_MGF1_SHA512 0x00000004UL
+
+struct ck_rsa_pkcs_pss_params {
+	ck_mechanism_type_t hash_alg;
+	/* ck_rsa_pkcs_mgf_type_t is not defined in old versions of p11-kit */
+	unsigned long mgf;
+	unsigned long s_len;
+};
+#endif
+
+static const struct hash_mappings_st hash_mappings[] =
+{
+	{.id = GNUTLS_DIG_SHA224,
+	 .phash = CKM_SHA224,
+	 .mgf_id = CKG_MGF1_SHA224
+	},
+	{.id = GNUTLS_DIG_SHA256,
+	 .phash = CKM_SHA256,
+	 .mgf_id = CKG_MGF1_SHA256
+	},
+	{.id = GNUTLS_DIG_SHA384,
+	 .phash = CKM_SHA384,
+	 .mgf_id = CKG_MGF1_SHA384
+	},
+	{.id = GNUTLS_DIG_SHA512,
+	 .phash = CKM_SHA512,
+	 .mgf_id = CKG_MGF1_SHA512
+	}
+};
+
+static const struct hash_mappings_st *hash_to_map(gnutls_digest_algorithm_t hash)
+{
+	unsigned i;
+	for (i=0;i<sizeof(hash_mappings)/sizeof(hash_mappings[0]);i++) {
+		if (hash == hash_mappings[i].id)
+			return &hash_mappings[i];
+	}
+	return NULL;
+}
+
 /*-
  * _gnutls_pkcs11_privkey_sign_hash:
  * @key: Holds the key
@@ -280,9 +331,11 @@ static int reopen_privkey_session(void * _privkey)
  *   negative error value.
  -*/
 int
-_gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
-				 const gnutls_datum_t * hash,
-				 gnutls_datum_t * signature)
+_gnutls_pkcs11_privkey_sign(gnutls_pkcs11_privkey_t key,
+			    const gnutls_sign_entry_st *se,
+			    const gnutls_datum_t * hash,
+			    gnutls_datum_t * signature,
+			    gnutls_x509_spki_st *spki_params)
 {
 	ck_rv_t rv;
 	int ret;
@@ -292,14 +345,35 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	struct pkcs11_session_info *sinfo;
 	unsigned req_login = 0;
 	unsigned login_flags = SESSION_LOGIN|SESSION_CONTEXT_SPECIFIC;
+	struct ck_rsa_pkcs_pss_params rsa_pss_params;
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
 	sinfo = &key->sinfo;
 
-	mech.mechanism = pk_to_mech(key->pk_algorithm);
-	mech.parameter = NULL;
-	mech.parameter_len = 0;
+	if (se->pk == GNUTLS_PK_RSA_PSS) {
+		const struct hash_mappings_st *map = hash_to_map(se->hash);
+
+		if (map == NULL)
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+
+		rsa_pss_params.hash_alg = map->phash;
+		rsa_pss_params.mgf = map->mgf_id;
+		rsa_pss_params.s_len = spki_params->salt_size;
+
+		mech.mechanism = CKM_RSA_PKCS_PSS;
+		mech.parameter = &rsa_pss_params;
+		mech.parameter_len = sizeof(rsa_pss_params);
+	} else {
+		ret = pk_to_mech(se->pk);
+
+		if (ret == -1)
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+
+		mech.mechanism = ret;
+		mech.parameter = NULL;
+		mech.parameter_len = 0;
+	}
 
 	ret = gnutls_mutex_lock(&key->mutex);
 	if (ret != 0)
@@ -309,6 +383,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	 * earlier. */
 	REPEAT_ON_INVALID_HANDLE(rv = pkcs11_sign_init(sinfo->module, sinfo->pks, &mech, key->ref));
 	if (rv != CKR_OK) {
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
@@ -404,7 +479,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
  *
  * Returns: this function will return non-zero if the token
  * holding the private key is still available (inserted), and zero otherwise.
- * 
+ *
  * Since: 3.1.9
  *
  **/
@@ -413,7 +488,7 @@ unsigned gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 	ck_rv_t rv;
 	int ret;
 	struct ck_session_info session_info;
-	
+
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
 	REPEAT_ON_INVALID_HANDLE(rv = (key->sinfo.module)->C_GetSessionInfo(key->sinfo.pks, &session_info));
@@ -547,7 +622,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
  * @plaintext: will contain the plaintext, allocated with gnutls_malloc()
  *
  * This function will decrypt the given data using the public key algorithm
- * supported by the private key. 
+ * supported by the private key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -702,7 +777,7 @@ gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
  * This function will generate a private key in the specified
  * by the @url token. The private key will be generate within
  * the token and will not be exportable. This function will
- * store the DER-encoded public key in the SubjectPublicKeyInfo format 
+ * store the DER-encoded public key in the SubjectPublicKeyInfo format
  * in @pubkey. The @pubkey should be deinitialized using gnutls_free().
  *
  * Note that when generating an elliptic curve key, the curve

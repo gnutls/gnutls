@@ -156,9 +156,11 @@ int pkcs11_token_matches_info(struct p11_kit_uri *info,
 unsigned int pkcs11_obj_flags_to_int(unsigned int flags);
 
 int
-_gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
-				 const gnutls_datum_t * hash,
-				 gnutls_datum_t * signature);
+_gnutls_pkcs11_privkey_sign(gnutls_pkcs11_privkey_t key,
+			    const gnutls_sign_entry_st *se,
+			    const gnutls_datum_t * hash,
+			    gnutls_datum_t * signature,
+			    gnutls_x509_spki_st *spki_params);
 
 int
 _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
@@ -175,8 +177,12 @@ static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 		return CKM_DSA;
 	else if (pk == GNUTLS_PK_EC)
 		return CKM_ECDSA;
-	else
+	else if (pk == GNUTLS_PK_RSA)
 		return CKM_RSA_PKCS;
+	else if (pk == GNUTLS_PK_RSA_PSS)
+		return CKM_RSA_PKCS_PSS;
+	else
+		return -1;
 }
 
 static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
@@ -185,8 +191,10 @@ static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
 		return CKK_DSA;
 	else if (pk == GNUTLS_PK_EC)
 		return CKK_ECDSA;
-	else
+	else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA)
 		return CKK_RSA;
+	else
+		return -1;
 }
 
 static inline gnutls_pk_algorithm_t key_type_to_pk(ck_key_type_t m)
@@ -209,9 +217,12 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 	} else if (pk == GNUTLS_PK_EC) {
 		*type = CKK_ECDSA;
 		return CKM_ECDSA_KEY_PAIR_GEN;
-	} else {
+	} else if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA) {
 		*type = CKK_RSA;
 		return CKM_RSA_PKCS_KEY_PAIR_GEN;
+	} else {
+		*type = -1;
+		return -1;
 	}
 }
 
