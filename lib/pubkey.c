@@ -1,6 +1,7 @@
 /*
  * GnuTLS public key support
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  * 
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1514,6 +1515,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	int ret;
 	const mac_entry_st *me;
 	gnutls_x509_spki_st params;
+	const gnutls_sign_entry_st *se;
 
 	if (pubkey == NULL) {
 		gnutls_assert();
@@ -1525,17 +1527,20 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 
 	memcpy(&params, &pubkey->params.sign, sizeof(gnutls_x509_spki_st));
 
-	params.pk = gnutls_sign_get_pk_algorithm(algo);
-	params.dig = gnutls_sign_get_hash_algorithm(algo);
-	me = hash_to_entry(params.dig);
-	if (me == NULL && !_gnutls_pk_is_not_prehashed(params.pk))
+	se = _gnutls_sign_to_entry(algo);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	params.pk = se->pk;
+
+	me = hash_to_entry(se->hash);
+	if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (params.pk != pubkey->pk_algorithm) {
+	if (se->pk != pubkey->pk_algorithm) {
 		if (!gnutls_sign_supports_pk_algorithm(algo, pubkey->pk_algorithm)) {
 			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
 					gnutls_pk_get_name(pubkey->pk_algorithm), pubkey->pk_algorithm,
-					gnutls_sign_get_name(algo), algo);
+					se->name, algo);
 			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 		}
 	}
@@ -1551,6 +1556,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 		 * it with the same way as gnutls_privkey_sign*. */
 		if (pubkey->pk_algorithm == GNUTLS_PK_RSA) {
 			gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
+			params.rsa_pss_dig = se->hash;
 			params.salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
 		}
 	}
@@ -1599,6 +1605,7 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 {
 	const mac_entry_st *me;
 	gnutls_x509_spki_st params;
+	const gnutls_sign_entry_st *se;
 	int ret;
 
 	if (key == NULL) {
@@ -1619,27 +1626,32 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		/* we do not check for insecure algorithms with this flag */
 		return _gnutls_pk_verify(params.pk, hash, signature,
 					 &key->params, &params);
+	} else if (algo == GNUTLS_SIGN_UNKNOWN) {
+		params.pk = key->pk_algorithm;
+		me = NULL;
 	} else {
-		if (algo == GNUTLS_SIGN_UNKNOWN) {
-			params.pk = key->pk_algorithm;
-			me = NULL;
-		} else {
-			params.pk = gnutls_sign_get_pk_algorithm(algo);
-			params.dig = gnutls_sign_get_hash_algorithm(algo);
+		se = _gnutls_sign_to_entry(algo);
+		if (se == NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-			me = hash_to_entry(params.dig);
+		params.pk = se->pk;
 
-			if (params.pk != key->pk_algorithm) {
-				if (!gnutls_sign_supports_pk_algorithm(algo, key->pk_algorithm)) {
-					_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
-						gnutls_pk_get_name(key->pk_algorithm), key->pk_algorithm,
-						gnutls_sign_get_name(algo), algo);
-					return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
-				}
+		if (params.pk != key->pk_algorithm) {
+			if (!gnutls_sign_supports_pk_algorithm(algo, key->pk_algorithm)) {
+				_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
+					gnutls_pk_get_name(key->pk_algorithm), key->pk_algorithm,
+					se->name, algo);
+				return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 			}
 		}
 
+		me = hash_to_entry(se->hash);
+		if (me == NULL && !_gnutls_pk_is_not_prehashed(se->pk))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 		if (params.pk == GNUTLS_PK_RSA_PSS) {
+			params.rsa_pss_dig = se->hash;
+
 			/* The requested sign algorithm is RSA-PSS, while the
 			 * pubkey doesn't include parameter information */
 			if (key->pk_algorithm == GNUTLS_PK_RSA) {
@@ -1649,15 +1661,15 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 				    _gnutls_find_rsa_pss_salt_size(key->bits, me, 0);
 			}
 		}
+	}
 
-		ret = pubkey_verify_hashed_data(params.pk, me,
-						 hash, signature,
-						 &key->params,
-						 &params);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
+	ret = pubkey_verify_hashed_data(params.pk, me,
+					 hash, signature,
+					 &key->params,
+					 &params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	if (algo != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {

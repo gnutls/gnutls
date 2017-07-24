@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -260,65 +261,27 @@ _gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
 
 		return result;
 	} else {
+		const gnutls_sign_entry_st *se;
+
 		memset(params, 0, sizeof(gnutls_x509_spki_st));
 
-		result = gnutls_oid_to_sign(oid);
-		if (result != GNUTLS_SIGN_UNKNOWN) {
-			params->pk = gnutls_sign_get_pk_algorithm(result);
-			params->dig = gnutls_sign_get_hash_algorithm(result);
+		se = _gnutls_oid_to_sign_entry(oid);
+		if (se != NULL) {
+			params->pk = se->pk;
 		}
 	}
 
 	return 0;
 }
 
-int
-_gnutls_x509_crt_read_sign_params(gnutls_x509_crt_t crt,
-				  gnutls_x509_spki_st *params)
-{
-	return _gnutls_x509_read_sign_params(crt->cert,
-					     "tbsCertificate."
-					     "subjectPublicKeyInfo."
-					     "algorithm",
-					     params);
-}
-
-int
-_gnutls_x509_crq_read_sign_params(gnutls_x509_crq_t crt,
-				  gnutls_x509_spki_st *params)
-{
-	return _gnutls_x509_read_sign_params(crt->crq,
-					     "certificationRequestInfo."
-					     "subjectPKInfo."
-					     "algorithm",
-					     params);
-}
-
-int
-_gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
-			       gnutls_x509_spki_st *params)
+static int write_oid_and_params(ASN1_TYPE dst, const char *dst_name, const char *oid, gnutls_x509_spki_st *params)
 {
 	int result;
 	char name[128];
-	const char *oid;
 
 	_gnutls_str_cpy(name, sizeof(name), dst_name);
 	_gnutls_str_cat(name, sizeof(name), ".algorithm");
 
-	if (params->legacy && params->pk == GNUTLS_PK_RSA)
-		oid = PK_PKIX1_RSA_OID;
-	else if (params->pk == GNUTLS_PK_RSA_PSS)
-		oid = PK_PKIX1_RSA_PSS_OID;
-	else
-		oid = gnutls_sign_get_oid(gnutls_pk_to_sign(params->pk,
-							    params->dig));
-	if (oid == NULL) {
-		gnutls_assert();
-		_gnutls_debug_log
-		    ("Cannot find OID for sign algorithm pk: %d dig: %d\n",
-		     (int) params->pk, (int) params->dig);
-		return GNUTLS_E_INVALID_REQUEST;
-	}
 
 	/* write the OID.
 	 */
@@ -327,7 +290,6 @@ _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
-
 
 	_gnutls_str_cpy(name, sizeof(name), dst_name);
 	_gnutls_str_cat(name, sizeof(name), ".parameters");
@@ -361,6 +323,54 @@ _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
 	}
 
 	return 0;
+}
+
+int
+_gnutls_x509_write_spki_params(ASN1_TYPE dst, const char *dst_name,
+			       gnutls_x509_spki_st *params)
+{
+	const char *oid;
+
+	if (params->legacy && params->pk == GNUTLS_PK_RSA)
+		oid = PK_PKIX1_RSA_OID;
+	else if (params->pk == GNUTLS_PK_RSA_PSS)
+		oid = PK_PKIX1_RSA_PSS_OID;
+	else
+		oid = gnutls_pk_get_oid(params->pk);
+
+	if (oid == NULL) {
+		gnutls_assert();
+		_gnutls_debug_log
+		    ("Cannot find OID for public key algorithm %s\n",
+		     gnutls_pk_get_name(params->pk));
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return write_oid_and_params(dst, dst_name, oid, params);
+}
+
+int
+_gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
+			       const gnutls_sign_entry_st *se, gnutls_x509_spki_st *params)
+{
+	const char *oid;
+
+	if (params->legacy && params->pk == GNUTLS_PK_RSA)
+		oid = PK_PKIX1_RSA_OID;
+	else if (params->pk == GNUTLS_PK_RSA_PSS)
+		oid = PK_PKIX1_RSA_PSS_OID;
+	else
+		oid = se->oid;
+
+	if (oid == NULL) {
+		gnutls_assert();
+		_gnutls_debug_log
+		    ("Cannot find OID for sign algorithm %s\n",
+		     se->name);
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return write_oid_and_params(dst, dst_name, oid, params);
 }
 
 /* this function reads a (small) unsigned integer

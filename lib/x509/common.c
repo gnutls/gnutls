@@ -1285,7 +1285,7 @@ _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
 		_gnutls_free_datum(&der);
 
 		if (result == 0)
-			result = gnutls_pk_to_sign(params.pk, params.dig);
+			result = gnutls_pk_to_sign(params.pk, params.rsa_pss_dig);
 		else if (result == GNUTLS_E_UNKNOWN_ALGORITHM)
 			result = GNUTLS_SIGN_UNKNOWN;
 	} else {

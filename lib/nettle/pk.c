@@ -756,7 +756,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			mpz_init(s);
 
 			ret =
-			    _rsa_pss_sign_digest_tr(sign_params->dig,
+			    _rsa_pss_sign_digest_tr(sign_params->rsa_pss_dig,
 						    &pub, &priv,
 						    NULL, rnd_nonce_func,
 						    sign_params->salt_size,
@@ -1014,7 +1014,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				goto cleanup;
 			}
 
-			ret = _rsa_pss_verify_digest(sign_params->dig,
+			ret = _rsa_pss_verify_digest(sign_params->rsa_pss_dig,
 						     &pub,
 						     sign_params->salt_size,
 						     vdata->data, vdata->size,
@@ -1475,7 +1475,7 @@ char* gen_data = NULL;
 		ddata.data = (void*)gen_data;
 		ddata.size = hash_len;
 	} else if (algo == GNUTLS_PK_RSA_PSS) {
-		switch (params->sign.dig) {
+		switch (params->sign.rsa_pss_dig) {
 		case GNUTLS_DIG_SHA256:
 			ddata.data = (void*)const_data_sha256;
 			ddata.size = sizeof(const_data_sha256);

@@ -2043,7 +2043,7 @@ gnutls_x509_crt_set_pk_algorithm(gnutls_x509_crt_t crt,
 	if (crt_pk == GNUTLS_PK_RSA) {
 		const mac_entry_st *me;
 
-		me = hash_to_entry(spki->dig);
+		me = hash_to_entry(spki->rsa_pss_dig);
 		if (unlikely(me == NULL)) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
@@ -2051,7 +2051,7 @@ gnutls_x509_crt_set_pk_algorithm(gnutls_x509_crt_t crt,
 
 		memset(&params, 0, sizeof(gnutls_x509_spki_st));
 		params.pk = spki->pk;
-		params.dig = spki->dig;
+		params.rsa_pss_dig = spki->rsa_pss_dig;
 
 		/* If salt size is zero, find the optimal salt size. */
 		if (spki->salt_size == 0) {
@@ -2061,13 +2061,13 @@ gnutls_x509_crt_set_pk_algorithm(gnutls_x509_crt_t crt,
 		} else
 			params.salt_size = spki->salt_size;
 	} else if (crt_pk == GNUTLS_PK_RSA_PSS) {
-		result = _gnutls_x509_crt_read_sign_params(crt, &params);
+		result = _gnutls_x509_crt_read_spki_params(crt, &params);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
 
-		if (params.dig != spki->dig ||
+		if (params.rsa_pss_dig != spki->rsa_pss_dig ||
 		    params.salt_size > spki->salt_size) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
@@ -2078,7 +2078,7 @@ gnutls_x509_crt_set_pk_algorithm(gnutls_x509_crt_t crt,
 
 	MODIFIED(crt);
 
-	result = _gnutls_x509_write_sign_params(crt->cert,
+	result = _gnutls_x509_write_spki_params(crt->cert,
 						"tbsCertificate."
 						"subjectPublicKeyInfo.algorithm",
 						&params);

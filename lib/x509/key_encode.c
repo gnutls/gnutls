@@ -344,7 +344,7 @@ _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
 		goto cleanup;
 	}
 
-	oid = gnutls_digest_get_oid(params->dig);
+	oid = gnutls_digest_get_oid(params->rsa_pss_dig);
 
 	if ((result = asn1_write_value(spk, "hashAlgorithm.algorithm", oid, 1))
 	    != ASN1_SUCCESS) {

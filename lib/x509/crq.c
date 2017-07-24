@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  * Copyright (C) 2012-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1325,13 +1326,13 @@ gnutls_x509_crq_get_pk_algorithm2(gnutls_x509_crq_t crq,
 
 		spki->pk = result;
 
-		result = _gnutls_x509_crq_read_sign_params(crq, &params);
+		result = _gnutls_x509_crq_read_spki_params(crq, &params);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
 
-		spki->dig = params.dig;
+		spki->rsa_pss_dig = params.rsa_pss_dig;
 		spki->salt_size = params.salt_size;
 
 		return spki->pk;
@@ -2822,6 +2823,7 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 	gnutls_datum_t tbs;
 	gnutls_pk_algorithm_t pk;
 	gnutls_x509_spki_st params;
+	const gnutls_sign_entry_st *se;
 
 	if (crq == NULL) {
 		gnutls_assert();
@@ -2838,14 +2840,14 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 		}
 	}
 
-	result = _gnutls_privkey_get_sign_params(key, &params);
+	result = _gnutls_privkey_get_spki_params(key, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
 	pk = gnutls_privkey_get_pk_algorithm(key, NULL);
-	result = _gnutls_privkey_update_sign_params(key, pk, dig, 0, &params);
+	result = _gnutls_privkey_update_spki_params(key, pk, dig, 0, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -2862,7 +2864,11 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 		return result;
 	}
 
-	result = privkey_sign_and_hash_data(key, _gnutls_pk_to_sign_entry(params.pk, dig),
+	se = _gnutls_pk_to_sign_entry(params.pk, dig);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	result = privkey_sign_and_hash_data(key, se,
 					    &tbs, &signature, &params);
 	gnutls_free(tbs.data);
 
@@ -2888,7 +2894,7 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 	 */
 	result =
 	    _gnutls_x509_write_sign_params(crq->crq, "signatureAlgorithm",
-					   &params);
+					   se, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -3244,7 +3250,7 @@ gnutls_x509_crq_set_pk_algorithm(gnutls_x509_crq_t crq,
 	if (crq_pk == GNUTLS_PK_RSA) {
 		const mac_entry_st *me;
 
-		me = hash_to_entry(spki->dig);
+		me = hash_to_entry(spki->rsa_pss_dig);
 		if (unlikely(me == NULL)) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
@@ -3252,7 +3258,7 @@ gnutls_x509_crq_set_pk_algorithm(gnutls_x509_crq_t crq,
 
 		memset(&params, 0, sizeof(gnutls_x509_spki_st));
 		params.pk = spki->pk;
-		params.dig = spki->dig;
+		params.rsa_pss_dig = spki->rsa_pss_dig;
 
 		/* If salt size is zero, find the optimal salt size. */
 		if (spki->salt_size == 0) {
@@ -3262,13 +3268,13 @@ gnutls_x509_crq_set_pk_algorithm(gnutls_x509_crq_t crq,
 		} else
 			params.salt_size = spki->salt_size;
 	} else if (crq_pk == GNUTLS_PK_RSA_PSS) {
-		result = _gnutls_x509_crq_read_sign_params(crq, &params);
+		result = _gnutls_x509_crq_read_spki_params(crq, &params);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
 
-		if (params.dig != spki->dig ||
+		if (params.rsa_pss_dig != spki->rsa_pss_dig ||
 		    params.salt_size > spki->salt_size) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
@@ -3277,7 +3283,7 @@ gnutls_x509_crq_set_pk_algorithm(gnutls_x509_crq_t crq,
 		params.salt_size = spki->salt_size;
 	}
 
-	result = _gnutls_x509_write_sign_params(crq->crq,
+	result = _gnutls_x509_write_spki_params(crq->crq,
 						"certificationRequestInfo."
 						"subjectPKInfo."
 						"algorithm",

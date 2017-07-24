@@ -113,10 +113,12 @@ gnutls_x509_spki_get_pk_algorithm(gnutls_x509_spki_t spki)
 /**
  * gnutls_x509_spki_set_digest_algorithm:
  * @spki: the SubjectPublicKeyInfo structure
- * @dig: the digest algorithm of type #gnutls_digest_algorithm_t
+ * @dig: a digest algorithm of type #gnutls_digest_algorithm_t
  *
  * This function will set the digest algorithm of a
- * SubjectPublicKeyInfo structure.
+ * SubjectPublicKeyInfo structure. This is relevant for
+ * RSA-PSS signatures which store the digest algorithm
+ * in the SubjectPublicKeyInfo.
  *
  * Since: 3.6.0
  *
@@ -125,7 +127,7 @@ void
 gnutls_x509_spki_set_digest_algorithm(gnutls_x509_spki_t spki,
 				      gnutls_digest_algorithm_t dig)
 {
-	spki->dig = dig;
+	spki->rsa_pss_dig = dig;
 }
 
 /**
@@ -133,7 +135,9 @@ gnutls_x509_spki_set_digest_algorithm(gnutls_x509_spki_t spki,
  * @spki: the SubjectPublicKeyInfo structure
  *
  * This function will get the digest algorithm of a
- * SubjectPublicKeyInfo structure.
+ * SubjectPublicKeyInfo structure. This is relevant for
+ * RSA-PSS signatures which store the digest algorithm
+ * in the SubjectPublicKeyInfo.
  *
  * Returns: a member of the #gnutls_digest_algorithm_t enumeration on
  * success, or a %GNUTLS_DIG_UNKNOWN on error.
@@ -144,7 +148,7 @@ gnutls_x509_spki_set_digest_algorithm(gnutls_x509_spki_t spki,
 int
 gnutls_x509_spki_get_digest_algorithm(gnutls_x509_spki_t spki)
 {
-	return spki->dig;
+	return spki->rsa_pss_dig;
 }
 
 /**

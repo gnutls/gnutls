@@ -2349,6 +2349,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	const mac_entry_st *me = hash_to_entry(dig);
 	unsigned pk, sigalgo;
 	gnutls_x509_spki_st key_params, params;
+	const gnutls_sign_entry_st *se;
 
 	if (pkcs7 == NULL || me == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
@@ -2486,23 +2487,29 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	/* write the signature algorithm */
 	pk = gnutls_x509_crt_get_pk_algorithm(signer, NULL);
 
-	ret = _gnutls_privkey_get_sign_params(signer_key, &key_params);
+	ret = _gnutls_privkey_get_spki_params(signer_key, &key_params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_x509_crt_get_sign_params(signer, &key_params, &params);
+	ret = _gnutls_x509_crt_get_spki_params(signer, &key_params, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	result = _gnutls_privkey_update_sign_params(signer_key, pk, dig, 0,
+	ret = _gnutls_privkey_update_spki_params(signer_key, pk, dig, 0,
 						  &params);
-	if (result < 0) {
+	if (ret < 0) {
 		gnutls_assert();
-		return result;
+		goto cleanup;
+	}
+
+	se = _gnutls_pk_to_sign_entry(params.pk, dig);
+	if (se == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+		goto cleanup;
 	}
 
 	/* RFC5652 is silent on what the values would be and initially I assumed that
@@ -2514,18 +2521,13 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	ret =
 	    _gnutls_x509_write_sign_params(pkcs7->signed_data,
 					   "signerInfos.?LAST.signatureAlgorithm",
-					   &params);
+					   se, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	sigalgo = gnutls_pk_to_sign(pk, dig);
-	if (sigalgo == GNUTLS_SIGN_UNKNOWN) {
-		gnutls_assert();
-		ret = GNUTLS_E_INVALID_REQUEST;
-		goto cleanup;
-	}
+	sigalgo = se->id;
 
 	/* sign the data */
 	ret =
@@ -2536,7 +2538,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	ret = privkey_sign_and_hash_data(signer_key, _gnutls_pk_to_sign_entry(params.pk, dig),
+	ret = privkey_sign_and_hash_data(signer_key, se,
 					 &sigdata, &signature, &params);
 	if (ret < 0) {
 		gnutls_assert();

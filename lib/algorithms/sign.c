@@ -254,6 +254,16 @@ gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name)
 
 }
 
+const gnutls_sign_entry_st *_gnutls_oid_to_sign_entry(const char *oid)
+{
+	GNUTLS_SIGN_LOOP(
+		if (p->oid && strcmp(oid, p->oid) == 0) {
+			return p;
+		}
+	);
+	return NULL;
+}
+
 /**
  * gnutls_oid_to_sign:
  * @oid: is an object identifier
@@ -267,18 +277,14 @@ gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name)
  **/
 gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid)
 {
-	gnutls_sign_algorithm_t ret = 0;
+	const gnutls_sign_entry_st *se;
 
-	GNUTLS_SIGN_LOOP(
-		if (p->oid && strcmp(oid, p->oid) == 0) {
-			ret = p->id; break;}
-	);
-
-	if (ret == 0) {
+	se = _gnutls_oid_to_sign_entry(oid);
+	if (se == NULL) {
 		_gnutls_debug_log("Unknown SIGN OID: '%s'\n", oid);
 		return GNUTLS_SIGN_UNKNOWN;
 	}
-	return ret;
+	return se->id;
 }
 
 const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash)

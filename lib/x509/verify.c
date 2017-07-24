@@ -1295,7 +1295,7 @@ _gnutls_x509_validate_sign_params(gnutls_pk_algorithm_t pk_algorithm,
 			}
 		} else {
 			/* Check if the underlying hash algorithms are same.  */
-			if (sig_params->dig != params.dig) {
+			if (sig_params->rsa_pss_dig != params.rsa_pss_dig) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
@@ -1330,6 +1330,7 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 	int ret;
 	gnutls_x509_spki_st sign_params;
 	const mac_entry_st * me;
+	const gnutls_sign_entry_st *se;
 
 	/* Read the MPI parameters from the issuer's certificate.
 	 */
@@ -1340,6 +1341,10 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 	}
 
 	issuer_pk = gnutls_x509_crt_get_pk_algorithm(issuer, NULL);
+
+	se = _gnutls_sign_to_entry(sign);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 
 	if (cert != NULL) {
 		ret = _gnutls_x509_read_sign_params(cert->cert,
@@ -1363,18 +1368,20 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 	} else {
 		memcpy(&sign_params, &params.sign,
 		       sizeof(gnutls_x509_spki_st));
-		sign_params.pk = gnutls_sign_get_pk_algorithm(sign);
-		sign_params.dig = gnutls_sign_get_hash_algorithm(sign);
+
+		sign_params.pk = se->pk;
+		if (sign_params.pk == GNUTLS_PK_RSA_PSS)
+			sign_params.rsa_pss_dig = se->hash;
 	}
 
-	me = hash_to_entry(sign_params.dig);
+	me = hash_to_entry(se->hash);
 	if (unlikely(me == NULL)) {
 		gnutls_assert();
 		ret = GNUTLS_E_CERTIFICATE_ERROR;
 		goto cleanup;
 	}
 
-	ret = pubkey_verify_data(sign_params.pk, me, data, signature, &params,
+	ret = pubkey_verify_data(se->pk, me, data, signature, &params,
 				 &sign_params);
 	if (ret < 0) {
 		gnutls_assert();

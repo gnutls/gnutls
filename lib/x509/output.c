@@ -1440,12 +1440,12 @@ print_crt_pubkey_params(gnutls_buffer_st * str, const char *key_name,
 	pk = ret;
 
 	if (pk == GNUTLS_PK_RSA_PSS) {
-		ret = _gnutls_x509_crt_read_sign_params(crt, &params);
+		ret = _gnutls_x509_crt_read_spki_params(crt, &params);
 		if (ret < 0)
 			return ret;
 		addf(str, _("\t%sPublic Key Parameters:\n"), key_name);
 		addf(str, "\t\tHash Algorithm: %s\n",
-		     gnutls_digest_get_name(params.dig));
+		     gnutls_digest_get_name(params.rsa_pss_dig));
 		addf(str, "\t\tSalt Length: %d\n", params.salt_size);
 	}
 
@@ -2385,12 +2385,12 @@ print_crq_pubkey_params(gnutls_buffer_st * str, const char *key_name,
 	pk = ret;
 
 	if (pk == GNUTLS_PK_RSA_PSS) {
-		ret = _gnutls_x509_crq_read_sign_params(crt, &params);
+		ret = _gnutls_x509_crq_read_spki_params(crt, &params);
 		if (ret < 0)
 			return ret;
 		addf(str, _("\t%sPublic Key Parameters:\n"), key_name);
 		addf(str, "\t\tHash Algorithm: %s\n",
-		     gnutls_digest_get_name(params.dig));
+		     gnutls_digest_get_name(params.rsa_pss_dig));
 		addf(str, "\t\tSalt Length: %d\n", params.salt_size);
 	}
 

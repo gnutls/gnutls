@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -159,7 +160,7 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 			   unsigned int flags,
 			   gnutls_x509_crt_t issuer,
 			   gnutls_privkey_t issuer_key);
-int _gnutls_x509_crt_get_sign_params(gnutls_x509_crt_t issuer,
+int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t issuer,
 				     const gnutls_x509_spki_st *key_params,
 				     gnutls_x509_spki_st *params);
 
@@ -256,7 +257,7 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
 				gnutls_pk_params_st * params, unsigned compat);
 
-int _gnutls_x509_privkey_get_sign_params(gnutls_x509_privkey_t key,
+int _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
 					 gnutls_x509_spki_st * params);
 
 int _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
@@ -324,11 +325,6 @@ int _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
 int _gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert,
 			      gnutls_pk_params_st * params);
 
-int _gnutls_x509_crt_read_sign_params(gnutls_x509_crt_t crt,
-				      gnutls_x509_spki_st *params);
-int _gnutls_x509_crq_read_sign_params(gnutls_x509_crq_t crt,
-				      gnutls_x509_spki_st *params);
-
 int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t, uint8_t * der,
 				    int dersize,
 				    gnutls_pk_params_st * params);
@@ -381,7 +377,34 @@ int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 int _gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
 				  gnutls_x509_spki_st *params);
 int _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
+				   const gnutls_sign_entry_st *se, gnutls_x509_spki_st *params);
+
+#define _gnutls_x509_read_spki_params _gnutls_x509_read_sign_params
+int _gnutls_x509_write_spki_params(ASN1_TYPE dst, const char *dst_name,
 				   gnutls_x509_spki_st *params);
+
+inline static int
+_gnutls_x509_crt_read_spki_params(gnutls_x509_crt_t crt,
+				  gnutls_x509_spki_st *params)
+{
+	return _gnutls_x509_read_spki_params(crt->cert,
+					     "tbsCertificate."
+					     "subjectPublicKeyInfo."
+					     "algorithm",
+					     params);
+}
+
+inline static int
+_gnutls_x509_crq_read_spki_params(gnutls_x509_crq_t crt,
+				  gnutls_x509_spki_st *params)
+{
+	return _gnutls_x509_read_spki_params(crt->crq,
+					     "certificationRequestInfo."
+					     "subjectPKInfo."
+					     "algorithm",
+					     params);
+}
+
 
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>

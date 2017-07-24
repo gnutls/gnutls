@@ -346,7 +346,7 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 
 	memset(params, 0, sizeof(gnutls_x509_spki_st));
 	params->pk = GNUTLS_PK_RSA_PSS;
-	params->dig = digest;
+	params->rsa_pss_dig = digest;
 
 	result = _gnutls_x509_read_uint(spk, "saltLength", &params->salt_size);
 	if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ||
@@ -451,7 +451,7 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_RSA_PSS: {
 		unsigned bits = pubkey_to_bits(algo, params);
-		const mac_entry_st *me = hash_to_entry(params->sign.dig);
+		const mac_entry_st *me = hash_to_entry(params->sign.rsa_pss_dig);
 		size_t hash_size;
 
 		if (unlikely(me == NULL))

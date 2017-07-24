@@ -1605,13 +1605,13 @@ gnutls_x509_crt_get_pk_algorithm2(gnutls_x509_crt_t cert,
 
 		spki->pk = result;
 
-		result = _gnutls_x509_crt_read_sign_params(cert, &params);
+		result = _gnutls_x509_crt_read_spki_params(cert, &params);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
 
-		spki->dig = params.dig;
+		spki->rsa_pss_dig = params.rsa_pss_dig;
 		spki->salt_size = params.salt_size;
 
 		return spki->pk;

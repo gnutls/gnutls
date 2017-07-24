@@ -50,14 +50,14 @@ _gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
 }
 
 int
-_gnutls_x509_crt_get_sign_params(gnutls_x509_crt_t crt,
+_gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
 				 const gnutls_x509_spki_st *key_params,
 				 gnutls_x509_spki_st *params)
 {
 	int result;
 	gnutls_x509_spki_st crt_params;
 
-	result = _gnutls_x509_crt_read_sign_params(crt, &crt_params);
+	result = _gnutls_x509_crt_read_spki_params(crt, &crt_params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -65,7 +65,7 @@ _gnutls_x509_crt_get_sign_params(gnutls_x509_crt_t crt,
 
 	if (crt_params.pk == GNUTLS_PK_RSA_PSS) {
 		if (key_params->pk == GNUTLS_PK_RSA_PSS) {
-			if (crt_params.dig != key_params->dig) {
+			if (crt_params.rsa_pss_dig != key_params->rsa_pss_dig) {
 				gnutls_assert();
 				return GNUTLS_E_CERTIFICATE_ERROR;
 			}
@@ -117,19 +117,19 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	if (pk == GNUTLS_PK_UNKNOWN)
 		pk = gnutls_privkey_get_pk_algorithm(issuer_key, NULL);
 
-	result = _gnutls_privkey_get_sign_params(issuer_key, &key_params);
+	result = _gnutls_privkey_get_spki_params(issuer_key, &key_params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	result = _gnutls_x509_crt_get_sign_params(issuer, &key_params, &params);
+	result = _gnutls_x509_crt_get_spki_params(issuer, &key_params, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	result = _gnutls_privkey_update_sign_params(issuer_key, pk, dig, flags,
+	result = _gnutls_privkey_update_spki_params(issuer_key, pk, dig, flags,
 						  &params);
 	if (result < 0) {
 		gnutls_assert();
@@ -154,7 +154,11 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	_gnutls_str_cpy(name, sizeof(name), src_name);
 	_gnutls_str_cat(name, sizeof(name), ".signature");
 
-	result = _gnutls_x509_write_sign_params(src, name, &params);
+	se = _gnutls_pk_to_sign_entry(params.pk, dig);
+	if (se == NULL)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
+
+	result = _gnutls_x509_write_sign_params(src, name, se, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -169,7 +173,6 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 		return result;
 	}
 
-	se = _gnutls_pk_to_sign_entry(params.pk, dig);
 	if (_gnutls_pk_is_not_prehashed(params.pk)) {
 		result = privkey_sign_raw_data(issuer_key, se, &tbs, &signature, &params);
 	} else {
@@ -201,7 +204,7 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	 */
 
 	result = _gnutls_x509_write_sign_params(src, "signatureAlgorithm",
-						&params);
+						se, &params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

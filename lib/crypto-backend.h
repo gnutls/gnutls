@@ -166,8 +166,13 @@ typedef struct gnutls_crypto_bigint {
 /* additional information about the public key
  */
 typedef struct gnutls_x509_spki_st {
+	/* We can have a key which is of type RSA, but a certificate
+	 * of type RSA-PSS; the value here will be the expected value
+	 * for signatures (i.e., RSA-PSS) */
 	gnutls_pk_algorithm_t pk;
-	gnutls_digest_algorithm_t dig;
+
+	/* the digest used by RSA-PSS */
+	gnutls_digest_algorithm_t rsa_pss_dig;
 
 	/* the size of salt used by RSA-PSS */
 	unsigned int salt_size;

@@ -1629,11 +1629,11 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 
 		key->params.sign.pk = GNUTLS_PK_RSA_PSS;
 		if (key->params.palgo != GNUTLS_DIG_UNKNOWN)
-			key->params.sign.dig = key->params.palgo;
+			key->params.sign.rsa_pss_dig = key->params.palgo;
 		else
-			key->params.sign.dig = GNUTLS_DIG_SHA256;
+			key->params.sign.rsa_pss_dig = GNUTLS_DIG_SHA256;
 
-		me = hash_to_entry(key->params.sign.dig);
+		me = hash_to_entry(key->params.sign.rsa_pss_dig);
 		if (unlikely(me == NULL)) {
 			gnutls_assert();
 			ret = GNUTLS_E_INVALID_REQUEST;
@@ -2157,7 +2157,7 @@ void gnutls_x509_privkey_set_flags(gnutls_x509_privkey_t key,
 }
 
 int
-_gnutls_x509_privkey_get_sign_params(gnutls_x509_privkey_t key,
+_gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
 				     gnutls_x509_spki_st *params)
 {
 	memcpy(params, &key->params.sign, sizeof(gnutls_x509_spki_st));
