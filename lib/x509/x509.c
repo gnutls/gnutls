@@ -1548,37 +1548,6 @@ int
 gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
 				 unsigned int *bits)
 {
-	return gnutls_x509_crt_get_pk_algorithm2(cert, NULL, bits);
-}
-
-/**
- * gnutls_x509_crt_get_pk_algorithm2:
- * @cert: a certificate of type #gnutls_x509_crt_t
- * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
- * @bits: if bits is non null it will hold the size of the parameters' in bits
- *
- * This function will return the public key algorithm of an X.509
- * certificate.
- *
- * If @spki is non null, it should have enough size to hold the
- * parameters.
- *
- * If @bits is non null, it should have enough size to hold the
- * parameters size in bits. For RSA the bits returned is the modulus.
- * For DSA the bits returned are of the public exponent.
- *
- * Unknown/unsupported algorithms are mapped to %GNUTLS_PK_UNKNOWN.
- *
- * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- * success, or a negative error code on error.
- *
- * Since: 3.6.0
- **/
-int
-gnutls_x509_crt_get_pk_algorithm2(gnutls_x509_crt_t cert,
-				  gnutls_x509_spki_t spki,
-				  unsigned int *bits)
-{
 	int result;
 
 	if (cert == NULL) {
@@ -1600,24 +1569,45 @@ gnutls_x509_crt_get_pk_algorithm2(gnutls_x509_crt_t cert,
 		return result;
 	}
 
-	if (spki) {
-		gnutls_x509_spki_st params;
+	return result;
+}
 
-		spki->pk = result;
+/**
+ * gnutls_x509_crt_get_spki:
+ * @cert: a certificate of type #gnutls_x509_crt_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
+ * @flags: must be zero
+ *
+ * This function will return the public key information of an X.509
+ * certificate. The provided @spki must be initialized.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_x509_crt_get_spki(gnutls_x509_crt_t cert, gnutls_x509_spki_t spki, unsigned int flags)
+{
+	int result;
+	gnutls_x509_spki_st params;
 
-		result = _gnutls_x509_crt_read_spki_params(cert, &params);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		spki->rsa_pss_dig = params.rsa_pss_dig;
-		spki->salt_size = params.salt_size;
-
-		return spki->pk;
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return result;
+	spki->pk = gnutls_x509_crt_get_pk_algorithm(cert, NULL);
+
+	memset(&params, 0, sizeof(params));
+
+	result = _gnutls_x509_crt_read_spki_params(cert, &params);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	spki->rsa_pss_dig = params.rsa_pss_dig;
+	spki->salt_size = params.salt_size;
+
+	return 0;
 }
 
 /* returns the type and the name on success.

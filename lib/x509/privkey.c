@@ -1231,35 +1231,11 @@ int
 gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t key,
 				      unsigned int *bits)
 {
-	return gnutls_x509_privkey_get_pk_algorithm3(key, NULL, bits);
-}
-
-/**
- * gnutls_x509_privkey_get_pk_algorithm3:
- * @key: should contain a #gnutls_x509_privkey_t type
- * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
- * @bits: The number of bits in the public key algorithm
- *
- * This function will return the public key algorithm of a private
- * key.
- *
- * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative error code on error.
- **/
-int
-gnutls_x509_privkey_get_pk_algorithm3(gnutls_x509_privkey_t key,
-				      gnutls_x509_spki_t spki,
-				      unsigned int *bits)
-{
 	int ret;
 
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	if (spki) {
-		memcpy(spki, &key->params.spki, sizeof (gnutls_x509_spki_st));
 	}
 
 	if (bits) {
@@ -1270,6 +1246,30 @@ gnutls_x509_privkey_get_pk_algorithm3(gnutls_x509_privkey_t key,
 	}
 
 	return key->pk_algorithm;
+}
+
+/**
+ * gnutls_x509_privkey_get_spki:
+ * @key: should contain a #gnutls_x509_privkey_t type
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
+ * @flags: must be zero
+ *
+ * This function will return the public key information of a private
+ * key. The provided @spki must be initialized.
+ *
+ * Returns: Zero on success, or a negative error code on error.
+ **/
+int
+gnutls_x509_privkey_get_spki(gnutls_x509_privkey_t key, gnutls_x509_spki_t spki, unsigned int flags)
+{
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	memcpy(spki, &key->params.spki, sizeof (gnutls_x509_spki_st));
+
+	return 0;
 }
 
 static const char *set_msg(gnutls_x509_privkey_t key)

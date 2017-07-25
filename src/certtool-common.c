@@ -1128,15 +1128,23 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 	ret = gnutls_x509_spki_init(&spki);
 	if (ret < 0) {
 		fprintf(stderr, "spki_init: %s\n", gnutls_strerror(ret));
+		return;
 	}
-	ret = gnutls_x509_privkey_get_pk_algorithm3(key, spki, &bits);
+
 	fprintf(outfile, "\tPublic Key Algorithm: ");
 
-	key_type = ret;
+	key_type = gnutls_x509_privkey_get_pk_algorithm2(key, &bits);
 
 	cprint = gnutls_pk_algorithm_get_name(key_type);
 	fprintf(outfile, "%s\n", cprint ? cprint : "Unknown");
-	if (spki && key_type == GNUTLS_PK_RSA_PSS) {
+
+	if (key_type == GNUTLS_PK_RSA_PSS) {
+		ret = gnutls_x509_privkey_get_spki(key, spki, 0);
+		if (ret < 0) {
+			fprintf(stderr, "spki_get: %s\n", gnutls_strerror(ret));
+			goto spki_skip;
+		}
+
 		ret = gnutls_x509_spki_get_digest_algorithm(spki);
 		if (ret < 0) {
 			fprintf(stderr, "spki_get_digest_algorithm: %s\n",
@@ -1145,6 +1153,7 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 			fprintf(outfile, "\t\tHash Algorithm: %s\n",
 				gnutls_digest_get_name(ret));
 		}
+
 		ret = gnutls_x509_spki_get_salt_size(spki);
 		if (ret < 0) {
 			fprintf(stderr, "spki_get_salt_size: %s\n",
@@ -1152,6 +1161,8 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		} else
 			fprintf(outfile, "\t\tSalt Length: %d\n", ret);
 	}
+
+ spki_skip:
 	gnutls_x509_spki_deinit(spki);
 	fprintf(outfile, "\tKey Security Level: %s (%u bits)\n\n",
 		gnutls_sec_param_get_name(gnutls_x509_privkey_sec_param

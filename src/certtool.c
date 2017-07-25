@@ -699,7 +699,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		gnutls_x509_spki_set_pk_algorithm(spki, GNUTLS_PK_RSA_PSS);
 		gnutls_x509_spki_set_digest_algorithm(spki, get_dig(crt));
 
-		result = gnutls_x509_crt_set_pk_algorithm(crt, spki, 0);
+		result = gnutls_x509_crt_set_spki(crt, spki, 0);
 		gnutls_x509_spki_deinit(spki);
 		if (result < 0) {
 			fprintf(stderr, "error setting signing algorithm: %s\n",

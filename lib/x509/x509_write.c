@@ -1991,7 +1991,7 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_pk_algorithm:
+ * gnutls_x509_crt_set_spki:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @spki: a SubjectPublicKeyInfo structure of type #gnutls_x509_spki_t
  * @flags: must be zero
@@ -2010,9 +2010,9 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
  * Since: 3.6.0
  **/
 int
-gnutls_x509_crt_set_pk_algorithm(gnutls_x509_crt_t crt,
-				 gnutls_x509_spki_t spki,
-				 unsigned int flags)
+gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
+			 const gnutls_x509_spki_t spki,
+			 unsigned int flags)
 {
 	int result;
 	gnutls_pk_algorithm_t crt_pk;
