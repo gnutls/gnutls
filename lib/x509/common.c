@@ -1032,8 +1032,6 @@ _asnstr_append_name(char *name, size_t name_size, const char *part1,
 int
 _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					const char *dst_name,
-					gnutls_pk_algorithm_t
-					pk_algorithm,
 					gnutls_pk_params_st * params)
 {
 	const char *oid;
@@ -1041,7 +1039,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 	int result;
 	char name[128];
 
-	oid = gnutls_pk_get_oid(pk_algorithm);
+	oid = gnutls_pk_get_oid(params->algo);
 	if (oid == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
@@ -1059,7 +1057,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 	}
 
 	result =
-	    _gnutls_x509_write_pubkey_params(pk_algorithm, params, &der);
+	    _gnutls_x509_write_pubkey_params(params, &der);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -1076,7 +1074,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_write_pubkey(pk_algorithm, params, &der);
+	result = _gnutls_x509_write_pubkey(params, &der);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -1102,8 +1100,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
  */
 int
 _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
-			       gnutls_pk_algorithm_t
-			       pk_algorithm, gnutls_pk_params_st * params)
+			       gnutls_pk_params_st * params)
 {
 	int ret;
 	ASN1_TYPE tmp;
@@ -1117,7 +1114,6 @@ _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
 
 	ret = _gnutls_x509_encode_and_copy_PKI_params(tmp,
 						      "tbsCertificate.subjectPublicKeyInfo",
-						      pk_algorithm,
 						      params);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();

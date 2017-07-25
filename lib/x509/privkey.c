@@ -1979,7 +1979,7 @@ gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
 	}
 
 	ret =
-	    _gnutls_get_key_id(key->pk_algorithm, &key->params,
+	    _gnutls_get_key_id(&key->params,
 			       output_data, output_data_size, flags);
 	if (ret < 0) {
 		gnutls_assert();

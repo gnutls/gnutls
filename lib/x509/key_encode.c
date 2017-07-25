@@ -157,11 +157,10 @@ _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
 }
 
 int
-_gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,
-				 gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 				 gnutls_datum_t * der)
 {
-	switch (algo) {
+	switch (params->algo) {
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_write_dsa_params(params, der);
 	case GNUTLS_PK_RSA:
@@ -187,11 +186,10 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,
 }
 
 int
-_gnutls_x509_write_pubkey(gnutls_pk_algorithm_t algo,
-			  gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
 			  gnutls_datum_t * der)
 {
-	switch (algo) {
+	switch (params->algo) {
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_write_dsa_pubkey(params, der);
 	case GNUTLS_PK_RSA:

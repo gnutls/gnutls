@@ -175,11 +175,8 @@ _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name);
 
 int _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					    const char *dst_name,
-					    gnutls_pk_algorithm_t
-					    pk_algorithm,
 					    gnutls_pk_params_st * params);
 int _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
-				   gnutls_pk_algorithm_t,
 				   gnutls_pk_params_st * params);
 int _gnutls_asn1_copy_node(ASN1_TYPE * dst, const char *dst_name,
 			   ASN1_TYPE src, const char *src_name);
@@ -194,7 +191,7 @@ int _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
 int _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 			 gnutls_pk_params_st * params);
 
-int _gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st *,
+int _gnutls_get_key_id(gnutls_pk_params_st *,
 		       unsigned char *output_data,
 		       size_t * output_data_size, unsigned flags);
 

@@ -2931,7 +2931,7 @@ gnutls_x509_crt_export2(gnutls_x509_crt_t cert,
 }
 
 int
-_gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
+_gnutls_get_key_id(gnutls_pk_params_st * params,
 		   unsigned char *output_data, size_t * output_data_size,
 		   unsigned flags)
 {
@@ -2952,7 +2952,7 @@ _gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	ret = _gnutls_x509_encode_PKI_params(&der, pk, params);
+	ret = _gnutls_x509_encode_PKI_params(&der, params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -2996,18 +2996,12 @@ gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt, unsigned int flags,
 			   unsigned char *output_data,
 			   size_t * output_data_size)
 {
-	int pk, ret = 0;
+	int ret = 0;
 	gnutls_pk_params_st params;
 
 	if (crt == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	pk = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
-	if (pk < 0) {
-		gnutls_assert();
-		return pk;
 	}
 
 	/* initializes params */
@@ -3018,7 +3012,7 @@ gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt, unsigned int flags,
 	}
 
 	ret =
-	    _gnutls_get_key_id(pk, &params, output_data, output_data_size, flags);
+	    _gnutls_get_key_id(&params, output_data, output_data_size, flags);
 
 	gnutls_pk_params_release(&params);
 

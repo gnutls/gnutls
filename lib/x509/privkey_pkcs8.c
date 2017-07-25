@@ -150,8 +150,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	}
 
 	result =
-	    _gnutls_x509_write_pubkey_params(pkey->pk_algorithm,
-					     &pkey->params, &algo_params);
+	    _gnutls_x509_write_pubkey_params(&pkey->params, &algo_params);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

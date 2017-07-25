@@ -921,7 +921,7 @@ gnutls_x509_crq_set_key(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 	result = _gnutls_x509_encode_and_copy_PKI_params
 	    (crq->crq,
 	     "certificationRequestInfo.subjectPKInfo",
-	     key->pk_algorithm, &key->params);
+	     &key->params);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -1039,11 +1039,12 @@ gnutls_x509_crq_set_key_rsa_raw(gnutls_x509_crq_t crq,
 	}
 
 	temp_params.params_nr = RSA_PUBLIC_PARAMS;
+	temp_params.algo = GNUTLS_PK_RSA;
 
 	result = _gnutls_x509_encode_and_copy_PKI_params
 	    (crq->crq,
 	     "certificationRequestInfo.subjectPKInfo",
-	     GNUTLS_PK_RSA, &temp_params);
+	     &temp_params);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -2759,18 +2760,12 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
 			   unsigned char *output_data,
 			   size_t * output_data_size)
 {
-	int pk, ret = 0;
+	int ret = 0;
 	gnutls_pk_params_st params;
 
 	if (crq == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	pk = gnutls_x509_crq_get_pk_algorithm(crq, NULL);
-	if (pk < 0) {
-		gnutls_assert();
-		return pk;
 	}
 
 	ret = _gnutls_x509_crq_get_mpis(crq, &params);
@@ -2780,7 +2775,7 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
 	}
 
 	ret =
-	    _gnutls_get_key_id(pk, &params, output_data, output_data_size, flags);
+	    _gnutls_get_key_id(&params, output_data, output_data_size, flags);
 
 	gnutls_pk_params_release(&params);
 

@@ -455,7 +455,6 @@ gnutls_pubkey_export(gnutls_pubkey_t key,
 
 	result =
 	    _gnutls_x509_encode_and_copy_PKI_params(spk, "",
-						    key->pk_algorithm,
 						    &key->params);
 	if (result < 0) {
 		gnutls_assert();
@@ -520,7 +519,6 @@ gnutls_pubkey_export2(gnutls_pubkey_t key,
 
 	result =
 	    _gnutls_x509_encode_and_copy_PKI_params(spk, "",
-						    key->pk_algorithm,
 						    &key->params);
 	if (result < 0) {
 		gnutls_assert();
@@ -578,7 +576,7 @@ gnutls_pubkey_get_key_id(gnutls_pubkey_t key, unsigned int flags,
 	}
 
 	ret =
-	    _gnutls_get_key_id(key->pk_algorithm, &key->params,
+	    _gnutls_get_key_id(&key->params,
 			       output_data, output_data_size, flags);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1050,7 +1048,6 @@ int gnutls_x509_crt_set_pubkey(gnutls_x509_crt_t crt, gnutls_pubkey_t key)
 
 	result = _gnutls_x509_encode_and_copy_PKI_params(crt->cert,
 							 "tbsCertificate.subjectPublicKeyInfo",
-							 key->pk_algorithm,
 							 &key->params);
 
 	if (result < 0) {
@@ -1089,7 +1086,7 @@ int gnutls_x509_crq_set_pubkey(gnutls_x509_crq_t crq, gnutls_pubkey_t key)
 	result = _gnutls_x509_encode_and_copy_PKI_params
 	    (crq->crq,
 	     "certificationRequestInfo.subjectPKInfo",
-	     key->pk_algorithm, &key->params);
+	     &key->params);
 
 	if (result < 0) {
 		gnutls_assert();

@@ -239,7 +239,6 @@ gnutls_x509_crt_set_key(gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
 
 	result = _gnutls_x509_encode_and_copy_PKI_params(crt->cert,
 							 "tbsCertificate.subjectPublicKeyInfo",
-							 key->pk_algorithm,
 							 &key->params);
 
 	if (result < 0) {

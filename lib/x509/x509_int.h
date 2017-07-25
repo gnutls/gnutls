@@ -347,11 +347,9 @@ int _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
 				    gnutls_datum_t * der);
 
 int
-_gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,
-				 gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 				 gnutls_datum_t * der);
-int _gnutls_x509_write_pubkey(gnutls_pk_algorithm_t,
-			      gnutls_pk_params_st * params,
+int _gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
 			      gnutls_datum_t * der);
 
 int _gnutls_x509_read_uint(ASN1_TYPE node, const char *value,

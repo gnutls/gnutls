@@ -127,6 +127,7 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 
 	pk_algorithm = result;
 	params->flags = curve;
+	params->algo = pk_algorithm;
 
 	/* Read the algorithm's parameters
 	 */
