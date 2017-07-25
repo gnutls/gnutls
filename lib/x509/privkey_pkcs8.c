@@ -979,6 +979,7 @@ _decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
+	pkey->params.algo = GNUTLS_PK_RSA_PSS;
 	memcpy(&pkey->params.spki, &params, sizeof(gnutls_x509_spki_st));
 
 	ret = 0;
@@ -1193,7 +1194,6 @@ decode_private_key_info(const gnutls_datum_t * der,
 		result = _gnutls_asn2err(result);
 		goto error;
 	}
-
 	/* we only support RSA and DSA private keys.
 	 */
 
