@@ -1652,7 +1652,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		if (key->params.palgo != GNUTLS_DIG_UNKNOWN)
 			key->params.spki.rsa_pss_dig = key->params.palgo;
 		else
-			key->params.spki.rsa_pss_dig = GNUTLS_DIG_SHA256;
+			key->params.spki.rsa_pss_dig = _gnutls_pk_bits_to_sha_hash(bits);
 
 		me = hash_to_entry(key->params.spki.rsa_pss_dig);
 		if (unlikely(me == NULL)) {

@@ -131,11 +131,29 @@ unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits)
 	unsigned int ret = 0;
 
 	GNUTLS_SEC_PARAM_LOOP(
-		ret = p->subgroup_bits; 
+		ret = p->subgroup_bits;
 		if (p->pk_bits >= pk_bits)
 			break;
 	);
 	return ret;
+}
+
+/* Returns a corresponding SHA algorithm size for the
+ * public key bits given. It is based on the NIST mappings.
+ */
+gnutls_digest_algorithm_t _gnutls_pk_bits_to_sha_hash(unsigned int pk_bits)
+{
+	GNUTLS_SEC_PARAM_LOOP(
+		if (p->pk_bits >= pk_bits) {
+			if (p->bits <= 128)
+				return GNUTLS_DIG_SHA256;
+			else if (p->bits <= 192)
+				return GNUTLS_DIG_SHA384;
+			else
+				return GNUTLS_DIG_SHA512;
+		}
+	);
+	return GNUTLS_DIG_SHA256;
 }
 
 /**
@@ -155,7 +173,7 @@ const char *gnutls_sec_param_get_name(gnutls_sec_param_t param)
 
 	GNUTLS_SEC_PARAM_LOOP(
 		if (p->sec_param == param) {
-			ret = p->name; 
+			ret = p->name;
 			break;
 		}
 	);
