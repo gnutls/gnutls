@@ -1140,6 +1140,9 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 
 	if (key_type == GNUTLS_PK_RSA_PSS) {
 		ret = gnutls_x509_privkey_get_spki(key, spki, 0);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			goto spki_skip;
+
 		if (ret < 0) {
 			fprintf(stderr, "spki_get: %s\n", gnutls_strerror(ret));
 			goto spki_skip;
