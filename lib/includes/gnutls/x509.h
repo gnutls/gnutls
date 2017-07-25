@@ -1189,6 +1189,10 @@ int gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t
 int gnutls_x509_privkey_get_spki(gnutls_x509_privkey_t key,
 				 gnutls_x509_spki_t spki,
 				 unsigned int flags);
+int
+gnutls_x509_privkey_set_spki(gnutls_x509_privkey_t key,
+			     const gnutls_x509_spki_t spki,
+			     unsigned int flags);
 
 int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
 				   unsigned int flags,
