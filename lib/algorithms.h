@@ -403,4 +403,6 @@ static inline int _sig_is_ecdsa(gnutls_sign_algorithm_t sig)
 	return 0;
 }
 
+bool _gnutls_pk_are_compat(gnutls_pk_algorithm_t pk1, gnutls_pk_algorithm_t pk2);
+
 #endif

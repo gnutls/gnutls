@@ -1286,7 +1286,12 @@ gnutls_x509_privkey_set_spki(gnutls_x509_privkey_t key, const gnutls_x509_spki_t
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	if (!_gnutls_pk_are_compat(key->params.algo, spki->pk))
+                return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	memcpy(&key->params.spki, spki, sizeof (gnutls_x509_spki_st));
+
+	key->params.algo = spki->pk;
 
 	return 0;
 }

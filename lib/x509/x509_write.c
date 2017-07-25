@@ -2031,6 +2031,9 @@ gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 
 	crt_pk = result;
 
+	if (!_gnutls_pk_are_compat(crt_pk, spki->pk))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (spki->pk != GNUTLS_PK_RSA_PSS) {
 		if (crt_pk == spki->pk)
 			return 0;

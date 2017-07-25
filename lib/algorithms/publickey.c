@@ -368,3 +368,14 @@ _gnutls_kx_encipher_type(gnutls_kx_algorithm_t kx_algorithm)
 	return ret;
 
 }
+
+bool _gnutls_pk_are_compat(gnutls_pk_algorithm_t pk1, gnutls_pk_algorithm_t pk2)
+{
+	if (pk1 == pk2)
+		return 1;
+
+	if (GNUTLS_PK_IS_RSA(pk1) && GNUTLS_PK_IS_RSA(pk2))
+		return 1;
+
+	return 0;
+}

@@ -3230,6 +3230,9 @@ gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
 
 	crq_pk = result;
 
+	if (!_gnutls_pk_are_compat(crq_pk, spki->pk))
+                return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (spki->pk != GNUTLS_PK_RSA_PSS) {
 		if (crq_pk == spki->pk)
 			return 0;

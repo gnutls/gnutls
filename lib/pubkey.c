@@ -2179,7 +2179,12 @@ gnutls_pubkey_set_spki(gnutls_pubkey_t pubkey, const gnutls_x509_spki_t spki, un
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	if (!_gnutls_pk_are_compat(pubkey->params.algo, spki->pk))
+                return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	memcpy(&pubkey->params.spki, spki, sizeof(gnutls_x509_spki_st));
+
+	pubkey->params.algo = spki->pk;
 
 	return 0;
 }
