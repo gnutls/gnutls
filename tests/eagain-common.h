@@ -24,7 +24,7 @@ extern const char *side;
     { \
       fprintf(stderr, "client[%d]: %s\n", cret, gnutls_strerror(cret)); \
       fprintf(stderr, "server[%d]: %s\n", sret, gnutls_strerror(sret)); \
-      fail("%s:%d: Handshake failed\n", __func__, __LINE__); \
+      fail("Handshake failed\n"); \
       exit(1); \
     }
 
