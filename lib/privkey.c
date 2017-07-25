@@ -1610,3 +1610,55 @@ _gnutls_privkey_get_preferred_sign_algo(gnutls_privkey_t key)
 	}
 	return GNUTLS_SIGN_UNKNOWN;
 }
+
+/**
+ * gnutls_privkey_get_spki:
+ * @privkey: a public key of type #gnutls_privkey_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_privkey_spki_t
+ * @flags: must be zero
+ *
+ * This function will return the public key information if available.
+ * The provided @spki must be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_get_spki(gnutls_privkey_t privkey, gnutls_x509_spki_t spki, unsigned int flags)
+{
+	if (privkey == NULL || privkey->type != GNUTLS_PRIVKEY_X509) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	memcpy(spki, &privkey->key.x509->params.spki, sizeof(gnutls_x509_spki_st));
+
+	return 0;
+}
+
+/**
+ * gnutls_privkey_set_spki:
+ * @privkey: a public key of type #gnutls_privkey_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_privkey_spki_t
+ * @flags: must be zero
+ *
+ * This function will set the public key information.
+ * The provided @spki must be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_privkey_set_spki(gnutls_privkey_t privkey, const gnutls_x509_spki_t spki, unsigned int flags)
+{
+	if (privkey == NULL || privkey->type != GNUTLS_PRIVKEY_X509) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	return gnutls_x509_privkey_set_spki(privkey->key.x509, spki, flags);
+}

@@ -2139,3 +2139,57 @@ int gnutls_pubkey_verify_params(gnutls_pubkey_t key)
 
 	return 0;
 }
+
+/**
+ * gnutls_pubkey_get_spki:
+ * @pubkey: a public key of type #gnutls_pubkey_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_pubkey_spki_t
+ * @flags: must be zero
+ *
+ * This function will return the public key information if available.
+ * The provided @spki must be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_pubkey_get_spki(gnutls_pubkey_t pubkey, gnutls_x509_spki_t spki, unsigned int flags)
+{
+	if (pubkey == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	memcpy(spki, &pubkey->params.spki, sizeof(gnutls_x509_spki_st));
+
+	return 0;
+}
+
+/**
+ * gnutls_pubkey_set_spki:
+ * @pubkey: a public key of type #gnutls_pubkey_t
+ * @spki: a SubjectPublicKeyInfo structure of type #gnutls_pubkey_spki_t
+ * @flags: must be zero
+ *
+ * This function will set the public key information.
+ * The provided @spki must be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_pubkey_set_spki(gnutls_pubkey_t pubkey, const gnutls_x509_spki_t spki, unsigned int flags)
+{
+	if (pubkey == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	memcpy(&pubkey->params.spki, spki, sizeof(gnutls_x509_spki_st));
+
+	return 0;
+}
