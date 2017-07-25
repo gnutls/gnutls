@@ -1366,7 +1366,7 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 			goto cleanup;
 		}
 	} else {
-		memcpy(&sign_params, &params.sign,
+		memcpy(&sign_params, &params.spki,
 		       sizeof(gnutls_x509_spki_st));
 
 		sign_params.pk = se->pk;

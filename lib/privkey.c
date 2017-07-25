@@ -153,7 +153,7 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 
 	pub->algo = priv->algo;
 	pub->flags = priv->flags;
-	memcpy(&pub->sign, &priv->sign, sizeof(gnutls_x509_spki_st));
+	memcpy(&pub->spki, &priv->spki, sizeof(gnutls_x509_spki_st));
 
 	switch (pk) {
 	case GNUTLS_PK_RSA_PSS:

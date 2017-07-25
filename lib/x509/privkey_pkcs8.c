@@ -980,7 +980,7 @@ _decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
-	memcpy(&pkey->params.sign, &params, sizeof(gnutls_x509_spki_st));
+	memcpy(&pkey->params.spki, &params, sizeof(gnutls_x509_spki_st));
 
 	ret = 0;
 

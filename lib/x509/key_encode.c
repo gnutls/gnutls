@@ -173,7 +173,7 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,
 		der->size = ASN1_NULL_SIZE;
 		return 0;
 	case GNUTLS_PK_RSA_PSS:
-		return _gnutls_x509_write_rsa_pss_params(&params->sign, der);
+		return _gnutls_x509_write_rsa_pss_params(&params->spki, der);
 	case GNUTLS_PK_ECDSA:
 		return _gnutls_x509_write_ecc_params(params->flags, der);
 	case GNUTLS_PK_EDDSA_ED25519:

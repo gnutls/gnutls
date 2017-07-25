@@ -332,7 +332,7 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 	}
 	dst->palgo = src->palgo;
 
-	memcpy(&dst->sign, &src->sign, sizeof(gnutls_x509_spki_st));
+	memcpy(&dst->spki, &src->spki, sizeof(gnutls_x509_spki_st));
 
 	return 0;
 

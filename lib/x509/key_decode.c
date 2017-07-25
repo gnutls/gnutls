@@ -433,7 +433,7 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_EDDSA_ED25519:
 		return 0;
 	case GNUTLS_PK_RSA_PSS:
-		return _gnutls_x509_read_rsa_pss_params(der, dersize, &params->sign);
+		return _gnutls_x509_read_rsa_pss_params(der, dersize, &params->spki);
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_read_dsa_params(der, dersize, params);
 	case GNUTLS_PK_EC:
@@ -451,14 +451,14 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_RSA_PSS: {
 		unsigned bits = pubkey_to_bits(algo, params);
-		const mac_entry_st *me = hash_to_entry(params->sign.rsa_pss_dig);
+		const mac_entry_st *me = hash_to_entry(params->spki.rsa_pss_dig);
 		size_t hash_size;
 
 		if (unlikely(me == NULL))
 			return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
 
 		hash_size = _gnutls_hash_get_algo_len(me);
-		if (hash_size + params->sign.salt_size + 2 > (bits + 7) / 8)
+		if (hash_size + params->spki.salt_size + 2 > (bits + 7) / 8)
 			return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
 		return 0;
 	}

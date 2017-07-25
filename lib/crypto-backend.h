@@ -194,7 +194,8 @@ typedef struct {
 	unsigned int seed_size;
 	uint8_t seed[MAX_PVP_SEED_SIZE];
 	gnutls_digest_algorithm_t palgo;
-	gnutls_x509_spki_st sign;
+	/* public key information */
+	gnutls_x509_spki_st spki;
 
 	gnutls_pk_algorithm_t algo;
 } gnutls_pk_params_st;
