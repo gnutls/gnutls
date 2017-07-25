@@ -289,7 +289,7 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 		/* fallthrough */
 	case GNUTLS_PK_ECDSA:
 
-		me = _gnutls_dsa_q_to_hash(key->pk_algorithm, &key->params, NULL);
+		me = _gnutls_dsa_q_to_hash(&key->params, NULL);
 		if (hash)
 			*hash = (gnutls_digest_algorithm_t)me->id;
 
@@ -1722,8 +1722,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (pubkey->pk_algorithm == GNUTLS_PK_DSA) {
-		me = _gnutls_dsa_q_to_hash(pubkey->pk_algorithm,
-					   &pubkey->params, &hash_size);
+		me = _gnutls_dsa_q_to_hash(&pubkey->params, &hash_size);
 
 		/* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
 		if (!_gnutls_version_has_selectable_sighash(ver)) {
@@ -1745,8 +1744,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 		if (_gnutls_version_has_selectable_sighash(ver)
 		    && se != NULL) {
 
-			_gnutls_dsa_q_to_hash(pubkey->pk_algorithm,
-						   &pubkey->params,
+			_gnutls_dsa_q_to_hash(&pubkey->params,
 						   &hash_size);
 
 			me = hash_to_entry(se->hash);
@@ -1861,7 +1859,7 @@ dsa_verify_hashed_data(gnutls_pk_algorithm_t pk,
 	unsigned int hash_len;
 
 	if (algo == NULL)
-		algo = _gnutls_dsa_q_to_hash(pk, params, &hash_len);
+		algo = _gnutls_dsa_q_to_hash(params, &hash_len);
 	else
 		hash_len = _gnutls_hash_get_algo_len(algo);
 
@@ -1898,7 +1896,7 @@ dsa_verify_data(gnutls_pk_algorithm_t pk,
 	gnutls_datum_t digest;
 
 	if (algo == NULL)
-		algo = _gnutls_dsa_q_to_hash(pk, params, NULL);
+		algo = _gnutls_dsa_q_to_hash(params, NULL);
 
 	ret = _gnutls_hash_fast((gnutls_digest_algorithm_t)algo->id,
 				data->data, data->size, _digest);
@@ -2001,16 +1999,15 @@ pubkey_verify_data(gnutls_pk_algorithm_t pk,
 	}
 }
 
-const mac_entry_st *_gnutls_dsa_q_to_hash(gnutls_pk_algorithm_t algo,
-					  const gnutls_pk_params_st *
+const mac_entry_st *_gnutls_dsa_q_to_hash(const gnutls_pk_params_st *
 					  params, unsigned int *hash_len)
 {
 	int bits = 0;
 	int ret;
 
-	if (algo == GNUTLS_PK_DSA)
+	if (params->algo == GNUTLS_PK_DSA)
 		bits = _gnutls_mpi_get_nbits(params->params[1]);
-	else if (algo == GNUTLS_PK_EC)
+	else if (params->algo == GNUTLS_PK_EC)
 		bits = gnutls_ecc_curve_get_size(params->flags) * 8;
 
 	if (bits <= 160) {
