@@ -92,7 +92,7 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 		      gnutls_datum_t * signature,
 		      gnutls_x509_spki_st * params);
 
-unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params);
+unsigned pubkey_to_bits(gnutls_pk_params_st * params);
 int _gnutls_pubkey_compatible_with_sig(gnutls_session_t,
 				       gnutls_pubkey_t pubkey,
 				       const version_entry_st * ver,

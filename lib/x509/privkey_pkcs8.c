@@ -65,7 +65,7 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	int ret;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
-	switch (pkey->pk_algorithm) {
+	switch (pkey->params.algo) {
 	case GNUTLS_PK_EDDSA_ED25519:
 		/* we encode as octet string (which is going to be stored inside
 		 * another octet string). No comments. */
@@ -143,7 +143,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	gnutls_datum_t algo_params = { NULL, 0 };
 	gnutls_datum_t algo_privkey = { NULL, 0 };
 
-	oid = gnutls_pk_get_oid(pkey->pk_algorithm);
+	oid = gnutls_pk_get_oid(pkey->params.algo);
 	if (oid == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -1197,8 +1197,8 @@ decode_private_key_info(const gnutls_datum_t * der,
 	/* we only support RSA and DSA private keys.
 	 */
 
-	pkey->pk_algorithm = gnutls_oid_to_pk(oid);
-	if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
+	pkey->params.algo = gnutls_oid_to_pk(oid);
+	if (pkey->params.algo == GNUTLS_PK_UNKNOWN) {
 		gnutls_assert();
 		_gnutls_debug_log
 		    ("PKCS #8 private key OID '%s' is unsupported.\n",
@@ -1210,7 +1210,7 @@ decode_private_key_info(const gnutls_datum_t * der,
 	/* Get the DER encoding of the actual private key.
 	 */
 
-	switch(pkey->pk_algorithm) {
+	switch(pkey->params.algo) {
 		case GNUTLS_PK_RSA:
 			result = _decode_pkcs8_rsa_key(pkcs8_asn, pkey);
 			break;
@@ -1290,7 +1290,7 @@ gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 	_data.data = data->data;
 	_data.size = data->size;
 
-	key->pk_algorithm = GNUTLS_PK_UNKNOWN;
+	key->params.algo = GNUTLS_PK_UNKNOWN;
 
 	/* If the Certificate is in PEM format then decode it
 	 */
@@ -1344,7 +1344,7 @@ gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 	/* This part is necessary to get the public key on certain algorithms.
 	 * In the import above we only get the private key. */
 	result =
-	    _gnutls_pk_fixup(key->pk_algorithm, GNUTLS_IMPORT, &key->params);
+	    _gnutls_pk_fixup(key->params.algo, GNUTLS_IMPORT, &key->params);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1358,7 +1358,7 @@ gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 	return 0;
 
       cleanup:
-	key->pk_algorithm = GNUTLS_PK_UNKNOWN;
+	key->params.algo = GNUTLS_PK_UNKNOWN;
 	if (need_free)
 		_gnutls_free_datum(&_data);
 	return result;

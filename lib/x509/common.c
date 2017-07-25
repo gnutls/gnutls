@@ -1183,7 +1183,7 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
 		if (result < 0)
 			return gnutls_assert_val(result);
 
-		bits[0] = pubkey_to_bits(algo, &params);
+		bits[0] = pubkey_to_bits(&params);
 		gnutls_pk_params_release(&params);
 	}
 

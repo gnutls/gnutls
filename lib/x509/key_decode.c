@@ -450,7 +450,7 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
 {
 	switch (algo) {
 	case GNUTLS_PK_RSA_PSS: {
-		unsigned bits = pubkey_to_bits(algo, params);
+		unsigned bits = pubkey_to_bits(params);
 		const mac_entry_st *me = hash_to_entry(params->spki.rsa_pss_dig);
 		size_t hash_size;
 

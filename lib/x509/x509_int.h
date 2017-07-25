@@ -135,7 +135,6 @@ typedef struct gnutls_x509_privkey_int {
 	 */
 	gnutls_pk_params_st params;
 
-	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned expanded;
 	unsigned flags;
 

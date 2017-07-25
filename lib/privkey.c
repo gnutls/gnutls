@@ -130,7 +130,7 @@ int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key, unsigned int *bits)
 #endif
 	case GNUTLS_PRIVKEY_X509:
 		if (bits) {
-			*bits = pubkey_to_bits(key->key.x509->pk_algorithm, &key->key.x509->params);
+			*bits = pubkey_to_bits(&key->key.x509->params);
 		}
 
 		return gnutls_x509_privkey_get_pk_algorithm(key->key.x509);

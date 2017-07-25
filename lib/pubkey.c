@@ -39,9 +39,9 @@
 #include <ecc.h>
 
 
-unsigned pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params)
+unsigned pubkey_to_bits(gnutls_pk_params_st * params)
 {
-	switch (pk) {
+	switch (params->algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_mpi_get_nbits(params->params[RSA_MODULUS]);
@@ -1009,10 +1009,10 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 	/* this has already been called by get_asn_mpis() thus it cannot
 	 * fail.
 	 */
-	key->pk_algorithm = _gnutls_x509_get_pk_algorithm(spk, "", &curve, NULL);
+	key->pk_algorithm = key->params.algo = _gnutls_x509_get_pk_algorithm(spk, "", &curve, NULL);
 
 	key->params.flags = curve;
-	key->bits = pubkey_to_bits(key->pk_algorithm, &key->params);
+	key->bits = pubkey_to_bits(&key->params);
 
 	result = 0;
 
@@ -1266,8 +1266,9 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
 	}
 
 	key->params.params_nr = RSA_PUBLIC_PARAMS;
+	key->params.algo = GNUTLS_PK_RSA;
 	key->pk_algorithm = GNUTLS_PK_RSA;
-	key->bits = pubkey_to_bits(GNUTLS_PK_RSA, &key->params);
+	key->bits = pubkey_to_bits(&key->params);
 
 	return 0;
 }
@@ -1475,8 +1476,8 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 	}
 
 	key->params.params_nr = DSA_PUBLIC_PARAMS;
-	key->pk_algorithm = GNUTLS_PK_DSA;
-	key->bits = pubkey_to_bits(GNUTLS_PK_DSA, &key->params);
+	key->pk_algorithm = key->params.algo = GNUTLS_PK_DSA;
+	key->bits = pubkey_to_bits(&key->params);
 
 	return 0;
 
