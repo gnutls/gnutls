@@ -1718,6 +1718,11 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 	unsigned int hash_size = 0;
 	unsigned int sig_hash_size;
 	const mac_entry_st *me;
+	const gnutls_sign_entry_st *se;
+
+	se = _gnutls_sign_to_entry(sign);
+	if (se == NULL && _gnutls_version_has_selectable_sighash(ver))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (pubkey->pk_algorithm == GNUTLS_PK_DSA) {
 		me = _gnutls_dsa_q_to_hash(pubkey->pk_algorithm,
@@ -1729,9 +1734,8 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 				return
 				    gnutls_assert_val
 				    (GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
-		} else if (sign != GNUTLS_SIGN_UNKNOWN) {
-			me = hash_to_entry(gnutls_sign_get_hash_algorithm
-					  (sign));
+		} else if (se != NULL) {
+			me = hash_to_entry(se->hash);
 			sig_hash_size = _gnutls_hash_get_algo_len(me);
 			if (sig_hash_size < hash_size)
 				_gnutls_audit_log(session,
@@ -1742,13 +1746,13 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 
 	} else if (pubkey->pk_algorithm == GNUTLS_PK_EC) {
 		if (_gnutls_version_has_selectable_sighash(ver)
-		    && sign != GNUTLS_SIGN_UNKNOWN) {
+		    && se != NULL) {
+
 			_gnutls_dsa_q_to_hash(pubkey->pk_algorithm,
 						   &pubkey->params,
 						   &hash_size);
 
-			me = hash_to_entry(gnutls_sign_get_hash_algorithm
-					  (sign));
+			me = hash_to_entry(se->hash);
 			sig_hash_size = _gnutls_hash_get_algo_len(me);
 
 			if (sig_hash_size < hash_size)
@@ -1758,6 +1762,16 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 						  hash_size);
 		}
 
+	} else if (pubkey->pk_algorithm == GNUTLS_PK_RSA_PSS) {
+		if (!_gnutls_version_has_selectable_sighash(ver))
+			/* this should not have happened */
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		/* RSA PSS public keys are restricted to a single digest, i.e., signature */
+
+		if (pubkey->params.spki.rsa_pss_dig && pubkey->params.spki.rsa_pss_dig != se->hash) {
+			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
+		}
 	}
 
 	return 0;
