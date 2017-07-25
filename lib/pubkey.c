@@ -74,7 +74,7 @@ int gnutls_pubkey_get_pk_algorithm(gnutls_pubkey_t key, unsigned int *bits)
 	if (bits)
 		*bits = key->bits;
 
-	return key->pk_algorithm;
+	return key->params.algo;
 }
 
 /**
@@ -160,8 +160,7 @@ gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
 	gnutls_pk_params_release(&key->params);
 	/* params initialized in _gnutls_x509_crt_get_mpis */
 
-	key->pk_algorithm =
-	    gnutls_x509_crt_get_pk_algorithm(crt, &key->bits);
+	key->params.algo = gnutls_x509_crt_get_pk_algorithm(crt, &key->bits);
 
 	ret = gnutls_x509_crt_get_key_usage(crt, &key->key_usage, NULL);
 	if (ret < 0)
@@ -199,8 +198,7 @@ gnutls_pubkey_import_x509_crq(gnutls_pubkey_t key, gnutls_x509_crq_t crq,
 	gnutls_pk_params_release(&key->params);
 	/* params initialized in _gnutls_x509_crq_get_mpis */
 
-	key->pk_algorithm =
-	    gnutls_x509_crq_get_pk_algorithm(crq, &key->bits);
+	key->params.algo = gnutls_x509_crq_get_pk_algorithm(crq, &key->bits);
 
 	ret = gnutls_x509_crq_get_key_usage(crq, &key->key_usage, NULL);
 	if (ret < 0)
@@ -240,10 +238,8 @@ gnutls_pubkey_import_privkey(gnutls_pubkey_t key, gnutls_privkey_t pkey,
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	key->pk_algorithm =
-	    gnutls_privkey_get_pk_algorithm(pkey, &key->bits);
-
 	key->key_usage = usage;
+	key->params.algo = gnutls_privkey_get_pk_algorithm(pkey, &key->bits);
 
 	return _gnutls_privkey_get_public_mpis(pkey, &key->params);
 }
@@ -282,7 +278,7 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 	if (mand)
 		*mand = 0;
 
-	switch (key->pk_algorithm) {
+	switch (key->params.algo) {
 	case GNUTLS_PK_DSA:
 		if (mand)
 			*mand = 1;
@@ -619,7 +615,7 @@ gnutls_pubkey_export_rsa_raw2(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (!GNUTLS_PK_IS_RSA(key->pk_algorithm)) {
+	if (!GNUTLS_PK_IS_RSA(key->params.algo)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -730,7 +726,7 @@ gnutls_pubkey_export_dsa_raw2(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (key->pk_algorithm != GNUTLS_PK_DSA) {
+	if (key->params.algo != GNUTLS_PK_DSA) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -841,7 +837,7 @@ gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (!IS_EC(key->pk_algorithm)) {
+	if (!IS_EC(key->params.algo)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -849,7 +845,7 @@ gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
 	if (curve)
 		*curve = key->params.flags;
 
-	if (key->pk_algorithm == GNUTLS_PK_EDDSA_ED25519) {
+	if (key->params.algo == GNUTLS_PK_EDDSA_ED25519) {
 		if (x) {
 			ret = _gnutls_set_datum(x, key->params.raw_pub.data, key->params.raw_pub.size);
 			if (ret < 0)
@@ -907,7 +903,7 @@ int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
 	int ret;
 	gnutls_datum_t raw_point = {NULL,0};
 
-	if (key == NULL || key->pk_algorithm != GNUTLS_PK_EC)
+	if (key == NULL || key->params.algo != GNUTLS_PK_EC)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	ret = _gnutls_x509_write_ecc_pubkey(&key->params, &raw_point);
@@ -1009,7 +1005,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 	/* this has already been called by get_asn_mpis() thus it cannot
 	 * fail.
 	 */
-	key->pk_algorithm = key->params.algo = _gnutls_x509_get_pk_algorithm(spk, "", &curve, NULL);
+	key->params.algo = _gnutls_x509_get_pk_algorithm(spk, "", &curve, NULL);
 
 	key->params.flags = curve;
 	key->bits = pubkey_to_bits(&key->params);
@@ -1267,7 +1263,6 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
 
 	key->params.params_nr = RSA_PUBLIC_PARAMS;
 	key->params.algo = GNUTLS_PK_RSA;
-	key->pk_algorithm = GNUTLS_PK_RSA;
 	key->bits = pubkey_to_bits(&key->params);
 
 	return 0;
@@ -1312,7 +1307,7 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 			goto cleanup;
 		}
 
-		key->pk_algorithm = GNUTLS_PK_EDDSA_ED25519;
+		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
 		key->params.flags = curve;
 
 		return 0;
@@ -1336,7 +1331,7 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 	key->params.params_nr++;
-	key->pk_algorithm = GNUTLS_PK_ECDSA;
+	key->params.algo = GNUTLS_PK_ECDSA;
 
 	return 0;
 
@@ -1400,7 +1395,7 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 	key->params.params_nr += 2;
-	key->pk_algorithm = GNUTLS_PK_EC;
+	key->params.algo = GNUTLS_PK_EC;
 
 	gnutls_free(raw_point.data);
 	return 0;
@@ -1476,7 +1471,7 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 	}
 
 	key->params.params_nr = DSA_PUBLIC_PARAMS;
-	key->pk_algorithm = key->params.algo = GNUTLS_PK_DSA;
+	key->params.algo = GNUTLS_PK_DSA;
 	key->bits = pubkey_to_bits(&key->params);
 
 	return 0;
@@ -1491,10 +1486,10 @@ int set_rsa_pss_params(gnutls_pubkey_t pubkey, const gnutls_sign_entry_st *se,
 {
 	unsigned bits;
 
-	if (se->pk != pubkey->pk_algorithm) {
-		if (!gnutls_sign_supports_pk_algorithm(se->pk, pubkey->pk_algorithm)) {
+	if (se->pk != pubkey->params.algo) {
+		if (!gnutls_sign_supports_pk_algorithm(se->pk, pubkey->params.algo)) {
 			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
-					gnutls_pk_get_name(pubkey->pk_algorithm), pubkey->pk_algorithm,
+					gnutls_pk_get_name(pubkey->params.algo), pubkey->params.algo,
 					se->name, se->id);
 			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 		}
@@ -1502,13 +1497,13 @@ int set_rsa_pss_params(gnutls_pubkey_t pubkey, const gnutls_sign_entry_st *se,
 
 	if (params->pk == GNUTLS_PK_RSA_PSS) {
 
-		if (!GNUTLS_PK_IS_RSA(pubkey->pk_algorithm))
+		if (!GNUTLS_PK_IS_RSA(pubkey->params.algo))
 			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 
 		/* The requested sign algorithm is RSA-PSS, while the
 		 * pubkey doesn't include parameter information. Fill
 		 * it with the same way as gnutls_privkey_sign*. */
-		if (pubkey->pk_algorithm == GNUTLS_PK_RSA || params->rsa_pss_dig == 0) {
+		if (pubkey->params.algo == GNUTLS_PK_RSA || params->rsa_pss_dig == 0) {
 			gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
 			params->rsa_pss_dig = se->hash;
 			params->salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
@@ -1626,21 +1621,21 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (_gnutls_pk_is_not_prehashed(key->pk_algorithm)) {
+	if (_gnutls_pk_is_not_prehashed(key->params.algo)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	memcpy(&params, &key->params.spki, sizeof(gnutls_x509_spki_st));
 
 	if (flags & OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA || flags & GNUTLS_VERIFY_USE_TLS1_RSA) {
-		if (!GNUTLS_PK_IS_RSA(key->pk_algorithm))
+		if (!GNUTLS_PK_IS_RSA(key->params.algo))
 			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 		params.pk = GNUTLS_PK_RSA;
 		/* we do not check for insecure algorithms with this flag */
 		return _gnutls_pk_verify(params.pk, hash, signature,
 					 &key->params, &params);
 	} else if (algo == GNUTLS_SIGN_UNKNOWN) {
-		params.pk = key->pk_algorithm;
+		params.pk = key->params.algo;
 		me = NULL;
 	} else {
 		se = _gnutls_sign_to_entry(algo);
@@ -1700,7 +1695,7 @@ gnutls_pubkey_encrypt_data(gnutls_pubkey_t key, unsigned int flags,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_pk_encrypt(key->pk_algorithm, ciphertext,
+	return _gnutls_pk_encrypt(key->params.algo, ciphertext,
 				  plaintext, &key->params);
 }
 
@@ -1722,7 +1717,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 	if (se == NULL && _gnutls_version_has_selectable_sighash(ver))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (pubkey->pk_algorithm == GNUTLS_PK_DSA) {
+	if (pubkey->params.algo == GNUTLS_PK_DSA) {
 		me = _gnutls_dsa_q_to_hash(&pubkey->params, &hash_size);
 
 		/* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
@@ -1741,7 +1736,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 						  hash_size);
 		}
 
-	} else if (pubkey->pk_algorithm == GNUTLS_PK_EC) {
+	} else if (pubkey->params.algo == GNUTLS_PK_EC) {
 		if (_gnutls_version_has_selectable_sighash(ver)
 		    && se != NULL) {
 
@@ -1758,7 +1753,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 						  hash_size);
 		}
 
-	} else if (pubkey->pk_algorithm == GNUTLS_PK_RSA_PSS) {
+	} else if (pubkey->params.algo == GNUTLS_PK_RSA_PSS) {
 		if (!_gnutls_version_has_selectable_sighash(ver))
 			/* this should not have happened */
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -2126,7 +2121,7 @@ int gnutls_pubkey_verify_params(gnutls_pubkey_t key)
 {
 	int ret;
 
-	ret = _gnutls_pk_verify_pub_params(key->pk_algorithm, &key->params);
+	ret = _gnutls_pk_verify_pub_params(key->params.algo, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

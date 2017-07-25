@@ -48,7 +48,6 @@ struct gnutls_privkey_st {
 };
 
 struct gnutls_pubkey_st {
-	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int bits;	/* an indication of the security parameter */
 
 	/* the size of params depends on the public

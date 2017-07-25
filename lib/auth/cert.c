@@ -1421,7 +1421,7 @@ unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
 				     gnutls_certificate_type_t cert_type,
 				     const gnutls_cipher_suite_entry_st *cs)
 {
-	unsigned pk = pubkey->pk_algorithm;
+	unsigned pk = pubkey->params.algo;
 	unsigned key_usage;
 
 	if (session->security_parameters.cert_type != cert_type) {
@@ -1483,7 +1483,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 				return gnutls_assert_val(ret);
 
 			_gnutls_debug_log("Selected (%s) cert\n",
-					  gnutls_pk_get_name(session->internals.selected_cert_list[0].pubkey->pk_algorithm));
+					  gnutls_pk_get_name(session->internals.selected_cert_list[0].pubkey->params.algo));
 		}
 
 		if (!pubkey_is_compat_with_cs(session,
@@ -1522,7 +1522,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 							     cs)) {
 					idx = i;
 					_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
-						  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->pk_algorithm),
+						  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->params.algo),
 						  (unsigned)cs->id[0],
 						  (unsigned)cs->id[1],
 						  cs->name);
@@ -1537,7 +1537,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 		_gnutls_handshake_log
 		    ("HSK[%p]: checking compat of %s with certificate[%d] (%s/%s)\n",
 		     session, cs->name, i,
-		     gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->pk_algorithm),
+		     gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->params.algo),
 		     gnutls_certificate_type_get_name(cred->certs
 						      [i].cert_list
 						      [0].type));
@@ -1548,7 +1548,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 					     cs)) {
 			idx = i;
 			_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
-					  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->pk_algorithm),
+					  gnutls_pk_get_name(cred->certs[i].cert_list[0].pubkey->params.algo),
 					  (unsigned)cs->id[0],
 					  (unsigned)cs->id[1],
 					  cs->name);
