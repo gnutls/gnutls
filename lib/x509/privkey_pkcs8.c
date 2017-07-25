@@ -1142,7 +1142,7 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	pkey->params.params_nr = DSA_PRIVATE_PARAMS;
 
 	ret =
-	    _gnutls_asn1_encode_privkey(GNUTLS_PK_DSA, &pkey->key,
+	    _gnutls_asn1_encode_privkey(&pkey->key,
 					&pkey->params, pkey->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
 		gnutls_assert();

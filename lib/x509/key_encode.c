@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
- * Copyright (C) 2013 Red Hat
+ * Copyright (C) 2013-2017 Red Hat
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -842,10 +842,10 @@ cleanup:
 	return ret;
 }
 
-int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
+int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 				gnutls_pk_params_st * params, unsigned compat)
 {
-	switch (pk) {
+	switch (params->algo) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_asn1_encode_rsa(c2, params, compat);

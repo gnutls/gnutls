@@ -113,7 +113,7 @@ gnutls_x509_privkey_cpy(gnutls_x509_privkey_t dst,
 	}
 
 	ret =
-	    _gnutls_asn1_encode_privkey(dst->pk_algorithm, &dst->key,
+	    _gnutls_asn1_encode_privkey(&dst->key,
 					&dst->params, src->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
 		gnutls_assert();
@@ -974,6 +974,8 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 		key->params.params_nr++;
 	}
 
+	key->params.algo = GNUTLS_PK_RSA;
+
 	ret = _gnutls_pk_fixup(GNUTLS_PK_RSA, GNUTLS_IMPORT, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -981,7 +983,7 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 	}
 
 	ret =
-	    _gnutls_asn1_encode_privkey(GNUTLS_PK_RSA, &key->key,
+	    _gnutls_asn1_encode_privkey(&key->key,
 					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1077,17 +1079,16 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
+	key->params.algo = GNUTLS_PK_DSA;
+	key->params.params_nr = DSA_PRIVATE_PARAMS;
+
 	ret =
-	    _gnutls_asn1_encode_privkey(GNUTLS_PK_DSA, &key->key,
+	    _gnutls_asn1_encode_privkey(&key->key,
 					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	key->params.params_nr = DSA_PRIVATE_PARAMS;
-	key->pk_algorithm = GNUTLS_PK_DSA;
-	key->params.algo = key->pk_algorithm;
 
 	return 0;
 
@@ -1642,6 +1643,8 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		key->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
 	}
 
+	key->params.algo = algo;
+
 	ret = _gnutls_pk_generate_params(algo, bits, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1684,12 +1687,11 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
-	ret = _gnutls_asn1_encode_privkey(algo, &key->key, &key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+	ret = _gnutls_asn1_encode_privkey(&key->key, &key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-	key->pk_algorithm = algo;
 
 	return 0;
 
@@ -2129,7 +2131,7 @@ int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
 	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 
 	ret =
-	    _gnutls_asn1_encode_privkey(key->pk_algorithm, &key->key,
+	    _gnutls_asn1_encode_privkey(&key->key,
 					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
 	if (ret < 0) {
 		gnutls_assert();

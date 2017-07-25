@@ -254,7 +254,7 @@ int
 _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 			     unsigned int *curve);
 
-int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
+int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 				gnutls_pk_params_st * params, unsigned compat);
 
 int _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
