@@ -1115,13 +1115,28 @@ static void update_signed_certificate(common_info_st * cinfo)
 static
 void sign_params_to_flags(common_info_st *cinfo, const char *params)
 {
-	if (strcasecmp(params, "rsa-pss") == 0) {
-		cinfo->rsa_pss_sign = 1;
-		return;
+	char *p, *sp;
+
+	sp = strdup(params);
+	if (sp == NULL) {
+		fprintf(stderr, "memory error\n");
+		app_exit(1);
 	}
 
-	fprintf(stderr, "Unknown signature parameters: %s\n", params);
-	app_exit(1);
+	p = strtok(sp, ",");
+
+	while(p != NULL) {
+		if (strcasecmp(p, "rsa-pss")==0) {
+			cinfo->rsa_pss_sign = 1;
+		} else {
+			fprintf(stderr, "Unknown signature parameter: %s\n", p);
+			app_exit(1);
+		}
+
+		p=strtok(NULL, ",");
+	}
+
+	free(sp);
 }
 
 static void figure_key_type(const char *key_type)
