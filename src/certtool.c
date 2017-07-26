@@ -135,6 +135,8 @@ generate_private_key_int(common_info_st * cinfo)
 	int ret, key_type, bits;
 	unsigned provable = cinfo->provable;
 	unsigned flags = 0;
+	gnutls_keygen_data_st kdata[8];
+	unsigned kdata_size = 0;
 
 	key_type = req_key_type;
 
@@ -188,12 +190,15 @@ generate_private_key_int(common_info_st * cinfo)
 		}
 	}
 
-	if (cinfo->seed_size > 0) {
-		gnutls_keygen_data_st data;
+	if (HAVE_OPT(SALT_SIZE)) {
+		kdata[kdata_size].type = GNUTLS_KEYGEN_RSA_PSS_SALT_SIZE;
+		kdata[kdata_size++].size = OPT_VALUE_SALT_SIZE;
+	}
 
-		data.type = GNUTLS_KEYGEN_SEED;
-		data.data = (void*)cinfo->seed;
-		data.size = cinfo->seed_size;
+	if (cinfo->seed_size > 0) {
+		kdata[kdata_size].type = GNUTLS_KEYGEN_SEED;
+		kdata[kdata_size].data = (void*)cinfo->seed;
+		kdata[kdata_size++].size = cinfo->seed_size;
 
 		if (GNUTLS_PK_IS_RSA(key_type)) {
 			if ((bits == 3072 && cinfo->seed_size != 32) || (bits == 2048 && cinfo->seed_size != 28)) {
@@ -205,17 +210,19 @@ generate_private_key_int(common_info_st * cinfo)
 			}
 		}
 
-		ret = gnutls_x509_privkey_generate2(key, key_type, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
-	} else {
-		gnutls_keygen_data_st data;
-
-		data.type = GNUTLS_KEYGEN_DIGEST;
-		data.size = default_dig;
-
-		if (provable)
-			flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
-		ret = gnutls_x509_privkey_generate2(key, key_type, bits, flags, &data, 1);
+		flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
 	}
+
+	if (default_dig) {
+		kdata[kdata_size].type = GNUTLS_KEYGEN_RSA_PSS_DIGEST;
+		kdata[kdata_size++].size = default_dig;
+
+	}
+
+	if (provable)
+		flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
+
+	ret = gnutls_x509_privkey_generate2(key, key_type, bits, flags, kdata, kdata_size);
 	if (ret < 0) {
 		fprintf(stderr, "privkey_generate: %s\n",
 			gnutls_strerror(ret));

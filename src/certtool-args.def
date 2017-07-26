@@ -181,7 +181,9 @@ flag = {
     name      = generate-privkey;
     value     = p;
     descrip   = "Generate a private key";
-    doc = "";
+    doc = "When generating RSA-PSS private keys, the --hash option will
+restrict the allowed hash for the key; in the same keys the --salt-size
+option is also acceptable.";
 };
 
 flag = {
@@ -561,6 +563,13 @@ flag = {
     arg-type  = string;
     descrip   = "Hash algorithm to use for signing";
     doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.";
+};
+
+flag = {
+    name      = salt-size;
+    arg-type  = number;
+    descrip   = "Specify the RSA-PSS key default salt size";
+    doc = "Typical keys shouldn't set or restrict this option.";
 };
 
 flag = {
