@@ -292,6 +292,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	int vers;
 	unsigned int usage = 0, server, ask;
 	gnutls_x509_crq_t crq;	/* request */
+	unsigned pk;
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0) {
@@ -359,6 +360,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		}
 		gnutls_pubkey_deinit(pubkey);
 	} else {
+
 		result = gnutls_x509_crt_set_crq(crt, crq);
 		if (result < 0) {
 			fprintf(stderr, "set_crq: %s\n",
@@ -369,6 +371,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		crq_extensions_set(crt, crq);
 	}
 
+	pk = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
 
 	{
 		size_t serial_size;
@@ -516,11 +519,6 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		}
 
 		if (!ca_status || server) {
-			int pk;
-
-
-			pk = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
-
 			if (pk == GNUTLS_PK_RSA) {	/* DSA and ECDSA keys can only sign. */
 				result = get_sign_status(server);
 				if (result)
@@ -691,9 +689,9 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		app_exit(1);
 	}
 
-	/* Algorithm restriction.
+	/* Set algorithm parameter restriction in CAs.
 	 */
-	if (req_key_type == GNUTLS_PK_RSA_PSS) {
+	if (pk == GNUTLS_PK_RSA_PSS && ca_status && key) {
 		gnutls_x509_spki_t spki;
 
 		result = gnutls_x509_spki_init(&spki);
@@ -703,16 +701,17 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			app_exit(1);
 		}
 
-		gnutls_x509_spki_set_pk_algorithm(spki, GNUTLS_PK_RSA_PSS);
-		gnutls_x509_spki_set_digest_algorithm(spki, get_dig(crt));
-
-		result = gnutls_x509_crt_set_spki(crt, spki, 0);
-		gnutls_x509_spki_deinit(spki);
-		if (result < 0) {
-			fprintf(stderr, "error setting signing algorithm: %s\n",
-				gnutls_strerror(result));
-			app_exit(1);
+		result = gnutls_privkey_get_spki(key, spki, 0);
+		if (result >= 0) {
+			result = gnutls_x509_crt_set_spki(crt, spki, 0);
+			if (result < 0) {
+				fprintf(stderr, "error setting RSA-PSS SPKI information: %s\n",
+					gnutls_strerror(result));
+				app_exit(1);
+			}
 		}
+
+		gnutls_x509_spki_deinit(spki);
 	}
 
 	*ret_key = key;
