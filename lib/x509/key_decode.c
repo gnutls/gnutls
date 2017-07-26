@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
- * Copyright (C) 2013 Red Hat
+ * Copyright (C) 2013-2017 Red Hat
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -251,7 +251,7 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	gnutls_digest_algorithm_t digest;
-	char oid[MAX_OID_SIZE];
+	char oid[MAX_OID_SIZE] = "";
 	int size;
 	unsigned int trailer;
 	gnutls_datum_t value = { NULL, 0 };
@@ -285,6 +285,13 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 		goto cleanup;
 	}
 
+	if (digest == GNUTLS_DIG_UNKNOWN) {
+		gnutls_assert();
+		_gnutls_debug_log("Unknown RSA-PSS hash: %s\n", oid);
+		result = GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
+		goto cleanup;
+	}
+
 	size = sizeof(oid);
 	result = asn1_read_value(spk, "maskGenAlgorithm.algorithm", oid, &size);
 	if (result == ASN1_SUCCESS) {
@@ -293,7 +300,8 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 		/* Error out if algorithm other than mgf1 is specified */
 		if (strcmp(oid, PKIX1_RSA_PSS_MGF1_OID) != 0) {
 			gnutls_assert();
-			result = GNUTLS_E_INVALID_REQUEST;
+			_gnutls_debug_log("Unknown mask algorithm: %s\n", oid);
+			result = GNUTLS_E_UNKNOWN_ALGORITHM;
 			goto cleanup;
 		}
 
@@ -335,7 +343,7 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 
 		if (digest != digest2) {
 			gnutls_assert();
-			result = GNUTLS_E_INVALID_REQUEST;
+			result = GNUTLS_E_CONSTRAINT_ERROR;
 			goto cleanup;
 		}
 	} else if (result != ASN1_ELEMENT_NOT_FOUND) {
