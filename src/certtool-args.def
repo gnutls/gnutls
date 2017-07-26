@@ -18,6 +18,27 @@ explain       = "";
 #define  VERBOSE_OPT 1
 #include args-std.def
 
+//----------------------------------------
+flag = {
+    name = cert_options;
+    documentation;
+    descrip = "Certificate related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = certificate-info;
+    value     = i;
+    descrip   = "Print information on the given certificate";
+    doc       = "";
+};
+
+flag = {
+    name      = pubkey-info;
+    descrip   = "Print information on a public key";
+    doc = "The option combined with --load-request, --load-pubkey, --load-privkey and --load-certificate will extract the public key of the object in question.";
+};
+
 flag = {
     name      = generate-self-signed;
     value     = s;
@@ -39,12 +60,6 @@ flag = {
 };
 
 flag = {
-    name      = generate-crl;
-    descrip   = "Generate a CRL";
-    doc = "This option generates a Certificate Revocation List. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).";
-};
-
-flag = {
     name      = update-certificate;
     value     = u;
     descrip   = "Update a signed certificate";
@@ -52,9 +67,155 @@ flag = {
 };
 
 flag = {
+    name      = fingerprint;
+    descrip   = "Print the fingerprint of the given certificate";
+    doc       = "This is a simple hash of the DER encoding of the certificate. It can be combined with the --hash parameter. However, it is recommended for identification to use the key-id which depends only on the certificate's key.";
+};
+
+flag = {
+    name      = key-id;
+    descrip   = "Print the key ID of the given certificate";
+    doc       = "This is a hash of the public key of the given certificate. It identifies the key uniquely, remains the same on a certificate renewal and depends only on signed fields of the certificate.";
+};
+
+flag = {
+    name      = certificate-pubkey;
+    descrip   = "Print certificate's public key";
+    doc       = "";
+};
+
+flag = {
+    name      = v1;
+    descrip   = "Generate an X.509 version 1 certificate (with no extensions)";
+    doc = "";
+};
+
+flag = {
+    name      = sign-params;
+    arg-type  = string;
+    descrip   = "Sign a certificate with a specific signature algorithm";
+    doc = "This option can be combined with --generate-certificate, to sign the certificate with
+a specific signature algorithm variant. The only option supported is
+'RSA-PSS', and should be specified when the signer does not have a certificate which is marked for RSA-PSS use only.";
+};
+
+
+//----------------------------------------
+flag = {
+    name = crq_options;
+    documentation;
+    descrip = "Certificate request related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = crq-info;
+    descrip   = "Print information on the given certificate request";
+    doc       = "";
+};
+
+flag = {
+    name      = generate-request;
+    value     = q;
+    descrip   = "Generate a PKCS #10 certificate request";
+    flags_cant = infile;
+    doc = "Will generate a PKCS #10 certificate request. To specify a private key use --load-privkey.";
+};
+
+flag = {
+    name      = no-crq-extensions;
+    descrip   = "Do not use extensions in certificate requests";
+    doc       = "";
+};
+
+//----------------------------------------
+flag = {
+    name = pkcs12_options;
+    documentation;
+    descrip = "PKCS#12 file related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = p12-info;
+    descrip   = "Print information on a PKCS #12 structure";
+    doc       = "This option will dump the contents and print the metadata of the provided PKCS #12 structure.";
+};
+
+flag = {
+    name      = p12-name;
+    arg-type  = string;
+    descrip   = "The PKCS #12 friendly name to use";
+    doc = "The name to be used for the primary certificate and private key in a PKCS #12 file.";
+};
+
+flag = {
+    name      = to-p12;
+    descrip   = "Generate a PKCS #12 structure";
+    doc = "It requires a certificate, a private key and possibly a CA certificate to be specified.";
+};
+
+
+//----------------------------------------
+flag = {
+    name = key_options;
+    documentation;
+    descrip = "Private key related options";
+};
+//----------------------------------------
+
+flag = {
+    name      = key-info;
+    value     = k;
+    descrip   = "Print information on a private key";
+    doc = "";
+};
+
+flag = {
+    name      = p8-info;
+    descrip   = "Print information on a PKCS #8 structure";
+    doc       = "This option will print information about encrypted PKCS #8 structures. That option does not require the decryption of the structure.";
+};
+
+flag = {
     name      = generate-privkey;
     value     = p;
     descrip   = "Generate a private key";
+    doc = "";
+};
+
+flag = {
+    name      = bits;
+    arg-type  = number;
+    descrip   = "Specify the number of bits for key generation";
+    doc      = "";
+};
+
+flag = {
+    name      = curve;
+    arg-type  = string;
+    descrip   = "Specify the curve used for EC key generation";
+    doc      = "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.";
+};
+
+flag = {
+    name      = sec-param;
+    arg-type  = string;
+    arg-name  = "Security parameter";
+    descrip   = "Specify the security level [low, legacy, medium, high, ultra]";
+    doc      = "This is alternative to the bits option.";
+};
+
+flag = {
+    name      = to-p8;
+    descrip   = "Convert a given key to a PKCS #8 structure";
+    doc = "This needs to be combined with --load-privkey.";
+};
+
+flag = {
+    name      = pkcs8;
+    value     = 8;
+    descrip   = "Use PKCS #8 format for private keys";
     doc = "";
 };
 
@@ -77,13 +238,44 @@ flag = {
     doc = "";
 };
 
+
+//----------------------------------------
 flag = {
-    name      = generate-request;
-    value     = q;
-    descrip   = "Generate a PKCS #10 certificate request";
-    flags_cant = infile;
-    doc = "Will generate a PKCS #10 certificate request. To specify a private key use --load-privkey.";
+    name = crl_options;
+    documentation;
+    descrip = "CRL related options";
 };
+//----------------------------------------
+
+flag = {
+    name      = crl-info;
+    value     = l;
+    descrip   = "Print information on the given CRL structure";
+    doc       = "";
+};
+
+
+flag = {
+    name      = generate-crl;
+    descrip   = "Generate a CRL";
+    doc = "This option generates a Certificate Revocation List. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).";
+};
+
+
+flag = {
+    name      = verify-crl;
+    descrip   = "Verify a Certificate Revocation List using a trusted list";
+    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
+    flags-must = load-ca-certificate;
+};
+
+//----------------------------------------
+flag = {
+    name = cert_verify_options;
+    documentation;
+    descrip = "Certificate verification related options";
+};
+//----------------------------------------
 
 flag = {
     name      = verify-chain;
@@ -102,13 +294,6 @@ flag = {
 certificate list is provided, then the system's trusted certificate list is used. Note that
 during verification multiple paths may be explored. On a successful verification
 the successful path will be the last one. It can be combined with --verify-purpose or --verify-hostname.";
-};
-
-flag = {
-    name      = verify-crl;
-    descrip   = "Verify a Certificate Revocation List using a trusted list";
-    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
-    flags-must = load-ca-certificate;
 };
 
 flag = {
@@ -139,6 +324,85 @@ flag = {
     doc = "This can be combined with --p7-verify, --verify or --verify-chain.";
 };
 
+//----------------------------------------
+flag = {
+    name = pkcs7_options;
+    documentation;
+    descrip = "PKCS#7 structure options";
+};
+//----------------------------------------
+
+flag = {
+    name      = p7-generate;
+    descrip   = "Generate a PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 certificate container structure. To add certificates in the structure use --load-certificate and --load-crl.";
+};
+
+flag = {
+    name      = p7-sign;
+    descrip   = "Signs using a PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The data are stored within the structure. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
+};
+
+
+flag = {
+    name      = p7-detached-sign;
+    descrip   = "Signs using a detached PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
+};
+
+flag = {
+    name      = p7-include-cert;
+    disable   = "no";
+    enabled;
+    descrip   = "The signer's certificate will be included in the cert list.";
+    doc       = "This options works with --p7-sign or --p7-detached-sign and will include or exclude the signer's certificate into the generated signature.";
+};
+
+flag = {
+    name      = p7-time;
+    disable   = "no";
+    disabled;
+    descrip   = "Will include a timestamp in the PKCS #7 structure";
+    doc       = "This option will include a timestamp in the generated signature";
+};
+
+flag = {
+    name      = p7-show-data;
+    disable   = "no";
+    disabled;
+    descrip   = "Will show the embedded data in the PKCS #7 structure";
+    doc       = "This option can be combined with --p7-verify or --p7-info and will display the embedded signed data in the PKCS #7 structure.";
+};
+
+flag = {
+    name      = p7-info;
+    descrip   = "Print information on a PKCS #7 structure";
+    doc       = "";
+};
+
+flag = {
+    name      = p7-verify;
+    descrip   = "Verify the provided PKCS #7 structure";
+    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. When no certificate list is provided, then the system's certificate list is used. Alternatively a direct signer can be provided using --load-certificate. A key purpose can be enforced with the --verify-purpose option, and the --load-data option will utilize detached data.";
+};
+
+flag = {
+    name      = smime-to-p7;
+    descrip   = "Convert S/MIME to PKCS #7 structure";
+    doc       = "";
+};
+
+
+
+//----------------------------------------
+flag = {
+    name = other_options;
+    documentation;
+    descrip = "Other options";
+};
+//----------------------------------------
+
 flag = {
     name      = generate-dh-params;
     descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
@@ -146,14 +410,17 @@ flag = {
 Diffie-Hellman key exchange. The output parameters will be in PKCS #3
 format. Note that it is recommended to use the --get-dh-params option
 instead.";
+    deprecated;
 };
 
 flag = {
     name      = get-dh-params;
-    descrip   = "Get the included PKCS #3 encoded Diffie-Hellman parameters";
+    descrip   = "List the included PKCS #3 encoded Diffie-Hellman parameters";
     doc = "Returns stored DH parameters in GnuTLS. Those parameters returned
 are defined in RFC7919, and can be considered standard parameters for a TLS
-key exchange.";
+key exchange. This option is provided for old applications which require
+DH parameters to be specified; modern GnuTLS applications should not require
+them.";
 };
 
 flag = {
@@ -251,173 +518,11 @@ flag = {
 };
 
 flag = {
-    name      = certificate-info;
-    value     = i;
-    descrip   = "Print information on the given certificate";
-    doc       = "";
-};
-
-flag = {
-    name      = fingerprint;
-    descrip   = "Print the fingerprint of the given certificate";
-    doc       = "This is a simple hash of the DER encoding of the certificate. It can be combined with the --hash parameter. However, it is recommended for identification to use the key-id which depends only on the certificate's key.";
-};
-
-flag = {
-    name      = key-id;
-    descrip   = "Print the key ID of the given certificate";
-    doc       = "This is a hash of the public key of the given certificate. It identifies the key uniquely, remains the same on a certificate renewal and depends only on signed fields of the certificate.";
-};
-
-flag = {
-    name      = certificate-pubkey;
-    descrip   = "Print certificate's public key";
-    doc       = "";
-};
-
-flag = {
-    name      = crl-info;
-    value     = l;
-    descrip   = "Print information on the given CRL structure";
-    doc       = "";
-};
-
-flag = {
-    name      = crq-info;
-    descrip   = "Print information on the given certificate request";
-    doc       = "";
-};
-
-
-flag = {
-    name      = no-crq-extensions;
-    descrip   = "Do not use extensions in certificate requests";
-    doc       = "";
-};
-
-flag = {
-    name      = p12-info;
-    descrip   = "Print information on a PKCS #12 structure";
-    doc       = "This option will dump the contents and print the metadata of the provided PKCS #12 structure.";
-};
-
-flag = {
-    name      = p12-name;
-    arg-type  = string;
-    descrip   = "The PKCS #12 friendly name to use";
-    doc = "The name to be used for the primary certificate and private key in a PKCS #12 file.";
-};
-
-flag = {
-    name      = p7-generate;
-    descrip   = "Generate a PKCS #7 structure";
-    doc       = "This option generates a PKCS #7 certificate container structure. To add certificates in the structure use --load-certificate and --load-crl.";
-};
-
-flag = {
-    name      = p7-sign;
-    descrip   = "Signs using a PKCS #7 structure";
-    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The data are stored within the structure. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
-};
-
-
-flag = {
-    name      = p7-detached-sign;
-    descrip   = "Signs using a detached PKCS #7 structure";
-    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
-};
-
-flag = {
-    name      = p7-include-cert;
-    disable   = "no";
-    enabled;
-    descrip   = "The signer's certificate will be included in the cert list.";
-    doc       = "This options works with --p7-sign or --p7-detached-sign and will include or exclude the signer's certificate into the generated signature.";
-};
-
-flag = {
-    name      = p7-time;
-    disable   = "no";
-    disabled;
-    descrip   = "Will include a timestamp in the PKCS #7 structure";
-    doc       = "This option will include a timestamp in the generated signature";
-};
-
-flag = {
-    name      = p7-show-data;
-    disable   = "no";
-    disabled;
-    descrip   = "Will show the embedded data in the PKCS #7 structure";
-    doc       = "This option can be combined with --p7-verify or --p7-info and will display the embedded signed data in the PKCS #7 structure.";
-};
-
-flag = {
-    name      = p7-info;
-    descrip   = "Print information on a PKCS #7 structure";
-    doc       = "";
-};
-
-flag = {
-    name      = p7-verify;
-    descrip   = "Verify the provided PKCS #7 structure";
-    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. When no certificate list is provided, then the system's certificate list is used. Alternatively a direct signer can be provided using --load-certificate. A key purpose can be enforced with the --verify-purpose option, and the --load-data option will utilize detached data.";
-};
-
-flag = {
-    name      = p8-info;
-    descrip   = "Print information on a PKCS #8 structure";
-    doc       = "This option will print information about encrypted PKCS #8 structures. That option does not require the decryption of the structure.";
-};
-
-flag = {
-    name      = smime-to-p7;
-    descrip   = "Convert S/MIME to PKCS #7 structure";
-    doc       = "";
-};
-
-flag = {
-    name      = key-info;
-    value     = k;
-    descrip   = "Print information on a private key";
-    doc = "";
-};
-
-flag = {
-    name      = pubkey-info;
-    descrip   = "Print information on a public key";
-    doc = "The option combined with --load-request, --load-pubkey, --load-privkey and --load-certificate will extract the public key of the object in question.";
-};
-
-flag = {
-    name      = v1;
-    descrip   = "Generate an X.509 version 1 certificate (with no extensions)";
-    doc = "";
-};
-
-flag = {
-    name      = to-p12;
-    descrip   = "Generate a PKCS #12 structure";
-    doc = "It requires a certificate, a private key and possibly a CA certificate to be specified.";
-};
-
-flag = {
-    name      = to-p8;
-    descrip   = "Generate a PKCS #8 structure";
-    doc = "";
-};
-
-flag = {
-    name      = pkcs8;
-    value     = 8;
-    descrip   = "Use PKCS #8 format for private keys";
-    doc = "";
-};
-
-flag = {
     name      = rsa;
     descrip   = "Generate RSA key";
     doc = "When combined with --generate-privkey generates an RSA private key.";
     description = "This option is equivalent to '--key-type rsa'.";
+    deprecated;
 };
 
 flag = {
@@ -425,6 +530,7 @@ flag = {
     descrip   = "Generate DSA key";
     doc = "When combined with --generate-privkey generates a DSA private key.";
     description = "This option is equivalent to '--key-type dsa'.";
+    deprecated;
 };
 
 flag = {
@@ -432,11 +538,13 @@ flag = {
     descrip   = "Generate ECC (ECDSA) key";
     doc = "When combined with --generate-privkey generates an elliptic curve private key to be used with ECDSA.";
     description = "This option is equivalent to '--key-type ecdsa'.";
+    deprecated;
 };
 
 flag = {
     name      = ecdsa;
     aliases   = ecc;
+    deprecated;
 };
 
 flag = {
@@ -446,15 +554,6 @@ flag = {
     doc = "This option can be combined with --generate-privkey, to specify
     the key type to be generated. Valid options are, 'rsa', 'rsa-pss',
 'dsa', 'ecdsa', and 'ed25519'.";
-};
-
-flag = {
-    name      = sign-params;
-    arg-type  = string;
-    descrip   = "Sign a certificate with a specific signature algorithm";
-    doc = "This option can be combined with --generate-certificate, to sign the certificate with
-a specific signature algorithm variant. The only option supported is
-'RSA-PSS', and should be specified when the signer does not have a certificate which is marked for RSA-PSS use only.";
 };
 
 flag = {
@@ -490,28 +589,6 @@ flag = {
 flag = {
     name      = outraw;
     aliases   = outder;
-};
-
-flag = {
-    name      = bits;
-    arg-type  = number;
-    descrip   = "Specify the number of bits for key generate";
-    doc      = "";
-};
-
-flag = {
-    name      = curve;
-    arg-type  = string;
-    descrip   = "Specify the curve used for EC key generation";
-    doc      = "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.";
-};
-
-flag = {
-    name      = sec-param;
-    arg-type  = string;
-    arg-name  = "Security parameter";
-    descrip   = "Specify the security level [low, legacy, medium, high, ultra]";
-    doc      = "This is alternative to the bits option.";
 };
 
 flag = {
