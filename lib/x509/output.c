@@ -1205,12 +1205,13 @@ print_extensions(gnutls_buffer_st * str, const char *prefix, int type,
 
 static void
 print_pubkey(gnutls_buffer_st * str, const char *key_name,
-	     gnutls_pubkey_t pubkey,
+	     gnutls_pubkey_t pubkey, gnutls_x509_spki_st *spki,
 	     gnutls_certificate_print_formats_t format)
 {
-	int err, pk;
+	int err;
 	const char *name;
 	unsigned bits;
+	unsigned pk;
 
 	err = gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
 	if (err < 0) {
@@ -1219,16 +1220,25 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 		return;
 	}
 
-	name = gnutls_pk_algorithm_get_name(err);
+	pk = err;
+
+	name = gnutls_pk_algorithm_get_name(pk);
 	if (name == NULL)
 		name = _("unknown");
 
-	pk = err;
-
 	addf(str, _("\t%sPublic Key Algorithm: %s\n"), key_name, name);
+
 	addf(str, _("\tAlgorithm Security Level: %s (%d bits)\n"),
 	     gnutls_sec_param_get_name(gnutls_pk_bits_to_sec_param
 				       (err, bits)), bits);
+
+	if (spki && pk == GNUTLS_PK_RSA_PSS && spki->pk == pk) {
+		addf(str, _("\t\tParameters:\n"));
+		addf(str, "\t\t\tHash Algorithm: %s\n",
+		     gnutls_digest_get_name(spki->rsa_pss_dig));
+		addf(str, "\t\t\tSalt Length: %d\n", spki->salt_size);
+	}
+
 	switch (pk) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
@@ -1425,39 +1435,16 @@ print_crt_sig_params(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 }
 
 static int
-print_crt_pubkey_params(gnutls_buffer_st * str, const char *key_name,
-			gnutls_x509_crt_t crt,
-			gnutls_certificate_print_formats_t format)
-{
-	int ret;
-	gnutls_pk_algorithm_t pk;
-	gnutls_x509_spki_st params;
-
-	ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
-	if (ret < 0)
-		return ret;
-
-	pk = ret;
-
-	if (pk == GNUTLS_PK_RSA_PSS) {
-		ret = _gnutls_x509_crt_read_spki_params(crt, &params);
-		if (ret < 0)
-			return ret;
-		addf(str, _("\t%sPublic Key Parameters:\n"), key_name);
-		addf(str, "\t\tHash Algorithm: %s\n",
-		     gnutls_digest_get_name(params.rsa_pss_dig));
-		addf(str, "\t\tSalt Length: %d\n", params.salt_size);
-	}
-
-	return 0;
-}
-
-static int
 print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 		 gnutls_certificate_print_formats_t format)
 {
 	gnutls_pubkey_t pubkey;
+	gnutls_x509_spki_st params;
 	int ret;
+
+	ret = _gnutls_x509_crt_read_spki_params(crt, &params);
+	if (ret < 0)
+		return ret;
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
@@ -1467,8 +1454,7 @@ print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 	if (ret < 0)
 		goto cleanup;
 
-	print_pubkey(str, _("Subject "), pubkey, format);
-	print_crt_pubkey_params(str, _("Subject "), crt, format);
+	print_pubkey(str, _("Subject "), pubkey, &params, format);
 	ret = 0;
 
       cleanup:
@@ -2369,40 +2355,18 @@ print_crq_sig_params(gnutls_buffer_st * str, gnutls_x509_crq_t crt,
 
 	return 0;
 }
-static int
-print_crq_pubkey_params(gnutls_buffer_st * str, const char *key_name,
-			gnutls_x509_crq_t crt,
-			gnutls_certificate_print_formats_t format)
-{
-	int ret;
-	gnutls_pk_algorithm_t pk;
-	gnutls_x509_spki_st params;
-
-	ret = gnutls_x509_crq_get_pk_algorithm(crt, NULL);
-	if (ret < 0)
-		return ret;
-
-	pk = ret;
-
-	if (pk == GNUTLS_PK_RSA_PSS) {
-		ret = _gnutls_x509_crq_read_spki_params(crt, &params);
-		if (ret < 0)
-			return ret;
-		addf(str, _("\t%sPublic Key Parameters:\n"), key_name);
-		addf(str, "\t\tHash Algorithm: %s\n",
-		     gnutls_digest_get_name(params.rsa_pss_dig));
-		addf(str, "\t\tSalt Length: %d\n", params.salt_size);
-	}
-
-	return 0;
-}
 
 static int
 print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 		 gnutls_certificate_print_formats_t format)
 {
 	gnutls_pubkey_t pubkey;
+	gnutls_x509_spki_st params;
 	int ret;
+
+	ret = _gnutls_x509_crq_read_spki_params(crq, &params);
+	if (ret < 0)
+		return ret;
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
@@ -2412,8 +2376,7 @@ print_crq_pubkey(gnutls_buffer_st * str, gnutls_x509_crq_t crq,
 	if (ret < 0)
 		goto cleanup;
 
-	print_pubkey(str, _("Subject "), pubkey, format);
-	print_crq_pubkey_params(str, _("Subject "), crq, format);
+	print_pubkey(str, _("Subject "), pubkey, &params, format);
 	ret = 0;
 
       cleanup:
@@ -2733,7 +2696,7 @@ gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 
 	_gnutls_buffer_append_str(&str, _("Public Key Information:\n"));
 
-	print_pubkey(&str, "", pubkey, format);
+	print_pubkey(&str, "", pubkey, NULL, format);
 	print_pubkey_other(&str, pubkey, format);
 
 	return _gnutls_buffer_to_datum(&str, out, 1);
