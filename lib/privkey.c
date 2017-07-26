@@ -325,7 +325,7 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 	if ((key_pk != pk) &&
 	      !(key_pk == GNUTLS_PK_RSA && pk == GNUTLS_PK_RSA_PSS)) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_CONSTRAINT_ERROR;
 	}
 
 	if (pk == GNUTLS_PK_RSA_PSS) {
@@ -339,8 +339,7 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 			salt_size = 0;
 		else if (params->pk == GNUTLS_PK_RSA_PSS) {
 			if (params->rsa_pss_dig != GNUTLS_DIG_UNKNOWN && dig != params->rsa_pss_dig) {
-				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
 			}
 
 			salt_size = params->salt_size;
