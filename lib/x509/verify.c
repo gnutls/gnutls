@@ -751,6 +751,8 @@ verify_crt(gnutls_x509_crt_t cert,
 
 			if (ret == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 				MARK_INVALID(GNUTLS_CERT_SIGNATURE_FAILURE);
+			} else if (ret == GNUTLS_E_CONSTRAINT_ERROR) {
+				MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
 			} else if (ret < 0) {
 				MARK_INVALID(0);
 			}
@@ -1639,6 +1641,10 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 			/* error. ignore it */
 			if (verify)
 				*verify |= GNUTLS_CERT_SIGNATURE_FAILURE;
+			result = 0;
+		} else if (result == GNUTLS_E_CONSTRAINT_ERROR) {
+			if (verify)
+				*verify |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE;
 			result = 0;
 		} else if (result < 0) {
 			gnutls_assert();
