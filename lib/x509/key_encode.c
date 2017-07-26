@@ -337,6 +337,10 @@ _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
 	if (params->pk != GNUTLS_PK_RSA_PSS)
 		return 0;
 
+	/* refuse to write parameters we cannot read */
+	if (gnutls_pk_to_sign(GNUTLS_PK_RSA_PSS, params->rsa_pss_dig) == GNUTLS_SIGN_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if ((result = asn1_create_element
 	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPSSParameters", &spk))
 	    != ASN1_SUCCESS) {
