@@ -303,10 +303,22 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 
 		ret = 0;
 		break;
-	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+		if (mand && key->params.spki.rsa_pss_dig)
+			*mand = 1;
+
+		if (hash) {
+			if (key->params.spki.rsa_pss_dig) {
+				*hash = key->params.spki.rsa_pss_dig;
+			} else {
+				*hash = _gnutls_pk_bits_to_sha_hash(pubkey_to_bits(&key->params));
+			}
+		}
+		ret = 0;
+		break;
+	case GNUTLS_PK_RSA:
 		if (hash)
-			*hash = GNUTLS_DIG_SHA256;
+			*hash = _gnutls_pk_bits_to_sha_hash(pubkey_to_bits(&key->params));
 		ret = 0;
 		break;
 
