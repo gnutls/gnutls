@@ -38,6 +38,12 @@
 #include "urls.h"
 #include <ecc.h>
 
+static int
+pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
+			  const gnutls_datum_t * hash,
+			  const gnutls_datum_t * signature,
+			  gnutls_pk_params_st * params,
+			  gnutls_x509_spki_st * sign_params);
 
 unsigned pubkey_to_bits(gnutls_pk_params_st * params)
 {
@@ -1634,9 +1640,6 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		/* we do not check for insecure algorithms with this flag */
 		return _gnutls_pk_verify(params.pk, hash, signature,
 					 &key->params, &params);
-	} else if (algo == GNUTLS_SIGN_UNKNOWN) {
-		params.pk = key->params.algo;
-		me = NULL;
 	} else {
 		se = _gnutls_sign_to_entry(algo);
 		if (se == NULL)
@@ -1652,15 +1655,13 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-	}
-
-	ret = pubkey_verify_hashed_data(params.pk, me,
-					 hash, signature,
-					 &key->params,
-					 &params);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+		ret = pubkey_verify_hashed_data(se, hash, signature,
+						&key->params,
+						&params);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	if (algo != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
@@ -1908,19 +1909,25 @@ dsa_verify_data(gnutls_pk_algorithm_t pk,
 /* Verifies the signature data, and returns GNUTLS_E_PK_SIG_VERIFY_FAILED if 
  * not verified, or 1 otherwise.
  */
-int
-pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
-			  const mac_entry_st *hash_algo,
+static int
+pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 			  const gnutls_datum_t * hash,
 			  const gnutls_datum_t * signature,
 			  gnutls_pk_params_st * params,
 			  gnutls_x509_spki_st * sign_params)
 {
-	switch (pk) {
+	const mac_entry_st *me;
+
+	me = hash_to_entry(se->hash);
+
+	switch (se->pk) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+		if (unlikely(me==NULL))
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
 		if (_pkcs1_rsa_verify_sig
-		    (pk, hash_algo, NULL, hash, signature, params, sign_params) != 0)
+		    (se->pk, me, NULL, hash, signature, params, sign_params) != 0)
 		{
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -1931,8 +1938,11 @@ pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
 
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_DSA:
+		if (unlikely(me==NULL))
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
 		if (dsa_verify_hashed_data
-		    (pk, hash_algo, hash, signature, params, sign_params) != 0) {
+		    (se->pk, me, hash, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}

@@ -218,8 +218,12 @@ _gnutls_handshake_verify_data10(gnutls_session_t session,
 	if (pk_algo == GNUTLS_PK_RSA) {
 		hash_algo = GNUTLS_DIG_MD5_SHA1;
 		verify_flags |= GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA;
-	} else
+	} else {
 		hash_algo = GNUTLS_DIG_SHA1;
+		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
+			sign_algo = gnutls_pk_to_sign(pk_algo, hash_algo);
+		}
+	}
 
 	me = hash_to_entry(hash_algo);
 
@@ -506,8 +510,11 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 	if (pk_algo == GNUTLS_PK_RSA) {
 		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
 		verify_flags |= GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA;
-	} else
+		sign_algo = GNUTLS_SIGN_UNKNOWN;
+	} else {
 		me = hash_to_entry(GNUTLS_DIG_SHA1);
+		sign_algo = gnutls_pk_to_sign(pk_algo, GNUTLS_DIG_SHA1);
+	}
 	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {
 		gnutls_assert();
@@ -523,7 +530,7 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
 
-	ret = gnutls_pubkey_verify_hash2(cert->pubkey, GNUTLS_SIGN_UNKNOWN,
+	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo,
 					 GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1|verify_flags,
 					 &dconcat, signature);
 	if (ret < 0)
