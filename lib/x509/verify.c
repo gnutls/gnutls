@@ -1297,7 +1297,7 @@ _gnutls_x509_validate_sign_params(gnutls_pk_algorithm_t pk_algorithm,
 			/* Check if the underlying hash algorithms are same.  */
 			if (sig_params->rsa_pss_dig != params.rsa_pss_dig) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_CONSTRAINT_ERROR;
 			}
 
 			/* The salt length used to generate the
@@ -1305,7 +1305,7 @@ _gnutls_x509_validate_sign_params(gnutls_pk_algorithm_t pk_algorithm,
 			 * the one in the key parameter. */
 			if (sig_params->salt_size < params.salt_size) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_CONSTRAINT_ERROR;
 			}
 		}
 	}
