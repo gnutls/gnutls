@@ -368,18 +368,16 @@ gnutls_x509_crl_get_issuer_dn3(gnutls_x509_crl_t crl, gnutls_datum_t * dn, unsig
  * This function will return a value of the #gnutls_sign_algorithm_t
  * enumeration that is the signature algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ * Since 3.6.0 this function never returns a negative error code.
+ * Error cases and unknown/unsupported signature algorithms are
+ * mapped to %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Returns: a #gnutls_sign_algorithm_t value
  **/
 int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl_t crl)
 {
-	if (crl == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	return _gnutls_x509_get_signature_algorithm(crl->crl,
-						    "signatureAlgorithm");
+	return map_errs_to_zero(_gnutls_x509_get_signature_algorithm(crl->crl,
+						    "signatureAlgorithm"));
 }
 
 /**

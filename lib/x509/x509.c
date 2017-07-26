@@ -981,15 +981,16 @@ gnutls_x509_crt_get_dn_oid(gnutls_x509_crt_t cert,
  * enumeration that is the signature algorithm that has been used to
  * sign this certificate.
  *
- * Unknown/unsupported signature algorithms are mapped to %GNUTLS_SIGN_UNKNOWN.
+ * Since 3.6.0 this function never returns a negative error code.
+ * Error cases and unknown/unsupported signature algorithms are
+ * mapped to %GNUTLS_SIGN_UNKNOWN.
  *
- * Returns: a #gnutls_sign_algorithm_t value, or a negative error code on
- *   error.
+ * Returns: a #gnutls_sign_algorithm_t value
  **/
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert)
 {
-	return _gnutls_x509_get_signature_algorithm(cert->cert,
-						    "signatureAlgorithm");
+	return map_errs_to_zero(_gnutls_x509_get_signature_algorithm(cert->cert,
+						    "signatureAlgorithm"));
 }
 
 /**

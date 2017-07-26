@@ -163,6 +163,8 @@ int _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t issuer,
 				     const gnutls_x509_spki_st *key_params,
 				     gnutls_x509_spki_st *params);
 
+#define map_errs_to_zero(x) ((x)<0?0:(x))
+
 /* dn.c */
 #define OID_X520_COUNTRY_NAME		"2.5.4.6"
 #define OID_X520_ORGANIZATION_NAME	"2.5.4.10"
