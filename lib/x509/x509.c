@@ -297,23 +297,30 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert)
 
 static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 {
-	int ret, s2;
+	int ret, len1, len2, result;
+	char oid1[MAX_OID_SIZE];
+	char oid2[MAX_OID_SIZE];
 	gnutls_datum_t sp1 = {NULL, 0};
 	gnutls_datum_t sp2 = {NULL, 0};
 	unsigned empty1 = 0, empty2 = 0;
 
-	ret = _gnutls_x509_get_signature_algorithm(cert->cert,
-						      "signatureAlgorithm");
-	if (ret < 0) {
+	len1 = sizeof(oid1);
+	result = asn1_read_value(cert->cert, "signatureAlgorithm.algorithm", oid1, &len1);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		return ret;
+		return _gnutls_asn2err(result);
 	}
 
-	s2 = _gnutls_x509_get_signature_algorithm(cert->cert,
-						  "tbsCertificate.signature");
-	if (ret != s2) {
+	len2 = sizeof(oid2);
+	result = asn1_read_value(cert->cert, "tbsCertificate.signature.algorithm", oid2, &len2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (len1 != len2 || memcmp(oid1, oid2, len1) != 0) {
 		_gnutls_debug_log("signatureAlgorithm.algorithm differs from tbsCertificate.signature.algorithm: %s, %s\n",
-			gnutls_sign_get_name(ret), gnutls_sign_get_name(s2));
+			oid1, oid2);
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_ERROR;
 	}
