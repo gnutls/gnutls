@@ -1282,13 +1282,16 @@ _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
 
 		if (result == 0)
 			result = gnutls_pk_to_sign(params.pk, params.rsa_pss_dig);
-		else if (result == GNUTLS_E_UNKNOWN_ALGORITHM)
-			result = GNUTLS_SIGN_UNKNOWN;
-	} else {
+	} else if (sa.data) {
 		result = gnutls_oid_to_sign((char *) sa.data);
+	} else {
+		result = GNUTLS_E_UNKNOWN_ALGORITHM;
 	}
 
 	_gnutls_free_datum(&sa);
+
+	if (result == GNUTLS_SIGN_UNKNOWN)
+		result = GNUTLS_E_UNKNOWN_ALGORITHM;
 
 	return result;
 }
