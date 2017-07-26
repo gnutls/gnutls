@@ -32,7 +32,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-TMPFILE=tmp.$$.pem
+TMPFILE=constraints.$$.pem.tmp
 
 . ${srcdir}/../scripts/common.sh
 
