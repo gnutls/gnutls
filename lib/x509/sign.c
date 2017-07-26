@@ -158,6 +158,8 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 
+	_gnutls_debug_log("signing structure using %s\n", se->name);
+
 	result = _gnutls_x509_write_sign_params(src, name, se, &params);
 	if (result < 0) {
 		gnutls_assert();
