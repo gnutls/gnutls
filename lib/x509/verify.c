@@ -1329,7 +1329,6 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 	gnutls_pk_algorithm_t issuer_pk;
 	int ret;
 	gnutls_x509_spki_st sign_params;
-	const mac_entry_st * me;
 	const gnutls_sign_entry_st *se;
 
 	/* Read the MPI parameters from the issuer's certificate.
@@ -1374,14 +1373,7 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 			sign_params.rsa_pss_dig = se->hash;
 	}
 
-	me = hash_to_entry(se->hash);
-	if (unlikely(me == NULL)) {
-		gnutls_assert();
-		ret = GNUTLS_E_CERTIFICATE_ERROR;
-		goto cleanup;
-	}
-
-	ret = pubkey_verify_data(se->pk, me, data, signature, &params,
+	ret = pubkey_verify_data(se, data, signature, &params,
 				 &sign_params);
 	if (ret < 0) {
 		gnutls_assert();

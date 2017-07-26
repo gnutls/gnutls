@@ -1569,7 +1569,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = pubkey_verify_data(params.pk, me, data, signature, &pubkey->params,
+	ret = pubkey_verify_data(se, data, signature, &pubkey->params,
 				 &params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1950,18 +1950,24 @@ pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
  * not verified, or 1 otherwise.
  */
 int
-pubkey_verify_data(gnutls_pk_algorithm_t pk,
-		   const mac_entry_st * me,
+pubkey_verify_data(const gnutls_sign_entry_st *se,
 		   const gnutls_datum_t * data,
 		   const gnutls_datum_t * signature,
 		   gnutls_pk_params_st * params,
 		   gnutls_x509_spki_st * sign_params)
 {
-	switch (pk) {
+	const mac_entry_st *me;
+
+	me = hash_to_entry(se->hash);
+
+	switch (se->pk) {
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
+		if (unlikely(me==NULL))
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
 		if (_pkcs1_rsa_verify_sig
-		    (pk, me, data, NULL, signature, params, sign_params) != 0) {
+		    (se->pk, me, data, NULL, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
@@ -1970,7 +1976,7 @@ pubkey_verify_data(gnutls_pk_algorithm_t pk,
 		break;
 
 	case GNUTLS_PK_EDDSA_ED25519:
-		if (_gnutls_pk_verify(pk, data, signature, params, sign_params) != 0) {
+		if (_gnutls_pk_verify(se->pk, data, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
@@ -1980,8 +1986,11 @@ pubkey_verify_data(gnutls_pk_algorithm_t pk,
 
 	case GNUTLS_PK_EC:
 	case GNUTLS_PK_DSA:
+		if (unlikely(me==NULL))
+			return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
 		if (dsa_verify_data
-		    (pk, me, data, signature, params, sign_params) != 0) {
+		    (se->pk, me, data, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}

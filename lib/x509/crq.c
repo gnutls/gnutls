@@ -2916,8 +2916,8 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 	gnutls_datum_t data = { NULL, 0 };
 	gnutls_datum_t signature = { NULL, 0 };
 	gnutls_pk_params_st params;
-	gnutls_digest_algorithm_t algo;
 	gnutls_x509_spki_st sign_params;
+	const gnutls_sign_entry_st *se;
 	int ret;
 
 	gnutls_pk_params_init(&params);
@@ -2939,7 +2939,12 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 		goto cleanup;
 	}
 
-	algo = gnutls_sign_get_hash_algorithm(ret);
+	se = _gnutls_sign_to_entry(ret);
+	if (se == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+		goto cleanup;
+	}
 
 	ret =
 	    _gnutls_x509_get_signature(crq->crq, "signature", &signature);
@@ -2963,8 +2968,7 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 	}
 
 	ret =
-	    pubkey_verify_data(sign_params.pk,
-			       hash_to_entry(algo), &data, &signature,
+	    pubkey_verify_data(se, &data, &signature,
 			       &params, &sign_params);
 	if (ret < 0) {
 		gnutls_assert();

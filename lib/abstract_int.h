@@ -107,8 +107,7 @@ pubkey_verify_hashed_data(gnutls_pk_algorithm_t pk,
 			  gnutls_pk_params_st * params,
 			  gnutls_x509_spki_st * sign_params);
 
-int pubkey_verify_data(gnutls_pk_algorithm_t pk,
-		       const mac_entry_st * algo,
+int pubkey_verify_data(const gnutls_sign_entry_st *se,
 		       const gnutls_datum_t * data,
 		       const gnutls_datum_t * signature,
 		       gnutls_pk_params_st * params,
