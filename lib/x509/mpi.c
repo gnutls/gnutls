@@ -226,12 +226,14 @@ _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
  */
 int
 _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
-			      gnutls_x509_spki_st *params, unsigned is_sig)
+			      gnutls_x509_spki_st *spki, unsigned is_sig)
 {
 	int result;
 	char name[128];
 	char oid[MAX_OID_SIZE];
 	int oid_size;
+
+	memset(spki, 0, sizeof(*spki));
 
 	_gnutls_str_cpy(name, sizeof(name), src_name);
 	_gnutls_str_cat(name, sizeof(name), ".algorithm");
@@ -265,7 +267,7 @@ _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
 		}
 
 		result = _gnutls_x509_read_rsa_pss_params(tmp.data, tmp.size,
-							  params);
+							  spki);
 		_gnutls_free_datum(&tmp);
 
 		if (result < 0)
