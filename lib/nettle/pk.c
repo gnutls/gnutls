@@ -395,7 +395,7 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 		}
 	default:
 		gnutls_assert();
-		ret = GNUTLS_E_INTERNAL_ERROR;
+		ret = GNUTLS_E_INVALID_REQUEST;
 		goto cleanup;
 	}
 
@@ -828,7 +828,7 @@ _rsa_pss_verify_digest(gnutls_digest_algorithm_t dig,
 	}
 
 	if (digest_size != hash_size)
-		return 0;
+		return gnutls_assert_val(0);
 
 	return verify_func(pub, salt_size, digest, s);
 }
