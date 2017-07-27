@@ -2971,7 +2971,7 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 	}
 
 	ret =
-	    pubkey_verify_data(se, &data, &signature,
+	    pubkey_verify_data(se, hash_to_entry(se->hash), &data, &signature,
 			       &params, &sign_params, flags);
 	if (ret < 0) {
 		gnutls_assert();

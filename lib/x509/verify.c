@@ -1377,7 +1377,7 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 			sign_params.rsa_pss_dig = se->hash;
 	}
 
-	ret = pubkey_verify_data(se, data, signature, &params,
+	ret = pubkey_verify_data(se, hash_to_entry(se->hash), data, signature, &params,
 				 &sign_params, vflags);
 	if (ret < 0) {
 		gnutls_assert();

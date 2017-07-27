@@ -91,7 +91,7 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 		      gnutls_datum_t * signature,
 		      gnutls_x509_spki_st * params);
 
-unsigned pubkey_to_bits(gnutls_pk_params_st * params);
+unsigned pubkey_to_bits(const gnutls_pk_params_st * params);
 int _gnutls_pubkey_compatible_with_sig(gnutls_session_t,
 				       gnutls_pubkey_t pubkey,
 				       const version_entry_st * ver,
@@ -100,6 +100,7 @@ int
 _gnutls_pubkey_get_mpis(gnutls_pubkey_t key, gnutls_pk_params_st * params);
 
 int pubkey_verify_data(const gnutls_sign_entry_st *se,
+		       const mac_entry_st *me,
 		       const gnutls_datum_t * data,
 		       const gnutls_datum_t * signature,
 		       gnutls_pk_params_st * params,
