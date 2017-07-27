@@ -74,7 +74,7 @@ _gnutls_x509_crt_get_spki_params(gnutls_x509_crt_t crt,
 				gnutls_assert();
 				return GNUTLS_E_CERTIFICATE_ERROR;
 			}
-		} else if (key_params->pk != GNUTLS_PK_RSA) {
+		} else if (key_params->pk != GNUTLS_PK_RSA && key_params->pk != GNUTLS_PK_UNKNOWN) {
 			gnutls_assert();
 			return GNUTLS_E_CERTIFICATE_ERROR;
 		}

@@ -334,6 +334,9 @@ _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
 	der->data = NULL;
 	der->size = 0;
 
+	if (params->pk != GNUTLS_PK_RSA_PSS)
+		return 0;
+
 	if ((result = asn1_create_element
 	     (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPSSParameters", &spk))
 	    != ASN1_SUCCESS) {

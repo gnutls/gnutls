@@ -1594,6 +1594,7 @@ gnutls_x509_crt_get_spki(gnutls_x509_crt_t cert, gnutls_x509_spki_t spki, unsign
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+
 	spki->pk = gnutls_x509_crt_get_pk_algorithm(cert, NULL);
 
 	memset(&params, 0, sizeof(params));
@@ -1603,6 +1604,9 @@ gnutls_x509_crt_get_spki(gnutls_x509_crt_t cert, gnutls_x509_spki_t spki, unsign
 		gnutls_assert();
 		return result;
 	}
+
+	if (params.pk == GNUTLS_PK_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	spki->rsa_pss_dig = params.rsa_pss_dig;
 	spki->salt_size = params.salt_size;

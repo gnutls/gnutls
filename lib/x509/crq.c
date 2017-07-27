@@ -1332,6 +1332,9 @@ gnutls_x509_crq_get_spki(gnutls_x509_crq_t crq,
 		return result;
 	}
 
+	if (params.pk == GNUTLS_PK_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
 	spki->rsa_pss_dig = params.rsa_pss_dig;
 	spki->salt_size = params.salt_size;
 

@@ -141,6 +141,10 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 	if (pk_algorithm != GNUTLS_PK_RSA && pk_algorithm != GNUTLS_PK_EDDSA_ED25519 && pk_algorithm != GNUTLS_PK_ECDH_X25519) {
 		/* RSA and EdDSA do not use parameters */
 		result = _gnutls_x509_read_value(asn, name, &tmp);
+		if (pk_algorithm == GNUTLS_PK_RSA_PSS && 
+		    (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND || result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)) {
+			goto skip_params;
+		}
 		if (result < 0) {
 			gnutls_assert();
 			goto error;
@@ -158,6 +162,7 @@ _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 		_gnutls_free_datum(&tmp);
 	}
 
+ skip_params:
 	/* Now read the public key */
 	_asnstr_append_name(name, sizeof(name), root, ".subjectPublicKey");
 
@@ -220,8 +225,8 @@ _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
  * This is the "signatureAlgorithm" fields.
  */
 int
-_gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
-			      gnutls_x509_spki_st *params)
+_gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
+			      gnutls_x509_spki_st *params, unsigned is_sig)
 {
 	int result;
 	char name[128];
@@ -246,10 +251,16 @@ _gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
 		_gnutls_str_cat(name, sizeof(name), ".parameters");
 
 		result = _gnutls_x509_read_value(src, name, &tmp);
-		if (result < 0 &&
-		    result != GNUTLS_E_ASN1_ELEMENT_NOT_FOUND &&
-		    result != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
-			_gnutls_free_datum(&tmp);
+		if (result < 0) {
+			if (!is_sig) {
+				if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ||
+				    result != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+					/* it is ok to not have parameters in SPKI, but
+					 * not in signatures */
+					return 0;
+				}
+			}
+
 			return gnutls_assert_val(result);
 		}
 
@@ -261,15 +272,6 @@ _gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
 			gnutls_assert();
 
 		return result;
-	} else {
-		const gnutls_sign_entry_st *se;
-
-		memset(params, 0, sizeof(gnutls_x509_spki_st));
-
-		se = _gnutls_oid_to_sign_entry(oid);
-		if (se != NULL) {
-			params->pk = se->pk;
-		}
 	}
 
 	return 0;

@@ -321,6 +321,7 @@ int gnutls_privkey_status(gnutls_privkey_t key);
  * @GNUTLS_PRIVKEY_DISABLE_CALLBACKS: The following flag disables call to PIN callbacks etc.
  *   Only relevant to TPM keys.
  * @GNUTLS_PRIVKEY_FLAG_PROVABLE: When generating a key involving prime numbers, use provable primes; a seed may be required.
+ * @GNUTLS_PRIVKEY_FLAG_CA: The generated private key is going to be used as a CA (relevant for RSA-PSS keys).
  * @GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT: Keys generated or imported as provable require an extended format which cannot be read by previous versions
  *   of gnutls or other applications. By setting this flag the key will be exported in a backwards compatible way,
  *   even if the information about the seed used will be lost.
@@ -335,7 +336,8 @@ typedef enum gnutls_privkey_flags {
 	GNUTLS_PRIVKEY_FLAG_PROVABLE = 1 << 5,
 	GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT = 1 << 6,
 	GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS = 1 << 7,
-	GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE = 1 << 8
+	GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE = 1 << 8,
+	GNUTLS_PRIVKEY_FLAG_CA = 1 << 9
 } gnutls_privkey_flags_t;
 
 int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,

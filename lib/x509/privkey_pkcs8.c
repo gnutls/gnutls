@@ -958,9 +958,14 @@ _decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	gnutls_datum_t tmp;
 	gnutls_x509_spki_st params;
 
+	memset(&params, 0, sizeof(params));
+
 	ret = _gnutls_x509_read_value(pkcs8_asn,
 				      "privateKeyAlgorithm.parameters", &tmp);
 	if (ret < 0) {
+		if (ret == GNUTLS_E_ASN1_VALUE_NOT_FOUND || ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+			goto skip_params;
+
 		gnutls_assert();
 		goto error;
 	}
@@ -973,6 +978,7 @@ _decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
+ skip_params:
 	ret = _decode_pkcs8_rsa_key(pkcs8_asn, pkey);
 	if (ret < 0) {
 		gnutls_assert();

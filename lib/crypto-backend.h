@@ -163,7 +163,9 @@ typedef struct gnutls_crypto_bigint {
 			     gnutls_bigint_format_t format);
 } gnutls_crypto_bigint_st;
 
-/* additional information about the public key
+/* Additional information about the public key, filled from
+ * SubjectPublicKeyInfo parameters. When there are no parameters,
+ * the pk field will be set to GNUTLS_PK_UNKNOWN.
  */
 typedef struct gnutls_x509_spki_st {
 	/* We can have a key which is of type RSA, but a certificate

@@ -1243,6 +1243,13 @@ gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t key,
 	return key->params.algo;
 }
 
+void
+_gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
+				     gnutls_x509_spki_st *params)
+{
+	memcpy(params, &key->params.spki, sizeof(gnutls_x509_spki_st));
+}
+
 /**
  * gnutls_x509_privkey_get_spki:
  * @key: should contain a #gnutls_x509_privkey_t type
@@ -1262,7 +1269,10 @@ gnutls_x509_privkey_get_spki(gnutls_x509_privkey_t key, gnutls_x509_spki_t spki,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	memcpy(spki, &key->params.spki, sizeof (gnutls_x509_spki_st));
+	if (key->params.spki.pk == GNUTLS_PK_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	_gnutls_x509_privkey_get_spki_params(key, spki);
 
 	return 0;
 }
@@ -1650,7 +1660,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		return ret;
 	}
 
-	if (algo == GNUTLS_PK_RSA_PSS) {
+	if (algo == GNUTLS_PK_RSA_PSS && (flags & GNUTLS_PRIVKEY_FLAG_CA)) {
 		const mac_entry_st *me;
 
 		key->params.spki.pk = GNUTLS_PK_RSA_PSS;
@@ -2179,14 +2189,5 @@ void gnutls_x509_privkey_set_flags(gnutls_x509_privkey_t key,
 				   unsigned int flags)
 {
 	key->flags |= flags;
-}
-
-int
-_gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
-				     gnutls_x509_spki_st *params)
-{
-	memcpy(params, &key->params.spki, sizeof(gnutls_x509_spki_st));
-	params->pk = key->params.algo;
-	return 0;
 }
 

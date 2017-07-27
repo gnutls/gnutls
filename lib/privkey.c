@@ -285,8 +285,8 @@ _gnutls_privkey_get_spki_params(gnutls_privkey_t key,
 	case GNUTLS_PRIVKEY_EXT:
 		break;
 	case GNUTLS_PRIVKEY_X509:
-		return _gnutls_x509_privkey_get_spki_params(key->key.x509,
-							    params);
+		_gnutls_x509_privkey_get_spki_params(key->key.x509, params);
+		return 0;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -299,7 +299,11 @@ _gnutls_privkey_get_spki_params(gnutls_privkey_t key,
 
 /* This function fills in PARAMS with the necessary parameters to sign
  * with PK and DIG. PARAMS must be initialized with
- * _gnutls_privkey_get_spki_params in advance. */
+ * _gnutls_privkey_get_spki_params in advance.
+ *
+ * After calling this function the params structure will
+ * be initialized even if the original SubjectPublicKeyInfo was empty.
+ */
 int
 _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 				 gnutls_pk_algorithm_t pk,
@@ -318,8 +322,8 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 	}
 
 	key_pk = gnutls_privkey_get_pk_algorithm(key, &bits);
-	if (!(key_pk == pk ||
-	      (key_pk == GNUTLS_PK_RSA && pk == GNUTLS_PK_RSA_PSS))) {
+	if ((key_pk != pk) &&
+	      !(key_pk == GNUTLS_PK_RSA && pk == GNUTLS_PK_RSA_PSS)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -334,7 +338,7 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 		if (params->pk == GNUTLS_PK_RSA)
 			salt_size = 0;
 		else if (params->pk == GNUTLS_PK_RSA_PSS) {
-			if (dig != params->rsa_pss_dig) {
+			if (params->rsa_pss_dig != GNUTLS_DIG_UNKNOWN && dig != params->rsa_pss_dig) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
@@ -348,7 +352,6 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 		params->salt_size = salt_size;
 		params->rsa_pss_dig = dig;
 	}
-
 
 	params->pk = pk;
 
@@ -987,7 +990,7 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 	}
 
 	ret = _gnutls_privkey_update_spki_params(signer, signer->pk_algorithm,
-					       hash, flags, &params);
+					         hash, flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1632,6 +1635,9 @@ gnutls_privkey_get_spki(gnutls_privkey_t privkey, gnutls_x509_spki_t spki, unsig
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
+
+	if (privkey->key.x509->params.spki.pk == GNUTLS_PK_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	memcpy(spki, &privkey->key.x509->params.spki, sizeof(gnutls_x509_spki_st));
 

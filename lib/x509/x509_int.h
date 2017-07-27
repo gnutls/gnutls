@@ -256,8 +256,8 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 				gnutls_pk_params_st * params, unsigned compat);
 
-int _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
-					 gnutls_x509_spki_st * params);
+void _gnutls_x509_privkey_get_spki_params(gnutls_x509_privkey_t key,
+					  gnutls_x509_spki_st * params);
 
 int _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 				     gnutls_x509_spki_st * params);
@@ -371,12 +371,13 @@ int _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 			   int lz);
 
-int _gnutls_x509_read_sign_params(ASN1_TYPE src, const char *src_name,
-				  gnutls_x509_spki_st *params);
+int _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
+				  gnutls_x509_spki_st *params, unsigned is_sig);
 int _gnutls_x509_write_sign_params(ASN1_TYPE dst, const char *dst_name,
 				   const gnutls_sign_entry_st *se, gnutls_x509_spki_st *params);
 
-#define _gnutls_x509_read_spki_params _gnutls_x509_read_sign_params
+#define _gnutls_x509_read_sign_params(src,name,params) _gnutls_x509_read_pkalgo_params(src,name,params,1)
+#define _gnutls_x509_read_spki_params(src,name,params) _gnutls_x509_read_pkalgo_params(src,name,params,0)
 int _gnutls_x509_write_spki_params(ASN1_TYPE dst, const char *dst_name,
 				   gnutls_x509_spki_st *params);
 
