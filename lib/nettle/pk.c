@@ -1464,6 +1464,9 @@ const char const_data_sha384[48] = "onetwothreefourfivesixseveneightnineteneleve
 const char const_data_sha512[64] = "onetwothreefourfivesixseveneightnineteneleventwelvethirteenfourt";
 gnutls_datum_t ddata, tmp = {NULL,0};
 char* gen_data = NULL;
+gnutls_x509_spki_st spki;
+
+	memcpy(&spki, &params->spki, sizeof(spki));
 
 	if (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_EC) {
 		unsigned hash_len;
@@ -1475,7 +1478,10 @@ char* gen_data = NULL;
 		ddata.data = (void*)gen_data;
 		ddata.size = hash_len;
 	} else if (algo == GNUTLS_PK_RSA_PSS) {
-		switch (params->spki.rsa_pss_dig) {
+		if (spki.rsa_pss_dig == GNUTLS_DIG_UNKNOWN)
+			spki.rsa_pss_dig = GNUTLS_DIG_SHA256;
+
+		switch (spki.rsa_pss_dig) {
 		case GNUTLS_DIG_SHA256:
 			ddata.data = (void*)const_data_sha256;
 			ddata.size = sizeof(const_data_sha256);
@@ -1534,13 +1540,13 @@ char* gen_data = NULL;
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_RSA_PSS:
-		ret = _gnutls_pk_sign(algo, &sig, &ddata, params, &params->spki);
+		ret = _gnutls_pk_sign(algo, &sig, &ddata, params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			goto cleanup;
 		}
 
-		ret = _gnutls_pk_verify(algo, &ddata, &sig, params, &params->spki);
+		ret = _gnutls_pk_verify(algo, &ddata, &sig, params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			gnutls_assert();
