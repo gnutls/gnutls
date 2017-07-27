@@ -1514,14 +1514,14 @@ int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_e
 			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
 					gnutls_pk_get_name(key_params->algo), key_params->algo,
 					se->name, se->id);
-			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
 		}
 	}
 
 	if (params->pk == GNUTLS_PK_RSA_PSS) {
 
 		if (!GNUTLS_PK_IS_RSA(key_params->algo))
-			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
 
 		/* The requested sign algorithm is RSA-PSS, while the
 		 * pubkey doesn't include parameter information. Fill
@@ -1533,7 +1533,7 @@ int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_e
 		}
 
 		if (params->rsa_pss_dig != se->hash)
-			return gnutls_assert_val(GNUTLS_E_KEY_USAGE_VIOLATION);
+			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
 	}
 
 	return 0;
