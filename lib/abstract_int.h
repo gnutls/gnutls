@@ -103,7 +103,8 @@ int pubkey_verify_data(const gnutls_sign_entry_st *se,
 		       const gnutls_datum_t * data,
 		       const gnutls_datum_t * signature,
 		       gnutls_pk_params_st * params,
-		       gnutls_x509_spki_st * sign_params);
+		       gnutls_x509_spki_st * sign_params,
+		       unsigned vflags);
 
 
 

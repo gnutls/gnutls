@@ -43,7 +43,8 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 			  const gnutls_datum_t * hash,
 			  const gnutls_datum_t * signature,
 			  gnutls_pk_params_st * params,
-			  gnutls_x509_spki_st * sign_params);
+			  gnutls_x509_spki_st * sign_params,
+			  unsigned flags);
 
 unsigned pubkey_to_bits(gnutls_pk_params_st * params)
 {
@@ -1588,15 +1589,10 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 		return gnutls_assert_val(ret);
 
 	ret = pubkey_verify_data(se, data, signature, &pubkey->params,
-				 &params);
+				 &params, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
-	}
-
-	if (gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
-		_gnutls_debug_log("signature algorithm %s is insecure\n", gnutls_sign_get_name(algo));
-		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
 
 	return 0;
@@ -1669,15 +1665,11 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 
 		ret = pubkey_verify_hashed_data(se, hash, signature,
 						&key->params,
-						&params);
+						&params, flags);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
-	}
-
-	if (algo != GNUTLS_SIGN_UNKNOWN && gnutls_sign_is_secure(algo) == 0 && _gnutls_is_broken_sig_allowed(algo, flags) == 0) {
-		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
 
 	return 0;
@@ -1926,7 +1918,8 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 			  const gnutls_datum_t * hash,
 			  const gnutls_datum_t * signature,
 			  gnutls_pk_params_st * params,
-			  gnutls_x509_spki_st * sign_params)
+			  gnutls_x509_spki_st * sign_params,
+			  unsigned flags)
 {
 	const mac_entry_st *me;
 
@@ -1966,6 +1959,12 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 		return GNUTLS_E_INVALID_REQUEST;
 
 	}
+
+	if (gnutls_sign_is_secure(se->id) == 0 && _gnutls_is_broken_sig_allowed(se->id, flags) == 0) {
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
+	}
+
+	return 1;
 }
 
 /* Verifies the signature data, and returns GNUTLS_E_PK_SIG_VERIFY_FAILED if 
@@ -1976,7 +1975,8 @@ pubkey_verify_data(const gnutls_sign_entry_st *se,
 		   const gnutls_datum_t * data,
 		   const gnutls_datum_t * signature,
 		   gnutls_pk_params_st * params,
-		   gnutls_x509_spki_st * sign_params)
+		   gnutls_x509_spki_st * sign_params,
+		   unsigned flags)
 {
 	const mac_entry_st *me;
 
@@ -1994,7 +1994,6 @@ pubkey_verify_data(const gnutls_sign_entry_st *se,
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
 
-		return 1;
 		break;
 
 	case GNUTLS_PK_EDDSA_ED25519:
@@ -2003,7 +2002,6 @@ pubkey_verify_data(const gnutls_sign_entry_st *se,
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
 
-		return 1;
 		break;
 
 	case GNUTLS_PK_EC:
@@ -2017,13 +2015,18 @@ pubkey_verify_data(const gnutls_sign_entry_st *se,
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
 
-		return 1;
 		break;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 
 	}
+
+	if (gnutls_sign_is_secure(se->id) == 0 && _gnutls_is_broken_sig_allowed(se->id, flags) == 0) {
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
+	}
+
+	return 1;
 }
 
 const mac_entry_st *_gnutls_dsa_q_to_hash(const gnutls_pk_params_st *

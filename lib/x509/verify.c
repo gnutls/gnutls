@@ -583,7 +583,8 @@ static int _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 				    const gnutls_datum_t * data,
 				    const gnutls_datum_t * signature,
 				    gnutls_x509_crt_t cert,
-				    gnutls_x509_crt_t issuer);
+				    gnutls_x509_crt_t issuer,
+				    unsigned vflags);
 
 /* 
  * Verifies the given certificate against a certificate list of
@@ -747,7 +748,7 @@ verify_crt(gnutls_x509_crt_t cert,
 						     &cert_signed_data,
 						     &cert_signature,
 						     cert,
-						     issuer);
+						     issuer, flags);
 
 			if (ret == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 				MARK_INVALID(GNUTLS_CERT_SIGNATURE_FAILURE);
@@ -1320,12 +1321,13 @@ _gnutls_x509_validate_sign_params(gnutls_pk_algorithm_t pk_algorithm,
  * 'data' is the signed data
  * 'signature' is the signature!
  */
-int
+static int
 _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 			 const gnutls_datum_t * data,
 			 const gnutls_datum_t * signature,
 			 gnutls_x509_crt_t cert,
-			 gnutls_x509_crt_t issuer)
+			 gnutls_x509_crt_t issuer,
+			 unsigned vflags)
 {
 	gnutls_pk_params_st params;
 	gnutls_pk_algorithm_t issuer_pk;
@@ -1376,7 +1378,7 @@ _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 	}
 
 	ret = pubkey_verify_data(se, data, signature, &params,
-				 &sign_params);
+				 &sign_params, vflags);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -1635,7 +1637,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 		    _gnutls_x509_verify_data(sigalg,
 					     &crl_signed_data, &crl_signature,
 					     NULL,
-					     issuer);
+					     issuer, flags);
 		if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 			gnutls_assert();
 			/* error. ignore it */
