@@ -1988,6 +1988,23 @@ void generate_request(common_info_st * cinfo)
 
 static void print_verification_res(FILE * outfile, unsigned int output);
 
+static const char *get_signature_algo(gnutls_x509_crt_t crt)
+{
+	int ret;
+	static char oid[128];
+
+	ret = gnutls_x509_crt_get_signature_algorithm(crt);
+	if (ret < 0 || ret == GNUTLS_SIGN_UNKNOWN) {
+		size_t oid_size = sizeof(oid);
+		ret = gnutls_x509_crt_get_signature_oid(crt, oid, &oid_size);
+		if (ret < 0)
+			return NULL;
+		return oid;
+	}
+
+	return gnutls_sign_get_name(ret);
+}
+
 static int detailed_verification(gnutls_x509_crt_t cert,
 				 gnutls_x509_crt_t issuer,
 				 gnutls_x509_crl_t crl,
@@ -2035,6 +2052,8 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 
 		fprintf(outfile, "\tChecked against: %s\n", issuer_name.data);
 	}
+
+	fprintf(outfile, "\tSignature algorithm: %s\n", get_signature_algo(cert));
 
 	if (crl != NULL) {
 		gnutls_datum_t data;
