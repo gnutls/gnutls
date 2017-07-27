@@ -173,6 +173,16 @@ pkcs11_get_mechanism_list(struct ck_function_list * module,
 }
 
 ck_rv_t
+pkcs11_get_mechanism_info(struct ck_function_list *module,
+			  ck_slot_id_t slot_id,
+			  ck_mechanism_type_t mechanism,
+			  struct ck_mechanism_info *ptr)
+{
+	return (module)->C_GetMechanismInfo(slot_id, mechanism,
+					    ptr);
+}
+
+ck_rv_t
 pkcs11_sign_init(struct ck_function_list * module,
 		 ck_session_handle_t sess,
 		 struct ck_mechanism * mechanism, ck_object_handle_t key)

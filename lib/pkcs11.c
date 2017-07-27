@@ -3470,7 +3470,68 @@ gnutls_pkcs11_token_get_mechanism(const char *url, unsigned int idx,
 	*mechanism = mlist[idx];
 
 	return 0;
+}
 
+/**
+ * gnutls_pkcs11_token_check_mechanism:
+ * @url: should contain a PKCS 11 URL
+ * @mechanism: The PKCS #11 mechanism ID
+ * @ptr: if set it should point to a CK_MECHANISM_INFO struct
+ * @psize: the size of CK_MECHANISM_INFO struct (for safety)
+ * @flags: must be zero
+ *
+ * This function will return whether a mechanism is supported
+ * by the given token. If the mechanism is supported and
+ * @ptr is set, it will be updated with the token information.
+ *
+ * Returns: Non-zero if the mechanism is supported or zero otherwise.
+ *
+ * Since: 3.6.0
+ **/
+unsigned
+gnutls_pkcs11_token_check_mechanism(const char *url,
+				    unsigned long mechanism,
+				    void *ptr, unsigned psize, unsigned flags)
+{
+	int ret;
+	ck_rv_t rv;
+	struct ck_function_list *module;
+	ck_slot_id_t slot;
+	struct ck_token_info tinfo;
+	struct p11_kit_uri *info = NULL;
+	struct ck_mechanism_info minfo;
+
+	PKCS11_CHECK_INIT;
+
+	ret = pkcs11_url_to_info(url, &info, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = pkcs11_find_slot(&module, &slot, info, &tinfo, NULL, NULL);
+	p11_kit_uri_free(info);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	rv = pkcs11_get_mechanism_info(module, slot, mechanism, &minfo);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		return 0;
+	}
+
+	if (ptr) {
+		if (sizeof(minfo) > psize)
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+		else if (sizeof(minfo) < psize)
+			memset(ptr, 0, psize);
+		memcpy(ptr, &minfo, sizeof(minfo));
+	}
+
+	return 1;
 }
 
 /**

@@ -357,6 +357,11 @@ gnutls_pkcs11_token_get_mechanism(const char *url,
 				  unsigned int idx,
 				  unsigned long *mechanism);
 
+unsigned
+gnutls_pkcs11_token_check_mechanism(const char *url,
+				    unsigned long mechanism,
+				    void *ptr, unsigned psize, unsigned flags);
+
 int gnutls_pkcs11_token_set_pin(const char *token_url, const char *oldpin, const char *newpin, unsigned int flags	/*gnutls_pin_flag_t */);
 
 int gnutls_pkcs11_token_get_url(unsigned int seq,
