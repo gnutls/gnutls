@@ -15,9 +15,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 #ifdef HAVE_CONFIG_H
@@ -87,8 +86,7 @@ void doit(void)
 
 	for (i = 0; chains[i].chain; i++) {
 
-		if (debug)
-			printf("Chain '%s' (%d)...\n", chains[i].name, (int)i);
+		printf("[%d]: Chain '%s'...\n", (int)i, chains[i].name);
 
 		for (j = 0; chains[i].chain[j]; j++) {
 			if (debug > 2)

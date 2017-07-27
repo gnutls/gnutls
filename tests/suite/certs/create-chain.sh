@@ -24,8 +24,8 @@ while test ${counter} -lt ${NUM}; do
 		name="CA-${counter}"
 	fi
 
-	"${CERTTOOL}" --generate-privkey >"${OUTPUT}/${name}.key" 2>/dev/null
 	if test ${counter} = 0; then
+	"${CERTTOOL}" --key-type rsa-pss --bits 2048 --hash sha256 --salt-size 64 --generate-privkey >"${OUTPUT}/${name}.key" 2>/dev/null
 	# ROOT CA
 		echo "cn = ${name}" >"${TEMPLATE}"
 		echo "ca" >>"${TEMPLATE}"
@@ -40,6 +40,7 @@ while test ${counter} -lt ${NUM}; do
 			"${OUTPUT}/${name}.crl" --template "${TEMPLATE}" 2>/dev/null
 	else
 		if test ${counter} = ${LAST}; then
+	"${CERTTOOL}" --key-type rsa --bits 2048 --generate-privkey >"${OUTPUT}/${name}.key" 2>/dev/null
 		# END certificate
 			echo "cn = ${name}" >"${TEMPLATE}"
 			echo "dns_name = localhost" >>"${TEMPLATE}"
@@ -49,8 +50,9 @@ while test ${counter} -lt ${NUM}; do
 			"${CERTTOOL}" --generate-certificate --load-privkey "${OUTPUT}/${name}.key" \
 				--load-ca-certificate "${OUTPUT}/${prev_name}.crt" \
 				--load-ca-privkey "${OUTPUT}/${prev_name}.key" \
-				--outfile "${OUTPUT}/${name}.crt" --template "${TEMPLATE}" 2>/dev/null
+				--outfile "${OUTPUT}/${name}.crt" --template "${TEMPLATE}" -d 4 #2>/dev/null
 		else
+	"${CERTTOOL}" --key-type rsa-pss --bits 2048 --hash sha384 --salt-size 48 --generate-privkey >"${OUTPUT}/${name}.key" -d 4 #2>/dev/null
 		# intermediate CA
 			echo "cn = ${name}" >"${TEMPLATE}"
 			echo "ca" >>"${TEMPLATE}"
@@ -60,7 +62,7 @@ while test ${counter} -lt ${NUM}; do
 			"${CERTTOOL}" --generate-certificate --load-privkey "${OUTPUT}/${name}.key" \
 				--load-ca-certificate "${OUTPUT}/${prev_name}.crt" \
 				--load-ca-privkey "${OUTPUT}/${prev_name}.key" \
-				--outfile "${OUTPUT}/${name}.crt" --template "${TEMPLATE}" 2>/dev/null
+				--outfile "${OUTPUT}/${name}.crt" --template "${TEMPLATE}" -d 4 #2>/dev/null
 		fi
 	fi
 
