@@ -61,6 +61,8 @@
 
 struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
+	unsigned int rsa_pss_ok; /* if it is an RSA key, it can do RSA-PSS */
+
 	unsigned int flags;
 	struct p11_kit_uri *uinfo;
 	char *url;
@@ -354,8 +356,11 @@ _gnutls_pkcs11_privkey_sign(gnutls_pkcs11_privkey_t key,
 	if (se->pk == GNUTLS_PK_RSA_PSS) {
 		const struct hash_mappings_st *map = hash_to_map(se->hash);
 
-		if (map == NULL)
+		if (unlikely(map == NULL))
 			return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+
+		if (unlikely(!key->rsa_pss_ok))
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 
 		rsa_pss_params.hash_alg = map->phash;
 		rsa_pss_params.mgf = map->mgf_id;
@@ -588,6 +593,12 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		    ("Cannot determine PKCS #11 key algorithm\n");
 		ret = GNUTLS_E_UNKNOWN_ALGORITHM;
 		goto cleanup;
+	}
+
+	if (pkey->pk_algorithm == GNUTLS_PK_RSA) { /* determine whether it can do rsa-pss */
+		ret = gnutls_pkcs11_token_check_mechanism(url, CKM_RSA_PKCS_PSS, NULL, 0, 0);
+		if (ret != 0)
+			pkey->rsa_pss_ok = 1;
 	}
 
 	a[0].type = CKA_ALWAYS_AUTHENTICATE;
