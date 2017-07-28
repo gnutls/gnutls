@@ -315,7 +315,7 @@ test_case_st tests[] = {
 	},
 	{
 		.name = "TLS 1.2 ECDHE-ECDSA with cred and cert but incompatible (ed25519) curves",
-		.server_ret = GNUTLS_E_UNWANTED_ALGORITHM,
+		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
 		.client_ret = GNUTLS_E_AGAIN,
 		.have_cert_cred = 1,
 		.have_ed25519_sign_cert = 1,
