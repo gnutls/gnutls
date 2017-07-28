@@ -35,6 +35,7 @@
 #include <fips.h>
 #include <system-keys.h>
 #include "urls.h"
+#include "pkcs11_int.h"
 #include <abstract_int.h>
 
 static int
@@ -1666,4 +1667,45 @@ gnutls_privkey_set_spki(gnutls_privkey_t privkey, const gnutls_x509_spki_t spki,
 	}
 
 	return gnutls_x509_privkey_set_spki(privkey->key.x509, spki, flags);
+}
+
+/* Checks whether the public key given is compatible with the
+ * signature algorithm used. The session is only used for audit logging, and
+ * it may be null.
+ */
+unsigned _gnutls_privkey_compatible_with_sig(gnutls_privkey_t privkey,
+				        gnutls_sign_algorithm_t sign)
+{
+	const gnutls_sign_entry_st *se;
+
+	se = _gnutls_sign_to_entry(sign);
+	if (unlikely(se == NULL))
+		return gnutls_assert_val(0);
+
+	/* Prevent RSA-PSS private keys from negotiating an RSA signature,
+	 * and RSA keys which cannot do RSA-PSS (e.g., smart card) from
+	 * negotiating RSA-PSS sig.
+	 */
+	if (privkey->pk_algorithm == GNUTLS_PK_RSA_PSS && se->pk != GNUTLS_PK_RSA_PSS) {
+			return 0;
+	}
+
+	if (privkey->type == GNUTLS_PRIVKEY_EXT) {
+		/* This key type is very limited on what it can handle */
+		if (se->pk == GNUTLS_PK_EDDSA_ED25519)
+			return 0;
+
+		if (se->pk == GNUTLS_PK_RSA_PSS)
+			return 0;
+	}
+#ifdef ENABLE_PKCS11
+	else if (privkey->type == GNUTLS_PRIVKEY_PKCS11) {
+		if (privkey->pk_algorithm == GNUTLS_PK_RSA && se->pk == GNUTLS_PK_RSA_PSS) {
+			if (!privkey->key.pkcs11->rsa_pss_ok)
+				return 0;
+		}
+	}
+#endif
+
+	return 1;
 }

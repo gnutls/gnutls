@@ -554,7 +554,7 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	if (sign_algo == GNUTLS_SIGN_UNKNOWN || 
 	    _gnutls_session_sign_algo_enabled(session, sign_algo) < 0) {
 
-		sign_algo = _gnutls_session_get_sign_algo(session, cert, 1);
+		sign_algo = _gnutls_session_get_sign_algo(session, cert, pkey, 1);
 		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
 			gnutls_assert();
 			return GNUTLS_E_UNWANTED_ALGORITHM;

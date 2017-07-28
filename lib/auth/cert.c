@@ -1448,6 +1448,7 @@ unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
 static
 int select_sign_algorithm(gnutls_session_t session,
 			  gnutls_pcert_st * cert,
+			  gnutls_privkey_t pkey,
 			  const gnutls_cipher_suite_entry_st *cs)
 {
 	gnutls_sign_algorithm_t algo;
@@ -1464,7 +1465,7 @@ int select_sign_algorithm(gnutls_session_t session,
 		return 0;
 	}
 
-	algo = _gnutls_session_get_sign_algo(session, cert, 0);
+	algo = _gnutls_session_get_sign_algo(session, cert, pkey, 0);
 	if (algo == GNUTLS_SIGN_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 
@@ -1526,7 +1527,10 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 		}
 
-		ret = select_sign_algorithm(session, &session->internals.selected_cert_list[0], cs);
+		ret = select_sign_algorithm(session,
+					    &session->internals.selected_cert_list[0],
+					    session->internals.selected_key,
+					    cs);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
@@ -1561,7 +1565,10 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 					continue;
 				}
 
-				ret = select_sign_algorithm(session, &cred->certs[i].cert_list[0], cs);
+				ret = select_sign_algorithm(session,
+							    &cred->certs[i].cert_list[0],
+							    cred->pkey[i],
+							    cs);
 				if (ret >= 0) {
 					idx = i;
 					_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
@@ -1595,7 +1602,10 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 			continue;
 		}
 
-		ret = select_sign_algorithm(session, &cred->certs[i].cert_list[0], cs);
+		ret = select_sign_algorithm(session,
+					    &cred->certs[i].cert_list[0],
+					    cred->pkey[i],
+					    cs);
 		if (ret >= 0) {
 			idx = i;
 			_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",

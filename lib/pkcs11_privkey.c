@@ -59,22 +59,6 @@
 		break; \
 	} while (1);
 
-struct gnutls_pkcs11_privkey_st {
-	gnutls_pk_algorithm_t pk_algorithm;
-	unsigned int rsa_pss_ok; /* if it is an RSA key, it can do RSA-PSS */
-
-	unsigned int flags;
-	struct p11_kit_uri *uinfo;
-	char *url;
-
-	struct pkcs11_session_info sinfo;
-	ck_object_handle_t ref;	/* the key in the session */
-	unsigned reauth; /* whether we need to login on each operation */
-
-	void *mutex; /* lock for operations requiring co-ordination */
-
-	struct pin_info_st pin;
-};
 
 /**
  * gnutls_pkcs11_privkey_init:

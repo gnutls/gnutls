@@ -77,6 +77,8 @@ int _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 				     unsigned flags,
 				     gnutls_x509_spki_st *params);
 
+unsigned _gnutls_privkey_compatible_with_sig(gnutls_privkey_t key, gnutls_sign_algorithm_t sig);
+
 void _gnutls_privkey_cleanup(gnutls_privkey_t key);
 
 int privkey_sign_and_hash_data(gnutls_privkey_t signer,
