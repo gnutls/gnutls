@@ -634,7 +634,7 @@ gnutls_privkey_import_ext(gnutls_privkey_t pkey,
 
 #define CHECK_EXT_PK(pk) \
 	if (pk != GNUTLS_PK_RSA && pk != GNUTLS_PK_ECDSA && pk != GNUTLS_PK_DSA) \
-		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST)
 
 /**
  * gnutls_privkey_import_ext2:
