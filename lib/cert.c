@@ -675,7 +675,7 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	gnutls_datum_t test = {(void*)TEST_TEXT, sizeof(TEST_TEXT)-1};
 	gnutls_datum_t sig = {NULL, 0};
 	int pk, pk2, ret;
-	unsigned sign_flags = 0;
+	unsigned sign_algo;
 
 	if (res->flags & GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH)
 		return 0;
@@ -693,8 +693,8 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 			return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 		}
 
-		if (pk == GNUTLS_PK_RSA_PSS)
-			sign_flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
+		if (pk2 == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_RSA_PSS)
+			pk = GNUTLS_PK_RSA_PSS;
 	} else if (pk2 != pk) {
 		gnutls_assert();
 		_gnutls_debug_log("key is %s, certificate is %s\n", gnutls_pk_get_name(pk2),
@@ -702,11 +702,13 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
 
+	sign_algo = gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256);
+
 	/* now check if keys really match. We use the sign/verify approach
 	 * because we cannot always obtain the parameters from the abstract
 	 * keys (e.g. PKCS #11). */
-	ret = gnutls_privkey_sign_data(res->pkey[res->ncerts - 1],
-		GNUTLS_DIG_SHA256, sign_flags, &test, &sig);
+	ret = gnutls_privkey_sign_data2(res->pkey[res->ncerts - 1],
+		sign_algo, 0, &test, &sig);
 	if (ret < 0) {
 		/* for some reason we couldn't sign that. That shouldn't have
 		 * happened, but since it did, report the issue and do not
@@ -716,8 +718,8 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	}
 
 	ret = gnutls_pubkey_verify_data2(res->certs[res->ncerts - 1].cert_list[0].pubkey,
-		gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256),
-		GNUTLS_VERIFY_ALLOW_BROKEN, &test, &sig);
+					 sign_algo,
+					 GNUTLS_VERIFY_ALLOW_BROKEN, &test, &sig);
 
 	gnutls_free(sig.data);
 
