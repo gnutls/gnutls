@@ -1315,6 +1315,9 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 		return _gnutls_pk_sign(pk, signature, data,
 				       &key->key.x509->params, params);
 	case GNUTLS_PRIVKEY_EXT:
+		if (pk == GNUTLS_PK_RSA_PSS || pk == GNUTLS_PK_EDDSA_ED25519)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 		if (key->key.ext.sign_func == NULL)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		return key->key.ext.sign_func(key, key->key.ext.userdata,
