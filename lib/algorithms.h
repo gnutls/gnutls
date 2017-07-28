@@ -153,22 +153,13 @@ inline static int _gnutls_mac_get_key_size(const mac_entry_st * e)
 #define _gnutls_digest_get_name _gnutls_mac_get_name
 #define _gnutls_hash_get_algo_len _gnutls_mac_get_algo_len
 
-/* Check generic-purpose security */
+/* Security against pre-image attacks */
 inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
 {
 	if (unlikely(e == NULL))
 		return 0;
 	else
-		return (e->slevel==_SECURE || e->slevel == _INSECURE_FOR_CERTS)?1:0;
-}
-
-/* Check certificate use security */
-inline static int _gnutls_digest_is_secure_for_certs(const mac_entry_st * e)
-{
-	if (unlikely(e == NULL))
-		return 0;
-	else
-		return (e->slevel==_SECURE)?1:0;
+		return (e->preimage_insecure==0);
 }
 
 /* Functions for cipher suites. */
@@ -308,6 +299,12 @@ enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm_t
 
 /* Functions for sign algorithms. */
 
+typedef enum hash_security_level_t {
+	_SECURE,
+	_INSECURE_FOR_CERTS,
+	_INSECURE
+} hash_security_level_t;
+
 struct gnutls_sign_entry_st {
 	const char *name;
 	const char *oid;
@@ -317,12 +314,15 @@ struct gnutls_sign_entry_st {
 	/* See RFC 5246 HashAlgorithm and SignatureAlgorithm
 	   for values to use in aid struct. */
 	const sign_algorithm_st aid;
+	hash_security_level_t slevel;	/* contains values of hash_security_level_t */
 };
 typedef struct gnutls_sign_entry_st gnutls_sign_entry_st;
 
 const gnutls_sign_entry_st *_gnutls_sign_to_entry(gnutls_sign_algorithm_t sign);
 const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t, gnutls_digest_algorithm_t);
 const gnutls_sign_entry_st *_gnutls_oid_to_sign_entry(const char *oid);
+
+bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st *se, unsigned int flags);
 
 gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk(gnutls_sign_algorithm_t
 					      sign);

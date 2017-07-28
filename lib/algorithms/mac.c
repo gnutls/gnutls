@@ -32,12 +32,6 @@
 #define MAC_OID_SHA384 "1.2.840.113549.2.10"
 #define MAC_OID_SHA512 "1.2.840.113549.2.11"
 
-#ifdef ALLOW_SHA1
-# define SHA1_SECURE_VAL _SECURE
-#else
-# define SHA1_SECURE_VAL _INSECURE_FOR_CERTS
-#endif
-
 static const mac_entry_st hash_algorithms[] = {
 	{.name = "SHA1",
 	 .oid = HASH_OID_SHA1,
@@ -45,13 +39,12 @@ static const mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_SHA1,
 	 .output_size = 20,
 	 .key_size = 20,
-	 .slevel = SHA1_SECURE_VAL,
 	 .block_size = 64},
 	{.name = "MD5+SHA1",
 	 .id = GNUTLS_MAC_MD5_SHA1,
 	 .output_size = 36,
 	 .key_size = 36,
-	 .slevel = _INSECURE,
+	 .preimage_insecure = 1,
 	 .block_size = 64},
 	{.name = "SHA256",
 	 .oid = HASH_OID_SHA256,
@@ -123,18 +116,17 @@ static const mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_MD5,
 	 .output_size = 16,
 	 .key_size = 16,
-	 .slevel = _INSECURE,
+	 .preimage_insecure = 1,
 	 .block_size = 64},
 	{.name = "MD2",
 	 .oid = HASH_OID_MD2,
-	 .slevel = _INSECURE,
+	 .preimage_insecure = 1,
 	 .id = GNUTLS_MAC_MD2},
 	{.name = "RIPEMD160",
 	 .oid = HASH_OID_RMD160,
 	 .id = GNUTLS_MAC_RMD160,
 	 .output_size = 20,
 	 .key_size = 20,
-	 .slevel = _INSECURE_FOR_CERTS,
 	 .block_size = 64},
 	{.name = "MAC-NULL",
 	 .id = GNUTLS_MAC_NULL},

@@ -387,7 +387,7 @@ static unsigned int check_time_status(gnutls_x509_crt_t crt, time_t now)
 	return 0;
 }
 
-unsigned _gnutls_is_broken_sig_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
+unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned int flags)
 {
 	gnutls_digest_algorithm_t hash;
 
@@ -396,14 +396,14 @@ unsigned _gnutls_is_broken_sig_allowed(gnutls_sign_algorithm_t sig, unsigned int
 		return 1;
 
 	/* the first two are for backwards compatibility */
-	if ((sig == GNUTLS_SIGN_RSA_MD2)
+	if ((se->id == GNUTLS_SIGN_RSA_MD2)
 	    && (flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2))
 		return 1;
-	if ((sig == GNUTLS_SIGN_RSA_MD5)
+	if ((se->id == GNUTLS_SIGN_RSA_MD5)
 	    && (flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5))
 		return 1;
 
-	hash = gnutls_sign_get_hash_algorithm(sig);
+	hash = se->hash;
 	if (hash == GNUTLS_DIG_SHA1 && (flags & GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1))
 		return 1;
 
@@ -613,6 +613,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	unsigned result = 1;
 	unsigned int out = 0, usage;
 	int sigalg, ret;
+	const gnutls_sign_entry_st *se;
 
 	if (output)
 		*output = 0;
@@ -650,6 +651,8 @@ verify_crt(gnutls_x509_crt_t cert,
 		MARK_INVALID(0);
 	}
 	sigalg = ret;
+
+	se = _gnutls_sign_to_entry(sigalg);
 
 	/* issuer is not in trusted certificate
 	 * authorities.
@@ -776,7 +779,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		}
 	}
 
-	if (sigalg >= 0) {
+	if (sigalg >= 0 && se) {
 		if (is_level_acceptable(cert, issuer, sigalg, flags) == 0) {
 			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
 		}
@@ -785,8 +788,8 @@ verify_crt(gnutls_x509_crt_t cert,
 		 * used are secure. If the certificate is self signed it doesn't
 		 * really matter.
 		 */
-		if (gnutls_sign_is_secure2(sigalg, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0 &&
-		    _gnutls_is_broken_sig_allowed(sigalg, flags) == 0 &&
+		if (_gnutls_sign_is_secure2(se, GNUTLS_SIGN_FLAG_SECURE_FOR_CERTS) == 0 &&
+		    _gnutls_is_broken_sig_allowed(se, flags) == 0 &&
 		    is_issuer(cert, cert) == 0) {
 			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
 		}

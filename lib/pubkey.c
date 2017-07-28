@@ -1961,7 +1961,7 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 
 	}
 
-	if (gnutls_sign_is_secure(se->id) == 0 && _gnutls_is_broken_sig_allowed(se->id, flags) == 0) {
+	if (_gnutls_sign_is_secure2(se, 0) == 0 && _gnutls_is_broken_sig_allowed(se, flags) == 0) {
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
 
@@ -2023,7 +2023,7 @@ pubkey_verify_data(const gnutls_sign_entry_st *se,
 
 	}
 
-	if (gnutls_sign_is_secure(se->id) == 0 && _gnutls_is_broken_sig_allowed(se->id, flags) == 0) {
+	if (_gnutls_sign_is_secure2(se,0) == 0 && _gnutls_is_broken_sig_allowed(se, flags) == 0) {
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	}
 

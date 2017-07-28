@@ -476,12 +476,6 @@ typedef struct gnutls_cipher_suite_entry_st {
 } gnutls_cipher_suite_entry_st;
 
 
-typedef enum hash_security_level_t {
-	_SECURE,
-	_INSECURE_FOR_CERTS,
-	_INSECURE
-} hash_security_level_t;
-
 typedef struct gnutls_group_entry_st {
 	const char *name;
 	gnutls_group_t id;
@@ -504,8 +498,8 @@ typedef struct mac_entry_st {
 	unsigned key_size;
 	unsigned nonce_size;
 	unsigned placeholder;	/* if set, then not a real MAC */
-	hash_security_level_t slevel;	/* contains values of hash_security_level_t */
 	unsigned block_size;	/* internal block size for HMAC */
+	unsigned preimage_insecure; /* if this algorithm should not be trusted for pre-image attacks */
 } mac_entry_st;
 
 typedef struct {
