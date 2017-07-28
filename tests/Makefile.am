@@ -89,7 +89,7 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
-ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
+ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
 	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
 	 crq_key_id x509sign-verify sign-verify cve-2009-1415 cve-2009-1416		\

@@ -1,3 +1,5 @@
+#include <errno.h>
+
 #define min(x,y) ((x)<(y)?(x):(y))
 
 extern const char *side;
