@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  * Copyright (C) 2012-2016 Nikos Mavrogiannopoulos
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -65,7 +65,9 @@ void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
 	gnutls_pk_params_release(&key->params);
 	/* avoid re-use of fields which may have had some sensible value */
 	memset(&key->params, 0, sizeof(key->params));
-	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
+
+	if (key->key)
+		asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 	key->key = ASN1_TYPE_EMPTY;
 }
 
@@ -586,6 +588,9 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 			gnutls_assert();
 			key->key = NULL;
 			goto cleanup;
+		} else {
+			/* some keys under PKCS#8 don't set key->key */
+			goto finish;
 		}
 	} else if (key->params.algo == GNUTLS_PK_RSA) {
 		key->key =
@@ -640,6 +645,7 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
+ finish:
 	result =
 	    _gnutls_pk_fixup(key->params.algo, GNUTLS_IMPORT, &key->params);
 	if (result < 0) {
@@ -1371,6 +1377,10 @@ gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	if (key->key == NULL) { /* can only export in PKCS#8 form */
+		return gnutls_x509_privkey_export_pkcs8(key, format, NULL, 0, output_data, output_data_size);
+	}
+
 	msg = set_msg(key);
 
 	if (key->flags & GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT) {
@@ -1414,6 +1424,10 @@ gnutls_x509_privkey_export2(gnutls_x509_privkey_t key,
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (key->key == NULL) { /* can only export in PKCS#8 form */
+		return gnutls_x509_privkey_export2_pkcs8(key, format, NULL, 0, out);
 	}
 
 	msg = set_msg(key);
@@ -2157,14 +2171,17 @@ int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
+	if (key->key) {
+		asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 
-	ret =
-	    _gnutls_asn1_encode_privkey(&key->key,
-					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+		ret =
+		    _gnutls_asn1_encode_privkey(&key->key,
+						&key->params,
+						key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	return 0;
