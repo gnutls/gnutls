@@ -93,9 +93,21 @@ void doit(void)
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
 		success("mech: %lu\n", mech);
+		ret = gnutls_pkcs11_token_check_mechanism("pkcs11:", mech, NULL, 0, 0);
+		if (ret == 0) {
+			fail("mechanism %ld was reported are supported, but is not found!\n", mech);
+		}
 	}
 	if (debug)
 		printf("done\n\n\n");
+
+	ret = gnutls_pkcs11_token_check_mechanism("pkcs11:", -1, NULL, 0, 0);
+	if (ret != 0)
+		fail("found invalid mechanism1\n");
+
+	ret = gnutls_pkcs11_token_check_mechanism("pkcs11:", -3, NULL, 0, 0);
+	if (ret != 0)
+		fail("found invalid mechanism2\n");
 
 	gnutls_pkcs11_deinit();
 	gnutls_global_deinit();
