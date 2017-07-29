@@ -21,9 +21,16 @@ export LD_LIBRARY_PATH=${srcdir}/../../lib/.libs/
 
 cat ${srcdir}/../../config.log|grep afl-gcc >/dev/null 2>&1
 if test $? != 0;then
-	echo "compile first library as:"
-	echo "CC=afl-gcc ./configure"
-	exit 1
+	cat ${srcdir}/../../config.log|grep afl-clang-fast >/dev/null 2>&1
+	if test $? != 0;then
+		echo "compile first library as:"
+		echo "CC=afl-gcc ./configure"
+		exit 1
+	else
+		fuzz=afl-clang-fast
+	fi
+else
+	fuzz=afl-gcc
 fi
 
 if test -z "$1";then
@@ -33,7 +40,7 @@ if test -z "$1";then
 fi
 
 rm -f $1
-CFLAGS="-g -O2" CC=afl-gcc make $1 || exit 1
+CFLAGS="-g -O2" CC=${fuzz} make $1 || exit 1
 
 TEST=$(echo $1|sed s/_fuzzer//)
 
