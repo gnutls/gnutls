@@ -829,7 +829,8 @@ static int try_resume(socket_st * hd)
 	if (udp)
 		socket_flags |= SOCKET_FLAG_UDP;
 
-	socket_open(hd, hostname, service, OPT_ARG(STARTTLS_PROTO), socket_flags, CONNECT_MSG, &rdata);
+	socket_open(hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
+		     socket_flags, CONNECT_MSG, &rdata);
 
 	printf("- Resume Handshake was completed\n");
 	if (gnutls_session_is_resumed(hd->session) != 0)
@@ -1082,6 +1083,8 @@ int main(int argc, char **argv)
 	inline_cmds_st inline_cmds;
 	unsigned last_op_is_write = 0;
 	int socket_flags = 0;
+	FILE *server_fp = NULL;
+	FILE *client_fp = NULL;
 #ifndef _WIN32
 	struct sigaction new_action;
 #endif
@@ -1118,7 +1121,17 @@ int main(int argc, char **argv)
 	else if (HAVE_OPT(STARTTLS_PROTO))
 		socket_flags |= SOCKET_FLAG_STARTTLS;
 
-	socket_open(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO), socket_flags, CONNECT_MSG, NULL);
+	if (HAVE_OPT(SAVE_SERVER_TRACE)) {
+		server_fp = fopen(OPT_ARG(SAVE_SERVER_TRACE), "wb");
+	}
+	if (HAVE_OPT(SAVE_CLIENT_TRACE)) {
+		client_fp = fopen(OPT_ARG(SAVE_CLIENT_TRACE), "wb");
+	}
+
+	socket_open2(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
+		     socket_flags, CONNECT_MSG, NULL,
+		     server_fp, client_fp);
+
 	hd.verbose = verbose;
 
 	if (hd.secure) {

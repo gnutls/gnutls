@@ -161,6 +161,20 @@ flag = {
 };
 
 flag = {
+    name      = save-server-trace;
+    arg-type  = string;
+    descrip   = "Save the server-side TLS message trace in the provided file";
+    doc      = "";
+};
+
+flag = {
+    name      = save-client-trace;
+    arg-type  = string;
+    descrip   = "Save the client-side TLS message trace in the provided file";
+    doc      = "";
+};
+
+flag = {
     name      = dh-bits;
     arg-type  = number;
     descrip   = "The minimum number of bits allowed for DH";

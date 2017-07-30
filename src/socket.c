@@ -387,6 +387,11 @@ void socket_bye(socket_st * socket, unsigned polite)
 	gnutls_free(socket->rdata.data);
 	socket->rdata.data = NULL;
 
+	if (socket->server_trace)
+		fclose(socket->server_trace);
+	if (socket->client_trace)
+		fclose(socket->client_trace);
+
 	socket->fd = -1;
 	socket->secure = 0;
 }
@@ -409,10 +414,45 @@ void canonicalize_host(char *hostname, char *service, unsigned service_size)
 	snprintf(service, service_size, "%s", p+1);
 }
 
+static ssize_t
+wrap_pull(gnutls_transport_ptr_t ptr, void *data, size_t len)
+{
+	socket_st *hd = ptr;
+	ssize_t r;
+
+	r = recv(hd->fd, data, len, 0);
+	if (r > 0 && hd->server_trace) {
+		fwrite(data, 1, len, hd->server_trace);
+	}
+	return r;
+}
+
+static ssize_t
+wrap_push(gnutls_transport_ptr_t ptr, const void *data, size_t len)
+{
+	socket_st *hd = ptr;
+
+	if (hd->client_trace) {
+		fwrite(data, 1, len, hd->client_trace);
+	}
+
+	return send(hd->fd, data, len, 0);
+}
+
+/* inline is used to avoid a gcc warning if used in mini-eagain */
+inline static int wrap_pull_timeout_func(gnutls_transport_ptr_t ptr,
+					   unsigned int ms)
+{
+	socket_st *hd = ptr;
+
+	return gnutls_system_recv_timeout((gnutls_transport_ptr_t)(long)hd->fd, ms);
+}
+
 
 void
-socket_open(socket_st * hd, const char *hostname, const char *service,
-	    const char *app_proto, int flags, const char *msg, gnutls_datum_t *rdata)
+socket_open2(socket_st * hd, const char *hostname, const char *service,
+	    const char *app_proto, int flags, const char *msg, gnutls_datum_t *rdata,
+	    FILE *server_trace, FILE *client_trace)
 {
 	struct addrinfo hints, *res, *ptr;
 	int sd, err = 0;
@@ -523,7 +563,16 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 				gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
 			}
 
-			gnutls_transport_set_int(hd->session, sd);
+			if (server_trace)
+				hd->server_trace = server_trace;
+
+			if (client_trace)
+				hd->client_trace = client_trace;
+
+			gnutls_transport_set_push_function(hd->session, wrap_push);
+			gnutls_transport_set_pull_function(hd->session, wrap_pull);
+			gnutls_transport_set_pull_timeout_function(hd->session, wrap_pull_timeout_func);
+			gnutls_transport_set_ptr(hd->session, hd);
 		}
 
 		if (!(flags & SOCKET_FLAG_RAW) && !(flags & SOCKET_FLAG_SKIP_INIT)) {
