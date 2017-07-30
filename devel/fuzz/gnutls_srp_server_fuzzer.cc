@@ -66,6 +66,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	int res;
 	gnutls_datum_t rsa_cert, rsa_key;
 	gnutls_datum_t ecdsa_cert, ecdsa_key;
+	gnutls_datum_t ed25519_cert, ed25519_key;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t xcred;
 	gnutls_srp_server_credentials_t pcred;
@@ -92,6 +93,11 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	ecdsa_key.data = (unsigned char *)kECDSAPrivateKeyDER;
 	ecdsa_key.size = sizeof(kECDSAPrivateKeyDER);
 
+	ed25519_cert.data = (unsigned char *)kEd25519CertificateDER;
+	ed25519_cert.size = sizeof(kEd25519CertificateDER);
+	ed25519_key.data = (unsigned char *)kEd25519PrivateKeyDER;
+	ed25519_key.size = sizeof(kEd25519PrivateKeyDER);
+
 	res =
 	    gnutls_certificate_set_x509_key_mem(xcred, &rsa_cert, &rsa_key,
 						GNUTLS_X509_FMT_DER);
@@ -99,6 +105,11 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	res =
 	    gnutls_certificate_set_x509_key_mem(xcred, &ecdsa_cert, &ecdsa_key,
+						GNUTLS_X509_FMT_DER);
+	assert(res >= 0);
+
+	res =
+	    gnutls_certificate_set_x509_key_mem(xcred, &ed25519_cert, &ed25519_key,
 						GNUTLS_X509_FMT_DER);
 	assert(res >= 0);
 
