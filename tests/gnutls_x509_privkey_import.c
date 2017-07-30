@@ -57,7 +57,7 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, gnutls_sign_algorithm_t 
 
 	ret = gnutls_privkey_import_x509(privkey, pkey, 0);
 	if (ret < 0)
-		fail("gnutls_pubkey_import_x509\n");
+		fail("gnutls_privkey_import_x509\n");
 
 	ret = gnutls_privkey_sign_data2(privkey, algo, 0,
 					&raw_data, &signature);
@@ -123,6 +123,48 @@ static void load_privkey(const char *name, const gnutls_datum_t *txtkey, gnutls_
 	return;
 }
 
+static void load_privkey_in_der(const char *name, const gnutls_datum_t *txtkey, gnutls_pk_algorithm_t pk,
+			 gnutls_sign_algorithm_t sig, int exp_key_err)
+{
+	gnutls_x509_privkey_t tmp;
+	gnutls_datum_t der;
+	int ret;
+
+	ret = gnutls_x509_privkey_init(&tmp);
+	if (ret < 0)
+		testfail("gnutls_privkey_init\n");
+
+	ret = gnutls_pem_base64_decode2(NULL, txtkey, &der);
+	if (ret < 0 || der.size == 0) {
+		testfail("could not convert key to DER form: %s\n", gnutls_strerror(ret));
+	}
+
+	ret = gnutls_x509_privkey_import(tmp, &der, GNUTLS_X509_FMT_DER);
+	gnutls_free(der.data);
+
+	if (ret < 0) {
+		if (exp_key_err) {
+			testfail("did not fail in key import, although expected\n");
+		}
+
+		testfail("gnutls_privkey_import: %s\n", gnutls_strerror(ret));
+	}
+
+	if (gnutls_x509_privkey_get_pk_algorithm(tmp) != (int)pk) {
+		testfail("pk algorithm doesn't match!\n");
+	}
+
+	ret = gnutls_x509_privkey_verify_params(tmp);
+	if (ret < 0)
+		testfail("gnutls_privkey_verify_params: %s\n", gnutls_strerror(ret));
+
+	sign_verify_data(tmp, sig);
+
+	gnutls_x509_privkey_deinit(tmp);
+
+	return;
+}
+
 typedef struct test_st {
 	const char *name;
 	gnutls_pk_algorithm_t pk;
@@ -167,6 +209,10 @@ void doit(void)
 		success("checking: %s\n", tests[i].name);
 
 		load_privkey(tests[i].name, tests[i].key, tests[i].pk,
+			     tests[i].sig, tests[i].exp_key_err);
+
+		success("checking: %s in der form\n", tests[i].name);
+		load_privkey_in_der(tests[i].name, tests[i].key, tests[i].pk,
 			     tests[i].sig, tests[i].exp_key_err);
 	}
 
