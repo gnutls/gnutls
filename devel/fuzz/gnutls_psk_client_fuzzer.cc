@@ -31,6 +31,8 @@
 
 #include <gnutls/gnutls.h>
 
+#include "psk.h"
+
 struct mem_st {
 	const uint8_t *data;
 	size_t size;
@@ -79,10 +81,10 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	gnutls_session_t session;
 	gnutls_psk_client_credentials_t pcred;
 	struct mem_st memdata;
-	gnutls_datum_t pskkey;
+	gnutls_datum_t psk_key;
 
-	pskkey.data = (unsigned char*)"\x8a\x77\x59\xb3\xf2\x69\x83\xc4\x53\xe4\x48\x06\x0b\xde\x89\x81";
-	pskkey.size = 16;
+	psk_key.data = (unsigned char*)psk_key16;
+	psk_key.size = 16;
 
 	res = gnutls_init(&session, GNUTLS_CLIENT);
 	assert(res >= 0);
@@ -90,7 +92,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_psk_allocate_client_credentials(&pcred);
 	assert(res >= 0);
 
-	res = gnutls_psk_set_client_credentials(pcred, "test", &pskkey, GNUTLS_PSK_KEY_RAW);
+	res = gnutls_psk_set_client_credentials(pcred, "test", &psk_key, GNUTLS_PSK_KEY_RAW);
 	assert(res >= 0);
 
 	res = gnutls_credentials_set(session, GNUTLS_CRD_PSK, pcred);

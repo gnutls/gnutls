@@ -30,6 +30,7 @@
 #include <gnutls/gnutls.h>
 
 #include "certs.h"
+#include "psk.h"
 
 struct mem_st {
 	const uint8_t *data;
@@ -77,9 +78,7 @@ psk_cb(gnutls_session_t session, const char *username,
 	key->data = (unsigned char*)gnutls_malloc(16);
 	assert(key->data != NULL);
 
-	memcpy(key->data,
-	       "\x8a\x77\x59\xb3\xf2\x69\x83\xc4\x53\xe4\x48\x06\x0b\xde\x89\x81",
-	       16);
+	memcpy(key->data, psk_key16, 16);
 	key->size = 16;
 
 	return 0;
