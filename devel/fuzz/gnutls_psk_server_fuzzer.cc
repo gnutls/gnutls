@@ -1,20 +1,25 @@
 /*
-# Copyright 2017 Red Hat, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-################################################################################
-*/
+ * Copyright (C) 2017 Nikos Mavrogiannopoulos
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *
+ */
 
 #include <assert.h>
 #include <stdint.h>
@@ -65,6 +70,21 @@ int server_pull_timeout_func(gnutls_transport_ptr_t tr, unsigned int ms)
 		return 0;	/* timeout */
 }
 
+static int
+psk_cb(gnutls_session_t session, const char *username,
+	gnutls_datum_t * key)
+{
+	key->data = (unsigned char*)gnutls_malloc(16);
+	assert(key->data != NULL);
+
+	memcpy(key->data,
+	       "\x8a\x77\x59\xb3\xf2\x69\x83\xc4\x53\xe4\x48\x06\x0b\xde\x89\x81",
+	       16);
+	key->size = 16;
+
+	return 0;
+}
+
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -75,6 +95,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	gnutls_datum_t ecdsa_cert, ecdsa_key;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t xcred;
+	gnutls_psk_server_credentials_t pcred;
 	struct mem_st memdata;
 
 	res = gnutls_init(&session, GNUTLS_SERVER);
@@ -82,6 +103,12 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	res = gnutls_certificate_allocate_credentials(&xcred);
 	assert(res >= 0);
+
+	res = gnutls_psk_allocate_server_credentials(&pcred);
+	assert(res >= 0);
+
+	gnutls_psk_set_server_credentials_function(pcred, psk_cb);
+	gnutls_psk_set_server_known_dh_params(pcred, GNUTLS_SEC_PARAM_MEDIUM);
 
 	rsa_cert.data = (unsigned char *)kRSACertificateDER;
 	rsa_cert.size = sizeof(kRSACertificateDER);
@@ -108,7 +135,10 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	assert(res >= 0);
 
-	res = gnutls_set_default_priority(session);
+	res = gnutls_credentials_set(session, GNUTLS_CRD_PSK, pcred);
+	assert(res >= 0);
+
+	res = gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK:+RSA-PSK", NULL);
 	assert(res >= 0);
 
 	memdata.data = data;
@@ -134,5 +164,6 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	gnutls_deinit(session);
 	gnutls_certificate_free_credentials(xcred);
+	gnutls_psk_free_server_credentials(pcred);
 	return 0;
 }
