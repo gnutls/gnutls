@@ -627,14 +627,18 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 					    gnutls_x509_privkey_import_pkcs8(key, data, format,
 									     NULL,
 									     GNUTLS_PKCS_PLAIN);
-					if (result < 0) {
-						gnutls_assert();
-						key->key = NULL;
-						if (result == GNUTLS_E_PK_INVALID_PRIVKEY)
-							goto cleanup;
+					if (result >= 0) {
+						/* there are keys (ed25519) which leave key->key NULL */
+						goto finish;
 					}
-				}
 
+					/* result < 0 */
+					gnutls_assert();
+					key->key = NULL;
+
+					if (result == GNUTLS_E_PK_INVALID_PRIVKEY)
+						goto cleanup;
+				}
 			}
 		}
 	}
