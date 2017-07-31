@@ -25,9 +25,10 @@ BUILT_SOURCES = srptool-args.c srptool-args.h \
 	serv-args.c serv-args.h cli-args.c cli-args.h \
 	cli-debug-args.c cli-debug-args.h certtool-args.c certtool-args.h \
 	danetool-args.c danetool-args.h p11tool-args.c p11tool-args.h \
-	tpmtool-args.c tpmtool-args.h systemkey-args.c systemkey-args.h
+	tpmtool-args.c tpmtool-args.h systemkey-args.c systemkey-args.h \
+	mech-list.h
 
-EXTRA_DIST = args-std.def
+EXTRA_DIST = args-std.def gen-mech-list.sh
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -289,5 +290,9 @@ systemkey-args.stamp: $(srcdir)/systemkey-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
 	touch $@
 
-clean-local:
-	rm -f *.stamp
+mech-list.h: gen-mech-list.sh
+	@$(srcdir)/gen-mech-list.sh > mech-list.h.tmp
+	@mv mech-list.h.tmp $@
+
+maintainer-clean-local:
+	rm -f *.stamp mech-list.h
