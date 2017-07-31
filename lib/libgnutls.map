@@ -1172,6 +1172,8 @@ GNUTLS_3_4
 	gnutls_group_get;
 	gnutls_priority_group_list;
 	gnutls_pkcs11_token_check_mechanism;
+	gnutls_base64_encode2;
+	gnutls_base64_decode2;
  local:
 	*;
 };

@@ -261,6 +261,10 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 	base64_decode_init(&ctx);
 
 	size = BASE64_DECODE_LENGTH(data_size);
+	if (size == 0) {
+		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		goto cleanup;
+	}
 
 	result->data = gnutls_malloc(size);
 	if (result->data == NULL) {
@@ -430,7 +434,7 @@ gnutls_pem_base64_decode(const char *header,
  * gnutls_pem_base64_decode2:
  * @header: The PEM header (eg. CERTIFICATE)
  * @b64_data: contains the encoded data
- * @result: the place where decoded data lie
+ * @result: the location of decoded data
  *
  * This function will decode the given encoded data. The decoded data
  * will be allocated, and stored into result.  If the header given is
@@ -466,6 +470,67 @@ gnutls_pem_base64_decode2(const char *header,
 	ret =
 	    _gnutls_fbase64_decode(header, b64_data->data, b64_data->size,
 				   result);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
+}
+
+/**
+ * gnutls_base64_decode2:
+ * @base64: contains the encoded data
+ * @result: the location of decoded data
+ *
+ * This function will decode the given base64 encoded data. The decoded data
+ * will be allocated, and stored into result.
+ *
+ * You should use gnutls_free() to free the returned data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_base64_decode2(const gnutls_datum_t *base64,
+		      gnutls_datum_t *result)
+{
+	int ret;
+
+	ret = _gnutls_base64_decode(base64->data, base64->size, result);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_base64_encode2:
+ * @data: contains the raw data
+ * @result: will hold the newly allocated encoded data
+ *
+ * This function will convert the given data to printable data, using
+ * the base64 encoding. This function will allocate the required
+ * memory to hold the encoded data.
+ *
+ * You should use gnutls_free() to free the returned data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.6.0
+ **/
+int
+gnutls_base64_encode2(const gnutls_datum_t *data,
+		      gnutls_datum_t *result)
+{
+	int ret;
+
+	if (result == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = _gnutls_fbase64_encode(NULL, data->data, data->size, result);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

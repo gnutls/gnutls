@@ -2427,6 +2427,11 @@ int gnutls_pem_base64_decode2(const char *header,
 				   const gnutls_datum_t * b64_data,
 				   gnutls_datum_t * result);
 
+int gnutls_base64_encode2(const gnutls_datum_t * data,
+			  gnutls_datum_t * result);
+int gnutls_base64_decode2(const gnutls_datum_t * b64_data,
+			  gnutls_datum_t * result);
+
 #define gnutls_pem_base64_encode_alloc gnutls_pem_base64_encode2
 #define gnutls_pem_base64_decode_alloc gnutls_pem_base64_decode2
 
