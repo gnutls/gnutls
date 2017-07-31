@@ -262,7 +262,7 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 
 	size = BASE64_DECODE_LENGTH(data_size);
 	if (size == 0) {
-		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		ret = gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 		goto cleanup;
 	}
 
@@ -276,13 +276,13 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 				   pdata.size, pdata.data); 
 	if (ret == 0) {
 		gnutls_assert();
-		ret = GNUTLS_E_PARSING_ERROR;
+		ret = GNUTLS_E_BASE64_DECODING_ERROR;
 		goto fail;
 	}
 
 	ret = base64_decode_final(&ctx);
 	if (ret != 1) {
-		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		ret = gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 		goto fail;
 	}
 
