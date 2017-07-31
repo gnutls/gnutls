@@ -72,9 +72,6 @@ See the end for copying conditions.
    priority string options. These allows enabling all broken and SHA1-based signature
    algorithms in certificate verification, respectively.
 
-** libgnutls: gnutls_pem_base64_encode/2() and gnutls_pem_base64_decode/2() can
-   be used to decode arbitrary base64 data if the header parameter is set to NULL.
-
 ** libgnutls: Removed support for libidn; gnutls can now be compiled only with
    libidn2.
 
@@ -89,6 +86,8 @@ See the end for copying conditions.
 ** psktool: Generate 256-bit keys by default.
 
 ** API and ABI modifications:
+gnutls_base64_encode2: Added
+gnutls_base64_decode2: Added
 gnutls_x509_crt_set_flags: Added
 gnutls_x509_crt_check_ip: Added
 gnutls_x509_ext_import_inhibit_anypolicy: Added
