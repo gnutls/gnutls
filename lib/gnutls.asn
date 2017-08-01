@@ -26,18 +26,14 @@ RSAPrivateKey ::= SEQUENCE {
   exponent1        INTEGER, -- (Usually large) d mod (p-1)
   exponent2        INTEGER, -- (Usually large) d mod (q-1)
   coefficient      INTEGER, -- (Usually large) (inverse of q) mod p
-  otherInfo	   RSAOtherInfo OPTIONAL
+  otherPrimeInfos  OtherPrimeInfos OPTIONAL
 }
 
 ProvableSeed ::= SEQUENCE {
-  algorithm OBJECT IDENTIFIER,
+  algorithm OBJECT IDENTIFIER, -- the hash algorithm OID used for FIPS186-4 generation
   seed OCTET STRING
 }
 
-RSAOtherInfo ::= CHOICE {
-  otherPrimeInfos	OtherPrimeInfos, -- the hash algorithm OID used for FIPS186-4 generation
-  seed		    [1] ProvableSeed
-}
 
 OtherPrimeInfos ::= SEQUENCE SIZE(1..MAX) OF OtherPrimeInfo
 
@@ -84,8 +80,7 @@ DSAPrivateKey ::= SEQUENCE {
   q        INTEGER,
   g        INTEGER,
   Y        INTEGER, -- public
-  priv     INTEGER,
-  seed [1] ProvableSeed OPTIONAL
+  priv     INTEGER
 }
 
 -- from PKCS#3

@@ -113,7 +113,7 @@ gnutls_x509_privkey_cpy(gnutls_x509_privkey_t dst,
 
 	ret =
 	    _gnutls_asn1_encode_privkey(&dst->key,
-					&dst->params, src->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&dst->params);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_pk_params_release(&dst->params);
@@ -132,8 +132,6 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 {
 	int result;
 	ASN1_TYPE pkey_asn;
-	char tmp[64];
-	int tmp_size;
 
 	gnutls_pk_params_init(&pkey->params);
 
@@ -219,29 +217,6 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 
 	pkey->params.params_nr = RSA_PRIVATE_PARAMS;
 	pkey->params.algo = GNUTLS_PK_RSA;
-
-	tmp_size = sizeof(tmp);
-	result = asn1_read_value(pkey_asn, "otherInfo", tmp, &tmp_size);
-	if (result == ASN1_SUCCESS && strcmp(tmp, "seed") == 0) {
-		gnutls_datum_t v;
-		char oid[MAX_OID_SIZE];
-		int oid_size;
-
-		oid_size = sizeof(oid);
-		result = asn1_read_value(pkey_asn, "otherInfo.seed.algorithm", oid, &oid_size);
-		if (result == ASN1_SUCCESS) {
-			pkey->params.palgo = gnutls_oid_to_digest(oid);
-		}
-
-		result = _gnutls_x509_read_value(pkey_asn, "otherInfo.seed.seed", &v);
-		if (result >= 0) {
-			if (v.size <= sizeof(pkey->params.seed)) {
-				memcpy(pkey->params.seed, v.data, v.size);
-				pkey->params.seed_size = v.size;
-			}
-			gnutls_free(v.data);
-		}
-	}
 
 	return pkey_asn;
 
@@ -466,8 +441,6 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 
 #define PEM_KEY_DSA "DSA PRIVATE KEY"
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
-#define PEM_KEY_DSA_PROVABLE "FIPS186-4 DSA PRIVATE KEY"
-#define PEM_KEY_RSA_PROVABLE "FIPS186-4 RSA PRIVATE KEY"
 #define PEM_KEY_ECC "EC PRIVATE KEY"
 #define PEM_KEY_PKCS8 "PRIVATE KEY"
 
@@ -547,8 +520,6 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 				IF_CHECK_FOR(PEM_KEY_RSA, GNUTLS_PK_RSA, ptr, begin_ptr, left, key)
 				else IF_CHECK_FOR(PEM_KEY_ECC, GNUTLS_PK_EC, ptr, begin_ptr, left, key)
 				else IF_CHECK_FOR(PEM_KEY_DSA, GNUTLS_PK_DSA, ptr, begin_ptr, left, key)
-				else IF_CHECK_FOR(PEM_KEY_RSA_PROVABLE, GNUTLS_PK_RSA, ptr, begin_ptr, left, key)
-				else IF_CHECK_FOR(PEM_KEY_DSA_PROVABLE, GNUTLS_PK_DSA, ptr, begin_ptr, left, key)
 
 				if (key->params.algo == GNUTLS_PK_UNKNOWN && left >= sizeof(PEM_KEY_PKCS8)) {
 					if (memcmp(ptr, PEM_KEY_PKCS8, sizeof(PEM_KEY_PKCS8)-1) == 0) {
@@ -996,7 +967,7 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 
 	ret =
 	    _gnutls_asn1_encode_privkey(&key->key,
-					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1092,7 +1063,7 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 
 	ret =
 	    _gnutls_asn1_encode_privkey(&key->key,
-					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1330,15 +1301,9 @@ gnutls_x509_privkey_set_spki(gnutls_x509_privkey_t key, const gnutls_x509_spki_t
 static const char *set_msg(gnutls_x509_privkey_t key)
 {
 	if (GNUTLS_PK_IS_RSA(key->params.algo)) {
-		if (key->params.seed_size > 0 && !(key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT))
-			return PEM_KEY_RSA_PROVABLE;
-		else
-			return PEM_KEY_RSA;
+		return PEM_KEY_RSA;
 	} else if (key->params.algo == GNUTLS_PK_DSA) {
-		if (key->params.seed_size > 0 && !(key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT))
-			return PEM_KEY_DSA_PROVABLE;
-		else
-			return PEM_KEY_DSA;
+		return PEM_KEY_DSA;
 	} else if (key->params.algo == GNUTLS_PK_EC)
 		return PEM_KEY_ECC;
 	else
@@ -1733,7 +1698,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		}
 	}
 
-	ret = _gnutls_asn1_encode_privkey(&key->key, &key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+	ret = _gnutls_asn1_encode_privkey(&key->key, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2179,8 +2144,7 @@ int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
 
 		ret =
 		    _gnutls_asn1_encode_privkey(&key->key,
-						&key->params,
-						key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+						&key->params);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
