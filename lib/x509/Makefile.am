@@ -42,6 +42,8 @@ libgnutls_x509_la_SOURCES =	\
 	crl_write.c		\
 	crq.c			\
 	dn.c			\
+	attributes.c		\
+	attributes.h		\
 	extensions.c		\
 	mpi.c			\
 	output.c		\
