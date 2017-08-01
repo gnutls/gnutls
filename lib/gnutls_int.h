@@ -1117,6 +1117,7 @@ typedef struct {
 	 * receive size */
 	unsigned max_recv_size;
 
+	/* whether the peer has advertized at least an FFDHE group */
 	bool have_ffdhe;
 
 	/* candidate groups to be selected for security params groups */

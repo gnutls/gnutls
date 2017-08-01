@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -73,13 +74,16 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 	unsigned free_pg = 0;
 	int ret;
 	unsigned q_bits = 0, i;
+	const gnutls_group_entry_st *group;
+
+	group = get_group(session);
 
 	params.deinit = 0;
 
-	/* if client advertised RFC7919 */
-	if (session->internals.have_ffdhe) {
+	/* if we negotiated RFC7919 FFDHE */
+	if (group && group->pk == GNUTLS_PK_DH) {
 		for (i=0;i<session->internals.priorities->groups.size;i++) {
-			if (session->internals.priorities->groups.entry[i] == get_group(session)) {
+			if (session->internals.priorities->groups.entry[i] == group) {
 				ret = _gnutls_mpi_init_scan_nz(&p,
 						session->internals.priorities->groups.entry[i]->prime->data,
 						session->internals.priorities->groups.entry[i]->prime->size);
