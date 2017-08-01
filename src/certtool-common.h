@@ -81,11 +81,21 @@ typedef struct common_info {
 } common_info_st;
 
 static inline
-void switch_to_pkcs8_when_needed(common_info_st *cinfo, unsigned key_type)
+void switch_to_pkcs8_when_needed(common_info_st *cinfo, gnutls_x509_privkey_t key, unsigned key_type)
 {
-	if ((key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519) && !cinfo->pkcs8) {
+	if (cinfo->pkcs8)
+		return;
+
+	if ((key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519)) {
 		fprintf(stderr, "Assuming --pkcs8 is given; %s private keys can only be exported in PKCS#8 format\n",
 			gnutls_pk_algorithm_get_name(key_type));
+		cinfo->pkcs8 = 1;
+		if (cinfo->password == NULL)
+			cinfo->password = "";
+	}
+
+	if (gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
+		fprintf(stderr, "Assuming --pkcs8 is given; provable private keys can only be exported in PKCS#8 format\n");
 		cinfo->pkcs8 = 1;
 		if (cinfo->password == NULL)
 			cinfo->password = "";

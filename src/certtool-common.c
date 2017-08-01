@@ -1286,7 +1286,7 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 	if (cinfo->outcert_format == GNUTLS_X509_FMT_PEM)
 		privkey_info_int(outfile, cinfo, key);
 
-	switch_to_pkcs8_when_needed(cinfo, gnutls_x509_privkey_get_pk_algorithm(key));
+	switch_to_pkcs8_when_needed(cinfo, key, gnutls_x509_privkey_get_pk_algorithm(key));
 
 	if (!cinfo->pkcs8) {
 
@@ -1298,22 +1298,6 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 				gnutls_strerror(ret));
 			app_exit(1);
 		}
-
-		if (cinfo->no_compat == 0 && gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
-			gnutls_x509_privkey_set_flags(key, GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
-
-			fwrite(lbuffer, 1, size, outfile);
-
-			size = lbuffer_size;
-			ret = gnutls_x509_privkey_export(key, cinfo->outcert_format,
-						 lbuffer, &size);
-			if (ret < 0) {
-				fprintf(stderr, "privkey_export: %s\n",
-					gnutls_strerror(ret));
-				app_exit(1);
-			}
-		}
-
 	} else {
 		unsigned int flags = 0;
 		const char *pass;

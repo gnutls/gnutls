@@ -149,8 +149,6 @@ generate_private_key_int(common_info_st * cinfo)
 
 	bits = get_bits(key_type, cinfo->bits, cinfo->sec_param, 1);
 
-	switch_to_pkcs8_when_needed(cinfo, key_type);
-
 	if (key_type == GNUTLS_PK_ECDSA || key_type == GNUTLS_PK_EDDSA_ED25519) {
 		char name[64];
 		int ecc_bits;
@@ -196,6 +194,8 @@ generate_private_key_int(common_info_st * cinfo)
 		fprintf(stderr, "error in SPKI initialization: %s\n", gnutls_strerror(ret));
 		app_exit(1);
 	}
+
+	switch_to_pkcs8_when_needed(cinfo, key, key_type);
 
 	if (cinfo->seed_size > 0) {
 		kdata[kdata_size].type = GNUTLS_KEYGEN_SEED;
