@@ -47,6 +47,8 @@
 #define HASH_OID_SHA3_384 "2.16.840.1.101.3.4.2.9"
 #define HASH_OID_SHA3_512 "2.16.840.1.101.3.4.2.10"
 
+#define OID_ATTR_PROV_SEED "1.3.6.1.4.1.2312.18.8.1"
+
 struct gnutls_x509_crl_iter {
 	/* This is used to optimize reads by gnutls_x509_crl_iter_crt_serial() */
 	ASN1_TYPE rcache;

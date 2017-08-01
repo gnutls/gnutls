@@ -42,6 +42,8 @@ libgnutls_x509_la_SOURCES =	\
 	dn.c			\
 	attributes.c		\
 	attributes.h		\
+	prov-seed.c		\
+	prov-seed.h		\
 	extensions.c		\
 	mpi.c			\
 	output.c		\

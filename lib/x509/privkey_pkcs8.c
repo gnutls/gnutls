@@ -37,6 +37,8 @@
 #include <random.h>
 #include <pk.h>
 #include <nettle/pbkdf2.h>
+#include "attributes.h"
+#include "prov-seed.h"
 
 static int _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn,
 				 gnutls_x509_privkey_t pkey);
@@ -207,13 +209,30 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 		goto error;
 	}
 
-	/* Append an empty Attributes field.
-	 */
-	result = asn1_write_value(*pkey_info, "attributes", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
+	if ((pkey->params.flags & GNUTLS_PK_FLAG_PROVABLE) && pkey->params.seed_size > 0) {
+		gnutls_datum_t seed_info;
+
+		result = _x509_encode_provable_seed(pkey, &seed_info);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		result = _x509_set_attribute(*pkey_info, "attributes", OID_ATTR_PROV_SEED, &seed_info);
+		gnutls_free(seed_info.data);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	} else {
+		/* Append an empty Attributes field.
+		 */
+		result = asn1_write_value(*pkey_info, "attributes", NULL, 0);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto error;
+		}
 	}
 
 	/* DER Encode the generated private key info.
@@ -1054,6 +1073,8 @@ decode_private_key_info(const gnutls_datum_t * der,
 	int result, len;
 	char oid[MAX_OID_SIZE];
 	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
+	gnutls_datum_t sder;
+	int ret;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -1083,9 +1104,6 @@ decode_private_key_info(const gnutls_datum_t * der,
 		goto error;
 	}
 
-	/* we only support RSA and DSA private keys.
-	 */
-
 	pkey->pk_algorithm = gnutls_oid_to_pk(oid);
 	if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
 		gnutls_assert();
@@ -1111,6 +1129,16 @@ decode_private_key_info(const gnutls_datum_t * der,
 	if (result < 0) {
 		gnutls_assert();
 		return result;
+	}
+
+	/* check for provable parameters attribute */
+	ret = _x509_parse_attribute(pkcs8_asn, "attributes", OID_ATTR_PROV_SEED, 0, 1, &sder);
+	if (ret >= 0) { /* ignore it when not being present */
+		ret = _x509_decode_provable_seed(pkey, &sder);
+		gnutls_free(sder.data);
+		if (ret < 0) {
+			gnutls_assert();
+		}
 	}
 
 	result = 0;

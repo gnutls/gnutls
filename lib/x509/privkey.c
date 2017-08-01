@@ -249,7 +249,6 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	gnutls_pk_params_clear(&pkey->params);
 	gnutls_pk_params_release(&pkey->params);
 	return NULL;
-
 }
 
 /* Converts an ECC key to
