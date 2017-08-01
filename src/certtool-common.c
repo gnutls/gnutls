@@ -1213,9 +1213,15 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 {
 	int ret;
 	size_t size;
+	unsigned int flags = 0;
 
 	if (!key)
 		return;
+
+	if (!cinfo->pkcs8 && cinfo->no_compat == 0 && gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
+		cinfo->pkcs8 = 1;
+		flags |= GNUTLS_PKCS_PLAIN;
+	}
 
 	if (!cinfo->pkcs8) {
 		/* Only print private key parameters when an unencrypted
@@ -1231,28 +1237,16 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 				gnutls_strerror(ret));
 			exit(1);
 		}
-
-		if (cinfo->no_compat == 0 && gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
-			gnutls_x509_privkey_set_flags(key, GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
-
-			fwrite(lbuffer, 1, size, outfile);
-
-			size = lbuffer_size;
-			ret = gnutls_x509_privkey_export(key, cinfo->outcert_format,
-						 lbuffer, &size);
-			if (ret < 0) {
-				fprintf(stderr, "privkey_export: %s\n",
-					gnutls_strerror(ret));
-				exit(1);
-			}
-		}
-
 	} else {
-		unsigned int flags = 0;
-		const char *pass;
+		const char *pass = NULL;
 
-		pass = get_password(cinfo, &flags, 0);
-		flags |= cipher_to_flags(cinfo->pkcs_cipher);
+		if (!(flags & GNUTLS_PKCS_PLAIN)) {
+			pass = get_password(cinfo, &flags, 0);
+			flags |= cipher_to_flags(cinfo->pkcs_cipher);
+		} else {
+			if (cinfo->outcert_format == GNUTLS_X509_FMT_PEM)
+				privkey_info_int(outfile, cinfo, key);
+		}
 
 		size = lbuffer_size;
 		ret =
