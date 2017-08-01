@@ -234,17 +234,6 @@ Dss-Sig-Value ::= SEQUENCE {
      s       INTEGER  
 }
 
-DomainParameters ::= SEQUENCE {
-     p       INTEGER, -- odd prime, p=jq +1
-     g       INTEGER, -- generator, g
-     q       INTEGER, -- factor of p-1
-     j       INTEGER OPTIONAL, -- subgroup factor, j>= 2
-     validationParms  ValidationParms OPTIONAL }
-
-ValidationParms ::= SEQUENCE {
-     seed             BIT STRING,
-     pgenCounter      INTEGER }
-
 Dss-Parms  ::=  SEQUENCE  {
      p             INTEGER,
      q             INTEGER,
