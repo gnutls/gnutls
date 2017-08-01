@@ -1121,6 +1121,7 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 	size_t size;
 	const char *cprint;
 	gnutls_x509_spki_t spki;
+	gnutls_digest_algorithm_t dig;
 
 	/* Public key algorithm
 	 */
@@ -1139,7 +1140,6 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 	fprintf(outfile, "%s\n", cprint ? cprint : "Unknown");
 
 	if (key_type == GNUTLS_PK_RSA_PSS) {
-		gnutls_digest_algorithm_t dig;
 		unsigned int salt_size;
 
 		ret = gnutls_x509_privkey_get_spki(key, spki, 0);
@@ -1238,14 +1238,17 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		}
 	}
 
-	fprintf(outfile, "\n");
-
 	size = lbuffer_size;
-	ret = gnutls_x509_privkey_get_seed(key, NULL, lbuffer, &size);
+	ret = gnutls_x509_privkey_get_seed(key, &dig, lbuffer, &size);
 	if (ret >= 0) {
-		fprintf(outfile, "Seed: %s\n",
-			raw_to_string(lbuffer, size));
+		fprintf(outfile, "Validation parameters:\n");
+		fprintf(outfile, "\tHash: %s\n",
+			gnutls_digest_get_name(dig));
+		fprintf(outfile, "\tSeed: %s\n",
+			raw_to_hex(lbuffer, size));
 	}
+
+	fprintf(outfile, "\n");
 
 	size = lbuffer_size;
 	ret =
