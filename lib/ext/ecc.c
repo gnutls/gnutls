@@ -167,23 +167,14 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 				group = NULL;
 				continue;
 			} else {
-				break;
+				if (group->pk == GNUTLS_PK_DH && session->internals.cand_dh_group == NULL)
+					session->internals.cand_dh_group = group;
+				else if (group->pk != GNUTLS_PK_DH && session->internals.cand_ec_group == NULL)
+					session->internals.cand_ec_group = group;
 			}
 		}
 
 		session->internals.have_ffdhe = have_ffdhe;
-
-		if (group == NULL) {
-			gnutls_assert();
-			/* The peer has requested unsupported group
-			 * types. Instead of failing, procceed normally.
-			 * (the ciphersuite selection would fail, or a
-			 * non certificate ciphersuite will be selected).
-			 */
-			return gnutls_assert_val(0);
-		}
-
-		_gnutls_session_group_set(session, group);
 	}
 
 	return 0;

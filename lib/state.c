@@ -197,6 +197,8 @@ static void handshake_internal_state_clear1(gnutls_session_t session)
 	session->internals.dtls.hsk_write_seq = 0;
 
 	session->internals.have_ffdhe = 0;
+	session->internals.cand_ec_group = 0;
+	session->internals.cand_dh_group = 0;
 }
 
 /* This function will clear all the variables in internals

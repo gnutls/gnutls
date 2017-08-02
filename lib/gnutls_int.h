@@ -591,7 +591,8 @@ typedef struct {
 	/* holds the negotiated certificate type */
 	gnutls_certificate_type_t cert_type;
 
-	const gnutls_group_entry_st *grp; /* holds the EC curve / DH group */
+	/* The selected (after server hello EC or DH group */
+	const gnutls_group_entry_st *grp;
 
 	/* Holds the signature algorithm used in this session - If any */
 	gnutls_sign_algorithm_t server_sign_algo;
@@ -1117,6 +1118,10 @@ typedef struct {
 	unsigned max_recv_size;
 
 	bool have_ffdhe;
+
+	/* candidate groups to be selected for security params groups */
+	const gnutls_group_entry_st *cand_ec_group;
+	const gnutls_group_entry_st *cand_dh_group;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

@@ -1371,21 +1371,28 @@ const char *gnutls_cipher_suite_info(size_t idx,
 		} \
 	}
 
-#define KX_CHECKS(kx, group, cred_type, action) \
-	{ \
-	if (_gnutls_kx_is_ecc(kx)) { \
-		if (group == NULL || group->curve == 0) { \
-			action; \
-		} \
-	} else if (_gnutls_kx_is_dhe(kx)) { \
-		if (group == NULL || !group->prime) { \
-			if (!check_server_dh_params(session, cred_type, kx)) { \
-				action; \
-			} \
-		} \
-	} \
-	KX_SRP_CHECKS(kx, action); \
+static unsigned kx_is_ok(gnutls_session_t session, gnutls_kx_algorithm_t kx, unsigned cred_type,
+			 const gnutls_group_entry_st **sgroup)
+{
+	if (_gnutls_kx_is_ecc(kx)) {
+		if (session->internals.cand_ec_group == NULL) {
+			return 0;
+		} else {
+			*sgroup = session->internals.cand_ec_group;
+		}
+	} else if (_gnutls_kx_is_dhe(kx)) {
+		if (session->internals.cand_dh_group == NULL) {
+			if (!check_server_dh_params(session, cred_type, kx)) {
+				return 0;
+			}
+		} else {
+			*sgroup = session->internals.cand_dh_group;
+		}
 	}
+	KX_SRP_CHECKS(kx, return 0);
+
+	return 1;
+}
 
 int
 _gnutls_figure_common_ciphersuite(gnutls_session_t session,
@@ -1398,13 +1405,11 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	const version_entry_st *version = get_version(session);
 	unsigned int is_dtls = IS_DTLS(session), kx, cred_type;
 	unsigned int no_cert_found = 0;
-	const gnutls_group_entry_st *group;
+	const gnutls_group_entry_st *sgroup = NULL;
 
 	if (version == NULL) {
 		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 	}
-
-	group = get_group(session);
 
 	if (session->internals.priorities->server_precedence == 0) {
 		for (i = 0; i < peer_clist->size; i++) {
@@ -1419,7 +1424,9 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 
 			for (j = 0; j < session->internals.priorities->cs.size; j++) {
 				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
-					KX_CHECKS(kx, group, cred_type, continue);
+					sgroup = NULL;
+					if (!kx_is_ok(session, kx, cred_type, &sgroup))
+						continue;
 
 					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
@@ -1430,6 +1437,10 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 							break;
 						}
 					}
+
+					/* select the group based on the selected ciphersuite */
+					if (sgroup)
+						_gnutls_session_group_set(session, sgroup);
 					*ce = peer_clist->entry[i];
 					return 0;
 				}
@@ -1446,10 +1457,12 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 					peer_clist->entry[i]->name);
 
 				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
+					sgroup = NULL;
 					kx = peer_clist->entry[i]->kx_algorithm;
 					cred_type = _gnutls_map_kx_get_cred(kx, 1);
 
-					KX_CHECKS(kx, group, cred_type, break);
+					if (!kx_is_ok(session, kx, cred_type, &sgroup))
+						break;
 
 					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
@@ -1460,6 +1473,10 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 							break;
 						}
 					}
+
+					/* select the group based on the selected ciphersuite */
+					if (sgroup)
+						_gnutls_session_group_set(session, sgroup);
 					*ce = peer_clist->entry[i];
 					return 0;
 				}
