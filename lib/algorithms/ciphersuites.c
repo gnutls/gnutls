@@ -1411,6 +1411,15 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 	}
 
+	/* If we didn't receive the supported_groups extension, then
+	 * we should assume that SECP256R1 is supported; that is required
+	 * by RFC4492, probably to allow SSLv2 hellos negotiate elliptic curve
+	 * ciphersuites */
+	if (session->internals.cand_ec_group == NULL &&
+	    _gnutls_extension_list_check(session, GNUTLS_EXTENSION_SUPPORTED_ECC) < 0) {
+		session->internals.cand_ec_group = _gnutls_id_to_group(DEFAULT_EC_GROUP);
+	}
+
 	if (session->internals.priorities->server_precedence == 0) {
 		for (i = 0; i < peer_clist->size; i++) {
 			_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",

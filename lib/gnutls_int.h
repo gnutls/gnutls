@@ -148,6 +148,10 @@ typedef struct {
 #define DEFAULT_EXPIRE_TIME 3600
 #define DEFAULT_HANDSHAKE_TIMEOUT_MS 40*1000
 
+/* The EC group to be used when the extension
+ * supported groups/curves is not present */
+#define DEFAULT_EC_GROUP GNUTLS_GROUP_SECP256R1
+
 typedef enum transport_t {
 	GNUTLS_STREAM,
 	GNUTLS_DGRAM
@@ -1098,10 +1102,6 @@ typedef struct {
 	struct extension_entry_st *rexts;
 	unsigned rexts_size;
 
-	/* In case of a client holds the extensions we sent to the peer;
-	 * otherwise the extensions we received from the client.
-	 */
-
 	struct {
 		uint16_t type;
 		gnutls_ext_priv_data_t priv;
@@ -1110,6 +1110,9 @@ typedef struct {
 		bool resumed_set;
 	} ext_data[MAX_EXT_TYPES];
 
+	/* In case of a client holds the extensions we sent to the peer;
+	 * otherwise the extensions we received from the client.
+	 */
 	const struct extension_entry_st *used_exts[MAX_EXT_TYPES];
 	unsigned used_exts_size;
 
