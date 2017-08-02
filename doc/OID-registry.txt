@@ -1,0 +1,22 @@
+There is a sub-registry of Red Hat OIDs managed through gnutls. This
+file is the canonical registry description of them.
+
+Top OID: 1.3.6.1.4.1.2312.18
+
+1.3.6.1.4.1.2312.18.8		PKCS#8 attributes tree
+1.3.6.1.4.1.2312.18.8.1		PKCS#8 Provable Seed attribute [0]
+
+
+
+
+
+
+[0]. This is an attribute to be used in PKCS#8 privateKeyInfo structure
+as an extension. It holds parameters related to private key validation
+for provable private keys as in FIPS186-4. When the OID is present it
+contains a single DER encoded value of the following.
+
+ProvableSeed ::= SEQUENCE {
+  algorithm OBJECT IDENTIFIER, -- the OID of the hash algorithm used in the key generation
+  seed OCTET STRING -- the seed used in key generation
+}
