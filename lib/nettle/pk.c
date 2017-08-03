@@ -488,6 +488,10 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 	return ret;
 }
 
+#define CHECK_INVALID_RSA_PSS_PARAMS(dig_size, salt_size, pub_size, err) \
+	if (unlikely(dig_size + salt_size + 2 > pub_size)) \
+		return gnutls_assert_val(err)
+
 static int
 _rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
 			const struct rsa_public_key *pub,
@@ -526,8 +530,7 @@ _rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
 	}
 
 	/* This is also checked in pss_encode_mgf1, but error out earlier.  */
-	if (hash_size + salt_size + 2 > pub->size)
-		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+	CHECK_INVALID_RSA_PSS_PARAMS(hash_size, salt_size, pub->size, GNUTLS_E_ILLEGAL_PARAMETER);
 
 	if (salt_size > 0) {
 		salt = gnutls_malloc(salt_size);
@@ -2341,6 +2344,15 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 
 		ed25519_sha512_public_key(params->raw_pub.data, params->raw_priv.data);
 		params->raw_pub.size = params->raw_priv.size;
+	} else if (algo == GNUTLS_PK_RSA_PSS) {
+		if (params->spki.rsa_pss_dig != 0) {
+			unsigned pub_size = nettle_mpz_sizeinbase_256_u(TOMPZ(params->params[RSA_MODULUS]));
+			/* sanity check for private key */
+			CHECK_INVALID_RSA_PSS_PARAMS(gnutls_hash_get_len(params->spki.rsa_pss_dig),
+						     params->spki.salt_size, pub_size,
+						     GNUTLS_E_PK_INVALID_PRIVKEY);
+		}
+
 	}
 
 
