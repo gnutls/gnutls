@@ -1294,6 +1294,9 @@ gnutls_x509_privkey_get_spki(gnutls_x509_privkey_t key, gnutls_x509_spki_t spki,
 int
 gnutls_x509_privkey_set_spki(gnutls_x509_privkey_t key, const gnutls_x509_spki_t spki, unsigned int flags)
 {
+	gnutls_pk_params_st tparams;
+	int ret;
+
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -1301,6 +1304,12 @@ gnutls_x509_privkey_set_spki(gnutls_x509_privkey_t key, const gnutls_x509_spki_t
 
 	if (!_gnutls_pk_are_compat(key->params.algo, spki->pk))
                 return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	memcpy(&tparams, &key->params, sizeof(gnutls_pk_params_st));
+	memcpy(&tparams.spki, spki, sizeof (gnutls_x509_spki_st));
+	ret = _gnutls_x509_check_pubkey_params(&tparams);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	memcpy(&key->params.spki, spki, sizeof (gnutls_x509_spki_st));
 
