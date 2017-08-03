@@ -168,7 +168,11 @@ gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
 	gnutls_pk_params_release(&key->params);
 	/* params initialized in _gnutls_x509_crt_get_mpis */
 
-	key->params.algo = gnutls_x509_crt_get_pk_algorithm(crt, &key->bits);
+	ret = gnutls_x509_crt_get_pk_algorithm(crt, &key->bits);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	key->params.algo = ret;
 
 	ret = gnutls_x509_crt_get_key_usage(crt, &key->key_usage, NULL);
 	if (ret < 0)
