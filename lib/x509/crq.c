@@ -3278,13 +3278,8 @@ gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
 			return result;
 		}
 
-		if (params.rsa_pss_dig != spki->rsa_pss_dig ||
-		    params.salt_size > spki->salt_size) {
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
-		}
-
 		params.salt_size = spki->salt_size;
+		params.rsa_pss_dig = spki->rsa_pss_dig;
 	}
 
 	result = _gnutls_x509_write_spki_params(crq->crq,

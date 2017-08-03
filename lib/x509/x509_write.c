@@ -2069,21 +2069,6 @@ gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 			return result;
 		}
 
-		if (params.rsa_pss_dig != GNUTLS_DIG_UNKNOWN) {
-			if (params.rsa_pss_dig != spki->rsa_pss_dig) {
-				_gnutls_debug_log("Asked to set RSA-PSS SPKI with %s, while we have %s\n",
-					gnutls_digest_get_name(spki->rsa_pss_dig),
-					gnutls_digest_get_name(params.rsa_pss_dig));
-				return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
-			}
-
-			if (params.salt_size > spki->salt_size) {
-				_gnutls_debug_log("Asked to set RSA-PSS SPKI with salt size %d, while we have %d\n",
-					(int)spki->salt_size, (int)params.salt_size);
-				return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
-			}
-		}
-
 		params.salt_size = spki->salt_size;
 		params.rsa_pss_dig = spki->rsa_pss_dig;
 	}
