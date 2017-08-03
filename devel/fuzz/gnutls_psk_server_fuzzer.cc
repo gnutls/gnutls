@@ -31,45 +31,7 @@
 
 #include "certs.h"
 #include "psk.h"
-
-struct mem_st {
-	const uint8_t *data;
-	size_t size;
-};
-
-#define MIN(x,y) ((x)<(y)?(x):(y))
-static ssize_t
-server_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
-{
-	return len;
-}
-
-static ssize_t server_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
-{
-	struct mem_st *p = (struct mem_st*)tr;
-
-	if (p->size == 0) {
-		return 0;
-	}
-
-	len = MIN(len, p->size);
-	memcpy(data, p->data, len);
-
-	p->size -= len;
-	p->data += len;
-
-	return len;
-}
-
-int server_pull_timeout_func(gnutls_transport_ptr_t tr, unsigned int ms)
-{
-	struct mem_st *p = (struct mem_st*)tr;
-
-	if (p->size > 0)
-		return 1;	/* available data */
-	else
-		return 0;	/* timeout */
-}
+#include "mem.h"
 
 static int
 psk_cb(gnutls_session_t session, const char *username,
@@ -143,9 +105,9 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	memdata.data = data;
 	memdata.size = size;
 
-	gnutls_transport_set_push_function(session, server_push);
-	gnutls_transport_set_pull_function(session, server_pull);
-	gnutls_transport_set_pull_timeout_function(session, server_pull_timeout_func);
+	gnutls_transport_set_push_function(session, mem_push);
+	gnutls_transport_set_pull_function(session, mem_pull);
+	gnutls_transport_set_pull_timeout_function(session, mem_pull_timeout);
 	gnutls_transport_set_ptr(session, &memdata);
 
 	do {
