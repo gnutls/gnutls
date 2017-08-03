@@ -1619,6 +1619,9 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
  * For DSA keys, if the subgroup size needs to be specified check
  * the GNUTLS_SUBGROUP_TO_BITS() macro.
  *
+ * When generating RSA-PSS keys which should require specific parameters, you should
+ * use @data of type %GNUTLS_KEYGEN_SPKI to specify the SubjectPublicKeyInfo parameters.
+ *
  * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -1631,6 +1634,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 {
 	int ret;
 	unsigned i;
+	gnutls_x509_spki_t tpki = NULL;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1645,6 +1649,8 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			memcpy(key->params.seed, data[i].data, data[i].size);
 		} else if (data[i].type == GNUTLS_KEYGEN_DIGEST) {
 			key->params.palgo = data[i].size;
+		} else if (data[i].type == GNUTLS_KEYGEN_SPKI) {
+			tpki = (void*)data[i].data;
 		}
 	}
 
@@ -1672,14 +1678,12 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		return ret;
 	}
 
-	if (algo == GNUTLS_PK_RSA_PSS && (flags & GNUTLS_PRIVKEY_FLAG_CA)) {
+	if (algo == GNUTLS_PK_RSA_PSS && (flags & GNUTLS_PRIVKEY_FLAG_CA) &&
+	    !key->params.spki.pk) {
 		const mac_entry_st *me;
-
 		key->params.spki.pk = GNUTLS_PK_RSA_PSS;
-		if (key->params.palgo != GNUTLS_DIG_UNKNOWN)
-			key->params.spki.rsa_pss_dig = key->params.palgo;
-		else
-			key->params.spki.rsa_pss_dig = _gnutls_pk_bits_to_sha_hash(bits);
+
+		key->params.spki.rsa_pss_dig = _gnutls_pk_bits_to_sha_hash(bits);
 
 		me = hash_to_entry(key->params.spki.rsa_pss_dig);
 		if (unlikely(me == NULL)) {
@@ -1688,12 +1692,8 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			goto cleanup;
 		}
 
-		if (flags & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE)
-			key->params.spki.salt_size = 0;
-		else {
-			key->params.spki.salt_size =
-			    _gnutls_find_rsa_pss_salt_size(bits, me, 0);
-		}
+		key->params.spki.salt_size =
+		    _gnutls_find_rsa_pss_salt_size(bits, me, 0);
 	}
 
 	ret = _gnutls_pk_generate_keys(algo, bits, &key->params, 0);
@@ -1706,6 +1706,14 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
+	}
+
+	if (tpki) {
+		ret = gnutls_x509_privkey_set_spki(key, tpki, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	ret = _gnutls_asn1_encode_privkey(&key->key, &key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);

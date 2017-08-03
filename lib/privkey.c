@@ -345,10 +345,10 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 			salt_size = params->salt_size;
 		}
 
-		if (!(flags & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE))
-			salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, salt_size);
-
-		params->salt_size = salt_size;
+		if (flags & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE)
+			params->salt_size = 0;
+		else
+			params->salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, salt_size);
 		params->rsa_pss_dig = dig;
 	}
 
