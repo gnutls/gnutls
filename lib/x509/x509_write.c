@@ -2013,9 +2013,10 @@ gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 			 const gnutls_x509_spki_t spki,
 			 unsigned int flags)
 {
-	int result;
+	int ret;
 	gnutls_pk_algorithm_t crt_pk;
-	gnutls_x509_spki_st params;
+	gnutls_x509_spki_st tpki;
+	gnutls_pk_params_st params;
 	unsigned bits;
 
 	if (crt == NULL) {
@@ -2023,23 +2024,29 @@ gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	result = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
-	if (result < 0) {
+	ret = _gnutls_x509_crt_get_mpis(crt, &params);
+	if (ret < 0) {
 		gnutls_assert();
-		return result;
+		return ret;
 	}
 
-	crt_pk = result;
+	bits = pubkey_to_bits(&params);
+	crt_pk = params.algo;
 
-	if (!_gnutls_pk_are_compat(crt_pk, spki->pk))
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (!_gnutls_pk_are_compat(crt_pk, spki->pk)) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
 
 	if (spki->pk != GNUTLS_PK_RSA_PSS) {
-		if (crt_pk == spki->pk)
-			return 0;
+		if (crt_pk == spki->pk) {
+			ret = 0;
+			goto cleanup;
+		}
 
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
 	if (crt_pk == GNUTLS_PK_RSA) {
@@ -2048,41 +2055,52 @@ gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 		me = hash_to_entry(spki->rsa_pss_dig);
 		if (unlikely(me == NULL)) {
 			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
 		}
 
-		memset(&params, 0, sizeof(gnutls_x509_spki_st));
-		params.pk = spki->pk;
-		params.rsa_pss_dig = spki->rsa_pss_dig;
+		memset(&tpki, 0, sizeof(gnutls_x509_spki_st));
+		tpki.pk = spki->pk;
+		tpki.rsa_pss_dig = spki->rsa_pss_dig;
 
 		/* If salt size is zero, find the optimal salt size. */
 		if (spki->salt_size == 0) {
-			params.salt_size =
+			tpki.salt_size =
 			    _gnutls_find_rsa_pss_salt_size(bits, me,
 							   spki->salt_size);
 		} else
-			params.salt_size = spki->salt_size;
+			tpki.salt_size = spki->salt_size;
 	} else if (crt_pk == GNUTLS_PK_RSA_PSS) {
-		result = _gnutls_x509_crt_read_spki_params(crt, &params);
-		if (result < 0) {
+		ret = _gnutls_x509_crt_read_spki_params(crt, &tpki);
+		if (ret < 0) {
 			gnutls_assert();
-			return result;
+			goto cleanup;
 		}
 
-		params.salt_size = spki->salt_size;
-		params.rsa_pss_dig = spki->rsa_pss_dig;
+		tpki.salt_size = spki->salt_size;
+		tpki.rsa_pss_dig = spki->rsa_pss_dig;
+	}
+
+	memcpy(&params.spki, &tpki, sizeof(tpki));
+	ret = _gnutls_x509_check_pubkey_params(&params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
 
 	MODIFIED(crt);
 
-	result = _gnutls_x509_write_spki_params(crt->cert,
+	ret = _gnutls_x509_write_spki_params(crt->cert,
 						"tbsCertificate."
 						"subjectPublicKeyInfo.algorithm",
-						&params);
-	if (result < 0) {
+						&tpki);
+	if (ret < 0) {
 		gnutls_assert();
-		return result;
+		goto cleanup;
 	}
 
-	return 0;
+	ret = 0;
+ cleanup:
+	gnutls_pk_params_release(&params);
+	return ret;
 }
