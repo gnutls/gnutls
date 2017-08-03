@@ -585,6 +585,7 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 		if (result < 0) {
 			gnutls_assert();
 			key->key = NULL;
+			goto cleanup;
 		}
 	} else if (key->params.algo == GNUTLS_PK_RSA) {
 		key->key =
@@ -624,6 +625,8 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 					if (result < 0) {
 						gnutls_assert();
 						key->key = NULL;
+						if (result == GNUTLS_E_PK_INVALID_PRIVKEY)
+							goto cleanup;
 					}
 				}
 
