@@ -833,6 +833,8 @@ _rsa_pss_verify_digest(gnutls_digest_algorithm_t dig,
 	if (digest_size != hash_size)
 		return gnutls_assert_val(0);
 
+	CHECK_INVALID_RSA_PSS_PARAMS(hash_size, salt_size, pub->size, 0);
+
 	return verify_func(pub, salt_size, digest, s);
 }
 
