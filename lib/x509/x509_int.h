@@ -329,8 +329,7 @@ int _gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert,
 int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t, uint8_t * der,
 				    int dersize,
 				    gnutls_pk_params_st * params);
-int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
-				     gnutls_pk_params_st * params);
+int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st * params);
 
 int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t, uint8_t * der,
 			     int dersize, gnutls_pk_params_st * params);

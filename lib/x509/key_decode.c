@@ -453,10 +453,9 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 
 /* This function must be called after _gnutls_x509_read_pubkey()
  */
-int _gnutls_x509_check_pubkey_params(gnutls_pk_algorithm_t algo,
-				     gnutls_pk_params_st * params)
+int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st * params)
 {
-	switch (algo) {
+	switch (params->algo) {
 	case GNUTLS_PK_RSA_PSS: {
 		unsigned bits;
 		const mac_entry_st *me;
