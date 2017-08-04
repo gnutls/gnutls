@@ -197,10 +197,6 @@ generate_private_key_int(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	if (HAVE_OPT(SALT_SIZE)) {
-		gnutls_x509_spki_set_salt_size(spki, OPT_VALUE_SALT_SIZE);
-	}
-
 	if (cinfo->seed_size > 0) {
 		kdata[kdata_size].type = GNUTLS_KEYGEN_SEED;
 		kdata[kdata_size].data = (void*)cinfo->seed;
@@ -219,13 +215,21 @@ generate_private_key_int(common_info_st * cinfo)
 		flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
 	}
 
-	if (default_dig) {
-		gnutls_x509_spki_set_digest_algorithm(spki, default_dig);
+	if (key_type == GNUTLS_PK_RSA_PSS && (default_dig || HAVE_OPT(SALT_SIZE))) {
+		unsigned salt_size;
 
-	}
+		if (!default_dig) {
+			fprintf(stderr, "You must provide the hash algorithm and optionally the salt size for RSA-PSS\n");
+			app_exit(1);
+		}
 
-	if (default_dig || HAVE_OPT(SALT_SIZE)) {
-		gnutls_x509_spki_set_pk_algorithm(spki, key_type);
+		if (HAVE_OPT(SALT_SIZE)) {
+			salt_size = OPT_VALUE_SALT_SIZE;
+		} else {
+			salt_size = gnutls_hash_get_len(default_dig);
+		}
+
+		gnutls_x509_spki_set_rsa_pss_params(spki, default_dig, salt_size);
 
 		kdata[kdata_size].type = GNUTLS_KEYGEN_SPKI;
 		kdata[kdata_size].data = (void*)spki;

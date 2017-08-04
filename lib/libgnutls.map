@@ -1150,12 +1150,8 @@ GNUTLS_3_4
 	gnutls_encode_rs_value;
 	gnutls_x509_spki_init;
 	gnutls_x509_spki_deinit;
-	gnutls_x509_spki_get_pk_algorithm;
-	gnutls_x509_spki_set_pk_algorithm;
-	gnutls_x509_spki_get_digest_algorithm;
-	gnutls_x509_spki_set_digest_algorithm;
-	gnutls_x509_spki_get_salt_size;
-	gnutls_x509_spki_set_salt_size;
+	gnutls_x509_spki_get_rsa_pss_params;
+	gnutls_x509_spki_set_rsa_pss_params;
 	gnutls_x509_crt_get_spki;
 	gnutls_x509_crt_set_spki;
 	gnutls_x509_crq_get_spki;

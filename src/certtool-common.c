@@ -1139,6 +1139,9 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 	fprintf(outfile, "%s\n", cprint ? cprint : "Unknown");
 
 	if (key_type == GNUTLS_PK_RSA_PSS) {
+		gnutls_digest_algorithm_t dig;
+		unsigned int salt_size;
+
 		ret = gnutls_x509_privkey_get_spki(key, spki, 0);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			goto spki_skip;
@@ -1148,21 +1151,15 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 			goto spki_skip;
 		}
 
-		ret = gnutls_x509_spki_get_digest_algorithm(spki);
+		ret = gnutls_x509_spki_get_rsa_pss_params(spki, &dig, &salt_size);
 		if (ret < 0) {
-			fprintf(stderr, "spki_get_digest_algorithm: %s\n",
+			fprintf(stderr, "spki_get_rsa_pss_params: %s\n",
 				gnutls_strerror(ret));
 		} else {
 			fprintf(outfile, "\t\tHash Algorithm: %s\n",
-				gnutls_digest_get_name(ret));
+				gnutls_digest_get_name(dig));
+			fprintf(outfile, "\t\tSalt Length: %d\n", salt_size);
 		}
-
-		ret = gnutls_x509_spki_get_salt_size(spki);
-		if (ret < 0) {
-			fprintf(stderr, "spki_get_salt_size: %s\n",
-				gnutls_strerror(ret));
-		} else
-			fprintf(outfile, "\t\tSalt Length: %d\n", ret);
 	}
 
  spki_skip:

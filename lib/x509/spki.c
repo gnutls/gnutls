@@ -74,119 +74,57 @@ gnutls_x509_spki_deinit(gnutls_x509_spki_t spki)
 }
 
 /**
- * gnutls_x509_spki_set_pk_algorithm:
- * @spki: the SubjectPublicKeyInfo structure
- * @pk: the public key algorithm of type #gnutls_pk_algorithm_t
- *
- * This function will set the public key algorithm of a
- * SubjectPublicKeyInfo structure.
- *
- * Since: 3.6.0
- *
- **/
-void
-gnutls_x509_spki_set_pk_algorithm(gnutls_x509_spki_t spki,
-				  gnutls_pk_algorithm_t pk)
-{
-	spki->pk = pk;
-}
-
-/**
- * gnutls_x509_spki_get_pk_algorithm:
- * @spki: the SubjectPublicKeyInfo structure
- *
- * This function will get the public key algorithm of a
- * SubjectPublicKeyInfo structure.
- *
- * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- * success, or %GNUTLS_PK_UNKNOWN on error.
- *
- * Since: 3.6.0
- *
- **/
-int
-gnutls_x509_spki_get_pk_algorithm(gnutls_x509_spki_t spki)
-{
-	return spki->pk;
-}
-
-/**
- * gnutls_x509_spki_set_digest_algorithm:
+ * gnutls_x509_spki_set_rsa_pss_params:
  * @spki: the SubjectPublicKeyInfo structure
  * @dig: a digest algorithm of type #gnutls_digest_algorithm_t
- *
- * This function will set the digest algorithm of a
- * SubjectPublicKeyInfo structure. This is relevant for
- * RSA-PSS signatures which store the digest algorithm
- * in the SubjectPublicKeyInfo.
- *
- * Since: 3.6.0
- *
- **/
-void
-gnutls_x509_spki_set_digest_algorithm(gnutls_x509_spki_t spki,
-				      gnutls_digest_algorithm_t dig)
-{
-	spki->rsa_pss_dig = dig;
-}
-
-/**
- * gnutls_x509_spki_get_digest_algorithm:
- * @spki: the SubjectPublicKeyInfo structure
- *
- * This function will get the digest algorithm of a
- * SubjectPublicKeyInfo structure. This is relevant for
- * RSA-PSS signatures which store the digest algorithm
- * in the SubjectPublicKeyInfo.
- *
- * Returns: a member of the #gnutls_digest_algorithm_t enumeration on
- * success, or a %GNUTLS_DIG_UNKNOWN on error.
- *
- * Since: 3.6.0
- *
- **/
-int
-gnutls_x509_spki_get_digest_algorithm(gnutls_x509_spki_t spki)
-{
-	return spki->rsa_pss_dig;
-}
-
-/**
- * gnutls_x509_spki_set_salt_size:
- * @spki: the SubjectPublicKeyInfo structure
  * @salt_size: the size of salt string
  *
- * This function will set the salt size parameter of a
- * SubjectPublicKeyInfo structure.
- *
- * The salt is used in the RSA-PSS signature scheme.
+ * This function will set the public key parameters for
+ * an RSA-PSS algorithm, in the SubjectPublicKeyInfo structure.
  *
  * Since: 3.6.0
  *
  **/
 void
-gnutls_x509_spki_set_salt_size(gnutls_x509_spki_t spki,
-			       unsigned int salt_size)
+gnutls_x509_spki_set_rsa_pss_params(gnutls_x509_spki_t spki,
+				    gnutls_digest_algorithm_t dig,
+				    unsigned int salt_size)
 {
+	spki->pk = GNUTLS_PK_RSA_PSS;
+	spki->rsa_pss_dig = dig;
 	spki->salt_size = salt_size;
 }
 
 /**
- * gnutls_x509_spki_get_salt_size:
+ * gnutls_x509_spki_get_rsa_pss_params:
  * @spki: the SubjectPublicKeyInfo structure
+ * @dig: if non-NULL, it will hold the digest algorithm
+ * @salt_size: if non-NULL, it will hold the salt size
  *
- * This function will get the salt size parameter of a
- * SubjectPublicKeyInfo structure.
+ * This function will get the public key algorithm parameters
+ * of RSA-PSS type.
  *
- * The salt is used in the RSA-PSS signature scheme.
- *
- * Returns: salt size as a positive integer, or zero.
+ * Returns: zero if the parameters are present or a negative
+ *     value on error.
  *
  * Since: 3.6.0
  *
  **/
 int
-gnutls_x509_spki_get_salt_size(gnutls_x509_spki_t spki)
+gnutls_x509_spki_get_rsa_pss_params(gnutls_x509_spki_t spki,
+				    gnutls_digest_algorithm_t *dig,
+				    unsigned int *salt_size)
 {
-	return spki->salt_size;
+	if (spki->pk == 0)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	if (spki->pk != GNUTLS_PK_RSA_PSS)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (dig)
+		*dig = spki->rsa_pss_dig;
+	if (salt_size)
+		*salt_size = spki->salt_size;
+
+	return 0;
 }

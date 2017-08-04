@@ -417,15 +417,12 @@ typedef struct gnutls_x509_spki_st *gnutls_x509_spki_t;
 
 int gnutls_x509_spki_init(gnutls_x509_spki_t *spki);
 void gnutls_x509_spki_deinit(gnutls_x509_spki_t spki);
-int gnutls_x509_spki_get_pk_algorithm(gnutls_x509_spki_t spki);
-void gnutls_x509_spki_set_pk_algorithm(gnutls_x509_spki_t spki,
-				       gnutls_pk_algorithm_t pk);
-int gnutls_x509_spki_get_digest_algorithm(gnutls_x509_spki_t spki);
-void gnutls_x509_spki_set_digest_algorithm(gnutls_x509_spki_t spki,
-					   gnutls_digest_algorithm_t dig);
-int gnutls_x509_spki_get_salt_size(gnutls_x509_spki_t spki);
-void gnutls_x509_spki_set_salt_size(gnutls_x509_spki_t spki,
-				    unsigned int salt_size);
+
+int gnutls_x509_spki_get_rsa_pss_params(gnutls_x509_spki_t spki,
+			gnutls_digest_algorithm_t *dig, unsigned int *salt_size);
+
+void gnutls_x509_spki_set_rsa_pss_params(gnutls_x509_spki_t spki,
+			gnutls_digest_algorithm_t dig, unsigned int salt_size);
 
 int gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
 				     unsigned int *bits);
