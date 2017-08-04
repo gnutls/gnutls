@@ -314,6 +314,9 @@ const char *gnutls_pk_get_oid(gnutls_pk_algorithm_t algorithm)
 	const char *ret = NULL;
 	const gnutls_pk_entry *p;
 
+	if (algorithm == 0)
+		return NULL;
+
 	for (p = pk_algorithms; p->name != NULL; p++)
 		if (p->id == algorithm) {
 			ret = p->oid;
