@@ -459,6 +459,7 @@ APIMANS += gnutls_pkcs11_privkey_status.3
 APIMANS += gnutls_pkcs11_reinit.3
 APIMANS += gnutls_pkcs11_set_pin_function.3
 APIMANS += gnutls_pkcs11_set_token_function.3
+APIMANS += gnutls_pkcs11_token_check_mechanism.3
 APIMANS += gnutls_pkcs11_token_get_flags.3
 APIMANS += gnutls_pkcs11_token_get_info.3
 APIMANS += gnutls_pkcs11_token_get_mechanism.3
