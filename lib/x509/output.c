@@ -1434,44 +1434,61 @@ print_crt_sig_params(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 	return 0;
 }
 
+static void print_pk_name(gnutls_buffer_st * str, gnutls_x509_crt_t crt)
+{
+	const char *p;
+	char *name = get_pk_name(crt, NULL);
+	if (name == NULL)
+		p = _("unknown");
+	else
+		p = name;
+
+	addf(str, "\tSubject Public Key Algorithm: %s\n", p);
+	gnutls_free(name);
+}
+
 static int
 print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 		 gnutls_certificate_print_formats_t format)
 {
-	gnutls_pubkey_t pubkey;
+	gnutls_pubkey_t pubkey = NULL;
 	gnutls_x509_spki_st params;
-	int ret;
+	int ret, pk;
 
 	ret = _gnutls_x509_crt_read_spki_params(crt, &params);
 	if (ret < 0)
 		return ret;
+
+	pk = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
+	if (pk < 0) {
+		gnutls_assert();
+		pk = GNUTLS_PK_UNKNOWN;
+	}
+
+	if (pk == GNUTLS_PK_UNKNOWN) {
+		print_pk_name(str, crt); /* print basic info only */
+		return 0;
+	}
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0)
 		return ret;
 
 	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
-	if (ret < 0)
+	if (ret < 0) {
+		if (ret != GNUTLS_E_UNIMPLEMENTED_FEATURE)
+			addf(str, "error importing public key: %s\n", gnutls_strerror(ret));
+		print_pk_name(str, crt); /* print basic info only */
+		ret = 0;
 		goto cleanup;
+	}
 
 	print_pubkey(str, _("Subject "), pubkey, &params, format);
 	ret = 0;
 
-      cleanup:
-	gnutls_pubkey_deinit(pubkey);
-
-	if (ret < 0) { /* print only name */
-		const char *p;
-		char *name = get_pk_name(crt, NULL);
-		if (name == NULL)
-			p = _("unknown");
-		else
-			p = name;
-
-		addf(str, "\tSubject Public Key Algorithm: %s\n", p);
-		gnutls_free(name);
-		ret = 0;
-	}
+ cleanup:
+	if (pubkey)
+		gnutls_pubkey_deinit(pubkey);
 
 	return ret;
 }

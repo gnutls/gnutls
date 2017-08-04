@@ -424,6 +424,7 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 		ret = _gnutls_x509_read_eddsa_pubkey(der, dersize, params);
 		break;
 	default:
+fprintf(stderr, "pk: %d\n", algo);
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 		break;
 	}
