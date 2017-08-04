@@ -1186,6 +1186,7 @@ GNUTLS_3_6_0
 	gnutls_pkcs11_token_check_mechanism;
 	gnutls_base64_encode2;
 	gnutls_base64_decode2;
+	gnutls_privkey_import_ext4;
  local:
 	*;
 } GNUTLS_3_4;

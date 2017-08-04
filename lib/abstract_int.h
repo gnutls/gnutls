@@ -35,7 +35,9 @@ struct gnutls_privkey_st {
 		gnutls_pkcs11_privkey_t pkcs11;
 #endif
 		struct {
-			gnutls_privkey_sign_func sign_func;
+			gnutls_privkey_sign_func sign_func; /* raw like TLS 1.x */
+			gnutls_privkey_sign_data_func sign_data_func;
+			gnutls_privkey_sign_hash_func sign_hash_func;
 			gnutls_privkey_decrypt_func decrypt_func;
 			gnutls_privkey_deinit_func deinit_func;
 			gnutls_privkey_info_func info_func;
@@ -116,8 +118,5 @@ const mac_entry_st *_gnutls_dsa_q_to_hash(const gnutls_pk_params_st *
 
 int
 _gnutls_privkey_get_mpis(gnutls_privkey_t key, gnutls_pk_params_st * params);
-
-gnutls_sign_algorithm_t
-_gnutls_privkey_get_preferred_sign_algo(gnutls_privkey_t key);
 
 #endif

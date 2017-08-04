@@ -66,23 +66,59 @@ typedef enum gnutls_abstract_export_flags {
 
 typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
 					 void *userdata,
-					 const gnutls_datum_t *
-					 raw_data,
+					 const gnutls_datum_t *raw_data,
 					 gnutls_datum_t * signature);
+
+
 typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
 					    void *userdata,
-					    const gnutls_datum_t *
-					    ciphertext,
+					    const gnutls_datum_t *ciphertext,
 					    gnutls_datum_t * plaintext);
+
+#define GNUTLS_SIGN_CB_FLAG_RSA_DIGESTINFO (1<<1)
+
+/* to be called to sign pre-hashed data. The input will be
+ * the output of the hash (such as SHA256) corresponding to
+ * the signature algorithm. The flag GNUTLS_SIGN_CB_FLAG_RSA_DIGESTINFO
+ * will be provided when RSA PKCS#1 DigestInfo structure is provided
+ * as data (when this is called from a TLS 1.0 or 1.1 session).
+ * In that case the signature algorithm will be set to %GNUTLS_SIGN_UNKNOWN
+ */
+typedef int (*gnutls_privkey_sign_hash_func) (gnutls_privkey_t key,
+					      gnutls_sign_algorithm_t algo,
+					      void *userdata,
+					      unsigned int flags,
+					      const gnutls_datum_t *hash,
+					      gnutls_datum_t * signature);
+
+/* to be called to sign data. The input data will be
+ * the data to be signed (and hashed), with the provided
+ * signature algorithm. This function is used for algorithms
+ * like ed25519 which cannot take pre-hashed data as input.
+ */
+typedef int (*gnutls_privkey_sign_data_func) (gnutls_privkey_t key,
+					      gnutls_sign_algorithm_t algo,
+					      void *userdata,
+					      unsigned int flags,
+					      const gnutls_datum_t *data,
+					      gnutls_datum_t * signature);
 
 typedef void (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
 					    void *userdata);
 
+
+#define GNUTLS_SIGN_ALGO_TO_FLAGS(sig) (unsigned int)((sig)<<20)
+#define GNUTLS_FLAGS_TO_SIGN_ALGO(flags) (unsigned int)((flags)>>20)
+
 /* Should return the public key algorithm (gnutls_pk_algorithm_t) */
 #define GNUTLS_PRIVKEY_INFO_PK_ALGO 1
-
 /* Should return the preferred signature algorithm (gnutls_sign_algorithm_t) or 0. */
 #define GNUTLS_PRIVKEY_INFO_SIGN_ALGO (1<<1)
+/* Should return true (1) or false (0) if the provided sign algorithm
+ * (obtained with GNUTLS_FLAGS_TO_SIGN_ALGO) is supported.
+ */
+#define GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO (1<<2)
+
 /* returns information on the public key associated with userdata */
 typedef int (*gnutls_privkey_info_func) (gnutls_privkey_t key, unsigned int flags, void *userdata);
 
@@ -418,6 +454,16 @@ int
 gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
                            void *userdata,
                            gnutls_privkey_sign_func sign_func,
+                           gnutls_privkey_decrypt_func decrypt_func,
+                           gnutls_privkey_deinit_func deinit_func,
+                           gnutls_privkey_info_func info_func,
+                           unsigned int flags);
+
+int
+gnutls_privkey_import_ext4(gnutls_privkey_t pkey,
+                           void *userdata,
+                           gnutls_privkey_sign_data_func sign_data_func,
+                           gnutls_privkey_sign_hash_func sign_hash_func,
                            gnutls_privkey_decrypt_func decrypt_func,
                            gnutls_privkey_deinit_func deinit_func,
                            gnutls_privkey_info_func info_func,
