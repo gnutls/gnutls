@@ -22,6 +22,8 @@ gnutls_anon_set_server_params_function@GNUTLS_3_4
 gnutls_auth_client_get_type@GNUTLS_3_4
 gnutls_auth_get_type@GNUTLS_3_4
 gnutls_auth_server_get_type@GNUTLS_3_4
+gnutls_base64_decode2@GNUTLS_3_4
+gnutls_base64_encode2@GNUTLS_3_4
 gnutls_buffer_append_data@GNUTLS_3_4
 gnutls_bye@GNUTLS_3_4
 gnutls_calloc@GNUTLS_3_4
