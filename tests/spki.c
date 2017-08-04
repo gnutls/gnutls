@@ -96,6 +96,10 @@ static void crq_check(void)
 	assert(salt_size == 32);
 	assert(dig == GNUTLS_DIG_SHA256);
 
+	/* set invalid */
+	gnutls_x509_spki_set_rsa_pss_params(spki, GNUTLS_DIG_SHA256, 1024);
+	assert(gnutls_x509_crq_set_spki(crq, spki, 0) == GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
+
 	gnutls_x509_crq_deinit(crq);
 	gnutls_x509_spki_deinit(spki);
 	gnutls_x509_privkey_deinit(privkey);
@@ -151,6 +155,10 @@ static void cert_check(void)
 	assert(salt_size == 32);
 	assert(dig == GNUTLS_DIG_SHA256);
 
+	/* set invalid */
+	gnutls_x509_spki_set_rsa_pss_params(spki, GNUTLS_DIG_SHA256, 1024);
+	assert(gnutls_x509_crt_set_spki(crt, spki, 0) == GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
+
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_spki_deinit(spki);
 	gnutls_global_deinit();
@@ -202,6 +210,10 @@ static void key_check(void)
 	assert(gnutls_x509_spki_get_rsa_pss_params(spki, &dig, &salt_size) >= 0);
 	assert(salt_size == 64);
 	assert(dig == GNUTLS_DIG_SHA1);
+
+	/* set invalid */
+	gnutls_x509_spki_set_rsa_pss_params(spki, GNUTLS_DIG_SHA1, 1024);
+	assert(gnutls_x509_privkey_set_spki(key, spki, 0) == GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 
 	gnutls_x509_privkey_deinit(key);
 	gnutls_x509_spki_deinit(spki);
