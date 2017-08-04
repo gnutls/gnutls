@@ -58,6 +58,24 @@ if test "${rc}" != "1"; then
 	exit ${rc}
 fi
 
+#sanity generation
+${VALGRIND} "${CERTTOOL}" --generate-privkey --key-type rsa-pss --hash sha256 --salt-size 64 --bits 2048 >/dev/null
+rc=$?
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Error in generating an RSA-PSS key"
+	exit ${rc}
+fi
+
+# generate illegal value
+${VALGRIND} "${CERTTOOL}" --generate-privkey --key-type rsa-pss --hash sha256 --salt-size 1024 --bits 2048 >/dev/null
+rc=$?
+# We're done.
+if test "${rc}" != "1"; then
+	echo "Error: allowed generation of an illegal key"
+	exit ${rc}
+fi
+
 rm -f $TMPFILE
 
 exit 0
