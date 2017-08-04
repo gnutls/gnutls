@@ -130,9 +130,7 @@ void doit(void)
 
 	assert(gnutls_privkey_init(&pkey) >=0);
 
-	gnutls_x509_spki_set_pk_algorithm(spki, GNUTLS_PK_RSA_PSS);
-	gnutls_x509_spki_set_digest_algorithm(spki, GNUTLS_DIG_SHA256);
-	gnutls_x509_spki_set_salt_size(spki, 32);
+	gnutls_x509_spki_set_rsa_pss_params(spki, GNUTLS_DIG_SHA256, 32);
 
 	ret =
 	    gnutls_privkey_generate(pkey, GNUTLS_PK_RSA, 2048, 0);
