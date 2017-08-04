@@ -18,6 +18,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+# When new symbols are added in a release (x.y.z) they are added
+# as GNUTLS_x_y_z { global: new_symbol } GNUTLS_prev_release_version
+# That allows tools like rpm detect the correct library dependency of an application.
+# See CONTRIBUTION.md symbol versioning section for more information.
+
 GNUTLS_3_4
 {
   global:
@@ -1133,13 +1138,20 @@ GNUTLS_3_4
 	gnutls_x509_crq_get_dn3;
 	gnutls_utf8_password_normalize;
 	gnutls_idna_map;
+	gnutls_idna_reverse_map;
+ local:
+	*;
+};
+
+GNUTLS_3_6_0
+{
+ global:
 	gnutls_pubkey_export_rsa_raw2;
 	gnutls_pubkey_export_dsa_raw2;
 	gnutls_pubkey_export_ecc_raw2;
 	gnutls_privkey_export_rsa_raw2;
 	gnutls_privkey_export_dsa_raw2;
 	gnutls_privkey_export_ecc_raw2;
-	gnutls_idna_reverse_map;
 	gnutls_x509_crt_set_flags;
 	gnutls_x509_crt_check_ip;
 	gnutls_x509_ext_import_inhibit_anypolicy;
@@ -1176,7 +1188,7 @@ GNUTLS_3_4
 	gnutls_base64_decode2;
  local:
 	*;
-};
+} GNUTLS_3_4;
 
 GNUTLS_FIPS140_3_4 {
 	gnutls_cipher_self_test;
@@ -1200,7 +1212,7 @@ GNUTLS_FIPS140_3_4 {
 	_gnutls_dh_generate_key;
 	_gnutls_ecdh_generate_key;
 	_gnutls_ecdh_compute_key;
-};
+} GNUTLS_3_4;
 
 GNUTLS_PRIVATE_3_4 {
   global:
@@ -1241,4 +1253,4 @@ GNUTLS_PRIVATE_3_4 {
 	# Internal symbols needed by tests/name-constraints-merge:
 	_gnutls_x509_name_constraints_merge;
 	_gnutls_server_name_set_raw;
-};
+} GNUTLS_3_4;
