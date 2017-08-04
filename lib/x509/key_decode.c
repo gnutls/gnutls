@@ -468,11 +468,11 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st * params)
 
 		me = hash_to_entry(params->spki.rsa_pss_dig);
 		if (unlikely(me == NULL))
-			return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 
 		hash_size = _gnutls_hash_get_algo_len(me);
 		if (hash_size + params->spki.salt_size + 2 > (bits + 7) / 8)
-			return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 		return 0;
 	}
 	case GNUTLS_PK_RSA:

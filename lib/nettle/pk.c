@@ -530,7 +530,7 @@ _rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
 	}
 
 	/* This is also checked in pss_encode_mgf1, but error out earlier.  */
-	CHECK_INVALID_RSA_PSS_PARAMS(hash_size, salt_size, pub->size, GNUTLS_E_ILLEGAL_PARAMETER);
+	CHECK_INVALID_RSA_PSS_PARAMS(hash_size, salt_size, pub->size, GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 
 	if (salt_size > 0) {
 		salt = gnutls_malloc(salt_size);
@@ -2352,7 +2352,7 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 			/* sanity check for private key */
 			CHECK_INVALID_RSA_PSS_PARAMS(gnutls_hash_get_len(params->spki.rsa_pss_dig),
 						     params->spki.salt_size, pub_size,
-						     GNUTLS_E_PK_INVALID_PRIVKEY);
+						     GNUTLS_E_PK_INVALID_PUBKEY_PARAMS);
 		}
 
 	}
