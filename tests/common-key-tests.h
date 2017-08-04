@@ -29,6 +29,7 @@ struct _key_tests_st {
 	gnutls_datum_t key;
 	gnutls_datum_t cert;
 	gnutls_pk_algorithm_t pk;
+	unsigned data_only;
 	unsigned digest;
 	unsigned sigalgo;
 	unsigned sign_flags;
@@ -75,6 +76,7 @@ struct _key_tests_st common_key_tests[] = {
 		.cert = {(void *) server_ca3_eddsa_cert_pem, sizeof(server_ca3_eddsa_cert_pem)-1},
 		.pk = GNUTLS_PK_EDDSA_ED25519,
 		.digest = GNUTLS_DIG_SHA512,
-		.sigalgo = GNUTLS_SIGN_EDDSA_ED25519
+		.sigalgo = GNUTLS_SIGN_EDDSA_ED25519,
+		.data_only = 1
 	}
 };
