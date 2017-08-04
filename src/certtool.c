@@ -137,6 +137,7 @@ generate_private_key_int(common_info_st * cinfo)
 	unsigned flags = 0;
 	gnutls_keygen_data_st kdata[8];
 	unsigned kdata_size = 0;
+	gnutls_x509_spki_t spki;
 
 	key_type = req_key_type;
 
@@ -190,9 +191,14 @@ generate_private_key_int(common_info_st * cinfo)
 		}
 	}
 
+	ret = gnutls_x509_spki_init(&spki);
+	if (ret < 0) {
+		fprintf(stderr, "error in SPKI initialization: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
 	if (HAVE_OPT(SALT_SIZE)) {
-		kdata[kdata_size].type = GNUTLS_KEYGEN_RSA_PSS_SALT_SIZE;
-		kdata[kdata_size++].size = OPT_VALUE_SALT_SIZE;
+		gnutls_x509_spki_set_salt_size(spki, OPT_VALUE_SALT_SIZE);
 	}
 
 	if (cinfo->seed_size > 0) {
@@ -214,9 +220,16 @@ generate_private_key_int(common_info_st * cinfo)
 	}
 
 	if (default_dig) {
-		kdata[kdata_size].type = GNUTLS_KEYGEN_RSA_PSS_DIGEST;
-		kdata[kdata_size++].size = default_dig;
+		gnutls_x509_spki_set_digest_algorithm(spki, default_dig);
 
+	}
+
+	if (default_dig || HAVE_OPT(SALT_SIZE)) {
+		gnutls_x509_spki_set_pk_algorithm(spki, key_type);
+
+		kdata[kdata_size].type = GNUTLS_KEYGEN_SPKI;
+		kdata[kdata_size].data = (void*)spki;
+		kdata[kdata_size++].size = sizeof(spki);
 	}
 
 	if (provable)
@@ -228,6 +241,8 @@ generate_private_key_int(common_info_st * cinfo)
 			gnutls_strerror(ret));
 		app_exit(1);
 	}
+
+	gnutls_x509_spki_deinit(spki);
 
 	ret = gnutls_x509_privkey_verify_params(key);
 	if (ret < 0) {
