@@ -205,6 +205,7 @@ extra/includes/Makefile.in
 extra/libgnutls-openssl.la
 extra/Makefile
 extra/Makefile.in
+fuzz/*_fuzzer
 gl/alloca.h
 gl/arg-nonnull.h
 gl/byteswap.h

@@ -35,7 +35,7 @@ SUBDIRS += src/gl
 endif
 
 if ENABLE_TESTS
-SUBDIRS += tests
+SUBDIRS += tests fuzz
 endif
 
 if HAVE_GUILE

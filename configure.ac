@@ -264,7 +264,7 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime localtime fmemopen vasprintf mmap],,)
+AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime localtime fmemopen vasprintf mmap fmemopen],,)
 if test "$ac_cv_func_vasprintf" != "yes";then
   AC_MSG_CHECKING([for va_copy])
   AC_LINK_IFELSE([AC_LANG_PROGRAM([
@@ -955,6 +955,7 @@ AC_CONFIG_FILES([
   tests/key-tests/Makefile
   tests/slow/Makefile
   tests/suite/Makefile
+  fuzz/Makefile
 ])
 
 AC_OUTPUT
