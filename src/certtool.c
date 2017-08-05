@@ -1176,6 +1176,20 @@ static void figure_key_type(const char *key_type)
 	}
 }
 
+static void load_infile(const char *file)
+{
+	struct stat st;
+	if (stat(file, &st) == 0) {
+		fix_lbuffer(2*st.st_size);
+	}
+
+	infile = fopen(file, "rb");
+	if (infile == NULL) {
+		fprintf(stderr, "Cannot open %s for reading\n", OPT_ARG(INFILE));
+		app_exit(1);
+	}
+}
+
 static void cmd_parser(int argc, char **argv)
 {
 	int ret, privkey_op = 0;
@@ -1207,19 +1221,24 @@ static void cmd_parser(int argc, char **argv)
 		outfile = stdout;
 	}
 
-	if (HAVE_OPT(INFILE)) {
-		struct stat st;
-		if (stat(OPT_ARG(INFILE), &st) == 0) {
-			fix_lbuffer(2*st.st_size);
-		}
+	if (!HAVE_OPT(INFILE)) {
+		/* infile can be different option depending on command */
+		if (HAVE_OPT(CERTIFICATE_INFO) && HAVE_OPT(LOAD_CERTIFICATE)) {
+			load_infile(OPT_ARG(LOAD_CERTIFICATE));
+		} else if (HAVE_OPT(CRQ_INFO) && HAVE_OPT(LOAD_REQUEST)) {
+			load_infile(OPT_ARG(LOAD_REQUEST));
+		} else if (HAVE_OPT(PUBKEY_INFO) && HAVE_OPT(LOAD_PUBKEY)) {
+			load_infile(OPT_ARG(LOAD_PUBKEY));
+		} else if (HAVE_OPT(KEY_INFO) && HAVE_OPT(LOAD_PRIVKEY)) {
+			load_infile(OPT_ARG(LOAD_PRIVKEY));
+		} else if (HAVE_OPT(CRL_INFO) && HAVE_OPT(LOAD_CRL)) {
+			load_infile(OPT_ARG(LOAD_CRL));
+		} else
+			infile = stdin;
+	} else {
+		load_infile(OPT_ARG(INFILE));
+	}
 
-		infile = fopen(OPT_ARG(INFILE), "rb");
-		if (infile == NULL) {
-			fprintf(stderr, "Cannot open %s for reading\n", OPT_ARG(INFILE));
-			app_exit(1);
-		}
-	} else
-		infile = stdin;
 
 	fix_lbuffer(0);
 
