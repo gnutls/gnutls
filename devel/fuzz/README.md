@@ -55,13 +55,17 @@ sudo docker run --rm -e ASAN_OPTIONS="detect_leaks=0" -ti -v $FILE:/testcase oss
 For the following tests dropping a file to a subdirectory in tests is
 sufficient:
 
-| Fuzzer                       | Directory                  |
-|:----------------------------:|:--------------------------:|
-|gnutls_client_fuzzer          | tests/client-interesting   |
-|gnutls_server_fuzzer          | tests/server-interesting   |
-|gnutls_pkcs7_parser_fuzzer    | tests/pkcs7-interesting    |
-|gnutls_x509_parser_fuzzer     | tests/certs-interesting    |
-|gnutls_ocsp_resp_parser_fuzzer| tests/ocsp-resp-interesting|
+| Fuzzer                       | Directory                   |
+|:----------------------------:|:---------------------------:|
+|gnutls_client_fuzzer          | tests/client-interesting    |
+|gnutls_server_fuzzer          | tests/server-interesting    |
+|gnutls_psk_client_fuzzer      | tests/psk-client-interesting|
+|gnutls_psk_server_fuzzer      | tests/psk-server-interesting|
+|gnutls_srp_client_fuzzer      | tests/srp-client-interesting|
+|gnutls_srp_server_fuzzer      | tests/srp-server-interesting|
+|gnutls_pkcs7_parser_fuzzer    | tests/pkcs7-interesting     |
+|gnutls_x509_parser_fuzzer     | tests/certs-interesting     |
+|gnutls_ocsp_resp_parser_fuzzer| tests/ocsp-resp-interesting |
 
 The following require modifying a test case. Mappings are shown in the
 table below.
@@ -71,3 +75,10 @@ table below.
 |gnutls_dn_parser_fuzzer          |tests/x509-dn-decode.c                                    |
 |gnutls_pkcs8_key_parser_fuzzer   |tests/key-tests/pkcs8-invalid,tests/key-tests/pkcs8-decode|
 |gnutls_private_key_parser_fuzzer |tests/key-tests/key-invalid                               |
+
+
+# Missing fuzzers
+
+ * TLS resumption
+ * TLS rehandshake
+ * Fuzzying past finished message processing

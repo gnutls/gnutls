@@ -96,6 +96,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid tls-neg-ext-k
 	 tls10-server-kx-neg tls11-server-kx-neg tls12-server-kx-neg ssl30-server-kx-neg \
 	 tls12-cipher-neg tls11-cipher-neg tls10-cipher-neg ssl30-cipher-neg \
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain	tls-rehandshake-cert-3 \
+	 psk-server psk-client srp-server srp-client \
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	ocsp-resp \
 	 tls-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
