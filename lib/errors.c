@@ -408,6 +408,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE),
 	ERROR_ENTRY(N_("The public key is invalid."),
 		    GNUTLS_E_PK_INVALID_PUBKEY),
+	ERROR_ENTRY(N_("There are no validation parameters present."),
+		    GNUTLS_E_PK_NO_VALIDATION_PARAMS),
 	ERROR_ENTRY(N_("The public key parameters are invalid."),
 		    GNUTLS_E_PK_INVALID_PUBKEY_PARAMS),
 	ERROR_ENTRY(N_("The private key is invalid."),

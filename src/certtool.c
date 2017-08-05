@@ -284,7 +284,10 @@ static void verify_provable_privkey(common_info_st * cinfo)
 	}
 
 	if (ret < 0) {
-		fprintf(stderr, "Error verifying private key: %s\n", gnutls_strerror(ret));
+		if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE)
+			fprintf(stderr, "The private key type cannot be associated with validated parameters\n");
+		else
+			fprintf(stderr, "Error verifying private key: %s\n", gnutls_strerror(ret));
 		app_exit(1);
 	}
 

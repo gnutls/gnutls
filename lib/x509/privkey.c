@@ -1896,7 +1896,7 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 	}
 
 	if (key->params.algo != GNUTLS_PK_RSA && key->params.algo != GNUTLS_PK_DSA)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	ret = gnutls_x509_privkey_get_pk_algorithm2(key, &bits);
 	if (ret < 0)
@@ -1912,7 +1912,7 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 	}
 
 	if (seed == NULL || seed_size == 0)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		return gnutls_assert_val(GNUTLS_E_PK_NO_VALIDATION_PARAMS);
 
 	data.type = GNUTLS_KEYGEN_SEED;
 	data.data = (void*)seed;
