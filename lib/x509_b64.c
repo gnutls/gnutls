@@ -209,6 +209,9 @@ gnutls_pem_base64_encode2(const char *header,
 
 /* copies data to result but removes newlines and <CR>
  * returns the size of the data copied.
+ *
+ * It will fail with GNUTLS_E_BASE64_DECODING_ERROR if the
+ * end-result is the empty string.
  */
 inline static int
 cpydata(const uint8_t * data, int data_size, gnutls_datum_t * result)
@@ -231,11 +234,20 @@ cpydata(const uint8_t * data, int data_size, gnutls_datum_t * result)
 
 	result->size = j;
 	result->data[j] = 0;
+
+	if (j==0) {
+		gnutls_free(result->data);
+		return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+	}
+
 	return j;
 }
 
-/* decodes data and puts the result into result (locally allocated)
- * The result_size is the return value
+/* decodes data and puts the result into result (locally allocated).
+ * Note that encodings of zero-length strings are being rejected
+ * with GNUTLS_E_BASE64_DECODING_ERROR.
+ *
+ * The result_size is the return value.
  */
 int
 _gnutls_base64_decode(const uint8_t * data, size_t data_size,
@@ -246,6 +258,9 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 	gnutls_datum_t pdata;
 	struct base64_decode_ctx ctx;
 
+	if (data_size == 0)
+		return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+
 	ret = cpydata(data, data_size, &pdata);
 	if (ret < 0) {
 		gnutls_assert();
@@ -254,7 +269,7 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 
 	base64_decode_init(&ctx);
 
-	size = BASE64_DECODE_LENGTH(data_size);
+	size = BASE64_DECODE_LENGTH(pdata.size);
 	if (size == 0) {
 		ret = gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 		goto cleanup;
@@ -268,7 +283,7 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 
 	ret = base64_decode_update(&ctx, &size, result->data,
 				   pdata.size, pdata.data); 
-	if (ret == 0) {
+	if (ret == 0 || size == 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_BASE64_DECODING_ERROR;
 		goto fail;
