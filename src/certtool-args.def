@@ -60,7 +60,14 @@ flag = {
 flag = {
     name      = provable;
     descrip   = "Generate a private key or parameters from a seed using a provable method";
-    doc = "This will use the FIPS-186-4 algorithms (i.e., Shawe-Taylor) for provable key generation. When specified the private keys or parameters will be generated from a seed, and can be proven to be correctly generated from the seed. You may specify --seed or allow GnuTLS to generate one (recommended). This option can be combined with --generate-privkey or --generate-dh-params.";
+    doc = "This will use the FIPS-186-4 algorithms (i.e., Shawe-Taylor) for provable key generation.
+When specified the private keys or parameters will be generated from a seed, and can be
+later validated with --verify-provable-privkey to be correctly generated from the seed. You may
+specify --seed or allow GnuTLS to generate one (recommended). This option can be combined with
+--generate-privkey or --generate-dh-params.
+
+That option applies to RSA and DSA keys. On the DSA keys the PQG parameters
+are generated using the seed, and on RSA the two primes.";
 };
 
 flag = {

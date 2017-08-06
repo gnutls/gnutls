@@ -5,6 +5,13 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.15 (unreleased)
+
+** certtool: Keys with provable RSA and DSA parameters are now only exported
+   in PKCS#8 form, following draft-mavrogiannopoulos-pkcs8-validated-parameters-00.txt.
+   This removes the need for a non-standard key format.
+
+
 * Version 3.5.14 (released 2017-07-04)
 
 ** libgnutls: Handle specially HSMs which request explicit authentication.
