@@ -939,6 +939,7 @@ _decode_pkcs8_rsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	_gnutls_free_key_datum(&tmp);
 
 	if (pkey->key == NULL) {
+		ret = GNUTLS_E_PK_INVALID_PRIVKEY;
 		gnutls_assert();
 		goto error;
 	}
