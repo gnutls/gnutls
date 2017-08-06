@@ -2298,7 +2298,7 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		 * keys were as old.
 		 */
 		if (params->params_nr < RSA_PRIVATE_PARAMS - 3)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
 
 		if (params->params[RSA_COEF] == NULL) {
 			ret = _gnutls_mpi_init(&params->params[RSA_COEF]);
@@ -2347,6 +2347,9 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		ed25519_sha512_public_key(params->raw_pub.data, params->raw_priv.data);
 		params->raw_pub.size = params->raw_priv.size;
 	} else if (algo == GNUTLS_PK_RSA_PSS) {
+		if (params->params_nr < RSA_PRIVATE_PARAMS - 3)
+			return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
+
 		if (params->spki.rsa_pss_dig != 0) {
 			unsigned pub_size = nettle_mpz_sizeinbase_256_u(TOMPZ(params->params[RSA_MODULUS]));
 			/* sanity check for private key */
