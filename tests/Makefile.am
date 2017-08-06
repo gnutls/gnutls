@@ -104,7 +104,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid tls-neg-ext-k
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
-	 gnutls_x509_privkey_import \
+	 gnutls_x509_privkey_import gnutls_x509_crt_list_import \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
 	 mini-cert-status rsa-psk global-init sec-params sign-verify-data \
