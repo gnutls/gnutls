@@ -37,6 +37,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/name-constraints-ip.pem data/cert-invalid-utf8.der data/very-long-dn.pem \
 	data/provable3072.pem data/provable2048.pem data/provable-dsa2048.pem \
 	data/provable-dsa2048-fips.pem templates/template-crq.tmpl \
+	data/provable3072.new.pem data/provable2048.new.pem data/provable-dsa2048.new.pem \
+	data/provable-dsa2048-fips.new.pem \
 	templates/template-unique.tmpl data/template-unique.pem \
 	templates/template-othername.tmpl data/template-othername.pem \
 	templates/template-othername-xmpp.tmpl data/template-othername-xmpp.pem \
@@ -72,6 +74,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email crq \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
+	provable-privkey-new \
 	provable-dh userid sha2-test sha2-dsa-test provable-privkey-dsa2048 \
 	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
 	pkcs7-constraints2 certtool-long-oids pkcs7-cat pkcs12-corner-cases \
