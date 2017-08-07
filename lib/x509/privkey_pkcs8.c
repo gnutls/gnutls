@@ -189,7 +189,6 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 		goto error;
 	}
 
-
 	/* Write the raw private key
 	 */
 	result = _encode_privkey(pkey, &algo_privkey);
@@ -211,7 +210,6 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 
 	if ((pkey->params.flags & GNUTLS_PK_FLAG_PROVABLE) && pkey->params.seed_size > 0) {
 		gnutls_datum_t seed_info;
-
 		result = _x509_encode_provable_seed(pkey, &seed_info);
 		if (result < 0) {
 			gnutls_assert();
@@ -1050,7 +1048,7 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 
 	ret =
 	    _gnutls_asn1_encode_privkey(GNUTLS_PK_DSA, &pkey->key,
-					&pkey->params, pkey->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&pkey->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;

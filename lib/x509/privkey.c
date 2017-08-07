@@ -112,7 +112,7 @@ gnutls_x509_privkey_cpy(gnutls_x509_privkey_t dst,
 
 	ret =
 	    _gnutls_asn1_encode_privkey(dst->pk_algorithm, &dst->key,
-					&dst->params, src->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&dst->params);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_pk_params_release(&dst->params);
@@ -975,7 +975,7 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 
 	ret =
 	    _gnutls_asn1_encode_privkey(GNUTLS_PK_RSA, &key->key,
-					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1070,7 +1070,7 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 
 	ret =
 	    _gnutls_asn1_encode_privkey(GNUTLS_PK_DSA, &key->key,
-					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1221,15 +1221,9 @@ gnutls_x509_privkey_get_pk_algorithm2(gnutls_x509_privkey_t key,
 static const char *set_msg(gnutls_x509_privkey_t key)
 {
 	if (key->pk_algorithm == GNUTLS_PK_RSA) {
-		if (key->params.seed_size > 0 && !(key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT))
-			return PEM_KEY_RSA_PROVABLE;
-		else
-			return PEM_KEY_RSA;
+		return PEM_KEY_RSA;
 	} else if (key->pk_algorithm == GNUTLS_PK_DSA) {
-		if (key->params.seed_size > 0 && !(key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT))
-			return PEM_KEY_DSA_PROVABLE;
-		else
-			return PEM_KEY_DSA;
+		return PEM_KEY_DSA;
 	} else if (key->pk_algorithm == GNUTLS_PK_EC)
 		return PEM_KEY_ECC;
 	else
@@ -1273,11 +1267,9 @@ gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 
 	msg = set_msg(key);
 
-	if (key->flags & GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT) {
-		ret = gnutls_x509_privkey_fix(key);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-	}
+	ret = gnutls_x509_privkey_fix(key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return _gnutls_x509_export_int(key->key, format, msg,
 				       output_data, output_data_size);
@@ -1318,11 +1310,9 @@ gnutls_x509_privkey_export2(gnutls_x509_privkey_t key,
 
 	msg = set_msg(key);
 
-	if (key->flags & GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT) {
-		ret = gnutls_x509_privkey_fix(key);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-	}
+	ret = gnutls_x509_privkey_fix(key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return _gnutls_x509_export_int2(key->key, format, msg, out);
 }
@@ -1576,7 +1566,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
-	ret = _gnutls_asn1_encode_privkey(algo, &key->key, &key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+	ret = _gnutls_asn1_encode_privkey(algo, &key->key, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2080,7 +2070,7 @@ int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
 
 	ret =
 	    _gnutls_asn1_encode_privkey(key->pk_algorithm, &key->key,
-					&key->params, key->flags&GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+					&key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
