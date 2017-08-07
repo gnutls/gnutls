@@ -153,7 +153,9 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 	int ret;
 
 	pub->algo = priv->algo;
-	pub->flags = priv->flags;
+	pub->pkflags = priv->pkflags;
+	pub->curve = priv->curve;
+	pub->qbits = priv->qbits;
 	memcpy(&pub->spki, &priv->spki, sizeof(gnutls_x509_spki_st));
 
 	switch (pk) {

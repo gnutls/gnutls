@@ -290,16 +290,16 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 			goto error;
 		}
 
-		pkey->params.flags = gnutls_oid_to_ecc_curve(oid);
+		pkey->params.curve = gnutls_oid_to_ecc_curve(oid);
 
-		if (pkey->params.flags == GNUTLS_ECC_CURVE_INVALID) {
+		if (pkey->params.curve == GNUTLS_ECC_CURVE_INVALID) {
 			_gnutls_debug_log("Curve %s is not supported\n", oid);
 			gnutls_assert();
 			ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
 			goto error;
 		}
 	} else {
-		pkey->params.flags = curve;
+		pkey->params.curve = curve;
 	}
 
 
@@ -1111,7 +1111,7 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 
 	gnutls_pk_params_init(&key->params);
 
-	key->params.flags = curve;
+	key->params.curve = curve;
 
 	if (curve_is_eddsa(curve)) {
 		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
@@ -1649,7 +1649,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	}
 
 	if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE) {
-		key->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
+		key->params.pkflags |= GNUTLS_PK_FLAG_PROVABLE;
 	}
 
 	key->params.algo = algo;

@@ -56,7 +56,7 @@ int set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
 
 	session->key.dh_params.params_nr = 3; /* include empty q */
 	session->key.dh_params.algo = GNUTLS_PK_DH;
-	session->key.dh_params.flags = q_bits;
+	session->key.dh_params.qbits = q_bits;
 
 	return 0;
 }

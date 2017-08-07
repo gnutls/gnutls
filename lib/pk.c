@@ -304,7 +304,9 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	dst->flags = src->flags;
+	dst->pkflags = src->pkflags;
+	dst->curve = src->curve;
+	dst->qbits = src->qbits;
 	dst->algo = src->algo;
 
 	for (i = 0; i < src->params_nr; i++) {
@@ -830,9 +832,9 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 	}
 
 	if (curve)
-		*curve = params->flags;
+		*curve = params->curve;
 
-	if (curve_is_eddsa(params->flags)) {
+	if (curve_is_eddsa(params->curve)) {
 		if (x) {
 			ret = _gnutls_set_datum(x, params->raw_pub.data, params->raw_pub.size);
 			if (ret < 0) {

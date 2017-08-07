@@ -118,7 +118,7 @@ _gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	result =
-	    _gnutls_ecc_ansi_x962_export(params->flags,
+	    _gnutls_ecc_ansi_x962_export(params->curve,
 					 params->params[ECC_X],
 					 params->params[ECC_Y], /*&out */
 					 der);
@@ -146,7 +146,7 @@ _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
 	if (params->raw_pub.size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (params->flags != GNUTLS_ECC_CURVE_ED25519)
+	if (params->curve != GNUTLS_ECC_CURVE_ED25519)
 		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 	ret = _gnutls_set_datum(raw, params->raw_pub.data, params->raw_pub.size);
@@ -174,7 +174,7 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 	case GNUTLS_PK_RSA_PSS:
 		return _gnutls_x509_write_rsa_pss_params(&params->spki, der);
 	case GNUTLS_PK_ECDSA:
-		return _gnutls_x509_write_ecc_params(params->flags, der);
+		return _gnutls_x509_write_ecc_params(params->curve, der);
 	case GNUTLS_PK_EDDSA_ED25519:
 		der->data = NULL;
 		der->size = 0;
@@ -631,7 +631,7 @@ _gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 	gnutls_datum_t pubkey = { NULL, 0 };
 	const char *oid;
 
-	oid = gnutls_ecc_curve_get_oid(params->flags);
+	oid = gnutls_ecc_curve_get_oid(params->curve);
 	if (oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -656,7 +656,7 @@ _gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	if (curve_is_eddsa(params->flags)) {
+	if (curve_is_eddsa(params->curve)) {
 		if (params->raw_pub.size == 0 || params->raw_priv.size == 0)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		ret =
@@ -679,7 +679,7 @@ _gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		ret =
-		    _gnutls_ecc_ansi_x962_export(params->flags,
+		    _gnutls_ecc_ansi_x962_export(params->curve,
 						 params->params[ECC_X],
 						 params->params[ECC_Y], &pubkey);
 		if (ret < 0)

@@ -511,7 +511,7 @@ static unsigned is_level_acceptable(
 				return gnutls_assert_val(0);
 			}
 
-			curve = params.flags;
+			curve = params.curve;
 			gnutls_pk_params_release(&params);
 
 			if (curve != GNUTLS_ECC_CURVE_SECP256R1 &&
@@ -539,7 +539,7 @@ static unsigned is_level_acceptable(
 					return gnutls_assert_val(0);
 				}
 
-				issuer_curve = params.flags;
+				issuer_curve = params.curve;
 				gnutls_pk_params_release(&params);
 
 				if (issuer_curve != GNUTLS_ECC_CURVE_SECP256R1 &&

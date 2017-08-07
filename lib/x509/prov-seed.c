@@ -124,7 +124,7 @@ int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t 
 	}
 
 	pkey->params.palgo = gnutls_oid_to_digest(oid);
-	pkey->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
+	pkey->params.pkflags |= GNUTLS_PK_FLAG_PROVABLE;
 
 	ret = 0;
 

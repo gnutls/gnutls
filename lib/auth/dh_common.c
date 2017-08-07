@@ -244,7 +244,7 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 
 				used_ffdhe = 1;
 				_gnutls_session_group_set(session, session->internals.priorities->groups.entry[j]);
-				session->key.dh_params.flags = *session->internals.priorities->groups.entry[j]->q_bits;
+				session->key.dh_params.qbits = *session->internals.priorities->groups.entry[j]->q_bits;
 				break;
 			}
 		}
@@ -312,7 +312,7 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 				  gnutls_buffer_st * data)
 {
 	int ret;
-	unsigned q_bits = session->key.dh_params.flags;
+	unsigned q_bits = session->key.dh_params.qbits;
 
 	if (q_bits < 192 && q_bits != 0) {
 		gnutls_assert();

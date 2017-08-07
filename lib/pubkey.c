@@ -57,7 +57,7 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st * params)
 		return _gnutls_mpi_get_nbits(params->params[DSA_P]);
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
-		return gnutls_ecc_curve_get_size(params->flags) * 8;
+		return gnutls_ecc_curve_get_size(params->curve) * 8;
 	default:
 		return 0;
 	}
@@ -867,7 +867,7 @@ gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
 	}
 
 	if (curve)
-		*curve = key->params.flags;
+		*curve = key->params.curve;
 
 	if (key->params.algo == GNUTLS_PK_EDDSA_ED25519) {
 		if (x) {
@@ -941,7 +941,7 @@ int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 
-	ret = _gnutls_x509_write_ecc_params(key->params.flags, parameters);
+	ret = _gnutls_x509_write_ecc_params(key->params.curve, parameters);
 	if (ret < 0) {
 		_gnutls_free_datum(ecpoint);
 		gnutls_assert();
@@ -1031,7 +1031,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 	 */
 	key->params.algo = _gnutls_x509_get_pk_algorithm(spk, "", &curve, NULL);
 
-	key->params.flags = curve;
+	key->params.curve = curve;
 	key->bits = pubkey_to_bits(&key->params);
 
 	result = 0;
@@ -1332,13 +1332,13 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 		}
 
 		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
-		key->params.flags = curve;
+		key->params.curve = curve;
 
 		return 0;
 	}
 
 	/* ECDSA */
-	key->params.flags = curve;
+	key->params.curve = curve;
 
 	if (_gnutls_mpi_init_scan_nz
 	    (&key->params.params[ECC_X], x->data, x->size)) {
@@ -1398,7 +1398,7 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 
 	ret =
 	    _gnutls_x509_read_ecc_params(parameters->data,
-					 parameters->size, &key->params.flags);
+					 parameters->size, &key->params.curve);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2039,7 +2039,7 @@ const mac_entry_st *_gnutls_dsa_q_to_hash(const gnutls_pk_params_st *
 	if (params->algo == GNUTLS_PK_DSA)
 		bits = _gnutls_mpi_get_nbits(params->params[1]);
 	else if (params->algo == GNUTLS_PK_EC)
-		bits = gnutls_ecc_curve_get_size(params->flags) * 8;
+		bits = gnutls_ecc_curve_get_size(params->curve) * 8;
 
 	if (bits <= 160) {
 		if (hash_len)

@@ -608,8 +608,8 @@ static int test_ecdh(void)
 	gnutls_pk_params_init(&priv);
 	gnutls_pk_params_init(&pub);
 	
-	priv.flags = GNUTLS_ECC_CURVE_SECP256R1;
-	pub.flags = GNUTLS_ECC_CURVE_SECP256R1;
+	priv.curve = GNUTLS_ECC_CURVE_SECP256R1;
+	pub.curve = GNUTLS_ECC_CURVE_SECP256R1;
 	
 	priv.algo = pub.algo = GNUTLS_PK_EC;
 	

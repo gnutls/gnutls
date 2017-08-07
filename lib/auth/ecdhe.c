@@ -99,7 +99,7 @@ static int calc_ecdh_key(gnutls_session_t session,
 	pub.params[ECC_Y] = session->key.ecdh_y;
 	pub.raw_pub.data = session->key.ecdhx.data;
 	pub.raw_pub.size = session->key.ecdhx.size;
-	pub.flags = ecurve->id;
+	pub.curve = ecurve->id;
 
 	ret =
 	    _gnutls_pk_derive(ecurve->pk, &tmp_dh_key,

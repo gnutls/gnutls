@@ -219,7 +219,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 		goto error;
 	}
 
-	if ((pkey->params.flags & GNUTLS_PK_FLAG_PROVABLE) && pkey->params.seed_size > 0) {
+	if ((pkey->params.pkflags & GNUTLS_PK_FLAG_PROVABLE) && pkey->params.seed_size > 0) {
 		gnutls_datum_t seed_info;
 
 		result = _x509_encode_provable_seed(pkey, &seed_info);
@@ -1092,7 +1092,7 @@ _decode_pkcs8_eddsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const c
 		pkey->params.algo = GNUTLS_PK_EDDSA_ED25519;
 		pkey->params.raw_priv.data = tmp.data;
 		pkey->params.raw_priv.size = tmp.size;
-		pkey->params.flags = curve;
+		pkey->params.curve = curve;
 
 		tmp.data = NULL;
 		return 0;

@@ -446,7 +446,7 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_read_dsa_params(der, dersize, params);
 	case GNUTLS_PK_EC:
-		return _gnutls_x509_read_ecc_params(der, dersize, &params->flags);
+		return _gnutls_x509_read_ecc_params(der, dersize, &params->curve);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
