@@ -1398,6 +1398,7 @@ gnutls_x509_crl_list_import(gnutls_x509_crl_t * crls,
 						   GNUTLS_X509_FMT_PEM);
 			if (ret < 0) {
 				gnutls_assert();
+				count++;
 				goto error;
 			}
 		}
