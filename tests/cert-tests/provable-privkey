@@ -78,6 +78,25 @@ if test "${rc3}" != "0"; then
 	exit 1
 fi
 
+#
+# Try whether re-importing a key loses the parameters
+#
+
+"${CERTTOOL}" -k --infile "${srcdir}/data/provable2048.new.pem"|"${CERTTOOL}" -k|"${CERTTOOL}" -k >${OUTFILE}
+grep "Seed: AB:49:9E:A5:5A:5F:4C:B7:43:43:4E:49:CA:1E:E3:A4:91:54:43:09:C6:F5:9A:B2:CD:55:07:DE" ${OUTFILE}
+if test $? != 0;then
+	cat $OUTFILE
+	echo "Could not find validation parameters after re-importing new format"
+	exit 1
+fi
+
+"${CERTTOOL}" -k --infile "${srcdir}/data/provable2048.pem"|"${CERTTOOL}" -k|"${CERTTOOL}" -k >${OUTFILE}
+grep "Seed: AB:49:9E:A5:5A:5F:4C:B7:43:43:4E:49:CA:1E:E3:A4:91:54:43:09:C6:F5:9A:B2:CD:55:07:DE" ${OUTFILE}
+if test $? != 0;then
+	echo "Could not find validation parameters after re-importing legacy format"
+	exit 1
+fi
+
 rm -f "$OUTFILE"
 
 exit 0
