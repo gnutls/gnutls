@@ -89,7 +89,37 @@ if test "${rc4}" != "0"; then
 	exit 1
 fi
 
+#
+# Negative tests, verify using an incorrect seed
+#
+
+ARB_SEED="31:EC:34:4F:97:DB:C0:BA:9C:86:52:A7:B5:D3:F7:B2:DB:BB:48:A4:84:2E:19:0D:21:0E:01:DA:BD:53:59:81:50:37:55:EE:96:A2:70:A5:98:E9:D9:1B:22:54:66:91:69:EB:DF:45:99:D9:F7:2A:CA"
+
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --seed "${ARB_SEED}" --load-privkey "${srcdir}/data/provable2048.pem" &
+PID1=$!
+
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --seed "${ARB_SEED}" --load-privkey "${srcdir}/data/${DSAFILE}" &
+PID2=$!
+
+wait $PID1
+rc1=$?
+
+wait $PID2
+rc2=$?
+
+if test "${rc1}" = "0"; then
+	echo "Incorrectly verified an RSA key with wrong seed"
+	exit 1
+fi
+
+if test "${rc2}" = "0"; then
+	echo "Incorrectly verified a DSA key with wrong seed"
+	exit 1
+fi
+
+#
 # Try whether re-importing a key loses the parameters
+#
 
 "${CERTTOOL}" -k --infile "${srcdir}/data/provable2048.pem"|"${CERTTOOL}" -k|"${CERTTOOL}" -k >${OUTFILE}
 grep "Hash: SHA384" ${OUTFILE} && grep "Seed: ab499ea55a5f4cb743434e49ca1ee3a491544309c6f59ab2cd5507de" ${OUTFILE}
