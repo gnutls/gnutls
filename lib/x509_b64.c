@@ -313,7 +313,8 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 /* Searches the given string for ONE PEM encoded certificate, and
  * stores it in the result.
  *
- * The result_size is the return value
+ * The result_size (always non-zero) is the return value,
+ * or a negative error code.
  */
 #define ENDSTR "-----"
 int

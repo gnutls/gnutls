@@ -256,7 +256,7 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 		    _gnutls_fbase64_decode(PEM_PKCS7, data->data,
 					   data->size, &_data);
 
-		if (result <= 0) {
+		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}

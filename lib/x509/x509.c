@@ -522,7 +522,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		    _gnutls_fbase64_decode(PEM_X509_CERT2, data->data,
 					   data->size, &cert->der);
 
-		if (result <= 0) {
+		if (result < 0) {
 			/* try for the second header */
 			result =
 			    _gnutls_fbase64_decode(PEM_X509_CERT,

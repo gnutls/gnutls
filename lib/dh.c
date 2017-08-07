@@ -441,9 +441,7 @@ gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 						pkcs3_params->size,
 						&_params);
 
-		if (result <= 0) {
-			if (result == 0)
-				result = GNUTLS_E_INTERNAL_ERROR;
+		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
