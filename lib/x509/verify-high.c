@@ -508,6 +508,7 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 	unsigned x;
 	unsigned int vret = 0;
 	uint32_t hash;
+	gnutls_x509_crl_t *tmp;
 
 	/* Probably we can optimize things such as removing duplicates
 	 * etc.
@@ -533,6 +534,8 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 						   &vret);
 			if (ret < 0 || vret != 0) {
 				_gnutls_debug_log("CRL verification failed, not adding it\n");
+				if (flags & GNUTLS_TL_NO_DUPLICATES)
+					gnutls_x509_crl_deinit(crl_list[i]);
 				continue;
 			}
 		}
@@ -552,22 +555,28 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 					} else {
 						/* The new is older, discard it */
 						gnutls_x509_crl_deinit(crl_list[i]);
-						continue;
+						goto next;
 					}
 				}
 			}
 		}
 
-		list->node[hash].crls =
-		    gnutls_realloc_fast(list->node[hash].crls,
+		tmp =
+		    gnutls_realloc(list->node[hash].crls,
 					(list->node[hash].crl_size +
 					 1) *
 					sizeof(list->node[hash].
 					       trusted_cas[0]));
-		if (list->node[hash].crls == NULL) {
+		if (tmp == NULL) {
+			ret = i;
 			gnutls_assert();
-			return i;
+			if (flags & GNUTLS_TL_NO_DUPLICATES)
+				while (i < crl_size)
+					gnutls_x509_crl_deinit(crl_list[i++]);
+			return ret;
 		}
+		list->node[hash].crls = tmp;
+
 
 		list->node[hash].crls[list->node[hash].crl_size] =
 		    crl_list[i];

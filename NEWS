@@ -3,6 +3,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.31 (unreleased)
+
+** libgnutls: Fixed memory leaks and a double free in gnutls_x509_trust_list_add_crls();
+   backported from 3.6.x.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.30 (released 2018-07-16)
 
 ** libgnutls: Corrected infinite loop when an incorrect PIN was provided
