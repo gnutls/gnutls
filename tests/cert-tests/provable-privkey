@@ -89,6 +89,15 @@ if test "${rc4}" != "0"; then
 	exit 1
 fi
 
+# Try whether re-importing a key loses the parameters
+
+"${CERTTOOL}" -k --infile "${srcdir}/data/provable2048.pem"|"${CERTTOOL}" -k|"${CERTTOOL}" -k >${OUTFILE}
+grep "Hash: SHA384" ${OUTFILE} && grep "Seed: ab499ea55a5f4cb743434e49ca1ee3a491544309c6f59ab2cd5507de" ${OUTFILE}
+if test $? != 0;then
+	echo "Could not find validation parameters after re-importing"
+	exit 1
+fi
+
 rm -f "$OUTFILE"
 
 exit 0
