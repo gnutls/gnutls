@@ -240,6 +240,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 			}
 			gnutls_free(v.data);
 		}
+		pkey->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
 	}
 
 	return pkey_asn;
@@ -445,6 +446,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 				pkey->params.seed_size = seed.size;
 			}
 			gnutls_free(seed.data);
+			pkey->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
 		}
 	}
 
