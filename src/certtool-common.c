@@ -1218,7 +1218,7 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 	if (!key)
 		return;
 
-	if (!cinfo->pkcs8 && cinfo->no_compat == 0 && gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
+	if (!cinfo->pkcs8 && gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
 		cinfo->pkcs8 = 1;
 		flags |= GNUTLS_PKCS_PLAIN;
 	}
@@ -1287,7 +1287,6 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 	if (how != 0) {
 		if (info->provable != 0) {
 			gnutls_x509_privkey_t pkey;
-			unsigned save;
 
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {
@@ -1322,10 +1321,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 			}
 
 			if (info->outcert_format == GNUTLS_X509_FMT_PEM) {
-				save = info->no_compat;
-				info->no_compat = 1;
 				print_private_key(outfile, info, pkey);
-				info->no_compat = save;
 			}
 
 			ret = gnutls_dh_params_import_dsa(dh_params, pkey);

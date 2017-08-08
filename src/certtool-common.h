@@ -70,9 +70,6 @@ typedef struct common_info {
 	/* when printing PKCS #11 objects, only print urls */
 	unsigned int only_urls;
 	unsigned int verbose;
-
-	/* set to non zero when no compatibility structs need to be exported */
-	unsigned no_compat;
 } common_info_st;
 
 int cipher_to_flags(const char *cipher);
