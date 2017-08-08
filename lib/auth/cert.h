@@ -59,6 +59,13 @@ typedef struct gnutls_certificate_credentials_st {
 	certs_st *certs;
 	unsigned ncerts;	/* the number of certs */
 
+	/* contains sorted index values for certs. Sorted in a way
+	 * that RSA-PSS keys always take precedence over plain RSA keys
+	 * to ensure that we use only RSA-PSS keys if present for RSA-PSS
+	 * operations. We keep indexes to certs structures above.
+	 */
+	unsigned int *sorted_cert_idx;
+
 	/* X509 specific stuff */
 	gnutls_x509_trust_list_t tlist;
 	unsigned flags; /* gnutls_certificate_flags */

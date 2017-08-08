@@ -66,7 +66,9 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
 	}
 
 	gnutls_free(sc->certs);
+	gnutls_free(sc->sorted_cert_idx);
 	sc->certs = NULL;
+	sc->sorted_cert_idx = NULL;
 
 	sc->ncerts = 0;
 }

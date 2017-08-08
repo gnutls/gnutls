@@ -876,7 +876,7 @@ read_cert_url(gnutls_certificate_credentials_t res, gnutls_privkey_t key, const 
 			gnutls_assert();
 			goto cleanup;
 		}
-		
+
 		ret = gnutls_x509_crt_import(crt, &t, GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1085,13 +1085,17 @@ certificate_credential_append_crt_list(gnutls_certificate_credentials_t res,
 				       gnutls_str_array_t names,
 				       gnutls_pcert_st * crt, int nr)
 {
+	res->sorted_cert_idx = gnutls_realloc_fast(res->sorted_cert_idx,
+						(1 + res->ncerts) *
+						sizeof(unsigned int));
+	if (res->sorted_cert_idx == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
 	res->certs = gnutls_realloc_fast(res->certs,
 					 (1 + res->ncerts) *
 					 sizeof(certs_st));
-	if (res->certs == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
+	if (res->certs == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	memset(&res->certs[res->ncerts], 0, sizeof(res->certs[0]));
 
@@ -1100,6 +1104,29 @@ certificate_credential_append_crt_list(gnutls_certificate_credentials_t res,
 	res->certs[res->ncerts].names = names;
 	res->certs[res->ncerts].pkey = key;
 
+	/* move RSA-PSS certificates before any RSA key.
+	 * Note that we cannot assume that any previous pointers
+	 * to sorted list are ok, due to the realloc in res->certs. */
+	if (crt->pubkey->params.algo == GNUTLS_PK_RSA_PSS) {
+		unsigned i,ridx;
+		unsigned tmp;
+
+		for (i=0;i<res->ncerts;i++) {
+			ridx = res->sorted_cert_idx[i];
+
+			if (res->certs[ridx].cert_list->pubkey->params.algo == GNUTLS_PK_RSA) {
+				tmp = ridx;
+				res->sorted_cert_idx[i] = res->ncerts;
+				res->sorted_cert_idx[res->ncerts] = tmp;
+				goto finish;
+			}
+		}
+	}
+
+	/* otherwise append it normally on the end */
+	res->sorted_cert_idx[res->ncerts] = res->ncerts;
+
+ finish:
 	return 0;
 
 }
@@ -1583,7 +1610,6 @@ gnutls_certificate_set_x509_key_file2(gnutls_certificate_credentials_t res,
 	 */
 	if ((ret = read_key_file(res, keyfile, type, pass, flags, &rkey)) < 0)
 		return ret;
-	
 
 	if ((ret = read_cert_file(res, rkey, certfile, type)) < 0) {
 		gnutls_privkey_deinit(rkey);

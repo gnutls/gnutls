@@ -1488,7 +1488,7 @@ int select_sign_algorithm(gnutls_session_t session,
 int
 _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs)
 {
-	unsigned i;
+	unsigned i, j;
 	int idx, ret;
 	gnutls_certificate_credentials_t cred;
 	char server_name[MAX_CN];
@@ -1552,7 +1552,9 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	 */
 
 	if (server_name[0] != 0) {
-		for (i = 0; i < cred->ncerts; i++) {
+		for (j = 0; j < cred->ncerts; j++) {
+			i = cred->sorted_cert_idx[j];
+
 			if (cred->certs[i].names != NULL
 			    && _gnutls_str_array_match(cred->certs[i].names,
 						       server_name) != 0) {
@@ -1586,7 +1588,9 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	}
 
 	/* no name match */
-	for (i = 0; i < cred->ncerts; i++) {
+	for (j = 0; j < cred->ncerts; j++) {
+		i = cred->sorted_cert_idx[j];
+
 		_gnutls_handshake_log
 		    ("HSK[%p]: checking compat of %s with certificate[%d] (%s/%s)\n",
 		     session, cs->name, i,
