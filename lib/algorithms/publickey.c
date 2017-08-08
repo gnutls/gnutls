@@ -352,7 +352,7 @@ gnutls_pk_algorithm_t _gnutls_oid_to_pk_and_curve(const char *oid, gnutls_ecc_cu
 		}
 
 	if (ret == GNUTLS_PK_UNKNOWN && curve)
-		*curve = GNUTLS_PK_UNKNOWN;
+		*curve = GNUTLS_ECC_CURVE_INVALID;
 
 	return ret;
 }
