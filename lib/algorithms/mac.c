@@ -350,20 +350,16 @@ const gnutls_digest_algorithm_t *gnutls_digest_list(void)
  **/
 gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid)
 {
-	gnutls_digest_algorithm_t ret = 0;
-
 	GNUTLS_HASH_LOOP(
 		if (p->oid && strcmp(oid, p->oid) == 0) {
 			if (_gnutls_digest_exists((gnutls_digest_algorithm_t)p->id)) {
-				ret = (gnutls_digest_algorithm_t) p->id;
+				return (gnutls_digest_algorithm_t) p->id;
 			}
 			break;
 		}
 	);
 
-	if (ret == 0)
-		return GNUTLS_DIG_UNKNOWN;
-	return ret;
+	return GNUTLS_DIG_UNKNOWN;
 }
 
 /**
@@ -379,20 +375,16 @@ gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid)
  **/
 gnutls_mac_algorithm_t gnutls_oid_to_mac(const char *oid)
 {
-	gnutls_digest_algorithm_t ret = 0;
-
 	GNUTLS_HASH_LOOP(
 		if (p->mac_oid && strcmp(oid, p->mac_oid) == 0) {
 			if (_gnutls_mac_exists(p->id)) {
-				ret = p->id;
+				return p->id;
 			}
 			break;
 		}
 	);
 
-	if (ret == 0)
-		return GNUTLS_MAC_UNKNOWN;
-	return ret;
+	return GNUTLS_MAC_UNKNOWN;
 }
 
 /**
@@ -408,14 +400,11 @@ gnutls_mac_algorithm_t gnutls_oid_to_mac(const char *oid)
  **/
 const char *gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm)
 {
-	const char *ret = NULL;
-
 	GNUTLS_HASH_LOOP(
 		if (algorithm == (unsigned) p->id && p->oid != NULL) {
-			ret = p->oid;
-			break;
+			return p->oid;
 		}
 	);
 
-	return ret;
+	return NULL;
 }
