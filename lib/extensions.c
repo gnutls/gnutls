@@ -788,7 +788,7 @@ gnutls_session_ext_register(gnutls_session_t session,
 	 * in any way, or are mapped to an exported API. */
 	for (i = 0; extfunc[i] != NULL; i++) {
 		if (extfunc[i]->type == type) {
-			if (!flags & GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL) {
+			if (!(flags & GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL)) {
 				return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
 			} else if (extfunc[i]->cannot_be_overriden) {
 				return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
