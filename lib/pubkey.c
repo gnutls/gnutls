@@ -1514,7 +1514,7 @@ int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_e
 	unsigned bits;
 
 	if (se->pk != key_params->algo) {
-		if (!gnutls_sign_supports_pk_algorithm(se->pk, key_params->algo)) {
+		if (!gnutls_sign_supports_pk_algorithm(se->id, key_params->algo)) {
 			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
 					gnutls_pk_get_name(key_params->algo), key_params->algo,
 					se->name, se->id);
