@@ -73,9 +73,6 @@ typedef struct common_info {
 	unsigned int only_urls;
 	unsigned int verbose;
 
-	/* set to non zero when no compatibility structs need to be exported */
-	unsigned no_compat;
-
 	unsigned rsa_pss_sign;
 	unsigned sort_chain;
 } common_info_st;

@@ -1347,7 +1347,6 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 	if (how != 0) {
 		if (info->provable != 0) {
 			gnutls_x509_privkey_t pkey;
-			unsigned save;
 
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {
@@ -1382,10 +1381,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 			}
 
 			if (info->outcert_format == GNUTLS_X509_FMT_PEM) {
-				save = info->no_compat;
-				info->no_compat = 1;
 				print_private_key(outfile, info, pkey);
-				info->no_compat = save;
 			}
 
 			ret = gnutls_dh_params_import_dsa(dh_params, pkey);
