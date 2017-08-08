@@ -54,22 +54,44 @@ KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
 CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
 KEY2=${srcdir}/../doc/credentials/x509/key-ecc.pem
 CERT2=${srcdir}/../doc/credentials/x509/cert-ecc.pem
+KEY3=${srcdir}/../doc/credentials/x509/key-rsa-pss.pem
+CERT3=${srcdir}/../doc/credentials/x509/cert-rsa-pss.pem
 CAFILE=${srcdir}/../doc/credentials/x509/ca.pem
+TMPFILE=outcert.$$.tmp
 
 eval "${GETPORT}"
 launch_server $$ --echo --priority "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA" --x509keyfile ${KEY1} --x509certfile ${CERT1} \
-	--x509keyfile ${KEY2} --x509certfile ${CERT2}
+	--x509keyfile ${KEY2} --x509certfile ${CERT2} --x509keyfile ${KEY3} --x509certfile ${CERT3}
 PID=$!
 wait_server ${PID}
 
-timeout 1800 datefudge "2016-09-2" \
+timeout 1800 datefudge "2017-08-9" \
 "${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA" </dev/null || \
 	fail ${PID} "1. handshake with RSA should have succeeded!"
 
-timeout 1800 datefudge "2016-09-2" \
+timeout 1800 datefudge "2017-08-9" \
 "${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-ECDSA" </dev/null || \
 	fail ${PID} "2. handshake with ECC should have succeeded!"
 
+timeout 1800 datefudge "2017-08-9" \
+"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-SHA256" --save-cert ${TMPFILE} </dev/null || \
+	fail ${PID} "3. handshake with RSA should have succeeded!"
+
+cmp ${TMPFILE} ${CERT1}
+if test $? != 0;then
+	fail ${PID} "3. the certificate used by server was not the expected"
+fi
+
+
+# check whether the server used the RSA-PSS certificate when we asked for RSA-PSS signature
+timeout 1800 datefudge "2017-08-9" \
+"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256" --save-cert ${TMPFILE} </dev/null || \
+	fail ${PID} "4. handshake with RSA-PSS and SHA256 should have succeeded!"
+
+cmp ${TMPFILE} ${CERT3}
+if test $? != 0;then
+	fail ${PID} "4. the certificate used by server was not the expected"
+fi
 
 kill ${PID}
 wait
