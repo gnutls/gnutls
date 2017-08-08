@@ -266,7 +266,7 @@ if test "${rc}" != "0"; then
 fi
 
 FILE="rsa-pss-signing"
-${VALGRIND} "${CERTTOOL}" --p7-sign --load-privkey  "${srcdir}/../../doc/credentials/x509/key-rsa.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa-pss.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"
+${VALGRIND} "${CERTTOOL}" --p7-sign --load-privkey  "${srcdir}/../../doc/credentials/x509/key-rsa-pss.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa-pss.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
