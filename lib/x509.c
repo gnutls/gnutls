@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2002-2016 Free Software Foundation, Inc.
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -55,6 +55,12 @@
 /*
  * some x509 certificate parsing functions.
  */
+
+static int
+certificate_credential_append_crt_list(gnutls_certificate_credentials_t res,
+				       gnutls_privkey_t key,
+				       gnutls_str_array_t names,
+				       gnutls_pcert_st * crt, int nr);
 
 #define CRED_RET_SUCCESS(cred) \
 	if (cred->flags & GNUTLS_CERTIFICATE_API_V2) { \
@@ -475,6 +481,7 @@ static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
  */
 static int
 parse_der_cert_mem(gnutls_certificate_credentials_t res,
+		   gnutls_privkey_t key,
 		   const void *input_cert, int input_cert_size)
 {
 	gnutls_datum_t tmp;
@@ -522,7 +529,7 @@ parse_der_cert_mem(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
-	ret = certificate_credential_append_crt_list(res, names, ccert, 1);
+	ret = certificate_credential_append_crt_list(res, key, names, ccert, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -541,6 +548,7 @@ parse_der_cert_mem(gnutls_certificate_credentials_t res,
  */
 static int
 parse_pem_cert_mem(gnutls_certificate_credentials_t res,
+		   gnutls_privkey_t key,
 		   const char *input_cert, int input_cert_size)
 {
 	int size;
@@ -637,7 +645,7 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 	}
 
 	ret =
-	    certificate_credential_append_crt_list(res, names, pcerts,
+	    certificate_credential_append_crt_list(res, key, names, pcerts,
 						   ncerts);
 	if (ret < 0) {
 		gnutls_assert();
@@ -666,15 +674,17 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 /* Reads a DER or PEM certificate from memory
  */
 static int
-read_cert_mem(gnutls_certificate_credentials_t res, const void *cert,
+read_cert_mem(gnutls_certificate_credentials_t res,
+	      gnutls_privkey_t key,
+	      const void *cert,
 	      int cert_size, gnutls_x509_crt_fmt_t type)
 {
 	int ret;
 
 	if (type == GNUTLS_X509_FMT_DER)
-		ret = parse_der_cert_mem(res, cert, cert_size);
+		ret = parse_der_cert_mem(res, key, cert, cert_size);
 	else
-		ret = parse_pem_cert_mem(res, cert, cert_size);
+		ret = parse_pem_cert_mem(res, key, cert, cert_size);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -699,13 +709,15 @@ static int tmp_pin_cb(void *userdata, int attempt, const char *token_url,
 }
 
 /* Reads a PEM encoded PKCS-1 RSA/DSA private key from memory.  Type
- * indicates the certificate format.  KEY can be NULL, to indicate
- * that GnuTLS doesn't know the private key.
+ * indicates the certificate format.
+ *
+ * It returns the private key read in @rkey.
  */
 static int
 read_key_mem(gnutls_certificate_credentials_t res,
 	     const void *key, int key_size, gnutls_x509_crt_fmt_t type,
-	     const char *pass, unsigned int flags)
+	     const char *pass, unsigned int flags,
+	     gnutls_privkey_t *rkey)
 {
 	int ret;
 	gnutls_datum_t tmp;
@@ -742,18 +754,11 @@ read_key_mem(gnutls_certificate_credentials_t res,
 			return ret;
 		}
 
-		ret = certificate_credentials_append_pkey(res, privkey);
-		if (ret < 0) {
-			gnutls_assert();
-			gnutls_privkey_deinit(privkey);
-			return ret;
-		}
-
+		*rkey = privkey;
 	} else {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
-
 
 	return 0;
 }
@@ -762,7 +767,7 @@ read_key_mem(gnutls_certificate_credentials_t res,
 /* Reads a private key from a token.
  */
 static int
-read_key_url(gnutls_certificate_credentials_t res, const char *url)
+read_key_url(gnutls_certificate_credentials_t res, const char *url, gnutls_privkey_t *rkey)
 {
 	int ret;
 	gnutls_privkey_t pkey = NULL;
@@ -785,11 +790,7 @@ read_key_url(gnutls_certificate_credentials_t res, const char *url)
 		goto cleanup;
 	}
 
-	ret = certificate_credentials_append_pkey(res, pkey);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	*rkey = pkey;
 
 	return 0;
 
@@ -805,7 +806,7 @@ read_key_url(gnutls_certificate_credentials_t res, const char *url)
 /* Reads a certificate key from a token.
  */
 static int
-read_cert_url(gnutls_certificate_credentials_t res, const char *url)
+read_cert_url(gnutls_certificate_credentials_t res, gnutls_privkey_t key, const char *url)
 {
 	int ret;
 	gnutls_x509_crt_t crt = NULL;
@@ -885,7 +886,7 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 		t.data = NULL;
 	}
 
-	ret = certificate_credential_append_crt_list(res, names, ccert, count);
+	ret = certificate_credential_append_crt_list(res, key, names, ccert, count);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -908,6 +909,7 @@ cleanup:
  */
 static int
 read_cert_file(gnutls_certificate_credentials_t res,
+	       gnutls_privkey_t key,
 	       const char *certfile, gnutls_x509_crt_fmt_t type)
 {
 	int ret;
@@ -915,7 +917,7 @@ read_cert_file(gnutls_certificate_credentials_t res,
 	char *data;
 
 	if (gnutls_url_is_supported(certfile)) {
-		return read_cert_url(res, certfile);
+		return read_cert_url(res, key, certfile);
 	}
 
 	data = read_binary_file(certfile, &size);
@@ -925,7 +927,7 @@ read_cert_file(gnutls_certificate_credentials_t res,
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	ret = read_cert_mem(res, data, size, type);
+	ret = read_cert_mem(res, key, data, size, type);
 	free(data);
 
 	return ret;
@@ -940,7 +942,8 @@ read_cert_file(gnutls_certificate_credentials_t res,
 static int
 read_key_file(gnutls_certificate_credentials_t res,
 	      const char *keyfile, gnutls_x509_crt_fmt_t type,
-	      const char *pass, unsigned int flags)
+	      const char *pass, unsigned int flags,
+	      gnutls_privkey_t *rkey)
 {
 	int ret;
 	size_t size;
@@ -955,7 +958,7 @@ read_key_file(gnutls_certificate_credentials_t res,
 				gnutls_certificate_set_pin_function(res, tmp_pin_cb, res->pin_tmp);
 			}
 
-			return read_key_url(res, keyfile);
+			return read_key_url(res, keyfile, rkey);
 		} else
 			return
 			    gnutls_assert_val
@@ -969,7 +972,7 @@ read_key_file(gnutls_certificate_credentials_t res,
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	ret = read_key_mem(res, data, size, type, pass, flags);
+	ret = read_key_mem(res, data, size, type, pass, flags, rkey);
 	free(data);
 
 	return ret;
@@ -1052,16 +1055,17 @@ gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
 				     const char *pass, unsigned int flags)
 {
 	int ret;
+	gnutls_privkey_t rkey;
 
 	/* this should be first
 	 */
 	if ((ret = read_key_mem(res, key ? key->data : NULL,
 				key ? key->size : 0, type, pass,
-				flags)) < 0)
+				flags, &rkey)) < 0)
 		return ret;
 
-	if ((ret = read_cert_mem(res, cert->data, cert->size, type)) < 0) {
-		gnutls_privkey_deinit(res->pkey[res->ncerts]);
+	if ((ret = read_cert_mem(res, rkey, cert->data, cert->size, type)) < 0) {
+		gnutls_privkey_deinit(rkey);
 		return ret;
 	}
 
@@ -1075,9 +1079,10 @@ gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
 	CRED_RET_SUCCESS(res);
 }
 
-int
-certificate_credential_append_crt_list(gnutls_certificate_credentials_t
-				       res, gnutls_str_array_t names,
+static int
+certificate_credential_append_crt_list(gnutls_certificate_credentials_t res,
+				       gnutls_privkey_t key,
+				       gnutls_str_array_t names,
 				       gnutls_pcert_st * crt, int nr)
 {
 	res->certs = gnutls_realloc_fast(res->certs,
@@ -1093,23 +1098,8 @@ certificate_credential_append_crt_list(gnutls_certificate_credentials_t
 	res->certs[res->ncerts].cert_list = crt;
 	res->certs[res->ncerts].cert_list_length = nr;
 	res->certs[res->ncerts].names = names;
+	res->certs[res->ncerts].pkey = key;
 
-	return 0;
-
-}
-
-int
-certificate_credentials_append_pkey(gnutls_certificate_credentials_t res,
-				    gnutls_privkey_t pkey)
-{
-	res->pkey = gnutls_realloc_fast(res->pkey,
-					(1 + res->ncerts) *
-					sizeof(gnutls_privkey_t));
-	if (res->pkey == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	res->pkey[res->ncerts] = pkey;
 	return 0;
 
 }
@@ -1175,12 +1165,6 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 		return ret;
 	}
 
-	ret = certificate_credentials_append_pkey(res, pkey);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
 	/* load certificates */
 	pcerts = gnutls_malloc(sizeof(gnutls_pcert_st) * cert_list_size);
 	if (pcerts == NULL) {
@@ -1203,7 +1187,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 	}
 
 	ret =
-	    certificate_credential_append_crt_list(res, names, pcerts,
+	    certificate_credential_append_crt_list(res, pkey, names, pcerts,
 						   cert_list_size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1263,7 +1247,7 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	return gnutls_privkey_export_x509(res->pkey[index], key);
+	return gnutls_privkey_export_x509(res->certs[index].pkey, key);
 }
 
 /**
@@ -1415,12 +1399,6 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 		gnutls_privkey_set_pin_function(key, res->pin.cb,
 						res->pin.data);
 
-	ret = certificate_credentials_append_pkey(res, key);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
 	new_pcert_list = gnutls_malloc(sizeof(gnutls_pcert_st) * pcert_list_size);
 	if (new_pcert_list == NULL) {
 		gnutls_assert();
@@ -1429,7 +1407,7 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 	memcpy(new_pcert_list, pcert_list, sizeof(gnutls_pcert_st) * pcert_list_size);
 
 	ret =
-	    certificate_credential_append_crt_list(res, str_names,
+	    certificate_credential_append_crt_list(res, key, str_names,
 						   new_pcert_list,
 						   pcert_list_size);
 	if (ret < 0) {
@@ -1599,15 +1577,16 @@ gnutls_certificate_set_x509_key_file2(gnutls_certificate_credentials_t res,
 				      const char *pass, unsigned int flags)
 {
 	int ret;
+	gnutls_privkey_t rkey;
 
 	/* this should be first
 	 */
-	if ((ret = read_key_file(res, keyfile, type, pass, flags)) < 0)
+	if ((ret = read_key_file(res, keyfile, type, pass, flags, &rkey)) < 0)
 		return ret;
 	
 
-	if ((ret = read_cert_file(res, certfile, type)) < 0) {
-		gnutls_privkey_deinit(res->pkey[res->ncerts]);
+	if ((ret = read_cert_file(res, rkey, certfile, type)) < 0) {
+		gnutls_privkey_deinit(rkey);
 		return ret;
 	}
 

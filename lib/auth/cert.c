@@ -596,7 +596,7 @@ select_client_cert(gnutls_session_t session,
 						   cert_list[0],
 						   cred->certs[indx].
 						   cert_list_length,
-						   cred->pkey[indx], 0,
+						   cred->certs[indx].pkey, 0,
 						   NULL, NULL);
 		} else {
 			_gnutls_selected_certs_set(session, NULL, 0, NULL, 0,
@@ -1567,7 +1567,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 
 				ret = select_sign_algorithm(session,
 							    &cred->certs[i].cert_list[0],
-							    cred->pkey[i],
+							    cred->certs[i].pkey,
 							    cs);
 				if (ret >= 0) {
 					idx = i;
@@ -1604,7 +1604,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 
 		ret = select_sign_algorithm(session,
 					    &cred->certs[i].cert_list[0],
-					    cred->pkey[i],
+					    cred->certs[i].pkey,
 					    cs);
 		if (ret >= 0) {
 			idx = i;
@@ -1626,7 +1626,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 		_gnutls_selected_certs_set(session,
 					   &cred->certs[idx].cert_list[0],
 					   cred->certs[idx].cert_list_length,
-					   cred->pkey[idx], 0,
+					   cred->certs[idx].pkey, 0,
 					   cred->certs[idx].ocsp_func,
 					   cred->certs[idx].ocsp_func_ptr);
 	} else {

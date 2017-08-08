@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -37,6 +38,9 @@ typedef struct {
 	gnutls_status_request_ocsp_func ocsp_func;
 	void *ocsp_func_ptr; /* corresponding OCSP response function + ptr */
 	char *ocsp_response_file; /* corresponding OCSP response file */
+
+	/* the private key corresponding to certificate */
+	gnutls_privkey_t pkey;
 } certs_st;
 
 /* This structure may be complex, but it's the only way to
@@ -54,12 +58,6 @@ typedef struct gnutls_certificate_credentials_st {
 
 	certs_st *certs;
 	unsigned ncerts;	/* the number of certs */
-
-	gnutls_privkey_t *pkey;
-	/* private keys. It contains ncerts private
-	 * keys. pkey[i] corresponds to certificate in
-	 * cert_list[i][0].
-	 */
 
 	/* X509 specific stuff */
 	gnutls_x509_trust_list_t tlist;
@@ -132,12 +130,6 @@ void _gnutls_selected_certs_deinit(gnutls_session_t session);
 int _gnutls_get_auth_info_pcert(gnutls_pcert_st * gcert,
 				gnutls_certificate_type_t type,
 				cert_auth_info_t info);
-
-int certificate_credential_append_crt_list(gnutls_certificate_credentials_t
-					   res, gnutls_str_array_t names,
-					   gnutls_pcert_st * crt, int nr);
-int certificate_credentials_append_pkey(gnutls_certificate_credentials_t
-					res, gnutls_privkey_t pkey);
 
 int _gnutls_selected_cert_supported_kx(struct gnutls_session_int *session,
 				       gnutls_kx_algorithm_t * alg,

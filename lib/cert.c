@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -62,17 +62,11 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
 		gnutls_free(sc->certs[i].cert_list);
 		gnutls_free(sc->certs[i].ocsp_response_file);
 		_gnutls_str_array_clear(&sc->certs[i].names);
+		gnutls_privkey_deinit(sc->certs[i].pkey);
 	}
 
 	gnutls_free(sc->certs);
 	sc->certs = NULL;
-
-	for (i = 0; i < sc->ncerts; i++) {
-		gnutls_privkey_deinit(sc->pkey[i]);
-	}
-
-	gnutls_free(sc->pkey);
-	sc->pkey = NULL;
 
 	sc->ncerts = 0;
 }
@@ -684,7 +678,7 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	    gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts - 1].
 					   cert_list[0].pubkey, NULL);
 	pk2 =
-	    gnutls_privkey_get_pk_algorithm(res->pkey[res->ncerts - 1],
+	    gnutls_privkey_get_pk_algorithm(res->certs[res->ncerts - 1].pkey,
 					    NULL);
 
 	if (GNUTLS_PK_IS_RSA(pk) && GNUTLS_PK_IS_RSA(pk2)) {
@@ -707,7 +701,7 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	/* now check if keys really match. We use the sign/verify approach
 	 * because we cannot always obtain the parameters from the abstract
 	 * keys (e.g. PKCS #11). */
-	ret = gnutls_privkey_sign_data2(res->pkey[res->ncerts - 1],
+	ret = gnutls_privkey_sign_data2(res->certs[res->ncerts - 1].pkey,
 		sign_algo, 0, &test, &sig);
 	if (ret < 0) {
 		/* for some reason we couldn't sign that. That shouldn't have
