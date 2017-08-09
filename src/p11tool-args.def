@@ -182,10 +182,19 @@ flag = {
 };
 
 flag = {
+    name      = generate-privkey;
+    arg-type  = string;
+    descrip   = "Generate private-public key pair of given type";
+    doc = "Generates a private-public key pair in the specified token.
+Acceptable types are RSA, ECDSA, and DSA. Should be combined with --sec-param or --bits.";
+};
+
+flag = {
     name      = generate-rsa;
     descrip   = "Generate an RSA private-public key pair";
     doc = "Generates an RSA private-public key pair on the specified token.
 Should be combined with --sec-param or --bits.";
+    deprecated;
 };
 
 flag = {
@@ -193,6 +202,7 @@ flag = {
     descrip   = "Generate a DSA private-public key pair";
     doc = "Generates a DSA private-public key pair on the specified token.
 Should be combined with --sec-param or --bits.";
+    deprecated;
 };
 
 flag = {
@@ -200,6 +210,7 @@ flag = {
     descrip   = "Generate an ECDSA private-public key pair";
     doc = "Generates an ECDSA private-public key pair on the specified token.
 Should be combined with --curve, --sec-param or --bits.";
+    deprecated;
 };
 
 flag = {
@@ -523,7 +534,7 @@ and its corresponding private key.
 
 To generate an RSA private key inside the token use:
 @example
-$ p11tool --login --generate-rsa --bits 1024 --label "MyNewKey" \
+$ p11tool --login --generate-privkey rsa --bits 1024 --label "MyNewKey" \
           --outfile MyNewKey.pub "pkcs11:TOKEN-URL"
 @end example
 The bits parameter in the above example is explicitly set because some

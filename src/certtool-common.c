@@ -1538,3 +1538,21 @@ void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size)
 
 	return;
 }
+
+gnutls_pk_algorithm_t figure_key_type(const char *key_type)
+{
+	if (strcasecmp(key_type, "rsa") == 0)
+		return GNUTLS_PK_RSA;
+	else if (strcasecmp(key_type, "rsa-pss") == 0)
+		return GNUTLS_PK_RSA_PSS;
+	else if (strcasecmp(key_type, "ed25519") == 0 || strcasecmp(key_type, "eddsa") == 0)
+		return GNUTLS_PK_EDDSA_ED25519;
+	else if (strcasecmp(key_type, "dsa") == 0)
+		return GNUTLS_PK_DSA;
+	else if (strcasecmp(key_type, "ecdsa") == 0 || strcasecmp(key_type, "ecc") == 0)
+		return GNUTLS_PK_ECDSA;
+	else {
+		fprintf(stderr, "unknown key type: %s\n", key_type);
+		return GNUTLS_PK_UNKNOWN;
+	}
+}

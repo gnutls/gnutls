@@ -172,4 +172,6 @@ void decode_seed(gnutls_datum_t *seed, const char *hex, unsigned hex_size);
 
 #define GNUTLS_PK_IS_RSA(pk) ((pk) == GNUTLS_PK_RSA || (pk) == GNUTLS_PK_RSA_PSS)
 
+gnutls_pk_algorithm_t figure_key_type(const char *key_type);
+
 #endif

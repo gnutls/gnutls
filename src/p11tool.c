@@ -320,9 +320,17 @@ static void cmd_parser(int argc, char **argv)
 		pkcs11_set_pin(outfile, url, &cinfo, 0);
 	} else if (HAVE_OPT(INITIALIZE_SO_PIN)) {
 		pkcs11_set_pin(outfile, url, &cinfo, 1);
-	} else if (HAVE_OPT(DELETE))
+	} else if (HAVE_OPT(DELETE)) {
 		pkcs11_delete(outfile, url, flags, &cinfo);
-	else if (HAVE_OPT(GENERATE_ECC)) {
+	} else if (HAVE_OPT(GENERATE_PRIVKEY)) {
+		key_type = figure_key_type(OPT_ARG(GENERATE_PRIVKEY));
+		if (key_type == GNUTLS_PK_UNKNOWN)
+			app_exit(1);
+		pkcs11_generate(outfile, url, key_type,
+				get_bits(key_type, bits, sec_param, 0),
+				label, id, detailed_url,
+				flags, &cinfo);
+	} else if (HAVE_OPT(GENERATE_ECC)) {
 		key_type = GNUTLS_PK_EC;
 		pkcs11_generate(outfile, url, key_type,
 				get_bits(key_type, bits, sec_param, 0),

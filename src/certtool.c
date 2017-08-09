@@ -1158,24 +1158,6 @@ void sign_params_to_flags(common_info_st *cinfo, const char *params)
 	free(sp);
 }
 
-static void figure_key_type(const char *key_type)
-{
-	if (strcasecmp(key_type, "rsa") == 0)
-		req_key_type = GNUTLS_PK_RSA;
-	else if (strcasecmp(key_type, "rsa-pss") == 0)
-		req_key_type = GNUTLS_PK_RSA_PSS;
-	else if (strcasecmp(key_type, "ed25519") == 0 || strcasecmp(key_type, "eddsa") == 0)
-		req_key_type = GNUTLS_PK_EDDSA_ED25519;
-	else if (strcasecmp(key_type, "dsa") == 0)
-		req_key_type = GNUTLS_PK_DSA;
-	else if (strcasecmp(key_type, "ecdsa") == 0 || strcasecmp(key_type, "ecc") == 0)
-		req_key_type = GNUTLS_PK_ECDSA;
-	else {
-		fprintf(stderr, "unknown key type: %s\n", key_type);
-		exit(1);
-	}
-}
-
 static void load_infile(const char *file)
 {
 	struct stat st;
@@ -1259,8 +1241,11 @@ static void cmd_parser(int argc, char **argv)
 		req_key_type = GNUTLS_PK_ECDSA;
 	}
 
-	if (HAVE_OPT(KEY_TYPE))
-		figure_key_type(OPT_ARG(KEY_TYPE));
+	if (HAVE_OPT(KEY_TYPE)) {
+		req_key_type = figure_key_type(OPT_ARG(KEY_TYPE));
+		if (req_key_type == GNUTLS_PK_UNKNOWN)
+			app_exit(1);
+	}
 
 	default_dig = GNUTLS_DIG_UNKNOWN;
 	if (HAVE_OPT(HASH)) {
