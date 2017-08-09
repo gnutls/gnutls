@@ -248,6 +248,14 @@ AC_ARG_ENABLE(tests,
     enable_tests=$enableval, enable_tests=$enable_tools)
 AM_CONDITIONAL(ENABLE_TESTS, test "$enable_tests" != "no")
 
+AC_ARG_ENABLE(fuzzer-target,
+  AS_HELP_STRING([--enable-fuzzer-target], [make a library intended for testing - not production]),
+    enable_fuzzer_target=$enableval, enable_fuzzer_target=no)
+AM_CONDITIONAL(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION, test "$enable_fuzzer_target" != "no")
+if test "$enable_fuzzer_target" != "no";then
+	AC_DEFINE([FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION], 1, [Enable fuzzer target -not for production])
+fi
+
 GTK_DOC_CHECK(1.1)
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19])
@@ -1041,5 +1049,11 @@ AC_MSG_WARN([[
 *** constructors for gnutls_global_init will not be made available to
 *** linking applications. If you are building that library for arbitrary
 *** applications to link, do not enable static linking.
+]])
+fi
+
+if test "$enable_fuzzer_target" != "no";then
+AC_MSG_WARN([[
+*** This version of the library is for fuzzying purposes and is intentionally broken!
 ]])
 fi

@@ -186,9 +186,14 @@ static int create_tls_random(uint8_t * dst)
 	 * system's time.
 	 */
 
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+	/* When fuzzying avoid timing dependencies */
+	memset(dst, 1, 4);
+#else
 	tim = gnutls_time(NULL);
 	/* generate server random value */
 	_gnutls_write_uint32(tim, dst);
+#endif
 
 	ret =
 	    gnutls_rnd(GNUTLS_RND_NONCE, &dst[3], GNUTLS_RANDOM_SIZE - 3);
@@ -793,11 +798,18 @@ static int _gnutls_recv_finished(gnutls_session_t session)
 		goto cleanup;
 	}
 
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+	/* When fuzzying allow to proceed without verifying the handshake
+	 * consistency */
+# warning This is unsafe for production builds
+
+#else
 	if (memcmp(vrfy, data, data_size) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 		goto cleanup;
 	}
+#endif
 
 	ret = _gnutls_ext_sr_finished(session, data, data_size, 1);
 	if (ret < 0) {

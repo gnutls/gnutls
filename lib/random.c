@@ -37,6 +37,9 @@
 # error Unsupported platform
 #endif
 
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+extern gnutls_crypto_rnd_st _gnutls_fuzz_rnd_ops;
+#endif
 
 /* Per thread context of random generator, and a flag to indicate initialization */
 static _Thread_local void *gnutls_rnd_ctx;
@@ -100,7 +103,13 @@ int _gnutls_rnd_preinit(void)
 {
 	int ret;
 
-#ifdef ENABLE_FIPS140
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+# warning Insecure PRNG is enabled
+	ret = gnutls_crypto_rnd_register(100, &_gnutls_fuzz_rnd_ops);
+	if (ret < 0)
+		return ret;
+
+#elif defined(ENABLE_FIPS140)
 	/* The FIPS140 random generator is only enabled when we are compiled
 	 * with FIPS support, _and_ the system requires FIPS140.
 	 */

@@ -18,7 +18,7 @@ using other projects like openssl.
 Use the following commands on top dir:
 
 ```
-$ CC="afl-gcc" ./configure
+$ CC="afl-gcc" ./configure --enable-fuzzer-target
 $ make -j$(nproc)
 $ cd devel/fuzz
 $ make gnutls_pkcs7_parser_fuzzer
