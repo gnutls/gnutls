@@ -63,7 +63,7 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for p11tool options
  */
-static char const p11tool_opt_strs[5770] =
+static char const p11tool_opt_strs[5890] =
 /*     0 */ "p11tool @VERSION@\n"
             "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
@@ -143,143 +143,146 @@ static char const p11tool_opt_strs[5770] =
 /*  2314 */ "an alias for the 'mark-distrusted' option\0"
 /*  2356 */ "distrusted\0"
 /*  2367 */ "Key generation:\0"
-/*  2383 */ "Generate an RSA private-public key pair\0"
-/*  2423 */ "GENERATE_RSA\0"
-/*  2436 */ "generate-rsa\0"
-/*  2449 */ "Generate a DSA private-public key pair\0"
-/*  2488 */ "GENERATE_DSA\0"
-/*  2501 */ "generate-dsa\0"
-/*  2514 */ "Generate an ECDSA private-public key pair\0"
-/*  2556 */ "GENERATE_ECC\0"
-/*  2569 */ "generate-ecc\0"
-/*  2582 */ "Specify the number of bits for the key generate\0"
-/*  2630 */ "BITS\0"
-/*  2635 */ "bits\0"
-/*  2640 */ "Specify the curve used for EC key generation\0"
-/*  2685 */ "CURVE\0"
-/*  2691 */ "curve\0"
-/*  2697 */ "Specify the security level\0"
-/*  2724 */ "SEC_PARAM\0"
-/*  2734 */ "sec-param\0"
-/*  2744 */ "Writing objects:\0"
-/*  2761 */ "Set the CKA_ID (in hex) for the specified by the URL object\0"
-/*  2821 */ "SET_ID\0"
-/*  2828 */ "set-id\0"
-/*  2835 */ "Set the CKA_LABEL for the specified by the URL object\0"
-/*  2889 */ "SET_LABEL\0"
-/*  2899 */ "set-label\0"
-/*  2909 */ "Writes the loaded objects to a PKCS #11 token\0"
-/*  2955 */ "WRITE\0"
-/*  2961 */ "write\0"
-/*  2967 */ "Deletes the objects matching the given PKCS #11 URL\0"
-/*  3019 */ "DELETE\0"
-/*  3026 */ "delete\0"
-/*  3033 */ "Sets a label for the write operation\0"
-/*  3070 */ "LABEL\0"
-/*  3076 */ "label\0"
-/*  3082 */ "Sets an ID for the write operation\0"
-/*  3117 */ "ID\0"
-/*  3120 */ "id\0"
-/*  3123 */ "Marks the generated key to be a wrapping key\0"
-/*  3168 */ "MARK_WRAP\0"
-/*  3178 */ "no-mark-wrap\0"
-/*  3191 */ "no\0"
-/*  3194 */ "Marks the object to be written as trusted\0"
-/*  3236 */ "MARK_TRUSTED\0"
-/*  3249 */ "no-mark-trusted\0"
-/*  3265 */ "When retrieving objects, it requires the objects to be distrusted\n"
+/*  2383 */ "Generate private-public key pair of given type\0"
+/*  2430 */ "GENERATE_PRIVKEY\0"
+/*  2447 */ "generate-privkey\0"
+/*  2464 */ "Generate an RSA private-public key pair (deprecated)\0"
+/*  2517 */ "GENERATE_RSA\0"
+/*  2530 */ "generate-rsa\0"
+/*  2543 */ "Generate a DSA private-public key pair (deprecated)\0"
+/*  2595 */ "GENERATE_DSA\0"
+/*  2608 */ "generate-dsa\0"
+/*  2621 */ "Generate an ECDSA private-public key pair (deprecated)\0"
+/*  2676 */ "GENERATE_ECC\0"
+/*  2689 */ "generate-ecc\0"
+/*  2702 */ "Specify the number of bits for the key generate\0"
+/*  2750 */ "BITS\0"
+/*  2755 */ "bits\0"
+/*  2760 */ "Specify the curve used for EC key generation\0"
+/*  2805 */ "CURVE\0"
+/*  2811 */ "curve\0"
+/*  2817 */ "Specify the security level\0"
+/*  2844 */ "SEC_PARAM\0"
+/*  2854 */ "sec-param\0"
+/*  2864 */ "Writing objects:\0"
+/*  2881 */ "Set the CKA_ID (in hex) for the specified by the URL object\0"
+/*  2941 */ "SET_ID\0"
+/*  2948 */ "set-id\0"
+/*  2955 */ "Set the CKA_LABEL for the specified by the URL object\0"
+/*  3009 */ "SET_LABEL\0"
+/*  3019 */ "set-label\0"
+/*  3029 */ "Writes the loaded objects to a PKCS #11 token\0"
+/*  3075 */ "WRITE\0"
+/*  3081 */ "write\0"
+/*  3087 */ "Deletes the objects matching the given PKCS #11 URL\0"
+/*  3139 */ "DELETE\0"
+/*  3146 */ "delete\0"
+/*  3153 */ "Sets a label for the write operation\0"
+/*  3190 */ "LABEL\0"
+/*  3196 */ "label\0"
+/*  3202 */ "Sets an ID for the write operation\0"
+/*  3237 */ "ID\0"
+/*  3240 */ "id\0"
+/*  3243 */ "Marks the generated key to be a wrapping key\0"
+/*  3288 */ "MARK_WRAP\0"
+/*  3298 */ "no-mark-wrap\0"
+/*  3311 */ "no\0"
+/*  3314 */ "Marks the object to be written as trusted\0"
+/*  3356 */ "MARK_TRUSTED\0"
+/*  3369 */ "no-mark-trusted\0"
+/*  3385 */ "When retrieving objects, it requires the objects to be distrusted\n"
             "(blacklisted)\0"
-/*  3345 */ "MARK_DISTRUSTED\0"
-/*  3361 */ "mark-distrusted\0"
-/*  3377 */ "Marks the object to be written for decryption\0"
-/*  3423 */ "MARK_DECRYPT\0"
-/*  3436 */ "no-mark-decrypt\0"
-/*  3452 */ "Marks the object to be written for signature generation\0"
-/*  3508 */ "MARK_SIGN\0"
-/*  3518 */ "no-mark-sign\0"
-/*  3531 */ "Marks the object to be written as a CA\0"
-/*  3570 */ "MARK_CA\0"
-/*  3578 */ "no-mark-ca\0"
-/*  3589 */ "Marks the object to be written as private\0"
-/*  3631 */ "MARK_PRIVATE\0"
-/*  3644 */ "no-mark-private\0"
-/*  3660 */ "an alias for the 'mark-ca' option\0"
-/*  3694 */ "ca\0"
-/*  3697 */ "an alias for the 'mark-private' option\0"
-/*  3736 */ "private\0"
-/*  3744 */ "Provide a hex encoded secret key\0"
-/*  3777 */ "SECRET_KEY\0"
-/*  3788 */ "secret-key\0"
-/*  3799 */ "Private key file to use\0"
-/*  3823 */ "LOAD_PRIVKEY\0"
-/*  3836 */ "load-privkey\0"
-/*  3849 */ "Public key file to use\0"
-/*  3872 */ "LOAD_PUBKEY\0"
-/*  3884 */ "load-pubkey\0"
-/*  3896 */ "Certificate file to use\0"
-/*  3920 */ "LOAD_CERTIFICATE\0"
-/*  3937 */ "load-certificate\0"
-/*  3954 */ "Other options:\0"
-/*  3969 */ "Enable debugging\0"
-/*  3986 */ "DEBUG\0"
-/*  3992 */ "debug\0"
-/*  3998 */ "Output file\0"
-/*  4010 */ "OUTFILE\0"
-/*  4018 */ "outfile\0"
-/*  4026 */ "Force (user) login to token\0"
-/*  4054 */ "LOGIN\0"
-/*  4060 */ "no-login\0"
-/*  4069 */ "Force security officer login to token\0"
-/*  4107 */ "SO_LOGIN\0"
-/*  4116 */ "no-so-login\0"
-/*  4128 */ "an alias for the 'so-login' option\0"
-/*  4163 */ "admin-login\0"
-/*  4175 */ "Tests the signature operation of the provided object\0"
-/*  4228 */ "TEST_SIGN\0"
-/*  4238 */ "test-sign\0"
-/*  4248 */ "Generate random data\0"
-/*  4269 */ "GENERATE_RANDOM\0"
-/*  4285 */ "generate-random\0"
-/*  4301 */ "Use PKCS #8 format for private keys\0"
-/*  4337 */ "PKCS8\0"
-/*  4343 */ "pkcs8\0"
-/*  4349 */ "Use DER/RAW format for input\0"
-/*  4378 */ "INDER\0"
-/*  4384 */ "no-inder\0"
-/*  4393 */ "an alias for the 'inder' option\0"
-/*  4425 */ "inraw\0"
-/*  4431 */ "Use DER format for output certificates, private keys, and DH parameters\0"
-/*  4503 */ "OUTDER\0"
-/*  4510 */ "no-outder\0"
-/*  4520 */ "an alias for the 'outder' option\0"
-/*  4553 */ "outraw\0"
-/*  4560 */ "Specify the PKCS #11 provider library\0"
-/*  4598 */ "PROVIDER\0"
-/*  4607 */ "provider\0"
-/*  4616 */ "Specify parameters for the PKCS #11 provider library (deprecated)\0"
-/*  4682 */ "PROVIDER_OPTS\0"
-/*  4696 */ "provider-opts\0"
-/*  4710 */ "Print detailed URLs\0"
-/*  4730 */ "DETAILED_URL\0"
-/*  4743 */ "no-detailed-url\0"
-/*  4759 */ "Print a compact listing using only the URLs\0"
-/*  4803 */ "ONLY_URLS\0"
-/*  4813 */ "only-urls\0"
-/*  4823 */ "Disable all interaction with the tool\0"
-/*  4861 */ "BATCH\0"
-/*  4867 */ "batch\0"
-/*  4873 */ "display extended usage information and exit\0"
-/*  4917 */ "help\0"
-/*  4922 */ "extended usage information passed thru pager\0"
-/*  4967 */ "more-help\0"
-/*  4977 */ "output version information and exit\0"
-/*  5013 */ "version\0"
-/*  5021 */ "P11TOOL\0"
-/*  5029 */ "p11tool - GnuTLS PKCS #11 tool\n"
+/*  3465 */ "MARK_DISTRUSTED\0"
+/*  3481 */ "mark-distrusted\0"
+/*  3497 */ "Marks the object to be written for decryption\0"
+/*  3543 */ "MARK_DECRYPT\0"
+/*  3556 */ "no-mark-decrypt\0"
+/*  3572 */ "Marks the object to be written for signature generation\0"
+/*  3628 */ "MARK_SIGN\0"
+/*  3638 */ "no-mark-sign\0"
+/*  3651 */ "Marks the object to be written as a CA\0"
+/*  3690 */ "MARK_CA\0"
+/*  3698 */ "no-mark-ca\0"
+/*  3709 */ "Marks the object to be written as private\0"
+/*  3751 */ "MARK_PRIVATE\0"
+/*  3764 */ "no-mark-private\0"
+/*  3780 */ "an alias for the 'mark-ca' option\0"
+/*  3814 */ "ca\0"
+/*  3817 */ "an alias for the 'mark-private' option\0"
+/*  3856 */ "private\0"
+/*  3864 */ "Provide a hex encoded secret key\0"
+/*  3897 */ "SECRET_KEY\0"
+/*  3908 */ "secret-key\0"
+/*  3919 */ "Private key file to use\0"
+/*  3943 */ "LOAD_PRIVKEY\0"
+/*  3956 */ "load-privkey\0"
+/*  3969 */ "Public key file to use\0"
+/*  3992 */ "LOAD_PUBKEY\0"
+/*  4004 */ "load-pubkey\0"
+/*  4016 */ "Certificate file to use\0"
+/*  4040 */ "LOAD_CERTIFICATE\0"
+/*  4057 */ "load-certificate\0"
+/*  4074 */ "Other options:\0"
+/*  4089 */ "Enable debugging\0"
+/*  4106 */ "DEBUG\0"
+/*  4112 */ "debug\0"
+/*  4118 */ "Output file\0"
+/*  4130 */ "OUTFILE\0"
+/*  4138 */ "outfile\0"
+/*  4146 */ "Force (user) login to token\0"
+/*  4174 */ "LOGIN\0"
+/*  4180 */ "no-login\0"
+/*  4189 */ "Force security officer login to token\0"
+/*  4227 */ "SO_LOGIN\0"
+/*  4236 */ "no-so-login\0"
+/*  4248 */ "an alias for the 'so-login' option\0"
+/*  4283 */ "admin-login\0"
+/*  4295 */ "Tests the signature operation of the provided object\0"
+/*  4348 */ "TEST_SIGN\0"
+/*  4358 */ "test-sign\0"
+/*  4368 */ "Generate random data\0"
+/*  4389 */ "GENERATE_RANDOM\0"
+/*  4405 */ "generate-random\0"
+/*  4421 */ "Use PKCS #8 format for private keys\0"
+/*  4457 */ "PKCS8\0"
+/*  4463 */ "pkcs8\0"
+/*  4469 */ "Use DER/RAW format for input\0"
+/*  4498 */ "INDER\0"
+/*  4504 */ "no-inder\0"
+/*  4513 */ "an alias for the 'inder' option\0"
+/*  4545 */ "inraw\0"
+/*  4551 */ "Use DER format for output certificates, private keys, and DH parameters\0"
+/*  4623 */ "OUTDER\0"
+/*  4630 */ "no-outder\0"
+/*  4640 */ "an alias for the 'outder' option\0"
+/*  4673 */ "outraw\0"
+/*  4680 */ "Specify the PKCS #11 provider library\0"
+/*  4718 */ "PROVIDER\0"
+/*  4727 */ "provider\0"
+/*  4736 */ "Specify parameters for the PKCS #11 provider library (deprecated)\0"
+/*  4802 */ "PROVIDER_OPTS\0"
+/*  4816 */ "provider-opts\0"
+/*  4830 */ "Print detailed URLs\0"
+/*  4850 */ "DETAILED_URL\0"
+/*  4863 */ "no-detailed-url\0"
+/*  4879 */ "Print a compact listing using only the URLs\0"
+/*  4923 */ "ONLY_URLS\0"
+/*  4933 */ "only-urls\0"
+/*  4943 */ "Disable all interaction with the tool\0"
+/*  4981 */ "BATCH\0"
+/*  4987 */ "batch\0"
+/*  4993 */ "display extended usage information and exit\0"
+/*  5037 */ "help\0"
+/*  5042 */ "extended usage information passed thru pager\0"
+/*  5087 */ "more-help\0"
+/*  5097 */ "output version information and exit\0"
+/*  5133 */ "version\0"
+/*  5141 */ "P11TOOL\0"
+/*  5149 */ "p11tool - GnuTLS PKCS #11 tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]... [url]\n\0"
-/*  5124 */ "@PACKAGE_BUGREPORT@\0"
-/*  5144 */ "\n\0"
-/*  5146 */ "Program that allows operations on PKCS #11 smart cards and security\n"
+/*  5244 */ "@PACKAGE_BUGREPORT@\0"
+/*  5264 */ "\n\0"
+/*  5266 */ "Program that allows operations on PKCS #11 smart cards and security\n"
             "modules.\n\n"
             "To use PKCS #11 tokens with GnuTLS the p11-kit configuration files need to\n"
             "be setup.  That is create a .module file in /etc/pkcs11/modules with the\n"
@@ -288,8 +291,8 @@ static char const p11tool_opt_strs[5770] =
             "the form 'load=/usr/lib/opensc-pkcs11.so'.\n\n"
             "You can provide the PIN to be used for the PKCS #11 operations with the\n"
             "environment variables GNUTLS_PIN and GNUTLS_SO_PIN.\n\0"
-/*  5688 */ "p11tool @VERSION@\0"
-/*  5706 */ "p11tool [options] [url]\n"
+/*  5808 */ "p11tool @VERSION@\0"
+/*  5826 */ "p11tool [options] [url]\n"
             "p11tool --help for usage instructions.\n";
 
 /**
@@ -600,50 +603,63 @@ static int const aExport_PubkeyCantList[] = {
 #define KEYGEN_RELATED_OPTIONS_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)
 
 /**
+ *  generate-privkey option description:
+ */
+/** Descriptive text for the generate-privkey option */
+#define GENERATE_PRIVKEY_DESC      (p11tool_opt_strs+2383)
+/** Upper-cased name for the generate-privkey option */
+#define GENERATE_PRIVKEY_NAME      (p11tool_opt_strs+2430)
+/** Name string for the generate-privkey option */
+#define GENERATE_PRIVKEY_name      (p11tool_opt_strs+2447)
+/** Compiled in flag settings for the generate-privkey option */
+#define GENERATE_PRIVKEY_FLAGS     (OPTST_DISABLED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+
+/**
  *  generate-rsa option description:
  */
 /** Descriptive text for the generate-rsa option */
-#define GENERATE_RSA_DESC      (p11tool_opt_strs+2383)
+#define GENERATE_RSA_DESC      (p11tool_opt_strs+2464)
 /** Upper-cased name for the generate-rsa option */
-#define GENERATE_RSA_NAME      (p11tool_opt_strs+2423)
+#define GENERATE_RSA_NAME      (p11tool_opt_strs+2517)
 /** Name string for the generate-rsa option */
-#define GENERATE_RSA_name      (p11tool_opt_strs+2436)
+#define GENERATE_RSA_name      (p11tool_opt_strs+2530)
 /** Compiled in flag settings for the generate-rsa option */
-#define GENERATE_RSA_FLAGS     (OPTST_DISABLED)
+#define GENERATE_RSA_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
 /**
  *  generate-dsa option description:
  */
 /** Descriptive text for the generate-dsa option */
-#define GENERATE_DSA_DESC      (p11tool_opt_strs+2449)
+#define GENERATE_DSA_DESC      (p11tool_opt_strs+2543)
 /** Upper-cased name for the generate-dsa option */
-#define GENERATE_DSA_NAME      (p11tool_opt_strs+2488)
+#define GENERATE_DSA_NAME      (p11tool_opt_strs+2595)
 /** Name string for the generate-dsa option */
-#define GENERATE_DSA_name      (p11tool_opt_strs+2501)
+#define GENERATE_DSA_name      (p11tool_opt_strs+2608)
 /** Compiled in flag settings for the generate-dsa option */
-#define GENERATE_DSA_FLAGS     (OPTST_DISABLED)
+#define GENERATE_DSA_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
 /**
  *  generate-ecc option description:
  */
 /** Descriptive text for the generate-ecc option */
-#define GENERATE_ECC_DESC      (p11tool_opt_strs+2514)
+#define GENERATE_ECC_DESC      (p11tool_opt_strs+2621)
 /** Upper-cased name for the generate-ecc option */
-#define GENERATE_ECC_NAME      (p11tool_opt_strs+2556)
+#define GENERATE_ECC_NAME      (p11tool_opt_strs+2676)
 /** Name string for the generate-ecc option */
-#define GENERATE_ECC_name      (p11tool_opt_strs+2569)
+#define GENERATE_ECC_name      (p11tool_opt_strs+2689)
 /** Compiled in flag settings for the generate-ecc option */
-#define GENERATE_ECC_FLAGS     (OPTST_DISABLED)
+#define GENERATE_ECC_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED)
 
 /**
  *  bits option description:
  */
 /** Descriptive text for the bits option */
-#define BITS_DESC      (p11tool_opt_strs+2582)
+#define BITS_DESC      (p11tool_opt_strs+2702)
 /** Upper-cased name for the bits option */
-#define BITS_NAME      (p11tool_opt_strs+2630)
+#define BITS_NAME      (p11tool_opt_strs+2750)
 /** Name string for the bits option */
-#define BITS_name      (p11tool_opt_strs+2635)
+#define BITS_name      (p11tool_opt_strs+2755)
 /** Compiled in flag settings for the bits option */
 #define BITS_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -652,11 +668,11 @@ static int const aExport_PubkeyCantList[] = {
  *  curve option description:
  */
 /** Descriptive text for the curve option */
-#define CURVE_DESC      (p11tool_opt_strs+2640)
+#define CURVE_DESC      (p11tool_opt_strs+2760)
 /** Upper-cased name for the curve option */
-#define CURVE_NAME      (p11tool_opt_strs+2685)
+#define CURVE_NAME      (p11tool_opt_strs+2805)
 /** Name string for the curve option */
-#define CURVE_name      (p11tool_opt_strs+2691)
+#define CURVE_name      (p11tool_opt_strs+2811)
 /** Compiled in flag settings for the curve option */
 #define CURVE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -665,11 +681,11 @@ static int const aExport_PubkeyCantList[] = {
  *  sec-param option description:
  */
 /** Descriptive text for the sec-param option */
-#define SEC_PARAM_DESC      (p11tool_opt_strs+2697)
+#define SEC_PARAM_DESC      (p11tool_opt_strs+2817)
 /** Upper-cased name for the sec-param option */
-#define SEC_PARAM_NAME      (p11tool_opt_strs+2724)
+#define SEC_PARAM_NAME      (p11tool_opt_strs+2844)
 /** Name string for the sec-param option */
-#define SEC_PARAM_name      (p11tool_opt_strs+2734)
+#define SEC_PARAM_name      (p11tool_opt_strs+2854)
 /** Compiled in flag settings for the sec-param option */
 #define SEC_PARAM_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -678,7 +694,7 @@ static int const aExport_PubkeyCantList[] = {
  *  write_object_related_options option description:
  */
 /** write_object_related_options option separation text */
-#define WRITE_OBJECT_RELATED_OPTIONS_DESC      (p11tool_opt_strs+2744)
+#define WRITE_OBJECT_RELATED_OPTIONS_DESC      (p11tool_opt_strs+2864)
 #define WRITE_OBJECT_RELATED_OPTIONS_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)
 
 /**
@@ -686,11 +702,11 @@ static int const aExport_PubkeyCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the set-id option */
-#define SET_ID_DESC      (p11tool_opt_strs+2761)
+#define SET_ID_DESC      (p11tool_opt_strs+2881)
 /** Upper-cased name for the set-id option */
-#define SET_ID_NAME      (p11tool_opt_strs+2821)
+#define SET_ID_NAME      (p11tool_opt_strs+2941)
 /** Name string for the set-id option */
-#define SET_ID_name      (p11tool_opt_strs+2828)
+#define SET_ID_name      (p11tool_opt_strs+2948)
 /** Other options that appear in conjunction with the set-id option */
 static int const aSet_IdCantList[] = {
     INDEX_OPT_WRITE, NO_EQUIVALENT };
@@ -703,11 +719,11 @@ static int const aSet_IdCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the set-label option */
-#define SET_LABEL_DESC      (p11tool_opt_strs+2835)
+#define SET_LABEL_DESC      (p11tool_opt_strs+2955)
 /** Upper-cased name for the set-label option */
-#define SET_LABEL_NAME      (p11tool_opt_strs+2889)
+#define SET_LABEL_NAME      (p11tool_opt_strs+3009)
 /** Name string for the set-label option */
-#define SET_LABEL_name      (p11tool_opt_strs+2899)
+#define SET_LABEL_name      (p11tool_opt_strs+3019)
 /** Other options that appear in conjunction with the set-label option */
 static int const aSet_LabelCantList[] = {
     INDEX_OPT_WRITE,
@@ -720,11 +736,11 @@ static int const aSet_LabelCantList[] = {
  *  write option description:
  */
 /** Descriptive text for the write option */
-#define WRITE_DESC      (p11tool_opt_strs+2909)
+#define WRITE_DESC      (p11tool_opt_strs+3029)
 /** Upper-cased name for the write option */
-#define WRITE_NAME      (p11tool_opt_strs+2955)
+#define WRITE_NAME      (p11tool_opt_strs+3075)
 /** Name string for the write option */
-#define WRITE_name      (p11tool_opt_strs+2961)
+#define WRITE_name      (p11tool_opt_strs+3081)
 /** Compiled in flag settings for the write option */
 #define WRITE_FLAGS     (OPTST_DISABLED)
 
@@ -732,11 +748,11 @@ static int const aSet_LabelCantList[] = {
  *  delete option description:
  */
 /** Descriptive text for the delete option */
-#define DELETE_DESC      (p11tool_opt_strs+2967)
+#define DELETE_DESC      (p11tool_opt_strs+3087)
 /** Upper-cased name for the delete option */
-#define DELETE_NAME      (p11tool_opt_strs+3019)
+#define DELETE_NAME      (p11tool_opt_strs+3139)
 /** Name string for the delete option */
-#define DELETE_name      (p11tool_opt_strs+3026)
+#define DELETE_name      (p11tool_opt_strs+3146)
 /** Compiled in flag settings for the delete option */
 #define DELETE_FLAGS     (OPTST_DISABLED)
 
@@ -744,11 +760,11 @@ static int const aSet_LabelCantList[] = {
  *  label option description:
  */
 /** Descriptive text for the label option */
-#define LABEL_DESC      (p11tool_opt_strs+3033)
+#define LABEL_DESC      (p11tool_opt_strs+3153)
 /** Upper-cased name for the label option */
-#define LABEL_NAME      (p11tool_opt_strs+3070)
+#define LABEL_NAME      (p11tool_opt_strs+3190)
 /** Name string for the label option */
-#define LABEL_name      (p11tool_opt_strs+3076)
+#define LABEL_name      (p11tool_opt_strs+3196)
 /** Compiled in flag settings for the label option */
 #define LABEL_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -757,11 +773,11 @@ static int const aSet_LabelCantList[] = {
  *  id option description:
  */
 /** Descriptive text for the id option */
-#define ID_DESC      (p11tool_opt_strs+3082)
+#define ID_DESC      (p11tool_opt_strs+3202)
 /** Upper-cased name for the id option */
-#define ID_NAME      (p11tool_opt_strs+3117)
+#define ID_NAME      (p11tool_opt_strs+3237)
 /** Name string for the id option */
-#define ID_name      (p11tool_opt_strs+3120)
+#define ID_name      (p11tool_opt_strs+3240)
 /** Compiled in flag settings for the id option */
 #define ID_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -770,13 +786,13 @@ static int const aSet_LabelCantList[] = {
  *  mark-wrap option description:
  */
 /** Descriptive text for the mark-wrap option */
-#define MARK_WRAP_DESC      (p11tool_opt_strs+3123)
+#define MARK_WRAP_DESC      (p11tool_opt_strs+3243)
 /** Upper-cased name for the mark-wrap option */
-#define MARK_WRAP_NAME      (p11tool_opt_strs+3168)
+#define MARK_WRAP_NAME      (p11tool_opt_strs+3288)
 /** disablement name for the mark-wrap option */
-#define NOT_MARK_WRAP_name  (p11tool_opt_strs+3178)
+#define NOT_MARK_WRAP_name  (p11tool_opt_strs+3298)
 /** disablement prefix for the mark-wrap option */
-#define NOT_MARK_WRAP_PFX   (p11tool_opt_strs+3191)
+#define NOT_MARK_WRAP_PFX   (p11tool_opt_strs+3311)
 /** Name string for the mark-wrap option */
 #define MARK_WRAP_name      (NOT_MARK_WRAP_name + 3)
 /** Compiled in flag settings for the mark-wrap option */
@@ -787,13 +803,13 @@ static int const aSet_LabelCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the mark-trusted option */
-#define MARK_TRUSTED_DESC      (p11tool_opt_strs+3194)
+#define MARK_TRUSTED_DESC      (p11tool_opt_strs+3314)
 /** Upper-cased name for the mark-trusted option */
-#define MARK_TRUSTED_NAME      (p11tool_opt_strs+3236)
+#define MARK_TRUSTED_NAME      (p11tool_opt_strs+3356)
 /** disablement name for the mark-trusted option */
-#define NOT_MARK_TRUSTED_name  (p11tool_opt_strs+3249)
+#define NOT_MARK_TRUSTED_name  (p11tool_opt_strs+3369)
 /** disablement prefix for the mark-trusted option */
-#define NOT_MARK_TRUSTED_PFX   (p11tool_opt_strs+3191)
+#define NOT_MARK_TRUSTED_PFX   (p11tool_opt_strs+3311)
 /** Name string for the mark-trusted option */
 #define MARK_TRUSTED_name      (NOT_MARK_TRUSTED_name + 3)
 /** Other options that appear in conjunction with the mark-trusted option */
@@ -807,11 +823,11 @@ static int const aMark_TrustedCantList[] = {
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the mark-distrusted option */
-#define MARK_DISTRUSTED_DESC      (p11tool_opt_strs+3265)
+#define MARK_DISTRUSTED_DESC      (p11tool_opt_strs+3385)
 /** Upper-cased name for the mark-distrusted option */
-#define MARK_DISTRUSTED_NAME      (p11tool_opt_strs+3345)
+#define MARK_DISTRUSTED_NAME      (p11tool_opt_strs+3465)
 /** Name string for the mark-distrusted option */
-#define MARK_DISTRUSTED_name      (p11tool_opt_strs+3361)
+#define MARK_DISTRUSTED_name      (p11tool_opt_strs+3481)
 /** Other options that appear in conjunction with the mark-distrusted option */
 static int const aMark_DistrustedCantList[] = {
     INDEX_OPT_MARK_TRUSTED, NO_EQUIVALENT };
@@ -822,13 +838,13 @@ static int const aMark_DistrustedCantList[] = {
  *  mark-decrypt option description:
  */
 /** Descriptive text for the mark-decrypt option */
-#define MARK_DECRYPT_DESC      (p11tool_opt_strs+3377)
+#define MARK_DECRYPT_DESC      (p11tool_opt_strs+3497)
 /** Upper-cased name for the mark-decrypt option */
-#define MARK_DECRYPT_NAME      (p11tool_opt_strs+3423)
+#define MARK_DECRYPT_NAME      (p11tool_opt_strs+3543)
 /** disablement name for the mark-decrypt option */
-#define NOT_MARK_DECRYPT_name  (p11tool_opt_strs+3436)
+#define NOT_MARK_DECRYPT_name  (p11tool_opt_strs+3556)
 /** disablement prefix for the mark-decrypt option */
-#define NOT_MARK_DECRYPT_PFX   (p11tool_opt_strs+3191)
+#define NOT_MARK_DECRYPT_PFX   (p11tool_opt_strs+3311)
 /** Name string for the mark-decrypt option */
 #define MARK_DECRYPT_name      (NOT_MARK_DECRYPT_name + 3)
 /** Compiled in flag settings for the mark-decrypt option */
@@ -838,13 +854,13 @@ static int const aMark_DistrustedCantList[] = {
  *  mark-sign option description:
  */
 /** Descriptive text for the mark-sign option */
-#define MARK_SIGN_DESC      (p11tool_opt_strs+3452)
+#define MARK_SIGN_DESC      (p11tool_opt_strs+3572)
 /** Upper-cased name for the mark-sign option */
-#define MARK_SIGN_NAME      (p11tool_opt_strs+3508)
+#define MARK_SIGN_NAME      (p11tool_opt_strs+3628)
 /** disablement name for the mark-sign option */
-#define NOT_MARK_SIGN_name  (p11tool_opt_strs+3518)
+#define NOT_MARK_SIGN_name  (p11tool_opt_strs+3638)
 /** disablement prefix for the mark-sign option */
-#define NOT_MARK_SIGN_PFX   (p11tool_opt_strs+3191)
+#define NOT_MARK_SIGN_PFX   (p11tool_opt_strs+3311)
 /** Name string for the mark-sign option */
 #define MARK_SIGN_name      (NOT_MARK_SIGN_name + 3)
 /** Compiled in flag settings for the mark-sign option */
@@ -854,13 +870,13 @@ static int const aMark_DistrustedCantList[] = {
  *  mark-ca option description:
  */
 /** Descriptive text for the mark-ca option */
-#define MARK_CA_DESC      (p11tool_opt_strs+3531)
+#define MARK_CA_DESC      (p11tool_opt_strs+3651)
 /** Upper-cased name for the mark-ca option */
-#define MARK_CA_NAME      (p11tool_opt_strs+3570)
+#define MARK_CA_NAME      (p11tool_opt_strs+3690)
 /** disablement name for the mark-ca option */
-#define NOT_MARK_CA_name  (p11tool_opt_strs+3578)
+#define NOT_MARK_CA_name  (p11tool_opt_strs+3698)
 /** disablement prefix for the mark-ca option */
-#define NOT_MARK_CA_PFX   (p11tool_opt_strs+3191)
+#define NOT_MARK_CA_PFX   (p11tool_opt_strs+3311)
 /** Name string for the mark-ca option */
 #define MARK_CA_name      (NOT_MARK_CA_name + 3)
 /** Compiled in flag settings for the mark-ca option */
@@ -870,13 +886,13 @@ static int const aMark_DistrustedCantList[] = {
  *  mark-private option description:
  */
 /** Descriptive text for the mark-private option */
-#define MARK_PRIVATE_DESC      (p11tool_opt_strs+3589)
+#define MARK_PRIVATE_DESC      (p11tool_opt_strs+3709)
 /** Upper-cased name for the mark-private option */
-#define MARK_PRIVATE_NAME      (p11tool_opt_strs+3631)
+#define MARK_PRIVATE_NAME      (p11tool_opt_strs+3751)
 /** disablement name for the mark-private option */
-#define NOT_MARK_PRIVATE_name  (p11tool_opt_strs+3644)
+#define NOT_MARK_PRIVATE_name  (p11tool_opt_strs+3764)
 /** disablement prefix for the mark-private option */
-#define NOT_MARK_PRIVATE_PFX   (p11tool_opt_strs+3191)
+#define NOT_MARK_PRIVATE_PFX   (p11tool_opt_strs+3311)
 /** Name string for the mark-private option */
 #define MARK_PRIVATE_name      (NOT_MARK_PRIVATE_name + 3)
 /** Compiled in flag settings for the mark-private option */
@@ -886,10 +902,10 @@ static int const aMark_DistrustedCantList[] = {
  *  ca option description:
  */
 /** Descriptive text for the ca option */
-#define CA_DESC    (p11tool_opt_strs+3660)
+#define CA_DESC    (p11tool_opt_strs+3780)
 #define CA_NAME    NULL
 /** Unmodified name string for the ca option */
-#define CA_name    (p11tool_opt_strs+3694)
+#define CA_name    (p11tool_opt_strs+3814)
 /** Compiled in flag settings for the ca option */
 #define CA_FLAGS     (MARK_CA_FLAGS | OPTST_ALIAS)
 
@@ -897,10 +913,10 @@ static int const aMark_DistrustedCantList[] = {
  *  private option description:
  */
 /** Descriptive text for the private option */
-#define PRIVATE_DESC    (p11tool_opt_strs+3697)
+#define PRIVATE_DESC    (p11tool_opt_strs+3817)
 #define PRIVATE_NAME    NULL
 /** Unmodified name string for the private option */
-#define PRIVATE_name    (p11tool_opt_strs+3736)
+#define PRIVATE_name    (p11tool_opt_strs+3856)
 /** Compiled in flag settings for the private option */
 #define PRIVATE_FLAGS     (MARK_PRIVATE_FLAGS | OPTST_ALIAS)
 
@@ -908,11 +924,11 @@ static int const aMark_DistrustedCantList[] = {
  *  secret-key option description:
  */
 /** Descriptive text for the secret-key option */
-#define SECRET_KEY_DESC      (p11tool_opt_strs+3744)
+#define SECRET_KEY_DESC      (p11tool_opt_strs+3864)
 /** Upper-cased name for the secret-key option */
-#define SECRET_KEY_NAME      (p11tool_opt_strs+3777)
+#define SECRET_KEY_NAME      (p11tool_opt_strs+3897)
 /** Name string for the secret-key option */
-#define SECRET_KEY_name      (p11tool_opt_strs+3788)
+#define SECRET_KEY_name      (p11tool_opt_strs+3908)
 /** Compiled in flag settings for the secret-key option */
 #define SECRET_KEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -921,11 +937,11 @@ static int const aMark_DistrustedCantList[] = {
  *  load-privkey option description:
  */
 /** Descriptive text for the load-privkey option */
-#define LOAD_PRIVKEY_DESC      (p11tool_opt_strs+3799)
+#define LOAD_PRIVKEY_DESC      (p11tool_opt_strs+3919)
 /** Upper-cased name for the load-privkey option */
-#define LOAD_PRIVKEY_NAME      (p11tool_opt_strs+3823)
+#define LOAD_PRIVKEY_NAME      (p11tool_opt_strs+3943)
 /** Name string for the load-privkey option */
-#define LOAD_PRIVKEY_name      (p11tool_opt_strs+3836)
+#define LOAD_PRIVKEY_name      (p11tool_opt_strs+3956)
 /** Compiled in flag settings for the load-privkey option */
 #define LOAD_PRIVKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -934,11 +950,11 @@ static int const aMark_DistrustedCantList[] = {
  *  load-pubkey option description:
  */
 /** Descriptive text for the load-pubkey option */
-#define LOAD_PUBKEY_DESC      (p11tool_opt_strs+3849)
+#define LOAD_PUBKEY_DESC      (p11tool_opt_strs+3969)
 /** Upper-cased name for the load-pubkey option */
-#define LOAD_PUBKEY_NAME      (p11tool_opt_strs+3872)
+#define LOAD_PUBKEY_NAME      (p11tool_opt_strs+3992)
 /** Name string for the load-pubkey option */
-#define LOAD_PUBKEY_name      (p11tool_opt_strs+3884)
+#define LOAD_PUBKEY_name      (p11tool_opt_strs+4004)
 /** Compiled in flag settings for the load-pubkey option */
 #define LOAD_PUBKEY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -947,11 +963,11 @@ static int const aMark_DistrustedCantList[] = {
  *  load-certificate option description:
  */
 /** Descriptive text for the load-certificate option */
-#define LOAD_CERTIFICATE_DESC      (p11tool_opt_strs+3896)
+#define LOAD_CERTIFICATE_DESC      (p11tool_opt_strs+4016)
 /** Upper-cased name for the load-certificate option */
-#define LOAD_CERTIFICATE_NAME      (p11tool_opt_strs+3920)
+#define LOAD_CERTIFICATE_NAME      (p11tool_opt_strs+4040)
 /** Name string for the load-certificate option */
-#define LOAD_CERTIFICATE_name      (p11tool_opt_strs+3937)
+#define LOAD_CERTIFICATE_name      (p11tool_opt_strs+4057)
 /** Compiled in flag settings for the load-certificate option */
 #define LOAD_CERTIFICATE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -960,18 +976,18 @@ static int const aMark_DistrustedCantList[] = {
  *  other_options option description:
  */
 /** other_options option separation text */
-#define OTHER_OPTIONS_DESC      (p11tool_opt_strs+3954)
+#define OTHER_OPTIONS_DESC      (p11tool_opt_strs+4074)
 #define OTHER_OPTIONS_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)
 
 /**
  *  debug option description:
  */
 /** Descriptive text for the debug option */
-#define DEBUG_DESC      (p11tool_opt_strs+3969)
+#define DEBUG_DESC      (p11tool_opt_strs+4089)
 /** Upper-cased name for the debug option */
-#define DEBUG_NAME      (p11tool_opt_strs+3986)
+#define DEBUG_NAME      (p11tool_opt_strs+4106)
 /** Name string for the debug option */
-#define DEBUG_name      (p11tool_opt_strs+3992)
+#define DEBUG_name      (p11tool_opt_strs+4112)
 /** Compiled in flag settings for the debug option */
 #define DEBUG_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -980,11 +996,11 @@ static int const aMark_DistrustedCantList[] = {
  *  outfile option description:
  */
 /** Descriptive text for the outfile option */
-#define OUTFILE_DESC      (p11tool_opt_strs+3998)
+#define OUTFILE_DESC      (p11tool_opt_strs+4118)
 /** Upper-cased name for the outfile option */
-#define OUTFILE_NAME      (p11tool_opt_strs+4010)
+#define OUTFILE_NAME      (p11tool_opt_strs+4130)
 /** Name string for the outfile option */
-#define OUTFILE_name      (p11tool_opt_strs+4018)
+#define OUTFILE_name      (p11tool_opt_strs+4138)
 /** Compiled in flag settings for the outfile option */
 #define OUTFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -993,13 +1009,13 @@ static int const aMark_DistrustedCantList[] = {
  *  login option description:
  */
 /** Descriptive text for the login option */
-#define LOGIN_DESC      (p11tool_opt_strs+4026)
+#define LOGIN_DESC      (p11tool_opt_strs+4146)
 /** Upper-cased name for the login option */
-#define LOGIN_NAME      (p11tool_opt_strs+4054)
+#define LOGIN_NAME      (p11tool_opt_strs+4174)
 /** disablement name for the login option */
-#define NOT_LOGIN_name  (p11tool_opt_strs+4060)
+#define NOT_LOGIN_name  (p11tool_opt_strs+4180)
 /** disablement prefix for the login option */
-#define NOT_LOGIN_PFX   (p11tool_opt_strs+3191)
+#define NOT_LOGIN_PFX   (p11tool_opt_strs+3311)
 /** Name string for the login option */
 #define LOGIN_name      (NOT_LOGIN_name + 3)
 /** Compiled in flag settings for the login option */
@@ -1009,13 +1025,13 @@ static int const aMark_DistrustedCantList[] = {
  *  so-login option description:
  */
 /** Descriptive text for the so-login option */
-#define SO_LOGIN_DESC      (p11tool_opt_strs+4069)
+#define SO_LOGIN_DESC      (p11tool_opt_strs+4189)
 /** Upper-cased name for the so-login option */
-#define SO_LOGIN_NAME      (p11tool_opt_strs+4107)
+#define SO_LOGIN_NAME      (p11tool_opt_strs+4227)
 /** disablement name for the so-login option */
-#define NOT_SO_LOGIN_name  (p11tool_opt_strs+4116)
+#define NOT_SO_LOGIN_name  (p11tool_opt_strs+4236)
 /** disablement prefix for the so-login option */
-#define NOT_SO_LOGIN_PFX   (p11tool_opt_strs+3191)
+#define NOT_SO_LOGIN_PFX   (p11tool_opt_strs+3311)
 /** Name string for the so-login option */
 #define SO_LOGIN_name      (NOT_SO_LOGIN_name + 3)
 /** Compiled in flag settings for the so-login option */
@@ -1025,10 +1041,10 @@ static int const aMark_DistrustedCantList[] = {
  *  admin-login option description:
  */
 /** Descriptive text for the admin-login option */
-#define ADMIN_LOGIN_DESC    (p11tool_opt_strs+4128)
+#define ADMIN_LOGIN_DESC    (p11tool_opt_strs+4248)
 #define ADMIN_LOGIN_NAME    NULL
 /** Unmodified name string for the admin-login option */
-#define ADMIN_LOGIN_name    (p11tool_opt_strs+4163)
+#define ADMIN_LOGIN_name    (p11tool_opt_strs+4283)
 /** Compiled in flag settings for the admin-login option */
 #define ADMIN_LOGIN_FLAGS     (SO_LOGIN_FLAGS | OPTST_ALIAS)
 
@@ -1036,11 +1052,11 @@ static int const aMark_DistrustedCantList[] = {
  *  test-sign option description:
  */
 /** Descriptive text for the test-sign option */
-#define TEST_SIGN_DESC      (p11tool_opt_strs+4175)
+#define TEST_SIGN_DESC      (p11tool_opt_strs+4295)
 /** Upper-cased name for the test-sign option */
-#define TEST_SIGN_NAME      (p11tool_opt_strs+4228)
+#define TEST_SIGN_NAME      (p11tool_opt_strs+4348)
 /** Name string for the test-sign option */
-#define TEST_SIGN_name      (p11tool_opt_strs+4238)
+#define TEST_SIGN_name      (p11tool_opt_strs+4358)
 /** Compiled in flag settings for the test-sign option */
 #define TEST_SIGN_FLAGS     (OPTST_DISABLED)
 
@@ -1048,11 +1064,11 @@ static int const aMark_DistrustedCantList[] = {
  *  generate-random option description:
  */
 /** Descriptive text for the generate-random option */
-#define GENERATE_RANDOM_DESC      (p11tool_opt_strs+4248)
+#define GENERATE_RANDOM_DESC      (p11tool_opt_strs+4368)
 /** Upper-cased name for the generate-random option */
-#define GENERATE_RANDOM_NAME      (p11tool_opt_strs+4269)
+#define GENERATE_RANDOM_NAME      (p11tool_opt_strs+4389)
 /** Name string for the generate-random option */
-#define GENERATE_RANDOM_name      (p11tool_opt_strs+4285)
+#define GENERATE_RANDOM_name      (p11tool_opt_strs+4405)
 /** Compiled in flag settings for the generate-random option */
 #define GENERATE_RANDOM_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -1061,11 +1077,11 @@ static int const aMark_DistrustedCantList[] = {
  *  pkcs8 option description:
  */
 /** Descriptive text for the pkcs8 option */
-#define PKCS8_DESC      (p11tool_opt_strs+4301)
+#define PKCS8_DESC      (p11tool_opt_strs+4421)
 /** Upper-cased name for the pkcs8 option */
-#define PKCS8_NAME      (p11tool_opt_strs+4337)
+#define PKCS8_NAME      (p11tool_opt_strs+4457)
 /** Name string for the pkcs8 option */
-#define PKCS8_name      (p11tool_opt_strs+4343)
+#define PKCS8_name      (p11tool_opt_strs+4463)
 /** Compiled in flag settings for the pkcs8 option */
 #define PKCS8_FLAGS     (OPTST_DISABLED)
 
@@ -1073,13 +1089,13 @@ static int const aMark_DistrustedCantList[] = {
  *  inder option description:
  */
 /** Descriptive text for the inder option */
-#define INDER_DESC      (p11tool_opt_strs+4349)
+#define INDER_DESC      (p11tool_opt_strs+4469)
 /** Upper-cased name for the inder option */
-#define INDER_NAME      (p11tool_opt_strs+4378)
+#define INDER_NAME      (p11tool_opt_strs+4498)
 /** disablement name for the inder option */
-#define NOT_INDER_name  (p11tool_opt_strs+4384)
+#define NOT_INDER_name  (p11tool_opt_strs+4504)
 /** disablement prefix for the inder option */
-#define NOT_INDER_PFX   (p11tool_opt_strs+3191)
+#define NOT_INDER_PFX   (p11tool_opt_strs+3311)
 /** Name string for the inder option */
 #define INDER_name      (NOT_INDER_name + 3)
 /** Compiled in flag settings for the inder option */
@@ -1089,10 +1105,10 @@ static int const aMark_DistrustedCantList[] = {
  *  inraw option description:
  */
 /** Descriptive text for the inraw option */
-#define INRAW_DESC    (p11tool_opt_strs+4393)
+#define INRAW_DESC    (p11tool_opt_strs+4513)
 #define INRAW_NAME    NULL
 /** Unmodified name string for the inraw option */
-#define INRAW_name    (p11tool_opt_strs+4425)
+#define INRAW_name    (p11tool_opt_strs+4545)
 /** Compiled in flag settings for the inraw option */
 #define INRAW_FLAGS     (INDER_FLAGS | OPTST_ALIAS)
 
@@ -1100,13 +1116,13 @@ static int const aMark_DistrustedCantList[] = {
  *  outder option description:
  */
 /** Descriptive text for the outder option */
-#define OUTDER_DESC      (p11tool_opt_strs+4431)
+#define OUTDER_DESC      (p11tool_opt_strs+4551)
 /** Upper-cased name for the outder option */
-#define OUTDER_NAME      (p11tool_opt_strs+4503)
+#define OUTDER_NAME      (p11tool_opt_strs+4623)
 /** disablement name for the outder option */
-#define NOT_OUTDER_name  (p11tool_opt_strs+4510)
+#define NOT_OUTDER_name  (p11tool_opt_strs+4630)
 /** disablement prefix for the outder option */
-#define NOT_OUTDER_PFX   (p11tool_opt_strs+3191)
+#define NOT_OUTDER_PFX   (p11tool_opt_strs+3311)
 /** Name string for the outder option */
 #define OUTDER_name      (NOT_OUTDER_name + 3)
 /** Compiled in flag settings for the outder option */
@@ -1116,10 +1132,10 @@ static int const aMark_DistrustedCantList[] = {
  *  outraw option description:
  */
 /** Descriptive text for the outraw option */
-#define OUTRAW_DESC    (p11tool_opt_strs+4520)
+#define OUTRAW_DESC    (p11tool_opt_strs+4640)
 #define OUTRAW_NAME    NULL
 /** Unmodified name string for the outraw option */
-#define OUTRAW_name    (p11tool_opt_strs+4553)
+#define OUTRAW_name    (p11tool_opt_strs+4673)
 /** Compiled in flag settings for the outraw option */
 #define OUTRAW_FLAGS     (OUTDER_FLAGS | OPTST_ALIAS)
 
@@ -1127,11 +1143,11 @@ static int const aMark_DistrustedCantList[] = {
  *  provider option description:
  */
 /** Descriptive text for the provider option */
-#define PROVIDER_DESC      (p11tool_opt_strs+4560)
+#define PROVIDER_DESC      (p11tool_opt_strs+4680)
 /** Upper-cased name for the provider option */
-#define PROVIDER_NAME      (p11tool_opt_strs+4598)
+#define PROVIDER_NAME      (p11tool_opt_strs+4718)
 /** Name string for the provider option */
-#define PROVIDER_name      (p11tool_opt_strs+4607)
+#define PROVIDER_name      (p11tool_opt_strs+4727)
 /** Compiled in flag settings for the provider option */
 #define PROVIDER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -1140,11 +1156,11 @@ static int const aMark_DistrustedCantList[] = {
  *  provider-opts option description:
  */
 /** Descriptive text for the provider-opts option */
-#define PROVIDER_OPTS_DESC      (p11tool_opt_strs+4616)
+#define PROVIDER_OPTS_DESC      (p11tool_opt_strs+4736)
 /** Upper-cased name for the provider-opts option */
-#define PROVIDER_OPTS_NAME      (p11tool_opt_strs+4682)
+#define PROVIDER_OPTS_NAME      (p11tool_opt_strs+4802)
 /** Name string for the provider-opts option */
-#define PROVIDER_OPTS_name      (p11tool_opt_strs+4696)
+#define PROVIDER_OPTS_name      (p11tool_opt_strs+4816)
 /** Compiled in flag settings for the provider-opts option */
 #define PROVIDER_OPTS_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -1153,13 +1169,13 @@ static int const aMark_DistrustedCantList[] = {
  *  detailed-url option description:
  */
 /** Descriptive text for the detailed-url option */
-#define DETAILED_URL_DESC      (p11tool_opt_strs+4710)
+#define DETAILED_URL_DESC      (p11tool_opt_strs+4830)
 /** Upper-cased name for the detailed-url option */
-#define DETAILED_URL_NAME      (p11tool_opt_strs+4730)
+#define DETAILED_URL_NAME      (p11tool_opt_strs+4850)
 /** disablement name for the detailed-url option */
-#define NOT_DETAILED_URL_name  (p11tool_opt_strs+4743)
+#define NOT_DETAILED_URL_name  (p11tool_opt_strs+4863)
 /** disablement prefix for the detailed-url option */
-#define NOT_DETAILED_URL_PFX   (p11tool_opt_strs+3191)
+#define NOT_DETAILED_URL_PFX   (p11tool_opt_strs+3311)
 /** Name string for the detailed-url option */
 #define DETAILED_URL_name      (NOT_DETAILED_URL_name + 3)
 /** Compiled in flag settings for the detailed-url option */
@@ -1169,11 +1185,11 @@ static int const aMark_DistrustedCantList[] = {
  *  only-urls option description:
  */
 /** Descriptive text for the only-urls option */
-#define ONLY_URLS_DESC      (p11tool_opt_strs+4759)
+#define ONLY_URLS_DESC      (p11tool_opt_strs+4879)
 /** Upper-cased name for the only-urls option */
-#define ONLY_URLS_NAME      (p11tool_opt_strs+4803)
+#define ONLY_URLS_NAME      (p11tool_opt_strs+4923)
 /** Name string for the only-urls option */
-#define ONLY_URLS_name      (p11tool_opt_strs+4813)
+#define ONLY_URLS_name      (p11tool_opt_strs+4933)
 /** Compiled in flag settings for the only-urls option */
 #define ONLY_URLS_FLAGS     (OPTST_DISABLED)
 
@@ -1181,22 +1197,22 @@ static int const aMark_DistrustedCantList[] = {
  *  batch option description:
  */
 /** Descriptive text for the batch option */
-#define BATCH_DESC      (p11tool_opt_strs+4823)
+#define BATCH_DESC      (p11tool_opt_strs+4943)
 /** Upper-cased name for the batch option */
-#define BATCH_NAME      (p11tool_opt_strs+4861)
+#define BATCH_NAME      (p11tool_opt_strs+4981)
 /** Name string for the batch option */
-#define BATCH_name      (p11tool_opt_strs+4867)
+#define BATCH_name      (p11tool_opt_strs+4987)
 /** Compiled in flag settings for the batch option */
 #define BATCH_FLAGS     (OPTST_DISABLED)
 
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (p11tool_opt_strs+4873)
-#define HELP_name       (p11tool_opt_strs+4917)
+#define HELP_DESC       (p11tool_opt_strs+4993)
+#define HELP_name       (p11tool_opt_strs+5037)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (p11tool_opt_strs+4922)
-#define MORE_HELP_name  (p11tool_opt_strs+4967)
+#define MORE_HELP_DESC  (p11tool_opt_strs+5042)
+#define MORE_HELP_name  (p11tool_opt_strs+5087)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -1209,8 +1225,8 @@ static int const aMark_DistrustedCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (p11tool_opt_strs+4977)
-#define VER_name        (p11tool_opt_strs+5013)
+#define VER_DESC        (p11tool_opt_strs+5097)
+#define VER_name        (p11tool_opt_strs+5133)
 /**
  *  Declare option callback procedures
  */
@@ -1534,8 +1550,20 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ KEYGEN_RELATED_OPTIONS_DESC, NULL, NULL,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 25, VALUE_OPT_GENERATE_RSA,
-     /* equiv idx, value */ 25, VALUE_OPT_GENERATE_RSA,
+  {  /* entry idx, value */ 25, VALUE_OPT_GENERATE_PRIVKEY,
+     /* equiv idx, value */ 25, VALUE_OPT_GENERATE_PRIVKEY,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ GENERATE_PRIVKEY_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --generate-privkey */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ GENERATE_PRIVKEY_DESC, GENERATE_PRIVKEY_NAME, GENERATE_PRIVKEY_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 26, VALUE_OPT_GENERATE_RSA,
+     /* equiv idx, value */ 26, VALUE_OPT_GENERATE_RSA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ GENERATE_RSA_FLAGS, 0,
@@ -1546,8 +1574,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ GENERATE_RSA_DESC, GENERATE_RSA_NAME, GENERATE_RSA_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 26, VALUE_OPT_GENERATE_DSA,
-     /* equiv idx, value */ 26, VALUE_OPT_GENERATE_DSA,
+  {  /* entry idx, value */ 27, VALUE_OPT_GENERATE_DSA,
+     /* equiv idx, value */ 27, VALUE_OPT_GENERATE_DSA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ GENERATE_DSA_FLAGS, 0,
@@ -1558,8 +1586,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ GENERATE_DSA_DESC, GENERATE_DSA_NAME, GENERATE_DSA_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 27, VALUE_OPT_GENERATE_ECC,
-     /* equiv idx, value */ 27, VALUE_OPT_GENERATE_ECC,
+  {  /* entry idx, value */ 28, VALUE_OPT_GENERATE_ECC,
+     /* equiv idx, value */ 28, VALUE_OPT_GENERATE_ECC,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ GENERATE_ECC_FLAGS, 0,
@@ -1570,8 +1598,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ GENERATE_ECC_DESC, GENERATE_ECC_NAME, GENERATE_ECC_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 28, VALUE_OPT_BITS,
-     /* equiv idx, value */ 28, VALUE_OPT_BITS,
+  {  /* entry idx, value */ 29, VALUE_OPT_BITS,
+     /* equiv idx, value */ 29, VALUE_OPT_BITS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ BITS_FLAGS, 0,
@@ -1582,8 +1610,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ BITS_DESC, BITS_NAME, BITS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 29, VALUE_OPT_CURVE,
-     /* equiv idx, value */ 29, VALUE_OPT_CURVE,
+  {  /* entry idx, value */ 30, VALUE_OPT_CURVE,
+     /* equiv idx, value */ 30, VALUE_OPT_CURVE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ CURVE_FLAGS, 0,
@@ -1594,8 +1622,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ CURVE_DESC, CURVE_NAME, CURVE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 30, VALUE_OPT_SEC_PARAM,
-     /* equiv idx, value */ 30, VALUE_OPT_SEC_PARAM,
+  {  /* entry idx, value */ 31, VALUE_OPT_SEC_PARAM,
+     /* equiv idx, value */ 31, VALUE_OPT_SEC_PARAM,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SEC_PARAM_FLAGS, 0,
@@ -1618,8 +1646,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ WRITE_OBJECT_RELATED_OPTIONS_DESC, NULL, NULL,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 32, VALUE_OPT_SET_ID,
-     /* equiv idx, value */ 32, VALUE_OPT_SET_ID,
+  {  /* entry idx, value */ 33, VALUE_OPT_SET_ID,
+     /* equiv idx, value */ 33, VALUE_OPT_SET_ID,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SET_ID_FLAGS, 0,
@@ -1630,8 +1658,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SET_ID_DESC, SET_ID_NAME, SET_ID_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 33, VALUE_OPT_SET_LABEL,
-     /* equiv idx, value */ 33, VALUE_OPT_SET_LABEL,
+  {  /* entry idx, value */ 34, VALUE_OPT_SET_LABEL,
+     /* equiv idx, value */ 34, VALUE_OPT_SET_LABEL,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SET_LABEL_FLAGS, 0,
@@ -1642,8 +1670,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SET_LABEL_DESC, SET_LABEL_NAME, SET_LABEL_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 34, VALUE_OPT_WRITE,
-     /* equiv idx, value */ 34, VALUE_OPT_WRITE,
+  {  /* entry idx, value */ 35, VALUE_OPT_WRITE,
+     /* equiv idx, value */ 35, VALUE_OPT_WRITE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ WRITE_FLAGS, 0,
@@ -1654,8 +1682,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ WRITE_DESC, WRITE_NAME, WRITE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 35, VALUE_OPT_DELETE,
-     /* equiv idx, value */ 35, VALUE_OPT_DELETE,
+  {  /* entry idx, value */ 36, VALUE_OPT_DELETE,
+     /* equiv idx, value */ 36, VALUE_OPT_DELETE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DELETE_FLAGS, 0,
@@ -1666,8 +1694,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DELETE_DESC, DELETE_NAME, DELETE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 36, VALUE_OPT_LABEL,
-     /* equiv idx, value */ 36, VALUE_OPT_LABEL,
+  {  /* entry idx, value */ 37, VALUE_OPT_LABEL,
+     /* equiv idx, value */ 37, VALUE_OPT_LABEL,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LABEL_FLAGS, 0,
@@ -1678,8 +1706,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LABEL_DESC, LABEL_NAME, LABEL_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 37, VALUE_OPT_ID,
-     /* equiv idx, value */ 37, VALUE_OPT_ID,
+  {  /* entry idx, value */ 38, VALUE_OPT_ID,
+     /* equiv idx, value */ 38, VALUE_OPT_ID,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ ID_FLAGS, 0,
@@ -1690,8 +1718,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ID_DESC, ID_NAME, ID_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 38, VALUE_OPT_MARK_WRAP,
-     /* equiv idx, value */ 38, VALUE_OPT_MARK_WRAP,
+  {  /* entry idx, value */ 39, VALUE_OPT_MARK_WRAP,
+     /* equiv idx, value */ 39, VALUE_OPT_MARK_WRAP,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MARK_WRAP_FLAGS, 0,
@@ -1702,8 +1730,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MARK_WRAP_DESC, MARK_WRAP_NAME, MARK_WRAP_name,
      /* disablement strs */ NOT_MARK_WRAP_name, NOT_MARK_WRAP_PFX },
 
-  {  /* entry idx, value */ 39, VALUE_OPT_MARK_TRUSTED,
-     /* equiv idx, value */ 39, VALUE_OPT_MARK_TRUSTED,
+  {  /* entry idx, value */ 40, VALUE_OPT_MARK_TRUSTED,
+     /* equiv idx, value */ 40, VALUE_OPT_MARK_TRUSTED,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MARK_TRUSTED_FLAGS, 0,
@@ -1714,8 +1742,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MARK_TRUSTED_DESC, MARK_TRUSTED_NAME, MARK_TRUSTED_name,
      /* disablement strs */ NOT_MARK_TRUSTED_name, NOT_MARK_TRUSTED_PFX },
 
-  {  /* entry idx, value */ 40, VALUE_OPT_MARK_DISTRUSTED,
-     /* equiv idx, value */ 40, VALUE_OPT_MARK_DISTRUSTED,
+  {  /* entry idx, value */ 41, VALUE_OPT_MARK_DISTRUSTED,
+     /* equiv idx, value */ 41, VALUE_OPT_MARK_DISTRUSTED,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MARK_DISTRUSTED_FLAGS, 0,
@@ -1726,8 +1754,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MARK_DISTRUSTED_DESC, MARK_DISTRUSTED_NAME, MARK_DISTRUSTED_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 41, VALUE_OPT_MARK_DECRYPT,
-     /* equiv idx, value */ 41, VALUE_OPT_MARK_DECRYPT,
+  {  /* entry idx, value */ 42, VALUE_OPT_MARK_DECRYPT,
+     /* equiv idx, value */ 42, VALUE_OPT_MARK_DECRYPT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MARK_DECRYPT_FLAGS, 0,
@@ -1738,8 +1766,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MARK_DECRYPT_DESC, MARK_DECRYPT_NAME, MARK_DECRYPT_name,
      /* disablement strs */ NOT_MARK_DECRYPT_name, NOT_MARK_DECRYPT_PFX },
 
-  {  /* entry idx, value */ 42, VALUE_OPT_MARK_SIGN,
-     /* equiv idx, value */ 42, VALUE_OPT_MARK_SIGN,
+  {  /* entry idx, value */ 43, VALUE_OPT_MARK_SIGN,
+     /* equiv idx, value */ 43, VALUE_OPT_MARK_SIGN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MARK_SIGN_FLAGS, 0,
@@ -1750,8 +1778,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MARK_SIGN_DESC, MARK_SIGN_NAME, MARK_SIGN_name,
      /* disablement strs */ NOT_MARK_SIGN_name, NOT_MARK_SIGN_PFX },
 
-  {  /* entry idx, value */ 43, VALUE_OPT_MARK_CA,
-     /* equiv idx, value */ 43, VALUE_OPT_MARK_CA,
+  {  /* entry idx, value */ 44, VALUE_OPT_MARK_CA,
+     /* equiv idx, value */ 44, VALUE_OPT_MARK_CA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MARK_CA_FLAGS, 0,
@@ -1762,8 +1790,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MARK_CA_DESC, MARK_CA_NAME, MARK_CA_name,
      /* disablement strs */ NOT_MARK_CA_name, NOT_MARK_CA_PFX },
 
-  {  /* entry idx, value */ 44, VALUE_OPT_MARK_PRIVATE,
-     /* equiv idx, value */ 44, VALUE_OPT_MARK_PRIVATE,
+  {  /* entry idx, value */ 45, VALUE_OPT_MARK_PRIVATE,
+     /* equiv idx, value */ 45, VALUE_OPT_MARK_PRIVATE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ MARK_PRIVATE_FLAGS, 0,
@@ -1774,8 +1802,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ MARK_PRIVATE_DESC, MARK_PRIVATE_NAME, MARK_PRIVATE_name,
      /* disablement strs */ NOT_MARK_PRIVATE_name, NOT_MARK_PRIVATE_PFX },
 
-  {  /* entry idx, value */ 45, VALUE_OPT_CA,
-     /* equiv idx, value */ 45, VALUE_OPT_CA,
+  {  /* entry idx, value */ 46, VALUE_OPT_CA,
+     /* equiv idx, value */ 46, VALUE_OPT_CA,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ CA_FLAGS, 0,
@@ -1786,8 +1814,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ CA_DESC, CA_NAME, CA_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 46, VALUE_OPT_PRIVATE,
-     /* equiv idx, value */ 46, VALUE_OPT_PRIVATE,
+  {  /* entry idx, value */ 47, VALUE_OPT_PRIVATE,
+     /* equiv idx, value */ 47, VALUE_OPT_PRIVATE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PRIVATE_FLAGS, 0,
@@ -1798,8 +1826,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PRIVATE_DESC, PRIVATE_NAME, PRIVATE_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 47, VALUE_OPT_SECRET_KEY,
-     /* equiv idx, value */ 47, VALUE_OPT_SECRET_KEY,
+  {  /* entry idx, value */ 48, VALUE_OPT_SECRET_KEY,
+     /* equiv idx, value */ 48, VALUE_OPT_SECRET_KEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SECRET_KEY_FLAGS, 0,
@@ -1810,8 +1838,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SECRET_KEY_DESC, SECRET_KEY_NAME, SECRET_KEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 48, VALUE_OPT_LOAD_PRIVKEY,
-     /* equiv idx, value */ 48, VALUE_OPT_LOAD_PRIVKEY,
+  {  /* entry idx, value */ 49, VALUE_OPT_LOAD_PRIVKEY,
+     /* equiv idx, value */ 49, VALUE_OPT_LOAD_PRIVKEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_PRIVKEY_FLAGS, 0,
@@ -1822,8 +1850,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_PRIVKEY_DESC, LOAD_PRIVKEY_NAME, LOAD_PRIVKEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 49, VALUE_OPT_LOAD_PUBKEY,
-     /* equiv idx, value */ 49, VALUE_OPT_LOAD_PUBKEY,
+  {  /* entry idx, value */ 50, VALUE_OPT_LOAD_PUBKEY,
+     /* equiv idx, value */ 50, VALUE_OPT_LOAD_PUBKEY,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_PUBKEY_FLAGS, 0,
@@ -1834,8 +1862,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOAD_PUBKEY_DESC, LOAD_PUBKEY_NAME, LOAD_PUBKEY_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 50, VALUE_OPT_LOAD_CERTIFICATE,
-     /* equiv idx, value */ 50, VALUE_OPT_LOAD_CERTIFICATE,
+  {  /* entry idx, value */ 51, VALUE_OPT_LOAD_CERTIFICATE,
+     /* equiv idx, value */ 51, VALUE_OPT_LOAD_CERTIFICATE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOAD_CERTIFICATE_FLAGS, 0,
@@ -1858,8 +1886,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ OTHER_OPTIONS_DESC, NULL, NULL,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 52, VALUE_OPT_DEBUG,
-     /* equiv idx, value */ 52, VALUE_OPT_DEBUG,
+  {  /* entry idx, value */ 53, VALUE_OPT_DEBUG,
+     /* equiv idx, value */ 53, VALUE_OPT_DEBUG,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DEBUG_FLAGS, 0,
@@ -1870,8 +1898,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DEBUG_DESC, DEBUG_NAME, DEBUG_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 53, VALUE_OPT_OUTFILE,
-     /* equiv idx, value */ 53, VALUE_OPT_OUTFILE,
+  {  /* entry idx, value */ 54, VALUE_OPT_OUTFILE,
+     /* equiv idx, value */ 54, VALUE_OPT_OUTFILE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OUTFILE_FLAGS, 0,
@@ -1882,8 +1910,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ OUTFILE_DESC, OUTFILE_NAME, OUTFILE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 54, VALUE_OPT_LOGIN,
-     /* equiv idx, value */ 54, VALUE_OPT_LOGIN,
+  {  /* entry idx, value */ 55, VALUE_OPT_LOGIN,
+     /* equiv idx, value */ 55, VALUE_OPT_LOGIN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LOGIN_FLAGS, 0,
@@ -1894,8 +1922,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LOGIN_DESC, LOGIN_NAME, LOGIN_name,
      /* disablement strs */ NOT_LOGIN_name, NOT_LOGIN_PFX },
 
-  {  /* entry idx, value */ 55, VALUE_OPT_SO_LOGIN,
-     /* equiv idx, value */ 55, VALUE_OPT_SO_LOGIN,
+  {  /* entry idx, value */ 56, VALUE_OPT_SO_LOGIN,
+     /* equiv idx, value */ 56, VALUE_OPT_SO_LOGIN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ SO_LOGIN_FLAGS, 0,
@@ -1906,8 +1934,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ SO_LOGIN_DESC, SO_LOGIN_NAME, SO_LOGIN_name,
      /* disablement strs */ NOT_SO_LOGIN_name, NOT_SO_LOGIN_PFX },
 
-  {  /* entry idx, value */ 56, VALUE_OPT_ADMIN_LOGIN,
-     /* equiv idx, value */ 56, VALUE_OPT_ADMIN_LOGIN,
+  {  /* entry idx, value */ 57, VALUE_OPT_ADMIN_LOGIN,
+     /* equiv idx, value */ 57, VALUE_OPT_ADMIN_LOGIN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ ADMIN_LOGIN_FLAGS, 0,
@@ -1918,8 +1946,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ADMIN_LOGIN_DESC, ADMIN_LOGIN_NAME, ADMIN_LOGIN_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 57, VALUE_OPT_TEST_SIGN,
-     /* equiv idx, value */ 57, VALUE_OPT_TEST_SIGN,
+  {  /* entry idx, value */ 58, VALUE_OPT_TEST_SIGN,
+     /* equiv idx, value */ 58, VALUE_OPT_TEST_SIGN,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ TEST_SIGN_FLAGS, 0,
@@ -1930,8 +1958,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ TEST_SIGN_DESC, TEST_SIGN_NAME, TEST_SIGN_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 58, VALUE_OPT_GENERATE_RANDOM,
-     /* equiv idx, value */ 58, VALUE_OPT_GENERATE_RANDOM,
+  {  /* entry idx, value */ 59, VALUE_OPT_GENERATE_RANDOM,
+     /* equiv idx, value */ 59, VALUE_OPT_GENERATE_RANDOM,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ GENERATE_RANDOM_FLAGS, 0,
@@ -1942,8 +1970,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ GENERATE_RANDOM_DESC, GENERATE_RANDOM_NAME, GENERATE_RANDOM_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 59, VALUE_OPT_PKCS8,
-     /* equiv idx, value */ 59, VALUE_OPT_PKCS8,
+  {  /* entry idx, value */ 60, VALUE_OPT_PKCS8,
+     /* equiv idx, value */ 60, VALUE_OPT_PKCS8,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PKCS8_FLAGS, 0,
@@ -1954,8 +1982,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PKCS8_DESC, PKCS8_NAME, PKCS8_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 60, VALUE_OPT_INDER,
-     /* equiv idx, value */ 60, VALUE_OPT_INDER,
+  {  /* entry idx, value */ 61, VALUE_OPT_INDER,
+     /* equiv idx, value */ 61, VALUE_OPT_INDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INDER_FLAGS, 0,
@@ -1966,8 +1994,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INDER_DESC, INDER_NAME, INDER_name,
      /* disablement strs */ NOT_INDER_name, NOT_INDER_PFX },
 
-  {  /* entry idx, value */ 61, VALUE_OPT_INRAW,
-     /* equiv idx, value */ 61, VALUE_OPT_INRAW,
+  {  /* entry idx, value */ 62, VALUE_OPT_INRAW,
+     /* equiv idx, value */ 62, VALUE_OPT_INRAW,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ INRAW_FLAGS, 0,
@@ -1978,8 +2006,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ INRAW_DESC, INRAW_NAME, INRAW_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 62, VALUE_OPT_OUTDER,
-     /* equiv idx, value */ 62, VALUE_OPT_OUTDER,
+  {  /* entry idx, value */ 63, VALUE_OPT_OUTDER,
+     /* equiv idx, value */ 63, VALUE_OPT_OUTDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OUTDER_FLAGS, 0,
@@ -1990,8 +2018,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ OUTDER_DESC, OUTDER_NAME, OUTDER_name,
      /* disablement strs */ NOT_OUTDER_name, NOT_OUTDER_PFX },
 
-  {  /* entry idx, value */ 63, VALUE_OPT_OUTRAW,
-     /* equiv idx, value */ 63, VALUE_OPT_OUTRAW,
+  {  /* entry idx, value */ 64, VALUE_OPT_OUTRAW,
+     /* equiv idx, value */ 64, VALUE_OPT_OUTRAW,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OUTRAW_FLAGS, 0,
@@ -2002,8 +2030,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ OUTRAW_DESC, OUTRAW_NAME, OUTRAW_name,
      /* disablement strs */ 0, 0 },
 
-  {  /* entry idx, value */ 64, VALUE_OPT_PROVIDER,
-     /* equiv idx, value */ 64, VALUE_OPT_PROVIDER,
+  {  /* entry idx, value */ 65, VALUE_OPT_PROVIDER,
+     /* equiv idx, value */ 65, VALUE_OPT_PROVIDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PROVIDER_FLAGS, 0,
@@ -2014,8 +2042,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PROVIDER_DESC, PROVIDER_NAME, PROVIDER_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 65, VALUE_OPT_PROVIDER_OPTS,
-     /* equiv idx, value */ 65, VALUE_OPT_PROVIDER_OPTS,
+  {  /* entry idx, value */ 66, VALUE_OPT_PROVIDER_OPTS,
+     /* equiv idx, value */ 66, VALUE_OPT_PROVIDER_OPTS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PROVIDER_OPTS_FLAGS, 0,
@@ -2026,8 +2054,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PROVIDER_OPTS_DESC, PROVIDER_OPTS_NAME, PROVIDER_OPTS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 66, VALUE_OPT_DETAILED_URL,
-     /* equiv idx, value */ 66, VALUE_OPT_DETAILED_URL,
+  {  /* entry idx, value */ 67, VALUE_OPT_DETAILED_URL,
+     /* equiv idx, value */ 67, VALUE_OPT_DETAILED_URL,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ DETAILED_URL_FLAGS, 0,
@@ -2038,8 +2066,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ DETAILED_URL_DESC, DETAILED_URL_NAME, DETAILED_URL_name,
      /* disablement strs */ NOT_DETAILED_URL_name, NOT_DETAILED_URL_PFX },
 
-  {  /* entry idx, value */ 67, VALUE_OPT_ONLY_URLS,
-     /* equiv idx, value */ 67, VALUE_OPT_ONLY_URLS,
+  {  /* entry idx, value */ 68, VALUE_OPT_ONLY_URLS,
+     /* equiv idx, value */ 68, VALUE_OPT_ONLY_URLS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ ONLY_URLS_FLAGS, 0,
@@ -2050,8 +2078,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ ONLY_URLS_DESC, ONLY_URLS_NAME, ONLY_URLS_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 68, VALUE_OPT_BATCH,
-     /* equiv idx, value */ 68, VALUE_OPT_BATCH,
+  {  /* entry idx, value */ 69, VALUE_OPT_BATCH,
+     /* equiv idx, value */ 69, VALUE_OPT_BATCH,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ BATCH_FLAGS, 0,
@@ -2104,21 +2132,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of p11tool. */
-#define zPROGNAME       (p11tool_opt_strs+5021)
+#define zPROGNAME       (p11tool_opt_strs+5141)
 /** Reference to the title line for p11tool usage. */
-#define zUsageTitle     (p11tool_opt_strs+5029)
+#define zUsageTitle     (p11tool_opt_strs+5149)
 /** There is no p11tool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for p11tool config files. */
 #define apzHomeList     NULL
 /** The p11tool program bug email address. */
-#define zBugsAddr       (p11tool_opt_strs+5124)
+#define zBugsAddr       (p11tool_opt_strs+5244)
 /** Clarification/explanation of what p11tool does. */
-#define zExplain        (p11tool_opt_strs+5144)
+#define zExplain        (p11tool_opt_strs+5264)
 /** Extra detail explaining what p11tool does. */
-#define zDetail         (p11tool_opt_strs+5146)
+#define zDetail         (p11tool_opt_strs+5266)
 /** The full version string for p11tool. */
-#define zFullVersion    (p11tool_opt_strs+5688)
+#define zFullVersion    (p11tool_opt_strs+5808)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -2130,7 +2158,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define p11tool_full_usage (NULL)
-#define p11tool_short_usage (p11tool_opt_strs+5706)
+#define p11tool_short_usage (p11tool_opt_strs+5826)
 
 #endif /* not defined __doxygen__ */
 
@@ -2495,7 +2523,7 @@ tOptions p11toolOptions = {
       NO_EQUIVALENT, /* '-#' option index */
       NO_EQUIVALENT /* index of default opt */
     },
-    72 /* full option count */, 69 /* user option count */,
+    73 /* full option count */, 70 /* user option count */,
     p11tool_full_usage, p11tool_short_usage,
     NULL, NULL,
     PKGDATADIR, p11tool_packager_info
@@ -2724,13 +2752,16 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
   puts(_("Key generation:"));
 
   /* referenced via p11toolOptions.pOptDesc->pzText */
-  puts(_("Generate an RSA private-public key pair"));
+  puts(_("Generate private-public key pair of given type"));
 
   /* referenced via p11toolOptions.pOptDesc->pzText */
-  puts(_("Generate a DSA private-public key pair"));
+  puts(_("Generate an RSA private-public key pair (deprecated)"));
 
   /* referenced via p11toolOptions.pOptDesc->pzText */
-  puts(_("Generate an ECDSA private-public key pair"));
+  puts(_("Generate a DSA private-public key pair (deprecated)"));
+
+  /* referenced via p11toolOptions.pOptDesc->pzText */
+  puts(_("Generate an ECDSA private-public key pair (deprecated)"));
 
   /* referenced via p11toolOptions.pOptDesc->pzText */
   puts(_("Specify the number of bits for the key generate"));
