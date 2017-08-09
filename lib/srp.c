@@ -762,15 +762,21 @@ gnutls_srp_verifier(const char *username, const char *password,
 	size = generator->size;
 	if (_gnutls_mpi_init_scan_nz(&_g, generator->data, size)) {
 		gnutls_assert();
+		_gnutls_mpi_release(&_n);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	ret = _gnutls_srp_gx(digest, 20, &res->data, _g, _n);
 	if (ret < 0) {
 		gnutls_assert();
+		_gnutls_mpi_release(&_n);
+		_gnutls_mpi_release(&_g);
 		return ret;
 	}
 	res->size = ret;
+
+	_gnutls_mpi_release(&_n);
+	_gnutls_mpi_release(&_g);
 
 	return 0;
 }
