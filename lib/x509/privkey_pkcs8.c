@@ -1276,7 +1276,6 @@ decode_private_key_info(const gnutls_datum_t * der,
 
 error:
 	asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
-
 	return result;
 
 }
@@ -1393,7 +1392,8 @@ gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 	 */
 	return 0;
 
-      cleanup:
+ cleanup:
+	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 	key->params.algo = GNUTLS_PK_UNKNOWN;
 	if (need_free)
 		_gnutls_free_datum(&_data);
