@@ -35,12 +35,11 @@ if ! test -z "${VALGRIND}"; then
 fi
 
 ret=0
-for p8 in "key-invalid1.der" "key-invalid2.der" "key-invalid3.der" "key-invalid4.der" \
-"key-invalid5.der";do
+for p8 in ${srcdir}/data/key-invalid*.der;do
 	set -- ${p8}
 	file="$1"
 	${VALGRIND} "${CERTTOOL}" --inder --key-info \
-		--infile "${srcdir}/data/${file}"
+		--infile "${file}"
 	rc=$?
 	if test ${rc} != 1; then
 		echo "FATAL ${p8} - errno ${rc}"
