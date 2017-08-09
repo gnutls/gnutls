@@ -54,7 +54,7 @@ static const unsigned prng_reseed_limits[] = {
 	[GNUTLS_RND_KEY] = 2*1024*1024 /* same as GNUTLS_RND_RANDOM - but we re-key on every operation */
 };
 
-static const unsigned prng_reseed_time[] = {
+static const time_t prng_reseed_time[] = {
 	[GNUTLS_RND_NONCE] = 14400, /* 4 hours */
 	[GNUTLS_RND_RANDOM] = 7200, /* 2 hours */
 	[GNUTLS_RND_KEY] = 7200 /* same as RANDOM */
