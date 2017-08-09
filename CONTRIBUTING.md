@@ -174,6 +174,51 @@ The NDEBUG macro is not used in GnuTLS compilation, so the assert() macros
 are always active.
 
 
+# Symbol and library versioning
+
+ The library uses the libtool versioning system, which in turn
+results to a soname bump on incompatible changes. That is described
+in [hooks.m4](m4/hooks.m4). Despite its complexity that system is
+only sufficient to distinguish between versions of the library that
+have broke ABI (i.e., soname bump occurred).
+
+Today however, soname versioning isn't sufficient. Symbol versioning
+as provided by [libgnutls.map](lib/libgnutls.map) have several
+advantages.
+ * they allow for symbol clashing between different gnutls library
+   versions being in the same address space.
+ * they allow installers to detect the library version used for
+   an application utilizing a specific symbol
+ * the allow introducing multiple versions of a symbol a la libc,
+   keeping the semantics of old functions while introducing new.
+
+As such for every symbol introduced on a particular version, we
+create an entry in libgnutls.map based on the version and containing
+the new symbols. For example, if in version 3.6.3 we introduce symbol
+```gnutls_xyz```, the entry would be:
+
+GNUTLS_3_6_2 {
+  global:
+	gnutls_xyz;
+} GNUTLS_3_6_1;
+
+where ```GNUTLS_3_6_1``` is the last version that symbols were introduced,
+and indicates a dependency of 3.6.2 to symbols of 3.6.1.
+
+Note that when the soname version is bumped, i.e., the ABI is broken
+all the previous symbol versions should be combined into a single. For
+example on the 3.4.0 soname bump, all symbols were put under the
+GNUTLS_3_4 version.
+
+Backporting new symbols to an old version which is soname compatible
+is not allowed (can cause quite some problems). Backporting symbols
+to an incompatible soname version is allowed, but must ensure that
+the symbol version used for the backported symbol version is distinct from
+the original library symbol version. E.g., if symbol ```gnutls_xyz```
+with version GNUTLS_3_6_3 is backported on gnutls 3.3.15, it should
+use version GNUTLS_3_3_15.
+
+
 # Auto-generated files:
  Several parts of the documentation and the command line tools parameters
 files (.def) are auto-generated. Normally when introducing new functions,

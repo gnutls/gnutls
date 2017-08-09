@@ -38,6 +38,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Library code modified:                              REVISION++
   # Interfaces changed/added/removed:   CURRENT++       REVISION=0
   # Interfaces added:                             AGE++
+  #   + add new version symbol in libgnutls.map, see Symbol and library versioning
+  #     in CONTRIBUTION.md for more info.
+  #
   # Interfaces removed:                           AGE=0 (+bump all symbol versions in .map)
   AC_SUBST(LT_CURRENT, 53)
   AC_SUBST(LT_REVISION, 0)
