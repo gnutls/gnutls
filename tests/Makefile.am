@@ -345,6 +345,7 @@ TESTS_ENVIRONMENT =						\
 	EXEEXT=$(EXEEXT)					\
 	builddir="$(builddir)"					\
 	top_builddir="$(top_builddir)"				\
+	libdir="$(libdir)"					\
 	srcdir="$(srcdir)"
 
 if WINDOWS

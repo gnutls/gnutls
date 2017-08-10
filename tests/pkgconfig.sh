@@ -31,6 +31,12 @@ echo "$CFLAGS"|grep sanitize && exit 77
 
 ${PKGCONFIG} --version >/dev/null || exit 77
 
+${PKGCONFIG} --libs nettle
+if test $? != 0;then
+	echo "Nettle was not found in pkg-config"
+	exit 77
+fi
+
 PKG_CONFIG_PATH=${top_builddir}/lib
 export PKG_CONFIG_PATH
 
