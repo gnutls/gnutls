@@ -194,7 +194,7 @@ advantages.
 
 As such for every symbol introduced on a particular version, we
 create an entry in libgnutls.map based on the version and containing
-the new symbols. For example, if in version 3.6.3 we introduce symbol
+the new symbols. For example, if in version 3.6.2 we introduce symbol
 ```gnutls_xyz```, the entry would be:
 
 GNUTLS_3_6_2 {
