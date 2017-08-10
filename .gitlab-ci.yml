@@ -9,7 +9,7 @@ variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian-stretch
   FEDORA_BUILD: buildenv-f26
-  FEDORA_X86_BUILD: buildenv-f23-x86
+  FEDORA_X86_BUILD: buildenv-f26-x86
   GET_SOURCES_ATTEMPTS: "3"
 
 ################
@@ -402,8 +402,9 @@ Fedora/x86:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --build=i686-redhat-linux --target=i686-redhat-linux --disable-cxx --enable-local-libopts --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile &&
-    make -j$(nproc) && make check -j$(nproc) && make pic-check
+    CC="gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --host=i686-redhat-linux --target=i686-redhat-linux --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile &&
+    make -j$(nproc) && make check -j$(nproc) &&
+    make pic-check
   tags:
   - shared
   except:
