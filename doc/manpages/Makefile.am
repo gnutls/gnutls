@@ -575,6 +575,7 @@ APIMANS += gnutls_privkey_import_ecc_raw.3
 APIMANS += gnutls_privkey_import_ext.3
 APIMANS += gnutls_privkey_import_ext2.3
 APIMANS += gnutls_privkey_import_ext3.3
+APIMANS += gnutls_privkey_import_ext4.3
 APIMANS += gnutls_privkey_import_openpgp.3
 APIMANS += gnutls_privkey_import_openpgp_raw.3
 APIMANS += gnutls_privkey_import_pkcs11.3
