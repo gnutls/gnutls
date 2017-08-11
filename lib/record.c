@@ -369,8 +369,13 @@ copy_record_version(gnutls_session_t session,
 		if (unlikely(lver == NULL))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		version[0] = lver->major;
-		version[1] = lver->minor;
+		if (lver->tls13_sem) {
+			version[0] = 0x03;
+			version[1] = 0x01;
+		} else {
+			version[0] = lver->major;
+			version[1] = lver->minor;
+		}
 	} else {
 		version[0] = session->internals.default_record_version[0];
 		version[1] = session->internals.default_record_version[1];
@@ -430,6 +435,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 	record_parameters_st *record_params;
 	size_t max_send_size;
 	record_state_st *record_state;
+	const version_entry_st *vers = get_version(session);
 
 	ret = _gnutls_epoch_get(session, epoch_rel, &record_params);
 	if (ret < 0)
@@ -494,7 +500,10 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 		headers = _mbuffer_get_uhead_ptr(bufel);
-		headers[0] = type;
+		if (vers->tls13_sem && record_params->cipher->id != GNUTLS_CIPHER_NULL)
+			headers[0] = GNUTLS_APPLICATION_DATA;
+		else
+			headers[0] = type;
 
 		/* Use the default record version, if it is
 		 * set. */
@@ -665,8 +674,14 @@ record_check_version(gnutls_session_t session,
 	const version_entry_st *vers = get_version(session);
 	int diff = 0;
 
-	if (vers->major != version[0] || vers->minor != version[1])
-		diff = 1;
+	if (vers->tls13_sem) {
+		/* TLS 1.3 requires version to be 0x0301 */
+		if (version[0] != 0x03 || version[1] != 0x01)
+			diff = 1;
+	} else {
+		if (vers->major != version[0] || vers->minor != version[1])
+			diff = 1;
+	}
 
 	if (!IS_DTLS(session)) {
 		if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO ||
@@ -1238,7 +1253,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	t.size = _mbuffer_get_udata_size(decrypted);
 	ret =
 	    _gnutls_decrypt(session, &ciphertext, &t,
-			    record.type, record_params, packet_sequence);
+			    &record.type, record_params, packet_sequence);
 	if (ret >= 0)
 		_mbuffer_set_udata_size(decrypted, ret);
 

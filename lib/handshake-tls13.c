@@ -46,6 +46,7 @@
 #include <state.h>
 #include <random.h>
 #include <dtls.h>
+#include "secrets.h"
 
 /*
  * _gnutls13_handshake_client
@@ -114,6 +115,35 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 	return 0;
 }
 
+static int generate_hs_traffic_keys(gnutls_session_t session)
+{
+	int ret;
+
+	if (unlikely(session->key.key.size == 0))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	ret = _tls13_update_secret(session, session->key.key.data, session->key.key.size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _tls13_connection_state_init(session);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
+				   NULL, 0, session->key.temp_secret);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
 /*
  * _gnutls13_handshake_server
  * This function does the server stuff of the handshake protocol.
@@ -124,6 +154,11 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 
 	switch (STATE) {
 	case STATE100:
+		ret =
+		    generate_hs_traffic_keys(session);
+		STATE = STATE100;
+		IMED_RET("generate session keys", ret, 0);
+		/* fall through */
 	case STATE101:
 		abort();
 		STATE = STATE101;

@@ -122,6 +122,8 @@ typedef struct {
 #define MAX_CIPHER_BLOCK_SIZE 16
 #define MAX_CIPHER_KEY_SIZE 32
 
+#define MAX_CIPHER_IV_SIZE 16
+
 #define MAX_USERNAME_SIZE 128
 #define MAX_SERVER_NAME_SIZE 256
 
@@ -423,8 +425,8 @@ struct gnutls_key_st {
 
 	/* the current (depending on state) secret, can be
 	 * early_secret, client_early_traffic_secret, ... */
-	uint8_t temp_secret[MAX_CIPHER_KEY_SIZE];
-	unsigned temp_secret_size;
+	uint8_t temp_secret[MAX_HASH_SIZE];
+	unsigned temp_secret_size; /* depends on negotiated PRF size */
 
 	/* For ECDH KX */
 	gnutls_pk_params_st ecdh_params; /* private part */
@@ -671,7 +673,12 @@ struct record_state_st {
 	gnutls_datum_t mac_secret;
 	gnutls_datum_t IV;
 	gnutls_datum_t key;
-	auth_cipher_hd_st cipher_state;
+	union {
+		auth_cipher_hd_st tls12;
+		gnutls_aead_cipher_hd_t aead;
+	} ctx;
+	unsigned aead_tag_size;
+	unsigned is_aead;
 	gnutls_uint64 sequence_number;
 };
 

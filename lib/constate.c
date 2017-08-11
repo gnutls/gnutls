@@ -36,9 +36,14 @@
 #include <hello_ext.h>
 #include <buffers.h>
 #include "dtls.h"
+#include "secrets.h"
+#include "handshake.h"
 
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof(keyexp) - 1;
+
+static int
+_tls13_init_record_state(record_parameters_st * params);
 
 /* This function is to be called after handshake, when master_secret,
  *  client_random and server_random have been initialized. 
@@ -194,6 +199,107 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 }
 
 static int
+_tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
+		unsigned iv_size, unsigned key_size)
+{
+	uint8_t hs_ckey[MAX_HASH_SIZE];
+	uint8_t hs_skey[MAX_HASH_SIZE];
+	uint8_t ckey_block[MAX_CIPHER_KEY_SIZE];
+	uint8_t civ_block[MAX_CIPHER_IV_SIZE];
+	uint8_t skey_block[MAX_CIPHER_KEY_SIZE];
+	uint8_t siv_block[MAX_CIPHER_IV_SIZE];
+	char buf[65];
+	record_state_st *client_write, *server_write;
+	int ret;
+
+	ret = _tls13_derive_secret(session, HANDSHAKE_CLIENT_TRAFFIC_LABEL, sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1,
+				   session->internals.handshake_hash_buffer.data,
+				   session->internals.handshake_hash_buffer.length, hs_ckey);
+
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* client keys */
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, hs_ckey, key_size, ckey_block);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, hs_ckey, iv_size, civ_block);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* server keys */
+	ret = _tls13_derive_secret(session, HANDSHAKE_SERVER_TRAFFIC_LABEL, sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1,
+				        session->internals.handshake_hash_buffer.data,
+				        session->internals.handshake_hash_buffer.length, hs_skey);
+
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, hs_skey, key_size, skey_block);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, hs_skey, iv_size, siv_block);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		client_write = &params->write;
+		server_write = &params->read;
+	} else {
+		client_write = &params->read;
+		server_write = &params->write;
+	}
+
+	client_write->mac_secret.data = NULL;
+	client_write->mac_secret.size = 0;
+
+	server_write->mac_secret.data = NULL;
+	server_write->mac_secret.size = 0;
+
+	ret = _gnutls_set_datum(&client_write->key, ckey_block, key_size);
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	_gnutls_hard_log("INT: CLIENT WRITE KEY [%d]: %s\n",
+			 key_size,
+			 _gnutls_bin2hex(ckey_block, key_size,
+					 buf, sizeof(buf), NULL));
+
+	ret = _gnutls_set_datum(&server_write->key, skey_block, key_size);
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	_gnutls_hard_log("INT: SERVER WRITE KEY [%d]: %s\n",
+			 key_size,
+			 _gnutls_bin2hex(skey_block, key_size,
+					 buf, sizeof(buf), NULL));
+
+	if (iv_size > 0) {
+		ret = _gnutls_set_datum(&client_write->IV, civ_block, iv_size);
+		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		_gnutls_hard_log("INT: CLIENT WRITE IV [%d]: %s\n",
+				 iv_size,
+				 _gnutls_bin2hex(civ_block, iv_size,
+						 buf, sizeof(buf), NULL));
+
+		ret = _gnutls_set_datum(&server_write->IV, siv_block, iv_size);
+		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		_gnutls_hard_log("INT: SERVER WRITE IV [%d]: %s\n",
+				 iv_size,
+				 _gnutls_bin2hex(siv_block, iv_size,
+						 buf, sizeof(buf), NULL));
+	}
+
+	return 0;
+}
+
+static int
 _gnutls_init_record_state(record_parameters_st * params,
 			  const version_entry_st * ver, int read,
 			  record_state_st * state)
@@ -206,7 +312,7 @@ _gnutls_init_record_state(record_parameters_st * params,
 			iv = &state->IV;
 	}
 
-	ret = _gnutls_auth_cipher_init(&state->cipher_state,
+	ret = _gnutls_auth_cipher_init(&state->ctx.tls12,
 				       params->cipher, &state->key, iv,
 				       params->mac, &state->mac_secret,
 				       params->etm,
@@ -286,29 +392,40 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	    || _gnutls_mac_is_ok(params->mac) == 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
-	if (!_gnutls_version_has_explicit_iv(ver) &&
-	    _gnutls_cipher_type(params->cipher) == CIPHER_BLOCK) {
-		IV_size = _gnutls_cipher_get_iv_size(params->cipher);
-	} else {
+	if (_gnutls_version_has_explicit_iv(ver) &&
+	    (_gnutls_cipher_type(params->cipher) != CIPHER_BLOCK)) {
 		IV_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
+	} else {
+		IV_size = _gnutls_cipher_get_iv_size(params->cipher);
 	}
 
 	key_size = _gnutls_cipher_get_key_size(params->cipher);
 	hash_size = _gnutls_mac_get_key_size(params->mac);
 	params->etm = session->security_parameters.etm;
 
-	ret = _gnutls_set_keys
-	    (session, params, hash_size, IV_size, key_size);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ver->tls13_sem) {
+		ret = _tls13_set_keys
+		    (session, params, IV_size, key_size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	ret = _gnutls_init_record_state(params, ver, 1, &params->read);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+		ret = _tls13_init_record_state(params);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	} else {
+		ret = _gnutls_set_keys
+		    (session, params, hash_size, IV_size, key_size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	ret = _gnutls_init_record_state(params, ver, 0, &params->write);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+		ret = _gnutls_init_record_state(params, ver, 1, &params->read);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_init_record_state(params, ver, 0, &params->write);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
 	session->internals.max_recv_size = _gnutls_record_overhead(params->cipher, params->mac, 1);
 	session->internals.max_recv_size += session->security_parameters.max_record_recv_size + RECORD_HEADER_SIZE(session);
@@ -619,13 +736,16 @@ void _gnutls_epoch_gc(gnutls_session_t session)
 	_gnutls_record_log("REC[%p]: End of epoch cleanup\n", session);
 }
 
-static inline void free_record_state(record_state_st * state, int d)
+static inline void free_record_state(record_state_st * state)
 {
 	_gnutls_free_datum(&state->mac_secret);
 	_gnutls_free_datum(&state->IV);
 	_gnutls_free_datum(&state->key);
 
-	_gnutls_auth_cipher_deinit(&state->cipher_state);
+	if (state->is_aead)
+		gnutls_aead_cipher_deinit(state->ctx.aead);
+	else
+		_gnutls_auth_cipher_deinit(&state->ctx.tls12);
 }
 
 void
@@ -634,8 +754,50 @@ _gnutls_epoch_free(gnutls_session_t session, record_parameters_st * params)
 	_gnutls_record_log("REC[%p]: Epoch #%u freed\n", session,
 			   params->epoch);
 
-	free_record_state(&params->read, 1);
-	free_record_state(&params->write, 0);
+	free_record_state(&params->read);
+	free_record_state(&params->write);
 
 	gnutls_free(params);
+}
+
+int _tls13_connection_state_init(gnutls_session_t session)
+{
+	const uint16_t epoch_next =
+	    session->security_parameters.epoch_next;
+	int ret;
+
+	ret = _gnutls_epoch_set_keys(session, epoch_next);
+	if (ret < 0)
+		return ret;
+
+	_gnutls_handshake_log("HSK[%p]: TLS 1.3 cipher suite: %s\n",
+			      session,
+			      session->security_parameters.cs->name);
+
+	session->security_parameters.epoch_read = epoch_next;
+	session->security_parameters.epoch_write = epoch_next;
+
+	return 0;
+}
+
+static int
+_tls13_init_record_state(record_parameters_st * params)
+{
+	int ret;
+
+	ret = gnutls_aead_cipher_init(&params->read.ctx.aead,
+				       params->cipher->id, &params->read.key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_aead_cipher_init(&params->write.ctx.aead,
+				       params->cipher->id, &params->write.key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	params->read.aead_tag_size = params->write.aead_tag_size = gnutls_cipher_get_tag_size(params->cipher->id);
+	params->read.is_aead = 1;
+	params->write.is_aead = 1;
+
+	return 0;
 }

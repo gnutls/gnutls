@@ -31,8 +31,9 @@
  * View first: "The order of encryption and authentication for
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  *
- * On update, make sure to update MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE
- * as well. If any ciphers are removed, remove them from the back-end but
+ * On update, make sure to update MAX_CIPHER_BLOCK_SIZE, MAX_CIPHER_IV_SIZE,
+ * and MAX_CIPHER_KEY_SIZE as well.
+ * If any ciphers are removed, remove them from the back-end but
  * keep them in that list to allow backwards compatibility with applications
  * that specify them (they will be a no-op).
  */

@@ -58,6 +58,9 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
+	if (record_params->write.is_aead) /* not yet ready */
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 	max_pad = MAX_PAD_SIZE;
 	fixed_pad = 1;
 
@@ -66,7 +69,7 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 	block_size = _gnutls_cipher_get_block_size(record_params->cipher);
 	tag_size =
 	    _gnutls_auth_cipher_tag_len(&record_params->write.
-					cipher_state);
+					ctx.tls12);
 	switch (_gnutls_cipher_type(record_params->cipher)) {
 	case CIPHER_AEAD:
 	case CIPHER_STREAM:
