@@ -70,6 +70,11 @@ See the end for copying conditions.
 
 ** libgnutls: Exported functions to encode and decode DSA and ECDSA r,s values.
 
+** libgnutls: Added new callback setting function to gnutls_privkey_t for external
+   keys. The new function (gnutls_privkey_import_ext4), allows signing in addition
+   to previous algorithms (RSA PKCS#1 1.5, DSA, ECDSA), with RSA-PSS and Ed25519
+   keys.
+
 ** libgnutls: Introduced the %VERIFY_ALLOW_BROKEN and %VERIFY_ALLOW_SIGN_WITH_SHA1
    priority string options. These allows enabling all broken and SHA1-based signature
    algorithms in certificate verification, respectively.
@@ -160,6 +165,7 @@ gnutls_pubkey_set_spki: Added
 gnutls_pubkey_get_spki: Added
 gnutls_privkey_set_spki: Added
 gnutls_privkey_get_spki: Added
+gnutls_privkey_import_ext4: Added
 GNUTLS_EXPORT_FLAG_NO_LZ: Added
 GNUTLS_DT_IP_ADDRESS: Added
 GNUTLS_X509_CRT_FLAG_IGNORE_SANITY: Added
