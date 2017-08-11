@@ -768,6 +768,10 @@ if test x$ac_zlib != xno; then
   fi
 fi
 AC_SUBST(LIBZ_PC)
+
+# export for use in scripts
+AC_SUBST(ac_cv_sizeof_unsigned_long_int)
+
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
 
 
