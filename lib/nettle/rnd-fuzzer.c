@@ -46,6 +46,9 @@ struct r48_rand_data {
 							   formula.  */
 };
 
+#ifdef __clang__
+__attribute__((no_sanitize("integer")))
+#endif
 static int
 __r48_rand_iterate(unsigned short int xsubi[3], struct r48_rand_data *buffer)
 {
@@ -74,6 +77,9 @@ __r48_rand_iterate(unsigned short int xsubi[3], struct r48_rand_data *buffer)
 	return 0;
 }
 
+#ifdef __clang__
+__attribute__((no_sanitize("integer")))
+#endif
 static int
 r48_r(unsigned short int xsubi[3], struct r48_rand_data *buffer,
       long int *result)
