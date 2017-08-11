@@ -31,6 +31,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     gnutls_ocsp_resp_t resp;
     int ret;
 
+    gnutls_global_init();
+
     raw.data = (unsigned char *)data;
     raw.size = size;
 
@@ -45,5 +47,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
 
     gnutls_ocsp_resp_deinit(resp);
+    gnutls_global_deinit();
     return 0;
 }

@@ -45,6 +45,8 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	struct mem_st memdata;
 	gnutls_datum_t psk_key;
 
+	gnutls_global_init();
+
 	psk_key.data = (unsigned char*)psk_key16;
 	psk_key.size = 16;
 
@@ -87,5 +89,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	gnutls_deinit(session);
 	gnutls_psk_free_client_credentials(pcred);
+
+	gnutls_global_deinit();
 	return 0;
 }

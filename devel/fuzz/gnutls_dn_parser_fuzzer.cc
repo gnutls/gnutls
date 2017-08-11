@@ -28,6 +28,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     gnutls_x509_dn_t dn;
     int ret;
 
+    gnutls_global_init();
+
     raw.data = (unsigned char *)data;
     raw.size = size;
 
@@ -48,5 +50,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
  cleanup:
     gnutls_x509_dn_deinit(dn);
+    gnutls_global_deinit();
     return 0;
 }

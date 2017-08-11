@@ -28,6 +28,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     gnutls_x509_privkey_t key;
     int ret;
 
+    gnutls_global_init();
+
     raw.data = (unsigned char *)data;
     raw.size = size;
 
@@ -37,5 +39,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     ret = gnutls_x509_privkey_import(key, &raw, GNUTLS_X509_FMT_DER);
 
     gnutls_x509_privkey_deinit(key);
+    gnutls_global_deinit();
     return 0;
 }

@@ -44,6 +44,8 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	gnutls_srp_client_credentials_t pcred;
 	struct mem_st memdata;
 
+	gnutls_global_init();
+
 	res = gnutls_init(&session, GNUTLS_CLIENT);
 	assert(res >= 0);
 
@@ -83,5 +85,6 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 
 	gnutls_deinit(session);
 	gnutls_srp_free_client_credentials(pcred);
+	gnutls_global_deinit();
 	return 0;
 }

@@ -34,6 +34,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     unsigned int i;
     int ret;
 
+    gnutls_global_init();
+
     raw.data = (unsigned char *)data;
     raw.size = size;
 
@@ -67,5 +69,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
  cleanup:
     gnutls_pkcs12_deinit(p12);
+    gnutls_global_deinit();
     return 0;
 }
