@@ -176,7 +176,7 @@ asan/Fedora/x86_64:
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
-  - make check -j$(nproc)
+  - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make check -j$(nproc)
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     ./configure --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --disable-guile
   - make -j$(nproc)
