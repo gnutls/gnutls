@@ -402,6 +402,11 @@ struct gnutls_key_st {
 	gnutls_pk_params_st kshare_ecdhx_params;
 	gnutls_pk_params_st kshare_dh_params;
 
+	/* the current (depending on state) secret, can be
+	 * early_secret, client_early_traffic_secret, ... */
+	uint8_t temp_secret[MAX_CIPHER_KEY_SIZE];
+	unsigned temp_secret_size;
+
 	/* For ECDH KX */
 	gnutls_pk_params_st ecdh_params; /* private part */
 
