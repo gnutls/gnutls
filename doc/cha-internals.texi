@@ -527,7 +527,13 @@ For more information see @ref{Hardware security modules and abstract key types}.
 @node Random Number Generators-internals
 @section Random Number Generators
 
-@subheading Inner workings
+@subheading About the generators
+
+GnuTLS provides two random generators. The default, and the AES-DRBG random
+generator which is only used when the library is compiled with support for
+FIPS140-2 and the system is in FIPS140-2 mode.
+
+@subheading The default generator - inner workings
 
 The random number generator levels in @code{gnutls_rnd_level_t} map to two CHACHA-based random generators which
 are initially seeded using the OS random device, e.g., @code{/dev/urandom}
@@ -573,6 +579,17 @@ Although the key generator used to provide data for the @code{GNUTLS_RND_RANDOM}
 and @code{GNUTLS_RND_KEY} levels is identical, when used with the @code{GNUTLS_RND_KEY} level
 a re-key of the PRNG using its own output, is additionally performed. That ensures that
 the recovery of the PRNG state will not be sufficient to recover previously generated values.
+
+
+@subheading The AES-DRBG generator - inner workings
+
+Similar with the default generator, the random number generator levels in @code{gnutls_rnd_level_t} map to two
+AES-DRBG random generators which are initially seeded using the OS random device,
+e.g., @code{/dev/urandom} or @code{getrandom()}. These random generators are
+unique per thread, and are automatically re-seeded when a fork is detected.
+
+The AES-DRBG generator is based on the AES cipher in counter mode and is
+re-seeded after a fixed amount of bytes are generated.
 
 
 @subheading Defense against PRNG attacks
