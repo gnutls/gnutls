@@ -633,8 +633,8 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 {
 	uint8_t *data;
-	int data_size;
-	size_t r_size;
+	ssize_t data_size;
+	ssize_t r_size;
 	gnutls_buffer_st buf;
 	int ret;
 	status_request_ext_st *priv = NULL;
