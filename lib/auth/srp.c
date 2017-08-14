@@ -346,7 +346,7 @@ int
 _gnutls_proc_srp_client_kx(gnutls_session_t session, uint8_t * data,
 			   size_t _data_size)
 {
-	size_t _n_A;
+	ssize_t _n_A;
 	ssize_t data_size = _data_size;
 	int ret;
 
