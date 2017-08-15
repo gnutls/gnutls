@@ -86,6 +86,8 @@ supported_versions_recv_params(gnutls_session_t session,
 				if (ret < 0)
 					return gnutls_assert_val(ret);
 
+				_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
+						      session, (int)major, (int)minor);
 				return 0;
 			}
 		}
