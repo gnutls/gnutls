@@ -89,72 +89,73 @@ typedef enum {
     INDEX_OPT_TO_P12                   = 23,
     INDEX_OPT_KEY_INFO                 = 25,
     INDEX_OPT_P8_INFO                  = 26,
-    INDEX_OPT_GENERATE_PRIVKEY         = 27,
-    INDEX_OPT_BITS                     = 28,
-    INDEX_OPT_CURVE                    = 29,
-    INDEX_OPT_SEC_PARAM                = 30,
-    INDEX_OPT_TO_P8                    = 31,
-    INDEX_OPT_PKCS8                    = 32,
-    INDEX_OPT_PROVABLE                 = 33,
-    INDEX_OPT_VERIFY_PROVABLE_PRIVKEY  = 34,
-    INDEX_OPT_SEED                     = 35,
-    INDEX_OPT_CRL_INFO                 = 37,
-    INDEX_OPT_GENERATE_CRL             = 38,
-    INDEX_OPT_VERIFY_CRL               = 39,
-    INDEX_OPT_VERIFY_CHAIN             = 41,
-    INDEX_OPT_VERIFY                   = 42,
-    INDEX_OPT_VERIFY_HOSTNAME          = 43,
-    INDEX_OPT_VERIFY_EMAIL             = 44,
-    INDEX_OPT_VERIFY_PURPOSE           = 45,
-    INDEX_OPT_VERIFY_ALLOW_BROKEN      = 46,
-    INDEX_OPT_P7_GENERATE              = 48,
-    INDEX_OPT_P7_SIGN                  = 49,
-    INDEX_OPT_P7_DETACHED_SIGN         = 50,
-    INDEX_OPT_P7_INCLUDE_CERT          = 51,
-    INDEX_OPT_P7_TIME                  = 52,
-    INDEX_OPT_P7_SHOW_DATA             = 53,
-    INDEX_OPT_P7_INFO                  = 54,
-    INDEX_OPT_P7_VERIFY                = 55,
-    INDEX_OPT_SMIME_TO_P7              = 56,
-    INDEX_OPT_GENERATE_DH_PARAMS       = 58,
-    INDEX_OPT_GET_DH_PARAMS            = 59,
-    INDEX_OPT_DH_INFO                  = 60,
-    INDEX_OPT_LOAD_PRIVKEY             = 61,
-    INDEX_OPT_LOAD_PUBKEY              = 62,
-    INDEX_OPT_LOAD_REQUEST             = 63,
-    INDEX_OPT_LOAD_CERTIFICATE         = 64,
-    INDEX_OPT_LOAD_CA_PRIVKEY          = 65,
-    INDEX_OPT_LOAD_CA_CERTIFICATE      = 66,
-    INDEX_OPT_LOAD_CRL                 = 67,
-    INDEX_OPT_LOAD_DATA                = 68,
-    INDEX_OPT_PASSWORD                 = 69,
-    INDEX_OPT_NULL_PASSWORD            = 70,
-    INDEX_OPT_EMPTY_PASSWORD           = 71,
-    INDEX_OPT_HEX_NUMBERS              = 72,
-    INDEX_OPT_CPRINT                   = 73,
-    INDEX_OPT_RSA                      = 74,
-    INDEX_OPT_DSA                      = 75,
-    INDEX_OPT_ECC                      = 76,
-    INDEX_OPT_ECDSA                    = 77,
-    INDEX_OPT_KEY_TYPE                 = 78,
-    INDEX_OPT_HASH                     = 79,
-    INDEX_OPT_SALT_SIZE                = 80,
-    INDEX_OPT_INDER                    = 81,
-    INDEX_OPT_INRAW                    = 82,
-    INDEX_OPT_OUTDER                   = 83,
-    INDEX_OPT_OUTRAW                   = 84,
-    INDEX_OPT_DISABLE_QUICK_RANDOM     = 85,
-    INDEX_OPT_TEMPLATE                 = 86,
-    INDEX_OPT_STDOUT_INFO              = 87,
-    INDEX_OPT_ASK_PASS                 = 88,
-    INDEX_OPT_PKCS_CIPHER              = 89,
-    INDEX_OPT_PROVIDER                 = 90,
-    INDEX_OPT_VERSION                  = 91,
-    INDEX_OPT_HELP                     = 92,
-    INDEX_OPT_MORE_HELP                = 93
+    INDEX_OPT_TO_RSA                   = 27,
+    INDEX_OPT_GENERATE_PRIVKEY         = 28,
+    INDEX_OPT_BITS                     = 29,
+    INDEX_OPT_CURVE                    = 30,
+    INDEX_OPT_SEC_PARAM                = 31,
+    INDEX_OPT_TO_P8                    = 32,
+    INDEX_OPT_PKCS8                    = 33,
+    INDEX_OPT_PROVABLE                 = 34,
+    INDEX_OPT_VERIFY_PROVABLE_PRIVKEY  = 35,
+    INDEX_OPT_SEED                     = 36,
+    INDEX_OPT_CRL_INFO                 = 38,
+    INDEX_OPT_GENERATE_CRL             = 39,
+    INDEX_OPT_VERIFY_CRL               = 40,
+    INDEX_OPT_VERIFY_CHAIN             = 42,
+    INDEX_OPT_VERIFY                   = 43,
+    INDEX_OPT_VERIFY_HOSTNAME          = 44,
+    INDEX_OPT_VERIFY_EMAIL             = 45,
+    INDEX_OPT_VERIFY_PURPOSE           = 46,
+    INDEX_OPT_VERIFY_ALLOW_BROKEN      = 47,
+    INDEX_OPT_P7_GENERATE              = 49,
+    INDEX_OPT_P7_SIGN                  = 50,
+    INDEX_OPT_P7_DETACHED_SIGN         = 51,
+    INDEX_OPT_P7_INCLUDE_CERT          = 52,
+    INDEX_OPT_P7_TIME                  = 53,
+    INDEX_OPT_P7_SHOW_DATA             = 54,
+    INDEX_OPT_P7_INFO                  = 55,
+    INDEX_OPT_P7_VERIFY                = 56,
+    INDEX_OPT_SMIME_TO_P7              = 57,
+    INDEX_OPT_GENERATE_DH_PARAMS       = 59,
+    INDEX_OPT_GET_DH_PARAMS            = 60,
+    INDEX_OPT_DH_INFO                  = 61,
+    INDEX_OPT_LOAD_PRIVKEY             = 62,
+    INDEX_OPT_LOAD_PUBKEY              = 63,
+    INDEX_OPT_LOAD_REQUEST             = 64,
+    INDEX_OPT_LOAD_CERTIFICATE         = 65,
+    INDEX_OPT_LOAD_CA_PRIVKEY          = 66,
+    INDEX_OPT_LOAD_CA_CERTIFICATE      = 67,
+    INDEX_OPT_LOAD_CRL                 = 68,
+    INDEX_OPT_LOAD_DATA                = 69,
+    INDEX_OPT_PASSWORD                 = 70,
+    INDEX_OPT_NULL_PASSWORD            = 71,
+    INDEX_OPT_EMPTY_PASSWORD           = 72,
+    INDEX_OPT_HEX_NUMBERS              = 73,
+    INDEX_OPT_CPRINT                   = 74,
+    INDEX_OPT_RSA                      = 75,
+    INDEX_OPT_DSA                      = 76,
+    INDEX_OPT_ECC                      = 77,
+    INDEX_OPT_ECDSA                    = 78,
+    INDEX_OPT_KEY_TYPE                 = 79,
+    INDEX_OPT_HASH                     = 80,
+    INDEX_OPT_SALT_SIZE                = 81,
+    INDEX_OPT_INDER                    = 82,
+    INDEX_OPT_INRAW                    = 83,
+    INDEX_OPT_OUTDER                   = 84,
+    INDEX_OPT_OUTRAW                   = 85,
+    INDEX_OPT_DISABLE_QUICK_RANDOM     = 86,
+    INDEX_OPT_TEMPLATE                 = 87,
+    INDEX_OPT_STDOUT_INFO              = 88,
+    INDEX_OPT_ASK_PASS                 = 89,
+    INDEX_OPT_PKCS_CIPHER              = 90,
+    INDEX_OPT_PROVIDER                 = 91,
+    INDEX_OPT_VERSION                  = 92,
+    INDEX_OPT_HELP                     = 93,
+    INDEX_OPT_MORE_HELP                = 94
 } teOptIndex;
 /** count of all options for certtool */
-#define OPTION_CT    94
+#define OPTION_CT    95
 /** certtool version */
 #define CERTTOOL_VERSION       "@VERSION@"
 /** Full certtool version text */
@@ -234,70 +235,71 @@ typedef enum {
 #define VALUE_OPT_TO_P12         0x100E
 #define VALUE_OPT_KEY_INFO       'k'
 #define VALUE_OPT_P8_INFO        0x100F
+#define VALUE_OPT_TO_RSA         0x1010
 #define VALUE_OPT_GENERATE_PRIVKEY 'p'
-#define VALUE_OPT_BITS           0x1010
+#define VALUE_OPT_BITS           0x1011
 
 #define OPT_VALUE_BITS           (DESC(BITS).optArg.argInt)
-#define VALUE_OPT_CURVE          0x1011
-#define VALUE_OPT_SEC_PARAM      0x1012
-#define VALUE_OPT_TO_P8          0x1013
+#define VALUE_OPT_CURVE          0x1012
+#define VALUE_OPT_SEC_PARAM      0x1013
+#define VALUE_OPT_TO_P8          0x1014
 #define VALUE_OPT_PKCS8          '8'
-#define VALUE_OPT_PROVABLE       0x1014
-#define VALUE_OPT_VERIFY_PROVABLE_PRIVKEY 0x1015
-#define VALUE_OPT_SEED           0x1016
+#define VALUE_OPT_PROVABLE       0x1015
+#define VALUE_OPT_VERIFY_PROVABLE_PRIVKEY 0x1016
+#define VALUE_OPT_SEED           0x1017
 #define VALUE_OPT_CRL_INFO       'l'
-#define VALUE_OPT_GENERATE_CRL   0x1017
-#define VALUE_OPT_VERIFY_CRL     0x1018
+#define VALUE_OPT_GENERATE_CRL   0x1018
+#define VALUE_OPT_VERIFY_CRL     0x1019
 #define VALUE_OPT_VERIFY_CHAIN   'e'
-#define VALUE_OPT_VERIFY         0x1019
-#define VALUE_OPT_VERIFY_HOSTNAME 0x101A
-#define VALUE_OPT_VERIFY_EMAIL   0x101B
-#define VALUE_OPT_VERIFY_PURPOSE 0x101C
-#define VALUE_OPT_VERIFY_ALLOW_BROKEN 0x101D
-#define VALUE_OPT_P7_GENERATE    0x101E
-#define VALUE_OPT_P7_SIGN        0x101F
-#define VALUE_OPT_P7_DETACHED_SIGN 0x1020
-#define VALUE_OPT_P7_INCLUDE_CERT 0x1021
-#define VALUE_OPT_P7_TIME        0x1022
-#define VALUE_OPT_P7_SHOW_DATA   0x1023
-#define VALUE_OPT_P7_INFO        0x1024
-#define VALUE_OPT_P7_VERIFY      0x1025
-#define VALUE_OPT_SMIME_TO_P7    0x1026
-#define VALUE_OPT_GENERATE_DH_PARAMS 0x1027
-#define VALUE_OPT_GET_DH_PARAMS  0x1028
-#define VALUE_OPT_DH_INFO        0x1029
-#define VALUE_OPT_LOAD_PRIVKEY   0x102A
-#define VALUE_OPT_LOAD_PUBKEY    0x102B
-#define VALUE_OPT_LOAD_REQUEST   0x102C
-#define VALUE_OPT_LOAD_CERTIFICATE 0x102D
-#define VALUE_OPT_LOAD_CA_PRIVKEY 0x102E
-#define VALUE_OPT_LOAD_CA_CERTIFICATE 0x102F
-#define VALUE_OPT_LOAD_CRL       0x1030
-#define VALUE_OPT_LOAD_DATA      0x1031
-#define VALUE_OPT_PASSWORD       0x1032
-#define VALUE_OPT_NULL_PASSWORD  0x1033
-#define VALUE_OPT_EMPTY_PASSWORD 0x1034
-#define VALUE_OPT_HEX_NUMBERS    0x1035
-#define VALUE_OPT_CPRINT         0x1036
-#define VALUE_OPT_RSA            0x1037
-#define VALUE_OPT_DSA            0x1038
-#define VALUE_OPT_ECC            0x1039
-#define VALUE_OPT_ECDSA          0x103A
-#define VALUE_OPT_KEY_TYPE       0x103B
-#define VALUE_OPT_HASH           0x103C
-#define VALUE_OPT_SALT_SIZE      0x103D
+#define VALUE_OPT_VERIFY         0x101A
+#define VALUE_OPT_VERIFY_HOSTNAME 0x101B
+#define VALUE_OPT_VERIFY_EMAIL   0x101C
+#define VALUE_OPT_VERIFY_PURPOSE 0x101D
+#define VALUE_OPT_VERIFY_ALLOW_BROKEN 0x101E
+#define VALUE_OPT_P7_GENERATE    0x101F
+#define VALUE_OPT_P7_SIGN        0x1020
+#define VALUE_OPT_P7_DETACHED_SIGN 0x1021
+#define VALUE_OPT_P7_INCLUDE_CERT 0x1022
+#define VALUE_OPT_P7_TIME        0x1023
+#define VALUE_OPT_P7_SHOW_DATA   0x1024
+#define VALUE_OPT_P7_INFO        0x1025
+#define VALUE_OPT_P7_VERIFY      0x1026
+#define VALUE_OPT_SMIME_TO_P7    0x1027
+#define VALUE_OPT_GENERATE_DH_PARAMS 0x1028
+#define VALUE_OPT_GET_DH_PARAMS  0x1029
+#define VALUE_OPT_DH_INFO        0x102A
+#define VALUE_OPT_LOAD_PRIVKEY   0x102B
+#define VALUE_OPT_LOAD_PUBKEY    0x102C
+#define VALUE_OPT_LOAD_REQUEST   0x102D
+#define VALUE_OPT_LOAD_CERTIFICATE 0x102E
+#define VALUE_OPT_LOAD_CA_PRIVKEY 0x102F
+#define VALUE_OPT_LOAD_CA_CERTIFICATE 0x1030
+#define VALUE_OPT_LOAD_CRL       0x1031
+#define VALUE_OPT_LOAD_DATA      0x1032
+#define VALUE_OPT_PASSWORD       0x1033
+#define VALUE_OPT_NULL_PASSWORD  0x1034
+#define VALUE_OPT_EMPTY_PASSWORD 0x1035
+#define VALUE_OPT_HEX_NUMBERS    0x1036
+#define VALUE_OPT_CPRINT         0x1037
+#define VALUE_OPT_RSA            0x1038
+#define VALUE_OPT_DSA            0x1039
+#define VALUE_OPT_ECC            0x103A
+#define VALUE_OPT_ECDSA          0x103B
+#define VALUE_OPT_KEY_TYPE       0x103C
+#define VALUE_OPT_HASH           0x103D
+#define VALUE_OPT_SALT_SIZE      0x103E
 
 #define OPT_VALUE_SALT_SIZE      (DESC(SALT_SIZE).optArg.argInt)
-#define VALUE_OPT_INDER          0x103E
-#define VALUE_OPT_INRAW          0x103F
-#define VALUE_OPT_OUTDER         0x1040
-#define VALUE_OPT_OUTRAW         0x1041
-#define VALUE_OPT_DISABLE_QUICK_RANDOM 0x1042
-#define VALUE_OPT_TEMPLATE       0x1043
-#define VALUE_OPT_STDOUT_INFO    0x1044
-#define VALUE_OPT_ASK_PASS       0x1045
-#define VALUE_OPT_PKCS_CIPHER    0x1046
-#define VALUE_OPT_PROVIDER       0x1047
+#define VALUE_OPT_INDER          0x103F
+#define VALUE_OPT_INRAW          0x1040
+#define VALUE_OPT_OUTDER         0x1041
+#define VALUE_OPT_OUTRAW         0x1042
+#define VALUE_OPT_DISABLE_QUICK_RANDOM 0x1043
+#define VALUE_OPT_TEMPLATE       0x1044
+#define VALUE_OPT_STDOUT_INFO    0x1045
+#define VALUE_OPT_ASK_PASS       0x1046
+#define VALUE_OPT_PKCS_CIPHER    0x1047
+#define VALUE_OPT_PROVIDER       0x1048
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
