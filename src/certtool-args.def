@@ -178,6 +178,14 @@ flag = {
 };
 
 flag = {
+    name      = to-rsa;
+    descrip   = "Convert an RSA-PSS key to raw RSA format";
+    doc = "It requires an RSA-PSS key as input and will output a raw RSA
+key. This command is necessary for compatibility with applications that
+cannot read RSA-PSS keys.";
+};
+
+flag = {
     name      = generate-privkey;
     value     = p;
     descrip   = "Generate a private key";

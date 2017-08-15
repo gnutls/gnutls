@@ -81,6 +81,8 @@ static void print_certificate_info(gnutls_x509_crt_t crt, FILE * out,
 				   unsigned int all);
 static void verify_certificate(common_info_st * cinfo);
 
+static void privkey_to_rsa(common_info_st * cinfo);
+
 static void pubkey_keyid(common_info_st * cinfo);
 static void certificate_fpr(common_info_st * cinfo);
 static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt);
@@ -1213,6 +1215,8 @@ static void cmd_parser(int argc, char **argv)
 			load_infile(OPT_ARG(LOAD_PUBKEY));
 		} else if (HAVE_OPT(KEY_INFO) && HAVE_OPT(LOAD_PRIVKEY)) {
 			load_infile(OPT_ARG(LOAD_PRIVKEY));
+		} else if (HAVE_OPT(TO_RSA) && HAVE_OPT(LOAD_PRIVKEY)) {
+			load_infile(OPT_ARG(LOAD_PRIVKEY));
 		} else if (HAVE_OPT(CRL_INFO) && HAVE_OPT(LOAD_CRL)) {
 			load_infile(OPT_ARG(LOAD_CRL));
 		} else
@@ -1440,7 +1444,9 @@ static void cmd_parser(int argc, char **argv)
 		certificate_info(1, &cinfo);
 	else if (HAVE_OPT(KEY_INFO))
 		privkey_info(&cinfo);
-	else if (HAVE_OPT(PUBKEY_INFO))
+	else if (HAVE_OPT(TO_RSA)) {
+		privkey_to_rsa(&cinfo);
+	} else if (HAVE_OPT(PUBKEY_INFO))
 		pubkey_info(NULL, &cinfo);
 	else if (HAVE_OPT(FINGERPRINT))
 		certificate_fpr(&cinfo);
@@ -1758,6 +1764,67 @@ void privkey_info(common_info_st * cinfo)
 	if (ret < 0)
 		fprintf(outfile,
 			"\n** Private key parameters validation failed **\n\n");
+
+	gnutls_x509_privkey_deinit(key);
+}
+
+static void privkey_to_rsa(common_info_st * cinfo)
+{
+	gnutls_x509_privkey_t key;
+	size_t size;
+	int ret;
+	gnutls_datum_t pem;
+	const char *pass;
+	unsigned int flags = 0;
+	gnutls_datum_t out;
+
+	size = fread(lbuffer, 1, lbuffer_size - 1, infile);
+	lbuffer[size] = 0;
+
+	gnutls_x509_privkey_init(&key);
+
+	pem.data = lbuffer;
+	pem.size = size;
+
+	ret =
+	    gnutls_x509_privkey_import2(key, &pem, incert_format, NULL, GNUTLS_PKCS_PLAIN);
+
+	/* If we failed to import the certificate previously try PKCS #8 */
+	if (ret == GNUTLS_E_DECRYPTION_FAILED) {
+		fprintf(stderr, "Encrypted structure detected...\n");
+
+		if (outcert_format == GNUTLS_X509_FMT_DER)
+			pkcs8_info_int(&pem, incert_format, 1, stderr, "");
+		else
+			pkcs8_info_int(&pem, incert_format, 1, outfile, "");
+
+		pass = get_password(cinfo, &flags, 0);
+
+		ret = gnutls_x509_privkey_import2(key, &pem,
+						  incert_format, pass,
+						  flags);
+	}
+	if (ret < 0) {
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	ret = gnutls_x509_privkey_get_pk_algorithm(key);
+	if (ret != GNUTLS_PK_RSA && ret != GNUTLS_PK_RSA_PSS) {
+		fprintf(stderr, "unexpected key type: %s\n", gnutls_pk_get_name(ret));
+		app_exit(1);
+	}
+
+	gnutls_x509_privkey_set_flags(key, GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+
+	ret = gnutls_x509_privkey_export2(key, cinfo->outcert_format, &out);
+	if (ret < 0) {
+		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	fwrite(out.data, out.size, 1, outfile);
+	gnutls_free(out.data);
 
 	gnutls_x509_privkey_deinit(key);
 }
