@@ -861,6 +861,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 	ciphersuite_list_st peer_clist;
 	const gnutls_cipher_suite_entry_st *selected;
 	int retval;
+	const version_entry_st *vers = get_version(session);
 
 	peer_clist.size = 0;
 
@@ -885,7 +886,6 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 		/* TLS_FALLBACK_SCSV */
 		if (data[i] == GNUTLS_FALLBACK_SCSV_MAJOR &&
 		    data[i + 1] == GNUTLS_FALLBACK_SCSV_MINOR) {
-			const version_entry_st *vers = get_version(session);
 			const version_entry_st *max = _gnutls_version_max(session);
 
 			_gnutls_handshake_log
@@ -920,25 +920,26 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 		return ret;
 	}
 
-	/* check if the credentials (username, public key etc.) are ok
-	 */
-	if (_gnutls_get_kx_cred(session, selected->kx_algorithm) == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
+	if (!vers->tls13_sem) {
+		/* check if the credentials (username, public key etc.) are ok
+		 */
+		if (_gnutls_get_kx_cred(session, selected->kx_algorithm) == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+		}
 
-
-	/* set the mod_auth_st to the appropriate struct
-	 * according to the KX algorithm. This is needed since all the
-	 * handshake functions are read from there;
-	 */
-	session->internals.auth_struct = _gnutls_kx_auth_struct(selected->kx_algorithm);
-	if (session->internals.auth_struct == NULL) {
-		_gnutls_handshake_log
-		    ("HSK[%p]: Cannot find the appropriate handler for the KX algorithm\n",
-		     session);
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		/* set the mod_auth_st to the appropriate struct
+		 * according to the KX algorithm. This is needed since all the
+		 * handshake functions are read from there;
+		 */
+		session->internals.auth_struct = _gnutls_kx_auth_struct(selected->kx_algorithm);
+		if (session->internals.auth_struct == NULL) {
+			_gnutls_handshake_log
+			    ("HSK[%p]: Cannot find the appropriate handler for the KX algorithm\n",
+			     session);
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
 	}
 
 	return 0;
@@ -1380,6 +1381,7 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	unsigned j;
 	int ret;
 	const gnutls_cipher_suite_entry_st *selected = NULL;
+	const version_entry_st *vers = get_version(session);
 
 	for (j = 0; j < session->internals.priorities->cs.size; j++) {
 		if (suite[0] == session->internals.priorities->cs.entry[j]->id[0] &&
@@ -1409,28 +1411,29 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	/* check if the credentials (username, public key etc.) are ok.
 	 * Actually checks if they exist.
 	 */
-	if (!session->internals.premaster_set &&
-	    _gnutls_get_kx_cred
-	    (session, selected->kx_algorithm) == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
+	if (!vers->tls13_sem) {
+		if (!session->internals.premaster_set &&
+		    _gnutls_get_kx_cred
+		    (session, selected->kx_algorithm) == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+		}
 
 
-	/* set the mod_auth_st to the appropriate struct
-	 * according to the KX algorithm. This is needed since all the
-	 * handshake functions are read from there;
-	 */
-	session->internals.auth_struct =
-	    _gnutls_kx_auth_struct(selected->kx_algorithm);
+		/* set the mod_auth_st to the appropriate struct
+		 * according to the KX algorithm. This is needed since all the
+		 * handshake functions are read from there;
+		 */
+		session->internals.auth_struct =
+		    _gnutls_kx_auth_struct(selected->kx_algorithm);
 
-	if (session->internals.auth_struct == NULL) {
-
-		_gnutls_handshake_log
-		    ("HSK[%p]: Cannot find the appropriate handler for the KX algorithm\n",
-		     session);
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		if (session->internals.auth_struct == NULL) {
+			_gnutls_handshake_log
+			    ("HSK[%p]: Cannot find the appropriate handler for the KX algorithm\n",
+			     session);
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
 	}
 
 	return 0;
