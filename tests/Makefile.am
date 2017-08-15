@@ -43,20 +43,16 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
 	certs-interesting/cert6.der certs-interesting/cert7.der certs-interesting/cert8.der \
 	certs-interesting/cert9.der certs-interesting/cert5.der.err \
-	certs-interesting/cert3.der.err certs-interesting/cert4.der pkcs7-interesting/pkcs7-1.der \
-	pkcs7-interesting/pkcs7-1.der.err pkcs7-interesting/pkcs7-2.der pkcs7-interesting/pkcs7-2.der.err \
-	client-interesting/client1.raw client-interesting/client2.raw client-interesting/client3.disabled \
-	server-interesting/server1.raw scripts/common.sh scripts/starttls-common.sh \
-	psk-server-interesting/psk-server1.raw \
-	srp-server-interesting/srp-server1.raw \
-	client-interesting/client3.raw rng-op.c x509sign-verify-common.h common-key-tests.h \
+	certs-interesting/cert3.der.err certs-interesting/cert4.der \
+	scripts/common.sh scripts/starttls-common.sh \
+	rng-op.c x509sign-verify-common.h common-key-tests.h \
 	ocsp-tests/certs/ca.key ocsp-tests/certs/ca.pem ocsp-tests/certs/ocsp-server.key ocsp-tests/certs/ocsp-server.pem ocsp-tests/response1.der \
 	ocsp-tests/response2.der ocsp-tests/certs/ocsp_index.txt ocsp-tests/certs/ocsp_index.txt.attr \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
 	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
-	p11-kit-trust-data/Example_Root_CA.pem ocsp-resp-interesting/1492.der
+	p11-kit-trust-data/Example_Root_CA.pem
 
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
@@ -98,8 +94,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid tls-neg-ext-k
 	 tls10-server-kx-neg tls11-server-kx-neg tls12-server-kx-neg ssl30-server-kx-neg \
 	 tls12-cipher-neg tls11-cipher-neg tls10-cipher-neg ssl30-cipher-neg \
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain	tls-rehandshake-cert-3 \
-	 psk-server psk-client srp-server srp-client \
-	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	ocsp-resp \
+	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	\
 	 tls-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
@@ -360,9 +355,6 @@ TESTS_ENVIRONMENT += ENABLE_SSL3=0
 endif
 
 if WANT_TEST_SUITE
-
-# These require the devel/fuzz directory which is not available on releases
-ctests += client server
 
 LOG_COMPILER = $(VALGRIND)
 endif
