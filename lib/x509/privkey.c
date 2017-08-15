@@ -1318,16 +1318,15 @@ static const char *set_msg(gnutls_x509_privkey_t key)
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
  *
- * This function will export the private key to a PKCS1 structure for
- * RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
- * the same format with the parameters used by openssl.
- *
- * If the buffer provided is not long enough to hold the output, then
- * *@output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER
- * will be returned.
+ * This function will export the private key to a PKCS#1 structure for
+ * RSA or RSA-PSS keys, and integer sequence for DSA keys. Other keys types
+ * will be exported in PKCS#8 form.
  *
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN RSA PRIVATE KEY".
+ *
+ * It is recommended to use gnutls_x509_privkey_export_pkcs8() instead
+ * of this function, when a consistent output format is required.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1337,28 +1336,17 @@ gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 			   gnutls_x509_crt_fmt_t format, void *output_data,
 			   size_t * output_data_size)
 {
-	const char *msg;
+	gnutls_datum_t out;
 	int ret;
 
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
+	ret = gnutls_x509_privkey_export2(key, format, &out);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	if (key->key == NULL) { /* can only export in PKCS#8 form */
-		return gnutls_x509_privkey_export_pkcs8(key, format, NULL, 0, output_data, output_data_size);
-	}
+	ret = _gnutls_copy_data(&out, output_data, output_data_size);
+	gnutls_free(out.data);
 
-	msg = set_msg(key);
-
-	if (key->flags & GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT) {
-		ret = gnutls_x509_privkey_fix(key);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-	}
-
-	return _gnutls_x509_export_int(key->key, format, msg,
-				       output_data, output_data_size);
+	return ret;
 }
 
 /**
@@ -1367,14 +1355,14 @@ gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
  * @format: the format of output params. One of PEM or DER.
  * @out: will contain a private key PEM or DER encoded
  *
- * This function will export the private key to a PKCS1 structure for
- * RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
- * the same format with the parameters used by openssl.
+ * This function will export the private key to a PKCS#1 structure for
+ * RSA or RSA-PSS keys, and integer sequence for DSA keys. Other keys types
+ * will be exported in PKCS#8 form.
  *
  * The output buffer is allocated using gnutls_malloc().
  *
- * If the structure is PEM encoded, it will have a header
- * of "BEGIN RSA PRIVATE KEY".
+ * It is recommended to use gnutls_x509_privkey_export2_pkcs8() instead
+ * of this function, when a consistent output format is required.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
