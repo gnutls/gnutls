@@ -1266,7 +1266,9 @@ applications see the GROUP keyword below.
 @item Groups @tab
 GROUP-SECP256R1, GROUP-SECP384R1, GROUP-SECP521R1, GROUP-X25519,
 GROUP-FFDHE2048, GROUP-FFDHE3072, GROUP-FFDHE4096 and GROUP-FFDHE8192.
-Catch all which enables all groups from NORMAL priority is GROUP-ALL.
+Groups include both elliptic curve groups, e.g., SECP256R1, as well as 
+finite field groups such as FFDHE2048. Catch all which enables all groups
+from NORMAL priority is GROUP-ALL.
 
 @item Certificate type @tab
 The only option currently is CTYPE-X509. Catch all is CTYPE-ALL.
@@ -1276,8 +1278,9 @@ The only option currently is CTYPE-X509. Catch all is CTYPE-ALL.
 @end float
 
 Note that the DHE key exchange methods are generally
-slower@footnote{It depends on the group used.  Primes with
-lesser bits are always faster, but also easier to break.  See @ref{Selecting cryptographic key sizes}
+slower@footnote{It depends on the group in use.  Groups with
+less bits are always faster, but the number of bits ties with the security
+parameter.  See @ref{Selecting cryptographic key sizes}
 for the acceptable security levels.} than their elliptic curves counterpart
 (ECDHE). 
 
