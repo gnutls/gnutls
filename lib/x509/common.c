@@ -695,7 +695,6 @@ x509_read_value(ASN1_TYPE c, const char *root,
 
 	if (result != ASN1_MEM_ERROR) {
 		if (result != ASN1_SUCCESS || allow_null == 0 || len != 0) {
-			gnutls_assert();
 			result = _gnutls_asn2err(result);
 			return result;
 		}

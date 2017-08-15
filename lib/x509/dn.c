@@ -982,7 +982,6 @@ _gnutls_x509_compare_raw_dn(const gnutls_datum_t * dn1,
 {
 
 	if (dn1->size != dn2->size) {
-		gnutls_assert();
 		return 0;
 	}
 	if (memcmp(dn1->data, dn2->data, dn2->size) != 0) {

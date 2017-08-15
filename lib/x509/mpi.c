@@ -392,7 +392,6 @@ _gnutls_x509_read_uint(ASN1_TYPE node, const char *value,
 	len = 0;
 	result = asn1_read_value(node, value, NULL, &len);
 	if (result != ASN1_MEM_ERROR) {
-		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 

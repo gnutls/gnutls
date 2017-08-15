@@ -62,7 +62,6 @@ _gnutls_get_extension(ASN1_TYPE asn, const char *root,
 		result = asn1_read_value(asn, name2, extnID, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
-			gnutls_assert();
 			break;
 		} else if (result != ASN1_SUCCESS) {
 			gnutls_assert();
