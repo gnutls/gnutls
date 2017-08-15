@@ -63,6 +63,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/openssl-keyid.p7b data/openssl-keyid.p7b.out data/openssl.p12 \
 	data/x509-v1-with-sid.pem data/x509-v1-with-iid.pem data/x509-v3-with-fractional-time.pem \
 	templates/template-long-dns.tmpl \
+	data/key-rsa-pss-raw.pem data/key-rsa-pss.pem \
 	data/long-dns.pem data/template-long-dns-crq.pem data/chain-with-critical-on-root.pem \
 	data/chain-with-critical-on-intermediate.pem data/chain-with-critical-on-endcert.pem \
 	templates/crit-extensions.tmpl data/crit-extensions.pem data/x509-with-zero-version.pem \

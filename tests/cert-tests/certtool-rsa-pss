@@ -112,6 +112,27 @@ if test "${rc}" != "0"; then
 fi
 done
 
+# Convert an RSA-PSS key to an RSA key
+#
+
+${VALGRIND} "${CERTTOOL}" --to-rsa --infile "${srcdir}/data/key-rsa-pss.pem" --outfile ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not convert an RSA-PSS certificate"
+	exit 1
+fi
+
+${DIFF} "${srcdir}/data/key-rsa-pss-raw.pem" ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "RSA-PSS decoding failed"
+	exit ${rc}
+fi
+
+echo "RSA-PSS to RSA conversion was successful"
+
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
