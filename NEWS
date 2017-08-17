@@ -53,7 +53,8 @@ See the end for copying conditions.
    DH parameters, though if they do these parameters will be used. Group
    selection can be done via priority strings. The introduced strings are
    GROUP-ALL, GROUP-FFDHE2048, GROUP-FFDHE3072, GROUP-FFDHE4096 and
-   GROUP-FFDHE8192, as well as the corresponding to curves groups.
+   GROUP-FFDHE8192, as well as the corresponding to curves groups. Note that
+   the 6144 group from RFC7919 is not supported.
 
 ** libgnutls: Introduced various sanity checks on certificate import. Refuse
    to import certificates which have fractional seconds in Time fields, X.509v1
