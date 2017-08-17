@@ -85,13 +85,13 @@ and polarssl.
 Debian/Ubuntu:
 ```
 apt-get install -y valgrind libasan1 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev
-apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker socat net-tools ppp
+apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker socat net-tools ppp lockfile-progs
 ```
 
 Fedora/RHEL:
 ```
 yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel
-yum install -y dieharder mbedtls-utils openssl abi-compliance-checker libcmocka-devel socat
+yum install -y dieharder mbedtls-utils openssl abi-compliance-checker libcmocka-devel socat lockfile-progs
 ```
 
 
