@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -117,15 +118,15 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 	int ret;
 	digest_hd_st td_sha;
 	uint8_t concat[MAX_SIG_SIZE];
-	const mac_entry_st *hash_algo;
+	const mac_entry_st *me;
 	gnutls_pk_algorithm_t pk_algo;
 
 	if (gnutls_privkey_get_pk_algorithm(pkey, NULL) == GNUTLS_PK_RSA)
-		hash_algo = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
+		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
 	else
-		hash_algo = hash_to_entry(
+		me = hash_to_entry(
 				gnutls_sign_get_hash_algorithm(sign_algo));
-	if (hash_algo == NULL)
+	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 
 	pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
@@ -136,7 +137,7 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 	    ("HSK[%p]: signing handshake data: using %s\n", session,
 	     gnutls_sign_algorithm_get_name(sign_algo));
 
-	ret = _gnutls_hash_init(&td_sha, hash_algo);
+	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -151,9 +152,10 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 	_gnutls_hash_deinit(&td_sha, concat);
 
 	dconcat.data = concat;
-	dconcat.size = _gnutls_hash_get_algo_len(hash_algo);
+	dconcat.size = _gnutls_hash_get_algo_len(me);
 
-	ret = gnutls_privkey_sign_raw_data(pkey, 0, &dconcat, signature);
+	ret = gnutls_privkey_sign_hash(pkey, me->id, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
+				       &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -641,7 +643,9 @@ _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
 
 	dconcat.size += 20;
 
-	ret = gnutls_privkey_sign_raw_data(pkey, 0, &dconcat, signature);
+	ret = gnutls_privkey_sign_hash(pkey, GNUTLS_DIG_SHA1,
+				       GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
+				       &dconcat, signature);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -723,7 +727,8 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 	dconcat.data = concat;
 	dconcat.size = _gnutls_hash_get_algo_len(me);
 
-	ret = gnutls_privkey_sign_raw_data(pkey, 0, &dconcat, signature);
+	ret = gnutls_privkey_sign_hash(pkey, me->id, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
+				       &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

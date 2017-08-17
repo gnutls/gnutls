@@ -304,14 +304,15 @@ static const struct hash_mappings_st *hash_to_map(gnutls_digest_algorithm_t hash
 }
 
 /*-
- * _gnutls_pkcs11_privkey_sign_hash:
+ * _gnutls_pkcs11_privkey_sign:
  * @key: Holds the key
  * @hash: holds the data to be signed (should be output of a hash)
  * @signature: will contain the signature allocated with gnutls_malloc()
  *
  * This function will sign the given data using a signature algorithm
  * supported by the private key. It is assumed that the given data
- * are the output of a hash function.
+ * are the output of a hash function. Input is the same as in
+ * privkey_sign_raw_data().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

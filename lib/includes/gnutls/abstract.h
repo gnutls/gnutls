@@ -75,14 +75,11 @@ typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
 					    const gnutls_datum_t *ciphertext,
 					    gnutls_datum_t * plaintext);
 
-#define GNUTLS_SIGN_CB_FLAG_RSA_DIGESTINFO (1<<1)
-
 /* to be called to sign pre-hashed data. The input will be
  * the output of the hash (such as SHA256) corresponding to
- * the signature algorithm. The flag GNUTLS_SIGN_CB_FLAG_RSA_DIGESTINFO
+ * the signature algorithm. The algorithm GNUTLS_SIGN_RSA_RAW
  * will be provided when RSA PKCS#1 DigestInfo structure is provided
  * as data (when this is called from a TLS 1.0 or 1.1 session).
- * In that case the signature algorithm will be set to %GNUTLS_SIGN_UNKNOWN
  */
 typedef int (*gnutls_privkey_sign_hash_func) (gnutls_privkey_t key,
 					      gnutls_sign_algorithm_t algo,

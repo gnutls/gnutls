@@ -408,3 +408,19 @@ const char *gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm)
 
 	return NULL;
 }
+
+gnutls_digest_algorithm_t _gnutls_hash_size_to_sha_hash(unsigned int size)
+{
+	if (size == 20)
+		return GNUTLS_DIG_SHA1;
+	else if (size == 28)
+		return GNUTLS_DIG_SHA224;
+	else if (size == 32)
+		return GNUTLS_DIG_SHA256;
+	else if (size == 48)
+		return GNUTLS_DIG_SHA384;
+	else if (size == 64)
+		return GNUTLS_DIG_SHA512;
+
+	return GNUTLS_DIG_UNKNOWN;
+}

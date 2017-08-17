@@ -557,7 +557,13 @@ _rsa_pss_sign_digest_tr(gnutls_digest_algorithm_t dig,
 	return ret;
 }
 
-/* in case of DSA puts into data, r,s
+/* This is the lower-level part of privkey_sign_raw_data().
+ *
+ * It accepts data in the appropriate hash form, i.e., DigestInfo
+ * for PK_RSA, hash for PK_ECDSA, PK_DSA, PK_RSA_PSS, and raw data
+ * for Ed25519.
+ *
+ * in case of EC/DSA, signed data are encoded into r,s values
  */
 static int
 _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,

@@ -336,6 +336,8 @@ const sign_algorithm_st *_gnutls_sign_to_tls_aid(gnutls_sign_algorithm_t
 unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits);
 gnutls_digest_algorithm_t _gnutls_pk_bits_to_sha_hash(unsigned int pk_bits);
 
+gnutls_digest_algorithm_t _gnutls_hash_size_to_sha_hash(unsigned int size);
+
 bool _gnutls_pk_is_not_prehashed(gnutls_pk_algorithm_t algorithm);
 
 /* ECC */

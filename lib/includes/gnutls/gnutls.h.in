@@ -729,6 +729,7 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
 /**
  * gnutls_sign_algorithm_t:
  * @GNUTLS_SIGN_UNKNOWN: Unknown signature algorithm.
+ * @GNUTLS_SIGN_RSA_RAW: Digital signature algorithm RSA with DigestInfo formatted data
  * @GNUTLS_SIGN_RSA_SHA1: Digital signature algorithm RSA with SHA-1
  * @GNUTLS_SIGN_RSA_SHA: Same as %GNUTLS_SIGN_RSA_SHA1.
  * @GNUTLS_SIGN_DSA_SHA1: Digital signature algorithm DSA with SHA-1
@@ -808,7 +809,8 @@ typedef enum {
 	GNUTLS_SIGN_RSA_PSS_SHA384 = 33,
 	GNUTLS_SIGN_RSA_PSS_SHA512 = 34,
 	GNUTLS_SIGN_EDDSA_ED25519 = 35,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_EDDSA_ED25519
+	GNUTLS_SIGN_RSA_RAW = 36,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_RAW
 } gnutls_sign_algorithm_t;
 
 /**

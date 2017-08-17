@@ -797,10 +797,9 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
  *
  * The @sign_hash_fn is to be called to sign pre-hashed data. The input
  * to the callback is the output of the hash (such as SHA256) corresponding
- * to the signature algorithm. The flag %GNUTLS_SIGN_CB_FLAG_RSA_DIGESTINFO
- * will be provided when RSA PKCS#1 DigestInfo structure is given as
- * data (e.g., when this is called from a TLS 1.0 or 1.1 session).
- * In that case the signature algorithm will be set to %GNUTLS_SIGN_UNKNOWN.
+ * to the signature algorithm. For RSA PKCS#1 signatures, the signature
+ * algorithm can be set to %GNUTLS_SIGN_RSA_RAW, and in that case the data
+ * should be handled as if they were an RSA PKCS#1 DigestInfo structure.
  *
  * The @sign_data_fn is to be called to sign data. The input data will be
  * he data to be signed (and hashed), with the provided signature
@@ -1182,7 +1181,7 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 	const gnutls_sign_entry_st *se;
 
 	se = _gnutls_sign_to_entry(algo);
-	if (se == NULL)
+	if (unlikely(se == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	ret = _gnutls_privkey_get_spki_params(signer, &params);
@@ -1212,7 +1211,7 @@ privkey_sign_and_hash_data(gnutls_privkey_t signer,
 	gnutls_datum_t digest;
 	const mac_entry_st *me;
 
-	if (se == NULL)
+	if (unlikely(se == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (_gnutls_pk_is_not_prehashed(se->pk)) {
@@ -1288,6 +1287,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 {
 	int ret;
 	gnutls_x509_spki_st params;
+	const gnutls_sign_entry_st *se;
 
 	ret = _gnutls_privkey_get_spki_params(signer, &params);
 	if (ret < 0) {
@@ -1302,7 +1302,25 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_prehashed(signer, _gnutls_pk_to_sign_entry(params.pk, hash_algo),
+	/* legacy callers of this API could use a hash algorithm of 0 (unknown)
+	 * to indicate raw hashing. As we now always want to know the signing
+	 * algorithm involved, we try discovering the hash algorithm. */
+	if (hash_algo == 0 && (params.pk == GNUTLS_PK_DSA || params.pk == GNUTLS_PK_ECDSA)) {
+		hash_algo = _gnutls_hash_size_to_sha_hash(hash_data->size);
+	}
+
+	if (params.pk == GNUTLS_PK_RSA && (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)) {
+		/* the corresponding signature algorithm is SIGN_RSA_RAW,
+		 * irrespective of hash algorithm. */
+		se = _gnutls_sign_to_entry(GNUTLS_SIGN_RSA_RAW);
+	} else {
+		se = _gnutls_pk_to_sign_entry(params.pk, hash_algo);
+	}
+
+	if (unlikely(se == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	return privkey_sign_prehashed(signer, se,
 				      hash_data, signature, &params, flags);
 }
 
@@ -1317,18 +1335,19 @@ privkey_sign_prehashed(gnutls_privkey_t signer,
 	int ret;
 	gnutls_datum_t digest;
 
-	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
+	if (unlikely(se == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (se->id == GNUTLS_SIGN_RSA_RAW) {
 		return privkey_sign_raw_data(signer,
 					     se,
 					     hash_data, signature,
 					     params);
+	}
 
 	if (_gnutls_pk_is_not_prehashed(signer->pk_algorithm)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
-
-	if (se == NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	digest.data = gnutls_malloc(hash_data->size);
 	if (digest.data == NULL) {
@@ -1371,7 +1390,8 @@ privkey_sign_prehashed(gnutls_privkey_t signer,
  * supported by the private key. Note that this is a low-level function
  * and does not apply any preprocessing or hash on the signed data. 
  * For example on an RSA key the input @data should be of the DigestInfo
- * PKCS #1 1.5 format. Use it only if you know what are you doing.
+ * PKCS #1 1.5 format, on RSA-PSS, DSA or ECDSA the input should be a hash output
+ * and on Ed25519 the raw data to be signed.
  *
  * Note this function is equivalent to using the %GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
  * flag with gnutls_privkey_sign_hash().
@@ -1388,12 +1408,8 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 		      gnutls_datum_t * signature,
 		      gnutls_x509_spki_st * params)
 {
-	gnutls_pk_algorithm_t pk;
-
-	if (se == NULL) /* it can be null when signing raw-rsa */
-		pk = params->pk;
-	else
-		pk = se->pk;
+	if (unlikely(se == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	switch (key->type) {
 #ifdef ENABLE_PKCS11
@@ -1403,7 +1419,7 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 						   params);
 #endif
 	case GNUTLS_PRIVKEY_X509:
-		return _gnutls_pk_sign(pk, signature, data,
+		return _gnutls_pk_sign(se->pk, signature, data,
 				       &key->key.x509->params, params);
 	case GNUTLS_PRIVKEY_EXT:
 		if (unlikely(key->key.ext.sign_data_func == NULL &&
@@ -1411,7 +1427,7 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 			key->key.ext.sign_func == NULL))
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-		if (_gnutls_pk_is_not_prehashed(pk)) {
+		if (_gnutls_pk_is_not_prehashed(se->pk)) {
 			if (!key->key.ext.sign_data_func)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -1422,16 +1438,17 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 		} else if (key->key.ext.sign_hash_func) {
 			unsigned int flags = 0;
 
-			if (pk == GNUTLS_PK_RSA)
-				flags |= GNUTLS_SIGN_CB_FLAG_RSA_DIGESTINFO;
+			if (se->pk == GNUTLS_PK_RSA) {
+				se = _gnutls_sign_to_entry(GNUTLS_SIGN_RSA_RAW);
+			}
 
 			/* se may not be set here if we are doing legacy RSA */
-			return key->key.ext.sign_hash_func(key, se?se->id:GNUTLS_SIGN_UNKNOWN,
+			return key->key.ext.sign_hash_func(key, se->id,
 							   key->key.ext.userdata,
 							   flags,
 							   data, signature);
 		} else {
-			if (!PK_IS_OK_FOR_EXT2(pk))
+			if (!PK_IS_OK_FOR_EXT2(se->pk))
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 			return key->key.ext.sign_func(key, key->key.ext.userdata,
