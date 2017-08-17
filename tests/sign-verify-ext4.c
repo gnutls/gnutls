@@ -110,10 +110,7 @@ int key_cb_sign_hash_func (gnutls_privkey_t key, gnutls_sign_algorithm_t sig,
 {
 	struct key_cb_data *p = userdata;
 
-	if (flags & GNUTLS_SIGN_CB_FLAG_RSA_DIGESTINFO) {
-		if (sig != GNUTLS_SIGN_RSA_RAW)
-			fail("unexpected signature algorithm with DigestInfo\n");
-
+	if (sig == GNUTLS_SIGN_RSA_RAW) {
 		if (debug)
 			fprintf(stderr, "signing digestinfo with: raw RSA\n");
 		return gnutls_privkey_sign_hash(p->rkey, 0, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA, data, signature);
