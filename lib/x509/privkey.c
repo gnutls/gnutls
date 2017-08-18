@@ -1343,7 +1343,10 @@ gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_copy_data(&out, output_data, output_data_size);
+	if (format == GNUTLS_X509_FMT_PEM)
+		ret = _gnutls_copy_string(&out, output_data, output_data_size);
+	else
+		ret = _gnutls_copy_data(&out, output_data, output_data_size);
 	gnutls_free(out.data);
 
 	return ret;
