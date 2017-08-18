@@ -998,7 +998,7 @@ const char *
 	gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
 
 const char *
-	gnutls_group_get_name(gnutls_group_t curve) __GNUTLS_CONST__;
+	gnutls_group_get_name(gnutls_group_t group) __GNUTLS_CONST__;
 
 int
 	gnutls_ecc_curve_get_size(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
@@ -1043,8 +1043,8 @@ const char *
 
 const char *
 	gnutls_sign_get_name(gnutls_sign_algorithm_t algorithm) __GNUTLS_CONST__;
-const char *
-	gnutls_sign_get_oid(gnutls_sign_algorithm_t algorithm) __GNUTLS_CONST__;
+
+const char *gnutls_sign_get_oid(gnutls_sign_algorithm_t sign) __GNUTLS_CONST__;
 
 size_t
 	gnutls_cipher_get_key_size(gnutls_cipher_algorithm_t algorithm) __GNUTLS_CONST__;
