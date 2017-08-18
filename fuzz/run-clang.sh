@@ -41,7 +41,7 @@ workers=$(($(nproc) - 0))
 jobs=$workers
 
 clang-5.0 \
- $CFLAGS -I/usr/local/include -I../lib/include -I.. \
+ $CFLAGS -I/usr/local/include -I../lib/includes -I.. \
  ${fuzzer}.c -o ${fuzzer} \
  -Wl,-Bstatic ../lib/.libs/libgnutls.a -lFuzzer \
  -Wl,-Bdynamic -lnettle -lhogweed -lgmp -lp11-kit -ltasn1 -lidn2 -lunistring -lclang-5.0 -lstdc++
