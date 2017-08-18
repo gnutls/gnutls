@@ -198,37 +198,22 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
 		}
 
 		if (print_cert) {
-			size_t size = 0;
-			char *p = NULL;
+			gnutls_datum_t pem;
 
 			ret =
-			    gnutls_x509_crt_export(crt,
-						   GNUTLS_X509_FMT_PEM, p,
-						   &size);
-			if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-				p = malloc(size + 1);
-				if (!p) {
-					fprintf(stderr, "gnutls_malloc\n");
-					exit(1);
-				}
-
-				ret =
-				    gnutls_x509_crt_export(crt,
-							   GNUTLS_X509_FMT_PEM,
-							   p, &size);
-			}
+			    gnutls_x509_crt_export2(crt,
+						   GNUTLS_X509_FMT_PEM, &pem);
 			if (ret < 0) {
 				fprintf(stderr, "Encoding error: %s\n",
 					gnutls_strerror(ret));
 				return;
 			}
 
-			p[size] = 0;
 			fputs("\n", out);
-			fputs(p, out);
+			fputs((char*)pem.data, out);
 			fputs("\n", out);
 
-			gnutls_free(p);
+			gnutls_free(pem.data);
 		}
 
 		gnutls_x509_crt_deinit(crt);
