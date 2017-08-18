@@ -25,9 +25,17 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	gnutls_datum_t raw = {.data = (unsigned char *)data, .size = size};
 	gnutls_datum_t out;
+	unsigned char result[50];
+	size_t result_size = sizeof(result);
 	int ret;
 
 	ret = gnutls_pem_base64_decode2(NULL, &raw, &out);
+	if (ret >= 0)
+		gnutls_free(out.data);
+
+	gnutls_pem_base64_decode(NULL, &raw, result, &result_size);
+
+	ret = gnutls_base64_decode2(&raw, &out);
 	if (ret >= 0)
 		gnutls_free(out.data);
 
