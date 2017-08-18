@@ -77,7 +77,7 @@ abi-check:
 	@echo "<headers>$(srcdir)/lib/includes/gnutls" >>$(TMPFILE)
 	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(TMPFILE)
 	@echo "<libs>$(builddir)/lib/.libs</libs>" >>$(TMPFILE)
-	for i in 3.4.0 3.4.17 3.5.8;do \
+	for i in 3.4.0 3.4.17 3.5.8 3.6.0;do \
 	test ! -f "$(srcdir)/devel/ABI-$$i-$$(uname -m).dump" || \
 		abi-compliance-checker -abi -lib gnutls -old "$(srcdir)/devel/ABI-$$i-$$(uname -m).dump" -new $(TMPFILE) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols; \
 	done
