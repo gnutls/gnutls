@@ -676,10 +676,14 @@ test_code_t test_camellia_cbc(gnutls_session_t session)
 {
 	int ret;
 
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
+
 	sprintf(prio_str,
 		INIT_STR "+CAMELLIA-128-CBC:" ALL_COMP ":" ALL_CERTTYPES
 		":%s:" ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
+
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -690,6 +694,9 @@ test_code_t test_camellia_cbc(gnutls_session_t session)
 test_code_t test_camellia_gcm(gnutls_session_t session)
 {
 	int ret;
+
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
 
 	sprintf(prio_str,
 		INIT_STR "+CAMELLIA-128-GCM:" ALL_COMP ":" ALL_CERTTYPES
@@ -745,6 +752,9 @@ test_code_t test_unknown_ciphersuites(gnutls_session_t session)
 test_code_t test_md5(gnutls_session_t session)
 {
 	int ret;
+
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
 
 	sprintf(prio_str,
 		INIT_STR "+AES-128-CBC:" ALL_CIPHERS ":" ALL_COMP ":"
@@ -823,6 +833,9 @@ test_code_t test_arcfour(gnutls_session_t session)
 {
 	int ret;
 
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
+
 	sprintf(prio_str,
 		INIT_STR "+ARCFOUR-128:" ALL_COMP ":" ALL_CERTTYPES ":%s:"
 		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
@@ -836,6 +849,9 @@ test_code_t test_arcfour(gnutls_session_t session)
 test_code_t test_chacha20(gnutls_session_t session)
 {
 	int ret;
+
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
 
 	sprintf(prio_str,
 		INIT_STR "+CHACHA20-POLY1305:" ALL_COMP ":" ALL_CERTTYPES ":%s:"
