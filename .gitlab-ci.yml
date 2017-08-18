@@ -415,6 +415,20 @@ ubsan-Werror/Fedora/x86_64:
       - tests/*/*.log
       - tests/suite/*/*.log
 
+apps/Fedora/x86_64:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - make autoreconf
+  - ./configure --disable-non-suiteb-curves --disable-guile --disable-doc --prefix=/usr --libdir=/usr/lib64 --disable-cxx --with-default-trust-store-pkcs11="pkcs11:"
+  - make -j$(nproc) &&
+    make install && ldconfig && devel/fedpkg-wrapper.sh /apps/libvirt &&
+    devel/fedpkg-wrapper.sh /apps/openconnect
+  tags:
+  - shared
+  except:
+  - tags
+
 Debian/x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
