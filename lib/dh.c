@@ -79,6 +79,7 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 	group = get_group(session);
 
 	params.deinit = 0;
+	session->internals.used_ffdhe = 0;
 
 	/* if we negotiated RFC7919 FFDHE */
 	if (group && group->pk == GNUTLS_PK_DH) {
@@ -100,6 +101,7 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 					goto cleanup;
 				}
 
+				session->internals.used_ffdhe = 1;
 				q_bits = *session->internals.priorities->groups.entry[i]->q_bits;
 				goto finished;
 			}

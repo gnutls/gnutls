@@ -1266,6 +1266,8 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_HB_PEER_SEND;
 	if (session->internals.false_start_used)
 		flags |= GNUTLS_SFLAGS_FALSE_START;
+	if (session->internals.used_ffdhe)
+		flags |= GNUTLS_SFLAGS_RFC7919;
 
 	return flags;
 }

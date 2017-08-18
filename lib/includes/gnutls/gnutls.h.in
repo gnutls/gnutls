@@ -1294,6 +1294,7 @@ unsigned gnutls_session_etm_status(gnutls_session_t session);
  * @GNUTLS_SFLAGS_SAFE_RENEGOTIATION: Safe renegotiation (RFC5746) was used
  * @GNUTLS_SFLAGS_EXT_MASTER_SECRET: The extended master secret (RFC7627) extension was used
  * @GNUTLS_SFLAGS_ETM: The encrypt then MAC (RFC7366) extension was used
+ * @GNUTLS_SFLAGS_RFC7919: The RFC7919 Diffie-Hellman parameters were negotiated
  * @GNUTLS_SFLAGS_HB_LOCAL_SEND: The heartbeat negotiation allows the local side to send heartbeat messages
  * @GNUTLS_SFLAGS_HB_PEER_SEND: The heartbeat negotiation allows the peer to send heartbeat messages
  * @GNUTLS_SFLAGS_FALSE_START: The appdata set with gnutls_handshake_set_appdata() were sent during handshake (false start)
@@ -1306,7 +1307,8 @@ typedef enum {
 	GNUTLS_SFLAGS_ETM = 1<<2,
 	GNUTLS_SFLAGS_HB_LOCAL_SEND = 1<<3,
 	GNUTLS_SFLAGS_HB_PEER_SEND = 1<<4,
-	GNUTLS_SFLAGS_FALSE_START = 1<<5
+	GNUTLS_SFLAGS_FALSE_START = 1<<5,
+	GNUTLS_SFLAGS_RFC7919 = 1<<6
 } gnutls_session_flags_t;
 
 unsigned gnutls_session_get_flags(gnutls_session_t session);

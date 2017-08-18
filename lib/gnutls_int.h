@@ -1115,6 +1115,7 @@ typedef struct {
 
 	/* whether the peer has advertized at least an FFDHE group */
 	bool have_ffdhe;
+	bool used_ffdhe; /* whether ffdhe was actually negotiated and used */
 
 	/* candidate groups to be selected for security params groups */
 	const gnutls_group_entry_st *cand_ec_group;
