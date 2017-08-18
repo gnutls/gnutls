@@ -203,20 +203,6 @@ _gnutls_parse_extensions(gnutls_session_t session,
 	const extension_entry_st *ext;
 	uint16_t size;
 
-#ifdef DEBUG
-	int i;
-
-	if (session->security_parameters.entity == GNUTLS_CLIENT)
-		for (i = 0; i < session->internals.extensions_sent_size;
-		     i++) {
-			_gnutls_handshake_log
-			    ("EXT[%d]: expecting extension '%s'\n",
-			     session,
-			     gnutls_ext_get_name(session->internals.
-							extensions_sent
-							[i]));
-		}
-#endif
 	if (data_size == 0)
 		return 0;
 

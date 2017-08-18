@@ -54,12 +54,6 @@
 #include <random.h>
 #include <dtls.h>
 
-#ifdef HANDSHAKE_DEBUG
-#define ERR(x, y) _gnutls_handshake_log("HSK[%p]: %s (%d)\n", session, x,y)
-#else
-#define ERR(x, y)
-#endif
-
 #define TRUE 1
 #define FALSE 0
 
@@ -759,7 +753,6 @@ static int _gnutls_recv_finished(gnutls_session_t session)
 	    _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_FINISHED,
 				   0, &buf);
 	if (ret < 0) {
-		ERR("recv finished int", ret);
 		gnutls_assert();
 		return ret;
 	}
@@ -2295,7 +2288,6 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 			} \
 		} \
 		gnutls_assert(); \
-		ERR( str, ret); \
 		/* do not allow non-fatal errors at this point */ \
 		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
 		session_invalidate(session); \
@@ -2375,21 +2367,6 @@ static int handshake_client(gnutls_session_t session)
 {
 	int ret = 0;
 
-#ifdef HANDSHAKE_DEBUG
-	char buf[64];
-
-	if (session->internals.resumed_security_parameters.
-	    session_id_size > 0)
-		_gnutls_handshake_log("HSK[%p]: Ask to resume: %s\n",
-				      session,
-				      _gnutls_bin2hex(session->internals.
-						      resumed_security_parameters.
-						      session_id,
-						      session->internals.
-						      resumed_security_parameters.
-						      session_id_size, buf,
-						      sizeof(buf), NULL));
-#endif
 	switch (STATE) {
 	case STATE0:
 	case STATE1:
@@ -2655,7 +2632,6 @@ static int send_handshake_final(gnutls_session_t session, int init)
 		FINAL_STATE = STATE0;
 
 		if (ret < 0) {
-			ERR("send ChangeCipherSpec", ret);
 			gnutls_assert();
 			return ret;
 		}
@@ -2681,7 +2657,6 @@ static int send_handshake_final(gnutls_session_t session, int init)
 		ret = _gnutls_send_finished(session, FAGAIN(STATE2));
 		FINAL_STATE = STATE2;
 		if (ret < 0) {
-			ERR("send Finished", ret);
 			gnutls_assert();
 			return ret;
 		}
@@ -2739,7 +2714,6 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 		    _gnutls_recv_int(session, GNUTLS_CHANGE_CIPHER_SPEC,
 				     ccs, ccs_len, NULL, tleft);
 		if (ret <= 0) {
-			ERR("recv ChangeCipherSpec", ret);
 			gnutls_assert();
 			return (ret<0)?ret:GNUTLS_E_UNEXPECTED_PACKET;
 		}
@@ -2775,7 +2749,6 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 
 		ret = _gnutls_recv_finished(session);
 		if (ret < 0) {
-			ERR("recv finished", ret);
 			gnutls_assert();
 			return ret;
 		}
