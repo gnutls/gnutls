@@ -137,7 +137,7 @@ launch_server() {
 	shift
 
 	wait_for_free_port ${PORT}
-	${SERV} ${DEBUG} -p "${PORT}" $* >/dev/null 2>&1 &
+	${SERV} ${DEBUG} -p "${PORT}" $* >/dev/null &
 }
 
 launch_pkcs11_server() {
@@ -156,7 +156,7 @@ launch_bare_server() {
 	shift
 
 	wait_for_free_port ${PORT}
-	${SERV} $* >/dev/null 2>&1 &
+	${SERV} $* >/dev/null &
 }
 
 wait_server() {
