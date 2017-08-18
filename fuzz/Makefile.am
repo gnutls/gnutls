@@ -33,7 +33,7 @@ check_PROGRAMS = $(FUZZERS)
 
 gnutls_base64_decoder_fuzzer_SOURCES = gnutls_base64_decoder_fuzzer.c main.c fuzzer.h
 gnutls_base64_encoder_fuzzer_SOURCES = gnutls_base64_encoder_fuzzer.c main.c fuzzer.h
-gnutls_client_fuzzer_SOURCES = gnutls_client_fuzzer.c main.c fuzzer.h
+gnutls_client_fuzzer_SOURCES = gnutls_client_fuzzer.c main.c fuzzer.h mem.h certs.h
 gnutls_dn_parser_fuzzer_SOURCES = gnutls_dn_parser_fuzzer.c main.c fuzzer.h
 gnutls_idna_parser_fuzzer_SOURCES = gnutls_idna_parser_fuzzer.c main.c fuzzer.h
 gnutls_ocsp_req_parser_fuzzer_SOURCES = gnutls_ocsp_req_parser_fuzzer.c main.c fuzzer.h
@@ -42,12 +42,12 @@ gnutls_pkcs12_key_parser_fuzzer_SOURCES = gnutls_pkcs12_key_parser_fuzzer.c main
 gnutls_pkcs7_parser_fuzzer_SOURCES = gnutls_pkcs7_parser_fuzzer.c main.c fuzzer.h
 gnutls_pkcs8_key_parser_fuzzer_SOURCES = gnutls_pkcs8_key_parser_fuzzer.c main.c fuzzer.h
 gnutls_private_key_parser_fuzzer_SOURCES = gnutls_private_key_parser_fuzzer.c main.c fuzzer.h
-gnutls_psk_client_fuzzer_SOURCES = gnutls_psk_client_fuzzer.c main.c fuzzer.h
-gnutls_psk_server_fuzzer_SOURCES = gnutls_psk_server_fuzzer.c main.c fuzzer.h
+gnutls_psk_client_fuzzer_SOURCES = gnutls_psk_client_fuzzer.c main.c fuzzer.h mem.h psk.h
+gnutls_psk_server_fuzzer_SOURCES = gnutls_psk_server_fuzzer.c main.c fuzzer.h mem.h psk.h
 gnutls_reverse_idna_parser_fuzzer_SOURCES = gnutls_reverse_idna_parser_fuzzer.c main.c fuzzer.h
-gnutls_server_fuzzer_SOURCES = gnutls_server_fuzzer.c main.c fuzzer.h
-gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c main.c fuzzer.h
-gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c main.c fuzzer.h
+gnutls_server_fuzzer_SOURCES = gnutls_server_fuzzer.c main.c fuzzer.h mem.h certs.h
+gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c main.c fuzzer.h mem.h srp.h
+gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c main.c fuzzer.h mem.h srp.h
 gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c main.c fuzzer.h
 gnutls_x509_parser_fuzzer_SOURCES = gnutls_x509_parser_fuzzer.c main.c fuzzer.h
 
