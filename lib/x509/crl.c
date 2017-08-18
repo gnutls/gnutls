@@ -204,7 +204,7 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
  *
  **/
 int
-gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl_t crl, char *buf,
+gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl_t crl, char *buf,
 			      size_t * sizeof_buf)
 {
 	if (crl == NULL) {
