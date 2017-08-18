@@ -150,6 +150,18 @@ static void try(test_case_st *test)
 		fail("%s: group doesn't match the expected\n", test->name);
 	}
 
+	if (test->group) {
+		if (test->group == GNUTLS_GROUP_FFDHE2048 || test->group == GNUTLS_GROUP_FFDHE3072 ||
+		    test->group == GNUTLS_GROUP_FFDHE4096 || test->group == GNUTLS_GROUP_FFDHE8192) {
+			if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_RFC7919)) {
+				fail("%s: gnutls_session_get_flags(client) reports that no RFC7919 negotiation was performed!\n", test->name);
+			}
+
+			if (!(gnutls_session_get_flags(server) & GNUTLS_SFLAGS_RFC7919)) {
+				fail("%s: gnutls_session_get_flags(server) reports that no RFC7919 negotiation was performed!\n", test->name);
+			}
+		}
+	}
 	gnutls_deinit(server);
 	gnutls_deinit(client);
 	gnutls_anon_free_client_credentials(c_anon_cred);
