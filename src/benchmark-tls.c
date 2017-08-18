@@ -495,7 +495,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		gnutls_deinit(server);
 
 		diffs[diffs_size++] = timespec_sub_ms(&tr_stop, &tr_start);
-		if (diffs_size > sizeof(diffs))
+		if (diffs_size > sizeof(diffs)/sizeof(diffs[0]))
 			abort();
 
 		st.size += 1;
