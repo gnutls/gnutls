@@ -202,6 +202,28 @@ test_code_t test_dhe(gnutls_session_t session)
 	return TEST_IGNORE;
 }
 
+test_code_t test_rfc7919(gnutls_session_t session)
+{
+#ifdef ENABLE_DHE
+	int ret;
+
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+		":+DHE-RSA:+DHE-DSS:+GROUP-ALL:%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+
+	if (ret != TEST_FAILED && (gnutls_session_get_flags(session) & GNUTLS_SFLAGS_RFC7919))
+		return TEST_SUCCEED;
+	else
+		return TEST_FAILED;
+#endif
+	return TEST_IGNORE;
+}
+
 test_code_t test_ecdhe(gnutls_session_t session)
 {
 	int ret;

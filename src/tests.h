@@ -30,6 +30,7 @@ test_code_t test_heartbeat_extension(gnutls_session_t state);
 test_code_t test_small_records(gnutls_session_t state);
 test_code_t test_rfc7507(gnutls_session_t state);
 test_code_t test_dhe(gnutls_session_t state);
+test_code_t test_rfc7919(gnutls_session_t state);
 test_code_t test_dhe_group(gnutls_session_t state);
 test_code_t test_ssl3(gnutls_session_t state);
 test_code_t test_aes(gnutls_session_t state);

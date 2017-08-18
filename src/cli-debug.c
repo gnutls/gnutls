@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -141,6 +142,8 @@ static const TLS_TEST tls_tests[] = {
 	 "N/A"},
 #endif
 	{"for ephemeral Diffie-Hellman support", test_dhe, "yes", "no",
+	 "dunno"},
+	{"for RFC7919 Diffie-Hellman support", test_rfc7919, "yes", "no",
 	 "dunno"},
 	{"ephemeral Diffie-Hellman group info", test_dhe_group, NULL, "N/A",
 	 "N/A"},
