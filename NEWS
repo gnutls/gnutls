@@ -37,6 +37,7 @@ See the end for copying conditions.
        multiple keys are supplied, RSA-PSS keys are preferred over RSA for RSA-PSS
        TLS signatures, to contain risks of cross-protocol attacks between the algorithms.
      * RSA-PSS key conversion to RSA PKCS#1 form (certtool --to-rsa)
+   Note that RSA-PSS signatures with SHA1 are (intentionally) not supported.
 
 ** libgnutls: Added support for Ed25519 signing in certificates and TLS key
    exchange following draft-ietf-tls-rfc4492bis-17.  The feature includes:
