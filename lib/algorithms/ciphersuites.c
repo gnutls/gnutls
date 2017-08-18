@@ -1158,7 +1158,7 @@ const gnutls_cipher_suite_entry_st *ciphersuite_to_entry(const uint8_t suite[2])
 gnutls_kx_algorithm_t
 _gnutls_cipher_suite_get_kx_algo(const uint8_t suite[2])
 {
-	int ret = 0;
+	gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
 	CIPHER_SUITE_ALG_LOOP(ret = p->kx_algorithm, suite);
 	return ret;
@@ -1403,7 +1403,9 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	unsigned int i, j;
 	int ret;
 	const version_entry_st *version = get_version(session);
-	unsigned int is_dtls = IS_DTLS(session), kx, cred_type;
+	unsigned int is_dtls = IS_DTLS(session);
+	gnutls_kx_algorithm_t kx;
+	gnutls_credentials_type_t cred_type;
 	unsigned int no_cert_found = 0;
 	const gnutls_group_entry_st *sgroup = NULL;
 
@@ -1527,7 +1529,9 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 
 	unsigned int j;
 	int ret;
-	unsigned int is_dtls = IS_DTLS(session), kx, cred_type;
+	unsigned int is_dtls = IS_DTLS(session);
+	gnutls_kx_algorithm_t kx;
+	gnutls_credentials_type_t cred_type;
 	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE*2 + RESERVED_CIPHERSUITES];
 	unsigned cipher_suites_size = 0;
 	size_t init_length = cdata->length;

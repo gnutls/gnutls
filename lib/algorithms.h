@@ -195,7 +195,7 @@ const cipher_entry_st *cipher_name_to_entry(const char *name);
 inline static cipher_type_t _gnutls_cipher_type(const cipher_entry_st * e)
 {
 	if (unlikely(e == NULL))
-		return 0;
+		return CIPHER_AEAD; /* doesn't matter */
 	return e->type;
 }
 

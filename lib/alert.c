@@ -155,7 +155,7 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 	data[0] = (uint8_t) level;
 	data[1] = (uint8_t) desc;
 
-	name = gnutls_alert_get_name((int) data[1]);
+	name = gnutls_alert_get_name((gnutls_alert_description_t) data[1]);
 	if (name == NULL)
 		name = "(unknown)";
 	_gnutls_record_log("REC: Sending Alert[%d|%d] - %s\n", data[0],
@@ -345,7 +345,7 @@ int gnutls_error_to_alert(int err, int *level)
  */
 int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 {
-	int alert;
+	gnutls_alert_description_t alert;
 	int level;
 
 	alert = gnutls_error_to_alert(err, &level);
@@ -353,7 +353,7 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 		return alert;
 	}
 
-	return gnutls_alert_send(session, level, alert);
+	return gnutls_alert_send(session, (gnutls_alert_level_t)level, alert);
 }
 
 /**
@@ -371,5 +371,5 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
  **/
 gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session)
 {
-	return session->internals.last_alert;
+	return (gnutls_alert_description_t)session->internals.last_alert;
 }
