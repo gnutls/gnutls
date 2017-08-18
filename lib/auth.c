@@ -169,7 +169,7 @@ int
 gnutls_credentials_get(gnutls_session_t session,
 		       gnutls_credentials_type_t type, void **cred)
 {
-const void *_cred;
+	const void *_cred;
 
 	_cred = _gnutls_get_cred(session, type);
 	if (_cred == NULL)
@@ -204,6 +204,11 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 	int server =
 	    session->security_parameters.entity == GNUTLS_SERVER ? 0 : 1;
 
+	if (!session->security_parameters.cs) {
+		gnutls_assert();
+		return 0;
+	}
+
 	return
 	    _gnutls_map_kx_get_cred(session->security_parameters.
 				     cs->kx_algorithm, server);
@@ -223,6 +228,11 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 gnutls_credentials_type_t
 gnutls_auth_server_get_type(gnutls_session_t session)
 {
+	if (!session->security_parameters.cs) {
+		gnutls_assert();
+		return 0;
+	}
+
 	return
 	    _gnutls_map_kx_get_cred(session->security_parameters.
 				     cs->kx_algorithm, 1);
@@ -242,6 +252,11 @@ gnutls_auth_server_get_type(gnutls_session_t session)
 gnutls_credentials_type_t
 gnutls_auth_client_get_type(gnutls_session_t session)
 {
+	if (!session->security_parameters.cs) {
+		gnutls_assert();
+		return 0;
+	}
+
 	return
 	    _gnutls_map_kx_get_cred(session->security_parameters.
 				     cs->kx_algorithm, 0);
