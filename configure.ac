@@ -156,6 +156,12 @@ if test "$use_accel" != "no"; then
 case $host_cpu in
   armv8 | aarch64)
       hw_accel="aarch64"
+      case $host_os in
+        *_ilp32)
+	  dnl ILP32 not supported in assembler yet
+	  hw_accel="none"
+        ;;
+      esac
   ;;
   i?86 | x86_64 | amd64)
       AC_CHECK_HEADERS(cpuid.h)
