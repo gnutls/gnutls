@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.5.15 (unreleased)
 
+** libgnutls: Disable hardware acceleration on aarch64/ilp32 mode. There is
+   no assembler code included for this CPU mode.
+
 ** certtool: Keys with provable RSA and DSA parameters are now only exported
    in PKCS#8 form, following draft-mavrogiannopoulos-pkcs8-validated-parameters-00.txt.
    This removes the need for a non-standard key format.
