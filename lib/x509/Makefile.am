@@ -86,4 +86,6 @@ libgnutls_x509_la_SOURCES += ocsp.c ocsp_output.c
 endif
 
 supported_exts.h: $(srcdir)/supported_exts.gperf
-	-gperf --global-table -t $^ > $@-tmp && sed -i 's/^const struct supported_exts_st \*/static const struct supported_exts_st \*/' $@-tmp && mv $@-tmp $@
+	-gperf --global-table -t $^ > $@-tmp \
+	&& sed 's/^const struct supported_exts_st \*/static const struct supported_exts_st \*/' <$@-tmp >$@ \
+	&& rm -f $@-tmp
