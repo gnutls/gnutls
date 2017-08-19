@@ -53,9 +53,7 @@ libcrypto_la_SOURCES += sysrng-linux.c
 endif
 endif
 
-if FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 libcrypto_la_SOURCES += rnd-fuzzer.c
-endif
 
 if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \

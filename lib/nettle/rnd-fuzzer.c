@@ -33,9 +33,7 @@
 #include <stdlib.h>
 #include <rnd-common.h>
 
-#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-# error 1
-#endif
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 
 struct r48_rand_data {
 	unsigned short int __x[3];	/* Current state.  */
@@ -146,3 +144,5 @@ gnutls_crypto_rnd_st _gnutls_fuzz_rnd_ops = {
 	.rnd_refresh = _rngfuzz_refresh,
 	.self_test = NULL,
 };
+
+#endif /* FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION */
