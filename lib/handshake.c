@@ -172,10 +172,9 @@ static int resume_copy_required_values(gnutls_session_t session)
  */
 static int create_tls_random(uint8_t * dst)
 {
-	uint32_t tim;
 	int ret;
 
-	/* Use weak random numbers for the most of the
+	/* Use nonce rng level for the most of the
 	 * buffer except for the first 4 that are the
 	 * system's time.
 	 */
@@ -184,6 +183,8 @@ static int create_tls_random(uint8_t * dst)
 	/* When fuzzying avoid timing dependencies */
 	memset(dst, 1, 4);
 #else
+	uint32_t tim;
+
 	tim = gnutls_time(NULL);
 	/* generate server random value */
 	_gnutls_write_uint32(tim, dst);
