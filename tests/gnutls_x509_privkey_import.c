@@ -49,7 +49,7 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, gnutls_sign_algorithm_t 
 {
 	int ret;
 	gnutls_privkey_t privkey;
-	gnutls_pubkey_t pubkey;
+	gnutls_pubkey_t pubkey = NULL;
 	gnutls_datum_t signature;
 
 	/* sign arbitrary data */
@@ -82,7 +82,8 @@ static int sign_verify_data(gnutls_x509_privkey_t pkey, gnutls_sign_algorithm_t 
 
 	ret = 0;
  cleanup:
-	gnutls_pubkey_deinit(pubkey);
+	if (pubkey)
+		gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(privkey);
 	gnutls_free(signature.data);
 
