@@ -224,6 +224,8 @@ int errno_to_gerr(int err, unsigned dtls)
 			return GNUTLS_E_LARGE_PACKET;
 		else
 			return GNUTLS_E_PUSH_ERROR;
+	case ECONNRESET:
+		return GNUTLS_E_PREMATURE_TERMINATION;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_PUSH_ERROR;
