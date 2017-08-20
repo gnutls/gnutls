@@ -282,6 +282,7 @@ static void server(int fd, const char *prio)
 	mtu = gnutls_dtls_get_mtu(session);
 
 	do {
+		usleep(10000); /* some systems like FreeBSD have their buffers full during this send */
 		do {
 			ret =
 			    gnutls_record_send(session, buffer,
@@ -319,7 +320,7 @@ static void server(int fd, const char *prio)
 static void start(const char *name, const char *prio)
 {
 	int fd[2];
-	int ret, status;
+	int ret, status = 0;
 
 	ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
 	if (ret < 0) {
