@@ -27,5 +27,5 @@ script:
   - make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
 
 after_failure:
-  - for i in tests/*.log;do echo "" && echo $i && cat $i;done
+  - for i in tests/*.log fuzz/*.log;do echo "" && echo $i && cat $i;done
 
