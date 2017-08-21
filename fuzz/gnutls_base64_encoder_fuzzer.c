@@ -33,7 +33,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	if (ret >= 0)
 		gnutls_free(out.data);
 
-	gnutls_pem_base64_encode(NULL, &raw, result, &result_size);
+	gnutls_pem_base64_encode("x", &raw, result, &result_size);
 
 	ret = gnutls_base64_encode2(&raw, &out);
 	if (ret >= 0)
