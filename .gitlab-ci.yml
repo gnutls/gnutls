@@ -298,7 +298,7 @@ MinGW64:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw64-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc &&
+    mingw64-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   tags:
   - shared
@@ -321,7 +321,7 @@ MinGW32:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    mingw32-configure --with-included-libtasn1 --disable-guile --with-included-unistring --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc &&
+    mingw32-configure --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   tags:
   - shared
