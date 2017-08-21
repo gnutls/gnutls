@@ -1,7 +1,12 @@
 AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLAGS) -Wno-unused-parameter -Wno-pedantic
 AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes -I$(srcdir) \
  -DSRCDIR=\"$(abs_srcdir)\" -DTEST_RUN
+
+if !MACOSX
+# This flag prevents compilation on travis MACOSX build
 AM_LDFLAGS = -static
+endif
+
 LDADD = ../gl/libgnu.la ../lib/libgnutls.la \
  $(LIBOBJS) $(GETADDRINFO_LIB) $(HOSTENT_LIB) $(INET_NTOP_LIB)\
  $(LIBSOCKET) $(LIB_CLOCK_GETTIME) $(LIB_NANOSLEEP) $(LIB_POLL) $(LIB_PTHREAD)\
