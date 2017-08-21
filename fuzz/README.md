@@ -15,7 +15,7 @@ regression testing with top dir 'make check'.
 Use the following commands on top dir:
 ```
 export CC=clang-5.0
-export CFLAGS="-O0 -g -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined,integer,nullability -fsanitize=address -fsanitize-address-use-after-scope -fsanitize-coverage=trace-pc-guard,trace-cmp"
+export CFLAGS="-O1 -g -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined,integer,nullability -fsanitize=address -fsanitize-address-use-after-scope -fsanitize-coverage=trace-pc-guard,trace-cmp"
 ./configure --enable-fuzzer-target --enable-static --disable-doc --disable-gcc-warnings --disable-hardware-acceleration
 make clean
 make
