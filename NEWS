@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.0 (unreleased)
+* Version 3.6.0 (released 2017-08-21)
 
 ** libgnutls: tlsfuzzer is part of the CI testsuite. This is a TLS testing and
    fuzzying toolkit, allowing for corner case testing, and ensuring that the
