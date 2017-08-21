@@ -307,8 +307,7 @@ name_constraints_merge_CPPFLAGS = $(AM_CPPFLAGS) \
 	$(NETTLE_CFLAGS)
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh \
-	p11-kit-trust.sh
+dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
 if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
@@ -316,6 +315,11 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh
+
+
+if ENABLE_PKCS11
+dist_check_SCRIPTS += p11-kit-trust.sh
+endif
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
