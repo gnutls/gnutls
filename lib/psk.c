@@ -371,6 +371,11 @@ const char *gnutls_psk_client_get_hint(gnutls_session_t session)
  * This function will set the Diffie-Hellman parameters for an
  * anonymous server to use. These parameters will be used in
  * Diffie-Hellman exchange with PSK cipher suites.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
@@ -396,6 +401,10 @@ gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
  * Ephemeral Diffie-Hellman cipher suites and will be selected from
  * the FFDHE set of RFC7919 according to the security level provided.
  *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -418,6 +427,11 @@ gnutls_psk_set_server_known_dh_params(gnutls_psk_server_credentials_t res,
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman parameters for PSK authentication.  The callback
  * should return %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_psk_set_server_params_function(gnutls_psk_server_credentials_t res,
@@ -434,6 +448,11 @@ gnutls_psk_set_server_params_function(gnutls_psk_server_credentials_t res,
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman or RSA parameters for PSK authentication.  The
  * callback should return %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_psk_set_params_function(gnutls_psk_server_credentials_t res,

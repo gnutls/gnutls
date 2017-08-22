@@ -859,6 +859,10 @@ gnutls_certificate_verification_status_print(unsigned int status,
  * to the parameters are stored in the certificate handle, so you
  * must not deallocate the parameters before the certificate is deallocated.
  *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
@@ -884,6 +888,10 @@ gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
  * certificate server to use. These parameters will be used in
  * Ephemeral Diffie-Hellman cipher suites and will be selected from
  * the FFDHE set of RFC7919 according to the security level provided.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

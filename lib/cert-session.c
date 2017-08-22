@@ -130,6 +130,11 @@ int gnutls_certificate_client_get_request_status(gnutls_session_t session)
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman or RSA parameters for certificate
  * authentication.  The callback should return %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Deprecated: This function is unnecessary and discouraged on GnuTLS 3.6.0
+ * or later. Since 3.6.0, DH parameters are negotiated
+ * following RFC7919.
+ *
  **/
 void
 gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
