@@ -85,6 +85,11 @@ int main(int argc, char **argv)
 	target = target ? target + 1 : argv[0];
 
 	char corporadir[sizeof(SRCDIR) + 1 + strlen(target) + 8];
+
+	if (strncmp(target, "lt-", 3) == 0) {
+		target += 3;
+	}
+
 	snprintf(corporadir, sizeof(corporadir), SRCDIR "/%s.in", target);
 
 	test_all_from(corporadir);
