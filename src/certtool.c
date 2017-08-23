@@ -551,9 +551,6 @@ generate_certificate(gnutls_privkey_t * ret_key,
 					usage |=
 					    GNUTLS_KEY_KEY_ENCIPHERMENT;
 			} else {
-				if (get_encrypt_status(server))
-					fprintf(stderr, "warning: this algorithm does not support encryption; disabling the encryption flag\n");
-
 				usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 			}
 
