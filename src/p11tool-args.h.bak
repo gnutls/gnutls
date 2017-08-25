@@ -120,23 +120,25 @@ typedef enum {
     INDEX_OPT_SO_LOGIN                      = 56,
     INDEX_OPT_ADMIN_LOGIN                   = 57,
     INDEX_OPT_TEST_SIGN                     = 58,
-    INDEX_OPT_GENERATE_RANDOM               = 59,
-    INDEX_OPT_PKCS8                         = 60,
-    INDEX_OPT_INDER                         = 61,
-    INDEX_OPT_INRAW                         = 62,
-    INDEX_OPT_OUTDER                        = 63,
-    INDEX_OPT_OUTRAW                        = 64,
-    INDEX_OPT_PROVIDER                      = 65,
-    INDEX_OPT_PROVIDER_OPTS                 = 66,
-    INDEX_OPT_DETAILED_URL                  = 67,
-    INDEX_OPT_ONLY_URLS                     = 68,
-    INDEX_OPT_BATCH                         = 69,
-    INDEX_OPT_VERSION                       = 70,
-    INDEX_OPT_HELP                          = 71,
-    INDEX_OPT_MORE_HELP                     = 72
+    INDEX_OPT_SIGN_PARAMS                   = 59,
+    INDEX_OPT_HASH                          = 60,
+    INDEX_OPT_GENERATE_RANDOM               = 61,
+    INDEX_OPT_PKCS8                         = 62,
+    INDEX_OPT_INDER                         = 63,
+    INDEX_OPT_INRAW                         = 64,
+    INDEX_OPT_OUTDER                        = 65,
+    INDEX_OPT_OUTRAW                        = 66,
+    INDEX_OPT_PROVIDER                      = 67,
+    INDEX_OPT_PROVIDER_OPTS                 = 68,
+    INDEX_OPT_DETAILED_URL                  = 69,
+    INDEX_OPT_ONLY_URLS                     = 70,
+    INDEX_OPT_BATCH                         = 71,
+    INDEX_OPT_VERSION                       = 72,
+    INDEX_OPT_HELP                          = 73,
+    INDEX_OPT_MORE_HELP                     = 74
 } teOptIndex;
 /** count of all options for p11tool */
-#define OPTION_CT    73
+#define OPTION_CT    75
 /** p11tool version */
 #define P11TOOL_VERSION       "@VERSION@"
 /** Full p11tool version text */
@@ -249,19 +251,21 @@ typedef enum {
 #define VALUE_OPT_SO_LOGIN       0x1033
 #define VALUE_OPT_ADMIN_LOGIN    0x1034
 #define VALUE_OPT_TEST_SIGN      0x1035
-#define VALUE_OPT_GENERATE_RANDOM 0x1036
+#define VALUE_OPT_SIGN_PARAMS    0x1036
+#define VALUE_OPT_HASH           0x1037
+#define VALUE_OPT_GENERATE_RANDOM 0x1038
 
 #define OPT_VALUE_GENERATE_RANDOM (DESC(GENERATE_RANDOM).optArg.argInt)
 #define VALUE_OPT_PKCS8          '8'
-#define VALUE_OPT_INDER          0x1037
-#define VALUE_OPT_INRAW          0x1038
-#define VALUE_OPT_OUTDER         0x1039
-#define VALUE_OPT_OUTRAW         0x103A
-#define VALUE_OPT_PROVIDER       0x103B
-#define VALUE_OPT_PROVIDER_OPTS  0x103C
-#define VALUE_OPT_DETAILED_URL   0x103D
-#define VALUE_OPT_ONLY_URLS      0x103E
-#define VALUE_OPT_BATCH          0x103F
+#define VALUE_OPT_INDER          0x1039
+#define VALUE_OPT_INRAW          0x103A
+#define VALUE_OPT_OUTDER         0x103B
+#define VALUE_OPT_OUTRAW         0x103C
+#define VALUE_OPT_PROVIDER       0x103D
+#define VALUE_OPT_PROVIDER_OPTS  0x103E
+#define VALUE_OPT_DETAILED_URL   0x103F
+#define VALUE_OPT_ONLY_URLS      0x1040
+#define VALUE_OPT_BATCH          0x1041
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
