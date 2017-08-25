@@ -24,6 +24,7 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
