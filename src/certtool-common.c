@@ -1556,3 +1556,34 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 		return GNUTLS_PK_UNKNOWN;
 	}
 }
+
+gnutls_digest_algorithm_t hash_to_id(const char *hash)
+{
+	if (strcasecmp(hash, "md5") == 0) {
+		fprintf(stderr,
+			"Warning: MD5 is broken, and should not be used any more for digital signatures.\n");
+		return GNUTLS_DIG_MD5;
+	} else if (strcasecmp(hash, "sha1") == 0)
+		return GNUTLS_DIG_SHA1;
+	else if (strcasecmp(hash, "sha256") == 0)
+		return GNUTLS_DIG_SHA256;
+	else if (strcasecmp(hash, "sha224") == 0)
+		return GNUTLS_DIG_SHA224;
+	else if (strcasecmp(hash, "sha384") == 0)
+		return GNUTLS_DIG_SHA384;
+	else if (strcasecmp(hash, "sha512") == 0)
+		return GNUTLS_DIG_SHA512;
+	else if (strcasecmp(hash, "sha3-256") == 0)
+		return GNUTLS_DIG_SHA3_256;
+	else if (strcasecmp(hash, "sha3-224") == 0)
+		return GNUTLS_DIG_SHA3_224;
+	else if (strcasecmp(hash, "sha3-384") == 0)
+		return GNUTLS_DIG_SHA3_384;
+	else if (strcasecmp(hash, "sha3-512") == 0)
+		return GNUTLS_DIG_SHA3_512;
+	else if (strcasecmp(hash, "rmd160") == 0)
+		return GNUTLS_DIG_RMD160;
+	else {
+		return gnutls_digest_get_id(hash);
+	}
+}

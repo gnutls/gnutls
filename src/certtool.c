@@ -1250,36 +1250,10 @@ static void cmd_parser(int argc, char **argv)
 
 	default_dig = GNUTLS_DIG_UNKNOWN;
 	if (HAVE_OPT(HASH)) {
-		if (strcasecmp(OPT_ARG(HASH), "md5") == 0) {
-			fprintf(stderr,
-				"Warning: MD5 is broken, and should not be used any more for digital signatures.\n");
-			default_dig = GNUTLS_DIG_MD5;
-		} else if (strcasecmp(OPT_ARG(HASH), "sha1") == 0)
-			default_dig = GNUTLS_DIG_SHA1;
-		else if (strcasecmp(OPT_ARG(HASH), "sha256") == 0)
-			default_dig = GNUTLS_DIG_SHA256;
-		else if (strcasecmp(OPT_ARG(HASH), "sha224") == 0)
-			default_dig = GNUTLS_DIG_SHA224;
-		else if (strcasecmp(OPT_ARG(HASH), "sha384") == 0)
-			default_dig = GNUTLS_DIG_SHA384;
-		else if (strcasecmp(OPT_ARG(HASH), "sha512") == 0)
-			default_dig = GNUTLS_DIG_SHA512;
-		else if (strcasecmp(OPT_ARG(HASH), "sha3-256") == 0)
-			default_dig = GNUTLS_DIG_SHA3_256;
-		else if (strcasecmp(OPT_ARG(HASH), "sha3-224") == 0)
-			default_dig = GNUTLS_DIG_SHA3_224;
-		else if (strcasecmp(OPT_ARG(HASH), "sha3-384") == 0)
-			default_dig = GNUTLS_DIG_SHA3_384;
-		else if (strcasecmp(OPT_ARG(HASH), "sha3-512") == 0)
-			default_dig = GNUTLS_DIG_SHA3_512;
-		else if (strcasecmp(OPT_ARG(HASH), "rmd160") == 0)
-			default_dig = GNUTLS_DIG_RMD160;
-		else {
-			default_dig = gnutls_digest_get_id(OPT_ARG(HASH));
-			if (default_dig == GNUTLS_DIG_UNKNOWN) {
-				fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
-				app_exit(1);
-			}
+		default_dig = hash_to_id(OPT_ARG(HASH));
+		if (default_dig == GNUTLS_DIG_UNKNOWN) {
+			fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
+			app_exit(1);
 		}
 	}
 
