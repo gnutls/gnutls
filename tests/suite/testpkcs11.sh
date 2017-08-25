@@ -696,6 +696,20 @@ test_sign () {
 	fi
 	echo ok
 
+	echo -n "* Testing RSA-PSS signatures using the private key... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --sign-params rsa-pss --test-sign "${token};object=serv-key" >>"${TMPFILE}" 2>&1
+	rc=$?
+	if test $rc != 0; then
+		if test $rc = 2; then
+			echo "failed. RSA-PSS not supported."
+		else
+			echo "failed. Cannot test signatures."
+			exit_error
+		fi
+	else
+		echo ok
+	fi
+
 	echo -n "* Testing signatures using the private key (with ID)... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};id=%ac%1d%7a%39%cb%72%17%94%66%6c%74%44%73%40%91%44%c0%a0%43%7d" >>"${TMPFILE}" 2>&1
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};id=%ac%1d%7a%39%cb%72%17%94%66%6c%74%44%73%40%91%44%c0%a0%43%7d" 2>&1|grep "Verifying against public key in the token..."|grep ok >>"${TMPFILE}" 2>&1
