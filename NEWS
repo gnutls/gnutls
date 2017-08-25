@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.1 (unreleased)
+
+** p11tool: added options --sign-params and --hash. This allows testing
+   signature with multiple algorithms, including RSA-PSS.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.0 (released 2017-08-21)
 
 ** libgnutls: tlsfuzzer is part of the CI testsuite. This is a TLS testing and
