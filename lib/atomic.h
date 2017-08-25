@@ -47,24 +47,24 @@ typedef struct gnutls_atomic_uint_st *gnutls_atomic_uint_t;
 inline static unsigned gnutls_atomic_val(gnutls_atomic_uint_t x)
 {
 	unsigned int t;
-	gnutls_mutex_lock(x->lock);
+	gnutls_mutex_lock(&x->lock);
 	t = x->value;
-	gnutls_mutex_unlock(x->lock);
+	gnutls_mutex_unlock(&x->lock);
 	return t;
 }
 
 inline static void gnutls_atomic_increment(gnutls_atomic_uint_t x)
 {
-	gnutls_mutex_lock(x->lock);
+	gnutls_mutex_lock(&x->lock);
 	x->value++;
-	gnutls_mutex_unlock(x->lock);
+	gnutls_mutex_unlock(&x->lock);
 }
 
 inline static void gnutls_atomic_decrement(gnutls_atomic_uint_t x)
 {
-	gnutls_mutex_lock(x->lock);
+	gnutls_mutex_lock(&x->lock);
 	x->value--;
-	gnutls_mutex_unlock(x->lock);
+	gnutls_mutex_unlock(&x->lock);
 }
 
 inline static void gnutls_atomic_init(gnutls_atomic_uint_t x)
