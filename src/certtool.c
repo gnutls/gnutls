@@ -1130,33 +1130,6 @@ static void update_signed_certificate(common_info_st * cinfo)
 	gnutls_x509_crt_deinit(crt);
 }
 
-static
-void sign_params_to_flags(common_info_st *cinfo, const char *params)
-{
-	char *p, *sp;
-
-	sp = strdup(params);
-	if (sp == NULL) {
-		fprintf(stderr, "memory error\n");
-		app_exit(1);
-	}
-
-	p = strtok(sp, ",");
-
-	while(p != NULL) {
-		if (strcasecmp(p, "rsa-pss")==0) {
-			cinfo->rsa_pss_sign = 1;
-		} else {
-			fprintf(stderr, "Unknown signature parameter: %s\n", p);
-			app_exit(1);
-		}
-
-		p=strtok(NULL, ",");
-	}
-
-	free(sp);
-}
-
 static void load_infile(const char *file)
 {
 	struct stat st;

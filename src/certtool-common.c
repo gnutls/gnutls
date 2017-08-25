@@ -1587,3 +1587,29 @@ gnutls_digest_algorithm_t hash_to_id(const char *hash)
 		return gnutls_digest_get_id(hash);
 	}
 }
+
+void sign_params_to_flags(common_info_st *cinfo, const char *params)
+{
+	char *p, *sp;
+
+	sp = strdup(params);
+	if (sp == NULL) {
+		fprintf(stderr, "memory error\n");
+		app_exit(1);
+	}
+
+	p = strtok(sp, ",");
+
+	while(p != NULL) {
+		if (strcasecmp(p, "rsa-pss")==0) {
+			cinfo->rsa_pss_sign = 1;
+		} else {
+			fprintf(stderr, "Unknown signature parameter: %s\n", p);
+			app_exit(1);
+		}
+
+		p=strtok(NULL, ",");
+	}
+
+	free(sp);
+}
