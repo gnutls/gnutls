@@ -646,7 +646,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 	ret =
 	    gnutls_pkcs11_privkey_generate3(url, pk, bits, label, &cid,
 					    GNUTLS_X509_FMT_PEM, &pubkey,
-					    flags);
+					    flags|GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
