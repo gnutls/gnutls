@@ -85,13 +85,12 @@ static void privkey_to_rsa(common_info_st * cinfo);
 
 static void pubkey_keyid(common_info_st * cinfo);
 static void certificate_fpr(common_info_st * cinfo);
-static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt);
+static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt, common_info_st * cinfo);
 
 FILE *outfile;
 static const char *outfile_name = NULL; /* to delete on exit */
 
 FILE *infile;
-static gnutls_digest_algorithm_t default_dig;
 static unsigned int incert_format, outcert_format;
 static unsigned int req_key_type = GNUTLS_PK_RSA;
 gnutls_certificate_print_formats_t full_format = GNUTLS_CRT_PRINT_FULL;
@@ -214,10 +213,10 @@ generate_private_key_int(common_info_st * cinfo)
 		flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
 	}
 
-	if (key_type == GNUTLS_PK_RSA_PSS && (default_dig || HAVE_OPT(SALT_SIZE))) {
+	if (key_type == GNUTLS_PK_RSA_PSS && (cinfo->hash || HAVE_OPT(SALT_SIZE))) {
 		unsigned salt_size;
 
-		if (!default_dig) {
+		if (!cinfo->hash) {
 			fprintf(stderr, "You must provide the hash algorithm and optionally the salt size for RSA-PSS\n");
 			app_exit(1);
 		}
@@ -225,10 +224,10 @@ generate_private_key_int(common_info_st * cinfo)
 		if (HAVE_OPT(SALT_SIZE)) {
 			salt_size = OPT_VALUE_SALT_SIZE;
 		} else {
-			salt_size = gnutls_hash_get_len(default_dig);
+			salt_size = gnutls_hash_get_len(cinfo->hash);
 		}
 
-		gnutls_x509_spki_set_rsa_pss_params(spki, default_dig, salt_size);
+		gnutls_x509_spki_set_rsa_pss_params(spki, cinfo->hash, salt_size);
 
 		kdata[kdata_size].type = GNUTLS_KEYGEN_SPKI;
 		kdata[kdata_size].data = (void*)spki;
@@ -845,7 +844,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	return crl;
 }
 
-static gnutls_digest_algorithm_t get_dig_for_pub(gnutls_pubkey_t pubkey)
+static gnutls_digest_algorithm_t get_dig_for_pub(gnutls_pubkey_t pubkey, common_info_st * cinfo)
 {
 	gnutls_digest_algorithm_t dig;
 	int result;
@@ -864,13 +863,13 @@ static gnutls_digest_algorithm_t get_dig_for_pub(gnutls_pubkey_t pubkey)
 	}
 
 	/* if algorithm allows alternatives */
-	if (mand == 0 && default_dig != GNUTLS_DIG_UNKNOWN)
-		dig = default_dig;
+	if (mand == 0 && cinfo->hash != GNUTLS_DIG_UNKNOWN)
+		dig = cinfo->hash;
 
 	return dig;
 }
 
-static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt)
+static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt, common_info_st * cinfo)
 {
 	gnutls_digest_algorithm_t dig;
 	gnutls_pubkey_t pubkey;
@@ -887,7 +886,7 @@ static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt)
 		}
 	}
 
-	dig = get_dig_for_pub(pubkey);
+	dig = get_dig_for_pub(pubkey, cinfo);
 
 	gnutls_pubkey_deinit(pubkey);
 
@@ -919,7 +918,7 @@ void generate_self_signed(common_info_st * cinfo)
 		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
 
 	result =
-	    gnutls_x509_crt_privkey_sign(crt, crt, key, get_dig(crt), flags);
+	    gnutls_x509_crt_privkey_sign(crt, crt, key, get_dig(crt, cinfo), flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		app_exit(1);
@@ -971,7 +970,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
-					 get_dig(ca_crt), flags);
+					 get_dig(ca_crt, cinfo), flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		app_exit(1);
@@ -1016,7 +1015,7 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 		flags |= GNUTLS_PRIVKEY_SIGN_FLAG_RSA_PSS;
 
 	result =
-	    gnutls_x509_crt_privkey_sign(crt, eecrt, eekey, get_dig(eecrt),
+	    gnutls_x509_crt_privkey_sign(crt, eecrt, eekey, get_dig(eecrt, cinfo),
 					 flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
@@ -1055,7 +1054,7 @@ static void generate_signed_crl(common_info_st * cinfo)
 	fprintf(stdlog, "\n");
 	result =
 	    gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key,
-					 get_dig(ca_crt), 0);
+					 get_dig(ca_crt, cinfo), 0);
 	if (result < 0) {
 		fprintf(stderr, "crl_privkey_sign: %s\n",
 			gnutls_strerror(result));
@@ -1111,7 +1110,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
-					 get_dig(ca_crt), flags);
+					 get_dig(ca_crt, cinfo), flags);
 	if (result < 0) {
 		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		app_exit(1);
@@ -1221,15 +1220,6 @@ static void cmd_parser(int argc, char **argv)
 			app_exit(1);
 	}
 
-	default_dig = GNUTLS_DIG_UNKNOWN;
-	if (HAVE_OPT(HASH)) {
-		default_dig = hash_to_id(OPT_ARG(HASH));
-		if (default_dig == GNUTLS_DIG_UNKNOWN) {
-			fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
-			app_exit(1);
-		}
-	}
-
 	batch = 0;
 	if (HAVE_OPT(TEMPLATE)) {
 		batch = 1;
@@ -1251,6 +1241,16 @@ static void cmd_parser(int argc, char **argv)
 	}
 
 	memset(&cinfo, 0, sizeof(cinfo));
+
+	cinfo.hash = GNUTLS_DIG_UNKNOWN;
+	if (HAVE_OPT(HASH)) {
+		cinfo.hash = hash_to_id(OPT_ARG(HASH));
+		if (cinfo.hash == GNUTLS_DIG_UNKNOWN) {
+			fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
+			app_exit(1);
+		}
+	}
+
 #ifdef ENABLE_PKCS11
 	if (HAVE_OPT(PROVIDER)) {
 		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
@@ -2006,7 +2006,7 @@ void generate_request(common_info_st * cinfo)
 
 	ret =
 	    gnutls_x509_crq_privkey_sign(crq, pkey,
-					 get_dig_for_pub(pubkey), 0);
+					 get_dig_for_pub(pubkey, cinfo), 0);
 	if (ret < 0) {
 		fprintf(stderr, "sign: %s\n", gnutls_strerror(ret));
 		app_exit(1);
@@ -2770,7 +2770,7 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 	if (embed)
 		flags |= GNUTLS_PKCS7_EMBED_DATA;
 
-	ret = gnutls_pkcs7_sign(pkcs7, *crts, key, &data, NULL, NULL, get_dig(*crts), flags);
+	ret = gnutls_pkcs7_sign(pkcs7, *crts, key, &data, NULL, NULL, get_dig(*crts, cinfo), flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error signing: %s\n", gnutls_strerror(ret));
 		app_exit(1);
@@ -3859,9 +3859,9 @@ void pubkey_keyid(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	if (default_dig == GNUTLS_DIG_SHA1 || default_dig == GNUTLS_DIG_UNKNOWN)
+	if (cinfo->hash == GNUTLS_DIG_SHA1 || cinfo->hash == GNUTLS_DIG_UNKNOWN)
 		flags = GNUTLS_KEYID_USE_SHA1; /* be backwards compatible */
-	else if (default_dig == GNUTLS_DIG_SHA256)
+	else if (cinfo->hash == GNUTLS_DIG_SHA256)
 		flags = GNUTLS_KEYID_USE_SHA256;
 	else {
 		fprintf(stderr, "Cannot calculate key ID with the provided hash\n");
@@ -3940,10 +3940,10 @@ void certificate_fpr(common_info_st * cinfo)
 
 	fpr_size = sizeof(fpr);
 
-	if (default_dig == GNUTLS_DIG_UNKNOWN)
-		default_dig = GNUTLS_DIG_SHA1;
+	if (cinfo->hash == GNUTLS_DIG_UNKNOWN)
+		cinfo->hash = GNUTLS_DIG_SHA1;
 
-	ret = gnutls_x509_crt_get_fingerprint(crt, default_dig, fpr, &fpr_size);
+	ret = gnutls_x509_crt_get_fingerprint(crt, cinfo->hash, fpr, &fpr_size);
 	if (ret < 0) {
 		fprintf(stderr,
 			"get_key_id: %s\n",
