@@ -989,9 +989,13 @@ pin_callback(void *user, int attempt, const char *token_url,
 	if (flags & GNUTLS_PIN_SO) {
 		env = "GNUTLS_SO_PIN";
 		desc = "security officer";
+		if (info)
+			password = info->so_pin;
 	} else {
 		env = "GNUTLS_PIN";
 		desc = "user";
+		if (info)
+			password = info->pin;
 	}
 
 	if (flags & GNUTLS_PIN_FINAL_TRY) {
@@ -1025,9 +1029,11 @@ pin_callback(void *user, int attempt, const char *token_url,
 		}
 	}
 
-	password = getenv(env);
-	if (password == NULL) /* compatibility */
-		password = getenv("GNUTLS_PIN");
+	if (password == NULL) {
+		password = getenv(env);
+		if (password == NULL) /* compatibility */
+			password = getenv("GNUTLS_PIN");
+	}
 
 	if (password == NULL && (info == NULL || info->batch == 0)) {
 		fprintf(stderr, "Token '%s' with URL '%s' ", token_label, token_url);

@@ -64,7 +64,7 @@ flag = {
 flag = {
     name      = set-pin;
     arg-type  = string;
-    descrip   = "Specify the PIN to use on token initialization";
+    descrip   = "Specify the PIN to use on token operations";
     doc      = "Alternatively the GNUTLS_PIN environment variable may be used.";
 };
 
