@@ -262,6 +262,8 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	int ret;
 	gnutls_datum_t data, sig = {NULL, 0};
 	int pk;
+	gnutls_digest_algorithm_t hash;
+	gnutls_sign_algorithm_t sig_algo;
 
 	pkcs11_common(info);
 
@@ -298,18 +300,42 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 		app_exit(1);
 	}
 
-	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA256, 0, &data, &sig);
-	if (ret < 0) {
-		fprintf(stderr, "Cannot sign data: %s\n",
-			gnutls_strerror(ret));
+	pk = gnutls_privkey_get_pk_algorithm(privkey, NULL);
+
+	if (info->hash == GNUTLS_DIG_UNKNOWN)
+		hash = GNUTLS_DIG_SHA256;
+	else
+		hash = info->hash;
+
+	if (info->rsa_pss_sign && pk == GNUTLS_PK_RSA)
+		pk = GNUTLS_PK_RSA_PSS;
+
+	sig_algo = gnutls_pk_to_sign(pk, hash);
+	if (sig_algo == GNUTLS_SIGN_UNKNOWN) {
+		fprintf(stderr, "No supported signature algorithm for %s and %s\n",
+			gnutls_pk_get_name(pk), gnutls_digest_get_name(hash));
 		app_exit(1);
 	}
 
-	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+	fprintf(stderr, "Signing using %s... ", gnutls_sign_get_name(sig_algo));
+
+	ret = gnutls_privkey_sign_data2(privkey, sig_algo, 0, &data, &sig);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot sign data: %s\n",
+			gnutls_strerror(ret));
+		/* in case of unsupported signature algorithm allow
+		 * calling apps to distinguish error codes (used
+		 * by testpkcs11.sh */
+		if (ret == GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM)
+			app_exit(2);
+		app_exit(1);
+	}
+
+	fprintf(stderr, "ok\n");
 
 	fprintf(stderr, "Verifying against private key parameters... ");
-	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256),
-		0, &data, &sig);
+	ret = gnutls_pubkey_verify_data2(pubkey, sig_algo,
+					 0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
 			gnutls_strerror(ret));
@@ -337,8 +363,8 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	}
 
 	fprintf(stderr, "Verifying against public key in the token... ");
-	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256),
-		0, &data, &sig);
+	ret = gnutls_pubkey_verify_data2(pubkey, sig_algo,
+					 0, &data, &sig);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot verify signed data: %s\n",
 			gnutls_strerror(ret));

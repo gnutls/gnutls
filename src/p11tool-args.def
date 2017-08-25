@@ -424,6 +424,22 @@ the signed data.";
 };
 
 flag = {
+    name      = sign-params;
+    arg-type  = string;
+    descrip   = "Sign with a specific signature algorithm";
+    doc = "This option can be combined with --test-sign, to sign with
+a specific signature algorithm variant. The only option supported is 'RSA-PSS', and should be
+specified in order to use RSA-PSS signature on RSA keys.";
+};
+
+flag = {
+    name      = hash;
+    arg-type  = string;
+    descrip   = "Hash algorithm to use for signing";
+    doc = "This option can be combined with test-sign. Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.";
+};
+
+flag = {
     name      = generate-random;
     descrip   = "Generate random data";
     arg-type  = number;

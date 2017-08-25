@@ -202,6 +202,17 @@ static void cmd_parser(int argc, char **argv)
 
 	memset(&cinfo, 0, sizeof(cinfo));
 
+	if (HAVE_OPT(HASH)) {
+		cinfo.hash = hash_to_id(OPT_ARG(HASH));
+		if (cinfo.hash == GNUTLS_DIG_UNKNOWN) {
+			fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
+			app_exit(1);
+		}
+	}
+
+	if (HAVE_OPT(SIGN_PARAMS))
+		sign_params_to_flags(&cinfo, OPT_ARG(SIGN_PARAMS));
+
 	if (HAVE_OPT(SECRET_KEY))
 		cinfo.secret_key = OPT_ARG(SECRET_KEY);
 
