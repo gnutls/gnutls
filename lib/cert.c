@@ -476,7 +476,7 @@ _gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum_t * cert)
  * or use gnutls_certificate_verify_peers3().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
- * A sucessful error code means that the @status parameter must be checked to obtain the validation status.
+ * A successful error code means that the @status parameter must be checked to obtain the validation status.
  **/
 int
 gnutls_certificate_verify_peers2(gnutls_session_t session,
@@ -509,7 +509,7 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * key usage), use gnutls_certificate_verify_peers().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
- * A sucessful error code means that the @status parameter must be checked to obtain the validation status.
+ * A successful error code means that the @status parameter must be checked to obtain the validation status.
  *
  * Since: 3.1.4
  **/
@@ -556,7 +556,7 @@ gnutls_typed_vdata_st data;
  * %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE flag set.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
- * A sucessful error code means that the @status parameter must be checked to obtain the validation status.
+ * A successful error code means that the @status parameter must be checked to obtain the validation status.
  *
  * Since: 3.3.0
  **/
