@@ -80,8 +80,12 @@ gnutls_privkey_t abs_key;
 
 @node Abstract public keys
 @subsection Public keys
-An abstract @code{gnutls_pubkey_t} can be initialized
-using the functions below. It can be imported through
+An abstract @code{gnutls_pubkey_t} can be initialized and freed by
+using the functions below.
+
+@showfuncB{gnutls_pubkey_init,gnutls_pubkey_deinit}
+
+After initialization its values can be imported from
 an existing structure like @code{gnutls_x509_crt_t},
 or through an ASN.1 encoding of the X.509 @code{SubjectPublicKeyInfo}
 sequence.
@@ -120,8 +124,12 @@ To export the key-specific parameters, or obtain a unique key ID the following f
 
 @node Abstract private keys
 @subsection Private keys
-An abstract @code{gnutls_privkey_t} can be initialized
-using the functions below. It can be imported through
+An abstract @code{gnutls_privkey_t} can be initialized and freed by
+using the functions below.
+
+@showfuncB{gnutls_privkey_init,gnutls_privkey_deinit}
+
+After initialization its values can be imported from
 an existing structure like @code{gnutls_x509_privkey_t},
 but unlike public keys it cannot be exported. That is
 to allow abstraction over keys stored in hardware that 

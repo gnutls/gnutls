@@ -112,4 +112,24 @@ inline static int _gnutls_str_array_append(gnutls_str_array_t * head,
 	return 0;
 }
 
+inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
+			const char *name, size_t size)
+{
+	int ret;
+	gnutls_datum_t ahost;
+
+	/* convert the provided hostname to ACE-Labels domain. */
+	ret = gnutls_idna_map(name, size, &ahost, 0);
+	if (ret < 0) {
+		_gnutls_debug_log("unable to convert hostname %s to IDNA format\n", name);
+		/* insert the raw name */
+		return _gnutls_str_array_append(head, name, size);
+	}
+
+	ret = _gnutls_str_array_append(head, (char*)ahost.data, ahost.size);
+	gnutls_free(ahost.data);
+
+	return ret;
+}
+
 #endif

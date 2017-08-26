@@ -31,6 +31,8 @@
 #include <gnutls/gnutls.h>
 #include <unistd.h>
 #include "utils.h"
+#include "cert-common.h"
+
 
 /* This will test whether the default public key storage backend
  * is operating properly */
@@ -40,7 +42,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static unsigned char server_cert_pem[] =
+static unsigned char tofu_server_cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
     "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
     "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
@@ -56,8 +58,8 @@ static unsigned char server_cert_pem[] =
     "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
     "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
+const gnutls_datum_t tofu_server_cert = { tofu_server_cert_pem,
+	sizeof(tofu_server_cert_pem)
 };
 
 static char client_pem[] =
@@ -86,6 +88,7 @@ const gnutls_datum_t client_cert =
 void doit(void)
 {
 	gnutls_datum_t der_cert, der_cert2;
+	gnutls_datum_t der_rawpk, der_rawpk2;
 	int ret;
 	gnutls_datum_t hash;
 	char path[512];
@@ -100,8 +103,9 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(2);
 
+	// X.509 certificates
 	ret =
-	    gnutls_pem_base64_decode_alloc("CERTIFICATE", &server_cert,
+	    gnutls_pem_base64_decode_alloc("CERTIFICATE", &tofu_server_cert,
 					   &der_cert);
 	if (ret < 0) {
 		fail("base64 decoding\n");
@@ -116,10 +120,27 @@ void doit(void)
 		goto fail;
 	}
 
+	// Raw public keys
+	ret =
+	    gnutls_pem_base64_decode_alloc("PUBLIC KEY", &rawpk_public_key1,
+					   &der_rawpk);
+	if (ret < 0) {
+		fail("base64 decoding\n");
+		goto fail;
+	}
+
+	ret =
+	    gnutls_pem_base64_decode_alloc("PUBLIC KEY", &rawpk_public_key2,
+					   &der_rawpk2);
+	if (ret < 0) {
+		fail("base64 decoding\n");
+		goto fail;
+	}
+
 	remove(HOSTS_FILE);
 	remove(TMP_FILE);
 
-	/* verify whether the stored hash verification succeeeds */
+	/* verify whether the stored hash verification succeeds */
 	ret = gnutls_store_commitment(TMP_FILE, NULL, "localhost", "https",
 				      GNUTLS_DIG_SHA1, &hash, 0, GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN);
 	if (ret != 0) {
@@ -175,7 +196,8 @@ void doit(void)
 		success("Commitment from homedir verification: passed\n");
 #endif
 
-	/* verify whether the stored pubkey verification succeeeds */
+	/* verify whether the stored pubkey verification succeeds */
+	// First we test regular X.509 certs
 	ret = gnutls_store_pubkey(TMP_FILE, NULL, "localhost", "https",
 				  GNUTLS_CRT_X509, &der_cert, 0, 0);
 	if (ret != 0) {
@@ -184,14 +206,14 @@ void doit(void)
 	}
 
 	if (debug)
-		success("Public key storage: passed\n");
+		success("Public key storage (from cert): passed\n");
 
 	ret =
 	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
 					"https", GNUTLS_CRT_X509,
 					&der_cert, 0);
 	if (ret != 0) {
-		fail("pubkey verification: %s\n", gnutls_strerror(ret));
+		fail("pubkey verification (from cert): %s\n", gnutls_strerror(ret));
 		goto fail;
 	}
 
@@ -200,7 +222,7 @@ void doit(void)
 					"https", GNUTLS_CRT_X509,
 					&der_cert2, 0);
 	if (ret == 0) {
-		fail("verification succeed when shouldn't!\n");
+		fail("verification succeeded when shouldn't!\n");
 		goto fail;
 	}
 	if (ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
@@ -210,7 +232,44 @@ void doit(void)
 	}
 
 	if (debug)
-		success("Public key verification: passed\n");
+		success("Public key verification (from cert): passed\n");
+
+	// Secondly we test raw public keys
+	ret = gnutls_store_pubkey(TMP_FILE, NULL, "localhost", "https",
+				  GNUTLS_CRT_RAWPK, &der_rawpk, 0, 0);
+	if (ret != 0) {
+		fail("storage: %s\n", gnutls_strerror(ret));
+		goto fail;
+	}
+
+	if (debug)
+		success("Public key storage (from raw pk): passed\n");
+
+	ret =
+	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
+					"https", GNUTLS_CRT_RAWPK,
+					&der_rawpk, 0);
+	if (ret != 0) {
+		fail("pubkey verification (from raw pk): %s\n", gnutls_strerror(ret));
+		goto fail;
+	}
+
+	ret =
+	    gnutls_verify_stored_pubkey(TMP_FILE, NULL, "localhost",
+					"https", GNUTLS_CRT_RAWPK,
+					&der_rawpk2, 0);
+	if (ret == 0) {
+		fail("verification succeeded when shouldn't!\n");
+		goto fail;
+	}
+	if (ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
+		fail("Wrong error code returned: %s!\n",
+		     gnutls_strerror(ret));
+		goto fail;
+	}
+
+	if (debug)
+		success("Public key verification (from raw pk): passed\n");
 
 	remove(HOSTS_FILE);
 	remove(TMP_FILE);
@@ -219,6 +278,8 @@ void doit(void)
 	gnutls_global_deinit();
 	gnutls_free(der_cert.data);
 	gnutls_free(der_cert2.data);
+	gnutls_free(der_rawpk.data);
+	gnutls_free(der_rawpk2.data);
 
 	return;
       fail:

@@ -31,17 +31,26 @@
 
 extern const char *server_priority;
 
-#define try(name, client_prio, client_kx, server_sign_algo, client_sign_algo) \
+#define try_x509(name, client_prio, client_kx, server_sign_algo, client_sign_algo) \
 	try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
-		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0)
+		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0, GNUTLS_CRT_X509, GNUTLS_CRT_UNKNOWN)
 
-#define try_ks(name, client_prio, client_kx, group) \
+#define try_rawpk(name, client_prio, client_kx, server_sign_algo, client_sign_algo) \
+	try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
+		&rawpk_public_key1, &rawpk_private_key1, NULL, NULL, 0, GNUTLS_CRT_RAWPK, GNUTLS_CRT_UNKNOWN)
+
+#define try_x509_ks(name, client_prio, client_kx, group) \
 	try_with_key_ks(name, client_prio, client_kx, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, GNUTLS_SIGN_UNKNOWN, \
-		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0, group)
+		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0, group, GNUTLS_CRT_X509, GNUTLS_CRT_UNKNOWN)
 
-#define try_cli(name, client_prio, client_kx, server_sign_algo, client_sign_algo, client_cert) \
+#define try_x509_cli(name, client_prio, client_kx, server_sign_algo, client_sign_algo, client_cert) \
 	try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
-		&server_ca3_localhost_cert, &server_ca3_key, &cli_ca3_cert, &cli_ca3_key, client_cert)
+		&server_ca3_localhost_cert, &server_ca3_key, &cli_ca3_cert, &cli_ca3_key, client_cert, GNUTLS_CRT_X509, GNUTLS_CRT_X509)
+
+#define try_rawpk_cli(name, client_prio, client_kx, server_sign_algo, client_sign_algo, client_cert) \
+	try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
+		&rawpk_public_key1, &rawpk_private_key1, &rawpk_public_key2, &rawpk_private_key2, client_cert, GNUTLS_CRT_RAWPK, GNUTLS_CRT_RAWPK)
+
 
 void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,
@@ -51,7 +60,9 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 		const gnutls_datum_t *cli_cert,
 		const gnutls_datum_t *cli_key,
 		unsigned client_cert,
-		unsigned exp_group);
+		unsigned exp_group,
+		gnutls_certificate_type_t server_ctype,
+		gnutls_certificate_type_t client_ctype);
 
 inline static
 void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
@@ -61,10 +72,12 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 		const gnutls_datum_t *serv_key,
 		const gnutls_datum_t *cli_cert,
 		const gnutls_datum_t *cli_key,
-		unsigned client_cert)
+		unsigned client_cert,
+		gnutls_certificate_type_t server_ctype,
+		gnutls_certificate_type_t client_ctype)
 {
 	return try_with_key_ks(name, client_prio, client_kx, server_sign_algo, client_sign_algo,
-			       serv_cert, serv_key, cli_cert, cli_key, client_cert, 0);
+			       serv_cert, serv_key, cli_cert, cli_key, client_cert, 0, server_ctype, client_ctype);
 }
 
 void try_with_key_fail(const char *name, const char *client_prio,

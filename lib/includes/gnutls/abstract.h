@@ -693,6 +693,14 @@ int gnutls_pcert_export_openpgp(gnutls_pcert_st * pcert,
 
 void gnutls_pcert_deinit(gnutls_pcert_st * pcert);
 
+int gnutls_pcert_import_rawpk(gnutls_pcert_st* pcert,
+			     gnutls_pubkey_t key, unsigned int flags);
+
+int gnutls_pcert_import_rawpk_raw(gnutls_pcert_st* pcert,
+				    const gnutls_datum_t* rawpubkey,
+				    gnutls_x509_crt_fmt_t format,
+				    unsigned int key_usage, unsigned int flags);
+
 /* For certificate credentials */
 	/* This is the same as gnutls_certificate_retrieve_function()
 	 * but retrieves a gnutls_pcert_st which requires much less processing

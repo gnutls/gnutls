@@ -599,6 +599,10 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
  * default upper limits regarding the certificate key size and chain
  * size are set. To override them use gnutls_certificate_set_verify_limits().
  *
+ * Note that when using raw public-keys verification will not work because there is
+ * no corresponding certificate body belonging to the raw key that can be verified. In that
+ * case this function will return %GNUTLS_E_INVALID_REQUEST.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
  * A successful error code means that the @status parameter must be checked to obtain the validation status.
  **/
@@ -639,6 +643,10 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * To avoid denial of service attacks some
  * default upper limits regarding the certificate key size and chain
  * size are set. To override them use gnutls_certificate_set_verify_limits().
+ *
+ * Note that when using raw public-keys verification will not work because there is
+ * no corresponding certificate body belonging to the raw key that can be verified. In that
+ * case this function will return %GNUTLS_E_INVALID_REQUEST.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
  * A successful error code means that the @status parameter must be checked to obtain the validation status.
@@ -695,6 +703,10 @@ gnutls_typed_vdata_st data;
  * default upper limits regarding the certificate key size and chain
  * size are set. To override them use gnutls_certificate_set_verify_limits().
  *
+ * Note that when using raw public-keys verification will not work because there is
+ * no corresponding certificate body belonging to the raw key that can be verified. In that
+ * case this function will return %GNUTLS_E_INVALID_REQUEST.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
  * A successful error code means that the @status parameter must be checked to obtain the validation status.
  *
@@ -719,7 +731,7 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
 
-	switch (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS)) {
+	switch (get_certificate_type(session, GNUTLS_CTYPE_PEERS)) {
 		case GNUTLS_CRT_X509:
 			return _gnutls_x509_cert_verify_peers(session, data, elements,
 										status);
@@ -820,7 +832,7 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session)
 		return (time_t) - 1;
 	}
 
-	switch (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS)) {
+	switch (get_certificate_type(session, GNUTLS_CTYPE_PEERS)) {
 		case GNUTLS_CRT_X509:
 			return
 					_gnutls_x509_get_raw_crt_expiration_time(&info->
@@ -856,7 +868,7 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session_t session)
 		return (time_t) - 1;
 	}
 
-	switch (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS)) {
+	switch (get_certificate_type(session, GNUTLS_CTYPE_PEERS)) {
 		case GNUTLS_CRT_X509:
 			return
 					_gnutls_x509_get_raw_crt_activation_time(&info->

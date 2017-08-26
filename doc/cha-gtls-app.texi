@@ -476,6 +476,7 @@ current session using @funcref{gnutls_credentials_set}.
 
 @menu
 * Certificate credentials::
+* Raw public-key credentials::
 * SRP credentials::
 * PSK credentials::
 * Anonymous credentials::
@@ -492,7 +493,7 @@ with the credential types is shown in @ref{tab:key-exchange-cred}.
 
 @headitem Authentication method @tab Key exchange @tab Client credentials @tab Server credentials
 
-@item Certificate
+@item Certificate and Raw public-key
 @tab @code{KX_RSA},
 @code{KX_DHE_RSA},
 @code{KX_DHE_DSS},
@@ -537,6 +538,10 @@ a pair, but a server could require it. In this section we discuss
 general issues applying to both client and server certificates. The next
 section will elaborate on issues arising from client authentication only.
 
+In order to use certificate credentials one must first initialize a credentials
+structure of type @code{gnutls_certificate_credentials_t}. After use this structure must
+be freed. This can be done with the following functions.
+
 @showfuncB{gnutls_certificate_allocate_credentials,gnutls_certificate_free_credentials}
 
 After the credentials structures are initialized, the certificate 
@@ -578,7 +583,7 @@ In that case a certificate should be selected according the peer's signature
 algorithm preferences. To get those preferences use
 @funcref{gnutls_sign_algorithm_get_requested}. Both functions are shown below.
 
-@showfuncC{gnutls_certificate_set_retrieve_function,gnutls_certificate_set_retrieve_function2,gnutls_sign_algorithm_get_requested}
+@showfuncD{gnutls_certificate_set_retrieve_function,gnutls_certificate_set_retrieve_function2,gnutls_certificate_set_retrieve_function3,gnutls_sign_algorithm_get_requested}
 
 The functions above do not handle the requested server name automatically.
 A server would need to check the name requested by the client
@@ -613,8 +618,8 @@ available in certificate authentication.
 @subsubheading Client certificate authentication
 
 If a certificate is to be requested from the client during the handshake, the server
-will send a certificate request message. This behavior is controlled @funcref{gnutls_certificate_server_set_request}.
-The request contains a list of the acceptable by the server certificate signers. This list
+will send a certificate request message. This behavior is controlled by @funcref{gnutls_certificate_server_set_request}.
+The request contains a list of the by the server accepted certificate signers. This list
 is constructed using the trusted certificate authorities of the server.
 In cases where the server supports a large number of certificate authorities
 it makes sense not to advertise all of the names to save bandwidth. That can
@@ -639,6 +644,7 @@ list by the server contains CAs other than its signer. That can be achieved
 using the @code{GNUTLS_FORCE_CLIENT_CERT} flag in @funcref{gnutls_init}.
 
 @showfuncC{gnutls_certificate_set_x509_key_file,gnutls_certificate_set_x509_simple_pkcs12_file,gnutls_certificate_set_retrieve_function2}
+
 
 @subsubheading Client or server certificate verification
 
@@ -670,6 +676,22 @@ can be printed using @funcref{gnutls_certificate_verification_status_print}.
 @showfuncdesc{gnutls_session_set_verify_cert}
 
 @showfuncB{gnutls_certificate_verify_peers3,gnutls_certificate_set_verify_function}
+
+Note that when using raw public-keys verification will not work because there is no corresponding
+certificate body belonging to the raw key that can be verified. In that case the @funcref{gnutls_certificate_verify_peers}
+family of functions will return a GNUTLS_E_INVALID_REQUEST error code. For authenticating raw public-keys
+one must use an out-of-band mechanism, e.g. by comparing hashes or using trust on first use
+(see @ref{Verifying a certificate using trust on first use authentication}).
+
+
+@node Raw public-key credentials
+@subsection Raw public-keys
+As of version 3.6.6 GnuTLS supports @ref{Raw public-keys}. With raw public-keys only the
+public-key part (that is normally embedded in a certificate) is transmitted to the peer.
+In order to load a raw public-key and its corresponding private key in a credentials
+structure one can use the following functions.
+
+@showfuncC{gnutls_certificate_set_key,gnutls_certificate_set_rawpk_key_mem,gnutls_certificate_set_rawpk_key_file}
 
 
 @node SRP credentials
@@ -1438,16 +1460,16 @@ that the CURVE keyword is kept for backwards compatibility only, for new
 applications see the GROUP keyword above.
 
 @item Certificate types @tab
-Certificate type negotitation must be explicitly enabled via the
-GNUTLS_ENABLE_CERT_TYPE_NEG flag in gnutls_init().
 Certificate types can be given in a symmetric fashion (i.e. the same for
 both client and server) or, as of GnuTLS 3.6.4, in an asymmetric fashion
-(i.e. different for the client than for the server).
+(i.e. different for the client than for the server). Alternative certificate
+types must be explicitly enabled via flags in @funcref{gnutls_init}.
 
-Currently supported types are:
-CTYPE-X509 or CTYPE-X.509. Catch all is CTYPE-ALL.
-CTYPE-CLI-X509 or CTYPE-CLI-X.509, CTYPE-SRV-X509 or CTYPE-SRV-X.509.
-Catch all is CTYPE-CLI-ALL and CTYPE-SRV-ALL.
+The currently supported types are CTYPE-X509, CTYPE-RAWPK which apply both to
+client and server; catch all is CTYPE-ALL. The types CTYPE-CLI-X509, CTYPE-SRV-X509,
+CTYPE-CLI-RAWPK, CTYPE-SRV-RAWPK can be used to specialize on client or server;
+catch all is CTYPE-CLI-ALL and CTYPE-SRV-ALL. The type 'X509' is aliased to 'X.509'
+for legacy reasons.
 
 @end multitable
 @caption{The supported algorithm keywords in priority strings.}

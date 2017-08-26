@@ -260,7 +260,7 @@ int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 
 int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out);
-int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+int _gnutls_x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 			   gnutls_datum_t * rpubkey);
 
 int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt,

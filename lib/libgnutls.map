@@ -1264,6 +1264,15 @@ GNUTLS_3_6_5
 	gnutls_privkey_decrypt_data2;
 } GNUTLS_3_6_4;
 
+GNUTLS_3_6_6
+{
+ global:
+	gnutls_certificate_set_rawpk_key_mem;
+	gnutls_certificate_set_rawpk_key_file;
+	gnutls_pcert_import_rawpk;
+	gnutls_pcert_import_rawpk_raw;
+} GNUTLS_3_6_5;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

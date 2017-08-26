@@ -53,6 +53,7 @@ to use this key exchange algorithm.
 @menu
 * X.509 certificates::
 * OpenPGP certificates::
+* Raw public-keys::
 * Advanced certificate verification::
 * Digital signatures::
 @end menu
@@ -478,6 +479,37 @@ use-cases, is a distraction that consumes considerable resources for
 improving and testing the library. For that we have decided to drop
 this functionality completely in 3.6.0.
 
+@node Raw public-keys
+@subsection Raw public-keys
+@cindex Raw public-keys
+
+There are situations in which a rather large certificate / certificate chain is undesirable or impractical.
+An example could be a resource contrained sensor network in which you do want to use authentication of and
+encryption between your devices but where your devices lack loads of memory or processing power. Furthermore,
+there are situations in which you don't want to or can't rely on a PKIX. TLS is, next to a PKIX environment,
+also commonly used with self-signed certificates in smaller deployments where the self-signed certificates
+are distributed to all involved protocol endpoints out-of-band. This practice does, however, still require
+the overhead of the certificate generation even though none of the information found in the certificate is
+actually used.
+
+With raw public-keys, only a subset of the information found in typical certificates is utilized: namely,
+the SubjectPublicKeyInfo structure (in ASN.1 format) of a PKIX certificate that carries the parameters
+necessary to describe the public-key. Other parameters found in PKIX certificates are omitted. By omitting
+various certificate-related structures, the resulting raw public-key is kept fairly small in comparison to
+the original certificate, and the code to process the keys can be simpler.
+
+It should be noted however, that the authenticity of these raw keys must be verified by an out-of-band mechanism
+or something like @acronym{TOFU}.
+
+@menu
+* Importing raw public-keys::
+@end menu
+
+@node Importing raw public-keys
+@subsubsection Importing raw public-keys
+Raw public-keys and their private counterparts can best be handled by using the abstract types
+@code{gnutls_pubkey_t} and @code{gnutls_privkey_t} respectively. To learn how to use these
+see @ref{Abstract key types}.
 
 @node Advanced certificate verification
 @subsection Advanced certificate verification

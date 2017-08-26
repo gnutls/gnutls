@@ -52,6 +52,7 @@
 #include <gnutls/dtls.h>
 #include "dtls.h"
 #include "tls13/session_ticket.h"
+#include "ext/cert_types.h"
 
 /* to be used by supplemental data support to disable TLS1.3
  * when supplemental data have been globally registered */
@@ -140,30 +141,9 @@ gnutls_certificate_type_t
 gnutls_certificate_type_get2(gnutls_session_t session,
 			     gnutls_ctype_target_t target)
 {
-	switch (target) {
-		case GNUTLS_CTYPE_CLIENT:
-			return session->security_parameters.client_ctype;
-			break;
-		case GNUTLS_CTYPE_SERVER:
-			return session->security_parameters.server_ctype;
-			break;
-		case GNUTLS_CTYPE_OURS:
-			if (IS_SERVER(session)) {
-				return session->security_parameters.server_ctype;
-			} else {
-				return session->security_parameters.client_ctype;
-			}
-			break;
-		case GNUTLS_CTYPE_PEERS:
-			if (IS_SERVER(session)) {
-				return session->security_parameters.client_ctype;
-			} else {
-				return session->security_parameters.server_ctype;
-			}
-			break;
-		default:		// Illegal parameter passed
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
+	/* We want to inline this function so therefore
+	 * we've defined it in gnutls_int.h */
+	return get_certificate_type(session, target);
 }
 
 /**
@@ -309,6 +289,10 @@ _gnutls_session_cert_type_supported(gnutls_session_t session,
 	unsigned i;
 	priority_st* ctype_priorities;
 
+	// Check whether this cert type is enabled by the application
+	if (!is_cert_type_enabled(session, cert_type))
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
+
 	// Perform a credentials check if requested
 	if (check_credentials)	{
 		if (!_gnutls_has_cert_credentials(session, cert_type))
@@ -336,14 +320,14 @@ _gnutls_session_cert_type_supported(gnutls_session_t session,
 	// No explicit priorities set, and default ctype is asked
 	if (ctype_priorities->num_priorities == 0
 	    && cert_type == DEFAULT_CERT_TYPE)
-		return 0; // ok
+		return 0;
 
 	/* Now lets find out whether our cert type is in our priority
 	 * list, i.e. set of allowed cert types.
 	 */
 	for (i = 0; i < ctype_priorities->num_priorities; i++) {
 		if (ctype_priorities->priorities[i] == cert_type)
-			return 0;	/* ok */
+			return 0;
 	}
 
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;

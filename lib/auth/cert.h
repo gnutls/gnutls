@@ -32,6 +32,12 @@
 
 #define MAX_OCSP_RESPONSES 8
 
+/* We use the structure below to hold a certificate chain
+ * with corresponding public/private key pair. This structure will
+ * also be used when raw public keys are used. The cert_list will
+ * then not hold the cert chain but only a raw public-key. In that case
+ * the list length is always 1.
+ */
 typedef struct {
 	gnutls_pcert_st *cert_list;	/* a certificate chain */
 	unsigned int cert_list_length;	/* its length */
@@ -73,7 +79,7 @@ typedef struct gnutls_certificate_credentials_st {
 	/* X509 specific stuff */
 	gnutls_x509_trust_list_t tlist;
 	unsigned flags; /* gnutls_certificate_flags */
-	unsigned int verify_flags;	/* flags to be used at 
+	unsigned int verify_flags;	/* flags to be used at
 					 * certificate verification.
 					 */
 	unsigned int verify_depth;
@@ -160,5 +166,10 @@ int _gnutls_gen_dhe_signature(gnutls_session_t session,
 int _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 			       size_t _data_size,
 			       gnutls_datum_t * vparams);
+
+int _gnutls_gen_rawpk_crt(gnutls_session_t session, gnutls_buffer_st* data);
+int _gnutls_proc_rawpk_crt(gnutls_session_t session,
+				uint8_t * data, size_t data_size);
+
 
 #endif
