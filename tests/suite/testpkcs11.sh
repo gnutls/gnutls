@@ -94,6 +94,13 @@ write_privkey () {
 	fi
 	echo ok
 
+	echo -n "* Checking whether object was marked sensitive... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client2" | grep "CKA_SENSITIVE" >/dev/null 2>&1
+	if test $? != 0; then
+		echo "private object was not sensitive"
+		exit_error
+	fi
+	echo ok
 }
 
 # $1: token
@@ -176,6 +183,14 @@ generate_rsa_privkey () {
 		echo failed
 		exit 1
 	fi
+
+	echo -n "* Checking whether private key was marked sensitive... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client" | grep "CKA_SENSITIVE" >/dev/null 2>&1
+	if test $? != 0; then
+		echo "private object was not sensitive"
+		exit_error
+	fi
+	echo ok
 }
 
 # $1: token
