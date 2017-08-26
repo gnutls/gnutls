@@ -184,6 +184,14 @@ generate_rsa_privkey () {
 		exit 1
 	fi
 
+	echo -n "* Checking whether generated private key was marked private... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --list-privkeys "${token};object=gnutls-client" 2>/dev/null | grep 'Label\:' >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		echo "private object was public"
+		exit_error
+	fi
+	echo ok
+
 	echo -n "* Checking whether private key was marked sensitive... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client" | grep "CKA_SENSITIVE" >/dev/null 2>&1
 	if test $? != 0; then
