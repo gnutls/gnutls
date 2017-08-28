@@ -1020,9 +1020,11 @@ pin_callback(void *user, int attempt, const char *token_url,
 				exit(1);
 			}
 
-			fprintf(stderr,
-				"Re-using cached PIN for token '%s'\n",
-				token_label);
+			if (info && info->verbose) {
+				fprintf(stderr,
+					"Re-using cached PIN for token '%s'\n",
+					token_label);
+			}
 			strcpy(pin, cached_pin);
 			cache--;
 			return 0;
