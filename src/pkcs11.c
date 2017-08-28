@@ -98,6 +98,100 @@ pkcs11_delete(FILE * outfile, const char *url,
 	return;
 }
 
+static
+const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl, unsigned flags)
+{
+	int ret;
+	gnutls_pubkey_t pubkey = NULL;
+	gnutls_privkey_t privkey = NULL;
+	gnutls_x509_crt_t crt = NULL;
+	static char str[256];
+	const char *p;
+	unsigned int bits;
+	gnutls_pk_algorithm_t pk;
+	gnutls_ecc_curve_t curve;
+
+	switch (otype) {
+		case GNUTLS_PKCS11_OBJ_X509_CRT:
+			gnutls_x509_crt_init(&crt);
+			ret = gnutls_x509_crt_import_url(crt, objurl, flags);
+			if (ret < 0)
+				goto fail;
+			ret = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
+			if (ret < 0)
+				goto fail;
+			pk = ret;
+
+			p = gnutls_pk_get_name(pk);
+			if (p) {
+				if ((pk == GNUTLS_PK_RSA || pk == GNUTLS_PK_DSA) && bits > 0) {
+					snprintf(str, sizeof(str), "%s-%d", p, bits);
+					p = str;
+				} else if (pk == GNUTLS_PK_ECDSA && gnutls_x509_crt_get_pk_ecc_raw(crt, &curve, NULL, NULL) >= 0) {
+					snprintf(str, sizeof(str), "%s-%s", p, gnutls_ecc_curve_get_name(curve));
+					p = str;
+				}
+			}
+			gnutls_x509_crt_deinit(crt);
+			return p;
+		case GNUTLS_PKCS11_OBJ_PUBKEY:
+			gnutls_pubkey_init(&pubkey);
+			ret = gnutls_pubkey_import_url(pubkey, objurl, flags);
+			if (ret < 0)
+				goto fail;
+			ret = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+			if (ret < 0)
+				goto fail;
+			pk = ret;
+
+			p = gnutls_pk_get_name(pk);
+			if (p) {
+				if ((pk == GNUTLS_PK_RSA || pk == GNUTLS_PK_DSA) && bits > 0) {
+					snprintf(str, sizeof(str), "%s-%d", p, bits);
+					p = str;
+				} else if (pk == GNUTLS_PK_ECDSA && gnutls_pubkey_export_ecc_raw(pubkey, &curve, NULL, NULL) >= 0) {
+					snprintf(str, sizeof(str), "%s-%s", p, gnutls_ecc_curve_get_name(curve));
+					p = str;
+				}
+			}
+
+			gnutls_pubkey_deinit(pubkey);
+			return p;
+		case GNUTLS_PKCS11_OBJ_PRIVKEY:
+			gnutls_privkey_init(&privkey);
+			ret = gnutls_privkey_import_url(privkey, objurl, flags);
+			if (ret < 0)
+				goto fail;
+			ret = gnutls_privkey_get_pk_algorithm(privkey, NULL);
+			if (ret < 0)
+				goto fail;
+			pk = ret;
+
+			p = gnutls_pk_get_name(pk);
+			if (p) {
+				if ((pk == GNUTLS_PK_RSA || pk == GNUTLS_PK_DSA) && bits > 0) {
+					snprintf(str, sizeof(str), "%s-%d", p, bits);
+					p = str;
+				} else if (pk == GNUTLS_PK_ECDSA && gnutls_privkey_export_ecc_raw(privkey, &curve, NULL, NULL, NULL) >= 0) {
+					snprintf(str, sizeof(str), "%s-%s", p, gnutls_ecc_curve_get_name(curve));
+					p = str;
+				}
+			}
+
+			gnutls_privkey_deinit(privkey);
+			return p;
+		default:
+ fail:
+			if (crt)
+				gnutls_x509_crt_deinit(crt);
+			if (pubkey)
+				gnutls_pubkey_deinit(pubkey);
+			if (privkey)
+				gnutls_privkey_deinit(privkey);
+			return NULL;
+	}
+}
+
 /* lists certificates from a token
  */
 void
@@ -155,6 +249,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	for (i = 0; i < crt_list_size; i++) {
 		char buf[128];
 		size_t size;
+		const char *p;
 		unsigned int oflags;
 
 		ret =
@@ -172,12 +267,25 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 			continue;
 		} else {
 			fprintf(outfile, "Object %d:\n\tURL: %s\n", i, output);
-			gnutls_free(output);
 		}
 
+		p = NULL;
 		otype = gnutls_pkcs11_obj_get_type(crt_list[i]);
-		fprintf(outfile, "\tType: %s\n",
-			gnutls_pkcs11_type_get_name(otype));
+		if (otype == GNUTLS_PKCS11_OBJ_PRIVKEY ||
+		    otype == GNUTLS_PKCS11_OBJ_PUBKEY ||
+		    otype == GNUTLS_PKCS11_OBJ_X509_CRT) {
+			p = get_key_algo_type(otype, output, obj_flags);
+		}
+
+		if (p) {
+			fprintf(outfile, "\tType: %s (%s)\n",
+				gnutls_pkcs11_type_get_name(otype), p);
+		} else {
+			fprintf(outfile, "\tType: %s\n",
+				gnutls_pkcs11_type_get_name(otype));
+		}
+
+		gnutls_free(output);
 
 		size = sizeof(buf);
 		ret =
