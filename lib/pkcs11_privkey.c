@@ -872,6 +872,9 @@ _dsa_params_generate(struct ck_function_list *module, ck_session_handle_t sessio
  * can be substituted in the place of the bits parameter using the
  * GNUTLS_CURVE_TO_BITS() macro.
  *
+ * It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
+ * unless there is a strong reason not to.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
