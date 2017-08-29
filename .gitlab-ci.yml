@@ -284,6 +284,7 @@ MinGW32/DLLs:
   only:
   - tags
   artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
     paths:
       - win32-build/
 
@@ -321,6 +322,7 @@ MinGW64/DLLs:
   only:
   - tags
   artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
     paths:
       - win64-build/
 
