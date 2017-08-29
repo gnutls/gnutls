@@ -72,6 +72,43 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .tls_id = 29,
 	 .pk = GNUTLS_PK_ECDH_X25519
 	},
+#ifdef ENABLE_GOST
+	{
+	 .name = "GOST256CPA",
+	 .id = GNUTLS_GROUP_GOST256CPA,
+	 .curve = GNUTLS_ECC_CURVE_GOST256CPA,
+	},
+	{
+	 .name = "GOST256CPB",
+	 .id = GNUTLS_GROUP_GOST256CPB,
+	 .curve = GNUTLS_ECC_CURVE_GOST256CPB,
+	},
+	{
+	 .name = "GOST256CPC",
+	 .id = GNUTLS_GROUP_GOST256CPC,
+	 .curve = GNUTLS_ECC_CURVE_GOST256CPC,
+	},
+	{
+	 .name = "GOST256CPXA",
+	 .id = GNUTLS_GROUP_GOST256CPXA,
+	 .curve = GNUTLS_ECC_CURVE_GOST256CPXA,
+	},
+	{
+	 .name = "GOST256CPXB",
+	 .id = GNUTLS_GROUP_GOST256CPXB,
+	 .curve = GNUTLS_ECC_CURVE_GOST256CPXB,
+	},
+	{
+	 .name = "GOST512A",
+	 .id = GNUTLS_GROUP_GOST512A,
+	 .curve = GNUTLS_ECC_CURVE_GOST512A,
+	},
+	{
+	 .name = "GOST512B",
+	 .id = GNUTLS_GROUP_GOST512B,
+	 .curve = GNUTLS_ECC_CURVE_GOST512B,
+	},
+#endif
 #ifdef ENABLE_DHE
 	{
 	 .name = "FFDHE2048",
