@@ -51,7 +51,7 @@ gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c main.c fuzzer.h me
 gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c main.c fuzzer.h
 gnutls_x509_parser_fuzzer_SOURCES = gnutls_x509_parser_fuzzer.c main.c fuzzer.h
 
-gnutls_set_trust_file_fuzzer_LDADD = $(LDADD) -ldl
+gnutls_set_trust_file_fuzzer_LDADD = $(LDADD) $(LIBDL)
 
 
 #EXTRA_DIST = $(wildcard *.options) $(wildcard *.dict) \

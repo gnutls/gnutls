@@ -123,7 +123,7 @@ if !WINDOWS
 noinst_LTLIBRARIES = libecore.la
 
 mini_record_timing_LDADD = -lrt $(LDADD)
-eagain_cli_LDADD = libecore.la -lrt -lm -ldl -lpthread $(LDADD)
+eagain_cli_LDADD = libecore.la -lrt -lm $(LIBDL) -lpthread $(LDADD)
 nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli mini-record-timing
