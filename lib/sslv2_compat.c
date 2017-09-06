@@ -75,7 +75,7 @@ _gnutls_handshake_select_v2_suite(gnutls_session_t session,
 		}
 	}
 
-	ret = _gnutls_server_select_suite(session, _data, _datalen);
+	ret = _gnutls_server_select_suite(session, _data, _datalen, 0);
 	gnutls_free(_data);
 
 	return ret;
