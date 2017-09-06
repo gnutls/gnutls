@@ -554,6 +554,10 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		session->internals.resumption_requested = 1;
 
 	if (ret == 0) {		/* resumed using default TLS resumption! */
+		ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 1);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		ret = resume_copy_required_values(session);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -613,6 +617,10 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		    max_record_send_size =
 		    session->security_parameters.max_record_send_size;
 
+		ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 1);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		ret = resume_copy_required_values(session);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -622,7 +630,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	/* select an appropriate cipher suite (as well as certificate)
 	 */
-	ret = _gnutls_server_select_suite(session, suite_ptr, suite_size);
+	ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -833,10 +841,13 @@ static int _gnutls_recv_finished(gnutls_session_t session)
 
 /* This selects the best supported ciphersuite from the given ones. Then
  * it adds the suite to the session and performs some checks.
+ *
+ * When @scsv_only is non-zero only the available SCSVs are parsed
+ * and acted upon.
  */
 int
 _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
-			    unsigned int datalen)
+			    unsigned int datalen, unsigned scsv_only)
 {
 	int ret;
 	unsigned int i;
@@ -847,7 +858,9 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 	peer_clist.size = 0;
 
 	for (i = 0; i < datalen; i += 2) {
-#ifdef ENABLE_SSL3 /* No need to support certain SCSV's without SSL 3.0 */
+		/* we support the TLS renegotiation SCSV, even if we are
+		 * not under SSL 3.0, because openssl sends this SCSV
+		 * on resumption unconditionally. */
 		/* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
 		if (session->internals.priorities->sr != SR_DISABLED &&
 		    data[i] == GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR &&
@@ -861,7 +874,6 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 				return retval;
 			}
 		}
-#endif
 
 		/* TLS_FALLBACK_SCSV */
 		if (data[i] == GNUTLS_FALLBACK_SCSV_MAJOR &&
@@ -873,7 +885,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 
 			if (gnutls_protocol_get_version(session) != max)
 				return gnutls_assert_val(GNUTLS_E_INAPPROPRIATE_FALLBACK);
-		} else {
+		} else if (!scsv_only) {
 			if (peer_clist.size < MAX_CIPHERSUITE_SIZE) {
 				peer_clist.entry[peer_clist.size] = ciphersuite_to_entry(&data[i]);
 				if (peer_clist.entry[peer_clist.size] != NULL)
@@ -881,6 +893,9 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 			}
 		}
 	}
+
+	if (scsv_only)
+		return 0;
 
 	ret = _gnutls_figure_common_ciphersuite(session, &peer_clist, &selected);
 	if (ret < 0) {
