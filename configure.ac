@@ -468,7 +468,7 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
-PKG_CHECK_MODULES(CMOCKA, cmocka, [with_cmocka=yes], [with_cmocka=no])
+PKG_CHECK_MODULES(CMOCKA, [cmocka >= 1.0.1], [with_cmocka=yes], [with_cmocka=no])
 AM_CONDITIONAL(HAVE_CMOCKA, test "$with_cmocka" != "no")
 
 with_old_nettle=no
