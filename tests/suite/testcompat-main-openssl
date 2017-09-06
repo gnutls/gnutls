@@ -676,6 +676,18 @@ run_server_suite() {
 	wait
 
 	if test ${NO_TLS1_2} = 0; then
+		# test resumption
+		echo "${PREFIX}Check TLS 1.2 with resumption"
+		eval "${GETPORT}"
+		launch_server $$ --priority "NORMAL${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"
+		PID=$!
+		wait_server ${PID}
+
+		${OPENSSL_CLI} s_client -host localhost -reconnect -tls1_2 -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+			fail ${PID} "Failed"
+
+		kill ${PID}
+		wait
 
 		echo "${PREFIX}Check TLS 1.2 with DHE-RSA ciphersuite"
 		eval "${GETPORT}"
@@ -845,7 +857,7 @@ run_server_suite() {
 }
 
 WAITPID=""
-for mod in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"; do
+for mod in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION" ":%SAFE_RENEGOTIATION"; do
 	run_server_suite $mod &
 	WAITPID="$WAITPID $!"
 done
