@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.6.1 (unreleased)
 
+** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
+   used. Resolves gitlab issue #259.
+
 ** p11tool: added options --sign-params and --hash. This allows testing
    signature with multiple algorithms, including RSA-PSS.
 
