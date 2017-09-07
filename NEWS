@@ -10,6 +10,15 @@ See the end for copying conditions.
 ** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
    used. Resolves gitlab issue #259.
 
+** libgnutls: gnutls_x509_crl_sign, gnutls_x509_crt_sign,
+   gnutls_x509_crq_sign, were modified to sign with a better algorithm than
+   SHA1. They will now sign with an algorithm that corresponds to the security
+   level of the signer's key.
+
+** libgnutls: gnutls_x509_*_sign2() functions and gnutls_x509_*_privkey_sign()
+   accept GNUTLS_DIG_UNKNOWN (0) as a hash function option. That will signal
+   the function to auto-detect an appropriate hash algorithm to use.
+
 ** p11tool: added options --sign-params and --hash. This allows testing
    signature with multiple algorithms, including RSA-PSS.
 
