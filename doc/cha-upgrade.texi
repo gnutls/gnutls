@@ -189,14 +189,17 @@ GnuTLS 3.6.x is source and binary compatible with GnuTLS 3.5.x releases;
 however, there are minor differences, listed below.
 
 @multitable @columnfractions .30 .60
-@headitem Old function @tab Replacement
+@headitem Old functionality @tab Replacement
 
-@item The priority string "+COMP" are a no-op
-@tab Compression will no longer be available.
+@item The priority strings "+COMP" are a no-op
+@tab TLS compression is no longer available.
 
 @item The compression-related functions are deprecated
 @tab No longer use @funcintref{gnutls_compression_get},
 @funcintref{gnutls_compression_get_name}, @funcintref{gnutls_compression_list},
 and @funcintref{gnutls_compression_get_id}.
+
+@item @funcref{gnutls_x509_crt_sign}, @funcref{gnutls_x509_crl_sign}, @funcref{gnutls_x509_crq_sign}
+@tab These signing functions will no longer sign using SHA1, but with a secure hash algorithm.
 
 @end multitable
