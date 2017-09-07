@@ -33,6 +33,7 @@
 
 #ifndef _WIN32
 # include <cmocka.h>
+# include <sys/socket.h>
 # include <arpa/inet.h>
 
 #define BUILD_IN_TESTS
