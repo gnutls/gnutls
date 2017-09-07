@@ -876,6 +876,9 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
  *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
  *   information in the certificate request (e.g., the version using
@@ -935,7 +938,7 @@ gnutls_x509_crq_sign2(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
  */
 int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
-	return gnutls_x509_crq_sign2(crq, key, GNUTLS_DIG_SHA1, 0);
+	return gnutls_x509_crq_sign2(crq, key, 0, 0);
 }
 
 /**
@@ -2541,6 +2544,9 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
  *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
  *   information in the certificate request (e.g., the version using
@@ -2573,6 +2579,27 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 			gnutls_assert();
 			return result;
 		}
+	}
+
+	if (dig == 0) {
+		/* attempt to find a reasonable choice */
+		gnutls_pubkey_t pubkey;
+		int ret;
+
+		ret = gnutls_pubkey_init(&pubkey);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = gnutls_pubkey_import_privkey(pubkey, key, 0, 0);
+		if (ret < 0) {
+			gnutls_pubkey_deinit(pubkey);
+			return gnutls_assert_val(ret);
+		}
+		ret = gnutls_pubkey_get_preferred_hash_algorithm(pubkey, &dig, NULL);
+		gnutls_pubkey_deinit(pubkey);
+
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
 
 	result = _gnutls_privkey_get_spki_params(key, &params);
