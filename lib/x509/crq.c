@@ -865,7 +865,7 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
  * gnutls_x509_crq_sign2:
  * @crq: should contain a #gnutls_x509_crq_t type
  * @key: holds a private key
- * @dig: The message digest to use, i.e., %GNUTLS_DIG_SHA1
+ * @dig: The message digest to use, i.e., %GNUTLS_DIG_SHA256
  * @flags: must be 0
  *
  * This function will sign the certificate request with a private key.
@@ -875,6 +875,10 @@ gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
  *
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
+ *
+ * A known limitation of this function is, that a newly-signed request will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
  *
  * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
  * and in that case, a suitable but reasonable for the key algorithm will be selected.
@@ -929,7 +933,13 @@ gnutls_x509_crq_sign2(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
  * @key: holds a private key
  *
  * This function is the same a gnutls_x509_crq_sign2() with no flags,
- * and SHA1 as the hash algorithm.
+ * and an appropriate hash algorithm. The hash algorithm used may
+ * vary between versions of GnuTLS, and it is tied to the security
+ * level of the issuer's public key.
+ *
+ * A known limitation of this function is, that a newly-signed request will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -2541,6 +2551,10 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
  *
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
+ *
+ * A known limitation of this function is, that a newly-signed request will not
+ * be fully functional (e.g., for signature verification), until it
+ * is exported an re-imported.
  *
  * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
  * and in that case, a suitable but reasonable for the key algorithm will be selected.
