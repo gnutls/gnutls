@@ -1285,6 +1285,8 @@ int gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
 
 /* Certificate request stuff.
  */
+int gnutls_x509_crq_sign(gnutls_x509_crq_t crq,
+			 gnutls_x509_privkey_t key);
 
 int gnutls_x509_crq_sign2(gnutls_x509_crq_t crq,
 			  gnutls_x509_privkey_t key,

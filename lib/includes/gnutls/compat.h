@@ -181,12 +181,6 @@ int gnutls_x509_crt_get_preferred_hash_algorithm(gnutls_x509_crt_t
 						 *mand)
     _GNUTLS_GCC_ATTR_DEPRECATED;
 
-	/* gnutls_x509_crq_privkey_sign() */
-int gnutls_x509_crq_sign(gnutls_x509_crq_t crq,
-			 gnutls_x509_privkey_t key)
-    _GNUTLS_GCC_ATTR_DEPRECATED;
-
-
 	/* use gnutls_privkey_sign_hash() with the GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA flag */
 
 #ifdef _ISOC99_SOURCE
