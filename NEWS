@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.5.16 (unreleased)
 
+** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
+   used. Resolves gitlab issue #259.
+
 ** p11tool: The options --set-pin and --set-so-pin can be used with all operations
    not only with --initialize.
 
