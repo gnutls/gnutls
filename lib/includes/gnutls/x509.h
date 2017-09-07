@@ -399,6 +399,10 @@ int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt_t crt,
 int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt_t dst,
 					gnutls_x509_crt_t src);
 
+int gnutls_x509_crl_sign(gnutls_x509_crl_t crl,
+			 gnutls_x509_crt_t issuer,
+			 gnutls_x509_privkey_t issuer_key);
+
 int gnutls_x509_crl_sign2(gnutls_x509_crl_t crl,
 			  gnutls_x509_crt_t issuer,
 			  gnutls_x509_privkey_t issuer_key,
