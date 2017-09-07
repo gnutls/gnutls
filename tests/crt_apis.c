@@ -78,6 +78,7 @@ void doit(void)
 	gnutls_x509_crt_t crt2;
 	const char *err = NULL;
 	unsigned char buf[64];
+	unsigned int status;
 	gnutls_datum_t out;
 	size_t s = 0;
 	int ret;
@@ -311,6 +312,16 @@ void doit(void)
 	if (ret != 0) {
 		fail("equality test failed\n");
 	}
+
+	ret = gnutls_x509_crt_verify(crt, &crt, 1, 0, &status);
+	if (ret < 0) {
+		fail("verification failed\n");
+	}
+
+	if (status != 0) {
+		fail("verification status failed\n");
+	}
+
 	assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_PEM, &out) >= 0);
 
 	if (debug)
