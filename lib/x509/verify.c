@@ -1562,6 +1562,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 	gnutls_x509_crt_t issuer = NULL;
 	int result, sigalg;
 	time_t now = gnutls_time(0);
+	time_t nextu;
 	unsigned int usage;
 
 	if (verify)
@@ -1677,7 +1678,8 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 	if (gnutls_x509_crl_get_this_update(crl) > now && verify)
 		*verify |= GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE;
 
-	if (gnutls_x509_crl_get_next_update(crl) < now && verify)
+	nextu = gnutls_x509_crl_get_next_update(crl);
+	if (nextu != -1 && nextu < now && verify)
 		*verify |= GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED;
 
 
