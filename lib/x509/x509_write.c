@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1113,6 +1113,9 @@ gnutls_x509_crt_set_private_key_usage_period(gnutls_x509_crt_t crt,
  * be fully functional (e.g., for signature verification), until it
  * is exported an re-imported.
  *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
@@ -1165,7 +1168,9 @@ gnutls_x509_crt_sign2(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
  * @issuer_key: holds the issuer's private key
  *
  * This function is the same a gnutls_x509_crt_sign2() with no flags,
- * and SHA1 as the hash algorithm.
+ * and an appropriate hash algorithm. The hash algorithm used may
+ * vary between versions of GnuTLS, and it is tied to the security
+ * level of the issuer's public key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1175,7 +1180,7 @@ gnutls_x509_crt_sign(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 		     gnutls_x509_privkey_t issuer_key)
 {
 	return gnutls_x509_crt_sign2(crt, issuer, issuer_key,
-				     GNUTLS_DIG_SHA1, 0);
+				     0, 0);
 }
 
 /**
@@ -1785,6 +1790,9 @@ gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
  * be fully functional (e.g., for signature verification), until it
  * is exported an re-imported.
  *
+ * After GnuTLS 3.6.1 the value of @dig may be %GNUTLS_DIG_UNKNOWN,
+ * and in that case, a suitable but reasonable for the key algorithm will be selected.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
@@ -1800,6 +1808,12 @@ gnutls_x509_crt_privkey_sign(gnutls_x509_crt_t crt,
 	if (crt == NULL || issuer == NULL || issuer_key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (dig == 0) {
+		result = gnutls_x509_crt_get_preferred_hash_algorithm(issuer, &dig, NULL);
+		if (result < 0)
+			return gnutls_assert_val(result);
 	}
 
 	MODIFIED(crt);

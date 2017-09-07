@@ -3183,7 +3183,7 @@ gnutls_x509_crt_check_key_purpose(gnutls_x509_crt_t cert,
  * gnutls_x509_crt_get_preferred_hash_algorithm:
  * @crt: Holds the certificate
  * @hash: The result of the call with the hash algorithm used for signature
- * @mand: If non-zero it means that the algorithm MUST use this hash. May be NULL.
+ * @mand: If non-zero it means that the algorithm MUST use this hash. May be %NULL.
  *
  * This function will read the certificate and return the appropriate digest
  * algorithm to use for signing with this certificate. Some certificates (i.e.
