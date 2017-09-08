@@ -9,7 +9,7 @@ variables:
   DEBIAN_BUILD: buildenv-debian-stretch
   FEDORA_BUILD: buildenv-f26
   FEDORA_X86_BUILD: buildenv-f26-x86
-  CPPCHECK_OPTIONS: "--enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
+  CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
 ##################################################
