@@ -1119,7 +1119,7 @@ typedef struct {
 	unsigned rexts_size;
 
 	struct {
-		uint16_t type;
+		uint16_t id;
 		gnutls_ext_priv_data_t priv;
 		gnutls_ext_priv_data_t resumed_priv;
 		uint8_t set;

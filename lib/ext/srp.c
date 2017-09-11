@@ -44,7 +44,7 @@ static int _gnutls_srp_send_params(gnutls_session_t state,
 
 const extension_entry_st ext_mod_srp = {
 	.name = "SRP",
-	.type = GNUTLS_EXTENSION_SRP,
+	.id = GNUTLS_EXTENSION_SRP,
 	.parse_type = GNUTLS_EXT_TLS,
 
 	.recv_func = _gnutls_srp_recv_params,

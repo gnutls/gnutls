@@ -37,7 +37,7 @@ static int _gnutls_ext_etm_send_params(gnutls_session_t session,
 
 const extension_entry_st ext_mod_etm = {
 	.name = "Encrypt-then-MAC",
-	.type = GNUTLS_EXTENSION_ETM,
+	.id = GNUTLS_EXTENSION_ETM,
 	.parse_type = GNUTLS_EXT_MANDATORY,
 
 	.recv_func = _gnutls_ext_etm_recv_params,

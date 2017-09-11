@@ -41,7 +41,7 @@ static void _gnutls_srtp_deinit_data(gnutls_ext_priv_data_t priv);
 
 const extension_entry_st ext_mod_srtp = {
 	.name = "SRTP",
-	.type = GNUTLS_EXTENSION_SRTP,
+	.id = GNUTLS_EXTENSION_SRTP,
 	.parse_type = GNUTLS_EXT_APPLICATION,
 
 	.recv_func = _gnutls_srtp_recv_params,

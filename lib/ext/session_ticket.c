@@ -61,7 +61,7 @@ static void session_ticket_deinit_data(gnutls_ext_priv_data_t priv);
 
 const extension_entry_st ext_mod_session_ticket = {
 	.name = "Session Ticket",
-	.type = GNUTLS_EXTENSION_SESSION_TICKET,
+	.id = GNUTLS_EXTENSION_SESSION_TICKET,
 	.parse_type = GNUTLS_EXT_TLS,
 
 	.recv_func = session_ticket_recv_params,

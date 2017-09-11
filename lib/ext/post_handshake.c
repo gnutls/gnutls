@@ -38,7 +38,7 @@ static int _gnutls_post_handshake_send_params(gnutls_session_t session,
 
 const extension_entry_st ext_mod_post_handshake = {
 	.name = "Post Handshake Auth",
-	.type = GNUTLS_EXTENSION_POST_HANDSHAKE,
+	.id = GNUTLS_EXTENSION_POST_HANDSHAKE,
 	.parse_type = GNUTLS_EXT_TLS,
 
 	.recv_func = _gnutls_post_handshake_recv_params,

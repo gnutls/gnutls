@@ -60,7 +60,7 @@ typedef struct extension_entry_st {
 	const char *name; /* const overriden when free_struct is set */
 	unsigned free_struct;
 
-	uint16_t type;
+	uint16_t id;
 	gnutls_ext_parse_type_t parse_type;
 
 	/* this function must return 0 when Not Applicable

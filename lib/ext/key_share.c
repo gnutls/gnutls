@@ -45,7 +45,7 @@ static int key_share_send_params(gnutls_session_t session,
 
 const extension_entry_st ext_mod_key_share = {
 	.name = "Key Share",
-	.type = GNUTLS_EXTENSION_KEY_SHARE,
+	.id = GNUTLS_EXTENSION_KEY_SHARE,
 	.parse_type = _GNUTLS_EXT_TLS_POST_CS,
 
 	.recv_func = key_share_recv_params,
