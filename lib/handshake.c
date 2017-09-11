@@ -476,9 +476,6 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	pos += 2;
 
-	_gnutls_handshake_log("HSK[%p]: Selected version %s\n",
-		     session, gnutls_protocol_get_name(neg_version));
-
 	/* Read client random value.
 	 */
 	DECR_LEN(len, GNUTLS_RANDOM_SIZE);
@@ -643,6 +640,8 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		gnutls_assert();
 		return ret;
 	}
+
+	_gnutls_handshake_log("HSK[%p]: Selected version %s\n", session, session->security_parameters.pversion->name);
 
 	/* select appropriate compression method */
 	ret =
