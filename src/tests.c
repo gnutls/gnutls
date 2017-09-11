@@ -912,7 +912,7 @@ test_code_t test_record_padding(gnutls_session_t session)
 
 	sprintf(prio_str,
 		INIT_STR BLOCK_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
-		":+VERS-TLS-ALL:-VERS-SSL3.0:" ALL_MACS ":" ALL_KX ":%s", rest);
+		":+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:-VERS-SSL3.0:" ALL_MACS ":" ALL_KX ":%s", rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
