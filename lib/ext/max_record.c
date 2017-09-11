@@ -51,6 +51,7 @@ const extension_entry_st ext_mod_max_record_size = {
 	.name = "Maximum Record Size",
 	.id = GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 	.parse_type = GNUTLS_EXT_TLS,
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 
 	.recv_func = _gnutls_max_record_recv_params,
 	.send_func = _gnutls_max_record_send_params,

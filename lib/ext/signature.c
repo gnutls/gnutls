@@ -52,6 +52,7 @@ static int signature_algorithms_unpack(gnutls_buffer_st * ps,
 const extension_entry_st ext_mod_sig = {
 	.name = "Signature Algorithms",
 	.id = GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_CR,
 	.parse_type = GNUTLS_EXT_TLS,
 
 	.recv_func = _gnutls_signature_algorithm_recv_params,

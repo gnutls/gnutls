@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Red Hat, Inc.
+ * Copyright (C) 2014-2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -20,7 +20,7 @@
  *
  */
 
-/* This file contains the code for the Max Record Size TLS extension.
+/* This file contains the code for the RFC7627 (ext master secret) TLS extension.
  */
 
 #include "gnutls_int.h"
@@ -39,6 +39,7 @@ const extension_entry_st ext_mod_ext_master_secret = {
 	.name = "Extended Master Secret",
 	.id = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
 	.parse_type = GNUTLS_EXT_MANDATORY,
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 
 	.recv_func = _gnutls_ext_master_secret_recv_params,
 	.send_func = _gnutls_ext_master_secret_send_params,

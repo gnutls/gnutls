@@ -34,6 +34,7 @@ static void _gnutls_sr_deinit_data(gnutls_ext_priv_data_t priv);
 const extension_entry_st ext_mod_sr = {
 	.name = "Safe Renegotiation",
 	.id = GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.parse_type = GNUTLS_EXT_MANDATORY,
 
 	.recv_func = _gnutls_sr_recv_params,

@@ -62,6 +62,7 @@ typedef struct extension_entry_st {
 
 	uint16_t id;
 	gnutls_ext_parse_type_t parse_type;
+	unsigned validity; /* multiple items of gnutls_ext_flags_t */
 
 	/* this function must return 0 when Not Applicable
 	 * size of extension data if ok

@@ -39,6 +39,7 @@ const extension_entry_st ext_mod_etm = {
 	.name = "Encrypt-then-MAC",
 	.id = GNUTLS_EXTENSION_ETM,
 	.parse_type = GNUTLS_EXT_MANDATORY,
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 
 	.recv_func = _gnutls_ext_etm_recv_params,
 	.send_func = _gnutls_ext_etm_send_params,

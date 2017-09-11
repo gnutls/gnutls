@@ -2647,11 +2647,12 @@ typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_t packed_data,
  * @GNUTLS_EXT_TLS: TLS-internal extension.
  * @GNUTLS_EXT_MANDATORY: Extension parsed even if resuming (or extensions are disabled).
  *
- * Enumeration of different TLS extension types.  This type is
+ * Enumeration of different TLS extension parsing types.  This type is
  * to indicate whether an extension is useful to application
- * level or TLS level only.  This is used to parse the
- * application level extensions before the "client_hello" callback
- * is called.
+ * level or TLS level only.  This is used to decide the appropriate time
+ * each extension is parsed at during the server or client hello parsing.
+ *
+ * This applies to TLS 1.2 and earlier versions.
  */
 typedef enum {
   GNUTLS_EXT_ANY = 0,
@@ -2664,11 +2665,27 @@ typedef enum {
 /**
  * gnutls_ext_flags_t:
  * @GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL: If specified the extension registered will override the internal; this does not work with extensions existing prior to 3.6.0.
+ * @GNUTLS_EXT_FLAG_CLIENT_HELLO: This extension can be present in a client hello
+ * @GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO: This extension can be present in a TLS1.2 or earlier server hello
+ * @GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO: This extension can be present in a TLS1.3 server hello
+ * @GNUTLS_EXT_FLAG_EE: This extension can be present in encrypted extensions message
+ * @GNUTLS_EXT_FLAG_CT: This extension can be present in certificate message
+ * @GNUTLS_EXT_FLAG_CR: This extension can be present in certificate request message
+ * @GNUTLS_EXT_FLAG_NST: This extension can be present in new session ticket message
+ * @GNUTLS_EXT_FLAG_HRR: This extension can be present in hello retry request message
  *
  * Enumeration of different TLS extension registration flags.
  */
 typedef enum {
-  GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL = 1
+  GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL = 1,
+  GNUTLS_EXT_FLAG_CLIENT_HELLO = (1<<1),
+  GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO = (1<<2),
+  GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO = (1<<3),
+  GNUTLS_EXT_FLAG_EE = (1<<4), /* ENCRYPTED */
+  GNUTLS_EXT_FLAG_CT = (1<<5),
+  GNUTLS_EXT_FLAG_CR = (1<<6),
+  GNUTLS_EXT_FLAG_NST = (1<<7),
+  GNUTLS_EXT_FLAG_HRR = (1<<8)
 } gnutls_ext_flags_t;
 
 /* Register a custom tls extension
