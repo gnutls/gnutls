@@ -85,7 +85,7 @@ static void client(int sd)
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
 				   NULL);
 
 	/* put the anonymous credentials to the current session
@@ -177,7 +177,7 @@ static gnutls_session_t initialize_tls_session(void)
 	 * are adequate.
 	 */
 	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
 				   NULL);
 
 	gnutls_handshake_set_timeout(session, 20 * 1000);

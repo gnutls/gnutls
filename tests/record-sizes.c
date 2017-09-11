@@ -81,7 +81,7 @@ void doit(void)
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_priority_set_direct(server,
-				   "NONE:+VERS-TLS-ALL:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
+				   "NONE:+VERS-TLS1.2:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
 				   NULL);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 	gnutls_transport_set_push_function(server, server_push);
@@ -92,7 +92,7 @@ void doit(void)
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_priority_set_direct(client,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
+				   "NONE:+VERS-TLS1.2:+CIPHER-ALL:+ARCFOUR-128:+MD5:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
 				   NULL);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 	gnutls_transport_set_push_function(client, client_push);
