@@ -26,10 +26,12 @@
 #include <gnutls/gnutls.h>
 
 int _gnutls_parse_extensions(gnutls_session_t session,
+			     gnutls_ext_flags_t msg,
 			     gnutls_ext_parse_type_t parse_type,
 			     const uint8_t * data, int data_size);
 int _gnutls_gen_extensions(gnutls_session_t session,
 			   gnutls_buffer_st * extdata,
+			   gnutls_ext_flags_t msg,
 			   gnutls_ext_parse_type_t);
 int _gnutls_ext_init(void);
 void _gnutls_ext_deinit(void);
@@ -55,6 +57,30 @@ int _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
 int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed);
 int _gnutls_ext_unpack(gnutls_session_t session,
 		       gnutls_buffer_st * packed);
+
+inline static const char *ext_msg_validity_to_str(gnutls_ext_flags_t msg)
+{
+	switch(msg) {
+		case GNUTLS_EXT_FLAG_CLIENT_HELLO:
+			return "client hello";
+		case GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO:
+			return "TLS 1.2 server hello";
+		case GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO:
+			return "TLS 1.3 server hello";
+		case GNUTLS_EXT_FLAG_EE:
+			return "encrypted extensions";
+		case GNUTLS_EXT_FLAG_CT:
+			return "certificate";
+		case GNUTLS_EXT_FLAG_CR:
+			return "certificate request";
+		case GNUTLS_EXT_FLAG_NST:
+			return "new session ticket";
+		case GNUTLS_EXT_FLAG_HRR:
+			return "hello retry request";
+		default:
+			return "(unknown)";
+	}
+}
 
 typedef struct extension_entry_st {
 	const char *name; /* const overriden when free_struct is set */

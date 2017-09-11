@@ -199,6 +199,7 @@ void _gnutls_extension_list_add_sr(gnutls_session_t session)
 
 int
 _gnutls_parse_extensions(gnutls_session_t session,
+			 gnutls_ext_flags_t msg,
 			 gnutls_ext_parse_type_t parse_type,
 			 const uint8_t * data, int data_size)
 {
@@ -255,6 +256,15 @@ _gnutls_parse_extensions(gnutls_session_t session,
 			continue;
 		}
 
+
+		if ((ext->validity & msg) == 0) {
+
+			_gnutls_debug_log("EXT[%p]: Received unexpected extension (%s/%d) for '%s'\n", session,
+					  gnutls_ext_get_name(id), (int)id,
+					  ext_msg_validity_to_str(msg));
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+		}
+
 		if (session->security_parameters.entity == GNUTLS_SERVER) {
 			ret = _gnutls_extension_list_add(session, ext, 1);
 			if (ret == 0)
@@ -283,7 +293,9 @@ _gnutls_parse_extensions(gnutls_session_t session,
 
 static
 int send_extension(gnutls_session_t session, const extension_entry_st *p,
-		   gnutls_buffer_st *extdata, gnutls_ext_parse_type_t parse_type)
+		   gnutls_buffer_st *extdata,
+		   gnutls_ext_flags_t msg,
+		   gnutls_ext_parse_type_t parse_type)
 {
 	int size_pos, appended, ret;
 	size_t size_prev;
@@ -294,6 +306,13 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 	if (parse_type != GNUTLS_EXT_ANY
 	    && p->parse_type != parse_type)
 		return 0;
+
+	if ((msg & p->validity) == 0) {
+		_gnutls_handshake_log("EXT[%p]: Not sending extension (%s/%d) for '%s'\n", session,
+				  gnutls_ext_get_name(p->id), (int)p->id,
+				  ext_msg_validity_to_str(msg));
+		return 0;
+	}
 
 	/* ensure we don't send something twice (i.e, overriden extensions in
 	 * client), and ensure we are sending only what we received in server. */
@@ -352,6 +371,7 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 int
 _gnutls_gen_extensions(gnutls_session_t session,
 		       gnutls_buffer_st * extdata,
+		       gnutls_ext_flags_t msg,
 		       gnutls_ext_parse_type_t parse_type)
 {
 	int size;
@@ -365,7 +385,7 @@ _gnutls_gen_extensions(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	for (i=0; i < session->internals.rexts_size; i++) {
-		ret = send_extension(session, &session->internals.rexts[i], extdata, parse_type);
+		ret = send_extension(session, &session->internals.rexts[i], extdata, msg, parse_type);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -373,7 +393,7 @@ _gnutls_gen_extensions(gnutls_session_t session,
 	/* send_extension() ensures we don't send duplicates, in case
 	 * of overriden extensions */
 	for (i = 0; extfunc[i] != NULL; i++) {
-		ret = send_extension(session, extfunc[i], extdata, parse_type);
+		ret = send_extension(session, extfunc[i], extdata, msg, parse_type);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -697,6 +717,9 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
  * structure using gnutls_ext_set_data(), and they can be retrieved using
  * gnutls_ext_get_data().
  *
+ * Any extensions registered with this function are valid for the client
+ * and TLS1.2 server hello (or encrypted extensions for TLS1.3).
+ *
  * This function is not thread safe.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
@@ -731,6 +754,7 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 	tmp_mod->deinit_func = deinit_func;
 	tmp_mod->pack_func = pack_func;
 	tmp_mod->unpack_func = unpack_func;
+	tmp_mod->validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|GNUTLS_EXT_FLAG_EE;
 
 	ret = ext_register(tmp_mod);
 	if (ret < 0) {
@@ -739,6 +763,11 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 	}
 	return ret;
 }
+
+#define VALIDITY_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO| \
+			GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO| \
+			GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_CT|GNUTLS_EXT_FLAG_CR| \
+			GNUTLS_EXT_FLAG_NST|GNUTLS_EXT_FLAG_HRR)
 
 /**
  * gnutls_session_ext_register:
@@ -765,6 +794,10 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
  * Each registered extension can store temporary data into the gnutls_session_t
  * structure using gnutls_ext_set_data(), and they can be retrieved using
  * gnutls_ext_get_data().
+ *
+ * The validity of the extension registered can be given by the appropriate flags
+ * of %gnutls_ext_flags_t. If no validity is given, then the registered extension
+ * will be valid for client and TLS1.2 server hello (or encrypted extensions for TLS1.3).
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -803,6 +836,11 @@ gnutls_session_ext_register(gnutls_session_t session,
 	tmp_mod.deinit_func = deinit_func;
 	tmp_mod.pack_func = pack_func;
 	tmp_mod.unpack_func = unpack_func;
+	tmp_mod.validity = flags;
+
+	if ((tmp_mod.validity & VALIDITY_MASK) == 0) {
+		tmp_mod.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|GNUTLS_EXT_FLAG_EE;
+	}
 
 	exts = gnutls_realloc(session->internals.rexts, (session->internals.rexts_size+1)*sizeof(*exts));
 	if (exts == NULL) {

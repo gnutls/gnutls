@@ -544,7 +544,8 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	 * resumed ones.
 	 */
 	ret =
-	    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
+				     GNUTLS_EXT_MANDATORY,
 				     ext_ptr, ext_size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -584,7 +585,8 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	 * Unconditionally try to parse extensions; safe renegotiation uses them in
 	 * sslv3 and higher, even though sslv3 doesn't officially support them.
 	 */
-	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_APPLICATION,
+	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
+				       GNUTLS_EXT_APPLICATION,
 				       ext_ptr, ext_size);
 	/* len is the rest of the parsed length */
 	if (ret < 0) {
@@ -601,7 +603,8 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	/* Session tickets are parsed in this point */
 	ret =
-	    _gnutls_parse_extensions(session, GNUTLS_EXT_TLS, ext_ptr, ext_size);
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
+				     GNUTLS_EXT_TLS, ext_ptr, ext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -655,7 +658,8 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	/* call extensions that are intended to be parsed after the ciphersuite/cert
 	 * are known. */
 	ret =
-	    _gnutls_parse_extensions(session, _GNUTLS_EXT_TLS_POST_CS, ext_ptr, ext_size);
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
+				     _GNUTLS_EXT_TLS_POST_CS, ext_ptr, ext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1516,6 +1520,8 @@ read_server_hello(gnutls_session_t session,
 	gnutls_protocol_t version;
 	int len = datalen;
 	const version_entry_st *vers;
+	gnutls_ext_flags_t ext_parse_flag;
+
 	if (datalen < GNUTLS_RANDOM_SIZE+2) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -1566,7 +1572,8 @@ read_server_hello(gnutls_session_t session,
 			DECR_LEN(len, 2 + 1);
 
 			ret =
-			    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
+			    _gnutls_parse_extensions(session, GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+						     GNUTLS_EXT_MANDATORY,
 						     &data[pos], len);
 			if (ret < 0) {
 				gnutls_assert();
@@ -1595,31 +1602,42 @@ read_server_hello(gnutls_session_t session,
 		 */
 		DECR_LEN(len, 1);
 		pos++;
+		ext_parse_flag = GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO;
+	} else {
+		ext_parse_flag = GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
 	}
 
 	/* Parse extensions in order.
 	 */
 	ret =
-	    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY, &data[pos],
-				     len);
+	    _gnutls_parse_extensions(session,
+				     ext_parse_flag,
+				     GNUTLS_EXT_MANDATORY,
+				     &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret =
-	    _gnutls_parse_extensions(session, GNUTLS_EXT_APPLICATION, &data[pos],
-				     len);
+	    _gnutls_parse_extensions(session,
+				     ext_parse_flag,
+				     GNUTLS_EXT_APPLICATION,
+				     &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret =
-	    _gnutls_parse_extensions(session, GNUTLS_EXT_TLS, &data[pos],
-				     len);
+	    _gnutls_parse_extensions(session,
+				     ext_parse_flag,
+				     GNUTLS_EXT_TLS,
+				     &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret =
-	    _gnutls_parse_extensions(session, _GNUTLS_EXT_TLS_POST_CS, &data[pos],
-				     len);
+	    _gnutls_parse_extensions(session,
+				     ext_parse_flag,
+				     _GNUTLS_EXT_TLS_POST_CS,
+				     &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1818,6 +1836,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 			ret =
 			    _gnutls_gen_extensions(session, &extdata,
+						   GNUTLS_EXT_FLAG_CLIENT_HELLO,
 						   type);
 			if (ret < 0) {
 				gnutls_assert();
@@ -1866,6 +1885,7 @@ static int send_server_hello(gnutls_session_t session, int again)
 	    session->security_parameters.session_id_size;
 	char buf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
 	const version_entry_st *vers;
+	gnutls_ext_flags_t ext_parse_flag;
 
 	_gnutls_buffer_init(&extdata);
 
@@ -1874,8 +1894,14 @@ static int send_server_hello(gnutls_session_t session, int again)
 		if (unlikely(vers == NULL))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+		if (vers->tls13_sem)
+			ext_parse_flag = GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
+		else
+			ext_parse_flag = GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO;
+
 		ret =
 		    _gnutls_gen_extensions(session, &extdata,
+					   ext_parse_flag,
 					   (session->internals.resumed ==
 					    RESUME_TRUE) ?
 					   GNUTLS_EXT_MANDATORY :
