@@ -360,8 +360,8 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 			_gnutls_extension_list_add(session, p, 0);
 
 		_gnutls_handshake_log
-			    ("EXT[%p]: Sending extension %s (%d bytes)\n",
-			     session, p->name, appended);
+			    ("EXT[%p]: Sending extension %s/%d (%d bytes)\n",
+			     session, p->name, p->id, appended);
 	} else if (appended == 0)
 		extdata->length -= 4;	/* reset type and size */
 
