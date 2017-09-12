@@ -77,6 +77,7 @@ abi-coverage.Fedora:
       - tests/*.log
       - tests/*/*.log
       - tests/suite/*/*.log
+      - guile/tests/*.log
 
 minimal.Fedora.x86_64:
   stage: stage1-testing
