@@ -87,6 +87,7 @@ else
 COBJECTS += system/keys-dummy.c
 endif
 
+COBJECTS += tls13/encrypted_extensions.c tls13/encrypted_extensions.h
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \

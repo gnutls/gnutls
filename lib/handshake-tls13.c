@@ -47,6 +47,9 @@
 #include <random.h>
 #include <dtls.h>
 #include "secrets.h"
+#include "tls13/encrypted_extensions.h"
+
+static int generate_hs_traffic_keys(gnutls_session_t session);
 
 /*
  * _gnutls13_handshake_client
@@ -58,49 +61,55 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 
 	switch (STATE) {
 	case STATE100:
-		abort();
+		ret =
+		    generate_hs_traffic_keys(session);
 		STATE = STATE100;
-		IMED_RET("recv encrypted extensions", ret, 0);
+		IMED_RET("generate session keys", ret, 0);
 		/* fall through */
 	case STATE101:
-		abort();
+		ret = _gnutls13_recv_encrypted_extensions(session);
 		STATE = STATE101;
-		IMED_RET("recv certificate request", ret, 0);
+		IMED_RET("recv encrypted extensions", ret, 0);
 		/* fall through */
 	case STATE102:
 		abort();
 		STATE = STATE102;
-		IMED_RET("recv certificate", ret, 0);
+		IMED_RET("recv certificate request", ret, 0);
 		/* fall through */
 	case STATE103:
 		abort();
 		STATE = STATE103;
-		IMED_RET("recv server certificate verify", ret, 0);
+		IMED_RET("recv certificate", ret, 0);
 		/* fall through */
 	case STATE104:
+		abort();
+		STATE = STATE104;
+		IMED_RET("recv server certificate verify", ret, 0);
+		/* fall through */
+	case STATE105:
 		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
-		STATE = STATE102;
+		STATE = STATE105;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		FALLTHROUGH;
-	case STATE105:
-		abort();
-		STATE = STATE105;
-		IMED_RET("recv finished", ret, 0);
-		/* fall through */
 	case STATE106:
 		abort();
 		STATE = STATE106;
-		IMED_RET("send certificate", ret, 0);
+		IMED_RET("recv finished", ret, 0);
 		/* fall through */
 	case STATE107:
 		abort();
 		STATE = STATE107;
-		IMED_RET("send certificate verify", ret, 0);
+		IMED_RET("send certificate", ret, 0);
 		/* fall through */
 	case STATE108:
 		abort();
 		STATE = STATE108;
+		IMED_RET("send certificate verify", ret, 0);
+		/* fall through */
+	case STATE109:
+		abort();
+		STATE = STATE109;
 		IMED_RET("send finished", ret, 0);
 
 		STATE = STATE0;
