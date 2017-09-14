@@ -828,6 +828,68 @@ _gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
 }
 
 int
+_gnutls_buffer_pop_datum_prefix16(gnutls_buffer_st * buf,
+				  gnutls_datum_t * data)
+{
+	size_t size;
+
+	if (buf->length < 2) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	size = _gnutls_read_uint16(buf->data);
+
+	buf->data += 2;
+	buf->length -= 2;
+
+	if (size > 0) {
+		size_t osize = size;
+		_gnutls_buffer_pop_datum(buf, data, size);
+		if (osize != data->size) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+	} else {
+		data->size = 0;
+		data->data = NULL;
+	}
+
+	return 0;
+}
+
+int
+_gnutls_buffer_pop_datum_prefix8(gnutls_buffer_st * buf,
+				 gnutls_datum_t * data)
+{
+	size_t size;
+
+	if (buf->length < 1) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	size = buf->data[0];
+
+	buf->data++;
+	buf->length--;
+
+	if (size > 0) {
+		size_t osize = size;
+		_gnutls_buffer_pop_datum(buf, data, size);
+		if (osize != data->size) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+	} else {
+		data->size = 0;
+		data->data = NULL;
+	}
+
+	return 0;
+}
+
+int
 _gnutls_buffer_append_data_prefix(gnutls_buffer_st * buf,
 				  int pfx_size, const void *data,
 				  size_t data_size)
