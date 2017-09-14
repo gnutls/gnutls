@@ -700,6 +700,7 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
  *      1 byte the protocol version
  *
  *      2 bytes the cipher suite
+ *      4 bytes the PRF ID
  *
  *      48 bytes the master secret
  *
@@ -744,6 +745,8 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 
 	BUFFER_APPEND_NUM(ps, session->security_parameters.entity);
 	BUFFER_APPEND(ps, session->security_parameters.cs->id, 2);
+	BUFFER_APPEND_NUM(ps, session->security_parameters.prf->id);
+
 	BUFFER_APPEND_NUM(ps, session->security_parameters.cert_type);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.pversion->id);
 
@@ -818,6 +821,11 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP(ps, cs, 2);
 	session->internals.resumed_security_parameters.cs = ciphersuite_to_entry(cs);
 	if (session->internals.resumed_security_parameters.cs == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	BUFFER_POP_NUM(ps, version);
+	session->internals.resumed_security_parameters.prf = mac_to_entry(version);
+	if (session->internals.resumed_security_parameters.prf == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	BUFFER_POP_NUM(ps,
@@ -949,6 +957,13 @@ gnutls_session_set_premaster(gnutls_session_t session, unsigned int entity,
 	    DEFAULT_CERT_TYPE;
 	session->internals.resumed_security_parameters.pversion =
 	    version_to_entry(version);
+
+	if (session->internals.resumed_security_parameters.pversion->selectable_prf)
+		session->internals.resumed_security_parameters.prf = mac_to_entry(session->internals.resumed_security_parameters.cs->prf);
+	else
+		session->internals.resumed_security_parameters.prf = mac_to_entry(GNUTLS_MAC_MD5_SHA1);
+	if (session->internals.resumed_security_parameters.prf == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (session->internals.resumed_security_parameters.pversion ==
 	    NULL)
