@@ -92,7 +92,7 @@ _gnutls_PRF(gnutls_session_t session,
 	    const char *label, int label_size, const uint8_t * seed,
 	    int seed_size, int total_bytes, void *ret)
 {
-	return _gnutls_prf_raw(session->security_parameters.prf_mac,
+	return _gnutls_prf_raw(session->security_parameters.prf->id,
 			       secret_size, secret,
 			       label_size, label,
 			       seed_size, seed,

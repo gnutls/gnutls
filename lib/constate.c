@@ -248,9 +248,9 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 		if (cs->prf == GNUTLS_MAC_UNKNOWN ||
 		    _gnutls_mac_is_ok(mac_to_entry(cs->prf)) == 0)
 			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-		session->security_parameters.prf_mac = cs->prf;
+		session->security_parameters.prf = mac_to_entry(cs->prf);
 	} else {
-		session->security_parameters.prf_mac = GNUTLS_MAC_MD5_SHA1;
+		session->security_parameters.prf = mac_to_entry(GNUTLS_MAC_MD5_SHA1);
 	}
 
 	session->security_parameters.cs = cs;

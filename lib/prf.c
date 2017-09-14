@@ -69,7 +69,7 @@ gnutls_prf_raw(gnutls_session_t session,
 {
 	int ret;
 
-	ret = _gnutls_prf_raw(session->security_parameters.prf_mac,
+	ret = _gnutls_prf_raw(session->security_parameters.prf->id,
 			  GNUTLS_MASTER_SIZE, session->security_parameters.master_secret,
 			  label_size, label,
 			  seed_size, (uint8_t *) seed,
@@ -210,7 +210,7 @@ gnutls_prf(gnutls_session_t session,
 	}
 
 	ret =
-	    _gnutls_prf_raw(session->security_parameters.prf_mac,
+	    _gnutls_prf_raw(session->security_parameters.prf->id,
 			GNUTLS_MASTER_SIZE, session->security_parameters.master_secret,
 			label_size, label,
 			seedsize, seed,

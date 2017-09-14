@@ -598,7 +598,8 @@ typedef struct {
 
 	/* This is kept outside the ciphersuite entry as on certain
 	 * TLS versions we need a separate PRF MAC, i.e., MD5_SHA1. */
-	gnutls_mac_algorithm_t prf_mac;
+	const mac_entry_st *prf;
+
 	uint8_t master_secret[GNUTLS_MASTER_SIZE];
 	uint8_t client_random[GNUTLS_RANDOM_SIZE];
 	uint8_t server_random[GNUTLS_RANDOM_SIZE];
@@ -636,7 +637,7 @@ typedef struct {
 	uint8_t etm;
 
 	/* Note: if you add anything in Security_Parameters struct, then
-	 * also modify CPY_COMMON in gnutls_constate.c, and gnutls_session_pack.c,
+	 * also modify CPY_COMMON in constate.c, and session_pack.c,
 	 * in order to save it in the session storage.
 	 */
 

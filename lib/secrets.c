@@ -34,7 +34,7 @@ int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_
 {
 	char buf[128];
 
-	session->key.temp_secret_size = gnutls_hmac_get_len(session->security_parameters.prf_mac);
+	session->key.temp_secret_size = session->security_parameters.prf->output_size;
 
 	/* when no PSK, use the zero-value */
 	if (psk == NULL) {
@@ -46,7 +46,7 @@ int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_
 		psk = (uint8_t*)buf;
 	}
 
-	return gnutls_hmac_fast(session->security_parameters.prf_mac,
+	return gnutls_hmac_fast(session->security_parameters.prf->id,
 				"", 0,
 				psk, psk_size,
 				session->key.temp_secret);
@@ -55,7 +55,7 @@ int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_
 /* HKDF-Extract(Prev-Secret, key) */
 int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t key_size)
 {
-	return gnutls_hmac_fast(session->security_parameters.prf_mac,
+	return gnutls_hmac_fast(session->security_parameters.prf->id,
 				session->key.temp_secret, session->key.temp_secret_size,
 				key, key_size,
 				session->key.temp_secret);
@@ -71,12 +71,12 @@ int _tls13_expand_hash_secret(gnutls_session_t session,
 {
 	uint8_t digest[MAX_HASH_SIZE];
 	int ret;
-	unsigned digest_size = gnutls_hmac_get_len(session->security_parameters.prf_mac);
+	unsigned digest_size = session->security_parameters.prf->output_size;
 
 	if (unlikely(label_size >= sizeof(digest)))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = gnutls_hash_fast((gnutls_digest_algorithm_t)session->security_parameters.prf_mac,
+	ret = gnutls_hash_fast((gnutls_digest_algorithm_t)session->security_parameters.prf->id,
 				tbh, tbh_size, digest);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -120,7 +120,7 @@ int _tls13_expand_secret(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	switch(session->security_parameters.prf_mac) {
+	switch(session->security_parameters.prf->id) {
 	case GNUTLS_MAC_SHA256:{
 		struct hmac_sha256_ctx ctx;
 
