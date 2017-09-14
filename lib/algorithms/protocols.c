@@ -40,6 +40,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 0,
 	 .obsolete = 1,
 	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
 	{.name = "TLS1.0",
@@ -55,6 +56,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 0,
 	 .obsolete = 0,
 	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
 	{.name = "TLS1.1",
@@ -70,6 +72,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 0,
 	 .obsolete = 0,
 	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
 	{.name = "TLS1.2",
@@ -85,6 +88,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 1,
 	 .obsolete = 0,
 	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 1
 	},
 #ifdef TLS13_FINAL_VERSION
@@ -105,7 +109,7 @@ static const version_entry_st sup_versions[] = {
 	 .post_handshake_auth = 1,
 	 .key_shares = 1,
 	 .false_start = 0, /* doesn't make sense */
-	 .tls_sig_sem = 1
+	 .tls_sig_sem = SIG_SEM_TLS13
 	},
 #else
 	{.name = "TLS1.3",
@@ -125,7 +129,7 @@ static const version_entry_st sup_versions[] = {
 	 .post_handshake_auth = 1,
 	 .key_shares = 1,
 	 .false_start = 0, /* doesn't make sense */
-	 .tls_sig_sem = 1
+	 .tls_sig_sem = SIG_SEM_TLS13
 	},
 #endif
 	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
@@ -141,6 +145,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 0,
 	 .obsolete = 0,
 	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
 	{.name = "DTLS1.0",
@@ -156,6 +161,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 0,
 	 .obsolete = 0,
 	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 0
 	},
 	{.name = "DTLS1.2",
@@ -171,6 +177,7 @@ static const version_entry_st sup_versions[] = {
 	 .selectable_prf = 1,
 	 .obsolete = 0,
 	 .only_extension = 0,
+	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 1
 	},
 	{0, 0, 0, 0, 0}

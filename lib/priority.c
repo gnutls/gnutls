@@ -1201,11 +1201,13 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		if (priority_cache->protocol.priority[i] < GNUTLS_DTLS_VERSION_MIN) {
 			tlsmax = version_to_entry(priority_cache->protocol.priority[i]);
 			if (tlsmax)
-				tls_sig_sem = tlsmax->tls_sig_sem;
+				tls_sig_sem |= tlsmax->tls_sig_sem;
 			if (dtlsmax)
 				break;
 		} else { /* dtls */
 			dtlsmax = version_to_entry(priority_cache->protocol.priority[i]);
+			if (dtlsmax)
+				tls_sig_sem |= dtlsmax->tls_sig_sem;
 			if (tlsmax)
 				break;
 		}
@@ -1249,9 +1251,9 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	for (i = 0; i < priority_cache->_sign_algo.algorithms; i++) {
 		se = _gnutls_sign_to_entry(priority_cache->_sign_algo.priority[i]);
 		if (se != NULL && priority_cache->sigalg.size < sizeof(priority_cache->sigalg.entry)/sizeof(priority_cache->sigalg.entry[0])) {
-			/* if the signature algorithm semantics are higher than
+			/* if the signature algorithm semantics are not compatible with
 			 * the protocol's, then skip. */
-			if (se->aid.tls_sem > tls_sig_sem)
+			if ((se->aid.tls_sem & tls_sig_sem) == 0)
 				continue;
 			priority_cache->sigalg.entry[priority_cache->sigalg.size++] = se;
 		}
