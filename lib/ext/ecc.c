@@ -123,9 +123,9 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 	unsigned min_dh;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		/* A client shouldn't receive this extension, but of course
-		 * there are servers out there that send it. Just ignore it. */
-		_gnutls_debug_log("received SUPPORTED ECC extension on client side!!!\n");
+		/* A client shouldn't receive this extension in TLS1.2. It is
+		 * possible to read that message under TLS1.3 as an encrypted
+		 * extension. */
 		return 0;
 	} else {		/* SERVER SIDE - we must check if the sent supported ecc type is the right one 
 				 */
