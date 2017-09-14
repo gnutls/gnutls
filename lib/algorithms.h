@@ -343,6 +343,9 @@ gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk(gnutls_sign_algorithm_t
 const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t,
 				     gnutls_digest_algorithm_t mac);
 
+const gnutls_sign_entry_st *
+_gnutls_tls_aid_to_sign_entry(uint8_t id0, uint8_t id1, const version_entry_st *ver);
+
 gnutls_sign_algorithm_t
 _gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st *ver);
 const sign_algorithm_st *_gnutls_sign_to_tls_aid(gnutls_sign_algorithm_t

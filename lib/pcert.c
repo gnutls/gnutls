@@ -317,7 +317,8 @@ int gnutls_pcert_export_x509(gnutls_pcert_st * pcert,
  **/
 void gnutls_pcert_deinit(gnutls_pcert_st * pcert)
 {
-	gnutls_pubkey_deinit(pcert->pubkey);
+	if (pcert->pubkey)
+		gnutls_pubkey_deinit(pcert->pubkey);
 	pcert->pubkey = NULL;
 	_gnutls_free_datum(&pcert->cert);
 }

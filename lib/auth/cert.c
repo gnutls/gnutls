@@ -72,8 +72,7 @@ typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64
 /* Copies data from a internal certificate struct (gnutls_pcert_st) to 
  * exported certificate struct (cert_auth_info_t)
  */
-static int copy_certificate_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts,	/* openpgp only */
-				      void *keyid)
+int _gnutls_copy_certificate_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts)
 {
 	/* Copy peer's information to auth_info_t
 	 */
@@ -836,11 +835,11 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	if ((ret =
-	     copy_certificate_auth_info(info,
+	ret =
+	     _gnutls_copy_certificate_auth_info(info,
 					peer_certificate_list,
-					peer_certificate_list_size,
-					NULL)) < 0) {
+					peer_certificate_list_size);
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}

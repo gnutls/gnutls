@@ -48,6 +48,10 @@
 #include <dtls.h>
 #include "secrets.h"
 #include "tls13/encrypted_extensions.h"
+#include "tls13/certificate_request.h"
+#include "tls13/certificate_verify.h"
+#include "tls13/certificate.h"
+#include "tls13/finished.h"
 
 static int generate_hs_traffic_keys(gnutls_session_t session);
 
@@ -72,17 +76,17 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		IMED_RET("recv encrypted extensions", ret, 0);
 		/* fall through */
 	case STATE102:
-		abort();
+		ret = _gnutls13_recv_certificate_request(session);
 		STATE = STATE102;
 		IMED_RET("recv certificate request", ret, 0);
 		/* fall through */
 	case STATE103:
-		abort();
+		ret = _gnutls13_recv_certificate(session);
 		STATE = STATE103;
 		IMED_RET("recv certificate", ret, 0);
 		/* fall through */
 	case STATE104:
-		abort();
+		ret = _gnutls13_recv_certificate_verify(session);
 		STATE = STATE104;
 		IMED_RET("recv server certificate verify", ret, 0);
 		/* fall through */
@@ -93,22 +97,22 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 			return gnutls_assert_val(ret);
 		FALLTHROUGH;
 	case STATE106:
-		abort();
+		ret = _gnutls13_recv_finished(session);
 		STATE = STATE106;
 		IMED_RET("recv finished", ret, 0);
 		/* fall through */
 	case STATE107:
-		abort();
+		ret = _gnutls13_send_certificate(session);
 		STATE = STATE107;
 		IMED_RET("send certificate", ret, 0);
 		/* fall through */
 	case STATE108:
-		abort();
+		ret = _gnutls13_send_certificate_verify(session);
 		STATE = STATE108;
 		IMED_RET("send certificate verify", ret, 0);
 		/* fall through */
 	case STATE109:
-		abort();
+		ret = _gnutls13_send_finished(session, AGAIN(STATE109));
 		STATE = STATE109;
 		IMED_RET("send finished", ret, 0);
 

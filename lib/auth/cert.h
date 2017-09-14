@@ -130,6 +130,8 @@ int _gnutls_get_selected_cert(gnutls_session_t session,
 			      int *apr_cert_list_length,
 			      gnutls_privkey_t * apr_pkey);
 
+int _gnutls_copy_certificate_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts);
+
 int
 _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs);
 void _gnutls_selected_certs_deinit(gnutls_session_t session);

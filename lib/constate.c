@@ -203,8 +203,6 @@ static int
 _tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
 		unsigned iv_size, unsigned key_size)
 {
-	uint8_t hs_ckey[MAX_HASH_SIZE];
-	uint8_t hs_skey[MAX_HASH_SIZE];
 	uint8_t ckey_block[MAX_CIPHER_KEY_SIZE];
 	uint8_t civ_block[MAX_CIPHER_IV_SIZE];
 	uint8_t skey_block[MAX_CIPHER_KEY_SIZE];
@@ -215,33 +213,33 @@ _tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
 
 	ret = _tls13_derive_secret(session, HANDSHAKE_CLIENT_TRAFFIC_LABEL, sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1,
 				   session->internals.handshake_hash_buffer.data,
-				   session->internals.handshake_hash_buffer.length, hs_ckey);
+				   session->internals.handshake_hash_buffer.length, session->key.hs_ckey);
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* client keys */
-	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, hs_ckey, key_size, ckey_block);
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_ckey, key_size, ckey_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, hs_ckey, iv_size, civ_block);
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_ckey, iv_size, civ_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* server keys */
 	ret = _tls13_derive_secret(session, HANDSHAKE_SERVER_TRAFFIC_LABEL, sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1,
 				        session->internals.handshake_hash_buffer.data,
-				        session->internals.handshake_hash_buffer.length, hs_skey);
+				        session->internals.handshake_hash_buffer.length, session->key.hs_skey);
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, hs_skey, key_size, skey_block);
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_skey, key_size, skey_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, hs_skey, iv_size, siv_block);
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_skey, iv_size, siv_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

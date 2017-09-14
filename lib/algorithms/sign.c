@@ -639,7 +639,7 @@ _gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st *ver)
 		return ret;
 
 	GNUTLS_SIGN_LOOP(
-		if (p->aid.id[0] == id0 && 
+		if (p->aid.id[0] == id0 &&
 		     p->aid.id[1] == id1 &&
 		     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
 
@@ -647,7 +647,6 @@ _gnutls_tls_aid_to_sign(uint8_t id0, uint8_t id1, const version_entry_st *ver)
 			break;
 		}
 	);
-
 
 	return ret;
 }
@@ -674,4 +673,22 @@ const gnutls_sign_entry_st *_gnutls_sign_to_entry(gnutls_sign_algorithm_t sign)
 	GNUTLS_SIGN_ALG_LOOP(ret = p);
 
 	return ret;
+}
+
+const gnutls_sign_entry_st *
+_gnutls_tls_aid_to_sign_entry(uint8_t id0, uint8_t id1, const version_entry_st *ver)
+{
+	if (id0 == 255 && id1 == 255)
+		return NULL;
+
+	GNUTLS_SIGN_LOOP(
+		if (p->aid.id[0] == id0 &&
+		     p->aid.id[1] == id1 &&
+		     ((p->aid.tls_sem & ver->tls_sig_sem) != 0)) {
+
+			return p;
+		}
+	);
+
+	return NULL;
 }
