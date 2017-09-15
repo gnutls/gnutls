@@ -146,6 +146,10 @@ int _tls13_expand_secret(gnutls_session_t session,
 	}
 
 #if 0
+        _gnutls_hard_log("INT: hkdf label: %d,%s\n",
+                         out_size,
+                         _gnutls_bin2hex(str.data, str.length,
+                                         (char*)tmp, sizeof(tmp), NULL));
         _gnutls_hard_log("INT: secret expanded for '%.*s': %d,%s\n", 
                          (int)label_size, label, out_size,
                          _gnutls_bin2hex(out, out_size,

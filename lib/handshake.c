@@ -108,6 +108,7 @@ void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session)
 {
 	session->internals.handshake_hash_buffer_prev_len = 0;
 	session->internals.handshake_hash_buffer_client_kx_len = 0;
+	session->internals.handshake_hash_buffer_server_finished_len = 0;
 	_gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
 }
 
@@ -1190,6 +1191,9 @@ handshake_hash_add_recvd(gnutls_session_t session,
 	if (recv_type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
 		session->internals.handshake_hash_buffer_client_kx_len =
 			session->internals.handshake_hash_buffer.length;
+	if (recv_type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_CLIENT)
+		session->internals.handshake_hash_buffer_server_finished_len =
+			session->internals.handshake_hash_buffer.length;
 
 	return 0;
 }
@@ -1235,6 +1239,9 @@ handshake_hash_add_sent(gnutls_session_t session,
 
 		if (type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
 			session->internals.handshake_hash_buffer_client_kx_len =
+				session->internals.handshake_hash_buffer.length;
+		if (type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_SERVER)
+			session->internals.handshake_hash_buffer_server_finished_len =
 				session->internals.handshake_hash_buffer.length;
 
 		return 0;

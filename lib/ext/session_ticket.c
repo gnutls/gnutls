@@ -644,7 +644,7 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 		ret =
 		    _gnutls_epoch_set_keys(session,
 					   session->security_parameters.
-					   epoch_next);
+					   epoch_next, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

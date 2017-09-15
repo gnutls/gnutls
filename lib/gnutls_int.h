@@ -159,6 +159,12 @@ typedef enum transport_t {
 	GNUTLS_DGRAM
 } transport_t;
 
+/* The TLS 1.3 stage of handshake */
+typedef enum hs_stage_t {
+	STAGE_HS,
+	STAGE_APP
+} hs_stage_t;
+
 typedef enum record_flush_t {
 	RECORD_FLUSH = 0,
 	RECORD_CORKED,
@@ -242,7 +248,7 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE20 = 20, STATE21, STATE22,
 	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
 	STATE100=100, STATE101, STATE102, STATE103, STATE104,
-	STATE105, STATE106, STATE107, STATE108, STATE109
+	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110
 } handshake_state_t;
 
 typedef enum bye_state_t {
@@ -893,6 +899,8 @@ typedef struct {
 						 * the last received message */
 	unsigned handshake_hash_buffer_client_kx_len;/* if non-zero it is the length of data until the
 						 * the client key exchange message */
+	unsigned handshake_hash_buffer_server_finished_len;/* if non-zero it is the length of data until the
+						 * the server finished message */
 	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
 						 * message */
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */

@@ -27,7 +27,7 @@ int _gnutls_set_cipher_suite2(gnutls_session_t session,
 			     const gnutls_cipher_suite_entry_st *cs);
 void _gnutls_epoch_set_null_algos(gnutls_session_t session,
 				  record_parameters_st * params);
-int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch);
+int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t stage);
 int _gnutls_connection_state_init(gnutls_session_t session);
 int _gnutls_read_connection_state_init(gnutls_session_t session);
 int _gnutls_write_connection_state_init(gnutls_session_t session);
@@ -44,7 +44,7 @@ void _gnutls_epoch_gc(gnutls_session_t session);
 void _gnutls_epoch_free(gnutls_session_t session,
 			record_parameters_st * state);
 
-int _tls13_connection_state_init(gnutls_session_t session);
+int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage);
 
 static inline int _gnutls_epoch_is_valid(gnutls_session_t session,
 					 int epoch)

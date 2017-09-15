@@ -54,6 +54,7 @@
 #include "tls13/finished.h"
 
 static int generate_hs_traffic_keys(gnutls_session_t session);
+static int generate_ap_traffic_keys(gnutls_session_t session);
 
 /*
  * _gnutls13_handshake_client
@@ -115,6 +116,12 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		ret = _gnutls13_send_finished(session, AGAIN(STATE109));
 		STATE = STATE109;
 		IMED_RET("send finished", ret, 0);
+		/* fall through */
+	case STATE110:
+		ret =
+		    generate_ap_traffic_keys(session);
+		STATE = STATE110;
+		IMED_RET("generate app keys", ret, 0);
 
 		STATE = STATE0;
 		break;
@@ -124,6 +131,34 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 
 	/* explicitly reset any false start flags */
 	session->internals.recv_state = RECV_STATE_0;
+	session->internals.initial_negotiation_completed = 1;
+
+	return 0;
+}
+
+static int generate_ap_traffic_keys(gnutls_session_t session)
+{
+	int ret;
+	uint8_t zero[MAX_HASH_SIZE];
+
+	ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
+				   NULL, 0, session->key.temp_secret);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	memset(zero, 0, session->security_parameters.prf->output_size);
+	ret = _tls13_update_secret(session, zero, session->security_parameters.prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	_gnutls_epoch_bump(session);
+	ret = _gnutls_epoch_dup(session);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _tls13_connection_state_init(session, STAGE_APP);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
@@ -141,14 +176,7 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 		return ret;
 	}
 
-	ret = _tls13_connection_state_init(session);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-				   NULL, 0, session->key.temp_secret);
+	ret = _tls13_connection_state_init(session, STAGE_HS);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

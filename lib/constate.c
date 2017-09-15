@@ -200,7 +200,7 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 }
 
 static int
-_tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
+_tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st * params,
 		unsigned iv_size, unsigned key_size)
 {
 	uint8_t ckey_block[MAX_CIPHER_KEY_SIZE];
@@ -209,11 +209,23 @@ _tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
 	uint8_t siv_block[MAX_CIPHER_IV_SIZE];
 	char buf[65];
 	record_state_st *client_write, *server_write;
+	const char *label;
+	unsigned label_size, hsk_len;
 	int ret;
 
-	ret = _tls13_derive_secret(session, HANDSHAKE_CLIENT_TRAFFIC_LABEL, sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1,
+	if (stage == STAGE_HS) {
+		label = HANDSHAKE_CLIENT_TRAFFIC_LABEL;
+		label_size = sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1;
+		hsk_len = session->internals.handshake_hash_buffer.length;
+	} else {
+		label = APPLICATION_CLIENT_TRAFFIC_LABEL;
+		label_size = sizeof(APPLICATION_CLIENT_TRAFFIC_LABEL)-1;
+		hsk_len = session->internals.handshake_hash_buffer_server_finished_len;
+	}
+
+	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
-				   session->internals.handshake_hash_buffer.length,
+				   hsk_len,
 				   session->key.hs_ckey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -228,9 +240,17 @@ _tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
 		return gnutls_assert_val(ret);
 
 	/* server keys */
-	ret = _tls13_derive_secret(session, HANDSHAKE_SERVER_TRAFFIC_LABEL, sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1,
+	if (stage == STAGE_HS) {
+		label = HANDSHAKE_SERVER_TRAFFIC_LABEL;
+		label_size = sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1;
+	} else {
+		label = APPLICATION_SERVER_TRAFFIC_LABEL;
+		label_size = sizeof(APPLICATION_SERVER_TRAFFIC_LABEL)-1;
+	}
+
+	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
-				   session->internals.handshake_hash_buffer.length,
+				   hsk_len,
 				   session->key.hs_skey);
 
 	if (ret < 0)
@@ -395,7 +415,7 @@ int _gnutls_epoch_dup(gnutls_session_t session)
 	return 0;
 }
 
-int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
+int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t stage)
 {
 	int hash_size;
 	int IV_size;
@@ -434,7 +454,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 
 	if (ver->tls13_sem) {
 		ret = _tls13_set_keys
-		    (session, params, IV_size, key_size);
+		    (session, stage, params, IV_size, key_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -531,7 +551,7 @@ int _gnutls_read_connection_state_init(gnutls_session_t session)
 	    session->security_parameters.entity == GNUTLS_CLIENT)
 		_gnutls_set_resumed_parameters(session);
 
-	ret = _gnutls_epoch_set_keys(session, epoch_next);
+	ret = _gnutls_epoch_set_keys(session, epoch_next, 0);
 	if (ret < 0)
 		return ret;
 
@@ -560,7 +580,7 @@ int _gnutls_write_connection_state_init(gnutls_session_t session)
 	    session->security_parameters.entity == GNUTLS_SERVER)
 		_gnutls_set_resumed_parameters(session);
 
-	ret = _gnutls_epoch_set_keys(session, epoch_next);
+	ret = _gnutls_epoch_set_keys(session, epoch_next, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -787,13 +807,13 @@ _gnutls_epoch_free(gnutls_session_t session, record_parameters_st * params)
 	gnutls_free(params);
 }
 
-int _tls13_connection_state_init(gnutls_session_t session)
+int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage)
 {
 	const uint16_t epoch_next =
 	    session->security_parameters.epoch_next;
 	int ret;
 
-	ret = _gnutls_epoch_set_keys(session, epoch_next);
+	ret = _gnutls_epoch_set_keys(session, epoch_next, stage);
 	if (ret < 0)
 		return ret;
 
