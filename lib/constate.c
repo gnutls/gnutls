@@ -366,6 +366,35 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 	return 0;
 }
 
+/* Sets the next epoch to be a clone of the current one.
+ */
+int _gnutls_epoch_dup(gnutls_session_t session)
+{
+	record_parameters_st *prev;
+	record_parameters_st *next;
+	int ret;
+
+	ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &prev);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_epoch_get(session, EPOCH_NEXT, &next);
+	if (ret < 0) {
+		ret = _gnutls_epoch_new(session, 0, &next);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
+	if (next->initialized
+	    || next->cipher != NULL || next->mac != NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	next->cipher = prev->cipher;
+	next->mac = prev->mac;
+
+	return 0;
+}
+
 int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 {
 	int hash_size;
@@ -514,8 +543,6 @@ int _gnutls_read_connection_state_init(gnutls_session_t session)
 
 	return 0;
 }
-
-
 
 /* Initializes the write connection session
  * (write encrypted data)

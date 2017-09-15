@@ -35,6 +35,8 @@ int _gnutls_write_connection_state_init(gnutls_session_t session);
 #define _gnutls_epoch_bump(session) \
 	(session)->security_parameters.epoch_next++
 
+int _gnutls_epoch_dup(gnutls_session_t session);
+
 int _gnutls_epoch_get(gnutls_session_t session, unsigned int epoch_rel,
 		      record_parameters_st ** params_out);
 int _gnutls_epoch_new(gnutls_session_t session, unsigned null_epoch, record_parameters_st **newp);
