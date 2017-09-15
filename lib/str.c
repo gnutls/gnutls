@@ -775,8 +775,8 @@ _gnutls_buffer_append_prefix(gnutls_buffer_st * buf, int pfx_size,
  * the number read, is less than the data in the buffer
  */
 int
-_gnutls_buffer_pop_prefix(gnutls_buffer_st * buf, size_t * data_size,
-			  int check)
+_gnutls_buffer_pop_prefix32(gnutls_buffer_st * buf, size_t * data_size,
+			    int check)
 {
 	size_t size;
 
@@ -806,7 +806,7 @@ _gnutls_buffer_pop_datum_prefix32(gnutls_buffer_st * buf,
 	size_t size;
 	int ret;
 
-	ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
+	ret = _gnutls_buffer_pop_prefix32(buf, &size, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

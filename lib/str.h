@@ -120,8 +120,8 @@ void _gnutls_buffer_pop_datum(gnutls_buffer_st *, gnutls_datum_t *,
 			      size_t max_size);
 
 /* 32-bit prefix */
-int _gnutls_buffer_pop_prefix(gnutls_buffer_st * buf, size_t * data_size,
-			      int check);
+int _gnutls_buffer_pop_prefix32(gnutls_buffer_st * buf, size_t * data_size,
+			        int check);
 
 /* 32-bit prefix */
 int _gnutls_buffer_pop_datum_prefix32(gnutls_buffer_st * buf,
@@ -245,7 +245,7 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 
 #define BUFFER_POP_NUM(b, o) { \
 	size_t s; \
-	ret = _gnutls_buffer_pop_prefix(b, &s, 0); \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
 	if (ret < 0) { \
 	    gnutls_assert(); \
 	    goto error; \
@@ -255,7 +255,7 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 
 #define BUFFER_POP_CAST_NUM(b, o) { \
 	size_t s; \
-	ret = _gnutls_buffer_pop_prefix(b, &s, 0); \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
 	if (ret < 0) { \
 	    gnutls_assert(); \
 	    goto error; \
