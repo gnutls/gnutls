@@ -213,8 +213,8 @@ _tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
 
 	ret = _tls13_derive_secret(session, HANDSHAKE_CLIENT_TRAFFIC_LABEL, sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1,
 				   session->internals.handshake_hash_buffer.data,
-				   session->internals.handshake_hash_buffer.length, session->key.hs_ckey);
-
+				   session->internals.handshake_hash_buffer.length,
+				   session->key.hs_ckey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -229,8 +229,9 @@ _tls13_set_keys(gnutls_session_t session, record_parameters_st * params,
 
 	/* server keys */
 	ret = _tls13_derive_secret(session, HANDSHAKE_SERVER_TRAFFIC_LABEL, sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1,
-				        session->internals.handshake_hash_buffer.data,
-				        session->internals.handshake_hash_buffer.length, session->key.hs_skey);
+				   session->internals.handshake_hash_buffer.data,
+				   session->internals.handshake_hash_buffer.length,
+				   session->key.hs_skey);
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -387,8 +388,8 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	_gnutls_record_log
 	    ("REC[%p]: Initializing epoch #%u\n", session, params->epoch);
 
-	if (_gnutls_cipher_is_ok(params->cipher) == 0
-	    || _gnutls_mac_is_ok(params->mac) == 0)
+	if (_gnutls_cipher_is_ok(params->cipher) == 0 ||
+	    _gnutls_mac_is_ok(params->mac) == 0)
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	if (_gnutls_version_has_explicit_iv(ver) &&
