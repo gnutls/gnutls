@@ -2180,6 +2180,11 @@ int gnutls_handshake(gnutls_session_t session)
 		    session->internals.priorities->cs.size == 0)
 			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
+		ret =
+		    _gnutls_epoch_new(session, 0, NULL);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		session->internals.used_exts_size = 0;
 		session->internals.crt_requested = 0;
 		session->internals.handshake_in_progress = 1;
@@ -2194,20 +2199,6 @@ int gnutls_handshake(gnutls_session_t session)
 	if (session->internals.recv_state == RECV_STATE_FALSE_START) {
 		session_invalidate(session);
 		return gnutls_assert_val(GNUTLS_E_HANDSHAKE_DURING_FALSE_START);
-	}
-
-	ret =
-	    _gnutls_epoch_get(session,
-			      session->security_parameters.epoch_next,
-			      NULL);
-	if (ret < 0) {
-		/* We assume the epoch is not allocated if _gnutls_epoch_get fails. */
-		ret =
-		    _gnutls_epoch_alloc(session,
-					session->security_parameters.
-					epoch_next, NULL);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
 	}
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
@@ -2242,7 +2233,7 @@ int gnutls_handshake(gnutls_session_t session)
 
 		_gnutls_handshake_internal_state_clear(session);
 
-		session->security_parameters.epoch_next++;
+		_gnutls_epoch_bump(session);
 	}
 
 	return 0;

@@ -242,7 +242,6 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 int gnutls_init(gnutls_session_t * session, unsigned int flags)
 {
 	int ret;
-	record_parameters_st *epoch;
 	
 	FAIL_IF_LIB_ERROR;
 
@@ -250,16 +249,12 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	if (*session == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	ret = _gnutls_epoch_alloc(*session, 0, &epoch);
+	ret = _gnutls_epoch_new(*session, 1, NULL);
 	if (ret < 0) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		gnutls_free(*session);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
-
-	/* Set all NULL algos on epoch 0 */
-	_gnutls_epoch_set_null_algos(*session, epoch);
-
-	(*session)->security_parameters.epoch_next = 1;
+	_gnutls_epoch_bump(*session);
 
 	(*session)->security_parameters.entity =
 	    (flags & GNUTLS_SERVER ? GNUTLS_SERVER : GNUTLS_CLIENT);

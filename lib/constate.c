@@ -260,23 +260,6 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 	return 0;
 }
 
-void
-_gnutls_epoch_set_null_algos(gnutls_session_t session,
-			     record_parameters_st * params)
-{
-	/* This is only called on startup. We are extra paranoid about this
-	   because it may cause unencrypted application data to go out on
-	   the wire. */
-	if (params->initialized || params->epoch != 0) {
-		gnutls_assert();
-		return;
-	}
-
-	params->cipher = cipher_to_entry(GNUTLS_CIPHER_NULL);
-	params->mac = mac_to_entry(GNUTLS_MAC_NULL);
-	params->initialized = 1;
-}
-
 int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 {
 	int hash_size;
@@ -514,15 +497,14 @@ _gnutls_epoch_get(gnutls_session_t session, unsigned int epoch_rel,
 }
 
 int
-_gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
-		    record_parameters_st ** out)
+_gnutls_epoch_new(gnutls_session_t session, unsigned null_epoch, record_parameters_st **newp)
 {
 	record_parameters_st **slot;
 
 	_gnutls_record_log("REC[%p]: Allocating epoch #%u\n", session,
-			   epoch);
+			   session->security_parameters.epoch_next);
 
-	slot = epoch_get_slot(session, epoch);
+	slot = epoch_get_slot(session, session->security_parameters.epoch_next);
 
 	/* If slot out of range or not empty. */
 	if (slot == NULL)
@@ -535,17 +517,24 @@ _gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
 	if (*slot == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	(*slot)->epoch = epoch;
-	(*slot)->cipher = NULL;
-	(*slot)->mac = NULL;
+	(*slot)->epoch = session->security_parameters.epoch_next;
+
+	if (null_epoch) {
+		(*slot)->cipher = cipher_to_entry(GNUTLS_CIPHER_NULL);
+		(*slot)->mac = mac_to_entry(GNUTLS_MAC_NULL);
+		(*slot)->initialized = 1;
+	} else {
+		(*slot)->cipher = NULL;
+		(*slot)->mac = NULL;
+	}
 
 	if (IS_DTLS(session))
-		_gnutls_write_uint16(epoch,
+		_gnutls_write_uint16(session->security_parameters.epoch_next,
 				     UINT64DATA((*slot)->write.
 						sequence_number));
 
-	if (out != NULL)
-		*out = *slot;
+	if (newp != NULL)
+		*newp = *slot;
 
 	return 0;
 }

@@ -32,10 +32,12 @@ int _gnutls_connection_state_init(gnutls_session_t session);
 int _gnutls_read_connection_state_init(gnutls_session_t session);
 int _gnutls_write_connection_state_init(gnutls_session_t session);
 
+#define _gnutls_epoch_bump(session) \
+	(session)->security_parameters.epoch_next++
+
 int _gnutls_epoch_get(gnutls_session_t session, unsigned int epoch_rel,
 		      record_parameters_st ** params_out);
-int _gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
-			record_parameters_st ** out);
+int _gnutls_epoch_new(gnutls_session_t session, unsigned null_epoch, record_parameters_st **newp);
 void _gnutls_epoch_gc(gnutls_session_t session);
 void _gnutls_epoch_free(gnutls_session_t session,
 			record_parameters_st * state);
