@@ -147,7 +147,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid tls-neg-ext-k
 	 multi-alerts naked-alerts pkcs7-cat-parse set_known_dh_params_x509 \
 	 set_known_dh_params_anon set_known_dh_params_psk session-tickets-ok \
 	 session-tickets-missing set_x509_key_file_legacy status-request-ext \
-	 gnutls_x509_crt_sign gnutls_x509_crq_sign \
+	 gnutls_x509_crt_sign gnutls_x509_crq_sign dtls-repro-20170915 \
 	 rng-no-onload dtls1-2-mtu-check crl_apis cert_verify_inv_utf8 \
 	 hostname-check-utf8 pkcs8-key-decode-encrypted priority-mix pkcs7 \
 	 send-data-before-handshake recv-data-before-handshake crt_inv_write \
@@ -191,6 +191,7 @@ resume_x509_CFLAGS = -DUSE_X509
 resume_x509_SOURCES = resume.c
 resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
 
+dtls_repro_20170915_SOURCES = dtls-repro-20170915.c common-cert-key-exchange.c cert-repro-20170915.h
 dtls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls12-cert-key-exchange.c common-cert-key-exchange.h
 dtls10_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls10-cert-key-exchange.c common-cert-key-exchange.h
 tls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls12-cert-key-exchange.c common-cert-key-exchange.h

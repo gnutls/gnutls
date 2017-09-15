@@ -54,11 +54,14 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 	dtls_try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
 		&server_ca3_localhost_cert, &server_ca3_key, &cli_ca3_cert, &cli_ca3_key, client_cert)
 
-void dtls_try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
+#define dtls_try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, serv_cert, serv_key, cli_cert, cli_key, client_cert) \
+	dtls_try_with_key_mtu(name, client_prio, client_kx, server_sign_algo, client_sign_algo, serv_cert, serv_key, cli_cert, cli_key, client_cert, 0)
+
+void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,
 		gnutls_sign_algorithm_t client_sign_algo,
 		const gnutls_datum_t *serv_cert,
 		const gnutls_datum_t *serv_key,
 		const gnutls_datum_t *cli_cert,
 		const gnutls_datum_t *cli_key,
-		unsigned client_cert);
+		unsigned client_cert, unsigned mtu);

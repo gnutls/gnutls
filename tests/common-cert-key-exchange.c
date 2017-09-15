@@ -34,6 +34,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include "utils.h"
+
 #include "eagain-common.h"
 #include "common-cert-key-exchange.h"
 
@@ -130,6 +131,7 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 	if (ret < 0)
 		exit(1);
 
+
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
@@ -213,14 +215,15 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 	gnutls_dh_params_deinit(dh_params);
 }
 
-void dtls_try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
+void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,
 		gnutls_sign_algorithm_t client_sign_algo,
 		const gnutls_datum_t *serv_cert,
 		const gnutls_datum_t *serv_key,
 		const gnutls_datum_t *client_cert,
 		const gnutls_datum_t *client_key,
-		unsigned cert_flags)
+		unsigned cert_flags,
+		unsigned smtu)
 {
 	int ret;
 	char buffer[256];
@@ -272,6 +275,8 @@ void dtls_try_with_key(const char *name, const char *client_prio, gnutls_kx_algo
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_pull_timeout_function(server, server_pull_timeout_func);
 	gnutls_transport_set_ptr(server, server);
+	if (smtu)
+		gnutls_dtls_set_mtu (server, smtu);
 
 	/* Init client */
 
@@ -313,6 +318,8 @@ void dtls_try_with_key(const char *name, const char *client_prio, gnutls_kx_algo
 	gnutls_transport_set_pull_timeout_function(client, client_pull_timeout_func);
 	
 	gnutls_transport_set_ptr(client, client);
+	if (smtu)
+		gnutls_dtls_set_mtu (client, smtu);
 
 	ret = gnutls_priority_set_direct(client, client_prio, NULL);
 	if (ret < 0) {
