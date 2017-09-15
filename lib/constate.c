@@ -601,9 +601,13 @@ void _gnutls_epoch_gc(gnutls_session_t session)
 	min_index = i;
 
 	/* Pick up the slack in the epoch window. */
-	for (i = 0, j = min_index; j < MAX_EPOCH_INDEX; i++, j++)
-		session->record_parameters[i] =
-		    session->record_parameters[j];
+	if (min_index != 0) {
+		for (i = 0, j = min_index; j < MAX_EPOCH_INDEX; i++, j++) {
+			session->record_parameters[i] =
+			    session->record_parameters[j];
+			session->record_parameters[j] = NULL;
+		}
+	}
 
 	/* Set the new epoch_min */
 	if (session->record_parameters[0] != NULL)
