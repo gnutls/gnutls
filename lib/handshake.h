@@ -123,4 +123,7 @@ int _gnutls_send_finished(gnutls_session_t session, int again);
 int _gnutls13_handshake_client(gnutls_session_t session);
 int _gnutls13_handshake_server(gnutls_session_t session);
 
+int
+_gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf);
+
 #endif

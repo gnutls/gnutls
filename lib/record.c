@@ -756,6 +756,7 @@ record_add_to_buffers(gnutls_session_t session,
 {
 
 	int ret;
+	const version_entry_st *ver = get_version(session);
 
 	if ((recv->type == type)
 	    && (type == GNUTLS_APPLICATION_DATA ||
@@ -910,6 +911,22 @@ record_add_to_buffers(gnutls_session_t session,
 						goto cleanup;
 					}
 				}
+			}
+
+			/* retrieve async handshake messages */
+			if (ver->tls13_sem) {
+				gnutls_buffer_st buf;
+
+				_gnutls_ro_buffer_from_datum(&buf, &bufel->msg);
+				ret = _gnutls13_recv_async_handshake(session,
+								     &buf);
+				if (ret < 0) {
+					gnutls_assert();
+				} else {
+					ret = GNUTLS_E_AGAIN;
+				}
+
+				goto cleanup;
 			}
 
 			/* This is legal if HELLO_REQUEST is received - and we are a client.
