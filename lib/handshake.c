@@ -2170,7 +2170,6 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
 int gnutls_handshake(gnutls_session_t session)
 {
 	int ret;
-	record_parameters_st *params;
 
 	/* sanity check. Verify that there are priorities setup.
 	 */
@@ -2200,7 +2199,7 @@ int gnutls_handshake(gnutls_session_t session)
 	ret =
 	    _gnutls_epoch_get(session,
 			      session->security_parameters.epoch_next,
-			      &params);
+			      NULL);
 	if (ret < 0) {
 		/* We assume the epoch is not allocated if _gnutls_epoch_get fails. */
 		ret =

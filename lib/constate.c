@@ -507,7 +507,8 @@ _gnutls_epoch_get(gnutls_session_t session, unsigned int epoch_rel,
 	if (params == NULL || *params == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	*params_out = *params;
+	if (params_out)
+		*params_out = *params;
 
 	return 0;
 }

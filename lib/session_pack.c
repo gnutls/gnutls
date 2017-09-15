@@ -722,7 +722,6 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	int ret;
 	int size_offset;
 	size_t cur_size;
-	record_parameters_st *params;
 
 	if (session->security_parameters.epoch_read
 	    != session->security_parameters.epoch_write) {
@@ -730,7 +729,7 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		return GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE;
 	}
 
-	ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &params);
+	ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
