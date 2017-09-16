@@ -156,6 +156,11 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 	point_size = data[i];
 	i += 1;
 
+	if (point_size == 0) {
+		ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		goto cleanup;
+	}
+
 	DECR_LEN(data_size, point_size);
 
 	if (ecurve->pk == GNUTLS_PK_EC) {
