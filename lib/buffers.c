@@ -950,11 +950,6 @@ parse_handshake_header(gnutls_session_t session, mbuffer_st * bufel,
 	memcpy(hsk->header, _mbuffer_get_udata_ptr(bufel),
 	       handshake_header_size);
 
-	if (hsk->length > 0 &&
-	    (hsk->end_offset - hsk->start_offset >= data_size))
-		return
-		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
-
 	if (hsk->length > 0 && (hsk->start_offset > hsk->end_offset ||
 				hsk->end_offset - hsk->start_offset >=
 				data_size
