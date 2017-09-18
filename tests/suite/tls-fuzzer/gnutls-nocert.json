@@ -20,7 +20,7 @@
           "ext padding, 16130 bytes",
           "ext padding, 65367 bytes"]},
          {"name" : "test-large-hello.py",
-          "comment" : "we don't support fragmentation in client hello",
+          "comment" : "These tests rely on fragmenting the first bytes of the handshake header. Gnutls is limited on that, and doesn't accept handshake header fragmentation.",
           "arguments" :
 	          ["sanity check - fragmented",
 	           "fragmented, padding ext 0 bytes",
@@ -126,7 +126,7 @@
           "comment" : "gnutls doesn't support interleaved data with handshake",
           "exp_pass" : false},
          {"name" : "test-record-layer-fragmentation.py",
-          "comment" : "FIXME: these need investigation",
+          "comment" : "These tests rely on fragmenting the first bytes of the handshake header. Gnutls is limited on that, and doesn't accept handshake header fragmentation.",
           "arguments" : ["-e", "non fragmented, over fragmentation limit: 65535 fragment - 16332B extension",
                          "-e", "small, maximum fragmentation: 1 fragment - 20B extension",
                          "-e", "medium, maximum fragmentation: 1 fragment - 1024B extension"]},
