@@ -39,7 +39,7 @@
 static void encode(const char *test_name, const gnutls_datum_t *raw, const char *expected)
 {
 	int ret;
-	gnutls_datum_t out, in;
+	gnutls_datum_t out;
 
 	ret = gnutls_pem_base64_encode2(NULL, raw, &out);
 	if (ret < 0) {
