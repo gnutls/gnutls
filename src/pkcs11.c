@@ -139,7 +139,7 @@ const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl
 			ret = gnutls_pubkey_import_url(pubkey, objurl, flags);
 			if (ret < 0)
 				goto fail;
-			ret = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+			ret = gnutls_pubkey_get_pk_algorithm(pubkey, &bits);
 			if (ret < 0)
 				goto fail;
 			pk = ret;
@@ -162,7 +162,7 @@ const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl
 			ret = gnutls_privkey_import_url(privkey, objurl, flags);
 			if (ret < 0)
 				goto fail;
-			ret = gnutls_privkey_get_pk_algorithm(privkey, NULL);
+			ret = gnutls_privkey_get_pk_algorithm(privkey, &bits);
 			if (ret < 0)
 				goto fail;
 			pk = ret;
