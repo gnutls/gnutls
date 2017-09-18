@@ -1204,6 +1204,12 @@ GNUTLS_3_6_3
 	gnutls_fips140_set_mode;
 } GNUTLS_3_6_2;
 
+GNUTLS_3_6_xx
+{
+ global:
+	gnutls_ext_get_current_msg;
+} GNUTLS_3_6_2;
+
 GNUTLS_FIPS140_3_4 {
 	gnutls_cipher_self_test;
 	gnutls_pk_self_test;

@@ -214,6 +214,7 @@ int hello_ext_parse(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_s
 	     session, gnutls_ext_get_name(tls_id), tls_id,
 	     data_size);
 
+	_gnutls_ext_set_msg(session, ctx->msg);
 	if ((ret = ext->recv_func(session, data, data_size)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -282,6 +283,7 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 
 	size_prev = buf->length;
 
+	_gnutls_ext_set_msg(session, ctx->msg);
 	ret = p->send_func(session, buf);
 	if (ret < 0 && ret != GNUTLS_E_INT_RET_0) {
 		return gnutls_assert_val(ret);
@@ -875,4 +877,24 @@ gnutls_ext_get_data(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	return _gnutls_hello_ext_get_sdata(session, id, data);
+}
+
+/**
+ * gnutls_ext_get_current_msg:
+ * @session: a #gnutls_session_t opaque pointer
+ *
+ * This function allows an extension handler to obtain the message
+ * this extension is being called from. The returned value is a single
+ * entry of the %gnutls_ext_flags_t enumeration. That is, if an
+ * extension was registered with the %GNUTLS_EXT_FLAG_HRR and
+ * %GNUTLS_EXT_FLAG_EE flags, the value when called during parsing of the
+ * encrypted extensions message will be %GNUTLS_EXT_FLAG_EE.
+ *
+ * If not called under an extension handler, its value is undefined.
+ *
+ * Since: 3.6.x
+ **/
+unsigned gnutls_ext_get_current_msg(gnutls_session_t session)
+{
+	return _gnutls_ext_get_msg(session);
 }

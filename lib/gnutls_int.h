@@ -1187,6 +1187,8 @@ typedef struct {
 	 */
 	ext_track_t used_exts;
 
+	gnutls_ext_flags_t ext_msg; /* accessed through _gnutls_ext_get/set_msg() */
+
 	/* this is not the negotiated max_record_recv_size, but the actual maximum
 	 * receive size */
 	unsigned max_recv_size;
