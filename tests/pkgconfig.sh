@@ -37,15 +37,17 @@ if test $? != 0;then
 	exit 77
 fi
 
+for lib in libidn2 p11-kit-1
+do
+	OTHER=$(${PKGCONFIG} --libs --static $lib)
+	if test -n "${OTHER}" && test "${OTHER#*-R}" != "$OTHER";then
+		echo "Found invalid string in $lib flags: ${OTHER}"
+		exit 77
+	fi
+done
+
 PKG_CONFIG_PATH=${top_builddir}/lib:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
-
-OTHER=$(${PKGCONFIG} --libs --static libidn2)
-OTHER="${OTHER} $(${PKGCONFIG} --libs --static p11-kit-1)"
-if test -n "${OTHER}" && test "${OTHER#*-R}" != "$OTHER";then
-	echo "Found invalid string in libidn2 flags: ${OTHER}"
-	exit 77
-fi
 
 set -e
 
