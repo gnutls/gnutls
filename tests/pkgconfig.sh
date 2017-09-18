@@ -46,6 +46,11 @@ do
 	fi
 done
 
+if ! test -r ${top_builddir}/lib/gnutls.pc ;then
+	echo "gnutls.pc not present at ${top_builddir}/lib"
+	exit 1
+fi
+
 PKG_CONFIG_PATH=${top_builddir}/lib:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
