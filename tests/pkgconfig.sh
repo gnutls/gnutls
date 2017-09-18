@@ -37,13 +37,13 @@ if test $? != 0;then
 	exit 77
 fi
 
-PKG_CONFIG_PATH=${top_builddir}/lib
+PKG_CONFIG_PATH=${top_builddir}/lib:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
-OTHER=$(${PKGCONFIG} --libs --static libidn)
+OTHER=$(${PKGCONFIG} --libs --static libidn2)
 OTHER="${OTHER} $(${PKGCONFIG} --libs --static p11-kit-1)"
 if test -n "${OTHER}" && test "${OTHER#*-R}" != "$OTHER";then
-	echo "Found invalid string in libidn flags: ${OTHER}"
+	echo "Found invalid string in libidn2 flags: ${OTHER}"
 	exit 77
 fi
 
@@ -58,15 +58,17 @@ gnutls_global_init();
 }
 __EOF__
 
-COMMON="-I${PKG_CONFIG_PATH}/includes -L${PKG_CONFIG_PATH}/.libs -I${srcdir}/../lib/includes"
+COMMON="-I${top_builddir}/lib/includes -L${top_builddir}/lib/.libs -I${srcdir}/../lib/includes"
 echo "Trying dynamic linking with:"
 echo "  * flags: $(${PKGCONFIG} --libs gnutls)"
 echo "  * common: ${COMMON}"
 echo "  * lib: ${CFLAGS}"
+echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
 cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
 
 echo ""
 echo "Trying static linking with $(${PKGCONFIG} --libs --static gnutls)"
+echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --static --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
 cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --static --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
 
 rm -f ${TMPFILE} ${TMPFILE_O}
