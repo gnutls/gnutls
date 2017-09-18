@@ -39,6 +39,10 @@ static int _gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
 static int _gnutls_x509_write_dsa_pubkey(gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
+static int _gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
+					 gnutls_datum_t * der);
+static int _gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
+					 gnutls_datum_t * der);
 
 /*
  * some x509 certificate functions that relate to MPI parameter
@@ -157,6 +161,78 @@ _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
 }
 
 int
+_gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
+			      gnutls_datum_t * der)
+{
+	bigint_t x, y;
+	int numlen;
+	int byte_size, ret;
+	size_t size;
+	int pos;
+
+	der->data = NULL;
+	der->size = 0;
+
+	if (params->params_nr < GOST_PUBLIC_PARAMS)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	x = params->params[GOST_X];
+	y = params->params[GOST_Y];
+	numlen = gnutls_ecc_curve_get_size(params->curve);
+
+	if (numlen == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	der->size = 1 + ASN1_MAX_LENGTH_SIZE + 2 * numlen;
+
+	der->data = gnutls_malloc(der->size);
+	if (der->data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	memset(der->data, 0, der->size);
+
+	der->data[0] = ASN1_TAG_OCTET_STRING;
+	asn1_length_der(2 * numlen, &der->data[1], &pos);
+	pos += 1;
+
+	/* pad and store x */
+	byte_size = (_gnutls_mpi_get_nbits(x) + 7) / 8;
+	if (numlen < byte_size) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
+	size = numlen;
+	ret = _gnutls_mpi_print_le(x, &der->data[pos], &size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* pad and store y */
+	byte_size = (_gnutls_mpi_get_nbits(y) + 7) / 8;
+	if (numlen < byte_size) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
+	size = numlen;
+	ret = _gnutls_mpi_print_le(y, &der->data[pos + numlen], &size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	der->size = pos + 2 * numlen;
+
+	return 0;
+
+ cleanup:
+	_gnutls_free_datum(der);
+	return ret;
+}
+
+int
 _gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 				 gnutls_datum_t * der)
 {
@@ -180,6 +256,10 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 		der->size = 0;
 
 		return 0;
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		return _gnutls_x509_write_gost_params(params, der);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
@@ -199,6 +279,10 @@ _gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
 		return _gnutls_x509_write_ecc_pubkey(params, der);
 	case GNUTLS_PK_EDDSA_ED25519:
 		return _gnutls_x509_write_eddsa_pubkey(params, der);
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		return _gnutls_x509_write_gost_pubkey(params, der);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
@@ -435,6 +519,93 @@ _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
       cleanup:
 	_gnutls_free_datum(&tmp);
 	asn1_delete_structure(&c2);
+	asn1_delete_structure(&spk);
+	return result;
+}
+
+static int
+_gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
+			      gnutls_datum_t * der)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	const char *oid;
+
+	der->data = NULL;
+	der->size = 0;
+
+	oid = gnutls_ecc_curve_get_oid(params->curve);
+	if (oid == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+
+	if ((result = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.GOSTParameters", &spk))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if ((result =
+	     asn1_write_value(spk, "publicKeyParamSet", oid,
+			      1)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (params->algo == GNUTLS_PK_GOST_01)
+		oid = HASH_OID_GOST_R_3411_94_CRYPTOPRO_PARAMS;
+	else if (params->algo == GNUTLS_PK_GOST_12_256)
+		oid = HASH_OID_STREEBOG_256;
+	else if (params->algo == GNUTLS_PK_GOST_12_512)
+		oid = HASH_OID_STREEBOG_512;
+	else {
+		gnutls_assert();
+		result = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	if ((result =
+	     asn1_write_value(spk, "digestParamSet", oid,
+			      1)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	oid = gnutls_gost_paramset_get_oid(params->gost_params);
+	if (oid == NULL) {
+		gnutls_assert();
+		result = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	if (params->algo == GNUTLS_PK_GOST_01) {
+		if (params->gost_params == GNUTLS_GOST_PARAMSET_CP_A)
+			oid = NULL;
+	} else {
+		if (params->gost_params == GNUTLS_GOST_PARAMSET_TC26_Z)
+			oid = NULL;
+	}
+
+	if ((result =
+	     asn1_write_value(spk, "encryptionParamSet", oid,
+			      oid ? 1 : 0)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode(spk, "", der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = 0;
+
+      cleanup:
 	asn1_delete_structure(&spk);
 	return result;
 }

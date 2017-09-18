@@ -1404,6 +1404,60 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 		}
 		break;
 
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		{
+			gnutls_datum_t x, y;
+			gnutls_ecc_curve_t curve;
+			gnutls_digest_algorithm_t digest;
+			gnutls_gost_paramset_t param;
+
+			err =
+			    gnutls_pubkey_export_gost_raw2(pubkey, &curve,
+							   &digest,
+							   &param,
+							   &x, &y, 0);
+			if (err < 0)
+				addf(str, "error: get_pk_gost_raw: %s\n",
+				     gnutls_strerror(err));
+			else {
+				addf(str, _("\t\tCurve:\t%s\n"),
+				     gnutls_ecc_curve_get_name(curve));
+				addf(str, _("\t\tDigest:\t%s\n"),
+				     gnutls_digest_get_name(digest));
+				addf(str, _("\t\tParamSet: %s\n"),
+				     gnutls_gost_paramset_get_name(param));
+				if (format ==
+				    GNUTLS_CRT_PRINT_FULL_NUMBERS) {
+					adds(str, _("\t\tX: "));
+					_gnutls_buffer_hexprint(str,
+								x.data,
+								x.size);
+					adds(str, "\n");
+					adds(str, _("\t\tY: "));
+					_gnutls_buffer_hexprint(str,
+								y.data,
+								y.size);
+					adds(str, "\n");
+				} else {
+					adds(str, _("\t\tX:\n"));
+					_gnutls_buffer_hexdump(str, x.data,
+							       x.size,
+							       "\t\t\t");
+					adds(str, _("\t\tY:\n"));
+					_gnutls_buffer_hexdump(str, y.data,
+							       y.size,
+							       "\t\t\t");
+				}
+
+				gnutls_free(x.data);
+				gnutls_free(y.data);
+
+			}
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -1765,6 +1819,15 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		gnutls_ecc_curve_t curve;
 
 		err = gnutls_x509_crt_get_pk_ecc_raw(cert, &curve, NULL, NULL);
+		if (err < 0)
+			return;
+
+		name = gnutls_ecc_curve_get_name(curve);
+		bits = 0;
+	} else if (IS_GOSTEC(err)) {
+		gnutls_ecc_curve_t curve;
+
+		err = gnutls_x509_crt_get_pk_gost_raw(cert, &curve, NULL, NULL, NULL, NULL);
 		if (err < 0)
 			return;
 

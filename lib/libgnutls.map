@@ -1226,6 +1226,9 @@ GNUTLS_3_6_3
 	gnutls_oid_to_gost_paramset;
 	gnutls_decode_gost_rs_value;
 	gnutls_encode_gost_rs_value;
+	gnutls_pubkey_export_gost_raw2;
+	gnutls_pubkey_import_gost_raw;
+	gnutls_x509_crt_get_pk_gost_raw;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {
