@@ -447,6 +447,11 @@ int gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
 				   gnutls_ecc_curve_t * curve,
 				   gnutls_datum_t * x,
 				   gnutls_datum_t * y);
+int gnutls_x509_crt_get_pk_gost_raw(gnutls_x509_crt_t crt,
+				    gnutls_ecc_curve_t * curve,
+				    gnutls_digest_algorithm_t * digest,
+				    gnutls_gost_paramset_t *paramset,
+				    gnutls_datum_t * x, gnutls_datum_t * y);
 
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt_t cert,
 					 unsigned int seq,

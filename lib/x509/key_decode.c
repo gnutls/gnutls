@@ -39,6 +39,8 @@ static int _gnutls_x509_read_ecc_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);
 static int _gnutls_x509_read_eddsa_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);
+static int _gnutls_x509_read_gost_pubkey(uint8_t * der, int dersize,
+					gnutls_pk_params_st * params);
 
 static int
 _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
@@ -115,6 +117,45 @@ int _gnutls_x509_read_eddsa_pubkey(uint8_t * der, int dersize,
 				   gnutls_pk_params_st * params)
 {
 	return _gnutls_set_datum(&params->raw_pub, der, dersize);
+}
+
+static int
+_gnutls_x509_read_gost_pubkey(uint8_t * der, int dersize,
+			     gnutls_pk_params_st * params)
+{
+	int ret;
+	int len;
+	bigint_t *x = &params->params[GOST_X];
+	bigint_t *y = &params->params[GOST_Y];
+
+	/* Quick and dirty parsing of OCTET STRING of 0x40 or 0x80 bytes */
+	if (der[0] != ASN1_TAG_OCTET_STRING) {
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	}
+
+	der++;
+	dersize--;
+
+	ret = asn1_get_length_der(der, dersize, &len);
+	if (ret < 0 || ret % 2 != 0 || dersize != len + ret) {
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	}
+
+	der += len;
+	dersize -= len;
+
+	/* read data */
+	ret = _gnutls_mpi_init_scan_le(x, der, dersize / 2);
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	ret = _gnutls_mpi_init_scan_le(y, der + dersize / 2, dersize / 2);
+	if (ret < 0) {
+		_gnutls_mpi_release(y);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	return 0;
 }
 
 /* reads p,q and g 
@@ -387,6 +428,97 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
 	return result;
 }
 
+/* reads the curve from the certificate.
+ * It does NOT set params_nr.
+ */
+int
+_gnutls_x509_read_gost_params(uint8_t * der, int dersize,
+			      gnutls_pk_params_st * params)
+{
+	int ret;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+	char oid[MAX_OID_SIZE];
+	int oid_size;
+	gnutls_ecc_curve_t curve;
+	int param;
+
+	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
+				       "GNUTLS.GOSTParameters",
+				       &spk)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(ret);
+	}
+
+	ret = asn1_der_decoding(&spk, der, dersize, NULL);
+
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+
+	/* read the curve */
+	oid_size = sizeof(oid);
+	ret = asn1_read_value(spk, "publicKeyParamSet", oid, &oid_size);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+
+	curve = gnutls_oid_to_ecc_curve(oid);
+	if (curve == GNUTLS_ECC_CURVE_INVALID) {
+		_gnutls_debug_log("Curve %s is not supported\n", oid);
+		gnutls_assert();
+		ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+		goto cleanup;
+	}
+
+	/* Read the digest */
+	oid_size = sizeof(oid);
+	ret = asn1_read_value(spk, "digestParamSet", oid, &oid_size);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+	/* For now ignore the OID: we use pk OID instead */
+
+	if (!strcmp(oid, HASH_OID_GOST_R_3411_94_CRYPTOPRO_PARAMS))
+		param = GNUTLS_GOST_PARAMSET_CP_A;
+	else
+		param = GNUTLS_GOST_PARAMSET_TC26_Z;
+
+	oid_size = sizeof(oid);
+	ret = asn1_read_value(spk, "encryptionParamSet", oid, &oid_size);
+	if (ret != ASN1_SUCCESS &&
+	    ret != ASN1_ELEMENT_NOT_FOUND) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+
+	if (ret != ASN1_ELEMENT_NOT_FOUND)
+		param = gnutls_oid_to_gost_paramset(oid);
+
+	if (param < 0) {
+		gnutls_assert();
+		ret = param;
+		goto cleanup;
+	}
+
+	params->curve = curve;
+	params->gost_params = param;
+	ret = 0;
+
+      cleanup:
+
+	asn1_delete_structure(&spk);
+
+	return ret;
+
+}
+
 /* This function must be called after _gnutls_x509_read_params()
  */
 int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
@@ -423,6 +555,15 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 	case GNUTLS_PK_EDDSA_ED25519:
 		ret = _gnutls_x509_read_eddsa_pubkey(der, dersize, params);
 		break;
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		ret = _gnutls_x509_read_gost_pubkey(der, dersize, params);
+		if (ret >= 0) {
+			params->algo = algo;
+			params->params_nr = GOST_PUBLIC_PARAMS;
+		}
+		break;
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 		break;
@@ -446,6 +587,10 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 		return _gnutls_x509_read_dsa_params(der, dersize, params);
 	case GNUTLS_PK_EC:
 		return _gnutls_x509_read_ecc_params(der, dersize, &params->curve);
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		return _gnutls_x509_read_gost_params(der, dersize, params);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
@@ -479,6 +624,9 @@ int _gnutls_x509_check_pubkey_params(gnutls_pk_params_st * params)
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
 		return 0;
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);

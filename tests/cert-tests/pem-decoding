@@ -124,7 +124,13 @@ fi
 
 
 #check whether the cert with GOST parameters is decoded as expected
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/gost-cert.pem" >${TMPFILE}
+if test "${ENABLE_GOST}" = "1"; then
+	GOSTCERT="${srcdir}/data/gost-cert.pem"
+else
+	GOSTCERT="${srcdir}/data/gost-cert-nogost.pem"
+fi
+
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${GOSTCERT}" >${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -132,11 +138,28 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} -I 'Algorithm Security Level' ${TMPFILE} "${srcdir}/data/gost-cert.pem" || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${TMPFILE}" "${srcdir}/data/gost-cert.pem"
+${DIFF} -u ${TMPFILE} "${GOSTCERT}" || ${DIFF} -u --strip-trailing-cr "${TMPFILE}" "${GOSTCERT}"
 rc=$?
 
 if test "${rc}" != "0"; then
 	echo "GOST cert decoding failed 2"
+	exit ${rc}
+fi
+
+#check whether the cert with GOST 31.10/11-94 parameters is decoded as expected
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/gost94-cert.pem" >${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "GOST94 cert decoding failed 1"
+	exit ${rc}
+fi
+
+${DIFF} -I 'Algorithm Security Level' ${TMPFILE} "${srcdir}/data/gost94-cert.pem" || ${DIFF} -I 'Algorithm Security Level' --strip-trailing-cr "${TMPFILE}" "${srcdir}/data/gost94-cert.pem"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "GOST94 cert decoding failed 2"
 	exit ${rc}
 fi
 
