@@ -357,14 +357,13 @@ str_days (parser_control *pc, char* /*output*/ buffer, size_t n)
   if (pc->debug_ordinal_day_seen)
     {
       /* use word description of possible (e.g. -1 = last, 3 = third) */
-      if (pc->day_ordinal>=-1 && pc->day_ordinal <=12)
+      if (pc->day_ordinal>=-1 && pc->day_ordinal<=12)
         {
-          strncpy (buffer, ordinal_values[ pc->day_ordinal+1 ], n);
-          buffer[n-1]='\0';
+          snprintf (buffer, n, "%s", ordinal_values[pc->day_ordinal + 1]);
         }
       else
         {
-          snprintf (buffer,n,"%ld",pc->day_ordinal);
+          snprintf (buffer, n, "%ld", pc->day_ordinal);
         }
     }
   else
@@ -376,12 +375,10 @@ str_days (parser_control *pc, char* /*output*/ buffer, size_t n)
   if (pc->day_number>=0 && pc->day_number<=6)
     {
       size_t l = strlen (buffer);
-      if (l>0)
-        {
-          strncat (buffer," ",n-l);
-          ++l;
-        }
-      strncat (buffer,days_values[pc->day_number],n-l);
+
+      if (l < n)
+        snprintf (buffer + l, n - l, "%s%s",
+			  (l ? " " : ""), days_values[pc->day_number]);
     }
   else
     {
