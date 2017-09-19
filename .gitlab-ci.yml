@@ -183,6 +183,7 @@ static-analyzers/Fedora/x86_64:
   - make -j$(nproc) syntax-check
   - make -j$(nproc) -C gl
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
+  - make -j$(nproc) -C src/gl && scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C src
   - scan-build --status-bugs -o scan-build-libdane make -j$(nproc) -C libdane
   - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -j$(nproc) $CPPCHECK_OPTIONS
   - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j$(nproc) $CPPCHECK_OPTIONS
@@ -378,6 +379,8 @@ ubsan-Werror/Fedora/x86_64:
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
   - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g"
+  - make -j$(nproc) -C src/gl
+  - make -j$(nproc) -C src CFLAGS="-Werror -O2 -g -fsanitize=undefined -Wno-error=parentheses -Wno-error=unused-macros"
   - make -j$(nproc)
   - make check -j$(nproc)
   - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --disable-non-suiteb-curves --disable-guile --disable-doc --with-default-trust-store-pkcs11="pkcs11:"
