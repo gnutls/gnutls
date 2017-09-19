@@ -524,7 +524,8 @@ _gnutls_heartbeat_unpack(gnutls_buffer_st * ps,
 
 const extension_entry_st ext_mod_heartbeat = {
 	.name = "Heartbeat",
-	.id = GNUTLS_EXTENSION_HEARTBEAT,
+	.tls_id = 15,
+	.gid = GNUTLS_EXTENSION_HEARTBEAT,
 	.parse_type = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 

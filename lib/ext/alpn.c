@@ -36,7 +36,8 @@ static void _gnutls_alpn_deinit_data(gnutls_ext_priv_data_t priv);
 
 const extension_entry_st ext_mod_alpn = {
 	.name = "ALPN",
-	.id = GNUTLS_EXTENSION_ALPN,
+	.tls_id = 16,
+	.gid = GNUTLS_EXTENSION_ALPN,
 	/* this extension must be parsed even on resumption */
 	.parse_type = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,

@@ -51,7 +51,8 @@ static int _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
 
 const extension_entry_st ext_mod_supported_ecc = {
 	.name = "Negotiated Groups",
-	.id = GNUTLS_EXTENSION_SUPPORTED_ECC,
+	.tls_id = 10,
+	.gid = GNUTLS_EXTENSION_SUPPORTED_ECC,
 	.parse_type = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 
@@ -65,7 +66,8 @@ const extension_entry_st ext_mod_supported_ecc = {
 
 const extension_entry_st ext_mod_supported_ecc_pf = {
 	.name = "Supported ECC Point Formats",
-	.id = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
+	.tls_id = 11,
+	.gid = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
 	.parse_type = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 

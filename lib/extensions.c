@@ -92,20 +92,20 @@ static extension_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 };
 
 static const extension_entry_st *
-_gnutls_ext_ptr(gnutls_session_t session, uint16_t id, gnutls_ext_parse_type_t parse_type)
+_gnutls_ext_ptr(gnutls_session_t session, extensions_t id, gnutls_ext_parse_type_t parse_type)
 {
 	unsigned i;
 	const extension_entry_st *e;
 
 	for (i=0;i<session->internals.rexts_size;i++) {
-		if (session->internals.rexts[i].id == id) {
+		if (session->internals.rexts[i].gid == id) {
 			e = &session->internals.rexts[i];
 			goto done;
 		}
 	}
 
 	for (i = 0; extfunc[i] != NULL; i++) {
-		if (extfunc[i]->id == id) {
+		if (extfunc[i]->gid == id) {
 			e = extfunc[i];
 			goto done;
 		}
@@ -135,7 +135,7 @@ const char *gnutls_ext_get_name(unsigned int ext)
 	size_t i;
 
 	for (i = 0; extfunc[i] != NULL; i++)
-		if (extfunc[i]->id == ext)
+		if (extfunc[i]->tls_id == ext)
 			return extfunc[i]->name;
 
 	return NULL;
@@ -146,12 +146,12 @@ const char *gnutls_ext_get_name(unsigned int ext)
  * otherwise a negative error value.
  */
 int
-_gnutls_extension_list_check(gnutls_session_t session, uint16_t id)
+_gnutls_extension_list_check(gnutls_session_t session, extensions_t id)
 {
 	unsigned i;
 
 	for (i = 0; i < session->internals.used_exts_size; i++) {
-		if (id == session->internals.used_exts[i]->id)
+		if (id == session->internals.used_exts[i]->gid)
 			return 0;
 	}
 
@@ -173,7 +173,7 @@ static unsigned _gnutls_extension_list_add(gnutls_session_t session, const struc
 
 	if (check_dup) {
 		for (i=0;i<session->internals.used_exts_size;i++) {
-			if (session->internals.used_exts[i]->id == e->id)
+			if (session->internals.used_exts[i]->gid == e->gid)
 				return 0;
 		}
 	}
@@ -191,6 +191,24 @@ static unsigned _gnutls_extension_list_add(gnutls_session_t session, const struc
 	}
 }
 
+static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
+{
+	unsigned i;
+
+	for (i=0; i < session->internals.rexts_size; i++) {
+		if (session->internals.rexts[i].tls_id == tls_id)
+			return session->internals.rexts[i].gid;
+	}
+
+	for (i = 0; extfunc[i] != NULL; i++) {
+		if (extfunc[i]->tls_id == tls_id)
+			return extfunc[i]->gid;
+	}
+
+	return 0;
+}
+
+
 void _gnutls_extension_list_add_sr(gnutls_session_t session)
 {
 	_gnutls_extension_list_add(session, &ext_mod_sr, 1);
@@ -205,7 +223,8 @@ _gnutls_parse_extensions(gnutls_session_t session,
 {
 	int next, ret;
 	int pos = 0;
-	uint16_t id;
+	uint16_t tls_id;
+	extensions_t id;
 	const uint8_t *sdata;
 	const extension_entry_st *ext;
 	uint16_t size;
@@ -226,19 +245,25 @@ _gnutls_parse_extensions(gnutls_session_t session,
 
 	do {
 		DECR_LENGTH_RET(next, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
-		id = _gnutls_read_uint16(&data[pos]);
+		tls_id = _gnutls_read_uint16(&data[pos]);
 		pos += 2;
+
+		id = tls_id_to_gid(session, tls_id);
+		if (id == 0) {
+			goto skip;
+		}
 
 		if (session->security_parameters.entity == GNUTLS_CLIENT) {
 			if ((ret =
 			     _gnutls_extension_list_check(session, id)) < 0) {
 				_gnutls_debug_log("EXT[%p]: Received unexpected extension '%s/%d'\n", session,
-						gnutls_ext_get_name(id), (int)id);
+						gnutls_ext_get_name(tls_id), (int)tls_id);
 				gnutls_assert();
 				return ret;
 			}
 		}
 
+ skip:
 		DECR_LENGTH_RET(next, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 		size = _gnutls_read_uint16(&data[pos]);
 		pos += 2;
@@ -251,7 +276,7 @@ _gnutls_parse_extensions(gnutls_session_t session,
 		if (ext == NULL || ext->recv_func == NULL) {
 			_gnutls_handshake_log
 			    ("EXT[%p]: Ignoring extension '%s/%d'\n", session,
-			     gnutls_ext_get_name(id), id);
+			     gnutls_ext_get_name(tls_id), tls_id);
 
 			continue;
 		}
@@ -260,7 +285,7 @@ _gnutls_parse_extensions(gnutls_session_t session,
 		if ((ext->validity & msg) == 0) {
 
 			_gnutls_debug_log("EXT[%p]: Received unexpected extension (%s/%d) for '%s'\n", session,
-					  gnutls_ext_get_name(id), (int)id,
+					  gnutls_ext_get_name(tls_id), (int)tls_id,
 					  ext_msg_validity_to_str(msg));
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 		}
@@ -273,7 +298,7 @@ _gnutls_parse_extensions(gnutls_session_t session,
 
 		_gnutls_handshake_log
 		    ("EXT[%p]: Parsing extension '%s/%d' (%d bytes)\n",
-		     session, gnutls_ext_get_name(id), id,
+		     session, gnutls_ext_get_name(tls_id), tls_id,
 		     size);
 
 		if ((ret = ext->recv_func(session, sdata, size)) < 0) {
@@ -309,14 +334,14 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 
 	if ((msg & p->validity) == 0) {
 		_gnutls_handshake_log("EXT[%p]: Not sending extension (%s/%d) for '%s'\n", session,
-				  gnutls_ext_get_name(p->id), (int)p->id,
+				  gnutls_ext_get_name(p->tls_id), (int)p->tls_id,
 				  ext_msg_validity_to_str(msg));
 		return 0;
 	}
 
 	/* ensure we don't send something twice (i.e, overriden extensions in
 	 * client), and ensure we are sending only what we received in server. */
-	ret = _gnutls_extension_list_check(session, p->id);
+	ret = _gnutls_extension_list_check(session, p->gid);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		if (ret < 0) /* not advertized */
@@ -326,7 +351,7 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 			return 0;
 	}
 
-	ret = _gnutls_buffer_append_prefix(extdata, 16, p->id);
+	ret = _gnutls_buffer_append_prefix(extdata, 16, p->tls_id);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -361,7 +386,7 @@ int send_extension(gnutls_session_t session, const extension_entry_st *p,
 
 		_gnutls_handshake_log
 			    ("EXT[%p]: Sending extension %s/%d (%d bytes)\n",
-			     session, p->name, p->id, appended);
+			     session, p->name, (int)p->tls_id, appended);
 	} else if (appended == 0)
 		extdata->length -= 4;	/* reset type and size */
 
@@ -459,10 +484,10 @@ static int pack_extension(gnutls_session_t session, const extension_entry_st *ex
 	int rval = 0;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, extp->id,
+	    _gnutls_ext_get_session_data(session, extp->gid,
 					 &data);
 	if (ret >= 0 && extp->pack_func != NULL) {
-		BUFFER_APPEND_NUM(packed, extp->id);
+		BUFFER_APPEND_NUM(packed, extp->gid);
 
 		size_offset = packed->length;
 		BUFFER_APPEND_NUM(packed, 0);
@@ -510,7 +535,7 @@ int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st *packed)
 
 static void
 _gnutls_ext_set_resumed_session_data(gnutls_session_t session,
-				     uint16_t id,
+				     extensions_t id,
 				     gnutls_ext_priv_data_t data)
 {
 	int i;
@@ -538,7 +563,7 @@ int _gnutls_ext_unpack(gnutls_session_t session, gnutls_buffer_st * packed)
 	int i, ret;
 	gnutls_ext_priv_data_t data;
 	int max_exts = 0;
-	uint16_t id;
+	extensions_t id;
 	int size_for_id, cur_pos;
 	const struct extension_entry_st *ext;
 
@@ -590,7 +615,7 @@ unset_ext_data(gnutls_session_t session, const struct extension_entry_st *ext, u
 
 void
 _gnutls_ext_unset_session_data(gnutls_session_t session,
-				uint16_t id)
+				extensions_t id)
 {
 	int i;
 	const struct extension_entry_st *ext;
@@ -639,7 +664,7 @@ void _gnutls_ext_free_session_data(gnutls_session_t session)
  * private pointer, to allow API additions by individual extensions.
  */
 void
-_gnutls_ext_set_session_data(gnutls_session_t session, uint16_t id,
+_gnutls_ext_set_session_data(gnutls_session_t session, extensions_t id,
 			     gnutls_ext_priv_data_t data)
 {
 	unsigned int i;
@@ -664,7 +689,7 @@ _gnutls_ext_set_session_data(gnutls_session_t session, uint16_t id,
 
 int
 _gnutls_ext_get_session_data(gnutls_session_t session,
-			     uint16_t id, gnutls_ext_priv_data_t * data)
+			     extensions_t id, gnutls_ext_priv_data_t * data)
 {
 	int i;
 
@@ -682,7 +707,7 @@ _gnutls_ext_get_session_data(gnutls_session_t session,
 
 int
 _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
-				     uint16_t id,
+				     extensions_t id,
 				     gnutls_ext_priv_data_t * data)
 {
 	int i;
@@ -701,7 +726,7 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
 /**
  * gnutls_ext_register:
  * @name: the name of the extension to register
- * @id: the numeric id of the extension
+ * @id: the numeric TLS id of the extension
  * @parse_type: the parse type of the extension (see gnutls_ext_parse_type_t)
  * @recv_func: a function to receive the data
  * @send_func: a function to send the data
@@ -735,11 +760,18 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 	extension_entry_st *tmp_mod;
 	int ret;
 	unsigned i;
+	unsigned gid = GNUTLS_EXTENSION_MAX+1;
 
 	for (i = 0; extfunc[i] != NULL; i++) {
-		if (extfunc[i]->id == id)
+		if (extfunc[i]->tls_id == id)
 			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
+
+		if (extfunc[i]->gid >= gid)
+			gid = extfunc[i]->gid + 1;
 	}
+
+	if (gid > GNUTLS_EXTENSION_MAX_VALUE)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	tmp_mod = gnutls_calloc(1, sizeof(*tmp_mod));
 	if (tmp_mod == NULL)
@@ -747,7 +779,8 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 
 	tmp_mod->name = gnutls_strdup(name);
 	tmp_mod->free_struct = 1;
-	tmp_mod->id = id;
+	tmp_mod->tls_id = id;
+	tmp_mod->gid = gid;
 	tmp_mod->parse_type = parse_type;
 	tmp_mod->recv_func = recv_func;
 	tmp_mod->send_func = send_func;
@@ -813,11 +846,12 @@ gnutls_session_ext_register(gnutls_session_t session,
 	extension_entry_st tmp_mod;
 	extension_entry_st *exts;
 	unsigned i;
+	unsigned gid = GNUTLS_EXTENSION_MAX+1;
 
 	/* reject handling any extensions which modify the TLS handshake
 	 * in any way, or are mapped to an exported API. */
 	for (i = 0; extfunc[i] != NULL; i++) {
-		if (extfunc[i]->id == id) {
+		if (extfunc[i]->tls_id == id) {
 			if (!(flags & GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL)) {
 				return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
 			} else if (extfunc[i]->cannot_be_overriden) {
@@ -825,11 +859,27 @@ gnutls_session_ext_register(gnutls_session_t session,
 			}
 			break;
 		}
+
+		if (extfunc[i]->gid >= gid)
+			gid = extfunc[i]->gid + 1;
 	}
+
+	for (i=0;i<session->internals.rexts_size;i++) {
+		if (session->internals.rexts[i].tls_id == id) {
+			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
+		}
+
+		if (session->internals.rexts[i].gid >= gid)
+			gid = session->internals.rexts[i].gid + 1;
+	}
+
+	if (gid > GNUTLS_EXTENSION_MAX_VALUE)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	memset(&tmp_mod, 0, sizeof(extension_entry_st));
 	tmp_mod.free_struct = 1;
-	tmp_mod.id = id;
+	tmp_mod.tls_id = id;
+	tmp_mod.gid = gid;
 	tmp_mod.parse_type = parse_type;
 	tmp_mod.recv_func = recv_func;
 	tmp_mod.send_func = send_func;
@@ -858,7 +908,7 @@ gnutls_session_ext_register(gnutls_session_t session,
 /**
  * gnutls_ext_set_data:
  * @session: a #gnutls_session_t opaque pointer
- * @id: the numeric id of the extension
+ * @tls_id: the numeric id of the extension
  * @data: the private data to set
  *
  * This function allows an extension handler to store data in the current session
@@ -868,16 +918,20 @@ gnutls_session_ext_register(gnutls_session_t session,
  * Since: 3.4.0
  **/
 void
-gnutls_ext_set_data(gnutls_session_t session, unsigned id,
+gnutls_ext_set_data(gnutls_session_t session, unsigned tls_id,
 		    gnutls_ext_priv_data_t data)
 {
+	unsigned id = tls_id_to_gid(session, tls_id);
+	if (id == 0)
+		return;
+
 	_gnutls_ext_set_session_data(session, id, data);
 }
 
 /**
  * gnutls_ext_get_data:
  * @session: a #gnutls_session_t opaque pointer
- * @id: the numeric id of the extension
+ * @tls_id: the numeric id of the extension
  * @data: a pointer to the private data to retrieve
  *
  * This function retrieves any data previously stored with gnutls_ext_set_data().
@@ -888,7 +942,11 @@ gnutls_ext_set_data(gnutls_session_t session, unsigned id,
  **/
 int
 gnutls_ext_get_data(gnutls_session_t session,
-		    unsigned id, gnutls_ext_priv_data_t *data)
+		    unsigned tls_id, gnutls_ext_priv_data_t *data)
 {
+	unsigned id = tls_id_to_gid(session, tls_id);
+	if (id == 0)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
 	return _gnutls_ext_get_session_data(session, id, data);
 }

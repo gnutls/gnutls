@@ -37,7 +37,8 @@ static int _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 
 const extension_entry_st ext_mod_ext_master_secret = {
 	.name = "Extended Master Secret",
-	.id = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
+	.tls_id = 23,
+	.gid = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
 	.parse_type = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 

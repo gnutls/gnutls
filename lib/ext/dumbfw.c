@@ -37,7 +37,8 @@ static int _gnutls_dumbfw_send_params(gnutls_session_t session,
 
 const extension_entry_st ext_mod_dumbfw = {
 	.name = "ClientHello Padding",
-	.id = GNUTLS_EXTENSION_DUMBFW,
+	.tls_id = 21,
+	.gid = GNUTLS_EXTENSION_DUMBFW,
 	.parse_type = GNUTLS_EXT_APPLICATION,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_HRR,
 

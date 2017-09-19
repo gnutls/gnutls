@@ -37,20 +37,20 @@ int _gnutls_ext_init(void);
 void _gnutls_ext_deinit(void);
 
 void _gnutls_extension_list_add_sr(gnutls_session_t session);
-int _gnutls_extension_list_check(gnutls_session_t session, uint16_t type);
+int _gnutls_extension_list_check(gnutls_session_t session, extensions_t type);
 
 void _gnutls_ext_free_session_data(gnutls_session_t session);
 
 /* functions to be used by extensions internally
  */
 void _gnutls_ext_unset_session_data(gnutls_session_t session,
-				    uint16_t type);
-void _gnutls_ext_set_session_data(gnutls_session_t session, uint16_t type,
+				    extensions_t ext);
+void _gnutls_ext_set_session_data(gnutls_session_t session, extensions_t ext,
 				  gnutls_ext_priv_data_t);
-int _gnutls_ext_get_session_data(gnutls_session_t session, uint16_t type,
+int _gnutls_ext_get_session_data(gnutls_session_t session, extensions_t ext,
 				 gnutls_ext_priv_data_t *);
 int _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
-					 uint16_t type,
+					 extensions_t ext,
 					 gnutls_ext_priv_data_t * data);
 
 /* for session packing */
@@ -86,7 +86,9 @@ typedef struct extension_entry_st {
 	const char *name; /* const overriden when free_struct is set */
 	unsigned free_struct;
 
-	uint16_t id;
+	uint16_t tls_id;
+	unsigned gid; /* gnutls internal ID */
+
 	gnutls_ext_parse_type_t parse_type;
 	unsigned validity; /* multiple items of gnutls_ext_flags_t */
 

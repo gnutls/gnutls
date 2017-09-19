@@ -38,7 +38,8 @@ static int supported_versions_send_params(gnutls_session_t session,
 
 const extension_entry_st ext_mod_supported_versions = {
 	.name = "Supported Versions",
-	.id = GNUTLS_EXTENSION_SUPPORTED_VERSIONS,
+	.tls_id = 43,
+	.gid = GNUTLS_EXTENSION_SUPPORTED_VERSIONS,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.parse_type = GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
 
