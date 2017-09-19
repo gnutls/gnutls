@@ -57,6 +57,7 @@ abi-coverage/Fedora:
       - tests/*.log
       - tests/*/*.log
       - tests/suite/*/*.log
+      - fuzz/*.log
       - GnuTLS*-coverage/*
 
 minimal/Fedora/x86_64:
