@@ -79,7 +79,7 @@ handshake_hash_buffer_empty(gnutls_session_t session)
 
 	_gnutls_buffers_log("BUF[HSK]: Emptied buffer\n");
 
-	session->internals.used_exts_size = 0;
+	session->internals.used_exts = 0;
 	session->internals.handshake_hash_buffer_prev_len = 0;
 	session->internals.handshake_hash_buffer.length = 0;
 	return;
@@ -2250,7 +2250,7 @@ int gnutls_handshake(gnutls_session_t session)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		session->internals.used_exts_size = 0;
+		session->internals.used_exts = 0;
 		session->internals.crt_requested = 0;
 		session->internals.handshake_in_progress = 1;
 		session->internals.vc_status = -1;

@@ -291,10 +291,20 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_MAX = GNUTLS_EXTENSION_SERVER_NAME
 } extensions_t;
 
-#define GNUTLS_EXTENSION_MAX_VALUE 63
+#define GNUTLS_EXTENSION_MAX_VALUE 31
 #if GNUTLS_EXTENSION_MAX >= GNUTLS_EXTENSION_MAX_VALUE
 # error over limit
 #endif
+
+#if GNUTLS_EXTENSION_MAX >= MAX_EXT_TYPES
+# error over limit
+#endif
+
+/* we must provide at least 16 extensions for users to register */
+#if GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX < 16
+# error not enough extension types; increase GNUTLS_EXTENSION_MAX_VALUE, MAX_EXT_TYPES and used_exts type
+#endif
+
 
 typedef enum { CIPHER_STREAM, CIPHER_BLOCK, CIPHER_AEAD } cipher_type_t;
 
@@ -1138,10 +1148,10 @@ typedef struct {
 	} ext_data[MAX_EXT_TYPES];
 
 	/* In case of a client holds the extensions we sent to the peer;
-	 * otherwise the extensions we received from the client.
+	 * otherwise the extensions we received from the client. This is
+	 * an OR of (1<<extensions_t values).
 	 */
-	const struct extension_entry_st *used_exts[MAX_EXT_TYPES];
-	unsigned used_exts_size;
+	uint32_t used_exts;
 
 	/* this is not the negotiated max_record_recv_size, but the actual maximum
 	 * receive size */

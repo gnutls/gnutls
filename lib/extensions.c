@@ -141,56 +141,6 @@ const char *gnutls_ext_get_name(unsigned int ext)
 	return NULL;
 }
 
-/* Checks if the extension @id provided has been requested
- * by us (in client side). In that case it returns zero, 
- * otherwise a negative error value.
- */
-int
-_gnutls_extension_list_check(gnutls_session_t session, extensions_t id)
-{
-	unsigned i;
-
-	for (i = 0; i < session->internals.used_exts_size; i++) {
-		if (id == session->internals.used_exts[i]->gid)
-			return 0;
-	}
-
-	return GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION;
-}
-
-/* Adds the extension we want to send in the extensions list.
- * This list is used in client side to check whether the (later) received
- * extensions are the ones we requested.
- *
- * In server side, this list is used to ensure we don't send
- * extensions that we didn't receive a corresponding value.
- *
- * Returns zero if failed, non-zero on success.
- */
-static unsigned _gnutls_extension_list_add(gnutls_session_t session, const struct extension_entry_st *e, unsigned check_dup)
-{
-	unsigned i;
-
-	if (check_dup) {
-		for (i=0;i<session->internals.used_exts_size;i++) {
-			if (session->internals.used_exts[i]->gid == e->gid)
-				return 0;
-		}
-	}
-
-	if (session->internals.used_exts_size < MAX_EXT_TYPES) {
-		session->internals.used_exts[session->
-						   internals.used_exts_size]
-		    = e;
-		session->internals.used_exts_size++;
-		return 1;
-	} else {
-		_gnutls_handshake_log
-		    ("extensions: Increase MAX_EXT_TYPES\n");
-		return 0;
-	}
-}
-
 static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
 {
 	unsigned i;
@@ -208,12 +158,10 @@ static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
 	return 0;
 }
 
-
 void _gnutls_extension_list_add_sr(gnutls_session_t session)
 {
 	_gnutls_extension_list_add(session, &ext_mod_sr, 1);
 }
-
 
 int
 _gnutls_parse_extensions(gnutls_session_t session,
@@ -514,21 +462,29 @@ int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st *packed)
 	unsigned int i;
 	int ret;
 	int total_exts_pos;
-	int exts = 0;
+	int n_exts = 0;
+	const struct extension_entry_st *ext;
 
 	total_exts_pos = packed->length;
 	BUFFER_APPEND_NUM(packed, 0);
 
-	for (i = 0; i < session->internals.used_exts_size; i++) {
-		ret = pack_extension(session, session->internals.used_exts[i], packed);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+	for (i = 0; i <= GNUTLS_EXTENSION_MAX_VALUE; i++) {
+		if (session->internals.used_exts & (1<<i)) {
 
-		if (ret > 0)
-			exts++;
+			ext = _gnutls_ext_ptr(session, i, GNUTLS_EXT_ANY);
+			if (ext == NULL)
+				continue;
+
+			ret = pack_extension(session, ext, packed);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			if (ret > 0)
+				n_exts++;
+		}
 	}
 
-	_gnutls_write_uint32(exts, packed->data + total_exts_pos);
+	_gnutls_write_uint32(n_exts, packed->data + total_exts_pos);
 
 	return 0;
 }

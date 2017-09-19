@@ -36,9 +36,6 @@ int _gnutls_gen_extensions(gnutls_session_t session,
 int _gnutls_ext_init(void);
 void _gnutls_ext_deinit(void);
 
-void _gnutls_extension_list_add_sr(gnutls_session_t session);
-int _gnutls_extension_list_check(gnutls_session_t session, extensions_t type);
-
 void _gnutls_ext_free_session_data(gnutls_session_t session);
 
 /* functions to be used by extensions internally
@@ -119,5 +116,43 @@ typedef struct extension_entry_st {
 } extension_entry_st;
 
 int _gnutls_ext_register(extension_entry_st *);
+
+void _gnutls_extension_list_add_sr(gnutls_session_t session);
+
+/* Checks if the extension @id provided has been requested
+ * by us (in client side). In that case it returns zero,
+ * otherwise a negative error value.
+ */
+inline static int
+_gnutls_extension_list_check(gnutls_session_t session, extensions_t id)
+{
+	if (id != 0 && ((1 << id) & session->internals.used_exts))
+		return 0;
+
+	return GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION;
+}
+
+/* Adds the extension we want to send in the extensions list.
+ * This list is used in client side to check whether the (later) received
+ * extensions are the ones we requested.
+ *
+ * In server side, this list is used to ensure we don't send
+ * extensions that we didn't receive a corresponding value.
+ *
+ * Returns zero if failed, non-zero on success.
+ */
+inline static
+unsigned _gnutls_extension_list_add(gnutls_session_t session,
+				    const struct extension_entry_st *e,
+				    unsigned check_dup)
+{
+	if (check_dup && _gnutls_extension_list_check(session, e->gid) == 0) {
+			return 0;
+	}
+
+	session->internals.used_exts |= (1 << e->gid);
+
+	return 1;
+}
 
 #endif
