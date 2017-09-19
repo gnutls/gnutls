@@ -38,7 +38,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs-interesting/cert2.der certs-interesting/cert2.der.err certs-interesting/cert3.der \
 	certs-interesting/cert3.der.err certs-interesting/cert4.der certs-interesting/cert5.der \
 	certs-interesting/cert6.der certs-interesting/cert7.der certs-interesting/cert8.der \
-	scripts/common.sh scripts/starttls-common.sh certs-interesting/cert5.der.err
+	scripts/common.sh scripts/starttls-common.sh certs-interesting/cert5.der.err \
+	cert-repro-20170915.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -125,7 +126,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid	\
 	 set_known_dh_params_anon set_known_dh_params_psk session-tickets-ok \
 	 session-tickets-missing set_x509_key_file_legacy status-request-ext \
 	 rng-no-onload dtls1-2-mtu-check crl_apis cert_verify_inv_utf8 \
-	 hostname-check-utf8 pkcs8-key-decode-encrypted priority-mix trust-store
+	 hostname-check-utf8 pkcs8-key-decode-encrypted priority-mix trust-store \
+	 dtls-repro-20170915
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
