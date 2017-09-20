@@ -117,8 +117,6 @@ typedef struct hello_ext_entry_st {
 	unsigned cannot_be_overriden;
 } hello_ext_entry_st;
 
-int _gnutls_ext_register(hello_ext_entry_st *);
-
 /* Checks if the extension @id provided has been requested
  * by us (in client side). In that case it returns non-zero,
  * otherwise zero.
