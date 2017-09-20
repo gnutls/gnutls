@@ -68,12 +68,6 @@ inline static const char *ext_msg_validity_to_str(gnutls_ext_flags_t msg)
 			return "TLS 1.3 server hello";
 		case GNUTLS_EXT_FLAG_EE:
 			return "encrypted extensions";
-		case GNUTLS_EXT_FLAG_CT:
-			return "certificate";
-		case GNUTLS_EXT_FLAG_CR:
-			return "certificate request";
-		case GNUTLS_EXT_FLAG_NST:
-			return "new session ticket";
 		case GNUTLS_EXT_FLAG_HRR:
 			return "hello retry request";
 		default:

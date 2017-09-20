@@ -2669,9 +2669,6 @@ typedef enum {
  * @GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO: This extension can be present in a TLS1.2 or earlier server hello
  * @GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO: This extension can be present in a TLS1.3 server hello
  * @GNUTLS_EXT_FLAG_EE: This extension can be present in encrypted extensions message
- * @GNUTLS_EXT_FLAG_CT: This extension can be present in certificate message
- * @GNUTLS_EXT_FLAG_CR: This extension can be present in certificate request message
- * @GNUTLS_EXT_FLAG_NST: This extension can be present in new session ticket message
  * @GNUTLS_EXT_FLAG_HRR: This extension can be present in hello retry request message
  *
  * Enumeration of different TLS extension registration flags.
@@ -2682,10 +2679,7 @@ typedef enum {
   GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO = (1<<2),
   GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO = (1<<3),
   GNUTLS_EXT_FLAG_EE = (1<<4), /* ENCRYPTED */
-  GNUTLS_EXT_FLAG_CT = (1<<5),
-  GNUTLS_EXT_FLAG_CR = (1<<6),
-  GNUTLS_EXT_FLAG_NST = (1<<7),
-  GNUTLS_EXT_FLAG_HRR = (1<<8)
+  GNUTLS_EXT_FLAG_HRR = (1<<5)
 } gnutls_ext_flags_t;
 
 /* Register a custom tls extension

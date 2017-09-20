@@ -53,7 +53,7 @@ const hello_ext_entry_st ext_mod_sig = {
 	.name = "Signature Algorithms",
 	.tls_id = 13,
 	.gid = GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_CR,
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.parse_type = GNUTLS_EXT_TLS,
 
 	.recv_func = _gnutls_signature_algorithm_recv_params,

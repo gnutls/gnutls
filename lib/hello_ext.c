@@ -726,8 +726,7 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 
 #define VALIDITY_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO| \
 			GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO| \
-			GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_CT|GNUTLS_EXT_FLAG_CR| \
-			GNUTLS_EXT_FLAG_NST|GNUTLS_EXT_FLAG_HRR)
+			GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_HRR)
 
 /**
  * gnutls_session_ext_register:
