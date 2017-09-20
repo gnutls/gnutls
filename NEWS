@@ -3,6 +3,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2016 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.29 (unreleased)
+
+** libgnutls: Fixed issue which caused 1-byte handshake fragments to be refused.
+   Reported by Balázs Kéri.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.28 (released 2017-07-04)
 
 ** libgnutls: Fixed issue when rehandshaking without a client certificate in
