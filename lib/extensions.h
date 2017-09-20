@@ -25,14 +25,14 @@
 
 #include <gnutls/gnutls.h>
 
-int _gnutls_parse_extensions(gnutls_session_t session,
-			     gnutls_ext_flags_t msg,
-			     gnutls_ext_parse_type_t parse_type,
-			     const uint8_t * data, int data_size);
-int _gnutls_gen_extensions(gnutls_session_t session,
-			   gnutls_buffer_st * extdata,
-			   gnutls_ext_flags_t msg,
-			   gnutls_ext_parse_type_t);
+int _gnutls_parse_hello_extensions(gnutls_session_t session,
+				   gnutls_ext_flags_t msg,
+				   gnutls_ext_parse_type_t parse_type,
+				   const uint8_t * data, int data_size);
+int _gnutls_gen_hello_extensions(gnutls_session_t session,
+				 gnutls_buffer_st * extdata,
+				 gnutls_ext_flags_t msg,
+				 gnutls_ext_parse_type_t);
 int _gnutls_ext_init(void);
 void _gnutls_ext_deinit(void);
 
