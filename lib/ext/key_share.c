@@ -43,7 +43,7 @@ static int key_share_recv_params(gnutls_session_t session,
 static int key_share_send_params(gnutls_session_t session,
 					     gnutls_buffer_st * extdata);
 
-const extension_entry_st ext_mod_key_share = {
+const hello_ext_entry_st ext_mod_key_share = {
 	.name = "Key Share",
 	.tls_id = 40,
 	.gid = GNUTLS_EXTENSION_KEY_SHARE,

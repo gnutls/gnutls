@@ -49,7 +49,7 @@ static int signature_algorithms_pack(gnutls_ext_priv_data_t epriv,
 static int signature_algorithms_unpack(gnutls_buffer_st * ps,
 				       gnutls_ext_priv_data_t * _priv);
 
-const extension_entry_st ext_mod_sig = {
+const hello_ext_entry_st ext_mod_sig = {
 	.name = "Signature Algorithms",
 	.tls_id = 13,
 	.gid = GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,

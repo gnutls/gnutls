@@ -36,7 +36,7 @@ static int _gnutls_post_handshake_recv_params(gnutls_session_t session,
 static int _gnutls_post_handshake_send_params(gnutls_session_t session,
 					  gnutls_buffer_st * extdata);
 
-const extension_entry_st ext_mod_post_handshake = {
+const hello_ext_entry_st ext_mod_post_handshake = {
 	.name = "Post Handshake Auth",
 	.tls_id = 49,
 	.gid = GNUTLS_EXTENSION_POST_HANDSHAKE,

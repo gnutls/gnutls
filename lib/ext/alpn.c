@@ -34,7 +34,7 @@ static int _gnutls_alpn_send_params(gnutls_session_t session,
 static void _gnutls_alpn_deinit_data(gnutls_ext_priv_data_t priv);
 
 
-const extension_entry_st ext_mod_alpn = {
+const hello_ext_entry_st ext_mod_alpn = {
 	.name = "ALPN",
 	.tls_id = 16,
 	.gid = GNUTLS_EXTENSION_ALPN,

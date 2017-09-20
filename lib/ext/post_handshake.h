@@ -25,6 +25,6 @@
 
 #include <extensions.h>
 
-extern const extension_entry_st ext_mod_post_handshake;
+extern const hello_ext_entry_st ext_mod_post_handshake;
 
 #endif

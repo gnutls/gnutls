@@ -31,7 +31,7 @@ static int _gnutls_sr_send_params(gnutls_session_t state,
 				  gnutls_buffer_st *);
 static void _gnutls_sr_deinit_data(gnutls_ext_priv_data_t priv);
 
-const extension_entry_st ext_mod_sr = {
+const hello_ext_entry_st ext_mod_sr = {
 	.name = "Safe Renegotiation",
 	.tls_id = 65281,
 	.gid = GNUTLS_EXTENSION_SAFE_RENEGOTIATION,

@@ -522,7 +522,7 @@ _gnutls_heartbeat_unpack(gnutls_buffer_st * ps,
 	return ret;
 }
 
-const extension_entry_st ext_mod_heartbeat = {
+const hello_ext_entry_st ext_mod_heartbeat = {
 	.name = "Heartbeat",
 	.tls_id = 15,
 	.gid = GNUTLS_EXTENSION_HEARTBEAT,

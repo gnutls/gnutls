@@ -49,7 +49,7 @@ static int _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
 						gnutls_buffer_st *
 						extdata);
 
-const extension_entry_st ext_mod_supported_ecc = {
+const hello_ext_entry_st ext_mod_supported_ecc = {
 	.name = "Negotiated Groups",
 	.tls_id = 10,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_ECC,
@@ -64,7 +64,7 @@ const extension_entry_st ext_mod_supported_ecc = {
 	.cannot_be_overriden = 1
 };
 
-const extension_entry_st ext_mod_supported_ecc_pf = {
+const hello_ext_entry_st ext_mod_supported_ecc_pf = {
 	.name = "Supported ECC Point Formats",
 	.tls_id = 11,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,

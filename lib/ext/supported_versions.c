@@ -36,7 +36,7 @@ static int supported_versions_recv_params(gnutls_session_t session,
 static int supported_versions_send_params(gnutls_session_t session,
 					  gnutls_buffer_st * extdata);
 
-const extension_entry_st ext_mod_supported_versions = {
+const hello_ext_entry_st ext_mod_supported_versions = {
 	.name = "Supported Versions",
 	.tls_id = 43,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_VERSIONS,

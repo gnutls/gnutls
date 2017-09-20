@@ -38,7 +38,7 @@ typedef struct {
 	unsigned int connection_using_safe_renegotiation:1;
 } sr_ext_st;
 
-extern const extension_entry_st ext_mod_sr;
+extern const hello_ext_entry_st ext_mod_sr;
 
 int _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 			    size_t vdata_size, int dir);

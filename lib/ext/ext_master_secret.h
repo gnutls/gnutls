@@ -25,6 +25,6 @@
 
 #include <extensions.h>
 
-extern const extension_entry_st ext_mod_ext_master_secret;
+extern const hello_ext_entry_st ext_mod_ext_master_secret;
 
 #endif

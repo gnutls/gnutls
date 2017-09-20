@@ -59,7 +59,7 @@ static int session_ticket_pack(gnutls_ext_priv_data_t _priv,
 			       gnutls_buffer_st * ps);
 static void session_ticket_deinit_data(gnutls_ext_priv_data_t priv);
 
-const extension_entry_st ext_mod_session_ticket = {
+const hello_ext_entry_st ext_mod_session_ticket = {
 	.name = "Session Ticket",
 	.tls_id = 35,
 	.gid = GNUTLS_EXTENSION_SESSION_TICKET,

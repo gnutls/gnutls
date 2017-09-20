@@ -25,6 +25,6 @@
 
 #include <extensions.h>
 
-extern const extension_entry_st ext_mod_supported_versions;
+extern const hello_ext_entry_st ext_mod_supported_versions;
 
 #endif

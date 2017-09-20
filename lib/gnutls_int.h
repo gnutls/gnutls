@@ -1138,7 +1138,7 @@ typedef struct {
 	struct gnutls_supplemental_entry_st *rsup;
 	unsigned rsup_size;
 
-	struct extension_entry_st *rexts;
+	struct hello_ext_entry_st *rexts;
 	unsigned rexts_size;
 
 	struct {

@@ -25,7 +25,7 @@
 
 #include <extensions.h>
 
-extern const extension_entry_st ext_mod_status_request;
+extern const hello_ext_entry_st ext_mod_status_request;
 
 int
 _gnutls_send_server_certificate_status(gnutls_session_t session,

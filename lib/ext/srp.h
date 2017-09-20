@@ -30,7 +30,7 @@
 #define IS_SRP_KX(kx) ((kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA) || \
 	  kx == GNUTLS_KX_SRP_DSS)?1:0)
 
-extern const extension_entry_st ext_mod_srp;
+extern const hello_ext_entry_st ext_mod_srp;
 
 typedef struct {
 	char *username;

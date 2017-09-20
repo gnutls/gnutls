@@ -42,7 +42,7 @@ static int _gnutls_srp_recv_params(gnutls_session_t state,
 static int _gnutls_srp_send_params(gnutls_session_t state,
 				   gnutls_buffer_st * extdata);
 
-const extension_entry_st ext_mod_srp = {
+const hello_ext_entry_st ext_mod_srp = {
 	.name = "SRP",
 	.tls_id = 12,
 	.gid = GNUTLS_EXTENSION_SRP,

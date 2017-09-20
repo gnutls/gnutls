@@ -27,7 +27,7 @@
 
 #include <extensions.h>
 
-extern const extension_entry_st ext_mod_sig;
+extern const hello_ext_entry_st ext_mod_sig;
 
 gnutls_sign_algorithm_t
 _gnutls_session_get_sign_algo(gnutls_session_t session,

@@ -529,7 +529,7 @@ _gnutls_status_request_unpack(gnutls_buffer_st * ps,
 	return ret;
 }
 
-const extension_entry_st ext_mod_status_request = {
+const hello_ext_entry_st ext_mod_status_request = {
 	.name = "OCSP Status Request",
 	.tls_id = 5,
 	.gid = GNUTLS_EXTENSION_STATUS_REQUEST,

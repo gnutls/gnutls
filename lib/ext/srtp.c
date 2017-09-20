@@ -39,7 +39,7 @@ static int _gnutls_srtp_pack(gnutls_ext_priv_data_t _priv,
 static void _gnutls_srtp_deinit_data(gnutls_ext_priv_data_t priv);
 
 
-const extension_entry_st ext_mod_srtp = {
+const hello_ext_entry_st ext_mod_srtp = {
 	.name = "SRTP",
 	.tls_id = 14,
 	.gid = GNUTLS_EXTENSION_SRTP,
