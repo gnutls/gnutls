@@ -806,6 +806,51 @@ _gnutls_buffer_pop_prefix32(gnutls_buffer_st * buf, size_t * data_size,
 	return 0;
 }
 
+int _gnutls_buffer_pop_prefix8(gnutls_buffer_st *buf, uint8_t *data, int check)
+{
+	if (buf->length < 1) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	*data = buf->data[0];
+
+	if (check && *data > buf->length - 1) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	buf->data++;
+	buf->length--;
+
+	return 0;
+}
+
+int
+_gnutls_buffer_pop_prefix24(gnutls_buffer_st * buf, size_t * data_size,
+			    int check)
+{
+	size_t size;
+
+	if (buf->length < 3) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	size = _gnutls_read_uint24(buf->data);
+	if (check && size > buf->length - 3) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	buf->data += 3;
+	buf->length -= 3;
+
+	*data_size = size;
+
+	return 0;
+}
+
 int
 _gnutls_buffer_pop_datum_prefix32(gnutls_buffer_st * buf,
 				  gnutls_datum_t * data)
