@@ -24,6 +24,7 @@
 #include "errors.h"
 #include "hello_ext.h"
 #include "handshake.h"
+#include "mbuffers.h"
 #include "tls13/encrypted_extensions.h"
 
 int _gnutls13_recv_encrypted_extensions(gnutls_session_t session)
@@ -44,4 +45,39 @@ int _gnutls13_recv_encrypted_extensions(gnutls_session_t session)
 		return gnutls_assert_val(ret);
 
 	return 0;
+}
+
+int _gnutls13_send_encrypted_extensions(gnutls_session_t session, unsigned again)
+{
+	int ret;
+	mbuffer_st *bufel = NULL;
+	gnutls_buffer_st buf;
+
+	if (again == 0) {
+		_gnutls_buffer_init(&buf);
+
+		ret = _gnutls_gen_hello_extensions(session, &buf, GNUTLS_EXT_FLAG_EE, GNUTLS_EXT_ANY);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		bufel = _gnutls_handshake_alloc(session, buf.length);
+		if (bufel == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		_mbuffer_set_udata_size(bufel, 0);
+		ret = _mbuffer_append_data(bufel, buf.data, buf.length);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		_gnutls_buffer_clear(&buf);
+	}
+
+	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_ENCRYPTED_EXTENSIONS);
+
+ cleanup:
+	_gnutls_buffer_clear(&buf);
+	_mbuffer_xfree(&bufel);
+	return ret;
 }

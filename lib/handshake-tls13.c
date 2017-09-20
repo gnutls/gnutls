@@ -202,7 +202,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		IMED_RET("generate session keys", ret, 0);
 		/* fall through */
 	case STATE101:
-		abort();
+		ret = _gnutls13_send_encrypted_extensions(session, AGAIN(STATE101));
 		STATE = STATE101;
 		IMED_RET("send encrypted extensions", ret, 0);
 		/* fall through */
