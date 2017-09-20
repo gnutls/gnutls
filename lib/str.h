@@ -137,6 +137,15 @@ int _gnutls_buffer_pop_datum_prefix8(gnutls_buffer_st * buf,
 
 int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsigned is_str);
 
+inline static
+void _gnutls_ro_buffer_from_datum(gnutls_buffer_st * str, gnutls_datum_t * data)
+{
+	_gnutls_buffer_init(str);
+	str->length = data->size;
+	str->max_length = data->size;
+	str->data = data->data;
+}
+
 int
 _gnutls_buffer_append_escape(gnutls_buffer_st * dest, const void *data,
 			     size_t data_size, const char *invalid_chars);

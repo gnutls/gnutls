@@ -123,6 +123,9 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 	size_t const tot_len = data_size + dest->length;
 	size_t const unused = MEMSUB(dest->data, dest->allocd);
 
+	if (unlikely(dest->data != NULL && dest->allocd == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (data_size == 0)
 		return 0;
 
@@ -160,6 +163,9 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 
 int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 {
+	if (unlikely(dest->data != NULL && dest->allocd == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (dest->max_length >= new_size) {
 		size_t unused = MEMSUB(dest->data, dest->allocd);
 		if (dest->max_length - unused <= new_size) {
@@ -209,7 +215,6 @@ void
 _gnutls_buffer_pop_datum(gnutls_buffer_st * str, gnutls_datum_t * data,
 			 size_t req_size)
 {
-
 	if (str->length == 0) {
 		data->data = NULL;
 		data->size = 0;
