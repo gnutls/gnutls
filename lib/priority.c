@@ -589,7 +589,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 
 	if (priority->no_tickets != 0) {
 		/* when PFS is explicitly requested, disable session tickets */
-		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SESSION_TICKET);
+		_gnutls_hello_ext_unset_sdata(session, GNUTLS_EXTENSION_SESSION_TICKET);
 	}
 
 	if (session->internals.priorities->protocol.algorithms == 0 ||

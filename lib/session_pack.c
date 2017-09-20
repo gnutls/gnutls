@@ -150,7 +150,7 @@ _gnutls_session_pack(gnutls_session_t session,
 		goto fail;
 	}
 
-	ret = _gnutls_ext_pack(session, &sb);
+	ret = _gnutls_hello_ext_pack(session, &sb);
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
@@ -256,7 +256,7 @@ _gnutls_session_unpack(gnutls_session_t session,
 		goto error;
 	}
 
-	ret = _gnutls_ext_unpack(session, &sb);
+	ret = _gnutls_hello_ext_unpack(session, &sb);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;

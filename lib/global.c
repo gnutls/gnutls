@@ -28,7 +28,7 @@
 #include <random.h>
 #include <gnutls/pkcs11.h>
 
-#include <extensions.h>	/* for _gnutls_ext_init */
+#include <extensions.h>	/* for _gnutls_hello_ext_init */
 #include <supplemental.h> /* for _gnutls_supplemental_deinit */
 #include <locks.h>
 #include <system.h>
@@ -310,7 +310,7 @@ static int _gnutls_global_init(unsigned constructor)
 	}
 
 	/* Initialize the default TLS extensions */
-	ret = _gnutls_ext_init();
+	ret = _gnutls_hello_ext_init();
 	if (ret < 0) {
 		gnutls_assert();
 		goto out;
@@ -412,7 +412,7 @@ static void _gnutls_global_deinit(unsigned destructor)
 		_gnutls_system_key_deinit();
 		gnutls_crypto_deinit();
 		_gnutls_rnd_deinit();
-		_gnutls_ext_deinit();
+		_gnutls_hello_ext_deinit();
 		asn1_delete_structure(&_gnutls_gnutls_asn);
 		asn1_delete_structure(&_gnutls_pkix1_asn);
 

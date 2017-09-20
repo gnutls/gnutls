@@ -129,7 +129,7 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 					    GNUTLS_NAME_DNS;
 
 					epriv = priv;
-					_gnutls_ext_set_session_data(session,
+					_gnutls_hello_ext_set_sdata(session,
 						     GNUTLS_EXTENSION_SERVER_NAME,
 						     epriv);
 					return 0;
@@ -156,7 +156,7 @@ _gnutls_server_name_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_ext_get_session_data(session,
+	    _gnutls_hello_ext_get_sdata(session,
 					 GNUTLS_EXTENSION_SERVER_NAME,
 					 &epriv);
 	if (ret < 0)
@@ -254,7 +254,7 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	ret =
-	    _gnutls_ext_get_session_data(session,
+	    _gnutls_hello_ext_get_sdata(session,
 					 GNUTLS_EXTENSION_SERVER_NAME,
 					 &epriv);
 	if (ret < 0) {
@@ -305,7 +305,7 @@ _gnutls_server_name_set_raw(gnutls_session_t session,
 	}
 
 	ret =
-	    _gnutls_ext_get_session_data(session,
+	    _gnutls_hello_ext_get_sdata(session,
 					 GNUTLS_EXTENSION_SERVER_NAME,
 					 &epriv);
 	if (ret < 0) {
@@ -331,7 +331,7 @@ _gnutls_server_name_set_raw(gnutls_session_t session,
 	priv->name_length = name_length;
 
 	if (set != 0)
-		_gnutls_ext_set_session_data(session,
+		_gnutls_hello_ext_set_sdata(session,
 					     GNUTLS_EXTENSION_SERVER_NAME,
 					     epriv);
 
@@ -375,7 +375,7 @@ gnutls_server_name_set(gnutls_session_t session,
 	}
 
 	if (name_length == 0) { /* unset extension */
-		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SERVER_NAME);
+		_gnutls_hello_ext_unset_sdata(session, GNUTLS_EXTENSION_SERVER_NAME);
 		return 0;
 	}
 
@@ -454,16 +454,16 @@ unsigned _gnutls_server_name_matches_resumed(gnutls_session_t session)
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_ext_get_session_data(session,
-					 GNUTLS_EXTENSION_SERVER_NAME,
-					 &epriv);
+	    _gnutls_hello_ext_get_sdata(session,
+					GNUTLS_EXTENSION_SERVER_NAME,
+					&epriv);
 	if (ret < 0) /* no server name in this session */
 		priv1 = NULL;
 	else
 		priv1 = epriv;
 
 	ret =
-	    _gnutls_ext_get_resumed_session_data(session,
+	    _gnutls_hello_ext_get_resumed_sdata(session,
 						 GNUTLS_EXTENSION_SERVER_NAME,
 						 &epriv);
 	if (ret < 0) /* no server name in extensions */

@@ -172,7 +172,7 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 	}
 
 	epriv = priv;
-	_gnutls_ext_set_session_data(session,
+	_gnutls_hello_ext_set_sdata(session,
 				     GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
 				     epriv);
 
@@ -290,7 +290,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	cert_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 
 	ret =
-	    _gnutls_ext_get_session_data(session,
+	    _gnutls_hello_ext_get_sdata(session,
 					 GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
 					 &epriv);
 	priv = epriv;
@@ -451,7 +451,7 @@ gnutls_sign_algorithm_get_requested(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	ret =
-	    _gnutls_ext_get_session_data(session,
+	    _gnutls_hello_ext_get_sdata(session,
 					 GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
 					 &epriv);
 	if (ret < 0) {

@@ -357,12 +357,12 @@ _gnutls_gen_hello_extensions(gnutls_session_t session,
 }
 
 /* Global deinit and init of global extensions */
-int _gnutls_ext_init(void)
+int _gnutls_hello_ext_init(void)
 {
 	return GNUTLS_E_SUCCESS;
 }
 
-void _gnutls_ext_deinit(void)
+void _gnutls_hello_ext_deinit(void)
 {
 	unsigned i;
 	for (i = 0; extfunc[i] != NULL; i++) {
@@ -403,7 +403,7 @@ static int pack_extension(gnutls_session_t session, const hello_ext_entry_st *ex
 	int rval = 0;
 
 	ret =
-	    _gnutls_ext_get_session_data(session, extp->gid,
+	    _gnutls_hello_ext_get_sdata(session, extp->gid,
 					 &data);
 	if (ret >= 0 && extp->pack_func != NULL) {
 		BUFFER_APPEND_NUM(packed, extp->gid);
@@ -428,7 +428,7 @@ static int pack_extension(gnutls_session_t session, const hello_ext_entry_st *ex
 	return rval;
 }
 
-int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st *packed)
+int _gnutls_hello_ext_pack(gnutls_session_t session, gnutls_buffer_st *packed)
 {
 	unsigned int i;
 	int ret;
@@ -485,7 +485,7 @@ _gnutls_ext_set_resumed_session_data(gnutls_session_t session,
 	}
 }
 
-int _gnutls_ext_unpack(gnutls_session_t session, gnutls_buffer_st * packed)
+int _gnutls_hello_ext_unpack(gnutls_session_t session, gnutls_buffer_st * packed)
 {
 	int i, ret;
 	gnutls_ext_priv_data_t data;
@@ -541,7 +541,7 @@ unset_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *ext, u
 }
 
 void
-_gnutls_ext_unset_session_data(gnutls_session_t session,
+_gnutls_hello_ext_unset_sdata(gnutls_session_t session,
 				extensions_t id)
 {
 	int i;
@@ -570,7 +570,7 @@ static void unset_resumed_ext_data(gnutls_session_t session, const struct hello_
 
 /* Deinitializes all data that are associated with TLS extensions.
  */
-void _gnutls_ext_free_session_data(gnutls_session_t session)
+void _gnutls_hello_ext_sdata_deinit(gnutls_session_t session)
 {
 	unsigned int i;
 	const struct hello_ext_entry_st *ext;
@@ -591,7 +591,7 @@ void _gnutls_ext_free_session_data(gnutls_session_t session)
  * private pointer, to allow API additions by individual extensions.
  */
 void
-_gnutls_ext_set_session_data(gnutls_session_t session, extensions_t id,
+_gnutls_hello_ext_set_sdata(gnutls_session_t session, extensions_t id,
 			     gnutls_ext_priv_data_t data)
 {
 	unsigned int i;
@@ -615,7 +615,7 @@ _gnutls_ext_set_session_data(gnutls_session_t session, extensions_t id,
 }
 
 int
-_gnutls_ext_get_session_data(gnutls_session_t session,
+_gnutls_hello_ext_get_sdata(gnutls_session_t session,
 			     extensions_t id, gnutls_ext_priv_data_t * data)
 {
 	int i;
@@ -633,7 +633,7 @@ _gnutls_ext_get_session_data(gnutls_session_t session,
 }
 
 int
-_gnutls_ext_get_resumed_session_data(gnutls_session_t session,
+_gnutls_hello_ext_get_resumed_sdata(gnutls_session_t session,
 				     extensions_t id,
 				     gnutls_ext_priv_data_t * data)
 {
@@ -852,7 +852,7 @@ gnutls_ext_set_data(gnutls_session_t session, unsigned tls_id,
 	if (id == 0)
 		return;
 
-	_gnutls_ext_set_session_data(session, id, data);
+	_gnutls_hello_ext_set_sdata(session, id, data);
 }
 
 /**
@@ -875,5 +875,5 @@ gnutls_ext_get_data(gnutls_session_t session,
 	if (id == 0)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	return _gnutls_ext_get_session_data(session, id, data);
+	return _gnutls_hello_ext_get_sdata(session, id, data);
 }

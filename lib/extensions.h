@@ -25,6 +25,8 @@
 
 #include <gnutls/gnutls.h>
 
+/* Functions for hello extension parsing.
+ */
 int _gnutls_parse_hello_extensions(gnutls_session_t session,
 				   gnutls_ext_flags_t msg,
 				   gnutls_ext_parse_type_t parse_type,
@@ -33,26 +35,26 @@ int _gnutls_gen_hello_extensions(gnutls_session_t session,
 				 gnutls_buffer_st * extdata,
 				 gnutls_ext_flags_t msg,
 				 gnutls_ext_parse_type_t);
-int _gnutls_ext_init(void);
-void _gnutls_ext_deinit(void);
+int _gnutls_hello_ext_init(void);
+void _gnutls_hello_ext_deinit(void);
 
-void _gnutls_ext_free_session_data(gnutls_session_t session);
+void _gnutls_hello_ext_sdata_deinit(gnutls_session_t session);
 
 /* functions to be used by extensions internally
  */
-void _gnutls_ext_unset_session_data(gnutls_session_t session,
+void _gnutls_hello_ext_unset_sdata(gnutls_session_t session,
 				    extensions_t ext);
-void _gnutls_ext_set_session_data(gnutls_session_t session, extensions_t ext,
+void _gnutls_hello_ext_set_sdata(gnutls_session_t session, extensions_t ext,
 				  gnutls_ext_priv_data_t);
-int _gnutls_ext_get_session_data(gnutls_session_t session, extensions_t ext,
+int _gnutls_hello_ext_get_sdata(gnutls_session_t session, extensions_t ext,
 				 gnutls_ext_priv_data_t *);
-int _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
+int _gnutls_hello_ext_get_resumed_sdata(gnutls_session_t session,
 					 extensions_t ext,
 					 gnutls_ext_priv_data_t * data);
 
 /* for session packing */
-int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed);
-int _gnutls_ext_unpack(gnutls_session_t session,
+int _gnutls_hello_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed);
+int _gnutls_hello_ext_unpack(gnutls_session_t session,
 		       gnutls_buffer_st * packed);
 
 inline static const char *ext_msg_validity_to_str(gnutls_ext_flags_t msg)
