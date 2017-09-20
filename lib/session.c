@@ -273,7 +273,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	gnutls_kx_algorithm_t kx;
 	const char *kx_str, *sign_str;
 	unsigned type;
-	char kx_name[64];
+	char kx_name[64] = "";
 	char proto_name[32];
 	char _group_name[24];
 	const char *group_name = NULL;
@@ -282,6 +282,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	unsigned sign_algo;
 	char *desc;
 	const struct gnutls_group_entry_st *group = get_group(session);
+	const version_entry_st *ver = get_version(session);
 
 	if (session->internals.initial_negotiation_completed == 0)
 		return NULL;
@@ -304,8 +305,22 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	sign_algo = gnutls_sign_algorithm_get(session);
 	sign_str = gnutls_sign_get_name(sign_algo);
 
-	kx_str = gnutls_kx_get_name(kx);
-	if (kx_str) {
+	if (kx == 0 && ver->tls13_sem) { /* TLS 1.3 */
+		if (group && sign_str) {
+			if (group->curve)
+				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
+					 group_name, sign_str);
+			else
+				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)-(%s)",
+					 group_name, sign_str);
+		}
+	} else {
+		kx_str = gnutls_kx_get_name(kx);
+		if (kx_str == NULL) {
+			gnutls_assert();
+			return NULL;
+		}
+
 		if (kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ECDHE_RSA || 
 		    kx == GNUTLS_KX_ECDHE_PSK) {
 			if (sign_str)
@@ -327,8 +342,6 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 			snprintf(kx_name, sizeof(kx_name), "(%s)",
 				 kx_str);
 		}
-	} else {
-		strcpy(kx_name, "(NULL)");
 	}
 
 

@@ -102,6 +102,11 @@ gnutls_certificate_type_get(gnutls_session_t session)
  *
  * Get currently used key exchange algorithm.
  *
+ * This function will return %GNUTLS_KX_ECDHE_RSA, or %GNUTLS_KX_DHE_RSA
+ * under TLS 1.3, to indicate an elliptic curve DH key exchange or
+ * a finite field one. The precise group used is available
+ * by calling gnutls_group_get() instead.
+ *
  * Returns: the key exchange algorithm used in the last handshake, a
  *   #gnutls_kx_algorithm_t value.
  **/
@@ -109,6 +114,19 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 {
 	if (session->security_parameters.cs == 0)
 		return 0;
+
+	if (session->security_parameters.cs->kx_algorithm == 0) { /* TLS 1.3 */
+		const version_entry_st *ver = get_version(session);
+		const gnutls_group_entry_st *group = get_group(session);
+
+		if (ver->tls13_sem && group) {
+			if (group->curve)
+				return GNUTLS_KX_ECDHE_RSA;
+			else
+				return GNUTLS_KX_DHE_RSA;
+		}
+	}
+
 	return session->security_parameters.cs->kx_algorithm;
 }
 
