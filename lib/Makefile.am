@@ -79,7 +79,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h	\
 	safe-memfuncs.c system/inet_pton.c atfork.c atfork.h randomart.c \
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
-	crypto-selftests.c crypto-selftests-pk.c secrets.c
+	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h
 
 if WINDOWS
 COBJECTS += system/keys-win.c

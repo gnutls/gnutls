@@ -292,6 +292,8 @@ typedef enum extensions_t {
 } extensions_t;
 
 #define GNUTLS_EXTENSION_MAX_VALUE 31
+#define ext_track_t uint32_t
+
 #if GNUTLS_EXTENSION_MAX >= GNUTLS_EXTENSION_MAX_VALUE
 # error over limit
 #endif
@@ -1151,7 +1153,7 @@ typedef struct {
 	 * otherwise the extensions we received from the client. This is
 	 * an OR of (1<<extensions_t values).
 	 */
-	uint32_t used_exts;
+	ext_track_t used_exts;
 
 	/* this is not the negotiated max_record_recv_size, but the actual maximum
 	 * receive size */
