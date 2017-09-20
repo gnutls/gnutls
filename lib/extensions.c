@@ -159,11 +159,6 @@ static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
 	return 0;
 }
 
-void _gnutls_extension_list_add_sr(gnutls_session_t session)
-{
-	_gnutls_extension_list_add(session, &ext_mod_sr, 1);
-}
-
 typedef struct hello_ext_ctx_st {
 	gnutls_session_t session;
 	gnutls_ext_flags_t msg;
@@ -186,12 +181,10 @@ int hello_ext_parse(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_s
 	}
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if ((ret =
-		     _gnutls_extension_list_check(session, id)) < 0) {
+		if (!_gnutls_hello_ext_is_present(session, id)) {
 			_gnutls_debug_log("EXT[%p]: Received unexpected extension '%s/%d'\n", session,
 					gnutls_ext_get_name(tls_id), (int)tls_id);
-			gnutls_assert();
-			return ret;
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 		}
 	}
 
@@ -211,7 +204,7 @@ int hello_ext_parse(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_s
 	}
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		ret = _gnutls_extension_list_add(session, ext, 1);
+		ret = _gnutls_hello_ext_save(session, ext->gid, 1);
 		if (ret == 0)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 	}
@@ -276,16 +269,14 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 
 	/* ensure we don't send something twice (i.e, overriden extensions in
 	 * client), and ensure we are sending only what we received in server. */
-	ret = _gnutls_extension_list_check(session, p->gid);
+	ret = _gnutls_hello_ext_is_present(session, p->gid);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		if (ret < 0) {/* not advertized */
+		if (ret == 0) /* not advertised */
 			return 0;
-		}
 	} else {
-		if (ret == 0) {/* already sent */
+		if (ret != 0) /* already sent */
 			return 0;
-		}
 	}
 
 
@@ -304,7 +295,7 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 	if ((appended > 0 || ret == GNUTLS_E_INT_RET_0) &&
 	    session->security_parameters.entity == GNUTLS_CLIENT) {
 
-		_gnutls_extension_list_add(session, p, 0);
+		_gnutls_hello_ext_save(session, p->gid, 0);
 	}
 
 	return ret;

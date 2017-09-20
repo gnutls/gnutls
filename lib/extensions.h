@@ -117,19 +117,17 @@ typedef struct hello_ext_entry_st {
 
 int _gnutls_ext_register(hello_ext_entry_st *);
 
-void _gnutls_extension_list_add_sr(gnutls_session_t session);
-
 /* Checks if the extension @id provided has been requested
- * by us (in client side). In that case it returns zero,
- * otherwise a negative error value.
+ * by us (in client side). In that case it returns non-zero,
+ * otherwise zero.
  */
-inline static int
-_gnutls_extension_list_check(gnutls_session_t session, extensions_t id)
+inline static unsigned
+_gnutls_hello_ext_is_present(gnutls_session_t session, extensions_t id)
 {
 	if (id != 0 && ((1 << id) & session->internals.used_exts))
-		return 0;
+		return 1;
 
-	return GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION;
+	return 0;
 }
 
 /* Adds the extension we want to send in the extensions list.
@@ -142,17 +140,23 @@ _gnutls_extension_list_check(gnutls_session_t session, extensions_t id)
  * Returns zero if failed, non-zero on success.
  */
 inline static
-unsigned _gnutls_extension_list_add(gnutls_session_t session,
-				    const struct hello_ext_entry_st *e,
-				    unsigned check_dup)
+unsigned _gnutls_hello_ext_save(gnutls_session_t session,
+				extensions_t id,
+				unsigned check_dup)
 {
-	if (check_dup && _gnutls_extension_list_check(session, e->gid) == 0) {
+	if (check_dup && _gnutls_hello_ext_is_present(session, id)) {
 			return 0;
 	}
 
-	session->internals.used_exts |= (1 << e->gid);
+	session->internals.used_exts |= (1 << id);
 
 	return 1;
+}
+
+inline static
+void _gnutls_hello_ext_save_sr(gnutls_session_t session)
+{
+	_gnutls_hello_ext_save(session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION, 1);
 }
 
 #endif

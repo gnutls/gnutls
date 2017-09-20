@@ -235,7 +235,7 @@ _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 	 *
 	 * To proceed, first check whether we have requested the certificate status
 	 */
-	if (_gnutls_extension_list_check(session, GNUTLS_EXTENSION_STATUS_REQUEST) < 0) {
+	if (!_gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_STATUS_REQUEST)) {
 		return 0;
 	}
 

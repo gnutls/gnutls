@@ -1457,7 +1457,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	 * by RFC4492, probably to allow SSLv2 hellos negotiate elliptic curve
 	 * ciphersuites */
 	if (session->internals.cand_ec_group == NULL &&
-	    _gnutls_extension_list_check(session, GNUTLS_EXTENSION_SUPPORTED_ECC) < 0) {
+	    !_gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_SUPPORTED_ECC)) {
 		session->internals.cand_ec_group = _gnutls_id_to_group(DEFAULT_EC_GROUP);
 	}
 
@@ -1613,7 +1613,7 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		_gnutls_extension_list_add_sr(session);
+		_gnutls_hello_ext_save_sr(session);
 	}
 #endif
 
