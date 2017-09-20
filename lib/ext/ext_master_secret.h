@@ -23,7 +23,7 @@
 #ifndef EXT_EXT_MASTER_SECRET_H
 #define EXT_EXT_MASTER_SECRET_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_ext_master_secret;
 

@@ -20,7 +20,7 @@
 #ifndef EXT_DUMBFW_H
 #define EXT_DUMBFW_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_dumbfw;
 

@@ -28,7 +28,7 @@
 #include <random.h>
 #include <gnutls/pkcs11.h>
 
-#include <extensions.h>	/* for _gnutls_hello_ext_init */
+#include <hello_ext.h>	/* for _gnutls_hello_ext_init */
 #include <supplemental.h> /* for _gnutls_supplemental_deinit */
 #include <locks.h>
 #include <system.h>

@@ -39,7 +39,7 @@
 #include <session_pack.h>
 #include <datum.h>
 #include <num.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include <constate.h>
 #include <algorithms.h>
 #include <state.h>

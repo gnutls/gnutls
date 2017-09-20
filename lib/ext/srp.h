@@ -23,7 +23,7 @@
 #ifndef EXT_SRP_H
 #define EXT_SRP_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 #ifdef ENABLE_SRP
 

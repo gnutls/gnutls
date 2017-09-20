@@ -37,7 +37,7 @@
 #include "num.h"
 #include "hash_int.h"
 #include "db.h"
-#include "extensions.h"
+#include "hello_ext.h"
 #include "supplemental.h"
 #include "auth.h"
 #include "sslv2_compat.h"

@@ -25,7 +25,7 @@
 #ifndef EXT_SIGNATURE_H
 #define EXT_SIGNATURE_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_sig;
 

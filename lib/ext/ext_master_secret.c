@@ -26,7 +26,7 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "num.h"
-#include <extensions.h>
+#include <hello_ext.h>
 #include <ext/ext_master_secret.h>
 
 static int _gnutls_ext_master_secret_recv_params(gnutls_session_t session,

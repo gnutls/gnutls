@@ -23,7 +23,7 @@
 #ifndef EXT_SERVER_NAME_H
 #define EXT_SERVER_NAME_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 typedef struct {
 	uint8_t name[MAX_SERVER_NAME_SIZE+1];

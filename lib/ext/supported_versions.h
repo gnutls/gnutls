@@ -23,7 +23,7 @@
 #ifndef EXT_SUPPORTED_VERSIONS_H
 #define EXT_SUPPORTED_VERSIONS_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_supported_versions;
 

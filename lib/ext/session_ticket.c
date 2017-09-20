@@ -31,7 +31,7 @@
 #include <random.h>
 #include <ext/session_ticket.h>
 #include <mbuffers.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include <constate.h>
 #include <dtls.h>
 #include "db.h"

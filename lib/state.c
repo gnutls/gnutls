@@ -44,7 +44,7 @@
 #include <auth/anon.h>
 #include <auth/psk.h>
 #include <algorithms.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include <system.h>
 #include <random.h>
 #include <fips.h>

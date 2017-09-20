@@ -30,7 +30,7 @@
 #include <x509_int.h>
 #include <num.h>
 #include "errors.h"
-#include "extensions.h"
+#include "hello_ext.h"
 #include "ip.h"
 
 #define addf _gnutls_buffer_append_printf

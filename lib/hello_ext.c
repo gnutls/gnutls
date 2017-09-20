@@ -27,7 +27,7 @@
  */
 
 #include "gnutls_int.h"
-#include "extensions.h"
+#include "hello_ext.h"
 #include "errors.h"
 #include "ext/max_record.h"
 #include <ext/server_name.h>

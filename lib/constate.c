@@ -33,7 +33,7 @@
 #include <num.h>
 #include <datum.h>
 #include <state.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include <buffers.h>
 #include "dtls.h"
 

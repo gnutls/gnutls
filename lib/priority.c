@@ -30,7 +30,7 @@
 #include <num.h>
 #include <gnutls/x509.h>
 #include <c-ctype.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include "fips.h"
 #include "errno.h"
 #include <gnutls/gnutls.h>

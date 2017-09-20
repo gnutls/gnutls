@@ -68,7 +68,7 @@ PSK_COBJECTS = psk.c
 COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h	\
 	mbuffers.c buffers.c handshake.c num.c errors.c dh.c kx.c	\
 	priority.c hash_int.c cipher_int.c session.c db.c x509_b64.c	\
-	extensions.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
+	hello_ext.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
 	pk.c cert.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
 	mem.c fingerprint.c tls-sig.c ecc.c alert.c privkey_raw.c atomic.h	\
 	system/certs.c system/threads.c system/fastopen.c system/sockets.c	\
@@ -101,7 +101,7 @@ HFILES = abstract_int.h debug.h cipher.h	\
 	buffers.h errors.h gnutls_int.h dtls.h	\
 	handshake.h num.h algorithms.h		\
 	dh.h kx.h hash_int.h cipher_int.h	\
-	db.h auth.h extensions.h	\
+	db.h auth.h hello_ext.h	\
 	x509_b64.h sslv2_compat.h datum.h \
 	mpi.h pk.h record.h		\
 	constate.h global.h tls-sig.h mem.h	\

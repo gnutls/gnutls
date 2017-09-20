@@ -23,7 +23,7 @@
 #ifndef EXT_SESSION_TICKET_H
 #define EXT_SESSION_TICKET_H
 
-#include <extensions.h>
+#include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_session_ticket;
 

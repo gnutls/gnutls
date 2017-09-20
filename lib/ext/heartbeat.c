@@ -29,7 +29,7 @@
 #include <dtls.h>
 #include <record.h>
 #include <ext/heartbeat.h>
-#include <extensions.h>
+#include <hello_ext.h>
 #include <random.h>
 
 #ifdef ENABLE_HEARTBEAT

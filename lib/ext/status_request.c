@@ -28,7 +28,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
-#include <extensions.h>
+#include <hello_ext.h>
 #include <ext/status_request.h>
 #include <mbuffers.h>
 #include <auth.h>

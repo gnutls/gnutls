@@ -30,7 +30,7 @@
 #include "errors.h"
 #include "algorithms.h"
 #include <num.h>
-#include <extensions.h>
+#include <hello_ext.h>
 
 static int _gnutls_srp_unpack(gnutls_buffer_st * ps,
 			      gnutls_ext_priv_data_t * _priv);

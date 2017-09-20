@@ -24,7 +24,7 @@
 #include "gnutls_int.h"
 #include "auth.h"
 #include "errors.h"
-#include "extensions.h"
+#include "hello_ext.h"
 #include <auth/cert.h>
 #include "dh.h"
 #include "num.h"
