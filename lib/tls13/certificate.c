@@ -26,6 +26,7 @@
 #include "handshake.h"
 #include "tls13/certificate.h"
 #include "auth/cert.h"
+#include "mbuffers.h"
 
 static int parse_cert_extension(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size);
 static int parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size);
@@ -62,6 +63,81 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 cleanup:
 
 	_gnutls_buffer_clear(&buf);
+	return ret;
+}
+
+int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
+{
+	int ret;
+	gnutls_pcert_st *apr_cert_list;
+	gnutls_privkey_t apr_pkey;
+	int apr_cert_list_length;
+	mbuffer_st *bufel = NULL;
+	gnutls_buffer_st buf;
+	unsigned pos_mark;
+	unsigned i;
+
+	if (again == 0) {
+		_gnutls_buffer_init(&buf);
+
+		ret = _gnutls_get_selected_cert(session, &apr_cert_list,
+						&apr_cert_list_length, &apr_pkey);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		/* mark total size */
+		pos_mark = buf.length;
+		ret = _gnutls_buffer_append_prefix(&buf, 24, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		for (i=0;i<(unsigned)apr_cert_list_length;i++) {
+			ret = _gnutls_buffer_append_data_prefix(&buf, 24,
+								apr_cert_list[i].cert.data,
+								apr_cert_list[i].cert.size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			/* no extensions for now */
+			ret = _gnutls_buffer_append_prefix(&buf, 16, 0);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+		}
+
+		_gnutls_write_uint24(buf.length-pos_mark-3, &buf.data[pos_mark]);
+
+		bufel = _gnutls_handshake_alloc(session, buf.length);
+		if (bufel == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
+
+		_mbuffer_set_udata_size(bufel, 0);
+		ret = _mbuffer_append_data(bufel, buf.data, buf.length);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		_gnutls_buffer_clear(&buf);
+	}
+
+	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+
+ cleanup:
+	_gnutls_buffer_clear(&buf);
+	_mbuffer_xfree(&bufel);
 	return ret;
 }
 
@@ -217,7 +293,3 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 
 }
 
-int _gnutls13_send_certificate(gnutls_session_t session)
-{
-	return 0;
-}

@@ -21,3 +21,4 @@
  */
 
 int _gnutls13_recv_certificate_request(gnutls_session_t session);
+int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again);

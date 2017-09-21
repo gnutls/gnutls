@@ -104,7 +104,7 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		IMED_RET("recv finished", ret, 0);
 		/* fall through */
 	case STATE107:
-		ret = _gnutls13_send_certificate(session);
+		ret = _gnutls13_send_certificate(session, AGAIN(STATE107));
 		STATE = STATE107;
 		IMED_RET("send certificate", ret, 0);
 		/* fall through */
@@ -207,12 +207,12 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		IMED_RET("send encrypted extensions", ret, 0);
 		/* fall through */
 	case STATE102:
-		abort();
+		ret = _gnutls13_send_certificate_request(session, AGAIN(STATE102));
 		STATE = STATE102;
 		IMED_RET("send certificate request", ret, 0);
 		/* fall through */
 	case STATE103:
-		abort();
+		ret = _gnutls13_send_certificate(session, AGAIN(STATE103));
 		STATE = STATE103;
 		IMED_RET("send certificate", ret, 0);
 		/* fall through */
