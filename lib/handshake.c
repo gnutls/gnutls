@@ -1765,11 +1765,9 @@ static int send_client_hello(gnutls_session_t session, int again)
 			 * that do not support TLS 1.2 and don't know
 			 * how 3,3 version of record packets look like.
 			 */
-			_gnutls_record_set_default_version(session,
-							   min_ver->major, min_ver->minor);
+			set_default_version(session, min_ver);
 		} else {
-			_gnutls_record_set_default_version(session,
-							   hver->major, hver->minor);
+			set_default_version(session, hver);
 		}
 
 		/* In order to know when this session was initiated.

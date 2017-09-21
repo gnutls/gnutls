@@ -42,6 +42,17 @@ _gnutls_session_group_set(gnutls_session_t session,
 	session->security_parameters.grp = e;
 }
 
+inline static
+void set_default_version(gnutls_session_t session, const version_entry_st *ver)
+{
+	if (ver->tls13_sem) {
+		session->internals.default_record_version[0] = 3;
+		session->internals.default_record_version[1] = 1;
+	} else {
+		session->internals.default_record_version[0] = ver->major;
+		session->internals.default_record_version[1] = ver->minor;
+	}
+}
 
 void
 _gnutls_record_set_default_version(gnutls_session_t session,
