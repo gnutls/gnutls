@@ -38,11 +38,11 @@
 
 /* Cipher SUITES */
 #define ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version ) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256}
+	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, GNUTLS_TLS1_2, dtls_version, GNUTLS_DTLS1_2, GNUTLS_MAC_SHA256}
 #define ENTRY_PRF( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf ) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf}
+	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, GNUTLS_TLS1_2, dtls_version, GNUTLS_DTLS1_2, prf}
 #define ENTRY_TLS13( name, block_algorithm, min_version, prf ) \
-	{ #name, name, block_algorithm, 0, GNUTLS_MAC_AEAD, min_version, GNUTLS_VERSION_UNKNOWN, prf}
+	{ #name, name, block_algorithm, 0, GNUTLS_MAC_AEAD, min_version, GNUTLS_TLS1_3, GNUTLS_VERSION_UNKNOWN, GNUTLS_VERSION_UNKNOWN, prf}
 
 /* TLS 1.3 ciphersuites */
 #define GNUTLS_AES_128_GCM_SHA256 { 0x13, 0x01 }
@@ -1395,11 +1395,13 @@ const char *gnutls_cipher_suite_info(size_t idx,
 #define VERSION_CHECK(entry) \
 			if (is_dtls) { \
 				if (entry->min_dtls_version == GNUTLS_VERSION_UNKNOWN || \
-				    version->id < entry->min_dtls_version) \
+				    version->id < entry->min_dtls_version || \
+				    version->id > entry->max_dtls_version) \
 					continue; \
 			} else { \
 				if (entry->min_version == GNUTLS_VERSION_UNKNOWN || \
-				    version->id < entry->min_version) \
+				    version->id < entry->min_version || \
+				    version->id > entry->max_version) \
 					continue; \
 			}
 

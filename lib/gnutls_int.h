@@ -514,7 +514,11 @@ typedef struct gnutls_cipher_suite_entry_st {
 	gnutls_protocol_t min_version;	/* this cipher suite is supported
 					 * from 'version' and above;
 					 */
+	gnutls_protocol_t max_version;	/* this cipher suite is not supported
+					 * after 'version' and above;
+					 */
 	gnutls_protocol_t min_dtls_version;	/* DTLS min version */
+	gnutls_protocol_t max_dtls_version;	/* DTLS max version */
 	gnutls_mac_algorithm_t prf;
 } gnutls_cipher_suite_entry_st;
 
