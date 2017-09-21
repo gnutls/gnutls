@@ -64,6 +64,8 @@ int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len);
 int _gnutls_gen_server_random(gnutls_session_t session, int version);
 void _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd);
 
+int _gnutls_send_server_hello(gnutls_session_t session, int again);
+
 int _gnutls_find_pk_algos_in_ciphersuites(uint8_t * data, int datalen);
 int _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 				unsigned int datalen, unsigned int scsv_only);
@@ -74,6 +76,8 @@ int _gnutls_user_hello_func(gnutls_session_t session,
 			    gnutls_protocol_t adv_version, uint8_t major, uint8_t minor);
 
 void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session);
+
+int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session);
 
 #define STATE session->internals.handshake_state
 #define FINAL_STATE session->internals.handshake_final_state

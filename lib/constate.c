@@ -354,17 +354,26 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 	const mac_entry_st *mac_algo;
 	record_parameters_st *params;
 	int ret;
+	const version_entry_st *ver = get_version(session);
 
 	ret = _gnutls_epoch_get(session, EPOCH_NEXT, &params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (params->initialized
-	    || params->cipher != NULL || params->mac != NULL)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
 	cipher_algo = cipher_to_entry(cs->block_algorithm);
 	mac_algo = mac_to_entry(cs->mac_algorithm);
+
+	if (ver->tls13_sem && (session->internals.hsk_flags & HSK_HRR_SENT)) {
+		if (params->initialized && (params->cipher != cipher_algo ||
+		    params->mac != mac_algo || cs != session->security_parameters.cs))
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		return 0;
+	} else {
+		if (params->initialized
+		    || params->cipher != NULL || params->mac != NULL)
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
 
 	if (_gnutls_cipher_is_ok(cipher_algo) == 0
 	    || _gnutls_mac_is_ok(mac_algo) == 0)

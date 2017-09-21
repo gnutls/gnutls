@@ -92,6 +92,7 @@ COBJECTS += tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
 	tls13/certificate_verify.c tls13/certificate_verify.h \
 	tls13-sig.c tls13-sig.h \
 	tls13/finished.c tls13/finished.h \
+	tls13/hello_retry.c tls13/hello_retry.h \
 	tls13/session_ticket.c tls13/session_ticket.h \
 	tls13/certificate.c tls13/certificate.h
 

@@ -247,6 +247,7 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE15, STATE16, STATE17, STATE18, STATE19,
 	STATE20 = 20, STATE21, STATE22,
 	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
+	STATE90=90, STATE91, STATE92, STATE93,
 	STATE100=100, STATE101, STATE102, STATE103, STATE104,
 	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110
 } handshake_state_t;
@@ -1109,6 +1110,7 @@ typedef struct {
 #define HSK_CRT_VRFY_EXPECTED 1
 #define HSK_CRT_SENT (1<<1)
 #define HSK_CRT_ASKED (1<<2)
+#define HSK_HRR_SENT (1<<3)
 	unsigned hsk_flags; /* TLS1.3 only */
 
 	unsigned crt_requested; /* 1 if client auth was requested (i.e., client cert).

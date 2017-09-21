@@ -652,13 +652,30 @@ key_share_send_params(gnutls_session_t session,
 		if (unlikely(ver == NULL || ver->key_shares == 0))
 			return gnutls_assert_val(0);
 
-		group = get_group(session);
-		if (unlikely(group == NULL))
-			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		if (_gnutls_ext_get_msg(session) == GNUTLS_EXT_FLAG_HRR) {
+			if (session->internals.cand_ec_group != NULL)
+				group = session->internals.cand_ec_group;
+			else
+				group = session->internals.cand_dh_group;
+			if (group == NULL)
+				return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
 
-		ret = server_gen_key_share(session, group, extdata);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+			_gnutls_session_group_set(session, group);
+
+			_gnutls_handshake_log("EXT[%p]: requesting retry with group %s\n", session, group->name);
+			ret =
+			    _gnutls_buffer_append_prefix(extdata, 16, group->tls_id);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		} else {
+			group = get_group(session);
+			if (unlikely(group == NULL))
+				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+			ret = server_gen_key_share(session, group, extdata);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
 	}
 
 	return 0;

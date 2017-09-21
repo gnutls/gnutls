@@ -74,13 +74,13 @@ send_handshake_final(gnutls_session_t session, int init);
 
 /* Empties but does not free the buffer
  */
-static inline void
-handshake_hash_buffer_empty(gnutls_session_t session)
+inline static void
+handshake_hash_buffer_reset(gnutls_session_t session)
 {
-
 	_gnutls_buffers_log("BUF[HSK]: Emptied buffer\n");
 
-	session->internals.used_exts = 0;
+	session->internals.handshake_hash_buffer_client_kx_len = 0;
+	session->internals.handshake_hash_buffer_server_finished_len = 0;
 	session->internals.handshake_hash_buffer_prev_len = 0;
 	session->internals.handshake_hash_buffer.length = 0;
 	return;
@@ -106,10 +106,41 @@ recv_hello_verify_request(gnutls_session_t session,
  */
 void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session)
 {
-	session->internals.handshake_hash_buffer_prev_len = 0;
-	session->internals.handshake_hash_buffer_client_kx_len = 0;
-	session->internals.handshake_hash_buffer_server_finished_len = 0;
+	handshake_hash_buffer_reset(session);
 	_gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
+}
+
+/* Replace handshake message buffer, with the special synthetic message
+ * needed by TLS1.3 when HRR is sent. */
+int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session)
+{
+	int ret;
+	uint8_t hdata[4+MAX_HASH_SIZE];
+
+	/* calculate hash */
+	hdata[0] = 254;
+	_gnutls_write_uint24(session->security_parameters.prf->output_size, &hdata[1]);
+
+	ret = gnutls_hash_fast((gnutls_digest_algorithm_t)session->security_parameters.prf->id,
+			       session->internals.handshake_hash_buffer.data,
+			       session->internals.handshake_hash_buffer.length,
+			       hdata+4);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	handshake_hash_buffer_reset(session);
+
+	ret =
+	    _gnutls_buffer_append_data(&session->internals.
+				       handshake_hash_buffer,
+				       hdata, session->security_parameters.prf->output_size+4);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	_gnutls_buffers_log("BUF[HSK]: Replaced handshake buffer with synth message (%d bytes)\n",
+			    session->security_parameters.prf->output_size+4);
+
+	return 0;
 }
 
 /* this will copy the required values for resuming to
@@ -1883,7 +1914,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 	return ret;
 }
 
-static int send_server_hello(gnutls_session_t session, int again)
+int _gnutls_send_server_hello(gnutls_session_t session, int again)
 {
 	mbuffer_st *bufel = NULL;
 	gnutls_buffer_st buf;
@@ -2046,7 +2077,9 @@ recv_hello_verify_request(gnutls_session_t session,
 	}
 
 	/* reset handshake hash buffers */
-	handshake_hash_buffer_empty(session);
+	handshake_hash_buffer_reset(session);
+	/* reset extensions used in previous hello */
+	session->internals.used_exts = 0;
 
 	return 0;
 }
@@ -2841,7 +2874,8 @@ static int handshake_server(gnutls_session_t session)
 	const version_entry_st *ver;
 
  reset:
-	if (STATE >= STATE100)
+
+	if (STATE >= STATE90)
 		return _gnutls13_handshake_server(session);
 
 	switch (STATE) {
@@ -2859,6 +2893,13 @@ static int handshake_server(gnutls_session_t session)
 		} else {
 			STATE = STATE1;
 		}
+
+		if (ret == GNUTLS_E_NO_COMMON_KEY_SHARE) {
+			STATE = STATE90;
+			session->internals.hsk_flags |= HSK_HRR_SENT;
+			goto reset;
+		}
+
 		IMED_RET("recv hello", ret, 1);
 		/* fall through */
 	case STATE2:
@@ -2868,7 +2909,7 @@ static int handshake_server(gnutls_session_t session)
 		IMED_RET("recv hello", ret, 0);
 		/* fall through */
 	case STATE3:
-		ret = send_server_hello(session, AGAIN(STATE3));
+		ret = _gnutls_send_server_hello(session, AGAIN(STATE3));
 		STATE = STATE3;
 		IMED_RET("send hello", ret, 1);
 

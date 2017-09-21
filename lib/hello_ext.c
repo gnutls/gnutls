@@ -266,6 +266,10 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 				  p->name, (int)p->tls_id,
 				  ext_msg_validity_to_str(ctx->msg));
 		return 0;
+	} else {
+		_gnutls_handshake_log("EXT[%p]: Preparing extension (%s/%d) for '%s'\n", session,
+				  p->name, (int)p->tls_id,
+				  ext_msg_validity_to_str(ctx->msg));
 	}
 
 	/* ensure we don't send something twice (i.e, overriden extensions in

@@ -47,6 +47,7 @@
 #include <random.h>
 #include <dtls.h>
 #include "secrets.h"
+#include "tls13/hello_retry.h"
 #include "tls13/encrypted_extensions.h"
 #include "tls13/certificate_request.h"
 #include "tls13/certificate_verify.h"
@@ -168,7 +169,7 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 {
 	int ret;
 
-	if (unlikely(session->key.key.size == 0))
+	if (unlikely(session->key.key.size == 0 || session->key.temp_secret_size == 0))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	ret = _tls13_update_secret(session, session->key.key.data, session->key.key.size);
@@ -195,6 +196,39 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 	int ret = 0;
 
 	switch (STATE) {
+	case STATE90:
+		ret = _gnutls13_handshake_hash_buffers_synth(session);
+		STATE = STATE90;
+		IMED_RET("reset handshake buffers", ret, 0);
+		/* fall through */
+	case STATE91:
+		ret = _gnutls13_send_hello_retry_request(session, AGAIN(STATE91));
+		STATE = STATE91;
+		IMED_RET("send hello retry request", ret, 0);
+		/* fall through */
+	case STATE92:
+		ret =
+		    _gnutls_recv_handshake(session,
+					   GNUTLS_HANDSHAKE_CLIENT_HELLO,
+					   0, NULL);
+		STATE = STATE92;
+
+		if (ret == GNUTLS_E_INT_RET_0) {
+			/* this is triggered by post_client_hello, and instructs the
+			 * handshake to proceed but be put on hold */
+			ret = GNUTLS_E_INTERRUPTED;
+			STATE = STATE100; /* hello already parsed -> move on */
+		} else {
+			STATE = STATE92;
+		}
+
+		IMED_RET("recv client hello", ret, 0);
+		/* fall through */
+	case STATE93:
+		ret = _gnutls_send_server_hello(session, AGAIN(STATE93));
+		STATE = STATE93;
+		IMED_RET("send hello", ret, 0);
+		/* fall through */
 	case STATE100:
 		ret =
 		    generate_hs_traffic_keys(session);
