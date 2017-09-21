@@ -47,7 +47,7 @@ _gnutls_server_name_set_raw(gnutls_session_t session,
 const extension_entry_st ext_mod_server_name = {
 	.name = "Server Name Indication",
 	.type = GNUTLS_EXTENSION_SERVER_NAME,
-	.parse_type = GNUTLS_EXT_APPLICATION,
+	.parse_type = GNUTLS_EXT_MANDATORY,
 
 	.recv_func = _gnutls_server_name_recv_params,
 	.send_func = _gnutls_server_name_send_params,
