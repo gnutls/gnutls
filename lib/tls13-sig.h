@@ -33,4 +33,11 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 			        const gnutls_datum_t *signature,
 			        const gnutls_sign_entry_st *se);
 
+int
+_gnutls13_handshake_sign_data(gnutls_session_t session,
+			      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
+			      const gnutls_datum_t *context,
+			      gnutls_datum_t * signature,
+			      const gnutls_sign_entry_st *se);
+
 #endif

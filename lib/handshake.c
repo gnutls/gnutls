@@ -2374,7 +2374,8 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 }
 
 /* Runs the certificate verification callback.
- * side is either GNUTLS_CLIENT or GNUTLS_SERVER.
+ * side is the side that we verify the certificate
+ * from (either GNUTLS_CLIENT or GNUTLS_SERVER).
  */
 int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side)
 {

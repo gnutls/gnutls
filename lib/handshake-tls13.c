@@ -109,7 +109,7 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		IMED_RET("send certificate", ret, 0);
 		/* fall through */
 	case STATE108:
-		ret = _gnutls13_send_certificate_verify(session);
+		ret = _gnutls13_send_certificate_verify(session, AGAIN(STATE108));
 		STATE = STATE108;
 		IMED_RET("send certificate verify", ret, 0);
 		/* fall through */
@@ -217,42 +217,51 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		IMED_RET("send certificate", ret, 0);
 		/* fall through */
 	case STATE104:
-		abort();
+		ret = _gnutls13_send_certificate_verify(session, AGAIN(STATE104));
 		STATE = STATE104;
 		IMED_RET("send certificate verify", ret, 0);
 		/* fall through */
 	case STATE105:
-		abort();
+		ret = _gnutls13_send_finished(session, AGAIN(STATE105));
 		STATE = STATE105;
 		IMED_RET("send finished", ret, 0);
 		/* fall through */
 	case STATE106:
-		abort();
+		ret = _gnutls13_recv_certificate(session);
 		STATE = STATE106;
 		IMED_RET("recv certificate", ret, 0);
 		/* fall through */
 	case STATE107:
-		abort();
+		ret = _gnutls13_recv_certificate_verify(session);
 		STATE = STATE107;
 		IMED_RET("recv certificate verify", ret, 0);
 		/* fall through */
 	case STATE108:
-		ret = _gnutls_run_verify_callback(session, GNUTLS_SERVER);
+		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
 		STATE = STATE108;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		/* fall through */
 	case STATE109:
-		abort();
+		ret = _gnutls13_recv_finished(session);
 		STATE = STATE109;
 		IMED_RET("recv finished", ret, 0);
 		/* fall through */
+	case STATE110:
+		ret =
+		    generate_ap_traffic_keys(session);
+		STATE = STATE110;
+		IMED_RET("generate app keys", ret, 0);
 
 		STATE = STATE0;
 		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
+
+	/* explicitly reset any false start flags */
+	session->internals.recv_state = RECV_STATE_0;
+	session->internals.initial_negotiation_completed = 1;
 
 	return 0;
 }

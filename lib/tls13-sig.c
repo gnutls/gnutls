@@ -127,3 +127,73 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 
 	return ret;
 }
+
+int
+_gnutls13_handshake_sign_data(gnutls_session_t session,
+			      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
+			      const gnutls_datum_t *context,
+			      gnutls_datum_t * signature,
+			      const gnutls_sign_entry_st *se)
+{
+	gnutls_datum_t p;
+	int ret;
+	gnutls_buffer_st buf;
+	uint8_t prefix[PREFIX_SIZE];
+
+	if (unlikely(se == NULL || se->hash == GNUTLS_DIG_SHA1 || se->pk == GNUTLS_PK_RSA))
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+	_gnutls_handshake_log
+	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s\n", session, se->name);
+
+	_gnutls_buffer_init(&buf);
+
+	memset(prefix, 0x20, sizeof(prefix));
+	ret = _gnutls_buffer_append_data(&buf, prefix, sizeof(prefix));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_buffer_append_data(&buf, context->data, context->size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_buffer_append_data(&buf, "\x00", 1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_hash_fast(session->security_parameters.prf->id,
+			       session->internals.handshake_hash_buffer.data,
+			       session->internals.handshake_hash_buffer.length,
+			       prefix);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_buffer_append_data(&buf, prefix, session->security_parameters.prf->output_size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	p.data = buf.data;
+	p.size = buf.length;
+
+	ret = gnutls_privkey_sign_data2(pkey, se->id, 0, &p, signature);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+	ret = 0;
+ cleanup:
+	_gnutls_buffer_clear(&buf);
+
+	return ret;
+
+}

@@ -27,6 +27,7 @@
 #include "ext/signature.h"
 #include "algorithms.h"
 #include "tls13-sig.h"
+#include "mbuffers.h"
 #include "tls13/certificate_verify.h"
 
 #define SRV_CTX "TLS 1.3, server CertificateVerify"
@@ -46,6 +47,11 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
 	memset(&peer_cert, 0, sizeof(peer_cert));
+
+	/* this message is only expected if we have received
+	 * a certificate message */
+	if (!(session->internals.hsk_flags & HSK_CRT_VRFY_EXPECTED))
+		return 0;
 
 	cred = (gnutls_certificate_credentials_t)
 		_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -120,7 +126,88 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	return ret;
 }
 
-int _gnutls13_send_certificate_verify(gnutls_session_t session)
+int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 {
-	return 0;
+	int ret;
+	gnutls_pcert_st *apr_cert_list;
+	gnutls_privkey_t apr_pkey;
+	int apr_cert_list_length;
+	mbuffer_st *bufel = NULL;
+	gnutls_buffer_st buf;
+	gnutls_datum_t sig = {NULL, 0};
+	gnutls_sign_algorithm_t algo;
+	const gnutls_sign_entry_st *se;
+
+	if (again == 0) {
+		_gnutls_buffer_init(&buf);
+
+		ret = _gnutls_get_selected_cert(session, &apr_cert_list,
+						&apr_cert_list_length, &apr_pkey);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		if (apr_cert_list_length == 0) {
+			if (session->security_parameters.entity == GNUTLS_SERVER) {
+				return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+			} else {
+				/* if we didn't get a cert request there will not be any */
+				if (!(session->internals.hsk_flags & HSK_CRT_SENT))
+					return 0;
+				else
+					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			}
+		}
+
+		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
+		if (algo == GNUTLS_SIGN_UNKNOWN)
+			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+
+		if (session->security_parameters.entity == GNUTLS_SERVER)
+			gnutls_sign_algorithm_set_server(session, algo);
+		else
+			gnutls_sign_algorithm_set_client(session, algo);
+
+		se = _gnutls_sign_to_entry(algo);
+
+		ret = _gnutls13_handshake_sign_data(session, &apr_cert_list[0], apr_pkey, &srv_ctx, &sig, se);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_buffer_append_data(&buf, se->aid.id, 2);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _gnutls_buffer_append_data_prefix(&buf, 16, sig.data, sig.size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		bufel = _gnutls_handshake_alloc(session, buf.length);
+		if (bufel == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
+
+		_mbuffer_set_udata_size(bufel, 0);
+		ret = _mbuffer_append_data(bufel, buf.data, buf.length);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		_gnutls_buffer_clear(&buf);
+		gnutls_free(sig.data);
+	}
+
+	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
+
+ cleanup:
+	gnutls_free(sig.data);
+	_gnutls_buffer_clear(&buf);
+	_mbuffer_xfree(&bufel);
+	return ret;
 }

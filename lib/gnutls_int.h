@@ -1106,6 +1106,11 @@ typedef struct {
 	unsigned int handshake_timeout_ms;	/* timeout in milliseconds */
 	unsigned int record_timeout_ms;	/* timeout in milliseconds */
 
+#define HSK_CRT_VRFY_EXPECTED 1
+#define HSK_CRT_SENT (1<<1)
+#define HSK_CRT_ASKED (1<<2)
+	unsigned hsk_flags; /* TLS1.3 only */
+
 	unsigned crt_requested; /* 1 if client auth was requested (i.e., client cert).
 	 * In case of a server this holds 1 if we should wait
 	 * for a client certificate verify

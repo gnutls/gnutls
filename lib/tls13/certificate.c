@@ -35,10 +35,24 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 {
 	int ret;
 	gnutls_buffer_st buf;
+	unsigned optional = 0;
 
-	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, 0, &buf);
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		/* if we didn't request a certificate, there will not be any */
+		if (session->internals.send_cert_req == 0)
+			return 0;
+
+		if (session->internals.send_cert_req != GNUTLS_CERT_REQUIRE)
+			optional = 1;
+	}
+
+	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, optional, &buf);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	if (buf.length == 0 && optional) {
+		return 0;
+	}
 
 	if (buf.data[0] != 0) {
 		/* The context field must be empty during handshake */
@@ -58,6 +72,8 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	session->internals.hsk_flags |= HSK_CRT_VRFY_EXPECTED;
 
 	ret = 0;
 cleanup:
@@ -84,6 +100,14 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 						&apr_cert_list_length, &apr_pkey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+
+		if (session->security_parameters.entity == GNUTLS_CLIENT) {
+			/* if we didn't get a cert request there will not be any */
+			if (apr_cert_list_length == 0 ||
+			    !(session->internals.hsk_flags & HSK_CRT_ASKED)) {
+				return 0;
+			}
+		}
 
 		ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
 		if (ret < 0)

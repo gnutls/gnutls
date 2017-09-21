@@ -66,6 +66,8 @@ int _gnutls13_recv_certificate_request(gnutls_session_t session)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	session->internals.hsk_flags |= HSK_CRT_ASKED;
+
 	return 0;
 }
 
