@@ -83,6 +83,9 @@ supported_versions_recv_params(gnutls_session_t session,
 
 			proto = _gnutls_version_get(major, minor);
 
+			_gnutls_handshake_log("EXT[%p]: Found version: %d.%d\n",
+					      session, (int)major, (int)minor);
+
 			if (_gnutls_version_is_supported(session, proto)) {
 				ret = _gnutls_set_current_version(session, proto);
 				if (ret < 0)
