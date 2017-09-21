@@ -317,7 +317,8 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
-	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh
+	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
+	sni-resume.sh
 
 
 if ENABLE_PKCS11
