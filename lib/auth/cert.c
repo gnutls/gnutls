@@ -1418,6 +1418,7 @@ unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
 {
 	unsigned pk = pubkey->params.algo;
 	unsigned key_usage;
+	const version_entry_st *ver = get_version(session);
 
 	if (session->security_parameters.cert_type != cert_type) {
 		return 0;
@@ -1429,7 +1430,7 @@ unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
 		key_usage = pubkey->key_usage;
 	}
 
-	if (!_gnutls_kx_supports_pk_usage(cs->kx_algorithm, pk, key_usage)) {
+	if (!ver->tls13_sem && !_gnutls_kx_supports_pk_usage(cs->kx_algorithm, pk, key_usage)) {
 		return 0;
 	}
 

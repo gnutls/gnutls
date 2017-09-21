@@ -1446,7 +1446,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	const version_entry_st *version = get_version(session);
 	unsigned int is_dtls = IS_DTLS(session);
 	gnutls_kx_algorithm_t kx;
-	gnutls_credentials_type_t cred_type;
+	gnutls_credentials_type_t cred_type = GNUTLS_CRD_CERTIFICATE; /* default for TLS1.3 */
 	unsigned int no_cert_found = 0;
 	const gnutls_group_entry_st *sgroup = NULL;
 
@@ -1472,7 +1472,9 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 			VERSION_CHECK(peer_clist->entry[i]);
 
 			kx = peer_clist->entry[i]->kx_algorithm;
-			cred_type = _gnutls_map_kx_get_cred(kx, 1);
+
+			if (!version->tls13_sem)
+				cred_type = _gnutls_map_kx_get_cred(kx, 1);
 
 			for (j = 0; j < session->internals.priorities->cs.size; j++) {
 				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
@@ -1511,7 +1513,9 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 				if (session->internals.priorities->cs.entry[j] == peer_clist->entry[i]) {
 					sgroup = NULL;
 					kx = peer_clist->entry[i]->kx_algorithm;
-					cred_type = _gnutls_map_kx_get_cred(kx, 1);
+
+					if (!version->tls13_sem)
+						cred_type = _gnutls_map_kx_get_cred(kx, 1);
 
 					if (!kx_is_ok(session, kx, cred_type, &sgroup))
 						break;
