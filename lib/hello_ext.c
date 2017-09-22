@@ -190,7 +190,7 @@ int hello_ext_parse(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_s
 
 	ext = _gnutls_ext_ptr(session, id, ctx->parse_type);
 	if (ext == NULL || ext->recv_func == NULL) {
-		_gnutls_handshake_log
+		_gnutls_hard_log
 		    ("EXT[%p]: Ignoring extension '%s/%d'\n", session,
 		     gnutls_ext_get_name(tls_id), tls_id);
 		return 0;
@@ -262,7 +262,7 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 	}
 
 	if ((ctx->msg & p->validity) == 0) {
-		_gnutls_handshake_log("EXT[%p]: Not sending extension (%s/%d) for '%s'\n", session,
+		_gnutls_hard_log("EXT[%p]: Not sending extension (%s/%d) for '%s'\n", session,
 				  p->name, (int)p->tls_id,
 				  ext_msg_validity_to_str(ctx->msg));
 		return 0;
