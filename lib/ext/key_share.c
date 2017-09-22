@@ -536,7 +536,6 @@ key_share_recv_params(gnutls_session_t session,
 			}
 
 			_gnutls_session_group_set(session, sgroup);
-			_gnutls_handshake_log("EXT[%p]: Selected group %s\n", session, sgroup->name);
 
 			ret = server_use_key_share(session, sgroup, data, size);
 			if (ret < 0) {
