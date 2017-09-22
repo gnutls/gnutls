@@ -810,7 +810,7 @@ record_add_to_buffers(gnutls_session_t session,
 				 */
 				gnutls_assert();
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
-				if (bufel->msg.data[0] == GNUTLS_AL_FATAL) {
+				if (ver->tls13_sem || bufel->msg.data[0] == GNUTLS_AL_FATAL) {
 					session_unresumable(session);
 					session_invalidate(session);
 					ret =
