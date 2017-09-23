@@ -41,6 +41,9 @@ int main(int argc, char **argv)
 
 #else
 
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -73,6 +76,8 @@ struct params_res {
 	int second_no_ext_master;
 	int try_alpn;
 	int try_resumed_data;
+	int try_diff_sni;
+	int try_sni;
 };
 
 pid_t child;
@@ -149,6 +154,26 @@ struct params_res resume_tests[] = {
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .expect_resume = 1},
+	{.desc = "try to resume from db and different SNI",
+	 .enable_db = 1,
+	 .try_sni = 1,
+	 .try_diff_sni = 1,
+	 .expect_resume = 0},
+	{.desc = "try to resume with ticket and different SNI",
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .try_sni = 1,
+	 .try_diff_sni = 1,
+	 .expect_resume = 0},
+	{.desc = "try to resume from db and same SNI",
+	 .enable_db = 1,
+	 .try_sni = 1,
+	 .expect_resume = 1},
+	{.desc = "try to resume with ticket and same SNI",
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .try_sni = 1,
+	 .expect_resume = 1},
 	{NULL, -1}
 };
 
@@ -171,7 +196,7 @@ static int hsk_hook_cb(gnutls_session_t session, unsigned int htype, unsigned po
 			unsigned int incoming, const gnutls_datum_t *_msg)
 {
 	unsigned size;
-	gnutls_datum msg = {_msg->data, _msg->size};
+	gnutls_datum_t msg = {_msg->data, _msg->size};
 
 	/* skip up to session ID */
 	if (msg.size <= HANDSHAKE_SESSION_ID_POS+6) {
@@ -252,6 +277,8 @@ static void client(int sds[], struct params_res *params)
 	char buffer[MAX_BUF + 1];
 	unsigned int ext_master_secret_check = 0;
 	char prio_str[256];
+	const char *dns_name1 = "example.com";
+	const char *dns_name2 = "www.example.com";
 #ifdef USE_PSK
 # define PRIO_STR "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+PSK:+CURVE-ALL"
 	const gnutls_datum_t pskkey = { (void *) "DEADBEEF", 8 };
@@ -332,6 +359,13 @@ static void client(int sds[], struct params_res *params)
 			/* if this is not the first time we connect */
 			gnutls_session_set_data(session, session_data.data,
 						session_data.size);
+			if (params->try_diff_sni)
+				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name1, strlen(dns_name1));
+			else if (params->try_sni)
+				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name2, strlen(dns_name2));
+		} else {
+			if (params->try_sni)
+				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name2, strlen(dns_name2));
 		}
 
 		if (ext_master_secret_check)
