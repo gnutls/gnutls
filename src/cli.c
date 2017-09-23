@@ -1177,8 +1177,8 @@ int main(int argc, char **argv)
 	setbuf(stdout, NULL);
 	setbuf(stderr, NULL);
 
+	memset(&inline_cmds, 0, sizeof(inline_cmds_st));
 	if (inline_commands) {
-		memset(&inline_cmds, 0, sizeof(inline_cmds_st));
 		inline_cmds.lf_found = true;	/* initially, at start of line */
 	}
 
