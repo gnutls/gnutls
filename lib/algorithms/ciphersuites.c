@@ -1409,7 +1409,7 @@ const char *gnutls_cipher_suite_info(size_t idx,
 static unsigned kx_is_ok(gnutls_session_t session, gnutls_kx_algorithm_t kx, unsigned cred_type,
 			 const gnutls_group_entry_st **sgroup)
 {
-	if (_gnutls_kx_is_ecc(kx)) {
+	if (_gnutls_kx_is_ecc(kx) || _gnutls_kx_is_vko_gost(kx)) {
 		if (session->internals.cand_ec_group == NULL) {
 			return 0;
 		} else {
