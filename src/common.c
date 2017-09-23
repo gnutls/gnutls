@@ -1076,8 +1076,6 @@ pin_callback(void *user, int attempt, const char *token_url,
 	else
 		cached_url = NULL;
 
-	cache = MAX_CACHE_TRIES;
-
 	return 0;
 }
 

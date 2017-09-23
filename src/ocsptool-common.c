@@ -303,7 +303,7 @@ void print_ocsp_verify_res(unsigned int output)
 		if (comma)
 			printf(", ");
 		printf("Signer cert expired");
-		comma = 1;
+		/*comma = 1;*/
 	}
 }
 

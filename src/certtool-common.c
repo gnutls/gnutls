@@ -1226,9 +1226,6 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 				"Error in key ECC data export: %s\n",
 				gnutls_strerror(ret));
 		else {
-			cprint = gnutls_ecc_curve_get_name(curve);
-			bits = 0;
-
 			print_ecc_pkey(outfile, curve, &k, &x, &y,
 				       cinfo->cprint);
 
@@ -1421,22 +1418,18 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 			p = gnutls_ffdhe_2048_group_prime;
 			g = gnutls_ffdhe_2048_group_generator;
 			key_bits = gnutls_ffdhe_2048_key_bits;
-			bits = 2048;
 		} else if (bits <= 3072) {
 			p = gnutls_ffdhe_3072_group_prime;
 			g = gnutls_ffdhe_3072_group_generator;
 			key_bits = gnutls_ffdhe_3072_key_bits;
-			bits = 3072;
 		} else if (bits <= 4096) {
 			p = gnutls_ffdhe_4096_group_prime;
 			g = gnutls_ffdhe_4096_group_generator;
 			key_bits = gnutls_ffdhe_4096_key_bits;
-			bits = 4096;
 		} else {
 			p = gnutls_ffdhe_8192_group_prime;
 			g = gnutls_ffdhe_8192_group_generator;
 			key_bits = gnutls_ffdhe_8192_key_bits;
-			bits = 8192;
 		}
 
 		ret = gnutls_dh_params_import_raw2(dh_params, &p, &g, key_bits);
@@ -1449,23 +1442,18 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 		if (bits <= 1024) {
 			p = gnutls_srp_1024_group_prime;
 			g = gnutls_srp_1024_group_generator;
-			bits = 1024;
 		} else if (bits <= 1536) {
 			p = gnutls_srp_1536_group_prime;
 			g = gnutls_srp_1536_group_generator;
-			bits = 1536;
 		} else if (bits <= 2048) {
 			p = gnutls_srp_2048_group_prime;
 			g = gnutls_srp_2048_group_generator;
-			bits = 2048;
 		} else if (bits <= 3072) {
 			p = gnutls_srp_3072_group_prime;
 			g = gnutls_srp_3072_group_generator;
-			bits = 3072;
 		} else {
 			p = gnutls_srp_4096_group_prime;
 			g = gnutls_srp_4096_group_generator;
-			bits = 4096;
 		}
 
 		ret = gnutls_dh_params_import_raw(dh_params, &p, &g);
