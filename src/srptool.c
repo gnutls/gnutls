@@ -381,7 +381,6 @@ int main(int argc, char **argv)
 {
 	const char *passwd;
 	int salt_size, ret;
-	int optct;
 	const char *fpasswd, *fpasswd_conf;
 	const char *username;
 #ifndef _WIN32
@@ -395,9 +394,7 @@ int main(int argc, char **argv)
 
 	umask(066);
 
-	optct = optionProcess(&srptoolOptions, argc, argv);
-	argc -= optct;
-	argv += optct;
+	optionProcess(&srptoolOptions, argc, argv);
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(OPT_VALUE_DEBUG);
