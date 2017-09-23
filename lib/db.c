@@ -29,6 +29,7 @@
 #include <db.h>
 #include <session_pack.h>
 #include <datum.h>
+#include "ext/server_name.h"
 
 /**
  * gnutls_db_set_retrieve_function:
@@ -255,6 +256,9 @@ int _gnutls_check_resumed_params(gnutls_session_t session)
 {
 	if (session->internals.resumed_security_parameters.ext_master_secret != 
 	    session->security_parameters.ext_master_secret)
+	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+
+	if (!_gnutls_server_name_matches_resumed(session))
 	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
 
 	return 0;
