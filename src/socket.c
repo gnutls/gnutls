@@ -613,6 +613,7 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 	hd->service = strdup(portname);
 	hd->ptr = ptr;
 	hd->addr_info = res;
+	gnutls_free(hd->rdata.data);
 	hd->rdata.data = NULL;
 	gnutls_free(idna.data);
 	return;

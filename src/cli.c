@@ -1138,8 +1138,10 @@ int main(int argc, char **argv)
 		printf("- Handshake was completed\n");
 
 		if (resume != 0)
-			if (try_resume(&hd))
-				return 1;
+			if (try_resume(&hd)) {
+				retval = 1;
+				goto cleanup;
+			}
 
 		print_other_info(hd.session);
 	}
@@ -1149,8 +1151,10 @@ int main(int argc, char **argv)
 	printf("\n- Simple Client Mode:\n\n");
 
 	if (rehandshake)
-		if (try_rehandshake(&hd))
-			return 1;
+		if (try_rehandshake(&hd)) {
+			retval = 1;
+			goto cleanup;
+		}
 
 #ifndef _WIN32
 	new_action.sa_handler = starttls_alarm;
@@ -1319,6 +1323,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+ cleanup:
 	if (user_term != 0)
 		socket_bye(&hd, 1);
 	else
