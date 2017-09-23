@@ -40,4 +40,6 @@ typedef struct {
 
 extern const extension_entry_st ext_mod_server_name;
 
+unsigned _gnutls_server_name_matches_resumed(gnutls_session_t);
+
 #endif
