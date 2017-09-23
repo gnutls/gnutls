@@ -84,5 +84,34 @@ void doit(void)
 	try_with_key("TLS 1.2 with ecdhe ecdsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_ECDSA_SHA256, GNUTLS_SIGN_UNKNOWN, 
 		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &cli_ca3_cert, &cli_ca3_key, ASK_CERT);
 
+#ifdef ENABLE_GOST
+	if (!gnutls_fips140_mode_enabled()) {
+		try_with_key("TLS 1.2 with gost01 no cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-01", GNUTLS_KX_VKO_GOST_01, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost01_cert, &server_ca3_gost01_key, NULL, NULL, 0);
+		try_with_key("TLS 1.2 with gost01 ask cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-01", GNUTLS_KX_VKO_GOST_01, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost01_cert, &server_ca3_gost01_key, NULL, NULL, ASK_CERT);
+		try_with_key("TLS 1.2 with gost01 use cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-01", GNUTLS_KX_VKO_GOST_01, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost01_cert, &server_ca3_gost01_key, &cligost01_ca3_cert, &cligost01_ca3_key, USE_CERT);
+		try_with_key("TLS 1.2 with gost12 256 no cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, NULL, NULL, 0);
+		try_with_key("TLS 1.2 with gost12 256 ask cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, NULL, NULL, ASK_CERT);
+		try_with_key("TLS 1.2 with gost12 256 use cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, &cligost12_256_ca3_cert, &cligost12_256_ca3_key, USE_CERT);
+		try_with_key("TLS 1.2 with gost12 256 use cert gost01", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_GOST_94,
+			&server_ca3_gost12_256_cert, &server_ca3_gost12_256_key, &cligost01_ca3_cert, &cligost01_ca3_key, USE_CERT);
+		try_with_key("TLS 1.2 with gost12 512 no cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, NULL, NULL, 0);
+		try_with_key("TLS 1.2 with gost12 512 ask cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, NULL, NULL, ASK_CERT);
+		try_with_key("TLS 1.2 with gost12 512 use cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, &cligost12_512_ca3_cert, &cligost12_512_ca3_key, USE_CERT);
+		try_with_key("TLS 1.2 with gost12 512 use cert gost01", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_GOST_94,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, &cligost01_ca3_cert, &cligost01_ca3_key, USE_CERT);
+		try_with_key("TLS 1.2 with gost12 512 use cert gost12 256", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+VKO-GOST-12", GNUTLS_KX_VKO_GOST_12, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_GOST_256,
+			&server_ca3_gost12_512_cert, &server_ca3_gost12_512_key, &cligost12_256_ca3_cert, &cligost12_256_ca3_key, USE_CERT);
+	}
+#endif
+
 	gnutls_global_deinit();
 }
