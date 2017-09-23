@@ -2423,8 +2423,7 @@ int get_data_encipherment_status(void)
 	if (batch) {
 		return cfg.data_encipherment;
 	} else {
-		/* this option is not asked in interactive mode */
-		return 0;
+		return read_yesno("Will the certificate be used for data encryption? (Y/n): ", 1);
 	}
 }
 
