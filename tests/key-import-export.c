@@ -87,6 +87,10 @@ unsigned char false_ed25519_x[] = "\xac\xac\x9a\xb3\xc3\x41\x8d\x41\x22\x21\xc1\
 unsigned char ed25519_x[] = "\xab\xaf\x98\xb3\xc3\x41\x8d\x41\x22\x21\xc1\x86\xa7\xb8\x70\xfb\x44\x6e\xc7\x7e\x20\x87\x7b\xd9\x22\xa4\x5d\xd2\x97\x09\xd5\x48";
 unsigned char ed25519_k[] = "\x1c\xa9\x23\xdc\x35\xa8\xfd\xd6\x2d\xa8\x98\xb9\x60\x7b\xce\x10\x3d\xf4\x64\xc6\xe5\x4b\x0a\x65\x56\x6a\x3c\x73\x65\x51\xa2\x2f";
 
+unsigned char gost_x[] = "\x00\xc0\x0f\x88\x63\xd2\xdd\x10\xdf\x3c\x5e\xd8\x1a\xbc\x5a\x3d\x2c\xdd\x50\xbd\xcf\x55\x44\x91\x73\x3c\x60\xa8\xc6\xf4\xe9\xbb\xd0";
+unsigned char gost_y[] = "\x37\x5b\xbd\x56\xfa\xb0\x3c\x6f\x21\x43\xac\x41\x86\xba\xc6\x24\xf5\xb4\x39\x94\x78\x66\x5f\x57\xff\x33\xc8\x0b\x3c\x96\xec\x8a";
+unsigned char gost_k[] = "\x00\xa5\x7f\x2e\x14\xb8\x90\x98\x34\x23\x78\x2f\xcd\x43\xd8\xf9\x66\x19\x31\xca\x1f\x82\xc3\xe0\x67\x1a\x58\xf8\x8a\x2c\x41\x59\x47";
+
 gnutls_datum_t _dsa_p = {dsa_p, sizeof(dsa_p)-1};
 gnutls_datum_t _dsa_q = {dsa_q, sizeof(dsa_q)-1};
 gnutls_datum_t _dsa_g = {dsa_g, sizeof(dsa_g)-1};
@@ -109,6 +113,10 @@ gnutls_datum_t _ecc_k = {ecc_k, sizeof(ecc_k)-1};
 gnutls_datum_t _false_ed25519_x = {false_ed25519_x, sizeof(false_ed25519_x)-1};
 gnutls_datum_t _ed25519_x = {ed25519_x, sizeof(ed25519_x)-1};
 gnutls_datum_t _ed25519_k = {ed25519_k, sizeof(ed25519_k)-1};
+
+gnutls_datum_t _gost_x = {gost_x, sizeof(gost_x)-1};
+gnutls_datum_t _gost_y = {gost_y, sizeof(gost_y)-1};
+gnutls_datum_t _gost_k = {gost_k, sizeof(gost_k)-1};
 
 unsigned char ecc_params[] = "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
 unsigned char ecc_point[] = "\x04\x41\x04\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x38\x0d\x30\x5c\xe4\x3f\x55\xcb\xd9\x17\x15\x46\x72\x71\x92\xc1\xf8\xc6\x33\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
@@ -262,6 +270,8 @@ int check_privkey_import_export(void)
 	gnutls_datum_t p, q, g, y, x;
 	gnutls_datum_t m, e, u, e1, e2, d;
 	gnutls_ecc_curve_t curve;
+	gnutls_digest_algorithm_t digest;
+	gnutls_gost_paramset_t paramset;
 	int ret;
 
 	global_init();
@@ -436,6 +446,62 @@ int check_privkey_import_export(void)
 	if (ret != GNUTLS_E_ILLEGAL_PARAMETER)
 		fail("error: %s\n", gnutls_strerror(ret));
 
+	gnutls_privkey_deinit(key);
+
+	/* GOST */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_gost_raw(key, GNUTLS_ECC_CURVE_GOST256CPXA, GNUTLS_DIG_GOSTR_94, GNUTLS_GOST_PARAMSET_CP_A, &_gost_x, &_gost_y, &_gost_k);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_export_gost_raw2(key, &curve, &digest, &paramset, &x, &y, &p, 0);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_GOST256CPXA) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	if (digest != GNUTLS_DIG_GOSTR_94) {
+		fprintf(stderr, "unexpected digest value: %d\n", (int)digest);
+		exit(1);
+	}
+	if (paramset != GNUTLS_GOST_PARAMSET_CP_A) {
+		fprintf(stderr, "unexpected paramset value: %d\n", (int)paramset);
+		exit(1);
+	}
+	CMP("x", &x, gost_x);
+	CMP("y", &y, gost_y);
+	CMP("k", &p, gost_k);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+	gnutls_free(p.data);
+
+	ret = gnutls_privkey_export_gost_raw2(key, &curve, &digest, &paramset, &x, &y, &p, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_GOST256CPXA) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	if (digest != GNUTLS_DIG_GOSTR_94) {
+		fprintf(stderr, "unexpected digest value: %d\n", (int)digest);
+		exit(1);
+	}
+	if (paramset != GNUTLS_GOST_PARAMSET_CP_A) {
+		fprintf(stderr, "unexpected paramset value: %d\n", (int)paramset);
+		exit(1);
+	}
+	CMP_NO_LZ("x", &x, gost_x);
+	CMP_NO_LZ("y", &y, gost_y);
+	CMP_NO_LZ("k", &p, gost_k);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+	gnutls_free(p.data);
 	gnutls_privkey_deinit(key);
 
 	return 0;
@@ -769,6 +835,108 @@ int check_ed25519(void)
 	return 0;
 }
 
+static
+int check_gost(void)
+{
+	gnutls_privkey_t key;
+	gnutls_pubkey_t pub;
+	gnutls_datum_t y, x, k;
+	gnutls_ecc_curve_t curve;
+	gnutls_digest_algorithm_t digest;
+	gnutls_gost_paramset_t paramset;
+	int ret;
+
+	/* ECC */
+	ret = gnutls_privkey_init(&key);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_init(&pub);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_privkey_import_x509_raw(key, &server_ca3_gost01_key, GNUTLS_X509_FMT_PEM, 0, 0);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
+	if (ret < 0)
+		fail("error\n");
+
+	ret = gnutls_pubkey_export_gost_raw2(pub, &curve, &digest, &paramset, &x, &y, 0);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_GOST256CPXA) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	if (digest != GNUTLS_DIG_GOSTR_94) {
+		fprintf(stderr, "unexpected digest value: %d\n", (int)digest);
+		exit(1);
+	}
+	if (paramset != GNUTLS_GOST_PARAMSET_CP_A) {
+		fprintf(stderr, "unexpected paramset value: %d\n", (int)paramset);
+		exit(1);
+	}
+	CMP("x", &x, gost_x);
+	CMP("y", &y, gost_y);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+
+	ret = gnutls_pubkey_export_gost_raw2(pub, &curve, &digest, &paramset, &x, &y, GNUTLS_EXPORT_FLAG_NO_LZ);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_GOST256CPXA) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	if (digest != GNUTLS_DIG_GOSTR_94) {
+		fprintf(stderr, "unexpected digest value: %d\n", (int)digest);
+		exit(1);
+	}
+	if (paramset != GNUTLS_GOST_PARAMSET_CP_A) {
+		fprintf(stderr, "unexpected paramset value: %d\n", (int)paramset);
+		exit(1);
+	}
+	CMP_NO_LZ("x", &x, gost_x);
+	CMP_NO_LZ("y", &y, gost_y);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+
+
+	/* check the private key export */
+	ret = gnutls_privkey_export_gost_raw(key, &curve, &digest, &paramset, &x, &y, &k);
+	if (ret < 0)
+		fail("error\n");
+
+	if (curve != GNUTLS_ECC_CURVE_GOST256CPXA) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	if (digest != GNUTLS_DIG_GOSTR_94) {
+		fprintf(stderr, "unexpected digest value: %d\n", (int)digest);
+		exit(1);
+	}
+	if (paramset != GNUTLS_GOST_PARAMSET_CP_A) {
+		fprintf(stderr, "unexpected paramset value: %d\n", (int)paramset);
+		exit(1);
+	}
+	CMP("x", &x, gost_x);
+	CMP("y", &y, gost_y);
+	CMP("k", &k, gost_k);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+	gnutls_free(k.data);
+
+	gnutls_privkey_deinit(key);
+
+	gnutls_pubkey_deinit(pub);
+
+	return 0;
+}
+
 void doit(void)
 {
 	if (check_x509_privkey() != 0) {
@@ -797,5 +965,9 @@ void doit(void)
 
 	if (check_ed25519() != 0) {
 		fail("error in ed25519 check\n");
+	}
+
+	if (check_gost() != 0) {
+		fail("error in ecdsa check\n");
 	}
 }
