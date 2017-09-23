@@ -272,6 +272,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	sig_ext_st *priv;
 	extension_priv_data_t epriv;
 	unsigned int cert_algo;
+	gnutls_sign_algorithm_t saved_sigalgo = 0;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_SIGN_UNKNOWN);
@@ -301,13 +302,22 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 			     priv->sign_algorithms[i]) < 0)
 				continue;
 
-			if (!client_cert && _gnutls_session_sign_algo_enabled
+			if (client_cert && !saved_sigalgo)
+				saved_sigalgo = priv->sign_algorithms[i];
+
+			if (_gnutls_session_sign_algo_enabled
 			    (session, priv->sign_algorithms[i]) < 0)
 				continue;
 
 			return priv->sign_algorithms[i];
 		}
 	}
+
+	/* When having a legacy client certificate which can only be signed
+	 * using algorithms we don't always enable by default (e.g., DSA-SHA1),
+	 * continue and sign with it. */
+	if (client_cert && saved_sigalgo)
+		return saved_sigalgo;
 
  fail:
 	return GNUTLS_SIGN_UNKNOWN;
