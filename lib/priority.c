@@ -1605,7 +1605,8 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
 					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
-					if (!have_ec && _gnutls_kx_is_ecc(ce->kx_algorithm)) {
+					if (!have_ec && (_gnutls_kx_is_ecc(ce->kx_algorithm) ||
+							 _gnutls_kx_is_vko_gost(ce->kx_algorithm))) {
 						have_ec = 1;
 						add_ec(priority_cache);
 					}

@@ -488,6 +488,14 @@ static inline int _gnutls_kx_is_dhe(gnutls_kx_algorithm_t kx)
 	return 0;
 }
 
+static inline unsigned _gnutls_kx_is_vko_gost(gnutls_kx_algorithm_t kx)
+{
+	if (kx == GNUTLS_KX_VKO_GOST_12)
+		return 1;
+
+	return 0;
+}
+
 static inline int _sig_is_ecdsa(gnutls_sign_algorithm_t sig)
 {
 	if (sig == GNUTLS_SIGN_ECDSA_SHA1 || sig == GNUTLS_SIGN_ECDSA_SHA224 ||
