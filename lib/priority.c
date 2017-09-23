@@ -1251,7 +1251,6 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 	const gnutls_sign_entry_st *se;
 	unsigned have_ec = 0;
 	unsigned have_dh = 0;
-	unsigned ecc_first = 0;
 
 	priority_cache->cs.size = 0;
 	priority_cache->sigalg.size = 0;
@@ -1270,11 +1269,12 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
 					if (!have_ec && _gnutls_kx_is_ecc(ce->kx_algorithm)) {
 						have_ec = 1;
-						if (have_dh == 0)
-							ecc_first = 1;
+						add_ec(priority_cache);
 					}
-					if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm))
+					if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm)) {
 						have_dh = 1;
+						add_dh(priority_cache);
+					}
 				}
 			}
 		}
@@ -1285,18 +1285,6 @@ static void set_ciphersuite_list(gnutls_priority_t priority_cache)
 		if (se != NULL && priority_cache->sigalg.size < sizeof(priority_cache->sigalg.entry)/sizeof(priority_cache->sigalg.entry[0])) {
 			priority_cache->sigalg.entry[priority_cache->sigalg.size++] = se;
 		}
-	}
-
-	if (ecc_first) {
-		if (have_ec)
-			add_ec(priority_cache);
-		if (have_dh)
-			add_dh(priority_cache);
-	} else {
-		if (have_dh)
-			add_dh(priority_cache);
-		if (have_ec)
-			add_ec(priority_cache);
 	}
 
 	_gnutls_debug_log("added %d ciphersuites, %d sig algos and %d groups into priority list\n",
