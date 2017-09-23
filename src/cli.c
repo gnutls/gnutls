@@ -1046,7 +1046,10 @@ print_other_info(gnutls_session_t session)
 		ret =
 		    gnutls_ocsp_resp_print(r, flag, &p);
 		gnutls_ocsp_resp_deinit(r);
-		fputs((char*)p.data, stdout);
+		if (ret>=0) {
+			fputs((char*)p.data, stdout);
+			gnutls_free(p.data);
+		}
 	}
 
 }
