@@ -1410,6 +1410,7 @@ test_code_t test_chain_order(gnutls_session_t session)
 		t.data = NULL;
 		ret = gnutls_pem_base64_encode_alloc("CERTIFICATE", &cert_list[i], &t);
 		if (ret < 0) {
+			free(p);
 			return TEST_FAILED;
 		}
 
