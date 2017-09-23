@@ -1187,7 +1187,6 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	const gnutls_sign_entry_st *se;
 	unsigned have_ec = 0;
 	unsigned have_dh = 0;
-	unsigned ecc_first = 0;
 	unsigned tls_sig_sem = 0;
 	const version_entry_st *tlsmax = NULL;
 	const version_entry_st *dtlsmax = NULL;
@@ -1241,29 +1240,33 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
 					if (!have_ec && _gnutls_kx_is_ecc(ce->kx_algorithm)) {
 						have_ec = 1;
-						if (have_dh == 0)
-							ecc_first = 1;
+						add_ec(priority_cache);
 					}
-					if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm))
+					if (!have_dh && _gnutls_kx_is_dhe(ce->kx_algorithm)) {
 						have_dh = 1;
+						add_dh(priority_cache);
+					}
 				}
 			}
 		}
 	}
 
-	if (have_tls13 && !have_ec) {
+	if (have_tls13 && (!have_ec || !have_dh)) {
 		/* scan groups to determine have_ec and have_dh */
 		for (i=0; i < priority_cache->_supported_ecc.algorithms; i++) {
 			const gnutls_group_entry_st *ge;
 			ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priority[i]);
 			if (ge) {
-				if (ge->curve) {
+				if (ge->curve && !have_ec) {
+					add_ec(priority_cache);
 					have_ec = 1;
-					if (!have_dh)
-						ecc_first = 1;
-				} else if (ge->prime) {
+				} else if (ge->prime && !have_dh) {
+					add_dh(priority_cache);
 					have_dh = 1;
 				}
+
+				if (have_dh && have_ec)
+					break;
 			}
 		}
 
@@ -1278,18 +1281,6 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 				continue;
 			priority_cache->sigalg.entry[priority_cache->sigalg.size++] = se;
 		}
-	}
-
-	if (ecc_first) {
-		if (have_ec)
-			add_ec(priority_cache);
-		if (have_dh)
-			add_dh(priority_cache);
-	} else {
-		if (have_dh)
-			add_dh(priority_cache);
-		if (have_ec)
-			add_ec(priority_cache);
 	}
 
 	_gnutls_debug_log("added %d ciphersuites, %d sig algos and %d groups into priority list\n",
