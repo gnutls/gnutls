@@ -23,6 +23,14 @@ See the end for copying conditions.
    TLS 1.3 no longer uses SHA2-224 and it was never a widespread algorithm
    in TLS 1.2. As such, no reason to keep supporting it.
 
+** libgnutls: Refuse to use client certificates containing disallowed
+   algorithms for a session. That reverts a change on 3.5.5, which allowed
+   a client to use DSA-SHA1 due to his old DSA certificate, without requiring him
+   to enable DSA-SHA1 (and thus make it acceptable for the server's certificate).
+   The previous approach was to allow a smooth move to client infrastructure
+   after the DSA algorithm became disabled by default, and is no longer necessary
+   as DSA is now being universally depracated.
+
 ** p11tool: added options --sign-params and --hash. This allows testing
    signature with multiple algorithms, including RSA-PSS.
 

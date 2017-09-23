@@ -296,12 +296,20 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 			     priv->sign_algorithms[i]) < 0)
 				continue;
 
-			if (!client_cert && _gnutls_session_sign_algo_enabled
+			if (_gnutls_session_sign_algo_enabled
 			    (session, priv->sign_algorithms[i]) < 0)
 				continue;
 
 			return priv->sign_algorithms[i];
 		}
+	}
+
+	/* When having a legacy client certificate which can only be signed
+	 * using algorithms we don't always enable by default (e.g., DSA-SHA1),
+	 * continue and sign with it. */
+	if (client_cert) {
+		_gnutls_audit_log(session, "No shared signature schemes with peer for client certificate (%s). Is the certificate a legacy one?",
+				  gnutls_pk_get_name(cert_algo));
 	}
 
  fail:
