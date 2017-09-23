@@ -736,6 +736,111 @@ const gnutls_datum_t clidsa_ca3_cert = { (void*)clidsa_ca3_cert_pem,
 	sizeof(clidsa_ca3_cert_pem)-1
 };
 
+static char cligost01_ca3_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIC4zCCAUugAwIBAgIIWcZXXAz6FbgwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA5MjMxMjQ1MTdaGA85OTk5MTIzMTIzNTk1OVowGzEZMBcG\n"
+	"A1UEAxMQR09TVC0yMDAxIGNsaWVudDBjMBwGBiqFAwICEzASBgcqhQMCAiQABgcq\n"
+	"hQMCAh4BA0MABEBuvOEDe9xPJY9jsnFckLyQ6B5XeDi4Wo2E4c05im/3iI+rlWGI\n"
+	"rTc6hMmWca0BVDL0lObZ0ZHb4Vhy0XREgvtro3YwdDAMBgNVHRMBAf8EAjAAMBMG\n"
+	"A1UdJQQMMAoGCCsGAQUFBwMCMA8GA1UdDwEB/wQFAwMHsAAwHQYDVR0OBBYEFCck\n"
+	"yCTDt+A6zS8SnMRrgbyjeQmoMB8GA1UdIwQYMBaAFPmohhljtqQUE2B2DwGaNTbv\n"
+	"8bSvMA0GCSqGSIb3DQEBCwUAA4IBgQACkq/DQhHMEZPL0NwPFpnf2+RDviEuRE+C\n"
+	"xaOMTbHgxIUSy6xQAaHXK5hNr9xk87OFPPXmNKPl1nVBXrDF0aj+YUVBT2QeJIpA\n"
+	"APfyjnPtdZpRl3MXrJbQ/VBCdShvmKhspiOkGO6K8ETDeqE57qtPsUaGApfNK7oL\n"
+	"WgevmnkaQqNTVJglOoB5o5IDNv0JuFEkKSEvCgS25OV+gl0rRHmWDaIdQtDJLQjV\n"
+	"24b99/woYj0Ql8WfvMUUUYqTX03zmV56k5DgoNusTxKG+r71WQwbeb3XiVjof6I7\n"
+	"ll3ANTdyf/KrysLx/tk1pNgfangArpAZzbCRejTQVYdVfCf3KDdwXvKlTHy9Jv+p\n"
+	"ZUSf7kMnBqcUHpbceiyHFCXNAKIdrMDkTJAeee7ktpeYMfdO9oBki+6a8RJjNHIr\n"
+	"wHe0DcExV7UsokG6jMl8kH7gb7EW0UphL3ncWyY8C4jbtf/q1kci6SZDcapXBpGp\n"
+	"adJdx9bycdOUm1cGiboUMMPiCA5bO+Q=\n"
+	"-----END CERTIFICATE-----\n";
+
+static char cligost01_ca3_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEUCAQAwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEEIgQgVPdBJeLrp/Zh\n"
+	"2tiV6qz9N6HraKTFTKz4alNuGhK2iLM=\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t cligost01_ca3_key = { (void*)cligost01_ca3_key_pem,
+	sizeof(cligost01_ca3_key_pem)-1
+};
+
+const gnutls_datum_t cligost01_ca3_cert = { (void*)cligost01_ca3_cert_pem,
+	sizeof(cligost01_ca3_cert_pem)-1
+};
+
+static char cligost12_256_ca3_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIC6jCCAVKgAwIBAgIIWcalgS6c0DMwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA5MjMxODE4NDJaGA85OTk5MTIzMTIzNTk1OVowHzEdMBsG\n"
+	"A1UEAxMUR09TVCAyMDEyLzI1NiBjbGllbnQwZjAfBggqhQMHAQEBATATBgcqhQMC\n"
+	"AiQABggqhQMHAQECAgNDAARArjme5Fb62BC4uPT8vQVim3xTjYY/RVvvUtAfYluY\n"
+	"o+8Zjz8A8VTFejK0Zok5f1dssbzrrHtRODJZsCuAjypIXqN2MHQwDAYDVR0TAQH/\n"
+	"BAIwADATBgNVHSUEDDAKBggrBgEFBQcDAjAPBgNVHQ8BAf8EBQMDB7AAMB0GA1Ud\n"
+	"DgQWBBTzHDVZRnSgaq4M3B7NdLResyKgajAfBgNVHSMEGDAWgBT5qIYZY7akFBNg\n"
+	"dg8BmjU27/G0rzANBgkqhkiG9w0BAQsFAAOCAYEAtAGi0lQdBC9Mp/TdqYFuMIDr\n"
+	"o/xGbie6Eq33BiqXo6B5DOiPZcE1Mi+y4htefvrEBkN4OLy4PbUHlfEC/ATs3X9S\n"
+	"cUHucm6gkyzUxTLPYPfTmXD24MRFDAJQKMvX8Pklbi7HyFZVYIQaJfEohaQZmuYR\n"
+	"S7Z03MW0Cbz6j7LGQl1Pyix78BLKeyLyAzQz63+hCuO46xp7TaGDKGI79Dd6Od0p\n"
+	"oY/B/MxfuP3RXhHrpjgp+Ev08dYoCH3Snps+TYWSyhkN0VhGRJgE5Tnhdly8XMW3\n"
+	"WKZqGYmWG+rBtiTgA6FZrw0qYwAsmN3yCo5pE+Ukd0Q5L0tugc0a9HK53AftG/zV\n"
+	"qf0DI+E4dEnUkVhdEQbW+rujGpAR0sgjgar5Zvwuu92BaV+AFucj7hVP1fqDySmp\n"
+	"E52EzrFcnCYrZb19aDJKgWevG5Vh6OEcu8Vx/zVFOoTx9ZCXniVLm7PaXyKXdhLv\n"
+	"Vhg3mi7koFAPGlTiKldJ/LKKPW0yti3I8L/p2F5+\n"
+	"-----END CERTIFICATE-----\n";
+
+static char cligost12_256_ca3_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIkAAYIKoUDBwEBAgIEIgQgnA1XIfe2\n"
+	"V3D0UVFQTRCHolA9v+r5cDt2tlr1gTZbDC8=\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t cligost12_256_ca3_key = { (void*)cligost12_256_ca3_key_pem,
+	sizeof(cligost12_256_ca3_key_pem)-1
+};
+
+const gnutls_datum_t cligost12_256_ca3_cert = { (void*)cligost12_256_ca3_cert_pem,
+	sizeof(cligost12_256_ca3_cert_pem)-1
+};
+
+static char cligost12_512_ca3_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDLzCCAZegAwIBAgIIWcalYA16syEwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA5MjMxODE4MDhaGA85OTk5MTIzMTIzNTk1OVowHzEdMBsG\n"
+	"A1UEAxMUR09TVCAyMDEyLzUxMiBjbGllbnQwgaowIQYIKoUDBwEBAQIwFQYJKoUD\n"
+	"BwECAQIBBggqhQMHAQECAwOBhAAEgYCyAdmv9viBTnemLvULAZ9RyaEf37ZAydKj\n"
+	"E3qLbZ5tTxgLAYhIIGApVPVb5SZxge3u2qY/ekkHjz9Asn5cPQ69wCvce87+2u1f\n"
+	"XcATUzYvR3UIL25C5BbNjDjGnufhjYAwT6uZ5xQ7j8/Wfr0MZU04O2CSUquKqfrB\n"
+	"DA81M2HvUqN2MHQwDAYDVR0TAQH/BAIwADATBgNVHSUEDDAKBggrBgEFBQcDAjAP\n"
+	"BgNVHQ8BAf8EBQMDB7AAMB0GA1UdDgQWBBRYXgWHcQazcPFyxKrgRdfd2IPBozAf\n"
+	"BgNVHSMEGDAWgBT5qIYZY7akFBNgdg8BmjU27/G0rzANBgkqhkiG9w0BAQsFAAOC\n"
+	"AYEAUOpvomUtaFQm5O8bEQk/d3ghZLzwfMKRngSq0XbXDi8t+TV+kFvkzJ/hrAOP\n"
+	"/HPCQdnEvdV2HyZzDb9b8cVegRHPPooKSV8+HCTNVXNKZPRSlE42S5kFIAnAxbs5\n"
+	"vzGfipp6jQe9dqlCYseikxnE31o3AX7QAlNBaXELu0JnEY5BoJeKoja8XS40b1k9\n"
+	"kKRwAGkdh1OcAy6pW8AH4m61RMDWFzmPGgcb0JiDNp+9HQDSkG904niU8AlvmoQD\n"
+	"Q2AVd9mam4NIjmA0hkVuSh+7Tn2XnoGoGxN/+u72qaSUA6ybkbtkIKpMeJ8vciI1\n"
+	"6GRhBYpI0OuRiAIbDA9WhfCCKwj9ZaIsSSHC7qADRz3bR/89Et1mM40v5jbYNDkV\n"
+	"1cvlca3+pK3DxNP7y/q3QoUz8++z9VXzsdVHc4wNUyg4E8mjMcdLlRsZbST0WjX+\n"
+	"IhxAkfOexMu3nJ3EVbjgvox6eIxjiTWr2DP6x666UztrnFSBhhypwKHb8jW7PYJ2\n"
+	"lWlI\n"
+	"-----END CERTIFICATE-----\n";
+
+static char cligost12_512_ca3_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBEA9uga7\n"
+	"LIPp1heDZYj5EozNtbrmsKYMXrFasBIVAFFVQVFd6/+YjttV6Vmx16OFWrM+/ydX\n"
+	"rB0aUqYPU8w5DUyk\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t cligost12_512_ca3_key = { (void*)cligost12_512_ca3_key_pem,
+	sizeof(cligost12_512_ca3_key_pem)-1
+};
+
+const gnutls_datum_t cligost12_512_ca3_cert = { (void*)cligost12_512_ca3_cert_pem,
+	sizeof(cligost12_512_ca3_cert_pem)-1
+};
+
 static char server_ca3_ecc_key_pem[] =
 	"-----BEGIN EC PRIVATE KEY-----\n"
 	"MHgCAQEEIQDn1XFX7QxTKXl2ekfSrEARsq+06ySEeeOB+N0igwcNLqAKBggqhkjO\n"
@@ -973,6 +1078,111 @@ static char server_ca3_eddsa_cert_pem[] =
 
 const gnutls_datum_t server_ca3_eddsa_cert = { (void*)server_ca3_eddsa_cert_pem,
 	sizeof(server_ca3_eddsa_cert_pem)-1
+};
+
+static char server_ca3_gost01_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEUCAQAwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEEIgQgR1lBLIr4WBpn\n"
+	"4MOCH8oxGWb52EPNL3gjNJiQuBQuf6U=\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_gost01_key = { (void*)server_ca3_gost01_key_pem,
+	sizeof(server_ca3_gost01_key_pem)-1
+};
+
+static char server_ca3_gost01_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIC7TCCAVWgAwIBAgIIWcZJ7xuHksUwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA5MjMxMTQ4MDFaGA85OTk5MTIzMTIzNTk1OVowDTELMAkG\n"
+	"A1UEAxMCR1IwYzAcBgYqhQMCAhMwEgYHKoUDAgIkAAYHKoUDAgIeAQNDAARA0Lvp\n"
+	"9MaoYDxzkURVz71Q3Sw9Wrwa2F483xDd0mOID8CK7JY8C8gz/1dfZniUObT1JMa6\n"
+	"hkGsQyFvPLD6Vr1bN6OBjTCBijAMBgNVHRMBAf8EAjAAMBQGA1UdEQQNMAuCCWxv\n"
+	"Y2FsaG9zdDATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDBzAAMB0G\n"
+	"A1UdDgQWBBSGUfwGWchcx3r3TNANllOEOFkTWDAfBgNVHSMEGDAWgBT5qIYZY7ak\n"
+	"FBNgdg8BmjU27/G0rzANBgkqhkiG9w0BAQsFAAOCAYEAXrO06eHEXlsbmRgSvCtu\n"
+	"mnXCG6KNI6K4WS411Adj3wLkfURlbLMTT6tBFLRq5EVWQqp867/xk577Rd85yC0P\n"
+	"biNXr0Am2DXEPOJnrmh3D/R8hy5gSozoZM7jfy3D9FK6l2O458teBe1l/aBZL7FW\n"
+	"EbM6W5SMqlDMkcZSa8hSuUHUtcTIbQzGdqkR9y/res8+INsRInpHgVZdEmTls8QM\n"
+	"UoBQMXtRgfAp22HHeCnH1rygTVglujU3SPAVEasKpN+D7ht4x2/M0sqljWmyew1B\n"
+	"ENyJ6fvnjLJLpLLoj3220cM+w7K+N5F2YKPi5POkSJJTUrsjUWpKD+J6V7NzPrYb\n"
+	"VtDA/qn1MJwJvob2L5lDcMPos4mk/HTRWT0MwcBovSGjLpVzrzGgVFdRzlxNDfWj\n"
+	"1qWGbXbdYK4akvQasESIfVu7jBROL9zm2JEGEvJYNMORqFUHczzpVyYhBiX3KCJb\n"
+	"6pd0K2Nq/UXI16aCWEw8hEiVHUwDd+0Qc3NR/DgeFciz\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_gost01_cert = { (void*)server_ca3_gost01_cert_pem,
+	sizeof(server_ca3_gost01_cert_pem)-1
+};
+
+static char server_ca3_gost12_256_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIkAAYIKoUDBwEBAgIEIgQg0+JttJEV\n"
+	"Ud+XBzX9q13ByKK+j2b+mEmNIo1yB0wGleo=\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_gost12_256_key = { (void*)server_ca3_gost12_256_key_pem,
+	sizeof(server_ca3_gost12_256_key_pem)-1
+};
+
+static char server_ca3_gost12_256_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIC8DCCAVigAwIBAgIIWcZKgxkCMvcwDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA5MjMxMTUwMjhaGA85OTk5MTIzMTIzNTk1OVowDTELMAkG\n"
+	"A1UEAxMCR1IwZjAfBggqhQMHAQEBATATBgcqhQMCAiQABggqhQMHAQECAgNDAARA\n"
+	"J9sMEEx0JW9QsT5bDqyc0TNcjVg9ZSdp4GkMtShM+OOgyBGrWK3zLP5IzHYSXja8\n"
+	"373QrJOUvdX7T7TUk5yU5aOBjTCBijAMBgNVHRMBAf8EAjAAMBQGA1UdEQQNMAuC\n"
+	"CWxvY2FsaG9zdDATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDBzAA\n"
+	"MB0GA1UdDgQWBBQYSEtdwsYrtnOq6Ya3nt8DgFPCQjAfBgNVHSMEGDAWgBT5qIYZ\n"
+	"Y7akFBNgdg8BmjU27/G0rzANBgkqhkiG9w0BAQsFAAOCAYEAikKRQ2s/mldqX1eX\n"
+	"DGXdQZs6S/RXywYCKYTr683TvXF5b3O80pM/kdwvD9/0LQhF/kkHawjGTEj6RbYe\n"
+	"rsAc3HQFq9AGrllin18nPRkVaOkxZQot5plfMBdJ6GVoe6shWejShZubDWsEmuoQ\n"
+	"jPW2P9lBbEuOuet0XLd5+uaoVmjPGpKaneWQxGyfT0eEfKVj+89zdX8MAf9aoEJf\n"
+	"RZulc73W91v51cX2zxnpA9u2XODMfBQIItAzi5+7jTzAExMFmx8dkzx+tM7D3Htr\n"
+	"/6Xajc2j6NnLmT56e+MAmEpf4AP7XdIVhyPvRIpW8V+bIvaFxo2XUKBipU9DarCi\n"
+	"o/0x8x4UaKlKQ8SkyppE2nDK98rPyObyWb6l5IN3fjv2XBjcwTz+t/SzzfHJNY7I\n"
+	"3I9J5vlWIG94FQn8Tj9vQ4swcNotVM74koaV7ZYWJm2mhZirVHwYBa3joHSVEs0u\n"
+	"m53rVbR+3MyzmsVtKIbqg76Tcf2Nm/cs+amFNCmB4vgcKhHO\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_gost12_256_cert = { (void*)server_ca3_gost12_256_cert_pem,
+	sizeof(server_ca3_gost12_256_cert_pem)-1
+};
+
+static char server_ca3_gost12_512_key_pem[] =
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBECS7bAh\n"
+	"TP5um5bxziaKkhb6xSI5WBQCSlaiHPBaMbgmgJiF8RubF7k0YMefpt0+sA3GvVGA\n"
+	"KjL7CLBERDm7Yvlv\n"
+	"-----END PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_ca3_gost12_512_key = { (void*)server_ca3_gost12_512_key_pem,
+	sizeof(server_ca3_gost12_512_key_pem)-1
+};
+
+static char server_ca3_gost12_512_cert_pem[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDNTCCAZ2gAwIBAgIIWcZKvSvigz0wDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
+	"AxMEQ0EtMzAgFw0xNzA5MjMxMTUxMjZaGA85OTk5MTIzMTIzNTk1OVowDTELMAkG\n"
+	"A1UEAxMCR1IwgaowIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwOB\n"
+	"hAAEgYAyMiKX4UdLpmVkJehhIY44Y2enFpWCeNSR6OocfHC8R6KTo0qxxEEcWm53\n"
+	"yNO3vSI5StDGbqEvJ4H28gBCNC8nIIjoA064jvJddDRDP2K9ZfgOah7GfToeOoo1\n"
+	"JT00+lhGcyv8lEUJo4NE0BUFD0K8En5FvJSc2yDcGhwllqkncaOBjTCBijAMBgNV\n"
+	"HRMBAf8EAjAAMBQGA1UdEQQNMAuCCWxvY2FsaG9zdDATBgNVHSUEDDAKBggrBgEF\n"
+	"BQcDATAPBgNVHQ8BAf8EBQMDBzAAMB0GA1UdDgQWBBTzbWGJHENCLWA8WBZ5nIN5\n"
+	"xgOWfDAfBgNVHSMEGDAWgBT5qIYZY7akFBNgdg8BmjU27/G0rzANBgkqhkiG9w0B\n"
+	"AQsFAAOCAYEAi6XPIwiObZWVZbKPavY0itehtVC+c2jVoMMEToAfUx0w8zVGgCI9\n"
+	"bAN3/ONIZqXZ4m4n1zOz7xoWyCSZ34EnHPLyDsxvtFDJf5jasVGpOe3hPAnk56OY\n"
+	"D8SI5g6KI9yp0ZGjA1Q10u8pR7XJWAhySfbcLBZCHqi+okO91za9wTUIz3sXjchI\n"
+	"3WZSIqttT3sx3K1RfvFENXLQm+ctim08CJsA1kmUO4i4nU7KvG4thMW7GERZOi+L\n"
+	"F00WtDvSv5yDeuNyfB2GUZU1fMfkLzJk6qlzPY3Tfs4+x87F2TToC8zI9xf6ykin\n"
+	"edg9NbHMV4o4fGb81G9I1iQ7W1E9wDsQ3ZPl65q3L+pV9Vi7fw87AxrD8ccyLi30\n"
+	"C7HeG4LrIa6PQwTKSUwHayIkHCEG66Q5Tx6MK4qMYsNFCRsesKfEAfo1ZsHNcL1u\n"
+	"t8spicVYd8Z8nIH1y31KxUmoHzsTzHHrkBj70C1QCgw0l0HqzGpoFutJOxSoAG1/\n"
+	"W/XeciR4jbN5\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ca3_gost12_512_cert = { (void*)server_ca3_gost12_512_cert_pem,
+	sizeof(server_ca3_gost12_512_cert_pem)-1
 };
 
 /* shares server_ca3 key */
