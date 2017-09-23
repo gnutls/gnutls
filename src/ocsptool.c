@@ -478,8 +478,12 @@ static void verify_response(gnutls_datum_t *nonce)
 
 	if (HAVE_OPT(LOAD_CHAIN)) {
 		chain_size = load_chain(chain);
+		if (chain_size < 1) {
+			fprintf(stderr, "Empty chain found; cannot verify\n");
+			app_exit(1);
+		}
 
-		if (chain_size <= 1)
+		if (chain_size == 1)
 			signer = chain[0];
 		else
 			signer = chain[1];
