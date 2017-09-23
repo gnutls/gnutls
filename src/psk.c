@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 #endif
 	unsigned char key[MAX_KEY_SIZE];
 	char hex_key[MAX_KEY_SIZE * 2 + 1];
-	int optct, key_size;
+	int key_size;
 	gnutls_datum_t dkey;
 	const char *passwd, *username;
 	size_t hex_key_size = sizeof(hex_key);
@@ -80,9 +80,7 @@ int main(int argc, char **argv)
 
 	umask(066);
 
-	optct = optionProcess(&psktoolOptions, argc, argv);
-	argc -= optct;
-	argv += optct;
+	optionProcess(&psktoolOptions, argc, argv);
 
 	if (!HAVE_OPT(PSKFILE)) {
 		fprintf(stderr, "You need to specify a PSK key file\n");
