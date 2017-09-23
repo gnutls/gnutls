@@ -219,7 +219,8 @@ int send_ocsp_request(const char *server,
 
 	if (ret < 0 || ud.size == 0) {
 		perror("recv");
-		return -1;
+		ret = -1;
+		goto cleanup;
 	}
 
 	socket_bye(&hd, 0);
@@ -227,22 +228,29 @@ int send_ocsp_request(const char *server,
 	p = memmem(ud.data, ud.size, "\r\n\r\n", 4);
 	if (p == NULL) {
 		fprintf(stderr, "Cannot interpret HTTP response\n");
-		return -1;
+		ret = -1;
+		goto cleanup;
 	}
 
 	p += 4;
 	resp_data->size = ud.size - (p - ud.data);
 	resp_data->data = malloc(resp_data->size);
-	if (resp_data->data == NULL)
-		return -1;
+	if (resp_data->data == NULL) {
+		perror("recv");
+		ret = -1;
+		goto cleanup;
+	}
 
 	memcpy(resp_data->data, p, resp_data->size);
 
+	ret = 0;
+
+ cleanup:
 	free(ud.data);
 	if (url != server)
 		free(url);
 
-	return 0;
+	return ret;
 }
 
 void print_ocsp_verify_res(unsigned int output)
