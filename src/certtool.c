@@ -2951,7 +2951,7 @@ void generate_pkcs12(common_info_st * cinfo)
 			app_exit(1);
 		}
 
-		assert(crts[i] != NULL);
+		assert(crts != NULL && crts[i] != NULL);
 		result = gnutls_pkcs12_bag_set_crt(bag, crts[i]);
 		if (result < 0) {
 			fprintf(stderr, "set_crt[%d]: %s\n", i,
@@ -3085,6 +3085,8 @@ void generate_pkcs12(common_info_st * cinfo)
 				gnutls_strerror(result));
 			app_exit(1);
 		}
+
+		assert(keys != NULL && keys[i] != NULL);
 
 		size = lbuffer_size;
 		result =
