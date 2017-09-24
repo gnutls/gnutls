@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed issue which causes 1-byte handshake fragments to be refused.
    Reported by Balázs Kéri.
 
+** libgnutls: Refuse to resume a session which had a different SNI advertised. That
+   improves RFC6066 support in server side. Reported by Thomas Klute.
+
 ** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
    used. Resolves gitlab issue #259.
 
