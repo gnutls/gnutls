@@ -90,7 +90,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der \
 	data/key-invalid4.der data/key-invalid5.der data/key-invalid6.der \
 	data data/pkcs8-invalid9.der data/key-invalid2.der data/pkcs8-invalid10.der \
-	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt
+	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt \
+	data/rfc4490.p7b data/rfc4490.p7b.out
 
 dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
