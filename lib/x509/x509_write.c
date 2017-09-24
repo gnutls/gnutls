@@ -2063,6 +2063,8 @@ gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 
+	memset(&tpki, 0, sizeof(gnutls_x509_spki_st));
+
 	if (crt_pk == GNUTLS_PK_RSA) {
 		const mac_entry_st *me;
 
@@ -2073,7 +2075,6 @@ gnutls_x509_crt_set_spki(gnutls_x509_crt_t crt,
 			goto cleanup;
 		}
 
-		memset(&tpki, 0, sizeof(gnutls_x509_spki_st));
 		tpki.pk = spki->pk;
 		tpki.rsa_pss_dig = spki->rsa_pss_dig;
 
