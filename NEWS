@@ -16,6 +16,11 @@ See the end for copying conditions.
 ** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
    used. Resolves gitlab issue #259.
 
+** libgnutls: When selecting a client side signature algorithm, prefer the signature
+   schemes in the enabled list (Since 3.5.5 client certificates can be used even
+   if they contain disallowed algorithms for a session, to allow utilizing old
+   client certificates -like DSA-SHA1 without enabling DSA for the server certificate).
+
 ** p11tool: The options --set-pin and --set-so-pin can be used with all operations
    not only with --initialize.
 
