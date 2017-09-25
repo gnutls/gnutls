@@ -77,7 +77,6 @@ E.g. ```gnutls_x509_crt_get_dn```, refers to the X.509
 certificate parsing part of gnutls. Some of the used prefixes are the
 following.
  * ```gnutls_x509_crt_``` for the X.509 certificate part
- * ```gnutls_openpgp_key_``` for the openpgp key part
  * ```gnutls_session_``` for the TLS session part (but this may be omited)
  * ```gnutls_handshake_``` for the TLS handshake part
  * ```gnutls_record_``` for the TLS record protocol part
@@ -93,6 +92,25 @@ internal data. Doing so harms future reorganization/rewrite of subsystems.
 
 All exported functions must be listed in libgnutls.map.in,
 in order to be exported.
+
+
+# Introducing new functions / API
+
+  Prior to introducing any new API consider all options to offer the same
+functionality without introducing a new function. The reason is that  we want
+to avoid breaking the ABI, and thus we cannot typically remove any function
+that was added (though we have few exceptions). Since we cannot remove, it
+means that experimental APIs, or helper APIs that are not typically needed
+may become a burden to maintain in the future. That is, they may prevent
+a refactoring, or require to keep legacy code.
+
+As such, some questions to answer before adding a new API:
+ * Is this API useful for a large class of applications, or is it limited
+   to few?
+ * If it is limited to few, can we work around that functionality without
+   a new API?
+ * Would that function be relevant in the future when a new protocol such TLS
+   13.0 is made available? Would it harm the addition of a new protocol?
 
 
 # Constructed types:
