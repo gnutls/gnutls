@@ -1191,6 +1191,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	unsigned tls_sig_sem = 0;
 	const version_entry_st *tlsmax = NULL;
 	const version_entry_st *dtlsmax = NULL;
+	unsigned have_tls13 = 0;
 
 	priority_cache->cs.size = 0;
 	priority_cache->sigalg.size = 0;
@@ -1200,12 +1201,18 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	for (i = 0; i < priority_cache->protocol.algorithms; i++) {
 		if (priority_cache->protocol.priority[i] < GNUTLS_DTLS_VERSION_MIN) {
 			tlsmax = version_to_entry(priority_cache->protocol.priority[i]);
-			if (tlsmax)
+			if (tlsmax) {
 				tls_sig_sem |= tlsmax->tls_sig_sem;
+				if (tlsmax->tls13_sem)
+					have_tls13 = 1;
+			}
 		} else { /* dtls */
 			dtlsmax = version_to_entry(priority_cache->protocol.priority[i]);
-			if (dtlsmax)
+			if (dtlsmax) {
 				tls_sig_sem |= dtlsmax->tls_sig_sem;
+				if (dtlsmax->tls13_sem)
+					have_tls13 = 1;
+			}
 		}
 	}
 
@@ -1242,6 +1249,24 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 				}
 			}
 		}
+	}
+
+	if (have_tls13 && !have_ec) {
+		/* scan groups to determine have_ec and have_dh */
+		for (i=0; i < priority_cache->_supported_ecc.algorithms; i++) {
+			const gnutls_group_entry_st *ge;
+			ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priority[i]);
+			if (ge) {
+				if (ge->curve) {
+					have_ec = 1;
+					if (!have_dh)
+						ecc_first = 1;
+				} else if (ge->prime) {
+					have_dh = 1;
+				}
+			}
+		}
+
 	}
 
 	for (i = 0; i < priority_cache->_sign_algo.algorithms; i++) {
