@@ -29,6 +29,8 @@
 #define USE_CERT 1
 #define ASK_CERT 2
 
+extern const char *server_priority;
+
 #define try(name, client_prio, client_kx, server_sign_algo, client_sign_algo) \
 	try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
 		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0)

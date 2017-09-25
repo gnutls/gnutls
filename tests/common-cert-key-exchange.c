@@ -34,11 +34,13 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include "utils.h"
+#include <assert.h>
 
 #include "eagain-common.h"
 #include "common-cert-key-exchange.h"
 
 const char *side;
+const char *server_priority = NULL;
 
 static void tls_log_func(int level, const char *str)
 {
@@ -100,9 +102,13 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 				serverx509cred);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
-				   NULL);
+
+	if (server_priority)
+		assert(gnutls_priority_set_direct(server, server_priority, NULL) >= 0);
+	else
+		assert(gnutls_priority_set_direct(server,
+				   "NORMAL:+VERS-TLS1.3:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
+				   NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);

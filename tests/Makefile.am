@@ -129,6 +129,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
 	 client-sign-md5-rep tls12-invalid-key-exchanges \
+	 tls13-cert-key-exchange \
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok status-request-missing sign-verify-ext \
@@ -212,6 +213,7 @@ tls12_resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
 dtls_repro_20170915_SOURCES = dtls-repro-20170915.c common-cert-key-exchange.c cert-repro-20170915.h
 dtls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls12-cert-key-exchange.c common-cert-key-exchange.h
 dtls10_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls10-cert-key-exchange.c common-cert-key-exchange.h
+tls13_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls13-cert-key-exchange.c common-cert-key-exchange.h
 tls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls12-cert-key-exchange.c common-cert-key-exchange.h
 tls11_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls11-cert-key-exchange.c common-cert-key-exchange.h
 tls10_cert_key_exchange_SOURCES = common-cert-key-exchange.c tls10-cert-key-exchange.c common-cert-key-exchange.h
