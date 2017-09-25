@@ -26,6 +26,8 @@
 
 #include "auth.h"
 
+#define version_to_entry _gnutls_version_to_entry
+
 #define GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR 0x00
 #define GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR 0xFF
 

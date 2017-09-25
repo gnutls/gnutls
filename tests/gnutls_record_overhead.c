@@ -51,16 +51,17 @@
 #include "../lib/algorithms.h"
 
 
-int _gnutls_record_overhead(const cipher_entry_st * cipher,
-			    const mac_entry_st * mac,
-			    unsigned max);
+unsigned _gnutls_record_overhead(const version_entry_st *ver,
+				 const cipher_entry_st *cipher,
+				 const mac_entry_st *mac,
+				 unsigned max);
 
 #define OVERHEAD(c, m) \
-	_gnutls_record_overhead(cipher_to_entry(c), mac_to_entry(m), \
+	_gnutls_record_overhead(version_to_entry(GNUTLS_TLS1_2), cipher_to_entry(c), mac_to_entry(m), \
 				0)
 
 #define MAX_OVERHEAD(c, m) \
-	_gnutls_record_overhead(cipher_to_entry(c), mac_to_entry(m), \
+	_gnutls_record_overhead(version_to_entry(GNUTLS_TLS1_2), cipher_to_entry(c), mac_to_entry(m), \
 				1)
 
 static void check_aes_gcm(void **glob_state)

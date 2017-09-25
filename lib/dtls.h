@@ -111,8 +111,9 @@ inline static void _dtls_async_timer_check(gnutls_session_t session)
 	}
 }
 
-unsigned _gnutls_record_overhead(const cipher_entry_st * cipher,
-				 const mac_entry_st * mac,
+unsigned _gnutls_record_overhead(const version_entry_st *ver,
+				 const cipher_entry_st *cipher,
+				 const mac_entry_st *mac,
 				 unsigned max);
 
 /* Returns non-zero if the async timer is active */

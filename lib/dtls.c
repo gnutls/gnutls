@@ -496,8 +496,9 @@ void gnutls_dtls_set_mtu(gnutls_session_t session, unsigned int mtu)
 /* when max is non-zero this function will return the maximum
  * overhead that this ciphersuite may introduce, e.g., the maximum
  * amount of padding required */
-unsigned _gnutls_record_overhead(const cipher_entry_st * cipher,
-				 const mac_entry_st * mac,
+unsigned _gnutls_record_overhead(const version_entry_st *ver,
+				 const cipher_entry_st *cipher,
+				 const mac_entry_st *mac,
 				 unsigned max)
 {
 	int total = 0;
@@ -508,7 +509,9 @@ unsigned _gnutls_record_overhead(const cipher_entry_st * cipher,
 		return 0;
 
 	if (mac->id == GNUTLS_MAC_AEAD) {
-		total += _gnutls_cipher_get_explicit_iv_size(cipher);
+		if (!ver->tls13_sem)
+			total += _gnutls_cipher_get_explicit_iv_size(cipher);
+
 		total += _gnutls_cipher_get_tag_size(cipher);
 	} else {
 		/* STREAM + BLOCK have a MAC appended */
@@ -581,7 +584,7 @@ size_t gnutls_est_record_overhead_size(gnutls_protocol_t version,
 	else
 		total = DTLS_RECORD_HEADER_SIZE;
 
-	total += _gnutls_record_overhead(c, m, 1);
+	total += _gnutls_record_overhead(v, c, m, 1);
 
 	return total;
 }
@@ -602,12 +605,11 @@ static int record_overhead_rt(gnutls_session_t session)
 
 	if (session->internals.initial_negotiation_completed == 0)
 		return GNUTLS_E_INVALID_REQUEST;
-
 	ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	return _gnutls_record_overhead(params->cipher, params->mac, 1);
+	return _gnutls_record_overhead(get_version(session), params->cipher, params->mac, 1);
 }
 
 /**
@@ -624,17 +626,17 @@ static int record_overhead_rt(gnutls_session_t session)
 size_t gnutls_record_overhead_size(gnutls_session_t session)
 {
 	const version_entry_st *v = get_version(session);
+	int ret;
 	size_t total;
-	int overhead;
 
 	if (v->transport == GNUTLS_STREAM)
 		total = TLS_RECORD_HEADER_SIZE;
 	else
 		total = DTLS_RECORD_HEADER_SIZE;
 
-	overhead = record_overhead_rt(session);
-	if (overhead > 0)
-		total += overhead;
+	ret = record_overhead_rt(session);
+	if (ret >= 0)
+		total += ret;
 
 	return total;
 }
@@ -669,7 +671,7 @@ unsigned int gnutls_dtls_get_data_mtu(gnutls_session_t session)
 		return mtu;
 
 	if (params->cipher->type == CIPHER_AEAD || params->cipher->type == CIPHER_STREAM)
-		return mtu-_gnutls_record_overhead(params->cipher, params->mac, 0);
+		return mtu-_gnutls_record_overhead(get_version(session), params->cipher, params->mac, 0);
 
 	/* CIPHER_BLOCK: in CBC ciphers guess the data MTU as it depends on residues
 	 */
