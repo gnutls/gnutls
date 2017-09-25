@@ -370,7 +370,7 @@ server_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		/* generate shared key */
 		ret = _gnutls_pk_derive_tls13(GNUTLS_PK_DH, &session->key.key, &session->key.kshare_dh_params, &pub);
-		_gnutls_mpi_release(pub.params[DH_Y]);
+		_gnutls_mpi_release(&pub.params[DH_Y]);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -468,7 +468,7 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		/* generate shared key */
 		ret = _gnutls_pk_derive_tls13(GNUTLS_PK_DH, &session->key.key, &session->key.kshare_dh_params, &pub);
-		_gnutls_mpi_release(pub.params[DH_Y]);
+		_gnutls_mpi_release(&pub.params[DH_Y]);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
