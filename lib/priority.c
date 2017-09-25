@@ -1202,14 +1202,10 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			tlsmax = version_to_entry(priority_cache->protocol.priority[i]);
 			if (tlsmax)
 				tls_sig_sem |= tlsmax->tls_sig_sem;
-			if (dtlsmax)
-				break;
 		} else { /* dtls */
 			dtlsmax = version_to_entry(priority_cache->protocol.priority[i]);
 			if (dtlsmax)
 				tls_sig_sem |= dtlsmax->tls_sig_sem;
-			if (tlsmax)
-				break;
 		}
 	}
 
