@@ -201,7 +201,7 @@ static void client(int fd, const char *prio, int ign)
 		exit(1);
 	}
 	
-	ret = gnutls_alert_send(session, GNUTLS_AL_WARNING, GNUTLS_A_USER_CANCELED);
+	ret = gnutls_bye(session, GNUTLS_SHUT_WR);
 	if (ret < 0) {
 		fail("server (%s): Error sending alert\n", prio);
 		exit(1);
@@ -229,8 +229,6 @@ static void client(int fd, const char *prio, int ign)
 			exit(1);
 		}
 	}
-
-	gnutls_bye(session, GNUTLS_SHUT_WR);
 
       end:
 
@@ -327,16 +325,14 @@ static void server(int fd, const char *prio, int ign)
 		} while (ret == GNUTLS_E_AGAIN
 			 || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
-	
-	if (ret != GNUTLS_E_WARNING_ALERT_RECEIVED ||
-		gnutls_alert_get(session) != GNUTLS_A_USER_CANCELED) {
 
-		if (ret <= 0) {
-			if (ret != 0) {
-				fail("client: Error: %s\n", gnutls_strerror(ret));
-				exit(1);
-			}
-		}
+	if (ret < 0) {
+		fail("client: Error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (ret != 0) {
+		fail("expected closure alert! Got: %d\n", ret);
 	}
 
 	/* Test sending */
@@ -369,7 +365,7 @@ static void server(int fd, const char *prio, int ign)
 
 	/* do not wait for the peer to close the connection.
 	 */
-	gnutls_bye(session, GNUTLS_SHUT_RDWR);
+	gnutls_bye(session, GNUTLS_SHUT_WR);
 
 	close(fd);
 	gnutls_deinit(session);
@@ -429,6 +425,10 @@ static void start(const char *name, const char *prio, int ign)
 
 #define CHACHA_POLY1305 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL"
 
+#define TLS13_AES_GCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define TLS13_AES_CCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define TLS13_CHACHA_POLY1305 "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+GROUP-ALL"
+
 static void ch_handler(int sig)
 {
 	return;
@@ -450,7 +450,12 @@ void doit(void)
 		start("arcfour-sha1", ARCFOUR_SHA1, 0);
 		start("arcfour-md5", ARCFOUR_MD5, 0);
 		start("chacha20-poly1305", CHACHA_POLY1305, 0);
+		start("tls13-chacha20-poly1305", TLS13_CHACHA_POLY1305, 0);
 	}
+
+	start("tls13-aes-gcm", TLS13_AES_GCM, 0);
+	start("tls13-aes-ccm", TLS13_AES_CCM, 0);
+
 }
 
 #endif				/* _WIN32 */
