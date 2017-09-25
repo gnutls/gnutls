@@ -354,6 +354,16 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 		return 0;
 	}
 
+	if (ver->tls13_sem) {
+		/* disallow RSA, DSA, and SHA1 */
+		const gnutls_sign_entry_st *se;
+		se = _gnutls_sign_to_entry(sig);
+		if (se == NULL || se->pk == GNUTLS_PK_RSA || se->pk == GNUTLS_PK_DSA || se->hash == GNUTLS_DIG_SHA1) {
+			gnutls_assert();
+			goto disallowed;
+		}
+	}
+
 	for (i = 0; i < session->internals.priorities->sigalg.size;
 	     i++) {
 		if (session->internals.priorities->sigalg.entry[i]->id ==
@@ -362,6 +372,7 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 		}
 	}
 
+ disallowed:
 	_gnutls_handshake_log("signature algorithm %s is not enabled\n", gnutls_sign_algorithm_get_name(sig));
 	return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 }
