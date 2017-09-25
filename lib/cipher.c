@@ -471,7 +471,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 	if (min_pad)
 		memset(&fdata[plain->size+1], 0, min_pad);
 
-	ret = gnutls_aead_cipher_encrypt(params->write.ctx.aead,
+	ret = gnutls_aead_cipher_encrypt(&params->write.ctx.aead,
 					 nonce, iv_size,
 					 NULL, 0,
 					 tag_size,
@@ -921,7 +921,7 @@ decrypt_packet_tls13(gnutls_session_t session,
 		    gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	}
 
-	ret = gnutls_aead_cipher_decrypt(params->read.ctx.aead,
+	ret = gnutls_aead_cipher_decrypt(&params->read.ctx.aead,
 					 nonce, iv_size,
 					 NULL, 0,
 					 tag_size,

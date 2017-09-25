@@ -38,6 +38,7 @@
 #include "dtls.h"
 #include "secrets.h"
 #include "handshake.h"
+#include "crypto-api.h"
 
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof(keyexp) - 1;
@@ -743,7 +744,7 @@ static inline void free_record_state(record_state_st * state)
 	_gnutls_free_datum(&state->key);
 
 	if (state->is_aead)
-		gnutls_aead_cipher_deinit(state->ctx.aead);
+		_gnutls_aead_cipher_deinit(&state->ctx.aead);
 	else
 		_gnutls_auth_cipher_deinit(&state->ctx.tls12);
 }
@@ -785,12 +786,12 @@ _tls13_init_record_state(record_parameters_st * params)
 {
 	int ret;
 
-	ret = gnutls_aead_cipher_init(&params->read.ctx.aead,
+	ret = _gnutls_aead_cipher_init(&params->read.ctx.aead,
 				       params->cipher->id, &params->read.key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = gnutls_aead_cipher_init(&params->write.ctx.aead,
+	ret = _gnutls_aead_cipher_init(&params->write.ctx.aead,
 				       params->cipher->id, &params->write.key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);

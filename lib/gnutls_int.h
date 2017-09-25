@@ -669,13 +669,17 @@ typedef struct {
 	const version_entry_st *pversion;
 } security_parameters_st;
 
+typedef struct api_aead_cipher_hd_st {
+	cipher_hd_st ctx_enc;
+} api_aead_cipher_hd_st;
+
 struct record_state_st {
 	gnutls_datum_t mac_secret;
 	gnutls_datum_t IV;
 	gnutls_datum_t key;
 	union {
 		auth_cipher_hd_st tls12;
-		gnutls_aead_cipher_hd_t aead;
+		api_aead_cipher_hd_st aead;
 	} ctx;
 	unsigned aead_tag_size;
 	unsigned is_aead;
