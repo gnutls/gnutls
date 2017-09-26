@@ -25,6 +25,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
+#include <assert.h>
 
 void _mbuffer_head_init(mbuffer_head_st * buf);
 void _mbuffer_head_clear(mbuffer_head_st * buf);
@@ -101,7 +102,62 @@ inline static void _mbuffer_set_uhead_size(mbuffer_st * bufel, size_t size)
 	bufel->uhead_mark = size;
 }
 
+inline static void _mbuffer_init(mbuffer_st *bufel, size_t max)
+{
+	memset(bufel, 0, sizeof(*bufel));
+	bufel->maximum_size = max;
 
+	/* payload points after the mbuffer_st structure */
+	bufel->msg.data = (uint8_t *) bufel + sizeof(mbuffer_st);
+}
+
+/* Helper functions to utilize a gnutls_buffer_st in order
+ * to generate a gnutls_mbuffer_st, without multiple allocations.
+ */
+inline static int _gnutls_buffer_init_mbuffer(gnutls_buffer_st * buf, size_t header_size)
+{
+	int ret;
+	mbuffer_st *bufel;
+
+	_gnutls_buffer_init(buf);
+
+	ret = _gnutls_buffer_resize(buf, sizeof(mbuffer_st)+header_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* we store the uhead size on the uninitialized bufel, only to read
+	 * it back on _gnutls_buffer_to_mbuffer(). */
+	bufel = (void*)buf->data;
+	_mbuffer_set_uhead_size(bufel, header_size);
+
+	buf->length = sizeof(mbuffer_st)+header_size;
+
+	return 0;
+}
+
+#define _gnutls_buffer_init_handshake_mbuffer(b) _gnutls_buffer_init_mbuffer(b, HANDSHAKE_HEADER_SIZE(session))
+
+
+/* Cannot fail */
+inline static mbuffer_st *_gnutls_buffer_to_mbuffer(gnutls_buffer_st * buf)
+{
+	mbuffer_st *bufel;
+	unsigned header_size;
+
+	bufel = (void*)buf->data;
+
+	header_size = _mbuffer_get_uhead_size(bufel);
+	assert(buf->length >= sizeof(mbuffer_st)+header_size);
+
+	_mbuffer_init(bufel, buf->length - sizeof(mbuffer_st));
+
+	_mbuffer_set_udata_size(bufel, buf->length - sizeof(mbuffer_st));
+	_mbuffer_set_uhead_size(bufel, header_size);
+
+	_gnutls_buffer_init(buf); /* avoid double frees */
+
+	return bufel;
+}
 
 inline static mbuffer_st *_gnutls_handshake_alloc(gnutls_session_t session,
 						  size_t maximum)
