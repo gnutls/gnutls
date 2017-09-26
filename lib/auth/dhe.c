@@ -87,6 +87,7 @@ gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
 	int ret = 0;
 	gnutls_certificate_credentials_t cred;
+	unsigned sig_pos;
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -108,6 +109,8 @@ gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return gnutls_assert_val(ret);
 	}
 
+	sig_pos = data->length;
+
 	ret =
 	    _gnutls_dh_common_print_server_kx(session, data);
 	if (ret < 0) {
@@ -116,8 +119,8 @@ gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	}
 
 	/* Generate the signature. */
-	return _gnutls_gen_dhe_signature(session, data, data->data,
-					 data->length);
+	return _gnutls_gen_dhe_signature(session, data, &data->data[sig_pos],
+					 data->length-sig_pos);
 }
 
 

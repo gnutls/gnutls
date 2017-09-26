@@ -87,17 +87,20 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	int apr_cert_list_length;
 	gnutls_sign_algorithm_t sign_algo;
 	const version_entry_st *ver = get_version(session);
+	unsigned init_pos;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	init_pos = data->length;
 
 	ret = _gnutls_gen_srp_server_kx(session, data);
 
 	if (ret < 0)
 		return ret;
 
-	ddata.data = data->data;
-	ddata.size = data->length;
+	ddata.data = &data->data[init_pos];
+	ddata.size = data->length-init_pos;
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -158,7 +161,7 @@ gen_srp_cert_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
       cleanup:
 	_gnutls_free_datum(&signature);

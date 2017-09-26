@@ -308,9 +308,12 @@ _gnutls_gen_rsa_client_kx(gnutls_session_t session,
 #ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
-		_gnutls_buffer_replace_data(data, &sdata);
+		ret =
+		    _gnutls_buffer_append_data(data, sdata.data,
+					       sdata.size);
 
-		return data->length;
+		_gnutls_free_datum(&sdata);
+		return ret;
 	} else
 #endif
 	{		/* TLS 1.x */

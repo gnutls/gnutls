@@ -75,14 +75,6 @@ void _gnutls_buffer_init(gnutls_buffer_st * str)
 	str->length = 0;
 }
 
-void _gnutls_buffer_replace_data(gnutls_buffer_st * buf,
-				 gnutls_datum_t * data)
-{
-	gnutls_free(buf->allocd);
-	buf->allocd = buf->data = data->data;
-	buf->max_length = buf->length = data->size;
-}
-
 void _gnutls_buffer_clear(gnutls_buffer_st * str)
 {
 	if (str == NULL || str->allocd == NULL)

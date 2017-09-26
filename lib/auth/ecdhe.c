@@ -242,6 +242,7 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 	const gnutls_group_entry_st *group = get_group(session);
 	const gnutls_ecc_curve_entry_st *ecurve;
 	int pk;
+	unsigned init_pos = data->length;
 
 	if (group == NULL)
 		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
@@ -299,7 +300,7 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
  cleanup:
 	gnutls_pk_params_clear(&session->key.ecdh_params);
 	return ret;
@@ -412,6 +413,7 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 	uint8_t p;
 	int ret;
 	gnutls_datum_t out;
+	unsigned init_pos = data->length;
 
 	if (group == NULL || group->curve == 0)
 		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
@@ -472,7 +474,7 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 	}
 
 
-	return data->length;
+	return data->length - init_pos;
 }
 
 static int
@@ -480,6 +482,7 @@ gen_ecdhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
 	int ret = 0;
 	gnutls_certificate_credentials_t cred;
+	unsigned sig_pos;
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -495,6 +498,8 @@ gen_ecdhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return ret;
 	}
 
+	sig_pos = data->length;
+
 	ret =
 	    _gnutls_ecdh_common_print_server_kx(session, data,
 						get_group
@@ -505,8 +510,8 @@ gen_ecdhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	}
 
 	/* Generate the signature. */
-	return _gnutls_gen_dhe_signature(session, data, data->data,
-					 data->length);
+	return _gnutls_gen_dhe_signature(session, data, &data->data[sig_pos],
+					 data->length-sig_pos);
 }
 
 #endif

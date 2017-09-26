@@ -100,6 +100,7 @@ gen_ecdhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	int ret, free;
 	gnutls_psk_client_credentials_t cred;
 	gnutls_datum_t username, key;
+	unsigned init_pos = data->length;
 
 	cred = (gnutls_psk_client_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
@@ -127,7 +128,7 @@ gen_ecdhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
       cleanup:
 	if (free) {
@@ -144,6 +145,7 @@ gen_dhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	int ret, free;
 	gnutls_psk_client_credentials_t cred;
 	gnutls_datum_t username, key;
+	unsigned init_pos = data->length;
 
 	cred = (gnutls_psk_client_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
@@ -171,7 +173,7 @@ gen_dhe_psk_client_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
       cleanup:
 	if (free) {

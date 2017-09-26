@@ -136,6 +136,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	gnutls_psk_client_credentials_t cred;
 	gnutls_datum_t username, key;
 	int ret, free;
+	unsigned init_pos;
 
 	if (auth == NULL) {
 		/* this shouldn't have happened. The proc_certificate
@@ -220,6 +221,8 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	 * }
 	 */
 
+	init_pos = data->length;
+
 	/* Write psk_identity and EncryptedPreMasterSecret into data stream
 	 */
 	ret =
@@ -239,7 +242,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
       cleanup:
 	_gnutls_free_datum(&sdata);

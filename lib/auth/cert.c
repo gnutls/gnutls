@@ -619,6 +619,7 @@ static int gen_x509_crt(gnutls_session_t session, gnutls_buffer_st * data)
 	gnutls_pcert_st *apr_cert_list;
 	gnutls_privkey_t apr_pkey;
 	int apr_cert_list_length;
+	unsigned init_pos = data->length;
 
 	/* find the appropriate certificate 
 	 */
@@ -660,7 +661,7 @@ static int gen_x509_crt(gnutls_session_t session, gnutls_buffer_st * data)
 			return gnutls_assert_val(ret);
 	}
 
-	return data->length;
+	return data->length - init_pos;
 }
 
 int
@@ -1002,6 +1003,7 @@ _gnutls_gen_cert_client_crt_vrfy(gnutls_session_t session,
 	gnutls_datum_t signature = { NULL, 0 };
 	gnutls_sign_algorithm_t sign_algo;
 	const version_entry_st *ver = get_version(session);
+	unsigned init_pos = data->length;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -1053,7 +1055,7 @@ _gnutls_gen_cert_client_crt_vrfy(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
  cleanup:
 	_gnutls_free_datum(&signature);
@@ -1143,6 +1145,7 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 	int ret;
 	uint8_t tmp_data[CERTTYPE_SIZE];
 	const version_entry_st *ver = get_version(session);
+	unsigned init_pos = data->length;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -1196,7 +1199,7 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 	}
 
-	return data->length;
+	return data->length - init_pos;
 }
 
 /* This function will return the appropriate certificate to use. 

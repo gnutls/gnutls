@@ -125,6 +125,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 	size_t tmp_size;
 	gnutls_ext_priv_data_t epriv;
 	srp_ext_st *priv;
+	unsigned init_pos;
 
 	ret =
 	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRP,
@@ -157,6 +158,8 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 		gnutls_assert();
 		return ret;
 	}
+
+	init_pos = data->length;
 
 	/* copy from pwd_entry to local variables (actually in session) */
 	tmp_size = pwd_entry->g.size;
@@ -231,7 +234,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 
 	_gnutls_mpi_log("SRP B: ", B);
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
       cleanup:
 	_gnutls_srp_entry_free(pwd_entry);

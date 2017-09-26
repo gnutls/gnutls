@@ -127,6 +127,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 	int ret;
 	gnutls_pk_params_st peer_pub;
 	gnutls_datum_t tmp_dh_key = {NULL, 0};
+	unsigned init_pos = data->length;
 	
 	gnutls_pk_params_init(&peer_pub);
 
@@ -168,7 +169,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 		goto error;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
  error:
 	gnutls_pk_params_clear(&session->key.dh_params);
@@ -314,6 +315,7 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 {
 	int ret;
 	unsigned q_bits = session->key.dh_params.qbits;
+	unsigned init_pos = data->length;
 
 	if (q_bits < 192 && q_bits != 0) {
 		gnutls_assert();
@@ -348,7 +350,7 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = data->length;
+	ret = data->length - init_pos;
 
 cleanup:
 	return ret;

@@ -101,9 +101,6 @@ int _gnutls_buffer_append_str(gnutls_buffer_st *, const char *str);
 
 #include <num.h>
 
-void _gnutls_buffer_replace_data(gnutls_buffer_st * buf,
-				 gnutls_datum_t * data);
-
 int _gnutls_buffer_append_prefix(gnutls_buffer_st * buf, int pfx_size,
 				 size_t data_size);
 
