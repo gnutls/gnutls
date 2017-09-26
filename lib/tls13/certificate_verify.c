@@ -139,8 +139,6 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 	const gnutls_sign_entry_st *se;
 
 	if (again == 0) {
-		_gnutls_buffer_init(&buf);
-
 		ret = _gnutls_get_selected_cert(session, &apr_cert_list,
 						&apr_cert_list_length, &apr_pkey);
 		if (ret < 0)
@@ -173,6 +171,12 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
+		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
 		ret = _gnutls_buffer_append_data(&buf, se->aid.id, 2);
 		if (ret < 0) {
 			gnutls_assert();
@@ -185,21 +189,8 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 			goto cleanup;
 		}
 
-		bufel = _gnutls_handshake_alloc(session, buf.length);
-		if (bufel == NULL) {
-			gnutls_assert();
-			ret = GNUTLS_E_MEMORY_ERROR;
-			goto cleanup;
-		}
+		bufel = _gnutls_buffer_to_mbuffer(&buf);
 
-		_mbuffer_set_udata_size(bufel, 0);
-		ret = _mbuffer_append_data(bufel, buf.data, buf.length);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		_gnutls_buffer_clear(&buf);
 		gnutls_free(sig.data);
 	}
 
@@ -208,6 +199,5 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
  cleanup:
 	gnutls_free(sig.data);
 	_gnutls_buffer_clear(&buf);
-	_mbuffer_xfree(&bufel);
 	return ret;
 }
