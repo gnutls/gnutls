@@ -153,6 +153,7 @@ _gnutls_gen_supplemental(gnutls_session_t session, gnutls_buffer_st * buf)
 {
 	size_t i;
 	int ret;
+	unsigned init_pos = buf->length;
 
 	/* Make room for 3 byte length field. */
 	ret = _gnutls_buffer_append_data(buf, "\0\0\0", 3);
@@ -173,15 +174,17 @@ _gnutls_gen_supplemental(gnutls_session_t session, gnutls_buffer_st * buf)
 			return gnutls_assert_val(ret);
 	}
 
-	buf->data[0] = ((buf->length - 3) >> 16) & 0xFF;
-	buf->data[1] = ((buf->length - 3) >> 8) & 0xFF;
-	buf->data[2] = (buf->length - 3) & 0xFF;
+	i = buf->length - init_pos - 3;
+
+	buf->data[init_pos] = (i >> 16) & 0xFF;
+	buf->data[init_pos+1] = (i >> 8) & 0xFF;
+	buf->data[init_pos+2] = i & 0xFF;
 
 	_gnutls_debug_log
 	    ("EXT[%p]: Sending %d bytes of supplemental data\n", session,
 	     (int) buf->length);
 
-	return buf->length;
+	return buf->length - init_pos;
 }
 
 int
