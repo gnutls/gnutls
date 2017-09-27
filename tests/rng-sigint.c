@@ -24,13 +24,14 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
+
 /* This program verifies whether the low-level random functions can operate
  * properly, even if interrupted by signals */
 
 #if defined(HAVE_SETITIMER) && (defined(HAVE_LINUX_GETRANDOM) || defined(__linux__))
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
