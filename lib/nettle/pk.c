@@ -1562,9 +1562,7 @@ gnutls_x509_spki_st spki;
 		free(sig.data);
 		sig.data = NULL;
 
-		/* Here we don't know the purpose of the key. Check both
-		 * signing and encryption.
-		 */
+		/* fallthrough */
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_DSA:
@@ -1676,6 +1674,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			break;
 		}
 #endif
+		/* fallthrough */
 	case GNUTLS_PK_DH:
 		{
 			struct dsa_params pub;
