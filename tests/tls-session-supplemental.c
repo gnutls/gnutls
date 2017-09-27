@@ -135,6 +135,7 @@ static void client(int sd)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session, "PERFORMANCE:+ANON-ECDH:+ANON-DH",
@@ -248,6 +249,7 @@ static void server(int sd)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER);
+	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
