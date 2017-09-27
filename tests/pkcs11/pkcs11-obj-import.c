@@ -222,7 +222,6 @@ void doit(void)
 	buf_size = sizeof(buf);
 	assert(gnutls_pkcs11_obj_get_info(obj, GNUTLS_PKCS11_OBJ_ID, buf, &buf_size) >= 0);
 	assert(buf_size != 0);
-	assert(buf != 0);
 
 	/* library description */
 	buf_size = sizeof(buf);
