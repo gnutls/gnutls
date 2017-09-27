@@ -99,6 +99,7 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 static void align_allocd_with_data(gnutls_buffer_st * dest)
 {
 	assert(dest->allocd != NULL);
+	assert(dest->data != NULL);
 	if (dest->length)
 		memmove(dest->allocd, dest->data, dest->length);
 	dest->data = dest->allocd;
@@ -154,6 +155,7 @@ gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 
 		align_allocd_with_data(dest);
 	}
+	assert(dest->data != NULL);
 
 	memcpy(&dest->data[dest->length], data, data_size);
 	dest->length = tot_len;
