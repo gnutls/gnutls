@@ -213,7 +213,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 		return gnutls_assert_val(ret);
 
 	/* generate server random value */
-	ret = _gnutls_set_server_random(session, neg_version, NULL);
+	ret = _gnutls_gen_server_random(session, neg_version);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
