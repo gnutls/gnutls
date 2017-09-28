@@ -208,9 +208,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	memcpy(&rnd[GNUTLS_RANDOM_SIZE - challenge], &data[pos],
 	       challenge);
 
-	ret = _gnutls_set_client_random(session, rnd);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	_gnutls_set_client_random(session, rnd);
 
 	/* generate server random value */
 	ret = _gnutls_gen_server_random(session, neg_version);

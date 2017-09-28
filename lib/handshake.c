@@ -168,28 +168,31 @@ static int resume_copy_required_values(gnutls_session_t session)
 	return 0;
 }
 
-int _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd)
+void _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd)
+{
+	memcpy(session->security_parameters.client_random, rnd,
+	       GNUTLS_RANDOM_SIZE);
+}
+
+static
+int _gnutls_gen_client_random(gnutls_session_t session)
 {
 	int ret;
 
-	if (rnd != NULL) { /* server */
-		memcpy(session->security_parameters.client_random, rnd,
+	/* no random given, we generate. */
+	if (session->internals.sc_random_set != 0) {
+		memcpy(session->security_parameters.client_random,
+		       session->internals.
+		       resumed_security_parameters.client_random,
 		       GNUTLS_RANDOM_SIZE);
-	} else { /* client */
-		/* no random given, we generate. */
-		if (session->internals.sc_random_set != 0) {
-			memcpy(session->security_parameters.client_random,
-			       session->internals.
-			       resumed_security_parameters.client_random,
-			       GNUTLS_RANDOM_SIZE);
-		} else {
-			ret = gnutls_rnd(GNUTLS_RND_NONCE,
-				session->security_parameters.client_random,
-				GNUTLS_RANDOM_SIZE);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-		}
+	} else {
+		ret = gnutls_rnd(GNUTLS_RND_NONCE,
+			session->security_parameters.client_random,
+			GNUTLS_RANDOM_SIZE);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
+
 	return 0;
 }
 
@@ -490,9 +493,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	/* Read client random value.
 	 */
 	DECR_LEN(len, GNUTLS_RANDOM_SIZE);
-	ret = _gnutls_set_client_random(session, &data[pos]);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	_gnutls_set_client_random(session, &data[pos]);
 
 	pos += GNUTLS_RANDOM_SIZE;
 
@@ -1788,7 +1789,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		if (!IS_DTLS(session)
 		    || session->internals.dtls.hsk_hello_verify_requests ==
 		    0) {
-			ret = _gnutls_set_client_random(session, NULL);
+			ret = _gnutls_gen_client_random(session);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
