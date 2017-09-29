@@ -105,9 +105,9 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 crq_key_id x509sign-verify sign-verify cve-2009-1415 cve-2009-1416		\
 	 tls10-server-kx-neg tls11-server-kx-neg tls12-server-kx-neg ssl30-server-kx-neg \
 	 tls12-cipher-neg tls11-cipher-neg tls10-cipher-neg ssl30-cipher-neg \
-	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain	tls-rehandshake-cert-3 \
+	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain	tls12-rehandshake-cert-3 \
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	\
-	 tls-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
+	 tls12-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
@@ -121,7 +121,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 fips-test fips-override-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
 	 crlverify mini-dtls-discard init_fds mini-record-failure memset \
-	 tls-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
+	 tls12-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
 	 mini-dtls-record-asym key-import-export priority-set priority-set2 \
 	 pubkey-import-export sign-is-secure spki spki-abstract rsa-rsa-pss \

@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2014 Nikos Mavrogiannopoulos
- * Copyright (C) 2017 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -54,8 +53,6 @@ int main()
 static void terminate(void);
 
 /* This program tests client and server initiated rehandshake.
- * On the initial handshake a certificate is requested from the
- * client, while on the following up not.
  */
 
 static void server_log_func(int level, const char *str)
@@ -68,14 +65,17 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
+
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, unsigned test)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
+	gnutls_anon_client_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
+	/* Need to enable anonymous KX specifically. */
 
 	global_init();
 	memset(buffer, 2, sizeof(buffer));
@@ -85,9 +85,8 @@ static void client(int fd)
 		gnutls_global_set_log_level(3);
 	}
 
+	gnutls_anon_allocate_client_credentials(&anoncred);
 	gnutls_certificate_allocate_credentials(&x509_cred);
-	gnutls_certificate_set_x509_key_mem(x509_cred, &cli_cert,
-					    &cli_key, GNUTLS_X509_FMT_PEM);
 
 	/* Initialize TLS session
 	 */
@@ -95,8 +94,11 @@ static void client(int fd)
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
 
+	/* put the anonymous credentials to the current session
+	 */
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
@@ -122,26 +124,64 @@ static void client(int fd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	ret = gnutls_handshake(session);
-	if (ret != 0) {
-		fail("client: error in code after rehandshake: %s\n",
-		     gnutls_strerror(ret));
-		exit(1);
-	}
+	if (debug)
+		success("client: test %d\n", test);
 
-	do {
+	if (test != 0) {
+		ret = gnutls_handshake(session);
+		if (ret != GNUTLS_E_GOT_APPLICATION_DATA) {
+			fail("client: error in code after rehandshake: %s\n",
+			     gnutls_strerror(ret));
+			exit(1);
+		}
+
+		do {
+			do {
+				ret =
+				    gnutls_record_recv(session, buffer,
+							MAX_BUF);
+			} while (ret == GNUTLS_E_AGAIN
+				 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret > 0);
+
+	} else {
+		do {
+			do {
+				ret =
+				    gnutls_record_recv(session, buffer,
+							MAX_BUF);
+			} while (ret == GNUTLS_E_AGAIN
+				 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret > 0);
+
+		if (ret != GNUTLS_E_REHANDSHAKE) {
+			fail("client: Error receiving rehandshake: %s\n",
+			     gnutls_strerror(ret));
+			exit(1);
+		}
+
 		do {
 			ret =
-			    gnutls_record_recv(session, buffer,
-						MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
-	} while (ret > 0);
+			    gnutls_record_send(session, buffer, sizeof(buffer));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-	if (ret != 0) {
-		fail("client: Error receiving: %s\n",
-		     gnutls_strerror(ret));
-		exit(1);
+		if (ret < 0) {
+			fail("Error sending %d byte packet: %s\n",
+			     (int)sizeof(buffer), gnutls_strerror(ret));
+			exit(1);
+		}
+
+		do {
+			ret =
+			    gnutls_record_send(session, buffer, sizeof(buffer));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+		if (ret < 0) {
+			fail("Error sending %d byte packet: %s\n",
+			     (int)sizeof(buffer), gnutls_strerror(ret));
+			exit(1);
+		}
+
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -150,6 +190,7 @@ static void client(int fd)
 
 	gnutls_deinit(session);
 
+	gnutls_anon_free_client_credentials(anoncred);
 	gnutls_certificate_free_credentials(x509_cred);
 
 	gnutls_global_deinit();
@@ -164,11 +205,12 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, unsigned test)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
+	gnutls_anon_server_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
 
 	/* this must be called once in the program
@@ -178,12 +220,14 @@ static void server(int fd)
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);
-		gnutls_global_set_log_level(4);
+		gnutls_global_set_log_level(3);
 	}
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
 					    &server_key, GNUTLS_X509_FMT_PEM);
+
+	gnutls_anon_allocate_server_credentials(&anoncred);
 
 	gnutls_init(&session, GNUTLS_SERVER);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
@@ -191,10 +235,10 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
 
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-	gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUIRE);
 
 	gnutls_transport_set_int(session, fd);
 
@@ -217,36 +261,80 @@ static void server(int fd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	gnutls_certificate_server_set_request(session, GNUTLS_CERT_IGNORE);
+	if (debug)
+		success("server: test %d\n", test);
 
-	do {
+	if (test != 0) {
+
+		do {
+			do {
+				ret =
+				    gnutls_record_recv(session, buffer,
+							MAX_BUF);
+			} while (ret == GNUTLS_E_AGAIN
+				 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret > 0);
+
+		if (ret != GNUTLS_E_REHANDSHAKE) {
+			fail("server: Error receiving client handshake request: %s\n", gnutls_strerror(ret));
+			terminate();
+		}
+
 		do {
 			ret =
-			    gnutls_record_recv(session, buffer,
-						MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
-	} while (ret > 0);
+			    gnutls_record_send(session, buffer, sizeof(buffer));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-	if (ret != GNUTLS_E_REHANDSHAKE) {
-		fail("server: Error receiving client handshake request: %s\n", gnutls_strerror(ret));
-		terminate();
-	}
+		if (ret < 0) {
+			fail("Error sending %d byte packet: %s\n",
+			     (int)sizeof(buffer), gnutls_strerror(ret));
+			terminate();
+		}
 
-	if (debug)
-		success("server: starting handshake\n");
+	} else {
+		if (debug)
+			success("server: sending rehandshake request\n");
 
-	ret = gnutls_handshake(session);
-	if (ret != 0) {
-		fail("server: unexpected error: %s\n", gnutls_strerror(ret));
-		terminate();
-	}
+		ret = gnutls_rehandshake(session);
+		if (ret < 0) {
+			fail("Error sending %d byte packet: %s\n",
+			     (int)sizeof(buffer), gnutls_strerror(ret));
+			terminate();
+		}
 
-	ret = gnutls_record_send(session, "hello", 4);
-	if (ret < 0) {
-		fail("Error sending data: %s\n",
-		     gnutls_strerror(ret));
-		terminate();
+		if (debug)
+			success("server: starting handshake\n");
+
+		ret = gnutls_handshake(session);
+
+		if (ret != GNUTLS_E_GOT_APPLICATION_DATA) {
+			fail("server: didn't receive GNUTLS_E_GOT_APPLICATION_DATA: %s\n", gnutls_strerror(ret));
+			terminate();
+		}
+
+		if (debug)
+			success("server: got application data error code: %s\n",
+				gnutls_strerror(ret));
+
+		do {
+			do {
+				ret =
+				    gnutls_record_recv(session, buffer,
+							MAX_BUF);
+			} while (ret == GNUTLS_E_AGAIN
+				 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret > 0);
+
+		if (debug)
+			success("server: final ret: %s\n",
+				gnutls_strerror(ret));
+
+		if (ret < 0) {
+			fail("Error receiving final packet: %s\n",
+			     gnutls_strerror(ret));
+			terminate();
+		}
+
 	}
 
 	/* do not wait for the peer to close the connection.
@@ -256,6 +344,7 @@ static void server(int fd)
 	close(fd);
 	gnutls_deinit(session);
 
+	gnutls_anon_free_server_credentials(anoncred);
 	gnutls_certificate_free_credentials(x509_cred);
 
 	gnutls_global_deinit();
@@ -264,7 +353,7 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-static void start(void)
+static void start(unsigned test)
 {
 	int fd[2];
 	int ret;
@@ -286,12 +375,12 @@ static void start(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0]);
+		server(fd[0], test);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], test);
 		exit(0);
 	}
 }
@@ -306,7 +395,8 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	start();
+//	start(0);
+	start(1);
 }
 
 #endif				/* _WIN32 */
