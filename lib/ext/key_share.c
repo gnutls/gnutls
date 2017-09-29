@@ -634,7 +634,7 @@ key_share_send_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		ver = _gnutls_version_max(session);
 		if (unlikely(ver == NULL || ver->key_shares == 0))
-			return gnutls_assert_val(0);
+			return 0;
 
 		/* write the total length later */
 		lengthp = &extdata->data[extdata->length];

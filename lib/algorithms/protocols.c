@@ -313,8 +313,8 @@ const version_entry_st *_gnutls_legacy_version_max(gnutls_session_t session)
 }
 
 /* Returns the number of bytes written to buffer or a negative
- * error code. It will return an error if there is no version
- * >= TLS 1.3.
+ * error code. It will return GNUTLS_E_UNSUPPORTED_VERSION_PACKET 
+ * if there is no version >= TLS 1.3.
  */
 int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, ssize_t buffer_size)
 {
@@ -362,7 +362,7 @@ int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, 
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	if (at_least_one_new == 0)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 
 	return written_bytes;
 }
