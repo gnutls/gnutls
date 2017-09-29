@@ -278,9 +278,10 @@ typedef enum recv_state_t {
  */
 #define MAX_ALGOS GNUTLS_MAX_ALGORITHM_NUM
 
-/* IDs are non-zero and allocated in a way that all values fit in 64-bit integer as (1<<val) */
+/* IDs are allocated in a way that all values fit in 64-bit integer as (1<<val) */
 typedef enum extensions_t {
-	GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
+	GNUTLS_EXTENSION_INVALID = 0xffff,
+	GNUTLS_EXTENSION_MAX_RECORD_SIZE = 0,
 	GNUTLS_EXTENSION_STATUS_REQUEST,
 	GNUTLS_EXTENSION_CERT_TYPE,
 	GNUTLS_EXTENSION_SUPPORTED_ECC,
@@ -1177,8 +1178,7 @@ typedef struct {
 	struct hello_ext_entry_st *rexts;
 	unsigned rexts_size;
 
-	struct {
-		extensions_t id;
+	struct { /* ext_data[id] contains data for extension_t id */
 		gnutls_ext_priv_data_t priv;
 		gnutls_ext_priv_data_t resumed_priv;
 		uint8_t set;

@@ -144,6 +144,8 @@ const char *gnutls_ext_get_name(unsigned int ext)
 	return NULL;
 }
 
+/* Returns %GNUTLS_EXTENSION_INVALID on error
+ */
 static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
 {
 	unsigned i;
@@ -158,7 +160,7 @@ static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
 			return extfunc[i]->gid;
 	}
 
-	return 0;
+	return GNUTLS_EXTENSION_INVALID;
 }
 
 typedef struct hello_ext_ctx_st {
@@ -178,7 +180,7 @@ int hello_ext_parse(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_s
 	int ret;
 
 	id = tls_id_to_gid(session, tls_id);
-	if (id == 0) { /* skip */
+	if (id == GNUTLS_EXTENSION_INVALID) { /* skip */
 		return 0;
 	}
 
@@ -473,24 +475,20 @@ _gnutls_ext_set_resumed_session_data(gnutls_session_t session,
 				     extensions_t id,
 				     gnutls_ext_priv_data_t data)
 {
-	int i;
 	const struct hello_ext_entry_st *ext;
 
+	/* If this happens we need to increase the max */
+	assert(id < MAX_EXT_TYPES);
+
 	ext = _gnutls_ext_ptr(session, id, GNUTLS_EXT_ANY);
+	assert(ext != NULL);
 
-	for (i = 0; i < MAX_EXT_TYPES; i++) {
-		if (session->internals.ext_data[i].id == id
-		    || (!session->internals.ext_data[i].resumed_set && !session->internals.ext_data[i].set)) {
+	if (session->internals.ext_data[id].resumed_set != 0)
+		unset_resumed_ext_data(session, ext, id);
 
-			if (session->internals.ext_data[i].resumed_set != 0)
-				unset_resumed_ext_data(session, ext, i);
-
-			session->internals.ext_data[i].id = id;
-			session->internals.ext_data[i].resumed_priv = data;
-			session->internals.ext_data[i].resumed_set = 1;
-			return;
-		}
-	}
+	session->internals.ext_data[id].resumed_priv = data;
+	session->internals.ext_data[id].resumed_set = 1;
+	return;
 }
 
 int _gnutls_hello_ext_unpack(gnutls_session_t session, gnutls_buffer_st * packed)
@@ -550,19 +548,13 @@ unset_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *ext, u
 
 void
 _gnutls_hello_ext_unset_sdata(gnutls_session_t session,
-				extensions_t id)
+			      extensions_t id)
 {
-	int i;
 	const struct hello_ext_entry_st *ext;
 
 	ext = _gnutls_ext_ptr(session, id, GNUTLS_EXT_ANY);
-
-	for (i = 0; i < MAX_EXT_TYPES; i++) {
-		if (session->internals.ext_data[i].id == id) {
-			unset_ext_data(session, ext, i);
-			return;
-		}
-	}
+	if (ext)
+		unset_ext_data(session, ext, id);
 }
 
 static void unset_resumed_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *ext, unsigned idx)
@@ -587,10 +579,11 @@ void _gnutls_hello_ext_sdata_deinit(gnutls_session_t session)
 		if (!session->internals.ext_data[i].set && !session->internals.ext_data[i].resumed_set)
 			continue;
 
-		ext = _gnutls_ext_ptr(session, session->internals.ext_data[i].id, GNUTLS_EXT_ANY);
-
-		unset_ext_data(session, ext, i);
-		unset_resumed_ext_data(session, ext, i);
+		ext = _gnutls_ext_ptr(session, i, GNUTLS_EXT_ANY);
+		if (ext) {
+			unset_ext_data(session, ext, i);
+			unset_resumed_ext_data(session, ext, i);
+		}
 	}
 }
 
@@ -602,41 +595,32 @@ void
 _gnutls_hello_ext_set_sdata(gnutls_session_t session, extensions_t id,
 			     gnutls_ext_priv_data_t data)
 {
-	unsigned int i;
 	const struct hello_ext_entry_st *ext;
 
+	assert(id < MAX_EXT_TYPES);
+
 	ext = _gnutls_ext_ptr(session, id, GNUTLS_EXT_ANY);
+	assert(ext != NULL);
 
-	for (i = 0; i < MAX_EXT_TYPES; i++) {
-		if (session->internals.ext_data[i].id == id ||
-		    (!session->internals.ext_data[i].set && !session->internals.ext_data[i].resumed_set)) {
-
-			if (session->internals.ext_data[i].set != 0) {
-				unset_ext_data(session, ext, i);
-			}
-			session->internals.ext_data[i].id = id;
-			session->internals.ext_data[i].priv = data;
-			session->internals.ext_data[i].set = 1;
-			return;
-		}
+	if (session->internals.ext_data[id].set != 0) {
+		unset_ext_data(session, ext, id);
 	}
+	session->internals.ext_data[id].priv = data;
+	session->internals.ext_data[id].set = 1;
+
+	return;
 }
 
 int
 _gnutls_hello_ext_get_sdata(gnutls_session_t session,
 			    extensions_t id, gnutls_ext_priv_data_t * data)
 {
-	int i;
-
-	for (i = 0; i < MAX_EXT_TYPES; i++) {
-		if (session->internals.ext_data[i].set != 0 &&
-		    session->internals.ext_data[i].id == id)
-		{
-			*data =
-			    session->internals.ext_data[i].priv;
-			return 0;
-		}
+	if (session->internals.ext_data[id].set != 0) {
+		*data =
+		    session->internals.ext_data[id].priv;
+		return 0;
 	}
+
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
@@ -645,16 +629,12 @@ _gnutls_hello_ext_get_resumed_sdata(gnutls_session_t session,
 				    extensions_t id,
 				    gnutls_ext_priv_data_t * data)
 {
-	int i;
-
-	for (i = 0; i < MAX_EXT_TYPES; i++) {
-		if (session->internals.ext_data[i].resumed_set != 0
-		    && session->internals.ext_data[i].id == id) {
-			*data =
-			    session->internals.ext_data[i].resumed_priv;
-			return 0;
-		}
+	if (session->internals.ext_data[id].resumed_set != 0) {
+		*data =
+		    session->internals.ext_data[id].resumed_priv;
+		return 0;
 	}
+
 	return GNUTLS_E_INVALID_REQUEST;
 }
 
@@ -856,7 +836,7 @@ gnutls_ext_set_data(gnutls_session_t session, unsigned tls_id,
 		    gnutls_ext_priv_data_t data)
 {
 	unsigned id = tls_id_to_gid(session, tls_id);
-	if (id == 0)
+	if (id == GNUTLS_EXTENSION_INVALID)
 		return;
 
 	_gnutls_hello_ext_set_sdata(session, id, data);
@@ -879,7 +859,7 @@ gnutls_ext_get_data(gnutls_session_t session,
 		    unsigned tls_id, gnutls_ext_priv_data_t *data)
 {
 	unsigned id = tls_id_to_gid(session, tls_id);
-	if (id == 0)
+	if (id == GNUTLS_EXTENSION_INVALID)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	return _gnutls_hello_ext_get_sdata(session, id, data);
