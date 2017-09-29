@@ -233,6 +233,9 @@ void doit(void)
 	int ret;
 	pid_t child;
 
+	/* re-enable when post-handshake authentication is available */
+	exit(77);
+
 	signal(SIGCHLD, ch_handler);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);

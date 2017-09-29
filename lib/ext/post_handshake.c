@@ -75,6 +75,10 @@ static int
 _gnutls_post_handshake_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
+	/* we don't support post-handshake authentication yet */
+	return 0;
+#if 0
+
 	gnutls_certificate_credentials_t cred;
 	const version_entry_st *max;
 
@@ -96,6 +100,7 @@ _gnutls_post_handshake_send_params(gnutls_session_t session,
 		return GNUTLS_E_INT_RET_0;
 	else
 		return 0;
+#endif
 }
 
 
