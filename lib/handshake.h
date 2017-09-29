@@ -77,7 +77,9 @@ int _gnutls_user_hello_func(gnutls_session_t session,
 
 void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session);
 
-int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session);
+int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session,
+					   const mac_entry_st *prf,
+					   unsigned client);
 
 #define STATE session->internals.handshake_state
 #define FINAL_STATE session->internals.handshake_final_state
@@ -126,6 +128,10 @@ int _gnutls_send_finished(gnutls_session_t session, int again);
 
 int _gnutls13_handshake_client(gnutls_session_t session);
 int _gnutls13_handshake_server(gnutls_session_t session);
+
+int
+_gnutls13_recv_hello_retry_request(gnutls_session_t session,
+				   gnutls_buffer_st *buf);
 
 int
 _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf);

@@ -43,6 +43,9 @@
 #define TLS_SIGN_AID_UNKNOWN {{255, 255}, 0}
 #define HAVE_UNKNOWN_SIGAID(aid) ((aid)->id[0] == 255 && (aid)->id[1] == 255)
 
+#define CS_INVALID_MAJOR 0x00
+#define CS_INVALID_MINOR 0x00
+
 /* Functions for version handling. */
 const version_entry_st *version_to_entry(gnutls_protocol_t version);
 const version_entry_st *nversion_to_entry(uint8_t major, uint8_t minor);

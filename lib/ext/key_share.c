@@ -556,6 +556,32 @@ key_share_recv_params(gnutls_session_t session,
 		if (unlikely(ver == NULL || ver->key_shares == 0))
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
+		if (_gnutls_ext_get_msg(session) == GNUTLS_EXT_FLAG_HRR) {
+			if (unlikely(!(session->internals.hsk_flags & HSK_HRR_RECEIVED)))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+			DECR_LEN(data_size, 2);
+			gid = _gnutls_read_uint16(data);
+
+			group = _gnutls_tls_id_to_group(gid);
+			if (group == NULL)
+				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+			_gnutls_handshake_log("EXT[%p]: HRR key share with %s\n", session, group->name);
+
+			/* check if we support it */
+			ret = _gnutls_session_supports_group(session, group->id);
+			if (ret < 0) {
+				_gnutls_handshake_log("EXT[%p]: received share for %s which is disabled\n", session, group->name);
+				return gnutls_assert_val(ret);
+			}
+
+			_gnutls_session_group_set(session, group);
+
+			return 0;
+		}
+		/* else */
+
 		DECR_LEN(data_size, 2);
 		gid = _gnutls_read_uint16(data);
 		data += 2;
@@ -620,6 +646,17 @@ key_share_send_params(gnutls_session_t session,
 
 		cur_length = extdata->length;
 
+		if (session->internals.hsk_flags & HSK_HRR_RECEIVED) { /* we know the group */
+			group = get_group(session);
+			if (unlikely(group == NULL))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+			ret = client_gen_key_share(session, group, extdata);
+			if (ret == GNUTLS_E_INT_RET_0)
+				return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		} else
 		/* generate key shares for out top-3 groups
 		 * if they are of different PK type. */
 		for (i=0;i<session->internals.priorities->groups.size;i++) {

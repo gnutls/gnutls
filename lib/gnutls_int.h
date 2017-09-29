@@ -1111,6 +1111,7 @@ typedef struct {
 #define HSK_CRT_SENT (1<<1)
 #define HSK_CRT_ASKED (1<<2)
 #define HSK_HRR_SENT (1<<3)
+#define HSK_HRR_RECEIVED (1<<4)
 	unsigned hsk_flags; /* TLS1.3 only */
 
 	unsigned crt_requested; /* 1 if client auth was requested (i.e., client cert).
@@ -1202,6 +1203,9 @@ typedef struct {
 	/* candidate groups to be selected for security params groups */
 	const gnutls_group_entry_st *cand_ec_group;
 	const gnutls_group_entry_st *cand_dh_group;
+
+	/* the ciphersuite received in HRR */
+	uint8_t hrr_cs[2];
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

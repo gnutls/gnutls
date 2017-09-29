@@ -197,7 +197,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 
 	switch (STATE) {
 	case STATE90:
-		ret = _gnutls13_handshake_hash_buffers_synth(session);
+		ret = _gnutls13_handshake_hash_buffers_synth(session, session->security_parameters.prf, 0);
 		STATE = STATE90;
 		IMED_RET("reset handshake buffers", ret, 0);
 		/* fall through */

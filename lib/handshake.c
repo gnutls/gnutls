@@ -88,18 +88,18 @@ handshake_hash_buffer_reset(gnutls_session_t session)
 
 static int
 handshake_hash_add_recvd(gnutls_session_t session,
-				 gnutls_handshake_description_t recv_type,
-				 uint8_t * header, uint16_t header_size,
-				 uint8_t * dataptr, uint32_t datalen);
+			 gnutls_handshake_description_t recv_type,
+			 uint8_t * header, uint16_t header_size,
+			 uint8_t * dataptr, uint32_t datalen);
 
 static int
 handshake_hash_add_sent(gnutls_session_t session,
-				gnutls_handshake_description_t type,
-				uint8_t * dataptr, uint32_t datalen);
+			gnutls_handshake_description_t type,
+			uint8_t * dataptr, uint32_t datalen);
 
 static int
 recv_hello_verify_request(gnutls_session_t session,
-				  uint8_t * data, int datalen);
+			  uint8_t * data, int datalen);
 
 
 /* Clears the handshake hash buffers and handles.
@@ -112,19 +112,26 @@ void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session)
 
 /* Replace handshake message buffer, with the special synthetic message
  * needed by TLS1.3 when HRR is sent. */
-int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session)
+int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session,
+					   const mac_entry_st *prf,
+					   unsigned client)
 {
 	int ret;
 	uint8_t hdata[4+MAX_HASH_SIZE];
+	size_t length;
+
+	if (client)
+		length = session->internals.handshake_hash_buffer_prev_len;
+	else
+		length = session->internals.handshake_hash_buffer.length;
 
 	/* calculate hash */
 	hdata[0] = 254;
-	_gnutls_write_uint24(session->security_parameters.prf->output_size, &hdata[1]);
+	_gnutls_write_uint24(prf->output_size, &hdata[1]);
 
-	ret = gnutls_hash_fast((gnutls_digest_algorithm_t)session->security_parameters.prf->id,
+	ret = gnutls_hash_fast((gnutls_digest_algorithm_t)prf->id,
 			       session->internals.handshake_hash_buffer.data,
-			       session->internals.handshake_hash_buffer.length,
-			       hdata+4);
+			       length, hdata+4);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -133,12 +140,12 @@ int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session)
 	ret =
 	    _gnutls_buffer_append_data(&session->internals.
 				       handshake_hash_buffer,
-				       hdata, session->security_parameters.prf->output_size+4);
+				       hdata, prf->output_size+4);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_buffers_log("BUF[HSK]: Replaced handshake buffer with synth message (%d bytes)\n",
-			    session->security_parameters.prf->output_size+4);
+			    prf->output_size+4);
 
 	return 0;
 }
@@ -1201,7 +1208,7 @@ handshake_hash_add_recvd(gnutls_session_t session,
 
 	if ((vers->id != GNUTLS_DTLS0_9 &&
 	     recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST) ||
-	    recv_type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
+	     recv_type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
 		return 0;
 
 	CHECK_SIZE(header_size + datalen);
@@ -1378,6 +1385,34 @@ _gnutls_recv_handshake(gnutls_session_t session,
 		}
 
 		break;
+	case GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST: {
+		/* hash buffer synth message is generated during hello retry parsing */
+		gnutls_datum_t hrr = {hsk.data.data, hsk.data.length};
+		ret =
+		    _gnutls13_recv_hello_retry_request(session,
+						       &hsk.data);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		} else {
+			/* during hello retry parsing, we reset handshake hash buffer,
+			 * re-add this message */
+			ret = handshake_hash_add_recvd(session, hsk.htype,
+						       hsk.header, hsk.header_size,
+						       hrr.data,
+						       hrr.size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			/* Signal our caller we have received a retry request
+			   and ClientHello needs to be sent again. */
+			ret = 1;
+		}
+
+		break;
+	}
 	case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
 		if (hsk.data.length == 0)
 			ret = 0;
@@ -1645,6 +1680,12 @@ read_server_hello(gnutls_session_t session,
 		return ret;
 	}
 	pos += 2;
+
+	if (session->internals.hsk_flags & HSK_HRR_RECEIVED) {
+		/* check if ciphersuite matches */
+		if (memcmp(session->security_parameters.cs->id, session->internals.hrr_cs, 2) != 0)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	}
 
 	if (vers->tls13_sem) {
 		/* TLS 1.3 Early Secret */
@@ -2478,6 +2519,18 @@ static int handshake_client(gnutls_session_t session)
 						   1, NULL);
 			STATE = STATE2;
 			IMED_RET("recv hello verify", ret, 1);
+
+			if (ret == 1) {
+				STATE = STATE0;
+				return 1;
+			}
+		} else {
+			ret =
+			    _gnutls_recv_handshake(session,
+						   GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST,
+						   1, NULL);
+			STATE = STATE2;
+			IMED_RET("recv hello retry", ret, 1);
 
 			if (ret == 1) {
 				STATE = STATE0;
