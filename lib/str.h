@@ -112,7 +112,7 @@ int _gnutls_buffer_append_fixed_mpi(gnutls_buffer_st * buf,
 
 int _gnutls_buffer_append_data_prefix(gnutls_buffer_st * buf, int pfx_size,
 				      const void *data, size_t data_size);
-void _gnutls_buffer_pop_data(gnutls_buffer_st *, void *, size_t * size);
+int _gnutls_buffer_pop_data(gnutls_buffer_st *, void *, size_t size);
 void _gnutls_buffer_pop_datum(gnutls_buffer_st *, gnutls_datum_t *,
 			      size_t max_size);
 
@@ -234,9 +234,8 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
     }
 
 #define BUFFER_POP(b, x, s) { \
-	size_t is = s; \
-	_gnutls_buffer_pop_data(b, x, &is); \
-	if (is != s) { \
+	ret = _gnutls_buffer_pop_data(b, x, s); \
+	if (ret < 0) { \
 	    ret = GNUTLS_E_PARSING_ERROR; \
 	    gnutls_assert(); \
 	    goto error; \

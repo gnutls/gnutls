@@ -280,24 +280,23 @@ int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsig
 	return ret;
 }
 
-/* returns data from a string in a constant buffer.
+/* returns data from a string in a constant buffer. Will
+ * fail with GNUTLS_E_PARSING_ERROR, if the string has not enough data.
  */
-void
+int
 _gnutls_buffer_pop_data(gnutls_buffer_st * str, void *data,
-			size_t * req_size)
+			size_t req_size)
 {
 	gnutls_datum_t tdata;
 
-	_gnutls_buffer_pop_datum(str, &tdata, *req_size);
-	if (tdata.data == NULL) {
-		*req_size = 0;
-		return;
+	_gnutls_buffer_pop_datum(str, &tdata, req_size);
+	if (tdata.data == NULL || tdata.size != req_size) {
+		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	*req_size = tdata.size;
 	memcpy(data, tdata.data, tdata.size);
 
-	return;
+	return 0;
 }
 
 int

@@ -798,7 +798,11 @@ unescape_string(char *output, const char *input, size_t * size,
 		return ret;
 	}
 
-	_gnutls_buffer_pop_data(&str, output, size);
+	ret = _gnutls_buffer_pop_data(&str, output, str.length);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	_gnutls_buffer_clear(&str);
 
