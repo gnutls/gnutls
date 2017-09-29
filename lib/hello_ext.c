@@ -54,44 +54,42 @@
 static void
 unset_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *, unsigned idx);
 
-static int ext_register(hello_ext_entry_st * mod);
 static void unset_resumed_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *, unsigned idx);
 
 static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
-	&ext_mod_max_record_size,
-	&ext_mod_ext_master_secret,
-	&ext_mod_supported_versions,
-	&ext_mod_post_handshake,
-	&ext_mod_etm,
+	[GNUTLS_EXTENSION_MAX_RECORD_SIZE] = &ext_mod_max_record_size,
+	[GNUTLS_EXTENSION_EXT_MASTER_SECRET] = &ext_mod_ext_master_secret,
+	[GNUTLS_EXTENSION_SUPPORTED_VERSIONS] = &ext_mod_supported_versions,
+	[GNUTLS_EXTENSION_POST_HANDSHAKE] = &ext_mod_post_handshake,
+	[GNUTLS_EXTENSION_ETM] = &ext_mod_etm,
 #ifdef ENABLE_OCSP
-	&ext_mod_status_request,
+	[GNUTLS_EXTENSION_STATUS_REQUEST] = &ext_mod_status_request,
 #endif
-	&ext_mod_server_name,
-	&ext_mod_sr,
+	[GNUTLS_EXTENSION_SERVER_NAME] = &ext_mod_server_name,
+	[GNUTLS_EXTENSION_SAFE_RENEGOTIATION] = &ext_mod_sr,
 #ifdef ENABLE_SRP
-	&ext_mod_srp,
+	[GNUTLS_EXTENSION_SRP] = &ext_mod_srp,
 #endif
 #ifdef ENABLE_HEARTBEAT
-	&ext_mod_heartbeat,
+	[GNUTLS_EXTENSION_HEARTBEAT] = &ext_mod_heartbeat,
 #endif
 #ifdef ENABLE_SESSION_TICKETS
-	&ext_mod_session_ticket,
+	[GNUTLS_EXTENSION_SESSION_TICKET] = &ext_mod_session_ticket,
 #endif
-	&ext_mod_supported_ecc,
-	&ext_mod_supported_ecc_pf,
-	&ext_mod_sig,
-	&ext_mod_key_share,
-	&ext_mod_cookie,
+	[GNUTLS_EXTENSION_SUPPORTED_ECC] = &ext_mod_supported_ecc,
+	[GNUTLS_EXTENSION_SUPPORTED_ECC_PF] = &ext_mod_supported_ecc_pf,
+	[GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS] = &ext_mod_sig,
+	[GNUTLS_EXTENSION_KEY_SHARE] = &ext_mod_key_share,
+	[GNUTLS_EXTENSION_COOKIE] = &ext_mod_cookie,
 #ifdef ENABLE_DTLS_SRTP
-	&ext_mod_srtp,
+	[GNUTLS_EXTENSION_SRTP] = &ext_mod_srtp,
 #endif
 #ifdef ENABLE_ALPN
-	&ext_mod_alpn,
+	[GNUTLS_EXTENSION_ALPN] = &ext_mod_alpn,
 #endif
 	/* This must be the last extension registered.
 	 */
-	&ext_mod_dumbfw,
-	NULL
+	[GNUTLS_EXTENSION_DUMBFW] = &ext_mod_dumbfw,
 };
 
 static const hello_ext_entry_st *
@@ -99,19 +97,15 @@ gid_to_ext_entry(gnutls_session_t session, extensions_t id)
 {
 	unsigned i;
 
+	assert(id < MAX_EXT_TYPES);
+
 	for (i=0;i<session->internals.rexts_size;i++) {
 		if (session->internals.rexts[i].gid == id) {
 			return &session->internals.rexts[i];
 		}
 	}
 
-	for (i = 0; extfunc[i] != NULL; i++) {
-		if (extfunc[i]->gid == id) {
-			return extfunc[i];
-		}
-	}
-
-	return NULL;
+	return extfunc[id];
 }
 
 static const hello_ext_entry_st *
@@ -127,7 +121,10 @@ tls_id_to_ext_entry(gnutls_session_t session, uint16_t tls_id, gnutls_ext_parse_
 		}
 	}
 
-	for (i = 0; extfunc[i] != NULL; i++) {
+	for (i = 0; i < MAX_EXT_TYPES; i++) {
+		if (!extfunc[i])
+			continue;
+
 		if (extfunc[i]->tls_id == tls_id) {
 			e = extfunc[i];
 			goto done;
@@ -157,9 +154,13 @@ const char *gnutls_ext_get_name(unsigned int ext)
 {
 	size_t i;
 
-	for (i = 0; extfunc[i] != NULL; i++)
+	for (i = 0; i < MAX_EXT_TYPES; i++) {
+		if (!extfunc[i])
+			continue;
+
 		if (extfunc[i]->tls_id == ext)
 			return extfunc[i]->name;
+	}
 
 	return NULL;
 }
@@ -175,7 +176,10 @@ static unsigned tls_id_to_gid(gnutls_session_t session, unsigned tls_id)
 			return session->internals.rexts[i].gid;
 	}
 
-	for (i = 0; extfunc[i] != NULL; i++) {
+	for (i = 0; i < MAX_EXT_TYPES; i++) {
+		if (!extfunc[i])
+			continue;
+
 		if (extfunc[i]->tls_id == tls_id)
 			return extfunc[i]->gid;
 	}
@@ -360,9 +364,12 @@ _gnutls_gen_hello_extensions(gnutls_session_t session,
 				     session, ctx.ext->name, (int)ctx.ext->tls_id, ret-4);
 	}
 
-	/* send_extension() ensures we don't send duplicates, in case
+	/* hello_ext_send() ensures we don't send duplicates, in case
 	 * of overriden extensions */
-	for (i = 0; extfunc[i] != NULL; i++) {
+	for (i = 0; i < MAX_EXT_TYPES; i++) {
+		if (!extfunc[i])
+			continue;
+
 		ctx.ext = extfunc[i];
 		ret = _gnutls_extv_append(buf, extfunc[i]->tls_id,
 					  &ctx, hello_ext_send);
@@ -391,31 +398,17 @@ int _gnutls_hello_ext_init(void)
 void _gnutls_hello_ext_deinit(void)
 {
 	unsigned i;
-	for (i = 0; extfunc[i] != NULL; i++) {
+
+	for (i = 0; i < MAX_EXT_TYPES; i++) {
+		if (!extfunc[i])
+			continue;
+
 		if (extfunc[i]->free_struct != 0) {
 			gnutls_free((void*)extfunc[i]->name);
 			gnutls_free((void*)extfunc[i]);
 			extfunc[i] = NULL;
 		}
 	}
-}
-
-static
-int ext_register(hello_ext_entry_st * mod)
-{
-	unsigned i = 0;
-
-	while(extfunc[i] != NULL) {
-		i++;
-	}
-
-	if (i >= MAX_EXT_TYPES-1) {
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-	}
-
-	extfunc[i] = mod;
-	extfunc[i+1] = NULL;
-	return GNUTLS_E_SUCCESS;
 }
 
 /* Packing of extension data (for use in resumption) */
@@ -689,11 +682,13 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 		    gnutls_ext_unpack_func unpack_func)
 {
 	hello_ext_entry_st *tmp_mod;
-	int ret;
 	unsigned i;
 	unsigned gid = GNUTLS_EXTENSION_MAX+1;
 
-	for (i = 0; extfunc[i] != NULL; i++) {
+	for (i = 0; i < MAX_EXT_TYPES; i++) {
+		if (!extfunc[i])
+			continue;
+
 		if (extfunc[i]->tls_id == id)
 			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
 
@@ -701,7 +696,7 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 			gid = extfunc[i]->gid + 1;
 	}
 
-	if (gid > GNUTLS_EXTENSION_MAX_VALUE)
+	if (gid > GNUTLS_EXTENSION_MAX_VALUE || gid >= sizeof(extfunc)/sizeof(extfunc[0]))
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	tmp_mod = gnutls_calloc(1, sizeof(*tmp_mod));
@@ -720,12 +715,10 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 	tmp_mod->unpack_func = unpack_func;
 	tmp_mod->validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|GNUTLS_EXT_FLAG_EE;
 
-	ret = ext_register(tmp_mod);
-	if (ret < 0) {
-		gnutls_free((void*)tmp_mod->name);
-		gnutls_free(tmp_mod);
-	}
-	return ret;
+	assert(extfunc[gid] == NULL);
+	extfunc[gid] = tmp_mod;
+
+	return 0;
 }
 
 #define VALIDITY_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO| \
@@ -780,7 +773,10 @@ gnutls_session_ext_register(gnutls_session_t session,
 
 	/* reject handling any extensions which modify the TLS handshake
 	 * in any way, or are mapped to an exported API. */
-	for (i = 0; extfunc[i] != NULL; i++) {
+	for (i = 0; i < GNUTLS_EXTENSION_MAX; i++) {
+		if (!extfunc[i])
+			continue;
+
 		if (extfunc[i]->tls_id == id) {
 			if (!(flags & GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL)) {
 				return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
