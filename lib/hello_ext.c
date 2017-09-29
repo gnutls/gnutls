@@ -47,6 +47,7 @@
 #include <ext/dumbfw.h>
 #include <ext/key_share.h>
 #include <ext/etm.h>
+#include <ext/cookie.h>
 #include "extv.h"
 #include <num.h>
 
@@ -80,6 +81,7 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 	&ext_mod_supported_ecc_pf,
 	&ext_mod_sig,
 	&ext_mod_key_share,
+	&ext_mod_cookie,
 #ifdef ENABLE_DTLS_SRTP
 	&ext_mod_srtp,
 #endif
@@ -622,7 +624,7 @@ _gnutls_hello_ext_set_sdata(gnutls_session_t session, extensions_t id,
 
 int
 _gnutls_hello_ext_get_sdata(gnutls_session_t session,
-			     extensions_t id, gnutls_ext_priv_data_t * data)
+			    extensions_t id, gnutls_ext_priv_data_t * data)
 {
 	int i;
 
@@ -640,8 +642,8 @@ _gnutls_hello_ext_get_sdata(gnutls_session_t session,
 
 int
 _gnutls_hello_ext_get_resumed_sdata(gnutls_session_t session,
-				     extensions_t id,
-				     gnutls_ext_priv_data_t * data)
+				    extensions_t id,
+				    gnutls_ext_priv_data_t * data)
 {
 	int i;
 
