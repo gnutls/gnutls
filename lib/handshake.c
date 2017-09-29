@@ -1566,7 +1566,6 @@ read_server_hello(gnutls_session_t session,
 	uint8_t session_id_len = 0;
 	int pos = 0;
 	int ret = 0;
-	gnutls_protocol_t version;
 	int len = datalen;
 	const version_entry_st *vers;
 	gnutls_ext_flags_t ext_parse_flag;
@@ -1580,21 +1579,22 @@ read_server_hello(gnutls_session_t session,
 			      session, data[pos], data[pos + 1]);
 
 	DECR_LEN(len, 2);
-	version = _gnutls_version_get(data[pos], data[pos + 1]);
-	if (_gnutls_version_is_supported(session, version) == 0) {
+	vers = nversion_to_entry(data[pos], data[pos + 1]);
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+	if (_gnutls_version_is_supported(session, vers->id) == 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
 
-	if (_gnutls_set_current_version(session, version) < 0)
+	if (_gnutls_set_current_version(session, vers->id) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
-
-	vers = get_version(session);
 
 	pos += 2;
 
 	DECR_LEN(len, GNUTLS_RANDOM_SIZE);
-	ret = _gnutls_set_server_random(session, version, &data[pos]);
+	ret = _gnutls_set_server_random(session, vers->id, &data[pos]);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

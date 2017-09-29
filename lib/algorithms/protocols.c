@@ -193,6 +193,17 @@ const version_entry_st *version_to_entry(gnutls_protocol_t version)
 	return NULL;
 }
 
+const version_entry_st *nversion_to_entry(uint8_t major, uint8_t minor)
+{
+	const version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++) {
+		if ((p->major == major) && (p->minor == minor))
+			    return p;
+	}
+	return NULL;
+}
+
 static int
 version_is_valid_for_session(gnutls_session_t session,
 			     const version_entry_st *v)

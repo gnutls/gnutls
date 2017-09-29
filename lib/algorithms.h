@@ -45,6 +45,7 @@
 
 /* Functions for version handling. */
 const version_entry_st *version_to_entry(gnutls_protocol_t version);
+const version_entry_st *nversion_to_entry(uint8_t major, uint8_t minor);
 const version_entry_st *_gnutls_version_lowest(gnutls_session_t session);
 
 const version_entry_st *_gnutls_legacy_version_max(gnutls_session_t session);
