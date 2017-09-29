@@ -49,14 +49,15 @@ static void tls_log_func(int level, const char *str)
 
 #define MSG "hello there ppl"
 
-void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
+void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,
 		gnutls_sign_algorithm_t client_sign_algo,
 		const gnutls_datum_t *serv_cert,
 		const gnutls_datum_t *serv_key,
 		const gnutls_datum_t *client_cert,
 		const gnutls_datum_t *client_key,
-		unsigned cert_flags)
+		unsigned cert_flags,
+		unsigned exp_group)
 {
 	int ret;
 	char buffer[256];
@@ -189,6 +190,18 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 		if (ret != (int)client_sign_algo) {
 			fail("%s: cl: got unexpected client signature algorithm: %d/%s\n", name, ret, gnutls_sign_get_name(ret));
 			exit(1);
+		}
+	}
+
+	if (exp_group != 0) {
+		ret = gnutls_group_get(server);
+		if (ret != (int)exp_group) {
+			fail("%s: got unexpected server group: %d/%s\n", name, ret, gnutls_group_get_name(ret));
+		}
+
+		ret = gnutls_group_get(client);
+		if (ret != (int)exp_group) {
+			fail("%s: got unexpected client group: %d/%s\n", name, ret, gnutls_group_get_name(ret));
 		}
 	}
 
