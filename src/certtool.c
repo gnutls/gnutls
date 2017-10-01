@@ -3865,10 +3865,12 @@ void pubkey_keyid(common_info_st * cinfo)
 
 	if (cinfo->hash == GNUTLS_DIG_SHA1 || cinfo->hash == GNUTLS_DIG_UNKNOWN)
 		flags = GNUTLS_KEYID_USE_SHA1; /* be backwards compatible */
+	else if (cinfo->hash == GNUTLS_DIG_SHA512)
+		flags = GNUTLS_KEYID_USE_SHA512;
 	else if (cinfo->hash == GNUTLS_DIG_SHA256)
 		flags = GNUTLS_KEYID_USE_SHA256;
 	else {
-		fprintf(stderr, "Cannot calculate key ID with the provided hash (use sha1, or sha256)\n");
+		fprintf(stderr, "Cannot calculate key ID with the provided hash (use sha1, sha256 or sha512)\n");
 		app_exit(1);
 	}
 
