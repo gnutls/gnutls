@@ -53,6 +53,8 @@
 #include "certtool-args.h"
 #include "certtool-common.h"
 
+#define MAX_HASH_SIZE 64
+
 static FILE *stdlog = NULL;
 
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
@@ -4016,8 +4018,8 @@ static
 void pubkey_keyid(common_info_st * cinfo)
 {
 	gnutls_pubkey_t pubkey;
-	uint8_t fpr[64];
-	char txt[256];
+	uint8_t fpr[MAX_HASH_SIZE];
+	char txt[MAX_HASH_SIZE*2+1];
 	int ret;
 	size_t size, fpr_size;
 	gnutls_datum_t tmp;
@@ -4034,8 +4036,8 @@ void pubkey_keyid(common_info_st * cinfo)
 	else if (default_dig == GNUTLS_DIG_SHA256)
 		flags = GNUTLS_KEYID_USE_SHA256;
 	else {
-		fprintf(stderr, "Cannot calculate key ID with the provided hash\n");
-		exit(1);
+		fprintf(stderr, "Cannot calculate key ID with the provided hash (use sha1, or sha256)\n");
+		app_exit(1);
 	}
 
 	fpr_size = sizeof(fpr);
@@ -4074,8 +4076,8 @@ void certificate_fpr(common_info_st * cinfo)
 	int ret = 0;
 	gnutls_datum_t pem, tmp;
 	unsigned int crt_num;
-	uint8_t fpr[32];
-	char txt[128];
+	uint8_t fpr[MAX_HASH_SIZE];
+	char txt[MAX_HASH_SIZE*2+1];
 	size_t fpr_size;
 
 	crt = load_cert(0, cinfo);
