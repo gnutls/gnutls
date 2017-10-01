@@ -65,6 +65,14 @@ if test "${id}" != "118e72e3655150c895ecbd19b3634179fb4a87c7a25abefcb11f5d66661d
 	exit 1
 fi
 
+id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/data/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha512| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "5e81ba533b1e7b88b3b0834a392c1cd63f8ccbe45f39edf4cb4b6a3e7700b333cfa386c54b1c5704a2b82a20dc417b347bb8f961c339134a91158a134ca6c478"; then
+	echo "Key-ID4 doesn't match the expected: ${id}"
+	exit 1
+fi
+
 #fingerprint
 id=`${VALGRIND} "${CERTTOOL}" --fingerprint --infile "${srcdir}/data/funny-spacing.pem"| tr -d '\r'`
 rc=$?
