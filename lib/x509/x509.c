@@ -2952,7 +2952,9 @@ _gnutls_get_key_id(gnutls_pk_params_st * params,
 	gnutls_digest_algorithm_t hash = GNUTLS_DIG_SHA1;
 	unsigned int digest_len;
 
-	if ((flags & GNUTLS_KEYID_USE_SHA256) || (flags & GNUTLS_KEYID_USE_BEST_KNOWN))
+	if ((flags & GNUTLS_KEYID_USE_SHA512) || (flags & GNUTLS_KEYID_USE_BEST_KNOWN))
+		hash = GNUTLS_DIG_SHA512;
+	else if (flags & GNUTLS_KEYID_USE_SHA256)
 		hash = GNUTLS_DIG_SHA256;
 
 	digest_len =
