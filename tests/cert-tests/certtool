@@ -82,6 +82,14 @@ if test "${id}" != "fc5b45b20c489393a457f177572920ac40bacba9d25cea51200822271eaf
 	exit 1
 fi
 
+id=`${VALGRIND} "${CERTTOOL}" --fingerprint --hash sha512 --infile "${srcdir}/data/funny-spacing.pem"| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "c4880390506a849cd2d8289fb8aea8c189e635aff1054faba58658a0f107472b725672c10d2f7f4ca360528b9433db278f544846e5613f9cd4cb4aa2f56a7894"; then
+	echo "Fingerprint doesn't match the expected: 5"
+	exit 1
+fi
+
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
