@@ -24,6 +24,8 @@ See the end for copying conditions.
 ** p11tool: The options --set-pin and --set-so-pin can be used with all operations
    not only with --initialize.
 
+** certtool: Enable certificate fingerprint generation with sha512 (#295).
+
 ** API and ABI modifications:
 No changes since last version.
 
