@@ -66,6 +66,16 @@ void doit(void)
 	try_with_key_ks("TLS 1.3 with x25519 ed25519 no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-ECDSA:-CURVE-ALL:+CURVE-X25519:-SIGN-ALL:+SIGN-EDDSA-ED25519", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_EDDSA_ED25519, GNUTLS_SIGN_UNKNOWN,
 		&server_ca3_eddsa_cert, &server_ca3_eddsa_key, NULL, NULL, 0, GNUTLS_GROUP_X25519);
 
+	/* client authentication */
+	try_with_key("TLS 1.3 with rsa-pss cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_ECDSA_SECP256R1_SHA256, GNUTLS_SIGN_RSA_PSS_SHA256,
+		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &cli_ca3_rsa_pss_cert, &cli_ca3_rsa_pss_key, USE_CERT);
+	try_with_key("TLS 1.3 with rsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_ECDSA_SECP256R1_SHA256, GNUTLS_SIGN_RSA_PSS_SHA256,
+		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &cli_ca3_cert, &cli_ca3_key, USE_CERT);
+	try_with_key("TLS 1.3 with ecdsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_ECDSA_SECP256R1_SHA256, GNUTLS_SIGN_ECDSA_SECP256R1_SHA256,
+		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, USE_CERT);
+	try_with_key("TLS 1.3 with x25519 ed25519 cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519:-SIGN-ALL:+SIGN-EDDSA-ED25519", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_EDDSA_ED25519, GNUTLS_SIGN_EDDSA_ED25519,
+		&server_ca3_eddsa_cert, &server_ca3_eddsa_key, &server_ca3_eddsa_cert, &server_ca3_eddsa_key, USE_CERT);
+
 	/* TLS 1.3 mis-matching groups */
 	/* Our policy is to send a key share for the first of each type of groups, so make sure
 	 * the server doesn't support them */
