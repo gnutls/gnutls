@@ -79,7 +79,10 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 		goto cleanup;
 	}
 
-	gnutls_sign_algorithm_set_server(session, se->id);
+	if (session->security_parameters.entity == GNUTLS_CLIENT)
+		gnutls_sign_algorithm_set_server(session, se->id);
+	else
+		gnutls_sign_algorithm_set_client(session, se->id);
 
 	buf.data+=2;
 	buf.length-=2;

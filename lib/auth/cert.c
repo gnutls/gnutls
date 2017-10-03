@@ -513,10 +513,10 @@ call_get_cert_callback(gnutls_session_t session,
  * 20020128: added ability to select a certificate depending on the SIGN
  * algorithm (only in automatic mode).
  */
-static int
-select_client_cert(gnutls_session_t session,
-		   uint8_t * _data, size_t _data_size,
-		   gnutls_pk_algorithm_t * pk_algos, int pk_algos_length)
+int
+_gnutls_select_client_cert(gnutls_session_t session,
+			   uint8_t * _data, size_t _data_size,
+			   gnutls_pk_algorithm_t * pk_algos, int pk_algos_length)
 {
 	int result;
 	int indx = -1;
@@ -983,8 +983,8 @@ _gnutls_proc_cert_cert_req(gnutls_session_t session, uint8_t * data,
 	 * he wants to use.
 	 */
 	if ((ret =
-	     select_client_cert(session, p, size, pk_algos,
-				pk_algos_length)) < 0) {
+	     _gnutls_select_client_cert(session, p, size, pk_algos,
+					pk_algos_length)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -1217,9 +1217,6 @@ _gnutls_get_selected_cert(gnutls_session_t session,
 {
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 
-		/* select_client_cert() has been called before.
-		 */
-
 		*apr_cert_list = session->internals.selected_cert_list;
 		*apr_pkey = session->internals.selected_key;
 		*apr_cert_list_length =
@@ -1232,9 +1229,7 @@ _gnutls_get_selected_cert(gnutls_session_t session,
 
 	} else {		/* CLIENT SIDE 
 				 */
-
-		/* we have already decided which certificate
-		 * to send.
+		/* _gnutls_select_client_cert() must have been called before.
 		 */
 		*apr_cert_list = session->internals.selected_cert_list;
 		*apr_cert_list_length =

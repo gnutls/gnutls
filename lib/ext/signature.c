@@ -291,8 +291,8 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 
 	ret =
 	    _gnutls_hello_ext_get_priv(session,
-					 GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
-					 &epriv);
+					GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+					&epriv);
 	priv = epriv;
 
 	if (ret < 0 || !_gnutls_version_has_selectable_sighash(ver)) {
@@ -463,8 +463,8 @@ gnutls_sign_algorithm_get_requested(gnutls_session_t session,
 
 	ret =
 	    _gnutls_hello_ext_get_priv(session,
-					 GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
-					 &epriv);
+					GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+					&epriv);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
