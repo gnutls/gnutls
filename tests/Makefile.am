@@ -97,7 +97,8 @@ libutils_la_LIBADD = ../lib/libgnutls.la
 
 indirect_tests =
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
-	tls13/post-handshake-with-cert tls13/post-handshake-without-cert
+	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
+	tls13/cookie
 
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
