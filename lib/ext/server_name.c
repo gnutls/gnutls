@@ -27,6 +27,7 @@
 #include "num.h"
 #include "str.h"
 #include <ext/server_name.h>
+#include "hello_ext_lib.h"
 
 static int _gnutls_server_name_recv_params(gnutls_session_t session,
 					   const uint8_t * data,
@@ -34,16 +35,10 @@ static int _gnutls_server_name_recv_params(gnutls_session_t session,
 static int _gnutls_server_name_send_params(gnutls_session_t session,
 					   gnutls_buffer_st * extdata);
 
-static int _gnutls_server_name_unpack(gnutls_buffer_st * ps,
-				      gnutls_ext_priv_data_t * _priv);
-static int _gnutls_server_name_pack(gnutls_ext_priv_data_t _priv,
-				    gnutls_buffer_st * ps);
-static void _gnutls_server_name_deinit_data(gnutls_ext_priv_data_t priv);
-
 int
 _gnutls_server_name_set_raw(gnutls_session_t session,
-		       gnutls_server_name_type_t type,
-		       const void *name, size_t name_length);
+			    gnutls_server_name_type_t type,
+			    const void *name, size_t name_length);
 
 const hello_ext_entry_st ext_mod_server_name = {
 	.name = "Server Name Indication",
@@ -54,9 +49,9 @@ const hello_ext_entry_st ext_mod_server_name = {
 
 	.recv_func = _gnutls_server_name_recv_params,
 	.send_func = _gnutls_server_name_send_params,
-	.pack_func = _gnutls_server_name_pack,
-	.unpack_func = _gnutls_server_name_unpack,
-	.deinit_func = _gnutls_server_name_deinit_data,
+	.pack_func = _gnutls_hello_ext_default_pack,
+	.unpack_func = _gnutls_hello_ext_default_unpack,
+	.deinit_func = _gnutls_hello_ext_default_deinit,
 	.cannot_be_overriden = 1
 };
 
@@ -76,8 +71,7 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 	const unsigned char *p;
 	uint16_t len, type;
 	ssize_t data_size = _data_size;
-	server_name_ext_st *priv = NULL;
-	gnutls_ext_priv_data_t epriv;
+	gnutls_datum_t name;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		DECR_LENGTH_RET(data_size, 2, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
@@ -114,26 +108,13 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 				if (!_gnutls_dnsname_is_valid((char*)p, len))
 					return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-				if (len < MAX_SERVER_NAME_SIZE) {
-					priv = gnutls_calloc(1, sizeof(*priv));
-					if (priv == NULL) {
-						gnutls_assert();
-						return GNUTLS_E_MEMORY_ERROR;
-					}
+				name.data = (void*)p;
+				name.size = len;
 
-					memcpy(priv->name, p, len);
-					priv->name[len] = 0;
-
-					priv->name_length = len;
-					priv->type =
-					    GNUTLS_NAME_DNS;
-
-					epriv = priv;
-					_gnutls_hello_ext_set_sdata(session,
-						     GNUTLS_EXTENSION_SERVER_NAME,
-						     epriv);
-					return 0;
-				}
+				_gnutls_hello_ext_unset_sdata(session, GNUTLS_EXTENSION_SERVER_NAME);
+				return _gnutls_hello_ext_set_datum(session,
+					     GNUTLS_EXTENSION_SERVER_NAME,
+					     &name);
 			}
 			p += len;
 
@@ -152,27 +133,23 @@ _gnutls_server_name_send_params(gnutls_session_t session,
 				gnutls_buffer_st * extdata)
 {
 	int total_size = 0, ret;
-	server_name_ext_st *priv;
-	gnutls_ext_priv_data_t epriv;
+	gnutls_datum_t name;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session,
-					 GNUTLS_EXTENSION_SERVER_NAME,
-					 &epriv);
+	    _gnutls_hello_ext_get_datum(session, GNUTLS_EXTENSION_SERVER_NAME,
+					&name);
 	if (ret < 0)
 		return 0;
 
 	/* this function sends the client extension data (dnsname)
 	 */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		priv = epriv;
-
-		if (priv->name_length == 0 || priv->type != GNUTLS_NAME_DNS)
+		if (name.size == 0)
 			return 0;
 
 		/* uint8_t + uint16_t + size
 		 */
-		total_size = 2 + 1 + 2 + priv->name_length;
+		total_size = 2 + 1 + 2 + name.size;
 
 		/* UINT16: write total size of all names
 		 */
@@ -191,12 +168,12 @@ _gnutls_server_name_send_params(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		_gnutls_debug_log("HSK[%p]: sent server name: '%s'\n", session, priv->name);
+		_gnutls_debug_log("HSK[%p]: sent server name: '%.*s'\n", session, name.size, name.data);
 
 		ret =
 		    _gnutls_buffer_append_data_prefix
 			    (extdata, 16,
-			     priv->name, priv->name_length);
+			     name.data, name.size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else {
@@ -241,9 +218,8 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 		       unsigned int *type, unsigned int indx)
 {
 	char *_data = data;
-	server_name_ext_st *priv;
+	gnutls_datum_t name;
 	int ret;
-	gnutls_ext_priv_data_t epriv;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		gnutls_assert();
@@ -254,32 +230,27 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session,
-					 GNUTLS_EXTENSION_SERVER_NAME,
-					 &epriv);
+	    _gnutls_hello_ext_get_datum(session, GNUTLS_EXTENSION_SERVER_NAME, &name);
 	if (ret < 0) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	priv = epriv;
-
-	if (priv->name_length == 0) {
+	if (name.size == 0) {
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	*type = priv->type;
+	*type = GNUTLS_NAME_DNS;
 
-	if (*data_length >	/* greater since we need one extra byte for the null */
-	    priv->name_length) {
-		*data_length = priv->name_length;
-		memcpy(data, priv->name, *data_length);
+	if (*data_length > name.size) { /* greater since we need one extra byte for the null */
+		*data_length = name.size;
+		memcpy(data, name.data, *data_length);
 
-		if (*type == GNUTLS_NAME_DNS)	/* null terminate */
-			_data[(*data_length)] = 0;
+		/* null terminate */
+		_data[(*data_length)] = 0;
 
 	} else {
-		*data_length = priv->name_length + 1;
+		*data_length = name.size + 1;
 		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
 		goto cleanup;
 	}
@@ -292,48 +263,24 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 /* This does not do any conversion not perform any check */
 int
 _gnutls_server_name_set_raw(gnutls_session_t session,
-		       gnutls_server_name_type_t type,
-		       const void *name, size_t name_length)
+			    gnutls_server_name_type_t type,
+			    const void *name, size_t name_length)
 {
 	int ret;
-	server_name_ext_st *priv;
-	gnutls_ext_priv_data_t epriv;
-	int set = 0;
+	gnutls_datum_t dname;
 
 	if (name_length >= MAX_SERVER_NAME_SIZE) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret =
-	    _gnutls_hello_ext_get_sdata(session,
-					 GNUTLS_EXTENSION_SERVER_NAME,
-					 &epriv);
-	if (ret < 0) {
-		set = 1;
-	}
+	_gnutls_hello_ext_unset_sdata(session, GNUTLS_EXTENSION_SERVER_NAME);
 
-	if (set != 0) {
-		priv = gnutls_calloc(1, sizeof(*priv));
-		if (priv == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		epriv = priv;
-	} else
-		priv = epriv;
+	dname.data = (void*)name;
+	dname.size = name_length;
 
-	priv->type = type;
-
-	if (name_length > 0) {
-		memcpy(priv->name, name, name_length);
-		priv->name[name_length] = 0;
-	}
-	priv->name_length = name_length;
-
-	if (set != 0)
-		_gnutls_hello_ext_set_sdata(session,
-					     GNUTLS_EXTENSION_SERVER_NAME,
-					     epriv);
+	ret = _gnutls_hello_ext_set_datum(session, GNUTLS_EXTENSION_SERVER_NAME, &dname);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
@@ -394,94 +341,40 @@ gnutls_server_name_set(gnutls_session_t session,
 	return ret;
 }
 
-static void _gnutls_server_name_deinit_data(gnutls_ext_priv_data_t priv)
-{
-	gnutls_free(priv);
-}
-
-static int
-_gnutls_server_name_pack(gnutls_ext_priv_data_t epriv,
-			 gnutls_buffer_st * ps)
-{
-	server_name_ext_st *priv = epriv;
-	int ret;
-
-	BUFFER_APPEND_NUM(ps, priv->type);
-	BUFFER_APPEND_PFX4(ps, priv->name,
-			   priv->name_length);
-	return 0;
-}
-
-static int
-_gnutls_server_name_unpack(gnutls_buffer_st * ps,
-			   gnutls_ext_priv_data_t * _priv)
-{
-	server_name_ext_st *priv;
-	int ret;
-	gnutls_ext_priv_data_t epriv;
-
-	priv = gnutls_calloc(1, sizeof(*priv));
-	if (priv == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	BUFFER_POP_NUM(ps, priv->type);
-	BUFFER_POP_NUM(ps, priv->name_length);
-	if (priv->name_length >=
-	    sizeof(priv->name)) {
-		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
-	}
-	BUFFER_POP(ps, priv->name,
-		   priv->name_length);
-	priv->name[priv->name_length] = 0;
-
-	epriv = priv;
-	*_priv = epriv;
-
-	return 0;
-
-      error:
-	gnutls_free(priv);
-	return ret;
-}
-
 unsigned _gnutls_server_name_matches_resumed(gnutls_session_t session)
 {
-	server_name_ext_st *priv1, *priv2;
+	gnutls_datum_t name1, name2;
 	int ret;
-	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session,
+	    _gnutls_hello_ext_get_datum(session,
 					GNUTLS_EXTENSION_SERVER_NAME,
-					&epriv);
-	if (ret < 0) /* no server name in this session */
-		priv1 = NULL;
-	else
-		priv1 = epriv;
+					&name1);
+	if (ret < 0) { /* no server name in this session */
+		name1.data = NULL;
+		name1.size = 0;
+	}
 
 	ret =
-	    _gnutls_hello_ext_get_resumed_sdata(session,
-						 GNUTLS_EXTENSION_SERVER_NAME,
-						 &epriv);
-	if (ret < 0) /* no server name in extensions */
-		priv2 = NULL;
-	else
-		priv2 = epriv;
+	    _gnutls_hello_ext_get_resumed_datum(session,
+						GNUTLS_EXTENSION_SERVER_NAME,
+						&name2);
+	if (ret < 0) { /* no server name in this session */
+		name2.data = NULL;
+		name2.size = 0;
+	}
 
-	if (priv1 == NULL || priv2 == NULL) {
-		if (priv1 == priv2)
+	if (name1.data == NULL || name2.data == NULL) {
+		if (name1.data == name2.data)
 			return 1;
 		else
 			return 0;
 	}
 
-	if (priv1->name_length != priv2->name_length)
+	if (name1.size != name2.size)
 		return 0;
 
-	if (memcmp(priv1->name, priv2->name, priv1->name_length) != 0)
+	if (memcmp(name1.data, name2.data, name1.size) != 0)
 		return 0;
 
 	return 1;
