@@ -243,8 +243,8 @@ gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t *
  *
  * This function specifies if we (in case of a server) are going to
  * send a certificate request message to the client. If @req is
- * GNUTLS_CERT_REQUIRE then the server will return an error if the
- * peer does not provide a certificate. If you do not call this
+ * GNUTLS_CERT_REQUIRE then the server will return the %GNUTLS_E_NO_CERTIFICATE_FOUND
+ * error if the peer does not provide a certificate. If you do not call this
  * function then the client will not be asked to send a certificate.
  **/
 void

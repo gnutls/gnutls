@@ -47,8 +47,12 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 	}
 
 	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, optional, &buf);
-	if (ret < 0)
+	if (ret < 0) {
+		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET && session->internals.send_cert_req)
+			return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
+
 		return gnutls_assert_val(ret);
+	}
 
 	if (buf.length == 0 && optional) {
 		return 0;
