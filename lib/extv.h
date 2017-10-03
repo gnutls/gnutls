@@ -63,10 +63,12 @@ int _gnutls_extv_append_final(gnutls_buffer_st *buf, unsigned init)
 	return 0;
 }
 
+typedef int (*extv_append_func)(void *ctx, gnutls_buffer_st *buf);
+
 int _gnutls_extv_append(gnutls_buffer_st *buf,
 			uint16_t tls_id,
 		        void *ctx,
-		        int (*cb)(void *ctx, gnutls_buffer_st *buf));
+		        extv_append_func cb);
 
 
 #endif

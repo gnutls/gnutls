@@ -25,6 +25,8 @@
 #include "extv.h"
 #include "handshake.h"
 #include "tls13/certificate_request.h"
+#include "ext/signature.h"
+#include "mbuffers.h"
 
 static
 int parse_cert_extension(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size)
@@ -71,7 +73,64 @@ int _gnutls13_recv_certificate_request(gnutls_session_t session)
 	return 0;
 }
 
+
 int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 {
-	return 0;
+	gnutls_certificate_credentials_t cred;
+	int ret;
+	mbuffer_st *bufel = NULL;
+	gnutls_buffer_st buf;
+	unsigned init_pos;
+
+	if (again == 0) {
+		if (session->internals.send_cert_req == 0)
+			return 0;
+
+		cred = (gnutls_certificate_credentials_t)
+		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+		if (cred == NULL)
+			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+
+		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _gnutls_extv_append_init(&buf);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		init_pos = ret;
+
+		ret = _gnutls_extv_append(&buf, ext_mod_sig.tls_id, session,
+					  (extv_append_func)_gnutls_sign_algorithm_write_params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _gnutls_extv_append_final(&buf, init_pos);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		bufel = _gnutls_buffer_to_mbuffer(&buf);
+
+		session->internals.hsk_flags |= HSK_CRT_REQ_SENT;
+	}
+
+	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
+
+ cleanup:
+	_gnutls_buffer_clear(&buf);
+	return ret;
+
 }
+
