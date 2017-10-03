@@ -196,13 +196,13 @@ static int cert_get_issuer_dn(gnutls_pcert_st * cert, gnutls_datum_t * odn)
 static int
 find_x509_client_cert(gnutls_session_t session,
 	       const gnutls_certificate_credentials_t cred,
-	       uint8_t * _data, size_t _data_size,
+	       const uint8_t * _data, size_t _data_size,
 	       const gnutls_pk_algorithm_t * pk_algos,
 	       int pk_algos_length, int *indx)
 {
 	unsigned size;
 	gnutls_datum_t odn = { NULL, 0 }, asked_dn;
-	uint8_t *data = _data;
+	const uint8_t *data = _data;
 	ssize_t data_size = _data_size;
 	unsigned i, j;
 	int result, cert_pk;
@@ -224,7 +224,7 @@ find_x509_client_cert(gnutls_session_t session,
 		DECR_LENGTH_RET(data_size, size, 0);
 		data += 2;
 
-		asked_dn.data = data;
+		asked_dn.data = (void*)data;
 		asked_dn.size = size;
 		_gnutls_dn_log("Peer requested CA", &asked_dn);
 
@@ -279,7 +279,7 @@ find_x509_client_cert(gnutls_session_t session,
  * certificate request packet.
  */
 static int
-get_issuers_num(gnutls_session_t session, uint8_t * data, ssize_t data_size)
+get_issuers_num(gnutls_session_t session, const uint8_t * data, ssize_t data_size)
 {
 	int issuers_dn_len = 0, result;
 	unsigned size;
@@ -328,7 +328,7 @@ get_issuers_num(gnutls_session_t session, uint8_t * data, ssize_t data_size)
 static int
 get_issuers(gnutls_session_t session,
 	    gnutls_datum_t * issuers_dn, int issuers_len,
-	    uint8_t * data, size_t data_size)
+	    const uint8_t * data, size_t data_size)
 {
 	int i;
 	unsigned size;
@@ -352,7 +352,7 @@ get_issuers(gnutls_session_t session,
 
 			data += 2;
 
-			issuers_dn[i].data = data;
+			issuers_dn[i].data = (void*)data;
 			issuers_dn[i].size = size;
 
 			_gnutls_dn_log("Peer requested CA", &issuers_dn[i]);
@@ -515,13 +515,13 @@ call_get_cert_callback(gnutls_session_t session,
  */
 int
 _gnutls_select_client_cert(gnutls_session_t session,
-			   uint8_t * _data, size_t _data_size,
+			   const uint8_t * _data, size_t _data_size,
 			   gnutls_pk_algorithm_t * pk_algos, int pk_algos_length)
 {
 	int result;
 	int indx = -1;
 	gnutls_certificate_credentials_t cred;
-	uint8_t *data = _data;
+	const uint8_t *data = _data;
 	ssize_t data_size = _data_size;
 	int issuers_dn_length;
 	gnutls_datum_t *issuers_dn = NULL;

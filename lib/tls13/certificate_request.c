@@ -30,11 +30,16 @@
 #include "algorithms.h"
 #include "auth/cert.h"
 
+/* for tlist dereference */
+#include "x509/verify-high.h"
+
+#define EXTID_CERTIFICATE_AUTHORITIES 47
+
 typedef struct crt_req_ctx_st {
 	gnutls_session_t session;
 	gnutls_pk_algorithm_t pk_algos[MAX_ALGOS];
 	unsigned pk_algos_length;
-	uint8_t *rdn;
+	const uint8_t *rdn; /* pointer inside the message buffer */
 	unsigned rdn_size;
 } crt_req_ctx_st;
 
@@ -91,6 +96,17 @@ int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int d
 
 			ctx->pk_algos[ctx->pk_algos_length++] = se->pk;
 		}
+	} else if (tls_id == EXTID_CERTIFICATE_AUTHORITIES) {
+		if (data_size < 3) {
+			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+		}
+
+		ret = _gnutls_read_uint16(data);
+		if (ret != data_size-2)
+			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+
+		ctx->rdn = data+2;
+		ctx->rdn_size = ret;
 	}
 
 	return 0;
@@ -152,10 +168,37 @@ int _gnutls13_recv_certificate_request(gnutls_session_t session)
 
  cleanup:
 	_gnutls_buffer_clear(&buf);
-	gnutls_free(ctx.rdn);
 	return ret;
 }
 
+static
+int write_certificate_authorities(void *ctx, gnutls_buffer_st *buf)
+{
+	gnutls_session_t session = ctx;
+	gnutls_certificate_credentials_t cred;
+
+	if (session->internals.ignore_rdn_sequence != 0)
+		return 0;
+
+	cred = (gnutls_certificate_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+	if (cred->tlist->x509_rdn_sequence.size == 0)
+		return 0;
+
+	return
+	    _gnutls_buffer_append_data_prefix(buf, 16,
+					      cred->
+					      tlist->x509_rdn_sequence.
+					      data,
+					      cred->
+					      tlist->x509_rdn_sequence.
+					      size);
+}
 
 int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 {
@@ -193,6 +236,13 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 
 		ret = _gnutls_extv_append(&buf, ext_mod_sig.tls_id, session,
 					  (extv_append_func)_gnutls_sign_algorithm_write_params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _gnutls_extv_append(&buf, EXTID_CERTIFICATE_AUTHORITIES, session,
+					  write_certificate_authorities);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
