@@ -213,7 +213,8 @@ int hello_ext_parse(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_s
 	}
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if (!_gnutls_hello_ext_is_present(session, ext->gid)) {
+		if (!(ext->validity & GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST) &&
+		    !_gnutls_hello_ext_is_present(session, ext->gid)) {
 			_gnutls_debug_log("EXT[%p]: Received unexpected extension '%s/%d'\n", session,
 					ext->name, (int)tls_id);
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
@@ -301,7 +302,8 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 	ret = _gnutls_hello_ext_is_present(session, p->gid);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		if (ret == 0) /* not advertised */
+		/* if client didn't advertise and the override flag is not present */
+		if (!(p->validity & GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST) && ret == 0)
 			return 0;
 	} else {
 		if (ret != 0) /* already sent */
