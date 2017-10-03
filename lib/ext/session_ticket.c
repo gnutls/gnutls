@@ -298,7 +298,7 @@ session_ticket_recv_params(gnutls_session_t session,
 	int ret;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session,
+	    _gnutls_hello_ext_get_priv(session,
 					 GNUTLS_EXTENSION_SESSION_TICKET,
 					 &epriv);
 	if (ret < 0) {
@@ -396,7 +396,7 @@ session_ticket_send_params(gnutls_session_t session,
 	int ret;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session,
+	    _gnutls_hello_ext_get_priv(session,
 					 GNUTLS_EXTENSION_SESSION_TICKET,
 					 &epriv);
 	if (ret >= 0)
@@ -411,7 +411,7 @@ session_ticket_send_params(gnutls_session_t session,
 		}
 	} else {
 		ret =
-		    _gnutls_hello_ext_get_resumed_sdata(session,
+		    _gnutls_hello_ext_get_resumed_priv(session,
 							 GNUTLS_EXTENSION_SESSION_TICKET,
 							 &epriv);
 		if (ret >= 0)
@@ -562,7 +562,7 @@ int gnutls_session_ticket_enable_client(gnutls_session_t session)
 	priv->session_ticket_enable = 1;
 	epriv = priv;
 
-	_gnutls_hello_ext_set_sdata(session,
+	_gnutls_hello_ext_set_priv(session,
 				     GNUTLS_EXTENSION_SESSION_TICKET,
 				     epriv);
 
@@ -606,7 +606,7 @@ gnutls_session_ticket_enable_server(gnutls_session_t session,
 	memcpy(&priv->key, key->data, key->size);
 	priv->session_ticket_enable = 1;
 
-	_gnutls_hello_ext_set_sdata(session,
+	_gnutls_hello_ext_set_priv(session,
 				     GNUTLS_EXTENSION_SESSION_TICKET,
 				     epriv);
 
@@ -627,7 +627,7 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 
 	if (again == 0) {
 		ret =
-		    _gnutls_hello_ext_get_sdata(session,
+		    _gnutls_hello_ext_get_priv(session,
 						 GNUTLS_EXTENSION_SESSION_TICKET,
 						 &epriv);
 		if (ret < 0)
@@ -717,7 +717,7 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session,
+	    _gnutls_hello_ext_get_priv(session,
 					 GNUTLS_EXTENSION_SESSION_TICKET,
 					 &epriv);
 	if (ret < 0) {

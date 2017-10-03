@@ -100,7 +100,7 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 	} else {		/* CLIENT SIDE - we must check if the sent record size is the right one 
 				 */
 		if (data_size > 0) {
-			ret = _gnutls_hello_ext_get_sdata(session,
+			ret = _gnutls_hello_ext_get_priv(session,
 							   GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 							   &epriv);
 			if (ret < 0) {
@@ -145,7 +145,7 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		gnutls_ext_priv_data_t epriv;
 
-		ret = _gnutls_hello_ext_get_sdata(session,
+		ret = _gnutls_hello_ext_get_priv(session,
 						   GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 						   &epriv);
 		if (ret < 0) {	/* it is ok not to have it */
@@ -305,7 +305,7 @@ ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 	session->security_parameters.max_record_send_size = size;
 	epriv = (void *)(intptr_t)size;
 
-	_gnutls_hello_ext_set_sdata(session,
+	_gnutls_hello_ext_set_priv(session,
 				     GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 				     epriv);
 

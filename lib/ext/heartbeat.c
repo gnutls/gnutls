@@ -56,7 +56,7 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
 	gnutls_ext_priv_data_t epriv;
 
 	epriv = (void*)(intptr_t)type;
-	_gnutls_hello_ext_set_sdata(session, GNUTLS_EXTENSION_HEARTBEAT,
+	_gnutls_hello_ext_set_priv(session, GNUTLS_EXTENSION_HEARTBEAT,
 				     epriv);
 }
 
@@ -79,7 +79,7 @@ unsigned gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
 	if (session->internals.handshake_in_progress != 0)
 		return 0; /* not allowed */
 
-	if (_gnutls_hello_ext_get_sdata
+	if (_gnutls_hello_ext_get_priv
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0)
 		return 0;	/* Not enabled */
 
@@ -444,7 +444,7 @@ _gnutls_heartbeat_recv_params(gnutls_session_t session,
 	unsigned policy;
 	gnutls_ext_priv_data_t epriv;
 
-	if (_gnutls_hello_ext_get_sdata
+	if (_gnutls_hello_ext_get_priv
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0) {
 		if (session->security_parameters.entity == GNUTLS_CLIENT)
 			return
@@ -467,7 +467,7 @@ _gnutls_heartbeat_recv_params(gnutls_session_t session,
 		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	epriv = (void*)(intptr_t)policy;
-	_gnutls_hello_ext_set_sdata(session, GNUTLS_EXTENSION_HEARTBEAT,
+	_gnutls_hello_ext_set_priv(session, GNUTLS_EXTENSION_HEARTBEAT,
 				     epriv);
 
 	return 0;
@@ -480,7 +480,7 @@ _gnutls_heartbeat_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 	uint8_t p;
 
-	if (_gnutls_hello_ext_get_sdata
+	if (_gnutls_hello_ext_get_priv
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0)
 		return 0;	/* nothing to send - not enabled */
 

@@ -43,7 +43,7 @@ _gnutls_hello_ext_get_resumed_datum(gnutls_session_t session,
 /* clear up any set data for the extension */
 #if 0 /* defined in hello_ext.h */
 void
-_gnutls_hello_ext_unset_sdata(gnutls_session_t session,
+_gnutls_hello_ext_unset_priv(gnutls_session_t session,
                               extensions_t id);
 #endif
 

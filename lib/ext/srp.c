@@ -93,7 +93,7 @@ _gnutls_srp_recv_params(gnutls_session_t session, const uint8_t * data,
 			}
 
 			epriv = priv;
-			_gnutls_hello_ext_set_sdata(session,
+			_gnutls_hello_ext_set_priv(session,
 						     GNUTLS_EXTENSION_SRP,
 						     epriv);
 		}
@@ -172,7 +172,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 		}
 
 		epriv = priv;
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRP,
 					     epriv);
 
@@ -203,7 +203,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 		}
 
 		epriv = priv;
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRP,
 					     epriv);
 

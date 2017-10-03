@@ -174,7 +174,7 @@ _gnutls_srtp_recv_params(gnutls_session_t session,
 	uint16_t profile;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0)
 		return 0;
@@ -240,7 +240,7 @@ _gnutls_srtp_send_params(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0)
 		return 0;
@@ -314,7 +314,7 @@ gnutls_srtp_get_selected_profile(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		gnutls_assert();
@@ -353,7 +353,7 @@ int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki)
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0)
 		return
@@ -394,7 +394,7 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		priv = gnutls_calloc(1, sizeof(*priv));
@@ -403,7 +403,7 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		epriv = priv;
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 	} else
 		priv = epriv;
@@ -439,7 +439,7 @@ gnutls_srtp_set_profile(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		priv = gnutls_calloc(1, sizeof(*priv));
@@ -448,7 +448,7 @@ gnutls_srtp_set_profile(gnutls_session_t session,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		epriv = priv;
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 	} else
 		priv = epriv;
@@ -487,7 +487,7 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 	gnutls_srtp_profile_t id;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRTP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRTP,
 					 &epriv);
 	if (ret < 0) {
 		set = 1;
@@ -521,7 +521,7 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 	} while (col != NULL);
 
 	if (set != 0)
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 
 	return 0;

@@ -58,7 +58,7 @@ _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 		return 0;
 	}
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -103,7 +103,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 		return 0;
 	}
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret >= 0)
@@ -203,7 +203,7 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 	sr_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -225,7 +225,7 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 	_gnutls_hello_ext_save_sr(session);
 
 	if (set != 0)
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 
@@ -238,7 +238,7 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 	sr_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -255,7 +255,7 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 	}
 
 	if (set != 0)
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 
@@ -284,7 +284,7 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 		return 0;
 	}
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0
@@ -303,7 +303,7 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 		}
 		epriv = priv;
 
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 	} else {
@@ -357,7 +357,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 		return 0;
 	}
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {
@@ -372,7 +372,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 		}
 		epriv = priv;
 
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 	} else
@@ -436,7 +436,7 @@ unsigned gnutls_safe_renegotiation_status(gnutls_session_t session)
 	sr_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret < 0) {

@@ -38,17 +38,17 @@ int _gnutls_gen_hello_extensions(gnutls_session_t session,
 int _gnutls_hello_ext_init(void);
 void _gnutls_hello_ext_deinit(void);
 
-void _gnutls_hello_ext_sdata_deinit(gnutls_session_t session);
+void _gnutls_hello_ext_priv_deinit(gnutls_session_t session);
 
 /* functions to be used by extensions internally
  */
-void _gnutls_hello_ext_unset_sdata(gnutls_session_t session,
+void _gnutls_hello_ext_unset_priv(gnutls_session_t session,
 				    extensions_t ext);
-void _gnutls_hello_ext_set_sdata(gnutls_session_t session, extensions_t ext,
+void _gnutls_hello_ext_set_priv(gnutls_session_t session, extensions_t ext,
 				  gnutls_ext_priv_data_t);
-int _gnutls_hello_ext_get_sdata(gnutls_session_t session, extensions_t ext,
+int _gnutls_hello_ext_get_priv(gnutls_session_t session, extensions_t ext,
 				 gnutls_ext_priv_data_t *);
-int _gnutls_hello_ext_get_resumed_sdata(gnutls_session_t session,
+int _gnutls_hello_ext_get_resumed_priv(gnutls_session_t session,
 					 extensions_t ext,
 					 gnutls_ext_priv_data_t * data);
 

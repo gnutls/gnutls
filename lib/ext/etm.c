@@ -72,7 +72,7 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 			return 0;
 
 		epriv = (void*)(intptr_t)1;
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 						   GNUTLS_EXTENSION_ETM,
 						   epriv);
 
@@ -121,7 +121,7 @@ _gnutls_ext_etm_send_params(gnutls_session_t session,
 			if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
 				return 0;
 
-			ret = _gnutls_hello_ext_get_sdata(session,
+			ret = _gnutls_hello_ext_get_priv(session,
 							   GNUTLS_EXTENSION_ETM,
 							   &epriv);
 			if (ret < 0 || ((intptr_t)epriv) == 0)

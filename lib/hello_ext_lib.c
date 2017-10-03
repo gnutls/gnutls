@@ -43,7 +43,7 @@ _gnutls_hello_ext_set_datum(gnutls_session_t session,
 {
 	gnutls_ext_priv_data_t epriv;
 
-	if (_gnutls_hello_ext_get_sdata(session, id, &epriv) >= 0)
+	if (_gnutls_hello_ext_get_priv(session, id, &epriv) >= 0)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	if (data->size >= UINT16_MAX)
@@ -56,7 +56,7 @@ _gnutls_hello_ext_set_datum(gnutls_session_t session,
 	_gnutls_write_uint16(data->size, epriv);
 	memcpy(((uint8_t*)epriv)+2, data->data, data->size);
 
-	_gnutls_hello_ext_set_sdata(session, id, epriv);
+	_gnutls_hello_ext_set_priv(session, id, epriv);
 
 	return 0;
 }
@@ -68,7 +68,7 @@ _gnutls_hello_ext_get_datum(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 	int ret;
 
-	ret = _gnutls_hello_ext_get_sdata(session, id, &epriv);
+	ret = _gnutls_hello_ext_get_priv(session, id, &epriv);
 	if (ret < 0 || epriv == NULL)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
@@ -85,7 +85,7 @@ _gnutls_hello_ext_get_resumed_datum(gnutls_session_t session,
 	gnutls_ext_priv_data_t epriv;
 	int ret;
 
-	ret = _gnutls_hello_ext_get_resumed_sdata(session, id, &epriv);
+	ret = _gnutls_hello_ext_get_resumed_priv(session, id, &epriv);
 	if (ret < 0 || epriv == NULL)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 

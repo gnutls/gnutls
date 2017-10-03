@@ -399,7 +399,7 @@ void gnutls_deinit(gnutls_session_t session)
 
 	_gnutls_handshake_internal_state_clear(session);
 	_gnutls_handshake_io_buffer_clear(session);
-	_gnutls_hello_ext_sdata_deinit(session);
+	_gnutls_hello_ext_priv_deinit(session);
 
 	for (i = 0; i < MAX_EPOCH_INDEX; i++)
 		if (session->record_parameters[i] != NULL) {

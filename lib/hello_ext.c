@@ -424,7 +424,7 @@ static int pack_extension(gnutls_session_t session, const hello_ext_entry_st *ex
 	int rval = 0;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, extp->gid,
+	    _gnutls_hello_ext_get_priv(session, extp->gid,
 					 &data);
 	if (ret >= 0 && extp->pack_func != NULL) {
 		BUFFER_APPEND_NUM(packed, extp->gid);
@@ -558,7 +558,7 @@ unset_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *ext, u
 }
 
 void
-_gnutls_hello_ext_unset_sdata(gnutls_session_t session,
+_gnutls_hello_ext_unset_priv(gnutls_session_t session,
 			      extensions_t id)
 {
 	const struct hello_ext_entry_st *ext;
@@ -581,7 +581,7 @@ static void unset_resumed_ext_data(gnutls_session_t session, const struct hello_
 
 /* Deinitializes all data that are associated with TLS extensions.
  */
-void _gnutls_hello_ext_sdata_deinit(gnutls_session_t session)
+void _gnutls_hello_ext_priv_deinit(gnutls_session_t session)
 {
 	unsigned int i;
 	const struct hello_ext_entry_st *ext;
@@ -603,7 +603,7 @@ void _gnutls_hello_ext_sdata_deinit(gnutls_session_t session)
  * private pointer, to allow API additions by individual extensions.
  */
 void
-_gnutls_hello_ext_set_sdata(gnutls_session_t session, extensions_t id,
+_gnutls_hello_ext_set_priv(gnutls_session_t session, extensions_t id,
 			     gnutls_ext_priv_data_t data)
 {
 	const struct hello_ext_entry_st *ext;
@@ -623,7 +623,7 @@ _gnutls_hello_ext_set_sdata(gnutls_session_t session, extensions_t id,
 }
 
 int
-_gnutls_hello_ext_get_sdata(gnutls_session_t session,
+_gnutls_hello_ext_get_priv(gnutls_session_t session,
 			    extensions_t id, gnutls_ext_priv_data_t * data)
 {
 	if (session->internals.ext_data[id].set != 0) {
@@ -636,7 +636,7 @@ _gnutls_hello_ext_get_sdata(gnutls_session_t session,
 }
 
 int
-_gnutls_hello_ext_get_resumed_sdata(gnutls_session_t session,
+_gnutls_hello_ext_get_resumed_priv(gnutls_session_t session,
 				    extensions_t id,
 				    gnutls_ext_priv_data_t * data)
 {
@@ -853,7 +853,7 @@ gnutls_ext_set_data(gnutls_session_t session, unsigned tls_id,
 	if (id == GNUTLS_EXTENSION_INVALID)
 		return;
 
-	_gnutls_hello_ext_set_sdata(session, id, data);
+	_gnutls_hello_ext_set_priv(session, id, data);
 }
 
 /**
@@ -876,7 +876,7 @@ gnutls_ext_get_data(gnutls_session_t session,
 	if (id == GNUTLS_EXTENSION_INVALID)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	return _gnutls_hello_ext_get_sdata(session, id, data);
+	return _gnutls_hello_ext_get_priv(session, id, data);
 }
 
 /**

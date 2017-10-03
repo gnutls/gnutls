@@ -128,7 +128,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 	unsigned init_pos;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP,
 					 &epriv);
 	if (ret < 0) {		/* peer didn't send a username */
 		gnutls_assert();
@@ -253,7 +253,7 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 	srp_ext_st *priv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP,
 					 &epriv);
 	if (ret < 0) {		/* peer didn't send a username */
 		gnutls_assert();
@@ -885,7 +885,7 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 	srp_ext_st *priv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session, GNUTLS_EXTENSION_SRP,
+	    _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_SRP,
 					 &epriv);
 	if (ret < 0) {
 		gnutls_assert();

@@ -206,7 +206,7 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 	if (_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL)
 		return 0;
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_STATUS_REQUEST,
 					   &epriv);
 
@@ -221,7 +221,7 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 		if (priv == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		_gnutls_hello_ext_set_sdata(session,
+		_gnutls_hello_ext_set_priv(session,
 					     GNUTLS_EXTENSION_STATUS_REQUEST,
 					     epriv);
 
@@ -237,7 +237,7 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
 	status_request_ext_st *priv;
 	int ret;
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_STATUS_REQUEST,
 					   &epriv);
 	if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
@@ -288,7 +288,7 @@ gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 	if (priv == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	_gnutls_hello_ext_set_sdata(session,
+	_gnutls_hello_ext_set_priv(session,
 				     GNUTLS_EXTENSION_STATUS_REQUEST,
 				     epriv);
 
@@ -321,7 +321,7 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = _gnutls_hello_ext_get_sdata(session,
+	ret = _gnutls_hello_ext_get_priv(session,
 					   GNUTLS_EXTENSION_STATUS_REQUEST,
 					   &epriv);
 	if (ret < 0)
@@ -557,7 +557,7 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 
 	if (again == 0) {
 		ret =
-		    _gnutls_hello_ext_get_sdata(session,
+		    _gnutls_hello_ext_get_priv(session,
 						 GNUTLS_EXTENSION_STATUS_REQUEST,
 						 &epriv);
 		if (ret < 0)
@@ -599,7 +599,7 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 	gnutls_ext_priv_data_t epriv;
 
 	ret =
-	    _gnutls_hello_ext_get_sdata(session,
+	    _gnutls_hello_ext_get_priv(session,
 					 GNUTLS_EXTENSION_STATUS_REQUEST,
 					 &epriv);
 	if (ret < 0)

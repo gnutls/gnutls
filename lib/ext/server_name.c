@@ -111,7 +111,7 @@ _gnutls_server_name_recv_params(gnutls_session_t session,
 				name.data = (void*)p;
 				name.size = len;
 
-				_gnutls_hello_ext_unset_sdata(session, GNUTLS_EXTENSION_SERVER_NAME);
+				_gnutls_hello_ext_unset_priv(session, GNUTLS_EXTENSION_SERVER_NAME);
 				return _gnutls_hello_ext_set_datum(session,
 					     GNUTLS_EXTENSION_SERVER_NAME,
 					     &name);
@@ -273,7 +273,7 @@ _gnutls_server_name_set_raw(gnutls_session_t session,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	_gnutls_hello_ext_unset_sdata(session, GNUTLS_EXTENSION_SERVER_NAME);
+	_gnutls_hello_ext_unset_priv(session, GNUTLS_EXTENSION_SERVER_NAME);
 
 	dname.data = (void*)name;
 	dname.size = name_length;
@@ -322,7 +322,7 @@ gnutls_server_name_set(gnutls_session_t session,
 	}
 
 	if (name_length == 0) { /* unset extension */
-		_gnutls_hello_ext_unset_sdata(session, GNUTLS_EXTENSION_SERVER_NAME);
+		_gnutls_hello_ext_unset_priv(session, GNUTLS_EXTENSION_SERVER_NAME);
 		return 0;
 	}
 
