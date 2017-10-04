@@ -235,24 +235,32 @@ int _gnutls_gen_client_random(gnutls_session_t session)
 }
 
 static
-int _gnutls_set_server_random(gnutls_session_t session, int version, uint8_t * rnd)
+int _gnutls_set_server_random(gnutls_session_t session, const version_entry_st *vers, uint8_t * rnd)
 {
+	const version_entry_st *max;
+
 	memcpy(session->security_parameters.server_random, rnd,
 	       GNUTLS_RANDOM_SIZE);
 
 	/* check whether the server random value is set according to
 	 * to TLS 1.3. p4.1.3 requirements */
-	if (!IS_DTLS(session) && version <= GNUTLS_TLS1_2 &&
-	    _gnutls_version_is_supported(session, GNUTLS_TLS1_3)) {
-		if (version == GNUTLS_TLS1_2 &&
-		    memcmp(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+	if (!IS_DTLS(session) && vers->id <= GNUTLS_TLS1_2) {
+
+		max = _gnutls_version_max(session);
+		if (max->id <= GNUTLS_TLS1_2)
+			return 0;
+
+		if (vers->id == GNUTLS_TLS1_2 &&
+		    memcmp(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8],
 		    "\x44\x4F\x57\x4E\x47\x52\x44\x01", 8) == 0) {
+
 			_gnutls_audit_log(session,
 				  "Detected downgrade to TLS 1.2 from TLS 1.3\n");
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-		} else if (version <= GNUTLS_TLS1_1 &&
-			   memcmp(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+		} else if (vers->id <= GNUTLS_TLS1_1 &&
+			   memcmp(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8],
 			   "\x44\x4F\x57\x4E\x47\x52\x44\x00", 8) == 0) {
+
 			_gnutls_audit_log(session,
 				  "Detected downgrade to TLS 1.1 or earlier from TLS 1.3\n");
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
@@ -265,6 +273,7 @@ int _gnutls_set_server_random(gnutls_session_t session, int version, uint8_t * r
 int _gnutls_gen_server_random(gnutls_session_t session, int version)
 {
 	int ret;
+	const version_entry_st *max;
 
 	if (session->internals.sc_random_set != 0) {
 		memcpy(session->security_parameters.server_random,
@@ -274,19 +283,20 @@ int _gnutls_gen_server_random(gnutls_session_t session, int version)
 		return 0;
 	}
 
-	if (!IS_DTLS(session) && _gnutls_version_is_supported(session, GNUTLS_TLS1_3) &&
+	max = _gnutls_version_max(session);
+
+	if (!IS_DTLS(session) && max->id >= GNUTLS_TLS1_3 &&
 	    version <= GNUTLS_TLS1_2) {
 		if (version == GNUTLS_TLS1_2) {
-			memcpy(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+			memcpy(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8],
 				"\x44\x4F\x57\x4E\x47\x52\x44\x01", 8);
-			ret =
-			    gnutls_rnd(GNUTLS_RND_NONCE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE-8);
 		} else {
-			memcpy(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8-1],
+			memcpy(&session->security_parameters.server_random[GNUTLS_RANDOM_SIZE-8],
 				"\x44\x4F\x57\x4E\x47\x52\x44\x00", 8);
-			ret =
-			    gnutls_rnd(GNUTLS_RND_NONCE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE-8);
 		}
+		ret =
+		    gnutls_rnd(GNUTLS_RND_NONCE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE-8);
+
 	} else {
 		ret =
 		    gnutls_rnd(GNUTLS_RND_NONCE, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
@@ -1629,7 +1639,7 @@ read_server_hello(gnutls_session_t session,
 	pos += 2;
 
 	DECR_LEN(len, GNUTLS_RANDOM_SIZE);
-	ret = _gnutls_set_server_random(session, vers->id, &data[pos]);
+	ret = _gnutls_set_server_random(session, vers, &data[pos]);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
