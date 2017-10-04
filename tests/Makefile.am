@@ -98,7 +98,8 @@ libutils_la_LIBADD = ../lib/libgnutls.la
 indirect_tests =
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
-	tls13/cookie
+	tls13/cookie tls12-rollback-detection tls11-rollback-detection \
+	tls12-check-rollback-val tls11-check-rollback-val
 
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
@@ -197,6 +198,22 @@ endif
 fips_mode_pthread_LDADD = $(LDADD) -lpthread
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
+
+tls12_rollback_detection_CFLAGS = -DTLS12
+tls12_rollback_detection_SOURCES = tls13/rnd-rollback-detection.c
+tls12_rollback_detection_LDADD = $(LDADD) ../gl/libgnu.la
+
+tls11_rollback_detection_CFLAGS = -DTLS11
+tls11_rollback_detection_SOURCES = tls13/rnd-rollback-detection.c
+tls11_rollback_detection_LDADD = $(LDADD) ../gl/libgnu.la
+
+tls12_check_rollback_val_CFLAGS = -DTLS12
+tls12_check_rollback_val_SOURCES = tls13/rnd-check-rollback-val.c
+tls12_check_rollback_val_LDADD = $(LDADD) ../gl/libgnu.la
+
+tls11_check_rollback_val_CFLAGS = -DTLS11
+tls11_check_rollback_val_SOURCES = tls13/rnd-check-rollback-val.c
+tls11_check_rollback_val_LDADD = $(LDADD) ../gl/libgnu.la
 
 # These tests need gnulib for memmem()
 tls12_resume_psk_CFLAGS = -DUSE_PSK -DTLS12
