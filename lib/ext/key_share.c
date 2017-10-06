@@ -627,7 +627,6 @@ key_share_recv_params(gnutls_session_t session,
 	return 0;
 }
 
-#define MAX_GROUPS 3
 /* returns data_size or a negative number on failure
  */
 static int
@@ -638,7 +637,6 @@ key_share_send_params(gnutls_session_t session,
 	int ret;
 	unsigned char *lengthp;
 	unsigned int cur_length;
-	gnutls_pk_algorithm_t selected_groups[MAX_GROUPS];
 	unsigned int generated = 0;
 	const gnutls_group_entry_st *group;
 	const version_entry_st *ver;
@@ -669,29 +667,40 @@ key_share_send_params(gnutls_session_t session,
 				return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
-		} else
-		/* generate key shares for out top-3 groups
-		 * if they are of different PK type. */
-		for (i=0;i<session->internals.priorities->groups.size;i++) {
-			group = session->internals.priorities->groups.entry[i];
+		} else {
+			gnutls_pk_algorithm_t selected_groups[3];
+			unsigned max_groups = 2; /* GNUTLS_KEY_SHARE_TOP2 */
 
-			if (generated == 1 && group->pk == selected_groups[0])
-				continue;
-			else if (generated == 2 && (group->pk == selected_groups[1] || group->pk == selected_groups[0]))
-				continue;
+			if (session->internals.flags & GNUTLS_KEY_SHARE_TOP)
+				max_groups = 1;
+			else if (session->internals.flags & GNUTLS_KEY_SHARE_TOP3)
+				max_groups = 3;
 
-			selected_groups[generated] = group->pk;
+			assert(max_groups <= sizeof(selected_groups)/sizeof(selected_groups[0]));
 
-			ret = client_gen_key_share(session, group, extdata);
-			if (ret == GNUTLS_E_INT_RET_0)
-				continue; /* no key share for this algorithm */
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			/* generate key shares for out top-(max_groups) groups
+			 * if they are of different PK type. */
+			for (i = 0; i < session->internals.priorities->groups.size; i++) {
+				group = session->internals.priorities->groups.entry[i];
 
-			generated++;
+				if (generated == 1 && group->pk == selected_groups[0])
+					continue;
+				else if (generated == 2 && (group->pk == selected_groups[1] || group->pk == selected_groups[0]))
+					continue;
 
-			if (generated >= MAX_GROUPS)
-				break;
+				selected_groups[generated] = group->pk;
+
+				ret = client_gen_key_share(session, group, extdata);
+				if (ret == GNUTLS_E_INT_RET_0)
+					continue; /* no key share for this algorithm */
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				generated++;
+
+				if (generated >= max_groups)
+					break;
+			}
 		}
 
 		/* copy actual length */

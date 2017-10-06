@@ -361,10 +361,23 @@ typedef enum {
  * @GNUTLS_ENABLE_FALSE_START: Enable the TLS false start on client side if the negotiated ciphersuites allow it. This will enable sending data prior to the handshake being complete, and may introduce a risk of crypto failure when combined with certain key exchanged; for that GnuTLS may not enable that option in ciphersuites that are known to be not safe for false start. Since 3.5.0.
  * @GNUTLS_FORCE_CLIENT_CERT: When in client side and only a single cert is specified, send that certificate irrespective of the issuers expected by the server. Since 3.5.0.
  * @GNUTLS_NO_TICKETS: Flag to indicate that the session should not use resumption with session tickets.
+ * @GNUTLS_KEY_SHARE_TOP3: Generate key shared for the top-3 different groups which are enabled.
+ *   That is, as each group is associated with a key type (EC, finite field, x25519), generate
+ *   three keys using %GNUTLS_PK_DH, %GNUTLS_PK_EC, %GNUTLS_PK_ECDH_X25519 if all of them are enabled.
+ * @GNUTLS_KEY_SHARE_TOP2: Generate key shared for the top-2 different groups which are enabled.
+ *   For example (ECDH + x25519). This is the default.
+ * @GNUTLS_KEY_SHARE_TOP: Generate key shared for the first group which is enabled.
+ *   For example x25519. This option is the most performant for client (less CPU spent
+ *   generating keys), but if the server doesn't support the advertized option it may
+ *   result to more roundtrips needed to discover the server's choice.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
  * exclusive.
+ *
+ * The key share options relate to the TLS 1.3 key share extension
+ * which is a speculative key generation expecting that the server
+ * would support the generated key.
  */
 typedef enum {
 	GNUTLS_SERVER = 1,
@@ -377,7 +390,10 @@ typedef enum {
 	GNUTLS_ALLOW_ID_CHANGE = (1<<7),
 	GNUTLS_ENABLE_FALSE_START = (1<<8),
 	GNUTLS_FORCE_CLIENT_CERT = (1<<9),
-	GNUTLS_NO_TICKETS = (1<<10)
+	GNUTLS_NO_TICKETS = (1<<10),
+	GNUTLS_KEY_SHARE_TOP = (1<<11),
+	GNUTLS_KEY_SHARE_TOP2 = (1<<12),
+	GNUTLS_KEY_SHARE_TOP3 = (1<<13)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls
