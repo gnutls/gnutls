@@ -15,9 +15,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this file; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
 
 SUBDIRS = . cert-tests slow
 
@@ -99,7 +99,7 @@ indirect_tests =
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
 	tls13/cookie tls13/key_share tls12-rollback-detection tls11-rollback-detection \
-	tls12-check-rollback-val tls11-check-rollback-val
+	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value
 
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
