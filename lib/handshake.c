@@ -1868,9 +1868,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		/* Generate random data 
 		 */
-		if (!IS_DTLS(session)
-		    || session->internals.dtls.hsk_hello_verify_requests ==
-		    0) {
+		if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED) &&
+		    !(IS_DTLS(session) && session->internals.dtls.hsk_hello_verify_requests == 0)) {
 			ret = _gnutls_gen_client_random(session);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
