@@ -124,7 +124,7 @@ static unsigned server_hello_ok = 0;
 
 #define TLS_EXT_POST_HANDSHAKE 49
 
-static void parse_ext(gnutls_datum_t *msg)
+static void parse_ext(void *priv, gnutls_datum_t *msg)
 {
 	if (msg->size != 0) {
 		fail("error in extension length: %d\n", (int)msg->size);
@@ -135,7 +135,7 @@ static int hellos_callback(gnutls_session_t session, unsigned int htype,
 	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
 {
 	if (htype == GNUTLS_HANDSHAKE_SERVER_HELLO && post == GNUTLS_HOOK_POST) {
-		if (find_server_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL)) {
+		if (find_server_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL, NULL)) {
 			fail("Post handshake extension seen in server hello!\n");
 		}
 		server_hello_ok = 1;
@@ -146,7 +146,7 @@ static int hellos_callback(gnutls_session_t session, unsigned int htype,
 	if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO || post != GNUTLS_HOOK_PRE)
 		return 0;
 
-	if (find_client_extension(msg, TLS_EXT_POST_HANDSHAKE, parse_ext))
+	if (find_client_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL, parse_ext))
 		client_hello_ok = 1;
 	else
 		fail("Post handshake extension NOT seen in client hello!\n");

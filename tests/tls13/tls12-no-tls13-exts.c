@@ -125,11 +125,11 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 	if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO || post != GNUTLS_HOOK_PRE)
 		return 0;
 
-	if (find_client_extension(msg, TLS_EXT_SUPPORTED_VERSIONS, NULL)) {
+	if (find_client_extension(msg, TLS_EXT_SUPPORTED_VERSIONS, NULL, NULL)) {
 		fail("Found TLS 1.3 supported versions extension in TLS 1.2!\n");
 	}
 
-	if (find_client_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL)) {
+	if (find_client_extension(msg, TLS_EXT_POST_HANDSHAKE, NULL, NULL)) {
 		fail("Found TLS 1.3 supported versions extension in TLS 1.2!\n");
 	}
 
