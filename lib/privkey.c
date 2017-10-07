@@ -962,9 +962,13 @@ gnutls_privkey_export_x509(gnutls_privkey_t pkey,
  * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
  *
  * This function will generate a random private key. Note that this
- * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
- * instructs the key generation process to use algorithms which generate
- * provable parameters out of a seed.
+ * function must be called on an initialized private key.
+ *
+ * The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
+ * instructs the key generation process to use algorithms like Shawe-Taylor
+ * (from FIPS PUB186-4) which generate provable parameters out of a seed
+ * for RSA and DSA keys. See gnutls_privkey_generate2() for more
+ * information.
  *
  * Note that when generating an elliptic curve key, the curve
  * can be substituted in the place of the bits parameter using the
@@ -975,6 +979,8 @@ gnutls_privkey_export_x509(gnutls_privkey_t pkey,
  * the GNUTLS_SUBGROUP_TO_BITS() macro.
  *
  * It is recommended to do not set the number of @bits directly, use gnutls_sec_param_to_pk_bits() instead .
+ *
+ * See also gnutls_privkey_generate2().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -999,15 +1005,30 @@ gnutls_privkey_generate(gnutls_privkey_t pkey,
  * @data_size: The number of @data available.
  *
  * This function will generate a random private key. Note that this
- * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
+ * function must be called on an initialized private key.
+ *
+ * The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
  * instructs the key generation process to use algorithms like Shawe-Taylor
- * which generate provable parameters out of a seed.
+ * (from FIPS PUB186-4) which generate provable parameters out of a seed
+ * for RSA and DSA keys. On DSA keys the PQG parameters are generated using the
+ * seed, while on RSA the two primes. To specify an explicit seed
+ * (by default a random seed is used), use the @data with a %GNUTLS_KEYGEN_SEED
+ * type.
  *
  * Note that when generating an elliptic curve key, the curve
  * can be substituted in the place of the bits parameter using the
  * GNUTLS_CURVE_TO_BITS() macro.
  *
- * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
+ * To export the generated keys in memory or in files it is recommended to use the
+ * PKCS#8 form as it can handle all key types, and can store additional parameters
+ * such as the seed, in case of provable RSA or DSA keys.
+ * Generated keys can be exported in memory using gnutls_privkey_export_x509(),
+ * and then with gnutls_x509_privkey_export2_pkcs8().
+ *
+ * If key generation is part of your application, avoid setting the number
+ * of bits directly, and instead use gnutls_sec_param_to_pk_bits().
+ * That way the generated keys will adapt to the security levels
+ * of the underlying GnuTLS library.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

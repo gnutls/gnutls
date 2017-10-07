@@ -61,6 +61,15 @@ either by setting the global PIN function
 (@funcref{gnutls_pkcs11_set_pin_function}), or better with the targetted to
 structures functions such as @funcref{gnutls_privkey_set_pin_function}.
 
+
+@subsection Key generation
+
+All supported key types (including RSA, DSA, ECDSA, Ed25519) can be generated
+with GnuTLS. They can be generated with the simpler @funcref{gnutls_privkey_generate}
+or with the more advanced @funcref{gnutls_privkey_generate2}.
+
+@showfuncdesc{gnutls_privkey_generate2}
+
 @node Cryptographic Message Syntax / PKCS#7
 @section Cryptographic Message Syntax / PKCS#7
 @cindex public key algorithms

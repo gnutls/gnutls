@@ -1214,7 +1214,7 @@ void gnutls_x509_privkey_set_flags(gnutls_x509_privkey_t key, unsigned int flags
  * @GNUTLS_KEYGEN_DIGEST: The size field specifies the hash algorithm to be used in key generation.
  * @GNUTLS_KEYGEN_SPKI: data points to a %gnutls_x509_spki_t structure; it is not used after the key generation call.
  *
- * Enumeration of different key exchange algorithms.
+ * Enumeration of different key generation data options.
  */
 typedef enum {
 	GNUTLS_KEYGEN_SEED = 1,
