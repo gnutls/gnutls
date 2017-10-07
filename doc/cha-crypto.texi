@@ -11,6 +11,7 @@ to the random number generation. For a low-level crypto API the usage of nettle
 @menu
 * Symmetric algorithms::
 * Public key algorithms::
+* Cryptographic Message Syntax / PKCS#7::
 * Hash and MAC functions::
 * Random number generation::
 * Overriding algorithms::
@@ -41,28 +42,55 @@ and addition in transparent way.
 @section Public key algorithms
 @cindex public key algorithms
 
-Public key cryptography algorithms such as RSA, DSA and ECDSA, can be
+Public key cryptography algorithms such as RSA, DSA and ECDSA, are
 accessed using the abstract key API in @ref{Abstract key types}. This
 is a high level API with the advantage of transparently handling keys
-in memory and keys present in smart cards.
+stored in memory and keys present in smart cards.
 
-@subsection PKCS #7 signing
-@cindex PKCS #7
+@showfuncF{gnutls_privkey_init,gnutls_privkey_import_url,gnutls_privkey_import_x509_raw,gnutls_privkey_sign_data,gnutls_privkey_sign_hash,gnutls_privkey_deinit}
+
+@showfuncF{gnutls_pubkey_init,gnutls_pubkey_import_url,gnutls_pubkey_import_x509,gnutls_pubkey_verify_data2,gnutls_pubkey_verify_hash2,gnutls_pubkey_deinit}
+
+Keys stored in memory can be imported using functions like
+@funcref{gnutls_privkey_import_x509_raw}, while keys on smart cards or HSMs
+should be imported using their PKCS#11 URL with
+@funcref{gnutls_privkey_import_url}.
+
+If any of the smart card operations require PIN, that should be provided
+either by setting the global PIN function
+(@funcref{gnutls_pkcs11_set_pin_function}), or better with the targetted to
+structures functions such as @funcref{gnutls_privkey_set_pin_function}.
+
+@node Cryptographic Message Syntax / PKCS#7
+@section Cryptographic Message Syntax / PKCS#7
+@cindex public key algorithms
+@cindex cryptographic message syntax
 @cindex file signing
+@cindex CMS
+@cindex PKCS #7
 
-The PKCS #7 format is common format used for digital signatures. It allows to sign
+The CMS or PKCS #7 format is a commonly used format for digital signatures.
+PKCS #7 is the name of the original standard when published by RSA, though
+today the standard is adopted by IETF under the name CMS.
+
+The standards include multiple ways of signing a digital document, e.g.,
 by embedding the data into the signature, or creating detached signatures of the data,
-including a timestamp, additional certificates etc. In certain cases this format is also
-used to transport lists of certificates and CRLs.
+including a timestamp, additional certificates etc. In certain cases the
+same format is also used to transport lists of certificates and CRLs.
 
-The basic functions to initialize, deinitialize, import, export or print information
-about a PKCS #7 structure are shown below.
+It is a relatively popular standard to sign structures, and is being used to
+sign in PDF files, as well as for signing kernel modules and other
+structures.
+
+In GnuTLS, the basic functions to initialize, deinitialize, import, export or print information
+about a PKCS #7 structure are listed below.
 @showfuncE{gnutls_pkcs7_init,gnutls_pkcs7_deinit,gnutls_pkcs7_export2,gnutls_pkcs7_import,gnutls_pkcs7_print}
 
 The following functions allow the verification of a structure using either a trust list, or
 individual certificates. The @funcref{gnutls_pkcs7_sign} function is the data signing function.
 
 @showfuncB{gnutls_pkcs7_verify_direct,gnutls_pkcs7_verify}
+
 @showfuncdesc{gnutls_pkcs7_sign}
 
 @showenumdesc{gnutls_pkcs7_sign_flags,Flags applicable to gnutls_pkcs7_sign()}
