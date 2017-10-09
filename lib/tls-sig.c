@@ -215,14 +215,11 @@ _gnutls_handshake_verify_data10(gnutls_session_t session,
 	gnutls_pk_algorithm_t pk_algo;
 
 	pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
-	if (pk_algo == GNUTLS_PK_RSA) {
-		hash_algo = GNUTLS_DIG_MD5_SHA1;
+	if (pk_algo == GNUTLS_PK_RSA)
 		verify_flags |= GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA;
-	} else {
-		hash_algo = GNUTLS_DIG_SHA1;
-		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
-			sign_algo = gnutls_pk_to_sign(pk_algo, hash_algo);
-		}
+	hash_algo = _gnutls_pk_get_tls10_digest(pk_algo);
+	if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
+		sign_algo = gnutls_pk_to_sign(pk_algo, hash_algo);
 	}
 
 	me = hash_to_entry(hash_algo);
@@ -466,6 +463,7 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 	gnutls_datum_t dconcat;
 	const version_entry_st *ver = get_version(session);
 	gnutls_pk_algorithm_t pk_algo;
+	gnutls_digest_algorithm_t hash_algo;
 	const mac_entry_st *me;
 	unsigned key_usage;
 
@@ -507,14 +505,11 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 
 	/* TLS 1.0 and TLS 1.1 */
 	pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
-	if (pk_algo == GNUTLS_PK_RSA) {
-		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
+	if (pk_algo == GNUTLS_PK_RSA)
 		verify_flags |= GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA;
-		sign_algo = GNUTLS_SIGN_UNKNOWN;
-	} else {
-		me = hash_to_entry(GNUTLS_DIG_SHA1);
-		sign_algo = gnutls_pk_to_sign(pk_algo, GNUTLS_DIG_SHA1);
-	}
+	hash_algo = _gnutls_pk_get_tls10_digest(pk_algo);
+	me = hash_to_entry(hash_algo);
+	sign_algo = gnutls_pk_to_sign(pk_algo, hash_algo);
 	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {
 		gnutls_assert();
@@ -676,6 +671,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 	const version_entry_st *ver = get_version(session);
 	gnutls_pk_algorithm_t pk =
 	    gnutls_privkey_get_pk_algorithm(pkey, NULL);
+	gnutls_digest_algorithm_t hash_algo;
 	const mac_entry_st *me;
 	unsigned key_usage = 0;
 
@@ -707,10 +703,11 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 							pkey, signature);
 #endif
 
-	if (pk == GNUTLS_PK_RSA)
-		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
-	else
-		me = hash_to_entry(GNUTLS_DIG_SHA1);
+	hash_algo = _gnutls_pk_get_tls10_digest(pk);
+	if (unlikely(hash_algo == GNUTLS_DIG_UNKNOWN))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	me = hash_to_entry(hash_algo);
 
 	ret = _gnutls_hash_init(&td_sha, me);
 	if (ret < 0) {

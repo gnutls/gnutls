@@ -106,6 +106,7 @@ struct gnutls_pk_entry {
 	gnutls_pk_algorithm_t id;
 	gnutls_ecc_curve_t curve; /* to map PK to specific OID, we need to know the curve for EdDSA */
 	bool no_prehashed; /* non-zero if the algorithm cannot sign pre-hashed data */
+	gnutls_digest_algorithm_t tls10_digest;
 };
 typedef struct gnutls_pk_entry gnutls_pk_entry;
 
@@ -113,33 +114,47 @@ static const gnutls_pk_entry pk_algorithms[] = {
 	/* having duplicate entries is ok, as long as the one
 	 * we want to return OID from is first */
 	{ .name = "RSA", .oid = PK_PKIX1_RSA_OID, .id = GNUTLS_PK_RSA,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_MD5_SHA1 },
 	{ .name = "RSA-PSS", .oid = PK_PKIX1_RSA_PSS_OID, .id = GNUTLS_PK_RSA_PSS,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_MD5_SHA1 },
 	{ .name = "RSA (X.509)", .oid = PK_X509_RSA_OID, .id = GNUTLS_PK_RSA,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },	/* some certificates use this OID for RSA */
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_MD5_SHA1 },	/* some certificates use this OID for RSA */
 	{ .name = "RSA-MD5", .oid = SIG_RSA_MD5_OID, .id = GNUTLS_PK_RSA,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },	/* some other broken certificates set RSA with MD5 as an indicator of RSA */
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_MD5_SHA1 },	/* some other broken certificates set RSA with MD5 as an indicator of RSA */
 	{ .name = "RSA-SHA1", .oid = SIG_RSA_SHA1_OID, .id = GNUTLS_PK_RSA,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_MD5_SHA1 },	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
 	{ .name = "RSA-SHA1", .oid = ISO_SIG_RSA_SHA1_OID, .id = GNUTLS_PK_RSA,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_MD5_SHA1 },	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
 	{ .name = "DSA", .oid = PK_DSA_OID, .id = GNUTLS_PK_DSA,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_SHA1 },
 	{ .name = "GOST R 34.10-2001", .oid = PK_GOST_R3410_2001_OID, .id = GNUTLS_PK_UNKNOWN,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_UNKNOWN },
 	{ .name = "GOST R 34.10-94", .oid = PK_GOST_R3410_94_OID, .id = GNUTLS_PK_UNKNOWN,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_UNKNOWN },
 	{ .name = "EC/ECDSA", .oid = "1.2.840.10045.2.1", .id = GNUTLS_PK_ECDSA,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_SHA1 },
 	{ .name = "EdDSA (Ed25519)", .oid = SIG_EDDSA_SHA512_OID, .id = GNUTLS_PK_EDDSA_ED25519, 
-	  .curve = GNUTLS_ECC_CURVE_ED25519, .no_prehashed = 1 },
+	  .curve = GNUTLS_ECC_CURVE_ED25519, .no_prehashed = 1,
+	  .tls10_digest = GNUTLS_DIG_SHA1 },
 	{ .name = "DH", .oid = NULL, .id = GNUTLS_PK_DH,
-	   .curve = GNUTLS_ECC_CURVE_INVALID },
+	   .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_SHA1 },
 	{ .name = "ECDH (X25519)", .oid = "1.3.101.110", .id = GNUTLS_PK_ECDH_X25519,
-	  .curve = GNUTLS_ECC_CURVE_X25519 },
+	  .curve = GNUTLS_ECC_CURVE_X25519,
+	   .tls10_digest = GNUTLS_DIG_SHA1 },
 	{ .name = "UNKNOWN", .oid = NULL, .id = GNUTLS_PK_UNKNOWN, 
-	  .curve = GNUTLS_ECC_CURVE_INVALID },
+	  .curve = GNUTLS_ECC_CURVE_INVALID,
+	   .tls10_digest = GNUTLS_DIG_UNKNOWN },
 	{0, 0, 0, 0}
 };
 
@@ -271,6 +286,26 @@ bool _gnutls_pk_is_not_prehashed(gnutls_pk_algorithm_t algorithm)
 		}
 
 	return 0;
+}
+
+/**
+ * _gnutls_pk_get_tls10_digest:
+ * @algorithm: is a public key algorithm
+ *
+ * Returns digest algorithm that should be used in TLS 1.0/1.1 together with this public key algorithm.
+ *
+ * Since: 3.6.0
+ **/
+gnutls_digest_algorithm_t _gnutls_pk_get_tls10_digest(gnutls_pk_algorithm_t algorithm)
+{
+	const gnutls_pk_entry *p;
+
+	for (p = pk_algorithms; p->name != NULL; p++)
+		if (algorithm == p->id) {
+			return p->tls10_digest;
+		}
+
+	return GNUTLS_DIG_UNKNOWN;
 }
 
 /**

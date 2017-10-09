@@ -340,6 +340,8 @@ gnutls_digest_algorithm_t _gnutls_hash_size_to_sha_hash(unsigned int size);
 
 bool _gnutls_pk_is_not_prehashed(gnutls_pk_algorithm_t algorithm);
 
+gnutls_digest_algorithm_t _gnutls_pk_get_tls10_digest(gnutls_pk_algorithm_t algorithm);
+
 /* ECC */
 typedef struct gnutls_ecc_curve_entry_st {
 	const char *name;
