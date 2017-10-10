@@ -318,12 +318,23 @@ pack_certificate_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 
 		BUFFER_APPEND_NUM(ps, info->ncerts);
 
-		for (i = 0; i < info->ncerts; i++)
+		for (i = 0; i < info->ncerts; i++) {
 			BUFFER_APPEND_PFX4(ps,
 					   info->raw_certificate_list[i].
 					   data,
 					   info->raw_certificate_list[i].
 					   size);
+		}
+
+		BUFFER_APPEND_NUM(ps, info->nocsp);
+
+		for (i = 0; i < info->nocsp; i++) {
+			BUFFER_APPEND_PFX4(ps,
+					   info->raw_ocsp_list[i].
+					   data,
+					   info->raw_ocsp_list[i].
+					   size);
+		}
 	}
 
 	/* write the real size */
@@ -344,6 +355,8 @@ unpack_certificate_auth_info(gnutls_session_t session,
 	unsigned int i = 0, j = 0;
 	size_t pack_size;
 	cert_auth_info_t info = NULL;
+	unsigned cur_ncerts = 0;
+	unsigned cur_nocsp = 0;
 
 	BUFFER_POP_NUM(ps, pack_size);
 
@@ -384,6 +397,25 @@ unpack_certificate_auth_info(gnutls_session_t session,
 
 	for (i = 0; i < info->ncerts; i++) {
 		BUFFER_POP_DATUM(ps, &info->raw_certificate_list[i]);
+		cur_ncerts++;
+	}
+
+	/* read OCSP responses */
+	BUFFER_POP_NUM(ps, info->nocsp);
+
+	if (info->nocsp > 0) {
+		info->raw_ocsp_list =
+		    gnutls_calloc(info->nocsp, sizeof(gnutls_datum_t));
+		if (info->raw_ocsp_list == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto error;
+		}
+	}
+
+	for (i = 0; i < info->nocsp; i++) {
+		BUFFER_POP_DATUM(ps, &info->raw_ocsp_list[i]);
+		cur_nocsp++;
 	}
 
 	return 0;
@@ -394,10 +426,16 @@ unpack_certificate_auth_info(gnutls_session_t session,
 		_gnutls_free_datum(&info->dh.generator);
 		_gnutls_free_datum(&info->dh.public_key);
 
-		for (j = 0; j < i; j++)
+		for (j = 0; j < cur_ncerts; j++)
 			_gnutls_free_datum(&info->raw_certificate_list[j]);
 
+		for (j = 0; j < cur_nocsp; j++)
+			_gnutls_free_datum(&info->raw_ocsp_list[j]);
+
 		gnutls_free(info->raw_certificate_list);
+		gnutls_free(info->raw_ocsp_list);
+		info->raw_certificate_list = NULL;
+		info->raw_ocsp_list = NULL;
 	}
 
 	return ret;

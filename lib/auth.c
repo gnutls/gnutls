@@ -363,14 +363,19 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
 			dh_info = &info->dh;
 			for (i = 0; i < info->ncerts; i++) {
-				_gnutls_free_datum(&info->
-						   raw_certificate_list
-						   [i]);
+				_gnutls_free_datum(&info->raw_certificate_list[i]);
+			}
+
+			for (i = 0; i < info->nocsp; i++) {
+				_gnutls_free_datum(&info->raw_ocsp_list[i]);
 			}
 
 			gnutls_free(info->raw_certificate_list);
+			gnutls_free(info->raw_ocsp_list);
 			info->raw_certificate_list = NULL;
+			info->raw_ocsp_list = NULL;
 			info->ncerts = 0;
+			info->nocsp = 0;
 
 #ifdef ENABLE_DHE
 			_gnutls_free_dh_info(dh_info);

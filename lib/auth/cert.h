@@ -100,10 +100,15 @@ typedef struct cert_auth_info_st {
 	 */
 	dh_info_st dh;
 
-	gnutls_datum_t *raw_certificate_list;	/* holds the raw certificate of the
-						 * peer.
-						 */
-	unsigned int ncerts;	/* holds the size of the list above */
+	/* we store the peer's OCSP responses received during
+	 * this session. */
+	gnutls_datum_t *raw_ocsp_list;
+	unsigned int nocsp;
+
+	/* we store the peer's certificates received during
+	 * this ession */
+	gnutls_datum_t *raw_certificate_list;
+	unsigned int ncerts;
 
 	gnutls_certificate_type_t cert_type;
 } *cert_auth_info_t;

@@ -32,4 +32,8 @@ _gnutls_send_server_certificate_status(gnutls_session_t session,
 				       int again);
 int _gnutls_recv_server_certificate_status(gnutls_session_t session);
 
+int _gnutls_parse_ocsp_response(gnutls_session_t session, const uint8_t *data,
+				ssize_t data_size,
+				gnutls_datum_t *resp);
+
 #endif
