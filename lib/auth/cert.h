@@ -91,11 +91,6 @@ typedef struct gnutls_certificate_credentials_st {
 	void *glob_ocsp_func_ptr; /* corresponding OCSP response function */
 } certificate_credentials_st;
 
-typedef struct rsa_info_st {
-	gnutls_datum_t modulus;
-	gnutls_datum_t exponent;
-} rsa_info_st;
-
 /* This is the information we keep for the peer
  * certificate.
  */
@@ -114,8 +109,6 @@ typedef struct cert_auth_info_st {
 } *cert_auth_info_t;
 
 typedef struct cert_auth_info_st cert_auth_info_st;
-
-void _gnutls_free_rsa_info(rsa_info_st * rsa);
 
 /* AUTH X509 functions */
 int _gnutls_gen_cert_server_crt(gnutls_session_t, gnutls_buffer_st *);

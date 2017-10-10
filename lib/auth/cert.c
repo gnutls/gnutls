@@ -1636,14 +1636,6 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	return 0;
 }
 
-/* Frees the rsa_info_st structure.
- */
-void _gnutls_free_rsa_info(rsa_info_st * rsa)
-{
-	_gnutls_free_datum(&rsa->modulus);
-	_gnutls_free_datum(&rsa->exponent);
-}
-
 int _gnutls_gen_dhe_signature(gnutls_session_t session,
 			      gnutls_buffer_st * data, uint8_t * plain,
 			      unsigned plain_size)
