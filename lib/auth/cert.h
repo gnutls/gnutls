@@ -128,7 +128,7 @@ _gnutls_select_client_cert(gnutls_session_t session,
 			   const uint8_t * _data, size_t _data_size,
 			   gnutls_pk_algorithm_t * pk_algos, int pk_algos_length);
 
-int _gnutls_copy_certificate_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts);
+int _gnutls_pcert_to_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts);
 
 int
 _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs);

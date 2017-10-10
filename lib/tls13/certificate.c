@@ -322,7 +322,7 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	}
 
 	ret =
-	     _gnutls_copy_certificate_auth_info(info,
+	     _gnutls_pcert_to_auth_info(info,
 					peer_certificate_list,
 					peer_certificate_list_size);
 	if (ret < 0) {
@@ -330,7 +330,7 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 		goto cleanup;
 	}
 
-	ret = 0;
+	return 0;
 
  cleanup:
 	for(x=0;x<peer_certificate_list_size;x++)

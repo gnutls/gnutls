@@ -69,14 +69,12 @@ _gnutls_selected_certs_set(gnutls_session_t session,
 typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64
 } CertificateSigType;
 
-/* Copies data from a internal certificate struct (gnutls_pcert_st) to 
- * exported certificate struct (cert_auth_info_t)
+/* Moves data from a internal certificate struct (gnutls_pcert_st) to 
+ * another internal certificate struct (cert_auth_info_t), and deinitializes
+ * the former.
  */
-int _gnutls_copy_certificate_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts)
+int _gnutls_pcert_to_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts)
 {
-	/* Copy peer's information to auth_info_t
-	 */
-	int ret;
 	size_t i, j;
 
 	if (info->raw_certificate_list != NULL) {
@@ -98,32 +96,18 @@ int _gnutls_copy_certificate_auth_info(cert_auth_info_t info, gnutls_pcert_st * 
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	for (i = 0; i < ncerts; i++) {
-		if (certs[i].cert.size > 0) {
-			ret =
-			    _gnutls_set_datum(&info->raw_certificate_list[i],
-					      certs[i].cert.data,
-					      certs[i].cert.size);
-			if (ret < 0) {
-				gnutls_assert();
-				goto clear;
-			}
-		}
-	}
-	info->ncerts = ncerts;
 	info->cert_type = certs[0].type;
+	info->ncerts = ncerts;
+
+	for (i = 0; i < ncerts; i++) {
+		info->raw_certificate_list[i].data = certs[i].cert.data;
+		info->raw_certificate_list[i].size = certs[i].cert.size;
+		certs[i].cert.data = NULL;
+		gnutls_pcert_deinit(&certs[i]);
+	}
+	gnutls_free(certs);
 
 	return 0;
-
- clear:
-
-	for (j = 0; j < i; j++)
-		_gnutls_free_datum(&info->raw_certificate_list[j]);
-
-	gnutls_free(info->raw_certificate_list);
-	info->raw_certificate_list = NULL;
-
-	return ret;
 }
 
 /* returns 0 if the algo_to-check exists in the pk_algos list,
@@ -837,7 +821,7 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 	}
 
 	ret =
-	     _gnutls_copy_certificate_auth_info(info,
+	     _gnutls_pcert_to_auth_info(info,
 					peer_certificate_list,
 					peer_certificate_list_size);
 	if (ret < 0) {
@@ -845,7 +829,7 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = 0;
+	return 0;
 
  cleanup:
 	CLEAR_CERTS;
