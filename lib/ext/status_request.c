@@ -320,7 +320,8 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (info == NULL || info->raw_ocsp_list == NULL || info->nocsp == 0)
+	if (info == NULL || info->raw_ocsp_list == NULL ||
+	    info->nocsp == 0 || info->raw_ocsp_list[0].size == 0)
 		return
 		    gnutls_assert_val
 		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
@@ -485,7 +486,7 @@ static void _gnutls_status_request_deinit_data(gnutls_ext_priv_data_t epriv)
 
 const hello_ext_entry_st ext_mod_status_request = {
 	.name = "OCSP Status Request",
-	.tls_id = 5,
+	.tls_id = STATUS_REQUEST_TLS_ID,
 	.gid = GNUTLS_EXTENSION_STATUS_REQUEST,
 	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.parse_type = _GNUTLS_EXT_TLS_POST_CS,

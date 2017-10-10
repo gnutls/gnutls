@@ -27,6 +27,7 @@
 #include "tls13/certificate.h"
 #include "auth/cert.h"
 #include "mbuffers.h"
+#include "ext/status_request.h"
 
 static int parse_cert_extension(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size);
 static int parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size);
@@ -188,10 +189,40 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 	return ret;
 }
 
-static int parse_cert_extension(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size)
+typedef struct crt_cert_ctx_st {
+	gnutls_session_t session;
+	gnutls_datum_t *ocsp;
+	unsigned idx;
+} crt_cert_ctx_st;
+
+static int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_size)
 {
-	/* ignore all extensions */
+	crt_cert_ctx_st *ctx = _ctx;
+	gnutls_session_t session = ctx->session;
+	int ret;
+
+	if (tls_id == STATUS_REQUEST_TLS_ID) {
+#ifdef ENABLE_OCSP
+		if (!_gnutls_hello_ext_is_present(session, ext_mod_status_request.gid)) {
+			gnutls_assert();
+			goto unexpected;
+		}
+
+		_gnutls_handshake_log("Found OCSP response on cert %d\n", ctx->idx);
+
+		ret = _gnutls_parse_ocsp_response(session, data, data_size, ctx->ocsp);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+#endif
+	} else {
+		goto unexpected;
+	}
+
 	return 0;
+
+ unexpected:
+	_gnutls_debug_log("received unexpected certificate extension (%d)\n", (int)tls_id);
+	return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 }
 
 static int
@@ -203,9 +234,11 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	gnutls_certificate_credentials_t cred;
 	ssize_t dsize = data_size, size;
 	int i;
-	gnutls_pcert_st *peer_certificate_list;
-	size_t peer_certificate_list_size = 0, j, x;
-	gnutls_datum_t tmp;
+	unsigned npeer_certs, npeer_ocsp, j;
+	crt_cert_ctx_st ctx;
+	gnutls_datum_t *peer_certs = NULL;
+	gnutls_datum_t *peer_ocsp = NULL;
+	unsigned nentries = 0;
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -221,13 +254,15 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
-
 	if (data == NULL || data_size == 0) {
 		gnutls_assert();
 		/* no certificate was sent */
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
+
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+	if (info == NULL)
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
 	DECR_LEN(dsize, 3);
 	size = _gnutls_read_uint24(p);
@@ -243,12 +278,13 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	}
 
 	i = dsize;
+
 	while (i > 0) {
 		DECR_LEN(dsize, 3);
 		len = _gnutls_read_uint24(p);
-		p += 3;
+
 		DECR_LEN(dsize, len);
-		p += len;
+		p += len + 3;
 		i -= len + 3;
 
 		DECR_LEN(dsize, 2);
@@ -256,29 +292,33 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 		DECR_LEN(dsize, len);
 
 		i -= len + 2;
+		p += len + 2;
 
-		peer_certificate_list_size++;
+		nentries++;
 	}
 
 	if (dsize != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-	if (peer_certificate_list_size == 0) {
+	if (nentries == 0) {
 		gnutls_assert();
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 
+	npeer_ocsp = 0;
+	npeer_certs = 0;
+
 	/* Ok we now allocate the memory to hold the
 	 * certificate list
 	 */
+	peer_certs = gnutls_calloc(nentries, sizeof(gnutls_datum_t));
+	if (peer_certs == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	peer_certificate_list =
-	    gnutls_calloc(1,
-			  sizeof(gnutls_pcert_st) *
-			  (peer_certificate_list_size));
-	if (peer_certificate_list == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+	peer_ocsp = gnutls_calloc(nentries, sizeof(gnutls_datum_t));
+	if (peer_ocsp == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
 	}
 
 	p = data+3;
@@ -288,54 +328,56 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	 * been parsed before.
 	 */
 
-	for (j = 0; j < peer_certificate_list_size; j++) {
+	ctx.session = session;
+
+	for (j = 0; j < nentries; j++) {
 		len = _gnutls_read_uint24(p);
 		p += 3;
 
-		tmp.size = len;
-		tmp.data = p;
-
-		ret =
-		    gnutls_pcert_import_x509_raw(&peer_certificate_list
-						 [j], &tmp,
-						 GNUTLS_X509_FMT_DER, 0);
+		ret = _gnutls_set_datum(&peer_certs[j], p, len);
 		if (ret < 0) {
 			gnutls_assert();
-			_gnutls_debug_log("error importing certificate[%d]: %s\n", (int)j, gnutls_strerror(ret));
-			peer_certificate_list_size = j;
 			ret = GNUTLS_E_CERTIFICATE_ERROR;
 			goto cleanup;
 		}
+		npeer_certs++;
 
 		p += len;
 
 		len = _gnutls_read_uint16(p);
-		p += 2;
 
-		/* FIXME: properly parse extensions */
-		ret = _gnutls_extv_parse(NULL, parse_cert_extension, p, len);
+		ctx.ocsp = &peer_ocsp[j];
+		ctx.idx = j;
+
+		ret = _gnutls_extv_parse(&ctx, parse_cert_extension, p, len+2);
 		if (ret < 0) {
 			gnutls_assert();
-			peer_certificate_list_size = j+1;
 			goto cleanup;
 		}
+
+		p += len+2;
+		npeer_ocsp++;
 	}
 
-	ret =
-	     _gnutls_pcert_to_auth_info(info,
-					peer_certificate_list,
-					peer_certificate_list_size);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	/* The OCSP entries match the certificate entries, although
+	 * the contents of each OCSP entry may be NULL.
+	 */
+	info->raw_certificate_list = peer_certs;
+	info->ncerts = npeer_certs;
+
+	info->raw_ocsp_list = peer_ocsp;
+	info->nocsp = npeer_ocsp;
 
 	return 0;
 
  cleanup:
-	for(x=0;x<peer_certificate_list_size;x++)
-		gnutls_pcert_deinit(&peer_certificate_list[x]);
-	gnutls_free(peer_certificate_list);
+	for(j=0;j<npeer_certs;j++)
+		gnutls_free(peer_certs[j].data);
+
+	for(j=0;j<npeer_ocsp;j++)
+		gnutls_free(peer_ocsp[j].data);
+	gnutls_free(peer_certs);
+	gnutls_free(peer_ocsp);
 	return ret;
 
 }
