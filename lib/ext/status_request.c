@@ -315,19 +315,49 @@ int
 gnutls_ocsp_status_request_get(gnutls_session_t session,
 			       gnutls_datum_t * response)
 {
+	return gnutls_ocsp_status_request_get2(session, 0, response);
+}
+
+/**
+ * gnutls_ocsp_status_request_get2:
+ * @session: is a #gnutls_session_t type.
+ * @idx: the index of peer's certificate
+ * @response: a #gnutls_datum_t with DER encoded OCSP response
+ *
+ * This function returns the OCSP status response received
+ * from the TLS server for the certificate index provided.
+ * The index corresponds to certificates as returned by
+ * gnutls_certificate_get_peers. When index is zero this
+ * function operates identically to gnutls_ocsp_status_request_get().
+ *
+ * The returned @response should be treated as
+ * constant. If no OCSP response is available for the
+ * given index then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * is returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ *
+ * Since: 3.6.xx
+ **/
+int
+gnutls_ocsp_status_request_get2(gnutls_session_t session,
+			        unsigned idx,
+			        gnutls_datum_t * response)
+{
 	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (info == NULL || info->raw_ocsp_list == NULL ||
-	    info->nocsp == 0 || info->raw_ocsp_list[0].size == 0)
+	    idx >= info->nocsp || info->raw_ocsp_list[idx].size == 0)
 		return
 		    gnutls_assert_val
 		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	response->data = info->raw_ocsp_list[0].data;
-	response->size = info->raw_ocsp_list[0].size;
+	response->data = info->raw_ocsp_list[idx].data;
+	response->size = info->raw_ocsp_list[idx].size;
 
 	return 0;
 }

@@ -1210,6 +1210,7 @@ GNUTLS_3_6_xx
 	gnutls_session_key_update;
 	gnutls_ext_get_current_msg;
 	gnutls_reauth;
+	gnutls_ocsp_status_request_get2;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {
