@@ -293,8 +293,8 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	gnutls_x509_crt_t *peer_certificate_list;
 	gnutls_datum_t resp;
 	int peer_certificate_list_size, i, x, ret;
-	gnutls_x509_crt_t *cand_issuers = NULL;
-	unsigned cand_issuers_size = 0;
+	gnutls_x509_crt_t *cand_issuers;
+	unsigned cand_issuers_size;
 	unsigned int ocsp_status = 0;
 	unsigned int verify_flags;
 
@@ -362,31 +362,38 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	if (verify_flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS)
 		goto skip_ocsp;
 
-	ret = gnutls_ocsp_status_request_get(session, &resp);
-	if (ret < 0) {
-		ret = _gnutls_ocsp_verify_mandatory_stapling(session, peer_certificate_list[0], &ocsp_status);
+	for (i=0;i<peer_certificate_list_size;i++) {
+		ret = gnutls_ocsp_status_request_get2(session, i, &resp);
 		if (ret < 0) {
-			gnutls_assert();
-			CLEAR_CERTS;
-			return ret;
+			ret = _gnutls_ocsp_verify_mandatory_stapling(session, peer_certificate_list[i], &ocsp_status);
+			if (ret < 0) {
+				gnutls_assert();
+				CLEAR_CERTS;
+				return ret;
+			}
+
+			continue;
 		}
 
-		goto skip_ocsp;
-	}
+		cand_issuers = NULL;
+		cand_issuers_size = 0;
+		if (peer_certificate_list_size > i+1) {
+			cand_issuers = &peer_certificate_list[i+1];
+			cand_issuers_size = peer_certificate_list_size-i-1;
+		}
 
-	if (peer_certificate_list_size > 1) {
-		cand_issuers = &peer_certificate_list[1];
-		cand_issuers_size = peer_certificate_list_size-1;
-	}
+		ret =
+			check_ocsp_response(session,
+					    peer_certificate_list[i],
+					    cred->tlist, 
+					    verify_flags, cand_issuers,
+					    cand_issuers_size,
+					    &resp, &ocsp_status);
 
-	ret =
-		check_ocsp_response(session, peer_certificate_list[0], cred->tlist, 
-				verify_flags, cand_issuers,
-				cand_issuers_size, &resp, &ocsp_status);
-
-	if (ret < 0) {
-		CLEAR_CERTS;
-		return gnutls_assert_val(ret);
+		if (ret < 0) {
+			CLEAR_CERTS;
+			return gnutls_assert_val(ret);
+		}
 	}
 #endif
 
