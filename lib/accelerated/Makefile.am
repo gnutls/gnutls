@@ -35,8 +35,8 @@ endif
 
 noinst_LTLIBRARIES = libaccelerated.la
 
-EXTRA_DIST = accelerated.h cryptodev.h
-libaccelerated_la_SOURCES = accelerated.c cryptodev.c cryptodev-gcm.c
+EXTRA_DIST = accelerated.h cryptodev.h afalg.h
+libaccelerated_la_SOURCES = accelerated.c cryptodev.c cryptodev-gcm.c afalg.c
 libaccelerated_la_LIBADD =
 
 if ENABLE_NETTLE
@@ -59,4 +59,8 @@ endif
 
 if ASM_X86_64
 AM_CFLAGS += -DASM_X86_64
+endif
+
+if ENABLE_AFALG
+libaccelerated_la_LDFLAGS = -lkcapi
 endif

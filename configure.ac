@@ -1208,6 +1208,7 @@ AC_MSG_NOTICE([summary of build options:
 AC_MSG_NOTICE([External hardware support:
 
   /dev/crypto:          $enable_cryptodev
+  AF_ALG support:       $enable_afalg
   Hardware accel:       $hw_accel
   Padlock accel:        $use_padlock
   Random gen. variant:  $rnd_variant
