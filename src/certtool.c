@@ -4037,7 +4037,7 @@ void pubkey_keyid(common_info_st * cinfo)
 		flags = GNUTLS_KEYID_USE_SHA256;
 	else {
 		fprintf(stderr, "Cannot calculate key ID with the provided hash (use sha1, or sha256)\n");
-		app_exit(1);
+		exit(1);
 	}
 
 	fpr_size = sizeof(fpr);
