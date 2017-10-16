@@ -15,9 +15,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 #ifdef HAVE_CONFIG_H
@@ -29,7 +28,6 @@
 #include <assert.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#include <assert.h>
 
 #ifdef ENABLE_OCSP
 
@@ -37,8 +35,7 @@
 #include "utils.h"
 
 /* Tests whether setting an OCSP response to a server with multiple
- * certificate sets, is working as expected. It tests
- * gnutls_certificate_set_ocsp_status_request_function2 */
+ * certificate sets, is working as expected */
 
 static time_t mytime(time_t * t)
 {
@@ -85,18 +82,6 @@ static void check_response(gnutls_session_t session, void *priv)
 	}
 }
 
-static int ocsp_func(gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response)
-{
-	gnutls_datum_t *c = ptr;
-	ocsp_response->data = gnutls_malloc(c->size);
-	assert(ocsp_response->data != NULL);
-
-	memcpy(ocsp_response->data, c->data, c->size);
-	ocsp_response->size = c->size;
-
-	return 0;
-}
-
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
@@ -110,9 +95,12 @@ void doit(void)
 	const char *certfile1;
 	const char *certfile2;
 	const char *certfile3;
-	char certname1[TMPNAME_SIZE];
-	char certname2[TMPNAME_SIZE];
-	char certname3[TMPNAME_SIZE];
+	const char *ocspfile1;
+	const char *ocspfile2;
+	const char *ocspfile3;
+	char certname1[TMPNAME_SIZE], ocspname1[TMPNAME_SIZE];
+	char certname2[TMPNAME_SIZE], ocspname2[TMPNAME_SIZE];
+	char certname3[TMPNAME_SIZE], ocspname3[TMPNAME_SIZE];
 	FILE *fp;
 	unsigned index1, index2, index3; /* indexes of certs */
 
@@ -191,22 +179,49 @@ void doit(void)
 	fclose(fp);
 
 	/* set OCSP response1 */
-	ret = gnutls_certificate_set_ocsp_status_request_function2(xcred, index1, ocsp_func, &ocsp_resp1);
+	ocspfile1 = get_tmpname(ocspname1);
+	fp = fopen(ocspfile1, "wb");
+	if (fp == NULL)
+		fail("error in fopen\n");
+	assert(fwrite(ocsp_resp1.data, 1, ocsp_resp1.size, fp)>0);
+	fclose(fp);
+
+	ret = gnutls_certificate_set_ocsp_status_request_file(xcred, ocspfile1, index1);
+	if (ret != GNUTLS_E_OCSP_MISMATCH_WITH_CERTS)
+		fail("unexpected error in setting invalid ocsp file: %s\n", gnutls_strerror(ret));
+
+	gnutls_certificate_set_flags(xcred, GNUTLS_CERTIFICATE_API_V2|GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK);
+
+	ret = gnutls_certificate_set_ocsp_status_request_file(xcred, ocspfile1, index1);
 	if (ret < 0)
 		fail("ocsp file set failed: %s\n", gnutls_strerror(ret));
 
 	/* set OCSP response2 */
-	ret = gnutls_certificate_set_ocsp_status_request_function2(xcred, index2, ocsp_func, &ocsp_resp2);
+	ocspfile2 = get_tmpname(ocspname2);
+	fp = fopen(ocspfile2, "wb");
+	if (fp == NULL)
+		fail("error in fopen\n");
+	assert(fwrite(ocsp_resp2.data, 1, ocsp_resp2.size, fp)>0);
+	fclose(fp);
+
+	ret = gnutls_certificate_set_ocsp_status_request_file(xcred, ocspfile2, index2);
 	if (ret < 0)
 		fail("ocsp file set failed: %s\n", gnutls_strerror(ret));
 
 	/* set OCSP response3 */
-	ret = gnutls_certificate_set_ocsp_status_request_function2(xcred, index3, ocsp_func, &ocsp_resp3);
+	ocspfile3 = get_tmpname(ocspname3);
+	fp = fopen(ocspfile3, "wb");
+	if (fp == NULL)
+		fail("error in fopen\n");
+	assert(fwrite(ocsp_resp3.data, 1, ocsp_resp3.size, fp)>0);
+	fclose(fp);
+
+	ret = gnutls_certificate_set_ocsp_status_request_file(xcred, ocspfile3, index3);
 	if (ret < 0)
 		fail("ocsp file set failed: %s\n", gnutls_strerror(ret));
 
 	/* set an OCSP response outside the bounds */
-	assert(gnutls_certificate_set_ocsp_status_request_function2(xcred, 34, ocsp_func, NULL) == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	assert(gnutls_certificate_set_ocsp_status_request_file(xcred, ocspfile3, 34) == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	/* make sure that our invalid OCSP responses are not considered in verification
 	 */
@@ -219,23 +234,20 @@ void doit(void)
 		fail("error in setting trust cert: %s\n", gnutls_strerror(ret));
 	}
 
-	success("TLS1.2 + resp1\n");
 	test_cli_serv(xcred, clicred, "NORMAL:-ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2", "localhost", &ocsp_resp1, check_response, NULL);
-	success("TLS1.2 + resp2\n");
 	test_cli_serv(xcred, clicred, "NORMAL:-ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2", "localhost6", &ocsp_resp2, check_response, NULL);
-	success("TLS1.2 + resp3\n");
 	test_cli_serv(xcred, clicred, "NORMAL:-ECDHE-RSA:-RSA:-DHE-RSA:-VERS-TLS-ALL:+VERS-TLS1.2", NULL, &ocsp_resp3, check_response, NULL);
 
-	success("TLS1.3 + resp1\n");
 	test_cli_serv(xcred, clicred, "NORMAL:-ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3", "localhost", &ocsp_resp1, check_response, NULL);
-	success("TLS1.3 + resp2\n");
 	test_cli_serv(xcred, clicred, "NORMAL:-ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.3", "localhost6", &ocsp_resp2, check_response, NULL);
-	success("TLS1.3 + resp3\n");
-	test_cli_serv(xcred, clicred, "NORMAL:-SIGN-ALL:+SIGN-ECDSA-SECP256R1-SHA256:-ECDHE-RSA:-RSA:-DHE-RSA:-VERS-TLS-ALL:+VERS-TLS1.3", NULL, &ocsp_resp3, check_response, NULL);
+	test_cli_serv(xcred, clicred, "NORMAL:-SIGN-ALL:+SIGN-ECDSA-SECP256R1-SHA256:-ECDHE-RSA:-DHE-RSA:-RSA:-VERS-TLS-ALL:+VERS-TLS1.3", NULL, &ocsp_resp3, check_response, NULL);
 
 	gnutls_certificate_free_credentials(xcred);
 	gnutls_certificate_free_credentials(clicred);
 	gnutls_global_deinit();
+	remove(ocspfile1);
+	remove(ocspfile2);
+	remove(ocspfile3);
 	remove(certfile1);
 	remove(certfile2);
 	remove(certfile3);

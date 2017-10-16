@@ -32,6 +32,7 @@ SUBDIRS += suite
 endif
 
 EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
+	ocsp-common.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem hex.h \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
@@ -106,6 +107,10 @@ ctests += tls13/key_update
 
 ctests += tls13/key_limits
 
+ctests += tls13/multi-ocsp
+
+ctests += tls13/ocsp-client
+
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
 	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
@@ -137,7 +142,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
 	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
 	 client-sign-md5-rep tls12-invalid-key-exchanges session-rdn-read \
-	 tls13-cert-key-exchange \
+	 tls13-cert-key-exchange x509-cert-callback-ocsp \
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok status-request-missing sign-verify-ext \
@@ -161,7 +166,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 set_x509_key_file_ocsp client-fastopen rng-sigint srp rng-pthread \
 	 safe-renegotiation/srn0 safe-renegotiation/srn1 safe-renegotiation/srn2 \
 	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5 \
-	 rsa-illegal-import set_x509_key_file_ocsp_multi set_key set_x509_key_file_ocsp_multi2 \
+	 rsa-illegal-import set_x509_ocsp_multi_invalid set_key set_x509_key_file_ocsp_multi2 \
+	 set_x509_ocsp_multi_unknown set_x509_ocsp_multi_pem \
 	 set_key_utf8 set_x509_key_utf8 insecure_key handshake-large-packet \
 	 client_dsa_key server_ecdsa_key tls-session-ext-register tls-session-supplemental \
 	 multi-alerts naked-alerts pkcs7-cat-parse set_known_dh_params_x509 \

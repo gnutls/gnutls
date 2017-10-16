@@ -42,7 +42,7 @@ int _gnutls_server_name_set_raw(gnutls_session_t session,
 const char *side = NULL;
 
 /* if @host is NULL certificate check is skipped */
-static int
+int
 _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      gnutls_certificate_credentials_t client_cred,
 	      const char *serv_prio, const char *cli_prio,
