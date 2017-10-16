@@ -275,7 +275,7 @@ gnutls_certificate_server_set_request(gnutls_session_t session,
  * by one of these CAs. These names, when available, are DER encoded. To get a more
  * meaningful value use the function gnutls_x509_rdn_get().
  *
- * @pk_algos contains a list with server's acceptable signature algorithms.
+ * @pk_algos contains a list with server's acceptable public key algorithms.
  * The certificate returned should support the server's given algorithms.
  *
  * @st should contain the certificates and private keys.
@@ -321,7 +321,7 @@ void gnutls_certificate_set_retrieve_function
  * by one of these CAs. These names, when available, are DER encoded. To get a more
  * meaningful value use the function gnutls_x509_rdn_get().
  *
- * @pk_algos contains a list with server's acceptable signature algorithms.
+ * @pk_algos contains a list with server's acceptable public key algorithms.
  * The certificate returned should support the server's given algorithms.
  *
  * @pcert should contain a single certificate and public key or a list of them.
