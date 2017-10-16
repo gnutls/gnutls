@@ -428,7 +428,7 @@ gnutls_status_request_ocsp_func ocsp_func, void *ptr)
  * @ptr: opaque pointer passed to callback function
  *
  * This function is to be used by server to register a callback to
- * handle OCSP status requests that correspond to the indexed certificate
+ * provide OCSP status requests that correspond to the indexed certificate chain
  * from the client.  The callback will be invoked if the client supplied a 
  * status-request OCSP extension.
  *
@@ -443,6 +443,12 @@ gnutls_status_request_ocsp_func ocsp_func, void *ptr)
  * it is expected to have the @ocsp_response field set with a valid (DER-encoded)
  * OCSP response. The response must be a value allocated using gnutls_malloc(),
  * and will be deinitialized by the caller.
+ *
+ * Note: the ability to set multiple OCSP responses per credential
+ * structure via the index @idx was added in version 3.5.6. To keep
+ * backwards compatibility, it requires using gnutls_certificate_set_flags()
+ * with the %GNUTLS_CERTIFICATE_API_V2 flag to make the set certificate
+ * functions return an index usable by this function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -491,8 +497,10 @@ static int file_ocsp_func(gnutls_session_t session, void *ptr,
  * file accesses.
  *
  * Note: the ability to set multiple OCSP responses per credential
- * structure via @idx was added in version 3.5.6 with the
- * %GNUTLS_CERTIFICATE_API_V2 flag.
+ * structure via the index @idx was added in version 3.5.6. To keep
+ * backwards compatibility, it requires using gnutls_certificate_set_flags()
+ * with the %GNUTLS_CERTIFICATE_API_V2 flag to make the set certificate
+ * functions return an index usable by this function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -500,9 +508,9 @@ static int file_ocsp_func(gnutls_session_t session, void *ptr,
  * Since: 3.1.3
  **/
 int
-gnutls_certificate_set_ocsp_status_request_file
-(gnutls_certificate_credentials_t sc, const char *response_file,
- unsigned idx)
+gnutls_certificate_set_ocsp_status_request_file(gnutls_certificate_credentials_t sc,
+						const char *response_file,
+						unsigned idx)
 {
 	if (idx >= sc->ncerts)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
