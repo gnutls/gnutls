@@ -345,10 +345,11 @@ gnutls_ocsp_status_request_get2(gnutls_session_t session,
 			        unsigned idx,
 			        gnutls_datum_t * response)
 {
+	const version_entry_st *ver = get_version(session);
 	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
-	if (session->security_parameters.entity == GNUTLS_SERVER)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (!ver->tls13_sem && session->security_parameters.entity == GNUTLS_SERVER)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	if (info == NULL || info->raw_ocsp_list == NULL ||
 	    idx >= info->nocsp || info->raw_ocsp_list[idx].size == 0)
