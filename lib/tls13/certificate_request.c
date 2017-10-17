@@ -75,6 +75,16 @@ int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int d
 
 		session->internals.hsk_flags |= HSK_CRT_REQ_GOT_SIG_ALGO;
 
+		if (data_size < 2)
+			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+
+		ret = _gnutls_read_uint16(data);
+		if (ret != data_size-2)
+			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+
+		data += 2;
+		data_size -= 2;
+
 		ret = _gnutls_sign_algorithm_parse_data(session, data, data_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
