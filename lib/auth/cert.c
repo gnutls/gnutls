@@ -1254,7 +1254,7 @@ int select_sign_algorithm(gnutls_session_t session,
 	gnutls_sign_algorithm_t algo;
 	const version_entry_st *ver = get_version(session);
 
-	if (_gnutls_kx_encipher_type(cs->kx_algorithm) != CIPHER_SIGN)
+	if (!ver->tls13_sem && _gnutls_kx_encipher_type(cs->kx_algorithm) != CIPHER_SIGN)
 		return 0;
 
 	if (!_gnutls_version_has_selectable_sighash(ver)) {
