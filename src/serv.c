@@ -1114,8 +1114,9 @@ int main(int argc, char **argv)
 
 	/* OCSP status-request TLS extension */
 	if (status_response_ocsp) {
-		if (gnutls_certificate_set_ocsp_status_request_file
-		    (cert_cred, status_response_ocsp, 0) < 0) {
+		ret = gnutls_certificate_set_ocsp_status_request_file
+		    (cert_cred, status_response_ocsp, 0);
+		if (ret < 0) {
 			fprintf(stderr,
 				"Cannot set OCSP status request file: %s\n",
 				gnutls_strerror(ret));
