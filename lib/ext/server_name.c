@@ -341,7 +341,7 @@ _gnutls_server_name_set_raw(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  * @type: specifies the indicator type
  * @name: is a string that contains the server name.
- * @name_length: holds the length of name
+ * @name_length: holds the length of name excluding the terminating null byte
  *
  * This function is to be used by clients that want to inform (via a
  * TLS extension mechanism) the server of the name they connected to.
