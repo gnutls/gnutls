@@ -194,6 +194,10 @@ however, there are minor differences, listed below.
 @item The priority strings "+COMP" are a no-op
 @tab TLS compression is no longer available.
 
+@item The hash function SHA2-224 is a no-op for TLS1.2
+@tab TLS 1.3 no longer uses SHA2-224, and it was never a widespread hash
+algorithm. As such it was removed for simplicity.
+
 @item The compression-related functions are deprecated
 @tab No longer use @funcintref{gnutls_compression_get},
 @funcintref{gnutls_compression_get_name}, @funcintref{gnutls_compression_list},
