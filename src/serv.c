@@ -75,7 +75,10 @@ const char *x509_cafile = NULL;
 const char *dh_params_file = NULL;
 const char *x509_crlfile = NULL;
 const char *priorities = NULL;
-const char *status_response_ocsp = NULL;
+
+const char **ocsp_responses = NULL;
+unsigned ocsp_responses_size = 0;
+
 const char *sni_hostname = NULL;
 int sni_hostname_fatal = 0;
 
@@ -996,6 +999,7 @@ int main(int argc, char **argv)
 	char name[256];
 	int cert_set = 0;
 	unsigned use_static_dh_params = 0;
+	unsigned i;
 
 	cmd_parser(argc, argv);
 
@@ -1091,8 +1095,6 @@ int main(int argc, char **argv)
 	}
 
 	if (x509_certfile_size > 0 && x509_keyfile_size > 0) {
-		unsigned i;
-
 		for (i = 0; i < x509_certfile_size; i++) {
 			ret = gnutls_certificate_set_x509_key_file
 			    (cert_cred, x509_certfile[i], x509_keyfile[i], x509ctype);
@@ -1113,12 +1115,16 @@ int main(int argc, char **argv)
 	}
 
 	/* OCSP status-request TLS extension */
-	if (status_response_ocsp) {
+	if (HAVE_OPT(IGNORE_OCSP_RESPONSE_ERRORS))
+		gnutls_certificate_set_flags(cert_cred, GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK);
+
+	for (i = 0; i < ocsp_responses_size; i++ ) {
 		ret = gnutls_certificate_set_ocsp_status_request_file
-		    (cert_cred, status_response_ocsp, 0);
+		    (cert_cred, ocsp_responses[i], 0);
 		if (ret < 0) {
 			fprintf(stderr,
-				"Cannot set OCSP status request file: %s\n",
+				"Cannot set OCSP status request file: %s: %s\n",
+				ocsp_responses[i],
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1669,8 +1675,10 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(PSKPASSWD))
 		psk_passwd = OPT_ARG(PSKPASSWD);
 
-	if (HAVE_OPT(OCSP_RESPONSE))
-		status_response_ocsp = OPT_ARG(OCSP_RESPONSE);
+	if (HAVE_OPT(OCSP_RESPONSE)) {
+		ocsp_responses = STACKLST_OPT(OCSP_RESPONSE);
+		ocsp_responses_size = STACKCT_OPT(OCSP_RESPONSE);
+	}
 
 	if (HAVE_OPT(SNI_HOSTNAME))
 		sni_hostname = OPT_ARG(SNI_HOSTNAME);

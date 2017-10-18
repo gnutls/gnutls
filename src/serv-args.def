@@ -261,10 +261,17 @@ flag = {
 
 flag = {
     name      = ocsp-response;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "The OCSP response to send to client";
     doc      = "If the client requested an OCSP response, return data from this file to the client.";
+    stack-arg;
+    max       = NOLIMIT;
+};
+
+flag = {
+    name      = ignore-ocsp-response-errors;
+    descrip   = "Ignore any errors when setting the OCSP response";
+    doc      = "That option instructs gnutls to not attempt to match the provided OCSP responses with the certificates.";
 };
 
 flag = {
