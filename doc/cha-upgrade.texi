@@ -210,4 +210,9 @@ and @funcintref{gnutls_compression_get_id}.
 @item @funcref{gnutls_x509_crt_sign}, @funcref{gnutls_x509_crl_sign}, @funcref{gnutls_x509_crq_sign}
 @tab These signing functions will no longer sign using SHA1, but with a secure hash algorithm.
 
+@item @funcref{gnutls_certificate_set_ocsp_status_request_file}
+@tab This function will return an error if the loaded response doesn't match
+any of the present certificates. To revert to previous semantics set the @code{GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK}
+flag using @funcref{gnutls_certificate_set_flags}.
+
 @end multitable
