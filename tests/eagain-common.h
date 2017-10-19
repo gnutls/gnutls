@@ -133,6 +133,30 @@ extern const char *side;
     } \
   while (transferred < 70000)
 
+#define EMPTY_BUF(s, c, buf, buflen) \
+    { \
+      side = "client"; ret = 0; \
+      while((ret == GNUTLS_E_AGAIN && to_server_len > 0) || to_server_len > 0) \
+	{ \
+	  side = "server"; \
+	  ret = gnutls_record_recv (s, buf, buflen); \
+	} \
+      if (ret < 0 && ret !=GNUTLS_E_AGAIN) \
+	{ \
+	  fail ("server: error: %s\n", gnutls_strerror (ret)); \
+	} \
+      side = "server"; ret = 0; \
+      while((to_client_len > 0 && ret == GNUTLS_E_AGAIN) || to_client_len > 0) \
+	{ \
+	  side = "client"; \
+	  ret = gnutls_record_recv (client, buf, buflen); \
+	} \
+      if (ret < 0 && ret !=GNUTLS_E_AGAIN) \
+	{ \
+	  fail ("client: Error: %s\n", gnutls_strerror (ret)); \
+	} \
+    }
+
 #define TRANSFER(c, s, msg, msglen, buf, buflen) \
   TRANSFER2(c, s, msg, msglen, buf, buflen, 0); \
   TRANSFER2(c, s, msg, msglen, buf, buflen, 1)

@@ -102,6 +102,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls12-rollback-detection tls11-rollback-detection \
 	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value
 
+ctests += tls13/key_update
+
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
 	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
