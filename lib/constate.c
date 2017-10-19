@@ -201,15 +201,69 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 
 static int
 _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
-		   uint16_t epoch, record_parameters_st *params,
+		   record_parameters_st *params,
 		   unsigned iv_size, unsigned key_size)
 {
 	uint8_t key_block[MAX_CIPHER_KEY_SIZE];
 	uint8_t iv_block[MAX_CIPHER_IV_SIZE];
 	char buf[65];
-	record_state_st *state;
-	uint16_t *session_epoch;
+	record_state_st *upd_state;
+	record_parameters_st *prev;
 	int ret;
+
+	/* generate new keys for direction needed and copy old from previous epoch */
+
+	if (stage == STAGE_UPD_OURS) {
+		upd_state = &params->write;
+
+		ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &prev);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		params->read.sequence_number = prev->read.sequence_number;
+		ret = _gnutls_set_datum(&params->read.key, prev->read.key.data, prev->read.key.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		_gnutls_hard_log("INT: READ KEY [%d]: %s\n",
+				 params->read.key.size,
+				 _gnutls_bin2hex(params->read.key.data, params->read.key.size,
+						 buf, sizeof(buf), NULL));
+
+		ret = _gnutls_set_datum(&params->read.IV, prev->read.IV.data, prev->read.IV.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		_gnutls_hard_log("INT: READ IV [%d]: %s\n",
+				 params->read.IV.size,
+				 _gnutls_bin2hex(params->read.IV.data, params->read.IV.size,
+						 buf, sizeof(buf), NULL));
+	} else {
+		upd_state = &params->read;
+
+		ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &prev);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		params->write.sequence_number = prev->write.sequence_number;
+		ret = _gnutls_set_datum(&params->write.key, prev->write.key.data, prev->write.key.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		_gnutls_hard_log("INT: WRITE KEY [%d]: %s\n",
+				 params->write.key.size,
+				 _gnutls_bin2hex(params->write.key.data, params->write.key.size,
+						 buf, sizeof(buf), NULL));
+
+		ret = _gnutls_set_datum(&params->write.IV, prev->write.IV.data, prev->write.IV.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		_gnutls_hard_log("INT: WRITE IV [%d]: %s\n",
+				 params->write.IV.size,
+				 _gnutls_bin2hex(params->write.IV.data, params->write.IV.size,
+						 buf, sizeof(buf), NULL));
+	}
 
 	if ((session->security_parameters.entity == GNUTLS_CLIENT && stage == STAGE_UPD_OURS) ||
 	    (session->security_parameters.entity == GNUTLS_SERVER && stage == STAGE_UPD_PEERS)) {
@@ -229,15 +283,6 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_ckey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-
-		if (stage == STAGE_UPD_OURS) {
-			state = &params->write;
-			session_epoch = &session->security_parameters.epoch_write;
-		} else {
-			state = &params->read;
-			session_epoch = &session->security_parameters.epoch_read;
-		}
-
 	} else {
 		ret = _tls13_derive_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
@@ -254,51 +299,38 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_skey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-
-		if (stage == STAGE_UPD_OURS) {
-			state = &params->write;
-			session_epoch = &session->security_parameters.epoch_write;
-		} else {
-			state = &params->read;
-			session_epoch = &session->security_parameters.epoch_read;
-		}
 	}
 
-	state->mac_secret.data = NULL;
-	state->mac_secret.size = 0;
+	upd_state->mac_secret.data = NULL;
+	upd_state->mac_secret.size = 0;
 
-	ret = _gnutls_set_datum(&state->key, key_block, key_size);
+	ret = _gnutls_set_datum(&upd_state->key, key_block, key_size);
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	_gnutls_hard_log("INT: NEW KEY [%d]: %s\n",
+	_gnutls_hard_log("INT: NEW %s KEY [%d]: %s\n",
+			 (upd_state == &params->read)?"READ":"WRITE",
 			 key_size,
 			 _gnutls_bin2hex(key_block, key_size,
 					 buf, sizeof(buf), NULL));
 
 	if (iv_size > 0) {
-		ret = _gnutls_set_datum(&state->IV, iv_block, iv_size);
+		ret = _gnutls_set_datum(&upd_state->IV, iv_block, iv_size);
 		if (ret < 0)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-		_gnutls_hard_log("INT: NEW WRITE IV [%d]: %s\n",
+		_gnutls_hard_log("INT: NEW %s IV [%d]: %s\n",
+				 (upd_state == &params->read)?"READ":"WRITE",
 				 iv_size,
 				 _gnutls_bin2hex(iv_block, iv_size,
 						 buf, sizeof(buf), NULL));
 	}
-
-	ret = _tls13_init_record_state(params->cipher->id, state);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	*session_epoch = epoch;
 
 	return 0;
 }
 
 static int
 _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
-		uint16_t epoch,
 		record_parameters_st * params,
 		unsigned iv_size, unsigned key_size)
 {
@@ -314,7 +346,7 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	int ret;
 
 	if (stage == STAGE_UPD_OURS || stage == STAGE_UPD_PEERS)
-		return _tls13_update_keys(session, stage, epoch,
+		return _tls13_update_keys(session, stage,
 					  params, iv_size, key_size);
 
 	if (stage == STAGE_HS) {
@@ -434,17 +466,6 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 						 buf, sizeof(buf), NULL));
 	}
 
-	ret = _tls13_init_record_state(params->cipher->id, &params->read);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = _tls13_init_record_state(params->cipher->id, &params->write);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	session->security_parameters.epoch_read = epoch;
-	session->security_parameters.epoch_write = epoch;
-
 	return 0;
 }
 
@@ -525,6 +546,7 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 }
 
 /* Sets the next epoch to be a clone of the current one.
+ * The keys are not cloned, only the cipher and MAC.
  */
 int _gnutls_epoch_dup(gnutls_session_t session)
 {
@@ -592,10 +614,17 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 
 	if (ver->tls13_sem) {
 		ret = _tls13_set_keys
-		    (session, stage, epoch, params, IV_size, key_size);
+		    (session, stage, params, IV_size, key_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
+		ret = _tls13_init_record_state(params->cipher->id, &params->read);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _tls13_init_record_state(params->cipher->id, &params->write);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	} else {
 		ret = _gnutls_set_keys
 		    (session, params, hash_size, IV_size, key_size);
@@ -957,9 +986,12 @@ int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage)
 	if (ret < 0)
 		return ret;
 
-	_gnutls_handshake_log("HSK[%p]: TLS 1.3 cipher suite: %s\n",
+	_gnutls_handshake_log("HSK[%p]: TLS 1.3 re-key with cipher suite: %s\n",
 			      session,
 			      session->security_parameters.cs->name);
+
+	session->security_parameters.epoch_read = epoch_next;
+	session->security_parameters.epoch_write = epoch_next;
 
 	return 0;
 }

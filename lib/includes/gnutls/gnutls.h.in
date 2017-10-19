@@ -1007,6 +1007,9 @@ void gnutls_handshake_set_timeout(gnutls_session_t session,
 				  unsigned int ms);
 int gnutls_rehandshake(gnutls_session_t session);
 
+#define GNUTLS_KU_PEER 1
+int gnutls_session_key_update(gnutls_session_t session, unsigned flags);
+
 gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session);
 int gnutls_alert_send(gnutls_session_t session,
 		      gnutls_alert_level_t level,
@@ -2955,7 +2958,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_ECC_UNSUPPORTED_CURVE -322
 #define GNUTLS_E_PKCS11_REQUESTED_OBJECT_NOT_AVAILBLE -323
 #define GNUTLS_E_CERTIFICATE_LIST_UNSORTED -324
-#define GNUTLS_E_ILLEGAL_PARAMETER -325
+#define GNUTLS_E_ILLEGAL_PARAMETER -325 /* GNUTLS_A_ILLEGAL_PARAMETER */
 #define GNUTLS_E_NO_PRIORITIES_WERE_SET -326
 #define GNUTLS_E_X509_UNSUPPORTED_EXTENSION -327
 #define GNUTLS_E_SESSION_EOF -328

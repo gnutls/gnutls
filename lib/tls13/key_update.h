@@ -21,4 +21,4 @@
  */
 
 int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf);
-int _gnutls13_send_key_update(gnutls_session_t session, unsigned again);
+int _gnutls13_send_key_update(gnutls_session_t session, unsigned again, unsigned flags);

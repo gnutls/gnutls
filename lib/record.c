@@ -1057,7 +1057,7 @@ record_read_headers(gnutls_session_t session,
 			memset(&record->sequence, 0,
 			       sizeof(record->sequence));
 			record->length = _gnutls_read_uint16(&headers[3]);
-			record->epoch = 0;
+			record->epoch = session->security_parameters.epoch_read;
 		}
 
 		_gnutls_record_log
@@ -1658,58 +1658,6 @@ ssize_t append_data_to_corked(gnutls_session_t session, const void *data, size_t
 	return data_size;
 }
 
-static
-ssize_t handle_key_update(gnutls_session_t session, const void *data, size_t data_size)
-{
-	ssize_t ret;
-
-	/* do nothing, if we are in corked mode. Otherwise
-	 * switch to corked mode, cache the data and send
-	 * the key update */
-
-	if (session->internals.record_flush_mode == RECORD_FLUSH) {
-		gnutls_record_cork(session); /* we are not in flush mode after that */
-
-		ret = append_data_to_corked(session, data, data_size);
-		if (ret < 0)
-			return ret;
-
-		ret = _gnutls13_send_key_update(session, 0);
-
-		session->internals.key_update_state = KEY_UPDATE_SENT;
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		session->internals.key_update_state = KEY_UPDATE_COMPLETED;
-
-		ret = gnutls_record_uncork(session, 0);
-		if (ret == 0)
-			session->internals.key_update_state = KEY_UPDATE_INACTIVE;
-		return ret;
-	} else {
-		switch(session->internals.key_update_state) {
-		case KEY_UPDATE_SCHEDULED:
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-		case KEY_UPDATE_SENT:
-			ret = _gnutls13_send_key_update(session, 1);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-
-			session->internals.key_update_state = KEY_UPDATE_COMPLETED;
-
-			FALLTHROUGH;
-		case KEY_UPDATE_COMPLETED:
-			ret = gnutls_record_uncork(session, 0);
-			if (ret == 0)
-				session->internals.key_update_state = KEY_UPDATE_INACTIVE;
-			return ret;
-		default:
-			/* no state */
-			return GNUTLS_E_INT_RET_0; /* notify fall through */
-		}
-	}
-}
 /**
  * gnutls_record_send:
  * @session: is a #gnutls_session_t type.
@@ -1749,6 +1697,8 @@ ssize_t
 gnutls_record_send(gnutls_session_t session, const void *data,
 		   size_t data_size)
 {
+	int ret;
+
 	if (unlikely(!session->internals.initial_negotiation_completed)) {
 		/* this is to protect buggy applications from sending unencrypted
 		 * data. We allow sending however, if we are in false start handshake
@@ -1757,23 +1707,45 @@ gnutls_record_send(gnutls_session_t session, const void *data,
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
 	}
 
-	if (session->internals.key_update_state > KEY_UPDATE_INACTIVE) {
-		ssize_t ret;
+	switch(session->internals.rsend_state) {
+		case RECORD_SEND_NORMAL:
+			return _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
+						-1, EPOCH_WRITE_CURRENT, data,
+						data_size, MBUFFER_FLUSH);
+		case RECORD_SEND_CORKED:
+		case RECORD_SEND_CORKED_TO_KU:
+			return append_data_to_corked(session, data, data_size);
+		case RECORD_SEND_KEY_UPDATE_1:
+			_gnutls_buffer_reset(&session->internals.record_key_update_buffer);
 
-		ret = handle_key_update(session, data, data_size);
-		if (ret != GNUTLS_E_INT_RET_0)
+			ret = _gnutls_buffer_append_data(&session->internals.record_key_update_buffer,
+							 data, data_size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_2;
+			/* fall-through */
+		case RECORD_SEND_KEY_UPDATE_2:
+			ret = gnutls_session_key_update(session, 0);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_3;
+			/* fall-through */
+		case RECORD_SEND_KEY_UPDATE_3:
+			ret = _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
+						-1, EPOCH_WRITE_CURRENT,
+						session->internals.record_key_update_buffer.data,
+						session->internals.record_key_update_buffer.length,
+						MBUFFER_FLUSH);
+			_gnutls_buffer_clear(&session->internals.record_key_update_buffer);
+			session->internals.rsend_state = RECORD_SEND_NORMAL;
+			if (ret < 0)
+				gnutls_assert();
+
 			return ret;
-		/* otherwise fall through */
-	}
-
-	if (session->internals.record_flush_mode == RECORD_FLUSH) {
-		return _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
-					-1, EPOCH_WRITE_CURRENT, data,
-					data_size, MBUFFER_FLUSH);
-	} else {		/* GNUTLS_CORKED */
-		return append_data_to_corked(session, data, data_size);
-
-
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 }
 
@@ -1790,7 +1762,7 @@ gnutls_record_send(gnutls_session_t session, const void *data,
  **/
 void gnutls_record_cork(gnutls_session_t session)
 {
-	session->internals.record_flush_mode = RECORD_CORKED;
+	session->internals.rsend_state = RECORD_SEND_CORKED;
 }
 
 /**
@@ -1818,11 +1790,14 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 {
 	int ret;
 	ssize_t total = 0;
+	record_send_state_t orig_state = session->internals.rsend_state;
 
-	if (session->internals.record_flush_mode == RECORD_FLUSH)
+	if (orig_state == RECORD_SEND_CORKED)
+		session->internals.rsend_state = RECORD_SEND_NORMAL;
+	else if (orig_state == RECORD_SEND_CORKED_TO_KU)
+		session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_1;
+	else
 		return 0;	/* nothing to be done */
-
-	session->internals.record_flush_mode = RECORD_FLUSH;
 
 	while (session->internals.record_presend_buffer.length > 0) {
 		if (flags == GNUTLS_RECORD_WAIT) {
@@ -1857,7 +1832,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 	return total;
 
       fail:
-	session->internals.record_flush_mode = RECORD_CORKED;
+	session->internals.rsend_state = orig_state;
 	return ret;
 }
 

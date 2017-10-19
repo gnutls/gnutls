@@ -69,7 +69,7 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 
 	_gnutls_epoch_gc(session);
 
-	_gnutls_handshake_log("HSK[%p]: requested TLS 1.3 key update (%u)\n",
+	_gnutls_handshake_log("HSK[%p]: received TLS 1.3 key update (%u)\n",
 			      session, (unsigned)buf->data[0]);
 
 	switch(buf->data[0]) {
@@ -81,6 +81,12 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 
 		break;
 	case 1:
+		if (session->internals.hsk_flags & HSK_KEY_UPDATE_ASKED) {
+			/* if we had asked a key update we shouldn't get this
+			 * reply */
+			return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		}
+
 		/* peer updated its key, requested our key update */
 		ret = update_keys(session, STAGE_UPD_PEERS);
 		if (ret < 0)
@@ -90,48 +96,107 @@ int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 		 * will be performed prior to sending the next application
 		 * message.
 		 */
-		session->internals.key_update_state = KEY_UPDATE_SCHEDULED;
+		if (session->internals.rsend_state == RECORD_SEND_NORMAL)
+			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_1;
+		else if (session->internals.rsend_state == RECORD_SEND_CORKED)
+			session->internals.rsend_state = RECORD_SEND_CORKED_TO_KU;
+		else
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
+	session->internals.hsk_flags &= ~(unsigned)(HSK_KEY_UPDATE_ASKED);
+
 	return 0;
 }
 
-int _gnutls13_send_key_update(gnutls_session_t session, unsigned again)
+int _gnutls13_send_key_update(gnutls_session_t session, unsigned again, unsigned flags /* GNUTLS_KU_* */)
 {
-	int ret, ret2;
+	int ret;
 	mbuffer_st *bufel = NULL;
-	const uint8_t val = 0;
+	uint8_t val;
 
 	if (again == 0) {
-		_gnutls_handshake_log("HSK[%p]: sending key update\n", session);
+		if (flags & GNUTLS_KU_PEER) {
+			/* mark that we asked a key update to prevent an
+			 * infinite ping pong when receiving the reply */
+			session->internals.hsk_flags |= HSK_KEY_UPDATE_ASKED;
+			val = 0x01;
+		} else {
+			val = 0x00;
+		}
+
+		_gnutls_handshake_log("HSK[%p]: sending key update (%u)\n", session, (unsigned)val);
 
 		bufel = _gnutls_handshake_alloc(session, 1);
 		if (bufel == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 		_mbuffer_set_udata_size(bufel, 0);
-		ret = _mbuffer_append_data(bufel, (void*)&val, 1);
+		ret = _mbuffer_append_data(bufel, &val, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
+
 	}
 
-	ret = _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_KEY_UPDATE);
-	if (ret == 0) {
-		/* it was completely sent, update the keys */
-		ret2 = update_keys(session, STAGE_UPD_OURS);
-		if (ret2 < 0)
-			return gnutls_assert_val(ret2);
-	}
-
-	return ret;
+	return _gnutls_send_handshake(session, bufel, GNUTLS_HANDSHAKE_KEY_UPDATE);
 
 cleanup:
 	_mbuffer_xfree(&bufel);
 	return ret;
+}
+
+/**
+ * gnutls_session_key_update:
+ * @session: is a #gnutls_session_t type.
+ * @flags: zero of %GNUTLS_KU_PEER
+ *
+ * This function will update/refresh the session keys when the
+ * TLS protocol is 1.3 or better. The peer is notified of the
+ * update by sending a message, so this function should be
+ * treated similarly to gnutls_record_send() --i.e., it may
+ * return %GNUTLS_E_AGAIN or %GNUTLS_E_INTERRUPTED.
+ *
+ * When this flag %GNUTLS_KU_PEER is specified, this function
+ * in addition to updating the local keys, will ask the peer to
+ * refresh its keys too.
+ *
+ * If the negotiated version is not TLS 1.3 or better this
+ * function will return %GNUTLS_E_INVALID_REQUEST.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.xx
+ **/
+int gnutls_session_key_update(gnutls_session_t session, unsigned flags)
+{
+	int ret;
+	const version_entry_st *vers = get_version(session);
+
+	if (!vers->tls13_sem)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	ret =
+	    _gnutls13_send_key_update(session, AGAIN(STATE150), flags);
+	STATE = STATE150;
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	STATE = STATE0;
+
+	_gnutls_epoch_gc(session);
+
+	/* it was completely sent, update the keys */
+	ret = update_keys(session, STAGE_UPD_OURS);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
 }

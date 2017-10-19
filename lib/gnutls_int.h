@@ -167,10 +167,14 @@ typedef enum hs_stage_t {
 	STAGE_UPD_PEERS
 } hs_stage_t;
 
-typedef enum record_flush_t {
-	RECORD_FLUSH = 0,
-	RECORD_CORKED,
-} record_flush_t;
+typedef enum record_send_state_t {
+	RECORD_SEND_NORMAL = 0,
+	RECORD_SEND_CORKED, /* corked and transition to NORMAL afterwards */
+	RECORD_SEND_CORKED_TO_KU, /* corked but must transition to RECORD_SEND_KEY_UPDATE_1 */
+	RECORD_SEND_KEY_UPDATE_1,
+	RECORD_SEND_KEY_UPDATE_2,
+	RECORD_SEND_KEY_UPDATE_3
+} record_send_state_t;
 
 /* the maximum size of encrypted packets */
 #define IS_DTLS(session) (session->internals.transport == GNUTLS_DGRAM)
@@ -251,7 +255,8 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
 	STATE90=90, STATE91, STATE92, STATE93,
 	STATE100=100, STATE101, STATE102, STATE103, STATE104,
-	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110
+	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110,
+	STATE150 /* key update */
 } handshake_state_t;
 
 typedef enum bye_state_t {
@@ -983,7 +988,9 @@ typedef struct {
 						 * send.
 						 */
 
-	record_flush_t record_flush_mode;	/* GNUTLS_FLUSH or GNUTLS_CORKED */
+	record_send_state_t rsend_state;
+	/* buffer used temporarily during key update */
+	gnutls_buffer_st record_key_update_buffer;
 	gnutls_buffer_st record_presend_buffer;	/* holds cached data
 						 * for the gnutls_record_send()
 						 * function.
@@ -1118,12 +1125,8 @@ typedef struct {
 #define HSK_HRR_RECEIVED (1<<4)
 #define HSK_CRT_REQ_SENT (1<<5)
 #define HSK_CRT_REQ_GOT_SIG_ALGO (1<<6)
+#define HSK_KEY_UPDATE_ASKED (1<<7) /* flag is not used during handshake */
 	unsigned hsk_flags; /* TLS1.3 only */
-#define KEY_UPDATE_INACTIVE 0
-#define KEY_UPDATE_SCHEDULED 1
-#define KEY_UPDATE_SENT 2
-#define KEY_UPDATE_COMPLETED 3
-	unsigned key_update_state; /* TLS1.3 only */
 	time_t last_key_update;
 
 	unsigned crt_requested; /* 1 if client auth was requested (i.e., client cert).
