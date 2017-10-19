@@ -53,6 +53,7 @@
 #include "tls13/certificate_verify.h"
 #include "tls13/certificate.h"
 #include "tls13/finished.h"
+#include "tls13/key_update.h"
 #include "tls13/session_ticket.h"
 
 static int generate_hs_traffic_keys(gnutls_session_t session);
@@ -326,29 +327,36 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = _gnutls_buffer_pop_prefix8(buf, &type, 0);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+	/* The following messages are expected asynchronously after
+	 * the handshake process is complete */
+	if (unlikely(session->internals.handshake_in_progress))
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 
-		ret = _gnutls_buffer_pop_prefix24(buf, &length, 1);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+	ret = _gnutls_buffer_pop_prefix8(buf, &type, 0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-		switch(type) {
-			case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
-				ret = _gnutls13_recv_session_ticket(session, buf);
-				if (ret < 0)
-					return gnutls_assert_val(ret);
-				break;
-			default:
-				gnutls_assert();
-				return GNUTLS_E_UNEXPECTED_PACKET;
-		}
+	ret = _gnutls_buffer_pop_prefix24(buf, &length, 1);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	} else {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET;
+	switch(type) {
+		case GNUTLS_HANDSHAKE_KEY_UPDATE:
+			ret = _gnutls13_recv_key_update(session, buf);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			break;
+		case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
+			if (session->security_parameters.entity != GNUTLS_CLIENT)
+				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+
+			ret = _gnutls13_recv_session_ticket(session, buf);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET;
 	}
 
 	return 0;

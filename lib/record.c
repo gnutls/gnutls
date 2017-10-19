@@ -46,6 +46,7 @@
 #include "datum.h"
 #include "constate.h"
 #include "ext/max_record.h"
+#include "tls13/key_update.h"
 #include <ext/heartbeat.h>
 #include <state.h>
 #include <dtls.h>
@@ -1635,6 +1636,80 @@ gnutls_record_recv_packet(gnutls_session_t session,
 	return get_packet_from_buffers(session, GNUTLS_APPLICATION_DATA, packet);
 }
 
+static
+ssize_t append_data_to_corked(gnutls_session_t session, const void *data, size_t data_size)
+{
+	int ret;
+
+	if (IS_DTLS(session)) {
+		if (data_size + session->internals.record_presend_buffer.length >
+			gnutls_dtls_get_data_mtu(session)) {
+			return gnutls_assert_val(GNUTLS_E_LARGE_PACKET);
+		}
+	}
+
+	ret =
+	    _gnutls_buffer_append_data(&session->internals.
+				       record_presend_buffer, data,
+				       data_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return data_size;
+}
+
+static
+ssize_t handle_key_update(gnutls_session_t session, const void *data, size_t data_size)
+{
+	ssize_t ret;
+
+	/* do nothing, if we are in corked mode. Otherwise
+	 * switch to corked mode, cache the data and send
+	 * the key update */
+
+	if (session->internals.record_flush_mode == RECORD_FLUSH) {
+		gnutls_record_cork(session); /* we are not in flush mode after that */
+
+		ret = append_data_to_corked(session, data, data_size);
+		if (ret < 0)
+			return ret;
+
+		ret = _gnutls13_send_key_update(session, 0);
+
+		session->internals.key_update_state = KEY_UPDATE_SENT;
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		session->internals.key_update_state = KEY_UPDATE_COMPLETED;
+
+		ret = gnutls_record_uncork(session, 0);
+		if (ret == 0)
+			session->internals.key_update_state = KEY_UPDATE_INACTIVE;
+		return ret;
+	} else {
+		switch(session->internals.key_update_state) {
+		case KEY_UPDATE_SCHEDULED:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		case KEY_UPDATE_SENT:
+			ret = _gnutls13_send_key_update(session, 1);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			session->internals.key_update_state = KEY_UPDATE_COMPLETED;
+
+			FALLTHROUGH;
+		case KEY_UPDATE_COMPLETED:
+			ret = gnutls_record_uncork(session, 0);
+			if (ret == 0)
+				session->internals.key_update_state = KEY_UPDATE_INACTIVE;
+			return ret;
+		default:
+			/* no state */
+			return GNUTLS_E_INT_RET_0; /* notify fall through */
+		}
+	}
+}
 /**
  * gnutls_record_send:
  * @session: is a #gnutls_session_t type.
@@ -1682,29 +1757,23 @@ gnutls_record_send(gnutls_session_t session, const void *data,
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
 	}
 
+	if (session->internals.key_update_state > KEY_UPDATE_INACTIVE) {
+		ssize_t ret;
+
+		ret = handle_key_update(session, data, data_size);
+		if (ret != GNUTLS_E_INT_RET_0)
+			return ret;
+		/* otherwise fall through */
+	}
+
 	if (session->internals.record_flush_mode == RECORD_FLUSH) {
 		return _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
 					-1, EPOCH_WRITE_CURRENT, data,
 					data_size, MBUFFER_FLUSH);
 	} else {		/* GNUTLS_CORKED */
+		return append_data_to_corked(session, data, data_size);
 
-		int ret;
 
-		if (IS_DTLS(session)) {
-			if (data_size + session->internals.record_presend_buffer.length >
-				gnutls_dtls_get_data_mtu(session)) {
-				return gnutls_assert_val(GNUTLS_E_LARGE_PACKET);
-			}
-		}
-
-		ret =
-		    _gnutls_buffer_append_data(&session->internals.
-					       record_presend_buffer, data,
-					       data_size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		return data_size;
 	}
 }
 

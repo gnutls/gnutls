@@ -162,7 +162,9 @@ typedef enum transport_t {
 /* The TLS 1.3 stage of handshake */
 typedef enum hs_stage_t {
 	STAGE_HS,
-	STAGE_APP
+	STAGE_APP,
+	STAGE_UPD_OURS,
+	STAGE_UPD_PEERS
 } hs_stage_t;
 
 typedef enum record_flush_t {
@@ -1117,6 +1119,12 @@ typedef struct {
 #define HSK_CRT_REQ_SENT (1<<5)
 #define HSK_CRT_REQ_GOT_SIG_ALGO (1<<6)
 	unsigned hsk_flags; /* TLS1.3 only */
+#define KEY_UPDATE_INACTIVE 0
+#define KEY_UPDATE_SCHEDULED 1
+#define KEY_UPDATE_SENT 2
+#define KEY_UPDATE_COMPLETED 3
+	unsigned key_update_state; /* TLS1.3 only */
+	time_t last_key_update;
 
 	unsigned crt_requested; /* 1 if client auth was requested (i.e., client cert).
 	 * In case of a server this holds 1 if we should wait

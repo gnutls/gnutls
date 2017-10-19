@@ -44,7 +44,7 @@ static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof(keyexp) - 1;
 
 static int
-_tls13_init_record_state(record_parameters_st * params);
+_tls13_init_record_state(gnutls_cipher_algorithm_t algo, record_state_st *state);
 
 /* This function is to be called after handshake, when master_secret,
  *  client_random and server_random have been initialized. 
@@ -200,7 +200,106 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 }
 
 static int
-_tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st * params,
+_tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
+		   uint16_t epoch, record_parameters_st *params,
+		   unsigned iv_size, unsigned key_size)
+{
+	uint8_t key_block[MAX_CIPHER_KEY_SIZE];
+	uint8_t iv_block[MAX_CIPHER_IV_SIZE];
+	char buf[65];
+	record_state_st *state;
+	uint16_t *session_epoch;
+	int ret;
+
+	if ((session->security_parameters.entity == GNUTLS_CLIENT && stage == STAGE_UPD_OURS) ||
+	    (session->security_parameters.entity == GNUTLS_SERVER && stage == STAGE_UPD_PEERS)) {
+		/* client keys */
+		ret = _tls13_derive_secret(session, APPLICATION_TRAFFIC_UPDATE,
+					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
+					   NULL, 0,
+					   session->key.temp_secret,
+					   session->key.hs_ckey);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_ckey, key_size, key_block);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_ckey, iv_size, iv_block);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		if (stage == STAGE_UPD_OURS) {
+			state = &params->write;
+			session_epoch = &session->security_parameters.epoch_write;
+		} else {
+			state = &params->read;
+			session_epoch = &session->security_parameters.epoch_read;
+		}
+
+	} else {
+		ret = _tls13_derive_secret(session, APPLICATION_TRAFFIC_UPDATE,
+					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
+					   NULL, 0,
+					   session->key.temp_secret,
+					   session->key.hs_skey);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_skey, key_size, key_block);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_skey, iv_size, iv_block);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		if (stage == STAGE_UPD_OURS) {
+			state = &params->write;
+			session_epoch = &session->security_parameters.epoch_write;
+		} else {
+			state = &params->read;
+			session_epoch = &session->security_parameters.epoch_read;
+		}
+	}
+
+	state->mac_secret.data = NULL;
+	state->mac_secret.size = 0;
+
+	ret = _gnutls_set_datum(&state->key, key_block, key_size);
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	_gnutls_hard_log("INT: NEW KEY [%d]: %s\n",
+			 key_size,
+			 _gnutls_bin2hex(key_block, key_size,
+					 buf, sizeof(buf), NULL));
+
+	if (iv_size > 0) {
+		ret = _gnutls_set_datum(&state->IV, iv_block, iv_size);
+		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		_gnutls_hard_log("INT: NEW WRITE IV [%d]: %s\n",
+				 iv_size,
+				 _gnutls_bin2hex(iv_block, iv_size,
+						 buf, sizeof(buf), NULL));
+	}
+
+	ret = _tls13_init_record_state(params->cipher->id, state);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	*session_epoch = epoch;
+
+	return 0;
+}
+
+static int
+_tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
+		uint16_t epoch,
+		record_parameters_st * params,
 		unsigned iv_size, unsigned key_size)
 {
 	uint8_t ckey_block[MAX_CIPHER_KEY_SIZE];
@@ -213,6 +312,10 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 	unsigned label_size, hsk_len;
 	const char *keylog_label;
 	int ret;
+
+	if (stage == STAGE_UPD_OURS || stage == STAGE_UPD_PEERS)
+		return _tls13_update_keys(session, stage, epoch,
+					  params, iv_size, key_size);
 
 	if (stage == STAGE_HS) {
 		label = HANDSHAKE_CLIENT_TRAFFIC_LABEL;
@@ -330,6 +433,17 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 				 _gnutls_bin2hex(siv_block, iv_size,
 						 buf, sizeof(buf), NULL));
 	}
+
+	ret = _tls13_init_record_state(params->cipher->id, &params->read);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _tls13_init_record_state(params->cipher->id, &params->write);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	session->security_parameters.epoch_read = epoch;
+	session->security_parameters.epoch_write = epoch;
 
 	return 0;
 }
@@ -478,13 +592,10 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 
 	if (ver->tls13_sem) {
 		ret = _tls13_set_keys
-		    (session, stage, params, IV_size, key_size);
+		    (session, stage, epoch, params, IV_size, key_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_init_record_state(params);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
 	} else {
 		ret = _gnutls_set_keys
 		    (session, params, hash_size, IV_size, key_size);
@@ -850,30 +961,21 @@ int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage)
 			      session,
 			      session->security_parameters.cs->name);
 
-	session->security_parameters.epoch_read = epoch_next;
-	session->security_parameters.epoch_write = epoch_next;
-
 	return 0;
 }
 
 static int
-_tls13_init_record_state(record_parameters_st * params)
+_tls13_init_record_state(gnutls_cipher_algorithm_t algo, record_state_st *state)
 {
 	int ret;
 
-	ret = _gnutls_aead_cipher_init(&params->read.ctx.aead,
-				       params->cipher->id, &params->read.key);
+	ret = _gnutls_aead_cipher_init(&state->ctx.aead,
+				       algo, &state->key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_aead_cipher_init(&params->write.ctx.aead,
-				       params->cipher->id, &params->write.key);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	params->read.aead_tag_size = params->write.aead_tag_size = gnutls_cipher_get_tag_size(params->cipher->id);
-	params->read.is_aead = 1;
-	params->write.is_aead = 1;
+	state->aead_tag_size = gnutls_cipher_get_tag_size(algo);
+	state->is_aead = 1;
 
 	return 0;
 }

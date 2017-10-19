@@ -119,7 +119,9 @@ int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certific
 #define DERIVED_LABEL "derived"
 #define APPLICATION_CLIENT_TRAFFIC_LABEL "c ap traffic"
 #define APPLICATION_SERVER_TRAFFIC_LABEL "s ap traffic"
+#define APPLICATION_TRAFFIC_UPDATE "traffic upd"
 #define EXPORTER_MASTER_LABEL "exp master"
+#define EXPORTER_LABEL "exp master"
 #define RES_LABEL "res master"
 
 int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side);
