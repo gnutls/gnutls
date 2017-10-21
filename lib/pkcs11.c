@@ -59,7 +59,8 @@ struct gnutls_pkcs11_provider_st {
 
 struct find_flags_data_st {
 	struct p11_kit_uri *info;
-	unsigned int slot_flags;
+	unsigned int slot_flags; /* Slot Information Flags */
+	unsigned int token_flags; /* Token Information Flags */
 	unsigned int trusted;
 };
 
@@ -3360,6 +3361,7 @@ find_flags_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo
 	else
 		find_data->trusted = 0;
 	find_data->slot_flags = sinfo->slot_info.flags;
+	find_data->token_flags = sinfo->tinfo.flags;
 
 	return 0;
 }
@@ -3402,9 +3404,51 @@ int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags)
 	}
 
 	*flags = 0;
+
+	/* read slot flags */
 	if (find_data.slot_flags & CKF_HW_SLOT)
 		*flags |= GNUTLS_PKCS11_TOKEN_HW;
 
+	/* read token flags */
+	if (find_data.token_flags & CKF_RNG)
+		*flags |= GNUTLS_PKCS11_TOKEN_RNG;
+
+	if (find_data.token_flags & CKF_LOGIN_REQUIRED)
+		*flags |= GNUTLS_PKCS11_TOKEN_LOGIN_REQUIRED;
+
+	if (find_data.token_flags & CKF_PROTECTED_AUTHENTICATION_PATH)
+		*flags |= GNUTLS_PKCS11_TOKEN_PROTECTED_AUTHENTICATION_PATH;
+
+	if (find_data.token_flags & CKF_TOKEN_INITIALIZED)
+		*flags |= GNUTLS_PKCS11_TOKEN_INITIALIZED;
+
+	if (find_data.token_flags & CKF_USER_PIN_COUNT_LOW)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_COUNT_LOW;
+
+	if (find_data.token_flags & CKF_USER_PIN_FINAL_TRY)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_FINAL_TRY;
+
+	if (find_data.token_flags & CKF_USER_PIN_LOCKED)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_LOCKED;
+
+	if (find_data.token_flags & CKF_SO_PIN_COUNT_LOW)
+		*flags |= GNUTLS_PKCS11_TOKEN_SO_PIN_COUNT_LOW;
+
+	if (find_data.token_flags & CKF_SO_PIN_FINAL_TRY)
+		*flags |= GNUTLS_PKCS11_TOKEN_SO_PIN_FINAL_TRY;
+
+	if (find_data.token_flags & CKF_SO_PIN_LOCKED)
+		*flags |= GNUTLS_PKCS11_TOKEN_SO_PIN_LOCKED;
+
+	if (find_data.token_flags & CKF_USER_PIN_INITIALIZED)
+		*flags |= GNUTLS_PKCS11_TOKEN_USER_PIN_INITIALIZED;
+
+#ifdef CKF_ERROR_STATE
+	if (find_data.token_flags & CKF_ERROR_STATE)
+		*flags |= GNUTLS_PKCS11_TOKEN_ERROR_STATE;
+#endif
+
+	/* other flags */
 	if (find_data.trusted != 0)
 		*flags |= GNUTLS_PKCS11_TOKEN_TRUSTED;
 
