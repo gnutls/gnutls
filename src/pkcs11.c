@@ -59,10 +59,19 @@ static char *_saved_url = NULL;
 
 #define KEEP_LOGIN_FLAGS(flags) (flags & (GNUTLS_PKCS11_OBJ_FLAG_LOGIN|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO))
 
-#define CHECK_LOGIN_FLAG(flags) \
-	if ((flags & KEEP_LOGIN_FLAGS(flags)) == 0) \
-		fprintf(stderr, \
-			"warning: --login was not specified and it may be required for this operation.\n")
+#define CHECK_LOGIN_FLAG(url, flags) \
+	if ((flags & KEEP_LOGIN_FLAGS(flags)) == 0) { \
+		unsigned _tflags; \
+		int _r = gnutls_pkcs11_token_get_flags(url, &_tflags); \
+		if (_r >= 0 && (_tflags & GNUTLS_PKCS11_TOKEN_LOGIN_REQUIRED)) { \
+			flags |= GNUTLS_PKCS11_OBJ_FLAG_LOGIN; \
+			fprintf(stderr, \
+				"note: assuming --login for this operation.\n"); \
+		} else { \
+			fprintf(stderr, \
+				"warning: --login was not specified and it may be required for this operation.\n"); \
+		} \
+	}
 
 
 void
@@ -1133,7 +1142,8 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	pkcs11_common(info);
 
 	FIX(url, outfile, 0, info);
-	CHECK_LOGIN_FLAG(flags);
+
+	CHECK_LOGIN_FLAG(url, flags);
 	if (label == NULL && info->batch == 0) {
 		label = read_str("warning: The object's label was not specified.\nLabel: ");
 	}
@@ -1268,7 +1278,8 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 	pkcs11_common(info);
 
 	FIX(url, outfile, detailed, info);
-	CHECK_LOGIN_FLAG(flags);
+
+	CHECK_LOGIN_FLAG(url, flags);
 
 	if (id != NULL) {
 		raw_id_size = sizeof(raw_id);
@@ -1322,7 +1333,8 @@ pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int
 	pkcs11_common(info);
 
 	FIX(url, outfile, detailed, info);
-	CHECK_LOGIN_FLAG(flags);
+
+	CHECK_LOGIN_FLAG(url, flags);
 
 	if (outfile == stderr || outfile == stdout) {
 		fprintf(stderr, "warning: no --outfile was specified and the public key will be printed on screen.\n");
@@ -1538,7 +1550,8 @@ void pkcs11_set_val(FILE * outfile, const char *url, int detailed,
 	pkcs11_common(info);
 
 	FIX(url, outfile, detailed, info);
-	CHECK_LOGIN_FLAG(flags);
+
+	CHECK_LOGIN_FLAG(url, flags);
 
 	ret = gnutls_pkcs11_obj_init(&obj);
 	if (ret < 0) {
