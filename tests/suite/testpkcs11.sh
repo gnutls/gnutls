@@ -370,6 +370,26 @@ generate_temp_ecc_privkey () {
 	fi
 }
 
+# $1: token
+# $2: PIN
+# $3: bits
+# The same as generate_temp_ecc_privkey but no explicit login is performed.
+# p11tool should detect that login is required for the operation.
+generate_temp_ecc_privkey_no_login () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+	bits="$3"
+
+	echo -n "* Generating ECC private key without --login (${bits})... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --label "temp-ecc-no-${bits}" --generate-ecc --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		echo ok
+	else
+		echo failed
+		exit 1
+	fi
+}
+
 # $1: name
 # $2: label prefix
 # $3: generate option
@@ -846,6 +866,9 @@ write_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/client.key"
 
 generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 256
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-256
+
+generate_temp_ecc_privkey_no_login "${TOKEN}" "${GNUTLS_PIN}" 256
+delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-no-256
 
 generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 384
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-384
