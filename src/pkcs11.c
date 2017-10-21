@@ -676,6 +676,94 @@ void print_type(FILE *outfile, unsigned flags)
 	if (print == 0)
 		fputs("Generic token", outfile);
 	fputc('\n', outfile);
+
+	print = 0;
+	fputs("\tFlags: ", outfile);
+	if (flags & GNUTLS_PKCS11_TOKEN_RNG) {
+		fputs("RNG", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_LOGIN_REQUIRED) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("Requires login", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_PROTECTED_AUTHENTICATION_PATH) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("External PIN", outfile);
+		print++;
+	}
+
+	if (!(flags & GNUTLS_PKCS11_TOKEN_INITIALIZED)) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("Uninitialized", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_USER_PIN_COUNT_LOW) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("uPIN low count", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_USER_PIN_FINAL_TRY) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("Final uPIN attempt", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_USER_PIN_FINAL_TRY) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("uPIN locked", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_SO_PIN_COUNT_LOW) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("SO-PIN low count", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_SO_PIN_FINAL_TRY) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("Final SO-PIN attempt", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_SO_PIN_FINAL_TRY) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("SO-PIN locked", outfile);
+		print++;
+	}
+
+	if (!(flags & GNUTLS_PKCS11_TOKEN_USER_PIN_INITIALIZED)) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("uPIN uninitialized", outfile);
+		print++;
+	}
+
+	if (flags & GNUTLS_PKCS11_TOKEN_ERROR_STATE) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("Error state", outfile);
+		print++;
+	}
+
+	if (print == 0)
+		fputs("Generic token", outfile);
+	fputc('\n', outfile);
 }
 
 void
