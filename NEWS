@@ -31,6 +31,9 @@ See the end for copying conditions.
    after the DSA algorithm became disabled by default, and is no longer necessary
    as DSA is now being universally depracated.
 
+** libgnutls: Refuse to resume a session which had a different SNI advertised. That
+   improves RFC6066 support in server side. Reported by Thomas Klute.
+
 ** p11tool: Mark all generated objects as sensitive by default.
 
 ** p11tool: added options --sign-params and --hash. This allows testing
