@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.1 (unreleased)
+* Version 3.6.1 (released 2017-10-21)
 
 ** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
    used. Resolves gitlab issue #259.
@@ -30,6 +30,8 @@ See the end for copying conditions.
    The previous approach was to allow a smooth move for client infrastructure
    after the DSA algorithm became disabled by default, and is no longer necessary
    as DSA is now being universally depracated.
+
+** p11tool: Mark all generated objects as sensitive by default.
 
 ** p11tool: added options --sign-params and --hash. This allows testing
    signature with multiple algorithms, including RSA-PSS.
