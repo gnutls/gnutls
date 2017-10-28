@@ -2183,38 +2183,52 @@ recv_hello_verify_request(gnutls_session_t session,
  * gnutls_rehandshake:
  * @session: is a #gnutls_session_t type.
  *
- * This function will renegotiate security parameters with the
- * client.  This should only be called in case of a server.
+ * This function can only be called in server side, and
+ * instructs a TLS 1.2 or earlier client to renegotiate
+ * parameters (perform a handshake), by sending a 
+ * hello request message.
  *
- * This message informs the peer that we want to renegotiate
- * parameters (perform a handshake).
+ * If this function succeeds, the calling application
+ * should call gnutls_record_recv() until %GNUTLS_E_REHANDSHAKE
+ * is returned to clear any pending data. If the %GNUTLS_E_REHANDSHAKE
+ * error code is not seen, then the handshake request was
+ * not followed by the peer (the TLS protocol does not require
+ * the client to do, and such compliance should be handled
+ * by the application protocol).
  *
- * If this function succeeds (returns 0), you must call the
- * gnutls_handshake() function in order to negotiate the new
+ * Once the %GNUTLS_E_REHANDSHAKE error code is seen, the
+ * calling application should proceed to calling
+ * gnutls_handshake() to negotiate the new
  * parameters.
  *
- * Since TLS is full duplex some application data might have been
- * sent during peer's processing of this message. In that case
- * one should call gnutls_record_recv() until GNUTLS_E_REHANDSHAKE
- * is returned to clear any pending data. Care must be taken, if
- * rehandshake is mandatory, to terminate if it does not start after
- * some threshold.
- *
  * If the client does not wish to renegotiate parameters he 
- * should reply with an alert message, thus the return code will be
- * %GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
+ * may reply with an alert message, and in that case the return code seen
+ * by subsequent gnutls_record_recv() will be
+ * %GNUTLS_E_WARNING_ALERT_RECEIVED with the specific alert being
  * %GNUTLS_A_NO_RENEGOTIATION.  A client may also choose to ignore
- * this message.
+ * this request.
+ *
+ * Under TLS 1.3 this function is equivalent to gnutls_session_key_update()
+ * with the %GNUTLS_KU_PEER flag. In that case subsequent calls to
+ * gnutls_record_recv() will not return %GNUTLS_E_REHANDSHAKE, and
+ * calls to gnutls_handshake() in server side are a no-op.
+ *
+ * This function always fails with %GNUTLS_E_INVALID_REQUEST when
+ * called in client side.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
 int gnutls_rehandshake(gnutls_session_t session)
 {
 	int ret;
+	const version_entry_st *vers = get_version(session);
 
 	/* only server sends that handshake packet */
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return GNUTLS_E_INVALID_REQUEST;
+
+	if (vers->tls13_sem)
+		return gnutls_session_key_update(session, GNUTLS_KU_PEER);
 
 	_dtls_async_timer_delete(session);
 
@@ -2305,45 +2319,58 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
  * gnutls_handshake:
  * @session: is a #gnutls_session_t type.
  *
- * This function does the handshake of the TLS/SSL protocol, and
- * initializes the TLS connection.
- *
- * This function will fail if any problem is encountered, and will
- * return a negative error code. In case of a client, if the client
- * has asked to resume a session, but the server couldn't, then a
- * full handshake will be performed.
+ * This function performs the handshake of the TLS/SSL protocol, and
+ * initializes the TLS session parameters.
  *
  * The non-fatal errors expected by this function are:
  * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN, 
- * %GNUTLS_E_WARNING_ALERT_RECEIVED, and %GNUTLS_E_GOT_APPLICATION_DATA,
- * the latter only in a case of rehandshake.
+ * %GNUTLS_E_WARNING_ALERT_RECEIVED. When this function is called
+ * for re-handshake under TLS 1.2 or earlier, the non-fatal error code
+ * %GNUTLS_E_GOT_APPLICATION_DATA may also be returned.
  *
- * The former two interrupt the handshake procedure due to the lower
- * layer being interrupted, and the latter because of an alert that
- * may be sent by a server (it is always a good idea to check any
- * received alerts). On these errors call this function again, until it
- * returns 0; cf.  gnutls_record_get_direction() and
+ * The former two interrupt the handshake procedure due to the transport
+ * layer being interrupted, and the latter because of a "warning" alert that
+ * was sent by the peer (it is always a good idea to check any
+ * received alerts). On these non-fatal errors call this function again,
+ * until it returns 0; cf.  gnutls_record_get_direction() and
  * gnutls_error_is_fatal(). In DTLS sessions the non-fatal error
  * %GNUTLS_E_LARGE_PACKET is also possible, and indicates that
  * the MTU should be adjusted.
  *
- * If this function is called by a server after a rehandshake request
- * then %GNUTLS_E_GOT_APPLICATION_DATA or
- * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
- * are non fatal errors, only in the specific case of a rehandshake.
- * Their meaning is that the client rejected the rehandshake request or
- * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it could also mean that
- * some data were pending. A client may receive that error code if
- * it initiates the handshake and the server doesn't agreed.
+ * When this function is called by a server after a rehandshake request
+ * under TLS 1.2 or earlier the %GNUTLS_E_GOT_APPLICATION_DATA error code indicates
+ * that some data were pending prior to peer initiating the handshake.
+ * Under TLS 1.3 this function when called after a successful handshake, is a no-op
+ * and always succeeds in server side; in client side this function is
+ * equivalent to gnutls_session_key_update() with %GNUTLS_KU_PEER flag.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ * This function handles both full and abbreviated TLS handshakes (resumption).
+ * For abbreviated handshakes, in client side, the gnutls_session_set_data()
+ * should be called prior to this function to set parameters from a previous session.
+ * In server side, resumption is handled by either setting a DB back-end, or setting
+ * up keys for session tickets.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on a successful handshake, otherwise a negative error code.
  **/
 int gnutls_handshake(gnutls_session_t session)
 {
 	int ret;
 
-	/* sanity check. Verify that there are priorities setup.
-	 */
+	if (unlikely(session->internals.initial_negotiation_completed)) {
+		const version_entry_st *vers = get_version(session);
+
+		if (vers->tls13_sem) {
+			if (session->security_parameters.entity == GNUTLS_CLIENT) {
+				return gnutls_session_key_update(session, GNUTLS_KU_PEER);
+			} else {
+				/* This is a no-op for a server under TLS 1.3, as
+				 * a server has already called gnutls_rehandshake()
+				 * which performed a key update.
+				 */
+				return 0;
+			}
+		}
+	}
 
 	if (STATE == STATE0) {
 		/* first call */
