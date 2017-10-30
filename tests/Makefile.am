@@ -113,6 +113,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain	tls12-rehandshake-cert-3 \
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	\
 	 tls12-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
+	 tls13-rehandshake-cert \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \

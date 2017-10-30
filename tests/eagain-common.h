@@ -98,8 +98,8 @@ extern const char *side;
 	  transferred += ret; \
 	} \
       side = "server"; \
-      ns = record_send_loop (server, msg, msglen, retry_send_with_null); \
-      if (ns < 0) fail ("server send error: %s\n", gnutls_strerror (ret)); \
+      ret = record_send_loop (server, msg, msglen, retry_send_with_null); \
+      if (ret < 0) fail ("server send error: %s\n", gnutls_strerror (ret)); \
       do \
 	{ \
 	  side = "client"; \
@@ -124,8 +124,8 @@ extern const char *side;
 	    } \
 	  /* echo back */ \
 	  side = "client"; \
-	  ns = record_send_loop (client, buf, msglen, retry_send_with_null); \
-	  if (ns < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
+	  ret = record_send_loop (client, buf, msglen, retry_send_with_null); \
+	  if (ret < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
 	  transferred += ret; \
 	  if (debug) \
 	    fputs (".", stdout); \
