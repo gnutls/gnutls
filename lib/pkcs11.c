@@ -108,7 +108,14 @@ struct find_cert_st {
 
 static struct gnutls_pkcs11_provider_st providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
-static unsigned int providers_initialized = 0;
+
+typedef enum init_level_t {
+	PROV_UNINITIALIZED = 0,
+	PROV_INIT_TRUSTED,
+	PROV_INIT_ALL
+} init_level_t;
+
+static init_level_t providers_initialized = PROV_UNINITIALIZED;
 static unsigned int pkcs11_forkid = 0;
 
 static int _gnutls_pkcs11_reinit(void);
@@ -261,15 +268,21 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, unsigned cu
  * The output value of the callback will be returned if it is
  * a negative one (indicating failure).
 */
-int _gnutls_pkcs11_check_init(void *priv, pkcs11_reinit_function cb)
+int _gnutls_pkcs11_check_init(unsigned trusted, void *priv, pkcs11_reinit_function cb)
 {
 	int ret;
+	init_level_t req_level = PROV_UNINITIALIZED;
+
+	if (trusted)
+		req_level = PROV_INIT_TRUSTED;
+	else
+		req_level = PROV_INIT_ALL;
 
 	ret = gnutls_mutex_lock(&_gnutls_pkcs11_mutex);
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
-	if (providers_initialized != 0) {
+	if (providers_initialized >= req_level) {
 		ret = 0;
 
 		if (_gnutls_detect_fork(pkcs11_forkid)) {
@@ -288,10 +301,16 @@ int _gnutls_pkcs11_check_init(void *priv, pkcs11_reinit_function cb)
 
 		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 		return ret;
+	} else if (providers_initialized < req_level) {
+		/* when upgrading initialization level, deinitialize
+		 * and re-initialize everything. */
+		gnutls_pkcs11_deinit();
 	}
 
 	_gnutls_debug_log("Initializing PKCS #11 modules\n");
-	ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+	ret = gnutls_pkcs11_init(
+		trusted?GNUTLS_PKCS11_FLAG_AUTO_TRUSTED:GNUTLS_PKCS11_FLAG_AUTO,
+		NULL);
 
 	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 
@@ -742,13 +761,13 @@ static void compat_load(const char *configfile)
 	return;
 }
 
-static int auto_load(void)
+static int auto_load(unsigned trusted)
 {
 	struct ck_function_list **modules;
 	int i, ret;
 	char* name;
 
-	modules = p11_kit_modules_load_and_initialize(0);
+	modules = p11_kit_modules_load_and_initialize(trusted?P11_KIT_MODULE_TRUSTED:0);
 	if (modules == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log
@@ -817,15 +836,21 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 	if (flags == GNUTLS_PKCS11_FLAG_MANUAL) {
 		/* if manual configuration is requested then don't
 		 * bother loading any other providers */
-		providers_initialized = 1;
+		providers_initialized = PROV_INIT_ALL;
 		return 0;
 	 } else if (flags & GNUTLS_PKCS11_FLAG_AUTO) {
 		if (deprecated_config_file == NULL)
-			ret = auto_load();
+			ret = auto_load(0);
 
 		compat_load(deprecated_config_file);
 
-		providers_initialized = 1;
+		providers_initialized = PROV_INIT_ALL;
+
+		return ret;
+	} else if (flags & GNUTLS_PKCS11_FLAG_AUTO_TRUSTED) {
+		ret = auto_load(1);
+
+		providers_initialized = PROV_INIT_TRUSTED;
 
 		return ret;
 	}
@@ -918,7 +943,7 @@ void gnutls_pkcs11_deinit(void)
 		p11_kit_module_release(providers[i].module);
 	}
 	active_providers = 0;
-	providers_initialized = 0;
+	providers_initialized = PROV_UNINITIALIZED;
 
 	gnutls_pkcs11_set_pin_function(NULL, NULL);
 	gnutls_pkcs11_set_token_function(NULL, NULL);
@@ -3173,7 +3198,11 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 	int ret;
 	struct find_obj_data_st priv;
 
-	PKCS11_CHECK_INIT;
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
+		PKCS11_CHECK_INIT_TRUSTED;
+	} else {
+		PKCS11_CHECK_INIT;
+	}
 
 	memset(&priv, 0, sizeof(priv));
 
