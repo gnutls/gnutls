@@ -56,7 +56,6 @@ void server_initiated_handshake(void)
 	gnutls_session_t client;
 	unsigned char buffer[64];
 	int cret = GNUTLS_E_AGAIN;
-	int ret;
 	size_t transferred = 0;
 
 	success("testing server initiated re-handshake\n");
@@ -140,7 +139,6 @@ void client_initiated_handshake(void)
 	gnutls_session_t client;
 	unsigned char buffer[64];
 	int cret = GNUTLS_E_AGAIN;
-	int ret;
 	size_t transferred = 0;
 
 	success("testing client initiated re-handshake\n");

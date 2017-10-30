@@ -57,7 +57,6 @@ static void run(const char *name, unsigned test)
 	gnutls_session_t client;
 	/* Need to enable anonymous KX specifically. */
 	char buffer[MAX_BUF + 1];
-	ssize_t ns;
 	int ret, transferred = 0;
 
 	/* General init. */

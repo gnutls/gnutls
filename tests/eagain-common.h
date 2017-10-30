@@ -73,87 +73,89 @@ extern const char *side;
 #define HANDSHAKE(c, s) \
   HANDSHAKE_EXPECT(c,s,0,0)
 
-#define TRANSFER2(c, s, msg, msglen, buf, buflen, retry_send_with_null) \
+#define TRANSFER2(c, s, msg, msglen, buf, buflen, retry_send_with_null) { \
+  int _ret; \
   side = "client"; \
-  ret = record_send_loop (c, msg, msglen, retry_send_with_null); \
+  _ret = record_send_loop (c, msg, msglen, retry_send_with_null); \
   \
-  if (ret < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
+  if (_ret < 0) fail ("client send error: %s\n", gnutls_strerror (_ret)); \
   \
   do \
     { \
       do \
 	{ \
 	  side = "server"; \
-	  ret = gnutls_record_recv (s, buf, buflen); \
+	  _ret = gnutls_record_recv (s, buf, buflen); \
 	} \
-      while(ret == GNUTLS_E_AGAIN); \
-      if (ret == 0) \
+      while(_ret == GNUTLS_E_AGAIN); \
+      if (_ret == 0) \
 	fail ("server: didn't receive any data\n"); \
-      else if (ret < 0) \
+      else if (_ret < 0) \
 	{ \
-	  fail ("server: error: %s\n", gnutls_strerror (ret)); \
+	  fail ("server: error: %s\n", gnutls_strerror (_ret)); \
 	} \
       else \
 	{ \
-	  transferred += ret; \
+	  transferred += _ret; \
 	} \
       side = "server"; \
-      ret = record_send_loop (server, msg, msglen, retry_send_with_null); \
-      if (ret < 0) fail ("server send error: %s\n", gnutls_strerror (ret)); \
+      _ret = record_send_loop (server, msg, msglen, retry_send_with_null); \
+      if (_ret < 0) fail ("server send error: %s\n", gnutls_strerror (_ret)); \
       do \
 	{ \
 	  side = "client"; \
-	  ret = gnutls_record_recv (client, buf, buflen); \
+	  _ret = gnutls_record_recv (client, buf, buflen); \
 	} \
-      while(ret == GNUTLS_E_AGAIN); \
-      if (ret == 0) \
+      while(_ret == GNUTLS_E_AGAIN); \
+      if (_ret == 0) \
 	{ \
 	  fail ("client: Peer has closed the TLS connection\n"); \
 	} \
-      else if (ret < 0) \
+      else if (_ret < 0) \
 	{ \
 	  if (debug) \
 	    fputs ("!", stdout); \
-	  fail ("client: Error: %s\n", gnutls_strerror (ret)); \
+	  fail ("client: Error: %s\n", gnutls_strerror (_ret)); \
 	} \
       else \
 	{ \
-	  if (msglen != ret || memcmp (buf, msg, msglen) != 0) \
+	  if (msglen != _ret || memcmp (buf, msg, msglen) != 0) \
 	    { \
 	      fail ("client: Transmitted data do not match\n"); \
 	    } \
 	  /* echo back */ \
 	  side = "client"; \
-	  ret = record_send_loop (client, buf, msglen, retry_send_with_null); \
-	  if (ret < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
-	  transferred += ret; \
+	  _ret = record_send_loop (client, buf, msglen, retry_send_with_null); \
+	  if (_ret < 0) fail ("client send error: %s\n", gnutls_strerror (_ret)); \
+	  transferred += _ret; \
 	  if (debug) \
 	    fputs (".", stdout); \
 	} \
     } \
-  while (transferred < 70000)
+  while (transferred < 70000); \
+  }
 
 #define EMPTY_BUF(s, c, buf, buflen) \
     { \
-      side = "client"; ret = 0; \
-      while((ret == GNUTLS_E_AGAIN && to_server_len > 0) || to_server_len > 0) \
+      side = "client"; int _ret = 0; \
+      while((_ret == GNUTLS_E_AGAIN && to_server_len > 0) || to_server_len > 0) \
 	{ \
 	  side = "server"; \
-	  ret = gnutls_record_recv (s, buf, buflen); \
+	  _ret = gnutls_record_recv (s, buf, buflen); \
 	} \
-      if (ret < 0 && ret !=GNUTLS_E_AGAIN) \
+      if (_ret < 0 && _ret !=GNUTLS_E_AGAIN) \
 	{ \
-	  fail ("server: error: %s\n", gnutls_strerror (ret)); \
+	  fail ("server: error: %s\n", gnutls_strerror (_ret)); \
 	} \
-      side = "server"; ret = 0; \
-      while((to_client_len > 0 && ret == GNUTLS_E_AGAIN) || to_client_len > 0) \
+      side = "server"; _ret = 0; \
+      while((to_client_len > 0 && _ret == GNUTLS_E_AGAIN) || to_client_len > 0) \
 	{ \
 	  side = "client"; \
-	  ret = gnutls_record_recv (client, buf, buflen); \
+	  _ret = gnutls_record_recv (client, buf, buflen); \
 	} \
-      if (ret < 0 && ret !=GNUTLS_E_AGAIN) \
+      if (_ret < 0 && _ret !=GNUTLS_E_AGAIN) \
 	{ \
-	  fail ("client: Error: %s\n", gnutls_strerror (ret)); \
+	  fail ("client: Error: %s\n", gnutls_strerror (_ret)); \
 	} \
     }
 

@@ -79,8 +79,7 @@ void doit(void)
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN, i;
 	/* Need to enable anonymous KX specifically. */
-	ssize_t ns;
-	int ret, transferred = 0;
+	int transferred = 0;
 
 	/* General init. */
 	global_init();
