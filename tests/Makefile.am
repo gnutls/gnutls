@@ -88,6 +88,7 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
+indirect_tests =
 ctests = mini-record-2 simple gc set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
 	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
@@ -309,7 +310,6 @@ name_constraints_merge_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
-check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
 if !WINDOWS
@@ -323,12 +323,21 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 
 if ENABLE_PKCS11
 dist_check_SCRIPTS += p11-kit-trust.sh
+
+if ENABLE_DESTRUCTIVE_TESTS
+if HAVE_PKCS11_TRUST_STORE
+dist_check_SCRIPTS += destructive/p11-kit-load.sh
+indirect_tests += pkcs11/list-tokens
+endif
+endif
+
 endif
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
 endif
 
+check_PROGRAMS = $(ctests) $(indirect_tests)
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT =						\

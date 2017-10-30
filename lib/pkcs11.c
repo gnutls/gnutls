@@ -2192,11 +2192,18 @@ find_token_modname_cb(struct ck_function_list *module, struct pkcs11_session_inf
 	return 0;
 }
 
+/* Internal symbol used by tests */
+int
+_gnutls_pkcs11_token_get_url(unsigned int seq,
+			     gnutls_pkcs11_url_type_t detailed, char **url,
+			     unsigned flags);
+
 /**
- * gnutls_pkcs11_token_get_url:
+ * _gnutls_pkcs11_token_get_url:
  * @seq: sequence number starting from 0
  * @detailed: non zero if a detailed URL is required
  * @url: will contain an allocated url
+ * @flags: zero or 1. When 1 no initialization is performed.
  *
  * This function will return the URL for each token available
  * in system. The url has to be released using gnutls_free()
@@ -2205,16 +2212,18 @@ find_token_modname_cb(struct ck_function_list *module, struct pkcs11_session_inf
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if the sequence number
  * exceeds the available tokens, otherwise a negative error value.
  *
- * Since: 2.12.0
  **/
 int
-gnutls_pkcs11_token_get_url(unsigned int seq,
-			    gnutls_pkcs11_url_type_t detailed, char **url)
+_gnutls_pkcs11_token_get_url(unsigned int seq,
+			     gnutls_pkcs11_url_type_t detailed, char **url,
+			     unsigned flags)
 {
 	int ret;
 	struct find_token_num tn;
 
-	PKCS11_CHECK_INIT;
+	if (!(flags & 1)) {
+		PKCS11_CHECK_INIT;
+	}
 
 	memset(&tn, 0, sizeof(tn));
 	tn.seq = seq;
@@ -2236,6 +2245,28 @@ gnutls_pkcs11_token_get_url(unsigned int seq,
 	}
 
 	return 0;
+}
+
+/**
+ * gnutls_pkcs11_token_get_url:
+ * @seq: sequence number starting from 0
+ * @detailed: non zero if a detailed URL is required
+ * @url: will contain an allocated url
+ *
+ * This function will return the URL for each token available
+ * in system. The url has to be released using gnutls_free()
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if the sequence number
+ * exceeds the available tokens, otherwise a negative error value.
+ *
+ * Since: 2.12.0
+ **/
+int
+gnutls_pkcs11_token_get_url(unsigned int seq,
+			    gnutls_pkcs11_url_type_t detailed, char **url)
+{
+	return _gnutls_pkcs11_token_get_url(seq, detailed, url, 0);
 }
 
 /**
