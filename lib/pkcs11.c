@@ -107,12 +107,6 @@ struct find_cert_st {
 static struct gnutls_pkcs11_provider_st providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
 
-typedef enum init_level_t {
-	PROV_UNINITIALIZED = 0,
-	PROV_INIT_TRUSTED,
-	PROV_INIT_ALL
-} init_level_t;
-
 static init_level_t providers_initialized = PROV_UNINITIALIZED;
 static unsigned int pkcs11_forkid = 0;
 
@@ -120,6 +114,8 @@ static int _gnutls_pkcs11_reinit(void);
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
+
+static int auto_load(unsigned trusted);
 
 int pkcs11_rv_to_err(ck_rv_t rv)
 {
@@ -265,15 +261,9 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
  * The output value of the callback will be returned if it is
  * a negative one (indicating failure).
 */
-int _gnutls_pkcs11_check_init(unsigned trusted, void *priv, pkcs11_reinit_function cb)
+int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_function cb)
 {
 	int ret;
-	init_level_t req_level = PROV_UNINITIALIZED;
-
-	if (trusted)
-		req_level = PROV_INIT_TRUSTED;
-	else
-		req_level = PROV_INIT_ALL;
 
 	ret = gnutls_mutex_lock(&_gnutls_pkcs11_mutex);
 	if (ret != 0)
@@ -298,16 +288,16 @@ int _gnutls_pkcs11_check_init(unsigned trusted, void *priv, pkcs11_reinit_functi
 
 		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 		return ret;
-	} else if (providers_initialized < req_level) {
-		/* when upgrading initialization level, deinitialize
-		 * and re-initialize everything. */
-		gnutls_pkcs11_deinit();
-	}
+	} else if (providers_initialized < req_level &&
+		   (req_level == PROV_INIT_TRUSTED)) {
+		_gnutls_debug_log("Initializing needed PKCS #11 modules\n");
+		ret = auto_load(1);
 
-	_gnutls_debug_log("Initializing PKCS #11 modules\n");
-	ret = gnutls_pkcs11_init(
-		trusted?GNUTLS_PKCS11_FLAG_AUTO_TRUSTED:GNUTLS_PKCS11_FLAG_AUTO,
-		NULL);
+		providers_initialized = PROV_INIT_TRUSTED;
+	} else {
+		_gnutls_debug_log("Initializing all PKCS #11 modules\n");
+		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+	}
 
 	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 
@@ -809,7 +799,7 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 	if (flags == GNUTLS_PKCS11_FLAG_MANUAL) {
 		/* if manual configuration is requested then don't
 		 * bother loading any other providers */
-		providers_initialized = PROV_INIT_ALL;
+		providers_initialized = PROV_INIT_MANUAL;
 		return 0;
 	 } else if (flags & GNUTLS_PKCS11_FLAG_AUTO) {
 		if (deprecated_config_file == NULL)
