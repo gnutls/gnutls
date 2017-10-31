@@ -267,3 +267,24 @@ two things must be done:
 
 Note that, for constants and enums, "schemefied" names are used, as
 noted under the "Guile API Conventions" node of the manual.
+
+
+# Reviewing code
+
+A review as part of the gitlab merge requests, is a way to prevent errors due to
+these guidelines not being followed, e.g., verify there is a reasonable test suite,
+and whether it covers reasonably the new code, that the function naming is
+consistent with these guidelines, as well as check for obvious mistakes in the new
+code.
+
+The intention is to keep reviews lightweight, and rely on CI for tasks such
+as compiling and testing code and features.
+
+A proposed checklist to assist such reviews follows.
+ * [ ] There is a test suite reasonably covering new functionality or modifications
+ * [ ] Function naming, parameters, return values, types, etc., are consistent and according to `CONTRIBUTION.md`
+ * [ ] This feature/change has adequate documentation added
+ * [ ] No obvious mistakes in the code
+
+
+[Guidelines to consider when reviewing.](https://github.com/thoughtbot/guides/tree/master/code-review)
