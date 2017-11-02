@@ -440,6 +440,8 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
 	ERROR_ENTRY(N_("Function was interrupted."), GNUTLS_E_INTERRUPTED),
 	ERROR_ENTRY(N_("Rehandshake was requested by the peer."),
 		    GNUTLS_E_REHANDSHAKE),
+	ERROR_ENTRY(N_("Re-authentication was requested by the peer."),
+		    GNUTLS_E_REAUTH_REQUEST),
 	/* Only non fatal (for handshake) errors here */
 	{NULL, NULL, 0}
 };

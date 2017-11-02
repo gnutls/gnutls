@@ -940,7 +940,6 @@ record_add_to_buffers(gnutls_session_t session,
 				} else {
 					ret = GNUTLS_E_AGAIN;
 				}
-
 				goto cleanup;
 			}
 

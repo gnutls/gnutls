@@ -263,7 +263,13 @@ typedef enum bye_state_t {
 	BYE_STATE0 = 0, BYE_STATE1, BYE_STATE2
 } bye_state_t;
 
+typedef enum reauth_state_t {
+	REAUTH_STATE0 = 0, REAUTH_STATE1, REAUTH_STATE2, REAUTH_STATE3,
+	REAUTH_STATE4, REAUTH_STATE5
+} reauth_state_t;
+
 #define BYE_STATE session->internals.bye_state
+#define REAUTH_STATE session->internals.reauth_state
 
 typedef enum heartbeat_state_t {
 	SHB_SEND1 = 0,
@@ -921,6 +927,8 @@ typedef struct {
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */
 	bool ticket_sent;	/* whether a session ticket was sent */
 	bye_state_t bye_state; /* used by gnutls_bye() */
+	reauth_state_t reauth_state; /* used by gnutls_reauth() */
+
 	handshake_state_t handshake_final_state;
 	handshake_state_t handshake_state;	/* holds
 						 * a number which indicates where
@@ -996,6 +1004,9 @@ typedef struct {
 						 * for the gnutls_record_send()
 						 * function.
 						 */
+
+	/* buffer used temporarily during TLS1.3 reauthentication */
+	gnutls_buffer_st reauth_buffer;
 
 	time_t expire_time;	/* after expire_time seconds this session will expire */
 	const struct mod_auth_st_int *auth_struct;	/* used in handshake packets and KX algorithms */
@@ -1118,6 +1129,13 @@ typedef struct {
 	time_t handshake_endtime;	/* end time in seconds */
 	unsigned int handshake_timeout_ms;	/* timeout in milliseconds */
 	unsigned int record_timeout_ms;	/* timeout in milliseconds */
+
+	/* saved context of post handshake certificate request. In
+	 * client side is what we received in server's certificate request;
+	 * in server side is what we sent to client. */
+	gnutls_datum_t post_handshake_cr_context;
+	/* it is a copy of the handshake hash buffer if post handshake is used */
+	gnutls_buffer_st post_handshake_hash_buffer;
 
 #define HSK_CRT_VRFY_EXPECTED 1
 #define HSK_CRT_SENT (1<<1)

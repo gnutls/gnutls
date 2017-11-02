@@ -291,10 +291,12 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 	/* Initialize buffers */
 	_gnutls_buffer_init(&(*session)->internals.handshake_hash_buffer);
+	_gnutls_buffer_init(&(*session)->internals.post_handshake_hash_buffer);
 	_gnutls_buffer_init(&(*session)->internals.hb_remote_data);
 	_gnutls_buffer_init(&(*session)->internals.hb_local_data);
 	_gnutls_buffer_init(&(*session)->internals.record_presend_buffer);
 	_gnutls_buffer_init(&(*session)->internals.record_key_update_buffer);
+	_gnutls_buffer_init(&(*session)->internals.reauth_buffer);
 
 	_mbuffer_head_init(&(*session)->internals.record_buffer);
 	_mbuffer_head_init(&(*session)->internals.record_send_buffer);
@@ -410,10 +412,12 @@ void gnutls_deinit(gnutls_session_t session)
 		}
 
 	_gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
+	_gnutls_buffer_clear(&session->internals.post_handshake_hash_buffer);
 	_gnutls_buffer_clear(&session->internals.hb_remote_data);
 	_gnutls_buffer_clear(&session->internals.hb_local_data);
 	_gnutls_buffer_clear(&session->internals.record_presend_buffer);
 	_gnutls_buffer_clear(&session->internals.record_key_update_buffer);
+	_gnutls_buffer_clear(&session->internals.reauth_buffer);
 
 	_mbuffer_head_clear(&session->internals.record_buffer);
 	_mbuffer_head_clear(&session->internals.record_recv_buffer);
@@ -423,6 +427,7 @@ void gnutls_deinit(gnutls_session_t session)
 	_gnutls_free_datum(&session->internals.dtls.dcookie);
 
 	gnutls_free(session->internals.rexts);
+	gnutls_free(session->internals.post_handshake_cr_context.data);
 
 	gnutls_free(session->internals.rsup);
 

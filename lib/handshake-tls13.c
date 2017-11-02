@@ -59,6 +59,16 @@
 static int generate_hs_traffic_keys(gnutls_session_t session);
 static int generate_ap_traffic_keys(gnutls_session_t session);
 
+#define SAVE_TRANSCRIPT \
+	if (session->internals.flags & GNUTLS_POST_HANDSHAKE_AUTH) { \
+		/* If post-handshake auth is in use we need a copy of the original \
+		 * handshake transcript */ \
+		memcpy( &session->internals.post_handshake_hash_buffer, \
+			&session->internals.handshake_hash_buffer, \
+			sizeof(session->internals.handshake_hash_buffer)); \
+		_gnutls_buffer_init(&session->internals.handshake_hash_buffer); \
+	}
+
 /*
  * _gnutls13_handshake_client
  * This function performs the client side of the handshake of the TLS/SSL protocol.
@@ -135,6 +145,8 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 	/* explicitly reset any false start flags */
 	session->internals.recv_state = RECV_STATE_0;
 	session->internals.initial_negotiation_completed = 1;
+
+	SAVE_TRANSCRIPT;
 
 	return 0;
 }
@@ -311,9 +323,16 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 	session->internals.recv_state = RECV_STATE_0;
 	session->internals.initial_negotiation_completed = 1;
 
+	SAVE_TRANSCRIPT;
+
 	return 0;
 }
 
+/* Processes handshake messages received asynchronously after initial handshake.
+ *
+ * It is called once per message, with a read-only buffer in @buf,
+ * and should return success, or a fatal error code.
+ */
 int
 _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 {
@@ -341,6 +360,24 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 		return gnutls_assert_val(ret);
 
 	switch(type) {
+		case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
+			if (!(session->security_parameters.entity == GNUTLS_CLIENT) ||
+			    !(session->internals.flags & GNUTLS_POST_HANDSHAKE_AUTH)) {
+				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			}
+
+			_gnutls_buffer_reset(&session->internals.reauth_buffer);
+
+			/* include the handshake headers in reauth buffer */
+			ret = _gnutls_buffer_append_data(&session->internals.reauth_buffer,
+							 buf->data-4, buf->length+4);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			/* Application is expected to handle re-authentication
+			 * explicitly.  */
+			return GNUTLS_E_REAUTH_REQUEST;
+
 		case GNUTLS_HANDSHAKE_KEY_UPDATE:
 			ret = _gnutls13_recv_key_update(session, buf);
 			if (ret < 0)

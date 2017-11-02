@@ -372,6 +372,9 @@ typedef enum {
  *   result to more roundtrips needed to discover the server's choice.
  * @GNUTLS_NO_AUTO_REKEY: Disable auto-rekeying under TLS1.3. If this option is not specified
  *   gnutls will force a rekey after 2^24 records have been sent.
+ * @GNUTLS_POST_HANDSHAKE_AUTH: Enable post handshake authentication for server and client. When set and
+ *   a server requests authentication after handshake %GNUTLS_E_REAUTH_REQUEST will be returned
+ *   by gnutls_record_recv(). A client should then call gnutls_reauth() to re-authenticate.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
@@ -396,6 +399,7 @@ typedef enum {
 	GNUTLS_KEY_SHARE_TOP = (1<<11),
 	GNUTLS_KEY_SHARE_TOP2 = (1<<12),
 	GNUTLS_KEY_SHARE_TOP3 = (1<<13),
+	GNUTLS_POST_HANDSHAKE_AUTH = (1<<14),
 	GNUTLS_NO_AUTO_REKEY = (1<<15)
 } gnutls_init_flags_t;
 
@@ -1003,6 +1007,8 @@ void gnutls_deinit(gnutls_session_t session);
 int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how);
 
 int gnutls_handshake(gnutls_session_t session);
+
+int gnutls_reauth(gnutls_session_t session, unsigned int flags);
 
 #define GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT ((unsigned int)-1)
 #define GNUTLS_INDEFINITE_TIMEOUT ((unsigned int)-2)
@@ -3011,7 +3017,8 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_PK_INVALID_PUBKEY_PARAMS -420
 #define GNUTLS_E_PK_NO_VALIDATION_PARAMS -421
 
-#define GNUTLS_E_NO_COMMON_KEY_SHARE -420
+#define GNUTLS_E_NO_COMMON_KEY_SHARE -423
+#define GNUTLS_E_REAUTH_REQUEST -424
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

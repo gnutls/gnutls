@@ -112,42 +112,45 @@ int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int d
 	return 0;
 }
 
-int _gnutls13_recv_certificate_request(gnutls_session_t session)
+int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buffer_st *buf)
 {
 	int ret;
-	gnutls_buffer_st buf;
 	crt_req_ctx_st ctx;
-
-	if (unlikely(session->security_parameters.entity != GNUTLS_CLIENT))
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST, 1, &buf);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	/* if not received */
-	if (buf.length == 0) {
-		_gnutls_buffer_clear(&buf);
-		return 0;
-	}
 
 	_gnutls_handshake_log("HSK[%p]: parsing certificate request\n", session);
 
-	if (buf.data[0] != 0) {
-		/* The context field must be empty during handshake */
-		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		gnutls_assert();
-		goto cleanup;
-	}
+	/* if initial negotiation is complete, this is a post-handshake auth */
+	if (!session->internals.initial_negotiation_completed ||
+	    session->security_parameters.entity == GNUTLS_SERVER) {
+		if (buf->data[0] != 0) {
+			/* The context field must be empty during handshake */
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			gnutls_assert();
+			goto cleanup;
+		}
 
-	/* buf.length is positive */
-	buf.data++;
-	buf.length--;
+		/* buf->length is positive */
+		buf->data++;
+		buf->length--;
+	} else {
+		gnutls_datum_t context;
+
+		ret = _gnutls_buffer_pop_datum_prefix8(buf, &context);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		gnutls_free(session->internals.post_handshake_cr_context.data);
+		session->internals.post_handshake_cr_context.data = NULL;
+		ret = _gnutls_set_datum(&session->internals.post_handshake_cr_context,
+					context.data, context.size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
 	memset(&ctx, 0, sizeof(ctx));
 	ctx.session = session;
 
-	ret = _gnutls_extv_parse(&ctx, parse_cert_extension, buf.data, buf.length);
+	ret = _gnutls_extv_parse(&ctx, parse_cert_extension, buf->data, buf->length);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -167,6 +170,29 @@ int _gnutls13_recv_certificate_request(gnutls_session_t session)
 	ret = 0;
 
  cleanup:
+	return ret;
+}
+
+int _gnutls13_recv_certificate_request(gnutls_session_t session)
+{
+	int ret;
+	gnutls_buffer_st buf;
+
+	if (unlikely(session->security_parameters.entity != GNUTLS_CLIENT))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST, 1, &buf);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* if not received */
+	if (buf.length == 0) {
+		_gnutls_buffer_clear(&buf);
+		return 0;
+	}
+
+	ret = _gnutls13_recv_certificate_request_int(session, &buf);
+
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
@@ -209,6 +235,8 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 	unsigned init_pos;
 
 	if (again == 0) {
+		unsigned char rnd[12];
+
 		if (session->internals.send_cert_req == 0)
 			return 0;
 
@@ -221,7 +249,29 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
+		if (session->internals.initial_negotiation_completed) { /* reauth */
+			ret = gnutls_rnd(GNUTLS_RND_NONCE, rnd, sizeof(rnd));
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			gnutls_free(session->internals.post_handshake_cr_context.data);
+			session->internals.post_handshake_cr_context.data = NULL;
+			ret = _gnutls_set_datum(&session->internals.post_handshake_cr_context,
+						rnd, sizeof(rnd));
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			ret = _gnutls_buffer_append_data_prefix(&buf, 8,
+							        session->internals.post_handshake_cr_context.data,
+							        session->internals.post_handshake_cr_context.size);
+		} else {
+			ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
+		}
+
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

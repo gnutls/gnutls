@@ -1088,6 +1088,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 	uint8_t *data;
 	uint32_t datasize, i_datasize;
 	int pos = 0;
+	const version_entry_st *vers = get_version(session);
 
 	if (bufel == NULL) {
 		/* we are resuming a previously interrupted
@@ -1164,6 +1165,13 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 		return ret;
 	}
 
+	if (vers && vers->tls13_sem &&
+	    session->internals.initial_negotiation_completed) {
+		/* we are under TLS1.3 in a re-authentication phase.
+		 * we don't attempt to cache any messages */
+		goto force_send;
+	}
+
 	/* The messages which are followed by another are not sent by default
 	 * but are cached instead */
 	switch (type) {
@@ -1185,11 +1193,13 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 		break;
 	default:
 		/* send cached messages */
-		ret = _gnutls_handshake_io_write_flush(session);
-		break;
+		goto force_send;
 	}
 
 	return ret;
+
+ force_send:
+	return _gnutls_handshake_io_write_flush(session);
 }
 
 #define CHECK_SIZE(ll) \

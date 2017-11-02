@@ -58,16 +58,36 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 		return 0;
 	}
 
-	if (buf.data[0] != 0) {
-		/* The context field must be empty during handshake */
-		gnutls_assert();
-		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		goto cleanup;
-	}
+	if (session->internals.initial_negotiation_completed &&
+	    session->internals.post_handshake_cr_context.size > 0) {
+		gnutls_datum_t context;
 
-	/* buf.length is positive */
-	buf.data++;
-	buf.length--;
+		/* verify whether the context matches */
+		ret = _gnutls_buffer_pop_datum_prefix8(&buf, &context);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (context.size != session->internals.post_handshake_cr_context.size ||
+		    memcmp(context.data, session->internals.post_handshake_cr_context.data,
+		           context.size) != 0) {
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else {
+		if (buf.data[0] != 0) {
+			/* The context field must be empty during handshake */
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto cleanup;
+		}
+
+		/* buf.length is positive */
+		buf.data++;
+		buf.length--;
+	}
 
 	_gnutls_handshake_log("HSK[%p]: parsing certificate message\n", session);
 
@@ -114,10 +134,21 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
+		if (session->security_parameters.entity == GNUTLS_CLIENT) {
+			ret = _gnutls_buffer_append_data_prefix(&buf, 8,
+								session->internals.post_handshake_cr_context.data,
+								session->internals.post_handshake_cr_context.size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+		} else {
+			ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 		}
 
 		/* mark total size */

@@ -62,7 +62,8 @@ _gnutls_post_handshake_recv_params(gnutls_session_t session,
 		if (unlikely(vers == NULL))
 			return 0;
 
-		if (vers->post_handshake_auth)
+		if ((session->internals.flags & GNUTLS_POST_HANDSHAKE_AUTH) &&
+		    vers->post_handshake_auth)
 			session->security_parameters.post_handshake_auth = 1;
 	}
 
@@ -75,14 +76,11 @@ static int
 _gnutls_post_handshake_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
-	/* we don't support post-handshake authentication yet */
-	return 0;
-#if 0
-
 	gnutls_certificate_credentials_t cred;
 	const version_entry_st *max;
 
-	if (session->security_parameters.entity != GNUTLS_CLIENT) {
+	if (session->security_parameters.entity != GNUTLS_CLIENT ||
+	    !(session->internals.flags & GNUTLS_POST_HANDSHAKE_AUTH)) {
 		/* not sent on server side */
 		return 0;
 	}
@@ -100,7 +98,4 @@ _gnutls_post_handshake_send_params(gnutls_session_t session,
 		return GNUTLS_E_INT_RET_0;
 	else
 		return 0;
-#endif
 }
-
-

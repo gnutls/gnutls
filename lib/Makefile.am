@@ -96,7 +96,8 @@ COBJECTS += tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
 	tls13/key_update.c tls13/key_update.h \
 	tls13/hello_retry.c tls13/hello_retry.h \
 	tls13/session_ticket.c tls13/session_ticket.h \
-	tls13/certificate.c tls13/certificate.h
+	tls13/certificate.c tls13/certificate.h \
+	tls13/post_handshake.c
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \
