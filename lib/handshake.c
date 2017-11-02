@@ -1976,6 +1976,8 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 	const version_entry_st *vers;
 	gnutls_ext_flags_t ext_parse_flag;
 
+	_gnutls_buffer_init(&buf);
+
 	if (again == 0) {
 		vers = get_version(session);
 		if (unlikely(vers == NULL || session->security_parameters.cs == NULL))
