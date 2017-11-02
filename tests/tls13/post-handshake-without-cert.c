@@ -45,14 +45,14 @@ int main()
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
+#include <assert.h>
 
 #include "cert-common.h"
 #include "tls13/ext-parse.h"
 #include "utils.h"
 
-/* This program tests the Post Handshake Auth extension present
- * in the client hello, and whether it is missing from server
- * hello.
+/* This program tests whether the Post Handshake Auth extension is missing
+ * from both hellos, when not enabled by client.
  */
 
 static void server_log_func(int level, const char *str)
@@ -82,6 +82,10 @@ static void client(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
+	assert(gnutls_certificate_set_x509_key_mem(x509_cred, &cli_ca3_cert,
+						   &cli_ca3_key,
+						   GNUTLS_X509_FMT_PEM) >= 0);
+
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
@@ -104,6 +108,11 @@ static void client(int fd)
 		ret = gnutls_handshake(session);
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
+	/* try if gnutls_reauth() would fail as expected */
+	ret = gnutls_reauth(session, 0);
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("server: gnutls_reauth did not fail as expected: %s", gnutls_strerror(ret));
 
 	close(fd);
 
@@ -188,6 +197,11 @@ static void server(int fd)
 	if (server_hello_ok == 0) {
 		fail("server: did not verify the server hello contents\n");
 	}
+
+	/* try if gnutls_reauth() would fail as expected */
+	ret = gnutls_reauth(session, 0);
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("server: gnutls_reauth did not fail as expected: %s", gnutls_strerror(ret));
 
 	close(fd);
 	gnutls_deinit(session);

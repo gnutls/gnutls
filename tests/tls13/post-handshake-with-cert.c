@@ -50,9 +50,10 @@ int main()
 #include "tls13/ext-parse.h"
 #include "utils.h"
 
-/* This program tests the Post Handshake Auth extension present
- * in the client hello, and whether it is missing from server
- * hello.
+/* This program tests whether the Post Handshake Auth extension is
+ * present in the client hello, and whether it is missing from server
+ * hello. In addition it contains basic functionality test for
+ * post handshake authentication.
  */
 
 static void server_log_func(int level, const char *str)
@@ -72,6 +73,7 @@ static void client(int fd)
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
+	char buf[64];
 
 	global_init();
 
@@ -84,7 +86,7 @@ static void client(int fd)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_POST_HANDSHAKE_AUTH);
 
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
@@ -109,6 +111,26 @@ static void client(int fd)
 		ret = gnutls_handshake(session);
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
+	if (ret != 0)
+		fail("handshake failed: %s\n", gnutls_strerror(ret));
+	success("client handshake completed\n");
+
+	do {
+		ret = gnutls_record_recv(session, buf, sizeof(buf));
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret != GNUTLS_E_REAUTH_REQUEST) {
+		fail("recv: unexpected error: %s\n", gnutls_strerror(ret));
+	}
+
+	success("received reauth request\n");
+	do {
+		ret = gnutls_reauth(session, 0);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret != 0)
+		fail("client: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
 
 	close(fd);
 
@@ -176,7 +198,7 @@ static void server(int fd)
 					    &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	gnutls_init(&session, GNUTLS_SERVER);
+	gnutls_init(&session, GNUTLS_SERVER|GNUTLS_POST_HANDSHAKE_AUTH);
 
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
@@ -194,11 +216,10 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-		if (ret == GNUTLS_E_INTERRUPTED) { /* expected */
-			break;
-		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
+	if (ret != 0)
+		fail("handshake failed: %s\n", gnutls_strerror(ret));
 
 	if (client_hello_ok == 0) {
 		fail("server: did not verify the client hello\n");
@@ -207,6 +228,16 @@ static void server(int fd)
 	if (server_hello_ok == 0) {
 		fail("server: did not verify the server hello contents\n");
 	}
+	success("server handshake completed\n");
+
+	gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUIRE);
+	/* ask peer for re-authentication */
+	do {
+		ret = gnutls_reauth(session, 0);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret != 0)
+		fail("server: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
 
 	close(fd);
 	gnutls_deinit(session);
@@ -232,9 +263,6 @@ void doit(void)
 	int fd[2];
 	int ret;
 	pid_t child;
-
-	/* re-enable when post-handshake authentication is available */
-	exit(77);
 
 	signal(SIGCHLD, ch_handler);
 
