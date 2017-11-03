@@ -141,4 +141,12 @@ if test "$nr" != 1;then
 	${builddir}/pkcs11/list-tokens -m -v
 fi
 
+# Check whether all modules are listed after certificate verification
+# is performed then a PKCS#11 function is called.
+${builddir}/pkcs11/list-tokens -v -d|wc -l
+if test "$nr" != 2;then
+	echo "Error in test 6: did not find all modules"
+	${builddir}/pkcs11/list-tokens -v
+fi
+
 exit 0

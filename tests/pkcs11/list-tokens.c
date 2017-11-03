@@ -70,6 +70,7 @@ int main(int argc, char **argv)
 	while((opt = getopt(argc, argv, "mvatd")) != -1) {
 		switch(opt) {
 			case 'm':
+				/* initialize manually - i.e., do no module loading */
 				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
 				if (ret != 0) {
 					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
@@ -77,9 +78,12 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'd':
+				/* when call _gnutls_pkcs11_token_get_url() do proper initialization
+				 * if none done */
 				flag = 0;
 				break;
 			case 'a':
+				/* initialize auto - i.e., do module loading */
 				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
 				if (ret != 0) {
 					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
@@ -87,6 +91,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 't':
+				/* do trusted module loading */
 				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO_TRUSTED, NULL);
 				if (ret != 0) {
 					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
@@ -94,6 +99,7 @@ int main(int argc, char **argv)
 				}
 				break;
 			case 'v':
+				/* do verification which should trigger trusted module loading */
 				assert(gnutls_certificate_allocate_credentials(&cred) >= 0);
 				assert(gnutls_certificate_set_x509_system_trust(cred) >= 0);
 				gnutls_certificate_free_credentials(cred);
