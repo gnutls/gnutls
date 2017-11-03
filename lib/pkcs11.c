@@ -233,7 +233,8 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
 	/* initially check if this module is a duplicate */
 	for (i = 0; i < active_providers; i++) {
 		/* already loaded, skip the rest */
-		if (module == providers[i].module) {
+		if (module == providers[i].module ||
+		    memcmp(&info, &providers[i].info, sizeof(info)) == 0) {
 			_gnutls_debug_log("p11: module %s is already loaded.\n", name);
 			return GNUTLS_E_INT_RET_0;
 		}
