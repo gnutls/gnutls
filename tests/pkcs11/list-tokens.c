@@ -119,5 +119,20 @@ int main(int argc, char **argv)
 		free(url);
 	}
 
+	/* try whether these URIs are operational */
+	for (i=0;;i++) {
+		unsigned tflags;
+
+		ret = _gnutls_pkcs11_token_get_url(i, 0, &url, flag);
+		if (ret < 0)
+			break;
+		ret = gnutls_pkcs11_token_get_flags(url, &tflags);
+		if (ret < 0) {
+			fprintf(stderr, "cannot get token %s flags: %s\n", url, gnutls_strerror(ret));
+			exit(1);
+		}
+		free(url);
+	}
+
 	gnutls_global_deinit();
 }
