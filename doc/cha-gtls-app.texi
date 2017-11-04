@@ -1770,7 +1770,7 @@ utilizing them.
 
 In older applications which require to specify explicit DH parameters, we recommend
 using @code{certtool} (of GnuTLS 3.5.6 or later) with the @code{--get-dh-params}
-option to obtain the FFDHE parameters descussed above. The output
+option to obtain the FFDHE parameters discussed above. The output
 parameters of the tool are in PKCS#3 format and can be imported by
 most existing applications.
 
