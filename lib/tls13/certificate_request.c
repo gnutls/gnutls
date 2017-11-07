@@ -156,7 +156,7 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 		goto cleanup;
 	}
 
-	session->internals.crt_requested = 1;
+	session->internals.hsk_flags |= HSK_CRT_ASKED;
 
 	ret = _gnutls_select_client_cert(session, ctx.rdn, ctx.rdn_size,
 					 ctx.pk_algos, ctx.pk_algos_length);
@@ -164,8 +164,6 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	session->internals.hsk_flags |= HSK_CRT_ASKED;
 
 	ret = 0;
 

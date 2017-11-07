@@ -2394,7 +2394,7 @@ int gnutls_handshake(gnutls_session_t session)
 			return gnutls_assert_val(ret);
 
 		session->internals.used_exts = 0;
-		session->internals.crt_requested = 0;
+		session->internals.hsk_flags = 0;
 		session->internals.handshake_in_progress = 1;
 		session->internals.vc_status = -1;
 		gettime(&session->internals.handshake_start_time);

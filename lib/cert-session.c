@@ -117,9 +117,10 @@ const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
  * Returns: 0 if the peer (server) did not request client
  *   authentication or 1 otherwise.
  **/
-int gnutls_certificate_client_get_request_status(gnutls_session_t session)
+unsigned
+gnutls_certificate_client_get_request_status(gnutls_session_t session)
 {
-	return session->internals.crt_requested;
+	return (session->internals.hsk_flags & HSK_CRT_ASKED)?1:0;
 }
 
 /**

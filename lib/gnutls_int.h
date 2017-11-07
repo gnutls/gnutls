@@ -1145,13 +1145,8 @@ typedef struct {
 #define HSK_CRT_REQ_SENT (1<<5)
 #define HSK_CRT_REQ_GOT_SIG_ALGO (1<<6)
 #define HSK_KEY_UPDATE_ASKED (1<<7) /* flag is not used during handshake */
-	unsigned hsk_flags; /* TLS1.3 only */
+	unsigned hsk_flags;
 	time_t last_key_update;
-
-	unsigned crt_requested; /* 1 if client auth was requested (i.e., client cert).
-	 * In case of a server this holds 1 if we should wait
-	 * for a client certificate verify
-	 */
 
 	gnutls_buffer_st hb_local_data;
 	gnutls_buffer_st hb_remote_data;
@@ -1168,6 +1163,7 @@ typedef struct {
 
 	recv_state_t recv_state;	/* state of the receive function */
 
+	/* if set, server and client random were set by the application */
 	bool sc_random_set;
 
 	unsigned flags; /* the flags in gnutls_init() */

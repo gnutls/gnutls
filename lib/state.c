@@ -223,7 +223,6 @@ static void handshake_internal_state_clear1(gnutls_session_t session)
 	session->internals.cand_ec_group = 0;
 	session->internals.cand_dh_group = 0;
 
-	session->internals.hsk_flags = 0;
 	session->internals.hrr_cs[0] = CS_INVALID_MAJOR;
 	session->internals.hrr_cs[1] = CS_INVALID_MINOR;
 }
