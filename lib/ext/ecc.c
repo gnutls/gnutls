@@ -179,7 +179,8 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 			}
 		}
 
-		session->internals.have_ffdhe = have_ffdhe;
+		if (have_ffdhe)
+			session->internals.hsk_flags |= HSK_HAVE_FFDHE;
 	}
 
 	return 0;

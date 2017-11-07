@@ -1146,6 +1146,8 @@ typedef struct {
 #define HSK_CRT_REQ_GOT_SIG_ALGO (1<<6)
 #define HSK_KEY_UPDATE_ASKED (1<<7) /* flag is not used during handshake */
 #define HSK_FALSE_START_USED (1<<8) /* TLS1.2 only */
+#define HSK_HAVE_FFDHE (1<<9) /* whether the peer has advertized at least an FFDHE group */
+#define HSK_USED_FFDHE (1<<10) /* whether ffdhe was actually negotiated and used */
 	unsigned hsk_flags;
 	time_t last_key_update;
 
@@ -1223,10 +1225,6 @@ typedef struct {
 	/* this is not the negotiated max_record_recv_size, but the actual maximum
 	 * receive size */
 	unsigned max_recv_size;
-
-	/* whether the peer has advertized at least an FFDHE group */
-	bool have_ffdhe;
-	bool used_ffdhe; /* whether ffdhe was actually negotiated and used */
 
 	/* candidate groups to be selected for security params groups */
 	const gnutls_group_entry_st *cand_ec_group;

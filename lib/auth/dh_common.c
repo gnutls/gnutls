@@ -190,8 +190,6 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	unsigned j;
 	ssize_t data_size = _data_size;
 
-	session->internals.used_ffdhe = 0;
-
 	/* just in case we are resuming a session */
 	gnutls_pk_params_release(&session->key.dh_params);
 
@@ -244,14 +242,14 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 			    memcmp(session->internals.priorities->groups.entry[j]->prime->data,
 				   data_p, n_p) == 0) {
 
-				session->internals.used_ffdhe = 1;
+				session->internals.hsk_flags |= HSK_USED_FFDHE;
 				_gnutls_session_group_set(session, session->internals.priorities->groups.entry[j]);
 				session->key.dh_params.qbits = *session->internals.priorities->groups.entry[j]->q_bits;
 				break;
 			}
 		}
 
-		if (!session->internals.used_ffdhe) {
+		if (!(session->internals.hsk_flags & HSK_USED_FFDHE)) {
 			_gnutls_audit_log(session, "FFDHE groups advertised, but server didn't support it; falling back to server's choice\n");
 		}
 	}
@@ -271,7 +269,7 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	session->key.dh_params.params_nr = 3; /* include empty q */
 	session->key.dh_params.algo = GNUTLS_PK_DH;
 
-	if (session->internals.used_ffdhe == 0) {
+	if (!(session->internals.hsk_flags & HSK_USED_FFDHE)) {
 		bits = _gnutls_dh_get_min_prime_bits(session);
 		if (bits < 0) {
 			gnutls_assert();

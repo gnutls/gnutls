@@ -1246,7 +1246,7 @@ check_server_dh_params(gnutls_session_t session,
 		return 1;
 	}
 
-	if (session->internals.have_ffdhe) {
+	if (session->internals.hsk_flags & HSK_HAVE_FFDHE) {
 		/* if the client has advertized FFDHE then it doesn't matter
 		 * whether we have server DH parameters. They are no good. */
 		gnutls_assert();
@@ -1548,7 +1548,8 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	 * we must also distinguish between not matching a ciphersuite due to an
 	 * incompatible certificate which we traditionally return GNUTLS_E_INSUFFICIENT_SECURITY.
 	 */
-	if (!no_cert_found && session->internals.have_ffdhe && session->internals.priorities->groups.have_ffdhe)
+	if (!no_cert_found && (session->internals.hsk_flags & HSK_HAVE_FFDHE) &&
+	    session->internals.priorities->groups.have_ffdhe)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	else
 		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);

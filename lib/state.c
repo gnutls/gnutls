@@ -219,7 +219,6 @@ static void handshake_internal_state_clear1(gnutls_session_t session)
 	session->internals.dtls.hsk_read_seq = 0;
 	session->internals.dtls.hsk_write_seq = 0;
 
-	session->internals.have_ffdhe = 0;
 	session->internals.cand_ec_group = 0;
 	session->internals.cand_dh_group = 0;
 
@@ -1296,7 +1295,7 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_HB_PEER_SEND;
 	if (session->internals.hsk_flags & HSK_FALSE_START_USED)
 		flags |= GNUTLS_SFLAGS_FALSE_START;
-	if (session->internals.used_ffdhe)
+	if (session->internals.hsk_flags & HSK_USED_FFDHE)
 		flags |= GNUTLS_SFLAGS_RFC7919;
 
 	return flags;
