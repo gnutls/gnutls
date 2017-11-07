@@ -1294,7 +1294,7 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_HB_LOCAL_SEND;
 	if (gnutls_heartbeat_allowed(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND))
 		flags |= GNUTLS_SFLAGS_HB_PEER_SEND;
-	if (session->internals.false_start_used)
+	if (session->internals.hsk_flags & HSK_FALSE_START_USED)
 		flags |= GNUTLS_SFLAGS_FALSE_START;
 	if (session->internals.used_ffdhe)
 		flags |= GNUTLS_SFLAGS_RFC7919;

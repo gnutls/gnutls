@@ -1145,6 +1145,7 @@ typedef struct {
 #define HSK_CRT_REQ_SENT (1<<5)
 #define HSK_CRT_REQ_GOT_SIG_ALGO (1<<6)
 #define HSK_KEY_UPDATE_ASKED (1<<7) /* flag is not used during handshake */
+#define HSK_FALSE_START_USED (1<<8) /* TLS1.2 only */
 	unsigned hsk_flags;
 	time_t last_key_update;
 
@@ -1194,8 +1195,6 @@ typedef struct {
 	/* The saved username from PSK or SRP auth */
 	char saved_username[MAX_USERNAME_SIZE+1];
 	bool saved_username_set;
-
-	bool false_start_used; /* non-zero if false start was used for appdata */
 
 	/* Needed for TCP Fast Open (TFO), set by gnutls_transport_set_fastopen() */
 	tfo_st tfo;

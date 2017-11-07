@@ -2726,7 +2726,7 @@ static int handshake_client(gnutls_session_t session)
 	case STATE17:
 		STATE = STATE17;
 		if (session->internals.resumed == RESUME_FALSE && (session->internals.flags & GNUTLS_ENABLE_FALSE_START) && can_send_false_start(session)) {
-			session->internals.false_start_used = 1;
+			session->internals.hsk_flags |= HSK_FALSE_START_USED;
 			session->internals.recv_state = RECV_STATE_FALSE_START;
 			/* complete this phase of the handshake. We
 			 * should be called again by gnutls_record_recv()
@@ -2735,8 +2735,6 @@ static int handshake_client(gnutls_session_t session)
 			gnutls_assert();
 
 			return 0;
-		} else {
-			session->internals.false_start_used = 0;
 		}
 		/* fall through */
 	case STATE18:
