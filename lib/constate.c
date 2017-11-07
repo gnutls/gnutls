@@ -53,7 +53,7 @@ _tls13_init_record_state(gnutls_cipher_algorithm_t algo, record_state_st *state)
  */
 static int
 _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
-		 int hash_size, int IV_size, int key_size)
+		 unsigned hash_size, unsigned IV_size, unsigned key_size)
 {
 	/* FIXME: This function is too long
 	 */
@@ -115,56 +115,40 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 
 	pos = 0;
 	if (hash_size > 0) {
-
-		if (_gnutls_set_datum
-		    (&client_write->mac_secret, &key_block[pos],
-		     hash_size) < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		assert(hash_size<=sizeof(client_write->mac_key));
+		client_write->mac_key_size = hash_size;
+		memcpy(client_write->mac_key, &key_block[pos], hash_size);
 
 		pos += hash_size;
 
-		if (_gnutls_set_datum
-		    (&server_write->mac_secret, &key_block[pos],
-		     hash_size) < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		server_write->mac_key_size = hash_size;
+		memcpy(server_write->mac_key, &key_block[pos], hash_size);
 
 		pos += hash_size;
 	}
 
 	if (key_size > 0) {
-		uint8_t *client_write_key, *server_write_key;
-		int client_write_key_size, server_write_key_size;
-
-		client_write_key = &key_block[pos];
-		client_write_key_size = key_size;
+		assert(key_size <=sizeof(client_write->key));
+		client_write->key_size = key_size;
+		memcpy(client_write->key, &key_block[pos], key_size);
 
 		pos += key_size;
 
-		server_write_key = &key_block[pos];
-		server_write_key_size = key_size;
+		server_write->key_size = key_size;
+		memcpy(server_write->key, &key_block[pos], key_size);
 
 		pos += key_size;
-
-		if (_gnutls_set_datum
-		    (&client_write->key, client_write_key,
-		     client_write_key_size) < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 		_gnutls_hard_log("INT: CLIENT WRITE KEY [%d]: %s\n",
-				 client_write_key_size,
-				 _gnutls_bin2hex(client_write_key,
-						 client_write_key_size,
+				 key_size,
+				 _gnutls_bin2hex(client_write->key,
+						 key_size,
 						 buf, sizeof(buf), NULL));
 
-		if (_gnutls_set_datum
-		    (&server_write->key, server_write_key,
-		     server_write_key_size) < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
 		_gnutls_hard_log("INT: SERVER WRITE KEY [%d]: %s\n",
-				 server_write_key_size,
-				 _gnutls_bin2hex(server_write_key,
-						 server_write_key_size,
+				 key_size,
+				 _gnutls_bin2hex(server_write->key,
+						 key_size,
 						 buf, sizeof(buf), NULL));
 
 	}
@@ -172,27 +156,26 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 	/* IV generation in export and non export ciphers.
 	 */
 	if (IV_size > 0) {
-		if (_gnutls_set_datum
-		    (&client_write->IV, &key_block[pos], IV_size) < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		assert(IV_size <= sizeof(client_write->iv));
+
+		client_write->iv_size = IV_size;
+		memcpy(client_write->iv, &key_block[pos], IV_size);
 
 		pos += IV_size;
 
-		if (_gnutls_set_datum
-		    (&server_write->IV, &key_block[pos], IV_size) < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
+		server_write->iv_size = IV_size;
+		memcpy(server_write->iv, &key_block[pos], IV_size);
 
 		_gnutls_hard_log("INT: CLIENT WRITE IV [%d]: %s\n",
-				 client_write->IV.size,
-				 _gnutls_bin2hex(client_write->IV.data,
-						 client_write->IV.size,
+				 client_write->iv_size,
+				 _gnutls_bin2hex(client_write->iv,
+						 client_write->iv_size,
 						 buf, sizeof(buf), NULL));
 
 		_gnutls_hard_log("INT: SERVER WRITE IV [%d]: %s\n",
-				 server_write->IV.size,
-				 _gnutls_bin2hex(server_write->IV.data,
-						 server_write->IV.size,
+				 server_write->iv_size,
+				 _gnutls_bin2hex(server_write->iv,
+						 server_write->iv_size,
 						 buf, sizeof(buf), NULL));
 	}
 
@@ -221,22 +204,21 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 			return gnutls_assert_val(ret);
 
 		params->read.sequence_number = prev->read.sequence_number;
-		ret = _gnutls_set_datum(&params->read.key, prev->read.key.data, prev->read.key.size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+
+		params->read.key_size = prev->read.key_size;
+		memcpy(params->read.key, prev->read.key, prev->read.key_size);
 
 		_gnutls_hard_log("INT: READ KEY [%d]: %s\n",
-				 params->read.key.size,
-				 _gnutls_bin2hex(params->read.key.data, params->read.key.size,
+				 params->read.key_size,
+				 _gnutls_bin2hex(params->read.key, params->read.key_size,
 						 buf, sizeof(buf), NULL));
 
-		ret = _gnutls_set_datum(&params->read.IV, prev->read.IV.data, prev->read.IV.size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		params->read.iv_size = prev->read.iv_size;
+		memcpy(params->read.iv, prev->read.iv, prev->read.key_size);
 
 		_gnutls_hard_log("INT: READ IV [%d]: %s\n",
-				 params->read.IV.size,
-				 _gnutls_bin2hex(params->read.IV.data, params->read.IV.size,
+				 params->read.iv_size,
+				 _gnutls_bin2hex(params->read.iv, params->read.iv_size,
 						 buf, sizeof(buf), NULL));
 	} else {
 		upd_state = &params->read;
@@ -246,22 +228,21 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 			return gnutls_assert_val(ret);
 
 		params->write.sequence_number = prev->write.sequence_number;
-		ret = _gnutls_set_datum(&params->write.key, prev->write.key.data, prev->write.key.size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+
+		params->write.key_size = prev->write.key_size;
+		memcpy(params->write.key, prev->write.key, prev->write.key_size);
 
 		_gnutls_hard_log("INT: WRITE KEY [%d]: %s\n",
-				 params->write.key.size,
-				 _gnutls_bin2hex(params->write.key.data, params->write.key.size,
+				 params->write.key_size,
+				 _gnutls_bin2hex(params->write.key, params->write.key_size,
 						 buf, sizeof(buf), NULL));
 
-		ret = _gnutls_set_datum(&params->write.IV, prev->write.IV.data, prev->write.IV.size);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		params->write.iv_size = prev->write.iv_size;
+		memcpy(params->write.iv, prev->write.iv, prev->write.iv_size);
 
 		_gnutls_hard_log("INT: WRITE IV [%d]: %s\n",
-				 params->write.IV.size,
-				 _gnutls_bin2hex(params->write.IV.data, params->write.IV.size,
+				 params->write.iv_size,
+				 _gnutls_bin2hex(params->write.iv, params->write.iv_size,
 						 buf, sizeof(buf), NULL));
 	}
 
@@ -301,12 +282,11 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 			return gnutls_assert_val(ret);
 	}
 
-	upd_state->mac_secret.data = NULL;
-	upd_state->mac_secret.size = 0;
+	upd_state->mac_key_size = 0;
 
-	ret = _gnutls_set_datum(&upd_state->key, key_block, key_size);
-	if (ret < 0)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	assert(key_size <= sizeof(upd_state->key));
+	memcpy(upd_state->key, key_block, key_size);
+	upd_state->key_size = key_size;
 
 	_gnutls_hard_log("INT: NEW %s KEY [%d]: %s\n",
 			 (upd_state == &params->read)?"READ":"WRITE",
@@ -315,9 +295,9 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 					 buf, sizeof(buf), NULL));
 
 	if (iv_size > 0) {
-		ret = _gnutls_set_datum(&upd_state->IV, iv_block, iv_size);
-		if (ret < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		assert(iv_size <= sizeof(upd_state->iv));
+		memcpy(upd_state->iv, iv_block, iv_size);
+		upd_state->iv_size = iv_size;
 
 		_gnutls_hard_log("INT: NEW %s IV [%d]: %s\n",
 				 (upd_state == &params->read)?"READ":"WRITE",
@@ -422,24 +402,20 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 		server_write = &params->write;
 	}
 
-	client_write->mac_secret.data = NULL;
-	client_write->mac_secret.size = 0;
+	client_write->mac_key_size = 0;
+	server_write->mac_key_size = 0;
 
-	server_write->mac_secret.data = NULL;
-	server_write->mac_secret.size = 0;
-
-	ret = _gnutls_set_datum(&client_write->key, ckey_block, key_size);
-	if (ret < 0)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	assert(key_size <= sizeof(client_write->key));
+	memcpy(client_write->key, ckey_block, key_size);
+	client_write->key_size = key_size;
 
 	_gnutls_hard_log("INT: CLIENT WRITE KEY [%d]: %s\n",
 			 key_size,
 			 _gnutls_bin2hex(ckey_block, key_size,
 					 buf, sizeof(buf), NULL));
 
-	ret = _gnutls_set_datum(&server_write->key, skey_block, key_size);
-	if (ret < 0)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	memcpy(server_write->key, ckey_block, key_size);
+	server_write->key_size = key_size;
 
 	_gnutls_hard_log("INT: SERVER WRITE KEY [%d]: %s\n",
 			 key_size,
@@ -447,18 +423,17 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 					 buf, sizeof(buf), NULL));
 
 	if (iv_size > 0) {
-		ret = _gnutls_set_datum(&client_write->IV, civ_block, iv_size);
-		if (ret < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		assert(iv_size <= sizeof(client_write->iv));
+		memcpy(client_write->iv, civ_block, iv_size);
+		client_write->iv_size = iv_size;
 
 		_gnutls_hard_log("INT: CLIENT WRITE IV [%d]: %s\n",
 				 iv_size,
 				 _gnutls_bin2hex(civ_block, iv_size,
 						 buf, sizeof(buf), NULL));
 
-		ret = _gnutls_set_datum(&server_write->IV, siv_block, iv_size);
-		if (ret < 0)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		memcpy(server_write->iv, civ_block, iv_size);
+		server_write->iv_size = iv_size;
 
 		_gnutls_hard_log("INT: SERVER WRITE IV [%d]: %s\n",
 				 iv_size,
@@ -475,16 +450,27 @@ _gnutls_init_record_state(record_parameters_st * params,
 			  record_state_st * state)
 {
 	int ret;
-	gnutls_datum_t *iv = NULL;
+	gnutls_datum_t *iv = NULL, _iv;
+	gnutls_datum_t key;
+	gnutls_datum_t mac;
+
+	_iv.data = state->iv;
+	_iv.size = state->iv_size;
+
+	key.data = state->key;
+	key.size = state->key_size;
+
+	mac.data = state->mac_key;
+	mac.size = state->mac_key_size;
 
 	if (!_gnutls_version_has_explicit_iv(ver)) {
 		if (_gnutls_cipher_type(params->cipher) == CIPHER_BLOCK)
-			iv = &state->IV;
+			iv = &_iv;
 	}
 
 	ret = _gnutls_auth_cipher_init(&state->ctx.tls12,
-				       params->cipher, &state->key, iv,
-				       params->mac, &state->mac_secret,
+				       params->cipher, &key, iv,
+				       params->mac, &mac,
 				       params->etm,
 #ifdef ENABLE_SSL3
 				       (ver->id == GNUTLS_SSL3) ? 1 : 0,
@@ -954,9 +940,9 @@ void _gnutls_epoch_gc(gnutls_session_t session)
 
 static inline void free_record_state(record_state_st * state)
 {
-	_gnutls_free_datum(&state->mac_secret);
-	_gnutls_free_datum(&state->IV);
-	_gnutls_free_datum(&state->key);
+	zeroize_temp_key(state->mac_key, state->mac_key_size);
+	zeroize_temp_key(state->iv, state->iv_size);
+	zeroize_temp_key(state->key, state->key_size);
 
 	if (state->is_aead)
 		_gnutls_aead_cipher_deinit(&state->ctx.aead);
@@ -1000,9 +986,13 @@ static int
 _tls13_init_record_state(gnutls_cipher_algorithm_t algo, record_state_st *state)
 {
 	int ret;
+	gnutls_datum_t key;
+
+	key.data = state->key;
+	key.size = state->key_size;
 
 	ret = _gnutls_aead_cipher_init(&state->ctx.aead,
-				       algo, &state->key);
+				       algo, &key);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

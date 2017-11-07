@@ -704,9 +704,15 @@ typedef struct api_aead_cipher_hd_st {
 } api_aead_cipher_hd_st;
 
 struct record_state_st {
-	gnutls_datum_t mac_secret;
-	gnutls_datum_t IV;
-	gnutls_datum_t key;
+	uint8_t mac_key[MAX_CIPHER_KEY_SIZE];
+	unsigned mac_key_size;
+
+	uint8_t iv[MAX_CIPHER_IV_SIZE];
+	unsigned iv_size;
+
+	uint8_t key[MAX_CIPHER_KEY_SIZE];
+	unsigned key_size;
+
 	union {
 		auth_cipher_hd_st tls12;
 		api_aead_cipher_hd_st aead;

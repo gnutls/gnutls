@@ -330,8 +330,8 @@ encrypt_packet(gnutls_session_t session,
 		if (params->cipher->xor_nonce == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
-			 if (params->write.IV.data == NULL
-			    || params->write.IV.size !=
+			 if (params->write.iv == NULL
+			    || params->write.iv_size !=
 			    imp_iv_size)
 				return
 				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -340,8 +340,8 @@ encrypt_packet(gnutls_session_t session,
 			 * write.sequence_number (It is a MAY on RFC 5288), and safer
 			 * as it will never reuse a value.
 			 */
-			memcpy(nonce, params->write.IV.data,
-			       params->write.IV.size);
+			memcpy(nonce, params->write.iv,
+			       params->write.iv_size);
 			memcpy(&nonce[imp_iv_size],
 			       UINT64DATA(params->write.sequence_number),
 			       8);
@@ -352,14 +352,14 @@ encrypt_packet(gnutls_session_t session,
 			/*data_ptr += exp_iv_size;*/
 			cipher_data += exp_iv_size;
 		} else { /* XOR nonce with IV */
-			if (unlikely(params->write.IV.size != 12 || imp_iv_size != 12 || exp_iv_size != 0))
+			if (unlikely(params->write.iv_size != 12 || imp_iv_size != 12 || exp_iv_size != 0))
 				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			memset(nonce, 0, 4);
 			memcpy(&nonce[4],
 			       UINT64DATA(params->write.sequence_number), 8);
 
-			memxor(nonce, params->write.IV.data, 12);
+			memxor(nonce, params->write.iv, 12);
 		}
 	}
 
@@ -436,7 +436,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 			 _gnutls_mac_get_name(params->mac),
 			 (unsigned int) params->epoch);
 
-	iv_size = params->write.IV.size;
+	iv_size = params->write.iv_size;
 
 	if (params->cipher->id == GNUTLS_CIPHER_NULL) {
 		if (cipher_size < plain->size+1)
@@ -445,7 +445,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 		return plain->size;
 	}
 
-	memcpy(nonce, params->write.IV.data, iv_size);
+	memcpy(nonce, params->write.iv, iv_size);
 	memxor(&nonce[iv_size-8], UINT64DATA(params->write.sequence_number), 8);
 
 	max = MAX_RECORD_SEND_SIZE(session);
@@ -611,12 +611,12 @@ decrypt_packet(gnutls_session_t session,
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
 			 if (unlikely
-			    (params->read.IV.data == NULL
-			     || params->read.IV.size != 4))
+			    (params->read.iv == NULL
+			     || params->read.iv_size != 4))
 				return
 				    gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
-			memcpy(nonce, params->read.IV.data,
+			memcpy(nonce, params->read.iv,
 			       imp_iv_size);
 
 			memcpy(&nonce[imp_iv_size],
@@ -625,13 +625,13 @@ decrypt_packet(gnutls_session_t session,
 			ciphertext->data += exp_iv_size;
 			ciphertext->size -= exp_iv_size;
 		} else { /* XOR nonce with IV */
-			if (unlikely(params->read.IV.size != 12 || imp_iv_size != 12 || exp_iv_size != 0))
+			if (unlikely(params->read.iv_size != 12 || imp_iv_size != 12 || exp_iv_size != 0))
 				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 			memset(nonce, 0, 4);
 			memcpy(&nonce[4], UINT64DATA(*sequence), 8);
 
-			memxor(nonce, params->read.IV.data, 12);
+			memxor(nonce, params->read.iv, 12);
 		}
 
 		length =
@@ -900,10 +900,10 @@ decrypt_packet_tls13(gnutls_session_t session,
 	if (unlikely(ciphertext->size < tag_size))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
-	if (unlikely(params->read.IV.size != iv_size || iv_size < 8))
+	if (unlikely(params->read.iv_size != iv_size || iv_size < 8))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
-	memcpy(nonce, params->read.IV.data, params->read.IV.size);
+	memcpy(nonce, params->read.iv, params->read.iv_size);
 	memxor(&nonce[iv_size-8], UINT64DATA(*sequence), 8);
 
 	length =
