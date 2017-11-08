@@ -83,13 +83,10 @@ int main(int argc, char **argv)
 
 static void cmd_parser(int argc, char **argv)
 {
-	unsigned int optct;
 	/* Note that the default sec-param is legacy because several TPMs
 	 * cannot handle larger keys.
 	 */
-	optct = optionProcess(&systemkey_toolOptions, argc, argv);
-	argc += optct;
-	argv += optct;
+	optionProcess(&systemkey_toolOptions, argc, argv);
 
 	gnutls_global_set_log_function(tls_log_func);
 

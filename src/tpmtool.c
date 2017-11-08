@@ -90,7 +90,6 @@ int main(int argc, char **argv)
 static void cmd_parser(int argc, char **argv)
 {
 	int ret, debug = 0;
-	unsigned int optct;
 	unsigned int key_type = GNUTLS_PK_UNKNOWN;
 	unsigned int bits = 0;
 	unsigned int genflags = 0;
@@ -99,9 +98,7 @@ static void cmd_parser(int argc, char **argv)
 	 */
 	const char *sec_param = "legacy";
 
-	optct = optionProcess(&tpmtoolOptions, argc, argv);
-	argc += optct;
-	argv += optct;
+	optionProcess(&tpmtoolOptions, argc, argv);
 
 	if (HAVE_OPT(DEBUG))
 		debug = OPT_VALUE_DEBUG;
