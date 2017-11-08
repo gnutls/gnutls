@@ -252,32 +252,32 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _tls13_derive_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
 					   NULL, 0,
-					   session->key.temp_secret,
-					   session->key.hs_ckey);
+					   session->key.proto.kshare.temp_secret,
+					   session->key.proto.kshare.hs_ckey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_ckey, key_size, key_block);
+		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.kshare.hs_ckey, key_size, key_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_ckey, iv_size, iv_block);
+		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.kshare.hs_ckey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else {
 		ret = _tls13_derive_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
 					   NULL, 0,
-					   session->key.temp_secret,
-					   session->key.hs_skey);
+					   session->key.proto.kshare.temp_secret,
+					   session->key.proto.kshare.hs_skey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_skey, key_size, key_block);
+		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.kshare.hs_skey, key_size, key_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_skey, iv_size, iv_block);
+		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.kshare.hs_skey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -344,21 +344,21 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
 				   hsk_len,
-				   session->key.temp_secret,
-				   session->key.hs_ckey);
+				   session->key.proto.kshare.temp_secret,
+				   session->key.proto.kshare.hs_ckey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_nss_keylog_write(session, keylog_label,
-				 session->key.hs_ckey,
+				 session->key.proto.kshare.hs_ckey,
 				 session->security_parameters.prf->output_size);
 
 	/* client keys */
-	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_ckey, key_size, ckey_block);
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.kshare.hs_ckey, key_size, ckey_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_ckey, iv_size, civ_block);
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.kshare.hs_ckey, iv_size, civ_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -376,21 +376,21 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
 				   hsk_len,
-				   session->key.temp_secret,
-				   session->key.hs_skey);
+				   session->key.proto.kshare.temp_secret,
+				   session->key.proto.kshare.hs_skey);
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_nss_keylog_write(session, keylog_label,
-				 session->key.hs_skey,
+				 session->key.proto.kshare.hs_skey,
 				 session->security_parameters.prf->output_size);
 
-	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_skey, key_size, skey_block);
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.kshare.hs_skey, key_size, skey_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.hs_skey, iv_size, siv_block);
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.kshare.hs_skey, iv_size, siv_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

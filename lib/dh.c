@@ -40,23 +40,23 @@ int set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
 			unsigned q_bits)
 {
 	/* just in case we are resuming a session */
-	gnutls_pk_params_release(&session->key.dh_params);
+	gnutls_pk_params_release(&session->key.proto.tls12.dh.params);
 
-	gnutls_pk_params_init(&session->key.dh_params);
+	gnutls_pk_params_init(&session->key.proto.tls12.dh.params);
 
-	session->key.dh_params.params[DH_G] = _gnutls_mpi_copy(g);
-	if (session->key.dh_params.params[DH_G] == NULL)
+	session->key.proto.tls12.dh.params.params[DH_G] = _gnutls_mpi_copy(g);
+	if (session->key.proto.tls12.dh.params.params[DH_G] == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	session->key.dh_params.params[DH_P] = _gnutls_mpi_copy(p);
-	if (session->key.dh_params.params[DH_P] == NULL) {
-		_gnutls_mpi_release(&session->key.dh_params.params[DH_G]);
+	session->key.proto.tls12.dh.params.params[DH_P] = _gnutls_mpi_copy(p);
+	if (session->key.proto.tls12.dh.params.params[DH_P] == NULL) {
+		_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_G]);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
-	session->key.dh_params.params_nr = 3; /* include empty q */
-	session->key.dh_params.algo = GNUTLS_PK_DH;
-	session->key.dh_params.qbits = q_bits;
+	session->key.proto.tls12.dh.params.params_nr = 3; /* include empty q */
+	session->key.proto.tls12.dh.params.algo = GNUTLS_PK_DH;
+	session->key.proto.tls12.dh.params.qbits = q_bits;
 
 	return 0;
 }

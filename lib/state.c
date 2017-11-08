@@ -169,30 +169,30 @@ gnutls_compression_get(gnutls_session_t session)
 
 static void deinit_keys(gnutls_session_t session)
 {
-	gnutls_pk_params_release(&session->key.ecdh_params);
-	gnutls_pk_params_release(&session->key.dh_params);
+	gnutls_pk_params_release(&session->key.proto.tls12.ecdh.params);
+	gnutls_pk_params_release(&session->key.proto.tls12.dh.params);
 
-	gnutls_pk_params_release(&session->key.kshare_ecdhx_params);
-	gnutls_pk_params_release(&session->key.kshare_ecdh_params);
-	gnutls_pk_params_release(&session->key.kshare_dh_params);
+	gnutls_pk_params_release(&session->key.proto.kshare.ecdhx_params);
+	gnutls_pk_params_release(&session->key.proto.kshare.ecdh_params);
+	gnutls_pk_params_release(&session->key.proto.kshare.dh_params);
 
-	zrelease_temp_mpi_key(&session->key.ecdh_x);
-	zrelease_temp_mpi_key(&session->key.ecdh_y);
-	_gnutls_free_temp_key_datum(&session->key.ecdhx);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.x);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.y);
+	_gnutls_free_temp_key_datum(&session->key.proto.tls12.ecdh.raw);
 
-	zrelease_temp_mpi_key(&session->key.client_Y);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.dh.client_Y);
 
 	/* SRP */
-	zrelease_temp_mpi_key(&session->key.srp_p);
-	zrelease_temp_mpi_key(&session->key.srp_g);
-	zrelease_temp_mpi_key(&session->key.srp_key);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_p);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_g);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_key);
 
-	zrelease_temp_mpi_key(&session->key.u);
-	zrelease_temp_mpi_key(&session->key.a);
-	zrelease_temp_mpi_key(&session->key.x);
-	zrelease_temp_mpi_key(&session->key.A);
-	zrelease_temp_mpi_key(&session->key.B);
-	zrelease_temp_mpi_key(&session->key.b);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.a);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.x);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.A);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.B);
+	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.b);
 
 	_gnutls_free_temp_key_datum(&session->key.key);
 	_gnutls_free_temp_key_datum(&session->key.key);

@@ -119,6 +119,7 @@ typedef struct {
  */
 #define MAX_FILENAME 512
 #define MAX_HASH_SIZE 64
+
 #define MAX_CIPHER_BLOCK_SIZE 16
 #define MAX_CIPHER_KEY_SIZE 32
 
@@ -440,44 +441,57 @@ typedef struct auth_cred_st {
 } auth_cred_st;
 
 struct gnutls_key_st {
-	/* TLS 1.3 key share exchange */
-	gnutls_pk_params_st kshare_ecdh_params;
-	gnutls_pk_params_st kshare_ecdhx_params;
-	gnutls_pk_params_st kshare_dh_params;
+	struct {
+		/* TLS 1.3 key share exchange */
+		struct {
+			gnutls_pk_params_st ecdh_params;
+			gnutls_pk_params_st ecdhx_params;
+			gnutls_pk_params_st dh_params;
 
-	/* the current (depending on state) secret, can be
-	 * early_secret, client_early_traffic_secret, ... */
-	uint8_t temp_secret[MAX_HASH_SIZE];
-	unsigned temp_secret_size; /* depends on negotiated PRF size */
-	uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_handshake_traffic_secret */
-	uint8_t hs_skey[MAX_HASH_SIZE]; /* server_handshake_traffic_secret */
-	uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
+			/* the current (depending on state) secret, can be
+			 * early_secret, client_early_traffic_secret, ... */
+			uint8_t temp_secret[MAX_HASH_SIZE];
+			unsigned temp_secret_size; /* depends on negotiated PRF size */
+			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_handshake_traffic_secret */
+			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_handshake_traffic_secret */
+			uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
+		} kshare; /* tls1.3 */
 
-	/* For ECDH KX */
-	gnutls_pk_params_st ecdh_params; /* private part */
+		/* Folow the SSL3.0 and TLS1.2 key exchanges */
 
-	/* public part */
-	bigint_t ecdh_x;
-	bigint_t ecdh_y;
-	gnutls_datum_t ecdhx; /* public key used in ECDHX (point) */
+		struct {
+			/* For ECDH KX */
+			struct {
+				gnutls_pk_params_st params; /* private part */
+				/* public part */
+				bigint_t x;
+				bigint_t y;
+				gnutls_datum_t raw; /* public key used in ECDHX (point) */
+			} ecdh;
 
-	/* For DH KX */
+			/* For DH KX */
+			struct {
+				gnutls_pk_params_st params;
+				bigint_t client_Y;
+			} dh;
+
+			/* for SRP KX */
+			struct {
+				bigint_t srp_key;
+				bigint_t srp_g;
+				bigint_t srp_p;
+				bigint_t A;
+				bigint_t B;
+				bigint_t u;
+				bigint_t b;
+				bigint_t a;
+				bigint_t x;
+			} srp;
+		} tls12; /* from ssl3.0 to tls12 */
+	} proto;
+
+	/* TLS pre-master key; applies to 1.2 and 1.3 */
 	gnutls_datum_t key;
-	
-	/* For DH KX */
-	gnutls_pk_params_st dh_params;
-	bigint_t client_Y;
-	/* for SRP */
-
-	bigint_t srp_key;
-	bigint_t srp_g;
-	bigint_t srp_p;
-	bigint_t A;
-	bigint_t B;
-	bigint_t u;
-	bigint_t b;
-	bigint_t a;
-	bigint_t x;
 
 	/* this is used to hold the peers authentication data 
 	 */
@@ -489,8 +503,6 @@ struct gnutls_key_st {
 	gnutls_credentials_type_t auth_info_type;
 	int auth_info_size;	/* needed in order to store to db for restoring 
 				 */
-	uint8_t crypt_algo;
-
 	auth_cred_st *cred;	/* used to specify keys/certificates etc */
 };
 
@@ -704,7 +716,8 @@ typedef struct api_aead_cipher_hd_st {
 } api_aead_cipher_hd_st;
 
 struct record_state_st {
-	uint8_t mac_key[MAX_CIPHER_KEY_SIZE];
+	/* mac keys can be as long as the hash size */
+	uint8_t mac_key[MAX_HASH_SIZE];
 	unsigned mac_key_size;
 
 	uint8_t iv[MAX_CIPHER_IV_SIZE];
