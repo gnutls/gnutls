@@ -945,8 +945,13 @@ typedef struct {
 	bool allow_key_usage_violation;
 	bool allow_wrong_pms;
 	bool dumbfw;
-	unsigned int dh_prime_bits;	/* old (deprecated) variable */
 
+	/* old (deprecated) variable. This is used for both srp_prime_bits
+	 * and dh_prime_bits as they don't overlap */
+	/* For SRP: minimum bits to allow for SRP
+	 * use gnutls_srp_set_prime_bits() to adjust it.
+	 */
+	uint16_t dh_prime_bits; /* srp_prime_bits */
 
 	/* resumed session */
 	bool resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */
@@ -1074,11 +1079,6 @@ typedef struct {
 	 * #define'd.)
 	 */
 	int errnum;
-
-	/* minimum bits to allow for SRP
-	 * use gnutls_srp_set_prime_bits() to adjust it.
-	 */
-	uint16_t srp_prime_bits;
 
 	/* A handshake process has been completed */
 	bool initial_negotiation_completed;

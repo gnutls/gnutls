@@ -800,7 +800,7 @@ gnutls_srp_verifier(const char *username, const char *password,
  **/
 void gnutls_srp_set_prime_bits(gnutls_session_t session, unsigned int bits)
 {
-	session->internals.srp_prime_bits = bits;
+	session->internals.dh_prime_bits = bits;
 }
 
 /**
