@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . cert-tests key-tests slow dtls windows
+SUBDIRS = . cert-tests key-tests slow windows
 
 if WANT_TEST_SUITE
 SUBDIRS += suite
@@ -70,7 +70,7 @@ AM_CPPFLAGS = \
 
 AM_LDFLAGS = -no-install
 COMMON_GNUTLS_LDADD = ../lib/libgnutls.la
-COMMON_DEPS_LDADD = $(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) $(LIBSECCOMP)
+COMMON_DEPS_LDADD = $(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) $(LIBSECCOMP) $(LIBRT)
 COMMON_LDADD = $(COMMON_GNUTLS_LDADD) $(COMMON_DEPS_LDADD)
 
 LDADD = $(COMMON_GNUTLS_LDADD) \
@@ -311,6 +311,17 @@ name_constraints_merge_CPPFLAGS = $(AM_CPPFLAGS) \
 	$(NETTLE_CFLAGS)
 
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
+
+if !WINDOWS
+dist_check_SCRIPTS += dtls/dtls dtls/dtls-resume #dtls/dtls-nb
+
+indirect_tests += dtls-stress
+
+dtls_stress_SOURCES = dtls/dtls-stress.c
+dtls_stress_LDADD = $(COMMON_GNUTLS_LDADD) \
+	$(COMMON_DEPS_LDADD)
+
+endif
 
 if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
