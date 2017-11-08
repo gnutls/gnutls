@@ -418,6 +418,7 @@ void gnutls_deinit(gnutls_session_t session)
 	_mbuffer_head_clear(&session->internals.record_send_buffer);
 
 	_gnutls_free_datum(&session->internals.resumption_data);
+	_gnutls_free_datum(&session->internals.dtls.dcookie);
 
 	gnutls_free(session->internals.rexts);
 

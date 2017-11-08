@@ -857,8 +857,7 @@ typedef struct gnutls_dh_params_int {
  */
 typedef struct {
 	/* HelloVerifyRequest DOS prevention cookie */
-	uint8_t cookie[DTLS_MAX_COOKIE_SIZE];
-	uint8_t cookie_len;
+	gnutls_datum_t dcookie;
 
 	/* For DTLS handshake fragmentation and reassembly. */
 	uint16_t hsk_write_seq;

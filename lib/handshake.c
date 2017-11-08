@@ -1897,12 +1897,14 @@ static int send_client_hello(gnutls_session_t session, int again)
 		/* Copy the DTLS cookie
 		 */
 		if (IS_DTLS(session)) {
-			ret = _gnutls_buffer_append_data_prefix(&extdata, 8, session->internals.dtls.cookie,
-				session->internals.dtls.cookie_len);
+			ret = _gnutls_buffer_append_data_prefix(&extdata, 8,
+								session->internals.dtls.dcookie.data,
+								session->internals.dtls.dcookie.size);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
+			_gnutls_free_datum(&session->internals.dtls.dcookie);
 		}
 
 		/* Copy the ciphersuites.
@@ -2090,6 +2092,7 @@ recv_hello_verify_request(gnutls_session_t session,
 	size_t pos = 0;
 	uint8_t cookie_len;
 	unsigned int nb_verifs;
+	int ret;
 
 	if (!IS_DTLS(session)
 	    || session->security_parameters.entity == GNUTLS_SERVER) {
@@ -2120,8 +2123,10 @@ recv_hello_verify_request(gnutls_session_t session,
 
 	DECR_LEN(len, cookie_len);
 
-	session->internals.dtls.cookie_len = cookie_len;
-	memcpy(session->internals.dtls.cookie, &data[pos], cookie_len);
+	gnutls_free(session->internals.dtls.dcookie.data);
+	ret = _gnutls_set_datum(&session->internals.dtls.dcookie, &data[pos], cookie_len);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	if (len != 0) {
 		gnutls_assert();
