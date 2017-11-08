@@ -42,7 +42,7 @@ doc-dist.Fedora:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf
-  - CFLAGS="-std=c99 -O2 -g" ./configure --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
+  - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
   - make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   - make -C doc gnutls.html
   - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
@@ -60,7 +60,7 @@ abi-coverage.Fedora:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf
-  - CFLAGS="-std=c99 -O2 -g" ./configure --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
+  - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
     && make -j$(nproc)
   - make abi-check
   - make pic-check
@@ -84,18 +84,19 @@ minimal.Fedora.x86_64:
   script:
   - echo "No tools build"
   - make autoreconf
-  - ./configure --cache-file cache/config.cache --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
+  - dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
   - make -j$(nproc)
   - make -j$(nproc) check
   - echo "Minimal build"
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
-    ./configure --with-included-libtasn1 --enable-valgrind-tests
+    dash ./configure --with-included-libtasn1 --enable-valgrind-tests
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe
     --disable-ocsp --disable-session-tickets --disable-non-suiteb-curves --with-included-unistring
     --disable-nls --disable-libdane --without-p11-kit --without-tpm
     --disable-ssl3-support --disable-ssl2-support --disable-doc --enable-openssl-compatibility
+    --disable-gcc-warnings
   - make -j$(nproc)
   tags:
   - shared
@@ -108,7 +109,7 @@ no-SSL-3.0.Fedora.x86_64:
   script:
   - make autoreconf
   - mkdir -p build && cd build &&
-    ../configure --cache-file ../cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
+    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
@@ -131,7 +132,7 @@ FIPS140-2.Fedora.x86_64:
   script:
   - make autoreconf
   - mkdir -p build && cd build &&
-    ../configure --cache-file ../cache/config.cache --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
+    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
   - make -j$(nproc)
   - GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1 make check -j$(nproc)
   - make check -j$(nproc)
@@ -152,7 +153,7 @@ valgrind.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - make autoreconf
-  - ./configure --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
+  - dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
   - make -j$(nproc)
   - make check -j$(nproc)
   tags:
@@ -175,11 +176,11 @@ asan.Fedora.x86_64:
   - git submodule update --init --no-fetch
   - make autoreconf
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
-    ./configure --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile
+    dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
   - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make check -j$(nproc)
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
-    ./configure --cache-file cache/config.cache --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --disable-guile --enable-destructive-tests
+    dash ./configure --cache-file cache/config.cache --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --disable-guile --enable-destructive-tests
   - make -j$(nproc)
   - make -C tests check -j$(nproc) TESTS="trust-store destructive/p11-kit-load.sh" SUBDIRS=.
   tags:
@@ -232,7 +233,7 @@ MinGW32.DLLs:
     rm -f tests/suite/mini-eagain2.c
   - make autoreconf
   - export CC="ccache i686-w64-mingw32-gcc"
-  - configure ./configure --host=i686-w64-mingw32 --target=i686-w64-mingw32 ---cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+  - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 ---cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
@@ -271,7 +272,7 @@ MinGW64.DLLs:
     rm -f tests/suite/mini-eagain2.c
   - make autoreconf
   - export CC="ccache x86_64-w64-mingw32-gcc"
-    ./configure --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+    dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
@@ -310,7 +311,7 @@ MinGW64:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    ../configure --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+    dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   - cd ..
   tags:
@@ -335,7 +336,7 @@ MinGW32:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    ../configure --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+    dash ../configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   - cd ..
   tags:
@@ -359,7 +360,7 @@ FreeBSD.x86_64:
   script:
   - export CC="ccache clang"
   - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
-    --cache-file cache/config.cache --disable-guile --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
+    --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
   only:
@@ -382,7 +383,7 @@ Fedora.x86:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
-    CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --host=i686-redhat-linux --target=i686-redhat-linux --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile &&
+    CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc) &&
     make pic-check
   tags:
@@ -405,7 +406,7 @@ ubsan-Werror.Fedora.x86_64:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf
-  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc
+  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" dash ./configure --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
   - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g"
@@ -413,7 +414,7 @@ ubsan-Werror.Fedora.x86_64:
   - make -j$(nproc) -C src CFLAGS="-Werror -O2 -g -fsanitize=undefined -Wno-error=parentheses -Wno-error=unused-macros"
   - make -j$(nproc)
   - make check -j$(nproc)
-  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" ./configure --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --enable-destructive-tests
+  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" dash ./configure --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --enable-destructive-tests
   - make -j$(nproc)
   - make -C tests check -j$(nproc) TESTS="trust-store destructive/p11-kit-load.sh" SUBDIRS=.
   tags:
@@ -435,7 +436,7 @@ Debian.x86_64:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --cache-file ../cache/config.cache --disable-doc --disable-guile &&
+    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
@@ -456,7 +457,7 @@ Debian.aarch64:
   image:
   script:
   - make autoreconf && mkdir -p build && cd build &&
-    ../configure --cache-file ../cache/config.cache --disable-doc --disable-guile --disable-full-test-suite &&
+    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile --disable-full-test-suite &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
