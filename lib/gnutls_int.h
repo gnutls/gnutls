@@ -922,7 +922,7 @@ typedef struct {
 	 * supports it. In server side it contains GNUTLS_CERT_REQUIRE
 	 * or similar.
 	 */
-	unsigned send_cert_req;
+	gnutls_certificate_request_t send_cert_req;
 
 	size_t max_handshake_data_buffer_size;
 
