@@ -1714,8 +1714,8 @@ read_server_hello(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-					   NULL, 0, session->key.proto.kshare.temp_secret,
-					   session->key.proto.kshare.temp_secret);
+					   NULL, 0, session->key.proto.tls13.temp_secret,
+					   session->key.proto.tls13.temp_secret);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -2076,8 +2076,8 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 
 		if (vers->tls13_sem) {
 			ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-						   NULL, 0, session->key.proto.kshare.temp_secret,
-						   session->key.proto.kshare.temp_secret);
+						   NULL, 0, session->key.proto.tls13.temp_secret,
+						   session->key.proto.tls13.temp_secret);
 			if (ret < 0) {
 				gnutls_assert();
 				goto fail;

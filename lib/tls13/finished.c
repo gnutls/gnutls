@@ -39,9 +39,9 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 	unsigned hash_size = session->security_parameters.prf->output_size;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
-		base_key = session->key.proto.kshare.hs_skey;
+		base_key = session->key.proto.tls13.hs_skey;
 	else
-		base_key = session->key.proto.kshare.hs_ckey;
+		base_key = session->key.proto.tls13.hs_ckey;
 
 	ret = _tls13_expand_secret(session, "finished", 8, NULL, 0, base_key,
 			hash_size, fkey);
@@ -105,9 +105,9 @@ int _gnutls13_send_finished(gnutls_session_t session, unsigned again)
 
 	if (again == 0) {
 		if (session->security_parameters.entity == GNUTLS_CLIENT)
-			base_key = session->key.proto.kshare.hs_ckey;
+			base_key = session->key.proto.tls13.hs_ckey;
 		else
-			base_key = session->key.proto.kshare.hs_skey;
+			base_key = session->key.proto.tls13.hs_skey;
 
 		ret = _tls13_expand_secret(session, "finished", 8, NULL, 0, base_key,
 					   hash_size, fkey);

@@ -441,13 +441,16 @@ typedef struct auth_cred_st {
 } auth_cred_st;
 
 struct gnutls_key_st {
-	struct {
-		/* TLS 1.3 key share exchange */
-		struct {
-			gnutls_pk_params_st ecdh_params;
-			gnutls_pk_params_st ecdhx_params;
-			gnutls_pk_params_st dh_params;
+	struct { /* These are kept outside the TLS1.3 union as they are
+	          * negotiated via extension, even before protocol is negotiated */
+		gnutls_pk_params_st ecdh_params;
+		gnutls_pk_params_st ecdhx_params;
+		gnutls_pk_params_st dh_params;
+	} kshare;
 
+	/* The union contents depend on the negotiated protocol */
+	union {
+		struct {
 			/* the current (depending on state) secret, can be
 			 * early_secret, client_early_traffic_secret, ... */
 			uint8_t temp_secret[MAX_HASH_SIZE];
@@ -455,10 +458,9 @@ struct gnutls_key_st {
 			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_handshake_traffic_secret */
 			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_handshake_traffic_secret */
 			uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
-		} kshare; /* tls1.3 */
+		} tls13; /* tls1.3 */
 
 		/* Folow the SSL3.0 and TLS1.2 key exchanges */
-
 		struct {
 			/* For ECDH KX */
 			struct {

@@ -157,8 +157,8 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 	uint8_t zero[MAX_HASH_SIZE];
 
 	ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-				   NULL, 0, session->key.proto.kshare.temp_secret,
-				   session->key.proto.kshare.temp_secret);
+				   NULL, 0, session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.temp_secret);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -170,13 +170,13 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 	ret = _tls13_derive_secret(session, EXPORTER_MASTER_LABEL, sizeof(EXPORTER_MASTER_LABEL)-1,
 				   session->internals.handshake_hash_buffer.data,
 				   session->internals.handshake_hash_buffer_server_finished_len,
-				   session->key.proto.kshare.temp_secret,
-				   session->key.proto.kshare.ap_expkey);
+				   session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.ap_expkey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_nss_keylog_write(session, "EXPORTER_SECRET",
-				 session->key.proto.kshare.ap_expkey,
+				 session->key.proto.tls13.ap_expkey,
 				 session->security_parameters.prf->output_size);
 
 	_gnutls_epoch_bump(session);
@@ -195,7 +195,7 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 {
 	int ret;
 
-	if (unlikely(session->key.key.size == 0 || session->key.proto.kshare.temp_secret_size == 0))
+	if (unlikely(session->key.key.size == 0 || session->key.proto.tls13.temp_secret_size == 0))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	ret = _tls13_update_secret(session, session->key.key.data, session->key.key.size);

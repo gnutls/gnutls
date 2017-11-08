@@ -34,8 +34,8 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 {
 	int ret;
 
-	ret = _tls13_update_secret(session, session->key.proto.kshare.temp_secret,
-				   session->key.proto.kshare.temp_secret_size);
+	ret = _tls13_update_secret(session, session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.temp_secret_size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

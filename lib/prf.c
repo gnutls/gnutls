@@ -149,7 +149,7 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 		}
 
 		ret = _tls13_derive_secret(session, label, label_size, NULL, 0,
-					   session->key.proto.kshare.ap_expkey, secret);
+					   session->key.proto.tls13.ap_expkey, secret);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 

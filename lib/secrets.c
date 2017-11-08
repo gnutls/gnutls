@@ -34,11 +34,11 @@ int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_
 {
 	char buf[128];
 
-	session->key.proto.kshare.temp_secret_size = session->security_parameters.prf->output_size;
+	session->key.proto.tls13.temp_secret_size = session->security_parameters.prf->output_size;
 
 	/* when no PSK, use the zero-value */
 	if (psk == NULL) {
-		psk_size = session->key.proto.kshare.temp_secret_size;
+		psk_size = session->key.proto.tls13.temp_secret_size;
 		if (unlikely(psk_size >= sizeof(buf)))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -49,16 +49,16 @@ int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_
 	return gnutls_hmac_fast(session->security_parameters.prf->id,
 				"", 0,
 				psk, psk_size,
-				session->key.proto.kshare.temp_secret);
+				session->key.proto.tls13.temp_secret);
 }
 
 /* HKDF-Extract(Prev-Secret, key) */
 int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t key_size)
 {
 	return gnutls_hmac_fast(session->security_parameters.prf->id,
-				session->key.proto.kshare.temp_secret, session->key.proto.kshare.temp_secret_size,
+				session->key.proto.tls13.temp_secret, session->key.proto.tls13.temp_secret_size,
 				key, key_size,
-				session->key.proto.kshare.temp_secret);
+				session->key.proto.tls13.temp_secret);
 }
 
 /* Derive-Secret(Secret, Label, Messages) */

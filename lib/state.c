@@ -169,32 +169,44 @@ gnutls_compression_get(gnutls_session_t session)
 
 static void deinit_keys(gnutls_session_t session)
 {
-	gnutls_pk_params_release(&session->key.proto.tls12.ecdh.params);
-	gnutls_pk_params_release(&session->key.proto.tls12.dh.params);
+	const version_entry_st *vers = get_version(session);
 
-	gnutls_pk_params_release(&session->key.proto.kshare.ecdhx_params);
-	gnutls_pk_params_release(&session->key.proto.kshare.ecdh_params);
-	gnutls_pk_params_release(&session->key.proto.kshare.dh_params);
+	if (vers == NULL)
+		return;
 
-	zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.x);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.y);
-	_gnutls_free_temp_key_datum(&session->key.proto.tls12.ecdh.raw);
+	gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
+	gnutls_pk_params_release(&session->key.kshare.ecdh_params);
+	gnutls_pk_params_release(&session->key.kshare.dh_params);
 
-	zrelease_temp_mpi_key(&session->key.proto.tls12.dh.client_Y);
+	if (!vers->tls13_sem) {
+		gnutls_pk_params_release(&session->key.proto.tls12.ecdh.params);
+		gnutls_pk_params_release(&session->key.proto.tls12.dh.params);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.x);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.ecdh.y);
+		_gnutls_free_temp_key_datum(&session->key.proto.tls12.ecdh.raw);
 
-	/* SRP */
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_p);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_g);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_key);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.dh.client_Y);
 
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.a);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.x);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.A);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.B);
-	zrelease_temp_mpi_key(&session->key.proto.tls12.srp.b);
+		/* SRP */
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_p);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_g);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.srp_key);
 
-	_gnutls_free_temp_key_datum(&session->key.key);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.u);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.a);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.x);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.A);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.B);
+		zrelease_temp_mpi_key(&session->key.proto.tls12.srp.b);
+	} else {
+		gnutls_memset(session->key.proto.tls13.temp_secret, 0,
+			      sizeof(session->key.proto.tls13.temp_secret));
+		gnutls_memset(session->key.proto.tls13.hs_ckey, 0,
+			      sizeof(session->key.proto.tls13.hs_ckey));
+		gnutls_memset(session->key.proto.tls13.hs_skey, 0,
+			      sizeof(session->key.proto.tls13.hs_skey));
+	}
+
 	_gnutls_free_temp_key_datum(&session->key.key);
 }
 
@@ -434,6 +446,9 @@ void gnutls_deinit(gnutls_session_t session)
 
 	/* we rely on priorities' internal reference counting */
 	gnutls_priority_deinit(session->internals.priorities);
+
+	/* overwrite any temp TLS1.3 keys */
+	gnutls_memset(&session->key.proto, 0, sizeof(session->key.proto));
 
 	gnutls_free(session);
 }
