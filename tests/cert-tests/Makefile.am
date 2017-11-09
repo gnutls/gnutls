@@ -75,7 +75,21 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/mem-leak.p12 data/alt-chain-new-ca.pem data/alt-chain-old-ca.pem \
 	data/alt-chain.pem data/pkcs7-chain.pem data/pkcs7-chain-root.pem data/chain-eddsa.pem \
 	data/pkcs7-chain-endcert-key.pem data/cert-rsa-pss.pem data/openssl-invalid-time-format.pem \
-	data/cert-eddsa.pem data/pubkey-eddsa.pem data/pkcs7-eddsa-sig.p7s
+	data/cert-eddsa.pem data/pubkey-eddsa.pem data/pkcs7-eddsa-sig.p7s \
+	data/key-ca.pem data/key-user.pem \
+	data/ca-gnutls-keyid.pem data/ca-no-keyid.pem data/ca-weird-keyid.pem \
+	data/key-ca-1234.p8 data/key-ca-empty.p8 data/key-ca-null.p8 \
+	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind \
+	data/encpkcs8.pem data/unencpkcs8.pem data/enc2pkcs8.pem \
+	data/openssl-3des.p8 data/openssl-3des.p8.txt data/openssl-aes128.p8 \
+	data/openssl-aes128.p8.txt data/openssl-aes256.p8 data/openssl-aes256.p8.txt \
+	data/cert.dsa.1024.pem data/cert.dsa.2048.pem data/cert.dsa.3072.pem \
+	data/dsa.1024.pem data/dsa.2048.pem data/dsa.3072.pem data/dsa-pubkey-1018.pem \
+	data/bad-key.pem data/p8key-illegal.pem data/key-illegal.pem data/pkcs8-pbes2-sha256.pem \
+	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der \
+	data/key-invalid4.der data/key-invalid5.der data/key-invalid6.der \
+	data data/pkcs8-invalid9.der data/key-invalid2.der data/pkcs8-invalid10.der \
+	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -83,17 +97,25 @@ dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
 	pkcs7-constraints2 certtool-long-oids pkcs7-cat cert-sanity cert-critical \
 	pkcs12 certtool-crl-decoding pkcs12-encode pkcs12-corner-cases inhibit-anypolicy \
-	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa
+	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa \
+	key-id pkcs8 pkcs8-decode ecdsa illegal-rsa pkcs8-invalid key-invalid \
+	pkcs8-eddsa
+
+dist_check_SCRIPTS += key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8 pkcs8-eddsa \
+	certtool-utf8 crq
+
 
 if WANT_TEST_SUITE
 dist_check_SCRIPTS += provable-dh-default
 endif
 
-dist_check_SCRIPTS += certtool-utf8 crq
+if !WITH_OLD_NETTLE
+dist_check_SCRIPTS += illegal-rsa
+endif
 
 if !WINDOWS
 dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
-	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8 rsa-pss-pad
+	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8 rsa-pss-pad dsa
 endif
 
 if ENABLE_DANE
