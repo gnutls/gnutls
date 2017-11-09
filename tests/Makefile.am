@@ -19,7 +19,13 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = . cert-tests key-tests slow windows
+SUBDIRS = . cert-tests key-tests slow
+
+TESTS_ENVIRONMENT =
+
+if WINDOWS
+SUBDIRS += windows
+endif
 
 if WANT_TEST_SUITE
 SUBDIRS += suite
@@ -313,6 +319,11 @@ name_constraints_merge_CPPFLAGS = $(AM_CPPFLAGS) \
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
 if !WINDOWS
+
+#
+# List of tests not available/functional under windows
+#
+
 dist_check_SCRIPTS += dtls/dtls dtls/dtls-resume #dtls/dtls-nb
 
 indirect_tests += dtls-stress
@@ -321,9 +332,6 @@ dtls_stress_SOURCES = dtls/dtls-stress.c
 dtls_stress_LDADD = $(COMMON_GNUTLS_LDADD) \
 	$(COMMON_DEPS_LDADD)
 
-endif
-
-if !WINDOWS
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
 	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
@@ -346,12 +354,17 @@ endif
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
+
+else
+
+TESTS_ENVIRONMENT += WINDOWS=1
+
 endif
 
 check_PROGRAMS = $(ctests) $(indirect_tests)
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
-TESTS_ENVIRONMENT =						\
+TESTS_ENVIRONMENT +=						\
 	CFLAGS="$(CFLAGS)"					\
 	LC_ALL="C"						\
 	LSAN_OPTIONS=suppressions=gnutls-asan.supp		\
@@ -372,10 +385,6 @@ TESTS_ENVIRONMENT =						\
 	top_builddir="$(top_builddir)"				\
 	libdir="$(libdir)"					\
 	srcdir="$(srcdir)"
-
-if WINDOWS
-TESTS_ENVIRONMENT += WINDOWS=1
-endif
 
 if ENABLE_SSL3
 TESTS_ENVIRONMENT += ENABLE_SSL3=1
