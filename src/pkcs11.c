@@ -1423,7 +1423,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 }
 
 void
-pkcs11_set_pin(FILE * outfile, const char *url, common_info_st * info, unsigned so)
+pkcs11_set_token_pin(FILE * outfile, const char *url, common_info_st * info, unsigned so)
 {
 	int ret;
 	const char *pin;

@@ -328,9 +328,9 @@ static void cmd_parser(int argc, char **argv)
 	} else if (HAVE_OPT(INITIALIZE)) {
 		pkcs11_init(outfile, url, label, &cinfo);
 	} else if (HAVE_OPT(INITIALIZE_PIN)) {
-		pkcs11_set_pin(outfile, url, &cinfo, 0);
+		pkcs11_set_token_pin(outfile, url, &cinfo, 0);
 	} else if (HAVE_OPT(INITIALIZE_SO_PIN)) {
-		pkcs11_set_pin(outfile, url, &cinfo, 1);
+		pkcs11_set_token_pin(outfile, url, &cinfo, 1);
 	} else if (HAVE_OPT(DELETE)) {
 		pkcs11_delete(outfile, url, flags, &cinfo);
 	} else if (HAVE_OPT(GENERATE_PRIVKEY)) {
