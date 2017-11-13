@@ -547,7 +547,20 @@ key_share_recv_params(gnutls_session_t session,
 		}
 
 		if (used_share == 0) {
-			/* we signal for hello-retry-request */
+			/* we utilize GNUTLS_E_NO_COMMON_KEY_SHARE for:
+			 * 1. signal for hello-retry-request in the handshake
+			 *    layer during first client hello parsing (server side - here).
+			 *    This does not result to error code being
+			 *    propagated to app layer.
+			 * 2. Propagate to application error code that no
+			 *    common key share was found after an HRR was
+			 *    received (client side)
+			 * 3. Propagate to application error code that no
+			 *    common key share was found after an HRR was
+			 *    sent (server side).
+			 * In cases (2,3) the error is translated to illegal
+			 * parameter alert.
+			 */
 			return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
 		}
 
