@@ -1520,9 +1520,9 @@ int gnutls_x509_ext_export_basic_constraints(unsigned int ca, int pathlen,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
-			      char **policyLanguage, char **policy,
-			      size_t * sizeof_policy)
+int gnutls_x509_ext_import_proxy(const gnutls_datum_t *ext, int *pathlen,
+			         char **policyLanguage, char **policy,
+			         size_t *sizeof_policy)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
@@ -1563,11 +1563,6 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 		goto cleanup;
 	}
 
-	if (policyLanguage) {
-		*policyLanguage = (char *)value1.data;
-		value1.data = NULL;
-	}
-
 	result = _gnutls_x509_read_value(c2, "proxyPolicy.policy", &value2);
 	if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
 		if (policy)
@@ -1584,6 +1579,11 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 		}
 		if (sizeof_policy)
 			*sizeof_policy = value2.size;
+	}
+
+	if (policyLanguage) {
+		*policyLanguage = (char *)value1.data;
+		value1.data = NULL;
 	}
 
 	result = 0;
