@@ -359,6 +359,7 @@ multitable:
 		$line =~ s/\@c (.*)/\% $1/g;
 		$line =~ s/\@math\{($mathmatch+)\}/\$$1\$/g;
 		$line =~ s/\@acronym\{($spacematch+)\}/\\acronym{$1}/g;
+		$line =~ s/\@acronym\{/\\acronym{/g;
 		$line =~ s/\s*\@xcite\{($match+)\}/~\\cite{$1}/g;
 		$line =~ s/\s*\@xcite\{($match+)\,($match+)\}/~\\cite{$1,$2}/g;
 		$line =~ s/\@footnote\{/\\footnote{/g;
