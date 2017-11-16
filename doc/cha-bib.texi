@@ -35,6 +35,11 @@ Y. Cheng and J. Chu and S. Radhakrishnan and A. Jain, "TCP Fast Open",
 December 2014, Available from
 @url{http://www.ietf.org/rfc/rfc7413.txt}.
 
+@item @anchor{RFC7918}[RFC7918]
+A. Langley, N. Modadugu, B. Moeller, "Transport Layer Security (TLS) False Start",
+August 2016, Available from
+@url{http://www.ietf.org/rfc/rfc7918.txt}.
+
 @item @anchor{RFC6125}[RFC6125]
 Peter Saint-Andre and Jeff Hodges, "Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)",
 March 2011, Available from
@@ -233,6 +238,10 @@ at @url{http://www.ecrypt.eu.org/documents/D.SPA.13.pdf}.
 @item @anchor{RFC5056}[RFC5056]
 N. Williams, "On the Use of Channel Bindings to Secure Channels",
 November 2007, available from @url{http://www.ietf.org/rfc/rfc5056}.
+
+@item @anchor{RFC5764}[RFC5764]
+D. McGrew, E. Rescorla, "Datagram Transport Layer Security (DTLS) Extension to Establish Keys for the Secure Real-time Transport Protocol (SRTP)On the Use of Channel Bindings to Secure Channels",
+May 2010, available from @url{http://www.ietf.org/rfc/rfc5764}.
 
 @item @anchor{RFC5929}[RFC5929]
 J. Altman, N. Williams, L. Zhu, "Channel Bindings for TLS", July 2010,

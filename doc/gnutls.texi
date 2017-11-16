@@ -63,7 +63,7 @@ Documentation License''.
 @end macro
 
 @macro xcite{ref}
-[@emph{\ref\}]
+[@ref{\ref\}]
 @end macro
 
 @macro funcref{ref}

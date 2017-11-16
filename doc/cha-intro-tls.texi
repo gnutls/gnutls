@@ -636,7 +636,7 @@ Other helper functions are listed below.
 @cindex False Start
 @cindex TLS False Start
 
-The TLS protocol was extended in @xcite{draft-ietf-tls-falsestart-01} to allow the client
+The TLS protocol was extended in @xcite{RFC7918} to allow the client
 to send data to server in a single round trip. This change however operates on the borderline
 of the TLS protocol security guarrantees and should be used for the cases where the reduced
 latency outperforms the risk of an adversary intercepting the transferred data. In GnuTLS
@@ -657,7 +657,7 @@ whitelisted for false start or on insufficient key sizes, the handshake
 process will complete properly (i.e., no early return). To verify that false start was used you
 may use @funcref{gnutls_session_get_flags} and check for the @acronym{GNUTLS_SFLAGS_FALSE_START}
 flag. For GnuTLS the false start is whitelisted for the following
-key exchange methods (see @xcite{draft-ietf-tls-falsestart-01} for rationale)
+key exchange methods (see @xcite{RFC7918} for rationale)
 @itemize
 @item DHE
 @item ECDHE
