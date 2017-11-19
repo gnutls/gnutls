@@ -638,7 +638,7 @@ Other helper functions are listed below.
 
 The TLS protocol was extended in @xcite{RFC7918} to allow the client
 to send data to server in a single round trip. This change however operates on the borderline
-of the TLS protocol security guarrantees and should be used for the cases where the reduced
+of the TLS protocol security guarantees and should be used for the cases where the reduced
 latency outperforms the risk of an adversary intercepting the transferred data. In GnuTLS
 applications can use the @acronym{GNUTLS_ENABLE_FALSE_START} as option to @funcref{gnutls_init}
 to request an early return of the @funcref{gnutls_handshake} function. After that early
