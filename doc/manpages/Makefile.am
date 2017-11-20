@@ -706,6 +706,7 @@ APIMANS += gnutls_session_get_ptr.3
 APIMANS += gnutls_session_get_random.3
 APIMANS += gnutls_session_get_verify_cert_status.3
 APIMANS += gnutls_session_is_resumed.3
+APIMANS += gnutls_session_key_update.3
 APIMANS += gnutls_session_resumption_requested.3
 APIMANS += gnutls_session_set_data.3
 APIMANS += gnutls_session_set_id.3
