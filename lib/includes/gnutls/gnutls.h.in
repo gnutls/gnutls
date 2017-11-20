@@ -2082,6 +2082,9 @@ int gnutls_srp_verifier(const char *username,
 /* The static parameters defined in draft-ietf-tls-srp-05
  * Those should be used as input to gnutls_srp_verifier().
  */
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_8192_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_8192_group_generator;
+
 extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_4096_group_prime;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_4096_group_generator;
 
