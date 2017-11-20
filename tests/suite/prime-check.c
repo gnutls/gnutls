@@ -42,6 +42,7 @@ static void test_prime(const gnutls_datum_t * prime)
 
 int main(int argc, char **argv)
 {
+	test_prime(&gnutls_srp_8192_group_prime);
 	test_prime(&gnutls_srp_4096_group_prime);
 	test_prime(&gnutls_srp_3072_group_prime);
 	test_prime(&gnutls_srp_2048_group_prime);
