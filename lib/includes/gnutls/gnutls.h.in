@@ -370,6 +370,8 @@ typedef enum {
  *   For example x25519. This option is the most performant for client (less CPU spent
  *   generating keys), but if the server doesn't support the advertized option it may
  *   result to more roundtrips needed to discover the server's choice.
+ * @GNUTLS_NO_AUTO_REKEY: Disable auto-rekeying under TLS1.3. If this option is not specified
+ *   gnutls will force a rekey after 2^24 records have been sent.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
@@ -393,7 +395,8 @@ typedef enum {
 	GNUTLS_NO_TICKETS = (1<<10),
 	GNUTLS_KEY_SHARE_TOP = (1<<11),
 	GNUTLS_KEY_SHARE_TOP2 = (1<<12),
-	GNUTLS_KEY_SHARE_TOP3 = (1<<13)
+	GNUTLS_KEY_SHARE_TOP3 = (1<<13),
+	GNUTLS_NO_AUTO_REKEY = (1<<15)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls

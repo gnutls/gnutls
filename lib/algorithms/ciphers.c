@@ -165,6 +165,8 @@ static const cipher_entry_st algorithms[] = {
 	  .explicit_iv = 0,
 	  .xor_nonce = 1,
 	  .cipher_iv = 12,
+	  /* in chacha20 we don't need a rekey after 2^24 messages */
+	  .no_rekey = 1,
 	  .tagsize = 16
 	},
 	{ .name = "CAMELLIA-128-GCM",

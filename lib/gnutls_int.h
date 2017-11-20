@@ -514,6 +514,7 @@ typedef struct cipher_entry_st {
 	uint16_t tagsize;
 	bool xor_nonce;	/* In this TLS AEAD cipher xor the implicit_iv with the nonce */
 	bool only_aead; /* When set, this cipher is only available through the new AEAD API */
+	bool no_rekey; /* whether this tls1.3 cipher doesn't need to rekey after 2^24 messages */
 } cipher_entry_st;
 
 typedef struct gnutls_cipher_suite_entry_st {

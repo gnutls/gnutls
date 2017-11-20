@@ -581,6 +581,17 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 	     _gnutls_packet2str(type), type, (int) record_params->epoch,
 	     (int) cipher_size);
 
+	if (vers->tls13_sem && !(session->internals.flags & GNUTLS_NO_AUTO_REKEY) &&
+	    !(record_params->cipher->no_rekey)) {
+		if (unlikely(record_state->sequence_number.i[7] == 0xfd &&
+		    record_state->sequence_number.i[6] == 0xff &&
+		    record_state->sequence_number.i[5] == 0xff)) {
+			/* After we have sent 2^24 messages, mark the session
+			 * as needing a key update. */
+			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_1;
+		}
+	}
+
 	return retval;
 }
 
