@@ -707,114 +707,6 @@ check_g_n(const uint8_t * g, size_t n_g, const uint8_t * n, size_t n_n)
 	return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 }
 
-/* Check if N is a prime and G a generator of the
- * group. This check is only done if N is big enough.
- * Otherwise only the included parameters must be used.
- */
-static int
-group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
-{
-	bigint_t q = NULL, two = NULL, w = NULL;
-	int ret;
-
-	if (_gnutls_mpi_get_nbits(n) < (session->internals.srp_prime_bits
-					? session->internals.srp_prime_bits
-					: 2048)) {
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
-
-	/* N must be of the form N=2q+1
-	 * where q is also a prime.
-	 */
-	if (_gnutls_prime_check(n) != 0) {
-		_gnutls_mpi_log("no prime N: ", n);
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
-
-	ret = _gnutls_mpi_init_multi(&two, &q, &w, NULL);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	/* q = n-1 
-	 */
-	ret = _gnutls_mpi_sub_ui(q, n, 1);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* q = q/2, remember that q is divisible by 2 (prime - 1)
-	 */
-	ret = _gnutls_mpi_set_ui(two, 2);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	ret = _gnutls_mpi_div(q, q, two);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	if (_gnutls_prime_check(q) != 0) {
-		/* N was not on the form N=2q+1, where q = prime
-		 */
-		_gnutls_mpi_log("no prime Q: ", q);
-		gnutls_assert();
-		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		goto error;
-	}
-
-	/* We also check whether g is a generator,
-	 */
-
-	/* check if g < q < N
-	 */
-	if (_gnutls_mpi_cmp(g, q) >= 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		goto error;
-	}
-
-	/* check if g^q mod N == N-1
-	 * w = g^q mod N
-	 */
-	ret = _gnutls_mpi_powm(w, g, q, n);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* w++
-	 */
-	ret = _gnutls_mpi_add_ui(w, w, 1);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	if (_gnutls_mpi_cmp(w, n) != 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		goto error;
-	}
-
-	ret = 0;
-
-      error:
-	_gnutls_mpi_release(&q);
-	_gnutls_mpi_release(&two);
-	_gnutls_mpi_release(&w);
-
-	return ret;
-
-}
-
 /* receive the key exchange message ( n, g, s, B) 
  */
 int
@@ -934,11 +826,8 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 	 */
 	if ((ret = check_g_n(data_g, _n_g, data_n, _n_n)) < 0) {
 		_gnutls_audit_log(session,
-				  "SRP group parameters are not in the white list. Checking validity.\n");
-		if ((ret = group_check_g_n(session, G, N)) < 0) {
-			gnutls_assert();
-			return ret;
-		}
+				  "SRP group parameters are not in the white list; rejecting.\n");
+		return gnutls_assert_val(ret);
 	}
 
 	/* Checks if b % n == 0
