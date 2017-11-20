@@ -1162,9 +1162,10 @@ gnutls_handshake_set_hook_function(gnutls_session_t session,
  *
  * This function will return the parameters of the current record state.
  * These are only useful to be provided to an external off-loading device
- * or subsystem.
+ * or subsystem. The returned values should be considered constant
+ * and valid for the lifetime of the session.
  *
- * In that case, to sync the state you must call gnutls_record_set_state().
+ * In that case, to sync the state back you must call gnutls_record_set_state().
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  *
