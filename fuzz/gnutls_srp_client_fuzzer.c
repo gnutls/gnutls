@@ -65,6 +65,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	gnutls_transport_set_pull_timeout_function(session,
 		mem_pull_timeout);
 	gnutls_transport_set_ptr(session, &memdata);
+	gnutls_srp_set_prime_bits(session, 1537);
 
 	do {
 		res = gnutls_handshake(session);
