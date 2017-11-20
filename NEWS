@@ -5,6 +5,17 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.2 (unreleased)
+
+** libgnutls: The SRP authentication will reject any parameters outside
+   RFC5054. This protects any client from potential MitM due to insecure
+   parameters. That also brings SRP in par with the RFC7919 changes to
+   Diffie-Hellman.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.1 (released 2017-10-21)
 
 ** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
