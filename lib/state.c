@@ -1229,7 +1229,7 @@ gnutls_record_get_state(gnutls_session_t session,
 int
 gnutls_record_set_state(gnutls_session_t session,
 			unsigned read,
-			unsigned char seq_number[8])
+			const unsigned char seq_number[8])
 {
 	record_parameters_st *record_params;
 	record_state_st *record_state;
