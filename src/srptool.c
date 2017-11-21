@@ -76,7 +76,7 @@ static int generate_create_conf(const char *tpasswd_conf)
 {
 	FILE *fd;
 	char line[5 * 1024];
-	int index = 1;
+	int index = 1, srp_idx;
 	gnutls_datum_t g, n;
 	gnutls_datum_t str_g, str_n;
 
@@ -89,26 +89,31 @@ static int generate_create_conf(const char *tpasswd_conf)
 	for (index = 1; index <= 5; index++) {
 
 		if (index == 1) {
-			n = gnutls_srp_1024_group_prime;
-			g = gnutls_srp_1024_group_generator;
-		} else if (index == 2) {
+			srp_idx = 2;
 			n = gnutls_srp_1536_group_prime;
 			g = gnutls_srp_1536_group_generator;
-		} else if (index == 3) {
+		} else if (index == 2) {
+			srp_idx = 3;
 			n = gnutls_srp_2048_group_prime;
 			g = gnutls_srp_2048_group_generator;
-		} else if (index == 4) {
+		} else if (index == 3) {
+			srp_idx = 4;
 			n = gnutls_srp_3072_group_prime;
 			g = gnutls_srp_3072_group_generator;
-		} else if (index == 5) {
+		} else if (index == 4) {
+			srp_idx = 5;
 			n = gnutls_srp_4096_group_prime;
 			g = gnutls_srp_4096_group_generator;
+		} else if (index == 5) {
+			srp_idx = 7;
+			n = gnutls_srp_8192_group_prime;
+			g = gnutls_srp_8192_group_generator;
 		} else {
 			fprintf(stderr, "Unknown index: %d\n", index);
 			return -1;
 		}
 
-		printf("\nGroup %d, of %d bits:\n", index, n.size * 8);
+		printf("\nGroup %d, of %d bits:\n", srp_idx, n.size * 8);
 		print_num("Generator", &g);
 		print_num("Prime", &n);
 
@@ -124,7 +129,7 @@ static int generate_create_conf(const char *tpasswd_conf)
 			return -1;
 		}
 
-		sprintf(line, "%d:%s:%s\n", index, str_n.data, str_g.data);
+		sprintf(line, "%d:%s:%s\n", srp_idx, str_n.data, str_g.data);
 
 		gnutls_free(str_n.data);
 		gnutls_free(str_g.data);
