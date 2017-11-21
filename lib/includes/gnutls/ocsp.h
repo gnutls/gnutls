@@ -196,8 +196,14 @@ void gnutls_ocsp_resp_deinit(gnutls_ocsp_resp_t resp);
 
 int gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 			    const gnutls_datum_t * data);
+int gnutls_ocsp_resp_import2(gnutls_ocsp_resp_t resp,
+			     const gnutls_datum_t * data,
+			     gnutls_x509_crt_fmt_t fmt);
 int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp,
 			    gnutls_datum_t * data);
+int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_t resp,
+			     gnutls_datum_t * data,
+			     gnutls_x509_crt_fmt_t fmt);
 int gnutls_ocsp_resp_print(gnutls_ocsp_resp_t resp,
 			   gnutls_ocsp_print_formats_t format,
 			   gnutls_datum_t * out);

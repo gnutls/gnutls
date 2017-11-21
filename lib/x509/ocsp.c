@@ -229,11 +229,44 @@ int
 gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 			const gnutls_datum_t * data)
 {
+	return gnutls_ocsp_resp_import2(resp, data, GNUTLS_X509_FMT_DER);
+}
+
+/**
+ * gnutls_ocsp_resp_import2:
+ * @resp: The data to store the parsed response.
+ * @data: DER or PEM encoded OCSP response.
+ * @fmt: DER or PEM
+ *
+ * This function will convert the given OCSP response to
+ * the native #gnutls_ocsp_resp_t format.  It also decodes the Basic
+ * OCSP Response part, if any.  The output will be stored in @resp.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.xx
+ **/
+int
+gnutls_ocsp_resp_import2(gnutls_ocsp_resp_t resp,
+			 const gnutls_datum_t *data,
+			 gnutls_x509_crt_fmt_t fmt)
+{
 	int ret = 0;
+	gnutls_datum_t der;
 
 	if (resp == NULL || data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	der.data = data->data;
+	der.size = data->size;
+
+	if (fmt == GNUTLS_X509_FMT_PEM) {
+		ret = gnutls_pem_base64_decode2("OCSP RESPONSE", data, &der);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
 
 	if (resp->init != 0) {
@@ -249,7 +282,8 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 					  &resp->resp);
 		if (ret != ASN1_SUCCESS) {
 			gnutls_assert();
-			return _gnutls_asn2err(ret);
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;
 		}
 
 		ret = asn1_create_element(_gnutls_get_pkix(),
@@ -257,7 +291,8 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 					  &resp->basicresp);
 		if (ret != ASN1_SUCCESS) {
 			gnutls_assert();
-			return _gnutls_asn2err(ret);
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;
 		}
 
 		gnutls_free(resp->der.data);
@@ -265,15 +300,18 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 	}
 
 	resp->init = 1;
-	ret = _asn1_strict_der_decode(&resp->resp, data->data, data->size, NULL);
+	ret = _asn1_strict_der_decode(&resp->resp, der.data, der.size, NULL);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
-		return _gnutls_asn2err(ret);
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
 	}
 
 	if (gnutls_ocsp_resp_get_status(resp) !=
-	    GNUTLS_OCSP_RESP_SUCCESSFUL)
-		return GNUTLS_E_SUCCESS;
+	    GNUTLS_OCSP_RESP_SUCCESSFUL) {
+		ret = GNUTLS_E_SUCCESS;
+		goto cleanup;
+	}
 
 	ret =
 	    _gnutls_x509_read_value(resp->resp,
@@ -281,7 +319,7 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 				    &resp->response_type_oid);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 #define OCSP_BASIC "1.3.6.1.5.5.7.48.1.1"
 
@@ -294,7 +332,7 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 					    "responseBytes.response", &resp->der);
 		if (ret < 0) {
 			gnutls_assert();
-			return ret;
+			goto cleanup;
 		}
 
 		ret =
@@ -302,14 +340,19 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 				      NULL);
 		if (ret != ASN1_SUCCESS) {
 			gnutls_assert();
-			return _gnutls_asn2err(ret);
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;
 		}
 	} else {
 		asn1_delete_structure(&resp->basicresp);
 		resp->basicresp = NULL;
 	}
 
-	return GNUTLS_E_SUCCESS;
+	ret = GNUTLS_E_SUCCESS;
+cleanup:
+	if (der.data != data->data)
+		gnutls_free(der.data);
+	return ret;
 }
 
 /**
@@ -356,12 +399,49 @@ int gnutls_ocsp_req_export(gnutls_ocsp_req_t req, gnutls_datum_t * data)
  **/
 int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp, gnutls_datum_t * data)
 {
+	return gnutls_ocsp_resp_export2(resp, data, GNUTLS_X509_FMT_DER);
+}
+
+/**
+ * gnutls_ocsp_resp_export2:
+ * @resp: Holds the OCSP response
+ * @data: newly allocate buffer holding DER or PEM encoded OCSP response
+ * @fmt: DER or PEM
+ *
+ * This function will export the OCSP response to DER or PEM format.
+ *
+ * Returns: In case of failure a negative error code will be
+ *   returned, and 0 on success.
+ *
+ * Since: 3.6.xx
+ **/
+int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_t resp, gnutls_datum_t * data,
+			     gnutls_x509_crt_fmt_t fmt)
+{
+	int ret;
+	gnutls_datum_t der;
+
 	if (resp == NULL || data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_get_raw_field(resp->resp, "", data);
+	ret = _gnutls_x509_get_raw_field(resp->resp, "", &der);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (fmt == GNUTLS_X509_FMT_DER) {
+		data->data = der.data;
+		data->size = der.size;
+		return ret;
+	} else {
+		ret = gnutls_pem_base64_encode2("OCSP RESPONSE", &der, data);
+		gnutls_free(der.data);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		return 0;
+	}
 }
 
 /**
