@@ -3,7 +3,9 @@ prog-name     = ocsptool;
 prog-title    = "GnuTLS OCSP tool";
 prog-desc     = "Program to handle OCSP request/responses.";
 detail    = "ocsptool is a program that can parse and print information about
-OCSP requests/responses, generate requests and verify responses.";
+OCSP requests/responses, generate requests and verify responses. Unlike
+other GnuTLS applications it outputs DER encoded structures by default
+unless the '--outpem' option is specified.";
 short-usage   = "ocsptool [options]\nocsptool --help for usage instructions.\n";
 explain       = "";
 
@@ -126,6 +128,18 @@ flag = {
     disable   = "no";
     descrip   = "Use DER format for input certificates and private keys";
     doc      = "";
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output of responses (this is the default)";
+    doc = "The output will be in DER encoded format. Unlike other GnuTLS tools, this is the default for this tool";
+};
+
+flag = {
+    name      = outpem;
+    descrip   = "Use PEM format for output of responses";
+    doc       = "The output will be in PEM format.";
 };
 
 flag = {

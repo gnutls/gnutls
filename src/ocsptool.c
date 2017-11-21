@@ -43,6 +43,7 @@
 #include "certtool-common.h"
 
 FILE *outfile;
+static unsigned int incert_format, outcert_format;
 static const char *outfile_name = NULL; /* to delete on exit */
 FILE *infile;
 static unsigned int encoding;
@@ -87,7 +88,7 @@ static void request_info(void)
 {
 	gnutls_ocsp_req_t req;
 	int ret;
-	gnutls_datum_t dat;
+	gnutls_datum_t dat, rbuf;
 	size_t size;
 
 	ret = gnutls_ocsp_req_init(&req);
@@ -108,6 +109,7 @@ static void request_info(void)
 	}
 	dat.size = size;
 
+
 	ret = gnutls_ocsp_req_import(req, &dat);
 	free(dat.data);
 	if (ret < 0) {
@@ -123,17 +125,36 @@ static void request_info(void)
 		app_exit(1);
 	}
 
-	printf("%.*s", dat.size, dat.data);
+	if (HAVE_OPT(OUTFILE)) {
+		ret = gnutls_ocsp_req_export(req, &rbuf);
+		if (ret < 0) {
+			fprintf(stderr, "error exporting request: %s\n",
+				gnutls_strerror(ret));
+			app_exit(1);
+		}
+
+		if (outcert_format == GNUTLS_X509_FMT_PEM) {
+			fprintf(stderr, "Cannot export requests into PEM form\n");
+			app_exit(1);
+		} else {
+			fwrite(rbuf.data, 1, rbuf.size, outfile);
+		}
+
+		gnutls_free(rbuf.data);
+	} else {
+		printf("%.*s", dat.size, dat.data);
+	}
+
 	gnutls_free(dat.data);
 
 	gnutls_ocsp_req_deinit(req);
 }
 
-static void _response_info(const gnutls_datum_t * data)
+static void _response_info(const gnutls_datum_t * data, unsigned force_print)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
-	gnutls_datum_t buf;
+	gnutls_datum_t buf, rbuf;
 
 	if (data->size == 0) {
 		fprintf(stderr, "Received empty response\n");
@@ -147,9 +168,14 @@ static void _response_info(const gnutls_datum_t * data)
 		app_exit(1);
 	}
 
-	ret = gnutls_ocsp_resp_import(resp, data);
+	ret = gnutls_ocsp_resp_import2(resp, data, incert_format);
+	if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
+		int ret2 = gnutls_ocsp_resp_import(resp, data);
+		if (ret2 >= 0)
+			ret = ret2;
+	}
 	if (ret < 0) {
-		fprintf(stderr, "importing response: %s\n",
+		fprintf(stderr, "error importing response: %s\n",
 			gnutls_strerror(ret));
 		app_exit(1);
 	}
@@ -168,7 +194,36 @@ static void _response_info(const gnutls_datum_t * data)
 		app_exit(1);
 	}
 
-	printf("%.*s", buf.size, buf.data);
+	if (HAVE_OPT(OUTFILE)) {
+		ret = gnutls_ocsp_resp_export2(resp, &rbuf, outcert_format);
+		if (ret < 0) {
+			fprintf(stderr, "error exporting response: %s\n",
+				gnutls_strerror(ret));
+			app_exit(1);
+		}
+
+		if (outcert_format == GNUTLS_X509_FMT_PEM)
+			fprintf(outfile, "%.*s\n", buf.size, buf.data);
+
+		fwrite(rbuf.data, 1, rbuf.size, outfile);
+
+		if (outcert_format == GNUTLS_X509_FMT_PEM)
+			fprintf(outfile, "\n");
+		gnutls_free(rbuf.data);
+	}
+
+	if (force_print || !HAVE_OPT(OUTFILE)) {
+		ret = gnutls_ocsp_resp_export2(resp, &rbuf, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "error exporting response: %s\n",
+				gnutls_strerror(ret));
+			app_exit(1);
+		}
+
+		fprintf(stdout, "%.*s\n", buf.size, buf.data);
+		fwrite(rbuf.data, 1, rbuf.size, stdout);
+		gnutls_free(rbuf.data);
+	}
 	gnutls_free(buf.data);
 
 	gnutls_ocsp_resp_deinit(resp);
@@ -191,7 +246,8 @@ static void response_info(void)
 	}
 	dat.size = size;
 
-	_response_info(&dat);
+	_response_info(&dat, 0);
+
 	gnutls_free(dat.data);
 }
 
@@ -232,7 +288,7 @@ static void generate_request(gnutls_datum_t *nonce)
 
 
 static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
-	gnutls_x509_crt_t signer)
+	gnutls_x509_crt_t signer, unsigned print_resp)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -257,17 +313,19 @@ static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce,
 		app_exit(1);
 	}
 
-	ret =
-	    gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_COMPACT,
-				   &dat);
-	if (ret < 0) {
-		fprintf(stderr, "ocsp_resp_print: %s\n",
-			gnutls_strerror(ret));
-		app_exit(1);
-	}
+	if (print_resp) {
+		ret =
+		    gnutls_ocsp_resp_print(resp, GNUTLS_OCSP_PRINT_COMPACT,
+					   &dat);
+		if (ret < 0) {
+			fprintf(stderr, "ocsp_resp_print: %s\n",
+				gnutls_strerror(ret));
+			app_exit(1);
+		}
 
-	printf("%s\n", dat.data);
-	gnutls_free(dat.data);
+		printf("%s\n", dat.data);
+		gnutls_free(dat.data);
+	}
 
 	if (nonce) {
 		gnutls_datum_t rnonce;
@@ -488,12 +546,12 @@ static void verify_response(gnutls_datum_t *nonce)
 		else
 			signer = chain[1];
 
-		v = _verify_response(&dat, nonce, signer);
+		v = _verify_response(&dat, nonce, signer, 1);
 
 		for (i=0;i<chain_size;i++)
 			gnutls_x509_crt_deinit(chain[i]);
 	} else if (HAVE_OPT(LOAD_TRUST)) {
-		v = _verify_response(&dat, nonce, NULL);
+		v = _verify_response(&dat, nonce, NULL, 1);
 	} else {
 		memset(&info, 0, sizeof(info));
 		info.verbose = verbose;
@@ -505,7 +563,7 @@ static void verify_response(gnutls_datum_t *nonce)
 
 		signer = load_cert(1, &info);
 
-		v = _verify_response(&dat, nonce, signer);
+		v = _verify_response(&dat, nonce, signer, 1);
 		gnutls_x509_crt_deinit(signer);
 	}
 
@@ -530,8 +588,11 @@ static void ask_server(const char *url)
 	chain_size = load_chain(chain);
 
 	if (chain_size > 2 && HAVE_OPT(OUTFILE)) {
-		fprintf(stderr, "You cannot combine --outfile when more than 2 certificates are found in a chain\n");
-		app_exit(1);
+		if (outcert_format != GNUTLS_X509_FMT_PEM) {
+			fprintf(stderr, "error: You cannot combine --outfile when more than 2 certificates are found in a chain\n");
+			fprintf(stderr, "Did you mean to use --outpem?\n");
+			app_exit(1);
+		}
 	}
 
 	counter = chain_size;
@@ -556,26 +617,22 @@ static void ask_server(const char *url)
 			app_exit(1);
 		}
 
-		if (HAVE_OPT(OUTFILE)) {
-			fwrite(resp_data.data, 1, resp_data.size, outfile);
-		}
-
-		_response_info(&resp_data);
+		_response_info(&resp_data, 1);
 
 		if (HAVE_OPT(LOAD_TRUST)) {
-			v = _verify_response(&resp_data, n, NULL);
+			v = _verify_response(&resp_data, n, NULL, 0);
 		} else if (HAVE_OPT(LOAD_SIGNER)) {
 			memset(&info, 0, sizeof(info));
 			info.verbose = verbose;
 			info.cert = OPT_ARG(LOAD_SIGNER);
 
-			v = _verify_response(&resp_data, n, load_cert(1, &info));
+			v = _verify_response(&resp_data, n, load_cert(1, &info), 0);
 		} else {
 			if (!HAVE_OPT(LOAD_CHAIN))
 				fprintf(stderr,
 					"\nAssuming response's signer = issuer (use --load-signer to override).\n");
 
-			v = _verify_response(&resp_data, n, chain[idx+1]);
+			v = _verify_response(&resp_data, n, chain[idx+1], 0);
 		}
 
 		total_v += v;
@@ -607,6 +664,16 @@ int main(int argc, char **argv)
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(OPT_VALUE_DEBUG);
+
+	if (ENABLED_OPT(INDER))
+		incert_format = GNUTLS_X509_FMT_DER;
+	else
+		incert_format = GNUTLS_X509_FMT_PEM;
+
+	if (HAVE_OPT(OUTPEM))
+		outcert_format = GNUTLS_X509_FMT_PEM;
+	else
+		outcert_format = GNUTLS_X509_FMT_DER;
 
 	if (HAVE_OPT(VERIFY_ALLOW_BROKEN))
 		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
