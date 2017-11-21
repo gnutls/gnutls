@@ -147,7 +147,7 @@ static char const srptool_opt_strs[2037] =
 /** Name string for the index option */
 #define INDEX_name      (srptool_opt_strs+991)
 /** The compiled in default value for the index option argument */
-#define INDEX_DFT_ARG   ((char const*)1)
+#define INDEX_DFT_ARG   ((char const*)3)
 /** Compiled in flag settings for the index option */
 #define INDEX_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))

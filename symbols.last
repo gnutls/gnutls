@@ -1,5 +1,6 @@
 GNUTLS_3_4@GNUTLS_3_4
 GNUTLS_3_6_0@GNUTLS_3_6_0
+GNUTLS_3_6_2@GNUTLS_3_6_2
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_deinit@GNUTLS_3_4
@@ -718,6 +719,8 @@ gnutls_srp_3072_group_generator@GNUTLS_3_4
 gnutls_srp_3072_group_prime@GNUTLS_3_4
 gnutls_srp_4096_group_generator@GNUTLS_3_4
 gnutls_srp_4096_group_prime@GNUTLS_3_4
+gnutls_srp_8192_group_generator@GNUTLS_3_6_2
+gnutls_srp_8192_group_prime@GNUTLS_3_6_2
 gnutls_srp_allocate_client_credentials@GNUTLS_3_4
 gnutls_srp_allocate_server_credentials@GNUTLS_3_4
 gnutls_srp_base64_decode2@GNUTLS_3_4
