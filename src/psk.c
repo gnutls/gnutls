@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 static int write_key(const char *username, const char *key, int key_size,
 		     const char *passwd_file);
 
-#define MAX_KEY_SIZE 64
+#define MAX_KEY_SIZE 512
 int main(int argc, char **argv)
 {
 	int ret;
