@@ -240,6 +240,11 @@ unsigned resp_matches_pcert(gnutls_ocsp_resp_t resp, const gnutls_pcert_st *cert
  * To revert to the previous behavior set the flag %GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK
  * in the certificate credentials structure. In that case, only the
  * end-certificate's OCSP response can be set.
+ * If the response is already expired at the time of loading the code
+ * %GNUTLS_E_EXPIRED is returned.
+ *
+ * To revert to the previous behavior of this function which does not return
+ * any errors, set the flag %GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -284,8 +289,11 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
 		t = _gnutls_ocsp_get_validity(resp);
 		/* if already invalid */
 		if (t == (time_t)-1) {
-			gnutls_assert();
-			continue;
+			_gnutls_debug_log("the OCSP response associated with chain %d on pos %d, is invalid/expired\n", idx, i);
+			return GNUTLS_E_EXPIRED;
+		} else if (t == (time_t)-2) {
+			_gnutls_debug_log("the OCSP response associated with chain %d on pos %d, is too old (ignoring)\n", idx, i);
+			return 0;
 		}
 
 		if (t >= 0)
@@ -350,6 +358,8 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
  * applicable to the certificate chain are available.
  * If the response provided does not match any certificates present
  * in the chain, the code %GNUTLS_E_OCSP_MISMATCH_WITH_CERTS is returned.
+ * If the response is already expired at the time of loading the code
+ * %GNUTLS_E_EXPIRED is returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -405,6 +415,10 @@ gnutls_certificate_set_ocsp_status_request_file2(gnutls_certificate_credentials_
  * apply to the certificate chain are available.
  * If the response provided does not match any certificates present
  * in the chain, the code %GNUTLS_E_OCSP_MISMATCH_WITH_CERTS is returned.
+ * If the response is already expired at the time of loading the code
+ * %GNUTLS_E_EXPIRED is returned.
+ * If the response is already expired at the time of loading the code
+ * %GNUTLS_E_EXPIRED is returned.
  *
  * Returns: On success, the number of loaded responses is returned,
  *   otherwise a negative error code.
@@ -477,6 +491,13 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 	} else {
 		/* DER: load a single response */
 		if (sc->flags & GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK) {
+			ret = gnutls_ocsp_resp_import2(resp, resp_data, GNUTLS_X509_FMT_DER);
+			if (ret >= 0) {
+				sc->certs[idx].ocsp_data[0].exptime = _gnutls_ocsp_get_validity(resp);
+				if (sc->certs[idx].ocsp_data[0].exptime <= 0)
+					sc->certs[idx].ocsp_data[0].exptime = 0;
+			}
+
 			/* quick load of first response */
 			gnutls_free(sc->certs[idx].ocsp_data[0].response.data);
 
@@ -488,7 +509,6 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 				goto cleanup;
 			}
 
-			sc->certs[idx].ocsp_data[0].exptime = 0;
 			sc->certs[idx].ocsp_data_length = 1;
 			goto cleanup;
 		}
@@ -513,6 +533,64 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 		gnutls_ocsp_resp_deinit(resp);
 
 	return ret;
+}
+
+/**
+ * gnutls_certificate_get_ocsp_expiration:
+ * @sc: is a credentials structure.
+ * @idx: is a certificate chain index as returned by gnutls_certificate_set_key() and friends
+ * @oidx: is an OCSP response index
+ * @flags: should be zero
+ *
+ * This function returns the validity of the loaded OCSP responses,
+ * to provide information on when to reload/refresh them.
+ *
+ * Note that the credentials structure should be read-only when in
+ * use, thus when reloading, either the credentials structure must not
+ * be in use by any sessions, or a new credentials structure should be
+ * allocated for new sessions.
+ *
+ * When @oidx is (-1) then the minimum refresh time for all responses
+ * is returned. Otherwise the index specifies the response corresponding
+ * to the @odix certificate in the certificate chain.
+ *
+ * Returns: On success, the expiration time of the OCSP response. Otherwise
+ *   (time_t)(-1) on error, or (time_t)-2 on out of bounds.
+ *
+ * Since: 3.6.xx
+ **/
+time_t
+gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,
+				       unsigned idx,
+				       int oidx,
+				       unsigned flags)
+{
+	unsigned j;
+
+	if (idx >= sc->ncerts)
+		return (time_t)-2;
+
+	if (oidx == -1) {
+		time_t min = 0;
+
+		for (j=0;j<MIN(sc->certs[idx].cert_list_length, MAX_OCSP_RESPONSES);j++) {
+			if (min <= 0)
+				min = sc->certs[idx].ocsp_data[j].exptime;
+			else
+				if (sc->certs[idx].ocsp_data[j].exptime > 0 &&
+				    min >= sc->certs[idx].ocsp_data[j].exptime)
+					min = sc->certs[idx].ocsp_data[j].exptime;
+		}
+		return min;
+	}
+
+	if (oidx >= MAX_OCSP_RESPONSES || (unsigned)oidx >= sc->certs[idx].cert_list_length)
+		return (time_t)-2;
+
+	if (sc->certs[idx].ocsp_data[oidx].response.data == NULL)
+		return (time_t)-1;
+
+	return sc->certs[idx].ocsp_data[oidx].exptime;
 }
 
 /**

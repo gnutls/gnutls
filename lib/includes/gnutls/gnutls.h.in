@@ -1917,6 +1917,12 @@ typedef struct gnutls_ocsp_data_st {
 	unsigned char padding[32];
 } gnutls_ocsp_data_st;
 
+time_t
+gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,
+				       unsigned idx,
+				       int oidx,
+				       unsigned flags);
+
 int gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 					     gnutls_datum_t * responder_id,
 					     size_t responder_id_size,

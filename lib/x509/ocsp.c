@@ -2546,8 +2546,9 @@ gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
 }
 
 /* This returns -1 if the OCSP response is invalid (revoked) or its
- * data are too old. Otherwise it returns the time after which that data
- * is invalid.
+ * data are too old. It returns -2 if it cannot determine the expiration
+ * time, and would otherwise treat it as too old.
+ * Otherwise it returns the time after which that data  is invalid.
  */
 time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_t resp)
 {
@@ -2581,7 +2582,7 @@ time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_t resp)
 		 * limit we apply when verifying responses. */
 		if (now - vtime > MAX_OCSP_VALIDITY_SECS) {
 			_gnutls_debug_log("The OCSP response is old\n");
-			return gnutls_assert_val(-1);
+			return gnutls_assert_val(-2);
 		}
 
 		return now + MAX_OCSP_VALIDITY_SECS;
