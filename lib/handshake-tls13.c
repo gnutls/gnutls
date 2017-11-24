@@ -144,7 +144,8 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 	uint8_t zero[MAX_HASH_SIZE];
 
 	ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-				   NULL, 0, session->key.temp_secret);
+				   NULL, 0, session->key.temp_secret,
+				   session->key.temp_secret);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

@@ -226,6 +226,7 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
 				   hsk_len,
+				   session->key.temp_secret,
 				   session->key.hs_ckey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -251,6 +252,7 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
 				   hsk_len,
+				   session->key.temp_secret,
 				   session->key.hs_skey);
 
 	if (ret < 0)
