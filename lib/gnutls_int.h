@@ -438,6 +438,7 @@ struct gnutls_key_st {
 	unsigned temp_secret_size; /* depends on negotiated PRF size */
 	uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_handshake_traffic_secret */
 	uint8_t hs_skey[MAX_HASH_SIZE]; /* server_handshake_traffic_secret */
+	uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
 
 	/* For ECDH KX */
 	gnutls_pk_params_st ecdh_params; /* private part */

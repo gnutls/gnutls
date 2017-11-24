@@ -154,6 +154,14 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	ret = _tls13_derive_secret(session, EXPORTER_MASTER_LABEL, sizeof(EXPORTER_MASTER_LABEL)-1,
+				   session->internals.handshake_hash_buffer.data,
+				   session->internals.handshake_hash_buffer_server_finished_len,
+				   session->key.temp_secret,
+				   session->key.ap_expkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	_gnutls_epoch_bump(session);
 	ret = _gnutls_epoch_dup(session);
 	if (ret < 0)

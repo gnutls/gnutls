@@ -113,13 +113,13 @@ int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certific
 #define EARLY_TRAFFIC_LABEL "c e traffic"
 #define EXT_BINDER_LABEL "ext binder"
 #define RES_BINDER_LABEL "res binder"
-#define EARLY_EXPORTER_LABEL "e exp master"
+#define EARLY_EXPORTER_MASTER_LABEL "e exp master"
 #define HANDSHAKE_CLIENT_TRAFFIC_LABEL "c hs traffic"
 #define HANDSHAKE_SERVER_TRAFFIC_LABEL "s hs traffic"
 #define DERIVED_LABEL "derived"
 #define APPLICATION_CLIENT_TRAFFIC_LABEL "c ap traffic"
 #define APPLICATION_SERVER_TRAFFIC_LABEL "s ap traffic"
-#define EXPORTER_LABEL "exp master"
+#define EXPORTER_MASTER_LABEL "exp master"
 #define RES_LABEL "res master"
 
 int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side);
