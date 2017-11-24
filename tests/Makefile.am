@@ -98,7 +98,8 @@ libutils_la_LIBADD = ../lib/libgnutls.la
 indirect_tests =
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
-	tls13/cookie tls13/key_share tls12-rollback-detection tls11-rollback-detection \
+	tls13/cookie tls13/key_share tls13/prf \
+	tls12-rollback-detection tls11-rollback-detection \
 	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value
 
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
