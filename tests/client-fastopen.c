@@ -103,8 +103,7 @@ static void client(int fd, struct sockaddr *connect_addr, socklen_t connect_addr
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		fail("client: Handshake failed\n");
-		gnutls_perror(ret);
+		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
 		exit(1);
 	} else {
 		if (debug)
@@ -152,10 +151,7 @@ pid_t child;
 
 static void terminate(void)
 {
-	int status;
-
 	kill(child, SIGTERM);
-	wait(&status);
 	exit(1);
 }
 
@@ -248,6 +244,11 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
+static void ch_handler(int sig)
+{
+	return;
+}
+
 void doit(void)
 {
 	int ret;
@@ -256,6 +257,7 @@ void doit(void)
 	int listener;
 	int fd;
 
+	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
 	listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -302,6 +304,7 @@ void doit(void)
 	} else {
 		fd = socket(AF_INET, SOCK_STREAM, 0);
 
+		usleep(1000000);
 		client(fd, (struct sockaddr*)&saddr, addrlen);
 		exit(0);
 	}
