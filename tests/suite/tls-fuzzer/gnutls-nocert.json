@@ -17,12 +17,10 @@
           "ext padding, 16130 bytes",
           "ext padding, 65367 bytes"]},
          {"name" : "test-large-hello.py",
-          "comment" : "These tests are not TLS1.3 ready; they use extensions already assigned for it wrongly; renamed once https://github.com/tomato42/tlsfuzzer/pull/163 is merged",
           "arguments" :
 	          ["multiple extensions 9212",
 	          "multiple extensions 1",
-	          "multiple extensions 16353"],
-          "exp_pass" : false},
+	          "multiple extensions 16353"]},
          {"name" : "test-large-hello.py",
           "comment" : "These tests rely on fragmenting the first bytes of the handshake header. Gnutls is limited on that, and doesn't accept handshake header fragmentation.",
           "arguments" :
