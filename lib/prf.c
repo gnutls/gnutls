@@ -136,11 +136,6 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 	const version_entry_st *vers = get_version(session);
 	int ret;
 
-	if (context != NULL && context_size > 65535)  {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
 	if (vers && vers->tls13_sem) {
 		uint8_t secret[MAX_HASH_SIZE];
 		uint8_t digest[MAX_HASH_SIZE];
@@ -168,6 +163,11 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 					   secret, outsize, out);
 	} else {
 		char *pctx = NULL;
+
+		if (context != NULL && context_size > 65535)  {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
 
 		if (context != NULL) {
 			pctx = gnutls_malloc(context_size+2);
