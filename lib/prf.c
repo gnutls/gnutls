@@ -47,10 +47,6 @@
  * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
  * and the provided data.
  *
- * This function only works with the TLS versions prior to 1.3.  In
- * TLS 1.3, the use of PRF is replaced with HKDF (HMAC-based Key
- * Derivation Function) based on the multi-stage key scheduling.
- *
  * The @label variable usually contains a string denoting the purpose
  * for the generated data.  The @seed usually contains data such as the
  * client and server random, perhaps together with some additional
@@ -65,6 +61,11 @@
  * client and server random fields directly, and is recommended if you
  * want to generate pseudo random data unique for each session.
  *
+ * Note: This function will only operate under TLS versions prior to 1.3.
+ * In TLS1.3 the use of PRF is replaced with HKDF and the generic
+ * exporters like gnutls_prf_rfc5705() should be used instead. Under
+ * TLS1.3 this function returns %GNUTLS_E_INVALID_REQUEST.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
@@ -75,6 +76,10 @@ gnutls_prf_raw(gnutls_session_t session,
 	       char *out)
 {
 	int ret;
+	const version_entry_st *vers = get_version(session);
+
+	if (vers && vers->tls13_sem)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	ret = _gnutls_prf_raw(session->security_parameters.prf->id,
 			  GNUTLS_MASTER_SIZE, session->security_parameters.master_secret,
