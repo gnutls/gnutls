@@ -109,15 +109,45 @@ static void dump(const char *name, const uint8_t *data, unsigned data_size)
 	} \
 	}
 
+#define TRY_OLD(label_size, label, size, exp) \
+	{ \
+	ret = gnutls_prf(session, label_size, label, 0, 0, NULL, size, \
+			 (void*)key_material); \
+	if (ret < 0) { \
+		fprintf(stderr, "gnutls_prf: error in %d\n", __LINE__); \
+		gnutls_perror(ret); \
+		exit(1); \
+	} \
+	if (memcmp(key_material, exp, size) != 0) { \
+		fprintf(stderr, "gnutls_prf: output doesn't match for '%s'\n", label); \
+		dump("got ", key_material, size); \
+		dump("expected ", exp, size); \
+		exit(1); \
+	} \
+	}
+
 static void check_prfs(gnutls_session_t session)
 {
 	unsigned char key_material[512];
 	int ret;
 
+	TRY_OLD(13, "key expansion", 34, (uint8_t*)"\xb1\xc3\x5e\x95\x9f\xf7\x5f\x91\x40\x85\xd7\xe8\xe7\x87\x0f\xb3\x78\xec\xbf\x40\x22\xcb\x24\x6e\x85\x91\xa4\xda\xa0\x48\xa5\xb9\x17\x65");
+	TRY_OLD(6, "hello", 31, (uint8_t*)"\x85\x18\x53\x95\xa8\x60\xa5\x75\xd9\xc3\x34\xa3\x45\xa4\x90\xf0\x9c\x3a\xe3\xcf\x9a\x56\x4c\xcc\xeb\xba\x62\x2f\x36\x68\x84");
+
 	TRY(13, "key expansion", 0, NULL, 34, (uint8_t*)"\xb1\xc3\x5e\x95\x9f\xf7\x5f\x91\x40\x85\xd7\xe8\xe7\x87\x0f\xb3\x78\xec\xbf\x40\x22\xcb\x24\x6e\x85\x91\xa4\xda\xa0\x48\xa5\xb9\x17\x65");
 	TRY(6, "hello", 0, NULL, 31, (uint8_t*)"\x85\x18\x53\x95\xa8\x60\xa5\x75\xd9\xc3\x34\xa3\x45\xa4\x90\xf0\x9c\x3a\xe3\xcf\x9a\x56\x4c\xcc\xeb\xba\x62\x2f\x36\x68\x84");
 	TRY(7, "context", 5, "abcd\xfa", 31, (uint8_t*)"\xf4\x49\x53\xf2\x8a\xcc\x59\x52\xa2\x29\x7d\xf4\x2f\x41\x92\x27\x6f\xc5\x1f\x52\xdb\x9a\xa5\x28\x33\x90\x28\x25\x52\x9f\x03");
 	TRY(12, "null-context", 0, "", 31, (uint8_t*)"\x91\xb6\xe5\xaf\x3c\x7d\x75\x0a\x66\xe2\xd9\x3d\x57\x2c\x70\x73\x6f\xe2\x8f\x44\x5a\x22\x86\x46\x6b\xe9\x30\xc4\xf4\x0b\x7c");
+
+	/* Try whether calling gnutls_prf() with non-null context or server-first
+	 * param, will fail */
+	ret = gnutls_prf(session, 3, (void*)"xxx", 0, 3, (void*)"yyy", 16, (void*)key_material);
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_prf: succeeded under TLS1.3!\n");
+
+	ret = gnutls_prf(session, 3, (void*)"xxx", 1, 0, NULL, 16, (void*)key_material);
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_prf: succeeded under TLS1.3!\n");
 }
 
 static void client(int fd)
