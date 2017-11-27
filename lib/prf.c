@@ -200,10 +200,6 @@ gnutls_prf_rfc5705(gnutls_session_t session,
  * and the provided data, seeded with the client and server random fields.
  * For the key expansion specified in RFC5705 see gnutls_prf_rfc5705().
  *
- * This function only works with the TLS versions prior to 1.3.  In
- * TLS 1.3, the use of PRF is replaced with HKDF (HMAC-based Key
- * Derivation Function) based on the multi-stage key scheduling.
- *
  * The @label variable usually contains a string denoting the purpose
  * for the generated data.  The @server_random_first indicates whether
  * the client random field or the server random field should be first
@@ -218,7 +214,9 @@ gnutls_prf_rfc5705(gnutls_session_t session,
  * The output is placed in @out, which must be pre-allocated.
  *
  * Note: This function produces identical output with gnutls_prf_rfc5705()
- * when @server_random_first is set to 0 and @extra is %NULL.
+ * when @server_random_first is set to 0 and @extra is %NULL. Under TLS1.3
+ * this function will only operate when these conditions are true, or otherwise
+ * return %GNUTLS_E_INVALID_REQUEST.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
@@ -232,7 +230,16 @@ gnutls_prf(gnutls_session_t session,
 {
 	int ret;
 	uint8_t *seed;
+	const version_entry_st *vers = get_version(session);
 	size_t seedsize = 2 * GNUTLS_RANDOM_SIZE + extra_size;
+
+	if (vers && vers->tls13_sem) {
+		if (extra == NULL && server_random_first == 0)
+			return gnutls_prf_rfc5705(session, label_size, label,
+						  extra_size, extra, outsize, out);
+		else
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	seed = gnutls_malloc(seedsize);
 	if (!seed) {
