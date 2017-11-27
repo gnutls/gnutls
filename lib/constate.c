@@ -327,6 +327,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->cs = src->cs; \
+	dst->grp = src->grp; \
 	memcpy( dst->master_secret, src->master_secret, GNUTLS_MASTER_SIZE); \
 	memcpy( dst->client_random, src->client_random, GNUTLS_RANDOM_SIZE); \
 	memcpy( dst->server_random, src->server_random, GNUTLS_RANDOM_SIZE); \
