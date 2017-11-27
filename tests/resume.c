@@ -270,12 +270,28 @@ static void verify_alpn(gnutls_session_t session, struct params_res *params, uns
 		success("ALPN got: %s\n", str);
 }
 
+static void verify_group(gnutls_session_t session, gnutls_group_t *group, unsigned counter)
+{
+	int ret;
+
+	if (counter == 0) {
+		*group = gnutls_group_get(session);
+		return;
+	}
+
+	if (gnutls_group_get(session) != *group) {
+		fail("expected group %s, got group %s\n", gnutls_group_get_name(*group),
+		     gnutls_group_get_name(gnutls_group_get(session)));
+	}
+}
+
 static void client(int sds[], struct params_res *params)
 {
 	int ret, ii;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	unsigned int ext_master_secret_check = 0;
+	gnutls_group_t pgroup;
 	char prio_str[256];
 	const char *dns_name1 = "example.com";
 	const char *dns_name2 = "www.example.com";
@@ -430,6 +446,7 @@ static void client(int sds[], struct params_res *params)
 		}
 
 		verify_alpn(session, params, t);
+		verify_group(session, &pgroup, t);
 
 		gnutls_record_send(session, MSG, strlen(MSG));
 
@@ -572,6 +589,7 @@ static void server(int sds[], struct params_res *params)
 	int ret;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
+	gnutls_group_t pgroup;
 
 	/* this must be called once in the program, it is mostly for the server.
 	 */
@@ -641,6 +659,7 @@ static void server(int sds[], struct params_res *params)
 			success("server: Handshake was completed\n");
 
 		verify_alpn(session, params, t);
+		verify_group(session, &pgroup, t);
 
 		/* see the Getting peer's information example */
 		/* print_info(session); */
