@@ -138,6 +138,5 @@ specific product using the library, and typically in the case of software they a
 @item Common Criteria for Information Technology Security Evaluation (CC), an international standard for verification of elaborate security claims (see @url{http://en.wikipedia.org/wiki/Common_Criteria}).
 @end itemize
 
-Obtaining such a certification is an expensive and elaborate job that has no immediate value for a continuously developed free software library (as the certification is tied to the
-particular version tested). While, as a free software project, we are not actively pursuing this kind of certification, GnuTLS has been FIPS-140-2 certified in several systems by
-third parties. If you are, interested, see @ref{Commercial Support}.
+GnuTLS has support for FIPS 140-2 under Red Hat Enterprise Linux.
+See @ref{FIPS140-2 mode} for more information.
