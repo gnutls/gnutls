@@ -31,6 +31,7 @@
 #include "errors.h"
 #include "algorithms.h"
 #include "debug.h"
+#include "locks.h"
 #include "mpi.h"
 #include <state.h>
 #include <datum.h>
@@ -44,6 +45,9 @@
 
 #define EXT_MASTER_SECRET "extended master secret"
 #define EXT_MASTER_SECRET_SIZE (sizeof(EXT_MASTER_SECRET)-1)
+
+GNUTLS_STATIC_MUTEX(keylog_mutex);
+static FILE *keylog;
 
 static int generate_normal_master(gnutls_session_t session,
 				  gnutls_datum_t *, int);
@@ -66,34 +70,44 @@ int _gnutls_generate_master(gnutls_session_t session, int keep_premaster)
 	return 0;
 }
 
-static void write_nss_key_log(gnutls_session_t session, const gnutls_datum_t *premaster)
+void _gnutls_nss_keylog_write(gnutls_session_t session,
+			      const char *label,
+			      const uint8_t *secret, size_t secret_size)
 {
-	char buf[512];
-	char buf2[512];
-	FILE *fp;
 	static const char *keylogfile = NULL;
 	static unsigned checked_env = 0;
 
 	if (!checked_env) {
 		checked_env = 1;
 		keylogfile = secure_getenv("SSLKEYLOGFILE");
+		if (keylogfile != NULL)
+			keylog = fopen(keylogfile, "a");
 	}
 
-	if (keylogfile == NULL)
-		return;
+	if (keylog) {
+		char client_random_hex[2*GNUTLS_RANDOM_SIZE+1];
+		char secret_hex[2*MAX_HASH_SIZE+1];
 
-	fp = fopen(keylogfile, "a");
-	if (fp == NULL)
-		return;
+		GNUTLS_STATIC_MUTEX_LOCK(keylog_mutex);
+		fprintf(keylog, "%s %s %s\n",
+			label,
+			_gnutls_bin2hex(session->security_parameters.
+					client_random, GNUTLS_RANDOM_SIZE,
+					client_random_hex,
+					sizeof(client_random_hex), NULL),
+			_gnutls_bin2hex(secret, secret_size,
+					secret_hex, sizeof(secret_hex), NULL));
+		fflush(keylog);
+		GNUTLS_STATIC_MUTEX_UNLOCK(keylog_mutex);
+	}
+}
 
-	fprintf(fp, "CLIENT_RANDOM %s %s\n", 
-		 _gnutls_bin2hex(session->security_parameters.
-				 client_random, 32, buf,
-				 sizeof(buf), NULL),
-		 _gnutls_bin2hex(session->security_parameters.
-				 master_secret, GNUTLS_MASTER_SIZE,
-				 buf2, sizeof(buf2), NULL));
-	fclose(fp);
+void _gnutls_nss_keylog_deinit(void)
+{
+	if (keylog) {
+		fclose(keylog);
+		keylog = NULL;
+	}
 }
 
 /* here we generate the TLS Master secret.
@@ -168,7 +182,9 @@ generate_normal_master(gnutls_session_t session,
 		gnutls_free(shash.data);
 	}
 
-	write_nss_key_log(session, premaster);
+	_gnutls_nss_keylog_write(session, "CLIENT_RANDOM",
+				 session->security_parameters.master_secret,
+				 GNUTLS_MASTER_SIZE);
 
 	if (!keep_premaster)
 		_gnutls_free_temp_key_datum(premaster);
