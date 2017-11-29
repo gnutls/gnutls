@@ -34,6 +34,11 @@
 #ifndef _HKDF_H_INCLUDED
 #define _HKDF_H_INCLUDED
 
+#include <nettle/version.h>
+#if NETTLE_VERSION_MAJOR > 3 || (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR >= 4)
+# include <nettle/hkdf.h>
+#else
+
 #include <nettle/nettle-meta.h>
 
 #ifdef __cplusplus
@@ -63,4 +68,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* NETTLE_VERSION_MAJOR etc. */
+
 #endif				/* NETTLE_HKDF_H_INCLUDED */
