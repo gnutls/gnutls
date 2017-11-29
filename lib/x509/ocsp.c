@@ -31,6 +31,7 @@
 #include <pk.h>
 #include "common.h"
 #include "verify-high.h"
+#include "x509.h"
 
 #include <gnutls/ocsp.h>
 #include <auth/cert.h>
@@ -264,9 +265,10 @@ gnutls_ocsp_resp_import2(gnutls_ocsp_resp_t resp,
 	der.size = data->size;
 
 	if (fmt == GNUTLS_X509_FMT_PEM) {
-		ret = gnutls_pem_base64_decode2("OCSP RESPONSE", data, &der);
-		if (ret < 0)
+		ret = gnutls_pem_base64_decode2(BARE_PEM_OCSP_RESPONSE, data, &der);
+		if (ret < 0) {
 			return gnutls_assert_val(ret);
+		}
 	}
 
 	if (resp->init != 0) {
@@ -2409,4 +2411,135 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 	gnutls_x509_crt_deinit(signercert);
 
 	return rc;
+}
+
+/**
+ * gnutls_x509_ocsp_resp_list_import2:
+ * @ocsps: Will hold the parsed OCSP response list.
+ * @size: It will contain the size of the list.
+ * @resp_data: The PEM encoded OCSP list.
+ * @format: Must be PEM.
+ * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+ *
+ * This function will convert the given PEM encoded OCSP response list
+ * to the native gnutls_ocsp_resp_t format. The output will be stored
+ * in @ocsps which will allocated and initialized.
+ *
+ * The OCSP responses should have a header of "OCSP RESPONSE".
+ *
+ * To deinitialize responses, you need to deinitialize each %gnutls_ocsp_resp_t
+ * structure independently, and use gnutls_free() at @ocsps.
+ *
+ * In PEM files, when no OCSP responses are detected
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Returns: the number of responses read or a negative error value.
+ *
+ * Since: 3.6.xx
+ **/
+int
+gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
+			     unsigned int *size,
+			     const gnutls_datum_t *resp_data,
+			     gnutls_x509_crt_fmt_t format,
+			     unsigned int flags)
+{
+	gnutls_ocsp_resp_t resp = NULL;
+	gnutls_ocsp_resp_t *new_ocsps;
+	int ret;
+	unsigned i;
+
+
+	if (format == GNUTLS_X509_FMT_PEM) {
+		/* load multiple responses */
+		gnutls_datum_t p = {resp_data->data, resp_data->size};
+
+		*size = 0;
+		*ocsps = NULL;
+
+		p.data = memmem(p.data, p.size, PEM_OCSP_RESPONSE,
+				sizeof(PEM_OCSP_RESPONSE)-1);
+		if (p.data == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+			goto cleanup;
+		}
+
+		p.size -= p.data - resp_data->data;
+		if (p.size <= 0) {
+			ret = gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+			goto cleanup;
+		}
+
+		do {
+			ret = gnutls_ocsp_resp_init(&resp);
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail;
+			}
+
+			ret = gnutls_ocsp_resp_import2(resp, &p, GNUTLS_X509_FMT_PEM);
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail;
+			}
+
+			new_ocsps = gnutls_realloc(*ocsps, (*size + 1)*sizeof(gnutls_ocsp_resp_t));
+			if (new_ocsps == NULL) {
+				resp = NULL;
+				gnutls_assert();
+				goto fail;
+			}
+
+			new_ocsps[*size] = resp;
+			resp = NULL;
+			(*size)++;
+			*ocsps = new_ocsps;
+
+			p.data++;
+			p.size--;
+
+			p.data = memmem(p.data, p.size, PEM_OCSP_RESPONSE,
+					sizeof(PEM_OCSP_RESPONSE)-1);
+			if (p.data == NULL)
+				break;
+			p.size = resp_data->size - (p.data - resp_data->data);
+		} while(p.size > 0);
+	} else {
+		/* DER: load a single response */
+		ret = gnutls_ocsp_resp_init(&resp);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		ret = gnutls_ocsp_resp_import2(resp, resp_data, GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		*ocsps = gnutls_malloc(1*sizeof(gnutls_ocsp_resp_t));
+		if (*ocsps == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
+
+		(*ocsps)[0] = resp;
+		resp = NULL;
+		*size = 1;
+	}
+
+	ret = 0;
+	goto cleanup;
+
+ fail:
+	for (i=0;i<*size;i++) {
+		gnutls_ocsp_resp_deinit((*ocsps)[i]);
+	}
+	gnutls_free(*ocsps);
+
+ cleanup:
+	if (resp)
+		gnutls_ocsp_resp_deinit(resp);
+	return ret;
 }

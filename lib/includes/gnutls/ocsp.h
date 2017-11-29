@@ -268,6 +268,13 @@ int gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 int gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_t resp,
 			       unsigned int indx, gnutls_x509_crt_t crt);
 
+int
+gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
+			     unsigned int *size,
+			     const gnutls_datum_t *resp_data,
+			     gnutls_x509_crt_fmt_t format,
+			     unsigned int flags);
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }

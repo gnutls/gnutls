@@ -30,6 +30,8 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 #define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
 #define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
+#define PEM_OCSP_RESPONSE "-----BEGIN OCSP RESPONSE"
+#define BARE_PEM_OCSP_RESPONSE "OCSP RESPONSE"
 
 #define PEM_CRL_SEP "-----BEGIN X509 CRL"
 
