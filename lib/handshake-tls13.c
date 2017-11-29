@@ -162,6 +162,10 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	_gnutls_nss_keylog_write(session, "EXPORTER_SECRET",
+				 session->key.ap_expkey,
+				 session->security_parameters.prf->output_size);
+
 	_gnutls_epoch_bump(session);
 	ret = _gnutls_epoch_dup(session);
 	if (ret < 0)

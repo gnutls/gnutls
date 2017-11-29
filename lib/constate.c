@@ -211,16 +211,19 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 	record_state_st *client_write, *server_write;
 	const char *label;
 	unsigned label_size, hsk_len;
+	const char *keylog_label;
 	int ret;
 
 	if (stage == STAGE_HS) {
 		label = HANDSHAKE_CLIENT_TRAFFIC_LABEL;
 		label_size = sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1;
 		hsk_len = session->internals.handshake_hash_buffer.length;
+		keylog_label = "CLIENT_HANDSHAKE_TRAFFIC_SECRET";
 	} else {
 		label = APPLICATION_CLIENT_TRAFFIC_LABEL;
 		label_size = sizeof(APPLICATION_CLIENT_TRAFFIC_LABEL)-1;
 		hsk_len = session->internals.handshake_hash_buffer_server_finished_len;
+		keylog_label = "CLIENT_TRAFFIC_SECRET_0";
 	}
 
 	ret = _tls13_derive_secret(session, label, label_size,
@@ -230,6 +233,10 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 				   session->key.hs_ckey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	_gnutls_nss_keylog_write(session, keylog_label,
+				 session->key.hs_ckey,
+				 session->security_parameters.prf->output_size);
 
 	/* client keys */
 	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_ckey, key_size, ckey_block);
@@ -244,9 +251,11 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 	if (stage == STAGE_HS) {
 		label = HANDSHAKE_SERVER_TRAFFIC_LABEL;
 		label_size = sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1;
+		keylog_label = "SERVER_HANDSHAKE_TRAFFIC_SECRET";
 	} else {
 		label = APPLICATION_SERVER_TRAFFIC_LABEL;
 		label_size = sizeof(APPLICATION_SERVER_TRAFFIC_LABEL)-1;
+		keylog_label = "SERVER_TRAFFIC_SECRET_0";
 	}
 
 	ret = _tls13_derive_secret(session, label, label_size,
@@ -257,6 +266,10 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage, record_parameters_st
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	_gnutls_nss_keylog_write(session, keylog_label,
+				 session->key.hs_skey,
+				 session->security_parameters.prf->output_size);
 
 	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.hs_skey, key_size, skey_block);
 	if (ret < 0)
