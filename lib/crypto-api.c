@@ -641,12 +641,13 @@ typedef struct api_aead_cipher_hd_st {
  *
  * Since: 3.4.0
  **/
-int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
+int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 			    gnutls_cipher_algorithm_t cipher,
-			    const gnutls_datum_t * key)
+			    const gnutls_datum_t *key)
 {
 	api_aead_cipher_hd_st *h;
-	const cipher_entry_st* e;
+	const cipher_entry_st *e;
+	int ret;
 
 	e = cipher_to_entry(cipher);
 	if (e == NULL || e->type != CIPHER_AEAD)
@@ -660,9 +661,14 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 
 	h = *handle;
 
-	return
+	ret =
 	    _gnutls_cipher_init(&h->ctx_enc, e, key,
 				NULL, 1);
+	if (ret < 0) {
+		gnutls_free(*handle);
+		*handle = NULL;
+	}
+	return ret;
 }
 
 /**
