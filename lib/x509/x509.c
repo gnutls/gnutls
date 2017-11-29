@@ -3563,7 +3563,7 @@ gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
  * CERTIFICATE", or "CERTIFICATE".
  *
  * To deinitialize @certs, you need to deinitialize each crt structure
- * independently, and use gnutls_free() at
+ * independently, and use gnutls_free() at @certs.
  *
  * Returns: the number of certificates read or a negative error value.
  *
