@@ -3184,11 +3184,7 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 	int ret;
 	struct find_obj_data_st priv;
 
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
-		PKCS11_CHECK_INIT_TRUSTED;
-	} else {
-		PKCS11_CHECK_INIT;
-	}
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -3825,7 +3821,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	size_t id_size;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -3917,7 +3913,7 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
 	struct find_cert_st priv;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -4004,7 +4000,7 @@ int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url,
 	struct find_cert_st priv;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -4098,7 +4094,7 @@ unsigned gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	size_t serial_size;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT_RET(0);
+	PKCS11_CHECK_INIT_FLAGS_RET(flags, 0);
 
 	memset(&priv, 0, sizeof(priv));
 
