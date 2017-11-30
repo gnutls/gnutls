@@ -109,15 +109,21 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 	if (ret < 0) \
 		return gnutls_assert_val(ret)
 
-#define PKCS11_CHECK_INIT_TRUSTED \
-	ret = _gnutls_pkcs11_check_init(PROV_INIT_TRUSTED, NULL, NULL); \
-	if (ret < 0) \
-		return gnutls_assert_val(ret)
-
 #define PKCS11_CHECK_INIT_RET(x) \
 	ret = _gnutls_pkcs11_check_init(PROV_INIT_ALL, NULL, NULL); \
 	if (ret < 0) \
 		return gnutls_assert_val(x)
+
+#define PKCS11_CHECK_INIT_FLAGS(f) \
+	ret = _gnutls_pkcs11_check_init((f & GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE)?PROV_INIT_TRUSTED:PROV_INIT_ALL, NULL, NULL); \
+	if (ret < 0) \
+		return gnutls_assert_val(ret)
+
+#define PKCS11_CHECK_INIT_FLAGS_RET(f, x) \
+	ret = _gnutls_pkcs11_check_init((f & GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE)?PROV_INIT_TRUSTED:PROV_INIT_ALL, NULL, NULL); \
+	if (ret < 0) \
+		return gnutls_assert_val(x)
+
 
 /* thus function is called for every token in the traverse_tokens
  * function. Once everything is traversed it is called with NULL tinfo.
