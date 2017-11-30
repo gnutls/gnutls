@@ -35,6 +35,7 @@
 #include <gnutls/abstract.h>
 #include <getopt.h>
 #include <assert.h>
+#include "cert-common.h"
 
 /* lists the registered PKCS#11 modules by p11-kit.
  */
@@ -55,8 +56,10 @@ int main(int argc, char **argv)
 	unsigned i;
 	int opt;
 	char *url;
-	gnutls_certificate_credentials_t cred;
+	gnutls_x509_trust_list_t tl;
+	gnutls_x509_crt_t crt;
 	unsigned flag = 1;
+	unsigned int status;
 
 	ret = gnutls_global_init();
 	if (ret != 0) {
@@ -100,9 +103,14 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				/* do verification which should trigger trusted module loading */
-				assert(gnutls_certificate_allocate_credentials(&cred) >= 0);
-				assert(gnutls_certificate_set_x509_system_trust(cred) >= 0);
-				gnutls_certificate_free_credentials(cred);
+				assert(gnutls_x509_crt_init(&crt) >= 0);
+				assert(gnutls_x509_crt_import(crt, &ca3_cert, GNUTLS_X509_FMT_PEM) >= 0);
+
+				assert(gnutls_x509_trust_list_init(&tl, 0) >= 0);
+				assert(gnutls_x509_trust_list_add_system_trust(tl, 0, 0) >= 0);
+				gnutls_x509_trust_list_verify_crt2(tl, &crt, 1, NULL, 0, 0, &status, NULL);
+				gnutls_x509_trust_list_deinit(tl, 1);
+				gnutls_x509_crt_deinit(crt);
 				break;
 			default:
 				fprintf(stderr, "Unknown option %c\n", (char)opt);
