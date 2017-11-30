@@ -264,20 +264,20 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
 */
 int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_function cb)
 {
-	int ret;
+	int ret, sret = 0;
 
 	ret = gnutls_mutex_lock(&_gnutls_pkcs11_mutex);
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
-	if (providers_initialized >= req_level) {
+	if (providers_initialized > PROV_UNINITIALIZED) {
 		ret = 0;
 
 		if (_gnutls_detect_fork(pkcs11_forkid)) {
 			/* if we are initialized but a fork is detected */
 			ret = _gnutls_pkcs11_reinit();
 			if (ret == 0) {
-				ret = 1;
+				sret = 1;
 				if (cb) {
 					int ret2 = cb(priv);
 					if (ret2 < 0)
@@ -287,25 +287,60 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 			}
 		}
 
-		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
-		return ret;
-	} else if (providers_initialized < req_level &&
-		   (req_level == PROV_INIT_TRUSTED)) {
-		_gnutls_debug_log("Initializing needed PKCS #11 modules\n");
-		ret = auto_load(1);
-
-		providers_initialized = PROV_INIT_TRUSTED;
-	} else {
-		_gnutls_debug_log("Initializing all PKCS #11 modules\n");
-		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
+	/* Possible Transitions: PROV_UNINITIALIZED -> PROV_INIT_MANUAL -> PROV_INIT_MANUAL_TRUSTED
+	 * PROV_UNINITIALIZED -> PROV_INIT_TRUSTED -> PROV_INIT_ALL
+	 *
+	 * request for PROV_INIT_TRUSTED may result to PROV_INIT_MANUAL_TRUSTED
+	 * request for PROV_INIT_ALL may result to PROV_INIT_MANUAL or PROV_INIT_MANUAL_TRUSTED
+	 */
+	switch(req_level) {
+		case PROV_UNINITIALIZED:
+		case PROV_INIT_MANUAL:
+			break;
+		case PROV_INIT_TRUSTED:
+		case PROV_INIT_MANUAL_TRUSTED:
+			if (providers_initialized < PROV_INIT_MANUAL_TRUSTED) {
+				_gnutls_debug_log("Initializing needed PKCS #11 modules\n");
+				ret = auto_load(1);
+				if (ret < 0) {
+					gnutls_assert();
+				}
+
+				if (providers_initialized == PROV_INIT_MANUAL)
+					providers_initialized = PROV_INIT_MANUAL_TRUSTED;
+				else
+					providers_initialized = PROV_INIT_TRUSTED;
+
+				goto cleanup;
+			}
+			break;
+		case PROV_INIT_ALL:
+			if (providers_initialized == PROV_INIT_TRUSTED ||
+			    providers_initialized == PROV_UNINITIALIZED) {
+				_gnutls_debug_log("Initializing all PKCS #11 modules\n");
+				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+				if (ret < 0) {
+					gnutls_assert();
+				}
+
+				providers_initialized = PROV_INIT_ALL;
+				goto cleanup;
+			}
+			break;
+	}
+
+	ret = sret;
+
+ cleanup:
 	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	return 0;
+	return ret;
 }
 
 
