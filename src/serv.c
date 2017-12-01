@@ -1547,6 +1547,7 @@ static void tcp_server(const char *name, int port)
 								j->http_state = HTTP_STATE_REQUEST;
 								free(j->
 								     http_response);
+								j->http_response = NULL;
 								j->response_length = 0;
 								j->request_length = 0;
 								j->http_request[0] = 0;
