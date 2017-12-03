@@ -37,6 +37,10 @@
 #endif
 #endif
 
+#ifdef NDEBUG
+# error tests cannot be compiled with NDEBUG defined
+#endif
+
 inline static int global_init(void)
 {
 #ifdef ENABLE_PKCS11
