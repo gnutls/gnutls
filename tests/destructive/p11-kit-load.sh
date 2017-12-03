@@ -38,7 +38,7 @@ for lib in ${libdir} ${libdir}/pkcs11 /usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/l
 	fi
 done
 
-for lib in ${libdir} ${libdir}/pkcs11 /usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/lib/x86_64-linux-gnu/pkcs11/;do
+for lib in ${libdir} ${libdir}/pkcs11 /usr/lib64/pkcs11/ /usr/lib/pkcs11/ /usr/lib/x86_64-linux-gnu/pkcs11/ /usr/lib/softhsm/;do
 	if test -f "${lib}/libsofthsm2.so"; then
 		SOFTHSM_MODULE="${lib}/libsofthsm2.so"
 		echo "located ${MODULE}"
@@ -66,6 +66,10 @@ fi
 # Create pkcs11.conf with two modules, a trusted (p11-kit-trust)
 # and softhsm (not trusted)
 DIR=$(${PKGCONFIG} --var=p11_system_config_modules p11-kit-1)
+if test $? != 0 || test -z ${DIR} || test ${DIR} = '/';then
+	echo "Cannot determine p11-kit module config directory"
+	exit 1
+fi
 
 mkdir -p ${TMPDIR}
 cp ${DIR}/* ${TMPDIR}
@@ -167,7 +171,15 @@ fi
 nr=$(${builddir}/pkcs11/list-tokens -v -d|${FILTERTOKEN}|sort -u|wc -l)
 if test "$nr" != 2;then
 	echo "Error in test 6: did not find all modules"
-	${builddir}/pkcs11/list-tokens -v
+	${builddir}/pkcs11/list-tokens -v -d
+	exit 1
+fi
+
+# Check whether all modules are listed after a private key operation.
+nr=$(${builddir}/pkcs11/list-tokens -p|${FILTERTOKEN}|sort -u|wc -l)
+if test "$nr" != 2;then
+	echo "Error in test 7: did not find all modules"
+	${builddir}/pkcs11/list-tokens -p
 	exit 1
 fi
 

@@ -58,7 +58,9 @@ int main(int argc, char **argv)
 	char *url;
 	gnutls_x509_trust_list_t tl;
 	gnutls_x509_crt_t crt;
+	gnutls_pkcs11_privkey_t key;
 	unsigned flag = 1;
+	unsigned private = 0;
 	unsigned int status;
 
 	ret = gnutls_global_init();
@@ -70,7 +72,7 @@ int main(int argc, char **argv)
 	gnutls_global_set_log_function(tls_log_func);
 	//gnutls_global_set_log_level(4711);
 
-	while((opt = getopt(argc, argv, "mvatd")) != -1) {
+	while((opt = getopt(argc, argv, "mvatdp")) != -1) {
 		switch(opt) {
 			case 'm':
 				/* initialize manually - i.e., do no module loading */
@@ -84,6 +86,12 @@ int main(int argc, char **argv)
 				/* when call _gnutls_pkcs11_token_get_url() do proper initialization
 				 * if none done */
 				flag = 0;
+				break;
+			case 'p':
+				/* do private key operations */
+				assert(gnutls_pkcs11_privkey_init(&key) >= 0);
+				gnutls_pkcs11_privkey_import_url(key, "pkcs11:", 0);
+				gnutls_pkcs11_privkey_deinit(key);
 				break;
 			case 'a':
 				/* initialize auto - i.e., do module loading */
