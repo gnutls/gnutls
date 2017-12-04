@@ -659,6 +659,7 @@ APIMANS += gnutls_pubkey_verify_hash2.3
 APIMANS += gnutls_pubkey_verify_params.3
 APIMANS += gnutls_random_art.3
 APIMANS += gnutls_range_split.3
+APIMANS += gnutls_reauth.3
 APIMANS += gnutls_record_can_use_length_hiding.3
 APIMANS += gnutls_record_check_corked.3
 APIMANS += gnutls_record_check_pending.3
