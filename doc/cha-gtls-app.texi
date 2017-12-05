@@ -1559,7 +1559,8 @@ and SRP authentication.
 * Virtual hosts and credentials::
 * Session resumption::
 * Certificate verification::
-* Re-authentication::
+* TLS 1.2 Re-authentication::
+* TLS 1.3 Re-authentication and re-key::
 * Parameter generation::
 * Deriving keys for other applications/protocols::
 * Channel Bindings::
@@ -1730,12 +1731,12 @@ you may use danetool (see @ref{danetool Invocation}).
 
 
 
-@node Re-authentication
-@subsection Re-authentication
-@cindex renegotiation
-@cindex reauthentication
+@node TLS 1.2 Re-authentication
+@subsection TLS 1.2 Re-authentication
+@cindex re-negotiation
+@cindex re-authentication
 
-In TLS there is no distinction between rekey, re-authentication, and re-negotiation.
+In TLS 1.2 or earlier there is no distinction between re-key, re-authentication, and re-negotiation.
 All of these use cases are handled by the TLS' rehandshake process. For that reason
 in GnuTLS rehandshake is not transparent to the application, and the application
 must explicitly take control of that process. In addition GnuTLS since version 3.5.0 will not
@@ -1773,6 +1774,32 @@ enabled for that session (see @funcref{gnutls_safe_renegotiation_status} and
 the discussion in @ref{Safe renegotiation}).
 
 @showfuncdesc{gnutls_rehandshake}
+
+@node TLS 1.3 Re-authentication and re-key
+@subsection TLS 1.3 Re-authentication and re-key
+@cindex re-key
+@cindex re-negotiation
+@cindex re-authentication
+@cindex post-handshake authentication
+
+The TLS 1.3 protocol distinguishes between between re-key and re-authentication.
+The re-key process ensures that fresh keys are supplied to the already
+negotiated parameters, and on GnuTLS can be initiated using
+@funcref{gnutls_session_key_update}. The re-key process can be one-way
+(i.e., the calling party only changes its keys), or two-way where the peer
+is requested to change keys as well.
+
+The re-authentication process, allows the connected client to switch
+identity by presenting a new certificate. Unlike TLS 1.2, the server
+is not allowed to change identities. That client re-authentication, or
+post-handshake authentication can be initiated only by the server using
+@funcref{gnutls_reauth}, and only if a client has advertized support for it.
+Both server and client have to explicitly enable support for post handshake
+authentication using the @code{GNUTLS_POST_HANDSHAKE_AUTH} flag at @funcref{gnutls_init}.
+
+A client receing an re-authentication request will "see" the error code
+@code{GNUTLS_E_REAUTH_REQUEST} at @funcref{gnutls_record_recv}. At this
+point, it should also call @funcref{gnutls_reauth}.
 
 @node Parameter generation
 @subsection Parameter generation
