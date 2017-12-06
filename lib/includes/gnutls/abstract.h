@@ -655,7 +655,38 @@ typedef int gnutls_certificate_retrieve_function2(gnutls_session_t,
 
 void gnutls_certificate_set_retrieve_function2
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function2 * func);
+     gnutls_certificate_retrieve_function2 *func);
+
+struct gnutls_cert_retr_st {
+	unsigned version; /* set to 1 */
+	gnutls_certificate_credentials_t cred;
+	const gnutls_datum_t *req_ca_rdn;
+	unsigned nreqs;
+	const gnutls_pk_algorithm_t *pk_algos;
+	unsigned pk_algos_length;
+
+	/* other fields may be added if version is > 1 */
+	unsigned char padding[64];
+};
+
+/* When the callback sets this value, gnutls will deinitialize the given
+ * values after use */
+#define GNUTLS_CERT_RETR_DEINIT_ALL 1
+
+typedef int gnutls_certificate_retrieve_function3(
+				gnutls_session_t,
+				const struct gnutls_cert_retr_st *info,
+				gnutls_pcert_st **certs,
+				unsigned int *pcert_length,
+				gnutls_datum_t **ocsp,
+				unsigned int *ocsp_length,
+				gnutls_privkey_t *privkey,
+				unsigned int *flags);
+
+
+void gnutls_certificate_set_retrieve_function3
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_retrieve_function3 *func);
 
 int
 gnutls_certificate_set_key(gnutls_certificate_credentials_t res,

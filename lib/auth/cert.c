@@ -47,19 +47,10 @@
 #include "abstract_int.h"
 #include "debug.h"
 
-static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
-						  certs, unsigned);
-static gnutls_privkey_t alloc_and_load_x509_key(gnutls_x509_privkey_t key,
-						int deinit);
-
-#ifdef ENABLE_PKCS11
-static gnutls_privkey_t alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t
-						  key, int deinit);
-#endif
-
 static void
 _gnutls_selected_certs_set(gnutls_session_t session,
 			   gnutls_pcert_st * certs, int ncerts,
+			   gnutls_datum_t *ocsp, int nocsp,
 			   gnutls_privkey_t key, int need_free,
 			   gnutls_status_request_ocsp_func ocsp_func,
 			   void *ocsp_func_ptr);
@@ -356,14 +347,13 @@ call_get_cert_callback(gnutls_session_t session,
 		       int issuers_dn_length,
 		       gnutls_pk_algorithm_t * pk_algos, int pk_algos_length)
 {
-	unsigned i;
-	gnutls_pcert_st *local_certs = NULL;
 	gnutls_privkey_t local_key = NULL;
 	int ret = GNUTLS_E_INTERNAL_ERROR;
 	gnutls_certificate_type_t type = gnutls_certificate_type_get(session);
 	gnutls_certificate_credentials_t cred;
-	gnutls_retr2_st st2;
 	gnutls_pcert_st *pcert = NULL;
+	gnutls_datum_t *ocsp = NULL;
+	unsigned int ocsp_length = 0;
 	unsigned int pcert_length = 0;
 
 	cred = (gnutls_certificate_credentials_t)
@@ -373,15 +363,23 @@ call_get_cert_callback(gnutls_session_t session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	memset(&st2, 0, sizeof(st2));
+	if (cred->get_cert_callback3) {
+		struct gnutls_cert_retr_st info;
+		unsigned int flags = 0;
 
-	if (cred->get_cert_callback2) {
+		memset(&info, 0, sizeof(info));
+		info.req_ca_rdn = issuers_dn;
+		info.nreqs = issuers_dn_length;
+		info.pk_algos = pk_algos;
+		info.pk_algos_length = pk_algos_length;
+		info.cred = cred;
+
 		/* we avoid all allocations and transformations */
 		ret =
-		    cred->get_cert_callback2(session, issuers_dn,
-					     issuers_dn_length, pk_algos,
-					     pk_algos_length, &pcert,
-					     &pcert_length, &local_key);
+		    cred->get_cert_callback3(session, &info,
+					     &pcert, &pcert_length,
+					     &ocsp, &ocsp_length,
+					     &local_key, &flags);
 		if (ret < 0)
 			return gnutls_assert_val(GNUTLS_E_USER_ERROR);
 
@@ -394,100 +392,15 @@ call_get_cert_callback(gnutls_session_t session,
 		}
 
 		_gnutls_selected_certs_set(session, pcert, pcert_length,
-					   local_key, 0, NULL, NULL);
+					   ocsp, ocsp_length,
+					   local_key, flags&GNUTLS_CERT_RETR_DEINIT_ALL?1:0,
+					   NULL, NULL);
 
 		return 0;
-
-	} else if (cred->get_cert_callback) {
-		ret =
-		    cred->get_cert_callback(session, issuers_dn,
-					    issuers_dn_length, pk_algos,
-					    pk_algos_length, &st2);
-
-	} else {		/* compatibility mode */
+	} else {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
-
-	if (ret < 0) {
-		gnutls_assert();
-		return GNUTLS_E_USER_ERROR;
-	}
-
-	if (st2.ncerts == 0)
-		return 0;	/* no certificate was selected */
-
-	if (type != st2.cert_type) {
-		gnutls_assert();
-		ret = GNUTLS_E_INVALID_REQUEST;
-		goto cleanup;
-	}
-
-	if (type == GNUTLS_CRT_X509) {
-		local_certs =
-		    alloc_and_load_x509_certs(st2.cert.x509, st2.ncerts);
-	} else {		/* PGP */
-		ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-		goto cleanup;
-	}
-
-	if (local_certs == NULL) {
-		gnutls_assert();
-		ret = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
-	}
-
-	switch (st2.key_type) {
-	case GNUTLS_PRIVKEY_PKCS11:
-#ifdef ENABLE_PKCS11
-		if (st2.key.pkcs11 != NULL) {
-			local_key =
-			    alloc_and_load_pkcs11_key(st2.key.pkcs11,
-						      st2.deinit_all);
-			if (local_key == NULL) {
-				gnutls_assert();
-				ret = GNUTLS_E_INTERNAL_ERROR;
-				goto cleanup;
-			}
-		}
-#endif
-		break;
-	case GNUTLS_PRIVKEY_X509:
-		if (st2.key.x509 != NULL) {
-			local_key =
-			    alloc_and_load_x509_key(st2.key.x509,
-						    st2.deinit_all);
-			if (local_key == NULL) {
-				gnutls_assert();
-				ret = GNUTLS_E_INTERNAL_ERROR;
-				goto cleanup;
-			}
-		}
-		break;
-	default:
-		gnutls_assert();
-		ret = GNUTLS_E_INVALID_REQUEST;
-		goto cleanup;
-	}
-
-	_gnutls_selected_certs_set(session, local_certs,
-				   st2.ncerts, local_key, 1,
-				   NULL, NULL);
-
-	ret = 0;
-
- cleanup:
-
-	if (st2.cert_type == GNUTLS_CRT_X509) {
-		if (st2.deinit_all) {
-			for (i = 0; i < st2.ncerts; i++) {
-				gnutls_x509_crt_deinit(st2.cert.x509[i]);
-			}
-			gnutls_free(st2.cert.x509);
-		}
-	}
-
-	return ret;
 }
 
 /* Finds the appropriate certificate depending on the cA Distinguished name
@@ -517,8 +430,7 @@ _gnutls_select_client_cert(gnutls_session_t session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if (cred->get_cert_callback != NULL
-	    || cred->get_cert_callback2 != NULL) {
+	if (cred->get_cert_callback3 != NULL) {
 
 		/* use a callback to get certificate 
 		 */
@@ -579,11 +491,12 @@ _gnutls_select_client_cert(gnutls_session_t session,
 						   cert_list[0],
 						   cred->certs[indx].
 						   cert_list_length,
+						   NULL, 0,
 						   cred->certs[indx].pkey, 0,
 						   NULL, NULL);
 		} else {
 			_gnutls_selected_certs_set(session, NULL, 0, NULL, 0,
-						   NULL, NULL);
+						   NULL, 0, NULL, NULL);
 		}
 
 		result = 0;
@@ -1225,109 +1138,6 @@ _gnutls_get_selected_cert(gnutls_session_t session,
 	return 0;
 }
 
-/* converts the given x509 certificate list to gnutls_pcert_st* and allocates
- * space for them.
- */
-static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
-						  certs, unsigned ncerts)
-{
-	gnutls_pcert_st *local_certs;
-	int ret = 0;
-	unsigned i, j;
-
-	if (certs == NULL)
-		return NULL;
-
-	local_certs = gnutls_malloc(sizeof(gnutls_pcert_st) * ncerts);
-	if (local_certs == NULL) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	for (i = 0; i < ncerts; i++) {
-		ret = gnutls_pcert_import_x509(&local_certs[i], certs[i], 0);
-		if (ret < 0)
-			break;
-	}
-
-	if (ret < 0) {
-		gnutls_assert();
-		for (j = 0; j < i; j++) {
-			gnutls_pcert_deinit(&local_certs[j]);
-		}
-		gnutls_free(local_certs);
-		return NULL;
-	}
-
-	return local_certs;
-}
-
-/* converts the given x509 key to gnutls_privkey* and allocates
- * space for it.
- */
-static gnutls_privkey_t
-alloc_and_load_x509_key(gnutls_x509_privkey_t key, int deinit)
-{
-	gnutls_privkey_t local_key;
-	int ret = 0;
-
-	if (key == NULL)
-		return NULL;
-
-	ret = gnutls_privkey_init(&local_key);
-	if (ret < 0) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	ret =
-	    gnutls_privkey_import_x509(local_key, key,
-				       deinit ?
-				       GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE : 0);
-	if (ret < 0) {
-		gnutls_assert();
-		gnutls_privkey_deinit(local_key);
-		return NULL;
-	}
-
-	return local_key;
-}
-
-#ifdef ENABLE_PKCS11
-
-/* converts the given raw key to gnutls_privkey* and allocates
- * space for it.
- */
-static gnutls_privkey_t
-alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t key, int deinit)
-{
-	gnutls_privkey_t local_key;
-	int ret = 0;
-
-	if (key == NULL)
-		return NULL;
-
-	ret = gnutls_privkey_init(&local_key);
-	if (ret < 0) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	ret =
-	    gnutls_privkey_import_pkcs11(local_key, key,
-					 deinit ?
-					 GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
-					 : 0);
-	if (ret < 0) {
-		gnutls_assert();
-		gnutls_privkey_deinit(local_key);
-		return NULL;
-	}
-
-	return local_key;
-}
-
-#endif
 
 void _gnutls_selected_certs_deinit(gnutls_session_t session)
 {
@@ -1340,6 +1150,13 @@ void _gnutls_selected_certs_deinit(gnutls_session_t session)
 					    selected_cert_list[i]);
 		}
 		gnutls_free(session->internals.selected_cert_list);
+
+		for (i = 0;
+		     i < session->internals.selected_ocsp_length; i++) {
+			_gnutls_free_datum(&session->internals.
+					   selected_ocsp[i]);
+		}
+		gnutls_free(session->internals.selected_ocsp);
 
 		gnutls_privkey_deinit(session->internals.selected_key);
 	}
@@ -1356,6 +1173,7 @@ void _gnutls_selected_certs_deinit(gnutls_session_t session)
 static void
 _gnutls_selected_certs_set(gnutls_session_t session,
 			   gnutls_pcert_st * certs, int ncerts,
+			   gnutls_datum_t *ocsp, int nocsp,
 			   gnutls_privkey_t key, int need_free,
 			   gnutls_status_request_ocsp_func ocsp_func,
 			   void *ocsp_func_ptr)
@@ -1364,6 +1182,10 @@ _gnutls_selected_certs_set(gnutls_session_t session,
 
 	session->internals.selected_cert_list = certs;
 	session->internals.selected_cert_list_length = ncerts;
+
+	session->internals.selected_ocsp = ocsp;
+	session->internals.selected_ocsp_length = nocsp;
+
 	session->internals.selected_key = key;
 	session->internals.selected_need_free = need_free;
 
@@ -1486,8 +1308,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	/* If the callback which retrieves certificate has been set,
 	 * use it and leave. We make sure that this is called once.
 	 */
-	if (cred->get_cert_callback
-	    || cred->get_cert_callback2) {
+	if (cred->get_cert_callback3) {
 
 		if (session->internals.selected_cert_list_length == 0) {
 			ret = call_get_cert_callback(session, NULL, 0, NULL, 0);
@@ -1608,6 +1429,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 		_gnutls_selected_certs_set(session,
 					   &cred->certs[idx].cert_list[0],
 					   cred->certs[idx].cert_list_length,
+					   NULL, 0,
 					   cred->certs[idx].pkey, 0,
 					   cred->certs[idx].ocsp_func,
 					   cred->certs[idx].ocsp_func_ptr);

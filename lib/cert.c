@@ -236,6 +236,110 @@ gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t *
 	return 0;
 }
 
+/* converts the given x509 certificate list to gnutls_pcert_st* and allocates
+ * space for them.
+ */
+static gnutls_pcert_st *alloc_and_load_x509_certs(gnutls_x509_crt_t *
+						  certs, unsigned ncerts)
+{
+	gnutls_pcert_st *local_certs;
+	int ret = 0;
+	unsigned i, j;
+
+	if (certs == NULL)
+		return NULL;
+
+	local_certs = gnutls_malloc(sizeof(gnutls_pcert_st) * ncerts);
+	if (local_certs == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	for (i = 0; i < ncerts; i++) {
+		ret = gnutls_pcert_import_x509(&local_certs[i], certs[i], 0);
+		if (ret < 0)
+			break;
+	}
+
+	if (ret < 0) {
+		gnutls_assert();
+		for (j = 0; j < i; j++) {
+			gnutls_pcert_deinit(&local_certs[j]);
+		}
+		gnutls_free(local_certs);
+		return NULL;
+	}
+
+	return local_certs;
+}
+
+/* converts the given x509 key to gnutls_privkey* and allocates
+ * space for it.
+ */
+static gnutls_privkey_t
+alloc_and_load_x509_key(gnutls_x509_privkey_t key, int deinit)
+{
+	gnutls_privkey_t local_key;
+	int ret = 0;
+
+	if (key == NULL)
+		return NULL;
+
+	ret = gnutls_privkey_init(&local_key);
+	if (ret < 0) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	ret =
+	    gnutls_privkey_import_x509(local_key, key,
+				       deinit ?
+				       GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE : 0);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_privkey_deinit(local_key);
+		return NULL;
+	}
+
+	return local_key;
+}
+
+#ifdef ENABLE_PKCS11
+
+/* converts the given raw key to gnutls_privkey* and allocates
+ * space for it.
+ */
+static gnutls_privkey_t
+alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t key, int deinit)
+{
+	gnutls_privkey_t local_key;
+	int ret = 0;
+
+	if (key == NULL)
+		return NULL;
+
+	ret = gnutls_privkey_init(&local_key);
+	if (ret < 0) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	ret =
+	    gnutls_privkey_import_pkcs11(local_key, key,
+					 deinit ?
+					 GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+					 : 0);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_privkey_deinit(local_key);
+		return NULL;
+	}
+
+	return local_key;
+}
+
+#endif
+
 /**
  * gnutls_certificate_server_set_request:
  * @session: is a #gnutls_session_t type.
@@ -252,6 +356,102 @@ gnutls_certificate_server_set_request(gnutls_session_t session,
 				      gnutls_certificate_request_t req)
 {
 	session->internals.send_cert_req = req;
+}
+
+static int call_legacy_cert_cb1(gnutls_session_t session,
+				const struct gnutls_cert_retr_st *info,
+				gnutls_pcert_st **certs,
+				unsigned int *pcert_length,
+				gnutls_datum_t **ocsp,
+				unsigned int *ocsp_length,
+				gnutls_privkey_t *privkey,
+				unsigned int *flags)
+{
+	gnutls_retr2_st st2;
+	gnutls_pcert_st *local_certs = NULL;
+	gnutls_privkey_t local_key = NULL;
+	unsigned i;
+	int ret;
+
+	*ocsp_length = 0;
+
+	memset(&st2, 0, sizeof(st2));
+
+	ret = info->cred->legacy_cert_cb1(session, info->req_ca_rdn, info->nreqs,
+					  info->pk_algos, info->pk_algos_length,
+				          &st2);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (st2.cert_type != GNUTLS_CRT_X509) {
+		gnutls_assert();
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	local_certs =
+	    alloc_and_load_x509_certs(st2.cert.x509, st2.ncerts);
+	if (local_certs == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	switch (st2.key_type) {
+#ifdef ENABLE_PKCS11
+	case GNUTLS_PRIVKEY_PKCS11:
+		if (st2.key.pkcs11 != NULL) {
+			local_key =
+			    alloc_and_load_pkcs11_key(st2.key.pkcs11,
+						      st2.deinit_all);
+			if (local_key == NULL) {
+				gnutls_assert();
+				ret = GNUTLS_E_INTERNAL_ERROR;
+				goto cleanup;
+			}
+		}
+		break;
+#endif
+	case GNUTLS_PRIVKEY_X509:
+		if (st2.key.x509 != NULL) {
+			local_key =
+			    alloc_and_load_x509_key(st2.key.x509,
+						    st2.deinit_all);
+			if (local_key == NULL) {
+				gnutls_assert();
+				ret = GNUTLS_E_INTERNAL_ERROR;
+				goto cleanup;
+			}
+		}
+		break;
+	default:
+		gnutls_assert();
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	*privkey = local_key;
+	*certs = local_certs;
+	*pcert_length = st2.ncerts;
+
+	/* flag the caller to deinitialize our values */
+	*flags |= GNUTLS_CERT_RETR_DEINIT_ALL;
+
+	ret = 0;
+
+ cleanup:
+
+	if (st2.cert_type == GNUTLS_CRT_X509) {
+		if (st2.deinit_all) {
+			for (i = 0; i < st2.ncerts; i++) {
+				gnutls_x509_crt_deinit(st2.cert.x509[i]);
+			}
+			gnutls_free(st2.cert.x509);
+		}
+	}
+
+	return ret;
+
 }
 
 /**
@@ -298,7 +498,30 @@ void gnutls_certificate_set_retrieve_function
     (gnutls_certificate_credentials_t cred,
      gnutls_certificate_retrieve_function * func)
 {
-	cred->get_cert_callback = func;
+	cred->legacy_cert_cb1 = func;
+	cred->get_cert_callback3 = call_legacy_cert_cb1;
+}
+
+static int call_legacy_cert_cb2(gnutls_session_t session,
+				const struct gnutls_cert_retr_st *info,
+				gnutls_pcert_st **certs,
+				unsigned int *pcert_length,
+				gnutls_datum_t **ocsp,
+				unsigned int *ocsp_length,
+				gnutls_privkey_t *privkey,
+				unsigned int *flags)
+{
+	int ret;
+	*ocsp_length = 0;
+	/* flags will be assumed to be zero */
+
+	ret = info->cred->legacy_cert_cb2(session, info->req_ca_rdn, info->nreqs,
+					  info->pk_algos, info->pk_algos_length,
+					  certs, pcert_length, privkey);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+	return ret;
 }
 
 /**
@@ -350,7 +573,64 @@ void gnutls_certificate_set_retrieve_function2
     (gnutls_certificate_credentials_t cred,
      gnutls_certificate_retrieve_function2 * func) 
 {
-	cred->get_cert_callback2 = func;
+	cred->legacy_cert_cb2 = func;
+	cred->get_cert_callback3 = call_legacy_cert_cb2;
+}
+
+/**
+ * gnutls_certificate_set_retrieve_function3:
+ * @cred: is a #gnutls_certificate_credentials_t type.
+ * @func: is the callback function
+ *
+ * This function sets a callback to be called in order to retrieve the
+ * certificate and OCSP responses to be used in the handshake. The callback will
+ * take control only if a certificate is requested by the peer.
+ *
+ * The callback's function prototype is defined in `abstract.h':
+ * int (*callback)(gnutls_session_t, const struct gnutls_cert_retr_st *info,
+ * gnutls_pcert_st **certs, unsigned int *pcert_length,
+ * gnutls_datum_t **ocsp, unsigned int *ocsp_length,
+ * gnutls_privkey_t * pkey, unsigned int *flags);
+ *
+ * The info field of the callback contains:
+ * @req_ca_dn which is a list with the CA names that the server considers trusted.
+ * This is a hint and typically the client should send a certificate that is signed
+ * by one of these CAs. These names, when available, are DER encoded. To get a more
+ * meaningful value use the function gnutls_x509_rdn_get().
+ * @pk_algos contains a list with server's acceptable public key algorithms.
+ * The certificate returned should support the server's given algorithms.
+ *
+ * The callback should fill-in the following values.
+ *
+ * @pcert should contain a single certificate and public key or a list of them.
+ * @pcert_length is the size of the previous list.
+ * @ocsp should contain a single OCSP response or a list of them.
+ * @ocsp_length is the size of the previous list.
+ * @pkey is the private key.
+ *
+ * If the callback function is provided then gnutls will call it, during
+ * handshake, after the certificate request message has been received,
+ * or during post-handshake.
+ *
+ * All the provided by the callback values will not be released or
+ * modified by gnutls.
+ *
+ * When this callback is set in server side, @pk_algos and @req_ca_dn are NULL.
+ *
+ * The callback function should set the certificate and OCSP response
+ * list to be sent, and return 0 on success. If no certificate was selected then
+ * the @pcert_length and @Ocsp_length should be set to zero. The return
+ * value (-1) indicates error and the handshake will be terminated. If both
+ * certificates are set in the credentials and a callback is available, the
+ * callback takes predence.
+ *
+ * Since: 3.6.xx
+ **/
+void gnutls_certificate_set_retrieve_function3
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_retrieve_function3 *func) 
+{
+	cred->get_cert_callback3 = func;
 }
 
 /**

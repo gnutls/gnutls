@@ -1085,9 +1085,17 @@ typedef struct {
 	gnutls_pcert_st *selected_cert_list;
 	int16_t selected_cert_list_length;
 	struct gnutls_privkey_st *selected_key;
-	bool selected_need_free;
+
+	/* new callbacks such as gnutls_certificate_retrieve_function3
+	 * set the selected_ocsp datum values. The older OCSP callback-based
+	 * functions, set the ocsp_func. The former takes precedence when
+	 * set.
+	 */
+	gnutls_datum_t *selected_ocsp;
+	int16_t selected_ocsp_length;
 	gnutls_status_request_ocsp_func selected_ocsp_func;
 	void *selected_ocsp_func_ptr;
+	bool selected_need_free;
 
 
 	/* This holds the default version that our first

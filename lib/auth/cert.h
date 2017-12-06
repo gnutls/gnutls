@@ -77,8 +77,9 @@ typedef struct gnutls_certificate_credentials_st {
 
 	/* It's a mess here. However we need to keep the old 3 functions
 	 * for compatibility */
-	gnutls_certificate_retrieve_function *get_cert_callback;	/* deprecated */
-	gnutls_certificate_retrieve_function2 *get_cert_callback2;
+	gnutls_certificate_retrieve_function *legacy_cert_cb1; /* deprecated */
+	gnutls_certificate_retrieve_function2 *legacy_cert_cb2;
+	gnutls_certificate_retrieve_function3 *get_cert_callback3;
 
 	gnutls_certificate_verify_function *verify_callback;
 
