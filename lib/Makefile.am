@@ -80,7 +80,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
-	hello_ext_lib.c hello_ext_lib.h
+	hello_ext_lib.c hello_ext_lib.h ocsp-api.c
 
 if WINDOWS
 COBJECTS += system/keys-win.c
