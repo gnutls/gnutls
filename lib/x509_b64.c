@@ -97,7 +97,7 @@ _gnutls_fbase64_encode(const char *msg, const uint8_t * data,
 		if (sizeof(tmpres) < size)
 			return gnutls_assert_val(GNUTLS_E_BASE64_ENCODING_ERROR);
 
-		base64_encode_raw(tmpres, tmp, &data[i]);
+		base64_encode_raw((void*)tmpres, tmp, &data[i]);
 
 		INCR(bytes, size + 1, max);
 		ptr = &result->data[pos];
@@ -256,8 +256,8 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	ret = base64_decode_update(&ctx, &size, result->data,
-				   pdata.size, pdata.data); 
-	if (ret == 0) {
+				   pdata.size, (void*)pdata.data);
+	if (ret == 0 || size == 0) {
 		gnutls_assert();
 		gnutls_free(result->data);
 		result->data = NULL;

@@ -377,7 +377,7 @@ static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
 	if (b64->data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	base64_encode_raw(b64->data, raw->size, raw->data);
+	base64_encode_raw((void*)b64->data, raw->size, raw->data);
 	b64->size = size;
 
 	return 0;

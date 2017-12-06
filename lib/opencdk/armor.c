@@ -180,7 +180,7 @@ static cdk_error_t armor_encode(void *data, FILE * in, FILE * out)
 			return CDK_File_Error;
 		}
 
-		base64_encode_raw((uint8_t*)buf, nread, (uint8_t*)raw);
+		base64_encode_raw((void*)buf, nread, (uint8_t*)raw);
 		buf[BASE64_ENCODE_RAW_LENGTH(nread)] = 0;
 		fprintf(out, "%s%s", buf, lf);
 	}
@@ -304,7 +304,7 @@ static cdk_error_t armor_decode(void *data, FILE * in, FILE * out)
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 
 			ret = base64_decode_update(&ctx, &crcbuf_size, crcbuf,
-						   len-1, (uint8_t*)buf+1);
+						   len-1, (void*)(buf+1));
 			if (ret == 0)
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 
@@ -323,7 +323,7 @@ static cdk_error_t armor_decode(void *data, FILE * in, FILE * out)
 			if ((ssize_t)raw_size < BASE64_DECODE_LENGTH(len))
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 			ret = base64_decode_update(&ctx, &raw_size, raw,
-						   len, (uint8_t*)buf);
+						   len, (void*)buf);
 			if (ret == 0)
 				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
 
@@ -472,7 +472,7 @@ cdk_armor_encode_buffer(const byte * inbuf, size_t inlen,
 			return CDK_File_Error;
 		}
 
-		base64_encode_raw((uint8_t*)tempout, len, (uint8_t*)tempbuf);
+		base64_encode_raw((void*)tempout, len, (uint8_t*)tempbuf);
 		tempout[BASE64_ENCODE_RAW_LENGTH(len)] = 0;
 
 		memcpy(outbuf + pos, tempout, strlen(tempout));
