@@ -123,8 +123,10 @@ typedef struct hello_ext_entry_st {
 } hello_ext_entry_st;
 
 /* Checks if the extension @id provided has been requested
- * by us (in client side). In that case it returns non-zero,
- * otherwise zero.
+ * by us (in client side).In server side it checks whether this
+ * extension was advertized by the client.
+ *
+ * It returns non-zero for true, otherwise zero.
  */
 inline static unsigned
 _gnutls_hello_ext_is_present(gnutls_session_t session, extensions_t id)

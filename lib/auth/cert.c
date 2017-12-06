@@ -493,7 +493,7 @@ _gnutls_select_client_cert(gnutls_session_t session,
 						   cert_list_length,
 						   NULL, 0,
 						   cred->certs[indx].pkey, 0,
-						   NULL, NULL);
+						   NULL, 0);
 		} else {
 			_gnutls_selected_certs_set(session, NULL, 0, NULL, 0,
 						   NULL, 0, NULL, NULL);
