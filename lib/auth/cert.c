@@ -48,12 +48,12 @@
 #include "debug.h"
 
 static void
-_gnutls_selected_certs_set(gnutls_session_t session,
-			   gnutls_pcert_st * certs, int ncerts,
-			   gnutls_datum_t *ocsp, int nocsp,
-			   gnutls_privkey_t key, int need_free,
-			   gnutls_status_request_ocsp_func ocsp_func,
-			   void *ocsp_func_ptr);
+selected_certs_set(gnutls_session_t session,
+		   gnutls_pcert_st * certs, int ncerts,
+		   gnutls_datum_t *ocsp, int nocsp,
+		   gnutls_privkey_t key, int need_free,
+		   gnutls_status_request_ocsp_func ocsp_func,
+		   void *ocsp_func_ptr);
 
 #define MAX_CLIENT_SIGN_ALGOS 3
 #define CERTTYPE_SIZE (MAX_CLIENT_SIGN_ALGOS+1)
@@ -391,10 +391,10 @@ call_get_cert_callback(gnutls_session_t session,
 			local_key = NULL;
 		}
 
-		_gnutls_selected_certs_set(session, pcert, pcert_length,
-					   ocsp, ocsp_length,
-					   local_key, flags&GNUTLS_CERT_RETR_DEINIT_ALL?1:0,
-					   NULL, NULL);
+		selected_certs_set(session, pcert, pcert_length,
+				   ocsp, ocsp_length,
+				   local_key, flags&GNUTLS_CERT_RETR_DEINIT_ALL?1:0,
+				   NULL, NULL);
 
 		return 0;
 	} else {
@@ -486,17 +486,17 @@ _gnutls_select_client_cert(gnutls_session_t session,
 		}
 
 		if (indx >= 0) {
-			_gnutls_selected_certs_set(session,
-						   &cred->certs[indx].
-						   cert_list[0],
-						   cred->certs[indx].
-						   cert_list_length,
-						   NULL, 0,
-						   cred->certs[indx].pkey, 0,
-						   NULL, 0);
+			selected_certs_set(session,
+					   &cred->certs[indx].
+					   cert_list[0],
+					   cred->certs[indx].
+					   cert_list_length,
+					   NULL, 0,
+					   cred->certs[indx].pkey, 0,
+					   NULL, 0);
 		} else {
-			_gnutls_selected_certs_set(session, NULL, 0, NULL, 0,
-						   NULL, 0, NULL, NULL);
+			selected_certs_set(session, NULL, 0, NULL, 0,
+					   NULL, 0, NULL, NULL);
 		}
 
 		result = 0;
@@ -1171,12 +1171,12 @@ void _gnutls_selected_certs_deinit(gnutls_session_t session)
 }
 
 static void
-_gnutls_selected_certs_set(gnutls_session_t session,
-			   gnutls_pcert_st * certs, int ncerts,
-			   gnutls_datum_t *ocsp, int nocsp,
-			   gnutls_privkey_t key, int need_free,
-			   gnutls_status_request_ocsp_func ocsp_func,
-			   void *ocsp_func_ptr)
+selected_certs_set(gnutls_session_t session,
+		   gnutls_pcert_st * certs, int ncerts,
+		   gnutls_datum_t *ocsp, int nocsp,
+		   gnutls_privkey_t key, int need_free,
+		   gnutls_status_request_ocsp_func ocsp_func,
+		   void *ocsp_func_ptr)
 {
 	_gnutls_selected_certs_deinit(session);
 
@@ -1426,13 +1426,13 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	 */
  finished:
 	if (idx >= 0) {
-		_gnutls_selected_certs_set(session,
-					   &cred->certs[idx].cert_list[0],
-					   cred->certs[idx].cert_list_length,
-					   NULL, 0,
-					   cred->certs[idx].pkey, 0,
-					   cred->certs[idx].ocsp_func,
-					   cred->certs[idx].ocsp_func_ptr);
+		selected_certs_set(session,
+				   &cred->certs[idx].cert_list[0],
+				   cred->certs[idx].cert_list_length,
+				   NULL, 0,
+				   cred->certs[idx].pkey, 0,
+				   cred->certs[idx].ocsp_func,
+				   cred->certs[idx].ocsp_func_ptr);
 	} else {
 		gnutls_assert();
 		/* Certificate does not support REQUESTED_ALGO.  */
