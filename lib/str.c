@@ -898,7 +898,7 @@ _gnutls_buffer_base64print(gnutls_buffer_st * str,
 		return gnutls_assert_val(ret);
 	}
 
-	base64_encode_raw(&str->data[str->length], len, data);
+	base64_encode_raw((void*)&str->data[str->length], len, data);
 	str->length += b64len;
 	str->data[str->length] = 0;
 
