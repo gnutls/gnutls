@@ -60,7 +60,11 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
 			gnutls_pcert_deinit(&sc->certs[i].cert_list[j]);
 		}
 		gnutls_free(sc->certs[i].cert_list);
-		gnutls_free(sc->certs[i].ocsp_response_file);
+
+		for (j = 0; j < sc->certs[i].ocsp_responses_length; j++) {
+			gnutls_free(sc->certs[i].ocsp_responses[j].data);
+			sc->certs[i].ocsp_responses[j].data = NULL;
+		}
 		_gnutls_str_array_clear(&sc->certs[i].names);
 		gnutls_privkey_deinit(sc->certs[i].pkey);
 	}

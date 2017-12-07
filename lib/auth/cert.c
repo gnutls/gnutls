@@ -491,7 +491,8 @@ _gnutls_select_client_cert(gnutls_session_t session,
 					   cert_list[0],
 					   cred->certs[indx].
 					   cert_list_length,
-					   NULL, 0,
+					   cred->certs[indx].ocsp_responses,
+					   cred->certs[indx].ocsp_responses_length,
 					   cred->certs[indx].pkey, 0,
 					   NULL, 0);
 		} else {
@@ -1426,13 +1427,23 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	 */
  finished:
 	if (idx >= 0) {
-		selected_certs_set(session,
-				   &cred->certs[idx].cert_list[0],
-				   cred->certs[idx].cert_list_length,
-				   NULL, 0,
-				   cred->certs[idx].pkey, 0,
-				   cred->certs[idx].ocsp_func,
-				   cred->certs[idx].ocsp_func_ptr);
+		if (cred->certs[idx].ocsp_func) {
+			selected_certs_set(session,
+					   &cred->certs[idx].cert_list[0],
+					   cred->certs[idx].cert_list_length,
+					   NULL, 0,
+					   cred->certs[idx].pkey, 0,
+					   cred->certs[idx].ocsp_func,
+					   cred->certs[idx].ocsp_func_ptr);
+		} else {
+			selected_certs_set(session,
+					   &cred->certs[idx].cert_list[0],
+					   cred->certs[idx].cert_list_length,
+					   &cred->certs[idx].ocsp_responses[0],
+					   cred->certs[idx].ocsp_responses_length,
+					   cred->certs[idx].pkey, 0,
+					   NULL, NULL);
+		}
 	} else {
 		gnutls_assert();
 		/* Certificate does not support REQUESTED_ALGO.  */

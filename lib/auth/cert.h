@@ -30,6 +30,8 @@
 #include <gnutls/compat.h>
 #include <str_array.h>
 
+#define MAX_OCSP_RESPONSES 8
+
 typedef struct {
 	gnutls_pcert_st *cert_list;	/* a certificate chain */
 	unsigned int cert_list_length;	/* its length */
@@ -37,7 +39,8 @@ typedef struct {
 
 	gnutls_status_request_ocsp_func ocsp_func;
 	void *ocsp_func_ptr; /* corresponding OCSP response function + ptr */
-	char *ocsp_response_file; /* corresponding OCSP response file */
+	gnutls_datum_t ocsp_responses[MAX_OCSP_RESPONSES]; /* corresponding OCSP response file */
+	unsigned int ocsp_responses_length;
 
 	/* the private key corresponding to certificate */
 	gnutls_privkey_t pkey;

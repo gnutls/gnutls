@@ -375,6 +375,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_CERTIFICATE_LIST_UNSORTED),
 	ERROR_ENTRY(N_("The OCSP response is invalid"),
 		    GNUTLS_E_OCSP_RESPONSE_ERROR),
+	ERROR_ENTRY(N_("The OCSP response provided doesn't match the available certificates"),
+		    GNUTLS_E_OCSP_MISMATCH_WITH_CERTS),
 	ERROR_ENTRY(N_("There is no certificate status (OCSP)."),
 		    GNUTLS_E_NO_CERTIFICATE_STATUS),
 	ERROR_ENTRY(N_("Error in the system's randomness device."),
