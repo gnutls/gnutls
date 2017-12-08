@@ -48,6 +48,7 @@
 #include "read-file.h"
 #include "system-keys.h"
 #include "urls.h"
+#include "ocsp.h"
 #ifdef _WIN32
 #include <wincrypt.h>
 #endif
@@ -70,7 +71,6 @@ certificate_credential_append_crt_list(gnutls_certificate_credentials_t res,
 	}
 
 /* fifteen days */
-#define MAX_OCSP_VALIDITY_SECS (15*60*60*24)
 #ifdef ENABLE_OCSP
 /* If the certificate is revoked status will be GNUTLS_CERT_REVOKED.
  * 

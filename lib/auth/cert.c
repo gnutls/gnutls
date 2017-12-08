@@ -50,7 +50,7 @@
 static void
 selected_certs_set(gnutls_session_t session,
 		   gnutls_pcert_st * certs, int ncerts,
-		   gnutls_datum_t *ocsp, int nocsp,
+		   gnutls_ocsp_data_st *ocsp, unsigned nocsp,
 		   gnutls_privkey_t key, int need_free,
 		   gnutls_status_request_ocsp_func ocsp_func,
 		   void *ocsp_func_ptr);
@@ -352,7 +352,7 @@ call_get_cert_callback(gnutls_session_t session,
 	gnutls_certificate_type_t type = gnutls_certificate_type_get(session);
 	gnutls_certificate_credentials_t cred;
 	gnutls_pcert_st *pcert = NULL;
-	gnutls_datum_t *ocsp = NULL;
+	gnutls_ocsp_data_st *ocsp = NULL;
 	unsigned int ocsp_length = 0;
 	unsigned int pcert_length = 0;
 
@@ -491,8 +491,8 @@ _gnutls_select_client_cert(gnutls_session_t session,
 					   cert_list[0],
 					   cred->certs[indx].
 					   cert_list_length,
-					   cred->certs[indx].ocsp_responses,
-					   cred->certs[indx].ocsp_responses_length,
+					   cred->certs[indx].ocsp_data,
+					   cred->certs[indx].ocsp_data_length,
 					   cred->certs[indx].pkey, 0,
 					   NULL, 0);
 		} else {
@@ -1155,7 +1155,7 @@ void _gnutls_selected_certs_deinit(gnutls_session_t session)
 		for (i = 0;
 		     i < session->internals.selected_ocsp_length; i++) {
 			_gnutls_free_datum(&session->internals.
-					   selected_ocsp[i]);
+					   selected_ocsp[i].response);
 		}
 		gnutls_free(session->internals.selected_ocsp);
 
@@ -1174,7 +1174,7 @@ void _gnutls_selected_certs_deinit(gnutls_session_t session)
 static void
 selected_certs_set(gnutls_session_t session,
 		   gnutls_pcert_st * certs, int ncerts,
-		   gnutls_datum_t *ocsp, int nocsp,
+		   gnutls_ocsp_data_st *ocsp, unsigned nocsp,
 		   gnutls_privkey_t key, int need_free,
 		   gnutls_status_request_ocsp_func ocsp_func,
 		   void *ocsp_func_ptr)
@@ -1439,8 +1439,8 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 			selected_certs_set(session,
 					   &cred->certs[idx].cert_list[0],
 					   cred->certs[idx].cert_list_length,
-					   &cred->certs[idx].ocsp_responses[0],
-					   cred->certs[idx].ocsp_responses_length,
+					   &cred->certs[idx].ocsp_data[0],
+					   cred->certs[idx].ocsp_data_length,
 					   cred->certs[idx].pkey, 0,
 					   NULL, NULL);
 		}

@@ -79,7 +79,7 @@ libgnutls_x509_la_SOURCES =	\
 	tls_features.c		\
 	krb5.c krb5.h		\
 	ip.c ip.h ip-in-cidr.h  \
-	supported_exts.h
+	supported_exts.h ocsp.h
 
 if ENABLE_OCSP
 libgnutls_x509_la_SOURCES += ocsp.c ocsp_output.c

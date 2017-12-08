@@ -61,9 +61,9 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
 		}
 		gnutls_free(sc->certs[i].cert_list);
 
-		for (j = 0; j < sc->certs[i].ocsp_responses_length; j++) {
-			gnutls_free(sc->certs[i].ocsp_responses[j].data);
-			sc->certs[i].ocsp_responses[j].data = NULL;
+		for (j = 0; j < sc->certs[i].ocsp_data_length; j++) {
+			gnutls_free(sc->certs[i].ocsp_data[j].response.data);
+			sc->certs[i].ocsp_data[j].response.data = NULL;
 		}
 		_gnutls_str_array_clear(&sc->certs[i].names);
 		gnutls_privkey_deinit(sc->certs[i].pkey);
@@ -366,7 +366,7 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
 				const struct gnutls_cert_retr_st *info,
 				gnutls_pcert_st **certs,
 				unsigned int *pcert_length,
-				gnutls_datum_t **ocsp,
+				gnutls_ocsp_data_st **ocsp,
 				unsigned int *ocsp_length,
 				gnutls_privkey_t *privkey,
 				unsigned int *flags)
@@ -510,7 +510,7 @@ static int call_legacy_cert_cb2(gnutls_session_t session,
 				const struct gnutls_cert_retr_st *info,
 				gnutls_pcert_st **certs,
 				unsigned int *pcert_length,
-				gnutls_datum_t **ocsp,
+				gnutls_ocsp_data_st **ocsp,
 				unsigned int *ocsp_length,
 				gnutls_privkey_t *privkey,
 				unsigned int *flags)

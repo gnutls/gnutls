@@ -1883,7 +1883,7 @@ int gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
 
   /* OCSP status request extension, RFC 6066 */
 typedef int (*gnutls_status_request_ocsp_func)
- (gnutls_session_t session, void *ptr, gnutls_datum_t * ocsp_response);
+ (gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response);
 
 void
 gnutls_certificate_set_ocsp_status_request_function
@@ -1899,6 +1899,23 @@ int
 gnutls_certificate_set_ocsp_status_request_file
 (gnutls_certificate_credentials_t res, const char *response_file,
  unsigned idx);
+
+int
+gnutls_certificate_set_ocsp_status_request_file2
+(gnutls_certificate_credentials_t res, const char *response_file,
+ unsigned idx, gnutls_x509_crt_fmt_t fmt);
+
+int
+gnutls_certificate_set_ocsp_status_request_mem
+(gnutls_certificate_credentials_t res, const gnutls_datum_t *resp,
+ unsigned idx, gnutls_x509_crt_fmt_t fmt);
+
+typedef struct gnutls_ocsp_data_st {
+	unsigned int version; /* must be zero */
+	gnutls_datum_t response;
+	time_t exptime;
+	unsigned char padding[32];
+} gnutls_ocsp_data_st;
 
 int gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 					     gnutls_datum_t * responder_id,

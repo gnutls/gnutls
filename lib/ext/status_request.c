@@ -172,7 +172,24 @@ server_send(gnutls_session_t session,
 	if (cred == NULL)	/* no certificate authentication */
 		return gnutls_assert_val(0);
 
-	if (session->internals.selected_ocsp_func) {
+	if (session->internals.selected_ocsp_length > 0) {
+		if (session->internals.selected_ocsp[0].response.data) {
+			if (session->internals.selected_ocsp[0].exptime != 0 &&
+			    (gnutls_time(0) >= session->internals.selected_ocsp[0].exptime)) {
+				gnutls_assert();
+				return 0;
+			}
+
+			ret = _gnutls_set_datum(&priv->sresp,
+						session->internals.selected_ocsp[0].response.data,
+						session->internals.selected_ocsp[0].response.size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			return GNUTLS_E_INT_RET_0;
+		} else {
+			return 0;
+		}
+	} else if (session->internals.selected_ocsp_func) {
 		func = session->internals.selected_ocsp_func;
 		func_ptr = session->internals.selected_ocsp_func_ptr;
 	} else if (cred->glob_ocsp_func) {

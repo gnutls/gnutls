@@ -32,6 +32,7 @@
 #include "common.h"
 #include "verify-high.h"
 #include "x509.h"
+#include "ocsp.h"
 
 #include <gnutls/ocsp.h>
 #include <auth/cert.h>
@@ -2542,4 +2543,55 @@ gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
 	if (resp)
 		gnutls_ocsp_resp_deinit(resp);
 	return ret;
+}
+
+/* This returns -1 if the OCSP response is invalid (revoked) or its
+ * data are too old. Otherwise it returns the time after which that data
+ * is invalid.
+ */
+time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_t resp)
+{
+	unsigned int cert_status;
+	time_t rtime, vtime, ntime, now;
+	int ret;
+
+	ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
+					  &cert_status, &vtime, &ntime,
+					  &rtime, NULL);
+	if (ret < 0) {
+		_gnutls_debug_log("There was an error parsing the OCSP response: %s\n",
+				  gnutls_strerror(ret));
+		return gnutls_assert_val(-1);
+	}
+
+	if (cert_status != GNUTLS_OCSP_CERT_GOOD &&
+	    cert_status != GNUTLS_OCSP_CERT_UNKNOWN) {
+		_gnutls_debug_log("The OCSP response status (%d) is invalid\n",
+				  cert_status);
+		return gnutls_assert_val(-1);
+	}
+
+	now = gnutls_time(0);
+
+	if (ntime == -1) {
+		/* This is a problematic case, and there is no concensus on how
+		 * to treat these responses. It doesn't contain the time after which
+		 * the response is invalid, thus it is an OCSP response effectively
+		 * valid forever defeating the purpose of OCSP. We set here the same
+		 * limit we apply when verifying responses. */
+		if (now - vtime > MAX_OCSP_VALIDITY_SECS) {
+			_gnutls_debug_log("The OCSP response is old\n");
+			return gnutls_assert_val(-1);
+		}
+
+		return now + MAX_OCSP_VALIDITY_SECS;
+	} else {
+		/* there is a newer OCSP answer, don't trust this one */
+		if (ntime < now) {
+			_gnutls_debug_log("There is a newer OCSP response\n");
+			return gnutls_assert_val(-1);
+		}
+
+		return ntime;
+	}
 }

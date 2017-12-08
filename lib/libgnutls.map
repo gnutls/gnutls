@@ -1214,7 +1214,9 @@ GNUTLS_3_6_xx
 	gnutls_ocsp_resp_import2;
 	gnutls_ocsp_resp_export2;
 	gnutls_ocsp_resp_list_import2;
-	gnutls_certificate_retrieve_function3;
+	gnutls_certificate_set_retrieve_function3;
+	gnutls_certificate_set_ocsp_status_request_file2;
+	gnutls_certificate_set_ocsp_status_request_mem;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {

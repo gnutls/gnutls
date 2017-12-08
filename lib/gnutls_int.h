@@ -1091,7 +1091,7 @@ typedef struct {
 	 * functions, set the ocsp_func. The former takes precedence when
 	 * set.
 	 */
-	gnutls_datum_t *selected_ocsp;
+	gnutls_ocsp_data_st *selected_ocsp;
 	uint16_t selected_ocsp_length;
 	gnutls_status_request_ocsp_func selected_ocsp_func;
 	void *selected_ocsp_func_ptr;

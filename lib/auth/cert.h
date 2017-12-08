@@ -39,8 +39,9 @@ typedef struct {
 
 	gnutls_status_request_ocsp_func ocsp_func;
 	void *ocsp_func_ptr; /* corresponding OCSP response function + ptr */
-	gnutls_datum_t ocsp_responses[MAX_OCSP_RESPONSES]; /* corresponding OCSP response file */
-	unsigned int ocsp_responses_length;
+
+	gnutls_ocsp_data_st ocsp_data[MAX_OCSP_RESPONSES];
+	unsigned int ocsp_data_length;
 
 	/* the private key corresponding to certificate */
 	gnutls_privkey_t pkey;
