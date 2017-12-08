@@ -1791,12 +1791,11 @@ to derive keys to be used in another application or protocol (e.g., in an
 other TLS session using pre-shared keys). The following describe GnuTLS'
 implementation of RFC5705 to extract keys based on a session's master secret.
 
-The API to use is @funcref{gnutls_prf}.  The 
+The API to use is @funcref{gnutls_prf_rfc5705}.  The 
 function needs to be provided with a label,
-and additional context data to mix in the @code{extra} parameter. 
-Moreover, the API allows to switch the mix of the
-client and server random nonces, using the @code{server_random_first} parameter.
-In typical uses you don't need it, so a zero value should be provided in @code{server_random_first}.
+and additional context data to mix in the @code{context} parameter. 
+
+@showfuncdesc{gnutls_prf_rfc5705}
 
 For example, after establishing a TLS session using
 @funcref{gnutls_handshake}, you can obtain 32-bytes to be used as key, using this call:
@@ -1806,15 +1805,19 @@ For example, after establishing a TLS session using
 #define MYCONTEXT "my-protocol's-1st-session"
 
 char out[32];
-rc = gnutls_prf (session, sizeof(MYLABEL)-1, MYLABEL, 0,
-                 sizeof(MYCONTEXT)-1, MYCONTEXT, 32, out);
+rc = gnutls_prf_rfc5705 (session, sizeof(MYLABEL)-1, MYLABEL,
+                         sizeof(MYCONTEXT)-1, MYCONTEXT, 32, out);
 @end example
 
 The output key depends on TLS' master secret, and is the same on both client
 and server.
 
-If you don't want to use the RFC5705 interface and not mix in the client and server random
-nonces, there is a low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
+For legacy applications which need to use a more flexible API, there is
+@funcref{gnutls_prf}, which in addition, allows to switch the mix of the
+client and server random nonces, using the @code{server_random_first} parameter.
+For additional flexibility and low-level access to the TLS1.2 PRF,
+there is a low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
+That however is not functional under newer protocol versions.
 
 @node Channel Bindings
 @subsection Channel bindings
