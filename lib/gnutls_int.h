@@ -1169,6 +1169,8 @@ typedef struct {
 #define HSK_FALSE_START_USED (1<<8) /* TLS1.2 only */
 #define HSK_HAVE_FFDHE (1<<9) /* whether the peer has advertized at least an FFDHE group */
 #define HSK_USED_FFDHE (1<<10) /* whether ffdhe was actually negotiated and used */
+	/* The hsk_flags are for use within the ongoing handshake;
+	 * they are reset to zero prior to handshake start by gnutls_handshake. */
 	unsigned hsk_flags;
 	time_t last_key_update;
 
