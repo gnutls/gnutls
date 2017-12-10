@@ -553,7 +553,12 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		pos += 2;
 
 		DECR_LEN(len, suite_size);
+		suite_ptr = &data[pos];
 		pos += suite_size;
+
+		ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 1);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
 		DECR_LEN(len, 1);
 		comp_size = data[pos++];	/* z is the number of compression methods */
@@ -653,6 +658,10 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		    max_record_send_size =
 		    session->security_parameters.max_record_send_size;
 
+		ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 1);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		ret = resume_copy_required_values(session);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -662,7 +671,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	/* select an appropriate cipher suite
 	 */
-	ret = _gnutls_server_select_suite(session, suite_ptr, suite_size);
+	ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -900,7 +909,7 @@ server_find_pk_algos_in_ciphersuites(const uint8_t *
  */
 int
 _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
-			    unsigned int datalen)
+			    unsigned int datalen, unsigned scsv_only)
 {
 	int ret;
 	unsigned int i, j, cipher_suites_size;
@@ -934,6 +943,9 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 			}
 		}
 	}
+
+	if (scsv_only)
+		return 0;
 
 	pk_algos_size = MAX_ALGOS;
 	ret =
