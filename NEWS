@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed issue which caused 1-byte handshake fragments to be refused.
    Reported by Balázs Kéri.
 
+** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
+   used. Resolves gitlab issue #259.
+
 ** p11tool: Mark all generated objects as sensitive by default.
 
 ** API and ABI modifications:
