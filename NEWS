@@ -11,6 +11,10 @@ See the end for copying conditions.
 ** libgnutls: Fixed interoperability issue with openssl when safe renegotiation was
    used. Resolves gitlab issue #259.
 
+** libgnutls: Use readdir() instead of readdir_r internally. The latter
+   is deprecated and on our use we don't need readdir() to be thread safe
+   (which it is in most common platforms).
+
 ** p11tool: Mark all generated objects as sensitive by default.
 
 ** API and ABI modifications:
