@@ -123,7 +123,7 @@ int append_status_request(void *_ctx, gnutls_buffer_st *buf)
 	gnutls_datum_t resp;
 	unsigned free_resp = 0;
 
-	assert(session->internals.selected_ocsp_func != NULL || ctx->cred->glob_ocsp_func != NULL ||
+	assert(session->internals.selected_ocsp_func != NULL ||
 	       session->internals.selected_ocsp_length != 0);
 
 	/* The global ocsp callback function can only be used to return
@@ -148,13 +148,6 @@ int append_status_request(void *_ctx, gnutls_buffer_st *buf)
 	} else if (session->internals.selected_ocsp_func) {
 		if (ctx->cert_index == 0) {
 			ret = session->internals.selected_ocsp_func(session, session->internals.selected_ocsp_func_ptr, &resp);
-			free_resp = 1;
-		} else {
-			return 0;
-		}
-	} else if (ctx->cred->glob_ocsp_func) {
-		if (ctx->cert_index == 0) {
-			ret = ctx->cred->glob_ocsp_func(session, ctx->cred->glob_ocsp_func_ptr, &resp);
 			free_resp = 1;
 		} else {
 			return 0;
@@ -261,8 +254,7 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 
 #ifdef ENABLE_OCSP
 			if ((session->internals.selected_ocsp_length > 0 ||
-			     session->internals.selected_ocsp_func ||
-			     cred->glob_ocsp_func) &&
+			     session->internals.selected_ocsp_func) &&
 			    _gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_STATUS_REQUEST)) {
 				/* append status response if available */
 				ret = _gnutls_extv_append_init(&buf);

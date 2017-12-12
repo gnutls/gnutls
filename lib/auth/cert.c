@@ -394,7 +394,7 @@ call_get_cert_callback(gnutls_session_t session,
 		selected_certs_set(session, pcert, pcert_length,
 				   ocsp, ocsp_length,
 				   local_key, flags&GNUTLS_CERT_RETR_DEINIT_ALL?1:0,
-				   NULL, NULL);
+				   cred->glob_ocsp_func, cred->glob_ocsp_func_ptr);
 
 		return 0;
 	} else {
@@ -1427,23 +1427,29 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	 */
  finished:
 	if (idx >= 0) {
-		if (cred->certs[idx].ocsp_func) {
-			selected_certs_set(session,
-					   &cred->certs[idx].cert_list[0],
-					   cred->certs[idx].cert_list_length,
-					   NULL, 0,
-					   cred->certs[idx].pkey, 0,
-					   cred->certs[idx].ocsp_func,
-					   cred->certs[idx].ocsp_func_ptr);
-		} else {
-			selected_certs_set(session,
-					   &cred->certs[idx].cert_list[0],
-					   cred->certs[idx].cert_list_length,
-					   &cred->certs[idx].ocsp_data[0],
-					   cred->certs[idx].ocsp_data_length,
-					   cred->certs[idx].pkey, 0,
-					   NULL, NULL);
+		gnutls_status_request_ocsp_func ocsp_func = NULL;
+		void *ocsp_ptr = NULL;
+		gnutls_ocsp_data_st *ocsp = NULL;
+		unsigned nocsp = 0;
+
+		if (cred->certs[idx].ocsp_data_length > 0) {
+			ocsp = &cred->certs[idx].ocsp_data[0];
+			nocsp = cred->certs[idx].ocsp_data_length;
+		} else if (cred->glob_ocsp_func != NULL) {
+			ocsp_func = cred->glob_ocsp_func;
+			ocsp_ptr = cred->glob_ocsp_func_ptr;
+		} else if (cred->certs[idx].ocsp_func != NULL) {
+			ocsp_func = cred->certs[idx].ocsp_func;
+			ocsp_ptr = cred->certs[idx].ocsp_func_ptr;
 		}
+
+		selected_certs_set(session,
+				   &cred->certs[idx].cert_list[0],
+				   cred->certs[idx].cert_list_length,
+				   ocsp, nocsp,
+				   cred->certs[idx].pkey, 0,
+				   ocsp_func,
+				   ocsp_ptr);
 	} else {
 		gnutls_assert();
 		/* Certificate does not support REQUESTED_ALGO.  */

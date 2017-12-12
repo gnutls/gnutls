@@ -192,9 +192,6 @@ server_send(gnutls_session_t session,
 	} else if (session->internals.selected_ocsp_func) {
 		func = session->internals.selected_ocsp_func;
 		func_ptr = session->internals.selected_ocsp_func_ptr;
-	} else if (cred->glob_ocsp_func) {
-		func = cred->glob_ocsp_func;
-		func_ptr = cred->glob_ocsp_func_ptr;
 	} else {
 		return 0;
 	}
