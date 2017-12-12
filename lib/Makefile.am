@@ -69,11 +69,11 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	mbuffers.c buffers.c handshake.c num.c errors.c dh.c kx.c	\
 	priority.c hash_int.c cipher_int.c session.c db.c x509_b64.c	\
 	hello_ext.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
-	pk.c cert.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
+	pk.c cert-cred.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
 	mem.c fingerprint.c tls-sig.c ecc.c alert.c privkey_raw.c atomic.h	\
 	system/certs.c system/threads.c system/fastopen.c system/sockets.c	\
 	system/inet_ntop.c str-iconv.c system/vasprintf.c vasprintf.h system.c \
-	str.c str-unicode.c str-idna.c state.c x509.c file.c supplemental.c	\
+	str.c str-unicode.c str-idna.c state.c cert-cred-x509.c file.c supplemental.c	\
 	random.c crypto-api.c crypto-api.h privkey.c pcert.c pubkey.c locks.c dtls.c \
 	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
 	safe-memfuncs.c system/inet_pton.c atfork.c atfork.h randomart.c \
