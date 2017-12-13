@@ -297,6 +297,11 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 
 	/* do not consider revocation data if response was not verified */
 	if (status != 0) {
+		char buf[MAX_OCSP_MSG_SIZE];
+
+		_gnutls_debug_log("OCSP rejection reason: %s\n",
+				  _gnutls_ocsp_verify_status_to_str(status, buf));
+
 		ret = gnutls_assert_val(0);
 		check_failed = 1;
 		*ostatus |= GNUTLS_CERT_INVALID_OCSP_STATUS;

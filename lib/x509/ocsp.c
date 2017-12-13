@@ -2596,3 +2596,61 @@ time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_t resp)
 		return ntime;
 	}
 }
+
+const char *_gnutls_ocsp_verify_status_to_str(gnutls_ocsp_verify_reason_t r, char out[MAX_OCSP_MSG_SIZE])
+{
+	gnutls_buffer_st str;
+	gnutls_datum_t buf;
+	int ret;
+
+	_gnutls_buffer_init(&str);
+
+	if (r == 0)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The OCSP response is trusted. "));
+
+	if (r & GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The OCSP response's signer could not be found. "));
+
+	if (r & GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("Error in the signer's key usageflags. "));
+
+	if (r & GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The OCSP response's signer is not trusted. "));
+
+	if (r & GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The OCSP response depends on insecure algorithms. "));
+
+	if (r & GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The OCSP response's signature cannot be validated. "));
+
+	if (r & GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The OCSP response's signer's certificate is not activated. "));
+
+	if (r & GNUTLS_OCSP_VERIFY_CERT_EXPIRED)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The OCSP response's signer's certificate is expired. "));
+
+	ret = _gnutls_buffer_to_datum(&str, &buf, 1);
+	if (ret < 0)
+		return _("Memory error");
+
+	snprintf(out, MAX_OCSP_MSG_SIZE, "%s", buf.data);
+	gnutls_free(buf.data);
+
+	return out;
+}

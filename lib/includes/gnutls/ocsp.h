@@ -114,6 +114,9 @@ typedef enum gnutls_x509_crl_reason_t {
 	GNUTLS_X509_CRLREASON_AACOMPROMISE = 10
 } gnutls_x509_crl_reason_t;
 
+/* When adding a verify failure reason update:
+ * _gnutls_ocsp_verify_status_to_str()
+ */
 /**
  * gnutls_ocsp_verify_reason_t:
  * @GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND: Signer cert not found.
