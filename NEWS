@@ -12,6 +12,8 @@ See the end for copying conditions.
    Introduced a multi-stage initialization which loads the trust modules, and
    other modules are deferred for the first pure PKCS#11 request.
 
+** libgnutls: Improved getrandom() detection in newer glibc versions.
+
 ** API and ABI modifications:
 No changes since last version.
 
