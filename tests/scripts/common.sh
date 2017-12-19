@@ -95,6 +95,18 @@ if test $? = 0;then
 fi
 }
 
+exit_if_non_padlock()
+{
+which lscpu >/dev/null 2>&1
+if test $? = 0;then
+        $(which lscpu)|grep Flags|grep phe
+        if test $? != 0;then
+                echo "non-Via padlock CPU detected"
+                exit 0
+        fi
+fi
+}
+
 wait_for_port()
 {
 	local ret
