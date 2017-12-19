@@ -251,12 +251,8 @@ static const int _cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_CHACHA20_POLY1305,
 	GNUTLS_CIPHER_AES_128_CCM,
 	GNUTLS_CIPHER_AES_256_CCM,
-	GNUTLS_CIPHER_CAMELLIA_128_GCM,
-	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_CAMELLIA_128_CBC,
-	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	0
 };
 
@@ -266,12 +262,8 @@ static const int _cipher_priority_performance_no_aesni[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_AES_128_CCM,
 	GNUTLS_CIPHER_AES_256_CCM,
-	GNUTLS_CIPHER_CAMELLIA_128_GCM,
-	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_CAMELLIA_128_CBC,
-	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	0
 };
 
@@ -282,19 +274,15 @@ static const int _cipher_priority_performance_no_aesni[] = {
  */
 static const int _cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
-	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_CHACHA20_POLY1305,
 	GNUTLS_CIPHER_AES_256_CCM,
 
 	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 
 	GNUTLS_CIPHER_AES_128_GCM,
-	GNUTLS_CIPHER_CAMELLIA_128_GCM,
 	GNUTLS_CIPHER_AES_128_CCM,
 
 	GNUTLS_CIPHER_AES_128_CBC,
-	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	0
 };
 
@@ -337,16 +325,12 @@ static const int* cipher_priority_suiteb192 = _cipher_priority_suiteb192;
 
 static const int _cipher_priority_secure128[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
-	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_CHACHA20_POLY1305,
 	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_AES_256_CCM,
 
 	GNUTLS_CIPHER_AES_128_GCM,
-	GNUTLS_CIPHER_CAMELLIA_128_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
-	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_AES_128_CCM,
 	0
 };
@@ -355,10 +339,8 @@ static const int *cipher_priority_secure128 = _cipher_priority_secure128;
 
 static const int _cipher_priority_secure192[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
-	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_CHACHA20_POLY1305,
 	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_AES_256_CCM,
 	0
 };
@@ -366,14 +348,19 @@ static const int* cipher_priority_secure192 = _cipher_priority_secure192;
 
 static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_RSA_SHA256,
+	GNUTLS_SIGN_RSA_PSS_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SECP256R1_SHA256,
 
+	GNUTLS_SIGN_EDDSA_ED25519,
+
 	GNUTLS_SIGN_RSA_SHA384,
+	GNUTLS_SIGN_RSA_PSS_SHA384,
 	GNUTLS_SIGN_ECDSA_SHA384,
 	GNUTLS_SIGN_ECDSA_SECP384R1_SHA384,
 
 	GNUTLS_SIGN_RSA_SHA512,
+	GNUTLS_SIGN_RSA_PSS_SHA512,
 
 	GNUTLS_SIGN_ECDSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SECP521R1_SHA512,
@@ -381,12 +368,6 @@ static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_RSA_SHA1,
 	GNUTLS_SIGN_ECDSA_SHA1,
 
-	/* added on the final position for compatibility purposes */
-	GNUTLS_SIGN_RSA_PSS_SHA256,
-	GNUTLS_SIGN_RSA_PSS_SHA384,
-	GNUTLS_SIGN_RSA_PSS_SHA512,
-
-	GNUTLS_SIGN_EDDSA_ED25519,
 	0
 };
 static const int* sign_priority_default = _sign_priority_default;
@@ -409,36 +390,35 @@ static const int* sign_priority_suiteb192 = _sign_priority_suiteb192;
 
 static const int _sign_priority_secure128[] = {
 	GNUTLS_SIGN_RSA_SHA256,
+	GNUTLS_SIGN_RSA_PSS_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SECP256R1_SHA256,
+	GNUTLS_SIGN_EDDSA_ED25519,
+
 	GNUTLS_SIGN_RSA_SHA384,
+	GNUTLS_SIGN_RSA_PSS_SHA384,
 	GNUTLS_SIGN_ECDSA_SHA384,
 	GNUTLS_SIGN_ECDSA_SECP384R1_SHA384,
+
 	GNUTLS_SIGN_RSA_SHA512,
+	GNUTLS_SIGN_RSA_PSS_SHA512,
 	GNUTLS_SIGN_ECDSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SECP521R1_SHA512,
 
-	/* added on the final position for compatibility purposes */
-	GNUTLS_SIGN_RSA_PSS_SHA256,
-	GNUTLS_SIGN_RSA_PSS_SHA384,
-	GNUTLS_SIGN_RSA_PSS_SHA512,
-
-	GNUTLS_SIGN_EDDSA_ED25519,
 	0
 };
 static const int* sign_priority_secure128 = _sign_priority_secure128;
 
 static const int _sign_priority_secure192[] = {
 	GNUTLS_SIGN_RSA_SHA384,
+	GNUTLS_SIGN_RSA_PSS_SHA384,
 	GNUTLS_SIGN_ECDSA_SHA384,
 	GNUTLS_SIGN_ECDSA_SECP384R1_SHA384,
 	GNUTLS_SIGN_RSA_SHA512,
+	GNUTLS_SIGN_RSA_PSS_SHA512,
 	GNUTLS_SIGN_ECDSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SECP521R1_SHA512,
 
-	/* added on the final position for compatibility purposes */
-	GNUTLS_SIGN_RSA_PSS_SHA384,
-	GNUTLS_SIGN_RSA_PSS_SHA512,
 	0
 };
 static const int* sign_priority_secure192 = _sign_priority_secure192;
@@ -446,7 +426,6 @@ static const int* sign_priority_secure192 = _sign_priority_secure192;
 static const int mac_priority_normal_default[] = {
 	GNUTLS_MAC_SHA1,
 	GNUTLS_MAC_SHA256,
-	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
 	0
 };
@@ -454,7 +433,6 @@ static const int mac_priority_normal_default[] = {
 static const int mac_priority_normal_fips[] = {
 	GNUTLS_MAC_SHA1,
 	GNUTLS_MAC_SHA256,
-	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
 	0
 };
@@ -489,7 +467,6 @@ static const int* mac_priority_suiteb = _mac_priority_suiteb;
 static const int _mac_priority_secure128[] = {
 	GNUTLS_MAC_SHA1,
 	GNUTLS_MAC_SHA256,
-	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
 	0
 };
@@ -497,7 +474,6 @@ static const int* mac_priority_secure128 = _mac_priority_secure128;
 
 static const int _mac_priority_secure192[] = {
 	GNUTLS_MAC_SHA256,
-	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
 	0
 };
