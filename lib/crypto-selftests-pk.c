@@ -733,8 +733,8 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			return 0;
 
 		FALLTHROUGH;
-	case GNUTLS_PK_EC:	/* Testing ECDSA */
-		/* Test ECDH */
+	case GNUTLS_PK_EC:
+		/* Test ECDH and ECDSA */
 #ifndef AVOID_INTERNALS
 		ret = test_ecdh();
 		if (ret < 0) {
@@ -742,11 +742,38 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			goto cleanup;
 		}
 
+#endif
+		/* Test ECDSA */
+		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
+			      GNUTLS_CURVE_TO_BITS
+			      (GNUTLS_ECC_CURVE_SECP256R1),
+			      GNUTLS_DIG_SHA256, ecdsa_secp256r1_privkey,
+			      ecdsa_secp256r1_sig);
+		PK_TEST(GNUTLS_PK_EC, test_sig,
+			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
+			GNUTLS_DIG_SHA256);
+
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
-#endif
 
-		/* Test ECDSA */
+		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
+			      GNUTLS_CURVE_TO_BITS
+			      (GNUTLS_ECC_CURVE_SECP384R1),
+			      GNUTLS_DIG_SHA256, ecdsa_secp384r1_privkey,
+			      ecdsa_secp384r1_sig);
+		PK_TEST(GNUTLS_PK_EC, test_sig,
+			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1),
+			GNUTLS_DIG_SHA384);
+
+		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
+			      GNUTLS_CURVE_TO_BITS
+			      (GNUTLS_ECC_CURVE_SECP521R1),
+			      GNUTLS_DIG_SHA512, ecdsa_secp521r1_privkey,
+			      ecdsa_secp521r1_sig);
+		PK_TEST(GNUTLS_PK_EC, test_sig,
+			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP521R1),
+			GNUTLS_DIG_SHA512);
+
 #ifdef ENABLE_NON_SUITEB_CURVES
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
@@ -766,32 +793,6 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1),
 			GNUTLS_DIG_SHA256);
 #endif
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP256R1),
-			      GNUTLS_DIG_SHA256, ecdsa_secp256r1_privkey,
-			      ecdsa_secp256r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
-			GNUTLS_DIG_SHA256);
-
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP384R1),
-			      GNUTLS_DIG_SHA256, ecdsa_secp384r1_privkey,
-			      ecdsa_secp384r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1),
-			GNUTLS_DIG_SHA384);
-
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP521R1),
-			      GNUTLS_DIG_SHA512, ecdsa_secp521r1_privkey,
-			      ecdsa_secp521r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP521R1),
-			GNUTLS_DIG_SHA512);
 
 		break;
 	default:
