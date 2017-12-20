@@ -73,4 +73,33 @@ void _gnutls_switch_lib_state(gnutls_lib_state_t state);
 void _gnutls_lib_simulate_error(void);
 void _gnutls_lib_force_operational(void);
 
+#ifdef ENABLE_FIPS140
+inline
+static unsigned is_mac_algo_forbidden(gnutls_mac_algorithm_t algo)
+{
+	if (_gnutls_fips_mode_enabled() != 0 &&
+	    _gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
+
+		switch(algo) {
+			case GNUTLS_MAC_SHA1:
+			case GNUTLS_MAC_SHA256:
+			case GNUTLS_MAC_SHA384:
+			case GNUTLS_MAC_SHA512:
+			case GNUTLS_MAC_SHA224:
+			case GNUTLS_MAC_SHA3_224:
+			case GNUTLS_MAC_SHA3_256:
+			case GNUTLS_MAC_SHA3_384:
+			case GNUTLS_MAC_SHA3_512:
+				return 0;
+			default:
+				return 1;
+		}
+	}
+
+	return 0;
+}
+#else
+# define is_mac_algo_forbidden(x) 0
+#endif
+
 #endif /* FIPS_H */

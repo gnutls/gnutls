@@ -32,7 +32,6 @@
 #include <nettle/sha3.h>
 #include <nettle/hmac.h>
 #include <nettle/umac.h>
-#include <fips.h>
 
 typedef void (*update_func) (void *, size_t, const uint8_t *);
 typedef void (*digest_func) (void *, size_t, uint8_t *);
@@ -109,6 +108,9 @@ _wrap_umac128_set_key(void *ctx, size_t len, const uint8_t * key)
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 			 struct nettle_mac_ctx *ctx)
 {
+	/* Any FIPS140-2 related enforcement is performed on
+	 * gnutls_hash_init() and gnutls_hmac_init() */
+
 	ctx->set_nonce = NULL;
 	switch (algo) {
 	case GNUTLS_MAC_MD5:
@@ -154,9 +156,6 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
 	case GNUTLS_MAC_UMAC_96:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	
 		ctx->update = (update_func) umac96_update;
 		ctx->digest = (digest_func) umac96_digest;
 		ctx->set_key = _wrap_umac96_set_key;
@@ -165,9 +164,6 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->length = 12;
 		break;
 	case GNUTLS_MAC_UMAC_128:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		ctx->update = (update_func) umac128_update;
 		ctx->digest = (digest_func) umac128_digest;
 		ctx->set_key = _wrap_umac128_set_key;
@@ -216,14 +212,9 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_SHA256:
 	case GNUTLS_MAC_SHA384:
 	case GNUTLS_MAC_SHA512:
-		return 1;
-
 	case GNUTLS_MAC_UMAC_96:
 	case GNUTLS_MAC_UMAC_128:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return 0;
-		else
-			return 1;
+		return 1;
 	default:
 		return 0;
 	}
@@ -348,10 +339,7 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 		return 0;
 #endif
 	case GNUTLS_DIG_MD2:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return 0;
-		else
-			return 1;
+		return 1;
 	default:
 		return 0;
 	}
@@ -380,6 +368,8 @@ static void _md5_sha1_digest(void *_ctx, size_t len, uint8_t *digest)
 static int _ctx_init(gnutls_digest_algorithm_t algo,
 		     struct nettle_hash_ctx *ctx)
 {
+	/* Any FIPS140-2 related enforcement is performed on
+	 * gnutls_hash_init() and gnutls_hmac_init() */
 	switch (algo) {
 	case GNUTLS_DIG_MD5:
 		md5_init(&ctx->ctx.md5);
@@ -462,9 +452,6 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		break;
 #endif
 	case GNUTLS_DIG_MD2:
-		if (_gnutls_fips_mode_enabled() != 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		md2_init(&ctx->ctx.md2);
 		ctx->update = (update_func) md2_update;
 		ctx->digest = (digest_func) md2_digest;

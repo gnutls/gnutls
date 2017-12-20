@@ -299,6 +299,7 @@ void gnutls_cipher_deinit(gnutls_cipher_hd_t handle)
 
 /* HMAC */
 
+
 /**
  * gnutls_hmac_init:
  * @dig: is a #gnutls_hmac_hd_t type
@@ -323,15 +324,9 @@ gnutls_hmac_init(gnutls_hmac_hd_t * dig,
 		 gnutls_mac_algorithm_t algorithm,
 		 const void *key, size_t keylen)
 {
-#ifdef ENABLE_FIPS140
 	/* MD5 is only allowed internally for TLS */
-	if (_gnutls_fips_mode_enabled() != 0 &&
-		_gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
-
-		if (algorithm == GNUTLS_MAC_MD5)
-			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-	}
-#endif
+	if (is_mac_algo_forbidden(algorithm))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	*dig = gnutls_malloc(sizeof(mac_hd_st));
 	if (*dig == NULL) {
@@ -446,6 +441,9 @@ gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 		 const void *key, size_t keylen,
 		 const void *ptext, size_t ptext_len, void *digest)
 {
+	if (is_mac_algo_forbidden(algorithm))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
 	return _gnutls_mac_fast(algorithm, key, keylen, ptext, ptext_len,
 				digest);
 }
@@ -470,15 +468,8 @@ int
 gnutls_hash_init(gnutls_hash_hd_t * dig,
 		 gnutls_digest_algorithm_t algorithm)
 {
-#ifdef ENABLE_FIPS140
-	/* MD5 is only allowed internally for TLS */
-	if (_gnutls_fips_mode_enabled() != 0 &&
-		_gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
-
-		if (algorithm == GNUTLS_DIG_MD5)
-			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
-	}
-#endif
+	if (is_mac_algo_forbidden(algorithm))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	*dig = gnutls_malloc(sizeof(digest_hd_st));
 	if (*dig == NULL) {
@@ -573,6 +564,9 @@ int
 gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		 const void *ptext, size_t ptext_len, void *digest)
 {
+	if (is_mac_algo_forbidden(algorithm))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
 	return _gnutls_hash_fast(algorithm, ptext, ptext_len, digest);
 }
 
