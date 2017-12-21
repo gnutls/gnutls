@@ -28,10 +28,6 @@
 #include <gnutls/crypto.h>
 #include "utils.h"
 
-#include "../lib/gnutls_int.h"
-#include "../lib/hash_int.h"
-#include "../lib/debug.h"
-
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
@@ -42,7 +38,6 @@ void doit(void)
 	unsigned char digest[20];
 	int err;
 
-	/* XXX: We need this to fix secure memory. */
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
