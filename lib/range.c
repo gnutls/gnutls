@@ -94,10 +94,10 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
  * @session: is a #gnutls_session_t type.
  *
  * If the session supports length-hiding padding, you can
- * invoke gnutls_range_send_message() to send a message whose
+ * invoke gnutls_record_send_range() to send a message whose
  * length is hidden in the given range. If the session does not
  * support length hiding padding, you can use the standard
- * gnutls_record_send() function, or gnutls_range_send_message()
+ * gnutls_record_send() function, or gnutls_record_send_range()
  * making sure that the range is the same as the length of the
  * message you are trying to send.
  *

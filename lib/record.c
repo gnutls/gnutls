@@ -76,8 +76,8 @@ struct tls_record_st {
  * complain if a server pads the encrypted data.  This of course will
  * disable protection against statistical attacks on the data.
  *
- * This functions is defunt since 3.1.7. Random padding is disabled
- * by default unless requested using gnutls_range_send_message().
+ * This function is defunct since 3.1.7. Random padding is disabled
+ * by default unless requested using gnutls_record_send_range().
  *
  **/
 void gnutls_record_disable_padding(gnutls_session_t session)
