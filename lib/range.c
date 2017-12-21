@@ -50,6 +50,10 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 	ssize_t this_pad;
 	ssize_t block_size;
 	ssize_t tag_size, overflow;
+	const version_entry_st *vers = get_version(session);
+
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	ret =
 	    _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT,
@@ -58,11 +62,16 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (record_params->write.is_aead) /* not yet ready */
+	if (!vers->tls13_sem && record_params->write.is_aead) /* not yet ready */
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	max_pad = MAX_PAD_SIZE;
-	fixed_pad = 1;
+	if (vers->tls13_sem) {
+		max_pad = max_user_send_size(session, record_params);
+		fixed_pad = 2;
+	} else {
+		max_pad = MAX_PAD_SIZE;
+		fixed_pad = 1;
+	}
 
 	this_pad = MIN(max_pad, max_frag - data_length);
 
@@ -108,9 +117,16 @@ int gnutls_record_can_use_length_hiding(gnutls_session_t session)
 {
 	int ret;
 	record_parameters_st *record_params;
+	const version_entry_st *vers = get_version(session);
+
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	if (vers->tls13_sem)
+		return 1;
 
 #ifdef ENABLE_SSL3
-	if (get_num_version(session) == GNUTLS_SSL3)
+	if (vers->id == GNUTLS_SSL3)
 		return 0;
 #endif
 
