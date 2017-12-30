@@ -339,6 +339,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
 	sni-resume.sh
 
+dist_check_SCRIPTS += gnutls-cli-self-signed.sh
 
 if ENABLE_PKCS11
 dist_check_SCRIPTS += p11-kit-trust.sh
