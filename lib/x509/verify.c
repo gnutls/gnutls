@@ -383,11 +383,13 @@ unsigned _gnutls_is_broken_sig_allowed(gnutls_sign_algorithm_t sig, unsigned int
 			_gnutls_debug_log(#level": certificate's security level is unacceptable\n"); \
 			return gnutls_assert_val(0); \
 		} \
-		sp = gnutls_pk_bits_to_sec_param(issuer_pkalg, issuer_bits); \
-		if (sp < level) { \
-			_gnutls_cert_log("issuer", issuer); \
-			_gnutls_debug_log(#level": certificate's issuer security level is unacceptable\n"); \
-			return gnutls_assert_val(0); \
+		if (issuer) { \
+			sp = gnutls_pk_bits_to_sec_param(issuer_pkalg, issuer_bits); \
+			if (sp < level) { \
+				_gnutls_cert_log("issuer", issuer); \
+				_gnutls_debug_log(#level": certificate's issuer security level is unacceptable\n"); \
+				return gnutls_assert_val(0); \
+			} \
 		} \
 		break;
 
