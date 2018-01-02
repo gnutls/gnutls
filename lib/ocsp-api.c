@@ -417,8 +417,6 @@ gnutls_certificate_set_ocsp_status_request_file2(gnutls_certificate_credentials_
  * in the chain, the code %GNUTLS_E_OCSP_MISMATCH_WITH_CERTS is returned.
  * If the response is already expired at the time of loading the code
  * %GNUTLS_E_EXPIRED is returned.
- * If the response is already expired at the time of loading the code
- * %GNUTLS_E_EXPIRED is returned.
  *
  * Returns: On success, the number of loaded responses is returned,
  *   otherwise a negative error code.

@@ -2419,12 +2419,12 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
  * @ocsps: Will hold the parsed OCSP response list.
  * @size: It will contain the size of the list.
  * @resp_data: The PEM encoded OCSP list.
- * @format: Must be PEM.
+ * @format: One of %GNUTLS_X509_FMT_PEM or %GNUTLS_X509_FMT_DER
  * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
  *
  * This function will convert the given PEM encoded OCSP response list
  * to the native gnutls_ocsp_resp_t format. The output will be stored
- * in @ocsps which will allocated and initialized.
+ * in @ocsps which will be allocated and initialized.
  *
  * The OCSP responses should have a header of "OCSP RESPONSE".
  *
