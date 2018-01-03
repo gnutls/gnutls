@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2018 Free Software Foundation, Inc.
  *
- * Author: Nikos Mavrogiannopoulos
+ * Author: Nikos Mavrogiannopoulos, Daiki Ueno
  *
  * This file is part of GnuTLS.
  *
@@ -15,9 +15,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 #ifdef HAVE_CONFIG_H
@@ -324,6 +323,7 @@ static void start(const char *prio)
 }
 
 #define AES_CBC "NONE:+VERS-TLS1.2:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_GCM "NONE:+VERS-TLS1.3:+AES-256-GCM:+AEAD:+SIGN-ALL:+GROUP-ALL"
 
 static void ch_handler(int sig)
 {
@@ -338,6 +338,7 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 
 	start(AES_CBC);
+	start(AES_GCM);
 }
 
 #endif				/* _WIN32 */
