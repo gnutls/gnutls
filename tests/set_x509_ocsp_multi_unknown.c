@@ -114,9 +114,9 @@ void doit(void)
 
 	gnutls_certificate_set_flags(xcred, GNUTLS_CERTIFICATE_API_V2);
 
+	/* set cert with localhost name */
 	certfile1 = get_tmpname(certname1);
 
-	/* set cert with localhost name */
 	fp = fopen(certfile1, "wb");
 	if (fp == NULL)
 		fail("error in fopen\n");

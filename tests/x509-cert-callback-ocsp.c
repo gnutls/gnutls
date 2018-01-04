@@ -206,7 +206,7 @@ static void start(const char *prio)
 
 	ret = gnutls_ocsp_status_request_get2(client, 2, &response);
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-		fail("found response in index 1: %s\n", gnutls_strerror(ret));
+		fail("found response in index 2: %s\n", gnutls_strerror(ret));
 	}
 
 	gnutls_bye(client, GNUTLS_SHUT_WR);

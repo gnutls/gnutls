@@ -36,7 +36,9 @@
 #include "utils.h"
 
 /* Tests whether we can send and receive multiple OCSP responses
- * one for each certificate in a chain under TLS 1.3.
+ * one for each certificate in a chain under TLS 1.3, but unrelated
+ * to these certificate (using the GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK
+ * flag).
  */
 
 static time_t mytime(time_t * t)
