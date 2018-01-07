@@ -14,6 +14,11 @@ See the end for copying conditions.
 
 ** libgnutls: Improved getrandom() detection in newer glibc versions.
 
+** libgnutls: When verifying against a self signed certificate ignore issuer.
+   That is, ignore issuer when checking the issuer's parameters strength, resolving
+   issue #347 which caused self signed certificates to be additionally marked as of
+   insufficient security level.
+
 ** API and ABI modifications:
 No changes since last version.
 
