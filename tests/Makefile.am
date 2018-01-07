@@ -310,6 +310,9 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
+
+dist_check_SCRIPTS += gnutls-cli-self-signed.sh
+
 endif
 
 TESTS = $(ctests) $(dist_check_SCRIPTS)
