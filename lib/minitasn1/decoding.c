@@ -45,6 +45,13 @@
 
 #define DECODE_FLAG_HAVE_TAG 1
 #define DECODE_FLAG_INDEFINITE (1<<1)
+/* On indefinite string decoding, allow this maximum levels
+ * of recursion. Allowing infinite recursion, makes the BER
+ * decoder susceptible to stack exhaustion due to that recursion.
+ */
+#define DECODE_FLAG_LEVEL1 (1<<2)
+#define DECODE_FLAG_LEVEL2 (1<<3)
+#define DECODE_FLAG_LEVEL3 (1<<4)
 
 #define DECR_LEN(l, s) do { \
 	  l -= s; \
@@ -2216,7 +2223,8 @@ _asn1_decode_simple_ber (unsigned int etype, const unsigned char *der,
     }
 
   /* indefinite constructed */
-  if (((dflags & DECODE_FLAG_INDEFINITE) || class == ASN1_CLASS_STRUCTURED) && ETYPE_IS_STRING(etype))
+  if ((((dflags & DECODE_FLAG_INDEFINITE) || class == ASN1_CLASS_STRUCTURED) && ETYPE_IS_STRING(etype)) &&
+      !(dflags & DECODE_FLAG_LEVEL3))
     {
       len_len = 1;
 
@@ -2236,8 +2244,17 @@ _asn1_decode_simple_ber (unsigned int etype, const unsigned char *der,
       do
         {
           unsigned tmp_len;
+          unsigned flags = DECODE_FLAG_HAVE_TAG;
 
-          result = asn1_decode_simple_ber(etype, p, der_len, &out, &out_len, &tmp_len);
+          if (dflags & DECODE_FLAG_LEVEL1)
+                flags |= DECODE_FLAG_LEVEL2;
+          else if (dflags & DECODE_FLAG_LEVEL2)
+		flags |= DECODE_FLAG_LEVEL3;
+	  else
+		flags |= DECODE_FLAG_LEVEL1;
+
+          result = _asn1_decode_simple_ber(etype, p, der_len, &out, &out_len, &tmp_len,
+                                           flags);
           if (result != ASN1_SUCCESS)
             {
               warn();
