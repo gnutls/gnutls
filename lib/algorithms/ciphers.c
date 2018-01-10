@@ -224,7 +224,7 @@ static const cipher_entry_st algorithms[] = {
 
 /* CIPHER functions */
 
-const cipher_entry_st *cipher_to_entry(gnutls_cipher_algorithm_t c)
+const cipher_entry_st *_gnutls_cipher_to_entry(gnutls_cipher_algorithm_t c)
 {
 	GNUTLS_CIPHER_LOOP(if (c == p->id) return p);
 

@@ -189,7 +189,8 @@ _gnutls_cipher_suite_get_id(gnutls_kx_algorithm_t kx_algorithm,
 const gnutls_cipher_suite_entry_st *ciphersuite_to_entry(const uint8_t suite[2]);
 
 /* Functions for ciphers. */
-const cipher_entry_st *cipher_to_entry(gnutls_cipher_algorithm_t c);
+const cipher_entry_st *_gnutls_cipher_to_entry(gnutls_cipher_algorithm_t c);
+#define cipher_to_entry(x) _gnutls_cipher_to_entry(x)
 const cipher_entry_st *cipher_name_to_entry(const char *name);
 
 inline static cipher_type_t _gnutls_cipher_type(const cipher_entry_st * e)

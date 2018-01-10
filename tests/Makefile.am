@@ -169,8 +169,9 @@ endif
 if HAVE_CMOCKA
 CMOCKA_LDADD = $(COMMON_LDADD) $(CMOCKA_LIBS)
 ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna \
-	tls10-prf tls12-prf
+	tls10-prf tls12-prf gnutls_record_overhead
 
+gnutls_record_overhead_LDADD = $(CMOCKA_LDADD)
 dtls_sliding_window_LDADD = $(CMOCKA_LDADD)
 ip_utils_LDADD = $(CMOCKA_LDADD)
 name_constraints_ip_LDADD = $(CMOCKA_LDADD)
@@ -179,6 +180,11 @@ str_unicode_LDADD = $(CMOCKA_LDADD)
 str_idna_LDADD = $(CMOCKA_LDADD)
 tls10_prf_LDADD = $(CMOCKA_LDADD)
 tls12_prf_LDADD = $(CMOCKA_LDADD)
+
+gnutls_record_overhead_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
 
 endif
 

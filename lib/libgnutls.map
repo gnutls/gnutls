@@ -1249,7 +1249,10 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_mpi_ops;
 	_gnutls_mpi_log;
 	_gnutls_mpi_release;
+
 	# Internal symbols needed by tests/:
+	_gnutls_record_overhead;
+	_gnutls_cipher_to_entry;
 	_gnutls_pkcs11_token_get_url;
 	_gnutls_pkcs12_string_to_key;
 	_gnutls_bin2hex;
