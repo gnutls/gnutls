@@ -141,6 +141,21 @@ static void dtls_mtu_try(const char *name, const char *client_prio,
 			assert(msg[i]==1);
 	}
 
+	gnutls_dtls_set_data_mtu(client, link_mtu);
+	dmtu = gnutls_dtls_get_data_mtu(client);
+	if (dmtu != link_mtu) {
+		if (gnutls_mac_get(client) == GNUTLS_MAC_AEAD)
+			fail("%s: got MTU (%d) which does not match expected (%d)\n", name, dmtu, link_mtu);
+		else if (dmtu < link_mtu)
+			fail("%s: got MTU (%d) smaller than expected (%d)\n", name, dmtu, link_mtu);
+	}
+
+	gnutls_dtls_set_mtu(client, link_mtu);
+	dmtu = gnutls_dtls_get_mtu(client);
+	if (dmtu != link_mtu) {
+		fail("%s: got MTU (%d) which does not match expected (%d)\n", name, dmtu, link_mtu);
+	}
+
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);
 
@@ -175,6 +190,16 @@ void doit(void)
 	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1515", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1515, 1451);
 	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1516", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1516, 1451);
 	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1517", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1517, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1518", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1518, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1519", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1519, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1520", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1520, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1521", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1521, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1522", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1522, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1523", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1523, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1524", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1524, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1525", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1525, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1526", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1526, 1467);
+	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA1 - mtu:1536", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA1", 1536, 1483);
 
 	dtls_mtu_try("DTLS 1.2 with AES-128-CBC-HMAC-SHA256", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+AES-128-CBC:-MAC-ALL:+SHA256", 1500, 1423);
 	dtls_mtu_try("DTLS 1.2 with 3DES-CBC-HMAC-SHA1", "NORMAL:%NO_ETM:-VERS-ALL:+VERS-DTLS1.2:-CIPHER-ALL:+3DES-CBC:-MAC-ALL:+SHA1", 1500, 1451);
