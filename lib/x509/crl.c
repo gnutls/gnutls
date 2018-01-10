@@ -1376,10 +1376,13 @@ gnutls_x509_crl_list_import(gnutls_x509_crl_t * crls,
 		if (count >= *crl_max) {
 			if (!
 			    (flags &
-			     GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED))
+			     GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED)) {
 				break;
-			else
+			} else if (nocopy == 0) {
+				for (j = 0; j < count; j++)
+					gnutls_x509_crl_deinit(crls[j]);
 				nocopy = 1;
+			}
 		}
 
 		if (!nocopy) {
@@ -1392,7 +1395,6 @@ gnutls_x509_crl_list_import(gnutls_x509_crl_t * crls,
 			tmp.data = (void *) ptr;
 			tmp.size =
 			    data->size - (ptr - (char *) data->data);
-
 			ret =
 			    gnutls_x509_crl_import(crls[count], &tmp,
 						   GNUTLS_X509_FMT_PEM);
