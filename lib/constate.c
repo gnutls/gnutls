@@ -310,7 +310,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	session->internals.max_recv_size = _gnutls_record_overhead(params->cipher, params->mac, params->etm, 0);
+	session->internals.max_recv_size = _gnutls_record_overhead(params->cipher, params->mac, 1);
 	session->internals.max_recv_size += session->security_parameters.max_record_recv_size + RECORD_HEADER_SIZE(session);
 	if (session->internals.allow_large_records != 0)
 		session->internals.max_recv_size += EXTRA_COMP_SIZE;
