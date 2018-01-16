@@ -113,7 +113,7 @@ AC_MSG_ERROR([[
       included_libtasn1=$withval,
       included_libtasn1=no)
   if test "$included_libtasn1" = "no"; then
-    PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= 3.9], [], [included_libtasn1=yes])
+    PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= 4.0], [], [included_libtasn1=yes])
     if test "$included_libtasn1" = yes; then
       AC_MSG_WARN([[
   *** 
