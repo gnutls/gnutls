@@ -19,6 +19,11 @@ See the end for copying conditions.
    issue #347 which caused self signed certificates to be additionally marked as of
    insufficient security level.
 
+** libgnutls: Corrected MTU calculation for the CBC ciphersuites. The data
+   MTU calculation now, it correctly accounts for the fixed overhead due to
+   padding (as 1 byte), while at the same time considers the rest of the
+   padding as part of data MTU.
+
 ** API and ABI modifications:
 No changes since last version.
 
