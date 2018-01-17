@@ -7,11 +7,6 @@ See the end for copying conditions.
 
 * Version 3.6.2 (unreleased)
 
-** libgnutls: The SRP authentication will reject any parameters outside
-   RFC5054. This protects any client from potential MitM due to insecure
-   parameters. That also brings SRP in par with the RFC7919 changes to
-   Diffie-Hellman.
-
 ** libgnutls: When verifying against a self signed certificate ignore issuer.
    That is, ignore issuer when checking the issuer's parameters strength, resolving
    issue #347 which caused self signed certificates to be additionally marked as of
@@ -21,6 +16,21 @@ See the end for copying conditions.
    MTU calculation now, it correctly accounts for the fixed overhead due to
    padding (as 1 byte), while at the same time considers the rest of the
    padding as part of data MTU.
+
+** libgnutls: Address issue of loading of all PKCS#11 modules on startup
+   on systems with a PKCS#11 trust store (as opposed to a file trust store).
+   Introduced a multi-stage initialization which loads the trust modules, and
+   other modules are deferred for the first pure PKCS#11 request.
+
+** libgnutls: The SRP authentication will reject any parameters outside
+   RFC5054. This protects any client from potential MitM due to insecure
+   parameters. That also brings SRP in par with the RFC7919 changes to
+   Diffie-Hellman.
+
+** libgnutls: Added the 8192-bit parameters of SRP to the accepted parameters
+   for SRP authentication.
+
+** srptool: the --create-conf option no longer includes 1024-bit parameters.
 
 ** API and ABI modifications:
 No changes since last version.
