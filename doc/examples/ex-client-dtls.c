@@ -21,7 +21,6 @@
 #define CHECK(x) assert((x)>=0)
 
 #define MAX_BUF 1024
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 extern int udp_connect(void);
@@ -46,9 +45,8 @@ int main(void)
         /* X509 stuff */
         CHECK(gnutls_certificate_allocate_credentials(&xcred));
 
-        /* sets the trusted cas file */
-        CHECK(gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                                     GNUTLS_X509_FMT_PEM));
+        /* sets the system trusted CAs for Internet PKI */
+        CHECK(gnutls_certificate_set_x509_system_trust(xcred));
 
         /* Initialize TLS session */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM));
