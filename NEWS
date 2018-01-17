@@ -15,6 +15,10 @@ See the end for copying conditions.
    is deprecated and on our use we don't need readdir() to be thread safe
    (which it is in most common platforms).
 
+** libgnutls: require strict DER encoding for certificates, OCSP requests, private
+   keys, CRLs and certificate requests.  This backports the already default behavior
+   from the 3.5.x branch, in order to reduce issues due to the complexity of BER rules.
+
 ** p11tool: Fixed issue preventing the deletion of objects in batch mode.
 
 ** p11tool: Mark all generated objects as sensitive by default.
