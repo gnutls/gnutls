@@ -65,6 +65,8 @@ pkcs11_delete(FILE * outfile, const char *url,
 
 	if (login_flags) obj_flags = login_flags;
 
+	pkcs11_common(info);
+
 	if (info->batch == 0) {
 		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login_flags,
 			    GNUTLS_PKCS11_URL_LIB, info);
