@@ -174,6 +174,23 @@ write_serv_cert () {
 
 # $1: token
 # $2: PIN
+test_delete_cert () {
+	export GNUTLS_PIN="$2"
+	filename="$3"
+	token="$1"
+
+	echo -n "* Deleting the server certificate... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --delete "${token};object=serv-cert;object-type=cert" >>"${TMPFILE}" 2>&1
+	if test $? = 0; then
+		echo ok
+	else
+		echo failed
+		exit_error
+	fi
+}
+
+# $1: token
+# $2: PIN
 # $3: bits
 generate_rsa_privkey () {
 	export GNUTLS_PIN="$2"
@@ -905,6 +922,8 @@ use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert" "${T
 write_certificate_id_test_rsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
 write_certificate_id_test_rsa2 "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
 write_certificate_id_test_ecdsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
+
+test_delete_cert "${TOKEN}" "${GNUTLS_PIN}"
 
 test_sign_set_pin "${TOKEN}" "${GNUTLS_PIN}"
 
