@@ -32,6 +32,8 @@ See the end for copying conditions.
 
 ** srptool: the --create-conf option no longer includes 1024-bit parameters.
 
+** p11tool: Fixed the deletion of objects in batch mode.
+
 ** API and ABI modifications:
 No changes since last version.
 
