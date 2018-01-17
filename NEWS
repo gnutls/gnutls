@@ -22,7 +22,7 @@ See the end for copying conditions.
 ** libgnutls: Corrected MTU calculation for the CBC ciphersuites. The data
    MTU calculation now, it correctly accounts for the fixed overhead due to
    padding (as 1 byte), while at the same time considers the rest of the
-   padding as part of data MTU.
+   padding as part of data MTU. Resolves issue #360.
 
 ** API and ABI modifications:
 No changes since last version.
