@@ -1196,9 +1196,13 @@ GNUTLS_3_6_2
  global:
 	gnutls_srp_8192_group_generator;
 	gnutls_srp_8192_group_prime;
- local:
-	*;
 } GNUTLS_3_6_0;
+
+GNUTLS_3_6_3
+{
+ global:
+	gnutls_fips140_set_mode;
+} GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {
 	gnutls_cipher_self_test;

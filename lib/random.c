@@ -29,13 +29,7 @@
 #include "locks.h"
 #include <fips.h>
 
-#ifdef HAVE_THREADS_H
-# include <threads.h>
-#elif defined(__GNUC__)
-# define _Thread_local __thread
-#else
-# error Unsupported platform
-#endif
+#include "gthreads.h"
 
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 extern gnutls_crypto_rnd_st _gnutls_fuzz_rnd_ops;

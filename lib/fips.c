@@ -30,7 +30,9 @@
 #include <extras/hex.h>
 #include <random.h>
 
-unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
+#include "gthreads.h"
+
+unsigned int _gnutls_lib_state = LIB_STATE_POWERON;
 #ifdef ENABLE_FIPS140
 
 #include <dlfcn.h>
@@ -38,22 +40,37 @@ unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
 #define FIPS_KERNEL_FILE "/proc/sys/crypto/fips_enabled"
 #define FIPS_SYSTEM_FILE "/etc/system-fips"
 
-static int _fips_mode = -1;
+/* We provide a per-thread FIPS-mode so that an application
+ * can use gnutls_fips140_set_mode() to override a specific
+ * operation on a thread */
+static gnutls_fips_mode_t _global_fips_mode = -1;
+static _Thread_local gnutls_fips_mode_t _tfips_mode = -1;
+
 static int _skip_integrity_checks = 0;
 
 /* Returns:
- * 0 - FIPS mode disabled
- * 1 - FIPS mode enabled and enforced
- * 2 - FIPS in testing mode
+ * a gnutls_fips_mode_t value
  */
 unsigned _gnutls_fips_mode_enabled(void)
 {
-unsigned f1p = 0, f2p;
-FILE* fd;
-const char *p;
+	unsigned f1p = 0, f2p;
+	FILE* fd;
+	const char *p;
+	unsigned ret;
 
-	if (_fips_mode != -1)
-		return _fips_mode;
+	/* We initialize this threads' mode, and
+	 * the global mode if not already initialized.
+	 * When the global mode is initialized, then
+	 * the thread mode is copied from it. As this
+	 * is called on library initialization, the
+	 * _global_fips_mode is always set during app run.
+	 */
+	if (_tfips_mode != (gnutls_fips_mode_t)-1)
+		return _tfips_mode;
+
+	if (_global_fips_mode != (gnutls_fips_mode_t)-1) {
+		return _global_fips_mode;
+	}
 
 	p = secure_getenv("GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS");
 	if (p && p[0] == '1') {
@@ -63,12 +80,17 @@ const char *p;
 	p = secure_getenv("GNUTLS_FORCE_FIPS_MODE");
 	if (p) {
 		if (p[0] == '1')
-			_fips_mode = 1;
+			ret = 1;
 		else if (p[0] == '2')
-			_fips_mode = 2;
+			ret = GNUTLS_FIPS140_SELFTESTS;
+		else if (p[0] == '3')
+			ret = GNUTLS_FIPS140_LAX;
+		else if (p[0] == '4')
+			ret = GNUTLS_FIPS140_LOG;
 		else
-			_fips_mode = 0;
-		return _fips_mode;
+			ret = GNUTLS_FIPS140_DISABLED;
+
+		goto exit;
 	}
 
 	fd = fopen(FIPS_KERNEL_FILE, "r");
@@ -84,28 +106,32 @@ const char *p;
 
 	if (f1p != 0 && f2p != 0) {
 		_gnutls_debug_log("FIPS140-2 mode enabled\n");
-		_fips_mode = 1;
-		return _fips_mode;
+		ret = GNUTLS_FIPS140_STRICT;
+		goto exit;
 	}
 
 	if (f2p != 0) {
 		/* a funny state where self tests are performed
 		 * and ignored */
 		_gnutls_debug_log("FIPS140-2 ZOMBIE mode enabled\n");
-		_fips_mode = 2;
-		return _fips_mode;
+		ret = GNUTLS_FIPS140_SELFTESTS;
+		goto exit;
 	}
 
-	_fips_mode = 0;
-	return _fips_mode;
+	ret = GNUTLS_FIPS140_DISABLED;
+	goto exit;
+
+ exit:
+	_global_fips_mode = ret;
+	return ret;
 }
 
 /* This _fips_mode == 2 is a strange mode where checks are being
  * performed, but its output is ignored. */
 void _gnutls_fips_mode_reset_zombie(void)
 {
-	if (_fips_mode == 2) {
-		_fips_mode = 0;
+	if (_global_fips_mode == GNUTLS_FIPS140_SELFTESTS) {
+		_global_fips_mode = GNUTLS_FIPS140_DISABLED;
 	}
 }
 
@@ -397,7 +423,13 @@ error:
 /**
  * gnutls_fips140_mode_enabled:
  *
- * Checks whether this library is in FIPS140 mode.
+ * Checks whether this library is in FIPS140 mode. The returned
+ * value corresponds to the library mode as set with
+ * gnutls_fips140_set_mode().
+ *
+ * If gnutls_fips140_set_mode() was called with %GNUTLS_FIPS140_SET_MODE_THREAD
+ * then this function will return the current thread's FIPS140 mode, otherwise
+ * the global value is returned.
  *
  * Returns: return non-zero if true or zero if false.
  *
@@ -406,12 +438,69 @@ error:
 unsigned gnutls_fips140_mode_enabled(void)
 {
 #ifdef ENABLE_FIPS140
-int ret = _gnutls_fips_mode_enabled();
+	unsigned ret = _gnutls_fips_mode_enabled();
 
-	if (ret == 1)
+	if (ret > GNUTLS_FIPS140_DISABLED)
 		return ret;
 #endif
 	return 0;
+}
+
+/**
+ * gnutls_fips140_set_mode:
+ * @mode: the FIPS140-2 mode to switch to
+ * @flags: should be zero or %GNUTLS_FIPS140_SET_MODE_THREAD
+ *
+ * That function is not thread-safe when changing the mode with no flags
+ * (globally), and should be called prior to creating any threads. Its
+ * behavior with no flags after threads are created is undefined.
+ *
+ * When the flag %GNUTLS_FIPS140_SET_MODE_THREAD is specified
+ * then this call will change the FIPS140-2 mode for this particular
+ * thread and not for the whole process. That way an application
+ * can utilize this function to set and reset mode for specific
+ * operations.
+ *
+ * This function never fails but will be a no-op if used when
+ * the library is not in FIPS140-2 mode. When asked to switch to unknown
+ * values for @mode or to %GNUTLS_FIPS140_SELFTESTS mode, the library
+ * switches to %GNUTLS_FIPS140_STRICT mode.
+ *
+ * Since: 3.6.2
+ **/
+void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags)
+{
+#ifdef ENABLE_FIPS140
+	gnutls_fips_mode_t prev = _gnutls_fips_mode_enabled();
+	if (prev == GNUTLS_FIPS140_DISABLED || prev == GNUTLS_FIPS140_SELFTESTS) {
+		/* we need to run self-tests first to be in FIPS140-2 mode */
+		_gnutls_audit_log(NULL, "The library should be initialized in FIPS140-2 mode to do that operation\n");
+		return;
+	}
+
+	switch (mode) {
+		case GNUTLS_FIPS140_STRICT:
+		case GNUTLS_FIPS140_LAX:
+		case GNUTLS_FIPS140_LOG:
+		case GNUTLS_FIPS140_DISABLED:
+			break;
+		case GNUTLS_FIPS140_SELFTESTS:
+			_gnutls_audit_log(NULL, "Cannot switch library to FIPS140-2 self-tests mode; defaulting to strict\n");
+			mode = GNUTLS_FIPS140_STRICT;
+			break;
+		default:
+			_gnutls_audit_log(NULL, "Cannot switch library to mode %u; defaulting to strict\n", (unsigned)mode);
+			mode = GNUTLS_FIPS140_STRICT;
+			break;
+	}
+
+	if (flags & GNUTLS_FIPS140_SET_MODE_THREAD)
+		_tfips_mode = mode;
+	else {
+		_global_fips_mode = mode;
+		_tfips_mode = -1;
+	}
+#endif
 }
 
 void _gnutls_lib_simulate_error(void)

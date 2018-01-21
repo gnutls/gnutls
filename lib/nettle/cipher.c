@@ -562,8 +562,7 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 	switch (ctx->cipher->algo) {
 	case GNUTLS_CIPHER_AES_128_GCM:
 	case GNUTLS_CIPHER_AES_256_GCM:
-		if (_gnutls_fips_mode_enabled() != 0 && iv_size < GCM_IV_SIZE)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		FIPS_RULE(iv_size < GCM_IV_SIZE, GNUTLS_E_INVALID_REQUEST, "access to short GCM nonce size\n");
 		break;
 	case GNUTLS_CIPHER_SALSA20_256:
 	case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
