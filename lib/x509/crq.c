@@ -144,7 +144,7 @@ gnutls_x509_crq_import(gnutls_x509_crq_t crq,
 	}
 
 	result =
-	    asn1_der_decoding(&crq->crq, _data.data, _data.size, NULL);
+	    _asn1_strict_der_decode(&crq->crq, _data.data, _data.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
 		gnutls_assert();
@@ -202,7 +202,7 @@ gnutls_x509_crq_get_private_key_usage_period(gnutls_x509_crq_t crq,
 		goto cleanup;
 	}
 
-	result = asn1_der_decoding(&c2, buf, buf_size, NULL);
+	result = _asn1_strict_der_decode(&c2, buf, buf_size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
@@ -1405,7 +1405,7 @@ gnutls_x509_crq_get_extension_info(gnutls_x509_crq_t crq, int indx,
 		goto out;
 	}
 
-	result = asn1_der_decoding(&c2, extensions, extensions_size, NULL);
+	result = _asn1_strict_der_decode(&c2, extensions, extensions_size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
@@ -1570,7 +1570,7 @@ gnutls_x509_crq_get_extension_data2(gnutls_x509_crq_t crq,
 		goto cleanup;
 	}
 
-	result = asn1_der_decoding(&c2, extensions, extensions_size, NULL);
+	result = _asn1_strict_der_decode(&c2, extensions, extensions_size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(result);
@@ -1766,7 +1766,7 @@ get_subject_alt_name(gnutls_x509_crq_t crq,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&c2, dnsname.data, dnsname.size, NULL);
+	result = _asn1_strict_der_decode(&c2, dnsname.data, dnsname.size, NULL);
 	gnutls_free(dnsname.data);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -2262,7 +2262,7 @@ gnutls_x509_crq_get_key_purpose_oid(gnutls_x509_crq_t crq,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&c2, prev.data, prev.size, NULL);
+	result = _asn1_strict_der_decode(&c2, prev.data, prev.size, NULL);
 	gnutls_free(prev.data);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -2369,7 +2369,7 @@ gnutls_x509_crq_set_key_purpose_oid(gnutls_x509_crq_t crq,
 		/* decode it.
 		 */
 		result =
-		    asn1_der_decoding(&c2, prev.data, prev.size, NULL);
+		    _asn1_strict_der_decode(&c2, prev.data, prev.size, NULL);
 		gnutls_free(prev.data);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();

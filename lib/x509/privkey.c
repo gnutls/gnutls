@@ -147,7 +147,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	}
 
 	result =
-	    asn1_der_decoding(&pkey_asn, raw_key->data, raw_key->size,
+	    _asn1_strict_der_decode(&pkey_asn, raw_key->data, raw_key->size,
 			      NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -262,7 +262,7 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 	}
 
 	ret =
-	    asn1_der_decoding(pkey_asn, raw_key->data, raw_key->size,
+	    _asn1_strict_der_decode(pkey_asn, raw_key->data, raw_key->size,
 			      NULL);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -369,7 +369,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 	pkey->params.algo = GNUTLS_PK_DSA;
 
 	result =
-	    asn1_der_decoding(&dsa_asn, raw_key->data, raw_key->size,
+	    _asn1_strict_der_decode(&dsa_asn, raw_key->data, raw_key->size,
 			      NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
