@@ -98,8 +98,35 @@ static unsigned is_mac_algo_forbidden(gnutls_mac_algorithm_t algo)
 
 	return 0;
 }
+
+inline
+static unsigned is_cipher_algo_forbidden(gnutls_cipher_algorithm_t algo)
+{
+	if (_gnutls_fips_mode_enabled() != 0 &&
+	    _gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
+
+		switch(algo) {
+			case GNUTLS_CIPHER_AES_128_CBC:
+			case GNUTLS_CIPHER_AES_256_CBC:
+			case GNUTLS_CIPHER_AES_192_CBC:
+			case GNUTLS_CIPHER_AES_128_GCM:
+			case GNUTLS_CIPHER_AES_256_GCM:
+			case GNUTLS_CIPHER_AES_128_CCM:
+			case GNUTLS_CIPHER_AES_256_CCM:
+			case GNUTLS_CIPHER_3DES_CBC:
+			case GNUTLS_CIPHER_AES_128_CCM_8:
+			case GNUTLS_CIPHER_AES_256_CCM_8:
+				return 0;
+			default:
+				return 1;
+		}
+	}
+
+	return 0;
+}
 #else
 # define is_mac_algo_forbidden(x) 0
+# define is_cipher_algo_forbidden(x) 0
 #endif
 
 #endif /* FIPS_H */

@@ -61,6 +61,9 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 	int ret;
 	const cipher_entry_st* e;
 
+	if (is_cipher_algo_forbidden(cipher))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+
 	e = cipher_to_entry(cipher);
 	if (e == NULL || e->only_aead)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -155,10 +158,14 @@ gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 {
 	api_cipher_hd_st *h = handle;
 
-	_gnutls_cipher_setiv(&h->ctx_enc, iv, ivlen);
+	if (_gnutls_cipher_setiv(&h->ctx_enc, iv, ivlen) < 0) {
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+	}
 
 	if (_gnutls_cipher_type(h->ctx_enc.e) == CIPHER_BLOCK)
-		_gnutls_cipher_setiv(&h->ctx_dec, iv, ivlen);
+		if (_gnutls_cipher_setiv(&h->ctx_dec, iv, ivlen) < 0) {
+			_gnutls_switch_lib_state(LIB_STATE_ERROR);
+		}
 }
 
 /**
@@ -642,6 +649,9 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 	api_aead_cipher_hd_st *h;
 	const cipher_entry_st *e;
 	int ret;
+
+	if (is_cipher_algo_forbidden(cipher))
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	e = cipher_to_entry(cipher);
 	if (e == NULL || e->type != CIPHER_AEAD)
