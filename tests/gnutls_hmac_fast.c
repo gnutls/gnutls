@@ -62,7 +62,7 @@ void doit(void)
 
 	/* enable MD5 usage */
 	if (gnutls_fips140_mode_enabled()) {
-		gnutls_fips140_set_mode(GNUTLS_FIPS140_LOG);
+		gnutls_fips140_set_mode(GNUTLS_FIPS140_LOG, 0);
 	}
 
 	err =
