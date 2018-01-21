@@ -189,6 +189,8 @@ _gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 		return _gnutls_asn2err(result);
 	}
 
+	/* rfc3279 doesn't specify whether Dss-Sig-Value is encoded
+	 * as DER or BER. As such we do not restrict to the DER subset. */
 	result =
 	    asn1_der_decoding(&sig, sig_value->data, sig_value->size,
 			      NULL);
@@ -262,6 +264,8 @@ _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 		return _gnutls_asn2err(result);
 	}
 
+	/* rfc3279 doesn't specify whether Dss-Sig-Value is encoded
+	 * as DER or BER. As such we do not restrict to the DER subset. */
 	result =
 	    asn1_der_decoding(&sig, sig_value->data, sig_value->size,
 			      NULL);
@@ -546,6 +550,8 @@ gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 		return _gnutls_asn2err(result);
 	}
 
+	/* rfc2313 required BER encoding of that field, thus
+	 * we don't restrict libtasn1 to DER subset */
 	result = asn1_der_decoding(&dinfo, info->data, info->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
