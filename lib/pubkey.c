@@ -1013,7 +1013,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 
-	result = asn1_der_decoding(&spk, _data.data, _data.size, NULL);
+	result = _asn1_strict_der_decode(&spk, _data.data, _data.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
