@@ -465,6 +465,8 @@ gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 		return _gnutls_asn2err(result);
 	}
 
+	/* PKCS#3 doesn't specify whether DHParameter is encoded as
+	 * BER or DER, thus we don't restrict libtasn1 to DER subset */
 	result = asn1_der_decoding(&c2, _params.data, _params.size, NULL);
 
 	if (need_free != 0) {
