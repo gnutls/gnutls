@@ -682,20 +682,62 @@ configure option. The operation of the library is then modified, as follows.
 @item Any cryptographic operation will be refused if any of the self-tests failed
 @end itemize
 
-There is a 'zombie' FIPS140-2 mode which is enabled when only one of the files
-described in the first step is available. In that case the self tests will
-be performed without affecting the operation of the library.
+
+There are also few environment variables which modify that operation. The
+environment variable @code{GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS} will disable
+the library integrity tests on startup, and the variable
+@code{GNUTLS_FORCE_FIPS_MODE} can be set to force a value from
+@ref{gnutls_fips_mode_t}, i.e., '1' will enable the FIPS140-2
+mode, while '0' will disable it.
 
 The integrity checks for the dependent libraries and GnuTLS are performed
 using '.hmac' files which are present at the same path as the library. The
 key for the operations can be provided on compile-time with the configure
 option '--with-fips140-key'. The MAC algorithm used is HMAC-SHA256.
 
-There are also few environment variables which modify that operation. The
-environment variable @code{GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS} will disable
-the library integrity tests on startup, and the variable
-@code{GNUTLS_FORCE_FIPS_MODE} when set to '1' will enable the FIPS140-2
-mode, when set to '0' will force a disable of it.
-
 On runtime an application can verify whether the library is in FIPS140-2
-using the @funcref{gnutls_fips140_mode_enabled} function.
+mode using the @funcref{gnutls_fips140_mode_enabled} function.
+
+@subheading Relaxing FIPS140-2 requirements
+
+The library by default operates in a strict enforcing mode, ensuring that
+all constraints imposed by the FIPS140-2 specification are enforced. However
+the application can relax these requirements via @funcref{gnutls_fips140_set_mode}
+which can switch to alternative modes as in @ref{gnutls_fips_mode_t}.
+
+@showenumdesc{gnutls_fips_mode_t,The @code{gnutls_@-fips_@-mode_t} enumeration.}
+
+The intention of this API is to be used by applications which need to run in
+FIPS140-2 mode, while they utilize few algorithms not in the allowed set,
+e.g., for non-security related purposes. In these cases applications should
+wrap the non-compliant code within blocks like the following.
+
+@example
+GNUTLS_FIPS140_SET_RELAX_MODE();
+
+_gnutls_hash_fast(GNUTLS_DIG_MD5, buffer, sizeof(buffer), output);
+
+GNUTLS_FIPS140_SET_STRICT_MODE();
+@end example
+
+The @code{GNUTLS_FIPS140_SET_RELAX_MODE} and
+@code{GNUTLS_FIPS140_SET_STRICT_MODE} are macros to simplify the following
+sequence of calls.
+
+@example
+if (gnutls_fips140_mode_enabled())
+  gnutls_fips140_set_mode(GNUTLS_FIPS140_SET_MODE_LAX, GNUTLS_FIPS140_SET_MODE_THREAD);
+
+_gnutls_hash_fast(GNUTLS_DIG_MD5, buffer, sizeof(buffer), output);
+
+if (gnutls_fips140_mode_enabled())
+  gnutls_fips140_set_mode(GNUTLS_FIPS140_SET_MODE_STRICT, GNUTLS_FIPS140_SET_MODE_THREAD);
+@end example
+
+The reason of the @code{GNUTLS_FIPS140_SET_MODE_THREAD} flag in the
+previous calls is to localize the change in the mode.
+
+Applications could also switch FIPS140-2 mode explicitly off, by calling
+@example
+gnutls_fips140_set_mode(GNUTLS_FIPS140_SET_MODE_LAX, 0);
+@end example
