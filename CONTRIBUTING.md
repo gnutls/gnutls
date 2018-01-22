@@ -169,6 +169,13 @@ from boolean functions to both the developer and the compiler. Note
 that in the past the 'unsigned' type was used to distinguish boolean functions
 and several of these still exist.
 
+## Selecting the right return value
+
+When selecting the return value for a TLS protocol parsing function
+a suggested approach is to check which alert fits best on that error
+(see `alert.c`), and then select from the error codes which are mapped
+to that alert (see `gnutls_error_to_alert()`). For more generic parsing
+errors consider using the `GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER`.
 
 
 # Usage of assert()
