@@ -5,6 +5,16 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.3 (unreleased)
+
+** libgnutls: Introduce function to switch the current FIPS140-2 operational
+   mode, i.e., strict vs a more lax mode which will allow certain non FIPS140-2
+   operations.
+
+** API and ABI modifications:
+gnutls_fips140_set_mode: Added
+
+
 * Version 3.6.2 (released 2018-02-16)
 
 ** libgnutls: When verifying against a self signed certificate ignore issuer.
