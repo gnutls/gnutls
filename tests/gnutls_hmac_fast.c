@@ -44,22 +44,6 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	err =
-	    gnutls_hmac_fast(GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8,
-			     digest);
-	if (err < 0)
-		fail("gnutls_hmac_fast(MD5) failed: %d\n", err);
-	else {
-		if (memcmp(digest, "\x3c\xb0\x9d\x83\x28\x01\xef\xc0"
-			   "\x7b\xb3\xaf\x42\x69\xe5\x93\x9a", 16) == 0) {
-			if (debug)
-				success("gnutls_hmac_fast(MD5) OK\n");
-		} else {
-			hexprint(digest, 16);
-			fail("gnutls_hmac_fast(MD5) failure\n");
-		}
-	}
-
-	err =
 	    gnutls_hmac_fast(GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh",
 			     8, digest);
 	if (err < 0)
@@ -75,6 +59,28 @@ void doit(void)
 			fail("gnutls_hmac_fast(SHA1) failure\n");
 		}
 	}
+
+	/* enable MD5 usage */
+	if (gnutls_fips140_mode_enabled()) {
+		gnutls_fips140_set_mode(GNUTLS_FIPS140_LOG);
+	}
+
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8,
+			     digest);
+	if (err < 0)
+		fail("gnutls_hmac_fast(MD5) failed: %d\n", err);
+	else {
+		if (memcmp(digest, "\x3c\xb0\x9d\x83\x28\x01\xef\xc0"
+			   "\x7b\xb3\xaf\x42\x69\xe5\x93\x9a", 16) == 0) {
+			if (debug)
+				success("gnutls_hmac_fast(MD5) OK\n");
+		} else {
+			hexprint(digest, 16);
+			fail("gnutls_hmac_fast(MD5) failure\n");
+		}
+	}
+
 
 	gnutls_global_deinit();
 }
