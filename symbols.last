@@ -653,6 +653,7 @@ gnutls_record_overhead_size@GNUTLS_3_4
 gnutls_record_recv@GNUTLS_3_4
 gnutls_record_recv_packet@GNUTLS_3_4
 gnutls_record_recv_seq@GNUTLS_3_4
+gnutls_record_send2@GNUTLS_3_6_xx
 gnutls_record_send@GNUTLS_3_4
 gnutls_record_send_range@GNUTLS_3_4
 gnutls_record_set_max_size@GNUTLS_3_4

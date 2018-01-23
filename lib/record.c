@@ -1707,6 +1707,33 @@ ssize_t
 gnutls_record_send(gnutls_session_t session, const void *data,
 		   size_t data_size)
 {
+	return gnutls_record_send2(session, data, data_size, 0, 0);
+}
+
+/**
+ * gnutls_record_send2:
+ * @session: is a #gnutls_session_t type.
+ * @data: contains the data to send
+ * @data_size: is the length of the data
+ * @pad: padding to be added to the record
+ * @flags: must be zero
+ *
+ * This function is identical to gnutls_record_send() except that it
+ * takes an extra argument to specify padding to be added the record.
+ * To determine the maximum size of padding, use
+ * gnutls_record_get_max_size() and gnutls_record_overhead_size().
+ *
+ * Returns: The number of bytes sent, or a negative error code.  The
+ *   number of bytes sent might be less than @data_size.  The maximum
+ *   number of bytes this function can send in a single call depends
+ *   on the negotiated maximum record size.
+ **/
+ssize_t
+gnutls_record_send2(gnutls_session_t session, const void *data,
+		    size_t data_size, size_t pad, unsigned flags)
+{
+	const version_entry_st *vers = get_version(session);
+	size_t max_pad = 0;
 	int ret;
 
 	if (unlikely(!session->internals.initial_negotiation_completed)) {
@@ -1717,11 +1744,20 @@ gnutls_record_send(gnutls_session_t session, const void *data,
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
 	}
 
+	if (unlikely(!vers))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	if (vers->tls13_sem)
+		max_pad = gnutls_record_get_max_size(session) - gnutls_record_overhead_size(session);
+
+	if (pad > max_pad)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	switch(session->internals.rsend_state) {
 		case RECORD_SEND_NORMAL:
-			return _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
-						-1, EPOCH_WRITE_CURRENT, data,
-						data_size, MBUFFER_FLUSH);
+			return _gnutls_send_tlen_int(session, GNUTLS_APPLICATION_DATA,
+						     -1, EPOCH_WRITE_CURRENT, data,
+						     data_size, pad, MBUFFER_FLUSH);
 		case RECORD_SEND_CORKED:
 		case RECORD_SEND_CORKED_TO_KU:
 			return append_data_to_corked(session, data, data_size);

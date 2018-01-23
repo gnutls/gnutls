@@ -1237,6 +1237,8 @@ int gnutls_range_split(gnutls_session_t session,
 
 ssize_t gnutls_record_send(gnutls_session_t session, const void *data,
 			   size_t data_size);
+ssize_t gnutls_record_send2(gnutls_session_t session, const void *data,
+			    size_t data_size, size_t pad, unsigned flags);
 ssize_t gnutls_record_send_range(gnutls_session_t session,
 				 const void *data, size_t data_size,
 				 const gnutls_range_st * range);

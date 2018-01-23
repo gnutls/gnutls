@@ -180,7 +180,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 send-data-before-handshake recv-data-before-handshake crt_inv_write \
 	 x509sign-verify-error rng-op-nonce rng-op-random rng-op-key x509-dn-decode-compat \
 	 ip-check mini-x509-ipaddr trust-store base64-raw random-art dhex509self \
-	 dss-sig-val sign-pk-api tls-session-ext-override
+	 dss-sig-val sign-pk-api tls-session-ext-override mini-record-pad
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
