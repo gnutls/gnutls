@@ -5,6 +5,14 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.18 (unreleased)
+
+** p11tool: Fixed issue preventing the deletion of objects in batch mode.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.5.17 (released 2018-01-17)
 
 ** libgnutls: Address issue of loading of all PKCS#11 modules on startup
