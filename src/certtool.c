@@ -1481,9 +1481,10 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 		if (outcert_format == GNUTLS_X509_FMT_PEM)
 			print_certificate_info(crts[i], outfile, 1);
 
-		if (pubkey)
+		if (pubkey) {
+			/* this deinitializes the certificate */
 			pubkey_info(crts[i], cinfo);
-		else {
+		} else {
 			size = lbuffer_size;
 			ret =
 			    gnutls_x509_crt_export(crts[i], outcert_format,
@@ -1495,9 +1496,10 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 			}
 
 			fwrite(lbuffer, 1, size, outfile);
+
+			gnutls_x509_crt_deinit(crts[i]);
 		}
 
-		gnutls_x509_crt_deinit(crts[i]);
 	}
 	gnutls_free(crts);
 }
@@ -3691,7 +3693,9 @@ void smime_to_pkcs7(void)
 	free(lineptr);
 }
 
-/* Tries to find a public key in the provided options or stdin */
+/* Tries to find a public key in the provided options or stdin
+ * When @crt is provided, it will be deinitialized.
+ */
 static
 gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 {
