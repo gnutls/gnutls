@@ -81,7 +81,8 @@ flag = {
 flag = {
     name      = certificate-pubkey;
     descrip   = "Print certificate's public key";
-    doc       = "";
+    doc       = "This option is deprecated as a duplicate of --pubkey-info";
+    deprecated;
 };
 
 flag = {
