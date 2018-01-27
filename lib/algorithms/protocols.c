@@ -128,16 +128,13 @@ static const version_entry_st sup_versions[] = {
 	{0, 0, 0, 0, 0}
 };
 
-#define GNUTLS_VERSION_LOOP(b) \
-	const version_entry_st *p; \
-		for(p = sup_versions; p->name != NULL; p++) { b ; }
-
-#define GNUTLS_VERSION_ALG_LOOP(a) \
-	GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
-
 const version_entry_st *version_to_entry(gnutls_protocol_t version)
 {
-	GNUTLS_VERSION_ALG_LOOP(return p);
+	const version_entry_st *p;
+
+	for (p = sup_versions; p->name != NULL; p++)
+		if (p->id == version)
+			return p;
 	return NULL;
 }
 
@@ -270,11 +267,12 @@ unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, ui
  **/
 const char *gnutls_protocol_get_name(gnutls_protocol_t version)
 {
-	const char *ret = NULL;
-
+	const version_entry_st *p;
 	/* avoid prefix */
-	GNUTLS_VERSION_ALG_LOOP(ret = p->name);
-	return ret;
+	for (p = sup_versions; p->name != NULL; p++)
+		if (p->id == version)
+			return p->name;
+	return NULL;
 }
 
 /**
@@ -288,14 +286,15 @@ const char *gnutls_protocol_get_name(gnutls_protocol_t version)
  **/
 gnutls_protocol_t gnutls_protocol_get_id(const char *name)
 {
+	const version_entry_st *p;
 	gnutls_protocol_t ret = GNUTLS_VERSION_UNKNOWN;
 
-	GNUTLS_VERSION_LOOP(
+	for (p = sup_versions; p->name != NULL; p++) {
 		if (strcasecmp(p->name, name) == 0) {
 			ret = p->id;
 			break;
 		}
-	);
+	}
 
 	return ret;
 }
@@ -313,12 +312,14 @@ gnutls_protocol_t gnutls_protocol_get_id(const char *name)
  **/
 const gnutls_protocol_t *gnutls_protocol_list(void)
 {
+	const version_entry_st *p;
 	static gnutls_protocol_t supported_protocols[MAX_ALGOS] = { 0 };
 
 	if (supported_protocols[0] == 0) {
 		int i = 0;
 
-		GNUTLS_VERSION_LOOP(supported_protocols[i++] = p->id);
+		for (p = sup_versions; p->name != NULL; p++)
+			supported_protocols[i++] = p->id;
 		supported_protocols[i++] = 0;
 	}
 
@@ -329,12 +330,12 @@ const gnutls_protocol_t *gnutls_protocol_list(void)
  */
 gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor)
 {
+	const version_entry_st *p;
 	int ret = GNUTLS_VERSION_UNKNOWN;
 
-	GNUTLS_VERSION_LOOP(
+	for (p = sup_versions; p->name != NULL; p++)
 		if ((p->major == major) && (p->minor == minor))
-			    ret = p->id
-	);
+			ret = p->id;
 	return ret;
 }
 
@@ -344,9 +345,10 @@ int
 _gnutls_version_is_supported(gnutls_session_t session,
 			     const gnutls_protocol_t version)
 {
+	const version_entry_st *p;
 	int ret = 0;
 
-	GNUTLS_VERSION_LOOP(
+	for (p = sup_versions; p->name != NULL; p++) {
 		if(p->id == version) {
 #ifndef ENABLE_SSL3
 			if (p->obsolete != 0) return 0;
@@ -354,7 +356,7 @@ _gnutls_version_is_supported(gnutls_session_t session,
 			ret = p->supported && p->transport == session->internals.transport;
 			break;
 		}
-	)
+	}
 
 	if (ret == 0)
 		return 0;
