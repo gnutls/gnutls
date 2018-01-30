@@ -113,7 +113,7 @@ ctests = mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid
 	 sign-verify-ext4 tls-neg-ext4-key \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
-	 mini-cert-status rsa-psk global-init sec-params sign-verify-data \
+	 mini-cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
 	 fips-test fips-override-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
 	 crlverify mini-dtls-discard init_fds mini-record-failure memset \
@@ -188,6 +188,7 @@ gnutls_record_overhead_CPPFLAGS = $(AM_CPPFLAGS) \
 
 endif
 
+fips_mode_pthread_LDADD = $(LDADD) -lpthread
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
 
