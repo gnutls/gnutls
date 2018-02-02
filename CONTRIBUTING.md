@@ -288,6 +288,7 @@ The intention is to keep reviews lightweight, and rely on CI for tasks such
 as compiling and testing code and features.
 
 A proposed checklist to assist such reviews follows.
+ * [ ] Any issues marked for closing are addressed
  * [ ] There is a test suite reasonably covering new functionality or modifications
  * [ ] Function naming, parameters, return values, types, etc., are consistent and according to `CONTRIBUTION.md`
  * [ ] This feature/change has adequate documentation added
