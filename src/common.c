@@ -640,6 +640,7 @@ void print_list(const char *priorities, int verbose)
 		}
 
 		printf("\n");
+#if 0
 		{
 			ret =
 			    gnutls_priority_certificate_type_list(pcache,
@@ -658,6 +659,7 @@ void print_list(const char *priorities, int verbose)
 					printf("\n");
 			}
 		}
+#endif
 
 		{
 			ret = gnutls_priority_protocol_list(pcache, &list);
@@ -716,25 +718,6 @@ void print_list(const char *priorities, int verbose)
 			for (i = 0; i < (unsigned) ret; i++) {
 				printf("%s",
 				       gnutls_kx_get_name(list[i]));
-				if (i + 1 != (unsigned) ret)
-					printf(", ");
-				else
-					printf("\n");
-			}
-		}
-
-		{
-			ret =
-			    gnutls_priority_compression_list(pcache,
-							     &list);
-
-			printf("Compression: ");
-			if (ret == 0)
-				printf("none\n");
-			for (i = 0; i < (unsigned) ret; i++) {
-				printf("COMP-%s",
-				       gnutls_compression_get_name(list
-								   [i]));
 				if (i + 1 != (unsigned) ret)
 					printf(", ");
 				else
