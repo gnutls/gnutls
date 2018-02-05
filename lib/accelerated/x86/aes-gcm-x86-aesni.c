@@ -49,7 +49,7 @@ static void x86_aes_encrypt(const void *_ctx,
 {
 	AES_KEY *ctx = (void*)_ctx;
 
-	aesni_ecb_encrypt(src, dst, 16, ctx, 1);
+	aesni_ecb_encrypt(src, dst, length, ctx, 1);
 }
 
 static void x86_aes128_set_encrypt_key(void *_ctx,
