@@ -55,7 +55,7 @@ static void x86_aes_encrypt(void *_ctx,
 {
 	AES_KEY *ctx = _ctx;
 
-	aesni_ecb_encrypt(src, dst, 16, ctx, 1);
+	aesni_ecb_encrypt(src, dst, length, ctx, 1);
 }
 
 #ifdef USE_NETTLE3
