@@ -37,6 +37,7 @@
 #include <byteswap.h>
 
 #define GCM_BLOCK_SIZE 16
+#define INC32(block) INCREMENT(4, block + GCM_BLOCK_SIZE - 4)
 
 /* GCM mode */
 
@@ -169,7 +170,7 @@ ctr32_encrypt_blocks_inplace(const unsigned char *in, unsigned char *out,
 
 		out += 16;
 		in += 16;
-		INCREMENT(16, ctr);
+		INC32(ctr);
 	}
 }
 
@@ -192,7 +193,7 @@ ctr32_encrypt_blocks(const unsigned char *in, unsigned char *out,
 
 		out += 16;
 		in += 16;
-		INCREMENT(16, ctr);
+		INC32(ctr);
 	}
 }
 
