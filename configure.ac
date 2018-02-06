@@ -127,6 +127,7 @@ case "$host" in
     have_macosx=yes
   ;;
   *solaris*)
+    have_elf=yes
     use_accel=no
     AC_MSG_WARN([[
 ***
