@@ -53,8 +53,14 @@ static void x86_aes_encrypt(void *_ctx,
 #endif
 {
 	AES_KEY *ctx = (void*)_ctx;
+	unsigned i;
+	unsigned blocks = (length+15) / 16;
 
-	vpaes_encrypt(src, dst, ctx);
+	for (i=0;i<blocks;i++) {
+		vpaes_encrypt(src, dst, ctx);
+		dst += 16;
+		src += 16;
+	}
 }
 
 #ifdef USE_NETTLE3
