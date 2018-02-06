@@ -99,7 +99,7 @@ static unsigned check_4th_gen_intel_features(unsigned ecx)
 	if ((ecx & OSXSAVE_MASK) != OSXSAVE_MASK)
 		return 0;
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 	xcr0 = _xgetbv(0);
 #else
 	__asm__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx");
