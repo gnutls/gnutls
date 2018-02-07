@@ -65,8 +65,7 @@ aes_ssse3_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 	struct aes_ctx *ctx = _ctx;
 	int ret;
 
-	if (keysize != 16 && keysize != 24 && keysize != 32)
-		return GNUTLS_E_INVALID_REQUEST;
+	CHECK_AES_KEYSIZE(keysize);
 
 	if (ctx->enc)
 		ret =

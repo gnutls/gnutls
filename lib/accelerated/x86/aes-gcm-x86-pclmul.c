@@ -96,6 +96,8 @@ aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 	struct aes_gcm_ctx *ctx = _ctx;
 	int ret;
 
+	CHECK_AES_KEYSIZE(keysize);
+
 	ret =
 	    aesni_set_encrypt_key(userkey, keysize * 8,
 				  ALIGN16(&ctx->expanded_key));

@@ -16,6 +16,10 @@ typedef struct {
 	uint32_t rounds;
 } AES_KEY;
 
+#define CHECK_AES_KEYSIZE(s) \
+	if (s != 16 && s != 24 && s != 32) \
+		return GNUTLS_E_INVALID_REQUEST
+
 int aes_v8_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);  
 int aes_v8_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
 void aes_v8_cbc_encrypt(const unsigned char *in, unsigned char *out,

@@ -102,7 +102,8 @@ aes_gcm_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 	} else if (keysize == 32) {
 		GCM_SET_KEY(ctx, x86_aes_256_set_encrypt_key, x86_aes_encrypt,
 			    key);
-	} else abort();
+	} else
+		return GNUTLS_E_INVALID_REQUEST;
 
 	return 0;
 }

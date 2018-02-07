@@ -35,6 +35,10 @@ unsigned int gnutls_have_cpuid(void);
 
 #endif
 
+#define CHECK_AES_KEYSIZE(s) \
+	if (s != 16 && s != 24 && s != 32) \
+		return GNUTLS_E_INVALID_REQUEST
+
 #define NN_HASH(name, update_func, digest_func, NAME) {	\
  #name,						\
  sizeof(struct name##_ctx),			\

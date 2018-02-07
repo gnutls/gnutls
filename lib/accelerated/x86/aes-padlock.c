@@ -100,7 +100,7 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 		break;
 #endif
 	default:
-		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	padlock_reload_key();
