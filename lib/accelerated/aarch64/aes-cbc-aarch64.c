@@ -65,6 +65,8 @@ aes_aarch64_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 	struct aes_ctx *ctx = _ctx;
 	int ret;
 
+	CHECK_AES_KEYSIZE(keysize);
+
 	if (ctx->enc)
 		ret =
 		    aes_v8_set_encrypt_key(userkey, keysize * 8,

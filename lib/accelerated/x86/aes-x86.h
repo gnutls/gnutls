@@ -18,6 +18,10 @@ typedef struct {
 	uint32_t rounds;
 } AES_KEY;
 
+#define CHECK_AES_KEYSIZE(s) \
+	if (s != 16 && s != 24 && s != 32) \
+		return GNUTLS_E_INVALID_REQUEST
+
 void aesni_ecb_encrypt(const unsigned char *in, unsigned char *out,
 		       size_t len, const AES_KEY * key, int enc);
 
