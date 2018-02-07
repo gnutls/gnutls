@@ -179,6 +179,10 @@ asan.Fedora.x86_64:
     dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
   - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make check -j$(nproc)
+  - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make -C fuzz check -j$(nproc) GNUTLS_CPUID_OVERRIDE=0x1
+  - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make -C fuzz check -j$(nproc) GNUTLS_CPUID_OVERRIDE=0x2
+  - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make -C fuzz check -j$(nproc) GNUTLS_CPUID_OVERRIDE=0x4
+  - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make -C fuzz check -j$(nproc) GNUTLS_CPUID_OVERRIDE=0x8
   - CFLAGS="-fsanitize=address -g -O2" LDFLAGS="-static-libasan"
     dash ./configure --cache-file cache/config.cache --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --disable-guile --enable-destructive-tests
   - make -j$(nproc)
