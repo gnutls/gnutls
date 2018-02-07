@@ -99,6 +99,8 @@ aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
 	struct cryptodev_gcm_ctx *ctx = _ctx;
 
+	CHECK_AES_KEYSIZE(keysize);
+
 	ctx->sess.keylen = keysize;
 	ctx->sess.key = (void *) userkey;
 

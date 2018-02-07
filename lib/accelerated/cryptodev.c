@@ -90,6 +90,8 @@ cryptodev_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 {
 	struct cryptodev_ctx *ctx = _ctx;
 
+	CHECK_AES_KEYSIZE(keysize);
+
 	ctx->sess.keylen = keysize;
 	ctx->sess.key = (void *) key;
 
