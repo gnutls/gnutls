@@ -84,19 +84,23 @@ flag = {
 flag = {
     name      = list-all;
     descrip   = "List all available objects in a token";
-    doc = "";
+    doc = "All objects available in the token will be listed. That includes
+objects which are potentially unaccessible using this tool.";
 };
 
 flag = {
     name      = list-all-certs;
     descrip   = "List all available certificates in a token";
-    doc = "";
+    doc = "That option will also provide more information on the
+certificates, for example, expand the attached extensions in a trust
+token (like p11-kit-trust).";
 };
 
 flag = {
     name      = list-certs;
     descrip   = "List all certificates that have an associated private key";
-    doc = "";
+    doc = "That option will only display certificates which have a private
+key associated with them (share the same ID).";
 };
 
 flag = {
