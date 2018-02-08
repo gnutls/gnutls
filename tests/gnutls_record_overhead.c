@@ -56,27 +56,35 @@ unsigned _gnutls_record_overhead(const version_entry_st *ver,
 				 const mac_entry_st *mac,
 				 unsigned max);
 
-#define OVERHEAD(c, m) \
-	_gnutls_record_overhead(version_to_entry(GNUTLS_TLS1_2), cipher_to_entry(c), mac_to_entry(m), \
+#define OVERHEAD(v, c, m)						\
+	_gnutls_record_overhead(version_to_entry(v), cipher_to_entry(c), mac_to_entry(m), \
 				0)
 
-#define MAX_OVERHEAD(c, m) \
-	_gnutls_record_overhead(version_to_entry(GNUTLS_TLS1_2), cipher_to_entry(c), mac_to_entry(m), \
+#define MAX_OVERHEAD(v, c, m)						\
+	_gnutls_record_overhead(version_to_entry(v), cipher_to_entry(c), mac_to_entry(m), \
 				1)
 
 static void check_aes_gcm(void **glob_state)
 {
 	const unsigned ov = 16+8;
 	/* Under AES-GCM the overhead is constant */
-	assert_int_equal(OVERHEAD(GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD), ov);
-	assert_int_equal(MAX_OVERHEAD(GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD), ov);
+	assert_int_equal(OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD), ov);
+	assert_int_equal(MAX_OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD), ov);
+}
+
+static void check_tls13_aes_gcm(void **glob_state)
+{
+	const unsigned ov = 16+1;
+	/* Under AES-GCM the overhead is constant */
+	assert_int_equal(OVERHEAD(GNUTLS_TLS1_3, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD), ov);
+	assert_int_equal(MAX_OVERHEAD(GNUTLS_TLS1_3, GNUTLS_CIPHER_AES_128_GCM, GNUTLS_MAC_AEAD), ov);
 }
 
 static void check_aes_sha1_min(void **glob_state)
 {
 	const unsigned mac = 20;
 	const unsigned block = 16;
-	assert_int_equal(OVERHEAD(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1), 1+mac+block);
+	assert_int_equal(OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1), 1+mac+block);
 }
 
 static void check_aes_sha1_max(void **glob_state)
@@ -84,13 +92,14 @@ static void check_aes_sha1_max(void **glob_state)
 	const unsigned mac = 20;
 	const unsigned block = 16;
 
-	assert_int_equal(MAX_OVERHEAD(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1), block+mac+block);
+	assert_int_equal(MAX_OVERHEAD(GNUTLS_TLS1_2, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1), block+mac+block);
 }
 
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(check_aes_gcm),
+		cmocka_unit_test(check_tls13_aes_gcm),
 		cmocka_unit_test(check_aes_sha1_min),
 		cmocka_unit_test(check_aes_sha1_max)
 	};

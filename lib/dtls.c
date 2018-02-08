@@ -508,6 +508,10 @@ unsigned _gnutls_record_overhead(const version_entry_st *ver,
 	if (unlikely(cipher == NULL))
 		return 0;
 
+	/* 1 octet content type in the unencrypted content */
+	if (ver->tls13_sem)
+		total++;
+
 	if (mac->id == GNUTLS_MAC_AEAD) {
 		if (!ver->tls13_sem)
 			total += _gnutls_cipher_get_explicit_iv_size(cipher);
