@@ -397,8 +397,11 @@ advance_iter(gnutls_x509_trust_list_t list,
  * When past the last element is accessed %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * is returned and the iterator is reset.
  *
- * After use, the iterator must be deinitialized usin
- *  gnutls_x509_trust_list_iter_deinit().
+ * The iterator is deinitialized and reset to %NULL automatically by this
+ * function after iterating through all elements until
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the iteration is
+ * aborted early, it must be manually deinitialized using
+ * gnutls_x509_trust_list_iter_deinit().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
