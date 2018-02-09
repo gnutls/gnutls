@@ -19,6 +19,9 @@ See the end for copying conditions.
    keys, CRLs and certificate requests.  This backports the already default behavior
    from the 3.5.x branch, in order to reduce issues due to the complexity of BER rules.
 
+** libgnutls: Addressed issue in the AES-CBC acceleration under ssse3 (patch by
+   Vitezslav Cizek).
+
 ** libgnutls: Addressed issue in the accelerated code affecting interoperability
    with versions of nettle >= 3.4.
 
