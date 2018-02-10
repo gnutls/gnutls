@@ -1,6 +1,7 @@
 GNUTLS_3_4@GNUTLS_3_4
 GNUTLS_3_6_0@GNUTLS_3_6_0
 GNUTLS_3_6_2@GNUTLS_3_6_2
+GNUTLS_3_6_3@GNUTLS_3_6_3
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_deinit@GNUTLS_3_4
@@ -200,6 +201,7 @@ gnutls_ffdhe_8192_group_prime@GNUTLS_3_4
 gnutls_ffdhe_8192_key_bits@GNUTLS_3_4
 gnutls_fingerprint@GNUTLS_3_4
 gnutls_fips140_mode_enabled@GNUTLS_3_4
+gnutls_fips140_set_mode@GNUTLS_3_6_3
 gnutls_free@GNUTLS_3_4
 gnutls_global_deinit@GNUTLS_3_4
 gnutls_global_init@GNUTLS_3_4
