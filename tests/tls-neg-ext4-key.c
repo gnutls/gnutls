@@ -228,7 +228,8 @@ void try_with_key(const char *name, const char *client_prio,
 				s_xcred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
+				   /*"NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",*/
+				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -387,7 +388,8 @@ static const test_st tests[] = {
 	},
 	{.name = "rsa-pss-sign key",
 	 .pk = GNUTLS_PK_RSA_PSS,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
+	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+	 /*.prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",*/
 	 .cert = &server_ca3_rsa_pss2_cert,
 	 .key = &server_ca3_rsa_pss2_key,
 	 .sig = GNUTLS_SIGN_RSA_PSS_SHA256,
@@ -395,7 +397,8 @@ static const test_st tests[] = {
 	},
 	{.name = "rsa-pss cert, rsa-sign key", /* we expect the server to refuse negotiating */
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
+	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+	 /*.prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",*/
 	 .cert = &server_ca3_rsa_pss_cert,
 	 .key = &server_ca3_rsa_pss_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,

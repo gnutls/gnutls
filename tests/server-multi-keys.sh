@@ -59,18 +59,20 @@ CERT3=${srcdir}/../doc/credentials/x509/cert-rsa-pss.pem
 CAFILE=${srcdir}/../doc/credentials/x509/ca.pem
 TMPFILE=outcert.$$.tmp
 
+PRIO_ADD=":+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512"
+
 eval "${GETPORT}"
-launch_server $$ --echo --priority "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA" --x509keyfile ${KEY1} --x509certfile ${CERT1} \
+launch_server $$ --echo --priority "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA${PRIO_ADD}" --x509keyfile ${KEY1} --x509certfile ${CERT1} \
 	--x509keyfile ${KEY2} --x509certfile ${CERT2} --x509keyfile ${KEY3} --x509certfile ${CERT3}
 PID=$!
 wait_server ${PID}
 
 timeout 1800 datefudge "2017-08-9" \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA" </dev/null || \
+"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA${PRIO_ADD}" </dev/null || \
 	fail ${PID} "1. handshake with RSA should have succeeded!"
 
 timeout 1800 datefudge "2017-08-9" \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-ECDSA" </dev/null || \
+"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-ECDSA${PRIO_ADD}" </dev/null || \
 	fail ${PID} "2. handshake with ECC should have succeeded!"
 
 timeout 1800 datefudge "2017-08-9" \
