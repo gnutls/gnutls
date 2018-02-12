@@ -22,8 +22,8 @@ See the end for copying conditions.
 ** libgnutls: Addressed issue in the AES-CBC acceleration under ssse3 (patch by
    Vitezslav Cizek).
 
-** libgnutls: Addressed issue in the accelerated code affecting interoperability
-   with versions of nettle >= 3.4.
+** libgnutls: Addressed issue in the accelerated code which may affect interoperability
+   with versions of nettle > 3.4.
 
 ** p11tool: Fixed issue preventing the deletion of objects in batch mode.
 
