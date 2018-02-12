@@ -94,39 +94,79 @@ static int cipher_test(const char *ocipher, gnutls_cipher_algorithm_t gcipher,
 			fail("EVP_get_cipherbyname failed for %s\n", ocipher);
 
 		ctx = EVP_CIPHER_CTX_new();
-		assert(EVP_CipherInit_ex(ctx, evp_cipher, NULL, key, nonce, 0) >
-		       0);
 
-		EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, tag_size,
-				    enc_data + enc_data_size - tag_size);
-
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		if (gcipher == GNUTLS_CIPHER_AES_128_CCM
 		    || gcipher == GNUTLS_CIPHER_AES_256_CCM) {
+			assert(EVP_CIPHER_CTX_init(ctx)==1);
+			assert(EVP_CipherInit_ex(ctx, evp_cipher, 0, 0, 0, 0) >
+			       0);
+
+			assert(EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_IVLEN, dnonce.size, 0)==1);
+			assert(EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_TAG, tag_size,
+					    enc_data + enc_data_size - tag_size) == 1);
+
+			assert(EVP_CipherInit_ex(ctx, 0, 0, key, nonce, 0) >
+			       0);
+
+			dec_data_size2 = sizeof(dec_data);
+			/* Add plain size */
 			assert(EVP_CipherUpdate
 			       (ctx, NULL, &dec_data_size2, NULL,
 				enc_data_size - tag_size) > 0);
+
+			/* Add AAD */
+			assert(EVP_CipherUpdate
+			       (ctx, NULL, &dec_data_size2, buffer_auth,
+				sizeof(buffer_auth)) > 0);
+
+			/* Decrypt */
+			assert(EVP_CipherUpdate
+			       (ctx, dec_data, &dec_data_size2, enc_data,
+				enc_data_size - tag_size) > 0);
+
+			dec_data_size = dec_data_size2;
+			dec_data_size2 = tag_size;
+
+			if (dec_data_size != sizeof(orig_plain_data)
+			    || memcmp(dec_data, orig_plain_data,
+				      sizeof(orig_plain_data)) != 0) {
+				fail("openssl decrypt failed for %s\n", ocipher);
+			}
+		} else
+#endif
+		{
+			assert(EVP_CipherInit_ex(ctx, evp_cipher, NULL, key, nonce, 0) >
+			       0);
+
+			EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, tag_size,
+					    enc_data + enc_data_size - tag_size);
+
+			dec_data_size2 = sizeof(dec_data);
+
+			/* Add AAD */
+			assert(EVP_CipherUpdate
+			       (ctx, NULL, &dec_data_size2, buffer_auth,
+				sizeof(buffer_auth)) > 0);
+
+			/* Decrypt */
+			assert(EVP_CipherUpdate
+			       (ctx, dec_data, &dec_data_size2, enc_data,
+				enc_data_size - tag_size) > 0);
+
+			dec_data_size = dec_data_size2;
+			dec_data_size2 = tag_size;
+			assert(EVP_CipherFinal_ex(ctx, tag, &dec_data_size2) > 0);
+
+			if (dec_data_size != sizeof(orig_plain_data)
+			    || memcmp(dec_data, orig_plain_data,
+				      sizeof(orig_plain_data)) != 0) {
+				fail("openssl decrypt failed for %s\n", ocipher);
+			}
+
 		}
-
-		dec_data_size2 = sizeof(dec_data);
-		assert(EVP_CipherUpdate
-		       (ctx, NULL, &dec_data_size2, buffer_auth,
-			sizeof(buffer_auth)) > 0);
-		dec_data_size2 = sizeof(dec_data);
-		assert(EVP_CipherUpdate
-		       (ctx, dec_data, &dec_data_size2, enc_data,
-			enc_data_size - tag_size) > 0);
-
-		dec_data_size = dec_data_size2;
-		dec_data_size2 = tag_size;
-		assert(EVP_CipherFinal_ex(ctx, tag, &dec_data_size2) > 0);
-
-		if (dec_data_size != sizeof(orig_plain_data)
-		    || memcmp(dec_data, orig_plain_data,
-			      sizeof(orig_plain_data)) != 0) {
-			fail("openssl decrypt failed for %s\n", ocipher);
-		}
-
 		EVP_CIPHER_CTX_free(ctx);
+
 	}
 
 	return 0;
@@ -153,6 +193,8 @@ void doit(void)
 	if (!gnutls_fips140_mode_enabled()) {
 		cipher_test("chacha20-poly1305", GNUTLS_CIPHER_CHACHA20_POLY1305, 16);
 	}
+	cipher_test("aes-128-ccm", GNUTLS_CIPHER_AES_128_CCM, 16);
+	cipher_test("aes-256-ccm", GNUTLS_CIPHER_AES_256_CCM, 16);
 #endif
 
 	gnutls_global_deinit();
