@@ -1577,7 +1577,7 @@ time_t gnutls_db_check_entry_time(gnutls_datum_t * entry);
    * gnutls_handshake_hook_func:
    * @session: the current session
    * @htype: the type of the handshake message (%gnutls_handshake_description_t)
-   * @post: non zero if this is a post-process/generation call and zero otherwise
+   * @when: non zero if this is a post-process/generation call and zero otherwise
    * @incoming: non zero if this is an incoming message and zero if this is an outgoing message
    * @msg: the (const) data of the handshake message without the handshake headers.
    *
@@ -1592,11 +1592,11 @@ time_t gnutls_db_check_entry_time(gnutls_datum_t * entry);
 
 typedef int (*gnutls_handshake_hook_func) (gnutls_session_t,
 					   unsigned int htype,
-					   unsigned post,
+					   unsigned when,
 					   unsigned int incoming,
 					   const gnutls_datum_t *msg);
 void gnutls_handshake_set_hook_function(gnutls_session_t session,
-					unsigned int htype, int post,
+					unsigned int htype, int when,
 					gnutls_handshake_hook_func func);
 
 #define gnutls_handshake_post_client_hello_func gnutls_handshake_simple_hook_func
