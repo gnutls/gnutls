@@ -1556,6 +1556,7 @@ and SRP authentication.
 @section Advanced topics
 
 @menu
+* Virtual hosts and credentials::
 * Session resumption::
 * Certificate verification::
 * Re-authentication::
@@ -1565,6 +1566,43 @@ and SRP authentication.
 * Interoperability::
 * Compatibility with the OpenSSL library::
 @end menu
+
+@node Virtual hosts and credentials
+@subsection Virtual hosts and credentials
+@cindex virtual hosts
+@cindex credentials
+
+Often when operating with virtual hosts, one may not want to associate
+a particular certificate set to the credentials function early, before
+the virtual host is known. That can be achieved by calling
+@funcref{gnutls_credentials_set} within a handshake pre-hook for client
+hello. That message contains the peer's intended hostname, and if read,
+and the appropriate credentials are set, gnutls will be able to
+continue in the handshake process. A brief usage example is shown
+below.
+
+@example
+static int
+handshake_hook_func(gnutls_session_t session, unsigned int htype,
+                    unsigned when, unsigned int incoming, const gnutls_datum_t *msg)
+@{
+    assert(htype == GNUTLS_HANDSHAKE_CLIENT_HELLO);
+    assert(when == GNUTLS_HOOK_PRE);
+
+    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred);
+@}
+
+int main()
+@{
+  ...
+
+  gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_CLIENT_HELLO,
+                                     GNUTLS_HOOK_PRE, handshake_hook_func);
+  ...
+@}
+@end example
+
+@showfuncdesc{gnutls_handshake_set_hook_function}
 
 @node Session resumption
 @subsection Session resumption
