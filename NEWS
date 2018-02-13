@@ -30,6 +30,14 @@ See the end for copying conditions.
 ** libgnutls: Added the 8192-bit parameters of SRP to the accepted parameters
    for SRP authentication.
 
+** libgnutls: Addressed issue in the accelerated code affecting interoperability
+   with versions of nettle >= 3.4.
+
+** libgnutls: Addressed issue in the AES-GCM acceleration under aarch64.
+
+** libgnutls: Addressed issue in the AES-CBC acceleration under ssse3 (patch by
+   Vitezslav Cizek).
+
 ** srptool: the --create-conf option no longer includes 1024-bit parameters.
 
 ** p11tool: Fixed the deletion of objects in batch mode.
