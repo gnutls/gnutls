@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.2 (unreleased)
+* Version 3.6.2 (released 2018-02-16)
 
 ** libgnutls: When verifying against a self signed certificate ignore issuer.
    That is, ignore issuer when checking the issuer's parameters strength, resolving
