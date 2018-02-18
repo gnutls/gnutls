@@ -43,7 +43,8 @@ See the end for copying conditions.
 ** p11tool: Fixed the deletion of objects in batch mode.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_srp_8192_group_generator: Added
+gnutls_srp_8192_group_prime: Added
 
 
 * Version 3.6.1 (released 2017-10-21)
