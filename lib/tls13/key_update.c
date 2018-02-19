@@ -171,7 +171,7 @@ cleanup:
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 int gnutls_session_key_update(gnutls_session_t session, unsigned flags)
 {

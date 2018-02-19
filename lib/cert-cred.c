@@ -628,7 +628,7 @@ void gnutls_certificate_set_retrieve_function2
  * certificates are set in the credentials and a callback is available, the
  * callback takes predence.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 void gnutls_certificate_set_retrieve_function3
     (gnutls_certificate_credentials_t cred,

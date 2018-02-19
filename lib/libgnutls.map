@@ -1202,11 +1202,6 @@ GNUTLS_3_6_3
 {
  global:
 	gnutls_fips140_set_mode;
-} GNUTLS_3_6_2;
-
-GNUTLS_3_6_xx
-{
- global:
 	gnutls_session_key_update;
 	gnutls_ext_get_current_msg;
 	gnutls_reauth;

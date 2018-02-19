@@ -79,7 +79,7 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 int
 gnutls_ocsp_status_request_get2(gnutls_session_t session,
@@ -233,7 +233,7 @@ unsigned resp_matches_pcert(gnutls_ocsp_resp_t resp, const gnutls_pcert_st *cert
  * with the %GNUTLS_CERTIFICATE_API_V2 flag to make the set certificate
  * functions return an index usable by this function.
  *
- * This function can be called multiple times since GnuTLS 3.6.xx
+ * This function can be called multiple times since GnuTLS 3.6.3
  * when multiple responses which apply to the chain are available.
  * If the response provided does not match any certificates present
  * in the chain, the code %GNUTLS_E_OCSP_MISMATCH_WITH_CERTS is returned.
@@ -421,7 +421,7 @@ gnutls_certificate_set_ocsp_status_request_file2(gnutls_certificate_credentials_
  * Returns: On success, the number of loaded responses is returned,
  *   otherwise a negative error code.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 int
 gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t sc,
@@ -555,7 +555,7 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
  * Returns: On success, the expiration time of the OCSP response. Otherwise
  *   (time_t)(-1) on error, or (time_t)-2 on out of bounds.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 time_t
 gnutls_certificate_get_ocsp_expiration(gnutls_certificate_credentials_t sc,

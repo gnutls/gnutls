@@ -20,6 +20,18 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
+gnutls_session_key_update: Added
+gnutls_ext_get_current_msg: Added
+gnutls_reauth: Added
+gnutls_ocsp_status_request_get2: Added
+gnutls_ocsp_resp_import2: Added
+gnutls_ocsp_resp_export2: Added
+gnutls_ocsp_resp_list_import2: Added
+gnutls_certificate_set_retrieve_function3: Added
+gnutls_certificate_set_ocsp_status_request_file2: Added
+gnutls_certificate_set_ocsp_status_request_mem: Added
+gnutls_certificate_get_ocsp_expiration: Added
+gnutls_record_send2: Added
 
 
 * Version 3.6.2 (released 2018-02-16)

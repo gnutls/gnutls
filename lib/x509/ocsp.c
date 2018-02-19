@@ -247,7 +247,7 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 int
 gnutls_ocsp_resp_import2(gnutls_ocsp_resp_t resp,
@@ -416,7 +416,7 @@ int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp, gnutls_datum_t * data)
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_t resp, gnutls_datum_t * data,
 			     gnutls_x509_crt_fmt_t fmt)
@@ -2436,7 +2436,7 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
  *
  * Returns: the number of responses read or a negative error value.
  *
- * Since: 3.6.xx
+ * Since: 3.6.3
  **/
 int
 gnutls_ocsp_resp_list_import2(gnutls_ocsp_resp_t **ocsps,
