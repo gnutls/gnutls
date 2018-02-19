@@ -131,7 +131,7 @@ static void client(int fd, const char *prio, const char *user, const char *pass,
 
 	/* Use default priorities */
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, 40 * 1000);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -229,7 +229,7 @@ static void server(int fd, const char *prio)
 				s_x509_cred);
 
 	gnutls_transport_set_int(session, fd);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, 40 * 1000);
 
 	do {
 		ret = gnutls_handshake(session);
