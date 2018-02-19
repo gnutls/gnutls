@@ -66,50 +66,51 @@
  *  Enumeration of each option type for gnutls-serv
  */
 typedef enum {
-    INDEX_OPT_DEBUG                =  0,
-    INDEX_OPT_SNI_HOSTNAME         =  1,
-    INDEX_OPT_SNI_HOSTNAME_FATAL   =  2,
-    INDEX_OPT_ALPN                 =  3,
-    INDEX_OPT_ALPN_FATAL           =  4,
-    INDEX_OPT_NOTICKET             =  5,
-    INDEX_OPT_GENERATE             =  6,
-    INDEX_OPT_QUIET                =  7,
-    INDEX_OPT_NODB                 =  8,
-    INDEX_OPT_HTTP                 =  9,
-    INDEX_OPT_ECHO                 = 10,
-    INDEX_OPT_UDP                  = 11,
-    INDEX_OPT_MTU                  = 12,
-    INDEX_OPT_SRTP_PROFILES        = 13,
-    INDEX_OPT_DISABLE_CLIENT_CERT  = 14,
-    INDEX_OPT_REQUIRE_CLIENT_CERT  = 15,
-    INDEX_OPT_VERIFY_CLIENT_CERT   = 16,
-    INDEX_OPT_HEARTBEAT            = 17,
-    INDEX_OPT_X509FMTDER           = 18,
-    INDEX_OPT_PRIORITY             = 19,
-    INDEX_OPT_DHPARAMS             = 20,
-    INDEX_OPT_X509CAFILE           = 21,
-    INDEX_OPT_X509CRLFILE          = 22,
-    INDEX_OPT_PGPKEYFILE           = 23,
-    INDEX_OPT_X509KEYFILE          = 24,
-    INDEX_OPT_X509CERTFILE         = 25,
-    INDEX_OPT_X509DSAKEYFILE       = 26,
-    INDEX_OPT_X509DSACERTFILE      = 27,
-    INDEX_OPT_X509ECCKEYFILE       = 28,
-    INDEX_OPT_X509ECCCERTFILE      = 29,
-    INDEX_OPT_SRPPASSWD            = 30,
-    INDEX_OPT_SRPPASSWDCONF        = 31,
-    INDEX_OPT_PSKPASSWD            = 32,
-    INDEX_OPT_PSKHINT              = 33,
-    INDEX_OPT_OCSP_RESPONSE        = 34,
-    INDEX_OPT_PORT                 = 35,
-    INDEX_OPT_LIST                 = 36,
-    INDEX_OPT_PROVIDER             = 37,
-    INDEX_OPT_VERSION              = 38,
-    INDEX_OPT_HELP                 = 39,
-    INDEX_OPT_MORE_HELP            = 40
+    INDEX_OPT_DEBUG                        =  0,
+    INDEX_OPT_SNI_HOSTNAME                 =  1,
+    INDEX_OPT_SNI_HOSTNAME_FATAL           =  2,
+    INDEX_OPT_ALPN                         =  3,
+    INDEX_OPT_ALPN_FATAL                   =  4,
+    INDEX_OPT_NOTICKET                     =  5,
+    INDEX_OPT_GENERATE                     =  6,
+    INDEX_OPT_QUIET                        =  7,
+    INDEX_OPT_NODB                         =  8,
+    INDEX_OPT_HTTP                         =  9,
+    INDEX_OPT_ECHO                         = 10,
+    INDEX_OPT_UDP                          = 11,
+    INDEX_OPT_MTU                          = 12,
+    INDEX_OPT_SRTP_PROFILES                = 13,
+    INDEX_OPT_DISABLE_CLIENT_CERT          = 14,
+    INDEX_OPT_REQUIRE_CLIENT_CERT          = 15,
+    INDEX_OPT_VERIFY_CLIENT_CERT           = 16,
+    INDEX_OPT_HEARTBEAT                    = 17,
+    INDEX_OPT_X509FMTDER                   = 18,
+    INDEX_OPT_PRIORITY                     = 19,
+    INDEX_OPT_DHPARAMS                     = 20,
+    INDEX_OPT_X509CAFILE                   = 21,
+    INDEX_OPT_X509CRLFILE                  = 22,
+    INDEX_OPT_PGPKEYFILE                   = 23,
+    INDEX_OPT_X509KEYFILE                  = 24,
+    INDEX_OPT_X509CERTFILE                 = 25,
+    INDEX_OPT_X509DSAKEYFILE               = 26,
+    INDEX_OPT_X509DSACERTFILE              = 27,
+    INDEX_OPT_X509ECCKEYFILE               = 28,
+    INDEX_OPT_X509ECCCERTFILE              = 29,
+    INDEX_OPT_SRPPASSWD                    = 30,
+    INDEX_OPT_SRPPASSWDCONF                = 31,
+    INDEX_OPT_PSKPASSWD                    = 32,
+    INDEX_OPT_PSKHINT                      = 33,
+    INDEX_OPT_OCSP_RESPONSE                = 34,
+    INDEX_OPT_IGNORE_OCSP_RESPONSE_ERRORS  = 35,
+    INDEX_OPT_PORT                         = 36,
+    INDEX_OPT_LIST                         = 37,
+    INDEX_OPT_PROVIDER                     = 38,
+    INDEX_OPT_VERSION                      = 39,
+    INDEX_OPT_HELP                         = 40,
+    INDEX_OPT_MORE_HELP                    = 41
 } teOptIndex;
 /** count of all options for gnutls-serv */
-#define OPTION_CT    41
+#define OPTION_CT    42
 /** gnutls-serv version */
 #define GNUTLS_SERV_VERSION       "@VERSION@"
 /** Full gnutls-serv version text */
@@ -203,11 +204,12 @@ typedef enum {
 #define VALUE_OPT_PSKPASSWD      0x101A
 #define VALUE_OPT_PSKHINT        0x101B
 #define VALUE_OPT_OCSP_RESPONSE  0x101C
+#define VALUE_OPT_IGNORE_OCSP_RESPONSE_ERRORS 0x101D
 #define VALUE_OPT_PORT           'p'
 
 #define OPT_VALUE_PORT           (DESC(PORT).optArg.argInt)
 #define VALUE_OPT_LIST           'l'
-#define VALUE_OPT_PROVIDER       0x101D
+#define VALUE_OPT_PROVIDER       0x101E
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */

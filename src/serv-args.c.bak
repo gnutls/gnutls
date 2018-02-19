@@ -63,7 +63,7 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for gnutls-serv options
  */
-static char const gnutls_serv_opt_strs[3281] =
+static char const gnutls_serv_opt_strs[3386] =
 /*     0 */ "gnutls-serv @VERSION@\n"
             "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
@@ -178,29 +178,32 @@ static char const gnutls_serv_opt_strs[3281] =
 /*  2646 */ "The OCSP response to send to client\0"
 /*  2682 */ "OCSP_RESPONSE\0"
 /*  2696 */ "ocsp-response\0"
-/*  2710 */ "The port to connect to\0"
-/*  2733 */ "PORT\0"
-/*  2738 */ "port\0"
-/*  2743 */ "Print a list of the supported algorithms and modes\0"
-/*  2794 */ "LIST\0"
-/*  2799 */ "list\0"
-/*  2804 */ "Specify the PKCS #11 provider library\0"
-/*  2842 */ "PROVIDER\0"
-/*  2851 */ "provider\0"
-/*  2860 */ "display extended usage information and exit\0"
-/*  2904 */ "help\0"
-/*  2909 */ "extended usage information passed thru pager\0"
-/*  2954 */ "more-help\0"
-/*  2964 */ "output version information and exit\0"
-/*  3000 */ "version\0"
-/*  3008 */ "GNUTLS_SERV\0"
-/*  3020 */ "gnutls-serv - GnuTLS server\n"
+/*  2710 */ "Ignore any errors when setting the OCSP response\0"
+/*  2759 */ "IGNORE_OCSP_RESPONSE_ERRORS\0"
+/*  2787 */ "ignore-ocsp-response-errors\0"
+/*  2815 */ "The port to connect to\0"
+/*  2838 */ "PORT\0"
+/*  2843 */ "port\0"
+/*  2848 */ "Print a list of the supported algorithms and modes\0"
+/*  2899 */ "LIST\0"
+/*  2904 */ "list\0"
+/*  2909 */ "Specify the PKCS #11 provider library\0"
+/*  2947 */ "PROVIDER\0"
+/*  2956 */ "provider\0"
+/*  2965 */ "display extended usage information and exit\0"
+/*  3009 */ "help\0"
+/*  3014 */ "extended usage information passed thru pager\0"
+/*  3059 */ "more-help\0"
+/*  3069 */ "output version information and exit\0"
+/*  3105 */ "version\0"
+/*  3113 */ "GNUTLS_SERV\0"
+/*  3125 */ "gnutls-serv - GnuTLS server\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  3106 */ "@PACKAGE_BUGREPORT@\0"
-/*  3126 */ "\n\0"
-/*  3128 */ "Server program that listens to incoming TLS connections.\n\0"
-/*  3186 */ "gnutls-serv @VERSION@\0"
-/*  3208 */ "Usage: gnutls-serv [options]\n"
+/*  3211 */ "@PACKAGE_BUGREPORT@\0"
+/*  3231 */ "\n\0"
+/*  3233 */ "Server program that listens to incoming TLS connections.\n\0"
+/*  3291 */ "gnutls-serv @VERSION@\0"
+/*  3313 */ "Usage: gnutls-serv [options]\n"
             "gnutls-serv --help for usage instructions.\n";
 
 /**
@@ -633,18 +636,30 @@ static char const gnutls_serv_opt_strs[3281] =
 /** Name string for the ocsp-response option */
 #define OCSP_RESPONSE_name      (gnutls_serv_opt_strs+2696)
 /** Compiled in flag settings for the ocsp-response option */
-#define OCSP_RESPONSE_FLAGS     (OPTST_DISABLED \
-        | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
+#define OCSP_RESPONSE_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
+
+/**
+ *  ignore-ocsp-response-errors option description:
+ */
+/** Descriptive text for the ignore-ocsp-response-errors option */
+#define IGNORE_OCSP_RESPONSE_ERRORS_DESC      (gnutls_serv_opt_strs+2710)
+/** Upper-cased name for the ignore-ocsp-response-errors option */
+#define IGNORE_OCSP_RESPONSE_ERRORS_NAME      (gnutls_serv_opt_strs+2759)
+/** Name string for the ignore-ocsp-response-errors option */
+#define IGNORE_OCSP_RESPONSE_ERRORS_name      (gnutls_serv_opt_strs+2787)
+/** Compiled in flag settings for the ignore-ocsp-response-errors option */
+#define IGNORE_OCSP_RESPONSE_ERRORS_FLAGS     (OPTST_DISABLED)
 
 /**
  *  port option description:
  */
 /** Descriptive text for the port option */
-#define PORT_DESC      (gnutls_serv_opt_strs+2710)
+#define PORT_DESC      (gnutls_serv_opt_strs+2815)
 /** Upper-cased name for the port option */
-#define PORT_NAME      (gnutls_serv_opt_strs+2733)
+#define PORT_NAME      (gnutls_serv_opt_strs+2838)
 /** Name string for the port option */
-#define PORT_name      (gnutls_serv_opt_strs+2738)
+#define PORT_name      (gnutls_serv_opt_strs+2843)
 /** Compiled in flag settings for the port option */
 #define PORT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -653,11 +668,11 @@ static char const gnutls_serv_opt_strs[3281] =
  *  list option description:
  */
 /** Descriptive text for the list option */
-#define LIST_DESC      (gnutls_serv_opt_strs+2743)
+#define LIST_DESC      (gnutls_serv_opt_strs+2848)
 /** Upper-cased name for the list option */
-#define LIST_NAME      (gnutls_serv_opt_strs+2794)
+#define LIST_NAME      (gnutls_serv_opt_strs+2899)
 /** Name string for the list option */
-#define LIST_name      (gnutls_serv_opt_strs+2799)
+#define LIST_name      (gnutls_serv_opt_strs+2904)
 /** Compiled in flag settings for the list option */
 #define LIST_FLAGS     (OPTST_DISABLED)
 
@@ -665,11 +680,11 @@ static char const gnutls_serv_opt_strs[3281] =
  *  provider option description:
  */
 /** Descriptive text for the provider option */
-#define PROVIDER_DESC      (gnutls_serv_opt_strs+2804)
+#define PROVIDER_DESC      (gnutls_serv_opt_strs+2909)
 /** Upper-cased name for the provider option */
-#define PROVIDER_NAME      (gnutls_serv_opt_strs+2842)
+#define PROVIDER_NAME      (gnutls_serv_opt_strs+2947)
 /** Name string for the provider option */
-#define PROVIDER_name      (gnutls_serv_opt_strs+2851)
+#define PROVIDER_name      (gnutls_serv_opt_strs+2956)
 /** Compiled in flag settings for the provider option */
 #define PROVIDER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -677,11 +692,11 @@ static char const gnutls_serv_opt_strs[3281] =
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (gnutls_serv_opt_strs+2860)
-#define HELP_name       (gnutls_serv_opt_strs+2904)
+#define HELP_DESC       (gnutls_serv_opt_strs+2965)
+#define HELP_name       (gnutls_serv_opt_strs+3009)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (gnutls_serv_opt_strs+2909)
-#define MORE_HELP_name  (gnutls_serv_opt_strs+2954)
+#define MORE_HELP_DESC  (gnutls_serv_opt_strs+3014)
+#define MORE_HELP_name  (gnutls_serv_opt_strs+3059)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -694,8 +709,8 @@ static char const gnutls_serv_opt_strs[3281] =
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (gnutls_serv_opt_strs+2964)
-#define VER_name        (gnutls_serv_opt_strs+3000)
+#define VER_DESC        (gnutls_serv_opt_strs+3069)
+#define VER_name        (gnutls_serv_opt_strs+3105)
 /**
  *  Declare option callback procedures
  */
@@ -706,10 +721,10 @@ extern tOptProc
     optionUnstackArg,   optionVendorOption;
 static tOptProc
     doOptDebug,           doOptDhparams,        doOptMtu,
-    doOptOcsp_Response,   doOptPgpkeyfile,      doOptProvider,
-    doOptPskpasswd,       doOptSrppasswd,       doOptSrppasswdconf,
-    doOptX509crlfile,     doOptX509dsacertfile, doOptX509dsakeyfile,
-    doOptX509ecccertfile, doOptX509ecckeyfile,  doUsageOpt;
+    doOptPgpkeyfile,      doOptProvider,        doOptPskpasswd,
+    doOptSrppasswd,       doOptSrppasswdconf,   doOptX509crlfile,
+    doOptX509dsacertfile, doOptX509dsakeyfile,  doOptX509ecccertfile,
+    doOptX509ecckeyfile,  doUsageOpt;
 #define VER_PROC        optionPrintVersion
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1130,17 +1145,29 @@ static tOptDesc optDesc[OPTION_CT] = {
   {  /* entry idx, value */ 34, VALUE_OPT_OCSP_RESPONSE,
      /* equiv idx, value */ 34, VALUE_OPT_OCSP_RESPONSE,
      /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
+     /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OCSP_RESPONSE_FLAGS, 0,
      /* last opt argumnt */ { NULL }, /* --ocsp-response */
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ doOptOcsp_Response,
+     /* option proc      */ optionStackArg,
      /* desc, NAME, name */ OCSP_RESPONSE_DESC, OCSP_RESPONSE_NAME, OCSP_RESPONSE_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 35, VALUE_OPT_PORT,
-     /* equiv idx, value */ 35, VALUE_OPT_PORT,
+  {  /* entry idx, value */ 35, VALUE_OPT_IGNORE_OCSP_RESPONSE_ERRORS,
+     /* equiv idx, value */ 35, VALUE_OPT_IGNORE_OCSP_RESPONSE_ERRORS,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ IGNORE_OCSP_RESPONSE_ERRORS_FLAGS, 0,
+     /* last opt argumnt */ { NULL }, /* --ignore-ocsp-response-errors */
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ IGNORE_OCSP_RESPONSE_ERRORS_DESC, IGNORE_OCSP_RESPONSE_ERRORS_NAME, IGNORE_OCSP_RESPONSE_ERRORS_name,
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ 36, VALUE_OPT_PORT,
+     /* equiv idx, value */ 36, VALUE_OPT_PORT,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PORT_FLAGS, 0,
@@ -1151,8 +1178,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ PORT_DESC, PORT_NAME, PORT_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 36, VALUE_OPT_LIST,
-     /* equiv idx, value */ 36, VALUE_OPT_LIST,
+  {  /* entry idx, value */ 37, VALUE_OPT_LIST,
+     /* equiv idx, value */ 37, VALUE_OPT_LIST,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ LIST_FLAGS, 0,
@@ -1163,8 +1190,8 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* desc, NAME, name */ LIST_DESC, LIST_NAME, LIST_name,
      /* disablement strs */ NULL, NULL },
 
-  {  /* entry idx, value */ 37, VALUE_OPT_PROVIDER,
-     /* equiv idx, value */ 37, VALUE_OPT_PROVIDER,
+  {  /* entry idx, value */ 38, VALUE_OPT_PROVIDER,
+     /* equiv idx, value */ 38, VALUE_OPT_PROVIDER,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ PROVIDER_FLAGS, 0,
@@ -1217,21 +1244,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of gnutls-serv. */
-#define zPROGNAME       (gnutls_serv_opt_strs+3008)
+#define zPROGNAME       (gnutls_serv_opt_strs+3113)
 /** Reference to the title line for gnutls-serv usage. */
-#define zUsageTitle     (gnutls_serv_opt_strs+3020)
+#define zUsageTitle     (gnutls_serv_opt_strs+3125)
 /** There is no gnutls-serv configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for gnutls-serv config files. */
 #define apzHomeList     NULL
 /** The gnutls-serv program bug email address. */
-#define zBugsAddr       (gnutls_serv_opt_strs+3106)
+#define zBugsAddr       (gnutls_serv_opt_strs+3211)
 /** Clarification/explanation of what gnutls-serv does. */
-#define zExplain        (gnutls_serv_opt_strs+3126)
+#define zExplain        (gnutls_serv_opt_strs+3231)
 /** Extra detail explaining what gnutls-serv does. */
-#define zDetail         (gnutls_serv_opt_strs+3128)
+#define zDetail         (gnutls_serv_opt_strs+3233)
 /** The full version string for gnutls-serv. */
-#define zFullVersion    (gnutls_serv_opt_strs+3186)
+#define zFullVersion    (gnutls_serv_opt_strs+3291)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -1243,7 +1270,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define gnutls_serv_full_usage (NULL)
-#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3208)
+#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3313)
 
 #endif /* not defined __doxygen__ */
 
@@ -1549,30 +1576,6 @@ doOptPskpasswd(tOptions* pOptions, tOptDesc* pOptDesc)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /**
- * Code to handle the ocsp-response option.
- * If the client requested an OCSP response, return data from this file to the client.
- * @param[in] pOptions the gnutls-serv options data structure
- * @param[in,out] pOptDesc the option descriptor for this option.
- */
-static void
-doOptOcsp_Response(tOptions* pOptions, tOptDesc* pOptDesc)
-{
-    static teOptFileType const  type =
-        FTYPE_MODE_MUST_EXIST + FTYPE_MODE_NO_OPEN;
-    static tuFileMode           mode;
-#ifndef O_CLOEXEC
-#  define O_CLOEXEC 0
-#endif
-    mode.file_flags = O_CLOEXEC;
-
-    /*
-     * This function handles special invalid values for "pOptions"
-     */
-    optionFileCheck(pOptions, pOptDesc, type, mode);
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-/**
  * Code to handle the provider option.
  * This will override the default options in /etc/gnutls/pkcs11.conf
  * @param[in] pOptions the gnutls-serv options data structure
@@ -1658,7 +1661,7 @@ tOptions gnutls_servOptions = {
       NO_EQUIVALENT, /* '-#' option index */
       NO_EQUIVALENT /* index of default opt */
     },
-    41 /* full option count */, 38 /* user option count */,
+    42 /* full option count */, 39 /* user option count */,
     gnutls_serv_full_usage, gnutls_serv_short_usage,
     NULL, NULL,
     PKGDATADIR, gnutls_serv_packager_info
@@ -1915,6 +1918,9 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.\n"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
   puts(_("The OCSP response to send to client"));
+
+  /* referenced via gnutls_servOptions.pOptDesc->pzText */
+  puts(_("Ignore any errors when setting the OCSP response"));
 
   /* referenced via gnutls_servOptions.pOptDesc->pzText */
   puts(_("The port to connect to"));
