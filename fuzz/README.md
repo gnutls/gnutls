@@ -10,24 +10,24 @@ Crash reproducers from OSS-Fuzz are put into $NAME.repro directory for
 regression testing with top dir 'make check'.
 
 
-# Running a fuzzer using clang
+# Running a fuzzer using clang and libFuzzer
 
 Use the following commands on top dir:
 ```
 export CC=clang-5.0
 export CFLAGS="-O1 -g -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined,integer,nullability -fsanitize=address -fsanitize-address-use-after-scope -fsanitize-coverage=trace-pc-guard,trace-cmp"
-./configure --enable-fuzzer-target --enable-static --disable-doc --disable-gcc-warnings --disable-hardware-acceleration
+./configure --disable-guile --enable-fuzzer-target --enable-static --disable-doc --disable-gcc-warnings --disable-hardware-acceleration
 make clean
 make
 cd fuzz
 
 # build and run gnutls_base64_decode_fuzzer
 UBSAN_OPTIONS=print_stacktrace=1 ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-5.0/bin/llvm-symbolizer \
-  ./run-clang.sh gnutls_base64_decode_fuzzer
+  ./run-clang.sh gnutls_base64_decoder_fuzzer
 ```
 
 
-# Running a fuzzer using AFL
+# Running a fuzzer using AFL and clang
 
 Use the following commands on top dir:
 
@@ -35,7 +35,18 @@ Use the following commands on top dir:
 $ CC=afl-clang-fast ./configure --disable-doc
 $ make -j$(nproc) clean all
 $ cd fuzz
-$ ./run-afl.sh gnutls_base64_decode_fuzzer
+$ ./run-afl.sh gnutls_base64_decoder_fuzzer
+```
+
+# Running a fuzzer using AFL and gcc
+
+Use the following commands on top dir:
+
+```
+$ CC=afl-gcc ./configure --disable-doc
+$ make -j$(nproc) clean all
+$ cd fuzz
+$ ./run-afl.sh gnutls_base64_decoder_fuzzer
 ```
 
 # Fuzz code coverage using the corpus directories *.in/
