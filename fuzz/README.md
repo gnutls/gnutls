@@ -32,7 +32,7 @@ UBSAN_OPTIONS=print_stacktrace=1 ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-5.0/bin/llvm
 Use the following commands on top dir:
 
 ```
-$ CC=afl-clang-fast ./configure --disable-doc
+$ CC=afl-clang-fast ./configure --disable-doc --enable-fuzzer-target --disable-guile
 $ make -j$(nproc) clean all
 $ cd fuzz
 $ ./run-afl.sh gnutls_base64_decoder_fuzzer
@@ -43,7 +43,7 @@ $ ./run-afl.sh gnutls_base64_decoder_fuzzer
 Use the following commands on top dir:
 
 ```
-$ CC=afl-gcc ./configure --disable-doc
+$ CC=afl-gcc ./configure --disable-doc --enable-fuzzer-target --disable-guile
 $ make -j$(nproc) clean all
 $ cd fuzz
 $ ./run-afl.sh gnutls_base64_decoder_fuzzer
