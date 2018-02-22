@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1068,9 +1068,22 @@ inline
 		if ((session->internals.h_type == type
 		     || session->internals.h_type == GNUTLS_HANDSHAKE_ANY)
 		    && (session->internals.h_post == post
-			|| session->internals.h_post == GNUTLS_HOOK_BOTH))
+			|| session->internals.h_post == GNUTLS_HOOK_BOTH)) {
+
+			/* internal API for testing: when we are expected to
+			 * wait for GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, we
+			 * do so, but not when doing for all messages. The
+			 * reason is that change cipher specs are not handshake
+			 * messages, and we don't support waiting for them
+			 * consistently (only sending is tracked, not receiving).
+			 */
+			if (type == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC &&
+			    session->internals.h_type != GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
+				return 0;
+
 			return session->internals.h_hook(session, type,
 							 post, incoming, &msg);
+		}
 	}
 	return 0;
 }
@@ -1553,7 +1566,7 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
  */
 static int
 client_check_if_resuming(gnutls_session_t session,
-				 uint8_t * session_id, int session_id_len)
+			 uint8_t * session_id, int session_id_len)
 {
 	char buf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
 	int ret;
@@ -2556,7 +2569,7 @@ static int handshake_client(gnutls_session_t session)
 	const version_entry_st *ver;
 
  reset:
-	if (STATE >= STATE100)
+	if (STATE >= STATE99)
 		return _gnutls13_handshake_client(session);
 
 	switch (STATE) {
@@ -2605,7 +2618,7 @@ static int handshake_client(gnutls_session_t session)
 	case STATE4:
 		ver = get_version(session);
 		if (ver->tls13_sem) { /* TLS 1.3 state machine */
-			STATE = STATE100;
+			STATE = STATE99;
 			goto reset;
 		}
 
@@ -2778,7 +2791,7 @@ static int handshake_client(gnutls_session_t session)
 /* This function is to be called if the handshake was successfully 
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
-static ssize_t send_change_cipher_spec(gnutls_session_t session, int again)
+ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
 {
 	uint8_t *data;
 	mbuffer_st *bufel;
@@ -2786,7 +2799,7 @@ static ssize_t send_change_cipher_spec(gnutls_session_t session, int again)
 	const version_entry_st *vers;
 
 	if (again == 0) {
-		bufel = _gnutls_handshake_alloc(session, 1);
+		bufel = _gnutls_handshake_alloc(session, 3); /* max for DTLS0.9 */
 		if (bufel == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -2809,12 +2822,25 @@ static ssize_t send_change_cipher_spec(gnutls_session_t session, int again)
 			session->internals.dtls.hsk_write_seq++;
 		}
 
+		ret = call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_PRE, 0,
+				     data, 1);
+		if (ret < 0) {
+			_mbuffer_xfree(&bufel);
+			return gnutls_assert_val(ret);
+		}
+
 		ret =
 		    _gnutls_handshake_io_cache_int(session,
 						   GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC,
 						   bufel);
 		if (ret < 0) {
 			_mbuffer_xfree(&bufel);
+			return gnutls_assert_val(ret);
+		}
+
+		ret = call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_POST, 0,
+				     data, 1);
+		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
 
@@ -2836,7 +2862,7 @@ static int send_handshake_final(gnutls_session_t session, int init)
 	switch (FINAL_STATE) {
 	case STATE0:
 	case STATE1:
-		ret = send_change_cipher_spec(session, FAGAIN(STATE1));
+		ret = _gnutls_send_change_cipher_spec(session, FAGAIN(STATE1));
 		FINAL_STATE = STATE0;
 
 		if (ret < 0) {
@@ -3021,7 +3047,7 @@ static int handshake_server(gnutls_session_t session)
 
 		ver = get_version(session);
 		if (ver->tls13_sem) { /* TLS 1.3 state machine */
-			STATE = STATE100;
+			STATE = STATE99;
 			goto reset;
 		}
 

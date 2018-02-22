@@ -1196,14 +1196,15 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	mbuffer_st *bufel = NULL, *decrypted = NULL;
 	gnutls_datum_t t;
 	int ret;
-	unsigned int empty_fragments = 0;
+	unsigned int n_retries = 0;
 	record_parameters_st *record_params;
 	record_state_st *record_state;
 	struct tls_record_st record;
+	const version_entry_st *vers = get_version(session);
 
-      begin:
+ begin:
 
-	if (empty_fragments > DEFAULT_MAX_EMPTY_RECORDS) {
+	if (n_retries > DEFAULT_MAX_EMPTY_RECORDS) {
 		gnutls_assert();
 		return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
 	}
@@ -1264,6 +1265,18 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	if (bufel == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+	if (vers && vers->tls13_sem && record.type == GNUTLS_CHANGE_CIPHER_SPEC &&
+	    record.length == 1 && session->internals.handshake_in_progress) {
+		_gnutls_read_log("discarding change cipher spec in TLS1.3\n");
+		/* we use the same mechanism to retry as when
+		 * receiving multiple empty TLS packets */
+		bufel =
+		    _mbuffer_head_pop_first(&session->internals.
+					    record_recv_buffer);
+		_mbuffer_xfree(&bufel);
+		n_retries++;
+		goto begin;
+	}
 
 	/* We allocate the maximum possible to allow few compressed bytes to expand to a
 	 * full record. Moreover we add space for any pad and the MAC (in case
@@ -1363,7 +1376,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
  */
 	if (_mbuffer_get_udata_size(decrypted) == 0) {
 		_mbuffer_xfree(&decrypted);
-		empty_fragments++;
+		n_retries++;
 		goto begin;
 	}
 
@@ -1388,7 +1401,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 
 	return ret;
 
-      discard:
+ discard:
 	session->internals.dtls.packets_dropped++;
 
 	/* discard the whole received fragment. */
@@ -1398,7 +1411,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	_mbuffer_xfree(&bufel);
 	return gnutls_assert_val(GNUTLS_E_AGAIN);
 
-      sanity_check_error:
+ sanity_check_error:
 	if (IS_DTLS(session)) {
 		session->internals.dtls.packets_dropped++;
 		ret = gnutls_assert_val(GNUTLS_E_AGAIN);
@@ -1408,11 +1421,11 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	session_unresumable(session);
 	session_invalidate(session);
 
-      cleanup:
+ cleanup:
 	_mbuffer_xfree(&decrypted);
 	return ret;
 
-      recv_error:
+ recv_error:
 	if (ret < 0
 	    && (gnutls_error_is_fatal(ret) == 0
 		|| ret == GNUTLS_E_TIMEDOUT))
