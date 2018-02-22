@@ -38,7 +38,7 @@
         ;                                       \
   } while (0)
 
-#define DRBG_AES_KEY_SIZE 32
+#define DRBG_AES_KEY_SIZE AES256_KEY_SIZE
 #define DRBG_AES_SEED_SIZE (AES_BLOCK_SIZE+DRBG_AES_KEY_SIZE)
 
 /* This is the CTR-AES-256-based random-number generator from SP800-90A.
@@ -46,7 +46,7 @@
 struct drbg_aes_ctx {
 	unsigned seeded;
 	/* The current key */
-	struct aes_ctx key;
+	struct aes256_ctx key;
 
 	uint8_t v[AES_BLOCK_SIZE];
 
