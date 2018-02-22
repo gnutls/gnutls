@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2012-2016 Nikos Mavrogiannopoulos
+ * Copyright (C) 2000-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2018 Nikos Mavrogiannopoulos
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -372,7 +373,7 @@ copy_record_version(gnutls_session_t session,
 
 		if (lver->tls13_sem) {
 			version[0] = 0x03;
-			version[1] = 0x01;
+			version[1] = 0x03;
 		} else {
 			version[0] = lver->major;
 			version[1] = lver->minor;
@@ -687,8 +688,8 @@ record_check_version(gnutls_session_t session,
 	int diff = 0;
 
 	if (vers->tls13_sem) {
-		/* TLS 1.3 requires version to be 0x0301 */
-		if (version[0] != 0x03 || version[1] != 0x01)
+		/* TLS 1.3 requires version to be 0x0303 */
+		if (version[0] != 0x03 || version[1] != 0x03)
 			diff = 1;
 	} else {
 		if (vers->major != version[0] || vers->minor != version[1])
