@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2011-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -306,13 +307,6 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
-#ifdef HAVE_LIBNETTLE
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock, 0);
-		if (ret < 0) {
-			gnutls_assert();
-		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
@@ -328,7 +322,6 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
-#endif
 	} else {
 		_gnutls_priority_update_non_aesni();
 	}
