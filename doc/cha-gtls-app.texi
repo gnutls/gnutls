@@ -1583,12 +1583,30 @@ continue in the handshake process. A brief usage example is shown
 below.
 
 @example
+static int ext_hook_func(void *ctx, unsigned tls_id,
+                         const unsigned char *data, unsigned size)
+@{
+	if (tls_id == 0) @{ /* server name */
+		/* figure the advertized name - the following hack
+                 * relies on the fact that this extension only supports
+                 * DNS names, and due to a protocol bug cannot be extended
+                 * to support anything else. */
+		if (name < 5) return 0;
+		name = data+5;
+		name_size = size-5;
+	@}
+@}
+
 static int
 handshake_hook_func(gnutls_session_t session, unsigned int htype,
                     unsigned when, unsigned int incoming, const gnutls_datum_t *msg)
 @{
     assert(htype == GNUTLS_HANDSHAKE_CLIENT_HELLO);
     assert(when == GNUTLS_HOOK_PRE);
+
+    ret = gnutls_ext_raw_parse(NULL, ext_hook_func, msg,
+                               GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO);
+    assert(ret >= 0);
 
     gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred);
 @}

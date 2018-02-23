@@ -27,7 +27,7 @@
 #include "tls13/session_ticket.h"
 #include "auth/cert.h"
 
-static int parse_nst_extension(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size);
+static int parse_nst_extension(void *ctx, unsigned tls_id, const uint8_t *data, unsigned data_size);
 
 int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *buf)
 {
@@ -76,7 +76,7 @@ cleanup:
 	return ret;
 }
 
-static int parse_nst_extension(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size)
+static int parse_nst_extension(void *ctx, unsigned tls_id, const uint8_t *data, unsigned data_size)
 {
 	/* ignore all extensions */
 	return 0;

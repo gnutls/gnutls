@@ -55,10 +55,11 @@ static unsigned is_algo_in_list(gnutls_pk_algorithm_t algo, gnutls_pk_algorithm_
 }
 
 static
-int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_size)
+int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned data_size)
 {
 	crt_req_ctx_st *ctx = _ctx;
 	gnutls_session_t session = ctx->session;
+	unsigned v;
 	int ret;
 
 	/* Decide which certificate to use if the signature algorithms extension
@@ -78,8 +79,8 @@ int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int d
 		if (data_size < 2)
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 
-		ret = _gnutls_read_uint16(data);
-		if (ret != data_size-2)
+		v = _gnutls_read_uint16(data);
+		if (v != data_size-2)
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 
 		data += 2;
@@ -111,12 +112,12 @@ int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int d
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 		}
 
-		ret = _gnutls_read_uint16(data);
-		if (ret != data_size-2)
+		v = _gnutls_read_uint16(data);
+		if (v != data_size-2)
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
 
 		ctx->rdn = data+2;
-		ctx->rdn_size = ret;
+		ctx->rdn_size = v;
 	}
 
 	return 0;

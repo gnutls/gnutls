@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,7 +28,7 @@
 /* Iterates through all extensions found, and calls the cb()
  * function with their data */
 int _gnutls_extv_parse(void *ctx,
-		       int (*cb)(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size),
+		       gnutls_ext_raw_process_func cb,
 		       const uint8_t * data, int data_size)
 {
 	int next, ret;
@@ -75,7 +75,78 @@ int _gnutls_extv_parse(void *ctx,
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 
 	return 0;
+}
 
+#define HANDSHAKE_SESSION_ID_POS (34)
+/**
+ * gnutls_ext_raw_parse:
+ * @ctx: a pointer to pass to callback function
+ * @cb: callback function to process each extension found
+ * @data: TLS extension data
+ * @flags: should be zero or %GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO
+ *
+ * This function iterates through the TLS extensions as passed in
+ * @data, passing the individual extension data to callback. The
+ * @data must conform to Extension extensions<0..2^16-1> format.
+ *
+ * If flags is %GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO then this function
+ * will parse the extension data from the position, as if the packet in
+ * @data is a client hello (without record or handshake headers) -
+ * as provided by gnutls_handshake_set_hook_function().
+ *
+ * The return value of the callback will be propagated.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code. On unknown
+ *   flags it returns %GNUTLS_E_INVALID_REQUEST.
+ *
+ * Since: 3.6.3
+ **/
+int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
+			 const gnutls_datum_t *data, unsigned int flags)
+{
+	if (flags & GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO) {
+		ssize_t size = data->size;
+		size_t len;
+		uint8_t *p = data->data;
+
+		DECR_LEN(size, HANDSHAKE_SESSION_ID_POS);
+
+		if (p[0] != 0x03)
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+		p += HANDSHAKE_SESSION_ID_POS;
+
+		/* skip session id */
+		DECR_LEN(size, 1);
+		len = p[0];
+		p++;
+		DECR_LEN(size, len);
+		p += len;
+
+		/* CipherSuites */
+		DECR_LEN(size, 2);
+		len = _gnutls_read_uint16(p);
+		p += 2;
+		DECR_LEN(size, len);
+		p += len;
+
+		/* legacy_compression_methods */
+		DECR_LEN(size, 1);
+		len = p[0];
+		p++;
+		DECR_LEN(size, len);
+		p += len;
+
+		if (size <= 0)
+			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+		return _gnutls_extv_parse(ctx, cb, p, size);
+	}
+
+	if (flags != 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	return _gnutls_extv_parse(ctx, cb, data->data, data->size);
 }
 
 /* Returns:

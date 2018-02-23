@@ -29,7 +29,7 @@
 #include "mbuffers.h"
 #include "ext/status_request.h"
 
-static int parse_cert_extension(void *ctx, uint16_t tls_id, const uint8_t *data, int data_size);
+static int parse_cert_extension(void *ctx, unsigned tls_id, const uint8_t *data, unsigned data_size);
 static int parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size);
 
 int _gnutls13_recv_certificate(gnutls_session_t session)
@@ -309,7 +309,7 @@ typedef struct crt_cert_ctx_st {
 	unsigned idx;
 } crt_cert_ctx_st;
 
-static int parse_cert_extension(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_size)
+static int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned data_size)
 {
 	crt_cert_ctx_st *ctx = _ctx;
 	gnutls_session_t session = ctx->session;

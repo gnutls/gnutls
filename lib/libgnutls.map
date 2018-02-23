@@ -1214,6 +1214,7 @@ GNUTLS_3_6_3
 	gnutls_certificate_set_ocsp_status_request_mem;
 	gnutls_certificate_get_ocsp_expiration;
 	gnutls_record_send2;
+	gnutls_ext_raw_parse;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {

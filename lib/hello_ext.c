@@ -195,7 +195,7 @@ typedef struct hello_ext_ctx_st {
 } hello_ext_ctx_st;
 
 static
-int hello_ext_parse(void *_ctx, uint16_t tls_id, const uint8_t *data, int data_size)
+int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned data_size)
 {
 	hello_ext_ctx_st *ctx = _ctx;
 	gnutls_session_t session = ctx->session;
