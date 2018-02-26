@@ -288,6 +288,7 @@ APIMANS += gnutls_est_record_overhead_size.3
 APIMANS += gnutls_ext_get_current_msg.3
 APIMANS += gnutls_ext_get_data.3
 APIMANS += gnutls_ext_get_name.3
+APIMANS += gnutls_ext_raw_parse.3
 APIMANS += gnutls_ext_register.3
 APIMANS += gnutls_ext_set_data.3
 APIMANS += gnutls_fingerprint.3

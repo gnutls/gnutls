@@ -190,6 +190,7 @@ gnutls_est_record_overhead_size@GNUTLS_3_4
 gnutls_ext_get_current_msg@GNUTLS_3_6_3
 gnutls_ext_get_data@GNUTLS_3_4
 gnutls_ext_get_name@GNUTLS_3_4
+gnutls_ext_raw_parse@GNUTLS_3_6_3
 gnutls_ext_register@GNUTLS_3_4
 gnutls_ext_set_data@GNUTLS_3_4
 gnutls_ffdhe_2048_group_generator@GNUTLS_3_4
