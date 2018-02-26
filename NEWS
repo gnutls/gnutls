@@ -18,6 +18,9 @@ See the end for copying conditions.
    and key usage limits. TLS1.3 support needs to be explicitly enabled via a
    priority string.
 
+** libgnutls: Introduced low-level function to assist applications attempting client
+   hello extension parsing, prior to GnuTLS' parsing of the message.
+
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
 gnutls_session_key_update: Added
@@ -32,6 +35,7 @@ gnutls_certificate_set_ocsp_status_request_file2: Added
 gnutls_certificate_set_ocsp_status_request_mem: Added
 gnutls_certificate_get_ocsp_expiration: Added
 gnutls_record_send2: Added
+gnutls_ext_raw_parse: Added
 
 
 * Version 3.6.2 (released 2018-02-16)
