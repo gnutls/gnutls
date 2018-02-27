@@ -14,7 +14,7 @@ regression testing with top dir 'make check'.
 
 Use the following commands on top dir:
 ```
-export CC=clang-5.0
+export CC=clang-6.0
 export CFLAGS="-O1 -g -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined,integer,nullability -fsanitize=address -fsanitize-address-use-after-scope -fsanitize-coverage=trace-pc-guard,trace-cmp"
 ./configure --disable-guile --enable-fuzzer-target --enable-static --disable-doc --disable-gcc-warnings --disable-hardware-acceleration
 make clean
@@ -22,7 +22,7 @@ make
 cd fuzz
 
 # build and run gnutls_base64_decode_fuzzer
-UBSAN_OPTIONS=print_stacktrace=1 ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-5.0/bin/llvm-symbolizer \
+UBSAN_OPTIONS=print_stacktrace=1 ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-6.0/bin/llvm-symbolizer \
   ./run-clang.sh gnutls_base64_decoder_fuzzer
 ```
 
