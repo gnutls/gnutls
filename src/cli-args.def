@@ -25,10 +25,11 @@ process.";
 
 flag = {
     name      = strict-tofu;
-    descrip   = "Fail to connect if a known certificate has changed";
+    descrip   = "Fail to connect if a certificate is unknown or a known certificate has changed";
     disabled;
     disable   = "no";
-    doc       = "This option will perform authentication as with option --tofu; however, while --tofu asks whether to trust a changed public key, this option will fail in case of public key changes.";
+    doc       = "This option will perform authentication as with option --tofu; however, no questions shall be asked whatsoever, neither to accept an unknown certificate nor a changed one.";
+
 };
 
 flag = {

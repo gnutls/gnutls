@@ -448,6 +448,9 @@ static int cert_verify_callback(gnutls_session_t session)
 					"Its certificate is valid for %s.\n",
 					hostname);
 
+			if (strictssh)
+				return -1;
+
 			rc = read_yesno
 			    ("Are you sure you want to trust it? (y/N): ");
 			if (rc == 0)
@@ -463,13 +466,13 @@ static int cert_verify_callback(gnutls_session_t session)
 					"Its certificate is valid for %s.\n",
 					hostname);
 
-			if (strictssh == 0) {
-				rc = read_yesno
-					("Do you trust the received key? (y/N): ");
-				if (rc == 0)
-					return -1;
-			} else return -1;
+			if (strictssh)
+				return -1;
 
+			rc = read_yesno
+				("Do you trust the received key? (y/N): ");
+			if (rc == 0)
+				return -1;
 		} else if (rc < 0) {
 			fprintf(stderr,
 				"gnutls_verify_stored_pubkey: %s\n",
