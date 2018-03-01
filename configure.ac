@@ -522,13 +522,7 @@ if test "$enable_non_suiteb" = "yes";then
 fi
 AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
-dnl nettle_rsa_pss_* are only available in the development version of nettle
-AC_CHECK_LIB(hogweed, nettle_rsa_pss_sha256_verify_digest, have_nettle_rsa_pss=yes, have_nettle_rsa_pss=no, [$HOGWEED_LIBS])
-
-if test "$have_nettle_rsa_pss" = "yes";then
-	AC_DEFINE([HAVE_NETTLE_RSA_PSS], 1, [Have nettle_rsa_pss_*])
-fi
-AM_CONDITIONAL(HAVE_NETTLE_RSA_PSS, test "$have_nettle_rsa_pss" = "yes")
+AM_CONDITIONAL(NETTLE_3_3_API, ! $PKG_CONFIG --atleast-version=3.4 nettle)
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
