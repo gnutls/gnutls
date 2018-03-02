@@ -64,6 +64,7 @@ struct gnutls_pkcs11_obj_st {
 struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int rsa_pss_ok; /* if it is an RSA key, it can do RSA-PSS */
+	unsigned int bits;
 
 	unsigned int flags;
 	struct p11_kit_uri *uinfo;
