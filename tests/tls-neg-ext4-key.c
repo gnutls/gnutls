@@ -73,6 +73,7 @@ struct key_cb_data {
 	gnutls_privkey_t rkey; /* the real thing */
 	unsigned pk;
 	unsigned sig;
+	unsigned bits;
 };
 
 static int key_cb_info_func(gnutls_privkey_t key, unsigned int flags, void *userdata)
@@ -81,6 +82,8 @@ static int key_cb_info_func(gnutls_privkey_t key, unsigned int flags, void *user
 
 	if (flags & GNUTLS_PRIVKEY_INFO_PK_ALGO)
 		return p->pk;
+	else if (flags & GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS)
+		return p->bits;
 	else if (flags & GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO) {
 		unsigned sig = GNUTLS_FLAGS_TO_SIGN_ALGO(flags);
 
@@ -158,6 +161,8 @@ static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t
 	    gnutls_privkey_import_x509_raw(userdata->rkey, txtkey, GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0)
 		testfail("gnutls_privkey_import\n");
+
+	gnutls_privkey_get_pk_algorithm(userdata->rkey, &userdata->bits);
 
 	userdata->pk = pk;
 	userdata->sig = sig;
