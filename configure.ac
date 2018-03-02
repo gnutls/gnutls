@@ -255,11 +255,6 @@ AC_ARG_ENABLE(tests,
     enable_tests=$enableval, enable_tests=$enable_tools)
 AM_CONDITIONAL(ENABLE_TESTS, test "$enable_tests" != "no")
 
-AC_ARG_ENABLE(destructive-tests,
-  AS_HELP_STRING([--enable-destructive-tests], [compile and run tests which touch outside gnutls' code boundary]),
-    enable_destructive_tests=$enableval, enable_destructive_tests=no)
-AM_CONDITIONAL(ENABLE_DESTRUCTIVE_TESTS, test "$enable_destructive_tests" != "no")
-
 AC_ARG_ENABLE(fuzzer-target,
   AS_HELP_STRING([--enable-fuzzer-target], [make a library intended for testing - not production]),
     enable_fuzzer_target=$enableval, enable_fuzzer_target=no)
@@ -615,6 +610,8 @@ if test "$with_p11_kit" != "no"; then
 *** ]])
 	fi
 fi
+
+AM_CONDITIONAL(P11KIT_0_23_10_API, ! $PKG_CONFIG --atleast-version=2.23.10 p11-kit)
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
@@ -974,7 +971,6 @@ AC_MSG_NOTICE([summary of build options:
   Local unistring:      ${included_unistring}
   Use nettle-mini:      ${mini_nettle}
   Documentation:        ${enable_doc} (manpages: ${enable_manpages})
-  Destructive tests:    ${enable_destructive_tests}
 ])
 
 AC_MSG_NOTICE([External hardware support:

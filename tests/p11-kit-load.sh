@@ -21,7 +21,6 @@
 
 srcdir="${srcdir:-.}"
 builddir="${builddir:-.}"
-P11TOOL="${P11TOOL:-../src/p11tool${EXEEXT}}"
 CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 PKGCONFIG="${PKG_CONFIG:-$(which pkg-config)}"
@@ -48,8 +47,9 @@ done
 
 ${PKGCONFIG} --version >/dev/null || exit 77
 
-if ! test -x "${P11TOOL}"; then
-	echo "p11tool was not found"
+${PKGCONFIG} --atleast-version=0.23.10 p11-kit-1
+if test $? != 0;then
+	echo p11-kit 0.23.10 is required
 	exit 77
 fi
 
@@ -102,16 +102,13 @@ if test "$nr" != 2;then
 	exit 1
 fi
 
-## Check whether p11tool with a specific provider would list only that
-## That is, check whether p11tool will list the trust module
-## if we only load softhsm (it should as trust modules
-## are always loaded).ould list them both
+# Check whether whether list-tokens will list the trust module
+# if we only load softhsm. It shouldn't as we only load the
+# trust module when needed (e.g., verification).
 
-
-#nr=$(${P11TOOL} --provider "${SOFTHSM_MODULE}" --list-tokens|grep -c ^Token)
 nr=$(${builddir}/pkcs11/list-tokens -o ${P11DIR} -m -s "${SOFTHSM_MODULE}"|${FILTERTOKEN}|sort -u|wc -l)
 if test "$nr" != 1;then
-	echo "Error: did not find softhsm modules"
+	echo "Error: did not find softhsm module"
 	${builddir}/pkcs11/list-tokens -o ${P11DIR} -m -s "${SOFTHSM_MODULE}"
 	exit 1
 fi
@@ -148,8 +145,7 @@ fi
 nr=$(${builddir}/pkcs11/list-tokens -o ${P11DIR} -v|${FILTERTOKEN}|sort -u|wc -l)
 if test "$nr" != 1;then
 	echo "Error in test 4: did not find 1 module"
-	echo xxx
-	GNUTLS_DEBUG_LEVEL=4 P11_KIT_DEBUG=all ${builddir}/pkcs11/list-tokens -o ${P11DIR} -v
+	${builddir}/pkcs11/list-tokens -o ${P11DIR} -v
 	exit 1
 fi
 

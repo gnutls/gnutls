@@ -388,9 +388,9 @@ dist_check_SCRIPTS += gnutls-cli-self-signed.sh
 if ENABLE_PKCS11
 dist_check_SCRIPTS += p11-kit-trust.sh
 
-if ENABLE_DESTRUCTIVE_TESTS
 if HAVE_PKCS11_TRUST_STORE
-dist_check_SCRIPTS += destructive/p11-kit-load.sh
+if P11KIT_0_23_10_API
+dist_check_SCRIPTS += p11-kit-load.sh
 indirect_tests += pkcs11/list-tokens
 endif
 endif

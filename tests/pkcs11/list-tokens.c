@@ -35,6 +35,8 @@
 #include <gnutls/abstract.h>
 #include <getopt.h>
 #include <assert.h>
+#define P11_KIT_FUTURE_UNSTABLE_API
+#include <p11-kit/p11-kit.h>
 #include "cert-common.h"
 
 /* lists the registered PKCS#11 modules by p11-kit.
@@ -55,12 +57,11 @@ int main(int argc, char **argv)
 	int ret;
 	unsigned i;
 	int opt;
-	char *url;
+	char *url, *mod;
 	gnutls_x509_trust_list_t tl;
 	gnutls_x509_crt_t crt;
 	gnutls_pkcs11_privkey_t key;
 	unsigned flag = 1;
-	unsigned private = 0;
 	unsigned int status;
 
 	ret = gnutls_global_init();
@@ -72,11 +73,23 @@ int main(int argc, char **argv)
 	gnutls_global_set_log_function(tls_log_func);
 	//gnutls_global_set_log_level(4711);
 
-	while((opt = getopt(argc, argv, "mvatdp")) != -1) {
+	while((opt = getopt(argc, argv, "s:o:mvatdp")) != -1) {
 		switch(opt) {
+			case 'o':
+				mod = strdup(optarg);
+				p11_kit_override_system_files(NULL, NULL, mod, mod, NULL);
+				break;
 			case 'm':
 				/* initialize manually - i.e., do no module loading */
 				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+				if (ret != 0) {
+					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
+					exit(1);
+				}
+				break;
+			case 's':
+				/* load module */
+				ret = gnutls_pkcs11_add_provider(optarg, NULL);
 				if (ret != 0) {
 					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
 					exit(1);
