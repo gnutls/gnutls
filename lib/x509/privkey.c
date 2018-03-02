@@ -1682,8 +1682,13 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			goto cleanup;
 		}
 
-		key->params.spki.salt_size =
-		    _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+		ret = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		key->params.spki.salt_size = ret;
 	}
 
 	ret = _gnutls_pk_generate_keys(algo, bits, &key->params, 0);

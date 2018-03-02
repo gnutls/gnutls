@@ -333,6 +333,7 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 
 	if (pk == GNUTLS_PK_RSA_PSS) {
 		const mac_entry_st *me;
+		int ret;
 
 		me = hash_to_entry(dig);
 		if (unlikely(me == NULL))
@@ -350,8 +351,12 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 
 		if (flags & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE)
 			params->salt_size = 0;
-		else
-			params->salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, salt_size);
+		else {
+			ret = _gnutls_find_rsa_pss_salt_size(bits, me, salt_size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			params->salt_size = ret;
+		}
 		params->rsa_pss_dig = dig;
 	}
 

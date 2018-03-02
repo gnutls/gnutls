@@ -104,7 +104,7 @@ int pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 		 gnutls_pk_params_st * params, const gnutls_datum_t * data,
 		 gnutls_datum_t * digest);
 
-unsigned _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
-					unsigned salt_size);
+int _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
+				   unsigned salt_size);
 
 #endif				/* GNUTLS_PK_H */
