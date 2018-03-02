@@ -21,6 +21,11 @@ See the end for copying conditions.
 ** libgnutls: Introduced low-level function to assist applications attempting client
    hello extension parsing, prior to GnuTLS' parsing of the message.
 
+** libgnutls: When exporting an X.509 certificate avoid re-encoding if there are no
+   modifications to the certificate. That would prevent DER re-encoding issues in
+   libtasn1, or other DER incompatibilities to affect the verbatim use of a certificate.
+   Relates with #403
+
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
 gnutls_session_key_update: Added
