@@ -137,7 +137,8 @@ int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key, unsigned int *bits)
 		return gnutls_x509_privkey_get_pk_algorithm(key->key.x509);
 	case GNUTLS_PRIVKEY_EXT:
 		if (bits)
-			*bits = 0;
+			*bits = key->key.ext.bits;
+
 		return key->pk_algorithm;
 	default:
 		gnutls_assert();
@@ -333,6 +334,7 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 
 	if (pk == GNUTLS_PK_RSA_PSS) {
 		const mac_entry_st *me;
+		int ret;
 
 		me = hash_to_entry(dig);
 		if (unlikely(me == NULL))
@@ -350,8 +352,12 @@ _gnutls_privkey_update_spki_params(gnutls_privkey_t key,
 
 		if (flags & GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE)
 			params->salt_size = 0;
-		else
-			params->salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, salt_size);
+		else {
+			ret = _gnutls_find_rsa_pss_salt_size(bits, me, salt_size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			params->salt_size = ret;
+		}
 		params->rsa_pss_dig = dig;
 	}
 
@@ -811,8 +817,9 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
  * unless prohibited by the type of the algorithm (e.g., as with Ed25519).
  *
  * The @info_fn must provide information on the signature algorithms supported by
- * this private key, and should support the flags %GNUTLS_PRIVKEY_INFO_PK_ALGO and
- * %GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO. It must return -1 on unknown flags.
+ * this private key, and should support the flags %GNUTLS_PRIVKEY_INFO_PK_ALGO,
+ * %GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO and %GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS.
+ * It must return -1 on unknown flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -853,6 +860,10 @@ gnutls_privkey_import_ext4(gnutls_privkey_t pkey,
 	pkey->flags = flags;
 
 	pkey->pk_algorithm = pkey->key.ext.info_func(pkey, GNUTLS_PRIVKEY_INFO_PK_ALGO, pkey->key.ext.userdata);
+
+	ret = pkey->key.ext.info_func(pkey, GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS, pkey->key.ext.userdata);
+	if (ret >= 0)
+		pkey->key.ext.bits = ret;
 
 	/* Ensure gnutls_privkey_deinit() calls the deinit_func */
 	if (deinit_fn)

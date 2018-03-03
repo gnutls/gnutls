@@ -1527,7 +1527,7 @@ int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_e
 	}
 
 	if (params->pk == GNUTLS_PK_RSA_PSS) {
-
+		int ret;
 		if (!GNUTLS_PK_IS_RSA(key_params->algo))
 			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
 
@@ -1537,7 +1537,11 @@ int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_e
 		if (key_params->algo == GNUTLS_PK_RSA || params->rsa_pss_dig == 0) {
 			bits = pubkey_to_bits(key_params);
 			params->rsa_pss_dig = se->hash;
-			params->salt_size = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+			ret = _gnutls_find_rsa_pss_salt_size(bits, me, 0);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			params->salt_size = ret;
 		}
 
 		if (params->rsa_pss_dig != se->hash)

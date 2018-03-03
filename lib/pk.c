@@ -382,19 +382,29 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
 	}
 }
 
-unsigned
+int
 _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
 			       unsigned salt_size)
 {
-	unsigned max_salt_size, digest_size;
+	unsigned digest_size;
+	int max_salt_size;
+	unsigned key_size;
 
 	digest_size = _gnutls_hash_get_algo_len(me);
-	max_salt_size = (bits + 7) / 8 - digest_size - 2;
+	key_size = (bits + 7) / 8;
+
+	if (key_size == 0) {
+		return gnutls_assert_val(GNUTLS_E_PK_INVALID_PUBKEY);
+	} else {
+		max_salt_size = key_size - digest_size - 2;
+		if (max_salt_size < 0)
+			return gnutls_assert_val(GNUTLS_E_CONSTRAINT_ERROR);
+	}
 
 	if (salt_size < digest_size)
 		salt_size = digest_size;
 
-	if (salt_size > max_salt_size)
+	if (salt_size > (unsigned)max_salt_size)
 		salt_size = max_salt_size;
 
 	return salt_size;

@@ -156,7 +156,7 @@ gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key,
 				       unsigned int *bits)
 {
 	if (bits)
-		*bits = 0;	/* FIXME */
+		*bits = key->bits;
 	return key->pk_algorithm;
 }
 
@@ -567,7 +567,6 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	a[0].type = CKA_KEY_TYPE;
 	a[0].value = &key_type;
 	a[0].value_len = sizeof(key_type);
-
 	if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, a, 1)
 	    == CKR_OK) {
 		pkey->pk_algorithm = key_type_to_pk(key_type);
@@ -580,7 +579,16 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		goto cleanup;
 	}
 
+
 	if (pkey->pk_algorithm == GNUTLS_PK_RSA) { /* determine whether it can do rsa-pss */
+		a[0].type = CKA_MODULUS;
+		a[0].value = NULL;
+		a[0].value_len = 0;
+		if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, a, 1)
+		    == CKR_OK) {
+			pkey->bits = a[0].value_len*8;
+		}
+
 		ret = gnutls_pkcs11_token_check_mechanism(url, CKM_RSA_PKCS_PSS, NULL, 0, 0);
 		if (ret != 0)
 			pkey->rsa_pss_ok = 1;

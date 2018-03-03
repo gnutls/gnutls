@@ -3052,9 +3052,14 @@ gnutls_x509_crq_set_spki(gnutls_x509_crq_t crq,
 
 		/* If salt size is zero, find the optimal salt size. */
 		if (spki->salt_size == 0) {
-			tpki.salt_size =
+			ret =
 			    _gnutls_find_rsa_pss_salt_size(bits, me,
 							   spki->salt_size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			tpki.salt_size = ret;
 		} else
 			tpki.salt_size = spki->salt_size;
 	} else if (crq_pk == GNUTLS_PK_RSA_PSS) {

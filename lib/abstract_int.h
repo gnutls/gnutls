@@ -42,6 +42,7 @@ struct gnutls_privkey_st {
 			gnutls_privkey_deinit_func deinit_func;
 			gnutls_privkey_info_func info_func;
 			void *userdata;
+			unsigned bits;
 		} ext;
 	} key;
 
