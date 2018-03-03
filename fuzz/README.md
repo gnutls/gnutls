@@ -55,9 +55,11 @@ Code coverage reports currently work best with gcc+lcov+genhtml.
 
 In the top directory:
 ```
-CC=gcc CFLAGS="-O0 -g" ./configure --disable-doc --disable-manywarnings
-make fuzz-coverage
+cd fuzz
+make coverage-prepare
+make coverage
 xdg-open lcov/index.html
+# repeat the last two steps after changing *fuzzer.c
 ```
 
 Each fuzzer target has it's own files/functions to cover, e.g.

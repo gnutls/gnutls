@@ -1,10 +1,10 @@
-#!/bin/bash -eu
+#!/bin/bash -e
 #
-# (C)2017 Tim Ruehsen tim.ruehsen@gmx.de
+# (C)2017-2018 Tim Ruehsen tim.ruehsen@gmx.de
 #
 # View the coverage report for one or more fuzzers.
 
-# 1. execute 'make coverage' in the fuzz/ directory
+# 1. execute 'make coverage-prepare' in the fuzz/ directory
 # 2. execute './view-coverage.sh <fuzz target(s)>
 
 # Example with single fuzzer:
@@ -20,9 +20,11 @@ if test -z "$1"; then
 fi
 
 LCOV_INFO=coverage.info
+
 lcov --zerocounters --directory ../lib/
-lcov --capture --initial --directory ../lib/.libs --directory . --output-file $LCOV_INFO
-make check TESTS="$*" CFLAGS="$(CFLAGS) --coverage" LDFLAGS="$(LDFLAGS) --coverage"
-lcov --capture --directory ../lib/.libs --output-file $LCOV_INFO
+#lcov --capture --initial --directory ../lib/ --directory . --output-file $LCOV_INFO
+make check TESTS="$*" CFLAGS="$CFLAGS --coverage" LDFLAGS="$LDFLAGS --coverage"
+lcov --capture --directory ../lib/ --output-file $LCOV_INFO
+lcov --remove $LCOV_INFO '/usr/include*' '*/gl/*' -o $LCOV_INFO
 genhtml --prefix . --ignore-errors source $LCOV_INFO --legend --title "$*" --output-directory=lcov
 xdg-open lcov/index.html
