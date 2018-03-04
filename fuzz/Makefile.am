@@ -84,18 +84,22 @@ oss-fuzz:
 
 .PHONY: oss-fuzz
 
-LCOV_INFO=coverage.info
-clean-lcov:
+CFLAGS ?=
+LDFLAGS ?=
+LCOV_INFO = coverage.info
+
+coverage-prepare: clean
 	rm -rf $(LCOV_INFO) ../*/*.gc?? ../*/.libs/*.gc?? lcov/
 	lcov --zerocounters --directory ../lib/
-
-coverage: clean clean-lcov
 	$(MAKE) -C .. clean
 	$(MAKE) -C ../gl
 	$(MAKE) -C ../lib CFLAGS="$(CFLAGS) --coverage" LDFLAGS="$(LDFLAGS) --coverage"
+
+coverage:
+	lcov --capture --initial --directory ../lib/ --output-file $(LCOV_INFO)
 	$(MAKE) check CFLAGS="$(CFLAGS) --coverage" LDFLAGS="$(LDFLAGS) --coverage"
-	lcov --capture --initial --directory ../lib/.libs --output-file $(LCOV_INFO)
-	lcov --capture --directory ../lib/.libs --output-file $(LCOV_INFO)
+	lcov --capture --directory ../lib/ --output-file $(LCOV_INFO)
+	lcov --remove $(LCOV_INFO) '/usr/include/*' '*/gl/*' -o $(LCOV_INFO)
 	genhtml --prefix . --ignore-errors source $(LCOV_INFO) --legend --title "gnutls-fuzz" --output-directory=lcov
 	@echo
 	@echo "You can now view the coverage report with 'xdg-open lcov/index.html'"
