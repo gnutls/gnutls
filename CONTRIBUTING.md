@@ -199,6 +199,21 @@ The NDEBUG macro is not used in GnuTLS compilation, so the assert() macros
 are always active.
 
 
+# Gnulib
+
+The files at `gl/`, `src/gl/` and `lib/unistring` directories are part of
+gnulib project and are included mainly for systems which may miss functionality
+available in glibc and unistring libraries. These files are updated when new
+functionality is needed or bug fixes affecting gnutls are required.
+
+They can be updated by the following make rule.
+```
+$ make glimport
+```
+
+That rule assumes that an updated gnulib is present at `../gnulib/`.
+
+
 # Symbol and library versioning
 
  The library uses the libtool versioning system, which in turn
