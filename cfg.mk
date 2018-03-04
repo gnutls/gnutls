@@ -77,7 +77,7 @@ update-po: refresh-po
 		cp $$f $$f.in; \
 	done
 	git add $(PODIR)/*.po.in
-	git commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
+	git commit -sm "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
 
 config:
 	./configure $(CFGFLAGS)
