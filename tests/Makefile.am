@@ -381,7 +381,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
-	sni-resume.sh ocsp-tests/ocsptool
+	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh
 

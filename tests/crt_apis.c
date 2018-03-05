@@ -78,6 +78,7 @@ void doit(void)
 	gnutls_x509_crt_t crt2;
 	const char *err = NULL;
 	unsigned char buf[64];
+	unsigned char large_buf[5*1024];
 	unsigned int status;
 	gnutls_datum_t out;
 	size_t s = 0;
@@ -330,6 +331,29 @@ void doit(void)
 	assert(out.size == saved_crt.size);
 	assert(memcmp(out.data, saved_crt.data, out.size)==0);
 #endif
+
+	/* test behavior of gnutls_x509_crt_export on varios corner cases */
+	s = 0;
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, NULL, &s) == GNUTLS_E_SHORT_MEMORY_BUFFER);
+	assert(s == out.size+1);
+	s = sizeof(buf);
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buf, &s) == GNUTLS_E_SHORT_MEMORY_BUFFER);
+	assert(s == out.size+1);
+
+	/* check whether the PEM output matches gnutls_x509_crt_export2 */
+	s = sizeof(large_buf);
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, large_buf, &s) == 0);
+	assert(s == out.size);
+	assert(memcmp(large_buf, out.data, out.size) == 0);
+	gnutls_free(out.data);
+
+	/* check whether the der out length differs */
+	s = sizeof(large_buf);
+	assert(gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_DER, large_buf, &s) == 0);
+	assert(gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER, &out) >= 0);
+
+	assert(s == out.size);
+	assert(memcmp(large_buf, out.data, out.size) == 0);
 
 	gnutls_free(out.data);
 

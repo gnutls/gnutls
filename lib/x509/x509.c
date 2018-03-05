@@ -2903,13 +2903,26 @@ gnutls_x509_crt_export(gnutls_x509_crt_t cert,
 		       gnutls_x509_crt_fmt_t format, void *output_data,
 		       size_t * output_data_size)
 {
-	if (cert == NULL) {
+	gnutls_datum_t out;
+	int ret;
+
+	ret = gnutls_x509_crt_export2(cert, format, &out);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (format == GNUTLS_X509_FMT_PEM)
+		ret = _gnutls_copy_string(&out, (uint8_t*)output_data, output_data_size);
+	else
+		ret = _gnutls_copy_data(&out, (uint8_t*)output_data, output_data_size);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
-	return _gnutls_x509_export_int(cert->cert, format, PEM_X509_CERT2,
-				       output_data, output_data_size);
+	ret = 0;
+ cleanup:
+	gnutls_free(out.data);
+	return ret;
 }
 
 /**
@@ -2936,6 +2949,15 @@ gnutls_x509_crt_export2(gnutls_x509_crt_t cert,
 	if (cert == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (!cert->modified && cert->der.size) {
+		if (format == GNUTLS_X509_FMT_DER)
+			return _gnutls_set_datum(out, cert->der.data, cert->der.size);
+		else
+			return _gnutls_fbase64_encode(PEM_X509_CERT2, cert->der.data,
+						      cert->der.size, out);
+
 	}
 
 	return _gnutls_x509_export_int2(cert->cert, format, PEM_X509_CERT2,
