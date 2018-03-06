@@ -1148,13 +1148,13 @@ gnutls_privkey_sign_data2(gnutls_privkey_t signer,
 {
 	int ret;
 	gnutls_x509_spki_st params;
-	const gnutls_sign_entry_st *e;
+	const gnutls_sign_entry_st *se;
 
 	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	e = _gnutls_sign_to_entry(algo);
-	if (e == NULL)
+	se = _gnutls_sign_to_entry(algo);
+	if (se == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	ret = _gnutls_privkey_get_spki_params(signer, &params);
@@ -1163,14 +1163,14 @@ gnutls_privkey_sign_data2(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	ret = _gnutls_privkey_update_spki_params(signer, e->pk, e->hash,
+	ret = _gnutls_privkey_update_spki_params(signer, se->pk, se->hash,
 					         flags, &params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	return privkey_sign_and_hash_data(signer, _gnutls_sign_to_entry(algo), data, signature, &params);
+	return privkey_sign_and_hash_data(signer, se, data, signature, &params);
 }
 
 /**
@@ -1831,8 +1831,13 @@ unsigned _gnutls_privkey_compatible_with_sig(gnutls_privkey_t privkey,
 	 * and RSA keys which cannot do RSA-PSS (e.g., smart card) from
 	 * negotiating RSA-PSS sig.
 	 */
-	if (privkey->pk_algorithm == GNUTLS_PK_RSA_PSS && se->pk != GNUTLS_PK_RSA_PSS) {
+
+	if (se->pk != privkey->pk_algorithm) { /* if the PK algorithm of the signature differs to the one on the pubkey */
+		if (!sign_supports_priv_pk_algorithm(se, privkey->pk_algorithm)) {
+			_gnutls_handshake_log("cannot use privkey of %s with %s\n",
+					      gnutls_pk_get_name(privkey->pk_algorithm), se->name);
 			return 0;
+		}
 	}
 
 	if (privkey->type == GNUTLS_PRIVKEY_EXT) {

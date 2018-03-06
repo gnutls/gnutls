@@ -145,7 +145,7 @@ void doit(void)
 	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_SHA3_256, 0) < 0)
 		fail("failed verification with SHA3-256!\n");
 
-	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_PSS_SHA256, 0) < 0)
+	if (sign_verify_data(pkey, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, 0) < 0)
 		fail("failed verification with SHA256 with PSS!\n");
 
 	gnutls_x509_privkey_deinit(pkey);

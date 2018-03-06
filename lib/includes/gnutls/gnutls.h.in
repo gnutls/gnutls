@@ -797,9 +797,21 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_RSA_SHA3_256: Digital signature algorithm RSA with SHA3-256.
  * @GNUTLS_SIGN_RSA_SHA3_384: Digital signature algorithm RSA with SHA3-384.
  * @GNUTLS_SIGN_RSA_SHA3_512: Digital signature algorithm RSA with SHA3-512.
- * @GNUTLS_SIGN_RSA_PSS_SHA256: Digital signature algorithm RSA with SHA-256, with PSS padding.
- * @GNUTLS_SIGN_RSA_PSS_SHA384: Digital signature algorithm RSA with SHA-384, with PSS padding.
- * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding.
+ * @GNUTLS_SIGN_RSA_PSS_RSAE_SHA256: Digital signature algorithm RSA with SHA-256,
+ *      with PSS padding (RSA PKCS#1 1.5 certificate). This signature is identical
+ *      to #GNUTLS_SIGN_RSA_PSS_SHA256, but they are distinct as the TLS1.3 protocol
+ *      treats them differently.
+ * @GNUTLS_SIGN_RSA_PSS_RSAE_SHA384: Digital signature algorithm RSA with SHA-384,
+ *      with PSS padding (RSA PKCS#1 1.5 certificate). This signature is identical
+ *      to #GNUTLS_SIGN_RSA_PSS_SHA384, but they are distinct as the TLS1.3 protocol
+ *      treats them differently.
+ * @GNUTLS_SIGN_RSA_PSS_RSAE_SHA512: Digital signature algorithm RSA with SHA-512,
+ *      with PSS padding (RSA PKCS#1 1.5 certificate). This signature is identical
+ *      to #GNUTLS_SIGN_RSA_PSS_SHA512, but they are distinct as the TLS1.3 protocol
+ *      treats them differently.
+ * @GNUTLS_SIGN_RSA_PSS_SHA256: Digital signature algorithm RSA with SHA-256, with PSS padding (RSA-PSS certificate).
+ * @GNUTLS_SIGN_RSA_PSS_SHA384: Digital signature algorithm RSA with SHA-384, with PSS padding (RSA-PSS certificate).
+ * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding (RSA-PSS certificate).
  * @GNUTLS_SIGN_EDDSA_ED25519: Digital signature algorithm EdDSA with Ed25519 curve.
  *
  * Enumeration of different digital signature algorithms.
@@ -849,7 +861,11 @@ typedef enum {
 	GNUTLS_SIGN_ECDSA_SECP256R1_SHA256 = 37,
 	GNUTLS_SIGN_ECDSA_SECP384R1_SHA384 = 38,
 	GNUTLS_SIGN_ECDSA_SECP521R1_SHA512 = 39,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_ECDSA_SECP521R1_SHA512
+
+	GNUTLS_SIGN_RSA_PSS_RSAE_SHA256 = 40,
+	GNUTLS_SIGN_RSA_PSS_RSAE_SHA384 = 41,
+	GNUTLS_SIGN_RSA_PSS_RSAE_SHA512 = 42,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_PSS_RSAE_SHA512
 } gnutls_sign_algorithm_t;
 
 /**

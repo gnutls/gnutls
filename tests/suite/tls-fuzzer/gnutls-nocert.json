@@ -134,9 +134,11 @@
                          "-e", "medium, maximum fragmentation: 1 fragment - 1024B extension"]},
          {"name" : "test-sessionID-resumption.py"},
          {"name" : "test-sig-algs.py",
-          "comment" : "FIXME: these fail, but most likely due to tls-fuzzer issue",
+          "comment" : "tlsfuzzer doesn't yet support draft-22 RSA-PSS",
           "arguments" : ["-e", "RSA-PSS only - fails in verify if server selects PSS",
-                         "-e", "with RSA-PSS - fails in verify if server selects PSS"]},
+                         "-e", "with RSA-PSS - fails in verify if server selects PSS"],
+          "exp_pass" : false
+         },
          {"name" : "test-signature-algorithms.py",
           "comment" : "gnutls doesn't tolerate that much",
           "arguments" : ["-e", "tolerance max (32764) number of methods"]

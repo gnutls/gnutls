@@ -283,6 +283,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	sig_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 	unsigned int cert_algo;
+	const gnutls_sign_entry_st *se;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_SIGN_UNKNOWN);
@@ -304,23 +305,28 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 		return ret;
 	}
 
+
+
 	for (i = 0; i < priv->sign_algorithms_size; i++) {
-		_gnutls_handshake_log("checking cert compat with %s\n", gnutls_sign_algorithm_get_name(priv->sign_algorithms[i]));
+		se = _gnutls_sign_to_entry(priv->sign_algorithms[i]);
+		if (se == NULL)
+			continue;
+
+		_gnutls_handshake_log("checking cert compat with %s\n", se->name);
 
 		if (_gnutls_privkey_compatible_with_sig(privkey, priv->sign_algorithms[i]) == 0)
 			continue;
 
-		if (gnutls_sign_supports_pk_algorithm(priv->sign_algorithms[i], cert_algo) != 0) {
+		if (sign_supports_cert_pk_algorithm(se, cert_algo) != 0) {
 			if (_gnutls_pubkey_compatible_with_sig
-			    (session, cert->pubkey, ver,
-			     priv->sign_algorithms[i]) < 0)
+			    (session, cert->pubkey, ver, se->id) < 0)
 				continue;
 
 			if (_gnutls_session_sign_algo_enabled
-			    (session, priv->sign_algorithms[i]) < 0)
+			    (session, se->id) < 0)
 				continue;
 
-			return priv->sign_algorithms[i];
+			return se->id;
 		}
 	}
 
@@ -328,7 +334,7 @@ _gnutls_session_get_sign_algo(gnutls_session_t session,
 	 * using algorithms we don't always enable by default (e.g., DSA-SHA1),
 	 * continue and sign with it. */
 	if (client_cert) {
-		_gnutls_audit_log(session, "No shared signature schemes with peer for client certificate (%s). Is the certificate a legacy one?",
+		_gnutls_audit_log(session, "No shared signature schemes with peer for client certificate (%s). Is the certificate a legacy one?\n",
 				  gnutls_pk_get_name(cert_algo));
 	}
 
@@ -357,8 +363,9 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 	if (ver->tls13_sem) {
 		/* disallow RSA, DSA, and SHA1 */
 		const gnutls_sign_entry_st *se;
+
 		se = _gnutls_sign_to_entry(sig);
-		if (se == NULL || se->pk == GNUTLS_PK_RSA || se->pk == GNUTLS_PK_DSA || se->hash == GNUTLS_DIG_SHA1) {
+		if (se == NULL || (se->tls13_ok == 0)) {
 			gnutls_assert();
 			goto disallowed;
 		}

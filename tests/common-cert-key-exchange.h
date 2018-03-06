@@ -36,7 +36,7 @@ extern const char *server_priority;
 		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0)
 
 #define try_ks(name, client_prio, client_kx, group) \
-	try_with_key_ks(name, client_prio, client_kx, GNUTLS_SIGN_RSA_PSS_SHA256, GNUTLS_SIGN_UNKNOWN, \
+	try_with_key_ks(name, client_prio, client_kx, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, GNUTLS_SIGN_UNKNOWN, \
 		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0, group)
 
 #define try_cli(name, client_prio, client_kx, server_sign_algo, client_sign_algo, client_cert) \

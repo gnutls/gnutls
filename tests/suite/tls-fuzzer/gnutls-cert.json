@@ -30,10 +30,11 @@
                          "-e", "check sigalgs in cert request"]
           },
          {"name" : "test-rsa-pss-sigs-on-certificate-verify.py",
-          "comment" : "tlsfuzzer doesn't like our set of algorithms",
+          "comment" : "tlsfuzzer doesn't yet support draft-22 RSA-PSS",
           "arguments" : ["-k", "tests/clientX509Key.pem",
                          "-c", "tests/clientX509Cert.pem",
-                         "-e", "check CertificateRequest sigalgs"]
+                         "-e", "check CertificateRequest sigalgs"],
+          "exp_pass" : false
           },
          {"name": "test-certificate-malformed.py",
           "comment" : "tlsfuzzer doesn't like the alerts we send",
