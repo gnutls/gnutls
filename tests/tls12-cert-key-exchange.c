@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -83,6 +83,24 @@ void doit(void)
 	try_cli("TLS 1.2 with rsa ask cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
 	try_with_key("TLS 1.2 with ecdhe ecdsa cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_ECDSA_SHA256, GNUTLS_SIGN_UNKNOWN, 
 		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &cli_ca3_cert, &cli_ca3_key, ASK_CERT);
+
+	/* illegal setups */
+	server_priority = "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA";
+	try_with_key_fail("TLS 1.2 with rsa cert and only RSA-PSS sig algos in client",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+			GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
+			&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL);
+
+	server_priority = NULL;
+	try_with_key_fail("TLS 1.2 with rsa cert and only RSA-PSS sig algos",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+			GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
+			&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL);
+
+	try_with_key_fail("TLS 1.2 with rsa-pss cert and rsa cli cert with only RSA-PSS sig algos",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+			GNUTLS_E_AGAIN, GNUTLS_E_UNWANTED_ALGORITHM,
+			&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, &cli_ca3_cert, &cli_ca3_key);
 
 	gnutls_global_deinit();
 }

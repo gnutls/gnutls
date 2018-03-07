@@ -67,6 +67,13 @@ void try_with_key(const char *name, const char *client_prio, gnutls_kx_algorithm
 			       serv_cert, serv_key, cli_cert, cli_key, client_cert, 0);
 }
 
+void try_with_key_fail(const char *name, const char *client_prio,
+			int server_err, int client_err,
+			const gnutls_datum_t *serv_cert,
+			const gnutls_datum_t *serv_key,
+			const gnutls_datum_t *cli_cert,
+			const gnutls_datum_t *cli_key);
+
 #define dtls_try(name, client_prio, client_kx, server_sign_algo, client_sign_algo) \
 	dtls_try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
 		&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL, 0)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -96,6 +96,24 @@ void doit(void)
 		&server_ca3_eddsa_cert, &server_ca3_eddsa_key, NULL, NULL, 0, 0);
 	try("TLS 1.2 fallback with secp521r1 rsa no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP521R1", GNUTLS_KX_ECDHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN);
 	try("TLS 1.2 fallback with ffdhe2048 rsa no-cli-cert", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-KX-ALL:+DHE-RSA:-GROUP-ALL:+GROUP-FFDHE2048", GNUTLS_KX_DHE_RSA, GNUTLS_SIGN_RSA_SHA256, GNUTLS_SIGN_UNKNOWN);
+
+	/* illegal setups */
+	server_priority = "NORMAL:-VERS-ALL:+VERS-TLS1.3";
+	try_with_key_fail("TLS 1.3 with rsa cert and only RSA-PSS sig algos in client",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+			GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
+			&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL);
+
+	server_priority = NULL;
+	try_with_key_fail("TLS 1.3 with rsa cert and only RSA-PSS sig algos",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+			GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
+			&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL);
+
+	try_with_key_fail("TLS 1.3 with rsa-pss cert and rsa cli cert with only RSA-PSS sig algos",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+			GNUTLS_E_AGAIN, GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY,
+			&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, &cli_ca3_cert, &cli_ca3_key);
 
 	gnutls_global_deinit();
 }
