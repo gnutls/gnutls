@@ -134,6 +134,13 @@ typedef struct {
 #define GNUTLS_MASTER_SIZE 48
 #define GNUTLS_RANDOM_SIZE 32
 
+#define HRR_RANDOM \
+	 "\xCF\x21\xAD\x74\xE5\x9A\x61\x11\xBE\x1D\x8C\x02\x1E\x65\xB8\x91" \
+	 "\xC2\xA2\x11\x16\x7A\xBB\x8C\x5E\x07\x9E\x09\xE2\xC8\xA8\x33\x9C"
+
+/* Under TLS1.3 a hello retry request is sent as server hello */
+#define REAL_HSK_TYPE(t) ((t)==GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST?GNUTLS_HANDSHAKE_SERVER_HELLO:t)
+
 /* Enable: Appendix D4.  Middlebox Compatibility Mode */
 #define TLS13_APPENDIX_D4 1
 
@@ -366,6 +373,10 @@ typedef enum content_type_t {
 typedef struct {
 	/* Handshake layer type and sequence of message */
 	gnutls_handshake_description_t htype;
+
+	/* The "real" type received; that is, it does not distinguish
+	 * HRR from server hello, while htype does */
+	gnutls_handshake_description_t rtype;
 	uint32_t length;
 
 	/* valid in DTLS */

@@ -1143,7 +1143,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 	i_datasize = _mbuffer_get_udata_size(bufel);
 	datasize = i_datasize + _mbuffer_get_uhead_size(bufel);
 
-	data[pos++] = (uint8_t) type;
+	data[pos++] = (uint8_t) REAL_HSK_TYPE(type);
 	_gnutls_write_uint24(_mbuffer_get_udata_size(bufel), &data[pos]);
 	pos += 3;
 
@@ -1389,7 +1389,7 @@ _gnutls_recv_handshake(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = handshake_hash_add_recvd(session, hsk.htype,
+	ret = handshake_hash_add_recvd(session, hsk.rtype,
 				       hsk.header, hsk.header_size,
 				       hsk.data.data,
 				       hsk.data.length);
@@ -1658,7 +1658,7 @@ read_server_hello(gnutls_session_t session,
 	int ret = 0;
 	int len = datalen;
 	unsigned ext_parse_flag = 0;
-	const version_entry_st *vers;
+	const version_entry_st *vers, *saved_vers;
 
 	if (datalen < GNUTLS_RANDOM_SIZE+2) {
 		gnutls_assert();
@@ -1671,6 +1671,8 @@ read_server_hello(gnutls_session_t session,
 	DECR_LEN(len, 2);
 	major = data[pos];
 	minor = data[pos+1];
+
+	saved_vers = get_version(session); /* will be non-null if HRR has been received */
 
 	vers = nversion_to_entry(major, minor);
 	if (unlikely(vers == NULL))
@@ -1769,6 +1771,10 @@ read_server_hello(gnutls_session_t session,
 	if (session->internals.hsk_flags & HSK_HRR_RECEIVED) {
 		/* check if ciphersuite matches */
 		if (memcmp(cs_pos, session->internals.hrr_cs, 2) != 0)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		/* check if HRR version matches this version */
+		if (vers != saved_vers)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 

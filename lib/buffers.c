@@ -900,17 +900,17 @@ parse_handshake_header(gnutls_session_t session, mbuffer_st * bufel,
 			return
 			    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 
-		hsk->htype = GNUTLS_HANDSHAKE_CLIENT_HELLO_V2;
+		hsk->rtype = hsk->htype = GNUTLS_HANDSHAKE_CLIENT_HELLO_V2;
 
 		hsk->sequence = 0;
 		hsk->start_offset = 0;
 		hsk->end_offset = hsk->length;
 	} else
 #endif
-	{		/* TLS or DTLS handshake headers */
+	{	/* TLS or DTLS handshake headers */
 
 
-		hsk->htype = dataptr[0];
+		hsk->rtype = hsk->htype = dataptr[0];
 
 		/* we do not use DECR_LEN because we know
 		 * that the packet has enough data.
@@ -931,6 +931,15 @@ parse_handshake_header(gnutls_session_t session, mbuffer_st * bufel,
 			hsk->end_offset =
 			    MIN((_mbuffer_get_udata_size(bufel) -
 				 handshake_header_size), hsk->length);
+		}
+
+		/* TLS1.3: distinguish server hello versus hello retry request.
+		 * The epitome of slick protocol design. */
+		if (hsk->htype == GNUTLS_HANDSHAKE_SERVER_HELLO && hsk->start_offset == 0 && !IS_DTLS(session)) {
+			if (_mbuffer_get_udata_size(bufel) > handshake_header_size+2+GNUTLS_RANDOM_SIZE &&
+			    memcmp(dataptr+handshake_header_size+2, HRR_RANDOM, GNUTLS_RANDOM_SIZE) == 0) {
+				hsk->htype = GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST;
+			}
 		}
 	}
 	data_size = _mbuffer_get_udata_size(bufel) - handshake_header_size;
