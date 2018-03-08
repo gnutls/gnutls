@@ -192,6 +192,7 @@ int gnutls_error_to_alert(int err, int *level)
 
 	switch (err) {		/* send appropriate alert */
 	case GNUTLS_E_PK_SIG_VERIFY_FAILED:
+	case GNUTLS_E_ERROR_IN_FINISHED_PACKET:
 		ret = GNUTLS_A_DECRYPT_ERROR;
 		_level = GNUTLS_AL_FATAL;
 		break;
