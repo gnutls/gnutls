@@ -1272,9 +1272,12 @@ typedef struct {
 	 * receive size */
 	unsigned max_recv_size;
 
-	/* candidate groups to be selected for security params groups */
+	/* candidate groups to be selected for security params groups, they are
+	 * prioritized in isolation under TLS1.2 */
 	const gnutls_group_entry_st *cand_ec_group;
 	const gnutls_group_entry_st *cand_dh_group;
+	/* used under TLS1.3+ */
+	const gnutls_group_entry_st *cand_group;
 
 	/* the ciphersuite received in HRR */
 	uint8_t hrr_cs[2];

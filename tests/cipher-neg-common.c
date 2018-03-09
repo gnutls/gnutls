@@ -23,6 +23,7 @@
 typedef struct test_case_st {
 	const char *name;
 	int cipher;
+	int group;
 	const char *client_prio;
 	const char *server_prio;
 	unsigned not_on_fips;
@@ -79,9 +80,26 @@ static void try(test_case_st *test)
 	}
 
 	if (cret != test->cipher) {
-		fail("%s: negotiated cipher diffs the expected (%s, %s)!\n",
+		fail("%s: negotiated cipher differs with the expected (%s, %s)!\n",
 			test->name, gnutls_cipher_get_name(cret),
 			gnutls_cipher_get_name(test->cipher));
+	}
+
+	if (test->group) {
+		sret = gnutls_group_get(client);
+		cret = gnutls_group_get(server);
+
+		if (sret != cret) {
+			fail("%s: client negotiated different group than server (%s, %s)!\n",
+				test->name, gnutls_group_get_name(cret),
+				gnutls_group_get_name(sret));
+		}
+
+		if (cret != test->group) {
+			fail("%s: negotiated group differs with the expected (%s, %s)!\n",
+				test->name, gnutls_group_get_name(cret),
+				gnutls_group_get_name(test->group));
+		}
 	}
 
 	gnutls_deinit(server);
