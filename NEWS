@@ -11,7 +11,7 @@ See the end for copying conditions.
    mode, i.e., strict vs a more lax mode which will allow certain non FIPS140-2
    operations.
 
-** libgnutls: Introduced support for draft-ietf-tls-tls13-21. It includes version
+** libgnutls: Introduced support for draft-ietf-tls-tls13-23. It includes version
    negotiation, post handshake authentication, length hiding, multiple OCSP support,
    consistent ciphersuite support across protocols, hello retry requests, ability
    to adjust key shares via gnutls_init() flags, certificate authorities extension,
@@ -25,6 +25,10 @@ See the end for copying conditions.
    modifications to the certificate. That would prevent DER re-encoding issues in
    libtasn1, or other DER incompatibilities to affect the verbatim use of a certificate.
    Relates with #403
+
+** libgnutls: gnutls_privkey_import_ext4() was enhanced with the
+   GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS flag.
+
 
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
@@ -41,6 +45,7 @@ gnutls_certificate_set_ocsp_status_request_mem: Added
 gnutls_certificate_get_ocsp_expiration: Added
 gnutls_record_send2: Added
 gnutls_ext_raw_parse: Added
+GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS: Added
 
 
 * Version 3.6.2 (released 2018-02-16)
