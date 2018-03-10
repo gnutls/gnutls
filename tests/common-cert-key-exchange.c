@@ -49,6 +49,94 @@ static void tls_log_func(int level, const char *str)
 
 #define MSG "hello there ppl"
 
+void try_with_key_fail(const char *name, const char *client_prio,
+			int server_err, int client_err,
+			const gnutls_datum_t *serv_cert,
+			const gnutls_datum_t *serv_key,
+			const gnutls_datum_t *cli_cert,
+			const gnutls_datum_t *cli_key)
+{
+	int ret;
+	/* Server stuff. */
+	gnutls_certificate_credentials_t serverx509cred;
+	gnutls_session_t server;
+	int sret = GNUTLS_E_AGAIN;
+	/* Client stuff. */
+	gnutls_certificate_credentials_t clientx509cred;
+	gnutls_session_t client;
+	int cret = GNUTLS_E_AGAIN;
+	const char *err;
+
+	/* General init. */
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(6);
+
+	reset_buffers();
+	/* Init server */
+	gnutls_certificate_allocate_credentials(&serverx509cred);
+
+	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
+						  serv_cert, serv_key,
+						  GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
+
+	gnutls_init(&server, GNUTLS_SERVER);
+	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
+			       serverx509cred);
+
+
+	if (server_priority)
+		assert(gnutls_priority_set_direct(server, server_priority, NULL) >= 0);
+	else
+		assert(gnutls_priority_set_direct(server, client_prio, NULL) >= 0);
+
+	gnutls_transport_set_push_function(server, server_push);
+	gnutls_transport_set_pull_function(server, server_pull);
+	gnutls_transport_set_ptr(server, server);
+
+	/* Init client */
+	ret = gnutls_certificate_allocate_credentials(&clientx509cred);
+	if (ret < 0)
+		exit(1);
+
+	if (cli_cert) {
+		gnutls_certificate_set_x509_key_mem(clientx509cred,
+						    cli_cert, cli_key,
+						    GNUTLS_X509_FMT_PEM);
+		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
+	}
+
+	ret = gnutls_init(&client, GNUTLS_CLIENT);
+	if (ret < 0)
+		exit(1);
+
+	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+				clientx509cred);
+	if (ret < 0)
+		exit(1);
+
+	gnutls_transport_set_push_function(client, client_push);
+	gnutls_transport_set_pull_function(client, client_pull);
+	gnutls_transport_set_ptr(client, client);
+
+	ret = gnutls_priority_set_direct(client, client_prio, &err);
+	if (ret < 0) {
+		if (ret == GNUTLS_E_INVALID_REQUEST)
+			fprintf(stderr, "Error in %s\n", err);
+		exit(1);
+	}
+	success("negotiating %s\n", name);
+	HANDSHAKE_EXPECT(client, server, client_err, server_err);
+
+	gnutls_deinit(client);
+	gnutls_deinit(server);
+
+	gnutls_certificate_free_credentials(serverx509cred);
+	gnutls_certificate_free_credentials(clientx509cred);
+}
+
 void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,
 		gnutls_sign_algorithm_t client_sign_algo,

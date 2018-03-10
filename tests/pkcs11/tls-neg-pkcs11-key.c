@@ -286,7 +286,7 @@ static const test_st tests[] = {
 	},
 	{.name = "tls1.2: rsa-pss cert, rsa-sign key no PSS signatures",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2:-SIGN-RSA-PSS-SHA256:-SIGN-RSA-PSS-SHA384:-SIGN-RSA-PSS-SHA512",
+	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2:-SIGN-RSA-PSS-SHA256:-SIGN-RSA-PSS-SHA384:-SIGN-RSA-PSS-SHA512:-SIGN-RSA-PSS-RSAE-SHA256:-SIGN-RSA-PSS-RSAE-SHA384:-SIGN-RSA-PSS-RSAE-SHA512",
 	 .cert = &server_ca3_rsa_pss_cert,
 	 .key = &server_ca3_rsa_pss_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,

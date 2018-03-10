@@ -87,6 +87,9 @@ _gnutls_handshake_sign_data12(gnutls_session_t session,
 	    ("HSK[%p]: signing TLS 1.2 handshake data: using %s\n", session,
 	     gnutls_sign_algorithm_get_name(sign_algo));
 
+	if (unlikely(gnutls_sign_supports_pk_algorithm(sign_algo, pkey->pk_algorithm) == 0))
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
 	dconcat.size = GNUTLS_RANDOM_SIZE*2 + params->size;
 	dconcat.data = gnutls_malloc(dconcat.size);
 	if (dconcat.data == NULL)
@@ -121,13 +124,17 @@ _gnutls_handshake_sign_data10(gnutls_session_t session,
 	const mac_entry_st *me;
 	gnutls_pk_algorithm_t pk_algo;
 
-	if (gnutls_privkey_get_pk_algorithm(pkey, NULL) == GNUTLS_PK_RSA)
+	pk_algo = gnutls_privkey_get_pk_algorithm(pkey, NULL);
+	if (pk_algo == GNUTLS_PK_RSA)
 		me = hash_to_entry(GNUTLS_DIG_MD5_SHA1);
 	else
 		me = hash_to_entry(
 				gnutls_sign_get_hash_algorithm(sign_algo));
 	if (me == NULL)
 		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
+
+	if (unlikely(gnutls_sign_supports_pk_algorithm(sign_algo, pk_algo) == 0))
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	pk_algo = gnutls_sign_get_pk_algorithm(sign_algo);
 	if (pk_algo == GNUTLS_PK_UNKNOWN)

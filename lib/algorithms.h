@@ -327,6 +327,18 @@ struct gnutls_sign_entry_st {
 	gnutls_pk_algorithm_t pk;
 	gnutls_digest_algorithm_t hash;
 
+	/* if non-zero it must be the algorithm of the
+	 * private key used or certificate. This is for algorithms
+	 * which can have a different public key type than the
+	 * private key (e.g., RSA PKCS#1 1.5 certificate, but
+	 * an RSA-PSS private key, or an RSA private key and
+	 * an RSA-PSS certificate). */
+	gnutls_pk_algorithm_t priv_pk;
+	gnutls_pk_algorithm_t cert_pk;
+
+	/* non-zero if it is ok to use under TLS1.3 */
+	unsigned tls13_ok;
+
 	/* if this signature algorithm is restricted to a curve
 	 * under TLS 1.3. */
 	gnutls_ecc_curve_t curve;
@@ -341,6 +353,28 @@ typedef struct gnutls_sign_entry_st gnutls_sign_entry_st;
 const gnutls_sign_entry_st *_gnutls_sign_to_entry(gnutls_sign_algorithm_t sign);
 const gnutls_sign_entry_st *_gnutls_pk_to_sign_entry(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash);
 const gnutls_sign_entry_st *_gnutls_oid_to_sign_entry(const char *oid);
+
+/* returns true if that signature can be generated
+ * from the given private key algorithm. */
+inline static unsigned
+sign_supports_priv_pk_algorithm(const gnutls_sign_entry_st *se, gnutls_pk_algorithm_t pk)
+{
+	if (pk == se->pk || (se->priv_pk && se->priv_pk == pk))
+		return 1;
+
+	return 0;
+}
+
+/* returns true if that signature can be verified with
+ * the given public key algorithm. */
+inline static unsigned
+sign_supports_cert_pk_algorithm(const gnutls_sign_entry_st *se, gnutls_pk_algorithm_t pk)
+{
+	if (pk == se->pk || (se->cert_pk && se->cert_pk == pk))
+		return 1;
+
+	return 0;
+}
 
 bool _gnutls_sign_is_secure2(const gnutls_sign_entry_st *se, unsigned int flags);
 

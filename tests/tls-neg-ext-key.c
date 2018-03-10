@@ -295,7 +295,7 @@ static const test_st tests[] = {
 	},
 	{.name = "rsa-sign key with rsa-pss sigs prioritized",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512",
+	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256:+SIGN-RSA-PSS-RSAE-SHA384:+SIGN-RSA-PSS-RSAE-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA
@@ -308,9 +308,9 @@ static const test_st tests[] = {
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .exp_key_err = GNUTLS_E_INVALID_REQUEST
 	},
-	{.name = "rsa-pss cert, rsa-sign key", /* we expect the server to refuse negotiating */
+	{.name = "rsa-pss cert, rsa-sign key, no rsa-pss-rsae sigs", /* we expect the server to refuse negotiating */
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA",
+	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512",
 	 .cert = &server_ca3_rsa_pss_cert,
 	 .key = &server_ca3_rsa_pss_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,

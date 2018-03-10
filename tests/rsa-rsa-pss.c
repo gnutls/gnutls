@@ -46,8 +46,8 @@ const gnutls_datum_t raw_data = {
 	11
 };
 
-static void inv_sign_check(gnutls_pk_algorithm_t algorithm, unsigned sigalgo,
-			     gnutls_privkey_t privkey, int exp_error)
+static void inv_sign_check(unsigned sigalgo,
+			   gnutls_privkey_t privkey, int exp_error)
 {
 	int ret;
 	gnutls_datum_t signature;
@@ -55,9 +55,11 @@ static void inv_sign_check(gnutls_pk_algorithm_t algorithm, unsigned sigalgo,
 	ret = gnutls_privkey_sign_data2(privkey, sigalgo, 0,
 					&raw_data, &signature);
 	if (ret != exp_error)
-		fail("gnutls_privkey_sign_data succeeded with %s and %s: %s\n", gnutls_pk_get_name(algorithm),
+		fail("gnutls_privkey_sign_data succeeded with %s and %s: %s\n", gnutls_pk_get_name(gnutls_privkey_get_pk_algorithm(privkey, NULL)),
 			gnutls_sign_get_name(sigalgo), gnutls_strerror(ret));
 
+	if (ret == 0)
+		gnutls_free(signature.data);
 }
 
 static void inv_encryption_check(gnutls_pk_algorithm_t algorithm,
@@ -82,8 +84,7 @@ static void inv_encryption_check(gnutls_pk_algorithm_t algorithm,
 
 }
 
-static void sign_verify_data(gnutls_pk_algorithm_t algorithm, unsigned sigalgo,
-			     gnutls_privkey_t privkey)
+static void sign_verify_data(unsigned sigalgo, gnutls_privkey_t privkey)
 {
 	int ret;
 	gnutls_pubkey_t pubkey;
@@ -112,7 +113,8 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm, unsigned sigalgo,
 
 void doit(void)
 {
-	gnutls_privkey_t pkey;
+	gnutls_privkey_t pkey_rsa_pss;
+	gnutls_privkey_t pkey_rsa;
 	gnutls_x509_privkey_t tkey;
 	int ret;
 	gnutls_x509_spki_t spki;
@@ -128,46 +130,67 @@ void doit(void)
 
 	assert(gnutls_x509_spki_init(&spki)>=0);
 
-	assert(gnutls_privkey_init(&pkey) >=0);
+	assert(gnutls_privkey_init(&pkey_rsa) >=0);
 
 	gnutls_x509_spki_set_rsa_pss_params(spki, GNUTLS_DIG_SHA256, 32);
 
 	ret =
-	    gnutls_privkey_generate(pkey, GNUTLS_PK_RSA, 2048, 0);
+	    gnutls_privkey_generate(pkey_rsa, GNUTLS_PK_RSA, 2048, 0);
 	if (ret < 0) {
 		fail("gnutls_privkey_generate: %s\n", gnutls_strerror(ret));
 	}
 
-	assert(gnutls_privkey_set_spki(pkey, spki, 0)>=0);
-	assert(gnutls_privkey_export_x509(pkey, &tkey) >=0);
+	assert(gnutls_privkey_set_spki(pkey_rsa, spki, 0)>=0);
+	assert(gnutls_privkey_export_x509(pkey_rsa, &tkey) >=0);
 
 	gnutls_x509_privkey_export2_pkcs8(tkey, GNUTLS_X509_FMT_PEM, NULL, 0, &tmp);
+
+	/* import RSA-PSS version of key */
+	assert(gnutls_privkey_init(&pkey_rsa_pss) >=0);
+	assert(gnutls_privkey_import_x509_raw(pkey_rsa_pss, &tmp, GNUTLS_X509_FMT_PEM, NULL, 0) >= 0);
+
+	gnutls_free(tmp.data);
+
+	/* import RSA-PSS version of key */
+	gnutls_privkey_deinit(pkey_rsa);
+	gnutls_x509_privkey_export2(tkey, GNUTLS_X509_FMT_PEM, &tmp);
+	assert(gnutls_privkey_init(&pkey_rsa) >=0);
+	assert(gnutls_privkey_import_x509_raw(pkey_rsa, &tmp, GNUTLS_X509_FMT_PEM, NULL, 0) >= 0);
+
 	gnutls_x509_privkey_deinit(tkey);
+	gnutls_free(tmp.data);
 
-	gnutls_privkey_deinit(pkey);
-
-	assert(gnutls_privkey_init(&pkey) >=0);
-
-	assert(gnutls_privkey_import_x509_raw(pkey, &tmp, GNUTLS_X509_FMT_PEM, NULL, 0) >= 0);
-
-	if (debug)
-		printf("%s", tmp.data);
-
-	sign_verify_data(GNUTLS_PK_RSA_PSS, GNUTLS_SIGN_RSA_PSS_SHA256, pkey);
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa_pss);
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_RSAE_SHA256, pkey_rsa);
+	sign_verify_data(GNUTLS_SIGN_RSA_PSS_SHA256, pkey_rsa);
 
 	if (debug)
 		success("success signing with RSA-PSS-SHA256\n");
 
-	/* check whether the RSA-PSS restrictions are being followed */
-	inv_encryption_check(GNUTLS_PK_RSA_PSS, pkey, GNUTLS_E_INVALID_REQUEST);
-	inv_sign_check(GNUTLS_PK_RSA, GNUTLS_SIGN_RSA_SHA512, pkey, GNUTLS_E_CONSTRAINT_ERROR);
-	inv_sign_check(GNUTLS_PK_RSA, GNUTLS_SIGN_RSA_SHA256, pkey, GNUTLS_E_CONSTRAINT_ERROR);
-	inv_sign_check(GNUTLS_PK_RSA_PSS, GNUTLS_SIGN_RSA_PSS_SHA384, pkey, GNUTLS_E_CONSTRAINT_ERROR);
-	inv_sign_check(GNUTLS_PK_RSA_PSS, GNUTLS_SIGN_RSA_PSS_SHA512, pkey, GNUTLS_E_CONSTRAINT_ERROR);
+	/* check whether the RSA-PSS key restrictions are being followed */
+	inv_encryption_check(GNUTLS_PK_RSA_PSS, pkey_rsa_pss, GNUTLS_E_INVALID_REQUEST);
+	inv_sign_check(GNUTLS_SIGN_RSA_SHA512, pkey_rsa_pss, GNUTLS_E_CONSTRAINT_ERROR);
+	inv_sign_check(GNUTLS_SIGN_RSA_SHA256, pkey_rsa_pss, GNUTLS_E_CONSTRAINT_ERROR);
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_SHA384, pkey_rsa_pss, GNUTLS_E_CONSTRAINT_ERROR);
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_SHA512, pkey_rsa_pss, GNUTLS_E_CONSTRAINT_ERROR);
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_RSAE_SHA384, pkey_rsa_pss, GNUTLS_E_CONSTRAINT_ERROR);
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_RSAE_SHA512, pkey_rsa_pss, GNUTLS_E_CONSTRAINT_ERROR);
 
-	gnutls_privkey_deinit(pkey);
+	/* check whether the RSA key is not being restricted */
+	inv_sign_check(GNUTLS_SIGN_RSA_SHA512, pkey_rsa, 0);
+	inv_sign_check(GNUTLS_SIGN_RSA_SHA256, pkey_rsa, 0);
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_RSAE_SHA384, pkey_rsa, 0);
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_RSAE_SHA512, pkey_rsa, 0);
+	/* an RSA key can also generate "pure" for TLS RSA-PSS signatures
+	 * as they are essentially the same thing, and we cannot always
+	 * know whether a key is RSA-PSS only, or not (e.g., in PKCS#11
+	 * keys). */
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_SHA384, pkey_rsa, 0);
+	inv_sign_check(GNUTLS_SIGN_RSA_PSS_SHA512, pkey_rsa, 0);
+
+	gnutls_privkey_deinit(pkey_rsa);
+	gnutls_privkey_deinit(pkey_rsa_pss);
 	gnutls_x509_spki_deinit(spki);
-	gnutls_free(tmp.data);
 
 	gnutls_global_deinit();
 }

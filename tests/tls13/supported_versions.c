@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -152,12 +152,8 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 		success("server hello:\n\t%d.%d\n",
 			(int)msg->data[pos], (int)msg->data[pos+1]);
 
-#ifdef TLS13_FINAL_VERSION
-		if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x04) {
-#else
-		if (msg->data[pos] != 0x7f || msg->data[pos+1] != 21) {
-#endif
-			fail("fail expected TLS 1.3 in server hello, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
+		if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x03) {
+			fail("fail expected TLS 1.2 in server hello, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
 		}
 
 		server_hello_ok = 1;
@@ -228,7 +224,7 @@ static int client_hello_callback(gnutls_session_t session, unsigned int htype,
 #ifdef TLS13_FINAL_VERSION
 			if (msg->data[pos] != 0x03 || msg->data[pos+1] != 0x04) {
 #else
-			if (msg->data[pos] != 0x7f || msg->data[pos+1] != 21) {
+			if (msg->data[pos] != 0x7f || msg->data[pos+1] != 23) {
 #endif
 				fail("fail expected TLS 1.3, got %d.%d\n", (int)msg->data[pos], (int)msg->data[pos+1]);
 			}

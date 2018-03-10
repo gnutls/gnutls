@@ -1518,7 +1518,7 @@ int fixup_spki_params(const gnutls_pk_params_st *key_params, const gnutls_sign_e
 	unsigned bits;
 
 	if (se->pk != key_params->algo) {
-		if (!gnutls_sign_supports_pk_algorithm(se->id, key_params->algo)) {
+		if (!sign_supports_priv_pk_algorithm(se, key_params->algo)) {
 			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
 					gnutls_pk_get_name(key_params->algo), key_params->algo,
 					se->name, se->id);
@@ -1729,7 +1729,7 @@ int pubkey_supports_sig(gnutls_pubkey_t pubkey,
 		gnutls_ecc_curve_t curve = pubkey->params.curve;
 
 		if (curve != se->curve) {
-			_gnutls_debug_log("have key: ECDSA with %s/%d, with sign %s/%d\n",
+			_gnutls_handshake_log("have key: ECDSA with %s/%d, with sign %s/%d\n",
 				gnutls_ecc_curve_get_name(curve), (int)curve,
 				se->name, se->id);
 			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
@@ -1737,8 +1737,8 @@ int pubkey_supports_sig(gnutls_pubkey_t pubkey,
 	}
 
 	if (se->pk != pubkey->params.algo) { /* if the PK algorithm of the signature differs to the one on the pubkey */
-		if (!gnutls_sign_supports_pk_algorithm(se->id, pubkey->params.algo)) {
-			_gnutls_debug_log("have key: %s/%d, with sign %s/%d\n",
+		if (!sign_supports_priv_pk_algorithm(se, pubkey->params.algo)) {
+			_gnutls_handshake_log("have key: %s/%d, with sign %s/%d\n",
 					gnutls_pk_get_name(pubkey->params.algo), pubkey->params.algo,
 					se->name, se->id);
 			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);

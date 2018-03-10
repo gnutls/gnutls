@@ -64,13 +64,15 @@ int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len);
 int _gnutls_gen_server_random(gnutls_session_t session, int version);
 void _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd);
 
+ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again);
+
 int _gnutls_send_server_hello(gnutls_session_t session, int again);
 
 int _gnutls_find_pk_algos_in_ciphersuites(uint8_t * data, int datalen);
 int _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 				unsigned int datalen, unsigned int scsv_only);
 
-int _gnutls_negotiate_legacy_version(gnutls_session_t session,
+int _gnutls_negotiate_version(gnutls_session_t session,
 			      gnutls_protocol_t adv_version, uint8_t major, uint8_t minor);
 int _gnutls_user_hello_func(gnutls_session_t session,
 			    gnutls_protocol_t adv_version, uint8_t major, uint8_t minor);

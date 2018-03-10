@@ -534,7 +534,6 @@ typedef enum {
 	GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST = 3,
 	GNUTLS_HANDSHAKE_NEW_SESSION_TICKET = 4,
 	GNUTLS_HANDSHAKE_END_OF_EARLY_DATA = 5,
-	GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST = 6,
 	GNUTLS_HANDSHAKE_ENCRYPTED_EXTENSIONS = 8,
 	GNUTLS_HANDSHAKE_CERTIFICATE_PKT = 11,
 	GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE = 12,
@@ -547,7 +546,8 @@ typedef enum {
 	GNUTLS_HANDSHAKE_SUPPLEMENTAL = 23,
 	GNUTLS_HANDSHAKE_KEY_UPDATE = 24,
 	GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC = 254,
-	GNUTLS_HANDSHAKE_CLIENT_HELLO_V2 = 1024
+	GNUTLS_HANDSHAKE_CLIENT_HELLO_V2 = 1024,
+	GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST = 1025,
 } gnutls_handshake_description_t;
 
 #define GNUTLS_HANDSHAKE_ANY ((unsigned int)-1)
@@ -797,9 +797,21 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_RSA_SHA3_256: Digital signature algorithm RSA with SHA3-256.
  * @GNUTLS_SIGN_RSA_SHA3_384: Digital signature algorithm RSA with SHA3-384.
  * @GNUTLS_SIGN_RSA_SHA3_512: Digital signature algorithm RSA with SHA3-512.
- * @GNUTLS_SIGN_RSA_PSS_SHA256: Digital signature algorithm RSA with SHA-256, with PSS padding.
- * @GNUTLS_SIGN_RSA_PSS_SHA384: Digital signature algorithm RSA with SHA-384, with PSS padding.
- * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding.
+ * @GNUTLS_SIGN_RSA_PSS_RSAE_SHA256: Digital signature algorithm RSA with SHA-256,
+ *      with PSS padding (RSA PKCS#1 1.5 certificate). This signature is identical
+ *      to #GNUTLS_SIGN_RSA_PSS_SHA256, but they are distinct as the TLS1.3 protocol
+ *      treats them differently.
+ * @GNUTLS_SIGN_RSA_PSS_RSAE_SHA384: Digital signature algorithm RSA with SHA-384,
+ *      with PSS padding (RSA PKCS#1 1.5 certificate). This signature is identical
+ *      to #GNUTLS_SIGN_RSA_PSS_SHA384, but they are distinct as the TLS1.3 protocol
+ *      treats them differently.
+ * @GNUTLS_SIGN_RSA_PSS_RSAE_SHA512: Digital signature algorithm RSA with SHA-512,
+ *      with PSS padding (RSA PKCS#1 1.5 certificate). This signature is identical
+ *      to #GNUTLS_SIGN_RSA_PSS_SHA512, but they are distinct as the TLS1.3 protocol
+ *      treats them differently.
+ * @GNUTLS_SIGN_RSA_PSS_SHA256: Digital signature algorithm RSA with SHA-256, with PSS padding (RSA-PSS certificate).
+ * @GNUTLS_SIGN_RSA_PSS_SHA384: Digital signature algorithm RSA with SHA-384, with PSS padding (RSA-PSS certificate).
+ * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding (RSA-PSS certificate).
  * @GNUTLS_SIGN_EDDSA_ED25519: Digital signature algorithm EdDSA with Ed25519 curve.
  *
  * Enumeration of different digital signature algorithms.
@@ -849,7 +861,11 @@ typedef enum {
 	GNUTLS_SIGN_ECDSA_SECP256R1_SHA256 = 37,
 	GNUTLS_SIGN_ECDSA_SECP384R1_SHA384 = 38,
 	GNUTLS_SIGN_ECDSA_SECP521R1_SHA512 = 39,
-	GNUTLS_SIGN_MAX = GNUTLS_SIGN_ECDSA_SECP521R1_SHA512
+
+	GNUTLS_SIGN_RSA_PSS_RSAE_SHA256 = 40,
+	GNUTLS_SIGN_RSA_PSS_RSAE_SHA384 = 41,
+	GNUTLS_SIGN_RSA_PSS_RSAE_SHA512 = 42,
+	GNUTLS_SIGN_MAX = GNUTLS_SIGN_RSA_PSS_RSAE_SHA512
 } gnutls_sign_algorithm_t;
 
 /**
@@ -2715,25 +2731,24 @@ int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 
 /**
  * gnutls_ext_parse_type_t:
- * @GNUTLS_EXT_NONE: Never parsed
- * @GNUTLS_EXT_ANY: Any extension type (internal use only).
- * @GNUTLS_EXT_APPLICATION: Application extension.
- * @GNUTLS_EXT_TLS: TLS-internal extension.
- * @GNUTLS_EXT_MANDATORY: Extension parsed even if resuming (or extensions are disabled).
+ * @GNUTLS_EXT_NONE: Never to be parsed
+ * @GNUTLS_EXT_ANY: Any extension type (should not be used as it is used only internally).
+ * @GNUTLS_EXT_VERSION_NEG: Extensions to be parsed first for TLS version negotiation.
+ * @GNUTLS_EXT_MANDATORY: Parsed after @GNUTLS_EXT_VERSION_NEG and even when resuming.
+ * @GNUTLS_EXT_APPLICATION: Parsed after @GNUTLS_EXT_MANDATORY
+ * @GNUTLS_EXT_TLS: TLS-internal extensions, parsed after @GNUTLS_EXT_APPLICATION.
  *
- * Enumeration of different TLS extension parsing types.  This type is
- * to indicate whether an extension is useful to application
- * level or TLS level only.  This is used to decide the appropriate time
- * each extension is parsed at during the server or client hello parsing.
+ * Enumeration of different TLS extension parsing phases.  The @gnutls_ext_parse_type_t
+ * indicates the time/phase an extension is parsed during Client or Server hello parsing.
  *
- * This applies to TLS 1.2 and earlier versions.
  */
 typedef enum {
   GNUTLS_EXT_ANY = 0,
   GNUTLS_EXT_APPLICATION = 1,
   GNUTLS_EXT_TLS = 2,
   GNUTLS_EXT_MANDATORY = 3,
-  GNUTLS_EXT_NONE = 4
+  GNUTLS_EXT_NONE = 4,
+  GNUTLS_EXT_VERSION_NEG = 5
 } gnutls_ext_parse_type_t;
 
 /**

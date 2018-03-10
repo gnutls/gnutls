@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -61,6 +61,13 @@ void doit(void)
 	try_cli("TLS 1.1 with rsa ask cert", "NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+RSA", GNUTLS_KX_RSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN, ASK_CERT);
 	try_with_key("TLS 1.1 with ecdhe ecdsa cert", "NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, GNUTLS_SIGN_UNKNOWN, GNUTLS_SIGN_UNKNOWN,
 		&server_ca3_localhost_ecc_cert, &server_ca3_ecc_key, &cli_ca3_cert, &cli_ca3_key, ASK_CERT);
+
+	/* illegal setups */
+	server_priority = NULL;
+	try_with_key_fail("TLS 1.1 with rsa-pss cert and no cli cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.1:-KX-ALL:+DHE-RSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
+			GNUTLS_E_UNWANTED_ALGORITHM, GNUTLS_E_AGAIN,
+			&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, NULL, NULL);
 
 	gnutls_global_deinit();
 }

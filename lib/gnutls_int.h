@@ -134,6 +134,16 @@ typedef struct {
 #define GNUTLS_MASTER_SIZE 48
 #define GNUTLS_RANDOM_SIZE 32
 
+#define HRR_RANDOM \
+	 "\xCF\x21\xAD\x74\xE5\x9A\x61\x11\xBE\x1D\x8C\x02\x1E\x65\xB8\x91" \
+	 "\xC2\xA2\x11\x16\x7A\xBB\x8C\x5E\x07\x9E\x09\xE2\xC8\xA8\x33\x9C"
+
+/* Under TLS1.3 a hello retry request is sent as server hello */
+#define REAL_HSK_TYPE(t) ((t)==GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST?GNUTLS_HANDSHAKE_SERVER_HELLO:t)
+
+/* Enable: Appendix D4.  Middlebox Compatibility Mode */
+#define TLS13_APPENDIX_D4 1
+
 /* DTLS */
 #define DTLS_RETRANS_TIMEOUT 1000
 
@@ -254,9 +264,10 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE15, STATE16, STATE17, STATE18, STATE19,
 	STATE20 = 20, STATE21, STATE22,
 	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
-	STATE90=90, STATE91, STATE92, STATE93,
+	STATE90=90, STATE91, STATE92, STATE93, STATE99=99,
 	STATE100=100, STATE101, STATE102, STATE103, STATE104,
 	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110,
+	STATE111,
 	STATE150 /* key update */
 } handshake_state_t;
 
@@ -362,6 +373,10 @@ typedef enum content_type_t {
 typedef struct {
 	/* Handshake layer type and sequence of message */
 	gnutls_handshake_description_t htype;
+
+	/* The "real" type received; that is, it does not distinguish
+	 * HRR from server hello, while htype does */
+	gnutls_handshake_description_t rtype;
 	uint32_t length;
 
 	/* valid in DTLS */

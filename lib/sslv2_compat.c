@@ -112,7 +112,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 
 	adv_version = _gnutls_version_get(major, minor);
 
-	ret = _gnutls_negotiate_legacy_version(session, adv_version, major, minor);
+	ret = _gnutls_negotiate_version(session, adv_version, major, minor);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

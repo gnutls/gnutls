@@ -29,6 +29,7 @@
 #include "num.h"
 #include <hello_ext.h>
 #include <ext/supported_versions.h>
+#include "handshake.h"
 
 static int supported_versions_recv_params(gnutls_session_t session,
 					  const uint8_t * data,
@@ -40,8 +41,9 @@ const hello_ext_entry_st ext_mod_supported_versions = {
 	.name = "Supported Versions",
 	.tls_id = 43,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_VERSIONS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO,
-	.parse_type = GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|
+		    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO|GNUTLS_EXT_FLAG_HRR,
+	.parse_type = GNUTLS_EXT_VERSION_NEG, /* force parsing prior to EXT_TLS extensions */
 
 	.recv_func = supported_versions_recv_params,
 	.send_func = supported_versions_send_params,
@@ -99,10 +101,32 @@ supported_versions_recv_params(gnutls_session_t session,
 
 		/* if we are here, none of the versions were acceptable */
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
-	} else {
-		/* a server should never send this message */
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION;
+	} else { /* client */
+		const version_entry_st *vers;
+
+		DECR_LEN(data_size, 2);
+
+		if (data_size != 0)
+			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+		major = data[0];
+		minor = data[1];
+
+		vers = nversion_to_entry(major, minor);
+		if (!vers)
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+		set_adv_version(session, major, minor);
+		proto = _gnutls_version_get(major, minor);
+
+		_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
+				      session, (int)major, (int)minor);
+
+		ret = _gnutls_negotiate_version(session, proto, major, minor);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	return 0;
@@ -116,10 +140,18 @@ supported_versions_send_params(gnutls_session_t session,
 {
 	uint8_t versions[32];
 	size_t versions_size;
+	const version_entry_st *vers;
 	int ret;
 
 	/* this function sends the client extension data (dnsname) */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		vers = _gnutls_version_max(session);
+
+		/* do not advertise this extension when we haven't TLS1.3
+		 * enabled. */
+		if (vers && !vers->tls13_sem)
+			return 0;
+
 		ret = _gnutls_write_supported_versions(session, versions, sizeof(versions));
 		if (ret <= 0) /* if this function doesn't succeed do not send anything */
 			return 0;
@@ -131,6 +163,26 @@ supported_versions_send_params(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 
 		return versions_size+2;
+	} else {
+		vers = get_version(session);
+		if (unlikely(vers == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		/* don't use this extension to negotiate versions <= 1.2,
+		 * pretend we don't support it, so that we use a single
+		 * code path to negotiate these protocols. */
+		if (!vers->tls13_sem)
+			return 0;
+
+		ret = _gnutls_buffer_append_data(extdata, &vers->major, 1);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_buffer_append_data(extdata, &vers->minor, 1);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		return 2;
 	}
 
 	return 0;

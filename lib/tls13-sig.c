@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -61,14 +61,18 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	if (unlikely(sign_supports_cert_pk_algorithm(se, cert->pubkey->params.algo) == 0)) {
+		_gnutls_handshake_log("HSK[%p]: certificate of %s cannot be combined with %s sig\n",
+				      session, gnutls_pk_get_name(cert->pubkey->params.algo), se->name);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	}
+
 	ret =
 	    _gnutls_session_sign_algo_enabled(session, se->id);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (se->hash == GNUTLS_DIG_SHA1) /* explicitly prohibited */
-		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-	if (se->pk == GNUTLS_PK_RSA) /* explicitly prohibited */
+	if (se->tls13_ok == 0) /* explicitly prohibited */
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	_gnutls_buffer_init(&buf);
@@ -140,7 +144,10 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	gnutls_buffer_st buf;
 	uint8_t prefix[PREFIX_SIZE];
 
-	if (unlikely(se == NULL || se->hash == GNUTLS_DIG_SHA1 || se->pk == GNUTLS_PK_RSA))
+	if (unlikely(se == NULL || se->tls13_ok == 0))
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	_gnutls_handshake_log

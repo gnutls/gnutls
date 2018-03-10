@@ -5,6 +5,7 @@
                  "--x509keyfile", "../../../certs/ecc256.pem",
                  "--x509certfile", "../../../certs/cert-ecc256.pem",
                  "--debug=3",
+                 "--noticket",
                  "--priority=@PRIORITY@",
                  "--disable-client-cert", "--port=@PORT@"],
      "tests" : [
@@ -60,7 +61,9 @@
          {"name" : "test-chacha20.py"},
          {"name" : "test-aes-gcm-nonces.py" },
          {"name" : "test-atypical-padding.py" },
-         {"name" : "test-bleichenbacher-workaround.py" },
+         {"name" : "test-bleichenbacher-workaround.py",
+          "arguments" : ["-n", "20"]
+         },
          {"name" : "test-clienthello-md5.py"},
          {"name" : "test-client-compatibility.py"},
          {"name" : "test-conversation.py"},
@@ -133,10 +136,8 @@
                          "-e", "small, maximum fragmentation: 1 fragment - 20B extension",
                          "-e", "medium, maximum fragmentation: 1 fragment - 1024B extension"]},
          {"name" : "test-sessionID-resumption.py"},
-         {"name" : "test-sig-algs.py",
-          "comment" : "FIXME: these fail, but most likely due to tls-fuzzer issue",
-          "arguments" : ["-e", "RSA-PSS only - fails in verify if server selects PSS",
-                         "-e", "with RSA-PSS - fails in verify if server selects PSS"]},
+         {"name" : "test-sig-algs.py"
+         },
          {"name" : "test-signature-algorithms.py",
           "comment" : "gnutls doesn't tolerate that much",
           "arguments" : ["-e", "tolerance max (32764) number of methods"]

@@ -107,39 +107,29 @@ static unsigned find_client_extension(const gnutls_datum_t *msg, unsigned extnr,
 
 static unsigned find_server_extension(const gnutls_datum_t *msg, unsigned extnr, void *priv, ext_parse_func cb)
 {
-	unsigned tls13 = 0;
 	unsigned pos = 0;
 
 	success("server hello of %d bytes\n", msg->size);
 	/* we expect the legacy version to be present */
 	/* ProtocolVersion legacy_version = 0x0303 */
-#ifdef TLS13_FINAL_VERSION
-	if (msg->data[0] != 0x03) {
-#else
-	if (msg->data[0] != 0x7f) {
-#endif
+	if (msg->data[0] != 0x03 || msg->data[1] != 0x03) {
 		fail("ProtocolVersion contains %d.%d\n", (int)msg->data[0], (int)msg->data[1]);
 	}
 
 	if (msg->data[1] >= 0x04) {
 		success("assuming TLS 1.3 or better hello format (seen %d.%d)\n", (int)msg->data[0], (int)msg->data[1]);
-		tls13 = 1;
 	}
 
 	pos += 2+TLS_RANDOM_SIZE;
 
-	if (!tls13) {
-		/* legacy_session_id */
-		SKIP8(pos, msg->size);
-	}
+	/* legacy_session_id */
+	SKIP8(pos, msg->size);
 
 	/* CipherSuite */
 	pos += 2;
 
-	if (!tls13) {
-		/* legacy_compression_methods */
-		SKIP8(pos, msg->size);
-	}
+	/* legacy_compression_methods */
+	SKIP8(pos, msg->size);
 
 	pos += 2;
 

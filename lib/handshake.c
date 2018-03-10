@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -422,14 +422,15 @@ _gnutls_finished(gnutls_session_t session, int type, void *ret,
 /* returns the 0 on success or a negative error code.
  */
 int
-_gnutls_negotiate_legacy_version(gnutls_session_t session,
+_gnutls_negotiate_version(gnutls_session_t session,
 			  gnutls_protocol_t adv_version, uint8_t major, uint8_t minor)
 {
 	const version_entry_st *vers;
 
 	/* if we do not support that version, unless that version is TLS 1.2;
 	 * TLS 1.2 is handled separately because it is always advertized under TLS 1.3 or later */
-	if (adv_version == GNUTLS_VERSION_UNKNOWN || _gnutls_version_is_supported(session, adv_version) == 0) {
+	if (adv_version == GNUTLS_VERSION_UNKNOWN ||
+	    _gnutls_version_is_supported(session, adv_version) == 0) {
 
 		if (adv_version == GNUTLS_TLS1_2) {
 			vers = _gnutls_version_max(session);
@@ -477,6 +478,7 @@ _gnutls_user_hello_func(gnutls_session_t session,
 			gnutls_protocol_t adv_version, uint8_t major, uint8_t minor)
 {
 	int ret, sret = 0;
+	const version_entry_st *vers;
 
 	if (session->internals.user_hello_func != NULL) {
 		ret = session->internals.user_hello_func(session);
@@ -489,13 +491,18 @@ _gnutls_user_hello_func(gnutls_session_t session,
 			return ret;
 		}
 
-		/* Here we need to renegotiate the version since the callee might
-		 * have disabled some TLS versions.
-		 */
-		ret = _gnutls_negotiate_legacy_version(session, adv_version, major, minor);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
+		vers = get_version(session);
+		if (!vers->tls13_sem) {
+			/* Here we need to renegotiate the version since the callee might
+			 * have disabled some TLS versions. We only do it for TLS1.2 or
+			 * earlier, as TLS1.3 uses a different set of ciphersuites, and
+			 * thus we cannot fallback.
+			 */
+			ret = _gnutls_negotiate_version(session, adv_version, major, minor);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
 		}
 	}
 	return sret;
@@ -519,6 +526,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	int len = datalen;
 	uint8_t major, minor;
 	uint8_t *suite_ptr, *comp_ptr, *session_id, *ext_ptr;
+	const version_entry_st *vers;
 
 	DECR_LEN(len, 2);
 	_gnutls_handshake_log("HSK[%p]: Client's version: %d.%d\n",
@@ -530,7 +538,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	minor = data[pos+1];
 	set_adv_version(session, major, minor);
 
-	neg_version = _gnutls_negotiate_legacy_version(session, adv_version, major, minor);
+	neg_version = _gnutls_negotiate_version(session, adv_version, major, minor);
 	if (neg_version < 0) {
 		gnutls_assert();
 		return neg_version;
@@ -598,46 +606,64 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	ext_ptr = &data[pos];
 	ext_size = len;
 
-	/* Parse only the mandatory to read extensions for resumption.
-	 * We don't want to parse any other extensions since
-	 * we don't want new extension values to override the
-	 * resumed ones.
-	 */
+	/* Parse only the mandatory to read extensions for resumption
+	 * and version negotiation. We don't want to parse any other
+	 * extensions since  we don't want new extension values to override
+	 * the resumed ones. */
 	ret =
 	    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
-				     GNUTLS_EXT_MANDATORY,
-				     ext_ptr, ext_size);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+					   GNUTLS_EXT_VERSION_NEG,
+					   ext_ptr, ext_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret =
-	    _gnutls_server_restore_session(session, session_id,
-					   session_id_len);
+	    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
+					   GNUTLS_EXT_MANDATORY,
+					   ext_ptr, ext_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	if (session_id_len > 0)
-		session->internals.resumption_requested = 1;
+	vers = get_version(session);
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
-	if (ret == 0) {		/* resumed using default TLS resumption! */
-		ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 1);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+	if (!vers->tls13_sem) {
+		ret =
+		    _gnutls_server_restore_session(session, session_id,
+						   session_id_len);
 
-		ret = resume_copy_required_values(session);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (session_id_len > 0)
+			session->internals.resumption_requested = 1;
 
-		session->internals.resumed = RESUME_TRUE;
+		if (ret == 0) {		/* resumed using default TLS resumption! */
+			ret = _gnutls_server_select_suite(session, suite_ptr, suite_size, 1);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
-		return _gnutls_user_hello_func(session, adv_version, major, minor);
-	} else {
-		_gnutls_generate_session_id(session->security_parameters.
-					    session_id,
-					    &session->security_parameters.
-					    session_id_size);
+			ret = resume_copy_required_values(session);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
-		session->internals.resumed = RESUME_FALSE;
+			session->internals.resumed = RESUME_TRUE;
+
+			return _gnutls_user_hello_func(session, adv_version, major, minor);
+		} else {
+			ret = _gnutls_generate_session_id(session->security_parameters.
+							  session_id,
+							  &session->security_parameters.
+							  session_id_size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			session->internals.resumed = RESUME_FALSE;
+		}
+	} else { /* TLS1.3 */
+		/* we echo client's session ID - length was checked previously */
+		assert(session_id_len <= GNUTLS_MAX_SESSION_ID_SIZE);
+		if (session_id_len > 0)
+			memcpy(session->security_parameters.session_id, session_id, session_id_len);
+		session->security_parameters.session_id_size = session_id_len;
 	}
 
 	/* Parse the extensions (if any)
@@ -646,8 +672,8 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	 * sslv3 and higher, even though sslv3 doesn't officially support them.
 	 */
 	ret = _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
-				       GNUTLS_EXT_APPLICATION,
-				       ext_ptr, ext_size);
+					     GNUTLS_EXT_APPLICATION,
+					     ext_ptr, ext_size);
 	/* len is the rest of the parsed length */
 	if (ret < 0) {
 		gnutls_assert();
@@ -664,7 +690,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	/* Session tickets are parsed in this point */
 	ret =
 	    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_CLIENT_HELLO,
-				     GNUTLS_EXT_TLS, ext_ptr, ext_size);
+					   GNUTLS_EXT_TLS, ext_ptr, ext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1068,9 +1094,22 @@ inline
 		if ((session->internals.h_type == type
 		     || session->internals.h_type == GNUTLS_HANDSHAKE_ANY)
 		    && (session->internals.h_post == post
-			|| session->internals.h_post == GNUTLS_HOOK_BOTH))
+			|| session->internals.h_post == GNUTLS_HOOK_BOTH)) {
+
+			/* internal API for testing: when we are expected to
+			 * wait for GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, we
+			 * do so, but not when doing for all messages. The
+			 * reason is that change cipher specs are not handshake
+			 * messages, and we don't support waiting for them
+			 * consistently (only sending is tracked, not receiving).
+			 */
+			if (type == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC &&
+			    session->internals.h_type != GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
+				return 0;
+
 			return session->internals.h_hook(session, type,
 							 post, incoming, &msg);
+		}
 	}
 	return 0;
 }
@@ -1104,7 +1143,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 	i_datasize = _mbuffer_get_udata_size(bufel);
 	datasize = i_datasize + _mbuffer_get_uhead_size(bufel);
 
-	data[pos++] = (uint8_t) type;
+	data[pos++] = (uint8_t) REAL_HSK_TYPE(type);
 	_gnutls_write_uint24(_mbuffer_get_udata_size(bufel), &data[pos]);
 	pos += 3;
 
@@ -1350,7 +1389,7 @@ _gnutls_recv_handshake(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = handshake_hash_add_recvd(session, hsk.htype,
+	ret = handshake_hash_add_recvd(session, hsk.rtype,
 				       hsk.header, hsk.header_size,
 				       hsk.data.data,
 				       hsk.data.length);
@@ -1549,11 +1588,11 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 
 /* This function returns 0 if we are resuming a session or -1 otherwise.
  * This also sets the variables in the session. Used only while reading a server
- * hello.
+ * hello. Only applicable to TLS1.2 or earlier.
  */
 static int
 client_check_if_resuming(gnutls_session_t session,
-				 uint8_t * session_id, int session_id_len)
+			 uint8_t * session_id, int session_id_len)
 {
 	char buf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
 	int ret;
@@ -1598,13 +1637,6 @@ client_check_if_resuming(gnutls_session_t session,
 no_resume:
 		/* keep the new session id */
 		session->internals.resumed = RESUME_FALSE;	/* we are not resuming */
-		session->security_parameters.session_id_size =
-		    session_id_len;
-		if (session_id_len > 0) {
-			memcpy(session->security_parameters.session_id, session_id,
-			       session_id_len);
-		}
-
 		return -1;
 	}
 }
@@ -1619,11 +1651,14 @@ read_server_hello(gnutls_session_t session,
 		  uint8_t * data, int datalen)
 {
 	uint8_t session_id_len = 0;
+	uint8_t *session_id;
+	uint8_t *cs_pos, *comp_pos, *srandom_pos;
+	uint8_t major, minor;
 	int pos = 0;
 	int ret = 0;
 	int len = datalen;
-	const version_entry_st *vers;
-	gnutls_ext_flags_t ext_parse_flag;
+	unsigned ext_parse_flag = 0;
+	const version_entry_st *vers, *saved_vers;
 
 	if (datalen < GNUTLS_RANDOM_SIZE+2) {
 		gnutls_assert();
@@ -1634,14 +1669,17 @@ read_server_hello(gnutls_session_t session,
 			      session, data[pos], data[pos + 1]);
 
 	DECR_LEN(len, 2);
-	vers = nversion_to_entry(data[pos], data[pos + 1]);
+	major = data[pos];
+	minor = data[pos+1];
+
+	saved_vers = get_version(session); /* will be non-null if HRR has been received */
+
+	vers = nversion_to_entry(major, minor);
 	if (unlikely(vers == NULL))
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
-	if (_gnutls_version_is_supported(session, vers->id) == 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	}
+	if (vers->tls13_sem) /* that shouldn't have been negotiated here */
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 	if (_gnutls_set_current_version(session, vers->id) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
@@ -1649,63 +1687,99 @@ read_server_hello(gnutls_session_t session,
 	pos += 2;
 
 	DECR_LEN(len, GNUTLS_RANDOM_SIZE);
-	ret = _gnutls_set_server_random(session, vers, &data[pos]);
+	srandom_pos = &data[pos];
+	pos += GNUTLS_RANDOM_SIZE;
+
+	/* Read session ID
+	 */
+	DECR_LEN(len, 1);
+	session_id_len = data[pos++];
+
+	if (len < session_id_len || session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
+		gnutls_assert();
+		return GNUTLS_E_ILLEGAL_PARAMETER;
+	}
+	DECR_LEN(len, session_id_len);
+	session_id = &data[pos];
+	pos += session_id_len;
+
+	DECR_LEN(len, 2);
+	cs_pos = &data[pos];
+	pos += 2;
+
+	/* move to compression
+	 */
+	DECR_LEN(len, 1);
+	comp_pos = &data[pos];
+	pos++;
+
+	/* parse extensions to figure version */
+	ret =
+	    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|
+					   GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+					   GNUTLS_EXT_VERSION_NEG,
+					   &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	pos += GNUTLS_RANDOM_SIZE;
+	vers = get_version(session);
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+	if (vers->tls13_sem) {
+		if (major != 0x03 || minor != 0x03)
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+	}
 
-	if (!vers->tls13_sem) {
-		/* Read session ID
-		 */
-		DECR_LEN(len, 1);
-		session_id_len = data[pos++];
+	if (_gnutls_version_is_supported(session, vers->id) == 0)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
-		if (len < session_id_len || session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
-			gnutls_assert();
-			return GNUTLS_E_ILLEGAL_PARAMETER;
-		}
-		DECR_LEN(len, session_id_len);
+	/* set server random - done after final version is selected */
+	ret = _gnutls_set_server_random(session, vers, srandom_pos);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-		/* check if we are resuming and set the appropriate
-		 * values;
-		 */
-		if (client_check_if_resuming
-		    (session, &data[pos], session_id_len) == 0) {
-			pos += session_id_len + 2 + 1;
-			DECR_LEN(len, 2 + 1);
+	/* check if we are resuming and set the appropriate
+	 * values;
+	 */
+	if (!vers->tls13_sem &&
+	    client_check_if_resuming(session, session_id, session_id_len) == 0) {
 
-			ret =
-			    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
-						     GNUTLS_EXT_MANDATORY,
-						     &data[pos], len);
-			if (ret < 0) {
-				gnutls_assert();
-				return ret;
-			}
-			return 0;
-		}
+		ret =
+		    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+						   GNUTLS_EXT_MANDATORY,
+						   &data[pos], len);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-		pos += session_id_len;
+		return 0;
+	} else {
+		session->security_parameters.session_id_size = session_id_len;
+		if (session_id_len > 0)
+			memcpy(session->security_parameters.session_id, session_id,
+			       session_id_len);
 	}
 
 	/* Check if the given cipher suite is supported and copy
 	 * it to the session.
 	 */
-
-	DECR_LEN(len, 2);
-	ret = set_client_ciphersuite(session, &data[pos]);
+	ret = set_client_ciphersuite(session, cs_pos);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
-	pos += 2;
 
 	if (session->internals.hsk_flags & HSK_HRR_RECEIVED) {
 		/* check if ciphersuite matches */
-		if (memcmp(session->security_parameters.cs->id, session->internals.hrr_cs, 2) != 0)
+		if (memcmp(cs_pos, session->internals.hrr_cs, 2) != 0)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		/* check if HRR version matches this version */
+		if (vers != saved_vers)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
+
+	if (*comp_pos != 0)
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	if (vers->tls13_sem) {
 		/* TLS 1.3 Early Secret */
@@ -1719,46 +1793,42 @@ read_server_hello(gnutls_session_t session,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ext_parse_flag = GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
+		ext_parse_flag |= GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
 	} else {
-		/* move to compression
-		 */
-		DECR_LEN(len, 1);
-		pos++;
-		ext_parse_flag = GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO;
+		ext_parse_flag |= GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO;
 	}
 
 	/* Parse extensions in order.
 	 */
 	ret =
 	    _gnutls_parse_hello_extensions(session,
-				     ext_parse_flag,
-				     GNUTLS_EXT_MANDATORY,
-				     &data[pos], len);
+					   ext_parse_flag,
+					   GNUTLS_EXT_MANDATORY,
+					   &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret =
 	    _gnutls_parse_hello_extensions(session,
-				     ext_parse_flag,
-				     GNUTLS_EXT_APPLICATION,
-				     &data[pos], len);
+					   ext_parse_flag,
+					   GNUTLS_EXT_APPLICATION,
+					   &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret =
 	    _gnutls_parse_hello_extensions(session,
-				     ext_parse_flag,
-				     GNUTLS_EXT_TLS,
-				     &data[pos], len);
+					   ext_parse_flag,
+					   GNUTLS_EXT_TLS,
+					   &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	ret =
 	    _gnutls_parse_hello_extensions(session,
-				     ext_parse_flag,
-				     _GNUTLS_EXT_TLS_POST_CS,
-				     &data[pos], len);
+					   ext_parse_flag,
+					   _GNUTLS_EXT_TLS_POST_CS,
+					   &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1793,7 +1863,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 	mbuffer_st *bufel = NULL;
 	int type;
 	int ret = 0;
-	const version_entry_st *hver, *min_ver;
+	const version_entry_st *hver, *min_ver, *max_ver;
 	uint8_t tver[2];
 	gnutls_buffer_st extdata;
 	int rehandshake = 0;
@@ -1829,7 +1899,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		if (hver == NULL) {
 			gnutls_assert();
-			return GNUTLS_E_NO_PRIORITIES_WERE_SET;
+			ret = GNUTLS_E_NO_PRIORITIES_WERE_SET;
+			goto cleanup;
 		}
 
 		if (unlikely(session->internals.default_hello_version[0] != 0)) {
@@ -1848,7 +1919,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 				      (unsigned)tver[0], (unsigned)tver[1]);
 
 		min_ver = _gnutls_version_lowest(session);
-		if (min_ver == NULL) {
+		max_ver = _gnutls_version_max(session);
+		if (min_ver == NULL || max_ver == NULL) {
 			gnutls_assert();
 			ret = GNUTLS_E_NO_PRIORITIES_WERE_SET;
 			goto cleanup;
@@ -1858,8 +1930,10 @@ static int send_client_hello(gnutls_session_t session, int again)
 		 * (RSA uses it).
 		 */
 		set_adv_version(session, hver->major, hver->minor);
-		if (_gnutls_set_current_version(session, hver->id) < 0)
-			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+		if (_gnutls_set_current_version(session, hver->id) < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+			goto cleanup;
+		}
 
 		if (session->internals.priorities->min_record_version != 0) {
 			/* Advertize the lowest supported (SSL 3.0) record packet
@@ -1882,24 +1956,43 @@ static int send_client_hello(gnutls_session_t session, int again)
 		if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED) &&
 		    !(IS_DTLS(session) && session->internals.dtls.hsk_hello_verify_requests == 0)) {
 			ret = _gnutls_gen_client_random(session);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 
 		}
 
 		ret = _gnutls_buffer_append_data(&extdata,
-					session->security_parameters.client_random,
-					GNUTLS_RANDOM_SIZE);
+						 session->security_parameters.client_random,
+						 GNUTLS_RANDOM_SIZE);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-		/* Copy the Session ID 
+#ifdef TLS13_APPENDIX_D4
+		if (max_ver->tls13_sem &&
+		    session->security_parameters.session_id_size == 0) {
+
+			/* Under TLS1.3 we generate a random session ID to make
+			 * the TLS1.3 session look like a resumed TLS1.2 session */
+			ret = _gnutls_generate_session_id(session->security_parameters.
+							  session_id,
+							  &session->security_parameters.
+							  session_id_size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+		}
+#endif
+
+		/* Copy the Session ID - if any
 		 */
 		ret = _gnutls_buffer_append_data_prefix(&extdata, 8, 
-						session->internals.resumed_security_parameters.session_id,
-						session_id_len);
+							session->internals.resumed_security_parameters.session_id,
+							session_id_len);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -1957,8 +2050,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 			ret =
 			    _gnutls_gen_hello_extensions(session, &extdata,
-						   GNUTLS_EXT_FLAG_CLIENT_HELLO,
-						   type);
+							 GNUTLS_EXT_FLAG_CLIENT_HELLO,
+							 type);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -1986,7 +2079,8 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 	    session->security_parameters.session_id_size;
 	char tmpbuf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
 	const version_entry_st *vers;
-	gnutls_ext_flags_t ext_parse_flag;
+	uint8_t vbytes[2];
+	unsigned extflag = 0;
 
 	_gnutls_buffer_init(&buf);
 
@@ -2001,22 +2095,20 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			ext_parse_flag = GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
+			vbytes[0] = 0x03; /* TLS1.2 */
+			vbytes[1] = 0x03;
+			extflag |= GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
 		} else {
-			ext_parse_flag = GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO;
+			vbytes[0] = vers->major;
+			vbytes[1] = vers->minor;
+			extflag |= GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO;
 		}
 
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _gnutls_buffer_append_data(&buf, &vers->major, 1);
-		if (ret < 0) {
-			gnutls_assert();
-			goto fail;
-		}
-
-		ret = _gnutls_buffer_append_data(&buf, &vers->minor, 1);
+		ret = _gnutls_buffer_append_data(&buf, vbytes, 2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto fail;
@@ -2030,21 +2122,19 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 			goto fail;
 		}
 
-		if (!vers->tls13_sem) {
-			ret = _gnutls_buffer_append_data_prefix(&buf, 8,
-						 session->security_parameters.session_id,
-						 session_id_len);
-			if (ret < 0) {
-				gnutls_assert();
-				goto fail;
-			}
-
-			_gnutls_handshake_log("HSK[%p]: SessionID: %s\n", session,
-					      _gnutls_bin2hex(session->
-							      security_parameters.session_id,
-							      session_id_len, tmpbuf,
-							      sizeof(tmpbuf), NULL));
+		ret = _gnutls_buffer_append_data_prefix(&buf, 8,
+							session->security_parameters.session_id,
+							session_id_len);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
 		}
+
+		_gnutls_handshake_log("HSK[%p]: SessionID: %s\n", session,
+				      _gnutls_bin2hex(session->
+						      security_parameters.session_id,
+						      session_id_len, tmpbuf,
+						      sizeof(tmpbuf), NULL));
 
 		ret = _gnutls_buffer_append_data(&buf,
 						 session->security_parameters.cs->id,
@@ -2054,17 +2144,16 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 			goto fail;
 		}
 
-		if (!vers->tls13_sem) {
-			ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
-			if (ret < 0) {
-				gnutls_assert();
-				goto fail;
-			}
+		/* compression */
+		ret = _gnutls_buffer_append_prefix(&buf, 8, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
 		}
 
 		ret =
 		    _gnutls_gen_hello_extensions(session, &buf,
-					   ext_parse_flag,
+					   extflag,
 					   (session->internals.resumed ==
 					    RESUME_TRUE) ?
 					   GNUTLS_EXT_MANDATORY :
@@ -2556,7 +2645,7 @@ static int handshake_client(gnutls_session_t session)
 	const version_entry_st *ver;
 
  reset:
-	if (STATE >= STATE100)
+	if (STATE >= STATE99)
 		return _gnutls13_handshake_client(session);
 
 	switch (STATE) {
@@ -2605,7 +2694,7 @@ static int handshake_client(gnutls_session_t session)
 	case STATE4:
 		ver = get_version(session);
 		if (ver->tls13_sem) { /* TLS 1.3 state machine */
-			STATE = STATE100;
+			STATE = STATE99;
 			goto reset;
 		}
 
@@ -2778,7 +2867,7 @@ static int handshake_client(gnutls_session_t session)
 /* This function is to be called if the handshake was successfully 
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
-static ssize_t send_change_cipher_spec(gnutls_session_t session, int again)
+ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
 {
 	uint8_t *data;
 	mbuffer_st *bufel;
@@ -2786,7 +2875,7 @@ static ssize_t send_change_cipher_spec(gnutls_session_t session, int again)
 	const version_entry_st *vers;
 
 	if (again == 0) {
-		bufel = _gnutls_handshake_alloc(session, 1);
+		bufel = _gnutls_handshake_alloc(session, 3); /* max for DTLS0.9 */
 		if (bufel == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -2809,12 +2898,25 @@ static ssize_t send_change_cipher_spec(gnutls_session_t session, int again)
 			session->internals.dtls.hsk_write_seq++;
 		}
 
+		ret = call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_PRE, 0,
+				     data, 1);
+		if (ret < 0) {
+			_mbuffer_xfree(&bufel);
+			return gnutls_assert_val(ret);
+		}
+
 		ret =
 		    _gnutls_handshake_io_cache_int(session,
 						   GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC,
 						   bufel);
 		if (ret < 0) {
 			_mbuffer_xfree(&bufel);
+			return gnutls_assert_val(ret);
+		}
+
+		ret = call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_POST, 0,
+				     data, 1);
+		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
 
@@ -2836,7 +2938,7 @@ static int send_handshake_final(gnutls_session_t session, int init)
 	switch (FINAL_STATE) {
 	case STATE0:
 	case STATE1:
-		ret = send_change_cipher_spec(session, FAGAIN(STATE1));
+		ret = _gnutls_send_change_cipher_spec(session, FAGAIN(STATE1));
 		FINAL_STATE = STATE0;
 
 		if (ret < 0) {
@@ -3021,7 +3123,7 @@ static int handshake_server(gnutls_session_t session)
 
 		ver = get_version(session);
 		if (ver->tls13_sem) { /* TLS 1.3 state machine */
-			STATE = STATE100;
+			STATE = STATE99;
 			goto reset;
 		}
 

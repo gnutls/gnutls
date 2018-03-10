@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -129,7 +129,7 @@ unsigned int tls_id_to_group[] = {
 };
 
 
-#define TLS_EXT_KEY_SHARE 40
+#define TLS_EXT_KEY_SHARE 51
 
 typedef struct ctx_st {
 	gnutls_group_t group;
@@ -154,7 +154,7 @@ void check_ks_contents(void *priv, gnutls_datum_t *msg)
 
 	pos = 2;
 
-	while(pos < msg->size) {
+	while((unsigned)pos < msg->size) {
 		id = (msg->data[pos] << 8) | msg->data[pos+1];
 		pos += 2;
 		len -= 2;
