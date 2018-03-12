@@ -122,6 +122,9 @@ supported_versions_recv_params(gnutls_session_t session,
 		_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
 				      session, (int)major, (int)minor);
 
+		if (!vers->tls13_sem)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
 		ret = _gnutls_negotiate_version(session, proto, major, minor);
 		if (ret < 0) {
 			gnutls_assert();
