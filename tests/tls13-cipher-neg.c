@@ -40,8 +40,8 @@
 /* We remove the ECDHE and DHE key exchanges as they impose additional
  * rules in the sorting of groups.
  */
-#define SPRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:-ECDHE-RSA:-ECDHE-ECDSA:-DHE-RSA:-RSA:-DHE-DSS"
-#define CPRIO "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:-ECDHE-RSA:-ECDHE-ECDSA:-DHE-RSA:-RSA:-DHE-DSS"
+#define SPRIO "NORMAL:-VERS-ALL:+VERS-TLS1.3"
+#define CPRIO "NORMAL:-VERS-ALL:+VERS-TLS1.3"
 
 test_case_st tests[] = {
 	{

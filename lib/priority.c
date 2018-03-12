@@ -1172,8 +1172,10 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	unsigned have_ec = 0;
 	unsigned have_dh = 0;
 	unsigned tls_sig_sem = 0;
-	const version_entry_st *tlsmax = NULL;
+	const version_entry_st *tlsmax = NULL, *vers;
 	const version_entry_st *dtlsmax = NULL;
+	const version_entry_st *tlsmin = NULL;
+	const version_entry_st *dtlsmin = NULL;
 	unsigned have_tls13 = 0;
 
 	priority_cache->cs.size = 0;
@@ -1182,21 +1184,40 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	priority_cache->groups.have_ffdhe = 0;
 
 	for (i = 0; i < priority_cache->protocol.algorithms; i++) {
-		if (priority_cache->protocol.priority[i] < GNUTLS_DTLS_VERSION_MIN) {
-			tlsmax = version_to_entry(priority_cache->protocol.priority[i]);
-			if (tlsmax) {
-				tls_sig_sem |= tlsmax->tls_sig_sem;
-				if (tlsmax->tls13_sem)
-					have_tls13 = 1;
-			}
+		vers = version_to_entry(priority_cache->protocol.priority[i]);
+		if (!vers)
+			continue;
+
+		if (vers->transport == GNUTLS_STREAM) { /* TLS */
+			tls_sig_sem |= vers->tls_sig_sem;
+			if (vers->tls13_sem)
+				have_tls13 = 1;
+
+			if (tlsmax == NULL || vers->age > tlsmax->age)
+				tlsmax = vers;
+			if (tlsmin == NULL || vers->age < tlsmin->age)
+				tlsmin = vers;
 		} else { /* dtls */
-			dtlsmax = version_to_entry(priority_cache->protocol.priority[i]);
-			if (dtlsmax) {
-				tls_sig_sem |= dtlsmax->tls_sig_sem;
-				if (dtlsmax->tls13_sem)
-					have_tls13 = 1;
-			}
+			tls_sig_sem |= vers->tls_sig_sem;
+			if (vers->tls13_sem)
+				have_tls13 = 1;
+
+			if (dtlsmax == NULL || vers->age > dtlsmax->age)
+				dtlsmax = vers;
+			if (dtlsmin == NULL || vers->age < dtlsmin->age)
+				dtlsmin = vers;
 		}
+	}
+
+	/* DTLS or TLS protocols must be present */
+	if ((!tlsmax || !tlsmin) && (!dtlsmax || !dtlsmin))
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+
+	/* if we are have TLS1.3+ do not enable any key exchange algorithms,
+	 * the protocol doesn't require any. */
+	if (tlsmin && tlsmin->tls13_sem) {
+		if (!dtlsmin || (dtlsmin && dtlsmin->tls13_sem))
+			priority_cache->_kx.algorithms = 0;
 	}
 
 	/* Add TLS 1.3 ciphersuites (no KX) */
