@@ -11,7 +11,7 @@ See the end for copying conditions.
    mode, i.e., strict vs a more lax mode which will allow certain non FIPS140-2
    operations.
 
-** libgnutls: Introduced support for draft-ietf-tls-tls13-23. It includes version
+** libgnutls: Introduced support for draft-ietf-tls-tls13-26. It includes version
    negotiation, post handshake authentication, length hiding, multiple OCSP support,
    consistent ciphersuite support across protocols, hello retry requests, ability
    to adjust key shares via gnutls_init() flags, certificate authorities extension,
@@ -29,6 +29,10 @@ See the end for copying conditions.
 ** libgnutls: gnutls_privkey_import_ext4() was enhanced with the
    GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS flag.
 
+** libgnutls: on group exchange honor the %SERVER_PRECEDENCE and select the groups
+   which are preferred by the server. That unfortunately has complicated semantics
+   as TLS1.2 requires specific ordering of the groups based on the ciphersuite ordering,
+   making group order unpredictable under TLS1.3.
 
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
