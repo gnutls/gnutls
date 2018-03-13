@@ -340,15 +340,18 @@ void doit(void)
 	fwrite(tpasswd_file, 1, strlen(tpasswd_file), fd);
 	fclose(fd);
 
-	start("srp-1024", "NORMAL:-KX-ALL:+SRP", "test", "test", 0);
-	start("srp-1536", "NORMAL:-KX-ALL:+SRP", "test2", "test2", 0);
-	start("srp-2048", "NORMAL:-KX-ALL:+SRP", "test3", "test3", 0);
-	start("srp-3072", "NORMAL:-KX-ALL:+SRP", "test4", "test4", 0);
-	start("srp-4096", "NORMAL:-KX-ALL:+SRP", "test5", "test5", 0);
-	start("srp-8192", "NORMAL:-KX-ALL:+SRP", "test7", "test7", 0);
-	start("srp-other", "NORMAL:-KX-ALL:+SRP", "test9", "test9", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	start("srp-1024", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test", "test", 0);
+	start("srp-1536", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test2", "test2", 0);
+	start("srp-2048", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test3", "test3", 0);
+	start("srp-3072", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test4", "test4", 0);
+	start("srp-4096", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test5", "test5", 0);
+	start("srp-8192", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test7", "test7", 0);
+	start("srp-other", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test9", "test9", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	start("srp-rsa", "NORMAL:-KX-ALL:+SRP-RSA", "test", "test", 0);
+	start("srp-rsa", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", "test", "test", 0);
+
+	/* check whether SRP works with the default protocol set */
+	start("srp-1024", "NORMAL:-KX-ALL:+SRP", "test", "test", 0);
 
 	remove("tpasswd");
 	remove("tpasswd.conf");

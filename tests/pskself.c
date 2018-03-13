@@ -297,16 +297,24 @@ void run_test(const char *prio)
 	if (child) {
 		int status;
 		/* parent */
+		close(sockets[1]);
 		server(sockets[0], prio);
 		wait(&status);
+		check_wait_status(status);
 	} else {
+		close(sockets[0]);
 		client(sockets[1], prio);
+		exit(0);
 	}
 }
 
 void doit(void)
 {
 	generate_dh_params();
+
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK");
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK");
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK");
 
 	run_test("NORMAL:-KX-ALL:+PSK");
 	run_test("NORMAL:-KX-ALL:+ECDHE-PSK");

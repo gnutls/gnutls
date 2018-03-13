@@ -49,6 +49,7 @@ int main(int argc, char **argv)
 #include <signal.h>
 #include <poll.h>
 #include <errno.h>
+#include <assert.h>
 
 #include "utils.h"
 #include "cert-common.h"
@@ -156,7 +157,7 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:-RSA", NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-RSA", NULL)>=0);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);

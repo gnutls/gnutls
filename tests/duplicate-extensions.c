@@ -156,7 +156,7 @@ static void server(int sd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2", NULL);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
@@ -210,6 +210,7 @@ void doit(void)
 
 		client(sockets[1]);
 		wait(&status);
+		check_wait_status(status);
 	} else {
 		server(sockets[0]);
 		_exit(0);

@@ -310,8 +310,11 @@ void doit(void)
 		/* parent */
 		server(sockets[0]);
 		wait(&status);
-	} else
+		check_wait_status(status);
+	} else {
 		client(sockets[1]);
+		exit(0);
+	}
 }
 
 #endif				/* _WIN32 */

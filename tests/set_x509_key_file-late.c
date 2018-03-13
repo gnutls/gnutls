@@ -103,7 +103,7 @@ static void start(const char *prio)
 		fail("set_x509_trust_file failed: %s\n", gnutls_strerror(ret));
 
 
-	success("Testing late set of credentials\n");
+	success("Testing late set of credentials: %s\n", prio);
 
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_CLIENT_HELLO,
@@ -141,5 +141,6 @@ static void start(const char *prio)
 void doit(void)
 {
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3");
 	start("NORMAL");
 }

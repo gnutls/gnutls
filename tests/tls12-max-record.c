@@ -77,7 +77,7 @@ void doit(void)
 				serverx509cred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL",
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -104,7 +104,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_priority_set_direct(client, "NORMAL", NULL);
+	ret = gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
 	if (ret < 0)
 		exit(1);
 

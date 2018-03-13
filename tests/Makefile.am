@@ -152,10 +152,10 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
-	 mini-x509-dual global-init-override tlsext-decoding rsa-psk-cb \
+	 tls12-anon-upgrade global-init-override tlsext-decoding rsa-psk-cb \
 	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
 	 rehandshake-switch-cert-client-allow handshake-versions dtls-handshake-versions \
-	 dtls-max-record tls-max-record alpn-server-prec ocsp-filename-memleak \
+	 dtls-max-record tls12-max-record alpn-server-prec ocsp-filename-memleak \
 	 dh-params rehandshake-ext-secret pcert-list session-export-funcs \
 	 handshake-false-start version-checks key-material-dtls key-material-set-dtls \
 	 system-prio-file name-constraints-merge crl-basic crq-basic \

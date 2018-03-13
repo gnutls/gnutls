@@ -32,6 +32,9 @@
 #include "utils.h"
 #include "eagain-common.h"
 
+/* This tests the upgrade from anonymous ciphersuites to certificates
+ * under TLS1.2 */
+
 const char *side;
 
 static void tls_log_func(int level, const char *str)
@@ -182,7 +185,7 @@ static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx)
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL:+ANON-ECDH:+ECDHE-RSA:+DHE-RSA",
+				   "NORMAL:-VERS-ALL:+VERS-TLS1.2:+ANON-ECDH:+ECDHE-RSA:+DHE-RSA",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -209,7 +212,7 @@ static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_priority_set_direct(client, "NORMAL:-KX-ALL:+ARCFOUR-128:+ANON-ECDH", NULL);
+	ret = gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ARCFOUR-128:+ANON-ECDH", NULL);
 	if (ret < 0)
 		exit(1);
 
@@ -292,10 +295,10 @@ void doit(void)
 {
 	global_init();
 
-	try("NORMAL:-KX-ALL:+DHE-RSA:+ARCFOUR-128", GNUTLS_KX_DHE_RSA);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-RSA:+ARCFOUR-128", GNUTLS_KX_DHE_RSA);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+ECDHE-RSA:+ARCFOUR-128", GNUTLS_KX_ECDHE_RSA);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:+ARCFOUR-128", GNUTLS_KX_ECDHE_RSA);
 	reset_buffers();
-	try("NORMAL:-KX-ALL:+RSA:+ARCFOUR-128", GNUTLS_KX_RSA);
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+RSA:+ARCFOUR-128", GNUTLS_KX_RSA);
 	gnutls_global_deinit();
 }

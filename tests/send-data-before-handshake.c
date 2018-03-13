@@ -46,6 +46,7 @@ int main()
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
+#include <assert.h>
 #include "cert-common.h"
 #include "utils.h"
 
@@ -89,7 +90,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -110,8 +111,7 @@ static void client(int fd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-RSA", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_PRE,
@@ -186,7 +186,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -210,10 +210,7 @@ static void server(int fd)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -257,10 +254,13 @@ static void ch_handler(int sig)
 	return;
 }
 
-void doit(void)
+static
+void start(const char *prio)
 {
 	int fd[2];
 	int ret, status = 0;
+
+	success("trying %s\n", prio);
 
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
@@ -281,14 +281,21 @@ void doit(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		client(fd[0]);
+		client(fd[0], prio);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		server(fd[1]);
+		server(fd[1], prio);
 		exit(0);
 	}
+}
+
+void doit(void)
+{
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
+	start("NORMAL");
 }
 
 #endif				/* _WIN32 */

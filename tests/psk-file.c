@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 #include <sys/wait.h>
 #endif
 #include <unistd.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 
 #include "utils.h"
@@ -64,7 +65,7 @@ static void tls_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void client(int sd, const char *user)
+static void client(int sd, const char *prio, const char *user, unsigned expect_fail)
 {
 	int ret, ii;
 	gnutls_session_t session;
@@ -90,7 +91,7 @@ static void client(int sd, const char *user)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+PSK", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -103,7 +104,8 @@ static void client(int sd, const char *user)
 	ret = gnutls_handshake(session);
 
 	if (ret < 0) {
-		fail("client: Handshake failed\n");
+		if (!expect_fail)
+			fail("client: Handshake failed\n");
 		gnutls_perror(ret);
 		goto end;
 	} else {
@@ -157,13 +159,13 @@ static void client(int sd, const char *user)
 
 #define MAX_BUF 1024
 
-static void server(int sd, const char *user, unsigned expect_fail)
+static void server(int sd, const char *prio, const char *user, unsigned expect_fail)
 {
-gnutls_psk_server_credentials_t server_pskcred;
-int ret;
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
-char *psk_file = getenv("PSK_FILE");
+	gnutls_psk_server_credentials_t server_pskcred;
+	int ret;
+	gnutls_session_t session;
+	char buffer[MAX_BUF + 1];
+	char *psk_file = getenv("PSK_FILE");
 
 	/* this must be called once in the program
 	 */
@@ -188,10 +190,7 @@ char *psk_file = getenv("PSK_FILE");
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+PSK", NULL);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
@@ -252,11 +251,13 @@ char *psk_file = getenv("PSK_FILE");
 }
 
 static
-void run_test(const char *user, unsigned expect_fail)
+void run_test(const char *prio, const char *user, unsigned expect_fail)
 {
 	pid_t child;
 	int err;
 	int sockets[2];
+
+	success("trying %s / user:%s\n", prio, user);
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
@@ -276,18 +277,22 @@ void run_test(const char *user, unsigned expect_fail)
 		close(sockets[1]);
 		int status;
 		/* parent */
-		server(sockets[0], user, expect_fail);
+		server(sockets[0], prio, user, expect_fail);
 		wait(&status);
+		check_wait_status(status);
 	} else {
 		close(sockets[0]);
-		client(sockets[1], user);
+		client(sockets[1], prio, user, expect_fail);
+		exit(0);
 	}
 }
 
 void doit(void)
 {
-	run_test("jas", 0);
-	run_test("non-hex", 1);
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", "jas", 0);
+	run_test("NORMAL:-KX-ALL:+PSK", "jas", 0);
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", "non-hex", 1);
+	run_test("NORMAL:-KX-ALL:+PSK", "non-hex", 1);
 }
 
 #endif				/* _WIN32 */

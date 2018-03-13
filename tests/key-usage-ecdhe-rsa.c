@@ -135,7 +135,7 @@ void server_check(void)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 	gnutls_priority_set_direct(server,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA",
+				   "NORMAL:-KX-ALL:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.2",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -159,7 +159,7 @@ void server_check(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL:+ECDHE-RSA", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -258,7 +258,7 @@ void client_check(void)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 	gnutls_priority_set_direct(server,
-				   "NORMAL:-KX-ALL:+ECDHE-RSA:%DEBUG_ALLOW_KEY_USAGE_VIOLATIONS",
+				   "NORMAL:-KX-ALL:+ECDHE-RSA:%DEBUG_ALLOW_KEY_USAGE_VIOLATIONS:-VERS-ALL:+VERS-TLS1.2",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -282,7 +282,7 @@ void client_check(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL:+ECDHE-RSA", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:+ECDHE-RSA:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

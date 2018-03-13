@@ -52,7 +52,7 @@ enum {
 };
 
 #define myfail(fmt, ...) \
-	fail("%s%s %d: "fmt, dtls?"-dtls":"", name, testno, ##__VA_ARGS__)
+	fail("%s%s %d: "fmt, dtls?"dtls":"tls", name, testno, ##__VA_ARGS__)
 
 static void try(const char *name, unsigned testno, unsigned fs,
 		const char *prio, unsigned dhsize,
@@ -265,7 +265,7 @@ static void try(const char *name, unsigned testno, unsigned fs,
 			gnutls_strerror(ret));
 	}
 
-	success("%5s%s \tok\n", dtls?"dtls-":"", name);
+	success("%5s%s \tok\n", dtls?"dtls-":"tls-", name);
  exit:
 	gnutls_deinit(client);
 	gnutls_deinit(server);
@@ -286,21 +286,28 @@ void doit(void)
 
 	for (j=0;j<2;j++) {
 		for (i = 0; i < TESTNO_MAX; i++) {
-			try("anon-dh  :", i, 0, "NORMAL:-KX-ALL:+ANON-DH", 3072, j);
+			try("1.2 anon-dh  :", i, 0, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ANON-DH", 3072, j);
 			reset_buffers();
-			try("anon-ecdh:", i, 0, "NORMAL:-KX-ALL:+ANON-ECDH", 2048, j);
+			try("1.2 anon-ecdh:", i, 0, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ANON-ECDH", 2048, j);
 			reset_buffers();
-			try("ecdhe-rsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-RSA", 2048, j);
+			try("1.2 ecdhe-rsa:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA", 2048, j);
 			reset_buffers();
-			try("ecdhe-x25519-rsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519", 2048, j);
+			try("1.2 ecdhe-x25519-rsa:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-CURVE-ALL:+CURVE-X25519", 2048, j);
 			reset_buffers();
-			try("ecdhe-ecdsa:", i, 1, "NORMAL:-KX-ALL:+ECDHE-ECDSA", 2048, j);
+			try("1.2 ecdhe-ecdsa:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+ECDHE-ECDSA", 2048, j);
 			reset_buffers();
-			try("dhe-rsa-2048:", i, 0, "NORMAL:-KX-ALL:+DHE-RSA", 2048, j);
+			try("1.2 dhe-rsa-2048:", i, 0, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", 2048, j);
 			reset_buffers();
-			try("dhe-rsa-3072:", i, 1, "NORMAL:-KX-ALL:+DHE-RSA", 3072, j);
+			try("1.2 dhe-rsa-3072:", i, 1, "NORMAL:-VERS-ALL:+VERS-DTLS1.2:+VERS-TLS1.2:-KX-ALL:+DHE-RSA", 3072, j);
 			reset_buffers();
 		}
 	}
+
+	/* it should work, but false start will not be reported */
+	try("1.3 secp256r1:", i, 0, "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1", 2048, 0);
+	reset_buffers();
+	try("1.3 ffdhe2048:", i, 0, "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-FFDHE2048", 2048, 0);
+	reset_buffers();
+
 	gnutls_global_deinit();
 }

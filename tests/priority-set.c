@@ -112,7 +112,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	assert(gnutls_priority_set_direct(client, "NORMAL", NULL)>=0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

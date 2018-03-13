@@ -22,7 +22,7 @@ extern const char *side;
 	} \
     } \
   while ((cret == GNUTLS_E_AGAIN || (cret == 0 && sret == GNUTLS_E_AGAIN)) && (sret == GNUTLS_E_AGAIN || (sret == 0 && cret == GNUTLS_E_AGAIN))); \
-  if (cret != clierr || sret != serverr) \
+  if ((clierr != -1 && cret != clierr) || (serverr != -1 && sret != serverr)) \
     { \
       fprintf(stderr, "client[%d]: %s\n", cret, gnutls_strerror(cret)); \
       fprintf(stderr, "server[%d]: %s\n", sret, gnutls_strerror(sret)); \

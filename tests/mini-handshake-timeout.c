@@ -87,7 +87,7 @@ static void client(int fd, int wait)
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:+ANON-ECDH", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.2", NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -127,16 +127,6 @@ static void client(int fd, int wait)
 	return;
 }
 
-static void initialize_tls_session(gnutls_session_t * session)
-{
-	gnutls_init(session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(*session, "NORMAL:+ANON-ECDH", NULL);
-}
-
 static void server(int fd, int wait)
 {
 	int ret;
@@ -154,7 +144,13 @@ static void server(int fd, int wait)
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-	initialize_tls_session(&session);
+	gnutls_init(&session, GNUTLS_SERVER);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session, "NORMAL:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.2", NULL);
+
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
 	gnutls_transport_set_int(session, fd);

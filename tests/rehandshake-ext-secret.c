@@ -73,7 +73,7 @@ static void try(unsigned onclient)
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	gnutls_priority_set_direct(server, "NORMAL", NULL);
+	gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -83,7 +83,7 @@ static void try(unsigned onclient)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
@@ -107,9 +107,9 @@ static void try(unsigned onclient)
 	}
 
 	if (onclient)
-		gnutls_priority_set_direct(client, "NORMAL:%NO_SESSION_HASH", NULL);
+		gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_SESSION_HASH", NULL);
 	else
-		gnutls_priority_set_direct(server, "NORMAL:%NO_SESSION_HASH", NULL);
+		gnutls_priority_set_direct(server, "NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_SESSION_HASH", NULL);
 
 	sret = gnutls_rehandshake(server);
 	if (debug) {

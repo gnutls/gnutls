@@ -243,7 +243,7 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	start("NORMAL");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
 }
 
 #endif				/* _WIN32 */
