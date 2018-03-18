@@ -113,6 +113,10 @@ As such, some questions to answer before adding a new API:
    13.0 is made available? Would it harm the addition of a new protocol?
 
 
+The make rule 'abi-check' verifies that the ABI remained compatible since
+the last tagged release. It relies on the git tree and abi-compliance-checker.
+
+
 # Constructed types:
 
   The constructed types in gnutls always have the ```gnutls_``` prefix.

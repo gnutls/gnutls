@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver2"
+  key: "$CI_JOB_NAME-ver3"
   paths:
     - cache/
 
@@ -60,7 +60,7 @@ abi-coverage.Fedora:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf
-  - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
+  - CFLAGS="-std=c99 -g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
     && make -j$(nproc)
   - make abi-check
   - make pic-check
@@ -74,6 +74,9 @@ abi-coverage.Fedora:
     expire_in: 1 week
     when: on_failure
     paths:
+      - ./*.xml
+      - ./gnutls-prev-abi.tmp/
+      - compat_reports/
       - tests/*.log
       - tests/*/*.log
       - tests/suite/*/*.log

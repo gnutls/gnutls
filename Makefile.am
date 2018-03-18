@@ -55,8 +55,6 @@ ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4 -I lib/unistring
 EXTRA_DIST = cfg.mk maint.mk CONTRIBUTING.md README.md LICENSE AUTHORS NEWS \
 	ChangeLog THANKS INSTALL.md
 
-TMPFILE="abi-temp.xml"
-
 pic-check:
 	@echo "Checking for position dependent code"
 	readelf -d $(builddir)/lib/.libs/libgnutls.so|grep TEXTREL; if test $$? = 0;then \
@@ -66,29 +64,49 @@ pic-check:
 
 abi-dump:
 	@abi-dumper lib/.libs/libgnutls.so -lver $(VERSION) -o "./devel/ABI-$(VERSION)-$$(uname -m).dump" -public-headers lib/includes/gnutls/
-	@echo "*******************************************************************************"
-	@echo "You need to modify Makefile.am abi-check rule if you need to check this release"
-	@echo "*******************************************************************************"
 
-abi-check:
-	@rm -f $(TMPFILE)
+ABI_TMPCLONEDIR="gnutls-prev-abi.tmp"
+ABI_TMPFILE_CUR="abi-temp-cur.xml"
+ABI_TMPFILE_PRE="abi-temp-prev.xml"
+ABIREF := $(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1)
+ABIVER := $(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1|cut -d '/' -f 3|sed -e 's/gnutls_//' -e 's/_/./g')
+prev-tag-abi.stamp:
+	@rm -rf $(ABI_TMPCLONEDIR)
+	@git clone -l . $(ABI_TMPCLONEDIR)
+	@echo "Creating ABI for $(ABIVER)"
+	cd $(ABI_TMPCLONEDIR) && \
+	  git checkout $(ABIREF) && \
+	  make autoreconf && CFLAGS="-g -Og" ./configure --disable-doc && \
+	  $(MAKE) -j$$(nproc) -C gl && $(MAKE) -j$$(nproc) -C lib && $(MAKE) -j$$(nproc) -C libdane
+	touch $@
+
+abi-check: prev-tag-abi.stamp
+	@rm -f $(ABI_TMPFILE_CUR) $(ABI_TMPFILE_PRE)
 	@echo "Checking libgnutls ABI"
-	@echo "<version>$(VERSION)</version>" >$(TMPFILE)
-	@echo "<headers>$(srcdir)/lib/includes/gnutls" >>$(TMPFILE)
-	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(TMPFILE)
-	@echo "<libs>$(builddir)/lib/.libs</libs>" >>$(TMPFILE)
-	for i in 3.4.0 3.4.17 3.5.8 3.6.0;do \
-	test ! -f "$(srcdir)/devel/ABI-$$i-$$(uname -m).dump" || \
-		abi-compliance-checker -abi -lib gnutls -old "$(srcdir)/devel/ABI-$$i-$$(uname -m).dump" -new $(TMPFILE) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols; \
-	done
+	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_CUR)
+	@echo "<headers>$(srcdir)/lib/includes/gnutls" >>$(ABI_TMPFILE_CUR)
+	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_CUR)
+	@echo "<libs>$(builddir)/lib/.libs</libs>" >>$(ABI_TMPFILE_CUR)
+	@echo "<version>$(ABIVER)</version>" >$(ABI_TMPFILE_PRE)
+	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
+	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
+	@echo "<libs>$(builddir)/$(ABI_TMPCLONEDIR)/lib/.libs</libs>" >>$(ABI_TMPFILE_PRE)
+	PATH="/sbin$(PATH_SEPARATOR)$$PATH" \
+	  abi-compliance-checker -abi -lib gnutls -old $(ABI_TMPFILE_PRE) -new $(ABI_TMPFILE_CUR) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols
 	@echo "Checking libgnutls-dane ABI"
-	@echo "<version>$(VERSION)</version>" >$(TMPFILE)
-	@echo "<headers>$(srcdir)/libdane/includes/gnutls" >>$(TMPFILE)
-	@echo "$(srcdir)/lib/includes/gnutls" >>$(TMPFILE)
-	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(TMPFILE)
-	@echo "<libs>$(builddir)/libdane/.libs</libs>" >>$(TMPFILE)
-	test ! -f "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" || abi-compliance-checker -abi -lib gnutls-dane -old "$(srcdir)/devel/ABI-dane-$$(uname -m).dump" -new $(TMPFILE)
-	@rm -f $(TMPFILE)
+	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_CUR)
+	@echo "<headers>$(srcdir)/libdane/includes/gnutls" >>$(ABI_TMPFILE_CUR)
+	@echo "$(srcdir)/lib/includes/gnutls" >>$(ABI_TMPFILE_CUR)
+	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_CUR)
+	@echo "<libs>$(builddir)/libdane/.libs</libs>" >>$(ABI_TMPFILE_CUR)
+	@echo "<version>3.5.0</version>" >$(ABI_TMPFILE_PRE)
+	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/libdane/includes/gnutls" >>$(ABI_TMPFILE_PRE)
+	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
+	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
+	@echo "<libs>$(builddir)/$(ABI_TMPCLONEDIR)/libdane/.libs</libs>" >>$(ABI_TMPFILE_PRE)
+	PATH="/sbin$(PATH_SEPARATOR)$$PATH" \
+	  abi-compliance-checker -abi -lib gnutls-dane -old $(ABI_TMPFILE_PRE) -new $(ABI_TMPFILE_CUR)
+	@rm -f $(ABI_TMPFILE_CUR) $(ABI_TMPFILE_PRE)
 
 symbol-check:
 	@objdump -T $(builddir)/lib/.libs/libgnutls.so  | grep -v ' \*UND\*'  | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE | grep -v '^@' |  sort -u >symbols.last.tmp
@@ -141,7 +159,7 @@ files-update: libopts-check
 	@echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
 	@echo "******************************************************************************************"
 
-dist-hook: libopts-check symbol-check abi-check
+dist-hook: libopts-check symbol-check
 	make -C doc/ compare-makefile
 	make -C doc/ compare-exported
 	make -C doc/manpages compare-makefile
