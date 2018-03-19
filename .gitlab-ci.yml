@@ -26,7 +26,8 @@ after_script:
 
 variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
-  DEBIAN_BUILD: buildenv-debian-stretch
+  DEBIAN_STRETCH_BUILD: buildenv-debian-stretch
+  DEBIAN_CROSS_BUILD: buildenv-debian-cross
   FEDORA_BUILD: buildenv-f26
   FEDORA_X86_BUILD: buildenv-f26-x86
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
@@ -465,7 +466,7 @@ ubsan-Werror.Fedora.x86_64:
 
 Debian.x86_64:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_STRETCH_BUILD
   script:
   - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
@@ -508,3 +509,44 @@ Debian.aarch64:
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
 
+.Debian.cross.template: &Debian_cross_template
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_CROSS_BUILD
+  script:
+  - build=$(dpkg-architecture -qDEB_HOST_GNU_TYPE)
+  - host="${CI_JOB_NAME#*.cross.}"
+  # not setting CC_FOR_BUILD paired with qemu-user/binfmt somehow causes
+  # config.guess to detect the target as the build platform and not activate
+  # cross-compile mode even though --build is given
+  - export CC_FOR_BUILD="ccache gcc"
+  - export CC="ccache $host-gcc"
+  - git submodule update --init --no-fetch
+  - make autoreconf
+  - mkdir -p build
+  - cd build
+  # Debian's softhsm package is not multiarch yet. Missing softhsm libraries
+  # for the target will cause the test suite to fail when p11-kit is enabled.
+  - dash ../configure --build=$build --host=$host --disable-gcc-warnings
+      --cache-file ../cache/config.cache --disable-doc --disable-guile
+      --without-p11-kit
+  - make -j$(nproc)
+  - make check -j$(nproc)
+  - cd ..
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    when: on_failure
+    paths:
+      - build/guile/tests/*.log
+      - build/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+      - build/tests/suite/*/*.log
+
+Debian.cross.arm-linux-gnueabihf:
+  <<: *Debian_cross_template
+
+Debian.cross.mips-linux-gnu:
+  <<: *Debian_cross_template
