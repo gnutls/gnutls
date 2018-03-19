@@ -31,7 +31,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
 
-EXTRA_DIST = crl/long.crl crl/long.pem
+EXTRA_DIST =
 
 check_PROGRAMS = rng prime-check
 AM_LDFLAGS = -no-install
@@ -93,7 +93,7 @@ nodist_check_SCRIPTS = chain.sh invalid-cert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh
 
 if ENABLE_PKCS11
-nodist_check_SCRIPTS += testpkcs11.sh crl-test
+nodist_check_SCRIPTS += testpkcs11.sh
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \

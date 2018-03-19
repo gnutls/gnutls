@@ -22,7 +22,7 @@
 
 srcdir="${srcdir:-.}"
 DIFF="${DIFF:-diff}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -35,7 +35,7 @@ fi
 TMPFILE=long.$$.pem.tmp
 
 rm -f $TMPFILE
-${VALGRIND} "${CERTTOOL}" --crl-info --inder --infile "${srcdir}/crl/long.crl" --outfile $TMPFILE
+${VALGRIND} "${CERTTOOL}" --crl-info --inder --infile "${srcdir}/data/long.crl" --outfile $TMPFILE
 rc=$?
 
 # We're done.
@@ -44,7 +44,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${DIFF} -I ^warning "${srcdir}/crl/long.pem" "$TMPFILE" || ${DIFF} -I ^warning --strip-trailing-cr "${srcdir}/crl/long.pem" $TMPFILE
+${DIFF} -I ^warning "${srcdir}/data/long.pem" "$TMPFILE" || ${DIFF} -I ^warning --strip-trailing-cr "${srcdir}/data/long.pem" $TMPFILE
 rc=$?
 
 if test "${rc}" != "0"; then
