@@ -86,7 +86,7 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common
-nodist_check_SCRIPTS = chain.sh invalid-cert.sh \
+nodist_check_SCRIPTS = chain.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
 	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh
