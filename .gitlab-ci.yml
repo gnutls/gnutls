@@ -234,11 +234,10 @@ MinGW32.DLLs:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
-    echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    rm -f tests/suite/mini-eagain2.c
+    echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf
   - export CC="ccache i686-w64-mingw32-gcc"
-  - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 ---cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+  - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 ---cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
@@ -273,11 +272,10 @@ MinGW64.DLLs:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
-    echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    rm -f tests/suite/mini-eagain2.c
+    echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - make autoreconf
   - export CC="ccache x86_64-w64-mingw32-gcc"
-    dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+    dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
@@ -315,8 +313,8 @@ MinGW64:
   - export CC="ccache x86_64-w64-mingw32-gcc"
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
-    rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+    mkdir -p build && cd build &&
+    dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   - cd ..
   tags:
@@ -340,8 +338,8 @@ MinGW32:
   - export CC="ccache i686-w64-mingw32-gcc"
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-doc &&
+    mkdir -p build && cd build &&
+    dash ../configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   - cd ..
   tags:
@@ -364,7 +362,7 @@ FreeBSD.x86_64:
   image:
   script:
   - export CC="ccache clang"
-  - gmake autoreconf && rm -f tests/suite/mini-eagain2.c && LIBS="-L/usr/local/lib" ./configure
+  - gmake autoreconf && LIBS="-L/usr/local/lib" ./configure --disable-full-test-suite
     --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
@@ -388,7 +386,8 @@ Fedora.x86:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
-    CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-doc --disable-guile &&
+    CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux
+     --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-full-test-suite --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc) &&
     make pic-check
   tags:
@@ -411,7 +410,8 @@ ubsan-Werror.Fedora.x86_64:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf
-  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" dash ./configure --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc
+  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" dash ./configure
+     --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-full-test-suite --disable-doc
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
   - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g"
@@ -419,7 +419,8 @@ ubsan-Werror.Fedora.x86_64:
   - make -j$(nproc) -C src CFLAGS="-Werror -O2 -g -fsanitize=undefined -Wno-error=parentheses -Wno-error=unused-macros"
   - make -j$(nproc)
   - make check -j$(nproc)
-  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" dash ./configure --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc --with-default-trust-store-pkcs11="pkcs11:"
+  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" LDFLAGS="-static-libubsan" dash ./configure
+   --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc --disable-full-test-suite --with-default-trust-store-pkcs11="pkcs11:"
   - make -j$(nproc)
   - make -C tests check -j$(nproc) TESTS="trust-store p11-kit-load.sh" SUBDIRS=.
   tags:
@@ -441,7 +442,7 @@ Debian.x86_64:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf && mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile &&
+    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile --disable-full-test-suite &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
