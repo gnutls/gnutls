@@ -115,7 +115,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 static void client(int fd, const char *prio, int ign)
 {
 	int ret;
-	unsigned i;
+	unsigned i, vers;
 	char buffer[MAX_BUF + 1];
 	const char* err;
 	gnutls_anon_client_credentials_t anoncred;
@@ -205,13 +205,16 @@ static void client(int fd, const char *prio, int ign)
 		fail("server (%s): Error sending %d byte packet; sent %d bytes instead of 16384\n", prio, i, ret);
 		exit(1);
 	}
-	
-	ret = gnutls_alert_send(session, GNUTLS_AL_WARNING, GNUTLS_A_USER_CANCELED);
+
+	memset(buffer, 0xff, sizeof(buffer));
+	ret = gnutls_record_send(session, buffer, 4);
 	if (ret < 0) {
-		fail("server (%s): Error sending alert\n", prio);
+		fail("server (%s): Error sending 4 byte packet: %s\n",
+		     prio, gnutls_strerror(ret));
 		exit(1);
 	}
 
+	memset(buffer, 0x02, sizeof(buffer));
 	gnutls_record_set_timeout(session, 10000);
 
 	/* Test receiving */
@@ -332,20 +335,19 @@ static void server(int fd, const char *prio, int ign)
 		} while (ret == GNUTLS_E_AGAIN
 			 || ret == GNUTLS_E_INTERRUPTED);
 		if (ret > 0 && ret != (int)i) {
-			fail("error receiving message[%d]: ret: %d\n", i, ret);
+			if (ret == 4 && (uint8_t)buffer[0] == 0xff) {
+				break;
+			} else {
+				fail("error receiving message[%d]: ret: %d\n", i, ret);
+			}
 		}
 		i++;
 	} while (ret > 0);
-	
-	if (ret != GNUTLS_E_WARNING_ALERT_RECEIVED ||
-		gnutls_alert_get(session) != GNUTLS_A_USER_CANCELED) {
 
-		if (ret <= 0) {
-			if (ret != 0) {
-				fail("client: Error: %s\n", gnutls_strerror(ret));
-				exit(1);
-			}
-		}
+next:
+	if (ret < 0) {
+		fail("client: Error: %s\n", gnutls_strerror(ret));
+		exit(1);
 	}
 
 	/* Test sending */
@@ -424,6 +426,7 @@ static void start(const char *prio, int ign)
 #define AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
 #define AES_CBC_SHA256 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
 #define AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
+#define TLS13_AES_GCM "NONE:+VERS-TLS1.3:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+CURVE-ALL"
 
 #define ARCFOUR_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
 #define ARCFOUR_MD5 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:+RSA"
@@ -445,6 +448,7 @@ void doit(void)
 	start(AES_CBC, 0);
 	start(AES_CBC_SHA256, 0);
 	start(AES_GCM, 0);
+	start(TLS13_AES_GCM, 0);
 
 	if (!gnutls_fips140_mode_enabled()) {
 		start(NULL_SHA1, 0);

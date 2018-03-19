@@ -143,7 +143,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 pubkey-import-export sign-is-secure spki spki-abstract rsa-rsa-pss \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
-	 mini-record-retvals mini-server-name tls-etm x509-cert-callback \
+	 record-retvals mini-server-name tls-etm x509-cert-callback alerts \
 	 client-sign-md5-rep tls12-invalid-key-exchanges session-rdn-read \
 	 tls13-cert-key-exchange x509-cert-callback-ocsp gnutls_ocsp_resp_list_import2 \
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
