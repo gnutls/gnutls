@@ -33,7 +33,7 @@ AM_CPPFLAGS = \
 
 EXTRA_DIST = crl/long.crl crl/long.pem
 
-check_PROGRAMS = rng prime-check cert-coverage ocsp-coverage
+check_PROGRAMS = rng prime-check
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
@@ -130,7 +130,7 @@ nodist_check_SCRIPTS += eagain.sh
 endif
 endif
 
-TESTS = $(nodist_check_SCRIPTS) prime-check cert-coverage ocsp-coverage
+TESTS = $(nodist_check_SCRIPTS) prime-check
 
 prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 
