@@ -85,16 +85,11 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 	ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
 
 
-EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common \
-	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm
+EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common
 nodist_check_SCRIPTS = chain.sh invalid-cert.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
-	testrandom.sh certtool-pkcs11.sh tls-fuzzer/tls-fuzzer-nocert.sh \
+	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh
-
-if ENABLE_PKCS11
-nodist_check_SCRIPTS += testpkcs11.sh
-endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"			\

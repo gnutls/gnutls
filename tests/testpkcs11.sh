@@ -19,11 +19,11 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-P11TOOL="${P11TOOL:-../../src/p11tool${EXEEXT}}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+P11TOOL="${P11TOOL:-../src/p11tool${EXEEXT}}"
+CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
-SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
+SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
+CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
 RETCODE=0
 
 if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
@@ -51,17 +51,20 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute valgrind --leak-check=full"
 fi
 
-TMPFILE="testpkcs11.debug"
+TMPFILE="testpkcs11.debug.log"
 CERTTOOL_PARAM="--stdout-info"
 
 if test "${WINDIR}" != ""; then
 	exit 77
 fi 
 
+ASAN_OPTIONS="detect_leaks=0"
+export ASAN_OPTIONS
+
 P11TOOL="${VALGRIND} ${P11TOOL} --batch"
 SERV="${SERV} -q"
 
-. ${srcdir}/../scripts/common.sh
+. ${srcdir}/scripts/common.sh
 
 rm -f "${TMPFILE}"
 
@@ -76,7 +79,7 @@ exit_error () {
 # $1: token
 # $2: PIN
 # $3: filename
-# ${srcdir}/pkcs11-certs/client.key
+# ${srcdir}/testpkcs11-certs/client.key
 write_privkey () {
 	export GNUTLS_PIN="$2"
 	filename="$3"
@@ -454,8 +457,8 @@ import_temp_dsa_privkey () {
 
 # $1: token
 # $2: PIN
-# $3: cakey: ${srcdir}/pkcs11-certs/ca.key
-# $4: cacert: ${srcdir}/pkcs11-certs/ca.crt
+# $3: cakey: ${srcdir}/testpkcs11-certs/ca.key
+# $4: cacert: ${srcdir}/testpkcs11-certs/ca.crt
 #
 # Tests writing a certificate which corresponds to the given key,
 # as well as the CA certificate, and tries to export them.
@@ -468,7 +471,7 @@ write_certificate_test () {
 
 	echo -n "* Generating client certificate... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
-	--template ${srcdir}/pkcs11-certs/client-tmpl --load-privkey "${token};object=gnutls-client;object-type=private" \
+	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey "${token};object=gnutls-client;object-type=private" \
 	--load-pubkey "$pubkey" --outfile tmp-client.crt >>"${TMPFILE}" 2>&1
 
 	if test $? = 0; then
@@ -551,7 +554,7 @@ write_certificate_test () {
 
 	echo -n "* Trying to obtain back the cert... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --export "${token};object=gnutls-ca;object-type=cert" --outfile crt1.tmp >>"${TMPFILE}" 2>&1
-	${DIFF} crt1.tmp "${srcdir}/pkcs11-certs/ca.crt"
+	${DIFF} crt1.tmp "${srcdir}/testpkcs11-certs/ca.crt"
 	if test $? != 0; then
 		echo "failed. Exported certificate differs (crt1.tmp)!"
 		exit_error
@@ -567,7 +570,7 @@ write_certificate_test () {
 	echo -n "* Trying to obtain the full chain... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --export-chain "${token};object=gnutls-client;object-type=cert"|"${CERTTOOL}" ${CERTTOOL_PARAM}  -i --outfile crt1.tmp >>"${TMPFILE}" 2>&1
 
-	cat tmp-client.crt ${srcdir}/pkcs11-certs/ca.crt|"${CERTTOOL}" ${CERTTOOL_PARAM}  -i >crt2.tmp
+	cat tmp-client.crt ${srcdir}/testpkcs11-certs/ca.crt|"${CERTTOOL}" ${CERTTOOL_PARAM}  -i >crt2.tmp
 	${DIFF} crt1.tmp crt2.tmp
 	if test $? != 0; then
 		echo "failed. Exported certificate chain differs!"
@@ -584,8 +587,8 @@ write_certificate_test () {
 
 # $1: token
 # $2: PIN
-# $3: cakey: ${srcdir}/pkcs11-certs/ca.key
-# $4: cacert: ${srcdir}/pkcs11-certs/ca.crt
+# $3: cakey: ${srcdir}/testpkcs11-certs/ca.key
+# $4: cacert: ${srcdir}/testpkcs11-certs/ca.crt
 #
 # Tests writing a certificate which corresponds to the given key,
 # and verifies whether the ID is the same. Should utilize the
@@ -607,7 +610,7 @@ write_certificate_id_test_rsa () {
 
 	echo -n "* Checking whether right ID is set on copy... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
-	--template ${srcdir}/pkcs11-certs/client-tmpl --load-privkey "${token};object=xxx1-rsa;object-type=private" \
+	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey "${token};object=xxx1-rsa;object-type=private" \
 	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
 
 	if test $? != 0; then
@@ -632,8 +635,8 @@ write_certificate_id_test_rsa () {
 
 # $1: token
 # $2: PIN
-# $3: cakey: ${srcdir}/pkcs11-certs/ca.key
-# $4: cacert: ${srcdir}/pkcs11-certs/ca.crt
+# $3: cakey: ${srcdir}/testpkcs11-certs/ca.key
+# $4: cacert: ${srcdir}/testpkcs11-certs/ca.crt
 #
 # Tests writing a certificate which corresponds to the given key,
 # and verifies whether the ID is the same. Should utilize the
@@ -656,7 +659,7 @@ write_certificate_id_test_rsa2 () {
 
 	echo -n "* Checking whether right ID is set on copy... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
-	--template ${srcdir}/pkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
+	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
 	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
 
 	if test $? != 0; then
@@ -689,8 +692,8 @@ write_certificate_id_test_rsa2 () {
 
 # $1: token
 # $2: PIN
-# $3: cakey: ${srcdir}/pkcs11-certs/ca.key
-# $4: cacert: ${srcdir}/pkcs11-certs/ca.crt
+# $3: cakey: ${srcdir}/testpkcs11-certs/ca.key
+# $4: cacert: ${srcdir}/testpkcs11-certs/ca.crt
 #
 # Tests writing a certificate which corresponds to the given key,
 # and verifies whether the ID is the same. Should utilize the
@@ -713,7 +716,7 @@ write_certificate_id_test_ecdsa () {
 
 	echo -n "* Checking whether right ID is set on copy... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
-	--template ${srcdir}/pkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
+	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
 	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
 
 	if test $? != 0; then
@@ -857,7 +860,7 @@ if test -z "${type}"; then
 		echo ""
 		type=softhsm
 	else
-		exit 1
+		exit 77
 	fi
 
 fi
@@ -879,7 +882,7 @@ if test "x${TOKEN}" = x; then
 fi
 
 #write a given privkey
-write_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/client.key"
+write_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/client.key"
 
 generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 256
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-256
@@ -908,20 +911,20 @@ change_id_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 export_pubkey_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 change_label_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 
-write_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt" tmp-client.pub
-write_serv_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/server.key"
-write_serv_cert "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/server.crt"
+write_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt" tmp-client.pub
+write_serv_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.key"
+write_serv_cert "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
 
-write_serv_pubkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/server.crt"
+write_serv_pubkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
 test_sign "${TOKEN}" "${GNUTLS_PIN}"
 
-use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/pkcs11-certs/ca.crt" "full URLs"
+use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/testpkcs11-certs/ca.crt" "full URLs"
 
-use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/pkcs11-certs/ca.crt" "abbrv URLs"
+use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/testpkcs11-certs/ca.crt" "abbrv URLs"
 
-write_certificate_id_test_rsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
-write_certificate_id_test_rsa2 "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
-write_certificate_id_test_ecdsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key" "${srcdir}/pkcs11-certs/ca.crt"
+write_certificate_id_test_rsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+write_certificate_id_test_rsa2 "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+write_certificate_id_test_ecdsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
 
 test_delete_cert "${TOKEN}" "${GNUTLS_PIN}"
 

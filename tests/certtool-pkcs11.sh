@@ -19,11 +19,11 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-P11TOOL="${P11TOOL:-../../src/p11tool${EXEEXT}}"
-CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+P11TOOL="${P11TOOL:-../src/p11tool${EXEEXT}}"
+CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
-SERV="${SERV:-../../src/gnutls-serv${EXEEXT}}"
-CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
+SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
+CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
 RETCODE=0
 
 if ! test -x "${P11TOOL}"; then
@@ -56,7 +56,7 @@ fi
 P11TOOL="${VALGRIND} ${P11TOOL} --batch"
 SERV="${SERV} -q"
 
-. ${srcdir}/../scripts/common.sh
+. ${srcdir}/scripts/common.sh
 
 rm -f "${TMPFILE}"
 
@@ -130,7 +130,7 @@ generate_cert() {
 	url=$1
 
 	echo -n "* Generating a certificate... "
-	$CERTTOOL ${ADDITIONAL_PARAM} --generate-certificate --load-ca-certificate "$url" --load-ca-privkey "${srcdir}/pkcs11-certs/ca.key" --load-privkey "${srcdir}/pkcs11-certs/server.key" --template "${srcdir}/pkcs11-certs/server-tmpl" >>"${TMPFILE}" 2>&1
+	$CERTTOOL ${ADDITIONAL_PARAM} --generate-certificate --load-ca-certificate "$url" --load-ca-privkey "${srcdir}/testpkcs11-certs/ca.key" --load-privkey "${srcdir}/testpkcs11-certs/server.key" --template "${srcdir}/testpkcs11-certs/server-tmpl" >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -144,7 +144,7 @@ generate_cert_with_key() {
 	ca_key_url=$2
 
 	echo -n "* Generating a certificate (privkey in pkcs11)... "
-	$CERTTOOL ${ADDITIONAL_PARAM} --generate-certificate --load-ca-certificate "${ca_url}" --load-ca-privkey "${ca_key_url}" --load-privkey "${srcdir}/pkcs11-certs/server.key" --template "${srcdir}/pkcs11-certs/server-tmpl" >>"${TMPFILE}" 2>&1
+	$CERTTOOL ${ADDITIONAL_PARAM} --generate-certificate --load-ca-certificate "${ca_url}" --load-ca-privkey "${ca_key_url}" --load-privkey "${srcdir}/testpkcs11-certs/server.key" --template "${srcdir}/testpkcs11-certs/server-tmpl" >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -175,13 +175,13 @@ if test "x${TOKEN}" = x; then
 	exit_error
 fi
 
-write_ca_cert "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.crt" "CA"
+write_ca_cert "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.crt" "CA"
 
-verify_certificate_test "${TOKEN};object=CA;object-type=cert" "${srcdir}/pkcs11-certs/server.crt"
-verify_certificate_test "${TOKEN};object=CA;object-type=cert" "${srcdir}/pkcs11-certs/client.crt"
+verify_certificate_test "${TOKEN};object=CA;object-type=cert" "${srcdir}/testpkcs11-certs/server.crt"
+verify_certificate_test "${TOKEN};object=CA;object-type=cert" "${srcdir}/testpkcs11-certs/client.crt"
 generate_cert "${TOKEN};object=CA;object-type=cert"
 
-write_ca_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key"
+write_ca_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key"
 
 generate_cert_with_key "${TOKEN};object=CA;object-type=cert" "${TOKEN};object=CA-key;object-type=private"
 
