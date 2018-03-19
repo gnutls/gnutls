@@ -31,9 +31,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
 
-EXTRA_DIST = crl/long.crl crl/long.pem data/test1.cat data/test2.cat \
-	data/test1.cat.data data/test2.cat.data \
-	data/test1.cat.out data/test2.cat.out data/ca.pem
+EXTRA_DIST = crl/long.crl crl/long.pem
 
 check_PROGRAMS = rng prime-check cert-coverage ocsp-coverage
 AM_LDFLAGS = -no-install
@@ -91,7 +89,7 @@ EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common
 	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm
 nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
-	testrandom.sh pkcs7-cat certtool-pkcs11.sh tls-fuzzer/tls-fuzzer-nocert.sh \
+	testrandom.sh certtool-pkcs11.sh tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh
 
 if ENABLE_PKCS11

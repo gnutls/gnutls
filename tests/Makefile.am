@@ -62,7 +62,9 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
 	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
-	p11-kit-trust-data/Example_Root_CA.pem
+	p11-kit-trust-data/Example_Root_CA.pem data/test1.cat data/test2.cat \
+	data/test1.cat.data data/test2.cat.data data/test1.cat.out data/test2.cat.out \
+	data/pkcs7-cat-ca.pem
 
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
@@ -383,7 +385,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
-	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh
+	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh pkcs7-cat.sh
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh
 
