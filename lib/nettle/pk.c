@@ -49,6 +49,7 @@
 #include <nettle/ecc-curve.h>
 #include <nettle/curve25519.h>
 #include <nettle/eddsa.h>
+#include <nettle/version.h>
 #include <gnettle.h>
 #include <fips.h>
 #ifndef HAVE_NETTLE_RSA_PSS
