@@ -47,6 +47,7 @@
 #include <nettle/ecdsa.h>
 #include <nettle/ecc-curve.h>
 #include <nettle/curve25519.h>
+#include <nettle/version.h>
 #include <gnettle.h>
 #include <fips.h>
 
