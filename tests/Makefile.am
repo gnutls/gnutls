@@ -122,6 +122,8 @@ ctests += tls13/change_cipher_spec
 
 ctests += tls13-cipher-neg
 
+ctests += tls13/no-psk-exts
+
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
 	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
