@@ -506,6 +506,13 @@ key_share_recv_params(gnutls_session_t session,
 		if (data_size != size)
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
+		/* if we do PSK without DH ignore that share */
+		if ((session->internals.hsk_flags & HSK_PSK_SELECTED) &&
+		    (session->internals.hsk_flags & HSK_PSK_KE_MODE_PSK)) {
+			reset_cand_groups(session);
+			return 0;
+		}
+
 		while(data_size > 0) {
 			DECR_LEN(data_size, 2);
 			gid = _gnutls_read_uint16(data);
@@ -554,8 +561,9 @@ key_share_recv_params(gnutls_session_t session,
 		 * In cases (2,3) the error is translated to illegal
 		 * parameter alert.
 		 */
-		if (used_share == 0)
+		if (used_share == 0) {
 			return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
+		}
 
 	} else { /* Client */
 		ver = get_version(session);
@@ -611,6 +619,7 @@ key_share_recv_params(gnutls_session_t session,
 		}
 
 		_gnutls_session_group_set(session, group);
+		session->internals.hsk_flags |= HSK_KEY_SHARE_RECEIVED;
 
 		ret = client_use_key_share(session, group, data, size);
 		if (ret < 0)
@@ -718,6 +727,11 @@ key_share_send_params(gnutls_session_t session,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		} else {
+			/* if we are negotiating PSK without DH, do not send a key share */
+			if ((session->internals.hsk_flags & HSK_PSK_SELECTED) &&
+			    (session->internals.hsk_flags & HSK_PSK_KE_MODE_PSK))
+				return gnutls_assert_val(0);
+
 			group = get_group(session);
 			if (unlikely(group == NULL))
 				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
@@ -726,8 +740,9 @@ key_share_send_params(gnutls_session_t session,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 		}
+
+		session->internals.hsk_flags |= HSK_KEY_SHARE_SENT;
 	}
 
 	return 0;
 }
-

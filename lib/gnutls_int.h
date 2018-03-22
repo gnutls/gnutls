@@ -325,7 +325,13 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 	GNUTLS_EXTENSION_SERVER_NAME,
 	GNUTLS_EXTENSION_COOKIE,
-	GNUTLS_EXTENSION_DUMBFW, /* this must always be the last */
+	GNUTLS_EXTENSION_PSK_KE_MODES,
+	/*
+	 * pre_shared_key and dumbfw must always be the last extensions,
+	 * in that order
+	 */
+	GNUTLS_EXTENSION_PRE_SHARED_KEY,
+	GNUTLS_EXTENSION_DUMBFW,
 	GNUTLS_EXTENSION_MAX /* not real extension - used for iterators */
 } extensions_t;
 
@@ -449,7 +455,7 @@ typedef struct mbuffer_head_st {
 typedef struct auth_cred_st {
 	gnutls_credentials_type_t algorithm;
 
-	/* the type of credentials depends on algorithm 
+	/* the type of credentials depends on algorithm
 	 */
 	void *credentials;
 	struct auth_cred_st *next;
@@ -463,9 +469,21 @@ struct gnutls_key_st {
 		gnutls_pk_params_st dh_params;
 	} kshare;
 
-	/* The union contents depend on the negotiated protocol */
+	/* The union contents depend on the negotiated protocol.
+	 * It should not contain any values which are allocated
+	 * prior to protocol negotiation, as it would be impossible
+	 * to deinitialize.
+	 */
 	union {
 		struct {
+			/*
+			 * 0-based index of the selected PSK.
+			 * This only applies if the HSK_PSK_SELECTED flag is set in internals.hsk_flags,
+			 * which signals a PSK has indeed been selected.
+			 */
+			unsigned psk_index;
+			const struct mac_entry_st *binder_prf;
+
 			/* the current (depending on state) secret, can be
 			 * early_secret, client_early_traffic_secret, ... */
 			uint8_t temp_secret[MAX_HASH_SIZE];
@@ -506,6 +524,10 @@ struct gnutls_key_st {
 			} srp;
 		} tls12; /* from ssl3.0 to tls12 */
 	} proto;
+
+	/* Pre-shared key in use (if any); temporary storage */
+	gnutls_datum_t psk;
+	unsigned psk_needs_free;
 
 	/* TLS pre-master key; applies to 1.2 and 1.3 */
 	gnutls_datum_t key;
@@ -849,6 +871,7 @@ struct gnutls_priority_st {
 	bool allow_server_key_usage_violation; /* for test suite purposes only */
 	bool no_tickets;
 	bool have_cbc;
+	bool have_psk;
 	unsigned int additional_verify_flags;
 
 	/* TLS_FALLBACK_SCSV */
@@ -1181,6 +1204,9 @@ typedef struct {
 	/* it is a copy of the handshake hash buffer if post handshake is used */
 	gnutls_buffer_st post_handshake_hash_buffer;
 
+/* When either of PSK or DHE-PSK is received */
+#define HSK_PSK_KE_MODES_RECEIVED (HSK_PSK_KE_MODE_PSK|HSK_PSK_KE_MODE_DHE_PSK|HSK_PSK_KE_MODE_INVALID)
+
 #define HSK_CRT_VRFY_EXPECTED 1
 #define HSK_CRT_SENT (1<<1)
 #define HSK_CRT_ASKED (1<<2)
@@ -1192,10 +1218,25 @@ typedef struct {
 #define HSK_FALSE_START_USED (1<<8) /* TLS1.2 only */
 #define HSK_HAVE_FFDHE (1<<9) /* whether the peer has advertized at least an FFDHE group */
 #define HSK_USED_FFDHE (1<<10) /* whether ffdhe was actually negotiated and used */
+#define HSK_PSK_KE_MODES_SENT (1<<11)
+#define HSK_PSK_KE_MODE_PSK (1<<12) /* client: whether PSK without DH is allowed,
+				     * server: whether PSK without DH is selected. */
+#define HSK_PSK_KE_MODE_INVALID (1<<13) /* server: no compatible PSK modes were seen */
+#define HSK_PSK_KE_MODE_DHE_PSK (1<<14) /* server: whether PSK with DH is selected
+					 * client: whether PSK with DH is allowed
+					 */
+#define HSK_PSK_SELECTED (1<<15)
+#define HSK_KEY_SHARE_SENT (1<<16) /* server: key share was sent to client */
+#define HSK_KEY_SHARE_RECEIVED (1<<17) /* client: key share was received */
+
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
 	unsigned hsk_flags;
 	time_t last_key_update;
+	/* Read-only pointer to the full ClientHello message */
+	gnutls_buffer_st full_client_hello;
+	/* The offset at which extensions start in the ClientHello buffer */
+	int extensions_offset;
 
 	gnutls_buffer_st hb_local_data;
 	gnutls_buffer_st hb_remote_data;
@@ -1288,6 +1329,10 @@ typedef struct {
 
 /* Maximum number of epochs we keep around. */
 #define MAX_EPOCH_INDEX 4
+
+#define reset_cand_groups(session) \
+	session->internals.cand_ec_group = session->internals.cand_dh_group = \
+		session->internals.cand_group = NULL
 
 struct gnutls_session_int {
 	security_parameters_st security_parameters;

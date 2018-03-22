@@ -2867,7 +2867,8 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_AGAIN -28
 #define GNUTLS_E_EXPIRED -29
 #define GNUTLS_E_DB_ERROR -30
-#define GNUTLS_E_SRP_PWD_ERROR -31
+#define GNUTLS_E_SRP_PWD_ERROR GNUTLS_E_KEYFILE_ERROR
+#define GNUTLS_E_KEYFILE_ERROR -31
 #define GNUTLS_E_INSUFFICIENT_CREDENTIALS -32
 #define GNUTLS_E_INSUFICIENT_CREDENTIALS GNUTLS_E_INSUFFICIENT_CREDENTIALS	/* for backwards compatibility only */
 #define GNUTLS_E_INSUFFICIENT_CRED GNUTLS_E_INSUFFICIENT_CREDENTIALS
@@ -2916,7 +2917,8 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_PK_SIG_VERIFY_FAILED -89
 
 #define GNUTLS_E_ILLEGAL_SRP_USERNAME -90
-#define GNUTLS_E_SRP_PWD_PARSING_ERROR -91
+#define GNUTLS_E_SRP_PWD_PARSING_ERROR GNUTLS_E_KEYFILE_PARSING_ERROR
+#define GNUTLS_E_KEYFILE_PARSING_ERROR -91
 #define GNUTLS_E_NO_TEMPORARY_DH_PARAMS -93
 
   /* For certificate and key stuff

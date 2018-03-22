@@ -119,11 +119,22 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 		const version_entry_st *ver = get_version(session);
 		const gnutls_group_entry_st *group = get_group(session);
 
-		if (ver->tls13_sem && group) {
-			if (group->curve)
-				return GNUTLS_KX_ECDHE_RSA;
-			else
-				return GNUTLS_KX_DHE_RSA;
+		if (ver->tls13_sem) {
+			if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+				if (group) {
+					if (group->pk == GNUTLS_PK_DH)
+						return GNUTLS_KX_DHE_PSK;
+					else
+						return GNUTLS_KX_ECDHE_PSK;
+				} else {
+					return GNUTLS_KX_PSK;
+				}
+			} else if (group) {
+				if (group->pk == GNUTLS_PK_DH)
+					return GNUTLS_KX_DHE_RSA;
+				else
+					return GNUTLS_KX_ECDHE_RSA;
+			}
 		}
 	}
 
@@ -207,6 +218,8 @@ static void deinit_keys(gnutls_session_t session)
 			      sizeof(session->key.proto.tls13.hs_skey));
 	}
 
+	if (session->key.psk_needs_free)
+		_gnutls_free_temp_key_datum(&session->key.psk);
 	_gnutls_free_temp_key_datum(&session->key.key);
 }
 
@@ -279,7 +292,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 int gnutls_init(gnutls_session_t * session, unsigned int flags)
 {
 	int ret;
-	
+
 	FAIL_IF_LIB_ERROR;
 
 	*session = gnutls_calloc(1, sizeof(struct gnutls_session_int));

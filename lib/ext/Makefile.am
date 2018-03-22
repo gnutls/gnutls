@@ -43,7 +43,8 @@ libgnutls_ext_la_SOURCES = max_record.c \
 	ext_master_secret.c ext_master_secret.h etm.h etm.c \
 	supported_versions.c supported_versions.h \
 	post_handshake.c post_handshake.h key_share.c key_share.h \
-	cookie.c cookie.h
+	cookie.c cookie.h \
+	psk_ke_modes.c psk_ke_modes.h pre_shared_key.c pre_shared_key.h
 
 if ENABLE_ALPN
 libgnutls_ext_la_SOURCES += alpn.c alpn.h

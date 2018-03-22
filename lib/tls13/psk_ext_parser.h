@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017 Free Software Foundation, Inc.
  *
- * Author: Nikos Mavrogiannopoulos
+ * Author: Ander Juaristi
  *
  * This file is part of GnuTLS.
  *
@@ -20,10 +20,29 @@
  *
  */
 
-int _gnutls13_compute_finished(const mac_entry_st *prf,
-		const uint8_t *base_key,
-		unsigned hash_size,
-		gnutls_buffer_st *handshake_hash_buffer,
-		void *out);
-int _gnutls13_recv_finished(gnutls_session_t session);
-int _gnutls13_send_finished(gnutls_session_t session, unsigned again);
+#ifndef PSK_PARSER_H
+#define PSK_PARSER_H
+#include "gnutls_int.h"
+
+struct psk_ext_parser_st {
+	unsigned char *data;
+	ssize_t len;
+	size_t obj_len;
+	size_t obj_read;
+	int next_index;
+};
+
+typedef struct psk_ext_parser_st psk_ext_parser_st;
+
+struct psk_st {
+	gnutls_datum_t identity;
+	uint32_t ob_ticket_age;
+};
+
+int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
+				  const unsigned char *data, size_t len);
+int _gnutls13_psk_ext_parser_next_psk(psk_ext_parser_st *p, struct psk_st *psk);
+int _gnutls13_psk_ext_parser_find_binder(psk_ext_parser_st *p, int psk_index,
+					 gnutls_datum_t *binder_out);
+
+#endif

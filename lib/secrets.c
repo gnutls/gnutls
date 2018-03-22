@@ -32,24 +32,36 @@
 /* HKDF-Extract(0,0) or HKDF-Extract(0, PSK) */
 int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_size)
 {
+	session->key.proto.tls13.temp_secret_size = session->security_parameters.prf->output_size;
+
+	return _tls13_init_secret2(session->security_parameters.prf,
+				   psk, psk_size,
+				   session->key.proto.tls13.temp_secret);
+}
+
+int _tls13_init_secret2(const mac_entry_st *prf,
+			const uint8_t *psk, size_t psk_size,
+			void *out)
+{
 	char buf[128];
 
-	session->key.proto.tls13.temp_secret_size = session->security_parameters.prf->output_size;
+	if (unlikely(prf == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	/* when no PSK, use the zero-value */
 	if (psk == NULL) {
-		psk_size = session->key.proto.tls13.temp_secret_size;
+		psk_size = prf->output_size;
 		if (unlikely(psk_size >= sizeof(buf)))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		memset(buf, 0, psk_size);
-		psk = (uint8_t*)buf;
+		psk = (uint8_t*) buf;
 	}
 
-	return gnutls_hmac_fast(session->security_parameters.prf->id,
+	return gnutls_hmac_fast(prf->id,
 				"", 0,
 				psk, psk_size,
-				session->key.proto.tls13.temp_secret);
+				out);
 }
 
 /* HKDF-Extract(Prev-Secret, key) */
@@ -62,7 +74,7 @@ int _tls13_update_secret(gnutls_session_t session, const uint8_t *key, size_t ke
 }
 
 /* Derive-Secret(Secret, Label, Messages) */
-int _tls13_derive_secret(gnutls_session_t session,
+int _tls13_derive_secret2(const mac_entry_st *prf,
 			 const char *label, unsigned label_size,
 			 const uint8_t *tbh, size_t tbh_size,
 			 const uint8_t secret[MAX_HASH_SIZE],
@@ -70,21 +82,39 @@ int _tls13_derive_secret(gnutls_session_t session,
 {
 	uint8_t digest[MAX_HASH_SIZE];
 	int ret;
-	unsigned digest_size = session->security_parameters.prf->output_size;
+	unsigned digest_size;
 
+	if (unlikely(prf == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	if (unlikely(label_size >= sizeof(digest)))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = gnutls_hash_fast((gnutls_digest_algorithm_t)session->security_parameters.prf->id,
+	digest_size = prf->output_size;
+	ret = gnutls_hash_fast((gnutls_digest_algorithm_t) prf->id,
 				tbh, tbh_size, digest);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	return _tls13_expand_secret(session, label, label_size, digest, digest_size, secret, digest_size, out);
+	return _tls13_expand_secret2(prf, label, label_size, digest, digest_size, secret, digest_size, out);
+}
+
+/* Derive-Secret(Secret, Label, Messages) */
+int _tls13_derive_secret(gnutls_session_t session,
+			 const char *label, unsigned label_size,
+			 const uint8_t *tbh, size_t tbh_size,
+			 const uint8_t secret[MAX_HASH_SIZE],
+			 void *out)
+{
+	if (unlikely(session->security_parameters.prf == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	return _tls13_derive_secret2(session->security_parameters.prf, label, label_size, tbh, tbh_size,
+				         secret,
+				         out);
 }
 
 /* HKDF-Expand-Label(Secret, Label, HashValue, Length) */
-int _tls13_expand_secret(gnutls_session_t session,
+int _tls13_expand_secret2(const mac_entry_st *prf,
 			 const char *label, unsigned label_size,
 			 const uint8_t *msg, size_t msg_size,
 			 const uint8_t secret[MAX_HASH_SIZE],
@@ -119,7 +149,7 @@ int _tls13_expand_secret(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	switch(session->security_parameters.prf->id) {
+	switch (prf->id) {
 	case GNUTLS_MAC_SHA256:{
 		struct hmac_sha256_ctx ctx;
 
@@ -160,3 +190,20 @@ int _tls13_expand_secret(gnutls_session_t session,
 	_gnutls_buffer_clear(&str);
 	return ret;
 }
+
+int _tls13_expand_secret(gnutls_session_t session,
+		const char *label, unsigned label_size,
+		const uint8_t *msg, size_t msg_size,
+		const uint8_t secret[MAX_CIPHER_KEY_SIZE],
+		unsigned out_size,
+		void *out)
+{
+	if (unlikely(session->security_parameters.prf == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	return _tls13_expand_secret2(session->security_parameters.prf,
+			label, label_size,
+			msg, msg_size, secret,
+			out_size, out);
+}
+

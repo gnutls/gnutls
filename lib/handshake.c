@@ -83,6 +83,7 @@ handshake_hash_buffer_reset(gnutls_session_t session)
 	session->internals.handshake_hash_buffer_server_finished_len = 0;
 	session->internals.handshake_hash_buffer_prev_len = 0;
 	session->internals.handshake_hash_buffer.length = 0;
+	session->internals.full_client_hello.length = 0;
 	return;
 }
 
@@ -108,6 +109,7 @@ void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session)
 {
 	handshake_hash_buffer_reset(session);
 	_gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
+	_gnutls_buffer_clear(&session->internals.full_client_hello);
 }
 
 /* Replace handshake message buffer, with the special synthetic message
@@ -1409,8 +1411,15 @@ _gnutls_recv_handshake(gnutls_session_t session,
 							 hsk.data.length);
 		else
 #endif
+		{
+			/* Reference the full ClientHello in case an extension needs it */
+			ret = _gnutls_ext_set_full_client_hello(session, &hsk);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
 			ret = read_client_hello(session, hsk.data.data,
 						hsk.data.length);
+		}
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -1581,6 +1590,15 @@ set_client_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
+	} else {
+		if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+			if (session->key.proto.tls13.binder_prf->id != selected->prf) {
+				_gnutls_handshake_log
+				    ("HSK[%p]: PRF of ciphersuite differs with the PSK identity (cs: %s, id: %s)\n",
+				     session, selected->name, session->key.proto.tls13.binder_prf->name);
+				gnutls_assert();
+			}
+		}
 	}
 
 	return 0;
@@ -1659,6 +1677,8 @@ read_server_hello(gnutls_session_t session,
 	int len = datalen;
 	unsigned ext_parse_flag = 0;
 	const version_entry_st *vers, *saved_vers;
+	const uint8_t *psk = NULL;
+	size_t psk_size = 0;
 
 	if (datalen < GNUTLS_RANDOM_SIZE+2) {
 		gnutls_assert();
@@ -1831,6 +1851,28 @@ read_server_hello(gnutls_session_t session,
 					   &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	if (vers->tls13_sem) {
+		/* TLS 1.3 Early Secret */
+		if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+			psk = session->key.psk.data;
+			psk_size = session->key.psk.size;
+		}
+
+		ret = _tls13_init_secret(session, psk, psk_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
+					   NULL, 0, session->key.proto.tls13.temp_secret,
+					   session->key.proto.tls13.temp_secret);
+		if (ret < 0)
+			gnutls_assert();
+	}
+
+cleanup:
 
 	return ret;
 }
@@ -2081,6 +2123,8 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 	const version_entry_st *vers;
 	uint8_t vbytes[2];
 	unsigned extflag = 0;
+	const uint8_t *psk = NULL;
+	size_t psk_size = 0;
 
 	_gnutls_buffer_init(&buf);
 
@@ -2091,9 +2135,16 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 
 		if (vers->tls13_sem) {
 			/* TLS 1.3 Early Secret */
-			ret = _tls13_init_secret(session, NULL, 0);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+				psk = session->key.psk.data;
+				psk_size = session->key.psk.size;
+			}
+
+			ret = _tls13_init_secret(session, psk, psk_size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail;
+			}
 
 			vbytes[0] = 0x03; /* TLS1.2 */
 			vbytes[1] = 0x03;
@@ -2105,8 +2156,10 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 		}
 
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
 
 		ret = _gnutls_buffer_append_data(&buf, vbytes, 2);
 		if (ret < 0) {
@@ -2180,7 +2233,7 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 	    _gnutls_send_handshake(session, bufel,
 				   GNUTLS_HANDSHAKE_SERVER_HELLO);
 
-      fail:
+fail:
 	_gnutls_buffer_clear(&buf);
 	return ret;
 }
@@ -2579,6 +2632,9 @@ int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side)
 {
 	gnutls_certificate_credentials_t cred;
 	int ret, type;
+
+	if (session->internals.hsk_flags & HSK_PSK_SELECTED)
+		return 0;
 
 	cred =
 	    (gnutls_certificate_credentials_t) _gnutls_get_cred(session,

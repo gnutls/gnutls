@@ -134,7 +134,7 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNIMPLEMENTED_FEATURE),
 	ERROR_ENTRY(N_("Insufficient credentials for that request."),
 		    GNUTLS_E_INSUFFICIENT_CREDENTIALS),
-	ERROR_ENTRY(N_("Error in password file."), GNUTLS_E_SRP_PWD_ERROR),
+	ERROR_ENTRY(N_("Error in password/key file."), GNUTLS_E_SRP_PWD_ERROR),
 	ERROR_ENTRY(N_("Wrong padding in PKCS1 packet."),
 		    GNUTLS_E_PKCS1_WRONG_PAD),
 	ERROR_ENTRY(N_("The session or certificate has expired."),
@@ -148,7 +148,7 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR),
 	ERROR_ENTRY(N_("Base64 encoding error."),
 		    GNUTLS_E_BASE64_ENCODING_ERROR),
-	ERROR_ENTRY(N_("Parsing error in password file."),
+	ERROR_ENTRY(N_("Parsing error in password/key file."),
 		    GNUTLS_E_SRP_PWD_PARSING_ERROR),
 	ERROR_ENTRY(N_("The requested data were not available."),
 		    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE),
@@ -260,7 +260,7 @@ static const gnutls_error_entry error_entries[] = {
 
 	ERROR_ENTRY(N_("The SRP username supplied is illegal."),
 		    GNUTLS_E_ILLEGAL_SRP_USERNAME),
-	ERROR_ENTRY(N_("The SRP username supplied is unknown."),
+	ERROR_ENTRY(N_("The username supplied is unknown."),
 		    GNUTLS_E_UNKNOWN_SRP_USERNAME),
 
 	ERROR_ENTRY(N_("The OpenPGP fingerprint is not supported."),

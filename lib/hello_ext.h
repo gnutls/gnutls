@@ -63,6 +63,22 @@ inline static void _gnutls_ext_set_msg(gnutls_session_t session, gnutls_ext_flag
 	session->internals.ext_msg = msg;
 }
 
+inline static void _gnutls_ext_set_extensions_offset(gnutls_session_t session,
+		int offset)
+{
+	session->internals.extensions_offset = offset;
+}
+
+inline static int _gnutls_ext_get_extensions_offset(gnutls_session_t session)
+{
+	return session->internals.extensions_offset;
+}
+
+int _gnutls_ext_set_full_client_hello(gnutls_session_t session,
+				      handshake_buffer_st *recv_buf);
+unsigned _gnutls_ext_get_full_client_hello(gnutls_session_t session,
+					   gnutls_datum_t *datum);
+
 /* for session packing */
 int _gnutls_hello_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed);
 int _gnutls_hello_ext_unpack(gnutls_session_t session,

@@ -38,6 +38,9 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 	gnutls_buffer_st buf;
 	unsigned optional = 0;
 
+	if (session->internals.hsk_flags & HSK_PSK_SELECTED)
+		return 0;
+
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		/* if we didn't request a certificate, there will not be any */
 		if (session->internals.send_cert_req == 0)
@@ -194,6 +197,9 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 	gnutls_certificate_credentials_t cred;
 
 	if (again == 0) {
+		if (session->internals.hsk_flags & HSK_PSK_SELECTED)
+			return 0;
+
 		cred = (gnutls_certificate_credentials_t)
 		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
 		if (cred == NULL) {
