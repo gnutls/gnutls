@@ -68,9 +68,9 @@ abi-dump:
 ABI_TMPCLONEDIR="gnutls-prev-abi.tmp"
 ABI_TMPFILE_CUR="abi-temp-cur.xml"
 ABI_TMPFILE_PRE="abi-temp-prev.xml"
-ABIREF := $(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1)
-ABIVER := $(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1|cut -d '/' -f 3|sed -e 's/gnutls_//' -e 's/_/./g')
-prev-tag-abi.stamp:
+ABIREF=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1)
+ABIVER=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1|cut -d '/' -f 3|sed -e 's/gnutls_//' -e 's/_/./g')
+.prev-tag-abi.stamp:
 	@rm -rf $(ABI_TMPCLONEDIR)
 	@git clone -l . $(ABI_TMPCLONEDIR)
 	@echo "Creating ABI for $(ABIVER)"
@@ -80,14 +80,14 @@ prev-tag-abi.stamp:
 	  $(MAKE) -j$$(nproc) -C gl && $(MAKE) -j$$(nproc) -C lib && $(MAKE) -j$$(nproc) -C libdane
 	touch $@
 
-abi-check: prev-tag-abi.stamp
+abi-check: .prev-tag-abi.stamp
 	@rm -f $(ABI_TMPFILE_CUR) $(ABI_TMPFILE_PRE)
 	@echo "Checking libgnutls ABI"
 	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_CUR)
 	@echo "<headers>$(srcdir)/lib/includes/gnutls" >>$(ABI_TMPFILE_CUR)
 	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_CUR)
 	@echo "<libs>$(builddir)/lib/.libs</libs>" >>$(ABI_TMPFILE_CUR)
-	@echo "<version>$(ABIVER)</version>" >$(ABI_TMPFILE_PRE)
+	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_PRE)
 	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
 	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
 	@echo "<libs>$(builddir)/$(ABI_TMPCLONEDIR)/lib/.libs</libs>" >>$(ABI_TMPFILE_PRE)
@@ -99,7 +99,7 @@ abi-check: prev-tag-abi.stamp
 	@echo "$(srcdir)/lib/includes/gnutls" >>$(ABI_TMPFILE_CUR)
 	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_CUR)
 	@echo "<libs>$(builddir)/libdane/.libs</libs>" >>$(ABI_TMPFILE_CUR)
-	@echo "<version>3.5.0</version>" >$(ABI_TMPFILE_PRE)
+	@echo "<version>$(ABIVER)</version>" >$(ABI_TMPFILE_PRE)
 	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/libdane/includes/gnutls" >>$(ABI_TMPFILE_PRE)
 	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
 	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
