@@ -218,4 +218,8 @@ flag using @funcref{gnutls_certificate_set_flags}.
 @item The callback @funcref{gnutls_privkey_import_ext3} is not flexible enough for new signature algorithms such as RSA-PSS
 @tab It is replaced with @funcref{gnutls_privkey_import_ext4}
 
+@item Re-handshake functionality is not applicable under TLS 1.3.
+@tab It is replaced by separate key update and re-authentication functionality
+which can be accessed directly via @funcref{gnutls_session_key_update} and @funcref{gnutls_reauth}.
+
 @end multitable
