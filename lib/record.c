@@ -1741,6 +1741,8 @@ gnutls_record_send(gnutls_session_t session, const void *data,
  *   number of bytes sent might be less than @data_size.  The maximum
  *   number of bytes this function can send in a single call depends
  *   on the negotiated maximum record size.
+ *
+ * Since: 3.6.3
  **/
 ssize_t
 gnutls_record_send2(gnutls_session_t session, const void *data,

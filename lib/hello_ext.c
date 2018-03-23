@@ -892,7 +892,7 @@ gnutls_ext_get_data(gnutls_session_t session,
  *
  * If not called under an extension handler, its value is undefined.
  *
- * Since: 3.6.x
+ * Since: 3.6.3
  **/
 unsigned gnutls_ext_get_current_msg(gnutls_session_t session)
 {
