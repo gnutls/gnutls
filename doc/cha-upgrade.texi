@@ -215,4 +215,7 @@ and @funcintref{gnutls_compression_get_id}.
 any of the present certificates. To revert to previous semantics set the @code{GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK}
 flag using @funcref{gnutls_certificate_set_flags}.
 
+@item The callback @funcref{gnutls_privkey_import_ext3} is not flexible enough for new signature algorithms such as RSA-PSS
+@tab It is replaced with @funcref{gnutls_privkey_import_ext4}
+
 @end multitable

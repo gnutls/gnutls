@@ -142,7 +142,7 @@ an external API, the following function is provided.
 This allows for a simple extensibility API without
 resorting to @acronym{PKCS} #11.
 
-@showfuncdesc{gnutls_privkey_import_ext3}
+@showfuncdesc{gnutls_privkey_import_ext4}
 
 On the private keys where exporting of parameters is possible (i.e.,
 software keys), the following functions are also available.
@@ -206,7 +206,7 @@ The input to this function are three callback functions as well as
 the prefix of the URL, (e.g., "mypkcs11:") and the length of the prefix.
 The types of the callbacks are shown below, and are expected to
 use the exported gnutls functions to import the keys and certificates.
-E.g., a typical @code{import_key} callback should use @funcref{gnutls_privkey_import_ext3}.
+E.g., a typical @code{import_key} callback should use @funcref{gnutls_privkey_import_ext4}.
 
 @example
 typedef int (*gnutls_privkey_import_url_func)(gnutls_privkey_t pkey,
