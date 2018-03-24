@@ -489,9 +489,10 @@ key_share_recv_params(gnutls_session_t session,
 	int ret;
 	ssize_t data_size = _data_size;
 	ssize_t size;
-	unsigned gid, used_share = 0;
+	unsigned gid;
 	const version_entry_st *ver;
-	const gnutls_group_entry_st *group, *sgroup = NULL;
+	const gnutls_group_entry_st *group;
+	unsigned used_share = 0;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		ver = get_version(session);
@@ -523,46 +524,38 @@ key_share_recv_params(gnutls_session_t session,
 			if (group != NULL)
 				_gnutls_handshake_log("EXT[%p]: Received key share for %s\n", session, group->name);
 
-			if (group != NULL) {
-				if (group == session->internals.cand_ec_group)
-					sgroup = group;
-				else if (group == session->internals.cand_dh_group)
-					sgroup = group;
+			if (group != NULL && group == session->internals.cand_group) {
+				_gnutls_session_group_set(session, group);
+
+				ret = server_use_key_share(session, group, data, size);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				used_share = 1;
+				break;
+
 			}
 
-			if (sgroup == NULL) {
-				data += size;
-				continue;
-			}
-
-			_gnutls_session_group_set(session, sgroup);
-
-			ret = server_use_key_share(session, sgroup, data, size);
-			if (ret < 0) {
-				return gnutls_assert_val(ret);
-			}
-
-			used_share = 1;
-			break;
+			data += size;
+			continue;
 		}
 
-		if (used_share == 0) {
-			/* we utilize GNUTLS_E_NO_COMMON_KEY_SHARE for:
-			 * 1. signal for hello-retry-request in the handshake
-			 *    layer during first client hello parsing (server side - here).
-			 *    This does not result to error code being
-			 *    propagated to app layer.
-			 * 2. Propagate to application error code that no
-			 *    common key share was found after an HRR was
-			 *    received (client side)
-			 * 3. Propagate to application error code that no
-			 *    common key share was found after an HRR was
-			 *    sent (server side).
-			 * In cases (2,3) the error is translated to illegal
-			 * parameter alert.
-			 */
+		/* we utilize GNUTLS_E_NO_COMMON_KEY_SHARE for:
+		 * 1. signal for hello-retry-request in the handshake
+		 *    layer during first client hello parsing (server side - here).
+		 *    This does not result to error code being
+		 *    propagated to app layer.
+		 * 2. Propagate to application error code that no
+		 *    common key share was found after an HRR was
+		 *    received (client side)
+		 * 3. Propagate to application error code that no
+		 *    common key share was found after an HRR was
+		 *    sent (server side).
+		 * In cases (2,3) the error is translated to illegal
+		 * parameter alert.
+		 */
+		if (used_share == 0)
 			return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
-		}
 
 	} else { /* Client */
 		ver = get_version(session);
@@ -712,10 +705,8 @@ key_share_send_params(gnutls_session_t session,
 			return gnutls_assert_val(0);
 
 		if (_gnutls_ext_get_msg(session) == GNUTLS_EXT_FLAG_HRR) {
-			if (session->internals.cand_ec_group != NULL)
-				group = session->internals.cand_ec_group;
-			else
-				group = session->internals.cand_dh_group;
+			group = session->internals.cand_group;
+
 			if (group == NULL)
 				return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
 

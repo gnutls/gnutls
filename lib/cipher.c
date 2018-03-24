@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2000-2013 Free Software Foundation, Inc.
  * Copyright (C) 2013 Nikos Mavrogiannopoulos
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -65,12 +65,11 @@ decrypt_packet_tls13(gnutls_session_t session,
 
 static int
 encrypt_packet_tls13(gnutls_session_t session,
-		     uint8_t * cipher_data, size_t cipher_size,
-		     gnutls_datum_t * plain,
+		     mbuffer_st *bufel,
+		     gnutls_datum_t *plain,
 		     size_t min_pad,
 		     content_type_t type,
-		     record_parameters_st * params);
-
+		     record_parameters_st *params);
 
 
 /* returns ciphertext which contains the headers too. This also
@@ -79,10 +78,10 @@ encrypt_packet_tls13(gnutls_session_t session,
  */
 int
 _gnutls_encrypt(gnutls_session_t session,
-		const uint8_t * data, size_t data_size,
+		const uint8_t *data, size_t data_size,
 		size_t min_pad,
-		mbuffer_st * bufel,
-		content_type_t type, record_parameters_st * params)
+		mbuffer_st *bufel,
+		content_type_t type, record_parameters_st *params)
 {
 	gnutls_datum_t plaintext;
 	const version_entry_st *vers = get_version(session);
@@ -91,31 +90,34 @@ _gnutls_encrypt(gnutls_session_t session,
 	plaintext.data = (uint8_t *) data;
 	plaintext.size = data_size;
 
-	if (vers && vers->tls13_sem)
+	if (vers && vers->tls13_sem) {
+		/* it fills the header, as it is included in the authenticated
+		 * data of the AEAD cipher. */
 		ret =
-		    encrypt_packet_tls13(session,
-					 _mbuffer_get_udata_ptr(bufel),
-					 _mbuffer_get_udata_size
-					 (bufel), &plaintext, min_pad, type,
+		    encrypt_packet_tls13(session, bufel,
+					 &plaintext, min_pad, type,
 					 params);
-	else
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	} else {
 		ret =
 		    encrypt_packet(session,
 				   _mbuffer_get_udata_ptr(bufel),
 				   _mbuffer_get_udata_size
 				   (bufel), &plaintext, min_pad, type,
 				   params);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	if (IS_DTLS(session))
-		_gnutls_write_uint16(ret,
-				     ((uint8_t *)
-				      _mbuffer_get_uhead_ptr(bufel)) + 11);
-	else
-		_gnutls_write_uint16(ret,
-				     ((uint8_t *)
-				      _mbuffer_get_uhead_ptr(bufel)) + 3);
+		if (IS_DTLS(session))
+			_gnutls_write_uint16(ret,
+					     ((uint8_t *)
+					      _mbuffer_get_uhead_ptr(bufel)) + 11);
+		else
+			_gnutls_write_uint16(ret,
+					     ((uint8_t *)
+					      _mbuffer_get_uhead_ptr(bufel)) + 3);
+	}
 
 	_mbuffer_set_udata_size(bufel, ret);
 	_mbuffer_set_uhead_size(bufel, 0);
@@ -130,10 +132,11 @@ _gnutls_encrypt(gnutls_session_t session,
  */
 int
 _gnutls_decrypt(gnutls_session_t session,
-		gnutls_datum_t * ciphertext,
-		gnutls_datum_t * output,
+		gnutls_datum_t *ciphertext,
+		gnutls_datum_t *output,
 		content_type_t *type,
-		record_parameters_st * params, gnutls_uint64 * sequence)
+		record_parameters_st *params,
+		gnutls_uint64 *sequence)
 {
 	int ret;
 	const version_entry_st *vers = get_version(session);
@@ -414,11 +417,11 @@ encrypt_packet(gnutls_session_t session,
 
 static int
 encrypt_packet_tls13(gnutls_session_t session,
-		     uint8_t * cipher_data, size_t cipher_size,
-		     gnutls_datum_t * plain,
+		     mbuffer_st *bciphertext,
+		     gnutls_datum_t *plain,
 		     size_t min_pad,
 		     content_type_t type,
-		     record_parameters_st * params)
+		     record_parameters_st *params)
 {
 	int ret;
 	unsigned int tag_size = params->write.aead_tag_size;
@@ -427,6 +430,10 @@ encrypt_packet_tls13(gnutls_session_t session,
 	unsigned iv_size = 0;
 	uint8_t *fdata;
 	ssize_t fdata_size, max;
+	uint8_t *cipher_data = _mbuffer_get_udata_ptr(bciphertext);
+	size_t cipher_size = _mbuffer_get_udata_size(bciphertext);
+	uint8_t *header = _mbuffer_get_uhead_ptr(bciphertext);
+	size_t header_size = _mbuffer_get_uhead_size(bciphertext);
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -442,6 +449,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 		if (cipher_size < plain->size+1)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		memcpy(cipher_data, plain->data, plain->size);
+		_gnutls_write_uint16(plain->size, header+3);
 		return plain->size;
 	}
 
@@ -471,9 +479,13 @@ encrypt_packet_tls13(gnutls_session_t session,
 	if (min_pad)
 		memset(&fdata[plain->size+1], 0, min_pad);
 
+	/* we need to write size to header prior to encryption, as
+	 * size is in authenticated data of AEAD cipher. */
+	_gnutls_write_uint16(fdata_size+tag_size, header+3);
+
 	ret = gnutls_aead_cipher_encrypt(&params->write.ctx.aead,
 					 nonce, iv_size,
-					 NULL, 0,
+					 header, header_size,
 					 tag_size,
 					 fdata, fdata_size,
 					 cipher_data, &cipher_size);
@@ -865,10 +877,10 @@ decrypt_packet(gnutls_session_t session,
 
 static int
 decrypt_packet_tls13(gnutls_session_t session,
-		     gnutls_datum_t * ciphertext,
-		     gnutls_datum_t * plain,
-		     content_type_t *type, record_parameters_st * params,
-		     gnutls_uint64 * sequence)
+		     gnutls_datum_t *ciphertext,
+		     gnutls_datum_t *plain,
+		     content_type_t *type, record_parameters_st *params,
+		     gnutls_uint64 *sequence)
 {
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
 	size_t length, length_to_decrypt;
@@ -878,6 +890,7 @@ decrypt_packet_tls13(gnutls_session_t session,
 	unsigned iv_size;
 	unsigned j;
 	volatile unsigned length_set;
+	uint8_t aad[5];
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -921,9 +934,14 @@ decrypt_packet_tls13(gnutls_session_t session,
 		    gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	}
 
+	aad[0] = *type;
+	aad[1] = 0x03;
+	aad[2] = 0x03;
+	_gnutls_write_uint16(ciphertext->size, &aad[3]);
+
 	ret = gnutls_aead_cipher_decrypt(&params->read.ctx.aead,
 					 nonce, iv_size,
-					 NULL, 0,
+					 aad, 5,
 					 tag_size,
 					 ciphertext->data, length_to_decrypt,
 					 plain->data, &length);
