@@ -1062,7 +1062,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	return ret;
 }
 
-#if NETTLE_MAJOR_VERSION < 3 || (NETTLE_MAJOR_VERSION == 3 && NETTLE_MINOR_VERSION < 4)
+#if !defined(NETTLE_VERSION_MAJOR) || (NETTLE_VERSION_MAJOR < 3 || (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR < 4))
 # ifdef ENABLE_NON_SUITEB_CURVES
 #  define nettle_get_secp_192r1() &nettle_secp_192r1
 #  define nettle_get_secp_224r1() &nettle_secp_224r1
