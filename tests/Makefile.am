@@ -425,6 +425,7 @@ check_PROGRAMS = $(ctests) $(indirect_tests)
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT +=						\
+	CC="$(CC)"						\
 	CFLAGS="$(CFLAGS)"					\
 	LC_ALL="C"						\
 	LSAN_OPTIONS=suppressions=gnutls-asan.supp		\

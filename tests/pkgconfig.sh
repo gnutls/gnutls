@@ -23,6 +23,7 @@
 srcdir="${srcdir:-.}"
 top_builddir="${top_builddir:-..}"
 PKGCONFIG="${PKG_CONFIG:-$(which pkg-config)}"
+CC=${CC:-cc}
 unset RETCODE
 TMPFILE=c.$$.tmp.c
 TMPFILE_O=c.$$.tmp.o
@@ -71,12 +72,12 @@ echo "  * flags: $(${PKGCONFIG} --libs gnutls)"
 echo "  * common: ${COMMON}"
 echo "  * lib: ${CFLAGS}"
 echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
-cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
+${CC} ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
 
 echo ""
 echo "Trying static linking with $(${PKGCONFIG} --libs --static gnutls)"
 echo cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --static --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
-cc ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --static --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
+${CC} ${TMPFILE} -o ${TMPFILE_O} $(${PKGCONFIG} --static --libs gnutls) $(${PKGCONFIG} --cflags gnutls) ${COMMON}
 
 rm -f ${TMPFILE} ${TMPFILE_O}
 
