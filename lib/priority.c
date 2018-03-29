@@ -105,6 +105,22 @@ static void _clear_given_priorities(priority_st * st, const int *list)
 	}
 }
 
+static const int _supported_groups_dh[] = {
+	GNUTLS_GROUP_FFDHE2048,
+	GNUTLS_GROUP_FFDHE3072,
+	GNUTLS_GROUP_FFDHE4096,
+	GNUTLS_GROUP_FFDHE8192,
+	0
+};
+
+static const int _supported_groups_ecdh[] = {
+	GNUTLS_GROUP_SECP256R1,
+	GNUTLS_GROUP_SECP384R1,
+	GNUTLS_GROUP_SECP521R1,
+	GNUTLS_GROUP_X25519, /* draft-ietf-tls-rfc4492bis */
+	0
+};
+
 static const int _supported_groups_normal[] = {
 	GNUTLS_GROUP_SECP256R1,
 	GNUTLS_GROUP_SECP384R1,
@@ -1585,6 +1601,18 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					bulk_fn(&(*priority_cache)->
 						_supported_ecc,
 						supported_groups_normal);
+				} else if (strncasecmp
+				    (&broken_list[i][1], "GROUP-DH-ALL",
+				     12) == 0) {
+					bulk_given_fn(&(*priority_cache)->
+						_supported_ecc,
+						_supported_groups_dh);
+				} else if (strncasecmp
+				    (&broken_list[i][1], "GROUP-EC-ALL",
+				     12) == 0) {
+					bulk_given_fn(&(*priority_cache)->
+						_supported_ecc,
+						_supported_groups_ecdh);
 				} else {
 					if ((algo =
 					     gnutls_group_get_id
