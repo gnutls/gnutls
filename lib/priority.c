@@ -31,6 +31,7 @@
 #include <gnutls/x509.h>
 #include <c-ctype.h>
 #include <hello_ext.h>
+#include <c-strcase.h>
 #include "fips.h"
 #include "errno.h"
 #include "ext/srp.h"
@@ -1687,21 +1688,21 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				 GNUTLS_KX_UNKNOWN) {
 				if (algo != GNUTLS_KX_INVALID)
 					fn(&(*priority_cache)->_kx, algo);
-			} else if (strncasecmp
+			} else if (c_strncasecmp
 				 (&broken_list[i][1], "VERS-", 5) == 0) {
-				if (strncasecmp
+				if (c_strncasecmp
 				    (&broken_list[i][1], "VERS-TLS-ALL",
 				     12) == 0) {
 					bulk_given_fn(&(*priority_cache)->
 						protocol,
 						stream_protocol_priority);
-				} else if (strncasecmp
+				} else if (c_strncasecmp
 					(&broken_list[i][1],
 					 "VERS-DTLS-ALL", 13) == 0) {
 					bulk_given_fn(&(*priority_cache)->
 						protocol,
 						(bulk_given_fn==_add_priority)?dtls_protocol_priority:dgram_protocol_priority);
-				} else if (strncasecmp
+				} else if (c_strncasecmp
 					(&broken_list[i][1],
 					 "VERS-ALL", 8) == 0) {
 					bulk_fn(&(*priority_cache)->
@@ -1719,14 +1720,14 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 
 				}
 			} /* now check if the element is something like -ALGO */
-			else if (strncasecmp
+			else if (c_strncasecmp
 				 (&broken_list[i][1], "COMP-", 5) == 0) {
 				/* ignore all compression methods */
 				continue;
 			} /* now check if the element is something like -ALGO */
-			else if (strncasecmp
+			else if (c_strncasecmp
 				 (&broken_list[i][1], "CURVE-", 6) == 0) {
-				if (strncasecmp
+				if (c_strncasecmp
 				    (&broken_list[i][1], "CURVE-ALL",
 				     9) == 0) {
 					bulk_fn(&(*priority_cache)->
@@ -1742,9 +1743,9 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					else
 						goto error;
 				}
-			} else if (strncasecmp
+			} else if (c_strncasecmp
 				 (&broken_list[i][1], "GROUP-", 6) == 0) {
-				if (strncasecmp
+				if (c_strncasecmp
 				    (&broken_list[i][1], "GROUP-ALL",
 				     9) == 0) {
 					bulk_fn(&(*priority_cache)->
@@ -1824,16 +1825,16 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					else
 						goto error;
 				}
-			} else if (strncasecmp
+			} else if (c_strncasecmp
 				(&broken_list[i][1], "MAC-ALL", 7) == 0) {
 				bulk_fn(&(*priority_cache)->_mac,
 					mac_priority_normal);
-			} else if (strncasecmp
+			} else if (c_strncasecmp
 				(&broken_list[i][1], "CIPHER-ALL",
 				 10) == 0) {
 				bulk_fn(&(*priority_cache)->_cipher,
 					cipher_priority_normal);
-			} else if (strncasecmp
+			} else if (c_strncasecmp
 				(&broken_list[i][1], "KX-ALL", 6) == 0) {
 				bulk_fn(&(*priority_cache)->_kx,
 					kx_priority_secure);

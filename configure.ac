@@ -651,7 +651,7 @@ if test "$with_p11_kit" != "no"; then
 	fi
 fi
 
-AM_CONDITIONAL(P11KIT_0_23_10_API, ! $PKG_CONFIG --atleast-version=2.23.10 p11-kit)
+AM_CONDITIONAL(P11KIT_0_23_11_API, $PKG_CONFIG --atleast-version=0.23.11 p11-kit-1)
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 

@@ -28,12 +28,14 @@
 #include <num.h>
 #include <tls-sig.h>
 #include <str.h>
+#include <c-strcase.h>
 #include <datum.h>
 #include "x509_int.h"
 #include <common.h>
 #include "verify-high.h"
 #include "read-file.h"
 #include <pkcs11_int.h>
+#include "urls.h"
 
 #include <dirent.h>
 
@@ -325,7 +327,7 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 
 	if (ca_file != NULL) {
 #ifdef ENABLE_PKCS11
-		if (strncmp(ca_file, "pkcs11:", 7) == 0) {
+		if (c_strncasecmp(ca_file, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 			unsigned pcrt_list_size = 0;
 
 			/* in case of a token URL import it as a PKCS #11 token,
@@ -497,7 +499,7 @@ gnutls_x509_trust_list_remove_trust_file(gnutls_x509_trust_list_t list,
 	int ret;
 
 #ifdef ENABLE_PKCS11
-	if (strncmp(ca_file, "pkcs11:", 7) == 0) {
+	if (c_strncasecmp(ca_file, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 		if (is_pkcs11_url_object(ca_file) != 0) {
 			return remove_pkcs11_object_url(list, ca_file);
 		} else { /* token */
