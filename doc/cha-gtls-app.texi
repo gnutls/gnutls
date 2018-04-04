@@ -888,25 +888,25 @@ no data have been received.
 
 The full TLS 1.2 handshake requires 2 round-trips to complete, and when
 combined with TCP's SYN and SYN-ACK negotiation it extends to 3 full
-round-trips. While, the abbreviated (resumed) TLS handshake drops that to 2.5
-round-trips, it still adds considerable latency, reducing its applicability
-to certain applications.
+round-trips. While, TLS 1.3 reduces that to two round-trips when under TCP,
+it still adds considerable latency, making the protocol unsuitable for
+certain applications.
 
-In client side, it is possible to take advantage of the TCP fast open
-@xcite{RFC7413} mechanism on operating
+To optimize the handshake latency, in client side, it is possible to take
+advantage of the TCP fast open @xcite{RFC7413} mechanism on operating
 systems that support it. That can be done either by manually crafting the push and pull
 callbacks, or by utilizing @funcref{gnutls_transport_set_fastopen}. In that
-case the initial TCP handshake is eliminated, reducing the TLS handshake round-trip to 2.
-Note, that in that case any connection failures will be reported during the
-@funcref{gnutls_handshake} function call with error code
-@code{GNUTLS_E_PUSH_ERROR}.
+case the initial TCP handshake is eliminated, reducing the TLS 1.2 handshake round-trip
+to 2, and the TLS 1.3 handshake to a single round-trip.
+Note, that when this function is used, any connection failures will be reported during the
+@funcref{gnutls_handshake} function call with error code @code{GNUTLS_E_PUSH_ERROR}.
 
 @showfuncdesc{gnutls_transport_set_fastopen}
 
-In non-resumed sessions it is possible to further reduce the round-trips to
-a single one by taking advantage of the @ref{False Start} TLS extension.
-This can be enabled by setting the @acronym{GNUTLS_ENABLE_FALSE_START} flag
-on @funcref{gnutls_init}.
+When restricted to TLS 1.2, and non-resumed sessions, it is possible to further
+reduce the round-trips to a single one by taking advantage of the @ref{False Start}
+TLS extension. This can be enabled by setting the @acronym{GNUTLS_ENABLE_FALSE_START}
+flag on @funcref{gnutls_init}.
 
 @node DTLS sessions
 @subsection DTLS sessions
@@ -1228,11 +1228,10 @@ all the algorithms from NORMAL priority.
 
 @item Key exchange @tab
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
-PSK, DHE-PSK, ECDHE-RSA, ECDHE-ECDSA, ECDHE-PSK, ANON-ECDH, ANON-DH. The
+PSK, DHE-PSK, ECDHE-PSK, ECDHE-RSA, ECDHE-ECDSA, ANON-ECDH, ANON-DH. The
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
-priority.
-
-Add @code{!DHE-RSA:!DHE-DSS} to the priority string to disable DHE.
+priority. Under TLS1.3, the DHE-PSK and ECDHE-PSK strings are equivalent
+and instruct for a Diffie-Hellman key exchange using the enabled groups.
 
 @item MAC @tab
 MD5, SHA1, SHA256, SHA384, AEAD (used with
@@ -1242,10 +1241,11 @@ GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-
 COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
 
 @item TLS versions @tab
-VERS-TLS1.0, VERS-TLS1.1, VERS-TLS1.2,
+VERS-TLS1.0, VERS-TLS1.1, VERS-TLS1.2, VERS-TLS1.3,
 VERS-DTLS1.0, VERS-DTLS1.2. 
-Catch all are VERS-ALL, VERS-TLS-ALL and VERS-DTLS-ALL, and will enable
-all protocols from NORMAL priority.
+Catch all are VERS-ALL, and will enable
+all protocols from NORMAL priority. To distinguish between TLS and DTLS
+versions you can use VERS-TLS-ALL and VERS-DTLS-ALL.
 
 @item Signature algorithms @tab
 SIGN-RSA-SHA1, SIGN-RSA-SHA224,
@@ -1256,13 +1256,6 @@ SIGN-RSA-PSS-SHA256, SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512.
 Catch all which enables all algorithms from NORMAL priority is SIGN-ALL.
 This option is only considered for TLS 1.2 and later.
 
-@item Elliptic curves @tab
-CURVE-SECP192R1, CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1,
-CURVE-SECP521R1, and CURVE-X25519.
-Catch all which enables all curves from NORMAL priority is CURVE-ALL. Note
-that the CURVE keyword is kept for backwards compatibility only, for new
-applications see the GROUP keyword below.
-
 @item Groups @tab
 GROUP-SECP256R1, GROUP-SECP384R1, GROUP-SECP521R1, GROUP-X25519,
 GROUP-FFDHE2048, GROUP-FFDHE3072, GROUP-FFDHE4096 and GROUP-FFDHE8192.
@@ -1272,15 +1265,22 @@ from NORMAL priority is GROUP-ALL. The helper keywords GROUP-DH-ALL and
 GROUP-EC-ALL are also available, restricting the groups to finite fields
 (DH) and elliptic curves.
 
-@item Certificate type @tab
-The only option currently is CTYPE-X509. Catch all is CTYPE-ALL.
+@item Elliptic curves (legacy) @tab
+CURVE-SECP192R1, CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1,
+CURVE-SECP521R1, and CURVE-X25519.
+Catch all which enables all curves from NORMAL priority is CURVE-ALL. Note
+that the CURVE keyword is kept for backwards compatibility only, for new
+applications see the GROUP keyword above.
+
+@c @item Certificate type @tab
+@c The only option currently is CTYPE-X509. Catch all is CTYPE-ALL.
 
 @end multitable
 @caption{The supported algorithm keywords in priority strings.}
 @end float
 
-Note that the DHE key exchange methods are generally
-slower@footnote{It depends on the group in use.  Groups with
+Note that the finite field groups (indicated by the FFDHE prefix) and DHE key
+exchange methods are generally slower@footnote{It depends on the group in use.  Groups with
 less bits are always faster, but the number of bits ties with the security
 parameter.  See @ref{Selecting cryptographic key sizes}
 for the acceptable security levels.} than their elliptic curves counterpart

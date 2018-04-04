@@ -341,7 +341,7 @@ expiration can be obtained using the @funcref{gnutls_certificate_get_ocsp_expira
 
 @showfuncdesc{gnutls_certificate_get_ocsp_expiration}
 
-Prior to GnuTLS 3.6.xx, the functions
+Prior to GnuTLS 3.6.4, the functions
 @funcref{gnutls_certificate_set_ocsp_status_request_function2}
 @funcref{gnutls_certificate_set_ocsp_status_request_file} were provided
 to set OCSP responses. These functions are still functional, but cannot be used

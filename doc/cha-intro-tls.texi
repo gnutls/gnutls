@@ -94,7 +94,6 @@ just after the handshake protocol has finished.
 @menu
 * Encryption algorithms used in the record layer::
 * Compression algorithms and the record layer::
-* Weaknesses and countermeasures::
 * On Record Padding::
 @end menu
 
@@ -117,56 +116,65 @@ The supported in @acronym{GnuTLS} ciphers and MAC algorithms are shown in @ref{t
 @ref{tab:macs}.
 
 @float Table,tab:ciphers
-@multitable @columnfractions .20 .20 .60
-@headitem Algorithm @tab Type @tab Description
+@multitable @columnfractions .20 .10 .15 .55
+@headitem Algorithm @tab Type @tab Applicable Protocols @tab Description
 @item AES-128-GCM, AES-256-GCM @tab
 AEAD @tab
+TLS 1.2, TLS 1.3 @tab
 This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
 @item AES-128-CCM, AES-256-CCM @tab
 AEAD @tab
+TLS 1.2, TLS 1.3 @tab
 This is the AES algorithm in the authenticated encryption CCM mode.
 This mode combines message authentication and encryption and is
 often used by systems without AES or GCM acceleration support.
 
-@item AES-128-CCM-8, AES-256-CCM-8 @tab
-AEAD @tab
-This is the AES algorithm in the authenticated encryption CCM mode
-with a truncated to 64-bit authentication tag. This mode is for
-communication with restricted systems.
-
-@item CAMELLIA-128-GCM, CAMELLIA-256-GCM @tab
-AEAD @tab
-This is the CAMELLIA algorithm in the authenticated encryption GCM mode.
-
 @item CHACHA20-POLY1305 @tab
 AEAD @tab
+TLS 1.2, TLS 1.3 @tab
 CHACHA20-POLY1305 is an authenticated encryption algorithm based on CHACHA20 cipher and
 POLY1305 MAC. CHACHA20 is a refinement of SALSA20 algorithm, an approved cipher by
 the European ESTREAM project. POLY1305 is Wegman-Carter, one-time authenticator. The
 combination provides a fast stream cipher suitable for systems where a hardware AES
 accelerator is not available.
 
+@item AES-128-CCM-8, AES-256-CCM-8 @tab
+AEAD @tab
+TLS 1.2, TLS 1.3 @tab
+This is the AES algorithm in the authenticated encryption CCM mode
+with a truncated to 64-bit authentication tag. This mode is for
+communication with restricted systems.
+
+@item CAMELLIA-128-GCM, CAMELLIA-256-GCM @tab
+AEAD @tab
+TLS 1.2 @tab
+This is the CAMELLIA algorithm in the authenticated encryption GCM mode.
+
 @item AES-128-CBC, AES-256-CBC @tab
 Legacy (block) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  It has 128 bits block size and is used in CBC mode.
 
 @item CAMELLIA-128-CBC, CAMELLIA-256-CBC @tab
 Legacy (block) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 This is an 128-bit block cipher developed by Mitsubishi and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
 
 @item 3DES-CBC @tab
 Legacy (block) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 This is the DES block cipher algorithm used with triple
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
 @item ARCFOUR-128 @tab
 Legacy (stream) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
 ARCFOUR-128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
 secret. It is a considered to be broken, and is only used for compatibility
 purposed. For this reason it is not enabled by default.
@@ -212,71 +220,26 @@ based on traffic analysis on the transported data. For that newer versions of th
 offer compression, and @acronym{GnuTLS} since 3.6.0 no longer implements any
 support for compression.
 
-@node Weaknesses and countermeasures
-@subsection Weaknesses and countermeasures
-
-Some weaknesses that may affect the security of the record layer have
-been found in @acronym{TLS} 1.0 protocol. These weaknesses can be
-exploited by active attackers, and exploit the facts that
-
-@enumerate
-
-@item
-@acronym{TLS} has separate alerts for ``decryption_failed'' and
-``bad_record_mac''
-
-@item
-The decryption failure reason can be detected by timing the response
-time.
-
-@item
-The IV for CBC encrypted packets is the last block of the previous
-encrypted packet.
-
-@end enumerate
-
-Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346}
-which is implemented in @acronym{GnuTLS}. For this reason we suggest
-to always negotiate the highest supported TLS version with the 
-peer@footnote{If this is not possible then please consult @ref{Interoperability}.}.
-For a detailed discussion of the issues see the archives of the TLS 
-Working Group mailing list and @xcite{CBCATT}.
-
 @node On Record Padding
 @subsection On record padding
 @cindex record padding
 @cindex bad_record_mac
 
-The TLS protocol allows for extra padding of records in CBC ciphers, to prevent
-statistical analysis based on the length of exchanged messages (see @xcite{RFC5246} section 6.2.3.2).  
-GnuTLS appears to be one of few implementations that take advantage of this feature: 
-the user can provide some plaintext data with a range of lengths she wishes to hide,
-and GnuTLS adds extra padding to make sure the attacker cannot tell the real plaintext
-length is in a range smaller than the user-provided one.
-Use @funcref{gnutls_record_send_range} to send length-hidden messages and
-@funcref{gnutls_record_can_use_length_hiding} to check whether the current
-session supports length hiding. Using the standard @funcref{gnutls_record_send}
-will only add minimal padding.
+The TLS 1.3 protocol allows for extra padding of records to prevent
+statistical analysis based on the length of exchanged messages.
+GnuTLS takes advantage of this feature, by allowing the user
+to specify the amount of padding for a particular message. The simplest
+interface is provided by @funcref{gnutls_record_send2}, and is made
+available when under TLS1.3; alternatively @funcref{gnutls_record_can_use_length_hiding}
+can be queried.
 
-The TLS implementation in the Symbian operating system, frequently
-used by Nokia and Sony-Ericsson mobile phones, cannot handle
-non-minimal record padding.  What happens when one of these clients
-handshake with a GnuTLS server is that the client will fail to compute
-the correct MAC for the record.  The client sends a TLS alert
-(@code{bad_record_mac}) and disconnects.  Typically this will result
-in error messages such as 'A TLS fatal alert has been received', 'Bad
-record MAC', or both, on the GnuTLS server side.
+@showfuncdesc{gnutls_record_send2}
 
-If compatibility with such devices is a concern, not sending length-hidden messages
-solves the problem by using minimal padding.
+Older GnuTLS versions provided an API suitable for cases where the sender
+sends data that are always within a given range. That API is still
+available, and consists of the following functions.
 
-If you implement an application that has a configuration file, we
-recommend that you make it possible for users or administrators to
-specify a GnuTLS protocol priority string, which is used by your
-application via @funcref{gnutls_priority_set}.  To allow the best
-flexibility, make it possible to have a different priority string for
-different incoming IP addresses.
-
+@showfuncB{gnutls_record_can_use_length_hiding,gnutls_record_send_range}
 
 @node The TLS Alert Protocol
 @section The TLS alert protocol
@@ -290,9 +253,9 @@ protocol and the application protocol does not have to cope with them
 (e.g. @code{GNUTLS_@-A_@-CLOSE_@-NOTIFY}), and others refer to the
 application protocol solely (e.g. @code{GNUTLS_@-A_@-USER_@-CANCELLED}).  An
 alert signal includes a level indication which may be either fatal or
-warning. Fatal alerts always terminate the current connection, and
-prevent future re-negotiations using the current session ID. All alert
-messages are summarized in the table below.
+warning (under TLS1.3 all alerts are fatal). Fatal alerts always terminate
+the current connection, and prevent future re-negotiations using the current
+session ID. All supported alert messages are summarized in the table below.
 
 The alert messages are protected by the record protocol, thus the
 information that is included does not leak. You must take extreme care
@@ -325,9 +288,14 @@ the handshake protocol, i.e., the ciphersuite negotiation.
 @node TLS Cipher Suites
 @subsection TLS ciphersuites
 
-The handshake protocol of @acronym{TLS} negotiates cipher suites of
-a special form illustrated by the @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA} cipher suite name.  A typical cipher
-suite contains these parameters:
+The TLS cipher suites have slightly different meaning under different
+protocols. Under @acronym{TLS 1.3}, a cipher suite indicates the symmetric
+encryption algorithm in use, as well as the pseudo-random function (PRF)
+used in the TLS session.
+
+Under TLS 1.2 or early the handshake protocol negotiates cipher suites of
+a special form illustrated by the @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA} cipher suite name.
+A typical cipher suite contains these parameters:
 
 @itemize
 
@@ -355,13 +323,22 @@ All the supported ciphersuites are listed in @ref{ciphersuites}.
 
 The key exchange algorithms of the @acronym{TLS} protocol offer
 authentication, which is a prerequisite for a secure connection. 
-The available authentication methods in @acronym{GnuTLS} follow.
+The available authentication methods in @acronym{GnuTLS}, under
+TLS 1.3 or earlier versions, follow.
 
 @itemize
 
 @item Certificate authentication: Authenticated key exchange using public key infrastructure and X.509 certificates.
-@item @acronym{SRP} authentication: Authenticated key exchange using a password.
 @item @acronym{PSK} authentication: Authenticated key exchange using a pre-shared key.
+
+@end itemize
+
+Under TLS 1.2 or earlier versions, the following authentication methods
+are also available.
+
+@itemize
+
+@item @acronym{SRP} authentication: Authenticated key exchange using a password.
 @item Anonymous authentication: Key exchange without peer authentication.
 
 @end itemize
