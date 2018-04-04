@@ -7,16 +7,22 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 
-/* Those functions are defined in other examples.
- */
 extern void check_alert(gnutls_session_t session, int ret);
 extern int tcp_connect(void);
 extern void tcp_close(int sd);
 
+/* A very basic TLS client, with X.509 authentication and server certificate
+ * verification as well as session resumption.
+ *
+ * Note that error recovery is minimal for simplicity.
+ */
+
+#define CHECK(x) assert((x)>=0)
+
 #define MAX_BUF 1024
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 int main(void)
@@ -30,40 +36,40 @@ int main(void)
         /* variables used in session resuming 
          */
         int t;
-        char *session_data = NULL;
-        size_t session_data_size = 0;
+        gnutls_datum_t sdata;
 
-        gnutls_global_init();
+        /* for backwards compatibility with gnutls < 3.3.0 */
+        CHECK(gnutls_global_init());
 
-        /* X509 stuff */
-        gnutls_certificate_allocate_credentials(&xcred);
-
-        gnutls_certificate_set_x509_trust_file(xcred, CAFILE,
-                                               GNUTLS_X509_FMT_PEM);
+        CHECK(gnutls_certificate_allocate_credentials(&xcred));
+        CHECK(gnutls_certificate_set_x509_system_trust(xcred));
 
         for (t = 0; t < 2; t++) {       /* connect 2 times to the server */
 
                 sd = tcp_connect();
 
-                gnutls_init(&session, GNUTLS_CLIENT);
+                CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
-                gnutls_priority_set_direct(session,
-                                           "PERFORMANCE:!ARCFOUR-128",
-                                           NULL);
+                CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS,
+                                             "my_host_name",
+                                             strlen("my_host_name")));
+                gnutls_session_set_verify_cert(session, "my_host_name", 0);
+
+                CHECK(gnutls_set_default_priority(session));
+
+                gnutls_transport_set_int(session, sd);
+                gnutls_handshake_set_timeout(session,
+                                             GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
                 gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
                                        xcred);
 
                 if (t > 0) {
                         /* if this is not the first time we connect */
-                        gnutls_session_set_data(session, session_data,
-                                                session_data_size);
-                        free(session_data);
+                        CHECK(gnutls_session_set_data(session, sdata.data,
+                                                      sdata.size));
+                        gnutls_free(sdata.data);
                 }
-
-                gnutls_transport_set_int(session, sd);
-                gnutls_handshake_set_timeout(session,
-                                             GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
                 /* Perform the TLS handshake
                  */
@@ -81,16 +87,9 @@ int main(void)
                 }
 
                 if (t == 0) {   /* the first time we connect */
-                        /* get the session data size */
-                        gnutls_session_get_data(session, NULL,
-                                                &session_data_size);
-                        session_data = malloc(session_data_size);
-
-                        /* put session data to the session variable */
-                        gnutls_session_get_data(session, session_data,
-                                                &session_data_size);
-
-                } else {        /* the second time we connect */
+                        /* get the session data */
+                        CHECK(gnutls_session_get_data2(session, &sdata));
+                } else { /* the second time we connect */
 
                         /* check if we actually resumed the previous session */
                         if (gnutls_session_is_resumed(session) != 0) {
@@ -100,10 +99,6 @@ int main(void)
                                         "*** Previous session was NOT resumed\n");
                         }
                 }
-
-                /* This function was defined in a previous example
-                 */
-                /* print_info(session); */
 
                 gnutls_record_send(session, MSG, strlen(MSG));
 

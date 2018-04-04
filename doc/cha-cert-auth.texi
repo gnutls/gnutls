@@ -513,7 +513,7 @@ failure is not enough to compromise the system. For example a server compromise
 may be detected using OCSP, and a CA compromise can be detected using
 the trust on first use method.
 Such a hybrid system with X.509 and trust on first use authentication is 
-shown in @ref{Simple client example with SSH-style certificate verification}.
+shown in @ref{Client example with SSH-style certificate verification}.
 
 See @ref{Certificate verification} on how to use the available functionality.
 
