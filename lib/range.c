@@ -113,7 +113,7 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
  * Returns: true (1) if the current session supports length-hiding
  * padding, false (0) if the current session does not.
  **/
-int gnutls_record_can_use_length_hiding(gnutls_session_t session)
+unsigned gnutls_record_can_use_length_hiding(gnutls_session_t session)
 {
 	int ret;
 	record_parameters_st *record_params;

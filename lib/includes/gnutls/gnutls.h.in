@@ -1287,7 +1287,7 @@ size_t
 void gnutls_session_enable_compatibility_mode(gnutls_session_t session);
 #define gnutls_record_set_max_empty_records(session, x)
 
-int gnutls_record_can_use_length_hiding(gnutls_session_t session);
+unsigned gnutls_record_can_use_length_hiding(gnutls_session_t session);
 
 int gnutls_record_get_direction(gnutls_session_t session);
 
