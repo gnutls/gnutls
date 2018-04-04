@@ -26,7 +26,6 @@
 
 #include "errors.h"
 #include "auth.h"
-#include "auth.h"
 #include "debug.h"
 #include "num.h"
 #include <auth/psk.h>

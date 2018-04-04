@@ -261,6 +261,7 @@ static int server_recv_params(gnutls_session_t session,
 	unsigned hash_size;
 	psk_ext_parser_st psk_parser;
 	struct psk_st psk;
+	psk_auth_info_t info;
 
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
 	if (ret < 0) {
@@ -317,6 +318,23 @@ static int server_recv_params(gnutls_session_t session,
 	else {
 		reset_cand_groups(session);
 		_gnutls_handshake_log("EXT[%p]: Selected PSK mode\n", session);
+	}
+
+	/* save the username in psk_auth_info to make it available
+	 * using gnutls_psk_server_get_username() */
+	if (psk.ob_ticket_age == 0) {
+		if (psk.identity.size >= sizeof(info->username))
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		ret = _gnutls_auth_info_set(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
+		assert(info != NULL);
+
+		memcpy(info->username, psk.identity.data, psk.identity.size);
+		info->username[psk.identity.size] = 0;
 	}
 
 	session->internals.hsk_flags |= HSK_PSK_SELECTED;

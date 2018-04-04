@@ -179,6 +179,7 @@ static void server(int sd, const char *prio, const char *user, int expect_fail, 
 	gnutls_psk_server_credentials_t server_pskcred;
 	int ret, kx;
 	gnutls_session_t session;
+	const char *pskid;
 	char buffer[MAX_BUF + 1];
 	char *psk_file = getenv("PSK_FILE");
 	char *desc;
@@ -268,6 +269,12 @@ static void server(int sd, const char *prio, const char *user, int expect_fail, 
 
 	if (expect_fail)
 		fail("server: expected failure but connection succeeded!\n");
+
+	pskid = gnutls_psk_server_get_username(session);
+	if (pskid == NULL || strcmp(pskid, user) != 0) {
+		fail("server: username (%s), does not match expected (%s)\n",
+		     pskid, user);
+	}
 
 	if (exp_kx && kx != exp_kx) {
 		fail("server: expected key exchange %s, but got %s\n",
