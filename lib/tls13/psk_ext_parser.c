@@ -20,23 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *
  */
+
+#include "gnutls_int.h"
 #include "tls13/psk_ext_parser.h"
 
-
-static int advance_to_end_of_object(psk_ext_parser_st *p)
-{
-	size_t adv;
-
-	/* Advance the pointer to the end of the current object */
-	if (p->obj_read < p->obj_len) {
-		adv = p->obj_len - p->obj_read;
-		DECR_LEN(p->len, adv);
-		p->data += adv;
-	}
-
-	return 0;
-}
-
+/* Returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE when no identities
+ * are present, or >= 0, on success.
+ */
 int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
 				  const unsigned char *data, size_t _len)
 {
@@ -48,105 +38,106 @@ int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
 
 	memset(p, 0, sizeof(*p));
 
+	DECR_LEN(len, 2);
 	identities_len = _gnutls_read_uint16(data);
+	data += 2;
 
-	if (identities_len > 0) {
-		DECR_LEN(len, 2);
-		data += 2;
+	if (identities_len == 0)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-		p->obj_len = identities_len;
-		p->data = (unsigned char *) data;
-		p->len = len;
-	}
+	p->id_len = identities_len;
+	p->data = (unsigned char *) data;
+	p->len = len;
 
-	return identities_len;
+	DECR_LEN(len, p->id_len);
+	data += p->id_len;
+
+	DECR_LEN(len, 2);
+	p->binder_len = _gnutls_read_uint16(data);
+
+	p->binder_data = p->data + p->id_len + 2;
+	DECR_LEN(len, p->binder_len);
+
+	return 0;
 }
 
 int _gnutls13_psk_ext_parser_next_psk(psk_ext_parser_st *p, struct psk_st *psk)
 {
-	if (p->obj_read >= p->obj_len)
+	if (p->id_read >= p->id_len)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	/* Read a PskIdentity structure */
+	DECR_LEN(p->len, 2);
 	psk->identity.size = _gnutls_read_uint16(p->data);
 	if (psk->identity.size == 0)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-	DECR_LEN(p->len, 2);
 	p->data += 2;
-	p->obj_read += 2;
+	p->id_read += 2;
 
-	psk->identity.data = p->data;
+	psk->identity.data = (void*)p->data;
 
 	DECR_LEN(p->len, psk->identity.size);
 	p->data += psk->identity.size;
-	p->obj_read += psk->identity.size;
+	p->id_read += psk->identity.size;
 
-	psk->ob_ticket_age = _gnutls_read_uint32(p->data);
 	DECR_LEN(p->len, 4);
+	psk->ob_ticket_age = _gnutls_read_uint32(p->data);
+
 	p->data += 4;
-	p->obj_read += 4;
+	p->id_read += 4;
 
 	return p->next_index++;
 }
 
+/* Output is a pointer to data, which shouldn't be de-allocated. */
 int _gnutls13_psk_ext_parser_find_binder(psk_ext_parser_st *p, int psk_index,
 					 gnutls_datum_t *binder_out)
 {
-	uint16_t binders_len;
 	uint8_t binder_len;
 	int cur_index = 0, binder_found = 0;
+	ssize_t len;
+	const uint8_t *data;
+	ssize_t read_data = 0;
 
 	if (p == NULL || psk_index < 0 || binder_out == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	if (p->obj_len == 0)
+	if (p->id_len == 0)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	/* Place the pointer at the start of the binders */
-	if (advance_to_end_of_object(p) < 0)
-		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+	len = p->binder_len;
+	data = p->binder_data;
 
-	DECR_LEN(p->len, 2);
-	binders_len = _gnutls_read_uint16(p->data);
-	if (binders_len > 0) {
-		p->data += 2;
-
-		p->obj_len = binders_len;
-		p->obj_read = 0;
-	} else {
+	if (len == 0)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
-	}
 
 	/* Start traversing the binders */
-	while (!binder_found && p->len > 0) {
-		DECR_LEN(p->len, 1);
-		binder_len = *(p->data);
+	while (!binder_found && len > 0) {
+		DECR_LEN(len, 1);
+		binder_len = *(data);
 
 		if (binder_len == 0)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-		p->data++;
-		p->obj_read++;
+		data++;
+		read_data++;
 
 		if (cur_index == psk_index) {
 			/* We found the binder with the supplied index */
-			binder_out->data = gnutls_malloc(binder_len);
-			if (!binder_out->data)
-				return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
+			DECR_LEN(len, binder_len);
+			binder_out->data = (void*)data;
 			binder_out->size = binder_len;
-			DECR_LEN(p->len, binder_len);
-			memcpy(binder_out->data, p->data, binder_len);
-			p->data += binder_len;
-			p->obj_read += binder_len;
+
+			data += binder_len;
+			read_data += binder_len;
 
 			binder_found = 1;
 		} else {
 			/* Not our binder - continue to the next one */
-			DECR_LEN(p->len, binder_len);
-			p->data += binder_len;
-			p->obj_read += binder_len;
+			DECR_LEN(len, binder_len);
+			data += binder_len;
+			read_data += binder_len;
 
 			cur_index++;
 		}

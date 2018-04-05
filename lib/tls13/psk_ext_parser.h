@@ -22,19 +22,23 @@
 
 #ifndef PSK_PARSER_H
 #define PSK_PARSER_H
-#include "gnutls_int.h"
+#include <gnutls/gnutls.h>
 
 struct psk_ext_parser_st {
-	unsigned char *data;
+	const unsigned char *data;
 	ssize_t len;
-	size_t obj_len;
-	size_t obj_read;
+	size_t id_len;
+	size_t id_read;
 	int next_index;
+
+	const unsigned char *binder_data;
+	ssize_t binder_len;
 };
 
 typedef struct psk_ext_parser_st psk_ext_parser_st;
 
 struct psk_st {
+	/* constant values */
 	gnutls_datum_t identity;
 	uint32_t ob_ticket_age;
 };

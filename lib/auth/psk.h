@@ -63,10 +63,9 @@ typedef struct psk_auth_info_st {
 	char hint[MAX_USERNAME_SIZE + 1];
 } *psk_auth_info_t;
 
+typedef struct psk_auth_info_st psk_auth_info_st;
 
 #ifdef ENABLE_PSK
-
-typedef struct psk_auth_info_st psk_auth_info_st;
 
 int
 _gnutls_set_psk_session_key(gnutls_session_t session, gnutls_datum_t * key,

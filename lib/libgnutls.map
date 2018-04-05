@@ -1218,6 +1218,7 @@ GNUTLS_3_6_3
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {
+  global:
 	gnutls_cipher_self_test;
 	gnutls_pk_self_test;
 	gnutls_mac_self_test;
@@ -1255,6 +1256,11 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_log_level;
 	_gnutls_digest_exists;
 	_gnutls_log;
+
+	# PSK extension parser unit test
+	_gnutls13_psk_ext_parser_init;
+	_gnutls13_psk_ext_parser_next_psk;
+	_gnutls13_psk_ext_parser_find_binder;
 
 	# Internal symbols needed by gnutls-cli-debug:
 	_gnutls_rsa_pms_set_version;

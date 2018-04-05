@@ -108,6 +108,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls12-rollback-detection tls11-rollback-detection \
 	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value
 
+ctests += tls13/psk-ext
+
 ctests += tls13/key_update
 
 ctests += tls13/key_limits

@@ -263,10 +263,9 @@ static int server_recv_params(gnutls_session_t session,
 	struct psk_st psk;
 
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
-	if (ret == 0) {
-		/* No PSKs advertised by client */
-		return 0;
-	} else if (ret < 0) {
+	if (ret < 0) {
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) /* No PSKs advertised by client */
+			return 0;
 		return gnutls_assert_val(ret);
 	}
 
@@ -295,10 +294,8 @@ static int server_recv_params(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	/* Get full ClientHello */
-	if (!_gnutls_ext_get_full_client_hello(session, &full_client_hello)) {
-		ret = 0;
-		goto cleanup;
-	}
+	if (!_gnutls_ext_get_full_client_hello(session, &full_client_hello))
+		return 0;
 
 	/* Compute the binder value for this PSK */
 	prf = pskcred->binder_algo;
@@ -306,16 +303,13 @@ static int server_recv_params(gnutls_session_t session,
 	ret = compute_psk_binder(GNUTLS_SERVER, prf, hash_size, hash_size, 0, 0,
 				 &key, &full_client_hello,
 				 binder_value);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	if (_gnutls_mac_get_algo_len(prf) != binder_recvd.size ||
 	    safe_memcmp(binder_value, binder_recvd.data, binder_recvd.size)) {
 		gnutls_free(key.data);
-		ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-		goto cleanup;
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
 	if (session->internals.hsk_flags & HSK_PSK_KE_MODE_DHE_PSK)
@@ -335,11 +329,7 @@ static int server_recv_params(gnutls_session_t session,
 	session->key.proto.tls13.psk_index = psk_index;
 	session->key.proto.tls13.binder_prf = prf;
 
-	ret = 0;
- cleanup:
-	_gnutls_free_datum(&binder_recvd);
-
-	return ret;
+	return 0;
 }
 
 /*
