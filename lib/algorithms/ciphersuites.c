@@ -1482,6 +1482,13 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 					if (!kx_is_ok(session, kx, cred_type, &sgroup))
 						continue;
 
+					/* if we have selected PSK, we need a ciphersuites which matches
+					 * the selected binder */
+					if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+						if (session->key.proto.tls13.binder_prf->id != session->internals.priorities->cs.entry[j]->prf)
+							continue;
+					}
+
 					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
 						if (ret < 0) {
@@ -1519,6 +1526,13 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 
 					if (!kx_is_ok(session, kx, cred_type, &sgroup))
 						break;
+
+					/* if we have selected PSK, we need a ciphersuites which matches
+					 * the selected binder */
+					if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+						if (session->key.proto.tls13.binder_prf->id != session->internals.priorities->cs.entry[j]->prf)
+							break;
+					}
 
 					if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);

@@ -1268,7 +1268,9 @@ GROUP-SECP256R1, GROUP-SECP384R1, GROUP-SECP521R1, GROUP-X25519,
 GROUP-FFDHE2048, GROUP-FFDHE3072, GROUP-FFDHE4096 and GROUP-FFDHE8192.
 Groups include both elliptic curve groups, e.g., SECP256R1, as well as 
 finite field groups such as FFDHE2048. Catch all which enables all groups
-from NORMAL priority is GROUP-ALL.
+from NORMAL priority is GROUP-ALL. The helper keywords GROUP-DH-ALL and
+GROUP-EC-ALL are also available, restricting the groups to finite fields
+(DH) and elliptic curves.
 
 @item Certificate type @tab
 The only option currently is CTYPE-X509. Catch all is CTYPE-ALL.

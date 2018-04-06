@@ -67,6 +67,8 @@ gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
+	(*sc)->binder_algo = _gnutls_mac_to_entry(GNUTLS_MAC_SHA256);
 	return 0;
 }
 
@@ -182,6 +184,8 @@ gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+	/* TLS 1.3 - Default binder HMAC algorithm is SHA-256 */
+	(*sc)->binder_algo = _gnutls_mac_to_entry(GNUTLS_MAC_SHA256);
 	return 0;
 }
 
@@ -343,7 +347,10 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
  * username to use.  This should only be called in case of PSK
  * authentication and in case of a client.
  *
- * Returns: the identity hint of the peer, or %NULL in case of an error.
+ * Note: there is no hint in TLS 1.3, so this function will return %NULL
+ * if TLS 1.3 has been negotiated.
+ *
+ * Returns: the identity hint of the peer, or %NULL in case of an error or if TLS 1.3 is being used.
  *
  * Since: 2.4.0
  **/

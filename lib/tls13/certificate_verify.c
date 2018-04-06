@@ -142,6 +142,9 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 	const gnutls_sign_entry_st *se;
 
 	if (again == 0) {
+		if (session->internals.hsk_flags & HSK_PSK_SELECTED)
+			return 0;
+
 		ret = _gnutls_get_selected_cert(session, &apr_cert_list,
 						&apr_cert_list_length, &apr_pkey);
 		if (ret < 0)

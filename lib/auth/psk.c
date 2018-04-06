@@ -26,7 +26,6 @@
 
 #include "errors.h"
 #include "auth.h"
-#include "auth.h"
 #include "debug.h"
 #include "num.h"
 #include <auth/psk.h>
@@ -109,40 +108,6 @@ _gnutls_set_psk_session_key(gnutls_session_t session,
       error:
 	_gnutls_free_temp_key_datum(&pwd_psk);
 	return ret;
-}
-
-/* returns the username and they key for the PSK session.
- * Free is non (0) if they have to be freed.
- */
-int _gnutls_find_psk_key(gnutls_session_t session,
-			 gnutls_psk_client_credentials_t cred,
-			 gnutls_datum_t * username, gnutls_datum_t * key,
-			 int *free)
-{
-	char *user_p;
-	int ret;
-
-	*free = 0;
-
-	if (cred->username.data != NULL && cred->key.data != NULL) {
-		username->data = cred->username.data;
-		username->size = cred->username.size;
-		key->data = cred->key.data;
-		key->size = cred->key.size;
-	} else if (cred->get_function != NULL) {
-		ret = cred->get_function(session, &user_p, key);
-		if (ret)
-			return gnutls_assert_val(ret);
-
-		username->data = (uint8_t *) user_p;
-		username->size = strlen(user_p);
-
-		*free = 1;
-	} else
-		return
-		    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
-
-	return 0;
 }
 
 

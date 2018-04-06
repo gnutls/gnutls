@@ -444,6 +444,15 @@ static inline int _gnutls_kx_is_ecc(gnutls_kx_algorithm_t kx)
 	return 0;
 }
 
+static inline int _gnutls_kx_is_psk(gnutls_kx_algorithm_t kx)
+{
+	if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK ||
+	    kx == GNUTLS_KX_ECDHE_PSK || kx == GNUTLS_KX_RSA_PSK)
+		return 1;
+
+	return 0;
+}
+
 static inline int _gnutls_kx_is_dhe(gnutls_kx_algorithm_t kx)
 {
 	if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS ||

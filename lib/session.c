@@ -306,7 +306,18 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	sign_str = gnutls_sign_get_name(sign_algo);
 
 	if (kx == 0 && ver->tls13_sem) { /* TLS 1.3 */
-		if (group && sign_str) {
+		if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
+			if (group) {
+				if (group->pk == GNUTLS_PK_DH)
+					snprintf(kx_name, sizeof(kx_name), "(DHE-PSK-%s)",
+						 group_name);
+				else
+					snprintf(kx_name, sizeof(kx_name), "(ECDHE-PSK-%s)",
+						 group_name);
+			} else {
+					snprintf(kx_name, sizeof(kx_name), "(PSK)");
+			}
+		} else if (group && sign_str) {
 			if (group->curve)
 				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
 					 group_name, sign_str);
@@ -346,7 +357,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 
 
 	type = gnutls_certificate_type_get(session);
-	if (type == GNUTLS_CRT_X509)
+	if (type == GNUTLS_CRT_X509 || type == GNUTLS_CRT_UNKNOWN)
 		snprintf(proto_name, sizeof(proto_name), "%s",
 			 gnutls_protocol_get_name(get_num_version
 						  (session)));

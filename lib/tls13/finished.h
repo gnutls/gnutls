@@ -20,5 +20,10 @@
  *
  */
 
+int _gnutls13_compute_finished(const mac_entry_st *prf,
+		const uint8_t *base_key,
+		unsigned hash_size,
+		gnutls_buffer_st *handshake_hash_buffer,
+		void *out);
 int _gnutls13_recv_finished(gnutls_session_t session);
 int _gnutls13_send_finished(gnutls_session_t session, unsigned again);

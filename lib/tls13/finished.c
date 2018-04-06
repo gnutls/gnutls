@@ -28,40 +28,63 @@
 #include "mbuffers.h"
 #include "secrets.h"
 
+int _gnutls13_compute_finished(const mac_entry_st *prf,
+		const uint8_t *base_key,
+		unsigned hash_size,
+		gnutls_buffer_st *handshake_hash_buffer,
+		void *out)
+{
+	int ret;
+	uint8_t fkey[MAX_HASH_SIZE];
+	uint8_t ts_hash[MAX_HASH_SIZE];
+
+	ret = _tls13_expand_secret2(prf,
+			"finished", 8,
+			NULL, 0,
+			base_key,
+			hash_size, fkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_hash_fast(prf->id,
+			       handshake_hash_buffer->data,
+			       handshake_hash_buffer->length,
+			       ts_hash);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_hmac_fast(prf->id,
+			       fkey, hash_size,
+			       ts_hash, hash_size,
+			       out);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
+}
+
 int _gnutls13_recv_finished(gnutls_session_t session)
 {
 	int ret;
 	gnutls_buffer_st buf;
-	uint8_t fkey[MAX_HASH_SIZE];
-	uint8_t ts_hash[MAX_HASH_SIZE];
 	uint8_t verifier[MAX_HASH_SIZE];
 	const uint8_t *base_key;
-	unsigned hash_size = session->security_parameters.prf->output_size;
+	unsigned hash_size;
+
+	if (unlikely(session->security_parameters.prf == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	hash_size = session->security_parameters.prf->output_size;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		base_key = session->key.proto.tls13.hs_skey;
 	else
 		base_key = session->key.proto.tls13.hs_ckey;
 
-	ret = _tls13_expand_secret(session, "finished", 8, NULL, 0, base_key,
-			hash_size, fkey);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = gnutls_hash_fast(session->security_parameters.prf->id,
-			       session->internals.handshake_hash_buffer.data,
-			       /* we haven't yet processed the finished message */
-			       session->internals.handshake_hash_buffer.length,
-			       ts_hash);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_hmac_fast(session->security_parameters.prf->id,
-			       fkey, hash_size,
-			       ts_hash, hash_size,
-			       verifier);
+	ret = _gnutls13_compute_finished(session->security_parameters.prf,
+			base_key, hash_size,
+			&session->internals.handshake_hash_buffer,
+			verifier);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -96,37 +119,26 @@ cleanup:
 int _gnutls13_send_finished(gnutls_session_t session, unsigned again)
 {
 	int ret;
-	uint8_t fkey[MAX_HASH_SIZE];
-	uint8_t ts_hash[MAX_HASH_SIZE];
 	uint8_t verifier[MAX_HASH_SIZE];
 	mbuffer_st *bufel = NULL;
 	const uint8_t *base_key;
-	unsigned hash_size = session->security_parameters.prf->output_size;
+	unsigned hash_size;
 
 	if (again == 0) {
+		if (unlikely(session->security_parameters.prf == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		hash_size = session->security_parameters.prf->output_size;
+
 		if (session->security_parameters.entity == GNUTLS_CLIENT)
 			base_key = session->key.proto.tls13.hs_ckey;
 		else
 			base_key = session->key.proto.tls13.hs_skey;
 
-		ret = _tls13_expand_secret(session, "finished", 8, NULL, 0, base_key,
-					   hash_size, fkey);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		ret = gnutls_hash_fast(session->security_parameters.prf->id,
-				       session->internals.handshake_hash_buffer.data,
-				       session->internals.handshake_hash_buffer.length,
-				       ts_hash);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = gnutls_hmac_fast(session->security_parameters.prf->id,
-				       fkey, hash_size,
-				       ts_hash, hash_size,
-				       verifier);
+		ret = _gnutls13_compute_finished(session->security_parameters.prf,
+				base_key, hash_size,
+				&session->internals.handshake_hash_buffer,
+				verifier);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
