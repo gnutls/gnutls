@@ -414,7 +414,7 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 			 _gnutls_bin2hex(ckey_block, key_size,
 					 buf, sizeof(buf), NULL));
 
-	memcpy(server_write->key, ckey_block, key_size);
+	memcpy(server_write->key, skey_block, key_size);
 	server_write->key_size = key_size;
 
 	_gnutls_hard_log("INT: SERVER WRITE KEY [%d]: %s\n",
@@ -432,7 +432,7 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 				 _gnutls_bin2hex(civ_block, iv_size,
 						 buf, sizeof(buf), NULL));
 
-		memcpy(server_write->iv, civ_block, iv_size);
+		memcpy(server_write->iv, siv_block, iv_size);
 		server_write->iv_size = iv_size;
 
 		_gnutls_hard_log("INT: SERVER WRITE IV [%d]: %s\n",

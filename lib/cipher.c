@@ -335,9 +335,7 @@ encrypt_packet(gnutls_session_t session,
 		if (params->cipher->xor_nonce == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
-			 if (params->write.iv == NULL
-			    || params->write.iv_size !=
-			    imp_iv_size)
+			 if (params->write.iv_size != imp_iv_size)
 				return
 				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -622,9 +620,7 @@ decrypt_packet(gnutls_session_t session,
 		if (params->cipher->xor_nonce == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
-			 if (unlikely
-			    (params->read.iv == NULL
-			     || params->read.iv_size != 4))
+			 if (unlikely(params->read.iv_size != 4))
 				return
 				    gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
