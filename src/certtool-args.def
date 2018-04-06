@@ -196,6 +196,15 @@ option is also acceptable.";
 };
 
 flag = {
+    name      = key-type;
+    arg-type  = string;
+    descrip   = "Specify the key type to use on key generation";
+    doc = "This option can be combined with --generate-privkey, to specify
+    the key type to be generated. Valid options are, 'rsa', 'rsa-pss',
+'dsa', 'ecdsa', and 'ed25519'.";
+};
+
+flag = {
     name      = bits;
     arg-type  = number;
     descrip   = "Specify the number of bits for key generation";
@@ -565,15 +574,6 @@ flag = {
     name      = ecdsa;
     aliases   = ecc;
     deprecated;
-};
-
-flag = {
-    name      = key-type;
-    arg-type  = string;
-    descrip   = "Specify the key type to use on key generation";
-    doc = "This option can be combined with --generate-privkey, to specify
-    the key type to be generated. Valid options are, 'rsa', 'rsa-pss',
-'dsa', 'ecdsa', and 'ed25519'.";
 };
 
 flag = {
