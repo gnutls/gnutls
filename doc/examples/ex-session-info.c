@@ -99,10 +99,10 @@ int print_info(gnutls_session_t session)
                 if (ecdh != 0)
                         printf("- Ephemeral ECDH using curve %s\n",
 	                       gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
-                             		                 (session)));
-	        else if (dhe != 0)
-        	        printf("- Ephemeral DH using prime of %d bits\n",
-                	       gnutls_dh_get_prime_bits(session));
+                                                         (session)));
+                else if (dhe != 0)
+                        printf("- Ephemeral DH using prime of %d bits\n",
+                               gnutls_dh_get_prime_bits(session));
         }
 
         return 0;
