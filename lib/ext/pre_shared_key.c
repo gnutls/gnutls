@@ -257,8 +257,8 @@ static int server_recv_params(gnutls_session_t session,
 	uint8_t binder_value[MAX_HASH_SIZE];
 	int psk_index = -1;
 	gnutls_datum_t binder_recvd = { NULL, 0 };
-	gnutls_datum_t key;
-	unsigned hash_size;
+	gnutls_datum_t key = {NULL, 0};
+	unsigned hash_size, cand_index;
 	psk_ext_parser_st psk_parser;
 	struct psk_st psk;
 	psk_auth_info_t info;
@@ -272,6 +272,8 @@ static int server_recv_params(gnutls_session_t session,
 
 	while ((ret = _gnutls13_psk_ext_parser_next_psk(&psk_parser, &psk)) >= 0) {
 		if (psk.ob_ticket_age == 0) {
+			cand_index = ret;
+
 			/* _gnutls_psk_pwd_find_entry() expects 0-terminated identities */
 			if (psk.identity.size > 0 && psk.identity.size <= MAX_USERNAME_SIZE) {
 				char identity_str[psk.identity.size + 1];
@@ -280,8 +282,11 @@ static int server_recv_params(gnutls_session_t session,
 				identity_str[psk.identity.size] = 0;
 
 				ret = _gnutls_psk_pwd_find_entry(session, identity_str, &key);
-				if (ret == 0)
-					psk_index = ret;
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				psk_index = cand_index;
+				break;
 			}
 		}
 	}
@@ -291,12 +296,17 @@ static int server_recv_params(gnutls_session_t session,
 
 	ret = _gnutls13_psk_ext_parser_find_binder(&psk_parser, psk_index,
 						   &binder_recvd);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
 
 	/* Get full ClientHello */
-	if (!_gnutls_ext_get_full_client_hello(session, &full_client_hello))
-		return 0;
+	if (!_gnutls_ext_get_full_client_hello(session, &full_client_hello)) {
+		ret = GNUTLS_E_INTERNAL_ERROR;
+		gnutls_assert();
+		goto fail;
+	}
 
 	/* Compute the binder value for this PSK */
 	prf = pskcred->binder_algo;
@@ -304,13 +314,16 @@ static int server_recv_params(gnutls_session_t session,
 	ret = compute_psk_binder(GNUTLS_SERVER, prf, hash_size, hash_size, 0, 0,
 				 &key, &full_client_hello,
 				 binder_value);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
 
 	if (_gnutls_mac_get_algo_len(prf) != binder_recvd.size ||
 	    safe_memcmp(binder_value, binder_recvd.data, binder_recvd.size)) {
-		gnutls_free(key.data);
-		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		gnutls_assert();
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		goto fail;
 	}
 
 	if (session->internals.hsk_flags & HSK_PSK_KE_MODE_DHE_PSK)
@@ -323,12 +336,17 @@ static int server_recv_params(gnutls_session_t session,
 	/* save the username in psk_auth_info to make it available
 	 * using gnutls_psk_server_get_username() */
 	if (psk.ob_ticket_age == 0) {
-		if (psk.identity.size >= sizeof(info->username))
-			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		if (psk.identity.size >= sizeof(info->username)) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto fail;
+		}
 
 		ret = _gnutls_auth_info_set(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
 
 		info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 		assert(info != NULL);
@@ -348,6 +366,10 @@ static int server_recv_params(gnutls_session_t session,
 	session->key.proto.tls13.binder_prf = prf;
 
 	return 0;
+
+ fail:
+	gnutls_free(key.data);
+	return ret;
 }
 
 /*
