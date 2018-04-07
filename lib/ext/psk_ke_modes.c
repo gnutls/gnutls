@@ -139,9 +139,10 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 		return gnutls_assert_val(0);
 
 	for (i=0;i<ke_modes_len;i++) {
+		DECR_LEN(len, 1);
 		if (data[i] == PSK_DHE_KE)
 			cli_dhpsk_pos = i;
-		if (data[i] == PSK_KE)
+		else if (data[i] == PSK_KE)
 			cli_psk_pos = i;
 
 		if (cli_psk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS)
