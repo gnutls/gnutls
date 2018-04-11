@@ -18,6 +18,12 @@ See the end for copying conditions.
    and key usage limits. TLS1.3 support needs to be explicitly enabled via a
    priority string.
 
+** libgnutls: Improve compatibility with TLS1.2 and earlier protocol options under
+   TLS 1.3. When SRP or NULL ciphersuites are specified in priority strings
+   TLS 1.3 is will be disabled. When Anonymous ciphersuites are specified in priority
+   strings, then TLS 1.3 negotiation will be disabled if the session is associated
+   with an anonymous credentials structure.
+
 ** libgnutls: Introduced low-level function to assist applications attempting client
    hello extension parsing, prior to GnuTLS' parsing of the message.
 
