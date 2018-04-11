@@ -196,7 +196,7 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 		assert(gnutls_priority_set_direct(server, server_priority, NULL) >= 0);
 	else
 		assert(gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-TLS1.3:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
+				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
 				   NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);

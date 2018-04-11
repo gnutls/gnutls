@@ -32,7 +32,7 @@
 #include <algorithms.h>
 #include "auth/psk.h"
 #include "auth/cert.h"
-#include "auth/anon.h"
+#include "handshake.h"
 #include "../ecc.h"
 #include "../algorithms.h"
 #include "pk.h"
@@ -647,6 +647,9 @@ key_share_send_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		ver = _gnutls_version_max(session);
 		if (unlikely(ver == NULL || ver->key_shares == 0))
+			return 0;
+
+		if (!have_creds_for_tls13(session))
 			return 0;
 
 		/* write the total length later */

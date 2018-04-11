@@ -39,6 +39,20 @@
 
 test_case_st tests[] = {
 	{
+		.name = "server TLS 1.2: NULL (server)",
+		.not_on_fips = 1,
+		.cipher = GNUTLS_CIPHER_NULL,
+		.server_prio = "NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
+		.client_prio = "NORMAL:+NULL"
+	},
+	{
+		.name = "client TLS 1.2: NULL (client)",
+		.not_on_fips = 1,
+		.cipher = GNUTLS_CIPHER_NULL,
+		.server_prio = "NORMAL:+NULL",
+		.client_prio = "NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+	},
+	{
 		.name = "server TLS 1.2: AES-128-GCM (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_GCM,
 		.server_prio = "NORMAL:-CIPHER-ALL:+AES-128-GCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",

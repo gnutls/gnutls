@@ -101,7 +101,8 @@ follow those conventions. The srptool program, discussed in the next section
 is a tool to manipulate the SRP parameters.
 
 The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP}. The
-supported key exchange methods are shown below.
+supported key exchange methods are shown below. Enabling any of these
+key exchange methods in a session disables support for TLS1.3.
 
 @table @code
 
@@ -145,7 +146,8 @@ an alternative with better properties, such as key continuity, is trust on first
 
 The available key exchange algorithms for anonymous authentication are
 shown below, but note that few public servers support them, and they 
-have to be explicitly enabled.
+have to be explicitly enabled. These ciphersuites are negotiated only under
+TLS 1.2.
 
 @table @code
 

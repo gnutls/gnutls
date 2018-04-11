@@ -26,6 +26,7 @@
 
 #include "errors.h"
 #include "record.h"
+#include <assert.h>
 
 #define IMED_RET( str, ret, allow_alert) do { \
 	if (ret < 0) { \
@@ -104,6 +105,20 @@ inline static int handshake_remaining_time(gnutls_session_t session)
 		else
 			return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
 	}
+	return 0;
+}
+
+/* Returns non-zero if the present credentials are sufficient for TLS1.3 negotiation.
+ * This is to be used in client side only. On server side, it is allowed to start
+ * without credentials.
+ */
+inline static unsigned have_creds_for_tls13(gnutls_session_t session)
+{
+	assert(session->security_parameters.entity == GNUTLS_CLIENT);
+	if (_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) != NULL ||
+	    _gnutls_get_cred(session, GNUTLS_CRD_PSK) != NULL)
+		return 1;
+
 	return 0;
 }
 

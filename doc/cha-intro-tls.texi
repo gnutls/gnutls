@@ -179,6 +179,16 @@ ARCFOUR-128 is a compatible algorithm with RSA's RC4 algorithm, which is conside
 secret. It is a considered to be broken, and is only used for compatibility
 purposed. For this reason it is not enabled by default.
 
+@item NULL @tab
+Legacy (stream) @tab
+TLS 1.0, TLS 1.1, TLS 1.2 @tab
+NULL is the empty/identity cipher which doesn't encrypt any data. It can be
+combined with data authentication under TLS 1.2 or earlier, but is only used
+transiently under TLS 1.3 until encryption starts. This cipher cannot be negotiated
+by default (need to be explicitly enabled) under TLS 1.2, and cannot be
+negotiated at all under TLS 1.3. When enabled, TLS 1.3 (or later) support will be
+implicitly disabled.
+
 @end multitable
 @caption{Supported ciphers in TLS.}
 @end float
