@@ -120,6 +120,8 @@ typedef struct {
 #define MAX_FILENAME 512
 #define MAX_HASH_SIZE 64
 
+#define MAX_MAC_KEY_SIZE 64
+
 #define MAX_CIPHER_BLOCK_SIZE 16
 #define MAX_CIPHER_KEY_SIZE 32
 
@@ -461,6 +463,12 @@ typedef struct auth_cred_st {
 	struct auth_cred_st *next;
 } auth_cred_st;
 
+/* session ticket definitions */
+#define TICKET_MASTER_KEY_SIZE (TICKET_KEY_NAME_SIZE+TICKET_CIPHER_KEY_SIZE+TICKET_MAC_SECRET_SIZE)
+#define TICKET_KEY_NAME_SIZE 16
+#define TICKET_CIPHER_KEY_SIZE 32
+#define TICKET_MAC_SECRET_SIZE 16
+
 struct gnutls_key_st {
 	struct { /* These are kept outside the TLS1.3 union as they are
 	          * negotiated via extension, even before protocol is negotiated */
@@ -531,6 +539,9 @@ struct gnutls_key_st {
 
 	/* TLS pre-master key; applies to 1.2 and 1.3 */
 	gnutls_datum_t key;
+
+	/* The key to encrypt and decrypt session tickets */
+	uint8_t session_ticket_key[TICKET_MASTER_KEY_SIZE];
 
 	/* this is used to hold the peers authentication data 
 	 */
@@ -1323,6 +1334,8 @@ typedef struct {
 
 	/* the ciphersuite received in HRR */
 	uint8_t hrr_cs[2];
+
+	int session_ticket_renew;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
