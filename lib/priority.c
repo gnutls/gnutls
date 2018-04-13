@@ -33,6 +33,7 @@
 #include <hello_ext.h>
 #include "fips.h"
 #include "errno.h"
+#include "ext/srp.h"
 #include <gnutls/gnutls.h>
 
 #define MAX_ELEMENTS 64
@@ -1192,18 +1193,45 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	const version_entry_st *dtlsmax = NULL;
 	const version_entry_st *tlsmin = NULL;
 	const version_entry_st *dtlsmin = NULL;
-	unsigned have_tls13 = 0;
-	unsigned have_psk = 0;
+	unsigned have_tls13 = 0, have_srp = 0;
+	unsigned have_psk = 0, have_null = 0;
 
 	priority_cache->cs.size = 0;
 	priority_cache->sigalg.size = 0;
 	priority_cache->groups.size = 0;
 	priority_cache->groups.have_ffdhe = 0;
 
+	for (j=0;j<priority_cache->_cipher.algorithms;j++) {
+		if (priority_cache->_cipher.priority[j] == GNUTLS_CIPHER_NULL) {
+			have_null = 1;
+			break;
+		}
+	}
+
+	for (i = 0; i < priority_cache->_kx.algorithms; i++) {
+		if (IS_SRP_KX(priority_cache->_kx.priority[i])) {
+			have_srp = 1;
+		} else if (_gnutls_kx_is_psk(priority_cache->_kx.priority[i])) {
+			have_psk = 1;
+		}
+	}
+
 	for (i = 0; i < priority_cache->protocol.algorithms; i++) {
 		vers = version_to_entry(priority_cache->protocol.priority[i]);
 		if (!vers)
 			continue;
+
+		/* if we have NULL ciphersuites enabled, remove TLS1.3+ protocol versions;
+		 * they cannot be negotiated under TLS1.3. */
+		if (have_null || have_srp) {
+			if (vers->tls13_sem) {
+				for (j=i+1;j<priority_cache->protocol.algorithms;j++)
+					priority_cache->protocol.priority[j-1] = priority_cache->protocol.priority[j];
+				priority_cache->protocol.algorithms--;
+				i--;
+				continue;
+			}
+		}
 
 		if (vers->transport == GNUTLS_STREAM) { /* TLS */
 			tls_sig_sem |= vers->tls_sig_sem;
@@ -1230,12 +1258,6 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	if ((!tlsmax || !tlsmin) && (!dtlsmax || !dtlsmin))
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
-	for (i = 0; i < priority_cache->_kx.algorithms; i++) {
-		if (_gnutls_kx_is_psk(priority_cache->_kx.priority[i])) {
-			have_psk = 1;
-			break;
-		}
-	}
 
 	priority_cache->have_psk = have_psk;
 

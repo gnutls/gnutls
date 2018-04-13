@@ -194,7 +194,7 @@ static void terminate(void)
 
 static void server(int fd, const char *prio)
 {
-	int ret;
+	int ret, kx;
 	gnutls_session_t session;
 	gnutls_srp_server_credentials_t s_srp_cred;
 	gnutls_certificate_credentials_t s_x509_cred;
@@ -249,6 +249,11 @@ static void server(int fd, const char *prio)
 		success("server: TLS version is: %s\n",
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
+
+	kx = gnutls_kx_get(session);
+	if (kx != GNUTLS_KX_SRP && kx != GNUTLS_KX_SRP_RSA &&
+	    kx != GNUTLS_KX_SRP_DSS)
+		fail("server: unexpected key exchange: %s\n", gnutls_kx_get_name(kx));
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -340,18 +345,21 @@ void doit(void)
 	fwrite(tpasswd_file, 1, strlen(tpasswd_file), fd);
 	fclose(fd);
 
-	start("srp-1024", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test", "test", 0);
-	start("srp-1536", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test2", "test2", 0);
-	start("srp-2048", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test3", "test3", 0);
-	start("srp-3072", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test4", "test4", 0);
-	start("srp-4096", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test5", "test5", 0);
-	start("srp-8192", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test7", "test7", 0);
-	start("srp-other", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test9", "test9", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	start("tls1.2 srp-1024", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test", "test", 0);
+	start("tls1.2 srp-1536", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test2", "test2", 0);
+	start("tls1.2 srp-2048", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test3", "test3", 0);
+	start("tls1.2 srp-3072", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test4", "test4", 0);
+	start("tls1.2 srp-4096", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test5", "test5", 0);
+	start("tls1.2 srp-8192", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test7", "test7", 0);
+	start("tls1.2 srp-other", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test9", "test9", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	start("srp-rsa", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", "test", "test", 0);
+	start("tls1.2 srp-rsa", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP-RSA", "test", "test", 0);
+
+	/* check whether SRP works with TLS1.3 being prioritized */
+	start("tls1.3 and srp-1024", "NORMAL:-KX-ALL:+SRP:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1", "test", "test", 0);
 
 	/* check whether SRP works with the default protocol set */
-	start("srp-1024", "NORMAL:-KX-ALL:+SRP", "test", "test", 0);
+	start("default srp-1024", "NORMAL:-KX-ALL:+SRP", "test", "test", 0);
 
 	remove("tpasswd");
 	remove("tpasswd.conf");

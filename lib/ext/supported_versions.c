@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001-2012 Free Software Foundation, Inc.
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -53,7 +53,6 @@ const hello_ext_entry_st ext_mod_supported_versions = {
 	.cannot_be_overriden = 1
 };
 
-/* Only client sends this extension. */
 static int
 supported_versions_recv_params(gnutls_session_t session,
 			       const uint8_t * data, size_t _data_size)
@@ -104,6 +103,14 @@ supported_versions_recv_params(gnutls_session_t session,
 	} else { /* client */
 		const version_entry_st *vers;
 
+		if (!have_creds_for_tls13(session)) {
+			/* if we don't have certificate or PSK (which work under TLS1.3)
+			 * don't try to negotiate version using the extension. We fallback
+			 * instead to the normal TLS negotiation which has a cap on TLS1.2.
+			 */
+			return 0;
+		}
+
 		DECR_LEN(data_size, 2);
 
 		if (data_size != 0)
@@ -149,6 +156,17 @@ supported_versions_send_params(gnutls_session_t session,
 	/* this function sends the client extension data (dnsname) */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		vers = _gnutls_version_max(session);
+
+		/* Do not advertise this extension if we are not doing certificate
+		 * or PSK authentication; i.e., do not try to do TLS1.3 if we have
+		 * credentials which do not fit it. */
+		if (!have_creds_for_tls13(session)) {
+			/* if we don't have certificate or PSK (which work under TLS1.3)
+			 * don't try to negotiate version using the extension. We fallback
+			 * instead to the normal TLS negotiation which has a cap on TLS1.2.
+			 */
+			return 0;
+		}
 
 		/* do not advertise this extension when we haven't TLS1.3
 		 * enabled. */

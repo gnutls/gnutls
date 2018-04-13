@@ -45,6 +45,20 @@
 
 test_case_st tests[] = {
 	{
+		.name = "server TLS 1.3: NULL (server - exp fallback)",
+		.not_on_fips = 1,
+		.cipher = GNUTLS_CIPHER_NULL,
+		.server_prio = SPRIO":+VERS-TLS1.2:-CIPHER-ALL:+NULL:+CIPHER-ALL:%SERVER_PRECEDENCE:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-ALL",
+		.client_prio = CPRIO":+VERS-TLS1.2:+NULL:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-SECP384R1:+GROUP-SECP521R1:+GROUP-SECP256R1"
+	},
+	{
+		.name = "client TLS 1.3: NULL (client)",
+		.not_on_fips = 1,
+		.cipher = GNUTLS_CIPHER_NULL,
+		.server_prio = SPRIO":+VERS-TLS1.2:+NULL:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-SECP384R1:+GROUP-SECP521R1:+GROUP-SECP256R1",
+		.client_prio = CPRIO":-CIPHER-ALL:+NULL:+CIPHER-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-SECP256R1:+GROUP-ALL"
+	},
+	{
 		.name = "server TLS 1.3: AES-128-GCM with SECP256R1 (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_GCM,
 		.group = GNUTLS_GROUP_SECP256R1,

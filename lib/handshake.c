@@ -246,7 +246,7 @@ int _gnutls_set_server_random(gnutls_session_t session, const version_entry_st *
 
 	/* check whether the server random value is set according to
 	 * to TLS 1.3. p4.1.3 requirements */
-	if (!IS_DTLS(session) && vers->id <= GNUTLS_TLS1_2) {
+	if (!IS_DTLS(session) && vers->id <= GNUTLS_TLS1_2 && have_creds_for_tls13(session)) {
 
 		max = _gnutls_version_max(session);
 		if (max->id <= GNUTLS_TLS1_2)
