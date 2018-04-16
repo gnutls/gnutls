@@ -69,6 +69,7 @@ static void client_log_func(int level, const char *str)
 }
 
 #define MAX_BUF 1024
+#define MAX_REHANDSHAKES 32
 
 static void client(int fd)
 {
@@ -76,6 +77,7 @@ static void client(int fd)
 	char buffer[MAX_BUF + 1];
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
+	unsigned i;
 
 	global_init();
 	memset(buffer, 2, sizeof(buffer));
@@ -122,18 +124,23 @@ static void client(int fd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	ret = gnutls_handshake(session);
-	if (ret != 0) {
-		fail("client: error in code after rehandshake: %s\n",
-		     gnutls_strerror(ret));
-		exit(1);
+	for (i=0;i<MAX_REHANDSHAKES;i++) {
+		do {
+			ret = gnutls_handshake(session);
+		} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+		if (ret != 0) {
+			fail("client: error in code after rehandshake: %s\n",
+			     gnutls_strerror(ret));
+			exit(1);
+		}
+
 	}
 
 	do {
 		do {
 			ret =
 			    gnutls_record_recv(session, buffer,
-						MAX_BUF);
+					       MAX_BUF);
 		} while (ret == GNUTLS_E_AGAIN
 			 || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
@@ -170,6 +177,7 @@ static void server(int fd)
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
+	unsigned tries = 0;
 
 	/* this must be called once in the program
 	 */
@@ -220,27 +228,40 @@ static void server(int fd)
 	gnutls_certificate_server_set_request(session, GNUTLS_CERT_IGNORE);
 
 	do {
+		tries++;
+
 		do {
-			ret =
-			    gnutls_record_recv(session, buffer,
-						MAX_BUF);
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
-	} while (ret > 0);
+			do {
+				ret =
+				    gnutls_record_recv(session, buffer,
+							MAX_BUF);
+			} while (ret == GNUTLS_E_AGAIN
+				 || ret == GNUTLS_E_INTERRUPTED);
+		} while (ret > 0);
 
-	if (ret != GNUTLS_E_REHANDSHAKE) {
-		fail("server: Error receiving client handshake request: %s\n", gnutls_strerror(ret));
-		terminate();
-	}
+		if (ret == 0)
+			break;
 
-	if (debug)
-		success("server: starting handshake\n");
+		if (ret != GNUTLS_E_REHANDSHAKE) {
+			fail("server: Error receiving client handshake request: %s\n", gnutls_strerror(ret));
+			terminate();
+		}
 
-	ret = gnutls_handshake(session);
-	if (ret != 0) {
-		fail("server: unexpected error: %s\n", gnutls_strerror(ret));
-		terminate();
-	}
+		if (debug)
+			success("server: starting handshake\n");
+
+		ret = gnutls_handshake(session);
+		if (ret != 0) {
+			fail("server: unexpected error: %s\n", gnutls_strerror(ret));
+			terminate();
+		}
+
+		if (debug)
+			success("server: handshake %d\n", tries);
+	} while(tries < MAX_REHANDSHAKES);
+
+	if (tries < MAX_REHANDSHAKES)
+		fail("server: only did %d rehandshakes\n", tries);
 
 	ret = gnutls_record_send(session, "hello", 4);
 	if (ret < 0) {
