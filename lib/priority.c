@@ -127,6 +127,11 @@ static const int _supported_groups_normal[] = {
 	GNUTLS_GROUP_SECP384R1,
 	GNUTLS_GROUP_SECP521R1,
 	GNUTLS_GROUP_X25519, /* draft-ietf-tls-rfc4492bis */
+
+	/* These should stay last as our default behavior
+	 * is to send key shares for two top types (GNUTLS_KEY_SHARE_TOP2)
+	 * and we wouldn't want to have these sent by all clients
+	 * by default as they are quite expensive CPU-wise. */
 	GNUTLS_GROUP_FFDHE2048,
 	GNUTLS_GROUP_FFDHE3072,
 	GNUTLS_GROUP_FFDHE4096,
