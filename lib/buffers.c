@@ -802,6 +802,8 @@ ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session)
 			total += ret;
 
 			ret = _mbuffer_head_remove_bytes(send_buffer, ret);
+			/* for each queued message we send, ensure that
+			 * we drop the epoch refcount set in _gnutls_handshake_io_cache_int(). */
 			if (ret == 1)
 				_gnutls_epoch_refcount_dec(session, epoch);
 
@@ -841,6 +843,8 @@ _gnutls_handshake_io_cache_int(gnutls_session_t session,
 
 	send_buffer = &session->internals.handshake_send_buffer;
 
+	/* ensure that our epoch does not get garbage collected
+	 * before we send all queued messages with it */
 	bufel->epoch =
 	    (uint16_t) _gnutls_epoch_refcount_inc(session,
 						  EPOCH_WRITE_CURRENT);
