@@ -981,6 +981,8 @@ typedef struct {
 						 * the client key exchange message */
 	unsigned handshake_hash_buffer_server_finished_len;/* if non-zero it is the length of data until the
 						 * the server finished message */
+	unsigned handshake_hash_buffer_client_finished_len;/* if non-zero it is the length of data until the
+						 * the client finished message */
 	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
 						 * message */
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */

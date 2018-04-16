@@ -81,6 +81,7 @@ handshake_hash_buffer_reset(gnutls_session_t session)
 
 	session->internals.handshake_hash_buffer_client_kx_len = 0;
 	session->internals.handshake_hash_buffer_server_finished_len = 0;
+	session->internals.handshake_hash_buffer_client_finished_len = 0;
 	session->internals.handshake_hash_buffer_prev_len = 0;
 	session->internals.handshake_hash_buffer.length = 0;
 	session->internals.full_client_hello.length = 0;
@@ -1303,6 +1304,9 @@ handshake_hash_add_recvd(gnutls_session_t session,
 	if (recv_type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_CLIENT)
 		session->internals.handshake_hash_buffer_server_finished_len =
 			session->internals.handshake_hash_buffer.length;
+	if (recv_type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_SERVER)
+		session->internals.handshake_hash_buffer_client_finished_len =
+			session->internals.handshake_hash_buffer.length;
 
 	return 0;
 }
@@ -1351,6 +1355,9 @@ handshake_hash_add_sent(gnutls_session_t session,
 				session->internals.handshake_hash_buffer.length;
 		if (type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_SERVER)
 			session->internals.handshake_hash_buffer_server_finished_len =
+				session->internals.handshake_hash_buffer.length;
+		if (type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_CLIENT)
+			session->internals.handshake_hash_buffer_client_finished_len =
 				session->internals.handshake_hash_buffer.length;
 
 		return 0;
