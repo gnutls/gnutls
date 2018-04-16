@@ -42,6 +42,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
+#define MAX_REHANDSHAKES 16
+
 void doit(void)
 {
 	int exit_code = EXIT_SUCCESS;
@@ -53,12 +55,13 @@ void doit(void)
 	gnutls_certificate_credentials_t clientx509cred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
+	unsigned i;
 
 	/* General init. */
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
-		gnutls_global_set_log_level(2);
+		gnutls_global_set_log_level(6);
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
@@ -85,22 +88,21 @@ void doit(void)
 
 	HANDSHAKE(client, server);
 
-	sret = gnutls_rehandshake(server);
-	if (debug) {
-		tls_log_func(0, "gnutls_rehandshake (server)...\n");
-		tls_log_func(0, gnutls_strerror(sret));
-		tls_log_func(0, "\n");
-	}
+	for (i=0;i<MAX_REHANDSHAKES;i++) {
+		sret = gnutls_rehandshake(server);
+		if (debug)
+			success("gnutls_rehandshake %d (server)...\n", i);
 
-	{
-		ssize_t n;
-		char b[1];
-		n = gnutls_record_recv(client, b, 1);
-		if (n != GNUTLS_E_REHANDSHAKE)
-			abort();
-	}
+		{
+			ssize_t n;
+			char b[1];
+			n = gnutls_record_recv(client, b, 1);
+			if (n != GNUTLS_E_REHANDSHAKE)
+				fail("client did not receive the expected rehandshake error code\n");
+		}
 
-	HANDSHAKE(client, server);
+		HANDSHAKE(client, server);
+	}
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);

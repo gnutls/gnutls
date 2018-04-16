@@ -52,7 +52,8 @@ int main()
 
 static void terminate(void);
 
-/* This program tests client and server initiated rehandshake.
+/* This program tests client and server initiated rehandshake
+ * behavior when they are refused by the peer.
  */
 
 static void server_log_func(int level, const char *str)
@@ -395,7 +396,7 @@ void doit(void)
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-//	start(0);
+	start(0);
 	start(1);
 }
 
