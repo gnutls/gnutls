@@ -156,6 +156,9 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 	if (again == 0) {
 		if (session->internals.hsk_flags & HSK_PSK_SELECTED)
 			return 0;
+		if (session->security_parameters.entity == GNUTLS_SERVER &&
+		    session->internals.resumed)
+			return 0;
 
 		if (session->security_parameters.entity == GNUTLS_SERVER)
 			server = 1;

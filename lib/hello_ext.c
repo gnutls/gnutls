@@ -75,9 +75,7 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 #ifdef ENABLE_HEARTBEAT
 	[GNUTLS_EXTENSION_HEARTBEAT] = &ext_mod_heartbeat,
 #endif
-#ifdef ENABLE_SESSION_TICKETS
 	[GNUTLS_EXTENSION_SESSION_TICKET] = &ext_mod_session_ticket,
-#endif
 	[GNUTLS_EXTENSION_SUPPORTED_ECC] = &ext_mod_supported_ecc,
 	[GNUTLS_EXTENSION_SUPPORTED_ECC_PF] = &ext_mod_supported_ecc_pf,
 	[GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS] = &ext_mod_sig,

@@ -230,17 +230,7 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 gnutls_credentials_type_t
 gnutls_auth_server_get_type(gnutls_session_t session)
 {
-	gnutls_kx_algorithm_t kx;
-
-	if (!session->security_parameters.cs) {
-		gnutls_assert();
-		return 0;
-	}
-
-	kx = gnutls_kx_get(session);
-
-	return
-	    _gnutls_map_kx_get_cred(kx, 1);
+	return session->security_parameters.server_auth_type;
 }
 
 /**
@@ -257,17 +247,7 @@ gnutls_auth_server_get_type(gnutls_session_t session)
 gnutls_credentials_type_t
 gnutls_auth_client_get_type(gnutls_session_t session)
 {
-	gnutls_kx_algorithm_t kx;
-
-	if (!session->security_parameters.cs) {
-		gnutls_assert();
-		return 0;
-	}
-
-	kx = gnutls_kx_get(session);
-
-	return
-	    _gnutls_map_kx_get_cred(kx, 0);
+	return session->security_parameters.client_auth_type;
 }
 
 

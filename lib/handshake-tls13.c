@@ -54,7 +54,7 @@
 #include "tls13/certificate.h"
 #include "tls13/finished.h"
 #include "tls13/key_update.h"
-#include "tls13/session_ticket.h"
+#include "ext/pre_shared_key.h"
 
 static int generate_hs_traffic_keys(gnutls_session_t session);
 static int generate_ap_traffic_keys(gnutls_session_t session);
@@ -158,6 +158,9 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 
 	SAVE_TRANSCRIPT;
 
+	if (session->internals.resumed != RESUME_FALSE)
+		_gnutls_set_resumed_parameters(session);
+
 	return 0;
 }
 
@@ -189,6 +192,14 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 				 session->key.proto.tls13.ap_expkey,
 				 session->security_parameters.prf->output_size);
 
+	ret = _tls13_derive_secret(session, RMS_MASTER_LABEL, sizeof(RMS_MASTER_LABEL)-1,
+				   session->internals.handshake_hash_buffer.data,
+				   session->internals.handshake_hash_buffer_client_finished_len,
+				   session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.ap_rms);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	_gnutls_epoch_bump(session);
 	ret = _gnutls_epoch_dup(session);
 	if (ret < 0)
@@ -210,9 +221,11 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	if ((session->security_parameters.entity == GNUTLS_CLIENT &&
-	    !(session->internals.hsk_flags & HSK_KEY_SHARE_RECEIVED)) ||
+	      (!(session->internals.hsk_flags & HSK_KEY_SHARE_RECEIVED) ||
+	        (!(session->internals.hsk_flags & HSK_PSK_KE_MODE_DHE_PSK) &&
+	           session->internals.resumed != RESUME_FALSE))) ||
 	    (session->security_parameters.entity == GNUTLS_SERVER &&
-	    !(session->internals.hsk_flags & HSK_KEY_SHARE_SENT))) {
+	      !(session->internals.hsk_flags & HSK_KEY_SHARE_SENT))) {
 
 		if ((session->internals.hsk_flags & HSK_PSK_SELECTED) &&
 		    (session->internals.hsk_flags & HSK_PSK_KE_MODE_PSK)) {
@@ -225,7 +238,7 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 		unsigned digest_size;
 
 		if (unlikely(session->security_parameters.prf == NULL))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		digest_size = session->security_parameters.prf->output_size;
 		memset(digest, 0, digest_size);
@@ -237,7 +250,7 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 		}
 	} else {
 		if (unlikely(session->key.key.size == 0))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		ret = _tls13_update_secret(session, session->key.key.data, session->key.key.size);
 		if (ret < 0) {
@@ -362,6 +375,11 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		    generate_ap_traffic_keys(session);
 		STATE = STATE111;
 		IMED_RET("generate app keys", ret, 0);
+		/* fall through */
+	case STATE112:
+		ret = _gnutls13_send_session_ticket(session, AGAIN(STATE112));
+		STATE = STATE112;
+		IMED_RET("send session ticket", ret, 0);
 
 		STATE = STATE0;
 		break;
@@ -374,6 +392,9 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 	session->internals.initial_negotiation_completed = 1;
 
 	SAVE_TRANSCRIPT;
+
+	if (session->internals.resumed != RESUME_FALSE)
+		_gnutls_set_resumed_parameters(session);
 
 	return 0;
 }
@@ -440,6 +461,13 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 			ret = _gnutls13_recv_session_ticket(session, buf);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
+
+			memcpy(session->internals.tls13_ticket.resumption_master_secret,
+			       session->key.proto.tls13.ap_rms,
+			       session->key.proto.tls13.temp_secret_size);
+
+			session->internals.tls13_ticket.prf = session->security_parameters.prf;
+			session->internals.hsk_flags |= HSK_TICKET_RECEIVED;
 			break;
 		default:
 			gnutls_assert();

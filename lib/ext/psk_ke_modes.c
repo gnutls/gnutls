@@ -28,26 +28,26 @@
 #define PSK_KE 0
 #define PSK_DHE_KE 1
 
+/* Relevant to client only */
 static bool
 psk_ke_modes_is_required(gnutls_session_t session)
 {
 	gnutls_psk_client_credentials_t cred;
 
+	if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
+	    session->internals.tls13_ticket.ticket.data != NULL)
+		return 1;
+
 	if (session->internals.priorities->have_psk) {
 		cred = (gnutls_psk_client_credentials_t)
 				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
-		if (cred && _gnutls_have_psk_credentials(cred))
+		if (cred && _gnutls_have_psk_credentials(cred, session))
 			return 1;
 	}
 
 	return 0;
 }
 
-/*
- * We only support ECDHE-authenticated PSKs.
- * The client just sends a "psk_key_exchange_modes" extension
- * with the value one.
- */
 static int
 psk_ke_modes_send_params(gnutls_session_t session,
 			 gnutls_buffer_t extdata)
@@ -94,6 +94,17 @@ psk_ke_modes_send_params(gnutls_session_t session,
 			break;
 	}
 
+	/* For session resumption we need to send at least one */
+	if (pos == 0) {
+		if (session->internals.flags & GNUTLS_NO_TICKETS)
+			return 0;
+
+		data[pos++] = PSK_DHE_KE;
+		data[pos++] = PSK_KE;
+		session->internals.hsk_flags |= HSK_PSK_KE_MODE_DHE_PSK;
+		session->internals.hsk_flags |= HSK_PSK_KE_MODE_PSK;
+	}
+
 	ret = _gnutls_buffer_append_data_prefix(extdata, 8, data, pos);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -137,7 +148,7 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	}
 
 	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(session, GNUTLS_CRD_PSK);
-	if (cred == NULL) {
+	if (cred == NULL && (session->internals.flags & GNUTLS_NO_TICKETS)) {
 		session->internals.hsk_flags |= HSK_PSK_KE_MODE_INVALID;
 		return gnutls_assert_val(0);
 	}
@@ -158,8 +169,12 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 			break;
 	}
 
-	if (session->internals.priorities->groups.size == 0 && psk_pos == MAX_POS)
-		return gnutls_assert_val(0);
+	if (psk_pos == MAX_POS && dhpsk_pos == MAX_POS) {
+		if (!(session->internals.flags & GNUTLS_NO_TICKETS))
+			dhpsk_pos = 0;
+		else if (session->internals.priorities->groups.size == 0)
+			return gnutls_assert_val(0);
+	}
 
 	for (i=0;i<ke_modes_len;i++) {
 		DECR_LEN(len, 1);
@@ -188,10 +203,11 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 
 	if ((session->internals.hsk_flags & HSK_PSK_KE_MODE_PSK) ||
 	    (session->internals.hsk_flags & HSK_PSK_KE_MODE_DHE_PSK)) {
+
 		return 0;
 	} else {
 		session->internals.hsk_flags |= HSK_PSK_KE_MODE_INVALID;
-		return 0;
+		return gnutls_assert_val(0);
 	}
 }
 

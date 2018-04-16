@@ -44,8 +44,6 @@
 #define MAC_ALGO GNUTLS_MAC_SHA1
 #define MAC_SIZE 20 /* HMAC-SHA1 */
 
-#ifdef ENABLE_SESSION_TICKETS
-
 static int session_ticket_recv_params(gnutls_session_t session,
 				      const uint8_t * data,
 				      size_t data_size);
@@ -71,8 +69,6 @@ const hello_ext_entry_st ext_mod_session_ticket = {
 	.deinit_func = session_ticket_deinit_data,
 	.cannot_be_overriden = 1
 };
-
-#endif
 
 #define NAME_POS (0)
 #define KEY_POS (TICKET_KEY_NAME_SIZE)
@@ -358,8 +354,6 @@ cleanup:
 	return ret;
 }
 
-#ifdef ENABLE_SESSION_TICKETS
-
 static int
 unpack_session(gnutls_session_t session, const gnutls_datum_t *state)
 {
@@ -643,6 +637,9 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 		if (!session->internals.session_ticket_renew)
 			return 0;
 
+		_gnutls_handshake_log
+		    ("HSK[%p]: sending session ticket\n", session);
+
 		/* XXX: Temporarily set write algorithms to be used.
 		   _gnutls_write_connection_state_init() does this job, but it also
 		   triggers encryption, while NewSessionTicket should not be
@@ -700,7 +697,7 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 
 		data_size = p - data;
 
-		session->internals.ticket_sent = 1;
+		session->internals.hsk_flags |= HSK_TLS12_TICKET_SENT;
 	}
 	return _gnutls_send_handshake(session, data_size ? bufel : NULL,
 				      GNUTLS_HANDSHAKE_NEW_SESSION_TICKET);
@@ -792,6 +789,10 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 	}
 	ret = 0;
 
+	_gnutls_handshake_log
+		    ("HSK[%p]: received session ticket\n", session);
+	session->internals.hsk_flags |= HSK_TICKET_RECEIVED;
+
 	_gnutls_hello_ext_set_priv(session,
 			GNUTLS_EXTENSION_SESSION_TICKET,
 			epriv);
@@ -801,5 +802,3 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 
 	return ret;
 }
-
-#endif

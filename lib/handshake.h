@@ -138,6 +138,7 @@ int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certific
 #define APPLICATION_SERVER_TRAFFIC_LABEL "s ap traffic"
 #define APPLICATION_TRAFFIC_UPDATE "traffic upd"
 #define EXPORTER_MASTER_LABEL "exp master"
+#define RMS_MASTER_LABEL "res master"
 #define EXPORTER_LABEL "exp master"
 #define RES_LABEL "res master"
 

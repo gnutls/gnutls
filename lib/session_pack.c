@@ -44,6 +44,7 @@
 #include <algorithms.h>
 #include <state.h>
 #include <db.h>
+#include "tls13/session_ticket.h"
 
 static int pack_certificate_auth_info(gnutls_session_t,
 				      gnutls_buffer_st * packed_session);
@@ -69,6 +70,10 @@ static int unpack_security_parameters(gnutls_session_t session,
 				      gnutls_buffer_st * packed_session);
 static int pack_security_parameters(gnutls_session_t session,
 				    gnutls_buffer_st * packed_session);
+static int tls13_unpack_security_parameters(gnutls_session_t session,
+					    gnutls_buffer_st * packed_session);
+static int tls13_pack_security_parameters(gnutls_session_t session,
+					  gnutls_buffer_st * packed_session);
 
 
 /* Since auth_info structures contain malloced data, this function
@@ -148,6 +153,15 @@ _gnutls_session_pack(gnutls_session_t session,
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
+	}
+
+
+	if (session->security_parameters.pversion->tls13_sem) {
+		ret = tls13_pack_security_parameters(session, &sb);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
 	}
 
 	ret = _gnutls_hello_ext_pack(session, &sb);
@@ -256,6 +270,15 @@ _gnutls_session_unpack(gnutls_session_t session,
 		goto error;
 	}
 
+	if (session->internals.resumed_security_parameters.pversion->tls13_sem) {
+		/* 'prf' will not be NULL at this point, else unpack_security_parameters() would have failed */
+		ret = tls13_unpack_security_parameters(session, &sb);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
 	ret = _gnutls_hello_ext_unpack(session, &sb);
 	if (ret < 0) {
 		gnutls_assert();
@@ -270,7 +293,107 @@ _gnutls_session_unpack(gnutls_session_t session,
 	return ret;
 }
 
+/*
+ * If we're using TLS 1.3 semantics, we might have TLS 1.3-specific data.
+ * Format:
+ *      4 bytes the total length
+ *      4 bytes the ticket lifetime
+ *      4 bytes the ticket age add value
+ *      1 byte the ticket nonce length
+ *      x bytes the ticket nonce
+ *      4 bytes the ticket length
+ *      x bytes the ticket
+ *      1 bytes the resumption master secret length
+ *      x bytes the resumption master secret
+ *
+ * WE DON'T STORE NewSessionTicket EXTENSIONS, as we don't support them yet.
+ *
+ * We only store that info if we received a TLS 1.3 NewSessionTicket at some point.
+ * If we didn't receive any NST then we cannot resume a TLS 1.3 session and hence
+ * its nonsense to store all that info.
+ */
+static int
+tls13_pack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
+{
+	int ret = 0;
+	uint32_t length = 0;
+	size_t length_pos;
+	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
 
+	length_pos = ps->length;
+	BUFFER_APPEND_NUM(ps, 0);
+
+	if (ticket->ticket.data != NULL) {
+		BUFFER_APPEND_NUM(ps, ticket->timestamp);
+		length += 4;
+		BUFFER_APPEND_NUM(ps, ticket->lifetime);
+		length += 4;
+		BUFFER_APPEND_NUM(ps, ticket->age_add);
+		length += 4;
+		BUFFER_APPEND_PFX1(ps,
+				   ticket->nonce,
+				   ticket->nonce_size);
+		length += (1 + ticket->nonce_size);
+		BUFFER_APPEND_PFX4(ps,
+				   ticket->ticket.data,
+				   ticket->ticket.size);
+		length += (4 + ticket->ticket.size);
+		BUFFER_APPEND_PFX1(ps,
+				   ticket->resumption_master_secret,
+				   ticket->prf->output_size);
+		length += (1 + ticket->prf->output_size);
+
+		/* Overwrite the length field */
+		_gnutls_write_uint32(length, ps->data + length_pos);
+	}
+
+	return ret;
+}
+
+static int
+tls13_unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
+{
+	uint32_t ttl_len;
+	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
+	gnutls_datum_t t;
+	int ret = 0;
+
+	BUFFER_POP_NUM(ps, ttl_len);
+
+	if (ttl_len > 0) {
+		BUFFER_POP_NUM(ps, ticket->timestamp);
+		BUFFER_POP_NUM(ps, ticket->lifetime);
+		BUFFER_POP_NUM(ps, ticket->age_add);
+
+		ret = _gnutls_buffer_pop_datum_prefix8(ps, &t);
+		if (ret < 0 || t.size > sizeof(ticket->nonce)) {
+			    ret = GNUTLS_E_PARSING_ERROR;
+			    gnutls_assert();
+			    goto error;
+		}
+		ticket->nonce_size = t.size;
+		memcpy(ticket->nonce, t.data, t.size);
+
+		BUFFER_POP_DATUM(ps, &ticket->ticket);
+
+		ret = _gnutls_buffer_pop_datum_prefix8(ps, &t);
+		if (ret < 0 || t.size > sizeof(ticket->resumption_master_secret)) {
+			    ret = GNUTLS_E_PARSING_ERROR;
+			    gnutls_assert();
+			    goto error;
+		}
+		memcpy(ticket->resumption_master_secret, t.data, t.size);
+
+		if (unlikely(session->internals.resumed_security_parameters.prf == NULL ||
+		    session->internals.resumed_security_parameters.prf->output_size != t.size))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		ticket->prf = session->internals.resumed_security_parameters.prf;
+	}
+
+error:
+	return ret;
+}
 
 /* Format: 
  *      1 byte the credentials type
@@ -740,10 +863,13 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
  *      2 bytes the cipher suite
  *      4 bytes the PRF ID
  *
- *      48 bytes the master secret
+ *      1 byte the size of the master secret
+ *        master secret (not in tls1.3)
  *
- *      32 bytes the client random
- *      32 bytes the server random
+ *      1 byte the size of client random
+ *        the client random (not in tls1.3)
+ *      1 byte the size of server random
+ *        the server random (not in tls1.3)
  *
  *      1 byte the session ID size
  *      x bytes the session ID (32 bytes max)
@@ -788,12 +914,19 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_APPEND_NUM(ps, session->security_parameters.cert_type);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.pversion->id);
 
-	BUFFER_APPEND(ps, session->security_parameters.master_secret,
-		      GNUTLS_MASTER_SIZE);
-	BUFFER_APPEND(ps, session->security_parameters.client_random,
-		      GNUTLS_RANDOM_SIZE);
-	BUFFER_APPEND(ps, session->security_parameters.server_random,
-		      GNUTLS_RANDOM_SIZE);
+	/* if we are under TLS 1.3 do not pack keys - they are not necessary */
+	if (session->security_parameters.pversion->tls13_sem) {
+		BUFFER_APPEND_PFX1(ps, NULL, 0);
+		BUFFER_APPEND_PFX1(ps, NULL, 0);
+		BUFFER_APPEND_PFX1(ps, NULL, 0);
+	} else {
+		BUFFER_APPEND_PFX1(ps, session->security_parameters.master_secret,
+			      GNUTLS_MASTER_SIZE);
+		BUFFER_APPEND_PFX1(ps, session->security_parameters.client_random,
+			      GNUTLS_RANDOM_SIZE);
+		BUFFER_APPEND_PFX1(ps, session->security_parameters.server_random,
+			      GNUTLS_RANDOM_SIZE);
+	}
 
 	BUFFER_APPEND(ps, &session->security_parameters.session_id_size,
 		      1);
@@ -824,6 +957,11 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_APPEND_NUM(ps,
 			  session->security_parameters.etm);
 
+	BUFFER_APPEND_NUM(ps,
+			  session->security_parameters.client_auth_type);
+	BUFFER_APPEND_NUM(ps,
+			  session->security_parameters.server_auth_type);
+
 	_gnutls_write_uint32(ps->length - cur_size,
 			     ps->data + size_offset);
 
@@ -836,6 +974,7 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	size_t pack_size;
 	int ret;
 	unsigned version;
+	gnutls_datum_t t;
 	time_t timestamp;
 	uint8_t cs[2];
 
@@ -876,16 +1015,36 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	    NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	BUFFER_POP(ps,
-		   session->internals.resumed_security_parameters.
-		   master_secret, GNUTLS_MASTER_SIZE);
+	/* master secret */
+	ret = _gnutls_buffer_pop_datum_prefix8(ps, &t);
+	if (ret < 0) {
+		ret = GNUTLS_E_PARSING_ERROR;
+		gnutls_assert();
+		goto error;
+	}
+	if (t.size == GNUTLS_MASTER_SIZE)
+		memcpy(session->internals.resumed_security_parameters.master_secret, t.data, t.size);
 
-	BUFFER_POP(ps,
-		   session->internals.resumed_security_parameters.
-		   client_random, GNUTLS_RANDOM_SIZE);
-	BUFFER_POP(ps,
-		   session->internals.resumed_security_parameters.
-		   server_random, GNUTLS_RANDOM_SIZE);
+	/* client random */
+	ret = _gnutls_buffer_pop_datum_prefix8(ps, &t);
+	if (ret < 0) {
+		ret = GNUTLS_E_PARSING_ERROR;
+		gnutls_assert();
+		goto error;
+	}
+	if (t.size == GNUTLS_RANDOM_SIZE)
+		memcpy(session->internals.resumed_security_parameters.client_random, t.data, t.size);
+
+	/* server random */
+	ret = _gnutls_buffer_pop_datum_prefix8(ps, &t);
+	if (ret < 0) {
+		ret = GNUTLS_E_PARSING_ERROR;
+		gnutls_assert();
+		goto error;
+	}
+	if (t.size == GNUTLS_RANDOM_SIZE)
+		memcpy(session->internals.resumed_security_parameters.server_random, t.data, t.size);
+
 	BUFFER_POP(ps,
 		   &session->internals.resumed_security_parameters.
 		   session_id_size, 1);
@@ -921,6 +1080,13 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       etm);
+
+	BUFFER_POP_NUM(ps,
+		       session->internals.resumed_security_parameters.
+		       client_auth_type);
+	BUFFER_POP_NUM(ps,
+		       session->internals.resumed_security_parameters.
+		       server_auth_type);
 
 	if (session->internals.resumed_security_parameters.
 	    max_record_recv_size == 0

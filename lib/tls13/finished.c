@@ -30,7 +30,6 @@
 
 int _gnutls13_compute_finished(const mac_entry_st *prf,
 		const uint8_t *base_key,
-		unsigned hash_size,
 		gnutls_buffer_st *handshake_hash_buffer,
 		void *out)
 {
@@ -42,7 +41,7 @@ int _gnutls13_compute_finished(const mac_entry_st *prf,
 			"finished", 8,
 			NULL, 0,
 			base_key,
-			hash_size, fkey);
+			prf->output_size, fkey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -54,8 +53,8 @@ int _gnutls13_compute_finished(const mac_entry_st *prf,
 		return gnutls_assert_val(ret);
 
 	ret = gnutls_hmac_fast(prf->id,
-			       fkey, hash_size,
-			       ts_hash, hash_size,
+			       fkey, prf->output_size,
+			       ts_hash, prf->output_size,
 			       out);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -82,7 +81,7 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 		base_key = session->key.proto.tls13.hs_ckey;
 
 	ret = _gnutls13_compute_finished(session->security_parameters.prf,
-			base_key, hash_size,
+			base_key,
 			&session->internals.handshake_hash_buffer,
 			verifier);
 	if (ret < 0) {
@@ -140,7 +139,7 @@ int _gnutls13_send_finished(gnutls_session_t session, unsigned again)
 			base_key = session->key.proto.tls13.hs_skey;
 
 		ret = _gnutls13_compute_finished(session->security_parameters.prf,
-				base_key, hash_size,
+				base_key,
 				&session->internals.handshake_hash_buffer,
 				verifier);
 		if (ret < 0) {

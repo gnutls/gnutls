@@ -97,7 +97,7 @@ minimal.Fedora.x86_64:
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe
-    --disable-ocsp --disable-session-tickets --disable-non-suiteb-curves --with-included-unistring
+    --disable-ocsp --disable-non-suiteb-curves --with-included-unistring
     --disable-nls --disable-libdane --without-p11-kit --without-tpm
     --disable-ssl3-support --disable-ssl2-support --disable-doc --enable-openssl-compatibility
     --disable-gcc-warnings
