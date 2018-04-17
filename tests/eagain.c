@@ -35,6 +35,9 @@
 #include "cert-common.h"
 #include "cmocka-common.h"
 
+/* This tests operation under non-blocking mode in TLS1.2/TLS1.3
+ * as well as operation under TLS1.2 re-handshake.
+ */
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "<%d>| %s", level, str);
@@ -83,7 +86,7 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 	gnutls_transport_set_ptr(server, server);
 
 	/* Init client */
-	
+
 	ret = gnutls_certificate_allocate_credentials(&clientx509cred);
 	assert_return_code(ret, 0);
 
@@ -103,7 +106,7 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 
 	HANDSHAKE(client, server);
 
-	if (rehsk == 1) {
+	if (rehsk == 1 || rehsk == 3) {
 		ssize_t n;
 		char b[1];
 
@@ -116,6 +119,22 @@ static void async_handshake(void **glob_state, const char *prio, unsigned rehsk)
 		} while(n == GNUTLS_E_AGAIN);
 
 		assert_int_equal(n, GNUTLS_E_REHANDSHAKE);
+
+		if (rehsk == 3) {
+			/* client sends app data and the server ignores them */
+			do {
+				cret = gnutls_record_send(client, "x", 1);
+			} while (cret == GNUTLS_E_AGAIN);
+
+			do {
+				sret = gnutls_handshake(server);
+			} while (sret == GNUTLS_E_AGAIN);
+			assert_int_equal(sret, GNUTLS_E_GOT_APPLICATION_DATA);
+
+			do {
+				n = gnutls_record_recv(server, buffer, sizeof(buffer));
+			} while(n == GNUTLS_E_AGAIN);
+		}
 
 		HANDSHAKE(client, server);
 	} else if (rehsk == 2) {
@@ -152,6 +171,11 @@ static void tls12_async_rehandshake_server(void **glob_state)
 	async_handshake(glob_state, "NORMAL:-VERS-ALL:+VERS-TLS1.2", 2);
 }
 
+static void tls12_async_rehandshake_server_appdata(void **glob_state)
+{
+	async_handshake(glob_state, "NORMAL:-VERS-ALL:+VERS-TLS1.2", 3);
+}
+
 static void tls13_async_handshake(void **glob_state)
 {
 	async_handshake(glob_state, "NORMAL:-VERS-ALL:+VERS-TLS1.3", 0);
@@ -163,6 +187,7 @@ int main(void)
 		cmocka_unit_test(tls12_async_handshake),
 		cmocka_unit_test(tls12_async_rehandshake_client),
 		cmocka_unit_test(tls12_async_rehandshake_server),
+		cmocka_unit_test(tls12_async_rehandshake_server_appdata),
 		cmocka_unit_test(tls13_async_handshake),
 	};
 	return cmocka_run_group_tests(tests, NULL, NULL);
