@@ -256,6 +256,14 @@ tls12_resume_x509_CFLAGS = -DUSE_X509 -DTLS12
 tls12_resume_x509_SOURCES = resume.c
 tls12_resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
 
+tls13_resume_psk_CFLAGS = -DUSE_PSK -DTLS13
+tls13_resume_psk_SOURCES = resume.c
+tls13_resume_psk_LDADD = $(LDADD) ../gl/libgnu.la
+
+tls13_resume_x509_CFLAGS = -DUSE_X509 -DTLS13
+tls13_resume_x509_SOURCES = resume.c
+tls13_resume_x509_LDADD = $(LDADD) ../gl/libgnu.la
+
 dtls_repro_20170915_SOURCES = dtls-repro-20170915.c common-cert-key-exchange.c cert-repro-20170915.h
 dtls12_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls12-cert-key-exchange.c common-cert-key-exchange.h
 dtls10_cert_key_exchange_SOURCES = common-cert-key-exchange.c dtls10-cert-key-exchange.c common-cert-key-exchange.h
@@ -357,7 +365,8 @@ endif
 
 if HAVE_FORK
 ctests += x509self x509dn anonself pskself dhepskself	\
-	setcredcrash tls12-resume-x509 tls12-resume-psk tls12-resume-anon
+	setcredcrash tls12-resume-x509 tls12-resume-psk tls12-resume-anon \
+	tls13-resume-x509 tls13-resume-psk
 endif
 
 gc_CPPFLAGS = $(AM_CPPFLAGS) \

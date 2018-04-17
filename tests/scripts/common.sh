@@ -195,3 +195,14 @@ else
 LOCKFILE="lockfile global.lock"
 UNLOCKFILE="rm -f global.lock"
 fi
+
+create_testdir() {
+	local PREFIX=$1
+	d=`mktemp -d -t ${PREFIX}.XXXXXX`
+	if test $? -ne 0; then
+		d=${TMPDIR}/${PREFIX}.$$
+		mkdir "$d" || exit 1
+	fi
+	trap "test -e \"$d\" && rm -rf \"$d\"" 1 15 2
+	echo "$d"
+}

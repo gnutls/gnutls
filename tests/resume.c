@@ -83,6 +83,7 @@ struct params_res {
 pid_t child;
 
 struct params_res resume_tests[] = {
+#ifndef TLS13
 	{.desc = "try to resume from db",
 	 .enable_db = 1,
 	 .enable_session_ticket_server = 0,
@@ -114,6 +115,7 @@ struct params_res resume_tests[] = {
 	 .expect_resume = 0,
 	 .first_no_ext_master = 1,
 	 .second_no_ext_master = 0},
+#endif
 	{.desc = "try to resume from session ticket", 
 	 .enable_db = 0, 
 	 .enable_session_ticket_server = 1,
@@ -125,6 +127,7 @@ struct params_res resume_tests[] = {
 	 .enable_session_ticket_client = 1,
 	 .try_resumed_data = 1,
 	 .expect_resume = 1},
+#ifndef TLS13
 	{.desc = "try to resume from session ticket (ext master secret -> none)", 
 	 .enable_db = 0, 
 	 .enable_session_ticket_server = 1,
@@ -169,6 +172,7 @@ struct params_res resume_tests[] = {
 	 .enable_db = 1,
 	 .try_sni = 1,
 	 .expect_resume = 1},
+#endif
 	{.desc = "try to resume with ticket and same SNI",
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
@@ -287,6 +291,9 @@ static void verify_group(gnutls_session_t session, gnutls_group_t *group, unsign
 
 #ifdef TLS12
 # define VERS_STR "+VERS-TLS1.2"
+#endif
+#ifdef TLS13
+# define VERS_STR "-VERS-ALL:+VERS-TLS1.3"
 #endif
 
 static void client(int sds[], struct params_res *params)
@@ -454,7 +461,9 @@ static void client(int sds[], struct params_res *params)
 
 		gnutls_record_send(session, MSG, strlen(MSG));
 
-		ret = gnutls_record_recv(session, buffer, MAX_BUF);
+		do {
+			ret = gnutls_record_recv(session, buffer, MAX_BUF);
+		} while (ret == GNUTLS_E_AGAIN);
 		if (ret == 0) {
 			if (debug)
 				success
