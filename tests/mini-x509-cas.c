@@ -47,7 +47,6 @@ static void tls_log_func(int level, const char *str)
 static
 void start(const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	const char *ca_file;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;

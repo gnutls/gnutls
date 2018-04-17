@@ -182,7 +182,6 @@ const gnutls_datum_t server_key = { server_key_pem,
 static
 void start(const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;

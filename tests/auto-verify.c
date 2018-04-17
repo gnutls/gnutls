@@ -183,7 +183,6 @@ const gnutls_datum_t server_key = { server_key_pem,
 static
 void test_failure(const char *name, const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -298,19 +297,11 @@ void test_failure(const char *name, const char *prio)
 
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			fprintf(stderr, "%s: Self-test successful", __func__);
-		else
-			fprintf(stderr, "%s: Self-test failed", __func__);
-	}
 }
 
 static
 void test_success1(const char *name, const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -425,19 +416,11 @@ void test_success1(const char *name, const char *prio)
 
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			fprintf(stderr, "%s: Self-test successful", __func__);
-		else
-			fprintf(stderr, "%s: Self-test failed", __func__);
-	}
 }
 
 static
 void test_success2(const char *name, const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -542,13 +525,6 @@ void test_success2(const char *name, const char *prio)
 
 	gnutls_certificate_free_credentials(serverx509cred);
 	gnutls_certificate_free_credentials(clientx509cred);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			fprintf(stderr, "%s: Self-test successful", __func__);
-		else
-			fprintf(stderr, "%s: Self-test failed", __func__);
-	}
 }
 
 void doit(void)

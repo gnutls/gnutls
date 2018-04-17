@@ -53,7 +53,6 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	      int serv_err,
 	      int cli_err)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_session_t server;
@@ -178,13 +177,6 @@ _test_cli_serv(gnutls_certificate_credentials_t server_cred,
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
-
 	return ret;
 }
 
@@ -203,7 +195,6 @@ test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
 	      gnutls_anon_client_credentials_t client_cred,
 	      const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_session_t server;
@@ -248,13 +239,6 @@ test_cli_serv_anon(gnutls_anon_server_credentials_t server_cred,
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
-
 	return ret;
 }
 
@@ -263,7 +247,6 @@ test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
 	      gnutls_psk_client_credentials_t client_cred,
 	      const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_session_t server;
@@ -307,13 +290,6 @@ test_cli_serv_psk(gnutls_psk_server_credentials_t server_cred,
 
 	gnutls_deinit(client);
 	gnutls_deinit(server);
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
 
 	return ret;
 }

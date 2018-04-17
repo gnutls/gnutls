@@ -173,7 +173,6 @@ server_cert_callback(gnutls_session_t session,
 
 static void start(const char *prio)
 {
-	int exit_code = EXIT_SUCCESS;
 	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
@@ -415,13 +414,6 @@ static void start(const char *prio)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_global_deinit();
-
-	if (debug > 0) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
 
 	reset_buffers();
 }

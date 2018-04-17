@@ -49,7 +49,6 @@ static void tls_log_func(int level, const char *str)
 
 static void try(unsigned onclient)
 {
-	int exit_code = EXIT_SUCCESS;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_session_t server;
@@ -139,13 +138,6 @@ static void try(unsigned onclient)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_global_deinit();
-
-	if (debug) {
-		if (exit_code == 0)
-			puts("Self-test successful");
-		else
-			puts("Self-test failed");
-	}
 }
 
 void doit(void)
