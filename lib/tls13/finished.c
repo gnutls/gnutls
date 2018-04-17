@@ -96,8 +96,11 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 
 	_gnutls_handshake_log("HSK[%p]: parsing finished\n", session);
 
-	if (buf.length != hash_size)
-		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+	if (buf.length != hash_size) {
+		gnutls_assert();
+		ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		goto cleanup;
+	}
 
 
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
@@ -105,7 +108,8 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 #else
 	if (safe_memcmp(verifier, buf.data, buf.length) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
+		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
+		goto cleanup;
 	}
 #endif
 
