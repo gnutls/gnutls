@@ -546,7 +546,7 @@ int _gnutls_epoch_dup(gnutls_session_t session)
 
 	ret = _gnutls_epoch_get(session, EPOCH_NEXT, &next);
 	if (ret < 0) {
-		ret = _gnutls_epoch_new(session, 0, &next);
+		ret = _gnutls_epoch_setup_next(session, 0, &next);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -817,13 +817,14 @@ _gnutls_epoch_get(gnutls_session_t session, unsigned int epoch_rel,
 	return 0;
 }
 
+/* Ensures that the next epoch is setup. When an epoch will null ciphers
+ * is to be setup, call with @null_epoch set to true. In that case
+ * the epoch is fully initialized after call.
+ */
 int
-_gnutls_epoch_new(gnutls_session_t session, unsigned null_epoch, record_parameters_st **newp)
+_gnutls_epoch_setup_next(gnutls_session_t session, unsigned null_epoch, record_parameters_st **newp)
 {
 	record_parameters_st **slot;
-
-	_gnutls_record_log("REC[%p]: Allocating epoch #%u\n", session,
-			   session->security_parameters.epoch_next);
 
 	slot = epoch_get_slot(session, session->security_parameters.epoch_next);
 
@@ -831,8 +832,18 @@ _gnutls_epoch_new(gnutls_session_t session, unsigned null_epoch, record_paramete
 	if (slot == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (*slot != NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (*slot != NULL) { /* already initialized */
+		if (unlikely(null_epoch && !(*slot)->initialized))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		if (unlikely((*slot)->epoch != session->security_parameters.epoch_next))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		goto finish;
+	}
+
+	_gnutls_record_log("REC[%p]: Allocating epoch #%u\n", session,
+			   session->security_parameters.epoch_next);
 
 	*slot = gnutls_calloc(1, sizeof(record_parameters_st));
 	if (*slot == NULL)
@@ -854,6 +865,7 @@ _gnutls_epoch_new(gnutls_session_t session, unsigned null_epoch, record_paramete
 				     UINT64DATA((*slot)->write.
 						sequence_number));
 
+ finish:
 	if (newp != NULL)
 		*newp = *slot;
 
