@@ -1,8 +1,22 @@
 #include <errno.h>
+#include <time.h>
+#include <stdio.h>
 
 #define min(x,y) ((x)<(y)?(x):(y))
 
 extern const char *side;
+
+#ifdef USE_CMOCKA
+# define failure() fail()
+# define client_transfer_failure(r) {fprintf(stderr, "client transfer failure: %s\n", gnutls_strerror(r)); fail();}
+# define server_transfer_failure(r) {fprintf(stderr, "server transfer failure: %s\n", gnutls_strerror(r)); fail();}
+# define switch_side(str)
+#else
+# define failure() fail("Handshake failed\n")
+# define client_transfer_failure(r) fail("client transfer failure: %s\n", gnutls_strerror(r))
+# define server_transfer_failure(r) fail("client transfer failure: %s\n", gnutls_strerror(r))
+# define switch_side(str) side = str
+#endif
 
 #define HANDSHAKE_EXPECT(c, s, clierr, serverr) \
   sret = cret = GNUTLS_E_AGAIN; \
@@ -10,13 +24,13 @@ extern const char *side;
     { \
       if (cret == GNUTLS_E_AGAIN) \
 	{ \
-	  side = "client"; \
+	  switch_side("client"); \
 	  cret = gnutls_handshake (c); \
 	  if (cret == GNUTLS_E_INTERRUPTED) cret = GNUTLS_E_AGAIN; \
 	} \
       if (sret == GNUTLS_E_AGAIN) \
 	{ \
-	  side = "server"; \
+	  switch_side("server"); \
 	  sret = gnutls_handshake (s); \
 	  if (sret == GNUTLS_E_INTERRUPTED) sret = GNUTLS_E_AGAIN; \
 	} \
@@ -26,8 +40,7 @@ extern const char *side;
     { \
       fprintf(stderr, "client[%d]: %s\n", cret, gnutls_strerror(cret)); \
       fprintf(stderr, "server[%d]: %s\n", sret, gnutls_strerror(sret)); \
-      fail("Handshake failed\n"); \
-      exit(1); \
+      failure(); \
     }
 
 #define HANDSHAKE(c, s) \
@@ -44,7 +57,7 @@ extern const char *side;
 	} \
       if (cret < 0 && gnutls_error_is_fatal(cret) == 0) \
 	{ \
-	  side = "client"; \
+	  switch_side("client"); \
 	  cret = gnutls_handshake (c); \
 	} \
       if (sret == GNUTLS_E_LARGE_PACKET) \
@@ -54,7 +67,7 @@ extern const char *side;
 	} \
       if (sret < 0 && gnutls_error_is_fatal(sret) == 0) \
 	{ \
-	  side = "server"; \
+	  switch_side("server"); \
 	  sret = gnutls_handshake (s); \
 	} \
     } \
@@ -63,8 +76,7 @@ extern const char *side;
     { \
       fprintf(stderr, "client: %s\n", gnutls_strerror(cret)); \
       fprintf(stderr, "server: %s\n", gnutls_strerror(sret)); \
-      fail("%s:%d: Handshake failed\n", __func__, __LINE__); \
-      exit(1); \
+      failure(); \
     }
 
 #define HANDSHAKE_DTLS(c, s) \
@@ -75,61 +87,51 @@ extern const char *side;
 
 #define TRANSFER2(c, s, msg, msglen, buf, buflen, retry_send_with_null) { \
   int _ret; \
-  side = "client"; \
+  switch_side("client"); \
   _ret = record_send_loop (c, msg, msglen, retry_send_with_null); \
   \
-  if (_ret < 0) fail ("client send error: %s\n", gnutls_strerror (_ret)); \
+  if (_ret < 0) client_transfer_failure(_ret); \
   \
   do \
     { \
       do \
 	{ \
-	  side = "server"; \
+	  switch_side("server"); \
 	  _ret = gnutls_record_recv (s, buf, buflen); \
 	} \
       while(_ret == GNUTLS_E_AGAIN); \
-      if (_ret == 0) \
-	fail ("server: didn't receive any data\n"); \
-      else if (_ret < 0) \
+      if (_ret <= 0) \
 	{ \
-	  fail ("server: error: %s\n", gnutls_strerror (_ret)); \
+	  server_transfer_failure(_ret); \
 	} \
       else \
 	{ \
 	  transferred += _ret; \
 	} \
-      side = "server"; \
+      switch_side("server"); \
       _ret = record_send_loop (server, msg, msglen, retry_send_with_null); \
-      if (_ret < 0) fail ("server send error: %s\n", gnutls_strerror (_ret)); \
+      if (_ret < 0) server_transfer_failure(_ret); \
       do \
 	{ \
-	  side = "client"; \
+	  switch_side("client"); \
 	  _ret = gnutls_record_recv (client, buf, buflen); \
 	} \
       while(_ret == GNUTLS_E_AGAIN); \
-      if (_ret == 0) \
+      if (_ret <= 0) \
 	{ \
-	  fail ("client: Peer has closed the TLS connection\n"); \
-	} \
-      else if (_ret < 0) \
-	{ \
-	  if (debug) \
-	    fputs ("!", stdout); \
-	  fail ("client: Error: %s\n", gnutls_strerror (_ret)); \
+	  client_transfer_failure(_ret); \
 	} \
       else \
 	{ \
 	  if (msglen != _ret || memcmp (buf, msg, msglen) != 0) \
 	    { \
-	      fail ("client: Transmitted data do not match\n"); \
+	      failure(); \
 	    } \
 	  /* echo back */ \
-	  side = "client"; \
+	  switch_side("client"); \
 	  _ret = record_send_loop (client, buf, msglen, retry_send_with_null); \
-	  if (_ret < 0) fail ("client send error: %s\n", gnutls_strerror (_ret)); \
+	  if (_ret < 0) client_transfer_failure(_ret); \
 	  transferred += _ret; \
-	  if (debug) \
-	    fputs (".", stdout); \
 	} \
     } \
   while (transferred < 70000); \
@@ -137,25 +139,25 @@ extern const char *side;
 
 #define EMPTY_BUF(s, c, buf, buflen) \
     { \
-      side = "client"; int _ret = 0; \
+      switch_side("client"); int _ret = 0; \
       while((_ret == GNUTLS_E_AGAIN && to_server_len > 0) || to_server_len > 0) \
 	{ \
-	  side = "server"; \
+	  switch_side("server"); \
 	  _ret = gnutls_record_recv (s, buf, buflen); \
 	} \
       if (_ret < 0 && _ret !=GNUTLS_E_AGAIN) \
 	{ \
-	  fail ("server: error: %s\n", gnutls_strerror (_ret)); \
+	  server_transfer_failure(_ret); \
 	} \
-      side = "server"; _ret = 0; \
+      switch_side("server"); _ret = 0; \
       while((to_client_len > 0 && _ret == GNUTLS_E_AGAIN) || to_client_len > 0) \
 	{ \
-	  side = "client"; \
+	  switch_side("client"); \
 	  _ret = gnutls_record_recv (client, buf, buflen); \
 	} \
       if (_ret < 0 && _ret !=GNUTLS_E_AGAIN) \
 	{ \
-	  fail ("client: Error: %s\n", gnutls_strerror (_ret)); \
+	  client_transfer_failure(_ret); \
 	} \
     }
 
@@ -169,10 +171,11 @@ static size_t to_server_len = 0;
 static char to_client[64 * 1024];
 static size_t to_client_len = 0;
 
+
 #ifdef RANDOMIZE
 #define RETURN_RND_EAGAIN(session) \
-  static unsigned char rnd = 0; \
-  if (rnd++ % 2 == 0) \
+  unsigned int rnd = time(0); \
+  if (rnd++ % 3 == 0) \
     { \
       gnutls_transport_set_errno (session, EAGAIN); \
       return -1; \

@@ -32,7 +32,7 @@ SUBDIRS += suite
 endif
 
 EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
-	ocsp-common.h \
+	ocsp-common.h cmocka-common.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem hex.h \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
@@ -130,7 +130,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 crq_key_id x509sign-verify sign-verify cve-2009-1415 cve-2009-1416		\
 	 tls10-server-kx-neg tls11-server-kx-neg tls12-server-kx-neg ssl30-server-kx-neg \
 	 tls12-cipher-neg tls11-cipher-neg tls10-cipher-neg ssl30-cipher-neg \
-	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain	tls12-rehandshake-cert-3 \
+	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 tls12-rehandshake-cert-3 \
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	\
 	 tls12-rehandshake-cert rng-fork mini-eagain-dtls resume-dtls \
 	 tls13-rehandshake-cert gnutls_ext_raw_parse \
@@ -201,7 +201,7 @@ endif
 if HAVE_CMOCKA
 CMOCKA_LDADD = $(COMMON_LDADD) $(CMOCKA_LIBS)
 ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna \
-	tls10-prf tls12-prf gnutls_record_overhead
+	tls10-prf tls12-prf gnutls_record_overhead eagain
 
 gnutls_record_overhead_LDADD = $(CMOCKA_LDADD)
 dtls_sliding_window_LDADD = $(CMOCKA_LDADD)
@@ -212,6 +212,7 @@ str_unicode_LDADD = $(CMOCKA_LDADD)
 str_idna_LDADD = $(CMOCKA_LDADD)
 tls10_prf_LDADD = $(CMOCKA_LDADD)
 tls12_prf_LDADD = $(CMOCKA_LDADD)
+eagain_LDADD = $(CMOCKA_LDADD)
 
 gnutls_record_overhead_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
