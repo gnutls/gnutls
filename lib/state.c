@@ -299,7 +299,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	if (*session == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	ret = _gnutls_epoch_new(*session, 1, NULL);
+	ret = _gnutls_epoch_setup_next(*session, 1, NULL);
 	if (ret < 0) {
 		gnutls_free(*session);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);

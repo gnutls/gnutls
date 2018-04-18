@@ -53,7 +53,7 @@ int main()
 
 static void terminate(void);
 
-/* This program tests client and server initiated rehandshake.
+/* This program tests client initiated rehandshake.
  * On the initial handshake a certificate is requested from the
  * client, while on the following up not.
  */
@@ -69,7 +69,7 @@ static void client_log_func(int level, const char *str)
 }
 
 #define MAX_BUF 1024
-#define MAX_REHANDSHAKES 32
+#define MAX_REHANDSHAKES 16
 
 static void client(int fd)
 {
