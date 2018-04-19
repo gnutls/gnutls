@@ -1278,6 +1278,15 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+int _gnutls_alert_send_appropriate (gnutls_session_t session, int err)
+{
+  if (err == _GNUTLS_E_UNRECOGNIZED_NAME)
+    return gnutls_alert_send(session,
+                             GNUTLS_AL_FATAL,
+                             GNUTLS_A_UNRECOGNIZED_NAME);
+  return gnutls_alert_send_appropriate(session, err);
+}
+
 static void retry_handshake(listener_item *j)
 {
 	int r, ret;
@@ -1293,7 +1302,7 @@ static void retry_handshake(listener_item *j)
 		GERR(r);
 
 		do {
-			ret = gnutls_alert_send_appropriate(j->tls_session, r);
+			ret = _gnutls_alert_send_appropriate(j->tls_session, r);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	} else if (r == 0) {
 		if (gnutls_session_is_resumed(j->tls_session) != 0 && verbose != 0)
@@ -1326,7 +1335,7 @@ int r, ret;
 
 	if (r < 0) {
 		do {
-			ret = gnutls_alert_send_appropriate(j->tls_session, r);
+			ret = _gnutls_alert_send_appropriate(j->tls_session, r);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		GERR(r);
 		j->http_state = HTTP_STATE_CLOSING;
