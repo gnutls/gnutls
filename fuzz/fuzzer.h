@@ -22,6 +22,9 @@
 #ifdef __cplusplus
 extern "C"
 #endif
+
+#define VERS_STR "-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0"
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
 
 static void __attribute__((constructor)) init(void)

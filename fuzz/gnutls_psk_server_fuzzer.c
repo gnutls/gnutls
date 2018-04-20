@@ -106,7 +106,7 @@ int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 	res = gnutls_credentials_set(session, GNUTLS_CRD_PSK, pcred);
 	assert(res >= 0);
 
-	res = gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK:+RSA-PSK:+VERS-TLS1.3", NULL);
+	res = gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK:+RSA-PSK:"VERS_STR, NULL);
 	assert(res >= 0);
 
 	memdata.data = data;
