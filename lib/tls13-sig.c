@@ -142,7 +142,7 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	gnutls_datum_t p;
 	int ret;
 	gnutls_buffer_st buf;
-	uint8_t prefix[PREFIX_SIZE];
+	uint8_t tmp[MAX_HASH_SIZE];
 
 	if (unlikely(se == NULL || se->tls13_ok == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
@@ -151,16 +151,19 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	_gnutls_handshake_log
-	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s\n", session, se->name);
+	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n", session, se->name,
+	     session->security_parameters.prf->name);
 
 	_gnutls_buffer_init(&buf);
 
-	memset(prefix, 0x20, sizeof(prefix));
-	ret = _gnutls_buffer_append_data(&buf, prefix, sizeof(prefix));
+	ret = _gnutls_buffer_resize(&buf, PREFIX_SIZE);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	memset(buf.data, 0x20, PREFIX_SIZE);
+	buf.length += PREFIX_SIZE;
 
 	ret = _gnutls_buffer_append_data(&buf, context->data, context->size);
 	if (ret < 0) {
@@ -177,13 +180,13 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	ret = gnutls_hash_fast(session->security_parameters.prf->id,
 			       session->internals.handshake_hash_buffer.data,
 			       session->internals.handshake_hash_buffer.length,
-			       prefix);
+			       tmp);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_buffer_append_data(&buf, prefix, session->security_parameters.prf->output_size);
+	ret = _gnutls_buffer_append_data(&buf, tmp, session->security_parameters.prf->output_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
