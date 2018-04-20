@@ -116,7 +116,7 @@ static gnutls_certificate_credentials_t xcred;
 
 /* prototypes */
 
-static void check_rehandshake(socket_st * socket, int ret);
+static void check_server_cmd(socket_st * socket, int ret);
 static void init_global_tls_stuff(void);
 static int cert_verify_ocsp(gnutls_session_t session);
 
@@ -714,7 +714,7 @@ static int handle_error(socket_st * hd, int err)
 		printf("*** Received alert [%d]: %s\n", alert, str);
 	}
 
-	check_rehandshake(hd, err);
+	check_server_cmd(hd, err);
 
 	return ret;
 }
@@ -801,6 +801,23 @@ static int try_rehandshake(socket_st * hd)
 		return ret;
 	} else {
 		printf("- ReHandshake was completed\n");
+		return 0;
+	}
+}
+
+static int try_rekey(socket_st * hd)
+{
+	int ret;
+
+	do {
+		ret = gnutls_session_key_update(hd->session, GNUTLS_KU_PEER);
+	} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret < 0) {
+		fprintf(stderr, "*** Rekey has failed: %s\n", gnutls_strerror(ret));
+		return ret;
+	} else {
+		printf("- Rekey was completed\n");
 		return 0;
 	}
 }
@@ -962,6 +979,8 @@ int run_inline_command(inline_cmds_st * cmd, socket_st * hd)
 	switch (cmd->cmd_found) {
 	case INLINE_COMMAND_RESUME:
 		return try_resume(hd);
+	case INLINE_COMMAND_REKEY:
+		return try_rekey(hd);
 	case INLINE_COMMAND_RENEGOTIATE:
 		return try_rehandshake(hd);
 	default:
@@ -1462,6 +1481,12 @@ static void cmd_parser(int argc, char **argv)
 	if (disable_extensions)
 		init_flags |= GNUTLS_NO_EXTENSIONS;
 
+	if (HAVE_OPT(SINGLE_KEY_SHARE))
+		init_flags |= GNUTLS_KEY_SHARE_TOP;
+
+	if (HAVE_OPT(POST_HANDSHAKE_AUTH))
+		init_flags |= GNUTLS_POST_HANDSHAKE_AUTH;
+
 	inline_commands = HAVE_OPT(INLINE_COMMANDS);
 	if (HAVE_OPT(INLINE_COMMANDS_PREFIX)) {
 		if (strlen(OPT_ARG(INLINE_COMMANDS_PREFIX)) > 1) {
@@ -1554,23 +1579,35 @@ static void cmd_parser(int argc, char **argv)
 	}
 }
 
-static void check_rehandshake(socket_st * socket, int ret)
+static void check_server_cmd(socket_st * socket, int ret)
 {
-	if (socket->secure && ret == GNUTLS_E_REHANDSHAKE) {
-		/* There is a race condition here. If application
-		 * data is sent after the rehandshake request,
-		 * the server thinks we ignored his request.
-		 * This is a bad design of this client.
-		 */
-		printf("*** Received rehandshake request\n");
-		/* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
+	if (socket->secure) {
+		if (ret == GNUTLS_E_REHANDSHAKE) {
+			/* There is a race condition here. If application
+			 * data is sent after the rehandshake request,
+			 * the server thinks we ignored his request.
+			 * This is a bad design of this client.
+			 */
+			printf("*** Received rehandshake request\n");
+			/* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
 
-		ret = do_handshake(socket);
+			ret = do_handshake(socket);
 
-		if (ret == 0) {
-			printf("*** Rehandshake was performed.\n");
-		} else {
-			printf("*** Rehandshake Failed.\n");
+			if (ret == 0) {
+				printf("*** Rehandshake was performed.\n");
+			} else {
+				printf("*** Rehandshake Failed: %s\n", gnutls_strerror(ret));
+			}
+		} else if (ret == GNUTLS_E_REAUTH_REQUEST) {
+			do {
+				ret = gnutls_reauth(socket->session, 0);
+			} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
+			if (ret == 0) {
+				printf("*** Re-auth was performed.\n");
+			} else {
+				printf("*** Re-auth failed: %s\n", gnutls_strerror(ret));
+			}
 		}
 	}
 }

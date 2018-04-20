@@ -368,6 +368,19 @@ flag = {
 };
 
 flag = {
+    name      = single-key-share;
+    descrip   = "Send a single key share under TLS1.3";
+    doc      = "This option switches the default mode of sending multiple
+key shares, to send a single one (the top one).";
+};
+
+flag = {
+    name      = post-handshake-auth;
+    descrip   = "Enable post-handshake authentication under TLS1.3";
+    doc      = "This option enables post-handshake authentication when under TLS1.3.";
+};
+
+flag = {
     name      = inline-commands;
     descrip   = "Inline commands of the form ^<cmd>^";
     doc       = "Enable inline commands of the form ^<cmd>^. The inline commands are expected to be in a line by themselves. The available commands are: resume and renegotiate.";
