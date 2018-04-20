@@ -152,6 +152,8 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 		else if (data[i] == PSK_KE)
 			cli_psk_pos = i;
 
+		_gnutls_handshake_log("EXT[%p]: PSK KE mode %.2x received\n",
+				      session, (unsigned)data[i]);
 		if (cli_psk_pos != MAX_POS && cli_dhpsk_pos != MAX_POS)
 			break;
 	}

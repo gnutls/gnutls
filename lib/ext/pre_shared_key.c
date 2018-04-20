@@ -30,17 +30,13 @@
 #include <ext/pre_shared_key.h>
 #include <assert.h>
 
-typedef struct {
-	uint16_t selected_identity;
-} psk_ext_st;
-
 static int
 compute_binder_key(const mac_entry_st *prf,
 		const uint8_t *key, size_t keylen,
 		void *out)
 {
 	int ret;
-	char label[] = "ext_binder";
+	char label[] = "ext binder";
 	size_t label_len = sizeof(label) - 1;
 	uint8_t tmp_key[MAX_HASH_SIZE];
 
@@ -100,23 +96,30 @@ compute_psk_binder(unsigned entity,
 		_gnutls_write_uint16(exts_length + binders_length + 2,
 				&handshake_buf.data[extensions_len_pos]);
 	} else {
-		gnutls_buffer_append_data(&handshake_buf,
-				(const void *) client_hello->data,
-				client_hello->size - binders_length - 3);
+		if (unlikely(client_hello->size <= binders_length))
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+		ret = gnutls_buffer_append_data(&handshake_buf,
+						(const void *) client_hello->data,
+						client_hello->size - binders_length);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
 	}
 
 	ret = compute_binder_key(prf,
-			psk->data, psk->size,
-			binder_key);
+				 psk->data, psk->size,
+				 binder_key);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	ret = _gnutls13_compute_finished(prf,
-			binder_key, hash_size,
-			&handshake_buf,
-			out);
+	ret = _gnutls13_compute_finished(prf, binder_key,
+					 hash_size,
+					 &handshake_buf,
+					 out);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -311,7 +314,7 @@ static int server_recv_params(gnutls_session_t session,
 	/* Compute the binder value for this PSK */
 	prf = pskcred->binder_algo;
 	hash_size = prf->output_size;
-	ret = compute_psk_binder(GNUTLS_SERVER, prf, hash_size, hash_size, 0, 0,
+	ret = compute_psk_binder(GNUTLS_SERVER, prf, psk_parser.binder_len+2, hash_size, 0, 0,
 				 &key, &full_client_hello,
 				 binder_value);
 	if (ret < 0) {
@@ -353,6 +356,7 @@ static int server_recv_params(gnutls_session_t session,
 
 		memcpy(info->username, psk.identity.data, psk.identity.size);
 		info->username[psk.identity.size] = 0;
+		_gnutls_handshake_log("EXT[%p]: Selected PSK identity: %s\n", session, info->username);
 	}
 
 	session->internals.hsk_flags |= HSK_PSK_SELECTED;
