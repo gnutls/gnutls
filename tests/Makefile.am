@@ -156,7 +156,7 @@ endif
 endif
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = rfc2253-escape-test
+dist_check_SCRIPTS = rfc2253-escape-test sni-hostname.sh
 
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
