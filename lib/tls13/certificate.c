@@ -481,6 +481,15 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	/* The OCSP entries match the certificate entries, although
 	 * the contents of each OCSP entry may be NULL.
 	 */
+	for(j=0;j<info->ncerts;j++)
+		gnutls_free(info->raw_certificate_list[j].data);
+	gnutls_free(info->raw_certificate_list);
+
+	for(j=0;j<info->nocsp;j++)
+		gnutls_free(info->raw_ocsp_list[j].data);
+	gnutls_free(info->raw_ocsp_list);
+
+
 	info->raw_certificate_list = peer_certs;
 	info->ncerts = npeer_certs;
 
