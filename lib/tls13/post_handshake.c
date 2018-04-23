@@ -204,7 +204,9 @@ int _gnutls13_reauth_server(gnutls_session_t session)
  * @flags: must be zero
  *
  * This function performs the post-handshake authentication
- * for TLS 1.3.
+ * for TLS 1.3. The post-handshake authentication is initiated by the server
+ * by calling this function. Clients respond when %GNUTLS_E_REAUTH_REQUEST
+ * has been seen while receiving data.
  *
  * The non-fatal errors expected by this function are:
  * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN, as well as
