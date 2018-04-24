@@ -2602,6 +2602,11 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 	/* First check for pin-value field */
 	pinfile = p11_kit_uri_get_pin_value(info);
 	if (pinfile != NULL) {
+		if (attempts > 0) {
+			_gnutls_debug_log("p11: refusing more than a single attempts with pin-value\n");
+			return gnutls_assert_val(GNUTLS_E_PKCS11_PIN_ERROR);
+		}
+
 		_gnutls_debug_log("p11: Using pin-value to retrieve PIN\n");
 		*pin = p11_kit_pin_new_for_string(pinfile);
 		if (*pin != NULL)
@@ -2610,6 +2615,11 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 		/* Check if a pinfile is specified, and use that if possible */
 		pinfile = p11_kit_uri_get_pin_source(info);
 		if (pinfile != NULL) {
+			if (attempts > 0) {
+				_gnutls_debug_log("p11: refusing more than a single attempts with pin-source\n");
+				return gnutls_assert_val(GNUTLS_E_PKCS11_PIN_ERROR);
+			}
+
 			_gnutls_debug_log("p11: Using pin-source to retrieve PIN\n");
 			ret =
 			    retrieve_pin_from_source(pinfile, token_info, attempts,
