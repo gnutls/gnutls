@@ -345,9 +345,9 @@ static int append_response(gnutls_certificate_credentials_t sc, unsigned idx,
  * @idx: is a certificate index as returned by gnutls_certificate_set_key() and friends
  * @fmt: is PEM or DER
  *
- * This function loads the provided OCSP response. It will be
- * sent to the client if requests an OCSP certificate status for
- * the certificate chain specified by @idx.
+ * This function loads the OCSP responses to be sent to the
+ * peer for the certificate chain specified by @idx. When @fmt is
+ * set to PEM, multiple responses can be loaded.
  *
  * This function must be called after setting any certificates, and
  * cannot be used for certificates that are provided via a callback --
@@ -397,9 +397,9 @@ gnutls_certificate_set_ocsp_status_request_file2(gnutls_certificate_credentials_
  * @idx: is a certificate index as returned by gnutls_certificate_set_key() and friends
  * @fmt: is PEM or DER
  *
- * This function sets the filename of an OCSP response, that will be
- * sent to the client if requests an OCSP certificate status for
- * the certificate chain specified by @idx.
+ * This function sets the OCSP responses to be sent to the
+ * peer for the certificate chain specified by @idx. When @fmt is set
+ * to PEM, multiple responses can be loaded.
  *
  * Note: the ability to set multiple OCSP responses per credential
  * structure via the index @idx was added in version 3.5.6. To keep
