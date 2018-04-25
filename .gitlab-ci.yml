@@ -171,6 +171,7 @@ FIPS140-2.Fedora.x86_64:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - build/guile/tests/*.log
@@ -456,6 +457,7 @@ ubsan-Werror.Fedora.x86_64:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - guile/tests/*.log
@@ -478,6 +480,7 @@ Debian.x86_64:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - build/guile/tests/*.log
@@ -537,6 +540,7 @@ Debian.aarch64:
   except:
   - tags
   artifacts:
+    expire_in: 1 week
     when: on_failure
     paths:
       - build/guile/tests/*.log
