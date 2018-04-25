@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Backported PKCS#11 module improvements in initialization
    from master branch.
 
+** libgnutls: Corrected infinite loop when an incorrect PIN was provided
+   via pin-value or pin-source.
+
 ** API and ABI modifications:
 No changes since last version.
 
