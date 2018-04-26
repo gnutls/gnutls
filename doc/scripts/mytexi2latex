@@ -83,7 +83,7 @@ my $pfuncref = \&funcref;
 my $pshowfunc = \&showfunc;
 my $pshowfuncdesc = \&showfuncdesc;
 my $pshowenumdesc = \&showenumdesc;
-my $mode;
+my $mode = NORMAL;
 my $num_args = $#ARGV + 1;
 
 if ($num_args != 1 || $ARGV[0] eq "-h" || $ARGV[0] eq "--help") {
@@ -209,7 +209,7 @@ multitable:
                 if ($line =~ s/\@end example/\\end{example}/g) {
                         $mode = pop(@stack);
                 }
-		$line =~ s/\@{/{/g;
+		$line =~ s/\@\{/{/g;
 		$line =~ s/\@}/}/g;
 		$verbatim = 1;
 
@@ -218,7 +218,7 @@ multitable:
                 if ($line =~ s/\@end smallexample/\\end{smallexample}/g) {
                         $mode = pop(@stack);
                 }
-		$line =~ s/\@{/\{/g;
+		$line =~ s/\@\{/\{/g;
 		$line =~ s/\@}/\}/g;
 		$verbatim = 1;
 

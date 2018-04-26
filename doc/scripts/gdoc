@@ -561,6 +561,7 @@ sub output_enum_tex {
         $param2 = $args{'parameters'}{$parameter};
 	$param2 =~ s/\#([a-zA-Z\_]+)/{\\it $1}/g;
 	$param2 =~ s/\%([a-zA-Z\_]+)/{\\bf $1}/g;
+	$param2 =~ s/([0-9]+)\^([0-9]+)/\$\{$1\}\^\{$2\}\$/g;
 	$out = just_highlight($param2);
 	$out =~ s/_/\\_/g;
 	chomp $out;
