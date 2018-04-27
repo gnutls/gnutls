@@ -531,7 +531,7 @@ Debian.aarch64:
   # for the target will cause the test suite to fail when p11-kit is enabled.
   - dash ../configure --build=$build --host=$host --disable-gcc-warnings
       --cache-file ../cache/config.cache --disable-doc --disable-guile
-      --without-p11-kit
+      --without-p11-kit --disable-full-test-suite
   - make -j$(nproc)
   - make check -j$(nproc)
   - cd ..
