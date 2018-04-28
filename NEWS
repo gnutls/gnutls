@@ -40,6 +40,11 @@ See the end for copying conditions.
    as TLS1.2 requires specific ordering of the groups based on the ciphersuite ordering,
    making group order unpredictable under TLS1.3.
 
+** libgnutls: gnutls_pkcs11_copy_secret_key, gnutls_pkcs11_copy_x509_privkey2,
+   gnutls_pkcs11_privkey_generate3 will mark objects as sensitive by default
+   unless GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE is specified. This is an API
+   change for these functions which make them err towards safety.
+
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
 gnutls_session_key_update: Added
@@ -56,6 +61,7 @@ gnutls_certificate_get_ocsp_expiration: Added
 gnutls_record_send2: Added
 gnutls_ext_raw_parse: Added
 GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS: Added
+GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE: Added
 
 
 * Version 3.6.2 (released 2018-02-16)
