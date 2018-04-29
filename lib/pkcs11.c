@@ -39,6 +39,7 @@
 #include "pkcs11x.h"
 #include <p11-kit/pin.h>
 #include <system-keys.h>
+#include "x509/x509_int.h"
 
 #include <atfork.h>
 
@@ -4045,11 +4046,14 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	gnutls_pkcs11_obj_set_pin_function(priv.obj, cert->pin.cb, cert->pin.data);
+
 	priv.need_import = 1;
 
 	ret =
 	    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
-				    NULL, pkcs11_obj_flags_to_int(flags));
+				    &cert->pin, pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

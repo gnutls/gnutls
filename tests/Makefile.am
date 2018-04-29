@@ -321,7 +321,8 @@ ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
 	pkcs11-privkey-always-auth pkcs11-privkey-export pkcs11/pkcs11-import-with-pin \
 	pkcs11/pkcs11-privkey-pthread pkcs11/pkcs11-pin-func pkcs11/pkcs11-obj-import \
 	pkcs11-privkey-fork-reinit pkcs11-mechanisms pkcs11-privkey-safenet-always-auth \
-	pkcs11/pkcs11-rsa-pss-privkey-test pkcs11/tls-neg-pkcs11-key pkcs11/pkcs11-privkey-generate
+	pkcs11/pkcs11-rsa-pss-privkey-test pkcs11/tls-neg-pkcs11-key pkcs11/pkcs11-privkey-generate \
+	pkcs11/gnutls_x509_crt_list_import_url pkcs11/gnutls_pcert_list_import_x509_file
 
 
 endif

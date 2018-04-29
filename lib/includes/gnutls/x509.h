@@ -169,6 +169,14 @@ int gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 				      /* GNUTLS_PKCS11_OBJ_FLAG_* */
     );
 
+int
+gnutls_x509_crt_list_import_url(gnutls_x509_crt_t **certs,
+				unsigned int *size,
+				const char *url,
+				gnutls_pin_callback_t pin_fn,
+				void *pin_fn_userdata,
+				unsigned int flags);
+
 int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
 			   gnutls_x509_crt_fmt_t format,
 			   void *output_data, size_t * output_data_size);

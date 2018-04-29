@@ -620,6 +620,14 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 				  gnutls_x509_crt_fmt_t format,
 				  unsigned int flags);
 
+int gnutls_pcert_list_import_x509_file(gnutls_pcert_st *pcert_list,
+				       unsigned *pcert_list_size,
+				       const char *file,
+				       gnutls_x509_crt_fmt_t format,
+				       gnutls_pin_callback_t pin_fn,
+				       void *pin_fn_userdata,
+				       unsigned int flags);
+
 int gnutls_pcert_import_x509_raw(gnutls_pcert_st * pcert,
 				 const gnutls_datum_t * cert,
 				 gnutls_x509_crt_fmt_t format,

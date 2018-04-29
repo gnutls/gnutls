@@ -26,6 +26,7 @@
 #include <x509/common.h>
 #include <x509.h>
 #include "x509/x509_int.h"
+#include <gnutls/x509.h>
 
 /**
  * gnutls_pcert_import_x509:
@@ -84,14 +85,15 @@ int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
 
 /**
  * gnutls_pcert_import_x509_list:
- * @pcert: The pcert structure
+ * @pcert_list: The structures to store the certificates; must not contain initialized #gnutls_pcert_st structures.
  * @crt: The certificates to be imported
- * @ncrt: The number of certificates
+ * @ncrt: The number of certificates in @crt; will be updated if necessary
  * @flags: zero or %GNUTLS_X509_CRT_LIST_SORT
  *
- * This convenience function will import the given certificate to a
- * #gnutls_pcert_st structure. The structure must be deinitialized
- * afterwards using gnutls_pcert_deinit();
+ * This convenience function will import the given certificates to an
+ * already allocated set of #gnutls_pcert_st structures. The structures must
+ * be deinitialized afterwards using gnutls_pcert_deinit(). @pcert_list
+ * should contain space for at least @ncrt elements.
  *
  * In the case %GNUTLS_X509_CRT_LIST_SORT is specified and that
  * function cannot sort the list, %GNUTLS_E_CERTIFICATE_LIST_UNSORTED
@@ -103,7 +105,7 @@ int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
  *
  * Since: 3.4.0
  **/
-int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
+int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert_list,
 				  gnutls_x509_crt_t *crt, unsigned *ncrt,
 				  unsigned int flags)
 {
@@ -132,7 +134,7 @@ int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
 	}
 
 	for (i=0;i<*ncrt;i++) {
-		ret = gnutls_pcert_import_x509(&pcert[i], s[i], 0);
+		ret = gnutls_pcert_import_x509(&pcert_list[i], s[i], 0);
 		if (ret < 0) {
 			current = i;
 			goto cleanup;
@@ -143,7 +145,7 @@ int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
 
  cleanup:
 	for (i=0;i<current;i++) {
-		gnutls_pcert_deinit(&pcert[i]);
+		gnutls_pcert_deinit(&pcert_list[i]);
 	}
 	return ret;
 
@@ -151,27 +153,30 @@ int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
 
 /**
  * gnutls_pcert_list_import_x509_raw:
- * @pcerts: The structures to store the parsed certificate. Must not be initialized.
- * @pcert_max: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+ * @pcert_list: The structures to store the certificates; must not contain initialized #gnutls_pcert_st structures.
+ * @pcert_list_size: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
  * @data: The certificates.
  * @format: One of DER or PEM.
  * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
  *
- * This function will convert the given PEM encoded certificate list
- * to the native gnutls_x509_crt_t format. The output will be stored
- * in @certs.  They will be automatically initialized.
+ * This function will import the provided DER or PEM encoded certificates to an
+ * already allocated set of #gnutls_pcert_st structures. The structures must
+ * be deinitialized afterwards using gnutls_pcert_deinit(). @pcert_list
+ * should contain space for at least @pcert_list_size elements.
  *
  * If the Certificate is PEM encoded it should have a header of "X509
  * CERTIFICATE", or "CERTIFICATE".
  *
- * Returns: the number of certificates read or a negative error value.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value; if the @pcert list doesn't have enough space
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
  *
  * Since: 3.0
  **/
 int
-gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
-				  unsigned int *pcert_max,
-				  const gnutls_datum_t * data,
+gnutls_pcert_list_import_x509_raw(gnutls_pcert_st *pcert_list,
+				  unsigned int *pcert_list_size,
+				  const gnutls_datum_t *data,
 				  gnutls_x509_crt_fmt_t format,
 				  unsigned int flags)
 {
@@ -179,21 +184,21 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 	unsigned int i = 0, j;
 	gnutls_x509_crt_t *crt;
 
-	crt = gnutls_malloc((*pcert_max) * sizeof(gnutls_x509_crt_t));
+	crt = gnutls_malloc((*pcert_list_size) * sizeof(gnutls_x509_crt_t));
 
 	if (crt == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	ret =
-	    gnutls_x509_crt_list_import(crt, pcert_max, data, format,
+	    gnutls_x509_crt_list_import(crt, pcert_list_size, data, format,
 					flags);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
 		goto cleanup_crt;
 	}
 
-	for (i = 0; i < *pcert_max; i++) {
-		ret = gnutls_pcert_import_x509(&pcerts[i], crt[i], flags);
+	for (i = 0; i < *pcert_list_size; i++) {
+		ret = gnutls_pcert_import_x509(&pcert_list[i], crt[i], flags);
 		if (ret < 0) {
 			ret = gnutls_assert_val(ret);
 			goto cleanup_pcert;
@@ -205,10 +210,10 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 
  cleanup_pcert:
 	for (j = 0; j < i; j++)
-		gnutls_pcert_deinit(&pcerts[j]);
+		gnutls_pcert_deinit(&pcert_list[j]);
 
  cleanup:
-	for (i = 0; i < *pcert_max; i++)
+	for (i = 0; i < *pcert_list_size; i++)
 		gnutls_x509_crt_deinit(crt[i]);
  
  cleanup_crt:
@@ -216,6 +221,89 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 	return ret;
 
 }
+
+/**
+ * gnutls_pcert_list_import_x509_url:
+ * @pcert_list: The structures to store the certificates; must not contain initialized #gnutls_pcert_st structures.
+ * @pcert_list_size: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+ * @file: A file or supported URI with the certificates to load
+ * @format: %GNUTLS_X509_FMT_DER or %GNUTLS_X509_FMT_PEM if a file is given
+ * @pin_fn: a PIN callback if not globally set
+ * @pin_fn_userdata: parameter for the PIN callback
+ * @flags: zero or flags from %gnutls_certificate_import_flags
+ *
+ * This convenience function will import a certificate chain from the given
+ * file or supported URI to #gnutls_pcert_st structures. The structures
+ * must be deinitialized afterwards using gnutls_pcert_deinit().
+ *
+ * This function will always return a sorted certificate chain.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value; if the @pcert list doesn't have enough space
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+ *
+ * Since: 3.6.3
+ **/
+int gnutls_pcert_list_import_x509_file(gnutls_pcert_st *pcert_list,
+				       unsigned *pcert_list_size,
+				       const char *file,
+				       gnutls_x509_crt_fmt_t format,
+				       gnutls_pin_callback_t pin_fn,
+				       void *pin_fn_userdata,
+				       unsigned int flags)
+{
+	int ret, ret2;
+	unsigned i;
+	gnutls_x509_crt_t *crts = NULL;
+	unsigned crts_size = 0;
+	gnutls_datum_t data = {NULL, 0};
+
+	if (gnutls_url_is_supported(file) != 0) {
+		ret = gnutls_x509_crt_list_import_url(&crts, &crts_size, file, pin_fn, pin_fn_userdata, 0);
+		if (ret < 0) {
+			ret2 = gnutls_x509_crt_list_import_url(&crts, &crts_size, file, pin_fn, pin_fn_userdata, GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+			if (ret2 >= 0) ret = ret2;
+		}
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+	} else { /* file */
+		ret = gnutls_load_file(file, &data);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &data, format, flags|GNUTLS_X509_CRT_LIST_SORT);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	if (crts_size > *pcert_list_size) {
+		gnutls_assert();
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto cleanup;
+	}
+
+	ret = gnutls_pcert_import_x509_list(pcert_list, crts, &crts_size, flags);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	*pcert_list_size = crts_size;
+
+	ret = 0;
+cleanup:
+	for (i=0;i<crts_size;i++)
+		gnutls_x509_crt_deinit(crts[i]);
+	gnutls_free(crts);
+	gnutls_free(data.data);
+	return ret;
+}
+
 
 /**
  * gnutls_pcert_import_x509_raw:

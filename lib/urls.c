@@ -148,7 +148,7 @@ int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 
 #ifdef ENABLE_PKCS11
 	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
-		return gnutls_pkcs11_get_raw_issuer(url, cert, issuer, GNUTLS_X509_FMT_DER, 0);
+		return gnutls_pkcs11_get_raw_issuer(url, cert, issuer, GNUTLS_X509_FMT_DER, flags);
 	}
 #endif
 	for (i=0;i<_gnutls_custom_urls_size;i++) {

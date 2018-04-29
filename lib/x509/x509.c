@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Authors: Nikos Mavrogiannopoulos, Simon Josefsson, Howard Chu
  *
@@ -4165,7 +4166,7 @@ void gnutls_x509_crt_set_pin_function(gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
-				  const char *url, unsigned int flags)
+			   const char *url, unsigned int flags)
 {
 	int ret;
 	unsigned i;
@@ -4191,6 +4192,110 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 	}
 
  cleanup:
+	return ret;
+}
+
+/**
+ * gnutls_x509_crt_list_import_url:
+ * @certs: Will hold the allocated certificate list.
+ * @size: It will contain the size of the list.
+ * @url: A PKCS 11 url
+ * @pin_fn: a PIN callback if not globally set
+ * @pin_fn_userdata: parameter for the PIN callback
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags for PKCS#11 URLs or zero otherwise
+ *
+ * This function will import a certificate chain present in a PKCS#11 token
+ * or any type of back-end that supports URLs. The certificates
+ * must be deinitialized afterwards using gnutls_x509_crt_deinit()
+ * and the returned pointer must be freed using gnutls_free().
+ *
+ * The URI provided must be the first certificate in the chain; subsequent
+ * certificates will be retrieved using gnutls_pkcs11_get_raw_issuer() or
+ * equivalent functionality for the supported URI.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.3
+ **/
+int
+gnutls_x509_crt_list_import_url(gnutls_x509_crt_t **certs,
+				unsigned int *size,
+				const char *url,
+				gnutls_pin_callback_t pin_fn,
+				void *pin_fn_userdata,
+				unsigned int flags)
+{
+	int ret;
+	unsigned i;
+	gnutls_x509_crt_t crts[DEFAULT_MAX_VERIFY_DEPTH];
+	gnutls_datum_t issuer = {NULL, 0};
+	unsigned total = 0;
+
+	memset(crts, 0, sizeof(crts));
+
+	ret = gnutls_x509_crt_init(&crts[0]);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	gnutls_x509_crt_set_pin_function(crts[0], pin_fn, pin_fn_userdata);
+
+	total = 1;
+
+	ret = gnutls_x509_crt_import_url(crts[0], url, flags);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	for (i=1;i<DEFAULT_MAX_VERIFY_DEPTH;i++) {
+		ret = _gnutls_get_raw_issuer(url, crts[i-1], &issuer, flags|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY);
+		if (ret < 0) {
+			issuer.data = NULL;
+			break;
+		}
+
+		if (gnutls_x509_crt_equals2(crts[i-1], &issuer)) {
+			gnutls_free(issuer.data);
+			issuer.data = NULL;
+			break;
+		}
+
+		ret = gnutls_x509_crt_init(&crts[i]);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		total++;
+
+		gnutls_x509_crt_set_pin_function(crts[i], pin_fn, pin_fn_userdata);
+
+		ret = gnutls_x509_crt_import(crts[i], &issuer, GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		gnutls_free(issuer.data);
+		issuer.data = NULL;
+	}
+
+	*certs = gnutls_malloc(total*sizeof(gnutls_x509_crt_t));
+	if (*certs == NULL) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	memcpy(*certs, crts, total*sizeof(gnutls_x509_crt_t));
+	*size = total;
+
+	return 0;
+ cleanup:
+	gnutls_free(issuer.data);
+	for (i=0;i<total;i++)
+		gnutls_x509_crt_deinit(crts[i]);
+
 	return ret;
 }
 

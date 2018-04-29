@@ -205,10 +205,12 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	a[a_val].value_len = crt->raw_dn.size;
 	a_val++;
 
-	a[a_val].type = CKA_ISSUER;
-	a[a_val].value = crt->raw_issuer_dn.data;
-	a[a_val].value_len = crt->raw_issuer_dn.size;
-	a_val++;
+	if (crt->raw_issuer_dn.size > 0) {
+		a[a_val].type = CKA_ISSUER;
+		a[a_val].value = crt->raw_issuer_dn.data;
+		a[a_val].value_len = crt->raw_issuer_dn.size;
+		a_val++;
+	}
 
 	serial_size = sizeof(serial);
 	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
