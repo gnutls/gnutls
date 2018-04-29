@@ -85,7 +85,14 @@ flag = {
     name      = sni-hostname;
     descrip   = "Server's hostname for server name indication extension";
     arg-type  = string;
-    doc      = "Set explicitly the server name used in the TLS server name indication extension. That is useful when testing with servers setup on different DNS name than the intended. If not specified, the provided hostname is used.";
+    doc      = "Set explicitly the server name used in the TLS server name indication extension. That is useful when testing with servers setup on different DNS name than the intended. If not specified, the provided hostname is used. Even with this option server certificate verification still uses the hostname passed on the main commandline. Use --verify-hostname to change this.";
+};
+
+flag = {
+    name      = verify-hostname;
+    descrip   = "Server's hostname to use for validation";
+    arg-type  = string;
+    doc      = "Set explicitly the server name to be used when validating the server's certificate.";
 };
 
 flag = {

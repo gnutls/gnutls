@@ -325,6 +325,7 @@ static int cert_verify_callback(gnutls_session_t session)
 	int ca_verify = ENABLED_OPT(CA_VERIFICATION);
 	const char *txt_service;
 	gnutls_datum_t oresp;
+	const char *host;
 
 	/* On an session with TOFU the PKI/DANE verification
 	 * become advisory.
@@ -333,6 +334,11 @@ static int cert_verify_callback(gnutls_session_t session)
 	if (strictssh) {
 		ssh = strictssh;
 	}
+
+	if (HAVE_OPT(VERIFY_HOSTNAME))
+		host = OPT_ARG(VERIFY_HOSTNAME);
+	else
+		host = hostname;
 
 	/* Save certificate and OCSP response */
 	if (HAVE_OPT(SAVE_CERT)) {
@@ -357,7 +363,7 @@ static int cert_verify_callback(gnutls_session_t session)
 	print_cert_info(session, verbose, print_cert);
 
 	if (ca_verify) {
-		rc = cert_verify(session, hostname, GNUTLS_KP_TLS_WWW_SERVER);
+		rc = cert_verify(session, host, GNUTLS_KP_TLS_WWW_SERVER);
 		if (rc == 0) {
 			printf
 			    ("*** PKI verification of server certificate failed...\n");
@@ -391,7 +397,7 @@ static int cert_verify_callback(gnutls_session_t session)
 			vflags |= DANE_VFLAG_ONLY_CHECK_EE_USAGE;
 
 		port = service_to_port(service, udp?"udp":"tcp");
-		rc = dane_verify_session_crt(NULL, session, hostname,
+		rc = dane_verify_session_crt(NULL, session, host,
 					     udp ? "udp" : "tcp", port,
 					     sflags, vflags, &status);
 		if (rc < 0) {
@@ -436,17 +442,17 @@ static int cert_verify_callback(gnutls_session_t session)
 
 		txt_service = port_to_service(service, udp?"udp":"tcp");
 
-		rc = gnutls_verify_stored_pubkey(NULL, NULL, hostname,
+		rc = gnutls_verify_stored_pubkey(NULL, NULL, host,
 						 txt_service,
 						 GNUTLS_CRT_X509, cert, 0);
 		if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND) {
 			fprintf(stderr,
 				"Host %s (%s) has never been contacted before.\n",
-				hostname, txt_service);
+				host, txt_service);
 			if (status == 0)
 				fprintf(stderr,
 					"Its certificate is valid for %s.\n",
-					hostname);
+					host);
 
 			if (strictssh)
 				return -1;
@@ -458,13 +464,13 @@ static int cert_verify_callback(gnutls_session_t session)
 		} else if (rc == GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
 			fprintf(stderr,
 				"Warning: host %s is known and it is associated with a different key.\n",
-				hostname);
+				host);
 			fprintf(stderr,
 				"It might be that the server has multiple keys, or an attacker replaced the key to eavesdrop this connection .\n");
 			if (status == 0)
 				fprintf(stderr,
 					"Its certificate is valid for %s.\n",
-					hostname);
+					host);
 
 			if (strictssh)
 				return -1;
@@ -481,7 +487,7 @@ static int cert_verify_callback(gnutls_session_t session)
 		}
 
 		if (rc != 0) {
-			rc = gnutls_store_pubkey(NULL, NULL, hostname,
+			rc = gnutls_store_pubkey(NULL, NULL, host,
 						 txt_service,
 						 GNUTLS_CRT_X509, cert, 0,
 						 0);
