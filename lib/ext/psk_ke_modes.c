@@ -112,12 +112,19 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
-	if (!vers || !vers->tls13_sem)
-		return 0;
+	/* we set hsk_flags to HSK_PSK_KE_MODE_INVALID on failure to ensure that
+	 * when we parse the pre-shared key extension we detect PSK_KE_MODES as
+	 * received. */
+	if (!vers || !vers->tls13_sem) {
+		session->internals.hsk_flags |= HSK_PSK_KE_MODE_INVALID;
+		return gnutls_assert_val(0);
+	}
 
 	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(session, GNUTLS_CRD_PSK);
-	if (cred == NULL)
-		return 0;
+	if (cred == NULL) {
+		session->internals.hsk_flags |= HSK_PSK_KE_MODE_INVALID;
+		return gnutls_assert_val(0);
+	}
 
 	DECR_LEN(len, 1);
 	ke_modes_len = *(data++);

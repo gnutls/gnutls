@@ -39,6 +39,7 @@ typedef struct test_case_st {
 	unsigned have_ed25519_sign_cert;
 	unsigned have_rsa_decrypt_cert;
 	unsigned not_on_fips;
+	unsigned exp_version;
 	const char *client_prio;
 	const char *server_prio;
 } test_case_st;
@@ -229,6 +230,13 @@ static void try(test_case_st *test)
 	assert(gnutls_priority_set_direct(client, test->client_prio, 0) >= 0);
 
 	HANDSHAKE_EXPECT(client, server, test->client_ret, test->server_ret);
+
+	if (test->client_ret == 0 && test->server_ret == 0 && test->exp_version) {
+		if (gnutls_protocol_get_version(client) != test->exp_version)
+			fail("expected version (%s) does not match %s\n",
+			     gnutls_protocol_get_name(test->exp_version),
+			     gnutls_protocol_get_name(gnutls_protocol_get_version(client)));
+	}
 
 	gnutls_deinit(server);
 	gnutls_deinit(client);

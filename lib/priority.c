@@ -1199,7 +1199,10 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	const version_entry_st *tlsmin = NULL;
 	const version_entry_st *dtlsmin = NULL;
 	unsigned have_tls13 = 0, have_srp = 0;
-	unsigned have_psk = 0, have_null = 0;
+	unsigned have_psk = 0, have_null = 0, have_rsa_psk = 0;
+
+	/* have_psk indicates that a PSK key exchange compatible
+	 * with TLS1.3 is enabled. */
 
 	priority_cache->cs.size = 0;
 	priority_cache->sigalg.size = 0;
@@ -1217,7 +1220,10 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		if (IS_SRP_KX(priority_cache->_kx.priority[i])) {
 			have_srp = 1;
 		} else if (_gnutls_kx_is_psk(priority_cache->_kx.priority[i])) {
-			have_psk = 1;
+			if (priority_cache->_kx.priority[i] == GNUTLS_KX_RSA_PSK)
+				have_rsa_psk = 1;
+			else
+				have_psk = 1;
 		}
 	}
 
@@ -1226,9 +1232,9 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		if (!vers)
 			continue;
 
-		/* if we have NULL ciphersuites enabled, remove TLS1.3+ protocol versions;
-		 * they cannot be negotiated under TLS1.3. */
-		if (have_null || have_srp) {
+		/* if we have NULL ciphersuites, SRP or RSA-PSK enabled, remove TLS1.3+ protocol
+		 * versions; they cannot be negotiated under TLS1.3. */
+		if (have_null || have_srp || have_rsa_psk) {
 			if (vers->tls13_sem) {
 				for (j=i+1;j<priority_cache->protocol.algorithms;j++)
 					priority_cache->protocol.priority[j-1] = priority_cache->protocol.priority[j];
