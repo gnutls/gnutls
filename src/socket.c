@@ -61,7 +61,7 @@ socket_recv(const socket_st * socket, void *buffer, int buffer_size)
 			if (ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED)
 				gnutls_heartbeat_pong(socket->session, 0);
 		}
-		while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN
+		while (ret == GNUTLS_E_INTERRUPTED
 		       || ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
 
 	} else
