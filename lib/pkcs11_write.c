@@ -91,8 +91,8 @@ static void mark_flags(unsigned flags, struct ck_attribute *a, unsigned *a_val, 
  *
  * This function will copy a certificate into a PKCS #11 token specified by
  * a URL. Valid flags to mark the certificate: %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA, %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -374,8 +374,8 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
  *
  * This function will copy a public key object into a PKCS #11 token specified by
  * a URL. Valid flags to mark the key: %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA, %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -625,8 +625,10 @@ gnutls_pkcs11_copy_attached_extension(const char *token_url,
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will copy a private key into a PKCS #11 token specified by
- * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
- * unless there is a strong reason not to.
+ * a URL.
+ *
+ * Since 3.6.3 the objects are marked as sensitive by default unless
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE is specified.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -782,7 +784,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 		a_val++;
 	}
 
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE) {
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE)) {
 		a[a_val].type = CKA_SENSITIVE;
 		a[a_val].value = (void *) &tval;
 		a[a_val].value_len = sizeof(tval);
@@ -1356,8 +1358,10 @@ int gnutls_pkcs11_copy_x509_crt(const char *token_url,
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will copy a private key into a PKCS #11 token specified by
- * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
- * unless there is a strong reason not to.
+ * a URL.
+ *
+ * Since 3.6.3 the objects are marked as sensitive by default unless
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE is specified.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

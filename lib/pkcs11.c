@@ -1922,8 +1922,12 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 	a[0].value_len = sizeof(b);
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a, 1);
-	if (rv == CKR_OK && b != 0)
-		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
+	if (rv == CKR_OK) {
+		if (b != 0)
+			pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
+		else
+			pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE;
+	}
 
 	a[0].type = CKA_EXTRACTABLE;
 	a[0].value = &b;
