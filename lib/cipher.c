@@ -459,7 +459,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 
 	/* check whether padding would exceed max */
 	if (fdata_size > max) {
-		if (unlikely(max-plain->size-1 < 0))
+		if (unlikely(max < (ssize_t)plain->size+1))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		min_pad = max - plain->size - 1;
