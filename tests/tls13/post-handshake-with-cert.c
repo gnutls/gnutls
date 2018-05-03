@@ -45,6 +45,7 @@ int main()
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
+#include <assert.h>
 
 #include "cert-common.h"
 #include "tls13/ext-parse.h"
@@ -70,7 +71,7 @@ static void client_log_func(int level, const char *str)
 
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, unsigned send_cert, unsigned max_auths)
 {
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
@@ -85,11 +86,11 @@ static void client(int fd)
 		gnutls_global_set_log_level(7);
 	}
 
-	gnutls_certificate_allocate_credentials(&x509_cred);
+	assert(gnutls_certificate_allocate_credentials(&x509_cred)>=0);
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_POST_HANDSHAKE_AUTH);
+	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_POST_HANDSHAKE_AUTH)>=0);
 
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
@@ -98,9 +99,11 @@ static void client(int fd)
 		fail("cannot set TLS 1.3 priorities\n");
 
 
-	gnutls_certificate_set_x509_key_mem(x509_cred, &cli_ca3_cert,
-					    &cli_ca3_key,
-					    GNUTLS_X509_FMT_PEM);
+	if (send_cert) {
+		assert(gnutls_certificate_set_x509_key_mem(x509_cred, &cli_ca3_cert,
+						    &cli_ca3_key,
+						    GNUTLS_X509_FMT_PEM)>=0);
+	}
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -117,9 +120,11 @@ static void client(int fd)
 
 	if (ret != 0)
 		fail("handshake failed: %s\n", gnutls_strerror(ret));
-	success("client handshake completed\n");
 
-	for (i=0;i<MAX_AUTHS;i++) {
+	if (debug)
+		success("client handshake completed\n");
+
+	for (i=0;i<max_auths;i++) {
 		do {
 			ret = gnutls_record_recv(session, buf, sizeof(buf));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
@@ -128,7 +133,8 @@ static void client(int fd)
 			fail("recv: unexpected error: %s\n", gnutls_strerror(ret));
 		}
 
-		success("received reauth request\n");
+		if (debug)
+			success("received reauth request\n");
 		do {
 			ret = gnutls_reauth(session, 0);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
@@ -182,7 +188,7 @@ static int hellos_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-static void server(int fd)
+static void server(int fd, int err, int type, unsigned max_auths)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -235,17 +241,23 @@ static void server(int fd)
 	if (server_hello_ok == 0) {
 		fail("server: did not verify the server hello contents\n");
 	}
-	success("server handshake completed\n");
 
-	gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUIRE);
+	if (debug)
+		success("server handshake completed\n");
 
-	for (i=0;i<MAX_AUTHS;i++) {
+	gnutls_certificate_server_set_request(session, type);
+
+	for (i=0;i<max_auths;i++) {
 		/* ask peer for re-authentication */
 		do {
 			ret = gnutls_reauth(session, 0);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-		if (ret != 0)
+		if (err) {
+			if (ret != err)
+				fail("server: expected error %s, got: %s\n", gnutls_strerror(err),
+				     gnutls_strerror(ret));
+		} else if (ret != 0)
 			fail("server: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
 	}
 
@@ -268,11 +280,17 @@ static void ch_handler(int sig)
 	return;
 }
 
-void doit(void)
+static
+void start(const char *name, int err, int type, unsigned max_auths, unsigned send_cert)
 {
 	int fd[2];
 	int ret;
 	pid_t child;
+
+	success("testing %s\n", name);
+
+	client_hello_ok = 0;
+	server_hello_ok = 0;
 
 	signal(SIGCHLD, ch_handler);
 
@@ -292,13 +310,20 @@ void doit(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0]);
+		server(fd[0], err, type, max_auths);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], send_cert, max_auths);
 		exit(0);
 	}
+
 }
 
+void doit(void)
+{
+	start("multi-reauth", 0, GNUTLS_CERT_REQUIRE, MAX_AUTHS, 1);
+	start("reauth-require with no-cert", GNUTLS_E_NO_CERTIFICATE_FOUND, GNUTLS_CERT_REQUIRE, 1, 0);
+	start("reauth-request with no-cert", 0, GNUTLS_CERT_REQUEST, 1, 0);
+}
 #endif				/* _WIN32 */
