@@ -309,6 +309,9 @@ void doit(void)
 	start("NORMAL", "NORMAL:%FALLBACK_SCSV", 0);
 	start("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:%FALLBACK_SCSV", 0);
 	start("NORMAL", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.1:%FALLBACK_SCSV", 1);
+	/* Check whether a TLS1.3 server rejects a TLS1.2 client which includes the SCSV */
+	start("NORMAL:+VERS-TLS1.3:+VERS-TLS1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2:%FALLBACK_SCSV", 1);
+	start("NORMAL:+VERS-TLS1.3:+VERS-TLS1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:%FALLBACK_SCSV", 0);
 }
 
 #endif				/* _WIN32 */
