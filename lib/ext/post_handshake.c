@@ -94,7 +94,7 @@ _gnutls_post_handshake_send_params(gnutls_session_t session,
 	if (unlikely(max == NULL))
 		return gnutls_assert_val(0);
 
-	if (max->post_handshake_auth && (cred->ncerts || cred->get_cert_callback3))
+	if (max->post_handshake_auth)
 		return GNUTLS_E_INT_RET_0;
 	else
 		return 0;
