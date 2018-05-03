@@ -117,16 +117,18 @@ typedef enum {
     INDEX_OPT_RECORDSIZE              = 48,
     INDEX_OPT_DISABLE_SNI             = 49,
     INDEX_OPT_DISABLE_EXTENSIONS      = 50,
-    INDEX_OPT_INLINE_COMMANDS         = 51,
-    INDEX_OPT_INLINE_COMMANDS_PREFIX  = 52,
-    INDEX_OPT_PROVIDER                = 53,
-    INDEX_OPT_FIPS140_MODE            = 54,
-    INDEX_OPT_VERSION                 = 55,
-    INDEX_OPT_HELP                    = 56,
-    INDEX_OPT_MORE_HELP               = 57
+    INDEX_OPT_SINGLE_KEY_SHARE        = 51,
+    INDEX_OPT_POST_HANDSHAKE_AUTH     = 52,
+    INDEX_OPT_INLINE_COMMANDS         = 53,
+    INDEX_OPT_INLINE_COMMANDS_PREFIX  = 54,
+    INDEX_OPT_PROVIDER                = 55,
+    INDEX_OPT_FIPS140_MODE            = 56,
+    INDEX_OPT_VERSION                 = 57,
+    INDEX_OPT_HELP                    = 58,
+    INDEX_OPT_MORE_HELP               = 59
 } teOptIndex;
 /** count of all options for gnutls-cli */
-#define OPTION_CT    58
+#define OPTION_CT    60
 /** gnutls-cli version */
 #define GNUTLS_CLI_VERSION       "@VERSION@"
 /** Full gnutls-cli version text */
@@ -240,10 +242,12 @@ typedef enum {
 #define OPT_VALUE_RECORDSIZE     (DESC(RECORDSIZE).optArg.argInt)
 #define VALUE_OPT_DISABLE_SNI    0x1029
 #define VALUE_OPT_DISABLE_EXTENSIONS 0x102A
-#define VALUE_OPT_INLINE_COMMANDS 0x102B
-#define VALUE_OPT_INLINE_COMMANDS_PREFIX 0x102C
-#define VALUE_OPT_PROVIDER       0x102D
-#define VALUE_OPT_FIPS140_MODE   0x102E
+#define VALUE_OPT_SINGLE_KEY_SHARE 0x102B
+#define VALUE_OPT_POST_HANDSHAKE_AUTH 0x102C
+#define VALUE_OPT_INLINE_COMMANDS 0x102D
+#define VALUE_OPT_INLINE_COMMANDS_PREFIX 0x102E
+#define VALUE_OPT_PROVIDER       0x102F
+#define VALUE_OPT_FIPS140_MODE   0x1030
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
