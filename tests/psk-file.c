@@ -87,7 +87,7 @@ static void client(int sd, const char *prio, const char *user, const gnutls_datu
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_KEY_SHARE_TOP);
 
 	/* Use default priorities */
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
@@ -392,6 +392,9 @@ void doit(void)
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "non-hex", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "unknown", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &wrong_key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+	/* try with HelloRetryRequest and PSK */
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", "jas", &key, 0, GNUTLS_KX_DHE_PSK, 0, 0);
 }
 
 #endif				/* _WIN32 */

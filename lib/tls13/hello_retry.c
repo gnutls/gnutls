@@ -89,6 +89,9 @@ int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 		/* reset extensions sent by this session to allow re-sending them */
 		session->internals.used_exts = 0;
 
+		if (session->key.psk_needs_free)
+			_gnutls_free_temp_key_datum(&session->key.psk);
+
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
