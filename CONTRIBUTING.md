@@ -294,10 +294,18 @@ two things must be done:
 Note that, for constants and enums, "schemefied" names are used, as
 noted under the "Guile API Conventions" node of the manual.
 
+# Automated testing
+
+ GnuTLS primarily relies on gitlab-ci which is configured in .gitlab-ci.yml
+file in the repository. The goal is to have a test suite which runs for
+every new merge request prior to merging. There are no particular rules for
+the test targets, except for them being reliable and running in a reasonable
+timeframe (~1 hour).
+
 
 # Reviewing code
 
-A review as part of the gitlab merge requests, is a way to prevent errors due to
+ A review as part of the gitlab merge requests, is a way to prevent errors due to
 these guidelines not being followed, e.g., verify there is a reasonable test suite,
 and whether it covers reasonably the new code, that the function naming is
 consistent with these guidelines, as well as check for obvious mistakes in the new
