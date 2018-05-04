@@ -393,7 +393,7 @@ call_get_cert_callback(gnutls_session_t session,
 
 		selected_certs_set(session, pcert, pcert_length,
 				   ocsp, ocsp_length,
-				   local_key, flags&GNUTLS_CERT_RETR_DEINIT_ALL?1:0,
+				   local_key, (flags&GNUTLS_CERT_RETR_DEINIT_ALL)?1:0,
 				   cred->glob_ocsp_func, cred->glob_ocsp_func_ptr);
 
 		return 0;

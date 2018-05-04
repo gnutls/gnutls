@@ -587,8 +587,9 @@ void gnutls_certificate_set_retrieve_function2
  * @func: is the callback function
  *
  * This function sets a callback to be called in order to retrieve the
- * certificate and OCSP responses to be used in the handshake. The callback will
- * take control only if a certificate is requested by the peer.
+ * certificate and OCSP responses to be used in the handshake. @func will
+ * be called only if the peer requests a certificate either during handshake
+ * or during post-handshake authentication.
  *
  * The callback's function prototype is defined in `abstract.h':
  * int (*callback)(gnutls_session_t, const struct gnutls_cert_retr_st *info,
@@ -606,24 +607,19 @@ void gnutls_certificate_set_retrieve_function2
  *
  * The callback should fill-in the following values.
  *
- * @pcert should contain a single certificate and public key or a list of them.
+ * @pcert should contain an allocated list of certificates and public keys.
  * @pcert_length is the size of the previous list.
- * @ocsp should contain a single OCSP response or a list of them.
+ * @ocsp should contain an allocated list of OCSP responses.
  * @ocsp_length is the size of the previous list.
  * @pkey is the private key.
  *
- * If the callback function is provided then gnutls will call it, during
- * handshake, after the certificate request message has been received,
- * or during post-handshake.
- *
- * All the provided by the callback values will not be released or
- * modified by gnutls.
- *
- * When this callback is set in server side, @pk_algos and @req_ca_dn are NULL.
+ * If flags in the callback are set to %GNUTLS_CERT_RETR_DEINIT_ALL then
+ * all provided values must be allocated using gnutls_malloc(), and will
+ * be released by gnutls; otherwise they will not be touched by gnutls.
  *
  * The callback function should set the certificate and OCSP response
- * list to be sent, and return 0 on success. If no certificate was selected then
- * the @pcert_length and @Ocsp_length should be set to zero. The return
+ * list to be sent, and return 0 on success. If no certificates are available,
+ * the @pcert_length and @ocsp_length should be set to zero. The return
  * value (-1) indicates error and the handshake will be terminated. If both
  * certificates are set in the credentials and a callback is available, the
  * callback takes predence.
