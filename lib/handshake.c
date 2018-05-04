@@ -1801,22 +1801,10 @@ read_server_hello(gnutls_session_t session,
 	if (*comp_pos != 0)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	if (vers->tls13_sem) {
-		/* TLS 1.3 Early Secret */
-		ret = _tls13_init_secret(session, NULL, 0);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-					   NULL, 0, session->key.proto.tls13.temp_secret,
-					   session->key.proto.tls13.temp_secret);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
+	if (vers->tls13_sem)
 		ext_parse_flag |= GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
-	} else {
+	else
 		ext_parse_flag |= GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO;
-	}
 
 	/* Parse extensions in order.
 	 */
@@ -1852,8 +1840,8 @@ read_server_hello(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	/* Calculate TLS 1.3 Early Secret */
 	if (vers->tls13_sem) {
-		/* TLS 1.3 Early Secret */
 		if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
 			psk = session->key.psk.data;
 			psk_size = session->key.psk.size;

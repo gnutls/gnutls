@@ -130,6 +130,30 @@ no-SSL-3.0.Fedora.x86_64:
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
 
+TLS1.3/interop:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - git submodule update --init --no-fetch
+  - make autoreconf
+  - dash ./configure --disable-gcc-warnings --cache-file ./cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
+    make -j$(nproc)
+  - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
+  - make -C tests/suite TESTS=testcompat-tls13-openssl.sh check
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/guile/tests/*.log
+      - build/tests/*.log
+      - build/*.log
+      - build/tests/*/*.log
+      - build/tests/suite/*/*.log
+
 FIPS140-2.Fedora.x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD

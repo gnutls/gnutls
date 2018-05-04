@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -50,6 +50,8 @@ int main()
 #include "tls13/ext-parse.h"
 #include "utils.h"
 
+#define MAX_AUTHS 4
+
 /* This program tests whether the Post Handshake Auth extension is
  * present in the client hello, and whether it is missing from server
  * hello. In addition it contains basic functionality test for
@@ -74,6 +76,7 @@ static void client(int fd)
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
 	char buf[64];
+	unsigned i;
 
 	global_init();
 
@@ -116,21 +119,24 @@ static void client(int fd)
 		fail("handshake failed: %s\n", gnutls_strerror(ret));
 	success("client handshake completed\n");
 
-	do {
-		ret = gnutls_record_recv(session, buf, sizeof(buf));
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	for (i=0;i<MAX_AUTHS;i++) {
+		do {
+			ret = gnutls_record_recv(session, buf, sizeof(buf));
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-	if (ret != GNUTLS_E_REAUTH_REQUEST) {
-		fail("recv: unexpected error: %s\n", gnutls_strerror(ret));
+		if (ret != GNUTLS_E_REAUTH_REQUEST) {
+			fail("recv: unexpected error: %s\n", gnutls_strerror(ret));
+		}
+
+		success("received reauth request\n");
+		do {
+			ret = gnutls_reauth(session, 0);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+		if (ret != 0)
+			fail("client: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
 	}
 
-	success("received reauth request\n");
-	do {
-		ret = gnutls_reauth(session, 0);
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-
-	if (ret != 0)
-		fail("client: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
 
 	close(fd);
 
@@ -182,6 +188,7 @@ static void server(int fd)
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
+	unsigned i;
 
 	/* this must be called once in the program
 	 */
@@ -231,13 +238,16 @@ static void server(int fd)
 	success("server handshake completed\n");
 
 	gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUIRE);
-	/* ask peer for re-authentication */
-	do {
-		ret = gnutls_reauth(session, 0);
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-	if (ret != 0)
-		fail("server: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
+	for (i=0;i<MAX_AUTHS;i++) {
+		/* ask peer for re-authentication */
+		do {
+			ret = gnutls_reauth(session, 0);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+		if (ret != 0)
+			fail("server: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
+	}
 
 	close(fd);
 	gnutls_deinit(session);

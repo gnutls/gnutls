@@ -380,9 +380,9 @@ gnutls_session_t initialize_session(int dtls)
 		priorities = "NORMAL";
 
 	if (dtls)
-		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_POST_HANDSHAKE_AUTH);
 	else
-		gnutls_init(&session, GNUTLS_SERVER);
+		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH);
 
 	/* allow the use of private ciphersuites.
 	 */
@@ -944,8 +944,12 @@ get_response(gnutls_session_t session, char *request,
 		strip(request);
 		fprintf(stderr, "received: %s\n", request);
 		if (check_command(session, request)) {
-			*response = NULL;
-			*response_length = 0;
+			*response = strdup("Successfully executed command\n");
+			if (*response == NULL) {
+				fprintf(stderr, "Memory error\n");
+				exit(1);
+			}
+			*response_length = strlen(*response);
 			return;
 		}
 		*response = strdup(request);

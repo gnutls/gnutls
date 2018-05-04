@@ -929,6 +929,20 @@ int check_command(gnutls_session_t session, const char *str)
 				"*** Sending rehandshake request\n");
 			gnutls_rehandshake(session);
 			return 1;
+		} else if (strncmp
+		    (str, "**REAUTH**",
+		     sizeof("**REAUTH**") - 1) == 0) {
+			fprintf(stderr,
+				"*** Sending re-auth request\n");
+			do {
+				ret = gnutls_reauth(session, 0);
+			} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+			if (ret < 0) {
+				fprintf(stderr, "reauth: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+			return 1;
 		} else
 		    if (strncmp
 			(str, "**HEARTBEAT**",

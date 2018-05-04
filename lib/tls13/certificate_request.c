@@ -37,6 +37,7 @@
 
 typedef struct crt_req_ctx_st {
 	gnutls_session_t session;
+	unsigned got_sig_algo;
 	gnutls_pk_algorithm_t pk_algos[MAX_ALGOS];
 	unsigned pk_algos_length;
 	const uint8_t *rdn; /* pointer inside the message buffer */
@@ -71,10 +72,10 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t *data, unsig
 		/* signature algorithms; let's use it to decide the certificate to use */
 		unsigned i;
 
-		if (session->internals.hsk_flags & HSK_CRT_REQ_GOT_SIG_ALGO)
+		if (ctx->got_sig_algo)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
-		session->internals.hsk_flags |= HSK_CRT_REQ_GOT_SIG_ALGO;
+		ctx->got_sig_algo = 1;
 
 		if (data_size < 2)
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
@@ -166,6 +167,10 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	/* The "signature_algorithms" extension MUST be specified */
+	if (!ctx.got_sig_algo)
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
 	session->internals.hsk_flags |= HSK_CRT_ASKED;
 

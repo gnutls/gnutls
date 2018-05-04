@@ -1788,7 +1788,11 @@ A server which wants to instruct the client to re-authenticate, should call
 @funcref{gnutls_rehandshake} and wait for the client to re-authenticate.
 It is recommended to only request re-handshake when safe renegotiation is
 enabled for that session (see @funcref{gnutls_safe_renegotiation_status} and
-the discussion in @ref{Safe renegotiation}).
+the discussion in @ref{Safe renegotiation}). A server could also encounter
+the GNUTLS_E_REHANDSHAKE error code while receiving data. That indicates
+a client-initiated re-handshake request. In that case the server could
+ignore that request, perform handshake (unsafe when done generally), or
+even drop the connection.
 
 @showfuncdesc{gnutls_rehandshake}
 

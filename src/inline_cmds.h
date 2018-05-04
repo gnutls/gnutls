@@ -40,7 +40,8 @@
  */
 typedef enum INLINE_COMMAND { INLINE_COMMAND_NONE,
 	INLINE_COMMAND_RESUME,
-	INLINE_COMMAND_RENEGOTIATE
+	INLINE_COMMAND_RENEGOTIATE,
+	INLINE_COMMAND_REKEY
 } inline_command_t;
 #define NUM_INLINE_COMMANDS 2
 
@@ -66,5 +67,6 @@ struct inline_command_definitions {
 /* All inline commands will contain a trailing LF */
 struct inline_command_definitions inline_commands_def[] = {
 	{INLINE_COMMAND_RESUME, "^resume^\n"},
+	{INLINE_COMMAND_REKEY, "^rekey^\n"},
 	{INLINE_COMMAND_RENEGOTIATE, "^renegotiate^\n"},
 };

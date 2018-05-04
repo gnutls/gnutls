@@ -50,7 +50,7 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 			optional = 1;
 	}
 
-	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, optional, &buf);
+	ret = _gnutls_recv_handshake(session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, 0, &buf);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET && session->internals.send_cert_req)
 			return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
@@ -58,8 +58,10 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 		return gnutls_assert_val(ret);
 	}
 
-	if (buf.length == 0 && optional) {
-		return 0;
+	if (buf.length == 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		goto cleanup;
 	}
 
 	if (session->internals.initial_negotiation_completed &&
@@ -97,6 +99,8 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 
 	ret = parse_cert_list(session, buf.data, buf.length);
 	if (ret < 0) {
+		if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND && optional)
+			ret = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -186,9 +190,9 @@ int append_status_request(void *_ctx, gnutls_buffer_st *buf)
 int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 {
 	int ret;
-	gnutls_pcert_st *apr_cert_list;
-	gnutls_privkey_t apr_pkey;
-	int apr_cert_list_length;
+	gnutls_pcert_st *apr_cert_list = NULL;
+	gnutls_privkey_t apr_pkey = NULL;
+	int apr_cert_list_length = 0;
 	mbuffer_st *bufel = NULL;
 	gnutls_buffer_st buf;
 	unsigned pos_mark, ext_pos_mark;
@@ -207,18 +211,15 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 		}
 
+		if (session->security_parameters.entity == GNUTLS_CLIENT &&
+		    !(session->internals.hsk_flags & HSK_CRT_ASKED)) {
+			return 0;
+		}
+
 		ret = _gnutls_get_selected_cert(session, &apr_cert_list,
 						&apr_cert_list_length, &apr_pkey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-
-		if (session->security_parameters.entity == GNUTLS_CLIENT) {
-			/* if we didn't get a cert request there will not be any */
-			if (apr_cert_list_length == 0 ||
-			    !(session->internals.hsk_flags & HSK_CRT_ASKED)) {
-				return 0;
-			}
-		}
 
 		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
 		if (ret < 0)
@@ -375,9 +376,8 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	}
 
 	if (data == NULL || data_size == 0) {
-		gnutls_assert();
 		/* no certificate was sent */
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	}
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
@@ -391,17 +391,16 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	if (size != dsize)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-	if (size == 0) {
-		gnutls_assert();
-		/* no certificate was sent */
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-	}
+	if (size == 0)
+		return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
 
 	i = dsize;
 
 	while (i > 0) {
 		DECR_LEN(dsize, 3);
 		len = _gnutls_read_uint24(p);
+		if (len == 0)
+			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		DECR_LEN(dsize, len);
 		p += len + 3;
@@ -420,10 +419,10 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	if (dsize != 0)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-	if (nentries == 0) {
-		gnutls_assert();
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-	}
+	/* this is unnecessary - keeping to avoid a regression due to a re-org
+	 * of the loop above */
+	if (nentries == 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	npeer_ocsp = 0;
 	npeer_certs = 0;
@@ -482,6 +481,15 @@ parse_cert_list(gnutls_session_t session, uint8_t * data, size_t data_size)
 	/* The OCSP entries match the certificate entries, although
 	 * the contents of each OCSP entry may be NULL.
 	 */
+	for(j=0;j<info->ncerts;j++)
+		gnutls_free(info->raw_certificate_list[j].data);
+	gnutls_free(info->raw_certificate_list);
+
+	for(j=0;j<info->nocsp;j++)
+		gnutls_free(info->raw_ocsp_list[j].data);
+	gnutls_free(info->raw_ocsp_list);
+
+
 	info->raw_certificate_list = peer_certs;
 	info->ncerts = npeer_certs;
 

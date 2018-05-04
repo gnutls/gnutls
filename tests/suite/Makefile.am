@@ -86,7 +86,8 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common
-nodist_check_SCRIPTS = chain.sh \
+
+scripts_to_test = chain.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
 	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
 	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh
@@ -108,7 +109,7 @@ TESTS_ENVIRONMENT += ENABLE_SSL3=1
 endif
 
 if ENABLE_DANE
-nodist_check_SCRIPTS += testdane.sh
+scripts_to_test += testdane.sh
 endif
 
 if !MACOSX
@@ -121,11 +122,13 @@ nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli mini-record-timing
 
-nodist_check_SCRIPTS += eagain.sh
+scripts_to_test += eagain.sh
 endif
 endif
 
-TESTS = $(nodist_check_SCRIPTS) prime-check
+nodist_check_SCRIPTS = $(scripts_to_test) testcompat-tls13-openssl.sh
+
+TESTS = $(scripts_to_test) prime-check
 
 prime_check_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 
