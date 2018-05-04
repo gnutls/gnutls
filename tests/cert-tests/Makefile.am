@@ -91,7 +91,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data data/pkcs8-invalid9.der data/key-invalid2.der data/pkcs8-invalid10.der \
 	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt
 
-dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
+dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
 	provable-dh userid sha2-test sha2-dsa-test provable-privkey-dsa2048 \
 	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
@@ -111,7 +111,7 @@ endif
 
 if !WINDOWS
 dist_check_SCRIPTS += template-test pem-decoding othername-test krb5-test sha3-test md5-test \
-	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8 rsa-pss-pad dsa
+	tlsfeature-test template-exts-test pkcs1-pad pkcs12-utf8 rsa-pss-pad dsa certtool
 endif
 
 if ENABLE_DANE

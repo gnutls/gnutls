@@ -1034,15 +1034,21 @@ pin_callback(void *user, int attempt, const char *token_url,
 			password = getenv("GNUTLS_PIN");
 	}
 
-	if (password == NULL && (info == NULL || info->batch == 0)) {
-		fprintf(stderr, "Token '%s' with URL '%s' ", token_label, token_url);
-		fprintf(stderr, "requires %s PIN\n", desc);
-
-		password = getpass("Enter PIN: ");
-	} else {
-		if (flags & GNUTLS_PIN_WRONG) {
+	if (password == NULL && (info == NULL || info->batch == 0 || info->ask_pass != 0)) {
+		if (token_label && token_label[0] != 0) {
 			fprintf(stderr, "Token '%s' with URL '%s' ", token_label, token_url);
 			fprintf(stderr, "requires %s PIN\n", desc);
+			password = getpass("Enter PIN: ");
+		} else {
+			password = getpass("Enter password: ");
+		}
+
+	} else {
+		if (flags & GNUTLS_PIN_WRONG) {
+			if (token_label && token_label[0] != 0) {
+				fprintf(stderr, "Token '%s' with URL '%s' ", token_label, token_url);
+				fprintf(stderr, "requires %s PIN\n", desc);
+			}
 			fprintf(stderr, "Cannot continue with a wrong password in the environment.\n");
 			exit(1);
 		}

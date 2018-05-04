@@ -1228,7 +1228,6 @@ static void cmd_parser(int argc, char **argv)
 		template_parse(OPT_ARG(TEMPLATE));
 	}
 
-	ask_pass = ENABLED_OPT(ASK_PASS);
 
 	gnutls_global_set_log_function(tls_log_func);
 
@@ -1244,6 +1243,7 @@ static void cmd_parser(int argc, char **argv)
 
 	memset(&cinfo, 0, sizeof(cinfo));
 
+	ask_pass = cinfo.ask_pass = ENABLED_OPT(ASK_PASS);
 	cinfo.hash = GNUTLS_DIG_UNKNOWN;
 	if (HAVE_OPT(HASH)) {
 		cinfo.hash = hash_to_id(OPT_ARG(HASH));

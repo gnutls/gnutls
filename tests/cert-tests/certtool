@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Copyright (C) 2014 Nikos Mavrogiannopoulos
+# Copyright (C) 2014-2018 Nikos Mavrogiannopoulos
+# Copyright (C) 2018 Red Hat, Inc.
 #
 # This file is part of GnuTLS.
 #
@@ -14,15 +15,17 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with GnuTLS; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 #set -e
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
+TMPFILE1=certtool-file1.$$.tmp
+TMPFILE2=certtool-file2.$$.tmp
+PASS="1234"
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -30,6 +33,30 @@ fi
 
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
+SETSID=$(which setsid)
+if test -n "${SETSID}";then
+	${VALGRIND} "${CERTTOOL}" --generate-privkey --rsa --outfile ${TMPFILE1} --pkcs8 --password ${PASS}
+	if test $? != 0;then
+		echo "private key generation failed"
+		exit 1
+	fi
+
+	#check whether ask-pass is being honoured
+	${SETSID} "${CERTTOOL}" --generate-self-signed --load-privkey ${TMPFILE1} --template "${srcdir}/templates/template-test.tmpl" --ask-pass >${TMPFILE2} 2>&1 <<<${PASS}
+	if test $? != 0;then
+		cat ${TMPFILE2}
+		echo "cert generation failed"
+		exit 1
+	fi
+
+	grep "Enter password" ${TMPFILE2} >/dev/null 2>&1
+	if test $? != 0;then
+		cat ${TMPFILE2}
+		echo "No password was asked"
+		exit 1
+	fi
 fi
 
 #check whether "funny" spaces can be interpreted
@@ -98,6 +125,8 @@ if test "${id}" != "c4880390506a849cd2d8289fb8aea8c189e635aff1054faba58658a0f107
 	exit 1
 fi
 
+rm -f ${TMPFILE1} ${TMPFILE2}
+
 export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
@@ -112,6 +141,5 @@ if test "${rc}" != "0"; then
 	echo "There was an issue verifying the chain"
 	exit 1
 fi
-
 
 exit 0
