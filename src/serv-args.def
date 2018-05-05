@@ -43,6 +43,12 @@ flag = {
 };
 
 flag = {
+    name      = nocookie;
+    descrip   = "Don't require cookie on DTLS sessions";
+    doc      = "";
+};
+
+flag = {
     name      = generate;
     value     = g;
     descrip   = "Generate Diffie-Hellman parameters";
