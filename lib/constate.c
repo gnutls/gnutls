@@ -191,7 +191,7 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 	uint8_t iv_block[MAX_CIPHER_IV_SIZE];
 	char buf[65];
 	record_state_st *upd_state;
-	record_parameters_st *prev;
+	record_parameters_st *prev = NULL;
 	int ret;
 
 	/* generate new keys for direction needed and copy old from previous epoch */
@@ -202,6 +202,7 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &prev);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+		assert(prev != NULL);
 
 		params->read.sequence_number = prev->read.sequence_number;
 
@@ -226,6 +227,7 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &prev);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+		assert(prev != NULL);
 
 		params->write.sequence_number = prev->write.sequence_number;
 

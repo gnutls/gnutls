@@ -1573,6 +1573,8 @@ void gnutls_packet_get(gnutls_packet_t packet, gnutls_datum_t *data, unsigned ch
 		}
 	}
 
+	assert(packet != NULL);
+
 	if (sequence) {
 		memcpy(sequence, packet->record_sequence.i, 8);
 	}

@@ -1604,7 +1604,7 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 
 	/* read the public key */
 	if (pubkey != NULL) {
-		size_t psize;
+		size_t psize = 0;
 
 		ret = gnutls_pubkey_init(&pub);
 		if (ret < 0) {

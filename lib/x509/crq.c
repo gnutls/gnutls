@@ -2858,7 +2858,7 @@ int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
 				    unsigned int *critical)
 {
 	int ret;
-	gnutls_datum_t der;
+	gnutls_datum_t der = {NULL, 0};
 
 	if (crq == NULL) {
 		gnutls_assert();

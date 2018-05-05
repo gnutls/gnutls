@@ -414,7 +414,7 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
 {
 	ASN1_TYPE pkcs8_asn = NULL, pkey_info;
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 	schema_id schema;
 
 	if (key == NULL) {
@@ -616,7 +616,7 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 {
 	ASN1_TYPE pkcs8_asn = NULL, pkey_info;
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 	schema_id schema;
 
 	if (key == NULL) {
@@ -694,7 +694,7 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 {
 	int result, len;
 	char enc_oid[MAX_OID_SIZE];
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 	int params_start, params_end, params_len;
 	struct pbkdf2_params kdf_params;
 	struct pbe_enc_params enc_params;
@@ -946,7 +946,7 @@ static int
 _decode_pkcs8_rsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 
 	ret = _gnutls_x509_read_value(pkcs8_asn, "privateKey", &tmp);
 	if (ret < 0) {
@@ -975,7 +975,7 @@ static int
 _decode_pkcs8_rsa_pss_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 	gnutls_x509_spki_st params;
 
 	memset(&params, 0, sizeof(params));
@@ -1020,7 +1020,7 @@ static int
 _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 	unsigned char oid[MAX_OID_SIZE];
 	unsigned curve = GNUTLS_ECC_CURVE_INVALID;
 	int len, result;
@@ -1107,7 +1107,7 @@ static int
 _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 
 	gnutls_pk_params_init(&pkey->params);
 

@@ -276,6 +276,8 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 	    _gnutls_cipher_get_block_size(handle->cipher.e);
 	unsigned l;
 
+	assert(ciphertext != NULL);
+
 	if (handle->is_mac) { /* cipher + mac */
 		if (handle->non_null == 0) { /* NULL cipher + MAC */
 			MAC(handle, text, textlen);
