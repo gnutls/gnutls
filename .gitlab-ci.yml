@@ -28,8 +28,8 @@ variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_STRETCH_BUILD: buildenv-debian-stretch
   DEBIAN_CROSS_BUILD: buildenv-debian-cross
-  FEDORA_BUILD: buildenv-f26
-  FEDORA_X86_BUILD: buildenv-f26-x86
+  FEDORA_BUILD: buildenv-f28
+  FEDORA_X86_BUILD: buildenv-f28-x86
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
@@ -54,7 +54,6 @@ doc-dist.Fedora:
   except:
   - tags
 
-# ABI check + coverage
 abi-coverage.Fedora:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
