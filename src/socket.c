@@ -422,7 +422,7 @@ wrap_pull(gnutls_transport_ptr_t ptr, void *data, size_t len)
 
 	r = recv(hd->fd, data, len, 0);
 	if (r > 0 && hd->server_trace) {
-		fwrite(data, 1, len, hd->server_trace);
+		fwrite(data, 1, r, hd->server_trace);
 	}
 	return r;
 }
