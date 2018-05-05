@@ -188,6 +188,16 @@ _gcm_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 		    length, dst, src);
 }
 
+static void _des_set_key(struct des_ctx *ctx, const uint8_t *key)
+{
+	des_set_key(ctx, key);
+}
+
+static void _des3_set_key(struct des3_ctx *ctx, const uint8_t *key)
+{
+	des3_set_key(ctx, key);
+}
+
 static const struct nettle_cipher_st builtin_ciphers[] = {
 	{  .algo = GNUTLS_CIPHER_AES_128_GCM,
 	   .block_size = AES_BLOCK_SIZE,
@@ -407,8 +417,8 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct CBC_CTX(struct des_ctx, DES_BLOCK_SIZE)),
 	   .encrypt = _cbc_encrypt,
 	   .decrypt = _cbc_decrypt,
-	   .set_encrypt_key = (nettle_set_key_func*)des_set_key,
-	   .set_decrypt_key = (nettle_set_key_func*)des_set_key,
+	   .set_encrypt_key = (nettle_set_key_func*)_des_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)_des_set_key,
 	   .max_iv_size = DES_BLOCK_SIZE,
 	},
 	{  .algo = GNUTLS_CIPHER_3DES_CBC,
@@ -420,8 +430,8 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct CBC_CTX(struct des3_ctx, DES3_BLOCK_SIZE)),
 	   .encrypt = _cbc_encrypt,
 	   .decrypt = _cbc_decrypt,
-	   .set_encrypt_key = (nettle_set_key_func*)des3_set_key,
-	   .set_decrypt_key = (nettle_set_key_func*)des3_set_key,
+	   .set_encrypt_key = (nettle_set_key_func*)_des3_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)_des3_set_key,
 	   .max_iv_size = DES_BLOCK_SIZE,
 	},
 	{  .algo = GNUTLS_CIPHER_ARCFOUR_128,
