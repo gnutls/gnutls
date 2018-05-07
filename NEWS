@@ -24,6 +24,10 @@ See the end for copying conditions.
    strings, then TLS 1.3 negotiation will be disabled if the session is associated
    with an anonymous credentials structure.
 
+** Provide a uniform cipher list across different protocols; the CAMELLIA ciphers
+   as well as ciphers utilizing HMAC-SHA384 have been removed from the default
+   priority strings.
+
 ** libgnutls: Introduced low-level function to assist applications attempting client
    hello extension parsing, prior to GnuTLS' parsing of the message.
 
