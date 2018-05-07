@@ -2761,6 +2761,8 @@ typedef enum {
  * @GNUTLS_EXT_FLAG_EE: This extension can be present in encrypted extensions message
  * @GNUTLS_EXT_FLAG_HRR: This extension can be present in hello retry request message
  * @GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST: When flag is present, this extension will be send even if the server didn't advertise it. An extension of this type is the Cookie TLS1.3 extension.
+ * @GNUTLS_EXT_FLAG_DTLS: This extension can be present under DTLS; otherwise ignored.
+ * @GNUTLS_EXT_FLAG_TLS: This extension can be present under TLS; otherwise ignored.
  *
  * Enumeration of different TLS extension registration flags.
  */
@@ -2771,7 +2773,9 @@ typedef enum {
   GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO = (1<<3),
   GNUTLS_EXT_FLAG_EE = (1<<4), /* ENCRYPTED */
   GNUTLS_EXT_FLAG_HRR = (1<<5),
-  GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST = (1<<6)
+  GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST = (1<<6),
+  GNUTLS_EXT_FLAG_TLS = (1<<7),
+  GNUTLS_EXT_FLAG_DTLS = (1<<8)
 } gnutls_ext_flags_t;
 
 /* Register a custom tls extension

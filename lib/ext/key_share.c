@@ -48,8 +48,8 @@ const hello_ext_entry_st ext_mod_key_share = {
 	.tls_id = 51,
 	.gid = GNUTLS_EXTENSION_KEY_SHARE,
 	.parse_type = _GNUTLS_EXT_TLS_POST_CS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO|GNUTLS_EXT_FLAG_HRR,
-
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO |
+		    GNUTLS_EXT_FLAG_HRR,
 	.recv_func = key_share_recv_params,
 	.send_func = key_share_send_params,
 	.pack_func = NULL,

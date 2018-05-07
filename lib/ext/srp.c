@@ -47,8 +47,7 @@ const hello_ext_entry_st ext_mod_srp = {
 	.tls_id = 12,
 	.gid = GNUTLS_EXTENSION_SRP,
 	.parse_type = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO,
-
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.recv_func = _gnutls_srp_recv_params,
 	.send_func = _gnutls_srp_send_params,
 	.pack_func = _gnutls_srp_pack,

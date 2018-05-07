@@ -208,12 +208,21 @@ int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned d
 
 	ext = tls_id_to_ext_entry(session, tls_id, ctx->parse_type);
 	if (ext == NULL || ext->recv_func == NULL) {
-		if (ext) {
-			_gnutls_hard_log
-			    ("EXT[%p]: Ignoring extension '%s/%d'\n", session,
-			     ext->name, (int)tls_id);
+		goto ignore;
+	}
+
+	/* we do not hard fail when extensions defined for TLS are used for
+	 * DTLS and vice-versa. They may extend their role in the future. */
+	if (IS_DTLS(session)) {
+		if (!(ext->validity & GNUTLS_EXT_FLAG_DTLS)) {
+			gnutls_assert();
+			goto ignore;
 		}
-		return 0;
+	} else {
+		if (!(ext->validity & GNUTLS_EXT_FLAG_TLS)) {
+			gnutls_assert();
+			goto ignore;
+		}
 	}
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
@@ -250,6 +259,14 @@ int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned d
 	}
 
 	return 0;
+
+ ignore:
+	if (ext) {
+		_gnutls_handshake_log
+		    ("EXT[%p]: Ignoring extension '%s/%d'\n", session,
+		     ext->name, (int)tls_id);
+	}
+	return 0;
 }
 
 int
@@ -260,6 +277,8 @@ _gnutls_parse_hello_extensions(gnutls_session_t session,
 {
 	int ret;
 	hello_ext_ctx_st ctx;
+
+	msg &= GNUTLS_EXT_FLAG_SET_ONLY_FLAGS_MASK;
 
 	ctx.session = session;
 	ctx.msg = msg;
@@ -290,11 +309,20 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 		return 0;
 	}
 
+	if (IS_DTLS(session)) {
+		if (!(p->validity & GNUTLS_EXT_FLAG_DTLS)) {
+			gnutls_assert();
+			goto skip;
+		}
+	} else {
+		if (!(p->validity & GNUTLS_EXT_FLAG_TLS)) {
+			gnutls_assert();
+			goto skip;
+		}
+	}
+
 	if ((ctx->msg & p->validity) == 0) {
-		_gnutls_hard_log("EXT[%p]: Not sending extension (%s/%d) for '%s'\n", session,
-				  p->name, (int)p->tls_id,
-				  ext_msg_validity_to_str(ctx->msg));
-		return 0;
+		goto skip;
 	} else {
 		_gnutls_handshake_log("EXT[%p]: Preparing extension (%s/%d) for '%s'\n", session,
 				  p->name, (int)p->tls_id,
@@ -335,6 +363,12 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 	}
 
 	return ret;
+
+ skip:
+	_gnutls_handshake_log("EXT[%p]: Not sending extension (%s/%d) for '%s'\n", session,
+			  p->name, (int)p->tls_id,
+			  ext_msg_validity_to_str(ctx->msg));
+	return 0;
 }
 
 int
@@ -346,6 +380,8 @@ _gnutls_gen_hello_extensions(gnutls_session_t session,
 	int pos, ret;
 	size_t i;
 	hello_ext_ctx_st ctx;
+
+	msg &= GNUTLS_EXT_FLAG_SET_ONLY_FLAGS_MASK;
 
 	ctx.session = session;
 	ctx.msg = msg;
@@ -752,7 +788,8 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 	tmp_mod->deinit_func = deinit_func;
 	tmp_mod->pack_func = pack_func;
 	tmp_mod->unpack_func = unpack_func;
-	tmp_mod->validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|GNUTLS_EXT_FLAG_EE;
+	tmp_mod->validity = GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+			    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_TLS;
 
 	assert(extfunc[gid] == NULL);
 	extfunc[gid] = tmp_mod;
@@ -760,9 +797,9 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
 	return 0;
 }
 
-#define VALIDITY_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO| \
-			GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO| \
-			GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_HRR)
+#define VALIDITY_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO | \
+			GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO | \
+			GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_HRR)
 
 /**
  * gnutls_session_ext_register:
@@ -854,7 +891,15 @@ gnutls_session_ext_register(gnutls_session_t session,
 	tmp_mod.validity = flags;
 
 	if ((tmp_mod.validity & VALIDITY_MASK) == 0) {
-		tmp_mod.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|GNUTLS_EXT_FLAG_EE;
+		tmp_mod.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+				   GNUTLS_EXT_FLAG_EE;
+	}
+
+	if ((tmp_mod.validity & (GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_TLS)) == 0) {
+		if (IS_DTLS(session))
+			tmp_mod.validity |= GNUTLS_EXT_FLAG_DTLS;
+		else
+			tmp_mod.validity |= GNUTLS_EXT_FLAG_TLS;
 	}
 
 	exts = gnutls_realloc(session->internals.rexts, (session->internals.rexts_size+1)*sizeof(*exts));

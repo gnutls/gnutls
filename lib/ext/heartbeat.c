@@ -527,8 +527,8 @@ const hello_ext_entry_st ext_mod_heartbeat = {
 	.tls_id = 15,
 	.gid = GNUTLS_EXTENSION_HEARTBEAT,
 	.parse_type = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
-
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_heartbeat_recv_params,
 	.send_func = _gnutls_heartbeat_send_params,
 	.pack_func = _gnutls_heartbeat_pack,

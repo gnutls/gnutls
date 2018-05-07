@@ -184,7 +184,7 @@ const hello_ext_entry_st ext_psk_ke_modes = {
 	.tls_id = 45,
 	.gid = GNUTLS_EXTENSION_PSK_KE_MODES,
 	.parse_type = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
 	.send_func = psk_ke_modes_send_params,
 	.recv_func = psk_ke_modes_recv_params
 };

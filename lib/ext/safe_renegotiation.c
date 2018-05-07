@@ -35,9 +35,9 @@ const hello_ext_entry_st ext_mod_sr = {
 	.name = "Safe Renegotiation",
 	.tls_id = 65281,
 	.gid = GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.parse_type = GNUTLS_EXT_MANDATORY,
-
 	.recv_func = _gnutls_sr_recv_params,
 	.send_func = _gnutls_sr_send_params,
 	.pack_func = NULL,
