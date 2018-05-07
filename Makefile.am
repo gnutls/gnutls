@@ -76,8 +76,11 @@ ABIVER=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tag
 	@echo "Creating ABI for $(ABIVER)"
 	cd $(ABI_TMPCLONEDIR) && \
 	  git checkout $(ABIREF) && \
-	  make autoreconf && CFLAGS="-g -Og" ./configure --disable-doc && \
-	  $(MAKE) -j$$(nproc) -C gl && $(MAKE) -j$$(nproc) -C lib && $(MAKE) -j$$(nproc) -C libdane
+	  make autoreconf && if test -f ../cache/config.cache;then\
+	    CFLAGS="-g -Og" ./configure --disable-doc --cache-file ../cache/config.cache;\
+	  else\
+	    CFLAGS="-g -Og" ./configure --disable-doc;\
+	  fi && $(MAKE) -j$$(nproc) -C gl && $(MAKE) -j$$(nproc) -C lib && $(MAKE) -j$$(nproc) -C libdane
 	touch $@
 
 abi-check: .prev-tag-abi.stamp
