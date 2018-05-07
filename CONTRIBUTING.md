@@ -116,6 +116,9 @@ As such, some questions to answer before adding a new API:
 The make rule 'abi-check' verifies that the ABI remained compatible since
 the last tagged release. It relies on the git tree and abi-compliance-checker.
 
+The above do not apply to the C++ library; this library's ABI should not
+be considered stable.
+
 
 # Constructed types:
 
