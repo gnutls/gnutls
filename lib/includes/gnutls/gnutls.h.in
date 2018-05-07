@@ -2724,7 +2724,8 @@ typedef int (*gnutls_ext_pack_func) (gnutls_ext_priv_data_t data,
 typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_t packed_data,
 				       gnutls_ext_priv_data_t *data);
 
-#define GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO 1
+#define GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO 1
+#define GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO (1<<1)
 typedef int (*gnutls_ext_raw_process_func)(void *ctx, unsigned tls_id, const unsigned char *data, unsigned data_size);
 int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 			 const gnutls_datum_t *data, unsigned int flags);

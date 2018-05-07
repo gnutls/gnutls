@@ -83,13 +83,13 @@ int _gnutls_extv_parse(void *ctx,
  * @ctx: a pointer to pass to callback function
  * @cb: callback function to process each extension found
  * @data: TLS extension data
- * @flags: should be zero or %GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO
+ * @flags: should be zero or %GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO or %GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO
  *
  * This function iterates through the TLS extensions as passed in
  * @data, passing the individual extension data to callback. The
  * @data must conform to Extension extensions<0..2^16-1> format.
  *
- * If flags is %GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO then this function
+ * If flags is %GNUTLS_EXT_RAW_TLS_FLAG_CLIENT_HELLO then this function
  * will parse the extension data from the position, as if the packet in
  * @data is a client hello (without record or handshake headers) -
  * as provided by gnutls_handshake_set_hook_function().
@@ -104,7 +104,7 @@ int _gnutls_extv_parse(void *ctx,
 int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 			 const gnutls_datum_t *data, unsigned int flags)
 {
-	if (flags & GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO) {
+	if (flags & GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO) {
 		ssize_t size = data->size;
 		size_t len;
 		uint8_t *p = data->data;
@@ -117,6 +117,50 @@ int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 		p += HANDSHAKE_SESSION_ID_POS;
 
 		/* skip session id */
+		DECR_LEN(size, 1);
+		len = p[0];
+		p++;
+		DECR_LEN(size, len);
+		p += len;
+
+		/* CipherSuites */
+		DECR_LEN(size, 2);
+		len = _gnutls_read_uint16(p);
+		p += 2;
+		DECR_LEN(size, len);
+		p += len;
+
+		/* legacy_compression_methods */
+		DECR_LEN(size, 1);
+		len = p[0];
+		p++;
+		DECR_LEN(size, len);
+		p += len;
+
+		if (size <= 0)
+			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+		return _gnutls_extv_parse(ctx, cb, p, size);
+	} else if (flags & GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO) {
+		ssize_t size = data->size;
+		size_t len;
+		uint8_t *p = data->data;
+
+		DECR_LEN(size, HANDSHAKE_SESSION_ID_POS);
+
+		if (p[0] != 254)
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+		p += HANDSHAKE_SESSION_ID_POS;
+
+		/* skip session id */
+		DECR_LEN(size, 1);
+		len = p[0];
+		p++;
+		DECR_LEN(size, len);
+		p += len;
+
+		/* skip cookie */
 		DECR_LEN(size, 1);
 		len = p[0];
 		p++;

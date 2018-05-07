@@ -69,7 +69,6 @@ static void client_log_func(int level, const char *str)
 
 static unsigned found_server_name = 0;
 static unsigned found_status_req = 0;
-static unsigned bare_version = 0;
 
 static int ext_callback(void *ctx, unsigned tls_id, const unsigned char *data, unsigned size)
 {
@@ -109,21 +108,8 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 	int ret;
 
 	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post) {
-		if (bare_version) {
-			ret = gnutls_ext_raw_parse(NULL, ext_callback, msg, GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO);
-		} else {
-			unsigned pos;
-			gnutls_datum_t mmsg;
-			assert(msg->size >= HANDSHAKE_SESSION_ID_POS);
-			pos = HANDSHAKE_SESSION_ID_POS;
-			SKIP8(pos, msg->size);
-			SKIP16(pos, msg->size);
-			SKIP8(pos, msg->size);
+		ret = gnutls_ext_raw_parse(NULL, ext_callback, msg, GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO);
 
-			mmsg.data = &msg->data[pos];
-			mmsg.size = msg->size - pos;
-			ret = gnutls_ext_raw_parse(NULL, ext_callback, &mmsg, 0);
-		}
 		assert(ret >= 0);
 	}
 	return 0;
@@ -146,11 +132,10 @@ static void client(int fd)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_DATAGRAM);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-DTLS1.2", NULL)>= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -215,17 +200,14 @@ static void server(int fd)
 					    &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	gnutls_init(&session, GNUTLS_SERVER);
+	gnutls_init(&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CLIENT_HELLO,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL);
+	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-ALL:+VERS-DTLS1.2", NULL)>= 0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -269,7 +251,7 @@ static void ch_handler(int sig)
 	return;
 }
 
-static void start(unsigned val)
+void doit(void)
 {
 	int fd[2];
 	int ret, status = 0;
@@ -277,8 +259,6 @@ static void start(unsigned val)
 
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
-
-	bare_version = val;
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -308,10 +288,5 @@ static void start(unsigned val)
 	return;
 }
 
-void doit(void)
-{
-	start(0);
-	start(1);
-}
 
 #endif				/* _WIN32 */
