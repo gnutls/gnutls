@@ -216,6 +216,7 @@ int gnutls_error_to_alert(int err, int *level)
 		ret = GNUTLS_A_DECOMPRESSION_FAILURE;
 		_level = GNUTLS_AL_FATAL;
 		break;
+	case GNUTLS_E_ILLEGAL_PARAMETER:
 	case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
 	case GNUTLS_E_ILLEGAL_SRP_USERNAME:
 	case GNUTLS_E_PK_INVALID_PUBKEY:

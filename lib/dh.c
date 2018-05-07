@@ -501,7 +501,7 @@ gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 
 	if (_gnutls_mpi_cmp_ui(params->params[0], 0) == 0) {
 		asn1_delete_structure(&c2);
-		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
 	/* read the generator
@@ -517,7 +517,7 @@ gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 	if (_gnutls_mpi_cmp_ui(params->params[1], 0) == 0) {
 		asn1_delete_structure(&c2);
 		_gnutls_mpi_release(&params->params[0]);
-		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
 
 	asn1_delete_structure(&c2);
