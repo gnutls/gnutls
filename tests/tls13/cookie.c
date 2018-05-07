@@ -258,6 +258,7 @@ void doit(void)
 	} else {
 		close(sockets[0]);
 		client(sockets[1]);
+		exit(0);
 	}
 }
 
