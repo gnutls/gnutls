@@ -123,7 +123,7 @@ static void run(const char *name, unsigned test)
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 		if (test != 0)
 			break;
-		sec_sleep(1);
+		sec_sleep(2);
 		/* fall-through */
 	case 2:
 		success("%s: updating server's key\n", name);
@@ -131,6 +131,8 @@ static void run(const char *name, unsigned test)
 		do {
 			ret = gnutls_session_key_update(server, 0);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		if (ret < 0)
+			fail("error in key update: %s\n", gnutls_strerror(ret));
 
 		/* client receives the key update and sends data */
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
@@ -138,13 +140,15 @@ static void run(const char *name, unsigned test)
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 		if (test != 0)
 			break;
-		sec_sleep(1);
+		sec_sleep(2);
 		/* fall-through */
 	case 3:
 		success("%s: updating client's key and asking server\n", name);
 		do {
 			ret = gnutls_session_key_update(client, GNUTLS_KU_PEER);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		if (ret < 0)
+			fail("error in key update: %s\n", gnutls_strerror(ret));
 
 		/* server receives the client key update and sends data */
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
@@ -152,13 +156,15 @@ static void run(const char *name, unsigned test)
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
 		if (test != 0)
 			break;
-		sec_sleep(1);
+		sec_sleep(2);
 		/* fall-through */
 	case 4:
 		success("%s: updating server's key and asking client\n", name);
 		do {
 			ret = gnutls_session_key_update(server, GNUTLS_KU_PEER);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		if (ret < 0)
+			fail("error in key update: %s\n", gnutls_strerror(ret));
 
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
@@ -173,7 +179,7 @@ static void run(const char *name, unsigned test)
 			ret = gnutls_session_key_update(server, GNUTLS_KU_PEER);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		if (ret < 0)
-			fail("cannot recv: %s\n", gnutls_strerror(ret));
+			fail("error in key update: %s\n", gnutls_strerror(ret));
 
 		/* client has data in the corked buffer */
 		do {
