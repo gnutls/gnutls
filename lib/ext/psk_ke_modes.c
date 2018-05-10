@@ -28,6 +28,21 @@
 #define PSK_KE 0
 #define PSK_DHE_KE 1
 
+static bool
+psk_ke_modes_is_required(gnutls_session_t session)
+{
+	gnutls_psk_client_credentials_t cred;
+
+	if (session->internals.priorities->have_psk) {
+		cred = (gnutls_psk_client_credentials_t)
+				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+		if (cred && _gnutls_have_psk_credentials(cred))
+			return 1;
+	}
+
+	return 0;
+}
+
 /*
  * We only support ECDHE-authenticated PSKs.
  * The client just sends a "psk_key_exchange_modes" extension
@@ -38,7 +53,6 @@ psk_ke_modes_send_params(gnutls_session_t session,
 			 gnutls_buffer_t extdata)
 {
 	int ret;
-	gnutls_psk_client_credentials_t cred;
 	const version_entry_st *vers;
 	uint8_t data[2];
 	unsigned pos, i;
@@ -46,19 +60,21 @@ psk_ke_modes_send_params(gnutls_session_t session,
 	unsigned have_psk = 0;
 
 	/* Server doesn't send psk_key_exchange_modes */
-	if (session->security_parameters.entity == GNUTLS_SERVER ||
-	    !session->internals.priorities->have_psk)
+	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return 0;
 
-	cred = (gnutls_psk_client_credentials_t)
-			_gnutls_get_cred(session, GNUTLS_CRD_PSK);
-	if (cred == NULL || _gnutls_have_psk_credentials(cred) == 0)
+	if (!psk_ke_modes_is_required(session))
 		return 0;
 
 	vers = _gnutls_version_max(session);
 	if (!vers || !vers->tls13_sem)
 		return 0;
 
+	/* We send the list prioritized according to our preferences as a convention
+	 * (used throughout the protocol), even if the protocol doesn't mandate that
+	 * for this particular message. That way we can keep the TLS 1.2 semantics/
+	 * prioritization when negotiating PSK or DHE-PSK. Receiving servers would
+	 * very likely respect our prioritization if they parse the message serially. */
 	pos = 0;
 	for (i=0;i<session->internals.priorities->_kx.algorithms;i++) {
 		if (session->internals.priorities->_kx.priority[i] == GNUTLS_KX_PSK && !have_psk) {
