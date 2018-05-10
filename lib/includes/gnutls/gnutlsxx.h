@@ -237,6 +237,7 @@ namespace gnutls {
 	class server_session:public session {
 	      public:
 		server_session();
+		server_session(int flags);
 		~server_session();
 		void db_remove() const;
 
@@ -261,6 +262,7 @@ namespace gnutls {
 	class client_session:public session {
 	      public:
 		client_session();
+		client_session(int flags);
 		~client_session();
 
 		void set_server_name(gnutls_server_name_type_t type,
