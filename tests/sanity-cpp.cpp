@@ -69,7 +69,7 @@ static ssize_t
 client_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 	if (to_client_len == 0) {
-		errno = EAGAIN;
+		gnutls_transport_set_errno ((gnutls_session_t)tr, EAGAIN);
 		return -1;
 	}
 
@@ -86,7 +86,7 @@ static ssize_t
 server_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 	if (to_server_len == 0) {
-		errno = EAGAIN;
+		gnutls_transport_set_errno ((gnutls_session_t)tr, EAGAIN);
 		return -1;
 	}
 
@@ -141,12 +141,14 @@ static void test_handshake(void **glob_state, const char *prio,
 
 		server.set_transport_push_function(server_push);
 		server.set_transport_pull_function(server_pull);
+		server.set_transport_ptr(server.ptr());
 
 		client.set_priority(prio, NULL);
 		client.set_credentials(clientx509cred);
 
 		client.set_transport_push_function(client_push);
 		client.set_transport_pull_function(client_pull);
+		client.set_transport_ptr(client.ptr());
 	}
 	catch (std::exception &ex) {
 		std::cerr << "Exception caught: " << ex.what() << std::endl;
