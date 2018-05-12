@@ -150,6 +150,7 @@ static void test_handshake(void **glob_state, const char *prio,
 	}
 	catch (std::exception &ex) {
 		std::cerr << "Exception caught: " << ex.what() << std::endl;
+		fail();
 	}
 
 	sret = cret = GNUTLS_E_AGAIN;
@@ -159,7 +160,8 @@ static void test_handshake(void **glob_state, const char *prio,
 			try {
 				cret = client.handshake();
 			} catch(gnutls::exception &ex) {
-				if (ex.get_code() == GNUTLS_E_INTERRUPTED || ex.get_code() == GNUTLS_E_AGAIN)
+				cret = ex.get_code();
+				if (cret == GNUTLS_E_INTERRUPTED || cret == GNUTLS_E_AGAIN)
 					cret = GNUTLS_E_AGAIN;
 			}
 		}
@@ -167,13 +169,18 @@ static void test_handshake(void **glob_state, const char *prio,
 			try {
 				sret = server.handshake();
 			} catch(gnutls::exception &ex) {
-				if (ex.get_code() == GNUTLS_E_INTERRUPTED || ex.get_code() == GNUTLS_E_AGAIN)
+				sret = ex.get_code();
+				if (sret == GNUTLS_E_INTERRUPTED || sret == GNUTLS_E_AGAIN)
 					sret = GNUTLS_E_AGAIN;
 			}
 		}
 	}
 	while ((cret == GNUTLS_E_AGAIN || (cret == 0 && sret == GNUTLS_E_AGAIN)) &&
 	       (sret == GNUTLS_E_AGAIN || (sret == 0 && cret == GNUTLS_E_AGAIN)));
+
+	if (sret < 0 || cret < 0) {
+		fail();
+	}
 
 	try {
 		client.send(MSG, sizeof(MSG)-1);
@@ -187,6 +194,7 @@ static void test_handshake(void **glob_state, const char *prio,
 	}
 	catch (std::exception &ex) {
 		std::cerr << "Exception caught: " << ex.what() << std::endl;
+		fail();
 	}
 
 	return;
