@@ -46,6 +46,11 @@ namespace gnutls
     gnutls_deinit (s);
   }
 
+  gnutls_session_t session::ptr()
+  {
+    return s;
+  }
+
   int session::bye (gnutls_close_request_t how)
   {
     return RETWRAP (gnutls_bye (s, how));
@@ -292,6 +297,11 @@ namespace gnutls
   }
 
 // client session
+  void client_session::set_verify_cert (const char *hostname, unsigned flags)
+  {
+    gnutls_session_set_verify_cert(s, hostname, flags);
+  }
+
   void client_session::set_server_name (gnutls_server_name_type_t type,
 					const void *name, size_t name_length)
   {
@@ -467,6 +477,11 @@ namespace gnutls
   void session::set_transport_pull_function (gnutls_pull_func pull_func)
   {
     gnutls_transport_set_pull_function (s, pull_func);
+  }
+
+  void session::set_transport_pull_timeout_function (gnutls_pull_timeout_func pull_timeout_func)
+  {
+    gnutls_transport_set_pull_timeout_function (s, pull_timeout_func);
   }
 
   void session::set_user_ptr (void *ptr)
