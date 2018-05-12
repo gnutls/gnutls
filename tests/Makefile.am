@@ -421,8 +421,22 @@ TESTS_ENVIRONMENT += WINDOWS=1
 
 endif
 
-check_PROGRAMS = $(ctests) $(indirect_tests)
-TESTS = $(ctests) $(dist_check_SCRIPTS)
+cpptests =
+if ENABLE_CXX
+if HAVE_CMOCKA
+
+cpptests += sanity-cpp
+
+sanity_cpp_SOURCES = sanity-cpp.cpp
+sanity_cpp_LDADD = $(CMOCKA_LDADD) ../lib/libgnutlsxx.la
+sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl
+endif
+endif
+
+check_PROGRAMS = $(cpptests) $(ctests) $(indirect_tests)
+TESTS = $(cpptests) $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT +=						\
 	CC="$(CC)"						\

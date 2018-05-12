@@ -60,6 +60,11 @@ namespace gnutls
   {
   }
 
+  server_session::server_session (int flags):session (GNUTLS_SERVER |
+			      (flags & ~GNUTLS_CLIENT))
+  {
+  }
+
   server_session::~server_session ()
   {
   }
@@ -274,6 +279,11 @@ namespace gnutls
 
 
   client_session::client_session ():session (GNUTLS_CLIENT)
+  {
+  }
+
+  client_session::client_session (int flags):session (GNUTLS_CLIENT |
+				  (flags & ~GNUTLS_SERVER))
   {
   }
 

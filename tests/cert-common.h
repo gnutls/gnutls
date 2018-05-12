@@ -71,11 +71,11 @@ static char ecc_cert[] =
 	"-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_ecc_cert =
-	{(void *) ecc_cert, sizeof(ecc_cert)-1};
+	{(unsigned char*) ecc_cert, sizeof(ecc_cert)-1};
 
 
 const gnutls_datum_t server_ecc_key =
-	{(void *) ecc_key, sizeof(ecc_key)-1};
+	{(unsigned char*) ecc_key, sizeof(ecc_key)-1};
 
 /* A cert-key pair */
 static char pem1_cert[] =
@@ -111,11 +111,11 @@ static char pem1_key[] =
     "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cert_dat =
-	{(void *) pem1_cert, sizeof(pem1_cert)-1};
+	{(unsigned char*) pem1_cert, sizeof(pem1_cert)-1};
 
 
 const gnutls_datum_t key_dat =
-	{(void *) pem1_key, sizeof(pem1_key)-1};
+	{(unsigned char*) pem1_key, sizeof(pem1_key)-1};
 
 
 /* A server cert/key pair with CA */
@@ -398,7 +398,7 @@ static char dsa_key_pem[] =
     "jlvXN8gyPpbCPvRD2n2RAg+3vPjvj/dBAF6W3w8IltzqsukGgq/SLwIUS5/r/2ya\n"
     "AoNBXjeBjgCGMei2m8E=\n" "-----END DSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t dsa_key = { (void*)dsa_key_pem,
+const gnutls_datum_t dsa_key = { (unsigned char*)dsa_key_pem,
 	sizeof(dsa_key_pem)-1
 };
 
@@ -471,11 +471,11 @@ static char ca3_key_pem[] =
 	"xkwfZG91IiOdKlKEddraZb3OppP1j7HsiyaYmwIMtsPc9wa2EsU=\n"
 	"-----END RSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t ca3_key = { (void*)ca3_key_pem,
+const gnutls_datum_t ca3_key = { (unsigned char*)ca3_key_pem,
 	sizeof(ca3_key_pem)-1
 };
 
-const gnutls_datum_t ca3_cert = { (void*)ca3_cert_pem,
+const gnutls_datum_t ca3_cert = { (unsigned char*)ca3_cert_pem,
 	sizeof(ca3_cert_pem)-1
 };
 
@@ -547,11 +547,11 @@ static char subca3_key_pem[] =
 	"CLo/c/+F0N4e0F7P+haq+Ccj6MNM99HnuJALc1Ke9971YxrNfniGvA==\n"
 	"-----END RSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t subca3_key = { (void*)subca3_key_pem,
+const gnutls_datum_t subca3_key = { (unsigned char*)subca3_key_pem,
 	sizeof(subca3_key_pem)-1
 };
 
-const gnutls_datum_t subca3_cert = { (void*)subca3_cert_pem,
+const gnutls_datum_t subca3_cert = { (unsigned char*)subca3_cert_pem,
 	sizeof(subca3_cert_pem)-1
 };
 
@@ -675,15 +675,15 @@ static char cli_ca3_key_pem[] =
 	"uiyti3689G0RW9DM/F+NeJkoEo0D15JweVkSfDcsVTdvNsbeA1Pzzds=\n"
 	"-----END RSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t cli_ca3_key = { (void*)cli_ca3_key_pem,
+const gnutls_datum_t cli_ca3_key = { (unsigned char*)cli_ca3_key_pem,
 	sizeof(cli_ca3_key_pem)-1
 };
 
-const gnutls_datum_t cli_ca3_cert = { (void*)cli_ca3_cert_pem,
+const gnutls_datum_t cli_ca3_cert = { (unsigned char*)cli_ca3_cert_pem,
 	sizeof(cli_ca3_cert_pem)-1
 };
 
-const gnutls_datum_t cli_ca3_cert_chain = { (void*)cli_ca3_cert_chain_pem,
+const gnutls_datum_t cli_ca3_cert_chain = { (unsigned char*)cli_ca3_cert_chain_pem,
 	sizeof(cli_ca3_cert_chain_pem)-1
 };
 
@@ -728,11 +728,11 @@ static char clidsa_ca3_key_pem[] =
 	"FgAdB5hhtag7oTw45a72\n"
 	"-----END DSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t clidsa_ca3_key = { (void*)clidsa_ca3_key_pem,
+const gnutls_datum_t clidsa_ca3_key = { (unsigned char*)clidsa_ca3_key_pem,
 	sizeof(clidsa_ca3_key_pem)-1
 };
 
-const gnutls_datum_t clidsa_ca3_cert = { (void*)clidsa_ca3_cert_pem,
+const gnutls_datum_t clidsa_ca3_cert = { (unsigned char*)clidsa_ca3_cert_pem,
 	sizeof(clidsa_ca3_cert_pem)-1
 };
 
@@ -743,7 +743,7 @@ static char server_ca3_ecc_key_pem[] =
 	"GK04pl/ReivZAwibv+85lpT4sm/9RBVhLZM=\n"
 	"-----END EC PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_ca3_ecc_key = { (void*)server_ca3_ecc_key_pem,
+const gnutls_datum_t server_ca3_ecc_key = { (unsigned char*)server_ca3_ecc_key_pem,
 	sizeof(server_ca3_ecc_key_pem)-1
 };
 
@@ -788,7 +788,7 @@ static char server_ca3_key_pem[] =
 	"r6wql68K+fJ1W38b+ENQ46bZZMvAh8z4MZyzBvS8M/grD0WBBwrWLA==\n"
 	"-----END RSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_ca3_key = { (void*)server_ca3_key_pem,
+const gnutls_datum_t server_ca3_key = { (unsigned char*)server_ca3_key_pem,
 	sizeof(server_ca3_key_pem)-1
 };
 
@@ -821,7 +821,7 @@ static char server_ca3_rsa_pss_key_pem[] =
 	"ODwZlaKK2fjp9xr2dNpYjRqyEb1gkC9FJMaxab9OAf+AoQifxncv\n"
 	"-----END RSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_ca3_rsa_pss_key = { (void*)server_ca3_rsa_pss_key_pem,
+const gnutls_datum_t server_ca3_rsa_pss_key = { (unsigned char*)server_ca3_rsa_pss_key_pem,
 	sizeof(server_ca3_rsa_pss_key_pem)-1
 };
 
@@ -851,7 +851,7 @@ static char server_ca3_rsa_pss_cert_pem[] =
 	"dPVrVe13NnAP8tV4a8PisLaz9fHLnA==\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_ca3_rsa_pss_cert = { (void*)server_ca3_rsa_pss_cert_pem,
+const gnutls_datum_t server_ca3_rsa_pss_cert = { (unsigned char*)server_ca3_rsa_pss_cert_pem,
 	sizeof(server_ca3_rsa_pss_cert_pem)-1
 };
 
@@ -886,7 +886,7 @@ static char server_ca3_rsa_pss2_key_pem[] =
 	"nQyUF7m3FUJjavm46KJIhw==\n"
 	"-----END PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_ca3_rsa_pss2_key = { (void*)server_ca3_rsa_pss2_key_pem,
+const gnutls_datum_t server_ca3_rsa_pss2_key = { (unsigned char*)server_ca3_rsa_pss2_key_pem,
 	sizeof(server_ca3_rsa_pss2_key_pem)-1
 };
 
@@ -915,7 +915,7 @@ static char server_ca3_rsa_pss2_cert_pem[] =
 	"D8aQbKGJzzih56a2wwc0ZqA0ilGm\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_ca3_rsa_pss2_cert = { (void*)server_ca3_rsa_pss2_cert_pem,
+const gnutls_datum_t server_ca3_rsa_pss2_cert = { (unsigned char*)server_ca3_rsa_pss2_cert_pem,
 	sizeof(server_ca3_rsa_pss2_cert_pem)-1
 };
 
@@ -945,7 +945,7 @@ static char cli_ca3_rsa_pss_cert_pem[] =
 	"vXOeamGsi2jyiC5LbreWecbMnzi3vQ==\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t cli_ca3_rsa_pss_cert = { (void*)cli_ca3_rsa_pss_cert_pem,
+const gnutls_datum_t cli_ca3_rsa_pss_cert = { (unsigned char*)cli_ca3_rsa_pss_cert_pem,
 	sizeof(cli_ca3_rsa_pss_cert_pem)-1
 };
 
@@ -957,7 +957,7 @@ static char server_ca3_eddsa_key_pem[] =
 	"MC4CAQAwBQYDK2VwBCIEIBypI9w1qP3WLaiYuWB7zhA99GTG5UsKZVZqPHNlUaIv\n"
 	"-----END PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_ca3_eddsa_key = { (void*)server_ca3_eddsa_key_pem,
+const gnutls_datum_t server_ca3_eddsa_key = { (unsigned char*)server_ca3_eddsa_key_pem,
 	sizeof(server_ca3_eddsa_key_pem)-1
 };
 
@@ -971,7 +971,7 @@ static char server_ca3_eddsa_cert_pem[] =
 	"KKn/PNiAq4fPNEupyzC3AzE1xLzKLRArAFFDDUjPCwy3OR4js3MF\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_ca3_eddsa_cert = { (void*)server_ca3_eddsa_cert_pem,
+const gnutls_datum_t server_ca3_eddsa_cert = { (unsigned char*)server_ca3_eddsa_cert_pem,
 	sizeof(server_ca3_eddsa_cert_pem)-1
 };
 
@@ -1055,13 +1055,13 @@ static char server_localhost6_ca3_cert_chain_pem[] =
 	"-----END CERTIFICATE-----\n";
 
 
-const gnutls_datum_t server_ca3_localhost6_cert = { (void*)server_localhost6_ca3_cert_pem,
+const gnutls_datum_t server_ca3_localhost6_cert = { (unsigned char*)server_localhost6_ca3_cert_pem,
 	sizeof(server_localhost6_ca3_cert_pem)-1
 };
 
 
 const gnutls_datum_t server_ca3_localhost6_cert_chain = {
-	(void*)server_localhost6_ca3_cert_chain_pem,
+	(unsigned char*)server_localhost6_ca3_cert_chain_pem,
 	sizeof(server_localhost6_ca3_cert_chain_pem)-1
 };
 
@@ -1143,13 +1143,13 @@ static char server_ipaddr_ca3_cert_chain_pem[] =
 	"-----END CERTIFICATE-----\n";
 
 
-const gnutls_datum_t server_ca3_ipaddr_cert = { (void*)server_ipaddr_ca3_cert_pem,
+const gnutls_datum_t server_ca3_ipaddr_cert = { (unsigned char*)server_ipaddr_ca3_cert_pem,
 	sizeof(server_ipaddr_ca3_cert_pem)-1
 };
 
 
 const gnutls_datum_t server_ca3_ipaddr_cert_chain = {
-	(void*)server_ipaddr_ca3_cert_chain_pem,
+	(unsigned char*)server_ipaddr_ca3_cert_chain_pem,
 	sizeof(server_ipaddr_ca3_cert_chain_pem)-1
 };
 
@@ -1182,7 +1182,7 @@ static char server_localhost_utf8_ca3_cert_pem[] =
 	"PexWtASNmu1xcO13LdgN4Oa1OL4P4U9TQVwoCpkjlDSVNLqBC0N5kPmGkOY=\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_ca3_localhost_utf8_cert = { (void*)server_localhost_utf8_ca3_cert_pem,
+const gnutls_datum_t server_ca3_localhost_utf8_cert = { (unsigned char*)server_localhost_utf8_ca3_cert_pem,
 	sizeof(server_localhost_utf8_ca3_cert_pem)-1
 };
 
@@ -1214,7 +1214,7 @@ static char server_localhost_inv_utf8_ca3_cert_pem[] =
 	"Efwe6rFJaNbKv9C9tWpPIPHRk/YkUIe29VUQR2m7UUpToBca\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_ca3_localhost_inv_utf8_cert = { (void*)server_localhost_inv_utf8_ca3_cert_pem,
+const gnutls_datum_t server_ca3_localhost_inv_utf8_cert = { (unsigned char*)server_localhost_inv_utf8_ca3_cert_pem,
 	sizeof(server_localhost_inv_utf8_ca3_cert_pem)-1
 };
 
@@ -1239,7 +1239,7 @@ static char server_localhost_ca3_ecc_cert_pem[] =
 	"Li9LPzU70EyX6WF+9FM45E4/Gt9Oh8btrYyjbyH/K2VI8qPRz5cW\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_ca3_localhost_ecc_cert = { (void*)server_localhost_ca3_ecc_cert_pem,
+const gnutls_datum_t server_ca3_localhost_ecc_cert = { (unsigned char*)server_localhost_ca3_ecc_cert_pem,
 	sizeof(server_localhost_ca3_ecc_cert_pem)-1};
 
 /* shares server_ca3 key */
@@ -1379,17 +1379,17 @@ static char server_localhost_ca3_cert_chain_pem[] =
 
 #define server_ca3_cert server_ca3_localhost_cert
 #define server_ca3_cert_chain server_ca3_localhost_cert_chain
-const gnutls_datum_t server_ca3_localhost_cert = { (void*)server_localhost_ca3_cert_pem,
+const gnutls_datum_t server_ca3_localhost_cert = { (unsigned char*)server_localhost_ca3_cert_pem,
 	sizeof(server_localhost_ca3_cert_pem)-1};
 
-const gnutls_datum_t server_ca3_localhost_rsa_decrypt_cert = { (void*)server_localhost_ca3_rsa_decrypt_cert_pem,
+const gnutls_datum_t server_ca3_localhost_rsa_decrypt_cert = { (unsigned char*)server_localhost_ca3_rsa_decrypt_cert_pem,
 	sizeof(server_localhost_ca3_rsa_decrypt_cert_pem)-1};
 
-const gnutls_datum_t server_ca3_localhost_rsa_sign_cert = { (void*)server_localhost_ca3_rsa_sign_cert_pem,
+const gnutls_datum_t server_ca3_localhost_rsa_sign_cert = { (unsigned char*)server_localhost_ca3_rsa_sign_cert_pem,
 	sizeof(server_localhost_ca3_rsa_sign_cert_pem)-1};
 
 const gnutls_datum_t server_ca3_localhost_cert_chain = {
-	(void*)server_localhost_ca3_cert_chain_pem,
+	(unsigned char*)server_localhost_ca3_cert_chain_pem,
 	sizeof(server_localhost_ca3_cert_chain_pem)-1
 };
 
@@ -1415,7 +1415,7 @@ static char server_localhost_insecure_ca3_cert_pem[] =
 	"F92lL9akoGYmyehqQHeRQsrVRKcCOiv8lgVF\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t server_ca3_localhost_insecure_cert = { (void*)server_localhost_insecure_ca3_cert_pem,
+const gnutls_datum_t server_ca3_localhost_insecure_cert = { (unsigned char*)server_localhost_insecure_ca3_cert_pem,
 	sizeof(server_localhost_insecure_ca3_cert_pem)-1
 };
 
@@ -1433,7 +1433,7 @@ static char server_ca3_localhost_insecure_key_pem[] =
 	"dD2lxHfq5Q1QxCSjl8EnBnjnbFJN9WmK9ztkK00Avg==\n"
 	"-----END RSA PRIVATE KEY-----\n";
 
-const gnutls_datum_t server_ca3_localhost_insecure_key = { (void*)server_ca3_localhost_insecure_key_pem,
+const gnutls_datum_t server_ca3_localhost_insecure_key = { (unsigned char*)server_ca3_localhost_insecure_key_pem,
 	sizeof(server_ca3_localhost_insecure_key_pem)-1
 };
 
@@ -1462,7 +1462,7 @@ static char unknown_ca_cert_pem[] =
 	"nva6xGbu1R8UP4+fXCOFdiVixHEQR5k+mqd65vGGxovALAfY\n"
 	"-----END CERTIFICATE-----\n";
 
-const gnutls_datum_t unknown_ca_cert = { (void*)unknown_ca_cert_pem,
+const gnutls_datum_t unknown_ca_cert = { (unsigned char*)unknown_ca_cert_pem,
 	sizeof(unknown_ca_cert_pem)-1
 };
 
@@ -1563,7 +1563,7 @@ static const char server_ca3_pkcs12_pem[] =
 	"BAjXfJCHoHZI2QICCAA=\n"
 	"-----END PKCS12-----\n";
 
-const gnutls_datum_t server_ca3_pkcs12 = { (void*)server_ca3_pkcs12_pem,
+const gnutls_datum_t server_ca3_pkcs12 = { (unsigned char*)server_ca3_pkcs12_pem,
 	sizeof(server_ca3_pkcs12_pem)-1
 };
 
