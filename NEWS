@@ -49,6 +49,14 @@ See the end for copying conditions.
    unless GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE is specified. This is an API
    change for these functions which make them err towards safety.
 
+** certtool: It is now possible to specify certificate and serial CRL numbers greater
+   than 2**63-2 as a hex-encoded string both when prompted and in a template file.
+   Default certificate serial numbers are now fully random. Default CRL
+   numbers include more random bits and are larger than in previous GnuTLS versions.
+   Since CRL numbers are required to be monotonic, specify suitable CRL numbers manually
+   if you intend to later downgrade to previous versions as it was not possible
+   to specify large CRL numbers in previous versions of certtool.
+
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
 gnutls_session_key_update: Added
