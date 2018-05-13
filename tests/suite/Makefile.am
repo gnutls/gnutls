@@ -85,7 +85,8 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 	ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
 
 
-EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl testcompat-common
+EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl \
+	      testcompat-common params.dh
 
 scripts_to_test = chain.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
