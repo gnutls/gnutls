@@ -878,7 +878,8 @@ cn = "Cindy Lauper"
 #dn = "cn = Nikos,st = New\, Something,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
 
 # The serial number of the certificate
-# Comment the field for a time-based serial number.
+# The value is in decimal (i.e. 1963) or hex (i.e. 0x07ab).
+# Comment the field for a random serial number.
 serial = 007
 
 # In how many days, counting from today, this certificate will expire.
@@ -1109,6 +1110,7 @@ encryption_key
 #crl_next_update = 43
 
 # this is the 5th CRL by this CA
+# The value is in decimal (i.e. 1963) or hex (i.e. 0x07ab).
 # Comment the field for a time-based number.
 #crl_number = 5
 
