@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  * Copyright (C) 2013 Adam Sampson <ats@offog.org>
- * Copyright (C) 2016 Red Hat, Inc.
+ * Copyright (C) 2016-2018 Red Hat, Inc.
  *
  * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
@@ -17,9 +17,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 /* Parts copied from GnuTLS example programs. */
@@ -54,6 +53,7 @@ int main(int argc, char **argv)
 #include <gnutls/gnutls.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <assert.h>
 #include "utils.h"
 #include "cert-common.h"
 
@@ -72,12 +72,15 @@ struct params_res {
 	int enable_session_ticket_server;
 	int enable_session_ticket_client;
 	int expect_resume;
+	int client_cert;
 	int first_no_ext_master;
 	int second_no_ext_master;
 	int try_alpn;
 	int try_resumed_data;
 	int try_diff_sni;
 	int try_sni;
+	int expire_ticket;
+	int change_ciphersuite;
 };
 
 pid_t child;
@@ -116,27 +119,49 @@ struct params_res resume_tests[] = {
 	 .first_no_ext_master = 1,
 	 .second_no_ext_master = 0},
 #endif
-	{.desc = "try to resume from session ticket", 
-	 .enable_db = 0, 
+#ifdef TLS13
+	/* only makes sense under TLS1.3 as negotiation involves a new
+	 * handshake with different parameters */
+	{.desc = "try to resume from session ticket (different cipher order)",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .change_ciphersuite = 1,
+	 .expect_resume = 1},
+#endif
+	{.desc = "try to resume from session ticket",
+	 .enable_db = 0,
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .expect_resume = 1},
-	{.desc = "try to resume from session ticket using resumed session's data", 
-	 .enable_db = 0, 
+	{.desc = "try to resume from session ticket (client cert)",
+	 .enable_db = 0,
+	 .client_cert = 1,
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .expect_resume = 1},
+	{.desc = "try to resume from session ticket (expired)",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .expire_ticket = 1,
+	 .expect_resume = 0},
+	{.desc = "try to resume from session ticket using resumed session's data",
+	 .enable_db = 0,
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .try_resumed_data = 1,
 	 .expect_resume = 1},
 #ifndef TLS13
-	{.desc = "try to resume from session ticket (ext master secret -> none)", 
-	 .enable_db = 0, 
+	{.desc = "try to resume from session ticket (ext master secret -> none)",
+	 .enable_db = 0,
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .expect_resume = 0,
 	 .first_no_ext_master = 0,
 	 .second_no_ext_master = 1},
-	{.desc = "try to resume from session ticket (none -> ext master secret)", 
-	 .enable_db = 0, 
+	{.desc = "try to resume from session ticket (none -> ext master secret)",
+	 .enable_db = 0,
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .expect_resume = 0,
@@ -289,6 +314,36 @@ static void verify_group(gnutls_session_t session, gnutls_group_t *group, unsign
 	}
 }
 
+static void verify_server_params(gnutls_session_t session, unsigned counter, struct params_res *params)
+{
+#if defined(USE_X509)
+	unsigned int l;
+
+	if (counter == 0 && gnutls_certificate_get_ours(session) == NULL)
+		fail("no certificate returned on server side (%s)\n", counter?"resumed session":"first session");
+	else if (counter != 0 && gnutls_certificate_get_ours(session) != NULL)
+		fail("certificate was returned on server side (%s)\n", counter?"resumed session":"first session");
+
+	if (params->client_cert) {
+		if (gnutls_certificate_get_peers(session, &l) == NULL || l < 1)
+			fail("no client certificate returned on server side (%s)\n", counter?"resumed session":"first session");
+	}
+#else
+	return;
+#endif
+}
+
+static void verify_client_params(gnutls_session_t session, unsigned counter)
+{
+#if defined(USE_X509)
+	unsigned int l;
+	if (gnutls_certificate_get_peers(session, &l) == NULL || l < 1)
+		fail("no server certificate returned on client side (%s)\n", counter?"resumed session":"first session");
+#else
+	return;
+#endif
+}
+
 #ifdef TLS12
 # define VERS_STR "+VERS-TLS1.2"
 #endif
@@ -338,8 +393,13 @@ static void client(int sds[], struct params_res *params)
 	gnutls_anon_allocate_client_credentials(&anoncred);
 #elif defined(USE_X509)
 	gnutls_certificate_allocate_credentials(&clientx509cred);
-#endif
 
+	if (params->client_cert) {
+		assert(gnutls_certificate_set_x509_key_mem(clientx509cred,
+							   &cli_cert, &cli_key,
+							   GNUTLS_X509_FMT_PEM) >= 0);
+	}
+#endif
 
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
@@ -363,6 +423,13 @@ static void client(int sds[], struct params_res *params)
 		if (params->second_no_ext_master && t > 0) {
 			strcat(prio_str, ":%NO_SESSION_HASH");
 			ext_master_secret_check = 0;
+		}
+
+		if (params->change_ciphersuite) {
+			if (t > 0)
+				strcat(prio_str, ":-CIPHER-ALL:+AES-256-GCM:+AES-128-GCM");
+			else
+				strcat(prio_str, ":-CIPHER-ALL:+AES-128-GCM");
 		}
 
 		append_alpn(session, params, t);
@@ -390,6 +457,9 @@ static void client(int sds[], struct params_res *params)
 				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name1, strlen(dns_name1));
 			else if (params->try_sni)
 				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name2, strlen(dns_name2));
+
+			if (params->expire_ticket)
+				sleep(2);
 		} else {
 			if (params->try_sni)
 				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name2, strlen(dns_name2));
@@ -454,10 +524,21 @@ static void client(int sds[], struct params_res *params)
 						    ("*** Previous session was NOT resumed (expected)\n");
 				}
 			}
+
+			if (params->change_ciphersuite) {
+				/* check if the expected cipher was negotiated */
+				if (gnutls_cipher_get(session) != GNUTLS_CIPHER_AES_128_GCM) {
+					fail("negotiated different cipher: %s\n",
+					     gnutls_cipher_get_name(gnutls_cipher_get(session)));
+				}
+			}
 		}
 
 		verify_alpn(session, params, t);
 		verify_group(session, &pgroup, t);
+
+		if (params->expect_resume)
+			verify_client_params(session, t);
 
 		gnutls_record_send(session, MSG, strlen(MSG));
 
@@ -500,43 +581,11 @@ static void client(int sds[], struct params_res *params)
 #endif
 }
 
-/* This is a sample TLS 1.0 echo server, for anonymous authentication only.
- */
-
 #define DH_BITS 1024
 
 /* These are global */
 static gnutls_datum_t session_ticket_key = { NULL, 0 };
 
-static gnutls_session_t initialize_tls_session(struct params_res *params)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session,
-				   PRIO_STR,
-				   NULL);
-
-
-	gnutls_dh_set_prime_bits(session, DH_BITS);
-
-	if (params->enable_db) {
-		gnutls_db_set_retrieve_function(session, wrap_db_fetch);
-		gnutls_db_set_remove_function(session, wrap_db_delete);
-		gnutls_db_set_store_function(session, wrap_db_store);
-		gnutls_db_set_ptr(session, NULL);
-	}
-
-	if (params->enable_session_ticket_server)
-		gnutls_session_ticket_enable_server(session,
-						    &session_ticket_key);
-
-	return session;
-}
 
 static gnutls_dh_params_t dh_params;
 
@@ -620,8 +669,8 @@ static void server(int sds[], struct params_res *params)
 	gnutls_anon_allocate_server_credentials(&anoncred);
 #elif defined(USE_X509)
 	gnutls_certificate_allocate_credentials(&serverx509cred);
-	gnutls_certificate_set_x509_key_mem(serverx509cred,
-		&server_cert, &server_key, GNUTLS_X509_FMT_PEM);
+	assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
+		&server_cert, &server_key, GNUTLS_X509_FMT_PEM) >= 0);
 #endif
 
 	if (debug)
@@ -643,9 +692,40 @@ static void server(int sds[], struct params_res *params)
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
-		session = initialize_tls_session(params);
+		assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
+
+		/* avoid calling all the priority functions, since the defaults
+		 * are adequate.
+		 */
+		assert(gnutls_priority_set_direct(session,
+						  PRIO_STR,
+						  NULL) >= 0);
+
+
+#if defined(USE_X509)
+		if (params->client_cert) {
+			gnutls_certificate_server_set_request(session,
+							      GNUTLS_CERT_REQUIRE);
+		}
+#endif
+
+		gnutls_dh_set_prime_bits(session, DH_BITS);
+
+		if (params->enable_db) {
+			gnutls_db_set_retrieve_function(session, wrap_db_fetch);
+			gnutls_db_set_remove_function(session, wrap_db_delete);
+			gnutls_db_set_store_function(session, wrap_db_store);
+			gnutls_db_set_ptr(session, NULL);
+		}
+
+		if (params->enable_session_ticket_server)
+			gnutls_session_ticket_enable_server(session,
+							    &session_ticket_key);
 
 		append_alpn(session, params, t);
+
+		if (params->expire_ticket)
+			gnutls_db_set_cache_expiration(session, 1);
 
 #ifdef USE_PSK
 		gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
@@ -671,8 +751,18 @@ static void server(int sds[], struct params_res *params)
 		if (debug)
 			success("server: Handshake was completed\n");
 
+		if (t > 0 && params->expect_resume) {
+			ret = gnutls_session_is_resumed(session);
+			if (ret == 0) {
+				fail("server: session_is_resumed error (%d)\n", t);
+			}
+		}
+
 		verify_alpn(session, params, t);
 		verify_group(session, &pgroup, t);
+
+		if (params->expect_resume)
+			verify_server_params(session, t, params);
 
 		/* see the Getting peer's information example */
 		/* print_info(session); */

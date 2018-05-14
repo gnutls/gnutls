@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2002-2016 Free Software Foundation, Inc.
  * Copyright (C) 2014-2016 Nikos Mavrogiannopoulos
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -726,7 +726,8 @@ gnutls_handshake_set_private_extensions(gnutls_session_t session,
  * gnutls_session_is_resumed:
  * @session: is a #gnutls_session_t type.
  *
- * Check whether session is resumed or not.
+ * Checks whether session is resumed or not. This is functional
+ * for both server and client side.
  *
  * Returns: non zero if this session is resumed, or a zero if this is
  *   a new session.
