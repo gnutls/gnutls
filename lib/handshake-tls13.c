@@ -430,6 +430,10 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	ret = _gnutls_call_hook_func(session, type, GNUTLS_HOOK_PRE, 1, buf->data, buf->length);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	switch(type) {
 		case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
 			if (!(session->security_parameters.entity == GNUTLS_CLIENT) ||
@@ -473,6 +477,10 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET;
 	}
+
+	ret = _gnutls_call_hook_func(session, type, GNUTLS_HOOK_POST, 1, buf->data, buf->length);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,6 +45,26 @@ static void tls_log_func(int level, const char *str)
 
 #define MAX_BUF 1024
 #define MSG "Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
+
+static unsigned key_update_msg_inc = 0;
+static unsigned key_update_msg_out = 0;
+
+static int hsk_callback(gnutls_session_t session, unsigned int htype,
+			unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+{
+	assert(post == GNUTLS_HOOK_PRE);
+
+	assert(msg->size == 1);
+
+	if (htype == GNUTLS_HANDSHAKE_KEY_UPDATE) {
+		if (incoming)
+			key_update_msg_inc++;
+		else
+			key_update_msg_out++;
+	}
+
+	return 0;
+}
 
 static void run(const char *name, unsigned test)
 {
@@ -104,6 +124,7 @@ static void run(const char *name, unsigned test)
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
+
 
 	HANDSHAKE(client, server);
 	if (debug)
@@ -169,6 +190,8 @@ static void run(const char *name, unsigned test)
 		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
 		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
+
+		sec_sleep(2);
 		break;
 	case 5:
 		success("%s: client cork\n", name);
@@ -199,11 +222,34 @@ static void run(const char *name, unsigned test)
 			fail("cannot send: %s\n", gnutls_strerror(ret));
 
 		EMPTY_BUF(server, client, buffer, MAX_BUF);
+
+		sec_sleep(2);
+		break;
+	case 6:
+		key_update_msg_inc = 0;
+		key_update_msg_out = 0;
+
+		success("%s: callbacks are called\n", name);
+
+		gnutls_handshake_set_hook_function(client, -1, GNUTLS_HOOK_PRE, hsk_callback);
+		gnutls_handshake_set_hook_function(server, -1, GNUTLS_HOOK_PRE, hsk_callback);
+
+		do {
+			ret = gnutls_session_key_update(client, GNUTLS_KU_PEER);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		if (ret < 0)
+			fail("error in key update: %s\n", gnutls_strerror(ret));
+
+		/* server receives the client key update and sends data */
+		TRANSFER(client, server, MSG, strlen(MSG), buffer, MAX_BUF);
+		TRANSFER(server, client, MSG, strlen(MSG), buffer, MAX_BUF);
+		EMPTY_BUF(server, client, buffer, MAX_BUF);
+
+		assert(key_update_msg_inc == 2);
+		assert(key_update_msg_out == 2);
 		break;
 	}
 
-	if (debug)
-		fputs("\n", stdout);
 
 	gnutls_bye(client, GNUTLS_SHUT_WR);
 	gnutls_bye(server, GNUTLS_SHUT_WR);
@@ -225,5 +271,6 @@ void doit(void)
 	run("single", 3);
 	run("single", 4);
 	run("single", 5);
+	run("single", 6);
 	run("all", 0);			/* all one after each other */
 }

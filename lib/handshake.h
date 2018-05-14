@@ -142,6 +142,11 @@ int _gnutls_check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certific
 #define EXPORTER_LABEL "exp master"
 #define RES_LABEL "res master"
 
+int _gnutls_call_hook_func(gnutls_session_t session,
+			   gnutls_handshake_description_t type,
+			   int post, unsigned incoming,
+			   const uint8_t *data, unsigned data_size);
+
 int _gnutls_run_verify_callback(gnutls_session_t session, unsigned int side);
 int _gnutls_recv_finished(gnutls_session_t session);
 int _gnutls_send_finished(gnutls_session_t session, int again);

@@ -800,7 +800,7 @@ int _gnutls_send_finished(gnutls_session_t session, int again)
 
 	if (again == 0) {
 		bufel =
-		    _gnutls_handshake_alloc(session, 
+		    _gnutls_handshake_alloc(session,
 					    MAX_VERIFY_DATA_SIZE);
 		if (bufel == NULL) {
 			gnutls_assert();
@@ -1116,11 +1116,10 @@ _gnutls_send_empty_handshake(gnutls_session_t session,
 	return _gnutls_send_handshake(session, bufel, type);
 }
 
-inline
-    static int call_hook_func(gnutls_session_t session,
-			      gnutls_handshake_description_t type,
-			      int post, unsigned incoming,
-			      const uint8_t *data, unsigned data_size)
+int _gnutls_call_hook_func(gnutls_session_t session,
+			   gnutls_handshake_description_t type,
+			   int post, unsigned incoming,
+			   const uint8_t *data, unsigned data_size)
 {
 	gnutls_datum_t msg = {(void*)data, data_size};
 
@@ -1214,8 +1213,8 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 			return ret;
 		}
 
-	ret = call_hook_func(session, type, GNUTLS_HOOK_PRE, 0,
-			     _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
+	ret = _gnutls_call_hook_func(session, type, GNUTLS_HOOK_PRE, 0,
+				     _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
 	if (ret < 0) {
 		gnutls_assert();
 		_mbuffer_xfree(&bufel);
@@ -1231,8 +1230,8 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 		return ret;
 	}
 
-	ret = call_hook_func(session, type, GNUTLS_HOOK_POST, 0, 
-			      _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
+	ret = _gnutls_call_hook_func(session, type, GNUTLS_HOOK_POST, 0,
+				      _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1441,7 +1440,7 @@ _gnutls_recv_handshake(gnutls_session_t session,
 	}
 	session->internals.last_handshake_in = hsk.htype;
 
-	ret = call_hook_func(session, hsk.htype, GNUTLS_HOOK_PRE, 1, hsk.data.data, hsk.data.length);
+	ret = _gnutls_call_hook_func(session, hsk.htype, GNUTLS_HOOK_PRE, 1, hsk.data.data, hsk.data.length);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1567,7 +1566,7 @@ _gnutls_recv_handshake(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret2 = call_hook_func(session, hsk.htype, GNUTLS_HOOK_POST, 1, hsk.data.data, hsk.data.length);
+	ret2 = _gnutls_call_hook_func(session, hsk.htype, GNUTLS_HOOK_POST, 1, hsk.data.data, hsk.data.length);
 	if (ret2 < 0) {
 		ret = ret2;
 		gnutls_assert();
@@ -3011,8 +3010,8 @@ ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
 			session->internals.dtls.hsk_write_seq++;
 		}
 
-		ret = call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_PRE, 0,
-				     data, 1);
+		ret = _gnutls_call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_PRE, 0,
+					     data, 1);
 		if (ret < 0) {
 			_mbuffer_xfree(&bufel);
 			return gnutls_assert_val(ret);
@@ -3027,8 +3026,8 @@ ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
 			return gnutls_assert_val(ret);
 		}
 
-		ret = call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_POST, 0,
-				     data, 1);
+		ret = _gnutls_call_hook_func(session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, GNUTLS_HOOK_POST, 0,
+					     data, 1);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
