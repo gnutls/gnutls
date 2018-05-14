@@ -198,22 +198,10 @@ gnutls_credentials_get(gnutls_session_t session,
  **/
 gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 {
-/* This is not the credentials we must set, but the authentication data
- * we get by the peer, so it should be reversed.
- */
-	gnutls_kx_algorithm_t kx;
-	int server =
-	    session->security_parameters.entity == GNUTLS_SERVER ? 0 : 1;
-
-	if (!session->security_parameters.cs) {
-		gnutls_assert();
-		return 0;
-	}
-
-	kx = gnutls_kx_get(session);
-
-	return
-	    _gnutls_map_kx_get_cred(kx, server);
+	if (session->security_parameters.entity == GNUTLS_SERVER)
+		return gnutls_auth_client_get_type(session);
+	else
+		return gnutls_auth_server_get_type(session);
 }
 
 /**
