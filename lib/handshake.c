@@ -1147,6 +1147,13 @@ int _gnutls_call_hook_func(gnutls_session_t session,
 	return 0;
 }
 
+/* Note that the "New session ticket" handshake packet behaves differently under
+ * TLS 1.2 or 1.3. In 1.2 it is included in the handshake process, while in 1.3
+ * it is sent asynchronously */
+#define IS_ASYNC(t, v) \
+	(t == GNUTLS_HANDSHAKE_HELLO_REQUEST || t == GNUTLS_HANDSHAKE_KEY_UPDATE || \
+	 (t == GNUTLS_HANDSHAKE_NEW_SESSION_TICKET && v->tls13_sem))
+
 /* This function sends a handshake message of type 'type' containing the
  * data specified here. If the previous _gnutls_send_handshake() returned
  * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
@@ -1204,7 +1211,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 
 	/* Here we keep the handshake messages in order to hash them...
 	 */
-	if (type != GNUTLS_HANDSHAKE_HELLO_REQUEST)
+	if (!IS_ASYNC(type, vers))
 		if ((ret =
 		     handshake_hash_add_sent(session, type, data,
 						     datasize)) < 0) {
@@ -1300,6 +1307,7 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
     return gnutls_assert_val(GNUTLS_E_HANDSHAKE_TOO_LARGE); \
     }
 
+
 /* This function add the handshake headers and the
  * handshake data to the handshake hash buffers. Needed
  * for the finished messages calculations.
@@ -1318,7 +1326,7 @@ handshake_hash_add_recvd(gnutls_session_t session,
 
 	if ((vers->id != GNUTLS_DTLS0_9 &&
 	     recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST) ||
-	     recv_type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
+	     IS_ASYNC(recv_type, vers))
 		return 0;
 
 	CHECK_SIZE(header_size + datalen);
@@ -1372,44 +1380,40 @@ handshake_hash_add_sent(gnutls_session_t session,
 	if (unlikely(vers == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	/* We don't check for GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST because it
-	 * is not sent via that channel.
-	 */
-	if (type != GNUTLS_HANDSHAKE_HELLO_REQUEST) {
-		CHECK_SIZE(datalen);
-
-		if (vers->id == GNUTLS_DTLS0_9) {
-			/* Old DTLS doesn't include the header in the MAC */
-			if (datalen < 12) {
-				gnutls_assert();
-				return GNUTLS_E_INTERNAL_ERROR;
-			}
-			dataptr += 12;
-			datalen -= 12;
-
-			if (datalen == 0)
-				return 0;
-		}
-
-		ret =
-		    _gnutls_buffer_append_data(&session->internals.
-					       handshake_hash_buffer,
-					       dataptr, datalen);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		if (type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
-			session->internals.handshake_hash_buffer_client_kx_len =
-				session->internals.handshake_hash_buffer.length;
-		if (type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_SERVER)
-			session->internals.handshake_hash_buffer_server_finished_len =
-				session->internals.handshake_hash_buffer.length;
-		if (type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_CLIENT)
-			session->internals.handshake_hash_buffer_client_finished_len =
-				session->internals.handshake_hash_buffer.length;
-
+	if (IS_ASYNC(type, vers))
 		return 0;
+
+	CHECK_SIZE(datalen);
+
+	if (vers->id == GNUTLS_DTLS0_9) {
+		/* Old DTLS doesn't include the header in the MAC */
+		if (datalen < 12) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		dataptr += 12;
+		datalen -= 12;
+
+		if (datalen == 0)
+			return 0;
 	}
+
+	ret =
+	    _gnutls_buffer_append_data(&session->internals.
+				       handshake_hash_buffer,
+				       dataptr, datalen);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
+		session->internals.handshake_hash_buffer_client_kx_len =
+			session->internals.handshake_hash_buffer.length;
+	if (type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_SERVER)
+		session->internals.handshake_hash_buffer_server_finished_len =
+			session->internals.handshake_hash_buffer.length;
+	if (type == GNUTLS_HANDSHAKE_FINISHED && session->security_parameters.entity == GNUTLS_CLIENT)
+		session->internals.handshake_hash_buffer_client_finished_len =
+			session->internals.handshake_hash_buffer.length;
 
 	return 0;
 }
