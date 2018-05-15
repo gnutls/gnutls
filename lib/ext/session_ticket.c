@@ -278,7 +278,6 @@ _gnutls_encrypt_session_ticket(gnutls_session_t session,
 	gnutls_datum_t encrypted_state = {NULL,0};
 	uint8_t iv[IV_SIZE];
 	gnutls_datum_t mac_secret;
-	uint32_t t;
 	struct ticket_st ticket;
 	int ret;
 
@@ -300,9 +299,7 @@ _gnutls_encrypt_session_ticket(gnutls_session_t session,
 	IV.data = iv;
 	IV.size = IV_SIZE;
 
-	t = gnutls_time(0);
-	memcpy(iv, &t, 4);
-	ret = gnutls_rnd(GNUTLS_RND_NONCE, iv+4, IV_SIZE-4);
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, iv, IV_SIZE);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
