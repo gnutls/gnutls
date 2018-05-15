@@ -734,6 +734,7 @@ APIMANS += gnutls_session_supplemental_register.3
 APIMANS += gnutls_session_ticket_enable_client.3
 APIMANS += gnutls_session_ticket_enable_server.3
 APIMANS += gnutls_session_ticket_key_generate.3
+APIMANS += gnutls_session_ticket_send.3
 APIMANS += gnutls_set_default_priority.3
 APIMANS += gnutls_sign_algorithm_get.3
 APIMANS += gnutls_sign_algorithm_get_client.3
