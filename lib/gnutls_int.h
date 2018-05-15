@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -277,11 +277,16 @@ typedef enum bye_state_t {
 	BYE_STATE0 = 0, BYE_STATE1, BYE_STATE2
 } bye_state_t;
 
+typedef enum send_ticket_state_t {
+	TICKET_STATE0 = 0, TICKET_STATE1
+} send_ticket_state_t;
+
 typedef enum reauth_state_t {
 	REAUTH_STATE0 = 0, REAUTH_STATE1, REAUTH_STATE2, REAUTH_STATE3,
 	REAUTH_STATE4, REAUTH_STATE5
 } reauth_state_t;
 
+#define TICKET_STATE session->internals.ticket_state
 #define BYE_STATE session->internals.bye_state
 #define REAUTH_STATE session->internals.reauth_state
 
@@ -1023,6 +1028,7 @@ typedef struct {
 						 * message */
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */
 
+	send_ticket_state_t ticket_state; /* used by gnutls_session_ticket_send() */
 	bye_state_t bye_state; /* used by gnutls_bye() */
 	reauth_state_t reauth_state; /* used by gnutls_reauth() */
 

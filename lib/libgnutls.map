@@ -1219,6 +1219,7 @@ GNUTLS_3_6_3
 	gnutls_pcert_list_import_x509_file;
 	gnutls_pkcs11_token_get_ptr;
 	gnutls_pkcs11_obj_get_ptr;
+	gnutls_session_ticket_send;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {

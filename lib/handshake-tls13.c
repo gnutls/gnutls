@@ -487,3 +487,49 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 	return 0;
 }
 
+/**
+ * gnutls_session_ticket_send:
+ * @session: is a #gnutls_session_t type.
+ * @flags: must be zero
+ *
+ * Sends a fresh session ticket to the peer. This is relevant only
+ * in server side under TLS1.3. This function may also return %GNUTLS_E_AGAIN
+ * or %GNUTLS_E_INTERRUPTED.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or a negative error code.
+ **/
+int gnutls_session_ticket_send(gnutls_session_t session, unsigned flags)
+{
+	int ret = 0;
+	const version_entry_st *vers = get_version(session);
+
+	if (!vers->tls13_sem || session->security_parameters.entity == GNUTLS_CLIENT)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	switch (TICKET_STATE) {
+	case TICKET_STATE0:
+		ret = _gnutls_io_write_flush(session);
+		TICKET_STATE = TICKET_STATE0;
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		/* fall through */
+	case TICKET_STATE1:
+		ret =
+		    _gnutls13_send_session_ticket(session, TICKET_STATE==TICKET_STATE1?1:0);
+		TICKET_STATE = TICKET_STATE1;
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	TICKET_STATE = TICKET_STATE0;
+
+	return 0;
+}

@@ -1396,6 +1396,8 @@ int gnutls_session_ticket_enable_client(gnutls_session_t session);
 int gnutls_session_ticket_enable_server(gnutls_session_t session,
 					const gnutls_datum_t * key);
 
+int gnutls_session_ticket_send(gnutls_session_t session, unsigned flags);
+
   /* SRTP, RFC 5764 */
 
 /**

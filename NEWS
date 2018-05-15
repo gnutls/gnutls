@@ -60,6 +60,7 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
 gnutls_session_key_update: Added
+gnutls_session_ticket_send: Added
 gnutls_ext_get_current_msg: Added
 gnutls_reauth: Added
 gnutls_ocsp_status_request_get2: Added
