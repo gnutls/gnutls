@@ -375,8 +375,12 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		    generate_ap_traffic_keys(session);
 		STATE = STATE111;
 		IMED_RET("generate app keys", ret, 0);
+
+		if (session->internals.resumed != RESUME_FALSE)
+			_gnutls_set_resumed_parameters(session);
 		/* fall through */
 	case STATE112:
+
 		ret = _gnutls13_send_session_ticket(session, AGAIN(STATE112));
 		STATE = STATE112;
 		IMED_RET("send session ticket", ret, 0);
@@ -393,8 +397,6 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 
 	SAVE_TRANSCRIPT;
 
-	if (session->internals.resumed != RESUME_FALSE)
-		_gnutls_set_resumed_parameters(session);
 
 	return 0;
 }

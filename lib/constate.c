@@ -647,7 +647,9 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 	return 0;
 }
 
-
+/* This copies the session values which apply to subsequent/resumed
+ * sessions. Under TLS 1.3, these values are items which are not
+ * negotiated on the subsequent session. */
 #define CPY_COMMON(tls13_sem) \
 	if (!tls13_sem) { \
 		dst->cs = src->cs; \
@@ -661,11 +663,11 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 		dst->prf = src->prf; \
 		dst->grp = src->grp; \
 		dst->pversion = src->pversion; \
+		memcpy( dst->session_id, src->session_id, GNUTLS_MAX_SESSION_ID_SIZE); \
+		dst->session_id_size = src->session_id_size; \
+		dst->timestamp = src->timestamp; \
 	} \
-	memcpy( dst->session_id, src->session_id, GNUTLS_MAX_SESSION_ID_SIZE); \
-	dst->session_id_size = src->session_id_size; \
 	dst->cert_type = src->cert_type; \
-	dst->timestamp = src->timestamp; \
 	dst->client_auth_type = src->client_auth_type; \
 	dst->server_auth_type = src->server_auth_type
 

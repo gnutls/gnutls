@@ -29,21 +29,31 @@
 #include "ext/session_ticket.h"
 #include "auth/cert.h"
 #include "tls13/session_ticket.h"
+#include "session_pack.h"
 
 static int
-pack_ticket(tls13_ticket_t *ticket, gnutls_datum_t *state)
+pack_ticket(gnutls_session_t session, tls13_ticket_t *ticket, gnutls_datum_t *packed)
 {
 	uint8_t *p;
+	gnutls_datum_t state;
+	int ret;
 
-	state->size = 2 + 4 + 4 +
+	ret = _gnutls_session_pack(session, &state);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	packed->size = 2 + 4 + 4 +
 		1 + ticket->prf->output_size +
-		1 + ticket->nonce_size;
+		1 + ticket->nonce_size + 2 + state.size;
 
-	state->data = gnutls_malloc(state->size);
-	if (!state->data)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	packed->data = gnutls_malloc(packed->size);
+	if (!packed->data) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
 
-	p = state->data;
+	p = packed->data;
 
 	_gnutls_write_uint16(ticket->prf->id, p);
 	p += 2;
@@ -59,30 +69,41 @@ pack_ticket(tls13_ticket_t *ticket, gnutls_datum_t *state)
 
 	p += 1;
 	memcpy(p, ticket->nonce, ticket->nonce_size);
+	p += ticket->nonce_size;
 
-	return 0;
+	_gnutls_write_uint16(state.size, p);
+	p += 2;
+
+	memcpy(p, state.data, state.size);
+	ret = 0;
+
+ cleanup:
+	gnutls_free(state.data);
+	return ret;
 }
 
 static int
-unpack_ticket(gnutls_datum_t *state, tls13_ticket_t *data)
+unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_t *data)
 {
 	uint32_t age_add, lifetime;
 	uint8_t resumption_master_secret[MAX_HASH_SIZE];
 	size_t resumption_master_secret_size;
 	uint8_t nonce[UINT8_MAX];
 	size_t nonce_size;
+	gnutls_datum_t state;
 	gnutls_mac_algorithm_t kdf;
 	const mac_entry_st *prf;
 	uint8_t *p;
 	ssize_t len;
+	int ret;
 
-	if (unlikely(state == NULL || data == NULL))
+	if (unlikely(packed == NULL || data == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	memset(data, 0, sizeof(*data));
 
-	p = state->data;
-	len = state->size;
+	p = packed->data;
+	len = packed->size;
 
 	DECR_LEN(len, 2);
 	kdf = _gnutls_read_uint16(p);
@@ -125,6 +146,18 @@ unpack_ticket(gnutls_datum_t *state, tls13_ticket_t *data)
 
 	DECR_LEN(len, nonce_size);
 	memcpy(nonce, p, nonce_size);
+	p += nonce_size;
+
+	DECR_LEN(len, 2);
+	state.size = _gnutls_read_uint16(p);
+	p += 2;
+
+	DECR_LEN(len, state.size);
+	state.data = p;
+
+	ret = _gnutls_session_unpack(session, &state);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	/* No errors - Now return all the data to the caller */
 	data->prf = prf;
@@ -142,7 +175,7 @@ static int
 generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
 {
 	int ret;
-	gnutls_datum_t state = { NULL, 0 };
+	gnutls_datum_t packed = { NULL, 0 };
 	tls13_ticket_t ticket_data;
 
 	/* Generate a random 128-bit ticket nonce */
@@ -170,12 +203,12 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
 	       session->key.proto.tls13.ap_rms,
 	       ticket->prf->output_size);
 
-	ret = pack_ticket(&ticket_data, &state);
+	ret = pack_ticket(session, &ticket_data, &packed);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_encrypt_session_ticket(session, &state, &ticket->ticket);
-	_gnutls_free_datum(&state);
+	ret = _gnutls_encrypt_session_ticket(session, &packed, &ticket->ticket);
+	_gnutls_free_datum(&packed);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -343,7 +376,7 @@ int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	/* Return ticket parameters */
-	ret = unpack_ticket(&decrypted, ticket_data);
+	ret = unpack_ticket(session, &decrypted, ticket_data);
 	_gnutls_free_datum(&decrypted);
 	if (ret < 0) {
 		return ret;

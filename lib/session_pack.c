@@ -1088,6 +1088,7 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		       session->internals.resumed_security_parameters.
 		       server_auth_type);
 
+
 	if (session->internals.resumed_security_parameters.
 	    max_record_recv_size == 0
 	    || session->internals.resumed_security_parameters.

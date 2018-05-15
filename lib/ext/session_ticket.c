@@ -594,9 +594,13 @@ int gnutls_session_ticket_enable_client(gnutls_session_t session)
  * @key: key to encrypt session parameters.
  *
  * Request that the server should attempt session resumption using
- * SessionTicket.  @key must be initialized with
- * gnutls_session_ticket_key_generate(), and should be overwritten
- * using gnutls_memset() before being released.
+ * session tickets, i.e., by delegating storage to the client.
+ * @key must be initialized using gnutls_session_ticket_key_generate().
+ * To avoid leaking that key, use gnutls_memset() prior to
+ * releasing it.
+ *
+ * The default ticket expiration time can be overriden using
+ * gnutls_db_set_cache_expiration().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  * error code.
