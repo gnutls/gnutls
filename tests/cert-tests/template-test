@@ -239,4 +239,23 @@ fi
 
 rm -f ${TMPFILE}
 
+# Test generation with larger serial number
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-long-serial.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+
+${DIFF} "${srcdir}/data/long-serial.pem" ${TMPFILE} >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 11 (long serial) failed"
+	exit ${rc}
+fi
+
+rm -f ${TMPFILE}
+
 exit 0

@@ -29,6 +29,8 @@
 #define TYPE_CRT 1
 #define TYPE_CRQ 2
 
+#define SERIAL_MAX_BYTES 20
+
 void certtool_version(void);
 
 #include <gnutls/x509.h>

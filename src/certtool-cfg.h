@@ -32,6 +32,7 @@ void read_crt_set(gnutls_x509_crt_t crt, const char *input_str,
 void read_crq_set(gnutls_x509_crq_t crq, const char *input_str,
 		  const char *oid);
 int64_t read_int(const char *input_str);
+int serial_decode(const char *input, gnutls_datum_t *output);
 const char *read_str(const char *input_str);
 int read_yesno(const char *input_str, int def);
 

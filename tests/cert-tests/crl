@@ -25,6 +25,7 @@ export TZ="UTC"
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
+ac_cv_sizeof_unsigned_long_int="${ac_cv_sizeof_unsigned_long_int:-8}"
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -56,6 +57,13 @@ fi
 grep "Revoked certificates (152)" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL generation didn't succeed as expected"
+	exit 1
+fi
+
+sed 's/\r$//' <"${INFOFILE}" | grep "CRL Number (not critical): 07$" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL generation didn't succeed as expected (2)"
+	grep "CRL Number (not critical):" "${INFOFILE}"
 	exit 1
 fi
 
@@ -118,6 +126,84 @@ grep "Next at: Wed Mar 29 13:21:42 UTC 2006" "${INFOFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL date setting didn't succeed as expected (3)"
 	exit 1
+fi
+
+# Check hex serial number
+echo "crl_next_update = 43" >$TMPFILE
+echo "crl_number = 0x1234567890abcdef1234567890abcdef12345678" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/ca-certs.pem" --template \
+	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL hex number failed"
+	exit ${rc}
+fi
+
+sed 's/\r$//' <"${INFOFILE}" | grep "CRL Number (not critical): 1234567890abcdef1234567890abcdef12345678$" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL hex number didn't succeed as expected"
+	grep "CRL Number (not critical):" "${INFOFILE}"
+	exit 1
+fi
+
+# Check default CRL number
+echo "crl_next_update = 43" >$TMPFILE
+
+export TZ="UTC"
+
+. ${srcdir}/../scripts/common.sh
+
+check_for_datefudge
+
+datefudge -s "2020-01-20 10:00:00" ${VALGRIND} \
+	"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
+	--load-ca-certificate "${srcdir}/data/template-test.pem" \
+	--load-certificate "${srcdir}/data/ca-certs.pem" --template \
+	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL default number failed"
+	exit ${rc}
+fi
+
+sed 's/\r$//' <"${INFOFILE}" | grep "CRL Number (not critical): 5e257a20[0-9a-f]\{30\}$" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL default number didn't succeed as expected"
+	grep "CRL Number (not critical):" "${INFOFILE}"
+	exit 1
+fi
+
+# datefudge <= 1.21 (present in Fedora 26 image) trims the date to 32 bits
+datefudge -s "2138-01-20 10:00:00" date | grep "Mon Jan 20 10:00:00 UTC 2138" >/dev/null 2>&1
+datefudge_ok="$?"
+
+if test "${ac_cv_sizeof_unsigned_long_int}" = 8 && test "${datefudge_ok}" = 0;then
+	# we should test that on systems which have 64-bit time_t
+	datefudge -s "2138-01-20 10:00:00" ${VALGRIND} \
+		"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
+		--load-ca-certificate "${srcdir}/data/template-test.pem" \
+		--load-certificate "${srcdir}/data/ca-certs.pem" --template \
+		"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
+	rc=$?
+
+	# We're done.
+	if test "${rc}" != "0"; then
+		echo "CRL default number 2 failed"
+		exit ${rc}
+	fi
+
+	sed 's/\r$//' <"${INFOFILE}" | grep "CRL Number (not critical): 013c1972a0[0-9a-f]\{30\}$" >/dev/null 2>&1
+	if test "$?" != "0"; then
+		echo "CRL default number 2 didn't succeed as expected"
+		grep "CRL Number (not critical):" "${INFOFILE}"
+		exit 1
+	fi
 fi
 
 rm -f "${OUTFILE}"

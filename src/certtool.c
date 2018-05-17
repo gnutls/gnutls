@@ -397,7 +397,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 	{
 		size_t serial_size;
-		unsigned char serial[16];
+		unsigned char serial[SERIAL_MAX_BYTES];
 
 		serial_size = sizeof(serial);
 
@@ -829,7 +829,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 
 	{
 		size_t serial_size;
-		unsigned char serial[16];
+		unsigned char serial[SERIAL_MAX_BYTES];
 
 		serial_size = sizeof(serial);
 
