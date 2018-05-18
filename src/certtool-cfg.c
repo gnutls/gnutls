@@ -1546,25 +1546,6 @@ int default_crl_number(unsigned char* serial, size_t *size)
 }
 
 /**
- * strip_trailing_newlines:
- * @str: zero-terminated string that will be modified in-place, must not be NULL
- *
- * This function will remove trailing CR or LF characters.
- **/
-static void strip_trailing_newlines(char *str)
-{
-	char *end;
-
-	end = str;
-	while (*end != '\0') end++;
-	end--;
-	while (end >= str && (*end == '\r' || *end == '\n')) {
-		*end = '\0';
-		end--;
-	}
-}
-
-/**
  * read_serial_value:
  * @serial: pointer to buffer with serial number
  * @size: pointer to actual size of data in buffer
@@ -1583,6 +1564,7 @@ void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,
 {
 	static char input[MAX_INPUT_SIZE];
 	int ret;
+	size_t input_len;
 	gnutls_datum_t decoded;
 	gnutls_datum_t serial_datum;
 	gnutls_datum_t encoded_default;
@@ -1604,9 +1586,9 @@ void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,
 	if (fgets(input, sizeof(input), stdin) == NULL)
 		return;
 
-	strip_trailing_newlines(input);
+	input_len = strip_nl(input, strlen(input));
 
-	if (strlen(input) == 0)
+	if (input_len == 0)
 		return;
 
 	ret = serial_decode(input, &decoded);
