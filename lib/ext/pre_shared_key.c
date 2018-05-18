@@ -498,7 +498,7 @@ const hello_ext_entry_st ext_pre_shared_key = {
 	.tls_id = 41,
 	.gid = GNUTLS_EXTENSION_PRE_SHARED_KEY,
 	.parse_type = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
 	.send_func = _gnutls_psk_send_params,
 	.recv_func = _gnutls_psk_recv_params
 };

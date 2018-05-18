@@ -41,8 +41,7 @@ const hello_ext_entry_st ext_mod_post_handshake = {
 	.tls_id = 49,
 	.gid = GNUTLS_EXTENSION_POST_HANDSHAKE,
 	.parse_type = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO,
-
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.recv_func = _gnutls_post_handshake_recv_params,
 	.send_func = _gnutls_post_handshake_send_params,
 	.pack_func = NULL,

@@ -2724,7 +2724,8 @@ typedef int (*gnutls_ext_pack_func) (gnutls_ext_priv_data_t data,
 typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_t packed_data,
 				       gnutls_ext_priv_data_t *data);
 
-#define GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO 1
+#define GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO 1
+#define GNUTLS_EXT_RAW_FLAG_DTLS_CLIENT_HELLO (1<<1)
 typedef int (*gnutls_ext_raw_process_func)(void *ctx, unsigned tls_id, const unsigned char *data, unsigned data_size);
 int gnutls_ext_raw_parse(void *ctx, gnutls_ext_raw_process_func cb,
 			 const gnutls_datum_t *data, unsigned int flags);
@@ -2760,6 +2761,8 @@ typedef enum {
  * @GNUTLS_EXT_FLAG_EE: This extension can be present in encrypted extensions message
  * @GNUTLS_EXT_FLAG_HRR: This extension can be present in hello retry request message
  * @GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST: When flag is present, this extension will be send even if the server didn't advertise it. An extension of this type is the Cookie TLS1.3 extension.
+ * @GNUTLS_EXT_FLAG_DTLS: This extension can be present under DTLS; otherwise ignored.
+ * @GNUTLS_EXT_FLAG_TLS: This extension can be present under TLS; otherwise ignored.
  *
  * Enumeration of different TLS extension registration flags.
  */
@@ -2770,7 +2773,9 @@ typedef enum {
   GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO = (1<<3),
   GNUTLS_EXT_FLAG_EE = (1<<4), /* ENCRYPTED */
   GNUTLS_EXT_FLAG_HRR = (1<<5),
-  GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST = (1<<6)
+  GNUTLS_EXT_FLAG_IGNORE_CLIENT_REQUEST = (1<<6),
+  GNUTLS_EXT_FLAG_TLS = (1<<7),
+  GNUTLS_EXT_FLAG_DTLS = (1<<8)
 } gnutls_ext_flags_t;
 
 /* Register a custom tls extension

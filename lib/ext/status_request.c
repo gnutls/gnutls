@@ -326,7 +326,8 @@ const hello_ext_entry_st ext_mod_status_request = {
 	.name = "OCSP Status Request",
 	.tls_id = STATUS_REQUEST_TLS_ID,
 	.gid = GNUTLS_EXTENSION_STATUS_REQUEST,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.parse_type = _GNUTLS_EXT_TLS_POST_CS,
 	.recv_func = _gnutls_status_request_recv_params,
 	.send_func = _gnutls_status_request_send_params,

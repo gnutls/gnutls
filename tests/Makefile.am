@@ -180,7 +180,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 safe-renegotiation/srn0 safe-renegotiation/srn1 safe-renegotiation/srn2 \
 	 safe-renegotiation/srn3 safe-renegotiation/srn4 safe-renegotiation/srn5 \
 	 rsa-illegal-import set_x509_ocsp_multi_invalid set_key set_x509_key_file_ocsp_multi2 \
-	 set_x509_ocsp_multi_unknown set_x509_ocsp_multi_pem \
+	 set_x509_ocsp_multi_unknown set_x509_ocsp_multi_pem tls-ext-not-in-dtls \
 	 set_key_utf8 set_x509_key_utf8 insecure_key handshake-large-packet \
 	 client_dsa_key server_ecdsa_key tls-session-ext-register tls-session-supplemental \
 	 multi-alerts naked-alerts pkcs7-cat-parse set_known_dh_params_x509 \
@@ -193,7 +193,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 x509sign-verify-error rng-op-nonce rng-op-random rng-op-key x509-dn-decode-compat \
 	 ip-check mini-x509-ipaddr trust-store base64-raw random-art dhex509self \
 	 dss-sig-val sign-pk-api tls-session-ext-override mini-record-pad \
-	 tls13-server-kx-neg
+	 tls13-server-kx-neg gnutls_ext_raw_parse_dtls
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp

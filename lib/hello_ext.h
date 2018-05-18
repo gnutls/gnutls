@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -52,10 +53,17 @@ int _gnutls_hello_ext_get_resumed_priv(gnutls_session_t session,
 					 extensions_t ext,
 					 gnutls_ext_priv_data_t * data);
 
+#define GNUTLS_EXT_FLAG_MSG_MASK (GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO| \
+		 GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO | GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_HRR)
+
+/* these flags can only be set in the extensions, but cannot be requested;
+ * they are handled internally by the hello parsing/generating functions. */
+#define GNUTLS_EXT_FLAG_SET_ONLY_FLAGS_MASK ~(GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_TLS)
+
 /* obtain the message this extension was received at */
 inline static gnutls_ext_flags_t _gnutls_ext_get_msg(gnutls_session_t session)
 {
-	return session->internals.ext_msg;
+	return session->internals.ext_msg & GNUTLS_EXT_FLAG_MSG_MASK;
 }
 
 inline static void _gnutls_ext_set_msg(gnutls_session_t session, gnutls_ext_flags_t msg)
@@ -86,6 +94,8 @@ int _gnutls_hello_ext_unpack(gnutls_session_t session,
 
 inline static const char *ext_msg_validity_to_str(gnutls_ext_flags_t msg)
 {
+	msg &= GNUTLS_EXT_FLAG_MSG_MASK;
+
 	switch(msg) {
 		case GNUTLS_EXT_FLAG_CLIENT_HELLO:
 			return "client hello";

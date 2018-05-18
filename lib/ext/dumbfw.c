@@ -41,8 +41,7 @@ const hello_ext_entry_st ext_mod_dumbfw = {
 	.tls_id = 21,
 	.gid = GNUTLS_EXTENSION_DUMBFW,
 	.parse_type = GNUTLS_EXT_APPLICATION,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO,
-
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO,
 	.recv_func = NULL,
 	.send_func = _gnutls_dumbfw_send_params,
 	.pack_func = NULL,

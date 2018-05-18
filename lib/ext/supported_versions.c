@@ -41,10 +41,9 @@ const hello_ext_entry_st ext_mod_supported_versions = {
 	.name = "Supported Versions",
 	.tls_id = 43,
 	.gid = GNUTLS_EXTENSION_SUPPORTED_VERSIONS,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO|
-		    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO|GNUTLS_EXT_FLAG_HRR,
+	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+		    GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO | GNUTLS_EXT_FLAG_HRR|GNUTLS_EXT_FLAG_TLS,
 	.parse_type = GNUTLS_EXT_VERSION_NEG, /* force parsing prior to EXT_TLS extensions */
-
 	.recv_func = supported_versions_recv_params,
 	.send_func = supported_versions_send_params,
 	.pack_func = NULL,

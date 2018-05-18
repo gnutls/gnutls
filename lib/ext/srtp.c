@@ -43,9 +43,9 @@ const hello_ext_entry_st ext_mod_srtp = {
 	.name = "SRTP",
 	.tls_id = 14,
 	.gid = GNUTLS_EXTENSION_SRTP,
-	.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO|GNUTLS_EXT_FLAG_EE|GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
+		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.parse_type = GNUTLS_EXT_APPLICATION,
-
 	.recv_func = _gnutls_srtp_recv_params,
 	.send_func = _gnutls_srtp_send_params,
 	.pack_func = _gnutls_srtp_pack,

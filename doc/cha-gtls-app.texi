@@ -1604,7 +1604,7 @@ handshake_hook_func(gnutls_session_t session, unsigned int htype,
     assert(when == GNUTLS_HOOK_PRE);
 
     ret = gnutls_ext_raw_parse(NULL, ext_hook_func, msg,
-                               GNUTLS_EXT_RAW_FLAG_CLIENT_HELLO);
+                               GNUTLS_EXT_RAW_FLAG_TLS_CLIENT_HELLO);
     assert(ret >= 0);
 
     gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred);
