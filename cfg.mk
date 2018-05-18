@@ -61,23 +61,12 @@ exclude_file_name_regexp--sc_prohibit_strncpy='unistr.in.h'
 gl_public_submodule_commit =
 
 autoreconf:
-	for f in $(PODIR)/*.po.in; do \
-		cp $$f `echo $$f | sed 's/.in//'`; \
-	done
-	for i in po.m4 nls.m4 gettext.m4 codeset.m4 glibc21.m4 glibc2.m4 iconv.m4 intdiv0.m4 intldir.m4 intl.m4 intlmacosx.m4 intmax.m4 inttypes_h.m4 inttypes-pri.m4 lcmessage.m4 lib-ld.m4 lib-link.m4 lib-prefix.m4 lock.m4 longlong.m4 printf-posix.m4 progtest.m4 size_max.m4 stdint_h.m4 uintmax_t.m4 wchar_t.m4 wint_t.m4 visibility.m4 xsize.m4;do \
-		if test -f /usr/share/aclocal/$$i;then \
-			rm -f m4/$$i; \
-		fi; \
-	done
+	./bootstrap
 	touch ChangeLog
-	test -f ./configure || AUTOPOINT=autopoint autoreconf --install
 
 update-po: refresh-po
-	for f in `ls $(PODIR)/*.po | grep -v quot.po`; do \
-		cp $$f $$f.in; \
-	done
-	git add $(PODIR)/*.po.in
-	git commit -sm "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
+	git add $(PODIR)/*.po
+	git commit -sm "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po
 
 config:
 	./configure $(CFGFLAGS)
