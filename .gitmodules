@@ -13,3 +13,6 @@
 [submodule "tests/suite/tls-fuzzer/tlslite-ng"]
 	path = tests/suite/tls-fuzzer/tlslite-ng
 	url = https://github.com/tomato42/tlslite-ng.git
+[submodule "gnulib"]
+	path = gnulib
+	url = https://git.savannah.gnu.org/git/gnulib.git
