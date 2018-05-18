@@ -1112,6 +1112,13 @@ encryption_key
 # this is the 5th CRL by this CA
 # The value is in decimal (i.e. 1963) or hex (i.e. 0x07ab).
 # Comment the field for a time-based number.
+# Time-based CRL numbers generated in GnuTLS 3.6.3 and later
+# are significantly larger than those generated in previous
+# versions. Since CRL numbers need to be monotonic, you need
+# to specify the CRL number here manually if you intend to
+# downgrade to an earlier version than 3.6.3 after publishing
+# the CRL as it is not possible to specify CRL numbers greater
+# than 2**63-2 using hex notation in those versions.
 #crl_number = 5
 
 # Specify the update dates more precisely.
