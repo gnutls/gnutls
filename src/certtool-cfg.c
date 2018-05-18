@@ -1580,9 +1580,11 @@ void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,
 	}
 
 	while (true) {
-		fprintf(stderr, "Enter the certificate's %s in decimal "
-				"(123) or hex (0xabcd) (default 0x%s): ",
-				label, encoded_default.data);
+		fprintf(stderr,
+			"Enter the certificate's %s in decimal (123) or hex (0xabcd)\n"
+			"(default is 0x%s)\n"
+			"value: ",
+			label, encoded_default.data);
 
 		if (fgets(input, sizeof(input), stdin) == NULL)
 			break;
