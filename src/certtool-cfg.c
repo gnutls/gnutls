@@ -1551,6 +1551,7 @@ int default_crl_number(unsigned char* serial, size_t *size)
  * @size: pointer to actual size of data in buffer
  * @max_size: capacity of the buffer
  * @label: user-facing description of the field we are reading value for
+ * @rfc_section: rfc section number that defines the field
  *
  * This function will read a serial number from the user. It takes a buffer
  * that contains a default value that will be displayed to the user and
@@ -1560,7 +1561,7 @@ int default_crl_number(unsigned char* serial, size_t *size)
  **/
 static
 void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,
-		const char *label)
+		const char *label, const char *rfc_section)
 {
 	static char input[MAX_INPUT_SIZE];
 	int ret;
@@ -1578,35 +1579,47 @@ void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,
 		exit(1);
 	}
 
-	fprintf(stderr, "Enter the certificate's %s in decimal "
-			"(123) or hex (0xabcd) (default 0x%s): ",
-			label, encoded_default.data);
-	gnutls_free(encoded_default.data);
+	while (true) {
+		fprintf(stderr, "Enter the certificate's %s in decimal "
+				"(123) or hex (0xabcd) (default 0x%s): ",
+				label, encoded_default.data);
 
-	if (fgets(input, sizeof(input), stdin) == NULL)
-		return;
+		if (fgets(input, sizeof(input), stdin) == NULL)
+			break;
 
-	input_len = strip_nl(input, strlen(input));
+		input_len = strip_nl(input, strlen(input));
 
-	if (input_len == 0)
-		return;
+		if (input_len == 0)
+			break;
 
-	ret = serial_decode(input, &decoded);
-	if (ret < 0) {
-		fprintf(stderr, "error parsing %s: %s\n", label, input);
-		exit(1);
-	}
+		ret = serial_decode(input, &decoded);
+		if (ret < 0) {
+			fprintf(stderr, "error parsing %s: %s\n", label, input);
+			continue;
+		}
 
-	if (decoded.size > max_size) {
-		fprintf(stderr, "maximum %zu octets allowed for %s\n", max_size, label);
+		if ((decoded.size == SERIAL_MAX_BYTES && decoded.data[0] & 0x80) ||
+				decoded.size > SERIAL_MAX_BYTES) {
+			fprintf(stderr, "%s would be encoded in more than 20 bytes,"
+				"see RFC 5280, section %s\n", label, rfc_section);
+			gnutls_free(decoded.data);
+			continue;
+		}
+
+		if (decoded.size > max_size) {
+			fprintf(stderr, "maximum %zu octets allowed for %s\n",
+					max_size, label);
+			gnutls_free(decoded.data);
+			continue;
+		}
+
+		memcpy(serial, decoded.data, decoded.size);
+		*size = decoded.size;
 		gnutls_free(decoded.data);
-		exit(1);
+		break;
 	}
 
-
-	memcpy(serial, decoded.data, decoded.size);
-	*size = decoded.size;
-	gnutls_free(decoded.data);
+	gnutls_free(encoded_default.data);
 }
 
 static
@@ -1636,10 +1649,9 @@ void get_serial_value(unsigned char *serial, size_t *size,
 	}
 
 	if (!batch)
-		read_serial_value(serial, size, max_size, label);
+		read_serial_value(serial, size, max_size, label, rfc_section);
 
 	if ((*size == SERIAL_MAX_BYTES && serial[0] & 0x80) || *size > SERIAL_MAX_BYTES) {
-		// TODO allow creating larger values and convert this to warning?
 		fprintf(stderr, "%s would be encoded in more than 20 bytes,"
 				"see RFC 5280, section %s\n", label, rfc_section);
 		exit(1);
