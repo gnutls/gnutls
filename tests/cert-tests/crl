@@ -179,11 +179,7 @@ if test "$?" != "0"; then
 	exit 1
 fi
 
-# datefudge <= 1.21 (present in Fedora 26 image) trims the date to 32 bits
-datefudge -s "2138-01-20 10:00:00" date | grep "Mon Jan 20 10:00:00 UTC 2138" >/dev/null 2>&1
-datefudge_ok="$?"
-
-if test "${ac_cv_sizeof_unsigned_long_int}" = 8 && test "${datefudge_ok}" = 0;then
+if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
 	# we should test that on systems which have 64-bit time_t
 	datefudge -s "2138-01-20 10:00:00" ${VALGRIND} \
 		"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \
