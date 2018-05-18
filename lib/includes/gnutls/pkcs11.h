@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2016-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -294,6 +295,12 @@ typedef enum {
 	GNUTLS_PKCS11_OBJ_LIBRARY_MANUFACTURER
 } gnutls_pkcs11_obj_info_t;
 
+int
+gnutls_pkcs11_obj_get_ptr(gnutls_pkcs11_obj_t obj, void **ptr,
+			  void **session, void **ohandle,
+			  unsigned long *slot_id,
+			  unsigned int flags);
+
 int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t obj,
 			       gnutls_pkcs11_obj_info_t itype,
 			       void *output, size_t * output_size);
@@ -354,6 +361,10 @@ typedef enum {
 int
 gnutls_pkcs11_token_init(const char *token_url,
 			 const char *so_pin, const char *label);
+
+int
+gnutls_pkcs11_token_get_ptr(const char *url, void **ptr, unsigned long *slot_id,
+			    unsigned int flags);
 
 int
 gnutls_pkcs11_token_get_mechanism(const char *url,

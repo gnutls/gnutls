@@ -288,6 +288,14 @@ pkcs11_import_url_privkey_SOURCES = pkcs11/pkcs11-import-url-privkey.c
 pkcs11_import_url_privkey_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_import_url_privkey_LDADD = $(LDADD) $(LIBDL)
 
+pkcs11_token_raw_SOURCES = pkcs11/pkcs11-token-raw.c
+pkcs11_token_raw_DEPENDENCIES = libpkcs11mock1.la libutils.la
+pkcs11_token_raw_LDADD = $(LDADD) $(LIBDL)
+
+pkcs11_obj_raw_SOURCES = pkcs11/pkcs11-obj-raw.c
+pkcs11_obj_raw_DEPENDENCIES = libpkcs11mock1.la libutils.la
+pkcs11_obj_raw_LDADD = $(LDADD) $(LIBDL)
+
 pkcs11_privkey_fork_SOURCES = pkcs11/pkcs11-privkey-fork.c
 pkcs11_privkey_fork_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_privkey_fork_LDADD = $(LDADD) $(LIBDL)
@@ -322,7 +330,8 @@ ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
 	pkcs11/pkcs11-privkey-pthread pkcs11/pkcs11-pin-func pkcs11/pkcs11-obj-import \
 	pkcs11-privkey-fork-reinit pkcs11-mechanisms pkcs11-privkey-safenet-always-auth \
 	pkcs11/pkcs11-rsa-pss-privkey-test pkcs11/tls-neg-pkcs11-key pkcs11/pkcs11-privkey-generate \
-	pkcs11/gnutls_x509_crt_list_import_url pkcs11/gnutls_pcert_list_import_x509_file
+	pkcs11/gnutls_x509_crt_list_import_url pkcs11/gnutls_pcert_list_import_x509_file \
+	pkcs11-token-raw pkcs11-obj-raw
 
 
 endif
