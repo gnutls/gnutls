@@ -206,6 +206,69 @@ if test "${ac_cv_sizeof_unsigned_long_int}" = 8 && test "${datefudge_ok}" = 0;th
 	fi
 fi
 
+# Check large decimal CRL number
+echo "crl_next_update = 43" >$TMPFILE
+echo "crl_number = 1234567890123456789012345678" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/ca-certs.pem" --template \
+	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" = "0"; then
+	echo "CRL large decimal number succeeded when shouldn't"
+	exit ${rc}
+fi
+
+sed 's/\r$//' <"${INFOFILE}" | grep "error parsing number: 1234567890123456789012345678" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL large number didn't fail as expected"
+	exit 1
+fi
+
+# Check invalid hex number
+echo "crl_next_update = 43" >$TMPFILE
+echo "crl_number = 0xsomething" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/ca-certs.pem" --template \
+	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" = "0"; then
+	echo "CRL invalid hex number succeeded when shouldn't"
+	exit ${rc}
+fi
+
+sed 's/\r$//' <"${INFOFILE}" | grep "error parsing number: 0xsomething" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL invalid hex number didn't fail as expected"
+	exit 1
+fi
+
+# Check invalid number
+echo "crl_next_update = 43" >$TMPFILE
+echo "crl_number = something" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/ca-certs.pem" --template \
+	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" = "0"; then
+	echo "CRL invalid number succeeded when shouldn't"
+	exit ${rc}
+fi
+
+sed 's/\r$//' <"${INFOFILE}" | grep "error parsing number: something" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL invalid number didn't fail as expected"
+	exit 1
+fi
+
 rm -f "${OUTFILE}"
 rm -f "${INFOFILE}"
 rm -f "${OUTFILE2}"
