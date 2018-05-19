@@ -28,9 +28,7 @@
 #include <gnutls/openpgp.h>
 #include <libguile.h>
 
-#ifdef HAVE_ALLOCA_H
 #include <alloca.h>
-#endif
 
 #include "enums.h"
 #include "smobs.h"

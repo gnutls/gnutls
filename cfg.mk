@@ -36,6 +36,7 @@ PO_DOMAIN := libgnutls
 
 local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_immutable_NEWS sc_program_name sc_prohibit_atoi_atof		\
+	sc_prohibit_always_true_header_tests                            \
 	sc_prohibit_empty_lines_at_EOF sc_prohibit_hash_without_use	\
 	sc_prohibit_have_config_h sc_prohibit_magic_number_exit		\
 	sc_prohibit_strcmp sc_require_config_h				\
