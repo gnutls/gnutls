@@ -220,6 +220,12 @@ $ make glimport
 
 That rule assumes that an updated gnulib is present at `../gnulib/`.
 
+Note that the gnulib library in `gl/` is used by the GnuTLS library
+and is kept separate from the gnulib used by the GnuTLS tools because
+of license issues, and also to prevent any gnulib networking modules
+from entering the library (gnulib networking re-implements the windows
+network stack and causes issues to gnutls applications running on windows).
+
 
 # Symbol and library versioning
 
