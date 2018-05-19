@@ -43,7 +43,7 @@ local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_unmarked_diagnostics sc_useless_cpp_parens			\
 	sc_two_space_separator_in_usage
 
-VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|po/.*.po.in|src/crywrap/|(devel/perlasm/|lib/accelerated/x86/|build-aux/|gl/|src/libopts/|tests/suite/ecore/|doc/protocol/).*$$
+VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|src/.*\.bak|src/crywrap/|(devel/perlasm/|lib/accelerated/x86/|build-aux/|gl/|src/libopts/|tests/suite/ecore/|doc/protocol/).*$$
 update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
@@ -58,6 +58,7 @@ exclude_file_name_regexp--sc_m4_quote_check='lib/unistring/m4/absolute-header.m4
 exclude_file_name_regexp--sc_makefile_at_at_check='lib/unistring/Makefile.am'
 exclude_file_name_regexp--sc_prohibit_stddef_without_use='u*-normalize.c'
 exclude_file_name_regexp--sc_prohibit_strncpy='unistr.in.h'
+exclude_file_name_regexp--sc_prohibit_always-defined_macros='lib/system/inet_pton.c'
 gl_public_submodule_commit =
 
 autoreconf:
