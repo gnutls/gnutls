@@ -65,7 +65,7 @@ struct find_flags_data_st {
 	unsigned int trusted;
 };
 
-struct find_url_data_st {
+struct find_single_obj_st {
 	gnutls_pkcs11_obj_t obj;
 	bool overwrite_exts; /* only valid if looking for a certificate */
 };
@@ -78,7 +78,7 @@ struct find_obj_session_st {
 	unsigned long slot_id;
 };
 
-struct find_obj_data_st {
+struct find_multi_obj_st {
 	gnutls_pkcs11_obj_t *p_list;
 	unsigned int current;
 	unsigned int flags;
@@ -2164,11 +2164,11 @@ pkcs11_import_object(ck_object_handle_t ctx, ck_object_class_t class,
 }
 
 static int
-find_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+find_single_obj_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	     struct ck_token_info *tinfo, struct ck_info *lib_info,
 	     void *input)
 {
-	struct find_url_data_st *find_data = input;
+	struct find_single_obj_st *find_data = input;
 	struct ck_attribute a[4];
 	ck_certificate_type_t type;
 	ck_object_class_t class;
@@ -2284,7 +2284,7 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 			     unsigned int flags)
 {
 	int ret;
-	struct find_url_data_st find_data;
+	struct find_single_obj_st find_data;
 
 	PKCS11_CHECK_INIT;
 	memset(&find_data, 0, sizeof(find_data));
@@ -2303,7 +2303,7 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 	}
 
 	ret =
-	    _pkcs11_traverse_tokens(find_obj_url_cb, &find_data, obj->info,
+	    _pkcs11_traverse_tokens(find_single_obj_cb, &find_data, obj->info,
 				    &obj->pin,
 				    pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
@@ -3066,10 +3066,10 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 #define OBJECTS_A_TIME 8*1024
 
 static int
-find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+find_multi_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	  struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
-	struct find_obj_data_st *find_data = input;
+	struct find_multi_obj_st *find_data = input;
 	struct ck_attribute a[16];
 	struct ck_attribute *attr;
 	ck_object_class_t class = (ck_object_class_t) -1;
@@ -3454,7 +3454,7 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 				   unsigned int flags)
 {
 	int ret;
-	struct find_obj_data_st priv;
+	struct find_multi_obj_st priv;
 
 	PKCS11_CHECK_INIT_FLAGS(flags);
 
@@ -3478,7 +3478,7 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 	}
 
 	ret =
-	    _pkcs11_traverse_tokens(find_objs_cb, &priv, priv.info,
+	    _pkcs11_traverse_tokens(find_multi_objs_cb, &priv, priv.info,
 				    NULL, pkcs11_obj_flags_to_int(flags));
 	p11_kit_uri_free(priv.info);
 
