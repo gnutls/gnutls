@@ -324,7 +324,7 @@ int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, 
 					at_least_one_new = 1;
 
 				if (buffer_size > 2) {
-					_gnutls_debug_log("Advertizing version %x.%x\n", (int)p->major, (int)p->minor);
+					_gnutls_debug_log("Advertizing version %d.%d\n", (int)p->major, (int)p->minor);
 					buffer[0] = p->major;
 					buffer[1] = p->minor;
 					written_bytes += 2;

@@ -21,7 +21,7 @@
  *
  */
 
-/* This file contains the code the Certificate Type TLS extension.
+/* This file contains the code for the Signature Algorithms TLS extension.
  * This extension is currently gnutls specific.
  */
 
@@ -41,8 +41,7 @@ static int _gnutls_signature_algorithm_recv_params(gnutls_session_t
 						   size_t data_size);
 static int _gnutls_signature_algorithm_send_params(gnutls_session_t
 						   session,
-						   gnutls_buffer_st *
-						   extdata);
+						   gnutls_buffer_st * extdata);
 static void signature_algorithms_deinit_data(gnutls_ext_priv_data_t priv);
 static int signature_algorithms_pack(gnutls_ext_priv_data_t epriv,
 				     gnutls_buffer_st * ps);
@@ -161,12 +160,10 @@ _gnutls_sign_algorithm_parse_data(gnutls_session_t session,
 		     gnutls_sign_get_name(sig));
 
 		if (sig != GNUTLS_SIGN_UNKNOWN) {
-			if (priv->sign_algorithms_size ==
-			    MAX_ALGOS)
+			if (priv->sign_algorithms_size == MAX_ALGOS)
 				break;
 			priv->sign_algorithms[priv->
-					      sign_algorithms_size++] =
-			    sig;
+					      sign_algorithms_size++] = sig;
 		}
 	}
 
@@ -204,7 +201,7 @@ _gnutls_signature_algorithm_recv_params(gnutls_session_t session,
 		 */
 		/* return GNUTLS_E_UNEXPECTED_PACKET; */
 	} else {
-		/* SERVER SIDE - we must check if the sent cert type is the right one
+		/* SERVER SIDE
 		 */
 		if (data_size >= 2) {
 			uint16_t len;
@@ -263,7 +260,7 @@ _gnutls_signature_algorithm_send_params(gnutls_session_t session,
 }
 
 /* Returns a requested by the peer signature algorithm that
- * matches the given certificate's public key algorithm. 
+ * matches the given certificate's public key algorithm.
  *
  * When the @client_cert flag is not set, then this function will
  * also check whether the signature algorithm is allowed to be
@@ -370,16 +367,14 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 		}
 	}
 
-	for (i = 0; i < session->internals.priorities->sigalg.size;
-	     i++) {
-		if (session->internals.priorities->sigalg.entry[i]->id ==
-		    sig) {
+	for (i = 0; i < session->internals.priorities->sigalg.size; i++) {
+		if (session->internals.priorities->sigalg.entry[i]->id == sig) {
 			return 0;	/* ok */
 		}
 	}
 
  disallowed:
-	_gnutls_handshake_log("signature algorithm %s is not enabled\n", gnutls_sign_algorithm_get_name(sig));
+	_gnutls_handshake_log("Signature algorithm %s is not enabled\n", gnutls_sign_algorithm_get_name(sig));
 	return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 }
 
@@ -493,7 +488,7 @@ gnutls_sign_algorithm_get_requested(gnutls_session_t session,
  * gnutls_sign_algorithm_get:
  * @session: is a #gnutls_session_t type.
  *
- * Returns the signature algorithm that is (or will be) used in this 
+ * Returns the signature algorithm that is (or will be) used in this
  * session by the server to sign data. This function should be
  * used only with TLS 1.2 or later.
  *
@@ -510,7 +505,7 @@ int gnutls_sign_algorithm_get(gnutls_session_t session)
  * gnutls_sign_algorithm_get_client:
  * @session: is a #gnutls_session_t type.
  *
- * Returns the signature algorithm that is (or will be) used in this 
+ * Returns the signature algorithm that is (or will be) used in this
  * session by the client to sign data. This function should be
  * used only with TLS 1.2 or later.
  *
