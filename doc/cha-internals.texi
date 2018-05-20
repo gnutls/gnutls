@@ -124,11 +124,11 @@ inside an application using GnuTLS) and register it via the exported functions
 @subheading Adding a new TLS hello extension
 
 Adding support for a new TLS hello extension is done from time to time, and
-the process to do so is not difficult.  Here are the steps you need to
-follow if you wish to do this yourself.  For the sake of discussion, let's
-consider adding support for the hypothetical TLS extension
-@code{foobar}. The following section is about adding an hello extension to
-GnuTLS itself. For custom application extensions you should check the exported functions
+the process to do so is not difficult. Here are the steps you need to
+follow if you wish to do this yourself. For the sake of discussion, let's
+consider adding support for the hypothetical TLS extension @code{foobar}.
+The following section is about adding an hello extension to GnuTLS itself.
+For custom application extensions you should check the exported functions
 @funcref{gnutls_session_ext_register} or @funcref{gnutls_ext_register}.
 
 @subsubheading Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
@@ -137,7 +137,7 @@ This step is useful when the extension code is large and it might be desirable
 under some circumstances to be able to leave out the extension during compilation of GnuTLS.
 If you don't need this kind of feature this step can be safely skipped.
 
-Whether to chooe enable or disable depends on whether you intend to make the extension be
+Whether to choose enable or disable depends on whether you intend to make the extension be
 enabled by default. Look at existing checks (i.e., SRP, authz) for
 how to model the code. For example:
 
@@ -181,28 +181,28 @@ A typical entry would be:
 #endif
 @end example
 
-Also for every extension you need to create @code{hello_ext_entry_st}
+Also for every extension you need to create an @code{hello_ext_entry_st}
 that describes the extension. This structure is placed in the designated
 c file for your extension and its name is used in the registration entry
 as depicted above.
 
 The structure of @code{hello_ext_entry_st} is as follows:
 @example
-	const hello_ext_entry_st ext_mod_foobar = @{
-		.name = "FOOBAR",
-		.tls_id = 255,
-		.gid = GNUTLS_EXTENSION_FOOBAR,
-		.parse_type = GNUTLS_EXT_TLS,
-		.validity = GNUTLS_EXT_FLAG_CLIENT_HELLO |
-			GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
-			GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
-		.recv_func = _gnutls_foobar_recv_params,
-		.send_func = _gnutls_foobar_send_params,
-		.pack_func = _gnutls_foobar_pack,
-		.unpack_func = _gnutls_foobar_unpack,
-		.deinit_func = _gnutls_foobar_deinit,
-		.cannot_be_overriden = 1
-	@};
+  const hello_ext_entry_st ext_mod_foobar = @{
+    .name = "FOOBAR",
+    .tls_id = 255,
+    .gid = GNUTLS_EXTENSION_FOOBAR,
+    .parse_type = GNUTLS_EXT_TLS,
+    .validity = GNUTLS_EXT_FLAG_CLIENT_HELLO |
+	GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+	GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+    .recv_func = _gnutls_foobar_recv_params,
+    .send_func = _gnutls_foobar_send_params,
+    .pack_func = _gnutls_foobar_pack,
+    .unpack_func = _gnutls_foobar_unpack,
+    .deinit_func = _gnutls_foobar_deinit,
+    .cannot_be_overriden = 1
+  @};
 @end example
 
 The GNUTLS_EXTENSION_FOOBAR is the identifier that you've added to
@@ -280,9 +280,9 @@ other error codes from the list in @ref{Error codes}. Return 0 on success.
 
 An extension typically stores private information in the @code{session}
 data for later usage. That can be done using the functions
-@funcintref{_gnutls_ext_set_session_data} and
-@funcintref{_gnutls_ext_get_session_data}. You can check simple examples
-at @code{ext/@-max_@-record.c} and @code{ext/@-server_@-name.c} extensions.
+@funcintref{_gnutls_hello_ext_set_priv} and
+@funcintref{_gnutls_hello_ext_get_priv}. You can check simple examples
+at @code{lib/ext/@-max_@-record.c} and @code{lib/ext/@-server_@-name.c} extensions.
 That private information can be saved and restored across session
 resumption if the following functions are set:
 
@@ -350,7 +350,7 @@ forget to add @code{Since:} tags to indicate the GnuTLS version the
 API was introduced in.
 
 @subsubheading Heartbeat extension.
-
+%REMARK: do we need this section?
 One such extension is HeartBeat protocol (RFC6520:
 @url{https://tools.ietf.org/html/rfc6520}) implementation. To enable
 it use option --heartbeat with example client and server supplied with
