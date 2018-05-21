@@ -195,7 +195,8 @@ The structure of @code{hello_ext_entry_st} is as follows:
     .parse_type = GNUTLS_EXT_TLS,
     .validity = GNUTLS_EXT_FLAG_CLIENT_HELLO |
 	GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
-	GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,
+	GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO |
+	GNUTLS_EXT_FLAG_TLS,
     .recv_func = _gnutls_foobar_recv_params,
     .send_func = _gnutls_foobar_send_params,
     .pack_func = _gnutls_foobar_pack,
@@ -291,6 +292,11 @@ internal extension data to save them in the session resumption storage.
 
 The @funcintref{_gnutls_foobar_unpack} function is responsible for
 restoring session data from the session resumption storage.
+
+When the internal data are stored using the @funcintref{_gnutls_hello_ext_set_datum},
+then you could rely on the default pack and unpack functions:
+@funcintref{_gnutls_hello_ext_default_pack} and
+@funcintref{_gnutls_hello_ext_default_unpack}.
 
 Recall that both for the client and server, the send and receive
 functions most likely will need to do different things
