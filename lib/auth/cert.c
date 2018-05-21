@@ -629,7 +629,7 @@ int check_pk_compat(gnutls_session_t session, gnutls_pubkey_t pubkey)
  */
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_pcert_deinit(&peer_certificate_list[x])
 static int
-_gnutls_proc_x509_server_crt(gnutls_session_t session,
+_gnutls_proc_x509_crt(gnutls_session_t session,
 			     uint8_t * data, size_t data_size)
 {
 	int size, len, ret;
@@ -790,7 +790,7 @@ int _gnutls_proc_crt(gnutls_session_t session, uint8_t * data, size_t data_size)
 
 	switch (cert_type) {
 		case GNUTLS_CRT_X509:
-			ret = _gnutls_proc_x509_server_crt(session, data, data_size);
+			ret = _gnutls_proc_x509_crt(session, data, data_size);
 			break;
 		default:
 			gnutls_assert();
