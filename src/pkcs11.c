@@ -1216,7 +1216,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		if (ret < 0) {
 			fprintf(stderr, "Error writing certificate: %s\n", gnutls_strerror(ret));
 			if (((flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_CA) ||
-			     (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)) && 
+			     (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)) &&
 			    (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO) == 0)
 				fprintf(stderr, "note: some tokens may require security officer login for this operation\n");
 			app_exit(1);

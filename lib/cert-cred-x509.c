@@ -252,7 +252,7 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 		}
 		count++;
 
-		/* now we move ptr after the pem header 
+		/* now we move ptr after the pem header
 		 */
 		ptr++;
 		size--;
@@ -1016,8 +1016,8 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
  * entity certificate (e.g., also an intermediate CA cert), the full
  * certificate chain must be provided in @pcert_list.
  *
- * Note that the @key and the elements of @pcert_list will become part of the credentials 
- * structure and must not be deallocated. They will be automatically deallocated 
+ * Note that the @key and the elements of @pcert_list will become part of the credentials
+ * structure and must not be deallocated. They will be automatically deallocated
  * when the @res structure is deinitialized.
  *
  * If that function fails to load the @res structure is at an undefined state, it must
@@ -1126,10 +1126,10 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
  * @tlist: is a #gnutls_x509_trust_list_t type
  * @flags: must be zero
  *
- * This function sets a trust list in the gnutls_certificate_credentials_t type. 
+ * This function sets a trust list in the gnutls_certificate_credentials_t type.
  *
- * Note that the @tlist will become part of the credentials 
- * structure and must not be deallocated. It will be automatically deallocated 
+ * Note that the @tlist will become part of the credentials
+ * structure and must not be deallocated. It will be automatically deallocated
  * when the @res structure is deinitialized.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
@@ -1309,7 +1309,7 @@ gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t res,
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, ca, NULL, 
+	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, ca, NULL,
 					type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
@@ -1344,7 +1344,10 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 				  int ca_list_size)
 {
 	int ret, i, j;
-	gnutls_x509_crt_t new_list[ca_list_size];
+	gnutls_x509_crt_t *new_list = gnutls_malloc(ca_list_size * sizeof(gnutls_x509_crt_t));
+
+	if (!new_list)
+		return GNUTLS_E_MEMORY_ERROR;
 
 	for (i = 0; i < ca_list_size; i++) {
 		ret = gnutls_x509_crt_init(&new_list[i]);
@@ -1368,11 +1371,13 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
+	gnutls_free(new_list);
 	return ret;
 
       cleanup:
 	for (j = 0; j < i; j++)
 		gnutls_x509_crt_deinit(new_list[j]);
+	gnutls_free(new_list);
 
 	return ret;
 }
@@ -1407,7 +1412,7 @@ gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials_t
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_file(cred->tlist, cafile, NULL, 
+	ret = gnutls_x509_trust_list_add_trust_file(cred->tlist, cafile, NULL,
 						type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
@@ -1421,7 +1426,7 @@ int ret;
  * @ca_dir: is a directory containing the list of trusted CAs (DER or PEM list)
  * @type: is PEM or DER
  *
- * This function adds the trusted CAs present in the directory in order to 
+ * This function adds the trusted CAs present in the directory in order to
  * verify client or server certificates. This function is identical
  * to gnutls_certificate_set_x509_trust_file() but loads all certificates
  * in a directory.
@@ -1438,7 +1443,7 @@ gnutls_certificate_set_x509_trust_dir(gnutls_certificate_credentials_t cred,
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_dir(cred->tlist, ca_dir, NULL, 
+	ret = gnutls_x509_trust_list_add_trust_dir(cred->tlist, ca_dir, NULL,
 						type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
@@ -1465,7 +1470,7 @@ int
 gnutls_certificate_set_x509_system_trust(gnutls_certificate_credentials_t
 					 cred)
 {
-	return gnutls_x509_trust_list_add_system_trust(cred->tlist, 
+	return gnutls_x509_trust_list_add_system_trust(cred->tlist,
 					GNUTLS_TL_USE_IN_TLS, 0);
 }
 
@@ -1490,7 +1495,7 @@ gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t res,
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, NULL, CRL, 
+	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, NULL, CRL,
 					type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
@@ -1520,7 +1525,10 @@ gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 				int crl_list_size)
 {
 	int ret, i, j;
-	gnutls_x509_crl_t new_crl[crl_list_size];
+	gnutls_x509_crl_t *new_crl = gnutls_malloc(crl_list_size * sizeof(gnutls_x509_crl_t));
+
+	if (!new_crl)
+		return GNUTLS_E_MEMORY_ERROR;
 
 	for (i = 0; i < crl_list_size; i++) {
 		ret = gnutls_x509_crl_init(&new_crl[i]);
@@ -1544,11 +1552,13 @@ gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
+	free(new_crl);
 	return ret;
 
       cleanup:
 	for (j = 0; j < i; j++)
 		gnutls_x509_crl_deinit(new_crl[j]);
+	free(new_crl);
 
 	return ret;
 }
@@ -1574,7 +1584,7 @@ gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t res,
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_file(res->tlist, NULL, crlfile, 
+	ret = gnutls_x509_trust_list_add_trust_file(res->tlist, NULL, crlfile,
 						type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
