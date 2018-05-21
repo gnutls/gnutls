@@ -280,8 +280,8 @@ other error codes from the list in @ref{Error codes}. Return 0 on success.
 
 An extension typically stores private information in the @code{session}
 data for later usage. That can be done using the functions
-@funcintref{_gnutls_hello_ext_set_priv} and
-@funcintref{_gnutls_hello_ext_get_priv}. You can check simple examples
+@funcintref{_gnutls_hello_ext_set_datum} and
+@funcintref{_gnutls_hello_ext_get_datum}. You can check simple examples
 at @code{lib/ext/@-max_@-record.c} and @code{lib/ext/@-server_@-name.c} extensions.
 That private information can be saved and restored across session
 resumption if the following functions are set:
@@ -348,33 +348,6 @@ symbols in @code{lib/@-libgnutls.map}, so that the symbols are exported properly
 When writing GTK-DOC style documentation for your new APIs, don't
 forget to add @code{Since:} tags to indicate the GnuTLS version the
 API was introduced in.
-
-@subsubheading Heartbeat extension.
-%REMARK: do we need this section?
-One such extension is HeartBeat protocol (RFC6520:
-@url{https://tools.ietf.org/html/rfc6520}) implementation. To enable
-it use option --heartbeat with example client and server supplied with
-gnutls:
-
-@example
-./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 \
-    --heartbeat --echo
-./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 \
-    --insecure --heartbeat
-@end example
-
-After that pasting
-@example
-**HEARTBEAT**
-@end example
-command into gnutls-cli will trigger corresponding command on the server and it will send HeartBeat Request with random length to client.
-
-Another way is to run capabilities check with:
-
-@example
-./doc/credentials/gnutls-http-serv -d 100 --heartbeat
-./src/gnutls-cli-debug localhost -p 5556
-@end example
 
 @subheading Adding a new Supplemental Data Handshake Message
 
