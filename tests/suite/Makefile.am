@@ -31,7 +31,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
 
-EXTRA_DIST =
+EXTRA_DIST = cbc-record-check.sh
 
 check_PROGRAMS = rng prime-check
 AM_LDFLAGS = -no-install
