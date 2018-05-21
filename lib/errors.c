@@ -231,6 +231,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_TOO_MANY_EMPTY_PACKETS),
 	ERROR_ENTRY(N_("Too many handshake packets have been received."),
 		    GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS),
+	ERROR_ENTRY(N_("More than a single object matches the criteria."),
+		    GNUTLS_E_TOO_MANY_MATCHES),
 	ERROR_ENTRY(N_("The crypto library version is too old."),
 		    GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY),
 

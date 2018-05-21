@@ -281,6 +281,7 @@ available in @code{gnutls/pkcs11.h}.
 * Accessing objects that require a PIN::
 * Reading objects::
 * Writing objects::
+* PKCS11 Low Level Access::
 * Using a PKCS11 token with TLS::
 * Verifying certificates over PKCS11::
 * p11tool Invocation::
@@ -464,6 +465,19 @@ entered before accessing the object (for operations or otherwise).
 
 @showfuncdesc{gnutls_pkcs11_copy_x509_crt2}
 @showfuncdesc{gnutls_pkcs11_delete_url}
+
+
+@node PKCS11 Low Level Access
+@subsection Low Level Access
+
+When it is needed to use PKCS#11 functionality which is not wrapped by
+GnuTLS, it is possible to extract the PKCS#11 session, object or token pointers.
+That allows an application to still access the low-level functionality,
+while at the same time take advantage of the URI addressing scheme supported
+by GnuTLS.
+
+@showfuncdesc{gnutls_pkcs11_token_get_ptr}
+@showfuncdesc{gnutls_pkcs11_obj_get_ptr}
 
 
 @node Using a PKCS11 token with TLS

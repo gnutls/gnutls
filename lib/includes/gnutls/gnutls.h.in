@@ -3079,6 +3079,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 
 #define GNUTLS_E_NO_COMMON_KEY_SHARE -423
 #define GNUTLS_E_REAUTH_REQUEST -424
+#define GNUTLS_E_TOO_MANY_MATCHES -425
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
