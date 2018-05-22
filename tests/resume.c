@@ -316,6 +316,18 @@ static void verify_group(gnutls_session_t session, gnutls_group_t *group, unsign
 
 static void verify_server_params(gnutls_session_t session, unsigned counter, struct params_res *params)
 {
+#if defined(USE_PSK)
+	const char *username;
+	username = gnutls_psk_server_get_username(session);
+	if (counter != 0) {
+		if (username == NULL)
+			fail("no username was returned on server side resumption\n");
+
+		if (strcmp(username, "test") != 0)
+			fail("wrong username was returned on server side resumption\n");
+	}
+#endif
+
 #if defined(USE_X509)
 	unsigned int l;
 
@@ -328,9 +340,9 @@ static void verify_server_params(gnutls_session_t session, unsigned counter, str
 		if (gnutls_certificate_get_peers(session, &l) == NULL || l < 1)
 			fail("no client certificate returned on server side (%s)\n", counter?"resumed session":"first session");
 	}
-#else
-	return;
 #endif
+
+	return;
 }
 
 static void verify_client_params(gnutls_session_t session, unsigned counter)
