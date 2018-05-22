@@ -293,8 +293,8 @@ internal extension data to save them in the session resumption storage.
 The @funcintref{_gnutls_foobar_unpack} function is responsible for
 restoring session data from the session resumption storage.
 
-When the internal data are stored using the @funcintref{_gnutls_hello_ext_set_datum},
-then you could rely on the default pack and unpack functions:
+When the internal data is stored using the @funcintref{_gnutls_hello_ext_set_datum},
+then you can rely on the default pack and unpack functions:
 @funcintref{_gnutls_hello_ext_default_pack} and
 @funcintref{_gnutls_hello_ext_default_unpack}.
 
