@@ -53,14 +53,14 @@ const hello_ext_entry_st ext_mod_ext_master_secret = {
 #ifdef ENABLE_SSL3
 static inline unsigned have_only_ssl3_enabled(gnutls_session_t session)
 {
-	if (session->internals.priorities->protocol.algorithms == 1 &&
-	    session->internals.priorities->protocol.priority[0] == GNUTLS_SSL3)
+	if (session->internals.priorities->protocol.num_priorities == 1 &&
+	    session->internals.priorities->protocol.priorities[0] == GNUTLS_SSL3)
 	    return 1;
 	return 0;
 }
 #endif
 
-/* 
+/*
  * In case of a server: if an EXT_MASTER_SECRET extension type is received then it
  * sets a flag into the session security parameters.
  *
@@ -129,7 +129,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 	return 0;
 #else
 	if (session->security_parameters.entity == GNUTLS_CLIENT ||
-	    session->security_parameters.ext_master_secret != 0) 
+	    session->security_parameters.ext_master_secret != 0)
 		return GNUTLS_E_INT_RET_0;
 	return 0;
 #endif

@@ -892,8 +892,8 @@ struct record_parameters_st {
 };
 
 typedef struct {
-	unsigned int priority[MAX_ALGOS];
-	unsigned int algorithms;
+	unsigned int priorities[MAX_ALGOS];
+	unsigned int num_priorities;
 } priority_st;
 
 typedef enum {

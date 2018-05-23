@@ -327,15 +327,15 @@ _gnutls_session_cert_type_supported(gnutls_session_t session,
 	}
 
 	// No explicit priorities set, and default ctype is asked
-	if (ctype_priorities->algorithms == 0
+	if (ctype_priorities->num_priorities == 0
 	    && cert_type == DEFAULT_CERT_TYPE)
 		return 0; // ok
 
 	/* Now lets find out whether our cert type is in our priority
 	 * list, i.e. set of allowed cert types.
 	 */
-	for (i = 0; i < ctype_priorities->algorithms; i++) {
-		if (ctype_priorities->priority[i] == cert_type)
+	for (i = 0; i < ctype_priorities->num_priorities; i++) {
+		if (ctype_priorities->priorities[i] == cert_type)
 			return 0;	/* ok */
 	}
 

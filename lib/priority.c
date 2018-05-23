@@ -60,10 +60,10 @@ inline static void _set_priority(priority_st * st, const int *list)
 		num++;
 	if (num > MAX_ALGOS)
 		num = MAX_ALGOS;
-	st->algorithms = num;
+	st->num_priorities = num;
 
 	for (i = 0; i < num; i++) {
-		st->priority[i] = list[i];
+		st->priorities[i] = list[i];
 	}
 
 	return;
@@ -73,7 +73,7 @@ inline static void _add_priority(priority_st * st, const int *list)
 {
 	int num, i, j, init;
 
-	init = i = st->algorithms;
+	init = i = st->num_priorities;
 
 	for (num = 0; list[num] != 0; ++num) {
 		if (i + 1 > MAX_ALGOS) {
@@ -81,14 +81,14 @@ inline static void _add_priority(priority_st * st, const int *list)
 		}
 
 		for (j = 0; j < init; j++) {
-			if (st->priority[j] == (unsigned) list[num]) {
+			if (st->priorities[j] == (unsigned) list[num]) {
 				break;
 			}
 		}
 
 		if (j == init) {
-			st->priority[i++] = list[num];
-			st->algorithms++;
+			st->priorities[i++] = list[num];
+			st->num_priorities++;
 		}
 	}
 
@@ -529,18 +529,18 @@ static void prio_remove(priority_st * priority_list, unsigned int algo)
 {
 	unsigned int i;
 
-	for (i = 0; i < priority_list->algorithms; i++) {
-		if (priority_list->priority[i] == algo) {
-			priority_list->algorithms--;
-			if ((priority_list->algorithms - i) > 0)
-				memmove(&priority_list->priority[i],
-					&priority_list->priority[i + 1],
-					(priority_list->algorithms -
+	for (i = 0; i < priority_list->num_priorities; i++) {
+		if (priority_list->priorities[i] == algo) {
+			priority_list->num_priorities--;
+			if ((priority_list->num_priorities - i) > 0)
+				memmove(&priority_list->priorities[i],
+					&priority_list->priorities[i + 1],
+					(priority_list->num_priorities -
 					 i) *
 					sizeof(priority_list->
-					       priority[0]));
-			priority_list->priority[priority_list->
-						algorithms] = 0;
+					       priorities[0]));
+			priority_list->priorities[priority_list->
+						num_priorities] = 0;
 			break;
 		}
 	}
@@ -550,18 +550,18 @@ static void prio_remove(priority_st * priority_list, unsigned int algo)
 
 static void prio_add(priority_st * priority_list, unsigned int algo)
 {
-	unsigned int i, l = priority_list->algorithms;
+	unsigned int i, l = priority_list->num_priorities;
 
 	if (l >= MAX_ALGOS)
 		return;		/* can't add it anyway */
 
 	for (i = 0; i < l; ++i) {
-		if (algo == priority_list->priority[i])
+		if (algo == priority_list->priorities[i])
 			return;	/* if it exists */
 	}
 
-	priority_list->priority[l] = algo;
-	priority_list->algorithms++;
+	priority_list->priorities[l] = algo;
+	priority_list->num_priorities++;
 
 	return;
 }
@@ -594,11 +594,11 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	/* set the current version to the first in the chain.
 	 * This will be overridden later.
 	 */
-	if (session->internals.priorities->protocol.algorithms > 0 &&
+	if (session->internals.priorities->protocol.num_priorities > 0 &&
 	    !session->internals.handshake_in_progress) {
 		if (_gnutls_set_current_version(session,
 					    session->internals.priorities->
-					    protocol.priority[0]) < 0) {
+					    protocol.priorities[0]) < 0) {
 			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 		}
 	}
@@ -608,7 +608,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 		session->internals.flags |= GNUTLS_NO_TICKETS;
 	}
 
-	if (session->internals.priorities->protocol.algorithms == 0 ||
+	if (session->internals.priorities->protocol.num_priorities == 0 ||
 	    session->internals.priorities->cs.size == 0)
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
@@ -1174,8 +1174,8 @@ static void add_ec(gnutls_priority_t priority_cache)
 	const gnutls_group_entry_st *ge;
 	unsigned i;
 
-	for (i = 0; i < priority_cache->_supported_ecc.algorithms; i++) {
-		ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priority[i]);
+	for (i = 0; i < priority_cache->_supported_ecc.num_priorities; i++) {
+		ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priorities[i]);
 		if (ge != NULL && priority_cache->groups.size < sizeof(priority_cache->groups.entry)/sizeof(priority_cache->groups.entry[0])) {
 			/* do not add groups which do not correspond to enabled ciphersuites */
 			if (!ge->curve)
@@ -1190,8 +1190,8 @@ static void add_dh(gnutls_priority_t priority_cache)
 	const gnutls_group_entry_st *ge;
 	unsigned i;
 
-	for (i = 0; i < priority_cache->_supported_ecc.algorithms; i++) {
-		ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priority[i]);
+	for (i = 0; i < priority_cache->_supported_ecc.num_priorities; i++) {
+		ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priorities[i]);
 		if (ge != NULL && priority_cache->groups.size < sizeof(priority_cache->groups.entry)/sizeof(priority_cache->groups.entry[0])) {
 			/* do not add groups which do not correspond to enabled ciphersuites */
 			if (!ge->prime)
@@ -1204,9 +1204,9 @@ static void add_dh(gnutls_priority_t priority_cache)
 
 #define REMOVE_TLS13_IN_LOOP(vers, i) \
 	if (vers->tls13_sem) { \
-		for (j=i+1;j<priority_cache->protocol.algorithms;j++) \
-			priority_cache->protocol.priority[j-1] = priority_cache->protocol.priority[j]; \
-		priority_cache->protocol.algorithms--; \
+		for (j=i+1;j<priority_cache->protocol.num_priorities;j++) \
+			priority_cache->protocol.priorities[j-1] = priority_cache->protocol.priorities[j]; \
+		priority_cache->protocol.num_priorities--; \
 		i--; \
 		continue; \
 	}
@@ -1234,26 +1234,26 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	priority_cache->groups.size = 0;
 	priority_cache->groups.have_ffdhe = 0;
 
-	for (j=0;j<priority_cache->_cipher.algorithms;j++) {
-		if (priority_cache->_cipher.priority[j] == GNUTLS_CIPHER_NULL) {
+	for (j=0;j<priority_cache->_cipher.num_priorities;j++) {
+		if (priority_cache->_cipher.priorities[j] == GNUTLS_CIPHER_NULL) {
 			have_null = 1;
 			break;
 		}
 	}
 
-	for (i = 0; i < priority_cache->_kx.algorithms; i++) {
-		if (IS_SRP_KX(priority_cache->_kx.priority[i])) {
+	for (i = 0; i < priority_cache->_kx.num_priorities; i++) {
+		if (IS_SRP_KX(priority_cache->_kx.priorities[i])) {
 			have_srp = 1;
-		} else if (_gnutls_kx_is_psk(priority_cache->_kx.priority[i])) {
-			if (priority_cache->_kx.priority[i] == GNUTLS_KX_RSA_PSK)
+		} else if (_gnutls_kx_is_psk(priority_cache->_kx.priorities[i])) {
+			if (priority_cache->_kx.priorities[i] == GNUTLS_KX_RSA_PSK)
 				have_rsa_psk = 1;
 			else
 				have_psk = 1;
 		}
 	}
 
-	for (i = 0; i < priority_cache->protocol.algorithms; i++) {
-		vers = version_to_entry(priority_cache->protocol.priority[i]);
+	for (i = 0; i < priority_cache->protocol.num_priorities; i++) {
+		vers = version_to_entry(priority_cache->protocol.priorities[i]);
 		if (!vers)
 			continue;
 
@@ -1295,15 +1295,15 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	 * the protocol doesn't require any. */
 	if (tlsmin && tlsmin->tls13_sem && !have_psk) {
 		if (!dtlsmin || (dtlsmin && dtlsmin->tls13_sem))
-			priority_cache->_kx.algorithms = 0;
+			priority_cache->_kx.num_priorities = 0;
 	}
 
 	/* Add TLS 1.3 ciphersuites (no KX) */
-	for (j=0;j<priority_cache->_cipher.algorithms;j++) {
-		for (z=0;z<priority_cache->_mac.algorithms;z++) {
+	for (j=0;j<priority_cache->_cipher.num_priorities;j++) {
+		for (z=0;z<priority_cache->_mac.num_priorities;z++) {
 			ce = cipher_suite_get(
-				0, priority_cache->_cipher.priority[j],
-				priority_cache->_mac.priority[z]);
+				0, priority_cache->_cipher.priorities[j],
+				priority_cache->_mac.priorities[z]);
 
 			if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
 				priority_cache->cs.entry[priority_cache->cs.size++] = ce;
@@ -1311,13 +1311,13 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		}
 	}
 
-	for (i = 0; i < priority_cache->_kx.algorithms; i++) {
-		for (j=0;j<priority_cache->_cipher.algorithms;j++) {
-			for (z=0;z<priority_cache->_mac.algorithms;z++) {
+	for (i = 0; i < priority_cache->_kx.num_priorities; i++) {
+		for (j=0;j<priority_cache->_cipher.num_priorities;j++) {
+			for (z=0;z<priority_cache->_mac.num_priorities;z++) {
 				ce = cipher_suite_get(
-					priority_cache->_kx.priority[i],
-					priority_cache->_cipher.priority[j],
-					priority_cache->_mac.priority[z]);
+					priority_cache->_kx.priorities[i],
+					priority_cache->_cipher.priorities[j],
+					priority_cache->_mac.priorities[z]);
 
 				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
 					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
@@ -1336,9 +1336,9 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 	if (have_tls13 && (!have_ec || !have_dh)) {
 		/* scan groups to determine have_ec and have_dh */
-		for (i=0; i < priority_cache->_supported_ecc.algorithms; i++) {
+		for (i=0; i < priority_cache->_supported_ecc.num_priorities; i++) {
 			const gnutls_group_entry_st *ge;
-			ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priority[i]);
+			ge = _gnutls_id_to_group(priority_cache->_supported_ecc.priorities[i]);
 			if (ge) {
 				if (ge->curve && !have_ec) {
 					add_ec(priority_cache);
@@ -1355,8 +1355,8 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 	}
 
-	for (i = 0; i < priority_cache->_sign_algo.algorithms; i++) {
-		se = _gnutls_sign_to_entry(priority_cache->_sign_algo.priority[i]);
+	for (i = 0; i < priority_cache->_sign_algo.num_priorities; i++) {
+		se = _gnutls_sign_to_entry(priority_cache->_sign_algo.priorities[i]);
 		if (se != NULL && priority_cache->sigalg.size < sizeof(priority_cache->sigalg.entry)/sizeof(priority_cache->sigalg.entry[0])) {
 			/* if the signature algorithm semantics are not compatible with
 			 * the protocol's, then skip. */
@@ -1367,31 +1367,31 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	}
 
 	_gnutls_debug_log("added %d protocols, %d ciphersuites, %d sig algos and %d groups into priority list\n",
-			  priority_cache->protocol.algorithms,
+			  priority_cache->protocol.num_priorities,
 			  priority_cache->cs.size, priority_cache->sigalg.size,
 			  priority_cache->groups.size);
 
 	if (priority_cache->sigalg.size == 0) {
 		/* no signature algorithms; eliminate TLS 1.2 or DTLS 1.2 and later */
 		priority_st newp;
-		newp.algorithms = 0;
+		newp.num_priorities = 0;
 
 		/* we need to eliminate TLS 1.2 or DTLS 1.2 and later protocols */
-		for (i = 0; i < priority_cache->protocol.algorithms; i++) {
-			if (priority_cache->protocol.priority[i] < GNUTLS_TLS1_2) {
-				newp.priority[newp.algorithms++] = priority_cache->protocol.priority[i];
-			} else if (priority_cache->protocol.priority[i] >= GNUTLS_DTLS_VERSION_MIN &&
-				   priority_cache->protocol.priority[i] < GNUTLS_DTLS1_2) {
-				newp.priority[newp.algorithms++] = priority_cache->protocol.priority[i];
+		for (i = 0; i < priority_cache->protocol.num_priorities; i++) {
+			if (priority_cache->protocol.priorities[i] < GNUTLS_TLS1_2) {
+				newp.priorities[newp.num_priorities++] = priority_cache->protocol.priorities[i];
+			} else if (priority_cache->protocol.priorities[i] >= GNUTLS_DTLS_VERSION_MIN &&
+				   priority_cache->protocol.priorities[i] < GNUTLS_DTLS1_2) {
+				newp.priorities[newp.num_priorities++] = priority_cache->protocol.priorities[i];
 			}
 		}
 		memcpy(&priority_cache->protocol, &newp, sizeof(newp));
 	}
 
-	if (unlikely(priority_cache->protocol.algorithms == 0))
+	if (unlikely(priority_cache->protocol.num_priorities == 0))
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 #ifndef ENABLE_SSL3
-	else if (unlikely(priority_cache->protocol.algorithms == 1 && priority_cache->protocol.priority[0] == GNUTLS_SSL3))
+	else if (unlikely(priority_cache->protocol.num_priorities == 1 && priority_cache->protocol.priorities[0] == GNUTLS_SSL3))
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 #endif
 
@@ -1400,8 +1400,8 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 	/* when TLS 1.3 is available we must have groups set */
 	if (unlikely(!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0)) {
-		for (i = 0; i < priority_cache->protocol.algorithms; i++) {
-			vers = version_to_entry(priority_cache->protocol.priority[i]);
+		for (i = 0; i < priority_cache->protocol.num_priorities; i++) {
+			vers = version_to_entry(priority_cache->protocol.priorities[i]);
 			if (!vers)
 				continue;
 
@@ -2083,18 +2083,18 @@ gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
 {
 	unsigned i;
 
-	if (pcache->_supported_ecc.algorithms == 0)
+	if (pcache->_supported_ecc.num_priorities == 0)
 		return 0;
 
-	*list = pcache->_supported_ecc.priority;
+	*list = pcache->_supported_ecc.priorities;
 
 	/* to ensure we don't confuse the caller, we do not include
 	 * any FFDHE groups. This may return an incomplete list. */
-	for (i=0;i<pcache->_supported_ecc.algorithms;i++)
-		if (pcache->_supported_ecc.priority[i] > GNUTLS_ECC_CURVE_MAX)
+	for (i=0;i<pcache->_supported_ecc.num_priorities;i++)
+		if (pcache->_supported_ecc.priorities[i] > GNUTLS_ECC_CURVE_MAX)
 			return i;
 
-	return pcache->_supported_ecc.algorithms;
+	return pcache->_supported_ecc.num_priorities;
 }
 
 /**
@@ -2113,11 +2113,11 @@ int
 gnutls_priority_group_list(gnutls_priority_t pcache,
 			       const unsigned int **list)
 {
-	if (pcache->_supported_ecc.algorithms == 0)
+	if (pcache->_supported_ecc.num_priorities == 0)
 		return 0;
 
-	*list = pcache->_supported_ecc.priority;
-	return pcache->_supported_ecc.algorithms;
+	*list = pcache->_supported_ecc.priorities;
+	return pcache->_supported_ecc.num_priorities;
 }
 
 /**
@@ -2135,11 +2135,11 @@ int
 gnutls_priority_kx_list(gnutls_priority_t pcache,
 			const unsigned int **list)
 {
-	if (pcache->_kx.algorithms == 0)
+	if (pcache->_kx.num_priorities == 0)
 		return 0;
 
-	*list = pcache->_kx.priority;
-	return pcache->_kx.algorithms;
+	*list = pcache->_kx.priorities;
+	return pcache->_kx.num_priorities;
 }
 
 /**
@@ -2157,11 +2157,11 @@ int
 gnutls_priority_cipher_list(gnutls_priority_t pcache,
 			    const unsigned int **list)
 {
-	if (pcache->_cipher.algorithms == 0)
+	if (pcache->_cipher.num_priorities == 0)
 		return 0;
 
-	*list = pcache->_cipher.priority;
-	return pcache->_cipher.algorithms;
+	*list = pcache->_cipher.priorities;
+	return pcache->_cipher.num_priorities;
 }
 
 /**
@@ -2179,11 +2179,11 @@ int
 gnutls_priority_mac_list(gnutls_priority_t pcache,
 			 const unsigned int **list)
 {
-	if (pcache->_mac.algorithms == 0)
+	if (pcache->_mac.num_priorities == 0)
 		return 0;
 
-	*list = pcache->_mac.priority;
-	return pcache->_mac.algorithms;
+	*list = pcache->_mac.priorities;
+	return pcache->_mac.num_priorities;
 }
 
 /**
@@ -2222,11 +2222,11 @@ int
 gnutls_priority_protocol_list(gnutls_priority_t pcache,
 			      const unsigned int **list)
 {
-	if (pcache->protocol.algorithms == 0)
+	if (pcache->protocol.num_priorities == 0)
 		return 0;
 
-	*list = pcache->protocol.priority;
-	return pcache->protocol.algorithms;
+	*list = pcache->protocol.priorities;
+	return pcache->protocol.num_priorities;
 }
 
 /**
@@ -2244,11 +2244,11 @@ int
 gnutls_priority_sign_list(gnutls_priority_t pcache,
 			  const unsigned int **list)
 {
-	if (pcache->_sign_algo.algorithms == 0)
+	if (pcache->_sign_algo.num_priorities == 0)
 		return 0;
 
-	*list = pcache->_sign_algo.priority;
-	return pcache->_sign_algo.algorithms;
+	*list = pcache->_sign_algo.priorities;
+	return pcache->_sign_algo.num_priorities;
 }
 
 /**
@@ -2298,15 +2298,15 @@ gnutls_priority_certificate_type_list2(gnutls_priority_t pcache,
 {
 	switch (target)	{
 		case GNUTLS_CTYPE_CLIENT:
-			if(pcache->client_ctype.algorithms > 0) {
-				*list = pcache->client_ctype.priority;
-				return pcache->client_ctype.algorithms;
+			if(pcache->client_ctype.num_priorities > 0) {
+				*list = pcache->client_ctype.priorities;
+				return pcache->client_ctype.num_priorities;
 			}
 			break;
 		case GNUTLS_CTYPE_SERVER:
-			if(pcache->server_ctype.algorithms > 0)	{
-				*list = pcache->server_ctype.priority;
-				return pcache->server_ctype.algorithms;
+			if(pcache->server_ctype.num_priorities > 0)	{
+				*list = pcache->server_ctype.priorities;
+				return pcache->server_ctype.num_priorities;
 			}
 			break;
 		default:

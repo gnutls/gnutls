@@ -215,15 +215,15 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 		 * initialization values apply. This default is currently set to
 		 * X.509 in which case we don't enable this extension.
 		 */
-		if (cert_priors->algorithms > 0) {	// Priorities are explicitly set
+		if (cert_priors->num_priorities > 0) {	// Priorities are explicitly set
 			/* If the certificate priority is explicitly set to only
 			 * X.509 (default) then, according to spec we don't send
 			 * this extension. We check this here to avoid further work in
 			 * this routine. We also check it below after pruning supported
 			 * types.
 			 */
-			if (cert_priors->algorithms == 1 &&
-					cert_priors->priority[0] == DEFAULT_CERT_TYPE) {
+			if (cert_priors->num_priorities == 1 &&
+					cert_priors->priorities[0] == DEFAULT_CERT_TYPE) {
 				_gnutls_handshake_log
 						("EXT[%p]: Server certificate type was set to default cert type (%s). "
 						 "We therefore do not send this extension.\n",
@@ -243,9 +243,9 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 			 * added in the ..type_supported() routine without modifying the
 			 * structure of the code here.
 			 */
-			for (i = 0; i < cert_priors->algorithms; i++) {
+			for (i = 0; i < cert_priors->num_priorities; i++) {
 				if (_gnutls_session_cert_type_supported
-						(session, cert_priors->priority[i],
+						(session, cert_priors->priorities[i],
 						 false, GNUTLS_CTYPE_SERVER) == 0) {
 					/* Check whether we are allowed to store another cert type
 					 * in our buffer. In other words, prevent a possible buffer
@@ -255,7 +255,7 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 						return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 					// Convert to IANA representation
-					cert_type = _gnutls_cert_type2IANA(cert_priors->priority[i]);
+					cert_type = _gnutls_cert_type2IANA(cert_priors->priorities[i]);
 					// Add this cert type to our list with supported types
 					cert_types[num_cert_types] = cert_type;
 					num_cert_types++;
@@ -263,7 +263,7 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 					_gnutls_handshake_log
 							("EXT[%p]: Server certificate type %s (%d) was queued.\n",
 							 session,
-							 gnutls_certificate_type_get_name(cert_priors->priority[i]),
+							 gnutls_certificate_type_get_name(cert_priors->priorities[i]),
 							 cert_type);
 				}
 			}

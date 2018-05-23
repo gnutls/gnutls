@@ -1700,13 +1700,13 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	/* find max_tls and max_dtls */
-	for (j=0;j<pcache->protocol.algorithms;j++) {
-		if (pcache->protocol.priority[j] <= GNUTLS_TLS_VERSION_MAX &&
-		    pcache->protocol.priority[j] >= max_tls) {
-			max_tls = pcache->protocol.priority[j];
-		} else if (pcache->protocol.priority[j] <= GNUTLS_DTLS_VERSION_MAX &&
-			   pcache->protocol.priority[j] >= max_dtls) {
-			max_dtls = pcache->protocol.priority[j];
+	for (j=0;j<pcache->protocol.num_priorities;j++) {
+		if (pcache->protocol.priorities[j] <= GNUTLS_TLS_VERSION_MAX &&
+		    pcache->protocol.priorities[j] >= max_tls) {
+			max_tls = pcache->protocol.priorities[j];
+		} else if (pcache->protocol.priorities[j] <= GNUTLS_DTLS_VERSION_MAX &&
+			   pcache->protocol.priorities[j] >= max_dtls) {
+			max_dtls = pcache->protocol.priorities[j];
 		}
 	}
 
