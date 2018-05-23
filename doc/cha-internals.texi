@@ -11,7 +11,7 @@ happens inside the black box.
 * The TLS Protocol::
 * TLS Handshake Protocol::
 * TLS Authentication Methods::
-* TLS Extension Handling::
+* TLS Hello Extension Handling::
 * Cryptographic Backend::
 * Random Number Generators-internals::
 * FIPS140-2 mode::
@@ -40,10 +40,10 @@ transport layer functions are used. The main idea is shown in @ref{fig-gnutls-ha
 @caption{GnuTLS handshake state machine.}
 @end float
 
-Also the way the input is processed varies per ciphersuite. Several 
-implementations of the internal handlers are available and 
-@funcref{gnutls_handshake} only multiplexes the input to the appropriate 
-handler. For example a @acronym{PSK} ciphersuite has a different 
+Also the way the input is processed varies per ciphersuite. Several
+implementations of the internal handlers are available and
+@funcref{gnutls_handshake} only multiplexes the input to the appropriate
+handler. For example a @acronym{PSK} ciphersuite has a different
 implementation of the @code{process_client_key_exchange} than a
 certificate ciphersuite. We illustrate the idea in @ref{fig-gnutls-handshake-sequence}.
 
@@ -60,7 +60,7 @@ affect only the handshake protocol, a simple interface is used. An
 authentication method needs to implement the functions shown below.
 
 @verbatim
-typedef struct 
+typedef struct
 {
   const char *name;
   int (*gnutls_generate_server_certificate) (gnutls_session_t, gnutls_buffer_st*);
@@ -97,10 +97,10 @@ ciphersuites. After implementing these functions the structure holding
 its pointers has to be registered in @code{gnutls_@-algorithms.c} in the
 @code{_gnutls_@-kx_@-algorithms} structure.
 
-@node TLS Extension Handling
+@node TLS Hello Extension Handling
 @section TLS Extension Handling
-As with authentication methods, the TLS extensions handlers can be
-implemented using the interface shown below.
+As with authentication methods, adding TLS hello extensions can be done
+quite easily by implementing the interface shown below.
 
 @verbatim
 typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
@@ -109,35 +109,37 @@ typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
                                      gnutls_buffer_st *extdata);
 @end verbatim
 
-Here there are two functions, one for receiving the extension data
-and one for sending. These functions have to check internally whether
-they operate in client or server side. 
+Here there are two main functions, one for parsing the received extension data
+and one for formatting the extension data that must be send. These functions
+have to check internally whether they operate within a client or a server session.
 
 A simple example of an extension handler can be seen in
-@code{ext/@-srp.c} in GnuTLS' source code. After implementing these functions, 
-together with the extension number they handle, they have to be registered 
-using @funcintref{_gnutls_ext_register} in
-@code{gnutls_extensions.c} typically within @funcintref{_gnutls_ext_init}.
+@code{lib/ext/@-srp.c} in GnuTLS' source code. After implementing these functions,
+the extension has to be registered. Registering an extension can be done in two
+ways. You can create a GnuTLS internal extension and register it in
+@code{hello_ext.c} or write an external extension (not inside GnuTLS but
+inside an application using GnuTLS) and register it via the exported functions
+@funcref{gnutls_session_ext_register} or @funcref{gnutls_ext_register}.
 
-@subheading Adding a new TLS extension
+@subheading Adding a new TLS hello extension
 
-Adding support for a new TLS extension is done from time to time, and
-the process to do so is not difficult.  Here are the steps you need to
-follow if you wish to do this yourself.  For sake of discussion, let's
-consider adding support for the hypothetical TLS extension
-@code{foobar}. The following section is about adding an extension to GnuTLS,
-for custom application extensions you should check the exported functions
+Adding support for a new TLS hello extension is done from time to time, and
+the process to do so is not difficult. Here are the steps you need to
+follow if you wish to do this yourself. For the sake of discussion, let's
+consider adding support for the hypothetical TLS extension @code{foobar}.
+The following section is about adding an hello extension to GnuTLS itself.
+For custom application extensions you should check the exported functions
 @funcref{gnutls_session_ext_register} or @funcref{gnutls_ext_register}.
 
 @subsubheading Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
 This step is useful when the extension code is large and it might be desirable
-to disable the extension under some circumstances. Otherwise it can be safely
-skipped.
+under some circumstances to be able to leave out the extension during compilation of GnuTLS.
+If you don't need this kind of feature this step can be safely skipped.
 
-Whether to chose enable or disable depends on whether you intend to make the extension be
-enabled by default.  Look at existing checks (i.e., SRP, authz) for
-how to model the code.  For example:
+Whether to choose enable or disable depends on whether you intend to make the extension be
+enabled by default. Look at existing checks (i.e., SRP, authz) for
+how to model the code. For example:
 
 @example
 AC_MSG_CHECKING([whether to disable foobar support])
@@ -155,135 +157,157 @@ fi
 AM_CONDITIONAL(ENABLE_FOOBAR, test "$ac_enable_foobar" != "no")
 @end example
 
-These lines should go in @code{m4/hooks.m4}.
+These lines should go in @code{lib/m4/hooks.m4}.
 
-@subsubheading Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
+@subsubheading Add an extension identifier to @code{extensions_t} in @code{gnutls_int.h}.
 
-A good name for the value would be GNUTLS_EXTENSION_FOOBAR.  Check
+A good name for the identifier would be GNUTLS_EXTENSION_FOOBAR. If the
+extension that you are implementing is an extension that is officially
+registered by IANA then it is recommended to use its official name such
+that the extension can be correctly identified by other developers. Check
 with @url{http://www.iana.org/assignments/tls-extensiontype-values}
-for allocated values.  For experiments, you could pick a number but
-remember that some consider it a bad idea to deploy such modified
-version since it will lead to interoperability problems in the future
-when the IANA allocates that number to someone else, or when the
-foobar protocol is allocated another number.
+for registered extensions.
 
-@subsubheading Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
+@subsubheading Register the extension in @code{lib/hello_ext.c}.
+
+In order for the extension to be executed you need to register it in the
+@code{static hello_ext_entry_st const *extfunc[]} list in @code{lib/hello_ext.c}.
 
 A typical entry would be:
 
 @example
-  int ret;
-
-#if ENABLE_FOOBAR
-  ret = _gnutls_ext_register (&foobar_ext);
-  if (ret != GNUTLS_E_SUCCESS)
-    return ret;
+#ifdef ENABLE_FOOBAR
+	[GNUTLS_EXTENSION_FOOBAR] = &ext_mod_foobar,
 #endif
 @end example
 
-Most likely you'll need to add an @code{#include "ext/@-foobar.h"}, that
-will contain something like
-like:
+Also for every extension you need to create an @code{hello_ext_entry_st}
+that describes the extension. This structure is placed in the designated
+c file for your extension and its name is used in the registration entry
+as depicted above.
+
+The structure of @code{hello_ext_entry_st} is as follows:
 @example
-  extension_entry_st foobar_ext = @{
+  const hello_ext_entry_st ext_mod_foobar = @{
     .name = "FOOBAR",
-    .type = GNUTLS_EXTENSION_FOOBAR,
+    .tls_id = 255,
+    .gid = GNUTLS_EXTENSION_FOOBAR,
     .parse_type = GNUTLS_EXT_TLS,
-    .recv_func = _foobar_recv_params,
-    .send_func = _foobar_send_params,
-    .pack_func = _foobar_pack,
-    .unpack_func = _foobar_unpack,
-    .deinit_func = NULL
-  @}
+    .validity = GNUTLS_EXT_FLAG_CLIENT_HELLO |
+	GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO |
+	GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO |
+	GNUTLS_EXT_FLAG_TLS,
+    .recv_func = _gnutls_foobar_recv_params,
+    .send_func = _gnutls_foobar_send_params,
+    .pack_func = _gnutls_foobar_pack,
+    .unpack_func = _gnutls_foobar_unpack,
+    .deinit_func = _gnutls_foobar_deinit,
+    .cannot_be_overriden = 1
+  @};
 @end example
 
-The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
-@code{gnutls_int.h} earlier.  In this structure you specify the
-functions to read the extension from the hello message, the function
-to send the reply to, and two more functions to pack and unpack from
-stored session data (e.g. when resumming a session). The @code{deinit} function
-will be called to deinitialize the extension's private parameters, if any.
+The GNUTLS_EXTENSION_FOOBAR is the identifier that you've added to
+@code{gnutls_int.h} earlier. The @code{.tls_id} should contain the number
+that IANA has assigned to this extension, or an unassigned number of your
+choice if this is an unregistered extension. In the rest of this structure
+you specify the functions to handle the extension data. The @code{receive} function
+will be called upon reception of the data and will be used to parse or
+interpret the extension data. The @code{send} function will be called prior to
+sending the extension data on the wire and will be used to format the data
+such that it can be send over the wire. The @code{pack} and @code{unpack}
+functions will be used to prepare the data for storage in case of session resumption
+(and vice versa). The @code{deinit} function will be called to deinitialize
+the extension's private parameters, if any.
 
-Note that the conditional @code{ENABLE_FOOBAR} definition should only be 
+Look at @code{gnutls_ext_parse_type_t} and @code{gnutls_ext_flags_t} for a complete
+list of available flags.
+
+Note that the conditional @code{ENABLE_FOOBAR} definition should only be
 used if step 1 with the @code{configure} options has taken place.
 
-@subsubheading Add new files that implement the extension.
+@subsubheading Add new files that implement the hello extension.
 
-The functions you are responsible to add are those mentioned in the
-previous step.  They should be added in a file such as @code{ext/@-foobar.c} 
-and headers should be placed in @code{ext/@-foobar.h}.
+To keep things structured every extension should have its own files. The
+functions that you should (at least) add are those referenced in the struct
+from the previous step. Use descriptive file names such as @code{lib/ext/@-foobar.c}
+and for the corresponding header @code{lib/ext/@-foobar.h}.
 As a starter, you could add this:
 
 @example
 int
-_foobar_recv_params (gnutls_session_t session, const opaque * data,
+_gnutls_foobar_recv_params (gnutls_session_t session, const uint8_t * data,
                      size_t data_size)
 @{
   return 0;
 @}
 
 int
-_foobar_send_params (gnutls_session_t session, gnutls_buffer_st* data)
+_gnutls_foobar_send_params (gnutls_session_t session, gnutls_buffer_st* data)
 @{
   return 0;
 @}
 
 int
-_foobar_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
+_gnutls_foobar_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
 @{
    /* Append the extension's internal state to buffer */
    return 0;
 @}
 
 int
-_foobar_unpack (gnutls_buffer_st * ps, extension_priv_data_t * epriv)
+_gnutls_foobar_unpack (gnutls_buffer_st * ps, extension_priv_data_t * epriv)
 @{
    /* Read the internal state from buffer */
    return 0;
 @}
 @end example
 
-The @funcintref{_foobar_recv_params} function is responsible for
+The @funcintref{_gnutls_foobar_recv_params} function is responsible for
 parsing incoming extension data (both in the client and server).
 
-The @funcintref{_foobar_send_params} function is responsible for
-sending extension data (both in the client and server). It should
-append data to provided buffer and return a positive (or zero) number on
-success or a negative error code. Previous to 3.6.0 versions of GnuTLS required
-that function to return the number of bytes that were written. If zero
-is returned and no bytes are appended the extension will not be sent.
-If a zero byte extension is to be sent this function must return
-@code{GNUTLS_E_INT_RET_0}.
+The @funcintref{_gnutls_foobar_send_params} function is responsible for
+formatting extension data such that it can be send over the wire (both in
+the client and server). It should append data to provided buffer and
+return a positive (or zero) number on success or a negative error code.
+Previous to 3.6.0 versions of GnuTLS required that function to return the
+number of bytes that were written. If zero is returned and no bytes are
+appended the extension will not be sent. If a zero byte extension is to
+be sent this function must return @code{GNUTLS_E_INT_RET_0}.
 
 If you receive length fields that don't match, return
 @code{GNUTLS_E_@-UNEXPECTED_@-PACKET_@-LENGTH}.  If you receive invalid
 data, return @code{GNUTLS_E_@-RECEIVED_@-ILLEGAL_@-PARAMETER}.  You can use
-other error codes from the list in @ref{Error codes}.  Return 0 on success.
+other error codes from the list in @ref{Error codes}. Return 0 on success.
 
 An extension typically stores private information in the @code{session}
-data for later usage. That can be done using the functions 
-@funcintref{_gnutls_ext_set_session_data} and
-@funcintref{_gnutls_ext_get_session_data}. You can check simple examples
-at @code{ext/@-max_@-record.c} and @code{ext/@-server_@-name.c} extensions.
-That private information can be saved and restored across session 
+data for later usage. That can be done using the functions
+@funcintref{_gnutls_hello_ext_set_datum} and
+@funcintref{_gnutls_hello_ext_get_datum}. You can check simple examples
+at @code{lib/ext/@-max_@-record.c} and @code{lib/ext/@-server_@-name.c} extensions.
+That private information can be saved and restored across session
 resumption if the following functions are set:
 
-The @funcintref{_foobar_pack} function is responsible for packing
+The @funcintref{_gnutls_foobar_pack} function is responsible for packing
 internal extension data to save them in the session resumption storage.
 
-The @funcintref{_foobar_unpack} function is responsible for
+The @funcintref{_gnutls_foobar_unpack} function is responsible for
 restoring session data from the session resumption storage.
 
-Recall that both the client and server, send and receive
-parameters, and your code most likely will need to do different things
-depending on which mode it is in.  It may be useful to make this
-distinction explicit in the code.  Thus, for example, a better
+When the internal data is stored using the @funcintref{_gnutls_hello_ext_set_datum},
+then you can rely on the default pack and unpack functions:
+@funcintref{_gnutls_hello_ext_default_pack} and
+@funcintref{_gnutls_hello_ext_default_unpack}.
+
+Recall that both for the client and server, the send and receive
+functions most likely will need to do different things
+depending on which mode they are in. It may be useful to make this
+distinction explicit in the code. Thus, for example, a better
 template than above would be:
 
 @example
 int
 _gnutls_foobar_recv_params (gnutls_session_t session,
-                            const opaque * data,
+                            const uint8_t * data,
                             size_t data_size)
 @{
   if (session->security_parameters.entity == GNUTLS_CLIENT)
@@ -305,7 +329,8 @@ _gnutls_foobar_send_params (gnutls_session_t session,
 
 The functions used would be declared as @code{static} functions, of
 the appropriate prototype, in the same file.
-When adding the files, you'll need to add them to @code{ext/@-Makefile.am}
+
+When adding the new extension files, you'll need to add them to @code{lib/ext/@-Makefile.am}
 as well, for example:
 
 @example
@@ -314,54 +339,26 @@ libgnutls_ext_la_SOURCES += ext/foobar.c ext/foobar.h
 endif
 @end example
 
-@subsubheading Add API functions to enable/disable the extension.
+@subsubheading Add API functions to use the extension.
 
 It might be desirable to allow users of the extension to
-request use of the extension, or set extension specific data.  
+request the use of the extension, or set extension specific data.
 This can be implemented by adding extension specific function calls
 that can be added to @code{includes/@-gnutls/@-gnutls.h},
 as long as the LGPLv2.1+ applies.
-The implementation of the function should lie in the @code{ext/@-foobar.c} file.
+The implementation of these functions should lie in the @code{lib/ext/@-foobar.c} file.
 
-To make the API available in the shared library you need to add the
-symbol in @code{lib/@-libgnutls.map}, so that the symbol
-is exported properly.
+To make the API available in the shared library you need to add the added
+symbols in @code{lib/@-libgnutls.map}, so that the symbols are exported properly.
 
 When writing GTK-DOC style documentation for your new APIs, don't
 forget to add @code{Since:} tags to indicate the GnuTLS version the
 API was introduced in.
 
-@subsubheading Heartbeat extension.
-
-One such extension is HeartBeat protocol (RFC6520:
-@url{https://tools.ietf.org/html/rfc6520}) implementation. To enable
-it use option --heartbeat with example client and server supplied with
-gnutls:
-
-@example
-./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 \
-    --heartbeat --echo
-./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 \
-    --insecure --heartbeat
-@end example
-
-After that pasting
-@example
-**HEARTBEAT**
-@end example
-command into gnutls-cli will trigger corresponding command on the server and it will send HeartBeat Request with random length to client.
-
-Another way is to run capabilities check with:
-
-@example
-./doc/credentials/gnutls-http-serv -d 100 --heartbeat
-./src/gnutls-cli-debug localhost -p 5556
-@end example
-
 @subheading Adding a new Supplemental Data Handshake Message
 
 TLS handshake extensions allow to send so called supplemental data
-handshake messages @xcite{RFC4680}. This short section explains how to 
+handshake messages @xcite{RFC4680}. This short section explains how to
 implement a supplemental data handshake message for a given TLS extension.
 
 First of all, modify your extension @code{foobar} in the way, to instruct
@@ -387,7 +384,7 @@ _gnutls_foobar_send_params (gnutls_session_t session, gnutls_buffer_st *extdata)
 @end example
 
 Furthermore you'll need two new functions @funcintref{_foobar_supp_recv_params}
-and @funcintref{_foobar_supp_send_params}, which must conform to the following 
+and @funcintref{_foobar_supp_send_params}, which must conform to the following
 prototypes.
 
 @example
@@ -402,7 +399,7 @@ The following example code shows how to send a
 ``Hello World'' string in the supplemental data handshake message.
 
 @example
-int 
+int
 _foobar_supp_recv_params(gnutls_session_t session, const opaque *data, size_t _data_size)
 @{
    uint8_t len = _data_size;
@@ -420,7 +417,7 @@ _foobar_supp_recv_params(gnutls_session_t session, const opaque *data, size_t _d
    return len;
 @}
 
-int 
+int
 _foobar_supp_send_params(gnutls_session_t session, gnutls_buffer_t buf)
 @{
    unsigned char *msg = "hello world";
@@ -441,8 +438,8 @@ or @funcref{gnutls_supplemental_register} at some point in your program.
 
 Today most new processors, either for embedded or desktop systems
 include either instructions  intended to speed up cryptographic operations,
-or a co-processor with cryptographic capabilities. Taking advantage of 
-those is a challenging task for every cryptographic  application or 
+or a co-processor with cryptographic capabilities. Taking advantage of
+those is a challenging task for every cryptographic  application or
 library. GnuTLS handles the cryptographic provider in a modular
 way, following a layered approach to access
 cryptographic operations as in @ref{fig-crypto-layers}.
@@ -452,7 +449,7 @@ cryptographic operations as in @ref{fig-crypto-layers}.
 @caption{GnuTLS cryptographic back-end design.}
 @end float
 
-The TLS layer uses a cryptographic provider layer, that will in turn either 
+The TLS layer uses a cryptographic provider layer, that will in turn either
 use the default crypto provider -- a software crypto library, or use an external
 crypto provider, if available in the local system. The reason of handling
 the external cryptographic provider in GnuTLS and not delegating it to
@@ -470,16 +467,16 @@ In the future other cryptographic libraries might be supported as well.
 
 @subheading External cryptography provider
 Systems that include a cryptographic co-processor, typically come with
-kernel drivers to utilize the operations from software. For this reason 
+kernel drivers to utilize the operations from software. For this reason
 GnuTLS provides a layer where each individual algorithm used can be replaced
 by another implementation, i.e., the one provided by the driver. The
-FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{http://home.gna.org/cryptodev-linux/} 
-for the Linux kernel implementation of @code{/dev/crypto}.} include already 
-a number of hardware assisted implementations, and also provide an interface 
+FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{http://home.gna.org/cryptodev-linux/}
+for the Linux kernel implementation of @code{/dev/crypto}.} include already
+a number of hardware assisted implementations, and also provide an interface
 to access them, called @code{/dev/crypto}.
 GnuTLS will take advantage of this interface if compiled with special
-options. That is because in most systems where hardware-assisted 
-cryptographic operations are not available, using this interface might 
+options. That is because in most systems where hardware-assisted
+cryptographic operations are not available, using this interface might
 actually harm performance.
 
 In systems that include cryptographic instructions with the CPU's
@@ -495,7 +492,7 @@ source code in @code{lib/accelerated/}.
 @subsubheading Overriding specific algorithms
 When an optimized implementation of a single algorithm is available,
 say a hardware assisted version of @acronym{AES-CBC} then the
-following functions, from @code{crypto.h}, can 
+following functions, from @code{crypto.h}, can
 be used to register those algorithms.
 
 @itemize

@@ -8,11 +8,11 @@ by @acronym{IETF}@footnote{IETF, or Internet Engineering Task Force,
 is a large open international community of network designers,
 operators, vendors, and researchers concerned with the evolution of
 the Internet architecture and the smooth operation of the Internet.
-It is open to any interested individual.}, described in @xcite{RFC5246}.  
+It is open to any interested individual.}, described in @xcite{RFC5246}.
 The protocol provides
 confidentiality, and authentication layers over any reliable transport
 layer.  The description, above, refers to @acronym{TLS} 1.0 but applies
-to all other TLS versions as the differences between the protocols are not major.  
+to all other TLS versions as the differences between the protocols are not major.
 
 The @acronym{DTLS} protocol, or ``Datagram @acronym{TLS}'' @xcite{RFC4347} is a
 protocol with identical goals as @acronym{TLS}, but can operate
@@ -48,7 +48,7 @@ conditions.  @xref{The Alert Protocol}, for more information.  The
 alert protocol is above the record protocol.
 
 The handshake protocol is responsible for the security parameters'
-negotiation, the initial key exchange and authentication.  
+negotiation, the initial key exchange and authentication.
 @xref{The Handshake Protocol}, for more information about the handshake
 protocol.  The protocol layering in TLS is shown in @ref{fig-tls-layers}.
 
@@ -67,7 +67,7 @@ above any transport layer, as long as it is a reliable one.  @acronym{DTLS}
 can be used over reliable and unreliable transport layers.
 @acronym{GnuTLS} supports TCP and UDP layers transparently using
 the Berkeley sockets API. However, any transport layer can be used
-by providing callbacks for @acronym{GnuTLS} to access the transport layer 
+by providing callbacks for @acronym{GnuTLS} to access the transport layer
 (for details see @ref{Setting up the transport layer}).
 
 @node The TLS record protocol
@@ -81,11 +81,11 @@ the handshake process is finished, when there is need to receive
 or send data. In @acronym{DTLS} however, due to re-transmission
 timers used in the handshake out-of-order handshake data might
 be received for some time (maximum 60 seconds) after the handshake
-process is finished. 
+process is finished.
 
 The functions to access the record protocol are limited to send
-and receive functions, which might, given 
-the importance of this protocol in @acronym{TLS}, seem awkward.  This is because 
+and receive functions, which might, given
+the importance of this protocol in @acronym{TLS}, seem awkward.  This is because
 the record protocol's parameters are all set by the handshake protocol.
 The record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
@@ -102,10 +102,10 @@ just after the handshake protocol has finished.
 @cindex symmetric encryption algorithms
 
 Confidentiality in the record layer is achieved by using symmetric
-ciphers like @code{AES} or @code{CHACHA20}.  Ciphers are encryption algorithms 
+ciphers like @code{AES} or @code{CHACHA20}.  Ciphers are encryption algorithms
 that use a single, secret, key to encrypt and decrypt data. Early
 versions of TLS separated between block and stream ciphers and had
-message authentication plugged in to them by the protocol, though later 
+message authentication plugged in to them by the protocol, though later
 versions switched to using authenticated-encryption (AEAD) ciphers. The AEAD
 ciphers are defined to combine encryption and authentication, and as such
 they are not only more efficient, as the primitives used are designed to
@@ -198,11 +198,11 @@ implicitly disabled.
 @multitable @columnfractions .20 .70
 @headitem Algorithm @tab Description
 @item MAC-MD5 @tab
-This is an HMAC based on MD5 a cryptographic hash algorithm designed 
+This is an HMAC based on MD5 a cryptographic hash algorithm designed
 by Ron Rivest. Outputs 128 bits of data.
 
 @item MAC-SHA1 @tab
-An HMAC based on the SHA1 cryptographic hash algorithm 
+An HMAC based on the SHA1 cryptographic hash algorithm
 designed by NSA. Outputs 160 bits of data.
 
 @item MAC-SHA256 @tab
@@ -270,7 +270,7 @@ session ID. All supported alert messages are summarized in the table below.
 The alert messages are protected by the record protocol, thus the
 information that is included does not leak. You must take extreme care
 for the alert information not to leak to a possible attacker, via
-public log files etc. 
+public log files etc.
 
 @include alerts.texi
 
@@ -283,7 +283,7 @@ The handshake protocol is responsible for the ciphersuite negotiation,
 the initial key exchange, and the authentication of the two peers.
 This is fully controlled by the application layer, thus your program
 has to set up the required parameters. The main handshake function
-is @funcref{gnutls_handshake}. In the next paragraphs we elaborate on 
+is @funcref{gnutls_handshake}. In the next paragraphs we elaborate on
 the handshake protocol, i.e., the ciphersuite negotiation.
 
 
@@ -332,7 +332,7 @@ All the supported ciphersuites are listed in @ref{ciphersuites}.
 @subsection Authentication
 
 The key exchange algorithms of the @acronym{TLS} protocol offer
-authentication, which is a prerequisite for a secure connection. 
+authentication, which is a prerequisite for a secure connection.
 The available authentication methods in @acronym{GnuTLS}, under
 TLS 1.3 or earlier versions, follow.
 
@@ -360,7 +360,7 @@ are also available.
 In the case of ciphersuites that use certificate authentication, the
 authentication of the client is optional in @acronym{TLS}.  A server
 may request a certificate from the client using the
-@funcref{gnutls_certificate_server_set_request} function. We elaborate 
+@funcref{gnutls_certificate_server_set_request} function. We elaborate
 in @ref{Certificate credentials}.
 
 @node Resuming Sessions
@@ -370,7 +370,7 @@ in @ref{Certificate credentials}.
 @cindex session resumption
 
 The TLS handshake process performs expensive calculations
-and a busy server might easily be put under load. To 
+and a busy server might easily be put under load. To
 reduce the load, session resumption may be used. This
 is a feature of the @acronym{TLS} protocol which allows a
 client to connect to a server after a successful handshake, without
@@ -378,8 +378,8 @@ the expensive calculations.  This is achieved by re-using the previously
 established keys, meaning the server needs to store the state of established
 connections (unless session tickets are used -- @ref{Session tickets}).
 
-Session resumption is an integral part of @acronym{GnuTLS}, and 
-@ref{Session resumption}, @ref{ex-resume-client} illustrate typical 
+Session resumption is an integral part of @acronym{GnuTLS}, and
+@ref{Session resumption}, @ref{ex-resume-client} illustrate typical
 uses of it.
 
 @node TLS Extensions
@@ -465,10 +465,10 @@ This is a TLS extension that allows to ping and receive confirmation from the pe
 and is described in @xcite{RFC6520}. The extension is disabled by default and
 @funcref{gnutls_heartbeat_enable} can be used to enable it. A policy
 may be negotiated to only allow sending heartbeat messages or sending and receiving.
-The current session policy can be checked with @funcref{gnutls_heartbeat_allowed}. 
+The current session policy can be checked with @funcref{gnutls_heartbeat_allowed}.
 The requests coming from the peer result to @code{GNUTLS_@-E_@-HEARTBEAT_@-PING_@-RECEIVED}
 being returned from the receive function. Ping requests to peer can be send via
-@funcref{gnutls_heartbeat_ping}. 
+@funcref{gnutls_heartbeat_ping}.
 
 @showfuncB{gnutls_heartbeat_allowed,gnutls_heartbeat_enable}
 
@@ -501,7 +501,7 @@ to access certain parts of a web site.  The
 attack works by having the attacker simulate a client and connect to a
 server, with server-only authentication, and send some data intended
 to cause harm.  The server will then require renegotiation from him
-in order to perform the request. 
+in order to perform the request.
 When the proper client attempts to contact the server,
 the attacker hijacks that connection and forwards traffic to
 the initial server that requested renegotiation.  The
@@ -539,7 +539,7 @@ Note that it is easy to configure clients to always require the safe
 renegotiation extension from servers.
 
 To modify the default behavior, we have introduced some new priority
-strings (see @ref{Priority Strings}).  
+strings (see @ref{Priority Strings}).
 The @code{%UNSAFE_RENEGOTIATION} priority string permits
 (re-)handshakes even when the safe renegotiation extension was not
 negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
@@ -657,7 +657,7 @@ but only when the negotiated parameters exceed @code{GNUTLS_SEC_PARAM_HIGH}
 @cindex ALPN
 @cindex Application Layer Protocol Negotiation
 
-The TLS protocol was extended in @code{RFC7301} 
+The TLS protocol was extended in @code{RFC7301}
 to provide the application layer a method of
 negotiating the application protocol version. This allows for negotiation
 of the application protocol during the TLS handshake, thus reducing
@@ -678,8 +678,8 @@ to register them.
 It is possible to transfer supplemental data during the TLS handshake, following
 @xcite{RFC4680}. This is for "custom" protocol modifications for applications which
 may want to transfer additional data (e.g. additional authentication messages). Such
-an exchange requires a custom extension to be registered. 
-The provided API for this functionality is low-level and described in @ref{TLS Extension Handling}.
+an exchange requires a custom extension to be registered.
+The provided API for this functionality is low-level and described in @ref{TLS Hello Extension Handling}.
 
 @include sec-tls-app.texi
 
