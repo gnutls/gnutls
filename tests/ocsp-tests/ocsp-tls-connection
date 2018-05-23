@@ -99,6 +99,7 @@ echo "=== Generating good server certificate ==="
 
 rm -f "$TEMPLATE_FILE"
 cp "${srcdir}/ocsp-tests/certs/server_good.template" "$TEMPLATE_FILE"
+chmod u+w "$TEMPLATE_FILE"
 echo "ocsp_uri=http://localhost:${OCSP_PORT}/ocsp/" >>"$TEMPLATE_FILE"
 
 # Generate certificates with the random port
