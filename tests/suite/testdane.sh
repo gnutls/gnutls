@@ -38,8 +38,8 @@ fi
 
 echo ""
 echo "*** Testing good HTTPS hosts ***"
-# www.vulcano.cl dane.nox.su
-HOSTS="good.dane.verisignlabs.com www.freebsd.org www.kumari.net torproject.org fedoraproject.org"
+# www.vulcano.cl dane.nox.su www.kumari.net
+HOSTS="good.dane.verisignlabs.com www.freebsd.org torproject.org fedoraproject.org"
 #HOSTS="${HOSTS} nohats.ca"
 for host in ${HOSTS}; do
 
