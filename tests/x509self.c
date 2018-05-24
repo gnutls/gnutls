@@ -204,11 +204,9 @@ static void client(int sd, const char *prio)
 
 static void server(int sd, const char *prio)
 {
-	int err, ret;
-	char topbuf[512];
+	int ret;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
-	int optval = 1;
 	gnutls_certificate_credentials_t x509_cred;
 
 	global_init();

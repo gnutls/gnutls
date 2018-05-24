@@ -115,7 +115,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 static void client(int fd, const char *prio, int ign)
 {
 	int ret;
-	unsigned i, vers;
+	unsigned i;
 	char buffer[MAX_BUF + 1];
 	const char* err;
 	gnutls_anon_client_credentials_t anoncred;
@@ -344,7 +344,6 @@ static void server(int fd, const char *prio, int ign)
 		i++;
 	} while (ret > 0);
 
-next:
 	if (ret < 0) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
 		exit(1);

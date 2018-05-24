@@ -67,7 +67,7 @@ static int TLS_SUPPLEMENTALDATA_server_sent			= 0;
 static int TLS_SUPPLEMENTALDATA_server_received		= 0;
 
 static const unsigned char supp_data[] =
-{	
+{
 	0xFE,
 	0xED
 };
@@ -180,10 +180,8 @@ end:
 
 static void server(int sd, const char *prio)
 {
-	int err, ret;
-	char topbuf[512];
+	int ret;
 	gnutls_session_t session;
-	int optval = 1;
 	gnutls_certificate_credentials_t serverx509cred;
 
 	/* this must be called once in the program
