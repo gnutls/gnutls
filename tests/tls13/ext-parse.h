@@ -44,6 +44,11 @@ typedef void (*ext_parse_func)(void *priv, gnutls_datum_t *extdata);
 
 #define HANDSHAKE_SESSION_ID_POS 34
 
+#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
 /* Returns 0 if the extension was not found, 1 otherwise.
  */
 static unsigned find_client_extension(const gnutls_datum_t *msg, unsigned extnr, void *priv, ext_parse_func cb)
@@ -164,3 +169,7 @@ static unsigned find_server_extension(const gnutls_datum_t *msg, unsigned extnr,
 
 	return 0;
 }
+
+#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#  pragma GCC diagnostic pop
+#endif
