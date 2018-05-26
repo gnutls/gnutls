@@ -117,7 +117,7 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_certificate_set_x509_key_mem(clientx509cred, 
+	ret = gnutls_certificate_set_x509_key_mem(clientx509cred,
 						  &cli_ca3_cert_chain, &cli_ca3_key,
 						  GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
@@ -173,7 +173,7 @@ static void try(const char *prio, unsigned expect, unsigned ca_type)
 	gnutls_dh_params_deinit(dh_params);
 }
 
-void start(const char *prio)
+static void start(const char *prio)
 {
 	global_init();
 

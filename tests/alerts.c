@@ -68,7 +68,6 @@ static void client_log_func(int level, const char *str)
 static void client(int fd, const char *prio, int ign)
 {
 	int ret;
-	unsigned i, vers;
 	char buffer[64];
 	const char* err;
 	gnutls_certificate_credentials_t x509_cred;
@@ -157,7 +156,6 @@ static void terminate(void)
 static void server(int fd, const char *prio, int ign)
 {
 	int ret;
-	unsigned i;
 	const char* err;
 	char buffer[64];
 	gnutls_session_t session;
@@ -225,7 +223,7 @@ static void server(int fd, const char *prio, int ign)
 	if (ret != GNUTLS_E_WARNING_ALERT_RECEIVED ||
 	    gnutls_alert_get(session) != GNUTLS_A_USER_CANCELED) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
-	}    
+	}
 
 	do {
 		do {
@@ -239,7 +237,7 @@ static void server(int fd, const char *prio, int ign)
 	if (ret != GNUTLS_E_FATAL_ALERT_RECEIVED ||
 	    gnutls_alert_get(session) != GNUTLS_A_DECRYPT_ERROR) {
 		fail("client: Error: %s\n", gnutls_strerror(ret));
-	}    
+	}
 
 	close(fd);
 	gnutls_deinit(session);

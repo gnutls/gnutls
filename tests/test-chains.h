@@ -3773,6 +3773,11 @@ static const char *tls_feat_superset[] = {
 	NULL
 };
 
+#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
 static struct
 {
   const char *name;
@@ -3925,4 +3930,9 @@ static struct
   { "rsa pss: chain with changing hashes - ok", rsa_pss_chain_sha512_sha384_sha256_ok, &rsa_pss_chain_sha512_sha384_sha256_ok[3], 0, 0, 0, 1501159136},
   { NULL, NULL, NULL, 0, 0}
 };
+
+#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#  pragma GCC diagnostic pop
+#endif
+
 /* *INDENT-ON* */

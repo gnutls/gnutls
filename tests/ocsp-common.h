@@ -23,6 +23,11 @@
 #ifndef OCSP_COMMON_H
 #define OCSP_COMMON_H
 
+#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
 /* Date for responses to be valid */
 #define OCSP_RESP_DATE 1508329639
 
@@ -574,5 +579,9 @@ static gnutls_datum_t ocsp_subca3_unknown = {
 static gnutls_datum_t ocsp_subca3_unknown_pem = {
 	(void *)_ocsp_subca3_unknown_pem, sizeof(_ocsp_subca3_unknown_pem)-1
 };
+
+#if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#  pragma GCC diagnostic pop
+#endif
 
 #endif

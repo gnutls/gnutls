@@ -48,8 +48,11 @@
 #define gnutls_assert()
 #define gnutls_assert_val(val) val
 
+/* #pragma doesn't work to suppress preprocessor warnings like -Wunused-macros.
+ * So we just use the above defined macros here. */
+#if defined _gnutls_debug_log && defined gnutls_assert && defined gnutls_assert_val
 #include "../lib/algorithms.h"
-
+#endif
 
 unsigned _gnutls_record_overhead(const version_entry_st *ver,
 				 const cipher_entry_st *cipher,

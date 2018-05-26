@@ -70,7 +70,7 @@ static int TLSEXT_TYPE_server_sent			= 0;
 static int TLSEXT_TYPE_server_received		= 0;
 
 static const unsigned char ext_data[] =
-{	
+{
 	0xFE,
 	0xED
 };
@@ -235,7 +235,6 @@ static void server(int sd, const char *prio)
 	gnutls_certificate_credentials_t serverx509cred;
 	int ret;
 	gnutls_session_t session;
-	unsigned i;
 
 	/* this must be called once in the program
 	 */
