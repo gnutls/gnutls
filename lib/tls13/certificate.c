@@ -203,6 +203,9 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 	if (again == 0) {
 		if (session->internals.hsk_flags & HSK_PSK_SELECTED)
 			return 0;
+		if (session->security_parameters.entity == GNUTLS_SERVER &&
+		    session->internals.resumed)
+			return 0;
 
 		cred = (gnutls_certificate_credentials_t)
 		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);

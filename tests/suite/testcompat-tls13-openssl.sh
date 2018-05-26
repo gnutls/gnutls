@@ -210,6 +210,23 @@ run_client_suite() {
 	kill ${PID}
 	wait
 
+	# Try resumption
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption..."
+	testdir=`create_testdir tls13-openssl-resumption`
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
+	PID=$!
+	wait_server ${PID}
+
+	# ${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --x509cafile "${CA_CERT}" --inline-commands | tee "${testdir}/client.out" >> ${OUTPUT}
+	{ echo a; sleep 1; echo '^resume^'; } | \
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --insecure --inline-commands | tee "${testdir}/client.out" >> ${OUTPUT}
+	grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+	rm -rf "$testdir"
 
 }
 
@@ -374,6 +391,27 @@ run_server_suite() {
 		kill ${PID}
 		wait
 	done
+
+	# Try resumption
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption..."
+	testdir=`create_testdir tls13-openssl-resumption`
+	eval "${GETPORT}"
+	launch_server $$ --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${RSA_CERT}" --x509keyfile "${RSA_KEY}" --x509cafile "${CA_CERT}"  >>${OUTPUT} 2>&1
+	PID=$!
+	wait_server ${PID}
+
+	{ echo a; sleep 1; } | \
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess.pem" 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess.pem" </dev/null 2>&1 > "${testdir}/server.out"
+	grep "\:error\:" "${testdir}/server.out" && \
+		fail ${PID} "Failed"
+	grep "^Reused, TLSv1.3" "${testdir}/server.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+	rm -rf "$testdir"
 
 }
 

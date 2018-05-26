@@ -27,6 +27,7 @@
 #include "tls13/hello_retry.h"
 #include "auth/cert.h"
 #include "mbuffers.h"
+#include "state.h"
 
 int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 {
@@ -88,6 +89,8 @@ int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again)
 
 		/* reset extensions sent by this session to allow re-sending them */
 		session->internals.used_exts = 0;
+
+		reset_binders(session);
 
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}

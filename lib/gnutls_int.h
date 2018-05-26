@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -120,6 +120,8 @@ typedef struct {
 #define MAX_FILENAME 512
 #define MAX_HASH_SIZE 64
 
+#define MAX_MAC_KEY_SIZE 64
+
 #define MAX_CIPHER_BLOCK_SIZE 16
 #define MAX_CIPHER_KEY_SIZE 32
 
@@ -158,7 +160,7 @@ typedef struct {
 #define _GNUTLS_EXT_TLS_POST_CS 177
 
 /* expire time for resuming sessions */
-#define DEFAULT_EXPIRE_TIME 3600
+#define DEFAULT_EXPIRE_TIME 21600
 #define DEFAULT_HANDSHAKE_TIMEOUT_MS 40*1000
 
 /* The EC group to be used when the extension
@@ -267,7 +269,7 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE90=90, STATE91, STATE92, STATE93, STATE99=99,
 	STATE100=100, STATE101, STATE102, STATE103, STATE104,
 	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110,
-	STATE111,
+	STATE111, STATE112,
 	STATE150 /* key update */
 } handshake_state_t;
 
@@ -275,11 +277,16 @@ typedef enum bye_state_t {
 	BYE_STATE0 = 0, BYE_STATE1, BYE_STATE2
 } bye_state_t;
 
+typedef enum send_ticket_state_t {
+	TICKET_STATE0 = 0, TICKET_STATE1
+} send_ticket_state_t;
+
 typedef enum reauth_state_t {
 	REAUTH_STATE0 = 0, REAUTH_STATE1, REAUTH_STATE2, REAUTH_STATE3,
 	REAUTH_STATE4, REAUTH_STATE5
 } reauth_state_t;
 
+#define TICKET_STATE session->internals.ticket_state
 #define BYE_STATE session->internals.bye_state
 #define REAUTH_STATE session->internals.reauth_state
 
@@ -461,6 +468,23 @@ typedef struct auth_cred_st {
 	struct auth_cred_st *next;
 } auth_cred_st;
 
+/* session ticket definitions */
+#define TICKET_MASTER_KEY_SIZE (TICKET_KEY_NAME_SIZE+TICKET_CIPHER_KEY_SIZE+TICKET_MAC_SECRET_SIZE)
+#define TICKET_KEY_NAME_SIZE 16
+#define TICKET_CIPHER_KEY_SIZE 32
+#define TICKET_MAC_SECRET_SIZE 16
+
+struct binder_data_st {
+	const struct mac_entry_st *prf; /* non-null if this struct is set */
+	gnutls_datum_t psk;
+
+	/* 0-based index of the selected PSK.
+	 * This only applies if the HSK_PSK_SELECTED flag is set in internals.hsk_flags,
+	 * which signals a PSK has indeed been selected. */
+	uint8_t idx;
+	uint8_t resumption; /* whether it is a resumption binder */
+};
+
 struct gnutls_key_st {
 	struct { /* These are kept outside the TLS1.3 union as they are
 	          * negotiated via extension, even before protocol is negotiated */
@@ -476,14 +500,6 @@ struct gnutls_key_st {
 	 */
 	union {
 		struct {
-			/*
-			 * 0-based index of the selected PSK.
-			 * This only applies if the HSK_PSK_SELECTED flag is set in internals.hsk_flags,
-			 * which signals a PSK has indeed been selected.
-			 */
-			unsigned psk_index;
-			const struct mac_entry_st *binder_prf;
-
 			/* the current (depending on state) secret, can be
 			 * early_secret, client_early_traffic_secret, ... */
 			uint8_t temp_secret[MAX_HASH_SIZE];
@@ -491,6 +507,7 @@ struct gnutls_key_st {
 			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_handshake_traffic_secret */
 			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_handshake_traffic_secret */
 			uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
+			uint8_t ap_rms[MAX_HASH_SIZE]; /* resumption_master_secret */
 		} tls13; /* tls1.3 */
 
 		/* Folow the SSL3.0 and TLS1.2 key exchanges */
@@ -525,12 +542,20 @@ struct gnutls_key_st {
 		} tls12; /* from ssl3.0 to tls12 */
 	} proto;
 
-	/* Pre-shared key in use (if any); temporary storage */
-	gnutls_datum_t psk;
-	unsigned psk_needs_free;
+	/* binders / pre-shared keys in use; temporary storage.
+	 * On client side it will hold data for the resumption and external
+	 * PSKs After server hello is received the selected binder is set on 0 position
+	 * and HSK_PSK_SELECTED is set.
+	 *
+	 * On server side the first value is populated with
+	 * the selected PSK data if HSK_PSK_SELECTED flag is set. */
+	struct binder_data_st binders[2];
 
 	/* TLS pre-master key; applies to 1.2 and 1.3 */
 	gnutls_datum_t key;
+
+	/* The key to encrypt and decrypt session tickets */
+	uint8_t session_ticket_key[TICKET_MASTER_KEY_SIZE];
 
 	/* this is used to hold the peers authentication data 
 	 */
@@ -738,6 +763,9 @@ typedef struct {
 	/* encrypt-then-mac -> rfc7366 */
 	uint8_t etm;
 
+	uint8_t client_auth_type; /* gnutls_credentials_type_t */
+	uint8_t server_auth_type;
+
 	/* Note: if you add anything in Security_Parameters struct, then
 	 * also modify CPY_COMMON in constate.c, and session_pack.c,
 	 * in order to save it in the session storage.
@@ -927,6 +955,19 @@ typedef struct gnutls_dh_params_int {
 				 */
 } dh_params_st;
 
+/* TLS 1.3 session ticket
+ */
+typedef struct tls13_ticket {
+	time_t timestamp;
+	uint32_t lifetime;
+	uint32_t age_add;
+	uint8_t nonce[255];
+	size_t nonce_size;
+	const mac_entry_st *prf;
+	uint8_t resumption_master_secret[MAX_HASH_SIZE];
+	gnutls_datum_t ticket;
+} tls13_ticket_t;
+
 /* DTLS session state
  */
 typedef struct {
@@ -981,10 +1022,13 @@ typedef struct {
 						 * the client key exchange message */
 	unsigned handshake_hash_buffer_server_finished_len;/* if non-zero it is the length of data until the
 						 * the server finished message */
+	unsigned handshake_hash_buffer_client_finished_len;/* if non-zero it is the length of data until the
+						 * the client finished message */
 	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
 						 * message */
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */
-	bool ticket_sent;	/* whether a session ticket was sent */
+
+	send_ticket_state_t ticket_state; /* used by gnutls_session_ticket_send() */
 	bye_state_t bye_state; /* used by gnutls_bye() */
 	reauth_state_t reauth_state; /* used by gnutls_reauth() */
 
@@ -1227,6 +1271,13 @@ typedef struct {
 #define HSK_PSK_SELECTED (1<<15)
 #define HSK_KEY_SHARE_SENT (1<<16) /* server: key share was sent to client */
 #define HSK_KEY_SHARE_RECEIVED (1<<17) /* client: key share was received */
+#define HSK_TLS13_TICKET_SENT (1<<18) /* client: sent a ticket under TLS1.3;
+					 * server: a ticket was sent to client.
+					 */
+#define HSK_TLS12_TICKET_SENT (1<<19) /* client: sent a ticket under TLS1.2;
+				       * server: a ticket was sent to client.
+				       */
+#define HSK_TICKET_RECEIVED (1<<20) /* client: a session ticket was received */
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
@@ -1321,6 +1372,11 @@ typedef struct {
 
 	/* the ciphersuite received in HRR */
 	uint8_t hrr_cs[2];
+
+	/* this is only used under TLS1.2 or earlier */
+	int session_ticket_renew;
+
+	tls13_ticket_t tls13_ticket;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

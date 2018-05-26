@@ -25,6 +25,7 @@
 #include "debug.h"
 #include <session_pack.h>
 #include <datum.h>
+#include "buffers.h"
 #include "state.h"
 
 /**
@@ -33,13 +34,10 @@
  * @session_data: is a pointer to space to hold the session.
  * @session_data_size: is the session_data's size, or it will be set by the function.
  *
- * Returns all session parameters needed to be stored to support resumption.
- * The client should call this, and store the returned session data. A session
- * may be resumed later by calling gnutls_session_set_data().  
+ * Returns all session parameters needed to be stored to support resumption,
+ * in a pre-allocated buffer.
  *
- * This function will fail if called prior to handshake completion. In
- * case of false start TLS, the handshake completes only after data have
- * been successfully received from the peer.
+ * See gnutls_session_get_data2() for more information.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -75,14 +73,20 @@ gnutls_session_get_data(gnutls_session_t session,
 	return ret;
 }
 
+#define EMPTY_DATA "\x00\x00\x00\x00"
+#define EMPTY_DATA_SIZE 4
+
 /**
  * gnutls_session_get_data2:
  * @session: is a #gnutls_session_t type.
  * @data: is a pointer to a datum that will hold the session.
  *
- * Returns all session parameters needed to be stored to support resumption.
- * The client should call this, and store the returned session data. A session
- * may be resumed later by calling gnutls_session_set_data().  
+ * Returns necessary parameters to support resumption. The client
+ * should call this function and store the returned session data. A session
+ * can be resumed later by calling gnutls_session_set_data() with the returned
+ * data. Note that under TLS 1.3, it is recommended for clients to use
+ * session parameters only once, to prevent passive-observers from correlating
+ * the different connections.
  *
  * The returned @data are allocated and must be released using gnutls_free().
  *
@@ -90,25 +94,54 @@ gnutls_session_get_data(gnutls_session_t session,
  * case of false start TLS, the handshake completes only after data have
  * been successfully received from the peer.
  *
+ * Under TLS1.3 session resumption is possible only after a session ticket
+ * is received by the client. To ensure that such a ticket has been received use
+ * gnutls_session_get_flags() and check for flag %GNUTLS_SFLAGS_SESSION_TICKET;
+ * if this flag is not set, this function will wait for a new ticket within
+ * 50ms, and if not received will return dummy data which cannot lead to
+ * resumption. To get notified when new tickets are received by the server
+ * use gnutls_handshake_set_hook_function() to wait for %GNUTLS_HANDSHAKE_NEW_SESSION_TICKET
+ * messages. Each call of gnutls_session_get_data2() after a ticket is
+ * received, will return session resumption data corresponding to the last
+ * received ticket.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
 int
 gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
 {
-
+	const version_entry_st *vers = get_version(session);
 	int ret;
 
-	if (data == NULL) {
+	if (data == NULL || vers == NULL) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	if (gnutls_session_is_resumed(session) && session->internals.resumption_data.data) {
-		ret = _gnutls_set_datum(data, session->internals.resumption_data.data, session->internals.resumption_data.size);
-		if (ret < 0)
+	if (vers->tls13_sem && !(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {
+		/* wait for a message with timeout of 1ms */
+		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, 100);
+		if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
 			return gnutls_assert_val(ret);
+		}
 
-		return 0;
+		if (!(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {
+			ret = _gnutls_set_datum(data, EMPTY_DATA, EMPTY_DATA_SIZE);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			return 0;
+		}
+	} else if (!vers->tls13_sem) {
+		/* under TLS1.3 we want to pack the latest ticket, while that's
+		 * not the case in TLS1.2 or earlier. */
+		if (gnutls_session_is_resumed(session) && session->internals.resumption_data.data) {
+			ret = _gnutls_set_datum(data, session->internals.resumption_data.data, session->internals.resumption_data.size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			return 0;
+		}
 	}
 
 	if (session->internals.resumable == RESUME_FALSE)
@@ -221,6 +254,14 @@ gnutls_session_set_data(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	/* under TLS1.3 we always return some data on resumption when there
+	 * is no ticket in order to keep compatibility with existing apps */
+	if (session_data_size == EMPTY_DATA_SIZE &&
+	    memcmp(session_data, EMPTY_DATA, EMPTY_DATA_SIZE) == 0) {
+		return 0;
+	}
+
 	ret = _gnutls_session_unpack(session, &psession);
 	if (ret < 0) {
 		gnutls_assert();

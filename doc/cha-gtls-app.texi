@@ -1648,11 +1648,13 @@ using the priority functions, at least the algorithms used in the last session.
 
 @subsubheading Server side
 
-In order to support resumption a server can store
-the session security parameters in a local database or by using session
-tickets (see @ref{Session tickets}) to delegate storage to the client. Because
-session tickets might not be supported by all clients, servers
-could combine the two methods.
+Under TLS 1.2, in order to support resumption a server can either store
+the session security parameters in a local database or use session
+tickets (see @ref{Session tickets}) to delegate storage to the client.
+A server enabling both session tickets and a storage for session data
+would use session tickets when clients support it and the storage otherwise.
+
+Under TLS1.3 a server can only send session tickets.
 
 A storing server needs to specify callback functions to store, retrieve and delete session data. These can be
 registered with the functions below. The stored sessions in the database can be checked using @funcref{gnutls_db_check_entry}
@@ -1661,7 +1663,7 @@ for expiration.
 @showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
 @showfuncA{gnutls_db_check_entry}
 
-A server utilizing tickets should generate ticket encryption
+A server supporting session tickets must generate ticket encryption
 and authentication keys using @funcref{gnutls_session_ticket_key_generate}.
 Those keys should be associated with the GnuTLS session using
 @funcref{gnutls_session_ticket_enable_server}, and should be rotated regularly
@@ -1672,8 +1674,8 @@ if revealed could be used to decrypt all previous sessions.
 @showfuncdesc{gnutls_session_ticket_key_generate}
 @showfuncdesc{gnutls_session_resumption_requested}
 
-A server enabling both session tickets and a storage for session data
-would use session tickets when clients support it and the storage otherwise.
+The expiration time for session resumption, either in tickets or stored data
+is set using @funcref{gnutls_db_set_cache_expiration}.
 
 @node Certificate verification
 @subsection Certificate verification

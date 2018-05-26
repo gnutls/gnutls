@@ -97,6 +97,8 @@ int _gnutls_session_is_psk(gnutls_session_t session);
 
 int _gnutls_openpgp_send_fingerprint(gnutls_session_t session);
 
+void reset_binders(gnutls_session_t session);
+
 inline static int
 _gnutls_PRF(gnutls_session_t session,
 	    const uint8_t * secret, unsigned int secret_size,

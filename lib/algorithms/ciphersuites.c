@@ -1435,6 +1435,7 @@ static unsigned kx_is_ok(gnutls_session_t session, gnutls_kx_algorithm_t kx, uns
 	return 1;
 }
 
+/* Called on server-side only */
 int
 _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 				  const ciphersuite_list_st *peer_clist,
@@ -1485,7 +1486,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 					/* if we have selected PSK, we need a ciphersuites which matches
 					 * the selected binder */
 					if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
-						if (session->key.proto.tls13.binder_prf->id != session->internals.priorities->cs.entry[j]->prf)
+						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
 							continue;
 					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
@@ -1528,7 +1529,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 					/* if we have selected PSK, we need a ciphersuites which matches
 					 * the selected binder */
 					if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
-						if (session->key.proto.tls13.binder_prf->id != session->internals.priorities->cs.entry[j]->prf)
+						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
 							break;
 					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);

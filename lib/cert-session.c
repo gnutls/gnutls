@@ -48,6 +48,11 @@
  * The certificate is in raw (DER) format.  No certificate
  * list is being returned. Only the first certificate.
  *
+ * This function returns the certificate that was sent in the current
+ * handshake. In subsequent resumed sessions this function will return
+ * %NULL. That differs from gnutls_certificate_get_peers() which always
+ * returns the peer's certificate used in the original session.
+ *
  * Returns: a pointer to a #gnutls_datum_t containing our
  *   certificate, or %NULL in case of an error or if no certificate
  *   was used.
@@ -85,8 +90,8 @@ const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
  * are servers which violate this principle and thus on certain
  * occasions this may be an unsorted list.
  *
- * In case of OpenPGP keys a single key will be returned in raw
- * format.
+ * In resumed sessions, this function will return the peer's certificate
+ * list as used in the first/original session.
  *
  * Returns: a pointer to a #gnutls_datum_t containing the peer's
  *   certificates, or %NULL in case of an error or if no certificate

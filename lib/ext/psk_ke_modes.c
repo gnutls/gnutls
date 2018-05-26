@@ -28,17 +28,31 @@
 #define PSK_KE 0
 #define PSK_DHE_KE 1
 
-/*
- * We only support ECDHE-authenticated PSKs.
- * The client just sends a "psk_key_exchange_modes" extension
- * with the value one.
- */
+/* Relevant to client only */
+static bool
+psk_ke_modes_is_required(gnutls_session_t session)
+{
+	gnutls_psk_client_credentials_t cred;
+
+	if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
+	    session->internals.tls13_ticket.ticket.data != NULL)
+		return 1;
+
+	if (session->internals.priorities->have_psk) {
+		cred = (gnutls_psk_client_credentials_t)
+				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+		if (cred && _gnutls_have_psk_credentials(cred, session))
+			return 1;
+	}
+
+	return 0;
+}
+
 static int
 psk_ke_modes_send_params(gnutls_session_t session,
 			 gnutls_buffer_t extdata)
 {
 	int ret;
-	gnutls_psk_client_credentials_t cred;
 	const version_entry_st *vers;
 	uint8_t data[2];
 	unsigned pos, i;
@@ -46,19 +60,21 @@ psk_ke_modes_send_params(gnutls_session_t session,
 	unsigned have_psk = 0;
 
 	/* Server doesn't send psk_key_exchange_modes */
-	if (session->security_parameters.entity == GNUTLS_SERVER ||
-	    !session->internals.priorities->have_psk)
+	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return 0;
 
-	cred = (gnutls_psk_client_credentials_t)
-			_gnutls_get_cred(session, GNUTLS_CRD_PSK);
-	if (cred == NULL || _gnutls_have_psk_credentials(cred) == 0)
+	if (!psk_ke_modes_is_required(session))
 		return 0;
 
 	vers = _gnutls_version_max(session);
 	if (!vers || !vers->tls13_sem)
 		return 0;
 
+	/* We send the list prioritized according to our preferences as a convention
+	 * (used throughout the protocol), even if the protocol doesn't mandate that
+	 * for this particular message. That way we can keep the TLS 1.2 semantics/
+	 * prioritization when negotiating PSK or DHE-PSK. Receiving servers would
+	 * very likely respect our prioritization if they parse the message serially. */
 	pos = 0;
 	for (i=0;i<session->internals.priorities->_kx.algorithms;i++) {
 		if (session->internals.priorities->_kx.priority[i] == GNUTLS_KX_PSK && !have_psk) {
@@ -76,6 +92,17 @@ psk_ke_modes_send_params(gnutls_session_t session,
 
 		if (have_psk && have_dhpsk)
 			break;
+	}
+
+	/* For session resumption we need to send at least one */
+	if (pos == 0) {
+		if (session->internals.flags & GNUTLS_NO_TICKETS)
+			return 0;
+
+		data[pos++] = PSK_DHE_KE;
+		data[pos++] = PSK_KE;
+		session->internals.hsk_flags |= HSK_PSK_KE_MODE_DHE_PSK;
+		session->internals.hsk_flags |= HSK_PSK_KE_MODE_PSK;
 	}
 
 	ret = _gnutls_buffer_append_data_prefix(extdata, 8, data, pos);
@@ -121,7 +148,7 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	}
 
 	cred = (gnutls_psk_server_credentials_t)_gnutls_get_cred(session, GNUTLS_CRD_PSK);
-	if (cred == NULL) {
+	if (cred == NULL && (session->internals.flags & GNUTLS_NO_TICKETS)) {
 		session->internals.hsk_flags |= HSK_PSK_KE_MODE_INVALID;
 		return gnutls_assert_val(0);
 	}
@@ -142,8 +169,12 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 			break;
 	}
 
-	if (session->internals.priorities->groups.size == 0 && psk_pos == MAX_POS)
-		return gnutls_assert_val(0);
+	if (psk_pos == MAX_POS && dhpsk_pos == MAX_POS) {
+		if (!(session->internals.flags & GNUTLS_NO_TICKETS))
+			dhpsk_pos = 0;
+		else if (session->internals.priorities->groups.size == 0)
+			return gnutls_assert_val(0);
+	}
 
 	for (i=0;i<ke_modes_len;i++) {
 		DECR_LEN(len, 1);
@@ -172,10 +203,11 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 
 	if ((session->internals.hsk_flags & HSK_PSK_KE_MODE_PSK) ||
 	    (session->internals.hsk_flags & HSK_PSK_KE_MODE_DHE_PSK)) {
+
 		return 0;
 	} else {
 		session->internals.hsk_flags |= HSK_PSK_KE_MODE_INVALID;
-		return 0;
+		return gnutls_assert_val(0);
 	}
 }
 

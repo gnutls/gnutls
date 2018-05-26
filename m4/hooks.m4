@@ -329,22 +329,6 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_OCSP, test "$ac_enable_ocsp" != "no")
 
-
-  AC_MSG_CHECKING([whether to disable session tickets support])
-  AC_ARG_ENABLE(session-tickets,
-    AS_HELP_STRING([--disable-session-tickets],
-                   [disable session tickets support]),
-    ac_enable_session_tickets=$enableval,ac_enable_session_tickets=yes)
-  if test x$ac_enable_session_tickets != xno; then
-   ac_enable_session_tickets=yes
-   AC_MSG_RESULT(no)
-   AC_DEFINE([ENABLE_SESSION_TICKETS], 1, [enable session tickets support])
-  else
-   ac_full=0
-   AC_MSG_RESULT(yes)
-  fi
-  AM_CONDITIONAL(ENABLE_SESSION_TICKETS, test "$ac_enable_session_tickets" != "no")
-
   # For storing integers in pointers without warnings
   # http://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
   AC_CHECK_SIZEOF(void *)

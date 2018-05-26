@@ -43,6 +43,8 @@ void _gnutls_epoch_gc(gnutls_session_t session);
 void _gnutls_epoch_free(gnutls_session_t session,
 			record_parameters_st * state);
 
+void _gnutls_set_resumed_parameters(gnutls_session_t session);
+
 int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage);
 
 static inline int _gnutls_epoch_is_valid(gnutls_session_t session,

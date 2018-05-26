@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Red Hat, Inc
+ * Copyright (C) 2016-2018 Red Hat, Inc
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -15,9 +15,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -55,7 +55,10 @@ int main()
 static void terminate(void);
 
 /* This program tests that handshakes do not include a session ticket
- * if the flag GNUTLS_NO_TICKETS is specified.
+ * if the flag GNUTLS_NO_TICKETS is specified under TLS 1.2.
+ *
+ * Under TLS 1.3 it verifies that not enabling session tickets doesn't
+ * result in a ticket being sent.
  */
 
 static time_t mytime(time_t * t)
@@ -168,13 +171,17 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd, const char *prio)
+static void server(int fd, const char *prio, unsigned server_no_tickets)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
-	gnutls_datum_t skey;
+	gnutls_datum_t skey = {NULL, 0};
+	unsigned int flags = GNUTLS_SERVER;
+
+	if (server_no_tickets)
+		flags |= GNUTLS_NO_TICKETS;
 
 	/* this must be called once in the program
 	 */
@@ -191,10 +198,12 @@ static void server(int fd, const char *prio)
 					    &server_key,
 					    GNUTLS_X509_FMT_PEM)>=0);
 
-	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
+	assert(gnutls_init(&session, flags)>=0);
 
-	assert(gnutls_session_ticket_key_generate(&skey)>=0);
-	assert(gnutls_session_ticket_enable_server(session, &skey) >= 0);
+	if (!server_no_tickets) {
+		assert(gnutls_session_ticket_key_generate(&skey)>=0);
+		assert(gnutls_session_ticket_enable_server(session, &skey) >= 0);
+	}
 
 	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
 					   GNUTLS_HOOK_POST,
@@ -254,7 +263,7 @@ static void ch_handler(int sig)
 }
 
 static
-void start(const char *prio)
+void start(const char *prio, unsigned server_no_tickets)
 {
 	int fd[2];
 	int ret, status = 0;
@@ -281,7 +290,7 @@ void start(const char *prio)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0], prio);
+		server(fd[0], prio, server_no_tickets);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
 	} else {
@@ -295,9 +304,11 @@ void start(const char *prio)
 
 void doit(void)
 {
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
-	start("NORMAL");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
+	/* Under TLS 1.3 session tickets are not negotiated; they are
+	 * "always sent unless server sets GNUTLS_NO_TICKETS */
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", 1);
+	start("NORMAL", 0);
 }
 
 #endif				/* _WIN32 */

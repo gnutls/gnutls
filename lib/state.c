@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2002-2016 Free Software Foundation, Inc.
  * Copyright (C) 2014-2016 Nikos Mavrogiannopoulos
- * Copyright (C) 2015-2016 Red Hat, Inc.
+ * Copyright (C) 2015-2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -51,6 +51,7 @@
 #include <intprops.h>
 #include <gnutls/dtls.h>
 #include "dtls.h"
+#include "tls13/session_ticket.h"
 
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
@@ -178,6 +179,13 @@ gnutls_compression_get(gnutls_session_t session)
 	return GNUTLS_COMP_NULL;
 }
 
+void reset_binders(gnutls_session_t session)
+{
+	_gnutls_free_temp_key_datum(&session->key.binders[0].psk);
+	_gnutls_free_temp_key_datum(&session->key.binders[1].psk);
+	memset(session->key.binders, 0, sizeof(session->key.binders));
+}
+
 static void deinit_keys(gnutls_session_t session)
 {
 	const version_entry_st *vers = get_version(session);
@@ -218,8 +226,7 @@ static void deinit_keys(gnutls_session_t session)
 			      sizeof(session->key.proto.tls13.hs_skey));
 	}
 
-	if (session->key.psk_needs_free)
-		_gnutls_free_temp_key_datum(&session->key.psk);
+	reset_binders(session);
 	_gnutls_free_temp_key_datum(&session->key.key);
 }
 
@@ -328,7 +335,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	_mbuffer_head_init(&(*session)->internals.handshake_send_buffer);
 	_gnutls_handshake_recv_buffer_init(*session);
 
-	(*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;	/* one hour default */
+	(*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;
 
 	gnutls_handshake_set_max_packet_length((*session),
 					       MAX_HANDSHAKE_PACKET_SIZE);
@@ -382,15 +389,15 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 	/* Enable useful extensions */
 	if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_EXTENSIONS)) {
-#ifdef ENABLE_SESSION_TICKETS
-		if (!(flags & GNUTLS_NO_TICKETS))
-			gnutls_session_ticket_enable_client(*session);
-#endif
 #ifdef ENABLE_OCSP
 		gnutls_ocsp_status_request_enable_client(*session, NULL, 0,
 							 NULL);
 #endif
 	}
+
+	/* session tickets in server side are enabled by setting a key */
+	if (flags & GNUTLS_SERVER)
+		flags |= GNUTLS_NO_TICKETS;
 
 	(*session)->internals.flags = flags;
 
@@ -456,6 +463,9 @@ void gnutls_deinit(gnutls_session_t session)
 
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
+
+	/* destroy any session ticket we may have received */
+	_gnutls13_session_ticket_unset(session);
 
 	/* we rely on priorities' internal reference counting */
 	gnutls_priority_deinit(session->internals.priorities);
@@ -716,7 +726,8 @@ gnutls_handshake_set_private_extensions(gnutls_session_t session,
  * gnutls_session_is_resumed:
  * @session: is a #gnutls_session_t type.
  *
- * Check whether session is resumed or not.
+ * Checks whether session is resumed or not. This is functional
+ * for both server and client side.
  *
  * Returns: non zero if this session is resumed, or a zero if this is
  *   a new session.
@@ -724,6 +735,11 @@ gnutls_handshake_set_private_extensions(gnutls_session_t session,
 int gnutls_session_is_resumed(gnutls_session_t session)
 {
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		const version_entry_st *ver = get_version(session);
+		if (ver && ver->tls13_sem &&
+		    session->internals.resumed != RESUME_FALSE)
+			return 1;
+
 		if (session->security_parameters.session_id_size > 0 &&
 		    session->security_parameters.session_id_size ==
 		    session->internals.resumed_security_parameters.
@@ -1334,6 +1350,8 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_FALSE_START;
 	if (session->internals.hsk_flags & HSK_USED_FFDHE)
 		flags |= GNUTLS_SFLAGS_RFC7919;
+	if (session->internals.hsk_flags & HSK_TICKET_RECEIVED)
+		flags |= GNUTLS_SFLAGS_SESSION_TICKET;
 
 	return flags;
 }

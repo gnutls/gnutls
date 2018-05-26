@@ -193,27 +193,18 @@ gnutls_credentials_get(gnutls_session_t session,
  * %GNUTLS_KX_RSA, %GNUTLS_KX_DHE_RSA), the same function are to be
  * used to access the authentication data.
  *
+ * Note that on resumed sessions, this function returns the schema
+ * used in the original session authentication.
+ *
  * Returns: The type of credentials for the current authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
 gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 {
-/* This is not the credentials we must set, but the authentication data
- * we get by the peer, so it should be reversed.
- */
-	gnutls_kx_algorithm_t kx;
-	int server =
-	    session->security_parameters.entity == GNUTLS_SERVER ? 0 : 1;
-
-	if (!session->security_parameters.cs) {
-		gnutls_assert();
-		return 0;
-	}
-
-	kx = gnutls_kx_get(session);
-
-	return
-	    _gnutls_map_kx_get_cred(kx, server);
+	if (session->security_parameters.entity == GNUTLS_SERVER)
+		return gnutls_auth_client_get_type(session);
+	else
+		return gnutls_auth_server_get_type(session);
 }
 
 /**
@@ -224,23 +215,16 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
  * The returned information is to be used to distinguish the function used
  * to access authentication data.
  *
+ * Note that on resumed sessions, this function returns the schema
+ * used in the original session authentication.
+ *
  * Returns: The type of credentials for the server authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
 gnutls_credentials_type_t
 gnutls_auth_server_get_type(gnutls_session_t session)
 {
-	gnutls_kx_algorithm_t kx;
-
-	if (!session->security_parameters.cs) {
-		gnutls_assert();
-		return 0;
-	}
-
-	kx = gnutls_kx_get(session);
-
-	return
-	    _gnutls_map_kx_get_cred(kx, 1);
+	return session->security_parameters.server_auth_type;
 }
 
 /**
@@ -251,23 +235,16 @@ gnutls_auth_server_get_type(gnutls_session_t session)
  * The returned information is to be used to distinguish the function used
  * to access authentication data.
  *
+ * Note that on resumed sessions, this function returns the schema
+ * used in the original session authentication.
+ *
  * Returns: The type of credentials for the client authentication
  *   schema, a #gnutls_credentials_type_t type.
  **/
 gnutls_credentials_type_t
 gnutls_auth_client_get_type(gnutls_session_t session)
 {
-	gnutls_kx_algorithm_t kx;
-
-	if (!session->security_parameters.cs) {
-		gnutls_assert();
-		return 0;
-	}
-
-	kx = gnutls_kx_get(session);
-
-	return
-	    _gnutls_map_kx_get_cred(kx, 0);
+	return session->security_parameters.client_auth_type;
 }
 
 

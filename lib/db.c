@@ -122,12 +122,18 @@ void *gnutls_db_get_ptr(gnutls_session_t session)
  * @session: is a #gnutls_session_t type.
  * @seconds: is the number of seconds.
  *
- * Set the expiration time for resumed sessions. The default is 3600
- * (one hour) at the time of this writing.
+ * Set the expiration time for resumed sessions. The default is 21600
+ * (size hours) at the time of writing.
+ *
+ * The maximum value that can be set using this function is 604800
+ * (7 days).
+ *
  **/
 void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds)
 {
 	session->internals.expire_time = seconds;
+	if (session->internals.expire_time > 604800)
+		session->internals.expire_time = 604800;
 }
 
 /**
