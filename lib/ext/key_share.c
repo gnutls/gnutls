@@ -26,7 +26,7 @@
 #include "gnutls_int.h"
 #include "errors.h"
 #include "num.h"
-#include <ext/ecc.h>
+#include "ext/supported_groups.h"
 #include <state.h>
 #include <num.h>
 #include <algorithms.h>

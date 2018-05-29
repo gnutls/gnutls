@@ -1224,7 +1224,7 @@ const gnutls_cipher_suite_entry_st
 		if (kx_algorithm == p->kx_algorithm &&
 			      cipher_algorithm == p->block_algorithm
 			      && mac_algorithm == p->mac_algorithm) {
-			ret = p; 
+			ret = p;
 			break;
 		}
 	);
@@ -1460,7 +1460,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	 * by RFC4492, probably to allow SSLv2 hellos negotiate elliptic curve
 	 * ciphersuites */
 	if (!version->tls13_sem && session->internals.cand_ec_group == NULL &&
-	    !_gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_SUPPORTED_ECC)) {
+	    !_gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_SUPPORTED_GROUPS)) {
 		session->internals.cand_ec_group = _gnutls_id_to_group(DEFAULT_EC_GROUP);
 	}
 
@@ -1655,11 +1655,11 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
  * @sidx: internal index of cipher suite to get information about.
  *
  * Provides the internal ciphersuite index to be used with
- * gnutls_cipher_suite_info(). The index @idx provided is an 
+ * gnutls_cipher_suite_info(). The index @idx provided is an
  * index kept at the priorities structure. It might be that a valid
- * priorities index does not correspond to a ciphersuite and in 
- * that case %GNUTLS_E_UNKNOWN_CIPHER_SUITE will be returned. 
- * Once the last available index is crossed then 
+ * priorities index does not correspond to a ciphersuite and in
+ * that case %GNUTLS_E_UNKNOWN_CIPHER_SUITE will be returned.
+ * Once the last available index is crossed then
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
  * Returns: On success it returns %GNUTLS_E_SUCCESS (0), or a negative error value otherwise.

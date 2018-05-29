@@ -115,7 +115,7 @@ typedef struct {
  */
 #define MAX_HANDSHAKE_PACKET_SIZE 128*1024
 
-/* The maximum digest size of hash algorithms. 
+/* The maximum digest size of hash algorithms.
  */
 #define MAX_FILENAME 512
 #define MAX_HASH_SIZE 64
@@ -316,8 +316,8 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_MAX_RECORD_SIZE = 0,
 	GNUTLS_EXTENSION_STATUS_REQUEST,
 	GNUTLS_EXTENSION_CERT_TYPE,
-	GNUTLS_EXTENSION_SUPPORTED_ECC,
-	GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
+	GNUTLS_EXTENSION_SUPPORTED_GROUPS,
+	GNUTLS_EXTENSION_SUPPORTED_EC_POINT_FORMATS,
 	GNUTLS_EXTENSION_SRP,
 	GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
 	GNUTLS_EXTENSION_SRTP,
@@ -456,7 +456,7 @@ typedef struct mbuffer_head_st {
 	size_t byte_length;
 } mbuffer_head_st;
 
-/* Store & Retrieve functions defines: 
+/* Store & Retrieve functions defines:
  */
 
 typedef struct auth_cred_st {
@@ -557,15 +557,15 @@ struct gnutls_key_st {
 	/* The key to encrypt and decrypt session tickets */
 	uint8_t session_ticket_key[TICKET_MASTER_KEY_SIZE];
 
-	/* this is used to hold the peers authentication data 
+	/* this is used to hold the peers authentication data
 	 */
-	/* auth_info_t structures SHOULD NOT contain malloced 
+	/* auth_info_t structures SHOULD NOT contain malloced
 	 * elements. Check gnutls_session_pack.c, and gnutls_auth.c.
 	 * Remember that this should be calloced!
 	 */
 	void *auth_info;
 	gnutls_credentials_type_t auth_info_type;
-	int auth_info_size;	/* needed in order to store to db for restoring 
+	int auth_info_size;	/* needed in order to store to db for restoring
 				 */
 	auth_cred_st *cred;	/* used to specify keys/certificates etc */
 };
@@ -664,7 +664,7 @@ typedef struct {
 	bool only_extension;	/* negotiated only with an extension */
 	bool post_handshake_auth;	/* Supports the TLS 1.3 post handshake auth */
 	bool key_shares;	/* TLS 1.3 key share key exchange */
-	/* 
+	/*
 	 * TLS versions modify the semantics of signature algorithms. This number
 	 * is there to distinguish signature algorithms semantics between versions
 	 * (maps to sign_algorithm_st->tls_sem)
@@ -690,13 +690,13 @@ typedef struct {
 
 #define MAX_VERIFY_DATA_SIZE 36	/* in SSL 3.0, 12 in TLS 1.0 */
 
-/* auth_info_t structures now MAY contain malloced 
+/* auth_info_t structures now MAY contain malloced
  * elements.
  */
 
 /* This structure and auth_info_t, are stored in the resume database,
  * and are restored, in case of resume.
- * Holds all the required parameters to resume the current 
+ * Holds all the required parameters to resume the current
  * session.
  */
 
@@ -717,7 +717,7 @@ typedef struct {
 	/* The epoch at index 0 of record_parameters. */
 	uint16_t epoch_min;
 
-	/* this is the ciphersuite we are going to use 
+	/* this is the ciphersuite we are going to use
 	 * moved here from internals in order to be restored
 	 * on resume;
 	 */
@@ -990,7 +990,7 @@ typedef struct {
 
 	unsigned int hsk_hello_verify_requests;
 
-	/* The actual retrans_timeout for the next message (e.g. doubled or so) 
+	/* The actual retrans_timeout for the next message (e.g. doubled or so)
 	 */
 	unsigned int actual_retrans_timeout_ms;
 
@@ -1024,7 +1024,7 @@ typedef struct {
 						 * the server finished message */
 	unsigned handshake_hash_buffer_client_finished_len;/* if non-zero it is the length of data until the
 						 * the client finished message */
-	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
+	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake
 						 * message */
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */
 
@@ -1089,7 +1089,7 @@ typedef struct {
 	/* this buffer holds a record packet -mostly used for
 	 * non blocking IO.
 	 */
-	mbuffer_head_st record_recv_buffer;	/* buffer holding the unparsed record that is currently 
+	mbuffer_head_st record_recv_buffer;	/* buffer holding the unparsed record that is currently
 						 * being received */
 	mbuffer_head_st record_send_buffer;	/* holds cached data
 						 * for the gnutls_io_write_buffered()
@@ -1116,7 +1116,7 @@ typedef struct {
 
 	/* this is the highest version available
 	 * to the peer. (advertized version).
-	 * This is obtained by the Handshake Client Hello 
+	 * This is obtained by the Handshake Client Hello
 	 * message. (some implementations read the Record version)
 	 */
 	uint8_t adv_version_major;
@@ -1397,7 +1397,7 @@ struct gnutls_session_int {
 };
 
 
-/* functions 
+/* functions
  */
 void _gnutls_free_auth_info(gnutls_session_t session);
 

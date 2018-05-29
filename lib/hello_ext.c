@@ -37,7 +37,8 @@
 #include <ext/safe_renegotiation.h>
 #include <ext/signature.h>
 #include <ext/safe_renegotiation.h>
-#include <ext/ecc.h>
+#include "ext/supported_groups.h"
+#include "ext/ec_point_formats.h"
 #include <ext/status_request.h>
 #include <ext/ext_master_secret.h>
 #include <ext/supported_versions.h>
@@ -76,8 +77,8 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 	[GNUTLS_EXTENSION_HEARTBEAT] = &ext_mod_heartbeat,
 #endif
 	[GNUTLS_EXTENSION_SESSION_TICKET] = &ext_mod_session_ticket,
-	[GNUTLS_EXTENSION_SUPPORTED_ECC] = &ext_mod_supported_ecc,
-	[GNUTLS_EXTENSION_SUPPORTED_ECC_PF] = &ext_mod_supported_ecc_pf,
+	[GNUTLS_EXTENSION_SUPPORTED_GROUPS] = &ext_mod_supported_groups,
+	[GNUTLS_EXTENSION_SUPPORTED_EC_POINT_FORMATS] = &ext_mod_supported_ec_point_formats,
 	[GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS] = &ext_mod_sig,
 	[GNUTLS_EXTENSION_KEY_SHARE] = &ext_mod_key_share,
 	[GNUTLS_EXTENSION_COOKIE] = &ext_mod_cookie,
@@ -748,9 +749,9 @@ _gnutls_hello_ext_get_resumed_priv(gnutls_session_t session,
  *
  * Since: 3.4.0
  **/
-int 
+int
 gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type,
-		    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
+		    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func,
 		    gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 		    gnutls_ext_unpack_func unpack_func)
 {
@@ -833,10 +834,10 @@ gnutls_ext_register(const char *name, int id, gnutls_ext_parse_type_t parse_type
  *
  * Since: 3.5.5
  **/
-int 
+int
 gnutls_session_ext_register(gnutls_session_t session,
 			    const char *name, int id, gnutls_ext_parse_type_t parse_type,
-			    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
+			    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func,
 			    gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 			    gnutls_ext_unpack_func unpack_func, unsigned flags)
 {

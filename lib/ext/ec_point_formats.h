@@ -19,16 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *
  */
-#ifndef EXT_ECC_H
-#define EXT_ECC_H
+#ifndef EXT_EC_POINT_FORMATS_H
+#define EXT_EC_POINT_FORMATS_H
 
 #include <hello_ext.h>
 
-extern const hello_ext_entry_st ext_mod_supported_ecc;
-extern const hello_ext_entry_st ext_mod_supported_ecc_pf;
-
-int
-_gnutls_session_supports_group(gnutls_session_t session,
-				unsigned int group);
+extern const hello_ext_entry_st ext_mod_supported_ec_point_formats;
 
 #endif
