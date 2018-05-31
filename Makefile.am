@@ -53,7 +53,7 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4 -I lib/unistring/m4
 
 EXTRA_DIST = cfg.mk maint.mk CONTRIBUTING.md README.md LICENSE AUTHORS NEWS \
-	ChangeLog THANKS INSTALL.md
+	ChangeLog THANKS INSTALL.md symbols.last
 
 pic-check:
 	@echo "Checking for position dependent code"
@@ -113,8 +113,8 @@ abi-check: .prev-tag-abi.stamp
 
 symbol-check:
 	@objdump -T $(builddir)/lib/.libs/libgnutls.so  | grep -v ' \*UND\*'  | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE | grep -v '^@' |  sort -u >symbols.last.tmp
-	@diff -u symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
-		diff -u symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
+	@diff -u $(srcdir)/symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
+		diff -u $(srcdir)symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
 		if grep -e '^-' symbols.diff.tmp;then \
 			echo "*******************************************"; \
 			echo "Symbols were removed from the library."; \
@@ -146,7 +146,7 @@ libopts-check:
 	@echo "Checking whether included libopts matches the system's. If the"
 	@echo "check fails upgrade the included libopts."
 	@echo "*****************************************************************"
-	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
+	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
 files-update: libopts-check
 	make -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
