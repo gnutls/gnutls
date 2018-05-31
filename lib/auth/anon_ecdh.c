@@ -37,7 +37,7 @@
 #include "mpi.h"
 #include <state.h>
 #include <auth/ecdhe.h>
-#include <ext/ecc.h>
+#include <ext/supported_groups.h>
 
 static int gen_anon_ecdh_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int proc_anon_ecdh_client_kx(gnutls_session_t, uint8_t *, size_t);

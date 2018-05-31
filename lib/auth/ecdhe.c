@@ -37,7 +37,7 @@
 #include <x509.h>
 #include <auth/ecdhe.h>
 #include <ecc.h>
-#include <ext/ecc.h>
+#include <ext/supported_groups.h>
 #include <algorithms.h>
 #include <auth/psk.h>
 #include <auth/cert.h>

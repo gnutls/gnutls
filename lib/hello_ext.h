@@ -24,7 +24,9 @@
 #ifndef GNUTLS_EXTENSIONS_H
 #define GNUTLS_EXTENSIONS_H
 
+#include "gnutls_int.h"
 #include <gnutls/gnutls.h>
+#include "str.h"
 
 /* Functions for hello extension parsing.
  */
@@ -136,7 +138,7 @@ typedef struct hello_ext_entry_st {
 	gnutls_ext_send_func send_func;
 
 	gnutls_ext_deinit_data_func deinit_func;	/* this will be called to deinitialize
-							 * internal data 
+							 * internal data
 							 */
 	gnutls_ext_pack_func pack_func;	/* packs internal data to machine independent format */
 	gnutls_ext_unpack_func unpack_func;	/* unpacks internal data */

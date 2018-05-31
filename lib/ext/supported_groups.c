@@ -21,62 +21,42 @@
  *
  */
 
-/* This file contains the code the Negotiated groups TLS 1.3, or
- * Elliptic curves TLS 1.2 extension.
+/* This file contains the code for the Supported Groups extension (rfc7919).
+ * This extension was previously named Supported Elliptic Curves under TLS 1.2.
  */
 
-#include "gnutls_int.h"
-#include "errors.h"
+#include "ext/supported_groups.h"
+#include "str.h"
 #include "num.h"
-#include <ext/ecc.h>
-#include <state.h>
-#include <num.h>
-#include <algorithms.h>
 #include "auth/psk.h"
 #include "auth/cert.h"
 #include "auth/anon.h"
+#include "algorithms.h"
+#include <gnutls/gnutls.h>
 
-static int _gnutls_supported_ecc_recv_params(gnutls_session_t session,
+
+static int _gnutls_supported_groups_recv_params(gnutls_session_t session,
 					     const uint8_t * data,
 					     size_t data_size);
-static int _gnutls_supported_ecc_send_params(gnutls_session_t session,
+static int _gnutls_supported_groups_send_params(gnutls_session_t session,
 					     gnutls_buffer_st * extdata);
 
-static int _gnutls_supported_ecc_pf_recv_params(gnutls_session_t session,
-						const uint8_t * data,
-						size_t data_size);
-static int _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
-						gnutls_buffer_st *
-						extdata);
 
-const hello_ext_entry_st ext_mod_supported_ecc = {
-	.name = "Negotiated Groups",
+const hello_ext_entry_st ext_mod_supported_groups = {
+	.name = "Supported Groups",
 	.tls_id = 10,
-	.gid = GNUTLS_EXTENSION_SUPPORTED_ECC,
+	.gid = GNUTLS_EXTENSION_SUPPORTED_GROUPS,
 	.parse_type = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
-	.recv_func = _gnutls_supported_ecc_recv_params,
-	.send_func = _gnutls_supported_ecc_send_params,
+	.recv_func = _gnutls_supported_groups_recv_params,
+	.send_func = _gnutls_supported_groups_send_params,
 	.pack_func = NULL,
 	.unpack_func = NULL,
 	.deinit_func = NULL,
 	.cannot_be_overriden = 1
 };
 
-const hello_ext_entry_st ext_mod_supported_ecc_pf = {
-	.name = "Supported ECC Point Formats",
-	.tls_id = 11,
-	.gid = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
-	.parse_type = GNUTLS_EXT_TLS,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS |
-		    GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
-	.recv_func = _gnutls_supported_ecc_pf_recv_params,
-	.send_func = _gnutls_supported_ecc_pf_send_params,
-	.pack_func = NULL,
-	.unpack_func = NULL,
-	.deinit_func = NULL
-};
 
 static unsigned get_min_dh(gnutls_session_t session)
 {
@@ -103,16 +83,16 @@ static unsigned get_min_dh(gnutls_session_t session)
 	return 0;
 }
 
-/* 
- * In case of a server: if a SUPPORTED_ECC extension type is received then it stores
+/*
+ * In case of a server: if a SUPPORTED_GROUPS extension type is received then it stores
  * into the session security parameters the new value. The server may use gnutls_session_certificate_type_get(),
  * to access it.
  *
- * In case of a client: If a supported_eccs have been specified then we send the extension.
+ * In case of a client: If supported_eccs have been specified then we send the extension.
  *
  */
 static int
-_gnutls_supported_ecc_recv_params(gnutls_session_t session,
+_gnutls_supported_groups_recv_params(gnutls_session_t session,
 				  const uint8_t * data, size_t _data_size)
 {
 	int i;
@@ -132,7 +112,7 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 		 * possible to read that message under TLS1.3 as an encrypted
 		 * extension. */
 		return 0;
-	} else {		/* SERVER SIDE - we must check if the sent supported ecc type is the right one 
+	} else {		/* SERVER SIDE - we must check if the sent supported ecc type is the right one
 				 */
 		if (data_size < 2)
 			return
@@ -233,7 +213,7 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 /* returns data_size or a negative number on failure
  */
 static int
-_gnutls_supported_ecc_send_params(gnutls_session_t session,
+_gnutls_supported_groups_send_params(gnutls_session_t session,
 				  gnutls_buffer_st * extdata)
 {
 	unsigned len, i;
@@ -254,7 +234,7 @@ _gnutls_supported_ecc_send_params(gnutls_session_t session,
 			for (i = 0; i < len; i++) {
 				p = session->internals.priorities->groups.entry[i]->tls_id;
 
-				_gnutls_handshake_log("EXT[%p]: sent group %s (0x%x)\n", session,
+				_gnutls_handshake_log("EXT[%p]: Sent group %s (0x%x)\n", session,
 					session->internals.priorities->groups.entry[i]->name, (unsigned)p);
 
 				ret =
@@ -270,84 +250,6 @@ _gnutls_supported_ecc_send_params(gnutls_session_t session,
 
 	return 0;
 }
-
-/* 
- * In case of a server: if a SUPPORTED_ECC extension type is received then it stores
- * into the session security parameters the new value. The server may use gnutls_session_certificate_type_get(),
- * to access it.
- *
- * In case of a client: If a supported_eccs have been specified then we send the extension.
- *
- */
-static int
-_gnutls_supported_ecc_pf_recv_params(gnutls_session_t session,
-				     const uint8_t * data,
-				     size_t _data_size)
-{
-	int len, i;
-	int uncompressed = 0;
-	int data_size = _data_size;
-
-	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if (data_size < 1)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
-
-		len = data[0];
-		if (len < 1)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
-
-		DECR_LEN(data_size, len + 1);
-
-		for (i = 1; i <= len; i++)
-			if (data[i] == 0) {	/* uncompressed */
-				uncompressed = 1;
-				break;
-			}
-
-		if (uncompressed == 0)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-	} else {
-		/* only sanity check here. We only support uncompressed points
-		 * and a client must support it thus nothing to check.
-		 */
-		if (_data_size < 1)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
-	}
-
-	return 0;
-}
-
-/* returns data_size or a negative number on failure
- */
-static int
-_gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
-				     gnutls_buffer_st * extdata)
-{
-	const uint8_t p[2] = { 0x01, 0x00 };	/* only support uncompressed point format */
-	int ret;
-
-	if (session->security_parameters.entity == GNUTLS_SERVER
-	    && !_gnutls_session_is_ecc(session))
-		return 0;
-
-	if (session->internals.priorities->groups.size > 0) {
-		ret = _gnutls_buffer_append_data(extdata, p, 2);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		return 2;
-	}
-	return 0;
-}
-
 
 /* Returns 0 if the given ECC curve is allowed in the current
  * session. A negative error value is returned otherwise.
