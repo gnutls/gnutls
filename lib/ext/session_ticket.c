@@ -198,18 +198,16 @@ _gnutls_decrypt_session_ticket(gnutls_session_t session,
 	struct ticket_st ticket;
 	int ret;
 
+	/* If the key name of the ticket does not match the one that we
+	   hold, issue a new ticket. */
+	if (ticket_data->size < TICKET_KEY_NAME_SIZE ||
+	    memcmp(ticket_data->data, &session->key.session_ticket_key[NAME_POS],
+		   TICKET_KEY_NAME_SIZE))
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
 	ret = unpack_ticket(ticket_data, &ticket);
 	if (ret < 0)
 		return ret;
-
-	/* If the key name of the ticket does not match the one that we
-	   hold, issue a new ticket. */
-	if (memcmp
-	    (ticket.key_name, &session->key.session_ticket_key[NAME_POS],
-	     TICKET_KEY_NAME_SIZE)) {
-		ret = GNUTLS_E_DECRYPTION_FAILED;
-		goto cleanup;
-	}
 
 	/* Check the integrity of ticket */
 	mac_secret.data = (void *) &session->key.session_ticket_key[MAC_SECRET_POS];
