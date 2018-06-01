@@ -230,6 +230,12 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned again)
 	if (session->internals.flags & GNUTLS_NO_TICKETS)
 		return gnutls_assert_val(0);
 
+	/* If we received the psk_key_exchange_modes extension which
+	 * does not have overlap with the server configuration, don't
+	 * send a session ticket */
+	if (session->internals.hsk_flags & HSK_PSK_KE_MODE_INVALID)
+		return gnutls_assert_val(0);
+
 	if (again == 0) {
 		memset(&ticket, 0, sizeof(tls13_ticket_t));
 

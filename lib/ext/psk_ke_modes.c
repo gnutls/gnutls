@@ -118,7 +118,7 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	int cli_dhpsk_pos = MAX_POS;
 	unsigned i;
 
-	/* Server doesn't send psk_key_exchange_modes */
+	/* Client doesn't receive psk_key_exchange_modes */
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
