@@ -466,7 +466,6 @@ static int server_recv_params(gnutls_session_t session,
 	int psk_index;
 	gnutls_datum_t binder_recvd = { NULL, 0 };
 	gnutls_datum_t key = {NULL, 0};
-	unsigned cand_index;
 	psk_ext_parser_st psk_parser;
 	struct psk_st psk;
 	psk_auth_info_t info;
@@ -481,43 +480,12 @@ static int server_recv_params(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 	}
 
-	psk_index = -1;
-
-	while ((ret = _gnutls13_psk_ext_parser_next_psk(&psk_parser, &psk)) >= 0) {
-		cand_index = ret;
-
-		/* Is this a PSK? */
-		if (psk.ob_ticket_age == 0) {
-			/* _gnutls_psk_pwd_find_entry() expects 0-terminated identities */
-			if (psk.identity.size > 0 && psk.identity.size <= MAX_USERNAME_SIZE) {
-				char identity_str[psk.identity.size + 1];
-
-				prf = pskcred->binder_algo;
-
-				memcpy(identity_str, psk.identity.data, psk.identity.size);
-				identity_str[psk.identity.size] = 0;
-
-				/* this fails only on configuration errors; as such we always
-				 * return its error code in that case */
-				ret = _gnutls_psk_pwd_find_entry(session, identity_str, &key);
-				if (ret < 0)
-					return gnutls_assert_val(ret);
-
-				psk_index = cand_index;
-				resuming = 0;
-				break;
-			}
-		}
-
-		/* Is this a session ticket? */
+	while ((psk_index = _gnutls13_psk_ext_parser_next_psk(&psk_parser, &psk)) >= 0) {
+		/* This will unpack the session ticket if it is well
+		 * formed and has the expected name */
 		if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
 		    (ret = _gnutls13_unpack_session_ticket(session, &psk.identity, &ticket_data)) == 0) {
 			prf = ticket_data.prf;
-
-			if (!prf) {
-				tls13_ticket_deinit(&ticket_data);
-				continue;
-			}
 
 			/* Check whether ticket is stale or not */
 			ticket_age = psk.ob_ticket_age - ticket_data.age_add;
@@ -539,8 +507,25 @@ static int server_recv_params(gnutls_session_t session,
 
 			tls13_ticket_deinit(&ticket_data);
 
-			psk_index = cand_index;
 			resuming = 1;
+			break;
+		} else if (psk.ob_ticket_age == 0 &&
+			   psk.identity.size > 0 && psk.identity.size <= MAX_USERNAME_SIZE) {
+			/* _gnutls_psk_pwd_find_entry() expects 0-terminated identities */
+			char identity_str[psk.identity.size + 1];
+
+			prf = pskcred->binder_algo;
+
+			memcpy(identity_str, psk.identity.data, psk.identity.size);
+			identity_str[psk.identity.size] = 0;
+
+			/* this fails only on configuration errors; as such we always
+			 * return its error code in that case */
+			ret = _gnutls_psk_pwd_find_entry(session, identity_str, &key);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			resuming = 0;
 			break;
 		}
 	}

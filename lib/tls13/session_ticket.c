@@ -112,7 +112,7 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_t *
 	/* Check if the MAC ID we got is valid */
 	prf = _gnutls_mac_to_entry(kdf);
 	if (prf == NULL)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	/* Read the ticket age add and the ticket lifetime */
 	DECR_LEN(len, 4);
@@ -133,7 +133,7 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_t *
 
 	/* Check if the size of resumption_master_secret matches the PRF */
 	if (resumption_master_secret_size != prf->output_size)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	DECR_LEN(len, resumption_master_secret_size);
 	memcpy(resumption_master_secret, p, resumption_master_secret_size);
