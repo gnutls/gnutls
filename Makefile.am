@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --disable-valgrind-tests
+DISTCHECK_CONFIGURE_FLAGS = --enable-doc --enable-gtk-doc --disable-valgrind-tests
 
 SUBDIRS = gl lib extra
 
