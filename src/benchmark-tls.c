@@ -43,20 +43,22 @@
 
 const char *side = "";
 
-#define PRIO_DHE_RSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+DHE-RSA:+GROUP-FFDHE3072"
-#define PRIO_ECDH "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
-#define PRIO_ECDH_X25519 "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
-#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
-#define PRIO_ECDH_X25519_ECDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
-#define PRIO_ECDH_X25519_EDDSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-EDDSA-ED25519:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
+#define PRIO_DHE_RSA "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+DHE-RSA:+GROUP-FFDHE3072"
+#define PRIO_ECDH "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
+#define PRIO_ECDH_X25519 "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-X25519"
+#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
+#define PRIO_ECDH_X25519_ECDSA "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
+#define PRIO_ECDH_X25519_EDDSA "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-EDDSA-ED25519:+COMP-NULL:+ECDHE-ECDSA:+CURVE-X25519"
 #define PRIO_RSA "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_ECDH_RSA_PSS "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-RSA-PSS-SHA256:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
+#define PRIO_ECDH_RSA_PSS "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-RSA-PSS-SHA256:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
 
 
 #define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_AES_CCM "NONE:+VERS-TLS1.2:+AES-128-CCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_CHACHA_POLY1305 "NONE:+VERS-TLS1.2:+CHACHA20-POLY1305:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-ALL"
+#define PRIO_TLS12_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_AES_GCM "NONE:+VERS-TLS1.3:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define PRIO_AES_CCM "NONE:+VERS-TLS1.3:+AES-128-CCM:+AEAD:+SIGN-ALL:+COMP-NULL:+GROUP-ALL"
+#define PRIO_TLS12_CHACHA_POLY1305 "NONE:+VERS-TLS1.2:+CHACHA20-POLY1305:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-ALL"
+#define PRIO_CHACHA_POLY1305 "NONE:+VERS-TLS1.3:+CHACHA20-POLY1305:+AEAD:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-ALL"
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 static const int rsa_bits = 3072, ec_bits = 256;
@@ -249,6 +251,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	int ret;
 	struct benchmark_st st;
 	gnutls_packet_t packet;
+	const char *name;
 
 	/* Init server */
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
@@ -292,10 +295,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 
 	HANDSHAKE(client, server);
 
-	fprintf(stdout, "%38s  ",
-		gnutls_cipher_suite_get_name(gnutls_kx_get(server),
-					     gnutls_cipher_get(server),
-					     gnutls_mac_get(server)));
+	name = gnutls_cipher_get_name(gnutls_cipher_get(server));
+	fprintf(stdout, "%30s - %s  ", name, gnutls_protocol_get_name(
+		gnutls_protocol_get_version(server)));
 	fflush(stdout);
 
 	gnutls_rnd(GNUTLS_RND_NONCE, buffer, sizeof(buffer));
@@ -531,8 +533,10 @@ void benchmark_tls(int debug_level, int ciphers)
 		    ("Testing throughput in cipher/MAC combinations (payload: %d bytes)\n",
 		     size);
 
+		test_ciphersuite(PRIO_TLS12_AES_GCM, size);
 		test_ciphersuite(PRIO_AES_GCM, size);
 		test_ciphersuite(PRIO_AES_CCM, size);
+		test_ciphersuite(PRIO_TLS12_CHACHA_POLY1305, size);
 		test_ciphersuite(PRIO_CHACHA_POLY1305, size);
 		test_ciphersuite(PRIO_AES_CBC_SHA1, size);
 		test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
@@ -541,8 +545,10 @@ void benchmark_tls(int debug_level, int ciphers)
 		printf
 		    ("\nTesting throughput in cipher/MAC combinations (payload: %d bytes)\n",
 		     size);
+		test_ciphersuite(PRIO_TLS12_AES_GCM, size);
 		test_ciphersuite(PRIO_AES_GCM, size);
 		test_ciphersuite(PRIO_AES_CCM, size);
+		test_ciphersuite(PRIO_TLS12_CHACHA_POLY1305, size);
 		test_ciphersuite(PRIO_CHACHA_POLY1305, size);
 		test_ciphersuite(PRIO_AES_CBC_SHA1, size);
 		test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
