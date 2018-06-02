@@ -1220,6 +1220,7 @@ GNUTLS_3_6_3
 	gnutls_pkcs11_token_get_ptr;
 	gnutls_pkcs11_obj_get_ptr;
 	gnutls_session_ticket_send;
+	gnutls_aead_cipher_encryptv;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {

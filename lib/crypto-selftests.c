@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Red Hat
+ * Copyright (C) 2013-2018 Red Hat
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -660,6 +660,191 @@ static int test_cipher_aead_compat(gnutls_cipher_algorithm_t cipher,
 
 }
 
+#define IOV_PARTS 8
+/* AEAD modes - scatter read */
+static int test_cipher_aead_scatter(gnutls_cipher_algorithm_t cipher,
+				    const struct cipher_aead_vectors_st *vectors,
+				    size_t vectors_size, unsigned flags)
+{
+	gnutls_aead_cipher_hd_t hd;
+	int ret;
+	unsigned int i, z;
+	uint8_t tmp[384];
+	gnutls_datum_t key, iv;
+	size_t s;
+	unsigned tag_size;
+	giovec_t auth_iov[IOV_PARTS];
+	int auth_iov_len;
+	int iov_len;
+	giovec_t iov[IOV_PARTS];
+
+	_gnutls_debug_log("running scatter (iovec) tests for: %s\n",
+				  gnutls_cipher_get_name(cipher));
+
+	for (i = 0; i < vectors_size; i++) {
+		memset(tmp, 0, sizeof(tmp));
+		key.data = (void *) vectors[i].key;
+		key.size = vectors[i].key_size;
+
+		iv.data = (void *) vectors[i].iv;
+		iv.size = vectors[i].iv_size;
+		tag_size = vectors[i].tag_size;
+
+		if (tag_size > gnutls_cipher_get_tag_size(cipher)) {
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		ret = gnutls_aead_cipher_init(&hd, cipher, &key);
+		if (ret < 0) {
+			_gnutls_debug_log("error initializing: %s\n",
+					  gnutls_cipher_get_name(cipher));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		s = sizeof(tmp);
+
+		/* single vector */
+		auth_iov_len = 1;
+		auth_iov[0].iov_base = (void*)vectors[i].auth;
+		auth_iov[0].iov_len = vectors[i].auth_size;
+
+		iov_len = 1;
+		iov[0].iov_base = (void*)vectors[i].plaintext;
+		iov[0].iov_len = vectors[i].plaintext_size;
+
+		ret =
+		    gnutls_aead_cipher_encryptv(hd,
+						iv.data, iv.size,
+						auth_iov, auth_iov_len,
+						vectors[i].tag_size,
+						iov, iov_len,
+						tmp, &s);
+		if (ret < 0)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_SELF_TEST_ERROR);
+
+		if (s != vectors[i].plaintext_size + tag_size) {
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (memcmp(tmp+vectors[i].plaintext_size, vectors[i].tag, tag_size) != 0) {
+			_gnutls_debug_log
+			    ("%s test vector %d failed (tag)!\n",
+			     gnutls_cipher_get_name(cipher), i);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (vectors[i].plaintext_size > 0) {
+			if (memcmp
+			    (tmp, vectors[i].ciphertext,
+			     vectors[i].plaintext_size) != 0) {
+				_gnutls_debug_log
+				    ("%s test vector %d failed!\n",
+				     gnutls_cipher_get_name(cipher), i);
+
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_SELF_TEST_ERROR);
+			}
+		}
+
+		/* multi-vector */
+		auth_iov_len = 0;
+		if (vectors[i].auth_size > IOV_PARTS) {
+			unsigned split = vectors[i].auth_size / IOV_PARTS;
+			assert(split>0);
+			for (z=0;z<IOV_PARTS;z++) {
+				auth_iov[z].iov_base = (void*)(vectors[i].auth+(z*split));
+				if (z==IOV_PARTS-1)
+					auth_iov[z].iov_len = vectors[i].auth_size - z*split;
+				else
+					auth_iov[z].iov_len = split;
+				auth_iov_len++;
+			}
+		} else {
+			auth_iov_len = 1;
+			auth_iov[0].iov_base = (void*)vectors[i].auth;
+			auth_iov[0].iov_len = vectors[i].auth_size;
+		}
+
+		iov_len = 0;
+		if (vectors[i].plaintext_size > IOV_PARTS) {
+			unsigned split = vectors[i].plaintext_size / IOV_PARTS;
+			assert(split>0);
+
+			for (z=0;z<IOV_PARTS;z++) {
+				iov[z].iov_base = (void*)(vectors[i].plaintext+(z*split));
+				if (z==IOV_PARTS-1)
+					iov[z].iov_len = vectors[i].plaintext_size - z*split;
+				else
+					iov[z].iov_len = split;
+				iov_len++;
+			}
+		} else {
+			iov_len = 1;
+			iov[0].iov_base = (void*)vectors[i].plaintext;
+			iov[0].iov_len = vectors[i].plaintext_size;
+		}
+
+		s = sizeof(tmp);
+
+		ret =
+		    gnutls_aead_cipher_encryptv(hd,
+						iv.data, iv.size,
+						auth_iov, auth_iov_len,
+						vectors[i].tag_size,
+						iov, iov_len,
+						tmp, &s);
+		if (ret < 0)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_SELF_TEST_ERROR);
+
+		if (s != vectors[i].plaintext_size + tag_size) {
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (memcmp(tmp+vectors[i].plaintext_size, vectors[i].tag, tag_size) != 0) {
+			_gnutls_debug_log
+			    ("%s test vector %d failed (tag)!\n",
+			     gnutls_cipher_get_name(cipher), i);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (vectors[i].plaintext_size > 0) {
+			if (memcmp
+			    (tmp, vectors[i].ciphertext,
+			     vectors[i].plaintext_size) != 0) {
+				_gnutls_debug_log
+				    ("%s test vector %d failed!\n",
+				     gnutls_cipher_get_name(cipher), i);
+
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_SELF_TEST_ERROR);
+			}
+		}
+
+
+
+		gnutls_aead_cipher_deinit(hd);
+	}
+
+	_gnutls_debug_log
+	    ("%s scatter self check succeeded\n",
+	     gnutls_cipher_get_name(cipher));
+
+	if (flags & GNUTLS_SELF_TEST_FLAG_NO_COMPAT)
+		return 0;
+	else
+		return test_cipher_aead_compat(cipher, vectors, vectors_size);
+}
+
 /* AEAD modes */
 static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 			    const struct cipher_aead_vectors_st *vectors,
@@ -792,12 +977,9 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 	    ("%s self check succeeded\n",
 	     gnutls_cipher_get_name(cipher));
 
-	/* test the compatibility APIs */
-	if (flags & GNUTLS_SELF_TEST_FLAG_NO_COMPAT)
-		return 0;
-	else
-		return test_cipher_aead_compat(cipher, vectors, vectors_size);
+	return test_cipher_aead_scatter(cipher, vectors, vectors_size, flags);
 }
+
 
 
 struct hash_vectors_st {

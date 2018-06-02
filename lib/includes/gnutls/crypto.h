@@ -84,6 +84,14 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 			   const void *ptext, size_t ptext_len,
 			   void *ctext, size_t *ctext_len);
 
+int
+gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
+			    const void *nonce, size_t nonce_len,
+			    const giovec_t *auth_iov, int auth_iovcnt,
+			    size_t tag_size,
+			    const giovec_t *iov, int iovcnt,
+			    void *ctext, size_t *ctext_len);
+
 void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle);
 
 /* Hash - MAC API */

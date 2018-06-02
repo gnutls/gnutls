@@ -23,10 +23,36 @@ to the random number generation. For a low-level crypto API the usage of nettle
 @cindex symmetric cryptography
 
 The available functions to access symmetric crypto algorithms operations
-are shown below. The supported algorithms are the algorithms required by the TLS protocol.
-They are listed in @ref{gnutls_cipher_algorithm_t}.
+are listed in the sections below. The supported algorithms are the algorithms required by the TLS protocol.
+They are listed in @ref{gnutls_cipher_algorithm_t}. Note that there two
+types of ciphers, the ones providing an authenticated-encryption with
+associated data (AEAD), and the legacy ciphers which provide raw access
+to the ciphers. We recommend the use of the AEAD APIs for new applications
+as it is designed to minimize misuse of cryptography.
 
 @showenumdesc{gnutls_cipher_algorithm_t,The supported ciphers.}
+
+@subheading Authenticated-encryption API
+
+The AEAD API provides access to all ciphers supported by GnuTLS which support
+authenticated encryption with associated data. That is particularly suitable
+for message or packet-encryption as it provides authentication and
+encryption on the same API. See @code{RFC5116} for more information on
+authenticated encryption.
+
+@showfuncD{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_deinit}
+
+Because the encryption function above may be difficult to use with
+scattered data, we provide the following API.
+
+@showfuncdesc{gnutls_aead_cipher_encryptv}
+
+@subheading Legacy API
+
+The legacy API provides low-level access to all legacy ciphers supported by GnuTLS,
+and some of the AEAD ciphers (e.g., AES-GCM and CHACHA20). The restrictions
+of the nettle library implementation of the ciphers apply verbatim to this
+API@footnote{See the nettle manual @url{https://www.lysator.liu.se/~nisse/nettle/nettle.html}}.
 
 @showfuncE{gnutls_cipher_init,gnutls_cipher_encrypt2,gnutls_cipher_decrypt2,gnutls_cipher_set_iv,gnutls_cipher_deinit}
 
@@ -35,8 +61,6 @@ While the latter two functions allow the same API can be used with authenticated
 it is recommended to use the following functions which are solely for AEAD ciphers. The latter
 API is designed to be simple to use and also hard to misuse, by handling the tag verification
 and addition in transparent way.
-
-@showfuncD{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_deinit}
 
 @node Public key algorithms
 @section Public key algorithms
