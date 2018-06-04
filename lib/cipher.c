@@ -495,44 +495,47 @@ encrypt_packet_tls13(gnutls_session_t session,
 	return cipher_size;
 }
 
-static void dummy_wait(record_parameters_st * params,
-		       gnutls_datum_t * plaintext, unsigned pad_failed,
-		       unsigned int pad, unsigned total)
+static void dummy_wait(record_parameters_st *params,
+		       gnutls_datum_t *plaintext,
+		       unsigned int mac_data, unsigned int max_mac_data)
 {
 	/* this hack is only needed on CBC ciphers when Encrypt-then-MAC mode
 	 * is not supported by the peer. */
 	if (_gnutls_cipher_type(params->cipher) == CIPHER_BLOCK) {
-		unsigned len, v;
+		unsigned v;
+		unsigned int tag_size =
+		    _gnutls_auth_cipher_tag_len(&params->read.ctx.tls12);
+		unsigned hash_block = _gnutls_mac_block_size(params->mac);
 
-		/* force an additional hash compression function evaluation to prevent timing 
+		/* force additional hash compression function evaluations to prevent timing
 		 * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
 		 */
-		if (pad_failed == 0 && pad > 0) {
-			len = _gnutls_mac_block_size(params->mac);
-			if (len > 0) {
-				if (params->mac && params->mac->id == GNUTLS_MAC_SHA384)
-					/* v = 1 for the hash function padding + 16 for message length */
-					v = 17;
-				else /* v = 1 for the hash function padding + 8 for message length */
-					v = 9;
 
-				if ((pad + total) % len > len - v
-				    && total % len <= len - v) {
-					if (len < plaintext->size)
-						_gnutls_auth_cipher_add_auth
-						    (&params->read.
-						     ctx.tls12,
-						     plaintext->data, len);
-					else
-						_gnutls_auth_cipher_add_auth
-						    (&params->read.
-						     ctx.tls12,
-						     plaintext->data,
-						     plaintext->size);
-				}
+		if (params->mac && params->mac->id == GNUTLS_MAC_SHA384)
+			/* v = 1 for the hash function padding + 16 for message length */
+			v = 17;
+		else /* v = 1 for the hash function padding + 8 for message length */
+			v = 9;
+
+		if (hash_block > 0) {
+			int max_blocks = (max_mac_data+v+hash_block-1)/hash_block;
+			int hashed_blocks = (mac_data+v+hash_block-1)/hash_block;
+			unsigned to_hash;
+
+			max_blocks -= hashed_blocks;
+			if (max_blocks < 1)
+				return;
+
+			to_hash = max_blocks * hash_block;
+			if ((unsigned)to_hash+1+tag_size < plaintext->size) {
+				_gnutls_auth_cipher_add_auth
+					    (&params->read.ctx.tls12,
+					     plaintext->data+plaintext->size-tag_size-to_hash-1,
+					     to_hash);
 			}
 		}
 	}
+
 }
 
 /* Deciphers the ciphertext packet, and puts the result to plain.
@@ -859,8 +862,9 @@ decrypt_packet(gnutls_session_t session,
 		if (unlikely
 		    (gnutls_memcmp(tag, tag_ptr, tag_size) != 0 || pad_failed != 0)) {
 			/* HMAC was not the same. */
-			dummy_wait(params, plain, pad_failed, pad,
-				   length + preamble_size);
+			dummy_wait(params, plain,
+				   length + preamble_size,
+				   preamble_size + ciphertext->size - tag_size - 1);
 
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}
