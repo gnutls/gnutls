@@ -439,7 +439,7 @@ $(FUNCS): stamp_functions
 
 compare-exported:
 	rm -f tmp-exp-$@ tmp-head-$@
-	for i in $(top_srcdir)/libdane/includes/gnutls/*.h $(top_srcdir)/lib/includes/gnutls/*.h;do perl $(srcdir)/scripts/getfuncs.pl <$$i >>tmp-head-$@;done
+	for i in $(top_srcdir)/libdane/includes/gnutls/*.h $(top_srcdir)/lib/includes/gnutls/*.h $(top_builddir)/lib/includes/gnutls/*.h;do perl $(srcdir)/scripts/getfuncs.pl <$$i >>tmp-head-$@;done
 	sort -u tmp-head-$@ > tmp2-head-$@
 	mv tmp2-head-$@ tmp-head-$@
 	$(srcdir)/scripts/getfuncs-map.pl <$(top_srcdir)/lib/libgnutls.map >tmp-exp-$@
