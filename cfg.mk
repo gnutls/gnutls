@@ -64,7 +64,6 @@ gl_public_submodule_commit =
 
 autoreconf:
 	./bootstrap
-	touch ChangeLog
 
 update-po: refresh-po
 	git add $(PODIR)/*.po
@@ -109,6 +108,8 @@ clang-copy:
 
 # Release
 
+# ChangeLog must be PHONY, else it isn't generated on 'make distcheck'
+.PHONY: ChangeLog
 ChangeLog:
 	git log --no-merges --no-decorate --pretty  --since="2014 November 07"|grep -v ^'commit' > ChangeLog
 

@@ -166,9 +166,8 @@ dist-hook: libopts-check symbol-check
 	make -C doc/ compare-makefile
 	make -C doc/ compare-exported
 	make -C doc/manpages compare-makefile
-	rm -f ChangeLog
 	make ChangeLog
-	cp -f ChangeLog $(distdir)/
+	mv ChangeLog $(distdir)
 	$(SED) 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
 	$(SED) 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
 	$(SED) 's/\@PACKAGE_BUGREPORT\@/$(PACKAGE_BUGREPORT)/g' -i $(distdir)/src/args-std.def
