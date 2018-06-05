@@ -84,7 +84,7 @@ static void client(int fd)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_NO_TICKETS);
 
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
@@ -148,7 +148,7 @@ static int hellos_callback(gnutls_session_t session, unsigned int htype,
 		fail("PSK extension seen in client hello with no PSK!\n");
 
 	if (find_client_extension(msg, TLS_EXT_PSK_KE, NULL, NULL))
-		fail("PSK extension seen in client hello with no PSK!\n");
+		fail("PSK KE extension seen in client hello with no PSK!\n");
 
 	return 0;
 }
