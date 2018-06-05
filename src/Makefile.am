@@ -28,6 +28,11 @@ BUILT_SOURCES = srptool-args.c srptool-args.h \
 	tpmtool-args.c tpmtool-args.h systemkey-args.c systemkey-args.h \
 	mech-list.h
 
+DISTCLEANFILES =$(BUILT_SOURCES) \
+	certtool-args.stamp cli-debug-args.stamp cli-args.stamp tpmtool-args.stamp \
+	systemkey-args.stamp srptool-args.stamp ocsptool-args.stamp p11tool-args.stamp \
+	danetool-args.stamp serv-args.stamp psktool-args.stamp
+
 EXTRA_DIST = args-std.def gen-mech-list.sh
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
