@@ -28,26 +28,6 @@
 #define PSK_KE 0
 #define PSK_DHE_KE 1
 
-/* Relevant to client only */
-static bool
-psk_ke_modes_is_required(gnutls_session_t session)
-{
-	gnutls_psk_client_credentials_t cred;
-
-	if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
-	    session->internals.tls13_ticket.ticket.data != NULL)
-		return 1;
-
-	if (session->internals.priorities->have_psk) {
-		cred = (gnutls_psk_client_credentials_t)
-				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
-		if (cred && _gnutls_have_psk_credentials(cred, session))
-			return 1;
-	}
-
-	return 0;
-}
-
 static int
 psk_ke_modes_send_params(gnutls_session_t session,
 			 gnutls_buffer_t extdata)
@@ -63,7 +43,10 @@ psk_ke_modes_send_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return 0;
 
-	if (!psk_ke_modes_is_required(session))
+	/* If session ticket is disabled and no PSK key exchange is
+	 * enabled, don't send the extension */
+	if ((session->internals.flags & GNUTLS_NO_TICKETS) &&
+	    !session->internals.priorities->have_psk)
 		return 0;
 
 	vers = _gnutls_version_max(session);
@@ -135,7 +118,7 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	int cli_dhpsk_pos = MAX_POS;
 	unsigned i;
 
-	/* Server doesn't send psk_key_exchange_modes */
+	/* Client doesn't receive psk_key_exchange_modes */
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
