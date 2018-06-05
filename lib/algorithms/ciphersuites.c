@@ -1405,6 +1405,14 @@ const char *gnutls_cipher_suite_info(size_t idx,
 					continue; \
 			}
 
+#define CIPHER_CHECK(algo) \
+			if (session->internals.priorities->force_etm && !have_etm) { \
+				const cipher_entry_st *_cipher; \
+				_cipher = cipher_to_entry(algo); \
+				if (_cipher == NULL || _gnutls_cipher_type(_cipher) == CIPHER_BLOCK) \
+					continue; \
+			}
+
 #define KX_SRP_CHECKS(kx, action) \
 	if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) { \
 		if (!_gnutls_get_cred(session, GNUTLS_CRD_SRP)) { \
@@ -1450,10 +1458,19 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	gnutls_credentials_type_t cred_type = GNUTLS_CRD_CERTIFICATE; /* default for TLS1.3 */
 	unsigned int no_cert_found = 0;
 	const gnutls_group_entry_st *sgroup = NULL;
+	gnutls_ext_priv_data_t epriv;
+	unsigned have_etm = 0;
 
 	if (version == NULL) {
 		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 	}
+
+	/* we figure whether etm is negotiated by checking the raw extension data
+	 * because we only set (security_params) EtM to true only after the ciphersuite is
+	 * negotiated. */
+	ret = _gnutls_hello_ext_get_priv(session, GNUTLS_EXTENSION_ETM, &epriv);
+	if (ret >= 0 && ((intptr_t)epriv) != 0)
+		have_etm = 1;
 
 	/* If we didn't receive the supported_groups extension, then
 	 * we should assume that SECP256R1 is supported; that is required
@@ -1473,6 +1490,8 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 			VERSION_CHECK(peer_clist->entry[i]);
 
 			kx = peer_clist->entry[i]->kx_algorithm;
+
+			CIPHER_CHECK(peer_clist->entry[i]->block_algorithm);
 
 			if (!version->tls13_sem)
 				cred_type = _gnutls_map_kx_get_cred(kx, 1);
@@ -1509,6 +1528,8 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	} else {
 		for (j = 0; j < session->internals.priorities->cs.size; j++) {
 			VERSION_CHECK(session->internals.priorities->cs.entry[j]);
+
+			CIPHER_CHECK(session->internals.priorities->cs.entry[j]->block_algorithm);
 
 			for (i = 0; i < peer_clist->size; i++) {
 				_gnutls_debug_log("checking %.2x.%.2x (%s) for compatibility\n",

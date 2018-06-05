@@ -1825,7 +1825,6 @@ read_server_hello(gnutls_session_t session,
 	 */
 	if (!vers->tls13_sem &&
 	    client_check_if_resuming(session, session_id, session_id_len) == 0) {
-
 		ret =
 		    _gnutls_parse_hello_extensions(session, GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 						   GNUTLS_EXT_MANDATORY,
@@ -1877,6 +1876,14 @@ read_server_hello(gnutls_session_t session,
 					   &data[pos], len);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	/* check if EtM is required */
+	if (!vers->tls13_sem && session->internals.priorities->force_etm && !session->security_parameters.etm) {
+		const cipher_entry_st *cipher = cipher_to_entry(session->security_parameters.cs->block_algorithm);
+		if (_gnutls_cipher_type(cipher) == CIPHER_BLOCK)
+			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+	}
+
 
 	ret =
 	    _gnutls_parse_hello_extensions(session,

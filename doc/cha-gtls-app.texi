@@ -1350,6 +1350,10 @@ in certificates.
 will disable the encrypt-then-mac TLS extension (RFC7366). This is
 implied by the %COMPAT keyword.
 
+@item %FORCE_ETM @tab
+negotiate CBC ciphersuites only when both sides of the connection support
+encrypt-then-mac TLS extension (RFC7366).
+
 @item %DISABLE_SAFE_RENEGOTIATION @tab
 will completely disable safe renegotiation
 completely.  Do not use unless you know what you are doing.

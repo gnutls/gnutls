@@ -809,6 +809,10 @@ static void enable_no_etm(gnutls_priority_t c)
 {
 	c->_no_etm = 1;
 }
+static void enable_force_etm(gnutls_priority_t c)
+{
+	c->force_etm = 1;
+}
 static void enable_no_tickets(gnutls_priority_t c)
 {
 	c->no_tickets = 1;
