@@ -312,6 +312,7 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
 	uint8_t value;
 	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
 	gnutls_datum_t t;
+	size_t val;
 
 	if (unlikely(buf == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -322,14 +323,16 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
 	_gnutls_handshake_log("HSK[%p]: parsing session ticket message\n", session);
 
 	/* ticket_lifetime */
-	ret = _gnutls_buffer_pop_prefix32(buf, (size_t *) &ticket->lifetime, 0);
+	ret = _gnutls_buffer_pop_prefix32(buf, &val, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+	ticket->lifetime = val;
 
 	/* ticket_age_add */
-	ret = _gnutls_buffer_pop_prefix32(buf, (size_t *) &ticket->age_add, 0);
+	ret = _gnutls_buffer_pop_prefix32(buf, &val, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+	ticket->age_add = val;
 
 	/* ticket_nonce */
 	ret = _gnutls_buffer_pop_prefix8(buf, &value, 0);
