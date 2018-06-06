@@ -96,10 +96,10 @@ glimport: unistringimport
 # Code Coverage
 
 clang:
-	make clean
+	$(MAKE) clean
 	scan-build ./configure
 	rm -rf scan.tmp
-	scan-build -o scan.tmp make
+	scan-build -o scan.tmp $(MAKE)
 
 clang-copy:
 	rm -fv `find $(htmldir)/clang -type f | grep -v CVS`
@@ -129,14 +129,14 @@ web:
 	echo generating documentation for $(PACKAGE)
 	mkdir -p $(htmldir)/manual
 	mkdir -p $(htmldir)/reference
-	make -C doc gnutls.html
+	$(MAKE) -C doc gnutls.html
 	cd doc && cp gnutls.html *.png ../$(htmldir)/manual/
 	cd doc && makeinfo --html --split=node -o ../$(htmldir)/manual/html_node/ --css-include=./texinfo.css gnutls.texi
 	cd doc && cp *.png ../$(htmldir)/manual/html_node/
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(htmldir)/manual/html_node/*.html $(htmldir)/manual/gnutls.html
-	-cd doc && make gnutls.epub && cp gnutls.epub ../$(htmldir)/manual/
-	cd doc/latex && make gnutls.pdf && cp gnutls.pdf ../../$(htmldir)/manual/
-	make -C doc gnutls-guile.html gnutls-guile.pdf
+	-cd doc && $(MAKE) gnutls.epub && cp gnutls.epub ../$(htmldir)/manual/
+	cd doc/latex && $(MAKE) gnutls.pdf && cp gnutls.pdf ../../$(htmldir)/manual/
+	$(MAKE) -C doc gnutls-guile.html gnutls-guile.pdf
 	cd doc && makeinfo --html --split=node -o ../$(htmldir)/manual/gnutls-guile/ --css-include=./texinfo.css gnutls-guile.texi
 	cd doc && cp gnutls-guile.pdf gnutls-guile.html ../$(htmldir)/manual/
 	-cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp* doc/reference/html/*.css $(htmldir)/reference/

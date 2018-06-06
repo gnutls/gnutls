@@ -76,7 +76,7 @@ ABIVER=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tag
 	@echo "Creating ABI for $(ABIVER)"
 	cd $(ABI_TMPCLONEDIR) && \
 	  git checkout $(ABIREF) && \
-	  make autoreconf && if test -f ../cache/config.cache;then\
+	  $(MAKE) autoreconf && if test -f ../cache/config.cache;then\
 	    CFLAGS="-g -Og" ./configure --disable-doc --cache-file ../cache/config.cache;\
 	  else\
 	    CFLAGS="-g -Og" ./configure --disable-doc;\
@@ -149,9 +149,9 @@ libopts-check:
 	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
 files-update: libopts-check
-	make -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
-	make -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
-	make -C . symbol-check || mv symbols.last.tmp symbols.last
+	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
+	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
+	$(MAKE) -C . symbol-check || mv symbols.last.tmp symbols.last
 	@echo "******************************************************************************************"
 	@echo "updating autogen files in src/"
 	@echo "******************************************************************************************"
@@ -163,10 +163,10 @@ files-update: libopts-check
 	@echo "******************************************************************************************"
 
 dist-hook: libopts-check symbol-check
-	make -C doc/ compare-makefile
-	make -C doc/ compare-exported
-	make -C doc/manpages compare-makefile
-	make ChangeLog
+	$(MAKE) -C doc/ compare-makefile
+	$(MAKE) -C doc/ compare-exported
+	$(MAKE) -C doc/manpages compare-makefile
+	$(MAKE) ChangeLog
 	mv ChangeLog $(distdir)
 	$(SED) 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
 	$(SED) 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
