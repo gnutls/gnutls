@@ -100,6 +100,8 @@ void doit(void)
 	_rnd_system_entropy_deinit();
 }
 #else
+void doit(void); /* prototype to avoid warning with -Wmissing-prototypes */
+
 void doit(void)
 {
 	exit(77);

@@ -277,7 +277,7 @@ static void start(const char *name, const char *prio, const char *user, const ch
 	int ret;
 
 	success("testing: %s\n", name);
-	ret = socketpair(AF_LOCAL, SOCK_STREAM, 0, fd);
+	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
 		perror("socketpair");
 		exit(1);

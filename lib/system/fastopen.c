@@ -83,7 +83,7 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 	tfo_st *p = ptr;
 	int fd = p->fd;
 	struct msghdr hdr;
-	int ret, on = 1;
+	int ret;
 
 	memset(&hdr, 0, sizeof(hdr));
 	hdr.msg_iov = (struct iovec *)iovec;
@@ -94,6 +94,8 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
 
 # if defined(TCP_FASTOPEN_LINUX)
 	if (!p->connect_only) {
+		int on = 1;
+
 		if (setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN, &on, sizeof(on)) == -1)
 			_gnutls_debug_log("Failed to set socket option FASTOPEN\n");
 
