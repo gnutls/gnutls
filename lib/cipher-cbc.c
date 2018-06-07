@@ -84,6 +84,7 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st *params,
 	const uint8_t *tag_ptr = NULL;
 	unsigned preamble_size;
 	uint8_t tag[MAX_HASH_SIZE];
+	unsigned blocksize = _gnutls_cipher_get_block_size(params->cipher);
 
 	pad = data[data_size - 1];	/* pad */
 
@@ -92,14 +93,19 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st *params,
 	 * because there is a timing channel in that memory access (in certain CPUs).
 	 */
 #ifdef ENABLE_SSL3
-	if (ver->id != GNUTLS_SSL3)
+	if (ver->id == GNUTLS_SSL3) {
+		if (pad >= blocksize)
+			pad_failed = 1;
+	} else
 #endif
+	{
 		for (i = 2; i <= MIN(256, data_size); i++) {
 			tmp_pad_failed |=
 			    (data[data_size - i] != pad);
 			pad_failed |=
 			    ((i <= (1 + pad)) & (tmp_pad_failed));
 		}
+	}
 
 	if (unlikely
 	    (pad_failed != 0
