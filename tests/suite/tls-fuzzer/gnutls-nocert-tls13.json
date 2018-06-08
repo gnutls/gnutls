@@ -1,0 +1,26 @@
+[
+    {"server_command": ["@SERVER@", "--http",
+                 "--x509keyfile", "tests/serverX509Key.pem",
+                 "--x509certfile", "tests/serverX509Cert.pem",
+                 "--x509keyfile", "../../../certs/ecc256.pem",
+                 "--x509certfile", "../../../certs/cert-ecc256.pem",
+                 "--debug=3",
+                 "--priority=@PRIORITY@",
+                 "--disable-client-cert", "--port=@PORT@"],
+     "tests" : [
+	 {"name" : "test-tls13-conversation.py"},
+	 {"name" : "test-tls13-empty-alert.py"},
+	 {"name" : "test-tls13-legacy-version.py"},
+	 {"name" : "test-tls13-nociphers.py"},
+	 {"name" : "test-tls13-pkcs-signature.py"},
+	 {"name" : "test-tls13-record-padding.py"},
+	 {"name" : "test-tls13-signature-algorithms.py"},
+	 {"name" : "test-tls13-version-negotiation.py"},
+	 {"name" : "test-tls13-zero-length-data.py",
+	  "comment" : "in these tests tlsfuzzer splits ClientHello into the first 2 bytes and the remainder, which gnutls doesn't support",
+	  "arguments": ["-e", "zero-length app data interleaved in handshake",
+			"-e", "zero-len app data with padding interleaved in handshake",
+			"-e", "zero-len app data with large padding interleaved in handshake"]}
+     ]
+    }
+]
