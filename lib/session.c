@@ -120,7 +120,7 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
 
 	if (vers->tls13_sem && !(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {
 		/* wait for a message with timeout of 1ms */
-		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, 100);
+		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, 50);
 		if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
 			return gnutls_assert_val(ret);
 		}
