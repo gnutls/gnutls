@@ -83,6 +83,9 @@ ABIVER=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tag
 	  fi && $(MAKE) -j$$(nproc) -C gl && $(MAKE) -j$$(nproc) -C lib && $(MAKE) -j$$(nproc) -C libdane
 	touch $@
 
+# We skip session::set_transport_vec_push_function() as it is seen as different when
+# compiled with the glibc struct iovec, under gcc8. This should be temporary for
+# 3.6.2 to 3.6.3 transition.
 abi-check: .prev-tag-abi.stamp
 	@rm -f $(ABI_TMPFILE_CUR) $(ABI_TMPFILE_PRE)
 	@echo "Checking libgnutls ABI"
@@ -93,6 +96,7 @@ abi-check: .prev-tag-abi.stamp
 	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_PRE)
 	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
 	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
+	@echo "<skip_symbols>_ZN6gnutls7session31set_transport_vec_push_functionEPFlPvPK8giovec_tiE</skip_symbols>" >>$(ABI_TMPFILE_PRE)
 	@echo "<libs>$(builddir)/$(ABI_TMPCLONEDIR)/lib/.libs</libs>" >>$(ABI_TMPFILE_PRE)
 	PATH="/sbin$(PATH_SEPARATOR)$$PATH" \
 	  abi-compliance-checker -abi -lib gnutls -old $(ABI_TMPFILE_PRE) -new $(ABI_TMPFILE_CUR) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols
