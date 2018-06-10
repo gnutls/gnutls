@@ -247,4 +247,16 @@ lib/accelerated/aarch64/elf/%.s: devel/perlasm/%.pl .submodule.stamp
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	rm -f $@.tmp.S $@.tmp.s $@.tmp
 
+lib/accelerated/aarch64/macosx/%.s: devel/perlasm/%.pl .submodule.stamp
+	rm -f $@tmp
+	CC=aarch64-linux-gnu-gcc perl $< ios64 $@.tmp
+	cat $@.tmp | /usr/bin/perl -ne '/^#(line)?\s*[0-9]+/ or print' > $@.tmp.S
+	echo "" >> $@.tmp.S
+	sed -i 's/OPENSSL_armcap_P/_gnutls_arm_cpuid_s/g' $@.tmp.S
+	sed -i 's/arm_arch.h/aarch64-common.h/g' $@.tmp.S
+	aarch64-linux-gnu-gcc -D__ARM_MAX_ARCH__=8 -Ilib/accelerated/aarch64 -Wa,--noexecstack -E $@.tmp.S -o $@.tmp.s
+	cat $<.license $@.tmp.s > $@
+	rm -f $@.tmp.S $@.tmp.s $@.tmp
 
+lib/accelerated/aarch64/coff/%.s: devel/perlasm/%.pl .submodule.stamp
+	@true
