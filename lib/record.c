@@ -803,7 +803,7 @@ record_add_to_buffers(gnutls_session_t session,
 			if (bufel->msg.size < 2) {
 				ret =
 				    gnutls_assert_val
-				    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+				    (GNUTLS_E_UNEXPECTED_PACKET);
 				goto unexpected_packet;
 			}
 
