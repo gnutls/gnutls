@@ -108,6 +108,60 @@ static unsigned find_client_extension(const gnutls_datum_t *msg, unsigned extnr,
 	return 0;
 }
 
+static unsigned is_client_extension_last(const gnutls_datum_t *msg, unsigned extnr)
+{
+	unsigned pos, found = 0;
+
+	if (msg->size < HANDSHAKE_SESSION_ID_POS)
+		fail("invalid client hello\n");
+
+	/* we expect the legacy version to be present */
+	/* ProtocolVersion legacy_version = 0x0303 */
+	if (msg->data[0] != 0x03) {
+		fail("ProtocolVersion contains %d.%d\n", (int)msg->data[0], (int)msg->data[1]);
+	}
+
+	pos = HANDSHAKE_SESSION_ID_POS;
+	/* legacy_session_id */
+	SKIP8(pos, msg->size);
+
+	/* CipherSuites */
+	SKIP16(pos, msg->size);
+
+	/* legacy_compression_methods */
+	SKIP8(pos, msg->size);
+
+	pos += 2;
+
+	while (pos < msg->size) {
+		uint16_t type;
+
+		if (pos+4 > msg->size)
+			fail("invalid client hello\n");
+
+		type = (msg->data[pos] << 8) | msg->data[pos+1];
+		pos+=2;
+
+		if (debug)
+			success("Found client extension %d\n", (int)type);
+
+		if (type != extnr) {
+			if (found) {
+				success("found extension %d after %d\n", type, extnr);
+				return 0;
+			}
+			SKIP16(pos, msg->size);
+		} else { /* found */
+			found = 1;
+			SKIP16(pos, msg->size);
+		}
+	}
+
+	if (found)
+		return 1;
+	return 0;
+}
+
 #define TLS_RANDOM_SIZE 32
 
 static unsigned find_server_extension(const gnutls_datum_t *msg, unsigned extnr, void *priv, ext_parse_func cb)
