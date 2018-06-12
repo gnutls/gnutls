@@ -148,11 +148,7 @@ TLS1.3/interop:
     expire_in: 1 week
     when: on_failure
     paths:
-      - build/guile/tests/*.log
-      - build/tests/*.log
-      - build/*.log
-      - build/tests/*/*.log
-      - build/tests/suite/*/*.log
+      - tests/suite/*.log
 
 FIPS140-2.Fedora.x86_64:
   stage: stage1-testing
