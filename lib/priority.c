@@ -455,14 +455,12 @@ static const int* sign_priority_secure192 = _sign_priority_secure192;
 
 static const int mac_priority_normal_default[] = {
 	GNUTLS_MAC_SHA1,
-	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_AEAD,
 	0
 };
 
 static const int mac_priority_normal_fips[] = {
 	GNUTLS_MAC_SHA1,
-	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_AEAD,
 	0
 };
@@ -496,14 +494,12 @@ static const int* mac_priority_suiteb = _mac_priority_suiteb;
 
 static const int _mac_priority_secure128[] = {
 	GNUTLS_MAC_SHA1,
-	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_AEAD,
 	0
 };
 static const int* mac_priority_secure128 = _mac_priority_secure128;
 
 static const int _mac_priority_secure192[] = {
-	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_AEAD,
 	0
 };
@@ -812,6 +808,10 @@ static void enable_no_ext_master_secret(gnutls_priority_t c)
 static void enable_no_etm(gnutls_priority_t c)
 {
 	c->_no_etm = 1;
+}
+static void enable_force_etm(gnutls_priority_t c)
+{
+	c->force_etm = 1;
 }
 static void enable_no_tickets(gnutls_priority_t c)
 {

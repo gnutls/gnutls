@@ -209,14 +209,12 @@ calc_enc_length_stream(gnutls_session_t session, int data_size,
 	return length;
 }
 
-#define MAX_PREAMBLE_SIZE 16
-
 /* generates the authentication data (data to be hashed only
  * and are not to be sent). Returns their size.
  */
-static inline int
-make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
-	      const version_entry_st * ver, uint8_t * preamble)
+int
+_gnutls_make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
+		      const version_entry_st * ver, uint8_t preamble[MAX_PREAMBLE_SIZE])
 {
 	uint8_t *p = preamble;
 	uint16_t c_length;
@@ -372,8 +370,8 @@ encrypt_packet(gnutls_session_t session,
 		ret = plain->size;
 
 	preamble_size =
-	    make_preamble(UINT64DATA(params->write.sequence_number),
-			  type, ret, ver, preamble);
+	    _gnutls_make_preamble(UINT64DATA(params->write.sequence_number),
+				  type, ret, ver, preamble);
 
 	if (algo_type == CIPHER_BLOCK || algo_type == CIPHER_STREAM) {
 		/* add the authenticated data */
@@ -495,41 +493,6 @@ encrypt_packet_tls13(gnutls_session_t session,
 	return cipher_size;
 }
 
-static void dummy_wait(record_parameters_st * params,
-		       gnutls_datum_t * plaintext, unsigned pad_failed,
-		       unsigned int pad, unsigned total)
-{
-	/* this hack is only needed on CBC ciphers */
-	if (_gnutls_cipher_type(params->cipher) == CIPHER_BLOCK) {
-		unsigned len;
-
-		/* force an additional hash compression function evaluation to prevent timing 
-		 * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
-		 */
-		if (pad_failed == 0 && pad > 0) {
-			len = _gnutls_mac_block_size(params->mac);
-			if (len > 0) {
-				/* This is really specific to the current hash functions.
-				 * It should be removed once a protocol fix is in place.
-				 */
-				if ((pad + total) % len > len - 9
-				    && total % len <= len - 9) {
-					if (len < plaintext->size)
-						_gnutls_auth_cipher_add_auth
-						    (&params->read.
-						     ctx.tls12,
-						     plaintext->data, len);
-					else
-						_gnutls_auth_cipher_add_auth
-						    (&params->read.
-						     ctx.tls12,
-						     plaintext->data,
-						     plaintext->size);
-				}
-			}
-		}
-	}
-}
 
 /* Deciphers the ciphertext packet, and puts the result to plain.
  * Returns the actual plaintext packet size.
@@ -544,12 +507,10 @@ decrypt_packet(gnutls_session_t session,
 	uint8_t tag[MAX_HASH_SIZE];
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
 	const uint8_t *tag_ptr = NULL;
-	unsigned int pad = 0, i;
+	unsigned int pad = 0;
 	int length, length_to_decrypt;
 	uint16_t blocksize;
 	int ret;
-	unsigned int tmp_pad_failed = 0;
-	unsigned int pad_failed = 0;
 	uint8_t preamble[MAX_PREAMBLE_SIZE];
 	unsigned int preamble_size = 0;
 	const version_entry_st *ver = get_version(session);
@@ -575,9 +536,9 @@ decrypt_packet(gnutls_session_t session,
 		if (unlikely(ciphertext->size < tag_size))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-		preamble_size = make_preamble(UINT64DATA(*sequence),
-					type, ciphertext->size-tag_size,
-					ver, preamble);
+		preamble_size = _gnutls_make_preamble(UINT64DATA(*sequence),
+						      type, ciphertext->size-tag_size,
+						      ver, preamble);
 
 		ret = _gnutls_auth_cipher_add_auth(&params->read.
 						   ctx.tls12, preamble,
@@ -651,8 +612,8 @@ decrypt_packet(gnutls_session_t session,
 		 * MAC.
 		 */
 		preamble_size =
-		    make_preamble(UINT64DATA(*sequence), type,
-				  length, ver, preamble);
+		    _gnutls_make_preamble(UINT64DATA(*sequence), type,
+					  length, ver, preamble);
 
 
 		if (unlikely
@@ -691,8 +652,8 @@ decrypt_packet(gnutls_session_t session,
 		 * MAC.
 		 */
 		preamble_size =
-		    make_preamble(UINT64DATA(*sequence), type,
-				  length, ver, preamble);
+		    _gnutls_make_preamble(UINT64DATA(*sequence), type,
+					  length, ver, preamble);
 
 		ret =
 		    _gnutls_auth_cipher_add_auth(&params->read.
@@ -721,6 +682,17 @@ decrypt_packet(gnutls_session_t session,
 
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
+
+		ret =
+		    _gnutls_auth_cipher_tag(&params->read.ctx.tls12, tag,
+					    tag_size);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+
+		if (unlikely
+		    (gnutls_memcmp(tag, tag_ptr, tag_size) != 0)) {
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+		}
 
 		break;
 	case CIPHER_BLOCK:
@@ -773,56 +745,13 @@ decrypt_packet(gnutls_session_t session,
 			if (unlikely(ret < 0))
 				return gnutls_assert_val(ret);
 
-			pad = plain->data[ciphertext->size - 1];	/* pad */
-
-			/* Check the pading bytes (TLS 1.x). 
-			 * Note that we access all 256 bytes of ciphertext for padding check
-			 * because there is a timing channel in that memory access (in certain CPUs).
-			 */
-#ifdef ENABLE_SSL3
-			if (ver->id != GNUTLS_SSL3)
-#endif
-				for (i = 2; i <= MIN(256, ciphertext->size); i++) {
-					tmp_pad_failed |=
-					    (plain->
-					     data[ciphertext->size - i] != pad);
-					pad_failed |=
-					    ((i <= (1 + pad)) & (tmp_pad_failed));
-				}
-
-			if (unlikely
-			    (pad_failed != 0
-			     || (1 + pad > ((int) ciphertext->size - tag_size)))) {
-				/* We do not fail here. We check below for the
-				 * the pad_failed. If zero means success.
-				 */
-				pad_failed = 1;
-				pad = 0;
-			}
-
-			length = ciphertext->size - tag_size - pad - 1;
-			tag_ptr = &plain->data[length];
-
-			/* Pass the type, version, length and plain through
-			 * MAC.
-			 */
-			preamble_size =
-			    make_preamble(UINT64DATA(*sequence), type,
-					  length, ver, preamble);
-
-			ret =
-			    _gnutls_auth_cipher_add_auth(&params->read.
-							 ctx.tls12, preamble,
-							 preamble_size);
+			ret = cbc_mac_verify(session, params, preamble, type,
+					     sequence, plain->data, ciphertext->size,
+					     tag_size);
 			if (unlikely(ret < 0))
 				return gnutls_assert_val(ret);
 
-			ret =
-			    _gnutls_auth_cipher_add_auth(&params->read.
-							 ctx.tls12,
-							 plain->data, length);
-			if (unlikely(ret < 0))
-				return gnutls_assert_val(ret);
+			length = ret;
 		} else { /* EtM */
 			ret =
 			    _gnutls_cipher_decrypt2(&params->read.ctx.tls12.
@@ -844,29 +773,6 @@ decrypt_packet(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	}
 
-	/* STREAM or BLOCK arrive here */
-	if (etm == 0) {
-		ret =
-		    _gnutls_auth_cipher_tag(&params->read.ctx.tls12, tag,
-					    tag_size);
-		if (unlikely(ret < 0))
-			return gnutls_assert_val(ret);
-
-		/* Here there could be a timing leakage in CBC ciphersuites that
-		 * could be exploited if the cost of a successful memcmp is high. 
-		 * A constant time memcmp would help there, but it is not easy to maintain
-		 * against compiler optimizations. Currently we rely on the fact that
-		 * a memcmp comparison is negligible over the crypto operations.
-		 */
-		if (unlikely
-		    (gnutls_memcmp(tag, tag_ptr, tag_size) != 0 || pad_failed != 0)) {
-			/* HMAC was not the same. */
-			dummy_wait(params, plain, pad_failed, pad,
-				   length + preamble_size);
-
-			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
-		}
-	}
 
 	return length;
 }

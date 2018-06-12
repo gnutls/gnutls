@@ -900,6 +900,7 @@ struct gnutls_priority_st {
 	bool no_tickets;
 	bool have_cbc;
 	bool have_psk;
+	bool force_etm;
 	unsigned int additional_verify_flags;
 
 	/* TLS_FALLBACK_SCSV */

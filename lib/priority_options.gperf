@@ -10,6 +10,7 @@ DUMBFW, enable_dumbfw
 NO_EXTENSIONS, enable_no_extensions
 NO_TICKETS, enable_no_tickets
 NO_ETM, enable_no_etm
+FORCE_ETM, enable_force_etm
 NO_SESSION_HASH, enable_no_ext_master_secret
 STATELESS_COMPRESSION, dummy_func
 VERIFY_ALLOW_BROKEN, enable_verify_allow_broken

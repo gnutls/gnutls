@@ -25,7 +25,7 @@ See the end for copying conditions.
    with an anonymous credentials structure.
 
 ** Provide a uniform cipher list across different protocols; the CAMELLIA ciphers
-   as well as ciphers utilizing HMAC-SHA384 have been removed from the default
+   as well as ciphers utilizing HMAC-SHA384 and SHA256 have been removed from the default
    priority strings.
 
 ** libgnutls: Introduced low-level function to assist applications attempting client

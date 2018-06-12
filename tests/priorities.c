@@ -113,19 +113,19 @@ try_prio_err(const char *prio, int err)
 
 void doit(void)
 {
-	const int null = 4;
-	int sec128_cs = 31;
-	int sec256_cs = 12;
-	int normal_cs = 31;
+	const int null = 3;
+	int sec128_cs = 25;
+	int sec256_cs = 10;
+	int normal_cs = 25;
 	int normal_ciphers = 7;
-	int pfs_cs = 23;
+	int pfs_cs = 19;
 
 	if (gnutls_fips140_mode_enabled()) {
-		normal_cs = 28;
+		normal_cs = 22;
 		normal_ciphers = 6;
 		pfs_cs = 22;
-		sec256_cs = 9;
-		sec128_cs = 28;
+		sec256_cs = 7;
+		sec128_cs = 22;
 	}
 
 	try_prio("NORMAL", normal_cs, normal_ciphers, __LINE__);
@@ -136,7 +136,7 @@ void doit(void)
 		try_prio("NORMAL:+CIPHER-ALL", normal_cs, 7, __LINE__);	/* all (except null) */
 		try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
 		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal_cs + null, 8, __LINE__);	/* should be null + all */
-		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
+		try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 4, 1, __LINE__);	/* should be null + all */
 	}
 
 	try_prio("PERFORMANCE", normal_cs, normal_ciphers, __LINE__);
