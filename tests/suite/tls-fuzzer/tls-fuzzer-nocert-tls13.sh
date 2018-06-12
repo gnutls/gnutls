@@ -28,10 +28,7 @@ TMPFILE=tls-fuzzer.$$.tmp
 . "${srcdir}/../scripts/common.sh"
 
 # We hard-code the port because of limitations in tlsfuzzer
-#eval "${GETPORT}"
-PORT=4433
-
-$LOCKFILE
+eval "${GETPORT}"
 
 pushd tls-fuzzer
 
@@ -64,5 +61,4 @@ rm -f ${TMPFILE}
 popd
 popd
 
-$UNLOCKFILE
 exit $retval
