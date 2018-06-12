@@ -323,7 +323,7 @@ void doit(void)
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", 0);
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK", 0);
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK", 0);
-	/* the follow should work once we support PSK without DH */
+	/* the following should work once we support PSK without DH */
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+PSK", 0);
 
 	run_test("NORMAL:-KX-ALL:+PSK", 1);
