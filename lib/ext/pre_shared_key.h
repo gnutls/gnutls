@@ -5,6 +5,8 @@
 #include <hello_ext.h>
 #include "tls13/session_ticket.h"
 
+#define PRE_SHARED_KEY_TLS_ID 41
+
 extern const hello_ext_entry_st ext_pre_shared_key;
 
 inline static

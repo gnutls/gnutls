@@ -195,6 +195,7 @@ typedef struct hello_ext_ctx_st {
 	gnutls_ext_flags_t msg;
 	gnutls_ext_parse_type_t parse_type;
 	const hello_ext_entry_st *ext; /* used during send */
+	unsigned seen_pre_shared_key;
 } hello_ext_ctx_st;
 
 static
@@ -204,6 +205,14 @@ int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned d
 	gnutls_session_t session = ctx->session;
 	const hello_ext_entry_st *ext;
 	int ret;
+
+	if (tls_id == PRE_SHARED_KEY_TLS_ID) {
+		ctx->seen_pre_shared_key = 1;
+	} else if (ctx->seen_pre_shared_key) {
+		/* the pre-shared key extension must always be the last one,
+		 * draft-ietf-tls-tls13-28: 4.2.11 */
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	}
 
 	ext = tls_id_to_ext_entry(session, tls_id, ctx->parse_type);
 	if (ext == NULL || ext->recv_func == NULL) {
@@ -270,9 +279,9 @@ int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned d
 
 int
 _gnutls_parse_hello_extensions(gnutls_session_t session,
-			 gnutls_ext_flags_t msg,
-			 gnutls_ext_parse_type_t parse_type,
-			 const uint8_t * data, int data_size)
+			       gnutls_ext_flags_t msg,
+			       gnutls_ext_parse_type_t parse_type,
+			       const uint8_t * data, int data_size)
 {
 	int ret;
 	hello_ext_ctx_st ctx;
@@ -282,6 +291,7 @@ _gnutls_parse_hello_extensions(gnutls_session_t session,
 	ctx.session = session;
 	ctx.msg = msg;
 	ctx.parse_type = parse_type;
+	ctx.seen_pre_shared_key = 0;
 
 	ret = _gnutls_extv_parse(&ctx, hello_ext_parse, data, data_size);
 	if (ret < 0)
