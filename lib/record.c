@@ -776,6 +776,20 @@ record_add_to_buffers(gnutls_session_t session,
 	    && (type == GNUTLS_APPLICATION_DATA ||
 		type == GNUTLS_CHANGE_CIPHER_SPEC ||
 		type == GNUTLS_HANDSHAKE)) {
+		if (bufel->msg.size == 0) {
+			if (type == GNUTLS_APPLICATION_DATA) {
+				/* this is needed to distinguish an empty
+				 * message and EOF */
+				ret = GNUTLS_E_AGAIN;
+				goto cleanup;
+			} else {
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_UNEXPECTED_PACKET);
+				goto unexpected_packet;
+			}
+		}
+
 		_gnutls_record_buffer_put(session, type, seq, bufel);
 
 		/* if we received application data as expected then we
@@ -789,7 +803,7 @@ record_add_to_buffers(gnutls_session_t session,
 			if (bufel->msg.size < 2) {
 				ret =
 				    gnutls_assert_val
-				    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+				    (GNUTLS_E_UNEXPECTED_PACKET);
 				goto unexpected_packet;
 			}
 
@@ -1374,7 +1388,14 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
  * In that case we go to the beginning and start reading
  * the next packet.
  */
-	if (_mbuffer_get_udata_size(decrypted) == 0) {
+	if (_mbuffer_get_udata_size(decrypted) == 0 &&
+	    /* Under TLS 1.3, there are only AEAD ciphers and this
+	     * logic is meaningless. Moreover, the implementation need
+	     * to send correct alert upon receiving empty messages in
+	     * certain occasions. Skip this and leave
+	     * record_add_to_buffers() to handle the empty
+	     * messages. */
+	    !(vers && vers->tls13_sem)) {
 		_mbuffer_xfree(&decrypted);
 		n_retries++;
 		goto begin;

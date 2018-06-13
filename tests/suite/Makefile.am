@@ -91,7 +91,8 @@ EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl \
 scripts_to_test = chain.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
 	testrandom.sh tls-fuzzer/tls-fuzzer-nocert.sh \
-	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh
+	tls-fuzzer/tls-fuzzer-cert.sh tls-fuzzer/tls-fuzzer-alpn.sh \
+	tls-fuzzer/tls-fuzzer-nocert-tls13.sh
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"			\

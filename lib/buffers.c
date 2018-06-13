@@ -920,7 +920,6 @@ parse_handshake_header(gnutls_session_t session, mbuffer_st * bufel,
 		 * that the packet has enough data.
 		 */
 		hsk->length = _gnutls_read_uint24(&dataptr[1]);
-		handshake_header_size = HANDSHAKE_HEADER_SIZE(session);
 
 		if (IS_DTLS(session)) {
 			hsk->sequence = _gnutls_read_uint16(&dataptr[4]);

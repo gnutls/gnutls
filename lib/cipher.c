@@ -855,10 +855,10 @@ decrypt_packet_tls13(gnutls_session_t session,
 	/* now figure the actual data size. We intentionally iterate through all data,
 	 * to avoid leaking the padding length due to timing differences in processing.
 	 */
-	for (j=length-1;j>0;j--) {
-		if (plain->data[j]!=0 && length_set == 0) {
-			*type = plain->data[j];
-			length = j;
+	for (j=length;j>0;j--) {
+		if (plain->data[j-1]!=0 && length_set == 0) {
+			*type = plain->data[j-1];
+			length = j-1;
 			length_set = 1;
 		}
 	}
