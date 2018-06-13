@@ -288,6 +288,13 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		IMED_RET("send hello retry request", ret, 0);
 		/* fall through */
 	case STATE92:
+#ifdef TLS13_APPENDIX_D4
+		ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE92));
+		STATE = STATE92;
+		IMED_RET("send change cipher spec", ret, 0);
+#endif
+		/* fall through */
+	case STATE93:
 		ret =
 		    _gnutls_recv_handshake(session,
 					   GNUTLS_HANDSHAKE_CLIENT_HELLO,
@@ -296,24 +303,28 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 			/* this is triggered by post_client_hello, and instructs the
 			 * handshake to proceed but be put on hold */
 			ret = GNUTLS_E_INTERRUPTED;
-			STATE = STATE93; /* hello already parsed -> move to next state */
+			STATE = STATE94; /* hello already parsed -> move to next state */
 		} else {
-			STATE = STATE92;
+			STATE = STATE93;
 		}
 
 		IMED_RET("recv client hello", ret, 0);
 		/* fall through */
-	case STATE93:
-		ret = _gnutls_send_server_hello(session, AGAIN(STATE93));
-		STATE = STATE93;
+	case STATE94:
+		ret = _gnutls_send_server_hello(session, AGAIN(STATE94));
+		STATE = STATE94;
 		IMED_RET("send hello", ret, 0);
 		/* fall through */
 	case STATE99:
 	case STATE100:
 #ifdef TLS13_APPENDIX_D4
-		ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE100));
-		STATE = STATE100;
-		IMED_RET("send change cipher spec", ret, 0);
+		/* don't send CCS twice: when HRR has already been
+		 * sent, CCS should have followed it (see above) */
+		if (!(session->internals.hsk_flags & HSK_HRR_SENT)) {
+			ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE100));
+			STATE = STATE100;
+			IMED_RET("send change cipher spec", ret, 0);
+		}
 #endif
 		/* fall through */
 	case STATE101:
