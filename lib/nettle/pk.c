@@ -52,9 +52,6 @@
 #include <nettle/version.h>
 #include <gnettle.h>
 #include <fips.h>
-#ifndef HAVE_NETTLE_RSA_PSS
-#include "rsa-pss.h"
-#endif
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
 
