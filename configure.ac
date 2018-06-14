@@ -125,6 +125,14 @@ case "$host" in
   ;;
   *darwin*)
     have_macosx=yes
+    save_LDFLAGS="$LDFLAGS"
+    dnl Try to use -no_weak_imports if available. This makes sure we
+    dnl error out when linking to a function that doesn't exist in the
+    dnl intended minimum runtime version.
+    LDFLAGS="$LDFLAGS -Wl,-no_weak_imports"
+    AC_MSG_CHECKING([whether the linker supports -Wl,-no_weak_imports])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+      [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); LDFLAGS="$save_LDFLAGS"])
   ;;
   *solaris*)
     have_elf=yes
