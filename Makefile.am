@@ -53,7 +53,7 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4 -I lib/unistring/m4
 
 EXTRA_DIST = cfg.mk maint.mk CONTRIBUTING.md README.md LICENSE AUTHORS NEWS \
-	ChangeLog THANKS INSTALL.md
+	ChangeLog THANKS INSTALL.md symbols.last
 
 pic-check:
 	@echo "Checking for position dependent code"
@@ -76,7 +76,7 @@ ABIVER=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tag
 	@echo "Creating ABI for $(ABIVER)"
 	cd $(ABI_TMPCLONEDIR) && \
 	  git checkout $(ABIREF) && \
-	  make autoreconf && if test -f ../cache/config.cache;then\
+	  $(MAKE) autoreconf && if test -f ../cache/config.cache;then\
 	    CFLAGS="-g -Og" ./configure --disable-doc --cache-file ../cache/config.cache;\
 	  else\
 	    CFLAGS="-g -Og" ./configure --disable-doc;\
@@ -113,8 +113,8 @@ abi-check: .prev-tag-abi.stamp
 
 symbol-check:
 	@objdump -T $(builddir)/lib/.libs/libgnutls.so  | grep -v ' \*UND\*'  | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE | grep -v '^@' |  sort -u >symbols.last.tmp
-	@diff -u symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
-		diff -u symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
+	@diff -u $(srcdir)/symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
+		diff -u $(srcdir)symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
 		if grep -e '^-' symbols.diff.tmp;then \
 			echo "*******************************************"; \
 			echo "Symbols were removed from the library."; \
@@ -146,12 +146,12 @@ libopts-check:
 	@echo "Checking whether included libopts matches the system's. If the"
 	@echo "check fails upgrade the included libopts."
 	@echo "*****************************************************************"
-	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
+	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
 files-update: libopts-check
-	make -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
-	make -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
-	make -C . symbol-check || mv symbols.last.tmp symbols.last
+	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
+	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
+	$(MAKE) -C . symbol-check || mv symbols.last.tmp symbols.last
 	@echo "******************************************************************************************"
 	@echo "updating autogen files in src/"
 	@echo "******************************************************************************************"
@@ -163,12 +163,11 @@ files-update: libopts-check
 	@echo "******************************************************************************************"
 
 dist-hook: libopts-check symbol-check
-	make -C doc/ compare-makefile
-	make -C doc/ compare-exported
-	make -C doc/manpages compare-makefile
-	rm -f ChangeLog
-	make ChangeLog
-	cp -f ChangeLog $(distdir)/
+	$(MAKE) -C doc/ compare-makefile
+	$(MAKE) -C doc/ compare-exported
+	$(MAKE) -C doc/manpages compare-makefile
+	$(MAKE) ChangeLog
+	mv ChangeLog $(distdir)
 	$(SED) 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
 	$(SED) 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
 	$(SED) 's/\@PACKAGE_BUGREPORT\@/$(PACKAGE_BUGREPORT)/g' -i $(distdir)/src/args-std.def

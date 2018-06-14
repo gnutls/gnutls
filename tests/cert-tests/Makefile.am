@@ -140,3 +140,6 @@ endif
 if WINDOWS
 TESTS_ENVIRONMENT += WINDOWS=1
 endif
+
+distclean-local:
+	rm -rf tmp-* *.tmp

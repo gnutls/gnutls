@@ -620,8 +620,14 @@ gnutls_session_t init_tls_session(const char *host)
 	if (HAVE_OPT(ALPN)) {
 		unsigned proto_n = STACKCT_OPT(ALPN);
 		char **protos = (void *) STACKLST_OPT(ALPN);
-		gnutls_datum_t p[proto_n];
 
+		if (proto_n > 1024) {
+			fprintf(stderr, "Number of ALPN protocols too large (%d)\n",
+					proto_n);
+			exit(1);
+		}
+
+		gnutls_datum_t p[1024];
 		for (i = 0; i < proto_n; i++) {
 			p[i].data = (void *) protos[i];
 			p[i].size = strlen(protos[i]);
@@ -1000,7 +1006,7 @@ int do_inline_command_processing(char *buffer_ptr, size_t curr_bytes,
 
       continue_inline_processing:
 	/* parse_for_inline_commands_in_buffer hunts for start of an inline command
-	 * sequence. The function maintains state information in inline_cmds. 
+	 * sequence. The function maintains state information in inline_cmds.
 	 */
 	inline_cmd_start_found =
 	    parse_for_inline_commands_in_buffer(buffer_ptr, bytes,
@@ -1854,7 +1860,7 @@ static void init_global_tls_stuff(void)
 
 }
 
-/* OCSP check for the peer's certificate. Should be called 
+/* OCSP check for the peer's certificate. Should be called
  * only after the certificate list verification is complete.
  * Returns:
  * -1: certificate chain could not be checked fully

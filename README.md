@@ -103,10 +103,11 @@ $ cd gnutls
 $ git submodule update --init
 ```
 
-The next step is to run autoreconf (etc) and then ./configure:
+The next step is to bootstrap and ./configure:
 
 ```
-$ make bootstrap
+$ ./bootstrap
+$ ./configure
 ```
 
 When built this way, some developer defaults will be enabled.  See

@@ -42,13 +42,13 @@ doc-dist.Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
-  - make autoreconf
+  - ./bootstrap
   - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
   - make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   - make -C doc gnutls.html
   - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
     make -C doc/latex gnutls.pdf
-  - make dist
+  - make distcheck
   tags:
   - shared
   except:
@@ -59,7 +59,7 @@ abi-coverage.Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
-  - make autoreconf
+  - ./bootstrap
   - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
     && make -j$(nproc)
   - make abi-check
@@ -87,7 +87,7 @@ minimal.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - echo "No tools build"
-  - make autoreconf
+  - ./bootstrap
   - dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
   - make -j$(nproc)
   - make -j$(nproc) check
@@ -111,7 +111,7 @@ no-SSL-3.0.Fedora.x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf
+  - ./bootstrap
   - mkdir -p build && cd build &&
     dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
@@ -135,7 +135,7 @@ TLS1.3/interop:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
-  - make autoreconf
+  - ./bootstrap
   - dash ./configure --disable-gcc-warnings --cache-file ./cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc)
   - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
@@ -154,7 +154,7 @@ FIPS140-2.Fedora.x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf
+  - ./bootstrap
   - mkdir -p build && cd build &&
     dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
   - make -j$(nproc)
@@ -177,7 +177,7 @@ valgrind.Fedora.x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf
+  - ./bootstrap
   - dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
   - make -j$(nproc)
   - make check -j$(nproc)
@@ -199,7 +199,7 @@ asan.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
-  - make autoreconf
+  - ./bootstrap
   - CFLAGS="-fsanitize=address -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libasan"
     dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
@@ -231,7 +231,7 @@ static-analyzers.Fedora.x86_64:
   before_script:
   - /bin/true
   script:
-  - make autoreconf
+  - ./bootstrap
   - scan-build ./configure --disable-doc --disable-guile --enable-fips140-mode --enable-valgrind-tests
   - make -j$(nproc) syntax-check
   - make -j$(nproc) -C gl
@@ -259,7 +259,7 @@ MinGW32.DLLs:
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
-  - make autoreconf
+  - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
   - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
@@ -297,7 +297,7 @@ MinGW64.DLLs:
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
-  - make autoreconf
+  - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
   - dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
@@ -333,7 +333,7 @@ MinGW64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf
+  - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
@@ -358,7 +358,7 @@ MinGW32:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - make autoreconf
+  - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
@@ -386,7 +386,7 @@ FreeBSD.x86_64:
   image:
   script:
   - export CC="ccache clang"
-  - gmake autoreconf && LIBS="-L/usr/local/lib" ./configure --disable-full-test-suite
+  - ./bootstrap && LIBS="-L/usr/local/lib" ./configure --disable-full-test-suite
     --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
@@ -409,7 +409,7 @@ Fedora.x86:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
   script:
   - git submodule update --init --no-fetch
-  - make autoreconf && mkdir -p build && cd build &&
+  - ./bootstrap && mkdir -p build && cd build &&
     CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux
      --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-full-test-suite --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc) &&
@@ -433,14 +433,14 @@ ubsan-Werror.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - git submodule update --init --no-fetch
-  - make autoreconf
+  - ./bootstrap
   - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
      --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-full-test-suite --disable-doc
   - make -j$(nproc) -C gl
-  - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g"
-  - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g"
+  - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g -Wimplicit-fallthrough=2"
+  - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g -Wimplicit-fallthrough=2"
   - make -j$(nproc) -C src/gl
-  - make -j$(nproc) -C src CFLAGS="-Werror -O2 -g -fsanitize=undefined -Wno-error=parentheses -Wno-error=unused-macros"
+  - make -j$(nproc) -C src CFLAGS="-Werror -O2 -g -fsanitize=undefined -Wno-error=parentheses -Wno-error=unused-macros -Wimplicit-fallthrough=2 -Wno-duplicated-branches"
   - make -j$(nproc)
   - make check -j$(nproc)
   - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
@@ -466,7 +466,7 @@ Debian.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_STRETCH_BUILD
   script:
   - git submodule update --init --no-fetch
-  - make autoreconf && mkdir -p build && cd build &&
+  - ./bootstrap && mkdir -p build && cd build &&
     dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile --disable-full-test-suite &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
@@ -488,7 +488,7 @@ Debian.aarch64:
   stage: stage1-testing
   image:
   script:
-  - make autoreconf && mkdir -p build && cd build &&
+  - ./bootstrap && mkdir -p build && cd build &&
     dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile --disable-full-test-suite &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
@@ -519,7 +519,7 @@ Debian.aarch64:
   - export CC_FOR_BUILD="ccache gcc"
   - export CC="ccache $host-gcc"
   - git submodule update --init --no-fetch
-  - make autoreconf
+  - ./bootstrap
   - mkdir -p build
   - cd build
   # Debian's softhsm package is not multiarch yet. Missing softhsm libraries

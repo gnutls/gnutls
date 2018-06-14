@@ -1201,7 +1201,7 @@ compare-makefile:
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nAPIMANS += $$i.3"; \
 	done; \
-	grep -v -e '^APIMANS += ' Makefile.am | \
+	grep -v -e '^APIMANS += ' $(srcdir)/Makefile.am | \
 		perl -p -e "s/^APIMANS =/APIMANS =$$MANS/" > tmp-$@; \
 	diff -u $(srcdir)/Makefile.am tmp-$@
 	rm -f tmp-$@
