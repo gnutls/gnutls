@@ -293,7 +293,24 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime localtime fmemopen vasprintf mmap],,)
+AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid localtime vasprintf mmap],,)
+dnl Manually check some functions by including headers first. On macOS, you
+dnl normally only have the latest SDK available, containing all existing
+dnl functions, but having them restricted according to target version in
+dnl headers. If we bypass the headers and just try linking (as AC_CHECK_FUNCS
+dnl does), we will accidentally detect functions which we shouldn't use. Set
+dnl ac_cv_func_* as well, to avoid later AC_CHECK_FUNCS from other included
+dnl scripts from overriding it.
+AC_MSG_CHECKING([for clock_gettime])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <time.h>], [clock_gettime(0, 0);])],
+  [AC_MSG_RESULT(yes); ac_cv_func_clock_gettime=yes
+  AC_DEFINE([HAVE_CLOCK_GETTIME], 1, [Define to 1 if you have the `clock_gettime' function.])],
+  [AC_MSG_RESULT(no); ac_cv_func_clock_gettime=no])
+AC_MSG_CHECKING([for fmemopen])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>], [fmemopen(0, 0, 0);])],
+  [AC_MSG_RESULT(yes); ac_cv_func_fmemopen=yes
+  AC_DEFINE([HAVE_FMEMOPEN], 1, [Define to 1 if you have the `fmemopen' function.])],
+  [AC_MSG_RESULT(no); ac_cv_func_fmemopen=no])
 if test "$ac_cv_func_vasprintf" != "yes";then
   AC_MSG_CHECKING([for va_copy])
   AC_LINK_IFELSE([AC_LANG_PROGRAM([
