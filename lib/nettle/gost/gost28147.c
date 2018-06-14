@@ -2367,4 +2367,89 @@ gost28147_encrypt_for_cfb(struct gost28147_ctx *ctx,
       ctx->key_count += GOST28147_BLOCK_SIZE;
     }
 }
+
+static void
+gost28147_cnt_next_iv(struct gost28147_cnt_ctx *ctx,
+		      uint8_t *out)
+{
+  uint32_t block[2];
+  uint32_t temp;
+
+  if (ctx->ctx.key_meshing && ctx->ctx.key_count == 1024)
+    {
+      gost28147_key_mesh_cryptopro(&ctx->ctx);
+      gost28147_encrypt_simple(ctx->ctx.key, ctx->ctx.sbox, ctx->iv, ctx->iv);
+      ctx->ctx.key_count = 0;
+    }
+
+  ctx->iv[0] += 0x01010101;
+  temp = ctx->iv[1] + 0x01010104;
+  if (temp < ctx->iv[1])
+    ctx->iv[1] = temp + 1; /* Overflow */
+  else
+    ctx->iv[1] = temp;
+
+  gost28147_encrypt_simple(ctx->ctx.key, ctx->ctx.sbox, ctx->iv, block);
+
+  LE_WRITE_UINT32(out + 0, block[0]);
+  LE_WRITE_UINT32(out + 4, block[1]);
+
+  ctx->ctx.key_count += GOST28147_BLOCK_SIZE;
+}
+
+void
+gost28147_cnt_init(struct gost28147_cnt_ctx *ctx,
+		   const uint8_t *key,
+		   const struct gost28147_param *param)
+{
+  gost28147_set_key(&ctx->ctx, key);
+  gost28147_set_param(&ctx->ctx, param);
+  ctx->bytes = 0;
+}
+
+void
+gost28147_cnt_set_iv(struct gost28147_cnt_ctx *ctx,
+		     const uint8_t *iv)
+{
+  uint32_t block[2];
+
+  block[0] = LE_READ_UINT32(iv + 0);
+  block[1] = LE_READ_UINT32(iv + 4);
+
+  gost28147_encrypt_simple(ctx->ctx.key, ctx->ctx.sbox, block, ctx->iv);
+}
+
+void
+gost28147_cnt_crypt(struct gost28147_cnt_ctx *ctx,
+		    size_t length, uint8_t *dst,
+		    const uint8_t *src)
+{
+  size_t block_size = GOST28147_BLOCK_SIZE;
+
+  if (ctx->bytes)
+    {
+      size_t part = ctx->bytes < length ? ctx->bytes : length;
+      memxor3(dst, src, ctx->buffer + block_size - ctx->bytes, part);
+      dst += part;
+      src += part;
+      length -= part;
+      ctx->bytes -= part;
+      ctx->bytes %= block_size;
+    }
+  while (length >= block_size)
+    {
+      gost28147_cnt_next_iv(ctx, ctx->buffer);
+      memxor3(dst, src, ctx->buffer, block_size);
+      length -= block_size;
+      src += block_size;
+      dst += block_size;
+    }
+
+  if (length != 0)
+    {
+      gost28147_cnt_next_iv(ctx, ctx->buffer);
+      memxor3(dst, src, ctx->buffer, length);
+      ctx->bytes = block_size - length;
+    }
+}
 #endif
