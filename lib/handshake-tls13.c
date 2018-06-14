@@ -292,13 +292,11 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		    _gnutls_recv_handshake(session,
 					   GNUTLS_HANDSHAKE_CLIENT_HELLO,
 					   0, NULL);
-		STATE = STATE92;
-
 		if (ret == GNUTLS_E_INT_RET_0) {
 			/* this is triggered by post_client_hello, and instructs the
 			 * handshake to proceed but be put on hold */
 			ret = GNUTLS_E_INTERRUPTED;
-			STATE = STATE99; /* hello already parsed -> move on */
+			STATE = STATE93; /* hello already parsed -> move to next state */
 		} else {
 			STATE = STATE92;
 		}
