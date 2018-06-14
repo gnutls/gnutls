@@ -67,8 +67,8 @@ static int
 encrypt_packet_tls13(gnutls_session_t session,
 		     uint8_t *cipher_data, size_t cipher_size,
 		     gnutls_datum_t *plain,
-		     size_t min_pad,
-		     content_type_t type,
+		     size_t pad_size,
+		     uint8_t type,
 		     record_parameters_st *params);
 
 /* returns ciphertext which contains the headers too. This also
@@ -417,8 +417,8 @@ static int
 encrypt_packet_tls13(gnutls_session_t session,
 		     uint8_t *cipher_data, size_t cipher_size,
 		     gnutls_datum_t *plain,
-		     size_t min_pad,
-		     content_type_t type,
+		     size_t pad_size,
+		     uint8_t type,
 		     record_parameters_st *params)
 {
 	int ret;
@@ -426,9 +426,10 @@ encrypt_packet_tls13(gnutls_session_t session,
 	const version_entry_st *ver = get_version(session);
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
 	unsigned iv_size = 0;
-	uint8_t *fdata;
-	ssize_t fdata_size, max;
+	ssize_t max, total;
 	uint8_t aad[5];
+	giovec_t auth_iov[1];
+	giovec_t iov[2];
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -453,39 +454,57 @@ encrypt_packet_tls13(gnutls_session_t session,
 	max = MAX_RECORD_SEND_SIZE(session);
 
 	/* make TLS 1.3 form of data */
-	fdata_size = plain->size + 1 + min_pad;
+	total = plain->size + 1 + pad_size;
 
 	/* check whether padding would exceed max */
-	if (fdata_size > max) {
+	if (total > max) {
 		if (unlikely(max < (ssize_t)plain->size+1))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		min_pad = max - plain->size - 1;
-		fdata_size = max;
+		pad_size = max - plain->size - 1;
+		total = max;
 	}
-
-	fdata = gnutls_malloc(fdata_size);
-	if (fdata == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	memcpy(fdata, plain->data, plain->size);
-	fdata[plain->size] = type;
-	if (min_pad)
-		memset(&fdata[plain->size+1], 0, min_pad);
 
 	/* create authenticated data header */
 	aad[0] = GNUTLS_APPLICATION_DATA;
 	aad[1] = 0x03;
 	aad[2] = 0x03;
-	_gnutls_write_uint16(fdata_size+tag_size, &aad[3]);
+	_gnutls_write_uint16(total+tag_size, &aad[3]);
 
-	ret = gnutls_aead_cipher_encrypt(&params->write.ctx.aead,
-					 nonce, iv_size,
-					 aad, sizeof(aad),
-					 tag_size,
-					 fdata, fdata_size,
-					 cipher_data, &cipher_size);
-	gnutls_free(fdata);
+	auth_iov[0].iov_base = aad;
+	auth_iov[0].iov_len = sizeof(aad);
+
+	iov[0].iov_base = plain->data;
+	iov[0].iov_len = plain->size;
+
+	if (pad_size) {
+		uint8_t *pad = gnutls_calloc(1, 1+pad_size);
+		if (pad == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		pad[0] = type;
+
+		iov[1].iov_base = pad;
+		iov[1].iov_len = 1+pad_size;
+
+		ret = gnutls_aead_cipher_encryptv(&params->write.ctx.aead,
+						  nonce, iv_size,
+						  auth_iov, 1,
+						  tag_size,
+						  iov, 2,
+						  cipher_data, &cipher_size);
+		gnutls_free(pad);
+	} else {
+		iov[1].iov_base = &type;
+		iov[1].iov_len = 1;
+
+		ret = gnutls_aead_cipher_encryptv(&params->write.ctx.aead,
+						  nonce, iv_size,
+						  auth_iov, 1,
+						  tag_size,
+						  iov, 2,
+						  cipher_data, &cipher_size);
+	}
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);

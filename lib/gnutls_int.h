@@ -122,7 +122,7 @@ typedef struct {
 
 #define MAX_MAC_KEY_SIZE 64
 
-#define MAX_CIPHER_BLOCK_SIZE 16
+#define MAX_CIPHER_BLOCK_SIZE 64 /* CHACHA20 */
 #define MAX_CIPHER_KEY_SIZE 32
 
 #define MAX_CIPHER_IV_SIZE 16

@@ -180,7 +180,7 @@ esac
 fi
 
 dnl Check for iovec type
-AC_CHECK_MEMBERS([struct iovec.iov_basea],
+AC_CHECK_MEMBERS([struct iovec.iov_base],
       [
         AC_SUBST([DEFINE_IOVEC_T], ["#include <sys/uio.h>
 typedef struct iovec giovec_t;"])
