@@ -1,7 +1,7 @@
 # Install a FreeBSD CI instance
 
 ```
-pkg install -y git gmake bash autoconf gettext libtool automake nettle p11-kit libunistring libtasn1 libidn2 gperf gawk bison softhsm2 openssl cmocka socat wget pkgconf
+pkg install -y git gmake bash autoconf gettext libtool automake nettle p11-kit libunistring libtasn1 libidn2 gperf gawk bison softhsm2 openssl cmocka socat wget pkgconf ccache
 bash
 pw group add -n gitlab-runner
 pw user add -n gitlab-runner -g gitlab-runner -s /usr/local/bin/bash
@@ -12,7 +12,7 @@ chmod +x /usr/local/bin/gitlab-runner
 touch /var/log/gitlab_runner.log && chown gitlab-runner:gitlab-runner /var/log/gitlab_runner.log
 mkdir -p /usr/local/etc/rc.d
 cat > /usr/local/etc/rc.d/gitlab_runner << "EOF"
-#!/bin/sh
+#!/usr/local/bin/bash
 # PROVIDE: gitlab_runner
 # REQUIRE: DAEMON NETWORKING
 # BEFORE:
@@ -38,6 +38,9 @@ gitlab_runner_start()
 {
     export USER=${user}
     export HOME=${user_home}
+    export GNULIB_SRCDIR=/builds/common/gnulib
+    export GNULIB_TOOL=/builds/common/gnulib/gnulib-tool
+
     if checkyesno ${rcvar}; then
         cd ${user_home}
         /usr/sbin/daemon -u ${user} -p ${pidfile} ${command} > /var/log/gitlab_runner.log 2>&1
@@ -66,5 +69,8 @@ chmod +x /usr/local/etc/rc.d/gitlab_runner
 su gitlab-runner -c 'gitlab-runner register'
 sysrc -f /etc/rc.conf "gitlab_runner_enable=YES"
 service gitlab_runner start
+mkdir -p /builds/common
+git clone https://git.savannah.gnu.org/git/gnulib.git /builds/common/gnulib
+
 ```
 
