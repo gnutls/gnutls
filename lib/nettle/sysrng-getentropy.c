@@ -34,6 +34,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#ifdef __APPLE__
+#include <sys/random.h>
+#endif
 
 /* gnulib wants to claim strerror even if it cannot provide it. WTF */
 #undef strerror

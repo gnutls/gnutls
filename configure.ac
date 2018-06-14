@@ -241,6 +241,9 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([
 AC_MSG_CHECKING([for getentropy])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([
 	   #include <unistd.h>
+           #ifdef __APPLE__
+           #include <sys/random.h>
+           #endif
            #ifdef __linux__
            #error 1
            #endif
