@@ -59,14 +59,3 @@ if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \
 	int/drbg-aes.c int/drbg-aes.h
 endif
-
-if NETTLE_3_3_API
-libcrypto_la_SOURCES += int/pss-mgf1.c int/pss-mgf1.h int/pss.c int/pss.h \
-	int/rsa-pss.c int/rsa-pss.h \
-	int/rsa-pss-sha256-sign-tr.c int/rsa-pss-sha256-verify.c \
-	int/rsa-pss-sha512-sign-tr.c int/rsa-pss-sha512-verify.c
-
-# HKDF was introduced in the same version of nettle
-libcrypto_la_SOURCES += int/hkdf.c int/hkdf.h
-
-endif

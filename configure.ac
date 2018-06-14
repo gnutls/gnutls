@@ -517,8 +517,6 @@ if test "$enable_non_suiteb" = "yes";then
 fi
 AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
-AM_CONDITIONAL(NETTLE_3_3_API, ! $PKG_CONFIG --atleast-version=3.4 nettle)
-
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],

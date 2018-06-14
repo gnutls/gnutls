@@ -25,7 +25,7 @@
 
 #include <config.h>
 #include "gnutls_int.h"
-#include "nettle/int/hkdf.h"
+#include <nettle/hkdf.h>
 #include <nettle/hmac.h>
 #include "secrets.h"
 
