@@ -348,7 +348,7 @@ int gnutls_error_to_alert(int err, int *level)
  */
 int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 {
-	gnutls_alert_description_t alert;
+	int alert;
 	int level;
 
 	alert = gnutls_error_to_alert(err, &level);
