@@ -2913,6 +2913,7 @@ void generate_pkcs12(common_info_st * cinfo)
 	gnutls_x509_crl_t *crls;
 	gnutls_x509_crt_t *crts, ca_crt;
 	gnutls_x509_privkey_t *keys;
+	gnutls_mac_algorithm_t mac;
 	int result;
 	size_t size;
 	gnutls_datum_t data;
@@ -2938,6 +2939,11 @@ void generate_pkcs12(common_info_st * cinfo)
 		fprintf(stderr, "You must specify one of\n\t--load-privkey\n\t--load-certificate\n\t--load-ca-certificate\n\t--load-crl\n");
 		app_exit(1);
 	}
+
+	if (cinfo->hash != GNUTLS_DIG_UNKNOWN)
+		mac = cinfo->hash;
+	else
+		mac = GNUTLS_MAC_SHA1;
 
 	if (HAVE_OPT(P12_NAME)) {
 		name = OPT_ARG(P12_NAME);
@@ -3165,7 +3171,7 @@ void generate_pkcs12(common_info_st * cinfo)
 		gnutls_pkcs12_bag_deinit(kbag);
 	}
 
-	result = gnutls_pkcs12_generate_mac(pkcs12, pass);
+	result = gnutls_pkcs12_generate_mac2(pkcs12, mac, pass);
 	if (result < 0) {
 		fprintf(stderr, "generate_mac: %s\n",
 			gnutls_strerror(result));
