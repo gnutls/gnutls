@@ -3043,6 +3043,14 @@ ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
 			return gnutls_assert_val(ret);
 		}
 
+		/* under TLS 1.3, CCS may be immediately followed by
+		 * receiving ClientHello thus cannot be cached */
+		if (vers && vers->tls13_sem) {
+			ret = _gnutls_handshake_io_write_flush(session);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
+
 		_gnutls_handshake_log("REC[%p]: Sent ChangeCipherSpec\n",
 				      session);
 	}
