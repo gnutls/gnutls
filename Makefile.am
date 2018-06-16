@@ -68,15 +68,16 @@ abi-dump:
 ABI_TMPCLONEDIR="gnutls-prev-abi.tmp"
 ABI_TMPFILE_CUR="abi-temp-cur.xml"
 ABI_TMPFILE_PRE="abi-temp-prev.xml"
-ABIREF=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1)
-ABIVER=$(shell git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1|cut -d '/' -f 3|sed -e 's/gnutls_//' -e 's/_/./g')
+ABIREFCMD="git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1"
+ABIVERCMD="git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1|cut -d '/' -f 3|sed -e 's/gnutls_//' -e 's/_/./g'"
 .prev-tag-abi.stamp:
 	@rm -rf $(ABI_TMPCLONEDIR)
 	@git clone -l . $(ABI_TMPCLONEDIR)
-	@echo "Creating ABI for $(ABIVER)"
+	@echo "Creating ABI for $$(eval $(ABIVERCMD))"
 	cd $(ABI_TMPCLONEDIR) && \
-	  git checkout $(ABIREF) && \
-	  $(MAKE) autoreconf && if test -f ../cache/config.cache;then\
+	  git fetch --tags https://gitlab.com/gnutls/gnutls.git && \
+	  git checkout $$(eval $(ABIREFCMD)) && \
+	  $(MAKE) autoreconf && if test -f ../cache/config.cache;then \
 	    CFLAGS="-g -Og" ./configure --disable-doc --cache-file ../cache/config.cache;\
 	  else\
 	    CFLAGS="-g -Og" ./configure --disable-doc;\
@@ -106,7 +107,7 @@ abi-check: .prev-tag-abi.stamp
 	@echo "$(srcdir)/lib/includes/gnutls" >>$(ABI_TMPFILE_CUR)
 	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_CUR)
 	@echo "<libs>$(builddir)/libdane/.libs</libs>" >>$(ABI_TMPFILE_CUR)
-	@echo "<version>$(ABIVER)</version>" >$(ABI_TMPFILE_PRE)
+	@echo "<version>$$(eval $(ABIVERCMD))</version>" >$(ABI_TMPFILE_PRE)
 	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/libdane/includes/gnutls" >>$(ABI_TMPFILE_PRE)
 	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
 	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
