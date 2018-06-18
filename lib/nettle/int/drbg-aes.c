@@ -160,12 +160,6 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		INCREMENT(sizeof(ctx->v), ctx->v);
 		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, ctx->v);
 
-		/* if detected loop */
-		if (memcmp(dst, ctx->prev_block, AES_BLOCK_SIZE) == 0) {
-			_gnutls_switch_lib_state(LIB_STATE_ERROR);
-			return gnutls_assert_val(0);
-		}
-
 		memcpy(ctx->prev_block, dst, AES_BLOCK_SIZE);
 	}
 
@@ -173,12 +167,6 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 
 		INCREMENT(sizeof(ctx->v), ctx->v);
 		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, ctx->v);
-
-		/* if detected loop */
-		if (memcmp(tmp, ctx->prev_block, AES_BLOCK_SIZE) == 0) {
-			_gnutls_switch_lib_state(LIB_STATE_ERROR);
-			return gnutls_assert_val(0);
-		}
 
 		memcpy(ctx->prev_block, tmp, AES_BLOCK_SIZE);
 		memcpy(dst, tmp, left);
