@@ -490,7 +490,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		retval = session->internals.record_send_buffer_user_size;
 	} else {
 		if (unlikely((send_data_size == 0 && min_pad == 0)))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		/* now proceed to packet encryption
 		 */

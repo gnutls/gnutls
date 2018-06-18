@@ -89,6 +89,7 @@ struct test_st {
 	size_t data;
 	const char *prio;
 	unsigned flags;
+	int sret;
 };
 
 static void client(int fd, struct test_st *test)
@@ -162,7 +163,7 @@ static void client(int fd, struct test_st *test)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -251,6 +252,15 @@ static void server(int fd, struct test_st *test)
 	} while (ret == GNUTLS_E_AGAIN
 		 || ret == GNUTLS_E_INTERRUPTED);
 
+	if (test->sret < 0) {
+		if (ret >= 0)
+			fail("server: expected failure got success!\n");
+		if (ret != test->sret)
+			fail("server: expected different failure: '%s', got: '%s'\n",
+			     gnutls_strerror(test->sret), gnutls_strerror(ret));
+		goto finish;
+	}
+
 	if (ret < 0) {
 		fail("Error sending packet: %s\n",
 		     gnutls_strerror(ret));
@@ -264,6 +274,7 @@ static void server(int fd, struct test_st *test)
 		terminate();
 	}
 
+ finish:
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -379,6 +390,14 @@ struct test_st tests[] =
 		.data = 0,
 		.prio = AES_GCM,
 		.flags = GNUTLS_SAFE_PADDING_CHECK
+	},
+	{
+		.name = "AES-GCM with pad, but no data and no pad",
+		.pad = 0,
+		.data = 0,
+		.prio = AES_GCM,
+		.flags = GNUTLS_SAFE_PADDING_CHECK,
+		.sret = GNUTLS_E_INVALID_REQUEST
 	},
 };
 
