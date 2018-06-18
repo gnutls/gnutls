@@ -477,7 +477,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 	iov[0].iov_base = plain->data;
 	iov[0].iov_len = plain->size;
 
-	if (pad_size) {
+	if (pad_size || (session->internals.flags & GNUTLS_SAFE_PADDING_CHECK)) {
 		uint8_t *pad = gnutls_calloc(1, 1+pad_size);
 		if (pad == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -879,6 +879,8 @@ decrypt_packet_tls13(gnutls_session_t session,
 			*type = plain->data[j-1];
 			length = j-1;
 			length_set = 1;
+			if (!(session->internals.flags & GNUTLS_SAFE_PADDING_CHECK))
+				break;
 		}
 	}
 

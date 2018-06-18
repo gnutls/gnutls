@@ -375,6 +375,11 @@ typedef enum {
  * @GNUTLS_POST_HANDSHAKE_AUTH: Enable post handshake authentication for server and client. When set and
  *   a server requests authentication after handshake %GNUTLS_E_REAUTH_REQUEST will be returned
  *   by gnutls_record_recv(). A client should then call gnutls_reauth() to re-authenticate.
+ * @GNUTLS_SAFE_PADDING_CHECK: Flag to indicate that the TLS 1.3 padding check will be done in a
+ *   safe way which doesn't leak the pad size based on GnuTLS processing time. This is of use to
+ *   applications which hide the length of transferred data via the TLS1.3 padding mechanism and
+ *   are already taking steps to hide the data processing time. This comes at a performance
+ *   penalty.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
@@ -400,7 +405,8 @@ typedef enum {
 	GNUTLS_KEY_SHARE_TOP2 = (1<<12),
 	GNUTLS_KEY_SHARE_TOP3 = (1<<13),
 	GNUTLS_POST_HANDSHAKE_AUTH = (1<<14),
-	GNUTLS_NO_AUTO_REKEY = (1<<15)
+	GNUTLS_NO_AUTO_REKEY = (1<<15),
+	GNUTLS_SAFE_PADDING_CHECK = (1<<16)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls
