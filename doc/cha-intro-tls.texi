@@ -243,6 +243,14 @@ interface is provided by @funcref{gnutls_record_send2}, and is made
 available when under TLS1.3; alternatively @funcref{gnutls_record_can_use_length_hiding}
 can be queried.
 
+Note that this interface is not sufficient to completely hide the length of the
+data. The application code may reveal the data transferred by leaking its
+data processing time, or by leaking the TLS1.3 record processing time by
+GnuTLS. That is because under TLS1.3 the padding removal time depends on the
+padding data for an efficient implementation. To make that processing
+constant time the @funcref{gnutls_init} function must be called with
+the flag @code{GNUTLS_SAFE_PADDING_CHECK}.
+
 @showfuncdesc{gnutls_record_send2}
 
 Older GnuTLS versions provided an API suitable for cases where the sender

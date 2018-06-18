@@ -1294,10 +1294,10 @@ and @ref{tab:prio-special2}.
 will enable compatibility mode. It might mean that violations
 of the protocols are allowed as long as maximum compatibility with
 problematic clients and servers is achieved. More specifically this
-string would disable TLS record random padding, tolerate packets
-over the maximum allowed TLS record, and add a padding to TLS Client
-Hello packet to prevent it being in the 256-512 range which is known
-to be causing issues with a commonly used firewall (see the %DUMBFW option).
+string will tolerate packets over the maximum allowed TLS record,
+and add a padding to TLS Client Hello packet to prevent it being in the
+256-512 range which is known to be causing issues with a commonly used
+firewall (see the %DUMBFW option).
 
 @item %DUMBFW @tab
 will add a private extension with bogus data that make the client

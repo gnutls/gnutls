@@ -1760,6 +1760,10 @@ gnutls_record_send(gnutls_session_t session, const void *data,
  * To determine the maximum size of padding, use
  * gnutls_record_get_max_size() and gnutls_record_overhead_size().
  *
+ * Note that in order for GnuTLS to provide constant time processing
+ * of padding and data in TLS1.3, the flag %GNUTLS_SAFE_PADDING_CHECK
+ * must be used in gnutls_init().
+ *
  * Returns: The number of bytes sent, or a negative error code.  The
  *   number of bytes sent might be less than @data_size.  The maximum
  *   number of bytes this function can send in a single call depends
