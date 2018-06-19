@@ -172,6 +172,12 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
  * current session.  In all supported TLS protocols, the session id
  * is less than %GNUTLS_MAX_SESSION_ID_SIZE.
  *
+ * The TLS session ID cannot be relied for uniquely identifying sessions.
+ * It should not be used by new applications, nor be assumed
+ * that it will remain the same on resumption. The session ID changes
+ * even on resumed sessions under session tickets, and has no defined meaning
+ * under TLS 1.3.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
@@ -206,6 +212,12 @@ gnutls_session_get_id(gnutls_session_t session,
  *
  * Returns the current session ID. The returned data should be
  * treated as constant.
+ *
+ * The TLS session ID cannot be relied for uniquely identifying sessions.
+ * It should not be used by new applications, nor be assumed
+ * that it will remain the same on resumption. The session ID changes
+ * even on resumed sessions under session tickets, and has no defined meaning
+ * under TLS 1.3.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
