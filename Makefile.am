@@ -157,12 +157,7 @@ files-update: libopts-check
 	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile $(srcdir)/doc/Makefile.am
 	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile $(srcdir)/doc/manpages/Makefile.am
 	$(MAKE) -C . symbol-check || mv symbols.last.tmp $(srcdir)/symbols.last
-	@echo "******************************************************************************************"
-	@echo "updating autogen files in src/"
-	@echo "******************************************************************************************"
-	cd $(srcdir)/src/ && for i in *-args.c *-args.h;do \
-		test -h $$i || cp $$i $$i.bak; \
-	done
+	$(MAKE) -C src files-update
 	@echo "******************************************************************************************"
 	@echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
 	@echo "******************************************************************************************"

@@ -301,3 +301,11 @@ mech-list.h: gen-mech-list.sh
 
 maintainer-clean-local:
 	rm -f *.stamp mech-list.h
+
+files-update:
+	@echo "******************************************************************************************"
+	@echo "updating autogen files in src/"
+	@echo "******************************************************************************************"
+	for i in *-args.c *-args.h;do \
+		test -h "$$i" || sed -e "s!$(srcdir)/!!g" "$$i" > $(srcdir)/`basename "$$i"`.bak; \
+	done
