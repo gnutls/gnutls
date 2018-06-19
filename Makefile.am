@@ -154,9 +154,9 @@ libopts-check:
 	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
 files-update: libopts-check
-	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
-	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
-	$(MAKE) -C . symbol-check || mv symbols.last.tmp symbols.last
+	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile $(srcdir)/doc/Makefile.am
+	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile $(srcdir)/doc/manpages/Makefile.am
+	$(MAKE) -C . symbol-check || mv symbols.last.tmp $(srcdir)/symbols.last
 	@echo "******************************************************************************************"
 	@echo "updating autogen files in src/"
 	@echo "******************************************************************************************"
