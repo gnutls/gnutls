@@ -57,10 +57,12 @@ gnutls_set_trust_file_fuzzer_LDADD = $(LDADD) $(LIBDL)
 #EXTRA_DIST = $(wildcard *.options) $(wildcard *.dict) \
 # $(wildcard *.in) $(wildcard *.repro)
 
+# We don't include the fuzz corpora into the tarball.
+# Testing the corpora during dev cycles and in the CI is enough.
 dist-hook:
 	find . -name '*.options' -exec cp -v '{}' $(distdir) ';'
 	find . -name '*.dict' -exec cp -v '{}' $(distdir) ';'
-	find . -name '*.in' -exec cp -vr '{}' $(distdir) ';'
+#	find . -name '*.in' -exec cp -vr '{}' $(distdir) ';'
 	find . -name '*.repro' -exec cp -vr '{}' $(distdir) ';'
 
 TESTS = $(FUZZERS)
