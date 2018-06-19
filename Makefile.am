@@ -119,7 +119,7 @@ abi-check: .prev-tag-abi.stamp
 symbol-check:
 	@objdump -T $(builddir)/lib/.libs/libgnutls.so  | grep -v ' \*UND\*'  | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE | grep -v '^@' |  sort -u >symbols.last.tmp
 	@diff -u $(srcdir)/symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
-		diff -u $(srcdir)symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
+		diff -u $(srcdir)/symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
 		if grep -e '^-' symbols.diff.tmp;then \
 			echo "*******************************************"; \
 			echo "Symbols were removed from the library."; \
