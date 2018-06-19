@@ -119,8 +119,9 @@ static void dtls_mtu_try(const char *name, const char *client_prio,
 	}
 
 	{
-		char msg[dmtu+1];
-		memset(msg, 1, sizeof(msg));
+		char *msg = gnutls_malloc(dmtu+1);
+		assert(msg);
+		memset(msg, 1, dmtu+1);
 		ret = gnutls_record_send(client, msg, dmtu+1);
 		if (ret != (int)GNUTLS_E_LARGE_PACKET) {
 			myfail("could send larger packet than MTU (%d), ret: %d\n", dmtu, ret);
@@ -139,6 +140,8 @@ static void dtls_mtu_try(const char *name, const char *client_prio,
 
 		for (i=0;i<dmtu;i++)
 			assert(msg[i]==1);
+
+		gnutls_free(msg);
 	}
 
 	gnutls_dtls_set_data_mtu(client, link_mtu);
