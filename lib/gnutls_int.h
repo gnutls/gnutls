@@ -1433,6 +1433,7 @@ inline static unsigned get_num_version(gnutls_session_t session)
 
 void _gnutls_priority_update_fips(void);
 void _gnutls_priority_update_non_aesni(void);
+extern unsigned _gnutls_disable_tls13;
 
 #define timespec_sub_ms _gnutls_timespec_sub_ms
 unsigned int
