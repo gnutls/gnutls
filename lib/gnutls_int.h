@@ -1307,7 +1307,8 @@ typedef struct {
 	/* if set, server and client random were set by the application */
 	bool sc_random_set;
 
-	unsigned flags; /* the flags in gnutls_init() */
+#define INT_FLAG_NO_TLS13 (1LL<<60)
+	uint64_t flags; /* the flags in gnutls_init() and GNUTLS_INT_FLAGS */
 
 	/* a verify callback to override the verify callback from the credentials
 	 * structure */
