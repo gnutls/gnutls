@@ -316,6 +316,8 @@ static void verify_group(gnutls_session_t session, gnutls_group_t *group, unsign
 
 static void verify_server_params(gnutls_session_t session, unsigned counter, struct params_res *params)
 {
+	static char id[GNUTLS_MAX_SESSION_ID];
+	static size_t id_size = 0;
 #if defined(USE_PSK)
 	const char *username;
 	username = gnutls_psk_server_get_username(session);
@@ -342,6 +344,31 @@ static void verify_server_params(gnutls_session_t session, unsigned counter, str
 	}
 #endif
 
+	/* verify whether the session ID remains the same between sessions */
+	if (counter == 0) {
+		id_size = sizeof(id);
+		assert(gnutls_session_get_id(session, id, &id_size) >= 0);
+	} else {
+		char id2[GNUTLS_MAX_SESSION_ID];
+		size_t id2_size = sizeof(id2);
+
+		if (params->enable_session_ticket_client && params->enable_session_ticket_server)
+			goto finish;
+
+		if (id_size == 0)
+			fail("no session ID was set\n");
+
+		assert(gnutls_session_get_id(session, id2, &id2_size) >= 0);
+
+		if (id_size != id2_size || memcmp(id, id2, id_size) != 0) {
+			hexprint(id, id_size);
+			printf("\n");
+			hexprint(id2, id2_size);
+			fail("resumed session ID does not match original\n");
+		}
+	}
+
+ finish:
 	return;
 }
 
