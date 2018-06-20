@@ -490,7 +490,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		retval = session->internals.record_send_buffer_user_size;
 	} else {
 		if (unlikely((send_data_size == 0 && min_pad == 0)))
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 		/* now proceed to packet encryption
 		 */
@@ -1759,6 +1759,10 @@ gnutls_record_send(gnutls_session_t session, const void *data,
  * takes an extra argument to specify padding to be added the record.
  * To determine the maximum size of padding, use
  * gnutls_record_get_max_size() and gnutls_record_overhead_size().
+ *
+ * Note that in order for GnuTLS to provide constant time processing
+ * of padding and data in TLS1.3, the flag %GNUTLS_SAFE_PADDING_CHECK
+ * must be used in gnutls_init().
  *
  * Returns: The number of bytes sent, or a negative error code.  The
  *   number of bytes sent might be less than @data_size.  The maximum

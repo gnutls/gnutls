@@ -45,6 +45,7 @@ int main(void)
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
+#include <assert.h>
 
 #include "cert-common.h"
 #include "utils.h"
@@ -82,7 +83,16 @@ push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static void client(int fd, const char *prio)
+struct test_st {
+	const char *name;
+	size_t pad;
+	size_t data;
+	const char *prio;
+	unsigned flags;
+	int sret;
+};
+
+static void client(int fd, struct test_st *test)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -101,12 +111,8 @@ static void client(int fd, const char *prio)
 	gnutls_anon_allocate_client_credentials(&anoncred);
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
-	/* Initialize TLS session
-	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
-
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, prio, NULL);
+	assert(gnutls_init(&session, GNUTLS_CLIENT|test->flags)>=0);
+	assert(gnutls_priority_set_direct(session, test->prio, NULL)>=0);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -138,7 +144,7 @@ static void client(int fd, const char *prio)
 
 	do {
 		do {
-			ret = gnutls_record_recv(session, buffer, MAX_BUF);
+			ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 		} while (ret == GNUTLS_E_AGAIN
 			 || ret == GNUTLS_E_INTERRUPTED);
 	} while (ret > 0);
@@ -157,7 +163,7 @@ static void client(int fd, const char *prio)
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-      end:
+ end:
 
 	close(fd);
 
@@ -179,7 +185,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd, const char *prio, size_t pad)
+static void server(int fd, struct test_st *test)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -205,12 +211,9 @@ static void server(int fd, const char *prio, size_t pad)
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-	gnutls_init(&session, GNUTLS_SERVER);
+	assert(gnutls_init(&session, GNUTLS_SERVER|test->flags)>=0);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, prio, NULL);
+	assert(gnutls_priority_set_direct(session, test->prio, NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
@@ -238,14 +241,25 @@ static void server(int fd, const char *prio, size_t pad)
 
 	gnutls_transport_set_push_function(session, push);
 
+	assert(test->data <= sizeof(buffer));
+
 	total = 0;
 	do {
 		ret =
 		    gnutls_record_send2(session, buffer,
-					sizeof(buffer),
-					pad, 0);
+					test->data,
+					test->pad, 0);
 	} while (ret == GNUTLS_E_AGAIN
 		 || ret == GNUTLS_E_INTERRUPTED);
+
+	if (test->sret < 0) {
+		if (ret >= 0)
+			fail("server: expected failure got success!\n");
+		if (ret != test->sret)
+			fail("server: expected different failure: '%s', got: '%s'\n",
+			     gnutls_strerror(test->sret), gnutls_strerror(ret));
+		goto finish;
+	}
 
 	if (ret < 0) {
 		fail("Error sending packet: %s\n",
@@ -253,13 +267,14 @@ static void server(int fd, const char *prio, size_t pad)
 		terminate();
 	}
 
-	expected = sizeof(buffer) + pad + gnutls_record_overhead_size(session);
+	expected = test->data + test->pad + gnutls_record_overhead_size(session);
 	if (total != expected) {
 		fail("Sent data (%u) are lower than expected (%u)\n",
 		     (unsigned) total, (unsigned) expected);
 		terminate();
 	}
 
+ finish:
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -276,10 +291,12 @@ static void server(int fd, const char *prio, size_t pad)
 		success("server: finished\n");
 }
 
-static void start(const char *prio, size_t pad)
+static void start(struct test_st *test)
 {
 	int fd[2];
 	int ret;
+
+	success("running %s\n", test->name);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -297,11 +314,11 @@ static void start(const char *prio, size_t pad)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0], prio, pad);
+		server(fd[0], test);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
-		client(fd[1], prio);
+		client(fd[1], test);
 		exit(0);
 	}
 }
@@ -316,13 +333,82 @@ static void ch_handler(int sig)
 	return;
 }
 
+struct test_st tests[] =
+{
+	{
+		.name = "AES-GCM with max pad",
+		.pad = HIGH(MAX_BUF+1)-(MAX_BUF+1),
+		.data = MAX_BUF,
+		.prio = AES_GCM,
+		.flags = 0
+	},
+	{
+		.name = "AES-GCM with zero pad",
+		.pad = 0,
+		.data = MAX_BUF,
+		.prio = AES_GCM,
+		.flags = 0
+	},
+	{
+		.name = "AES-GCM with 1-byte pad",
+		.pad = 1,
+		.data = MAX_BUF,
+		.prio = AES_GCM,
+		.flags = 0
+	},
+	{
+		.name = "AES-GCM with pad, but no data",
+		.pad = 16,
+		.data = 0,
+		.prio = AES_GCM,
+		.flags = 0
+	},
+	{
+		.name = "AES-GCM with max pad and safe padding check",
+		.pad = HIGH(MAX_BUF+1)-(MAX_BUF+1),
+		.data = MAX_BUF,
+		.prio = AES_GCM,
+		.flags = GNUTLS_SAFE_PADDING_CHECK
+	},
+	{
+		.name = "AES-GCM with zero pad and safe padding check",
+		.pad = 0,
+		.data = MAX_BUF,
+		.prio = AES_GCM,
+		.flags = GNUTLS_SAFE_PADDING_CHECK
+	},
+	{
+		.name = "AES-GCM with 1-byte pad and safe padding check",
+		.pad = 1,
+		.data = MAX_BUF,
+		.prio = AES_GCM,
+		.flags = GNUTLS_SAFE_PADDING_CHECK
+	},
+	{
+		.name = "AES-GCM with pad, but no data and safe padding check",
+		.pad = 16,
+		.data = 0,
+		.prio = AES_GCM,
+		.flags = GNUTLS_SAFE_PADDING_CHECK
+	},
+	{
+		.name = "AES-GCM with pad, but no data and no pad",
+		.pad = 0,
+		.data = 0,
+		.prio = AES_GCM,
+		.flags = GNUTLS_SAFE_PADDING_CHECK,
+		.sret = GNUTLS_E_INVALID_REQUEST
+	},
+};
+
 void doit(void)
 {
+	unsigned i;
 	signal(SIGCHLD, ch_handler);
 
-	start(AES_GCM, HIGH(MAX_BUF+1)-(MAX_BUF+1));
-	start(AES_GCM, 0);
-	start(AES_GCM, 1);
+	for (i=0;i<sizeof(tests)/sizeof(tests[0]);i++) {
+		start(&tests[i]);
+	}
 }
 
 #endif				/* _WIN32 */
