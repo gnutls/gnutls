@@ -119,7 +119,7 @@ abi-check: .prev-tag-abi.stamp
 symbol-check:
 	@objdump -T $(builddir)/lib/.libs/libgnutls.so  | grep -v ' \*UND\*'  | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE | grep -v '^@' |  sort -u >symbols.last.tmp
 	@diff -u $(srcdir)/symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
-		diff -u $(srcdir)symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
+		diff -u $(srcdir)/symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
 		if grep -e '^-' symbols.diff.tmp;then \
 			echo "*******************************************"; \
 			echo "Symbols were removed from the library."; \
@@ -154,15 +154,10 @@ libopts-check:
 	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
 files-update: libopts-check
-	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile doc/Makefile.am
-	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile doc/manpages/Makefile.am
-	$(MAKE) -C . symbol-check || mv symbols.last.tmp symbols.last
-	@echo "******************************************************************************************"
-	@echo "updating autogen files in src/"
-	@echo "******************************************************************************************"
-	cd $(srcdir)/src/ && for i in *-args.c *-args.h;do \
-		test -h $$i || cp $$i $$i.bak; \
-	done
+	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile $(srcdir)/doc/Makefile.am
+	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile $(srcdir)/doc/manpages/Makefile.am
+	$(MAKE) -C . symbol-check || mv symbols.last.tmp $(srcdir)/symbols.last
+	$(MAKE) -C src files-update
 	@echo "******************************************************************************************"
 	@echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
 	@echo "******************************************************************************************"
