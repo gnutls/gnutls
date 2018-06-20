@@ -37,7 +37,13 @@
 
 #include <dirent.h>
 
-static void test_all_from(const char *dirname)
+#ifdef _WIN32
+#  define SLASH '\\'
+#else
+#  define SLASH '/'
+#endif
+
+static int test_all_from(const char *dirname)
 {
 	DIR *dirp;
 	struct dirent *dp;
@@ -76,27 +82,46 @@ static void test_all_from(const char *dirname)
 			close(fd);
 		}
 		closedir(dirp);
+		return 0;
 	}
+
+	return 1;
 }
 
 int main(int argc, char **argv)
 {
-	const char *target = strrchr(argv[0], '/');
+	const char *target;
+	size_t target_len;
+
+	if ((target = strrchr(argv[0], SLASH)))
+		target = strrchr(target, '/');
+	else
+		target = strrchr(argv[0], '/');
 	target = target ? target + 1 : argv[0];
 
-	char corporadir[sizeof(SRCDIR) + 1 + strlen(target) + 8];
-
-	if (strncmp(target, "lt-", 3) == 0) {
+	if (strncmp(target, "lt-", 3) == 0)
 		target += 3;
+
+	target_len = strlen(target);
+
+#ifdef _WIN32
+	target_len -= 4; // ignore .exe
+#endif
+
+	{
+		int rc;
+		char corporadir[sizeof(SRCDIR) + 1 + target_len + 8];
+		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.in", (int) target_len, target);
+
+		rc = test_all_from(corporadir);
+		if (rc)
+			fprintf(stderr, "Failed to find %s\n", corporadir);
+
+		snprintf(corporadir, sizeof(corporadir), SRCDIR "/%.*s.repro", (int) target_len, target);
+
+		if (test_all_from(corporadir) && rc)
+			return 77;
 	}
-
-	snprintf(corporadir, sizeof(corporadir), SRCDIR "/%s.in", target);
-
-	test_all_from(corporadir);
-
-	snprintf(corporadir, sizeof(corporadir), SRCDIR "/%s.repro", target);
-
-	test_all_from(corporadir);
 
 	return 0;
 }
