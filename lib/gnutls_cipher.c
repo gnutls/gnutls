@@ -659,7 +659,11 @@ ciphertext_to_compressed(gnutls_session_t session,
 		 * Note that we access all 256 bytes of ciphertext for padding check
 		 * because there is a timing channel in that memory access (in certain CPUs).
 		 */
-		if (ver->id != GNUTLS_SSL3)
+		if (ver->id == GNUTLS_SSL3) {
+			if (pad >= blocksize)
+				pad_failed = 1;
+		} else
+		{
 			for (i = 2; i <= MIN(256, ciphertext->size); i++) {
 				tmp_pad_failed |=
 				    (compressed->
@@ -667,6 +671,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 				pad_failed |=
 				    ((i <= (1 + pad)) & (tmp_pad_failed));
 			}
+		}
 
 		if (unlikely
 		    (pad_failed != 0
