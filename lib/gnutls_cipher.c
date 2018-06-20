@@ -440,7 +440,7 @@ static void dummy_wait(record_parameters_st * params,
 {
 	/* this hack is only needed on CBC ciphers */
 	if (_gnutls_cipher_is_block(params->cipher) == CIPHER_BLOCK) {
-		unsigned len;
+		unsigned len, v;
 
 		/* force an additional hash compression function evaluation to prevent timing 
 		 * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
@@ -448,11 +448,14 @@ static void dummy_wait(record_parameters_st * params,
 		if (pad_failed == 0 && pad > 0) {
 			len = _gnutls_mac_block_size(params->mac);
 			if (len > 0) {
-				/* This is really specific to the current hash functions.
-				 * It should be removed once a protocol fix is in place.
-				 */
-				if ((pad + total) % len > len - 9
-				    && total % len <= len - 9) {
+				if (params->mac && params->mac->id == GNUTLS_MAC_SHA384)
+					/* v = 1 for the hash function padding + 16 for message length */
+					v = 17;
+				else /* v = 1 for the hash function padding + 8 for message length */
+					v = 9;
+
+				if ((pad + total) % len > len - v
+				    && total % len <= len - v) {
 					if (len < plaintext->size)
 						_gnutls_auth_cipher_add_auth
 						    (&params->read.
