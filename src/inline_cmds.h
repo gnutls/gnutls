@@ -41,9 +41,9 @@
 typedef enum INLINE_COMMAND { INLINE_COMMAND_NONE,
 	INLINE_COMMAND_RESUME,
 	INLINE_COMMAND_RENEGOTIATE,
-	INLINE_COMMAND_REKEY
+	INLINE_COMMAND_REKEY_LOCAL,
+	INLINE_COMMAND_REKEY_BOTH
 } inline_command_t;
-#define NUM_INLINE_COMMANDS 2
 
 #define MAX_INLINE_COMMAND_BYTES 20
 
@@ -67,6 +67,9 @@ struct inline_command_definitions {
 /* All inline commands will contain a trailing LF */
 struct inline_command_definitions inline_commands_def[] = {
 	{INLINE_COMMAND_RESUME, "^resume^\n"},
-	{INLINE_COMMAND_REKEY, "^rekey^\n"},
+	{INLINE_COMMAND_REKEY_LOCAL, "^rekey1^\n"},
+	{INLINE_COMMAND_REKEY_BOTH, "^rekey^\n"},
 	{INLINE_COMMAND_RENEGOTIATE, "^renegotiate^\n"},
 };
+
+#define NUM_INLINE_COMMANDS ((unsigned)(sizeof(inline_commands_def)/sizeof(inline_commands_def[0])))

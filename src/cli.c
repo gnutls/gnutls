@@ -811,12 +811,12 @@ static int try_rehandshake(socket_st * hd)
 	}
 }
 
-static int try_rekey(socket_st * hd)
+static int try_rekey(socket_st * hd, unsigned peer)
 {
 	int ret;
 
 	do {
-		ret = gnutls_session_key_update(hd->session, GNUTLS_KU_PEER);
+		ret = gnutls_session_key_update(hd->session, peer?GNUTLS_KU_PEER:0);
 	} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
@@ -985,8 +985,10 @@ int run_inline_command(inline_cmds_st * cmd, socket_st * hd)
 	switch (cmd->cmd_found) {
 	case INLINE_COMMAND_RESUME:
 		return try_resume(hd);
-	case INLINE_COMMAND_REKEY:
-		return try_rekey(hd);
+	case INLINE_COMMAND_REKEY_LOCAL:
+		return try_rekey(hd, 0);
+	case INLINE_COMMAND_REKEY_BOTH:
+		return try_rekey(hd, 1);
 	case INLINE_COMMAND_RENEGOTIATE:
 		return try_rehandshake(hd);
 	default:

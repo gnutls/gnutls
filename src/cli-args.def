@@ -383,7 +383,7 @@ flag = {
 flag = {
     name      = inline-commands;
     descrip   = "Inline commands of the form ^<cmd>^";
-    doc       = "Enable inline commands of the form ^<cmd>^. The inline commands are expected to be in a line by themselves. The available commands are: resume and renegotiate.";
+    doc       = "Enable inline commands of the form ^<cmd>^. The inline commands are expected to be in a line by themselves. The available commands are: resume, rekey1 (local rekey), rekey (rekey on both peers) and renegotiate.";
 };
 
 flag = {
