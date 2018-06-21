@@ -108,10 +108,6 @@ static gnutls_psk_client_credentials_t psk_cred;
 static gnutls_anon_client_credentials_t anon_cred;
 static gnutls_certificate_credentials_t xcred;
 
-/* The number of seconds we wait for a reply from peer prior to
- * closing the connection. */
-#define TERM_TIMEOUT 8000
-
 /* end of global stuff */
 
 /* prototypes */
@@ -739,12 +735,13 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
+#define IN_NONE 0
 #define IN_KEYBOARD 1
 #define IN_NET 2
-#define IN_NONE 0
+#define IN_TERM 3
 /* returns IN_KEYBOARD for keyboard input and IN_NET for network input
  */
-static int check_net_or_keyboard_input(socket_st * hd)
+static int check_net_or_keyboard_input(socket_st * hd, unsigned user_term)
 {
 	int maxfd;
 	fd_set rset;
@@ -756,14 +753,18 @@ static int check_net_or_keyboard_input(socket_st * hd)
 		FD_SET(hd->fd, &rset);
 
 #ifndef _WIN32
-		FD_SET(fileno(stdin), &rset);
-		maxfd = MAX(fileno(stdin), hd->fd);
+		if (!user_term) {
+			FD_SET(fileno(stdin), &rset);
+			maxfd = MAX(fileno(stdin), hd->fd);
+		} else {
+			maxfd = hd->fd;
+		}
 #else
 		maxfd = hd->fd;
 #endif
 
-		tv.tv_sec = 0;
-		tv.tv_usec = 500 * 1000;
+		tv.tv_sec = 2;
+		tv.tv_usec = 0;
 
 		if (hd->secure == 1)
 			if (gnutls_record_check_pending(hd->session))
@@ -787,9 +788,11 @@ static int check_net_or_keyboard_input(socket_st * hd)
 				return IN_KEYBOARD;
 		}
 #else
-		if (FD_ISSET(fileno(stdin), &rset))
+		if (!user_term && FD_ISSET(fileno(stdin), &rset))
 			return IN_KEYBOARD;
 #endif
+		if (err == 0 && user_term)
+			return IN_TERM;
 	}
 	while (err == 0);
 
@@ -1090,26 +1093,6 @@ print_other_info(gnutls_session_t session)
 
 }
 
-static void flush_socket(socket_st *hd, unsigned ms)
-{
-	int ret, ii;
-	char buffer[MAX_BUF + 1];
-
-	memset(buffer, 0, MAX_BUF + 1);
-	ret = socket_recv_timeout(hd, buffer, MAX_BUF, ms);
-	if (ret == 0)
-		return;
-	else if (ret > 0) {
-		if (verbose != 0)
-			printf("- Received[%d]: ", ret);
-
-		for (ii = 0; ii < ret; ii++) {
-			fputc(buffer[ii], stdout);
-		}
-		fflush(stdout);
-	}
-}
-
 int main(int argc, char **argv)
 {
 	int ret;
@@ -1120,7 +1103,6 @@ int main(int argc, char **argv)
 	ssize_t bytes, keyboard_bytes;
 	char *keyboard_buffer_ptr;
 	inline_cmds_st inline_cmds;
-	unsigned last_op_is_write = 0;
 	int socket_flags = 0;
 	FILE *server_fp = NULL;
 	FILE *client_fp = NULL;
@@ -1228,25 +1210,24 @@ int main(int argc, char **argv)
 			if (ret < 0) {
 				fprintf(stderr,
 					"*** Handshake has failed\n");
-				user_term = 1;
 				retval = 1;
 				break;
 			}
 		}
 
-		inp = check_net_or_keyboard_input(&hd);
+		inp = check_net_or_keyboard_input(&hd, user_term);
+		if (inp == IN_TERM)
+			break;
 
 		if (inp == IN_NET) {
 			memset(buffer, 0, MAX_BUF + 1);
-			last_op_is_write = 0;
 			ret = socket_recv(&hd, buffer, MAX_BUF);
 
-			if (ret == 0) {
+			if (ret == 0 || (ret == GNUTLS_E_PREMATURE_TERMINATION && user_term)) {
 				printf
 				    ("- Peer has closed the GnuTLS connection\n");
 				break;
-			} else if (handle_error(&hd, ret) < 0
-				   && user_term == 0) {
+			} else if (handle_error(&hd, ret) < 0) {
 				fprintf(stderr,
 					"*** Server has terminated the connection abnormally.\n");
 				retval = 1;
@@ -1259,15 +1240,12 @@ int main(int argc, char **argv)
 				}
 				fflush(stdout);
 			}
-
-			if (user_term != 0)
-				break;
 		}
 
-		if (inp == IN_KEYBOARD) {
+		if (inp == IN_KEYBOARD && user_term == 0) {
 			if ((bytes =
-			     read(fileno(stdin), buffer,
-				  MAX_BUF - 1)) <= 0) {
+			    read(fileno(stdin), buffer,
+			    MAX_BUF - 1)) <= 0) {
 				if (hd.secure == 0) {
 					/* Warning!  Do not touch this text string, it is
 					   used by external programs to search for when
@@ -1279,20 +1257,22 @@ int main(int argc, char **argv)
 					if (ret < 0) {
 						fprintf(stderr,
 							"*** Handshake has failed\n");
-						user_term = 1;
 						retval = 1;
 						break;
 					}
 				} else {
-					if (last_op_is_write)
-						flush_socket(&hd, TERM_TIMEOUT);
+					do {
+						ret = gnutls_bye(hd.session, GNUTLS_SHUT_WR);
+					} while (ret == GNUTLS_E_INTERRUPTED ||
+					         ret == GNUTLS_E_AGAIN);
+
 					user_term = 1;
-					break;
 				}
 				continue;
 			}
-
+			bytes=strlen(buffer);
 			buffer[bytes] = 0;
+
 			if (crlf != 0) {
 				char *b = strchr(buffer, '\n');
 				if (b != NULL) {
@@ -1325,7 +1305,6 @@ int main(int argc, char **argv)
 				}
 			}
 
-			last_op_is_write = 1;
 			if (ranges
 			    && gnutls_record_can_use_length_hiding(hd.
 								   session))
@@ -1363,10 +1342,7 @@ int main(int argc, char **argv)
 	}
 
  cleanup:
-	if (user_term != 0)
-		socket_bye(&hd, 1);
-	else
-		socket_bye(&hd, 0);
+	socket_bye(&hd, 0);
 
 #ifdef ENABLE_SRP
 	if (srp_cred)
