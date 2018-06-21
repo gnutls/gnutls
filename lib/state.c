@@ -224,10 +224,6 @@ static void deinit_keys(gnutls_session_t session)
 	} else {
 		gnutls_memset(session->key.proto.tls13.temp_secret, 0,
 			      sizeof(session->key.proto.tls13.temp_secret));
-		gnutls_memset(session->key.proto.tls13.hs_ckey, 0,
-			      sizeof(session->key.proto.tls13.hs_ckey));
-		gnutls_memset(session->key.proto.tls13.hs_skey, 0,
-			      sizeof(session->key.proto.tls13.hs_skey));
 	}
 
 	reset_binders(session);

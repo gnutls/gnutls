@@ -503,8 +503,8 @@ struct gnutls_key_st {
 			 * early_secret, client_early_traffic_secret, ... */
 			uint8_t temp_secret[MAX_HASH_SIZE];
 			unsigned temp_secret_size; /* depends on negotiated PRF size */
-			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_handshake_traffic_secret */
-			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_handshake_traffic_secret */
+			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_hs_traffic_secret/client_ap_traffic_secret */
+			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_hs_traffic_secret/server_ap_traffic_secret */
 			uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
 			uint8_t ap_rms[MAX_HASH_SIZE]; /* resumption_master_secret */
 		} tls13; /* tls1.3 */

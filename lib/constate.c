@@ -248,13 +248,16 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 						 buf, sizeof(buf), NULL));
 	}
 
+
 	if ((session->security_parameters.entity == GNUTLS_CLIENT && stage == STAGE_UPD_OURS) ||
 	    (session->security_parameters.entity == GNUTLS_SERVER && stage == STAGE_UPD_PEERS)) {
+
 		/* client keys */
-		ret = _tls13_derive_secret(session, APPLICATION_TRAFFIC_UPDATE,
+		ret = _tls13_expand_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
 					   NULL, 0,
-					   session->key.proto.tls13.temp_secret,
+					   session->key.proto.tls13.hs_ckey,
+					   session->security_parameters.prf->output_size,
 					   session->key.proto.tls13.hs_ckey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -267,10 +270,11 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else {
-		ret = _tls13_derive_secret(session, APPLICATION_TRAFFIC_UPDATE,
+		ret = _tls13_expand_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
 					   NULL, 0,
-					   session->key.proto.tls13.temp_secret,
+					   session->key.proto.tls13.hs_skey,
+					   session->security_parameters.prf->output_size,
 					   session->key.proto.tls13.hs_skey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
