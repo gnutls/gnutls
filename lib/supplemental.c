@@ -282,7 +282,8 @@ _gnutls_supplemental_register(gnutls_supplemental_entry_st *entry)
  * registered or handled by GnuTLS internally %GNUTLS_E_ALREADY_REGISTERED
  * will be returned.
  *
- * This function is not thread safe.
+ * This function is not thread safe. As supplemental data are not defined under
+ * TLS 1.3, this function will disable TLS 1.3 support globally.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -304,6 +305,9 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
 	if (ret < 0) {
 		gnutls_free(tmp_entry.name);
 	}
+
+	_gnutls_disable_tls13 = 1;
+
 	return ret;
 }
 
@@ -323,6 +327,9 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
  *
  * If the type is already registered or handled by GnuTLS internally
  * %GNUTLS_E_ALREADY_REGISTERED will be returned.
+ *
+ * As supplemental data are not defined under TLS 1.3, this function will
+ * disable TLS 1.3 support for the given session.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -358,6 +365,8 @@ gnutls_session_supplemental_register(gnutls_session_t session, const char *name,
 
 	memcpy(&session->internals.rsup[session->internals.rsup_size], &tmp_entry, sizeof(tmp_entry));
 	session->internals.rsup_size++;
+
+	session->internals.flags |= INT_FLAG_NO_TLS13;
 
 	return GNUTLS_E_SUCCESS;
 }

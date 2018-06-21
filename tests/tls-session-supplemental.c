@@ -15,9 +15,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 /* This tests the supplemental data extension under TLS1.2 */
@@ -59,12 +58,12 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
-#define TLS_SUPPLEMENTALDATATYPE_SAMPLE						0xBABE
+#define TLS_SUPPLEMENTALDATATYPE_SAMPLE	0xBABE
 
-static int TLS_SUPPLEMENTALDATA_client_sent			= 0;
-static int TLS_SUPPLEMENTALDATA_client_received		= 0;
-static int TLS_SUPPLEMENTALDATA_server_sent			= 0;
-static int TLS_SUPPLEMENTALDATA_server_received		= 0;
+static int TLS_SUPPLEMENTALDATA_client_sent	= 0;
+static int TLS_SUPPLEMENTALDATA_client_received	= 0;
+static int TLS_SUPPLEMENTALDATA_server_sent	= 0;
+static int TLS_SUPPLEMENTALDATA_server_received	= 0;
 
 static const unsigned char supp_data[] =
 {
@@ -116,7 +115,7 @@ int supp_server_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 	return GNUTLS_E_SUCCESS;
 }
 
-static void client(int sd, const char *prio)
+static void client(int sd, const char *prio, unsigned server_only)
 {
 	int ret;
 	gnutls_session_t session;
@@ -145,10 +144,12 @@ static void client(int sd, const char *prio)
 
 	gnutls_transport_set_int(session, sd);
 
-	gnutls_supplemental_recv(session, 1);
-	gnutls_supplemental_send(session, 1);
+	if (!server_only) {
+		gnutls_supplemental_recv(session, 1);
+		gnutls_supplemental_send(session, 1);
 
-	gnutls_session_supplemental_register(session, "supplemental_client", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_client_recv_func, supp_client_send_func, 0);
+		gnutls_session_supplemental_register(session, "supplemental_client", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_client_recv_func, supp_client_send_func, 0);
+	}
 
 	/* Perform the TLS handshake
 	 */
@@ -163,8 +164,14 @@ static void client(int sd, const char *prio)
 			success("client: Handshake was completed\n");
 	}
 
-	if (TLS_SUPPLEMENTALDATA_client_sent != 1 || TLS_SUPPLEMENTALDATA_client_received != 1)
-		fail("client: extension not properly sent/received\n");
+	if (!server_only) {
+		if (TLS_SUPPLEMENTALDATA_client_sent != 1 || TLS_SUPPLEMENTALDATA_client_received != 1)
+			fail("client: extension not properly sent/received\n");
+	} else {
+		/* we expect TLS1.2 handshake as TLS1.3 is not (yet) defined
+		 * with supplemental data */
+		assert(gnutls_protocol_get_version(session) == GNUTLS_TLS1_2);
+	}
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
@@ -178,7 +185,7 @@ end:
 	gnutls_global_deinit();
 }
 
-static void server(int sd, const char *prio)
+static void server(int sd, const char *prio, unsigned server_only)
 {
 	int ret;
 	gnutls_session_t session;
@@ -206,8 +213,10 @@ static void server(int sd, const char *prio)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	gnutls_supplemental_recv(session, 1);
-	gnutls_supplemental_send(session, 1);
+	if (!server_only) {
+		gnutls_supplemental_recv(session, 1);
+		gnutls_supplemental_send(session, 1);
+	}
 
 	gnutls_session_supplemental_register(session, "supplemental_server", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_server_recv_func, supp_server_send_func, 0);
 
@@ -223,8 +232,10 @@ static void server(int sd, const char *prio)
 	if (debug)
 		success("server: Handshake was completed\n");
 
-	if (TLS_SUPPLEMENTALDATA_server_sent != 1 || TLS_SUPPLEMENTALDATA_server_received != 1)
-		fail("server: extension not properly sent/received\n");
+	if (!server_only) {
+		if (TLS_SUPPLEMENTALDATA_server_sent != 1 || TLS_SUPPLEMENTALDATA_server_received != 1)
+			fail("server: extension not properly sent/received\n");
+	}
 
 	/* do not wait for the peer to close the connection.
 	 */
@@ -242,7 +253,7 @@ static void server(int sd, const char *prio)
 }
 
 static
-void start(const char *prio)
+void start(const char *prio, unsigned server_only)
 {
 	pid_t child;
 	int sockets[2], err;
@@ -272,17 +283,23 @@ void start(const char *prio)
 	if (child) {
 		int status;
 		/* parent */
-		server(sockets[0], prio);
+		server(sockets[0], prio, server_only);
 		wait(&status);
 		check_wait_status(status);
 	} else {
-		client(sockets[1], prio);
+		client(sockets[1], prio, server_only);
 		exit(0);
 	}
 }
 
 void doit(void)
 {
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
+	start("NORMAL", 0);
+	/* try setting supplemental only in server side, it should
+	 * lead to normal authentication */
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", 1);
+	start("NORMAL", 1);
 }
 #endif				/* _WIN32 */

@@ -53,6 +53,10 @@
 #include "dtls.h"
 #include "tls13/session_ticket.h"
 
+/* to be used by supplemental data support to disable TLS1.3
+ * when supplemental data have been globally registered */
+unsigned _gnutls_disable_tls13 = 0;
+
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
 void
@@ -400,6 +404,9 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 		flags |= GNUTLS_NO_TICKETS;
 
 	(*session)->internals.flags = flags;
+
+	if (_gnutls_disable_tls13 != 0)
+		(*session)->internals.flags |= INT_FLAG_NO_TLS13;
 
 	return 0;
 }

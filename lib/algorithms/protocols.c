@@ -284,6 +284,9 @@ const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 				if (!p->supported || p->transport != session->internals.transport)
 					break;
 
+				if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
+				    break;
+
 				if (max == NULL || cur_prot > max->id) {
 					max = p;
 				}
@@ -491,6 +494,9 @@ _gnutls_version_is_supported(gnutls_session_t session,
 #ifndef ENABLE_SSL3
 			if (p->obsolete != 0) return 0;
 #endif
+			if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
+				return 0;
+
 			ret = p->supported && p->transport == session->internals.transport;
 			break;
 		}
