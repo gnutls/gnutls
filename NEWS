@@ -13,6 +13,14 @@ See the end for copying conditions.
 ** libgnutls: Corrected infinite loop when an incorrect PIN was provided
    via pin-value or pin-source.
 
+** Improved counter-measures for TLS CBC record padding, when encrypt-then-MAC
+   mode is not used.
+
+** The ciphers utilizing HMAC-SHA384 and SHA256 have been removed from the default
+   priority strings. They are not necessary for compatibility or other purpose and
+   provide no advantage over their SHA1 counter-parts, as they all depend on the legacy
+   TLS CBC block mode.
+
 ** API and ABI modifications:
 No changes since last version.
 
