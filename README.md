@@ -72,7 +72,7 @@ Nettle, P11-kit and Autogen, which you will need to build from sources.
 
 Dependencies that are used during make check or make dist are listed below.
 Moreover, for basic interoperability testing you may want to install openssl
-and polarssl.
+and mbedtls.
 
 * [Valgrind](http://valgrind.org/) (optional)
 * [Libasan](https://gcc.gnu.org//) (optional)
@@ -84,13 +84,13 @@ and polarssl.
 
 Debian/Ubuntu:
 ```
-apt-get install -y valgrind libasan1 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev
+apt-get install -y valgrind libasan1 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect
 apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker socat net-tools ppp lockfile-progs
 ```
 
 Fedora/RHEL:
 ```
-yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel
+yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel expect
 yum install -y dieharder mbedtls-utils openssl abi-compliance-checker libcmocka-devel socat lockfile-progs
 ```
 

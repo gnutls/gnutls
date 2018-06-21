@@ -87,7 +87,7 @@ run_client_suite() {
 
 
 	eval "${GETPORT}"
-	launch_bare_server $$ s_server -ciphersuites ${OCIPHERSUITES} -groups 'X25519:P-256:X448:P-521:P-384' -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -Verify 1 -CAfile "${CA_CERT}"
+	launch_bare_server $$ s_server -ciphersuites ${OCIPHERSUITES} -groups 'X25519:P-256:X448:P-521:P-384' -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
 	PID=$!
 	wait_server ${PID}
 
@@ -104,8 +104,8 @@ run_client_suite() {
 			fail ${PID} "Failed"
 	done
 
-	echo_cmd "${PREFIX}Checking TLS 1.3 with rekey..."
-	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --insecure --inline-commands <<<$(echo "^rekey^") >>${OUTPUT} || \
+	echo_cmd "${PREFIX}Checking TLS 1.3 with double rekey..."
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --insecure --inline-commands <<<$(echo -e "^rekey^\n^rekey1^\nGET / HTTP/1.0\r\n\r\n") >>${OUTPUT} || \
 		fail ${PID} "Failed"
 
 	# Try hello retry request
@@ -214,8 +214,7 @@ run_client_suite() {
 	wait_server ${PID}
 
 	# ${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --x509cafile "${CA_CERT}" --inline-commands | tee "${testdir}/client.out" >> ${OUTPUT}
-	{ echo a; sleep 1; echo '^resume^'; } | \
-	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --insecure --inline-commands | tee "${testdir}/client.out" >> ${OUTPUT}
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --insecure --inline-commands <<< $(echo -e "^resume^\nGET / HTTP/1.0\r\n\r\n")| tee "${testdir}/client.out" >> ${OUTPUT}
 	grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
 		fail ${PID} "Failed"
 
@@ -275,7 +274,6 @@ run_server_suite() {
 	done
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with HRR..."
-
 	eval "${GETPORT}"
 	launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP384R1${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}"  >>${OUTPUT} 2>&1
 	PID=$!
@@ -285,8 +283,25 @@ run_server_suite() {
 		fail ${PID} "Failed"
 
 	echo_cmd "${PREFIX}Checking TLS 1.3 with rekey..."
-	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" <<<$(echo "***REKEY***") 2>&1 | grep "\:error\:" && \
+	expect - >/dev/null <<_EOF_
+set timeout 10
+set os_error_flag 1
+spawn ${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}"
+
+expect "SSL-Session" {send "K\n"} timeout {exit 1}
+expect "KEYUPDATE" {send "HELLO\n"} timeout {exit 1}
+expect "HELLO" {close} timeout {exit 1}
+
+lassign [wait] pid spawnid os_error_flag value
+if {\$os_error_flag == 0} {
+    exit $value
+} else {
+    exit 1
+}
+_EOF_
+	if test $? != 0;then
 		fail ${PID} "Failed"
+	fi
 
 	kill ${PID}
 	wait
@@ -320,12 +335,39 @@ run_server_suite() {
 	echo_cmd "${PREFIX}Checking TLS 1.3 with post handshake auth..."
 
 	eval "${GETPORT}"
-	launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" >>${OUTPUT} 2>&1
+	launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" #>>${OUTPUT} 2>&1
 	PID=$!
 	wait_server ${PID}
 
-	${OPENSSL_CLI} s_client -force_pha -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" <<<$(echo "***REAUTH***") 2>&1 | grep "\:error\:" && \
+	expect - >/dev/null <<_EOF_
+set timeout 10
+set os_error_flag 1
+spawn ${OPENSSL_CLI} s_client -force_pha -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}"
+
+expect "SSL-Session" {send "**REAUTH**\n"} timeout {exit 1}
+expect {
+  timeout {exit 1}
+  "error*" {exit 1}
+  "Successfully executed command" {send "**REAUTH**\n"}
+}
+expect {
+  timeout {exit 1}
+  "error*" {exit 1}
+  "Successfully executed command" {send "HELLO\n"}
+}
+
+expect "HELLO" {close} timeout {exit 1}
+
+lassign [wait] pid spawnid os_error_flag value
+if {\$os_error_flag == 0} {
+    exit $value
+} else {
+    exit 1
+}
+_EOF_
+	if test $? != 0;then
 		fail ${PID} "Failed"
+	fi
 
 	kill ${PID}
 	wait
