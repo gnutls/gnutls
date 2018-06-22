@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  * Copyright (C) 2013 Adam Sampson <ats@offog.org>
+ * Copyright (C) 2018 Red Hat, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -16,12 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-
-/* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -29,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #if defined(_WIN32)
 
@@ -48,10 +47,14 @@ int main(int argc, char **argv)
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <assert.h>
+
+#include "tls13/ext-parse.h"
 
 #include "utils.h"
 
-/* A very basic TLS client, with PSK authentication.
+/* Tests whether the pre-shared key extension will always be last
+ * even if the dumbfw extension is present.
  */
 
 const char *side = "";
@@ -64,7 +67,7 @@ static void tls_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void client(int sd, const char *prio, unsigned exp_hint)
+static void client(int sd, const char *prio)
 {
 	int ret, ii;
 	gnutls_session_t session;
@@ -72,12 +75,11 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 	gnutls_psk_client_credentials_t pskcred;
 	/* Need to enable anonymous KX specifically. */
 	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
-	const char *hint;
 
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
-		gnutls_global_set_log_level(4711);
+		gnutls_global_set_log_level(6);
 
 	side = "client";
 
@@ -85,16 +87,10 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 	gnutls_psk_set_client_credentials(pskcred, "test", &key,
 					  GNUTLS_PSK_KEY_HEX);
 
-	/* Initialize TLS session
-	 */
-	gnutls_init(&session, GNUTLS_CLIENT);
+	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_KEY_SHARE_TOP)>=0);
 
-	/* Use default priorities */
-	gnutls_priority_set_direct(session, prio, NULL);
-
-	/* put the anonymous credentials to the current session
-	 */
-	gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
+	assert(gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred)>=0);
 
 	gnutls_transport_set_int(session, sd);
 
@@ -111,16 +107,7 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 			success("client: Handshake was completed\n");
 	}
 
-	/* check the hint */
-	if (exp_hint) {
-		hint = gnutls_psk_client_get_hint(session);
-		if (hint == NULL || strcmp(hint, "hint") != 0) {
-			fail("client: hint is not the expected: %s\n", gnutls_psk_client_get_hint(session));
-			goto end;
-		}
-	}
-
-	gnutls_record_send(session, MSG, strlen(MSG));
+	assert(gnutls_record_send(session, MSG, strlen(MSG))>=0);
 
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	if (ret == 0) {
@@ -154,13 +141,6 @@ static void client(int sd, const char *prio, unsigned exp_hint)
 	gnutls_global_deinit();
 }
 
-/* This is a sample TLS 1.0 echo server, for PSK authentication.
- */
-
-#define MAX_BUF 1024
-
-/* These are global */
-
 static int
 pskfunc(gnutls_session_t session, const char *username,
 	gnutls_datum_t * key)
@@ -176,54 +156,82 @@ pskfunc(gnutls_session_t session, const char *username,
 	return 0;
 }
 
-static gnutls_dh_params_t dh_params;
+#define EXT_CLIENTHELLO_PADDING 21
+#define EXT_PRE_SHARED_KEY 41
 
-static int generate_dh_params(void)
+struct ctx_st {
+	unsigned long pos;
+	void *base;
+};
+
+static
+void check_ext_pos(void *priv, gnutls_datum_t *msg)
 {
-	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
-	/* Generate Diffie-Hellman parameters - for use with DHE
-	 * kx algorithms. These should be discarded and regenerated
-	 * once a day, once a week or once a month. Depending on the
-	 * security requirements.
-	 */
-	gnutls_dh_params_init(&dh_params);
-	return gnutls_dh_params_import_pkcs3(dh_params, &p3,
-					     GNUTLS_X509_FMT_PEM);
+	struct ctx_st *ctx = priv;
+
+	ctx->pos = (ptrdiff_t)((ptrdiff_t)msg->data - (ptrdiff_t)ctx->base);
+}
+
+static int client_hello_callback(gnutls_session_t session, unsigned int htype,
+	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+{
+	unsigned long pos_psk;
+	unsigned long pos_pad;
+
+	if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && post == GNUTLS_HOOK_POST) {
+		struct ctx_st ctx;
+
+		ctx.base = msg->data;
+		if (find_client_extension(msg, EXT_CLIENTHELLO_PADDING, &ctx, check_ext_pos) == 0)
+			fail("Could not find dumbfw/client hello padding extension!\n");
+		pos_pad = ctx.pos;
+
+		ctx.base = msg->data;
+		if (find_client_extension(msg, EXT_PRE_SHARED_KEY, &ctx, check_ext_pos) == 0)
+			fail("Could not find psk extension!\n");
+		pos_psk = ctx.pos;
+
+		if (pos_psk < pos_pad) {
+			fail("The dumbfw extension was sent after pre-shared key!\n");
+		}
+
+		/* check if we are the last extension in general */
+		if (!is_client_extension_last(msg, EXT_PRE_SHARED_KEY)) {
+			fail("pre-shared key extension wasn't the last one!\n");
+		}
+	}
+
+	return 0;
 }
 
 
 static void server(int sd, const char *prio)
 {
-gnutls_psk_server_credentials_t server_pskcred;
-int ret;
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
+	gnutls_psk_server_credentials_t server_pskcred;
+	int ret;
+	gnutls_session_t session;
+	char buffer[MAX_BUF + 1];
 
-	/* this must be called once in the program
-	 */
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
-		gnutls_global_set_log_level(4711);
+		gnutls_global_set_log_level(6);
 
 	side = "server";
 
 
-	gnutls_psk_allocate_server_credentials(&server_pskcred);
-	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
+	assert(gnutls_psk_allocate_server_credentials(&server_pskcred)>=0);
 	gnutls_psk_set_server_credentials_function(server_pskcred,
 						   pskfunc);
 
-	gnutls_psk_set_server_dh_params(server_pskcred, dh_params);
+	assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
 
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, prio, NULL);
-
+	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
+
+	gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_ANY,
+					   GNUTLS_HOOK_BOTH,
+					   client_hello_callback);
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
@@ -236,9 +244,6 @@ char buffer[MAX_BUF + 1];
 	}
 	if (debug)
 		success("server: Handshake was completed\n");
-
-	/* see the Getting peer's information example */
-	/* print_info(session); */
 
 	for (;;) {
 		memset(buffer, 0, MAX_BUF + 1);
@@ -260,8 +265,7 @@ char buffer[MAX_BUF + 1];
 					   strlen(buffer));
 		}
 	}
-	/* do not wait for the peer to close the connection.
-	 */
+
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
 	close(sd);
@@ -276,7 +280,7 @@ char buffer[MAX_BUF + 1];
 }
 
 static
-void run_test(const char *prio, unsigned exp_hint)
+void run_test(const char *prio)
 {
 	pid_t child;
 	int err;
@@ -307,30 +311,14 @@ void run_test(const char *prio, unsigned exp_hint)
 		check_wait_status(status);
 	} else {
 		close(sockets[0]);
-		client(sockets[1], prio, exp_hint);
+		client(sockets[1], prio);
 		exit(0);
 	}
 }
 
 void doit(void)
 {
-	generate_dh_params();
-
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", 1);
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-PSK", 1);
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+DHE-PSK", 1);
-
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK", 0);
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+DHE-PSK", 0);
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-SECP256R1:+ECDHE-PSK", 0);
-	/* the following should work once we support PSK without DH */
-	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+PSK", 0);
-
-	run_test("NORMAL:-KX-ALL:+PSK", 1);
-	run_test("NORMAL:-KX-ALL:+ECDHE-PSK", 1);
-	run_test("NORMAL:-KX-ALL:+DHE-PSK", 1);
-
-	gnutls_dh_params_deinit(dh_params);
+	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+PSK:%DUMBFW:-GROUP-ALL:+GROUP-FFDHE2048");
 }
 
 #endif				/* _WIN32 */

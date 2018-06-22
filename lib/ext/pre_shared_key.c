@@ -749,7 +749,7 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 
 const hello_ext_entry_st ext_pre_shared_key = {
 	.name = "Pre Shared Key",
-	.tls_id = 41,
+	.tls_id = PRE_SHARED_KEY_TLS_ID,
 	.gid = GNUTLS_EXTENSION_PRE_SHARED_KEY,
 	.parse_type = GNUTLS_EXT_TLS,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO,

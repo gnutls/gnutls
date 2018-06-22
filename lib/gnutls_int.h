@@ -335,10 +335,9 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_PSK_KE_MODES,
 	/*
 	 * pre_shared_key and dumbfw must always be the last extensions,
-	 * in that order
-	 */
-	GNUTLS_EXTENSION_PRE_SHARED_KEY,
+	 * in that order */
 	GNUTLS_EXTENSION_DUMBFW,
+	GNUTLS_EXTENSION_PRE_SHARED_KEY,
 	GNUTLS_EXTENSION_MAX /* not real extension - used for iterators */
 } extensions_t;
 
