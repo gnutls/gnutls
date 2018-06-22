@@ -39,6 +39,8 @@
 #include "serv-args.h"
 #include "list.h"
 
+extern int disable_client_cert;
+
 typedef struct {
 	gnutls_session_t session;
 	int fd;
@@ -207,7 +209,7 @@ void udp_server(const char *name, int port, int mtu)
 			     sequence[3], sequence[4], sequence[5],
 			     sequence[6], sequence[7], buffer);
 
-			if (check_command(session, buffer) == 0) {
+			if (check_command(session, buffer, disable_client_cert) == 0) {
 				/* reply back */
 				ret =
 				    gnutls_record_send(session, buffer,

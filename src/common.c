@@ -914,7 +914,7 @@ void print_list(const char *priorities, int verbose)
 	}
 }
 
-int check_command(gnutls_session_t session, const char *str)
+int check_command(gnutls_session_t session, const char *str, unsigned no_cli_cert)
 {
 	size_t len = strnlen(str, 128);
 	int ret;
@@ -932,6 +932,10 @@ int check_command(gnutls_session_t session, const char *str)
 		} else if (strncmp
 		    (str, "**REAUTH**",
 		     sizeof("**REAUTH**") - 1) == 0) {
+			/* in case we have a re-auth cmd prepare for it */
+			if (no_cli_cert)
+				gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUIRE);
+
 			fprintf(stderr,
 				"*** Sending re-auth request\n");
 			do {

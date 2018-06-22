@@ -939,9 +939,12 @@ get_response(gnutls_session_t session, char *request,
 	if (http != 0) {
 		*response = peer_print_info(session, response_length, h);
 	} else {
+		int ret;
 		strip(request);
-		fprintf(stderr, "received: %s\n", request);
-		if (check_command(session, request)) {
+		fprintf(stderr, "received cmd: %s\n", request);
+
+		ret = check_command(session, request, disable_client_cert);
+		if (ret > 0) {
 			*response = strdup("Successfully executed command\n");
 			if (*response == NULL) {
 				fprintf(stderr, "Memory error\n");
@@ -949,9 +952,14 @@ get_response(gnutls_session_t session, char *request,
 			}
 			*response_length = strlen(*response);
 			return;
+		} else if (ret == 0) {
+			*response = strdup(request);
+			*response_length = ((*response) ? strlen(*response) : 0);
+		} else {
+			do {
+				ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
+			} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		}
-		*response = strdup(request);
-		*response_length = ((*response) ? strlen(*response) : 0);
 	}
 
 	return;
