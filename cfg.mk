@@ -31,9 +31,6 @@ ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
 endif
 
-PODIR := po
-PO_DOMAIN := libgnutls
-
 local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_immutable_NEWS sc_program_name sc_prohibit_atoi_atof		\
 	sc_prohibit_always_true_header_tests                            \
@@ -64,10 +61,6 @@ gl_public_submodule_commit =
 
 autoreconf:
 	./bootstrap
-
-update-po: refresh-po
-	git add $(PODIR)/*.po
-	git commit -sm "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po
 
 config:
 	./configure $(CFGFLAGS)
