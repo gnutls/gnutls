@@ -70,6 +70,17 @@ _gnutls_decode_ber_rs_raw(const gnutls_datum_t * sig_value, gnutls_datum_t *r,
 			  gnutls_datum_t *s);
 
 int
+_gnutls_encode_gost_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s,
+		       size_t intsize);
+
+int
+_gnutls_decode_gost_rs(const gnutls_datum_t * sig_value, bigint_t * r,
+		       bigint_t * s);
+
+gnutls_digest_algorithm_t _gnutls_gost_digest(gnutls_pk_algorithm_t pk);
+gnutls_pk_algorithm_t _gnutls_digest_gost(gnutls_digest_algorithm_t digest);
+
+int
 encode_ber_digest_info(const mac_entry_st * e,
 		       const gnutls_datum_t * digest,
 		       gnutls_datum_t * output);
@@ -93,6 +104,15 @@ _gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
 
 int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k,
+				       unsigned int flags);
+
+int _gnutls_params_get_gost_raw(const gnutls_pk_params_st* params,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_digest_algorithm_t * digest,
+				       gnutls_gost_paramset_t * paramset,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
 				       gnutls_datum_t * k,

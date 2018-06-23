@@ -672,6 +672,7 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 {
 	gnutls_datum_t test = {(void*)TEST_TEXT, sizeof(TEST_TEXT)-1};
 	gnutls_datum_t sig = {NULL, 0};
+	gnutls_digest_algorithm_t dig;
 	int pk, pk2, ret;
 	unsigned sign_algo;
 
@@ -700,7 +701,16 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
 
-	sign_algo = gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256);
+	if (pk == GNUTLS_PK_GOST_01)
+		dig = GNUTLS_DIG_GOSTR_94;
+	else if (pk == GNUTLS_PK_GOST_12_256)
+		dig = GNUTLS_DIG_STREEBOG_256;
+	else if (pk == GNUTLS_PK_GOST_12_512)
+		dig = GNUTLS_DIG_STREEBOG_512;
+	else
+		dig = GNUTLS_DIG_SHA256;
+
+	sign_algo = gnutls_pk_to_sign(pk, dig);
 
 	/* now check if keys really match. We use the sign/verify approach
 	 * because we cannot always obtain the parameters from the abstract

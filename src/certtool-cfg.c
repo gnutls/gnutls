@@ -262,7 +262,7 @@ void cfg_init(void)
   { \
     char str[512]; \
     char * p; \
-    int len; \
+    size_t len; \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
@@ -2587,8 +2587,7 @@ int get_data_encipherment_status(void)
 	if (batch) {
 		return cfg.data_encipherment;
 	} else {
-		/* this option is not asked in interactive mode */
-		return 0;
+		return read_yesno("Will the certificate be used for data encryption? (Y/n): ", 1);
 	}
 }
 

@@ -156,6 +156,7 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 	pub->algo = priv->algo;
 	pub->pkflags = priv->pkflags;
 	pub->curve = priv->curve;
+	pub->gost_params = priv->gost_params;
 	pub->qbits = priv->qbits;
 	memcpy(&pub->spki, &priv->spki, sizeof(gnutls_x509_spki_st));
 
@@ -207,6 +208,21 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 		ret = _gnutls_set_datum(&pub->raw_pub, priv->raw_pub.data, priv->raw_pub.size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+
+		break;
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		pub->params[GOST_X] = _gnutls_mpi_copy(priv->params[GOST_X]);
+		pub->params[GOST_Y] = _gnutls_mpi_copy(priv->params[GOST_Y]);
+
+		pub->params_nr = GOST_PUBLIC_PARAMS;
+
+		if (pub->params[GOST_X] == NULL || pub->params[GOST_Y] == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
 
 		break;
 	default:

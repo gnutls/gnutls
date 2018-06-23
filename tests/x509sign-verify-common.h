@@ -21,6 +21,39 @@ const gnutls_datum_t sha256_data = {
 	32
 };
 
+/* gost r 34.11-94 hash of "hello" string */
+const gnutls_datum_t gostr94_data = {
+	(void *)
+	    "\x92\xea\x6d\xdb\xaf\x40\x02\x0d\xf3\x65"
+	    "\x1f\x27\x8f\xd7\x15\x12\x17\xa2\x4a\xa8"
+	    "\xd2\x2e\xbd\x25\x19\xcf\xd4\xd8\x9e\x64"
+	    "\x50\xea",
+	32
+};
+
+/* Streebog-256 hash of "hello" string */
+const gnutls_datum_t streebog256_data = {
+	(void *)
+	    "\x3f\xb0\x70\x0a\x41\xce\x6e\x41\x41\x3b"
+	    "\xa7\x64\xf9\x8b\xf2\x13\x5b\xa6\xde\xd5"
+	    "\x16\xbe\xa2\xfa\xe8\x42\x9c\xc5\xbd\xd4"
+	    "\x6d\x6d",
+	32
+};
+
+/* Streebog-512 hash of "hello" string */
+const gnutls_datum_t streebog512_data = {
+	(void *)
+	    "\x8d\xf4\x14\x26\x09\x66\xbe\xb7\xb3\x4d"
+	    "\x92\x07\x63\x07\x9e\x15\xdf\x1f\x63\x29"
+	    "\x7e\xb3\xdd\x43\x11\xe8\xb5\x85\xd4\xbf"
+	    "\x2f\x59\x23\x21\x4f\x1d\xfe\xd3\xfd\xee"
+	    "\x4a\xaf\x01\x83\x30\xa1\x2a\xcd\xe0\xef"
+	    "\xcc\x33\x8e\xb5\x29\x22\xf3\xe5\x71\x21"
+	    "\x2d\x42\xc8\xde",
+	64
+};
+
 const gnutls_datum_t invalid_hash_data = {
 	(void *)
 	    "\xaa\xf4\xc6\x1d\xdc\xca\xe8\xa2\xda\xbe"
@@ -78,6 +111,12 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 		vflags |= GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1;
 	} else if (hash == GNUTLS_DIG_SHA256)
 		hash_data = &sha256_data;
+	else if (hash == GNUTLS_DIG_GOSTR_94)
+		hash_data = &gostr94_data;
+	else if (hash == GNUTLS_DIG_STREEBOG_256)
+		hash_data = &streebog256_data;
+	else if (hash == GNUTLS_DIG_STREEBOG_512)
+		hash_data = &streebog512_data;
 	else
 		abort();
 

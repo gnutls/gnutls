@@ -31,6 +31,9 @@
 #define MAC_OID_SHA256 "1.2.840.113549.2.9"
 #define MAC_OID_SHA384 "1.2.840.113549.2.10"
 #define MAC_OID_SHA512 "1.2.840.113549.2.11"
+#define MAC_OID_GOST_R_3411_94 "1.2.643.2.2.10"
+#define MAC_OID_STREEBOG_256 "1.2.643.7.1.1.4.1"
+#define MAC_OID_STREEBOG_512 "1.2.643.7.1.1.4.2"
 
 static const mac_entry_st hash_algorithms[] = {
 	{.name = "SHA1",
@@ -127,6 +130,27 @@ static const mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_RMD160,
 	 .output_size = 20,
 	 .key_size = 20,
+	 .block_size = 64},
+	{.name = "GOSTR341194",
+	 .oid = HASH_OID_GOST_R_3411_94,
+	 .mac_oid = MAC_OID_GOST_R_3411_94,
+	 .id = GNUTLS_MAC_GOSTR_94,
+	 .output_size = 32,
+	 .key_size = 32,
+	 .block_size = 32},
+	{.name = "STREEBOG-256",
+	 .oid = HASH_OID_STREEBOG_256,
+	 .mac_oid = MAC_OID_STREEBOG_256,
+	 .id = GNUTLS_MAC_STREEBOG_256,
+	 .output_size = 32,
+	 .key_size = 32,
+	 .block_size = 64},
+	{.name = "STREEBOG-512",
+	 .oid = HASH_OID_STREEBOG_512,
+	 .mac_oid = MAC_OID_STREEBOG_512,
+	 .id = GNUTLS_MAC_STREEBOG_512,
+	 .output_size = 64,
+	 .key_size = 64,
 	 .block_size = 64},
 	{.name = "MAC-NULL",
 	 .id = GNUTLS_MAC_NULL},

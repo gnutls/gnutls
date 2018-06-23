@@ -149,7 +149,11 @@ generate_private_key_int(common_info_st * cinfo)
 
 	bits = get_bits(key_type, cinfo->bits, cinfo->sec_param, 1);
 
-	if (key_type == GNUTLS_PK_ECDSA || key_type == GNUTLS_PK_EDDSA_ED25519) {
+	if (key_type == GNUTLS_PK_ECDSA ||
+	    key_type == GNUTLS_PK_EDDSA_ED25519 ||
+	    key_type == GNUTLS_PK_GOST_01 ||
+	    key_type == GNUTLS_PK_GOST_12_256 ||
+	    key_type == GNUTLS_PK_GOST_12_512) {
 		char name[64];
 		int ecc_bits;
 
@@ -541,7 +545,10 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		}
 
 		if (!ca_status || server) {
-			if (pk == GNUTLS_PK_RSA) {	/* DSA and ECDSA keys can only sign. */
+			if (pk == GNUTLS_PK_RSA ||
+			    pk == GNUTLS_PK_GOST_01 ||
+			    pk == GNUTLS_PK_GOST_12_256 ||
+			    pk == GNUTLS_PK_GOST_12_512)  {	/* DSA and ECDSA keys can only sign. */
 				result = get_sign_status(server);
 				if (result)
 					usage |=
@@ -1881,7 +1888,10 @@ void generate_request(common_info_st * cinfo)
 			app_exit(1);
 		}
 
-		if (pk == GNUTLS_PK_RSA) {
+		if (pk == GNUTLS_PK_RSA ||
+		    pk == GNUTLS_PK_GOST_01 ||
+		    pk == GNUTLS_PK_GOST_12_256 ||
+		    pk == GNUTLS_PK_GOST_12_512) {
 			ret = get_sign_status(1);
 			if (ret)
 				usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
@@ -2903,6 +2913,7 @@ void generate_pkcs12(common_info_st * cinfo)
 	gnutls_x509_crl_t *crls;
 	gnutls_x509_crt_t *crts, ca_crt;
 	gnutls_x509_privkey_t *keys;
+	gnutls_mac_algorithm_t mac;
 	int result;
 	size_t size;
 	gnutls_datum_t data;
@@ -2928,6 +2939,11 @@ void generate_pkcs12(common_info_st * cinfo)
 		fprintf(stderr, "You must specify one of\n\t--load-privkey\n\t--load-certificate\n\t--load-ca-certificate\n\t--load-crl\n");
 		app_exit(1);
 	}
+
+	if (cinfo->hash != GNUTLS_DIG_UNKNOWN)
+		mac = cinfo->hash;
+	else
+		mac = GNUTLS_MAC_SHA1;
 
 	if (HAVE_OPT(P12_NAME)) {
 		name = OPT_ARG(P12_NAME);
@@ -3155,7 +3171,7 @@ void generate_pkcs12(common_info_st * cinfo)
 		gnutls_pkcs12_bag_deinit(kbag);
 	}
 
-	result = gnutls_pkcs12_generate_mac(pkcs12, pass);
+	result = gnutls_pkcs12_generate_mac2(pkcs12, mac, pass);
 	if (result < 0) {
 		fprintf(stderr, "generate_mac: %s\n",
 			gnutls_strerror(result));

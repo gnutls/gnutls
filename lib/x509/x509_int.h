@@ -48,6 +48,11 @@
 #define HASH_OID_SHA3_256 "2.16.840.1.101.3.4.2.8"
 #define HASH_OID_SHA3_384 "2.16.840.1.101.3.4.2.9"
 #define HASH_OID_SHA3_512 "2.16.840.1.101.3.4.2.10"
+#define HASH_OID_GOST_R_3411_94 "1.2.643.2.2.9"
+#define HASH_OID_STREEBOG_256 "1.2.643.7.1.1.2.2"
+#define HASH_OID_STREEBOG_512 "1.2.643.7.1.1.2.3"
+
+#define HASH_OID_GOST_R_3411_94_CRYPTOPRO_PARAMS "1.2.643.2.2.30.1"
 
 #define OID_ATTR_PROV_SEED "1.3.6.1.4.1.2312.18.8.1"
 
@@ -257,6 +262,10 @@ int
 _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 			     unsigned int *curve);
 
+int
+_gnutls_x509_read_gost_params(uint8_t * der, int dersize,
+			      gnutls_pk_params_st * params);
+
 int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 				gnutls_pk_params_st * params);
 
@@ -373,6 +382,11 @@ int _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
 			  bigint_t * ret_mpi);
 int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 			   int lz);
+
+int _gnutls_x509_read_key_int_le(ASN1_TYPE node, const char *value,
+				 bigint_t * ret_mpi);
+int _gnutls_x509_write_key_int_le(ASN1_TYPE node, const char *value,
+				  bigint_t mpi);
 
 int _gnutls_x509_read_pkalgo_params(ASN1_TYPE src, const char *src_name,
 				  gnutls_x509_spki_st *params, unsigned is_sig);

@@ -61,6 +61,9 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st * params)
 		return _gnutls_mpi_get_nbits(params->params[DSA_P]);
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
 		return gnutls_ecc_curve_get_size(params->curve) * 8;
 	default:
 		return 0;
@@ -310,6 +313,16 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 	case GNUTLS_PK_EDDSA_ED25519:
 		if (hash)
 			*hash = GNUTLS_DIG_SHA512;
+
+		ret = 0;
+		break;
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		if (hash)
+			*hash = _gnutls_gost_digest(key->params.algo);
+		if (mand)
+			*mand = 1;
 
 		ret = 0;
 		break;
@@ -959,6 +972,82 @@ int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
 }
 
 /**
+ * gnutls_pubkey_export_gost_raw2:
+ * @key: Holds the public key
+ * @curve: will hold the curve (may be %NULL)
+ * @digest: will hold the curve (may be %NULL)
+ * @paramset: will hold the parameters id (may be %NULL)
+ * @x: will hold x (may be %NULL)
+ * @y: will hold y (may be %NULL)
+ * @flags: flags from %gnutls_abstract_export_flags_t
+ *
+ * This function will export the GOST public key's parameters found in
+ * the given key.  The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.3
+ **/
+int
+gnutls_pubkey_export_gost_raw2(gnutls_pubkey_t key,
+			       gnutls_ecc_curve_t * curve,
+			       gnutls_digest_algorithm_t * digest,
+			       gnutls_gost_paramset_t * paramset,
+			       gnutls_datum_t * x, gnutls_datum_t * y,
+			       unsigned int flags)
+{
+	int ret;
+
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+
+	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
+		dprint = _gnutls_mpi_dprint;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (key->params.algo != GNUTLS_PK_GOST_01 &&
+	    key->params.algo != GNUTLS_PK_GOST_12_256 &&
+	    key->params.algo != GNUTLS_PK_GOST_12_512) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (curve)
+		*curve = key->params.curve;
+
+	if (digest)
+		*digest = _gnutls_gost_digest(key->params.algo);
+
+	if (paramset)
+		*paramset = key->params.gost_params;
+
+	/* X */
+	if (x) {
+		ret = dprint(key->params.params[GOST_X], x);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+
+	/* Y */
+	if (y) {
+		ret = dprint(key->params.params[GOST_Y], y);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(x);
+			return ret;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_pubkey_import:
  * @key: The public key. 
  * @data: The DER or PEM encoded certificate. 
@@ -1431,6 +1520,80 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
       cleanup:
 	gnutls_pk_params_release(&key->params);
 	gnutls_free(raw_point.data);
+	return ret;
+}
+
+/**
+ * gnutls_pubkey_import_gost_raw:
+ * @key: The structure to store the parsed key
+ * @curve: holds the curve
+ * @digest: holds the digest
+ * @paramset: holds the parameters id
+ * @x: holds the x
+ * @y: holds the y
+ *
+ * This function will convert the given GOST public key's parameters to a
+ * #gnutls_pubkey_t.  The output will be stored in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.3
+ **/
+int
+gnutls_pubkey_import_gost_raw(gnutls_pubkey_t key,
+			     gnutls_ecc_curve_t curve,
+			     gnutls_digest_algorithm_t digest,
+			     gnutls_gost_paramset_t paramset,
+			     const gnutls_datum_t * x,
+			     const gnutls_datum_t * y)
+{
+	int ret;
+	gnutls_pk_algorithm_t pk_algo;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	pk_algo = _gnutls_digest_gost(digest);
+	if (pk_algo == GNUTLS_PK_UNKNOWN)
+		return GNUTLS_E_ILLEGAL_PARAMETER;
+
+	if (paramset < 0) {
+		if (pk_algo == GNUTLS_PK_GOST_01)
+			paramset = GNUTLS_GOST_PARAMSET_CP_A;
+		else
+			paramset = GNUTLS_GOST_PARAMSET_TC26_Z;
+	}
+
+	gnutls_pk_params_release(&key->params);
+	gnutls_pk_params_init(&key->params);
+
+	key->params.curve = curve;
+	key->params.gost_params = paramset;
+
+	if (_gnutls_mpi_init_scan_nz
+	    (&key->params.params[GOST_X], x->data, x->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+	key->params.params_nr++;
+
+	if (_gnutls_mpi_init_scan_nz
+	    (&key->params.params[GOST_Y], y->data, y->size)) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+	key->params.params_nr++;
+	key->params.algo = pk_algo;
+
+	return 0;
+
+      cleanup:
+	gnutls_pk_params_release(&key->params);
 	return ret;
 }
 
@@ -1993,6 +2156,9 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 		break;
 
 	case GNUTLS_PK_ECDSA:
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
 	case GNUTLS_PK_DSA:
 		if (dsa_verify_hashed_data
 		    (se->pk, me, hash, signature, params, sign_params) != 0) {
@@ -2057,6 +2223,9 @@ pubkey_verify_data(const gnutls_sign_entry_st *se,
 
 	case GNUTLS_PK_EC:
 	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
 		if (dsa_verify_data
 		    (se->pk, me, data, signature, params, sign_params) != 0) {
 			gnutls_assert();

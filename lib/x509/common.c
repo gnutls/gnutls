@@ -130,6 +130,14 @@ static const struct oid_to_string _oid2str[] = {
 	/* rfc3920 section 5.1.1 */
 	ENTRY("1.3.6.1.5.5.7.8.5", "XmppAddr", NULL, ASN1_ETYPE_UTF8_STRING),
 
+	/* Russian things: https://cdnimg.rg.ru/pril/66/91/91/23041_pril.pdf */
+	/* Main state registration number */
+	ENTRY("1.2.643.100.1", "OGRN", NULL, ASN1_ETYPE_NUMERIC_STRING),
+	/* Individual insurance account number */
+	ENTRY("1.2.643.100.3", "SNILS", NULL, ASN1_ETYPE_NUMERIC_STRING),
+	/* VAT identification number */
+	ENTRY("1.2.643.3.131.1.1", "INN", NULL, ASN1_ETYPE_NUMERIC_STRING),
+
 	{NULL, 0, NULL, 0, NULL, 0}
 };
 
@@ -1812,4 +1820,91 @@ int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr)
 
 cleanup:
 	return ret;
+}
+
+/**
+ * gnutls_gost_paramset_get_name:
+ * @param: is a GOST 28147 param set
+ *
+ * Convert a #gnutls_gost_paramset_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified GOST param set,
+ *   or %NULL.
+ *
+ * Since: 3.6.3
+ **/
+const char *gnutls_gost_paramset_get_name(gnutls_gost_paramset_t param)
+{
+	switch(param) {
+	case GNUTLS_GOST_PARAMSET_TC26_Z:
+		return "TC26-Z";
+	case GNUTLS_GOST_PARAMSET_CP_A:
+		return "CryptoPro-A";
+	case GNUTLS_GOST_PARAMSET_CP_B:
+		return "CryptoPro-B";
+	case GNUTLS_GOST_PARAMSET_CP_C:
+		return "CryptoPro-C";
+	case GNUTLS_GOST_PARAMSET_CP_D:
+		return "CryptoPro-D";
+	default:
+		gnutls_assert();
+		return "Unknown";
+	}
+}
+
+/**
+ * gnutls_gost_paramset_get_oid:
+ * @param: is a GOST 28147 param set
+ *
+ * Convert a #gnutls_gost_paramset_t value to its object identifier.
+ *
+ * Returns: a string that contains the object identifier of the specified GOST
+ *   param set, or %NULL.
+ *
+ * Since: 3.6.3
+ **/
+const char *gnutls_gost_paramset_get_oid(gnutls_gost_paramset_t param)
+{
+	switch(param) {
+	case GNUTLS_GOST_PARAMSET_TC26_Z:
+		return GOST28147_89_TC26Z_OID;
+	case GNUTLS_GOST_PARAMSET_CP_A:
+		return GOST28147_89_CPA_OID;
+	case GNUTLS_GOST_PARAMSET_CP_B:
+		return GOST28147_89_CPB_OID;
+	case GNUTLS_GOST_PARAMSET_CP_C:
+		return GOST28147_89_CPC_OID;
+	case GNUTLS_GOST_PARAMSET_CP_D:
+		return GOST28147_89_CPD_OID;
+	default:
+		gnutls_assert();
+		return NULL;
+	}
+}
+
+/**
+ * gnutls_oid_to_gost_paramset:
+ * @oid: is an object identifier
+ *
+ * Converts a textual object identifier to a #gnutls_gost_paramset_t value.
+ *
+ * Returns: a #gnutls_gost_paramset_get_oid of the specified GOST 28147
+ *   param st, or %GNUTLS_GOST_PARAMSET_UNKNOWN on failure.
+ *
+ * Since: 3.6.3
+ **/
+gnutls_gost_paramset_t gnutls_oid_to_gost_paramset(const char *oid)
+{
+	if (!strcmp(oid, GOST28147_89_TC26Z_OID))
+		return GNUTLS_GOST_PARAMSET_TC26_Z;
+	else if (!strcmp(oid, GOST28147_89_CPA_OID))
+		return GNUTLS_GOST_PARAMSET_CP_A;
+	else if (!strcmp(oid, GOST28147_89_CPB_OID))
+		return GNUTLS_GOST_PARAMSET_CP_B;
+	else if (!strcmp(oid, GOST28147_89_CPC_OID))
+		return GNUTLS_GOST_PARAMSET_CP_C;
+	else if (!strcmp(oid, GOST28147_89_CPD_OID))
+		return GNUTLS_GOST_PARAMSET_CP_D;
+	else
+		return gnutls_assert_val(GNUTLS_GOST_PARAMSET_UNKNOWN);
 }

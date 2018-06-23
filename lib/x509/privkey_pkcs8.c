@@ -78,6 +78,32 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 			gnutls_assert();
 		return ret;
 
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		if ((ret = asn1_create_element
+					(_gnutls_get_gnutls_asn(), "GNUTLS.GOSTPrivateKey", &spk))
+				!= ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto error;
+		}
+
+		ret = _gnutls_x509_write_key_int_le(spk, "", pkey->params.params[GOST_K]);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		ret = _gnutls_x509_der_encode(spk, "", raw, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		asn1_delete_structure2(&spk, ASN1_DELETE_FLAG_ZEROIZE);
+		break;
+
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_ECDSA:
@@ -1101,6 +1127,159 @@ _decode_pkcs8_eddsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey, const c
 	}
 }
 
+/* Converts a GOST key to
+ * an internal structure (gnutls_private_key)
+ */
+static int
+_privkey_decode_gost_key(const gnutls_datum_t * raw_key,
+			 gnutls_x509_privkey_t pkey)
+{
+	int ret;
+
+	if (raw_key->data[0] == ASN1_TAG_INTEGER) {
+		ASN1_TYPE pkey_asn;
+
+		if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
+					       "GNUTLS.GOSTPrivateKeyOld",
+					       &pkey_asn)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto error;
+		}
+
+		ret = _asn1_strict_der_decode(&pkey_asn,
+				raw_key->data, raw_key->size,
+				NULL);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+			goto error;
+		}
+
+		ret = _gnutls_x509_read_key_int(pkey_asn, "",
+						&pkey->params.params[GOST_K]);
+		if (ret < 0) {
+			gnutls_assert();
+			asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+			goto error;
+		}
+		asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+	} else if (raw_key->data[0] == ASN1_TAG_OCTET_STRING) {
+		ASN1_TYPE pkey_asn;
+
+		if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
+					       "GNUTLS.GOSTPrivateKey",
+					       &pkey_asn)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto error;
+		}
+
+		ret = _asn1_strict_der_decode(&pkey_asn,
+				raw_key->data, raw_key->size,
+				NULL);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+			goto error;
+		}
+
+		ret = _gnutls_x509_read_key_int_le(pkey_asn, "",
+						   &pkey->params.params[GOST_K]);
+		if (ret < 0) {
+			gnutls_assert();
+			asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+			goto error;
+		}
+		asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
+	} else { /* Custom but also used format, no encap */
+		gnutls_assert();
+		ret = GNUTLS_E_PARSING_ERROR;
+		goto error;
+	}
+
+	pkey->params.params_nr++;
+
+	return 0;
+
+      error:
+	return ret;
+
+}
+
+/* Decodes a GOST privateKey from a PKCS8 structure.
+ */
+static int
+_decode_pkcs8_gost_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey,
+		       gnutls_pk_algorithm_t algo)
+{
+	int ret;
+	gnutls_datum_t tmp;
+	unsigned char oid[3 * MAX_OID_SIZE]; /* GOST parameters can have 3 OIDs at most */
+	int len, result;
+
+	gnutls_pk_params_init(&pkey->params);
+
+	len = sizeof(oid);
+	result = asn1_read_value(pkcs8_asn, "privateKeyAlgorithm.parameters",
+				 oid, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = GNUTLS_E_PARSING_ERROR;
+		goto error;
+	} else {
+		ret = _gnutls_x509_read_gost_params(oid, len, &pkey->params);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* Will be fixed later by pk_fixup */
+	ret = _gnutls_mpi_init(&pkey->params.params[GOST_X]);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+	pkey->params.params_nr++;
+
+	ret = _gnutls_mpi_init(&pkey->params.params[GOST_Y]);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+	pkey->params.params_nr++;
+
+	_gnutls_mpi_set_ui(pkey->params.params[GOST_X], 0);
+	_gnutls_mpi_set_ui(pkey->params.params[GOST_Y], 0);
+
+	ret = _gnutls_x509_read_value(pkcs8_asn, "privateKey", &tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = _privkey_decode_gost_key(&tmp, pkey);
+	_gnutls_free_key_datum(&tmp);
+
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	pkey->params.algo = algo;
+
+	return 0;
+
+error:
+	gnutls_pk_params_clear(&pkey->params);
+	gnutls_pk_params_release(&pkey->params);
+
+	return ret;
+}
+
 /* Decodes an DSA privateKey and params from a PKCS8 structure.
  */
 static int
@@ -1251,6 +1430,12 @@ decode_private_key_info(const gnutls_datum_t * der,
 			break;
 		case GNUTLS_PK_EDDSA_ED25519:
 			result = _decode_pkcs8_eddsa_key(pkcs8_asn, pkey, oid);
+			break;
+		case GNUTLS_PK_GOST_01:
+		case GNUTLS_PK_GOST_12_256:
+		case GNUTLS_PK_GOST_12_512:
+			result = _decode_pkcs8_gost_key(pkcs8_asn,
+							pkey, pkey->params.algo);
 			break;
 		default:
 			result = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);

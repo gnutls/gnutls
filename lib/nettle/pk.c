@@ -50,10 +50,15 @@
 #include <nettle/curve25519.h>
 #include <nettle/eddsa.h>
 #include <nettle/version.h>
+#if ENABLE_GOST
+#include "gost/gostdsa.h"
+#include "gost/ecc-gost-curve.h"
+#endif
 #include <gnettle.h>
 #include <fips.h>
 
 static inline const struct ecc_curve *get_supported_nist_curve(int curve);
+static inline const struct ecc_curve *get_supported_gost_curve(int curve);
 
 /* When these callbacks are used for a nettle operation, the
  * caller must check the macro HAVE_LIB_ERROR() after the operation
@@ -163,6 +168,36 @@ _ecc_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 
 	return 0;
 }
+
+#if ENABLE_GOST
+static int
+_gost_params_to_privkey(const gnutls_pk_params_st * pk_params,
+		       struct ecc_scalar *priv,
+		       const struct ecc_curve *curve)
+{
+	ecc_scalar_init(priv, curve);
+	if (ecc_scalar_set(priv, pk_params->params[GOST_K]) == 0) {
+		ecc_scalar_clear(priv);
+		return gnutls_assert_val(GNUTLS_E_PK_INVALID_PRIVKEY);
+	}
+
+	return 0;
+}
+
+static int
+_gost_params_to_pubkey(const gnutls_pk_params_st * pk_params,
+		       struct ecc_point *pub, const struct ecc_curve *curve)
+{
+	ecc_point_init(pub, curve);
+	if (ecc_point_set
+	    (pub, pk_params->params[GOST_X], pk_params->params[GOST_Y]) == 0) {
+		ecc_point_clear(pub);
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	return 0;
+}
+#endif
 
 static void
 ecc_shared_secret(struct ecc_scalar *private_key,
@@ -617,6 +652,58 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			break;
 		}
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		{
+			struct ecc_scalar priv;
+			struct dsa_signature sig;
+			const struct ecc_curve *curve;
+
+			curve = get_supported_gost_curve(pk_params->curve);
+			if (curve == NULL)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			ret =
+			    _ecc_params_to_privkey(pk_params, &priv,
+						   curve);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			/* This call will return a valid MAC entry and
+			 * getters will check that is not null anyway. */
+			me = mac_to_entry(_gnutls_gost_digest(pk_params->algo));
+			if (_gnutls_mac_get_algo_len(me) != vdata->size) {
+				gnutls_assert();
+				_gnutls_debug_log
+				    ("Security level of algorithm requires hash %s(%zd)\n",
+				     _gnutls_mac_get_name(me),
+				     _gnutls_mac_get_algo_len(me));
+				return GNUTLS_E_INVALID_REQUEST;
+			}
+
+			dsa_signature_init(&sig);
+
+			gostdsa_sign(&priv, NULL, rnd_tmpkey_func,
+				     vdata->size, vdata->data, &sig);
+
+			ret =
+			    _gnutls_encode_gost_rs(signature, &sig.r, &sig.s,
+						   (ecc_bit_size(curve) + 7) / 8);
+
+			dsa_signature_clear(&sig);
+			ecc_scalar_zclear(&priv);
+
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			break;
+		}
+#endif
 	case GNUTLS_PK_ECDSA:	/* we do ECDSA */
 		{
 			struct ecc_scalar priv;
@@ -894,6 +981,55 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			}
 			break;
 		}
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		{
+			struct ecc_point pub;
+			struct dsa_signature sig;
+			const struct ecc_curve *curve;
+			const mac_entry_st *me;
+
+			curve = get_supported_gost_curve(pk_params->curve);
+			if (curve == NULL)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			/* This call will return a valid MAC entry and
+			 * getters will check that is not null anyway. */
+			me = mac_to_entry(_gnutls_gost_digest(pk_params->algo));
+			if (_gnutls_mac_get_algo_len(me) != vdata->size)
+				return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+
+			ret =
+			    _gnutls_decode_gost_rs(signature, &tmp[0],
+						  &tmp[1]);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			ret =
+			    _gost_params_to_pubkey(pk_params, &pub, curve);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			memcpy(sig.r, tmp[0], SIZEOF_MPZT);
+			memcpy(sig.s, tmp[1], SIZEOF_MPZT);
+
+			ret = gostdsa_verify(&pub, vdata->size, vdata->data, &sig);
+			if (ret == 0) {
+				gnutls_assert();
+				ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+			} else
+				ret = 0;
+
+			ecc_point_clear(&pub);
+			break;
+		}
+#endif
 	case GNUTLS_PK_ECDSA:	/* ECDSA */
 		{
 			struct ecc_point pub;
@@ -1089,6 +1225,22 @@ static inline const struct ecc_curve *get_supported_nist_curve(int curve)
 	}
 }
 
+static inline const struct ecc_curve *get_supported_gost_curve(int curve)
+{
+	switch (curve) {
+#if ENABLE_GOST
+	case GNUTLS_ECC_CURVE_GOST256CPA:
+		return nettle_get_gost_256cpa();
+	case GNUTLS_ECC_CURVE_GOST256CPXA:
+		return nettle_get_gost_256cpa();
+	case GNUTLS_ECC_CURVE_GOST512A:
+		return nettle_get_gost_512a();
+#endif
+	default:
+		return NULL;
+	}
+}
+
 static int _wrap_nettle_pk_curve_exists(gnutls_ecc_curve_t curve)
 {
 	switch (curve) {
@@ -1096,7 +1248,8 @@ static int _wrap_nettle_pk_curve_exists(gnutls_ecc_curve_t curve)
 		case GNUTLS_ECC_CURVE_X25519:
 			return 1;
 		default:
-			return ((get_supported_nist_curve(curve)!=NULL)?1:0);
+			return ((get_supported_nist_curve(curve)!=NULL ||
+				 get_supported_gost_curve(curve)!=NULL)?1:0);
 	}
 }
 
@@ -1218,6 +1371,11 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+#endif
 		break;
 	default:
 		gnutls_assert();
@@ -1504,6 +1662,12 @@ gnutls_x509_spki_st spki;
 
 		ddata.data = (void*)gen_data;
 		ddata.size = hash_len;
+	} else if (algo == GNUTLS_PK_GOST_01 || algo == GNUTLS_PK_GOST_12_256) {
+		ddata.data = (void*)const_data_sha256;
+		ddata.size = sizeof(const_data_sha256);
+	} else if (algo == GNUTLS_PK_GOST_12_512) {
+		ddata.data = (void*)const_data_sha512;
+		ddata.size = sizeof(const_data_sha512);
 	} else if (algo == GNUTLS_PK_RSA_PSS) {
 		if (spki.rsa_pss_dig == GNUTLS_DIG_UNKNOWN)
 			spki.rsa_pss_dig = GNUTLS_DIG_SHA256;
@@ -1565,6 +1729,9 @@ gnutls_x509_spki_st spki;
 	case GNUTLS_PK_EDDSA_ED25519:
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_RSA_PSS:
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
 		ret = _gnutls_pk_sign(algo, &sig, &ddata, params, &spki);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
@@ -1912,6 +2079,65 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			break;
 		}
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		if (params->pkflags & GNUTLS_PK_FLAG_PROVABLE)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		{
+			struct ecc_scalar key;
+			struct ecc_point pub;
+			const struct ecc_curve *curve;
+			const mac_entry_st *me;
+
+			curve = get_supported_gost_curve(level);
+			if (curve == NULL)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			me = hash_to_entry(_gnutls_gost_digest(algo));
+			if (!me || me->output_size * 8 != ecc_bit_size(curve))
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			ecc_scalar_init(&key, curve);
+			ecc_point_init(&pub, curve);
+
+			gostdsa_generate_keypair(&pub, &key, NULL, rnd_key_func);
+			if (HAVE_LIB_ERROR()) {
+				ret = gnutls_assert_val(GNUTLS_E_LIB_IN_ERROR_STATE);
+				goto ecc_fail;
+			}
+
+
+			ret = _gnutls_mpi_init_multi(&params->params[GOST_X], &params->params[GOST_Y],
+					&params->params[GOST_K], NULL);
+			if (ret < 0) {
+				gnutls_assert();
+				goto gost_fail;
+			}
+
+			params->curve = level;
+			params->params_nr = GOST_PRIVATE_PARAMS;
+
+			ecc_point_get(&pub, TOMPZ(params->params[GOST_X]),
+				      TOMPZ(params->params[GOST_Y]));
+			ecc_scalar_get(&key, TOMPZ(params->params[GOST_K]));
+
+			ret = 0;
+
+		      gost_fail:
+			ecc_point_clear(&pub);
+			ecc_scalar_clear(&key);
+
+			if (ret < 0)
+				goto fail;
+
+			break;
+		}
+#endif
 	case GNUTLS_PK_ECDH_X25519:
 		{
 			unsigned size = gnutls_ecc_curve_get_size(level);
@@ -2192,6 +2418,83 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		ret = 0;
 		break;
 	}
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		{
+			struct ecc_point r, pub;
+			struct ecc_scalar priv;
+			mpz_t x1, y1, x2, y2;
+			const struct ecc_curve *curve;
+
+			if (params->params_nr != GOST_PRIVATE_PARAMS)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_INVALID_REQUEST);
+
+			curve = get_supported_gost_curve(params->curve);
+			if (curve == NULL)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			ret = _gost_params_to_pubkey(params, &pub, curve);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			ret = _gost_params_to_privkey(params, &priv, curve);
+			if (ret < 0) {
+				ecc_point_clear(&pub);
+				return gnutls_assert_val(ret);
+			}
+
+			ecc_point_init(&r, curve);
+			/* verify that x,y lie on the curve */
+			ret =
+			    ecc_point_set(&r, TOMPZ(params->params[GOST_X]),
+					  TOMPZ(params->params[GOST_Y]));
+			if (ret == 0) {
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_ILLEGAL_PARAMETER);
+				goto gost_cleanup;
+			}
+			ecc_point_clear(&r);
+
+			ecc_point_init(&r, curve);
+			ecc_point_mul_g(&r, &priv);
+
+			mpz_init(x1);
+			mpz_init(y1);
+			ecc_point_get(&r, x1, y1);
+			ecc_point_zclear(&r);
+
+			mpz_init(x2);
+			mpz_init(y2);
+			ecc_point_get(&pub, x2, y2);
+
+			/* verify that k*(Gx,Gy)=(x,y) */
+			if (mpz_cmp(x1, x2) != 0 || mpz_cmp(y1, y2) != 0) {
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_ILLEGAL_PARAMETER);
+				goto gost_cleanup;
+			}
+
+			ret = 0;
+
+		      gost_cleanup:
+			ecc_scalar_zclear(&priv);
+			ecc_point_clear(&pub);
+
+			mpz_clear(x1);
+			mpz_clear(y1);
+			mpz_clear(x2);
+			mpz_clear(y2);
+		}
+		break;
+#endif
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -2251,6 +2554,50 @@ wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
 			ecc_point_clear(&pub);
 		}
 		break;
+#if ENABLE_GOST
+	case GNUTLS_PK_GOST_01:
+	case GNUTLS_PK_GOST_12_256:
+	case GNUTLS_PK_GOST_12_512:
+		{
+			/* just verify that x and y lie on the curve */
+			struct ecc_point r, pub;
+			const struct ecc_curve *curve;
+
+			if (params->params_nr != GOST_PUBLIC_PARAMS)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_INVALID_REQUEST);
+
+			curve = get_supported_gost_curve(params->curve);
+			if (curve == NULL)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			ret = _gost_params_to_pubkey(params, &pub, curve);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			ecc_point_init(&r, curve);
+			/* verify that x,y lie on the curve */
+			ret =
+			    ecc_point_set(&r, TOMPZ(params->params[GOST_X]),
+					  TOMPZ(params->params[GOST_Y]));
+			if (ret == 0) {
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_ILLEGAL_PARAMETER);
+				goto gost_cleanup;
+			}
+			ecc_point_clear(&r);
+
+			ret = 0;
+
+		      gost_cleanup:
+			ecc_point_clear(&pub);
+		}
+		break;
+#endif
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
@@ -2380,7 +2727,38 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 	}
+#if ENABLE_GOST
+	else if (algo == GNUTLS_PK_GOST_01 ||
+		 algo == GNUTLS_PK_GOST_12_256 ||
+		 algo == GNUTLS_PK_GOST_12_512) {
+		struct ecc_point r;
+		struct ecc_scalar priv;
+		const struct ecc_curve *curve;
 
+		if (params->params_nr != GOST_PRIVATE_PARAMS)
+			return gnutls_assert_val
+				(GNUTLS_E_INVALID_REQUEST);
+
+		curve = get_supported_gost_curve(params->curve);
+		if (curve == NULL)
+			return gnutls_assert_val
+				(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+		ret = _gost_params_to_privkey(params, &priv, curve);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+
+		ecc_point_init(&r, curve);
+		ecc_point_mul_g(&r, &priv);
+
+		ecc_point_get(&r, params->params[GOST_X],
+				  params->params[GOST_Y]);
+
+		ecc_point_clear(&r);
+		ecc_scalar_clear(&priv);
+	}
+#endif
 
 	return 0;
 }

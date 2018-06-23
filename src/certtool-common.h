@@ -87,7 +87,9 @@ void switch_to_pkcs8_when_needed(common_info_st *cinfo, gnutls_x509_privkey_t ke
 	if (cinfo->pkcs8)
 		return;
 
-	if ((key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519)) {
+	if (key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519 ||
+	    key_type == GNUTLS_PK_GOST_01 || key_type == GNUTLS_PK_GOST_12_256 ||
+	    key_type == GNUTLS_PK_GOST_12_512) {
 		if (cinfo->verbose)
 			fprintf(stderr, "Assuming --pkcs8 is given; %s private keys can only be exported in PKCS#8 format\n",
 				gnutls_pk_algorithm_get_name(key_type));
@@ -153,6 +155,11 @@ void _pubkey_info(FILE * outfile, gnutls_certificate_print_formats_t,
 void print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 		    gnutls_datum_t * k, gnutls_datum_t * x,
 		    gnutls_datum_t * y, int cprint);
+void print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
+		     gnutls_digest_algorithm_t digest,
+		     gnutls_gost_paramset_t paramset,
+		     gnutls_datum_t * k, gnutls_datum_t * x,
+		     gnutls_datum_t * y, int cprint);
 void print_rsa_pkey(FILE * outfile, gnutls_datum_t * m, gnutls_datum_t * e,
 		    gnutls_datum_t * d, gnutls_datum_t * p,
 		    gnutls_datum_t * q, gnutls_datum_t * u,

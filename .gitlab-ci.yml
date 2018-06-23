@@ -101,6 +101,7 @@ minimal.Fedora.x86_64:
     --disable-nls --disable-libdane --without-p11-kit --without-tpm
     --disable-ssl3-support --disable-ssl2-support --disable-doc --enable-openssl-compatibility
     --disable-gcc-warnings
+    --disable-gost
   - make -j$(nproc)
   tags:
   - shared

@@ -37,6 +37,10 @@
 #include "x509_int.h"
 #include "pkcs7_int.h"
 #include <random.h>
+#include <nettle/pbkdf2.h>
+#if ENABLE_GOST
+#include "../nettle/gost/pbkdf2-gost.h"
+#endif
 
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
@@ -843,6 +847,53 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 	return result;
 }
 
+#if ENABLE_GOST
+/*
+ * Russian differs from PKCS#12 here. It described proprietary way
+ * to obtain MAC key instead of using standard mechanism.
+ *
+ * See http://wwwold.tc26.ru/standard/rs/%D0%A0%2050.1.112-2016.pdf
+ * section 5.
+ */
+static int
+_gnutls_pkcs12_gost_string_to_key(gnutls_mac_algorithm_t algo,
+				  const uint8_t * salt,
+				  unsigned int salt_size, unsigned int iter,
+				  const char *pass, unsigned int req_keylen,
+				  uint8_t * keybuf)
+{
+	uint8_t temp[96];
+	size_t temp_len = sizeof(temp);
+	unsigned int pass_len = 0;
+
+	if (pass)
+		pass_len = strlen(pass);
+
+	if (algo == GNUTLS_MAC_GOSTR_94)
+		pbkdf2_hmac_gosthash94cp(pass_len, (uint8_t *) pass,
+				iter,
+				salt_size,
+				salt, temp_len, temp);
+	else if (algo == GNUTLS_MAC_STREEBOG_256)
+		pbkdf2_hmac_streebog256(pass_len, (uint8_t *) pass,
+				iter,
+				salt_size,
+				salt, temp_len, temp);
+	else if (algo == GNUTLS_MAC_STREEBOG_512)
+		pbkdf2_hmac_streebog512(pass_len, (uint8_t *) pass,
+				iter,
+				salt_size,
+				salt, temp_len, temp);
+	else
+		/* Should not reach here */
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	memcpy(keybuf, temp + temp_len - req_keylen, req_keylen);
+
+	return 0;
+}
+#endif
+
 /**
  * gnutls_pkcs12_generate_mac2:
  * @pkcs12: A pkcs12 type
@@ -861,7 +912,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 	const int iter = 10*1024;
 	mac_hd_st td1;
 	gnutls_datum_t tmp = { NULL, 0 };
-	unsigned mac_size;
+	unsigned mac_size, key_len;
 	uint8_t mac_out[MAX_HASH_SIZE];
 	const mac_entry_st *me = mac_to_entry(mac);
 
@@ -872,6 +923,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	mac_size = _gnutls_mac_get_algo_len(me);
+	key_len = mac_size;
 
 	/* Generate the salt.
 	 */
@@ -907,9 +959,24 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 
 	/* Generate the key.
 	 */
-	result =
-	    _gnutls_pkcs12_string_to_key(me, 3 /*MAC*/, salt, sizeof(salt),
-					 iter, pass, mac_size, key);
+#if ENABLE_GOST
+	if (me->id == GNUTLS_MAC_GOSTR_94 ||
+	    me->id == GNUTLS_MAC_STREEBOG_256 ||
+	    me->id == GNUTLS_MAC_STREEBOG_512) {
+		key_len = 32;
+		result = _gnutls_pkcs12_gost_string_to_key(me->id,
+							   salt,
+							   sizeof(salt),
+							   iter,
+							   pass,
+							   mac_size,
+							   key);
+	} else
+#endif
+		result = _gnutls_pkcs12_string_to_key(me, 3 /*MAC*/,
+						      salt, sizeof(salt),
+						      iter, pass,
+						      mac_size, key);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -926,7 +993,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 	/* MAC the data
 	 */
 	result = _gnutls_mac_init(&td1, me,
-				  key, mac_size);
+				  key, key_len);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1014,6 +1081,9 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	gnutls_mac_algorithm_t algo;
 	unsigned mac_len, key_len;
 	const mac_entry_st *entry;
+#if ENABLE_GOST
+	int gost_retry = 0;
+#endif
 
 	if (pkcs12 == NULL) {
 		gnutls_assert();
@@ -1064,15 +1134,14 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 	/* Generate the key.
 	 */
-	result =
-	    _gnutls_pkcs12_string_to_key(entry, 3 /*MAC*/, salt.data, salt.size,
-					 iter, pass, key_len, key);
+	result = _gnutls_pkcs12_string_to_key(entry, 3 /*MAC*/,
+					      salt.data, salt.size,
+					      iter, pass,
+					      key_len, key);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	_gnutls_free_datum(&salt);
 
 	/* Get the data to be MACed
 	 */
@@ -1081,6 +1150,12 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 		gnutls_assert();
 		goto cleanup;
 	}
+
+#if ENABLE_GOST
+	/* GOST PKCS#12 files use either PKCS#12 scheme or proprietary
+	 * HMAC-based scheme to generate MAC key. */
+pkcs12_try_gost:
+#endif
 
 	/* MAC the data
 	 */
@@ -1091,7 +1166,6 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	}
 
 	_gnutls_mac(&td1, tmp.data, tmp.size);
-	_gnutls_free_datum(&tmp);
 
 	_gnutls_mac_deinit(&td1, mac_output);
 
@@ -1107,9 +1181,39 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 	if ((unsigned)len != mac_len ||
 	    memcmp(mac_output_orig, mac_output, len) != 0) {
+
+#if ENABLE_GOST
+		/* It is possible that GOST files use proprietary
+		 * key generation scheme */
+		if (!gost_retry &&
+		    (algo == GNUTLS_MAC_GOSTR_94 ||
+		     algo == GNUTLS_MAC_STREEBOG_256 ||
+		     algo == GNUTLS_MAC_STREEBOG_512)) {
+			gost_retry = 1;
+			key_len = 32;
+			result = _gnutls_pkcs12_gost_string_to_key(algo,
+								   salt.data,
+								   salt.size,
+								   iter,
+								   pass,
+								   key_len,
+								   key);
+			if (result < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			goto pkcs12_try_gost;
+		}
+#endif
+
 		gnutls_assert();
-		return GNUTLS_E_MAC_VERIFY_FAILED;
+		result = GNUTLS_E_MAC_VERIFY_FAILED;
+		goto cleanup;
 	}
+
+	_gnutls_free_datum(&tmp);
+	_gnutls_free_datum(&salt);
 
 	return 0;
 

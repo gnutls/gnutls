@@ -59,3 +59,28 @@ if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \
 	int/drbg-aes.c int/drbg-aes.h
 endif
+
+if ENABLE_GOST
+libcrypto_la_SOURCES += \
+	gost/nettle-write.h \
+	gost/gost28147.c gost/gost28147.h \
+	gost/gosthash94.c gost/gosthash94.h gost/gosthash94-meta.c \
+	gost/streebog.c gost/streebog.h gost/streebog-meta.c \
+	gost/hmac-gosthash94.c gost/hmac-streebog.c gost/hmac-gost.h
+
+libcrypto_la_SOURCES += \
+	gost/bignum-le.c gost/bignum-le.h
+
+libcrypto_la_SOURCES += \
+	gost/pbkdf2-hmac-gosthash94.c gost/pbkdf2-hmac-streebog.c \
+	gost/pbkdf2-gost.h
+
+libcrypto_la_SOURCES += \
+	gost/nettle-internal.h \
+	gost/ecc-gost256cpa.c gost/ecc-gost256cpa-32.h  gost/ecc-gost256cpa-64.h\
+	gost/ecc-gost512a.c gost/ecc-gost512a-32.h gost/ecc-gost512a-64.h \
+	gost/ecc-internal.h gost/gmp-glue.h \
+	gost/ecc-gostdsa-sign.c gost/ecc-gostdsa-verify.c \
+	gost/gostdsa-sign.c gost/gostdsa-verify.c \
+	gost/gostdsa.h gost/ecc-gost-curve.h gost/ecc-gost-hash.c
+endif

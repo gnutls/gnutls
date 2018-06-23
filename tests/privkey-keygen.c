@@ -67,6 +67,12 @@ static void sign_verify_data(gnutls_pk_algorithm_t algorithm, gnutls_x509_privke
 
 	if (algorithm == GNUTLS_PK_EDDSA_ED25519)
 		digest = GNUTLS_DIG_SHA512;
+	else if (algorithm == GNUTLS_PK_GOST_01)
+		digest = GNUTLS_DIG_GOSTR_94;
+	else if (algorithm == GNUTLS_PK_GOST_12_256)
+		digest = GNUTLS_DIG_STREEBOG_256;
+	else if (algorithm == GNUTLS_PK_GOST_12_512)
+		digest = GNUTLS_DIG_STREEBOG_512;
 	else
 		digest = GNUTLS_DIG_SHA256;
 
@@ -118,6 +124,13 @@ void doit(void)
 			if (algorithm == GNUTLS_PK_DH ||
 			    algorithm == GNUTLS_PK_ECDH_X25519)
 				continue;
+
+			if (gnutls_fips140_mode_enabled() &&
+			    (algorithm == GNUTLS_PK_GOST_01 ||
+			     algorithm == GNUTLS_PK_GOST_12_256 ||
+			     algorithm == GNUTLS_PK_GOST_12_512))
+				continue;
+
 
 			ret = gnutls_x509_privkey_init(&pkey);
 			if (ret < 0) {

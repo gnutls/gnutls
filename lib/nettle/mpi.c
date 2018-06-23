@@ -29,6 +29,9 @@
 #include <num.h>
 #include <mpi.h>
 #include <nettle/bignum.h> /* includes gmp.h */
+#if ENABLE_GOST
+#include "gost/bignum-le.h"
+#endif
 #include <gnettle.h>
 #include <random.h>
 
@@ -43,6 +46,10 @@ wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t * nbytes,
 		size = nettle_mpz_sizeinbase_256_u(*p);
 	} else if (format == GNUTLS_MPI_FORMAT_STD) {
 		size = nettle_mpz_sizeinbase_256_s(*p);
+#if ENABLE_GOST
+	} else if (format == GNUTLS_MPI_FORMAT_ULE) {
+		size = nettle_mpz_sizeinbase_256_u_le(*p);
+#endif
 	} else {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -50,11 +57,16 @@ wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t * nbytes,
 
 	if (buffer == NULL || size > *nbytes) {
 		*nbytes = size;
+		gnutls_assert();
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	nettle_mpz_get_str_256(size, buffer, *p);
-
+#if ENABLE_GOST
+	if (format == GNUTLS_MPI_FORMAT_ULE)
+		nettle_mpz_get_str_256_u_le(size, buffer, *p);
+	else
+#endif
+		nettle_mpz_get_str_256(size, buffer, *p);
 	*nbytes = size;
 
 	return 0;
@@ -136,6 +148,10 @@ wrap_nettle_mpi_scan(bigint_t r, const void *buffer, size_t nbytes,
 		nettle_mpz_set_str_256_u(TOMPZ(r), nbytes, buffer);
 	} else if (format == GNUTLS_MPI_FORMAT_STD) {
 		nettle_mpz_set_str_256_s(TOMPZ(r), nbytes, buffer);
+#if ENABLE_GOST
+	} else if (format == GNUTLS_MPI_FORMAT_ULE) {
+		nettle_mpz_set_str_256_u_le(TOMPZ(r), nbytes, buffer);
+#endif
 	} else {
 		gnutls_assert();
 		goto fail;

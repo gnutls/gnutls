@@ -121,4 +121,14 @@ RSAPSSParameters ::= SEQUENCE {
 	trailerField		[3] INTEGER DEFAULT 1
 }
 
+-- GOST R 34.10
+GOSTParameters ::= SEQUENCE {
+   publicKeyParamSet  OBJECT IDENTIFIER,
+   digestParamSet     OBJECT IDENTIFIER,
+   encryptionParamSet OBJECT IDENTIFIER OPTIONAL
+}
+
+GOSTPrivateKey ::= OCTET STRING
+GOSTPrivateKeyOld ::= INTEGER
+
 END

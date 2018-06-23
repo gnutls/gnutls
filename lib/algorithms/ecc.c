@@ -79,6 +79,62 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .size = 32,
 	 .sig_size = 64
 	},
+	{
+	 .name = "CryptoPro-A",
+	 .oid = "1.2.643.2.2.35.1",
+	 .id = GNUTLS_ECC_CURVE_GOST256CPA,
+	 .pk = GNUTLS_PK_UNKNOWN,
+	 .size = 32,
+	 .gost_curve = 1,
+	},
+	{
+	 .name = "CryptoPro-B",
+	 .oid = "1.2.643.2.2.35.2",
+	 .id = GNUTLS_ECC_CURVE_GOST256CPB,
+	 .pk = GNUTLS_PK_UNKNOWN,
+	 .size = 32,
+	 .gost_curve = 1,
+	},
+	{
+	 .name = "CryptoPro-C",
+	 .oid = "1.2.643.2.2.35.3",
+	 .id = GNUTLS_ECC_CURVE_GOST256CPC,
+	 .pk = GNUTLS_PK_UNKNOWN,
+	 .size = 32,
+	 .gost_curve = 1,
+	},
+	{
+	 .name = "CryptoPro-XchA",
+	 .oid = "1.2.643.2.2.36.0",
+	 .id = GNUTLS_ECC_CURVE_GOST256CPXA,
+	 .pk = GNUTLS_PK_UNKNOWN,
+	 .size = 32,
+	 .gost_curve = 1,
+	},
+	{
+	 .name = "CryptoPro-XchB",
+	 .oid = "1.2.643.2.2.36.1",
+	 .id = GNUTLS_ECC_CURVE_GOST256CPXB,
+	 .pk = GNUTLS_PK_UNKNOWN,
+	 .size = 32,
+	 .gost_curve = 1,
+	},
+	{
+	 .name = "TC26-512-A",
+	 .oid = "1.2.643.7.1.2.1.2.1",
+	 .id = GNUTLS_ECC_CURVE_GOST512A,
+	 .pk = GNUTLS_PK_GOST_12_512,
+	 .size = 64,
+	 .gost_curve = 1,
+	},
+	{
+	 .name = "TC26-512-B",
+	 .oid = "1.2.643.7.1.2.1.2.2",
+	 .id = GNUTLS_ECC_CURVE_GOST512B,
+	 .pk = GNUTLS_PK_GOST_12_512,
+	 .size = 64,
+	 .gost_curve = 1,
+	},
 	{0, 0, 0}
 };
 
@@ -162,6 +218,19 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)
 	return ret;
 }
 
+static int _gnutls_ecc_pk_compatible(const gnutls_ecc_curve_entry_st *p,
+				     gnutls_pk_algorithm_t pk)
+{
+	if (!_gnutls_pk_curve_exists(p->id))
+		return 0;
+
+	if (pk == GNUTLS_PK_GOST_01 ||
+	    pk == GNUTLS_PK_GOST_12_256)
+		return p->gost_curve && p->size == 32;
+
+	return pk == p->pk;
+}
+
 /*-
  * _gnutls_ecc_bits_to_curve:
  * @bits: is a security parameter in bits
@@ -175,11 +244,16 @@ gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(gnutls_pk_algorithm_t pk, int bits)
 
 	if (pk == GNUTLS_PK_ECDSA)
 		ret = GNUTLS_ECC_CURVE_SECP256R1;
+	else if (pk == GNUTLS_PK_GOST_01 ||
+		 pk == GNUTLS_PK_GOST_12_256)
+		ret = GNUTLS_ECC_CURVE_GOST256CPA;
+	else if (pk == GNUTLS_PK_GOST_12_512)
+		ret = GNUTLS_ECC_CURVE_GOST512A;
 	else
 		ret = GNUTLS_ECC_CURVE_ED25519;
 
 	GNUTLS_ECC_CURVE_LOOP(
-		if (pk == p->pk && 8 * p->size >= (unsigned)bits && _gnutls_pk_curve_exists(p->id)) {
+		if (_gnutls_ecc_pk_compatible(p, pk) && 8 * p->size >= (unsigned)bits) {
 			ret = p->id;
 			break;
 		}

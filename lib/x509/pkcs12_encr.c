@@ -61,9 +61,14 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	unsigned v_size = 0;
 
 	switch (me->id) {
+		case GNUTLS_DIG_GOSTR_94:
+			v_size = 32;
+			break;
 		case GNUTLS_DIG_SHA1:
 		case GNUTLS_DIG_SHA224:
 		case GNUTLS_DIG_SHA256:
+		case GNUTLS_DIG_STREEBOG_256:
+		case GNUTLS_DIG_STREEBOG_512:
 			v_size = 64;
 			break;
 		case GNUTLS_DIG_SHA384:

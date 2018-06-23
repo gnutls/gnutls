@@ -43,7 +43,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/template-krb5name.pem data/template-krb5name-full.pem data/template-test-ecc.key \
 	data/template-rsa-sha3-256.pem data/template-rsa-sha3-512.pem data/template-rsa-sha3-224.pem \
 	data/template-rsa-sha3-384.pem data/long-oids.pem \
-	data/name-constraints-ip2.pem data/chain-md5.pem data/gost-cert.pem \
+	data/name-constraints-ip2.pem data/chain-md5.pem \
+	data/gost-cert.pem data/gost-cert-nogost.pem data/gost94-cert.pem \
 	templates/template-tlsfeature.tmpl data/userid.pem data/cert-with-crl.p12 \
 	data/template-tlsfeature.pem data/template-tlsfeature.csr \
 	templates/template-tlsfeature-crq.tmpl templates/arb-extensions.tmpl data/arb-extensions.pem \
@@ -89,7 +90,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/pkcs8-pbes1-des-md5.pem data/pkcs8-invalid8.der data/key-invalid1.der \
 	data/key-invalid4.der data/key-invalid5.der data/key-invalid6.der \
 	data data/pkcs8-invalid9.der data/key-invalid2.der data/pkcs8-invalid10.der \
-	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt
+	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt \
+	data/rfc4490.p7b data/rfc4490.p7b.out data/gost01.p12 data/gost12.p12 data/gost12-2.p12
 
 dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -118,6 +120,13 @@ if ENABLE_DANE
 dist_check_SCRIPTS += dane
 endif
 
+if ENABLE_GOST
+dist_check_SCRIPTS += gost
+if !WINDOWS
+dist_check_SCRIPTS += pkcs12-gost
+endif
+endif
+
 dist_check_SCRIPTS += certtool-rsa-pss certtool-eddsa
 
 TESTS = $(dist_check_SCRIPTS)
@@ -139,6 +148,12 @@ endif
 
 if WINDOWS
 TESTS_ENVIRONMENT += WINDOWS=1
+endif
+
+if ENABLE_GOST
+TESTS_ENVIRONMENT += ENABLE_GOST=1
+else
+TESTS_ENVIRONMENT += ENABLE_GOST=0
 endif
 
 distclean-local:

@@ -3523,6 +3523,59 @@ gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
 }
 
 /**
+ * gnutls_x509_crt_get_pk_gost_raw:
+ * @crt: Holds the certificate
+ * @curve: will hold the curve
+ * @paramset: will hold paramset
+ * @x: will hold x
+ * @y: will hold y
+ *
+ * This function will export the GOST public key's parameters found in
+ * the given certificate.  The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.6.3
+ **/
+int
+gnutls_x509_crt_get_pk_gost_raw(gnutls_x509_crt_t crt,
+				gnutls_ecc_curve_t * curve,
+				gnutls_digest_algorithm_t * digest,
+				gnutls_gost_paramset_t *paramset,
+				gnutls_datum_t * x, gnutls_datum_t * y)
+{
+	int ret;
+	gnutls_pubkey_t pubkey;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_pubkey_export_gost_raw2(pubkey, curve, digest,
+					     paramset, x, y, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+ cleanup:
+	gnutls_pubkey_deinit(pubkey);
+	return ret;
+}
+
+/**
  * gnutls_x509_crt_get_pk_dsa_raw:
  * @crt: Holds the certificate
  * @p: will hold the p

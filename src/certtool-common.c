@@ -907,6 +907,61 @@ print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 	}
 }
 
+static const char *
+gost_param_name(int param)
+{
+	switch(param) {
+	case 0:
+		return "TC26-Z";
+	case 1:
+		return "CryptoPro-A";
+	case 2:
+		return "CryptoPro-B";
+	case 3:
+		return "CryptoPro-C";
+	case 4:
+		return "CryptoPro-D";
+	default:
+		return "unknown";
+	}
+}
+
+void
+print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
+	       gnutls_digest_algorithm_t digest, gnutls_gost_paramset_t paramset,
+	       gnutls_datum_t * k, gnutls_datum_t * x, gnutls_datum_t * y,
+	       int cprint)
+{
+	if (cprint != 0)
+		fprintf(outfile, "/* curve: %s */\n",
+			gnutls_ecc_curve_get_name(curve));
+	else
+		fprintf(outfile, "curve:\t%s\n",
+			gnutls_ecc_curve_get_name(curve));
+
+	if (cprint != 0)
+		fprintf(outfile, "/* digest: %s */\n",
+			gnutls_digest_get_name(digest));
+	else
+		fprintf(outfile, "digest:\t%s\n",
+			gnutls_digest_get_name(digest));
+
+	if (cprint != 0)
+		fprintf(outfile, "/* paramset: %s */\n",
+			gost_param_name(paramset));
+	else
+		fprintf(outfile, "paramset:\t%s\n",
+			gost_param_name(paramset));
+
+	if (k) {
+		print_head(outfile, "private key", k->size, cprint);
+		print_hex_datum(outfile, k, cprint);
+	}
+	print_head(outfile, "x", x->size, cprint);
+	print_hex_datum(outfile, x, cprint);
+	print_head(outfile, "y", y->size, cprint);
+	print_hex_datum(outfile, y, cprint);
+}
 
 void
 print_rsa_pkey(FILE * outfile, gnutls_datum_t * m, gnutls_datum_t * e,
@@ -1107,6 +1162,16 @@ int cipher_to_flags(const char *cipher)
 		return GNUTLS_PKCS_USE_PBES2_AES_256;
 	} else if (strcasecmp(cipher, "rc2-40") == 0) {
 		return GNUTLS_PKCS_USE_PKCS12_RC2_40;
+	} else if (strcasecmp(cipher, "gost28147-tc26z") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_TC26Z;
+	} else if (strcasecmp(cipher, "gost28147-cpa") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPA;
+	} else if (strcasecmp(cipher, "gost28147-cpb") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPB;
+	} else if (strcasecmp(cipher, "gost28147-cpc") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPC;
+	} else if (strcasecmp(cipher, "gost28147-cpd") == 0) {
+		return GNUTLS_PKCS_USE_PBES2_GOST_CPD;
 	}
 
 	fprintf(stderr, "unknown cipher %s\n", cipher);
@@ -1228,6 +1293,32 @@ static void privkey_info_int(FILE *outfile, common_info_st * cinfo,
 		else {
 			print_ecc_pkey(outfile, curve, &k, &x, &y,
 				       cinfo->cprint);
+
+			gnutls_free(x.data);
+			gnutls_free(y.data);
+			gnutls_free(k.data);
+		}
+	} else if (key_type == GNUTLS_PK_GOST_01 ||
+		   key_type == GNUTLS_PK_GOST_12_256 ||
+		   key_type == GNUTLS_PK_GOST_12_512) {
+		gnutls_datum_t y, x, k;
+		gnutls_ecc_curve_t curve;
+		gnutls_digest_algorithm_t digest;
+		gnutls_gost_paramset_t paramset;
+
+		ret =
+		    gnutls_x509_privkey_export_gost_raw(key, &curve,
+							&digest,
+							&paramset,
+							&x, &y, &k);
+		if (ret < 0)
+			fprintf(stderr,
+				"Error in key GOST data export: %s\n",
+				gnutls_strerror(ret));
+		else {
+			print_gost_pkey(outfile, curve, digest, paramset,
+					&k, &x, &y,
+					cinfo->cprint);
 
 			gnutls_free(x.data);
 			gnutls_free(y.data);
@@ -1539,6 +1630,12 @@ gnutls_pk_algorithm_t figure_key_type(const char *key_type)
 		return GNUTLS_PK_DSA;
 	else if (strcasecmp(key_type, "ecdsa") == 0 || strcasecmp(key_type, "ecc") == 0)
 		return GNUTLS_PK_ECDSA;
+	else if (strcasecmp(key_type, "gost01") == 0)
+		return GNUTLS_PK_GOST_01;
+	else if (strcasecmp(key_type, "gost12-256") == 0)
+		return GNUTLS_PK_GOST_12_256;
+	else if (strcasecmp(key_type, "gost12-512") == 0)
+		return GNUTLS_PK_GOST_12_512;
 	else {
 		fprintf(stderr, "unknown key type: %s\n", key_type);
 		return GNUTLS_PK_UNKNOWN;

@@ -39,7 +39,14 @@ OUTFILE2=out2-pkcs7.$$.tmp
 
 check_for_datefudge
 
-for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b; do
+if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != "1"
+then
+	GOST_P7B="rfc4490.p7b"
+else
+	GOST_P7B=""
+fi
+
+for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b $GOST_P7B; do
 ${VALGRIND} "${CERTTOOL}" --inder --p7-info --infile "${srcdir}/data/${FILE}"|grep -v "Signing time" >"${OUTFILE}"
 rc=$?
 
@@ -281,6 +288,27 @@ rc=$?
 if test "${rc}" != "0"; then
 	echo "${FILE}: PKCS7 struct signing failed verification"
 	exit ${rc}
+fi
+
+if test "x$ENABLE_GOST" = "x1"  && test "x${GNUTLS_FORCE_FIPS_MODE}" != "x1"
+then
+	FILE="gost01-signing"
+	${VALGRIND} "${CERTTOOL}" --p7-sign --load-privkey  "${srcdir}/../../doc/credentials/x509/key-gost01.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-gost01.pem" --infile "${srcdir}/data/pkcs7-detached.txt" >"${OUTFILE}"
+	rc=$?
+
+	if test "${rc}" != "0"; then
+		echo "${FILE}: PKCS7 struct signing failed"
+		exit ${rc}
+	fi
+
+	FILE="gost01-signing-verify"
+	${VALGRIND} "${CERTTOOL}" --p7-verify --load-certificate "${srcdir}/../../doc/credentials/x509/cert-gost01.pem" <"${OUTFILE}"
+	rc=$?
+
+	if test "${rc}" != "0"; then
+		echo "${FILE}: PKCS7 struct signing failed verification"
+		exit ${rc}
+	fi
 fi
 
 rm -f "${OUTFILE}"
