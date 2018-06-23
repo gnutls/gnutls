@@ -18,6 +18,11 @@ See the end for copying conditions.
    and key usage limits. TLS1.3 support needs to be explicitly enabled via a
    priority string.
 
+** Added support for Russian Public Key Infrastructure according to RFCs 4491/4357/7836.
+   Added elliptic curves GOST R 34.10-2001 CryptoProA 256-bit curve (RFC 4357),
+   GOST R 34.10-2001 CryptoProXchA 256-bit curve (RFC 4357), GOST R 34.10-2012
+   TC26-512-A 512-bit curve (RFC 7836).
+
 ** libgnutls: Improve compatibility with TLS1.2 and earlier protocol options under
    TLS 1.3. When SRP or NULL ciphersuites are specified in priority strings
    TLS 1.3 is will be disabled. When Anonymous ciphersuites are specified in priority
