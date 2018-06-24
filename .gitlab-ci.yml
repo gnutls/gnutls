@@ -26,7 +26,7 @@ after_script:
 
 variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
-  DEBIAN_STRETCH_BUILD: buildenv-debian-stretch
+  DEBIAN_BUILD: buildenv-debian
   DEBIAN_CROSS_BUILD: buildenv-debian-cross
   FEDORA_BUILD: buildenv-f28
   FEDORA_X86_BUILD: buildenv-f28-x86
@@ -464,7 +464,7 @@ ubsan-Werror.Fedora.x86_64:
 
 Debian.x86_64:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_STRETCH_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
   - git submodule update --init --no-fetch
   - ./bootstrap && mkdir -p build && cd build &&
