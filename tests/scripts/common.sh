@@ -67,6 +67,12 @@ GETPORT='rc=0; myrandom=$(date +%N | sed s/^0*//)
 '
 
 check_for_datefudge() {
+	# On certain platforms running datefudge date fails (e.g., x86 datefudge
+	# with x86-64 date app).
+	if test ${SKIP_DATEFUDGE_CHECK} = 1;then
+		return
+	fi
+
 	TSTAMP=`datefudge -s "2006-09-23" date -u +%s || true`
 	if test "$TSTAMP" != "1158969600" || test "$WINDOWS" = 1; then
 	echo $TSTAMP

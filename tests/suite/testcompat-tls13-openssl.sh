@@ -39,13 +39,6 @@ if ! test -x "${CLI}"; then
 	exit 77
 fi
 
-# Check for datefudge
-TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
-if test "${TSTAMP}" != "1158969600"; then
-	echo "You need datefudge to run this test"
-	exit 77
-fi
-
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
@@ -55,6 +48,8 @@ if test "${WINDIR}" != ""; then
 fi
 
 . "${srcdir}/../scripts/common.sh"
+
+check_for_datefudge
 
 . "${srcdir}/testcompat-common"
 

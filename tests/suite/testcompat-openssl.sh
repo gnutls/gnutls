@@ -52,11 +52,9 @@ fi
 export TZ="UTC"
 
 # Check for datefudge
-TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
-if test "${TSTAMP}" != "1158969600"; then
-	echo "You need datefudge to run this test"
-	exit 77
-fi
+. "${srcdir}/../scripts/common.sh"
+
+check_for_datefudge
 
 timeout 1800 datefudge "2012-09-2" "${srcdir}/testcompat-main-openssl"
 

@@ -403,17 +403,14 @@ FreeBSD.x86_64:
       - tests/*.log
       - tests/*/*.log
 
-# We need a clean 32-bit fedora for testing. Note that this is also
-# a test for interoperability with openssl 1.0.x.
 Fedora.x86:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
   script:
-  - git submodule update --init --no-fetch
   - ./bootstrap && mkdir -p build && cd build &&
     CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux
      --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-full-test-suite --disable-doc --disable-guile &&
-    make -j$(nproc) && make check -j$(nproc) &&
+    make -j$(nproc) && make check -j$(nproc) SKIP_DATEFUDGE_CHECK=1 &&
     make pic-check
   tags:
   - shared
