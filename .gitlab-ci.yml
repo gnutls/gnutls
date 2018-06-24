@@ -339,7 +339,7 @@ MinGW64:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
     mkdir -p build && cd build &&
-    ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
+    ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   - cd ..
   tags:
