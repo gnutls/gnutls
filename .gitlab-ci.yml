@@ -491,7 +491,6 @@ Debian.x86_64:
   # cross-compile mode even though --build is given
   - export CC_FOR_BUILD="ccache gcc"
   - export CC="ccache $host-gcc"
-  - git submodule update --init --no-fetch
   - ./bootstrap
   - mkdir -p build
   - cd build
