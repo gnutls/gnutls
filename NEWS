@@ -55,6 +55,13 @@ See the end for copying conditions.
    unless GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE is specified. This is an API
    change for these functions which make them err towards safety.
 
+** libgnutls: improved aarch64 cpu features detection by using getauxval().
+
+** Improved counter-measures for TLS CBC record padding, when encrypt-then-MAC
+   mode is not used. Introduced the %FORCE_ETM priority string option. This option
+   prevents the negotiation of legacy CBC ciphersuites unless encrypt-then-mac
+   is negotiated as well.
+
 ** certtool: It is now possible to specify certificate and serial CRL numbers greater
    than 2**63-2 as a hex-encoded string both when prompted and in a template file.
    Default certificate serial numbers are now fully random. Default CRL
