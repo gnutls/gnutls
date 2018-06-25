@@ -1071,7 +1071,8 @@ algorithms and options in a compact, easy-to-use format. These
 strings are intended as a user-specified override of the library defaults.
 
 That is, we recommend applications using the default settings
-(c.f. @funcref{gnutls_set_default_priority}), and provide the user 
+(c.f. @funcref{gnutls_set_default_priority} or
+@funcref{gnutls_set_default_priority_append}), and provide the user 
 with access to priority strings for overriding the default behavior,
 on configuration files, or other UI. Following such a principle,
 makes the GnuTLS library as the default settings provider. That is
@@ -1079,7 +1080,7 @@ necessary and a good practice, because TLS protocol hardening and
 phasing out of legacy algorithms, is easier to co-ordinate when happens
 in a single library.
 
-@showfuncB{gnutls_set_default_priority,gnutls_priority_set_direct}
+@showfuncC{gnutls_set_default_priority,gnutls_set_default_priority_append,gnutls_priority_set_direct}
 
 The priority string translation to the internal GnuTLS form requires
 processing and the generated internal form also occupies some memory.
@@ -1088,7 +1089,7 @@ and share the generated data across sessions. The following functions
 allow the generation of a "priority cache" and the sharing of it across
 sessions.
 
-@showfuncC{gnutls_priority_init,gnutls_priority_set,gnutls_priority_deinit}
+@showfuncD{gnutls_priority_init2,gnutls_priority_init,gnutls_priority_set,gnutls_priority_deinit}
 
 @subheading Using Priority Strings
 

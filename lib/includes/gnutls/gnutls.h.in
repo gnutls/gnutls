@@ -1548,11 +1548,13 @@ int gnutls_alpn_set_protocols(gnutls_session_t session,
 
 int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size);
 
-/* if you just want some defaults, use the following.
- */
 
+#define GNUTLS_PRIORITY_INIT_DEF_APPEND 1
 int gnutls_priority_init(gnutls_priority_t * priority_cache,
 			 const char *priorities, const char **err_pos);
+int gnutls_priority_init2(gnutls_priority_t * priority_cache,
+			  const char *priorities, const char **err_pos,
+			  unsigned flags);
 void gnutls_priority_deinit(gnutls_priority_t priority_cache);
 int gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 					   unsigned int idx,
@@ -1589,9 +1591,11 @@ int gnutls_priority_cipher_list(gnutls_priority_t pcache,
 int gnutls_priority_mac_list(gnutls_priority_t pcache,
 			     const unsigned int **list);
 
-  /* for compatibility
-   */
 int gnutls_set_default_priority(gnutls_session_t session);
+int gnutls_set_default_priority_append(gnutls_session_t session,
+				       const char *add_prio,
+				       const char **err_pos,
+				       unsigned flags);
 
 /* Returns the name of a cipher suite */
 const char *
