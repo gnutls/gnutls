@@ -1944,12 +1944,21 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 						params->seed_size, params->seed,
 						NULL, NULL, level);
 				} else {
-					params->seed_size = sizeof(params->seed);
-					ret =
-					    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
+					unsigned retries = 0;
+					/* The provable RSA key generation process is deterministic
+					 * but has an internal maximum iteration counter and when
+					 * exceed will fail for certain random seeds. This is a very
+					 * rare condition, but it nevertheless happens and even CI builds fail
+					 * occasionally. When we generate the random seed internally, remediate
+					 * by retrying a different seed on failure. */
+					do {
+						params->seed_size = sizeof(params->seed);
+						ret =
+						    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
 							 rnd_func, NULL, NULL,
 							 &params->seed_size, params->seed,
 							 level);
+					} while (ret != 1 && ++retries < 3);
 				}
 			} else {
 				ret =
