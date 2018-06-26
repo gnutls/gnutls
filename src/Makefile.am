@@ -307,5 +307,11 @@ files-update:
 	@echo "updating autogen files in src/"
 	@echo "******************************************************************************************"
 	for i in *-args.c *-args.h;do \
-		test -h "$$i" || sed -e "s!$(srcdir)/!!g" "$$i" > $(srcdir)/`basename "$$i"`.bak; \
+		if ! test -h "$$i" ; then \
+			if test "$(srcdir)" = "." ; then \
+				cp "$$i" "$$i.bak" ; \
+			else \
+				sed -e "s!$(srcdir)/!!g" "$$i" > $(srcdir)/`basename "$$i"`.bak ; \
+			fi; \
+		fi; \
 	done
