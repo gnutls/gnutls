@@ -130,9 +130,7 @@ double stop_benchmark(struct benchmark_st *st, const char *metric,
 
 	gettime(&stop);
 
-	lsecs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
-		 (st->start.tv_sec * 1000 +
-		  st->start.tv_nsec / (1000 * 1000)));
+	lsecs = timespec_sub_ms(&stop, &st->start);
 	secs = lsecs;
 	secs /= 1000;
 
