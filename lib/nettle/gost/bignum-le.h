@@ -38,7 +38,7 @@
 
 #include <nettle/nettle-types.h>
 
-#include <gmp.h>
+#include <nettle/bignum.h>
 
 #ifdef __cplusplus
 extern "C" {

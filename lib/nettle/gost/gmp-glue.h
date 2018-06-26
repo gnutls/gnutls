@@ -49,7 +49,7 @@ void
 mpn_get_base256_le (uint8_t *rp, size_t rn,
 		    const mp_limb_t *xp, mp_size_t xn);
 
-#ifndef mpn_zero_p
+#if !defined(mpn_zero_p) && !defined(__MINI_GMP_H__)
 static inline int
 mpn_zero_p (const mp_limb_t *xp, mp_size_t n)
 {
