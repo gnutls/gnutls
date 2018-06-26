@@ -330,7 +330,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	char proto_name[32];
 	char _group_name[24];
 	const char *group_name = NULL;
-	unsigned dh_bits = 0;
+	int dh_bits = 0;
 	unsigned mac_id;
 	unsigned sign_algo;
 	char *desc;
@@ -346,7 +346,10 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 	if (group_name == NULL && _gnutls_kx_is_dhe(kx)) {
 		dh_bits = gnutls_dh_get_prime_bits(session);
-		snprintf(_group_name, sizeof(_group_name), "CUSTOM%u", dh_bits);
+		if (dh_bits > 0)
+			snprintf(_group_name, sizeof(_group_name), "CUSTOM%u", dh_bits);
+		else
+			snprintf(_group_name, sizeof(_group_name), "CUSTOM");
 		group_name = _group_name;
 	}
 #endif
