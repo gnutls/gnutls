@@ -154,8 +154,8 @@ push_crippled(gnutls_transport_ptr_t tr, const void *_data, size_t len)
 static unsigned long timespec_sub_ns(struct timespec *a,
 				     struct timespec *b)
 {
-	return (a->tv_sec * 1000 * 1000 * 1000 + a->tv_nsec -
-		(b->tv_sec * 1000 * 1000 * 1000 + b->tv_nsec));
+	return (a->tv_sec - b->tv_sec) * 1000 * 1000 * 1000 + a->tv_nsec -
+		b->tv_nsec;
 }
 #endif
 
