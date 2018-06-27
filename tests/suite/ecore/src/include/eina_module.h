@@ -120,11 +120,9 @@ EAPI const char *eina_module_file_get(const Eina_Module * m)
 EINA_PURE EINA_WARN_UNUSED_RESULT EINA_ARG_NONNULL(1);
 
 EAPI char *eina_module_symbol_path_get(const void *symbol,
-				       const char *sub_dir)
-EINA_PURE EINA_MALLOC EINA_ARG_NONNULL(1, 2);
+				       const char *sub_dir);
 EAPI char *eina_module_environment_path_get(const char *env,
-					    const char *sub_dir)
-EINA_PURE EINA_MALLOC EINA_ARG_NONNULL(1, 2);
+					    const char *sub_dir);
 
 EAPI Eina_Array *eina_module_arch_list_get(Eina_Array * array,
 					   const char *path,
