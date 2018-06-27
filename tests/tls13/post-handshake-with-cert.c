@@ -234,6 +234,11 @@ static void server(int fd, int err, int type, unsigned max_auths)
 	if (ret != 0)
 		fail("handshake failed: %s\n", gnutls_strerror(ret));
 
+	if (!(gnutls_session_get_flags(session) & GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH)) {
+		fail("server: session flags did not contain GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH\n");
+	}
+
+
 	if (client_hello_ok == 0) {
 		fail("server: did not verify the client hello\n");
 	}

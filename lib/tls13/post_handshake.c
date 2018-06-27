@@ -219,7 +219,9 @@ int _gnutls13_reauth_server(gnutls_session_t session)
  * When this function is called under TLS1.2 or earlier or the peer didn't
  * advertise post-handshake auth, it always fails with
  * %GNUTLS_E_INVALID_REQUEST. The verification of the received peers certificate
- * is delegated to the session or credentials verification callbacks.
+ * is delegated to the session or credentials verification callbacks. A
+ * server can check whether post handshake authentication is supported
+ * by the client by checking the session flags with gnutls_session_get_flags().
  *
  * Prior to calling this function in server side, the function
  * gnutls_certificate_server_set_request() must be called setting expectations

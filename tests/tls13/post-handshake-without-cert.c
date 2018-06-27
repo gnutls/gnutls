@@ -193,6 +193,9 @@ static void server(int fd)
 		}
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
+	if ((gnutls_session_get_flags(session) & GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH)) {
+		fail("server: session flags did contain GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH\n");
+	}
 
 	if (server_hello_ok == 0) {
 		fail("server: did not verify the server hello contents\n");

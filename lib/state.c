@@ -1355,6 +1355,8 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_RFC7919;
 	if (session->internals.hsk_flags & HSK_TICKET_RECEIVED)
 		flags |= GNUTLS_SFLAGS_SESSION_TICKET;
+	if (session->security_parameters.post_handshake_auth)
+		flags |= GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH;
 
 	return flags;
 }
