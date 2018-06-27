@@ -70,6 +70,7 @@ static void client_log_func(int level, const char *str)
 }
 
 #define MAX_BUF 1024
+#define MAX_APP_DATA 3
 
 static void client(int fd, unsigned send_cert, unsigned max_auths)
 {
@@ -77,7 +78,7 @@ static void client(int fd, unsigned send_cert, unsigned max_auths)
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
 	char buf[64];
-	unsigned i;
+	unsigned i, j;
 
 	global_init();
 
@@ -105,8 +106,6 @@ static void client(int fd, unsigned send_cert, unsigned max_auths)
 						    GNUTLS_X509_FMT_PEM)>=0);
 	}
 
-	/* put the anonymous credentials to the current session
-	 */
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
@@ -124,13 +123,29 @@ static void client(int fd, unsigned send_cert, unsigned max_auths)
 	if (debug)
 		success("client handshake completed\n");
 
+	gnutls_record_set_timeout(session, 20 * 1000);
+
 	for (i=0;i<max_auths;i++) {
+		if (debug)
+			success("waiting for auth nr %d\n", i);
+
 		do {
 			ret = gnutls_record_recv(session, buf, sizeof(buf));
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret != GNUTLS_E_REAUTH_REQUEST) {
 			fail("recv: unexpected error: %s\n", gnutls_strerror(ret));
+		}
+
+		/* send application data to check if server tolerates them */
+		if (i==0) {
+			for (j=0;j<MAX_APP_DATA;j++) {
+				memset(buf, j, sizeof(buf));
+				do {
+					ret = gnutls_record_send(session, buf, sizeof(buf));
+				} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+				assert(ret>=0);
+			}
 		}
 
 		if (debug)
@@ -194,7 +209,7 @@ static void server(int fd, int err, int type, unsigned max_auths)
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
-	unsigned i;
+	unsigned i, retries;
 
 	/* this must be called once in the program
 	 */
@@ -203,7 +218,7 @@ static void server(int fd, int err, int type, unsigned max_auths)
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);
-		gnutls_global_set_log_level(4711);
+		gnutls_global_set_log_level(6);
 	}
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
@@ -252,7 +267,40 @@ static void server(int fd, int err, int type, unsigned max_auths)
 
 	gnutls_certificate_server_set_request(session, type);
 
-	for (i=0;i<max_auths;i++) {
+	/* i = 0 */
+	/* ask peer for re-authentication */
+	retries = 0;
+	do {
+		do {
+			ret = gnutls_reauth(session, 0);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+		if (ret == GNUTLS_E_GOT_APPLICATION_DATA) {
+			int ret2;
+			do {
+				ret2 = gnutls_record_recv(session, buffer, sizeof(buffer));
+			} while (ret2 == GNUTLS_E_AGAIN || ret2 == GNUTLS_E_INTERRUPTED);
+
+			if (ret2 < 0)
+				fail("error receiving app data: %s\n", gnutls_strerror(ret2));
+
+			/* sender memsets the message with the retry attempt */
+			assert((uint8_t)buffer[0] == retries);
+			assert(retries < MAX_APP_DATA);
+		}
+
+		retries++;
+	} while (ret == GNUTLS_E_GOT_APPLICATION_DATA);
+
+	if (err) {
+		if (ret != err)
+			fail("server: expected error %s, got: %s\n", gnutls_strerror(err),
+			     gnutls_strerror(ret));
+	} else if (ret != 0)
+		fail("server: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
+
+
+	for (i=1;i<max_auths;i++) {
 		/* ask peer for re-authentication */
 		do {
 			ret = gnutls_reauth(session, 0);
@@ -298,6 +346,7 @@ void start(const char *name, int err, int type, unsigned max_auths, unsigned sen
 	server_hello_ok = 0;
 
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {

@@ -330,6 +330,7 @@ void start(const char *name, int err, int type, unsigned max_auths, unsigned sen
 	server_hello_ok = 0;
 
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
