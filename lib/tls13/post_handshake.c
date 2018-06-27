@@ -214,7 +214,8 @@ int _gnutls13_reauth_server(gnutls_session_t session)
  *
  * The former two interrupt the authentication procedure due to the transport
  * layer being interrupted, and the latter because there were pending data prior
- * to peer initiating the re-authentication.
+ * to peer initiating the re-authentication. The server should read/process that
+ * data as unauthenticated and retry calling gnutls_reauth().
  *
  * When this function is called under TLS1.2 or earlier or the peer didn't
  * advertise post-handshake auth, it always fails with
