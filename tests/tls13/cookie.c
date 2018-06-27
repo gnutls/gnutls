@@ -250,7 +250,7 @@ void doit(void)
 	}
 
 	if (child) {
-		int status;
+		int status = 0;
 		/* parent */
 		close(sockets[1]);
 		server(sockets[0]);

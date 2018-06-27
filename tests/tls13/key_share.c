@@ -258,7 +258,7 @@ static void server(int fd, gnutls_group_t exp_group, unsigned ngroups)
 
 static void ch_handler(int sig)
 {
-	int status;
+	int status = 0;
 	wait(&status);
 	check_wait_status(status);
 	return;
@@ -271,6 +271,8 @@ static void start(const char *name, const char *prio, unsigned flag, gnutls_grou
 	pid_t child;
 
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
+
 	testname = name;
 	success("== test %s ==\n", testname);
 

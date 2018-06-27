@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <assert.h>
+#include <signal.h>
 
 #include "tls13/ext-parse.h"
 
@@ -279,12 +280,24 @@ static void server(int sd, const char *prio)
 		success("server: finished\n");
 }
 
+static void ch_handler(int sig)
+{
+	int status = 0;
+	wait(&status);
+	check_wait_status(status);
+	return;
+}
+
+
 static
 void run_test(const char *prio)
 {
 	pid_t child;
 	int err;
 	int sockets[2];
+
+	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	success("trying with %s\n", prio);
 
@@ -303,7 +316,7 @@ void run_test(const char *prio)
 	}
 
 	if (child) {
-		int status;
+		int status = 0;
 		/* parent */
 		close(sockets[1]);
 		server(sockets[0], prio);

@@ -327,7 +327,7 @@ static void server(int fd, int err, int type, unsigned max_auths)
 
 static void ch_handler(int sig)
 {
-	int status;
+	int status = 0;
 	wait(&status);
 	check_wait_status(status);
 	return;

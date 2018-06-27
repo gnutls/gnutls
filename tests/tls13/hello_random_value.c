@@ -248,7 +248,7 @@ void doit(void)
 	}
 
 	if (child) {
-		int status;
+		int status = 0;
 		/* parent */
 		close(sockets[1]);
 		client(sockets[0]);

@@ -318,7 +318,7 @@ static void server(int fd)
 
 static void ch_handler(int sig)
 {
-	int status;
+	int status = 0;
 	wait(&status);
 	check_wait_status(status);
 	return;
