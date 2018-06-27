@@ -19,7 +19,7 @@
  */
 
 
-#define print(...) fprintf(stderr, "line %i: ", __LINE__); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n")
+#define print(...) {fprintf(stderr, "line %i: ", __LINE__); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n");}
 
 static int done = 0;
 
