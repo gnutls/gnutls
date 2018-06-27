@@ -235,9 +235,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		if (print_exts != 0) print_exts++;
 	} else if (type == PKCS11_TYPE_PRIVKEY) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
-	} else if (type == PKCS11_TYPE_INFO) {
-		attrs = GNUTLS_PKCS11_OBJ_ATTR_MATCH;
-	} else {
+	} else { /* also PKCS11_TYPE_INFO */
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_ALL;
 	}
 
