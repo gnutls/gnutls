@@ -225,7 +225,13 @@ int _gnutls13_reauth_server(gnutls_session_t session)
  *
  * Prior to calling this function in server side, the function
  * gnutls_certificate_server_set_request() must be called setting expectations
- * for the received certificate (request or require).
+ * for the received certificate (request or require). If none are set
+ * this function will return with %GNUTLS_E_INVALID_REQUEST.
+ *
+ * Note that post handshake authentication is available irrespective
+ * of the initial negotiation type (PSK or certificate). In all cases
+ * however, certificate credentials must be set to the session prior
+ * to calling this function.
  *
  * Returns: %GNUTLS_E_SUCCESS on a successful authentication, otherwise a negative error code.
  **/
