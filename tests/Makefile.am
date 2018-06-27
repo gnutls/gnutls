@@ -106,7 +106,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
 	tls13/cookie tls13/key_share tls13/prf tls13/post-handshake-with-cert-ticket \
 	tls12-rollback-detection tls11-rollback-detection \
-	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value
+	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value \
+	tls13/post-handshake-with-psk
 
 ctests += tls13/psk-ext
 
