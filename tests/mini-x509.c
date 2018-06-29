@@ -52,7 +52,7 @@ static time_t mytime(time_t * t)
 }
 
 static
-void start(const char *prio)
+void start(const char *prio, unsigned expect_max)
 {
 	int ret;
 	/* Server stuff. */
@@ -222,17 +222,21 @@ void start(const char *prio)
 		}
 	}
 
+	if (expect_max) {
+		if (gnutls_protocol_get_version(client) != GNUTLS_TLS_VERSION_MAX) {
+			fail("The negotiated TLS protocol is not the maximum supported\n");
+		}
+	}
+
 	if (gnutls_protocol_get_version(client) == GNUTLS_TLS1_2) {
 		ret = gnutls_session_ext_master_secret_status(client);
 		if (ret != 1) {
 			fail("Extended master secret wasn't negotiated by default (client ret: %d)\n", ret);
-			exit(1);
 		}
 
 		ret = gnutls_session_ext_master_secret_status(server);
 		if (ret != 1) {
 			fail("Extended master secret wasn't negotiated by default (server ret: %d)\n", ret);
-			exit(1);
 		}
 	}
 
@@ -252,7 +256,7 @@ void start(const char *prio)
 
 void doit(void)
 {
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.2");
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.3");
-	start("NORMAL");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", 0);
+	start("NORMAL", 1);
 }

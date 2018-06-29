@@ -686,7 +686,8 @@ typedef enum {
  * @GNUTLS_DTLS1_0: DTLS version 1.0.
  * @GNUTLS_DTLS1_2: DTLS version 1.2.
  * @GNUTLS_DTLS0_9: DTLS version 0.9 (Cisco AnyConnect / OpenSSL 0.9.8e).
- * @GNUTLS_VERSION_MAX: Maps to the highest supported TLS version.
+ * @GNUTLS_TLS_VERSION_MAX: Maps to the highest supported TLS version.
+ * @GNUTLS_DTLS_VERSION_MAX: Maps to the highest supported DTLS version.
  * @GNUTLS_VERSION_UNKNOWN: Unknown SSL/TLS version.
  *
  * Enumeration of different SSL/TLS protocol versions.
