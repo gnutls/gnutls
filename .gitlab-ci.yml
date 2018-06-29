@@ -93,7 +93,7 @@ minimal.Fedora.x86_64:
   - make -j$(nproc) check
   - echo "Minimal build"
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
-    dash ./configure --with-included-libtasn1 --enable-valgrind-tests
+    dash ./configure --cache-file cache/config.cache --with-included-libtasn1 --enable-valgrind-tests
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe
@@ -102,6 +102,7 @@ minimal.Fedora.x86_64:
     --disable-ssl3-support --disable-ssl2-support --disable-doc --enable-openssl-compatibility
     --disable-gcc-warnings
     --disable-gost
+  - make clean
   - make -j$(nproc)
   tags:
   - shared
@@ -137,7 +138,7 @@ TLS1.3/interop:
   script:
   - git submodule update --init --no-fetch
   - ./bootstrap
-  - dash ./configure --disable-gcc-warnings --cache-file ./cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
+  - dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc)
   - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
   - make -C tests/suite TESTS=testcompat-tls13-openssl.sh check
@@ -233,7 +234,7 @@ static-analyzers.Fedora.x86_64:
   - /bin/true
   script:
   - ./bootstrap
-  - scan-build ./configure --disable-doc --disable-guile --enable-fips140-mode --enable-valgrind-tests
+  - scan-build ./configure --cache-file cache/config.cache --disable-doc --disable-guile --enable-fips140-mode --enable-valgrind-tests
   - make -j$(nproc) syntax-check
   - make -j$(nproc) -C gl
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
@@ -339,7 +340,7 @@ MinGW64:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
     mkdir -p build && cd build &&
-    ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
+    ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
     mingw64-make -j$(nproc) && mingw64-make -C tests check -j$(nproc)
   - cd ..
   tags:
@@ -364,7 +365,7 @@ MinGW32:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
     mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
+    dash ../configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc &&
     mingw32-make -j$(nproc) && mingw32-make -C tests check -j$(nproc)
   - cd ..
   tags:
@@ -408,8 +409,10 @@ Fedora.x86:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
   script:
   - ./bootstrap && mkdir -p build && cd build &&
-    CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux
-     --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests --disable-full-test-suite --disable-doc --disable-guile &&
+    CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ TIME_T_32_BIT_OK=yes
+    ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux
+      --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests
+      --disable-full-test-suite --disable-doc --disable-guile --cache-file ../cache/config.cache &&
     make -j$(nproc) && make check -j$(nproc) SKIP_DATEFUDGE_CHECK=1 &&
     make pic-check
   tags:
@@ -442,6 +445,7 @@ ubsan-Werror.Fedora.x86_64:
   - make check -j$(nproc)
   - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
    --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc --disable-full-test-suite --with-default-trust-store-pkcs11="pkcs11:"
+  - make clean
   - make -j$(nproc)
   - make -C tests check -j$(nproc) TESTS="trust-store p11-kit-load.sh" SUBDIRS=.
   tags:
