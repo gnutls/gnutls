@@ -133,7 +133,12 @@ datefudge -s "2007-04-22" \
 		--outfile ${TMPFILE} 2>/dev/null
 
 rc=$?
-if test "${ac_cv_sizeof_time_t}" = 8;then
+if test "${ac_cv_sizeof_time_t}" -lt 8;then
+	if test "$rc" = "0"; then
+		echo "Test 5-1 (overflow2) succeeded unexpectedly with 32-bit time_t"
+		exit ${rc}
+	fi
+else
 	if test "$rc" != "0"; then
 		echo "Test 5-1 (overflow2) failed"
 		exit ${rc}
@@ -165,6 +170,34 @@ rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 6 (explicit dates) failed"
 	exit ${rc}
+fi
+
+rm -f ${TMPFILE}
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-dates-after2038.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+rc=$?
+if test "${ac_cv_sizeof_time_t}" -lt 8;then
+	if test "$rc" = "0"; then
+		echo "Test 6-2 (explicit dates) succeeded unexpectedly with 32-bit long"
+		exit ${rc}
+	fi
+else
+	if test "$rc" != "0"; then
+		echo "Test 6-2 (explicit dates) failed"
+		exit ${rc}
+	fi
+
+	${DIFF} "${srcdir}/data/template-dates-after2038.pem" ${TMPFILE} >/dev/null 2>&1
+	rc=$?
+
+	if test "${rc}" != "0"; then
+		echo "Test 6-3 (explicit dates) failed"
+		exit ${rc}
+	fi
 fi
 
 rm -f ${TMPFILE}
