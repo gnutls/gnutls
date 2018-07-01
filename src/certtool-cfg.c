@@ -68,6 +68,10 @@ extern int ask_pass;
 #define MAX_ENTRIES 128
 #define MAX_POLICIES 8
 
+#define PRINT_TIME_T_ERROR \
+	if (sizeof(time_t) < 8) \
+		fprintf(stderr, "This system expresses time with a 32-bit time_t; that prevents dates after 2038 to be expressed by GnuTLS.\n")
+
 enum option_types { OPTION_NUMERIC, OPTION_STRING, OPTION_BOOLEAN, OPTION_MULTI_LINE };
 
 struct cfg_options {
@@ -1693,6 +1697,7 @@ time_t get_date(const char* date)
 	struct timespec r;
 
 	if (date==NULL || parse_datetime(&r, date, NULL) == 0) {
+		PRINT_TIME_T_ERROR;
 		fprintf(stderr, "Cannot parse date: %s\n", date);
 		exit(1);
 	}
@@ -1754,6 +1759,7 @@ time_t now = time(NULL);
 
 	return secs;
  overflow:
+	PRINT_TIME_T_ERROR;
 	fprintf(stderr, "Overflow while parsing days\n");
 	exit(1);
 }
