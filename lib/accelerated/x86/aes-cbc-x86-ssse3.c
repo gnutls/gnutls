@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -88,6 +89,9 @@ aes_ssse3_encrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct aes_ctx *ctx = _ctx;
 
+	if (unlikely(src_size % 16 != 0))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	vpaes_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
 			  ctx->iv, 1);
 	return 0;
@@ -98,6 +102,9 @@ aes_ssse3_decrypt(void *_ctx, const void *src, size_t src_size,
 	    void *dst, size_t dst_size)
 {
 	struct aes_ctx *ctx = _ctx;
+
+	if (unlikely(src_size % 16 != 0))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	vpaes_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
 			  ctx->iv, 0);
