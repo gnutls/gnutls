@@ -31,7 +31,6 @@
 #include <gnutls/x509-ext.h>
 #include <string.h>
 #include <limits.h>
-#include <inttypes.h>
 #include <time.h>
 #include <timespec.h>
 #include <parse-datetime.h>
@@ -57,10 +56,8 @@
 #include "certtool-common.h"
 
 /* to print uint64_t */
-#if SIZEOF_LONG < 8
 # define __STDC_FORMAT_MACROS
 # include <inttypes.h>
-#endif
 
 extern int batch;
 extern int ask_pass;
@@ -751,7 +748,7 @@ int serial_decode(const char *input, gnutls_datum_t *output)
 	}
 
 	if (value <= 0 || value >= value_limit) {
-		fprintf(stderr, "Integer out of range: `%s' (min: 1, max: %lu)\n", input, value_limit-1);
+		fprintf(stderr, "Integer out of range: `%s' (min: 1, max: %"PRId64")\n", input, value_limit-1);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
