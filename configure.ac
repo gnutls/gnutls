@@ -739,9 +739,10 @@ AC_CHECK_TYPE(ssize_t,
 # For minitasn1.
 AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
+AC_CHECK_SIZEOF(time_t, 4)
 
 # export for use in scripts
-AC_SUBST(ac_cv_sizeof_unsigned_long_int)
+AC_SUBST(ac_cv_sizeof_time_t)
 
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
 
