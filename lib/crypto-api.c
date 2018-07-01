@@ -138,9 +138,7 @@ gnutls_cipher_add_auth(gnutls_cipher_hd_t handle, const void *ptext,
 	if (_gnutls_cipher_is_aead(&h->ctx_enc) == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	_gnutls_cipher_auth(&h->ctx_enc, ptext, ptext_size);
-
-	return 0;
+	return _gnutls_cipher_auth(&h->ctx_enc, ptext, ptext_size);
 }
 
 /**
