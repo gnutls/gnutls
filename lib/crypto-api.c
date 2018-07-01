@@ -831,7 +831,7 @@ static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 
 #define AUTH_UPDATE(ctx, data, length) do { \
 	if (index) { \
-		unsigned left = blocksize - index; \
+		ssize_t left = blocksize - index; \
 		if (length < left) { \
 			memcpy(cache+index, data, \
 			       length); \
@@ -847,7 +847,7 @@ static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 		} \
 	} \
 	if (length >= blocksize) { \
-		unsigned to_proc = (length/blocksize)*blocksize; \
+		ssize_t to_proc = (length/blocksize)*blocksize; \
 		ret = _gnutls_cipher_auth(ctx, data, to_proc); \
 		if (unlikely(ret < 0)) \
 			return gnutls_assert_val(ret); \
@@ -863,7 +863,7 @@ static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 
 #define ENCRYPT_FINAL(ctx, dst, dst_size) do { \
 	if (index) { \
-		if (unlikely(dst_size < index)) \
+		if (unlikely(dst_size < (ssize_t)index)) \
 			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER); \
 		ret = _gnutls_cipher_encrypt2(ctx, cache, index, dst, dst_size); \
 		if (unlikely(ret < 0)) \
@@ -875,7 +875,7 @@ static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 
 #define ENCRYPT(ctx, data, length, dst, dst_size) do { \
 	if (index) { \
-		unsigned left = blocksize - index; \
+		ssize_t left = blocksize - index; \
 		if (length < left) { \
 			memcpy(cache+index, data, \
 			       length); \
@@ -895,7 +895,7 @@ static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 		} \
 	} \
 	if (length >= blocksize) { \
-		unsigned to_proc = (length/blocksize)*blocksize; \
+		ssize_t to_proc = (length/blocksize)*blocksize; \
 		if (unlikely(dst_size < to_proc)) \
 			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER); \
 		ret = _gnutls_cipher_encrypt2(ctx, data, to_proc, dst, dst_size); \
@@ -951,7 +951,7 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 	unsigned i;
 	uint8_t cache[MAX_CIPHER_BLOCK_SIZE];
 	unsigned index;
-	unsigned blocksize = handle->ctx_enc.e->blocksize;
+	ssize_t blocksize = handle->ctx_enc.e->blocksize;
 
 	/* Limitation: this function provides an optimization under the internally registered
 	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
