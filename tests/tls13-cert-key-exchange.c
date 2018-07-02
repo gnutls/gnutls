@@ -109,6 +109,11 @@ void doit(void)
 			GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
 			&server_ca3_localhost_cert, &server_ca3_key, NULL, NULL);
 
+	try_with_key_fail("TLS 1.3 with x25519 with rsa-pss cert and RSAE signatures",
+			  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-X25519:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256:+SIGN-RSA-PSS-RSAE-SHA384",
+			  GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
+			  &server_ca3_rsa_pss2_cert, &server_ca3_rsa_pss2_key, NULL, NULL);
+
 	server_priority = NULL;
 	try_with_key_fail("TLS 1.3 with rsa cert and only RSA-PSS sig algos",
 			"NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",

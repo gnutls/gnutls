@@ -374,7 +374,7 @@ sign_supports_priv_pk_algorithm(const gnutls_sign_entry_st *se, gnutls_pk_algori
 inline static unsigned
 sign_supports_cert_pk_algorithm(const gnutls_sign_entry_st *se, gnutls_pk_algorithm_t pk)
 {
-	if (pk == se->pk || (se->cert_pk && se->cert_pk == pk))
+	if ((!se->cert_pk && pk == se->pk) || (se->cert_pk && se->cert_pk == pk))
 		return 1;
 
 	return 0;
