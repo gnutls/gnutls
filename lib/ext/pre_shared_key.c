@@ -201,8 +201,7 @@ client_send_params(gnutls_session_t session,
 	unsigned next_idx;
 	const mac_entry_st *prf_res = NULL;
 	const mac_entry_st *prf_psk = NULL;
-	time_t cur_time;
-	int ticket_age;
+	time_t cur_time, ticket_age;
 	uint32_t ob_ticket_age;
 	int free_username = 0;
 	psk_auth_info_t info = NULL;
@@ -470,7 +469,7 @@ static int server_recv_params(gnutls_session_t session,
 	struct psk_st psk;
 	psk_auth_info_t info;
 	tls13_ticket_t ticket_data;
-	int ticket_age;
+	time_t ticket_age;
 	bool resuming;
 
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
