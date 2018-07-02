@@ -164,6 +164,6 @@ _gnutls13_recv_hello_retry_request(gnutls_session_t session,
 				   gnutls_buffer_st *buf);
 
 int
-_gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf);
+_gnutls13_recv_async_handshake(gnutls_session_t session);
 
 #endif

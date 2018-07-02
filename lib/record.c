@@ -790,6 +790,13 @@ record_add_to_buffers(gnutls_session_t session,
 			}
 		}
 
+		/* application data cannot be inserted between (async) handshake
+		 * messages */
+		if (type == GNUTLS_APPLICATION_DATA && session->internals.handshake_recv_buffer_size != 0) {
+			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			goto unexpected_packet;
+		}
+
 		_gnutls_record_buffer_put(session, type, seq, bufel);
 
 		/* if we received application data as expected then we
@@ -956,17 +963,14 @@ record_add_to_buffers(gnutls_session_t session,
 
 			/* retrieve async handshake messages */
 			if (ver && ver->tls13_sem) {
-				gnutls_buffer_st buf;
+				_gnutls_record_buffer_put(session, recv->type, seq, bufel);
 
-				_gnutls_ro_buffer_from_datum(&buf, &bufel->msg);
-				ret = _gnutls13_recv_async_handshake(session,
-								     &buf);
-				if (ret < 0) {
-					gnutls_assert();
-				} else {
-					ret = GNUTLS_E_AGAIN;
-				}
-				goto cleanup;
+				ret = _gnutls13_recv_async_handshake(session);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				/* bufel is now accounted */
+				return GNUTLS_E_AGAIN;
 			}
 
 			/* This is legal if HELLO_REQUEST is received - and we are a client.
@@ -1014,13 +1018,14 @@ record_add_to_buffers(gnutls_session_t session,
 
 	return 0;
 
-      unexpected_packet:
+ unexpected_packet:
+
 	if (IS_DTLS(session) && ret != GNUTLS_E_REHANDSHAKE) {
 		_mbuffer_xfree(&bufel);
 		RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, ret);
 	}
 
-      cleanup:
+ cleanup:
 	_mbuffer_xfree(&bufel);
 	return ret;
 
@@ -1491,7 +1496,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 /* Returns a value greater than zero (>= 0) if buffers should be checked
  * for data. */
 static ssize_t
-check_session_status(gnutls_session_t session)
+check_session_status(gnutls_session_t session, unsigned ms)
 {
 	int ret;
 
@@ -1506,6 +1511,16 @@ check_session_status(gnutls_session_t session)
 	}
 
 	switch (session->internals.recv_state) {
+	case RECV_STATE_ASYNC_HANDSHAKE:
+		ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, -1, ms);
+		if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls13_recv_async_handshake(session);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		return GNUTLS_E_AGAIN;
 	case RECV_STATE_FALSE_START_HANDLING:
 		return 1;
 	case RECV_STATE_FALSE_START:
@@ -1564,7 +1579,7 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 	    && (data_size == 0 || data == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = check_session_status(session);
+	ret = check_session_status(session, ms);
 	if (ret <= 0)
 		return ret;
 
@@ -1678,7 +1693,7 @@ gnutls_record_recv_packet(gnutls_session_t session,
 	if (packet == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = check_session_status(session);
+	ret = check_session_status(session, session->internals.record_timeout_ms);
 	if (ret <= 0)
 		return ret;
 

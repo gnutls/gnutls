@@ -1086,6 +1086,9 @@ static int merge_handshake_packet(gnutls_session_t session,
 inline static int cmp_hsk_types(gnutls_handshake_description_t expected,
 				gnutls_handshake_description_t recvd)
 {
+	if (expected == GNUTLS_HANDSHAKE_ANY)
+		return 1;
+
 #ifdef ENABLE_SSL2
 	if (expected == GNUTLS_HANDSHAKE_CLIENT_HELLO
 	     && recvd == GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)

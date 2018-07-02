@@ -300,7 +300,8 @@ typedef enum recv_state_t {
 	RECV_STATE_0 = 0,
 	RECV_STATE_DTLS_RETRANSMIT,
 	RECV_STATE_FALSE_START_HANDLING, /* we are calling gnutls_handshake() within record_recv() */
-	RECV_STATE_FALSE_START /* gnutls_record_recv() should complete the handshake */
+	RECV_STATE_FALSE_START, /* gnutls_record_recv() should complete the handshake */
+	RECV_STATE_ASYNC_HANDSHAKE /* an incomplete async handshake message was seen */
 } recv_state_t;
 
 #include "str.h"
