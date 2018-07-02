@@ -188,7 +188,7 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
 	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE, &ticket->age_add, sizeof(uint32_t))) < 0)
 		return gnutls_assert_val(ret);
 
-	/* Set ticket lifetime to 1 day (86400 seconds) */
+	/* Set ticket lifetime to the default expiration time */
 	ticket->lifetime = session->internals.expire_time;
 
 	ticket->prf = session->security_parameters.prf;
