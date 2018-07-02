@@ -9,6 +9,7 @@
                  "--priority=@PRIORITY@",
                  "--disable-client-cert", "--port=@PORT@"],
      "tests" : [
+         {"name" : "test-fuzzed-plaintext.py"},
          {"name" : "test-large-hello.py",
           "arguments" : [
           "two ext, #80 61384 bytes",
