@@ -390,7 +390,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		/* fall through */
 	case STATE112:
 
-		ret = _gnutls13_send_session_ticket(session, AGAIN(STATE112));
+		ret = _gnutls13_send_session_ticket(session, 1, AGAIN(STATE112));
 		STATE = STATE112;
 		IMED_RET("send session ticket", ret, 0);
 
@@ -499,6 +499,7 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
 /**
  * gnutls_session_ticket_send:
  * @session: is a #gnutls_session_t type.
+ * @nr: the number of tickets to send; must be a positive integer
  * @flags: must be zero
  *
  * Sends a fresh session ticket to the peer. This is relevant only
@@ -507,12 +508,15 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or a negative error code.
  **/
-int gnutls_session_ticket_send(gnutls_session_t session, unsigned flags)
+int gnutls_session_ticket_send(gnutls_session_t session, unsigned nr, unsigned flags)
 {
 	int ret = 0;
 	const version_entry_st *vers = get_version(session);
 
 	if (!vers->tls13_sem || session->security_parameters.entity == GNUTLS_CLIENT)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (nr == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	switch (TICKET_STATE) {
@@ -526,7 +530,7 @@ int gnutls_session_ticket_send(gnutls_session_t session, unsigned flags)
 		/* fall through */
 	case TICKET_STATE1:
 		ret =
-		    _gnutls13_send_session_ticket(session, TICKET_STATE==TICKET_STATE1?1:0);
+		    _gnutls13_send_session_ticket(session, nr, TICKET_STATE==TICKET_STATE1?1:0);
 		TICKET_STATE = TICKET_STATE1;
 		if (ret < 0) {
 			gnutls_assert();

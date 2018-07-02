@@ -1154,14 +1154,21 @@ int _gnutls_call_hook_func(gnutls_session_t session,
 	(t == GNUTLS_HANDSHAKE_HELLO_REQUEST || t == GNUTLS_HANDSHAKE_KEY_UPDATE || \
 	 (t == GNUTLS_HANDSHAKE_NEW_SESSION_TICKET && v->tls13_sem))
 
+int
+_gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
+		       gnutls_handshake_description_t type)
+{
+	return _gnutls_send_handshake2(session, bufel, type, 0);
+}
+
 /* This function sends a handshake message of type 'type' containing the
  * data specified here. If the previous _gnutls_send_handshake() returned
  * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
  * (until it returns ok), with NULL parameters.
  */
 int
-_gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
-		       gnutls_handshake_description_t type)
+_gnutls_send_handshake2(gnutls_session_t session, mbuffer_st * bufel,
+		        gnutls_handshake_description_t type, unsigned queue_only)
 {
 	int ret;
 	uint8_t *data;
@@ -1243,6 +1250,9 @@ _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 		gnutls_assert();
 		return ret;
 	}
+
+	if (queue_only)
+		return 0;
 
 	/* Decide when to cache and when to send */
 	if (vers && vers->tls13_sem) {

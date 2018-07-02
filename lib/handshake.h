@@ -61,6 +61,11 @@ int _gnutls_recv_hello_request(gnutls_session_t session, void *data,
 int _gnutls_recv_handshake(gnutls_session_t session,
 			   gnutls_handshake_description_t type,
 			   unsigned int optional, gnutls_buffer_st * buf);
+
+int
+_gnutls_send_handshake2(gnutls_session_t session, mbuffer_st * bufel,
+		        gnutls_handshake_description_t type, unsigned queue_only);
+
 int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len);
 int _gnutls_gen_server_random(gnutls_session_t session, int version);
 void _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd);
