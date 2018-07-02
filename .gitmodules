@@ -1,9 +1,6 @@
 [submodule "devel/openssl"]
 	path = devel/openssl
 	url = https://github.com/openssl/openssl.git
-[submodule "tlsproxy"]
-	path = doc/examples/tlsproxy
-	url = https://github.com/abligh/tlsproxy.git
 [submodule "tests/suite/tls-fuzzer/tlsfuzzer"]
 	path = tests/suite/tls-fuzzer/tlsfuzzer
 	url = https://github.com/tomato42/tlsfuzzer.git
