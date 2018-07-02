@@ -395,7 +395,8 @@ static char const gnutls_serv_opt_strs[3442] =
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
 
 /**
- *  disable-client-cert option description:
+ *  disable-client-cert option description with
+ *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the disable-client-cert option */
 #define DISABLE_CLIENT_CERT_DESC      (gnutls_serv_opt_strs+1627)
@@ -403,6 +404,9 @@ static char const gnutls_serv_opt_strs[3442] =
 #define DISABLE_CLIENT_CERT_NAME      (gnutls_serv_opt_strs+1663)
 /** Name string for the disable-client-cert option */
 #define DISABLE_CLIENT_CERT_name      (gnutls_serv_opt_strs+1683)
+/** Other options that appear in conjunction with the disable-client-cert option */
+static int const aDisable_Client_CertCantList[] = {
+    INDEX_OPT_REQUIRE_CLIENT_CERT, NO_EQUIVALENT };
 /** Compiled in flag settings for the disable-client-cert option */
 #define DISABLE_CLIENT_CERT_FLAGS     (OPTST_DISABLED)
 
@@ -936,7 +940,7 @@ static tOptDesc optDesc[OPTION_CT] = {
      /* opt state flags  */ DISABLE_CLIENT_CERT_FLAGS, 0,
      /* last opt argumnt */ { NULL }, /* --disable-client-cert */
      /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL, NULL,
+     /* must/cannot opts */ NULL, aDisable_Client_CertCantList,
      /* option proc      */ NULL,
      /* desc, NAME, name */ DISABLE_CLIENT_CERT_DESC, DISABLE_CLIENT_CERT_NAME, DISABLE_CLIENT_CERT_name,
      /* disablement strs */ NULL, NULL },

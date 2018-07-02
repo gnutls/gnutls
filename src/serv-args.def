@@ -107,6 +107,7 @@ flag = {
     value     = a;
     descrip   = "Do not request a client certificate";
     doc      = "";
+    flags-cant = require-client-cert;
 };
 
 flag = {
