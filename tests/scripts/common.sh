@@ -69,7 +69,7 @@ GETPORT='rc=0; myrandom=$(date +%N | sed s/^0*//)
 check_for_datefudge() {
 	# On certain platforms running datefudge date fails (e.g., x86 datefudge
 	# with x86-64 date app).
-	if test ${SKIP_DATEFUDGE_CHECK} = 1;then
+	if test "${SKIP_DATEFUDGE_CHECK}" = 1;then
 		return
 	fi
 

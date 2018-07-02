@@ -25,7 +25,7 @@ export TZ="UTC"
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
-ac_cv_sizeof_unsigned_long_int="${ac_cv_sizeof_unsigned_long_int:-8}"
+ac_cv_sizeof_time_t="${ac_cv_sizeof_time_t:-8}"
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -179,7 +179,7 @@ if test "$?" != "0"; then
 	exit 1
 fi
 
-if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
+if test "${ac_cv_sizeof_time_t}" = 8;then
 	# we should test that on systems which have 64-bit time_t
 	datefudge -s "2138-01-20 10:00:00" ${VALGRIND} \
 		"${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key" \

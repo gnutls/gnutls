@@ -31,7 +31,6 @@
 #include <gnutls/x509-ext.h>
 #include <string.h>
 #include <limits.h>
-#include <inttypes.h>
 #include <time.h>
 #include <timespec.h>
 #include <parse-datetime.h>
@@ -57,16 +56,18 @@
 #include "certtool-common.h"
 
 /* to print uint64_t */
-#if SIZEOF_LONG < 8
 # define __STDC_FORMAT_MACROS
 # include <inttypes.h>
-#endif
 
 extern int batch;
 extern int ask_pass;
 
 #define MAX_ENTRIES 128
 #define MAX_POLICIES 8
+
+#define PRINT_TIME_T_ERROR \
+	if (sizeof(time_t) < 8) \
+		fprintf(stderr, "This system expresses time with a 32-bit time_t; that prevents dates after 2038 to be expressed by GnuTLS.\n")
 
 enum option_types { OPTION_NUMERIC, OPTION_STRING, OPTION_BOOLEAN, OPTION_MULTI_LINE };
 
@@ -747,7 +748,7 @@ int serial_decode(const char *input, gnutls_datum_t *output)
 	}
 
 	if (value <= 0 || value >= value_limit) {
-		fprintf(stderr, "Integer out of range: `%s' (min: 1, max: %lu)\n", input, value_limit-1);
+		fprintf(stderr, "Integer out of range: `%s' (min: 1, max: %"PRId64")\n", input, value_limit-1);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
@@ -1693,6 +1694,7 @@ time_t get_date(const char* date)
 	struct timespec r;
 
 	if (date==NULL || parse_datetime(&r, date, NULL) == 0) {
+		PRINT_TIME_T_ERROR;
 		fprintf(stderr, "Cannot parse date: %s\n", date);
 		exit(1);
 	}
@@ -1754,6 +1756,7 @@ time_t now = time(NULL);
 
 	return secs;
  overflow:
+	PRINT_TIME_T_ERROR;
 	fprintf(stderr, "Overflow while parsing days\n");
 	exit(1);
 }

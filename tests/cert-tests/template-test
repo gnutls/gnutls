@@ -21,7 +21,7 @@
 #set -e
 
 srcdir="${srcdir:-.}"
-ac_cv_sizeof_unsigned_long_int="${ac_cv_sizeof_unsigned_long_int:-8}"
+ac_cv_sizeof_time_t="${ac_cv_sizeof_time_t:-8}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 
@@ -35,6 +35,8 @@ TMPFILE=tmp-tt.pem.$$.tmp
 . ${srcdir}/../scripts/common.sh
 
 check_for_datefudge
+
+echo "Running test for ${ac_cv_sizeof_time_t}-byte time_t"
 
 # Note that in rare cases this test may fail because the
 # time set using datefudge could have changed since the generation
@@ -123,7 +125,6 @@ fi
 rm -f ${TMPFILE}
 
 # The following test works in 64-bit systems
-if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
@@ -131,17 +132,30 @@ datefudge -s "2007-04-22" \
 		--template "${srcdir}/templates/template-overflow2.tmpl" \
 		--outfile ${TMPFILE} 2>/dev/null
 
-${DIFF} "${srcdir}/data/template-overflow2.pem" ${TMPFILE} >/dev/null 2>&1
 rc=$?
+if test "${ac_cv_sizeof_time_t}" -lt 8;then
+	if test "$rc" = "0"; then
+		echo "Test 5-1 (overflow2) succeeded unexpectedly with 32-bit time_t"
+		exit ${rc}
+	fi
+else
+	if test "$rc" != "0"; then
+		echo "Test 5-1 (overflow2) failed"
+		exit ${rc}
+	fi
 
-# We're done.
-if test "${rc}" != "0"; then
-	echo "Test 5 (overflow2) failed"
-	exit ${rc}
+	${DIFF} "${srcdir}/data/template-overflow2.pem" ${TMPFILE} #>/dev/null 2>&1
+	rc=$?
+
+	# We're done.
+	if test "${rc}" != "0"; then
+	echo $TMPFILE
+		echo "Test 5-2 (overflow2) failed"
+		exit ${rc}
+	fi
+
 fi
-
 rm -f ${TMPFILE}
-fi
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
@@ -156,6 +170,34 @@ rc=$?
 if test "${rc}" != "0"; then
 	echo "Test 6 (explicit dates) failed"
 	exit ${rc}
+fi
+
+rm -f ${TMPFILE}
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-dates-after2038.tmpl" \
+		--outfile ${TMPFILE} 2>/dev/null
+rc=$?
+if test "${ac_cv_sizeof_time_t}" -lt 8;then
+	if test "$rc" = "0"; then
+		echo "Test 6-2 (explicit dates) succeeded unexpectedly with 32-bit long"
+		exit ${rc}
+	fi
+else
+	if test "$rc" != "0"; then
+		echo "Test 6-2 (explicit dates) failed"
+		exit ${rc}
+	fi
+
+	${DIFF} "${srcdir}/data/template-dates-after2038.pem" ${TMPFILE} >/dev/null 2>&1
+	rc=$?
+
+	if test "${rc}" != "0"; then
+		echo "Test 6-3 (explicit dates) failed"
+		exit ${rc}
+	fi
 fi
 
 rm -f ${TMPFILE}
@@ -181,7 +223,7 @@ rm -f ${TMPFILE}
 
 
 # Test the GeneralizedTime support
-if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
+if test "${ac_cv_sizeof_time_t}" = 8;then
 	# we should test that on systems which have 64-bit time_t.
 	datefudge -s "2051-04-22" \
 			"${CERTTOOL}" --generate-self-signed \
