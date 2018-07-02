@@ -64,6 +64,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
+static unsigned tickets_seen = 0;
 static int ticket_callback(gnutls_session_t session, unsigned int htype,
 			   unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
 {
@@ -80,6 +81,7 @@ static int ticket_callback(gnutls_session_t session, unsigned int htype,
 	d = gnutls_session_get_ptr(session);
 
 	if (post == GNUTLS_HOOK_POST) {
+		tickets_seen++;
 		if (d->data)
 			gnutls_free(d->data);
 		ret = gnutls_session_get_data2(session, d);
@@ -92,7 +94,7 @@ static int ticket_callback(gnutls_session_t session, unsigned int htype,
 	return 0;
 }
 
-static void client(int fd)
+static void client(int fd, unsigned tickets)
 {
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
@@ -102,6 +104,7 @@ static void client(int fd)
 	gnutls_datum_t session_data = {NULL, 0};
 
 	global_init();
+	tickets_seen = 0;
 
 	if (debug) {
 		gnutls_global_set_log_function(client_log_func);
@@ -178,6 +181,8 @@ static void client(int fd)
 		fail("error in recv: %s\n", gnutls_strerror(ret));
 	}
 
+	assert(tickets_seen == tickets+1);
+
 	gnutls_deinit(session);
 
 	if (try == 0) {
@@ -212,7 +217,7 @@ static void compare(const gnutls_datum_t *der, const void *ipem)
 	return;
 }
 
-static void server(int fd)
+static void server(int fd, unsigned tickets)
 {
 	int ret;
 	gnutls_session_t session;
@@ -265,10 +270,16 @@ static void server(int fd)
 	if (ret != 0)
 		fail("server: gnutls_reauth did not succeed as expected: %s\n", gnutls_strerror(ret));
 
-	/* send a fresh ticket after re-auth */
-	do {
-		ret = gnutls_session_ticket_send(session, 0);
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	if (tickets == 0) {
+		/* test whether the expected error code would be returned */
+		ret = gnutls_session_ticket_send(session, 0, 0);
+		assert(ret == GNUTLS_E_INVALID_REQUEST);
+	} else {
+		/* send tickets after re-auth */
+		do {
+			ret = gnutls_session_ticket_send(session, tickets, 0);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	}
 
 	do {
 		ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
@@ -297,11 +308,13 @@ static void server(int fd)
 	assert(gnutls_session_is_resumed(session) != 0);
 
 	/* check if cert is visible */
-	clist = gnutls_certificate_get_peers(session, &clist_size);
-	assert(clist != NULL);
-	assert(clist_size > 0);
+	if (tickets > 0) {
+		clist = gnutls_certificate_get_peers(session, &clist_size);
+		assert(clist != NULL);
+		assert(clist_size > 0);
 
-	compare(&clist[0], cli_ca3_cert.data);
+		compare(&clist[0], cli_ca3_cert.data);
+	}
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	gnutls_deinit(session);
@@ -324,14 +337,13 @@ static void ch_handler(int sig)
 	return;
 }
 
-void doit(void)
+static void start(const char *name, unsigned tickets)
 {
 	int fd[2];
 	int ret;
 	pid_t child;
 
-	signal(SIGCHLD, ch_handler);
-	signal(SIGPIPE, SIG_IGN);
+	success("testing: %s\n", name);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -349,13 +361,24 @@ void doit(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0]);
+		server(fd[0], tickets);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], tickets);
 		exit(0);
 	}
 
+}
+
+void doit(void)
+{
+	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
+
+	start("no ticket", 0);
+	start("single ticket", 1);
+	start("8 tickets", 8);
+	start("16 tickets", 16);
 }
 #endif				/* _WIN32 */
