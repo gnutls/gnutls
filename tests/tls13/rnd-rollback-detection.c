@@ -194,7 +194,7 @@ static void server(int fd)
 
 static void ch_handler(int sig)
 {
-	int status;
+	int status = 0;
 	wait(&status);
 	check_wait_status(status);
 	return;
@@ -207,6 +207,7 @@ void doit(void)
 	pid_t child;
 
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {

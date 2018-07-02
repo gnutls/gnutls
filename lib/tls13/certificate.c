@@ -38,7 +38,8 @@ int _gnutls13_recv_certificate(gnutls_session_t session)
 	gnutls_buffer_st buf;
 	unsigned optional = 0;
 
-	if (session->internals.hsk_flags & HSK_PSK_SELECTED)
+	if (!session->internals.initial_negotiation_completed &&
+	    session->internals.hsk_flags & HSK_PSK_SELECTED)
 		return 0;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -201,8 +202,10 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 	gnutls_certificate_credentials_t cred;
 
 	if (again == 0) {
-		if (session->internals.hsk_flags & HSK_PSK_SELECTED)
+		if (!session->internals.initial_negotiation_completed &&
+		    session->internals.hsk_flags & HSK_PSK_SELECTED)
 			return 0;
+
 		if (session->security_parameters.entity == GNUTLS_SERVER &&
 		    session->internals.resumed)
 			return 0;

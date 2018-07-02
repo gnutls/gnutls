@@ -214,16 +214,25 @@ int _gnutls13_reauth_server(gnutls_session_t session)
  *
  * The former two interrupt the authentication procedure due to the transport
  * layer being interrupted, and the latter because there were pending data prior
- * to peer initiating the re-authentication.
+ * to peer initiating the re-authentication. The server should read/process that
+ * data as unauthenticated and retry calling gnutls_reauth().
  *
  * When this function is called under TLS1.2 or earlier or the peer didn't
  * advertise post-handshake auth, it always fails with
  * %GNUTLS_E_INVALID_REQUEST. The verification of the received peers certificate
- * is delegated to the session or credentials verification callbacks.
+ * is delegated to the session or credentials verification callbacks. A
+ * server can check whether post handshake authentication is supported
+ * by the client by checking the session flags with gnutls_session_get_flags().
  *
  * Prior to calling this function in server side, the function
  * gnutls_certificate_server_set_request() must be called setting expectations
- * for the received certificate (request or require).
+ * for the received certificate (request or require). If none are set
+ * this function will return with %GNUTLS_E_INVALID_REQUEST.
+ *
+ * Note that post handshake authentication is available irrespective
+ * of the initial negotiation type (PSK or certificate). In all cases
+ * however, certificate credentials must be set to the session prior
+ * to calling this function.
  *
  * Returns: %GNUTLS_E_SUCCESS on a successful authentication, otherwise a negative error code.
  **/

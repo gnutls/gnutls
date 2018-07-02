@@ -1443,6 +1443,7 @@ unsigned gnutls_session_etm_status(gnutls_session_t session);
  * @GNUTLS_SFLAGS_HB_PEER_SEND: The heartbeat negotiation allows the peer to send heartbeat messages
  * @GNUTLS_SFLAGS_FALSE_START: The appdata set with gnutls_handshake_set_appdata() were sent during handshake (false start)
  * @GNUTLS_SFLAGS_SESSION_TICKET: A session ticket has been received by the server.
+ * @GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH: Indicates client capability for post-handshake auth; set only on server side.
  *
  * Enumeration of different session parameters.
  */
@@ -1454,7 +1455,8 @@ typedef enum {
 	GNUTLS_SFLAGS_HB_PEER_SEND = 1<<4,
 	GNUTLS_SFLAGS_FALSE_START = 1<<5,
 	GNUTLS_SFLAGS_RFC7919 = 1<<6,
-	GNUTLS_SFLAGS_SESSION_TICKET = 1<<7
+	GNUTLS_SFLAGS_SESSION_TICKET = 1<<7,
+	GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH = 1<<8
 } gnutls_session_flags_t;
 
 unsigned gnutls_session_get_flags(gnutls_session_t session);

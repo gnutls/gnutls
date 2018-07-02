@@ -339,7 +339,7 @@ void doit(void)
 	}
 
 	if (child) {
-		int status;
+		int status = 0;
 		/* parent */
 
 		server(fd[0]);

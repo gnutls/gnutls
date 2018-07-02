@@ -838,7 +838,7 @@ record_add_to_buffers(gnutls_session_t session,
 				 */
 				gnutls_assert();
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
-				if (ver->tls13_sem || bufel->msg.data[0] == GNUTLS_AL_FATAL) {
+				if ((ver && ver->tls13_sem) || bufel->msg.data[0] == GNUTLS_AL_FATAL) {
 					session_unresumable(session);
 					session_invalidate(session);
 					ret =
@@ -875,8 +875,19 @@ record_add_to_buffers(gnutls_session_t session,
 				goto unexpected_packet;
 			}
 
+			/* In TLS1.3 post-handshake authentication allow application
+			 * data error code. */
+			if ((ver && ver->tls13_sem) && type == GNUTLS_HANDSHAKE &&
+			    htype == GNUTLS_HANDSHAKE_CERTIFICATE_PKT &&
+			    session->internals.initial_negotiation_completed) {
+				_gnutls_record_buffer_put(session, recv->type,
+							  seq, bufel);
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_GOT_APPLICATION_DATA);
+			}
 
-			/* the got_application data is only returned
+			/* The got_application data is only returned
 			 * if expecting client hello (for rehandshake
 			 * reasons). Otherwise it is an unexpected packet
 			 */
@@ -944,7 +955,7 @@ record_add_to_buffers(gnutls_session_t session,
 			}
 
 			/* retrieve async handshake messages */
-			if (ver->tls13_sem) {
+			if (ver && ver->tls13_sem) {
 				gnutls_buffer_st buf;
 
 				_gnutls_ro_buffer_from_datum(&buf, &bufel->msg);
