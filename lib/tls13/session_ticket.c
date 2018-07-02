@@ -178,8 +178,8 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
 	gnutls_datum_t packed = { NULL, 0 };
 	tls13_ticket_t ticket_data;
 
-	/* Generate a random 128-bit ticket nonce */
-	ticket->nonce_size = 16;
+	/* Generate a random 32-bit ticket nonce */
+	ticket->nonce_size = 4;
 
 	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE,
 			ticket->nonce, ticket->nonce_size)) < 0)
