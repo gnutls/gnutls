@@ -339,6 +339,13 @@ client_send_params(gnutls_session_t session,
 		binders_len += 1 + _gnutls_mac_get_algo_len(prf_psk);
 	}
 
+	/* if no tickets or identities to be sent */
+	if (psk_id_len == 0) {
+		/* reset extensions buffer */
+		extdata->length = spos;
+		return 0;
+	}
+
 	_gnutls_write_uint16(psk_id_len, &extdata->data[spos]);
 
 	binders_pos = extdata->length-spos;
