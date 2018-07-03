@@ -56,6 +56,7 @@ static int
 supported_versions_recv_params(gnutls_session_t session,
 			       const uint8_t * data, size_t _data_size)
 {
+	const version_entry_st *vers;
 	ssize_t data_size = _data_size;
 	uint8_t major, minor;
 	gnutls_protocol_t proto;
@@ -63,6 +64,14 @@ supported_versions_recv_params(gnutls_session_t session,
 	int ret;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		vers = _gnutls_version_max(session);
+
+		/* do not parse this extension when we haven't TLS1.3
+		 * enabled. That is because we cannot handle earlier protocol
+		 * negotiotation (such as SSL3.0) with this */
+		if (vers && !vers->tls13_sem)
+			return 0;
+
 		DECR_LEN(data_size, 1);
 		bytes = data[0];
 		data++;
@@ -100,7 +109,6 @@ supported_versions_recv_params(gnutls_session_t session,
 		/* if we are here, none of the versions were acceptable */
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	} else { /* client */
-		const version_entry_st *vers;
 
 		if (!have_creds_for_tls13(session)) {
 			/* if we don't have certificate or PSK (which work under TLS1.3)
