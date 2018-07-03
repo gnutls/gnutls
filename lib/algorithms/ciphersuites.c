@@ -1581,7 +1581,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	 * incompatible certificate which we traditionally return GNUTLS_E_INSUFFICIENT_SECURITY.
 	 */
 	if (!no_cert_found && (session->internals.hsk_flags & HSK_HAVE_FFDHE) &&
-	    session->internals.priorities->groups.have_ffdhe)
+	    session->internals.priorities->groups.have_ffdhe && !version->tls13_sem)
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
 	else
 		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);

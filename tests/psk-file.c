@@ -381,7 +381,7 @@ void doit(void)
 		  "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-128-GCM:+PSK:+DHE-PSK:%SERVER_PRECEDENCE:-GROUP-DH-ALL",
 		  "jas", &key, 0, GNUTLS_KX_PSK, 0, 0);
 	/* try with PRF that doesn't match binder (SHA256) */
-	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_SECURITY);
+	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:+PSK:+DHE-PSK", NULL, "jas", &key, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_NO_CIPHER_SUITES);
 	/* try with no groups and PSK */
 	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-GROUP-ALL", "jas", &key, 0, 0);
 	/* try without any groups but DHE-PSK */
