@@ -138,10 +138,11 @@ TLS1.3/interop:
   script:
   - git submodule update --init --no-fetch
   - ./bootstrap
-  - dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
+  - dash ./configure --enable-tls13-support --disable-gcc-warnings --cache-file cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc)
   - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
   - make -C tests/suite TESTS=testcompat-tls13-openssl.sh check
+  - make -C tests/ check -j$(nproc)
   tags:
   - shared
   except:

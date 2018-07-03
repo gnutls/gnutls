@@ -174,13 +174,13 @@ void try_with_key(const char *name, const char *client_prio,
 		testfail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 	}
 
-	gnutls_init(&server, GNUTLS_SERVER);
+	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				s_xcred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
-				   NULL);
+	assert(gnutls_priority_set_direct(server,
+				   "NORMAL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
+				   NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -279,30 +279,45 @@ typedef struct test_st {
 } test_st;
 
 static const test_st tests[] = {
-	{.name = "ecc key",
+	{.name = "TLS1.2 ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
-	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA",
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA",
 	 .cert = &server_ca3_localhost_ecc_cert,
 	 .key = &server_ca3_ecc_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA
 	},
+	{.name = "TLS1.3 ecc key",
+	 .pk = GNUTLS_PK_ECDSA,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+	 .cert = &server_ca3_localhost_ecc_cert,
+	 .key = &server_ca3_ecc_key,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA
+	},
 	{.name = "rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA",
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.1:+ECDHE-RSA:+ECDHE-ECDSA",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA
 	},
 	{.name = "rsa-sign key with rsa-pss sigs prioritized",
 	 .pk = GNUTLS_PK_RSA,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256:+SIGN-RSA-PSS-RSAE-SHA384:+SIGN-RSA-PSS-RSAE-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512",
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.1:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256:+SIGN-RSA-PSS-RSAE-SHA384:+SIGN-RSA-PSS-RSAE-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512",
 	 .cert = &server_ca3_localhost_cert,
 	 .key = &server_ca3_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA
 	},
-	{.name = "rsa-pss-sign key",
+	{.name = "TLS 1.2 rsa-pss-sign key",
 	 .pk = GNUTLS_PK_RSA_PSS,
-	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA",
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.1:+ECDHE-RSA:+ECDHE-ECDSA",
+	 .cert = &server_ca3_rsa_pss2_cert,
+	 .key = &server_ca3_rsa_pss2_key,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
+	 .exp_key_err = GNUTLS_E_INVALID_REQUEST
+	},
+	{.name = "TLS 1.3 rsa-pss-sign key",
+	 .pk = GNUTLS_PK_RSA_PSS,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+ECDHE-RSA:+ECDHE-ECDSA",
 	 .cert = &server_ca3_rsa_pss2_cert,
 	 .key = &server_ca3_rsa_pss2_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,

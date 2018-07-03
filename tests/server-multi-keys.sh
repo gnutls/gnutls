@@ -74,13 +74,17 @@ timeout 1800 datefudge "2017-08-9" \
 	fail ${PID} "2. handshake with ECC should have succeeded!"
 
 timeout 1800 datefudge "2017-08-9" \
-"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-SHA256" --save-cert ${TMPFILE} </dev/null || \
+"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+ECDHE-RSA:-SIGN-ALL:+SIGN-RSA-SHA256" --save-cert ${TMPFILE} </dev/null || \
 	fail ${PID} "3. handshake with RSA should have succeeded!"
 
 cmp ${TMPFILE} ${CERT1}
 if test $? != 0;then
 	fail ${PID} "3. the certificate used by server was not the expected"
 fi
+
+timeout 1800 datefudge "2017-08-9" \
+"${CLI}" -p "${PORT}" localhost --x509cafile ${CAFILE} --priority "NORMAL:-KX-ALL:+ECDHE-RSA:+SIGN-RSA-SHA256:+SIGN-RSA-PSS-RSAE-SHA256" --save-cert ${TMPFILE} </dev/null || \
+	fail ${PID} "4. handshake with RSA should have succeeded!"
 
 
 # check whether the server used the RSA-PSS certificate when we asked for RSA-PSS signature

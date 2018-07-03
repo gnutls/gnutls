@@ -258,5 +258,9 @@ void doit(void)
 {
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", 0);
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", 0);
+#ifndef ENABLE_TLS13
+	start("NORMAL", 0);
+#else
 	start("NORMAL", 1);
+#endif
 }

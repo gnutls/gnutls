@@ -172,6 +172,21 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl3" != "no")
 
+  ac_enable_tls13=no
+  AC_MSG_CHECKING([whether to enable the TLS 1.3 draft protocol])
+  AC_ARG_ENABLE(tls13-support,
+    AS_HELP_STRING([--enable-tls13-support],
+                   [enable the TLS1.3 draft protocol by default]),
+    ac_enable_tls13=$enableval)
+  if test x$ac_enable_tls13 != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_TLS13], 1, [enable TLS1.3 support])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ENABLE_TLS13, test "$ac_enable_tls13" != "no")
+
   ac_enable_ssl2=yes
   AC_MSG_CHECKING([whether to disable the SSL 2.0 client hello])
   AC_ARG_ENABLE(ssl2-support,

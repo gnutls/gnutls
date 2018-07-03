@@ -11,8 +11,8 @@ See the end for copying conditions.
    negotiation, post handshake authentication, length hiding, multiple OCSP support,
    consistent ciphersuite support across protocols, hello retry requests, ability
    to adjust key shares via gnutls_init() flags, certificate authorities extension,
-   and key usage limits. TLS1.3 support needs to be explicitly enabled via a
-   priority string.
+   and key usage limits. TLS1.3 draft-28 support can be enabled by default if
+   the option --enable-tls13-support is given to configure script.
 
 ** libgnutls: Introduced function to switch the current FIPS140-2 operational
    mode, i.e., strict vs a more lax mode which will allow certain non FIPS140-2

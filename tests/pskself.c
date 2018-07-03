@@ -326,9 +326,15 @@ void doit(void)
 	/* the following should work once we support PSK without DH */
 	run_test("NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+PSK", 0);
 
+#ifdef ENABLE_TLS13
+	run_test("NORMAL:-KX-ALL:+PSK", 0);
+	run_test("NORMAL:-KX-ALL:+ECDHE-PSK", 0);
+	run_test("NORMAL:-KX-ALL:+DHE-PSK", 0);
+#else
 	run_test("NORMAL:-KX-ALL:+PSK", 1);
 	run_test("NORMAL:-KX-ALL:+ECDHE-PSK", 1);
 	run_test("NORMAL:-KX-ALL:+DHE-PSK", 1);
+#endif
 
 	gnutls_dh_params_deinit(dh_params);
 }

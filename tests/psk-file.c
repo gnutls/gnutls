@@ -85,11 +85,8 @@ static void client(int sd, const char *prio, const char *user, const gnutls_datu
 	gnutls_psk_set_client_credentials(pskcred, user, key,
 					  GNUTLS_PSK_KEY_HEX);
 
-	/* Initialize TLS session
-	 */
-	gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_KEY_SHARE_TOP);
+	assert(gnutls_init(&session, GNUTLS_CLIENT|GNUTLS_KEY_SHARE_TOP)>=0);
 
-	/* Use default priorities */
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
 	/* put the anonymous credentials to the current session
@@ -366,9 +363,15 @@ void doit(void)
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "jas", &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED);
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", NULL, "non-hex", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
 
-	run_test_ok("NORMAL:-KX-ALL:+PSK", "jas", &key, 1, 0);
+	run_test_ok("NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+PSK", "jas", &key, 1, 0);
+	run_test_ok("NORMAL:-KX-ALL:+PSK", "jas", &key, 0, 0);
+#ifdef ENABLE_TLS13
+	run_test2("NORMAL:+PSK", NULL, "unknown", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	run_test2("NORMAL:+PSK", NULL, "jas", &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+#else
 	run_test2("NORMAL:+PSK", NULL, "unknown", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED);
 	run_test2("NORMAL:+PSK", NULL, "jas", &wrong_key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_DECRYPTION_FAILED);
+#endif
 	run_test2("NORMAL:-KX-ALL:+PSK", NULL, "non-hex", &key, 1, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_KEYFILE_ERROR);
 
 	run_dhtest_ok("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-EC-ALL", "jas", &key, 0, 0);

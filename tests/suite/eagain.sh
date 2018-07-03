@@ -33,7 +33,7 @@ SERV="${SERV} -q"
 
 eval "${GETPORT}"
 
-launch_server $$ --echo --priority "NORMAL:+ANON-DH" --dhparams "${srcdir}/params.dh"
+launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:+ANON-DH" --dhparams "${srcdir}/params.dh"
 PID=$!
 wait_server ${PID}
 

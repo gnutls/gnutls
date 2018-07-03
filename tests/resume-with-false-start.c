@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 #include <gnutls/gnutls.h>
 #include "utils.h"
 #include "eagain-common.h"
@@ -104,7 +105,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_set_default_priority(client);
+	assert(gnutls_priority_set_direct(client, "NORMAL:-VERS-ALL:+VERS-TLS1.2", NULL)>=0);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
