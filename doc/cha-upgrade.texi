@@ -234,4 +234,19 @@ TLS 1.3 is done via session tickets, c.f. @funcref{gnutls_session_ticket_enable_
 milliseconds. Check output of @funcref{gnutls_session_get_flags} for GNUTLS_SFLAGS_SESSION_TICKET
 before calling this function to avoid delays.
 
+@item SRP and RSA-PSK key exchanges are not supported under TLS 1.3
+@tab SRP and RSA-PSK key exchanges are not supported in TLS 1.3, so when these key exchanges are present in a priority string, TLS 1.3 is disabled.
+
+@item Anonymous key exchange is not supported under TLS 1.3
+@tab There is no anonymous key exchange supported under TLS 1.3, so if an anonymous key exchange method is set in a priority string, and no certificate credentials are set in the client or server, TLS 1.3 will not be negotiated.
+
+@item ECDHE-PSK and DHE-PSK keywords have the same meaning under TLS 1.3
+@tab In the priority strings, both @code{ECDHE@-PSK} and @code{DHE@-PSK} indicate the intent to support an ephemeral key exchange with the pre-shared key.  The parameters of the key exchange are negotiated with the supported groups specified in the priority string.
+
+@item Authentication-only ciphersuites are not supported under TLS 1.3
+@tab Ciphersuites with the @code{NULL} cipher (i.e., authentication-only) are not supported in TLS 1.3, so when they are specified in a priority string, TLS 1.3 is disabled.
+
+@item Supplemental data is not supported under TLS 1.3
+@tab The TLS supplemental data handshake message (RFC 4680) is not supported under TLS 1.3, so if the application calls @funcref{gnutls_supplemental_register} or @funcref{gnutls_session_supplemental_register}, TLS 1.3 is disabled.
+
 @end multitable

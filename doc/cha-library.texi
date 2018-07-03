@@ -7,7 +7,7 @@ privacy over insecure lines, and were designed to prevent
 eavesdropping, tampering, or message forgery.
 
 Technically @acronym{GnuTLS} is a portable ANSI C based library which
-implements the protocols ranging from SSL 3.0 to TLS 1.2 (see @ref{Introduction to TLS}, 
+implements the protocols ranging from SSL 3.0 to TLS 1.3 (see @ref{Introduction to TLS}, 
 for a detailed description of the protocols), accompanied
 with the required framework for authentication and public key
 infrastructure.  Important features of the @acronym{GnuTLS} library
@@ -15,7 +15,7 @@ include:
 
 @itemize
 
-@item Support for TLS 1.2, TLS 1.1, TLS 1.0 and SSL 3.0 protocols.
+@item Support for TLS 1.3, TLS 1.2, TLS 1.1, TLS 1.0 and SSL 3.0 protocols.
 
 @item Support for Datagram TLS 1.0 and 1.2.
 
