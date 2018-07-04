@@ -165,7 +165,7 @@ client(int fd, const char *prio, unsigned int text_size,
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
-	char text[text_size];
+	char *text;
 	gnutls_psk_client_credentials_t pskcred;
 	gnutls_session_t session;
 	static unsigned long measurement;
@@ -174,6 +174,9 @@ client(int fd, const char *prio, unsigned int text_size,
 	unsigned j;
 
 	gnutls_global_init();
+
+	text = malloc(text_size);
+	assert(text != NULL);
 
 	setpriority(PRIO_PROCESS, getpid(), -15);
 
@@ -317,6 +320,7 @@ finish:
 	gnutls_psk_free_client_credentials(pskcred);
 
 	gnutls_global_deinit();
+	free(text);
 }
 
 static int
