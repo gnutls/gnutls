@@ -11,6 +11,12 @@ See the end for copying conditions.
 ** gnutls-cli: backported the --sni-hostname option. This allows overriding the
    hostname advertised to the peer.
 
+** Improved counter-measures for TLS CBC record padding. Kenny Paterson, Eyal Ronen
+   and Adi Shamir reported that the existing counter-measures had certain issues and
+   were insufficient when the attacker could access the cache and perform chosen-
+   plaintext. This affected the legacy CBC ciphersuites when the encrypt-then-MAC
+   TLS feature was not supported by the peer.
+
 ** API and ABI modifications:
 No changes since last version.
 
