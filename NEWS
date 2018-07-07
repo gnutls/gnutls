@@ -50,8 +50,8 @@ See the end for copying conditions.
 
 ** Improved counter-measures for TLS CBC record padding. Kenny Paterson, Eyal Ronen
    and Adi Shamir reported that the existing counter-measures had certain issues and
-   were insufficient under a new Lucky13-type of attack which shares the cache and
-   chosen-plaintext. This affected the legacy CBC ciphersuites when the encrypt-then-MAC
+   were insufficient when the attacker could access the cache and perform chosen-
+   plaintext. This affected the legacy CBC ciphersuites when the encrypt-then-MAC
    TLS feature was not supported by the peer.
 
 ** Introduced the %FORCE_ETM priority string option. This option prevents the negotiation
