@@ -8,13 +8,16 @@
                  "--alpn-fatal",
                  "--priority=@PRIORITY@",
                  "--disable-client-cert", "--port=@PORT@"],
+     "server_hostname": "localhost",
+     "server_port": @PORT@,
      "tests" : [
 	 {"name" : "test-alpn-negotiation.py",
           "comment" : "we do not not fail when ALPN name changes on resumption",
           "comment" : "we do not not parse all objects when a match is found",
           "arguments" : ["-e", "overflow length of last item",
           "-e", "resumption with alpn change",
-          "-e", "underflow length of protocol_name_list"]}
+          "-e", "underflow length of protocol_name_list",
+          "-p", "@PORT@"]}
      ]
     }
 ]

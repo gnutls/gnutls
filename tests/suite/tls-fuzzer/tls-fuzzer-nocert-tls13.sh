@@ -27,7 +27,6 @@ TMPFILE=tls-fuzzer.$$.tmp
 
 . "${srcdir}/../scripts/common.sh"
 
-# We hard-code the port because of limitations in tlsfuzzer
 eval "${GETPORT}"
 
 pushd tls-fuzzer
