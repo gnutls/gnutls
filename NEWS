@@ -13,8 +13,11 @@ See the end for copying conditions.
 ** libgnutls: Corrected infinite loop when an incorrect PIN was provided
    via pin-value or pin-source.
 
-** Improved counter-measures for TLS CBC record padding, when encrypt-then-MAC
-   mode is not used.
+** Improved counter-measures for TLS CBC record padding. Kenny Paterson, Eyal Ronen
+   and Adi Shamir reported that the existing counter-measures had certain issues and
+   were insufficient under a new Lucky13-type of attack which shares the cache and
+   chosen-plaintext. This affected the legacy CBC ciphersuites when the encrypt-then-MAC
+   TLS feature was not supported by the peer.
 
 ** The ciphers utilizing HMAC-SHA384 and SHA256 have been removed from the default
    priority strings. They are not necessary for compatibility or other purpose and
