@@ -179,11 +179,11 @@ LIBTASN1_MINIMUM=4.9
                    [enable the TLS1.3 draft protocol by default]),
     ac_enable_tls13=$enableval)
   if test x$ac_enable_tls13 != xno; then
-   AC_MSG_RESULT(no)
+   AC_MSG_RESULT(yes)
    AC_DEFINE([ENABLE_TLS13], 1, [enable TLS1.3 support])
   else
    ac_full=0
-   AC_MSG_RESULT(yes)
+   AC_MSG_RESULT(no)
   fi
   AM_CONDITIONAL(ENABLE_TLS13, test "$ac_enable_tls13" != "no")
 
