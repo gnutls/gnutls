@@ -79,9 +79,14 @@ int main(void)
         gnutls_psk_allocate_server_credentials(&psk_cred);
         gnutls_psk_set_server_credentials_function(psk_cred, pskfunc);
 
-        gnutls_priority_init(&priority_cache,
-                             "NORMAL:+PSK:+ECDHE-PSK:+DHE-PSK",
-                             NULL);
+        /* pre-3.6.3 equivalent:
+         * gnutls_priority_init(&priority_cache,
+         *                      "NORMAL:+PSK:+ECDHE-PSK:+DHE-PSK",
+         *                      NULL);
+         */
+        gnutls_priority_init2(&priority_cache,
+                              "+ECDHE-PSK:+DHE-PSK:+PSK",
+                              NULL, GNUTLS_PRIORITY_INIT_DEF_APPEND);
 
         gnutls_certificate_set_known_dh_params(x509_cred, GNUTLS_SEC_PARAM_MEDIUM);
 

@@ -161,11 +161,11 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls13-cert-key-exchange x509-cert-callback-ocsp gnutls_ocsp_resp_list_import2 \
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa x509sign-verify-gost \
-	 mini-alignment oids atfork prf psk-file \
+	 mini-alignment oids atfork prf psk-file priority-init2 \
 	 status-request status-request-ok status-request-missing sign-verify-ext \
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
-	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
+	 record-timeouts mini-dtls-hello-verify-48 set-default-prio \
 	 tls12-anon-upgrade global-init-override tlsext-decoding rsa-psk-cb \
 	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
 	 rehandshake-switch-cert-client-allow handshake-versions dtls-handshake-versions \

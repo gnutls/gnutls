@@ -1233,6 +1233,8 @@ GNUTLS_3_6_3
 	gnutls_privkey_import_gost_raw;
 	gnutls_x509_privkey_export_gost_raw;
 	gnutls_x509_privkey_import_gost_raw;
+	gnutls_set_default_priority_append;
+	gnutls_priority_init2;
 } GNUTLS_3_6_2;
 
 GNUTLS_FIPS140_3_4 {

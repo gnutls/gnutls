@@ -1385,10 +1385,11 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 }
 
 /**
- * gnutls_priority_init:
+ * gnutls_priority_init2:
  * @priority_cache: is a #gnutls_prioritity_t type.
  * @priorities: is a string describing priorities (may be %NULL)
  * @err_pos: In case of an error this will have the position in the string the error occurred
+ * @flags: zero or %GNUTLS_PRIORITY_INIT_DEF_APPEND
  *
  * Sets priorities for the ciphers, key exchange methods, and macs.
  * The @priority_cache should be deinitialized
@@ -1398,6 +1399,9 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
  * separated list of the cipher priorities to enable.
  * Some keywords are defined to provide quick access
  * to common preferences.
+ *
+ * When @flags is set to %GNUTLS_PRIORITY_INIT_DEF_APPEND then the @priorities
+ * specified will be appended to the default options.
  *
  * Unless there is a special need, use the "NORMAL" keyword to
  * apply a reasonable security level, or "NORMAL:%%COMPAT" for compatibility.
@@ -1472,6 +1476,80 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
  * "SECURE256:+SECURE128",
  *
  * Note that "NORMAL:%%COMPAT" is the most compatible mode.
+ *
+ * A %NULL @priorities string indicates the default priorities to be
+ * used (this is available since GnuTLS 3.3.0).
+ *
+ * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
+ * %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.6.3
+ **/
+int
+gnutls_priority_init2(gnutls_priority_t * priority_cache,
+		      const char *priorities, const char **err_pos,
+		      unsigned flags)
+{
+	gnutls_buffer_st buf;
+	const char *ep;
+	int ret;
+
+	if (flags & GNUTLS_PRIORITY_INIT_DEF_APPEND) {
+		if (priorities == NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		if (err_pos)
+			*err_pos = priorities;
+
+		_gnutls_buffer_init(&buf);
+
+		ret = _gnutls_buffer_append_str(&buf, DEFAULT_PRIORITY_STRING);
+		if (ret < 0) {
+			_gnutls_buffer_clear(&buf);
+			return gnutls_assert_val(ret);
+		}
+
+		ret = _gnutls_buffer_append_str(&buf, ":");
+		if (ret < 0) {
+			_gnutls_buffer_clear(&buf);
+			return gnutls_assert_val(ret);
+		}
+
+		ret = _gnutls_buffer_append_str(&buf, priorities);
+		if (ret < 0) {
+			_gnutls_buffer_clear(&buf);
+			return gnutls_assert_val(ret);
+		}
+
+		ret = gnutls_priority_init(priority_cache, (const char*)buf.data, &ep);
+		if (ret < 0 && ep != (const char*)buf.data && ep != NULL) {
+			ptrdiff_t diff = (ptrdiff_t)ep-(ptrdiff_t)buf.data;
+			unsigned hlen = strlen(DEFAULT_PRIORITY_STRING)+1;
+
+			if (err_pos && diff > hlen) {
+				*err_pos = priorities + diff - hlen;
+			}
+		}
+		_gnutls_buffer_clear(&buf);
+		return ret;
+	} else {
+		return gnutls_priority_init(priority_cache, priorities, err_pos);
+	}
+}
+
+/**
+ * gnutls_priority_init:
+ * @priority_cache: is a #gnutls_prioritity_t type.
+ * @priorities: is a string describing priorities (may be %NULL)
+ * @err_pos: In case of an error this will have the position in the string the error occurred
+ *
+ * For applications that do not modify their crypto settings per release, consider
+ * using gnutls_priority_init2() with %GNUTLS_PRIORITY_INIT_DEF_APPEND flag
+ * instead. We suggest to use centralized crypto settings handled by the GnuTLS
+ * library, and applications modifying the default settings to their needs.
+ *
+ * This function is identical to gnutls_priority_init2() with zero
+ * flags.
  *
  * A %NULL @priorities string indicates the default priorities to be
  * used (this is available since GnuTLS 3.3.0).
@@ -1734,7 +1812,6 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	*priority_cache = NULL;
 
 	return ret;
-
 }
 
 /**
@@ -1778,7 +1855,7 @@ void gnutls_priority_deinit(gnutls_priority_t priority_cache)
  * TLS session.  For documentation check the gnutls_priority_init().
  *
  * To use a reasonable default, consider using gnutls_set_default_priority(),
- * instead of this function.
+ * or gnutls_set_default_priority_append() instead of this function.
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
  * %GNUTLS_E_SUCCESS on success, or an error code.
@@ -1849,6 +1926,9 @@ break_list(char *list,
  * maximum compatibility consider calling gnutls_session_enable_compatibility_mode()
  * after this function.
  *
+ * For an application to specify additional options to priority string
+ * consider using gnutls_set_default_priority_append().
+ *
  * To allow a user to override the defaults (e.g., when a user interface
  * or configuration file is available), the functions
  * gnutls_priority_set_direct() or gnutls_priority_set() can
@@ -1861,6 +1941,58 @@ break_list(char *list,
 int gnutls_set_default_priority(gnutls_session_t session)
 {
 	return gnutls_priority_set_direct(session, NULL, NULL);
+}
+
+/**
+ * gnutls_set_default_priority_append:
+ * @session: is a #gnutls_session_t type.
+ * @add_prio: is a string describing priorities to be appended to default
+ * @err_pos: In case of an error this will have the position in the string the error occurred
+ * @flags: must be zero
+ *
+ * Sets the default priority on the ciphers, key exchange methods,
+ * and macs with the additional options in @add_prio. This is the recommended method of
+ * setting the defaults when only few additional options are to be added. This promotes
+ * consistency between applications using GnuTLS, and allows GnuTLS using applications
+ * to update settings in par with the library.
+ *
+ * The @add_prio string should start as a normal priority string, e.g.,
+ * '-VERS-TLS-ALL:+VERS-TLS1.3:%%COMPAT' or '%%FORCE_ETM'. That is, it must not start
+ * with ':'.
+ *
+ * To allow a user to override the defaults (e.g., when a user interface
+ * or configuration file is available), the functions
+ * gnutls_priority_set_direct() or gnutls_priority_set() can
+ * be used.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.6.3
+ **/
+int gnutls_set_default_priority_append(gnutls_session_t session,
+				       const char *add_prio,
+				       const char **err_pos,
+				       unsigned flags)
+{
+	gnutls_priority_t prio;
+	int ret;
+
+	ret = gnutls_priority_init2(&prio, add_prio, err_pos, GNUTLS_PRIORITY_INIT_DEF_APPEND);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = gnutls_priority_set(session, prio);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* ensure that the session holds the only reference for the struct */
+	gnutls_priority_deinit(prio);
+
+	return 0;
 }
 
 /**
