@@ -1230,7 +1230,7 @@ _decode_pkcs8_gost_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey,
 		ret = GNUTLS_E_PARSING_ERROR;
 		goto error;
 	} else {
-		ret = _gnutls_x509_read_gost_params(oid, len, &pkey->params);
+		ret = _gnutls_x509_read_gost_params(oid, len, &pkey->params, algo);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;

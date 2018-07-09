@@ -1775,13 +1775,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	}
 
 	if (IS_GOSTEC(algo)) {
-		unsigned params;
 		int size;
-
-		if (algo == GNUTLS_PK_GOST_01)
-			params = GNUTLS_GOST_PARAMSET_CP_A;
-		else
-			params = GNUTLS_GOST_PARAMSET_TC26_Z;
 
 		if (GNUTLS_BITS_ARE_CURVE(bits))
 			bits = GNUTLS_BITS_TO_CURVE(bits);
@@ -1797,7 +1791,7 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		}
 
-		key->params.gost_params = params;
+		key->params.gost_params = _gnutls_gost_paramset_default(algo);
 	}
 
 	if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE) {

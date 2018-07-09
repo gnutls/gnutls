@@ -581,13 +581,8 @@ _gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
 		goto cleanup;
 	}
 
-	if (params->algo == GNUTLS_PK_GOST_01) {
-		if (params->gost_params == GNUTLS_GOST_PARAMSET_CP_A)
-			oid = NULL;
-	} else {
-		if (params->gost_params == GNUTLS_GOST_PARAMSET_TC26_Z)
-			oid = NULL;
-	}
+	if (params->gost_params == _gnutls_gost_paramset_default(params->algo))
+		oid = NULL;
 
 	if ((result =
 	     asn1_write_value(spk, "encryptionParamSet", oid,

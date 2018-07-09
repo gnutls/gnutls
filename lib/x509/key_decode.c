@@ -28,6 +28,7 @@
 #include <datum.h>
 #include "common.h"
 #include "x509_int.h"
+#include "pk.h"
 #include <num.h>
 #include <ecc.h>
 
@@ -435,14 +436,15 @@ _gnutls_x509_read_rsa_pss_params(uint8_t * der, int dersize,
  */
 int
 _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
-			      gnutls_pk_params_st * params)
+			      gnutls_pk_params_st * params,
+			      gnutls_pk_algorithm_t algo)
 {
 	int ret;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 	char oid[MAX_OID_SIZE];
 	int oid_size;
 	gnutls_ecc_curve_t curve;
-	int param;
+	gnutls_gost_paramset_t param;
 
 	if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
 				       "GNUTLS.GOSTParameters",
@@ -486,11 +488,6 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 	}
 	/* For now ignore the OID: we use pk OID instead */
 
-	if (!strcmp(oid, HASH_OID_GOST_R_3411_94_CRYPTOPRO_PARAMS))
-		param = GNUTLS_GOST_PARAMSET_CP_A;
-	else
-		param = GNUTLS_GOST_PARAMSET_TC26_Z;
-
 	oid_size = sizeof(oid);
 	ret = asn1_read_value(spk, "encryptionParamSet", oid, &oid_size);
 	if (ret != ASN1_SUCCESS &&
@@ -502,6 +499,8 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 
 	if (ret != ASN1_ELEMENT_NOT_FOUND)
 		param = gnutls_oid_to_gost_paramset(oid);
+	else
+		param = _gnutls_gost_paramset_default(algo);
 
 	if (param == GNUTLS_GOST_PARAMSET_UNKNOWN) {
 		gnutls_assert();
@@ -592,7 +591,7 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
-		return _gnutls_x509_read_gost_params(der, dersize, params);
+		return _gnutls_x509_read_gost_params(der, dersize, params, algo);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}

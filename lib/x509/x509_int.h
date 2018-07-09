@@ -264,7 +264,8 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 
 int
 _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
-			      gnutls_pk_params_st * params);
+			      gnutls_pk_params_st * params,
+			      gnutls_pk_algorithm_t algo);
 
 int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 				gnutls_pk_params_st * params);
