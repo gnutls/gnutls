@@ -79,6 +79,7 @@ _gnutls_decode_gost_rs(const gnutls_datum_t * sig_value, bigint_t * r,
 
 gnutls_digest_algorithm_t _gnutls_gost_digest(gnutls_pk_algorithm_t pk);
 gnutls_pk_algorithm_t _gnutls_digest_gost(gnutls_digest_algorithm_t digest);
+gnutls_gost_paramset_t _gnutls_gost_paramset_default(gnutls_pk_algorithm_t pk);
 
 int
 encode_ber_digest_info(const mac_entry_st * e,

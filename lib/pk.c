@@ -459,6 +459,17 @@ gnutls_pk_algorithm_t _gnutls_digest_gost(gnutls_digest_algorithm_t digest)
 	return GNUTLS_PK_UNKNOWN;
 }
 
+gnutls_gost_paramset_t _gnutls_gost_paramset_default(gnutls_pk_algorithm_t pk)
+{
+	if (pk == GNUTLS_PK_GOST_01)
+		return GNUTLS_GOST_PARAMSET_CP_A;
+	else if (pk == GNUTLS_PK_GOST_12_256 ||
+		 pk == GNUTLS_PK_GOST_12_512)
+		return GNUTLS_GOST_PARAMSET_TC26_Z;
+	else
+		return gnutls_assert_val(GNUTLS_GOST_PARAMSET_UNKNOWN);
+}
+
 /* some generic pk functions */
 
 int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,

@@ -1560,12 +1560,8 @@ gnutls_pubkey_import_gost_raw(gnutls_pubkey_t key,
 	if (pk_algo == GNUTLS_PK_UNKNOWN)
 		return GNUTLS_E_ILLEGAL_PARAMETER;
 
-	if (paramset < 0) {
-		if (pk_algo == GNUTLS_PK_GOST_01)
-			paramset = GNUTLS_GOST_PARAMSET_CP_A;
-		else
-			paramset = GNUTLS_GOST_PARAMSET_TC26_Z;
-	}
+	if (paramset == GNUTLS_GOST_PARAMSET_UNKNOWN)
+		paramset = _gnutls_gost_paramset_default(pk_algo);
 
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);

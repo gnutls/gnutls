@@ -503,7 +503,7 @@ _gnutls_x509_read_gost_params(uint8_t * der, int dersize,
 	if (ret != ASN1_ELEMENT_NOT_FOUND)
 		param = gnutls_oid_to_gost_paramset(oid);
 
-	if (param < 0) {
+	if (param == GNUTLS_GOST_PARAMSET_UNKNOWN) {
 		gnutls_assert();
 		ret = param;
 		goto cleanup;

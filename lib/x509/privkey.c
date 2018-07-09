@@ -1207,16 +1207,13 @@ gnutls_x509_privkey_import_gost_raw(gnutls_x509_privkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (paramset < 0) {
-		if (digest == GNUTLS_DIG_GOSTR_94)
-			paramset = GNUTLS_GOST_PARAMSET_CP_A;
-		else
-			paramset = GNUTLS_GOST_PARAMSET_TC26_Z;
-	}
-
 	key->params.curve = curve;
-	key->params.gost_params = paramset;
 	key->params.algo = _gnutls_digest_gost(digest);
+
+	if (paramset == GNUTLS_GOST_PARAMSET_UNKNOWN)
+		paramset = _gnutls_gost_paramset_default(key->params.algo);
+
+	key->params.gost_params = paramset;
 
 	if (_gnutls_mpi_init_scan_nz
 	    (&key->params.params[GOST_X], x->data, x->size)) {
