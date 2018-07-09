@@ -476,7 +476,10 @@ error:
  *
  * This function will convert the given GOST private key's parameters to the
  * native #gnutls_privkey_t format.  The output will be stored
- * in @key.
+ * in @key.  @digest should be one of GNUTLS_DIG_GOSR_94,
+ * GNUTLS_DIG_STREEBOG_256 or GNUTLS_DIG_STREEBOG_512.  If @paramset is set to
+ * GNUTLS_GOST_PARAMSET_UNKNOWN default one will be selected depending on
+ * @digest.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
