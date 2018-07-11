@@ -113,14 +113,14 @@ char protocol_all_str[] =
     "+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0";
 char prio_str[512] = "";
 
-#define ALL_CIPHERS "+AES-128-GCM:+CAMELLIA-128-GCM:+AES-128-CBC:+CAMELLIA-128-CBC:+3DES-CBC:+ARCFOUR-128"
-#define BLOCK_CIPHERS "+3DES-CBC:+AES-128-CBC:+CAMELLIA-128-CBC"
+#define ALL_CIPHERS "+CIPHER-ALL:+ARCFOUR-128:+3DES-CBC"
+#define BLOCK_CIPHERS "+3DES-CBC:+AES-128-CBC:+CAMELLIA-128-CBC:+AES-256-CBC:+CAMELLIA-256-CBC"
 #define ALL_COMP "+COMP-NULL"
-#define ALL_MACS "+SHA1:+MD5:+AEAD"
+#define ALL_MACS "+MAC-ALL:+MD5:+SHA1"
 #define ALL_CERTTYPES "+CTYPE-X509"
 #define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+ECDHE-RSA:+ECDHE-ECDSA:+ANON-ECDH"
 #define INIT_STR "NONE:"
-char rest[128] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+CURVE-ALL";
+char rest[128] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+GROUP-ALL";
 
 static inline void
 _gnutls_priority_set_direct(gnutls_session_t session, const char *str)
@@ -738,7 +738,7 @@ test_code_t test_unknown_ciphersuites(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str,
-		INIT_STR "+AES-128-CBC:" ALL_CIPHERS ":" ALL_COMP ":"
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":"
 		ALL_CERTTYPES ":%s:" ALL_MACS ":" ALL_KX ":%s",
 		protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
@@ -757,7 +757,7 @@ test_code_t test_md5(gnutls_session_t session)
 		return TEST_IGNORE;
 
 	sprintf(prio_str,
-		INIT_STR "+AES-128-CBC:" ALL_CIPHERS ":" ALL_COMP ":"
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":"
 		ALL_CERTTYPES ":%s:+MD5:" ALL_KX ":%s", protocol_str,
 		rest);
 	_gnutls_priority_set_direct(session, prio_str);
@@ -790,7 +790,7 @@ test_code_t test_sha(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str,
-		INIT_STR "+AES-128-CBC:" ALL_CIPHERS ":" ALL_COMP ":"
+		INIT_STR  ALL_CIPHERS ":" ALL_COMP ":"
 		ALL_CERTTYPES ":%s:+SHA1:" ALL_KX ":%s", protocol_str,
 		rest);
 	_gnutls_priority_set_direct(session, prio_str);
@@ -805,7 +805,7 @@ test_code_t test_sha256(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str,
-		INIT_STR "+AES-128-CBC:" ALL_CIPHERS ":" ALL_COMP ":"
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":"
 		ALL_CERTTYPES ":%s:+SHA256:" ALL_KX ":%s",
 		protocol_all_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
