@@ -15,9 +15,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 #ifdef HAVE_CONFIG_H
@@ -46,6 +45,7 @@ int main()
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
+#include <virt-time.h>
 
 #include "utils.h"
 
@@ -156,7 +156,7 @@ static void server(int fd, int wait)
 	gnutls_transport_set_int(session, fd);
 
 	if (wait) {
-		sec_sleep(25);
+		virt_sec_sleep(25);
 	} else {
 		do {
 			ret = gnutls_handshake(session);
@@ -217,6 +217,8 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+	virt_time_init();
+
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 

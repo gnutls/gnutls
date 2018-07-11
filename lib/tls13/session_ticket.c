@@ -177,9 +177,23 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
 	int ret;
 	gnutls_datum_t packed = { NULL, 0 };
 	tls13_ticket_t ticket_data;
+	time_t now = gnutls_time(0);
 
-	/* Generate a random 128-bit ticket nonce */
-	ticket->nonce_size = 16;
+	if (session->internals.resumed != RESUME_FALSE) {
+		/* If we are resuming ensure that we don't extend the lifetime
+		 * of the ticket past the original session expiration time */
+		if (now >= session->security_parameters.timestamp + session->internals.expire_time)
+			return GNUTLS_E_INT_RET_0; /* don't send ticket */
+		else
+			ticket->lifetime = session->security_parameters.timestamp +
+					   session->internals.expire_time - now;
+	} else {
+		/* Set ticket lifetime to the default expiration time */
+		ticket->lifetime = session->internals.expire_time;
+	}
+
+	/* Generate a random 32-bit ticket nonce */
+	ticket->nonce_size = 4;
 
 	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE,
 			ticket->nonce, ticket->nonce_size)) < 0)
@@ -188,8 +202,6 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
 	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE, &ticket->age_add, sizeof(uint32_t))) < 0)
 		return gnutls_assert_val(ret);
 
-	/* Set ticket lifetime to 1 day (86400 seconds) */
-	ticket->lifetime = session->internals.expire_time;
 
 	ticket->prf = session->security_parameters.prf;
 
@@ -239,11 +251,16 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned again)
 	if (again == 0) {
 		memset(&ticket, 0, sizeof(tls13_ticket_t));
 
-		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
 		ret = generate_session_ticket(session, &ticket);
+		if (ret < 0) {
+			if (ret == GNUTLS_E_INT_RET_0) {
+				return gnutls_assert_val(0);
+			}
+
+			return gnutls_assert_val(ret);
+		}
+
+		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
