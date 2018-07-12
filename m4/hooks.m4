@@ -157,11 +157,11 @@ LIBTASN1_MINIMUM=4.9
   fi
   AM_CONDITIONAL(ALLOW_SHA1, test "$ac_allow_sha1" != "no")
 
-  ac_enable_ssl3=yes
+  ac_enable_ssl3=no
   AC_MSG_CHECKING([whether to disable the SSL 3.0 protocol])
   AC_ARG_ENABLE(ssl3-support,
-    AS_HELP_STRING([--disable-ssl3-support],
-                   [disable support for the SSL 3.0 protocol]),
+    AS_HELP_STRING([--enable-ssl3-support],
+                   [enable support for the SSL 3.0 protocol]),
     ac_enable_ssl3=$enableval)
   if test x$ac_enable_ssl3 != xno; then
    AC_MSG_RESULT(no)
@@ -170,6 +170,7 @@ LIBTASN1_MINIMUM=4.9
    ac_full=0
    AC_MSG_RESULT(yes)
   fi
+
   AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl3" != "no")
 
   ac_enable_tls13=no
@@ -200,7 +201,7 @@ LIBTASN1_MINIMUM=4.9
    ac_full=0
    AC_MSG_RESULT(yes)
   fi
-  AM_CONDITIONAL(ENABLE_SSL3, test "$ac_enable_ssl2" != "no")
+  AM_CONDITIONAL(ENABLE_SSL2, test "$ac_enable_ssl2" != "no")
 
   ac_enable_srtp=yes
   AC_MSG_CHECKING([whether to disable DTLS-SRTP extension])

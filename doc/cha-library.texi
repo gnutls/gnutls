@@ -15,7 +15,7 @@ include:
 
 @itemize
 
-@item Support for TLS 1.3, TLS 1.2, TLS 1.1, TLS 1.0 and SSL 3.0 protocols.
+@item Support for TLS 1.3, TLS 1.2, TLS 1.1, TLS 1.0 and optionally SSL 3.0 protocols.
 
 @item Support for Datagram TLS 1.0 and 1.2.
 

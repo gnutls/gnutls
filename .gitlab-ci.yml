@@ -109,13 +109,13 @@ minimal.Fedora.x86_64:
   except:
   - tags
 
-no-SSL-3.0.Fedora.x86_64:
+SSL-3.0.Fedora.x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - ./bootstrap
   - mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
+    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --enable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
@@ -138,7 +138,7 @@ TLS1.3/interop:
   script:
   - git submodule update --init --no-fetch
   - ./bootstrap
-  - dash ./configure --enable-tls13-support --disable-gcc-warnings --cache-file cache/config.cache --disable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
+  - dash ./configure --enable-tls13-support --disable-gcc-warnings --cache-file cache/config.cache --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc)
   - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
   - make -C tests/suite TESTS=testcompat-tls13-openssl.sh check

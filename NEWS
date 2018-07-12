@@ -31,6 +31,9 @@ See the end for copying conditions.
    priority strings, as they are undefined under TLS1.3 and they provide not advantage
    over other options in earlier protocols.
 
+** The SSL 3.0 protocol is disabled on compile-time by default. It can be re-enabled
+   by specifying --enable-ssl3-support on configure script.
+
 ** libgnutls: Introduced function to switch the current FIPS140-2 operational
    mode, i.e., strict vs a more lax mode which will allow certain non FIPS140-2
    operations.

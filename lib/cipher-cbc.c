@@ -84,7 +84,9 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st *params,
 	const uint8_t *tag_ptr = NULL;
 	unsigned preamble_size;
 	uint8_t tag[MAX_HASH_SIZE];
+#ifdef ENABLE_SSL3
 	unsigned blocksize = _gnutls_cipher_get_block_size(params->cipher);
+#endif
 
 	pad = data[data_size - 1];	/* pad */
 
