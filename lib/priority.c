@@ -1350,9 +1350,10 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		}
 	}
 
-	_gnutls_debug_log("added %d ciphersuites, %d sig algos and %d groups into priority list\n",
-		priority_cache->cs.size, priority_cache->sigalg.size,
-		priority_cache->groups.size);
+	_gnutls_debug_log("added %d protocols, %d ciphersuites, %d sig algos and %d groups into priority list\n",
+			  priority_cache->protocol.algorithms,
+			  priority_cache->cs.size, priority_cache->sigalg.size,
+			  priority_cache->groups.size);
 
 	if (priority_cache->sigalg.size == 0) {
 		/* no signature algorithms; eliminate TLS 1.2 or DTLS 1.2 and later */
@@ -1369,16 +1370,20 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			}
 		}
 		memcpy(&priority_cache->protocol, &newp, sizeof(newp));
-
-		if (priority_cache->protocol.algorithms == 0)
-			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 	}
 
-	if (priority_cache->cs.size == 0)
+	if (unlikely(priority_cache->protocol.algorithms == 0))
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+#ifndef ENABLE_SSL3
+	else if (unlikely(priority_cache->protocol.algorithms == 1 && priority_cache->protocol.priority[0] == GNUTLS_SSL3))
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+#endif
+
+	if (unlikely(priority_cache->cs.size == 0))
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	/* when TLS 1.3 is available we must have groups set */
-	if (!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0)
+	if (unlikely(!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0))
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	return 0;

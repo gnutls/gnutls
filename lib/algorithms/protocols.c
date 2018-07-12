@@ -33,7 +33,9 @@ static const version_entry_st sup_versions[] = {
 	 .major = 3,
 	 .minor = 0,
 	 .transport = GNUTLS_STREAM,
+#ifdef ENABLE_SSL3
 	 .supported = 1,
+#endif
 	 .explicit_iv = 0,
 	 .extensions = 0,
 	 .selectable_sighash = 0,
