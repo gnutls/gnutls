@@ -83,9 +83,11 @@ typedef struct {
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
+#ifdef ENABLE_SSL3
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
 	/* The following tests will disable TLS 1.x if the server is
 	 * buggy */
+#endif
 	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
 	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.1", test_tls_disable1, "no",

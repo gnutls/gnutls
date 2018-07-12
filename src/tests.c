@@ -121,14 +121,16 @@ char prio_str[512] = "";
 #define INIT_STR "NONE:"
 char rest[128] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+GROUP-ALL";
 
+#define _gnutls_priority_set_direct(s, str) __gnutls_priority_set_direct(s, str, __LINE__)
+
 static inline void
-_gnutls_priority_set_direct(gnutls_session_t session, const char *str)
+__gnutls_priority_set_direct(gnutls_session_t session, const char *str, int line)
 {
 	const char *err;
 	int ret = gnutls_priority_set_direct(session, str, &err);
 
 	if (ret < 0) {
-		fprintf(stderr, "Error with string %s\n", str);
+		fprintf(stderr, "Error at %d with string %s\n", line, str);
 		fprintf(stderr, "Error at %s: %s\n", err,
 			gnutls_strerror(ret));
 		exit(1);
@@ -303,8 +305,10 @@ test_code_t test_rfc7507(gnutls_session_t session)
 		pstr = "-VERS-TLS-ALL:+VERS-TLS1.1:%FALLBACK_SCSV";
 	else if (tls1_1_ok && tls1_ok)
 		pstr = "-VERS-TLS-ALL:+VERS-TLS1.0:%FALLBACK_SCSV";
+#ifdef ENABLE_SSL3
 	else if (tls1_ok && ssl3_ok)
 		pstr = "-VERS-TLS-ALL:+VERS-SSL3.0:%FALLBACK_SCSV";
+#endif
 	else
 		return TEST_IGNORE;
 
@@ -436,7 +440,7 @@ test_code_t test_safe_renegotiation_scsv(gnutls_session_t session)
 		return TEST_IGNORE;
 
 	sprintf(prio_str, INIT_STR
-		ALL_CIPHERS ":" ALL_COMP ":+VERS-SSL3.0:"
+		ALL_CIPHERS ":" ALL_COMP ":+VERS-TLS1.0:"
 		ALL_MACS ":" ALL_KX ":%%SAFE_RENEGOTIATION");
 	_gnutls_priority_set_direct(session, prio_str);
 
