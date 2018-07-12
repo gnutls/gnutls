@@ -614,7 +614,7 @@ test_code_t test_aes(gnutls_session_t session)
 	int ret;
 
 	sprintf(prio_str, INIT_STR
-		"+AES-128-CBC:" ALL_COMP ":%s:" ALL_MACS
+		"+AES-128-CBC:+AES-256-CBC:" ALL_COMP ":%s:" ALL_MACS
 		":" ALL_KX ":%s", protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
@@ -680,7 +680,7 @@ test_code_t test_camellia_cbc(gnutls_session_t session)
 		return TEST_IGNORE;
 
 	sprintf(prio_str,
-		INIT_STR "+CAMELLIA-128-CBC:" ALL_COMP
+		INIT_STR "+CAMELLIA-128-CBC:+CAMELLIA-256-CBC:" ALL_COMP
 		":%s:" ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
@@ -699,7 +699,7 @@ test_code_t test_camellia_gcm(gnutls_session_t session)
 		return TEST_IGNORE;
 
 	sprintf(prio_str,
-		INIT_STR "+CAMELLIA-128-GCM:" ALL_COMP
+		INIT_STR "+CAMELLIA-128-GCM:+CAMELLIA-256-GCM:" ALL_COMP
 		":%s:" ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
