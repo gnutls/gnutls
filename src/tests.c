@@ -56,6 +56,7 @@ int tls1_ok = 0;
 int ssl3_ok = 0;
 int tls1_1_ok = 0;
 int tls1_2_ok = 0;
+int tls1_3_ok = 0;
 
 /* keep session info */
 static char *session_data = NULL;
@@ -920,7 +921,17 @@ test_code_t test_record_padding(gnutls_session_t session)
 	if (ret == TEST_SUCCEED) {
 		tls1_ok = 1;
 	} else {
-		strcat(rest, ":%COMPAT");
+		sprintf(prio_str,
+			INIT_STR BLOCK_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
+			":+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:-VERS-SSL3.0:" ALL_MACS ":" ALL_KX ":%%COMPAT:%s", rest);
+		_gnutls_priority_set_direct(session, prio_str);
+
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+		ret = do_handshake(session);
+		if (ret == TEST_SUCCEED) {
+			tls1_ok = 1;
+			strcat(rest, ":%COMPAT");
+		}
 	}
 
 	return ret;
@@ -941,8 +952,17 @@ test_code_t test_no_extensions(gnutls_session_t session)
 	if (ret == TEST_SUCCEED) {
 		tls_ext_ok = 1;
 	} else {
-		tls_ext_ok = 0;
-		strcat(rest, ":%NO_EXTENSIONS");
+		sprintf(prio_str,
+			INIT_STR BLOCK_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
+			":+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:-VERS-SSL3.0:" ALL_MACS ":" ALL_KX ":%%NO_EXTENSIONS:%s", rest);
+		_gnutls_priority_set_direct(session, prio_str);
+
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+		ret = do_handshake(session);
+		if (ret == TEST_SUCCEED) {
+			tls_ext_ok = 0;
+			strcat(rest, ":%NO_EXTENSIONS");
+		}
 	}
 
 	return ret;
@@ -962,6 +982,25 @@ test_code_t test_tls1_2(gnutls_session_t session)
 	ret = do_handshake(session);
 	if (ret == TEST_SUCCEED)
 		tls1_2_ok = 1;
+
+	return ret;
+
+}
+
+test_code_t test_tls1_3(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
+		":+VERS-TLS1.3:" ALL_MACS ":" ALL_KX ":%s", rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+	if (ret == TEST_SUCCEED)
+		tls1_3_ok = 1;
 
 	return ret;
 

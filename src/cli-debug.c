@@ -62,6 +62,7 @@ unsigned int verbose = 0;
 extern int tls1_ok;
 extern int tls1_1_ok;
 extern int tls1_2_ok;
+extern int tls1_3_ok;
 extern int ssl3_ok;
 extern const char *ext_text;
 
@@ -102,7 +103,8 @@ static const TLS_TEST tls_tests[] = {
 	 "failed",
 	 "SSL 3.0"},
 	{"for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno"},
-	{"fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
+	{"for TLS 1.3 (draft-ietf-tls-tls13-28) support", test_tls1_3, "yes", "no", "dunno"},
+	{"TLS1.2 neg fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
 	 "failed (server requires fallback dance)", "dunno"},
 	{"for inappropriate fallback (RFC7507) support", test_rfc7507, "yes", "no", "dunno"},
 	{"for HTTPS server name", test_server, NULL, "failed", "not checked", 1},
@@ -153,7 +155,7 @@ static const TLS_TEST tls_tests[] = {
 	{"for curve SECP256r1 (RFC4492)", test_ecdhe_secp256r1, "yes", "no", "dunno"},
 	{"for curve SECP384r1 (RFC4492)", test_ecdhe_secp384r1, "yes", "no", "dunno"},
 	{"for curve SECP521r1 (RFC4492)", test_ecdhe_secp521r1, "yes", "no", "dunno"},
-	{"for curve X25519 (draft-ietf-tls-rfc4492bis-07)", test_ecdhe_x25519, "yes", "no", "dunno"},
+	{"for curve X25519 (draft-ietf-tls-rfc4492bis-17)", test_ecdhe_x25519, "yes", "no", "dunno"},
 	{"for AES-128-GCM cipher (RFC5288) support", test_aes_gcm, "yes", "no",
 	 "dunno"},
 	{"for AES-128-CCM cipher (RFC6655) support", test_aes_ccm, "yes", "no",
@@ -281,10 +283,10 @@ int main(int argc, char **argv)
 
 		/* if neither of SSL3 and TLSv1 are supported, exit
 		 */
-		if (i > 10 && tls1_2_ok == 0 && tls1_1_ok == 0 && tls1_ok == 0
-		    && ssl3_ok == 0) {
+		if (i > 11 && tls1_2_ok == 0 && tls1_1_ok == 0 && tls1_ok == 0
+		    && ssl3_ok == 0 && tls1_3_ok == 0) {
 			fprintf(stderr,
-				"\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1 and TLS 1.2\n");
+				"\nServer does not support any of SSL 3.0, TLS 1.0, 1.1, 1.2 and 1.3\n");
 			break;
 		}
 

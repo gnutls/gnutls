@@ -49,6 +49,7 @@ test_code_t test_etm(gnutls_session_t state);
 test_code_t test_safe_renegotiation_scsv(gnutls_session_t state);
 test_code_t test_tls1_1(gnutls_session_t state);
 test_code_t test_tls1_2(gnutls_session_t state);
+test_code_t test_tls1_3(gnutls_session_t state);
 test_code_t test_tls1_1_fallback(gnutls_session_t state);
 test_code_t test_tls1_6_fallback(gnutls_session_t state);
 test_code_t test_tls_disable0(gnutls_session_t state);
