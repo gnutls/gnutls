@@ -227,12 +227,13 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
 	return 0;
 }
 
-int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned again)
+int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr, unsigned again)
 {
 	int ret = 0;
 	mbuffer_st *bufel = NULL;
 	gnutls_buffer_st buf;
 	tls13_ticket_t ticket;
+	unsigned i;
 
 	/* Client does not send a NewSessionTicket */
 	if (unlikely(session->security_parameters.entity == GNUTLS_CLIENT))
@@ -249,70 +250,79 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned again)
 		return gnutls_assert_val(0);
 
 	if (again == 0) {
-		memset(&ticket, 0, sizeof(tls13_ticket_t));
+		for (i=0;i<nr;i++) {
+			memset(&ticket, 0, sizeof(tls13_ticket_t));
+			bufel = NULL;
 
-		ret = generate_session_ticket(session, &ticket);
-		if (ret < 0) {
-			if (ret == GNUTLS_E_INT_RET_0) {
-				return gnutls_assert_val(0);
+			ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			ret = generate_session_ticket(session, &ticket);
+			if (ret < 0) {
+				if (ret == GNUTLS_E_INT_RET_0) {
+					ret = gnutls_assert_val(0);
+					goto cleanup;
+				}
+				gnutls_assert();
+				goto cleanup;
 			}
 
-			return gnutls_assert_val(ret);
+			ret = _gnutls_buffer_append_prefix(&buf, 32, ticket.lifetime);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			ret = _gnutls_buffer_append_prefix(&buf, 32, ticket.age_add);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			/* append ticket_nonce */
+			ret = _gnutls_buffer_append_data_prefix(&buf, 8, ticket.nonce, ticket.nonce_size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			/* append ticket */
+			ret = _gnutls_buffer_append_data_prefix(&buf, 16, ticket.ticket.data, ticket.ticket.size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			ret = _gnutls_buffer_append_prefix(&buf, 16, 0);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			_gnutls_free_datum(&ticket.ticket);
+
+			bufel = _gnutls_buffer_to_mbuffer(&buf);
+
+			ret = _gnutls_send_handshake2(session, bufel,
+						      GNUTLS_HANDSHAKE_NEW_SESSION_TICKET, 1);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			session->internals.hsk_flags |= HSK_TLS13_TICKET_SENT;
 		}
-
-		ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = _gnutls_buffer_append_prefix(&buf, 32, ticket.lifetime);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = _gnutls_buffer_append_prefix(&buf, 32, ticket.age_add);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		/* append ticket_nonce */
-		ret = _gnutls_buffer_append_data_prefix(&buf, 8, ticket.nonce, ticket.nonce_size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		/* append ticket */
-		ret = _gnutls_buffer_append_data_prefix(&buf, 16, ticket.ticket.data, ticket.ticket.size);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = _gnutls_buffer_append_prefix(&buf, 16, 0);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		_gnutls_free_datum(&ticket.ticket);
-
-		bufel = _gnutls_buffer_to_mbuffer(&buf);
 	}
 
-	ret = _gnutls_send_handshake(session, bufel,
-				     GNUTLS_HANDSHAKE_NEW_SESSION_TICKET);
-	if (ret > 0)
-		session->internals.hsk_flags |= HSK_TLS13_TICKET_SENT;
+	ret = _gnutls_handshake_io_write_flush(session);
 
 	return ret;
 
 cleanup:
 	_gnutls_free_datum(&ticket.ticket);
 	_mbuffer_xfree(&bufel);
+	_gnutls_buffer_clear(&buf);
 
 	return ret;
 }

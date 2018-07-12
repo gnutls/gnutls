@@ -390,7 +390,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		/* fall through */
 	case STATE112:
 
-		ret = _gnutls13_send_session_ticket(session, AGAIN(STATE112));
+		ret = _gnutls13_send_session_ticket(session, 1, AGAIN(STATE112));
 		STATE = STATE112;
 		IMED_RET("send session ticket", ret, 0);
 
@@ -412,93 +412,136 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 
 /* Processes handshake messages received asynchronously after initial handshake.
  *
- * It is called once per message, with a read-only buffer in @buf,
- * and should return success, or a fatal error code.
+ * It is called once per message and should return success, or a fatal error code.
  */
 int
-_gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
+_gnutls13_recv_async_handshake(gnutls_session_t session)
 {
-	uint8_t type;
 	int ret;
-	size_t handshake_header_size = HANDSHAKE_HEADER_SIZE(session);
-	size_t length;
-
-	if (buf->length < handshake_header_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+	handshake_buffer_st hsk;
 
 	/* The following messages are expected asynchronously after
 	 * the handshake process is complete */
 	if (unlikely(session->internals.handshake_in_progress))
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 
-	ret = _gnutls_buffer_pop_prefix8(buf, &type, 0);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = _gnutls_buffer_pop_prefix24(buf, &length, 1);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = _gnutls_call_hook_func(session, type, GNUTLS_HOOK_PRE, 1, buf->data, buf->length);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	switch(type) {
-		case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
-			if (!(session->security_parameters.entity == GNUTLS_CLIENT) ||
-			    !(session->internals.flags & GNUTLS_POST_HANDSHAKE_AUTH)) {
-				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
-			}
-
-			_gnutls_buffer_reset(&session->internals.reauth_buffer);
-
-			/* include the handshake headers in reauth buffer */
-			ret = _gnutls_buffer_append_data(&session->internals.reauth_buffer,
-							 buf->data-4, buf->length+4);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-
-			/* Application is expected to handle re-authentication
-			 * explicitly.  */
-			return GNUTLS_E_REAUTH_REQUEST;
-
-		case GNUTLS_HANDSHAKE_KEY_UPDATE:
-			ret = _gnutls13_recv_key_update(session, buf);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-			break;
-		case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
-			if (session->security_parameters.entity != GNUTLS_CLIENT)
-				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
-
-			ret = _gnutls13_recv_session_ticket(session, buf);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-
-			memcpy(session->internals.tls13_ticket.resumption_master_secret,
-			       session->key.proto.tls13.ap_rms,
-			       session->key.proto.tls13.temp_secret_size);
-
-			session->internals.tls13_ticket.prf = session->security_parameters.prf;
-			session->internals.hsk_flags |= HSK_TICKET_RECEIVED;
-			break;
-		default:
+	do {
+		/* the received handshake message has already been pushed into
+		 * handshake buffers. As we do not need to use the handshake hash
+		 * buffers we call the lower level receive functions */
+		ret = _gnutls_handshake_io_recv_int(session, GNUTLS_HANDSHAKE_ANY, &hsk, 0);
+		if (ret < 0) {
 			gnutls_assert();
-			return GNUTLS_E_UNEXPECTED_PACKET;
-	}
+			goto cleanup;
+		}
+		session->internals.last_handshake_in = hsk.htype;
 
-	ret = _gnutls_call_hook_func(session, type, GNUTLS_HOOK_POST, 1, buf->data, buf->length);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+		ret = _gnutls_call_hook_func(session, hsk.htype, GNUTLS_HOOK_PRE, 1,
+					     hsk.data.data, hsk.data.length);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		switch(hsk.htype) {
+			case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
+				if (!(session->security_parameters.entity == GNUTLS_CLIENT) ||
+				    !(session->internals.flags & GNUTLS_POST_HANDSHAKE_AUTH)) {
+					ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+					goto cleanup;
+				}
+
+				_gnutls_buffer_reset(&session->internals.reauth_buffer);
+
+				/* include the handshake headers in reauth buffer */
+				ret = _gnutls_buffer_append_data(&session->internals.reauth_buffer,
+								 hsk.header, hsk.header_size);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+
+				ret = _gnutls_buffer_append_data(&session->internals.reauth_buffer,
+								 hsk.data.data, hsk.data.length);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+
+				/* Application is expected to handle re-authentication
+				 * explicitly.  */
+				ret = GNUTLS_E_REAUTH_REQUEST;
+				goto cleanup;
+
+			case GNUTLS_HANDSHAKE_KEY_UPDATE:
+				ret = _gnutls13_recv_key_update(session, &hsk.data);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+
+				/* Handshake messages MUST NOT span key changes, i.e., we
+				 * should not have any other pending handshake messages from
+				 * the same record. */
+				if (session->internals.handshake_recv_buffer_size != 0) {
+					ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+					goto cleanup;
+				}
+				break;
+			case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
+				if (session->security_parameters.entity != GNUTLS_CLIENT) {
+					ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+					goto cleanup;
+				}
+
+				ret = _gnutls13_recv_session_ticket(session, &hsk.data);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+
+				memcpy(session->internals.tls13_ticket.resumption_master_secret,
+				       session->key.proto.tls13.ap_rms,
+				       session->key.proto.tls13.temp_secret_size);
+
+				session->internals.tls13_ticket.prf = session->security_parameters.prf;
+				session->internals.hsk_flags |= HSK_TICKET_RECEIVED;
+				break;
+			default:
+				gnutls_assert();
+				ret = GNUTLS_E_UNEXPECTED_PACKET;
+				goto cleanup;
+		}
+
+		ret = _gnutls_call_hook_func(session, hsk.htype, GNUTLS_HOOK_POST, 1, hsk.data.data, hsk.data.length);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		_gnutls_handshake_buffer_clear(&hsk);
+
+	} while (_gnutls_record_buffer_get_size(session) > 0);
+
+	session->internals.recv_state = RECV_STATE_0;
 
 	return 0;
+
+ cleanup:
+	/* if we have pending/partial handshake data in buffers, ensure that
+	 * next read will read handshake data */
+	if (_gnutls_record_buffer_get_size(session) > 0)
+		session->internals.recv_state = RECV_STATE_ASYNC_HANDSHAKE;
+	else
+		session->internals.recv_state = RECV_STATE_0;
+
+	_gnutls_handshake_buffer_clear(&hsk);
+	return ret;
 }
 
 /**
  * gnutls_session_ticket_send:
  * @session: is a #gnutls_session_t type.
+ * @nr: the number of tickets to send
  * @flags: must be zero
  *
  * Sends a fresh session ticket to the peer. This is relevant only
@@ -507,12 +550,15 @@ _gnutls13_recv_async_handshake(gnutls_session_t session, gnutls_buffer_st *buf)
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or a negative error code.
  **/
-int gnutls_session_ticket_send(gnutls_session_t session, unsigned flags)
+int gnutls_session_ticket_send(gnutls_session_t session, unsigned nr, unsigned flags)
 {
 	int ret = 0;
 	const version_entry_st *vers = get_version(session);
 
 	if (!vers->tls13_sem || session->security_parameters.entity == GNUTLS_CLIENT)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (nr == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	switch (TICKET_STATE) {
@@ -526,7 +572,7 @@ int gnutls_session_ticket_send(gnutls_session_t session, unsigned flags)
 		/* fall through */
 	case TICKET_STATE1:
 		ret =
-		    _gnutls13_send_session_ticket(session, TICKET_STATE==TICKET_STATE1?1:0);
+		    _gnutls13_send_session_ticket(session, nr, TICKET_STATE==TICKET_STATE1?1:0);
 		TICKET_STATE = TICKET_STATE1;
 		if (ret < 0) {
 			gnutls_assert();

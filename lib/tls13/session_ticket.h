@@ -23,7 +23,7 @@
 #define SESSION_TICKET_H
 
 int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *buf);
-int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned again);
+int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr, unsigned again);
 
 int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 				    gnutls_datum_t *data,
