@@ -61,14 +61,12 @@ test_code_t test_max_record_size(gnutls_session_t state);
 test_code_t test_version_rollback(gnutls_session_t state);
 test_code_t test_anonymous(gnutls_session_t state);
 test_code_t test_unknown_ciphersuites(gnutls_session_t state);
-test_code_t test_openpgp1(gnutls_session_t state);
 test_code_t test_bye(gnutls_session_t state);
 test_code_t test_certificate(gnutls_session_t state);
 test_code_t test_server_cas(gnutls_session_t state);
 test_code_t test_session_resume2(gnutls_session_t state);
 test_code_t test_rsa_pms_version_check(gnutls_session_t session);
 test_code_t test_version_oob(gnutls_session_t session);
-test_code_t test_zlib(gnutls_session_t session);
 int _test_srp_username_callback(gnutls_session_t session,
 				char **username, char **password);
 
