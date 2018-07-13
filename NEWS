@@ -81,7 +81,6 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_fips140_set_mode: Added
 gnutls_session_key_update: Added
-gnutls_session_ticket_send: Added
 gnutls_ext_get_current_msg: Added
 gnutls_reauth: Added
 gnutls_ocsp_status_request_get2: Added
@@ -94,8 +93,26 @@ gnutls_certificate_set_ocsp_status_request_mem: Added
 gnutls_certificate_get_ocsp_expiration: Added
 gnutls_record_send2: Added
 gnutls_ext_raw_parse: Added
-gnutls_pcert_list_import_x509_file: Added
 gnutls_x509_crt_list_import_url: Added
+gnutls_pcert_list_import_x509_file: Added
+gnutls_pkcs11_token_get_ptr: Added
+gnutls_pkcs11_obj_get_ptr: Added
+gnutls_session_ticket_send: Added
+gnutls_aead_cipher_encryptv: Added
+gnutls_gost_paramset_get_name: Added
+gnutls_gost_paramset_get_oid: Added
+gnutls_oid_to_gost_paramset: Added
+gnutls_decode_gost_rs_value: Added
+gnutls_encode_gost_rs_value: Added
+gnutls_pubkey_export_gost_raw2: Added
+gnutls_pubkey_import_gost_raw: Added
+gnutls_x509_crt_get_pk_gost_raw: Added
+gnutls_privkey_export_gost_raw2: Added
+gnutls_privkey_import_gost_raw: Added
+gnutls_x509_privkey_export_gost_raw: Added
+gnutls_x509_privkey_import_gost_raw: Added
+gnutls_set_default_priority_append: Added
+gnutls_priority_init2: Added
 GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS: Added
 GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE: Added
 
