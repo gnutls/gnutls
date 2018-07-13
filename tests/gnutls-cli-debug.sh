@@ -80,8 +80,15 @@ declare -a arr=("whether we need to disable TLS 1.2... no" "for TLS 1.0 (RFC2246
 		"TLS1.2 neg fallback from TLS 1.6 to... TLS1.2" "for safe renegotiation (RFC5746) support... yes"
 		"for encrypt-then-MAC (RFC7366) support... yes" "for ext master secret (RFC7627) support... yes"
 		"for RFC7919 Diffie-Hellman support... yes" "for curve SECP256r1 (RFC4492)... yes"
-		"for AES-GCM cipher (RFC5288) support... yes" "for CHACHA20-POLY1305 cipher (RFC7905) support... yes"
-		"for SHA1 MAC support... yes" "for MD5 MAC support... no" "for ARCFOUR 128 cipher (RFC2246) support... no")
+		"for AES-GCM cipher (RFC5288) support... yes"
+		"for SHA1 MAC support... yes")
+
+if test "${GNUTLS_FORCE_FIPS_MODE}" != 1;then
+#these tests are not run in FIPS mode
+arr+=("for MD5 MAC support... no")
+arr+=("for ARCFOUR 128 cipher (RFC2246) support... no")
+arr+=("for CHACHA20-POLY1305 cipher (RFC7905) support... yes")
+fi
 
 for txt in "${arr[@]}"
 do
@@ -117,8 +124,15 @@ declare -a arr=("whether we need to disable TLS 1.2... no" "for TLS 1.0 (RFC2246
 		"TLS1.2 neg fallback from TLS 1.6 to... TLS1.2" "for safe renegotiation (RFC5746) support... yes"
 		"for encrypt-then-MAC (RFC7366) support... yes" "for ext master secret (RFC7627) support... yes"
 		"for RFC7919 Diffie-Hellman support... yes" "for curve SECP256r1 (RFC4492)... yes"
-		"for AES-GCM cipher (RFC5288) support... yes" "for CHACHA20-POLY1305 cipher (RFC7905) support... yes"
-		"for SHA1 MAC support... yes" "for MD5 MAC support... no" "for ARCFOUR 128 cipher (RFC2246) support... no")
+		"for AES-GCM cipher (RFC5288) support... yes"
+		"for SHA1 MAC support... yes")
+
+if test "${GNUTLS_FORCE_FIPS_MODE}" != 1;then
+#these tests are not run in FIPS mode
+arr+=("for MD5 MAC support... no")
+arr+=("for ARCFOUR 128 cipher (RFC2246) support... no")
+arr+=("for CHACHA20-POLY1305 cipher (RFC7905) support... yes")
+fi
 
 for txt in "${arr[@]}"
 do
