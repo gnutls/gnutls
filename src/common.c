@@ -614,7 +614,10 @@ void print_list(const char *priorities, int verbose)
 
 		ret = gnutls_priority_init(&pcache, priorities, &err);
 		if (ret < 0) {
-			fprintf(stderr, "Syntax error at: %s\n", err);
+			if (ret == GNUTLS_E_INVALID_REQUEST)
+				fprintf(stderr, "Syntax error at: %s\n", err);
+			else
+				fprintf(stderr, "Error in priorities: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 
