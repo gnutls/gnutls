@@ -34,11 +34,9 @@
 #include <rnd-common.h>
 
 /* This provides a random generator for gnutls. It uses
- * three instances of the DRBG-AES-CTR generator, one for
- * each level of randomness. It uses /dev/urandom for their
- * seeding.
+ * two instances of the DRBG-AES-CTR generator, one for
+ * nonce level and another for the other levels of randomness.
  */
-
 struct fips_ctx {
 	struct drbg_aes_ctx nonce_context;
 	struct drbg_aes_ctx normal_context;
