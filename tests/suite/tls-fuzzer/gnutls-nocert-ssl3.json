@@ -1,0 +1,28 @@
+[
+    {"server_command": ["@SERVER@", "--http",
+                 "--x509keyfile", "tests/serverX509Key.pem",
+                 "--x509certfile", "tests/serverX509Cert.pem",
+                 "--x509keyfile", "../../../certs/ecc256.pem",
+                 "--x509certfile", "../../../certs/cert-ecc256.pem",
+                 "--debug=3",
+                 "--noticket",
+                 "--priority=@PRIORITY@",
+                 "--disable-client-cert", "--port=@PORT@"],
+     "server_hostname": "localhost",
+     "server_port": @PORT@,
+     "tests" : [
+         {"name" : "test-SSLv3-padding.py",
+                   "comment" : "we accept zero filled padding in SSLv3",
+                   "exp_pass" : false,
+	  "arguments": ["-p", "@PORT@"]
+         },
+         {"name" : "test-export-ciphers-rejected.py",
+          "comment" : "we negotiate AES even in SSL3.0",
+          "arguments" : ["--ssl3", "-p", "@PORT@"] },
+         {"name" : "test-client-compatibility.py",
+          "arguments" : ["-p", "@PORT@", "18: IE 6 on XP",
+                         "52: YandexBot 3.0 on unknown",
+                         "100: IE 6 on XP"]}
+     ]
+    }
+]

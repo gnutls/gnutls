@@ -107,6 +107,7 @@ TESTS_ENVIRONMENT += ENABLE_NON_SUITEB_CURVES=1
 endif
 
 if ENABLE_SSL3
+scripts_to_test += tls-fuzzer/tls-fuzzer-nocert-ssl3.sh
 TESTS_ENVIRONMENT += ENABLE_SSL3=1
 endif
 
