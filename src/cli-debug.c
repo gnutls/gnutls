@@ -190,7 +190,7 @@ const char *ip;
 gnutls_session_t init_tls_session(const char *host)
 {
 	gnutls_session_t state = NULL;
-	gnutls_init(&state, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
+	gnutls_init(&state, GNUTLS_CLIENT);
 
 	set_read_funcs(state);
 	if (host && is_ip(host) == 0)

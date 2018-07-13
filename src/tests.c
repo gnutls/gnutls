@@ -87,7 +87,6 @@ static int do_handshake(gnutls_session_t session)
 
 	if (ret < 0)
 		return TEST_FAILED;
-
 	gnutls_session_get_data(session, NULL, &session_data_size);
 
 	if (sfree != 0) {
@@ -412,7 +411,7 @@ test_code_t test_etm(gnutls_session_t session)
 		return TEST_IGNORE;
 
 	sprintf(prio_str, INIT_STR
-		ALL_CIPHERS ":" ALL_COMP ":%s:" ALL_MACS
+		"+AES-128-CBC:+AES-256-CBC:" ALL_COMP ":%s:" ALL_MACS
 		":%s:" ALL_KX, rest, protocol_str);
 	_gnutls_priority_set_direct(session, prio_str);
 
