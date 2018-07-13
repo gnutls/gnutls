@@ -140,7 +140,8 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  *
  * Get the status of the extended master secret extension negotiation.
- * This is in accordance to draft-ietf-tls-session-hash-01
+ * This is in accordance to RFC7627. That information is also
+ * available to the more generic gnutls_session_get_flags().
  *
  * Returns: Non-zero if the negotiation was successful or zero otherwise.
  **/
