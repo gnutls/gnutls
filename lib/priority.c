@@ -1039,6 +1039,8 @@ void _gnutls_unload_system_priorities(void)
 	system_priority_last_mod = 0;
 }
 
+#define S(str) ((str!=NULL)?str:"")
+
 /* Returns the new priorities if a priority string prefixed
  * with '@' is provided, or just a copy of the provided
  * priorities, appended with any additional present in
@@ -1112,7 +1114,7 @@ size_t n, n2 = 0, line_size;
 			} while (l>0);
 
 			_gnutls_debug_log("resolved '%.*s' to '%s', next '%.*s'\n",
-					  ss_len, ss, p ? : "", ss_next_len, ss_next ? : "");
+					  ss_len, ss, S(p), ss_next_len, S(ss_next));
 			ss = ss_next;
 			fclose(fp);
 			fp = NULL;
