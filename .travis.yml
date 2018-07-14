@@ -17,7 +17,9 @@ notifications:
 before_install:
   - git submodule update --init
   - if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then
-        brew install autoconf automake autogen libtool nettle valgrind p11-kit libtasn1 gettext || true;
+        brew update;
+        brew install autoconf automake autogen libtool nettle valgrind p11-kit libtasn1 gettext;
+        brew upgrade nettle p11-kit libtasn1 gettext;
     fi
 
 script:
