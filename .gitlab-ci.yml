@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver5"
+  key: "$CI_JOB_NAME-ver6"
   paths:
     - cache/
 
@@ -435,7 +435,7 @@ ubsan-Werror.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - ./bootstrap
-  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
+  - CFLAGS="-std=c99 -fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
      --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-full-test-suite --disable-doc
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g -Wimplicit-fallthrough=2"
@@ -444,7 +444,7 @@ ubsan-Werror.Fedora.x86_64:
   - make -j$(nproc) -C src CFLAGS="-Werror -O2 -g -fsanitize=undefined -Wno-error=parentheses -Wno-error=unused-macros -Wimplicit-fallthrough=2 -Wno-duplicated-branches"
   - make -j$(nproc)
   - make check -j$(nproc)
-  - CFLAGS="-fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
+  - CFLAGS="-std=c99 -fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
    --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc --disable-full-test-suite --with-default-trust-store-pkcs11="pkcs11:"
   - make clean
   - make -j$(nproc)
