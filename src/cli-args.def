@@ -284,6 +284,7 @@ flag = {
     name      = ranges;
     descrip   = "Use length-hiding padding to prevent traffic analysis";
     doc      = "When possible (e.g., when using CBC ciphersuites), use length-hiding padding to prevent traffic analysis.";
+    deprecated;
 };
 
 flag = {
@@ -321,7 +322,7 @@ flag = {
 flag = {
     name      = noticket;
     descrip   = "Don't allow session tickets";
-    doc      = "";
+    doc      = "Disable the request of receiving of session tickets under TLS1.2 or earlier";
 };
 
 flag = {
@@ -365,6 +366,7 @@ flag = {
     name      = disable-extensions;
     descrip   = "Disable all the TLS extensions";
     doc      = "This option disables all TLS extensions. Deprecated option. Use the priority string.";
+    deprecated;
 };
 
 flag = {
