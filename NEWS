@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.3 (unreleased)
+* Version 3.6.3 (released 2018-07-16)
 
 ** libgnutls: Introduced support for draft-ietf-tls-tls13-28. It includes version
    negotiation, post handshake authentication, length hiding, multiple OCSP support,
@@ -53,9 +53,8 @@ See the end for copying conditions.
 
 ** Improved counter-measures for TLS CBC record padding. Kenny Paterson, Eyal Ronen
    and Adi Shamir reported that the existing counter-measures had certain issues and
-   were insufficient when the attacker could access the cache and perform chosen-
-   plaintext. This affected the legacy CBC ciphersuites when the encrypt-then-MAC
-   TLS feature was not supported by the peer.
+   were insufficient when the attacker has additional access to the CPU cache and 
+   performs a chosen-plaintext attack. This affected the legacy CBC ciphersuites. [CVSS: medium]
 
 ** Introduced the %FORCE_ETM priority string option. This option prevents the negotiation
    of legacy CBC ciphersuites unless encrypt-then-mac is negotiated.
