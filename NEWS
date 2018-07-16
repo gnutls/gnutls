@@ -13,8 +13,8 @@ See the end for copying conditions.
 
 ** Improved counter-measures for TLS CBC record padding. Kenny Paterson, Eyal Ronen
    and Adi Shamir reported that the existing counter-measures had certain issues and
-   were insufficient when the attacker could access the cache and perform chosen-
-   plaintext. This affected the legacy CBC ciphersuites.
+   were insufficient when the attacker has additional access to the CPU cache and 
+   performs a chosen-plaintext attack. This affected the legacy CBC ciphersuites. [CVSS: medium]
 
 ** The ciphers utilizing HMAC-SHA384 and SHA256 have been removed from the default
    priority strings. They are not necessary for compatibility or other purpose and
