@@ -280,7 +280,6 @@ MinGW32.DLLs:
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/iconv*.dll win32-build/bin &&
     cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win32-build/bin &&
     cp lib/.libs/*.a lib/*.def lib/gnutls.pc win32-build/lib &&
     cp lib/includes/gnutls/*.h win32-build/lib/includes
@@ -318,7 +317,6 @@ MinGW64.DLLs:
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/iconv*.dll win64-build/bin &&
     cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win64-build/bin &&
     cp lib/.libs/*.a lib/*.def lib/gnutls.pc win64-build/lib &&
     cp lib/includes/gnutls/*.h win64-build/lib/includes
