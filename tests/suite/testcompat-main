@@ -49,7 +49,14 @@ SERV=openssl
 OPENSSL_CLI="$SERV"
 
 echo "Compatibility checks using "`${SERV} version`
-${SERV} version|grep -e '1\.[0-9]\..' >/dev/null 2>&1
+${SERV} version|grep -e '1\.0\..' >/dev/null 2>&1
+SV=$?
+if test ${SV} != 0; then
+	echo "OpenSSL 1.0.0 is required for ECDH and DTLS tests"
+	exit 77
+fi
+
+${SERV} version|grep -e '1\.[1-9]\..' >/dev/null 2>&1
 SV=$?
 if test ${SV} != 0; then
 	echo "OpenSSL 1.0.0 is required for ECDH and DTLS tests"
