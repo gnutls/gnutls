@@ -212,9 +212,9 @@ asan.Fedora.x86_64:
   - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make -C fuzz check -j$(nproc) GNUTLS_CPUID_OVERRIDE=0x4
   - LSAN_OPTIONS="suppressions=$(pwd)/fuzz/lsan.supp" make -C fuzz check -j$(nproc) GNUTLS_CPUID_OVERRIDE=0x8
   - CFLAGS="-fsanitize=address -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libasan"
-    dash ./configure --cache-file cache/config.cache --disable-doc --with-default-trust-store-pkcs11="pkcs11:" --disable-guile
+    dash ./configure --cache-file cache/config.cache --disable-doc --with-system-priority-file=/etc/crypto-policies/back-ends/gnutls.config --with-default-priority-string=@SYSTEM --with-default-trust-store-pkcs11="pkcs11:" --disable-guile
   - make -j$(nproc)
-  - make -C tests check -j$(nproc) TESTS="trust-store p11-kit-load.sh" SUBDIRS=.
+  - make -C tests check -j$(nproc) TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
   - shared
   except:

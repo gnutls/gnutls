@@ -40,6 +40,7 @@
 
 /* This function is used by the test suite */
 char *_gnutls_resolve_priorities(const char* priorities);
+const char *_gnutls_default_priority_string = DEFAULT_PRIORITY_STRING;
 
 static void prio_remove(priority_st * priority_list, unsigned int algo);
 static void prio_add(priority_st * priority_list, unsigned int algo);
@@ -1510,7 +1511,7 @@ gnutls_priority_init2(gnutls_priority_t * priority_cache,
 
 		_gnutls_buffer_init(&buf);
 
-		ret = _gnutls_buffer_append_str(&buf, DEFAULT_PRIORITY_STRING);
+		ret = _gnutls_buffer_append_str(&buf, _gnutls_default_priority_string);
 		if (ret < 0) {
 			_gnutls_buffer_clear(&buf);
 			return gnutls_assert_val(ret);
@@ -1531,7 +1532,7 @@ gnutls_priority_init2(gnutls_priority_t * priority_cache,
 		ret = gnutls_priority_init(priority_cache, (const char*)buf.data, &ep);
 		if (ret < 0 && ep != (const char*)buf.data && ep != NULL) {
 			ptrdiff_t diff = (ptrdiff_t)ep-(ptrdiff_t)buf.data;
-			unsigned hlen = strlen(DEFAULT_PRIORITY_STRING)+1;
+			unsigned hlen = strlen(_gnutls_default_priority_string)+1;
 
 			if (err_pos && diff > hlen) {
 				*err_pos = priorities + diff - hlen;
@@ -1578,6 +1579,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	bulk_rmadd_func *bulk_fn;
 	bulk_rmadd_func *bulk_given_fn;
 	const cipher_entry_st *centry;
+	unsigned resolved_match = 1;
 
 	if (err_pos)
 		*err_pos = priorities;
@@ -1596,14 +1598,19 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->min_record_version = 1;
 	gnutls_atomic_init(&(*priority_cache)->usage_cnt);
 
-	if (priorities == NULL)
-		priorities = DEFAULT_PRIORITY_STRING;
+	if (priorities == NULL) {
+		priorities = _gnutls_default_priority_string;
+		resolved_match = 0;
+	}
 
 	darg = _gnutls_resolve_priorities(priorities);
 	if (darg == NULL) {
 		gnutls_assert();
 		goto error;
 	}
+
+	if (strcmp(darg, priorities) != 0)
+		resolved_match = 0;
 
 	break_list(darg, broken_list, &broken_list_size);
 	/* This is our default set of protocol version, certificate types.
@@ -1805,7 +1812,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	return 0;
 
  error:
-	if (err_pos != NULL && i < broken_list_size) {
+	if (err_pos != NULL && i < broken_list_size && resolved_match) {
 		*err_pos = priorities;
 		for (j = 0; j < i; j++) {
 			(*err_pos) += strlen(broken_list[j]) + 1;

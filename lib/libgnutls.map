@@ -1294,6 +1294,7 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_mpi_release;
 
 	# Internal symbols needed by tests/:
+	_gnutls_default_priority_string;
 	_gnutls_supplemental_deinit;
 	_gnutls_record_overhead;
 	_gnutls_cipher_to_entry;

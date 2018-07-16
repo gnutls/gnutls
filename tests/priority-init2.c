@@ -35,6 +35,7 @@
 #include "cert-common.h"
 
 const char *side;
+extern const char *_gnutls_default_priority_string;
 
 static void tls_log_func(int level, const char *str)
 {
@@ -44,6 +45,7 @@ static void tls_log_func(int level, const char *str)
 struct test_st {
 	const char *name;
 	const char *add_prio;
+	const char *def_prio;
 	int exp_err;
 	int exp_etm;
 	unsigned err_pos;
@@ -69,6 +71,11 @@ static void start(struct test_st *test)
 	else
 		success("running %s\n", test->name);
 
+	if (test && test->def_prio)
+		_gnutls_default_priority_string = test->def_prio;
+	else
+		_gnutls_default_priority_string = "NORMAL";
+
 	/* General init. */
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
@@ -83,20 +90,30 @@ static void start(struct test_st *test)
 	assert(gnutls_init(&server, GNUTLS_SERVER) >= 0);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
-	if (test == NULL)
+	if (test == NULL) {
 		ret = gnutls_priority_init(&cache, NULL, NULL);
-	else
+		if (ret < 0)
+			fail("error: %s\n", gnutls_strerror(ret));
+	} else {
 		ret = gnutls_priority_init2(&cache, test->add_prio, &ep, GNUTLS_PRIORITY_INIT_DEF_APPEND);
-	if (ret < 0) {
-		if (test->exp_err == ret) {
-			if (ep-test->add_prio != test->err_pos) {
-				fprintf(stderr, "diff: %d\n", (int)(ep-test->add_prio));
-				fail("error expected error on different position[%d]: %s\n",
-					test->err_pos, test->add_prio);
+		if (ret < 0) {
+			if (test->exp_err == ret) {
+				if (strchr(_gnutls_default_priority_string, '@') != 0) {
+					if (ep != test->add_prio) {
+						fail("error expected error on start of string[%d]: %s\n",
+							test->err_pos, test->add_prio);
+					}
+				} else {
+					if (ep-test->add_prio != test->err_pos) {
+						fprintf(stderr, "diff: %d\n", (int)(ep-test->add_prio));
+						fail("error expected error on different position[%d]: %s\n",
+							test->err_pos, test->add_prio);
+					}
+				}
+				goto cleanup;
 			}
-			goto cleanup;
+			fail("error: %s\n", gnutls_strerror(ret));
 		}
-		fail("error: %s\n", gnutls_strerror(ret));
 	}
 	gnutls_priority_set(server, cache);
 
@@ -229,29 +246,41 @@ static void start(struct test_st *test)
 struct test_st tests[] = {
 	{
 		.name = "additional flag",
+		.def_prio = "NORMAL",
 		.add_prio = "%FORCE_ETM",
 		.exp_err = 0
 	},
 	{
 		.name = "additional flag typo1",
+		.def_prio = "NORMAL",
 		.add_prio = ":%FORCE_ETM",
 		.exp_err = GNUTLS_E_INVALID_REQUEST,
 		.err_pos = 0
 	},
 	{
 		.name = "additional flag typo2",
+		.def_prio = "NORMAL",
 		.add_prio = "%FORCE_ETM::%NO_TICKETS",
 		.exp_err = GNUTLS_E_INVALID_REQUEST,
 		.err_pos = 11
 	},
 	{
 		.name = "additional flag typo3",
+		.def_prio = "NORMAL",
 		.add_prio = "%FORCE_ETM:%%NO_TICKETS",
 		.exp_err = GNUTLS_E_INVALID_REQUEST,
 		.err_pos = 11
 	},
 	{
+		.name = "additional flag typo3 (with resolved def prio)",
+		.def_prio = "@HELLO",
+		.add_prio = "%FORCE_ETM:%%NO_TICKETS",
+		.exp_err = GNUTLS_E_INVALID_REQUEST,
+		.err_pos = 0
+	},
+	{
 		.name = "additional flag for version (functional)",
+		.def_prio = "NORMAL",
 		.add_prio = "-VERS-ALL:+VERS-TLS1.1",
 		.exp_etm = 1,
 		.exp_err = 0,
