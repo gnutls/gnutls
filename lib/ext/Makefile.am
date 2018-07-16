@@ -46,7 +46,8 @@ libgnutls_ext_la_SOURCES = max_record.c \
 	cookie.c cookie.h \
 	psk_ke_modes.c psk_ke_modes.h pre_shared_key.c pre_shared_key.h \
 	supported_groups.c supported_groups.h \
-	ec_point_formats.c ec_point_formats.h
+	ec_point_formats.c ec_point_formats.h \
+	early_data.c early_data.h
 
 if ENABLE_ALPN
 libgnutls_ext_la_SOURCES += alpn.c alpn.h

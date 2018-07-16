@@ -17,6 +17,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 GNUTLS_ENABLE_EARLY_START: Added
+gnutls_record_set_max_early_data_size: Added
 
 
 * Version 3.6.3 (released 2018-07-16)

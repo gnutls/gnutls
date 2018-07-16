@@ -51,6 +51,7 @@
 #include <ext/psk_ke_modes.h>
 #include <ext/etm.h>
 #include <ext/cookie.h>
+#include <ext/early_data.h>
 #include "extv.h"
 #include <num.h>
 
@@ -82,6 +83,7 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 	[GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS] = &ext_mod_sig,
 	[GNUTLS_EXTENSION_KEY_SHARE] = &ext_mod_key_share,
 	[GNUTLS_EXTENSION_COOKIE] = &ext_mod_cookie,
+	[GNUTLS_EXTENSION_EARLY_DATA] = &ext_mod_early_data,
 #ifdef ENABLE_DTLS_SRTP
 	[GNUTLS_EXTENSION_SRTP] = &ext_mod_srtp,
 #endif
