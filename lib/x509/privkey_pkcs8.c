@@ -72,8 +72,8 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 		/* we encode as octet string (which is going to be stored inside
 		 * another octet string). No comments. */
 		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
-					 pkey->params.raw_priv.data, pkey->params.raw_priv.size,
-					 raw);
+						 pkey->params.raw_priv.data, pkey->params.raw_priv.size,
+						 raw);
 		if (ret < 0)
 			gnutls_assert();
 		return ret;
@@ -108,8 +108,8 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	case GNUTLS_PK_RSA_PSS:
 	case GNUTLS_PK_ECDSA:
 		ret =
-		    gnutls_x509_privkey_export2(pkey, GNUTLS_X509_FMT_DER,
-						raw);
+		    _gnutls_x509_export_int2(pkey->key, GNUTLS_X509_FMT_DER,
+					     "", raw);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;

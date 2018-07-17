@@ -1164,6 +1164,14 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 		goto cleanup;
 	}
 
+	ret =
+	    _gnutls_asn1_encode_privkey(&key->key,
+					&key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
 	return 0;
 
       cleanup:
