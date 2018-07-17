@@ -60,6 +60,10 @@ bindtoaddress (char *addrport)
   struct addrinfo hints;
   struct addrinfo *result, *rp;
   int fd, s;
+  char addr[128];
+
+  strncpy(addr, addrport, sizeof(addr)-1);
+  addr[sizeof(addr)-1] = 0;
 
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
@@ -67,9 +71,8 @@ bindtoaddress (char *addrport)
   hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
   hints.ai_protocol = 0;	/* any protocol */
 
-  char *addr = strdupa (addrport);
   char *colon = strrchr (addr, ':');
-  char *port = defaultport;
+  const char *port = defaultport;
   if (colon)
     {
       *colon = 0;
@@ -127,6 +130,10 @@ connecttoaddress (char *addrport)
   struct addrinfo hints;
   struct addrinfo *result, *rp;
   int fd, s;
+  char addr[128];
+
+  strncpy(addr, addrport, sizeof(addr)-1);
+  addr[sizeof(addr)-1] = 0;
 
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
@@ -134,9 +141,8 @@ connecttoaddress (char *addrport)
   hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
   hints.ai_protocol = 0;	/* any protocol */
 
-  char *addr = strdupa (addrport);
   char *colon = strrchr (addr, ':');
-  char *port = defaultport;
+  const char *port = defaultport;
   if (colon)
     {
       *colon = 0;
@@ -223,7 +229,7 @@ runproxy (int acceptfd)
 }
 
 static int
-runlistener ()
+runlistener (void)
 {
   int listenfd;
   if ((listenfd = bindtoaddress (listenaddr)) < 0)
@@ -277,7 +283,7 @@ runlistener ()
 }
 
 static void
-usage ()
+usage (void)
 {
   fprintf (stderr, "tlsproxy\n\n\
 Usage:\n\
@@ -324,10 +330,10 @@ processoptions (int argc, char **argv)
 	{0, 0, 0, 0}
       };
 
-      int optind = 0;
+      int optidx = 0;
 
       int c =
-	getopt_long (argc, argv, "c:l:K:C:A:H:sindh", longopts, &optind);
+	getopt_long (argc, argv, "c:l:K:C:A:H:sindh", longopts, &optidx);
       if (c == -1)
 	break;
 
@@ -412,7 +418,7 @@ handlesignal (int sig)
 }
 
 static void
-setsignalmasks ()
+setsignalmasks (void)
 {
   struct sigaction sa;
   /* Set up the structure to specify the new action. */
