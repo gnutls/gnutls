@@ -62,8 +62,7 @@ bindtoaddress (char *addrport)
   int fd, s;
   char addr[128];
 
-  strncpy(addr, addrport, sizeof(addr)-1);
-  addr[sizeof(addr)-1] = 0;
+  snprintf(addr, sizeof(addr), "%s", addrport);
 
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
@@ -132,8 +131,7 @@ connecttoaddress (char *addrport)
   int fd, s;
   char addr[128];
 
-  strncpy(addr, addrport, sizeof(addr)-1);
-  addr[sizeof(addr)-1] = 0;
+  snprintf(addr, sizeof(addr), "%s", addrport);
 
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_flags = AI_PASSIVE;	/* For wildcard IP address */
