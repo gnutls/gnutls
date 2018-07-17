@@ -230,28 +230,27 @@ The @acronym{GnuTLS} library is thread safe by design, meaning that
 objects of the library such as TLS sessions, can be safely divided across
 threads as long as a single thread accesses a single object. This is
 sufficient to support a server which handles several sessions per thread.
-If, however, an object needs to be shared across threads then access must be 
-protected with a mutex. Read-only access to objects, for example the
-credentials holding structures, is also thread-safe. 
+Read-only access to objects, for example the credentials holding structures,
+is also thread-safe. 
 
-A @code{gnutls_session_t} object can be shared by two threads, one sending,
-the other receiving. In that case rehandshakes, if required,
-must only be handled by a single thread being active. The termination of a session 
+A @code{gnutls_session_t} object could also be shared by two threads, one sending,
+the other receiving. In that case however, care must be taken during key
+updates and re-handshakes to be handled only by a single thread. The termination of a session 
 should be handled, either by a single thread being active, or by the sender thread 
 using @funcref{gnutls_bye} with @code{GNUTLS_SHUT_WR} and the receiving thread 
 waiting for a return value of zero.
 
-The random generator of the cryptographic back-end, utilizes mutex locks (e.g., pthreads on GNU/Linux and CriticalSection on Windows)
-which are setup by @acronym{GnuTLS} on library initialization. Prior to version 3.3.0
-they were setup by calling @funcref{gnutls_global_init}.@footnote{On special systems
+For several aspects of the library (e.g., the random generator, PKCS#11
+operations), the library may utilize mutex locks (e.g., pthreads on GNU/Linux and CriticalSection on Windows)
+which are transparently setup on library initialization. Prior to version 3.3.0
+these were setup by explicitly calling @funcref{gnutls_global_init}.@footnote{On special systems
 you could manually specify the locking system using
 the function @funcref{gnutls_global_set_mutex} before calling any other
 GnuTLS function. Setting mutexes manually is not recommended.}
-Note that, on Glibc systems the GnuTLS library does not link with the libpthread
-library by default, it utilizes the Glibc mutex stubs, which allows Glibc to
-use the non-multithreaded (and optimized) variants of its algorithms.
-That, however, for applications using GnuTLS that may potentially utilize mutexes,
-requires them to explicitly link with libpthread.
+
+Note that, on Glibc systems, unless the application is explicitly linked
+with the libpthread library, no mutex locks are used and setup by GnuTLS. It 
+will use the Glibc mutex stubs.
 
 @node Running in a sandbox
 @subsection Running in a sandbox
