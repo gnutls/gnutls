@@ -7,8 +7,8 @@ stages:
 variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian
-  FEDORA_BUILD: buildenv-f26
-  FEDORA_X86_BUILD: buildenv-f26-x86
+  FEDORA_BUILD: buildenv-f28
+  FEDORA_X86_BUILD: buildenv-f28-x86
   GET_SOURCES_ATTEMPTS: "3"
 
 ##################################################
@@ -39,7 +39,7 @@ abi-coverage/Fedora:
   script:
   - git submodule update --init --no-fetch
   - make autoreconf
-  - CFLAGS="-std=c99 -O2 -g" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
+  - CFLAGS="-g -Og" ./configure --prefix=/usr --libdir=/usr/lib64 --disable-cxx --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
     && make -j$(nproc)
   - make abi-check
   - make pic-check
@@ -58,6 +58,7 @@ abi-coverage/Fedora:
       - ./*.log
       - ./tests/*/*.log
       - ./tests/suite/*/*.log
+      - ./compat_reports/*
 
 minimal/Fedora/x86_64:
   stage: stage1-testing
@@ -149,8 +150,7 @@ no-openpgp/Fedora/x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - make autoreconf
-  - mkdir -p build && cd build &&
-    ../configure --disable-openpgp-authentication --disable-doc --disable-guile --disable-full-test-suite
+  - CFLAGS="-g -Og" ./configure --disable-openpgp-authentication --disable-doc --disable-guile --disable-full-test-suite
   - make -j$(nproc)
   - make abi-check
   - make check -j$(nproc)
@@ -161,10 +161,10 @@ no-openpgp/Fedora/x86_64:
   artifacts:
     when: on_failure
     paths:
-      - build/guile/tests/*.log
-      - build/tests/*.log
-      - build/tests/*/*.log
-      - build/compat_reports/*
+      - ./guile/tests/*.log
+      - ./tests/*.log
+      - ./tests/*/*.log
+      - ./compat_reports/*
 
 valgrind/Fedora/x86_64:
   stage: stage1-testing

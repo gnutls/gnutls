@@ -77,9 +77,9 @@ ABIVERCMD="git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|gr
 	  git fetch --tags https://gitlab.com/gnutls/gnutls.git && \
 	  git checkout $$(eval $(ABIREFCMD)) && \
 	  $(MAKE) autoreconf && if test -f ../cache/config.cache;then \
-	    CFLAGS="-g -Og" ./configure --disable-doc --cache-file ../cache/config.cache;\
+	    CFLAGS="-g -Og" ./configure --disable-cxx --disable-doc --cache-file ../cache/config.cache;\
 	  else\
-	    CFLAGS="-g -Og" ./configure --disable-doc;\
+	    CFLAGS="-g -Og" ./configure --disable-cxx --disable-doc;\
 	  fi && $(MAKE) -j$$(nproc) -C gl && $(MAKE) -j$$(nproc) -C lib && $(MAKE) -j$$(nproc) -C libdane
 	touch $@
 
