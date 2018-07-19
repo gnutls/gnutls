@@ -256,7 +256,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	}
 
 	for (i = 0; i < crt_list_size; i++) {
-		char buf[128];
+		char buf[256];
 		size_t size;
 		const char *p;
 		unsigned int oflags;
@@ -327,11 +327,16 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 					       GNUTLS_PKCS11_OBJ_ID_HEX,
 					       buf, &size);
 		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-				__LINE__, gnutls_strerror(ret));
-			app_exit(1);
+			if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+				fprintf(outfile, "\tID: (too long)\n");
+			} else {
+				fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+					__LINE__, gnutls_strerror(ret));
+				app_exit(1);
+			}
+		} else {
+			fprintf(outfile, "\tID: %s\n", buf);
 		}
-		fprintf(outfile, "\tID: %s\n", buf);
 
 		if (otype == GNUTLS_PKCS11_OBJ_X509_CRT && print_exts > 0) {
 			ret = gnutls_pkcs11_obj_get_exts(crt_list[i], &exts, &exts_size, 0);
