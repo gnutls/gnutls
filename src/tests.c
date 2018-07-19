@@ -112,15 +112,27 @@ char protocol_str[] =
     "+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0";
 char protocol_all_str[] =
     "+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0";
-char prio_str[512] = "";
+char prio_str[768] = "";
 
-#define ALL_CIPHERS "+CIPHER-ALL:+ARCFOUR-128:+3DES-CBC"
+#ifdef ENABLE_GOST
+#define GOST_CIPHERS ":+GOST28147-TC26Z-CNT"
+#define GOST_MACS ":+GOST28147-TC26Z-IMIT"
+#define GOST_KX ":+VKO-GOST-12"
+#define GOST_REST ":+SIGN-GOSTR341012-512:+SIGN-GOSTR341012-256:+SIGN-GOSTR341001:+GROUP-GOST-ALL"
+#else
+#define GOST_CIPHERS
+#define GOST_MACS
+#define GOST_KX
+#define GOST_REST
+#endif
+
+#define ALL_CIPHERS "+CIPHER-ALL:+ARCFOUR-128:+3DES-CBC" GOST_CIPHERS
 #define BLOCK_CIPHERS "+3DES-CBC:+AES-128-CBC:+CAMELLIA-128-CBC:+AES-256-CBC:+CAMELLIA-256-CBC"
 #define ALL_COMP "+COMP-NULL"
-#define ALL_MACS "+MAC-ALL:+MD5:+SHA1"
-#define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+ECDHE-RSA:+ECDHE-ECDSA:+ANON-ECDH"
+#define ALL_MACS "+MAC-ALL:+MD5:+SHA1" GOST_MACS
+#define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+ECDHE-RSA:+ECDHE-ECDSA:+ANON-ECDH" GOST_KX
 #define INIT_STR "NONE:"
-char rest[128] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+GROUP-ALL";
+char rest[384] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+GROUP-ALL" GOST_REST;
 
 #define _gnutls_priority_set_direct(s, str) __gnutls_priority_set_direct(s, str, __LINE__)
 
@@ -248,6 +260,31 @@ test_code_t test_ecdhe(gnutls_session_t session)
 
 	return ret;
 }
+
+#ifdef ENABLE_GOST
+test_code_t test_vko_gost_12(gnutls_session_t session)
+{
+	int ret;
+
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":%s:" ALL_MACS
+		":+VKO-GOST-12:%s", protocol_all_str,
+		rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake(session);
+
+	if (ret < 0)
+		return TEST_FAILED;
+
+	return ret;
+}
+#endif
 
 test_code_t test_rsa(gnutls_session_t session)
 {
@@ -801,6 +838,26 @@ test_code_t test_sha256(gnutls_session_t session)
 	return ret;
 }
 
+#ifdef ENABLE_GOST
+test_code_t test_gost_imit(gnutls_session_t session)
+{
+	int ret;
+
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP
+		":%s:+GOST28147-TC26Z-IMIT:" ALL_KX ":%s",
+		protocol_all_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake(session);
+	return ret;
+}
+#endif
+
 test_code_t test_3des(gnutls_session_t session)
 {
 	int ret;
@@ -848,6 +905,25 @@ test_code_t test_chacha20(gnutls_session_t session)
 	ret = test_do_handshake(session);
 	return ret;
 }
+
+#ifdef ENABLE_GOST
+test_code_t test_gost_cnt(gnutls_session_t session)
+{
+	int ret;
+
+	if (gnutls_fips140_mode_enabled())
+		return TEST_IGNORE;
+
+	sprintf(prio_str,
+		INIT_STR "+GOST28147-TC26Z-CNT:" ALL_COMP ":%s:"
+		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake(session);
+	return ret;
+}
+#endif
 
 test_code_t test_tls1(gnutls_session_t session)
 {

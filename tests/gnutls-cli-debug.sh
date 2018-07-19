@@ -56,6 +56,8 @@ KEY2=${srcdir}/../doc/credentials/x509/key-ecc.pem
 CERT2=${srcdir}/../doc/credentials/x509/cert-ecc.pem
 KEY3=${srcdir}/../doc/credentials/x509/key-rsa-pss.pem
 CERT3=${srcdir}/../doc/credentials/x509/cert-rsa-pss.pem
+KEY4=${srcdir}/../doc/credentials/x509/key-gost12.pem
+CERT4=${srcdir}/../doc/credentials/x509/cert-gost12.pem
 CAFILE=${srcdir}/../doc/credentials/x509/ca.pem
 TMPFILE=outcert.$$.tmp
 
@@ -168,5 +170,29 @@ check_text "whether %ALLOW_SMALL_RECORDS is required... yes"
 check_text "for RSA key exchange support... no"
 
 rm -f ${OUTFILE}
+
+if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != 1 ; then
+	# GOST_CNT test
+	echo ""
+	echo "Checking output of gnutls-cli-debug for GOST-enabled server"
+
+	eval "${GETPORT}"
+	launch_server $$ --echo --priority "NORMAL" --x509keyfile ${KEY4} --x509certfile ${CERT4} >/dev/null 2>&1
+	PID=$!
+	wait_server ${PID}
+
+	timeout 1800 datefudge "2017-08-9" \
+	"${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+
+	kill ${PID}
+	wait
+
+	check_text "for VKO GOST-2012 (draft-smyshlyaev-tls12-gost-suites) support... yes"
+	check_text "for GOST28147-CNT cipher (draft-smyshlyaev-tls12-gost-suites) support... yes"
+	check_text "for GOST28147-IMIT MAC (draft-smyshlyaev-tls12-gost-suites) support... yes"
+
+	rm -f ${OUTFILE}
+
+fi
 
 exit 0
