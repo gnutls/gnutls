@@ -54,16 +54,18 @@ doc-dist.Fedora:
   except:
   - tags
 
-abi-coverage.Fedora:
+abi/coverage.Debian:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
   - git submodule update --init --no-fetch
   - ./bootstrap
-  - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-non-suiteb-curves --disable-maintainer-mode --disable-doc
-    && make -j$(nproc)
+  - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc
+  - make -j$(nproc)
   - make abi-check
   - make pic-check
+  - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
+  - make -C tests/suite TESTS=testcompat-tls13-openssl.sh check
   - make -j$(nproc) check
   - make local-code-coverage-output || true
   tags:
@@ -131,27 +133,6 @@ SSL-3.0.Fedora.x86_64:
       - build/*.log
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
-
-TLS1.3/interop:
-  stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - git submodule update --init --no-fetch
-  - ./bootstrap
-  - dash ./configure --enable-tls13-support --disable-gcc-warnings --cache-file cache/config.cache --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
-    make -j$(nproc)
-  - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
-  - make -C tests/suite TESTS=testcompat-tls13-openssl.sh check
-  - make -C tests/ check -j$(nproc)
-  tags:
-  - shared
-  except:
-  - tags
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - tests/suite/*.log
 
 FIPS140-2.Fedora.x86_64:
   stage: stage1-testing
