@@ -36,7 +36,13 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h test-chains.h \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem \
-	cert-common.h pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c
+	cert-common.h pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c \
+	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm \
+	testpkcs11-certs/ca.crt testpkcs11-certs/ca-tmpl \
+	testpkcs11-certs/client.key testpkcs11-certs/server.crt \
+	testpkcs11-certs/server-tmpl testpkcs11-certs/ca.key \
+	testpkcs11-certs/client.crt testpkcs11-certs/client-tmpl \
+	testpkcs11-certs/server.key
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -160,6 +166,9 @@ dist_check_SCRIPTS = rfc2253-escape-test
 
 if !WINDOWS
 dist_check_SCRIPTS += sni-hostname.sh
+if ENABLE_PKCS11
+dist_check_SCRIPTS += testpkcs11.sh
+endif
 endif
 
 TESTS = $(ctests) $(dist_check_SCRIPTS)

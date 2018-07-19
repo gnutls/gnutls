@@ -86,11 +86,10 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom \
-	testpkcs11 testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm \
 	testrng test-ciphersuite-names
 
 TESTS = test-ciphersuite-names eagain testsrn testcompat chain invalid-cert \
-	testpkcs11 testrng test-ciphersuite-names
+	testrng test-ciphersuite-names
 
 if ENABLE_PKCS11
 TESTS += crl-test
