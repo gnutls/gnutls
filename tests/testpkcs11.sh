@@ -887,8 +887,9 @@ write_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/client.key"
 generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 256
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-256
 
-generate_temp_ecc_privkey_no_login "${TOKEN}" "${GNUTLS_PIN}" 256
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-no-256
+# Disabled: generation of ECC key without login is not supported in gnutls_3_3_x
+#generate_temp_ecc_privkey_no_login "${TOKEN}" "${GNUTLS_PIN}" 256
+#delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-no-256
 
 generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 384
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-384
@@ -911,24 +912,30 @@ change_id_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 export_pubkey_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 change_label_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 
-write_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt" tmp-client.pub
+# Disabled: certificates are marked as private in gnutls_3_3_x
+#write_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt" tmp-client.pub
 write_serv_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.key"
 write_serv_cert "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
 
-write_serv_pubkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
-test_sign "${TOKEN}" "${GNUTLS_PIN}"
+# Disabled: --load-pubkey is not supported in gnutls_3_3_x
+#write_serv_pubkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
 
-use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/testpkcs11-certs/ca.crt" "full URLs"
+# Disabled: --test-sign is not supported in gnutls_3_3_x
+#test_sign "${TOKEN}" "${GNUTLS_PIN}"
 
-use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/testpkcs11-certs/ca.crt" "abbrv URLs"
+# Disabled: Cannot test without written certificates (write_certificate_test)
+#use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/testpkcs11-certs/ca.crt" "full URLs"
+#use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/testpkcs11-certs/ca.crt" "abbrv URLs"
 
-write_certificate_id_test_rsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
-write_certificate_id_test_rsa2 "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
-write_certificate_id_test_ecdsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+# Disabled: certificates do not inherit its ID from privkey in gnutls_3_3_x
+#write_certificate_id_test_rsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+#write_certificate_id_test_rsa2 "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+#write_certificate_id_test_ecdsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
 
 test_delete_cert "${TOKEN}" "${GNUTLS_PIN}"
 
-test_sign_set_pin "${TOKEN}" "${GNUTLS_PIN}"
+# Disabled: --test-sign is not supported in gnutls_3_3_x
+#test_sign_set_pin "${TOKEN}" "${GNUTLS_PIN}"
 
 if test ${RETCODE} = 0; then
 	echo "* All smart cards tests succeeded"
