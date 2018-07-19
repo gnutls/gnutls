@@ -211,6 +211,7 @@ asan.Fedora.x86_64:
     when: on_failure
     paths:
       - ./*.log
+      - fuzz/*.log
       - tests/*.log
       - tests/*/*.log
       - tests/suite/*/*.log
