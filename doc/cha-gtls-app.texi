@@ -907,6 +907,15 @@ reduce the round-trips to a single one by taking advantage of the @ref{False Sta
 TLS extension. This can be enabled by setting the @acronym{GNUTLS_ENABLE_FALSE_START}
 flag on @funcref{gnutls_init}.
 
+Under TLS 1.3, the server side can start transmitting before the handshake
+is complete (i.e., while the client Finished message is still in flight),
+when no client certificate authentication is requested. This, unlike false
+start, is part of protocol design with no known security implications.
+It can be enabled by setting the @acronym{GNUTLS_ENABLE_EARLY_START} on
+@funcref{gnutls_init}, and the @funcref{gnutls_handshake} function will
+return early, allowing the server to send data earlier.
+
+
 @node DTLS sessions
 @subsection DTLS sessions
 

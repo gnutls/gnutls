@@ -81,6 +81,8 @@ struct params_res {
 	int try_sni;
 	int expire_ticket;
 	int change_ciphersuite;
+	int early_start;
+	int no_early_start;
 };
 
 pid_t child;
@@ -119,7 +121,7 @@ struct params_res resume_tests[] = {
 	 .first_no_ext_master = 1,
 	 .second_no_ext_master = 0},
 #endif
-#ifdef TLS13
+#if defined(TLS13)
 	/* only makes sense under TLS1.3 as negotiation involves a new
 	 * handshake with different parameters */
 	{.desc = "try to resume from session ticket (different cipher order)",
@@ -127,6 +129,23 @@ struct params_res resume_tests[] = {
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .change_ciphersuite = 1,
+	 .expect_resume = 1},
+#endif
+#if defined(TLS13) && !defined(USE_PSK)
+	{.desc = "try to resume from session ticket (early start)",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .early_start = 1,
+	 .expect_resume = 1},
+#endif
+#if defined(TLS13) && defined(USE_PSK)
+	/* early start should no happen on PSK. */
+	{.desc = "try to resume from session ticket (early start)",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .no_early_start = 1,
 	 .expect_resume = 1},
 #endif
 	{.desc = "try to resume from session ticket",
@@ -330,6 +349,18 @@ static void verify_server_params(gnutls_session_t session, unsigned counter, str
 	}
 #endif
 
+	if (counter == 0 && params->early_start) {
+		if (!(gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_START)) {
+			fail("early start did not happen on %d!\n", counter);
+		}
+	}
+
+	if (params->no_early_start) {
+		if (gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_START) {
+			fail("early start did happen on %d but was not expected!\n", counter);
+		}
+	}
+
 #if defined(USE_X509)
 	unsigned int l;
 
@@ -423,7 +454,6 @@ static void client(int sds[], struct params_res *params)
 		gnutls_global_set_log_function(tls_log_func);
 		gnutls_global_set_log_level(2);
 	}
-	global_init();
 
 #ifdef USE_PSK
 	gnutls_psk_allocate_client_credentials(&pskcred);
@@ -443,9 +473,7 @@ static void client(int sds[], struct params_res *params)
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
-		/* Initialize TLS session
-		 */
-		gnutls_init(&session, GNUTLS_CLIENT);
+		assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
 
 		snprintf(prio_str, sizeof(prio_str), "%s", PRIO_STR);
 
@@ -663,8 +691,6 @@ static void global_stop(void)
 	gnutls_certificate_free_credentials(serverx509cred);
 #endif
 	gnutls_dh_params_deinit(dh_params);
-
-	gnutls_global_deinit();
 }
 
 #ifdef USE_PSK
@@ -691,6 +717,10 @@ static void server(int sds[], struct params_res *params)
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	gnutls_group_t pgroup;
+	unsigned iflags = GNUTLS_SERVER;
+
+	if (params->early_start || params->no_early_start)
+		iflags |= GNUTLS_ENABLE_EARLY_START;
 
 	/* this must be called once in the program, it is mostly for the server.
 	 */
@@ -698,8 +728,6 @@ static void server(int sds[], struct params_res *params)
 		gnutls_global_set_log_function(tls_log_func);
 		gnutls_global_set_log_level(2);
 	}
-
-	global_init();
 
 #ifdef USE_PSK
 	gnutls_psk_allocate_server_credentials(&pskcred);
@@ -731,7 +759,7 @@ static void server(int sds[], struct params_res *params)
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
-		assert(gnutls_init(&session, GNUTLS_SERVER) >= 0);
+		assert(gnutls_init(&session, iflags) >= 0);
 
 		/* avoid calling all the priority functions, since the defaults
 		 * are adequate.
@@ -894,7 +922,6 @@ void doit(void)
 			for (j = 0; j < SESSIONS; j++)
 				close(server_sds[j]);
 			client(client_sds, &resume_tests[i]);
-			gnutls_global_deinit();
 			exit(0);
 		}
 	}

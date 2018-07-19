@@ -262,34 +262,34 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _tls13_expand_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
 					   NULL, 0,
-					   session->key.proto.tls13.hs_ckey,
+					   session->key.proto.tls13.ap_ckey,
 					   session->security_parameters.prf->output_size,
-					   session->key.proto.tls13.hs_ckey);
+					   session->key.proto.tls13.ap_ckey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.hs_ckey, key_size, key_block);
+		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.ap_ckey, key_size, key_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.hs_ckey, iv_size, iv_block);
+		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.ap_ckey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else {
 		ret = _tls13_expand_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
 					   NULL, 0,
-					   session->key.proto.tls13.hs_skey,
+					   session->key.proto.tls13.ap_skey,
 					   session->security_parameters.prf->output_size,
-					   session->key.proto.tls13.hs_skey);
+					   session->key.proto.tls13.ap_skey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.hs_skey, key_size, key_block);
+		ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.ap_skey, key_size, key_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.hs_skey, iv_size, iv_block);
+		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.ap_skey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -335,6 +335,7 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	const char *label;
 	unsigned label_size, hsk_len;
 	const char *keylog_label;
+	void *ckey, *skey;
 	int ret;
 
 	if (stage == STAGE_UPD_OURS || stage == STAGE_UPD_PEERS)
@@ -346,31 +347,33 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 		label_size = sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1;
 		hsk_len = session->internals.handshake_hash_buffer.length;
 		keylog_label = "CLIENT_HANDSHAKE_TRAFFIC_SECRET";
+		ckey = session->key.proto.tls13.hs_ckey;
 	} else {
 		label = APPLICATION_CLIENT_TRAFFIC_LABEL;
 		label_size = sizeof(APPLICATION_CLIENT_TRAFFIC_LABEL)-1;
 		hsk_len = session->internals.handshake_hash_buffer_server_finished_len;
 		keylog_label = "CLIENT_TRAFFIC_SECRET_0";
+		ckey = session->key.proto.tls13.ap_ckey;
 	}
 
 	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
 				   hsk_len,
 				   session->key.proto.tls13.temp_secret,
-				   session->key.proto.tls13.hs_ckey);
+				   ckey);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_nss_keylog_write(session, keylog_label,
-				 session->key.proto.tls13.hs_ckey,
+				 ckey,
 				 session->security_parameters.prf->output_size);
 
 	/* client keys */
-	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.hs_ckey, key_size, ckey_block);
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, ckey, key_size, ckey_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.hs_ckey, iv_size, civ_block);
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, ckey, iv_size, civ_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -379,30 +382,32 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 		label = HANDSHAKE_SERVER_TRAFFIC_LABEL;
 		label_size = sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1;
 		keylog_label = "SERVER_HANDSHAKE_TRAFFIC_SECRET";
+		skey = session->key.proto.tls13.hs_skey;
 	} else {
 		label = APPLICATION_SERVER_TRAFFIC_LABEL;
 		label_size = sizeof(APPLICATION_SERVER_TRAFFIC_LABEL)-1;
 		keylog_label = "SERVER_TRAFFIC_SECRET_0";
+		skey = session->key.proto.tls13.ap_skey;
 	}
 
 	ret = _tls13_derive_secret(session, label, label_size,
 				   session->internals.handshake_hash_buffer.data,
 				   hsk_len,
 				   session->key.proto.tls13.temp_secret,
-				   session->key.proto.tls13.hs_skey);
+				   skey);
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	_gnutls_nss_keylog_write(session, keylog_label,
-				 session->key.proto.tls13.hs_skey,
+				 skey,
 				 session->security_parameters.prf->output_size);
 
-	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.hs_skey, key_size, skey_block);
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, skey, key_size, skey_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.hs_skey, iv_size, siv_block);
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, skey, iv_size, siv_block);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1007,6 +1012,44 @@ int _tls13_connection_state_init(gnutls_session_t session, hs_stage_t stage)
 			      session->security_parameters.cs->name);
 
 	session->security_parameters.epoch_read = epoch_next;
+	session->security_parameters.epoch_write = epoch_next;
+
+	return 0;
+}
+
+int _tls13_read_connection_state_init(gnutls_session_t session, hs_stage_t stage)
+{
+	const uint16_t epoch_next =
+	    session->security_parameters.epoch_next;
+	int ret;
+
+	ret = _gnutls_epoch_set_keys(session, epoch_next, stage);
+	if (ret < 0)
+		return ret;
+
+	_gnutls_handshake_log("HSK[%p]: TLS 1.3 set read key with cipher suite: %s\n",
+			      session,
+			      session->security_parameters.cs->name);
+
+	session->security_parameters.epoch_read = epoch_next;
+
+	return 0;
+}
+
+int _tls13_write_connection_state_init(gnutls_session_t session, hs_stage_t stage)
+{
+	const uint16_t epoch_next =
+	    session->security_parameters.epoch_next;
+	int ret;
+
+	ret = _gnutls_epoch_set_keys(session, epoch_next, stage);
+	if (ret < 0)
+		return ret;
+
+	_gnutls_handshake_log("HSK[%p]: TLS 1.3 set write key with cipher suite: %s\n",
+			      session,
+			      session->security_parameters.cs->name);
+
 	session->security_parameters.epoch_write = epoch_next;
 
 	return 0;

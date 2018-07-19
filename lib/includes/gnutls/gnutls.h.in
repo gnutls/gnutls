@@ -381,6 +381,10 @@ typedef enum {
  * @GNUTLS_NO_REPLAY_PROTECTION: Disable any replay protection in DTLS. This must only be used if  replay protection is achieved using other means. Since 3.2.2.
  * @GNUTLS_ALLOW_ID_CHANGE: Allow the peer to replace its certificate, or change its ID during a rehandshake. This change is often used in attacks and thus prohibited by default. Since 3.5.0.
  * @GNUTLS_ENABLE_FALSE_START: Enable the TLS false start on client side if the negotiated ciphersuites allow it. This will enable sending data prior to the handshake being complete, and may introduce a risk of crypto failure when combined with certain key exchanged; for that GnuTLS may not enable that option in ciphersuites that are known to be not safe for false start. Since 3.5.0.
+ * @GNUTLS_ENABLE_EARLY_START: Under TLS1.3 allow the server to return earlier than the full handshake
+ *   finish; similarly to false start the handshake will be completed once data are received by the
+ *   client, while the server is able to transmit sooner. This is not enabled by default as it could
+ *   break certain existing server assumptions and use-cases. Since 3.6.4.
  * @GNUTLS_FORCE_CLIENT_CERT: When in client side and only a single cert is specified, send that certificate irrespective of the issuers expected by the server. Since 3.5.0.
  * @GNUTLS_NO_TICKETS: Flag to indicate that the session should not use resumption with session tickets.
  * @GNUTLS_KEY_SHARE_TOP3: Generate key shares for the top-3 different groups which are enabled.
@@ -428,7 +432,8 @@ typedef enum {
 	GNUTLS_KEY_SHARE_TOP3 = (1<<13),
 	GNUTLS_POST_HANDSHAKE_AUTH = (1<<14),
 	GNUTLS_NO_AUTO_REKEY = (1<<15),
-	GNUTLS_SAFE_PADDING_CHECK = (1<<16)
+	GNUTLS_SAFE_PADDING_CHECK = (1<<16),
+	GNUTLS_ENABLE_EARLY_START = (1<<17)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls
@@ -1441,9 +1446,10 @@ unsigned gnutls_session_etm_status(gnutls_session_t session);
  * @GNUTLS_SFLAGS_RFC7919: The RFC7919 Diffie-Hellman parameters were negotiated
  * @GNUTLS_SFLAGS_HB_LOCAL_SEND: The heartbeat negotiation allows the local side to send heartbeat messages
  * @GNUTLS_SFLAGS_HB_PEER_SEND: The heartbeat negotiation allows the peer to send heartbeat messages
- * @GNUTLS_SFLAGS_FALSE_START: The appdata set with gnutls_handshake_set_appdata() were sent during handshake (false start)
+ * @GNUTLS_SFLAGS_FALSE_START: False start was used in this client session.
  * @GNUTLS_SFLAGS_SESSION_TICKET: A session ticket has been received by the server.
  * @GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH: Indicates client capability for post-handshake auth; set only on server side.
+ * @GNUTLS_SFLAGS_EARLY_START: The TLS1.3 server session returned early.
  *
  * Enumeration of different session parameters.
  */
@@ -1456,7 +1462,8 @@ typedef enum {
 	GNUTLS_SFLAGS_FALSE_START = 1<<5,
 	GNUTLS_SFLAGS_RFC7919 = 1<<6,
 	GNUTLS_SFLAGS_SESSION_TICKET = 1<<7,
-	GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH = 1<<8
+	GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH = 1<<8,
+	GNUTLS_SFLAGS_EARLY_START = 1<<9
 } gnutls_session_flags_t;
 
 unsigned gnutls_session_get_flags(gnutls_session_t session);

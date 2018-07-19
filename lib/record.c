@@ -1521,30 +1521,48 @@ check_session_status(gnutls_session_t session, unsigned ms)
 			return gnutls_assert_val(ret);
 
 		return GNUTLS_E_AGAIN;
+	case RECV_STATE_EARLY_START_HANDLING:
 	case RECV_STATE_FALSE_START_HANDLING:
 		return 1;
 	case RECV_STATE_FALSE_START:
 		/* if false start is not complete we always expect for handshake packets
 		 * prior to anything else. */
-		if (session->security_parameters.entity == GNUTLS_CLIENT &&
-		    (session->internals.flags & GNUTLS_ENABLE_FALSE_START)) {
-			/* Attempt to complete handshake */
-
-			session->internals.recv_state = RECV_STATE_FALSE_START_HANDLING;
-			ret = gnutls_handshake(session);
-			if (ret < 0) {
-				/* a temp or fatal error, make sure we reset the state
-				 * so we can resume or temp errors */
-				session->internals.recv_state = RECV_STATE_FALSE_START;
-				gnutls_assert();
-				return ret;
-			}
-
-			session->internals.recv_state = RECV_STATE_0;
-			return 1;
-		} else {
+		if (session->security_parameters.entity != GNUTLS_CLIENT ||
+		    !(session->internals.flags & GNUTLS_ENABLE_FALSE_START))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		/* Attempt to complete handshake */
+
+		session->internals.recv_state = RECV_STATE_FALSE_START_HANDLING;
+		ret = gnutls_handshake(session);
+		if (ret < 0) {
+			/* a temp or fatal error, make sure we reset the state
+			 * so we can resume on temp errors */
+			session->internals.recv_state = RECV_STATE_FALSE_START;
+			return gnutls_assert_val(ret);
 		}
+
+		session->internals.recv_state = RECV_STATE_0;
+		return 1;
+	case RECV_STATE_EARLY_START:
+		/* if early start is not complete we always expect for handshake packets
+		 * prior to anything else. */
+		if (session->security_parameters.entity != GNUTLS_SERVER ||
+		    !(session->internals.flags & GNUTLS_ENABLE_EARLY_START))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		/* Attempt to complete handshake */
+		session->internals.recv_state = RECV_STATE_EARLY_START_HANDLING;
+		ret = gnutls_handshake(session);
+		if (ret < 0) {
+			/* a temp or fatal error, make sure we reset the state
+			 * so we can resume on temp errors */
+			session->internals.recv_state = RECV_STATE_EARLY_START;
+			return gnutls_assert_val(ret);
+		}
+
+		session->internals.recv_state = RECV_STATE_0;
+		return 1;
 	case RECV_STATE_DTLS_RETRANSMIT:
 		ret = _dtls_retransmit(session);
 		if (ret < 0)
@@ -1809,7 +1827,8 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 		/* this is to protect buggy applications from sending unencrypted
 		 * data. We allow sending however, if we are in false start handshake
 		 * state. */
-		if (session->internals.recv_state != RECV_STATE_FALSE_START)
+		if (session->internals.recv_state != RECV_STATE_FALSE_START &&
+		    session->internals.recv_state != RECV_STATE_EARLY_START)
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
 	}
 
@@ -1984,7 +2003,8 @@ gnutls_record_recv(gnutls_session_t session, void *data, size_t data_size)
 		/* this is to protect buggy applications from sending unencrypted
 		 * data. We allow sending however, if we are in false start handshake
 		 * state. */
-		if (session->internals.recv_state != RECV_STATE_FALSE_START)
+		if (session->internals.recv_state != RECV_STATE_FALSE_START &&
+		    session->internals.recv_state != RECV_STATE_EARLY_START)
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
 	}
 

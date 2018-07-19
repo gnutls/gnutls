@@ -43,18 +43,19 @@
 	 {"name" : "test-tls13-version-negotiation.py",
 	  "arguments": ["-p", "@PORT@"]},
 	 {"name" : "test-tls13-zero-length-data.py",
-	  "comment" : "in these tests tlsfuzzer splits ClientHello into the first 2 bytes and the remainder, which gnutls doesn't support, last 3 related to #481",
+	  "comment" : "in these tests tlsfuzzer splits ClientHello into the first 2 bytes and the remainder, which gnutls doesn't support",
 	  "arguments": ["-p", "@PORT@",
+			"-e", "zero-length app data interleaved in handshake",
 			"-e", "zero-len app data with large padding during handshake",
 			"-e", "zero-len app data with large padding interleaved in handshake",
-			"-e", "zero-len app data with padding interleaved in handshake",
-			"-e", "zero-length app data during handshake",
-			"-e", "zero-length app data interleaved in handshake",
-			"-e", "zero-length app data with padding during handshake"]},
+			"-e", "zero-len app data with padding interleaved in handshake"]},
 	 {"name" : "test-tls13-finished.py",
-	  "arguments": ["-p", "@PORT@", "-n", "5"],
-	  "exp_pass" : false,
-	  "comment" : "we do not switch the keys early enough for this test see #481"}
+	  "commoent" : "the disabled tests timeout very often due to slow tls-fuzzer implementation",
+	  "arguments": ["-p", "@PORT@", "-n", "5",
+			"-e", "padding - cipher TLS_AES_128_GCM_SHA256, pad_byte 0, pad_left 0, pad_right 16777183",
+			"-e", "padding - cipher TLS_AES_256_GCM_SHA384, pad_byte 0, pad_left 0, pad_right 16777167"]},
+	 {"name" : "test-tls13-count-tickets.py",
+	  "arguments": ["-p", "@PORT@", "-t", "1"]}
      ]
     }
 ]

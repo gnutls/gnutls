@@ -44,7 +44,13 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _tls13_connection_state_init(session, stage);
+	/* If we send a key update during early start, only update our
+	 * write keys */
+	if (session->internals.recv_state == RECV_STATE_EARLY_START) {
+		ret = _tls13_write_connection_state_init(session, stage);
+	} else {
+		ret = _tls13_connection_state_init(session, stage);
+	}
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

@@ -860,7 +860,8 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	size_t cur_size;
 
 	if (session->security_parameters.epoch_read
-	    != session->security_parameters.epoch_write) {
+	    != session->security_parameters.epoch_write &&
+	    !(session->internals.hsk_flags & HSK_EARLY_START_USED)) {
 		gnutls_assert();
 		return GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE;
 	}
