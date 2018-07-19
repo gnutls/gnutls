@@ -45,7 +45,6 @@ int main()
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
-#include <virt-time.h>
 
 #include "utils.h"
 
@@ -62,15 +61,11 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-/* A very basic TLS client, with anonymous authentication.
- */
-
 static void client(int fd, int wait)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
 	gnutls_session_t session;
-	/* Need to enable anonymous KX specifically. */
 
 	global_init();
 
@@ -156,7 +151,7 @@ static void server(int fd, int wait)
 	gnutls_transport_set_int(session, fd);
 
 	if (wait) {
-		virt_sec_sleep(25);
+		sec_sleep(25);
 	} else {
 		do {
 			ret = gnutls_handshake(session);
@@ -172,13 +167,13 @@ static void server(int fd, int wait)
 	gnutls_global_deinit();
 }
 
-static void start(int wait)
+static void start(int wait_flag)
 {
 	int fd[2];
 	int ret;
 	pid_t child;
 
-	if (debug && wait)
+	if (debug && wait_flag)
 		fprintf(stderr, "\nWill test timeout\n");
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
@@ -195,13 +190,17 @@ static void start(int wait)
 	}
 
 	if (child) {
+		int status = 0;
 		/* parent */
 		close(fd[1]);
-		server(fd[0], wait);
+		server(fd[0], wait_flag);
 		close(fd[0]);
+
+		wait(&status);
+		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1], wait);
+		client(fd[1], wait_flag);
 		close(fd[1]);
 		exit(0);
 	}
@@ -209,16 +208,11 @@ static void start(int wait)
 
 static void ch_handler(int sig)
 {
-	int status = 0;
-	wait(&status);
-	check_wait_status(status);
 	return;
 }
 
 void doit(void)
 {
-	virt_time_init();
-
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
