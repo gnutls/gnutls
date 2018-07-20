@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <utils.h>
+#include <assert.h>
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -120,6 +121,24 @@ gnutls_datum_t _gost_k = {gost_k, sizeof(gost_k)-1};
 
 unsigned char ecc_params[] = "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
 unsigned char ecc_point[] = "\x04\x41\x04\x3c\x15\x6f\x1d\x48\x3e\x64\x59\x13\x2c\x6d\x04\x1a\x38\x0d\x30\x5c\xe4\x3f\x55\xcb\xd9\x17\x15\x46\x72\x71\x92\xc1\xf8\xc6\x33\x3d\x04\x2e\xc8\xc1\x0f\xc0\x50\x04\x7b\x9f\xc9\x48\xb5\x40\xfa\x6f\x93\x82\x59\x61\x5e\x72\x57\xcb\x83\x06\xbd\xcc\x82\x94\xc1";
+
+static int _gnutls_privkey_export2_pkcs8(gnutls_privkey_t key, gnutls_x509_crt_fmt_t f,
+					 const char *password, unsigned flags, gnutls_datum_t *out)
+{
+	gnutls_x509_privkey_t xkey;
+	int ret;
+
+	ret = gnutls_privkey_export_x509(key, &xkey);
+	if (ret < 0)
+		fail("error in gnutls_privkey_export_x509\n");
+
+	assert(gnutls_x509_privkey_fix(xkey)>=0);
+
+	ret = gnutls_x509_privkey_export2_pkcs8(xkey, f, password, 0, out);
+	gnutls_x509_privkey_deinit(xkey);
+
+	return ret;
+}
 
 #define CMP(name, dat, v) cmp(name, __LINE__, dat, v, sizeof(v)-1)
 static int cmp(const char *name, int line, gnutls_datum_t *v1, unsigned char *v2, unsigned size)
@@ -517,6 +536,8 @@ int check_dsa(void)
 
 	global_init();
 
+	success("Checking DSA key operations\n");
+
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
 		fail("error\n");
@@ -573,6 +594,11 @@ int check_dsa(void)
 	gnutls_free(y.data);
 	gnutls_free(x.data);
 
+	ret = _gnutls_privkey_export2_pkcs8(key, GNUTLS_X509_FMT_DER, NULL, 0, &x);
+	if (ret < 0 || x.size == 0)
+		fail("error in pkcs8 export\n");
+	gnutls_free(x.data);
+
 	gnutls_privkey_deinit(key);
 	gnutls_pubkey_deinit(pub);
 
@@ -586,6 +612,9 @@ int check_rsa(void)
 	gnutls_pubkey_t pub;
 	gnutls_datum_t m, e, d, p, q, u, e1, e2;
 	int ret;
+
+	success("Checking RSA key operations\n");
+
 	/* RSA */
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
@@ -642,6 +671,11 @@ int check_rsa(void)
 	gnutls_free(e1.data);
 	gnutls_free(e2.data);
 
+	ret = _gnutls_privkey_export2_pkcs8(key, GNUTLS_X509_FMT_DER, NULL, 0, &m);
+	if (ret < 0 || m.size == 0)
+		fail("error in pkcs8 export\n");
+	gnutls_free(m.data);
+
 	gnutls_privkey_deinit(key);
 	gnutls_pubkey_deinit(pub);
 
@@ -656,6 +690,8 @@ int check_ecc(void)
 	gnutls_datum_t y, x, k;
 	gnutls_ecc_curve_t curve;
 	int ret;
+
+	success("Checking SECP256R1 key operations\n");
 
 	/* ECC */
 	ret = gnutls_privkey_init(&key);
@@ -717,6 +753,11 @@ int check_ecc(void)
 	gnutls_free(y.data);
 	gnutls_free(k.data);
 
+	ret = _gnutls_privkey_export2_pkcs8(key, GNUTLS_X509_FMT_DER, NULL, 0, &x);
+	if (ret < 0 || x.size == 0)
+		fail("error in pkcs8 export\n");
+	gnutls_free(x.data);
+
 	gnutls_privkey_deinit(key);
 
 	/* More public key ops */
@@ -761,6 +802,8 @@ int check_ed25519(void)
 	gnutls_datum_t y, x, k;
 	gnutls_ecc_curve_t curve;
 	int ret;
+
+	success("Checking ed25519 key operations\n");
 
 	/* ECC */
 	ret = gnutls_privkey_init(&key);
@@ -822,6 +865,11 @@ int check_ed25519(void)
 		fail("expected NULL value in Y\n");
 	}
 
+	ret = _gnutls_privkey_export2_pkcs8(key, GNUTLS_X509_FMT_DER, NULL, 0, &x);
+	if (ret < 0 || x.size == 0)
+		fail("error in pkcs8 export\n");
+	gnutls_free(x.data);
+
 	gnutls_privkey_deinit(key);
 
 	/* More public key ops */
@@ -845,6 +893,8 @@ int check_gost(void)
 	gnutls_digest_algorithm_t digest;
 	gnutls_gost_paramset_t paramset;
 	int ret;
+
+	success("Checking GOST key operations\n");
 
 	/* ECC */
 	ret = gnutls_privkey_init(&key);
@@ -929,6 +979,11 @@ int check_gost(void)
 	gnutls_free(x.data);
 	gnutls_free(y.data);
 	gnutls_free(k.data);
+
+	ret = _gnutls_privkey_export2_pkcs8(key, GNUTLS_X509_FMT_DER, NULL, 0, &x);
+	if (ret < 0 || x.size == 0)
+		fail("error in pkcs8 export\n");
+	gnutls_free(x.data);
 
 	gnutls_privkey_deinit(key);
 

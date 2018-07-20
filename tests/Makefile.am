@@ -197,7 +197,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 x509sign-verify-error rng-op-nonce rng-op-random rng-op-key x509-dn-decode-compat \
 	 ip-check mini-x509-ipaddr trust-store base64-raw random-art dhex509self \
 	 dss-sig-val sign-pk-api tls-session-ext-override record-pad \
-	 tls13-server-kx-neg gnutls_ext_raw_parse_dtls
+	 tls13-server-kx-neg gnutls_ext_raw_parse_dtls key-export-pkcs8
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
