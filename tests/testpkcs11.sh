@@ -26,11 +26,6 @@ SERV="${SERV:-../src/gnutls-serv${EXEEXT}}"
 CLI="${CLI:-../src/gnutls-cli${EXEEXT}}"
 RETCODE=0
 
-if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
-	echo "Cannot run in FIPS140-2 mode"
-	exit 77
-fi
-
 if ! test -x "${P11TOOL}"; then
 	exit 77
 fi
@@ -600,7 +595,8 @@ write_certificate_id_test_rsa () {
 	cacert="$4"
 
 	echo -n "* Generating RSA private key on HSM... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --label xxx1-rsa --generate-rsa --bits 1024 "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --label xxx1-rsa --generate-rsa \
+	--bits 2048 "${token}" >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -649,7 +645,8 @@ write_certificate_id_test_rsa2 () {
 	tmpkey="key.$$.tmp"
 
 	echo -n "* Generating RSA private key... "
-	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --bits 1024 --outfile ${tmpkey} >>"${TMPFILE}" 2>&1
+	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --bits 2048 \
+	--outfile ${tmpkey} >>"${TMPFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -907,7 +904,7 @@ delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-256
 import_temp_dsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 2048
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" dsa-2048
 
-generate_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 1024
+generate_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 2048
 change_id_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 export_pubkey_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 change_label_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
