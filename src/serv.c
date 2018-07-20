@@ -1734,7 +1734,7 @@ static void cmd_parser(int argc, char **argv)
 /* session resuming support */
 
 #define SESSION_ID_SIZE 32
-#define SESSION_DATA_SIZE 1024
+#define SESSION_DATA_SIZE (16*1024)
 
 typedef struct {
 	char session_id[SESSION_ID_SIZE];
