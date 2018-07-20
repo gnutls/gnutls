@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 }
 
 static
-unsigned opt_to_flags(void)
+unsigned opt_to_flags(common_info_st *cinfo)
 {
 	unsigned flags = 0;
 
@@ -78,6 +78,12 @@ unsigned opt_to_flags(void)
 		} else {
 			flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE;
 		}
+	} else { /* if not given mark as private the private objects, and public the public ones */
+		if (cinfo->privkey)
+			flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
+		else if (cinfo->pubkey || cinfo->cert)
+			flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE;
+		/* else set the defaults of the token */
 	}
 
 	if (ENABLED_OPT(MARK_TRUSTED))
@@ -166,8 +172,6 @@ static void cmd_parser(int argc, char **argv)
 
 	memset(&cinfo, 0, sizeof(cinfo));
 
-	flags = opt_to_flags();
-
 	if (HAVE_OPT(SECRET_KEY))
 		cinfo.secret_key = OPT_ARG(SECRET_KEY);
 
@@ -226,6 +230,8 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(SEC_PARAM)) {
 		sec_param = OPT_ARG(SEC_PARAM);
 	}
+
+	flags = opt_to_flags(&cinfo);
 
 	if (debug > 4) {
 		if (HAVE_OPT(MARK_PRIVATE))
