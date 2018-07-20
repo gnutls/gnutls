@@ -907,25 +907,6 @@ print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 	}
 }
 
-static const char *
-gost_param_name(int param)
-{
-	switch(param) {
-	case 0:
-		return "TC26-Z";
-	case 1:
-		return "CryptoPro-A";
-	case 2:
-		return "CryptoPro-B";
-	case 3:
-		return "CryptoPro-C";
-	case 4:
-		return "CryptoPro-D";
-	default:
-		return "unknown";
-	}
-}
-
 void
 print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 	       gnutls_digest_algorithm_t digest, gnutls_gost_paramset_t paramset,
@@ -948,10 +929,10 @@ print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 
 	if (cprint != 0)
 		fprintf(outfile, "/* paramset: %s */\n",
-			gost_param_name(paramset));
+			gnutls_gost_paramset_get_name(paramset));
 	else
 		fprintf(outfile, "paramset:\t%s\n",
-			gost_param_name(paramset));
+			gnutls_gost_paramset_get_name(paramset));
 
 	if (k) {
 		print_head(outfile, "private key", k->size, cprint);
