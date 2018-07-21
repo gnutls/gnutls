@@ -1215,18 +1215,25 @@ static void get_server_name(gnutls_session_t session, uint8_t * name,
 	return;
 }
 
+/* Selects a signature algorithm (if required by the ciphersuite and TLS
+ * version), appropriate for the certificate. If none can be selected
+ * returns an error.
+ */
 static
-unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
-				     gnutls_pubkey_t pubkey,
-				     gnutls_certificate_type_t cert_type,
-				     const gnutls_cipher_suite_entry_st *cs)
+int cert_select_sign_algorithm(gnutls_session_t session,
+			       gnutls_pcert_st * cert,
+			       gnutls_privkey_t pkey,
+			       const gnutls_cipher_suite_entry_st *cs)
 {
+	gnutls_pubkey_t pubkey = cert->pubkey;
+	gnutls_certificate_type_t cert_type = cert->type;
 	unsigned pk = pubkey->params.algo;
 	unsigned key_usage;
+	gnutls_sign_algorithm_t algo;
 	const version_entry_st *ver = get_version(session);
 
 	if (session->security_parameters.cert_type != cert_type) {
-		return 0;
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 	}
 
 	if (unlikely(session->internals.priorities->allow_server_key_usage_violation)) {
@@ -1236,24 +1243,8 @@ unsigned pubkey_is_compat_with_cs(gnutls_session_t session,
 	}
 
 	if (!ver->tls13_sem && !_gnutls_kx_supports_pk_usage(cs->kx_algorithm, pk, key_usage)) {
-		return 0;
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 	}
-
-	return 1;
-}
-
-/* Selects a signature algorithm (if required by the ciphersuite and TLS
- * version), appropriate for the certificate. If none can be selected
- * returns an error.
- */
-static
-int select_sign_algorithm(gnutls_session_t session,
-			  gnutls_pcert_st * cert,
-			  gnutls_privkey_t pkey,
-			  const gnutls_cipher_suite_entry_st *cs)
-{
-	gnutls_sign_algorithm_t algo;
-	const version_entry_st *ver = get_version(session);
 
 	if (!ver->tls13_sem && _gnutls_kx_encipher_type(cs->kx_algorithm) != CIPHER_SIGN)
 		return 0;
@@ -1320,17 +1311,10 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 					  gnutls_pk_get_name(session->internals.selected_cert_list[0].pubkey->params.algo));
 		}
 
-		if (!pubkey_is_compat_with_cs(session,
-					     session->internals.selected_cert_list[0].pubkey,
-					     session->internals.selected_cert_list[0].type,
-					     cs)) {
-			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
-		}
-
-		ret = select_sign_algorithm(session,
-					    &session->internals.selected_cert_list[0],
-					    session->internals.selected_key,
-					    cs);
+		ret = cert_select_sign_algorithm(session,
+						 &session->internals.selected_cert_list[0],
+						 session->internals.selected_key,
+						 cs);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
 		}
@@ -1360,17 +1344,10 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 						       server_name) != 0) {
 				/* if requested algorithms are also compatible select it */
 
-				if (!pubkey_is_compat_with_cs(session,
-							     cred->certs[i].cert_list[0].pubkey,
-							     cred->certs[i].cert_list[0].type,
-							     cs)) {
-					continue;
-				}
-
-				ret = select_sign_algorithm(session,
-							    &cred->certs[i].cert_list[0],
-							    cred->certs[i].pkey,
-							    cs);
+				ret = cert_select_sign_algorithm(session,
+								 &cred->certs[i].cert_list[0],
+								 cred->certs[i].pkey,
+								 cs);
 				if (ret >= 0) {
 					idx = i;
 					_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
@@ -1399,17 +1376,10 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 						      [i].cert_list
 						      [0].type));
 
-		if (!pubkey_is_compat_with_cs(session,
-					     cred->certs[i].cert_list[0].pubkey,
-					     cred->certs[i].cert_list[0].type,
-					     cs)) {
-			continue;
-		}
-
-		ret = select_sign_algorithm(session,
-					    &cred->certs[i].cert_list[0],
-					    cred->certs[i].pkey,
-					    cs);
+		ret = cert_select_sign_algorithm(session,
+						 &cred->certs[i].cert_list[0],
+						 cred->certs[i].pkey,
+						 cs);
 		if (ret >= 0) {
 			idx = i;
 			_gnutls_debug_log("Selected (%s) cert based on ciphersuite %x.%x: %s\n",
