@@ -118,6 +118,18 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 		memcpy(server_write->mac_key, &key_block[pos], hash_size);
 
 		pos += hash_size;
+
+		_gnutls_hard_log("INT: CLIENT MAC KEY [%d]: %s\n",
+				 key_size,
+				 _gnutls_bin2hex(client_write->mac_key,
+						 hash_size,
+						 buf, sizeof(buf), NULL));
+
+		_gnutls_hard_log("INT: SERVER MAC KEY [%d]: %s\n",
+				 key_size,
+				 _gnutls_bin2hex(server_write->mac_key,
+						 hash_size,
+						 buf, sizeof(buf), NULL));
 	}
 
 	if (key_size > 0) {
