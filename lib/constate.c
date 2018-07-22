@@ -58,7 +58,6 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 	/* FIXME: This function is too long
 	 */
 	uint8_t rnd[2 * GNUTLS_RANDOM_SIZE];
-	uint8_t rrnd[2 * GNUTLS_RANDOM_SIZE];
 	int pos, ret;
 	int block_size;
 	char buf[65];
@@ -82,12 +81,6 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 	       GNUTLS_RANDOM_SIZE);
 	memcpy(&rnd[GNUTLS_RANDOM_SIZE],
 	       session->security_parameters.client_random,
-	       GNUTLS_RANDOM_SIZE);
-
-	memcpy(rrnd, session->security_parameters.client_random,
-	       GNUTLS_RANDOM_SIZE);
-	memcpy(&rrnd[GNUTLS_RANDOM_SIZE],
-	       session->security_parameters.server_random,
 	       GNUTLS_RANDOM_SIZE);
 
 #ifdef ENABLE_SSL3
