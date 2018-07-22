@@ -192,7 +192,8 @@ generate_normal_master(gnutls_session_t session,
 	if (ret < 0)
 		return ret;
 
-	_gnutls_hard_log("INT: MASTER SECRET: %s\n",
+	_gnutls_hard_log("INT: MASTER SECRET[%d]: %s\n",
+			 GNUTLS_MASTER_SIZE,
 			 _gnutls_bin2hex(session->security_parameters.
 					 master_secret, GNUTLS_MASTER_SIZE,
 					 buf, sizeof(buf), NULL));
