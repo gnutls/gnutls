@@ -74,6 +74,9 @@ ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 ${NOOPTS} --priority "NORMAL" --x509
 ${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --sni-hostname example.com --priority "NORMAL" --x509cafile ${CA1} </dev/null >/dev/null && \
 	fail ${PID} "5. handshake should have failed!"
 
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 --sni-hostname example.com. --verify-hostname example.com. --priority "NORMAL" --x509cafile ${CA1} </dev/null >/dev/null || \
+	fail ${PID} "6. handshake should have succeeded!"
+
 kill ${PID}
 wait
 

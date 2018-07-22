@@ -401,17 +401,22 @@ void socket_bye(socket_st * socket, unsigned polite)
 void canonicalize_host(char *hostname, char *service, unsigned service_size)
 {
 	char *p;
-	unsigned char buf[64];
 
-	p = strchr(hostname, ':');
-	if (p == NULL)
-		return;
+	if ((p = strchr(hostname, ':'))) {
+		unsigned char buf[64];
 
-	if (inet_pton(AF_INET6, hostname, buf) == 1)
-		return;
+		if (inet_pton(AF_INET6, hostname, buf) == 1)
+			return;
 
-	*p = 0;
-	snprintf(service, service_size, "%s", p+1);
+		*p = 0;
+
+		if (service && service_size)
+			snprintf(service, service_size, "%s", p+1);
+	} else
+		p = hostname + strlen(hostname);
+
+	if (p > hostname && p[-1] == '.')
+		p[-1] = 0; // remove trailing dot on FQDN
 }
 
 static ssize_t

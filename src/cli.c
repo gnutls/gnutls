@@ -331,9 +331,10 @@ static int cert_verify_callback(gnutls_session_t session)
 		ssh = strictssh;
 	}
 
-	if (HAVE_OPT(VERIFY_HOSTNAME))
+	if (HAVE_OPT(VERIFY_HOSTNAME)) {
 		host = OPT_ARG(VERIFY_HOSTNAME);
-	else
+		canonicalize_host((char *) host, NULL, 0);
+	} else
 		host = hostname;
 
 	/* Save certificate and OCSP response */
@@ -603,8 +604,10 @@ gnutls_session_t init_tls_session(const char *host)
 	 */
 	if (disable_extensions == 0 && disable_sni == 0) {
 		if (HAVE_OPT(SNI_HOSTNAME)) {
-			gnutls_server_name_set(session, GNUTLS_NAME_DNS,
-					       OPT_ARG(SNI_HOSTNAME), strlen(OPT_ARG(SNI_HOSTNAME)));
+			const char *sni_host = OPT_ARG(SNI_HOSTNAME);
+
+			canonicalize_host((char *) sni_host, NULL, 0);
+			gnutls_server_name_set(session, GNUTLS_NAME_DNS, sni_host, strlen(sni_host));
 		} else if (host != NULL && is_ip(host) == 0)
 			gnutls_server_name_set(session, GNUTLS_NAME_DNS,
 					       host, strlen(host));
