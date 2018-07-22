@@ -60,7 +60,8 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 	uint8_t rnd[2 * GNUTLS_RANDOM_SIZE];
 	int pos, ret;
 	int block_size;
-	char buf[65];
+	char buf[4 * MAX_HASH_SIZE + 4 * MAX_CIPHER_KEY_SIZE +
+		 4 * MAX_CIPHER_BLOCK_SIZE];
 	/* avoid using malloc */
 	uint8_t key_block[2 * MAX_HASH_SIZE + 2 * MAX_CIPHER_KEY_SIZE +
 			  2 * MAX_CIPHER_BLOCK_SIZE];
