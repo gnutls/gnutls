@@ -58,10 +58,10 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 	/* FIXME: This function is too long
 	 */
 	uint8_t rnd[2 * GNUTLS_RANDOM_SIZE];
-	uint8_t rrnd[2 * GNUTLS_RANDOM_SIZE];
 	int pos, ret;
 	int block_size;
-	char buf[65];
+	char buf[4 * MAX_HASH_SIZE + 4 * MAX_CIPHER_KEY_SIZE +
+		 4 * MAX_CIPHER_BLOCK_SIZE];
 	/* avoid using malloc */
 	uint8_t key_block[2 * MAX_HASH_SIZE + 2 * MAX_CIPHER_KEY_SIZE +
 			  2 * MAX_CIPHER_BLOCK_SIZE];
@@ -82,12 +82,6 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 	       GNUTLS_RANDOM_SIZE);
 	memcpy(&rnd[GNUTLS_RANDOM_SIZE],
 	       session->security_parameters.client_random,
-	       GNUTLS_RANDOM_SIZE);
-
-	memcpy(rrnd, session->security_parameters.client_random,
-	       GNUTLS_RANDOM_SIZE);
-	memcpy(&rrnd[GNUTLS_RANDOM_SIZE],
-	       session->security_parameters.server_random,
 	       GNUTLS_RANDOM_SIZE);
 
 #ifdef ENABLE_SSL3
@@ -125,6 +119,18 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 		memcpy(server_write->mac_key, &key_block[pos], hash_size);
 
 		pos += hash_size;
+
+		_gnutls_hard_log("INT: CLIENT MAC KEY [%d]: %s\n",
+				 key_size,
+				 _gnutls_bin2hex(client_write->mac_key,
+						 hash_size,
+						 buf, sizeof(buf), NULL));
+
+		_gnutls_hard_log("INT: SERVER MAC KEY [%d]: %s\n",
+				 key_size,
+				 _gnutls_bin2hex(server_write->mac_key,
+						 hash_size,
+						 buf, sizeof(buf), NULL));
 	}
 
 	if (key_size > 0) {
