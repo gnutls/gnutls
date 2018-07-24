@@ -503,7 +503,10 @@ void gnutls_certificate_set_retrieve_function
      gnutls_certificate_retrieve_function * func)
 {
 	cred->legacy_cert_cb1 = func;
-	cred->get_cert_callback3 = call_legacy_cert_cb1;
+	if (!func)
+		cred->get_cert_callback3 = NULL;
+	else
+		cred->get_cert_callback3 = call_legacy_cert_cb1;
 }
 
 static int call_legacy_cert_cb2(gnutls_session_t session,
@@ -578,7 +581,10 @@ void gnutls_certificate_set_retrieve_function2
      gnutls_certificate_retrieve_function2 * func) 
 {
 	cred->legacy_cert_cb2 = func;
-	cred->get_cert_callback3 = call_legacy_cert_cb2;
+	if (!func)
+		cred->get_cert_callback3 = NULL;
+	else
+		cred->get_cert_callback3 = call_legacy_cert_cb2;
 }
 
 /**
