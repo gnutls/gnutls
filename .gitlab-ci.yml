@@ -53,6 +53,7 @@ doc-dist.Fedora:
   - shared
   except:
   - tags
+  retry: 1
 
 abi/coverage.Debian:
   stage: stage1-testing
@@ -83,6 +84,7 @@ abi/coverage.Debian:
       - tests/*/*.log
       - tests/suite/*/*.log
       - guile/tests/*.log
+  retry: 1
 
 minimal.Fedora.x86_64:
   stage: stage1-testing
@@ -110,6 +112,7 @@ minimal.Fedora.x86_64:
   - shared
   except:
   - tags
+  retry: 1
 
 SSL-3.0.Fedora.x86_64:
   stage: stage1-testing
@@ -133,6 +136,7 @@ SSL-3.0.Fedora.x86_64:
       - build/*.log
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
+  retry: 1
 
 FIPS140-2.Fedora.x86_64:
   stage: stage1-testing
@@ -156,6 +160,7 @@ FIPS140-2.Fedora.x86_64:
       - build/guile/tests/*.log
       - build/tests/*.log
       - build/tests/*/*.log
+  retry: 1
 
 valgrind.Fedora.x86_64:
   stage: stage1-testing
@@ -176,6 +181,7 @@ valgrind.Fedora.x86_64:
       - ./*.log
       - tests/*.log
       - tests/*/*.log
+  retry: 1
 
 # Two runs, one with normal backend and another with pkcs11 trust store
 asan.Fedora.x86_64:
@@ -208,6 +214,7 @@ asan.Fedora.x86_64:
       - tests/*.log
       - tests/*/*.log
       - tests/suite/*/*.log
+  retry: 1
 
 static-analyzers.Fedora.x86_64:
   stage: stage1-testing
@@ -236,6 +243,7 @@ static-analyzers.Fedora.x86_64:
     paths:
       - scan-build-lib/*
       - scan-build-libdane/*
+  retry: 1
 
 MinGW32.DLLs:
   stage: stage1-testing
@@ -273,6 +281,7 @@ MinGW32.DLLs:
     name: "${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
     paths:
       - win32-build/
+  retry: 1
 
 MinGW64.DLLs:
   stage: stage1-testing
@@ -310,6 +319,7 @@ MinGW64.DLLs:
     name: "${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
     paths:
       - win64-build/
+  retry: 1
 
 MinGW64:
   stage: stage1-testing
@@ -335,6 +345,7 @@ MinGW64:
       - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
+  retry: 1
 
 MinGW32:
   stage: stage1-testing
@@ -360,6 +371,7 @@ MinGW32:
       - build/*.log
       - build/tests/*.log
       - build/tests/*/*.log
+  retry: 1
 
 # That is a specific runner that we cannot enable universally.
 # We restrict it to builds under the $BUILD_IMAGES_PROJECT project.
@@ -383,6 +395,7 @@ FreeBSD.x86_64:
       - ./*.log
       - tests/*.log
       - tests/*/*.log
+  retry: 1
 
 Fedora.x86:
   stage: stage1-testing
@@ -407,6 +420,7 @@ Fedora.x86:
       - build/tests/*.log
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
+  retry: 1
 
 # Two runs, one with normal backend and another with pkcs11 trust store
 ubsan-Werror.Fedora.x86_64:
@@ -441,6 +455,7 @@ ubsan-Werror.Fedora.x86_64:
       - tests/*.log
       - tests/*/*.log
       - tests/suite/*/*.log
+  retry: 1
 
 Debian.x86_64:
   stage: stage1-testing
@@ -463,6 +478,7 @@ Debian.x86_64:
       - build/tests/*.log
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
+  retry: 1
 
 .Debian.cross.template: &Debian_cross_template
   stage: stage1-testing
@@ -499,6 +515,7 @@ Debian.x86_64:
       - build/tests/*.log
       - build/tests/*/*.log
       - build/tests/suite/*/*.log
+  retry: 1
 
 Debian.cross.arm-linux-gnueabihf:
   <<: *Debian_cross_template
