@@ -5,6 +5,16 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.4 (unreleased)
+
+** libgnutls: Corrected regression since 3.6.3 in the callbacks set with
+   gnutls_certificate_set_retrieve_function() which could not handle the case where
+   no certificates were returned, or the callbacks were set to NULL (see #528).
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.3 (released 2018-07-16)
 
 ** libgnutls: Introduced support for draft-ietf-tls-tls13-28. It includes version
