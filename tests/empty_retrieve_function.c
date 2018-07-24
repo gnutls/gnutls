@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
  * Copyright (C) 2018 Dmitry Eremin-Solenikov
+ * Copyright (C) 2018 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -31,8 +32,8 @@
 #include "utils.h"
 #include "cert-common.h"
 
-/* Test for behavior of the library when NULL is set as certificate
- * function.
+/* Test for behavior of the library when certificate callbacks
+ * return no certificates.
  */
 
 static int cert_cb1(gnutls_session_t session,
@@ -42,7 +43,8 @@ static int cert_cb1(gnutls_session_t session,
 		int pk_algos_length,
 		gnutls_retr2_st *retr)
 {
-	return -1;
+	memset(retr, 0, sizeof(*retr));
+	return 0;
 }
 
 static int cert_cb2(gnutls_session_t session,
@@ -54,7 +56,11 @@ static int cert_cb2(gnutls_session_t session,
 		unsigned int *pcert_length,
 		gnutls_privkey_t *privkey)
 {
-	return -1;
+	*pcert_length = 0;
+	*privkey = NULL;
+	*pcert = NULL;
+
+	return 0;
 }
 
 static int cert_cb3(gnutls_session_t session,
@@ -66,7 +72,10 @@ static int cert_cb3(gnutls_session_t session,
 		gnutls_privkey_t *privkey,
 		unsigned int *flags)
 {
-	return -1;
+	*privkey = NULL;
+	*ocsp_length = 0;
+	*pcert_length = 0;
+	return 0;
 }
 
 
@@ -101,19 +110,16 @@ void doit(void)
 
 	gnutls_certificate_allocate_credentials(&clicred);
 	gnutls_certificate_set_retrieve_function(clicred, cert_cb1);
-	gnutls_certificate_set_retrieve_function(clicred, NULL);
 	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_NO_CERTIFICATE_FOUND, -1);
 	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_certificate_allocate_credentials(&clicred);
 	gnutls_certificate_set_retrieve_function2(clicred, cert_cb2);
-	gnutls_certificate_set_retrieve_function2(clicred, NULL);
 	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_NO_CERTIFICATE_FOUND, -1);
 	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_certificate_allocate_credentials(&clicred);
 	gnutls_certificate_set_retrieve_function3(clicred, cert_cb3);
-	gnutls_certificate_set_retrieve_function3(clicred, NULL);
 	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_NO_CERTIFICATE_FOUND, -1);
 	gnutls_certificate_free_credentials(clicred);
 
