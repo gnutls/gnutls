@@ -387,6 +387,13 @@ static int call_legacy_cert_cb1(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	if (st2.ncerts == 0) {
+		*pcert_length = 0;
+		*ocsp_length = 0;
+		*privkey = NULL;
+		return 0;
+	}
+
 	if (st2.cert_type != GNUTLS_CRT_X509) {
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;
