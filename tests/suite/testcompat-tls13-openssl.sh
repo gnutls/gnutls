@@ -185,7 +185,6 @@ run_client_suite() {
 	PID=$!
 	wait_server ${PID}
 
-#	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509cafile "${CA_CERT}" </dev/null >>${OUTPUT} || \
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --insecure </dev/null >>${OUTPUT} || \
 		fail ${PID} "Failed"
 
@@ -198,7 +197,6 @@ run_client_suite() {
 	PID=$!
 	wait_server ${PID}
 
-#	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509cafile "${CA_CERT}" </dev/null >>${OUTPUT} || \
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --insecure </dev/null >>${OUTPUT} || \
 		fail ${PID} "Failed"
 
@@ -213,14 +211,28 @@ run_client_suite() {
 	PID=$!
 	wait_server ${PID}
 
-	# ${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --x509cafile "${CA_CERT}" --inline-commands | tee "${testdir}/client.out" >> ${OUTPUT}
 	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --insecure --inline-commands <<< $(echo -e "^resume^\nGET / HTTP/1.0\r\n\r\n")| tee "${testdir}/client.out" >> ${OUTPUT}
 	grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
 		fail ${PID} "Failed"
 
 	kill ${PID}
 	wait
-	rm -rf "$testdir"
+
+	# Try resumption with HRR
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption and HRR..."
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -groups 'X25519:P-256' -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}"
+	PID=$!
+	wait_server ${PID}
+
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-SECP256R1${ADD}" --single-key-share --insecure --inline-commands <<< $(echo -e "^resume^\nGET / HTTP/1.0\r\n\r\n")| tee "${testdir}/client.out" >> ${OUTPUT}
+	grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	rm -rf "${testdir}"
 
 }
 
@@ -448,7 +460,25 @@ _EOF_
 
 	kill ${PID}
 	wait
-	rm -rf "$testdir"
+
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption and HRR..."
+	eval "${GETPORT}"
+	launch_server $$ --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:-CIPHER-ALL:+AES-256-GCM:-GROUP-ALL:+GROUP-SECP384R1${ADD}" --x509certfile "${RSA_CERT}" --x509keyfile "${RSA_KEY}" --x509cafile "${CA_CERT}"  >>${OUTPUT} 2>&1
+	PID=$!
+	wait_server ${PID}
+
+	{ echo a; sleep 1; } | \
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-hrr.pem" 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-hrr.pem" </dev/null 2>&1 > "${testdir}/server.out"
+	grep "\:error\:" "${testdir}/server.out" && \
+		fail ${PID} "Failed"
+	grep "^Reused, TLSv1.3" "${testdir}/server.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+	rm -rf "${testdir}"
 
 }
 
