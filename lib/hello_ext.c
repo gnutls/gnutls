@@ -208,7 +208,7 @@ int hello_ext_parse(void *_ctx, unsigned tls_id, const uint8_t *data, unsigned d
 
 	if (tls_id == PRE_SHARED_KEY_TLS_ID) {
 		ctx->seen_pre_shared_key = 1;
-	} else if (ctx->seen_pre_shared_key) {
+	} else if (ctx->seen_pre_shared_key && session->security_parameters.entity == GNUTLS_SERVER) {
 		/* the pre-shared key extension must always be the last one,
 		 * draft-ietf-tls-tls13-28: 4.2.11 */
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
