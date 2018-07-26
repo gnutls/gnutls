@@ -2049,13 +2049,15 @@ static int send_client_hello(gnutls_session_t session, int again)
 			goto cleanup;
 		}
 
-		/* Set the version we advertized as maximum 
-		 * (RSA uses it).
-		 */
-		set_adv_version(session, hver->major, hver->minor);
-		if (_gnutls_set_current_version(session, hver->id) < 0) {
-			ret = gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
-			goto cleanup;
+		/* if we are replying to an HRR the version is already negotiated */
+		if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED) || !get_version(session)) {
+			/* Set the version we advertized as maximum
+			 * (RSA uses it). */
+			set_adv_version(session, hver->major, hver->minor);
+			if (_gnutls_set_current_version(session, hver->id) < 0) {
+				ret = gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+				goto cleanup;
+			}
 		}
 
 		if (session->internals.priorities->min_record_version != 0) {
