@@ -64,7 +64,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
 	p11-kit-trust-data/Example_Root_CA.pem data/test1.cat data/test2.cat \
 	data/test1.cat.data data/test2.cat.data data/test1.cat.out data/test2.cat.out \
-	data/pkcs7-cat-ca.pem data/long.crl data/long.pem \
+	data/pkcs7-cat-ca.pem data/long.crl data/long.pem data/large-cert.pem \
 	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm testpkcs11-certs/ca.crt testpkcs11-certs/ca-tmpl \
 	testpkcs11-certs/client.key testpkcs11-certs/server.crt testpkcs11-certs/server-tmpl \
 	testpkcs11-certs/ca.key testpkcs11-certs/client.crt testpkcs11-certs/client-tmpl testpkcs11-certs/server.key
@@ -136,7 +136,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 tls12-rehandshake-cert-3 \
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509	\
 	 rng-fork mini-eagain-dtls resume-dtls empty_retrieve_function \
-	 tls13-rehandshake-cert gnutls_ext_raw_parse \
+	 tls13-rehandshake-cert gnutls_ext_raw_parse handshake-large-cert \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
