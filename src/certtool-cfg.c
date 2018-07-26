@@ -261,22 +261,15 @@ void cfg_init(void)
   val = optionGetValue(pov, name); \
   if (val != NULL && val->valType == OPARG_TYPE_STRING) \
   { \
-    char str[512]; \
-    char * p; \
-    size_t len; \
+    char *str; \
+    char *p; \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       do { \
 	if (val && strcmp(val->pzName, name)!=0) \
 	  continue; \
-	len = strlen(val->v.strVal); \
-	if (sizeof(str) > (unsigned)len) { \
-		strcpy(str, val->v.strVal); \
-	} else { \
-		memcpy(str, val->v.strVal, sizeof(str)-1); \
-		str[sizeof(str)-1] = 0; \
-	} \
+	str = strdup(val->v.strVal); \
 	if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
 	  fprintf(stderr, "Error parsing %s\n", name); \
 	  exit(1); \
@@ -291,6 +284,7 @@ void cfg_init(void)
 	} \
 	s_name[i+1] = strdup(p); \
 	i+=2; \
+	free(str); \
 	if (i>=MAX_ENTRIES) \
 	  break; \
       } while((val = optionNextValue(pov, val)) != NULL); \
