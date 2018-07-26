@@ -905,8 +905,8 @@ static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt, common_info_st *
 void generate_self_signed(common_info_st * cinfo)
 {
 	gnutls_x509_crt_t crt;
+	gnutls_datum_t out;
 	gnutls_privkey_t key;
-	size_t size;
 	int result;
 	unsigned int flags = 0;
 
@@ -933,15 +933,15 @@ void generate_self_signed(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	size = lbuffer_size;
 	result =
-	    gnutls_x509_crt_export(crt, outcert_format, lbuffer, &size);
+	    gnutls_x509_crt_export2(crt, outcert_format, &out);
 	if (result < 0) {
 		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		app_exit(1);
 	}
 
-	fwrite(lbuffer, 1, size, outfile);
+	fwrite(out.data, 1, out.size, outfile);
+	gnutls_free(out.data);
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_privkey_deinit(key);
@@ -951,7 +951,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 {
 	gnutls_x509_crt_t crt;
 	gnutls_privkey_t key;
-	size_t size;
+	gnutls_datum_t out;
 	int result;
 	gnutls_privkey_t ca_key;
 	gnutls_x509_crt_t ca_crt;
@@ -985,15 +985,15 @@ static void generate_signed_certificate(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	size = lbuffer_size;
 	result =
-	    gnutls_x509_crt_export(crt, outcert_format, lbuffer, &size);
+	    gnutls_x509_crt_export2(crt, outcert_format, &out);
 	if (result < 0) {
 		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		app_exit(1);
 	}
 
-	fwrite(lbuffer, 1, size, outfile);
+	fwrite(out.data, 1, out.size, outfile);
+	gnutls_free(out.data);
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_crt_deinit(ca_crt);
@@ -1005,7 +1005,7 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 {
 	gnutls_x509_crt_t crt, eecrt;
 	gnutls_privkey_t key, eekey;
-	size_t size;
+	gnutls_datum_t out;
 	int result;
 	unsigned int flags = 0;
 
@@ -1031,15 +1031,15 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	size = lbuffer_size;
 	result =
-	    gnutls_x509_crt_export(crt, outcert_format, lbuffer, &size);
+	    gnutls_x509_crt_export2(crt, outcert_format, &out);
 	if (result < 0) {
 		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		app_exit(1);
 	}
 
-	fwrite(lbuffer, 1, size, outfile);
+	fwrite(out.data, 1, out.size, outfile);
+	gnutls_free(out.data);
 
 	gnutls_x509_crt_deinit(eecrt);
 	gnutls_x509_crt_deinit(crt);
@@ -1080,10 +1080,10 @@ static void generate_signed_crl(common_info_st * cinfo)
 static void update_signed_certificate(common_info_st * cinfo)
 {
 	gnutls_x509_crt_t crt;
-	size_t size;
 	int result;
 	gnutls_privkey_t ca_key;
 	gnutls_x509_crt_t ca_crt;
+	gnutls_datum_t out;
 	time_t tim;
 	unsigned int flags = 0;
 
@@ -1125,15 +1125,15 @@ static void update_signed_certificate(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	size = lbuffer_size;
 	result =
-	    gnutls_x509_crt_export(crt, outcert_format, lbuffer, &size);
+	    gnutls_x509_crt_export2(crt, outcert_format, &out);
 	if (result < 0) {
 		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		app_exit(1);
 	}
 
-	fwrite(lbuffer, 1, size, outfile);
+	fwrite(out.data, 1, out.size, outfile);
+	gnutls_free(out.data);
 
 	gnutls_x509_crt_deinit(crt);
 }
@@ -1451,6 +1451,7 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 {
 	gnutls_x509_crt_t *crts = NULL;
 	size_t size;
+	gnutls_datum_t out;
 	int ret, i, count;
 	gnutls_datum_t pem;
 	unsigned int crt_num;
@@ -1492,17 +1493,16 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 			/* this deinitializes the certificate */
 			pubkey_info(crts[i], cinfo);
 		} else {
-			size = lbuffer_size;
 			ret =
-			    gnutls_x509_crt_export(crts[i], outcert_format,
-						   lbuffer, &size);
+			    gnutls_x509_crt_export2(crts[i], outcert_format, &out);
 			if (ret < 0) {
 				fprintf(stderr, "export error: %s\n",
 					gnutls_strerror(ret));
 				app_exit(1);
 			}
 
-			fwrite(lbuffer, 1, size, outfile);
+			fwrite(out.data, 1, out.size, outfile);
+			gnutls_free(out.data);
 
 			gnutls_x509_crt_deinit(crts[i]);
 		}
