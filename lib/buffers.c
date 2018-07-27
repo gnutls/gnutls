@@ -1196,7 +1196,7 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	if (!IS_DTLS(session)) {
-		ssize_t remain, append, header_size;
+		ssize_t append, header_size;
 
 		do {
 			if (bufel->type != GNUTLS_HANDSHAKE)
@@ -1204,18 +1204,12 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session)
 				    gnutls_assert_val
 				    (GNUTLS_E_UNEXPECTED_PACKET);
 
-			/* if we have a half received message then complete it.
-			 */
-			remain = recv_buf[0].length -
-			    recv_buf[0].data.length;
-
 			/* this is the rest of a previous message */
 			if (session->internals.handshake_recv_buffer_size >
-			    0 && recv_buf[0].length > 0 && remain > 0) {
-				if ((ssize_t) msg.size <= remain)
-					append = msg.size;
-				else
-					append = remain;
+			    0 && recv_buf[0].length > recv_buf[0].data.length) {
+				append = MIN(msg.size,
+					     recv_buf[0].length -
+					     recv_buf[0].data.length);
 
 				ret =
 				    _gnutls_buffer_append_data(&recv_buf
