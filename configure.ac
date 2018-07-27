@@ -471,6 +471,7 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
   gl_WARN_ADD([-Wno-format-truncation]) # Many warnings with no point
   gl_WARN_ADD([-Wimplicit-fallthrough=2])
+  gl_WARN_ADD([-Wabi=11])
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
