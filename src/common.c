@@ -113,7 +113,7 @@ const char *raw_to_base64(const unsigned char *raw, size_t raw_size)
 	return buf;
 }
 
-static void print_x509_info_compact(gnutls_session_t session)
+static void print_x509_info_compact(gnutls_session_t session, int print_crt_status)
 {
 	gnutls_x509_crt_t crt;
 	const gnutls_datum_t *cert_list;
@@ -123,7 +123,8 @@ static void print_x509_info_compact(gnutls_session_t session)
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 	if (cert_list_size == 0) {
-		fprintf(stderr, "No certificates found!\n");
+		if (print_crt_status)
+			fprintf(stderr, "No certificates found!\n");
 		return;
 	}
 
@@ -152,7 +153,7 @@ static void print_x509_info_compact(gnutls_session_t session)
 }
 
 static void
-print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
+print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert, int print_crt_status)
 {
 	gnutls_x509_crt_t crt;
 	const gnutls_datum_t *cert_list;
@@ -161,7 +162,8 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 	if (cert_list_size == 0) {
-		fprintf(stderr, "No certificates found!\n");
+		if (print_crt_status)
+			fprintf(stderr, "No certificates found!\n");
 		return;
 	}
 
@@ -387,6 +389,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	gnutls_srtp_profile_t srtp_profile;
 	gnutls_datum_t p;
 	char *desc;
+	gnutls_protocol_t version;
 	int rc;
 
 	desc = gnutls_session_get_desc(session);
@@ -395,8 +398,10 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 
 	/* print session ID */
 	gnutls_session_get_id(session, session_id, &session_id_size);
-	printf("- Session ID: %s\n",
-	       raw_to_string(session_id, session_id_size));
+	if (session_id_size > 0) {
+		printf("- Session ID: %s\n",
+		       raw_to_string(session_id, session_id_size));
+	}
 
 	/* print the key exchange's algorithm name
 	 */
@@ -470,13 +475,15 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 			print_ecdh_info(session, "Ephemeral ");
 	}
 
+	version = gnutls_protocol_get_version(session);
 	tmp =
-	    SU(gnutls_protocol_get_name
-	       (gnutls_protocol_get_version(session)));
+	    SU(gnutls_protocol_get_name(version));
 	printf("- Version: %s\n", tmp);
 
-	tmp = SU(gnutls_kx_get_name(kx));
-	printf("- Key Exchange: %s\n", tmp);
+	if (version < GNUTLS_TLS1_3) {
+		tmp = SU(gnutls_kx_get_name(kx));
+		printf("- Key Exchange: %s\n", tmp);
+	}
 
 	if (gnutls_sign_algorithm_get(session) != GNUTLS_SIGN_UNKNOWN) {
 		tmp =
@@ -558,38 +565,41 @@ void print_cert_info(gnutls_session_t session, int verbose, int print_cert)
 
 void print_cert_info2(gnutls_session_t session, int verbose, FILE *out, int print_cert)
 {
-	int flag;
+	int flag, print_crt_status = 0;
 
 	if (verbose)
 		flag = GNUTLS_CRT_PRINT_FULL;
 	else
 		flag = GNUTLS_CRT_PRINT_COMPACT;
 
-	if (gnutls_certificate_client_get_request_status(session) != 0)
+	if (gnutls_certificate_client_get_request_status(session) != 0) {
 		printf("- Server has requested a certificate.\n");
+		print_crt_status = 1;
+	}
 
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
-		print_x509_info(session, out, flag, print_cert);
+		print_x509_info(session, out, flag, print_cert, print_crt_status);
 		break;
 	default:
-		printf("Unknown type\n");
 		break;
 	}
 }
 
 void print_cert_info_compact(gnutls_session_t session)
 {
+	int verbose = 0;
 
-	if (gnutls_certificate_client_get_request_status(session) != 0)
+	if (gnutls_certificate_client_get_request_status(session) != 0) {
 		printf("- Server has requested a certificate.\n");
+		verbose = 1;
+	}
 
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
-		print_x509_info_compact(session);
+		print_x509_info_compact(session, verbose);
 		break;
 	default:
-		printf("Unknown type\n");
 		break;
 	}
 }

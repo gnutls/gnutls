@@ -194,6 +194,7 @@ typedef struct {
 	unsigned int pkflags; /* gnutls_pk_flag_t */
 	unsigned int qbits; /* GNUTLS_PK_DH */
 	gnutls_ecc_curve_t curve; /* GNUTLS_PK_EC, GNUTLS_PK_ED25519, GNUTLS_PK_GOST* */
+	gnutls_group_t dh_group; /* GNUTLS_PK_DH - used by ext/key_share */
 	gnutls_gost_paramset_t gost_params; /* GNUTLS_PK_GOST_* */
 	gnutls_datum_t raw_pub; /* used by x25519 */
 	gnutls_datum_t raw_priv;

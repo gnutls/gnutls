@@ -1,0 +1,18 @@
+[
+    {"server_command": ["@SERVER@", "--http",
+                 "--debug=3",
+                 "--pskpasswd", "@PSKFILE@",
+                 "--priority=@PRIORITY@",
+                 "--port=@PORT@"],
+     "server_hostname": "localhost",
+     "server_port": @PORT@,
+     "tests" : [
+         {"name" : "test-tls13-psk_ke.py",
+          "arguments" : ["-p", "@PORT@", "--psk", "@PSKKEY@",
+                  "--psk-iden", "@PSKID@"]},
+         {"name" : "test-tls13-psk_dhe_ke.py",
+          "arguments" : ["-p", "@PORT@", "--psk", "@PSKKEY@",
+                  "--psk-iden", "@PSKID@"]}
+     ]
+    }
+]

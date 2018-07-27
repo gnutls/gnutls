@@ -153,6 +153,7 @@ static int client_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 			return gnutls_assert_val(ret);
 
 		session->key.kshare.dh_params.algo = group->pk;
+		session->key.kshare.dh_params.dh_group = group->id; /* no curve in FFDH, we write the group */
 		session->key.kshare.dh_params.qbits = *group->q_bits;
 		session->key.kshare.dh_params.params_nr = 3; /* empty q */
 
@@ -400,6 +401,9 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		gnutls_pk_params_init(&pub);
 
+		if (session->key.kshare.ecdh_params.algo != group->pk || session->key.kshare.ecdh_params.curve != curve->id)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
 		if (curve->size*2+1 != data_size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
@@ -428,6 +432,9 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		curve = _gnutls_ecc_curve_get_params(group->curve);
 
+		if (session->key.kshare.ecdhx_params.algo != group->pk || session->key.kshare.ecdhx_params.curve != curve->id)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
 		if (curve->size != data_size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
@@ -452,6 +459,9 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 	} else if (group->pk == GNUTLS_PK_DH) {
 		gnutls_pk_params_st pub;
+
+		if (session->key.kshare.dh_params.algo != group->pk || session->key.kshare.dh_params.dh_group != group->id)
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 		if (data_size != group->prime->size)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
