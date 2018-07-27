@@ -1204,9 +1204,18 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session)
 				    gnutls_assert_val
 				    (GNUTLS_E_UNEXPECTED_PACKET);
 
-			/* this is the rest of a previous message */
-			if (session->internals.handshake_recv_buffer_size >
-			    0 && recv_buf[0].length > recv_buf[0].data.length) {
+			if (unlikely
+			    (session->internals.handshake_recv_buffer_size == 0 &&
+			     msg.size < HANDSHAKE_HEADER_SIZE(session) &&
+			     session->internals.handshake_header_recv_buffer.byte_length <
+			     HANDSHAKE_HEADER_SIZE(session) - msg.size)) {
+				bufel = _mbuffer_head_pop_first(&session->internals.record_buffer);
+				_mbuffer_enqueue(&session->internals.handshake_header_recv_buffer,
+						 bufel);
+				break;
+			} else if (session->internals.handshake_recv_buffer_size >
+				   0 && recv_buf[0].length > recv_buf[0].data.length) {
+				/* this is the rest of a previous message */
 				append = MIN(msg.size,
 					     recv_buf[0].length -
 					     recv_buf[0].data.length);
@@ -1224,6 +1233,25 @@ int _gnutls_parse_record_buffered_msgs(gnutls_session_t session)
 							   record_buffer,
 							   append);
 			} else {	/* received new message */
+				if (unlikely
+				    (session->internals.
+				     handshake_header_recv_buffer.length > 0)) {
+					bufel = _mbuffer_head_pop_first(&session->internals.
+									record_buffer);
+					_mbuffer_enqueue(&session->internals.
+							 handshake_header_recv_buffer,
+							 bufel);
+					ret = _mbuffer_linearize_align16(&session->internals.
+									 handshake_header_recv_buffer,
+									 get_total_headers(session));
+					if (ret < 0)
+						return gnutls_assert_val(ret);
+					bufel = _mbuffer_head_pop_first(&session->internals.
+									handshake_header_recv_buffer);
+					_mbuffer_head_push_first(&session->internals.
+								 record_buffer,
+								 bufel);
+				}
 
 				ret =
 				    parse_handshake_header(session, bufel,

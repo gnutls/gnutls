@@ -1097,6 +1097,7 @@ typedef struct {
 	 * protocol only. freed using _gnutls_handshake_io_buffer_clear();
 	 */
 	mbuffer_head_st handshake_send_buffer;
+	mbuffer_head_st handshake_header_recv_buffer;
 	handshake_buffer_st handshake_recv_buffer[MAX_HANDSHAKE_MSGS];
 	int handshake_recv_buffer_size;
 
