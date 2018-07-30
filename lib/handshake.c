@@ -158,7 +158,7 @@ int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session,
  * internals, and to security_parameters.
  * this will keep as less data to security_parameters.
  */
-static int resume_copy_required_values(gnutls_session_t session)
+static int tls12_resume_copy_required_vals(gnutls_session_t session, unsigned ticket)
 {
 	int ret;
 
@@ -201,11 +201,13 @@ static int resume_copy_required_values(gnutls_session_t session)
 	session->security_parameters.cert_type =
 	    session->internals.resumed_security_parameters.cert_type;
 
-	memcpy(session->security_parameters.session_id,
-	       session->internals.resumed_security_parameters.session_id,
-	       sizeof(session->security_parameters.session_id));
-	session->security_parameters.session_id_size =
-	    session->internals.resumed_security_parameters.session_id_size;
+	if (!ticket) {
+		memcpy(session->security_parameters.session_id,
+		       session->internals.resumed_security_parameters.session_id,
+		       sizeof(session->security_parameters.session_id));
+		session->security_parameters.session_id_size =
+		    session->internals.resumed_security_parameters.session_id_size;
+	}
 
 	return 0;
 }
@@ -667,7 +669,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			ret = resume_copy_required_values(session);
+			ret = tls12_resume_copy_required_vals(session, 0);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -724,12 +726,6 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	/* resumed by session_ticket extension */
 	if (!vers->tls13_sem && session->internals.resumed != RESUME_FALSE) {
-		/* to indicate the client that the current session is resumed */
-		memcpy(session->internals.resumed_security_parameters.
-		       session_id, session_id, session_id_len);
-		session->internals.resumed_security_parameters.
-		    session_id_size = session_id_len;
-
 		session->internals.resumed_security_parameters.
 		    max_record_recv_size =
 		    session->security_parameters.max_record_recv_size;
@@ -741,9 +737,13 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = resume_copy_required_values(session);
+		ret = tls12_resume_copy_required_vals(session, 1);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+
+		/* to indicate to the client that the current session is resumed */
+		memcpy(session->security_parameters.session_id, session_id, session_id_len);
+		session->security_parameters.session_id_size = session_id_len;
 
 		return 0;
 	}
@@ -2307,6 +2307,18 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 				gnutls_assert();
 				goto fail;
 			}
+
+			/* Under TLS1.3, the session ID is used for different purposes than
+			 * the TLS1.0 session ID. Ensure that there is an internally set
+			 * value which the server will see on the original and resumed sessions */
+			ret = _gnutls_generate_session_id(session->security_parameters.
+							  session_id,
+							  &session->security_parameters.
+							  session_id_size);
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail;
+			}
 		}
 
 		bufel = _gnutls_buffer_to_mbuffer(&buf);
@@ -3411,15 +3423,15 @@ static int handshake_server(gnutls_session_t session)
 	return _gnutls_check_id_for_change(session);
 }
 
-int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len)
+int _gnutls_generate_session_id(uint8_t * session_id, uint8_t *len)
 {
 	int ret;
 
-	*len = GNUTLS_MAX_SESSION_ID_SIZE;
+	*len = GNUTLS_DEF_SESSION_ID_SIZE;
 
 	ret =
 	    gnutls_rnd(GNUTLS_RND_NONCE, session_id,
-			GNUTLS_MAX_SESSION_ID_SIZE);
+			GNUTLS_DEF_SESSION_ID_SIZE);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

@@ -115,6 +115,8 @@ typedef struct {
  */
 #define MAX_HANDSHAKE_PACKET_SIZE 128*1024
 
+#define GNUTLS_DEF_SESSION_ID_SIZE 32
+
 /* The maximum digest size of hash algorithms.
  */
 #define MAX_FILENAME 512

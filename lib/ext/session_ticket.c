@@ -652,6 +652,20 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 			return ret;
 		}
 
+		/* Under TLS1.2 with session tickets, the session ID is used for different
+		 * purposes than the TLS1.0 session ID. Ensure that there is an internally
+		 * set value which the server will see on the original and resumed sessions */
+		if (session->internals.resumed != RESUME_TRUE) {
+			ret = _gnutls_generate_session_id(session->security_parameters.
+							  session_id,
+							  &session->security_parameters.
+							  session_id_size);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+		}
+
 		session->security_parameters.epoch_write =
 		    session->security_parameters.epoch_next;
 

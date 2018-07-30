@@ -163,20 +163,23 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
  * @session_id: is a pointer to space to hold the session id.
  * @session_id_size: initially should contain the maximum @session_id size and will be updated.
  *
- * Returns the current session ID. This can be used if you want to
- * check if the next session you tried to resume was actually
- * resumed.  That is because resumed sessions share the same session ID
- * with the original session.
+ * Returns the TLS session identifier. The session ID is selected by the
+ * server, and in older versions of TLS was a unique identifier shared
+ * between client and server which was persistent across resumption.
+ * In the latest version of TLS (1.3) or TLS with session tickets, the
+ * notion of session identifiers is undefined and cannot be relied for uniquely
+ * identifying sessions across client and server.
  *
- * The session ID is selected by the server, that identify the
- * current session.  In all supported TLS protocols, the session id
- * is less than %GNUTLS_MAX_SESSION_ID_SIZE.
+ * In client side this function returns the identifier returned by the
+ * server, and cannot be assumed to have any relation to session resumption.
+ * In server side this function is guarranteed to return a persistent
+ * identifier of the session since GnuTLS 3.6.4, which may not necessarily
+ * map into the TLS session ID value. Prior to that version the value
+ * could only be considered a persistent identifier, under TLS1.2 or earlier
+ * and when no session tickets were in use.
  *
- * The TLS session ID cannot be relied for uniquely identifying sessions.
- * It should not be used by new applications, nor be assumed
- * that it will remain the same on resumption. The session ID changes
- * even on resumed sessions under session tickets, and has no defined meaning
- * under TLS 1.3.
+ * The session identifier value returned is always less than
+ * %GNUTLS_MAX_SESSION_ID_SIZE.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -210,14 +213,23 @@ gnutls_session_get_id(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  * @session_id: will point to the session ID.
  *
- * Returns the current session ID. The returned data should be
- * treated as constant.
+ * Returns the TLS session identifier. The session ID is selected by the
+ * server, and in older versions of TLS was a unique identifier shared
+ * between client and server which was persistent across resumption.
+ * In the latest version of TLS (1.3) or TLS 1.2 with session tickets, the
+ * notion of session identifiers is undefined and cannot be relied for uniquely
+ * identifying sessions across client and server.
  *
- * The TLS session ID cannot be relied for uniquely identifying sessions.
- * It should not be used by new applications, nor be assumed
- * that it will remain the same on resumption. The session ID changes
- * even on resumed sessions under session tickets, and has no defined meaning
- * under TLS 1.3.
+ * In client side this function returns the identifier returned by the
+ * server, and cannot be assumed to have any relation to session resumption.
+ * In server side this function is guarranteed to return a persistent
+ * identifier of the session since GnuTLS 3.6.4, which may not necessarily
+ * map into the TLS session ID value. Prior to that version the value
+ * could only be considered a persistent identifier, under TLS1.2 or earlier
+ * and when no session tickets were in use.
+ *
+ * The session identifier value returned is always less than
+ * %GNUTLS_MAX_SESSION_ID_SIZE and should be treated as constant.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
