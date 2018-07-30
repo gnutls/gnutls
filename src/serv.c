@@ -570,17 +570,15 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	version = gnutls_protocol_get_version(session);
 
 	/* print session_id */
-	if (version < GNUTLS_TLS1_3) {
-		sesid_size = sizeof(sesid);
-		gnutls_session_get_id(session, sesid, &sesid_size);
-		snprintf(tmp_buffer, tmp_buffer_size, "\n<p>Session ID: <i>");
-		for (i = 0; i < sesid_size; i++)
-			snprintf(tmp_buffer, tmp_buffer_size, "%.2X", sesid[i]);
-		snprintf(tmp_buffer, tmp_buffer_size, "</i></p>\n");
-		snprintf(tmp_buffer, tmp_buffer_size,
-			 "<h5>If your browser supports session resuming, then you should see the "
-			 "same session ID, when you press the <b>reload</b> button.</h5>\n");
-	}
+	sesid_size = sizeof(sesid);
+	gnutls_session_get_id(session, sesid, &sesid_size);
+	snprintf(tmp_buffer, tmp_buffer_size, "\n<p>Session ID: <i>");
+	for (i = 0; i < sesid_size; i++)
+		snprintf(tmp_buffer, tmp_buffer_size, "%.2X", sesid[i]);
+	snprintf(tmp_buffer, tmp_buffer_size, "</i></p>\n");
+	snprintf(tmp_buffer, tmp_buffer_size,
+		 "<h5>If your browser supports session resumption, then you should see the "
+		 "same session ID, when you press the <b>reload</b> button.</h5>\n");
 
 	/* Here unlike print_info() we use the kx algorithm to distinguish
 	 * the functions to call.
