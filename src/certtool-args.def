@@ -664,7 +664,7 @@ doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';
   ds-text   = <<-_EOT_
-    p11tool (1)
+    p11tool (1), psktool (1), srptool (1)
 _EOT_;
 };
 
@@ -727,6 +727,12 @@ $ certtool --generate-certificate --load-privkey key.pem \
 To view the certificate information, use:
 @example
 $ certtool --certificate-info --infile cert.pem
+@end example
+
+@subheading Changing the certificate format
+To convert the certificate from PEM to DER format, use:
+@example
+$ certtool --certificate-info --infile cert.pem --outder --outfile cert.der
 @end example
 
 @subheading PKCS #12 structure generation
