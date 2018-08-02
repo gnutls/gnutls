@@ -55,7 +55,9 @@
 			"-e", "padding - cipher TLS_AES_128_GCM_SHA256, pad_byte 0, pad_left 0, pad_right 16777183",
 			"-e", "padding - cipher TLS_AES_256_GCM_SHA384, pad_byte 0, pad_left 0, pad_right 16777167"]},
 	 {"name" : "test-tls13-count-tickets.py",
-	  "arguments": ["-p", "@PORT@", "-t", "1"]}
+	  "arguments": ["-p", "@PORT@", "-t", "1"]},
+	 {"name" : "test-tls13-0rtt-garbage.py",
+	  "arguments": ["-p", "@PORT@"]}
      ]
     }
 ]
