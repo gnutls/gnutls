@@ -1273,7 +1273,6 @@ int main(int argc, char **argv)
 				}
 				continue;
 			}
-			bytes=strlen(buffer);
 			buffer[bytes] = 0;
 
 			if (crlf != 0) {
