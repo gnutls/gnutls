@@ -51,7 +51,8 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute valgrind --leak-check=full"
 fi
 
-TMPFILE="testpkcs11.debug.log"
+TMPFILE="testpkcs11.$$.tmp"
+LOGFILE="testpkcs11.debug.log"
 CERTTOOL_PARAM="--stdout-info"
 
 if test "${WINDIR}" != ""; then
@@ -66,13 +67,13 @@ SERV="${SERV} -q"
 
 . ${srcdir}/scripts/common.sh
 
-rm -f "${TMPFILE}"
+rm -f "${LOGFILE}"
 
 exit_error () {
-	echo "check ${TMPFILE} for additional debugging information"
+	echo "check ${LOGFILE} for additional debugging information"
 	echo ""
 	echo ""
-	tail "${TMPFILE}"
+	tail "${LOGFILE}"
 	exit 1
 }
 
@@ -86,7 +87,7 @@ write_privkey () {
 	token="$1"
 
 	echo -n "* Writing a client private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label gnutls-client2 --load-privkey "${filename}" "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label gnutls-client2 --load-privkey "${filename}" "${token}" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -95,7 +96,7 @@ write_privkey () {
 	fi
 
 	echo -n "* Checking whether object was marked private... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --list-privkeys "${token};object=gnutls-client2" 2>/dev/null | grep 'Label\:' >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --list-privkeys "${token};object=gnutls-client2" 2>/dev/null | grep 'Label\:' >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo "private object was public"
 		exit_error
@@ -120,7 +121,7 @@ write_serv_privkey () {
 	token="$1"
 
 	echo -n "* Writing the server private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label serv-key --load-privkey "${filename}" "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label serv-key --load-privkey "${filename}" "${token}" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -139,7 +140,7 @@ write_serv_pubkey () {
 	token="$1"
 
 	echo -n "* Writing the server public key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label serv-pubkey --load-pubkey "${filename}" "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label serv-pubkey --load-pubkey "${filename}" "${token}" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -148,7 +149,7 @@ write_serv_pubkey () {
 	fi
 
 	#verify it being written
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all "${token};object=serv-pubkey;type=public" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all "${token};object=serv-pubkey;type=public" >>"${LOGFILE}" 2>&1
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all "${token};object=serv-pubkey;type=public"|grep "Public key" >/dev/null 2>&1
 	if test $? != 0;then
 		echo "Cannot verify the existence of the written pubkey"
@@ -165,7 +166,7 @@ write_serv_cert () {
 	token="$1"
 
 	echo -n "* Writing the server certificate... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --no-mark-private --label serv-cert --load-certificate "${filename}" "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --no-mark-private --label serv-cert --load-certificate "${filename}" "${token}" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -183,7 +184,7 @@ test_delete_cert () {
 	token="$1"
 
 	echo -n "* Deleting the server certificate... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --delete "${token};object=serv-cert;object-type=cert" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --delete "${token};object=serv-cert;object-type=cert" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -201,7 +202,7 @@ generate_rsa_privkey () {
 	bits="$3"
 
 	echo -n "* Generating RSA private key ("${bits}")... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --id 000102030405 --label gnutls-client --generate-rsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --id 000102030405 --label gnutls-client --generate-rsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -210,7 +211,7 @@ generate_rsa_privkey () {
 	fi
 
 	echo -n "* Checking whether generated private key was marked private... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --list-privkeys "${token};object=gnutls-client" 2>/dev/null | grep 'Label\:' >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --list-privkeys "${token};object=gnutls-client" 2>/dev/null | grep 'Label\:' >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo "private object was public"
 		exit_error
@@ -235,7 +236,7 @@ generate_temp_rsa_privkey () {
 	bits="$3"
 
 	echo -n "* Generating RSA private key ("${bits}")... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --label temp-rsa-"${bits}" --generate-rsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --label temp-rsa-"${bits}" --generate-rsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -245,13 +246,13 @@ generate_temp_rsa_privkey () {
 
 #  if test ${RETCODE} = 0; then
 #    echo -n "* Testing private key flags... "
-#    ${P11TOOL} ${ADDITIONAL_PARAM} --login --list-keys "${token};object=gnutls-client2;object-type=private" >tmp-client-2.pub 2>>"${TMPFILE}"
+#    ${P11TOOL} ${ADDITIONAL_PARAM} --login --list-keys "${token};object=gnutls-client2;object-type=private" >tmp-client-2.pub 2>>"${LOGFILE}"
 #    if test $? != 0; then
 #      echo failed
 #      exit_error
 #    fi
 #
-#    grep CKA_WRAP tmp-client-2.pub >>"${TMPFILE}" 2>&1
+#    grep CKA_WRAP tmp-client-2.pub >>"${LOGFILE}" 2>&1
 #    if test $? != 0; then
 #      echo "failed (no CKA_WRAP)"
 #      exit_error
@@ -267,7 +268,7 @@ generate_temp_dsa_privkey () {
 	bits="$3"
 
 	echo -n "* Generating DSA private key ("${bits}")... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --label temp-dsa-"${bits}" --generate-dsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --label temp-dsa-"${bits}" --generate-dsa --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -286,7 +287,7 @@ delete_temp_privkey () {
 	test "${RETCODE}" = "0" || return
 
 	echo -n "* Deleting private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --delete "${token};object=temp-${type};object-type=private" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --delete "${token};object=temp-${type};object-type=private" >>"${LOGFILE}" 2>&1
 
 	if test $? != 0; then
 		echo failed
@@ -307,7 +308,7 @@ export_pubkey_of_privkey () {
 	bits="$3"
 
 	echo -n "* Exporting public key of generated private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --export-pubkey "${token};object=gnutls-client;object-type=private" --outfile tmp-client-2.pub >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --export-pubkey "${token};object=gnutls-client;object-type=private" --outfile tmp-client-2.pub >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit 1
@@ -329,13 +330,13 @@ change_id_of_privkey () {
 	token="$1"
 
 	echo -n "* Change the CKA_ID of generated private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-id "01a1b103" "${token};object=gnutls-client;id=%00%01%02%03%04%05;object-type=private" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-id "01a1b103" "${token};object=gnutls-client;id=%00%01%02%03%04%05;object-type=private" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client;object-type=private;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=gnutls-client;object-type=private;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "ID didn't change"
 		exit_error
@@ -351,19 +352,19 @@ change_label_of_privkey () {
 	token="$1"
 
 	echo -n "* Change the CKA_LABEL of generated private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-label "new-label" "${token};object=gnutls-client;object-type=private" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-label "new-label" "${token};object=gnutls-client;object-type=private" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=new-label;object-type=private" 2>&1 |grep 'Label: new-label' >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-privkeys "${token};object=new-label;object-type=private" 2>&1 |grep 'Label: new-label' >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "label didn't change"
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-label "gnutls-client" "${token};object=new-label;object-type=private" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-label "gnutls-client" "${token};object=new-label;object-type=private" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
@@ -381,7 +382,7 @@ generate_temp_ecc_privkey () {
 	bits="$3"
 
 	echo -n "* Generating ECC private key (${bits})... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --label "temp-ecc-${bits}" --generate-ecc --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --label "temp-ecc-${bits}" --generate-ecc --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -401,7 +402,7 @@ generate_temp_ecc_privkey_no_login () {
 	bits="$3"
 
 	echo -n "* Generating ECC private key without --login (${bits})... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --label "temp-ecc-no-${bits}" --generate-ecc --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --label "temp-ecc-no-${bits}" --generate-ecc --bits "${bits}" "${token}" --outfile tmp-client.pub >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -428,13 +429,13 @@ import_privkey () {
 
 	echo -n "* Importing ${name} private key (${bits})... "
 
-	"${CERTTOOL}" ${CERTTOOL_PARAM} --generate-privkey "${gen_option}" --pkcs8 --password= --outfile "${outfile}" >>"${TMPFILE}" 2>&1
+	"${CERTTOOL}" ${CERTTOOL_PARAM} --generate-privkey "${gen_option}" --pkcs8 --password= --outfile "${outfile}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit 1
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label "${prefix}-${bits}" --load-privkey "${outfile}" "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label "${prefix}-${bits}" --load-privkey "${outfile}" "${token}" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -472,7 +473,7 @@ write_certificate_test () {
 	echo -n "* Generating client certificate... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
 	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey "${token};object=gnutls-client;object-type=private" \
-	--load-pubkey "$pubkey" --outfile tmp-client.crt >>"${TMPFILE}" 2>&1
+	--load-pubkey "$pubkey" --outfile tmp-client.crt >>"${LOGFILE}" 2>&1
 
 	if test $? = 0; then
 		echo ok
@@ -482,7 +483,7 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Writing client certificate... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --id "01a1b103" --label gnutls-client --load-certificate tmp-client.crt "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --id "01a1b103" --label gnutls-client --load-certificate tmp-client.crt "${token}" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -491,7 +492,7 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Checking whether ID was correctly set... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=gnutls-client;object-type=private;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=gnutls-client;object-type=private;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "ID was not set on copy"
 		exit_error
@@ -503,7 +504,7 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Checking whether object was public... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --list-all-certs "${token};object=gnutls-client;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --list-all-certs "${token};object=gnutls-client;id=%01%a1%b1%03" 2>&1 | grep 'ID: 01:a1:b1:03' >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "certificate object was not public"
 		exit_error
@@ -515,11 +516,11 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Writing certificate of client's CA... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --mark-trusted --mark-ca --write --label gnutls-ca --load-certificate "${cacert}" "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --mark-trusted --mark-ca --write --label gnutls-ca --load-certificate "${cacert}" "${token}" >>"${LOGFILE}" 2>&1
 	ret=$?
 	if test ${ret} != 0; then
-		echo "Failed with PIN, trying to write with so PIN" >>"${TMPFILE}"
-		${P11TOOL} ${ADDITIONAL_PARAM} --so-login --mark-ca --write --mark-trusted --label gnutls-ca --load-certificate "${cacert}" "${token}" >>"${TMPFILE}" 2>&1
+		echo "Failed with PIN, trying to write with so PIN" >>"${LOGFILE}"
+		${P11TOOL} ${ADDITIONAL_PARAM} --so-login --mark-ca --write --mark-trusted --label gnutls-ca --load-certificate "${cacert}" "${token}" >>"${LOGFILE}" 2>&1
 		ret=$?
 	fi
 
@@ -531,19 +532,20 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Testing certificate flags... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all-certs "${token};object=gnutls-ca;object-type=cert" |grep Flags|head -n 1 >tmp-client-2.pub 2>>"${TMPFILE}"
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all-certs "${token};object=gnutls-ca;object-type=cert" >${TMPFILE} 2>&1
+	grep Flags ${TMPFILE}|head -n 1 >tmp-client-2.pub 2>>"${LOGFILE}"
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	grep CKA_TRUSTED tmp-client-2.pub >>"${TMPFILE}" 2>&1
+	grep CKA_TRUSTED tmp-client-2.pub >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "failed (no CKA_TRUSTED)"
 		#exit_error
 	fi
 
-	grep "CKA_CERTIFICATE_CATEGORY=CA" tmp-client-2.pub >>"${TMPFILE}" 2>&1
+	grep "CKA_CERTIFICATE_CATEGORY=CA" tmp-client-2.pub >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "failed (no CKA_CERTIFICATE_CATEGORY=CA)"
 		#exit_error
@@ -551,9 +553,35 @@ write_certificate_test () {
 
 	echo ok
 
+	echo -n "* Checking output of certificate"
+	grep "Expires: Sun Dec 13 08:24:54 2020" ${TMPFILE} >/dev/null
+	if test $? != 0;then
+		echo "failed. Expiration time not found"
+		exit_error
+	fi
+
+	grep "X.509 Certificate (RSA-1024)" ${TMPFILE} >/dev/null
+	if test $? != 0;then
+		echo "failed. Certificate type and size not found."
+		exit_error
+	fi
+
+	grep "Label: gnutls-ca" ${TMPFILE} >/dev/null
+	if test $? != 0;then
+		echo "failed. Certificate label not found."
+		exit_error
+	fi
+
+	grep "Flags: CKA_CERTIFICATE_CATEGORY=CA; CKA_TRUSTED;" ${TMPFILE} >/dev/null
+	if test $? != 0;then
+		echo "failed. Object flags were not found."
+		exit_error
+	fi
+
+	rm -f ${TMPFILE}
 
 	echo -n "* Trying to obtain back the cert... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --export "${token};object=gnutls-ca;object-type=cert" --outfile crt1.tmp >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --export "${token};object=gnutls-ca;object-type=cert" --outfile crt1.tmp >>"${LOGFILE}" 2>&1
 	${DIFF} crt1.tmp "${srcdir}/testpkcs11-certs/ca.crt"
 	if test $? != 0; then
 		echo "failed. Exported certificate differs (crt1.tmp)!"
@@ -568,7 +596,7 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Trying to obtain the full chain... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --export-chain "${token};object=gnutls-client;object-type=cert"|"${CERTTOOL}" ${CERTTOOL_PARAM}  -i --outfile crt1.tmp >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --export-chain "${token};object=gnutls-client;object-type=cert"|"${CERTTOOL}" ${CERTTOOL_PARAM}  -i --outfile crt1.tmp >>"${LOGFILE}" 2>&1
 
 	cat tmp-client.crt ${srcdir}/testpkcs11-certs/ca.crt|"${CERTTOOL}" ${CERTTOOL_PARAM}  -i >crt2.tmp
 	${DIFF} crt1.tmp crt2.tmp
@@ -600,7 +628,7 @@ write_certificate_id_test_rsa () {
 	cacert="$4"
 
 	echo -n "* Generating RSA private key on HSM... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --label xxx1-rsa --generate-rsa --bits 1024 "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --label xxx1-rsa --generate-rsa --bits 1024 "${token}" >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -611,7 +639,7 @@ write_certificate_id_test_rsa () {
 	echo -n "* Checking whether right ID is set on copy... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
 	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey "${token};object=xxx1-rsa;object-type=private" \
-	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
+	--outfile tmp-client.crt >>"${LOGFILE}" 2>&1
 
 	if test $? != 0; then
 		echo failed
@@ -619,13 +647,13 @@ write_certificate_id_test_rsa () {
 	fi
 
 	id=$(${P11TOOL} ${ADDITIONAL_PARAM} --list-all "${token};object=xxx1-rsa;object-type=public" 2>&1 | grep 'ID: '|sed -e 's/ID://' -e 's/^[ \t]*//' -e 's/[ \t]*$//')
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx1-rsa --load-certificate tmp-client.crt "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx1-rsa --load-certificate tmp-client.crt "${token}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx1-rsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx1-rsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "ID '$id' was not set on copy"
 		exit_error
@@ -649,7 +677,7 @@ write_certificate_id_test_rsa2 () {
 	tmpkey="key.$$.tmp"
 
 	echo -n "* Generating RSA private key... "
-	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --bits 1024 --outfile ${tmpkey} >>"${TMPFILE}" 2>&1
+	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --bits 1024 --outfile ${tmpkey} >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -660,14 +688,14 @@ write_certificate_id_test_rsa2 () {
 	echo -n "* Checking whether right ID is set on copy... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
 	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
-	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
+	--outfile tmp-client.crt >>"${LOGFILE}" 2>&1
 
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label xxx2-rsa --load-privkey ${tmpkey} "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label xxx2-rsa --load-privkey ${tmpkey} "${token}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
@@ -676,13 +704,13 @@ write_certificate_id_test_rsa2 () {
 	id=$(${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all "${token};object=xxx2-rsa;object-type=private" 2>&1 | grep 'ID: '|sed -e 's/ID://' -e 's/^[ \t]*//' -e 's/[ \t]*$//')
 
 	rm -f ${tmpkey}
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx2-rsa --load-certificate tmp-client.crt "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx2-rsa --load-certificate tmp-client.crt "${token}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx2-rsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx2-rsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "ID '$id' was not set on copy"
 		exit_error
@@ -706,7 +734,7 @@ write_certificate_id_test_ecdsa () {
 	tmpkey="key.$$.tmp"
 
 	echo -n "* Generating ECDSA private key... "
-	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --ecdsa --outfile ${tmpkey} >>"${TMPFILE}" 2>&1
+	${CERTTOOL} ${ADDITIONAL_PARAM} --generate-privkey --ecdsa --outfile ${tmpkey} >>"${LOGFILE}" 2>&1
 	if test $? = 0; then
 		echo ok
 	else
@@ -717,14 +745,14 @@ write_certificate_id_test_ecdsa () {
 	echo -n "* Checking whether right ID is set on copy... "
 	"${CERTTOOL}" ${CERTTOOL_PARAM} ${ADDITIONAL_PARAM}  --generate-certificate --load-ca-privkey "${cakey}"  --load-ca-certificate "${cacert}"  \
 	--template ${srcdir}/testpkcs11-certs/client-tmpl --load-privkey ${tmpkey} \
-	--outfile tmp-client.crt >>"${TMPFILE}" 2>&1
+	--outfile tmp-client.crt >>"${LOGFILE}" 2>&1
 
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label xxx-ecdsa --load-privkey ${tmpkey} "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label xxx-ecdsa --load-privkey ${tmpkey} "${token}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
@@ -733,13 +761,13 @@ write_certificate_id_test_ecdsa () {
 	id=$(${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all "${token};object=xxx-ecdsa;object-type=private" 2>&1 | grep 'ID: '|sed -e 's/ID://' -e 's/^[ \t]*//' -e 's/[ \t]*$//')
 
 	rm -f ${tmpkey}
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx-ecdsa --load-certificate tmp-client.crt "${token}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --write --label tmp-xxx-ecdsa --load-certificate tmp-client.crt "${token}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit_error
 	fi
 
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx-ecdsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-certs "${token};object=tmp-xxx-ecdsa;object-type=cert" 2>&1 | grep "ID: ${id}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "ID '$id' was not set on copy"
 		exit_error
@@ -752,7 +780,7 @@ test_sign () {
 	token="$1"
 
 	echo -n "* Testing signatures using the private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};object=serv-key" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};object=serv-key" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "failed. Cannot test signatures."
 		exit_error
@@ -760,7 +788,7 @@ test_sign () {
 	echo ok
 
 	echo -n "* Testing RSA-PSS signatures using the private key... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --sign-params rsa-pss --test-sign "${token};object=serv-key" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --sign-params rsa-pss --test-sign "${token};object=serv-key" >>"${LOGFILE}" 2>&1
 	rc=$?
 	if test $rc != 0; then
 		if test $rc = 2; then
@@ -774,8 +802,8 @@ test_sign () {
 	fi
 
 	echo -n "* Testing signatures using the private key (with ID)... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};id=%ac%1d%7a%39%cb%72%17%94%66%6c%74%44%73%40%91%44%c0%a0%43%7d" >>"${TMPFILE}" 2>&1
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};id=%ac%1d%7a%39%cb%72%17%94%66%6c%74%44%73%40%91%44%c0%a0%43%7d" 2>&1|grep "Verifying against public key in the token..."|grep ok >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};id=%ac%1d%7a%39%cb%72%17%94%66%6c%74%44%73%40%91%44%c0%a0%43%7d" >>"${LOGFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --test-sign "${token};id=%ac%1d%7a%39%cb%72%17%94%66%6c%74%44%73%40%91%44%c0%a0%43%7d" 2>&1|grep "Verifying against public key in the token..."|grep ok >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "failed. Cannot test signatures with ID."
 		exit_error
@@ -791,7 +819,7 @@ test_sign_set_pin () {
 	unset GNUTLS_PIN
 
 	echo -n "* Testing signatures using the private key and --set-pin... "
-	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-pin ${pin} --test-sign "${token};object=serv-key" >>"${TMPFILE}" 2>&1
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --set-pin ${pin} --test-sign "${token};object=serv-key" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo "failed. Cannot test signatures."
 		exit_error
@@ -821,22 +849,22 @@ use_certificate_test () {
 	eval "${GETPORT}"
 	launch_pkcs11_server $$ "${ADDITIONAL_PARAM}" --echo --priority NORMAL --x509certfile="${certfile}" \
 		--x509keyfile="$keyfile" --x509cafile="${cafile}" \
-		--verify-client-cert --require-client-cert >>"${TMPFILE}" 2>&1
+		--verify-client-cert --require-client-cert >>"${LOGFILE}" 2>&1
 
 	PID=$!
 	wait_server ${PID}
 
 	# connect to server using SC
-	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509cafile="${cafile}" </dev/null >>"${TMPFILE}" 2>&1 && \
+	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 && \
 		fail ${PID} "Connection should have failed!"
 
 	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${certfile}" \
-	--x509keyfile="$keyfile" --x509cafile="${cafile}" </dev/null >>"${TMPFILE}" 2>&1 || \
+	--x509keyfile="$keyfile" --x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
 		fail ${PID} "Connection (with files) should have succeeded!"
 
 	${VALGRIND} "${CLI}" ${ADDITIONAL_PARAM} -p "${PORT}" localhost --priority NORMAL --x509certfile="${token};object=gnutls-client;object-type=cert" \
 		--x509keyfile="${token};object=gnutls-client;object-type=private" \
-		--x509cafile="${cafile}" </dev/null >>"${TMPFILE}" 2>&1 || \
+		--x509cafile="${cafile}" </dev/null >>"${LOGFILE}" 2>&1 || \
 		fail ${PID} "Connection (with SC) should have succeeded!"
 
 	kill ${PID}
@@ -933,6 +961,6 @@ test_sign_set_pin "${TOKEN}" "${GNUTLS_PIN}"
 if test ${RETCODE} = 0; then
 	echo "* All smart cards tests succeeded"
 fi
-rm -f tmp-client.crt tmp-client.pub tmp-client-2.pub "${TMPFILE}"
+rm -f tmp-client.crt tmp-client.pub tmp-client-2.pub "${LOGFILE}" "${TMPFILE}"
 
 exit 0

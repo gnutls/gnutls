@@ -110,7 +110,7 @@ pkcs11_delete(FILE * outfile, const char *url,
 }
 
 static
-const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl, unsigned flags)
+const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl, unsigned flags, time_t *exp)
 {
 	int ret;
 	gnutls_pubkey_t pubkey = NULL;
@@ -121,6 +121,9 @@ const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl
 	unsigned int bits;
 	gnutls_pk_algorithm_t pk;
 	gnutls_ecc_curve_t curve;
+
+	if (exp)
+		*exp = -1;
 
 	switch (otype) {
 		case GNUTLS_PKCS11_OBJ_X509_CRT:
@@ -143,6 +146,10 @@ const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl
 					p = str;
 				}
 			}
+
+			if (exp)
+				*exp = gnutls_x509_crt_get_expiration_time(crt);
+
 			gnutls_x509_crt_deinit(crt);
 			return p;
 		case GNUTLS_PKCS11_OBJ_PUBKEY:
@@ -217,6 +224,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	gnutls_x509_ext_st *exts;
 	unsigned exts_size;
 	unsigned int obj_flags = flags;
+	time_t exp;
 
 	pkcs11_common(info);
 
@@ -283,7 +291,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		if (otype == GNUTLS_PKCS11_OBJ_PRIVKEY ||
 		    otype == GNUTLS_PKCS11_OBJ_PUBKEY ||
 		    otype == GNUTLS_PKCS11_OBJ_X509_CRT) {
-			p = get_key_algo_type(otype, output, obj_flags);
+			p = get_key_algo_type(otype, output, obj_flags, &exp);
 		}
 
 		if (p) {
@@ -292,6 +300,13 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		} else {
 			fprintf(outfile, "\tType: %s\n",
 				gnutls_pkcs11_type_get_name(otype));
+		}
+
+		if (otype == GNUTLS_PKCS11_OBJ_X509_CRT && exp != -1) {
+			if (exp == GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION)
+				fprintf(outfile, "\tExpires: Never\n");
+			else
+				fprintf(outfile, "\tExpires: %s", ctime(&exp));
 		}
 
 		gnutls_free(output);
