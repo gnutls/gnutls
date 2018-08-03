@@ -24,7 +24,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/bmpstring.pem data/template-utf8.pem templates/template-utf8.tmpl \
 	templates/template-dn.tmpl data/template-dn.pem data/complex-cert.pem \
 	data/template-overflow.pem templates/template-overflow.tmpl data/template-overflow2.pem \
-	templates/template-overflow2.tmpl data/template-crq.pem \
+	templates/template-overflow2.tmpl data/template-crq.pem data/cert-ecc256-full.pem \
 	templates/template-date.tmpl data/template-date.pem templates/template-dn-err.tmpl \
 	templates/template-nc.tmpl data/template-nc.pem data/xmpp-othername.pem \
 	suppressions.valgrind data/csr-invalid.der data/invalid-sig2.pem data/invalid-sig3.pem \
@@ -43,7 +43,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/template-krb5name.pem data/template-krb5name-full.pem data/template-test-ecc.key \
 	data/template-rsa-sha3-256.pem data/template-rsa-sha3-512.pem data/template-rsa-sha3-224.pem \
 	data/template-rsa-sha3-384.pem data/long-oids.pem \
-	data/name-constraints-ip2.pem data/chain-md5.pem \
+	data/name-constraints-ip2.pem data/chain-md5.pem data/pubkey-ecc256.pem \
 	templates/template-dates-after2038.tmpl data/template-dates-after2038.pem \
 	data/gost-cert.pem data/gost-cert-nogost.pem data/gost94-cert.pem \
 	templates/template-tlsfeature.tmpl data/userid.pem data/cert-with-crl.p12 \
@@ -100,7 +100,7 @@ dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	provable-privkey-rsa2048 provable-privkey-gen-default pkcs7-constraints \
 	pkcs7-constraints2 certtool-long-oids pkcs7-cat cert-sanity cert-critical \
 	pkcs12 certtool-crl-decoding pkcs12-encode pkcs12-corner-cases inhibit-anypolicy \
-	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa \
+	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa certtool-ecdsa \
 	key-id pkcs8 pkcs8-decode ecdsa illegal-rsa pkcs8-invalid key-invalid \
 	pkcs8-eddsa
 
