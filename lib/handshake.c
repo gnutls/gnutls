@@ -1991,12 +1991,13 @@ static int send_client_hello(gnutls_session_t session, int again)
 	uint8_t session_id_len =
 	    session->internals.resumed_security_parameters.session_id_size;
 
-	/* note that rehandshake is different than resuming
-	 */
-	if (session->security_parameters.session_id_size)
-		rehandshake = 1;
 
 	if (again == 0) {
+		/* note that rehandshake is different than resuming
+		 */
+		if (session->internals.initial_negotiation_completed)
+			rehandshake = 1;
+
 		ret = _gnutls_buffer_init_handshake_mbuffer(&extdata);
 		if (ret < 0)
 			return gnutls_assert_val(ret);

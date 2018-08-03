@@ -109,6 +109,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value \
 	tls13/post-handshake-with-psk
 
+ctests += tls13/hello_retry_request
+
 ctests += tls13/psk-ext
 
 ctests += tls13/key_update
