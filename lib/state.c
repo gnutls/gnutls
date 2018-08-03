@@ -1351,6 +1351,9 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_HB_PEER_SEND;
 	if (session->internals.hsk_flags & HSK_FALSE_START_USED)
 		flags |= GNUTLS_SFLAGS_FALSE_START;
+	if ((session->internals.hsk_flags & HSK_EARLY_START_USED) &&
+	    (session->internals.flags & GNUTLS_ENABLE_EARLY_START))
+		flags |= GNUTLS_SFLAGS_EARLY_START;
 	if (session->internals.hsk_flags & HSK_USED_FFDHE)
 		flags |= GNUTLS_SFLAGS_RFC7919;
 	if (session->internals.hsk_flags & HSK_TICKET_RECEIVED)

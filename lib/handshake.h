@@ -28,6 +28,11 @@
 #include "record.h"
 #include <assert.h>
 
+/* The following two macros are used in the handshake state machines; the first
+ * (IMED_RET) accounts for non-fatal errors and re-entry to current state, while
+ * the latter invalidates the handshake on any error (to be used by functions
+ * that are not expected to return non-fatal errors).
+ */
 #define IMED_RET( str, ret, allow_alert) do { \
 	if (ret < 0) { \
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
@@ -49,6 +54,16 @@
 		gnutls_assert(); \
 		/* do not allow non-fatal errors at this point */ \
 		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
+		session_invalidate(session); \
+		_gnutls_handshake_hash_buffers_clear(session); \
+		return ret; \
+	} } while (0)
+
+#define IMED_RET_FATAL( str, ret, allow_alert) do { \
+	if (ret < 0) { \
+		gnutls_assert(); \
+		if (gnutls_error_is_fatal(ret) == 0) \
+			ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
 		session_invalidate(session); \
 		_gnutls_handshake_hash_buffers_clear(session); \
 		return ret; \

@@ -209,6 +209,7 @@ int gnutls_error_to_alert(int err, int *level)
 	case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
 	case GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH:
 	case GNUTLS_E_NO_CERTIFICATE_FOUND:
+	case GNUTLS_E_HANDSHAKE_TOO_LARGE:
 		ret = GNUTLS_A_DECODE_ERROR;
 		_level = GNUTLS_AL_FATAL;
 		break;

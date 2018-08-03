@@ -138,7 +138,7 @@ LIST_TYPE_DECLARE(listener_item, char *http_request; char *http_response;
 		  int listen_socket; int fd;
 		  gnutls_session_t tls_session;
 		  int handshake_ok;
-		  int no_close;
+		  int close_ok;
 		  time_t start;
     );
 
@@ -156,7 +156,7 @@ static void listener_free(listener_item * j)
 	free(j->http_request);
 	free(j->http_response);
 	if (j->fd >= 0) {
-		if (j->no_close == 0)
+		if (j->close_ok)
 			gnutls_bye(j->tls_session, GNUTLS_SHUT_WR);
 		shutdown(j->fd, 2);
 		close(j->fd);
@@ -1281,7 +1281,7 @@ static void retry_handshake(listener_item *j)
 		do {
 			ret = gnutls_alert_send_appropriate(j->tls_session, r);
 		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-		j->no_close = 1;
+		j->close_ok = 0;
 	} else if (r == 0) {
 		if (gnutls_session_is_resumed(j->tls_session) != 0 && verbose != 0)
 			printf("*** This is a resumed session\n");
@@ -1299,14 +1299,16 @@ static void retry_handshake(listener_item *j)
 			print_info(j->tls_session, verbose, verbose);
 		}
 
+		j->close_ok = 1;
 		j->handshake_ok = 1;
 	}
 }
 
 static void try_rehandshake(listener_item *j)
 {
-int r, ret;
+	int r, ret;
 	fprintf(stderr, "*** Received hello message\n");
+
 	do {
 		r = gnutls_handshake(j->tls_session);
 	} while (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN);
@@ -1318,6 +1320,7 @@ int r, ret;
 		fprintf(stderr, "Error in rehandshake: %s\n", gnutls_strerror(r));
 		j->http_state = HTTP_STATE_CLOSING;
 	} else {
+		j->close_ok = 1;
 		j->http_state = HTTP_STATE_REQUEST;
 	}
 }
@@ -1425,7 +1428,7 @@ static void tcp_server(const char *name, int port)
 					    (j->tls_session, accept_fd);
 					set_read_funcs(j->tls_session);
 					j->handshake_ok = 0;
-					j->no_close = 0;
+					j->close_ok = 0;
 
 					if (verbose != 0) {
 						ctt = ctime(&tt);
@@ -1479,7 +1482,7 @@ static void tcp_server(const char *name, int port)
 									ret = gnutls_alert_send_appropriate(j->tls_session, r);
 								} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 								GERR(r);
-								j->no_close = 1;
+								j->close_ok = 0;
 							}
 						}
 					} else {

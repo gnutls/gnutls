@@ -11,8 +11,12 @@ See the end for copying conditions.
    gnutls_certificate_set_retrieve_function() which could not handle the case where
    no certificates were returned, or the callbacks were set to NULL (see #528).
 
+** libgnutls: gnutls_handshake() on server returns early on handshake when no
+   certificate is presented by client and the gnutls_init() flag GNUTLS_ENABLE_EARLY_START
+   is specified.
+
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_ENABLE_EARLY_START: Added
 
 
 * Version 3.6.3 (released 2018-07-16)

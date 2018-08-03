@@ -269,7 +269,7 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE90=90, STATE91, STATE92, STATE93, STATE94, STATE99=99,
 	STATE100=100, STATE101, STATE102, STATE103, STATE104,
 	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110,
-	STATE111, STATE112,
+	STATE111, STATE112, STATE113, STATE114,
 	STATE150 /* key update */
 } handshake_state_t;
 
@@ -299,9 +299,14 @@ typedef enum heartbeat_state_t {
 typedef enum recv_state_t {
 	RECV_STATE_0 = 0,
 	RECV_STATE_DTLS_RETRANSMIT,
+	/* client-side false start state */
 	RECV_STATE_FALSE_START_HANDLING, /* we are calling gnutls_handshake() within record_recv() */
 	RECV_STATE_FALSE_START, /* gnutls_record_recv() should complete the handshake */
-	RECV_STATE_ASYNC_HANDSHAKE /* an incomplete async handshake message was seen */
+	/* async handshake msg state */
+	RECV_STATE_ASYNC_HANDSHAKE, /* an incomplete async handshake message was seen */
+	/* server-side early start under TLS1.3; enabled when no client cert is received */
+	RECV_STATE_EARLY_START_HANDLING, /* we are calling gnutls_handshake() within record_recv() */
+	RECV_STATE_EARLY_START /* gnutls_record_recv() should complete the handshake */
 } recv_state_t;
 
 #include "str.h"
@@ -504,8 +509,10 @@ struct gnutls_key_st {
 			 * early_secret, client_early_traffic_secret, ... */
 			uint8_t temp_secret[MAX_HASH_SIZE];
 			unsigned temp_secret_size; /* depends on negotiated PRF size */
-			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_hs_traffic_secret/client_ap_traffic_secret */
-			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_hs_traffic_secret/server_ap_traffic_secret */
+			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_hs_traffic_secret */
+			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_hs_traffic_secret */
+			uint8_t ap_ckey[MAX_HASH_SIZE]; /* client_ap_traffic_secret */
+			uint8_t ap_skey[MAX_HASH_SIZE]; /* server_ap_traffic_secret */
 			uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
 			uint8_t ap_rms[MAX_HASH_SIZE]; /* resumption_master_secret */
 		} tls13; /* tls1.3 */
@@ -1279,6 +1286,7 @@ typedef struct {
 				       * server: a ticket was sent to client.
 				       */
 #define HSK_TICKET_RECEIVED (1<<20) /* client: a session ticket was received */
+#define HSK_EARLY_START_USED (1<<21)
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */

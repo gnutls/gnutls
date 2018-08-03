@@ -2462,8 +2462,9 @@ int gnutls_rehandshake(gnutls_session_t session)
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	if (vers->tls13_sem)
+	if (vers->tls13_sem) {
 		return gnutls_session_key_update(session, GNUTLS_KU_PEER);
+	}
 
 	_dtls_async_timer_delete(session);
 
@@ -2652,9 +2653,8 @@ int gnutls_handshake(gnutls_session_t session)
 	}
 
 	/* clear handshake buffer */
-	if (session->security_parameters.entity != GNUTLS_CLIENT ||
-	    !(session->internals.flags & GNUTLS_ENABLE_FALSE_START) ||
-	    session->internals.recv_state != RECV_STATE_FALSE_START) {
+	if (session->internals.recv_state != RECV_STATE_FALSE_START &&
+	    session->internals.recv_state != RECV_STATE_EARLY_START) {
 
 		_gnutls_handshake_hash_buffers_clear(session);
 
@@ -2839,7 +2839,7 @@ static int handshake_client(gnutls_session_t session)
 
 		ret = _gnutls_ext_sr_verify(session);
 		STATE = STATE4;
-		IMED_RET("recv hello", ret, 0);
+		IMED_RET_FATAL("recv hello", ret, 0);
 		/* fall through */
 	case STATE5:
 		if (session->security_parameters.do_recv_supplemental) {
@@ -3257,7 +3257,7 @@ static int handshake_server(gnutls_session_t session)
 
 		ret = _gnutls_ext_sr_verify(session);
 		STATE = STATE2;
-		IMED_RET("recv hello", ret, 0);
+		IMED_RET_FATAL("recv hello", ret, 0);
 		/* fall through */
 	case STATE3:
 		ret = _gnutls_send_server_hello(session, AGAIN(STATE3));

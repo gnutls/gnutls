@@ -66,7 +66,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 {
 	struct hsk_st *h = gnutls_session_get_ptr(session);
 
-	if (htype == GNUTLS_HANDSHAKE_FINISHED && incoming) {
+	if (htype == GNUTLS_HANDSHAKE_FINISHED && !incoming) {
 		if (h->sleep_at_finished)
 			virt_sec_sleep(h->sleep_at_finished);
 		return 0;

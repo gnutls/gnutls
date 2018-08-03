@@ -75,10 +75,17 @@ int _gnutls13_recv_finished(gnutls_session_t session)
 
 	hash_size = session->security_parameters.prf->output_size;
 
-	if (session->security_parameters.entity == GNUTLS_CLIENT)
-		base_key = session->key.proto.tls13.hs_skey;
-	else
-		base_key = session->key.proto.tls13.hs_ckey;
+	if (!session->internals.initial_negotiation_completed) {
+		if (session->security_parameters.entity == GNUTLS_CLIENT)
+			base_key = session->key.proto.tls13.hs_skey;
+		else
+			base_key = session->key.proto.tls13.hs_ckey;
+	} else {
+		if (session->security_parameters.entity == GNUTLS_CLIENT)
+			base_key = session->key.proto.tls13.ap_skey;
+		else
+			base_key = session->key.proto.tls13.ap_ckey;
+	}
 
 	ret = _gnutls13_compute_finished(session->security_parameters.prf,
 			base_key,
@@ -133,10 +140,17 @@ int _gnutls13_send_finished(gnutls_session_t session, unsigned again)
 
 		hash_size = session->security_parameters.prf->output_size;
 
-		if (session->security_parameters.entity == GNUTLS_CLIENT)
-			base_key = session->key.proto.tls13.hs_ckey;
-		else
-			base_key = session->key.proto.tls13.hs_skey;
+		if (!session->internals.initial_negotiation_completed) {
+			if (session->security_parameters.entity == GNUTLS_CLIENT)
+				base_key = session->key.proto.tls13.hs_ckey;
+			else
+				base_key = session->key.proto.tls13.hs_skey;
+		} else {
+			if (session->security_parameters.entity == GNUTLS_CLIENT)
+				base_key = session->key.proto.tls13.ap_ckey;
+			else
+				base_key = session->key.proto.tls13.ap_skey;
+		}
 
 		ret = _gnutls13_compute_finished(session->security_parameters.prf,
 				base_key,
