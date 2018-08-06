@@ -276,6 +276,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 
 	session->internals.tfo.connect_addrlen = 0;
 	session->internals.tfo.connect_only = 0;
+	session->internals.early_data_received = 0;
 }
 
 /**
@@ -353,6 +354,13 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	    DEFAULT_MAX_RECORD_SIZE;
 	(*session)->security_parameters.max_record_send_size =
 	    DEFAULT_MAX_RECORD_SIZE;
+
+	/* set the default early data size for TLS
+	 */
+	if ((*session)->security_parameters.entity == GNUTLS_SERVER) {
+		(*session)->security_parameters.max_early_data_size =
+			DEFAULT_MAX_EARLY_DATA_SIZE;
+	}
 
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.

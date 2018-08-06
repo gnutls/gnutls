@@ -27,6 +27,7 @@
 #include "mbuffers.h"
 #include "ext/pre_shared_key.h"
 #include "ext/session_ticket.h"
+#include "ext/early_data.h"
 #include "auth/cert.h"
 #include "tls13/session_ticket.h"
 #include "session_pack.h"
@@ -329,7 +330,14 @@ cleanup:
 
 static int parse_nst_extension(void *ctx, unsigned tls_id, const unsigned char *data, unsigned data_size)
 {
-	/* ignore all extensions */
+	gnutls_session_t session = ctx;
+	if (tls_id == ext_mod_early_data.tls_id) {
+		uint32_t size;
+		if (data_size < 4)
+			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+		size = _gnutls_read_uint32(data);
+		session->security_parameters.max_early_data_size = size;
+	}
 	return 0;
 }
 
@@ -382,7 +390,7 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
 		return gnutls_assert_val(ret);
 
 	/* Extensions */
-	ret = _gnutls_extv_parse(NULL, parse_nst_extension, buf->data, buf->length);
+	ret = _gnutls_extv_parse(session, parse_nst_extension, buf->data, buf->length);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

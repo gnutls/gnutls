@@ -701,6 +701,7 @@ APIMANS += gnutls_record_recv_seq.3
 APIMANS += gnutls_record_send.3
 APIMANS += gnutls_record_send2.3
 APIMANS += gnutls_record_send_range.3
+APIMANS += gnutls_record_set_max_early_data_size.3
 APIMANS += gnutls_record_set_max_size.3
 APIMANS += gnutls_record_set_state.3
 APIMANS += gnutls_record_set_timeout.3

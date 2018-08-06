@@ -193,6 +193,7 @@ typedef enum record_send_state_t {
 #define IS_DTLS(session) (session->internals.transport == GNUTLS_DGRAM)
 
 #define DEFAULT_MAX_RECORD_SIZE 16384
+#define DEFAULT_MAX_EARLY_DATA_SIZE 16384
 #define TLS_RECORD_HEADER_SIZE 5
 #define DTLS_RECORD_HEADER_SIZE (TLS_RECORD_HEADER_SIZE+8)
 #define RECORD_HEADER_SIZE(session) (IS_DTLS(session) ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
@@ -338,6 +339,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 	GNUTLS_EXTENSION_SERVER_NAME,
 	GNUTLS_EXTENSION_COOKIE,
+	GNUTLS_EXTENSION_EARLY_DATA,
 	GNUTLS_EXTENSION_PSK_KE_MODES,
 	/*
 	 * pre_shared_key and dumbfw must always be the last extensions,
@@ -749,6 +751,10 @@ typedef struct {
 	 */
 	uint16_t max_record_send_size;
 	uint16_t max_record_recv_size;
+
+	/* The maximum amount of early data */
+	uint32_t max_early_data_size;
+
 	/* holds the negotiated certificate type */
 	gnutls_certificate_type_t cert_type;
 
@@ -1287,6 +1293,7 @@ typedef struct {
 				       */
 #define HSK_TICKET_RECEIVED (1<<20) /* client: a session ticket was received */
 #define HSK_EARLY_START_USED (1<<21)
+#define HSK_EARLY_DATA_IN_FLIGHT (1<<22) /* server: early_data extension was seen in ClientHello */
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
@@ -1387,6 +1394,9 @@ typedef struct {
 	int session_ticket_renew;
 
 	tls13_ticket_t tls13_ticket;
+
+	/* the amount of early data received so far */
+	uint32_t early_data_received;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

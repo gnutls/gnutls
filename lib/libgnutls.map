@@ -1237,6 +1237,12 @@ GNUTLS_3_6_3
 	gnutls_priority_init2;
 } GNUTLS_3_6_2;
 
+GNUTLS_3_6_4
+{
+ global:
+	gnutls_record_set_max_early_data_size;
+} GNUTLS_3_6_3;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
