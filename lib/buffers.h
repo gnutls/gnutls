@@ -22,6 +22,8 @@
 #ifndef GNUTLS_BUFFERS_H
 #define GNUTLS_BUFFERS_H
 
+#include "mbuffers.h"
+
 #define MBUFFER_FLUSH 1
 
 void
@@ -98,6 +100,7 @@ inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t
 		_gnutls_handshake_buffer_clear(&session->internals.
 					       handshake_recv_buffer[i]);
 	session->internals.handshake_recv_buffer_size = 0;
+	_mbuffer_head_clear(&session->internals.handshake_header_recv_buffer);
 }
 
 inline static void _gnutls_handshake_recv_buffer_init(gnutls_session_t
@@ -109,6 +112,7 @@ inline static void _gnutls_handshake_recv_buffer_init(gnutls_session_t
 					      handshake_recv_buffer[i]);
 	}
 	session->internals.handshake_recv_buffer_size = 0;
+	_mbuffer_head_init(&session->internals.handshake_header_recv_buffer);
 }
 
 int _gnutls_parse_record_buffered_msgs(gnutls_session_t session);

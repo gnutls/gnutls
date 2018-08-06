@@ -1190,8 +1190,15 @@ static int recv_headers(gnutls_session_t session,
 		    (session, "Received packet with illegal length: %u\n",
 		     (unsigned int) record->length);
 
-		if (record->length == 0)
+		if (record->length == 0) {
+			/* Empty, unencrypted records are always unexpected. */
+			if (record_params->cipher->id == GNUTLS_CIPHER_NULL)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_UNEXPECTED_PACKET);
+
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+		}
 		return
 		    gnutls_assert_val(GNUTLS_E_RECORD_OVERFLOW);
 	}

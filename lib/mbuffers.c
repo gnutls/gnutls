@@ -126,6 +126,25 @@ mbuffer_st *_mbuffer_dequeue(mbuffer_head_st * buf, mbuffer_st * bufel)
 	return ret;
 }
 
+/* Append a segment to the beginning of this buffer.
+ *
+ * Cost: O(1)
+ */
+void _mbuffer_head_push_first(mbuffer_head_st * buf, mbuffer_st * bufel)
+{
+	bufel->prev = NULL;
+	bufel->next = buf->head;
+
+	buf->length++;
+	buf->byte_length += bufel->msg.size - bufel->mark;
+
+	if (buf->head != NULL)
+		buf->head->prev = bufel;
+	else
+		buf->tail = bufel;
+	buf->head = bufel;
+}
+
 /* Get a reference to the first segment of the buffer and
  * remove it from the list.
  *
