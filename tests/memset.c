@@ -33,7 +33,6 @@
 #include "utils.h"
 
 #define BUF_SIZE 128
-#define CHAR 0x0a
 
 void func1(void);
 void func2(void);

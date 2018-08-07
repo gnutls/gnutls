@@ -18,11 +18,8 @@
  *
  */
 
-#ifdef TEST_SAFE_MEMSET
-# include <string.h>
-#else
-# include "gnutls_int.h"
-#endif
+#include "gnutls_int.h"
+#include <string.h>
 
 /**
  * gnutls_memset:
@@ -33,14 +30,18 @@
  * This function will operate similarly to memset(), but will
  * not be optimized out by the compiler.
  *
- * Returns: void.
- *
  * Since: 3.4.0
  **/
 void gnutls_memset(void *data, int c, size_t size)
 {
-	volatile unsigned volatile_zero = 0;
+	volatile unsigned volatile_zero;
 	volatile char *vdata = (volatile char*)data;
+#ifdef HAVE_EXPLICIT_BZERO
+	if (c == 0) {
+		explicit_bzero(data, size);
+	}
+#endif
+	volatile_zero = 0;
 
 	/* This is based on a nice trick for safe memset,
 	 * sent by David Jacobson in the openssl-dev mailing list.
