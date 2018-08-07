@@ -568,7 +568,8 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
 		}
 		data = tmp;
 		data_size = size;
-		/* fallthrough */
+
+		FALLTHROUGH;
 	case GNUTLS_PKCS11_OBJ_ID:
 		a[0].type = CKA_ID;
 		a[0].value = (void*)data;

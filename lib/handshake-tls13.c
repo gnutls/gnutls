@@ -88,33 +88,33 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		STATE = STATE100;
 		IMED_RET("send change cipher spec", ret, 0);
 #endif
-		/* fall through */
+		FALLTHROUGH;
 	case STATE101:
 		ret =
 		    generate_and_set_hs_traffic_keys(session);
 		STATE = STATE101;
 		IMED_RET_FATAL("generate session keys", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE102:
 		ret = _gnutls13_recv_encrypted_extensions(session);
 		STATE = STATE102;
 		IMED_RET("recv encrypted extensions", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE103:
 		ret = _gnutls13_recv_certificate_request(session);
 		STATE = STATE103;
 		IMED_RET("recv certificate request", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE104:
 		ret = _gnutls13_recv_certificate(session);
 		STATE = STATE104;
 		IMED_RET("recv certificate", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE105:
 		ret = _gnutls13_recv_certificate_verify(session);
 		STATE = STATE105;
 		IMED_RET("recv server certificate verify", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE106:
 		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
 		STATE = STATE106;
@@ -125,22 +125,22 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		ret = _gnutls13_recv_finished(session);
 		STATE = STATE107;
 		IMED_RET("recv finished", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE108:
 		ret = _gnutls13_send_certificate(session, AGAIN(STATE108));
 		STATE = STATE108;
 		IMED_RET("send certificate", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE109:
 		ret = _gnutls13_send_certificate_verify(session, AGAIN(STATE109));
 		STATE = STATE109;
 		IMED_RET("send certificate verify", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE110:
 		ret = _gnutls13_send_finished(session, AGAIN(STATE110));
 		STATE = STATE110;
 		IMED_RET("send finished", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE111:
 		STATE = STATE111;
 
@@ -333,19 +333,19 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		ret = _gnutls13_handshake_hash_buffers_synth(session, session->security_parameters.prf, 0);
 		STATE = STATE90;
 		IMED_RET_FATAL("reset handshake buffers", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE91:
 		ret = _gnutls13_send_hello_retry_request(session, AGAIN(STATE91));
 		STATE = STATE91;
 		IMED_RET("send hello retry request", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE92:
 #ifdef TLS13_APPENDIX_D4
 		ret = _gnutls_send_change_cipher_spec(session, AGAIN(STATE92));
 		STATE = STATE92;
 		IMED_RET("send change cipher spec", ret, 0);
 #endif
-		/* fall through */
+		FALLTHROUGH;
 	case STATE93:
 		ret =
 		    _gnutls_recv_handshake(session,
@@ -361,12 +361,12 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		}
 
 		IMED_RET("recv client hello", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE94:
 		ret = _gnutls_send_server_hello(session, AGAIN(STATE94));
 		STATE = STATE94;
 		IMED_RET("send hello", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE99:
 	case STATE100:
 #ifdef TLS13_APPENDIX_D4
@@ -378,38 +378,38 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 			IMED_RET("send change cipher spec", ret, 0);
 		}
 #endif
-		/* fall through */
+		FALLTHROUGH;
 	case STATE101:
 		ret =
 		    generate_and_set_hs_traffic_keys(session);
 		STATE = STATE101;
 		IMED_RET_FATAL("generate session keys", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE102:
 		ret = _gnutls13_send_encrypted_extensions(session, AGAIN(STATE102));
 		STATE = STATE102;
 		IMED_RET("send encrypted extensions", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE103:
 		ret = _gnutls13_send_certificate_request(session, AGAIN(STATE103));
 		STATE = STATE103;
 		IMED_RET("send certificate request", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE104:
 		ret = _gnutls13_send_certificate(session, AGAIN(STATE104));
 		STATE = STATE104;
 		IMED_RET("send certificate", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE105:
 		ret = _gnutls13_send_certificate_verify(session, AGAIN(STATE105));
 		STATE = STATE105;
 		IMED_RET("send certificate verify", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE106:
 		ret = _gnutls13_send_finished(session, AGAIN(STATE106));
 		STATE = STATE106;
 		IMED_RET("send finished", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE107:
 		/* At this point our sending keys should be the app keys
 		 * see 4.4.4 at draft-ietf-tls-tls13-28 */
@@ -434,7 +434,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 
 		_gnutls_handshake_log("HSK[%p]: switching early to application traffic keys\n", session);
 
-		/* fall through */
+		FALLTHROUGH;
 	case STATE108:
 		if (session->internals.resumed != RESUME_FALSE)
 			_gnutls_set_resumed_parameters(session);
@@ -458,28 +458,28 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 				return 0;
 			}
 		}
-		/* fall through */
+		FALLTHROUGH;
 	case STATE109:
 		ret = _gnutls13_recv_certificate(session);
 		STATE = STATE109;
 		IMED_RET("recv certificate", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE110:
 		ret = _gnutls13_recv_certificate_verify(session);
 		STATE = STATE110;
 		IMED_RET("recv certificate verify", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE111:
 		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
 		STATE = STATE111;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE112: /* can enter from STATE108 */
 		ret = _gnutls13_recv_finished(session);
 		STATE = STATE112;
 		IMED_RET("recv finished", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case STATE113:
 		/* If we did request a client certificate, then we can
 		 * only send the tickets here */
@@ -493,7 +493,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		ret = _tls13_read_connection_state_init(session, STAGE_APP);
 		IMED_RET_FATAL("set read app keys", ret, 0);
 
-		/* fall through */
+		FALLTHROUGH;
 	case STATE114:
 		if (!(session->internals.hsk_flags & (HSK_TLS13_TICKET_SENT|HSK_EARLY_START_USED))) {
 			ret = _gnutls13_send_session_ticket(session, TICKETS_TO_SEND,
@@ -677,7 +677,7 @@ int gnutls_session_ticket_send(gnutls_session_t session, unsigned nr, unsigned f
 			gnutls_assert();
 			return ret;
 		}
-		/* fall through */
+		FALLTHROUGH;
 	case TICKET_STATE1:
 		ret =
 		    _gnutls13_send_session_ticket(session, nr, TICKET_STATE==TICKET_STATE1?1:0);

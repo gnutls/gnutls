@@ -301,7 +301,7 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 	case GNUTLS_PK_DSA:
 		if (mand)
 			*mand = 1;
-		/* fallthrough */
+		FALLTHROUGH;
 	case GNUTLS_PK_ECDSA:
 
 		me = _gnutls_dsa_q_to_hash(&key->params, NULL);

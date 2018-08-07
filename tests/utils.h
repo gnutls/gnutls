@@ -40,6 +40,14 @@
 # error tests cannot be compiled with NDEBUG defined
 #endif
 
+#if _GNUTLS_GCC_VERSION >= 70100
+#define FALLTHROUGH      __attribute__ ((fallthrough))
+#endif
+
+#ifndef FALLTHROUGH
+# define FALLTHROUGH
+#endif
+
 inline static int global_init(void)
 {
 #ifdef ENABLE_PKCS11

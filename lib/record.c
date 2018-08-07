@@ -293,7 +293,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 			gnutls_assert();
 			return ret;
 		}
-		/* fall through */
+		FALLTHROUGH;
 	case BYE_STATE1:
 		ret =
 		    gnutls_alert_send(session, GNUTLS_AL_WARNING,
@@ -303,7 +303,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 			gnutls_assert();
 			return ret;
 		}
-		/* fall through */
+		FALLTHROUGH;
 	case BYE_STATE2:
 		BYE_STATE = BYE_STATE2;
 		if (how == GNUTLS_SHUT_RDWR) {
@@ -1615,7 +1615,6 @@ check_session_status(gnutls_session_t session, unsigned ms)
 
 		session->internals.recv_state = RECV_STATE_0;
 
-		/* Fall through: */
 		FALLTHROUGH;
 	case RECV_STATE_0:
 
@@ -1903,14 +1902,14 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 				return gnutls_assert_val(ret);
 
 			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_2;
-			/* fall-through */
+			FALLTHROUGH;
 		case RECORD_SEND_KEY_UPDATE_2:
 			ret = gnutls_session_key_update(session, 0);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
 			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_3;
-			/* fall-through */
+			FALLTHROUGH;
 		case RECORD_SEND_KEY_UPDATE_3:
 			ret = _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
 						-1, EPOCH_WRITE_CURRENT,
