@@ -515,7 +515,8 @@ static int server_recv_params(gnutls_session_t session,
 
 			resuming = 1;
 			break;
-		} else if (psk.ob_ticket_age == 0 &&
+		} else if (pskcred &&
+			   psk.ob_ticket_age == 0 &&
 			   psk.identity.size > 0 && psk.identity.size <= MAX_USERNAME_SIZE) {
 			/* _gnutls_psk_pwd_find_entry() expects 0-terminated identities */
 			char identity_str[psk.identity.size + 1];
