@@ -1072,7 +1072,6 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 	int result = 0, need_free = 0;
 	gnutls_datum_t _data;
 	ASN1_TYPE spk;
-	gnutls_ecc_curve_t curve;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1119,14 +1118,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 
-	/* this has already been called by get_asn_mpis() thus it cannot
-	 * fail.
-	 */
-	key->params.algo = _gnutls_x509_get_pk_algorithm(spk, "", &curve, NULL);
-
-	key->params.curve = curve;
 	key->bits = pubkey_to_bits(&key->params);
-
 	result = 0;
 
       cleanup:
