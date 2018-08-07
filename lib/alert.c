@@ -221,7 +221,6 @@ int gnutls_error_to_alert(int err, int *level)
 	case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
 	case GNUTLS_E_ILLEGAL_SRP_USERNAME:
 	case GNUTLS_E_PK_INVALID_PUBKEY:
-	case GNUTLS_E_NO_COMMON_KEY_SHARE:
 		ret = GNUTLS_A_ILLEGAL_PARAMETER;
 		_level = GNUTLS_AL_FATAL;
 		break;
@@ -255,6 +254,7 @@ int gnutls_error_to_alert(int err, int *level)
 	case GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL:
 	case GNUTLS_E_UNKNOWN_PK_ALGORITHM:
 	case GNUTLS_E_UNWANTED_ALGORITHM:
+	case GNUTLS_E_NO_COMMON_KEY_SHARE:
 		ret = GNUTLS_A_HANDSHAKE_FAILURE;
 		_level = GNUTLS_AL_FATAL;
 		break;
