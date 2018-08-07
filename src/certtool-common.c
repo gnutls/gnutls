@@ -1498,6 +1498,10 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 			p = gnutls_ffdhe_4096_group_prime;
 			g = gnutls_ffdhe_4096_group_generator;
 			key_bits = gnutls_ffdhe_4096_key_bits;
+		} else if (bits <= 6144) {
+			p = gnutls_ffdhe_6144_group_prime;
+			g = gnutls_ffdhe_6144_group_generator;
+			key_bits = gnutls_ffdhe_6144_key_bits;
 		} else {
 			p = gnutls_ffdhe_8192_group_prime;
 			g = gnutls_ffdhe_8192_group_generator;

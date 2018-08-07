@@ -50,6 +50,7 @@ int main(int argc, char **argv)
 	test_prime(&gnutls_srp_1024_group_prime);
 
 	test_prime(&gnutls_ffdhe_8192_group_prime);
+	test_prime(&gnutls_ffdhe_6144_group_prime);
 	test_prime(&gnutls_ffdhe_4096_group_prime);
 	test_prime(&gnutls_ffdhe_3072_group_prime);
 	test_prime(&gnutls_ffdhe_2048_group_prime);
