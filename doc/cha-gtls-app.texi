@@ -976,13 +976,16 @@ exchange.
 
 In GnuTLS 3.5.0 and later it is recommended to use @funcref{gnutls_session_set_verify_cert}
 for the handshake process to ensure the verification of the peer's identity.
+That will verify the peer's certificate, against the trusted CA store while
+accounting for stapled OCSP responses during the handshake; any error will
+be returned as a handshake error.
 
-In older GnuTLS versions it is required to manually verify the peer's certificate
-during the handshake by using @funcref{gnutls_certificate_set_verify_function}, and
-@funcref{gnutls_certificate_verify_peers2}. See @ref{Certificate authentication}
+In older GnuTLS versions it is required to verify the peer's certificate
+during the handshake by setting a callback with @funcref{gnutls_certificate_set_verify_function},
+and then using @funcref{gnutls_certificate_verify_peers3} from it. See @ref{Certificate authentication}
 for more information.
 
-@showfuncB{gnutls_session_set_verify_cert,gnutls_certificate_verify_peers2}
+@showfuncB{gnutls_session_set_verify_cert,gnutls_certificate_verify_peers3}
 
 @node Data transfer and termination
 @section Data transfer and termination

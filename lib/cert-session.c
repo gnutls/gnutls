@@ -587,17 +587,17 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
  * The default verification flags used by this function can be overridden
  * using gnutls_certificate_set_verify_flags().
  *
- * This function will take into account the OCSP Certificate Status TLS extension,
+ * This function will take into account the stapled OCSP responses sent by the server,
  * as well as the following X.509 certificate extensions: Name Constraints,
  * Key Usage, and Basic Constraints (pathlen).
  * 
- * To avoid denial of service attacks some
- * default upper limits regarding the certificate key size and chain
- * size are set. To override them use gnutls_certificate_set_verify_limits().
- *
  * Note that you must also check the peer's name in order to check if
  * the verified certificate belongs to the actual peer, see gnutls_x509_crt_check_hostname(),
  * or use gnutls_certificate_verify_peers3().
+ *
+ * To avoid denial of service attacks some
+ * default upper limits regarding the certificate key size and chain
+ * size are set. To override them use gnutls_certificate_set_verify_limits().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
  * A successful error code means that the @status parameter must be checked to obtain the validation status.
@@ -624,6 +624,10 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * using gnutls_certificate_set_verify_flags(). See the documentation
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
+ * This function will take into account the stapled OCSP responses sent by the server,
+ * as well as the following X.509 certificate extensions: Name Constraints,
+ * Key Usage, and Basic Constraints (pathlen).
+ * 
  * If the @hostname provided is non-NULL then this function will compare
  * the hostname in the certificate against it. The comparison will follow
  * the RFC6125 recommendations. If names do not match the
@@ -631,6 +635,10 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  *
  * In order to verify the purpose of the end-certificate (by checking the extended
  * key usage), use gnutls_certificate_verify_peers().
+ *
+ * To avoid denial of service attacks some
+ * default upper limits regarding the certificate key size and chain
+ * size are set. To override them use gnutls_certificate_set_verify_limits().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
  * A successful error code means that the @status parameter must be checked to obtain the validation status.
@@ -667,6 +675,10 @@ gnutls_typed_vdata_st data;
  * using gnutls_certificate_set_verify_flags(). See the documentation
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
+ * This function will take into account the stapled OCSP responses sent by the server,
+ * as well as the following X.509 certificate extensions: Name Constraints,
+ * Key Usage, and Basic Constraints (pathlen).
+ * 
  * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME, %GNUTLS_DT_RFC822NAME and %GNUTLS_DT_KEY_PURPOSE_OID.
  * The former two accept as data a null-terminated hostname or email address, and the latter a null-terminated
  * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
@@ -678,6 +690,10 @@ gnutls_typed_vdata_st data;
  * usage PKIX extension, it will be required to be have the provided key purpose 
  * or be marked for any purpose, otherwise verification status will have the
  * %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE flag set.
+ *
+ * To avoid denial of service attacks some
+ * default upper limits regarding the certificate key size and chain
+ * size are set. To override them use gnutls_certificate_set_verify_limits().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) when the validation is performed, or a negative error code otherwise.
  * A successful error code means that the @status parameter must be checked to obtain the validation status.

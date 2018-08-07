@@ -5,7 +5,7 @@
 The most known authentication method of @acronym{TLS} are certificates.
 The PKIX @xcite{PKIX} public key infrastructure is daily used by anyone
 using a browser today. @acronym{GnuTLS} provides a simple API to 
-use the @acronym{X.509} certificates @xcite{PKIX}.
+verify the @acronym{X.509} certificates as in @xcite{PKIX}.
 
 The key exchange algorithms supported by certificate authentication are
 shown in @ref{tab:key-exchange}.
