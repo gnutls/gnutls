@@ -886,6 +886,11 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_APPEND_NUM(ps,
 			  session->security_parameters.server_auth_type);
 
+	BUFFER_APPEND(ps, &session->security_parameters.session_id_size,
+		      1);
+	BUFFER_APPEND(ps, session->security_parameters.session_id,
+		      session->security_parameters.session_id_size);
+
 	BUFFER_APPEND_NUM(ps, session->security_parameters.pversion->id);
 
 	/* if we are under TLS 1.3 do not pack keys or params negotiated using an extension
@@ -901,11 +906,6 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 			      GNUTLS_RANDOM_SIZE);
 		BUFFER_APPEND_PFX1(ps, session->security_parameters.server_random,
 			      GNUTLS_RANDOM_SIZE);
-
-		BUFFER_APPEND(ps, &session->security_parameters.session_id_size,
-			      1);
-		BUFFER_APPEND(ps, session->security_parameters.session_id,
-			      session->security_parameters.session_id_size);
 
 		BUFFER_APPEND_NUM(ps,
 				  session->security_parameters.
@@ -977,6 +977,16 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		       session->internals.resumed_security_parameters.
 		       server_auth_type);
 
+	BUFFER_POP(ps,
+		   &session->internals.resumed_security_parameters.
+		   session_id_size, 1);
+
+	BUFFER_POP(ps,
+		   session->internals.resumed_security_parameters.
+		   session_id,
+		   session->internals.resumed_security_parameters.
+		   session_id_size);
+
 	BUFFER_POP_NUM(ps, version);
 	session->internals.resumed_security_parameters.pversion =
 	    version_to_entry(version);
@@ -1024,15 +1034,6 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		if (t.size == GNUTLS_RANDOM_SIZE)
 			memcpy(session->internals.resumed_security_parameters.server_random, t.data, t.size);
 
-		BUFFER_POP(ps,
-			   &session->internals.resumed_security_parameters.
-			   session_id_size, 1);
-
-		BUFFER_POP(ps,
-			   session->internals.resumed_security_parameters.
-			   session_id,
-			   session->internals.resumed_security_parameters.
-			   session_id_size);
 
 		BUFFER_POP_NUM(ps,
 			       session->internals.resumed_security_parameters.

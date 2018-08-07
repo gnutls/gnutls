@@ -227,6 +227,10 @@ flag using @funcref{gnutls_certificate_set_flags}.
 @tab It is replaced by separate key update and re-authentication functionality
 which can be accessed directly via @funcref{gnutls_session_key_update} and @funcref{gnutls_reauth}.
 
+@item TLS session identifiers are not shared with the server under TLS 1.3.
+@tab The TLS session identifiers are persistent across resumption only on
+server side and can be obtained as before via @funcref{gnutls_session_get_id2}.
+
 @item @funcref{gnutls_pkcs11_privkey_generate3}, @funcref{gnutls_pkcs11_copy_secret_key}, @funcref{gnutls_pkcs11_copy_x509_privkey2}
 @tab These functions no longer create an exportable key by default; they require the flag @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_SENSITIVE} to do so.
 

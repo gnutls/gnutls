@@ -678,9 +678,9 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 		dst->prf = src->prf; \
 		dst->grp = src->grp; \
 		dst->pversion = src->pversion; \
-		memcpy( dst->session_id, src->session_id, GNUTLS_MAX_SESSION_ID_SIZE); \
-		dst->session_id_size = src->session_id_size; \
 	} \
+	memcpy( dst->session_id, src->session_id, GNUTLS_MAX_SESSION_ID_SIZE); \
+	dst->session_id_size = src->session_id_size; \
 	dst->timestamp = src->timestamp; \
 	dst->cert_type = src->cert_type; \
 	dst->client_auth_type = src->client_auth_type; \

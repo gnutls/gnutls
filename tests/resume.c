@@ -383,9 +383,6 @@ static void verify_server_params(gnutls_session_t session, unsigned counter, str
 		char id2[GNUTLS_MAX_SESSION_ID];
 		size_t id2_size = sizeof(id2);
 
-		if (params->enable_session_ticket_client && params->enable_session_ticket_server)
-			goto finish;
-
 		if (id_size == 0)
 			fail("no session ID was set\n");
 
@@ -452,7 +449,7 @@ static void client(int sds[], struct params_res *params)
 
 	if (debug) {
 		gnutls_global_set_log_function(tls_log_func);
-		gnutls_global_set_log_level(2);
+		gnutls_global_set_log_level(4);
 	}
 
 #ifdef USE_PSK
@@ -726,7 +723,7 @@ static void server(int sds[], struct params_res *params)
 	 */
 	if (debug) {
 		gnutls_global_set_log_function(tls_log_func);
-		gnutls_global_set_log_level(2);
+		gnutls_global_set_log_level(4);
 	}
 
 #ifdef USE_PSK
