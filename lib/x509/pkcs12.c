@@ -1645,7 +1645,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 					goto done;
 				}
 
-				/* fallthrough */
+				FALLTHROUGH;
 			case GNUTLS_BAG_PKCS8_KEY:
 				if (*key != NULL) {	/* too simple to continue */
 					gnutls_assert();

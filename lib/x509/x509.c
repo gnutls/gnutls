@@ -3979,7 +3979,7 @@ legacy_parse_aia(ASN1_TYPE src,
 
 	case GNUTLS_IA_CAISSUERS_URI:
 		oid = GNUTLS_OID_AD_CAISSUERS;
-		/* fall through */
+		FALLTHROUGH;
 
 	case GNUTLS_IA_OCSP_URI:
 		if (oid == NULL)
@@ -4007,7 +4007,7 @@ legacy_parse_aia(ASN1_TYPE src,
 				    gnutls_assert_val
 				    (GNUTLS_E_UNKNOWN_ALGORITHM);
 		}
-		/* fall through */
+		FALLTHROUGH;
 
 	case GNUTLS_IA_URI:
 		snprintf(nptr, sizeof(nptr),

@@ -99,23 +99,23 @@ int _gnutls13_reauth_client(gnutls_session_t session)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE1:
 		ret = _gnutls13_recv_certificate_request_int(session,
 							     &session->internals.reauth_buffer);
 		REAUTH_STATE = REAUTH_STATE1;
 		IMED_RET("recv certificate request", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE2:
 		ret = _gnutls13_send_certificate(session, AGAIN(REAUTH_STATE2));
 		REAUTH_STATE = REAUTH_STATE2;
 		IMED_RET("send certificate", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE3:
 		ret = _gnutls13_send_certificate_verify(session, AGAIN(REAUTH_STATE3));
 		REAUTH_STATE = REAUTH_STATE3;
 		IMED_RET("send certificate verify", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE4:
 		ret = _gnutls13_send_finished(session, AGAIN(REAUTH_STATE4));
 		REAUTH_STATE = REAUTH_STATE4;
@@ -160,29 +160,29 @@ int _gnutls13_reauth_server(gnutls_session_t session)
 
 		session->internals.handshake_hash_buffer_prev_len = session->internals.handshake_hash_buffer.length;
 
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE1:
 		ret = _gnutls13_send_certificate_request(session, AGAIN(REAUTH_STATE1));
 		REAUTH_STATE = REAUTH_STATE1;
 		IMED_RET("send certificate request", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE2:
 		/* here we should tolerate application data */
 		ret = _gnutls13_recv_certificate(session);
 		REAUTH_STATE = REAUTH_STATE2;
 		IMED_RET("recv certificate", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE3:
 		ret = _gnutls13_recv_certificate_verify(session);
 		REAUTH_STATE = REAUTH_STATE3;
 		IMED_RET("recv certificate verify", ret, 0);
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE4:
 		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
 		REAUTH_STATE = REAUTH_STATE4;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-		/* fall through */
+		FALLTHROUGH;
 	case REAUTH_STATE5:
 		ret = _gnutls13_recv_finished(session);
 		REAUTH_STATE = REAUTH_STATE5;

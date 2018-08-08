@@ -120,10 +120,10 @@ _nettle_write_be32(unsigned length, uint8_t * dst, uint32_t * src)
 			abort();
 		case 3:
 			dst[--j] = (word >> 8) & 0xff;
-			/* Fall through */
+			FALLTHROUGH;
 		case 2:
 			dst[--j] = (word >> 16) & 0xff;
-			/* Fall through */
+			FALLTHROUGH;
 		case 1:
 			dst[--j] = (word >> 24) & 0xff;
 		}

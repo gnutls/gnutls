@@ -145,7 +145,7 @@ static void run(const char *name, unsigned test)
 		if (test != 0)
 			break;
 		sec_sleep(2);
-		/* fall-through */
+		FALLTHROUGH;
 	case 2:
 		success("%s: updating server's key\n", name);
 
@@ -162,7 +162,7 @@ static void run(const char *name, unsigned test)
 		if (test != 0)
 			break;
 		sec_sleep(2);
-		/* fall-through */
+		FALLTHROUGH;
 	case 3:
 		success("%s: updating client's key and asking server\n", name);
 		do {
@@ -178,7 +178,7 @@ static void run(const char *name, unsigned test)
 		if (test != 0)
 			break;
 		sec_sleep(2);
-		/* fall-through */
+		FALLTHROUGH;
 	case 4:
 		success("%s: updating server's key and asking client\n", name);
 		do {

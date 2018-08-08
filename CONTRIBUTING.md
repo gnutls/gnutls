@@ -140,8 +140,14 @@ The gnutls functions accept parameters in the order:
  1. Input parameters
  2. Output parameters
 
-When data and size is expected, a gnutls_datum structure should be
-used (or more precisely a pointer to the structure).
+When data and size are expected as input, a const gnutls_datum_t structure
+should be used (or more precisely a pointer to the structure).
+
+When data pointer and size are to be returned as output, a gnutls_datum_t
+structure should be used.
+
+When output is to be copied to caller an array of fixed data should be
+provided.
 
 
 # Callback function parameters:
@@ -225,6 +231,37 @@ and is kept separate from the gnulib used by the GnuTLS tools because
 of license issues, and also to prevent any gnulib networking modules
 from entering the library (gnulib networking re-implements the windows
 network stack and causes issues to gnutls applications running on windows).
+
+
+# Compiler warnings
+
+The compiler prints warnings for several reasons; these warnings are
+also not constant in time, different versions of the same compiler may
+warn about different issues.
+
+In GnuTLS we enable as many as possible warnings available in the compiler
+via configure.ac. On certain cases however we silence or disable warnings
+and the following subsections go case by case.
+
+## Switch unintended fall-through warnings
+
+These we silence by using the macro FALLTHROUGH under a switch
+statement which intentionally falls through. Example:
+```
+switch (session->internals.recv_state) {
+        case RECV_STATE_DTLS_RETRANSMIT:
+                ret = _dtls_retransmit(session);
+                if (ret < 0)
+                        return gnutls_assert_val(ret);
+
+                session->internals.recv_state = RECV_STATE_0;
+                FALLTHROUGH;
+        case RECV_STATE_0:
+
+                _dtls_async_timer_check(session);
+                return 1;
+}
+```
 
 
 # Symbol and library versioning
