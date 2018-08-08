@@ -152,7 +152,8 @@ static void try(test_case_st *test)
 
 	if (test->group) {
 		if (test->group == GNUTLS_GROUP_FFDHE2048 || test->group == GNUTLS_GROUP_FFDHE3072 ||
-		    test->group == GNUTLS_GROUP_FFDHE4096 || test->group == GNUTLS_GROUP_FFDHE8192) {
+		    test->group == GNUTLS_GROUP_FFDHE4096 || test->group == GNUTLS_GROUP_FFDHE6144 ||
+		    test->group == GNUTLS_GROUP_FFDHE8192) {
 			if (!(gnutls_session_get_flags(client) & GNUTLS_SFLAGS_RFC7919)) {
 				fail("%s: gnutls_session_get_flags(client) reports that no RFC7919 negotiation was performed!\n", test->name);
 			}
@@ -211,6 +212,15 @@ test_case_st tests[] = {
 		.client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096"
 	},
 	{
+		.name = "TLS 1.2 ANON-DH (FFDHE6144)",
+		.group = GNUTLS_GROUP_FFDHE6144,
+		.client_ret = 0,
+		.server_ret = 0,
+		.have_anon_cred = 1,
+		.server_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
+		.client_prio = "NORMAL:-KX-ALL:+ANON-DH:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144"
+	},
+	{
 		.name = "TLS 1.2 ANON-DH (FFDHE8192)",
 		.group = GNUTLS_GROUP_FFDHE8192,
 		.client_ret = 0,
@@ -253,6 +263,15 @@ test_case_st tests[] = {
 		.have_psk_cred = 1,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
 		.client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096"
+	},
+	{
+		.name = "TLS 1.2 DHE-PSK (FFDHE6144)",
+		.client_ret = 0,
+		.server_ret = 0,
+		.group = GNUTLS_GROUP_FFDHE6144,
+		.have_psk_cred = 1,
+		.server_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
+		.client_prio = "NORMAL:-KX-ALL:+DHE-PSK:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144"
 	},
 	{
 		.name = "TLS 1.2 DHE-PSK (FFDHE8192)",
@@ -301,6 +320,16 @@ test_case_st tests[] = {
 		.have_rsa_sign_cert = 1,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096",
 		.client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE4096"
+	},
+	{
+		.name = "TLS 1.2 DHE-RSA (FFDHE6144)",
+		.group = GNUTLS_GROUP_FFDHE6144,
+		.client_ret = 0,
+		.server_ret = 0,
+		.have_cert_cred = 1,
+		.have_rsa_sign_cert = 1,
+		.server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144",
+		.client_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE6144"
 	},
 	{
 		.name = "TLS 1.2 DHE-RSA (FFDHE8192)",

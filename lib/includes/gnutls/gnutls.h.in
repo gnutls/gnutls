@@ -966,6 +966,7 @@ typedef enum {
  * @GNUTLS_GROUP_FFDHE2048: the FFDHE2048 group
  * @GNUTLS_GROUP_FFDHE3072: the FFDHE3072 group
  * @GNUTLS_GROUP_FFDHE4096: the FFDHE4096 group
+ * @GNUTLS_GROUP_FFDHE6144: the FFDHE6144 group
  * @GNUTLS_GROUP_FFDHE8192: the FFDHE8192 group
  *
  * Enumeration of supported groups. It is intended to be backwards
@@ -985,7 +986,8 @@ typedef enum {
 	GNUTLS_GROUP_FFDHE3072,
 	GNUTLS_GROUP_FFDHE4096,
 	GNUTLS_GROUP_FFDHE8192,
-	GNUTLS_GROUP_MAX = GNUTLS_GROUP_FFDHE8192,
+	GNUTLS_GROUP_FFDHE6144,
+	GNUTLS_GROUP_MAX = GNUTLS_GROUP_FFDHE6144,
 } gnutls_group_t;
 
 /* macros to allow specifying a specific curve in gnutls_privkey_generate()
@@ -2300,6 +2302,10 @@ extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1024_group_generator;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_prime;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_generator;
 extern _SYM_EXPORT const unsigned int gnutls_ffdhe_8192_key_bits;
+
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_6144_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_6144_group_generator;
+extern _SYM_EXPORT const unsigned int gnutls_ffdhe_6144_key_bits;
 
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_4096_group_prime;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_4096_group_generator;

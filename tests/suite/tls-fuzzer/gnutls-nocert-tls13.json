@@ -43,9 +43,7 @@
 	 {"name" : "test-tls13-version-negotiation.py",
 	  "arguments": ["-p", "@PORT@"]},
 	 {"name" : "test-tls13-zero-length-data.py",
-	  "comment" : "gnutls sends NST before receiving client Finished, that is not expected in the disabled test",
-	  "arguments": ["-p", "@PORT@",
-			"-e", "zero-len app data with large padding during handshake"]},
+	  "arguments": ["-p", "@PORT@"]},
 	 {"name" : "test-tls13-finished.py",
 	  "commoent" : "the disabled tests timeout very often due to slow tls-fuzzer implementation",
 	  "arguments": ["-p", "@PORT@", "-n", "5",
@@ -54,6 +52,12 @@
 	 {"name" : "test-tls13-count-tickets.py",
 	  "arguments": ["-p", "@PORT@", "-t", "1"]},
 	 {"name" : "test-tls13-0rtt-garbage.py",
+	  "arguments": ["-p", "@PORT@"]},
+	 {"name" : "test-tls13-ffdhe-sanity.py",
+	  "arguments": ["-p", "@PORT@"]},
+	 {"name" : "test-tls13-session-resumption.py",
+	  "arguments": ["-p", "@PORT@"]},
+	 {"name" : "test-tls13-unrecognised-groups.py",
 	  "arguments": ["-p", "@PORT@"]}
      ]
     }

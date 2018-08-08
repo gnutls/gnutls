@@ -27,6 +27,7 @@
 #include <config.h>
 #endif
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -171,7 +172,8 @@ static void client(int sd, const char *prio, const char *user, const gnutls_datu
 
 #define MAX_BUF 1024
 
-static void server(int sd, const char *prio, const char *user, int expect_fail, int exp_kx)
+static void server(int sd, const char *prio, const char *user, bool no_cred,
+		   int expect_fail, int exp_kx)
 {
 	gnutls_psk_server_credentials_t server_pskcred;
 	int ret, kx;
@@ -206,7 +208,8 @@ static void server(int sd, const char *prio, const char *user, int expect_fail, 
 
 	assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 
-	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
+	if (!no_cred)
+		gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
@@ -267,10 +270,12 @@ static void server(int sd, const char *prio, const char *user, int expect_fail, 
 	if (expect_fail)
 		fail("server: expected failure but connection succeeded!\n");
 
-	pskid = gnutls_psk_server_get_username(session);
-	if (pskid == NULL || strcmp(pskid, user) != 0) {
-		fail("server: username (%s), does not match expected (%s)\n",
-		     pskid, user);
+	if (!no_cred) {
+		pskid = gnutls_psk_server_get_username(session);
+		if (pskid == NULL || strcmp(pskid, user) != 0) {
+			fail("server: username (%s), does not match expected (%s)\n",
+			     pskid, user);
+		}
 	}
 
 	if (exp_kx && kx != exp_kx) {
@@ -292,7 +297,7 @@ static void server(int sd, const char *prio, const char *user, int expect_fail, 
 }
 
 static
-void run_test2(const char *prio, const char *sprio, const char *user, const gnutls_datum_t *key,
+void run_test3(const char *prio, const char *sprio, const char *user, const gnutls_datum_t *key, bool no_cred,
 	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv)
 {
 	pid_t child;
@@ -323,7 +328,7 @@ void run_test2(const char *prio, const char *sprio, const char *user, const gnut
 		close(sockets[1]);
 		int status;
 		/* parent */
-		server(sockets[0], sprio?sprio:prio, user, expect_fail_serv, exp_kx);
+		server(sockets[0], sprio?sprio:prio, user, no_cred, expect_fail_serv, exp_kx);
 		wait(&status);
 		check_wait_status(status);
 	} else {
@@ -334,21 +339,28 @@ void run_test2(const char *prio, const char *sprio, const char *user, const gnut
 }
 
 static
+void run_test2(const char *prio, const char *sprio, const char *user, const gnutls_datum_t *key,
+	      unsigned expect_hint, int exp_kx, int expect_fail_cli, int expect_fail_serv)
+{
+	run_test3(prio, sprio, user, key, 0, expect_hint, exp_kx, expect_fail_cli, expect_fail_serv);
+}
+
+static
 void run_test_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
 {
-	return run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_PSK, expect_fail, expect_fail);
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_PSK, expect_fail, expect_fail);
 }
 
 static
 void run_ectest_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
 {
-	return run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_ECDHE_PSK, expect_fail, expect_fail);
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_ECDHE_PSK, expect_fail, expect_fail);
 }
 
 static
 void run_dhtest_ok(const char *prio, const char *user, const gnutls_datum_t *key, unsigned expect_hint, int expect_fail)
 {
-	return run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_DHE_PSK, expect_fail, expect_fail);
+	run_test2(prio, NULL, user, key, expect_hint, GNUTLS_KX_DHE_PSK, expect_fail, expect_fail);
 }
 
 void doit(void)
@@ -398,6 +410,9 @@ void doit(void)
 
 	/* try with HelloRetryRequest and PSK */
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", "jas", &key, 0, GNUTLS_KX_DHE_PSK, 0, 0);
+
+	/* try without server credentials */
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 }
 
 #endif				/* _WIN32 */

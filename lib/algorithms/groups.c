@@ -101,6 +101,15 @@ static const gnutls_group_entry_st supported_groups[] = {
 	 .tls_id = 0x102
 	},
 	{
+	 .name = "FFDHE6144",
+	 .id = GNUTLS_GROUP_FFDHE6144,
+	 .generator = &gnutls_ffdhe_6144_group_generator,
+	 .prime = &gnutls_ffdhe_6144_group_prime,
+	 .q_bits = &gnutls_ffdhe_6144_key_bits,
+	 .pk = GNUTLS_PK_DH,
+	 .tls_id = 0x103
+	},
+	{
 	 .name = "FFDHE8192",
 	 .id = GNUTLS_GROUP_FFDHE8192,
 	 .generator = &gnutls_ffdhe_8192_group_generator,
