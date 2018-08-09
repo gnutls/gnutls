@@ -2143,7 +2143,6 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
 
-		return 1;
 		break;
 
 	case GNUTLS_PK_ECDSA:
@@ -2157,7 +2156,6 @@ pubkey_verify_hashed_data(const gnutls_sign_entry_st *se,
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		}
 
-		return 1;
 		break;
 	default:
 		gnutls_assert();
