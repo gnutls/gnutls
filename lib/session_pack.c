@@ -1126,23 +1126,22 @@ gnutls_session_set_premaster(gnutls_session_t session, unsigned int entity,
 		return gnutls_assert_val(ret);
 
 	session->internals.resumed_security_parameters.cs = ciphersuite_to_entry(cs);
-	if (cs == NULL)
+	if (session->internals.resumed_security_parameters.cs == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	session->internals.resumed_security_parameters.cert_type =
 	    DEFAULT_CERT_TYPE;
 	session->internals.resumed_security_parameters.pversion =
 	    version_to_entry(version);
+	if (session->internals.resumed_security_parameters.pversion ==
+	    NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (session->internals.resumed_security_parameters.pversion->selectable_prf)
 		session->internals.resumed_security_parameters.prf = mac_to_entry(session->internals.resumed_security_parameters.cs->prf);
 	else
 		session->internals.resumed_security_parameters.prf = mac_to_entry(GNUTLS_MAC_MD5_SHA1);
 	if (session->internals.resumed_security_parameters.prf == NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	if (session->internals.resumed_security_parameters.pversion ==
-	    NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (master->size != GNUTLS_MASTER_SIZE)
