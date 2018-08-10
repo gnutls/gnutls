@@ -52,6 +52,7 @@
 #include <ext/etm.h>
 #include <ext/cookie.h>
 #include <ext/early_data.h>
+#include <ext/record_size_limit.h>
 #include "extv.h"
 #include <num.h>
 
@@ -92,6 +93,9 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 #endif
 	[GNUTLS_EXTENSION_PSK_KE_MODES] = &ext_psk_ke_modes,
 	[GNUTLS_EXTENSION_PRE_SHARED_KEY] = &ext_pre_shared_key,
+	[GNUTLS_EXTENSION_RECORD_SIZE_LIMIT] = &ext_mod_record_size_limit,
+	/* This must be the last extension registered.
+	 */
 	[GNUTLS_EXTENSION_DUMBFW] = &ext_mod_dumbfw,
 };
 

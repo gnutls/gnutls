@@ -15,6 +15,9 @@ See the end for copying conditions.
    certificate is presented by client and the gnutls_init() flag GNUTLS_ENABLE_EARLY_START
    is specified.
 
+** libgnutls: The 'record size limit' extension is added and preferred to the
+   'max record size' extension when possible.
+
 ** API and ABI modifications:
 GNUTLS_ENABLE_EARLY_START: Added
 gnutls_record_set_max_early_data_size: Added

@@ -46,7 +46,6 @@
 #include "record.h"
 #include "datum.h"
 #include "constate.h"
-#include "ext/max_record.h"
 #include "tls13/key_update.h"
 #include <ext/heartbeat.h>
 #include <state.h>

@@ -70,6 +70,9 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 	ssize_t new_size;
 	ssize_t data_size = _data_size;
 
+	if (session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED)
+		return 0;
+
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
 			DECR_LEN(data_size, 1);
@@ -96,8 +99,12 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 
 			new_size = _gnutls_mre_num2record(data[0]);
 
-			if (new_size < 0 ||
-			    new_size != session->security_parameters.
+			if (new_size < 0) {
+				gnutls_assert();
+				return new_size;
+			}
+
+			if (new_size != session->security_parameters.
 			    max_record_send_size) {
 				gnutls_assert();
 				return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -127,11 +134,16 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		if (session->security_parameters.max_record_send_size !=
 		    DEFAULT_MAX_RECORD_SIZE) {
-			p = (uint8_t)
-			    _gnutls_mre_record2num
-			    (session->security_parameters.
-			     max_record_send_size);
+			ret = _gnutls_mre_record2num
+			      (session->security_parameters.
+			       max_record_send_size);
 
+			/* it's not an error, as long as we send the
+			 * record_size_limit extension with that value */
+			if (ret < 0)
+				return 0;
+
+			p = (uint8_t) ret;
 			ret = _gnutls_buffer_append_data(extdata, &p, 1);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
@@ -143,11 +155,16 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 
 		if (session->security_parameters.max_record_recv_size !=
 		    DEFAULT_MAX_RECORD_SIZE) {
-			p = (uint8_t)
-			    _gnutls_mre_record2num
-			    (session->security_parameters.
-			     max_record_recv_size);
+			ret = _gnutls_mre_record2num
+			      (session->security_parameters.
+			       max_record_recv_size);
 
+			/* it's not an error, as long as we send the
+			 * record_size_limit extension with that value */
+			if (ret < 0)
+				return 0;
+
+			p = (uint8_t) ret;
 			ret = _gnutls_buffer_append_data(extdata, &p, 1);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
@@ -226,30 +243,28 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
  * connection.  This property can only be set to clients.  The server
  * may choose not to accept the requested size.
  *
- * Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and
- * 4096(=2^12).  The requested record size does get in effect
- * immediately only while sending data. The receive part will take
- * effect after a successful handshake.
+ * The requested record size does get in effect immediately only while
+ * sending data. The receive part will take effect after a successful
+ * handshake.
  *
- * This function uses a TLS extension called 'max record size'.  Not
- * all TLS implementations use or even understand this extension.
+ * Prior to 3.6.4, this function was implemented using a TLS extension
+ * called 'max record size', which limits the acceptable values to
+ * 512(=2^9), 1024(=2^10), 2048(=2^11) and 4096(=2^12). Since 3.6.4,
+ * it uses another TLS extension called 'record size limit', which
+ * doesn't have the limitation, as long as the value ranges between
+ * 512 and 16384.  Note that not all TLS implementations use or even
+ * understand those extension.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
 ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 {
-	ssize_t new_size;
-
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	new_size = _gnutls_mre_record2num(size);
-
-	if (new_size < 0) {
-		gnutls_assert();
-		return new_size;
-	}
+	if (size < MIN_RECORD_SIZE || size > DEFAULT_MAX_RECORD_SIZE)
+		return GNUTLS_E_INVALID_REQUEST;
 
 	session->security_parameters.max_record_send_size = size;
 
