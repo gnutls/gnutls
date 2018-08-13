@@ -1113,7 +1113,10 @@ token_callback(void *user, const char *label, const unsigned retry)
 	}
 	printf("Please insert token '%s' in slot and press enter\n",
 	       label);
-	fgets(buf, sizeof(buf), stdin);
+	if (fgets(buf, sizeof(buf), stdin) == NULL) {
+		fprintf(stderr, "error reading input\n");
+		return -1;
+	}
 
 	return 0;
 }

@@ -301,7 +301,11 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 		gnutls_protocol_get_version(server)));
 	fflush(stdout);
 
-	gnutls_rnd(GNUTLS_RND_NONCE, buffer, sizeof(buffer));
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, buffer, sizeof(buffer));
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s\n", str);
+		exit(1);
+	}
 
 	start_benchmark(&st);
 

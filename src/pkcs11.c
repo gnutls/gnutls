@@ -127,7 +127,10 @@ const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl
 
 	switch (otype) {
 		case GNUTLS_PKCS11_OBJ_X509_CRT:
-			gnutls_x509_crt_init(&crt);
+			ret = gnutls_x509_crt_init(&crt);
+			if (ret < 0)
+				goto fail;
+
 			ret = gnutls_x509_crt_import_url(crt, objurl, flags);
 			if (ret < 0)
 				goto fail;
@@ -153,7 +156,10 @@ const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl
 			gnutls_x509_crt_deinit(crt);
 			return p;
 		case GNUTLS_PKCS11_OBJ_PUBKEY:
-			gnutls_pubkey_init(&pubkey);
+			ret = gnutls_pubkey_init(&pubkey);
+			if (ret < 0)
+				goto fail;
+
 			ret = gnutls_pubkey_import_url(pubkey, objurl, flags);
 			if (ret < 0)
 				goto fail;
@@ -176,7 +182,10 @@ const char *get_key_algo_type(gnutls_pkcs11_obj_type_t otype, const char *objurl
 			gnutls_pubkey_deinit(pubkey);
 			return p;
 		case GNUTLS_PKCS11_OBJ_PRIVKEY:
-			gnutls_privkey_init(&privkey);
+			ret = gnutls_privkey_init(&privkey);
+			if (ret < 0)
+				goto fail;
+
 			ret = gnutls_privkey_import_url(privkey, objurl, flags);
 			if (ret < 0)
 				goto fail;
@@ -230,7 +239,11 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 
 	FIX(url, outfile, detailed, info);
 
-	gnutls_pkcs11_token_get_flags(url, &flags);
+	ret = gnutls_pkcs11_token_get_flags(url, &flags);
+	if (ret < 0) {
+		flags = 0;
+	}
+
 	if (flags & GNUTLS_PKCS11_TOKEN_TRUSTED)
 		print_exts = 1;
 

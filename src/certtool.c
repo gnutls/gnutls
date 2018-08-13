@@ -884,7 +884,11 @@ static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt, common_info_st *
 	gnutls_pubkey_t pubkey;
 	int result;
 
-	gnutls_pubkey_init(&pubkey);
+	result = gnutls_pubkey_init(&pubkey);
+	if (result < 0) {
+		fprintf(stderr, "memory error\n");
+		app_exit(1);
+	}
 
 	result = gnutls_pubkey_import_x509(pubkey, crt, 0);
 	if (result < 0) {
@@ -1682,7 +1686,11 @@ void privkey_info(common_info_st * cinfo)
 	size = fread(lbuffer, 1, lbuffer_size - 1, infile);
 	lbuffer[size] = 0;
 
-	gnutls_x509_privkey_init(&key);
+	ret = gnutls_x509_privkey_init(&key);
+	if (ret < 0) {
+		fprintf(stderr, "privkey_init: %s", gnutls_strerror(ret));
+		app_exit(1);
+	}
 
 	pem.data = lbuffer;
 	pem.size = size;
@@ -1736,7 +1744,11 @@ static void privkey_to_rsa(common_info_st * cinfo)
 	size = fread(lbuffer, 1, lbuffer_size - 1, infile);
 	lbuffer[size] = 0;
 
-	gnutls_x509_privkey_init(&key);
+	ret = gnutls_x509_privkey_init(&key);
+	if (ret < 0) {
+		fprintf(stderr, "privkey_init: %s", gnutls_strerror(ret));
+		app_exit(1);
+	}
 
 	pem.data = lbuffer;
 	pem.size = size;
