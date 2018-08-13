@@ -284,9 +284,13 @@ static int write_oid_and_params(ASN1_TYPE dst, const char *dst_name, const char 
 	int result;
 	char name[128];
 
+	if (params == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	_gnutls_str_cpy(name, sizeof(name), dst_name);
 	_gnutls_str_cat(name, sizeof(name), ".algorithm");
-
 
 	/* write the OID.
 	 */
@@ -304,11 +308,6 @@ static int write_oid_and_params(ASN1_TYPE dst, const char *dst_name, const char 
 		    asn1_write_value(dst, name, ASN1_NULL, ASN1_NULL_SIZE);
 	else if (params->pk == GNUTLS_PK_RSA_PSS) {
 		gnutls_datum_t tmp = { NULL, 0 };
-
-		if (params == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
-		}
 
 		result = _gnutls_x509_write_rsa_pss_params(params, &tmp);
 		if (result < 0)
