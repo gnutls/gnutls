@@ -93,7 +93,6 @@ static const version_entry_st sup_versions[] = {
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 1
 	},
-#ifdef TLS13_FINAL_VERSION
 	{.name = "TLS1.3",
 	 .id = GNUTLS_TLS1_3,
 	 .age = 5,
@@ -113,27 +112,6 @@ static const version_entry_st sup_versions[] = {
 	 .false_start = 0, /* doesn't make sense */
 	 .tls_sig_sem = SIG_SEM_TLS13
 	},
-#else
-	{.name = "TLS1.3",
-	 .id = GNUTLS_TLS1_3,
-	 .age = 5,
-	 .major = 0x7f,
-	 .minor = 28,
-	 .transport = GNUTLS_STREAM,
-	 .supported = 1,
-	 .explicit_iv = 0,
-	 .extensions = 1,
-	 .selectable_sighash = 1,
-	 .selectable_prf = 1,
-	 .tls13_sem = 1,
-	 .obsolete = 0,
-	 .only_extension = 1,
-	 .post_handshake_auth = 1,
-	 .key_shares = 1,
-	 .false_start = 0, /* doesn't make sense */
-	 .tls_sig_sem = SIG_SEM_TLS13
-	},
-#endif
 	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
 	 .id = GNUTLS_DTLS0_9,
 	 .age = 200,

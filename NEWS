@@ -7,6 +7,8 @@ See the end for copying conditions.
 
 * Version 3.6.4 (unreleased)
 
+** libgnutls: Added the final (RFC8446) version numbering of the TLS1.3 protocol.
+
 ** libgnutls: Corrected regression since 3.6.3 in the callbacks set with
    gnutls_certificate_set_retrieve_function() which could not handle the case where
    no certificates were returned, or the callbacks were set to NULL (see #528).
