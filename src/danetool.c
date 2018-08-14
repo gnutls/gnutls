@@ -645,7 +645,13 @@ gnutls_session_t init_tls_session(const char *hostname)
 	}
 	gnutls_session_set_ptr(session, &priv);
 
-	gnutls_set_default_priority(session);
+	ret = gnutls_set_default_priority(session);
+	if (ret < 0) {
+		fprintf(stderr, "error[%d]: %s\n", __LINE__,
+			gnutls_strerror(ret));
+		app_exit(1);
+	}
+
 	if (hostname && is_ip(hostname)==0) {
 		gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
 	}

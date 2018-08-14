@@ -1488,6 +1488,7 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 
 			if (se->pk == GNUTLS_PK_RSA) {
 				se = _gnutls_sign_to_entry(GNUTLS_SIGN_RSA_RAW);
+				assert(se != NULL);
 			}
 
 			/* se may not be set here if we are doing legacy RSA */

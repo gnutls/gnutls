@@ -809,14 +809,20 @@ static void print_head(FILE * out, const char *txt, unsigned int size,
 {
 	unsigned i;
 	char *p, *ntxt;
+	int ret;
 
 	if (cprint != 0) {
 		if (size > 0)
-			asprintf(&ntxt, "const unsigned char %s[%u] =",
-				 txt, size);
+			ret = asprintf(&ntxt, "const unsigned char %s[%u] =",
+				       txt, size);
 		else
-			asprintf(&ntxt, "const unsigned char %s[] =\n",
-				 txt);
+			ret = asprintf(&ntxt, "const unsigned char %s[] =\n",
+				       txt);
+
+		if (ret == -1) {
+			fprintf(stderr, "memory error\n");
+			app_exit(1);
+		}
 
 		p = strstr(ntxt, "char");
 		p += 5;
