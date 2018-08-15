@@ -37,7 +37,7 @@
 
 #include "utils.h"
 
-/* We test whether implicit global initialization can be overriden */
+/* We test whether implicit global initialization can be overridden */
 
 GNUTLS_SKIP_GLOBAL_INIT
 

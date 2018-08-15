@@ -340,7 +340,7 @@ int hello_ext_send(void *_ctx, gnutls_buffer_st *buf)
 				  ext_msg_validity_to_str(ctx->msg));
 	}
 
-	/* ensure we don't send something twice (i.e, overriden extensions in
+	/* ensure we don't send something twice (i.e, overridden extensions in
 	 * client), and ensure we are sending only what we received in server. */
 	ret = _gnutls_hello_ext_is_present(session, p->gid);
 
@@ -419,7 +419,7 @@ _gnutls_gen_hello_extensions(gnutls_session_t session,
 	}
 
 	/* hello_ext_send() ensures we don't send duplicates, in case
-	 * of overriden extensions */
+	 * of overridden extensions */
 	for (i = 0; i < MAX_EXT_TYPES; i++) {
 		if (!extfunc[i])
 			continue;

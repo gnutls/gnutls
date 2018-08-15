@@ -115,7 +115,7 @@ inline static const char *ext_msg_validity_to_str(gnutls_ext_flags_t msg)
 }
 
 typedef struct hello_ext_entry_st {
-	const char *name; /* const overriden when free_struct is set */
+	const char *name; /* const overridden when free_struct is set */
 	unsigned free_struct;
 
 	uint16_t tls_id;
@@ -143,7 +143,7 @@ typedef struct hello_ext_entry_st {
 	gnutls_ext_pack_func pack_func;	/* packs internal data to machine independent format */
 	gnutls_ext_unpack_func unpack_func;	/* unpacks internal data */
 
-	/* non-zero if that extension cannot be overriden by the applications.
+	/* non-zero if that extension cannot be overridden by the applications.
 	 * That should be set to extensions which allocate data early, e.g., on
 	 * gnutls_init(), or modify the TLS protocol in a way that the application
 	 * cannot control. */

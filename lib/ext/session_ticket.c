@@ -594,7 +594,7 @@ int gnutls_session_ticket_enable_client(gnutls_session_t session)
  * To avoid leaking that key, use gnutls_memset() prior to
  * releasing it.
  *
- * The default ticket expiration time can be overriden using
+ * The default ticket expiration time can be overridden using
  * gnutls_db_set_cache_expiration().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an

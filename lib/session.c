@@ -172,7 +172,7 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
  *
  * In client side this function returns the identifier returned by the
  * server, and cannot be assumed to have any relation to session resumption.
- * In server side this function is guarranteed to return a persistent
+ * In server side this function is guaranteed to return a persistent
  * identifier of the session since GnuTLS 3.6.4, which may not necessarily
  * map into the TLS session ID value. Prior to that version the value
  * could only be considered a persistent identifier, under TLS1.2 or earlier
@@ -222,7 +222,7 @@ gnutls_session_get_id(gnutls_session_t session,
  *
  * In client side this function returns the identifier returned by the
  * server, and cannot be assumed to have any relation to session resumption.
- * In server side this function is guarranteed to return a persistent
+ * In server side this function is guaranteed to return a persistent
  * identifier of the session since GnuTLS 3.6.4, which may not necessarily
  * map into the TLS session ID value. Prior to that version the value
  * could only be considered a persistent identifier, under TLS1.2 or earlier

@@ -369,8 +369,8 @@ static int _gnutls_global_init(unsigned constructor)
 	_gnutls_load_system_priorities();
 
 #ifdef ENABLE_FIPS140
-	/* These self tests are performed on the overriden algorithms
-	 * (e.g., AESNI overriden AES). They are after _gnutls_register_accel_crypto()
+	/* These self tests are performed on the overridden algorithms
+	 * (e.g., AESNI overridden AES). They are after _gnutls_register_accel_crypto()
 	 * intentionally */
 	if (res != 0) {
 		ret = _gnutls_fips_perform_self_checks2();

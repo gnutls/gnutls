@@ -275,7 +275,7 @@ No changes since last version.
 
 ** libgnutls: PKIX certificates with unknown critical extensions are rejected
    on verification with status GNUTLS_CERT_UNKNOWN_CRIT_EXTENSIONS. This
-   behavior can be overriden by providing the flag GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS
+   behavior can be overridden by providing the flag GNUTLS_VERIFY_IGNORE_UNKNOWN_CRIT_EXTENSIONS
    to verification functions. Resolves gitlab issue #177.
 
 ** libgnutls: Refuse to generate a certificate with an illegal version, or an
@@ -1201,7 +1201,7 @@ being usable after a reinitialization.
 
 ** libgnutls: The GNUTLS_CPUID_OVERRIDE environment variable can be used to 
 explicitly enable/disable the use of certain CPU capabilities. Note that CPU
-detection cannot be overriden, i.e., VIA options cannot be enabled on an Intel
+detection cannot be overridden, i.e., VIA options cannot be enabled on an Intel
 CPU. The currently available options are:
   0x1: Disable all run-time detected optimizations
   0x2: Enable AES-NI
