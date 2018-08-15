@@ -1183,7 +1183,14 @@ verification profile.
 
 @item NONE @tab
 Means nothing is enabled.  This disables even protocol versions.
-It should be followed by the algorithms to be enabled.
+It should be followed by the algorithms to be enabled. Note that
+using this option to build a priority string gives detailed control
+into the resulting settings, however it creates non-portable applications.
+With new revisions of the TLS protocol new priority items are routinely added
+requiring such a string to be continuously updated with the library. As
+such, we advice against using that option for applications targetting multiple versions
+of the GnuTLS library, and recommend using the defaults (see above) or
+adjusting the defaults via @funcref{gnutls_set_default_priority_append}.
 
 @end multitable
 @caption{Supported initial keywords.}
