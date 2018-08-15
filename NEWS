@@ -18,9 +18,18 @@ See the end for copying conditions.
 ** libgnutls: The 'record size limit' extension is added and preferred to the
    'max record size' extension when possible.
 
+** Added support for seperately negotiating client and server certificate types as
+   defined in RFC7250. This mechanism must be explicitly enabled via the
+   GNUTLS_ENABLE_CERT_TYPE_NEG flag in gnutls_init().
+
+
 ** API and ABI modifications:
 GNUTLS_ENABLE_EARLY_START: Added
 gnutls_record_set_max_early_data_size: Added
+gnutls_certificate_type_get2: Added
+gnutls_priority_certificate_type_list2: Added
+GNUTLS_ENABLE_CERT_TYPE_NEG: Added
+gnutls_ctype_target_t: New enumeration
 
 
 * Version 3.6.3 (released 2018-07-16)

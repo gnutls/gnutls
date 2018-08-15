@@ -25,6 +25,11 @@
 
 #include "gnutls_int.h"
 
+void _gnutls_session_client_cert_type_set(gnutls_session_t session,
+					 gnutls_certificate_type_t);
+void _gnutls_session_server_cert_type_set(gnutls_session_t session,
+					 gnutls_certificate_type_t);
+
 inline static const gnutls_group_entry_st *
 get_group(gnutls_session_t session)
 {
@@ -73,6 +78,11 @@ _gnutls_hello_set_default_version(gnutls_session_t session,
 
 #endif
 
+
+int _gnutls_session_cert_type_supported(gnutls_session_t session,
+				    gnutls_certificate_type_t cert_type,
+				    bool check_credentials,
+				    gnutls_ctype_target_t target);
 int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits);
 
 int _gnutls_dh_set_peer_public(gnutls_session_t session, bigint_t public);

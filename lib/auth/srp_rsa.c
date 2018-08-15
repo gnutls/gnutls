@@ -241,8 +241,7 @@ proc_srp_cert_server_kx(gnutls_session_t session, uint8_t * data,
 
 	ret =
 	    _gnutls_get_auth_info_pcert(&peer_cert,
-					session->security_parameters.
-					cert_type, info);
+					session->security_parameters.server_ctype, info);
 
 	if (ret < 0) {
 		gnutls_assert();

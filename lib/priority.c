@@ -517,6 +517,12 @@ static const int cert_type_priority_default[] = {
 	0
 };
 
+static const int cert_type_priority_all[] = {
+	GNUTLS_CRT_X509,
+	GNUTLS_CRT_RAWPK,
+	0
+};
+
 typedef void (rmadd_func) (priority_st * priority_list, unsigned int alg);
 
 static void prio_remove(priority_st * priority_list, unsigned int algo)
@@ -1621,7 +1627,9 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	if (strcasecmp(broken_list[0], LEVEL_NONE) != 0) {
 		_set_priority(&(*priority_cache)->protocol,
 			      protocol_priority);
-		_set_priority(&(*priority_cache)->cert_type,
+		_set_priority(&(*priority_cache)->client_ctype,
+			      cert_type_priority_default);
+		_set_priority(&(*priority_cache)->server_ctype,
 			      cert_type_priority_default);
 		_set_priority(&(*priority_cache)->_sign_algo,
 			      sign_priority_default);
@@ -1755,8 +1763,39 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 						goto error;
 				}
 			} else if (strncasecmp
-				 (&broken_list[i][1], "CTYPE-", 6) == 0) {
-				continue;
+				(&broken_list[i][1], "CTYPE-", 6) == 0) { // Certificate types
+				if (strncasecmp(&broken_list[i][1], "CTYPE-ALL", 9) == 0)
+				{ // Symmetric cert types, all types allowed
+					bulk_fn(&(*priority_cache)->client_ctype, cert_type_priority_all);
+					bulk_fn(&(*priority_cache)->server_ctype, cert_type_priority_all);
+				} else if (strncasecmp(&broken_list[i][1], "CTYPE-CLI-", 10) == 0)
+				{ // Client certificate types
+					if (strncasecmp(&broken_list[i][1], "CTYPE-CLI-ALL", 13) == 0)
+					{ // All client cert types allowed
+						bulk_fn(&(*priority_cache)->client_ctype,	cert_type_priority_all);
+					} else if ((algo = gnutls_certificate_type_get_id
+							(&broken_list[i][11])) != GNUTLS_CRT_UNKNOWN)
+					{ // Specific client cert type allowed
+						fn(&(*priority_cache)->client_ctype, algo);
+					} else goto error;
+				} else if (strncasecmp(&broken_list[i][1], "CTYPE-SRV-", 10) == 0)
+				{ // Server certificate types
+					if (strncasecmp(&broken_list[i][1], "CTYPE-SRV-ALL", 13) == 0)
+					{ // All server cert types allowed
+						bulk_fn(&(*priority_cache)->server_ctype,	cert_type_priority_all);
+					} else if ((algo = gnutls_certificate_type_get_id
+							(&broken_list[i][11])) != GNUTLS_CRT_UNKNOWN)
+					{ // Specific server cert type allowed
+						fn(&(*priority_cache)->server_ctype, algo);
+					} else goto error;
+				} else { // Symmetric certificate type
+					if ((algo = gnutls_certificate_type_get_id
+					     (&broken_list[i][7])) != GNUTLS_CRT_UNKNOWN)
+					{
+						fn(&(*priority_cache)->client_ctype, algo);
+						fn(&(*priority_cache)->server_ctype, algo);
+					} else goto error;
+				}
 			} else if (strncasecmp
 				 (&broken_list[i][1], "SIGN-", 5) == 0) {
 				if (strncasecmp
@@ -2207,7 +2246,13 @@ gnutls_priority_sign_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available certificate types in the priority
- * structure. 
+ * structure.
+ *
+ * As of version 3.6.4 this function is an alias for
+ * gnutls_priority_certificate_type_list2 with the target parameter
+ * set to:
+ * - GNUTLS_CTYPE_SERVER, if the %SERVER_PRECEDENCE option is set
+ * - GNUTLS_CTYPE_CLIENT, otherwise.
  *
  * Returns: the number of certificate types, or an error code.
  * Since: 3.0
@@ -2216,11 +2261,50 @@ int
 gnutls_priority_certificate_type_list(gnutls_priority_t pcache,
 				      const unsigned int **list)
 {
-	if (pcache->cert_type.algorithms == 0)
-		return 0;
+	gnutls_ctype_target_t target =
+		pcache->server_precedence ? GNUTLS_CTYPE_SERVER : GNUTLS_CTYPE_CLIENT;
 
-	*list = pcache->cert_type.priority;
-	return pcache->cert_type.algorithms;
+	return gnutls_priority_certificate_type_list2(pcache, list, target);
+}
+
+/**
+ * gnutls_priority_certificate_type_list2:
+ * @pcache: is a #gnutls_prioritity_t type.
+ * @list: will point to an integer list.
+ * @target: is a #gnutls_ctype_target_t type. Valid arguments are
+ *   GNUTLS_CTYPE_CLIENT and GNUTLS_CTYPE_SERVER
+ *
+ * Get a list of available certificate types for the given target
+ * in the priority structure.
+ *
+ * Returns: the number of certificate types, or an error code.
+ *
+ * Since: 3.6.4
+ **/
+int
+gnutls_priority_certificate_type_list2(gnutls_priority_t pcache,
+				      const unsigned int **list, gnutls_ctype_target_t target)
+{
+	switch (target)	{
+		case GNUTLS_CTYPE_CLIENT:
+			if(pcache->client_ctype.algorithms > 0) {
+				*list = pcache->client_ctype.priority;
+				return pcache->client_ctype.algorithms;
+			}
+			break;
+		case GNUTLS_CTYPE_SERVER:
+			if(pcache->server_ctype.algorithms > 0)	{
+				*list = pcache->server_ctype.priority;
+				return pcache->server_ctype.algorithms;
+			}
+			break;
+		default:
+			// Invalid target given
+			gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	// Found a matching target but non of them had any ctypes set
+	return 0;
 }
 
 /**

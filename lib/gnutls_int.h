@@ -191,9 +191,17 @@ typedef enum record_send_state_t {
 	RECORD_SEND_KEY_UPDATE_3
 } record_send_state_t;
 
-/* the maximum size of encrypted packets */
+/* The mode check occurs a lot throughout GnuTLS and can be replaced by
+ * the following shorter macro. Also easier to update one macro
+ * in the future when the internal structure changes than all the conditionals
+ * itself.
+ */
+#define IS_SERVER(session) (session->security_parameters.entity == GNUTLS_SERVER)
+
+/* To check whether we have a DTLS session */
 #define IS_DTLS(session) (session->internals.transport == GNUTLS_DGRAM)
 
+/* the maximum size of encrypted packets */
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define DEFAULT_MAX_EARLY_DATA_SIZE 16384
 #define TLS_RECORD_HEADER_SIZE 5
@@ -327,6 +335,8 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_MAX_RECORD_SIZE = 0,
 	GNUTLS_EXTENSION_STATUS_REQUEST,
 	GNUTLS_EXTENSION_CERT_TYPE,
+	GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
+	GNUTLS_EXTENSION_SERVER_CERT_TYPE,
 	GNUTLS_EXTENSION_SUPPORTED_GROUPS,
 	GNUTLS_EXTENSION_SUPPORTED_EC_POINT_FORMATS,
 	GNUTLS_EXTENSION_SRP,
@@ -760,8 +770,9 @@ typedef struct {
 	/* The maximum amount of early data */
 	uint32_t max_early_data_size;
 
-	/* holds the negotiated certificate type */
-	gnutls_certificate_type_t cert_type;
+	/* holds the negotiated certificate types */
+	gnutls_certificate_type_t client_ctype;
+	gnutls_certificate_type_t server_ctype;
 
 	/* The selected (after server hello EC or DH group */
 	const gnutls_group_entry_st *grp;
@@ -887,7 +898,8 @@ typedef struct sign_algo_list_st {
 /* For the external api */
 struct gnutls_priority_st {
 	priority_st protocol;
-	priority_st cert_type;
+	priority_st client_ctype;
+	priority_st server_ctype;
 
 	/* The following are not necessary to be stored in
 	 * the structure; however they are required by the
@@ -1045,6 +1057,7 @@ typedef struct {
 						 * the client finished message */
 	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake
 						 * message */
+
 	bool resumable;	/* TRUE or FALSE - if we can resume that session */
 
 	send_ticket_state_t ticket_state; /* used by gnutls_session_ticket_send() */
@@ -1434,13 +1447,13 @@ void _gnutls_free_auth_info(gnutls_session_t session);
 /* These two macros return the advertised TLS version of
  * the peer.
  */
-#define _gnutls_get_adv_version_major( session) \
+#define _gnutls_get_adv_version_major(session) \
 	session->internals.adv_version_major
 
-#define _gnutls_get_adv_version_minor( session) \
+#define _gnutls_get_adv_version_minor(session) \
 	session->internals.adv_version_minor
 
-#define set_adv_version( session, major, minor) \
+#define set_adv_version(session, major, minor) \
 	session->internals.adv_version_major = major; \
 	session->internals.adv_version_minor = minor
 
@@ -1491,6 +1504,11 @@ inline static size_t max_user_send_size(gnutls_session_t session,
 	}
 
 	return max;
+}
+
+inline static bool _gnutls_has_negotiate_ctypes(gnutls_session_t session)
+{
+	return session->internals.flags & GNUTLS_ENABLE_CERT_TYPE_NEG;
 }
 
 #endif				/* GNUTLS_INT_H */

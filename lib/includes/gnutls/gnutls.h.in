@@ -406,6 +406,7 @@ typedef enum {
  *   applications which hide the length of transferred data via the TLS1.3 padding mechanism and
  *   are already taking steps to hide the data processing time. This comes at a performance
  *   penalty.
+ * @GNUTLS_ENABLE_CERT_TYPE_NEG: Enable certificate type negotiation extensions (RFC7250).
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually
@@ -433,7 +434,8 @@ typedef enum {
 	GNUTLS_POST_HANDSHAKE_AUTH = (1<<14),
 	GNUTLS_NO_AUTO_REKEY = (1<<15),
 	GNUTLS_SAFE_PADDING_CHECK = (1<<16),
-	GNUTLS_ENABLE_EARLY_START = (1<<17)
+	GNUTLS_ENABLE_EARLY_START = (1<<17),
+	GNUTLS_ENABLE_CERT_TYPE_NEG = (1<<18)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls
@@ -719,7 +721,7 @@ typedef enum {
  * @GNUTLS_CRT_UNKNOWN: Unknown certificate type.
  * @GNUTLS_CRT_X509: X.509 Certificate.
  * @GNUTLS_CRT_OPENPGP: OpenPGP certificate.
- * @GNUTLS_CRT_RAW: Raw public key (SubjectPublicKey)
+ * @GNUTLS_CRT_RAWPK: Raw public-key (SubjectPublicKeyInfo)
  *
  * Enumeration of different certificate types.
  */
@@ -727,7 +729,8 @@ typedef enum {
 	GNUTLS_CRT_UNKNOWN = 0,
 	GNUTLS_CRT_X509 = 1,
 	GNUTLS_CRT_OPENPGP = 2,
-	GNUTLS_CRT_RAW = 3
+	GNUTLS_CRT_RAWPK = 3,
+	GNUTLS_CRT_MAX = GNUTLS_CRT_RAWPK
 } gnutls_certificate_type_t;
 
 /**
@@ -1060,6 +1063,24 @@ typedef enum {
 	GNUTLS_GOST_PARAMSET_CP_D
 } gnutls_gost_paramset_t;
 
+/**
+ * gnutls_ctype_target_t:
+ * @GNUTLS_CTYPE_CLIENT: for requesting client certificate type values.
+ * @GNUTLS_CTYPE_SERVER: for requesting server certificate type values.
+ * @GNUTLS_CTYPE_OURS: for requesting our certificate type values.
+ * @GNUTLS_CTYPE_PEERS: for requesting the peers' certificate type values.
+ *
+ * Enumeration of certificate type targets with respect to asymmetric
+ * certificate types as specified in RFC7250 and P2P connection set up
+ * as specified in draft-vanrein-tls-symmetry-02.
+ */
+typedef enum {
+	GNUTLS_CTYPE_CLIENT,
+	GNUTLS_CTYPE_SERVER,
+	GNUTLS_CTYPE_OURS,
+	GNUTLS_CTYPE_PEERS
+} gnutls_ctype_target_t;
+
 /* If you want to change this, then also change the define in
  * gnutls_int.h, and recompile.
  */
@@ -1154,6 +1175,9 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session);
 gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session);
 gnutls_certificate_type_t
 gnutls_certificate_type_get(gnutls_session_t session);
+gnutls_certificate_type_t
+gnutls_certificate_type_get2(gnutls_session_t session,
+								gnutls_ctype_target_t target);
 
 int gnutls_sign_algorithm_get(gnutls_session_t session);
 int gnutls_sign_algorithm_get_client(gnutls_session_t session);
@@ -1585,6 +1609,9 @@ int gnutls_priority_set_direct(gnutls_session_t session,
 
 int gnutls_priority_certificate_type_list(gnutls_priority_t pcache,
 					  const unsigned int **list);
+int gnutls_priority_certificate_type_list2(gnutls_priority_t pcache,
+					  const unsigned int **list,
+					  gnutls_ctype_target_t target);
 int gnutls_priority_sign_list(gnutls_priority_t pcache,
 			      const unsigned int **list);
 int gnutls_priority_protocol_list(gnutls_priority_t pcache,

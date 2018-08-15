@@ -337,7 +337,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 {
 	gnutls_kx_algorithm_t kx;
 	const char *kx_str, *sign_str;
-	unsigned type;
+	gnutls_certificate_type_t ctype_client, ctype_server;
 	char kx_name[64] = "";
 	char proto_name[32];
 	char _group_name[24];
@@ -423,17 +423,29 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 		}
 	}
 
+	// Check whether we have negotiated certificate types
+	if (_gnutls_has_negotiate_ctypes(session)) {
+		// Get certificate types
+		ctype_client = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT);
+		ctype_server = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_SERVER);
 
-	type = gnutls_certificate_type_get(session);
-	if (type == GNUTLS_CRT_X509 || type == GNUTLS_CRT_UNKNOWN)
-		snprintf(proto_name, sizeof(proto_name), "%s",
-			 gnutls_protocol_get_name(get_num_version
-						  (session)));
-	else
-		snprintf(proto_name, sizeof(proto_name), "%s-%s",
-			 gnutls_protocol_get_name(get_num_version
-						  (session)),
-			 gnutls_certificate_type_get_name(type));
+		if (ctype_client == ctype_server) {
+			// print proto version, client/server cert type
+			snprintf(proto_name, sizeof(proto_name), "%s-%s",
+				 gnutls_protocol_get_name(get_num_version(session)),
+				 gnutls_certificate_type_get_name(ctype_client));
+		} else {
+			// print proto version, client cert type, server cert type
+			snprintf(proto_name, sizeof(proto_name), "%s-%s-%s",
+				 gnutls_protocol_get_name(get_num_version(session)),
+				 gnutls_certificate_type_get_name(ctype_client),
+				 gnutls_certificate_type_get_name(ctype_server));
+		}
+	} else { // Assumed default certificate type (X.509)
+			snprintf(proto_name, sizeof(proto_name), "%s",
+				 gnutls_protocol_get_name(get_num_version
+								(session)));
+	}
 
 	desc = gnutls_malloc(DESC_SIZE);
 	if (desc == NULL)

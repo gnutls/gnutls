@@ -668,9 +668,9 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 #define CPY_COMMON(tls13_sem) \
 	if (!tls13_sem) { \
 		dst->cs = src->cs; \
-		memcpy( dst->master_secret, src->master_secret, GNUTLS_MASTER_SIZE); \
-		memcpy( dst->client_random, src->client_random, GNUTLS_RANDOM_SIZE); \
-		memcpy( dst->server_random, src->server_random, GNUTLS_RANDOM_SIZE); \
+		memcpy(dst->master_secret, src->master_secret, GNUTLS_MASTER_SIZE); \
+		memcpy(dst->client_random, src->client_random, GNUTLS_RANDOM_SIZE); \
+		memcpy(dst->server_random, src->server_random, GNUTLS_RANDOM_SIZE); \
 		dst->ext_master_secret = src->ext_master_secret; \
 		dst->etm = src->etm; \
 		dst->max_record_recv_size = src->max_record_recv_size; \
@@ -679,10 +679,11 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 		dst->grp = src->grp; \
 		dst->pversion = src->pversion; \
 	} \
-	memcpy( dst->session_id, src->session_id, GNUTLS_MAX_SESSION_ID_SIZE); \
+	memcpy(dst->session_id, src->session_id, GNUTLS_MAX_SESSION_ID_SIZE); \
 	dst->session_id_size = src->session_id_size; \
 	dst->timestamp = src->timestamp; \
-	dst->cert_type = src->cert_type; \
+	dst->client_ctype = src->client_ctype; \
+	dst->server_ctype = src->server_ctype; \
 	dst->client_auth_type = src->client_auth_type; \
 	dst->server_auth_type = src->server_auth_type
 

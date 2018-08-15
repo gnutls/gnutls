@@ -1244,6 +1244,8 @@ GNUTLS_3_6_4
 	gnutls_ffdhe_6144_group_prime;
 	gnutls_ffdhe_6144_group_generator;
 	gnutls_ffdhe_6144_key_bits;
+	gnutls_certificate_type_get2;
+	gnutls_priority_certificate_type_list2;
 } GNUTLS_3_6_3;
 
 GNUTLS_FIPS140_3_4 {

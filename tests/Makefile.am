@@ -67,7 +67,8 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	data/pkcs7-cat-ca.pem data/long.crl data/long.pem data/large-cert.pem \
 	testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm testpkcs11-certs/ca.crt testpkcs11-certs/ca-tmpl \
 	testpkcs11-certs/client.key testpkcs11-certs/server.crt testpkcs11-certs/server-tmpl \
-	testpkcs11-certs/ca.key testpkcs11-certs/client.crt testpkcs11-certs/client-tmpl testpkcs11-certs/server.key
+	testpkcs11-certs/ca.key testpkcs11-certs/client.crt testpkcs11-certs/client-tmpl testpkcs11-certs/server.key \
+	crt_type-neg-common.c
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -202,7 +203,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 ip-check mini-x509-ipaddr trust-store base64-raw random-art dhex509self \
 	 dss-sig-val sign-pk-api tls-session-ext-override record-pad \
 	 tls13-server-kx-neg gnutls_ext_raw_parse_dtls key-export-pkcs8 \
-	 null_retrieve_function tls-record-size-limit
+	 null_retrieve_function tls-record-size-limit tls-crt_type-neg
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp

@@ -656,8 +656,9 @@ void print_list(const char *priorities, int verbose)
 #if 0
 		{
 			ret =
-			    gnutls_priority_certificate_type_list(pcache,
-								  &list);
+			    gnutls_priority_certificate_type_list2(pcache,
+								  &list,
+								  GNUTLS_CTYPE_CLIENT);
 
 			printf("Certificate types: ");
 			if (ret == 0)
