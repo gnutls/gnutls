@@ -12,4 +12,4 @@
 	url = https://github.com/tomato42/tlslite-ng.git
 [submodule "gnulib"]
 	path = gnulib
-	url = https://git.savannah.gnu.org/git/gnulib.git
+	url = https://gitlab.com/libidn/gnulib-mirror.git
