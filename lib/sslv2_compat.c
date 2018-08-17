@@ -96,6 +96,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	uint8_t rnd[GNUTLS_RANDOM_SIZE], major, minor;
 	int len = datalen;
 	int neg_version;
+	const version_entry_st *vers;
 	uint16_t challenge;
 	uint8_t session_id[GNUTLS_MAX_SESSION_ID_SIZE];
 
@@ -109,12 +110,17 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	minor = data[pos + 1];
 	set_adv_version(session, major, minor);
 
-	ret = _gnutls_negotiate_version(session, major, minor);
+	ret = _gnutls_negotiate_version(session, major, minor, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
-	neg_version = ret;
+
+	vers = get_version(session);
+	if (vers == NULL)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+	neg_version = vers->id;
 
 	pos += 2;
 

@@ -133,7 +133,7 @@ supported_versions_recv_params(gnutls_session_t session,
 		if (!vers->tls13_sem)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-		ret = _gnutls_negotiate_version(session, major, minor);
+		ret = _gnutls_negotiate_version(session, major, minor, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

@@ -431,7 +431,7 @@ _gnutls_finished(gnutls_session_t session, int type, void *ret,
  */
 int
 _gnutls_negotiate_version(gnutls_session_t session,
-			  uint8_t major, uint8_t minor)
+			  uint8_t major, uint8_t minor, unsigned allow_tls13)
 {
 	const version_entry_st *vers;
 	const version_entry_st *aversion = nversion_to_entry(major, minor);
@@ -471,6 +471,12 @@ _gnutls_negotiate_version(gnutls_session_t session,
 	} else {
 		session->security_parameters.pversion = aversion;
 
+		/* we do not allow TLS1.3 negotiation using this mechanism */
+		if (aversion->tls13_sem && !allow_tls13) {
+			vers = _gnutls_legacy_version_max(session);
+			session->security_parameters.pversion = vers;
+		}
+
 		return 0;
 	}
 }
@@ -505,7 +511,7 @@ _gnutls_user_hello_func(gnutls_session_t session,
 			 * earlier, as TLS1.3 uses a different set of ciphersuites, and
 			 * thus we cannot fallback.
 			 */
-			ret = _gnutls_negotiate_version(session, major, minor);
+			ret = _gnutls_negotiate_version(session, major, minor, 0);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;
@@ -565,11 +571,15 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	set_adv_version(session, major, minor);
 
-	ret = _gnutls_negotiate_version(session, major, minor);
+	ret = _gnutls_negotiate_version(session, major, minor, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	neg_version = get_num_version(session);
+	vers = get_version(session);
+	if (vers == NULL)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+	neg_version = vers->id;
 
 	pos += 2;
 
