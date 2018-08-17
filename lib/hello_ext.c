@@ -92,8 +92,6 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 #endif
 	[GNUTLS_EXTENSION_PSK_KE_MODES] = &ext_psk_ke_modes,
 	[GNUTLS_EXTENSION_PRE_SHARED_KEY] = &ext_pre_shared_key,
-	/* This must be the last extension registered.
-	 */
 	[GNUTLS_EXTENSION_DUMBFW] = &ext_mod_dumbfw,
 };
 
