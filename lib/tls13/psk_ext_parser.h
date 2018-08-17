@@ -20,22 +20,16 @@
  *
  */
 
-#ifndef PSK_PARSER_H
-#define PSK_PARSER_H
-#include <gnutls/gnutls.h>
-
 struct psk_ext_parser_st {
-	const unsigned char *data;
-	ssize_t len;
-	size_t id_len;
-	size_t id_read;
-	int next_index;
+	const unsigned char *identities_data;
+	ssize_t identities_len;
 
-	const unsigned char *binder_data;
-	ssize_t binder_len;
+	const unsigned char *binders_data;
+	ssize_t binders_len;
 };
 
 typedef struct psk_ext_parser_st psk_ext_parser_st;
+typedef struct psk_ext_parser_st psk_ext_iter_st;
 
 struct psk_st {
 	/* constant values */
@@ -45,8 +39,15 @@ struct psk_st {
 
 int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
 				  const unsigned char *data, size_t len);
-int _gnutls13_psk_ext_parser_next_psk(psk_ext_parser_st *p, struct psk_st *psk);
-int _gnutls13_psk_ext_parser_find_binder(psk_ext_parser_st *p, int psk_index,
-					 gnutls_datum_t *binder_out);
 
-#endif
+inline static
+void _gnutls13_psk_ext_iter_init(psk_ext_iter_st *iter,
+				 const psk_ext_parser_st *p)
+{
+	memcpy(iter, p, sizeof(*p));
+}
+
+int _gnutls13_psk_ext_iter_next_identity(psk_ext_iter_st *iter,
+					 struct psk_st *psk);
+int _gnutls13_psk_ext_iter_next_binder(psk_ext_iter_st *iter,
+				       gnutls_datum_t *binder);

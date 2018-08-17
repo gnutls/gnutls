@@ -40,9 +40,11 @@ static void decode(const char *test_name, const gnutls_datum_t *raw, const gnutl
 {
 	int ret;
 	psk_ext_parser_st p;
+	psk_ext_iter_st iter;
 	struct psk_st psk;
 	gnutls_datum_t binder;
 	unsigned found = 0;
+	unsigned i, j;
 
 	ret = _gnutls13_psk_ext_parser_init(&p, raw->data, raw->size);
 	if (ret < 0) {
@@ -52,8 +54,16 @@ static void decode(const char *test_name, const gnutls_datum_t *raw, const gnutl
 		exit(1);
 	}
 
-	while ((ret = _gnutls13_psk_ext_parser_next_psk(&p, &psk)) >= 0) {
-		if (ret == (int)idx) {
+	_gnutls13_psk_ext_iter_init(&iter, &p);
+	for (i = 0; ; i++) {
+		ret = _gnutls13_psk_ext_iter_next_identity(&iter, &psk);
+		if (ret < 0) {
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			if (res == ret) /* expected */
+				return;
+		}
+		if (i == idx) {
 			if (psk.identity.size == id->size && memcmp(psk.identity.data, id->data, id->size) == 0) {
 				if (debug)
 					success("%s: found id\n", test_name);
@@ -68,10 +78,19 @@ static void decode(const char *test_name, const gnutls_datum_t *raw, const gnutl
 	if (found == 0)
 		fail("%s: did not found identity!\n", test_name);
 
-	ret = _gnutls13_psk_ext_parser_find_binder(&p, idx, &binder);
-	if (ret < 0) {
-		fail("%s: could not extract binder: %s\n", test_name, gnutls_strerror(ret));
+	_gnutls13_psk_ext_iter_init(&iter, &p);
+	for (j = 0; j <= i; j++) {
+		ret = _gnutls13_psk_ext_iter_next_binder(&iter, &binder);
+		if (ret < 0) {
+			if (res == ret) /* expected */
+				return;
+			fail("%s: could not extract binder: %s\n",
+			     test_name, gnutls_strerror(ret));
+		}
 	}
+
+	if (debug)
+		success("%s: found binder\n", test_name);
 
 	if (binder.size != b->size || memcmp(binder.data, b->data, b->size) != 0) {
 		hexprint(binder.data, binder.size);
@@ -155,6 +174,22 @@ struct decode_tests_st decode_tests[] = {
 		.binder = { (unsigned char*)"\x71\x83\x89\x3d\xcc\x46\xad\x83\x18\x98\x59\x46\x0b\xb2\x51\x24\x53\x41\xb4\x35\x04\x22\x90\x02\xac\x5e\xc1\xe7\xbc\xca\x52\x16", 32},
 		.idx = 2,
 		.res = 0
+	},
+	{
+		.name = "multiple psks id3",
+		.psk = { (unsigned char*)"\x00\x20\x00\x04\x70\x73\x6b\x31\x00\x00\x00\x00"
+				"\x00\x06\x70\x73\x6b\x69\x64\x00\x00\x00\x00\x00"
+				"\x00\x04\x74\x65\x73\x74\x00\x00\x00\x00\x00\x42"
+				"\x20\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+				"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+				"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x20\x01\x00"
+				"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+				"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+				"\x00\x00\x00\x00\x00\x00", 102},
+		.id = { (unsigned char*)"test", 4 },
+		.binder = { NULL, 0 },
+		.idx = 2,
+		.res = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
 	}
 };
 

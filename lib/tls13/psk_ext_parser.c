@@ -25,12 +25,11 @@
 #include "tls13/psk_ext_parser.h"
 
 /* Returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE when no identities
- * are present, or >= 0, on success.
+ * are present, or 0, on success.
  */
 int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
 				  const unsigned char *data, size_t _len)
 {
-	uint16_t identities_len;
 	ssize_t len = _len;
 
 	if (!p || !data || !len)
@@ -39,112 +38,76 @@ int _gnutls13_psk_ext_parser_init(psk_ext_parser_st *p,
 	memset(p, 0, sizeof(*p));
 
 	DECR_LEN(len, 2);
-	identities_len = _gnutls_read_uint16(data);
+	p->identities_len = _gnutls_read_uint16(data);
 	data += 2;
 
-	if (identities_len == 0)
+	if (p->identities_len == 0)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	p->id_len = identities_len;
-	p->data = (unsigned char *) data;
-	p->len = len;
+	p->identities_data = (unsigned char *) data;
 
-	DECR_LEN(len, p->id_len);
-	data += p->id_len;
+	DECR_LEN(len, p->identities_len);
+	data += p->identities_len;
 
 	DECR_LEN(len, 2);
-	p->binder_len = _gnutls_read_uint16(data);
+	p->binders_len = _gnutls_read_uint16(data);
+	data += 2;
 
-	p->binder_data = p->data + p->id_len + 2;
-	DECR_LEN(len, p->binder_len);
+	p->binders_data = data;
+	DECR_LEN(len, p->binders_len);
 
 	return 0;
 }
 
-int _gnutls13_psk_ext_parser_next_psk(psk_ext_parser_st *p, struct psk_st *psk)
+/* Extract PSK identity and move to the next iteration.
+ *
+ * Returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE when no more identities
+ * are present, or 0, on success.
+ */
+int _gnutls13_psk_ext_iter_next_identity(psk_ext_iter_st *iter,
+					 struct psk_st *psk)
 {
-	if (p->id_read >= p->id_len)
+	if (iter->identities_len == 0)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-	/* Read a PskIdentity structure */
-	DECR_LEN(p->len, 2);
-	psk->identity.size = _gnutls_read_uint16(p->data);
+	DECR_LEN(iter->identities_len, 2);
+	psk->identity.size = _gnutls_read_uint16(iter->identities_data);
 	if (psk->identity.size == 0)
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	p->data += 2;
-	p->id_read += 2;
+	iter->identities_data += 2;
+	psk->identity.data = (void*)iter->identities_data;
 
-	psk->identity.data = (void*)p->data;
+	DECR_LEN(iter->identities_len, psk->identity.size);
+	iter->identities_data += psk->identity.size;
 
-	DECR_LEN(p->len, psk->identity.size);
-	p->data += psk->identity.size;
-	p->id_read += psk->identity.size;
+	DECR_LEN(iter->identities_len, 4);
+	psk->ob_ticket_age = _gnutls_read_uint32(iter->identities_data);
+	iter->identities_data += 4;
 
-	DECR_LEN(p->len, 4);
-	psk->ob_ticket_age = _gnutls_read_uint32(p->data);
-
-	p->data += 4;
-	p->id_read += 4;
-
-	return p->next_index++;
+	return 0;
 }
 
-/* Output is a pointer to data, which shouldn't be de-allocated. */
-int _gnutls13_psk_ext_parser_find_binder(psk_ext_parser_st *p, int psk_index,
-					 gnutls_datum_t *binder_out)
+/* Extract PSK binder and move to the next iteration.
+ *
+ * Returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE when no more identities
+ * are present, or 0, on success.
+ */
+int _gnutls13_psk_ext_iter_next_binder(psk_ext_iter_st *iter,
+				       gnutls_datum_t *binder)
 {
-	uint8_t binder_len;
-	int cur_index = 0, binder_found = 0;
-	ssize_t len;
-	const uint8_t *data;
-	ssize_t read_data = 0;
+	if (iter->binders_len == 0)
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-	if (p == NULL || psk_index < 0 || binder_out == NULL)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	DECR_LEN(iter->binders_len, 1);
+	binder->size = *iter->binders_data;
+	if (binder->size == 0)
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	if (p->id_len == 0)
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	iter->binders_data++;
+	binder->data = (uint8_t *)iter->binders_data;
+	DECR_LEN(iter->binders_len, binder->size);
+	iter->binders_data += binder->size;
 
-	len = p->binder_len;
-	data = p->binder_data;
-
-	if (len == 0)
-		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
-
-	/* Start traversing the binders */
-	while (!binder_found && len > 0) {
-		DECR_LEN(len, 1);
-		binder_len = *(data);
-
-		if (binder_len == 0)
-			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-
-		data++;
-		read_data++;
-
-		if (cur_index == psk_index) {
-			/* We found the binder with the supplied index */
-			DECR_LEN(len, binder_len);
-			binder_out->data = (void*)data;
-			binder_out->size = binder_len;
-
-			data += binder_len;
-			read_data += binder_len;
-
-			binder_found = 1;
-		} else {
-			/* Not our binder - continue to the next one */
-			DECR_LEN(len, binder_len);
-			data += binder_len;
-			read_data += binder_len;
-
-			cur_index++;
-		}
-	}
-
-	if (binder_found)
-		return 0;
-	else
-		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	return 0;
 }
