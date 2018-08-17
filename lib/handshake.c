@@ -431,21 +431,21 @@ _gnutls_finished(gnutls_session_t session, int type, void *ret,
  */
 int
 _gnutls_negotiate_version(gnutls_session_t session,
-			  gnutls_protocol_t adv_version, uint8_t major, uint8_t minor)
+			  uint8_t major, uint8_t minor)
 {
 	const version_entry_st *vers;
+	const version_entry_st *aversion = nversion_to_entry(major, minor);
 
 	/* if we do not support that version, unless that version is TLS 1.2;
 	 * TLS 1.2 is handled separately because it is always advertized under TLS 1.3 or later */
-	if (adv_version == GNUTLS_VERSION_UNKNOWN ||
-	    _gnutls_version_is_supported(session, adv_version) == 0) {
+	if (aversion == NULL ||
+	    _gnutls_nversion_is_supported(session, major, minor) == 0) {
 
-		if (adv_version == GNUTLS_TLS1_2) {
+		if (aversion && aversion->id == GNUTLS_TLS1_2) {
 			vers = _gnutls_version_max(session);
 			if (vers->id >= GNUTLS_TLS1_2) {
-				if (_gnutls_set_current_version(session, adv_version) < 0)
-					return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
-				return adv_version;
+				session->security_parameters.pversion = aversion;
+				return 0;
 			}
 		}
 
@@ -467,12 +467,11 @@ _gnutls_negotiate_version(gnutls_session_t session,
 
 		session->security_parameters.pversion = vers;
 
-		return vers->id;
+		return 0;
 	} else {
-		if (_gnutls_set_current_version(session, adv_version) < 0)
-			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+		session->security_parameters.pversion = aversion;
 
-		return adv_version;
+		return 0;
 	}
 }
 
@@ -483,7 +482,7 @@ _gnutls_negotiate_version(gnutls_session_t session,
  */
 int
 _gnutls_user_hello_func(gnutls_session_t session,
-			gnutls_protocol_t adv_version, uint8_t major, uint8_t minor)
+			uint8_t major, uint8_t minor)
 {
 	int ret, sret = 0;
 	const version_entry_st *vers;
@@ -506,7 +505,7 @@ _gnutls_user_hello_func(gnutls_session_t session,
 			 * earlier, as TLS1.3 uses a different set of ciphersuites, and
 			 * thus we cannot fallback.
 			 */
-			ret = _gnutls_negotiate_version(session, adv_version, major, minor);
+			ret = _gnutls_negotiate_version(session, major, minor);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;
@@ -551,7 +550,6 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	int pos = 0, ret;
 	uint16_t suite_size, comp_size;
 	int ext_size;
-	gnutls_protocol_t adv_version;
 	int neg_version, sret = 0;
 	int len = datalen;
 	uint8_t major, minor;
@@ -562,17 +560,16 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	_gnutls_handshake_log("HSK[%p]: Client's version: %d.%d\n",
 			      session, data[pos], data[pos + 1]);
 
-	adv_version = _gnutls_version_get(data[pos], data[pos + 1]);
-
 	major = data[pos];
 	minor = data[pos+1];
+
 	set_adv_version(session, major, minor);
 
-	neg_version = _gnutls_negotiate_version(session, adv_version, major, minor);
-	if (neg_version < 0) {
-		gnutls_assert();
-		return neg_version;
-	}
+	ret = _gnutls_negotiate_version(session, major, minor);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	neg_version = get_num_version(session);
 
 	pos += 2;
 
@@ -677,7 +674,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 			session->internals.resumed = RESUME_TRUE;
 
-			return _gnutls_user_hello_func(session, adv_version, major, minor);
+			return _gnutls_user_hello_func(session, major, minor);
 		} else {
 			ret = _gnutls_generate_session_id(session->security_parameters.
 							  session_id,
@@ -711,7 +708,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	}
 
 	/* we cache this error code */
-	sret = _gnutls_user_hello_func(session, adv_version, major, minor);
+	sret = _gnutls_user_hello_func(session, major, minor);
 	if (sret < 0 && sret != GNUTLS_E_INT_RET_0) {
 		gnutls_assert();
 		return sret;
@@ -1824,7 +1821,7 @@ read_server_hello(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	}
 
-	if (_gnutls_version_is_supported(session, vers->id) == 0)
+	if (_gnutls_nversion_is_supported(session, vers->major, vers->minor) == 0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 	/* set server random - done after final version is selected */

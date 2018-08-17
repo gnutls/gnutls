@@ -463,26 +463,29 @@ gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor)
 /* Version Functions */
 
 int
-_gnutls_version_is_supported(gnutls_session_t session,
-			     const gnutls_protocol_t version)
+_gnutls_nversion_is_supported(gnutls_session_t session,
+			      unsigned char major, unsigned char minor)
 {
 	const version_entry_st *p;
-	int ret = 0;
+	int version = 0;
 
 	for (p = sup_versions; p->name != NULL; p++) {
-		if(p->id == version) {
+		if(p->major == major && p->minor == minor) {
 #ifndef ENABLE_SSL3
 			if (p->obsolete != 0) return 0;
 #endif
 			if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
 				return 0;
 
-			ret = p->supported && p->transport == session->internals.transport;
+			if (!p->supported || p->transport != session->internals.transport)
+				return 0;
+
+			version = p->id;
 			break;
 		}
 	}
 
-	if (ret == 0)
+	if (version == 0)
 		return 0;
 
 	if (_gnutls_version_priority(session, version) < 0)
@@ -490,4 +493,3 @@ _gnutls_version_is_supported(gnutls_session_t session,
 	else
 		return 1;
 }
-

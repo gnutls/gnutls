@@ -94,9 +94,9 @@ int _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 				unsigned int datalen, unsigned int scsv_only);
 
 int _gnutls_negotiate_version(gnutls_session_t session,
-			      gnutls_protocol_t adv_version, uint8_t major, uint8_t minor);
+			      uint8_t major, uint8_t minor);
 int _gnutls_user_hello_func(gnutls_session_t session,
-			    gnutls_protocol_t adv_version, uint8_t major, uint8_t minor);
+			    uint8_t major, uint8_t minor);
 
 void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session);
 

@@ -93,7 +93,6 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	int pos = 0;
 	int ret = 0, sret = 0;
 	uint16_t sizeOfSuites;
-	gnutls_protocol_t adv_version;
 	uint8_t rnd[GNUTLS_RANDOM_SIZE], major, minor;
 	int len = datalen;
 	int neg_version;
@@ -110,9 +109,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	minor = data[pos + 1];
 	set_adv_version(session, major, minor);
 
-	adv_version = _gnutls_version_get(major, minor);
-
-	ret = _gnutls_negotiate_version(session, adv_version, major, minor);
+	ret = _gnutls_negotiate_version(session, major, minor);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -148,7 +145,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 
 	/* call the user hello callback
 	 */
-	ret = _gnutls_user_hello_func(session, adv_version, major, minor);
+	ret = _gnutls_user_hello_func(session, major, minor);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) {
 			sret = GNUTLS_E_INT_RET_0;
