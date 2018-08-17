@@ -52,6 +52,8 @@ TLS_PY=./tlslite-ng/scripts/tls.py
 
 sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nocert-tls13.json >${TMPFILE}
 
+sed -i 's/(127, 28)/(3, 4)/g' ./tlslite/constants.py
+
 PYTHONPATH=. python tests/scripts_retention.py ${TMPFILE} ${SERV}
 retval=$?
 
