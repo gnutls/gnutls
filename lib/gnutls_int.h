@@ -1091,7 +1091,10 @@ typedef struct {
 
 	/* resumed session */
 	bool resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */
-	bool resumption_requested;	/* non-zero if resumption was requested by client */
+
+	/* server side: non-zero if resumption was requested by client
+	 * client side: non-zero if we set resumption parameters */
+	bool resumption_requested;
 	security_parameters_st resumed_security_parameters;
 	gnutls_datum_t resumption_data; /* copy of input to gnutls_session_set_data() */
 

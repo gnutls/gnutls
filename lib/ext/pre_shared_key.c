@@ -493,6 +493,8 @@ static int server_recv_params(gnutls_session_t session,
 		    (ret = _gnutls13_unpack_session_ticket(session, &psk.identity, &ticket_data)) == 0) {
 			prf = ticket_data.prf;
 
+			session->internals.resumption_requested = 1;
+
 			/* Check whether ticket is stale or not */
 			ticket_age = psk.ob_ticket_age - ticket_data.age_add;
 			if (ticket_age < 0) {
