@@ -64,7 +64,7 @@ static int TLSEXT_TYPE_client_sent		= 0;
 static int TLSEXT_TYPE_client_received		= 0;
 static int TLSEXT_TYPE_server_sent		= 0;
 static int TLSEXT_TYPE_server_received		= 0;
-static int overriden_extension = -1;
+static int overridden_extension = -1;
 
 static const unsigned char ext_data[] =
 {
@@ -82,7 +82,7 @@ static int ext_recv_client_params(gnutls_session_t session, const unsigned char 
 
 	TLSEXT_TYPE_client_received = 1;
 
-	gnutls_ext_set_data(session, overriden_extension, session);
+	gnutls_ext_set_data(session, overridden_extension, session);
 
 	return 0; //Success
 }
@@ -146,24 +146,24 @@ static void client(int sd)
 	gnutls_transport_set_int(session, sd);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 
-	ret = gnutls_session_ext_register(session, "ext_client", overriden_extension, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
+	ret = gnutls_session_ext_register(session, "ext_client", overridden_extension, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, 0);
 	if (ret != GNUTLS_E_ALREADY_REGISTERED)
-		fail("client: register existing extension (%d)\n", overriden_extension);
+		fail("client: register existing extension (%d)\n", overridden_extension);
 
 	ret = gnutls_session_ext_register(session, "ext_client", 0, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
 	if (ret != GNUTLS_E_ALREADY_REGISTERED)
 		fail("client: register extension %d\n", 0);
 
-	ret = gnutls_session_ext_register(session, "ext_client", overriden_extension, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
+	ret = gnutls_session_ext_register(session, "ext_client", overridden_extension, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
 	if (ret < 0)
-		fail("client: register extension (%d)\n", overriden_extension);
+		fail("client: register extension (%d)\n", overridden_extension);
 
 	/* Perform the TLS handshake
 	 */
 	ret = gnutls_handshake(session);
 
 	if (ret < 0) {
-		fail("[%d]: client: Handshake failed\n", overriden_extension);
+		fail("[%d]: client: Handshake failed\n", overridden_extension);
 		gnutls_perror(ret);
 		goto end;
 	} else {
@@ -174,7 +174,7 @@ static void client(int sd)
 	if (TLSEXT_TYPE_client_sent != 1 || TLSEXT_TYPE_client_received != 1)
 		fail("client: extension not properly sent/received\n");
 
-	ret = gnutls_ext_get_data(session, overriden_extension, &p);
+	ret = gnutls_ext_get_data(session, overridden_extension, &p);
 	if (ret < 0) {
 		fail("gnutls_ext_get_data: %s\n", gnutls_strerror(ret));
 	}
@@ -226,11 +226,11 @@ static void server(int sd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 
-	ret = gnutls_session_ext_register(session, "ext_server", overriden_extension, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, 0);
+	ret = gnutls_session_ext_register(session, "ext_server", overridden_extension, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, 0);
 	if (ret != GNUTLS_E_ALREADY_REGISTERED)
 		fail("client: register existing extension\n");
 
-	ret = gnutls_session_ext_register(session, "ext_server", overriden_extension, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
+	ret = gnutls_session_ext_register(session, "ext_server", overridden_extension, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL);
 	if (ret < 0)
 		fail("client: register extension\n");
 
@@ -242,7 +242,7 @@ static void server(int sd)
 		close(sd);
 		gnutls_deinit(session);
 		fail("[%d]: server: Handshake has failed (%s)\n\n",
-		     overriden_extension, gnutls_strerror(ret));
+		     overridden_extension, gnutls_strerror(ret));
 		return;
 	}
 	if (debug)
@@ -285,7 +285,7 @@ static void override_ext(unsigned extension)
 	TLSEXT_TYPE_client_received = 0;
 	TLSEXT_TYPE_server_sent	= 0;
 	TLSEXT_TYPE_server_received = 0;
-	overriden_extension = extension;
+	overridden_extension = extension;
 
 	child = fork();
 	if (child < 0) {
