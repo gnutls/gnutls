@@ -719,12 +719,12 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
 
-	switch (gnutls_certificate_type_get(session)) {
-	case GNUTLS_CRT_X509:
-		return _gnutls_x509_cert_verify_peers(session, data, elements,
-						      status);
-	default:
-		return GNUTLS_E_INVALID_REQUEST;
+	switch (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS)) {
+		case GNUTLS_CRT_X509:
+			return _gnutls_x509_cert_verify_peers(session, data, elements,
+										status);
+		default:
+			return GNUTLS_E_INVALID_REQUEST;
 	}
 }
 
@@ -820,14 +820,13 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session)
 		return (time_t) - 1;
 	}
 
-	switch (gnutls_certificate_type_get(session)) {
-	case GNUTLS_CRT_X509:
-		return
-		    _gnutls_x509_get_raw_crt_expiration_time(&info->
-							     raw_certificate_list
-							     [0]);
-	default:
-		return (time_t) - 1;
+	switch (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS)) {
+		case GNUTLS_CRT_X509:
+			return
+					_gnutls_x509_get_raw_crt_expiration_time(&info->
+										 raw_certificate_list[0]);
+		default:
+			return (time_t) - 1;
 	}
 }
 
@@ -857,13 +856,12 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session_t session)
 		return (time_t) - 1;
 	}
 
-	switch (gnutls_certificate_type_get(session)) {
-	case GNUTLS_CRT_X509:
-		return
-		    _gnutls_x509_get_raw_crt_activation_time(&info->
-							     raw_certificate_list
-							     [0]);
-	default:
-		return (time_t) - 1;
+	switch (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS)) {
+		case GNUTLS_CRT_X509:
+			return
+					_gnutls_x509_get_raw_crt_activation_time(&info->
+										 raw_certificate_list[0]);
+		default:
+			return (time_t) - 1;
 	}
 }

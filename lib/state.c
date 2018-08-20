@@ -92,13 +92,71 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
  * The certificate type is by default X.509, unless it is negotiated
  * as a TLS extension.
  *
+ * As of version 3.6.4 it is recommended to use
+ * gnutls_certificate_type_get2().
+ *
  * Returns: the currently used #gnutls_certificate_type_t certificate
- *   type.
+ *   type as negotiated for 'our' side of the connection.
  **/
 gnutls_certificate_type_t
 gnutls_certificate_type_get(gnutls_session_t session)
 {
-	return session->security_parameters.cert_type;
+	return gnutls_certificate_type_get2(session, GNUTLS_CTYPE_OURS);
+}
+
+/**
+ * gnutls_certificate_type_get2:
+ * @session: is a #gnutls_session_t type.
+ * @target: is a #gnutls_ctype_target_t type.
+ *
+ * The raw public-key extension (RFC7250) introduces a mechanism
+ * to specifcy different certificate types for the client and server. We
+ * therefore distinguish between negotiated certificate types for the
+ * client and server. The @target parameter specifies whether you want
+ * the negotiated certificate type for the client (GNUTLS_CTYPE_CLIENT)
+ * or for the server (GNUTLS_CTYPE_SERVER). Additionally, in P2P mode
+ * connection set up where you don't know in advance who will be client
+ * and who will be server you can use the flag (GNUTLS_CTYPE_OURS) and
+ * (GNUTLS_CTYPE_PEERS) to retrieve the corresponding certificate types.
+ *
+ * In case no certificate types were explicitly set via the priority
+ * strings to be negotiated during the handshake, then this function
+ * will return the default certificate type (X.509) for both the
+ * client and the server.
+ *
+ * Returns: the currently used #gnutls_certificate_type_t certificate
+ *   type for the client or the server.
+ *
+ * Since: 3.6.4
+ **/
+gnutls_certificate_type_t
+gnutls_certificate_type_get2(gnutls_session_t session,
+								gnutls_ctype_target_t target)
+{
+	switch (target) {
+		case GNUTLS_CTYPE_CLIENT:
+			return session->security_parameters.client_ctype;
+			break;
+		case GNUTLS_CTYPE_SERVER:
+			return session->security_parameters.server_ctype;
+			break;
+		case GNUTLS_CTYPE_OURS:
+			if (IS_SERVER(session)) {
+				return session->security_parameters.server_ctype;
+			} else {
+				return session->security_parameters.client_ctype;
+			}
+			break;
+		case GNUTLS_CTYPE_PEERS:
+			if (IS_SERVER(session)) {
+				return session->security_parameters.client_ctype;
+			} else {
+				return session->security_parameters.server_ctype;
+			}
+			break;
+		default:		// Illegal parameter passed
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 }
 
 /**
@@ -188,6 +246,100 @@ void reset_binders(gnutls_session_t session)
 	_gnutls_free_temp_key_datum(&session->key.binders[0].psk);
 	_gnutls_free_temp_key_datum(&session->key.binders[1].psk);
 	memset(session->key.binders, 0, sizeof(session->key.binders));
+}
+
+/* Check whether certificate credentials of type @cert_type are set
+ * for the current session.
+ */
+static bool _gnutls_has_cert_credentials(gnutls_session_t session,
+						gnutls_certificate_type_t cert_type)
+{
+	unsigned i;
+	unsigned cert_found = 0;
+	gnutls_certificate_credentials_t cred;
+
+	/* First, check for certificate credentials. If we have no certificate
+	 * credentials set then we don't support certificates at all.
+	 */
+	cred = (gnutls_certificate_credentials_t)
+			_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
+
+	if (cred == NULL)
+		return false;
+
+	/* There are credentials initialized. Now check whether we can find
+	 * pre-set certificates of the required type, but only if we don't
+	 * use the callback functions.
+	 */
+	if (cred->get_cert_callback3 == NULL) {
+		for (i = 0; i < cred->ncerts; i++) {
+			if (cred->certs[i].cert_list[0].type == cert_type) {
+				cert_found = 1;
+				break;
+			}
+		}
+
+		if (cert_found == 0) {
+			/* No matching certificate found. */
+			return false;
+		}
+	}
+
+	return true; // OK
+}
+
+/* Check if the given certificate type is supported.
+ * This means that it is enabled by the priority functions,
+ * and in some cases a matching certificate exists. A check for
+ * the latter can be toggled via the parameter @check_credentials.
+ */
+int
+_gnutls_session_cert_type_supported(gnutls_session_t session,
+				    gnutls_certificate_type_t cert_type,
+				    bool check_credentials,
+				    gnutls_ctype_target_t target)
+{
+	unsigned i;
+	priority_st* ctype_priorities;
+
+	// Perform a credentials check if requested
+	if (check_credentials)	{
+		if (!_gnutls_has_cert_credentials(session, cert_type))
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
+	}
+
+	/* So far so good. We have the required credentials (if needed).
+	 * Now check whether we are allowed to use them according to our
+	 * priorities.
+	 */
+	// Which certificate type should we query?
+	switch (target) {
+		case GNUTLS_CTYPE_CLIENT:
+			ctype_priorities =
+					&(session->internals.priorities->client_ctype);
+			break;
+		case GNUTLS_CTYPE_SERVER:
+			ctype_priorities =
+					&(session->internals.priorities->server_ctype);
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	// No explicit priorities set, and default ctype is asked
+	if (ctype_priorities->algorithms == 0
+	    && cert_type == DEFAULT_CERT_TYPE)
+		return 0; // ok
+
+	/* Now lets find out whether our cert type is in our priority
+	 * list, i.e. set of allowed cert types.
+	 */
+	for (i = 0; i < ctype_priorities->algorithms; i++) {
+		if (ctype_priorities->priority[i] == cert_type)
+			return 0;	/* ok */
+	}
+
+	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 }
 
 static void deinit_keys(gnutls_session_t session)
@@ -318,7 +470,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	    (flags & GNUTLS_SERVER ? GNUTLS_SERVER : GNUTLS_CLIENT);
 
 	/* the default certificate type for TLS */
-	(*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
+	(*session)->security_parameters.client_ctype = DEFAULT_CERT_TYPE;
+	(*session)->security_parameters.server_ctype = DEFAULT_CERT_TYPE;
 
 	/* Initialize buffers */
 	_gnutls_buffer_init(&(*session)->internals.handshake_hash_buffer);
@@ -924,6 +1077,24 @@ _gnutls_rsa_pms_set_version(gnutls_session_t session,
 {
 	session->internals.rsa_pms_version[0] = major;
 	session->internals.rsa_pms_version[1] = minor;
+}
+
+void _gnutls_session_client_cert_type_set(gnutls_session_t session,
+			      gnutls_certificate_type_t ct)
+{
+	_gnutls_handshake_log
+	    ("HSK[%p]: Selected client certificate type %s (%d)\n", session,
+	     gnutls_certificate_type_get_name(ct), ct);
+	session->security_parameters.client_ctype = ct;
+}
+
+void _gnutls_session_server_cert_type_set(gnutls_session_t session,
+			      gnutls_certificate_type_t ct)
+{
+	_gnutls_handshake_log
+	    ("HSK[%p]: Selected server certificate type %s (%d)\n", session,
+	     gnutls_certificate_type_get_name(ct), ct);
+	session->security_parameters.server_ctype = ct;
 }
 
 /**

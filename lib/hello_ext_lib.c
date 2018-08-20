@@ -40,7 +40,7 @@ void _gnutls_hello_ext_default_deinit(gnutls_ext_priv_data_t priv)
 int
 _gnutls_hello_ext_set_datum(gnutls_session_t session,
 			    extensions_t id, const gnutls_datum_t *data)
-{
+{ //REMARK: we are limiting the data size to fit in a uint16 while a datum_t uses unsigned int!
 	gnutls_ext_priv_data_t epriv;
 
 	if (_gnutls_hello_ext_get_priv(session, id, &epriv) >= 0)

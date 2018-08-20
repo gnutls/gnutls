@@ -48,7 +48,10 @@ libgnutls_ext_la_SOURCES = max_record.c \
 	supported_groups.c supported_groups.h \
 	ec_point_formats.c ec_point_formats.h \
 	early_data.c early_data.h \
-	record_size_limit.c record_size_limit.h
+	record_size_limit.c record_size_limit.h \
+	client_cert_type.c client_cert_type.h \
+	server_cert_type.c server_cert_type.h \
+	cert_types.h
 
 if ENABLE_ALPN
 libgnutls_ext_la_SOURCES += alpn.c alpn.h

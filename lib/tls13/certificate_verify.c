@@ -51,6 +51,7 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	gnutls_pcert_st peer_cert;
 	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	bool server = 0;
+	gnutls_certificate_type_t cert_type;
 
 	memset(&peer_cert, 0, sizeof(peer_cert));
 
@@ -73,7 +74,7 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_handshake_log("HSK[%p]: parsing certificate verify\n", session);
+	_gnutls_handshake_log("HSK[%p]: Parsing certificate verify\n", session);
 
 	if (buf.length < 2) {
 		gnutls_assert();
@@ -83,7 +84,7 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 
 	se = _gnutls_tls_aid_to_sign_entry(buf.data[0], buf.data[1], get_version(session));
 	if (se == NULL) {
-		_gnutls_handshake_log("found unsupported signature (%d.%d)\n", (int)buf.data[0], (int)buf.data[1]);
+		_gnutls_handshake_log("Found unsupported signature (%d.%d)\n", (int)buf.data[0], (int)buf.data[1]);
 		ret = gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 		goto cleanup;
 	}
@@ -110,8 +111,12 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 		goto cleanup;
 	}
 
+	/* We verify the certificate of the peer. Therefore we need to
+	 * retrieve the negotiated certificate type for the peer. */
+	cert_type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS);
+
 	/* Verify the signature */
-	ret = _gnutls_get_auth_info_pcert(&peer_cert, session->security_parameters.cert_type, info);
+	ret = _gnutls_get_auth_info_pcert(&peer_cert, cert_type, info);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

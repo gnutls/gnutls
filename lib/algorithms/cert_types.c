@@ -41,6 +41,8 @@ const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t
 
 	if (type == GNUTLS_CRT_X509)
 		ret = "X.509";
+	if (type == GNUTLS_CRT_RAWPK)
+		ret = "Raw Public Key";
 
 	return ret;
 }
@@ -61,6 +63,9 @@ gnutls_certificate_type_t gnutls_certificate_type_get_id(const char *name)
 	if (strcasecmp(name, "X.509") == 0
 	    || strcasecmp(name, "X509") == 0)
 		return GNUTLS_CRT_X509;
+	if (strcasecmp(name, "RAWPK") == 0
+			|| strcasecmp(name, "RAWPUBKEY") == 0)
+		return GNUTLS_CRT_RAWPK;
 
 	return ret;
 }

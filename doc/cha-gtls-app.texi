@@ -1292,6 +1292,18 @@ Catch all which enables all curves from NORMAL priority is CURVE-ALL. Note
 that the CURVE keyword is kept for backwards compatibility only, for new
 applications see the GROUP keyword above.
 
+@item Certificate types @tab
+Certificate type negotitation must be explicitly enabled via the
+GNUTLS_ENABLE_CERT_TYPE_NEG flag in gnutls_init().
+Certificate types can be given in a symmetric fashion (i.e. the same for
+both client and server) or, as of GnuTLS 3.6.4, in an asymmetric fashion
+(i.e. different for the client than for the server).
+
+Currently supported types are:
+CTYPE-X509 or CTYPE-X.509. Catch all is CTYPE-ALL.
+CTYPE-CLI-X509 or CTYPE-CLI-X.509, CTYPE-SRV-X509 or CTYPE-SRV-X.509.
+Catch all is CTYPE-CLI-ALL and CTYPE-SRV-ALL.
+
 @end multitable
 @caption{The supported algorithm keywords in priority strings.}
 @end float

@@ -308,7 +308,7 @@ get_issuers(gnutls_session_t session,
 	int i;
 	unsigned size;
 
-	if (gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
+	if (gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT) != GNUTLS_CRT_X509)
 		return 0;
 
 	/* put the requested DNs to req_dn, only in case
@@ -339,7 +339,7 @@ get_issuers(gnutls_session_t session,
 	return 0;
 }
 
-/* Calls the client or server get callback.
+/* Calls the client or server certificate get callback.
  */
 static int
 call_get_cert_callback(gnutls_session_t session,
@@ -349,7 +349,7 @@ call_get_cert_callback(gnutls_session_t session,
 {
 	gnutls_privkey_t local_key = NULL;
 	int ret = GNUTLS_E_INTERNAL_ERROR;
-	gnutls_certificate_type_t type = gnutls_certificate_type_get(session);
+	gnutls_certificate_type_t type;
 	gnutls_certificate_credentials_t cred;
 	gnutls_pcert_st *pcert = NULL;
 	gnutls_ocsp_data_st *ocsp = NULL;
@@ -361,6 +361,19 @@ call_get_cert_callback(gnutls_session_t session,
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+	/* Correctly set the certificate type depending on whether we
+	 * have explicitly negotiated certificate types (RFC7250).
+	 */
+	if (_gnutls_has_negotiate_ctypes(session)) {
+		if (IS_SERVER(session))	{
+			type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_SERVER);
+		} else { // Client mode
+			type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT);
+		}
+	} else {
+		type = DEFAULT_CERT_TYPE;
 	}
 
 	if (cred->get_cert_callback3) {
@@ -432,9 +445,9 @@ _gnutls_select_client_cert(gnutls_session_t session,
 
 	if (cred->get_cert_callback3 != NULL) {
 
-		/* use a callback to get certificate 
+		/* use a callback to get certificate
 		 */
-		if (session->security_parameters.cert_type == GNUTLS_CRT_X509) {
+		if (session->security_parameters.client_ctype == GNUTLS_CRT_X509) {
 			issuers_dn_length =
 			    get_issuers_num(session, data, data_size);
 			if (issuers_dn_length < 0) {
@@ -473,7 +486,7 @@ _gnutls_select_client_cert(gnutls_session_t session,
 	} else {
 		/* If we have no callbacks, try to guess.
 		 */
-		if (session->security_parameters.cert_type == GNUTLS_CRT_X509) {
+		if (session->security_parameters.client_ctype == GNUTLS_CRT_X509) {
 			result =
 			    find_x509_client_cert(session, cred, _data, _data_size,
 					   pk_algos, pk_algos_length, &indx);
@@ -565,7 +578,7 @@ static int gen_x509_crt(gnutls_session_t session, gnutls_buffer_st * data)
 int
 _gnutls_gen_cert_client_crt(gnutls_session_t session, gnutls_buffer_st * data)
 {
-	switch (session->security_parameters.cert_type) {
+	switch (session->security_parameters.client_ctype) {
 	case GNUTLS_CRT_X509:
 		return gen_x509_crt(session, data);
 	default:
@@ -577,7 +590,7 @@ _gnutls_gen_cert_client_crt(gnutls_session_t session, gnutls_buffer_st * data)
 int
 _gnutls_gen_cert_server_crt(gnutls_session_t session, gnutls_buffer_st * data)
 {
-	switch (session->security_parameters.cert_type) {
+	switch (session->security_parameters.server_ctype) {
 	case GNUTLS_CRT_X509:
 		return gen_x509_crt(session, data);
 	default:
@@ -756,6 +769,7 @@ int _gnutls_proc_crt(gnutls_session_t session, uint8_t * data, size_t data_size)
 {
 	int ret;
 	gnutls_certificate_credentials_t cred;
+	gnutls_certificate_type_t cert_type;
 
 	cred =
 	    (gnutls_certificate_credentials_t) _gnutls_get_cred(session,
@@ -765,19 +779,28 @@ int _gnutls_proc_crt(gnutls_session_t session, uint8_t * data, size_t data_size)
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	switch (session->security_parameters.cert_type) {
-	case GNUTLS_CRT_X509:
-		ret = _gnutls_proc_x509_server_crt(session, data, data_size);
-		break;
-	default:
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+	/* Determine what certificate type we need to process */
+	if (IS_SERVER(session))	{
+		// We are the server therefore we process the client certificate
+		cert_type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT);
+	} else {
+		// We are the client therefore we process the server certificate
+		cert_type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_SERVER);
+	}
+
+	switch (cert_type) {
+		case GNUTLS_CRT_X509:
+			ret = _gnutls_proc_x509_server_crt(session, data, data_size);
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	return ret;
 }
 
-/* Checks if we support the given signature algorithm 
+/* Checks if we support the given signature algorithm
  * (RSA or DSA). Returns the corresponding gnutls_pk_algorithm_t
  * if true;
  */
@@ -1016,7 +1039,7 @@ _gnutls_proc_cert_client_crt_vrfy(gnutls_session_t session,
 
 	ret = _gnutls_get_auth_info_pcert(&peer_cert,
 					  session->security_parameters.
-					  cert_type, info);
+					  client_ctype, info);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1078,7 +1101,7 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 		}
 	}
 
-	if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
+	if (session->security_parameters.client_ctype == GNUTLS_CRT_X509 &&
 	    session->internals.ignore_rdn_sequence == 0) {
 
 		ret =
@@ -1215,9 +1238,17 @@ static void get_server_name(gnutls_session_t session, uint8_t * name,
 	return;
 }
 
-/* Selects a signature algorithm (if required by the ciphersuite and TLS
- * version), appropriate for the certificate. If none can be selected
- * returns an error.
+/* Checks the compatibility of the pubkey in the certificate with the
+ * ciphersuite and selects a signature algorithm (if required by the
+ * ciphersuite and TLS version) appropriate for the certificate. If none
+ * can be selected returns an error.
+ *
+ * IMPORTANT
+ * Currently this function is only called from _gnutls_server_select_cert,
+ * i.e. it is only called at the server. We therefore retrieve the
+ * negotiated server certificate type within this function.
+ * If, in the future, this routine is called at the client then we
+ * need to adapt the implementation accordingly.
  */
 static
 int cert_select_sign_algorithm(gnutls_session_t session,
@@ -1231,8 +1262,14 @@ int cert_select_sign_algorithm(gnutls_session_t session,
 	unsigned key_usage;
 	gnutls_sign_algorithm_t algo;
 	const version_entry_st *ver = get_version(session);
+	gnutls_certificate_type_t ctype;
 
-	if (session->security_parameters.cert_type != cert_type) {
+	assert(IS_SERVER(session));
+
+	/* Retrieve the server certificate type */
+	ctype = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_SERVER);
+
+	if (ctype != cert_type) {
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 	}
 
@@ -1297,7 +1334,7 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	 * the ciphersuites.
 	 */
 
-	/* If the callback which retrieves certificate has been set,
+	/* If the callback which retrieves the certificate has been set,
 	 * use it and leave. We make sure that this is called once.
 	 */
 	if (cred->get_cert_callback3) {
@@ -1358,8 +1395,6 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 					/* found */
 					goto finished;
 				}
-
-
 			}
 		}
 	}
@@ -1524,6 +1559,7 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 	const version_entry_st *ver = get_version(session);
 	gnutls_certificate_credentials_t cred;
 	unsigned vflags;
+	gnutls_certificate_type_t cert_type;
 
 	if (unlikely(info == NULL || info->ncerts == 0 || ver == NULL)) {
 		gnutls_assert();
@@ -1565,10 +1601,11 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 	signature.data = data;
 	signature.size = sigsize;
 
+	// Retrieve the negotiated certificate type
+	cert_type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_SERVER);
+
 	if ((ret =
-	     _gnutls_get_auth_info_pcert(&peer_cert,
-					 session->security_parameters.cert_type,
-					 info)) < 0) {
+	     _gnutls_get_auth_info_pcert(&peer_cert, cert_type, info)) < 0) {
 		gnutls_assert();
 		return ret;
 	}

@@ -198,8 +198,10 @@ static int tls12_resume_copy_required_vals(gnutls_session_t session, unsigned ti
 				    id) < 0)
 		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
-	session->security_parameters.cert_type =
-	    session->internals.resumed_security_parameters.cert_type;
+	session->security_parameters.client_ctype =
+	    session->internals.resumed_security_parameters.client_ctype;
+	session->security_parameters.server_ctype =
+	    session->internals.resumed_security_parameters.server_ctype;
 
 	if (!ticket) {
 		memcpy(session->security_parameters.session_id,

@@ -55,6 +55,8 @@
 #include <ext/record_size_limit.h>
 #include "extv.h"
 #include <num.h>
+#include <ext/client_cert_type.h>
+#include <ext/server_cert_type.h>
 
 static void
 unset_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *, unsigned idx);
@@ -79,6 +81,8 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 	[GNUTLS_EXTENSION_HEARTBEAT] = &ext_mod_heartbeat,
 #endif
 	[GNUTLS_EXTENSION_SESSION_TICKET] = &ext_mod_session_ticket,
+	[GNUTLS_EXTENSION_CLIENT_CERT_TYPE] = &ext_mod_client_cert_type,
+	[GNUTLS_EXTENSION_SERVER_CERT_TYPE] = &ext_mod_server_cert_type,
 	[GNUTLS_EXTENSION_SUPPORTED_GROUPS] = &ext_mod_supported_groups,
 	[GNUTLS_EXTENSION_SUPPORTED_EC_POINT_FORMATS] = &ext_mod_supported_ec_point_formats,
 	[GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS] = &ext_mod_sig,
