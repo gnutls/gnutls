@@ -201,6 +201,8 @@ typedef enum record_send_state_t {
 #define RECORD_HEADER_SIZE(session) (IS_DTLS(session) ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
 #define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
 
+#define MIN_RECORD_SIZE 512
+
 /* The following macro is used to calculate the overhead when sending.
  * when receiving we use a different way as there are implementations that
  * store more data than allowed.
@@ -343,6 +345,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_COOKIE,
 	GNUTLS_EXTENSION_EARLY_DATA,
 	GNUTLS_EXTENSION_PSK_KE_MODES,
+	GNUTLS_EXTENSION_RECORD_SIZE_LIMIT,
 	/*
 	 * pre_shared_key and dumbfw must always be the last extensions,
 	 * in that order */
@@ -1300,6 +1303,7 @@ typedef struct {
 #define HSK_TICKET_RECEIVED (1<<20) /* client: a session ticket was received */
 #define HSK_EARLY_START_USED (1<<21)
 #define HSK_EARLY_DATA_IN_FLIGHT (1<<22) /* server: early_data extension was seen in ClientHello */
+#define HSK_RECORD_SIZE_LIMIT_NEGOTIATED (1<<23)
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
