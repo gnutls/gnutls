@@ -81,6 +81,11 @@ check TLS1.0 "NORMAL:-VERS-ALL:+VERS-TLS1.0"
 check TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.1"
 check SSL3.0-TLS1.1 "NORMAL:-VERS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:+VERS-TLS1.1"
 check DTLS1.0 "NORMAL:-VERS-ALL:+VERS-DTLS1.0"
+# Priority strings prior to 3.6.x did not require the +GROUP option; here we
+# test whether these work as expected.
+check legacy1 "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-GCM:+SIGN-ALL:+COMP-NULL"
+check legacy2 "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL"
+
 
 rm -f ${TMPFILE}
 rm -f ${TMPFILE2}

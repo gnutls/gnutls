@@ -1201,6 +1201,15 @@ static void add_dh(gnutls_priority_t priority_cache)
 	}
 }
 
+#define REMOVE_TLS13_IN_LOOP(vers, i) \
+	if (vers->tls13_sem) { \
+		for (j=i+1;j<priority_cache->protocol.algorithms;j++) \
+			priority_cache->protocol.priority[j-1] = priority_cache->protocol.priority[j]; \
+		priority_cache->protocol.algorithms--; \
+		i--; \
+		continue; \
+	}
+
 static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 {
 	unsigned i, j, z;
@@ -1247,16 +1256,10 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		if (!vers)
 			continue;
 
-		/* if we have NULL ciphersuites, SRP or RSA-PSK enabled, remove TLS1.3+ protocol
-		 * versions; they cannot be negotiated under TLS1.3. */
+		/* if we have NULL ciphersuites, SRP, or RSA-PSK enabled remove TLS1.3+
+		 * protocol versions; they cannot be negotiated under TLS1.3. */
 		if (have_null || have_srp || have_rsa_psk) {
-			if (vers->tls13_sem) {
-				for (j=i+1;j<priority_cache->protocol.algorithms;j++)
-					priority_cache->protocol.priority[j-1] = priority_cache->protocol.priority[j];
-				priority_cache->protocol.algorithms--;
-				i--;
-				continue;
-			}
+			REMOVE_TLS13_IN_LOOP(vers, i);
 		}
 
 		if (vers->transport == GNUTLS_STREAM) { /* TLS */
@@ -1395,8 +1398,15 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	/* when TLS 1.3 is available we must have groups set */
-	if (unlikely(!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0))
-		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+	if (unlikely(!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0)) {
+		for (i = 0; i < priority_cache->protocol.algorithms; i++) {
+			vers = version_to_entry(priority_cache->protocol.priority[i]);
+			if (!vers)
+				continue;
+
+			REMOVE_TLS13_IN_LOOP(vers, i);
+		}
+	}
 
 	return 0;
 }
