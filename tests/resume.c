@@ -355,6 +355,12 @@ static void verify_server_params(gnutls_session_t session, unsigned counter, str
 		}
 	}
 
+	if (counter > 0) {
+		if (gnutls_session_resumption_requested(session) == 0) {
+			fail("client did not request resumption!\n");
+		}
+	}
+
 	if (params->no_early_start) {
 		if (gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_START) {
 			fail("early start did happen on %d but was not expected!\n", counter);
