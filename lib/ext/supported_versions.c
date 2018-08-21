@@ -59,7 +59,6 @@ supported_versions_recv_params(gnutls_session_t session,
 	const version_entry_st *vers;
 	ssize_t data_size = _data_size;
 	uint8_t major, minor;
-	gnutls_protocol_t proto;
 	ssize_t bytes;
 	int ret;
 
@@ -90,15 +89,11 @@ supported_versions_recv_params(gnutls_session_t session,
 			data += 2;
 			bytes -= 2;
 
-			proto = _gnutls_version_get(major, minor);
-
 			_gnutls_handshake_log("EXT[%p]: Found version: %d.%d\n",
 					      session, (int)major, (int)minor);
 
-			if (_gnutls_version_is_supported(session, proto)) {
-				ret = _gnutls_set_current_version(session, proto);
-				if (ret < 0)
-					return gnutls_assert_val(ret);
+			if (_gnutls_nversion_is_supported(session, major, minor)) {
+				session->security_parameters.pversion = nversion_to_entry(major, minor);
 
 				_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
 						      session, (int)major, (int)minor);
@@ -131,7 +126,6 @@ supported_versions_recv_params(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 		set_adv_version(session, major, minor);
-		proto = _gnutls_version_get(major, minor);
 
 		_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
 				      session, (int)major, (int)minor);
@@ -139,7 +133,7 @@ supported_versions_recv_params(gnutls_session_t session,
 		if (!vers->tls13_sem)
 			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-		ret = _gnutls_negotiate_version(session, proto, major, minor);
+		ret = _gnutls_negotiate_version(session, major, minor, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

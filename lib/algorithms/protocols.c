@@ -93,7 +93,6 @@ static const version_entry_st sup_versions[] = {
 	 .tls_sig_sem = SIG_SEM_PRE_TLS12,
 	 .false_start = 1
 	},
-#ifdef TLS13_FINAL_VERSION
 	{.name = "TLS1.3",
 	 .id = GNUTLS_TLS1_3,
 	 .age = 5,
@@ -113,27 +112,6 @@ static const version_entry_st sup_versions[] = {
 	 .false_start = 0, /* doesn't make sense */
 	 .tls_sig_sem = SIG_SEM_TLS13
 	},
-#else
-	{.name = "TLS1.3",
-	 .id = GNUTLS_TLS1_3,
-	 .age = 5,
-	 .major = 0x7f,
-	 .minor = 28,
-	 .transport = GNUTLS_STREAM,
-	 .supported = 1,
-	 .explicit_iv = 0,
-	 .extensions = 1,
-	 .selectable_sighash = 1,
-	 .selectable_prf = 1,
-	 .tls13_sem = 1,
-	 .obsolete = 0,
-	 .only_extension = 1,
-	 .post_handshake_auth = 1,
-	 .key_shares = 1,
-	 .false_start = 0, /* doesn't make sense */
-	 .tls_sig_sem = SIG_SEM_TLS13
-	},
-#endif
 	{.name = "DTLS0.9", /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
 	 .id = GNUTLS_DTLS0_9,
 	 .age = 200,
@@ -485,26 +463,29 @@ gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor)
 /* Version Functions */
 
 int
-_gnutls_version_is_supported(gnutls_session_t session,
-			     const gnutls_protocol_t version)
+_gnutls_nversion_is_supported(gnutls_session_t session,
+			      unsigned char major, unsigned char minor)
 {
 	const version_entry_st *p;
-	int ret = 0;
+	int version = 0;
 
 	for (p = sup_versions; p->name != NULL; p++) {
-		if(p->id == version) {
+		if(p->major == major && p->minor == minor) {
 #ifndef ENABLE_SSL3
 			if (p->obsolete != 0) return 0;
 #endif
 			if (p->tls13_sem && (session->internals.flags & INT_FLAG_NO_TLS13))
 				return 0;
 
-			ret = p->supported && p->transport == session->internals.transport;
+			if (!p->supported || p->transport != session->internals.transport)
+				return 0;
+
+			version = p->id;
 			break;
 		}
 	}
 
-	if (ret == 0)
+	if (version == 0)
 		return 0;
 
 	if (_gnutls_version_priority(session, version) < 0)
@@ -512,4 +493,3 @@ _gnutls_version_is_supported(gnutls_session_t session,
 	else
 		return 1;
 }
-

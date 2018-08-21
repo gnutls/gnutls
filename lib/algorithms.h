@@ -59,8 +59,8 @@ const version_entry_st *_gnutls_legacy_version_max(gnutls_session_t session);
 const version_entry_st *_gnutls_version_max(gnutls_session_t session);
 int _gnutls_version_priority(gnutls_session_t session,
 			     gnutls_protocol_t version);
-int _gnutls_version_is_supported(gnutls_session_t session,
-				 const gnutls_protocol_t version);
+int _gnutls_nversion_is_supported(gnutls_session_t session,
+				  unsigned char major, unsigned char minor);
 gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor);
 unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor);
 
