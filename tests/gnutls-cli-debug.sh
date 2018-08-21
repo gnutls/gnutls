@@ -120,7 +120,7 @@ wait
 
 declare -a arr=("whether we need to disable TLS 1.2... no" "for TLS 1.0 (RFC2246) support... no"
 		"for TLS 1.1 (RFC4346) support... no" "for TLS 1.2 (RFC5246) support... yes"
-		"for TLS 1.3 (draft-ietf-tls-tls13-28) support... yes"
+		"for TLS 1.3 (RFC8446) support... yes"
 		"TLS1.2 neg fallback from TLS 1.6 to... TLS1.2" "for safe renegotiation (RFC5746) support... yes"
 		"for encrypt-then-MAC (RFC7366) support... yes" "for ext master secret (RFC7627) support... yes"
 		"for RFC7919 Diffie-Hellman support... yes" "for curve SECP256r1 (RFC4492)... yes"
