@@ -7,7 +7,7 @@
 
 #define PRE_SHARED_KEY_TLS_ID 41
 
-extern const hello_ext_entry_st ext_pre_shared_key;
+extern const hello_ext_entry_st ext_mod_pre_shared_key;
 
 inline static
 unsigned _gnutls_have_psk_credentials(const gnutls_psk_client_credentials_t cred, gnutls_session_t session)

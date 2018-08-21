@@ -3,6 +3,6 @@
 
 #include <hello_ext.h>
 
-extern const hello_ext_entry_st ext_psk_ke_modes;
+extern const hello_ext_entry_st ext_mod_psk_ke_modes;
 
 #endif

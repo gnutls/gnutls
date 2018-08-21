@@ -768,7 +768,7 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 	}
 }
 
-const hello_ext_entry_st ext_pre_shared_key = {
+const hello_ext_entry_st ext_mod_pre_shared_key = {
 	.name = "Pre Shared Key",
 	.tls_id = PRE_SHARED_KEY_TLS_ID,
 	.gid = GNUTLS_EXTENSION_PRE_SHARED_KEY,

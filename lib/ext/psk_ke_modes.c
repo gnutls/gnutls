@@ -194,7 +194,7 @@ psk_ke_modes_recv_params(gnutls_session_t session,
 	}
 }
 
-const hello_ext_entry_st ext_psk_ke_modes = {
+const hello_ext_entry_st ext_mod_psk_ke_modes = {
 	.name = "PSK Key Exchange Modes",
 	.tls_id = 45,
 	.gid = GNUTLS_EXTENSION_PSK_KE_MODES,
