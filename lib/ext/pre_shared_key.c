@@ -201,8 +201,8 @@ client_send_params(gnutls_session_t session,
 	unsigned next_idx;
 	const mac_entry_st *prf_res = NULL;
 	const mac_entry_st *prf_psk = NULL;
-	time_t cur_time, ticket_age;
-	uint32_t ob_ticket_age;
+	time_t cur_time;
+	uint32_t ticket_age, ob_ticket_age;
 	int free_username = 0;
 	psk_auth_info_t info = NULL;
 	unsigned psk_id_len = 0;
@@ -235,16 +235,16 @@ client_send_params(gnutls_session_t session,
 
 		prf_res = session->internals.tls13_ticket.prf;
 
-		/* Check whether the ticket is stale */
 		cur_time = gnutls_time(0);
-		ticket_age = cur_time - session->internals.tls13_ticket.timestamp;
-		if (ticket_age < 0 || ticket_age > cur_time) {
+		if (unlikely(cur_time < session->internals.tls13_ticket.timestamp)) {
 			gnutls_assert();
 			_gnutls13_session_ticket_unset(session);
 			goto ignore_ticket;
 		}
 
-		if ((unsigned int) ticket_age > session->internals.tls13_ticket.lifetime) {
+		/* Check whether the ticket is stale */
+		ticket_age = cur_time - session->internals.tls13_ticket.timestamp;
+		if (ticket_age > session->internals.tls13_ticket.lifetime) {
 			_gnutls13_session_ticket_unset(session);
 			goto ignore_ticket;
 		}
@@ -477,7 +477,7 @@ static int server_recv_params(gnutls_session_t session,
 	struct psk_st psk;
 	psk_auth_info_t info;
 	tls13_ticket_t ticket_data;
-	time_t ticket_age;
+	uint32_t ticket_age;
 	bool resuming;
 
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
@@ -507,14 +507,14 @@ static int server_recv_params(gnutls_session_t session,
 			session->internals.resumption_requested = 1;
 
 			/* Check whether ticket is stale or not */
-			ticket_age = psk.ob_ticket_age - ticket_data.age_add;
-			if (ticket_age < 0) {
+			if (psk.ob_ticket_age < ticket_data.age_add) {
 				gnutls_assert();
 				tls13_ticket_deinit(&ticket_data);
 				continue;
 			}
 
-			if ((unsigned int) (ticket_age / 1000) > ticket_data.lifetime) {
+			ticket_age = psk.ob_ticket_age - ticket_data.age_add;
+			if (ticket_age / 1000 > ticket_data.lifetime) {
 				gnutls_assert();
 				tls13_ticket_deinit(&ticket_data);
 				continue;
