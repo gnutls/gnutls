@@ -380,11 +380,13 @@ tests/dtls-rehandshake-cert
 tests/dtls-rehandshake-cert-2
 tests/dtls-rehandshake-cert-3
 tests/dtls-repro-20170915
+tests/dtls-session-ticket-lost
 tests/dtls-sliding-window
 tests/dtls-stress
 tests/dtls-with-seccomp
 tests/duplicate-extensions
 tests/eagain
+tests/empty_retrieve_function
 tests/fallback-scsv
 tests/finished
 tests/fips-mode-pthread
@@ -404,7 +406,9 @@ tests/gnutls_x509_crt_list_import
 tests/gnutls_x509_crt_sign
 tests/gnutls_x509_privkey_import
 tests/handshake-false-start
+tests/handshake-large-cert
 tests/handshake-large-packet
+tests/handshake-timeout
 tests/handshake-versions
 tests/hex
 tests/hostname-check
@@ -415,6 +419,7 @@ tests/init_roundtrip
 tests/insecure_key
 tests/ip-check
 tests/ip-utils
+tests/key-export-pkcs8
 tests/keygen
 tests/key-id/Makefile
 tests/key-id/Makefile.in
@@ -433,6 +438,8 @@ tests/long-session-id
 tests/Makefile
 tests/Makefile.in
 tests/memset
+tests/memset0
+tests/memset1
 tests/mini
 tests/mini-alignment
 tests/mini-alpn
@@ -503,6 +510,7 @@ tests/name-constraints-merge
 tests/netconf-psk
 tests/no-signal
 tests/nul-in-x509-names
+tests/null_retrieve_function
 tests/ocsp
 tests/ocsp-filename-memleak
 tests/ocsp-resp
@@ -575,6 +583,7 @@ tests/pkcs8-key-decode-encrypted
 tests/prf
 tests/priorities
 tests/priorities-groups
+tests/priority-init2
 tests/priority-mix
 tests/priority-set
 tests/priority-set2
@@ -600,6 +609,7 @@ tests/rehandshake-switch-srp-id
 tests/resume
 tests/resume-anon
 tests/resume-dtls
+tests/resume-lifetime
 tests/resume-psk
 tests/resume-with-false-start
 tests/resume-x509
@@ -636,6 +646,7 @@ tests/session-rdn-read
 tests/session-tickets-missing
 tests/session-tickets-ok
 tests/setcredcrash
+tests/set-default-prio
 tests/set_key
 tests/set_key_utf8
 tests/set_known_dh_params_anon
@@ -751,10 +762,11 @@ tests/tls12-rollback-detection
 tests/tls12-server-kx-neg
 tests/tls13-cert-key-exchange
 tests/tls13/change_cipher_spec
-tests/tls13/post-handshake-with-psk
 tests/tls13-cipher-neg
 tests/tls13/cookie
+tests/tls13-early-start
 tests/tls13/hello_random_value
+tests/tls13/hello_retry_request
 tests/tls13/key_limits
 tests/tls13/key_share
 tests/tls13/key_update
@@ -764,6 +776,7 @@ tests/tls13/ocsp-client
 tests/tls13/post-handshake-with-cert
 tests/tls13/post-handshake-with-cert-ticket
 tests/tls13/post-handshake-without-cert
+tests/tls13/post-handshake-with-psk
 tests/tls13/prf
 tests/tls13/psk-dumbfw
 tests/tls13/psk-ext
@@ -774,6 +787,7 @@ tests/tls13-server-kx-neg
 tests/tls13/supported_versions
 tests/tls13/tls12-no-tls13-exts
 tests/tls-client-with-seccomp
+tests/tls-crt_type-neg
 tests/tls-etm
 tests/tlsext-decoding
 tests/tls-ext-not-in-dtls
@@ -785,6 +799,7 @@ tests/tlsia
 tests/tls-max-record
 tests/tls-neg-ext4-key
 tests/tls-neg-ext-key
+tests/tls-record-size-limit
 tests/tls-rehandshake-anon
 tests/tls-rehandshake-cert
 tests/tls-rehandshake-cert-2
