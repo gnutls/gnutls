@@ -737,12 +737,22 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 	/* This is the last flight and peer cannot be sure
 	 * we have received it unless we notify him. So we
 	 * wait for a message and retransmit if needed. */
-	if (IS_DTLS(session) && !_dtls_is_async(session) &&
-	    (gnutls_record_check_pending(session) +
-	     record_check_unprocessed(session)) == 0) {
-		ret = _dtls_wait_and_retransmit(session);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+	if (IS_DTLS(session) && !_dtls_is_async(session)) {
+		unsigned have;
+		mbuffer_st *bufel = NULL;
+
+		have = gnutls_record_check_pending(session) +
+		       record_check_unprocessed(session);
+
+		if (have != 0) {
+			bufel = _mbuffer_head_get_first(&session->internals.record_buffer, NULL);
+		}
+
+		if (have == 0 || (bufel && bufel->type != GNUTLS_HANDSHAKE)) {
+			ret = _dtls_wait_and_retransmit(session);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
 	}
 
 	ret = _gnutls_recv_handshake(session,

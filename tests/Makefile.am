@@ -184,7 +184,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 set_x509_key_file_der set_x509_pkcs12_key crt_apis tls12-cert-key-exchange \
 	 tls11-cert-key-exchange tls10-cert-key-exchange ssl30-cert-key-exchange \
 	 dtls12-cert-key-exchange dtls10-cert-key-exchange x509-cert-callback-legacy \
-	 keylog-env ssl2-hello tlsfeature-ext dtls-rehandshake-cert-2 \
+	 keylog-env ssl2-hello tlsfeature-ext dtls-rehandshake-cert-2 dtls-session-ticket-lost \
 	 tlsfeature-crt dtls-rehandshake-cert-3 resume-with-false-start \
 	 set_x509_key_file_ocsp client-fastopen rng-sigint srp rng-pthread \
 	 safe-renegotiation/srn0 safe-renegotiation/srn1 safe-renegotiation/srn2 \
