@@ -95,8 +95,8 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 #ifdef ENABLE_ALPN
 	[GNUTLS_EXTENSION_ALPN] = &ext_mod_alpn,
 #endif
-	[GNUTLS_EXTENSION_PSK_KE_MODES] = &ext_psk_ke_modes,
-	[GNUTLS_EXTENSION_PRE_SHARED_KEY] = &ext_pre_shared_key,
+	[GNUTLS_EXTENSION_PSK_KE_MODES] = &ext_mod_psk_ke_modes,
+	[GNUTLS_EXTENSION_PRE_SHARED_KEY] = &ext_mod_pre_shared_key,
 	[GNUTLS_EXTENSION_RECORD_SIZE_LIMIT] = &ext_mod_record_size_limit,
 	/* This must be the last extension registered.
 	 */

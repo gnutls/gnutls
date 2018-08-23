@@ -201,8 +201,8 @@ client_send_params(gnutls_session_t session,
 	unsigned next_idx;
 	const mac_entry_st *prf_res = NULL;
 	const mac_entry_st *prf_psk = NULL;
-	time_t cur_time, ticket_age;
-	uint32_t ob_ticket_age;
+	time_t cur_time;
+	uint32_t ticket_age, ob_ticket_age;
 	int free_username = 0;
 	psk_auth_info_t info = NULL;
 	unsigned psk_id_len = 0;
@@ -235,16 +235,16 @@ client_send_params(gnutls_session_t session,
 
 		prf_res = session->internals.tls13_ticket.prf;
 
-		/* Check whether the ticket is stale */
 		cur_time = gnutls_time(0);
-		ticket_age = cur_time - session->internals.tls13_ticket.timestamp;
-		if (ticket_age < 0 || ticket_age > cur_time) {
+		if (unlikely(cur_time < session->internals.tls13_ticket.timestamp)) {
 			gnutls_assert();
 			_gnutls13_session_ticket_unset(session);
 			goto ignore_ticket;
 		}
 
-		if ((unsigned int) ticket_age > session->internals.tls13_ticket.lifetime) {
+		/* Check whether the ticket is stale */
+		ticket_age = cur_time - session->internals.tls13_ticket.timestamp;
+		if (ticket_age > session->internals.tls13_ticket.lifetime) {
 			_gnutls13_session_ticket_unset(session);
 			goto ignore_ticket;
 		}
@@ -469,24 +469,35 @@ static int server_recv_params(gnutls_session_t session,
 	const mac_entry_st *prf;
 	gnutls_datum_t full_client_hello;
 	uint8_t binder_value[MAX_HASH_SIZE];
-	int psk_index;
+	uint16_t psk_index, i;
 	gnutls_datum_t binder_recvd = { NULL, 0 };
 	gnutls_datum_t key = {NULL, 0};
 	psk_ext_parser_st psk_parser;
+	psk_ext_iter_st psk_iter;
 	struct psk_st psk;
 	psk_auth_info_t info;
 	tls13_ticket_t ticket_data;
-	time_t ticket_age;
+	uint32_t ticket_age;
 	bool resuming;
 
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
 	if (ret < 0) {
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) /* No PSKs advertised by client */
+		/* No PSKs advertised by client */
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			return 0;
 		return gnutls_assert_val(ret);
 	}
 
-	while ((psk_index = _gnutls13_psk_ext_parser_next_psk(&psk_parser, &psk)) >= 0) {
+	_gnutls13_psk_ext_iter_init(&psk_iter, &psk_parser);
+	for (psk_index = 0; ; psk_index++) {
+		ret = _gnutls13_psk_ext_iter_next_identity(&psk_iter, &psk);
+		if (ret < 0) {
+			/* We couldn't find any usable PSK */
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				return 0;
+			return gnutls_assert_val(ret);
+		}
+
 		/* This will unpack the session ticket if it is well
 		 * formed and has the expected name */
 		if (!(session->internals.flags & GNUTLS_NO_TICKETS) &&
@@ -496,19 +507,22 @@ static int server_recv_params(gnutls_session_t session,
 			session->internals.resumption_requested = 1;
 
 			/* Check whether ticket is stale or not */
-			ticket_age = psk.ob_ticket_age - ticket_data.age_add;
-			if (ticket_age < 0) {
+			if (psk.ob_ticket_age < ticket_data.age_add) {
+				gnutls_assert();
 				tls13_ticket_deinit(&ticket_data);
 				continue;
 			}
 
-			if ((unsigned int) (ticket_age / 1000) > ticket_data.lifetime) {
+			ticket_age = psk.ob_ticket_age - ticket_data.age_add;
+			if (ticket_age / 1000 > ticket_data.lifetime) {
+				gnutls_assert();
 				tls13_ticket_deinit(&ticket_data);
 				continue;
 			}
 
 			ret = compute_psk_from_ticket(&ticket_data, &key);
 			if (ret < 0) {
+				gnutls_assert();
 				tls13_ticket_deinit(&ticket_data);
 				continue;
 			}
@@ -539,14 +553,16 @@ static int server_recv_params(gnutls_session_t session,
 		}
 	}
 
-	if (psk_index < 0)
-		return 0;
-
-	ret = _gnutls13_psk_ext_parser_find_binder(&psk_parser, psk_index,
-						   &binder_recvd);
-	if (ret < 0) {
-		gnutls_assert();
-		goto fail;
+	_gnutls13_psk_ext_iter_init(&psk_iter, &psk_parser);
+	for (i = 0; i <= psk_index; i++) {
+		ret = _gnutls13_psk_ext_iter_next_binder(&psk_iter, &binder_recvd);
+		if (ret < 0) {
+			gnutls_assert();
+			/* We couldn't extract binder */
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto fail;
+		}
 	}
 
 	/* Get full ClientHello */
@@ -557,7 +573,7 @@ static int server_recv_params(gnutls_session_t session,
 	}
 
 	/* Compute the binder value for this PSK */
-	ret = compute_psk_binder(session, prf, psk_parser.binder_len+2, 0, 0,
+	ret = compute_psk_binder(session, prf, psk_parser.binders_len+2, 0, 0,
 				 &key, &full_client_hello, resuming,
 				 binder_value);
 	if (ret < 0) {
@@ -582,11 +598,7 @@ static int server_recv_params(gnutls_session_t session,
 	/* save the username in psk_auth_info to make it available
 	 * using gnutls_psk_server_get_username() */
 	if (!resuming) {
-		if (psk.identity.size >= sizeof(info->username)) {
-			gnutls_assert();
-			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-			goto fail;
-		}
+		assert(psk.identity.size < sizeof(info->username));
 
 		ret = _gnutls_auth_info_set(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
 		if (ret < 0) {
@@ -756,7 +768,7 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 	}
 }
 
-const hello_ext_entry_st ext_pre_shared_key = {
+const hello_ext_entry_st ext_mod_pre_shared_key = {
 	.name = "Pre Shared Key",
 	.tls_id = PRE_SHARED_KEY_TLS_ID,
 	.gid = GNUTLS_EXTENSION_PRE_SHARED_KEY,
