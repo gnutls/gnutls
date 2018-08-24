@@ -38,12 +38,6 @@
 #include <stdbool.h>
 #include <assert.h>
 
-/* For some reason gnulib likes to provide alternatives for
- * functions it doesn't include. Even worse these functions seem
- * to be available on the target systems.
- */
-#undef strdup
-
 #ifdef NO_SSIZE_T
 #define HAVE_SSIZE_T
 typedef int ssize_t;
