@@ -1154,7 +1154,7 @@ size_t n, n2 = 0, line_size;
 			ret[n] = 0;
 		}
 	} else {
-		return strdup(p);
+		return gnutls_strdup(p);
 	}
 
 finish:
