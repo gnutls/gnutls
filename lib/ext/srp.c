@@ -158,13 +158,13 @@ _gnutls_srp_send_params(gnutls_session_t session,
 			goto cleanup;
 		}
 
-		priv->username = strdup(cred->username);
+		priv->username = gnutls_strdup(cred->username);
 		if (priv->username == NULL) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-		priv->password = strdup(cred->password);
+		priv->password = gnutls_strdup(cred->password);
 		if (priv->password == NULL) {
 			gnutls_assert();
 			goto cleanup;
