@@ -767,7 +767,7 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 					(list->node[hash].crl_size +
 					 1) *
 					sizeof(list->node[hash].
-					       trusted_cas[0]));
+					       crls[0]));
 		if (tmp == NULL) {
 			ret = i;
 			gnutls_assert();
