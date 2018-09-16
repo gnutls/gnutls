@@ -796,7 +796,6 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	fprintf(stderr, "Update times.\n");
 	secs = get_crl_next_update();
 
 	result =
@@ -2479,7 +2478,7 @@ void verify_crl(common_info_st * cinfo)
 	size_t size;
 	gnutls_datum_t dn;
 	unsigned int output;
-	int ret;
+	int ret, rc;
 	gnutls_datum_t pem, pout;
 	gnutls_x509_crl_t crl;
 	gnutls_x509_crt_t issuer;
@@ -2519,7 +2518,6 @@ void verify_crl(common_info_st * cinfo)
 
 	print_crl_info(crl, outfile);
 
-	fprintf(outfile, "Verification output: ");
 	ret = gnutls_x509_crl_verify(crl, &issuer, 1, 0, &output);
 	if (ret < 0) {
 		fprintf(stderr, "verification error: %s\n",
@@ -2527,10 +2525,14 @@ void verify_crl(common_info_st * cinfo)
 		app_exit(1);
 	}
 
+	fprintf(outfile, "Verification output: ");
+
 	if (output) {
 		fprintf(outfile, "Not verified. ");
+		rc = 1;
 	} else {
 		fprintf(outfile, "Verified.");
+		rc = 0;
 	}
 
 	ret =
@@ -2546,6 +2548,8 @@ void verify_crl(common_info_st * cinfo)
 	gnutls_free(pout.data);
 
 	fprintf(outfile, "\n");
+
+	app_exit(rc);
 }
 
 static void print_dn(const char *prefix, const gnutls_datum_t *raw)
