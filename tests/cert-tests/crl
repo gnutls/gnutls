@@ -265,6 +265,26 @@ if test "$?" != "0"; then
 	exit 1
 fi
 
+# Check CRL verification
+
+## CRL validation is expected to succeed
+${VALGRIND} "${CERTTOOL}" --verify-crl --infile "${srcdir}/data/ca-crl-valid.crl"  --load-ca-certificate \
+	"${srcdir}/data/ca-crl-valid.pem" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+if test "${rc}" != "0"; then
+	echo "CRL verification failed"
+	exit ${rc}
+fi
+
+## CRL validation is expected to fail because the CA doesn't have the CRLSign key usage flag
+${VALGRIND} "${CERTTOOL}" --verify-crl --infile "${srcdir}/data/ca-crl-invalid.crl"  --load-ca-certificate \
+	"${srcdir}/data/ca-crl-invalid.pem" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+if test "${rc}" = "0"; then
+	echo "CRL verification succeeded when shouldn't"
+	exit 1
+fi
+
 rm -f "${OUTFILE}"
 rm -f "${INFOFILE}"
 rm -f "${OUTFILE2}"

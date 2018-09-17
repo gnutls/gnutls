@@ -1576,7 +1576,7 @@ void read_serial_value(unsigned char *serial, size_t *size, size_t max_size,
 
 	while (true) {
 		fprintf(stderr,
-			"Enter the certificate's %s in decimal (123) or hex (0xabcd)\n"
+			"Enter the %s in decimal (123) or hex (0xabcd)\n"
 			"(default is 0x%s)\n"
 			"value: ",
 			label, encoded_default.data);
@@ -1679,7 +1679,7 @@ int default_serial(unsigned char *serial, size_t *size)
 void get_serial(unsigned char *serial, size_t *size)
 {
 	get_serial_value(serial, size, cfg.serial, cfg.serial_size,
-			default_serial, "serial number", "4.1.2.2");
+			default_serial, "certificate's serial number", "4.1.2.2");
 }
 
 static
@@ -1776,8 +1776,7 @@ time_t get_int_date(const char *txt_val, int int_val, const char *msg)
 
 		do {
 			days =
-			    read_int
-			    ("The certificate will expire in (days): ");
+			    read_int(msg);
 		}
 		while (days == 0);
 		return days_to_secs(days);
@@ -1816,7 +1815,7 @@ int get_crq_extensions_status(void)
 void get_crl_number(unsigned char* serial, size_t * size)
 {
 	get_serial_value(serial, size, cfg.crl_number, cfg.crl_number_size,
-			default_crl_number, "CRL number", "5.2.3");
+			default_crl_number, "CRL's serial number", "5.2.3");
 }
 
 int get_path_len(void)
