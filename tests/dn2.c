@@ -89,6 +89,8 @@ void doit(void)
 	if (ret < 0)
 		fail("x509_crt_print %d\n", ret);
 
+/* When allowing SHA1, the output is different: no broken! string */
+#ifndef ALLOW_SHA1
 	if (out.size != strlen(info) ||
 	    strcasecmp((char *) out.data, info) != 0) {
 		fprintf(stderr, "comparison fail (%d/%d)\nexpected: %s\n\n   got: %.*s\n\n",
@@ -96,6 +98,7 @@ void doit(void)
 		     out.data);
 		fail("comparison failed\n");
 	}
+#endif
 
 	gnutls_x509_crt_deinit(cert);
 	gnutls_global_deinit();

@@ -56,6 +56,7 @@
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
 	}
 
+#ifndef ALLOW_SHA1
 #define CHECK_INSECURE_FOR_CERTS_SIG(sig) \
 	ret = gnutls_sign_is_secure2(sig, 0); \
 	if (ret == 0) { \
@@ -69,6 +70,9 @@
 	if (ret == 0) { \
 		fail("error testing %d/%s\n", sig, gnutls_sign_get_name(sig)); \
 	}
+#else
+#define CHECK_INSECURE_FOR_CERTS_SIG(sig)
+#endif
 
 void doit(void)
 {
@@ -83,8 +87,11 @@ void doit(void)
 	CHECK_INSECURE_SIG(GNUTLS_SIGN_RSA_MD2);
 
 	for (i=1;i<GNUTLS_SIGN_MAX;i++) {
-		if (i==GNUTLS_SIGN_RSA_SHA1||i==GNUTLS_SIGN_DSA_SHA1||i==GNUTLS_SIGN_ECDSA_SHA1||
-		    i==GNUTLS_SIGN_RSA_MD5||i==GNUTLS_SIGN_RSA_MD2||i==GNUTLS_SIGN_UNKNOWN)
+#ifndef ALLOW_SHA1
+		if (i==GNUTLS_SIGN_RSA_SHA1||i==GNUTLS_SIGN_DSA_SHA1||i==GNUTLS_SIGN_ECDSA_SHA1)
+			continue;
+#endif
+		if (i==GNUTLS_SIGN_RSA_MD5||i==GNUTLS_SIGN_RSA_MD2||i==GNUTLS_SIGN_UNKNOWN)
 			continue;
 		/* skip any unused elements */
 		if (gnutls_sign_algorithm_get_name(i)==NULL)
