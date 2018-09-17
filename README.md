@@ -100,7 +100,6 @@ To download the version controlled sources:
 ```
 $ git clone https://gitlab.com/gnutls/gnutls.git
 $ cd gnutls
-$ git submodule update --init
 ```
 
 The next step is to bootstrap and ./configure:

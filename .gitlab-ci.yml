@@ -41,8 +41,7 @@ doc-dist.Fedora:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - git submodule update --init --no-fetch
-  - ./bootstrap
+  - SUBMODULE_NOFETCH=1 ./bootstrap
   - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
   - make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
   - make -C doc gnutls.html
@@ -59,8 +58,7 @@ abi/coverage.Debian:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
-  - git submodule update --init --no-fetch
-  - ./bootstrap
+  - SUBMODULE_NOFETCH=1 ./bootstrap
   - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc
   - make -j$(nproc)
   - make abi-check
@@ -189,8 +187,7 @@ asan.Fedora.x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
-  - git submodule update --init --no-fetch
-  - ./bootstrap
+  - SUBMODULE_NOFETCH=1  ./bootstrap
   - CFLAGS="-fsanitize=address -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libasan"
     dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile
   - make -j$(nproc)
