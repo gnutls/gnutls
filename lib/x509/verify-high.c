@@ -344,7 +344,7 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			ret = add_new_ca_to_rdn_seq(list, clist[i]);
 			if (ret < 0) {
 				gnutls_assert();
-				return i;
+				return i+1;
 			}
 		}
 	}
