@@ -1096,11 +1096,7 @@ int _gnutls_params_get_gost_raw(const gnutls_pk_params_st* params,
 				       unsigned int flags)
 {
 	int ret;
-	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
-
-	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
-		dprint = _gnutls_mpi_dprint;
-
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_le;
 
 	if (params == NULL) {
 		gnutls_assert();
