@@ -256,14 +256,23 @@ trust_list_add_compat(gnutls_x509_trust_list_t list,
  * @flags: flags from %gnutls_trust_list_flags_t
  *
  * This function will add the given certificate authorities
- * to the trusted list. The list of CAs must not be deinitialized
- * during this structure's lifetime.
+ * to the trusted list. The CAs in @clist must not be deinitialized
+ * during the lifetime of @list.
  *
  * If the flag %GNUTLS_TL_NO_DUPLICATES is specified, then
- * the provided @clist entries that are duplicates will not be
- * added to the list and will be deinitialized.
+ * this function will ensure that no duplicates will be
+ * present in the final trust list.
  *
- * Returns: The number of added elements is returned.
+ * If the flag %GNUTLS_TL_NO_DUPLICATE_KEY is specified, then
+ * this function will ensure that no certificates with the
+ * same key are present in the final trust list.
+ *
+ * If either %GNUTLS_TL_NO_DUPLICATE_KEY or %GNUTLS_TL_NO_DUPLICATES
+ * are given, gnutls_x509_trust_list_deinit() must be called with parameter
+ * @all being 1.
+ *
+ * Returns: The number of added elements is returned; that includes
+ *          duplicate entries.
  *
  * Since: 3.0.0
  **/
@@ -629,8 +638,8 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
  * certificates that are trusted by the user for that specific server
  * but for no other purposes.
  *
- * The certificate must not be deinitialized during the lifetime
- * of the trusted list.
+ * The certificate @cert must not be deinitialized during the lifetime
+ * of the @list.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -684,18 +693,21 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
  * @verification_flags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
  *
  * This function will add the given certificate revocation lists
- * to the trusted list. The list of CRLs must not be deinitialized
- * during this structure's lifetime.
+ * to the trusted list. The CRLs in @crl_list must not be deinitialized
+ * during the lifetime of @list.
  *
  * This function must be called after gnutls_x509_trust_list_add_cas()
  * to allow verifying the CRLs for validity. If the flag %GNUTLS_TL_NO_DUPLICATES
- * is given, then any provided CRLs that are a duplicate, will be deinitialized
- * and not added to the list (that assumes that gnutls_x509_trust_list_deinit()
- * will be called with all=1).
+ * is given, then the final CRL list will not contain duplicate entries.
  *
- * If GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before being added.
+ * If the flag %GNUTLS_TL_NO_DUPLICATES is given, gnutls_x509_trust_list_deinit() must be
+ * called with parameter @all being 1.
  *
- * Returns: The number of added elements is returned.
+ * If flag %GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before being added,
+ * and if verification fails, they will be skipped.
+ *
+ * Returns: The number of added elements is returned; that includes
+ *          duplicate entries.
  *
  * Since: 3.0
  **/
