@@ -175,6 +175,32 @@ _gnutls_mpi_init_scan_le(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 	return 0;
 }
 
+int _gnutls_mpi_dprint_le(const bigint_t a, gnutls_datum_t * dest)
+{
+	int ret;
+	uint8_t *buf = NULL;
+	size_t bytes = 0;
+
+	if (dest == NULL || a == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	_gnutls_mpi_print_le(a, NULL, &bytes);
+	if (bytes != 0)
+		buf = gnutls_malloc(bytes);
+	if (buf == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+
+	ret = _gnutls_mpi_print_le(a, buf, &bytes);
+	if (ret < 0) {
+		gnutls_free(buf);
+		return ret;
+	}
+
+	dest->data = buf;
+	dest->size = bytes;
+	return 0;
+}
+
 /* Always has the first bit zero */
 int _gnutls_mpi_dprint_lz(const bigint_t a, gnutls_datum_t * dest)
 {
