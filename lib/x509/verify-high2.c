@@ -58,6 +58,9 @@
  * This function will add the given certificate authorities
  * to the trusted list. 
  *
+ * If this function is used gnutls_x509_trust_list_deinit() must be called
+ * with parameter @all being 1.
+ *
  * Returns: The number of added elements is returned.
  *
  * Since: 3.1
@@ -76,6 +79,9 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
 	unsigned int x509_ncas, x509_ncrls;
 	unsigned int r = 0;
 
+	/* When adding CAs or CRLs, we use the GNUTLS_TL_NO_DUPLICATES flag to ensure
+	 * that unaccounted certificates/CRLs are deinitialized. */
+
 	if (cas != NULL && cas->data != NULL) {
 		ret =
 		    gnutls_x509_crt_list_import2(&x509_ca_list, &x509_ncas,
@@ -85,7 +91,7 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
 
 		ret =
 		    gnutls_x509_trust_list_add_cas(list, x509_ca_list,
-						   x509_ncas, tl_flags);
+						   x509_ncas, tl_flags|GNUTLS_TL_NO_DUPLICATES);
 		gnutls_free(x509_ca_list);
 
 		if (ret < 0)
