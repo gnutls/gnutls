@@ -89,14 +89,12 @@ echo "PKCS1-PAD2 OK"
 # by Andrei Pyshkin, Erik Tews and Ralf-Philipp Weinmann.
 
 
-EXPECT3=03
-
 datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/data/pkcs1-pad-broken3.pem" | tee $TMPFILE1 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' $TMPFILE1 | wc -l | tr -d " "`
 out1fails=`grep 'Not verified.' $TMPFILE1 | wc -l | tr -d " "`
 
-if test "${out1oks}${out1fails}" != "${EXPECT3}"; then
+if test ${out1fails} -lt 2 || test ${out1oks} != 0;then
 	echo "$TMPFILE1 oks ${out1oks} fails ${out1fails}"
 	echo "expected ${EXPECT3}"
 	echo "PKCS1-PAD3 FAIL"
