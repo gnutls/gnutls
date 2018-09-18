@@ -17,6 +17,11 @@ See the end for copying conditions.
    certificate is presented by client and the gnutls_init() flag GNUTLS_ENABLE_EARLY_START
    is specified.
 
+** libgnutls: Added session ticket key rotation on server side with TOTP.
+   The key set with gnutls_session_ticket_enable_server() is used as a
+   master key to generate time-based keys for tickets. The rotation
+   relates to the gnutls_db_set_cache_expiration() period.
+
 ** libgnutls: The 'record size limit' extension is added and preferred to the
    'max record size' extension when possible.
 

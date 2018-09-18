@@ -157,6 +157,7 @@ typedef struct {
 
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 21600
+#define STEK_ROTATION_PERIOD_PRODUCT 3
 #define DEFAULT_HANDSHAKE_TIMEOUT_MS 40*1000
 
 /* The EC group to be used when the extension
@@ -490,6 +491,22 @@ typedef struct auth_cred_st {
 #define TICKET_CIPHER_KEY_SIZE 32
 #define TICKET_MAC_SECRET_SIZE 16
 
+/* These are restricted by TICKET_CIPHER_KEY_SIZE and TICKET_MAC_SECRET_SIZE */
+#define TICKET_CIPHER GNUTLS_CIPHER_AES_256_CBC
+#define TICKET_IV_SIZE 16
+#define TICKET_BLOCK_SIZE 16
+
+#define TICKET_MAC_ALGO GNUTLS_MAC_SHA1
+#define TICKET_MAC_SIZE 20 /* HMAC-SHA1 */
+
+struct ticket_st {
+	uint8_t key_name[TICKET_KEY_NAME_SIZE];
+	uint8_t IV[TICKET_IV_SIZE];
+	uint8_t *encrypted_state;
+	uint16_t encrypted_state_len;
+	uint8_t mac[TICKET_MAC_SIZE];
+};
+
 struct binder_data_st {
 	const struct mac_entry_st *prf; /* non-null if this struct is set */
 	gnutls_datum_t psk;
@@ -500,6 +517,10 @@ struct binder_data_st {
 	uint8_t idx;
 	uint8_t resumption; /* whether it is a resumption binder */
 };
+
+typedef void (* gnutls_stek_rotation_callback_t) (const gnutls_datum_t *prev_key,
+						const gnutls_datum_t *new_key,
+						uint64_t t);
 
 struct gnutls_key_st {
 	struct { /* These are kept outside the TLS1.3 union as they are
@@ -572,8 +593,13 @@ struct gnutls_key_st {
 	/* TLS pre-master key; applies to 1.2 and 1.3 */
 	gnutls_datum_t key;
 
-	/* The key to encrypt and decrypt session tickets */
-	uint8_t session_ticket_key[TICKET_MASTER_KEY_SIZE];
+	uint8_t
+		/* The key to encrypt and decrypt session tickets */
+		session_ticket_key[TICKET_MASTER_KEY_SIZE],
+		/* Static buffer for the previous key, whenever we need it */
+		previous_ticket_key[TICKET_MASTER_KEY_SIZE],
+		/* Initial key supplied by the caller */
+		initial_stek[TICKET_MASTER_KEY_SIZE];
 
 	/* this is used to hold the peers authentication data
 	 */
@@ -586,6 +612,12 @@ struct gnutls_key_st {
 	int auth_info_size;	/* needed in order to store to db for restoring
 				 */
 	auth_cred_st *cred;	/* used to specify keys/certificates etc */
+
+	struct {
+		uint64_t last_result;
+		uint8_t was_rotated;
+		gnutls_stek_rotation_callback_t cb;
+	} totp;
 };
 
 typedef struct gnutls_key_st gnutls_key_st;
