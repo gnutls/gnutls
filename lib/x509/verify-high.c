@@ -749,6 +749,8 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 				_gnutls_debug_log("CRL verification failed, not adding it\n");
 				if (flags & GNUTLS_TL_NO_DUPLICATES)
 					gnutls_x509_crl_deinit(crl_list[i]);
+				if (flags & GNUTLS_TL_FAIL_ON_INVALID_CRL)
+					return gnutls_assert_val(GNUTLS_E_CRL_VERIFICATION_ERROR);
 				continue;
 			}
 		}
