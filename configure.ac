@@ -986,6 +986,7 @@ AC_CONFIG_FILES([
   po/Makefile.in
   src/Makefile
   src/gl/Makefile
+  src/args-std.def
   tests/Makefile
   tests/windows/Makefile
   tests/cert-tests/Makefile

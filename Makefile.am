@@ -168,9 +168,6 @@ dist-hook: libopts-check symbol-check
 	$(MAKE) -C doc/manpages compare-makefile
 	$(MAKE) ChangeLog
 	mv ChangeLog $(distdir)
-	$(SED) 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
-	$(SED) 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
-	$(SED) 's/\@PACKAGE_BUGREPORT\@/$(PACKAGE_BUGREPORT)/g' -i $(distdir)/src/args-std.def
 	cd $(distdir)/src/ && for i in *.def;do \
 		if test x"$$i" = x"args-std.def";then  continue; fi; \
 		autogen $$i; \
