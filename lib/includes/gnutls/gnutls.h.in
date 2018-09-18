@@ -263,9 +263,9 @@ typedef enum {
  * @GNUTLS_MAC_SHA512: HMAC-SHA-512 algorithm.
  * @GNUTLS_MAC_SHA224: HMAC-SHA-224 algorithm.
  * @GNUTLS_MAC_MD5_SHA1: Combined MD5+SHA1 MAC placeholder.
- * @GNUTLS_MAC_GOSTR_94: HMAC GOST R 34.10-94 algorithm.
- * @GNUTLS_MAC_STREEBOG_256: HMAC GOST R 34.10-2001 (Streebog) algorithm, 256 bit.
- * @GNUTLS_MAC_STREEBOG_512: HMAC GOST R 34.10-2001 (Streebog) algorithm, 512 bit.
+ * @GNUTLS_MAC_GOSTR_94: HMAC GOST R 34.11-94 algorithm.
+ * @GNUTLS_MAC_STREEBOG_256: HMAC GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
+ * @GNUTLS_MAC_STREEBOG_512: HMAC GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
  * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
  * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
@@ -316,9 +316,9 @@ typedef enum {
  * @GNUTLS_DIG_SHA3_384: SHA3-384 algorithm.
  * @GNUTLS_DIG_SHA3_512: SHA3-512 algorithm.
  * @GNUTLS_DIG_MD5_SHA1: Combined MD5+SHA1 algorithm.
- * @GNUTLS_DIG_GOSTR_94: GOST R 34.10-94 algorithm.
- * @GNUTLS_DIG_STREEBOG_256: GOST R 34.10-2001 (Streebog) algorithm, 256 bit.
- * @GNUTLS_DIG_STREEBOG_512: GOST R 34.10-2001 (Streebog) algorithm, 512 bit.
+ * @GNUTLS_DIG_GOSTR_94: GOST R 34.11-94 algorithm.
+ * @GNUTLS_DIG_STREEBOG_256: GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
+ * @GNUTLS_DIG_STREEBOG_512: GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
  *
  * Enumeration of different digest (hash) algorithms.
  */
@@ -857,8 +857,8 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_RSA_PSS_SHA512: Digital signature algorithm RSA with SHA-512, with PSS padding (RSA-PSS certificate).
  * @GNUTLS_SIGN_EDDSA_ED25519: Digital signature algorithm EdDSA with Ed25519 curve.
  * @GNUTLS_SIGN_GOST_94: Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-94
- * @GNUTLS_SIGN_GOST_256: Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-2012 256 bit
- * @GNUTLS_SIGN_GOST_512: Digital signature algorithm GOST R 34.10-2001 with GOST R 34.11-2012 512 bit
+ * @GNUTLS_SIGN_GOST_256: Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 256 bit
+ * @GNUTLS_SIGN_GOST_512: Digital signature algorithm GOST R 34.10-2012 with GOST R 34.11-2012 512 bit
  *
  * Enumeration of different digital signature algorithms.
  */
