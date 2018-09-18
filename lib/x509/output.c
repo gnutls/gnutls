@@ -1203,6 +1203,18 @@ print_extensions(gnutls_buffer_st * str, const char *prefix, int type,
 	}
 }
 
+static void reverse_datum(gnutls_datum_t *d)
+{
+	unsigned int i;
+	unsigned char c;
+
+	for (i = 0; i < d->size / 2; i++) {
+		c = d->data[i];
+		d->data[i] = d->data[d->size - i - 1];
+		d->data[d->size - i - 1] = c;
+	}
+}
+
 static void
 print_pubkey(gnutls_buffer_st * str, const char *key_name,
 	     gnutls_pubkey_t pubkey, gnutls_x509_spki_st *spki,
@@ -1428,6 +1440,8 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 				     gnutls_digest_get_name(digest));
 				addf(str, _("\t\tParamSet: %s\n"),
 				     gnutls_gost_paramset_get_name(param));
+				reverse_datum(&x);
+				reverse_datum(&y);
 				if (format ==
 				    GNUTLS_CRT_PRINT_FULL_NUMBERS) {
 					adds(str, _("\t\tX: "));
