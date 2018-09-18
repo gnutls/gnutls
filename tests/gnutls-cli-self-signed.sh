@@ -124,7 +124,7 @@ PID=$!
 wait_server ${PID}
 
 datefudge "2018-1-1" \
-${VALGRIND} "${CLI}" -p "${PORT}" localhost >${TMPFILE} 2>&1 && \
+${VALGRIND} "${CLI}" -p "${PORT}" localhost >${TMPFILE} 2>&1 </dev/null && \
 	fail ${PID} "1. handshake should have failed!"
 
 

@@ -881,7 +881,8 @@ static
 bool parse_for_inline_commands_in_buffer(char *buffer, size_t bytes,
 					 inline_cmds_st * inline_cmds)
 {
-	ssize_t local_bytes, match_bytes, prev_bytes_copied, ii, jj;
+	ssize_t local_bytes, match_bytes, prev_bytes_copied, ii;
+	unsigned jj;
 	char *local_buffer_ptr, *ptr;
 	char inline_command_string[MAX_INLINE_COMMAND_BYTES];
 	ssize_t l;
@@ -1765,6 +1766,7 @@ static void init_global_tls_stuff(void)
 	gnutls_certificate_set_pin_function(xcred, pin_callback, NULL);
 
 	gnutls_certificate_set_verify_flags(xcred, global_vflags);
+	gnutls_certificate_set_flags(xcred, GNUTLS_CERTIFICATE_VERIFY_CRLS);
 
 	if (x509_cafile != NULL) {
 		ret = gnutls_certificate_set_x509_trust_file(xcred,
@@ -1773,12 +1775,17 @@ static void init_global_tls_stuff(void)
 	} else {
 		if (insecure == 0) {
 			ret = gnutls_certificate_set_x509_system_trust(xcred);
+			if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE) {
+				fprintf(stderr, "Warning: this system doesn't support a default trust store\n");
+				ret = 0;
+			}
 		} else {
 			ret = 0;
 		}
 	}
 	if (ret < 0) {
-		fprintf(stderr, "Error setting the x509 trust file\n");
+		fprintf(stderr, "Error setting the x509 trust file: %s\n", gnutls_strerror(ret));
+		exit(1);
 	} else {
 		printf("Processed %d CA certificate(s).\n", ret);
 	}
@@ -1790,7 +1797,8 @@ static void init_global_tls_stuff(void)
 							 x509ctype);
 		if (ret < 0) {
 			fprintf(stderr,
-				"Error setting the x509 CRL file\n");
+				"Error setting the x509 CRL file: %s\n", gnutls_strerror(ret));
+			exit(1);
 		} else {
 			printf("Processed %d CRL(s).\n", ret);
 		}
