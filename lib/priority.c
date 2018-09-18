@@ -1056,7 +1056,7 @@ void _gnutls_unload_system_priorities(void)
  * priorities, appended with any additional present in
  * the priorities string.
  *
- * The returned string must be released using free().
+ * The returned string must be released using gnutls_free().
  */
 char *_gnutls_resolve_priorities(const char* priorities)
 {
@@ -1140,7 +1140,7 @@ size_t n, n2 = 0, line_size;
 		if (additional)
 			n2 = strlen(additional);
 
-		ret = malloc(n+n2+1+1);
+		ret = gnutls_malloc(n+n2+1+1);
 		if (ret == NULL) {
 			goto finish;
 		}
@@ -1859,7 +1859,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 		goto error_cleanup;
 	}
 
-	free(darg);
+	gnutls_free(darg);
 
 	return 0;
 
