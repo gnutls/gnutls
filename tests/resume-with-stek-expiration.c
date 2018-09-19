@@ -41,6 +41,7 @@ int main(int argc, char **argv)
 #include <assert.h>
 #include "utils.h"
 #include "cert-common.h"
+#include "virt-time.h"
 
 /*
  * This will set the following values:
@@ -189,8 +190,6 @@ static void client(int fd, int *resumption_should_succeed, unsigned num_sessions
 		if (resume_and_close(session, &session_data, resumption_should_succeed[i]) < 0)
 			return;
 
-		sec_sleep(TICKET_EXPIRATION);
-
 		if (clientx509cred)
 			gnutls_certificate_free_credentials(clientx509cred);
 		gnutls_deinit(session);
@@ -203,6 +202,8 @@ static void server(int fd, int *resumption_should_succeed, unsigned num_sessions
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_datum_t session_ticket_key = { NULL, 0 };
+
+	virt_time_init();
 
 	if (gnutls_session_ticket_key_generate(&session_ticket_key) < 0)
 		fail("server: Could not generate session ticket key\n");
@@ -262,6 +263,9 @@ static void server(int fd, int *resumption_should_succeed, unsigned num_sessions
 		gnutls_deinit(session);
 		gnutls_certificate_free_credentials(serverx509cred);
 		serverx509cred = NULL;
+
+		if (i != 0)
+			virt_sec_sleep(TICKET_EXPIRATION);
 	}
 
 	if (num_stek_rotations != 4)

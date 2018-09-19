@@ -41,6 +41,7 @@ int main(int argc, char **argv)
 #include <assert.h>
 #include "utils.h"
 #include "cert-common.h"
+#include "virt-time.h"
 
 #define TICKET_EXPIRATION 1 /* seconds */
 #define TICKET_ROTATION_PERIOD 3 /* seconds */
@@ -114,8 +115,6 @@ static void client(int fd, int *resume, unsigned rounds, const char *prio)
 		gnutls_transport_set_int(session, fd);
 		gnutls_handshake_set_timeout(session, 20 * 1000);
 
-		sec_sleep(TICKET_ROTATION_PERIOD-1);
-
 		/* Perform TLS handshake and obtain session ticket */
 		if (client_handshake(session, &session_data,
 				     resume[i]) < 0)
@@ -143,6 +142,8 @@ static void server(int fd, unsigned rounds, const char *prio)
 	gnutls_datum_t session_ticket_key = { NULL, 0 };
 	gnutls_certificate_credentials_t serverx509cred = NULL;
 
+	virt_time_init();
+
 	if (gnutls_session_ticket_key_generate(&session_ticket_key) < 0) {
 		fail("server: Could not generate session ticket key\n");
 	}
@@ -151,9 +152,11 @@ static void server(int fd, unsigned rounds, const char *prio)
 		assert(gnutls_init(&session, GNUTLS_SERVER)>=0);
 
 		assert(gnutls_certificate_allocate_credentials(&serverx509cred)>=0);
-		assert(gnutls_certificate_set_x509_key_mem(serverx509cred,
+		retval = gnutls_certificate_set_x509_key_mem(serverx509cred,
 						&server_cert, &server_key,
-						GNUTLS_X509_FMT_PEM)>=0);
+						GNUTLS_X509_FMT_PEM);
+		if (retval < 0)
+			fail("error setting key: %s\n", gnutls_strerror(retval));
 
 		assert(gnutls_priority_set_direct(session, prio, NULL)>=0);
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
@@ -169,6 +172,8 @@ static void server(int fd, unsigned rounds, const char *prio)
 
 		gnutls_transport_set_int(session, fd);
 		gnutls_handshake_set_timeout(session, 20 * 1000);
+
+		virt_sec_sleep(TICKET_ROTATION_PERIOD-1);
 
 		do {
 			retval = gnutls_handshake(session);
@@ -225,11 +230,9 @@ static void run(const char *name, const char *prio, int resume[], int rounds)
 		server(sockets[0], rounds, prio);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
-		gnutls_global_deinit();
 	} else {
 		/* We are the child */
 		client(sockets[1], resume, rounds, prio);
-		gnutls_global_deinit();
 		exit(0);
 	}
 }
