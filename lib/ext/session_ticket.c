@@ -349,7 +349,6 @@ static int
 unpack_session(gnutls_session_t session, const gnutls_datum_t *state)
 {
 	int ret;
-	time_t timestamp = gnutls_time(0);
 
 	if (unlikely(!state))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -357,13 +356,6 @@ unpack_session(gnutls_session_t session, const gnutls_datum_t *state)
 	ret = _gnutls_session_unpack(session, state);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
-
-	if (timestamp -
-	    session->internals.resumed_security_parameters.timestamp >
-	    session->internals.expire_time
-	    || session->internals.resumed_security_parameters.timestamp >
-	    timestamp)
-		return gnutls_assert_val(GNUTLS_E_EXPIRED);
 
 	ret = _gnutls_check_resumed_params(session);
 	if (ret < 0)

@@ -260,12 +260,28 @@ int _gnutls_server_register_current_session(gnutls_session_t session)
 
 int _gnutls_check_resumed_params(gnutls_session_t session)
 {
-	if (session->internals.resumed_security_parameters.ext_master_secret != 
-	    session->security_parameters.ext_master_secret)
-	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+	time_t timestamp = gnutls_time(0);
+	const version_entry_st *vers;
 
-	if (!_gnutls_server_name_matches_resumed(session))
-	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+	/* check whether the session is expired */
+	if (timestamp -
+	    session->internals.resumed_security_parameters.timestamp >
+	    session->internals.expire_time
+	    || session->internals.resumed_security_parameters.timestamp >
+	    timestamp)
+		return gnutls_assert_val(GNUTLS_E_EXPIRED);
+
+	/* check various parameters applicable to resumption in TLS1.2 or earlier
+	 */
+	vers = get_version(session);
+	if (!vers || !vers->tls13_sem) {
+		if (session->internals.resumed_security_parameters.ext_master_secret !=
+		    session->security_parameters.ext_master_secret)
+			return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+
+		if (!_gnutls_server_name_matches_resumed(session))
+			return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+	}
 
 	return 0;
 }
@@ -311,7 +327,6 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
-	/* expiration check is performed inside */
 	ret = gnutls_session_set_data(session, data.data, data.size);
 	gnutls_free(data.data);
 
@@ -320,6 +335,7 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return ret;
 	}
 
+	/* expiration check is performed inside */
 	ret = _gnutls_check_resumed_params(session);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
