@@ -3897,9 +3897,14 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type)
 }
 
 static
-int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now)
+int check_found_cert(struct find_cert_st *priv,
+		     ck_object_handle_t ctx,
+		     gnutls_datum_t *data,
+		     time_t now,
+		     ck_object_handle_t *cand_ctx)
 {
 	gnutls_x509_crt_t tcrt = NULL;
+	unsigned has_ski;
 	int ret;
 
 	ret = gnutls_x509_crt_init(&tcrt);
@@ -3911,14 +3916,6 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 	ret = gnutls_x509_crt_import(tcrt, data, GNUTLS_X509_FMT_DER);
 	if (ret < 0) {
 		gnutls_assert();
-		goto cleanup;
-	}
-
-	if (priv->key_id.size > 0 &&
-	    !_gnutls_check_valid_key_id(&priv->key_id, tcrt, now)) {
-		gnutls_assert();
-		_gnutls_debug_log("check_found_cert: cert has invalid key ID\n");
-		ret = -1;
 		goto cleanup;
 	}
 
@@ -3952,11 +3949,63 @@ int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now
 		}
 	}
 
+	if (priv->key_id.size > 0 &&
+	    !_gnutls_check_valid_key_id(&priv->key_id, tcrt, now, &has_ski)) {
+		gnutls_assert();
+		if (has_ski) {
+			_gnutls_debug_log("check_found_cert: cert has invalid key ID\n");
+			ret = -1;
+		} else {
+			/* That's a possible match; there can be CA certificates without
+			 * an SKI, which match a cert which has AKI. */
+			*cand_ctx = ctx;
+		}
+		goto cleanup;
+	}
+
 	ret = 0;
 cleanup:
 	if (tcrt != NULL)
 		gnutls_x509_crt_deinit(tcrt);
 	return ret;
+}
+
+static int get_data_and_attrs(struct pkcs11_session_info *sinfo,
+			      ck_object_handle_t object, gnutls_datum_t *data,
+			      char *label, size_t label_size,
+			      uint8_t *id, size_t id_size,
+			      gnutls_datum_t *o_label, gnutls_datum_t *o_id)
+{
+	ck_rv_t rv;
+	struct ck_attribute a[2];
+
+	/* data will contain the certificate */
+	rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, object, CKA_VALUE, data);
+	if (rv == CKR_OK) {
+		a[0].type = CKA_LABEL;
+		a[0].value = label;
+		a[0].value_len = label_size;
+
+		a[1].type = CKA_ID;
+		a[1].value = id;
+		a[1].value_len = id_size;
+
+		if (pkcs11_get_attribute_value(sinfo->module, sinfo->pks, object, a,
+				     2) == CKR_OK) {
+			o_label->data = a[0].value;
+			o_label->size = a[0].value_len;
+			o_id->data = a[1].value;
+			o_id->size = a[1].value_len;
+
+			return 0;
+		} else {
+			_gnutls_free_datum(data);
+			_gnutls_debug_log
+				    ("p11: Skipped cert, missing attrs.\n");
+		}
+	}
+
+	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
 static int
@@ -3967,14 +4016,15 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	ck_object_class_t class = -1;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
 	ck_rv_t rv;
-	ck_object_handle_t ctx;
+	ck_object_handle_t ctx, cand_ctx = CK_INVALID_HANDLE;
 	unsigned long count, a_vals;
 	int found = 0, ret;
 	struct find_cert_st *priv = input;
 	char label_tmp[PKCS11_LABEL_SIZE];
-	char id_tmp[PKCS11_ID_SIZE];
+	uint8_t id_tmp[PKCS11_ID_SIZE];
 	gnutls_datum_t data = {NULL, 0};
-	unsigned tries, i, finalized;
+	unsigned finalized;
+	int i, tries;
 	ck_bool_t trusted = 1;
 	time_t now;
 	gnutls_datum_t label = {NULL,0}, id = {NULL,0};
@@ -4087,38 +4137,38 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 				break;
 			}
 
-			/* data will contain the certificate */
-			rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, ctx, CKA_VALUE, &data);
-			if (rv == CKR_OK) {
-				ret = check_found_cert(priv, &data, now);
-				if (ret < 0) {
-					_gnutls_free_datum(&data);
-					continue;
-				}
+			ret = get_data_and_attrs(sinfo, ctx, &data,
+						 label_tmp, sizeof(label_tmp),
+						 id_tmp, sizeof(id_tmp),
+						 &label,
+						 &id);
+			if (ret < 0)
+				continue;
 
-				a[0].type = CKA_LABEL;
-				a[0].value = label_tmp;
-				a[0].value_len = sizeof(label_tmp);
-
-				a[1].type = CKA_ID;
-				a[1].value = id_tmp;
-				a[1].value_len = sizeof(id_tmp);
-
-				if (pkcs11_get_attribute_value(sinfo->module, sinfo->pks, ctx, a,
-				     2) == CKR_OK) {
-					label.data = a[0].value;
-					label.size = a[0].value_len;
-					id.data = a[1].value;
-					id.size = a[1].value_len;
-
-					found = 1;
-					break;
-				} else {
-					_gnutls_free_datum(&data);
-					_gnutls_debug_log
-					    ("p11: Skipped cert, missing attrs.\n");
-				}
+			ret = check_found_cert(priv, ctx, &data, now, &cand_ctx);
+			if (ret < 0) {
+				_gnutls_free_datum(&data);
+				continue;
 			}
+
+			found = 1;
+			break;
+		}
+
+		if (!found && cand_ctx != CK_INVALID_HANDLE) {
+			/* there was a possible match; let's retrieve that one instead of
+			 * failing */
+			ret = get_data_and_attrs(sinfo, cand_ctx, &data,
+						 label_tmp, sizeof(label_tmp),
+						 id_tmp, sizeof(id_tmp),
+						 &label,
+						 &id);
+			if (ret >= 0)
+				found = 1;
+
+			/* we do not need to use check_found_cert() because
+			 * in case we have a candidate, we already have checked it
+			 */
 		}
 
 		pkcs11_find_objects_final(sinfo);
@@ -4241,6 +4291,15 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	ret =
 	    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
 				    &cert->pin, pkcs11_obj_flags_to_int(flags));
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		/* we have failed retrieving the right certificate; if there
+		 * was a close match return that one. */
+		priv.flags |= GNUTLS_PKCS11_OBJ_FLAG_FIRST_CLOSE_MATCH;
+		ret =
+		    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
+					    &cert->pin, pkcs11_obj_flags_to_int(flags));
+	}
+
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
