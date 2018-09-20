@@ -1197,6 +1197,9 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
  * GNUTLS_GOST_PARAMSET_UNKNOWN default one will be selected depending on
  * @digest.
  *
+ * Note: parameters should be stored with least significant byte first. On
+ * version 3.6.3 big-endian format was used incorrectly.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -1226,7 +1229,7 @@ gnutls_x509_privkey_import_gost_raw(gnutls_x509_privkey_t key,
 
 	key->params.gost_params = paramset;
 
-	if (_gnutls_mpi_init_scan_nz
+	if (_gnutls_mpi_init_scan_le
 	    (&key->params.params[GOST_X], x->data, x->size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1234,7 +1237,7 @@ gnutls_x509_privkey_import_gost_raw(gnutls_x509_privkey_t key,
 	}
 	key->params.params_nr++;
 
-	if (_gnutls_mpi_init_scan_nz
+	if (_gnutls_mpi_init_scan_le
 	    (&key->params.params[GOST_Y], y->data, y->size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1242,7 +1245,7 @@ gnutls_x509_privkey_import_gost_raw(gnutls_x509_privkey_t key,
 	}
 	key->params.params_nr++;
 
-	if (_gnutls_mpi_init_scan_nz
+	if (_gnutls_mpi_init_scan_le
 	    (&key->params.params[GOST_K], k->data, k->size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1561,6 +1564,9 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
  * This function will export the GOST private key's parameters found
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Note: parameters will be stored with least significant byte first. On
+ * version 3.6.3 this was incorrectly returned in big-endian format.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

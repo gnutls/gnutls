@@ -985,6 +985,9 @@ int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
  * the given key.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
+ * Note: parameters will be stored with least significant byte first. On
+ * version 3.6.3 this was incorrectly returned in big-endian format.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.6.3
@@ -999,10 +1002,7 @@ gnutls_pubkey_export_gost_raw2(gnutls_pubkey_t key,
 {
 	int ret;
 
-	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
-
-	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
-		dprint = _gnutls_mpi_dprint;
+	mpi_dprint_func dprint = _gnutls_mpi_dprint_le;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1530,6 +1530,9 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
  * GNUTLS_DIG_STREEBOG_512.  If @paramset is set to GNUTLS_GOST_PARAMSET_UNKNOWN
  * default one will be selected depending on @digest.
  *
+ * Note: parameters should be stored with least significant byte first. On
+ * version 3.6.3 big-endian format was used incorrectly.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -1564,7 +1567,7 @@ gnutls_pubkey_import_gost_raw(gnutls_pubkey_t key,
 	key->params.curve = curve;
 	key->params.gost_params = paramset;
 
-	if (_gnutls_mpi_init_scan_nz
+	if (_gnutls_mpi_init_scan_le
 	    (&key->params.params[GOST_X], x->data, x->size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1572,7 +1575,7 @@ gnutls_pubkey_import_gost_raw(gnutls_pubkey_t key,
 	}
 	key->params.params_nr++;
 
-	if (_gnutls_mpi_init_scan_nz
+	if (_gnutls_mpi_init_scan_le
 	    (&key->params.params[GOST_Y], y->data, y->size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;

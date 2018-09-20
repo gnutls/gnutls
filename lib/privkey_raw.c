@@ -273,6 +273,9 @@ int ret;
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
+ * Note: parameters will be stored with least significant byte first. On
+ * version 3.6.3 this was incorrectly returned in big-endian format.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.6.3
@@ -480,6 +483,9 @@ error:
  * GNUTLS_DIG_STREEBOG_256 or GNUTLS_DIG_STREEBOG_512.  If @paramset is set to
  * GNUTLS_GOST_PARAMSET_UNKNOWN default one will be selected depending on
  * @digest.
+ *
+ * Note: parameters should be stored with least significant byte first. On
+ * version 3.6.3 big-endian format was used incorrectly.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

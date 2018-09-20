@@ -913,6 +913,18 @@ print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 	}
 }
 
+static void reverse_datum(gnutls_datum_t *d)
+{
+	unsigned int i;
+	unsigned char c;
+
+	for (i = 0; i < d->size / 2; i++) {
+		c = d->data[i];
+		d->data[i] = d->data[d->size - i - 1];
+		d->data[d->size - i - 1] = c;
+	}
+}
+
 void
 print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 	       gnutls_digest_algorithm_t digest, gnutls_gost_paramset_t paramset,
@@ -941,9 +953,12 @@ print_gost_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 			gnutls_gost_paramset_get_name(paramset));
 
 	if (k) {
+		reverse_datum(k);
 		print_head(outfile, "private key", k->size, cprint);
 		print_hex_datum(outfile, k, cprint);
 	}
+	reverse_datum(x);
+	reverse_datum(y);
 	print_head(outfile, "x", x->size, cprint);
 	print_hex_datum(outfile, x, cprint);
 	print_head(outfile, "y", y->size, cprint);
