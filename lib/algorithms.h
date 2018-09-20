@@ -426,9 +426,8 @@ gnutls_pk_algorithm_t _gnutls_oid_to_pk_and_curve(const char *oid, gnutls_ecc_cu
 
 inline static int _curve_is_eddsa(const gnutls_ecc_curve_entry_st * e)
 {
-	size_t ret = 0;
 	if (unlikely(e == NULL))
-		return ret;
+		return 0;
 	if (e->pk == GNUTLS_PK_EDDSA_ED25519)
 		return 1;
 	return 0;

@@ -827,7 +827,9 @@ gnutls_pubkey_export_dsa_raw2(gnutls_pubkey_t key,
  * This function will export the ECC public key's parameters found in
  * the given key.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
- * For EdDSA public keys, @y will be set to %NULL.
+ *
+ * In EdDSA curves the @y parameter will be %NULL and the other parameters
+ * will be in the native format for the curve.
  *
  * This function allows for %NULL parameters since 3.4.1.
  *
@@ -854,6 +856,9 @@ gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
  * This function will export the ECC public key's parameters found in
  * the given key.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * In EdDSA curves the @y parameter will be %NULL and the other parameters
+ * will be in the native format for the curve.
  *
  * This function allows for %NULL parameters since 3.4.1.
  *
@@ -1385,8 +1390,10 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
  * @y: holds the y
  *
  * This function will convert the given elliptic curve parameters to a
- * #gnutls_pubkey_t.  The output will be stored in @key. For EdDSA
- * keys the @y parameter should be %NULL.
+ * #gnutls_pubkey_t.  The output will be stored in @key.
+ *
+ * In EdDSA curves the @y parameter will be %NULL and the other parameters
+ * will be in the native format for the curve.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

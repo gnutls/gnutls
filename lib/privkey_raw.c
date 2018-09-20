@@ -199,6 +199,9 @@ int ret;
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
+ * In EdDSA curves the @y parameter will be %NULL and the other parameters
+ * will be in the native format for the curve.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.3.0
@@ -225,6 +228,9 @@ gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
  * This function will export the ECC private key's parameters found
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * In EdDSA curves the @y parameter will be %NULL and the other parameters
+ * will be in the native format for the curve.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -430,6 +436,9 @@ error:
  * native #gnutls_privkey_t format.  The output will be stored
  * in @key.
  *
+ * In EdDSA curves the @y parameter should be %NULL and the @x parameter must
+ * be the value in the native format for the curve.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -437,10 +446,10 @@ error:
  **/
 int
 gnutls_privkey_import_ecc_raw(gnutls_privkey_t key,
-				   gnutls_ecc_curve_t curve,
-				   const gnutls_datum_t * x,
-				   const gnutls_datum_t * y,
-				   const gnutls_datum_t * k)
+			      gnutls_ecc_curve_t curve,
+			      const gnutls_datum_t * x,
+			      const gnutls_datum_t * y,
+			      const gnutls_datum_t * k)
 {
 int ret;
 gnutls_x509_privkey_t xkey;

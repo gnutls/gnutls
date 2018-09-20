@@ -1088,7 +1088,8 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
  *
  * This function will convert the given elliptic curve parameters to the
  * native #gnutls_x509_privkey_t format.  The output will be stored
- * in @key. For EdDSA keys, the @x and @k values will be read.
+ * in @key. For EdDSA keys, the @x and @k values must be in the
+ * native to curve format.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1530,7 +1531,9 @@ gnutls_sec_param_t gnutls_x509_privkey_sec_param(gnutls_x509_privkey_t key)
  * This function will export the ECC private key's parameters found
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
- * For EdDSA keys, the @y value should be %NULL.
+ *
+ * In EdDSA curves the @y parameter will be %NULL and the other parameters
+ * will be in the native format for the curve.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1552,7 +1555,7 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_privkey_export_ecc_raw:
+ * gnutls_x509_privkey_export_gost_raw:
  * @key: a key
  * @curve: will hold the curve
  * @digest: will hold the digest

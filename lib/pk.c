@@ -1014,6 +1014,7 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 {
 	int ret;
 	mpi_dprint_func dprint = _gnutls_mpi_dprint_lz;
+	const gnutls_ecc_curve_entry_st *e;
 
 	if (flags & GNUTLS_EXPORT_FLAG_NO_LZ)
 		dprint = _gnutls_mpi_dprint;
@@ -1026,7 +1027,9 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 	if (curve)
 		*curve = params->curve;
 
-	if (curve_is_eddsa(params->curve)) {
+	e = _gnutls_ecc_curve_get_params(params->curve);
+
+	if (_curve_is_eddsa(e)) {
 		if (x) {
 			ret = _gnutls_set_datum(x, params->raw_pub.data, params->raw_pub.size);
 			if (ret < 0) {
@@ -1050,6 +1053,8 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 		return 0;
 	}
 
+	if (unlikely(e == NULL || e->pk != GNUTLS_PK_ECDSA))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* X */
 	if (x) {
