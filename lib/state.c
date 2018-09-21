@@ -491,6 +491,9 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 	(*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;
 
+	/* Ticket key rotation - set the default X to 3 times the ticket expire time */
+	(*session)->key.totp.last_result = 0;
+
 	gnutls_handshake_set_max_packet_length((*session),
 					       MAX_HANDSHAKE_PACKET_SIZE);
 

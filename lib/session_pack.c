@@ -960,8 +960,6 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	session->internals.resumed_security_parameters.timestamp =
 	    timestamp;
 
-	timestamp = gnutls_time(0);
-
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       entity);
@@ -1069,15 +1067,6 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		    max_record_send_size == 0) {
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		}
-	}
-
-	if (timestamp -
-	    session->internals.resumed_security_parameters.timestamp >
-	    session->internals.expire_time
-	    || session->internals.resumed_security_parameters.timestamp >
-	    timestamp) {
-		gnutls_assert();
-		return GNUTLS_E_EXPIRED;
 	}
 
 	ret = 0;

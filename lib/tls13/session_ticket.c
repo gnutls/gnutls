@@ -31,6 +31,7 @@
 #include "auth/cert.h"
 #include "tls13/session_ticket.h"
 #include "session_pack.h"
+#include "db.h"
 
 static int
 pack_ticket(gnutls_session_t session, tls13_ticket_t *ticket, gnutls_datum_t *packed)
@@ -422,9 +423,12 @@ int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 	/* Return ticket parameters */
 	ret = unpack_ticket(session, &decrypted, ticket_data);
 	_gnutls_free_datum(&decrypted);
-	if (ret < 0) {
+	if (ret < 0)
 		return ret;
-	}
+
+	ret = _gnutls_check_resumed_params(session);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }

@@ -56,6 +56,7 @@ int main(int argc, char **argv)
 #include <assert.h>
 #include "utils.h"
 #include "cert-common.h"
+#include "virt-time.h"
 
 static void wrap_db_init(void);
 static void wrap_db_deinit(void);
@@ -528,8 +529,6 @@ static void client(int sds[], struct params_res *params)
 			else if (params->try_sni)
 				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name2, strlen(dns_name2));
 
-			if (params->expire_ticket)
-				sleep(2);
 		} else {
 			if (params->try_sni)
 				gnutls_server_name_set(session, GNUTLS_NAME_DNS, dns_name2, strlen(dns_name2));
@@ -722,6 +721,8 @@ static void server(int sds[], struct params_res *params)
 	gnutls_group_t pgroup;
 	unsigned iflags = GNUTLS_SERVER;
 
+	virt_time_init();
+
 	if (params->early_start || params->no_early_start)
 		iflags |= GNUTLS_ENABLE_EARLY_START;
 
@@ -794,9 +795,10 @@ static void server(int sds[], struct params_res *params)
 
 		append_alpn(session, params, t);
 
-		if (params->expire_ticket)
-			gnutls_db_set_cache_expiration(session, 1);
-
+		if (params->expire_ticket) {
+			gnutls_db_set_cache_expiration(session, 45);
+			virt_sec_sleep(60);
+		}
 #ifdef USE_PSK
 		gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
 #elif defined(USE_ANON)
