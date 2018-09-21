@@ -40,6 +40,18 @@
 #else
 #include <nettle/gost28147.h>
 #endif
+#ifndef HAVE_NETTLE_MAGMA_SET_KEY
+#include "gost/magma.h"
+#else
+#include <nettle/magma.h>
+#endif
+#ifndef HAVE_NETTLE_KUZNYECHIK_SET_KEY
+#include "gost/kuznyechik.h"
+#else
+#include <nettle/kuznyechik.h>
+#endif
+#include "gost/acpkm.h"
+#include <nettle/ctr.h>
 #endif
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
@@ -160,6 +172,18 @@ _cbc_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 }
 
 #if ENABLE_GOST
+struct magma_acpkm_ctx {
+	uint8_t iv[MAGMA_BLOCK_SIZE];
+	struct acpkm_ctx ctx;
+	struct magma_ctx cipher;
+};
+
+struct kuznyechik_acpkm_ctx {
+	uint8_t iv[KUZNYECHIK_BLOCK_SIZE];
+	struct acpkm_ctx ctx;
+	struct kuznyechik_ctx cipher;
+};
+
 static void
 _cfb_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 		const uint8_t * src)
@@ -176,6 +200,16 @@ _cfb_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 	cfb_decrypt(ctx->ctx_ptr, ctx->cipher->encrypt_block,
 		    ctx->iv_size, ctx->iv,
 		    length, dst, src);
+}
+
+static void
+_ctr_acpkm_crypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
+	   const uint8_t * src)
+{
+	/* Use context-specific IV which comes as a first field */
+	ctr_crypt(ctx->ctx_ptr, ctx->cipher->encrypt_block,
+		  ctx->cipher->block_size, ctx->ctx_ptr,
+		  length, dst, src);
 }
 
 static void
@@ -230,6 +264,58 @@ _gost28147_cnt_crypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst
 		     const uint8_t * src)
 {
 	gost28147_cnt_crypt((void *)ctx->ctx_ptr, length, dst, src);
+}
+
+static void
+_magma_acpkm_crypt(struct magma_acpkm_ctx *ctx,
+		  size_t length, uint8_t *dst,
+		  const uint8_t *src)
+{
+  acpkm_crypt(&ctx->ctx, &ctx->cipher,
+	      (nettle_cipher_func *)magma_encrypt,
+	      (nettle_set_key_func *)magma_set_key,
+	      length, dst, src);
+}
+
+static void
+_kuznyechik_acpkm_crypt(struct kuznyechik_acpkm_ctx *ctx,
+		       size_t length, uint8_t *dst,
+		       const uint8_t *src)
+{
+  acpkm_crypt(&ctx->ctx, &ctx->cipher,
+	      (nettle_cipher_func *)kuznyechik_encrypt,
+	      (nettle_set_key_func *)kuznyechik_set_key,
+	      length, dst, src);
+}
+
+static void
+_magma_ctr_acpkm_set_key(struct magma_acpkm_ctx *ctx, const uint8_t *key)
+{
+	magma_set_key(&ctx->cipher, key);
+	ctx->ctx.pos = 0;
+	ctx->ctx.N = 1024;
+}
+
+static void
+_magma_ctr_acpkm_set_iv(struct magma_acpkm_ctx *ctx, size_t length, const uint8_t *iv)
+{
+	memcpy(ctx->iv, iv, length);
+	memset(ctx->iv + length, 0, MAGMA_BLOCK_SIZE - length);
+}
+
+static void
+_kuznyechik_ctr_acpkm_set_key(struct kuznyechik_acpkm_ctx *ctx, const uint8_t *key)
+{
+	kuznyechik_set_key(&ctx->cipher, key);
+	ctx->ctx.pos = 0;
+	ctx->ctx.N = 4096;
+}
+
+static void
+_kuznyechik_ctr_acpkm_set_iv(struct kuznyechik_acpkm_ctx *ctx, size_t length, const uint8_t *iv)
+{
+	memcpy(ctx->iv, iv, length);
+	memset(ctx->iv + length, 0, KUZNYECHIK_BLOCK_SIZE - length);
 }
 #endif
 
@@ -880,6 +966,34 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .set_encrypt_key = _gost28147_cnt_set_key_tc26z,
 	   .set_decrypt_key = _gost28147_cnt_set_key_tc26z,
 	   .set_iv = (setiv_func)_gost28147_cnt_set_nonce,
+	},
+	{
+	   .algo = GNUTLS_CIPHER_MAGMA_CTR_ACPKM,
+	   .block_size = MAGMA_BLOCK_SIZE,
+	   .key_size = MAGMA_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)_magma_acpkm_crypt,
+	   .decrypt_block = (nettle_cipher_func*)_magma_acpkm_crypt,
+
+	   .ctx_size = sizeof(struct magma_acpkm_ctx),
+	   .encrypt = _ctr_acpkm_crypt,
+	   .decrypt = _ctr_acpkm_crypt,
+	   .set_encrypt_key = (nettle_set_key_func*)_magma_ctr_acpkm_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)_magma_ctr_acpkm_set_key,
+	   .set_iv = (setiv_func)_magma_ctr_acpkm_set_iv,
+	},
+	{
+	   .algo = GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM,
+	   .block_size = KUZNYECHIK_BLOCK_SIZE,
+	   .key_size = KUZNYECHIK_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)_kuznyechik_acpkm_crypt,
+	   .decrypt_block = (nettle_cipher_func*)_kuznyechik_acpkm_crypt,
+
+	   .ctx_size = sizeof(struct kuznyechik_acpkm_ctx),
+	   .encrypt = _ctr_acpkm_crypt,
+	   .decrypt = _ctr_acpkm_crypt,
+	   .set_encrypt_key = (nettle_set_key_func*)_kuznyechik_ctr_acpkm_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)_kuznyechik_ctr_acpkm_set_key,
+	   .set_iv = (setiv_func)_kuznyechik_ctr_acpkm_set_iv,
 	},
 #endif
 	{  .algo = GNUTLS_CIPHER_AES_128_CFB8,
