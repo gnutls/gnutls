@@ -1585,6 +1585,8 @@
       <enumerator name='GNUTLS_MAC_GOST28147_TC26Z_IMIT' value='208'/>
       <enumerator name='GNUTLS_MAC_SHAKE_128' value='209'/>
       <enumerator name='GNUTLS_MAC_SHAKE_256' value='210'/>
+      <enumerator name='GNUTLS_MAC_MAGMA_OMAC' value='211'/>
+      <enumerator name='GNUTLS_MAC_KUZNYECHIK_OMAC' value='212'/>
     </enum-decl>
     <typedef-decl name='gnutls_mac_algorithm_t' type-id='type-id-44' id='type-id-31'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-45'>

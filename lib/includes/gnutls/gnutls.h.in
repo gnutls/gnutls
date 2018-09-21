@@ -314,6 +314,8 @@ typedef enum {
  * @GNUTLS_MAC_GOST28147_TC26Z_IMIT: The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
  * @GNUTLS_MAC_SHAKE_128: Reserved; unimplemented.
  * @GNUTLS_MAC_SHAKE_256: Reserved; unimplemented.
+ * @GNUTLS_MAC_MAGMA_OMAC: GOST R 34.12-2015 (Magma) in OMAC (CMAC) mode.
+ * @GNUTLS_MAC_KUZNYECHIK_OMAC: GOST R 34.12-2015 (Kuznyechik) in OMAC (CMAC) mode.
  *
  * Enumeration of different Message Authentication Code (MAC)
  * algorithms.
@@ -349,7 +351,9 @@ typedef enum {
 	GNUTLS_MAC_AES_GMAC_256 = 207,
 	GNUTLS_MAC_GOST28147_TC26Z_IMIT = 208,
 	GNUTLS_MAC_SHAKE_128 = 209,
-	GNUTLS_MAC_SHAKE_256 = 210
+	GNUTLS_MAC_SHAKE_256 = 210,
+	GNUTLS_MAC_MAGMA_OMAC = 211,
+	GNUTLS_MAC_KUZNYECHIK_OMAC = 212
 } gnutls_mac_algorithm_t;
 
 /**
