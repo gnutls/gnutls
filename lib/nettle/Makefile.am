@@ -91,7 +91,8 @@ libcrypto_la_SOURCES += gost_keywrap.c
 
 libcrypto_la_SOURCES += \
 	gost/magma.c gost/magma.h \
-	gost/kuznyechik.c gost/kuznyechik.h gost/kuztable.h
+	gost/kuznyechik.c gost/kuznyechik.h gost/kuztable.h \
+	gost/cmac.h gost/cmac-magma.c gost/cmac-kuznyechik.c
 endif
 
 if NEED_INT_ECC
@@ -181,6 +182,11 @@ if NEED_CMAC
 libcrypto_la_SOURCES += \
 	backport/cmac.c backport/cmac.h \
 	backport/cmac-aes128.c backport/cmac-aes256.c
+endif
+
+if NEED_CMAC64
+libcrypto_la_SOURCES += \
+	backport/cmac64.c backport/cmac.h backport/cmac64.h
 endif
 
 if NEED_XTS

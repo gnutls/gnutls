@@ -34,6 +34,14 @@
 #include <nettle/umac.h>
 #include <nettle/hkdf.h>
 #include <nettle/pbkdf2.h>
+#ifdef HAVE_NETTLE_CMAC128_UPDATE
+#include <nettle/cmac.h>
+#ifndef HAVE_NETTLE_CMAC64_UPDATE
+#include "cmac64.h"
+#endif /* HAVE_NETTLE_CMAC64_UPDATE */
+#else
+#include "cmac.h"
+#endif /* HAVE_NETTLE_CMAC128_UPDATE */
 #if ENABLE_GOST
 #include "gost/hmac-gost.h"
 #ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
@@ -45,12 +53,8 @@
 #ifndef HAVE_NETTLE_GOST28147_SET_KEY
 #include "gost/gost28147.h"
 #endif
+#include "gost/cmac.h"
 #endif
-#ifdef HAVE_NETTLE_CMAC128_UPDATE
-#include <nettle/cmac.h>
-#else
-#include "cmac.h"
-#endif /* HAVE_NETTLE_CMAC128_UPDATE */
 #include <nettle/gcm.h>
 
 typedef void (*update_func) (void *, size_t, const uint8_t *);
