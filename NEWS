@@ -29,21 +29,29 @@ See the end for copying conditions.
    This addresses the problem where the CA certificate doesn't have a subject key
    identifier whereas the end certificates have an authority key identifier (#569)
 
-** Added support for seperately negotiating client and server certificate types as
-   defined in RFC7250. This mechanism must be explicitly enabled via the
+** libgnutls: gnutls_privkey_export_gost_raw2(), gnutls_privkey_import_gost_raw(),
+   gnutls_pubkey_export_gost_raw2(), gnutls_pubkey_import_gost_raw() import
+   and export GOST parameters in the "native" little endian format used for these
+   curves. This is an intentional incompatible change with 3.6.3.
+
+** libgnutls: Added support for seperately negotiating client and server certificate types
+   as defined in RFC7250. This mechanism must be explicitly enabled via the
    GNUTLS_ENABLE_CERT_TYPE_NEG flag in gnutls_init().
 
 ** gnutls-cli: enable CRL validation on startup (#564)
 
 ** API and ABI modifications:
 GNUTLS_ENABLE_EARLY_START: Added
-gnutls_record_set_max_early_data_size: Added
-gnutls_certificate_type_get2: Added
-gnutls_priority_certificate_type_list2: Added
 GNUTLS_ENABLE_CERT_TYPE_NEG: Added
 GNUTLS_TL_FAIL_ON_INVALID_CRL: Added
 GNUTLS_CERTIFICATE_VERIFY_CRLS: Added
 gnutls_ctype_target_t: New enumeration
+gnutls_record_set_max_early_data_size: Added
+gnutls_certificate_type_get2: Added
+gnutls_priority_certificate_type_list2: Added
+gnutls_ffdhe_6144_group_prime: Added
+gnutls_ffdhe_6144_group_generator: Added
+gnutls_ffdhe_6144_key_bits: Added
 
 
 * Version 3.6.3 (released 2018-07-16)
