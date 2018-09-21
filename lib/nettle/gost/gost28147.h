@@ -57,6 +57,7 @@ extern "C" {
 
 /* Private */
 #define gost28147_encrypt_simple _gnutls_gost28147_encrypt_simple
+#define gost28147_decrypt_simple _gnutls_gost28147_decrypt_simple
 
 /* Public functions */
 #define gost28147_set_key _gnutls_gost28147_set_key
@@ -108,6 +109,8 @@ extern const struct gost28147_param gost28147_param_TC26_Z;
 /* Internal interface for use by GOST R 34.11-94 */
 void gost28147_encrypt_simple (const uint32_t *key, const uint32_t *sbox,
                                const uint32_t *in, uint32_t *out);
+void gost28147_decrypt_simple (const uint32_t *key, const uint32_t *sbox,
+			       const uint32_t *in, uint32_t *out);
 
 void
 gost28147_set_key(struct gost28147_ctx *ctx, const uint8_t *key);

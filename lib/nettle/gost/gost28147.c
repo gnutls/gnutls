@@ -2219,8 +2219,8 @@ void gost28147_encrypt_simple (const uint32_t *key, const uint32_t *sbox,
   *out = l, *(out + 1) = r;
 }
 
-static void gost28147_decrypt_simple (const uint32_t *key, const uint32_t *sbox,
-                                      const uint32_t *in, uint32_t *out)
+void gost28147_decrypt_simple (const uint32_t *key, const uint32_t *sbox,
+                               const uint32_t *in, uint32_t *out)
 {
   uint32_t l, r, tmp;
 
