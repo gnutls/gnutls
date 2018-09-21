@@ -1928,13 +1928,16 @@ gnutls_certificate_get_verify_flags(gnutls_certificate_credentials_t res);
  * @GNUTLS_CERTIFICATE_API_V2: If set the gnutls_certificate_set_*key* functions will return an index of the added key pair instead of zero.
  * @GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK: If set, the gnutls_certificate_set_ocsp_status_request_file
  *    function, will not check whether the response set matches any of the certificates.
+ * @GNUTLS_CERTIFICATE_VERIFY_CRLS: This will enable CRL verification when added in the certificate structure.
+ *    When used, it requires CAs to be added before CRLs.
  *
  * Enumeration of different certificate credentials flags.
  */
 typedef enum gnutls_certificate_flags {
 	GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH = 1,
 	GNUTLS_CERTIFICATE_API_V2 = (1<<1),
-	GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK = (1<<2)
+	GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK = (1<<2),
+	GNUTLS_CERTIFICATE_VERIFY_CRLS = (1<<3)
 } gnutls_certificate_flags;
 
 void gnutls_certificate_set_flags(gnutls_certificate_credentials_t,
@@ -3214,6 +3217,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_NO_COMMON_KEY_SHARE -423
 #define GNUTLS_E_REAUTH_REQUEST -424
 #define GNUTLS_E_TOO_MANY_MATCHES -425
+#define GNUTLS_E_CRL_VERIFICATION_ERROR -426
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

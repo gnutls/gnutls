@@ -165,6 +165,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_CERTIFICATE_TIME_ERROR),
 	ERROR_ENTRY(N_("Error in the certificate verification."),
 		    GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR),
+	ERROR_ENTRY(N_("Error in the CRL verification."),
+		    GNUTLS_E_CRL_VERIFICATION_ERROR),
 	ERROR_ENTRY(N_("Error in the private key verification; seed doesn't match."),
 		    GNUTLS_E_PRIVKEY_VERIFICATION_ERROR),
 	ERROR_ENTRY(N_("Could not authenticate peer."),

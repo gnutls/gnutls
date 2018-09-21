@@ -1562,6 +1562,8 @@ int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t
  * @GNUTLS_TL_GET_COPY: The semantics of this flag are documented to the functions which
  *   are applicable. In general, on returned value, the function will provide a copy
  *   if this flag is provided, rather than a pointer to internal data.
+ * @GNUTLS_TL_FAIL_ON_INVALID_CRL: If an CRL is added which cannot be validated return
+ *   an error instead of ignoring (must be used with %GNUTLS_TL_VERIFY_CRL).
  *
  * Enumeration of different certificate trust list flags.
  */
@@ -1574,8 +1576,10 @@ typedef enum gnutls_trust_list_flags_t {
 #define GNUTLS_TL_NO_DUPLICATES (1<<2)
 	GNUTLS_TL_NO_DUPLICATE_KEY = (1<<3),
 #define GNUTLS_TL_NO_DUPLICATE_KEY (1<<3)
-	GNUTLS_TL_GET_COPY = (1<<4)
+	GNUTLS_TL_GET_COPY = (1<<4),
 #define GNUTLS_TL_GET_COPY (1<<4)
+	GNUTLS_TL_FAIL_ON_INVALID_CRL = (1<<5)
+#define GNUTLS_TL_FAIL_ON_INVALID_CRL (1<<5)
 } gnutls_trust_list_flags_t;
 
 int

@@ -1493,10 +1493,14 @@ gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t res,
 				    const gnutls_datum_t * CRL,
 				    gnutls_x509_crt_fmt_t type)
 {
-int ret;
+	unsigned flags = GNUTLS_TL_USE_IN_TLS;
+	int ret;
+
+	if (res->flags & GNUTLS_CERTIFICATE_VERIFY_CRLS)
+		flags |= GNUTLS_TL_VERIFY_CRL|GNUTLS_TL_FAIL_ON_INVALID_CRL;
 
 	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, NULL, CRL,
-					type, GNUTLS_TL_USE_IN_TLS, 0);
+					type, flags, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
 
@@ -1526,6 +1530,10 @@ gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 {
 	int ret, i, j;
 	gnutls_x509_crl_t *new_crl = gnutls_malloc(crl_list_size * sizeof(gnutls_x509_crl_t));
+	unsigned flags = GNUTLS_TL_USE_IN_TLS;
+
+	if (res->flags & GNUTLS_CERTIFICATE_VERIFY_CRLS)
+		flags |= GNUTLS_TL_VERIFY_CRL|GNUTLS_TL_FAIL_ON_INVALID_CRL;
 
 	if (!new_crl)
 		return GNUTLS_E_MEMORY_ERROR;
@@ -1546,7 +1554,7 @@ gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 
 	ret =
 	    gnutls_x509_trust_list_add_crls(res->tlist, new_crl,
-				    crl_list_size, GNUTLS_TL_USE_IN_TLS, 0);
+				    crl_list_size, flags, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1582,10 +1590,14 @@ gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t res,
 				     const char *crlfile,
 				     gnutls_x509_crt_fmt_t type)
 {
-int ret;
+	int ret;
+	unsigned flags = GNUTLS_TL_USE_IN_TLS;
+
+	if (res->flags & GNUTLS_CERTIFICATE_VERIFY_CRLS)
+		flags |= GNUTLS_TL_VERIFY_CRL|GNUTLS_TL_FAIL_ON_INVALID_CRL;
 
 	ret = gnutls_x509_trust_list_add_trust_file(res->tlist, NULL, crlfile,
-						type, GNUTLS_TL_USE_IN_TLS, 0);
+						type, flags, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
 
