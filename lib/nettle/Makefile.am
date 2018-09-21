@@ -92,6 +92,7 @@ libcrypto_la_SOURCES += gost_keywrap.c
 libcrypto_la_SOURCES += \
 	gost/magma.c gost/magma.h \
 	gost/kuznyechik.c gost/kuznyechik.h gost/kuztable.h \
+	gost/acpkm.c gost/acpkm.h \
 	gost/cmac.h gost/cmac-magma.c gost/cmac-kuznyechik.c
 endif
 
