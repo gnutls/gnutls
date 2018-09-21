@@ -88,6 +88,9 @@ libcrypto_la_SOURCES += \
 	gost/gostdsa-mask.c gost/gostdsa2.h
 
 libcrypto_la_SOURCES += gost_keywrap.c
+
+libcrypto_la_SOURCES += \
+	gost/magma.c gost/magma.h
 endif
 
 if NEED_INT_ECC
