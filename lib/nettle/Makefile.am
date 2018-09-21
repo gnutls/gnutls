@@ -90,7 +90,8 @@ libcrypto_la_SOURCES += \
 libcrypto_la_SOURCES += gost_keywrap.c
 
 libcrypto_la_SOURCES += \
-	gost/magma.c gost/magma.h
+	gost/magma.c gost/magma.h \
+	gost/kuznyechik.c gost/kuznyechik.h gost/kuztable.h
 endif
 
 if NEED_INT_ECC

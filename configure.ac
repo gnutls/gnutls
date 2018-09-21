@@ -713,6 +713,12 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_magma_set_key)
 LIBS=$save_LIBS
 
+# Check for Kuznyechik
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_kuznyechik_set_key)
+LIBS=$save_LIBS
+
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_LIBS=$LIBS
 LIBS="$LIBS $GMP_LIBS"
