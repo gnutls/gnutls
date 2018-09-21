@@ -179,9 +179,7 @@ static const int _supported_groups_secure192[] = {
 static const int* supported_groups_secure192 = _supported_groups_secure192;
 
 static const int protocol_priority[] = {
-#ifdef ENABLE_TLS13
 	GNUTLS_TLS1_3,
-#endif
 	GNUTLS_TLS1_2,
 	GNUTLS_TLS1_1,
 	GNUTLS_TLS1_0,

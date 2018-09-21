@@ -260,20 +260,6 @@ void doit(void)
 		}
 	}
 
-#ifndef ENABLE_TLS13
-	ret = gnutls_session_ext_master_secret_status(client);
-	if (ret != 1) {
-		fprintf(stderr, "Extended master secret wasn't negotiated by default (client ret: %d)\n", ret);
-		exit(1);
-	}
-
-	ret = gnutls_session_ext_master_secret_status(server);
-	if (ret != 1) {
-		fprintf(stderr, "Extended master secret wasn't negotiated by default (server ret: %d)\n", ret);
-		exit(1);
-	}
-#endif
-
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);
 

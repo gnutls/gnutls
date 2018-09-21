@@ -316,11 +316,7 @@ void doit(void)
 	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_NO_TICKETS);
 	/* ...or there is no overlap between PSK key exchange modes */
 	start2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:-DHE-PSK", "NORMAL:-VERS-ALL:+VERS-TLS1.3", 0, 0);
-#ifdef ENABLE_TLS13
 	start("NORMAL", GNUTLS_NO_TICKETS);
-#else
-	start("NORMAL", 0);
-#endif
 }
 
 #endif				/* _WIN32 */

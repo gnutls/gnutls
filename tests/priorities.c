@@ -114,27 +114,19 @@ try_prio_err(const char *prio, int err)
 void doit(void)
 {
 	const int null = 3;
-#ifdef ENABLE_TLS13
 	int sec128_cs = 29;
 	int sec256_cs = 12;
 	int normal_cs = 29;
 	int pfs_cs = 23;
 	int null_normal_cs = 28; /* disables TLS1.3 CS */
-#else
-	int sec128_cs = 25;
-	int sec256_cs = 10;
-	int pfs_cs = 19;
-	int normal_cs = 25;
-	int null_normal_cs = normal_cs + null;
-#endif
 	int normal_ciphers = 7;
 
 	if (gnutls_fips140_mode_enabled()) {
-		normal_cs = 22;
+		normal_cs = 25;
 		normal_ciphers = 6;
-		pfs_cs = 22;
-		sec256_cs = 7;
-		sec128_cs = 22;
+		pfs_cs = 25;
+		sec256_cs = 8;
+		sec128_cs = 25;
 	}
 
 	try_prio("NORMAL", normal_cs, normal_ciphers, __LINE__);
