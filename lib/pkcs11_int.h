@@ -187,6 +187,7 @@ ck_object_class_t pkcs11_strtype_to_class(const char *type);
 /* Additional internal flags for gnutls_pkcs11_obj_flags */
 /* @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT: When importing an object, provide a hint on the type, to allow incomplete URLs
  * @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY: Hint for private key */
+#define GNUTLS_PKCS11_OBJ_FLAG_FIRST_CLOSE_MATCH ((unsigned int)1<<28)
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT (1<<29)
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY (1<<30)
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PUBKEY ((unsigned int)1<<31)

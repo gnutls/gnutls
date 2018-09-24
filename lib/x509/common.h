@@ -236,7 +236,8 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 
 unsigned
 _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
-			   gnutls_x509_crt_t cert, time_t now);
+			   gnutls_x509_crt_t cert, time_t now,
+			   unsigned *has_ski);
 
 unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, unsigned no_any);
 

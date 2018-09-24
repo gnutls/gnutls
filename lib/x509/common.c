@@ -1674,11 +1674,15 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 
 unsigned
 _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
-			   gnutls_x509_crt_t cert, time_t now)
+			   gnutls_x509_crt_t cert, time_t now,
+			   unsigned *has_ski)
 {
 	uint8_t id[MAX_KEY_ID_SIZE];
 	size_t id_size;
 	unsigned result = 0;
+
+	if (has_ski)
+		*has_ski = 0;
 
 	if (now > gnutls_x509_crt_get_expiration_time(cert) ||
 	    now < gnutls_x509_crt_get_activation_time(cert)) {
@@ -1692,6 +1696,9 @@ _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
 		gnutls_assert();
 		goto out;
 	}
+
+	if (has_ski)
+		*has_ski = 1;
 
 	if (id_size == key_id->size && !memcmp(id, key_id->data, id_size))
 		result = 1;

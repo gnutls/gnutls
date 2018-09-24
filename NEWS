@@ -25,6 +25,10 @@ See the end for copying conditions.
 ** libgnutls: The 'record size limit' extension is added and preferred to the
    'max record size' extension when possible.
 
+** libgnutls: Provide a more flexible PKCS#11 search of trust store certificates.
+   This addresses the problem where the CA certificate doesn't have a subject key
+   identifier whereas the end certificates have an authority key identifier (#569)
+
 ** Added support for seperately negotiating client and server certificate types as
    defined in RFC7250. This mechanism must be explicitly enabled via the
    GNUTLS_ENABLE_CERT_TYPE_NEG flag in gnutls_init().
