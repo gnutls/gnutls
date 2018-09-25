@@ -225,7 +225,7 @@ gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -236,7 +236,7 @@ socket-api.texi: $(top_srcdir)/lib/includes/gnutls/socket.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -247,7 +247,7 @@ dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -259,7 +259,7 @@ x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includ
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	rm -f $@-tmp2
@@ -271,7 +271,7 @@ pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -282,7 +282,7 @@ pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -293,7 +293,7 @@ pkcs7-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs7.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -304,7 +304,7 @@ tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -316,7 +316,7 @@ abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/li
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	rm -f $@-headers-tmp
@@ -328,7 +328,7 @@ compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -339,7 +339,7 @@ dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -350,7 +350,7 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -361,7 +361,7 @@ ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) >> $@-tmp && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
