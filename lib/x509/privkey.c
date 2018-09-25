@@ -1186,7 +1186,8 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
  * gnutls_x509_privkey_import_gost_raw:
  * @key: The data to store the parsed key
  * @curve: holds the curve
- * @paramset: holds the parameters id
+ * @digest: will hold the digest
+ * @paramset: will hold the GOST parameter set ID
  * @x: holds the x
  * @y: holds the y
  * @k: holds the k
@@ -1559,7 +1560,7 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
  * @key: a key
  * @curve: will hold the curve
  * @digest: will hold the digest
- * @paramset: will hold the parameters id
+ * @paramset: will hold the GOST parameter set ID
  * @x: will hold the x coordinate
  * @y: will hold the y coordinate
  * @k: will hold the private key

@@ -653,6 +653,7 @@ int gnutls_pubkey_import_openpgp_raw(gnutls_pubkey_t pkey,
  * @output_data: will contain the key ID
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
+ * @subkey: ignored
  *
  * This function is no-op.
  *
@@ -793,6 +794,7 @@ int gnutls_pcert_export_openpgp(gnutls_pcert_st * pcert,
 /**
  * gnutls_openpgp_privkey_sign_hash:
  * @session: is a gnutls session
+ * @status: is ignored
  *
  * This function is no-op.
  *

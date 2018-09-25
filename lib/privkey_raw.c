@@ -270,6 +270,7 @@ int ret;
  * @key: Holds the public key
  * @curve: will hold the curve
  * @digest: will hold the digest
+ * @paramset: will hold the GOST parameter set ID
  * @x: will hold the x coordinate
  * @y: will hold the y coordinate
  * @k: will hold the private key
@@ -482,6 +483,7 @@ error:
  * @key: The key
  * @curve: holds the curve
  * @digest: holds the digest
+ * @paramset: holds the GOST parameter set ID
  * @x: holds the x
  * @y: holds the y
  * @k: holds the k

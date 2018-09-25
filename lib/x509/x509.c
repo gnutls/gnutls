@@ -3526,7 +3526,8 @@ gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
  * gnutls_x509_crt_get_pk_gost_raw:
  * @crt: Holds the certificate
  * @curve: will hold the curve
- * @paramset: will hold paramset
+ * @digest: will hold the digest
+ * @paramset: will hold the GOST parameter set ID
  * @x: will hold x
  * @y: will hold y
  *

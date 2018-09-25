@@ -269,6 +269,10 @@ typedef enum {
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
  * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
  * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
+ * @GNUTLS_MAC_SHA3_224: Reserved; unimplemented.
+ * @GNUTLS_MAC_SHA3_256: Reserved; unimplemented.
+ * @GNUTLS_MAC_SHA3_384: Reserved; unimplemented.
+ * @GNUTLS_MAC_SHA3_512: Reserved; unimplemented.
  *
  * Enumeration of different Message Authentication Code (MAC)
  * algorithms.
@@ -559,6 +563,7 @@ typedef enum {
  * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
  * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec.
  * @GNUTLS_HANDSHAKE_CLIENT_HELLO_V2: SSLv2 Client Hello.
+ * @GNUTLS_HANDSHAKE_ENCRYPTED_EXTENSIONS: Encrypted extensions message.
  *
  * Enumeration of different TLS handshake packets.
  */
