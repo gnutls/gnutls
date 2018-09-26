@@ -992,8 +992,6 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 	 */
 	for (i = clist_size - 1; i > 0; i--) {
 		output = 0;
-		if (i - 1 < 0)
-			break;
 
 		if (purpose != NULL) {
 			ret = _gnutls_check_key_purpose(certificate_list[i], purpose, 1);
