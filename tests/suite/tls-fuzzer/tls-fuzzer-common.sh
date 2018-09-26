@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2017 Red Hat, Inc.
+# Copyright (C) 2016-2018 Red Hat, Inc.
 #
 # This file is part of GnuTLS.
 #
@@ -18,16 +18,39 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
+SERV="../../../../src/gnutls-serv${EXEEXT}"
+CLI="../../../../src/gnutls-cli${EXEEXT}"
 
-tls_fuzzer_prepare() {
-PRIORITY="NORMAL:+ARCFOUR-128:%VERIFY_ALLOW_SIGN_WITH_SHA1:+3DES-CBC:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1:-CURVE-SECP192R1:+VERS-SSL3.0"
-${CLI} --list --priority "${PRIORITY}" >/dev/null 2>&1
-if test $? != 0;then
-	PRIORITY="NORMAL:+ARCFOUR-128:%VERIFY_ALLOW_SIGN_WITH_SHA1:+3DES-CBC:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1:+VERS-SSL3.0"
+TMPFILE=tls-fuzzer.$$.tmp
+PSKFILE=tls-fuzzer.psk.$$.tmp
+
+. "${srcdir}/../scripts/common.sh"
+
+eval "${GETPORT}"
+
+pushd tls-fuzzer
+
+if ! test -d tlsfuzzer;then
+	exit 77
 fi
 
-sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-cert.json >${TMPFILE}
-}
+pushd tlsfuzzer
+test -L ecdsa || ln -s ../python-ecdsa/src/ecdsa ecdsa
+test -L tlslite || ln -s ../tlslite-ng/tlslite tlslite 2>/dev/null
 
-. "${srcdir}/tls-fuzzer/tls-fuzzer-common.sh"
+wait_for_free_port $PORT
+
+retval=0
+
+tls_fuzzer_prepare
+
+PYTHONPATH=. python tests/scripts_retention.py ${TMPFILE} ${SERV}
+retval=$?
+
+rm -f ${TMPFILE}
+[ -f "${PSKFILE}" ] && rm -f ${PSKFILE}
+
+popd
+popd
+
+exit $retval
