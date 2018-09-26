@@ -26,7 +26,7 @@ PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:-KX-ALL:+DHE-P
 PSKKEY=8a7759b3f26983c453e448060bde8981
 PSKID=test
 
-sed -e "s|@SERVER@|$SERV|g" -e "s/@PSKKEY@/$PSKKEY/g" -e "s/@PSKID@/$PSKID/g" -e "s/@PSKFILE@/$PSKFILE/g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-psk.json >${TMPFILE}
+sed -e "s|@SERVER@|$SERV|g" -e "s/@PSKKEY@/$PSKKEY/g" -e "s/@PSKID@/$PSKID/g" -e "s^@PSKFILE@^$PSKFILE^g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-psk.json >${TMPFILE}
 
 cat >${PSKFILE} <<_EOF_
 ${PSKID}:${PSKKEY}

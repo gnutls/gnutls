@@ -18,23 +18,23 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SERV="../../../../src/gnutls-serv${EXEEXT}"
-CLI="../../../../src/gnutls-cli${EXEEXT}"
+builddir=`pwd`
+CLI="${builddir}/../../src/gnutls-cli${EXEEXT}"
+SERV="${builddir}/../../src/gnutls-serv${EXEEXT}"
 
-TMPFILE=tls-fuzzer.$$.tmp
-PSKFILE=tls-fuzzer.psk.$$.tmp
+TMPFILE="${builddir}/tls-fuzzer.$$.tmp"
+PSKFILE="${builddir}/tls-fuzzer.psk.$$.tmp"
 
 . "${srcdir}/../scripts/common.sh"
 
 eval "${GETPORT}"
 
-pushd tls-fuzzer
-
-if ! test -d tlsfuzzer;then
+if ! test -d "${srcdir}/tls-fuzzer/tlsfuzzer" ; then
 	exit 77
 fi
 
-pushd tlsfuzzer
+pushd "${srcdir}/tls-fuzzer/tlsfuzzer"
+
 test -L ecdsa || ln -s ../python-ecdsa/src/ecdsa ecdsa
 test -L tlslite || ln -s ../tlslite-ng/tlslite tlslite 2>/dev/null
 
@@ -50,7 +50,6 @@ retval=$?
 rm -f ${TMPFILE}
 [ -f "${PSKFILE}" ] && rm -f ${PSKFILE}
 
-popd
 popd
 
 exit $retval
