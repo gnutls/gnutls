@@ -35,6 +35,7 @@
 #include "errno.h"
 #include "ext/srp.h"
 #include <gnutls/gnutls.h>
+#include "c-strcase.h"
 
 #define MAX_ELEMENTS 64
 
@@ -261,7 +262,7 @@ static const int _kx_priority_secure[] = {
 	GNUTLS_KX_RSA,
 	/* KX-RSA is now ahead of DHE-RSA and DHE-DSS due to the compatibility
 	 * issues the DHE ciphersuites have. That is, one cannot enforce a specific
-	 * security level without dropping the connection. 
+	 * security level without dropping the connection.
 	 */
 #ifdef ENABLE_DHE
 	GNUTLS_KX_DHE_RSA,
@@ -651,7 +652,7 @@ struct priority_groups_st {
 	bool no_tickets;
 };
 
-static const struct priority_groups_st pgroups[] = 
+static const struct priority_groups_st pgroups[] =
 {
 	{.name = LEVEL_NORMAL,
 	 .cipher_list = &cipher_priority_normal,
@@ -767,8 +768,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		if (pgroups[i].name == NULL)
 			return 0;
 
-		if (strcasecmp(level, pgroups[i].name) == 0 ||
-			(pgroups[i].alias != NULL && strcasecmp(level, pgroups[i].alias) == 0)) {
+		if (c_strcasecmp(level, pgroups[i].name) == 0 ||
+			(pgroups[i].alias != NULL && c_strcasecmp(level, pgroups[i].alias) == 0)) {
 			if (pgroups[i].proto_list != NULL)
 				func(&priority_cache->protocol, *pgroups[i].proto_list);
 			func(&priority_cache->_cipher, *pgroups[i].cipher_list);
@@ -1443,8 +1444,8 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
  * included as a fallback only.  The ciphers are sorted by security
  * margin.
  *
- * "PFS" means all "secure" ciphersuites that support perfect forward secrecy. 
- * The 256-bit ciphers are included as a fallback only.  
+ * "PFS" means all "secure" ciphersuites that support perfect forward secrecy.
+ * The 256-bit ciphers are included as a fallback only.
  * The ciphers are sorted by security margin.
  *
  * "SECURE128" means all "secure" ciphersuites of security level 128-bit
@@ -1494,9 +1495,9 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
  * "SECURE128:-VERS-SSL3.0" means that only secure ciphers are
  * and enabled, SSL3.0 is disabled.
  *
- * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", 
+ * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1",
  *
- * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+ECDHE-RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1:+CURVE-SECP256R1", 
+ * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+ECDHE-RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1:+CURVE-SECP256R1",
  *
  * "SECURE256:+SECURE128",
  *
@@ -1632,7 +1633,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	break_list(darg, broken_list, &broken_list_size);
 	/* This is our default set of protocol version, certificate types.
 	 */
-	if (strcasecmp(broken_list[0], LEVEL_NONE) != 0) {
+	if (c_strcasecmp(broken_list[0], LEVEL_NONE) != 0) {
 		_set_priority(&(*priority_cache)->protocol,
 			      protocol_priority);
 		_set_priority(&(*priority_cache)->client_ctype,
@@ -2065,7 +2066,7 @@ int gnutls_set_default_priority_append(gnutls_session_t session,
  * @list: will point to an integer list
  *
  * Get a list of available elliptic curves in the priority
- * structure. 
+ * structure.
  *
  * Deprecated: This function has been replaced by
  * gnutls_priority_group_list() since 3.6.0.
@@ -2100,7 +2101,7 @@ gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available groups in the priority
- * structure. 
+ * structure.
  *
  * Returns: the number of items, or an error code.
  *
@@ -2123,7 +2124,7 @@ gnutls_priority_group_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available key exchange methods in the priority
- * structure. 
+ * structure.
  *
  * Returns: the number of items, or an error code.
  * Since: 3.2.3
@@ -2145,7 +2146,7 @@ gnutls_priority_kx_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available ciphers in the priority
- * structure. 
+ * structure.
  *
  * Returns: the number of items, or an error code.
  * Since: 3.2.3
@@ -2167,7 +2168,7 @@ gnutls_priority_cipher_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available MAC algorithms in the priority
- * structure. 
+ * structure.
  *
  * Returns: the number of items, or an error code.
  * Since: 3.2.3
@@ -2189,7 +2190,7 @@ gnutls_priority_mac_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available compression method in the priority
- * structure. 
+ * structure.
  *
  * Returns: the number of methods, or an error code.
  * Since: 3.0
@@ -2210,7 +2211,7 @@ gnutls_priority_compression_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available TLS version numbers in the priority
- * structure. 
+ * structure.
  *
  * Returns: the number of protocols, or an error code.
  * Since: 3.0
@@ -2232,7 +2233,7 @@ gnutls_priority_protocol_list(gnutls_priority_t pcache,
  * @list: will point to an integer list
  *
  * Get a list of available signature algorithms in the priority
- * structure. 
+ * structure.
  *
  * Returns: the number of algorithms, or an error code.
  * Since: 3.0

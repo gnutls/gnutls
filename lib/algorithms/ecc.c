@@ -25,6 +25,7 @@
 #include "errors.h"
 #include <x509/common.h>
 #include <pk.h>
+#include "c-strcase.h"
 
 /* Supported ECC curves
  */
@@ -161,7 +162,7 @@ const gnutls_ecc_curve_t *gnutls_ecc_curve_list(void)
 		int i = 0;
 
 		GNUTLS_ECC_CURVE_LOOP(
-			if (_gnutls_pk_curve_exists(p->id)) 
+			if (_gnutls_pk_curve_exists(p->id))
 				supported_curves[i++] = p->id;
 		);
 		supported_curves[i++] = 0;
@@ -184,7 +185,7 @@ gnutls_ecc_curve_t gnutls_oid_to_ecc_curve(const char *oid)
 	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
 	GNUTLS_ECC_CURVE_LOOP(
-		if (p->oid != NULL && strcasecmp(p->oid, oid) == 0 && _gnutls_pk_curve_exists(p->id)) {
+		if (p->oid != NULL && c_strcasecmp(p->oid, oid) == 0 && _gnutls_pk_curve_exists(p->id)) {
 			ret = p->id;
 			break;
 		}
@@ -209,7 +210,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)
 	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
 	GNUTLS_ECC_CURVE_LOOP(
-		if (strcasecmp(p->name, name) == 0 && _gnutls_pk_curve_exists(p->id)) {
+		if (c_strcasecmp(p->name, name) == 0 && _gnutls_pk_curve_exists(p->id)) {
 			ret = p->id;
 			break;
 		}
@@ -304,7 +305,7 @@ const char *gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve)
 
 	GNUTLS_ECC_CURVE_LOOP(
 		if (p->id == curve) {
-			ret = p->oid; 
+			ret = p->oid;
 			break;
 		}
 	);

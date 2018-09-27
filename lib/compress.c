@@ -21,6 +21,7 @@
  */
 
 #include "gnutls_int.h"
+#include "c-strcase.h"
 
 /* Compatibility compression functions */
 
@@ -53,7 +54,7 @@ const char *gnutls_compression_get_name(gnutls_compression_method_t
  **/
 gnutls_compression_method_t gnutls_compression_get_id(const char *name)
 {
-	if (strcasecmp(name, "NULL") == 0)
+	if (c_strcasecmp(name, "NULL") == 0)
 		return GNUTLS_COMP_NULL;
 
 	return GNUTLS_COMP_UNKNOWN;
@@ -62,7 +63,7 @@ gnutls_compression_method_t gnutls_compression_get_id(const char *name)
 /**
  * gnutls_compression_list:
  *
- * Get a list of compression methods.  
+ * Get a list of compression methods.
  *
  * Returns: a zero-terminated list of #gnutls_compression_method_t
  *   integers indicating the available compression methods.
