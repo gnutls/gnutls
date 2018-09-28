@@ -196,6 +196,8 @@ $blankline_man = "";
 $blankline_text = "";
 my $lineprefix = "";
 
+my $function_found = 0;
+
 sub usage {
     print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man | -tex | -texinfo  -listfunc ]\n";
     print "         [ -sourceversion verno ] [ -include file | -includefuncprefix ]\n";
@@ -797,6 +799,10 @@ sub dump_function {
 	$function_name = $2;
 	$args = $3;
 
+	if ($return_type eq 'typedef') {
+	    return;
+	}
+
 #	print STDERR "ARGS = '$args'\n";
 
 	foreach $arg (split ',', $args) {
@@ -813,7 +819,7 @@ sub dump_function {
 		$param = $2;
 		push @args, $1;
 	    }
-	    if ($param =~ m/^(.*)(\[\])$/) {
+	    if ($param =~ m/^(.*)(\[[0-9]*\])$/) {
 		$param = $1;
 		push @args, $2;
 	    }
@@ -822,7 +828,8 @@ sub dump_function {
 
 	    if ((!defined($parameters{$param}) || $parameters{$param} eq "") && $param ne "void") {
 		$parameters{$param} = "-- undescribed --";
-		print STDERR "warning: $lineno: Function parameter '$param' not described in '$function_name'\n";
+		print STDERR "error: $lineno: Function parameter '$param' not described in '$function_name'\n";
+		exit 1;
 	    }
 
 	    push @parameterlist, $param;
@@ -831,11 +838,12 @@ sub dump_function {
 #	    print STDERR "param = '$param', type = '$type'\n";
 	}
     } else {
-	print STDERR "warning: $lineno: Cannot understand prototype: '$prototype'\n";
-	return;
+	print STDERR "error: $lineno: Cannot understand prototype: '$prototype'\n";
+	exit 1;
     }
 
     if ($function_only==0 || defined($function_table{$function_name})) {
+	$function_found=1;
 	output_function({'function' => $function_name,
 			 'module' => $modulename,
 			 'sourceversion' => $sourceversion,
@@ -1008,7 +1016,7 @@ foreach $file (@ARGV) {
 		}
 	    } else {
 		# i dont know - bad line?  ignore.
-		print STDERR "warning: $lineno: Bad line: $_";
+		#print STDERR "warning: $lineno: Bad line: $_";
 	    }
 	} elsif ($state == 3) {	# scanning for function { (end of prototype)
 	    if ($line =~ /([a-zA-Z\s]+)enum(.*)$/) {
@@ -1066,5 +1074,9 @@ foreach $file (@ARGV) {
     
 	}
     }
+}
 
+if ($function_only != 0 && $function_found == 0) {
+	print STDERR "error: could not find the expected function\n";
+	exit 1;
 }

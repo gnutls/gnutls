@@ -1235,7 +1235,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1249,7 +1249,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1263,7 +1263,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1277,7 +1277,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1291,7 +1291,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1305,7 +1305,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1319,7 +1319,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1333,7 +1333,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1347,7 +1347,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1361,7 +1361,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1375,7 +1375,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1389,21 +1389,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for openpgp.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/openpgp.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/openpgp.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1417,7 +1403,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1431,7 +1417,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1445,7 +1431,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2014-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1459,7 +1445,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2014-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""

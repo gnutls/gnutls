@@ -43,7 +43,7 @@ doc-dist.Fedora:
   script:
   - SUBMODULE_NOFETCH=1 ./bootstrap
   - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
-  - make -C doc stamp-vti && make -C doc stamp-1 && make -j$(nproc)
+  - make -C doc stamp-vti && make -C doc stamp-1 && make -C doc stamp_enums && make -j$(nproc)
   - make -C doc gnutls.html
   - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
     make -C doc/latex gnutls.pdf
