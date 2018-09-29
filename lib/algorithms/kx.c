@@ -25,6 +25,7 @@
 #include "errors.h"
 #include <x509/common.h>
 #include "state.h"
+#include "c-strcase.h"
 
 extern mod_auth_st rsa_auth_struct;
 extern mod_auth_st dhe_rsa_auth_struct;
@@ -42,7 +43,7 @@ extern mod_auth_st srp_rsa_auth_struct;
 extern mod_auth_st srp_dss_auth_struct;
 
 
-/* Cred type mappings to KX algorithms 
+/* Cred type mappings to KX algorithms
  * FIXME: The mappings are not 1-1. Some KX such as SRP_RSA require
  * more than one credentials type.
  */
@@ -180,7 +181,7 @@ gnutls_kx_algorithm_t gnutls_kx_get_id(const char *name)
 	gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
 	GNUTLS_KX_LOOP(
-		if (strcasecmp(p->name, name) == 0 && (int)p->algorithm != GNUTLS_KX_INVALID) {
+		if (c_strcasecmp(p->name, name) == 0 && (int)p->algorithm != GNUTLS_KX_INVALID) {
 			ret = p->algorithm;
 			break;
 		}
@@ -198,7 +199,7 @@ int _gnutls_kx_get_id(const char *name)
 	gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
 	GNUTLS_KX_LOOP(
-		if (strcasecmp(p->name, name) == 0) {
+		if (c_strcasecmp(p->name, name) == 0) {
 			ret = p->algorithm;
 			break;
 		}
@@ -265,7 +266,7 @@ bool _gnutls_kx_allows_false_start(gnutls_session_t session)
 					ret = 0;
 			} else if (gnutls_dh_get_prime_bits(session) < bits)
 				ret = 0;
-		} else 
+		} else
 #endif
 		if (algorithm == GNUTLS_KX_ECDHE_RSA || algorithm == GNUTLS_KX_ECDHE_ECDSA) {
 			bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_EC, GNUTLS_SEC_PARAM_HIGH);

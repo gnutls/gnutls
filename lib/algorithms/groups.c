@@ -25,6 +25,7 @@
 #include "errors.h"
 #include <x509/common.h>
 #include <pk.h>
+#include "c-strcase.h"
 
 /* Supported ECC curves
  */
@@ -176,7 +177,7 @@ const gnutls_group_t *gnutls_group_list(void)
 		int i = 0;
 
 		GNUTLS_GROUP_LOOP(
-			if (p->curve == 0 || _gnutls_pk_curve_exists(p->curve)) 
+			if (p->curve == 0 || _gnutls_pk_curve_exists(p->curve))
 				groups[i++] = p->id;
 		);
 		groups[i++] = 0;
@@ -201,7 +202,7 @@ gnutls_group_t gnutls_group_get_id(const char *name)
 	gnutls_group_t ret = GNUTLS_GROUP_INVALID;
 
 	GNUTLS_GROUP_LOOP(
-		if (strcasecmp(p->name, name) == 0 && (
+		if (c_strcasecmp(p->name, name) == 0 && (
 		    p->curve == 0 ||_gnutls_pk_curve_exists(p->curve))) {
 			ret = p->id;
 			break;

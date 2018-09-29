@@ -24,6 +24,7 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
+#include "c-strcase.h"
 
 /* TLS Versions */
 static const version_entry_st sup_versions[] = {
@@ -242,7 +243,7 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 	return min_v;
 }
 
-/* Returns the maximum version in the priorities 
+/* Returns the maximum version in the priorities
  */
 const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 {
@@ -296,7 +297,7 @@ const version_entry_st *_gnutls_legacy_version_max(gnutls_session_t session)
 }
 
 /* Returns the number of bytes written to buffer or a negative
- * error code. It will return GNUTLS_E_UNSUPPORTED_VERSION_PACKET 
+ * error code. It will return GNUTLS_E_UNSUPPORTED_VERSION_PACKET
  * if there is no version >= TLS 1.3.
  */
 int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, ssize_t buffer_size)
@@ -411,7 +412,7 @@ gnutls_protocol_t gnutls_protocol_get_id(const char *name)
 	gnutls_protocol_t ret = GNUTLS_VERSION_UNKNOWN;
 
 	for (p = sup_versions; p->name != NULL; p++) {
-		if (strcasecmp(p->name, name) == 0) {
+		if (c_strcasecmp(p->name, name) == 0) {
 			ret = p->id;
 			break;
 		}

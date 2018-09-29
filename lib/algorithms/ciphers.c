@@ -24,9 +24,10 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
+#include "c-strcase.h"
 
 
-/* Note that all algorithms are in CBC or STREAM modes. 
+/* Note that all algorithms are in CBC or STREAM modes.
  * Do not add any algorithms in other modes (avoid modified algorithms).
  * View first: "The order of encryption and authentication for
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
@@ -54,7 +55,7 @@ static const cipher_entry_st algorithms[] = {
 	  .cipher_iv = 16},
 	{ .name = "AES-128-CBC",
 	  .id = GNUTLS_CIPHER_AES_128_CBC,
-	  .blocksize = 16, 
+	  .blocksize = 16,
 	  .keysize = 16,
 	  .type = CIPHER_BLOCK,
 	  .explicit_iv = 16,
@@ -121,14 +122,14 @@ static const cipher_entry_st algorithms[] = {
 	  .id = GNUTLS_CIPHER_ARCFOUR_128,
 	  .blocksize = 1,
 	  .keysize = 16,
-	  .type = CIPHER_STREAM, 
+	  .type = CIPHER_STREAM,
 	 0, 0, 0, 0},
-	{ .name = "ESTREAM-SALSA20-256", 
+	{ .name = "ESTREAM-SALSA20-256",
 	  .id = GNUTLS_CIPHER_ESTREAM_SALSA20_256,
 	  .blocksize = 64,
 	  .keysize = 32,
 	 .type = CIPHER_STREAM, 0, 0, 8, 0},
-	{ .name = "SALSA20-256", 
+	{ .name = "SALSA20-256",
 	  .id = GNUTLS_CIPHER_SALSA20_256,
 	  .blocksize = 64,
 	  .keysize = 32,
@@ -218,24 +219,24 @@ static const cipher_entry_st algorithms[] = {
 	  .type = CIPHER_STREAM,
 	  .implicit_iv = 8,
 	  .cipher_iv = 8},
-	{ .name = "3DES-CBC", 
+	{ .name = "3DES-CBC",
 	  .id = GNUTLS_CIPHER_3DES_CBC,
 	  .blocksize = 8,
 	  .keysize = 24,
 	  .type = CIPHER_BLOCK,
 	  .explicit_iv = 8,
 	  .cipher_iv = 8},
-	{ .name = "DES-CBC", 
+	{ .name = "DES-CBC",
 	  .id = GNUTLS_CIPHER_DES_CBC,
 	  .blocksize = 8,
 	  .keysize = 8,
 	  .type = CIPHER_BLOCK,
 	  .explicit_iv = 8,
 	  .cipher_iv = 8},
-	{ .name = "ARCFOUR-40", 
+	{ .name = "ARCFOUR-40",
 	  .id = GNUTLS_CIPHER_ARCFOUR_40,
 	  .blocksize = 1,
-	  .keysize = 5, 
+	  .keysize = 5,
 	  .type = CIPHER_STREAM},
 	{ .name = "RC2-40",
 	  .id = GNUTLS_CIPHER_RC2_40_CBC,
@@ -275,7 +276,7 @@ const cipher_entry_st *_gnutls_cipher_to_entry(gnutls_cipher_algorithm_t c)
 const cipher_entry_st *cipher_name_to_entry(const char *name)
 {
 	GNUTLS_CIPHER_LOOP(
-		if (strcasecmp(p->name, name) == 0) {
+		if (c_strcasecmp(p->name, name) == 0) {
 			return p;
 		}
 	);
@@ -382,9 +383,9 @@ gnutls_cipher_algorithm_t gnutls_cipher_get_id(const char *name)
 	gnutls_cipher_algorithm_t ret = GNUTLS_CIPHER_UNKNOWN;
 
 	GNUTLS_CIPHER_LOOP(
-		if (strcasecmp(p->name, name) == 0) {
+		if (c_strcasecmp(p->name, name) == 0) {
 			if (p->id == GNUTLS_CIPHER_NULL || _gnutls_cipher_exists(p->id))
-				ret = p->id; 
+				ret = p->id;
 			break;
 		}
 	);

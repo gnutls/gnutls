@@ -25,6 +25,7 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
+#include "c-strcase.h"
 
 #define MAC_OID_SHA1 "1.2.840.113549.2.7"
 #define MAC_OID_SHA224 "1.2.840.113549.2.8"
@@ -229,7 +230,7 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 	gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
 
 	GNUTLS_HASH_LOOP(
-		if (p->oid != NULL && strcasecmp(p->name, name) == 0) {
+		if (p->oid != NULL && c_strcasecmp(p->name, name) == 0) {
 			if (_gnutls_digest_exists((gnutls_digest_algorithm_t)p->id))
 				ret = (gnutls_digest_algorithm_t)p->id;
 			break;
@@ -254,7 +255,7 @@ gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name)
 	gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
 	GNUTLS_HASH_LOOP(
-		if (strcasecmp(p->name, name) == 0) {
+		if (c_strcasecmp(p->name, name) == 0) {
 			if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
 				ret = p->id;
 			break;
@@ -351,7 +352,7 @@ const gnutls_digest_algorithm_t *gnutls_digest_list(void)
 		GNUTLS_HASH_LOOP(
 			if (p->oid != NULL && (p->placeholder != 0 ||
 				_gnutls_mac_exists(p->id))) {
-				
+
 				supported_digests[i++] = (gnutls_digest_algorithm_t)p->id;
 			}
 		);

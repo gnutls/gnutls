@@ -26,6 +26,7 @@
 #include "errors.h"
 #include <x509/common.h>
 #include <assert.h>
+#include "c-strcase.h"
 
 /* signature algorithms;
  */
@@ -503,7 +504,7 @@ gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name)
 	gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
 	GNUTLS_SIGN_LOOP(
-		if (strcasecmp(p->name, name) == 0) {
+		if (c_strcasecmp(p->name, name) == 0) {
 			ret = p->id;
 			break;
 		}

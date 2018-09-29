@@ -24,6 +24,7 @@
 #include <algorithms.h>
 #include "errors.h"
 #include <x509/common.h>
+#include "c-strcase.h"
 
 /**
  * gnutls_certificate_type_get_name:
@@ -60,11 +61,11 @@ gnutls_certificate_type_t gnutls_certificate_type_get_id(const char *name)
 {
 	gnutls_certificate_type_t ret = GNUTLS_CRT_UNKNOWN;
 
-	if (strcasecmp(name, "X.509") == 0
-	    || strcasecmp(name, "X509") == 0)
+	if (c_strcasecmp(name, "X.509") == 0
+	    || c_strcasecmp(name, "X509") == 0)
 		return GNUTLS_CRT_X509;
-	if (strcasecmp(name, "RAWPK") == 0
-			|| strcasecmp(name, "RAWPUBKEY") == 0)
+	if (c_strcasecmp(name, "RAWPK") == 0
+			|| c_strcasecmp(name, "RAWPUBKEY") == 0)
 		return GNUTLS_CRT_RAWPK;
 
 	return ret;
