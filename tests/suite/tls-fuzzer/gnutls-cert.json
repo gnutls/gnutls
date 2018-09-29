@@ -6,41 +6,50 @@
                  "--priority=@PRIORITY@",
                  "--port=@PORT@"],
      "environment": {"PYTHONPATH" : "."},
+     "server_hostname": "localhost",
+     "server_port": @PORT@,
      "tests" : [
          {"name": "test-rsa-sigs-on-certificate-verify.py",
           "arguments" : ["-k", "tests/clientX509Key.pem",
-                         "-c", "tests/clientX509Cert.pem"]
+                         "-c", "tests/clientX509Cert.pem",
+                         "-p", "@PORT@"]
          },
          {"name" : "test-certificate-verify.py",
           "arguments" : ["-k", "tests/clientX509Key.pem",
-                         "-c", "tests/clientX509Cert.pem"]
+                         "-c", "tests/clientX509Cert.pem",
+                         "-p", "@PORT@"]
           },
          {"name" : "test-certificate-verify-malformed.py",
           "arguments" : ["-k", "tests/clientX509Key.pem",
-                         "-c", "tests/clientX509Cert.pem"]
+                         "-c", "tests/clientX509Cert.pem",
+                         "-p", "@PORT@"]
           },
          {"name" : "test-certificate-verify-malformed-sig.py",
           "arguments" : ["-k", "tests/clientX509Key.pem",
-                         "-c", "tests/clientX509Cert.pem"]
+                         "-c", "tests/clientX509Cert.pem",
+                         "-p", "@PORT@"]
           },
          {"name" : "test-certificate-request.py",
           "comment" : "tlsfuzzer doesn't like our set of algorithms",
           "arguments" : ["-k", "tests/clientX509Key.pem",
                          "-c", "tests/clientX509Cert.pem",
-                         "-e", "check sigalgs in cert request"]
+                         "-e", "check sigalgs in cert request",
+                         "-p", "@PORT@"]
           },
          {"name" : "test-rsa-pss-sigs-on-certificate-verify.py",
           "arguments" : ["-k", "tests/clientX509Key.pem",
                          "-c", "tests/clientX509Cert.pem",
                          "-e", "check CertificateRequest sigalgs",
-                         "-n", "100"]
+                         "-n", "100",
+                         "-p", "@PORT@"]
           },
          {"name": "test-certificate-malformed.py",
           "comment" : "tlsfuzzer doesn't like the alerts we send",
           "arguments" : ["-k", "tests/clientX509Key.pem",
                          "-c", "tests/clientX509Cert.pem",
                          "-e", "fuzz empty certificate - overall 7, certs 4, cert 1",
-                         "-e", "fuzz empty certificate - overall 8, certs 5, cert 2"]
+                         "-e", "fuzz empty certificate - overall 8, certs 5, cert 2",
+                         "-p", "@PORT@"]
 	 }
      ]
     }

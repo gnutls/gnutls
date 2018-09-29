@@ -19,36 +19,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-SERV="../../../../src/gnutls-serv${EXEEXT}"
-CLI="../../../../src/gnutls-cli${EXEEXT}"
 
-OUTFILE=tls-fuzzer.debug.log
-TMPFILE=tls-fuzzer.$$.tmp
-
-. "${srcdir}/../scripts/common.sh"
-
-# We hard-code the port because of limitations in tlsfuzzer
-#eval "${GETPORT}"
-PORT=4433
-
-$LOCKFILE
-
-pushd tls-fuzzer
-
-if ! test -d tlsfuzzer;then
-	exit 77
-fi
-
-rm -f "$OUTFILE"
-
-pushd tlsfuzzer
-test -L ecdsa || ln -s ../python-ecdsa/src/ecdsa ecdsa
-test -L tlslite || ln -s ../tlslite-ng/tlslite tlslite 2>/dev/null
-
-wait_for_free_port $PORT
-
-retval=0
-
+tls_fuzzer_prepare() {
 VERSIONS="-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0"
 PRIORITY="NORMAL:%VERIFY_ALLOW_SIGN_WITH_SHA1:+ARCFOUR-128:+3DES-CBC:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1:-CURVE-SECP192R1:${VERSIONS}:+SHA256"
 ${CLI} --list --priority "${PRIORITY}" >/dev/null 2>&1
@@ -56,18 +28,7 @@ if test $? != 0;then
 	PRIORITY="NORMAL:%VERIFY_ALLOW_SIGN_WITH_SHA1:+ARCFOUR-128:+3DES-CBC:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1:${VERSIONS}:+SHA256"
 fi
 
-TLS_PY=./tlslite-ng/scripts/tls.py
-#TLS_PY=$(which tls.py)
-
 sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nocert.json >${TMPFILE}
+}
 
-PYTHONPATH=. python tests/scripts_retention.py ${TMPFILE} ${SERV}
-retval=$?
-
-rm -f ${TMPFILE}
-
-popd
-popd
-
-$UNLOCKFILE
-exit $retval
+. "${srcdir}/tls-fuzzer/tls-fuzzer-common.sh"

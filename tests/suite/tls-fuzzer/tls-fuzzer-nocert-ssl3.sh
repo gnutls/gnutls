@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2017 Red Hat, Inc.
+# Copyright (C) 2016-2017 Red Hat, Inc.
 #
 # This file is part of GnuTLS.
 #
@@ -21,13 +21,9 @@
 srcdir="${srcdir:-.}"
 
 tls_fuzzer_prepare() {
-PRIORITY="NORMAL:+ARCFOUR-128:%VERIFY_ALLOW_SIGN_WITH_SHA1:+3DES-CBC:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1:-CURVE-SECP192R1:+VERS-SSL3.0"
-${CLI} --list --priority "${PRIORITY}" >/dev/null 2>&1
-if test $? != 0;then
-	PRIORITY="NORMAL:+ARCFOUR-128:%VERIFY_ALLOW_SIGN_WITH_SHA1:+3DES-CBC:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1:+VERS-SSL3.0"
-fi
+PRIORITY="NORMAL:%VERIFY_ALLOW_SIGN_WITH_SHA1:+ARCFOUR-128:+3DES-CBC:-VERS-ALL:+VERS-SSL3.0"
 
-sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-cert.json >${TMPFILE}
+sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nocert-ssl3.json >${TMPFILE}
 }
 
 . "${srcdir}/tls-fuzzer/tls-fuzzer-common.sh"

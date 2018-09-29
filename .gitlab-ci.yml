@@ -119,7 +119,7 @@ SSL-3.0.Fedora.x86_64:
   script:
   - ./bootstrap
   - mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --disable-ssl2-support --disable-full-test-suite --enable-seccomp-tests --disable-doc --disable-guile &&
+    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
