@@ -167,7 +167,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls13-cert-key-exchange x509-cert-callback-ocsp gnutls_ocsp_resp_list_import2 \
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa x509sign-verify-gost \
-	 mini-alignment oids atfork prf psk-file priority-init2 \
+	 mini-alignment oids atfork prf psk-file priority-init2 post-client-hello-change-prio \
 	 status-request status-request-ok status-request-missing sign-verify-ext \
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \

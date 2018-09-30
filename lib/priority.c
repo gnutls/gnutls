@@ -593,7 +593,8 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	/* set the current version to the first in the chain.
 	 * This will be overridden later.
 	 */
-	if (session->internals.priorities->protocol.algorithms > 0) {
+	if (session->internals.priorities->protocol.algorithms > 0 &&
+	    !session->internals.handshake_in_progress) {
 		if (_gnutls_set_current_version(session,
 					    session->internals.priorities->
 					    protocol.priority[0]) < 0) {

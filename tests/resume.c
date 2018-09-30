@@ -73,6 +73,7 @@ struct params_res {
 	int enable_session_ticket_server;
 	int enable_session_ticket_client;
 	int expect_resume;
+	int call_post_client_hello;
 	int client_cert;
 	int first_no_ext_master;
 	int second_no_ext_master;
@@ -94,6 +95,12 @@ struct params_res resume_tests[] = {
 	 .enable_db = 1,
 	 .enable_session_ticket_server = 0,
 	 .enable_session_ticket_client = 0,
+	 .expect_resume = 1},
+	{.desc = "try to resume from db with post_client_hello",
+	 .enable_db = 1,
+	 .enable_session_ticket_server = 0,
+	 .enable_session_ticket_client = 0,
+	 .call_post_client_hello = 1,
 	 .expect_resume = 1},
 	{.desc = "try to resume from db using resumed session's data",
 	 .enable_db = 1,
@@ -130,6 +137,12 @@ struct params_res resume_tests[] = {
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .change_ciphersuite = 1,
+	 .expect_resume = 1},
+	{.desc = "try to resume from session ticket with post_client_hello",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .call_post_client_hello = 1,
 	 .expect_resume = 1},
 #endif
 #if defined(TLS13) && !defined(USE_PSK)
@@ -239,6 +252,13 @@ static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "%s |<%d>| %s", child ? "server" : "client", level,
 		str);
+}
+
+static int post_client_hello_callback(gnutls_session_t session)
+{
+	/* switches the supported ciphersuites to something compatible */
+	assert(gnutls_priority_set_direct(session, gnutls_session_get_ptr(session), NULL) >= 0);
+	return 0;
 }
 
 static int hsk_hook_cb(gnutls_session_t session, unsigned int htype, unsigned post,
@@ -808,6 +828,13 @@ static void server(int sds[], struct params_res *params)
 #endif
 		gnutls_transport_set_int(session, sd);
 		gnutls_handshake_set_timeout(session, 20 * 1000);
+
+		if (params->call_post_client_hello) {
+			gnutls_session_set_ptr(session, PRIO_STR);
+			gnutls_handshake_set_post_client_hello_function(session,
+									post_client_hello_callback);
+		}
+
 
 		do {
 			ret = gnutls_handshake(session);
