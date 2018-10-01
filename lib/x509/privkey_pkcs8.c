@@ -247,6 +247,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 
 	if ((pkey->params.pkflags & GNUTLS_PK_FLAG_PROVABLE) && pkey->params.seed_size > 0) {
 		gnutls_datum_t seed_info;
+		/* rfc8479 attribute encoding */
 
 		result = _x509_encode_provable_seed(pkey, &seed_info);
 		if (result < 0) {

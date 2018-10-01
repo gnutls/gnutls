@@ -54,6 +54,7 @@
 
 #define HASH_OID_GOST_R_3411_94_CRYPTOPRO_PARAMS "1.2.643.2.2.30.1"
 
+/* from rfc8479 */
 #define OID_ATTR_PROV_SEED "1.3.6.1.4.1.2312.18.8.1"
 
 struct gnutls_x509_crl_iter {
