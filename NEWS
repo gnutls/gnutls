@@ -77,7 +77,7 @@ gnutls_ffdhe_6144_key_bits: Added
 
 ** Provide a uniform cipher list across supported TLS protocols; the CAMELLIA ciphers
    as well as ciphers utilizing HMAC-SHA384 and SHA256 have been removed from the default
-   priority strings, as they are undefined under TLS1.3 and they provide not advantage
+   priority strings, as they are undefined under TLS1.3 and they provide no advantage
    over other options in earlier protocols.
 
 ** The SSL 3.0 protocol is disabled on compile-time by default. It can be re-enabled
