@@ -145,8 +145,10 @@ int _gnutls13_reauth_server(gnutls_session_t session)
 	    (!(session->internals.flags & GNUTLS_POST_HANDSHAKE_AUTH)))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (session->internals.send_cert_req == 0)
+	if (session->internals.send_cert_req == 0) {
+		_gnutls_debug_log("You need to call gnutls_certificate_server_set_request to enable post handshake auth\n");
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	switch (REAUTH_STATE) {
 	case REAUTH_STATE0:

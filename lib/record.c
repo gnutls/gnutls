@@ -756,6 +756,37 @@ record_check_version(gnutls_session_t session,
 	return 0;
 }
 
+static int
+recv_hello_request(gnutls_session_t session, void *data,
+		   uint32_t data_size)
+{
+	uint8_t type;
+
+	if (session->security_parameters.entity == GNUTLS_SERVER)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+
+	if (data_size < 1)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+	if (session->internals.handshake_in_progress)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+
+	type = ((uint8_t *) data)[0];
+	if (type == GNUTLS_HANDSHAKE_HELLO_REQUEST) {
+		if (IS_DTLS(session))
+			session->internals.dtls.hsk_read_seq++;
+		if (session->internals.flags & GNUTLS_AUTO_REAUTH) {
+			session->internals.recv_state = RECV_STATE_REHANDSHAKE;
+			return GNUTLS_E_AGAIN;
+		} else {
+			return GNUTLS_E_REHANDSHAKE;
+		}
+	} else {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET;
+	}
+}
+
 /* This function will check if the received record type is
  * the one we actually expect and adds it to the proper
  * buffer. The bufel will be deinitialized after calling
@@ -995,12 +1026,10 @@ record_add_to_buffers(gnutls_session_t session,
 			/* So we accept it, if it is a Hello. If not, this will
 			 * fail and trigger flight retransmissions after some time. */
 			ret =
-			    _gnutls_recv_hello_request(session,
-						       bufel->msg.data,
-						       bufel->msg.size);
+			    recv_hello_request(session,
+					       bufel->msg.data,
+					       bufel->msg.size);
 			goto unexpected_packet;
-
-			break;
 		default:
 
 			_gnutls_record_log
@@ -1555,6 +1584,30 @@ check_session_status(gnutls_session_t session, unsigned ms)
 	}
 
 	switch (session->internals.recv_state) {
+	case RECV_STATE_REAUTH:
+		session->internals.recv_state = RECV_STATE_0;
+
+		ret = gnutls_reauth(session, 0);
+		if (ret < 0) {
+			/* a temp or fatal error, make sure we reset the state
+			 * so we can resume on temp errors */
+			session->internals.recv_state = RECV_STATE_REAUTH;
+			return gnutls_assert_val(ret);
+		}
+
+		return 1;
+	case RECV_STATE_REHANDSHAKE:
+		session->internals.recv_state = RECV_STATE_0;
+
+		ret = gnutls_handshake(session);
+		if (ret < 0) {
+			/* a temp or fatal error, make sure we reset the state
+			 * so we can resume on temp errors */
+			session->internals.recv_state = RECV_STATE_REHANDSHAKE;
+			return gnutls_assert_val(ret);
+		}
+
+		return 1;
 	case RECV_STATE_ASYNC_HANDSHAKE:
 		ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, -1, ms);
 		if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)

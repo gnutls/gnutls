@@ -527,6 +527,7 @@ _gnutls13_recv_async_handshake(gnutls_session_t session)
 {
 	int ret;
 	handshake_buffer_st hsk;
+	recv_state_t next_state = RECV_STATE_0;
 
 	/* The following messages are expected asynchronously after
 	 * the handshake process is complete */
@@ -576,9 +577,20 @@ _gnutls13_recv_async_handshake(gnutls_session_t session)
 					goto cleanup;
 				}
 
-				/* Application is expected to handle re-authentication
-				 * explicitly.  */
-				ret = GNUTLS_E_REAUTH_REQUEST;
+				if (session->internals.flags & GNUTLS_AUTO_REAUTH) {
+					ret = gnutls_reauth(session, 0);
+					if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) {
+						next_state = RECV_STATE_REAUTH;
+					} else if (ret < 0) {
+						gnutls_assert();
+						goto cleanup;
+					}
+				} else {
+					/* Application is expected to handle re-authentication
+					 * explicitly.  */
+					ret = GNUTLS_E_REAUTH_REQUEST;
+				}
+
 				goto cleanup;
 
 			case GNUTLS_HANDSHAKE_KEY_UPDATE:
@@ -630,7 +642,7 @@ _gnutls13_recv_async_handshake(gnutls_session_t session)
 
 	} while (_gnutls_record_buffer_get_size(session) > 0);
 
-	session->internals.recv_state = RECV_STATE_0;
+	session->internals.recv_state = next_state;
 
 	return 0;
 
@@ -640,7 +652,7 @@ _gnutls13_recv_async_handshake(gnutls_session_t session)
 	if (_gnutls_record_buffer_get_size(session) > 0)
 		session->internals.recv_state = RECV_STATE_ASYNC_HANDSHAKE;
 	else
-		session->internals.recv_state = RECV_STATE_0;
+		session->internals.recv_state = next_state;
 
 	_gnutls_handshake_buffer_clear(&hsk);
 	return ret;

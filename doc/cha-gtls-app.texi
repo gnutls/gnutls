@@ -1835,6 +1835,12 @@ Due to limitations of early protocol versions, it is required to check whether
 safe renegotiation is in place, i.e., using @funcref{gnutls_safe_renegotiation_status},
 which ensures that the server remains the same as the initial.
 
+To make re-authentication transparent to the application when requested
+by the server, use the @code{GNUTLS_AUTO_REAUTH} flag on the
+@funcref{gnutls_init} call. In that case the re-authentication will happen
+in the call of @funcref{gnutls_record_recv} that received the
+reauthentication request.
+
 @showfuncdesc{gnutls_safe_renegotiation_status}
 
 @subsubsection Server side
@@ -1876,6 +1882,12 @@ authentication using the @code{GNUTLS_POST_HANDSHAKE_AUTH} flag at @funcref{gnut
 A client receiving a re-authentication request will "see" the error code
 @code{GNUTLS_E_REAUTH_REQUEST} at @funcref{gnutls_record_recv}. At this
 point, it should also call @funcref{gnutls_reauth}.
+
+To make re-authentication transparent to the application when requested
+by the server, use the @code{GNUTLS_AUTO_REAUTH} and @code{GNUTLS_POST_HANDSHAKE_AUTH}
+flags on the @funcref{gnutls_init} call. In that case the re-authentication will happen
+in the call of @funcref{gnutls_record_recv} that received the
+reauthentication request.
 
 @node Parameter generation
 @subsection Parameter generation
