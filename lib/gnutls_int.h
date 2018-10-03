@@ -1564,4 +1564,8 @@ inline static bool _gnutls_has_negotiate_ctypes(gnutls_session_t session)
 	return session->internals.flags & GNUTLS_ENABLE_CERT_TYPE_NEG;
 }
 
+/* Macros to aide constant time/mem checks */
+#define CONSTCHECK_NOT_EQUAL(a, b) ((-((uint32_t)(a) ^ (uint32_t)(b))) >> 31)
+#define CONSTCHECK_EQUAL(a, b) (1U - CONSTCHECK_NOT_EQUAL(a, b))
+
 #endif				/* GNUTLS_INT_H */

@@ -553,6 +553,15 @@ if test "$enable_non_suiteb" = "yes";then
 fi
 AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
+# We MUST require a Nettle version that has rsa_sec_decrypt now.
+save_LIBS=$LIBS
+LIBS="$LIBS $HOGWEED_LIBS"
+AC_CHECK_FUNCS(nettle_rsa_sec_decrypt,
+    [],
+    [AC_MSG_ERROR([Nettle lacks the required rsa_sec_decrypt function])]
+)
+LIBS=$save_LIBS
+
 # Check if nettle has CFB8 support
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"

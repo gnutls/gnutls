@@ -28,6 +28,7 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 
 #define _gnutls_pk_encrypt( algo, ciphertext, plaintext, params) _gnutls_pk_ops.encrypt( algo, ciphertext, plaintext, params)
 #define _gnutls_pk_decrypt( algo, ciphertext, plaintext, params) _gnutls_pk_ops.decrypt( algo, ciphertext, plaintext, params)
+#define _gnutls_pk_decrypt2( algo, ciphertext, plaintext, size, params) _gnutls_pk_ops.decrypt2( algo, ciphertext, plaintext, size, params)
 #define _gnutls_pk_sign( algo, sig, data, params, sign_params) _gnutls_pk_ops.sign( algo, sig, data, params, sign_params)
 #define _gnutls_pk_verify( algo, data, sig, params, sign_params) _gnutls_pk_ops.verify( algo, data, sig, params, sign_params)
 #define _gnutls_pk_verify_priv_params( algo, params) _gnutls_pk_ops.verify_priv_params( algo, params)

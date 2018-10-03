@@ -1555,6 +1555,82 @@ gnutls_privkey_decrypt_data(gnutls_privkey_t key,
 }
 
 /**
+ * gnutls_privkey_decrypt_data2:
+ * @key: Holds the key
+ * @flags: zero for now
+ * @ciphertext: holds the data to be decrypted
+ * @plaintext: a preallocated buffer that will be filled with the plaintext
+ * @plaintext_size: in/out size of the plaintext
+ *
+ * This function will decrypt the given data using the algorithm
+ * supported by the private key. Unlike with gnutls_privkey_decrypt_data()
+ * this function operates in constant time and constant memory access.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ * negative error value.
+ *
+ * Since: 3.6.5
+ **/
+
+int
+gnutls_privkey_decrypt_data2(gnutls_privkey_t key,
+			     unsigned int flags,
+			     const gnutls_datum_t * ciphertext,
+			     unsigned char * plaintext,
+			     size_t plaintext_size)
+{
+	/* Note: except for the backwards compatibility function, no
+	 * conditional code should be called after the decryption
+	 * function call, to avoid creating oracle attacks based
+	 * on cache/timing side channels */
+
+	/* backwards compatibility */
+	if (key->type == GNUTLS_PRIVKEY_EXT &&
+	    key->key.ext.decrypt_func2 == NULL &&
+	    key->key.ext.decrypt_func != NULL) {
+		gnutls_datum_t plain;
+		int ret;
+		ret = key->key.ext.decrypt_func(key,
+						key->key.ext.userdata,
+						ciphertext,
+						&plain);
+		if (plain.size != plaintext_size) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		} else {
+			memcpy(plaintext, plain.data, plain.size);
+		}
+		gnutls_free(plain.data);
+		return ret;
+	}
+
+	switch (key->type) {
+	case GNUTLS_PRIVKEY_X509:
+		return _gnutls_pk_decrypt2(key->pk_algorithm, ciphertext,
+					   plaintext, plaintext_size,
+					   &key->key.x509->params);
+#ifdef ENABLE_PKCS11
+	case GNUTLS_PRIVKEY_PKCS11:
+		return _gnutls_pkcs11_privkey_decrypt_data2(key->key.pkcs11,
+							    flags,
+							    ciphertext,
+							    plaintext,
+							    plaintext_size);
+#endif
+	case GNUTLS_PRIVKEY_EXT:
+		if (key->key.ext.decrypt_func2 == NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		return key->key.ext.decrypt_func2(key,
+						  key->key.ext.userdata,
+						  ciphertext, plaintext,
+						  plaintext_size);
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+}
+
+/**
  * gnutls_privkey_import_x509_raw:
  * @pkey: The private key
  * @data: The private key data to be imported

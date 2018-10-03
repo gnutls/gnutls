@@ -591,6 +591,7 @@ APIMANS += gnutls_priority_set_direct.3
 APIMANS += gnutls_priority_sign_list.3
 APIMANS += gnutls_priority_string_list.3
 APIMANS += gnutls_privkey_decrypt_data.3
+APIMANS += gnutls_privkey_decrypt_data2.3
 APIMANS += gnutls_privkey_deinit.3
 APIMANS += gnutls_privkey_export_dsa_raw.3
 APIMANS += gnutls_privkey_export_dsa_raw2.3

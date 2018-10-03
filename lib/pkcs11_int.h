@@ -219,6 +219,13 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 				    gnutls_datum_t * plaintext);
 
 int
+_gnutls_pkcs11_privkey_decrypt_data2(gnutls_pkcs11_privkey_t key,
+				     unsigned int flags,
+				     const gnutls_datum_t * ciphertext,
+			             unsigned char * plaintext,
+			             size_t plaintext_size);
+
+int
 _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, unsigned flags);
 
 static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
