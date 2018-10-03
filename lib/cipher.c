@@ -448,6 +448,9 @@ encrypt_packet_tls13(gnutls_session_t session,
 		return plain->size;
 	}
 
+	if (unlikely(iv_size < 8))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 	memcpy(nonce, params->write.iv, iv_size);
 	memxor(&nonce[iv_size-8], UINT64DATA(params->write.sequence_number), 8);
 
