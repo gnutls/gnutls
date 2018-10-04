@@ -1630,6 +1630,7 @@ static int ext_hook_func(void *ctx, unsigned tls_id,
 		name = data+5;
 		name_size = size-5;
 	@}
+	return 0;
 @}
 
 static int
