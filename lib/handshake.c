@@ -491,7 +491,8 @@ _gnutls_user_hello_func(gnutls_session_t session,
 			uint8_t major, uint8_t minor)
 {
 	int ret, sret = 0;
-	const version_entry_st *vers;
+	const version_entry_st *vers, *old_vers;
+	const version_entry_st *new_max;
 
 	if (session->internals.user_hello_func != NULL) {
 		ret = session->internals.user_hello_func(session);
@@ -504,17 +505,34 @@ _gnutls_user_hello_func(gnutls_session_t session,
 			return ret;
 		}
 
-		vers = get_version(session);
-		if (!vers->tls13_sem) {
-			/* Here we need to renegotiate the version since the callee might
-			 * have disabled some TLS versions. We only do it for TLS1.2 or
-			 * earlier, as TLS1.3 uses a different set of ciphersuites, and
-			 * thus we cannot fallback.
-			 */
-			ret = _gnutls_negotiate_version(session, major, minor, 0);
-			if (ret < 0) {
-				gnutls_assert();
-				return ret;
+		/* This callback is often used to switch the priority string of the
+		 * server, and that includes switching version which we have already
+		 * negotiated; note that this doesn't apply when resuming as the version
+		 * negotiation is already complete. */
+		if (session->internals.resumed != RESUME_TRUE) {
+			new_max = _gnutls_version_max(session);
+			old_vers = get_version(session);
+
+			if (!old_vers->tls13_sem || (new_max && !new_max->tls13_sem)) {
+#if GNUTLS_TLS_VERSION_MAX != GNUTLS_TLS1_3
+# error "Need to update the following logic"
+#endif
+				/* Here we need to renegotiate the version since the callee might
+				 * have disabled some TLS versions. This logic does not cope for
+				 * protocols later than TLS1.3 if they have the tls13_sem set */
+				ret = _gnutls_negotiate_version(session, major, minor, 0);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				vers = get_version(session);
+				if (old_vers != vers) {
+					/* at this point we need to regenerate the random value to
+					 * avoid the peer detecting this session as a rollback
+					 * attempt. */
+					ret = _gnutls_gen_server_random(session, vers->id);
+					if (ret < 0)
+						return gnutls_assert_val(ret);
+				}
 			}
 		}
 	}
