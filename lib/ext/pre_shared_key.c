@@ -23,6 +23,7 @@
 
 #include "gnutls_int.h"
 #include "auth/psk.h"
+#include "handshake.h"
 #include "secrets.h"
 #include "tls13/psk_ext_parser.h"
 #include "tls13/finished.h"
@@ -36,7 +37,6 @@ static int
 compute_psk_from_ticket(const tls13_ticket_st *ticket, gnutls_datum_t *key)
 {
 	int ret;
-	char label[] = "resumption";
 
 	if (unlikely(ticket->prf == NULL || ticket->prf->output_size == 0))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -49,7 +49,7 @@ compute_psk_from_ticket(const tls13_ticket_st *ticket, gnutls_datum_t *key)
 	key->size = ticket->prf->output_size;
 
 	ret = _tls13_expand_secret2(ticket->prf,
-				    label, sizeof(label)-1,
+				    RESUMPTION_LABEL, sizeof(RESUMPTION_LABEL)-1,
 				    ticket->nonce, ticket->nonce_size,
 				    ticket->resumption_master_secret,
 				    key->size,
@@ -67,9 +67,9 @@ compute_binder_key(const mac_entry_st *prf,
 		   void *out)
 {
 	int ret;
-	const char ext_label[] = "ext binder";
+	const char ext_label[] = EXT_BINDER_LABEL;
 	const size_t ext_label_len = sizeof(ext_label) - 1;
-	const char res_label[] = "res binder";
+	const char res_label[] = RES_BINDER_LABEL;
 	const size_t res_label_len = sizeof(res_label) - 1;
 	const char *label = resuming ? res_label : ext_label;
 	size_t label_len = resuming ? res_label_len : ext_label_len;
