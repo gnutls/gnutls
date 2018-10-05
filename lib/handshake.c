@@ -80,6 +80,7 @@ handshake_hash_buffer_reset(gnutls_session_t session)
 {
 	_gnutls_buffers_log("BUF[HSK]: Emptied buffer\n");
 
+	session->internals.handshake_hash_buffer_client_hello_len = 0;
 	session->internals.handshake_hash_buffer_client_kx_len = 0;
 	session->internals.handshake_hash_buffer_server_finished_len = 0;
 	session->internals.handshake_hash_buffer_client_finished_len = 0;
@@ -1408,6 +1409,9 @@ handshake_hash_add_recvd(gnutls_session_t session,
 	/* save the size until client KX. That is because the TLS
 	 * session hash is calculated up to this message.
 	 */
+	if (recv_type == GNUTLS_HANDSHAKE_CLIENT_HELLO)
+		session->internals.handshake_hash_buffer_client_hello_len =
+			session->internals.handshake_hash_buffer.length;
 	if (recv_type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
 		session->internals.handshake_hash_buffer_client_kx_len =
 			session->internals.handshake_hash_buffer.length;
@@ -1459,6 +1463,9 @@ handshake_hash_add_sent(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	if (type == GNUTLS_HANDSHAKE_CLIENT_HELLO)
+		session->internals.handshake_hash_buffer_client_hello_len =
+			session->internals.handshake_hash_buffer.length;
 	if (type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
 		session->internals.handshake_hash_buffer_client_kx_len =
 			session->internals.handshake_hash_buffer.length;

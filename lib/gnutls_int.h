@@ -1072,6 +1072,7 @@ typedef struct {
 
 	int handshake_hash_buffer_prev_len;	/* keeps the length of handshake_hash_buffer, excluding
 						 * the last received message */
+	unsigned handshake_hash_buffer_client_hello_len; /* if non-zero it is the length of data until the client hello message */
 	unsigned handshake_hash_buffer_client_kx_len;/* if non-zero it is the length of data until the
 						 * the client key exchange message */
 	unsigned handshake_hash_buffer_server_finished_len;/* if non-zero it is the length of data until the
