@@ -70,9 +70,13 @@ gnutls_datum_t hrnd = {(void*)"\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
 static const
 gnutls_datum_t hsrnd = {(void*)"\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32};
 
+static int gnutls_rnd_works;
+
 int __attribute__ ((visibility ("protected")))
 gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
+	gnutls_rnd_works = 1;
+
 	memset(data, 0xff, len);
 
 	/* Flip the first byte to avoid infinite loop in the RSA
@@ -134,6 +138,11 @@ static void check_prfs(gnutls_session_t session)
 {
 	unsigned char key_material[512];
 	int ret;
+
+	if (!gnutls_rnd_works) {
+		fprintf(stderr, "gnutls_rnd() could not be overridden, see #584\n");
+		exit(77);
+	}
 
 	TRY_OLD(13, "key expansion", 34, (uint8_t*)KEY_EXP_VALUE);
 	TRY_OLD(6, "hello", 31, (uint8_t*)HELLO_VALUE);
