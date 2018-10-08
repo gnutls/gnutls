@@ -152,9 +152,12 @@ inline static void _check_wait_status(int status, unsigned sigonly)
 		if (WIFSIGNALED(status)) {
 			fail("Child died with signal %d\n", WTERMSIG(status));
 		} else {
-			if (!sigonly)
+			if (!sigonly) {
+				if (WEXITSTATUS(status) == 77)
+					exit(77);
 				fail("Child died with status %d\n",
 				     WEXITSTATUS(status));
+			}
 		}
 	}
 #endif
