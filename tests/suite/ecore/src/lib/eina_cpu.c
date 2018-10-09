@@ -24,7 +24,7 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#elif defined (__SUNPRO_C) || defined(__GNU__)
+#elif defined (__SUNPRO_C) || defined(__GNUC__)
 #include <unistd.h>
 #elif defined (__FreeBSD__) || defined (__OpenBSD__) || \
    defined (__NetBSD__) || defined (__DragonFly__) || defined (__MacOSX__) || \
@@ -86,7 +86,7 @@ EAPI int eina_cpu_count(void)
 	GetSystemInfo(&sysinfo);
 	return sysinfo.dwNumberOfProcessors;
 
-#elif defined (__SUNPRO_C) || defined(__GNU__)
+#elif defined (__SUNPRO_C) || defined(__GNUC__)
 	/*
 	 * _SC_NPROCESSORS_ONLN: number of processors that are online, that
 	 is available when sysconf is called. The number
