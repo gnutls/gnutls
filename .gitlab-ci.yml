@@ -506,6 +506,7 @@ Debian.x86_64:
   - cd ..
   tags:
   - shared
+  - docker
   except:
   - tags
   artifacts:
