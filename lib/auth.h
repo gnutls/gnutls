@@ -57,7 +57,7 @@ const void *_gnutls_get_cred(gnutls_session_t session,
 			     gnutls_credentials_type_t type);
 const void *_gnutls_get_kx_cred(gnutls_session_t session,
 				gnutls_kx_algorithm_t algo);
-int _gnutls_auth_info_set(gnutls_session_t session,
+int _gnutls_auth_info_init(gnutls_session_t session,
 			  gnutls_credentials_type_t type, int size,
 			  int allow_change);
 

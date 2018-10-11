@@ -650,7 +650,7 @@ _gnutls_proc_x509_crt(gnutls_session_t session,
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
 				   sizeof(cert_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -842,7 +842,7 @@ _gnutls_proc_cert_cert_req(gnutls_session_t session, uint8_t * data,
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
 				   sizeof(cert_auth_info_st), 0)) < 0) {
 		gnutls_assert();
 		return ret;

@@ -74,7 +74,7 @@ gen_anon_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
 				   sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -113,7 +113,7 @@ proc_anon_server_kx(gnutls_session_t session, uint8_t * data,
 
 	/* set auth_info */
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
 				   sizeof(anon_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;

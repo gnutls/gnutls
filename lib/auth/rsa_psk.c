@@ -281,7 +281,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	ret = _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
+	ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
 				    sizeof(psk_auth_info_st), 1);
 	if (ret < 0) {
 		gnutls_assert();
