@@ -1508,7 +1508,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
 							continue;
 					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
-						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
+						ret = _gnutls_select_server_cert(session, peer_clist->entry[i]);
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();
@@ -1553,7 +1553,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
 							break;
 					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
-						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
+						ret = _gnutls_select_server_cert(session, peer_clist->entry[i]);
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();

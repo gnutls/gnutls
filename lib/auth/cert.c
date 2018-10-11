@@ -1244,7 +1244,7 @@ static void get_server_name(gnutls_session_t session, uint8_t * name,
  * can be selected returns an error.
  *
  * IMPORTANT
- * Currently this function is only called from _gnutls_server_select_cert,
+ * Currently this function is only called from _gnutls_select_server_cert,
  * i.e. it is only called at the server. We therefore retrieve the
  * negotiated server certificate type within this function.
  * If, in the future, this routine is called at the client then we
@@ -1315,7 +1315,7 @@ int cert_select_sign_algorithm(gnutls_session_t session,
  *
  */
 int
-_gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs)
+_gnutls_select_server_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs)
 {
 	unsigned i, j;
 	int idx, ret;
