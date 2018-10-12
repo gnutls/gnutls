@@ -456,7 +456,7 @@ inline static int wrap_pull_timeout_func(gnutls_transport_ptr_t ptr,
 
 void
 socket_open2(socket_st * hd, const char *hostname, const char *service,
-	    const char *app_proto, int flags, const char *msg, gnutls_datum_t *rdata,
+	    const char *app_proto, int flags, const char *msg, gnutls_datum_t *rdata, gnutls_datum_t *edata,
 	    FILE *server_trace, FILE *client_trace)
 {
 	struct addrinfo hints, *res, *ptr;
@@ -477,6 +477,11 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 	if (rdata) {
 		hd->rdata.data = rdata->data;
 		hd->rdata.size = rdata->size;
+	}
+
+	if (edata) {
+		hd->edata.data = edata->data;
+		hd->edata.size = edata->size;
 	}
 
 	ret = gnutls_idna_map(hostname, strlen(hostname), &idna, 0);
@@ -564,6 +569,13 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 		}
 
 		if (hd->session) {
+			if (hd->edata.data) {
+				ret = gnutls_record_send_early_data(hd->session, hd->edata.data, hd->edata.size);
+				if (ret < 0) {
+					fprintf(stderr, "error sending early data\n");
+					exit(1);
+				}
+			}
 			if (hd->rdata.data) {
 				gnutls_session_set_data(hd->session, hd->rdata.data, hd->rdata.size);
 			}
@@ -621,6 +633,8 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 	hd->addr_info = res;
 	gnutls_free(hd->rdata.data);
 	hd->rdata.data = NULL;
+	gnutls_free(hd->edata.data);
+	hd->edata.data = NULL;
 	gnutls_free(idna.data);
 	return;
 }

@@ -75,6 +75,13 @@ flag = {
 };
 
 flag = {
+    name      = earlydata;
+    arg-type  = string;
+    descrip   = "Send early data on resumption from the specified file";
+    doc      = "";
+};
+
+flag = {
     name      = rehandshake;
     value     = e;
     descrip   = "Establish a session and rehandshake";
