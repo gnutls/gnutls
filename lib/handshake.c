@@ -539,23 +539,40 @@ _gnutls_user_hello_func(gnutls_session_t session,
 	return sret;
 }
 
+/* Associates the right credential types for the session, and
+ * performs sanity checks. */
 static int set_auth_types(gnutls_session_t session)
 {
 	const version_entry_st *ver = get_version(session);
 	gnutls_kx_algorithm_t kx;
 
-	kx = session->security_parameters.cs->kx_algorithm;
-	if (kx == 0 && ver->tls13_sem) {
-		/* if we are resuming then the KX seen doesn't match the original */
+	/* sanity check:
+	 * we see TLS1.3 negotiated but no key share was sent */
+	if (ver->tls13_sem) {
+		if (unlikely(!(session->internals.hsk_flags & HSK_PSK_KE_MODE_PSK) &&
+			     !(session->internals.hsk_flags & HSK_KEY_SHARE_RECEIVED))) {
+			return gnutls_assert_val(GNUTLS_E_MISSING_EXTENSION);
+		}
+
+		/* Under TLS1.3 this returns a KX which matches the negotiated
+		 * groups from the key shares; if we are resuming then the KX seen
+		 * here doesn't match the original session. */
 		if (session->internals.resumed == RESUME_FALSE)
 			kx = gnutls_kx_get(session);
+		else
+			kx = GNUTLS_KX_UNKNOWN;
+	} else {
+		/* TLS1.2 or earlier, kx is associated with ciphersuite */
+		kx = session->security_parameters.cs->kx_algorithm;
 	}
 
-	if (kx) {
+	if (kx != GNUTLS_KX_UNKNOWN) {
 		session->security_parameters.server_auth_type = _gnutls_map_kx_get_cred(kx, 1);
 		session->security_parameters.client_auth_type = _gnutls_map_kx_get_cred(kx, 0);
-	} else if (session->internals.resumed == RESUME_FALSE) {
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	} else if (unlikely(session->internals.resumed == RESUME_FALSE)) {
+		/* Here we can only arrive if something we received
+		 * prevented the session from completing. */
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 	}
 
 	return 0;

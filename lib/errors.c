@@ -81,6 +81,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INAPPROPRIATE_FALLBACK),
 	ERROR_ENTRY(N_("An illegal TLS extension was received."),
 		    GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION),
+	ERROR_ENTRY(N_("An required TLS extension was received."),
+		    GNUTLS_E_MISSING_EXTENSION),
 	ERROR_ENTRY(N_("A TLS fatal alert has been received."),
 		    GNUTLS_E_FATAL_ALERT_RECEIVED),
 	ERROR_ENTRY(N_("An unexpected TLS packet was received."),

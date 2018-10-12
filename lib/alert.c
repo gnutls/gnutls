@@ -79,6 +79,8 @@ static const gnutls_alert_entry sup_alerts[] = {
 		    N_("The server name sent was not recognized")),
 	ALERT_ENTRY(GNUTLS_A_UNKNOWN_PSK_IDENTITY,
 		    N_("The SRP/PSK username is missing or not known")),
+	ALERT_ENTRY(GNUTLS_A_MISSING_EXTENSION,
+		    N_("An extension was expected but was not seen")),
 	ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
 		    N_
 		    ("No supported application protocol could be negotiated")),
@@ -260,6 +262,10 @@ int gnutls_error_to_alert(int err, int *level)
 		break;
 	case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
 		ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_MISSING_EXTENSION:
+		ret = GNUTLS_A_MISSING_EXTENSION;
 		_level = GNUTLS_AL_FATAL;
 		break;
 	case GNUTLS_E_USER_ERROR:
