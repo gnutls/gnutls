@@ -551,13 +551,13 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 /* Sets the next epoch to be a clone of the current one.
  * The keys are not cloned, only the cipher and MAC.
  */
-int _gnutls_epoch_dup(gnutls_session_t session)
+int _gnutls_epoch_dup(gnutls_session_t session, unsigned int epoch_rel)
 {
 	record_parameters_st *prev;
 	record_parameters_st *next;
 	int ret;
 
-	ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &prev);
+	ret = _gnutls_epoch_get(session, epoch_rel, &prev);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

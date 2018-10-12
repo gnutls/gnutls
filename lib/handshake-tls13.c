@@ -255,7 +255,7 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 				 session->security_parameters.prf->output_size);
 
 	_gnutls_epoch_bump(session);
-	ret = _gnutls_epoch_dup(session);
+	ret = _gnutls_epoch_dup(session, EPOCH_READ_CURRENT);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
