@@ -61,6 +61,7 @@ static int debug = 0;
 unsigned int verbose = 1;
 static int nodb;
 static int noticket;
+static int earlydata;
 int require_cert;
 int disable_client_cert;
 
@@ -140,6 +141,7 @@ LIST_TYPE_DECLARE(listener_item, char *http_request; char *http_response;
 		  int handshake_ok;
 		  int close_ok;
 		  time_t start;
+		  int earlydata_eof;
     );
 
 static const char *safe_strerror(int value)
@@ -375,11 +377,15 @@ gnutls_session_t initialize_session(int dtls)
 	const char *err;
 	gnutls_datum_t alpn[MAX_ALPN_PROTOCOLS];
 	unsigned alpn_size;
+	unsigned flags = GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH;
 
 	if (dtls)
-		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_POST_HANDSHAKE_AUTH);
-	else
-		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH);
+		flags |= GNUTLS_DATAGRAM;
+
+	if (earlydata)
+		flags |= GNUTLS_ENABLE_EARLY_DATA;
+
+	gnutls_init(&session, flags);
 
 	/* allow the use of private ciphersuites.
 	 */
@@ -1463,11 +1469,27 @@ static void tcp_server(const char *name, int port)
 				}
 
 				if (j->handshake_ok == 1) {
-					r = gnutls_record_recv(j->
-							       tls_session,
-							       buf,
-							       MIN(sizeof(buf),
-								   SMALL_READ_TEST));
+					int earlydata_read = 0;
+					if (earlydata && !j->earlydata_eof) {
+						r = gnutls_record_recv_early_data(j->
+										  tls_session,
+										  buf,
+										  MIN(sizeof(buf),
+										      SMALL_READ_TEST));
+						if (r == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+							j->earlydata_eof = 1;
+						}
+						if (r == 0) {
+							earlydata_read = 1;
+						}
+					}
+					if (!earlydata_read) {
+						r = gnutls_record_recv(j->
+								       tls_session,
+								       buf,
+								       MIN(sizeof(buf),
+									   SMALL_READ_TEST));
+					}
 					if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
 						/* do nothing */
 					} else if (r <= 0) {
@@ -1659,6 +1681,7 @@ static void cmd_parser(int argc, char **argv)
 
 	nodb = HAVE_OPT(NODB);
 	noticket = HAVE_OPT(NOTICKET);
+	earlydata = HAVE_OPT(EARLYDATA);
 
 	if (HAVE_OPT(ECHO))
 		http = 0;
