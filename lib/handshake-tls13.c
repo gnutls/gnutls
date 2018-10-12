@@ -270,6 +270,14 @@ static int generate_and_set_hs_traffic_keys(gnutls_session_t session)
 	if (unlikely(session->key.proto.tls13.temp_secret_size == 0))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+	ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
+				   NULL, 0, session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.temp_secret);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	if ((session->security_parameters.entity == GNUTLS_CLIENT &&
 	      (!(session->internals.hsk_flags & HSK_KEY_SHARE_RECEIVED) ||
 	        (!(session->internals.hsk_flags & HSK_PSK_KE_MODE_DHE_PSK) &&

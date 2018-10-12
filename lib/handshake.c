@@ -1985,14 +1985,6 @@ read_server_hello(gnutls_session_t session,
 			gnutls_assert();
 			goto cleanup;
 		}
-
-		ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-					   NULL, 0, session->key.proto.tls13.temp_secret,
-					   session->key.proto.tls13.temp_secret);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
 	}
 
 	ret = set_auth_types(session);
@@ -2352,14 +2344,6 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 		}
 
 		if (vers->tls13_sem) {
-			ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
-						   NULL, 0, session->key.proto.tls13.temp_secret,
-						   session->key.proto.tls13.temp_secret);
-			if (ret < 0) {
-				gnutls_assert();
-				goto fail;
-			}
-
 			/* Under TLS1.3, the session ID is used for different purposes than
 			 * the TLS1.0 session ID. Ensure that there is an internally set
 			 * value which the server will see on the original and resumed sessions */
