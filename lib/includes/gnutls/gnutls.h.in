@@ -399,6 +399,7 @@ typedef enum {
  *   finish; similarly to false start the handshake will be completed once data are received by the
  *   client, while the server is able to transmit sooner. This is not enabled by default as it could
  *   break certain existing server assumptions and use-cases. Since 3.6.4.
+ * @GNUTLS_ENABLE_EARLY_DATA: Under TLS1.3 allow the server to receive early data sent as part of the initial ClientHello (0-RTT). This is not enabled by default as early data has weaker security properties than other data. Since 3.6.5.
  * @GNUTLS_FORCE_CLIENT_CERT: When in client side and only a single cert is specified, send that certificate irrespective of the issuers expected by the server. Since 3.5.0.
  * @GNUTLS_NO_TICKETS: Flag to indicate that the session should not use resumption with session tickets.
  * @GNUTLS_KEY_SHARE_TOP3: Generate key shares for the top-3 different groups which are enabled.
@@ -456,7 +457,8 @@ typedef enum {
 	GNUTLS_SAFE_PADDING_CHECK = (1<<16),
 	GNUTLS_ENABLE_EARLY_START = (1<<17),
 	GNUTLS_ENABLE_CERT_TYPE_NEG = (1<<18),
-	GNUTLS_AUTO_REAUTH = (1<<19)
+	GNUTLS_AUTO_REAUTH = (1<<19),
+	GNUTLS_ENABLE_EARLY_DATA = (1<<20)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls
@@ -1502,6 +1504,7 @@ unsigned gnutls_session_etm_status(gnutls_session_t session);
  * @GNUTLS_SFLAGS_SESSION_TICKET: A session ticket has been received by the server.
  * @GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH: Indicates client capability for post-handshake auth; set only on server side.
  * @GNUTLS_SFLAGS_EARLY_START: The TLS1.3 server session returned early.
+ * @GNUTLS_SFLAGS_EARLY_DATA: The TLS1.3 early data has been received by the server.
  *
  * Enumeration of different session parameters.
  */
@@ -1515,7 +1518,8 @@ typedef enum {
 	GNUTLS_SFLAGS_RFC7919 = 1<<6,
 	GNUTLS_SFLAGS_SESSION_TICKET = 1<<7,
 	GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH = 1<<8,
-	GNUTLS_SFLAGS_EARLY_START = 1<<9
+	GNUTLS_SFLAGS_EARLY_START = 1<<9,
+	GNUTLS_SFLAGS_EARLY_DATA = 1<<10
 } gnutls_session_flags_t;
 
 unsigned gnutls_session_get_flags(gnutls_session_t session);

@@ -1370,42 +1370,89 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	_mbuffer_head_remove_bytes(&session->internals.record_recv_buffer,
 				   record.header_size + record.length);
 
-	/* FIXME: as 0-RTT is not implemented yet, when early data is
-	 * indicated, skip decryption failure up to
-	 * max_early_data_size. Otherwise, if the record is properly
-	 * decrypted, treat it as the start of client's second flight.
-	 *
-	 * This implements the first way suggested in 4.2.10 of
-	 * draft-ietf-tls-tls13-28.
-	 */
-	if (unlikely(session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT)) {
-		if (record.type == GNUTLS_APPLICATION_DATA &&
-		    (ret < 0 ||
-		     /* early data must always be encrypted, treat it
-		      * as decryption failure if otherwise */
-		     record_params->cipher->id == GNUTLS_CIPHER_NULL)) {
-			if (record.length >
-			    session->security_parameters.max_early_data_size -
-			    session->internals.early_data_received) {
+	if (session->security_parameters.entity == GNUTLS_SERVER &&
+	    session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) {
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {
+			if (ret < 0 ||
+			    /* early data must always be encrypted, treat it
+			     * as decryption failure if otherwise */
+			    record_params->cipher->id == GNUTLS_CIPHER_NULL) {
 				_gnutls_record_log
-					("REC[%p]: max_early_data_size exceeded\n",
-					 session);
-				ret = GNUTLS_E_UNEXPECTED_PACKET;
+					("REC[%p]: failed to decrypt early data, in epoch %d\n",
+					 session,
+						record_params->epoch);
+				ret = GNUTLS_E_DECRYPTION_FAILED;
 				goto sanity_check_error;
-			}
+			} else if (record.type == GNUTLS_APPLICATION_DATA) {
+				size_t decrypted_length =
+					_mbuffer_get_udata_size(decrypted);
+				_gnutls_record_log
+					("REC[%p]: decrypted early data with length: %d, in epoch %d\n",
+					 session,
+					 (int) decrypted_length,
+					 record_params->epoch);
+				if (decrypted_length >
+				    session->security_parameters.max_early_data_size -
+				    session->internals.early_data_received) {
+					_gnutls_record_log
+						("REC[%p]: max_early_data_size exceeded\n",
+						 session);
+					ret = GNUTLS_E_UNEXPECTED_PACKET;
+					goto sanity_check_error;
+				}
 
-			_gnutls_record_log("REC[%p]: Discarded early data[%u] due to invalid decryption, length: %u\n",
-					   session,
-					   (unsigned int)
-					   _gnutls_uint64touint32(packet_sequence),
-					   (unsigned int)
-					   record.length);
-			session->internals.early_data_received += record.length;
-			/* silently discard received data */
-			_mbuffer_xfree(&decrypted);
-			return gnutls_assert_val(GNUTLS_E_AGAIN);
+				_mbuffer_enqueue(&session->internals.early_data_recv_buffer, decrypted);
+				session->internals.early_data_received +=
+					decrypted_length;
+
+				/* Increase sequence number. We do both for TLS and DTLS, since in
+				 * DTLS we also rely on that number (roughly) since it may get reported
+				 * to application via gnutls_record_get_state().
+				 */
+				if (sequence_increment(session, &record_state->sequence_number) != 0) {
+					session_invalidate(session);
+					gnutls_assert();
+					ret = GNUTLS_E_RECORD_LIMIT_REACHED;
+					goto sanity_check_error;
+				}
+
+				/* decrypted is now accounted */
+				return GNUTLS_E_AGAIN;
+			}
 		} else {
-			session->internals.hsk_flags &= ~HSK_EARLY_DATA_IN_FLIGHT;
+			/* We do not accept early data: skip decryption
+			 * failure up to max_early_data_size. Otherwise,
+			 * if the record is properly decrypted, treat it as
+			 * the start of client's second flight.
+			 */
+			if (record.type == GNUTLS_APPLICATION_DATA &&
+			    (ret < 0 ||
+			     /* early data must always be encrypted, treat it
+			      * as decryption failure if otherwise */
+			     record_params->cipher->id == GNUTLS_CIPHER_NULL)) {
+				if (record.length >
+				    session->security_parameters.max_early_data_size -
+				    session->internals.early_data_received) {
+					_gnutls_record_log
+						("REC[%p]: max_early_data_size exceeded\n",
+						 session);
+					ret = GNUTLS_E_UNEXPECTED_PACKET;
+					goto sanity_check_error;
+				}
+
+				_gnutls_record_log("REC[%p]: Discarded early data[%u] due to invalid decryption, length: %u\n",
+						   session,
+						   (unsigned int)
+						   _gnutls_uint64touint32(packet_sequence),
+						   (unsigned int)
+						   record.length);
+				session->internals.early_data_received += record.length;
+				/* silently discard received data */
+				_mbuffer_xfree(&decrypted);
+				return gnutls_assert_val(GNUTLS_E_AGAIN);
+			} else {
+				session->internals.hsk_flags &= ~HSK_EARLY_DATA_IN_FLIGHT;
+			}
 		}
 	}
 
@@ -1926,7 +1973,8 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 		 * data. We allow sending however, if we are in false start handshake
 		 * state. */
 		if (session->internals.recv_state != RECV_STATE_FALSE_START &&
-		    session->internals.recv_state != RECV_STATE_EARLY_START)
+		    session->internals.recv_state != RECV_STATE_EARLY_START &&
+		    !(session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT))
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
 	}
 

@@ -39,7 +39,7 @@ const hello_ext_entry_st ext_mod_early_data = {
 	.name = "Early Data",
 	.tls_id = 42,
 	.gid = GNUTLS_EXTENSION_EARLY_DATA,
-	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO,
+	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_CLIENT_HELLO | GNUTLS_EXT_FLAG_EE,
 	.parse_type = GNUTLS_EXT_MANDATORY, /* force parsing prior to EXT_TLS extensions */
 	.recv_func = early_data_recv_params,
 	.send_func = early_data_send_params,
@@ -54,10 +54,20 @@ early_data_recv_params(gnutls_session_t session,
 		       const uint8_t * data, size_t _data_size)
 {
 	const version_entry_st *vers = get_version(session);
+
 	if (!vers || !vers->tls13_sem)
 		return gnutls_assert_val(0);
-	if (session->security_parameters.entity == GNUTLS_SERVER)
+
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		if ((session->internals.flags & GNUTLS_ENABLE_EARLY_DATA) &&
+		    /* Refuse early data when this is a second CH after HRR */
+		    !(session->internals.hsk_flags & HSK_HRR_SENT))
+			session->internals.hsk_flags |= HSK_EARLY_DATA_ACCEPTED;
 		session->internals.hsk_flags |= HSK_EARLY_DATA_IN_FLIGHT;
+	} else {
+		if (_gnutls_ext_get_msg(session) == GNUTLS_EXT_FLAG_EE)
+			session->internals.hsk_flags |= HSK_EARLY_DATA_ACCEPTED;
+	}
 
 	return 0;
 }
@@ -68,6 +78,16 @@ static int
 early_data_send_params(gnutls_session_t session,
 		       gnutls_buffer_st * extdata)
 {
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED)
+			return GNUTLS_E_INT_RET_0;
+	} else {
+		if (session->internals.early_data_presend_buffer.length > 0) {
+			session->internals.hsk_flags |= HSK_EARLY_DATA_IN_FLIGHT;
+			return GNUTLS_E_INT_RET_0;
+		}
+	}
+
 	return 0;
 }
 

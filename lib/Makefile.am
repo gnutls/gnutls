@@ -97,6 +97,7 @@ COBJECTS += tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
 	tls13/hello_retry.c tls13/hello_retry.h \
 	tls13/session_ticket.c tls13/session_ticket.h \
 	tls13/certificate.c tls13/certificate.h \
+	tls13/early_data.c tls13/early_data.h \
 	tls13/post_handshake.c \
 	tls13/psk_ext_parser.c tls13/psk_ext_parser.h
 
