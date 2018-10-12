@@ -24,8 +24,6 @@ tls_fuzzer_prepare() {
 PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1"
 
 sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nocert-tls13.json >${TMPFILE}
-
-sed -i 's/(127, 28)/(3, 4)/g' ./tlslite/constants.py
 }
 
 . "${srcdir}/tls-fuzzer/tls-fuzzer-common.sh"
