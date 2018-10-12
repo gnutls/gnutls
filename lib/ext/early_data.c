@@ -92,6 +92,25 @@ early_data_send_params(gnutls_session_t session,
 }
 
 /**
+ * gnutls_record_get_max_early_data_size:
+ * @session: is a #gnutls_session_t type.
+ *
+ * This function returns the maximum early data size in this connection.
+ * This property can only be set to servers.  The client may be
+ * provided with the maximum allowed size through the "early_data"
+ * extension of the NewSessionTicket handshake message.
+ *
+ * Returns: The maximum early data size in this connection.
+ *
+ * Since: 3.6.5
+ **/
+size_t
+gnutls_record_get_max_early_data_size(gnutls_session_t session)
+{
+	return session->security_parameters.max_early_data_size;
+}
+
+/**
  * gnutls_record_set_max_early_data_size:
  * @session: is a #gnutls_session_t type.
  * @size: is the new size
@@ -113,7 +132,8 @@ gnutls_record_set_max_early_data_size(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	if (size > UINT32_MAX)
+	/* Reject zero as well, as it is useless. */
+	if (size == 0 || size > UINT32_MAX)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	session->security_parameters.max_early_data_size = (uint32_t) size;

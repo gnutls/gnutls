@@ -2030,6 +2030,94 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 }
 
 /**
+ * gnutls_record_send_early_data:
+ * @session: is a #gnutls_session_t type.
+ * @data: contains the data to send
+ * @data_size: is the length of the data
+ *
+ * This function can be used by a client to send data early in the
+ * handshake processes when resuming a session.  This is used to
+ * implement a zero-roundtrip (0-RTT) mode.  It has the same semantics
+ * as gnutls_record_send().
+ *
+ * There may be a limit to the amount of data sent as early data.  Use
+ * gnutls_record_get_max_early_data_size() to check the limit.
+ *
+ * Returns: The number of bytes sent, or a negative error code.  The
+ *   number of bytes sent might be less than @data_size.  The maximum
+ *   number of bytes this function can send in a single call depends
+ *   on the negotiated maximum record size.
+ *
+ * Since: 3.6.5
+ **/
+ssize_t gnutls_record_send_early_data(gnutls_session_t session,
+				      const void *data,
+				      size_t data_size)
+{
+	int ret;
+
+	if (session->security_parameters.entity != GNUTLS_CLIENT)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret =
+	    _gnutls_buffer_append_data(&session->internals.
+				       early_data_presend_buffer, data,
+				       data_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return ret;
+}
+
+/**
+ * gnutls_record_recv_early_data:
+ * @session: is a #gnutls_session_t type.
+ * @data: the buffer that the data will be read into
+ * @data_size: the number of requested bytes
+ *
+ * This function can be used by a searver to retrieve data sent early
+ * in the handshake processes when resuming a session.  This is used
+ * to implement a zero-roundtrip (0-RTT) mode.  It has the same
+ * semantics as gnutls_record_recv().
+ *
+ * This function can be called either in a handshake hook, or after
+ * the handshake is complete.
+ *
+ * Returns: The number of bytes received and zero when early data
+ * reading is complete.  A negative error code is returned in case of
+ * an error.  If no early data is received during the handshake, this
+ * function returns %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.  The
+ * number of bytes received might be less than the requested
+ * @data_size.
+ *
+ * Since: 3.6.5
+ **/
+ssize_t
+gnutls_record_recv_early_data(gnutls_session_t session, void *data, size_t data_size)
+{
+	mbuffer_st *bufel;
+	gnutls_datum_t msg;
+	size_t length;
+
+	if (session->security_parameters.entity != GNUTLS_SERVER)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	bufel = _mbuffer_head_get_first(&session->internals.early_data_recv_buffer,
+					&msg);
+	if (bufel == NULL)
+		return
+		    gnutls_assert_val
+		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	length = MIN(msg.size, data_size);
+	memcpy(data, msg.data, length);
+	_mbuffer_head_remove_bytes(&session->internals.early_data_recv_buffer,
+				   length);
+
+	return length;
+}
+
+/**
  * gnutls_record_cork:
  * @session: is a #gnutls_session_t type.
  *
