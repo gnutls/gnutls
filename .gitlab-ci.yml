@@ -462,10 +462,12 @@ Debian.x86_64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
+  - set -e
   - ./bootstrap
   - mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile --disable-full-test-suite LDFLAGS='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' &&
+    ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile --disable-full-test-suite LDFLAGS='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now' &&
     make -j$(nproc) && make check -j$(nproc)
+  - echo "status is $?"
   - cd ..
   tags:
   - shared
