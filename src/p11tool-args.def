@@ -57,8 +57,9 @@ flag = {
 
 flag = {
     name      = initialize-so-pin;
-    descrip   = "Initializes/Resets a PKCS #11 token security officer PIN";
-    doc = "";
+    descrip   = "Initializes/Resets a PKCS #11 token security officer PIN.";
+    doc = "This initializes the security officer's PIN. When used non-interactively use the GNUTLS_NEW_SO_PIN
+environment variables to initialize SO's PIN.";
 };
 
 flag = {

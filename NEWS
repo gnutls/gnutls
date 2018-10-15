@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Provide the option of transparent re-handshake/reauthentication
    when the GNUTLS_AUTO_REAUTH flag is specified in gnutls_init().
 
+** p11tool: fix initialization of security officer's PIN with the --initialize-so-pin
+   option (#561)
+
 ** API and ABI modifications:
 GNUTLS_AUTO_REAUTH: Added
 

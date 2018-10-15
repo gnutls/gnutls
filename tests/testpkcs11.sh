@@ -57,7 +57,7 @@ CERTTOOL_PARAM="--stdout-info"
 
 if test "${WINDIR}" != ""; then
 	exit 77
-fi 
+fi
 
 ASAN_OPTIONS="detect_leaks=0"
 export ASAN_OPTIONS
@@ -873,6 +873,120 @@ use_certificate_test () {
 	echo ok
 }
 
+reset_pins () {
+	token="$1"
+	UPIN="$2"
+	SOPIN="$3"
+	NEWPIN=88654321
+	LARGE_NEWPIN="1234123412341234123412341234123" #31 chars
+	TOO_LARGE_NEWPIN="12341234123412341234123412341234" #32 chars
+
+	echo -n "* Setting SO PIN... "
+	# Test admin PIN
+	GNUTLS_NEW_SO_PIN="${NEWPIN}" \
+	GNUTLS_SO_PIN="${SOPIN}" \
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-so-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	# reset back
+	echo -n "* Re-setting SO PIN... "
+	TMP="${NEWPIN}"
+	GNUTLS_SO_PIN="${TMP}" \
+	GNUTLS_NEW_SO_PIN="${SOPIN}" \
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-so-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	echo -n "* Setting too large SO PIN... "
+	GNUTLS_NEW_SO_PIN="${TOO_LARGE_NEWPIN}" \
+	GNUTLS_SO_PIN="${SOPIN}" \
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-so-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? = 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	echo -n "* Setting large SO PIN... "
+	GNUTLS_NEW_SO_PIN="${LARGE_NEWPIN}" \
+	GNUTLS_SO_PIN="${SOPIN}" \
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-so-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	# reset back
+	echo -n "* Re-setting SO PIN... "
+	TMP="${LARGE_NEWPIN}"
+	GNUTLS_SO_PIN="${TMP}" \
+	GNUTLS_NEW_SO_PIN="${SOPIN}" \
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-so-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	NEWPIN=977654321
+	# Test user PIN
+	echo -n "* Setting user PIN... "
+	export GNUTLS_SO_PIN="${SOPIN}"
+	export GNUTLS_PIN="${NEWPIN}"
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	echo -n "* Re-setting user PIN... "
+	export GNUTLS_PIN="${UPIN}"
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	echo -n "* Setting too large user PIN... "
+	export GNUTLS_SO_PIN="${SOPIN}"
+	export GNUTLS_PIN="${TOO_LARGE_NEWPIN}"
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? = 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	echo -n "* Setting large user PIN... "
+	export GNUTLS_SO_PIN="${SOPIN}"
+	export GNUTLS_PIN="${LARGE_NEWPIN}"
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+
+	echo -n "* Re-setting user PIN... "
+	export GNUTLS_PIN="${UPIN}"
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --initialize-pin "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit_error
+	fi
+	echo ok
+}
+
 
 
 echo "Testing PKCS11 support"
@@ -896,9 +1010,10 @@ fi
 . "${srcdir}/testpkcs11.${type}"
 
 export GNUTLS_PIN=12345678
-export GNUTLS_SO_PIN=00000000
+export GNUTLS_SO_PIN=00000001
 
 init_card "${GNUTLS_PIN}" "${GNUTLS_SO_PIN}"
+
 
 # find token name
 TOKEN=`${P11TOOL} ${ADDITIONAL_PARAM} --list-tokens pkcs11:token=Nikos|grep URL|grep token=GnuTLS-Test|sed 's/\s*URL\: //g'`
@@ -908,6 +1023,8 @@ if test "x${TOKEN}" = x; then
 	echo "Could not find generated token"
 	exit_error
 fi
+
+reset_pins "${TOKEN}" "${GNUTLS_PIN}" "${GNUTLS_SO_PIN}"
 
 #write a given privkey
 write_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/client.key"

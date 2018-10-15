@@ -25,6 +25,7 @@
 
 #include <config.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/pkcs11.h>
 #include <certtool-common.h>
 #include <c-ctype.h>
 #include <string.h>
@@ -70,6 +71,10 @@ const char *raw_to_string(const unsigned char *raw, size_t raw_size);
 const char *raw_to_hex(const unsigned char *raw, size_t raw_size);
 const char *raw_to_base64(const unsigned char *raw, size_t raw_size);
 int check_command(gnutls_session_t session, const char *str, unsigned no_cli_cert);
+
+#define MAX_PIN_LEN GNUTLS_PKCS11_MAX_PIN_LEN
+void getenv_copy(char *str, size_t max_str_size, const char *envvar);
+void getpass_copy(char *pass, size_t max_pass_size, const char *prompt);
 
 int
 pin_callback(void *user, int attempt, const char *token_url,

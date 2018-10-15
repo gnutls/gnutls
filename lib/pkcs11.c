@@ -35,9 +35,7 @@
 
 #include <pin.h>
 #include <pkcs11_int.h>
-#include <p11-kit/p11-kit.h>
 #include "pkcs11x.h"
-#include <p11-kit/pin.h>
 #include <system-keys.h>
 #include "x509/x509_int.h"
 
@@ -2781,10 +2779,10 @@ retrieve_pin_from_callback(const struct pin_info_st *pin_info,
 	return 0;
 }
 
-static int
-retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
-	     struct ck_token_info *token_info, int attempts,
-	     ck_user_type_t user_type, struct p11_kit_pin **pin)
+int
+pkcs11_retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
+		    struct ck_token_info *token_info, int attempts,
+		    ck_user_type_t user_type, struct p11_kit_pin **pin)
 {
 	const char *pinfile;
 	int ret = GNUTLS_E_PKCS11_PIN_ERROR;
@@ -2930,8 +2928,8 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		}
 
 		ret =
-		    retrieve_pin(pin_info, info, &tinfo, attempt++,
-				 user_type, &pin);
+		    pkcs11_retrieve_pin(pin_info, info, &tinfo, attempt++,
+					user_type, &pin);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
