@@ -764,6 +764,7 @@ tests/tls13-cert-key-exchange
 tests/tls13/change_cipher_spec
 tests/tls13-cipher-neg
 tests/tls13/cookie
+tests/tls13-early-data
 tests/tls13-early-start
 tests/tls13/hello_random_value
 tests/tls13/hello_retry_request

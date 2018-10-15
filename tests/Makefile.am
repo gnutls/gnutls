@@ -397,7 +397,7 @@ endif
 if HAVE_FORK
 ctests += x509self x509dn anonself pskself dhepskself	\
 	setcredcrash tls12-resume-x509 tls12-resume-psk tls12-resume-anon \
-	tls13-resume-x509 tls13-resume-psk
+	tls13-resume-x509 tls13-resume-psk tls13-early-data
 endif
 
 gc_CPPFLAGS = $(AM_CPPFLAGS) \
