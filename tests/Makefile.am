@@ -157,7 +157,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
 	 crlverify mini-dtls-discard init_fds mini-record-failure \
 	 tls12-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
-	 tls12-rehandshake-cert-auto eagain-auto-auth \
+	 tls12-rehandshake-cert-auto \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
 	 mini-dtls-record-asym key-import-export priority-set priority-set2 \
 	 pubkey-import-export sign-is-secure spki spki-abstract rsa-rsa-pss \
@@ -215,7 +215,8 @@ endif
 if HAVE_CMOCKA
 CMOCKA_LDADD = $(COMMON_LDADD) $(CMOCKA_LIBS)
 ctests += dtls-sliding-window ip-utils name-constraints-ip conv-utf8 str-unicode str-idna \
-	tls10-prf tls12-prf gnutls_record_overhead eagain tls12-rehandshake-cert
+	tls10-prf tls12-prf gnutls_record_overhead eagain tls12-rehandshake-cert \
+	eagain-auto-auth
 
 gnutls_record_overhead_LDADD = $(CMOCKA_LDADD)
 dtls_sliding_window_LDADD = $(CMOCKA_LDADD)
