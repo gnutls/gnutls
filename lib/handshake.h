@@ -71,8 +71,6 @@
 
 int _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
 			   gnutls_handshake_description_t type);
-int _gnutls_recv_hello_request(gnutls_session_t session, void *data,
-			       uint32_t data_size);
 int _gnutls_recv_handshake(gnutls_session_t session,
 			   gnutls_handshake_description_t type,
 			   unsigned int optional, gnutls_buffer_st * buf);

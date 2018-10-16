@@ -314,7 +314,9 @@ typedef enum recv_state_t {
 	RECV_STATE_ASYNC_HANDSHAKE, /* an incomplete async handshake message was seen */
 	/* server-side early start under TLS1.3; enabled when no client cert is received */
 	RECV_STATE_EARLY_START_HANDLING, /* we are calling gnutls_handshake() within record_recv() */
-	RECV_STATE_EARLY_START /* gnutls_record_recv() should complete the handshake */
+	RECV_STATE_EARLY_START, /* gnutls_record_recv() should complete the handshake */
+	RECV_STATE_REHANDSHAKE, /* gnutls_record_recv() should complete any incoming re-handshake requests */
+	RECV_STATE_REAUTH /* gnutls_record_recv() should complete any incoming reauthentication requests */
 } recv_state_t;
 
 #include "str.h"

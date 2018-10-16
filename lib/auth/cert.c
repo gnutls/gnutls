@@ -1338,11 +1338,13 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 	 * use it and leave. We make sure that this is called once.
 	 */
 	if (cred->get_cert_callback3) {
-
 		if (session->internals.selected_cert_list_length == 0) {
 			ret = call_get_cert_callback(session, NULL, 0, NULL, 0);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
+
+			if (session->internals.selected_cert_list_length == 0)
+				return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
 			_gnutls_debug_log("Selected (%s) cert\n",
 					  gnutls_pk_get_name(session->internals.selected_cert_list[0].pubkey->params.algo));
@@ -1352,9 +1354,8 @@ _gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_e
 						 &session->internals.selected_cert_list[0],
 						 session->internals.selected_key,
 						 cs);
-		if (ret < 0) {
+		if (ret < 0)
 			return gnutls_assert_val(ret);
-		}
 
 		return 0;
 	}

@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.5 (unreleased)
+
+** libgnutls: Provide the option of transparent re-handshake/reauthentication
+   when the GNUTLS_AUTO_REAUTH flag is specified in gnutls_init().
+
+** API and ABI modifications:
+GNUTLS_AUTO_REAUTH: Added
+
+
 * Version 3.6.4 (released 2018-09-24)
 
 ** libgnutls: Added the final (RFC8446) version numbering of the TLS1.3 protocol.
