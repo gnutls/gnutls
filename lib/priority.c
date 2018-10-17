@@ -591,11 +591,13 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	session->internals.priorities = priority;
 	gnutls_atomic_increment(&priority->usage_cnt);
 
-	/* set the current version to the first in the chain.
-	 * This will be overridden later.
-	 */
+	/* set the current version to the first in the chain, if this is
+	 * the call before the initial handshake. During a re-handshake
+	 * we do not set the version to avoid overriding the currently
+	 * negotiated version. */
 	if (session->internals.priorities->protocol.num_priorities > 0 &&
-	    !session->internals.handshake_in_progress) {
+	    !session->internals.handshake_in_progress &&
+	    !session->internals.initial_negotiation_completed) {
 		if (_gnutls_set_current_version(session,
 					    session->internals.priorities->
 					    protocol.priorities[0]) < 0) {
