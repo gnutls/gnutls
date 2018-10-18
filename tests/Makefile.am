@@ -327,6 +327,11 @@ pkcs11_obj_raw_SOURCES = pkcs11/pkcs11-obj-raw.c
 pkcs11_obj_raw_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_obj_raw_LDADD = $(LDADD) $(LIBDL)
 
+pkcs11_import_url_privkey_caps_SOURCES = pkcs11/pkcs11-import-url-privkey.c
+pkcs11_import_url_privkey_caps_DEPENDENCIES = libpkcs11mock1.la libutils.la
+pkcs11_import_url_privkey_caps_LDADD = $(LDADD) $(LIBDL)
+pkcs11_import_url_privkey_caps_CFLAGS = -DALL_CAPS_URI
+
 pkcs11_privkey_fork_SOURCES = pkcs11/pkcs11-privkey-fork.c
 pkcs11_privkey_fork_DEPENDENCIES = libpkcs11mock1.la libutils.la
 pkcs11_privkey_fork_LDADD = $(LDADD) $(LIBDL)
@@ -364,6 +369,9 @@ ctests += pkcs11-cert-import-url-exts pkcs11-get-exts pkcs11-get-raw-issuer-exts
 	pkcs11/gnutls_x509_crt_list_import_url pkcs11/gnutls_pcert_list_import_x509_file \
 	pkcs11-token-raw pkcs11-obj-raw
 
+if P11KIT_0_23_11_API
+ctests += pkcs11-import-url-privkey-caps
+endif
 
 endif
 endif
@@ -446,7 +454,7 @@ if ENABLE_PKCS11
 dist_check_SCRIPTS += p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh
 
 if HAVE_PKCS11_TRUST_STORE
-if P11KIT_0_23_10_API
+if P11KIT_0_23_11_API
 dist_check_SCRIPTS += p11-kit-load.sh
 indirect_tests += pkcs11/list-tokens
 endif
