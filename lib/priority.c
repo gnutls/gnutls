@@ -573,46 +573,46 @@ static void prio_add(priority_st * priority_list, unsigned int algo)
  * @priority: is a #gnutls_priority_t type.
  *
  * Sets the priorities to use on the ciphers, key exchange methods,
- * and macs.
+ * and macs. Note that this function is expected to be called once
+ * per session; when called multiple times (e.g., before a re-handshake,
+ * the caller should make sure that any new settings are not incompatible
+ * with the original session).
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code on error.
  **/
 int
 gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 {
-	if (priority == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_NO_CIPHER_SUITES;
-	}
+	int ret;
 
-	if (session->internals.priorities)
-		gnutls_priority_deinit(session->internals.priorities);
-
-	session->internals.priorities = priority;
-	gnutls_atomic_increment(&priority->usage_cnt);
+	if (priority == NULL || priority->protocol.num_priorities == 0 ||
+	    priority->cs.size == 0)
+		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	/* set the current version to the first in the chain, if this is
 	 * the call before the initial handshake. During a re-handshake
 	 * we do not set the version to avoid overriding the currently
 	 * negotiated version. */
-	if (session->internals.priorities->protocol.num_priorities > 0 &&
-	    !session->internals.handshake_in_progress &&
+	if (!session->internals.handshake_in_progress &&
 	    !session->internals.initial_negotiation_completed) {
-		if (_gnutls_set_current_version(session,
-					    session->internals.priorities->
-					    protocol.priorities[0]) < 0) {
-			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
-		}
+		ret = _gnutls_set_current_version(session,
+						  priority->protocol.priorities[0]);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
+
+	/* At this point the provided priorities passed the sanity tests */
+
+	if (session->internals.priorities)
+		gnutls_priority_deinit(session->internals.priorities);
+
+	gnutls_atomic_increment(&priority->usage_cnt);
+	session->internals.priorities = priority;
 
 	if (priority->no_tickets != 0) {
 		/* when PFS is explicitly requested, disable session tickets */
 		session->internals.flags |= GNUTLS_NO_TICKETS;
 	}
-
-	if (session->internals.priorities->protocol.num_priorities == 0 ||
-	    session->internals.priorities->cs.size == 0)
-		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 	ADD_PROFILE_VFLAGS(session, priority->additional_verify_flags);
 
