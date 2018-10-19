@@ -42,6 +42,7 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	gnettle.h rnd-common.h prf.c \
 	backport/cfb8.c backport/cfb8.h \
 	backport/cmac.c backport/cmac.h \
+	backport/xts.c backport/xts.h \
 	rnd.c int/rsa-fips.h int/rsa-keygen-fips186.c int/provable-prime.c \
 	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c \
 	int/tls1-prf.c int/tls1-prf.h
