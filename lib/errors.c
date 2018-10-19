@@ -431,6 +431,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INSUFFICIENT_SECURITY),
 	ERROR_ENTRY(N_("No common key share with peer."),
 		    GNUTLS_E_NO_COMMON_KEY_SHARE),
+	ERROR_ENTRY(N_("The early data were rejected."),
+		    GNUTLS_E_EARLY_DATA_REJECTED),
 	{NULL, NULL, 0}
 };
 

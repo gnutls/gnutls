@@ -59,10 +59,13 @@ early_data_recv_params(gnutls_session_t session,
 		return gnutls_assert_val(0);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		/* The flag may be cleared by pre_shared_key
+		 * extension, when replay is detected. */
 		if ((session->internals.flags & GNUTLS_ENABLE_EARLY_DATA) &&
 		    /* Refuse early data when this is a second CH after HRR */
 		    !(session->internals.hsk_flags & HSK_HRR_SENT))
 			session->internals.hsk_flags |= HSK_EARLY_DATA_ACCEPTED;
+
 		session->internals.hsk_flags |= HSK_EARLY_DATA_IN_FLIGHT;
 	} else {
 		if (_gnutls_ext_get_msg(session) == GNUTLS_EXT_FLAG_EE)

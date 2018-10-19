@@ -43,12 +43,14 @@ int main(void)
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
 #include <assert.h>
 
 #include "cert-common.h"
 #include "utils.h"
+#include "virt-time.h"
 
 /* This program tests the robustness of record sending with padding.
  */
@@ -73,6 +75,25 @@ static void client_log_func(int level, const char *str)
 #define EARLY_MSG "Hello TLS, it's early"
 #define PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3"
 
+static const
+gnutls_datum_t hrnd = {(void*)"\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 32};
+
+static int gnutls_rnd_works;
+
+int __attribute__ ((visibility ("protected")))
+gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
+{
+	gnutls_rnd_works = 1;
+
+	memset(data, 0xff, len);
+
+	/* Flip the first byte to avoid infinite loop in the RSA
+	 * blinding code of Nettle */
+	if (len > 0)
+		memset(data, 0x0, 1);
+	return 0;
+}
+
 static void client(int sds[])
 {
 	int ret;
@@ -86,6 +107,11 @@ static void client(int sds[])
 		gnutls_global_set_log_function(client_log_func);
 		gnutls_global_set_log_level(7);
 	}
+
+	/* Generate the same ob_ticket_age value, which affects the
+	 * binder calculation.
+	 */
+	virt_time_init();
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
@@ -102,6 +128,7 @@ static void client(int sds[])
 		if (t > 0) {
 			assert(gnutls_session_set_data(session, session_data.data, session_data.size) >= 0);
 			assert(gnutls_record_send_early_data(session, EARLY_MSG, sizeof(EARLY_MSG)) >= 0);
+			assert(gnutls_handshake_set_random(session, &hrnd) >= 0);
 		}
 
 		/* Perform the TLS handshake
@@ -130,7 +157,7 @@ static void client(int sds[])
 				fail("client: Getting resume data failed\n");
 		}
 
-		if (t == 1) {
+		if (t > 0) {
 			if (!gnutls_session_is_resumed(session)) {
 				fail("client: session_is_resumed error (%d)\n", t);
 			}
@@ -166,6 +193,55 @@ static void client(int sds[])
 
 static pid_t child;
 
+#define MAX_CLIENT_HELLO_RECORDED 10
+
+struct storage_st {
+	gnutls_datum_t entries[MAX_CLIENT_HELLO_RECORDED];
+	size_t num_entries;
+};
+
+static int
+storage_add(void *ptr, gnutls_datum_t key, gnutls_datum_t value)
+{
+	struct storage_st *storage = ptr;
+	gnutls_datum_t *datum;
+	size_t i;
+
+	for (i = 0; i < storage->num_entries; i++) {
+		if (key.size == storage->entries[i].size &&
+		    memcmp(storage->entries[i].data, key.data, key.size) == 0) {
+			return GNUTLS_E_DB_ENTRY_EXISTS;
+		}
+	}
+
+	/* If the maximum number of ClientHello exceeded, reject early
+	 * data until next time.
+	 */
+	if (storage->num_entries == MAX_CLIENT_HELLO_RECORDED)
+		return GNUTLS_E_DB_ERROR;
+
+	datum = &storage->entries[storage->num_entries];
+	datum->data = gnutls_malloc(key.size);
+	if (!datum->data)
+		return GNUTLS_E_MEMORY_ERROR;
+	memcpy(datum->data, key.data, key.size);
+	datum->size = key.size;
+
+	storage->num_entries++;
+
+	return 0;
+}
+
+static void
+storage_clear(struct storage_st *storage)
+{
+	size_t i;
+
+	for (i = 0; i < storage->num_entries; i++)
+		gnutls_free(storage->entries[i].data);
+	storage->num_entries = 0;
+}
+
 static void server(int sds[])
 {
 	int ret;
@@ -173,12 +249,15 @@ static void server(int sds[])
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_datum_t session_ticket_key = { NULL, 0 };
+	struct storage_st storage;
+	gnutls_anti_replay_t anti_replay;
 	int t;
 
 	/* this must be called once in the program
 	 */
 	global_init();
 	memset(buffer, 0, sizeof(buffer));
+	memset(&storage, 0, sizeof(storage));
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);
@@ -192,6 +271,10 @@ static void server(int sds[])
 
 	gnutls_session_ticket_key_generate(&session_ticket_key);
 
+	ret = gnutls_anti_replay_init(&anti_replay);
+	if (ret < 0)
+		fail("server: failed to initialize anti-replay\n");
+
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
@@ -203,6 +286,10 @@ static void server(int sds[])
 
 		gnutls_session_ticket_enable_server(session,
 						    &session_ticket_key);
+
+		gnutls_db_set_add_function(session, storage_add);
+		gnutls_db_set_ptr(session, &storage);
+		gnutls_anti_replay_enable(session, anti_replay);
 
 		gnutls_transport_set_int(session, sd);
 
@@ -220,23 +307,39 @@ static void server(int sds[])
 		if (debug)
 			success("server: Handshake was completed\n");
 
-		if (t == 1) {
+		if (t > 0) {
 			if (!gnutls_session_is_resumed(session)) {
 				fail("server: session_is_resumed error (%d)\n", t);
 			}
 
-			if (!(gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_DATA)) {
-				fail("server: early data is not received (%d)\n", t);
-			}
+			/* as we reuse the same ticket twice, expect
+			 * early data only on the first resumption */
+			if (t == 1) {
+				if (gnutls_rnd_works) {
+					if (!(gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_DATA)) {
+						fail("server: early data is not received (%d)\n", t);
+					}
+				} else {
+					success("server: gnutls_rnd() could not be overridden, skip checking replay (%d)\n", t);
+				}
 
-			ret = gnutls_record_recv_early_data(session, buffer, sizeof(buffer));
-			if (ret < 0) {
-				fail("server: failed to retrieve early data: %s\n",
-				     gnutls_strerror(ret));
-			}
+				ret = gnutls_record_recv_early_data(session, buffer, sizeof(buffer));
+				if (ret < 0) {
+					fail("server: failed to retrieve early data: %s\n",
+					     gnutls_strerror(ret));
+				}
 
-			if (ret != sizeof(EARLY_MSG) || memcmp(buffer, EARLY_MSG, ret))
-				fail("server: early data mismatch\n");
+				if (ret != sizeof(EARLY_MSG) || memcmp(buffer, EARLY_MSG, ret))
+					fail("server: early data mismatch\n");
+			} else {
+				if (gnutls_rnd_works) {
+					if (gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_DATA) {
+						fail("server: early data is not rejected (%d)\n", t);
+					}
+				} else {
+					success("server: gnutls_rnd() could not be overridden, skip checking replay (%d)\n", t);
+				}
+			}
 		}
 
 		/* see the Getting peer's information example */
@@ -270,6 +373,10 @@ static void server(int sds[])
 
 		gnutls_deinit(session);
 	}
+
+	gnutls_anti_replay_deinit(anti_replay);
+
+	storage_clear(&storage);
 
 	gnutls_free(session_ticket_key.data);
 

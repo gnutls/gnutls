@@ -99,7 +99,8 @@ COBJECTS += tls13/encrypted_extensions.c tls13/encrypted_extensions.h \
 	tls13/certificate.c tls13/certificate.h \
 	tls13/early_data.c tls13/early_data.h \
 	tls13/post_handshake.c \
-	tls13/psk_ext_parser.c tls13/psk_ext_parser.h
+	tls13/psk_ext_parser.c tls13/psk_ext_parser.h \
+	tls13/anti_replay.c tls13/anti_replay.h
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \

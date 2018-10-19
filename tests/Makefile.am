@@ -109,7 +109,8 @@ ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/cookie tls13/key_share tls13/prf tls13/post-handshake-with-cert-ticket \
 	tls12-rollback-detection tls11-rollback-detection \
 	tls12-check-rollback-val tls11-check-rollback-val tls13/hello_random_value \
-	tls13/post-handshake-with-psk tls13/post-handshake-with-cert-auto
+	tls13/post-handshake-with-psk tls13/post-handshake-with-cert-auto \
+	tls13/anti_replay
 
 ctests += tls13/hello_retry_request
 
@@ -421,6 +422,16 @@ pkcs12_s2k_CPPFLAGS = $(AM_CPPFLAGS) \
 	$(NETTLE_CFLAGS)
 
 name_constraints_merge_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
+
+murmur3_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
+
+tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)

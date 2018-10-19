@@ -2991,6 +2991,17 @@ void gnutls_supplemental_recv(gnutls_session_t session, unsigned do_recv_supplem
 
 void gnutls_supplemental_send(gnutls_session_t session, unsigned do_send_supplemental);
 
+/* Anti-replay related functions */
+
+typedef struct gnutls_anti_replay_st *gnutls_anti_replay_t;
+
+int gnutls_anti_replay_init(gnutls_anti_replay_t *anti_replay);
+void gnutls_anti_replay_deinit(gnutls_anti_replay_t anti_replay);
+void gnutls_anti_replay_set_window(gnutls_anti_replay_t anti_replay,
+				   unsigned int window);
+void gnutls_anti_replay_enable(gnutls_session_t session,
+			       gnutls_anti_replay_t anti_replay);
+
 /* FIPS140-2 related functions */
 unsigned gnutls_fips140_mode_enabled(void);
 
@@ -3270,6 +3281,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_CRL_VERIFICATION_ERROR -426
 #define GNUTLS_E_MISSING_EXTENSION -427
 #define GNUTLS_E_DB_ENTRY_EXISTS -428
+#define GNUTLS_E_EARLY_DATA_REJECTED -429
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
