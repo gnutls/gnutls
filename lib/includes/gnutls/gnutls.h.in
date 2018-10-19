@@ -498,14 +498,15 @@ typedef enum {
  * @GNUTLS_A_EXPORT_RESTRICTION: Export restriction.
  * @GNUTLS_A_PROTOCOL_VERSION: Error in protocol version.
  * @GNUTLS_A_INSUFFICIENT_SECURITY: Insufficient security.
- * @GNUTLS_A_USER_CANCELED: User canceled.
  * @GNUTLS_A_INTERNAL_ERROR: Internal error.
  * @GNUTLS_A_INAPPROPRIATE_FALLBACK: Inappropriate fallback,
+ * @GNUTLS_A_USER_CANCELED: User canceled.
  * @GNUTLS_A_NO_RENEGOTIATION: No renegotiation is allowed.
- * @GNUTLS_A_CERTIFICATE_UNOBTAINABLE: Could not retrieve the
- *   specified certificate.
+ * @GNUTLS_A_MISSING_EXTENSION: An extension was expected but was not seen
  * @GNUTLS_A_UNSUPPORTED_EXTENSION: An unsupported extension was
  *   sent.
+ * @GNUTLS_A_CERTIFICATE_UNOBTAINABLE: Could not retrieve the
+ *   specified certificate.
  * @GNUTLS_A_UNRECOGNIZED_NAME: The server name sent was not
  *   recognized.
  * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
@@ -541,6 +542,7 @@ typedef enum {
 	GNUTLS_A_INAPPROPRIATE_FALLBACK = 86,
 	GNUTLS_A_USER_CANCELED = 90,
 	GNUTLS_A_NO_RENEGOTIATION = 100,
+	GNUTLS_A_MISSING_EXTENSION = 109,
 	GNUTLS_A_UNSUPPORTED_EXTENSION = 110,
 	GNUTLS_A_CERTIFICATE_UNOBTAINABLE = 111,
 	GNUTLS_A_UNRECOGNIZED_NAME = 112,
@@ -3230,6 +3232,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_REAUTH_REQUEST -424
 #define GNUTLS_E_TOO_MANY_MATCHES -425
 #define GNUTLS_E_CRL_VERIFICATION_ERROR -426
+#define GNUTLS_E_MISSING_EXTENSION -427
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

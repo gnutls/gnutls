@@ -575,6 +575,7 @@ key_share_recv_params(gnutls_session_t session,
 			return gnutls_assert_val(GNUTLS_E_NO_COMMON_KEY_SHARE);
 		}
 
+		session->internals.hsk_flags |= HSK_KEY_SHARE_RECEIVED;
 	} else { /* Client */
 		ver = get_version(session);
 		if (unlikely(ver == NULL || ver->key_shares == 0))

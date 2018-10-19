@@ -1332,9 +1332,12 @@ typedef struct {
 #define HSK_PSK_KE_MODE_DHE_PSK (1<<14) /* server: whether PSK with DH is selected
 					 * client: whether PSK with DH is allowed
 					 */
-#define HSK_PSK_SELECTED (1<<15)
+#define HSK_PSK_SELECTED (1<<15) /* server: whether PSK was selected, either for resumption or not;
+				  *	    on resumption session->internals.resumed will be set as well.
+				  * client: the same */
 #define HSK_KEY_SHARE_SENT (1<<16) /* server: key share was sent to client */
-#define HSK_KEY_SHARE_RECEIVED (1<<17) /* client: key share was received */
+#define HSK_KEY_SHARE_RECEIVED (1<<17) /* client: key share was received
+					* server: key share was received and accepted */
 #define HSK_TLS13_TICKET_SENT (1<<18) /* client: sent a ticket under TLS1.3;
 					 * server: a ticket was sent to client.
 					 */
