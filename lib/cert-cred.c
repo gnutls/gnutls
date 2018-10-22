@@ -197,17 +197,18 @@ void
 gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 {
 	// Check for valid pointer and otherwise do nothing
-	if (sc != NULL)	{
-		gnutls_x509_trust_list_deinit(sc->tlist, 1);
-		gnutls_certificate_free_keys(sc);
-		memset(sc->pin_tmp, 0, sizeof(sc->pin_tmp));
+	if (sc == NULL)
+		return;
+		
+	gnutls_x509_trust_list_deinit(sc->tlist, 1);
+	gnutls_certificate_free_keys(sc);
+	memset(sc->pin_tmp, 0, sizeof(sc->pin_tmp));
 
-		if (sc->deinit_dh_params) {
-			gnutls_dh_params_deinit(sc->dh_params);
-		}
-
-		gnutls_free(sc);
+	if (sc->deinit_dh_params) {
+		gnutls_dh_params_deinit(sc->dh_params);
 	}
+
+	gnutls_free(sc);
 }
 
 
