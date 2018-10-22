@@ -1015,6 +1015,7 @@ typedef struct gnutls_dh_params_int {
  */
 typedef struct {
 	struct timespec arrival_time;
+	struct timespec creation_time;
 	uint32_t lifetime;
 	uint32_t age_add;
 	uint8_t nonce[255];

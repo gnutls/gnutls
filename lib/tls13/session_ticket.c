@@ -46,7 +46,7 @@ pack_ticket(gnutls_session_t session, tls13_ticket_st *ticket, gnutls_datum_t *p
 
 	packed->size = 2 + 4 + 4 +
 		1 + ticket->prf->output_size +
-		1 + ticket->nonce_size + 2 + state.size;
+		1 + ticket->nonce_size + 2 + state.size + 12;
 
 	packed->data = gnutls_malloc(packed->size);
 	if (!packed->data) {
@@ -77,6 +77,14 @@ pack_ticket(gnutls_session_t session, tls13_ticket_st *ticket, gnutls_datum_t *p
 	p += 2;
 
 	memcpy(p, state.data, state.size);
+	p += state.size;
+
+	_gnutls_write_uint32(ticket->creation_time.tv_sec >> 32, p);
+	p += 4;
+	_gnutls_write_uint32(ticket->creation_time.tv_sec & 0xFFFFFFFF, p);
+	p += 4;
+	_gnutls_write_uint32(ticket->creation_time.tv_nsec, p);
+
 	ret = 0;
 
  cleanup:
@@ -88,6 +96,7 @@ static int
 unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_st *data)
 {
 	uint32_t age_add, lifetime;
+	struct timespec creation_time;
 	uint8_t resumption_master_secret[MAX_HASH_SIZE];
 	size_t resumption_master_secret_size;
 	uint8_t nonce[UINT8_MAX];
@@ -156,6 +165,15 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_st 
 
 	DECR_LEN(len, state.size);
 	state.data = p;
+	p += state.size;
+
+	DECR_LEN(len, 12);
+	creation_time.tv_sec = _gnutls_read_uint32(p);
+	p += 4;
+	creation_time.tv_sec <<= 32;
+	creation_time.tv_sec |= _gnutls_read_uint32(p);
+	p += 4;
+	creation_time.tv_nsec = _gnutls_read_uint32(p);
 
 	ret = _gnutls_session_unpack(session, &state);
 	if (ret < 0)
@@ -169,6 +187,7 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_st 
 	data->nonce_size = nonce_size;
 	data->age_add = age_add;
 	data->lifetime = lifetime;
+	memcpy(&data->creation_time, &creation_time, sizeof(struct timespec));
 
 	return 0;
 }
@@ -178,17 +197,18 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st *ticket)
 {
 	int ret;
 	gnutls_datum_t packed = { NULL, 0 };
+	struct timespec now;
 	tls13_ticket_st ticket_data;
-	time_t now = gnutls_time(0);
 
+	gnutls_gettime(&now);
 	if (session->internals.resumed != RESUME_FALSE) {
 		/* If we are resuming ensure that we don't extend the lifetime
 		 * of the ticket past the original session expiration time */
-		if (now >= session->security_parameters.timestamp + session->internals.expire_time)
+		if (now.tv_sec >= session->security_parameters.timestamp + session->internals.expire_time)
 			return GNUTLS_E_INT_RET_0; /* don't send ticket */
 		else
 			ticket->lifetime = session->security_parameters.timestamp +
-					   session->internals.expire_time - now;
+					   session->internals.expire_time - now.tv_sec;
 	} else {
 		/* Set ticket lifetime to the default expiration time */
 		ticket->lifetime = session->internals.expire_time;
@@ -210,6 +230,7 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st *ticket)
 	/* Encrypt the ticket and place the result in ticket->ticket */
 	ticket_data.lifetime = ticket->lifetime;
 	ticket_data.age_add = ticket->age_add;
+	memcpy(&ticket_data.creation_time, &now, sizeof(struct timespec));
 	memcpy(ticket_data.nonce, ticket->nonce, ticket->nonce_size);
 	ticket_data.nonce_size = ticket->nonce_size;
 	ticket_data.prf = ticket->prf;
