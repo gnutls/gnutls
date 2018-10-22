@@ -232,6 +232,40 @@ run_client_suite() {
 	kill ${PID}
 	wait
 
+	# Try resumption with early data
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
+	testdir=`create_testdir tls13-openssl-resumption`
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data
+	PID=$!
+	wait_server ${PID}
+
+	echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --earlydata "${testdir}/earlydata.txt" --insecure --inline-commands <<< '^resume^'| tee "${testdir}/client.out" >> ${OUTPUT}
+	grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	# Try resumption with early data with small limit
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption with early data..."
+	testdir=`create_testdir tls13-openssl-resumption`
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -quiet -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -early_data -max_early_data 1
+	PID=$!
+	wait_server ${PID}
+
+	echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --earlydata "${testdir}/earlydata.txt" --insecure --inline-commands <<< '^resume^'|& tee "${testdir}/client.out" >> ${OUTPUT}
+	grep '^\*\*\* This is a resumed session' "${testdir}/client.out" || \
+		fail ${PID} "Failed"
+	grep '^\*\*\* Received alert \[10\]: Unexpected message' "${testdir}/client.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
 	rm -rf "${testdir}"
 
 }
@@ -471,6 +505,26 @@ _EOF_
 	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-hrr.pem" 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -curves 'X25519:P-256:X448:P-521:P-384' -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-hrr.pem" </dev/null 2>&1 > "${testdir}/server.out"
+	grep "\:error\:" "${testdir}/server.out" && \
+		fail ${PID} "Failed"
+	grep "^Reused, TLSv1.3" "${testdir}/server.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption and early data..."
+	testdir=`create_testdir tls13-openssl-resumption`
+	eval "${GETPORT}"
+	launch_server $$ --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${RSA_CERT}" --x509keyfile "${RSA_KEY}" --x509cafile "${CA_CERT}" --earlydata  >>${OUTPUT} 2>&1
+	PID=$!
+	wait_server ${PID}
+
+	echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
+	{ echo a; sleep 1; } | \
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-earlydata.pem" 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-earlydata.pem" -early_data "${testdir}/earlydata.txt" </dev/null 2>&1 > "${testdir}/server.out"
 	grep "\:error\:" "${testdir}/server.out" && \
 		fail ${PID} "Failed"
 	grep "^Reused, TLSv1.3" "${testdir}/server.out" || \
