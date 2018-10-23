@@ -128,6 +128,14 @@ void doit(void)
 	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_STRICT)
 		fail("switching to unknown mode didn't switch the lib to the expected mode\n");
 
+	GNUTLS_FIPS140_SET_LAX_MODE();
+	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_LAX)
+		fail("switching to lax mode did not succeed!\n");
+
+	GNUTLS_FIPS140_SET_STRICT_MODE();
+	if (gnutls_fips140_mode_enabled() != GNUTLS_FIPS140_STRICT)
+		fail("switching to strict mode did not succeed!\n");
+
 	gnutls_global_deinit();
 	return;
 }

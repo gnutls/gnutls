@@ -2996,6 +2996,16 @@ typedef enum gnutls_fips_mode_t {
 
 void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 
+#define GNUTLS_FIPS140_SET_LAX_MODE() do { \
+	if (gnutls_fips140_mode_enabled()) \
+		gnutls_fips140_set_mode(GNUTLS_FIPS140_LAX, GNUTLS_FIPS140_SET_MODE_THREAD); \
+	} while(0)
+
+#define GNUTLS_FIPS140_SET_STRICT_MODE() do { \
+	if (gnutls_fips140_mode_enabled()) \
+		gnutls_fips140_set_mode(GNUTLS_FIPS140_STRICT, GNUTLS_FIPS140_SET_MODE_THREAD); \
+	} while(0)
+
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.
    */
