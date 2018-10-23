@@ -310,7 +310,7 @@ client_send_params(gnutls_session_t session,
 			user_key.size = tkey.size;
 		}
 
-		ret = _gnutls_auth_info_set(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
+		ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -600,7 +600,7 @@ static int server_recv_params(gnutls_session_t session,
 	if (!resuming) {
 		assert(psk.identity.size < sizeof(info->username));
 
-		ret = _gnutls_auth_info_set(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
+		ret = _gnutls_auth_info_init(session, GNUTLS_CRD_PSK, sizeof(psk_auth_info_st), 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto fail;

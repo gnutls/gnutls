@@ -494,7 +494,7 @@ unpack_certificate_auth_info(gnutls_session_t session,
 	/* client and server have the same auth_info here
 	 */
 	ret =
-	    _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
 				  sizeof(cert_auth_info_st), 1);
 	if (ret < 0) {
 		gnutls_assert();
@@ -622,7 +622,7 @@ unpack_srp_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	}
 
 	ret =
-	    _gnutls_auth_info_set(session, GNUTLS_CRD_SRP,
+	    _gnutls_auth_info_init(session, GNUTLS_CRD_SRP,
 				  sizeof(srp_server_auth_info_st), 1);
 	if (ret < 0) {
 		gnutls_assert();
@@ -704,7 +704,7 @@ unpack_anon_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	/* client and server have the same auth_info here
 	 */
 	ret =
-	    _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
+	    _gnutls_auth_info_init(session, GNUTLS_CRD_ANON,
 				  sizeof(anon_auth_info_st), 1);
 	if (ret < 0) {
 		gnutls_assert();
@@ -797,7 +797,7 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	unsigned pack_size;
 
 	ret =
-	    _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
+	    _gnutls_auth_info_init(session, GNUTLS_CRD_PSK,
 				  sizeof(psk_auth_info_st), 1);
 	if (ret < 0) {
 		gnutls_assert();

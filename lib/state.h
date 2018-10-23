@@ -71,7 +71,7 @@ _gnutls_hello_set_default_version(gnutls_session_t session,
 
 #include <auth.h>
 
-#define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(session) != auth) { \
+#define CHECK_AUTH_TYPE(auth, ret) if (gnutls_auth_get_type(session) != auth) { \
 	gnutls_assert(); \
 	return ret; \
 	}

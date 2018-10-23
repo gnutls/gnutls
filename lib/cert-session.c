@@ -61,7 +61,7 @@ const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
 {
 	gnutls_certificate_credentials_t cred;
 
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_CERTIFICATE, NULL);
 
 	cred = (gnutls_certificate_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
@@ -103,7 +103,7 @@ const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
 {
 	cert_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_CERTIFICATE, NULL);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL)
@@ -455,7 +455,7 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	/* No OCSP check so far */
 	session->internals.ocsp_check_ok = 0;
 
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {
@@ -708,7 +708,7 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 {
 	cert_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {
@@ -808,7 +808,7 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session)
 {
 	cert_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {
@@ -844,7 +844,7 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session_t session)
 {
 	cert_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {

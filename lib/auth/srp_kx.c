@@ -137,7 +137,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 	priv = epriv;
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_SRP,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_SRP,
 				   sizeof(srp_server_auth_info_st),
 				   1)) < 0) {
 		gnutls_assert();

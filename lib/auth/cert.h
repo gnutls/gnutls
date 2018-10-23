@@ -141,7 +141,7 @@ _gnutls_select_client_cert(gnutls_session_t session,
 int _gnutls_pcert_to_auth_info(cert_auth_info_t info, gnutls_pcert_st * certs, size_t ncerts);
 
 int
-_gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs);
+_gnutls_select_server_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs);
 void _gnutls_selected_certs_deinit(gnutls_session_t session);
 
 int _gnutls_get_auth_info_pcert(gnutls_pcert_st * gcert,

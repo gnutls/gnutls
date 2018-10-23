@@ -56,7 +56,7 @@
  */
 
 static int
-certificate_credential_append_crt_list(gnutls_certificate_credentials_t res,
+certificate_credential_append_keypair(gnutls_certificate_credentials_t res,
 				       gnutls_privkey_t key,
 				       gnutls_str_array_t names,
 				       gnutls_pcert_st * crt, int nr);
@@ -186,7 +186,7 @@ parse_der_cert_mem(gnutls_certificate_credentials_t res,
 		goto cleanup;
 	}
 
-	ret = certificate_credential_append_crt_list(res, key, names, ccert, 1);
+	ret = certificate_credential_append_keypair(res, key, names, ccert, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -302,7 +302,7 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 	}
 
 	ret =
-	    certificate_credential_append_crt_list(res, key, names, pcerts,
+	    certificate_credential_append_keypair(res, key, names, pcerts,
 						   ncerts);
 	if (ret < 0) {
 		gnutls_assert();
@@ -543,7 +543,7 @@ read_cert_url(gnutls_certificate_credentials_t res, gnutls_privkey_t key, const 
 		t.data = NULL;
 	}
 
-	ret = certificate_credential_append_crt_list(res, key, names, ccert, count);
+	ret = certificate_credential_append_keypair(res, key, names, ccert, count);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -737,7 +737,7 @@ gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
 }
 
 static int
-certificate_credential_append_crt_list(gnutls_certificate_credentials_t res,
+certificate_credential_append_keypair(gnutls_certificate_credentials_t res,
 				       gnutls_privkey_t key,
 				       gnutls_str_array_t names,
 				       gnutls_pcert_st * crt, int nr)
@@ -871,7 +871,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 	}
 
 	ret =
-	    certificate_credential_append_crt_list(res, pkey, names, pcerts,
+	    certificate_credential_append_keypair(res, pkey, names, pcerts,
 						   cert_list_size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1091,7 +1091,7 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 	memcpy(new_pcert_list, pcert_list, sizeof(gnutls_pcert_st) * pcert_list_size);
 
 	ret =
-	    certificate_credential_append_crt_list(res, key, str_names,
+	    certificate_credential_append_keypair(res, key, str_names,
 						   new_pcert_list,
 						   pcert_list_size);
 	if (ret < 0) {

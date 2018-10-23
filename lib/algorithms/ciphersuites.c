@@ -1508,7 +1508,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
 							continue;
 					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
-						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
+						ret = _gnutls_select_server_cert(session, peer_clist->entry[i]);
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();
@@ -1553,7 +1553,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 						if (session->key.binders[0].prf->id != session->internals.priorities->cs.entry[j]->prf)
 							break;
 					} else if (cred_type == GNUTLS_CRD_CERTIFICATE) {
-						ret = _gnutls_server_select_cert(session, peer_clist->entry[i]);
+						ret = _gnutls_select_server_cert(session, peer_clist->entry[i]);
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();
@@ -1670,7 +1670,7 @@ _gnutls_get_client_ciphersuites(gnutls_session_t session,
 }
 
 /**
- * gnutls_priority_get_cipher_suite:
+ * gnutls_priority_get_cipher_suite_index:
  * @pcache: is a #gnutls_prioritity_t type.
  * @idx: is an index number.
  * @sidx: internal index of cipher suite to get information about.
@@ -1700,13 +1700,13 @@ gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
 	/* find max_tls and max_dtls */
-	for (j=0;j<pcache->protocol.algorithms;j++) {
-		if (pcache->protocol.priority[j] <= GNUTLS_TLS_VERSION_MAX &&
-		    pcache->protocol.priority[j] >= max_tls) {
-			max_tls = pcache->protocol.priority[j];
-		} else if (pcache->protocol.priority[j] <= GNUTLS_DTLS_VERSION_MAX &&
-			   pcache->protocol.priority[j] >= max_dtls) {
-			max_dtls = pcache->protocol.priority[j];
+	for (j=0;j<pcache->protocol.num_priorities;j++) {
+		if (pcache->protocol.priorities[j] <= GNUTLS_TLS_VERSION_MAX &&
+		    pcache->protocol.priorities[j] >= max_tls) {
+			max_tls = pcache->protocol.priorities[j];
+		} else if (pcache->protocol.priorities[j] <= GNUTLS_DTLS_VERSION_MAX &&
+			   pcache->protocol.priorities[j] >= max_dtls) {
+			max_dtls = pcache->protocol.priorities[j];
 		}
 	}
 

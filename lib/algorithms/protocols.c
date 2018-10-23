@@ -202,9 +202,9 @@ _gnutls_version_priority(gnutls_session_t session,
 {
 	unsigned int i;
 
-	for (i = 0; i < session->internals.priorities->protocol.algorithms;
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities;
 	     i++) {
-		if (session->internals.priorities->protocol.priority[i] ==
+		if (session->internals.priorities->protocol.priorities[i] ==
 		    version)
 			return i;
 	}
@@ -220,9 +220,9 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 	const version_entry_st *v, *min_v = NULL;
 	const version_entry_st *backup = NULL;
 
-	for (i=0;i < session->internals.priorities->protocol.algorithms;i++) {
+	for (i=0;i < session->internals.priorities->protocol.num_priorities;i++) {
 		cur_prot =
-		    session->internals.priorities->protocol.priority[i];
+		    session->internals.priorities->protocol.priorities[i];
 		v = version_to_entry(cur_prot);
 
 		if (v != NULL && version_is_valid_for_session(session, v)) {
@@ -251,10 +251,10 @@ const version_entry_st *_gnutls_version_max(gnutls_session_t session)
 	gnutls_protocol_t cur_prot;
 	const version_entry_st *p, *max = NULL;
 
-	for (i = 0; i < session->internals.priorities->protocol.algorithms;
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities;
 	     i++) {
 		cur_prot =
-		    session->internals.priorities->protocol.priority[i];
+		    session->internals.priorities->protocol.priorities[i];
 
 		for (p = sup_versions; p->name != NULL; p++) {
 			if(p->id == cur_prot) {
@@ -308,9 +308,9 @@ int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, 
 	unsigned i;
 	const version_entry_st *p;
 
-	for (i = 0; i < session->internals.priorities->protocol.algorithms; i++) {
+	for (i = 0; i < session->internals.priorities->protocol.num_priorities; i++) {
 		cur_prot =
-		    session->internals.priorities->protocol.priority[i];
+		    session->internals.priorities->protocol.priorities[i];
 
 		for (p = sup_versions; p->name != NULL; p++) {
 			if(p->id == cur_prot) {
@@ -324,7 +324,7 @@ int _gnutls_write_supported_versions(gnutls_session_t session, uint8_t *buffer, 
 					at_least_one_new = 1;
 
 				if (buffer_size > 2) {
-					_gnutls_debug_log("Advertizing version %x.%x\n", (int)p->major, (int)p->minor);
+					_gnutls_debug_log("Advertizing version %d.%d\n", (int)p->major, (int)p->minor);
 					buffer[0] = p->major;
 					buffer[1] = p->minor;
 					written_bytes += 2;

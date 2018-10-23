@@ -96,7 +96,7 @@ gen_dhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ((ret = _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
+	if ((ret = _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
 					 sizeof(cert_auth_info_st),
 					 1)) < 0) {
 		gnutls_assert();

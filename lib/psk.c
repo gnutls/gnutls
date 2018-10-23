@@ -327,7 +327,7 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
 {
 	psk_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_PSK, NULL);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_PSK, NULL);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 	if (info == NULL)
@@ -358,7 +358,7 @@ const char *gnutls_psk_client_get_hint(gnutls_session_t session)
 {
 	psk_auth_info_t info;
 
-	CHECK_AUTH(GNUTLS_CRD_PSK, NULL);
+	CHECK_AUTH_TYPE(GNUTLS_CRD_PSK, NULL);
 
 	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 	if (info == NULL)

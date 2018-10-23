@@ -60,7 +60,7 @@ selected_certs_set(gnutls_session_t session,
 typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64
 } CertificateSigType;
 
-/* Moves data from a internal certificate struct (gnutls_pcert_st) to 
+/* Moves data from a internal certificate struct (gnutls_pcert_st) to
  * another internal certificate struct (cert_auth_info_t), and deinitializes
  * the former.
  */
@@ -118,7 +118,7 @@ check_pk_algo_in_list(const gnutls_pk_algorithm_t *
 	return -1;
 }
 
-/* Returns the issuer's Distinguished name in odn, of the certificate 
+/* Returns the issuer's Distinguished name in odn, of the certificate
  * specified in cert.
  */
 static int cert_get_issuer_dn(gnutls_pcert_st * cert, gnutls_datum_t * odn)
@@ -165,7 +165,7 @@ static int cert_get_issuer_dn(gnutls_pcert_st * cert, gnutls_datum_t * odn)
 /* Locates the most appropriate x509 certificate using the
  * given DN. If indx == -1 then no certificate was found.
  *
- * That is to guess which certificate to use, based on the 
+ * That is to guess which certificate to use, based on the
  * CAs and sign algorithms supported by the peer server.
  */
 static int
@@ -269,7 +269,7 @@ get_issuers_num(gnutls_session_t session, const uint8_t * data, ssize_t data_siz
 
 	if (data_size > 0)
 		do {
-			/* This works like DECR_LEN() 
+			/* This works like DECR_LEN()
 			 */
 			result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 			DECR_LENGTH_COM(data_size, 2, goto error);
@@ -507,7 +507,7 @@ _gnutls_select_client_cert(gnutls_session_t session,
 					   cred->certs[indx].ocsp_data,
 					   cred->certs[indx].ocsp_data_length,
 					   cred->certs[indx].pkey, 0,
-					   NULL, 0);
+					   NULL, NULL);
 		} else {
 			selected_certs_set(session, NULL, 0, NULL, 0,
 					   NULL, 0, NULL, NULL);
@@ -532,7 +532,7 @@ static int gen_x509_crt(gnutls_session_t session, gnutls_buffer_st * data)
 	int apr_cert_list_length;
 	unsigned init_pos = data->length;
 
-	/* find the appropriate certificate 
+	/* find the appropriate certificate
 	 */
 	if ((ret =
 	     _gnutls_get_selected_cert(session, &apr_cert_list,
@@ -553,7 +553,7 @@ static int gen_x509_crt(gnutls_session_t session, gnutls_buffer_st * data)
 	 * instead of:
 	 * 0B 00 00 00	  // empty certificate handshake
 	 *
-	 * ( the above is the whole handshake message, not 
+	 * ( the above is the whole handshake message, not
 	 * the one produced here )
 	 */
 
@@ -629,7 +629,7 @@ int check_pk_compat(gnutls_session_t session, gnutls_pubkey_t pubkey)
  */
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_pcert_deinit(&peer_certificate_list[x])
 static int
-_gnutls_proc_x509_server_crt(gnutls_session_t session,
+_gnutls_proc_x509_crt(gnutls_session_t session,
 			     uint8_t * data, size_t data_size)
 {
 	int size, len, ret;
@@ -650,7 +650,7 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
 				   sizeof(cert_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -701,7 +701,7 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 	}
 
 	/* Ok we now allocate the memory to hold the
-	 * certificate list 
+	 * certificate list
 	 */
 
 	peer_certificate_list =
@@ -790,7 +790,7 @@ int _gnutls_proc_crt(gnutls_session_t session, uint8_t * data, size_t data_size)
 
 	switch (cert_type) {
 		case GNUTLS_CRT_X509:
-			ret = _gnutls_proc_x509_server_crt(session, data, data_size);
+			ret = _gnutls_proc_x509_crt(session, data, data_size);
 			break;
 		default:
 			gnutls_assert();
@@ -842,7 +842,7 @@ _gnutls_proc_cert_cert_req(gnutls_session_t session, uint8_t * data,
 	}
 
 	if ((ret =
-	     _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
+	     _gnutls_auth_info_init(session, GNUTLS_CRD_CERTIFICATE,
 				   sizeof(cert_auth_info_st), 0)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -895,7 +895,7 @@ _gnutls_proc_cert_cert_req(gnutls_session_t session, uint8_t * data,
 
 	DECR_LEN_FINAL(dsize, size);
 
-	/* We should reply with a certificate message, 
+	/* We should reply with a certificate message,
 	 * even if we have no certificate to send.
 	 */
 	session->internals.hsk_flags |= HSK_CRT_ASKED;
@@ -1123,7 +1123,7 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 	return data->length - init_pos;
 }
 
-/* This function will return the appropriate certificate to use. 
+/* This function will return the appropriate certificate to use.
  * Fills in the apr_cert_list, apr_cert_list_length and apr_pkey.
  * The return value is a negative error code on error.
  *
@@ -1148,7 +1148,7 @@ _gnutls_get_selected_cert(gnutls_session_t session,
 			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 		}
 
-	} else {		/* CLIENT SIDE 
+	} else {		/* CLIENT SIDE
 				 */
 		/* _gnutls_select_client_cert() must have been called before.
 		 */
@@ -1244,7 +1244,7 @@ static void get_server_name(gnutls_session_t session, uint8_t * name,
  * can be selected returns an error.
  *
  * IMPORTANT
- * Currently this function is only called from _gnutls_server_select_cert,
+ * Currently this function is only called from _gnutls_select_server_cert,
  * i.e. it is only called at the server. We therefore retrieve the
  * negotiated server certificate type within this function.
  * If, in the future, this routine is called at the client then we
@@ -1315,7 +1315,7 @@ int cert_select_sign_algorithm(gnutls_session_t session,
  *
  */
 int
-_gnutls_server_select_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs)
+_gnutls_select_server_cert(gnutls_session_t session, const gnutls_cipher_suite_entry_st *cs)
 {
 	unsigned i, j;
 	int idx, ret;

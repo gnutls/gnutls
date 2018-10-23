@@ -106,7 +106,7 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials_t sc)
  *
  * As with gnutls_x509_trust_list_get_issuer() this function requires
  * the %GNUTLS_TL_GET_COPY flag in order to operate with PKCS#11 trust
- * lists in a thread-safe way. 
+ * lists in a thread-safe way.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -171,7 +171,7 @@ gnutls_certificate_get_crt_raw(gnutls_certificate_credentials_t sc,
  * credentials. Clients may call this to save some memory since in
  * client side the CA names are not used. Servers might want to use
  * this function if a large list of trusted CAs is present and
- * sending the names of it would just consume bandwidth without providing 
+ * sending the names of it would just consume bandwidth without providing
  * information to client.
  *
  * CA names are used by servers to advertise the CAs they support to
@@ -196,6 +196,10 @@ void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc)
 void
 gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 {
+	// Check for valid pointer and otherwise do nothing
+	if (sc == NULL)
+		return;
+		
 	gnutls_x509_trust_list_deinit(sc->tlist, 1);
 	gnutls_certificate_free_keys(sc);
 	memset(sc->pin_tmp, 0, sizeof(sc->pin_tmp));
@@ -585,7 +589,7 @@ static int call_legacy_cert_cb2(gnutls_session_t session,
  **/
 void gnutls_certificate_set_retrieve_function2
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function2 * func) 
+     gnutls_certificate_retrieve_function2 * func)
 {
 	cred->legacy_cert_cb2 = func;
 	if (!func)
@@ -641,7 +645,7 @@ void gnutls_certificate_set_retrieve_function2
  **/
 void gnutls_certificate_set_retrieve_function3
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function3 *func) 
+     gnutls_certificate_retrieve_function3 *func)
 {
 	cred->get_cert_callback3 = func;
 }

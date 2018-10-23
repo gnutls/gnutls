@@ -380,7 +380,7 @@ void _gnutls_free_auth_info(gnutls_session_t session)
  * info structure to a different type.
  */
 int
-_gnutls_auth_info_set(gnutls_session_t session,
+_gnutls_auth_info_init(gnutls_session_t session,
 		      gnutls_credentials_type_t type, int size,
 		      int allow_change)
 {
