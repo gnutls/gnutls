@@ -704,37 +704,39 @@ which can switch to alternative modes as in @ref{gnutls_fips_mode_t}.
 
 @showenumdesc{gnutls_fips_mode_t,The @code{gnutls_@-fips_@-mode_t} enumeration.}
 
-The intention of this API is to be used by applications which need to run in
+The intention of this API is to be used by applications which may run in
 FIPS140-2 mode, while they utilize few algorithms not in the allowed set,
 e.g., for non-security related purposes. In these cases applications should
 wrap the non-compliant code within blocks like the following.
 
 @example
-GNUTLS_FIPS140_SET_RELAX_MODE();
+GNUTLS_FIPS140_SET_LAX_MODE();
 
 _gnutls_hash_fast(GNUTLS_DIG_MD5, buffer, sizeof(buffer), output);
 
 GNUTLS_FIPS140_SET_STRICT_MODE();
 @end example
 
-The @code{GNUTLS_FIPS140_SET_RELAX_MODE} and
+The @code{GNUTLS_FIPS140_SET_LAX_MODE} and
 @code{GNUTLS_FIPS140_SET_STRICT_MODE} are macros to simplify the following
 sequence of calls.
 
 @example
 if (gnutls_fips140_mode_enabled())
-  gnutls_fips140_set_mode(GNUTLS_FIPS140_SET_MODE_LAX, GNUTLS_FIPS140_SET_MODE_THREAD);
+  gnutls_fips140_set_mode(GNUTLS_FIPS140_LAX, GNUTLS_FIPS140_SET_MODE_THREAD);
 
 _gnutls_hash_fast(GNUTLS_DIG_MD5, buffer, sizeof(buffer), output);
 
 if (gnutls_fips140_mode_enabled())
-  gnutls_fips140_set_mode(GNUTLS_FIPS140_SET_MODE_STRICT, GNUTLS_FIPS140_SET_MODE_THREAD);
+  gnutls_fips140_set_mode(GNUTLS_FIPS140_STRICT, GNUTLS_FIPS140_SET_MODE_THREAD);
 @end example
 
 The reason of the @code{GNUTLS_FIPS140_SET_MODE_THREAD} flag in the
-previous calls is to localize the change in the mode.
+previous calls is to localize the change in the mode. Note also, that
+such a block has no effect when the library is not operating
+under FIPS140-2 mode, and thus it can be considered a no-op.
 
 Applications could also switch FIPS140-2 mode explicitly off, by calling
 @example
-gnutls_fips140_set_mode(GNUTLS_FIPS140_SET_MODE_LAX, 0);
+gnutls_fips140_set_mode(GNUTLS_FIPS140_LAX, 0);
 @end example
