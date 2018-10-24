@@ -836,7 +836,7 @@ static int try_rekey(socket_st * hd, unsigned peer)
 
 static int try_resume(socket_st * hd)
 {
-	int ret, socket_flags = 0;
+	int ret, socket_flags = SOCKET_FLAG_DONT_PRINT_ERRORS;
 	gnutls_datum_t rdata = {NULL, 0};
 
 	if (gnutls_session_is_resumed(hd->session) == 0) {
@@ -1107,7 +1107,7 @@ int main(int argc, char **argv)
 	ssize_t bytes, keyboard_bytes;
 	char *keyboard_buffer_ptr;
 	inline_cmds_st inline_cmds;
-	int socket_flags = 0;
+	int socket_flags = SOCKET_FLAG_DONT_PRINT_ERRORS;
 	FILE *server_fp = NULL;
 	FILE *client_fp = NULL;
 #ifndef _WIN32

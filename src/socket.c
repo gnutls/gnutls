@@ -588,7 +588,8 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 				continue;
 			}
 			else if (err < 0) {
-				fprintf(stderr, "*** handshake has failed: %s\n", gnutls_strerror(err));
+				if (!(flags & SOCKET_FLAG_DONT_PRINT_ERRORS))
+					fprintf(stderr, "*** handshake has failed: %s\n", gnutls_strerror(err));
 				exit(1);
 			}
 		}

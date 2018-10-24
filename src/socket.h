@@ -7,6 +7,7 @@
 #define SOCKET_FLAG_RAW (1<<3) /* unencrypted */
 #define SOCKET_FLAG_VERBOSE (1<<4)
 #define SOCKET_FLAG_SKIP_INIT (1<<5)
+#define SOCKET_FLAG_DONT_PRINT_ERRORS (1<<6)
 
 
 typedef struct {
