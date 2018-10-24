@@ -97,6 +97,9 @@ extern "C" {
  * @GNUTLS_CIPHER_AES_128_CBC: AES in CBC mode with 128-bit keys.
  * @GNUTLS_CIPHER_AES_192_CBC: AES in CBC mode with 192-bit keys.
  * @GNUTLS_CIPHER_AES_256_CBC: AES in CBC mode with 256-bit keys.
+ * @GNUTLS_CIPHER_AES_128_CFB8: AES in CFB8 mode with 128-bit keys.
+ * @GNUTLS_CIPHER_AES_192_CFB8: AES in CFB8 mode with 192-bit keys.
+ * @GNUTLS_CIPHER_AES_256_CFB8: AES in CFB8 mode with 256-bit keys.
  * @GNUTLS_CIPHER_ARCFOUR_40: ARCFOUR stream cipher with 40-bit keys.
  * @GNUTLS_CIPHER_CAMELLIA_128_CBC: Camellia in CBC mode with 128-bit keys.
  * @GNUTLS_CIPHER_CAMELLIA_192_CBC: Camellia in CBC mode with 192-bit keys.
@@ -161,6 +164,9 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_GOST28147_CPB_CFB = 26,
 	GNUTLS_CIPHER_GOST28147_CPC_CFB = 27,
 	GNUTLS_CIPHER_GOST28147_CPD_CFB = 28,
+	GNUTLS_CIPHER_AES_128_CFB8 = 29,
+	GNUTLS_CIPHER_AES_192_CFB8 = 30,
+	GNUTLS_CIPHER_AES_256_CFB8 = 31,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */

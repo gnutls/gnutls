@@ -43,6 +43,7 @@
 #include <nettle/gcm.h>
 #include <nettle/ccm.h>
 #include <nettle/chacha-poly1305.h>
+#include <nettle/cfb.h>
 #include <fips.h>
 
 struct nettle_cipher_ctx;
@@ -256,6 +257,24 @@ static void _des_set_key(struct des_ctx *ctx, const uint8_t *key)
 static void _des3_set_key(struct des3_ctx *ctx, const uint8_t *key)
 {
 	des3_set_key(ctx, key);
+}
+
+static void
+_cfb8_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
+	      const uint8_t * src)
+{
+	cfb8_encrypt(ctx->ctx_ptr, ctx->cipher->encrypt_block,
+		     ctx->iv_size, ctx->iv,
+		     length, dst, src);
+}
+
+static void
+_cfb8_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
+	      const uint8_t * src)
+{
+	cfb8_decrypt(ctx->ctx_ptr, ctx->cipher->encrypt_block,
+		     ctx->iv_size, ctx->iv,
+		     length, dst, src);
 }
 
 static const struct nettle_cipher_st builtin_ciphers[] = {
@@ -616,6 +635,45 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .set_decrypt_key = _gost28147_set_key_cpd,
 	},
 #endif
+	{  .algo = GNUTLS_CIPHER_AES_128_CFB8,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES128_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes128_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes128_encrypt,
+
+	   .ctx_size = sizeof(struct CFB8_CTX(struct aes128_ctx, AES_BLOCK_SIZE)),
+	   .encrypt = _cfb8_encrypt,
+	   .decrypt = _cfb8_decrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)aes128_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)aes128_set_encrypt_key,
+	   .max_iv_size = AES_BLOCK_SIZE,
+	},
+	{  .algo = GNUTLS_CIPHER_AES_192_CFB8,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES192_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes192_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes192_encrypt,
+
+	   .ctx_size = sizeof(struct CFB8_CTX(struct aes192_ctx, AES_BLOCK_SIZE)),
+	   .encrypt = _cfb8_encrypt,
+	   .decrypt = _cfb8_decrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)aes192_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)aes192_set_encrypt_key,
+	   .max_iv_size = AES_BLOCK_SIZE,
+	},
+	{  .algo = GNUTLS_CIPHER_AES_256_CFB8,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES256_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes256_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes256_encrypt,
+
+	   .ctx_size = sizeof(struct CFB8_CTX(struct aes256_ctx, AES_BLOCK_SIZE)),
+	   .encrypt = _cfb8_encrypt,
+	   .decrypt = _cfb8_decrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)aes256_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)aes256_set_encrypt_key,
+	   .max_iv_size = AES_BLOCK_SIZE,
+	},
 };
 
 static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
