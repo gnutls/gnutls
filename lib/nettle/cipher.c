@@ -36,14 +36,17 @@
 #include <nettle/version.h>
 #if ENABLE_GOST
 #include "gost/gost28147.h"
-#include <nettle/cfb.h>
 #endif
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
 #include <nettle/ccm.h>
 #include <nettle/chacha-poly1305.h>
+#ifdef HAVE_NETTLE_CFB8_ENCRYPT
 #include <nettle/cfb.h>
+#else
+#include "cfb8.h"
+#endif /* HAVE_NETTLE_CFB8_ENCRYPT */
 #include <fips.h>
 
 struct nettle_cipher_ctx;
