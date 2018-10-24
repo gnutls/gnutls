@@ -512,12 +512,6 @@ static int server_recv_params(gnutls_session_t session,
 			session->internals.resumption_requested = 1;
 
 			/* Check whether ticket is stale or not */
-			if (psk.ob_ticket_age < ticket_data.age_add) {
-				gnutls_assert();
-				tls13_ticket_deinit(&ticket_data);
-				continue;
-			}
-
 			ticket_age = psk.ob_ticket_age - ticket_data.age_add;
 			if (ticket_age / 1000 > ticket_data.lifetime) {
 				gnutls_assert();
