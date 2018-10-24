@@ -984,6 +984,54 @@ int check_command(gnutls_session_t session, const char *str, unsigned no_cli_cer
 	return 0;
 }
 
+/* error is indicated by returning an empty string */
+void getpass_copy(char *pass, size_t max_pass_size, const char *prompt)
+{
+	char *tmp;
+	size_t len;
+
+	tmp = getpass(prompt);
+	if (tmp == NULL) {
+		pass[0] = 0;
+		return;
+	}
+
+	len = strlen(tmp);
+	if (len >= max_pass_size) {
+		gnutls_memset(tmp, 0, len);
+		pass[0] = 0;
+		return;
+	}
+
+	strcpy(pass, tmp);
+	gnutls_memset(tmp, 0, len);
+
+	return;
+}
+
+/* error is indicated by returning an empty string */
+void getenv_copy(char *str, size_t max_str_size, const char *envvar)
+{
+	char *tmp;
+	size_t len;
+
+	tmp = getenv(envvar);
+	if (tmp == NULL) {
+		str[0] = 0;
+		return;
+	}
+
+	len = strlen(tmp);
+	if (len >= max_str_size) {
+		str[0] = 0;
+		return;
+	}
+
+	strcpy(str, tmp);
+
+	return;
+}
+
 #define MIN(x,y) ((x)<(y))?(x):(y)
 #define MAX_CACHE_TRIES 5
 int
@@ -991,26 +1039,26 @@ pin_callback(void *user, int attempt, const char *token_url,
 	     const char *token_label, unsigned int flags, char *pin,
 	     size_t pin_max)
 {
-	const char *password = NULL;
+	char password[MAX_PIN_LEN] = "";
 	common_info_st *info = user;
 	const char *desc;
 	int cache = MAX_CACHE_TRIES;
 	unsigned len;
 /* allow caching of PIN */
 	static char *cached_url = NULL;
-	static char cached_pin[32] = "";
+	static char cached_pin[MAX_PIN_LEN] = "";
 	const char *env;
 
 	if (flags & GNUTLS_PIN_SO) {
 		env = "GNUTLS_SO_PIN";
 		desc = "security officer";
-		if (info)
-			password = info->so_pin;
+		if (info && info->so_pin)
+			snprintf(password, sizeof(password), "%s", info->so_pin);
 	} else {
 		env = "GNUTLS_PIN";
 		desc = "user";
-		if (info)
-			password = info->pin;
+		if (info && info->pin)
+			snprintf(password, sizeof(password), "%s", info->pin);
 	}
 
 	if (flags & GNUTLS_PIN_FINAL_TRY) {
@@ -1046,19 +1094,19 @@ pin_callback(void *user, int attempt, const char *token_url,
 		}
 	}
 
-	if (password == NULL) {
-		password = getenv(env);
-		if (password == NULL) /* compatibility */
-			password = getenv("GNUTLS_PIN");
+	if (password[0] == 0) {
+		getenv_copy(password, sizeof(password), env);
+		if (password[0] == 0) /* compatibility */
+			getenv_copy(password, sizeof(password), "GNUTLS_PIN");
 	}
 
-	if (password == NULL && (info == NULL || info->batch == 0 || info->ask_pass != 0)) {
+	if (password[0] == 0 && (info == NULL || info->batch == 0 || info->ask_pass != 0)) {
 		if (token_label && token_label[0] != 0) {
 			fprintf(stderr, "Token '%s' with URL '%s' ", token_label, token_url);
 			fprintf(stderr, "requires %s PIN\n", desc);
-			password = getpass("Enter PIN: ");
+			getpass_copy(password, sizeof(password), "Enter PIN: ");
 		} else {
-			password = getpass("Enter password: ");
+			getpass_copy(password, sizeof(password), "Enter password: ");
 		}
 
 	} else {
@@ -1072,7 +1120,7 @@ pin_callback(void *user, int attempt, const char *token_url,
 		}
 	}
 
-	if (password == NULL || password[0] == 0 || password[0] == '\n') {
+	if (password[0] == 0 || password[0] == '\n') {
 		fprintf(stderr, "No PIN given.\n");
 		if (info != NULL && info->batch != 0) {
 			fprintf(stderr, "note: when operating in batch mode, set the GNUTLS_PIN or GNUTLS_SO_PIN environment variables\n");

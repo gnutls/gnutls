@@ -1193,6 +1193,8 @@ gnutls_pkcs11_token_init(const char *token_url,
 
 }
 
+#define L(x) ((x==NULL)?0:strlen(x))
+
 /**
  * gnutls_pkcs11_token_set_pin:
  * @token_url: A PKCS #11 URL specifying a token
@@ -1200,9 +1202,11 @@ gnutls_pkcs11_token_init(const char *token_url,
  * @newpin: new user's PIN
  * @flags: one of #gnutls_pin_flag_t.
  *
- * This function will modify or set a user's PIN for the given token. 
- * If it is called to set a user pin for first time the oldpin must
- * be NULL.
+ * This function will modify or set a user or administrator's PIN for
+ * the given token.  If it is called to set a PIN for first time
+ * the oldpin must be %NULL. When setting the admin's PIN with the
+ * %GNUTLS_PIN_SO flag, the @oldpin value must be provided (this requirement
+ * is relaxed after GnuTLS 3.6.5 since which the PIN will be requested if missing).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1240,7 +1244,8 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 		return ret;
 	}
 
-	if (oldpin == NULL) {
+	if (oldpin == NULL && !(flags & GNUTLS_PIN_SO)) {
+		/* This changes only the user PIN */
 		rv = pkcs11_init_pin(sinfo.module, sinfo.pks,
 				     (uint8_t *) newpin, strlen(newpin));
 		if (rv != CKR_OK) {
@@ -1251,9 +1256,32 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 			goto finish;
 		}
 	} else {
+		struct p11_kit_pin *pin;
+		unsigned oldpin_size;
+
+		oldpin_size = L(oldpin);
+
+		if (!(sinfo.tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH)) {
+			if (newpin == NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+			if (oldpin == NULL) {
+				struct pin_info_st pin_info;
+				memset(&pin_info, 0, sizeof(pin_info));
+
+				ret = pkcs11_retrieve_pin(&pin_info, info, &sinfo.tinfo, 0, CKU_SO, &pin);
+				if (ret < 0) {
+					gnutls_assert();
+					goto finish;
+				}
+				oldpin = (const char*)p11_kit_pin_get_value(pin, NULL);
+				oldpin_size = p11_kit_pin_get_length(pin);
+			}
+		}
+
 		rv = pkcs11_set_pin(sinfo.module, sinfo.pks,
-				    oldpin, strlen(oldpin),
-				    newpin, strlen(newpin));
+				    oldpin, oldpin_size,
+				    newpin, L(newpin));
 		if (rv != CKR_OK) {
 			gnutls_assert();
 			_gnutls_debug_log("p11: %s\n",

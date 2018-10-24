@@ -31,6 +31,8 @@
 #define PKCS11_ID_SIZE 128
 #define PKCS11_LABEL_SIZE 128
 
+#include <p11-kit/p11-kit.h>
+#include <p11-kit/pin.h>
 #include <p11-kit/uri.h>
 typedef unsigned char ck_bool_t;
 
@@ -268,6 +270,11 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 		return -1;
 	}
 }
+
+int
+pkcs11_retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
+		    struct ck_token_info *token_info, int attempts,
+		    ck_user_type_t user_type, struct p11_kit_pin **pin);
 
 ck_object_class_t pkcs11_type_to_class(gnutls_pkcs11_obj_type_t type);
 

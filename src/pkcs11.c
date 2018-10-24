@@ -21,8 +21,6 @@
  */
 #include <config.h>
 
-#include <getpass.h>
-
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/abstract.h>
@@ -1411,8 +1409,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	    common_info_st * info)
 {
 	int ret;
-	const char *pin;
-	char so_pin[32];
+	char so_pin[MAX_PIN_LEN];
 
 	pkcs11_common(info);
 
@@ -1426,20 +1423,18 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 		app_exit(1);
 	}
 
-	if (info->so_pin != NULL)
-		pin = info->so_pin;
-	else {
-		pin = getenv("GNUTLS_SO_PIN");
-		if (pin == NULL && info->batch == 0)
-			pin = getpass("Enter Security Officer's PIN: ");
-		if (pin == NULL)
+	if (info->so_pin != NULL) {
+		snprintf(so_pin, sizeof(so_pin), "%s", info->so_pin);
+	} else {
+		getenv_copy(so_pin, sizeof(so_pin), "GNUTLS_SO_PIN");
+		if (so_pin[0] == 0 && info->batch == 0)
+			getpass_copy(so_pin, sizeof(so_pin), "Enter Security Officer's PIN: ");
+		if (so_pin[0] == 0)
 			app_exit(1);
 	}
 
-	if (strlen(pin) >= sizeof(so_pin) || pin[0] == '\n')
+	if (so_pin[0] == '\n' || so_pin[0] == 0)
 		app_exit(1);
-
-	strcpy(so_pin, pin);
 
 	fprintf(stderr, "Initializing token... ");
 	ret = gnutls_pkcs11_token_init(url, so_pin, label);
@@ -1459,7 +1454,7 @@ void
 pkcs11_set_token_pin(FILE * outfile, const char *url, common_info_st * info, unsigned so)
 {
 	int ret;
-	const char *pin;
+	char newpin[MAX_PIN_LEN] = "";
 
 	pkcs11_common(info);
 
@@ -1468,34 +1463,32 @@ pkcs11_set_token_pin(FILE * outfile, const char *url, common_info_st * info, uns
 		app_exit(1);
 	}
 
-	fprintf(stderr, "Setting token's user PIN...\n");
+	if (so)
+		fprintf(stderr, "Setting admin's PIN...\n");
+	else
+		fprintf(stderr, "Setting user's PIN...\n");
 
 	if (so) {
-		if (info->so_pin != NULL) {
-			pin = info->so_pin;
-		} else {
-			pin = getenv("GNUTLS_SO_PIN");
-			if (pin == NULL && info->batch == 0)
-				pin = getpass("Enter Administrators's new PIN: ");
-			if (pin == NULL)
-				app_exit(1);
+		getenv_copy(newpin, sizeof(newpin), "GNUTLS_NEW_SO_PIN");
+		if (newpin[0] == 0 && info->batch == 0) {
+			getpass_copy(newpin, sizeof(newpin), "Enter Administrators's new PIN: ");
 		}
 	} else {
 		if (info->pin != NULL) {
-			pin = info->pin;
+			snprintf(newpin, sizeof(newpin), "%s", info->pin);
 		} else {
-			pin = getenv("GNUTLS_PIN");
-			if (pin == NULL && info->batch == 0)
-				pin = getpass("Enter User's new PIN: ");
-			if (pin == NULL)
-				app_exit(1);
+			getenv_copy(newpin, sizeof(newpin), "GNUTLS_PIN");
+			if (newpin[0] == 0 && info->batch == 0)
+				getpass_copy(newpin, sizeof(newpin), "Enter User's new PIN: ");
 		}
 	}
 
-	if (pin == NULL || pin[0] == '\n')
+	if (newpin[0] == 0 || newpin[0] == '\n') {
+		fprintf(stderr, "No PIN was given to change\n");
 		app_exit(1);
+	}
 
-	ret = gnutls_pkcs11_token_set_pin(url, NULL, pin, (so!=0)?GNUTLS_PIN_SO:GNUTLS_PIN_USER);
+	ret = gnutls_pkcs11_token_set_pin(url, NULL, newpin, (so!=0)?GNUTLS_PIN_SO:GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
