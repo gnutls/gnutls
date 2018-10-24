@@ -139,6 +139,9 @@ static unsigned is_cipher_algo_forbidden(gnutls_cipher_algorithm_t algo)
 			case GNUTLS_CIPHER_3DES_CBC:
 			case GNUTLS_CIPHER_AES_128_CCM_8:
 			case GNUTLS_CIPHER_AES_256_CCM_8:
+			case GNUTLS_CIPHER_AES_128_CFB8:
+			case GNUTLS_CIPHER_AES_192_CFB8:
+			case GNUTLS_CIPHER_AES_256_CFB8:
 				return 0;
 			default:
 				if (mode == GNUTLS_FIPS140_LAX)

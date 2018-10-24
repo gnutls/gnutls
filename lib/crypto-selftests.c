@@ -373,6 +373,53 @@ const struct cipher_vectors_st arcfour_vectors[] = { /* RFC6229 */
 	},
 };
 
+const struct cipher_vectors_st aes128_cfb8_vectors[] = { /* NIST 800-38a */
+	{
+	 STR(key, key_size,
+	     "\x2b\x7e\x15\x16\x28\xae\xd2\xa6\xab\xf7\x15\x88\x09\xcf\x4f\x3c"),
+	 STR(plaintext, plaintext_size,
+	     "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
+             "\xae\x2d"),
+	 .ciphertext = (uint8_t *)
+	     "\x3b\x79\x42\x4c\x9c\x0d\xd4\x36\xba\xce\x9e\x0e\xd4\x58\x6a\x4f"
+             "\x32\xb9",
+	 STR(iv, iv_size,
+	     "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+	 },
+};
+
+const struct cipher_vectors_st aes192_cfb8_vectors[] = { /* NIST 800-38a */
+	{
+	 STR(key, key_size,
+	     "\x8e\x73\xb0\xf7\xda\x0e\x64\x52\xc8\x10\xf3\x2b\x80\x90\x79\xe5"
+             "\x62\xf8\xea\xd2\x52\x2c\x6b\x7b"),
+	 STR(plaintext, plaintext_size,
+	     "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
+             "\xae\x2d"),
+	 .ciphertext = (uint8_t *)
+	     "\xcd\xa2\x52\x1e\xf0\xa9\x05\xca\x44\xcd\x05\x7c\xbf\x0d\x47\xa0"
+             "\x67\x8a",
+	 STR(iv, iv_size,
+	     "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+	 },
+};
+
+const struct cipher_vectors_st aes256_cfb8_vectors[] = { /* NIST 800-38a */
+	{
+	 STR(key, key_size,
+	     "\x60\x3d\xeb\x10\x15\xca\x71\xbe\x2b\x73\xae\xf0\x85\x7d\x77\x81"
+             "\x1f\x35\x2c\x07\x3b\x61\x08\xd7\x2d\x98\x10\xa3\x09\x14\xdf\xf4"),
+	 STR(plaintext, plaintext_size,
+	     "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
+             "\xae\x2d"),
+	 .ciphertext = (uint8_t *)
+	     "\xdc\x1f\x1a\x85\x20\xa6\x4d\xb5\x5f\xcc\x8a\xc5\x54\x84\x4e\x88"
+             "\x97\x00",
+	 STR(iv, iv_size,
+	     "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+	 },
+};
+
 static int test_cipher(gnutls_cipher_algorithm_t cipher,
 		       const struct cipher_vectors_st *vectors,
 		       size_t vectors_size, unsigned flags)
@@ -1339,6 +1386,15 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_CIPHER_CHACHA20_POLY1305, test_cipher_aead,
 		     chacha_poly1305_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_CIPHER_AES_128_CFB8, test_cipher,
+		     aes128_cfb8_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_CIPHER_AES_192_CFB8, test_cipher,
+		     aes192_cfb8_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_CIPHER_AES_256_CFB8, test_cipher,
+		     aes256_cfb8_vectors);
 		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
