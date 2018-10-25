@@ -1512,6 +1512,18 @@ unsigned int
 /* returns a-b in ms */
  timespec_sub_ms(struct timespec *a, struct timespec *b);
 
+inline static int _gnutls_timespec_cmp(struct timespec *a, struct timespec *b) {
+	if (a->tv_sec < b->tv_sec)
+		return -1;
+	if (a->tv_sec > b->tv_sec)
+		return 1;
+	if (a->tv_nsec < b->tv_nsec)
+		return -1;
+	if (a->tv_nsec > b->tv_nsec)
+		return 1;
+	return 0;
+}
+
 #include <algorithms.h>
 inline static int _gnutls_set_current_version(gnutls_session_t s, unsigned v)
 {
