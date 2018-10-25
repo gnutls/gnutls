@@ -1016,7 +1016,7 @@ typedef struct gnutls_dh_params_int {
 
 /* TLS 1.3 session ticket
  */
-typedef struct tls13_ticket {
+typedef struct {
 	time_t timestamp;
 	uint32_t lifetime;
 	uint32_t age_add;
@@ -1025,7 +1025,7 @@ typedef struct tls13_ticket {
 	const mac_entry_st *prf;
 	uint8_t resumption_master_secret[MAX_HASH_SIZE];
 	gnutls_datum_t ticket;
-} tls13_ticket_t;
+} tls13_ticket_st;
 
 /* DTLS session state
  */
@@ -1447,7 +1447,7 @@ typedef struct {
 	/* this is only used under TLS1.2 or earlier */
 	int session_ticket_renew;
 
-	tls13_ticket_t tls13_ticket;
+	tls13_ticket_st tls13_ticket;
 
 	/* the amount of early data received so far */
 	uint32_t early_data_received;

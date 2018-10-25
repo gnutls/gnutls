@@ -33,7 +33,7 @@
 #include <assert.h>
 
 static int
-compute_psk_from_ticket(const tls13_ticket_t *ticket, gnutls_datum_t *key)
+compute_psk_from_ticket(const tls13_ticket_st *ticket, gnutls_datum_t *key)
 {
 	int ret;
 	char label[] = "resumption";
@@ -476,7 +476,7 @@ static int server_recv_params(gnutls_session_t session,
 	psk_ext_iter_st psk_iter;
 	struct psk_st psk;
 	psk_auth_info_t info;
-	tls13_ticket_t ticket_data;
+	tls13_ticket_st ticket_data;
 	uint32_t ticket_age;
 	bool resuming;
 

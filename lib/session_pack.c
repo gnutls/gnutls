@@ -323,7 +323,7 @@ tls13_pack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 	int ret = 0;
 	uint32_t length = 0;
 	size_t length_pos;
-	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
+	tls13_ticket_st *ticket = &session->internals.tls13_ticket;
 
 	length_pos = ps->length;
 	BUFFER_APPEND_NUM(ps, 0);
@@ -359,7 +359,7 @@ static int
 tls13_unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 {
 	uint32_t ttl_len;
-	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
+	tls13_ticket_st *ticket = &session->internals.tls13_ticket;
 	gnutls_datum_t t;
 	int ret = 0;
 

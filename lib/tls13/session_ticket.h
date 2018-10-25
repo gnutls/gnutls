@@ -27,17 +27,17 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr, unsigne
 
 int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 				    gnutls_datum_t *data,
-				    tls13_ticket_t *ticket_data);
+				    tls13_ticket_st *ticket_data);
 
 inline static
-void tls13_ticket_deinit(tls13_ticket_t *ticket)
+void tls13_ticket_deinit(tls13_ticket_st *ticket)
 {
 	if (ticket) {
 		zeroize_temp_key(&ticket->resumption_master_secret,
 				 sizeof(ticket->resumption_master_secret));
 
 		_gnutls_free_datum(&ticket->ticket);
-		memset(ticket, 0, sizeof(tls13_ticket_t));
+		memset(ticket, 0, sizeof(tls13_ticket_st));
 	}
 }
 
