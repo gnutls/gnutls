@@ -395,8 +395,8 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	/* Set the ticket timestamp */
-	ticket->timestamp = gnutls_time(0);
+	/* Record the ticket arrival time */
+	gnutls_gettime(&ticket->arrival_time);
 
 	return 0;
 }

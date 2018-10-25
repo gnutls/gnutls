@@ -201,7 +201,7 @@ client_send_params(gnutls_session_t session,
 	unsigned next_idx;
 	const mac_entry_st *prf_res = NULL;
 	const mac_entry_st *prf_psk = NULL;
-	time_t cur_time;
+	struct timespec cur_time;
 	uint32_t ticket_age, ob_ticket_age;
 	int free_username = 0;
 	psk_auth_info_t info = NULL;
@@ -235,16 +235,21 @@ client_send_params(gnutls_session_t session,
 
 		prf_res = session->internals.tls13_ticket.prf;
 
-		cur_time = gnutls_time(0);
-		if (unlikely(cur_time < session->internals.tls13_ticket.timestamp)) {
+		gnutls_gettime(&cur_time);
+		if (unlikely(_gnutls_timespec_cmp(&cur_time,
+						  &session->internals.
+						  tls13_ticket.
+						  arrival_time) < 0)) {
 			gnutls_assert();
 			_gnutls13_session_ticket_unset(session);
 			goto ignore_ticket;
 		}
 
 		/* Check whether the ticket is stale */
-		ticket_age = cur_time - session->internals.tls13_ticket.timestamp;
-		if (ticket_age > session->internals.tls13_ticket.lifetime) {
+		ticket_age = timespec_sub_ms(&cur_time,
+					     &session->internals.tls13_ticket.
+					     arrival_time);
+		if (ticket_age / 1000 > session->internals.tls13_ticket.lifetime) {
 			_gnutls13_session_ticket_unset(session);
 			goto ignore_ticket;
 		}
@@ -256,7 +261,7 @@ client_send_params(gnutls_session_t session,
 		}
 
 		/* Calculate obfuscated ticket age, in milliseconds, mod 2^32 */
-		ob_ticket_age = ticket_age * 1000 + session->internals.tls13_ticket.age_add;
+		ob_ticket_age = ticket_age + session->internals.tls13_ticket.age_add;
 
 		if ((ret = _gnutls_buffer_append_data_prefix(extdata, 16,
 							     session->internals.tls13_ticket.ticket.data,

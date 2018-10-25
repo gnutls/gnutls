@@ -1017,7 +1017,7 @@ typedef struct gnutls_dh_params_int {
 /* TLS 1.3 session ticket
  */
 typedef struct {
-	time_t timestamp;
+	struct timespec arrival_time;
 	uint32_t lifetime;
 	uint32_t age_add;
 	uint8_t nonce[255];
