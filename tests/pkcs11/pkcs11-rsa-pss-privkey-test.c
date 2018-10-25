@@ -126,7 +126,7 @@ void doit(void)
 
 	if (verify_rsa_pss_presence() == 0) {
 		fprintf(stderr, "Skipping test as no RSA-PSS mech is supported\n");
-		goto cleanup;
+		exit(77);
 	}
 
 	ret = gnutls_x509_crt_init(&crt);
@@ -265,7 +265,6 @@ void doit(void)
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(pkey);
 
-cleanup:
 	gnutls_global_deinit();
 
 	remove(CONFIG);
