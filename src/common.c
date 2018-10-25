@@ -283,6 +283,15 @@ print_dh_info(gnutls_session_t session, const char *str, int print)
 {
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 	unsigned group;
+	int ret;
+	gnutls_datum_t raw_gen = { NULL, 0 };
+	gnutls_datum_t raw_prime = { NULL, 0 };
+	gnutls_dh_params_t dh_params = NULL;
+	unsigned char *params_data = NULL;
+	size_t params_data_size = 0;
+
+	if (!print)
+		return;
 
 	group = gnutls_group_get(session);
 	if (group != 0) {
@@ -297,77 +306,71 @@ print_dh_info(gnutls_session_t session, const char *str, int print)
 	printf(" - Peer's public key: %d bits\n",
 	       gnutls_dh_get_peers_public_bits(session));
 
-	if (print) {
-		int ret;
-		gnutls_datum_t raw_gen = { NULL, 0 };
-		gnutls_datum_t raw_prime = { NULL, 0 };
-		gnutls_dh_params_t dh_params = NULL;
-		unsigned char *params_data = NULL;
-		size_t params_data_size = 0;
-
-		ret = gnutls_dh_get_group(session, &raw_gen, &raw_prime);
-		if (ret) {
-			fprintf(stderr, "gnutls_dh_get_group %d\n", ret);
-			goto out;
-		}
-
-		ret = gnutls_dh_params_init(&dh_params);
-		if (ret) {
-			fprintf(stderr, "gnutls_dh_params_init %d\n", ret);
-			goto out;
-		}
-
-		ret =
-		    gnutls_dh_params_import_raw(dh_params, &raw_prime,
-						&raw_gen);
-		if (ret) {
-			fprintf(stderr, "gnutls_dh_params_import_raw %d\n",
-				ret);
-			goto out;
-		}
-
-		ret = gnutls_dh_params_export_pkcs3(dh_params,
-						    GNUTLS_X509_FMT_PEM,
-						    params_data,
-						    &params_data_size);
-		if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			fprintf(stderr,
-				"gnutls_dh_params_export_pkcs3 %d\n", ret);
-			goto out;
-		}
-
-		params_data = gnutls_malloc(params_data_size);
-		if (!params_data) {
-			fprintf(stderr, "gnutls_malloc %d\n", ret);
-			goto out;
-		}
-
-		ret = gnutls_dh_params_export_pkcs3(dh_params,
-						    GNUTLS_X509_FMT_PEM,
-						    params_data,
-						    &params_data_size);
-		if (ret) {
-			fprintf(stderr,
-				"gnutls_dh_params_export_pkcs3-2 %d\n",
-				ret);
-			goto out;
-		}
-
-		printf(" - PKCS#3 format:\n\n%.*s\n",
-		       (int) params_data_size, params_data);
-
-	      out:
-		gnutls_free(params_data);
-		gnutls_free(raw_prime.data);
-		gnutls_free(raw_gen.data);
-		gnutls_dh_params_deinit(dh_params);
+	ret = gnutls_dh_get_group(session, &raw_gen, &raw_prime);
+	if (ret) {
+		fprintf(stderr, "gnutls_dh_get_group %d\n", ret);
+		goto out;
 	}
+
+	ret = gnutls_dh_params_init(&dh_params);
+	if (ret) {
+		fprintf(stderr, "gnutls_dh_params_init %d\n", ret);
+		goto out;
+	}
+
+	ret =
+	    gnutls_dh_params_import_raw(dh_params, &raw_prime,
+						&raw_gen);
+	if (ret) {
+		fprintf(stderr, "gnutls_dh_params_import_raw %d\n",
+			ret);
+		goto out;
+	}
+
+	ret = gnutls_dh_params_export_pkcs3(dh_params,
+					    GNUTLS_X509_FMT_PEM,
+					    params_data,
+					    &params_data_size);
+	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		fprintf(stderr,
+			"gnutls_dh_params_export_pkcs3 %d\n", ret);
+		goto out;
+	}
+
+	params_data = gnutls_malloc(params_data_size);
+	if (!params_data) {
+		fprintf(stderr, "gnutls_malloc %d\n", ret);
+		goto out;
+	}
+
+	ret = gnutls_dh_params_export_pkcs3(dh_params,
+					    GNUTLS_X509_FMT_PEM,
+					    params_data,
+					    &params_data_size);
+	if (ret) {
+		fprintf(stderr,
+			"gnutls_dh_params_export_pkcs3-2 %d\n",
+			ret);
+		goto out;
+	}
+
+	printf(" - PKCS#3 format:\n\n%.*s\n",
+	       (int) params_data_size, params_data);
+
+      out:
+	gnutls_free(params_data);
+	gnutls_free(raw_prime.data);
+	gnutls_free(raw_gen.data);
+	gnutls_dh_params_deinit(dh_params);
 #endif
 }
 
-static void print_ecdh_info(gnutls_session_t session, const char *str)
+static void print_ecdh_info(gnutls_session_t session, const char *str, int print)
 {
 	int curve;
+
+	if (!print)
+		return;
 
 	printf("- %sEC Diffie-Hellman parameters\n", str);
 
@@ -412,7 +415,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 #ifdef ENABLE_ANON
 	case GNUTLS_CRD_ANON:
 		if (kx == GNUTLS_KX_ANON_ECDH)
-			print_ecdh_info(session, "Anonymous ");
+			print_ecdh_info(session, "Anonymous ", verbose);
 		else
 			print_dh_info(session, "Anonymous ", verbose);
 		break;
@@ -442,7 +445,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		if (kx == GNUTLS_KX_DHE_PSK)
 			print_dh_info(session, "Ephemeral ", verbose);
 		if (kx == GNUTLS_KX_ECDHE_PSK)
-			print_ecdh_info(session, "Ephemeral ");
+			print_ecdh_info(session, "Ephemeral ", verbose);
 		break;
 #endif
 	case GNUTLS_CRD_IA:
@@ -472,39 +475,42 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 			print_dh_info(session, "Ephemeral ", verbose);
 		else if (kx == GNUTLS_KX_ECDHE_RSA
 			 || kx == GNUTLS_KX_ECDHE_ECDSA)
-			print_ecdh_info(session, "Ephemeral ");
+			print_ecdh_info(session, "Ephemeral ", verbose);
 	}
 
-	version = gnutls_protocol_get_version(session);
-	tmp =
-	    SU(gnutls_protocol_get_name(version));
-	printf("- Version: %s\n", tmp);
 
-	if (version < GNUTLS_TLS1_3) {
-		tmp = SU(gnutls_kx_get_name(kx));
-		printf("- Key Exchange: %s\n", tmp);
-	}
-
-	if (gnutls_sign_algorithm_get(session) != GNUTLS_SIGN_UNKNOWN) {
+	if (verbose) {
+		version = gnutls_protocol_get_version(session);
 		tmp =
-		    SU(gnutls_sign_get_name
-		       (gnutls_sign_algorithm_get(session)));
-		printf("- Server Signature: %s\n", tmp);
+		    SU(gnutls_protocol_get_name(version));
+		printf("- Version: %s\n", tmp);
+
+		if (version < GNUTLS_TLS1_3) {
+			tmp = SU(gnutls_kx_get_name(kx));
+			printf("- Key Exchange: %s\n", tmp);
+		}
+
+		if (gnutls_sign_algorithm_get(session) != GNUTLS_SIGN_UNKNOWN) {
+			tmp =
+			    SU(gnutls_sign_get_name
+			       (gnutls_sign_algorithm_get(session)));
+			printf("- Server Signature: %s\n", tmp);
+		}
+
+		if (gnutls_sign_algorithm_get_client(session) !=
+		    GNUTLS_SIGN_UNKNOWN) {
+			tmp =
+			    SU(gnutls_sign_get_name
+			       (gnutls_sign_algorithm_get_client(session)));
+			printf("- Client Signature: %s\n", tmp);
+		}
+
+		tmp = SU(gnutls_cipher_get_name(gnutls_cipher_get(session)));
+		printf("- Cipher: %s\n", tmp);
+
+		tmp = SU(gnutls_mac_get_name(gnutls_mac_get(session)));
+		printf("- MAC: %s\n", tmp);
 	}
-
-	if (gnutls_sign_algorithm_get_client(session) !=
-	    GNUTLS_SIGN_UNKNOWN) {
-		tmp =
-		    SU(gnutls_sign_get_name
-		       (gnutls_sign_algorithm_get_client(session)));
-		printf("- Client Signature: %s\n", tmp);
-	}
-
-	tmp = SU(gnutls_cipher_get_name(gnutls_cipher_get(session)));
-	printf("- Cipher: %s\n", tmp);
-
-	tmp = SU(gnutls_mac_get_name(gnutls_mac_get(session)));
-	printf("- MAC: %s\n", tmp);
 
 	printf("- Options:");
 	if (gnutls_session_ext_master_secret_status(session)!=0)
