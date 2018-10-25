@@ -77,7 +77,10 @@ ssize_t system_read(gnutls_transport_ptr_t ptr, void *data,
 # define HAVE_NO_LOCKS
 #endif
 
+typedef void (*gnutls_gettime_func) (struct timespec *);
+
 extern gnutls_time_func gnutls_time;
+extern gnutls_gettime_func gnutls_gettime;
 
 static inline void millisleep(unsigned int ms)
 {
@@ -93,25 +96,13 @@ static inline void millisleep(unsigned int ms)
 #endif
 }
 
-/* emulate gnulib's gettime using gettimeofday to avoid linking to
- * librt */
-inline static void gettime(struct timespec *t)
-{
-#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_REALTIME)
-	clock_gettime(CLOCK_REALTIME, t);
-#else
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	t->tv_sec = tv.tv_sec;
-	t->tv_nsec = tv.tv_usec * 1000;
-#endif
-}
-
 int _gnutls_find_config_path(char *path, size_t max_size);
 int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 			 gnutls_datum_t * output, unsigned bigendian);
 int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 			 gnutls_datum_t * output);
+
+void _gnutls_global_set_gettime_function(gnutls_gettime_func gettime_func);
 
 int gnutls_system_global_init(void);
 void gnutls_system_global_deinit(void);

@@ -29,19 +29,28 @@
 #include <time.h>
 #include <gnutls/gnutls.h>
 
+/* copied from ../lib/system.h so not to include that header from
+ * every test program */
+typedef void (*gnutls_gettime_func) (struct timespec *);
+extern void _gnutls_global_set_gettime_function(gnutls_gettime_func gettime_func);
+
 /* virtualize time in a test. This freezes the time in the test, except for
  * the advances due to calls to virt_sleep_sec(). This makes the test
- * independent of the test system load, and avoids any long delays.
- *
- * This only affects the parts of the library that utilize gnutls_time(),
- * not the higher precision gettime */
-static time_t _now = 0;
+ * independent of the test system load, and avoids any long delays. */
+static time_t _now;
+static struct timespec _now_ts;
 
-#define virt_sec_sleep(s) _now += s
+#define virt_sec_sleep(s) { \
+		_now += s; \
+		_now_ts.tv_sec += s; \
+	}
 
 #define virt_time_init() { \
 		_now = time(0); \
 		gnutls_global_set_time_function(mytime); \
+		_now_ts.tv_sec = _now; \
+		_now_ts.tv_nsec = 0; \
+		_gnutls_global_set_gettime_function(mygettime); \
 	}
 
 
@@ -51,6 +60,12 @@ static time_t mytime(time_t * t)
 		*t = _now;
 
 	return _now;
+}
+
+static void mygettime(struct timespec * t)
+{
+	if (t)
+		*t = _now_ts;
 }
 
 #endif

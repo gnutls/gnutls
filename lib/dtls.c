@@ -234,7 +234,7 @@ int _dtls_transmit(gnutls_session_t session)
 	unsigned int diff;
 	struct timespec now;
 
-	gettime(&now);
+	gnutls_gettime(&now);
 
 	/* If we have already sent a flight and we are operating in a 
 	 * non blocking way, check if it is time to retransmit or just
@@ -321,7 +321,7 @@ int _dtls_transmit(gnutls_session_t session)
 
 				last_type = cur->htype;
 			}
-			gettime(&session->internals.dtls.last_retransmit);
+			gnutls_gettime(&session->internals.dtls.last_retransmit);
 
 			if (session->internals.dtls.flight_init == 0) {
 				session->internals.dtls.flight_init = 1;
@@ -391,7 +391,7 @@ int _dtls_transmit(gnutls_session_t session)
 		}
 
 	      keep_up:
-		gettime(&now);
+		gnutls_gettime(&now);
 	} while (ret == GNUTLS_E_TIMEDOUT);
 
 	if (ret < 0) {
@@ -789,7 +789,7 @@ unsigned int gnutls_dtls_get_timeout(gnutls_session_t session)
 	struct timespec now;
 	unsigned int diff;
 
-	gettime(&now);
+	gnutls_gettime(&now);
 
 	diff =
 	    timespec_sub_ms(&now,

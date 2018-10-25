@@ -116,7 +116,7 @@ inline static int handshake_remaining_time(gnutls_session_t session)
 {
 	if (session->internals.handshake_endtime) {
 		struct timespec now;
-		gettime(&now);
+		gnutls_gettime(&now);
 
 		if (now.tv_sec < session->internals.handshake_endtime)
 			return (session->internals.handshake_endtime -

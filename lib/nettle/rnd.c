@@ -106,7 +106,7 @@ static int single_prng_init(struct prng_ctx_st *ctx,
 
 		ctx->forkid = _gnutls_get_forkid();
 
-		gettime(&now);
+		gnutls_gettime(&now);
 		memcpy(nonce, &now, MIN(sizeof(nonce), sizeof(now)));
 		ctx->last_reseed = now.tv_sec;
 	}

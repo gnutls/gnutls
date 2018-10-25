@@ -202,7 +202,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		gettime(&session->internals.hb_ping_start);
+		gnutls_gettime(&session->internals.hb_ping_start);
 		session->internals.hb_local_data.length = data_size;
 		session->internals.hb_state = SHB_SEND2;
 
@@ -220,7 +220,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		gettime(&session->internals.hb_ping_sent);
+		gnutls_gettime(&session->internals.hb_ping_sent);
 
 		if (!(flags & GNUTLS_HEARTBEAT_WAIT)) {
 			session->internals.hb_state = SHB_SEND1;
@@ -246,7 +246,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 				return gnutls_assert_val(ret);
 			}
 
-			gettime(&now);
+			gnutls_gettime(&now);
 			diff =
 			    timespec_sub_ms(&now,
 					    &session->internals.
@@ -405,7 +405,7 @@ unsigned int gnutls_heartbeat_get_timeout(gnutls_session_t session)
 	struct timespec now;
 	unsigned int diff;
 
-	gettime(&now);
+	gnutls_gettime(&now);
 	diff = timespec_sub_ms(&now, &session->internals.hb_ping_sent);
 	if (diff >= session->internals.hb_actual_retrans_timeout_ms)
 		return 0;
