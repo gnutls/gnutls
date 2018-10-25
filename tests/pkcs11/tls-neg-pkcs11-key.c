@@ -56,6 +56,22 @@ static void tls_log_func(int level, const char *str)
 #define testfail(fmt, ...) \
 	fail("%s: "fmt, name, ##__VA_ARGS__)
 
+static unsigned verify_eddsa_presence(void)
+{
+	unsigned i;
+	unsigned long mechanism;
+	int ret;
+
+	i = 0;
+	do {
+		ret = gnutls_pkcs11_token_get_mechanism("pkcs11:", i++, &mechanism);
+		if (ret >= 0 && mechanism == 0x1057 /* CKM_EDDSA */)
+			return 1;
+	} while(ret>=0);
+
+	return 0;
+}
+
 static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t *txtkey, int exp_key_err)
 {
 	gnutls_privkey_t privkey;
@@ -243,6 +259,7 @@ typedef struct test_st {
 	gnutls_kx_algorithm_t exp_kx;
 	int exp_key_err;
 	int exp_serv_err;
+	int needs_eddsa;
 	unsigned requires_pkcs11_pss;
 } test_st;
 
@@ -292,13 +309,13 @@ static const test_st tests[] = {
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
 	},
-	{.name = "tls1.2: ed25519 cert, ed25519 key", /* we cannot import that key */
+	{.name = "tls1.2: ed25519 cert, ed25519 key",
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
+	 .needs_eddsa = 1,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA",
 	 .cert = &server_ca3_eddsa_cert,
 	 .key = &server_ca3_eddsa_key,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
-	 .exp_key_err = GNUTLS_E_INVALID_REQUEST
 	}
 };
 
@@ -322,7 +339,7 @@ void doit(void)
 	gnutls_privkey_t privkey;
 	const char *bin, *lib;
 	char buf[512];
-	unsigned int i;
+	unsigned int i, have_eddsa;
 	int ret;
 
 #ifdef _WIN32
@@ -351,7 +368,12 @@ void doit(void)
 			gnutls_strerror(ret));
 	}
 
+	have_eddsa = verify_eddsa_presence();
+
 	for (i=0;i<sizeof(tests)/sizeof(tests[0]);i++) {
+		if (tests[i].needs_eddsa && !have_eddsa)
+			continue;
+
 		success("checking: %s\n", tests[i].name);
 
 		if (tests[i].requires_pkcs11_pss) {

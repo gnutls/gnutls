@@ -357,6 +357,29 @@ static int add_pubkey(gnutls_pubkey_t pubkey, struct ck_attribute *a, unsigned *
 		(*a_val)++;
 		break;
 	}
+	case GNUTLS_PK_EDDSA_ED25519: {
+		gnutls_datum_t params;
+
+		ret =
+		    _gnutls_x509_write_ecc_params(pubkey->params.curve,
+						  &params);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		a[*a_val].type = CKA_EC_PARAMS;
+		a[*a_val].value = params.data;
+		a[*a_val].value_len = params.size;
+		(*a_val)++;
+
+		a[*a_val].type = CKA_EC_POINT;
+		a[*a_val].value = pubkey->params.raw_pub.data;
+		a[*a_val].value_len = pubkey->params.raw_pub.size;
+		(*a_val)++;
+		break;
+	}
+
 	default:
 		_gnutls_debug_log("requested writing public key of unsupported type %u\n", (unsigned)pk);
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
@@ -920,6 +943,30 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 			break;
 		}
+	case GNUTLS_PK_EDDSA_ED25519:
+		{
+			ret =
+			    _gnutls_x509_write_ecc_params(key->params.curve,
+							  &p);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			type = CKK_EC_EDWARDS;
+
+			a[a_val].type = CKA_EC_PARAMS;
+			a[a_val].value = p.data;
+			a[a_val].value_len = p.size;
+			a_val++;
+
+			a[a_val].type = CKA_VALUE;
+			a[a_val].value = key->params.raw_priv.data;
+			a[a_val].value_len = key->params.raw_priv.size;
+			a_val++;
+
+			break;
+		}
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;
@@ -966,6 +1013,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 			break;
 		}
 	case GNUTLS_PK_EC:
+	case GNUTLS_PK_EDDSA_ED25519:
 		{
 			gnutls_free(p.data);
 			gnutls_free(x.data);

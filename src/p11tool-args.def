@@ -191,7 +191,7 @@ flag = {
     arg-type  = string;
     descrip   = "Generate private-public key pair of given type";
     doc = "Generates a private-public key pair in the specified token.
-Acceptable types are RSA, ECDSA, and DSA. Should be combined with --sec-param or --bits.";
+Acceptable types are RSA, ECDSA, Ed25519, and DSA. Should be combined with --sec-param or --bits.";
 };
 
 flag = {
