@@ -10,11 +10,16 @@ See the end for copying conditions.
 ** libgnutls: Provide the option of transparent re-handshake/reauthentication
    when the GNUTLS_AUTO_REAUTH flag is specified in gnutls_init().
 
+** libgnutls: Added support for AES-CFB8 cipher (#357)
+
 ** p11tool: fix initialization of security officer's PIN with the --initialize-so-pin
    option (#561)
 
 ** API and ABI modifications:
 GNUTLS_AUTO_REAUTH: Added
+GNUTLS_CIPHER_AES_128_CFB8: Added
+GNUTLS_CIPHER_AES_192_CFB8: Added
+GNUTLS_CIPHER_AES_256_CFB8: Added
 
 
 * Version 3.6.4 (released 2018-09-24)
