@@ -565,6 +565,12 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cfb8_encrypt)
 LIBS=$save_LIBS
 
+# Check if nettle has CMAC support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_cmac128_update)
+LIBS=$save_LIBS
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],

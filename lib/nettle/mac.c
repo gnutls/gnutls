@@ -37,6 +37,11 @@
 #include "gost/gosthash94.h"
 #include "gost/streebog.h"
 #endif
+#ifdef HAVE_NETTLE_CMAC128_UPDATE
+#include <nettle/cmac.h>
+#else
+#include "cmac.h"
+#endif /* HAVE_NETTLE_CMAC128_UPDATE */
 
 typedef void (*update_func) (void *, size_t, const uint8_t *);
 typedef void (*digest_func) (void *, size_t, uint8_t *);
