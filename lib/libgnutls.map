@@ -1326,4 +1326,6 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_server_name_set_raw;
 	# Internal symbols needed by tests/suite/resume-with-stek-expiration
 	_gnutls_set_session_ticket_key_rotation_callback;
+	# Internal symbols needed by tests/virt-time.h
+	_gnutls_global_set_gettime_function;
 } GNUTLS_3_4;

@@ -233,6 +233,24 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 	} \
     }
 
+#define BUFFER_APPEND_TS(b, s) { \
+	ret = _gnutls_buffer_append_prefix(b, 32, s.tv_sec >> 32); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    return ret; \
+	} \
+	ret = _gnutls_buffer_append_prefix(b, 32, s.tv_sec & 0xFFFFFFFF); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    return ret; \
+	} \
+	ret = _gnutls_buffer_append_prefix(b, 32, s.tv_nsec); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    return ret; \
+	} \
+    }
+
 #define BUFFER_POP(b, x, s) { \
 	ret = _gnutls_buffer_pop_data(b, x, s); \
 	if (ret < 0) { \
@@ -271,6 +289,30 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 	    goto error; \
 	} \
 	o = (void *) (intptr_t)(s); \
+    }
+
+#define BUFFER_POP_TS(b, o) { \
+	size_t s; \
+	uint64_t v; \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    goto error; \
+	} \
+	v = s; \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    goto error; \
+	} \
+	v = (v << 32) | s; \
+	ret = _gnutls_buffer_pop_prefix32(b, &s, 0); \
+	if (ret < 0) { \
+	    gnutls_assert(); \
+	    goto error; \
+	} \
+	o.tv_sec = v; \
+	o.tv_nsec = s; \
     }
 
 #endif

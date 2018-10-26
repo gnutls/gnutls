@@ -40,7 +40,7 @@ void _dtls_reset_window(struct record_parameters_st *rp);
 #define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
   struct timespec _now; \
   unsigned int _diff; \
-  gettime(&_now); \
+  gnutls_gettime(&_now); \
    \
   _diff = timespec_sub_ms(&_now, &session->internals.handshake_start_time); \
   if (_diff > session->internals.handshake_timeout_ms) \

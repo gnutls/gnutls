@@ -252,7 +252,7 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 		ret = _gnutls_io_check_recv(session, *ms);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-		gettime(&t1);
+		gnutls_gettime(&t1);
 	}
 
 	*bufel = _mbuffer_alloc_align16(max_size, get_total_headers(session));
@@ -287,7 +287,7 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 	}
 
 	if (ms && *ms > 0) {
-		gettime(&t2);
+		gnutls_gettime(&t2);
 		diff = timespec_sub_ms(&t2, &t1);
 		if (diff < *ms)
 			*ms -= diff;
@@ -338,7 +338,7 @@ _gnutls_stream_read(gnutls_session_t session, mbuffer_st ** bufel,
 				goto cleanup;
 			}
 
-			gettime(&t1);
+			gnutls_gettime(&t1);
 		}
 
 		reset_errno(session);
@@ -383,7 +383,7 @@ _gnutls_stream_read(gnutls_session_t session, mbuffer_st ** bufel,
 		(*bufel)->msg.size += i;
 
 		if (ms && *ms > 0 && *ms != GNUTLS_INDEFINITE_TIMEOUT) {
-			gettime(&t2);
+			gnutls_gettime(&t2);
 			diff = timespec_sub_ms(&t2, &t1);
 			if (diff < *ms)
 				*ms -= diff;

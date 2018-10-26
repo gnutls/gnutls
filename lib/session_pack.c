@@ -310,6 +310,7 @@ _gnutls_session_unpack(gnutls_session_t session,
  *      x bytes the ticket
  *      1 bytes the resumption master secret length
  *      x bytes the resumption master secret
+ *     12 bytes the ticket arrival time
  *
  * WE DON'T STORE NewSessionTicket EXTENSIONS, as we don't support them yet.
  *
@@ -323,14 +324,12 @@ tls13_pack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 	int ret = 0;
 	uint32_t length = 0;
 	size_t length_pos;
-	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
+	tls13_ticket_st *ticket = &session->internals.tls13_ticket;
 
 	length_pos = ps->length;
 	BUFFER_APPEND_NUM(ps, 0);
 
 	if (ticket->ticket.data != NULL) {
-		BUFFER_APPEND_NUM(ps, ticket->timestamp);
-		length += 4;
 		BUFFER_APPEND_NUM(ps, ticket->lifetime);
 		length += 4;
 		BUFFER_APPEND_NUM(ps, ticket->age_add);
@@ -347,6 +346,8 @@ tls13_pack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 				   ticket->resumption_master_secret,
 				   ticket->prf->output_size);
 		length += (1 + ticket->prf->output_size);
+		BUFFER_APPEND_TS(ps, ticket->arrival_time);
+		length += 12;
 
 		/* Overwrite the length field */
 		_gnutls_write_uint32(length, ps->data + length_pos);
@@ -359,14 +360,13 @@ static int
 tls13_unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 {
 	uint32_t ttl_len;
-	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
+	tls13_ticket_st *ticket = &session->internals.tls13_ticket;
 	gnutls_datum_t t;
 	int ret = 0;
 
 	BUFFER_POP_NUM(ps, ttl_len);
 
 	if (ttl_len > 0) {
-		BUFFER_POP_NUM(ps, ticket->timestamp);
 		BUFFER_POP_NUM(ps, ticket->lifetime);
 		BUFFER_POP_NUM(ps, ticket->age_add);
 
@@ -394,6 +394,8 @@ tls13_unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		ticket->prf = session->internals.resumed_security_parameters.prf;
+
+		BUFFER_POP_TS(ps, ticket->arrival_time);
 	}
 
 error:

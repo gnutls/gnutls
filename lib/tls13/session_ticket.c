@@ -34,7 +34,7 @@
 #include "db.h"
 
 static int
-pack_ticket(gnutls_session_t session, tls13_ticket_t *ticket, gnutls_datum_t *packed)
+pack_ticket(gnutls_session_t session, tls13_ticket_st *ticket, gnutls_datum_t *packed)
 {
 	uint8_t *p;
 	gnutls_datum_t state;
@@ -85,7 +85,7 @@ pack_ticket(gnutls_session_t session, tls13_ticket_t *ticket, gnutls_datum_t *pa
 }
 
 static int
-unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_t *data)
+unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_st *data)
 {
 	uint32_t age_add, lifetime;
 	uint8_t resumption_master_secret[MAX_HASH_SIZE];
@@ -174,11 +174,11 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_t *
 }
 
 static int
-generate_session_ticket(gnutls_session_t session, tls13_ticket_t *ticket)
+generate_session_ticket(gnutls_session_t session, tls13_ticket_st *ticket)
 {
 	int ret;
 	gnutls_datum_t packed = { NULL, 0 };
-	tls13_ticket_t ticket_data;
+	tls13_ticket_st ticket_data;
 	time_t now = gnutls_time(0);
 
 	if (session->internals.resumed != RESUME_FALSE) {
@@ -234,7 +234,7 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr, unsigne
 	int ret = 0;
 	mbuffer_st *bufel = NULL;
 	gnutls_buffer_st buf;
-	tls13_ticket_t ticket;
+	tls13_ticket_st ticket;
 	unsigned i;
 
 	/* Client does not send a NewSessionTicket */
@@ -253,7 +253,7 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr, unsigne
 
 	if (again == 0) {
 		for (i=0;i<nr;i++) {
-			memset(&ticket, 0, sizeof(tls13_ticket_t));
+			memset(&ticket, 0, sizeof(tls13_ticket_st));
 			bufel = NULL;
 
 			ret = _gnutls_buffer_init_handshake_mbuffer(&buf);
@@ -346,7 +346,7 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
 {
 	int ret;
 	uint8_t value;
-	tls13_ticket_t *ticket = &session->internals.tls13_ticket;
+	tls13_ticket_st *ticket = &session->internals.tls13_ticket;
 	gnutls_datum_t t;
 	size_t val;
 
@@ -354,7 +354,7 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	_gnutls_free_datum(&ticket->ticket);
-	memset(ticket, 0, sizeof(tls13_ticket_t));
+	memset(ticket, 0, sizeof(tls13_ticket_st));
 
 	_gnutls_handshake_log("HSK[%p]: parsing session ticket message\n", session);
 
@@ -395,8 +395,8 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	/* Set the ticket timestamp */
-	ticket->timestamp = gnutls_time(0);
+	/* Record the ticket arrival time */
+	gnutls_gettime(&ticket->arrival_time);
 
 	return 0;
 }
@@ -407,7 +407,7 @@ int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *bu
  */
 int _gnutls13_unpack_session_ticket(gnutls_session_t session,
 		gnutls_datum_t *data,
-		tls13_ticket_t *ticket_data)
+		tls13_ticket_st *ticket_data)
 {
 	int ret;
 	gnutls_datum_t decrypted = { NULL, 0 };

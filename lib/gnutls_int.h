@@ -1016,8 +1016,8 @@ typedef struct gnutls_dh_params_int {
 
 /* TLS 1.3 session ticket
  */
-typedef struct tls13_ticket {
-	time_t timestamp;
+typedef struct {
+	struct timespec arrival_time;
 	uint32_t lifetime;
 	uint32_t age_add;
 	uint8_t nonce[255];
@@ -1025,7 +1025,7 @@ typedef struct tls13_ticket {
 	const mac_entry_st *prf;
 	uint8_t resumption_master_secret[MAX_HASH_SIZE];
 	gnutls_datum_t ticket;
-} tls13_ticket_t;
+} tls13_ticket_st;
 
 /* DTLS session state
  */
@@ -1447,7 +1447,7 @@ typedef struct {
 	/* this is only used under TLS1.2 or earlier */
 	int session_ticket_renew;
 
-	tls13_ticket_t tls13_ticket;
+	tls13_ticket_st tls13_ticket;
 
 	/* the amount of early data received so far */
 	uint32_t early_data_received;
@@ -1511,6 +1511,18 @@ extern unsigned _gnutls_disable_tls13;
 unsigned int
 /* returns a-b in ms */
  timespec_sub_ms(struct timespec *a, struct timespec *b);
+
+inline static int _gnutls_timespec_cmp(struct timespec *a, struct timespec *b) {
+	if (a->tv_sec < b->tv_sec)
+		return -1;
+	if (a->tv_sec > b->tv_sec)
+		return 1;
+	if (a->tv_nsec < b->tv_nsec)
+		return -1;
+	if (a->tv_nsec > b->tv_nsec)
+		return 1;
+	return 0;
+}
 
 #include <algorithms.h>
 inline static int _gnutls_set_current_version(gnutls_session_t s, unsigned v)
