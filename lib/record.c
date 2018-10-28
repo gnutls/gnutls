@@ -1401,7 +1401,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 					   (unsigned int)
 					   record.length);
 			session->internals.early_data_received += record.length;
-			goto discard;
+			/* silently discard received data */
+			_mbuffer_xfree(&decrypted);
+			return gnutls_assert_val(GNUTLS_E_AGAIN);
 		} else {
 			session->internals.hsk_flags &= ~HSK_EARLY_DATA_IN_FLIGHT;
 		}
