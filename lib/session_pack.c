@@ -311,8 +311,7 @@ _gnutls_session_unpack(gnutls_session_t session,
  *      1 bytes the resumption master secret length
  *      x bytes the resumption master secret
  *     12 bytes the ticket arrival time
- *
- * WE DON'T STORE NewSessionTicket EXTENSIONS, as we don't support them yet.
+ *      4 bytes the max early data size
  *
  * We only store that info if we received a TLS 1.3 NewSessionTicket at some point.
  * If we didn't receive any NST then we cannot resume a TLS 1.3 session and hence
@@ -348,6 +347,10 @@ tls13_pack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 		length += (1 + ticket->prf->output_size);
 		BUFFER_APPEND_TS(ps, ticket->arrival_time);
 		length += 12;
+		BUFFER_APPEND_NUM(ps,
+				  session->security_parameters.
+				  max_early_data_size);
+		length += 4;
 
 		/* Overwrite the length field */
 		_gnutls_write_uint32(length, ps->data + length_pos);
@@ -396,6 +399,9 @@ tls13_unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st *ps)
 		ticket->prf = session->internals.resumed_security_parameters.prf;
 
 		BUFFER_POP_TS(ps, ticket->arrival_time);
+		BUFFER_POP_NUM(ps,
+			       session->security_parameters.
+			       max_early_data_size);
 	}
 
 error:
