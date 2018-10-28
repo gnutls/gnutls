@@ -15,6 +15,10 @@ See the end for copying conditions.
 ** p11tool: fix initialization of security officer's PIN with the --initialize-so-pin
    option (#561)
 
+** In two previous versions GNUTLS_CIPHER_GOST28147_CPB/CPC/CPD_CFB ciphers
+   have incorrectly used CryptoPro-A S-BOX instead of proper (CryptoPro-B/-C/-D
+   S-BOXes). They are fixed now.
+
 ** API and ABI modifications:
 GNUTLS_AUTO_REAUTH: Added
 GNUTLS_CIPHER_AES_128_CFB8: Added
