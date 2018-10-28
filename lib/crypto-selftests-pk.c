@@ -88,6 +88,24 @@ static const char dsa_key[] =
  "VzO8qcrLCFvTOXY=\n"
  "-----END DSA PRIVATE KEY-----\n";
 
+static const char gost01_key[] =
+ "-----BEGIN PRIVATE KEY-----\n"
+ "MEUCAQAwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEEIgQgR1lBLIr4WBpn\n"
+ "4MOCH8oxGWb52EPNL3gjNJiQuBQuf6U=\n"
+ "-----END PRIVATE KEY-----\n";
+
+static const char gost12_256_key[] =
+ "-----BEGIN PRIVATE KEY-----\n"
+ "MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIkAAYIKoUDBwEBAgIEIgQg0+JttJEV\n"
+ "Ud+XBzX9q13ByKK+j2b+mEmNIo1yB0wGleo=\n"
+ "-----END PRIVATE KEY-----\n";
+
+static const char gost12_512_key[] =
+ "-----BEGIN PRIVATE KEY-----\n"
+ "MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBECS7bAh\n"
+ "TP5um5bxziaKkhb6xSI5WBQCSlaiHPBaMbgmgJiF8RubF7k0YMefpt0+sA3GvVGA\n"
+ "KjL7CLBERDm7Yvlv\n"
+ "-----END PRIVATE KEY-----\n";
 
 static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 			unsigned bits, gnutls_digest_algorithm_t ign)
@@ -173,11 +191,15 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	gnutls_datum_t raw_rsa_key = { (void*)rsa_key2048, sizeof(rsa_key2048)-1 };
 	gnutls_datum_t raw_dsa_key = { (void*)dsa_key, sizeof(dsa_key)-1 };
 	gnutls_datum_t raw_ecc_key = { (void*)ecc_key, sizeof(ecc_key)-1 };
+	gnutls_datum_t raw_gost01_key = { (void*)gost01_key, sizeof(gost01_key)-1 };
+	gnutls_datum_t raw_gost12_256_key = { (void*)gost12_256_key, sizeof(gost12_256_key)-1 };
+	gnutls_datum_t raw_gost12_512_key = { (void*)gost12_512_key, sizeof(gost12_512_key)-1 };
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub = NULL;
 	char param_name[32];
 
-	if (pk == GNUTLS_PK_EC) {
+	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
+	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512) {
 		snprintf(param_name, sizeof(param_name), "%s",
 			 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
 						   (bits)));
@@ -201,6 +223,12 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 		ret = gnutls_privkey_import_x509_raw(key, &raw_dsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	} else if (pk == GNUTLS_PK_ECC) {
 		ret = gnutls_privkey_import_x509_raw(key, &raw_ecc_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	} else if (pk == GNUTLS_PK_GOST_01) {
+		ret = gnutls_privkey_import_x509_raw(key, &raw_gost01_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	} else if (pk == GNUTLS_PK_GOST_12_256) {
+		ret = gnutls_privkey_import_x509_raw(key, &raw_gost12_256_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	} else if (pk == GNUTLS_PK_GOST_12_512) {
+		ret = gnutls_privkey_import_x509_raw(key, &raw_gost12_512_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	} else {
 		gnutls_assert();
 		ret = GNUTLS_E_INTERNAL_ERROR;
@@ -343,6 +371,34 @@ static const char dsa_privkey[] =
 static const char dsa_sig[] =
     "\x30\x3d\x02\x1c\x2e\x40\x14\xb3\x7a\x3f\xc0\x4f\x06\x74\x4f\xa6\x5f\xc2\x0a\x46\x35\x38\x88\xb4\x1a\xcf\x94\x02\x40\x42\x7c\x7f\x02\x1d\x00\x98\xfc\xf1\x08\x66\xf1\x86\x28\xc9\x73\x9e\x2b\x5d\xce\x57\xe8\xb5\xeb\xcf\xa3\xf6\x60\xf6\x63\x16\x0e\xc0\x42";
 
+static const char gost01_privkey[] =
+ "-----BEGIN PRIVATE KEY-----\n"
+ "MEUCAQAwHAYGKoUDAgITMBIGByqFAwICIwEGByqFAwICHgEEIgQgdNfuHGmmTdPm\n"
+ "p5dAa3ea9UYxpdYQPP9lbDwzQwG2bJM=\n"
+ "-----END PRIVATE KEY-----\n";
+
+static const char gost01_sig[] =
+    "\xc5\xc8\xf8\xdc\x22\x51\xb0\x72\xe9\xa2\xbb\x84\x6c\xe2\x24\xd5\x72\x39\x2a\x5a\x0e\x7a\x43\xfc\x9c\xc3\x5d\x32\x92\xbb\xab\xc0\x4b\x99\xbd\xc8\x47\x24\x70\x06\x7e\xa1\xc6\xe3\xa0\xdc\x42\xed\xa0\x66\xf0\xcc\x50\x97\xe9\x5a\x7d\x3f\x65\x2d\x7b\x1b\x03\xcb";
+
+static const char gost12_256_privkey[] =
+ "-----BEGIN PRIVATE KEY-----\n"
+ "MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIjAQYIKoUDBwEBAgIEIgQgKOF96tom\n"
+ "D61rhSnzKjyrmO3fv0gdlHei+6ovrc8SnBk=\n"
+ "-----END PRIVATE KEY-----\n";
+
+static const char gost12_256_sig[] =
+    "\xb2\x51\x5a\x1a\xbd\x95\x4e\x71\x55\xad\x74\x74\x81\xa6\xca\x6c\x14\x01\xe0\x18\xda\xe4\x0d\x02\x4f\x14\xd2\x39\xd6\x3c\xb5\x85\xa8\x37\xfd\x7f\x2b\xfa\xe4\xf5\xbc\xbc\x15\x20\x8b\x83\x4b\x84\x0d\x5d\x02\x21\x8c\x0d\xb9\xc4\x2b\xc0\x3e\xfd\x42\x55\x1d\xb0";
+
+static const char gost12_512_privkey[] =
+ "-----BEGIN PRIVATE KEY-----\n"
+ "MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBECjFpvp\n"
+ "B0vdc7u59b99TCNXhHiB69JJtUjvieNkGYJpoaaIvoKZTNCjpSZASsZcQZCHOTof\n"
+ "hsQ3JCCy4xnd5jWT\n"
+ "-----END PRIVATE KEY-----\n";
+
+static const char gost12_512_sig[] =
+    "\x52\x4f\xa2\x77\x51\xd2\xc5\xef\xd3\xa3\x99\x4e\xec\xff\xc6\xe9\xfc\x2f\xc0\x28\x42\x03\x95\x6c\x9a\x38\xee\xea\x89\x79\xae\x1a\xc3\x68\x5e\xe4\x15\x15\x4b\xec\x0f\xf1\x7e\x0f\xba\x01\xc7\x84\x16\xc7\xb5\xac\x9d\x0c\x22\xdd\x31\xf7\xb0\x9b\x59\x4b\xf0\x02\xa8\x7d\xfd\x6d\x02\x43\xc7\x4f\x65\xbd\x84\x5c\x54\x91\xba\x75\x9f\x5a\x61\x19\x5c\x9a\x10\x78\x34\xa0\xa6\xf6\xdc\xb6\xb0\x50\x22\x38\x5f\xb0\x16\x66\xf1\xd5\x46\x00\xd5\xe2\xa8\xe5\xd2\x11\x5f\xd1\xbe\x6e\xac\xb2\x9c\x14\x34\x96\xe7\x58\x94\xb8\xf4\x5f";
+
 static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 			  gnutls_digest_algorithm_t dig,
 			  const void *privkey, size_t privkey_size,
@@ -356,7 +412,8 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	gnutls_privkey_t key;
 	char param_name[32];
 
-	if (pk == GNUTLS_PK_EC) {
+	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
+	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512) {
 		snprintf(param_name, sizeof(param_name), "%s",
 			 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
 						   (bits)));
@@ -792,6 +849,35 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		PK_TEST(GNUTLS_PK_EC, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1),
 			GNUTLS_DIG_SHA256);
+#endif
+
+#if ENABLE_GOST
+		FALLTHROUGH;
+	case GNUTLS_PK_GOST_01:
+		PK_KNOWN_TEST(GNUTLS_PK_GOST_01, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_GOSTR_94,
+			      gost01_privkey, gost01_sig);
+		PK_TEST(GNUTLS_PK_GOST_01, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA), GNUTLS_DIG_GOSTR_94);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
+		FALLTHROUGH;
+	case GNUTLS_PK_GOST_12_256:
+		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_256, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_STREEBOG_256,
+			      gost12_256_privkey, gost12_256_sig);
+		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA), GNUTLS_DIG_STREEBOG_256);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
+		FALLTHROUGH;
+	case GNUTLS_PK_GOST_12_512:
+		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_512, 0, GNUTLS_ECC_CURVE_GOST512A, GNUTLS_DIG_STREEBOG_512,
+			      gost12_512_privkey, gost12_512_sig);
+		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A), GNUTLS_DIG_STREEBOG_256);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
 #endif
 
 		break;
