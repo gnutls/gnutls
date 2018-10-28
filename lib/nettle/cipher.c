@@ -176,21 +176,21 @@ static void
 _gost28147_set_key_cpb(void *ctx, const uint8_t *key)
 {
 	gost28147_set_key(ctx, key);
-	gost28147_set_param(ctx, &gost28147_param_CryptoPro_A);
+	gost28147_set_param(ctx, &gost28147_param_CryptoPro_B);
 }
 
 static void
 _gost28147_set_key_cpc(void *ctx, const uint8_t *key)
 {
 	gost28147_set_key(ctx, key);
-	gost28147_set_param(ctx, &gost28147_param_CryptoPro_A);
+	gost28147_set_param(ctx, &gost28147_param_CryptoPro_C);
 }
 
 static void
 _gost28147_set_key_cpd(void *ctx, const uint8_t *key)
 {
 	gost28147_set_key(ctx, key);
-	gost28147_set_param(ctx, &gost28147_param_CryptoPro_A);
+	gost28147_set_param(ctx, &gost28147_param_CryptoPro_D);
 }
 #endif
 
