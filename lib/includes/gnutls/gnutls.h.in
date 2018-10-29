@@ -275,6 +275,8 @@ typedef enum {
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
  * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
  * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
+ * @GNUTLS_MAC_AES_CMAC_128: The AES-CMAC-128 MAC algorithm.
+ * @GNUTLS_MAC_AES_CMAC_256: The AES-CMAC-256 MAC algorithm.
  * @GNUTLS_MAC_SHA3_224: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_256: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_384: Reserved; unimplemented.
@@ -307,6 +309,8 @@ typedef enum {
 	GNUTLS_MAC_AEAD = 200,	/* indicates that MAC is on the cipher */
 	GNUTLS_MAC_UMAC_96 = 201,
 	GNUTLS_MAC_UMAC_128 = 202,
+	GNUTLS_MAC_AES_CMAC_128 = 203,
+	GNUTLS_MAC_AES_CMAC_256 = 204,
 } gnutls_mac_algorithm_t;
 
 /**

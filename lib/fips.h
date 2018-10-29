@@ -105,6 +105,8 @@ static unsigned is_mac_algo_forbidden(gnutls_mac_algorithm_t algo)
 			case GNUTLS_MAC_SHA3_256:
 			case GNUTLS_MAC_SHA3_384:
 			case GNUTLS_MAC_SHA3_512:
+                        case GNUTLS_MAC_AES_CMAC_128:
+                        case GNUTLS_MAC_AES_CMAC_256:
 				return 0;
 			default:
 				if (mode == GNUTLS_FIPS140_LAX)

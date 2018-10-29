@@ -37,6 +37,11 @@
 #include "gost/gosthash94.h"
 #include "gost/streebog.h"
 #endif
+#ifdef HAVE_NETTLE_CMAC128_UPDATE
+#include <nettle/cmac.h>
+#else
+#include "cmac.h"
+#endif /* HAVE_NETTLE_CMAC128_UPDATE */
 
 typedef void (*update_func) (void *, size_t, const uint8_t *);
 typedef void (*digest_func) (void *, size_t, uint8_t *);
@@ -93,6 +98,8 @@ struct nettle_mac_ctx {
 #endif
 		struct umac96_ctx umac96;
 		struct umac128_ctx umac128;
+                struct cmac_aes128_ctx cmac128;
+                struct cmac_aes256_ctx cmac256;
 	} ctx;
 
 	void *ctx_ptr;
@@ -118,6 +125,22 @@ _wrap_umac128_set_key(void *ctx, size_t len, const uint8_t * key)
 	if (unlikely(len != 16))
 		abort();
 	umac128_set_key(ctx, key);
+}
+
+static void
+_wrap_cmac128_set_key(void *ctx, size_t len, const uint8_t * key)
+{
+	if (unlikely(len != 16))
+		abort();
+	cmac_aes128_set_key(ctx, key);
+}
+
+static void
+_wrap_cmac256_set_key(void *ctx, size_t len, const uint8_t * key)
+{
+	if (unlikely(len != 32))
+		abort();
+	cmac_aes256_set_key(ctx, key);
 }
 
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
@@ -208,6 +231,20 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->set_nonce = (set_nonce_func) umac128_set_nonce;
 		ctx->ctx_ptr = &ctx->ctx.umac128;
 		ctx->length = 16;
+		break;
+	case GNUTLS_MAC_AES_CMAC_128:
+		ctx->update = (update_func) cmac_aes128_update;
+		ctx->digest = (digest_func) cmac_aes128_digest;
+		ctx->set_key = _wrap_cmac128_set_key;
+		ctx->ctx_ptr = &ctx->ctx.cmac128;
+		ctx->length = CMAC128_DIGEST_SIZE;
+		break;
+	case GNUTLS_MAC_AES_CMAC_256:
+		ctx->update = (update_func) cmac_aes256_update;
+		ctx->digest = (digest_func) cmac_aes256_digest;
+		ctx->set_key = _wrap_cmac256_set_key;
+		ctx->ctx_ptr = &ctx->ctx.cmac256;
+		ctx->length = CMAC128_DIGEST_SIZE;
 		break;
 	default:
 		gnutls_assert();

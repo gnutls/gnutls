@@ -1425,6 +1425,29 @@ const struct mac_vectors_st hmac_streebog_256_vectors[] = {
 	},
 };
 
+const struct mac_vectors_st aes_cmac_128_vectors[] = { /* NIST SP800-38A */
+	{
+	 STR(key, key_size,
+	     "\x2b\x7e\x15\x16\x28\xae\xd2\xa6\xab\xf7\x15\x88\x09\xcf\x4f\x3c"),
+	 STR(plaintext, plaintext_size,
+             "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"),
+	 STR(output, output_size,
+	     "\x07\x0a\x16\xb4\x6b\x4d\x41\x44\xf7\x9b\xdd\x9d\xd0\x4a\x28\x7c"),
+	 },
+};
+
+const struct mac_vectors_st aes_cmac_256_vectors[] = { /* NIST SP800-38A */
+	{
+	 STR(key, key_size,
+	     "\x60\x3d\xeb\x10\x15\xca\x71\xbe\x2b\x73\xae\xf0\x85\x7d\x77\x81"
+             "\x1f\x35\x2c\x07\x3b\x61\x08\xd7\x2d\x98\x10\xa3\x09\x14\xdf\xf4"),
+	 STR(plaintext, plaintext_size,
+             "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a"),
+	 STR(output, output_size,
+	     "\x28\xa7\x02\x3f\x45\x2e\x8f\x82\xbd\x4b\xf2\x8d\x8c\x37\xc3\x5c"),
+	 },
+};
+
 static int test_mac(gnutls_mac_algorithm_t mac,
 		    const struct mac_vectors_st *vectors,
 		    size_t vectors_size, unsigned flags)
@@ -1623,6 +1646,10 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_MAC_STREEBOG_256, test_mac, hmac_streebog_256_vectors);
 #endif
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_CMAC_128, test_mac, aes_cmac_128_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_CMAC_256, test_mac, aes_cmac_256_vectors);
 
 		break;
 	default:

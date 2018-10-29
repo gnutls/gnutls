@@ -12,6 +12,8 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for AES-CFB8 cipher (#357)
 
+** libgnutls: Added support for AES-CMAC MAC (#351)
+
 ** p11tool: fix initialization of security officer's PIN with the --initialize-so-pin
    option (#561)
 
