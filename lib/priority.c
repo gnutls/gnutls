@@ -1810,6 +1810,9 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					     (&broken_list[i][7])) != GNUTLS_CRT_UNKNOWN) {
 						fn(&(*priority_cache)->client_ctype, algo);
 						fn(&(*priority_cache)->server_ctype, algo);
+					} else if (strncasecmp(&broken_list[i][1], "CTYPE-OPENPGP", 13) == 0) {
+						/* legacy openpgp option - ignore */
+						continue;
 					} else goto error;
 				}
 			} else if (strncasecmp

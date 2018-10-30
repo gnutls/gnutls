@@ -61,7 +61,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	ocsp-tests/certs/server_good.key ocsp-tests/certs/server_bad.key ocsp-tests/certs/server_good.template \
 	ocsp-tests/certs/server_bad.template ocsp-tests/certs/ocsp-staple-unrelated.der ocsp-tests/suppressions.valgrind \
 	data/listings-DTLS1.0 data/listings-SSL3.0 data/listings-TLS1.0 data/listings-TLS1.1 \
-	data/listings-legacy1 data/listings-legacy2 \
+	data/listings-legacy1 data/listings-legacy2 data/listings-legacy3 data/listings-legacy4 \
 	data/listings-SSL3.0-TLS1.1 p11-kit-trust-data/Example_Root_CA.p11-kit server-kx-neg-common.c \
 	p11-kit-trust-data/Example_Root_CA.pem data/test1.cat data/test2.cat \
 	data/test1.cat.data data/test2.cat.data data/test1.cat.out data/test2.cat.out \
