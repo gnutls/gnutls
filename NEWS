@@ -14,12 +14,15 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for AES-CMAC MAC (#351)
 
-** p11tool: fix initialization of security officer's PIN with the --initialize-so-pin
-   option (#561)
-
-** In two previous versions GNUTLS_CIPHER_GOST28147_CPB/CPC/CPD_CFB ciphers
+** libgnutls: In two previous versions GNUTLS_CIPHER_GOST28147_CPB/CPC/CPD_CFB ciphers
    have incorrectly used CryptoPro-A S-BOX instead of proper (CryptoPro-B/-C/-D
    S-BOXes). They are fixed now.
+
+** p11tool: Fix initialization of security officer's PIN with the --initialize-so-pin
+   option (#561)
+
+** gnutls-serv: It applies the default settings when no --priority option is given,
+   using gnutls_set_default_priority().
 
 ** API and ABI modifications:
 GNUTLS_AUTO_REAUTH: Added

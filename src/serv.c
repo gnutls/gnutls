@@ -376,9 +376,6 @@ gnutls_session_t initialize_session(int dtls)
 	gnutls_datum_t alpn[MAX_ALPN_PROTOCOLS];
 	unsigned alpn_size;
 
-	if (priorities == NULL)
-		priorities = "NORMAL";
-
 	if (dtls)
 		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM | GNUTLS_POST_HANDSHAKE_AUTH);
 	else
@@ -406,9 +403,18 @@ gnutls_session_t initialize_session(int dtls)
 		gnutls_handshake_set_post_client_hello_function(session,
 								&post_client_hello);
 
-	if (gnutls_priority_set_direct(session, priorities, &err) < 0) {
-		fprintf(stderr, "Syntax error at: %s\n", err);
-		exit(1);
+	if (priorities == NULL) {
+		ret = gnutls_set_default_priority(session);
+		if (ret < 0) {
+			fprintf(stderr, "Could not set default policy: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		ret = gnutls_priority_set_direct(session, priorities, &err);
+		if (ret < 0) {
+			fprintf(stderr, "Syntax error at: %s\n", err);
+			exit(1);
+		}
 	}
 
 	alpn_size = MIN(MAX_ALPN_PROTOCOLS,alpn_protos_size);
