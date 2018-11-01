@@ -245,6 +245,7 @@ APIMANS += gnutls_db_check_entry_time.3
 APIMANS += gnutls_db_get_default_cache_expiration.3
 APIMANS += gnutls_db_get_ptr.3
 APIMANS += gnutls_db_remove_session.3
+APIMANS += gnutls_db_set_add_function.3
 APIMANS += gnutls_db_set_cache_expiration.3
 APIMANS += gnutls_db_set_ptr.3
 APIMANS += gnutls_db_set_remove_function.3

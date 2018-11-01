@@ -193,6 +193,7 @@ static const gnutls_error_entry error_entries[] = {
 		    ("TLS Application data were received, while expecting handshake data."),
 		    GNUTLS_E_GOT_APPLICATION_DATA),
 	ERROR_ENTRY(N_("Error in Database backend."), GNUTLS_E_DB_ERROR),
+	ERROR_ENTRY(N_("The Database entry already exists."), GNUTLS_E_DB_ENTRY_EXISTS),
 	ERROR_ENTRY(N_("The certificate type is not supported."),
 		    GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE),
 	ERROR_ENTRY(N_

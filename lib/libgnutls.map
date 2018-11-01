@@ -1255,6 +1255,7 @@ GNUTLS_3_6_5
 	gnutls_record_send_early_data;
 	gnutls_record_recv_early_data;
 	gnutls_db_check_entry_expire_time;
+	gnutls_db_set_add_function;
 } GNUTLS_3_6_4;
 
 GNUTLS_FIPS140_3_4 {

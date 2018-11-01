@@ -1216,6 +1216,7 @@ typedef struct {
 	gnutls_db_store_func db_store_func;
 	gnutls_db_retr_func db_retrieve_func;
 	gnutls_db_remove_func db_remove_func;
+	gnutls_db_add_func db_add_func;
 	void *db_ptr;
 
 	/* post client hello callback (server side only)

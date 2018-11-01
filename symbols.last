@@ -142,6 +142,7 @@ gnutls_db_check_entry_time@GNUTLS_3_4
 gnutls_db_get_default_cache_expiration@GNUTLS_3_4
 gnutls_db_get_ptr@GNUTLS_3_4
 gnutls_db_remove_session@GNUTLS_3_4
+gnutls_db_set_add_function@GNUTLS_3_6_5
 gnutls_db_set_cache_expiration@GNUTLS_3_4
 gnutls_db_set_ptr@GNUTLS_3_4
 gnutls_db_set_remove_function@GNUTLS_3_4

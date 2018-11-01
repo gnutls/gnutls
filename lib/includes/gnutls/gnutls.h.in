@@ -1783,6 +1783,8 @@ typedef int (*gnutls_db_store_func) (void *, gnutls_datum_t key,
 				     gnutls_datum_t data);
 typedef int (*gnutls_db_remove_func) (void *, gnutls_datum_t key);
 typedef gnutls_datum_t(*gnutls_db_retr_func) (void *, gnutls_datum_t key);
+typedef int (*gnutls_db_add_func) (void *, gnutls_datum_t key,
+				   gnutls_datum_t data);
 
 void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds);
 unsigned gnutls_db_get_default_cache_expiration(void);
@@ -1794,6 +1796,8 @@ void gnutls_db_set_remove_function(gnutls_session_t session,
 				   gnutls_db_remove_func rem_func);
 void gnutls_db_set_store_function(gnutls_session_t session,
 				  gnutls_db_store_func store_func);
+void gnutls_db_set_add_function(gnutls_session_t session,
+				gnutls_db_add_func add_func);
 void gnutls_db_set_ptr(gnutls_session_t session, void *ptr);
 void *gnutls_db_get_ptr(gnutls_session_t session);
 int gnutls_db_check_entry(gnutls_session_t session,
@@ -3265,6 +3269,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_TOO_MANY_MATCHES -425
 #define GNUTLS_E_CRL_VERIFICATION_ERROR -426
 #define GNUTLS_E_MISSING_EXTENSION -427
+#define GNUTLS_E_DB_ENTRY_EXISTS -428
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

@@ -1708,7 +1708,7 @@ A storing server needs to specify callback functions to store, retrieve and dele
 registered with the functions below. The stored sessions in the database can be checked using @funcref{gnutls_db_check_entry}
 for expiration.
 
-@showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
+@showfuncE{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function,gnutls_db_set_add_function}
 @showfuncA{gnutls_db_check_entry}
 
 A server supporting session tickets must generate ticket encryption
