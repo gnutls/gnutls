@@ -116,8 +116,19 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 		ret = gnutls_ext_raw_parse(&client_handshake_cb_data, ext_callback, msg, 0);
 		assert(ret >= 0);
 		break;
+	case GNUTLS_HANDSHAKE_SERVER_HELLO:
+		assert(msg->size >= HANDSHAKE_SESSION_ID_POS);
+		pos = HANDSHAKE_SESSION_ID_POS;
+		SKIP8(pos, msg->size);
+		pos += 3;
+
+		mmsg.data = &msg->data[pos];
+		mmsg.size = msg->size - pos;
+		ret = gnutls_ext_raw_parse(&client_handshake_cb_data, ext_callback, &mmsg, 0);
+		assert(ret >= 0);
+		break;
 	default:
-		abort();
+		break;
 	}
 	return 0;
 }
@@ -201,7 +212,6 @@ static void start(const struct test_st *test)
 
 
 	/* Init client */
-
 	ret = gnutls_certificate_allocate_credentials(&clientx509cred);
 	if (ret < 0)
 		exit(1);
@@ -239,7 +249,7 @@ static void start(const struct test_st *test)
 
 	client_handshake_cb_data.session = client;
 	gnutls_handshake_set_hook_function(client,
-					   GNUTLS_HANDSHAKE_ENCRYPTED_EXTENSIONS,
+					   GNUTLS_HANDSHAKE_ANY,
 					   GNUTLS_HOOK_POST,
 					   handshake_callback);
 
@@ -294,7 +304,7 @@ static const struct test_st tests[] = {
 		},
 		.expect_client_ext = {
 			.max_record_size = 0,
-			.record_size_limit = 0
+			.record_size_limit = 1
 		}
 	},
 	{
@@ -308,7 +318,7 @@ static const struct test_st tests[] = {
 		},
 		.expect_client_ext = {
 			.max_record_size = 0,
-			.record_size_limit = 0
+			.record_size_limit = 1
 		}
 	},
 	{
@@ -322,7 +332,7 @@ static const struct test_st tests[] = {
 		},
 		.expect_client_ext = {
 			.max_record_size = 0,
-			.record_size_limit = 0
+			.record_size_limit = 1
 		}
 	},
 	{
@@ -336,7 +346,7 @@ static const struct test_st tests[] = {
 		},
 		.expect_client_ext = {
 			.max_record_size = 0,
-			.record_size_limit = 0
+			.record_size_limit = 1
 		}
 	},
 	{
@@ -350,7 +360,7 @@ static const struct test_st tests[] = {
 		},
 		.expect_client_ext = {
 			.max_record_size = 0,
-			.record_size_limit = 0
+			.record_size_limit = 1
 		}
 	},
 
