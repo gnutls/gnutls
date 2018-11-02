@@ -49,9 +49,12 @@
 
 static void cmd_parser(int argc, char **argv);
 static void tpm_generate(FILE * outfile, unsigned int key_type,
-			 unsigned int bits, unsigned int flags);
-static void tpm_pubkey(const char *url, FILE * outfile);
-static void tpm_delete(const char *url, FILE * outfile);
+			 unsigned int bits, unsigned int flags,
+			 unsigned int srk_well_known);
+static void tpm_pubkey(const char *url, FILE * outfile,
+		       unsigned int srk_well_known);
+static void tpm_delete(const char *url, FILE * outfile,
+		       unsigned int srk_well_known);
 static void tpm_test_sign(const char *url, FILE * outfile);
 static void tpm_list(FILE * outfile);
 
@@ -164,11 +167,11 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(GENERATE_RSA)) {
 		key_type = GNUTLS_PK_RSA;
 		bits = get_bits(key_type, bits, sec_param, 0);
-		tpm_generate(outfile, key_type, bits, genflags);
+		tpm_generate(outfile, key_type, bits, genflags, HAVE_OPT(SRK_WELL_KNOWN));
 	} else if (HAVE_OPT(PUBKEY)) {
-		tpm_pubkey(OPT_ARG(PUBKEY), outfile);
+		tpm_pubkey(OPT_ARG(PUBKEY), outfile, HAVE_OPT(SRK_WELL_KNOWN));
 	} else if (HAVE_OPT(DELETE)) {
-		tpm_delete(OPT_ARG(DELETE), outfile);
+		tpm_delete(OPT_ARG(DELETE), outfile, HAVE_OPT(SRK_WELL_KNOWN));
 	} else if (HAVE_OPT(LIST)) {
 		tpm_list(outfile);
 	} else if (HAVE_OPT(TEST_SIGN)) {
@@ -252,15 +255,18 @@ tpm_test_sign(const char *url, FILE * out)
 }
 
 static void tpm_generate(FILE * out, unsigned int key_type,
-			 unsigned int bits, unsigned int flags)
+			 unsigned int bits, unsigned int flags,
+			 unsigned int srk_well_known)
 {
 	int ret;
-	char *srk_pass, *key_pass = NULL;
+	char *srk_pass = NULL, *key_pass = NULL;
 	gnutls_datum_t privkey, pubkey;
 
-	srk_pass = getpass("Enter SRK password: ");
-	if (srk_pass != NULL)
-		srk_pass = strdup(srk_pass);
+	if (!srk_well_known) {
+		srk_pass = getpass("Enter SRK password: ");
+		if (srk_pass != NULL)
+			srk_pass = strdup(srk_pass);
+	}
 
 	if (!(flags & GNUTLS_TPM_REGISTER_KEY)) {
 		key_pass = getpass("Enter key password: ");
@@ -290,12 +296,14 @@ static void tpm_generate(FILE * out, unsigned int key_type,
 	gnutls_free(pubkey.data);
 }
 
-static void tpm_delete(const char *url, FILE * out)
+static void tpm_delete(const char *url, FILE * out,
+		       unsigned int srk_well_known)
 {
 	int ret;
-	char *srk_pass;
+	char *srk_pass = NULL;
 
-	srk_pass = getpass("Enter SRK password: ");
+	if (!srk_well_known)
+		srk_pass = getpass("Enter SRK password: ");
 
 	ret = gnutls_tpm_privkey_delete(url, srk_pass);
 	if (ret < 0) {
@@ -339,15 +347,17 @@ static void tpm_list(FILE * out)
 	fputs("\n", out);
 }
 
-static void tpm_pubkey(const char *url, FILE * out)
+static void tpm_pubkey(const char *url, FILE * out, unsigned int srk_well_known)
 {
 	int ret;
-	char *srk_pass;
+	char *srk_pass = NULL;
 	gnutls_pubkey_t pubkey;
 
-	srk_pass = getpass("Enter SRK password: ");
-	if (srk_pass != NULL)
-		srk_pass = strdup(srk_pass);
+	if (!srk_well_known) {
+		srk_pass = getpass("Enter SRK password: ");
+		if (srk_pass != NULL)
+			srk_pass = strdup(srk_pass);
+	}
 
 	gnutls_pubkey_init(&pubkey);
 
