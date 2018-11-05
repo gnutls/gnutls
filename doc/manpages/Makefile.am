@@ -19,22 +19,29 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+man_MANS =
 EXTRA_DIST = stamp_mans
-
-dist_man_MANS =
+MAINTAINERCLEANFILES = stamp_mans
 
 -include $(top_srcdir)/doc/doc.mk
 
-if ENABLE_TOOLS
-dist_man_MANS += gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
+TOOLS_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
 	certtool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
+SRP_MANS = srptool.1
+DANE_MANS = danetool.1
+
+if ENABLE_TOOLS
+man_MANS += $(TOOLS_MANS)
 if ENABLE_SRP
-dist_man_MANS += srptool.1
+man_MANS += $(SRP_MANS)
 endif
 if ENABLE_DANE
-dist_man_MANS += danetool.1
+man_MANS += $(DANE_MANS)
 endif
 endif
+
+EXTRA_DIST += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
+MAINTAINERCLEANFILES += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 
 # Note that our .def files depend on autogen
 # supporting the @subheading texi keyword. This
@@ -1205,8 +1212,11 @@ APIMANS += gnutls_x509_trust_list_verify_crt2.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
 
 if ENABLE_DOC
-dist_man_MANS += $(APIMANS)
+man_MANS += $(APIMANS)
 endif
+
+EXTRA_DIST += $(APIMANS)
+MAINTAINERCLEANFILES += $(APIMANS)
 
 $(APIMANS): stamp_mans
 
