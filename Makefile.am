@@ -171,11 +171,6 @@ dist-hook: libopts-check symbol-check
 	cd $(distdir)/src/ && for i in *.def;do \
 		if test x"$$i" = x"args-std.def";then  continue; fi; \
 		autogen $$i; \
-		cp $$i $$i.tmp; \
-		$(SED) -i 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $$i.tmp; \
-		autogen -Tagman-cmd.tpl $$i.tmp; \
-		rm -f $$i.tmp; \
-		mv -f *.1 ../doc/manpages/; \
 	done
 	cd $(distdir)/src/ && for i in *-args.c *-args.h;do \
 		mv $$i $$i.bak; \
