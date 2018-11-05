@@ -80,18 +80,6 @@ AC_ARG_ENABLE(tools,
     enable_tools=$enableval, enable_tools=yes)
 AM_CONDITIONAL(ENABLE_TOOLS, test "$enable_tools" != "no")
 
-if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
-  AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [:])
-
-  if test x"$AUTOGEN" = "x:"; then
-    AC_MSG_WARN([[
-***
-*** autogen not found. Will not link against libopts.
-*** ]])
-    included_libopts=yes
-  fi
-fi
-
 # For includes/gnutls/gnutls.h.in.
 AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
 AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
@@ -720,6 +708,16 @@ AC_SUBST(TROUSERS_LIB)
 included_libopts=no
 create_libopts_links=no
 if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
+	AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [:])
+
+	if test x"$AUTOGEN" = "x:"; then
+		AC_MSG_WARN([[
+***
+*** autogen not found. Will not link against system libopts.
+*** ]])
+		dnl simulate specifying option on the command line
+		enable_local_libopts=yes
+	fi
 	LIBOPTS_CHECK([src/libopts])
 	if test "$NEED_LIBOPTS_DIR" = "true";then
 		dnl replace libopts-generated files with distributed backups, if present
@@ -730,9 +728,8 @@ if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
 else
 	# Need to ensure the relevant conditionals get set
 	gl_STDNORETURN_H
+	AC_SUBST([AUTOGEN], [/bin/true])
 	AM_CONDITIONAL([INSTALL_LIBOPTS],[false])
-	AM_CONDITIONAL([NEED_LIBOPTS], [false])
-	included_libopts=yes
 fi
 
 AM_CONDITIONAL(NEED_LIBOPTS, test "$included_libopts" = "yes")
