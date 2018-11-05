@@ -41,55 +41,55 @@ endif
 # is not currently the case so we do remove it
 # before processing. Once the new version of autogen
 # is out, replace the sed and tmp files with a simple
-# autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+# autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 certtool.1: ../../src/certtool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 ocsptool.1: ../../src/ocsptool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 danetool.1: ../../src/danetool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 gnutls-cli.1: ../../src/cli-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 gnutls-serv.1: ../../src/serv-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 gnutls-cli-debug.1: ../../src/cli-debug-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 srptool.1: ../../src/srptool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 p11tool.1: ../../src/p11tool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 tpmtool.1: ../../src/tpmtool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 psktool.1: ../../src/psktool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 APIMANS =
