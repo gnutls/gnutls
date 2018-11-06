@@ -19,7 +19,7 @@
  * The systemkey-tool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -53,7 +53,7 @@ extern "C" {
 #endif
 extern FILE * option_usage_fp;
 #define zCopyright      (systemkey_tool_opt_strs+0)
-#define zLicenseDescrip (systemkey_tool_opt_strs+295)
+#define zLicenseDescrip (systemkey_tool_opt_strs+289)
 
 
 #ifndef NULL
@@ -63,13 +63,13 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for systemkey-tool options
  */
-static char const systemkey_tool_opt_strs[1642] =
-/*     0 */ "systemkey-tool @VERSION@\n"
-            "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
+static char const systemkey_tool_opt_strs[1628] =
+/*     0 */ "systemkey-tool 3.6.4\n"
+            "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
-/*   295 */ "systemkey-tool is free software: you can redistribute it and/or modify it\n"
+/*   289 */ "systemkey-tool is free software: you can redistribute it and/or modify it\n"
             "under the terms of the GNU General Public License as published by the Free\n"
             "Software Foundation, either version 3 of the License, or (at your option)\n"
             "any later version.\n\n"
@@ -79,54 +79,54 @@ static char const systemkey_tool_opt_strs[1642] =
             "for more details.\n\n"
             "You should have received a copy of the GNU General Public License along\n"
             "with this program.  If not, see <http://www.gnu.org/licenses/>.\n\0"
-/*   912 */ "Enable debugging\0"
-/*   929 */ "DEBUG\0"
-/*   935 */ "debug\0"
-/*   941 */ "Input file\0"
-/*   952 */ "INFILE\0"
-/*   959 */ "infile\0"
-/*   966 */ "Output file\0"
-/*   978 */ "OUTFILE\0"
-/*   986 */ "outfile\0"
-/*   994 */ "Lists all stored keys.\0"
-/*  1017 */ "LIST\0"
-/*  1022 */ "list\0"
-/*  1027 */ "Delete the key identified by the given URL.\0"
-/*  1071 */ "DELETE\0"
-/*  1078 */ "delete\0"
-/*  1085 */ "Use the DER format for keys.\0"
-/*  1114 */ "INDER\0"
-/*  1120 */ "no-inder\0"
-/*  1129 */ "no\0"
-/*  1132 */ "Use DER format for output keys\0"
-/*  1163 */ "OUTDER\0"
-/*  1170 */ "no-outder\0"
-/*  1180 */ "display extended usage information and exit\0"
-/*  1224 */ "help\0"
-/*  1229 */ "extended usage information passed thru pager\0"
-/*  1274 */ "more-help\0"
-/*  1284 */ "output version information and exit\0"
-/*  1320 */ "version\0"
-/*  1328 */ "SYSTEMKEY_TOOL\0"
-/*  1343 */ "systemkey-tool - GnuTLS system key tool\n"
+/*   906 */ "Enable debugging\0"
+/*   923 */ "DEBUG\0"
+/*   929 */ "debug\0"
+/*   935 */ "Input file\0"
+/*   946 */ "INFILE\0"
+/*   953 */ "infile\0"
+/*   960 */ "Output file\0"
+/*   972 */ "OUTFILE\0"
+/*   980 */ "outfile\0"
+/*   988 */ "Lists all stored keys.\0"
+/*  1011 */ "LIST\0"
+/*  1016 */ "list\0"
+/*  1021 */ "Delete the key identified by the given URL.\0"
+/*  1065 */ "DELETE\0"
+/*  1072 */ "delete\0"
+/*  1079 */ "Use the DER format for keys.\0"
+/*  1108 */ "INDER\0"
+/*  1114 */ "no-inder\0"
+/*  1123 */ "no\0"
+/*  1126 */ "Use DER format for output keys\0"
+/*  1157 */ "OUTDER\0"
+/*  1164 */ "no-outder\0"
+/*  1174 */ "display extended usage information and exit\0"
+/*  1218 */ "help\0"
+/*  1223 */ "extended usage information passed thru pager\0"
+/*  1268 */ "more-help\0"
+/*  1278 */ "output version information and exit\0"
+/*  1314 */ "version\0"
+/*  1322 */ "SYSTEMKEY_TOOL\0"
+/*  1337 */ "systemkey-tool - GnuTLS system key tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  1441 */ "@PACKAGE_BUGREPORT@\0"
-/*  1461 */ "\n\0"
-/*  1463 */ "Program that allows handling user keys as stored in the system in a uniform\n"
+/*  1435 */ "bugs@gnutls.org\0"
+/*  1451 */ "\n\0"
+/*  1453 */ "Program that allows handling user keys as stored in the system in a uniform\n"
             "way.\n\0"
-/*  1545 */ "systemkey-tool @VERSION@\0"
-/*  1570 */ "systemkey-tool [options]\n"
+/*  1535 */ "systemkey-tool 3.6.4\0"
+/*  1556 */ "systemkey-tool [options]\n"
             "systemkey-tool --help for usage instructions.\n";
 
 /**
  *  debug option description:
  */
 /** Descriptive text for the debug option */
-#define DEBUG_DESC      (systemkey_tool_opt_strs+912)
+#define DEBUG_DESC      (systemkey_tool_opt_strs+906)
 /** Upper-cased name for the debug option */
-#define DEBUG_NAME      (systemkey_tool_opt_strs+929)
+#define DEBUG_NAME      (systemkey_tool_opt_strs+923)
 /** Name string for the debug option */
-#define DEBUG_name      (systemkey_tool_opt_strs+935)
+#define DEBUG_name      (systemkey_tool_opt_strs+929)
 /** Compiled in flag settings for the debug option */
 #define DEBUG_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -135,11 +135,11 @@ static char const systemkey_tool_opt_strs[1642] =
  *  infile option description:
  */
 /** Descriptive text for the infile option */
-#define INFILE_DESC      (systemkey_tool_opt_strs+941)
+#define INFILE_DESC      (systemkey_tool_opt_strs+935)
 /** Upper-cased name for the infile option */
-#define INFILE_NAME      (systemkey_tool_opt_strs+952)
+#define INFILE_NAME      (systemkey_tool_opt_strs+946)
 /** Name string for the infile option */
-#define INFILE_name      (systemkey_tool_opt_strs+959)
+#define INFILE_name      (systemkey_tool_opt_strs+953)
 /** Compiled in flag settings for the infile option */
 #define INFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -148,11 +148,11 @@ static char const systemkey_tool_opt_strs[1642] =
  *  outfile option description:
  */
 /** Descriptive text for the outfile option */
-#define OUTFILE_DESC      (systemkey_tool_opt_strs+966)
+#define OUTFILE_DESC      (systemkey_tool_opt_strs+960)
 /** Upper-cased name for the outfile option */
-#define OUTFILE_NAME      (systemkey_tool_opt_strs+978)
+#define OUTFILE_NAME      (systemkey_tool_opt_strs+972)
 /** Name string for the outfile option */
-#define OUTFILE_name      (systemkey_tool_opt_strs+986)
+#define OUTFILE_name      (systemkey_tool_opt_strs+980)
 /** Compiled in flag settings for the outfile option */
 #define OUTFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -161,11 +161,11 @@ static char const systemkey_tool_opt_strs[1642] =
  *  list option description:
  */
 /** Descriptive text for the list option */
-#define LIST_DESC      (systemkey_tool_opt_strs+994)
+#define LIST_DESC      (systemkey_tool_opt_strs+988)
 /** Upper-cased name for the list option */
-#define LIST_NAME      (systemkey_tool_opt_strs+1017)
+#define LIST_NAME      (systemkey_tool_opt_strs+1011)
 /** Name string for the list option */
-#define LIST_name      (systemkey_tool_opt_strs+1022)
+#define LIST_name      (systemkey_tool_opt_strs+1016)
 /** Compiled in flag settings for the list option */
 #define LIST_FLAGS     (OPTST_DISABLED)
 
@@ -173,11 +173,11 @@ static char const systemkey_tool_opt_strs[1642] =
  *  delete option description:
  */
 /** Descriptive text for the delete option */
-#define DELETE_DESC      (systemkey_tool_opt_strs+1027)
+#define DELETE_DESC      (systemkey_tool_opt_strs+1021)
 /** Upper-cased name for the delete option */
-#define DELETE_NAME      (systemkey_tool_opt_strs+1071)
+#define DELETE_NAME      (systemkey_tool_opt_strs+1065)
 /** Name string for the delete option */
-#define DELETE_name      (systemkey_tool_opt_strs+1078)
+#define DELETE_name      (systemkey_tool_opt_strs+1072)
 /** Compiled in flag settings for the delete option */
 #define DELETE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -186,13 +186,13 @@ static char const systemkey_tool_opt_strs[1642] =
  *  inder option description:
  */
 /** Descriptive text for the inder option */
-#define INDER_DESC      (systemkey_tool_opt_strs+1085)
+#define INDER_DESC      (systemkey_tool_opt_strs+1079)
 /** Upper-cased name for the inder option */
-#define INDER_NAME      (systemkey_tool_opt_strs+1114)
+#define INDER_NAME      (systemkey_tool_opt_strs+1108)
 /** disablement name for the inder option */
-#define NOT_INDER_name  (systemkey_tool_opt_strs+1120)
+#define NOT_INDER_name  (systemkey_tool_opt_strs+1114)
 /** disablement prefix for the inder option */
-#define NOT_INDER_PFX   (systemkey_tool_opt_strs+1129)
+#define NOT_INDER_PFX   (systemkey_tool_opt_strs+1123)
 /** Name string for the inder option */
 #define INDER_name      (NOT_INDER_name + 3)
 /** Compiled in flag settings for the inder option */
@@ -202,13 +202,13 @@ static char const systemkey_tool_opt_strs[1642] =
  *  outder option description:
  */
 /** Descriptive text for the outder option */
-#define OUTDER_DESC      (systemkey_tool_opt_strs+1132)
+#define OUTDER_DESC      (systemkey_tool_opt_strs+1126)
 /** Upper-cased name for the outder option */
-#define OUTDER_NAME      (systemkey_tool_opt_strs+1163)
+#define OUTDER_NAME      (systemkey_tool_opt_strs+1157)
 /** disablement name for the outder option */
-#define NOT_OUTDER_name  (systemkey_tool_opt_strs+1170)
+#define NOT_OUTDER_name  (systemkey_tool_opt_strs+1164)
 /** disablement prefix for the outder option */
-#define NOT_OUTDER_PFX   (systemkey_tool_opt_strs+1129)
+#define NOT_OUTDER_PFX   (systemkey_tool_opt_strs+1123)
 /** Name string for the outder option */
 #define OUTDER_name      (NOT_OUTDER_name + 3)
 /** Compiled in flag settings for the outder option */
@@ -217,11 +217,11 @@ static char const systemkey_tool_opt_strs[1642] =
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (systemkey_tool_opt_strs+1180)
-#define HELP_name       (systemkey_tool_opt_strs+1224)
+#define HELP_DESC       (systemkey_tool_opt_strs+1174)
+#define HELP_name       (systemkey_tool_opt_strs+1218)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (systemkey_tool_opt_strs+1229)
-#define MORE_HELP_name  (systemkey_tool_opt_strs+1274)
+#define MORE_HELP_DESC  (systemkey_tool_opt_strs+1223)
+#define MORE_HELP_name  (systemkey_tool_opt_strs+1268)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -234,8 +234,8 @@ static char const systemkey_tool_opt_strs[1642] =
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (systemkey_tool_opt_strs+1284)
-#define VER_name        (systemkey_tool_opt_strs+1320)
+#define VER_DESC        (systemkey_tool_opt_strs+1278)
+#define VER_name        (systemkey_tool_opt_strs+1314)
 /**
  *  Declare option callback procedures
  */
@@ -381,21 +381,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of systemkey-tool. */
-#define zPROGNAME       (systemkey_tool_opt_strs+1328)
+#define zPROGNAME       (systemkey_tool_opt_strs+1322)
 /** Reference to the title line for systemkey-tool usage. */
-#define zUsageTitle     (systemkey_tool_opt_strs+1343)
+#define zUsageTitle     (systemkey_tool_opt_strs+1337)
 /** There is no systemkey-tool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for systemkey-tool config files. */
 #define apzHomeList     NULL
 /** The systemkey-tool program bug email address. */
-#define zBugsAddr       (systemkey_tool_opt_strs+1441)
+#define zBugsAddr       (systemkey_tool_opt_strs+1435)
 /** Clarification/explanation of what systemkey-tool does. */
-#define zExplain        (systemkey_tool_opt_strs+1461)
+#define zExplain        (systemkey_tool_opt_strs+1451)
 /** Extra detail explaining what systemkey-tool does. */
-#define zDetail         (systemkey_tool_opt_strs+1463)
+#define zDetail         (systemkey_tool_opt_strs+1453)
 /** The full version string for systemkey-tool. */
-#define zFullVersion    (systemkey_tool_opt_strs+1545)
+#define zFullVersion    (systemkey_tool_opt_strs+1535)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -407,7 +407,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define systemkey_tool_full_usage (NULL)
-#define systemkey_tool_short_usage (systemkey_tool_opt_strs+1570)
+#define systemkey_tool_short_usage (systemkey_tool_opt_strs+1556)
 
 #endif /* not defined __doxygen__ */
 
@@ -691,8 +691,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via systemkey_toolOptions.pzCopyright */
-  puts(_("systemkey-tool @VERSION@\n\
-Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("systemkey-tool 3.6.4\n\
+Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -751,7 +751,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
 way.\n"));
 
   /* referenced via systemkey_toolOptions.pzFullVersion */
-  puts(_("systemkey-tool @VERSION@"));
+  puts(_("systemkey-tool 3.6.4"));
 
   /* referenced via systemkey_toolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

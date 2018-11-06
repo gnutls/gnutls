@@ -19,7 +19,7 @@
  * The gnutls-cli program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -130,9 +130,9 @@ typedef enum {
 /** count of all options for gnutls-cli */
 #define OPTION_CT    60
 /** gnutls-cli version */
-#define GNUTLS_CLI_VERSION       "@VERSION@"
+#define GNUTLS_CLI_VERSION       "3.6.4"
 /** Full gnutls-cli version text */
-#define GNUTLS_CLI_FULL_VERSION  "gnutls-cli @VERSION@"
+#define GNUTLS_CLI_FULL_VERSION  "gnutls-cli 3.6.4"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
