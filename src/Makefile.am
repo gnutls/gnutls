@@ -28,12 +28,14 @@ BUILT_SOURCES = srptool-args.c srptool-args.h \
 	tpmtool-args.c tpmtool-args.h systemkey-args.c systemkey-args.h \
 	mech-list.h
 
-DISTCLEANFILES =$(BUILT_SOURCES) \
+ARGS_STAMPS = \
 	certtool-args.stamp cli-debug-args.stamp cli-args.stamp tpmtool-args.stamp \
 	systemkey-args.stamp srptool-args.stamp ocsptool-args.stamp p11tool-args.stamp \
 	danetool-args.stamp serv-args.stamp psktool-args.stamp
 
-EXTRA_DIST = gen-mech-list.sh
+DISTCLEANFILES = $(BUILT_SOURCES) $(ARGS_STAMPS)
+
+EXTRA_DIST = gen-mech-list.sh args-bak-upd.sh
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -250,36 +252,42 @@ ocsptool-args.h: ocsptool-args.stamp
 ocsptool-args.c: ocsptool-args.stamp
 ocsptool-args.stamp: $(srcdir)/ocsptool-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 tpmtool-args.h: tpmtool-args.stamp
 tpmtool-args.c: tpmtool-args.stamp
 tpmtool-args.stamp: $(srcdir)/tpmtool-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 p11tool-args.h: p11tool-args.stamp
 p11tool-args.c: p11tool-args.stamp
 p11tool-args.stamp: $(srcdir)/p11tool-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 psktool-args.h: psktool-args.stamp
 psktool-args.c: psktool-args.stamp
 psktool-args.stamp: $(srcdir)/psktool-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 cli-debug-args.h: cli-debug-args.stamp
 cli-debug-args.c: cli-debug-args.stamp
 cli-debug-args.stamp: $(srcdir)/cli-debug-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 cli-args.h: cli-args.stamp
 cli-args.c: cli-args.stamp
 cli-args.stamp: $(srcdir)/cli-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 serv-args.h: serv-args.stamp
@@ -292,18 +300,21 @@ srptool-args.h: srptool-args.stamp
 srptool-args.c: srptool-args.stamp
 srptool-args.stamp: $(srcdir)/srptool-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 certtool-args.h: certtool-args.stamp
 certtool-args.c: certtool-args.stamp
 certtool-args.stamp: $(srcdir)/certtool-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 systemkey-args.h: systemkey-args.stamp
 systemkey-args.c: systemkey-args.stamp
 systemkey-args.stamp: $(srcdir)/systemkey-args.def args-std.def
 	-$(AUTOGEN) $<
+	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
 	touch $@
 
 mech-list.h: gen-mech-list.sh
@@ -313,16 +324,7 @@ mech-list.h: gen-mech-list.sh
 maintainer-clean-local:
 	rm -f *.stamp mech-list.h
 
-files-update:
+files-update: $(ARGS_STAMPS)
 	@echo "******************************************************************************************"
-	@echo "updating autogen files in src/"
+	@echo "updated autogen files in src/"
 	@echo "******************************************************************************************"
-	for i in *-args.c *-args.h;do \
-		if ! test -h "$$i" ; then \
-			if test "$(srcdir)" = "." ; then \
-				cp "$$i" "$$i.bak" ; \
-			else \
-				sed -e "s!$(srcdir)/!!g" "$$i" > $(srcdir)/`basename "$$i"`.bak ; \
-			fi; \
-		fi; \
-	done
