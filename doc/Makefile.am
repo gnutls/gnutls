@@ -40,7 +40,7 @@ endif
 -include $(top_srcdir)/doc/doc.mk
 
 invoke-gnutls-cli.texi: $(top_srcdir)/src/cli-args.def
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_srcdir)/src -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -48,7 +48,7 @@ invoke-gnutls-cli.texi: $(top_srcdir)/src/cli-args.def
 	mv -f $@.tmp $@
 
 invoke-gnutls-cli-debug.texi: $(top_srcdir)/src/cli-debug-args.def invoke-gnutls-cli.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -56,7 +56,7 @@ invoke-gnutls-cli-debug.texi: $(top_srcdir)/src/cli-debug-args.def invoke-gnutls
 	mv -f $@.tmp $@
 
 invoke-gnutls-serv.texi: $(top_srcdir)/src/serv-args.def invoke-gnutls-cli-debug.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -64,7 +64,7 @@ invoke-gnutls-serv.texi: $(top_srcdir)/src/serv-args.def invoke-gnutls-cli-debug
 	mv -f $@.tmp $@
 
 invoke-certtool.texi: $(top_srcdir)/src/certtool-args.def invoke-gnutls-serv.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -75,7 +75,7 @@ invoke-certtool.texi: $(top_srcdir)/src/certtool-args.def invoke-gnutls-serv.tex
 	rm -f $@.tmp
 
 invoke-ocsptool.texi: $(top_srcdir)/src/ocsptool-args.def invoke-certtool.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -86,7 +86,7 @@ invoke-ocsptool.texi: $(top_srcdir)/src/ocsptool-args.def invoke-certtool.texi
 	rm -f $@.tmp
 
 invoke-danetool.texi: $(top_srcdir)/src/danetool-args.def invoke-ocsptool.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -97,7 +97,7 @@ invoke-danetool.texi: $(top_srcdir)/src/danetool-args.def invoke-ocsptool.texi
 	rm -f $@.tmp
 
 invoke-srptool.texi: $(top_srcdir)/src/srptool-args.def invoke-danetool.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -108,7 +108,7 @@ invoke-srptool.texi: $(top_srcdir)/src/srptool-args.def invoke-danetool.texi
 	rm -f $@.tmp
 
 invoke-psktool.texi: $(top_srcdir)/src/psktool-args.def invoke-srptool.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -119,7 +119,7 @@ invoke-psktool.texi: $(top_srcdir)/src/psktool-args.def invoke-srptool.texi
 	rm -f $@.tmp
 
 invoke-p11tool.texi: $(top_srcdir)/src/p11tool-args.def invoke-psktool.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
@@ -131,7 +131,7 @@ invoke-p11tool.texi: $(top_srcdir)/src/p11tool-args.def invoke-psktool.texi
 	rm -f $@.tmp
 
 invoke-tpmtool.texi: $(top_srcdir)/src/tpmtool-args.def invoke-p11tool.texi
-	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -Tagtexi-cmd.tpl $<; \
+	PATH="$(top_builddir)/src/$(PATH_SEPARATOR)$${PATH}$(PATH_SEPARATOR)" $(AUTOGEN) -L$(top_builddir)/src -Tagtexi-cmd.tpl $<; \
 	if [ ! -e $@ ]; then \
 		cp $(srcdir)/$@ .; \
 	fi; \
