@@ -20,22 +20,42 @@
 # src/gl is being added by the top level makefile
 SUBDIRS = 
 
-BUILT_SOURCES = srptool-args.c srptool-args.h \
-	psktool-args.c psktool-args.h ocsptool-args.h ocsptool-args.c \
-	serv-args.c serv-args.h cli-args.c cli-args.h \
-	cli-debug-args.c cli-debug-args.h certtool-args.c certtool-args.h \
-	danetool-args.c danetool-args.h p11tool-args.c p11tool-args.h \
-	tpmtool-args.c tpmtool-args.h systemkey-args.c systemkey-args.h \
-	mech-list.h
+ARGS_BUILT = \
+	srptool-args.c srptool-args.h \
+	psktool-args.c psktool-args.h \
+	ocsptool-args.h ocsptool-args.c \
+	serv-args.c serv-args.h \
+	cli-args.c cli-args.h \
+	cli-debug-args.c cli-debug-args.h \
+	certtool-args.c certtool-args.h \
+	danetool-args.c danetool-args.h \
+	p11tool-args.c p11tool-args.h \
+	tpmtool-args.c tpmtool-args.h \
+	systemkey-args.c systemkey-args.h
+
+ARGS_BAK = \
+	srptool-args.c.bak srptool-args.h.bak \
+	psktool-args.c.bak psktool-args.h.bak \
+	ocsptool-args.h.bak ocsptool-args.c.bak \
+	serv-args.c.bak serv-args.h.bak \
+	cli-args.c.bak cli-args.h.bak \
+	cli-debug-args.c.bak cli-debug-args.h.bak \
+	certtool-args.c.bak certtool-args.h.bak \
+	danetool-args.c.bak danetool-args.h.bak \
+	p11tool-args.c.bak p11tool-args.h.bak \
+	tpmtool-args.c.bak tpmtool-args.h.bak \
+	systemkey-args.c.bak systemkey-args.h.bak
 
 ARGS_STAMPS = \
 	certtool-args.stamp cli-debug-args.stamp cli-args.stamp tpmtool-args.stamp \
 	systemkey-args.stamp srptool-args.stamp ocsptool-args.stamp p11tool-args.stamp \
 	danetool-args.stamp serv-args.stamp psktool-args.stamp
 
+BUILT_SOURCES = $(ARGS_BUILT) mech-list.h
+
 DISTCLEANFILES = $(BUILT_SOURCES) $(ARGS_STAMPS)
 
-EXTRA_DIST = gen-mech-list.sh args-bak-upd.sh
+EXTRA_DIST = gen-mech-list.sh args-bak-upd.sh $(ARGS_BAK)
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \

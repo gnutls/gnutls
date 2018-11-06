@@ -166,15 +166,9 @@ dist-hook: libopts-check symbol-check
 	$(MAKE) -C doc/ compare-makefile
 	$(MAKE) -C doc/ compare-exported
 	$(MAKE) -C doc/manpages compare-makefile
+	$(MAKE) -C src/ files-update
 	$(MAKE) ChangeLog
 	mv ChangeLog $(distdir)
-	cd $(distdir)/src/ && for i in *.def;do \
-		if test x"$$i" = x"args-std.def";then  continue; fi; \
-		autogen $$i; \
-	done
-	cd $(distdir)/src/ && for i in *-args.c *-args.h;do \
-		mv $$i $$i.bak; \
-	done
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
 .PHONY: abi-check abi-dump pic-check symbol-check local-code-coverage-output files-update libopts-check
