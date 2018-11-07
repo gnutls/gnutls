@@ -1085,12 +1085,15 @@ static void update_signed_certificate(common_info_st * cinfo)
 	gnutls_x509_crt_t crt;
 	int result;
 	gnutls_privkey_t ca_key;
+	gnutls_privkey_t pkey;
+	gnutls_pubkey_t pubkey;
 	gnutls_x509_crt_t ca_crt;
 	gnutls_datum_t out;
 	time_t tim;
 	unsigned int flags = 0;
 
 	fprintf(stdlog, "Generating a signed certificate...\n");
+
 
 	ca_key = load_ca_private_key(cinfo);
 	ca_crt = load_ca_cert(1, cinfo);
@@ -1107,12 +1110,24 @@ static void update_signed_certificate(common_info_st * cinfo)
 	}
 
 	tim = get_expiration_date();
-
 	result = gnutls_x509_crt_set_expiration_time(crt, tim);
 	if (result < 0) {
 		fprintf(stderr, "set_expiration: %s\n",
 			gnutls_strerror(result));
 		app_exit(1);
+	}
+
+	pkey = load_private_key(0, cinfo);
+	pubkey = load_public_key_or_import(0, pkey, cinfo);
+
+	if (pubkey) {
+		fprintf(stderr, "Updating public key\n");
+		result = gnutls_x509_crt_set_pubkey(crt, pubkey);
+		if (result < 0) {
+			fprintf(stderr, "cannot set public key: %s\n",
+				gnutls_strerror(result));
+			app_exit(1);
+		}
 	}
 
 	fprintf(stderr, "\n\nSigning certificate...\n");
