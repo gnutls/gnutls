@@ -234,7 +234,7 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
     }
 
 #define BUFFER_APPEND_TS(b, s) { \
-	ret = _gnutls_buffer_append_prefix(b, 32, s.tv_sec >> 32); \
+	ret = _gnutls_buffer_append_prefix(b, 32, (uint64_t) s.tv_sec >> 32); \
 	if (ret < 0) { \
 	    gnutls_assert(); \
 	    return ret; \
