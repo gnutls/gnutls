@@ -137,6 +137,7 @@ gnutls_crypto_register_cipher@GNUTLS_3_4
 gnutls_crypto_register_digest@GNUTLS_3_4
 gnutls_crypto_register_mac@GNUTLS_3_4
 gnutls_db_check_entry@GNUTLS_3_4
+gnutls_db_check_entry_expire_time@GNUTLS_3_6_5
 gnutls_db_check_entry_time@GNUTLS_3_4
 gnutls_db_get_default_cache_expiration@GNUTLS_3_4
 gnutls_db_get_ptr@GNUTLS_3_4

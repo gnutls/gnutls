@@ -240,6 +240,7 @@ APIMANS += gnutls_crypto_register_cipher.3
 APIMANS += gnutls_crypto_register_digest.3
 APIMANS += gnutls_crypto_register_mac.3
 APIMANS += gnutls_db_check_entry.3
+APIMANS += gnutls_db_check_entry_expire_time.3
 APIMANS += gnutls_db_check_entry_time.3
 APIMANS += gnutls_db_get_default_cache_expiration.3
 APIMANS += gnutls_db_get_ptr.3

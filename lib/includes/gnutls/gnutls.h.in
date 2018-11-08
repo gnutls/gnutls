@@ -1799,6 +1799,7 @@ void *gnutls_db_get_ptr(gnutls_session_t session);
 int gnutls_db_check_entry(gnutls_session_t session,
 			  gnutls_datum_t session_entry);
 time_t gnutls_db_check_entry_time(gnutls_datum_t * entry);
+time_t gnutls_db_check_entry_expire_time(gnutls_datum_t * entry);
 
   /**
    * gnutls_handshake_hook_func:

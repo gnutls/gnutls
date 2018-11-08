@@ -104,6 +104,7 @@ _gnutls_session_pack(gnutls_session_t session,
 
 	BUFFER_APPEND_NUM(&sb, PACKED_SESSION_MAGIC);
 	BUFFER_APPEND_NUM(&sb, session->security_parameters.timestamp);
+	BUFFER_APPEND_NUM(&sb, session->internals.expire_time);
 	BUFFER_APPEND(&sb, &id, 1);
 
 	switch (id) {
@@ -190,6 +191,7 @@ _gnutls_session_unpack(gnutls_session_t session,
 	int ret;
 	gnutls_buffer_st sb;
 	uint32_t magic;
+	uint32_t expire_time;
 	uint8_t id;
 
 	_gnutls_buffer_init(&sb);
@@ -220,6 +222,8 @@ _gnutls_session_unpack(gnutls_session_t session,
 	BUFFER_POP_NUM(&sb,
 		       session->internals.resumed_security_parameters.
 		       timestamp);
+	BUFFER_POP_NUM(&sb, expire_time);
+	(void) expire_time;
 	BUFFER_POP(&sb, &id, 1);
 
 	switch (id) {

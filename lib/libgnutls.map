@@ -1254,6 +1254,7 @@ GNUTLS_3_6_5
 	gnutls_record_get_max_early_data_size;
 	gnutls_record_send_early_data;
 	gnutls_record_recv_early_data;
+	gnutls_db_check_entry_expire_time;
 } GNUTLS_3_6_4;
 
 GNUTLS_FIPS140_3_4 {
