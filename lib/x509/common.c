@@ -441,7 +441,7 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 {
 	const struct oid_to_string *oentry;
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp = {NULL, 0};
 
 	if (value == NULL || value_size <= 0) {
 		gnutls_assert();
@@ -632,6 +632,9 @@ _gnutls_x509_decode_string(unsigned int etype,
 	uint8_t *str;
 	unsigned int str_size, len;
 	gnutls_datum_t td;
+
+	output->data = NULL;
+	output->size = 0;
 
 	if (allow_ber)
 		ret =
