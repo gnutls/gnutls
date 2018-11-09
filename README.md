@@ -61,7 +61,7 @@ apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-uti
 
 Fedora/RHEL:
 ```
-yum install -y dash git autoconf libtool gettext-devel automake autogen
+yum install -y dash git autoconf libtool gettext-devel automake autogen patch
 yum install -y nettle-devel p11-kit-devel autogen-libopts-devel libunistring-devel
 yum install -y trousers-devel guile-devel libtasn1-devel libidn2-devel gawk gperf
 yum install -y libtasn1-tools unbound-devel bison help2man gtk-doc texinfo texlive
