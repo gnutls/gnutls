@@ -187,6 +187,12 @@ esac
 
 fi
 
+AC_ARG_ENABLE(tls13-interop,
+  AS_HELP_STRING([--disable-tls13-interop], [disable TLS1.3 interoperability testing with openssl]),
+    enable_tls13_interop=$enableval, enable_tls13_interop=yes)
+
+AM_CONDITIONAL(ENABLE_TLS13_INTEROP, test "$enable_tls13_interop" != "no")
+
 dnl Check for iovec type
 AC_CHECK_MEMBERS([struct iovec.iov_base],
       [
