@@ -53,12 +53,7 @@ typedef int ssize_t;
 #endif
 #include <time.h>
 
-#ifdef HAVE_LIBNETTLE
 #include <nettle/memxor.h>
-#else
-#include <gl/memxor.h>
-#define memxor gl_memxor
-#endif
 
 #define ENABLE_ALIGN16
 
