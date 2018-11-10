@@ -446,16 +446,17 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 		    || bag_type == GNUTLS_BAG_CRL
 		    || bag_type == GNUTLS_BAG_SECRET) {
 			gnutls_datum_t tmp = bag->element[i].data;
+			bag->element[i].data.data = NULL;
+			bag->element[i].data.size = 0;
 
 			result =
 			    _pkcs12_decode_crt_bag(bag_type, &tmp,
 						   &bag->element[i].data);
+			_gnutls_free_datum(&tmp);
 			if (result < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
-
-			_gnutls_free_datum(&tmp);
 		}
 
 		/* read the bag attributes
@@ -1212,12 +1213,8 @@ pkcs12_try_gost:
 		goto cleanup;
 	}
 
-	_gnutls_free_datum(&tmp);
-	_gnutls_free_datum(&salt);
-
-	return 0;
-
-      cleanup:
+	result = 0;
+ cleanup:
 	_gnutls_free_datum(&tmp);
 	_gnutls_free_datum(&salt);
 	return result;
@@ -2024,12 +2021,13 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 				memcpy(salt, dsalt.data, dsalt.size);
 		} else {
 			*salt_size = dsalt.size;
-			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+			ret = gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+			goto cleanup;
 		}
 	}
 
 	ret = 0;
-      cleanup:
+ cleanup:
 	_gnutls_free_datum(&tmp);
 	_gnutls_free_datum(&dsalt);
 	return ret;
