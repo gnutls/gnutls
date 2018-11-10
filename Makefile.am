@@ -166,23 +166,9 @@ dist-hook: libopts-check symbol-check
 	$(MAKE) -C doc/ compare-makefile
 	$(MAKE) -C doc/ compare-exported
 	$(MAKE) -C doc/manpages compare-makefile
+	$(MAKE) -C src/ files-update
 	$(MAKE) ChangeLog
 	mv ChangeLog $(distdir)
-	$(SED) 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
-	$(SED) 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
-	$(SED) 's/\@PACKAGE_BUGREPORT\@/$(PACKAGE_BUGREPORT)/g' -i $(distdir)/src/args-std.def
-	cd $(distdir)/src/ && for i in *.def;do \
-		if test x"$$i" = x"args-std.def";then  continue; fi; \
-		autogen $$i; \
-		cp $$i $$i.tmp; \
-		$(SED) -i 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $$i.tmp; \
-		autogen -Tagman-cmd.tpl $$i.tmp; \
-		rm -f $$i.tmp; \
-		mv -f *.1 ../doc/manpages/; \
-	done
-	cd $(distdir)/src/ && for i in *-args.c *-args.h;do \
-		mv $$i $$i.bak; \
-	done
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
 .PHONY: abi-check abi-dump pic-check symbol-check local-code-coverage-output files-update libopts-check

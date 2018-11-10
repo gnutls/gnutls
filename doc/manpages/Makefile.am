@@ -19,77 +19,84 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+man_MANS =
 EXTRA_DIST = stamp_mans
-
-dist_man_MANS =
+MAINTAINERCLEANFILES = stamp_mans
 
 -include $(top_srcdir)/doc/doc.mk
 
-if ENABLE_TOOLS
-dist_man_MANS += gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
+TOOLS_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
 	certtool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
+SRP_MANS = srptool.1
+DANE_MANS = danetool.1
+
+if ENABLE_TOOLS
+man_MANS += $(TOOLS_MANS)
 if ENABLE_SRP
-dist_man_MANS += srptool.1
+man_MANS += $(SRP_MANS)
 endif
 if ENABLE_DANE
-dist_man_MANS += danetool.1
+man_MANS += $(DANE_MANS)
 endif
 endif
+
+EXTRA_DIST += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
+MAINTAINERCLEANFILES += $(TOOLS_MANS) $(SRP_MANS) $(DANE_MANS)
 
 # Note that our .def files depend on autogen
 # supporting the @subheading texi keyword. This
 # is not currently the case so we do remove it
 # before processing. Once the new version of autogen
 # is out, replace the sed and tmp files with a simple
-# autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+# autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 certtool.1: ../../src/certtool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 ocsptool.1: ../../src/ocsptool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 danetool.1: ../../src/danetool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 gnutls-cli.1: ../../src/cli-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 gnutls-serv.1: ../../src/serv-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 gnutls-cli-debug.1: ../../src/cli-debug-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 srptool.1: ../../src/srptool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 p11tool.1: ../../src/p11tool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 tpmtool.1: ../../src/tpmtool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 psktool.1: ../../src/psktool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
-	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	autogen -L ../../src -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
 APIMANS =
@@ -1205,8 +1212,11 @@ APIMANS += gnutls_x509_trust_list_verify_crt2.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
 
 if ENABLE_DOC
-dist_man_MANS += $(APIMANS)
+man_MANS += $(APIMANS)
 endif
+
+EXTRA_DIST += $(APIMANS)
+MAINTAINERCLEANFILES += $(APIMANS)
 
 $(APIMANS): stamp_mans
 
@@ -1225,230 +1235,22 @@ compare-makefile:
 	rm -f tmp-$@
 
 stamp_mans: $(HEADER_FILES)
-	@echo $(ECHO_N) "Creating man pages for gnutls.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in`; do \
+	@for header in $(HEADER_FILES); do \
+	echo $(ECHO_N) "Creating man pages for `basename $$header .in`..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $$header`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/gnutls.h" \
+			-include "gnutls/`basename $$header .in`" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 && \
 		echo $(ECHO_N) "."; \
+	done ; \
+	echo "" ; \
 	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for compat.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/compat.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/compat.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for socket.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/socket.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/socket.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for dane.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/libdane/includes/gnutls/dane.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/dane.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for x509.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/x509.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/x509.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for x509-ext.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/x509-ext.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/x509-ext.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for pkcs7.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs7.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/pkcs7.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for ocsp.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/ocsp.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/ocsp.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for abstract.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/abstract.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/abstract.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for pkcs12.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs12.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/pkcs12.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_X509_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for pkcs11.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs11.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/pkcs11.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for dtls.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/dtls.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/dtls.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for crypto.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/crypto.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/crypto.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for tpm.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/tpm.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/tpm.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for urls.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/urls.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/urls.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2014-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for system-keys.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/system-keys.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/system-keys.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2014-$(YEAR) Free Software Foundation, Inc., and others" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
 	echo $@ > $@
 
 .PHONY: update-makefile

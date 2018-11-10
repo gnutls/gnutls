@@ -19,7 +19,7 @@
  * The srptool program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -53,7 +53,7 @@ extern "C" {
 #endif
 extern FILE * option_usage_fp;
 #define zCopyright      (srptool_opt_strs+0)
-#define zLicenseDescrip (srptool_opt_strs+288)
+#define zLicenseDescrip (srptool_opt_strs+282)
 
 
 #ifndef NULL
@@ -63,13 +63,13 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for srptool options
  */
-static char const srptool_opt_strs[2037] =
-/*     0 */ "srptool @VERSION@\n"
-            "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
+static char const srptool_opt_strs[2023] =
+/*     0 */ "srptool 3.6.4\n"
+            "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
-/*   288 */ "srptool is free software: you can redistribute it and/or modify it under\n"
+/*   282 */ "srptool is free software: you can redistribute it and/or modify it under\n"
             "the terms of the GNU General Public License as published by the Free\n"
             "Software Foundation, either version 3 of the License, or (at your option)\n"
             "any later version.\n\n"
@@ -79,60 +79,60 @@ static char const srptool_opt_strs[2037] =
             "details.\n\n"
             "You should have received a copy of the GNU General Public License along\n"
             "with this program.  If not, see <http://www.gnu.org/licenses/>.\n\0"
-/*   891 */ "Enable debugging\0"
-/*   908 */ "DEBUG\0"
-/*   914 */ "debug\0"
-/*   920 */ "specify the index of the group parameters in tpasswd.conf to use\0"
-/*   985 */ "INDEX\0"
-/*   991 */ "index\0"
-/*   997 */ "specify a username\0"
-/*  1016 */ "USERNAME\0"
-/*  1025 */ "username\0"
-/*  1034 */ "specify a password file\0"
-/*  1058 */ "PASSWD\0"
-/*  1065 */ "passwd\0"
-/*  1072 */ "specify salt size\0"
-/*  1090 */ "SALT\0"
-/*  1095 */ "salt\0"
-/*  1100 */ "just verify the password.\0"
-/*  1126 */ "VERIFY\0"
-/*  1133 */ "verify\0"
-/*  1140 */ "specify a password conf file.\0"
-/*  1170 */ "PASSWD_CONF\0"
-/*  1182 */ "passwd-conf\0"
-/*  1194 */ "Generate a password configuration file.\0"
-/*  1234 */ "CREATE_CONF\0"
-/*  1246 */ "create-conf\0"
-/*  1258 */ "display extended usage information and exit\0"
-/*  1302 */ "help\0"
-/*  1307 */ "extended usage information passed thru pager\0"
-/*  1352 */ "more-help\0"
-/*  1362 */ "output version information and exit\0"
-/*  1398 */ "version\0"
-/*  1406 */ "SRPTOOL\0"
-/*  1414 */ "srptool - GnuTLS SRP tool\n"
+/*   885 */ "Enable debugging\0"
+/*   902 */ "DEBUG\0"
+/*   908 */ "debug\0"
+/*   914 */ "specify the index of the group parameters in tpasswd.conf to use\0"
+/*   979 */ "INDEX\0"
+/*   985 */ "index\0"
+/*   991 */ "specify a username\0"
+/*  1010 */ "USERNAME\0"
+/*  1019 */ "username\0"
+/*  1028 */ "specify a password file\0"
+/*  1052 */ "PASSWD\0"
+/*  1059 */ "passwd\0"
+/*  1066 */ "specify salt size\0"
+/*  1084 */ "SALT\0"
+/*  1089 */ "salt\0"
+/*  1094 */ "just verify the password.\0"
+/*  1120 */ "VERIFY\0"
+/*  1127 */ "verify\0"
+/*  1134 */ "specify a password conf file.\0"
+/*  1164 */ "PASSWD_CONF\0"
+/*  1176 */ "passwd-conf\0"
+/*  1188 */ "Generate a password configuration file.\0"
+/*  1228 */ "CREATE_CONF\0"
+/*  1240 */ "create-conf\0"
+/*  1252 */ "display extended usage information and exit\0"
+/*  1296 */ "help\0"
+/*  1301 */ "extended usage information passed thru pager\0"
+/*  1346 */ "more-help\0"
+/*  1356 */ "output version information and exit\0"
+/*  1392 */ "version\0"
+/*  1400 */ "SRPTOOL\0"
+/*  1408 */ "srptool - GnuTLS SRP tool\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  1498 */ "@PACKAGE_BUGREPORT@\0"
-/*  1518 */ "\n\0"
-/*  1520 */ "Simple program that emulates the programs in the Stanford SRP (Secure\n"
+/*  1492 */ "bugs@gnutls.org\0"
+/*  1508 */ "\n\0"
+/*  1510 */ "Simple program that emulates the programs in the Stanford SRP (Secure\n"
             "Remote Password) libraries using GnuTLS.  It is intended for use in places\n"
             "where you don't expect SRP authentication to be the used for system users.\n\n"
             "In brief, to use SRP you need to create two files.  These are the password\n"
             "file that holds the users and the verifiers associated with them and the\n"
             "configuration file to hold the group parameters (called tpasswd.conf).\n\0"
-/*  1961 */ "srptool @VERSION@\0"
-/*  1979 */ "srptool [options]\n"
+/*  1951 */ "srptool 3.6.4\0"
+/*  1965 */ "srptool [options]\n"
             "srptool --help for usage instructions.\n";
 
 /**
  *  debug option description:
  */
 /** Descriptive text for the debug option */
-#define DEBUG_DESC      (srptool_opt_strs+891)
+#define DEBUG_DESC      (srptool_opt_strs+885)
 /** Upper-cased name for the debug option */
-#define DEBUG_NAME      (srptool_opt_strs+908)
+#define DEBUG_NAME      (srptool_opt_strs+902)
 /** Name string for the debug option */
-#define DEBUG_name      (srptool_opt_strs+914)
+#define DEBUG_name      (srptool_opt_strs+908)
 /** Compiled in flag settings for the debug option */
 #define DEBUG_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -141,11 +141,11 @@ static char const srptool_opt_strs[2037] =
  *  index option description:
  */
 /** Descriptive text for the index option */
-#define INDEX_DESC      (srptool_opt_strs+920)
+#define INDEX_DESC      (srptool_opt_strs+914)
 /** Upper-cased name for the index option */
-#define INDEX_NAME      (srptool_opt_strs+985)
+#define INDEX_NAME      (srptool_opt_strs+979)
 /** Name string for the index option */
-#define INDEX_name      (srptool_opt_strs+991)
+#define INDEX_name      (srptool_opt_strs+985)
 /** The compiled in default value for the index option argument */
 #define INDEX_DFT_ARG   ((char const*)3)
 /** Compiled in flag settings for the index option */
@@ -156,11 +156,11 @@ static char const srptool_opt_strs[2037] =
  *  username option description:
  */
 /** Descriptive text for the username option */
-#define USERNAME_DESC      (srptool_opt_strs+997)
+#define USERNAME_DESC      (srptool_opt_strs+991)
 /** Upper-cased name for the username option */
-#define USERNAME_NAME      (srptool_opt_strs+1016)
+#define USERNAME_NAME      (srptool_opt_strs+1010)
 /** Name string for the username option */
-#define USERNAME_name      (srptool_opt_strs+1025)
+#define USERNAME_name      (srptool_opt_strs+1019)
 /** Compiled in flag settings for the username option */
 #define USERNAME_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -169,11 +169,11 @@ static char const srptool_opt_strs[2037] =
  *  passwd option description:
  */
 /** Descriptive text for the passwd option */
-#define PASSWD_DESC      (srptool_opt_strs+1034)
+#define PASSWD_DESC      (srptool_opt_strs+1028)
 /** Upper-cased name for the passwd option */
-#define PASSWD_NAME      (srptool_opt_strs+1058)
+#define PASSWD_NAME      (srptool_opt_strs+1052)
 /** Name string for the passwd option */
-#define PASSWD_name      (srptool_opt_strs+1065)
+#define PASSWD_name      (srptool_opt_strs+1059)
 /** Compiled in flag settings for the passwd option */
 #define PASSWD_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -182,11 +182,11 @@ static char const srptool_opt_strs[2037] =
  *  salt option description:
  */
 /** Descriptive text for the salt option */
-#define SALT_DESC      (srptool_opt_strs+1072)
+#define SALT_DESC      (srptool_opt_strs+1066)
 /** Upper-cased name for the salt option */
-#define SALT_NAME      (srptool_opt_strs+1090)
+#define SALT_NAME      (srptool_opt_strs+1084)
 /** Name string for the salt option */
-#define SALT_name      (srptool_opt_strs+1095)
+#define SALT_name      (srptool_opt_strs+1089)
 /** Compiled in flag settings for the salt option */
 #define SALT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -195,11 +195,11 @@ static char const srptool_opt_strs[2037] =
  *  verify option description:
  */
 /** Descriptive text for the verify option */
-#define VERIFY_DESC      (srptool_opt_strs+1100)
+#define VERIFY_DESC      (srptool_opt_strs+1094)
 /** Upper-cased name for the verify option */
-#define VERIFY_NAME      (srptool_opt_strs+1126)
+#define VERIFY_NAME      (srptool_opt_strs+1120)
 /** Name string for the verify option */
-#define VERIFY_name      (srptool_opt_strs+1133)
+#define VERIFY_name      (srptool_opt_strs+1127)
 /** Compiled in flag settings for the verify option */
 #define VERIFY_FLAGS     (OPTST_DISABLED)
 
@@ -207,11 +207,11 @@ static char const srptool_opt_strs[2037] =
  *  passwd-conf option description:
  */
 /** Descriptive text for the passwd-conf option */
-#define PASSWD_CONF_DESC      (srptool_opt_strs+1140)
+#define PASSWD_CONF_DESC      (srptool_opt_strs+1134)
 /** Upper-cased name for the passwd-conf option */
-#define PASSWD_CONF_NAME      (srptool_opt_strs+1170)
+#define PASSWD_CONF_NAME      (srptool_opt_strs+1164)
 /** Name string for the passwd-conf option */
-#define PASSWD_CONF_name      (srptool_opt_strs+1182)
+#define PASSWD_CONF_name      (srptool_opt_strs+1176)
 /** Compiled in flag settings for the passwd-conf option */
 #define PASSWD_CONF_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -220,11 +220,11 @@ static char const srptool_opt_strs[2037] =
  *  create-conf option description:
  */
 /** Descriptive text for the create-conf option */
-#define CREATE_CONF_DESC      (srptool_opt_strs+1194)
+#define CREATE_CONF_DESC      (srptool_opt_strs+1188)
 /** Upper-cased name for the create-conf option */
-#define CREATE_CONF_NAME      (srptool_opt_strs+1234)
+#define CREATE_CONF_NAME      (srptool_opt_strs+1228)
 /** Name string for the create-conf option */
-#define CREATE_CONF_name      (srptool_opt_strs+1246)
+#define CREATE_CONF_name      (srptool_opt_strs+1240)
 /** Compiled in flag settings for the create-conf option */
 #define CREATE_CONF_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -232,11 +232,11 @@ static char const srptool_opt_strs[2037] =
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (srptool_opt_strs+1258)
-#define HELP_name       (srptool_opt_strs+1302)
+#define HELP_DESC       (srptool_opt_strs+1252)
+#define HELP_name       (srptool_opt_strs+1296)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (srptool_opt_strs+1307)
-#define MORE_HELP_name  (srptool_opt_strs+1352)
+#define MORE_HELP_DESC  (srptool_opt_strs+1301)
+#define MORE_HELP_name  (srptool_opt_strs+1346)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -249,8 +249,8 @@ static char const srptool_opt_strs[2037] =
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (srptool_opt_strs+1362)
-#define VER_name        (srptool_opt_strs+1398)
+#define VER_DESC        (srptool_opt_strs+1356)
+#define VER_name        (srptool_opt_strs+1392)
 /**
  *  Declare option callback procedures
  */
@@ -408,21 +408,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of srptool. */
-#define zPROGNAME       (srptool_opt_strs+1406)
+#define zPROGNAME       (srptool_opt_strs+1400)
 /** Reference to the title line for srptool usage. */
-#define zUsageTitle     (srptool_opt_strs+1414)
+#define zUsageTitle     (srptool_opt_strs+1408)
 /** There is no srptool configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for srptool config files. */
 #define apzHomeList     NULL
 /** The srptool program bug email address. */
-#define zBugsAddr       (srptool_opt_strs+1498)
+#define zBugsAddr       (srptool_opt_strs+1492)
 /** Clarification/explanation of what srptool does. */
-#define zExplain        (srptool_opt_strs+1518)
+#define zExplain        (srptool_opt_strs+1508)
 /** Extra detail explaining what srptool does. */
-#define zDetail         (srptool_opt_strs+1520)
+#define zDetail         (srptool_opt_strs+1510)
 /** The full version string for srptool. */
-#define zFullVersion    (srptool_opt_strs+1961)
+#define zFullVersion    (srptool_opt_strs+1951)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -434,7 +434,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define srptool_full_usage (NULL)
-#define srptool_short_usage (srptool_opt_strs+1979)
+#define srptool_short_usage (srptool_opt_strs+1965)
 
 #endif /* not defined __doxygen__ */
 
@@ -693,8 +693,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via srptoolOptions.pzCopyright */
-  puts(_("srptool @VERSION@\n\
-Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("srptool 3.6.4\n\
+Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -760,7 +760,7 @@ file that holds the users and the verifiers associated with them and the\n\
 configuration file to hold the group parameters (called tpasswd.conf).\n"));
 
   /* referenced via srptoolOptions.pzFullVersion */
-  puts(_("srptool @VERSION@"));
+  puts(_("srptool 3.6.4"));
 
   /* referenced via srptoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

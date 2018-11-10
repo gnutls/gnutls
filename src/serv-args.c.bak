@@ -19,7 +19,7 @@
  * The gnutls-serv program is copyrighted and licensed
  * under the following terms:
  *
- *  Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.
+ *  Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.
  *  This is free software. It is licensed for use, modification and
  *  redistribution under the terms of the GNU General Public License,
  *  version 3 or later <http://gnu.org/licenses/gpl.html>
@@ -53,7 +53,7 @@ extern "C" {
 #endif
 extern FILE * option_usage_fp;
 #define zCopyright      (gnutls_serv_opt_strs+0)
-#define zLicenseDescrip (gnutls_serv_opt_strs+292)
+#define zLicenseDescrip (gnutls_serv_opt_strs+286)
 
 
 #ifndef NULL
@@ -63,13 +63,13 @@ extern FILE * option_usage_fp;
 /**
  *  static const strings for gnutls-serv options
  */
-static char const gnutls_serv_opt_strs[3442] =
-/*     0 */ "gnutls-serv @VERSION@\n"
-            "Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n"
+static char const gnutls_serv_opt_strs[3428] =
+/*     0 */ "gnutls-serv 3.6.4\n"
+            "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
             "version 3 or later <http://gnu.org/licenses/gpl.html>\n\0"
-/*   292 */ "gnutls-serv is free software: you can redistribute it and/or modify it\n"
+/*   286 */ "gnutls-serv is free software: you can redistribute it and/or modify it\n"
             "under the terms of the GNU General Public License as published by the Free\n"
             "Software Foundation, either version 3 of the License, or (at your option)\n"
             "any later version.\n\n"
@@ -79,145 +79,145 @@ static char const gnutls_serv_opt_strs[3442] =
             "more details.\n\n"
             "You should have received a copy of the GNU General Public License along\n"
             "with this program.  If not, see <http://www.gnu.org/licenses/>.\n\0"
-/*   903 */ "Enable debugging\0"
-/*   920 */ "DEBUG\0"
-/*   926 */ "debug\0"
-/*   932 */ "Server's hostname for server name extension\0"
-/*   976 */ "SNI_HOSTNAME\0"
-/*   989 */ "sni-hostname\0"
-/*  1002 */ "Send fatal alert on sni-hostname mismatch\0"
-/*  1044 */ "SNI_HOSTNAME_FATAL\0"
-/*  1063 */ "sni-hostname-fatal\0"
-/*  1082 */ "Specify ALPN protocol to be enabled by the server\0"
-/*  1132 */ "ALPN\0"
-/*  1137 */ "alpn\0"
-/*  1142 */ "Send fatal alert on non-matching ALPN name\0"
-/*  1185 */ "ALPN_FATAL\0"
-/*  1196 */ "alpn-fatal\0"
-/*  1207 */ "Don't accept session tickets\0"
-/*  1236 */ "NOTICKET\0"
-/*  1245 */ "noticket\0"
-/*  1254 */ "Don't require cookie on DTLS sessions\0"
-/*  1292 */ "NOCOOKIE\0"
-/*  1301 */ "nocookie\0"
-/*  1310 */ "Generate Diffie-Hellman parameters\0"
-/*  1345 */ "GENERATE\0"
-/*  1354 */ "generate\0"
-/*  1363 */ "Suppress some messages\0"
-/*  1386 */ "QUIET\0"
-/*  1392 */ "quiet\0"
-/*  1398 */ "Do not use a resumption database\0"
-/*  1431 */ "NODB\0"
-/*  1436 */ "nodb\0"
-/*  1441 */ "Act as an HTTP server\0"
-/*  1463 */ "HTTP\0"
-/*  1468 */ "http\0"
-/*  1473 */ "Act as an Echo server\0"
-/*  1495 */ "ECHO\0"
-/*  1500 */ "echo\0"
-/*  1505 */ "Use DTLS (datagram TLS) over UDP\0"
-/*  1538 */ "UDP\0"
-/*  1542 */ "udp\0"
-/*  1546 */ "Set MTU for datagram TLS\0"
-/*  1571 */ "MTU\0"
-/*  1575 */ "mtu\0"
-/*  1579 */ "Offer SRTP profiles\0"
-/*  1599 */ "SRTP_PROFILES\0"
-/*  1613 */ "srtp-profiles\0"
-/*  1627 */ "Do not request a client certificate\0"
-/*  1663 */ "DISABLE_CLIENT_CERT\0"
-/*  1683 */ "disable-client-cert\0"
-/*  1703 */ "Require a client certificate\0"
-/*  1732 */ "REQUIRE_CLIENT_CERT\0"
-/*  1752 */ "require-client-cert\0"
-/*  1772 */ "If a client certificate is sent then verify it.\0"
-/*  1820 */ "VERIFY_CLIENT_CERT\0"
-/*  1839 */ "verify-client-cert\0"
-/*  1858 */ "Activate heartbeat support\0"
-/*  1885 */ "HEARTBEAT\0"
-/*  1895 */ "heartbeat\0"
-/*  1905 */ "Use DER format for certificates to read from\0"
-/*  1950 */ "X509FMTDER\0"
-/*  1961 */ "x509fmtder\0"
-/*  1972 */ "Priorities string\0"
-/*  1990 */ "PRIORITY\0"
-/*  1999 */ "priority\0"
-/*  2008 */ "DH params file to use\0"
-/*  2030 */ "DHPARAMS\0"
-/*  2039 */ "dhparams\0"
-/*  2048 */ "Certificate file or PKCS #11 URL to use\0"
-/*  2088 */ "X509CAFILE\0"
-/*  2099 */ "x509cafile\0"
-/*  2110 */ "CRL file to use\0"
-/*  2126 */ "X509CRLFILE\0"
-/*  2138 */ "x509crlfile\0"
-/*  2150 */ "PGP Key file to use (deprecated)\0"
-/*  2183 */ "PGPKEYFILE\0"
-/*  2194 */ "pgpkeyfile\0"
-/*  2205 */ "X.509 key file or PKCS #11 URL to use\0"
-/*  2243 */ "X509KEYFILE\0"
-/*  2255 */ "x509keyfile\0"
-/*  2267 */ "X.509 Certificate file or PKCS #11 URL to use\0"
-/*  2313 */ "X509CERTFILE\0"
-/*  2326 */ "x509certfile\0"
-/*  2339 */ "an alias for the 'x509keyfile' option (deprecated)\0"
-/*  2390 */ "x509dsakeyfile\0"
-/*  2405 */ "an alias for the 'x509certfile' option (deprecated)\0"
-/*  2457 */ "x509dsacertfile\0"
-/*  2473 */ "x509ecckeyfile\0"
-/*  2488 */ "x509ecccertfile\0"
-/*  2504 */ "SRP password file to use\0"
-/*  2529 */ "SRPPASSWD\0"
-/*  2539 */ "srppasswd\0"
-/*  2549 */ "SRP password configuration file to use\0"
-/*  2588 */ "SRPPASSWDCONF\0"
-/*  2602 */ "srppasswdconf\0"
-/*  2616 */ "PSK password file to use\0"
-/*  2641 */ "PSKPASSWD\0"
-/*  2651 */ "pskpasswd\0"
-/*  2661 */ "PSK identity hint to use\0"
-/*  2686 */ "PSKHINT\0"
-/*  2694 */ "pskhint\0"
-/*  2702 */ "The OCSP response to send to client\0"
-/*  2738 */ "OCSP_RESPONSE\0"
-/*  2752 */ "ocsp-response\0"
-/*  2766 */ "Ignore any errors when setting the OCSP response\0"
-/*  2815 */ "IGNORE_OCSP_RESPONSE_ERRORS\0"
-/*  2843 */ "ignore-ocsp-response-errors\0"
-/*  2871 */ "The port to connect to\0"
-/*  2894 */ "PORT\0"
-/*  2899 */ "port\0"
-/*  2904 */ "Print a list of the supported algorithms and modes\0"
-/*  2955 */ "LIST\0"
-/*  2960 */ "list\0"
-/*  2965 */ "Specify the PKCS #11 provider library\0"
-/*  3003 */ "PROVIDER\0"
-/*  3012 */ "provider\0"
-/*  3021 */ "display extended usage information and exit\0"
-/*  3065 */ "help\0"
-/*  3070 */ "extended usage information passed thru pager\0"
-/*  3115 */ "more-help\0"
-/*  3125 */ "output version information and exit\0"
-/*  3161 */ "version\0"
-/*  3169 */ "GNUTLS_SERV\0"
-/*  3181 */ "gnutls-serv - GnuTLS server\n"
+/*   897 */ "Enable debugging\0"
+/*   914 */ "DEBUG\0"
+/*   920 */ "debug\0"
+/*   926 */ "Server's hostname for server name extension\0"
+/*   970 */ "SNI_HOSTNAME\0"
+/*   983 */ "sni-hostname\0"
+/*   996 */ "Send fatal alert on sni-hostname mismatch\0"
+/*  1038 */ "SNI_HOSTNAME_FATAL\0"
+/*  1057 */ "sni-hostname-fatal\0"
+/*  1076 */ "Specify ALPN protocol to be enabled by the server\0"
+/*  1126 */ "ALPN\0"
+/*  1131 */ "alpn\0"
+/*  1136 */ "Send fatal alert on non-matching ALPN name\0"
+/*  1179 */ "ALPN_FATAL\0"
+/*  1190 */ "alpn-fatal\0"
+/*  1201 */ "Don't accept session tickets\0"
+/*  1230 */ "NOTICKET\0"
+/*  1239 */ "noticket\0"
+/*  1248 */ "Don't require cookie on DTLS sessions\0"
+/*  1286 */ "NOCOOKIE\0"
+/*  1295 */ "nocookie\0"
+/*  1304 */ "Generate Diffie-Hellman parameters\0"
+/*  1339 */ "GENERATE\0"
+/*  1348 */ "generate\0"
+/*  1357 */ "Suppress some messages\0"
+/*  1380 */ "QUIET\0"
+/*  1386 */ "quiet\0"
+/*  1392 */ "Do not use a resumption database\0"
+/*  1425 */ "NODB\0"
+/*  1430 */ "nodb\0"
+/*  1435 */ "Act as an HTTP server\0"
+/*  1457 */ "HTTP\0"
+/*  1462 */ "http\0"
+/*  1467 */ "Act as an Echo server\0"
+/*  1489 */ "ECHO\0"
+/*  1494 */ "echo\0"
+/*  1499 */ "Use DTLS (datagram TLS) over UDP\0"
+/*  1532 */ "UDP\0"
+/*  1536 */ "udp\0"
+/*  1540 */ "Set MTU for datagram TLS\0"
+/*  1565 */ "MTU\0"
+/*  1569 */ "mtu\0"
+/*  1573 */ "Offer SRTP profiles\0"
+/*  1593 */ "SRTP_PROFILES\0"
+/*  1607 */ "srtp-profiles\0"
+/*  1621 */ "Do not request a client certificate\0"
+/*  1657 */ "DISABLE_CLIENT_CERT\0"
+/*  1677 */ "disable-client-cert\0"
+/*  1697 */ "Require a client certificate\0"
+/*  1726 */ "REQUIRE_CLIENT_CERT\0"
+/*  1746 */ "require-client-cert\0"
+/*  1766 */ "If a client certificate is sent then verify it.\0"
+/*  1814 */ "VERIFY_CLIENT_CERT\0"
+/*  1833 */ "verify-client-cert\0"
+/*  1852 */ "Activate heartbeat support\0"
+/*  1879 */ "HEARTBEAT\0"
+/*  1889 */ "heartbeat\0"
+/*  1899 */ "Use DER format for certificates to read from\0"
+/*  1944 */ "X509FMTDER\0"
+/*  1955 */ "x509fmtder\0"
+/*  1966 */ "Priorities string\0"
+/*  1984 */ "PRIORITY\0"
+/*  1993 */ "priority\0"
+/*  2002 */ "DH params file to use\0"
+/*  2024 */ "DHPARAMS\0"
+/*  2033 */ "dhparams\0"
+/*  2042 */ "Certificate file or PKCS #11 URL to use\0"
+/*  2082 */ "X509CAFILE\0"
+/*  2093 */ "x509cafile\0"
+/*  2104 */ "CRL file to use\0"
+/*  2120 */ "X509CRLFILE\0"
+/*  2132 */ "x509crlfile\0"
+/*  2144 */ "PGP Key file to use (deprecated)\0"
+/*  2177 */ "PGPKEYFILE\0"
+/*  2188 */ "pgpkeyfile\0"
+/*  2199 */ "X.509 key file or PKCS #11 URL to use\0"
+/*  2237 */ "X509KEYFILE\0"
+/*  2249 */ "x509keyfile\0"
+/*  2261 */ "X.509 Certificate file or PKCS #11 URL to use\0"
+/*  2307 */ "X509CERTFILE\0"
+/*  2320 */ "x509certfile\0"
+/*  2333 */ "an alias for the 'x509keyfile' option (deprecated)\0"
+/*  2384 */ "x509dsakeyfile\0"
+/*  2399 */ "an alias for the 'x509certfile' option (deprecated)\0"
+/*  2451 */ "x509dsacertfile\0"
+/*  2467 */ "x509ecckeyfile\0"
+/*  2482 */ "x509ecccertfile\0"
+/*  2498 */ "SRP password file to use\0"
+/*  2523 */ "SRPPASSWD\0"
+/*  2533 */ "srppasswd\0"
+/*  2543 */ "SRP password configuration file to use\0"
+/*  2582 */ "SRPPASSWDCONF\0"
+/*  2596 */ "srppasswdconf\0"
+/*  2610 */ "PSK password file to use\0"
+/*  2635 */ "PSKPASSWD\0"
+/*  2645 */ "pskpasswd\0"
+/*  2655 */ "PSK identity hint to use\0"
+/*  2680 */ "PSKHINT\0"
+/*  2688 */ "pskhint\0"
+/*  2696 */ "The OCSP response to send to client\0"
+/*  2732 */ "OCSP_RESPONSE\0"
+/*  2746 */ "ocsp-response\0"
+/*  2760 */ "Ignore any errors when setting the OCSP response\0"
+/*  2809 */ "IGNORE_OCSP_RESPONSE_ERRORS\0"
+/*  2837 */ "ignore-ocsp-response-errors\0"
+/*  2865 */ "The port to connect to\0"
+/*  2888 */ "PORT\0"
+/*  2893 */ "port\0"
+/*  2898 */ "Print a list of the supported algorithms and modes\0"
+/*  2949 */ "LIST\0"
+/*  2954 */ "list\0"
+/*  2959 */ "Specify the PKCS #11 provider library\0"
+/*  2997 */ "PROVIDER\0"
+/*  3006 */ "provider\0"
+/*  3015 */ "display extended usage information and exit\0"
+/*  3059 */ "help\0"
+/*  3064 */ "extended usage information passed thru pager\0"
+/*  3109 */ "more-help\0"
+/*  3119 */ "output version information and exit\0"
+/*  3155 */ "version\0"
+/*  3163 */ "GNUTLS_SERV\0"
+/*  3175 */ "gnutls-serv - GnuTLS server\n"
             "Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n\0"
-/*  3267 */ "@PACKAGE_BUGREPORT@\0"
-/*  3287 */ "\n\0"
-/*  3289 */ "Server program that listens to incoming TLS connections.\n\0"
-/*  3347 */ "gnutls-serv @VERSION@\0"
-/*  3369 */ "Usage: gnutls-serv [options]\n"
+/*  3261 */ "bugs@gnutls.org\0"
+/*  3277 */ "\n\0"
+/*  3279 */ "Server program that listens to incoming TLS connections.\n\0"
+/*  3337 */ "gnutls-serv 3.6.4\0"
+/*  3355 */ "Usage: gnutls-serv [options]\n"
             "gnutls-serv --help for usage instructions.\n";
 
 /**
  *  debug option description:
  */
 /** Descriptive text for the debug option */
-#define DEBUG_DESC      (gnutls_serv_opt_strs+903)
+#define DEBUG_DESC      (gnutls_serv_opt_strs+897)
 /** Upper-cased name for the debug option */
-#define DEBUG_NAME      (gnutls_serv_opt_strs+920)
+#define DEBUG_NAME      (gnutls_serv_opt_strs+914)
 /** Name string for the debug option */
-#define DEBUG_name      (gnutls_serv_opt_strs+926)
+#define DEBUG_name      (gnutls_serv_opt_strs+920)
 /** Compiled in flag settings for the debug option */
 #define DEBUG_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -226,11 +226,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  sni-hostname option description:
  */
 /** Descriptive text for the sni-hostname option */
-#define SNI_HOSTNAME_DESC      (gnutls_serv_opt_strs+932)
+#define SNI_HOSTNAME_DESC      (gnutls_serv_opt_strs+926)
 /** Upper-cased name for the sni-hostname option */
-#define SNI_HOSTNAME_NAME      (gnutls_serv_opt_strs+976)
+#define SNI_HOSTNAME_NAME      (gnutls_serv_opt_strs+970)
 /** Name string for the sni-hostname option */
-#define SNI_HOSTNAME_name      (gnutls_serv_opt_strs+989)
+#define SNI_HOSTNAME_name      (gnutls_serv_opt_strs+983)
 /** Compiled in flag settings for the sni-hostname option */
 #define SNI_HOSTNAME_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -239,11 +239,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  sni-hostname-fatal option description:
  */
 /** Descriptive text for the sni-hostname-fatal option */
-#define SNI_HOSTNAME_FATAL_DESC      (gnutls_serv_opt_strs+1002)
+#define SNI_HOSTNAME_FATAL_DESC      (gnutls_serv_opt_strs+996)
 /** Upper-cased name for the sni-hostname-fatal option */
-#define SNI_HOSTNAME_FATAL_NAME      (gnutls_serv_opt_strs+1044)
+#define SNI_HOSTNAME_FATAL_NAME      (gnutls_serv_opt_strs+1038)
 /** Name string for the sni-hostname-fatal option */
-#define SNI_HOSTNAME_FATAL_name      (gnutls_serv_opt_strs+1063)
+#define SNI_HOSTNAME_FATAL_name      (gnutls_serv_opt_strs+1057)
 /** Compiled in flag settings for the sni-hostname-fatal option */
 #define SNI_HOSTNAME_FATAL_FLAGS     (OPTST_DISABLED)
 
@@ -251,11 +251,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  alpn option description:
  */
 /** Descriptive text for the alpn option */
-#define ALPN_DESC      (gnutls_serv_opt_strs+1082)
+#define ALPN_DESC      (gnutls_serv_opt_strs+1076)
 /** Upper-cased name for the alpn option */
-#define ALPN_NAME      (gnutls_serv_opt_strs+1132)
+#define ALPN_NAME      (gnutls_serv_opt_strs+1126)
 /** Name string for the alpn option */
-#define ALPN_name      (gnutls_serv_opt_strs+1137)
+#define ALPN_name      (gnutls_serv_opt_strs+1131)
 /** Compiled in flag settings for the alpn option */
 #define ALPN_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -264,11 +264,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  alpn-fatal option description:
  */
 /** Descriptive text for the alpn-fatal option */
-#define ALPN_FATAL_DESC      (gnutls_serv_opt_strs+1142)
+#define ALPN_FATAL_DESC      (gnutls_serv_opt_strs+1136)
 /** Upper-cased name for the alpn-fatal option */
-#define ALPN_FATAL_NAME      (gnutls_serv_opt_strs+1185)
+#define ALPN_FATAL_NAME      (gnutls_serv_opt_strs+1179)
 /** Name string for the alpn-fatal option */
-#define ALPN_FATAL_name      (gnutls_serv_opt_strs+1196)
+#define ALPN_FATAL_name      (gnutls_serv_opt_strs+1190)
 /** Compiled in flag settings for the alpn-fatal option */
 #define ALPN_FATAL_FLAGS     (OPTST_DISABLED)
 
@@ -276,11 +276,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  noticket option description:
  */
 /** Descriptive text for the noticket option */
-#define NOTICKET_DESC      (gnutls_serv_opt_strs+1207)
+#define NOTICKET_DESC      (gnutls_serv_opt_strs+1201)
 /** Upper-cased name for the noticket option */
-#define NOTICKET_NAME      (gnutls_serv_opt_strs+1236)
+#define NOTICKET_NAME      (gnutls_serv_opt_strs+1230)
 /** Name string for the noticket option */
-#define NOTICKET_name      (gnutls_serv_opt_strs+1245)
+#define NOTICKET_name      (gnutls_serv_opt_strs+1239)
 /** Compiled in flag settings for the noticket option */
 #define NOTICKET_FLAGS     (OPTST_DISABLED)
 
@@ -288,11 +288,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  nocookie option description:
  */
 /** Descriptive text for the nocookie option */
-#define NOCOOKIE_DESC      (gnutls_serv_opt_strs+1254)
+#define NOCOOKIE_DESC      (gnutls_serv_opt_strs+1248)
 /** Upper-cased name for the nocookie option */
-#define NOCOOKIE_NAME      (gnutls_serv_opt_strs+1292)
+#define NOCOOKIE_NAME      (gnutls_serv_opt_strs+1286)
 /** Name string for the nocookie option */
-#define NOCOOKIE_name      (gnutls_serv_opt_strs+1301)
+#define NOCOOKIE_name      (gnutls_serv_opt_strs+1295)
 /** Compiled in flag settings for the nocookie option */
 #define NOCOOKIE_FLAGS     (OPTST_DISABLED)
 
@@ -300,11 +300,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  generate option description:
  */
 /** Descriptive text for the generate option */
-#define GENERATE_DESC      (gnutls_serv_opt_strs+1310)
+#define GENERATE_DESC      (gnutls_serv_opt_strs+1304)
 /** Upper-cased name for the generate option */
-#define GENERATE_NAME      (gnutls_serv_opt_strs+1345)
+#define GENERATE_NAME      (gnutls_serv_opt_strs+1339)
 /** Name string for the generate option */
-#define GENERATE_name      (gnutls_serv_opt_strs+1354)
+#define GENERATE_name      (gnutls_serv_opt_strs+1348)
 /** Compiled in flag settings for the generate option */
 #define GENERATE_FLAGS     (OPTST_DISABLED)
 
@@ -312,11 +312,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  quiet option description:
  */
 /** Descriptive text for the quiet option */
-#define QUIET_DESC      (gnutls_serv_opt_strs+1363)
+#define QUIET_DESC      (gnutls_serv_opt_strs+1357)
 /** Upper-cased name for the quiet option */
-#define QUIET_NAME      (gnutls_serv_opt_strs+1386)
+#define QUIET_NAME      (gnutls_serv_opt_strs+1380)
 /** Name string for the quiet option */
-#define QUIET_name      (gnutls_serv_opt_strs+1392)
+#define QUIET_name      (gnutls_serv_opt_strs+1386)
 /** Compiled in flag settings for the quiet option */
 #define QUIET_FLAGS     (OPTST_DISABLED)
 
@@ -324,11 +324,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  nodb option description:
  */
 /** Descriptive text for the nodb option */
-#define NODB_DESC      (gnutls_serv_opt_strs+1398)
+#define NODB_DESC      (gnutls_serv_opt_strs+1392)
 /** Upper-cased name for the nodb option */
-#define NODB_NAME      (gnutls_serv_opt_strs+1431)
+#define NODB_NAME      (gnutls_serv_opt_strs+1425)
 /** Name string for the nodb option */
-#define NODB_name      (gnutls_serv_opt_strs+1436)
+#define NODB_name      (gnutls_serv_opt_strs+1430)
 /** Compiled in flag settings for the nodb option */
 #define NODB_FLAGS     (OPTST_DISABLED)
 
@@ -336,11 +336,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  http option description:
  */
 /** Descriptive text for the http option */
-#define HTTP_DESC      (gnutls_serv_opt_strs+1441)
+#define HTTP_DESC      (gnutls_serv_opt_strs+1435)
 /** Upper-cased name for the http option */
-#define HTTP_NAME      (gnutls_serv_opt_strs+1463)
+#define HTTP_NAME      (gnutls_serv_opt_strs+1457)
 /** Name string for the http option */
-#define HTTP_name      (gnutls_serv_opt_strs+1468)
+#define HTTP_name      (gnutls_serv_opt_strs+1462)
 /** Compiled in flag settings for the http option */
 #define HTTP_FLAGS     (OPTST_DISABLED)
 
@@ -348,11 +348,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  echo option description:
  */
 /** Descriptive text for the echo option */
-#define ECHO_DESC      (gnutls_serv_opt_strs+1473)
+#define ECHO_DESC      (gnutls_serv_opt_strs+1467)
 /** Upper-cased name for the echo option */
-#define ECHO_NAME      (gnutls_serv_opt_strs+1495)
+#define ECHO_NAME      (gnutls_serv_opt_strs+1489)
 /** Name string for the echo option */
-#define ECHO_name      (gnutls_serv_opt_strs+1500)
+#define ECHO_name      (gnutls_serv_opt_strs+1494)
 /** Compiled in flag settings for the echo option */
 #define ECHO_FLAGS     (OPTST_DISABLED)
 
@@ -360,11 +360,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  udp option description:
  */
 /** Descriptive text for the udp option */
-#define UDP_DESC      (gnutls_serv_opt_strs+1505)
+#define UDP_DESC      (gnutls_serv_opt_strs+1499)
 /** Upper-cased name for the udp option */
-#define UDP_NAME      (gnutls_serv_opt_strs+1538)
+#define UDP_NAME      (gnutls_serv_opt_strs+1532)
 /** Name string for the udp option */
-#define UDP_name      (gnutls_serv_opt_strs+1542)
+#define UDP_name      (gnutls_serv_opt_strs+1536)
 /** Compiled in flag settings for the udp option */
 #define UDP_FLAGS     (OPTST_DISABLED)
 
@@ -372,11 +372,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  mtu option description:
  */
 /** Descriptive text for the mtu option */
-#define MTU_DESC      (gnutls_serv_opt_strs+1546)
+#define MTU_DESC      (gnutls_serv_opt_strs+1540)
 /** Upper-cased name for the mtu option */
-#define MTU_NAME      (gnutls_serv_opt_strs+1571)
+#define MTU_NAME      (gnutls_serv_opt_strs+1565)
 /** Name string for the mtu option */
-#define MTU_name      (gnutls_serv_opt_strs+1575)
+#define MTU_name      (gnutls_serv_opt_strs+1569)
 /** Compiled in flag settings for the mtu option */
 #define MTU_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -385,11 +385,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  srtp_profiles option description:
  */
 /** Descriptive text for the srtp_profiles option */
-#define SRTP_PROFILES_DESC      (gnutls_serv_opt_strs+1579)
+#define SRTP_PROFILES_DESC      (gnutls_serv_opt_strs+1573)
 /** Upper-cased name for the srtp_profiles option */
-#define SRTP_PROFILES_NAME      (gnutls_serv_opt_strs+1599)
+#define SRTP_PROFILES_NAME      (gnutls_serv_opt_strs+1593)
 /** Name string for the srtp_profiles option */
-#define SRTP_PROFILES_name      (gnutls_serv_opt_strs+1613)
+#define SRTP_PROFILES_name      (gnutls_serv_opt_strs+1607)
 /** Compiled in flag settings for the srtp_profiles option */
 #define SRTP_PROFILES_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -399,11 +399,11 @@ static char const gnutls_serv_opt_strs[3442] =
  *  "Must also have options" and "Incompatible options":
  */
 /** Descriptive text for the disable-client-cert option */
-#define DISABLE_CLIENT_CERT_DESC      (gnutls_serv_opt_strs+1627)
+#define DISABLE_CLIENT_CERT_DESC      (gnutls_serv_opt_strs+1621)
 /** Upper-cased name for the disable-client-cert option */
-#define DISABLE_CLIENT_CERT_NAME      (gnutls_serv_opt_strs+1663)
+#define DISABLE_CLIENT_CERT_NAME      (gnutls_serv_opt_strs+1657)
 /** Name string for the disable-client-cert option */
-#define DISABLE_CLIENT_CERT_name      (gnutls_serv_opt_strs+1683)
+#define DISABLE_CLIENT_CERT_name      (gnutls_serv_opt_strs+1677)
 /** Other options that appear in conjunction with the disable-client-cert option */
 static int const aDisable_Client_CertCantList[] = {
     INDEX_OPT_REQUIRE_CLIENT_CERT, NO_EQUIVALENT };
@@ -414,11 +414,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  require-client-cert option description:
  */
 /** Descriptive text for the require-client-cert option */
-#define REQUIRE_CLIENT_CERT_DESC      (gnutls_serv_opt_strs+1703)
+#define REQUIRE_CLIENT_CERT_DESC      (gnutls_serv_opt_strs+1697)
 /** Upper-cased name for the require-client-cert option */
-#define REQUIRE_CLIENT_CERT_NAME      (gnutls_serv_opt_strs+1732)
+#define REQUIRE_CLIENT_CERT_NAME      (gnutls_serv_opt_strs+1726)
 /** Name string for the require-client-cert option */
-#define REQUIRE_CLIENT_CERT_name      (gnutls_serv_opt_strs+1752)
+#define REQUIRE_CLIENT_CERT_name      (gnutls_serv_opt_strs+1746)
 /** Compiled in flag settings for the require-client-cert option */
 #define REQUIRE_CLIENT_CERT_FLAGS     (OPTST_DISABLED)
 
@@ -426,11 +426,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  verify-client-cert option description:
  */
 /** Descriptive text for the verify-client-cert option */
-#define VERIFY_CLIENT_CERT_DESC      (gnutls_serv_opt_strs+1772)
+#define VERIFY_CLIENT_CERT_DESC      (gnutls_serv_opt_strs+1766)
 /** Upper-cased name for the verify-client-cert option */
-#define VERIFY_CLIENT_CERT_NAME      (gnutls_serv_opt_strs+1820)
+#define VERIFY_CLIENT_CERT_NAME      (gnutls_serv_opt_strs+1814)
 /** Name string for the verify-client-cert option */
-#define VERIFY_CLIENT_CERT_name      (gnutls_serv_opt_strs+1839)
+#define VERIFY_CLIENT_CERT_name      (gnutls_serv_opt_strs+1833)
 /** Compiled in flag settings for the verify-client-cert option */
 #define VERIFY_CLIENT_CERT_FLAGS     (OPTST_DISABLED)
 
@@ -438,11 +438,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  heartbeat option description:
  */
 /** Descriptive text for the heartbeat option */
-#define HEARTBEAT_DESC      (gnutls_serv_opt_strs+1858)
+#define HEARTBEAT_DESC      (gnutls_serv_opt_strs+1852)
 /** Upper-cased name for the heartbeat option */
-#define HEARTBEAT_NAME      (gnutls_serv_opt_strs+1885)
+#define HEARTBEAT_NAME      (gnutls_serv_opt_strs+1879)
 /** Name string for the heartbeat option */
-#define HEARTBEAT_name      (gnutls_serv_opt_strs+1895)
+#define HEARTBEAT_name      (gnutls_serv_opt_strs+1889)
 /** Compiled in flag settings for the heartbeat option */
 #define HEARTBEAT_FLAGS     (OPTST_DISABLED)
 
@@ -450,11 +450,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509fmtder option description:
  */
 /** Descriptive text for the x509fmtder option */
-#define X509FMTDER_DESC      (gnutls_serv_opt_strs+1905)
+#define X509FMTDER_DESC      (gnutls_serv_opt_strs+1899)
 /** Upper-cased name for the x509fmtder option */
-#define X509FMTDER_NAME      (gnutls_serv_opt_strs+1950)
+#define X509FMTDER_NAME      (gnutls_serv_opt_strs+1944)
 /** Name string for the x509fmtder option */
-#define X509FMTDER_name      (gnutls_serv_opt_strs+1961)
+#define X509FMTDER_name      (gnutls_serv_opt_strs+1955)
 /** Compiled in flag settings for the x509fmtder option */
 #define X509FMTDER_FLAGS     (OPTST_DISABLED)
 
@@ -462,11 +462,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  priority option description:
  */
 /** Descriptive text for the priority option */
-#define PRIORITY_DESC      (gnutls_serv_opt_strs+1972)
+#define PRIORITY_DESC      (gnutls_serv_opt_strs+1966)
 /** Upper-cased name for the priority option */
-#define PRIORITY_NAME      (gnutls_serv_opt_strs+1990)
+#define PRIORITY_NAME      (gnutls_serv_opt_strs+1984)
 /** Name string for the priority option */
-#define PRIORITY_name      (gnutls_serv_opt_strs+1999)
+#define PRIORITY_name      (gnutls_serv_opt_strs+1993)
 /** Compiled in flag settings for the priority option */
 #define PRIORITY_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -475,11 +475,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  dhparams option description:
  */
 /** Descriptive text for the dhparams option */
-#define DHPARAMS_DESC      (gnutls_serv_opt_strs+2008)
+#define DHPARAMS_DESC      (gnutls_serv_opt_strs+2002)
 /** Upper-cased name for the dhparams option */
-#define DHPARAMS_NAME      (gnutls_serv_opt_strs+2030)
+#define DHPARAMS_NAME      (gnutls_serv_opt_strs+2024)
 /** Name string for the dhparams option */
-#define DHPARAMS_name      (gnutls_serv_opt_strs+2039)
+#define DHPARAMS_name      (gnutls_serv_opt_strs+2033)
 /** Compiled in flag settings for the dhparams option */
 #define DHPARAMS_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -488,11 +488,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509cafile option description:
  */
 /** Descriptive text for the x509cafile option */
-#define X509CAFILE_DESC      (gnutls_serv_opt_strs+2048)
+#define X509CAFILE_DESC      (gnutls_serv_opt_strs+2042)
 /** Upper-cased name for the x509cafile option */
-#define X509CAFILE_NAME      (gnutls_serv_opt_strs+2088)
+#define X509CAFILE_NAME      (gnutls_serv_opt_strs+2082)
 /** Name string for the x509cafile option */
-#define X509CAFILE_name      (gnutls_serv_opt_strs+2099)
+#define X509CAFILE_name      (gnutls_serv_opt_strs+2093)
 /** Compiled in flag settings for the x509cafile option */
 #define X509CAFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -501,11 +501,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509crlfile option description:
  */
 /** Descriptive text for the x509crlfile option */
-#define X509CRLFILE_DESC      (gnutls_serv_opt_strs+2110)
+#define X509CRLFILE_DESC      (gnutls_serv_opt_strs+2104)
 /** Upper-cased name for the x509crlfile option */
-#define X509CRLFILE_NAME      (gnutls_serv_opt_strs+2126)
+#define X509CRLFILE_NAME      (gnutls_serv_opt_strs+2120)
 /** Name string for the x509crlfile option */
-#define X509CRLFILE_name      (gnutls_serv_opt_strs+2138)
+#define X509CRLFILE_name      (gnutls_serv_opt_strs+2132)
 /** Compiled in flag settings for the x509crlfile option */
 #define X509CRLFILE_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -514,11 +514,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  pgpkeyfile option description:
  */
 /** Descriptive text for the pgpkeyfile option */
-#define PGPKEYFILE_DESC      (gnutls_serv_opt_strs+2150)
+#define PGPKEYFILE_DESC      (gnutls_serv_opt_strs+2144)
 /** Upper-cased name for the pgpkeyfile option */
-#define PGPKEYFILE_NAME      (gnutls_serv_opt_strs+2183)
+#define PGPKEYFILE_NAME      (gnutls_serv_opt_strs+2177)
 /** Name string for the pgpkeyfile option */
-#define PGPKEYFILE_name      (gnutls_serv_opt_strs+2194)
+#define PGPKEYFILE_name      (gnutls_serv_opt_strs+2188)
 /** Compiled in flag settings for the pgpkeyfile option */
 #define PGPKEYFILE_FLAGS     (OPTST_DISABLED | OPTST_DEPRECATED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -527,11 +527,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509keyfile option description:
  */
 /** Descriptive text for the x509keyfile option */
-#define X509KEYFILE_DESC      (gnutls_serv_opt_strs+2205)
+#define X509KEYFILE_DESC      (gnutls_serv_opt_strs+2199)
 /** Upper-cased name for the x509keyfile option */
-#define X509KEYFILE_NAME      (gnutls_serv_opt_strs+2243)
+#define X509KEYFILE_NAME      (gnutls_serv_opt_strs+2237)
 /** Name string for the x509keyfile option */
-#define X509KEYFILE_name      (gnutls_serv_opt_strs+2255)
+#define X509KEYFILE_name      (gnutls_serv_opt_strs+2249)
 /** Compiled in flag settings for the x509keyfile option */
 #define X509KEYFILE_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -540,11 +540,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509certfile option description:
  */
 /** Descriptive text for the x509certfile option */
-#define X509CERTFILE_DESC      (gnutls_serv_opt_strs+2267)
+#define X509CERTFILE_DESC      (gnutls_serv_opt_strs+2261)
 /** Upper-cased name for the x509certfile option */
-#define X509CERTFILE_NAME      (gnutls_serv_opt_strs+2313)
+#define X509CERTFILE_NAME      (gnutls_serv_opt_strs+2307)
 /** Name string for the x509certfile option */
-#define X509CERTFILE_name      (gnutls_serv_opt_strs+2326)
+#define X509CERTFILE_name      (gnutls_serv_opt_strs+2320)
 /** Compiled in flag settings for the x509certfile option */
 #define X509CERTFILE_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -553,10 +553,10 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509dsakeyfile option description:
  */
 /** Descriptive text for the x509dsakeyfile option */
-#define X509DSAKEYFILE_DESC    (gnutls_serv_opt_strs+2339)
+#define X509DSAKEYFILE_DESC    (gnutls_serv_opt_strs+2333)
 #define X509DSAKEYFILE_NAME    NULL
 /** Unmodified name string for the x509dsakeyfile option */
-#define X509DSAKEYFILE_name    (gnutls_serv_opt_strs+2390)
+#define X509DSAKEYFILE_name    (gnutls_serv_opt_strs+2384)
 /** Compiled in flag settings for the x509dsakeyfile option */
 #define X509DSAKEYFILE_FLAGS     (X509KEYFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
@@ -564,10 +564,10 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509dsacertfile option description:
  */
 /** Descriptive text for the x509dsacertfile option */
-#define X509DSACERTFILE_DESC    (gnutls_serv_opt_strs+2405)
+#define X509DSACERTFILE_DESC    (gnutls_serv_opt_strs+2399)
 #define X509DSACERTFILE_NAME    NULL
 /** Unmodified name string for the x509dsacertfile option */
-#define X509DSACERTFILE_name    (gnutls_serv_opt_strs+2457)
+#define X509DSACERTFILE_name    (gnutls_serv_opt_strs+2451)
 /** Compiled in flag settings for the x509dsacertfile option */
 #define X509DSACERTFILE_FLAGS     (X509CERTFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
@@ -575,10 +575,10 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509ecckeyfile option description:
  */
 /** Descriptive text for the x509ecckeyfile option */
-#define X509ECCKEYFILE_DESC    (gnutls_serv_opt_strs+2339)
+#define X509ECCKEYFILE_DESC    (gnutls_serv_opt_strs+2333)
 #define X509ECCKEYFILE_NAME    NULL
 /** Unmodified name string for the x509ecckeyfile option */
-#define X509ECCKEYFILE_name    (gnutls_serv_opt_strs+2473)
+#define X509ECCKEYFILE_name    (gnutls_serv_opt_strs+2467)
 /** Compiled in flag settings for the x509ecckeyfile option */
 #define X509ECCKEYFILE_FLAGS     (X509KEYFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
@@ -586,10 +586,10 @@ static int const aDisable_Client_CertCantList[] = {
  *  x509ecccertfile option description:
  */
 /** Descriptive text for the x509ecccertfile option */
-#define X509ECCCERTFILE_DESC    (gnutls_serv_opt_strs+2405)
+#define X509ECCCERTFILE_DESC    (gnutls_serv_opt_strs+2399)
 #define X509ECCCERTFILE_NAME    NULL
 /** Unmodified name string for the x509ecccertfile option */
-#define X509ECCCERTFILE_name    (gnutls_serv_opt_strs+2488)
+#define X509ECCCERTFILE_name    (gnutls_serv_opt_strs+2482)
 /** Compiled in flag settings for the x509ecccertfile option */
 #define X509ECCCERTFILE_FLAGS     (X509CERTFILE_FLAGS | OPTST_ALIAS | OPTST_DEPRECATED)
 
@@ -597,11 +597,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  srppasswd option description:
  */
 /** Descriptive text for the srppasswd option */
-#define SRPPASSWD_DESC      (gnutls_serv_opt_strs+2504)
+#define SRPPASSWD_DESC      (gnutls_serv_opt_strs+2498)
 /** Upper-cased name for the srppasswd option */
-#define SRPPASSWD_NAME      (gnutls_serv_opt_strs+2529)
+#define SRPPASSWD_NAME      (gnutls_serv_opt_strs+2523)
 /** Name string for the srppasswd option */
-#define SRPPASSWD_name      (gnutls_serv_opt_strs+2539)
+#define SRPPASSWD_name      (gnutls_serv_opt_strs+2533)
 /** Compiled in flag settings for the srppasswd option */
 #define SRPPASSWD_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -610,11 +610,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  srppasswdconf option description:
  */
 /** Descriptive text for the srppasswdconf option */
-#define SRPPASSWDCONF_DESC      (gnutls_serv_opt_strs+2549)
+#define SRPPASSWDCONF_DESC      (gnutls_serv_opt_strs+2543)
 /** Upper-cased name for the srppasswdconf option */
-#define SRPPASSWDCONF_NAME      (gnutls_serv_opt_strs+2588)
+#define SRPPASSWDCONF_NAME      (gnutls_serv_opt_strs+2582)
 /** Name string for the srppasswdconf option */
-#define SRPPASSWDCONF_name      (gnutls_serv_opt_strs+2602)
+#define SRPPASSWDCONF_name      (gnutls_serv_opt_strs+2596)
 /** Compiled in flag settings for the srppasswdconf option */
 #define SRPPASSWDCONF_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -623,11 +623,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  pskpasswd option description:
  */
 /** Descriptive text for the pskpasswd option */
-#define PSKPASSWD_DESC      (gnutls_serv_opt_strs+2616)
+#define PSKPASSWD_DESC      (gnutls_serv_opt_strs+2610)
 /** Upper-cased name for the pskpasswd option */
-#define PSKPASSWD_NAME      (gnutls_serv_opt_strs+2641)
+#define PSKPASSWD_NAME      (gnutls_serv_opt_strs+2635)
 /** Name string for the pskpasswd option */
-#define PSKPASSWD_name      (gnutls_serv_opt_strs+2651)
+#define PSKPASSWD_name      (gnutls_serv_opt_strs+2645)
 /** Compiled in flag settings for the pskpasswd option */
 #define PSKPASSWD_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -636,11 +636,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  pskhint option description:
  */
 /** Descriptive text for the pskhint option */
-#define PSKHINT_DESC      (gnutls_serv_opt_strs+2661)
+#define PSKHINT_DESC      (gnutls_serv_opt_strs+2655)
 /** Upper-cased name for the pskhint option */
-#define PSKHINT_NAME      (gnutls_serv_opt_strs+2686)
+#define PSKHINT_NAME      (gnutls_serv_opt_strs+2680)
 /** Name string for the pskhint option */
-#define PSKHINT_name      (gnutls_serv_opt_strs+2694)
+#define PSKHINT_name      (gnutls_serv_opt_strs+2688)
 /** Compiled in flag settings for the pskhint option */
 #define PSKHINT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -649,11 +649,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  ocsp-response option description:
  */
 /** Descriptive text for the ocsp-response option */
-#define OCSP_RESPONSE_DESC      (gnutls_serv_opt_strs+2702)
+#define OCSP_RESPONSE_DESC      (gnutls_serv_opt_strs+2696)
 /** Upper-cased name for the ocsp-response option */
-#define OCSP_RESPONSE_NAME      (gnutls_serv_opt_strs+2738)
+#define OCSP_RESPONSE_NAME      (gnutls_serv_opt_strs+2732)
 /** Name string for the ocsp-response option */
-#define OCSP_RESPONSE_name      (gnutls_serv_opt_strs+2752)
+#define OCSP_RESPONSE_name      (gnutls_serv_opt_strs+2746)
 /** Compiled in flag settings for the ocsp-response option */
 #define OCSP_RESPONSE_FLAGS     (OPTST_DISABLED | OPTST_STACKED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_STRING))
@@ -662,11 +662,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  ignore-ocsp-response-errors option description:
  */
 /** Descriptive text for the ignore-ocsp-response-errors option */
-#define IGNORE_OCSP_RESPONSE_ERRORS_DESC      (gnutls_serv_opt_strs+2766)
+#define IGNORE_OCSP_RESPONSE_ERRORS_DESC      (gnutls_serv_opt_strs+2760)
 /** Upper-cased name for the ignore-ocsp-response-errors option */
-#define IGNORE_OCSP_RESPONSE_ERRORS_NAME      (gnutls_serv_opt_strs+2815)
+#define IGNORE_OCSP_RESPONSE_ERRORS_NAME      (gnutls_serv_opt_strs+2809)
 /** Name string for the ignore-ocsp-response-errors option */
-#define IGNORE_OCSP_RESPONSE_ERRORS_name      (gnutls_serv_opt_strs+2843)
+#define IGNORE_OCSP_RESPONSE_ERRORS_name      (gnutls_serv_opt_strs+2837)
 /** Compiled in flag settings for the ignore-ocsp-response-errors option */
 #define IGNORE_OCSP_RESPONSE_ERRORS_FLAGS     (OPTST_DISABLED)
 
@@ -674,11 +674,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  port option description:
  */
 /** Descriptive text for the port option */
-#define PORT_DESC      (gnutls_serv_opt_strs+2871)
+#define PORT_DESC      (gnutls_serv_opt_strs+2865)
 /** Upper-cased name for the port option */
-#define PORT_NAME      (gnutls_serv_opt_strs+2894)
+#define PORT_NAME      (gnutls_serv_opt_strs+2888)
 /** Name string for the port option */
-#define PORT_name      (gnutls_serv_opt_strs+2899)
+#define PORT_name      (gnutls_serv_opt_strs+2893)
 /** Compiled in flag settings for the port option */
 #define PORT_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC))
@@ -687,11 +687,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  list option description:
  */
 /** Descriptive text for the list option */
-#define LIST_DESC      (gnutls_serv_opt_strs+2904)
+#define LIST_DESC      (gnutls_serv_opt_strs+2898)
 /** Upper-cased name for the list option */
-#define LIST_NAME      (gnutls_serv_opt_strs+2955)
+#define LIST_NAME      (gnutls_serv_opt_strs+2949)
 /** Name string for the list option */
-#define LIST_name      (gnutls_serv_opt_strs+2960)
+#define LIST_name      (gnutls_serv_opt_strs+2954)
 /** Compiled in flag settings for the list option */
 #define LIST_FLAGS     (OPTST_DISABLED)
 
@@ -699,11 +699,11 @@ static int const aDisable_Client_CertCantList[] = {
  *  provider option description:
  */
 /** Descriptive text for the provider option */
-#define PROVIDER_DESC      (gnutls_serv_opt_strs+2965)
+#define PROVIDER_DESC      (gnutls_serv_opt_strs+2959)
 /** Upper-cased name for the provider option */
-#define PROVIDER_NAME      (gnutls_serv_opt_strs+3003)
+#define PROVIDER_NAME      (gnutls_serv_opt_strs+2997)
 /** Name string for the provider option */
-#define PROVIDER_name      (gnutls_serv_opt_strs+3012)
+#define PROVIDER_name      (gnutls_serv_opt_strs+3006)
 /** Compiled in flag settings for the provider option */
 #define PROVIDER_FLAGS     (OPTST_DISABLED \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_FILE))
@@ -711,11 +711,11 @@ static int const aDisable_Client_CertCantList[] = {
 /*
  *  Help/More_Help/Version option descriptions:
  */
-#define HELP_DESC       (gnutls_serv_opt_strs+3021)
-#define HELP_name       (gnutls_serv_opt_strs+3065)
+#define HELP_DESC       (gnutls_serv_opt_strs+3015)
+#define HELP_name       (gnutls_serv_opt_strs+3059)
 #ifdef HAVE_WORKING_FORK
-#define MORE_HELP_DESC  (gnutls_serv_opt_strs+3070)
-#define MORE_HELP_name  (gnutls_serv_opt_strs+3115)
+#define MORE_HELP_DESC  (gnutls_serv_opt_strs+3064)
+#define MORE_HELP_name  (gnutls_serv_opt_strs+3109)
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
 #define MORE_HELP_DESC  HELP_DESC
@@ -728,8 +728,8 @@ static int const aDisable_Client_CertCantList[] = {
 #  define VER_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
-#define VER_DESC        (gnutls_serv_opt_strs+3125)
-#define VER_name        (gnutls_serv_opt_strs+3161)
+#define VER_DESC        (gnutls_serv_opt_strs+3119)
+#define VER_name        (gnutls_serv_opt_strs+3155)
 /**
  *  Declare option callback procedures
  */
@@ -1275,21 +1275,21 @@ static tOptDesc optDesc[OPTION_CT] = {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /** Reference to the upper cased version of gnutls-serv. */
-#define zPROGNAME       (gnutls_serv_opt_strs+3169)
+#define zPROGNAME       (gnutls_serv_opt_strs+3163)
 /** Reference to the title line for gnutls-serv usage. */
-#define zUsageTitle     (gnutls_serv_opt_strs+3181)
+#define zUsageTitle     (gnutls_serv_opt_strs+3175)
 /** There is no gnutls-serv configuration file. */
 #define zRcName         NULL
 /** There are no directories to search for gnutls-serv config files. */
 #define apzHomeList     NULL
 /** The gnutls-serv program bug email address. */
-#define zBugsAddr       (gnutls_serv_opt_strs+3267)
+#define zBugsAddr       (gnutls_serv_opt_strs+3261)
 /** Clarification/explanation of what gnutls-serv does. */
-#define zExplain        (gnutls_serv_opt_strs+3287)
+#define zExplain        (gnutls_serv_opt_strs+3277)
 /** Extra detail explaining what gnutls-serv does. */
-#define zDetail         (gnutls_serv_opt_strs+3289)
+#define zDetail         (gnutls_serv_opt_strs+3279)
 /** The full version string for gnutls-serv. */
-#define zFullVersion    (gnutls_serv_opt_strs+3347)
+#define zFullVersion    (gnutls_serv_opt_strs+3337)
 /* extracted from optcode.tlib near line 364 */
 
 #if defined(ENABLE_NLS)
@@ -1301,7 +1301,7 @@ static tOptDesc optDesc[OPTION_CT] = {
 #endif /* ENABLE_NLS */
 
 #define gnutls_serv_full_usage (NULL)
-#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3369)
+#define gnutls_serv_short_usage (gnutls_serv_opt_strs+3355)
 
 #endif /* not defined __doxygen__ */
 
@@ -1827,8 +1827,8 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via gnutls_servOptions.pzCopyright */
-  puts(_("gnutls-serv @VERSION@\n\
-Copyright (C) 2000-@YEAR@ Free Software Foundation, and others, all rights reserved.\n\
+  puts(_("gnutls-serv 3.6.4\n\
+Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
 version 3 or later <http://gnu.org/licenses/gpl.html>\n"));
@@ -1985,7 +1985,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
   puts(_("Server program that listens to incoming TLS connections.\n"));
 
   /* referenced via gnutls_servOptions.pzFullVersion */
-  puts(_("gnutls-serv @VERSION@"));
+  puts(_("gnutls-serv 3.6.4"));
 
   /* referenced via gnutls_servOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));
