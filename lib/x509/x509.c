@@ -3480,12 +3480,15 @@ gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt_t crt,
  * gnutls_x509_crt_get_pk_ecc_raw:
  * @crt: Holds the certificate
  * @curve: will hold the curve
- * @x: will hold x
- * @y: will hold y
+ * @x: will hold the x-coordinate
+ * @y: will hold the y-coordinate
  *
  * This function will export the ECC public key's parameters found in
  * the given certificate.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * In EdDSA curves the @y parameter will be %NULL and the other parameters
+ * will be in the native format for the curve.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -3493,8 +3496,8 @@ gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
-			       gnutls_ecc_curve_t * curve,
-			       gnutls_datum_t * x, gnutls_datum_t * y)
+			       gnutls_ecc_curve_t *curve,
+			       gnutls_datum_t *x, gnutls_datum_t *y)
 {
 	int ret;
 	gnutls_pubkey_t pubkey;
@@ -3531,8 +3534,8 @@ gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
  * @curve: will hold the curve
  * @digest: will hold the digest
  * @paramset: will hold the GOST parameter set ID
- * @x: will hold x
- * @y: will hold y
+ * @x: will hold the x-coordinate
+ * @y: will hold the y-coordinate
  *
  * This function will export the GOST public key's parameters found in
  * the given certificate.  The new parameters will be allocated using
@@ -3544,10 +3547,10 @@ gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_get_pk_gost_raw(gnutls_x509_crt_t crt,
-				gnutls_ecc_curve_t * curve,
-				gnutls_digest_algorithm_t * digest,
+				gnutls_ecc_curve_t *curve,
+				gnutls_digest_algorithm_t *digest,
 				gnutls_gost_paramset_t *paramset,
-				gnutls_datum_t * x, gnutls_datum_t * y)
+				gnutls_datum_t *x, gnutls_datum_t *y)
 {
 	int ret;
 	gnutls_pubkey_t pubkey;
