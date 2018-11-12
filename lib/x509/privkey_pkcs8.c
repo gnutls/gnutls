@@ -1136,10 +1136,29 @@ _privkey_decode_gost_key(const gnutls_datum_t * raw_key,
 			 gnutls_x509_privkey_t pkey)
 {
 	int ret;
+	int ecc_size = gnutls_ecc_curve_get_size(pkey->params.curve);
 
-	if (raw_key->data[0] == ASN1_TAG_INTEGER) {
+	/* Just to be sure here */
+	if (ecc_size <= 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+		goto error;
+	}
+
+	/* Private key form described in R 50.1.112-2016.
+	 * Private key can come up as masked value concatenated with several masks.
+	 * each part is of ecc_size bytes. Key will be unmasked in pk_fixup */
+	if (raw_key->size % ecc_size == 0) {
+		ret = _gnutls_mpi_init_scan_le(&pkey->params.params[GOST_K],
+				raw_key->data, raw_key->size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	} else if (raw_key->data[0] == ASN1_TAG_INTEGER) {
 		ASN1_TYPE pkey_asn;
 
+		/* Very old format: INTEGER packed in OCTET STRING */
 		if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
 					       "GNUTLS.GOSTPrivateKeyOld",
 					       &pkey_asn)) != ASN1_SUCCESS) {
@@ -1169,6 +1188,7 @@ _privkey_decode_gost_key(const gnutls_datum_t * raw_key,
 	} else if (raw_key->data[0] == ASN1_TAG_OCTET_STRING) {
 		ASN1_TYPE pkey_asn;
 
+		/* format: OCTET STRING packed in OCTET STRING */
 		if ((ret = asn1_create_element(_gnutls_get_gnutls_asn(),
 					       "GNUTLS.GOSTPrivateKey",
 					       &pkey_asn)) != ASN1_SUCCESS) {
@@ -1195,7 +1215,7 @@ _privkey_decode_gost_key(const gnutls_datum_t * raw_key,
 			goto error;
 		}
 		asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
-	} else { /* Custom but also used format, no encap */
+	} else {
 		gnutls_assert();
 		ret = GNUTLS_E_PARSING_ERROR;
 		goto error;
