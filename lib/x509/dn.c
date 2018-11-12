@@ -286,6 +286,8 @@ _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		goto cleanup;
 	}
 
+	assert(dn.data != NULL);
+
 	if (buf) {
 		memcpy(buf, dn.data, dn.size);
 		buf[dn.size] = 0;

@@ -40,6 +40,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <ctype.h>
+#include <assert.h>
 
 /* Get TCP_FASTOPEN */
 #ifdef HAVE_NETINET_TCP_H
@@ -913,6 +914,8 @@ bool parse_for_inline_commands_in_buffer(char *buffer, size_t bytes,
 		local_bytes = bytes;
 		inline_cmds->new_buffer_ptr = buffer + bytes;
 	}
+
+	assert(local_buffer_ptr != NULL);
 
 	inline_cmds->current_ptr = local_buffer_ptr;
 

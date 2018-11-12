@@ -55,9 +55,7 @@ check_for_datefudge
 
 PORT="${PORT:-${RPORT}}"
 
-export LD_LIBRARY_PATH=${abs_top_srcdir}/devel/openssl
-echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-SERV=../../devel/openssl/apps/openssl
+SERV=openssl
 OPENSSL_CLI="$SERV"
 
 if test -z "$OUTPUT";then
@@ -347,14 +345,14 @@ _EOF_
 	echo_cmd "${PREFIX}Checking TLS 1.3 with post handshake auth..."
 
 	eval "${GETPORT}"
-	launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" #>>${OUTPUT} 2>&1
+	launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" >>${OUTPUT} 2>&1
 	PID=$!
 	wait_server ${PID}
 
 	expect - >/dev/null <<_EOF_
 set timeout 10
 set os_error_flag 1
-spawn ${OPENSSL_CLI} s_client -force_pha -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}"
+spawn ${OPENSSL_CLI} s_client -enable_pha -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}"
 
 expect "SSL-Session" {send "**REAUTH**\n"} timeout {exit 1}
 expect {

@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver6"
+  key: "$CI_JOB_NAME-ver7"
   paths:
     - cache/
 
@@ -28,8 +28,9 @@ variables:
   BUILD_IMAGES_PROJECT: gnutls/build-images
   DEBIAN_BUILD: buildenv-debian
   DEBIAN_CROSS_BUILD: buildenv-debian-cross
-  FEDORA_BUILD: buildenv-f28
-  FEDORA_X86_BUILD: buildenv-f28-x86
+  DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
+  FEDORA28_BUILD: buildenv-f28
+  FEDORA_BUILD: buildenv-f29
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
@@ -63,8 +64,6 @@ abi/coverage.Debian:
   - make -j$(nproc)
   - make abi-check
   - make pic-check
-  - cd devel/openssl && ./config enable-tls1_3 && make -j$(nproc) && cd ../..
-  - make -C tests/suite TESTS=testcompat-tls13-openssl.sh check
   - make -j$(nproc) check
   - make local-code-coverage-output || true
   tags:
@@ -112,14 +111,15 @@ minimal.Fedora.x86_64:
   - tags
   retry: 1
 
-# This enables SSL3.0 and SHA-1 support
+# This enables SSL3.0 and SHA-1 support, and runs interop tests
+# with openssl 1.1.0, which include legacy algorithms like DSA.
 SSL-3.0.Fedora.x86_64:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA28_BUILD
   script:
   - ./bootstrap
   - mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile &&
+    dash ../configure --disable-tls13-interop --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
@@ -397,32 +397,6 @@ FreeBSD.x86_64:
       - tests/*/*.log
   retry: 1
 
-Fedora.x86:
-  stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_X86_BUILD
-  script:
-  - ./bootstrap
-  - mkdir -p build && cd build &&
-    CC="ccache gcc -m32" PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig/ TIME_T_32_BIT_OK=yes
-    ../configure --disable-gcc-warnings --host=i686-redhat-linux --target=i686-redhat-linux
-      --libdir=/usr/lib --disable-cxx --disable-non-suiteb-curves --enable-seccomp-tests
-      --disable-full-test-suite --disable-doc --disable-guile --cache-file ../cache/config.cache &&
-    make -j$(nproc) && make check -j$(nproc) SKIP_DATEFUDGE_CHECK=1 &&
-    make pic-check
-  tags:
-  - shared
-  except:
-  - tags
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - build/*.log
-      - build/tests/*.log
-      - build/tests/*/*.log
-      - build/tests/suite/*/*.log
-  retry: 1
-
 # Two runs, one with normal backend and another with pkcs11 trust store
 ubsan-Werror.Fedora.x86_64:
   stage: stage1-testing
@@ -469,6 +443,44 @@ Debian.x86_64:
   - cd ..
   tags:
   - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/guile/tests/*.log
+      - build/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+      - build/tests/suite/*/*.log
+  retry: 1
+
+Debian.cross.i686-linux-gnu:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_X86_CROSS_BUILD
+  script:
+  - build=$(dpkg-architecture -qDEB_HOST_GNU_TYPE)
+  - host=i686-linux-gnu
+  # not setting CC_FOR_BUILD paired with qemu-user/binfmt somehow causes
+  # config.guess to detect the target as the build platform and not activate
+  # cross-compile mode even though --build is given
+  - export CC_FOR_BUILD="ccache gcc"
+  - export CC="ccache $host-gcc"
+  - ./bootstrap
+  - mkdir -p build
+  - cd build
+  # Debian's softhsm package is not multiarch yet. Missing softhsm libraries
+  # for the target will cause the test suite to fail when p11-kit is enabled.
+  - dash ../configure --build=$build --host=$host --disable-gcc-warnings
+      --cache-file ../cache/config.cache --disable-doc --disable-guile
+      --without-p11-kit --disable-full-test-suite
+  - make -j$(nproc)
+  - make check -j$(nproc)
+  - cd ..
+  tags:
+  - shared
+  - docker
   except:
   - tags
   artifacts:

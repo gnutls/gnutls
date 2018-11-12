@@ -154,6 +154,9 @@ gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1,
 {
 	bool result;
 
+	if (cert1 == NULL || der == NULL)
+		return 0;
+
 	if (cert1->der.size == 0 || cert1->modified) {
 		gnutls_datum_t tmp1;
 		int ret;
@@ -4196,8 +4199,10 @@ void gnutls_x509_crt_set_pin_function(gnutls_x509_crt_t crt,
 				      gnutls_pin_callback_t fn,
 				      void *userdata)
 {
-	crt->pin.cb = fn;
-	crt->pin.data = userdata;
+	if (crt) {
+		crt->pin.cb = fn;
+		crt->pin.data = userdata;
+	}
 }
 
 /**

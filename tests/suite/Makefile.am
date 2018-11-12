@@ -111,6 +111,10 @@ scripts_to_test += tls-fuzzer/tls-fuzzer-nocert-ssl3.sh
 TESTS_ENVIRONMENT += ENABLE_SSL3=1
 endif
 
+if ENABLE_TLS13_INTEROP
+scripts_to_test += testcompat-tls13-openssl.sh
+endif
+
 if ENABLE_DANE
 scripts_to_test += testdane.sh
 endif
@@ -129,7 +133,7 @@ scripts_to_test += eagain.sh
 endif
 endif
 
-nodist_check_SCRIPTS = $(scripts_to_test) testcompat-tls13-openssl.sh
+nodist_check_SCRIPTS = $(scripts_to_test)
 
 TESTS = $(scripts_to_test) prime-check
 
