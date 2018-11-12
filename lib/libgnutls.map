@@ -1248,6 +1248,20 @@ GNUTLS_3_6_4
 	gnutls_priority_certificate_type_list2;
 } GNUTLS_3_6_3;
 
+GNUTLS_3_6_5
+{
+ global:
+	gnutls_record_get_max_early_data_size;
+	gnutls_record_send_early_data;
+	gnutls_record_recv_early_data;
+	gnutls_db_check_entry_expire_time;
+	gnutls_db_set_add_function;
+	gnutls_anti_replay_init;
+	gnutls_anti_replay_deinit;
+	gnutls_anti_replay_set_window;
+	gnutls_anti_replay_enable;
+} GNUTLS_3_6_4;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
@@ -1328,4 +1342,6 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_set_session_ticket_key_rotation_callback;
 	# Internal symbols needed by tests/virt-time.h
 	_gnutls_global_set_gettime_function;
+	# Internal symbols needed by tests/tls13/anti_replay.c
+	_gnutls_anti_replay_check;
 } GNUTLS_3_4;

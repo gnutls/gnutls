@@ -23,7 +23,9 @@
 
 #include "gnutls_int.h"
 #include "auth/psk.h"
+#include "handshake.h"
 #include "secrets.h"
+#include "tls13/anti_replay.h"
 #include "tls13/psk_ext_parser.h"
 #include "tls13/finished.h"
 #include "tls13/session_ticket.h"
@@ -36,7 +38,6 @@ static int
 compute_psk_from_ticket(const tls13_ticket_st *ticket, gnutls_datum_t *key)
 {
 	int ret;
-	char label[] = "resumption";
 
 	if (unlikely(ticket->prf == NULL || ticket->prf->output_size == 0))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -49,7 +50,7 @@ compute_psk_from_ticket(const tls13_ticket_st *ticket, gnutls_datum_t *key)
 	key->size = ticket->prf->output_size;
 
 	ret = _tls13_expand_secret2(ticket->prf,
-				    label, sizeof(label)-1,
+				    RESUMPTION_LABEL, sizeof(RESUMPTION_LABEL)-1,
 				    ticket->nonce, ticket->nonce_size,
 				    ticket->resumption_master_secret,
 				    key->size,
@@ -67,9 +68,9 @@ compute_binder_key(const mac_entry_st *prf,
 		   void *out)
 {
 	int ret;
-	const char ext_label[] = "ext binder";
+	const char ext_label[] = EXT_BINDER_LABEL;
 	const size_t ext_label_len = sizeof(ext_label) - 1;
-	const char res_label[] = "res binder";
+	const char res_label[] = RES_BINDER_LABEL;
 	const size_t res_label_len = sizeof(res_label) - 1;
 	const char *label = resuming ? res_label : ext_label;
 	size_t label_len = resuming ? res_label_len : ext_label_len;
@@ -482,7 +483,9 @@ static int server_recv_params(gnutls_session_t session,
 	struct psk_st psk;
 	psk_auth_info_t info;
 	tls13_ticket_st ticket_data;
-	uint32_t ticket_age;
+	/* These values should be set properly when session ticket is accepted. */
+	uint32_t ticket_age = UINT32_MAX;
+	struct timespec ticket_creation_time = { 0, 0 };
 	bool resuming;
 
 	ret = _gnutls13_psk_ext_parser_init(&psk_parser, data, len);
@@ -525,6 +528,10 @@ static int server_recv_params(gnutls_session_t session,
 				tls13_ticket_deinit(&ticket_data);
 				continue;
 			}
+
+			memcpy(&ticket_creation_time,
+			       &ticket_data.creation_time,
+			       sizeof(struct timespec));
 
 			tls13_ticket_deinit(&ticket_data);
 
@@ -612,6 +619,24 @@ static int server_recv_params(gnutls_session_t session,
 		info->username[psk.identity.size] = 0;
 		_gnutls_handshake_log("EXT[%p]: selected PSK identity: %s (%d)\n", session, info->username, psk_index);
 	} else {
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {
+			if (session->internals.anti_replay) {
+				ret = _gnutls_anti_replay_check(session,
+								ticket_age,
+								&ticket_creation_time,
+								&binder_recvd);
+				if (ret < 0) {
+					session->internals.hsk_flags &= ~HSK_EARLY_DATA_ACCEPTED;
+					_gnutls_handshake_log("EXT[%p]: replay detected; rejecting early data\n",
+						      session);
+				}
+			} else {
+				_gnutls_handshake_log("EXT[%p]: anti-replay is not enabled; rejecting early data\n",
+						      session);
+				session->internals.hsk_flags &= ~HSK_EARLY_DATA_ACCEPTED;
+			}
+		}
+
 		session->internals.resumed = RESUME_TRUE;
 		_gnutls_handshake_log("EXT[%p]: selected resumption PSK identity (%d)\n", session, psk_index);
 	}

@@ -485,6 +485,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	_mbuffer_head_init(&(*session)->internals.record_buffer);
 	_mbuffer_head_init(&(*session)->internals.record_send_buffer);
 	_mbuffer_head_init(&(*session)->internals.record_recv_buffer);
+	_mbuffer_head_init(&(*session)->internals.early_data_recv_buffer);
+	_gnutls_buffer_init(&(*session)->internals.early_data_presend_buffer);
 
 	_mbuffer_head_init(&(*session)->internals.handshake_send_buffer);
 	_gnutls_handshake_recv_buffer_init(*session);
@@ -619,6 +621,9 @@ void gnutls_deinit(gnutls_session_t session)
 	_mbuffer_head_clear(&session->internals.record_buffer);
 	_mbuffer_head_clear(&session->internals.record_recv_buffer);
 	_mbuffer_head_clear(&session->internals.record_send_buffer);
+
+	_mbuffer_head_clear(&session->internals.early_data_recv_buffer);
+	_gnutls_buffer_clear(&session->internals.early_data_presend_buffer);
 
 	_gnutls_free_datum(&session->internals.resumption_data);
 	_gnutls_free_datum(&session->internals.dtls.dcookie);
@@ -1542,6 +1547,8 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_SESSION_TICKET;
 	if (session->security_parameters.post_handshake_auth)
 		flags |= GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH;
+	if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED)
+		flags |= GNUTLS_SFLAGS_EARLY_DATA;
 
 	return flags;
 }

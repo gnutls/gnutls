@@ -169,7 +169,8 @@ typedef enum hs_stage_t {
 	STAGE_HS,
 	STAGE_APP,
 	STAGE_UPD_OURS,
-	STAGE_UPD_PEERS
+	STAGE_UPD_PEERS,
+	STAGE_EARLY
 } hs_stage_t;
 
 typedef enum record_send_state_t {
@@ -272,7 +273,7 @@ typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE90=90, STATE91, STATE92, STATE93, STATE94, STATE99=99,
 	STATE100=100, STATE101, STATE102, STATE103, STATE104,
 	STATE105, STATE106, STATE107, STATE108, STATE109, STATE110,
-	STATE111, STATE112, STATE113, STATE114,
+	STATE111, STATE112, STATE113, STATE114, STATE115,
 	STATE150 /* key update */
 } handshake_state_t;
 
@@ -538,6 +539,7 @@ struct gnutls_key_st {
 			 * early_secret, client_early_traffic_secret, ... */
 			uint8_t temp_secret[MAX_HASH_SIZE];
 			unsigned temp_secret_size; /* depends on negotiated PRF size */
+			uint8_t e_ckey[MAX_HASH_SIZE]; /* client_early_traffic_secret */
 			uint8_t hs_ckey[MAX_HASH_SIZE]; /* client_hs_traffic_secret */
 			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_hs_traffic_secret */
 			uint8_t ap_ckey[MAX_HASH_SIZE]; /* client_ap_traffic_secret */
@@ -1013,6 +1015,7 @@ typedef struct gnutls_dh_params_int {
  */
 typedef struct {
 	struct timespec arrival_time;
+	struct timespec creation_time;
 	uint32_t lifetime;
 	uint32_t age_add;
 	uint8_t nonce[255];
@@ -1072,6 +1075,7 @@ typedef struct {
 
 	int handshake_hash_buffer_prev_len;	/* keeps the length of handshake_hash_buffer, excluding
 						 * the last received message */
+	unsigned handshake_hash_buffer_client_hello_len; /* if non-zero it is the length of data until the client hello message */
 	unsigned handshake_hash_buffer_client_kx_len;/* if non-zero it is the length of data until the
 						 * the client key exchange message */
 	unsigned handshake_hash_buffer_server_finished_len;/* if non-zero it is the length of data until the
@@ -1159,6 +1163,9 @@ typedef struct {
 						 * send.
 						 */
 
+	mbuffer_head_st early_data_recv_buffer;
+	gnutls_buffer_st early_data_presend_buffer;
+
 	record_send_state_t rsend_state;
 	/* buffer used temporarily during key update */
 	gnutls_buffer_st record_key_update_buffer;
@@ -1209,6 +1216,7 @@ typedef struct {
 	gnutls_db_store_func db_store_func;
 	gnutls_db_retr_func db_retrieve_func;
 	gnutls_db_remove_func db_remove_func;
+	gnutls_db_add_func db_add_func;
 	void *db_ptr;
 
 	/* post client hello callback (server side only)
@@ -1341,8 +1349,13 @@ typedef struct {
 				       */
 #define HSK_TICKET_RECEIVED (1<<20) /* client: a session ticket was received */
 #define HSK_EARLY_START_USED (1<<21)
-#define HSK_EARLY_DATA_IN_FLIGHT (1<<22) /* server: early_data extension was seen in ClientHello */
-#define HSK_RECORD_SIZE_LIMIT_NEGOTIATED (1<<23)
+#define HSK_EARLY_DATA_IN_FLIGHT (1<<22) /* client: sent early_data extension in ClientHello
+					  * server: early_data extension was seen in ClientHello
+					  */
+#define HSK_EARLY_DATA_ACCEPTED (1<<23) /* client: early_data extension was seen in EncryptedExtensions
+					 * server: intend to process early data
+					 */
+#define HSK_RECORD_SIZE_LIMIT_NEGOTIATED (1<<24)
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
@@ -1446,6 +1459,9 @@ typedef struct {
 
 	/* the amount of early data received so far */
 	uint32_t early_data_received;
+
+	/* anti-replay measure for 0-RTT mode */
+	gnutls_anti_replay_t anti_replay;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

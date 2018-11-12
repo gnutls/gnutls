@@ -995,7 +995,7 @@ static void wrap_db_deinit(void)
 static int
 wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
-	time_t t, now = time(0);
+	time_t t, e, now = time(0);
 
 #ifdef DEBUG_CACHE
 	if (debug) {
@@ -1018,6 +1018,13 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 	t = gnutls_db_check_entry_time(&data);
 	if (t < now - 10 || t > now + 10) {
 		fail("Time returned by gnutls_db_check_entry_time is bogus\n");
+		exit(1);
+	}
+
+	/* check the correctness of gnutls_db_check_entry_expire_time() */
+	e = gnutls_db_check_entry_expire_time(&data);
+	if (e < t) {
+		fail("Time returned by gnutls_db_check_entry_expire_time is bogus\n");
 		exit(1);
 	}
 

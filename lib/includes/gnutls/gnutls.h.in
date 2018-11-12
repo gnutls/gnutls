@@ -399,6 +399,7 @@ typedef enum {
  *   finish; similarly to false start the handshake will be completed once data are received by the
  *   client, while the server is able to transmit sooner. This is not enabled by default as it could
  *   break certain existing server assumptions and use-cases. Since 3.6.4.
+ * @GNUTLS_ENABLE_EARLY_DATA: Under TLS1.3 allow the server to receive early data sent as part of the initial ClientHello (0-RTT). This is not enabled by default as early data has weaker security properties than other data. Since 3.6.5.
  * @GNUTLS_FORCE_CLIENT_CERT: When in client side and only a single cert is specified, send that certificate irrespective of the issuers expected by the server. Since 3.5.0.
  * @GNUTLS_NO_TICKETS: Flag to indicate that the session should not use resumption with session tickets.
  * @GNUTLS_KEY_SHARE_TOP3: Generate key shares for the top-3 different groups which are enabled.
@@ -456,7 +457,8 @@ typedef enum {
 	GNUTLS_SAFE_PADDING_CHECK = (1<<16),
 	GNUTLS_ENABLE_EARLY_START = (1<<17),
 	GNUTLS_ENABLE_CERT_TYPE_NEG = (1<<18),
-	GNUTLS_AUTO_REAUTH = (1<<19)
+	GNUTLS_AUTO_REAUTH = (1<<19),
+	GNUTLS_ENABLE_EARLY_DATA = (1<<20)
 } gnutls_init_flags_t;
 
 /* compatibility defines (previous versions of gnutls
@@ -1434,7 +1436,14 @@ ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size);
 size_t gnutls_record_check_pending(gnutls_session_t session);
 size_t gnutls_record_check_corked(gnutls_session_t session);
 
+size_t gnutls_record_get_max_early_data_size(gnutls_session_t session);
 int gnutls_record_set_max_early_data_size(gnutls_session_t session, size_t size);
+ssize_t gnutls_record_send_early_data(gnutls_session_t session,
+				      const void *data,
+				      size_t length);
+ssize_t gnutls_record_recv_early_data(gnutls_session_t session,
+				      void *data,
+				      size_t data_size);
 
 void gnutls_session_force_valid(gnutls_session_t session);
 
@@ -1502,6 +1511,7 @@ unsigned gnutls_session_etm_status(gnutls_session_t session);
  * @GNUTLS_SFLAGS_SESSION_TICKET: A session ticket has been received by the server.
  * @GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH: Indicates client capability for post-handshake auth; set only on server side.
  * @GNUTLS_SFLAGS_EARLY_START: The TLS1.3 server session returned early.
+ * @GNUTLS_SFLAGS_EARLY_DATA: The TLS1.3 early data has been received by the server.
  *
  * Enumeration of different session parameters.
  */
@@ -1515,7 +1525,8 @@ typedef enum {
 	GNUTLS_SFLAGS_RFC7919 = 1<<6,
 	GNUTLS_SFLAGS_SESSION_TICKET = 1<<7,
 	GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH = 1<<8,
-	GNUTLS_SFLAGS_EARLY_START = 1<<9
+	GNUTLS_SFLAGS_EARLY_START = 1<<9,
+	GNUTLS_SFLAGS_EARLY_DATA = 1<<10
 } gnutls_session_flags_t;
 
 unsigned gnutls_session_get_flags(gnutls_session_t session);
@@ -1772,6 +1783,8 @@ typedef int (*gnutls_db_store_func) (void *, gnutls_datum_t key,
 				     gnutls_datum_t data);
 typedef int (*gnutls_db_remove_func) (void *, gnutls_datum_t key);
 typedef gnutls_datum_t(*gnutls_db_retr_func) (void *, gnutls_datum_t key);
+typedef int (*gnutls_db_add_func) (void *, gnutls_datum_t key,
+				   gnutls_datum_t data);
 
 void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds);
 unsigned gnutls_db_get_default_cache_expiration(void);
@@ -1783,11 +1796,14 @@ void gnutls_db_set_remove_function(gnutls_session_t session,
 				   gnutls_db_remove_func rem_func);
 void gnutls_db_set_store_function(gnutls_session_t session,
 				  gnutls_db_store_func store_func);
+void gnutls_db_set_add_function(gnutls_session_t session,
+				gnutls_db_add_func add_func);
 void gnutls_db_set_ptr(gnutls_session_t session, void *ptr);
 void *gnutls_db_get_ptr(gnutls_session_t session);
 int gnutls_db_check_entry(gnutls_session_t session,
 			  gnutls_datum_t session_entry);
 time_t gnutls_db_check_entry_time(gnutls_datum_t * entry);
+time_t gnutls_db_check_entry_expire_time(gnutls_datum_t * entry);
 
   /**
    * gnutls_handshake_hook_func:
@@ -2975,6 +2991,17 @@ void gnutls_supplemental_recv(gnutls_session_t session, unsigned do_recv_supplem
 
 void gnutls_supplemental_send(gnutls_session_t session, unsigned do_send_supplemental);
 
+/* Anti-replay related functions */
+
+typedef struct gnutls_anti_replay_st *gnutls_anti_replay_t;
+
+int gnutls_anti_replay_init(gnutls_anti_replay_t *anti_replay);
+void gnutls_anti_replay_deinit(gnutls_anti_replay_t anti_replay);
+void gnutls_anti_replay_set_window(gnutls_anti_replay_t anti_replay,
+				   unsigned int window);
+void gnutls_anti_replay_enable(gnutls_session_t session,
+			       gnutls_anti_replay_t anti_replay);
+
 /* FIPS140-2 related functions */
 unsigned gnutls_fips140_mode_enabled(void);
 
@@ -3253,6 +3280,8 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_TOO_MANY_MATCHES -425
 #define GNUTLS_E_CRL_VERIFICATION_ERROR -426
 #define GNUTLS_E_MISSING_EXTENSION -427
+#define GNUTLS_E_DB_ENTRY_EXISTS -428
+#define GNUTLS_E_EARLY_DATA_REJECTED -429
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

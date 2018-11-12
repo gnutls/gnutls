@@ -839,6 +839,7 @@ static int try_resume(socket_st * hd)
 {
 	int ret, socket_flags = SOCKET_FLAG_DONT_PRINT_ERRORS;
 	gnutls_datum_t rdata = {NULL, 0};
+	gnutls_datum_t edata = {NULL, 0};
 
 	if (gnutls_session_is_resumed(hd->session) == 0) {
 		/* not resumed - obtain the session data */
@@ -868,8 +869,22 @@ static int try_resume(socket_st * hd)
 	if (udp)
 		socket_flags |= SOCKET_FLAG_UDP;
 
-	socket_open(hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
-		     socket_flags, CONNECT_MSG, &rdata);
+	if (HAVE_OPT(EARLYDATA)) {
+		FILE *fp;
+		size_t size;
+
+		fp = fopen(OPT_ARG(EARLYDATA), "r");
+		if (fp == NULL) {
+			fprintf(stderr, "could not open %s\n", OPT_ARG(EARLYDATA));
+			exit(1);
+		}
+		edata.data = (void *) fread_file(fp, &size);
+		edata.size = size;
+		fclose(fp);
+	}
+
+	socket_open3(hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
+		     socket_flags, CONNECT_MSG, &rdata, &edata);
 
 	printf("- Resume Handshake was completed\n");
 	if (gnutls_session_is_resumed(hd->session) != 0)
@@ -1157,7 +1172,7 @@ int main(int argc, char **argv)
 	}
 
 	socket_open2(&hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
-		     socket_flags, CONNECT_MSG, NULL,
+		     socket_flags, CONNECT_MSG, NULL, NULL,
 		     server_fp, client_fp);
 
 	hd.verbose = verbose;

@@ -43,6 +43,12 @@ flag = {
 };
 
 flag = {
+    name      = earlydata;
+    descrip   = "Accept early data";
+    doc      = "";
+};
+
+flag = {
     name      = nocookie;
     descrip   = "Don't require cookie on DTLS sessions";
     doc      = "";

@@ -40,7 +40,7 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 		return gnutls_assert_val(ret);
 
 	_gnutls_epoch_bump(session);
-	ret = _gnutls_epoch_dup(session);
+	ret = _gnutls_epoch_dup(session, EPOCH_READ_CURRENT);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

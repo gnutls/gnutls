@@ -814,6 +814,8 @@ remaining until the next retransmission, or better the time until
 @menu
 * Asynchronous operation::
 * Reducing round-trips::
+* Zero-roundtrip mode::
+* Anti-replay protection::
 * DTLS sessions::
 * DTLS and SCTP::
 @end menu
@@ -914,6 +916,142 @@ start, is part of protocol design with no known security implications.
 It can be enabled by setting the @acronym{GNUTLS_ENABLE_EARLY_START} on
 @funcref{gnutls_init}, and the @funcref{gnutls_handshake} function will
 return early, allowing the server to send data earlier.
+
+
+@node Zero-roundtrip mode
+@subsection Zero-roundtrip mode
+
+Under TLS 1.3, when the client has already connected to the server and
+is resuming a session, it can start transmitting application data during
+handshake.  This is called zero round-trip time (0-RTT) mode, and the
+application data sent in this mode is called early data.  The client can
+send early data with @funcref{gnutls_record_send_early_data}.  The
+client should call this function before calling
+@funcref{gnutls_handshake} and after calling
+@funcref{gnutls_session_set_data}.
+
+Note, however, that early data has weaker security properties than
+normal application data sent after handshake, such as lack of forward
+secrecy, no guarantees of non-replay between connections.  Thus it is
+disabled on the server side by default.  To enable it, the server
+needs to:
+@enumerate
+@item Set @acronym{GNUTLS_ENABLE_EARLY_DATA} on @funcref{gnutls_init}.  Note that this option only has effect on server.
+
+@item Enable anti-replay measure.  See @ref{Anti-replay protection} for the details.
+@end enumerate
+
+The server caches the received early data until it is read.  To set the
+maximum amount of data to be stored in the cache, use
+@funcref{gnutls_record_set_max_early_data_size}.  After receiving the
+EndOfEarlyData handshake message, the server can start retrieving the
+received data with @funcref{gnutls_record_recv_early_data}.  You can
+call the function either after the handshake is complete, or through a
+handshake hook (@funcref{gnutls_handshake_set_hook_function}).
+
+On the client side, to check whether the sent early data was accepted by
+the server, use @funcref{gnutls_session_get_flags} and compare the
+result with @acronym{GNUTLS_SFLAGS_EARLY_DATA}.  Similarly, on the
+server side, the same function and flag can be used to check whether it
+has actually accepted early data.
+
+
+@node Anti-replay protection
+@subsection Anti-replay protection
+
+When 0-RTT mode is used, the server must protect itself from replay
+attacks, where adversary client reuses duplicate session ticket to send
+early data, before the server authenticates the client.
+
+GnuTLS provides a simple mechanism against replay attacks, following the
+method called ClientHello recording.  When a session ticket is accepted,
+the server checks if the ClientHello message has been already seen.  If
+there is a duplicate, the server rejects early data.
+
+The problem of this approach is that the number of recorded messages
+grows indefinitely.  To prevent that, the server can limit the recording
+to a certain time window, which can be configured with
+@funcref{gnutls_anti_replay_set_window}.
+
+The anti-replay mechanism shall be globally initialized with
+@funcref{gnutls_anti_replay_init}, and then attached to a session using
+@funcref{gnutls_anti_replay_enable}.  It can be deinitialized with
+@funcref{gnutls_anti_replay_deinit}.
+
+The server must also set up a database back-end to store ClientHello
+messages.  That can be achieved using
+@funcref{gnutls_db_set_add_function} (see @ref{Session resumption}).
+
+Note that, if the back-end stores arbitrary number of ClientHello, it
+needs to periodically clean up the stored entries based on the time
+window set with @funcref{gnutls_anti_replay_set_window}.  The cleanup
+can be implemented by iterating through the database entries and calling
+@funcref{gnutls_db_check_entry_expire_time}.  This is similar to session
+database cleanup used by TLS1.2 sessions.
+
+The full set up of the server using early data would be like the
+following example:
+@example
+#define MAX_EARLY_DATA_SIZE 16384
+
+static int
+db_add_func(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
+@{
+    /* Return GNUTLS_E_DB_ENTRY_EXISTS, if KEY is found in the database.
+     * Otherwise, store it and return 0.
+     */
+@}
+
+static int
+handshake_hook_func(gnutls_session_t session, unsigned int htype,
+                    unsigned when, unsigned int incoming, const gnutls_datum_t *msg)
+@{
+    int ret;
+    char buf[MAX_EARLY_DATA_SIZE];
+
+    assert(htype == GNUTLS_HANDSHAKE_END_OF_EARLY_DATA);
+    assert(when == GNUTLS_HOOK_POST);
+
+    if (gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_DATA) @{
+        ret = gnutls_record_recv_early_data(session, buf, sizeof(buf));
+        assert(ret >= 0);
+    @}
+
+    return ret;
+@}
+
+int main()
+@{
+  ...
+  /* Initialize anti-replay measure, which can be shared
+   * among multiple sessions.
+   */
+  gnutls_anti_replay_init(&anti_replay);
+
+  ...
+
+  gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ENABLE_EARLY_DATA);
+  gnutls_record_set_max_early_data_size(server, MAX_EARLY_DATA_SIZE);
+  ...
+
+  /* Set the database back-end function for the session.
+   */
+  gnutls_db_set_add_function(server, db_add_func);
+  ...
+
+  /* Set the anti-replay measure to the session.
+   */
+  gnutls_anti_replay_enable(server, anti_replay);
+  ...
+
+  /* Retrieve early data in a handshake hook;
+   * you can also do that after handshake.
+   */
+  gnutls_handshake_set_hook_function(server, GNUTLS_HANDSHAKE_END_OF_EARLY_DATA,
+                                     GNUTLS_HOOK_POST, handshake_hook_func);
+  ...
+@}
+@end example
 
 
 @node DTLS sessions
@@ -1637,6 +1775,8 @@ static int
 handshake_hook_func(gnutls_session_t session, unsigned int htype,
                     unsigned when, unsigned int incoming, const gnutls_datum_t *msg)
 @{
+    int ret;
+
     assert(htype == GNUTLS_HANDSHAKE_CLIENT_HELLO);
     assert(when == GNUTLS_HOOK_PRE);
 
@@ -1645,6 +1785,8 @@ handshake_hook_func(gnutls_session_t session, unsigned int htype,
     assert(ret >= 0);
 
     gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred);
+
+    return ret;
 @}
 
 int main()
@@ -1708,7 +1850,7 @@ A storing server needs to specify callback functions to store, retrieve and dele
 registered with the functions below. The stored sessions in the database can be checked using @funcref{gnutls_db_check_entry}
 for expiration.
 
-@showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
+@showfuncE{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function,gnutls_db_set_add_function}
 @showfuncA{gnutls_db_check_entry}
 
 A server supporting session tickets must generate ticket encryption

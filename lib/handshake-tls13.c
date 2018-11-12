@@ -52,12 +52,13 @@
 #include "tls13/certificate_request.h"
 #include "tls13/certificate_verify.h"
 #include "tls13/certificate.h"
+#include "tls13/early_data.h"
 #include "tls13/finished.h"
 #include "tls13/key_update.h"
 #include "ext/pre_shared_key.h"
 
 static int generate_rms_keys(gnutls_session_t session);
-static int generate_and_set_hs_traffic_keys(gnutls_session_t session);
+static int generate_hs_traffic_keys(gnutls_session_t session);
 static int generate_ap_traffic_keys(gnutls_session_t session);
 
 #define SAVE_TRANSCRIPT \
@@ -90,59 +91,99 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 #endif
 		FALLTHROUGH;
 	case STATE101:
-		ret =
-		    generate_and_set_hs_traffic_keys(session);
-		STATE = STATE101;
-		IMED_RET_FATAL("generate session keys", ret, 0);
+		/* Note that we check IN_FLIGHT, not ACCEPTED
+		 * here. This is because the client sends early data
+		 * speculatively. */
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) {
+			ret = _tls13_write_connection_state_init(session, STAGE_EARLY);
+			if (ret == 0) {
+				_gnutls_epoch_bump(session);
+				ret = _gnutls_epoch_dup(session, EPOCH_WRITE_CURRENT);
+			}
+			STATE = STATE101;
+			IMED_RET_FATAL("set early traffic keys", ret, 0);
+		}
 		FALLTHROUGH;
 	case STATE102:
-		ret = _gnutls13_recv_encrypted_extensions(session);
+		ret = _gnutls13_send_early_data(session);
 		STATE = STATE102;
-		IMED_RET("recv encrypted extensions", ret, 0);
+		IMED_RET("send early data", ret, 0);
 		FALLTHROUGH;
 	case STATE103:
-		ret = _gnutls13_recv_certificate_request(session);
 		STATE = STATE103;
-		IMED_RET("recv certificate request", ret, 0);
+		ret = generate_hs_traffic_keys(session);
+		/* Note that we check IN_FLIGHT, not ACCEPTED
+		 * here. This is because the client sends early data
+		 * speculatively. */
+		IMED_RET_FATAL("generate hs traffic keys", ret, 0);
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT)
+			ret = _tls13_read_connection_state_init(session, STAGE_HS);
+		else
+			ret = _tls13_connection_state_init(session, STAGE_HS);
+		IMED_RET_FATAL("set hs traffic keys", ret, 0);
 		FALLTHROUGH;
 	case STATE104:
-		ret = _gnutls13_recv_certificate(session);
+		ret = _gnutls13_recv_encrypted_extensions(session);
 		STATE = STATE104;
-		IMED_RET("recv certificate", ret, 0);
+		IMED_RET("recv encrypted extensions", ret, 0);
 		FALLTHROUGH;
 	case STATE105:
-		ret = _gnutls13_recv_certificate_verify(session);
+		ret = _gnutls13_recv_certificate_request(session);
 		STATE = STATE105;
-		IMED_RET("recv server certificate verify", ret, 0);
+		IMED_RET("recv certificate request", ret, 0);
 		FALLTHROUGH;
 	case STATE106:
-		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
+		ret = _gnutls13_recv_certificate(session);
 		STATE = STATE106;
+		IMED_RET("recv certificate", ret, 0);
+		FALLTHROUGH;
+	case STATE107:
+		ret = _gnutls13_recv_certificate_verify(session);
+		STATE = STATE107;
+		IMED_RET("recv server certificate verify", ret, 0);
+		FALLTHROUGH;
+	case STATE108:
+		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
+		STATE = STATE108;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		FALLTHROUGH;
-	case STATE107:
+	case STATE109:
 		ret = _gnutls13_recv_finished(session);
-		STATE = STATE107;
+		STATE = STATE109;
 		IMED_RET("recv finished", ret, 0);
 		FALLTHROUGH;
-	case STATE108:
-		ret = _gnutls13_send_certificate(session, AGAIN(STATE108));
-		STATE = STATE108;
-		IMED_RET("send certificate", ret, 0);
-		FALLTHROUGH;
-	case STATE109:
-		ret = _gnutls13_send_certificate_verify(session, AGAIN(STATE109));
-		STATE = STATE109;
-		IMED_RET("send certificate verify", ret, 0);
-		FALLTHROUGH;
 	case STATE110:
-		ret = _gnutls13_send_finished(session, AGAIN(STATE110));
+		ret = _gnutls13_send_end_of_early_data(session, AGAIN(STATE110));
 		STATE = STATE110;
-		IMED_RET("send finished", ret, 0);
+		IMED_RET("send end of early data", ret, 0);
+
+		/* Note that we check IN_FLIGHT, not ACCEPTED
+		 * here. This is because the client sends early data
+		 * speculatively. */
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) {
+			session->internals.hsk_flags &= ~HSK_EARLY_DATA_IN_FLIGHT;
+			ret = _tls13_write_connection_state_init(session, STAGE_HS);
+			IMED_RET_FATAL("set hs traffic key after sending early data", ret, 0);
+		}
 		FALLTHROUGH;
 	case STATE111:
+		ret = _gnutls13_send_certificate(session, AGAIN(STATE111));
 		STATE = STATE111;
+		IMED_RET("send certificate", ret, 0);
+		FALLTHROUGH;
+	case STATE112:
+		ret = _gnutls13_send_certificate_verify(session, AGAIN(STATE112));
+		STATE = STATE112;
+		IMED_RET("send certificate verify", ret, 0);
+		FALLTHROUGH;
+	case STATE113:
+		ret = _gnutls13_send_finished(session, AGAIN(STATE113));
+		STATE = STATE113;
+		IMED_RET("send finished", ret, 0);
+		FALLTHROUGH;
+	case STATE114:
+		STATE = STATE114;
 
 		ret =
 		    generate_ap_traffic_keys(session);
@@ -255,20 +296,28 @@ static int generate_ap_traffic_keys(gnutls_session_t session)
 				 session->security_parameters.prf->output_size);
 
 	_gnutls_epoch_bump(session);
-	ret = _gnutls_epoch_dup(session);
+	ret = _gnutls_epoch_dup(session, EPOCH_READ_CURRENT);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	return 0;
 }
 
-static int generate_and_set_hs_traffic_keys(gnutls_session_t session)
+static int generate_hs_traffic_keys(gnutls_session_t session)
 {
 	int ret;
 	unsigned null_key = 0;
 
 	if (unlikely(session->key.proto.tls13.temp_secret_size == 0))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	ret = _tls13_derive_secret(session, DERIVED_LABEL, sizeof(DERIVED_LABEL)-1,
+				   NULL, 0, session->key.proto.tls13.temp_secret,
+				   session->key.proto.tls13.temp_secret);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	if ((session->security_parameters.entity == GNUTLS_CLIENT &&
 	      (!(session->internals.hsk_flags & HSK_KEY_SHARE_RECEIVED) ||
@@ -307,12 +356,6 @@ static int generate_and_set_hs_traffic_keys(gnutls_session_t session)
 			gnutls_assert();
 			return ret;
 		}
-	}
-
-	ret = _tls13_connection_state_init(session, STAGE_HS);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
 	}
 
 	return 0;
@@ -380,10 +423,26 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 #endif
 		FALLTHROUGH;
 	case STATE101:
-		ret =
-		    generate_and_set_hs_traffic_keys(session);
 		STATE = STATE101;
-		IMED_RET_FATAL("generate session keys", ret, 0);
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {
+			ret = _tls13_read_connection_state_init(session, STAGE_EARLY);
+			if (ret == 0) {
+				_gnutls_epoch_bump(session);
+				ret = _gnutls_epoch_dup(session, EPOCH_READ_CURRENT);
+			}
+			IMED_RET_FATAL("set early traffic keys", ret, 0);
+
+			ret = generate_hs_traffic_keys(session);
+			IMED_RET_FATAL("generate hs traffic keys", ret, 0);
+
+			ret = _tls13_write_connection_state_init(session, STAGE_HS);
+		} else {
+			ret = generate_hs_traffic_keys(session);
+			IMED_RET_FATAL("generate hs traffic keys", ret, 0);
+
+			ret = _tls13_connection_state_init(session, STAGE_HS);
+		}
+		IMED_RET_FATAL("set hs traffic keys", ret, 0);
 		FALLTHROUGH;
 	case STATE102:
 		ret = _gnutls13_send_encrypted_extensions(session, AGAIN(STATE102));
@@ -411,6 +470,16 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		IMED_RET("send finished", ret, 0);
 		FALLTHROUGH;
 	case STATE107:
+		ret = _gnutls13_recv_end_of_early_data(session);
+		STATE = STATE107;
+		IMED_RET("recv end of early data", ret, 0);
+
+		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {
+			ret = _tls13_read_connection_state_init(session, STAGE_HS);
+			IMED_RET_FATAL("set hs traffic key after receiving early data", ret, 0);
+		}
+		FALLTHROUGH;
+	case STATE108:
 		/* At this point our sending keys should be the app keys
 		 * see 4.4.4 at draft-ietf-tls-tls13-28 */
 		ret =
@@ -420,7 +489,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		/* If the session is unauthenticated, try to optimize the handshake by
 		 * sending the session ticket early. */
 		if (!(session->internals.hsk_flags & (HSK_CRT_REQ_SENT|HSK_PSK_SELECTED))) {
-			STATE = STATE107;
+			STATE = STATE108;
 
 			ret = generate_non_auth_rms_keys(session);
 			IMED_RET_FATAL("generate rms keys", ret, 0);
@@ -435,15 +504,15 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		_gnutls_handshake_log("HSK[%p]: switching early to application traffic keys\n", session);
 
 		FALLTHROUGH;
-	case STATE108:
+	case STATE109:
 		if (session->internals.resumed != RESUME_FALSE)
 			_gnutls_set_resumed_parameters(session);
 
 		if (session->internals.hsk_flags & HSK_EARLY_START_USED) {
 			ret = _gnutls13_send_session_ticket(session, TICKETS_TO_SEND,
-							    AGAIN(STATE108));
+							    AGAIN(STATE109));
 
-			STATE = STATE108;
+			STATE = STATE109;
 			IMED_RET("send session ticket", ret, 0);
 
 			/* complete this phase of the handshake. We
@@ -451,7 +520,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 			 */
 
 			if (session->internals.flags & GNUTLS_ENABLE_EARLY_START) {
-				STATE = STATE112; /* finished */
+				STATE = STATE113; /* finished */
 				gnutls_assert();
 
 				session->internals.recv_state = RECV_STATE_EARLY_START;
@@ -459,31 +528,31 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 			}
 		}
 		FALLTHROUGH;
-	case STATE109:
+	case STATE110:
 		ret = _gnutls13_recv_certificate(session);
-		STATE = STATE109;
+		STATE = STATE110;
 		IMED_RET("recv certificate", ret, 0);
 		FALLTHROUGH;
-	case STATE110:
+	case STATE111:
 		ret = _gnutls13_recv_certificate_verify(session);
-		STATE = STATE110;
+		STATE = STATE111;
 		IMED_RET("recv certificate verify", ret, 0);
 		FALLTHROUGH;
-	case STATE111:
+	case STATE112:
 		ret = _gnutls_run_verify_callback(session, GNUTLS_CLIENT);
-		STATE = STATE111;
+		STATE = STATE112;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		FALLTHROUGH;
-	case STATE112: /* can enter from STATE108 */
+	case STATE113: /* can enter from STATE109 */
 		ret = _gnutls13_recv_finished(session);
-		STATE = STATE112;
+		STATE = STATE113;
 		IMED_RET("recv finished", ret, 0);
 		FALLTHROUGH;
-	case STATE113:
+	case STATE114:
 		/* If we did request a client certificate, then we can
 		 * only send the tickets here */
-		STATE = STATE113;
+		STATE = STATE114;
 
 		if (!(session->internals.hsk_flags & HSK_EARLY_START_USED)) {
 			ret = generate_rms_keys(session);
@@ -494,11 +563,11 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		IMED_RET_FATAL("set read app keys", ret, 0);
 
 		FALLTHROUGH;
-	case STATE114:
+	case STATE115:
 		if (!(session->internals.hsk_flags & (HSK_TLS13_TICKET_SENT|HSK_EARLY_START_USED))) {
 			ret = _gnutls13_send_session_ticket(session, TICKETS_TO_SEND,
-							    AGAIN(STATE114));
-			STATE = STATE114;
+							    AGAIN(STATE115));
+			STATE = STATE115;
 			IMED_RET("send session ticket", ret, 0);
 		}
 

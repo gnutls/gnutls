@@ -322,6 +322,61 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 }
 
 static int
+_tls13_set_early_keys(gnutls_session_t session,
+		      record_parameters_st * params,
+		      unsigned iv_size, unsigned key_size)
+{
+	uint8_t key_block[MAX_CIPHER_KEY_SIZE];
+	uint8_t iv_block[MAX_CIPHER_IV_SIZE];
+	char buf[65];
+	record_state_st *early_state;
+	int ret;
+
+	if (session->security_parameters.entity == GNUTLS_CLIENT &&
+	    !(session->internals.hsk_flags & HSK_TLS13_TICKET_SENT)) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, session->key.proto.tls13.e_ckey, key_size, key_block);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.e_ckey, iv_size, iv_block);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		early_state = &params->write;
+	} else {
+		early_state = &params->read;
+	}
+
+	early_state->mac_key_size = 0;
+
+	assert(key_size <= sizeof(early_state->key));
+	memcpy(early_state->key, key_block, key_size);
+	early_state->key_size = key_size;
+
+	_gnutls_hard_log("INT: EARLY KEY [%d]: %s\n",
+			 key_size,
+			 _gnutls_bin2hex(key_block, key_size,
+					 buf, sizeof(buf), NULL));
+
+	if (iv_size > 0) {
+		assert(iv_size <= sizeof(early_state->iv));
+		memcpy(early_state->iv, iv_block, iv_size);
+		early_state->iv_size = iv_size;
+
+		_gnutls_hard_log("INT: EARLY IV [%d]: %s\n",
+				 iv_size,
+				 _gnutls_bin2hex(iv_block, iv_size,
+						 buf, sizeof(buf), NULL));
+	}
+
+	return 0;
+}
+
+static int
 _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 		record_parameters_st * params,
 		unsigned iv_size, unsigned key_size)
@@ -342,7 +397,11 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 		return _tls13_update_keys(session, stage,
 					  params, iv_size, key_size);
 
-	if (stage == STAGE_HS) {
+	else if (stage == STAGE_EARLY)
+		return _tls13_set_early_keys(session,
+					     params, iv_size, key_size);
+
+	else if (stage == STAGE_HS) {
 		label = HANDSHAKE_CLIENT_TRAFFIC_LABEL;
 		label_size = sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1;
 		hsk_len = session->internals.handshake_hash_buffer.length;
@@ -551,13 +610,13 @@ _gnutls_set_cipher_suite2(gnutls_session_t session,
 /* Sets the next epoch to be a clone of the current one.
  * The keys are not cloned, only the cipher and MAC.
  */
-int _gnutls_epoch_dup(gnutls_session_t session)
+int _gnutls_epoch_dup(gnutls_session_t session, unsigned int epoch_rel)
 {
 	record_parameters_st *prev;
 	record_parameters_st *next;
 	int ret;
 
-	ret = _gnutls_epoch_get(session, EPOCH_READ_CURRENT, &prev);
+	ret = _gnutls_epoch_get(session, epoch_rel, &prev);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -621,13 +680,19 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = _tls13_init_record_state(params->cipher->id, &params->read);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (stage != STAGE_EARLY ||
+		    session->security_parameters.entity == GNUTLS_SERVER) {
+			ret = _tls13_init_record_state(params->cipher->id, &params->read);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
 
-		ret = _tls13_init_record_state(params->cipher->id, &params->write);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (stage != STAGE_EARLY ||
+		    session->security_parameters.entity == GNUTLS_CLIENT) {
+			ret = _tls13_init_record_state(params->cipher->id, &params->write);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
 	} else {
 		ret = _gnutls_set_keys
 		    (session, params, hash_size, IV_size, key_size);

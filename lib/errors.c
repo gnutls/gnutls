@@ -193,6 +193,7 @@ static const gnutls_error_entry error_entries[] = {
 		    ("TLS Application data were received, while expecting handshake data."),
 		    GNUTLS_E_GOT_APPLICATION_DATA),
 	ERROR_ENTRY(N_("Error in Database backend."), GNUTLS_E_DB_ERROR),
+	ERROR_ENTRY(N_("The Database entry already exists."), GNUTLS_E_DB_ENTRY_EXISTS),
 	ERROR_ENTRY(N_("The certificate type is not supported."),
 		    GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE),
 	ERROR_ENTRY(N_
@@ -430,6 +431,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INSUFFICIENT_SECURITY),
 	ERROR_ENTRY(N_("No common key share with peer."),
 		    GNUTLS_E_NO_COMMON_KEY_SHARE),
+	ERROR_ENTRY(N_("The early data were rejected."),
+		    GNUTLS_E_EARLY_DATA_REJECTED),
 	{NULL, NULL, 0}
 };
 

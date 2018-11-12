@@ -72,46 +72,47 @@ typedef enum {
     INDEX_OPT_ALPN                         =  3,
     INDEX_OPT_ALPN_FATAL                   =  4,
     INDEX_OPT_NOTICKET                     =  5,
-    INDEX_OPT_NOCOOKIE                     =  6,
-    INDEX_OPT_GENERATE                     =  7,
-    INDEX_OPT_QUIET                        =  8,
-    INDEX_OPT_NODB                         =  9,
-    INDEX_OPT_HTTP                         = 10,
-    INDEX_OPT_ECHO                         = 11,
-    INDEX_OPT_UDP                          = 12,
-    INDEX_OPT_MTU                          = 13,
-    INDEX_OPT_SRTP_PROFILES                = 14,
-    INDEX_OPT_DISABLE_CLIENT_CERT          = 15,
-    INDEX_OPT_REQUIRE_CLIENT_CERT          = 16,
-    INDEX_OPT_VERIFY_CLIENT_CERT           = 17,
-    INDEX_OPT_HEARTBEAT                    = 18,
-    INDEX_OPT_X509FMTDER                   = 19,
-    INDEX_OPT_PRIORITY                     = 20,
-    INDEX_OPT_DHPARAMS                     = 21,
-    INDEX_OPT_X509CAFILE                   = 22,
-    INDEX_OPT_X509CRLFILE                  = 23,
-    INDEX_OPT_PGPKEYFILE                   = 24,
-    INDEX_OPT_X509KEYFILE                  = 25,
-    INDEX_OPT_X509CERTFILE                 = 26,
-    INDEX_OPT_X509DSAKEYFILE               = 27,
-    INDEX_OPT_X509DSACERTFILE              = 28,
-    INDEX_OPT_X509ECCKEYFILE               = 29,
-    INDEX_OPT_X509ECCCERTFILE              = 30,
-    INDEX_OPT_SRPPASSWD                    = 31,
-    INDEX_OPT_SRPPASSWDCONF                = 32,
-    INDEX_OPT_PSKPASSWD                    = 33,
-    INDEX_OPT_PSKHINT                      = 34,
-    INDEX_OPT_OCSP_RESPONSE                = 35,
-    INDEX_OPT_IGNORE_OCSP_RESPONSE_ERRORS  = 36,
-    INDEX_OPT_PORT                         = 37,
-    INDEX_OPT_LIST                         = 38,
-    INDEX_OPT_PROVIDER                     = 39,
-    INDEX_OPT_VERSION                      = 40,
-    INDEX_OPT_HELP                         = 41,
-    INDEX_OPT_MORE_HELP                    = 42
+    INDEX_OPT_EARLYDATA                    =  6,
+    INDEX_OPT_NOCOOKIE                     =  7,
+    INDEX_OPT_GENERATE                     =  8,
+    INDEX_OPT_QUIET                        =  9,
+    INDEX_OPT_NODB                         = 10,
+    INDEX_OPT_HTTP                         = 11,
+    INDEX_OPT_ECHO                         = 12,
+    INDEX_OPT_UDP                          = 13,
+    INDEX_OPT_MTU                          = 14,
+    INDEX_OPT_SRTP_PROFILES                = 15,
+    INDEX_OPT_DISABLE_CLIENT_CERT          = 16,
+    INDEX_OPT_REQUIRE_CLIENT_CERT          = 17,
+    INDEX_OPT_VERIFY_CLIENT_CERT           = 18,
+    INDEX_OPT_HEARTBEAT                    = 19,
+    INDEX_OPT_X509FMTDER                   = 20,
+    INDEX_OPT_PRIORITY                     = 21,
+    INDEX_OPT_DHPARAMS                     = 22,
+    INDEX_OPT_X509CAFILE                   = 23,
+    INDEX_OPT_X509CRLFILE                  = 24,
+    INDEX_OPT_PGPKEYFILE                   = 25,
+    INDEX_OPT_X509KEYFILE                  = 26,
+    INDEX_OPT_X509CERTFILE                 = 27,
+    INDEX_OPT_X509DSAKEYFILE               = 28,
+    INDEX_OPT_X509DSACERTFILE              = 29,
+    INDEX_OPT_X509ECCKEYFILE               = 30,
+    INDEX_OPT_X509ECCCERTFILE              = 31,
+    INDEX_OPT_SRPPASSWD                    = 32,
+    INDEX_OPT_SRPPASSWDCONF                = 33,
+    INDEX_OPT_PSKPASSWD                    = 34,
+    INDEX_OPT_PSKHINT                      = 35,
+    INDEX_OPT_OCSP_RESPONSE                = 36,
+    INDEX_OPT_IGNORE_OCSP_RESPONSE_ERRORS  = 37,
+    INDEX_OPT_PORT                         = 38,
+    INDEX_OPT_LIST                         = 39,
+    INDEX_OPT_PROVIDER                     = 40,
+    INDEX_OPT_VERSION                      = 41,
+    INDEX_OPT_HELP                         = 42,
+    INDEX_OPT_MORE_HELP                    = 43
 } teOptIndex;
 /** count of all options for gnutls-serv */
-#define OPTION_CT    43
+#define OPTION_CT    44
 /** gnutls-serv version */
 #define GNUTLS_SERV_VERSION       "3.6.4"
 /** Full gnutls-serv version text */
@@ -174,44 +175,45 @@ typedef enum {
 #define VALUE_OPT_ALPN           0x1003
 #define VALUE_OPT_ALPN_FATAL     0x1004
 #define VALUE_OPT_NOTICKET       0x1005
-#define VALUE_OPT_NOCOOKIE       0x1006
+#define VALUE_OPT_EARLYDATA      0x1006
+#define VALUE_OPT_NOCOOKIE       0x1007
 #define VALUE_OPT_GENERATE       'g'
 #define VALUE_OPT_QUIET          'q'
-#define VALUE_OPT_NODB           0x1007
-#define VALUE_OPT_HTTP           0x1008
-#define VALUE_OPT_ECHO           0x1009
+#define VALUE_OPT_NODB           0x1008
+#define VALUE_OPT_HTTP           0x1009
+#define VALUE_OPT_ECHO           0x100A
 #define VALUE_OPT_UDP            'u'
-#define VALUE_OPT_MTU            0x100A
+#define VALUE_OPT_MTU            0x100B
 
 #define OPT_VALUE_MTU            (DESC(MTU).optArg.argInt)
-#define VALUE_OPT_SRTP_PROFILES  0x100B
+#define VALUE_OPT_SRTP_PROFILES  0x100C
 #define VALUE_OPT_DISABLE_CLIENT_CERT 'a'
 #define VALUE_OPT_REQUIRE_CLIENT_CERT 'r'
-#define VALUE_OPT_VERIFY_CLIENT_CERT 0x100C
+#define VALUE_OPT_VERIFY_CLIENT_CERT 0x100D
 #define VALUE_OPT_HEARTBEAT      'b'
-#define VALUE_OPT_X509FMTDER     0x100D
-#define VALUE_OPT_PRIORITY       0x100E
-#define VALUE_OPT_DHPARAMS       0x100F
-#define VALUE_OPT_X509CAFILE     0x1010
-#define VALUE_OPT_X509CRLFILE    0x1011
-#define VALUE_OPT_PGPKEYFILE     0x1012
-#define VALUE_OPT_X509KEYFILE    0x1013
-#define VALUE_OPT_X509CERTFILE   0x1014
-#define VALUE_OPT_X509DSAKEYFILE 0x1015
-#define VALUE_OPT_X509DSACERTFILE 0x1016
-#define VALUE_OPT_X509ECCKEYFILE 0x1017
-#define VALUE_OPT_X509ECCCERTFILE 0x1018
-#define VALUE_OPT_SRPPASSWD      0x1019
-#define VALUE_OPT_SRPPASSWDCONF  0x101A
-#define VALUE_OPT_PSKPASSWD      0x101B
-#define VALUE_OPT_PSKHINT        0x101C
-#define VALUE_OPT_OCSP_RESPONSE  0x101D
-#define VALUE_OPT_IGNORE_OCSP_RESPONSE_ERRORS 0x101E
+#define VALUE_OPT_X509FMTDER     0x100E
+#define VALUE_OPT_PRIORITY       0x100F
+#define VALUE_OPT_DHPARAMS       0x1010
+#define VALUE_OPT_X509CAFILE     0x1011
+#define VALUE_OPT_X509CRLFILE    0x1012
+#define VALUE_OPT_PGPKEYFILE     0x1013
+#define VALUE_OPT_X509KEYFILE    0x1014
+#define VALUE_OPT_X509CERTFILE   0x1015
+#define VALUE_OPT_X509DSAKEYFILE 0x1016
+#define VALUE_OPT_X509DSACERTFILE 0x1017
+#define VALUE_OPT_X509ECCKEYFILE 0x1018
+#define VALUE_OPT_X509ECCCERTFILE 0x1019
+#define VALUE_OPT_SRPPASSWD      0x101A
+#define VALUE_OPT_SRPPASSWDCONF  0x101B
+#define VALUE_OPT_PSKPASSWD      0x101C
+#define VALUE_OPT_PSKHINT        0x101D
+#define VALUE_OPT_OCSP_RESPONSE  0x101E
+#define VALUE_OPT_IGNORE_OCSP_RESPONSE_ERRORS 0x101F
 #define VALUE_OPT_PORT           'p'
 
 #define OPT_VALUE_PORT           (DESC(PORT).optArg.argInt)
 #define VALUE_OPT_LIST           'l'
-#define VALUE_OPT_PROVIDER       0x101F
+#define VALUE_OPT_PROVIDER       0x1020
 /** option flag (value) for help-value option */
 #define VALUE_OPT_HELP          'h'
 /** option flag (value) for more-help-value option */
