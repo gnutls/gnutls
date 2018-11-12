@@ -711,12 +711,14 @@ fi
 AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the trousers library])
 AC_SUBST(TROUSERS_LIB)
 
+AM_MISSING_PROG([AUTOGEN], [autogen])
+
 included_libopts=no
 create_libopts_links=no
 if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
-	AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [:])
+	AC_CHECK_PROGS([autogen], [autogen])
 
-	if test x"$AUTOGEN" = "x:"; then
+	if test -z "$autogen"; then
 		AC_MSG_WARN([[
 ***
 *** autogen not found. Will not link against system libopts.
@@ -728,13 +730,11 @@ if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
 	if test "$NEED_LIBOPTS_DIR" = "true";then
 		dnl replace libopts-generated files with distributed backups, if present
 		create_libopts_links=yes
-		AC_SUBST([AUTOGEN], [/bin/true])
 		included_libopts=yes
 	fi
 else
 	# Need to ensure the relevant conditionals get set
 	gl_STDNORETURN_H
-	AC_SUBST([AUTOGEN], [/bin/true])
 	AM_CONDITIONAL([INSTALL_LIBOPTS],[false])
 fi
 
