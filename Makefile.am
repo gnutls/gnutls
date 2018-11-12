@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-doc --enable-gtk-doc --disable-valgrind-tests
+DISTCHECK_CONFIGURE_FLAGS = --enable-doc --enable-gtk-doc --disable-valgrind-tests AUTOGEN=false
 
 SUBDIRS = gl lib extra
 
@@ -157,7 +157,6 @@ files-update: libopts-check
 	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile $(srcdir)/doc/Makefile.am
 	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile $(srcdir)/doc/manpages/Makefile.am
 	$(MAKE) -C . symbol-check || mv symbols.last.tmp $(srcdir)/symbols.last
-	$(MAKE) -C src files-update
 	@echo "******************************************************************************************"
 	@echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
 	@echo "******************************************************************************************"
@@ -166,7 +165,6 @@ dist-hook: libopts-check symbol-check
 	$(MAKE) -C doc/ compare-makefile
 	$(MAKE) -C doc/ compare-exported
 	$(MAKE) -C doc/manpages compare-makefile
-	$(MAKE) -C src/ files-update
 	$(MAKE) ChangeLog
 	mv ChangeLog $(distdir)
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
