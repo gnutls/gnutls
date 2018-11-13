@@ -296,6 +296,7 @@ src/libcmd-tpmtool.la
 src/libopts/libopts.la
 src/Makefile
 src/Makefile.in
+src/mech-list.h
 src/ocsptool
 src/ocsptool-args.c
 src/ocsptool-args.h

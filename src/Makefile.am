@@ -331,8 +331,4 @@ systemkey-args.c: systemkey-args.stamp
 systemkey-args.stamp: args-std.def
 
 mech-list.h: gen-mech-list.sh
-	@$(srcdir)/gen-mech-list.sh > mech-list.h.tmp
-	@mv mech-list.h.tmp $@
-
-maintainer-clean-local:
-	rm -f *.stamp mech-list.h
+	$(AM_V_GEN) $(srcdir)/gen-mech-list.sh > $@.tmp && mv $@.tmp $@
