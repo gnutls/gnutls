@@ -1417,6 +1417,12 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 	gnutls_pk_params_init(&key->params);
 
 	if (curve_is_eddsa(curve)) {
+		unsigned size = gnutls_ecc_curve_get_size(curve);
+		if (x->size != size) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
+
 		ret = _gnutls_set_datum(&key->params.raw_pub, x->data, x->size);
 		if (ret < 0) {
 			gnutls_assert();

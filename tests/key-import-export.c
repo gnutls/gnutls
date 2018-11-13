@@ -431,6 +431,11 @@ int check_privkey_import_export(void)
 	if (ret < 0)
 		fail("error\n");
 
+	/* test whether an invalid size would fail */
+	ret = gnutls_privkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519, &_rsa_m, NULL, &_rsa_m);
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("error\n");
+
 	ret = gnutls_privkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519, &_ed25519_x, NULL, &_ed25519_k);
 	if (ret < 0)
 		fail("error\n");

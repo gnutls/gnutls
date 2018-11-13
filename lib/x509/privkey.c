@@ -1115,7 +1115,14 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 	key->params.curve = curve;
 
 	if (curve_is_eddsa(curve)) {
+		unsigned size;
 		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
+
+		size = gnutls_ecc_curve_get_size(curve);
+		if (x->size != size || k->size != size) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
 
 		ret = _gnutls_set_datum(&key->params.raw_pub, x->data, x->size);
 		if (ret < 0) {
