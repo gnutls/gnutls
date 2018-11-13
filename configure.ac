@@ -1055,7 +1055,6 @@ if features are disabled)
   DTLS-SRTP support:    $ac_enable_srtp
   ALPN support:         $ac_enable_alpn
   OCSP support:         $ac_enable_ocsp
-  Ses. ticket support:  $ac_enable_session_tickets
   SRP support:          $ac_enable_srp
   PSK support:          $ac_enable_psk
   DHE support:          $ac_enable_dhe
