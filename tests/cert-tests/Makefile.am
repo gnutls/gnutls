@@ -94,7 +94,10 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/key-invalid3.der data/pkcs8-eddsa.pem data/pkcs8-eddsa.pem.txt \
 	data/rfc4490.p7b data/rfc4490.p7b.out data/gost01.p12 data/gost12.p12 data/gost12-2.p12 \
 	data/ca-crl-invalid.crl data/ca-crl-invalid.pem data/ca-crl-valid.pem data/ca-crl-valid.crl \
-	data/rfc4134-ca-rsa.pem data/rfc4134-4.5.p7b
+	data/rfc4134-ca-rsa.pem data/rfc4134-4.5.p7b \
+	data/key-gost01.p8 data/key-gost01-2.p8 data/key-gost01-2-enc.p8 \
+	data/key-gost12-256.p8 data/key-gost12-256-2.p8 data/key-gost12-256-2-enc.p8 \
+	data/key-gost12-512.p8
 
 dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -126,7 +129,7 @@ endif
 if ENABLE_GOST
 dist_check_SCRIPTS += gost
 if !WINDOWS
-dist_check_SCRIPTS += pkcs12-gost
+dist_check_SCRIPTS += pkcs12-gost pkcs8-gost
 endif
 endif
 
