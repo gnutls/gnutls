@@ -38,8 +38,9 @@ static int _gnutls_x509_read_dsa_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);
 static int _gnutls_x509_read_ecc_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);
-static int _gnutls_x509_read_eddsa_pubkey(uint8_t * der, int dersize,
-					gnutls_pk_params_st * params);
+static int _gnutls_x509_read_eddsa_pubkey(gnutls_ecc_curve_t curve,
+					  uint8_t * der, int dersize,
+					  gnutls_pk_params_st * params);
 static int _gnutls_x509_read_gost_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);
 
@@ -114,9 +115,14 @@ _gnutls_x509_read_ecc_pubkey(uint8_t * der, int dersize,
 					    &params->params[ECC_Y]);
 }
 
-int _gnutls_x509_read_eddsa_pubkey(uint8_t * der, int dersize,
+int _gnutls_x509_read_eddsa_pubkey(gnutls_ecc_curve_t curve,
+				   uint8_t * der, int dersize,
 				   gnutls_pk_params_st * params)
 {
+	int size = gnutls_ecc_curve_get_size(curve);
+	if (dersize != size)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+
 	return _gnutls_set_datum(&params->raw_pub, der, dersize);
 }
 
@@ -554,7 +560,7 @@ int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t algo, uint8_t * der,
 		}
 		break;
 	case GNUTLS_PK_EDDSA_ED25519:
-		ret = _gnutls_x509_read_eddsa_pubkey(der, dersize, params);
+		ret = _gnutls_x509_read_eddsa_pubkey(GNUTLS_ECC_CURVE_ED25519, der, dersize, params);
 		break;
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
