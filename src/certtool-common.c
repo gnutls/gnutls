@@ -1174,6 +1174,8 @@ int cipher_to_flags(const char *cipher)
 		return GNUTLS_PKCS_USE_PBES2_GOST_CPC;
 	} else if (strcasecmp(cipher, "gost28147-cpd") == 0) {
 		return GNUTLS_PKCS_USE_PBES2_GOST_CPD;
+	} else if (strcasecmp(cipher, "none") == 0) {
+		return GNUTLS_PKCS_PLAIN;
 	}
 
 	fprintf(stderr, "unknown cipher %s\n", cipher);
