@@ -290,6 +290,17 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+# Test BER encoding, see RFC 4134 Section 4.5
+# SHA1 signature, so --verify-allow-broken
+FILE="rfc4134-4.5"
+${VALGRIND} "${CERTTOOL}" --p7-verify --verify-allow-broken --load-ca-certificate "${srcdir}/data/rfc4134-ca-rsa.pem" --infile "${srcdir}/data/rfc4134-4.5.p7b" --inder
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 BER parsing/decoding failed"
+	exit ${rc}
+fi
+
 if test "x$ENABLE_GOST" = "x1"  && test "x${GNUTLS_FORCE_FIPS_MODE}" != "x1"
 then
 	FILE="gost01-signing"
