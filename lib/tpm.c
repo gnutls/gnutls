@@ -839,15 +839,10 @@ static int randomize_uuid(TSS_UUID * uuid)
 static int encode_tpmkey_url(char **url, const TSS_UUID * uuid,
 			     TSS_FLAG storage)
 {
-	size_t size = (UUID_SIZE * 2 + 4) * 2 + 32;
 	uint8_t u1[UUID_SIZE];
 	gnutls_buffer_st buf;
 	gnutls_datum_t dret;
 	int ret;
-
-	*url = gnutls_malloc(size);
-	if (*url == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	_gnutls_buffer_init(&buf);
 
