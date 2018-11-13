@@ -49,7 +49,7 @@ gostdsa_verify (const struct ecc_point *pub,
 	      size_t length, const uint8_t *digest,
 	      const struct dsa_signature *signature)
 {
-  mp_limb_t size = ecc_size (pub->ecc);
+  size_t size = ecc_size (pub->ecc);
   mp_size_t itch = 2*size + ecc_gostdsa_verify_itch (pub->ecc);
   /* For ECC_MUL_A_WBITS == 0, at most 1512 bytes. With
      ECC_MUL_A_WBITS == 4, currently needs 67 * ecc->size, at most
