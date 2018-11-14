@@ -56,29 +56,6 @@ gnutls_db_set_retrieve_function(gnutls_session_t session,
 }
 
 /**
- * gnutls_db_set_add_function:
- * @session: is a #gnutls_session_t type.
- * @add_func: is the function.
- *
- * Sets the function that will be used to store an entry if it is not
- * already present in the resumed sessions database.  This function returns 0
- * if the entry is successfully stored, and a negative error code
- * otherwise.  In particular, if the entry is found in the database,
- * it returns %GNUTLS_E_DB_ENTRY_EXISTS.
- *
- * The first argument to @add_func will be null unless
- * gnutls_db_set_ptr() has been called.
- *
- * Since: 3.6.5
- **/
-void
-gnutls_db_set_add_function(gnutls_session_t session,
-			   gnutls_db_add_func add_func)
-{
-	session->internals.db_add_func = add_func;
-}
-
-/**
  * gnutls_db_set_remove_function:
  * @session: is a #gnutls_session_t type.
  * @rem_func: is the function.

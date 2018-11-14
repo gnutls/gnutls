@@ -20,7 +20,7 @@
  *
  */
 
-int _gnutls_anti_replay_check(gnutls_session_t session,
+int _gnutls_anti_replay_check(gnutls_anti_replay_t,
 			      uint32_t client_ticket_age,
 			      struct timespec *ticket_creation_time,
 			      gnutls_datum_t *id);

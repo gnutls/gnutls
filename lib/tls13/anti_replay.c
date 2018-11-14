@@ -32,6 +32,8 @@
 struct gnutls_anti_replay_st {
 	uint32_t window;
 	struct timespec start_time;
+	gnutls_db_add_func db_add_func;
+	void *db_ptr;
 };
 
 /**
@@ -121,13 +123,13 @@ gnutls_anti_replay_enable(gnutls_session_t session,
 }
 
 int
-_gnutls_anti_replay_check(gnutls_session_t session,
+_gnutls_anti_replay_check(gnutls_anti_replay_t anti_replay,
 			  uint32_t client_ticket_age,
 			  struct timespec *ticket_creation_time,
 			  gnutls_datum_t *id)
 {
-	gnutls_anti_replay_t anti_replay = session->internals.anti_replay;
 	struct timespec now;
+	time_t window;
 	uint32_t server_ticket_age, diff;
 	gnutls_datum_t key = { NULL, 0 };
 	gnutls_datum_t entry = { NULL, 0 };
@@ -176,7 +178,7 @@ _gnutls_anti_replay_check(gnutls_session_t session,
 
 	/* Check if the ClientHello is stored in the database.
 	 */
-	if (!session->internals.db_add_func)
+	if (!anti_replay->db_add_func)
 		return gnutls_assert_val(GNUTLS_E_EARLY_DATA_REJECTED);
 
 	/* Create a key for database lookup, prefixing window start
@@ -198,24 +200,67 @@ _gnutls_anti_replay_check(gnutls_session_t session,
 
 	/* Create an entry to be stored on database if the lookup
 	 * failed.  This is formatted so that
-	 * gnutls_db_entry_is_expired() work.
+	 * gnutls_db_check_entry_expire_time() work.
 	 */
 	p = entry_buffer;
 	_gnutls_write_uint32(PACKED_SESSION_MAGIC, p);
 	p += 4;
 	_gnutls_write_uint32(now.tv_sec, p);
 	p += 4;
-	_gnutls_write_uint32(anti_replay->window / 1000, p);
+	window = anti_replay->window / 1000;
+	_gnutls_write_uint32(window, p);
 	p += 4;
 	entry.data = entry_buffer;
 	entry.size = p - entry_buffer;
 
-	ret = session->internals.db_add_func(session->internals.db_ptr,
-					     key, entry);
+	ret = anti_replay->db_add_func(anti_replay->db_ptr,
+				       (uint64_t)now.tv_sec+(uint64_t)window, &key, &entry);
 	if (ret < 0) {
 		_gnutls_handshake_log("anti_replay: duplicate ClientHello found\n");
 		return gnutls_assert_val(GNUTLS_E_EARLY_DATA_REJECTED);
 	}
 
 	return 0;
+}
+
+/**
+ * gnutls_anti_replay_set_ptr:
+ * @anti_replay: is a #gnutls_anti_replay_t type.
+ * @ptr: is the pointer
+ *
+ * Sets the pointer that will be provided to db add function
+ * as the first argument.
+ **/
+void gnutls_anti_replay_set_ptr(gnutls_anti_replay_t anti_replay, void *ptr)
+{
+	anti_replay->db_ptr = ptr;
+}
+
+/**
+ * gnutls_anti_replay_set_add_function:
+ * @anti_replay: is a #gnutls_anti_replay_t type.
+ * @add_func: is the function.
+ *
+ * Sets the function that will be used to store an entry if it is not
+ * already present in the resumed sessions database.  This function returns 0
+ * if the entry is successfully stored, and a negative error code
+ * otherwise.  In particular, if the entry is found in the database,
+ * it returns %GNUTLS_E_DB_ENTRY_EXISTS.
+ *
+ * The arguments to the @add_func are:
+ *  - %ptr: the pointer set with gnutls_anti_replay_set_ptr()
+ *  - %exp_time: the expiration time of the entry
+ *  - %key: a pointer to the key
+ *  - %data: a pointer to data to store
+ *
+ * The data set by this function can be examined using
+ * gnutls_db_check_entry_expire_time() and gnutls_db_check_entry_time().
+ *
+ * Since: 3.6.5
+ **/
+void
+gnutls_anti_replay_set_add_function(gnutls_anti_replay_t anti_replay,
+				    gnutls_db_add_func add_func)
+{
+	anti_replay->db_add_func = add_func;
 }

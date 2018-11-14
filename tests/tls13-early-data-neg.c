@@ -235,15 +235,15 @@ struct storage_st {
 };
 
 static int
-storage_add(void *ptr, gnutls_datum_t key, gnutls_datum_t value)
+storage_add(void *ptr, time_t expires, const gnutls_datum_t *key, const gnutls_datum_t *value)
 {
 	struct storage_st *storage = ptr;
 	gnutls_datum_t *datum;
 	size_t i;
 
 	for (i = 0; i < storage->num_entries; i++) {
-		if (key.size == storage->entries[i].size &&
-		    memcmp(storage->entries[i].data, key.data, key.size) == 0) {
+		if (key->size == storage->entries[i].size &&
+		    memcmp(storage->entries[i].data, key->data, key->size) == 0) {
 			return GNUTLS_E_DB_ENTRY_EXISTS;
 		}
 	}
@@ -255,11 +255,11 @@ storage_add(void *ptr, gnutls_datum_t key, gnutls_datum_t value)
 		return GNUTLS_E_DB_ERROR;
 
 	datum = &storage->entries[storage->num_entries];
-	datum->data = gnutls_malloc(key.size);
+	datum->data = gnutls_malloc(key->size);
 	if (!datum->data)
 		return GNUTLS_E_MEMORY_ERROR;
-	memcpy(datum->data, key.data, key.size);
-	datum->size = key.size;
+	memcpy(datum->data, key->data, key->size);
+	datum->size = key->size;
 
 	storage->num_entries++;
 
@@ -308,6 +308,8 @@ static void server(int sds[])
 	ret = gnutls_anti_replay_init(&anti_replay);
 	if (ret < 0)
 		fail("server: failed to initialize anti-replay\n");
+	gnutls_anti_replay_set_add_function(anti_replay, storage_add);
+	gnutls_anti_replay_set_ptr(anti_replay, &storage);
 
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
@@ -323,8 +325,6 @@ static void server(int sds[])
 		gnutls_session_ticket_enable_server(session,
 						    &session_ticket_key);
 
-		gnutls_db_set_add_function(session, storage_add);
-		gnutls_db_set_ptr(session, &storage);
 		gnutls_anti_replay_enable(session, anti_replay);
 
 		gnutls_transport_set_int(session, sd);
@@ -435,7 +435,7 @@ static void server(int sds[])
 void doit(void)
 {
 	int client_sds[SESSIONS], server_sds[SESSIONS];
-	int i, status;
+	int i, status = 0;
 	int ret;
 
 	signal(SIGCHLD, SIG_IGN);
