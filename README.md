@@ -45,6 +45,11 @@ We require several tools to check out and build the software, including:
 * [bison](http://www.gnu.org/software/bison) (for datetime parser in certtool)
 * [libunbound](https://unbound.net/) (for DANE support)
 * [abi-compliance-checker](http://ispras.linuxbase.org/index.php/ABI_compliance_checker) (for make dist)
+* [tcsd](http://trousers.sourceforge.net/) (for TPM support; optional)
+* [swtpm](https://github.com/stefanberger/swtpm) (for TPM test; optional)
+* [ncat](https://nmap.org/download.html) (for TPM test; optional)
+* [tpm-tools](http://trousers.sourceforge.net/) (for TPM test; optional)
+* [expect](https://core.tcl.tk/expect/index) (for TPM test; optional)
 
 The required software is typically distributed with your operating
 system, and the instructions for installing them differ.  Here are

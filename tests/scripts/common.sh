@@ -212,3 +212,32 @@ create_testdir() {
 	trap "test -e \"$d\" && rm -rf \"$d\"" 1 15 2
 	echo "$d"
 }
+
+wait_for_file() {
+	local filename="$1"
+	local timeout="$2"
+
+	local loops=$((timeout * 10)) loop=0
+
+	while test $loop -lt $loops; do
+		[ -f "$filename" ] && {
+			#allow file to be written to
+			sleep 0.2
+			return 1
+		}
+		sleep 0.1
+		loop=$((loop+1))
+	done
+	return 0
+}
+
+# Kill a process quietly
+# @1: signal, e.g. -9
+# @2: pid
+kill_quiet() {
+	local sig="$1"
+	local pid="$2"
+
+	sh -c "kill $sig $pid &>/dev/null"
+	return $?
+}
