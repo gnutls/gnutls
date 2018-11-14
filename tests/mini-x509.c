@@ -124,6 +124,9 @@ void start(const char *prio, unsigned expect_max)
 		}
 	}
 
+	assert(gnutls_certificate_type_get(server)==GNUTLS_CRT_X509);
+	assert(gnutls_certificate_type_get(client)==GNUTLS_CRT_X509);
+
 	/* check the number of certificates received and verify */
 	{
 		unsigned cert_list_size = 0;
