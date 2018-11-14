@@ -111,7 +111,7 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 
 	/* Try reading as octet string according to rfc5652. If that fails, attempt
 	 * a raw read according to rfc2315 */
-	result = _gnutls_x509_read_string(c2, "encapContentInfo.eContent", &pkcs7->der_signed_data, ASN1_ETYPE_OCTET_STRING, 0);
+	result = _gnutls_x509_read_string(c2, "encapContentInfo.eContent", &pkcs7->der_signed_data, ASN1_ETYPE_OCTET_STRING, 1);
 	if (result < 0) {
 		result = _gnutls_x509_read_value(c2, "encapContentInfo.eContent", &pkcs7->der_signed_data);
 		if (result < 0) {
@@ -130,7 +130,7 @@ static int _decode_pkcs7_signed_data(gnutls_pkcs7_t pkcs7)
 				goto cleanup;
 			}
 
-			result = asn1_get_length_der(pkcs7->der_signed_data.data+tag_len, pkcs7->der_signed_data.size-tag_len, &len_len);
+			result = asn1_get_length_ber(pkcs7->der_signed_data.data+tag_len, pkcs7->der_signed_data.size-tag_len, &len_len);
 			if (result < 0) {
 				gnutls_assert();
 				result = GNUTLS_E_ASN1_DER_ERROR;
