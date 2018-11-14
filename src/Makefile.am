@@ -55,7 +55,9 @@ BUILT_SOURCES = $(ARGS_BUILT) mech-list.h
 
 DISTCLEANFILES = $(BUILT_SOURCES) $(ARGS_STAMPS)
 
-EXTRA_DIST = gen-mech-list.sh args-bak-upd.sh $(ARGS_BAK)
+EXTRA_DIST = gen-mech-list.sh $(ARGS_BAK)
+
+MAINTAINERCLEANFILES = $(ARGS_BAK)
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -262,89 +264,71 @@ nodist_libcmd_systemkey_la_SOURCES = systemkey-args.c systemkey-args.h
 libcmd_systemkey_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_systemkey_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
+SUFFIXES = .stamp .def .c.bak .h.bak
+
+.def.stamp:
+	$(AM_V_GEN) $(AUTOGEN) $< || { \
+		srcdir=''; \
+		test -f ./$@ || srcdir=$(srcdir)/; \
+		b=`echo $@ | sed 's/.stamp$$//'`; \
+		cp -p $${srcdir}$${b}.c.bak $${b}.c; \
+		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
+	} && \
+	touch $@
+
+.c.c.bak:
+	$(AM_V_GEN) srcdir=''; \
+		test -f ./$@ || srcdir=$(srcdir)/; \
+		test -f $${srcdir}/$@ || cp -p $< $@
+
+.h.h.bak:
+	$(AM_V_GEN) srcdir=''; \
+		test -f ./$@ || srcdir=$(srcdir)/; \
+		test -f $${srcdir}/$@ || cp -p $< $@
+
 danetool-args.h: danetool-args.stamp
 danetool-args.c: danetool-args.stamp
-danetool-args.stamp: $(srcdir)/danetool-args.def args-std.def
-	-$(AUTOGEN) $<
-	touch $@
+danetool-args.stamp: args-std.def
 
 ocsptool-args.h: ocsptool-args.stamp
 ocsptool-args.c: ocsptool-args.stamp
-ocsptool-args.stamp: $(srcdir)/ocsptool-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+ocsptool-args.stamp: args-std.def
 
 tpmtool-args.h: tpmtool-args.stamp
 tpmtool-args.c: tpmtool-args.stamp
-tpmtool-args.stamp: $(srcdir)/tpmtool-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+tpmtool-args.stamp: args-std.def
 
 p11tool-args.h: p11tool-args.stamp
 p11tool-args.c: p11tool-args.stamp
-p11tool-args.stamp: $(srcdir)/p11tool-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+p11tool-args.stamp: args-std.def
 
 psktool-args.h: psktool-args.stamp
 psktool-args.c: psktool-args.stamp
-psktool-args.stamp: $(srcdir)/psktool-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+psktool-args.stamp: args-std.def
 
 cli-debug-args.h: cli-debug-args.stamp
 cli-debug-args.c: cli-debug-args.stamp
-cli-debug-args.stamp: $(srcdir)/cli-debug-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+cli-debug-args.stamp: args-std.def
 
 cli-args.h: cli-args.stamp
 cli-args.c: cli-args.stamp
-cli-args.stamp: $(srcdir)/cli-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+cli-args.stamp: args-std.def
 
 serv-args.h: serv-args.stamp
 serv-args.c: serv-args.stamp
-serv-args.stamp: $(srcdir)/serv-args.def args-std.def
-	-$(AUTOGEN) $<
-	touch $@
+serv-args.stamp: args-std.def
 
 srptool-args.h: srptool-args.stamp
 srptool-args.c: srptool-args.stamp
-srptool-args.stamp: $(srcdir)/srptool-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+srptool-args.stamp: args-std.def
 
 certtool-args.h: certtool-args.stamp
 certtool-args.c: certtool-args.stamp
-certtool-args.stamp: $(srcdir)/certtool-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+certtool-args.stamp: args-std.def
 
 systemkey-args.h: systemkey-args.stamp
 systemkey-args.c: systemkey-args.stamp
-systemkey-args.stamp: $(srcdir)/systemkey-args.def args-std.def
-	-$(AUTOGEN) $<
-	-$(srcdir)/args-bak-upd.sh $@ $(srcdir)
-	touch $@
+systemkey-args.stamp: args-std.def
 
 mech-list.h: gen-mech-list.sh
-	@$(srcdir)/gen-mech-list.sh > mech-list.h.tmp
-	@mv mech-list.h.tmp $@
-
-maintainer-clean-local:
-	rm -f *.stamp mech-list.h
-
-files-update: $(ARGS_STAMPS)
-	@echo "******************************************************************************************"
-	@echo "updated autogen files in src/"
-	@echo "******************************************************************************************"
+	$(AM_V_GEN) $(srcdir)/gen-mech-list.sh > $@.tmp && mv $@.tmp $@

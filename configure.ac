@@ -711,12 +711,13 @@ fi
 AC_DEFINE_UNQUOTED([TROUSERS_LIB], ["$ac_trousers_lib"], [the location of the trousers library])
 AC_SUBST(TROUSERS_LIB)
 
-included_libopts=no
-create_libopts_links=no
-if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
-	AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [:])
+AM_MISSING_PROG([AUTOGEN], [autogen])
 
-	if test x"$AUTOGEN" = "x:"; then
+included_libopts=no
+if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
+	AC_CHECK_PROGS([autogen], [autogen])
+
+	if test -z "$autogen"; then
 		AC_MSG_WARN([[
 ***
 *** autogen not found. Will not link against system libopts.
@@ -727,14 +728,11 @@ if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
 	LIBOPTS_CHECK([src/libopts])
 	if test "$NEED_LIBOPTS_DIR" = "true";then
 		dnl replace libopts-generated files with distributed backups, if present
-		create_libopts_links=yes
-		AC_SUBST([AUTOGEN], [/bin/true])
 		included_libopts=yes
 	fi
 else
 	# Need to ensure the relevant conditionals get set
 	gl_STDNORETURN_H
-	AC_SUBST([AUTOGEN], [/bin/true])
 	AM_CONDITIONAL([INSTALL_LIBOPTS],[false])
 fi
 
@@ -949,15 +947,6 @@ AC_DEFINE([read_binary_file], [_gnutls_read_binary_file], [static lib rename])
 dnl Some variables needed in makefiles
 YEAR=`date +%Y`
 AC_SUBST([YEAR], $YEAR)
-
-for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
-	nam=$(basename $i|sed 's/.bak//g')
-	if test "$create_libopts_links" = "yes";then
-		rm -f "src/$nam.stamp"
-		rm -f "src/$nam"
-		AC_CONFIG_LINKS([src/$nam:$i])
-	fi
-done
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
