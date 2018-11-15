@@ -821,8 +821,8 @@ gnutls_pubkey_export_dsa_raw2(gnutls_pubkey_t key,
  * gnutls_pubkey_export_ecc_raw:
  * @key: Holds the public key
  * @curve: will hold the curve (may be %NULL)
- * @x: will hold x (may be %NULL)
- * @y: will hold y (may be %NULL)
+ * @x: will hold x-coordinate (may be %NULL)
+ * @y: will hold y-coordinate (may be %NULL)
  *
  * This function will export the ECC public key's parameters found in
  * the given key.  The new parameters will be allocated using
@@ -849,8 +849,8 @@ gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
  * gnutls_pubkey_export_ecc_raw2:
  * @key: Holds the public key
  * @curve: will hold the curve (may be %NULL)
- * @x: will hold x (may be %NULL)
- * @y: will hold y (may be %NULL)
+ * @x: will hold x-coordinate (may be %NULL)
+ * @y: will hold y-coordinate (may be %NULL)
  * @flags: flags from %gnutls_abstract_export_flags_t
  *
  * This function will export the ECC public key's parameters found in
@@ -982,8 +982,8 @@ int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
  * @curve: will hold the curve (may be %NULL)
  * @digest: will hold the curve (may be %NULL)
  * @paramset: will hold the parameters id (may be %NULL)
- * @x: will hold x (may be %NULL)
- * @y: will hold y (may be %NULL)
+ * @x: will hold the x-coordinate (may be %NULL)
+ * @y: will hold the y-coordinate (may be %NULL)
  * @flags: flags from %gnutls_abstract_export_flags_t
  *
  * This function will export the GOST public key's parameters found in
@@ -1386,14 +1386,14 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
  * gnutls_pubkey_import_ecc_raw:
  * @key: The structure to store the parsed key
  * @curve: holds the curve
- * @x: holds the x
- * @y: holds the y
+ * @x: holds the x-coordinate
+ * @y: holds the y-coordinate
  *
  * This function will convert the given elliptic curve parameters to a
  * #gnutls_pubkey_t.  The output will be stored in @key.
  *
- * In EdDSA curves the @y parameter will be %NULL and the other parameters
- * will be in the native format for the curve.
+ * In EdDSA curves the @y parameter should be %NULL and the @x parameter must
+ * be the value in the native format for the curve.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1417,6 +1417,12 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 	gnutls_pk_params_init(&key->params);
 
 	if (curve_is_eddsa(curve)) {
+		unsigned size = gnutls_ecc_curve_get_size(curve);
+		if (x->size != size) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
+
 		ret = _gnutls_set_datum(&key->params.raw_pub, x->data, x->size);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1528,8 +1534,8 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
  * @curve: holds the curve
  * @digest: holds the digest
  * @paramset: holds the parameters id
- * @x: holds the x
- * @y: holds the y
+ * @x: holds the x-coordinate
+ * @y: holds the y-coordinate
  *
  * This function will convert the given GOST public key's parameters to a
  * #gnutls_pubkey_t.  The output will be stored in @key.  @digest should be

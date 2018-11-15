@@ -153,7 +153,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime memset0 memset1 \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record handshake-timeout mini-record-range \
-	 mini-cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
+	 cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
 	 fips-test fips-override-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
 	 crlverify mini-dtls-discard init_fds mini-record-failure \

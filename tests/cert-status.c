@@ -45,9 +45,11 @@ int main()
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
+#include <assert.h>
 #include <signal.h>
 
 #include "utils.h"
+#include "cert-common.h"
 
 /* This program tests whether the GNUTLS_CERT_* flags
  * work as expected.
@@ -63,60 +65,14 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-static unsigned char server_cert_pem[] =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
-
-const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
-};
-
-static unsigned char server_key_pem[] =
-    "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
-    "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
-    "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
-    "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
-    "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
-    "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
-    "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
-    "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
-    "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
-    "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
-    "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
-    "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
-    "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
-    "-----END RSA PRIVATE KEY-----\n";
-
-const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
-};
-
-
-/* A very basic TLS client, with anonymous authentication.
- */
-
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	const char *p;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
-	/* Need to enable anonymous KX specifically. */
 
 	global_init();
 
@@ -127,22 +83,16 @@ static void client(int fd)
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
-	/* Initialize TLS session
-	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
 
-	/* Use default priorities */
 	ret =
 	    gnutls_priority_set_direct(session,
-					"NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
-					&p);
+					prio, &p);
 	if (ret < 0) {
 		fail("error in setting priority: %s\n", p);
 		exit(1);
 	}
 
-	/* put the anonymous credentials to the current session
-	 */
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_transport_set_int(session, fd);
@@ -180,10 +130,7 @@ static void client(int fd)
 }
 
 
-/* These are global */
-pid_t child;
-
-static void server(int fd, unsigned status, int expected)
+static void server(int fd, const char *prio, unsigned status, int expected)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -197,12 +144,8 @@ static void server(int fd, unsigned status, int expected)
 
 	gnutls_init(&session, GNUTLS_SERVER);
 
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
-				   NULL);
+	assert(gnutls_priority_set_direct(session,
+					  prio, NULL)>=0);
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);
@@ -227,7 +170,7 @@ static void server(int fd, unsigned status, int expected)
 	if (ret == expected) {
 		if (debug)
 			success
-			    ("server: Handshake finished as expected\n");
+			    ("server: Handshake finished as expected (%d)\n", ret);
 		goto finish;
 	} else {
 		fail("expected %d, handshake returned %d\n", expected,
@@ -253,10 +196,14 @@ static void server(int fd, unsigned status, int expected)
 		success("server: finished\n");
 }
 
-static void start(unsigned status, int expected)
+static void start(const char *prio, unsigned status, int expected)
 {
 	int fd[2];
 	int ret;
+	pid_t child;
+	int pstatus = 0;
+
+	success("testing: %s (%d,%d)\n", prio, status, expected);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -274,33 +221,42 @@ static void start(unsigned status, int expected)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0], status, expected);
-		waitpid(-1, NULL, 0);
-		//kill(child, SIGTERM);
+		server(fd[0], prio, status, expected);
+		waitpid(-1, &pstatus, 0);
+		check_wait_status_for_sig(pstatus);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], prio);
 		exit(0);
 	}
 }
 
 static void ch_handler(int sig)
 {
-	int status = 0;
-
-	waitpid(-1, &status, 0);
-	check_wait_status_for_sig(status);
 	return;
 }
+
 
 void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
 
-	start(GNUTLS_CERT_IGNORE, 0);
-	start(GNUTLS_CERT_REQUEST, 0);
-	start(GNUTLS_CERT_REQUIRE, GNUTLS_E_NO_CERTIFICATE_FOUND);
+	start("NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA", GNUTLS_CERT_IGNORE, 0);
+	start("NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA", GNUTLS_CERT_REQUEST, 0);
+	start("NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA", GNUTLS_CERT_REQUIRE, GNUTLS_E_NO_CERTIFICATE_FOUND);
+
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", GNUTLS_CERT_IGNORE, 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", GNUTLS_CERT_REQUEST, 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2", GNUTLS_CERT_REQUIRE, GNUTLS_E_NO_CERTIFICATE_FOUND);
+
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_CERT_IGNORE, 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_CERT_REQUEST, 0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3", GNUTLS_CERT_REQUIRE, GNUTLS_E_NO_CERTIFICATE_FOUND);
+
+	start("NORMAL", GNUTLS_CERT_IGNORE, 0);
+	start("NORMAL", GNUTLS_CERT_REQUEST, 0);
+	start("NORMAL", GNUTLS_CERT_REQUIRE, GNUTLS_E_NO_CERTIFICATE_FOUND);
 }
 
 #endif				/* _WIN32 */

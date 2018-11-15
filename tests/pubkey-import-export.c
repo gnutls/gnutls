@@ -276,6 +276,11 @@ int check_pubkey_import_export(void)
 	if (ret < 0)
 		fail("error\n");
 
+	/* test whether an invalid size would fail */
+	ret = gnutls_pubkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519, &_rsa_m, NULL);
+	if (ret != GNUTLS_E_INVALID_REQUEST)
+		fail("error\n");
+
 	ret = gnutls_pubkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519, &_ed25519_x, NULL);
 	if (ret < 0)
 		fail("error\n");

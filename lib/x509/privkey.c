@@ -1082,8 +1082,8 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
  * gnutls_x509_privkey_import_ecc_raw:
  * @key: The data to store the parsed key
  * @curve: holds the curve
- * @x: holds the x
- * @y: holds the y
+ * @x: holds the x-coordinate
+ * @y: holds the y-coordinate
  * @k: holds the k
  *
  * This function will convert the given elliptic curve parameters to the
@@ -1115,7 +1115,14 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 	key->params.curve = curve;
 
 	if (curve_is_eddsa(curve)) {
+		unsigned size;
 		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
+
+		size = gnutls_ecc_curve_get_size(curve);
+		if (x->size != size || k->size != size) {
+			ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+			goto cleanup;
+		}
 
 		ret = _gnutls_set_datum(&key->params.raw_pub, x->data, x->size);
 		if (ret < 0) {
@@ -1188,9 +1195,9 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
  * @curve: holds the curve
  * @digest: will hold the digest
  * @paramset: will hold the GOST parameter set ID
- * @x: holds the x
- * @y: holds the y
- * @k: holds the k
+ * @x: holds the x-coordinate
+ * @y: holds the y-coordinate
+ * @k: holds the k (private key)
  *
  * This function will convert the given GOST private key's parameters to the
  * native #gnutls_x509_privkey_t format.  The output will be stored
@@ -1525,8 +1532,8 @@ gnutls_sec_param_t gnutls_x509_privkey_sec_param(gnutls_x509_privkey_t key)
  * gnutls_x509_privkey_export_ecc_raw:
  * @key: a key
  * @curve: will hold the curve
- * @x: will hold the x coordinate
- * @y: will hold the y coordinate
+ * @x: will hold the x-coordinate
+ * @y: will hold the y-coordinate
  * @k: will hold the private key
  *
  * This function will export the ECC private key's parameters found
@@ -1542,10 +1549,10 @@ gnutls_sec_param_t gnutls_x509_privkey_sec_param(gnutls_x509_privkey_t key)
  * Since: 3.0
  **/
 int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
-				       gnutls_ecc_curve_t * curve,
-				       gnutls_datum_t * x,
-				       gnutls_datum_t * y,
-				       gnutls_datum_t * k)
+				       gnutls_ecc_curve_t *curve,
+				       gnutls_datum_t *x,
+				       gnutls_datum_t *y,
+				       gnutls_datum_t *k)
 {
 	if (key == NULL) {
 		gnutls_assert();
@@ -1561,8 +1568,8 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
  * @curve: will hold the curve
  * @digest: will hold the digest
  * @paramset: will hold the GOST parameter set ID
- * @x: will hold the x coordinate
- * @y: will hold the y coordinate
+ * @x: will hold the x-coordinate
+ * @y: will hold the y-coordinate
  * @k: will hold the private key
  *
  * This function will export the GOST private key's parameters found

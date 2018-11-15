@@ -191,8 +191,8 @@ int ret;
  * gnutls_privkey_export_ecc_raw:
  * @key: Holds the public key
  * @curve: will hold the curve
- * @x: will hold the x coordinate
- * @y: will hold the y coordinate
+ * @x: will hold the x-coordinate
+ * @y: will hold the y-coordinate
  * @k: will hold the private key
  *
  * This function will export the ECC private key's parameters found
@@ -220,8 +220,8 @@ gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
  * gnutls_privkey_export_ecc_raw2:
  * @key: Holds the public key
  * @curve: will hold the curve
- * @x: will hold the x coordinate
- * @y: will hold the y coordinate
+ * @x: will hold the x-coordinate
+ * @y: will hold the y-coordinate
  * @k: will hold the private key
  * @flags: flags from %gnutls_abstract_export_flags_t
  *
@@ -271,8 +271,8 @@ int ret;
  * @curve: will hold the curve
  * @digest: will hold the digest
  * @paramset: will hold the GOST parameter set ID
- * @x: will hold the x coordinate
- * @y: will hold the y coordinate
+ * @x: will hold the x-coordinate
+ * @y: will hold the y-coordinate
  * @k: will hold the private key
  * @flags: flags from %gnutls_abstract_export_flags_t
  *
@@ -429,16 +429,16 @@ error:
  * gnutls_privkey_import_ecc_raw:
  * @key: The key
  * @curve: holds the curve
- * @x: holds the x
- * @y: holds the y
- * @k: holds the k
+ * @x: holds the x-coordinate
+ * @y: holds the y-coordinate
+ * @k: holds the k (private key)
  *
  * This function will convert the given elliptic curve parameters to the
  * native #gnutls_privkey_t format.  The output will be stored
  * in @key.
  *
- * In EdDSA curves the @y parameter should be %NULL and the @x parameter must
- * be the value in the native format for the curve.
+ * In EdDSA curves the @y parameter should be %NULL and the @x and @k parameters
+ * must be in the native format for the curve.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -484,9 +484,9 @@ error:
  * @curve: holds the curve
  * @digest: holds the digest
  * @paramset: holds the GOST parameter set ID
- * @x: holds the x
- * @y: holds the y
- * @k: holds the k
+ * @x: holds the x-coordinate
+ * @y: holds the y-coordinate
+ * @k: holds the k (private key)
  *
  * This function will convert the given GOST private key's parameters to the
  * native #gnutls_privkey_t format.  The output will be stored
