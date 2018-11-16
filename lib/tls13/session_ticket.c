@@ -388,12 +388,10 @@ static int parse_nst_extension(void *ctx, unsigned tls_id, const unsigned char *
 {
 	gnutls_session_t session = ctx;
 	if (tls_id == ext_mod_early_data.tls_id) {
-		uint32_t size;
 		if (data_size < 4)
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
-		size = _gnutls_read_uint32(data);
-		if (size < session->security_parameters.max_early_data_size)
-			session->security_parameters.max_early_data_size = size;
+		session->security_parameters.max_early_data_size =
+			_gnutls_read_uint32(data);
 	}
 	return 0;
 }
