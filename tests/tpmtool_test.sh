@@ -243,10 +243,10 @@ setup_tcsd()
 run_tpmtool()
 {
 	local srk_password="$1"
+	local key_password="$2"
 
-	shift 1
+	shift 2
 
-	local key_password="" # never used with --register
 	local prg out rc
 
 	prg="spawn $TPMTOOL $@
@@ -278,11 +278,14 @@ tpmtool_test()
 	local workdir="$1"
 	local owner_password="$2"
 	local srk_password="$3"
+	local key_password="$4"
+	local register=$5  # whether to --register the key
 
 	local params msg tpmkeyurl
 	local tpmpubkey=${workdir}/tpmpubkey.pem
 	local tpmca=${workdir}/tpmca.pem
 	local template=${workdir}/template
+	local tpmkey=${workdir}/tpmkey.pem # if --register is not used
 
 	setup_tcsd "$workdir" "$owner_password" "$srk_password"
 	[ $? -ne 0 ] && return 1
@@ -294,29 +297,43 @@ tpmtool_test()
 		export GNUTLS_PIN="$srk_password"
 	fi
 
-	msg="$(run_tpmtool "${srk_password}" \
-		${params} --generate-rsa --register --signing)"
-	[ $? -ne 0 ] && {
-		echo "Could not create TPM signing key"
-		echo "$msg"
-		return 1
-	}
-	tpmkeyurl=$(echo "${msg}" | sed -n 's/\(tpmkey:uuid=[^;]*\);.*/\1/p')
-	[ -z "$tpmkeyurl" ] && {
-		echo "Could not get TPM key URL"
-		return 1
-	}
+	if [ $register -ne 0 ]; then
+		# --register key
+		msg="$(run_tpmtool "$srk_password" "$key_password" \
+			$params --register --generate-rsa --signing)"
+		[ $? -ne 0 ] && {
+			echo "Could not create TPM signing key"
+			echo "$msg"
+			return 1
+		}
+		tpmkeyurl=$(echo "$msg" | sed -n 's/\(tpmkey:uuid=[^;]*\);.*/\1/p')
+		[ -z "$tpmkeyurl" ] && {
+			echo "Could not get TPM key URL"
+			return 1
+		}
+	else
+		msg="$(run_tpmtool "$srk_password" "$key_password" \
+			$params --generate-rsa --signing --outfile ${tpmkey})"
+		[ $? -ne 0 ] && {
+			echo "Could not create TPM signing key"
+			echo "$msg"
+			return 1
+		}
+		tpmkeyurl="tpmkey:file=${tpmkey}"
+	fi
 
-	msg=$(run_tpmtool "${srk_password}" \
-		${params} --test-sign ${tpmkeyurl})
-	[ $? -ne 0 ] && {
-		echo "Could not test sign with key ${tpmkeyurl}"
-		echo "$msg"
-		return 1
-	}
+	if [ $register -ne 0 ]; then
+		msg=$(run_tpmtool "$srk_password" "$key_password" \
+			$params --test-sign $tpmkeyurl)
+		[ $? -ne 0 ] && {
+			echo "Could not test sign with key $tpmkeyurl"
+			echo "$msg"
+			return 1
+		}
+	fi
 
-	msg=$(run_tpmtool "${srk_password}" \
-		${params} --pubkey=${tpmkeyurl} --outfile "${tpmpubkey}")
+	msg=$(run_tpmtool "$srk_password" "$key_password" \
+		$params --pubkey "$tpmkeyurl" --outfile "$tpmpubkey")
 	[ $? -ne 0 ] && {
 		echo "Could not get TPM key's public key"
 		echo "$msg"
@@ -344,22 +361,24 @@ _EOF_
 
 	echo "Successfully created TPM root CA cert using key $tpmkeyurl"
 
-	if [ -z "$($TPMTOOL --list | grep "${tpmkeyurl}")" ]; then
-		echo "TPM key '${tpmkeyurl}' was not found in list of TPM keys"
-		return 1
-	fi
+	if [ $register -ne 0 ]; then
+		if [ -z "$($TPMTOOL --list | grep "${tpmkeyurl}")" ]; then
+			echo "TPM key '${tpmkeyurl}' was not found in list of TPM keys"
+			return 1
+		fi
 
-	msg=$(run_tpmtool "${srk_password}" \
-		${params} --delete ${tpmkeyurl})
-	[ $? -ne 0 ] && {
-		echo "Could not delete TPM key ${tpmkeyurl}"
-		echo "$msg"
-		return 1
-	}
+		msg=$(run_tpmtool "$srk_password" "$key_password" \
+			$params --delete $tpmkeyurl)
+		[ $? -ne 0 ] && {
+			echo "Could not delete TPM key ${tpmkeyurl}"
+			echo "$msg"
+			return 1
+		}
 
-	if [ -n "$($TPMTOOL --list | grep "${tpmkeyurl}")" ]; then
-		echo "TPM key '${tpmkeyurl}' was not properly deleted"
-		return 1
+		if [ -n "$($TPMTOOL --list | grep "$tpmkeyurl")" ]; then
+			echo "TPM key '$tpmkeyurl' was not properly deleted"
+			return 1
+		fi
 	fi
 
 	stop_tcsd
@@ -373,11 +392,25 @@ run_tests()
 		echo "No workdir"
 		return 1
 	}
-	local srk_password
+	local srk_password key_password
 	local owner_password="owner"
+	local register
 
+	register=1
+	# Test with --register; key password is not needed
 	for srk_password in "" "s"; do
-		tpmtool_test "$workdir" "$owner_password" "$srk_password"
+		tpmtool_test "$workdir" "$owner_password" "$srk_password" "" "$register"
+		[ $? -ne 0 ] && return 1
+		stop_tcsd
+		rm ${workdir}/*
+	done
+
+	# Test without --register; the key needs a password, but it has to be the same as the
+	# srk_password due to a bug in TrouSerS
+	register=0
+	for srk_password in "s"; do
+		key_password=$srk_password
+		tpmtool_test "$workdir" "$owner_password" "$srk_password" "$key_password" "$register"
 		[ $? -ne 0 ] && return 1
 		stop_tcsd
 		rm ${workdir}/*
