@@ -55,9 +55,9 @@ doc-dist.Fedora:
   - tags
   retry: 1
 
-abi/coverage.Debian:
+abi/coverage:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - SUBMODULE_NOFETCH=1 ./bootstrap
   - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc
