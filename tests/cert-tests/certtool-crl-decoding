@@ -24,7 +24,6 @@
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
 OUTFILE="crl.$$.pem"
 
 if ! test -x "${CERTTOOL}"; then
@@ -35,21 +34,21 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=3"
 fi
 
+. "${srcdir}/../scripts/common.sh"
+
 # crl-demo1.pem: version 2 CRL with a single extension
 # crl-demo2.pem: version 2 CRL with two extensions (one critical)
 # crl-demo3.pem: version 1 CRL with many revoked certificates
 
 for i in "crl-demo1.pem" "crl-demo2.pem" "crl-demo3.pem";do
 ${VALGRIND} "${CERTTOOL}" --crl-info --infile "${srcdir}/data/$i" >$OUTFILE
-rc=$?
-
-if test "${rc}" != 0;then
+if test $? != 0; then
 	echo "Could not read CRL $i"
 	exit 1
 fi
 
-$DIFF -I 'warning:' ${OUTFILE} "${srcdir}/data/$i"
-if test $? != 0;then
+check_if_equal ${OUTFILE} "${srcdir}/data/$i" "warning:"
+if test $? != 0; then
 	echo "Error in parsing cert with long OIDs"
 	exit 1
 fi
