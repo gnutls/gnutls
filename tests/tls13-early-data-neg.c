@@ -46,6 +46,7 @@ int main(void)
 #include <gnutls/crypto.h>
 #include <gnutls/dtls.h>
 #include <signal.h>
+#include <sys/wait.h>
 #include <assert.h>
 
 #include "cert-common.h"
@@ -65,9 +66,6 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-
-/* A very basic TLS client.
- */
 
 #define SESSIONS 3
 #define MAX_BUF 1024
@@ -94,6 +92,32 @@ gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 	return 0;
 }
 
+gnutls_datum_t client_hello_msg = {NULL, 0};
+
+static int handshake_callback(gnutls_session_t session, unsigned int htype,
+	unsigned post, unsigned int incoming, const gnutls_datum_t *msg)
+{
+	assert(client_hello_msg.data == NULL);
+
+	client_hello_msg.data = gnutls_malloc(msg->size+9);
+	assert(client_hello_msg.data != NULL);
+	client_hello_msg.size = msg->size+9;
+	memcpy(client_hello_msg.data+9, msg->data, msg->size);
+	/* reconstruct record header */
+	client_hello_msg.data[0] = 22;
+	client_hello_msg.data[1] = 3;
+	client_hello_msg.data[2] = 3;
+	client_hello_msg.data[3] = (msg->size+4) >> 8;
+	client_hello_msg.data[4] = (msg->size+4);
+
+	client_hello_msg.data[5] = GNUTLS_HANDSHAKE_CLIENT_HELLO;
+	client_hello_msg.data[6] = 0;
+	client_hello_msg.data[7] = msg->size >> 8;
+	client_hello_msg.data[8] = msg->size;
+
+	return 0;
+}
+
 static void client(int sds[])
 {
 	int ret;
@@ -115,7 +139,7 @@ static void client(int sds[])
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 
-	for (t = 0; t < SESSIONS; t++) {
+	for (t = 0; t < SESSIONS-1; t++) {
 		int sd = sds[t];
 
 		assert(gnutls_init(&session, GNUTLS_CLIENT)>=0);
@@ -129,6 +153,10 @@ static void client(int sds[])
 			assert(gnutls_session_set_data(session, session_data.data, session_data.size) >= 0);
 			assert(gnutls_record_send_early_data(session, EARLY_MSG, sizeof(EARLY_MSG)) >= 0);
 			assert(gnutls_handshake_set_random(session, &hrnd) >= 0);
+
+			gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_CLIENT_HELLO,
+							   GNUTLS_HOOK_POST,
+							   handshake_callback);
 		}
 
 		/* Perform the TLS handshake
@@ -185,7 +213,13 @@ static void client(int sds[])
 		gnutls_deinit(session);
 	}
 
+	assert(client_hello_msg.data != NULL);
+
+	ret = send(sds[SESSIONS-1], client_hello_msg.data, client_hello_msg.size, 0);
+	assert(ret == (int)client_hello_msg.size);
+
  end:
+	gnutls_free(client_hello_msg.data);
 	gnutls_free(session_data.data);
 	gnutls_certificate_free_credentials(x509_cred);
 }
@@ -274,12 +308,13 @@ static void server(int sds[])
 	ret = gnutls_anti_replay_init(&anti_replay);
 	if (ret < 0)
 		fail("server: failed to initialize anti-replay\n");
-
 	gnutls_anti_replay_set_add_function(anti_replay, storage_add);
 	gnutls_anti_replay_set_ptr(anti_replay, &storage);
 
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
+
+		success("=== session %d ===\n", t);
 
 		assert(gnutls_init(&session, GNUTLS_SERVER|GNUTLS_ENABLE_EARLY_DATA)>=0);
 
@@ -296,13 +331,25 @@ static void server(int sds[])
 
 		do {
 			ret = gnutls_handshake(session);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
+		if (t == SESSIONS-1) {
+			/* duplicate data expected */
+			if (ret < 0 && !(gnutls_session_get_flags(session) & GNUTLS_SFLAGS_EARLY_DATA)) {
+				success("we detected the duplicate data!\n");
+				close(sd);
+				gnutls_deinit(session);
+				goto cleanup;
+			} else {
+				fail("server: duplicate early data was not detected (%d)\n", t);
+			}
 		}
-		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
-			fail("server: Handshake has failed (%s)\n\n",
-			     gnutls_strerror(ret));
+			fail("server[%d]: Handshake has failed (%s)\n\n",
+			     t, gnutls_strerror(ret));
 			return;
 		}
 		if (debug)
@@ -343,9 +390,6 @@ static void server(int sds[])
 			}
 		}
 
-		/* see the Getting peer's information example */
-		/* print_info(session); */
-
 		for (;;) {
 			memset(buffer, 0, MAX_BUF + 1);
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
@@ -375,6 +419,7 @@ static void server(int sds[])
 		gnutls_deinit(session);
 	}
 
+ cleanup:
 	gnutls_anti_replay_deinit(anti_replay);
 
 	storage_clear(&storage);
@@ -390,7 +435,7 @@ static void server(int sds[])
 void doit(void)
 {
 	int client_sds[SESSIONS], server_sds[SESSIONS];
-	int i;
+	int i, status = 0;
 	int ret;
 
 	signal(SIGCHLD, SIG_IGN);
@@ -421,7 +466,8 @@ void doit(void)
 		for (i = 0; i < SESSIONS; i++)
 			close(client_sds[i]);
 		server(server_sds);
-		kill(child, SIGTERM);
+		wait(&status);
+		check_wait_status(status);
 	} else {
 		for (i = 0; i < SESSIONS; i++)
 			close(server_sds[i]);

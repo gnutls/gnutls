@@ -39,8 +39,8 @@ GNUTLS_MAC_AES_CMAC_256: Added
 gnutls_record_get_max_early_data_size: Added
 gnutls_record_send_early_data: Added
 gnutls_record_recv_early_data: Added
-gnutls_db_entry_is_expired: Added
-gnutls_db_set_add_function: Added
+gnutls_db_check_entry_expire_time: Added
+gnutls_anti_replay_set_add_function: Added
 gnutls_anti_replay_init: Added
 gnutls_anti_replay_deinit: Added
 gnutls_anti_replay_set_window: Added

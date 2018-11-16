@@ -1783,8 +1783,6 @@ typedef int (*gnutls_db_store_func) (void *, gnutls_datum_t key,
 				     gnutls_datum_t data);
 typedef int (*gnutls_db_remove_func) (void *, gnutls_datum_t key);
 typedef gnutls_datum_t(*gnutls_db_retr_func) (void *, gnutls_datum_t key);
-typedef int (*gnutls_db_add_func) (void *, gnutls_datum_t key,
-				   gnutls_datum_t data);
 
 void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds);
 unsigned gnutls_db_get_default_cache_expiration(void);
@@ -1796,8 +1794,6 @@ void gnutls_db_set_remove_function(gnutls_session_t session,
 				   gnutls_db_remove_func rem_func);
 void gnutls_db_set_store_function(gnutls_session_t session,
 				  gnutls_db_store_func store_func);
-void gnutls_db_set_add_function(gnutls_session_t session,
-				gnutls_db_add_func add_func);
 void gnutls_db_set_ptr(gnutls_session_t session, void *ptr);
 void *gnutls_db_get_ptr(gnutls_session_t session);
 int gnutls_db_check_entry(gnutls_session_t session,
@@ -3001,6 +2997,15 @@ void gnutls_anti_replay_set_window(gnutls_anti_replay_t anti_replay,
 				   unsigned int window);
 void gnutls_anti_replay_enable(gnutls_session_t session,
 			       gnutls_anti_replay_t anti_replay);
+
+typedef int (*gnutls_db_add_func) (void *, time_t exp_time, const gnutls_datum_t *key,
+				   const gnutls_datum_t *data);
+
+void gnutls_anti_replay_set_add_function(gnutls_anti_replay_t,
+					 gnutls_db_add_func add_func);
+
+void gnutls_anti_replay_set_ptr(gnutls_anti_replay_t, void *ptr);
+
 
 /* FIPS140-2 related functions */
 unsigned gnutls_fips140_mode_enabled(void);

@@ -1255,7 +1255,8 @@ GNUTLS_3_6_5
 	gnutls_record_send_early_data;
 	gnutls_record_recv_early_data;
 	gnutls_db_check_entry_expire_time;
-	gnutls_db_set_add_function;
+	gnutls_anti_replay_set_add_function;
+	gnutls_anti_replay_set_ptr;
 	gnutls_anti_replay_init;
 	gnutls_anti_replay_deinit;
 	gnutls_anti_replay_set_window;

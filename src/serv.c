@@ -126,8 +126,8 @@ static int wrap_db_store(void *dbf, gnutls_datum_t key,
 			 gnutls_datum_t data);
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key);
 static int wrap_db_delete(void *dbf, gnutls_datum_t key);
-static int wrap_db_add(void *dbf, gnutls_datum_t key,
-		       gnutls_datum_t data);
+static int anti_replay_db_add(void *dbf, time_t exp, const gnutls_datum_t *key,
+			      const gnutls_datum_t *data);
 
 static void cmd_parser(int argc, char **argv);
 
@@ -401,7 +401,6 @@ gnutls_session_t initialize_session(int dtls)
 		gnutls_db_set_retrieve_function(session, wrap_db_fetch);
 		gnutls_db_set_remove_function(session, wrap_db_delete);
 		gnutls_db_set_store_function(session, wrap_db_store);
-		gnutls_db_set_add_function(session, wrap_db_add);
 		gnutls_db_set_ptr(session, NULL);
 	}
 
@@ -1270,6 +1269,8 @@ int main(int argc, char **argv)
 			fprintf(stderr, "Error while initializing anti-replay: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+		gnutls_anti_replay_set_add_function(anti_replay, anti_replay_db_add);
+		gnutls_anti_replay_set_ptr(anti_replay, NULL);
 	}
 
 	if (HAVE_OPT(MTU))
@@ -1897,19 +1898,19 @@ static int wrap_db_delete(void *dbf, gnutls_datum_t key)
 }
 
 static int
-wrap_db_add(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
+anti_replay_db_add(void *dbf, time_t exp, const gnutls_datum_t *key, const gnutls_datum_t *data)
 {
 	time_t now = time(0);
 	int i;
 
 	for (i = 0; i < cache_db_ptr; i++) {
-		if (key.size == cache_db[i].session_id_size &&
-		    memcmp(key.data, cache_db[i].session_id,
-			   key.size) == 0 &&
+		if (key->size == cache_db[i].session_id_size &&
+		    memcmp(key->data, cache_db[i].session_id,
+			   key->size) == 0 &&
 		    now < gnutls_db_check_entry_expire_time(&cache_db[i].
 							    session_data))
 			return GNUTLS_E_DB_ENTRY_EXISTS;
 	}
 
-	return wrap_db_store(dbf, key, data);
+	return wrap_db_store(dbf, *key, *data);
 }

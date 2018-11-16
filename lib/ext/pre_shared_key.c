@@ -621,7 +621,7 @@ static int server_recv_params(gnutls_session_t session,
 	} else {
 		if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED) {
 			if (session->internals.anti_replay) {
-				ret = _gnutls_anti_replay_check(session,
+				ret = _gnutls_anti_replay_check(session->internals.anti_replay,
 								ticket_age,
 								&ticket_creation_time,
 								&binder_recvd);

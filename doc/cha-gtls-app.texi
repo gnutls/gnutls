@@ -980,7 +980,8 @@ The anti-replay mechanism shall be globally initialized with
 
 The server must also set up a database back-end to store ClientHello
 messages.  That can be achieved using
-@funcref{gnutls_db_set_add_function} (see @ref{Session resumption}).
+@funcref{gnutls_anti_replay_set_add_function} and
+@funcref{gnutls_anti_replay_set_ptr}.
 
 Note that, if the back-end stores arbitrary number of ClientHello, it
 needs to periodically clean up the stored entries based on the time
@@ -1028,15 +1029,15 @@ int main()
    */
   gnutls_anti_replay_init(&anti_replay);
 
+  /* Set the database back-end function for the anti-replay data. */
+  gnutls_anti_replay_set_add_function(anti_replay, db_add_func);
+  gnutls_anti_replay_set_ptr(anti_replay, NULL);
+
   ...
 
   gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ENABLE_EARLY_DATA);
   gnutls_record_set_max_early_data_size(server, MAX_EARLY_DATA_SIZE);
-  ...
 
-  /* Set the database back-end function for the session.
-   */
-  gnutls_db_set_add_function(server, db_add_func);
   ...
 
   /* Set the anti-replay measure to the session.
@@ -1850,7 +1851,7 @@ A storing server needs to specify callback functions to store, retrieve and dele
 registered with the functions below. The stored sessions in the database can be checked using @funcref{gnutls_db_check_entry}
 for expiration.
 
-@showfuncE{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function,gnutls_db_set_add_function}
+@showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
 @showfuncA{gnutls_db_check_entry}
 
 A server supporting session tickets must generate ticket encryption
