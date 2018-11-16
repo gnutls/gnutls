@@ -48,21 +48,6 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d> %s", level, str);
 }
 
-/* sha1 hash of "hello" string */
-const gnutls_datum_t sha1_hash_data = {
-	(void *)
-	    "\xaa\xf4\xc6\x1d\xdc\xc5\xe8\xa2\xda\xbe"
-	    "\xde\x0f\x3b\x48\x2c\xd9\xae\xa9\x43\x4d",
-	20
-};
-
-const gnutls_datum_t sha256_hash_data = {
-	(void *)
-	    "\x2c\xf2\x4d\xba\x5f\xb0\xa3\x0e\x26\xe8\x3b\x2a\xc5\xb9\xe2\x9e"
-	    "\x1b\x16\x1e\x5c\x1f\xa7\x42\x5e\x73\x04\x33\x62\x93\x8b\x98\x24",
-	32
-};
-
 const gnutls_datum_t raw_data = {
 	(void *) "hello",
 	5
@@ -232,9 +217,7 @@ void try_with_key(const char *name, const char *client_prio,
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				s_xcred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
-				   NULL);
+	assert(gnutls_priority_set_direct(server, "NORMAL", NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -406,13 +389,53 @@ static const test_st tests[] = {
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
 	},
-	{.name = "ed25519 cert, ed25519 key", /* we expect the server to refuse negotiating */
+	{.name = "ed25519 cert, ed25519 key",
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_eddsa_cert,
 	 .key = &server_ca3_eddsa_key,
 	 .sig = GNUTLS_SIGN_EDDSA_ED25519,
 	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA,
+	},
+	{.name = "tls1.3 ecc key",
+	 .pk = GNUTLS_PK_ECDSA,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+	 .cert = &server_ca3_localhost_ecc_cert,
+	 .key = &server_ca3_ecc_key,
+	 .sig = GNUTLS_SIGN_ECDSA_SECP256R1_SHA256,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA
+	},
+	{.name = "tls1.3 rsa-sign key",
+	 .pk = GNUTLS_PK_RSA,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+	 .cert = &server_ca3_localhost_cert,
+	 .key = &server_ca3_key,
+	 .sig = GNUTLS_SIGN_RSA_PSS_RSAE_SHA256,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA
+	},
+	{.name = "tls1.3 rsa-pss-sign key",
+	 .pk = GNUTLS_PK_RSA_PSS,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+	 .cert = &server_ca3_rsa_pss2_cert,
+	 .key = &server_ca3_rsa_pss2_key,
+	 .sig = GNUTLS_SIGN_RSA_PSS_SHA256,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
+	},
+	{.name = "tls1.3 rsa-pss cert, rsa-sign key", /* we expect the server to refuse negotiating */
+	 .pk = GNUTLS_PK_RSA,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+	 .cert = &server_ca3_rsa_pss_cert,
+	 .key = &server_ca3_rsa_pss_key,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
+	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
+	},
+	{.name = "tls1.3 ed25519 cert, ed25519 key",
+	 .pk = GNUTLS_PK_EDDSA_ED25519,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+	 .cert = &server_ca3_eddsa_cert,
+	 .key = &server_ca3_eddsa_key,
+	 .sig = GNUTLS_SIGN_EDDSA_ED25519,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	}
 };
 
