@@ -29,6 +29,9 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for TLS 1.3 zero round-trip (0-RTT) mode (#127)
 
+** libgnutls: Added support for GOST key unmasking and unwrapped GOST private
+   keys parsing, as specified in R 50.1.112-2016.
+
 ** API and ABI modifications:
 GNUTLS_AUTO_REAUTH: Added
 GNUTLS_CIPHER_AES_128_CFB8: Added

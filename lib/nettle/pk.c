@@ -2753,6 +2753,9 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 			return gnutls_assert_val
 				(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
+		if (ecc_bit_size(curve) < _gnutls_mpi_get_nbits(params->params[GOST_K]))
+			gostdsa_unmask_key(curve, TOMPZ(params->params[GOST_K]));
+
 		ret = _gost_params_to_privkey(params, &priv, curve);
 		if (ret < 0) {
 			return gnutls_assert_val(ret);
