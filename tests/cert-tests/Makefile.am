@@ -162,5 +162,9 @@ else
 TESTS_ENVIRONMENT += ENABLE_GOST=0
 endif
 
+if DISABLE_BASH_TESTS
+TESTS_ENVIRONMENT += DISABLE_BASH_TESTS=1
+endif
+
 distclean-local:
 	rm -rf tmp-* *.tmp
