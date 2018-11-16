@@ -993,36 +993,40 @@ print_rsa_pkey(FILE * outfile, gnutls_datum_t * m, gnutls_datum_t * e,
 	}
 }
 
-void _pubkey_info(FILE * outfile,
-		  gnutls_certificate_print_formats_t format,
-		  gnutls_pubkey_t pubkey)
+void print_pubkey_info(gnutls_pubkey_t pubkey,
+		       FILE *outfile,
+		       gnutls_certificate_print_formats_t format,
+		       gnutls_x509_crt_fmt_t outcert_format,
+		       unsigned int outtext)
 {
 	gnutls_datum_t data;
 	int ret;
 	size_t size;
 
-	fix_lbuffer(0);
+	if (outtext) {
+		ret = gnutls_pubkey_print(pubkey, format, &data);
+		if (ret < 0) {
+			fprintf(stderr, "pubkey_print error: %s\n",
+				gnutls_strerror(ret));
+			app_exit(1);
+		}
 
-	ret = gnutls_pubkey_print(pubkey, format, &data);
-	if (ret < 0) {
-		fprintf(stderr, "pubkey_print error: %s\n",
-			gnutls_strerror(ret));
-		app_exit(1);
+		fprintf(outfile, "%s\n\n", data.data);
+		gnutls_free(data.data);
 	}
 
-	fprintf(outfile, "%s\n", data.data);
-	gnutls_free(data.data);
+	fix_lbuffer(0);
 
 	size = lbuffer_size;
 	ret =
-	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_PEM, lbuffer,
+	    gnutls_pubkey_export(pubkey, outcert_format, lbuffer,
 				 &size);
 	if (ret < 0) {
 		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
 		app_exit(1);
 	}
 
-	fprintf(outfile, "\n%s\n", lbuffer);
+	fwrite(lbuffer, 1, size, outfile);
 }
 
 static void
@@ -1114,7 +1118,7 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 		app_exit(1);
 	}
 
-	if (ci->outcert_format == GNUTLS_X509_FMT_PEM)
+	if (ci->outtext)
 		print_dh_info(outfile, &p, &g, q_bits, ci->cprint);
 
 	if (!ci->cprint) {	/* generate a PKCS#3 structure */
@@ -1378,7 +1382,7 @@ print_private_key(FILE *outfile, common_info_st * cinfo, gnutls_x509_privkey_t k
 
 	/* Only print private key parameters when an unencrypted
 	 * format is used */
-	if (cinfo->outcert_format == GNUTLS_X509_FMT_PEM)
+	if (cinfo->outtext)
 		privkey_info_int(outfile, cinfo, key);
 
 	switch_to_pkcs8_when_needed(cinfo, key, gnutls_x509_privkey_get_pk_algorithm(key));
@@ -1568,7 +1572,7 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 #endif
 	}
 
-	if (info->outcert_format == GNUTLS_X509_FMT_PEM)
+	if (info->outtext)
 		print_dh_info(outfile, &p, &g, q_bits, info->cprint);
 
 	if (!info->cprint) {	/* generate a PKCS#3 structure */
