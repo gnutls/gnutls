@@ -408,8 +408,16 @@ gnutls_session_t initialize_session(int dtls)
 		gnutls_session_ticket_enable_server(session,
 						    &session_ticket_key);
 
-	if (earlydata)
+	if (earlydata) {
 		gnutls_anti_replay_enable(session, anti_replay);
+		if (HAVE_OPT(MAXEARLYDATA)) {
+			ret = gnutls_record_set_max_early_data_size(session, OPT_VALUE_MAXEARLYDATA);
+			if (ret < 0) {
+				fprintf(stderr, "Could not set max early data size: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+	}
 
 	if (sni_hostname != NULL)
 		gnutls_handshake_set_post_client_hello_function(session,
