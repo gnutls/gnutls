@@ -59,7 +59,10 @@ check_if_port_listening() {
 }
 
 # Find a port number not currently in use.
-GETPORT='rc=0; myrandom=$(date +%N | sed s/^0*//)
+GETPORT='rc=0; unset myrandom
+    if test -n "$RANDOM"; then myrandom=$(($RANDOM + $RANDOM)); fi
+    if test -z "$myrandom"; then myrandom=$(date +%N | sed s/^0*//); fi
+    if test -z "$myrandom"; then myrandom=0; fi
     while test $rc = 0;do
 	PORT="$(((($$<<15)|$myrandom) % 63001 + 2000))"
 	check_if_port_in_use $PORT;rc=$?
@@ -117,7 +120,7 @@ wait_for_port()
 {
 	local ret
 	local PORT="$1"
-	sleep 4
+	sleep 1
 
 	for i in 1 2 3 4 5 6;do
 		check_if_port_listening ${PORT}
@@ -144,7 +147,7 @@ wait_for_free_port()
 		if test $ret != 0;then
 			break
 		else
-			sleep 20
+			sleep 2
 		fi
 	done
 	return $ret
