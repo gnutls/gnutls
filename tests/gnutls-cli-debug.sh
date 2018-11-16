@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Copyright (C) 2017-2018 Red Hat, Inc.
 #
@@ -74,31 +74,33 @@ timeout 1800 datefudge "2017-08-9" \
 kill ${PID}
 wait
 
-
-declare -a arr=("whether we need to disable TLS 1.2... no" "for TLS 1.0 (RFC2246) support... no"
-		"for TLS 1.1 (RFC4346) support... yes" "for TLS 1.2 (RFC5246) support... yes"
-		"TLS1.2 neg fallback from TLS 1.6 to... TLS1.2" "for safe renegotiation (RFC5746) support... yes"
-		"for encrypt-then-MAC (RFC7366) support... yes" "for ext master secret (RFC7627) support... yes"
-		"for RFC7919 Diffie-Hellman support... yes" "for curve SECP256r1 (RFC4492)... yes"
-		"for AES-GCM cipher (RFC5288) support... yes"
-		"for SHA1 MAC support... yes")
-
-if test "${GNUTLS_FORCE_FIPS_MODE}" != 1;then
-#these tests are not run in FIPS mode
-arr+=("for MD5 MAC support... no")
-arr+=("for ARCFOUR 128 cipher (RFC2246) support... no")
-arr+=("for CHACHA20-POLY1305 cipher (RFC7905) support... yes")
-fi
-
-for txt in "${arr[@]}"
-do
-	echo " - Checking ${OUTFILE} for \"${txt}\""
-	grep "$txt" $OUTFILE >/dev/null
-	if test $? != 0;then
+check_text() {
+	echo " - Checking ${OUTFILE} for \"$1\""
+	grep "$1" $OUTFILE >/dev/null
+	if test $? != 0; then
 		echo "failed"
 		exit 1
 	fi
-done
+}
+
+check_text "whether we need to disable TLS 1.2... no"
+check_text "for TLS 1.0 (RFC2246) support... no"
+check_text "for TLS 1.1 (RFC4346) support... yes"
+check_text "for TLS 1.2 (RFC5246) support... yes"
+check_text "TLS1.2 neg fallback from TLS 1.6 to... TLS1.2"
+check_text "for safe renegotiation (RFC5746) support... yes"
+check_text "for encrypt-then-MAC (RFC7366) support... yes"
+check_text "for ext master secret (RFC7627) support... yes"
+check_text "for RFC7919 Diffie-Hellman support... yes"
+check_text "for curve SECP256r1 (RFC4492)... yes"
+check_text "for AES-GCM cipher (RFC5288) support... yes"
+check_text "for SHA1 MAC support... yes"
+if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
+	#these tests are not run in FIPS mode
+	check_text "for MD5 MAC support... no"
+	check_text "for ARCFOUR 128 cipher (RFC2246) support... no"
+	check_text "for CHACHA20-POLY1305 cipher (RFC7905) support... yes"
+fi
 
 rm -f ${OUTFILE}
 
@@ -118,31 +120,25 @@ timeout 1800 datefudge "2017-08-9" \
 kill ${PID}
 wait
 
-declare -a arr=("whether we need to disable TLS 1.2... no" "for TLS 1.0 (RFC2246) support... no"
-		"for TLS 1.1 (RFC4346) support... no" "for TLS 1.2 (RFC5246) support... yes"
-		"for TLS 1.3 (RFC8446) support... yes"
-		"TLS1.2 neg fallback from TLS 1.6 to... TLS1.2" "for safe renegotiation (RFC5746) support... yes"
-		"for encrypt-then-MAC (RFC7366) support... yes" "for ext master secret (RFC7627) support... yes"
-		"for RFC7919 Diffie-Hellman support... yes" "for curve SECP256r1 (RFC4492)... yes"
-		"for AES-GCM cipher (RFC5288) support... yes"
-		"for SHA1 MAC support... yes")
-
-if test "${GNUTLS_FORCE_FIPS_MODE}" != 1;then
-#these tests are not run in FIPS mode
-arr+=("for MD5 MAC support... no")
-arr+=("for ARCFOUR 128 cipher (RFC2246) support... no")
-arr+=("for CHACHA20-POLY1305 cipher (RFC7905) support... yes")
+check_text "whether we need to disable TLS 1.2... no"
+check_text "for TLS 1.0 (RFC2246) support... no"
+check_text "for TLS 1.1 (RFC4346) support... no"
+check_text "for TLS 1.2 (RFC5246) support... yes"
+check_text "for TLS 1.3 (RFC8446) support... yes"
+check_text "TLS1.2 neg fallback from TLS 1.6 to... TLS1.2"
+check_text "for safe renegotiation (RFC5746) support... yes"
+check_text "for encrypt-then-MAC (RFC7366) support... yes"
+check_text "for ext master secret (RFC7627) support... yes"
+check_text "for RFC7919 Diffie-Hellman support... yes"
+check_text "for curve SECP256r1 (RFC4492)... yes"
+check_text "for AES-GCM cipher (RFC5288) support... yes"
+check_text "for SHA1 MAC support... yes"
+if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
+	#these tests are not run in FIPS mode
+	check_text "for MD5 MAC support... no"
+	check_text "for ARCFOUR 128 cipher (RFC2246) support... no"
+	check_text "for CHACHA20-POLY1305 cipher (RFC7905) support... yes"
 fi
-
-for txt in "${arr[@]}"
-do
-	echo " - Checking ${OUTFILE} for \"${txt}\""
-	grep "$txt" $OUTFILE >/dev/null
-	if test $? != 0;then
-		echo "failed"
-		exit 1
-	fi
-done
 
 rm -f ${OUTFILE}
 
