@@ -476,6 +476,10 @@ if ENABLE_DANE
 dist_check_SCRIPTS += danetool.sh
 endif
 
+if ENABLE_TROUSERS
+dist_check_SCRIPTS += tpmtool_test.sh
+endif
+
 else
 
 TESTS_ENVIRONMENT += WINDOWS=1

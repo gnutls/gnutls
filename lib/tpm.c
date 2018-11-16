@@ -422,6 +422,7 @@ static int tpm_open_session(struct tpm_ctx_st *s, const char *_srk_password, uns
 		ret = tss_err(err);
 		goto out_srkpol;
 	}
+	gnutls_free(password);
 
 	return 0;
 

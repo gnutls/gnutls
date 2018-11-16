@@ -109,6 +109,15 @@ minimal.Fedora.x86_64:
   - shared
   except:
   - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - fuzz/*.log
+      - tests/*.log
+      - tests/*/*.log
+      - tests/suite/*/*.log
   retry: 1
 
 # This enables SSL3.0 and SHA-1 support, and runs interop tests

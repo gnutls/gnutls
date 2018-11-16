@@ -337,6 +337,7 @@ static void tpm_list(FILE * out)
 		else if (ret < 0) {
 			fprintf(stderr, "gnutls_tpm_key_list_get_url: %s\n",
 				gnutls_strerror(ret));
+			gnutls_tpm_key_list_deinit(list);
 			exit(1);
 		}
 
@@ -344,6 +345,7 @@ static void tpm_list(FILE * out)
 		gnutls_free(url);
 	}
 
+	gnutls_tpm_key_list_deinit(list);
 	fputs("\n", out);
 }
 
