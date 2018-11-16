@@ -22,7 +22,6 @@
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff -b -B}"
 KEYFILE=ecdsa-privkey.$$.tmp
 TMPFILE=ecdsa.$$.tmp
 
@@ -38,6 +37,7 @@ if test "${GNUTLS_FORCE_FIPS_MODE}" = 1;then
 	exit 77
 fi
 
+. "${srcdir}/../scripts/common.sh"
 
 ${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/cert-ecc256-full.pem" --outfile "${TMPFILE}"
 rc=$?
@@ -47,7 +47,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-$DIFF -I 'Not After:' ${TMPFILE} "${srcdir}/data/cert-ecc256-full.pem"
+check_if_equal ${TMPFILE} "${srcdir}/data/cert-ecc256-full.pem" "Not After:"
 if test $? != 0;then
 	echo "Error in parsing ECDSA cert"
 	exit 1
@@ -60,7 +60,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-$DIFF ${TMPFILE} "${srcdir}/data/pubkey-ecc256.pem"
+check_if_equal ${TMPFILE} "${srcdir}/data/pubkey-ecc256.pem"
 if test $? != 0;then
 	echo "Error in parsing ECDSA public key"
 	exit 1
