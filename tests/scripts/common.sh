@@ -262,6 +262,7 @@ terminate_proc() {
 	done
 	kill_quiet -9 $pid
 	sleep 0.1
+}
 
 # $1, $2: the two files to check for equality
 # $3: Strings to be ignored, separated by |
