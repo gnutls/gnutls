@@ -425,9 +425,11 @@ typedef enum {
  * @GNUTLS_AUTO_REAUTH: Enable transparent re-authentication in client side when the server
  *    requests to. That is, reauthentication is handled within gnutls_record_recv(), and
  *    the %GNUTLS_E_REHANDSHAKE or %GNUTLS_E_REAUTH_REQUEST are not returned. This must be
- *    enabled with %GNUTLS_POST_HANDSHAKE_AUTH for TLS1.3, and it requires to restore interrupted
- *    calls to gnutls_record_recv() based on the output of gnutls_record_get_direction(), i.e.,
- *    gnutls_record_recv() could also be interrupted when sending when this flag is enabled.
+ *    enabled with %GNUTLS_POST_HANDSHAKE_AUTH for TLS1.3. Enabling this flag requires to restore
+ *    interrupted calls to gnutls_record_recv() based on the output of gnutls_record_get_direction(),
+ *    since gnutls_record_recv() could be interrupted when sending when this flag is enabled.
+ *    Note this flag may not be used if you are using the same session for sending and receiving
+ *    in different threads.
  *
  * Enumeration of different flags for gnutls_init() function. All the flags
  * can be combined except @GNUTLS_SERVER and @GNUTLS_CLIENT which are mutually

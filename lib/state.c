@@ -1052,12 +1052,15 @@ void
  * gnutls_record_get_direction:
  * @session: is a #gnutls_session_t type.
  *
- * This function provides information about the internals of the
- * record protocol and is only useful if a prior gnutls function call,
- * e.g.  gnutls_handshake(), was interrupted for some reason. That
- * is, if a function returned %GNUTLS_E_INTERRUPTED or
- * %GNUTLS_E_AGAIN. In such a case, you might want to call select()
- * or poll() before restoring the interrupted gnutls function.
+ * This function is useful to determine whether a GnuTLS function was interrupted
+ * while sending or receiving, so that select() or poll() may be called appropriately.
+ *
+ * It provides information about the internals of the record
+ * protocol and is only useful if a prior gnutls function call,
+ * e.g.  gnutls_handshake(), was interrupted and returned
+ * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN. After such an interrupt
+ * applications may call select() or poll() before restoring the
+ * interrupted GnuTLS function.
  *
  * This function's output is unreliable if you are using the same
  * @session in different threads, for sending and receiving.
