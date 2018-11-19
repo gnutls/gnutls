@@ -63,8 +63,9 @@ case by case basis.
 
 # Indentation style:
 
- In general, use the Linux kernel coding style.  You may indent the source
-using GNU indent, e.g. "indent -linux *.c".
+ In general, use [the Linux kernel coding style](https://www.kernel.org/doc/html/latest/process/coding-style.html).
+You may indent the source using GNU indent, e.g. "indent -linux *.c".
+
 
 
 # Function names:

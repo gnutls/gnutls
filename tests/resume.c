@@ -395,13 +395,13 @@ static void verify_server_params(gnutls_session_t session, unsigned counter, str
 		fail("did not find the expected X509 certificate type! (%d)\n", gnutls_certificate_type_get(session));
 
 	if (counter == 0 && gnutls_certificate_get_ours(session) == NULL)
-		fail("no certificate returned on server side (%s)\n", counter?"resumed session":"first session");
+		fail("no certificate returned on server side (%s)\n", counter ? "resumed session" : "first session");
 	else if (counter != 0 && gnutls_certificate_get_ours(session) != NULL)
-		fail("certificate was returned on server side (%s)\n", counter?"resumed session":"first session");
+		fail("certificate was returned on server side (%s)\n", counter ? "resumed session" : "first session");
 
 	if (params->client_cert) {
 		if (gnutls_certificate_get_peers(session, &l) == NULL || l < 1)
-			fail("no client certificate returned on server side (%s)\n", counter?"resumed session":"first session");
+			fail("no client certificate returned on server side (%s)\n", counter ? "resumed session" : "first session");
 	}
 #endif
 
@@ -435,7 +435,7 @@ static void verify_client_params(gnutls_session_t session, unsigned counter)
 #if defined(USE_X509)
 	unsigned int l;
 	if (gnutls_certificate_get_peers(session, &l) == NULL || l < 1)
-		fail("no server certificate returned on client side (%s)\n", counter?"resumed session":"first session");
+		fail("no server certificate returned on client side (%s)\n", counter ? "resumed session" : "first session");
 #else
 	return;
 #endif
