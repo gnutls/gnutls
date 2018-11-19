@@ -82,9 +82,9 @@ static int key_cb_info_func(gnutls_privkey_t key, unsigned int flags, void *user
 }
 
 static
-int key_cb_sign_data_func (gnutls_privkey_t key, gnutls_sign_algorithm_t sig,
-			   void* userdata, unsigned int flags, const gnutls_datum_t *data,
-			   gnutls_datum_t *signature)
+int key_cb_sign_data_func(gnutls_privkey_t key, gnutls_sign_algorithm_t sig,
+			  void* userdata, unsigned int flags, const gnutls_datum_t *data,
+			  gnutls_datum_t *signature)
 {
 	struct key_cb_data *p = userdata;
 
@@ -94,9 +94,9 @@ int key_cb_sign_data_func (gnutls_privkey_t key, gnutls_sign_algorithm_t sig,
 }
 
 static
-int key_cb_sign_hash_func (gnutls_privkey_t key, gnutls_sign_algorithm_t sig,
-			   void* userdata, unsigned int flags, const gnutls_datum_t *data,
-			   gnutls_datum_t *signature)
+int key_cb_sign_hash_func(gnutls_privkey_t key, gnutls_sign_algorithm_t sig,
+			  void* userdata, unsigned int flags, const gnutls_datum_t *data,
+			  gnutls_datum_t *signature)
 {
 	struct key_cb_data *p = userdata;
 
@@ -109,6 +109,15 @@ int key_cb_sign_hash_func (gnutls_privkey_t key, gnutls_sign_algorithm_t sig,
 			fprintf(stderr, "signing hash with: %s\n", gnutls_sign_get_name(sig));
 		return gnutls_privkey_sign_hash2(p->rkey, sig, 0, data, signature);
 	}
+}
+
+static
+int key_cb_decrypt_func(gnutls_privkey_t key, void *userdata, const gnutls_datum_t *ciphertext,
+			gnutls_datum_t *plaintext)
+{
+	struct key_cb_data *p = userdata;
+
+	return gnutls_privkey_decrypt_data(p->rkey, 0, ciphertext, plaintext);
 }
 
 static void key_cb_deinit_func(gnutls_privkey_t key, void* userdata)
@@ -153,7 +162,7 @@ static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t
 	userdata->sig = sig;
 
 	ret = gnutls_privkey_import_ext4(privkey, userdata, key_cb_sign_data_func,
-					 key_cb_sign_hash_func, NULL,
+					 key_cb_sign_hash_func, key_cb_decrypt_func,
 					 key_cb_deinit_func, key_cb_info_func,
 					 GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
 	if (ret < 0) {
@@ -317,7 +326,7 @@ typedef struct test_st {
 } test_st;
 
 static const test_st tests[] = {
-	{.name = "ecc key",
+	{.name = "tls1.2 ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
 	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_localhost_ecc_cert,
@@ -325,7 +334,7 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_ECDSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA
 	},
-	{.name = "ecc key TLS 1.0",
+	{.name = "tls1.0 ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
 	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.0",
 	 .cert = &server_ca3_localhost_ecc_cert,
@@ -333,7 +342,7 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_ECDSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA
 	},
-	{.name = "ecc key TLS 1.1",
+	{.name = "tls1.1 ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
 	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.1",
 	 .cert = &server_ca3_localhost_ecc_cert,
@@ -341,7 +350,7 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_ECDSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA
 	},
-	{.name = "rsa-sign key",
+	{.name = "tls1.2 rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_localhost_cert,
@@ -349,7 +358,7 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_RSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA
 	},
-	{.name = "rsa-sign key TLS 1.0",
+	{.name = "tls1.0 rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.0",
 	 .cert = &server_ca3_localhost_cert,
@@ -357,7 +366,14 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_RSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA
 	},
-	{.name = "rsa-sign key TLS 1.1",
+	{.name = "tls1.0 rsa-decrypt key",
+	 .pk = GNUTLS_PK_RSA,
+	 .prio = "NORMAL:-KX-ALL:+RSA:-VERS-ALL:+VERS-TLS1.0",
+	 .cert = &server_ca3_localhost_cert,
+	 .key = &server_ca3_key,
+	 .exp_kx = GNUTLS_KX_RSA
+	},
+	{.name = "tls1.1 rsa-sign key",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.1",
 	 .cert = &server_ca3_localhost_cert,
@@ -365,7 +381,7 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_RSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA
 	},
-	{.name = "rsa-sign key with rsa-pss sigs prioritized",
+	{.name = "tls1.2 rsa-sign key with rsa-pss sigs prioritized",
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512:+SIGN-RSA-SHA256:+SIGN-RSA-SHA384:+SIGN-RSA-SHA512:-VERS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_localhost_cert,
@@ -373,7 +389,7 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_RSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA
 	},
-	{.name = "rsa-pss-sign key",
+	{.name = "tls1.2 rsa-pss-sign key",
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_rsa_pss2_cert,
@@ -381,7 +397,7 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_RSA_PSS_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	},
-	{.name = "rsa-pss cert, rsa-sign key", /* we expect the server to refuse negotiating */
+	{.name = "tls1.2 rsa-pss cert, rsa-sign key", /* we expect the server to refuse negotiating */
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_rsa_pss_cert,
@@ -389,13 +405,20 @@ static const test_st tests[] = {
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
 	},
-	{.name = "ed25519 cert, ed25519 key",
+	{.name = "tls1.2 ed25519 cert, ed25519 key",
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
 	 .prio = "NORMAL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-ALL:+VERS-TLS1.2",
 	 .cert = &server_ca3_eddsa_cert,
 	 .key = &server_ca3_eddsa_key,
 	 .sig = GNUTLS_SIGN_EDDSA_ED25519,
 	 .exp_kx = GNUTLS_KX_ECDHE_ECDSA,
+	},
+	{.name = "tls1.2 rsa-decrypt key",
+	 .pk = GNUTLS_PK_RSA,
+	 .prio = "NORMAL:-KX-ALL:+RSA:-VERS-ALL:+VERS-TLS1.2",
+	 .cert = &server_ca3_localhost_cert,
+	 .key = &server_ca3_key,
+	 .exp_kx = GNUTLS_KX_RSA
 	},
 	{.name = "tls1.3 ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
