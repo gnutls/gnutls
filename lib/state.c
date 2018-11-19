@@ -89,11 +89,16 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
  * gnutls_certificate_type_get:
  * @session: is a #gnutls_session_t type.
  *
- * The certificate type is by default X.509, unless it is negotiated
- * as a TLS extension.
+ * This function returns the type of the certificate that is negotiated
+ * for this side to send to the peer. The certificate type is by default
+ * X.509, unless an alternative certificate type is enabled by
+ * gnutls_init() and negotiated during the session.
+ *
+ * Resumed sessions will return the certificate type that was negotiated
+ * and used in the original session.
  *
  * As of version 3.6.4 it is recommended to use
- * gnutls_certificate_type_get2().
+ * gnutls_certificate_type_get2() which is more fine-grained.
  *
  * Returns: the currently used #gnutls_certificate_type_t certificate
  *   type as negotiated for 'our' side of the connection.
@@ -109,20 +114,22 @@ gnutls_certificate_type_get(gnutls_session_t session)
  * @session: is a #gnutls_session_t type.
  * @target: is a #gnutls_ctype_target_t type.
  *
- * The raw public-key extension (RFC7250) introduces a mechanism
- * to specifcy different certificate types for the client and server. We
- * therefore distinguish between negotiated certificate types for the
- * client and server. The @target parameter specifies whether you want
- * the negotiated certificate type for the client (GNUTLS_CTYPE_CLIENT)
- * or for the server (GNUTLS_CTYPE_SERVER). Additionally, in P2P mode
- * connection set up where you don't know in advance who will be client
- * and who will be server you can use the flag (GNUTLS_CTYPE_OURS) and
- * (GNUTLS_CTYPE_PEERS) to retrieve the corresponding certificate types.
+ * This function returns the type of the certificate that a side
+ * is negotiated to use.  The certificate type is by default X.509,
+ * unless an alternative certificate type is enabled by gnutls_init() and
+ * negotiated during the session.
  *
- * In case no certificate types were explicitly set via the priority
- * strings to be negotiated during the handshake, then this function
- * will return the default certificate type (X.509) for both the
- * client and the server.
+ * The @target parameter specifies whether to request the negotiated
+ * certificate type for the client (%GNUTLS_CTYPE_CLIENT),
+ * or for the server (%GNUTLS_CTYPE_SERVER). Additionally, in P2P mode
+ * connection set up where you don't know in advance who will be client
+ * and who will be server you can use the flag (%GNUTLS_CTYPE_OURS) and
+ * (%GNUTLS_CTYPE_PEERS) to retrieve the corresponding certificate types.
+ *
+ * Resumed sessions will return the certificate type that was negotiated
+ * and used in the original session. That is, this function can be used
+ * to reliably determine the type of the certificate returned by
+ * gnutls_certificate_get_peers().
  *
  * Returns: the currently used #gnutls_certificate_type_t certificate
  *   type for the client or the server.
@@ -131,7 +138,7 @@ gnutls_certificate_type_get(gnutls_session_t session)
  **/
 gnutls_certificate_type_t
 gnutls_certificate_type_get2(gnutls_session_t session,
-								gnutls_ctype_target_t target)
+			     gnutls_ctype_target_t target)
 {
 	switch (target) {
 		case GNUTLS_CTYPE_CLIENT:

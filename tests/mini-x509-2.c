@@ -303,6 +303,8 @@ void start(const char *prio)
 			exit(1);
 		}
 		gnutls_free(scert.data);
+
+		assert(gnutls_certificate_type_get(server)==GNUTLS_CRT_X509);
 	}
 
 	/* check gnutls_certificate_get_ours() - client side */
@@ -336,6 +338,8 @@ void start(const char *prio)
 			exit(1);
 		}
 		gnutls_free(ccert.data);
+
+		assert(gnutls_certificate_type_get(client)==GNUTLS_CRT_X509);
 	}
 
 	/* check the number of certificates received */
