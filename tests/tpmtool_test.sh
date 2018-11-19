@@ -54,13 +54,13 @@ if [ -z "$(which expect 2>/dev/null)" ]; then
 	exit 77
 fi
 
-$TPMTOOL --help &>/dev/null
+$TPMTOOL --help >/dev/null
 if [ $? -ne 0 ]; then
 	echo "tpmtool cannot show help screen (TPMTOOL=$TPMTOOL)."
 	exit 77
 fi
 
-$CERTTOOL --help &>/dev/null
+$CERTTOOL --help >/dev/null
 if [ $? -ne 0 ]; then
 	echo "certtool cannot show help screen (CERTTOOL=$CERTTOOL)."
 	exit 77
