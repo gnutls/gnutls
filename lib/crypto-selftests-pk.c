@@ -184,7 +184,7 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 }
 
 static int test_sig(gnutls_pk_algorithm_t pk,
-		    unsigned bits, gnutls_digest_algorithm_t dig)
+		    unsigned bits, gnutls_sign_algorithm_t sigalgo)
 {
 	int ret;
 	gnutls_datum_t sig = { NULL, 0 };
@@ -219,6 +219,8 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 
 	if (pk == GNUTLS_PK_RSA) {
 		ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	} else if (pk == GNUTLS_PK_RSA_PSS) {
+		ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	} else if (pk == GNUTLS_PK_DSA) {
 		ret = gnutls_privkey_import_x509_raw(key, &raw_dsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	} else if (pk == GNUTLS_PK_ECC) {
@@ -245,14 +247,14 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 		goto cleanup;
 	}
 
-	ret = gnutls_privkey_sign_data(key, dig, 0, &signed_data, &sig);
+	ret = gnutls_privkey_sign_data2(key, sigalgo, 0, &signed_data, &sig);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret =
-	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
+	    gnutls_pubkey_verify_data2(pub, sigalgo, 0,
 				       &signed_data, &sig);
 	if (ret < 0) {
 		ret = GNUTLS_E_SELF_TEST_ERROR;
@@ -261,7 +263,7 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	}
 
 	ret =
-	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
+	    gnutls_pubkey_verify_data2(pub, sigalgo, 0,
 				       &bad_data, &sig);
 
 	if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
@@ -526,8 +528,8 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	return ret;
 }
 
-#define PK_TEST(pk, func, bits, dig) \
-			ret = func(pk, bits, dig); \
+#define PK_TEST(pk, func, bits, sigalgo) \
+			ret = func(pk, bits, sigalgo); \
 			if (ret < 0) { \
 				gnutls_assert(); \
 				goto cleanup; \
@@ -775,7 +777,14 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 2048, GNUTLS_DIG_SHA256,
 			      rsa_key2048, rsa_sig);
 		PK_TEST(GNUTLS_PK_RSA, test_rsa_enc, 2048, 0);
-		PK_TEST(GNUTLS_PK_RSA, test_sig, 3072, GNUTLS_DIG_SHA256);
+		PK_TEST(GNUTLS_PK_RSA, test_sig, 3072, GNUTLS_SIGN_RSA_SHA256);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
+		FALLTHROUGH;
+	case GNUTLS_PK_RSA_PSS:
+		PK_TEST(GNUTLS_PK_RSA_PSS, test_sig, 2048, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
@@ -784,7 +793,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_DSA:
 		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 2048, GNUTLS_DIG_SHA256,
 			      dsa_privkey, dsa_sig);
-		PK_TEST(GNUTLS_PK_DSA, test_sig, 3072, GNUTLS_DIG_SHA256);
+		PK_TEST(GNUTLS_PK_DSA, test_sig, 3072, GNUTLS_SIGN_DSA_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
@@ -808,7 +817,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			      ecdsa_secp256r1_sig);
 		PK_TEST(GNUTLS_PK_EC, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
-			GNUTLS_DIG_SHA256);
+			GNUTLS_SIGN_ECDSA_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
@@ -820,7 +829,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			      ecdsa_secp384r1_sig);
 		PK_TEST(GNUTLS_PK_EC, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1),
-			GNUTLS_DIG_SHA384);
+			GNUTLS_SIGN_ECDSA_SHA384);
 
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
@@ -829,7 +838,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			      ecdsa_secp521r1_sig);
 		PK_TEST(GNUTLS_PK_EC, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP521R1),
-			GNUTLS_DIG_SHA512);
+			GNUTLS_SIGN_ECDSA_SHA512);
 
 #ifdef ENABLE_NON_SUITEB_CURVES
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
@@ -839,7 +848,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			      ecdsa_secp192r1_sig);
 		PK_TEST(GNUTLS_PK_EC, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP192R1),
-			GNUTLS_DIG_SHA256);
+			GNUTLS_SIGN_ECDSA_SHA256);
 
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
@@ -848,7 +857,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			      ecdsa_secp224r1_sig);
 		PK_TEST(GNUTLS_PK_EC, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1),
-			GNUTLS_DIG_SHA256);
+			GNUTLS_SIGN_ECDSA_SHA256);
 #endif
 
 #if ENABLE_GOST
@@ -856,7 +865,8 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_GOST_01:
 		PK_KNOWN_TEST(GNUTLS_PK_GOST_01, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_GOSTR_94,
 			      gost01_privkey, gost01_sig);
-		PK_TEST(GNUTLS_PK_GOST_01, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA), GNUTLS_DIG_GOSTR_94);
+		PK_TEST(GNUTLS_PK_GOST_01, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
+			GNUTLS_SIGN_GOST_94);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
@@ -865,7 +875,8 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_GOST_12_256:
 		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_256, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_STREEBOG_256,
 			      gost12_256_privkey, gost12_256_sig);
-		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA), GNUTLS_DIG_STREEBOG_256);
+		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
+			GNUTLS_SIGN_GOST_256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
@@ -874,7 +885,8 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_GOST_12_512:
 		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_512, 0, GNUTLS_ECC_CURVE_GOST512A, GNUTLS_DIG_STREEBOG_512,
 			      gost12_512_privkey, gost12_512_sig);
-		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A), GNUTLS_DIG_STREEBOG_256);
+		PK_TEST(GNUTLS_PK_GOST_12_512, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A),
+			GNUTLS_SIGN_GOST_512);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
