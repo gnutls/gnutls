@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2018 Red Hat, Inc.
  *
- * Author: Nikos Mavrogiannopoulos
+ * Author: Nikos Mavrogiannopoulos, Simo Sorce
  *
  * This file is part of GnuTLS.
  *
@@ -36,10 +36,10 @@
 #include "../utils.h"
 #include "softhsm.h"
 
-#define CONFIG_NAME "softhsm-privkey-rsa-pss-test"
+#define CONFIG_NAME "softhsm-privkey-eddsa-test"
 #define CONFIG CONFIG_NAME".config"
 
-/* Tests whether signing with PKCS#11 and RSA-PSS would
+/* Tests whether signing with PKCS#11 and EDDSA would
  * generate valid signatures */
 
 #include "../cert-common.h"
@@ -67,7 +67,7 @@ int pin_func(void *userdata, int attempt, const char *url, const char *label,
 #define myfail(fmt, ...) \
 	fail("%s (iter %d): "fmt, gnutls_sign_get_name(sigalgo), i, ##__VA_ARGS__)
 
-static unsigned verify_rsa_pss_presence(void)
+static unsigned verify_eddsa_presence(void)
 {
 	unsigned i;
 	unsigned long mechanism;
@@ -76,7 +76,7 @@ static unsigned verify_rsa_pss_presence(void)
 	i = 0;
 	do {
 		ret = gnutls_pkcs11_token_get_mechanism("pkcs11:", i++, &mechanism);
-		if (ret >= 0 && mechanism == 0xd /* CKM_RSA_PKCS_PSS*/)
+		if (ret >= 0 && mechanism == 0x1057 /* CKM_EDDSA */)
 			return 1;
 	} while(ret>=0);
 
@@ -103,7 +103,6 @@ void doit(void)
 	ret = global_init();
 	if (ret != 0) {
 		fail("%d: %s\n", ret, gnutls_strerror(ret));
-		exit(1);
 	}
 
 	gnutls_pkcs11_set_pin_function(pin_func, NULL);
@@ -119,31 +118,23 @@ void doit(void)
 
 	ret = gnutls_pkcs11_add_provider(lib, NULL);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_crt_init: %s\n",
-			gnutls_strerror(ret));
-		exit(1);
+		fail("gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
 	}
 
-	if (verify_rsa_pss_presence() == 0) {
-		fprintf(stderr, "Skipping test as no RSA-PSS mech is supported\n");
+	if (verify_eddsa_presence() == 0) {
+		fprintf(stderr, "Skipping test as no EDDSA mech is supported\n");
 		exit(77);
 	}
 
 	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("gnutls_x509_crt_init: %s\n", gnutls_strerror(ret));
 
 	ret =
-	    gnutls_x509_crt_import(crt, &cli_ca3_rsa_pss_cert,
+	    gnutls_x509_crt_import(crt, &server_ca3_eddsa_cert,
 				   GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}
+	if (ret < 0)
+		fail("gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
 
 	if (debug) {
 		gnutls_x509_crt_print(crt, GNUTLS_CRT_PRINT_ONELINE, &tmp);
@@ -154,26 +145,20 @@ void doit(void)
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+		fail("gnutls_x509_privkey_init: %s\n", gnutls_strerror(ret));
 	}
 
 	ret =
-	    gnutls_x509_privkey_import(key, &cli_ca3_rsa_pss_key,
+	    gnutls_x509_privkey_import(key, &server_ca3_eddsa_key,
 				       GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
-		fprintf(stderr,
-			"gnutls_x509_privkey_import: %s\n",
-			gnutls_strerror(ret));
-		exit(1);
+		fail("gnutls_x509_privkey_import: %s\n", gnutls_strerror(ret));
 	}
 
 	/* initialize softhsm token */
 	ret = gnutls_pkcs11_token_init(SOFTHSM_URL, PIN, "test");
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_init: %s\n", gnutls_strerror(ret));
-		exit(1);
 	}
 
 	ret =
@@ -181,7 +166,6 @@ void doit(void)
 					GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
-		exit(1);
 	}
 
 	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, crt, "cert",
@@ -189,7 +173,6 @@ void doit(void)
 					  GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
-		exit(1);
 	}
 
 	ret =
@@ -203,7 +186,6 @@ void doit(void)
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_privkey: %s\n",
 		     gnutls_strerror(ret));
-		exit(1);
 	}
 
 	gnutls_x509_crt_deinit(crt);
@@ -218,9 +200,7 @@ void doit(void)
 					     ";object=cert;object-type=private;pin-value="
 					     PIN);
 	if (ret < 0) {
-		fprintf(stderr, "error in %d: %s\n", __LINE__,
-			gnutls_strerror(ret));
-		exit(1);
+		fail("error in gnutls_privkey_import_pkcs11_url: %s\n", gnutls_strerror(ret));
 	}
 
 	assert(gnutls_pubkey_init(&pubkey) == 0);
@@ -228,10 +208,10 @@ void doit(void)
 
 	assert(gnutls_pubkey_init(&pubkey2) == 0);
 	assert(gnutls_pubkey_import_x509_raw
-	       (pubkey2, &cli_ca3_rsa_pss_cert, GNUTLS_X509_FMT_PEM, 0) == 0);
+	       (pubkey2, &server_ca3_eddsa_cert, GNUTLS_X509_FMT_PEM, 0) == 0);
 
 	/* this is the algorithm supported by the certificate */
-	sigalgo = GNUTLS_SIGN_RSA_PSS_SHA256;
+	sigalgo = GNUTLS_SIGN_EDDSA_ED25519;
 
 	for (i = 0; i < 20; i++) {
 		/* check whether privkey and pubkey are operational

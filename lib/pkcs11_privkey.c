@@ -1075,6 +1075,29 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		a[a_val].value = der.data;
 		a[a_val].value_len = der.size;
 		a_val++;
+
+		break;
+	case GNUTLS_PK_EDDSA_ED25519:
+		p[p_val].type = CKA_SIGN;
+		p[p_val].value = (void *) &tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
+
+		a[a_val].type = CKA_VERIFY;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
+
+		ret = _gnutls_x509_write_ecc_params(GNUTLS_ECC_CURVE_ED25519, &der);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		a[a_val].type = CKA_EC_PARAMS;
+		a[a_val].value = der.data;
+		a[a_val].value_len = der.size;
+		a_val++;
 		break;
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);

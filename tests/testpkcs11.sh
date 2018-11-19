@@ -62,6 +62,8 @@ fi
 ASAN_OPTIONS="detect_leaks=0"
 export ASAN_OPTIONS
 
+have_ed25519=0
+
 P11TOOL="${VALGRIND} ${P11TOOL} --batch"
 SERV="${SERV} -q"
 
@@ -277,6 +279,21 @@ generate_temp_dsa_privkey () {
 	fi
 }
 
+generate_temp_ed25519_privkey () {
+	export GNUTLS_PIN="$2"
+	token="$1"
+	bits="$3"
+
+	echo -n "* Generating ed25519 private key ("${bits}")... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --login -d 3 --label temp-ed25519 --generate-privkey ed25519 "${token}" --outfile tmp-client.pub >>"${LOGFILE}" 2>&1
+	if test $? = 0; then
+		echo ok
+	else
+		echo failed
+		exit 1
+	fi
+}
+
 # $1: token
 # $2: PIN
 delete_temp_privkey () {
@@ -450,6 +467,10 @@ import_temp_rsa_privkey () {
 
 import_temp_ecc_privkey () {
 	import_privkey ECC temp-ecc --ecc $@
+}
+
+import_temp_ed25519_privkey () {
+	import_privkey ed25519 temp-ed25519 --key-type ed25519 $@
 }
 
 import_temp_dsa_privkey () {
@@ -1024,6 +1045,11 @@ if test "x${TOKEN}" = x; then
 	exit_error
 fi
 
+${P11TOOL} ${ADDITIONAL_PARAM} --list-machanisms ${TOKEN}|grep 25519 >/dev/null
+if test $? = 0;then
+	have_ed25519=1
+fi
+
 reset_pins "${TOKEN}" "${GNUTLS_PIN}" "${GNUTLS_SO_PIN}"
 
 #write a given privkey
@@ -1038,6 +1064,11 @@ delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-no-256
 generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 384
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-384
 
+if test $have_ed25519 != 0;then
+	generate_temp_ed25519_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
+	delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
+fi
+
 generate_temp_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 2048
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" rsa-2048
 
@@ -1050,6 +1081,11 @@ import_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 256
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-256
 import_temp_dsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 2048
 delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" dsa-2048
+
+if test $have_ed25519 != 0;then
+	import_temp_ed25519_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
+	delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
+fi
 
 generate_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 1024
 change_id_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
