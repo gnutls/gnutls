@@ -238,6 +238,25 @@ kill_quiet() {
 	local sig="$1"
 	local pid="$2"
 
-	sh -c "kill $sig $pid &>/dev/null"
+	sh -c "kill $sig $pid 2>/dev/null"
 	return $?
+}
+
+# Terminate a process first using SIGTERM, wait 1s and if still avive use
+# SIGKILL
+# @1: pid
+terminate_proc() {
+	local pid="$1"
+
+	local ctr=0
+
+	kill_quiet -15 $pid
+	while [ $ctr -lt 10 ]; do
+		sleep 0.1
+		kill -0 $pid 2>/dev/null
+		[ $? -ne 0 ] && return
+		ctr=$((ctr + 1))
+	done
+	kill_quiet -9 $pid
+	sleep 0.1
 }
