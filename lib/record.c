@@ -52,6 +52,7 @@
 #include <dtls.h>
 #include <dh.h>
 #include <random.h>
+#include <xsize.h>
 
 struct tls_record_st {
 	uint16_t header_size;
@@ -2041,7 +2042,9 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
  * as gnutls_record_send().
  *
  * There may be a limit to the amount of data sent as early data.  Use
- * gnutls_record_get_max_early_data_size() to check the limit.
+ * gnutls_record_get_max_early_data_size() to check the limit.  If the
+ * limit exceeds, this function returns
+ * %GNUTLS_E_RECORD_LIMIT_REACHED.
  *
  * Returns: The number of bytes sent, or a negative error code.  The
  *   number of bytes sent might be less than @data_size.  The maximum
@@ -2058,6 +2061,12 @@ ssize_t gnutls_record_send_early_data(gnutls_session_t session,
 
 	if (session->security_parameters.entity != GNUTLS_CLIENT)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (xsum(session->internals.
+		 early_data_presend_buffer.length,
+		 data_size) >
+	    session->security_parameters.max_early_data_size)
+		return gnutls_assert_val(GNUTLS_E_RECORD_LIMIT_REACHED);
 
 	ret =
 	    _gnutls_buffer_append_data(&session->internals.

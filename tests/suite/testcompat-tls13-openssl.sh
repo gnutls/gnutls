@@ -530,6 +530,24 @@ _EOF_
 
 	kill ${PID}
 	wait
+
+	echo_cmd "${PREFIX}Checking TLS 1.3 with resumption and early data with small limit..."
+	testdir=`create_testdir tls13-openssl-resumption`
+	eval "${GETPORT}"
+	launch_server $$ --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${RSA_CERT}" --x509keyfile "${RSA_KEY}" --x509cafile "${CA_CERT}" --earlydata --maxearlydata 1  >>${OUTPUT} 2>&1
+	PID=$!
+	wait_server ${PID}
+
+	echo "This file contains early data sent by the client" > "${testdir}/earlydata.txt"
+	{ echo a; sleep 1; } | \
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_out "${testdir}/sess-earlydata.pem" 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -CAfile "${CA_CERT}" -sess_in "${testdir}/sess-earlydata.pem" -early_data "${testdir}/earlydata.txt" </dev/null 2>&1 > "${testdir}/server.out"
+	grep "^Early data was rejected" "${testdir}/server.out" || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
 	rm -rf "${testdir}"
 
 }

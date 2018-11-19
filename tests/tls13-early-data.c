@@ -51,6 +51,7 @@ int main(void)
 #include "cert-common.h"
 #include "utils.h"
 #include "virt-time.h"
+#define MIN(x,y) (((x)<(y))?(x):(y))
 
 /* This program tests the robustness of record sending with padding.
  */
@@ -94,7 +95,7 @@ gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 	return 0;
 }
 
-static void client(int sds[])
+static void client(int sds[], const char *data, size_t size, size_t maxsize)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -127,7 +128,12 @@ static void client(int sds[])
 
 		if (t > 0) {
 			assert(gnutls_session_set_data(session, session_data.data, session_data.size) >= 0);
-			assert(gnutls_record_send_early_data(session, EARLY_MSG, sizeof(EARLY_MSG)) >= 0);
+			/* The server should have advertised the same maximum. */
+			if (gnutls_record_get_max_early_data_size(session) != maxsize)
+				fail("client: max_early_data_size mismatch %d != %d\n",
+				     (int) gnutls_record_get_max_early_data_size(session),
+				     (int) maxsize);
+			assert(gnutls_record_send_early_data(session, data, MIN(size, maxsize)) >= 0);
 			assert(gnutls_handshake_set_random(session, &hrnd) >= 0);
 		}
 
@@ -242,7 +248,7 @@ storage_clear(struct storage_st *storage)
 	storage->num_entries = 0;
 }
 
-static void server(int sds[])
+static void server(int sds[], const char *data, size_t size, size_t maxsize)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -292,6 +298,12 @@ static void server(int sds[])
 
 		gnutls_anti_replay_enable(session, anti_replay);
 
+		/* on the replay connection, early data is skipped
+		 * until max_early_data_size without decryption
+		 */
+		if (t < 2)
+			(void) gnutls_record_set_max_early_data_size(session, maxsize);
+
 		gnutls_transport_set_int(session, sd);
 
 		do {
@@ -330,7 +342,8 @@ static void server(int sds[])
 					     gnutls_strerror(ret));
 				}
 
-				if (ret != sizeof(EARLY_MSG) || memcmp(buffer, EARLY_MSG, ret))
+				if ((size_t) ret != MIN(size, maxsize) ||
+				    memcmp(buffer, data, ret))
 					fail("server: early data mismatch\n");
 			} else {
 				if (gnutls_rnd_works) {
@@ -387,7 +400,8 @@ static void server(int sds[])
 		success("server: finished\n");
 }
 
-void doit(void)
+static void
+start(const char *data, size_t size, size_t maxsize)
 {
 	int client_sds[SESSIONS], server_sds[SESSIONS];
 	int i;
@@ -420,14 +434,20 @@ void doit(void)
 		/* parent */
 		for (i = 0; i < SESSIONS; i++)
 			close(client_sds[i]);
-		server(server_sds);
+		server(server_sds, data, size, maxsize);
 		kill(child, SIGTERM);
 	} else {
 		for (i = 0; i < SESSIONS; i++)
 			close(server_sds[i]);
-		client(client_sds);
+		client(client_sds, data, size, maxsize);
 		exit(0);
 	}
+}
+
+void doit(void)
+{
+	start(EARLY_MSG, sizeof(EARLY_MSG), MAX_BUF);
+	start(EARLY_MSG, sizeof(EARLY_MSG), 10);
 }
 
 #endif				/* _WIN32 */
