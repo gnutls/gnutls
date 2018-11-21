@@ -3273,7 +3273,7 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 			app_exit(1);
 		}
 
-		fprintf(stderr, "\tType: %s\n", BAGTYPE(type));
+		fprintf(outfile, "\tType: %s\n", BAGTYPE(type));
 
 		result = gnutls_pkcs12_bag_get_data(bag, i, &cdata);
 		if (result < 0) {
@@ -3282,12 +3282,9 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 			app_exit(1);
 		}
 
-		if (type == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY) {
-			if (outcert_format == GNUTLS_X509_FMT_DER)
-				pkcs8_info_int(&cdata, GNUTLS_X509_FMT_DER, 1, stderr, "\t");
-			else
-				pkcs8_info_int(&cdata, GNUTLS_X509_FMT_DER, 1, outfile, "\t");
-		}
+		if (type == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY &&
+		    outcert_format == GNUTLS_X509_FMT_PEM)
+			pkcs8_info_int(&cdata, GNUTLS_X509_FMT_DER, 1, outfile, "\t");
 
 		name = NULL;
 		result =
@@ -3505,9 +3502,9 @@ void pkcs12_info(common_info_st * cinfo)
 		}
 
 		if (result == GNUTLS_BAG_ENCRYPTED) {
-			fprintf(stderr, "\tType: %s\n", BAGTYPE(result));
-			pkcs12_bag_enc_info(bag, stderr);
-			fprintf(stderr, "\n\tDecrypting...\n");
+			fprintf(outfile, "\tType: %s\n", BAGTYPE(result));
+			pkcs12_bag_enc_info(bag, outfile);
+			fprintf(outfile, "\n\tDecrypting...\n");
 
 			result = gnutls_pkcs12_bag_decrypt(bag, pass);
 
