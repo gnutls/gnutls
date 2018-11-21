@@ -34,6 +34,7 @@ fi
 
 OUTFILE=out-pkcs7.$$.tmp
 OUTFILE2=out2-pkcs7.$$.tmp
+TMPFILE=tmp-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
@@ -62,6 +63,19 @@ if test "$?" != "0"; then
 	exit 1
 fi
 done
+
+${VALGRIND} "${CERTTOOL}" --inder --p7-info --infile "${srcdir}/data/full.p7b" --outfile "${TMPFILE}" --no-text
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text pkcs7 info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$\|^[A-Za-z0-9/+=]\+$\|^-----END [A-Z0-9 ]\+-----$' ${TMPFILE} ; then
+	echo "--no-text pkcs7 info failed 2"
+	exit 1
+fi
 
 # check signatures
 
@@ -324,5 +338,6 @@ fi
 
 rm -f "${OUTFILE}"
 rm -f "${OUTFILE2}"
+rm -f "${TMPFILE}"
 
 exit 0
