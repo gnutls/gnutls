@@ -39,6 +39,7 @@ OUTFILE=out-crl.$$.tmp
 INFOFILE=out-crl-info.$$.tmp
 OUTFILE2=out2-crl.$$.tmp
 TMPFILE=crl.$$.tmpl
+TMP2FILE=crl.$$.tmp2
 
 echo "crl_next_update = 43" >$TMPFILE
 echo "crl_number = 7" >>$TMPFILE
@@ -52,6 +53,19 @@ rc=$?
 if test "${rc}" != "0"; then
 	echo "CRL generation failed"
 	exit ${rc}
+fi
+
+${VALGRIND} "${CERTTOOL}" --crl-info --infile ${OUTFILE} --no-text >${TMP2FILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text crl info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$\|^[A-Za-z0-9/+=]\+$\|^-----END [A-Z0-9 ]\+-----$' ${TMP2FILE} ; then
+	echo "--no-text crl info failed 2"
+	exit 1
 fi
 
 grep "Revoked certificates (152)" "${INFOFILE}" >/dev/null 2>&1
@@ -289,5 +303,6 @@ rm -f "${OUTFILE}"
 rm -f "${INFOFILE}"
 rm -f "${OUTFILE2}"
 rm -f "${TMPFILE}"
+rm -f "${TMP2FILE}"
 
 exit 0

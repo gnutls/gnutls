@@ -66,6 +66,19 @@ datefudge -s "2007-04-22" \
 		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
 		--outfile $OUTFILE 2>/dev/null
 
+${CERTTOOL} --crq-info --no-text --infile ${OUTFILE} > ${TMPFILE}
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text crq info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$\|^[A-Za-z0-9/+=]\+$\|^-----END [A-Z0-9 ]\+-----$' ${TMPFILE} ; then
+	echo "--no-text crq info failed 2"
+	exit 1
+fi
+
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-certificate \
 		--load-ca-privkey "${srcdir}/data/template-test.key" \
