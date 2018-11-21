@@ -67,7 +67,7 @@ _gnutls_rsa_pms_set_version(gnutls_session_t session,
  * gnutls_cipher_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used cipher.
+ * Get the currently used cipher.
  *
  * Returns: the currently used cipher, a #gnutls_cipher_algorithm_t
  *   type.
@@ -170,7 +170,7 @@ gnutls_certificate_type_get2(gnutls_session_t session,
  * gnutls_kx_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used key exchange algorithm.
+ * Get the currently used key exchange algorithm.
  *
  * This function will return %GNUTLS_KX_ECDHE_RSA, or %GNUTLS_KX_DHE_RSA
  * under TLS 1.3, to indicate an elliptic curve DH key exchange or
@@ -215,7 +215,7 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
  * gnutls_mac_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used MAC algorithm.
+ * Get the currently used MAC algorithm.
  *
  * Returns: the currently used mac algorithm, a
  *   #gnutls_mac_algorithm_t value.
@@ -237,7 +237,7 @@ gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
  * gnutls_compression_get:
  * @session: is a #gnutls_session_t type.
  *
- * Get currently used compression algorithm.
+ * Get the currently used compression algorithm.
  *
  * Returns: the currently used compression method, a
  *   #gnutls_compression_method_t value.
