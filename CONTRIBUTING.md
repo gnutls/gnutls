@@ -9,6 +9,7 @@ of changes.
 We try to stick to the following rules, so when contributing please
 try to follow them too.
 
+
 # Git commits:
 
 Note that when contributing code you will need to assert that the contribution is
@@ -25,6 +26,7 @@ $ cp devel/git-template ~/.git-template
 [edit]
 $ git config commit.template ~/.git-template
 ```
+
 
 # Test suite:
 
@@ -44,6 +46,7 @@ Certificates for testing purposes are available at [cert-common.h](tests/cert-co
 Note that we do not regenerate test certificates when they expire, but
 we rather fix the test's time using datefudge or gnutls_global_set_time_function().
 For example, see [x509cert-tl.c](tests/x509cert-tl.c).
+
 
 # File names:
 
@@ -66,6 +69,17 @@ case by case basis.
  In general, use [the Linux kernel coding style](https://www.kernel.org/doc/html/latest/process/coding-style.html).
 You may indent the source using GNU indent, e.g. "indent -linux *.c".
 
+
+# Commenting style
+
+In general for documenting new code we prefer self-documented code to comments. That is:
+  - Meaningful function and macro names
+  - Short functions which do a single thing
+
+That does not mean that no comments are allowed, but that when they are
+used, they are used to document something that is not obvious, or the protocol
+expectations. Though we haven't followed that rule strictly in the past, it
+should be followed on new code.
 
 
 # Function names:
@@ -119,6 +133,33 @@ the last tagged release. It relies on the git tree and abi-compliance-checker.
 
 The above do not apply to the C++ library; this library's ABI should not
 be considered stable.
+
+
+# API documentation
+
+When introducing a new API, we provide the function documentation as
+inline comments, in a way that it can be used to generate a man-page
+and be included in our manual. For that we use gnome-style comments
+as in the example below. The detailed form is documented on `doc/scripts/gdoc`.
+
+/**
+ * gnutls_init:
+ * @session: is a pointer to a #gnutls_session_t type.
+ * @flags: indicate if this session is to be used for server or client.
+ *
+ * This function initializes the provided session. Every
+ * session must be initialized before use, and must be deinitialized
+ * after used by calling gnutls_deinit().
+ *
+ * @flags can be any combination of flags from %gnutls_init_flags_t.
+ *
+ * Note that since version 3.1.2 this function enables some common
+ * TLS extensions such as session tickets and OCSP certificate status
+ * request in client side by default. To prevent that use the %GNUTLS_NO_EXTENSIONS
+ * flag.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or a negative error code.
+ **/
 
 
 # Constructed types:
