@@ -135,6 +135,24 @@ The above do not apply to the C++ library; this library's ABI should not
 be considered stable.
 
 
+# Introducing new features / modifying behavior
+
+  When a new feature is introduced which may affect already deployed code, 
+it must be disabled by default. For example a new TLS extension should be
+enabled when explicitly requested by the application. That can happen for
+example with a gnutls_init() flag.
+
+The same should be followed when an existing function behavior is modified
+in a way that may break existing applications which use the API in a
+reasonable way. If the existing function allows flags, then a new flag
+should be introduced to enable the new behavior.
+
+When it is necessary, or desireable to enable the new features by default
+(e.g., TLS1.3 introduction), the "next" releases should be used (and
+introduced if necessary), to allow the modification to be tested for an
+extended amount of time.
+
+
 # API documentation
 
 When introducing a new API, we provide the function documentation as
