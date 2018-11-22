@@ -341,8 +341,6 @@ static void verify_alpn(gnutls_session_t session, struct params_res *params, uns
 
 static void verify_group(gnutls_session_t session, gnutls_group_t *group, unsigned counter)
 {
-	int ret;
-
 	if (counter == 0) {
 		*group = gnutls_group_get(session);
 		return;
@@ -426,7 +424,6 @@ static void verify_server_params(gnutls_session_t session, unsigned counter, str
 		}
 	}
 
- finish:
 	return;
 }
 
@@ -737,7 +734,7 @@ pskfunc(gnutls_session_t session, const char *username,
 
 static void server(int sds[], struct params_res *params)
 {
-	size_t t;
+	int t;
 	int ret;
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
