@@ -1331,8 +1331,15 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	if (bufel == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	if (vers && vers->tls13_sem && record.type == GNUTLS_CHANGE_CIPHER_SPEC &&
-	    record.length == 1 && session->internals.handshake_in_progress) {
+	if (vers && vers->tls13_sem && record.type == GNUTLS_CHANGE_CIPHER_SPEC) {
+		/* if the CCS has value other than 0x01, or arrives
+		 * after Finished, abort the connection */
+		if (record.length != 1 ||
+		    *((uint8_t *) _mbuffer_get_udata_ptr(bufel) +
+		      record.header_size) != 0x01 ||
+		    !session->internals.handshake_in_progress)
+			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+
 		_gnutls_read_log("discarding change cipher spec in TLS1.3\n");
 		/* we use the same mechanism to retry as when
 		 * receiving multiple empty TLS packets */
