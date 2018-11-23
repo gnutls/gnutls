@@ -262,4 +262,21 @@ terminate_proc() {
 	done
 	kill_quiet -9 $pid
 	sleep 0.1
+
+# $1, $2: the two files to check for equality
+# $3: Strings to be ignored, separated by |
+check_if_equal() {
+	if test -n "$3"; then
+		local tmp1=`basename "$1"`"1.tmp"
+		local tmp2=`basename "$2"`"2.tmp"
+		egrep -v "$3" "$1" | tr -d '\r' >"$tmp1"
+		egrep -v "$3" "$2" | tr -d '\r' >"$tmp2"
+		diff -b -B "$tmp1" "$tmp2"
+		local rc=$?
+		rm -f "$tmp1" "$tmp2"
+		return $rc
+	fi
+
+	diff -b -B "$1" "$2"
+	return $?
 }
