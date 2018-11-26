@@ -269,22 +269,18 @@ SUFFIXES = .stamp .def .c.bak .h.bak
 .def.stamp:
 	$(AM_V_GEN) $(AUTOGEN) $< || { \
 		srcdir=''; \
-		test -f ./$@ || srcdir=$(srcdir)/; \
 		b=`echo $@ | sed 's/.stamp$$//'`; \
+		test -f ./$${b}.def || srcdir=$(srcdir)/; \
 		cp -p $${srcdir}$${b}.c.bak $${b}.c; \
 		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
 	} && \
 	touch $@
 
 .c.c.bak:
-	$(AM_V_GEN) srcdir=''; \
-		test -f ./$@ || srcdir=$(srcdir)/; \
-		test -f $${srcdir}/$@ || cp -p $< $@
+	$(AM_V_GEN) cp -p $< $@
 
 .h.h.bak:
-	$(AM_V_GEN) srcdir=''; \
-		test -f ./$@ || srcdir=$(srcdir)/; \
-		test -f $${srcdir}/$@ || cp -p $< $@
+	$(AM_V_GEN) cp -p $< $@
 
 danetool-args.h: danetool-args.stamp
 danetool-args.c: danetool-args.stamp

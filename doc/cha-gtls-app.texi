@@ -949,11 +949,17 @@ received data with @funcref{gnutls_record_recv_early_data}.  You can
 call the function either after the handshake is complete, or through a
 handshake hook (@funcref{gnutls_handshake_set_hook_function}).
 
-On the client side, to check whether the sent early data was accepted by
-the server, use @funcref{gnutls_session_get_flags} and compare the
-result with @acronym{GNUTLS_SFLAGS_EARLY_DATA}.  Similarly, on the
-server side, the same function and flag can be used to check whether it
-has actually accepted early data.
+When sending early data, the client should respect the maximum amount
+of early data, which may have been previously advertised by the
+server.  It can be checked using
+@funcref{gnutls_record_get_max_early_data_size}, right after calling
+@funcref{gnutls_session_set_data}.
+
+After sending early data, to check whether the sent early data was
+accepted by the server, use @funcref{gnutls_session_get_flags} and
+compare the result with @acronym{GNUTLS_SFLAGS_EARLY_DATA}.
+Similarly, on the server side, the same function and flag can be used
+to check whether it has actually accepted early data.
 
 
 @node Anti-replay protection
