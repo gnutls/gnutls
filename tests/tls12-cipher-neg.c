@@ -43,166 +43,192 @@ test_case_st tests[] = {
 		.not_on_fips = 1,
 		.cipher = GNUTLS_CIPHER_NULL,
 		.server_prio = "NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+NULL"
+		.client_prio = "NORMAL:+NULL",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(NULL)-(SHA1)",
 	},
 	{
 		.name = "client TLS 1.2: NULL (client)",
 		.not_on_fips = 1,
 		.cipher = GNUTLS_CIPHER_NULL,
 		.server_prio = "NORMAL:+NULL",
-		.client_prio = "NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(NULL)-(SHA1)",
 	},
 	{
 		.name = "server TLS 1.2: AES-128-GCM (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_GCM,
 		.server_prio = "NORMAL:-CIPHER-ALL:+AES-128-GCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+AES-128-GCM"
+		.client_prio = "NORMAL:+AES-128-GCM",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-GCM)"
 	},
 	{
 		.name = "both TLS 1.2: AES-128-GCM (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_GCM,
 		.server_prio = "NORMAL:-CIPHER-ALL:+AES-128-GCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+AES-128-GCM:+VERS-TLS1.2"
+		.client_prio = "NORMAL:+AES-128-GCM:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-GCM)"
 	},
 	{
 		.name = "client TLS 1.2: AES-128-GCM (client)",
 		.cipher = GNUTLS_CIPHER_AES_128_GCM,
 		.server_prio = "NORMAL:+AES-128-GCM",
-		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-GCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-GCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-GCM)"
 	},
 	{
 		.name = "both TLS 1.2: AES-128-GCM (client)",
 		.cipher = GNUTLS_CIPHER_AES_128_GCM,
 		.server_prio = "NORMAL:+AES-128-GCM:+VERS-TLS1.2",
-		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-GCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-GCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-GCM)"
 	},
 	{
 		.name = "server TLS 1.2: AES-128-CCM (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_CCM,
 		.server_prio = "NORMAL:-CIPHER-ALL:+AES-128-CCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+AES-128-CCM"
+		.client_prio = "NORMAL:+AES-128-CCM",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CCM)"
 	},
 	{
 		.name = "both TLS 1.2: AES-128-CCM (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_CCM,
 		.server_prio = "NORMAL:-CIPHER-ALL:+AES-128-CCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+AES-128-CCM:+VERS-TLS1.2"
+		.client_prio = "NORMAL:+AES-128-CCM:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CCM)"
 	},
 	{
 		.name = "client TLS 1.2: AES-128-CCM (client)",
 		.cipher = GNUTLS_CIPHER_AES_128_CCM,
 		.server_prio = "NORMAL:+AES-128-CCM",
-		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CCM)"
 	},
 	{
 		.name = "both TLS 1.2: AES-128-CCM (client)",
 		.cipher = GNUTLS_CIPHER_AES_128_CCM,
 		.server_prio = "NORMAL:+AES-128-CCM:+VERS-TLS1.2",
-		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CCM:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CCM)"
 	},
 	{
 		.name = "server TLS 1.2: CHACHA20-POLY (server)",
 		.cipher = GNUTLS_CIPHER_CHACHA20_POLY1305,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+CHACHA20-POLY1305:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+CHACHA20-POLY1305"
+		.client_prio = "NORMAL:+CHACHA20-POLY1305",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(CHACHA20-POLY1305)"
 	},
 	{
 		.name = "both TLS 1.2: CHACHA20-POLY (server)",
 		.cipher = GNUTLS_CIPHER_CHACHA20_POLY1305,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+CHACHA20-POLY1305:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+CHACHA20-POLY1305:+VERS-TLS1.2"
+		.client_prio = "NORMAL:+CHACHA20-POLY1305:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(CHACHA20-POLY1305)"
 	},
 	{
 		.name = "client TLS 1.2: CHACHA20-POLY (client)",
 		.cipher = GNUTLS_CIPHER_CHACHA20_POLY1305,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:+CHACHA20-POLY1305",
-		.client_prio = "NORMAL:-CIPHER-ALL:+CHACHA20-POLY1305:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+CHACHA20-POLY1305:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(CHACHA20-POLY1305)"
 	},
 	{
 		.name = "both TLS 1.2: CHACHA20-POLY (client)",
 		.cipher = GNUTLS_CIPHER_CHACHA20_POLY1305,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:+CHACHA20-POLY1305:+VERS-TLS1.2",
-		.client_prio = "NORMAL:-CIPHER-ALL:+CHACHA20-POLY1305:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+CHACHA20-POLY1305:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(CHACHA20-POLY1305)"
 	},
 	{
 		.name = "server TLS 1.2: AES-128-CBC (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_CBC,
 		.server_prio = "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+AES-128-CBC"
+		.client_prio = "NORMAL:+AES-128-CBC",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CBC)-(SHA1)"
 	},
 	{
 		.name = "both TLS 1.2: AES-128-CBC (server)",
 		.cipher = GNUTLS_CIPHER_AES_128_CBC,
 		.server_prio = "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+AES-128-CBC:+VERS-TLS1.2"
+		.client_prio = "NORMAL:+AES-128-CBC:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CBC)-(SHA1)"
 	},
 	{
 		.name = "client TLS 1.2: AES-128-CBC (client)",
 		.cipher = GNUTLS_CIPHER_AES_128_CBC,
 		.server_prio = "NORMAL:+AES-128-CBC",
-		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CBC)-(SHA1)"
 	},
 	{
 		.name = "both TLS 1.2: AES-128-CBC (client)",
 		.cipher = GNUTLS_CIPHER_AES_128_CBC,
 		.server_prio = "NORMAL:+AES-128-CBC:+VERS-TLS1.2",
-		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+AES-128-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(AES-128-CBC)-(SHA1)"
 	},
 	{
 		.name = "server TLS 1.2: 3DES-CBC (server)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
 		.server_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+3DES-CBC"
+		.client_prio = "NORMAL:+3DES-CBC",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"
 	},
 	{
 		.name = "both TLS 1.2: 3DES-CBC (server)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
 		.server_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+3DES-CBC:+VERS-TLS1.2"
+		.client_prio = "NORMAL:+3DES-CBC:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"
 	},
 	{
 		.name = "client TLS 1.2: 3DES-CBC (client)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
 		.server_prio = "NORMAL:+3DES-CBC",
-		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"
 	},
 	{
 		.name = "both TLS 1.2: 3DES-CBC (client)",
 		.cipher = GNUTLS_CIPHER_3DES_CBC,
 		.server_prio = "NORMAL:+3DES-CBC:+VERS-TLS1.2",
-		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+3DES-CBC:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(3DES-CBC)-(SHA1)"
 	},
 	{
 		.name = "server TLS 1.2: ARCFOUR-128 (server)",
 		.cipher = GNUTLS_CIPHER_ARCFOUR_128,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+ARCFOUR-128"
+		.client_prio = "NORMAL:+ARCFOUR-128",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(ARCFOUR-128)-(SHA1)"
 	},
 	{
 		.name = "both TLS 1.2: ARCFOUR-128 (server)",
 		.cipher = GNUTLS_CIPHER_ARCFOUR_128,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2:%SERVER_PRECEDENCE",
-		.client_prio = "NORMAL:+ARCFOUR-128:+VERS-TLS1.2"
+		.client_prio = "NORMAL:+ARCFOUR-128:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(ARCFOUR-128)-(SHA1)"
 	},
 	{
 		.name = "client TLS 1.2: ARCFOUR-128 (client)",
 		.cipher = GNUTLS_CIPHER_ARCFOUR_128,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:+ARCFOUR-128",
-		.client_prio = "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(ARCFOUR-128)-(SHA1)"
 	},
 	{
 		.name = "both TLS 1.2: ARCFOUR-128 (client)",
 		.cipher = GNUTLS_CIPHER_ARCFOUR_128,
 		.not_on_fips = 1,
 		.server_prio = "NORMAL:+ARCFOUR-128:+VERS-TLS1.2",
-		.client_prio = "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2"
+		.client_prio = "NORMAL:-CIPHER-ALL:+ARCFOUR-128:+CIPHER-ALL:-VERS-ALL:+VERS-TLS1.2",
+		.desc = "(TLS1.2)-(ECDHE-SECP256R1)-(ECDSA-SHA256)-(ARCFOUR-128)-(SHA1)"
 	}
 };
 
