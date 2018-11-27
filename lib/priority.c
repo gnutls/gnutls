@@ -1226,6 +1226,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	const version_entry_st *tlsmin = NULL;
 	const version_entry_st *dtlsmin = NULL;
 	unsigned have_tls13 = 0, have_srp = 0;
+	unsigned have_pre_tls12 = 0, have_tls12 = 0;
 	unsigned have_psk = 0, have_null = 0, have_rsa_psk = 0;
 
 	/* have_psk indicates that a PSK key exchange compatible
@@ -1270,14 +1271,20 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 			if (vers->tls13_sem)
 				have_tls13 = 1;
 
+			if (vers->id == GNUTLS_TLS1_2)
+				have_tls12 = 1;
+			else if (vers->id < GNUTLS_TLS1_2)
+				have_pre_tls12 = 1;
+
 			if (tlsmax == NULL || vers->age > tlsmax->age)
 				tlsmax = vers;
 			if (tlsmin == NULL || vers->age < tlsmin->age)
 				tlsmin = vers;
 		} else { /* dtls */
 			tls_sig_sem |= vers->tls_sig_sem;
-			if (vers->tls13_sem)
-				have_tls13 = 1;
+
+			/* we need to introduce similar handling to above
+			 * when DTLS1.3 is supported */
 
 			if (dtlsmax == NULL || vers->age > dtlsmax->age)
 				dtlsmax = vers;
@@ -1400,11 +1407,15 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	if (unlikely(priority_cache->cs.size == 0))
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
-	/* when TLS 1.3 is available we must have groups set */
-	if (unlikely(!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0)) {
+	/* when TLS 1.3 is available we must have groups set; additionally
+	 * we require TLS1.2 to be enabled if TLS1.3 is asked for, and
+	 * a pre-TLS1.2 protocol is there; that is because servers which
+	 * do not support TLS1.3 will negotiate TLS1.2 if seen a TLS1.3 handshake */
+	if (unlikely((!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0)) ||
+	    (!have_tls12 && have_pre_tls12 && have_tls13)) {
 		for (i = 0; i < priority_cache->protocol.num_priorities; i++) {
 			vers = version_to_entry(priority_cache->protocol.priorities[i]);
-			if (!vers)
+			if (!vers || vers->transport != GNUTLS_STREAM)
 				continue;
 
 			REMOVE_TLS13_IN_LOOP(vers, i);

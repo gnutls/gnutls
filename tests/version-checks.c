@@ -164,6 +164,13 @@ void doit(void)
 	reset_buffers();
 	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3", GNUTLS_TLS1_3);
 	reset_buffers();
+	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.0", GNUTLS_TLS1_0);
+	reset_buffers();
+	/* similar to above test, but checks a different syntax */
+	try("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.1", GNUTLS_TLS1_1);
+	reset_buffers();
+	try("NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2", GNUTLS_TLS1_3);
+	reset_buffers();
 #ifdef ENABLE_SSL3
 	try("NORMAL:-VERS-TLS-ALL:+VERS-SSL3.0", -1);
 	reset_buffers();
