@@ -80,6 +80,19 @@ if test ${rc} != 0; then
 	exit 1
 fi
 
+${VALGRIND} "${CERTTOOL}" --p12-info --inder --password 1234 --infile "$srcdir/data/sha256.p12" --outfile "${TMPFILE}" --no-text
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "--no-text pkcs12 info failed 1"
+	exit ${rc}
+fi
+
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$\|^[A-Za-z0-9/+=]\+$\|^-----END [A-Z0-9 ]\+-----$' ${TMPFILE} ; then
+	echo "--no-text pkcs12 info failed 2"
+	exit 1
+fi
+
 # test whether we can encode a certificate and a key
 ${VALGRIND} "${CERTTOOL}" --to-p12 --password 1234 --p12-name "my-key" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --outder --outfile $TMPFILE >/dev/null
 rc=$?

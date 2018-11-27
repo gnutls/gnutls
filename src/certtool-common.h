@@ -43,6 +43,7 @@ typedef struct common_info {
 	int pkcs8;
 	int incert_format;
 	int outcert_format;
+	int outtext;
 	const char *cert;
 
 	const char *request;
@@ -150,8 +151,11 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci);
 gnutls_x509_privkey_t *load_privkey_list(int mand, size_t * privkey_size,
 					 common_info_st * info);
 
-void _pubkey_info(FILE * outfile, gnutls_certificate_print_formats_t,
-		  gnutls_pubkey_t pubkey);
+void print_pubkey_info(gnutls_pubkey_t pubkey,
+		       FILE *outfile,
+		       gnutls_certificate_print_formats_t format,
+		       gnutls_x509_crt_fmt_t outcert_format,
+		       unsigned int outtext);
 void print_ecc_pkey(FILE * outfile, gnutls_ecc_curve_t curve,
 		    gnutls_datum_t * k, gnutls_datum_t * x,
 		    gnutls_datum_t * y, int cprint);

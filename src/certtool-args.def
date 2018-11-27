@@ -661,6 +661,14 @@ flag = {
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
 };
 
+flag = {
+    name      = text;
+    descrip   = "Output textual information before PEM-encoded certificates, private keys, etc";
+    enabled;
+    disable   = "no";
+    doc       = "Output textual information before PEM-encoded data";
+};
+
 doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';

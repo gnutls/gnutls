@@ -373,7 +373,7 @@ static void tpm_pubkey(const char *url, FILE * out, unsigned int srk_well_known)
 		exit(1);
 	}
 
-	_pubkey_info(out, GNUTLS_CRT_PRINT_FULL, pubkey);
+	print_pubkey_info(pubkey, out, GNUTLS_CRT_PRINT_FULL, GNUTLS_X509_FMT_PEM, 1);
 
 	gnutls_pubkey_deinit(pubkey);
 }
