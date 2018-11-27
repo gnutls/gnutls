@@ -54,13 +54,13 @@ if [ -z "$(which expect 2>/dev/null)" ]; then
 	exit 77
 fi
 
-$TPMTOOL --help &>/dev/null
+$TPMTOOL --help >/dev/null
 if [ $? -ne 0 ]; then
 	echo "tpmtool cannot show help screen (TPMTOOL=$TPMTOOL)."
 	exit 77
 fi
 
-$CERTTOOL --help &>/dev/null
+$CERTTOOL --help >/dev/null
 if [ $? -ne 0 ]; then
 	echo "certtool cannot show help screen (CERTTOOL=$CERTTOOL)."
 	exit 77
@@ -126,7 +126,7 @@ start_swtpm()
 stop_swtpm()
 {
 	if [ -n "$SWTPM_PID" ]; then
-		kill_quiet -15 $SWTPM_PID
+		terminate_proc $SWTPM_PID
 		unset SWTPM_PID
 	fi
 }
@@ -165,7 +165,7 @@ _EOF_
 stop_tcsd()
 {
 	if [ -n "$TCSD_PID" ]; then
-		kill_quiet -15 $TCSD_PID
+		terminate_proc $TCSD_PID
 		unset TCSD_PID
 	fi
 	stop_swtpm
