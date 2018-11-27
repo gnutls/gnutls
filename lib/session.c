@@ -317,7 +317,7 @@ void gnutls_session_force_valid(gnutls_session_t session)
 	session->internals.invalid_connection = 0;
 }
 
-#define DESC_SIZE 64
+#define DESC_SIZE 96
 
 /**
  * gnutls_session_get_desc:

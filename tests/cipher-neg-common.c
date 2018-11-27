@@ -26,6 +26,7 @@ typedef struct test_case_st {
 	int group;
 	const char *client_prio;
 	const char *server_prio;
+	const char *desc;
 	unsigned not_on_fips;
 } test_case_st;
 
@@ -72,6 +73,19 @@ static void try(test_case_st *test)
 
 	sret = gnutls_cipher_get(client);
 	cret = gnutls_cipher_get(server);
+
+	if (test->desc) {
+		char *desc1 = gnutls_session_get_desc(server);
+		char *desc2 = gnutls_session_get_desc(client);
+
+		if (strcmp(desc1, desc2) != 0)
+			fail("server and client session description don't match (%s, %s)\n", desc1, desc2);
+
+		if (strcmp(desc1, test->desc) != 0)
+			fail("session and expected session description don't match (%s, %s)\n", desc1, test->desc);
+		gnutls_free(desc1);
+		gnutls_free(desc2);
+	}
 
 	if (sret != cret) {
 		fail("%s: client negotiated different cipher than server (%s, %s)!\n",
