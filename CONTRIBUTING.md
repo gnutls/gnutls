@@ -99,8 +99,12 @@ following.
  * ```gnutls_credentials_``` for the credentials structures
  * ```gnutls_global_``` for the global structures handling
 
-Internal functions -- that are not exported in the API -- should
-be prefixed with an underscore. E.g. ```_gnutls_handshake_begin()```
+Internal functions, i.e, functions that are not exported in the API but
+are used internally by multiple files, should be prefixed with an underscore.
+For example `_gnutls_handshake_begin()`.
+
+Internal functions restricted to a file (static), or inline functions, should
+not use the `_gnutls` prefix for simplicity, e.g., `get_version()`.
 
 Internal structures should not be exported. Especially pointers to
 internal data. Doing so harms future reorganization/rewrite of subsystems.
