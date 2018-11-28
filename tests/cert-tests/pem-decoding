@@ -180,7 +180,7 @@ if test "${rc}" != "0"; then
 fi
 
 #check if --no-text works as expected
-${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/cert-ecc256.pem" --no-text >${TMPFILE}
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/data/cert-ecc256.pem" --no-text --outfile ${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -194,7 +194,7 @@ if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$\|^[A-Za-z0-9/+=]\+$\|^-----END [A-Z0-9
 fi
 
 #check if --no-text works as expected
-${VALGRIND} "${CERTTOOL}" --certificate-pubkey --infile "${srcdir}/data/cert-ecc256.pem" --no-text >${TMPFILE}
+${VALGRIND} "${CERTTOOL}" --certificate-pubkey --infile "${srcdir}/data/cert-ecc256.pem" --no-text  --outfile ${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -208,7 +208,7 @@ if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$\|^[A-Za-z0-9/+=]\+$\|^-----END [A-Z0-9
 fi
 
 #check if --no-text works as expected
-${VALGRIND} "${CERTTOOL}" --pubkey-info --infile "${srcdir}/data/cert-ecc256.pem" --no-text >${TMPFILE}
+${VALGRIND} "${CERTTOOL}" --pubkey-info --infile "${srcdir}/data/cert-ecc256.pem" --no-text  --outfile ${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then

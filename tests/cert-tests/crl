@@ -55,7 +55,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-${VALGRIND} "${CERTTOOL}" --crl-info --infile ${OUTFILE} --no-text >${TMP2FILE}
+${VALGRIND} "${CERTTOOL}" --crl-info --infile ${OUTFILE} --no-text --outfile ${TMP2FILE}
 rc=$?
 
 if test "${rc}" != "0"; then
