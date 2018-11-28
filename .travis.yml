@@ -33,5 +33,6 @@ script:
   - make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
 
 after_failure:
+  - find . -name 'test-suite.log' -execdir grep -il "FAILED" {} \; -exec echo {} \; -exec cat {} \;
   - for i in tests/*.log fuzz/*.log;do echo "" && echo $i && cat $i;done
 
