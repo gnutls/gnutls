@@ -943,6 +943,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 			break;
 		}
+#ifdef HAVE_CKM_EDDSA
 	case GNUTLS_PK_EDDSA_ED25519:
 		{
 			ret =
@@ -967,6 +968,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 			break;
 		}
+#endif
 	default:
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;
