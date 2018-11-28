@@ -72,8 +72,10 @@ static unsigned verify_eddsa_presence(void)
 	return 0;
 }
 
-static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t *txtkey, int exp_key_err)
+static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t *txtkey,
+					  int exp_key_err, unsigned needs_decryption)
 {
+	unsigned flags;
 	gnutls_privkey_t privkey;
 	gnutls_x509_privkey_t tmp;
 	int ret;
@@ -86,7 +88,12 @@ static gnutls_privkey_t load_virt_privkey(const char *name, const gnutls_datum_t
 	if (ret < 0)
 		testfail("gnutls_privkey_import: %s\n", gnutls_strerror(ret));
 
-	ret = gnutls_pkcs11_copy_x509_privkey(SOFTHSM_URL, tmp, "key", GNUTLS_KEY_DIGITAL_SIGNATURE,
+	if (needs_decryption)
+		flags = GNUTLS_KEY_KEY_ENCIPHERMENT;
+	else
+		flags = GNUTLS_KEY_DIGITAL_SIGNATURE;
+
+	ret = gnutls_pkcs11_copy_x509_privkey(SOFTHSM_URL, tmp, "key", flags,
 					      GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE|GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE|GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	gnutls_x509_privkey_deinit(tmp);
 
@@ -166,9 +173,9 @@ void try_with_key(const char *name, const char *client_prio,
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				s_xcred);
 
-	gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
-				   NULL);
+	assert(gnutls_priority_set_direct(server,
+					  "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
+					  NULL) >= 0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
@@ -260,10 +267,19 @@ typedef struct test_st {
 	int exp_key_err;
 	int exp_serv_err;
 	int needs_eddsa;
+	int needs_decryption;
 	unsigned requires_pkcs11_pss;
 } test_st;
 
 static const test_st tests[] = {
+	{.name = "tls1.2: rsa-decryption key",
+	 .pk = GNUTLS_PK_RSA,
+	 .prio = "NORMAL:-KX-ALL:+RSA:-VERS-TLS-ALL:+VERS-TLS1.2",
+	 .cert = &server_ca3_localhost_rsa_decrypt_cert,
+	 .key = &server_ca3_key,
+	 .exp_kx = GNUTLS_KX_RSA,
+	 .needs_decryption = 1
+	},
 	{.name = "tls1.2: ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
 	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2",
@@ -437,7 +453,7 @@ void doit(void)
 			}
 		}
 
-		privkey = load_virt_privkey(tests[i].name, tests[i].key, tests[i].exp_key_err);
+		privkey = load_virt_privkey(tests[i].name, tests[i].key, tests[i].exp_key_err, tests[i].needs_decryption);
 		if (privkey == NULL && tests[i].exp_key_err < 0)
 			continue;
 		assert(privkey != 0);
