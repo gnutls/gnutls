@@ -44,7 +44,7 @@ if test "${rc}" != "0";then
 fi
 done
 
-${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/data/privkey1.pem" --no-text >${TMPFILE}
+${VALGRIND} "${CERTTOOL}" -k --infile "${srcdir}/data/privkey1.pem" --no-text --outfile ${TMPFILE}
 rc=$?
 
 if test "${rc}" != "0"; then
