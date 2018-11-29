@@ -63,7 +63,7 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
-if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$\|^[A-Za-z0-9/+=]\+$\|^-----END [A-Z0-9 ]\+-----$' ${TMP2FILE} ; then
+if grep -v '^-----BEGIN [A-Z0-9 ]\+-----$' ${TMP2FILE} | grep -v '^[A-Za-z0-9/+=]\+$' | grep -v '^-----END [A-Z0-9 ]\+-----$' ; then
 	echo "--no-text crl info failed 2"
 	exit 1
 fi
