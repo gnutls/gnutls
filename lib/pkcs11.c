@@ -612,12 +612,17 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
  * @obj: should contain a #gnutls_pkcs11_obj_t type
  * @itype: Denotes the type of information requested
  * @output: where output will be stored
- * @output_size: contains the maximum size of the output and will be overwritten with actual
+ * @output_size: contains the maximum size of the output buffer and will be
+ *     overwritten with the actual size.
  *
  * This function will return information about the PKCS11 certificate
  * such as the label, id as well as token information where the key is
- * stored. When output is text it returns null terminated string
- * although @output_size contains the size of the actual data only.
+ * stored.
+ *
+ * When output is text, a null terminated string is written to @output and its
+ * string length is written to @output_size (without null terminator). If the
+ * buffer is too small, @output_size will contain the expected buffer size
+ * (with null terminator for text) and return %GNUTLS_E_SHORT_MEMORY_BUFFER.
  *
  * In versions previously to 3.6.0 this function included the null terminator
  * to @output_size. After 3.6.0 the output size doesn't include the terminator character.
@@ -2447,10 +2452,16 @@ gnutls_pkcs11_token_get_url(unsigned int seq,
  * @url: should contain a PKCS 11 URL
  * @ttype: Denotes the type of information requested
  * @output: where output will be stored
- * @output_size: contains the maximum size of the output and will be overwritten with actual
+ * @output_size: contains the maximum size of the output buffer and will be
+ *     overwritten with the actual size.
  *
  * This function will return information about the PKCS 11 token such
  * as the label, id, etc.
+ *
+ * When output is text, a null terminated string is written to @output and its
+ * string length is written to @output_size (without null terminator). If the
+ * buffer is too small, @output_size will contain the expected buffer size
+ * (with null terminator for text) and return %GNUTLS_E_SHORT_MEMORY_BUFFER.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code
  * on error.
