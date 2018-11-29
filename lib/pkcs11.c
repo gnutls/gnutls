@@ -2476,6 +2476,7 @@ gnutls_pkcs11_token_get_info(const char *url,
 	struct p11_kit_uri *info = NULL;
 	const uint8_t *str;
 	size_t str_max;
+	char *temp_str = NULL;
 	size_t len;
 	int ret;
 
@@ -2516,10 +2517,14 @@ gnutls_pkcs11_token_get_info(const char *url,
 			goto cleanup;
 		}
 
-		snprintf(output, *output_size, "%s", tn.modname);
-		*output_size = strlen(output);
-		ret = 0;
-		goto cleanup;
+		temp_str = tn.modname;
+		if (temp_str == NULL) {
+			gnutls_assert();
+			str_max = 0;
+		} else {
+			str = (uint8_t *)temp_str;
+		}
+		break;
 	}
 	default:
 		gnutls_assert();
@@ -2527,14 +2532,21 @@ gnutls_pkcs11_token_get_info(const char *url,
 		goto cleanup;
 	}
 
-	len = p11_kit_space_strlen(str, str_max);
+	if (temp_str)
+		len = strlen(temp_str);
+	else if (str_max == 0)
+		len = 0;
+	else
+		len = p11_kit_space_strlen(str, str_max);
 
 	if (len + 1 > *output_size) {
 		*output_size = len + 1;
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto cleanup;
 	}
 
-	memcpy(output, str, len);
+	if (len)
+		memcpy(output, str, len);
 	((char *) output)[len] = '\0';
 
 	*output_size = len;
@@ -2542,6 +2554,7 @@ gnutls_pkcs11_token_get_info(const char *url,
 	ret = 0;
 
  cleanup:
+	free(temp_str);
 	p11_kit_uri_free(info);
 	return ret;
 }
