@@ -143,32 +143,16 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		memset(seed, 0, DRBG_AES_SEED_SIZE);
 	}
 
-	/* Throw the first block generated. FIPS 140-2 requirement (see 
-	 * the continuous random number generator test in 4.9.2)
-	 */
-	if (ctx->prev_block_present == 0) {
-		INCREMENT(sizeof(ctx->v), ctx->v);
-		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->prev_block, ctx->v);
-
-		ctx->prev_block_present = 1;
-	}
-
 	/* Perform the actual encryption */
 	for (left = length; left >= AES_BLOCK_SIZE;
 	     left -= AES_BLOCK_SIZE, dst += AES_BLOCK_SIZE) {
-
 		INCREMENT(sizeof(ctx->v), ctx->v);
 		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, ctx->v);
-
-		memcpy(ctx->prev_block, dst, AES_BLOCK_SIZE);
 	}
 
 	if (left > 0) {		/* partial fill */
-
 		INCREMENT(sizeof(ctx->v), ctx->v);
 		aes256_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, ctx->v);
-
-		memcpy(ctx->prev_block, tmp, AES_BLOCK_SIZE);
 		memcpy(dst, tmp, left);
 	}
 

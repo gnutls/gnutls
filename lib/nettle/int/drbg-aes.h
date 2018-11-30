@@ -50,8 +50,6 @@ struct drbg_aes_ctx {
 
 	uint8_t v[AES_BLOCK_SIZE];
 
-	unsigned prev_block_present;
-	uint8_t prev_block[AES_BLOCK_SIZE];
 	unsigned reseed_counter;
 };
 
