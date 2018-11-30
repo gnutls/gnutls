@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 # USA
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [3.6.4], [bugs@gnutls.org])
+AC_INIT([GnuTLS], [3.6.5], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIRS([m4 src/gl/m4 src/libopts/m4 lib/unistring/m4])
 AC_CANONICAL_HOST
