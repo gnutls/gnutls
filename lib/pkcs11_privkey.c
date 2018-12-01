@@ -715,6 +715,121 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	return ret;
 }
 
+/*-
+ * _gnutls_pkcs11_privkey_decrypt_data2:
+ * @key: Holds the key
+ * @flags: should be 0 for now
+ * @ciphertext: holds the data to be signed
+ * @plaintext: a preallocated buffer that will be filled with the plaintext
+ * @plaintext_size: size of the plaintext
+ *
+ * This function will decrypt the given data using the public key algorithm
+ * supported by the private key.
+ * Unlike with _gnutls_pkcs11_privkey_decrypt_data the plaintext size is known
+ * and provided by the caller, if the plaintext size differs from the requested
+ * one, the operation fails and the provided buffer is left unchanged.
+ * NOTE: plaintext_size must be exactly the size of the payload in the
+ * ciphertext, otherwise an error is returned and the plaintext buffer is left
+ * unchanged.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ -*/
+int
+_gnutls_pkcs11_privkey_decrypt_data2(gnutls_pkcs11_privkey_t key,
+				     unsigned int flags,
+				     const gnutls_datum_t * ciphertext,
+				     unsigned char * plaintext,
+				     size_t plaintext_size)
+{
+	ck_rv_t rv;
+	int ret;
+	struct ck_mechanism mech;
+	unsigned long siglen = ciphertext->size;
+	unsigned req_login = 0;
+	unsigned login_flags = SESSION_LOGIN|SESSION_CONTEXT_SPECIFIC;
+	unsigned char *buffer;
+	volatile unsigned char value;
+	unsigned char mask;
+
+	PKCS11_CHECK_INIT_PRIVKEY(key);
+
+	if (key->pk_algorithm != GNUTLS_PK_RSA)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	mech.mechanism = CKM_RSA_PKCS;
+	mech.parameter = NULL;
+	mech.parameter_len = 0;
+
+	ret = gnutls_mutex_lock(&key->mutex);
+	if (ret != 0)
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+
+	buffer = gnutls_malloc(siglen);
+	if (!buffer) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	/* Initialize signing operation; using the private key discovered
+	 * earlier. */
+	REPEAT_ON_INVALID_HANDLE(
+		rv = pkcs11_decrypt_init(key->sinfo.module, key->sinfo.pks,
+					 &mech, key->ref)
+	);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
+
+ retry_login:
+	if (key->reauth || req_login) {
+		if (req_login)
+			login_flags = SESSION_FORCE_LOGIN|SESSION_LOGIN;
+		ret =
+		    pkcs11_login(&key->sinfo, &key->pin,
+				 key->uinfo, login_flags);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
+			/* let's try the operation anyway */
+		}
+	}
+
+	ret = 0;
+	siglen = ciphertext->size;
+	rv = pkcs11_decrypt(key->sinfo.module, key->sinfo.pks,
+			    ciphertext->data, ciphertext->size,
+			    buffer, &siglen);
+	if (unlikely(rv == CKR_USER_NOT_LOGGED_IN && req_login == 0)) {
+		req_login = 1;
+		goto retry_login;
+	}
+
+	/* NOTE: These branches are not side-channel silent */
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+	} else if (siglen != plaintext_size) {
+		gnutls_assert();
+		ret = GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* conditionally copy buffer in a side-channel silent way */
+	/* on success mask is 0xFF, on failure it is 0 */
+	mask = ((uint32_t)ret >> 31) - 1U;
+	for (size_t i = 0; i < plaintext_size; i++) {
+		value = (buffer[i] & mask) + (plaintext[i] & ~mask);
+		plaintext[i] = value;
+	}
+
+      cleanup:
+	gnutls_mutex_unlock(&key->mutex);
+	gnutls_free(buffer);
+	return ret;
+}
+
 /**
  * gnutls_pkcs11_privkey_export_url:
  * @key: Holds the PKCS 11 key

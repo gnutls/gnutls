@@ -108,6 +108,7 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a);
 #define _gnutls_write_log(...) LEVEL(11, __VA_ARGS__)
 #define _gnutls_io_log(...) LEVEL(12, __VA_ARGS__)
 #define _gnutls_buffers_log(...) LEVEL(13, __VA_ARGS__)
+#define _gnutls_no_log(...) LEVEL(INT_MAX, __VA_ARGS__)
 #else
 #define _gnutls_debug_log _gnutls_null_log
 #define _gnutls_assert_log _gnutls_null_log
@@ -119,6 +120,7 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a);
 #define _gnutls_dtls_log _gnutls_null_log
 #define _gnutls_read_log _gnutls_null_log
 #define _gnutls_write_log _gnutls_null_log
+#define _gnutls_no_log _gnutle_null_log
 
 void _gnutls_null_log(void *, ...);
 

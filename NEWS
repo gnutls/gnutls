@@ -41,6 +41,15 @@ See the end for copying conditions.
 ** certtool: Add parameter --no-text that prevents certtool from outputting
    text before PEM-encoded private key, public key, certificate, CRL or CSR.
 
+** libgnutls: Change RSA decryption to use a new side-channel silent function.
+   This addresses a security issue where memory access patterns as well as timing
+   on the underlying Nettle rsa-decrypt function could lead to new Bleichenbacher
+   attacks. Side-channel resistant code is slower due to the need to mask
+   access and timings. When used in TLS the new functions cause RSA based
+   handshakes to be between 13% and 28% slower on average (Numbers are indicative,
+   the tests where performed on a relatively modern Intel CPU, results vary
+   depending on the CPU and architecture used).
+
 ** API and ABI modifications:
 GNUTLS_AUTO_REAUTH: Added
 GNUTLS_CIPHER_AES_128_CFB8: Added
@@ -57,6 +66,7 @@ gnutls_anti_replay_init: Added
 gnutls_anti_replay_deinit: Added
 gnutls_anti_replay_set_window: Added
 gnutls_anti_replay_enable: Added
+gnutls_privkey_decrypt_data2: Added
 
 
 * Version 3.6.4 (released 2018-09-24)

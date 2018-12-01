@@ -529,6 +529,57 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 	return ret;
 }
 
+/* Note: we do not allocate in this function to avoid asymettric
+ * unallocation (which creates a side channel) in case of failure
+ * */
+static int
+_wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
+			 const gnutls_datum_t * ciphertext,
+			 unsigned char * plaintext,
+			 size_t plaintext_size,
+			 const gnutls_pk_params_st * pk_params)
+{
+	struct rsa_private_key priv;
+	struct rsa_public_key pub;
+	bigint_t c;
+	uint32_t is_err;
+	int ret;
+
+	if (algo != GNUTLS_PK_RSA || plaintext == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	_rsa_params_to_privkey(pk_params, &priv);
+	ret = _rsa_params_to_pubkey(pk_params, &pub);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (ciphertext->size != pub.size)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	if (_gnutls_mpi_init_scan_nz(&c, ciphertext->data,
+				     ciphertext->size) != 0) {
+		return gnutls_assert_val (GNUTLS_E_MPI_SCAN_FAILED);
+	}
+
+	ret = rsa_sec_decrypt(&pub, &priv, NULL, rnd_nonce_func,
+			     plaintext_size, plaintext, TOMPZ(c));
+	/* after this point, any conditional on failure that cause differences
+	 * in execution may create a timing or cache access pattern side
+	 * channel that can be used as an oracle, so thread very carefully */
+	_gnutls_mpi_release(&c);
+	/* Here HAVE_LIB_ERROR() should be fine as it doesn't have
+	 * branches in it and returns a bool */
+	is_err = HAVE_LIB_ERROR();
+	/* if is_err != 0 */
+	is_err = CONSTCHECK_NOT_EQUAL(is_err, 0);
+	/* or ret == 0 */
+	is_err |= CONSTCHECK_EQUAL(ret, 0);
+	/* then return GNUTLS_E_DECRYPTION_FAILED */
+	return (int)((is_err * UINT_MAX) & GNUTLS_E_DECRYPTION_FAILED);
+}
+
 #define CHECK_INVALID_RSA_PSS_PARAMS(dig_size, salt_size, pub_size, err) \
 	if (unlikely(dig_size + salt_size + 2 > pub_size)) \
 		return gnutls_assert_val(err)
@@ -2780,6 +2831,7 @@ int crypto_pk_prio = INT_MAX;
 gnutls_crypto_pk_st _gnutls_pk_ops = {
 	.encrypt = _wrap_nettle_pk_encrypt,
 	.decrypt = _wrap_nettle_pk_decrypt,
+	.decrypt2 = _wrap_nettle_pk_decrypt2,
 	.sign = _wrap_nettle_pk_sign,
 	.verify = _wrap_nettle_pk_verify,
 	.verify_priv_params = wrap_nettle_pk_verify_priv_params,

@@ -567,6 +567,7 @@ gnutls_priority_set@GNUTLS_3_4
 gnutls_priority_set_direct@GNUTLS_3_4
 gnutls_priority_sign_list@GNUTLS_3_4
 gnutls_priority_string_list@GNUTLS_3_4
+gnutls_privkey_decrypt_data2@GNUTLS_3_6_5
 gnutls_privkey_decrypt_data@GNUTLS_3_4
 gnutls_privkey_deinit@GNUTLS_3_4
 gnutls_privkey_export_dsa_raw2@GNUTLS_3_6_0

@@ -39,6 +39,7 @@ struct gnutls_privkey_st {
 			gnutls_privkey_sign_data_func sign_data_func;
 			gnutls_privkey_sign_hash_func sign_hash_func;
 			gnutls_privkey_decrypt_func decrypt_func;
+			gnutls_privkey_decrypt_func2 decrypt_func2;
 			gnutls_privkey_deinit_func deinit_func;
 			gnutls_privkey_info_func info_func;
 			void *userdata;

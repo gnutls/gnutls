@@ -1261,6 +1261,7 @@ GNUTLS_3_6_5
 	gnutls_anti_replay_deinit;
 	gnutls_anti_replay_set_window;
 	gnutls_anti_replay_enable;
+	gnutls_privkey_decrypt_data2;
 } GNUTLS_3_6_4;
 
 GNUTLS_FIPS140_3_4 {

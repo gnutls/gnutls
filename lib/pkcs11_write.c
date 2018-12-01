@@ -753,7 +753,8 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 	if (pk == GNUTLS_PK_RSA) {
 		a[a_val].type = CKA_DECRYPT;
-		if (key_usage & (GNUTLS_KEY_ENCIPHER_ONLY|GNUTLS_KEY_DECIPHER_ONLY)) {
+		if ((key_usage & (GNUTLS_KEY_ENCIPHER_ONLY|GNUTLS_KEY_DECIPHER_ONLY)) ||
+		    (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)) {
 			a[a_val].value = (void*)&tval;
 			a[a_val].value_len = sizeof(tval);
 		} else {

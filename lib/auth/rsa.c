@@ -155,12 +155,13 @@ static int
 proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		   size_t _data_size)
 {
-	gnutls_datum_t plaintext = {NULL, 0};
+	const char attack_error[] = "auth_rsa: Possible PKCS #1 attack\n";
 	gnutls_datum_t ciphertext;
 	int ret, dsize;
-	int use_rnd_key = 0;
 	ssize_t data_size = _data_size;
-	gnutls_datum_t rndkey = {NULL, 0};
+	volatile uint8_t ver_maj, ver_min;
+	volatile uint8_t check_ver_min;
+	volatile uint32_t ok;
 
 #ifdef ENABLE_SSL3
 	if (get_num_version(session) == GNUTLS_SSL3) {
@@ -184,75 +185,73 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		ciphertext.size = dsize;
 	}
 
-	rndkey.size = GNUTLS_MASTER_SIZE;
-	rndkey.data = gnutls_malloc(rndkey.size);
-	if (rndkey.data == NULL) {
+	ver_maj = _gnutls_get_adv_version_major(session);
+	ver_min = _gnutls_get_adv_version_minor(session);
+	check_ver_min = (session->internals.allow_wrong_pms == 0);
+
+	session->key.key.data = gnutls_malloc(GNUTLS_MASTER_SIZE);
+	if (session->key.key.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+	session->key.key.size = GNUTLS_MASTER_SIZE;
 
-	/* we do not need strong random numbers here.
-	 */
-	ret = gnutls_rnd(GNUTLS_RND_NONCE, rndkey.data,
-			  rndkey.size);
+	/* Fallback value when decryption fails. Needs to be unpredictable. */
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, session->key.key.data,
+			 GNUTLS_MASTER_SIZE);
 	if (ret < 0) {
+                gnutls_free(session->key.key.data);
+                session->key.key.data = NULL;
+                session->key.key.size = 0;
 		gnutls_assert();
-		goto cleanup;
+		return ret;
 	}
 
 	ret =
-	    gnutls_privkey_decrypt_data(session->internals.selected_key, 0,
-					&ciphertext, &plaintext);
+	    gnutls_privkey_decrypt_data2(session->internals.selected_key,
+					 0, &ciphertext, session->key.key.data,
+					 session->key.key.size);
+	/* After this point, any conditional on failure that cause differences
+	 * in execution may create a timing or cache access pattern side
+	 * channel that can be used as an oracle, so tread very carefully */
 
-	if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE) {
-		/* In case decryption fails then don't inform
-		 * the peer. Just use a random key. (in order to avoid
-		 * attack against pkcs-1 formating).
-		 */
-		_gnutls_debug_log("auth_rsa: Possible PKCS #1 format attack\n");
-		if (ret >= 0) {
-			gnutls_free(plaintext.data);
-			plaintext.data = NULL;
-		}
-		use_rnd_key = 1;
-	} else {
-		/* If the secret was properly formatted, then
-		 * check the version number.
-		 */
-		if (_gnutls_get_adv_version_major(session) !=
-		    plaintext.data[0]
-		    || (session->internals.allow_wrong_pms == 0
-			&& _gnutls_get_adv_version_minor(session) !=
-			plaintext.data[1])) {
-			/* No error is returned here, if the version number check
-			 * fails. We proceed normally.
-			 * That is to defend against the attack described in the paper
-			 * "Attacking RSA-based sessions in SSL/TLS" by Vlastimil Klima,
-			 * Ondej Pokorny and Tomas Rosa.
-			 */
-			_gnutls_debug_log("auth_rsa: Possible PKCS #1 version check format attack\n");
-		}
-	}
+	/* Error handling logic:
+	 * In case decryption fails then don't inform the peer. Just use the
+	 * random key previously generated. (in order to avoid attack against
+	 * pkcs-1 formating).
+	 *
+	 * If we get version mismatches no error is returned either. We
+	 * proceed normally. This is to defend against the attack described
+	 * in the paper "Attacking RSA-based sessions in SSL/TLS" by
+	 * Vlastimil Klima, Ondej Pokorny and Tomas Rosa.
+	 */
 
-	if (use_rnd_key != 0) {
-		session->key.key.data = rndkey.data;
-		session->key.key.size = rndkey.size;
-		rndkey.data = NULL;
+	/* ok is 0 in case of error and 1 in case of success. */
+
+	/* if ret < 0 */
+	ok = CONSTCHECK_EQUAL(ret, 0);
+	/* session->key.key.data[0] must equal ver_maj */
+	ok &= CONSTCHECK_EQUAL(session->key.key.data[0], ver_maj);
+	/* if check_ver_min then session->key.key.data[1] must equal ver_min */
+	ok &= CONSTCHECK_NOT_EQUAL(check_ver_min, 0) &
+	        CONSTCHECK_EQUAL(session->key.key.data[1], ver_min);
+
+	if (ok) {
+		/* call logging function unconditionally so all branches are
+		 * indistinguishable for timing and cache access when debug
+		 * logging is disabled */
+		_gnutls_no_log("%s", attack_error);
 	} else {
-		session->key.key.data = plaintext.data;
-		session->key.key.size = plaintext.size;
+		_gnutls_debug_log("%s", attack_error);
 	}
 
 	/* This is here to avoid the version check attack
 	 * discussed above.
 	 */
-	session->key.key.data[0] = _gnutls_get_adv_version_major(session);
-	session->key.key.data[1] = _gnutls_get_adv_version_minor(session);
+	session->key.key.data[0] = ver_maj;
+	session->key.key.data[1] = ver_min;
 
-	ret = 0;
- cleanup:
-	gnutls_free(rndkey.data);
-	return ret;
+	return 0;
 }
 
 

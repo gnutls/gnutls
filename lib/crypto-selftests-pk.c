@@ -116,6 +116,7 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 	gnutls_datum_t raw_rsa_key = { (void*)rsa_key2048, sizeof(rsa_key2048)-1 };
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub = NULL;
+	unsigned char plaintext2[sizeof(DATASTR) - 1];
 
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
@@ -160,6 +161,18 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 
 	if (dec.size != signed_data.size
 	    || memcmp(dec.data, signed_data.data, dec.size) != 0) {
+		ret = GNUTLS_E_SELF_TEST_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_privkey_decrypt_data2(key, 0, &enc, plaintext2,
+					   signed_data.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	if (memcmp(plaintext2, signed_data.data, signed_data.size) != 0) {
 		ret = GNUTLS_E_SELF_TEST_ERROR;
 		gnutls_assert();
 		goto cleanup;
