@@ -68,16 +68,17 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_SSL_VERSION=`expr ${LT_SSL_CURRENT} - ${LT_SSL_AGE}`
   AC_SUBST(DLL_SSL_VERSION)
 
-  PKG_CHECK_MODULES(NETTLE, [nettle >= 3.4.1], [cryptolib="nettle"], [
+NETTLE_MINIMUM=3.4.1
+  PKG_CHECK_MODULES(NETTLE, [nettle >= $NETTLE_MINIMUM], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
   *** 
-  *** Libnettle 3.4 was not found.
+  *** Libnettle $NETTLE_MINIMUM was not found.
 ]])
   ])
-  PKG_CHECK_MODULES(HOGWEED, [hogweed >= 3.4.1], [], [
+  PKG_CHECK_MODULES(HOGWEED, [hogweed >= $NETTLE_MINIMUM ], [], [
 AC_MSG_ERROR([[
   *** 
-  *** Libhogweed (nettle's companion library) was not found. Note that you must compile nettle with gmp support.
+  *** Libhogweed (nettle's companion library) $NETTLE_MINIMUM was not found. Note that you must compile nettle with gmp support.
 ]])
   ])
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
