@@ -70,7 +70,7 @@ int gnutls_system_global_init(void)
 #if defined(_WIN32) && defined(NEED_CERT_ENUM_CRLS)
 	/* used in system/certs.c */
 	HMODULE crypto;
-	crypto = LoadLibraryA("Crypt32.dll");
+	crypto = LoadLibrary(TEXT("Crypt32.dll"));
 
 	if (crypto == NULL)
 		return GNUTLS_E_CRYPTO_INIT_FAILED;
