@@ -2737,6 +2737,10 @@ int gnutls_handshake(gnutls_session_t session)
 	}
 
 	if (STATE == STATE0) {
+		unsigned int tmo_ms;
+		struct timespec *end;
+		struct timespec *start;
+
 		/* first call */
 		if (session->internals.priorities == NULL ||
 		    session->internals.priorities->cs.size == 0)
@@ -2752,10 +2756,17 @@ int gnutls_handshake(gnutls_session_t session)
 		session->internals.handshake_in_progress = 1;
 		session->internals.vc_status = -1;
 		gnutls_gettime(&session->internals.handshake_start_time);
-		if (session->internals.handshake_timeout_ms &&
-		    session->internals.handshake_endtime == 0)
-			    session->internals.handshake_endtime = session->internals.handshake_start_time.tv_sec +
-			    session->internals.handshake_timeout_ms / 1000;
+
+		tmo_ms = session->internals.handshake_timeout_ms;
+		end = &session->internals.handshake_endtime;
+		start = &session->internals.handshake_start_time;
+
+		if (tmo_ms && end->tv_sec == 0 && end->tv_nsec == 0) {
+			end->tv_sec =
+				start->tv_sec + (start->tv_nsec + tmo_ms * 1000000LL) / 1000000000LL;
+			end->tv_nsec =
+				(start->tv_nsec + tmo_ms * 1000000LL) % 1000000000LL;
+		}
 	}
 
 	if (session->internals.recv_state == RECV_STATE_FALSE_START) {

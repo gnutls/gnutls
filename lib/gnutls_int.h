@@ -1303,7 +1303,9 @@ typedef struct {
 	/* starting time of current handshake */
 	struct timespec handshake_start_time;
 
-	time_t handshake_endtime;	/* end time in seconds */
+	/* end time of current handshake */
+	struct timespec handshake_endtime;
+
 	unsigned int handshake_timeout_ms;	/* timeout in milliseconds */
 	unsigned int record_timeout_ms;	/* timeout in milliseconds */
 
