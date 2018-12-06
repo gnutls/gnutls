@@ -14,6 +14,8 @@
      "tests" : [
 	 {"name" : "test-tls13-0rtt-garbage.py",
 	  "arguments": ["-p", "@PORT@"]},
+	 {"name" : "test-tls13-ccs.py",
+	  "arguments": ["-p", "@PORT@"]},
 	 {"name" : "test-tls13-crfg-curves.py",
 	  "comment": "We do not support x448",
 	  "arguments": ["-p", "@PORT@",
