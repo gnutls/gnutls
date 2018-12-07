@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #if defined(_WIN32)
 
@@ -61,7 +62,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-static void client(int fd, int wait)
+static void client(int fd, int tmo_ms)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -79,7 +80,7 @@ static void client(int fd, int wait)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_handshake_set_timeout(session, tmo_ms);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session, "NORMAL:+ANON-ECDH:-VERS-ALL:+VERS-TLS1.2", NULL);
@@ -102,7 +103,7 @@ static void client(int fd, int wait)
 	gnutls_global_deinit();
 
 	if (ret < 0) {
-		if (ret != GNUTLS_E_TIMEDOUT || wait == 0) {
+		if (ret != GNUTLS_E_TIMEDOUT || tmo_ms == 0) {
 			if (debug)
 				fail("client: unexpected error: %s\n",
 				     gnutls_strerror(ret));
@@ -110,19 +111,19 @@ static void client(int fd, int wait)
 		}
 		if (debug)
 			success("client: expected timeout occurred\n");
-		return;
 	} else {
-		if (wait != 0) {
+		if (tmo_ms != 0) {
 			fail("client: handshake was completed unexpectedly\n");
 			gnutls_perror(ret);
 			exit(1);
 		}
 	}
 
+	shutdown(fd, SHUT_RDWR);
 	return;
 }
 
-static void server(int fd, int wait)
+static void server(int fd, int tmo_ms)
 {
 	int ret;
 	gnutls_session_t session;
@@ -150,8 +151,12 @@ static void server(int fd, int wait)
 
 	gnutls_transport_set_int(session, fd);
 
-	if (wait) {
-		sec_sleep(25);
+	if (tmo_ms) {
+		char buf[32];
+
+		// read until client closes connection
+		while (read(fd, buf, sizeof(buf)) > 0)
+			;
 	} else {
 		do {
 			ret = gnutls_handshake(session);
@@ -167,14 +172,14 @@ static void server(int fd, int wait)
 	gnutls_global_deinit();
 }
 
-static void start(int wait_flag)
+static void start(int tmo_ms)
 {
 	int fd[2];
 	int ret;
 	pid_t child;
 
-	if (debug && wait_flag)
-		fprintf(stderr, "\nWill test timeout\n");
+	if (debug && tmo_ms)
+		fprintf(stderr, "\nWill test timeout %dms\n", tmo_ms);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -193,14 +198,14 @@ static void start(int wait_flag)
 		int status = 0;
 		/* parent */
 		close(fd[1]);
-		server(fd[0], wait_flag);
+		server(fd[0], tmo_ms);
 		close(fd[0]);
 
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1], wait_flag);
+		client(fd[1], tmo_ms);
 		close(fd[1]);
 		exit(0);
 	}
@@ -219,8 +224,11 @@ void doit(void)
 	/* make sure that normal handshake occurs */
 	start(0);
 
-	/* check the handshake with an expected timeout */
-	start(1);
+	/* check the handshake with a 100ms timeout */
+	start(100);
+
+	/* check the handshake with a 1000ms timeout */
+	start(1000);
 }
 
 #endif				/* _WIN32 */

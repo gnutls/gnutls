@@ -112,16 +112,23 @@ int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session,
 #define FAGAIN(target) (FINAL_STATE==target?1:0)
 #define AGAIN2(state, target) (state==target?1:0)
 
+/* return the remaining time in ms */
 inline static int handshake_remaining_time(gnutls_session_t session)
 {
-	if (session->internals.handshake_endtime) {
+	struct timespec *end = &session->internals.handshake_endtime;
+
+	if (end->tv_sec || end->tv_nsec) {
 		struct timespec now;
 		gnutls_gettime(&now);
 
-		if (now.tv_sec < session->internals.handshake_endtime)
-			return (session->internals.handshake_endtime -
-				now.tv_sec) * 1000;
-		else
+		if (now.tv_sec < end->tv_sec ||
+		   (now.tv_sec == end->tv_sec && now.tv_nsec < end->tv_nsec))
+		{
+			long long now_ms = now.tv_sec * 1000LL + now.tv_nsec / 1000000;
+			long long end_ms = end->tv_sec * 1000LL + end->tv_nsec / 1000000;
+
+			return end_ms - now_ms;
+		} else
 			return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
 	}
 	return 0;
