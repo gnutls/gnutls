@@ -134,6 +134,11 @@ static void client(int fd, unsigned ccs_check)
 	if (ret < 0)
 		fail("client: recv did not succeed as expected: %s\n", gnutls_strerror(ret));
 
+	/* send change cipher spec, this should fail in the server */
+	do {
+		ret = send(fd, "\x14\x03\x03\x00\x01\x01", 6, 0);
+	} while(ret == -1 && (errno == EINTR || errno == EAGAIN));
+
 	close(fd);
 
 	gnutls_deinit(session);
@@ -217,6 +222,7 @@ static void server(int fd, unsigned ccs_check)
 	int ret;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
+	char buf[64];
 
 	/* this must be called once in the program
 	 */
@@ -275,6 +281,15 @@ static void server(int fd, unsigned ccs_check)
 
 	if (ret < 0)
 		fail("server: gnutls_record_send did not succeed as expected: %s\n", gnutls_strerror(ret));
+
+	/* receive CCS and fail */
+	do {
+		ret = gnutls_record_recv(session, buf, sizeof(buf));
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret != GNUTLS_E_UNEXPECTED_PACKET)
+		fail("server: incorrect alert sent: %d != %d\n",
+		     ret, GNUTLS_E_UNEXPECTED_PACKET);
 
 	close(fd);
 	gnutls_deinit(session);
