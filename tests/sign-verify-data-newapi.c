@@ -91,11 +91,11 @@ void doit(void)
 
 		ret = gnutls_pubkey_init(&pubkey);
 		if (ret < 0)
-			testfail("gnutls_privkey_init\n");
+			testfail("gnutls_pubkey_init\n");
 
 		ret = gnutls_privkey_init(&privkey);
 		if (ret < 0)
-			testfail("gnutls_pubkey_init\n");
+			testfail("gnutls_privkey_init\n");
 
 		ret = gnutls_privkey_import_x509_raw(privkey, &tests[i].key, GNUTLS_X509_FMT_PEM, NULL, 0);
 		if (ret < 0)
