@@ -459,10 +459,11 @@ gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *
  *
  * This function sets the username and password, in a
  * #gnutls_srp_client_credentials_t type.  Those will be used in
- * SRP authentication.  @username and @password should be ASCII
- * strings or UTF-8 strings prepared using the "SASLprep" profile of
- * "stringprep".
- *
+ * SRP authentication.  @username should be an ASCII string or UTF-8
+ * string. In case of a UTF-8 string it is recommended to be following
+ * the PRECIS framework for usernames (rfc8265). The password can
+ * be in ASCII format, or normalized using gnutls_utf8_password_normalize().
+
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  *   error code.
  **/
@@ -671,9 +672,12 @@ gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
  * int (*callback)(gnutls_session_t, char** username, char**password);
  *
  * The @username and @password must be allocated using
- * gnutls_malloc().  @username and @password should be ASCII strings
- * or UTF-8 strings prepared using the "SASLprep" profile of
- * "stringprep".
+ * gnutls_malloc().
+ *
+ * The @username should be an ASCII string or UTF-8
+ * string. In case of a UTF-8 string it is recommended to be following
+ * the PRECIS framework for usernames (rfc8265). The password can
+ * be in ASCII format, or normalized using gnutls_utf8_password_normalize().
  *
  * The callback function will be called once per handshake before the
  * initial hello message is sent.

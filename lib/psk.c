@@ -83,9 +83,9 @@ gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *
  * This function sets the username and password, in a
  * gnutls_psk_client_credentials_t type.  Those will be used in
  * PSK authentication.  @username should be an ASCII string or UTF-8
- * strings prepared using the "SASLprep" profile of "stringprep".  The
- * key can be either in raw byte format or in Hex format (without the
- * 0x prefix).
+ * string. In case of a UTF-8 string it is recommended to be following
+ * the PRECIS framework for usernames (rfc8265). The key can be either
+ * in raw byte format or in Hex format (without the 0x prefix).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -296,8 +296,9 @@ gnutls_psk_set_server_credentials_function(gnutls_psk_server_credentials_t
  *  gnutls_datum_t* key);
  *
  * The @username and @key->data must be allocated using gnutls_malloc().
- * @username should be ASCII strings or UTF-8 strings prepared using
- * the "SASLprep" profile of "stringprep".
+ * The @username should be an ASCII string or UTF-8
+ * string. In case of a UTF-8 string it is recommended to be following
+ * the PRECIS framework for usernames (rfc8265).
  *
  * The callback function will be called once per handshake.
  *
