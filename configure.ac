@@ -724,9 +724,11 @@ AM_MISSING_PROG([AUTOGEN], [autogen])
 
 included_libopts=no
 if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
-	AC_CHECK_PROGS([autogen], [autogen])
-
-	if test -z "$autogen"; then
+	AC_MSG_CHECKING([whether autogen is recent enough])
+	if $PKG_CONFIG --atleast-version=41.1.16 autoopts 2>&1 >/dev/null; then
+		AC_MSG_RESULT([yes])
+	else
+		AC_MSG_RESULT([no])
 		AC_MSG_WARN([[
 ***
 *** autogen not found. Will not link against system libopts.
@@ -998,7 +1000,6 @@ AC_CONFIG_FILES([
   lib/unistring/Makefile
   po/Makefile.in
   src/Makefile
-  src/args-std.def
   src/gl/Makefile
   tests/Makefile
   tests/windows/Makefile
