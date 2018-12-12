@@ -644,8 +644,7 @@ typedef struct gnutls_pcert_st {
 	gnutls_certificate_type_t type;
 } gnutls_pcert_st;
 
-/* Do not initialize the "cert" element of
- * the certificate */
+/* This flag is unused/ignored */
 #define GNUTLS_PCERT_NO_CERT 1
 
 int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,

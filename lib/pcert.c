@@ -426,7 +426,7 @@ _gnutls_get_auth_info_pcert(gnutls_pcert_st * pcert,
 						    raw_certificate_list
 						    [0],
 						    GNUTLS_X509_FMT_DER,
-						    GNUTLS_PCERT_NO_CERT);
+						    0);
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
