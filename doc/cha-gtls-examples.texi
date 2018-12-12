@@ -137,9 +137,11 @@ This section has various, more advanced topics in client and servers.
 * Using a callback to select the certificate to use::
 * Obtaining session information::
 * Advanced certificate verification example::
+* Client example with PSK authentication::
 * Client example with SRP authentication::
 * Legacy client example with X.509 certificate support::
 * Client example in C++::
+* Echo server with PSK authentication::
 * Echo server with SRP authentication::
 * Echo server with anonymous authentication::
 * Helper functions for TCP connections::
@@ -195,6 +197,17 @@ and CRLs.
 
 @verbatiminclude examples/ex-verify.c
 
+
+@node Client example with PSK authentication
+@subsection Client example with @acronym{PSK} authentication
+
+The following client is a very simple @acronym{PSK} @acronym{TLS}
+client which connects to a server and authenticates using a
+@emph{username} and a @emph{key}.
+
+@verbatiminclude examples/ex-client-psk.c
+
+
 @node Client example with SRP authentication
 @subsection Client example with @acronym{SRP} authentication
 
@@ -223,6 +236,14 @@ The following client is a simple example of a client client utilizing
 the GnuTLS C++ API.
 
 @verbatiminclude examples/ex-cxx.cpp
+
+
+@node Echo server with PSK authentication
+@subsection Echo server with @acronym{PSK} authentication
+
+This is a server which supports @acronym{PSK} authentication.
+
+@verbatiminclude examples/ex-serv-psk.c
 
 
 @node Echo server with SRP authentication
