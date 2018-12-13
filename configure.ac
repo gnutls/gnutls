@@ -110,6 +110,7 @@ case "$host" in
   ;;
   *mingw32* | *mingw64*)
     have_win=yes
+    AC_DEFINE([_UNICODE], [1], [Defined to 1 for Unicode (wide chars) APIs])
   ;;
   *darwin*)
     have_macosx=yes
