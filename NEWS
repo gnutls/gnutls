@@ -5,6 +5,18 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.6 (unreleased)
+
+** libgnutls: Added support for raw public-key authentication as defined in RFC7250.
+   Raw public-keys can be negotiated by enabling the corresponding certificate
+   types via the priority strings. The raw public-key mechanism must be explicitly
+   enabled via the GNUTLS_ENABLE_RAWPK init flag.
+
+** API and ABI modifications:
+GNUTLS_ENABLE_RAWPK: Added
+GNUTLS_ENABLE_CERT_TYPE_NEG: Removed (was no-op; replaced by GNUTLS_ENABLE_RAWPK) 
+
+
 * Version 3.6.5 (released 2018-12-01)
 
 ** libgnutls: Provide the option of transparent re-handshake/reauthentication
@@ -53,11 +65,6 @@ See the end for copying conditions.
 ** certtool: Add parameter --no-text that prevents certtool from outputting
    text before PEM-encoded private key, public key, certificate, CRL or CSR.
 
-** libgnutls: Added support for raw public-key authentication as defined in RFC7250.
-   Raw public-keys can be negotiated by enabling the corresponding certificate
-   types via the priority strings. The raw public-key mechanism must be explicitly
-   enabled via the GNUTLS_ENABLE_RAWPK init flag.
-
 ** API and ABI modifications:
 GNUTLS_AUTO_REAUTH: Added
 GNUTLS_CIPHER_AES_128_CFB8: Added
@@ -65,8 +72,6 @@ GNUTLS_CIPHER_AES_192_CFB8: Added
 GNUTLS_CIPHER_AES_256_CFB8: Added
 GNUTLS_MAC_AES_CMAC_128: Added
 GNUTLS_MAC_AES_CMAC_256: Added
-GNUTLS_ENABLE_RAWPK: Added
-GNUTLS_ENABLE_CERT_TYPE_NEG: Removed
 gnutls_record_get_max_early_data_size: Added
 gnutls_record_send_early_data: Added
 gnutls_record_recv_early_data: Added
