@@ -2608,6 +2608,7 @@ gnutls_pkcs11_token_get_ptr(const char *url, void **ptr, unsigned long *slot_id,
 	ret = 0;
 
  cleanup:
+	free(tn.modname);
 	p11_kit_uri_free(info);
 	return ret;
 }
