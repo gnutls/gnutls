@@ -1561,9 +1561,39 @@ inline static size_t max_user_send_size(gnutls_session_t session,
 	return max;
 }
 
-inline static bool _gnutls_has_negotiate_ctypes(gnutls_session_t session)
+/* Returns the during the handshake negotiated certificate type(s).
+ * See state.c for the full function documentation.
+ *
+ * This function is made static inline for optimization reasons.
+ */
+static inline gnutls_certificate_type_t
+get_certificate_type(gnutls_session_t session,
+								gnutls_ctype_target_t target)
 {
-	return session->internals.flags & GNUTLS_ENABLE_CERT_TYPE_NEG;
+	switch (target) {
+		case GNUTLS_CTYPE_CLIENT:
+			return session->security_parameters.client_ctype;
+			break;
+		case GNUTLS_CTYPE_SERVER:
+			return session->security_parameters.server_ctype;
+			break;
+		case GNUTLS_CTYPE_OURS:
+			if (IS_SERVER(session)) {
+				return session->security_parameters.server_ctype;
+			} else {
+				return session->security_parameters.client_ctype;
+			}
+			break;
+		case GNUTLS_CTYPE_PEERS:
+			if (IS_SERVER(session)) {
+				return session->security_parameters.client_ctype;
+			} else {
+				return session->security_parameters.server_ctype;
+			}
+			break;
+		default:	// Illegal parameter passed
+			return GNUTLS_CRT_UNKNOWN;
+	}
 }
 
 /* Macros to aide constant time/mem checks */

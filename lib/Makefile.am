@@ -80,7 +80,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
-	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c
+	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c
 
 if WINDOWS
 COBJECTS += system/keys-win.c
@@ -124,7 +124,7 @@ HFILES = abstract_int.h debug.h cipher.h	\
 	srp.h auth/srp_kx.h auth/srp_passwd.h	\
 	file.h supplemental.h crypto.h random.h system.h\
 	locks.h mbuffers.h ecc.h pin.h fips.h \
-	priority_options.h secrets.h stek.h
+	priority_options.h secrets.h stek.h cert-cred.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h pkcs11x.h
@@ -216,7 +216,7 @@ libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes -I
 
 AM_CXXFLAGS = \
 	-I$(srcdir)/includes	\
-	-I$(builddir)/includes	
+	-I$(builddir)/includes
 
 lib_LTLIBRARIES += libgnutlsxx.la
 

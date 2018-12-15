@@ -117,7 +117,7 @@ _gnutls_get_public_rsa_params(gnutls_session_t session,
 	}
 
 	// Get the negotiated server certificate type
-	cert_type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_SERVER);
+	cert_type = get_certificate_type(session, GNUTLS_CTYPE_SERVER);
 
 	ret = _gnutls_get_auth_info_pcert(&peer_cert, cert_type, info);
 

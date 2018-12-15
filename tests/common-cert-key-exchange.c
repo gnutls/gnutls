@@ -145,12 +145,14 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 		const gnutls_datum_t *client_cert,
 		const gnutls_datum_t *client_key,
 		unsigned cert_flags,
-		unsigned exp_group)
+		unsigned exp_group,
+		gnutls_certificate_type_t server_ctype,
+		gnutls_certificate_type_t client_ctype)
 {
 	int ret;
 	char buffer[256];
 	/* Server stuff. */
-	gnutls_certificate_credentials_t serverx509cred;
+	gnutls_certificate_credentials_t server_cred;
 	gnutls_anon_server_credentials_t s_anoncred;
 	gnutls_dh_params_t dh_params;
 	const gnutls_datum_t p3 =
@@ -158,7 +160,7 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
-	gnutls_certificate_credentials_t clientx509cred;
+	gnutls_certificate_credentials_t client_cred;
 	gnutls_anon_client_credentials_t c_anoncred;
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN, version;
@@ -172,23 +174,36 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	reset_buffers();
 	/* Init server */
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
-	gnutls_certificate_allocate_credentials(&serverx509cred);
+	gnutls_certificate_allocate_credentials(&server_cred);
 
-	ret = gnutls_certificate_set_x509_key_mem(serverx509cred,
-					    serv_cert, serv_key,
-					    GNUTLS_X509_FMT_PEM);
+	// Set server crt creds based on ctype
+	switch (server_ctype) {
+		case GNUTLS_CRT_X509:
+			ret = gnutls_certificate_set_x509_key_mem(server_cred,
+									serv_cert, serv_key,
+									GNUTLS_X509_FMT_PEM);
+			break;
+		case GNUTLS_CRT_RAWPK:
+			ret = gnutls_certificate_set_rawpk_key_mem(server_cred,
+									serv_cert, serv_key, GNUTLS_X509_FMT_PEM, NULL, 0,
+									NULL, 0, 0);
+			break;
+		default:
+			ret = GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+	}
+
 	if (ret < 0) {
 		fail("Could not set key/cert: %s\n", gnutls_strerror(ret));
 	}
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
-	gnutls_certificate_set_dh_params(serverx509cred, dh_params);
+	gnutls_certificate_set_dh_params(server_cred, dh_params);
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 
-	gnutls_init(&server, GNUTLS_SERVER);
+	gnutls_init(&server, GNUTLS_SERVER | GNUTLS_ENABLE_RAWPK);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
-				serverx509cred);
+				server_cred);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 
 
@@ -196,33 +211,45 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 		assert(gnutls_priority_set_direct(server, server_priority, NULL) >= 0);
 	else
 		assert(gnutls_priority_set_direct(server,
-				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519",
+				   "NORMAL:+VERS-SSL3.0:+ANON-ECDH:+ANON-DH:+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-ECDSA:+CURVE-X25519:+SIGN-EDDSA-ED25519:+CTYPE-ALL",
 				   NULL)>=0);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
 
 	/* Init client */
-
-	ret = gnutls_certificate_allocate_credentials(&clientx509cred);
+	ret = gnutls_certificate_allocate_credentials(&client_cred);
 	if (ret < 0)
 		exit(1);
 
 	if (cert_flags == USE_CERT) {
-		gnutls_certificate_set_x509_key_mem(clientx509cred,
-						    client_cert, client_key,
-						    GNUTLS_X509_FMT_PEM);
+		// Set client crt creds based on ctype
+		switch (client_ctype) {
+			case GNUTLS_CRT_X509:
+				gnutls_certificate_set_x509_key_mem(client_cred,
+										client_cert, client_key,
+										GNUTLS_X509_FMT_PEM);
+				break;
+			case GNUTLS_CRT_RAWPK:
+				gnutls_certificate_set_rawpk_key_mem(client_cred,
+									client_cert, client_key, GNUTLS_X509_FMT_PEM, NULL, 0,
+									NULL, 0, 0);
+				break;
+			default:
+				fail("Illegal client certificate type given\n");
+		}
+
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUIRE);
 	} else if (cert_flags == ASK_CERT) {
 		gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 	}
 
 #if 0
-	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_certificate_set_x509_trust_mem(client_cred, &ca_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
 #endif
-	ret = gnutls_init(&client, GNUTLS_CLIENT);
+	ret = gnutls_init(&client, GNUTLS_CLIENT | GNUTLS_ENABLE_RAWPK);
 	if (ret < 0)
 		exit(1);
 
@@ -230,7 +257,7 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
-				clientx509cred);
+				client_cred);
 	if (ret < 0)
 		exit(1);
 
@@ -315,8 +342,8 @@ void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algori
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
-	gnutls_certificate_free_credentials(serverx509cred);
-	gnutls_certificate_free_credentials(clientx509cred);
+	gnutls_certificate_free_credentials(server_cred);
+	gnutls_certificate_free_credentials(client_cred);
 	gnutls_anon_free_server_credentials(s_anoncred);
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_dh_params_deinit(dh_params);
@@ -423,7 +450,7 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_pull_timeout_function(client, client_pull_timeout_func);
-	
+
 	gnutls_transport_set_ptr(client, client);
 	if (smtu)
 		gnutls_dtls_set_mtu (client, smtu);

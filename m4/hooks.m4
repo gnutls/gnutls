@@ -71,13 +71,13 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
 NETTLE_MINIMUM=3.4.1
   PKG_CHECK_MODULES(NETTLE, [nettle >= $NETTLE_MINIMUM], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
-  *** 
+  ***
   *** Libnettle $NETTLE_MINIMUM was not found.
 ]])
   ])
   PKG_CHECK_MODULES(HOGWEED, [hogweed >= $NETTLE_MINIMUM ], [], [
 AC_MSG_ERROR([[
-  *** 
+  ***
   *** Libhogweed (nettle's companion library) $NETTLE_MINIMUM was not found. Note that you must compile nettle with gmp support.
 ]])
   ])
@@ -116,7 +116,7 @@ LIBTASN1_MINIMUM=4.9
     PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= $LIBTASN1_MINIMUM], [], [included_libtasn1=yes])
     if test "$included_libtasn1" = yes; then
       AC_MSG_ERROR([[
-  *** 
+  ***
   *** Libtasn1 $LIBTASN1_MINIMUM was not found. To use the included one, use --with-included-libtasn1
   ]])
     fi
@@ -132,7 +132,7 @@ LIBTASN1_MINIMUM=4.9
   AC_MSG_CHECKING([whether C99 macros are supported])
   AC_TRY_COMPILE(,
   [
-    #define test_mac(...) 
+    #define test_mac(...)
     int z,y,x;
     test_mac(x,y,z);
     return 0;
@@ -246,7 +246,7 @@ LIBTASN1_MINIMUM=4.9
    AC_MSG_RESULT(yes)
   fi
   AM_CONDITIONAL(ENABLE_SRP, test "$ac_enable_srp" != "no")
-  
+
   ac_enable_psk=yes
   AC_MSG_CHECKING([whether to disable PSK authentication support])
   AC_ARG_ENABLE(psk-authentication,
@@ -261,7 +261,7 @@ LIBTASN1_MINIMUM=4.9
    AC_MSG_RESULT(yes)
   fi
   AM_CONDITIONAL(ENABLE_PSK, test "$ac_enable_psk" != "no")
-  
+
   ac_enable_anon=yes
   AC_MSG_CHECKING([whether to disable anonymous authentication support])
   AC_ARG_ENABLE(anon-authentication,

@@ -27,6 +27,7 @@
 #include <datum.h>
 #include "buffers.h"
 #include "state.h"
+#include "ext/cert_types.h"
 
 /**
  * gnutls_session_get_data:
@@ -423,11 +424,10 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 		}
 	}
 
-	// Check whether we have negotiated certificate types
-	if (_gnutls_has_negotiate_ctypes(session)) {
+	if (are_alternative_cert_types_allowed(session)) {
 		// Get certificate types
-		ctype_client = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_CLIENT);
-		ctype_server = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_SERVER);
+		ctype_client = get_certificate_type(session, GNUTLS_CTYPE_CLIENT);
+		ctype_server = get_certificate_type(session, GNUTLS_CTYPE_SERVER);
 
 		if (ctype_client == ctype_server) {
 			// print proto version, client/server cert type
@@ -442,9 +442,8 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 				 gnutls_certificate_type_get_name(ctype_server));
 		}
 	} else { // Assumed default certificate type (X.509)
-			snprintf(proto_name, sizeof(proto_name), "%s",
-				 gnutls_protocol_get_name(get_num_version
-								(session)));
+		snprintf(proto_name, sizeof(proto_name), "%s",
+				 gnutls_protocol_get_name(get_num_version(session)));
 	}
 
 	desc = gnutls_malloc(DESC_SIZE);

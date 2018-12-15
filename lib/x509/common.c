@@ -1653,7 +1653,7 @@ int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt,
 }
 
 /* Converts an X.509 certificate to subjectPublicKeyInfo */
-int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+int _gnutls_x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 			   gnutls_datum_t * rpubkey)
 {
 	gnutls_x509_crt_t crt = NULL;

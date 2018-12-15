@@ -33,8 +33,8 @@
 #include "hello_ext.h"
 #include "hello_ext_lib.h"
 #include "errors.h"
-#include <state.h>
-#include <datum.h>
+#include "state.h"
+#include "datum.h"
 
 
 static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
@@ -76,10 +76,10 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 	ssize_t len = data_size;
 	const uint8_t* pdata = data;
 
-	/* Only activate this extension if cert type negotiation is enabled
-	 * and we have cert credentials set */
-	if (!_gnutls_has_negotiate_ctypes(session) ||
-			_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL)
+	/* Only activate this extension if we have cert credentials set
+	 * and alternative cert types are allowed */
+	if (!are_alternative_cert_types_allowed(session) ||
+		(_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL))
 		return 0;
 
 	if (!IS_SERVER(session)) {	// client mode
@@ -96,7 +96,7 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 		 * may only receive a cert type that we offered, i.e. one that we
 		 * support. Because the world isn't as beautiful as it may seem,
 		 * we're going to check it nevertheless. */
-		cert_type = _gnutls_IANA2cert_type(pdata[0]);
+		cert_type = IANA2cert_type(pdata[0]);
 
 		// Check validity of cert type
 		if (cert_type == GNUTLS_CRT_UNKNOWN) {
@@ -118,7 +118,7 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 
 		// Check whether what we got back is actually offered by us
 		for (i = 0; i < sent_cert_types.size; i++) {
-			if (_gnutls_IANA2cert_type(sent_cert_types.data[i]) == cert_type)
+			if (IANA2cert_type(sent_cert_types.data[i]) == cert_type)
 				found = 1;
 		}
 
@@ -159,7 +159,7 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 		 */
 		for (i = 0; i < cert_types.size; i++) {
 			// Convert to internal representation
-			cert_type = _gnutls_IANA2cert_type(cert_types.data[i]);
+			cert_type = IANA2cert_type(cert_types.data[i]);
 
 			// If we have an invalid cert id then continue to the next
 			if (cert_type == GNUTLS_CRT_UNKNOWN)
@@ -197,12 +197,12 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 	uint8_t i = 0, num_cert_types = 0;
 	priority_st* cert_priorities;
 	gnutls_datum_t tmp_cert_types; // For type conversion
-	uint8_t cert_types[GNUTLS_CRT_MAX]; // The list with supported cert types
+	uint8_t cert_types[GNUTLS_CRT_MAX]; // The list with supported cert types. Inv: 0 <= cert type Id < 256
 
-	/* Only activate this extension if cert type negotiation is enabled
-	 * and we have cert credentials set */
-	if (!_gnutls_has_negotiate_ctypes(session) ||
-			_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL)
+	/* Only activate this extension if we have cert credentials set
+	 * and alternative cert types are allowed */
+	if (!are_alternative_cert_types_allowed(session) ||
+		(_gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE) == NULL))
 		return 0;
 
 	if (!IS_SERVER(session)) {	// Client mode
@@ -255,7 +255,13 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 						return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 					// Convert to IANA representation
-					cert_type = _gnutls_cert_type2IANA(cert_priorities->priorities[i]);
+					ret = cert_type2IANA(cert_priorities->priorities[i]);
+
+					if (ret < 0)
+						return gnutls_assert_val(ret);
+
+					cert_type = ret; // For readability
+
 					// Add this cert type to our list with supported types
 					cert_types[num_cert_types] = cert_type;
 					num_cert_types++;
@@ -281,7 +287,7 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 
 				return 0;
 			} else if (num_cert_types == 1 &&
-					 _gnutls_IANA2cert_type(cert_types[0]) == DEFAULT_CERT_TYPE) {
+					 IANA2cert_type(cert_types[0]) == DEFAULT_CERT_TYPE) {
 				_gnutls_handshake_log
 						("EXT[%p]: The only supported server certificate type is (%s) which is the default. "
 						 "We therefore do not send this extension.\n",
@@ -320,9 +326,13 @@ static int _gnutls_server_cert_type_send_params(gnutls_session_t session,
 		}
 	} else {	// Server mode
 		// Retrieve negotiated server certificate type and send it
-		cert_type =
-				_gnutls_cert_type2IANA(session->security_parameters.
-						server_ctype);
+		ret = cert_type2IANA(get_certificate_type(
+					session, GNUTLS_CTYPE_SERVER));
+
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		cert_type = ret; // For readability
 
 		ret = gnutls_buffer_append_data(data, &cert_type, 1);
 

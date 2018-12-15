@@ -113,7 +113,7 @@ int _gnutls13_recv_certificate_verify(gnutls_session_t session)
 
 	/* We verify the certificate of the peer. Therefore we need to
 	 * retrieve the negotiated certificate type for the peer. */
-	cert_type = gnutls_certificate_type_get2(session, GNUTLS_CTYPE_PEERS);
+	cert_type = get_certificate_type(session, GNUTLS_CTYPE_PEERS);
 
 	/* Verify the signature */
 	ret = _gnutls_get_auth_info_pcert(&peer_cert, cert_type, info);

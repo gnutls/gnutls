@@ -21,7 +21,7 @@
  */
 
 #include <libtasn1.h>
-#include <gnutls/abstract.h>
+
 
 int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 				   gnutls_typed_vdata_st * data,
@@ -34,6 +34,7 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 #define BARE_PEM_OCSP_RESPONSE "OCSP RESPONSE"
 
 #define PEM_CRL_SEP "-----BEGIN X509 CRL"
+
 
 int _gnutls_x509_raw_privkey_to_gkey(gnutls_privkey_t * privkey,
 				     const gnutls_datum_t * raw_key,

@@ -27,6 +27,7 @@
 #include <x509.h>
 #include "x509/x509_int.h"
 #include <gnutls/x509.h>
+#include "x509_b64.h"
 
 /**
  * gnutls_pcert_import_x509:
@@ -215,7 +216,7 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st *pcert_list,
  cleanup:
 	for (i = 0; i < *pcert_list_size; i++)
 		gnutls_x509_crt_deinit(crt[i]);
- 
+
  cleanup_crt:
 	gnutls_free(crt);
 	return ret;
@@ -356,6 +357,133 @@ int gnutls_pcert_import_x509_raw(gnutls_pcert_st * pcert,
 }
 
 /**
+ * gnutls_pcert_import_rawpk:
+ * @pcert: The pcert structure to import the data into.
+ * @pubkey: The raw public-key in #gnutls_pubkey_t format to be imported
+ * @flags: zero for now
+ *
+ * This convenience function will import (i.e. convert) the given raw
+ * public key @pubkey into a #gnutls_pcert_st structure. The structure
+ * must be deinitialized afterwards using gnutls_pcert_deinit(). The
+ * given @pubkey must not be deinitialized because it will be associated
+ * with the given @pcert structure and will be deinitialized with it.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.6
+ **/
+int gnutls_pcert_import_rawpk(gnutls_pcert_st* pcert,
+			     gnutls_pubkey_t pubkey, unsigned int flags)
+{
+	int ret;
+
+	if (pubkey == NULL) {
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+	}
+
+	memset(pcert, 0, sizeof(*pcert));
+
+	/* A pcert struct holds a raw copy of the certificate data.
+	 * Therefore we convert our gnutls_pubkey_t to its raw DER
+	 * representation and copy it into our pcert. It is this raw data
+	 * that will be transfered to the peer via a Certificate msg.
+	 * According to the spec (RFC7250) a DER representation must be used.
+	 */
+	ret = gnutls_pubkey_export2(pubkey, GNUTLS_X509_FMT_DER, &pcert->cert);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	pcert->pubkey = pubkey;
+
+	pcert->type = GNUTLS_CRT_RAWPK;
+
+	return GNUTLS_E_SUCCESS;
+}
+
+/**
+ * gnutls_pcert_import_rawpk_raw:
+ * @pcert: The pcert structure to import the data into.
+ * @rawpubkey: The raw public-key in #gnutls_datum_t format to be imported.
+ * @format: The format of the raw public-key. DER or PEM.
+ * @key_usage: An ORed sequence of %GNUTLS_KEY_* flags.
+ * @flags: zero for now
+ *
+ * This convenience function will import (i.e. convert) the given raw
+ * public key @rawpubkey into a #gnutls_pcert_st structure. The structure
+ * must be deinitialized afterwards using gnutls_pcert_deinit().
+ * Note that the caller is responsible for freeing @rawpubkey. All necessary
+ * values will be copied into @pcert.
+ *
+ * Key usage (as defined by X.509 extension (2.5.29.15)) can be explicitly
+ * set because there is no certificate structure around the key to define
+ * this value. See for more info gnutls_x509_crt_get_key_usage().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.6
+ **/
+int gnutls_pcert_import_rawpk_raw(gnutls_pcert_st* pcert,
+				    const gnutls_datum_t* rawpubkey,
+				    gnutls_x509_crt_fmt_t format,
+				    unsigned int key_usage, unsigned int flags)
+{
+	int ret;
+
+	if (rawpubkey == NULL) {
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+	}
+
+	memset(pcert, 0, sizeof(*pcert));
+
+	ret = gnutls_pubkey_init(&pcert->pubkey);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	// Convert our raw public-key to a gnutls_pubkey_t structure
+	ret = gnutls_pubkey_import(pcert->pubkey, rawpubkey, format);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	pcert->pubkey->key_usage = key_usage;
+
+	/* A pcert struct holds a raw copy of the certificate data.
+	 * It is this raw data that will be transfered to the peer via a
+	 * Certificate message. According to the spec (RFC7250) a DER
+	 * representation must be used. Therefore we check the format and
+	 * convert if necessary.
+	 */
+	if (format == GNUTLS_X509_FMT_PEM) {
+		ret = _gnutls_fbase64_decode(PEM_PK,
+					rawpubkey->data, rawpubkey->size,
+					&pcert->cert);
+
+		if (ret < 0) {
+			gnutls_pubkey_deinit(pcert->pubkey);
+
+			return gnutls_assert_val(ret);
+		}
+	} else {
+		// Directly copy the raw DER data to our pcert
+		ret = _gnutls_set_datum(&pcert->cert, rawpubkey->data, rawpubkey->size);
+
+		if (ret < 0) {
+			gnutls_pubkey_deinit(pcert->pubkey);
+
+			return gnutls_assert_val(ret);
+		}
+	}
+
+	pcert->type = GNUTLS_CRT_RAWPK;
+
+	return GNUTLS_E_SUCCESS;
+}
+
+/**
  * gnutls_pcert_export_x509:
  * @pcert: The pcert structure.
  * @crt: An initialized #gnutls_x509_crt_t.
@@ -420,15 +548,17 @@ _gnutls_get_auth_info_pcert(gnutls_pcert_st * pcert,
 			    cert_auth_info_t info)
 {
 	switch (type) {
-	case GNUTLS_CRT_X509:
-		return gnutls_pcert_import_x509_raw(pcert,
-						    &info->
-						    raw_certificate_list
-						    [0],
-						    GNUTLS_X509_FMT_DER,
-						    0);
-	default:
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		case GNUTLS_CRT_X509:
+			return gnutls_pcert_import_x509_raw(pcert,
+							&info->raw_certificate_list[0],
+							GNUTLS_X509_FMT_DER,
+							0);
+		case GNUTLS_CRT_RAWPK:
+			return gnutls_pcert_import_rawpk_raw(pcert,
+							&info->raw_certificate_list[0],
+							GNUTLS_X509_FMT_DER,
+							0, 0);
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 }
