@@ -43,6 +43,7 @@
 
 #include <wincrypt.h>
 #include <winbase.h>
+#include <winapifamily.h>
 
 #define DYN_NCRYPT
 
@@ -612,6 +613,9 @@ static int cng_info(gnutls_privkey_t key, unsigned int flags, void *userdata)
  -*/
 int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
 {
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+#else
 	uint8_t id[MAX_WID_SIZE];
 	HCERTSTORE store = NULL;
 	size_t id_size;
@@ -861,6 +865,7 @@ int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
 
 	CertCloseStore(store, 0);
 	return ret;
+#endif
 }
 
 int _gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url)
@@ -1426,7 +1431,7 @@ int _gnutls_system_key_init(void)
 	int ret;
 
 #ifdef DYN_NCRYPT
-	ncrypt_lib = LoadLibraryA("ncrypt.dll");
+	ncrypt_lib = LoadLibrary(TEXT("ncrypt.dll"));
 	if (ncrypt_lib == NULL) {
 		return gnutls_assert_val(GNUTLS_E_CRYPTO_INIT_FAILED);
 	}
