@@ -9,6 +9,7 @@ of changes.
 We try to stick to the following rules, so when contributing please
 try to follow them too.
 
+
 # Git commits:
 
 Note that when contributing code you will need to assert that the contribution is
@@ -25,6 +26,7 @@ $ cp devel/git-template ~/.git-template
 [edit]
 $ git config commit.template ~/.git-template
 ```
+
 
 # Test suite:
 
@@ -44,6 +46,7 @@ Certificates for testing purposes are available at [cert-common.h](tests/cert-co
 Note that we do not regenerate test certificates when they expire, but
 we rather fix the test's time using datefudge or gnutls_global_set_time_function().
 For example, see [x509cert-tl.c](tests/x509cert-tl.c).
+
 
 # File names:
 
@@ -67,6 +70,17 @@ case by case basis.
 You may indent the source using GNU indent, e.g. "indent -linux *.c".
 
 
+# Commenting style
+
+In general for documenting new code we prefer self-documented code to comments. That is:
+  - Meaningful function and macro names
+  - Short functions which do a single thing
+
+That does not mean that no comments are allowed, but that when they are
+used, they are used to document something that is not obvious, or the protocol
+expectations. Though we haven't followed that rule strictly in the past, it
+should be followed on new code.
+
 
 # Function names:
 
@@ -85,8 +99,12 @@ following.
  * ```gnutls_credentials_``` for the credentials structures
  * ```gnutls_global_``` for the global structures handling
 
-Internal functions -- that are not exported in the API -- should
-be prefixed with an underscore. E.g. ```_gnutls_handshake_begin()```
+Internal functions, i.e, functions that are not exported in the API but
+are used internally by multiple files, should be prefixed with an underscore.
+For example `_gnutls_handshake_begin()`.
+
+Internal functions restricted to a file (static), or inline functions, should
+not use the `_gnutls` prefix for simplicity, e.g., `get_version()`.
 
 Internal structures should not be exported. Especially pointers to
 internal data. Doing so harms future reorganization/rewrite of subsystems.
@@ -119,6 +137,51 @@ the last tagged release. It relies on the git tree and abi-compliance-checker.
 
 The above do not apply to the C++ library; this library's ABI should not
 be considered stable.
+
+
+# Introducing new features / modifying behavior
+
+  When a new feature is introduced which may affect already deployed code, 
+it must be disabled by default. For example a new TLS extension should be
+enabled when explicitly requested by the application. That can happen for
+example with a gnutls_init() flag.
+
+The same should be followed when an existing function behavior is modified
+in a way that may break existing applications which use the API in a
+reasonable way. If the existing function allows flags, then a new flag
+should be introduced to enable the new behavior.
+
+When it is necessary, or desireable to enable the new features by default
+(e.g., TLS1.3 introduction), the "next" releases should be used (and
+introduced if necessary), to allow the modification to be tested for an
+extended amount of time.
+
+
+# API documentation
+
+When introducing a new API, we provide the function documentation as
+inline comments, in a way that it can be used to generate a man-page
+and be included in our manual. For that we use gnome-style comments
+as in the example below. The detailed form is documented on `doc/scripts/gdoc`.
+
+/**
+ * gnutls_init:
+ * @session: is a pointer to a #gnutls_session_t type.
+ * @flags: indicate if this session is to be used for server or client.
+ *
+ * This function initializes the provided session. Every
+ * session must be initialized before use, and must be deinitialized
+ * after used by calling gnutls_deinit().
+ *
+ * @flags can be any combination of flags from %gnutls_init_flags_t.
+ *
+ * Note that since version 3.1.2 this function enables some common
+ * TLS extensions such as session tickets and OCSP certificate status
+ * request in client side by default. To prevent that use the %GNUTLS_NO_EXTENSIONS
+ * flag.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or a negative error code.
+ **/
 
 
 # Constructed types:
