@@ -60,6 +60,11 @@ fi
 AX_CODE_COVERAGE
 AM_MAINTAINER_MODE([enable])
 
+AC_ARG_ENABLE(bash-tests,
+  AS_HELP_STRING([--disable-bash-tests], [skip some tests that badly need bash]),
+    enable_bash_tests=$enableval, enable_bash_tests=yes)
+AM_CONDITIONAL(DISABLE_BASH_TESTS, test "$enable_bash_tests" != "yes")
+
 AC_ARG_ENABLE(doc,
   AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
     enable_doc=$enableval, enable_doc=yes)

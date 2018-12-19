@@ -21,7 +21,6 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-DIFF="${DIFF:-diff}"
 CERTTOOL="${CERTTOOL:-../src/certtool${EXEEXT}}"
 
 if ! test -x "${CERTTOOL}"; then
@@ -32,24 +31,20 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
+. "${srcdir}/scripts/common.sh"
+
 TMPFILE=long.$$.pem.tmp
 
-rm -f $TMPFILE
 ${VALGRIND} "${CERTTOOL}" --crl-info --inder --infile "${srcdir}/data/long.crl" --outfile $TMPFILE
-rc=$?
-
-# We're done.
-if test "${rc}" != "0"; then
+if test $? != 0; then
 	echo "CRL decoding failed 1!"
-	exit ${rc}
+	exit 1
 fi
 
-${DIFF} -I ^warning "${srcdir}/data/long.pem" "$TMPFILE" || ${DIFF} -I ^warning --strip-trailing-cr "${srcdir}/data/long.pem" $TMPFILE
-rc=$?
-
-if test "${rc}" != "0"; then
+check_if_equal "${srcdir}/data/long.pem" $TMPFILE "^warning"
+if test $? != 0; then
 	echo "CRL decoding failed 2!"
-	exit ${rc}
+	exit 1
 fi
 
 rm -f $TMPFILE

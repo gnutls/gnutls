@@ -38,7 +38,8 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=6"
 fi
 
-DIFF="${DIFF:-diff}"
+. "${srcdir}/../scripts/common.sh"
+
 TMPFILE="pkcs12-corner.$$.tmp"
 
 # Cases from oss-fuzz
@@ -79,7 +80,7 @@ for p12 in "key-corpus-rc2-1.p12";do
 	set -- ${p12}
 	file="$1"
 	"${CERTTOOL}" --p12-info --inder --password "${cpassword}" \
-		--infile "${srcdir}/data/${file}" >${TMPFILE} 2>/dev/null
+		--infile "${srcdir}/data/${file}" | tr -d '\r' >${TMPFILE} 2>/dev/null
 	rc=$?
 	if test ${rc} != 0 && test ${rc} != 1; then
 		cat ${TMPFILE}
@@ -87,7 +88,7 @@ for p12 in "key-corpus-rc2-1.p12";do
 		exit 1
 	fi
 
-	${DIFF} --strip-trailing-cr ${TMPFILE} "${srcdir}/data/${file}.out"
+	check_if_equal ${TMPFILE} "${srcdir}/data/${file}.out"
 	rc=$?
 	if test ${rc} != 0;then
 		echo "Output differs in ${file}.out ${TMPFILE}"

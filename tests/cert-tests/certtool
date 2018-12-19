@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Copyright (C) 2014-2018 Nikos Mavrogiannopoulos
 # Copyright (C) 2018 Red Hat, Inc.
@@ -27,6 +27,10 @@ TMPFILE1=certtool-file1.$$.tmp
 TMPFILE2=certtool-file2.$$.tmp
 PASS="1234"
 
+if test -n "$DISABLE_BASH_TESTS"; then
+	exit 77
+fi
+
 if ! test -x "${CERTTOOL}"; then
 	exit 77
 fi
@@ -43,8 +47,11 @@ if test -n "${SETSID}";then
 		exit 1
 	fi
 
-	#check whether ask-pass is being honoured
-	${SETSID} "${CERTTOOL}" --generate-self-signed --load-privkey ${TMPFILE1} --template "${srcdir}/templates/template-test.tmpl" --ask-pass >${TMPFILE2} 2>&1 <<<${PASS}
+	#check whether password is being honoured
+	#some CI runners need GNUTLS_PIN (GNUTLS_PIN=${PASS})
+	${SETSID} "${CERTTOOL}" --generate-self-signed --load-privkey ${TMPFILE1} --template ${srcdir}/templates/template-test.tmpl --ask-pass >${TMPFILE2} 2>&1 <<EOF
+$PASS
+EOF
 	if test $? != 0;then
 		cat ${TMPFILE2}
 		echo "cert generation failed"
