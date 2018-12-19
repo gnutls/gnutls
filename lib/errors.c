@@ -26,7 +26,6 @@
 #ifdef STDC_HEADERS
 #include <stdarg.h>
 #endif
-#include "vasprintf.h"
 #include "str.h"
 
 #define ERROR_ENTRY(desc, name) \

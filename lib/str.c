@@ -29,7 +29,6 @@
 #include <c-ctype.h>
 #include <intprops.h>
 #include <nettle/base64.h>
-#include "vasprintf.h"
 #include "extras/hex.h"
 
 /* These functions are like strcat, strcpy. They only

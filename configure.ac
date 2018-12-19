@@ -293,7 +293,7 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid localtime vasprintf mmap explicit_bzero],,)
+AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid localtime mmap explicit_bzero],,)
 dnl Manually check some functions by including headers first. On macOS, you
 dnl normally only have the latest SDK available, containing all existing
 dnl functions, but having them restricted according to target version in
@@ -311,28 +311,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>], [fmemopen(0, 0, 0);])],
   [AC_MSG_RESULT(yes); ac_cv_func_fmemopen=yes
   AC_DEFINE([HAVE_FMEMOPEN], 1, [Define to 1 if you have the `fmemopen' function.])],
   [AC_MSG_RESULT(no); ac_cv_func_fmemopen=no])
-if test "$ac_cv_func_vasprintf" != "yes";then
-  AC_MSG_CHECKING([for va_copy])
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([
-	#include <stdarg.h>
-	va_list a;],[
-	va_list b;
-	va_copy(b,a);
-	va_end(b);])],
-	[AC_DEFINE([HAVE_VA_COPY], 1, [Have va_copy()])
-	AC_MSG_RESULT(va_copy)],
-	[AC_LINK_IFELSE([AC_LANG_PROGRAM([
-		#include <stdarg.h>
-		va_list a;],[
-		va_list b;
-		__va_copy(b,a);
-		va_end(b);])],
-		[AC_DEFINE([HAVE___VA_COPY], 1, [Have __va_copy()])
-		AC_MSG_RESULT(__va_copy)],
-		[AC_MSG_RESULT(no)
-		AC_MSG_ERROR([Your system lacks vasprintf() and va_copy()])])
-	])
-fi
 
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
