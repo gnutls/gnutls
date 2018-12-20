@@ -486,6 +486,10 @@ else
 
 TESTS_ENVIRONMENT += WINDOWS=1
 
+win32_certopenstore_SOURCES = win-certopenstore.c
+win32_certopenstore_LDADD = $(LDADD) -lcrypt32
+ctests += win32-certopenstore
+
 endif
 
 cpptests =
