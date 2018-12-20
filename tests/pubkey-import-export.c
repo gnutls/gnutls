@@ -168,6 +168,7 @@ int check_pubkey_import_export(void)
 	gnutls_datum_t p, q, g, y, x;
 	gnutls_datum_t m, e;
 	gnutls_ecc_curve_t curve;
+	unsigned bits;
 	int ret;
 
 	global_init();
@@ -179,6 +180,11 @@ int check_pubkey_import_export(void)
 	ret = gnutls_pubkey_import_dsa_raw(key, &_dsa_p, &_dsa_q, &_dsa_g, &_dsa_y);
 	if (ret < 0)
 		fail("error\n");
+
+	bits = 0;
+	ret = gnutls_pubkey_get_pk_algorithm(key, &bits);
+	if (ret <= 0 || bits == 0)
+		fail("error: %s [%u]\n", gnutls_strerror(ret), bits);
 
 	ret = gnutls_pubkey_export_dsa_raw2(key, &p, &q, &g, &y, 0);
 	if (ret < 0)
@@ -216,6 +222,11 @@ int check_pubkey_import_export(void)
 	if (ret < 0)
 		fail("error\n");
 
+	bits = 0;
+	ret = gnutls_pubkey_get_pk_algorithm(key, &bits);
+	if (ret <= 0 || bits == 0)
+		fail("error: %s [%u]\n", gnutls_strerror(ret), bits);
+
 	ret = gnutls_pubkey_export_rsa_raw2(key, &m, &e, 0);
 	if (ret < 0)
 		fail("error\n");
@@ -243,6 +254,11 @@ int check_pubkey_import_export(void)
 	ret = gnutls_pubkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_SECP256R1, &_ecc_x, &_ecc_y);
 	if (ret < 0)
 		fail("error\n");
+
+	bits = 0;
+	ret = gnutls_pubkey_get_pk_algorithm(key, &bits);
+	if (ret <= 0 || bits == 0)
+		fail("error: %s [%u]\n", gnutls_strerror(ret), bits);
 
 	ret = gnutls_pubkey_export_ecc_raw2(key, &curve, &x, &y, 0);
 	if (ret < 0)
@@ -284,6 +300,11 @@ int check_pubkey_import_export(void)
 	ret = gnutls_pubkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519, &_ed25519_x, NULL);
 	if (ret < 0)
 		fail("error\n");
+
+	bits = 0;
+	ret = gnutls_pubkey_get_pk_algorithm(key, &bits);
+	if (ret <= 0 || bits == 0)
+		fail("error: %s [%u]\n", gnutls_strerror(ret), bits);
 
 	ret = gnutls_pubkey_verify_params(key);
 	if (ret != 0)
