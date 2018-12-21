@@ -1174,11 +1174,8 @@ time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt_t cert)
  * gnutls_x509_crt_get_expiration_time:
  * @cert: should contain a #gnutls_x509_crt_t type
  *
- * This function will return the time this Certificate was or will be
+ * This function will return the time this certificate was or will be
  * expired.
- *
- * The no well defined expiration time can be checked against with the
- * %GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION macro.
  *
  * Returns: expiration time, or (time_t)-1 on error.
  **/

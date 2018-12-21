@@ -12,9 +12,13 @@ See the end for copying conditions.
    types via the priority strings. The raw public-key mechanism must be explicitly
    enabled via the GNUTLS_ENABLE_RAWPK init flag.
 
+** GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION was marked as deprecated. The previous
+   definition was buggy and non-functional.
+
 ** API and ABI modifications:
 GNUTLS_ENABLE_RAWPK: Added
 GNUTLS_ENABLE_CERT_TYPE_NEG: Removed (was no-op; replaced by GNUTLS_ENABLE_RAWPK) 
+GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION: Deprecated
 
 
 * Version 3.6.5 (released 2018-12-01)

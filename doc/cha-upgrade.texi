@@ -258,4 +258,9 @@ before calling this function to avoid delays.
 @item Supplemental data is not supported under TLS 1.3
 @tab The TLS supplemental data handshake message (RFC 4680) is not supported under TLS 1.3, so if the application calls @funcref{gnutls_supplemental_register} or @funcref{gnutls_session_supplemental_register}, TLS 1.3 is disabled.
 
+@item The GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION macro is a no-op
+@tab The macro was non-functional and because of the nature of the
+definition of the no-well-defined date for certificates (a real date),
+it will not be fixed or re-introduced.
+
 @end multitable
