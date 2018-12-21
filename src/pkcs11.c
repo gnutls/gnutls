@@ -314,10 +314,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		}
 
 		if (otype == GNUTLS_PKCS11_OBJ_X509_CRT && exp != -1) {
-			if (exp == GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION)
-				fprintf(outfile, "\tExpires: Never\n");
-			else
-				fprintf(outfile, "\tExpires: %s", ctime(&exp));
+			fprintf(outfile, "\tExpires: %s", ctime(&exp));
 		}
 
 		gnutls_free(output);
