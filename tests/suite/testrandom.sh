@@ -38,8 +38,10 @@ counter=0
 
 echo "Testing verification with randomly generated certificates..."
 while [ ${counter} -lt 400 ]; do
+	counter=`expr ${counter} + 1`
+
 	"${srcdir}/x509random.pl" > "${file}"
-	${VALGRIND} "${CERTTOOL}" -i --inder --infile "${file}" --outfile "${file}.pem" >/dev/null 2>&1
+	${VALGRIND} "${CERTTOOL}" -i --inder --infile "${file}" --outfile "${file}.pem" >/dev/null
 	if test $? != 0; then
 		continue
 	fi
@@ -53,8 +55,6 @@ while [ ${counter} -lt 400 ]; do
 		exit 1
 	fi
 	rm -f "${file}.pem" "${file}-chain.pem"
-
-	counter=`expr ${counter} + 1`
 done
 
 
