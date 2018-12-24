@@ -1431,6 +1431,7 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 
 		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
 		key->params.curve = curve;
+		key->bits = pubkey_to_bits(&key->params);
 
 		return 0;
 	}
@@ -1454,6 +1455,7 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 	}
 	key->params.params_nr++;
 	key->params.algo = GNUTLS_PK_ECDSA;
+	key->bits = pubkey_to_bits(&key->params);
 
 	return 0;
 

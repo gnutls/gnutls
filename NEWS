@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.6.6 (unreleased)
 
+** libgnutls: gnutls_pubkey_import_ecc_raw() was fixed to set the number bits
+   on the public key (#640).
+
 ** libgnutls: Added support for raw public-key authentication as defined in RFC7250.
    Raw public-keys can be negotiated by enabling the corresponding certificate
    types via the priority strings. The raw public-key mechanism must be explicitly
