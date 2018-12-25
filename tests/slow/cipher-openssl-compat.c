@@ -106,7 +106,6 @@ static int cipher_test(const char *ocipher, gnutls_cipher_algorithm_t gcipher,
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		if (gcipher == GNUTLS_CIPHER_AES_128_CCM
 		    || gcipher == GNUTLS_CIPHER_AES_256_CCM) {
-			assert(EVP_CIPHER_CTX_init(ctx)==1);
 			assert(EVP_CipherInit_ex(ctx, evp_cipher, 0, 0, 0, 0) >
 			       0);
 
