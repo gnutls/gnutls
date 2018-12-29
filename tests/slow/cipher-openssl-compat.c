@@ -38,6 +38,19 @@ static int cipher_test(const char *ocipher, gnutls_cipher_algorithm_t gcipher,
 
 	success("cipher: %s\n", ocipher);
 
+	/* decrypt with openssl */
+	evp_cipher = EVP_get_cipherbyname(ocipher);
+	if (!evp_cipher) {
+		/* XXX: fix version check later when LibreSSL fixes support for aes-ccm and chacha20-poly1305 */
+#ifdef LIBRESSL_VERSION_NUMBER
+		fprintf(stderr, "EVP_get_cipherbyname failed for %s\n", ocipher);
+		return -1;
+#else
+		/* OpenSSL should always work! */
+		fail("EVP_get_cipherbyname failed for %s\n", ocipher);
+#endif
+	}
+
 	for (i = 0; i < 32; i++) {	/* try with multiple keys and nonces */
 		assert(gnutls_rnd
 		       (GNUTLS_RND_NONCE, orig_plain_data,
@@ -88,17 +101,11 @@ static int cipher_test(const char *ocipher, gnutls_cipher_algorithm_t gcipher,
 
 		gnutls_aead_cipher_deinit(hd);
 
-		/* decrypt with openssl */
-		evp_cipher = EVP_get_cipherbyname(ocipher);
-		if (!evp_cipher)
-			fail("EVP_get_cipherbyname failed for %s\n", ocipher);
-
 		ctx = EVP_CIPHER_CTX_new();
 
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		if (gcipher == GNUTLS_CIPHER_AES_128_CCM
 		    || gcipher == GNUTLS_CIPHER_AES_256_CCM) {
-			assert(EVP_CIPHER_CTX_init(ctx)==1);
 			assert(EVP_CipherInit_ex(ctx, evp_cipher, 0, 0, 0, 0) >
 			       0);
 
