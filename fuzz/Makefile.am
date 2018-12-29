@@ -74,7 +74,7 @@ oss-fuzz:
 	if test "$$OUT" != ""; then \
 	for ccfile in *_fuzzer.c; do \
 	fuzzer=$$(basename $$ccfile .c); \
-	XLIBS="-lnettle -lhogweed -ltasn1 -lgmp -lidn2 -lunistring"; \
+	XLIBS="-lhogweed -lnettle -ltasn1 -lgmp -lidn2 -lunistring"; \
 	$$CXX $$CXXFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
 	"$${fuzzer}.c" -o "$${fuzzer}" \
 	../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
