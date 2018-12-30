@@ -51,9 +51,9 @@ int main(void)
                 CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
                 CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS,
-                                             "my_host_name",
-                                             strlen("my_host_name")));
-                gnutls_session_set_verify_cert(session, "my_host_name", 0);
+                                             "www.example.com",
+                                             strlen("www.example.com")));
+                gnutls_session_set_verify_cert(session, "www.example.com", 0);
 
                 CHECK(gnutls_set_default_priority(session));
 

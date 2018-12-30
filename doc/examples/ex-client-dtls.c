@@ -56,10 +56,10 @@ int main(void)
 
         /* put the x509 credentials to the current session */
         CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
-        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
-                                     strlen("my_host_name")));
+        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "www.example.com",
+                                     strlen("www.example.com")));
 
-        gnutls_session_set_verify_cert(session, "my_host_name", 0);
+        gnutls_session_set_verify_cert(session, "www.example.com", 0);
 
         /* connect to the peer */
         sd = udp_connect();
