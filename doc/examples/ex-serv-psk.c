@@ -20,6 +20,11 @@
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define CRLFILE "crl.pem"
 
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
+
 /* This is a sample TLS echo server, supporting X.509 and PSK
    authentication.
  */
@@ -132,7 +137,7 @@ int main(void)
                                  sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
                 gnutls_transport_set_int(session, sd);
-                ret = gnutls_handshake(session);
+                LOOP_CHECK(ret, gnutls_handshake(session));
                 if (ret < 0) {
                         close(sd);
                         gnutls_deinit(session);
@@ -154,7 +159,7 @@ int main(void)
                 /* print_info(session); */
 
                 for (;;) {
-                        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+                        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
 
                         if (ret == 0) {
                                 printf
@@ -178,7 +183,7 @@ int main(void)
                 printf("\n");
                 /* do not wait for the peer to close the connection.
                  */
-                gnutls_bye(session, GNUTLS_SHUT_WR);
+                LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_WR));
 
                 close(sd);
                 gnutls_deinit(session);

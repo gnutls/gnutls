@@ -18,6 +18,11 @@
  */
 
 #define CHECK(x) assert((x)>=0)
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+        assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
@@ -112,9 +117,9 @@ int main(void)
                 gnutls_free(desc);
         }
 
-        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
+        LOOP_CHECK(ret, gnutls_record_send(session, MSG, strlen(MSG)));
 
-        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
         if (ret == 0) {
                 printf("- Peer has closed the TLS connection\n");
                 goto end;

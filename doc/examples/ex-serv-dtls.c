@@ -27,6 +27,11 @@
  * Note that error checking is minimal to simplify the example.
  */
 
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
+
 #define MAX_BUFFER 1024
 #define PORT 5557
 
@@ -197,11 +202,7 @@ int main(void)
                 gnutls_transport_set_pull_timeout_function(session,
                                                            pull_timeout_func);
 
-                do {
-                        ret = gnutls_handshake(session);
-                }
-                while (ret == GNUTLS_E_INTERRUPTED
-                       || ret == GNUTLS_E_AGAIN);
+                LOOP_CHECK(ret, gnutls_handshake(session));
                 /* Note that DTLS may also receive GNUTLS_E_LARGE_PACKET.
                  * In that case the MTU should be adjusted.
                  */
@@ -216,14 +217,10 @@ int main(void)
                 printf("- Handshake was completed\n");
 
                 for (;;) {
-                        do {
-                                ret =
+                        LOOP_CHECK(ret,
                                     gnutls_record_recv_seq(session, buffer,
                                                            MAX_BUFFER,
-                                                           sequence);
-                        }
-                        while (ret == GNUTLS_E_AGAIN
-                               || ret == GNUTLS_E_INTERRUPTED);
+                                                           sequence));
 
                         if (ret < 0 && gnutls_error_is_fatal(ret) == 0) {
                                 fprintf(stderr, "*** Warning: %s\n",
@@ -248,7 +245,7 @@ int main(void)
                              sequence[6], sequence[7], buffer);
 
                         /* reply back */
-                        ret = gnutls_record_send(session, buffer, ret);
+                        LOOP_CHECK(ret, gnutls_record_send(session, buffer, ret));
                         if (ret < 0) {
                                 fprintf(stderr, "Error in send(): %s\n",
                                         gnutls_strerror(ret));
@@ -256,7 +253,7 @@ int main(void)
                         }
                 }
 
-                gnutls_bye(session, GNUTLS_SHUT_WR);
+                LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_WR));
                 gnutls_deinit(session);
 
         }
