@@ -82,7 +82,7 @@ should be imported using their PKCS#11 URL with
 
 If any of the smart card operations require PIN, that should be provided
 either by setting the global PIN function
-(@funcref{gnutls_pkcs11_set_pin_function}), or better with the targetted to
+(@funcref{gnutls_pkcs11_set_pin_function}), or better with the targeted to
 structures functions such as @funcref{gnutls_privkey_set_pin_function}.
 
 

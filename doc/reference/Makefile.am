@@ -64,7 +64,7 @@ HTML_IMAGES=
 # e.g. content_files=running.xml building.xml changes-2.0.xml
 content_files=
 
-# Files where gtk-doc abbrevations (#GtkWidget) are expanded
+# Files where gtk-doc abbreviations (#GtkWidget) are expanded
 # e.g. expand_content_files=running.xml
 expand_content_files=
 

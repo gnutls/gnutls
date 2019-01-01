@@ -561,7 +561,7 @@ second is shared for the @code{GNUTLS_RND_KEY} and @code{GNUTLS_RND_RANDOM}
 levels. For the rest of this section we refer to the first as the nonce
 generator and the second as the key generator.
 
-The nonce generator will reseed after outputing a fixed amount of bytes
+The nonce generator will reseed after outputting a fixed amount of bytes
 (typically few megabytes), or after few hours of operation without reaching
 the limit has passed. It is being re-seed using
 the key generator to obtain a new key for the CHACHA cipher, which is mixed
