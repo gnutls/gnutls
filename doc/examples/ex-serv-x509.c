@@ -22,6 +22,10 @@
 #define CRLFILE "crl.pem"
 
 #define CHECK(x) assert((x)>=0)
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED)
 
 /* The OCSP status file contains up to date information about revocation
  * of the server's certificate. That can be periodically be updated
@@ -137,11 +141,7 @@ int main(void)
 
                 gnutls_transport_set_int(session, sd);
 
-                do {
-                        ret = gnutls_handshake(session);
-                }
-                while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-
+                LOOP_CHECK(ret, gnutls_handshake(session));
                 if (ret < 0) {
                         close(sd);
                         gnutls_deinit(session);
@@ -156,7 +156,7 @@ int main(void)
                 /* print_info(session); */
 
                 for (;;) {
-                        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+                        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
 
                         if (ret == 0) {
                                 printf
@@ -180,7 +180,7 @@ int main(void)
                 printf("\n");
                 /* do not wait for the peer to close the connection.
                  */
-                CHECK(gnutls_bye(session, GNUTLS_SHUT_WR));
+                LOOP_CHECK(ret, gnutls_bye(session, GNUTLS_SHUT_WR));
 
                 close(sd);
                 gnutls_deinit(session);

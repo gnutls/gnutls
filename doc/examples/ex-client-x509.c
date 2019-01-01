@@ -17,6 +17,11 @@
  */
 
 #define CHECK(x) assert((x)>=0)
+#define LOOP_CHECK(rval, cmd) \
+        do { \
+                rval = cmd; \
+        } while(rval == GNUTLS_E_AGAIN || rval == GNUTLS_E_INTERRUPTED); \
+        assert(rval >= 0)
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
@@ -57,8 +62,8 @@ int main(void)
         /* Initialize TLS session */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
-        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
-                                     strlen("my_host_name")));
+        CHECK(gnutls_server_name_set(session, GNUTLS_NAME_DNS, "www.example.com",
+                                     strlen("www.example.com")));
 
         /* It is recommended to use the default priorities */
         CHECK(gnutls_set_default_priority(session));
@@ -66,7 +71,7 @@ int main(void)
         /* put the x509 credentials to the current session
          */
         CHECK(gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred));
-        gnutls_session_set_verify_cert(session, "my_host_name", 0);
+        gnutls_session_set_verify_cert(session, "www.example.com", 0);
 
         /* connect to the peer
          */
@@ -101,9 +106,9 @@ int main(void)
         }
 
 	/* send data */
-        CHECK(gnutls_record_send(session, MSG, strlen(MSG)));
+        LOOP_CHECK(ret, gnutls_record_send(session, MSG, strlen(MSG)));
 
-        ret = gnutls_record_recv(session, buffer, MAX_BUF);
+        LOOP_CHECK(ret, gnutls_record_recv(session, buffer, MAX_BUF));
         if (ret == 0) {
                 printf("- Peer has closed the TLS connection\n");
                 goto end;
