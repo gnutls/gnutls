@@ -271,6 +271,7 @@ _gnutls_handshake_verify_data12(gnutls_session_t session,
 	gnutls_datum_t dconcat;
 	int ret;
 	const version_entry_st *ver = get_version(session);
+	const gnutls_sign_entry_st *se = _gnutls_sign_to_entry(sign_algo);
 
 	_gnutls_handshake_log
 	    ("HSK[%p]: verify TLS 1.2 handshake data: using %s\n", session,
@@ -282,6 +283,12 @@ _gnutls_handshake_verify_data12(gnutls_session_t session,
 					       sign_algo);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	if (unlikely(sign_supports_cert_pk_algorithm(se, cert->pubkey->params.algo) == 0)) {
+		_gnutls_handshake_log("HSK[%p]: certificate of %s cannot be combined with %s sig\n",
+				      session, gnutls_pk_get_name(cert->pubkey->params.algo), se->name);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	}
 
 	ret =
 	    _gnutls_session_sign_algo_enabled(session, sign_algo);
@@ -356,10 +363,17 @@ _gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
 {
 	int ret;
 	gnutls_datum_t dconcat;
+	const gnutls_sign_entry_st *se = _gnutls_sign_to_entry(sign_algo);
 
 	ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	if (unlikely(sign_supports_cert_pk_algorithm(se, cert->pubkey->params.algo) == 0)) {
+		_gnutls_handshake_log("HSK[%p]: certificate of %s cannot be combined with %s sig\n",
+				      session, gnutls_pk_get_name(cert->pubkey->params.algo), se->name);
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	}
 
 	dconcat.data = session->internals.handshake_hash_buffer.data;
 	dconcat.size = session->internals.handshake_hash_buffer_prev_len;
@@ -566,6 +580,9 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	}
 
 	gnutls_sign_algorithm_set_client(session, sign_algo);
+
+	if (unlikely(gnutls_sign_supports_pk_algorithm(sign_algo, pkey->pk_algorithm) == 0))
+		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
 	_gnutls_debug_log("sign handshake cert vrfy: picked %s\n",
 			  gnutls_sign_algorithm_get_name(sign_algo));

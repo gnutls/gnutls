@@ -37,13 +37,11 @@
                          "-p", "@PORT@"]
           },
          {"name" : "test-rsa-pss-sigs-on-certificate-verify.py",
-	  "comment" : "FIXME: We shouldn't allow rsa_pss_pss* schemes as there is only RSA key #645",
+	  "comment": "tlsfuzzer doesn't know ed25519 scheme which we advertise",
           "arguments" : ["-k", "tests/clientX509Key.pem",
                          "-c", "tests/clientX509Cert.pem",
                          "-e", "check CertificateRequest sigalgs",
-			 "-e", "rsa_pss_pss_sha256 in CertificateVerify with rsa key",
-			 "-e", "rsa_pss_pss_sha384 in CertificateVerify with rsa key",
-			 "-e", "rsa_pss_pss_sha512 in CertificateVerify with rsa key",
+                         "--illegpar",
                          "-n", "100",
                          "-p", "@PORT@"]
           },
