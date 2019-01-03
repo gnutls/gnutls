@@ -286,7 +286,7 @@ operation.
 As well as any calls needed for memory allocation to work. Note however, that GnuTLS
 depends on libc for the system calls, and there is no guarantee that libc will
 call the expected system call. For that it is recommended to test your
-program in all the targetted platforms when filters like seccomp are in place.
+program in all the targeted platforms when filters like seccomp are in place.
 
 An example with a seccomp filter from GnuTLS' test suite is at:
 @url{http://gitlab.com/gnutls/gnutls/blob/master/tests/seccomp.c}.
@@ -1205,7 +1205,7 @@ A session can be deinitialized with the @funcref{gnutls_deinit} function.
 Although @funcref{gnutls_record_send} is sufficient to transmit data
 to the peer, when many small chunks of data are to be transmitted
 it is inefficient and wastes bandwidth due to the TLS record
-overhead. In that case it is preferrable to combine the small chunks
+overhead. In that case it is preferable to combine the small chunks
 before transmission. The following functions provide that functionality.
 
 @showfuncdesc{gnutls_record_cork}
@@ -1355,7 +1355,7 @@ using this option to build a priority string gives detailed control
 into the resulting settings, however with new revisions of the TLS protocol
 new priority items are routinely added, and such strings are not
 forward compatible with new protocols. As such, we
-advice against using that option for applications targetting multiple versions
+advice against using that option for applications targeting multiple versions
 of the GnuTLS library, and recommend using the defaults (see above) or
 adjusting the defaults via @funcref{gnutls_set_default_priority_append}.
 

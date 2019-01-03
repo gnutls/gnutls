@@ -449,7 +449,7 @@ indicates that the CA is allowed to sign certificates for email users.
 @item GNUTLS_KP_OCSP_SIGNING @tab
 1.3.6.1.5.5.7.3.9 @tab
 The certificate is to be used for signing OCSP responses. When in a CA certificate, it
-indicates that the CA is allowed to sign certificates which sign OCSP reponses.
+indicates that the CA is allowed to sign certificates which sign OCSP responses.
 
 @item GNUTLS_KP_ANY @tab
 2.5.29.37.0 @tab

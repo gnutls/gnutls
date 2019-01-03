@@ -50,7 +50,7 @@ to sign an X.509 certificate with a key that resides in a token the following st
 used.
 
 @example
-#inlude <gnutls/abstract.h>
+#include <gnutls/abstract.h>
 
 void sign_cert( gnutls_x509_crt_t to_be_signed)
 @{
@@ -346,7 +346,7 @@ flag.
 
 @showfuncdesc{gnutls_pkcs11_add_provider}
 
-In that case, the application will only have access to the modules explictly
+In that case, the application will only have access to the modules explicitly
 loaded. If the @code{GNUTLS_PKCS11_FLAG_MANUAL} flag is specified and no calls
 to @funcref{gnutls_pkcs11_add_provider} are made, then the PKCS #11 functionality
 is effectively disabled.

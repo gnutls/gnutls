@@ -41,7 +41,7 @@ explicitly enabled, since they reduce the overall security level.
 draft-mavrogiannopoulos-chacha-tls-05 and draft-irtf-cfrg-chacha20-poly1305-10.
 That is currently provided as technology preview and is not enabled by
 default, since there are no assigned ciphersuite points by IETF and there 
-is no guarrantee of compatibility between draft versions. The ciphersuite
+is no guarantee of compatibility between draft versions. The ciphersuite
 priority string to enable it is "+CHACHA20-POLY1305".
 
 ** libgnutls: Added support for encrypt-then-authenticate in CBC

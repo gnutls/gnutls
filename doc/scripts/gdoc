@@ -95,7 +95,7 @@
 #  * my_function
 #  **/
 #
-# If the Description: header tag is ommitted, then there must be a blank line
+# If the Description: header tag is omitted, then there must be a blank line
 # after the last parameter specification.
 # e.g.
 # /**
@@ -310,7 +310,7 @@ sub dump_section {
 #  parameterlist => @list of parameters
 #  parameters => %parameter descriptions
 #  sectionlist => @list of sections
-#  sections => %descriont descriptions
+#  sections => %section descriptions
 #  
 
 sub just_highlight {
@@ -1015,7 +1015,7 @@ foreach $file (@ARGV) {
 		    $contents .= $1."\n";
 		}
 	    } else {
-		# i dont know - bad line?  ignore.
+		# i don't know - bad line?  ignore.
 		#print STDERR "warning: $lineno: Bad line: $_";
 	    }
 	} elsif ($state == 3) {	# scanning for function { (end of prototype)
