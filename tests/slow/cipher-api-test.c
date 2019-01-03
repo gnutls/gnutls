@@ -48,14 +48,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-static unsigned error_detected = 0;
-
-static void custom_abrt(int sig)
-{
-	error_detected = 1;
-}
-
-static void test_cipher(int algo, unsigned aead)
+/* Test whether an invalid call to gnutls_cipher_encrypt() is caught */
+static void test_cipher(int algo)
 {
 	int ret;
 	gnutls_cipher_hd_t ch;
@@ -63,10 +57,6 @@ static void test_cipher(int algo, unsigned aead)
 	uint8_t iv16[32];
 	uint8_t data[128];
 	gnutls_datum_t key, iv;
-	unsigned auth = 1;
-
-	if (algo == GNUTLS_CIPHER_CHACHA20_POLY1305)
-		auth = 0;
 
 	key.data = key16;
 	key.size = gnutls_cipher_get_key_size(algo);
@@ -94,42 +84,131 @@ static void test_cipher(int algo, unsigned aead)
 	if (ret < 0)
 		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
 
-	if (aead) {
-		if (auth) {
-			ret = gnutls_cipher_add_auth(ch, data, sizeof(data)-1);
-			if (ret < 0)
-				fail("could not add auth data\n");
+	/* try encrypting in a way that violates nettle's block conventions */
+	ret = gnutls_cipher_encrypt(ch, data, sizeof(data)-1);
+	if (ret >= 0)
+		fail("succeeded in encrypting partial data on block cipher\n");
 
-			signal(SIGABRT, custom_abrt);
-			ret = gnutls_cipher_add_auth(ch, data, 16);
-			signal(SIGABRT, SIG_DFL);
-			if (ret >= 0 && error_detected == 0)
-				fail("succeeded in adding auth data data after partial data were given\n");
-		}
+	gnutls_cipher_deinit(ch);
 
-		/* try encrypting in a way that violates nettle's AEAD conventions */
-		ret = gnutls_cipher_encrypt(ch, data, sizeof(data)-1);
-		if (ret < 0)
-			fail("could not encrypt data\n");
+	gnutls_global_deinit();
+}
 
-		signal(SIGABRT, custom_abrt);
-		ret = gnutls_cipher_encrypt(ch, data, sizeof(data));
-		signal(SIGABRT, SIG_DFL);
-		if (ret >= 0 && error_detected == 0)
-			fail("succeeded in encrypting partial data after partial data were given\n");
+/* Test whether an invalid gnutls_cipher_add_auth() is caught */
+static void test_aead_cipher1(int algo)
+{
+	int ret;
+	gnutls_cipher_hd_t ch;
+	uint8_t key16[64];
+	uint8_t iv16[32];
+	uint8_t data[128];
+	gnutls_datum_t key, iv;
 
-	} else {
-		/* try encrypting in a way that violates nettle's block conventions */
-		signal(SIGABRT, custom_abrt);
-		ret = gnutls_cipher_encrypt(ch, data, sizeof(data)-1);
-		signal(SIGABRT, SIG_DFL);
-		if (ret >= 0 && error_detected == 0)
-			fail("succeeded in encrypting partial data on block cipher\n");
+	if (algo == GNUTLS_CIPHER_CHACHA20_POLY1305)
+		return;
+
+	key.data = key16;
+	key.size = gnutls_cipher_get_key_size(algo);
+	assert(key.size <= sizeof(key16));
+
+	iv.data = iv16;
+	iv.size = gnutls_cipher_get_iv_size(algo);
+	assert(iv.size <= sizeof(iv16));
+
+	memset(iv.data, 0xff, iv.size);
+	memset(key.data, 0xfe, key.size);
+	memset(data, 0xfa, sizeof(data));
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	ret = global_init();
+	if (ret < 0) {
+		fail("Cannot initialize library\n"); /*errcode 1 */
 	}
+
+	ret =
+	    gnutls_cipher_init(&ch, algo, &key, &iv);
+	if (ret < 0)
+		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
+
+	ret = gnutls_cipher_add_auth(ch, data, sizeof(data)-1);
+	if (ret < 0)
+		fail("could not add auth data\n");
+
+	ret = gnutls_cipher_add_auth(ch, data, 16);
+	if (ret >= 0)
+		fail("succeeded in adding auth data data after partial data were given\n");
+
 	gnutls_cipher_deinit(ch);
 
 	gnutls_global_deinit();
 	return;
+}
+
+/* Test whether an invalid call to gnutls_cipher_encrypt() is caught */
+static void test_aead_cipher2(int algo)
+{
+	int ret;
+	gnutls_cipher_hd_t ch;
+	uint8_t key16[64];
+	uint8_t iv16[32];
+	uint8_t data[128];
+	gnutls_datum_t key, iv;
+
+	key.data = key16;
+	key.size = gnutls_cipher_get_key_size(algo);
+	assert(key.size <= sizeof(key16));
+
+	iv.data = iv16;
+	iv.size = gnutls_cipher_get_iv_size(algo);
+	assert(iv.size <= sizeof(iv16));
+
+	memset(iv.data, 0xff, iv.size);
+	memset(key.data, 0xfe, key.size);
+	memset(data, 0xfa, sizeof(data));
+
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
+
+	ret = global_init();
+	if (ret < 0) {
+		fail("Cannot initialize library\n"); /*errcode 1 */
+	}
+
+	ret =
+	    gnutls_cipher_init(&ch, algo, &key, &iv);
+	if (ret < 0)
+		fail("gnutls_cipher_init failed\n"); /*errcode 1 */
+
+	/* try encrypting in a way that violates nettle's AEAD conventions */
+	ret = gnutls_cipher_encrypt(ch, data, sizeof(data)-1);
+	if (ret < 0)
+		fail("could not encrypt data\n");
+
+	ret = gnutls_cipher_encrypt(ch, data, sizeof(data));
+	if (ret >= 0)
+		fail("succeeded in encrypting partial data after partial data were given\n");
+
+	gnutls_cipher_deinit(ch);
+
+	gnutls_global_deinit();
+	return;
+}
+
+static void check_status(int status)
+{
+	if (WEXITSTATUS(status) != 0 ||
+	    (WIFSIGNALED(status) && WTERMSIG(status) != SIGABRT)) {
+		if (WIFSIGNALED(status)) {
+			fail("Child died with signal %d\n", WTERMSIG(status));
+		} else {
+			fail("Child died with status %d\n",
+			     WEXITSTATUS(status));
+		}
+	}
 }
 
 static
@@ -152,9 +231,34 @@ void start(const char *name, int algo, unsigned aead)
 		int status;
 		/* parent */
 		wait(&status);
-		check_wait_status(status);
+		check_status(status);
 	} else {
-		test_cipher(algo,aead);
+		if (!aead)
+			test_cipher(algo);
+		else
+			test_aead_cipher1(algo);
+		exit(0);
+	}
+
+	if (!aead)
+		return;
+
+	/* check test_aead_cipher2 */
+
+	child = fork();
+	if (child < 0) {
+		perror("fork");
+		fail("fork");
+		return;
+	}
+
+	if (child) {
+		int status;
+		/* parent */
+		wait(&status);
+		check_status(status);
+	} else {
+		test_aead_cipher2(algo);
 		exit(0);
 	}
 }

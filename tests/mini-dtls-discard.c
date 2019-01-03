@@ -44,6 +44,7 @@ int main()
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <errno.h>
+#include <signal.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <assert.h>
@@ -265,6 +266,8 @@ void start(const char *prio)
 {
 	int fd[2];
 	int ret;
+
+	signal(SIGPIPE, SIG_IGN);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {

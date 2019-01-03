@@ -331,6 +331,7 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+	signal(SIGPIPE, SIG_IGN);
 	signal(SIGCHLD, ch_handler);
 
 	start("aes-cbc", AES_CBC, 1);
