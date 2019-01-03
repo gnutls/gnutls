@@ -1045,7 +1045,7 @@ if test "x${TOKEN}" = x; then
 	exit_error
 fi
 
-${P11TOOL} ${ADDITIONAL_PARAM} --list-machanisms ${TOKEN}|grep 25519 >/dev/null
+${P11TOOL} ${ADDITIONAL_PARAM} --list-mechanisms ${TOKEN}|grep 25519 >/dev/null
 if test $? = 0;then
 	have_ed25519=1
 fi
