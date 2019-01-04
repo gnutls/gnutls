@@ -541,7 +541,7 @@ static int server_recv_params(gnutls_session_t session,
 			   psk.ob_ticket_age == 0 &&
 			   psk.identity.size > 0 && psk.identity.size <= MAX_USERNAME_SIZE) {
 			/* _gnutls_psk_pwd_find_entry() expects 0-terminated identities */
-			char identity_str[psk.identity.size + 1];
+			char identity_str[MAX_USERNAME_SIZE + 1];
 
 			prf = pskcred->binder_algo;
 
