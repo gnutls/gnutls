@@ -45,10 +45,6 @@
 # endif
 #endif
 
-#ifdef _WIN32
-# include <tchar.h>
-#endif
-
 /* Convenience functions for verify-high functionality 
  */
 
@@ -390,13 +386,11 @@ int load_dir_certs(const char *dirname,
 			  unsigned int tl_flags, unsigned int tl_vflags,
 			  unsigned type, unsigned crl)
 {
+	DIR *dirp;
+	struct dirent *d;
 	int ret;
 	int r = 0;
 	char path[GNUTLS_PATH_MAX];
-
-#if !defined(_WIN32) || !defined(_UNICODE)
-	DIR *dirp;
-	struct dirent *d;
 
 	dirp = opendir(dirname);
 	if (dirp != NULL) {
@@ -428,47 +422,7 @@ int load_dir_certs(const char *dirname,
 		while (d != NULL);
 		closedir(dirp);
 	}
-#else /* _WIN32 */
 
-	_TDIR *dirp;
-	struct _tdirent *d;
-	gnutls_datum_t utf16 = {NULL, 0};
-
-	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16);
-	if (r < 0)
-		return gnutls_assert_val(r);
-	dirp = _topendir((_TCHAR*)utf16.data);
-	gnutls_free(utf16.data);
-	if (dirp != NULL) {
-		do {
-			d = _treaddir(dirp);
-			if (d != NULL
-#ifdef _DIRENT_HAVE_D_TYPE
-				&& (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
-#endif
-			) {
-				snprintf(path, sizeof(path), "%s/%S",
-					dirname, d->d_name);
-
-				if (crl != 0) {
-					ret =
-					    gnutls_x509_trust_list_add_trust_file
-					    (list, NULL, path, type, tl_flags,
-					     tl_vflags);
-				} else {
-					ret =
-					    gnutls_x509_trust_list_add_trust_file
-					    (list, path, NULL, type, tl_flags,
-					     tl_vflags);
-				}
-				if (ret >= 0)
-					r += ret;
-			}
-		}
-		while (d != NULL);
-		_tclosedir(dirp);
-	}
-#endif /* _WIN32 */
 	return r;
 }
 
