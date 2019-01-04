@@ -198,6 +198,7 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	ret = gnutls_privkey_sign_data2(pkey, se->id, 0, &p, signature);
 	if (ret < 0) {
 		gnutls_assert();
+		goto cleanup;
 	}
 
 	ret = 0;
