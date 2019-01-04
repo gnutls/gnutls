@@ -91,7 +91,7 @@ static int _gnutls_server_cert_type_recv_params(gnutls_session_t session,
 					gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		}
 
-		/* The server picked one of the offered cert types iff he supports
+		/* The server picked one of the offered cert types if he supports
 		 * at least one of them. If both parties play by the rules then we
 		 * may only receive a cert type that we offered, i.e. one that we
 		 * support. Because the world isn't as beautiful as it may seem,

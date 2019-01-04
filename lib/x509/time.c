@@ -35,7 +35,7 @@
 #include <common.h>
 
 /* TIME functions 
- * Convertions between generalized or UTC time to time_t
+ * Conversions between generalized or UTC time to time_t
  *
  */
 
@@ -69,7 +69,7 @@ static const int MONTHDAYS[] = {
 /*
  **  Given a struct tm representing a calendar time in UTC, convert it to
  **  seconds since epoch.  Returns (time_t) -1 if the time is not
- **  convertable.  Note that this function does not canonicalize the provided
+ **  convertible.  Note that this function does not canonicalize the provided
  **  struct tm, nor does it allow out of range values or years before 1970.
  */
 static time_t mktime_utc(const struct fake_tm *tm)

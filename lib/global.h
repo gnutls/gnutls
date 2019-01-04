@@ -33,7 +33,7 @@ extern ASN1_TYPE _gnutls_gnutls_asn;
 
 /* removed const from node_asn* to
  * prevent warnings, since libtasn1 doesn't
- * use the const keywork in its functions.
+ * use the const keyword in its functions.
  */
 #define _gnutls_get_gnutls_asn() ((ASN1_TYPE) _gnutls_gnutls_asn)
 #define _gnutls_get_pkix() ((ASN1_TYPE) _gnutls_pkix1_asn)

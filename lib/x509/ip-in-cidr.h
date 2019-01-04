@@ -30,7 +30,7 @@
  * The @ip version must match the @cidr version (v4/v6),
  * (this is not checked).
  *
- * Returns: 1 if @ip lies withing @cidr, 0 otherwise
+ * Returns: 1 if @ip lies within @cidr, 0 otherwise
  -*/
 static unsigned ip_in_cidr(const gnutls_datum_t *ip, const gnutls_datum_t *cidr)
 {

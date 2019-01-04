@@ -387,7 +387,7 @@ int gnutls_pcert_import_rawpk(gnutls_pcert_st* pcert,
 	/* A pcert struct holds a raw copy of the certificate data.
 	 * Therefore we convert our gnutls_pubkey_t to its raw DER
 	 * representation and copy it into our pcert. It is this raw data
-	 * that will be transfered to the peer via a Certificate msg.
+	 * that will be transferred to the peer via a Certificate msg.
 	 * According to the spec (RFC7250) a DER representation must be used.
 	 */
 	ret = gnutls_pubkey_export2(pubkey, GNUTLS_X509_FMT_DER, &pcert->cert);
@@ -452,7 +452,7 @@ int gnutls_pcert_import_rawpk_raw(gnutls_pcert_st* pcert,
 	pcert->pubkey->key_usage = key_usage;
 
 	/* A pcert struct holds a raw copy of the certificate data.
-	 * It is this raw data that will be transfered to the peer via a
+	 * It is this raw data that will be transferred to the peer via a
 	 * Certificate message. According to the spec (RFC7250) a DER
 	 * representation must be used. Therefore we check the format and
 	 * convert if necessary.

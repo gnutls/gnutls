@@ -593,7 +593,7 @@ static int _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
  * trusted CAs.
  *
  * Returns only 0 or 1. If 1 it means that the certificate 
- * was successfuly verified.
+ * was successfully verified.
  *
  * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
  *

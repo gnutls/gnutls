@@ -110,7 +110,7 @@ _x509_parse_attribute(ASN1_TYPE asn1_struct,
 			goto cleanup;
 		}
 
-		/* Move to the attibute type and values
+		/* Move to the attribute type and values
 		 */
 		/* Read the OID
 		 */

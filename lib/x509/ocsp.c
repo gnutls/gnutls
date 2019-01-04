@@ -2575,7 +2575,7 @@ time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_t resp)
 	now = gnutls_time(0);
 
 	if (ntime == -1) {
-		/* This is a problematic case, and there is no concensus on how
+		/* This is a problematic case, and there is no consensus on how
 		 * to treat these responses. It doesn't contain the time after which
 		 * the response is invalid, thus it is an OCSP response effectively
 		 * valid forever defeating the purpose of OCSP. We set here the same

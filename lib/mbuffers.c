@@ -324,7 +324,7 @@ _mbuffer_append_data(mbuffer_st * bufel, void *newdata,
 #ifdef ENABLE_ALIGN16
 # define ALIGN_SIZE 16
 
-/* Allocate a 16-byte alligned buffer segment. The segment is not initially "owned" by
+/* Allocate a 16-byte aligned buffer segment. The segment is not initially "owned" by
  * any buffer.
  *
  * maximum_size: Amount of data that this segment can contain.

@@ -547,7 +547,7 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 }
 
 /* the same as _gnutls_handshake_sign_crt_vrfy except that it is made for TLS 1.2.
- * Returns the used signature algorihm, or a negative error code.
+ * Returns the used signature algorithm, or a negative error code.
  */
 static int
 _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
@@ -668,7 +668,7 @@ _gnutls_handshake_sign_crt_vrfy3(gnutls_session_t session,
  * For TLS1.x, x<2 returns negative for failure and zero or unspecified for success.
  * For TLS1.2 returns the signature algorithm used on success, or a negative error code;
  *
- * Returns the used signature algorihm, or a negative error code.
+ * Returns the used signature algorithm, or a negative error code.
  */
 int
 _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,

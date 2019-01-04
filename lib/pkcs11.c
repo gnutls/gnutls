@@ -1291,7 +1291,7 @@ void gnutls_pkcs11_obj_deinit(gnutls_pkcs11_obj_t obj)
  *   replaced by the actual size of parameters)
  *
  * This function will export the PKCS11 object data.  It is normal for
- * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * data to be inaccessible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * If the buffer provided is not long enough to hold the output, then
@@ -1329,7 +1329,7 @@ gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
  * @out: will contain the object data
  *
  * This function will export the PKCS11 object data.  It is normal for
- * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * data to be inaccessible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * The output buffer is allocated using gnutls_malloc().
@@ -1352,7 +1352,7 @@ gnutls_pkcs11_obj_export2(gnutls_pkcs11_obj_t obj, gnutls_datum_t * out)
  * @fmt: The format of the exported data
  *
  * This function will export the PKCS11 object data.  It is normal for
- * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * data to be inaccessible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * The output buffer is allocated using gnutls_malloc().
@@ -4252,7 +4252,7 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
  *
  * This function will return the issuer of a given certificate, if it
  * is stored in the token. By default only marked as trusted issuers
- * are retuned. If any issuer should be returned specify
+ * are returned. If any issuer should be returned specify
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -4355,7 +4355,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
  *
  * This function will return the certificate with the given DN, if it
  * is stored in the token. By default only marked as trusted issuers
- * are retuned. If any issuer should be returned specify
+ * are returned. If any issuer should be returned specify
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
  *
  * The name of the function includes issuer because it can
@@ -4440,7 +4440,7 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
  *
  * This function will return the certificate with the given DN and @spki, if it
  * is stored in the token. By default only marked as trusted issuers
- * are retuned. If any issuer should be returned specify
+ * are returned. If any issuer should be returned specify
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
  *
  * The name of the function includes issuer because it can

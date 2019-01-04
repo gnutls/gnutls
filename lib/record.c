@@ -872,7 +872,7 @@ record_add_to_buffers(gnutls_session_t session,
 				goto cleanup;
 			} else {
 				/* if the alert is FATAL or WARNING
-				 * return the apropriate message
+				 * return the appropriate message
 				 */
 				gnutls_assert();
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;

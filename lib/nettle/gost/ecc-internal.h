@@ -127,7 +127,7 @@ struct ecc_curve
 {
   /* The prime p. */
   struct ecc_modulo p;
-  /* Group order. FIXME: Currently, many fucntions rely on q.size ==
+  /* Group order. FIXME: Currently, many functions rely on q.size ==
      p.size. This has to change for radix-51 implementation of
      curve25519 mod p arithmetic. */
   struct ecc_modulo q;
@@ -202,7 +202,7 @@ gost_hash (const struct ecc_modulo *m,
 
 /* Converts a point P in jacobian coordinates into a point R in affine
    coordinates. If op == 1, produce x coordinate only. If op == 2,
-   produce the x coordiante only, and in also it modulo q. FIXME: For
+   produce the x coordinate only, and in also it modulo q. FIXME: For
    the public interface, have separate for the three cases, and use
    this flag argument only for the internal ecc->h_to_a function. */
 void

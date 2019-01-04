@@ -334,7 +334,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE) {
 		/* In case decryption fails then don't inform
 		 * the peer. Just use a random key. (in order to avoid
-		 * attack against pkcs-1 formating).
+		 * attack against pkcs-1 formatting).
 		 */
 		gnutls_assert();
 		_gnutls_debug_log
