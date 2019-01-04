@@ -24,6 +24,7 @@
 #define UTILS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <stdarg.h>
@@ -148,7 +149,7 @@ inline static void _check_wait_status(int status, unsigned sigonly)
 {
 #if defined WEXITSTATUS && defined WIFSIGNALED
 	if (WEXITSTATUS(status) != 0 ||
-	    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {
+	    (WIFSIGNALED(status) && WTERMSIG(status) != SIGTERM)) {
 		if (WIFSIGNALED(status)) {
 			fail("Child died with signal %d\n", WTERMSIG(status));
 		} else {

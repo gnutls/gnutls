@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 #include <sys/wait.h>
 #endif
 #include <unistd.h>
+#include <signal.h>
 #include <assert.h>
 #include <gnutls/gnutls.h>
 
@@ -304,6 +305,8 @@ void run_test3(const char *prio, const char *sprio, const char *user, const gnut
 	int err;
 	int sockets[2];
 
+	signal(SIGPIPE, SIG_IGN);
+
 	if (expect_fail_serv || expect_fail_cli) {
 		success("ntest %s (user:%s)\n", prio, user);
 	} else {
@@ -407,7 +410,7 @@ void doit(void)
 	run_test2("NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE4096", "NORMAL:-VERS-ALL:+VERS-TLS1.3:+DHE-PSK:-GROUP-ALL:+GROUP-FFDHE4096", "jas", &key, 0, GNUTLS_KX_DHE_PSK, 0, 0);
 
 	/* try without server credentials */
-	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &key, 1, 0, 0, GNUTLS_E_FATAL_ALERT_RECEIVED, GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+	run_test3("NORMAL:-VERS-ALL:+VERS-TLS1.3:+PSK:+DHE-PSK", NULL, "jas", &key, 1, 0, 0, GNUTLS_E_PUSH_ERROR, GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 }
 
 #endif				/* _WIN32 */
