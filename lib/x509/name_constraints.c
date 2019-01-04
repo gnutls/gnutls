@@ -242,7 +242,7 @@ static name_constraints_node_st* name_constraints_node_new(unsigned type,
  * @_nc_excluded: Corresponding excluded name constraints list
  *
  * This function finds the intersection of @_nc and @_nc2. The result is placed in @_nc,
- * the original @_nc is deallocated. @_nc2 is not chenged. If necessary, a universal
+ * the original @_nc is deallocated. @_nc2 is not changed. If necessary, a universal
  * excluded name constraint node of the right type is added to the list provided
  * in @_nc_excluded.
  *

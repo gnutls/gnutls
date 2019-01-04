@@ -122,7 +122,7 @@ typedef void (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
  */
 #define GNUTLS_PRIVKEY_INFO_HAVE_SIGN_ALGO (1<<2)
 /* Should return the number of bits of the public key algorithm (required for RSA-PSS)
- * It is the value that should be retuned by gnutls_pubkey_get_pk_algorithm() */
+ * It is the value that should be returned by gnutls_pubkey_get_pk_algorithm() */
 #define GNUTLS_PRIVKEY_INFO_PK_ALGO_BITS (1<<3)
 
 /* returns information on the public key associated with userdata */

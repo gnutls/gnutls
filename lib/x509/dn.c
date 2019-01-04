@@ -74,7 +74,7 @@ static int append_elements(ASN1_TYPE asn1_struct, const char *asn1_rdn_name, gnu
 		goto cleanup;
 	}
 
-	do {		/* Move to the attibute type and values
+	do {		/* Move to the attribute type and values
 				 */
 		k2++;
 
@@ -359,7 +359,7 @@ _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 
 		k2 = 0;
 
-		do {		/* Move to the attibute type and values
+		do {		/* Move to the attribute type and values
 				 */
 			k2++;
 
@@ -519,7 +519,7 @@ _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
 
 		k2 = 0;
 
-		do {		/* Move to the attibute type and values
+		do {		/* Move to the attribute type and values
 				 */
 			k2++;
 

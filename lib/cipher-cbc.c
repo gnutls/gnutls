@@ -90,7 +90,7 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st *params,
 
 	pad = data[data_size - 1];	/* pad */
 
-	/* Check the pading bytes (TLS 1.x).
+	/* Check the padding bytes (TLS 1.x).
 	 * Note that we access all 256 bytes of ciphertext for padding check
 	 * because there is a timing channel in that memory access (in certain CPUs).
 	 */

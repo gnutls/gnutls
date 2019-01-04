@@ -453,7 +453,7 @@ int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t * ext,
  *
  * This function will convert the provided name constraints type to a
  * DER-encoded PKIX NameConstraints (2.5.29.30) extension. The output data in 
- * @ext will be allocated usin gnutls_malloc().
+ * @ext will be allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
@@ -3136,7 +3136,7 @@ int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
  *
  * This function will convert the key purposes type to a
  * DER-encoded PKIX ExtKeyUsageSyntax (2.5.29.37) extension. The output data in 
- * @ext will be allocated usin gnutls_malloc().
+ * @ext will be allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *

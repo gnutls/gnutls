@@ -358,7 +358,7 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 		goto cleanup;
 	}
 
-	/* Done! Almost, we must compute the auxillary private values. */
+	/* Done! Almost, we must compute the auxiliary private values. */
 	/* a = d % (p-1) */
 	mpz_fdiv_r(key->a, key->d, p1);
 

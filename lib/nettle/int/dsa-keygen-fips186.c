@@ -421,7 +421,7 @@ _dsa_generate_dss_pqg(struct dsa_params *params,
 	if (_gnutls_fips_mode_enabled() != 0) {
 		cert->seed_length = 2 * (q_bits / 8) + 1;
 
-		FIPS_RULE(cert->seed_length != seed_size, 0, "unsupported DSA seed length (is %d, shoudl be %d)\n", seed_size, cert->seed_length);
+		FIPS_RULE(cert->seed_length != seed_size, 0, "unsupported DSA seed length (is %d, should be %d)\n", seed_size, cert->seed_length);
 	} else {
 		cert->seed_length = seed_size;
 	}

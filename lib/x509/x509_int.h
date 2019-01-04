@@ -313,7 +313,7 @@ _gnutls_x509_ext_extract_number(uint8_t * number,
 				size_t * nr_size,
 				uint8_t * extnValue, int extnValueLen);
 int
-_gnutls_x509_ext_gen_number(const uint8_t * nuber, size_t nr_size,
+_gnutls_x509_ext_gen_number(const uint8_t * number, size_t nr_size,
 			    gnutls_datum_t * der_ext);
 
 

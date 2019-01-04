@@ -827,7 +827,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 	asn1_delete_structure(&safe_cont);
 
 
-	/* Step 5. Reencode and copy the AuthenticatedSafe into the pkcs12
+	/* Step 5. Re-encode and copy the AuthenticatedSafe into the pkcs12
 	 * structure.
 	 */
 	result =

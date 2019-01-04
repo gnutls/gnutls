@@ -251,7 +251,7 @@ int _gnutls_cryptodev_init(void)
 			return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
 		}
 
-		/* Set close-on-exec (not really neede here) */
+		/* Set close-on-exec (not really needed here) */
 		if (fcntl(cfd, F_SETFD, 1) == -1) {
 			gnutls_assert();
 			return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;

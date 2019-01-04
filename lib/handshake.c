@@ -1626,7 +1626,7 @@ _gnutls_recv_handshake(gnutls_session_t session,
 	default:
 		gnutls_assert();
 		/* we shouldn't actually arrive here in any case .
-		 * unexpected messages should be catched after _gnutls_handshake_io_recv_int()
+		 * unexpected messages should be caught after _gnutls_handshake_io_recv_int()
 		 */
 		ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 		goto cleanup;

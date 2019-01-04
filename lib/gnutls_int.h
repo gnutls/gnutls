@@ -1101,7 +1101,7 @@ typedef struct {
 
 	bool invalid_connection;	/* true or FALSE - if this session is valid */
 
-	bool may_not_read;	/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
+	bool may_not_read;	/* if it's 0 then we can read/write, otherwise it's forbidden to read/write
 				 */
 	bool may_not_write;
 	bool read_eof;		/* non-zero if we have received a closure alert. */
@@ -1263,7 +1263,7 @@ typedef struct {
 	 */
 	bool ignore_rdn_sequence;
 
-	/* This is used to set an arbitary version in the RSA
+	/* This is used to set an arbitrary version in the RSA
 	 * PMS secret. Can be used by clients to test whether the
 	 * server checks that version. (** only used in gnutls-cli-debug)
 	 */
