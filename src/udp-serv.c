@@ -56,6 +56,15 @@ static ssize_t pull_func(gnutls_transport_ptr_t p, void *data,
 
 #define MAX_BUFFER 255		/* Longest string to echo */
 
+/* record layer indication for a handshake packet */
+#define HANDSHAKE_CONTENT_TYPE 22
+/* TLS record content is the first by of the packet */
+#define RECORD_CONTENT_POS 0
+/* handshake type is first byte in Handshake packet;
+ * we have to skip type;version;epoch;sequence_number;
+ * and length in DTLSPlaintext */
+#define HANDSHAKE_TYPE_POS 13
+
 void udp_server(const char *name, int port, int mtu)
 {
 	int sock, ret;
@@ -91,7 +100,11 @@ void udp_server(const char *name, int port, int mtu)
 		    recvfrom(sock, buffer, sizeof(buffer)-1, MSG_PEEK,
 			     (struct sockaddr *) &cli_addr,
 			     &cli_addr_size);
-		if (ret > 0) {
+
+		/* only accept a valid client hello */
+		if (ret > HANDSHAKE_TYPE_POS &&
+		    buffer[RECORD_CONTENT_POS] == HANDSHAKE_CONTENT_TYPE &&
+		    buffer[HANDSHAKE_TYPE_POS] == GNUTLS_HANDSHAKE_CLIENT_HELLO) {
 			if (!HAVE_OPT(NOCOOKIE)) {
 				memset(&prestate, 0, sizeof(prestate));
 				ret =
@@ -222,8 +235,8 @@ void udp_server(const char *name, int port, int mtu)
 				}
 			}
 		}
+		gnutls_deinit(session);
 	}
-	gnutls_deinit(session);
 }
 
 /* Wait for data to be received within a timeout period in milliseconds
