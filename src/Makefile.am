@@ -33,6 +33,24 @@ ARGS_BUILT = \
 	tpmtool-args.c tpmtool-args.h \
 	systemkey-args.c systemkey-args.h
 
+# We bundle autogen-generated files as *.bak files.  This is awkward,
+# but it covers the common use-cases where autogen/libopts is
+# installed or not.  Do not attempt to simplify it unless autogen
+# gains a support for better handling of intermediate files with
+# autotools.
+ARGS_BAK = \
+	srptool-args.c.bak srptool-args.h.bak \
+	psktool-args.c.bak psktool-args.h.bak \
+	ocsptool-args.h.bak ocsptool-args.c.bak \
+	serv-args.c.bak serv-args.h.bak \
+	cli-args.c.bak cli-args.h.bak \
+	cli-debug-args.c.bak cli-debug-args.h.bak \
+	certtool-args.c.bak certtool-args.h.bak \
+	danetool-args.c.bak danetool-args.h.bak \
+	p11tool-args.c.bak p11tool-args.h.bak \
+	tpmtool-args.c.bak tpmtool-args.h.bak \
+	systemkey-args.c.bak systemkey-args.h.bak
+
 ARGS_STAMPS = \
 	certtool-args.stamp cli-debug-args.stamp cli-args.stamp tpmtool-args.stamp \
 	systemkey-args.stamp srptool-args.stamp ocsptool-args.stamp p11tool-args.stamp \
@@ -40,11 +58,11 @@ ARGS_STAMPS = \
 
 BUILT_SOURCES = $(ARGS_BUILT) mech-list.h
 
-DISTCLEANFILES = mech-list.h
+DISTCLEANFILES = $(BUILT_SOURCES) $(ARGS_STAMPS)
 
-EXTRA_DIST = gen-mech-list.sh args-std.def.in args-std.def $(ARGS_BUILT) $(ARGS_STAMPS)
+EXTRA_DIST = gen-mech-list.sh $(ARGS_BAK)
 
-MAINTAINERCLEANFILES = args-std.def $(ARGS_BUILT) $(ARGS_STAMPS)
+MAINTAINERCLEANFILES = $(ARGS_BAK)
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -251,17 +269,23 @@ nodist_libcmd_systemkey_la_SOURCES = systemkey-args.c systemkey-args.h
 libcmd_systemkey_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_systemkey_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
-args-std.def: args-std.def.in
-	$(AM_V_GEN) sed \
-		-e 's|@VERSION[@]|$(VERSION)|g' \
-		-e 's|@YEAR[@]|$(YEAR)|g' \
-		-e 's|@PACKAGE_BUGREPORT[@]|$(PACKAGE_BUGREPORT)|g' \
-		$< > $@.tmp && mv $@.tmp $@
-
-SUFFIXES = .stamp .def
+SUFFIXES = .stamp .def .c.bak .h.bak
 
 .def.stamp:
-	$(AM_V_GEN) $(AUTOGEN) $< && touch $@
+	$(AM_V_GEN) $(AUTOGEN) $< || { \
+		srcdir=''; \
+		b=`echo $@ | sed 's/.stamp$$//'`; \
+		test -f ./$${b}.def || srcdir=$(srcdir)/; \
+		cp -p $${srcdir}$${b}.c.bak $${b}.c; \
+		cp -p $${srcdir}$${b}.h.bak $${b}.h; \
+	} && \
+	touch $@
+
+.c.c.bak:
+	$(AM_V_GEN) cp -p $< $@
+
+.h.h.bak:
+	$(AM_V_GEN) cp -p $< $@
 
 danetool-args.h: danetool-args.stamp
 danetool-args.c: danetool-args.stamp
