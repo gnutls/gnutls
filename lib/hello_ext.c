@@ -442,7 +442,7 @@ _gnutls_gen_hello_extensions(gnutls_session_t session,
 				     session, ctx.ext->name, (int)ctx.ext->tls_id, ret-4);
 	}
 
-	ret = _gnutls_extv_append_final(buf, pos);
+	ret = _gnutls_extv_append_final(buf, pos, !(msg & GNUTLS_EXT_FLAG_EE));
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

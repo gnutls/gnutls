@@ -200,7 +200,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 set_known_dh_params_anon set_known_dh_params_psk session-tickets-ok \
 	 session-tickets-missing set_x509_key_file_legacy status-request-ext \
 	 gnutls_x509_crt_sign gnutls_x509_crq_sign dtls-repro-20170915 \
-	 rng-no-onload dtls1-2-mtu-check crl_apis cert_verify_inv_utf8 \
+	 rng-no-onload dtls1-2-mtu-check crl_apis cert_verify_inv_utf8 no-extensions \
 	 hostname-check-utf8 pkcs8-key-decode-encrypted priority-mix pkcs7 \
 	 send-data-before-handshake recv-data-before-handshake crt_inv_write \
 	 x509sign-verify-error rng-op-nonce rng-op-random rng-op-key x509-dn-decode-compat \
