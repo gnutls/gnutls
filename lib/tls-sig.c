@@ -275,7 +275,7 @@ _gnutls_handshake_verify_data12(gnutls_session_t session,
 
 	_gnutls_handshake_log
 	    ("HSK[%p]: verify TLS 1.2 handshake data: using %s\n", session,
-	     gnutls_sign_algorithm_get_name(sign_algo));
+	     se->name);
 
 	ret =
 	    _gnutls_pubkey_compatible_with_sig(session,
