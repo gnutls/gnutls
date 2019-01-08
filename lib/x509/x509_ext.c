@@ -1052,7 +1052,7 @@ int gnutls_x509_ext_export_authority_key_id(gnutls_x509_aki_t aki,
 							   san.data,
 							   aki->cert_issuer.
 							   names[i].san.size);
-			if (result < 0) {
+			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
