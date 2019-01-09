@@ -288,7 +288,7 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 					goto cleanup;
 				}
 
-				ret = _gnutls_extv_append_final(&buf, ext_pos_mark);
+				ret = _gnutls_extv_append_final(&buf, ext_pos_mark, 0);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;

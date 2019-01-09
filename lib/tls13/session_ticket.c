@@ -353,7 +353,7 @@ int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr, unsigne
 				goto cleanup;
 			}
 
-			ret = _gnutls_extv_append_final(&buf, init_pos);
+			ret = _gnutls_extv_append_final(&buf, init_pos, 0);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;

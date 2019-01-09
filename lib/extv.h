@@ -48,9 +48,11 @@ int _gnutls_extv_append_init(gnutls_buffer_st *buf)
 	return pos;
 }
 
-/* its input is the buffer and the return value of _gnutls_extv_append_init() */
+/* its input is the buffer and the return value of _gnutls_extv_append_init()
+ * @is_hello: should be true for client and server hello messages.
+ */
 inline static
-int _gnutls_extv_append_final(gnutls_buffer_st *buf, unsigned init)
+int _gnutls_extv_append_final(gnutls_buffer_st *buf, unsigned init, unsigned is_hello)
 {
 	unsigned size = buf->length - init - 2;
 
@@ -59,6 +61,11 @@ int _gnutls_extv_append_final(gnutls_buffer_st *buf, unsigned init)
 
 	if (size > 0)
 		_gnutls_write_uint16(size, &buf->data[init]);
+	else if (is_hello && size == 0) {
+		/* there is no point to send empty extension bytes, and
+		 * they are known to break certain clients */
+		buf->length -= 2;
+	}
 
 	return 0;
 }

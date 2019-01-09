@@ -15,6 +15,11 @@ See the end for copying conditions.
    types via the priority strings. The raw public-key mechanism must be explicitly
    enabled via the GNUTLS_ENABLE_RAWPK init flag.
 
+** libgnutls: When on server or client side we are sending no extensions we do
+   not set an empty extensions field but we rather remove that field competely.
+   This solves a regression since 3.5.x and improves compatibility of the server
+   side with certain clients.
+
 ** GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION was marked as deprecated. The previous
    definition was buggy and non-functional.
 
