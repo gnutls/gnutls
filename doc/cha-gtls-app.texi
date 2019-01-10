@@ -1507,7 +1507,8 @@ with %COMPAT.
 @item %NO_EXTENSIONS @tab
 will prevent the sending of any TLS extensions in client side. Note
 that TLS 1.2 requires extensions to be used, as well as safe
-renegotiation thus this option must be used with care.
+renegotiation thus this option must be used with care. When this option
+is set with TLS1.3 enabled the session behavior is undefined.
 
 @item %NO_TICKETS @tab
 will prevent the advertizing of the TLS session ticket extension.
