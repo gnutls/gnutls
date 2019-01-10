@@ -27,7 +27,7 @@ before_install:
     fi
 
 script:
-  - PATH=/usr/local/opt/gettext/bin:$PATH make autoreconf
+  - PATH=/usr/local/opt/gettext/bin:$PATH ./bootstrap
   - PATH=/usr/local/opt/gettext/bin:$PATH ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-dependency-tracking
   - make -j$(sysctl -n hw.ncpu)
   - make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
