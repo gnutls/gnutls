@@ -250,6 +250,13 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 	}
 
 	hmac_size = hex_data_size(data.size);
+
+	/* trim eventual newlines from the end of the data read from file */
+	while ((data.size > 0) && (data.data[data.size - 1] == '\n')) {
+		data.data[data.size - 1] = 0;
+		data.size--;
+	}
+
 	ret = gnutls_hex_decode(&data, hmac, &hmac_size);
 	gnutls_free(data.data);
 
