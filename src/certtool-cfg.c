@@ -2583,7 +2583,7 @@ int get_data_encipherment_status(void)
 	if (batch) {
 		return cfg.data_encipherment;
 	} else {
-		return read_yesno("Will the certificate be used for data encryption? (Y/n): ", 1);
+		return read_yesno("Will the certificate be used for data encryption? (y/N): ", 0);
 	}
 }
 
