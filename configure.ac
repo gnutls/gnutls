@@ -365,17 +365,17 @@ AC_ARG_WITH(included-unistring, AS_HELP_STRING([--with-included-unistring],
 if test "$included_unistring" = yes;then
   ac_have_unistring=no
 else
-  AC_LIB_HAVE_LINKFLAGS(unistring,, [#include <uninorm.h>], [u8_normalize(0, 0, 0, 0, 0);])
-
-  if test "$HAVE_LIBUNISTRING" = "yes";then
+  AC_SEARCH_LIBS(u8_normalize, unistring, [
     included_unistring=no
     ac_have_unistring=yes
-  else
-      AC_MSG_ERROR([[
+    AC_SUBST([LIBUNISTRING], [$ac_cv_search_u8_normalize])
+  ], [
+    ac_cv_libunistring=no
+    AC_MSG_ERROR([[
   ***
   *** Libunistring was not found. To use the included one, use --with-included-unistring
-  ]])
-  fi
+    ]])
+  ])
 fi
 
 AM_CONDITIONAL(HAVE_LIBUNISTRING, test "$ac_have_unistring" = "yes")
