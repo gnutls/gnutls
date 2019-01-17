@@ -54,6 +54,8 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 
 	DECR_LEN(data_size, 2);
+	if (data_size != 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	new_size = _gnutls_read_uint16(data);
 
 	/* protocol error */
