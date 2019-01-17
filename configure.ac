@@ -207,6 +207,8 @@ dnl Need netinet/tcp.h for TCP_FASTOPEN
 AC_CHECK_HEADERS([netinet/tcp.h])
 AC_CHECK_HEADERS([stdatomic.h])
 
+AC_SEARCH_LIBS([__atomic_load_4], [atomic], [AC_SUBST([LIBATOMIC_LIBS], [-latomic])])
+
 dnl We use its presence to detect C11 threads
 AC_CHECK_HEADERS([threads.h])
 
