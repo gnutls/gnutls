@@ -62,19 +62,29 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 	if (new_size < 64)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	/* we do not want to accept sizes less than our minimum */
-	if (new_size < MIN_RECORD_SIZE)
-		return 0;
+	session->internals.hsk_flags |= HSK_RECORD_SIZE_LIMIT_RECEIVED;
+
+	/* we do not want to accept sizes outside of our supported range */
+	if (new_size < MIN_RECORD_SIZE) {
+		/* for server, reject it by omitting the extension in the reply */
+		if (session->security_parameters.entity == GNUTLS_SERVER) {
+			_gnutls_handshake_log("EXT[%p]: client requested too small record_size_limit %u; ignoring\n",
+					      session, (unsigned)new_size);
+			return gnutls_assert_val(0);
+		} else {
+			_gnutls_handshake_log("EXT[%p]: server requested too small record_size_limit %u; closing the connection\n",
+					      session, (unsigned)new_size);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		}
+	}
 
 	session->internals.hsk_flags |= HSK_RECORD_SIZE_LIMIT_NEGOTIATED;
 
-	/* if a larger record size limit than the protocol limit is
-	 * provided by the peer, ignore it and stick to the default */
-	if (unlikely(new_size > DEFAULT_MAX_RECORD_SIZE))
-		return gnutls_assert_val(0);
+	_gnutls_handshake_log("EXT[%p]: record_size_limit %u negotiated\n",
+			      session, (unsigned)new_size);
 
-	session->security_parameters.max_record_send_size = new_size;
-	session->security_parameters.max_record_recv_size = new_size;
+	session->security_parameters.max_record_recv_size =
+		MIN(new_size, session->security_parameters.max_record_send_size);
 
 	return 0;
 }
@@ -90,6 +100,13 @@ _gnutls_record_size_limit_send_params(gnutls_session_t session,
 	assert(session->security_parameters.max_record_send_size >= 64 &&
 	       session->security_parameters.max_record_send_size <=
 	       DEFAULT_MAX_RECORD_SIZE);
+
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		/* if we had received the extension and rejected, don't send it */
+		if (session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_RECEIVED &&
+		    !(session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED))
+			return gnutls_assert_val(0);
+	}
 
 	ret = _gnutls_buffer_append_prefix(extdata, 16,
 					   session->security_parameters.max_record_send_size);

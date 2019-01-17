@@ -1358,6 +1358,7 @@ typedef struct {
 					 */
 #define HSK_RECORD_SIZE_LIMIT_NEGOTIATED (1<<24)
 #define HSK_RECORD_SIZE_LIMIT_SENT (1<<25) /* record_size_limit extension was sent */
+#define HSK_RECORD_SIZE_LIMIT_RECEIVED (1<<26) /* server: record_size_limit extension was seen but not accepted yet */
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
@@ -1547,17 +1548,20 @@ inline static int _gnutls_set_current_version(gnutls_session_t s, unsigned v)
 	return 0;
 }
 
+/* Returns the maximum size of the plaintext to be sent, considering
+ * both user-specified/negotiated maximum values.
+ */
 inline static size_t max_user_send_size(gnutls_session_t session,
 					record_parameters_st *
 					record_params)
 {
 	size_t max;
 
-	if (IS_DTLS(session)) {
-		max = MIN(gnutls_dtls_get_data_mtu(session), session->security_parameters.max_record_send_size);
-	} else {
-		max = session->security_parameters.max_record_send_size;
-	}
+	max = MIN(session->security_parameters.max_record_send_size,
+		  session->security_parameters.max_record_recv_size);
+
+	if (IS_DTLS(session))
+		max = MIN(gnutls_dtls_get_data_mtu(session), max);
 
 	return max;
 }
