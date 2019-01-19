@@ -136,7 +136,7 @@ cert_callback(gnutls_session_t session,
 static void client(int sd, const char *prio)
 {
 	int ret, ii;
-	gnutls_session_t session;
+	gnutls_session_t session = NULL;
 	char buffer[MAX_BUF + 1];
 	gnutls_certificate_credentials_t xcred;
 
