@@ -579,7 +579,7 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 
 		ret =
 		    gnutls_cipher_decrypt2(hd,
-					   vectors[i].ciphertext, 
+					   vectors[i].ciphertext,
 					   vectors[i].plaintext_size, tmp,
 					   sizeof(tmp));
 		if (ret < 0) {
@@ -1293,7 +1293,7 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 		gnutls_hash_deinit(hd, data);
 
 		data_size = gnutls_hash_get_len(dig);
-		if (ret < 0)
+		if (data_size <= 0)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		if (data_size != vectors[i].output_size ||
@@ -1482,7 +1482,7 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 		gnutls_hmac_deinit(hd, data);
 
 		data_size = gnutls_hmac_get_len(mac);
-		if (ret < 0)
+		if (data_size <= 0)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		if (data_size != vectors[i].output_size ||
