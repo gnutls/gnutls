@@ -738,8 +738,6 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch, hs_stage_t 
 		memcpy(dst->server_random, src->server_random, GNUTLS_RANDOM_SIZE); \
 		dst->ext_master_secret = src->ext_master_secret; \
 		dst->etm = src->etm; \
-		dst->max_record_recv_size = src->max_record_recv_size; \
-		dst->max_record_send_size = src->max_record_send_size; \
 		dst->prf = src->prf; \
 		dst->grp = src->grp; \
 		dst->pversion = src->pversion; \
@@ -757,8 +755,15 @@ void _gnutls_set_resumed_parameters(gnutls_session_t session)
 	security_parameters_st *src =
 	    &session->internals.resumed_security_parameters;
 	security_parameters_st *dst = &session->security_parameters;
+	const version_entry_st *ver = get_version(session);
 
-	CPY_COMMON(get_version(session)->tls13_sem);
+	CPY_COMMON(ver->tls13_sem);
+
+	if (!ver->tls13_sem &&
+	    !(session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED)) {
+		dst->max_record_recv_size = src->max_record_recv_size;
+		dst->max_record_send_size = src->max_record_send_size;
+	}
 }
 
 /* Sets the current connection session to conform with the
