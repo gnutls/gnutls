@@ -325,8 +325,7 @@ typedef enum recv_state_t {
 /* IDs are allocated in a way that all values fit in 64-bit integer as (1<<val) */
 typedef enum extensions_t {
 	GNUTLS_EXTENSION_INVALID = 0xffff,
-	GNUTLS_EXTENSION_MAX_RECORD_SIZE = 0,
-	GNUTLS_EXTENSION_STATUS_REQUEST,
+	GNUTLS_EXTENSION_STATUS_REQUEST = 0,
 	GNUTLS_EXTENSION_CERT_TYPE,
 	GNUTLS_EXTENSION_CLIENT_CERT_TYPE,
 	GNUTLS_EXTENSION_SERVER_CERT_TYPE,
@@ -349,6 +348,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_EARLY_DATA,
 	GNUTLS_EXTENSION_PSK_KE_MODES,
 	GNUTLS_EXTENSION_RECORD_SIZE_LIMIT,
+	GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 	/*
 	 * pre_shared_key and dumbfw must always be the last extensions,
 	 * in that order */
@@ -1357,6 +1357,7 @@ typedef struct {
 					 * server: intend to process early data
 					 */
 #define HSK_RECORD_SIZE_LIMIT_NEGOTIATED (1<<24)
+#define HSK_RECORD_SIZE_LIMIT_SENT (1<<25) /* record_size_limit extension was sent */
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */

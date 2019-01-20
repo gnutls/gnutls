@@ -153,16 +153,16 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 
 	} else {		/* server side */
 
+		if (session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_SENT)
+			return 0;
+
 		if (session->security_parameters.max_record_recv_size !=
 		    DEFAULT_MAX_RECORD_SIZE) {
 			ret = _gnutls_mre_record2num
 			      (session->security_parameters.
 			       max_record_recv_size);
-
-			/* it's not an error, as long as we send the
-			 * record_size_limit extension with that value */
 			if (ret < 0)
-				return 0;
+				return gnutls_assert_val(ret);
 
 			p = (uint8_t) ret;
 			ret = _gnutls_buffer_append_data(extdata, &p, 1);

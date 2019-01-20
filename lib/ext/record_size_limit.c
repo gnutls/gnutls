@@ -96,5 +96,7 @@ _gnutls_record_size_limit_send_params(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	session->internals.hsk_flags |= HSK_RECORD_SIZE_LIMIT_SENT;
+
 	return 2;
 }
