@@ -31,12 +31,30 @@ variables:
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
   FEDORA28_BUILD: buildenv-f28
   FEDORA_BUILD: buildenv-f29
+  ALPINE_BASE_BUILD: buildenv-alpine-base
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
 ##################################################
 # Stage 1, documentation, and advanced checks
 ##################################################
+
+commit-check:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$ALPINE_BASE_BUILD
+  before_script:
+    - /bin/true
+  after_script:
+    - /bin/true
+  cache:
+    # do not load cache files
+    key: none
+    policy: pull
+  script:
+    # we want $ALPINE_BASE_BUILD without git, so add it here
+    - apk add git
+    - devel/check_if_signed
+  retry: 0
 
 doc-dist.Fedora:
   stage: stage1-testing

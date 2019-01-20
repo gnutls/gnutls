@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+
+if test -z "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"; then
+  CI_MERGE_REQUEST_TARGET_BRANCH_NAME="master"
+fi
+
+echo "target=$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+echo "source=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+
+# create list of commits of the current branch
+commits=$(git rev-list --no-merges $CI_MERGE_REQUEST_TARGET_BRANCH_NAME..$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME)
+
+# check if author's email matches email in 'Signed-off-by'
+for hash in $commits; do
+  author=$(git log --format='%ae' ${hash}^\!)
+  signed=$(git log --format='%b' ${hash}^\! | grep -i "Signed-off-by:")
+  if test $? -ne 0; then
+    echo "Missing Signed-off-by"
+    exit 1
+  fi
+  if ! echo $signed | grep -q "Signed-off-by:.*<${author}>"; then
+    echo "Author '${author}' doesn't match"
+    exit 1
+  fi
+done
