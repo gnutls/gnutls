@@ -184,7 +184,7 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
  * renegotiation will be performed.
  *
  * If there is no mapping to a valid alert the alert to indicate
- * internal error is returned.
+ * internal error (%GNUTLS_A_INTERNAL_ERROR) is returned.
  *
  * Returns: the alert code to use for a particular error code.
  **/
@@ -340,7 +340,7 @@ int gnutls_error_to_alert(int err, int *level)
 /**
  * gnutls_alert_send_appropriate:
  * @session: is a #gnutls_session_t type.
- * @err: is an integer
+ * @err: is an error code returned by another GnuTLS function
  *
  * Sends an alert to the peer depending on the error code returned by
  * a gnutls function. This function will call gnutls_error_to_alert()
@@ -349,8 +349,11 @@ int gnutls_error_to_alert(int err, int *level)
  * This function may also return %GNUTLS_E_AGAIN, or
  * %GNUTLS_E_INTERRUPTED.
  *
- * If the return value is %GNUTLS_E_INVALID_REQUEST, then no alert has
- * been sent to the peer.
+ * This function historically was always sending an alert to the
+ * peer, even if @err was inappropriate to respond with an alert
+ * (e.g., %GNUTLS_E_SUCCESS). Since 3.6.6 this function returns
+ * success without transmitting any data on error codes that
+ * should not result to an alert.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -360,10 +363,11 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 	int alert;
 	int level;
 
+	if (err != GNUTLS_E_REHANDSHAKE && (!gnutls_error_is_fatal(err) ||
+	    err == GNUTLS_E_FATAL_ALERT_RECEIVED))
+		return gnutls_assert_val(0);
+
 	alert = gnutls_error_to_alert(err, &level);
-	if (alert < 0) {
-		return alert;
-	}
 
 	return gnutls_alert_send(session, (gnutls_alert_level_t)level, alert);
 }
