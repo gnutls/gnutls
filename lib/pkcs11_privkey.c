@@ -581,17 +581,25 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 
 	if (pkey->pk_algorithm == GNUTLS_PK_RSA) { /* determine whether it can do rsa-pss */
+		ck_bool_t tval = 0;
+
 		a[0].type = CKA_MODULUS;
 		a[0].value = NULL;
 		a[0].value_len = 0;
-		if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, a, 1)
+		a[1].type = CKA_SIGN;
+		a[1].value = &tval;
+		a[1].value_len = sizeof(tval);
+		if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, a, 2)
 		    == CKR_OK) {
 			pkey->bits = a[0].value_len*8;
 		}
 
 		ret = gnutls_pkcs11_token_check_mechanism(url, CKM_RSA_PKCS_PSS, NULL, 0, 0);
-		if (ret != 0)
+		if (ret != 0 && tval) {
 			pkey->rsa_pss_ok = 1;
+		} else {
+			_gnutls_debug_log("Detected incompatible with TLS1.3 RSA key! (%s)\n", url);
+		}
 	}
 
 	a[0].type = CKA_ALWAYS_AUTHENTICATE;

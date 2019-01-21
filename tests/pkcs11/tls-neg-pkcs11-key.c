@@ -280,6 +280,14 @@ static const test_st tests[] = {
 	 .exp_kx = GNUTLS_KX_RSA,
 	 .needs_decryption = 1
 	},
+	{.name = "tls1.2: rsa-decryption key, signatures prioritized",
+	 .pk = GNUTLS_PK_RSA,
+	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+RSA:-VERS-TLS-ALL:+VERS-TLS1.2:-SIGN-ALL:+SIGN-RSA-PSS-RSAE-SHA256",
+	 .cert = &server_ca3_localhost_cert,
+	 .key = &server_ca3_key,
+	 .exp_kx = GNUTLS_KX_RSA,
+	 .needs_decryption = 1
+	},
 	{.name = "tls1.2: ecc key",
 	 .pk = GNUTLS_PK_ECDSA,
 	 .prio = "NORMAL:-KX-ALL:+ECDHE-RSA:+ECDHE-ECDSA:-VERS-TLS-ALL:+VERS-TLS1.2",
