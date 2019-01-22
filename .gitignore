@@ -625,6 +625,7 @@ tests/resume-lifetime
 tests/resume-psk
 tests/resume-with-false-start
 tests/resume-with-previous-stek
+tests/resume-with-record-size-limit
 tests/resume-with-stek-expiration
 tests/resume-x509
 tests/rng-fork
