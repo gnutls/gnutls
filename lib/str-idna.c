@@ -81,6 +81,14 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	idn2_tflags |= IDN2_TRANSITIONAL;
 #endif
 
+	/* This avoids excessive CPU usage with libidn2 < 2.1.1 */
+	if (ilen > 2048) {
+		gnutls_assert();
+		_gnutls_debug_log("unable to convert name '%.*s' to IDNA format: %s\n",
+			(int) ilen, input, idn2_strerror(IDN2_TOO_BIG_DOMAIN));
+		return GNUTLS_E_INVALID_UTF8_STRING;
+	}
+
 	if (ilen == 0) {
 		out->data = (uint8_t*)gnutls_strdup("");
 		out->size = 0;
