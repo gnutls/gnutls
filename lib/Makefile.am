@@ -149,7 +149,7 @@ thirdparty_libadd += $(LIBIDN2_LIBS)
 endif
 
 if HAVE_LIBUNISTRING
-thirdparty_libadd += $(LTLIBUNISTRING)
+thirdparty_libadd += $(LIBUNISTRING)
 else
 libgnutls_la_LIBADD += unistring/libunistring.la
 endif
