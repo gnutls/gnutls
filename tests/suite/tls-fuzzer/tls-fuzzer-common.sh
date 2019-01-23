@@ -44,7 +44,7 @@ retval=0
 
 tls_fuzzer_prepare
 
-PYTHONPATH=. python tests/scripts_retention.py ${TMPFILE} ${SERV}
+PYTHONPATH=. python tests/scripts_retention.py ${TMPFILE} ${SERV} 821
 retval=$?
 
 rm -f ${TMPFILE}
