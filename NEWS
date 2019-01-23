@@ -20,6 +20,9 @@ See the end for copying conditions.
    This solves a regression since 3.5.x and improves compatibility of the server
    side with certain clients.
 
+** libgnutls: We no longer mark RSA keys in PKCS#11 tokens as RSA-PSS capable if
+   the CKA_SIGN is not set (#667).
+
 ** GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION was marked as deprecated. The previous
    definition was buggy and non-functional.
 
