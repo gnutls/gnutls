@@ -208,7 +208,10 @@ AC_CHECK_HEADERS([netinet/tcp.h])
 AC_CHECK_HEADERS([stdatomic.h])
 
 dnl This ensures that we link with the right library for atomic operations on Linux SPARC
-AC_SEARCH_LIBS([__atomic_load_4], [atomic], [AC_SUBST([LIBATOMIC_LIBS], [-latomic])])
+AC_SEARCH_LIBS([__atomic_load_4], [atomic], [], [AC_MSG_NOTICE([Could not detect libatomic])])
+AS_IF([test "$ac_cv_search___atomic_load_4" = "none required" || test "$ac_cv_search___atomic_load_4" = "no"],
+      [AC_SUBST([LIBATOMIC_LIBS], [])],
+      [AC_SUBST([LIBATOMIC_LIBS], [$ac_cv_search___atomic_load_4])])
 
 dnl We use its presence to detect C11 threads
 AC_CHECK_HEADERS([threads.h])
