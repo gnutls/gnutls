@@ -1204,15 +1204,6 @@ static void add_dh(gnutls_priority_t priority_cache)
 	}
 }
 
-#define REMOVE_TLS13_IN_LOOP(vers, i) \
-	if (vers->tls13_sem) { \
-		for (j=i+1;j<priority_cache->protocol.num_priorities;j++) \
-			priority_cache->protocol.priorities[j-1] = priority_cache->protocol.priorities[j]; \
-		priority_cache->protocol.num_priorities--; \
-		i--; \
-		continue; \
-	}
-
 static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 {
 	unsigned i, j, z;
@@ -1255,16 +1246,21 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 		}
 	}
 
+	/* if we have NULL ciphersuites, SRP, or RSA-PSK enabled remove TLS1.3+
+	 * protocol versions; they cannot be negotiated under TLS1.3. */
+	if (have_null || have_srp || have_rsa_psk) {
+		for (i = j = 0; i < priority_cache->protocol.num_priorities; i++) {
+			vers = version_to_entry(priority_cache->protocol.priorities[i]);
+			if (!vers || !vers->tls13_sem)
+				priority_cache->protocol.priorities[j++] = priority_cache->protocol.priorities[i];
+		}
+		priority_cache->protocol.num_priorities = j;
+	}
+
 	for (i = 0; i < priority_cache->protocol.num_priorities; i++) {
 		vers = version_to_entry(priority_cache->protocol.priorities[i]);
 		if (!vers)
 			continue;
-
-		/* if we have NULL ciphersuites, SRP, or RSA-PSK enabled remove TLS1.3+
-		 * protocol versions; they cannot be negotiated under TLS1.3. */
-		if (have_null || have_srp || have_rsa_psk) {
-			REMOVE_TLS13_IN_LOOP(vers, i);
-		}
 
 		if (vers->transport == GNUTLS_STREAM) { /* TLS */
 			tls_sig_sem |= vers->tls_sig_sem;
@@ -1413,13 +1409,12 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 	 * do not support TLS1.3 will negotiate TLS1.2 if seen a TLS1.3 handshake */
 	if (unlikely((!have_psk && tlsmax && tlsmax->id >= GNUTLS_TLS1_3 && priority_cache->groups.size == 0)) ||
 	    (!have_tls12 && have_pre_tls12 && have_tls13)) {
-		for (i = 0; i < priority_cache->protocol.num_priorities; i++) {
+		for (i = j = 0; i < priority_cache->protocol.num_priorities; i++) {
 			vers = version_to_entry(priority_cache->protocol.priorities[i]);
-			if (!vers || vers->transport != GNUTLS_STREAM)
-				continue;
-
-			REMOVE_TLS13_IN_LOOP(vers, i);
+			if (!vers || vers->transport != GNUTLS_STREAM || !vers->tls13_sem)
+				priority_cache->protocol.priorities[j++] = priority_cache->protocol.priorities[i];
 		}
+		priority_cache->protocol.num_priorities = j;
 	}
 
 	return 0;
