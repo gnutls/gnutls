@@ -23,6 +23,10 @@ See the end for copying conditions.
 ** libgnutls: We no longer mark RSA keys in PKCS#11 tokens as RSA-PSS capable if
    the CKA_SIGN is not set (#667).
 
+** libgnutls: The priority string option %NO_EXTENSIONS was improved to completely
+   disable extensions at all cases, while providing a functional session. This
+   also implies that when specified, TLS1.3 is disabled.
+
 ** GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION was marked as deprecated. The previous
    definition was buggy and non-functional.
 
