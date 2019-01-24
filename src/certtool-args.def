@@ -200,8 +200,7 @@ flag = {
     arg-type  = string;
     descrip   = "Specify the key type to use on key generation";
     doc = "This option can be combined with --generate-privkey, to specify
-    the key type to be generated. Valid options are, 'rsa', 'rsa-pss',
-'dsa', 'ecdsa', and 'ed25519'.";
+the key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', and 'ed25519'.";
 };
 
 flag = {
@@ -312,9 +311,9 @@ flag = {
     value     = e;
     descrip   = "Verify a PEM encoded certificate chain";
     doc = "Verifies the validity of a certificate chain. That is, an ordered set of
-    certificates where each one is the issuer of the previous, and the first is
-    the end-certificate to be validated. In a proper chain the last certificate
-    is a self signed one. It can be combined with --verify-purpose or --verify-hostname.";
+certificates where each one is the issuer of the previous, and the first is
+the end-certificate to be validated. In a proper chain the last certificate
+is a self signed one. It can be combined with --verify-purpose or --verify-hostname.";
 };
 
 flag = {
