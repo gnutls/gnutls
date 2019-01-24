@@ -130,7 +130,7 @@ void start(const char *prio)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	gnutls_init(&server, GNUTLS_SERVER|GNUTLS_NO_EXTENSIONS);
+	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				serverx509cred);
 	assert(gnutls_priority_set_direct(server, prio, NULL)>=0);
@@ -152,7 +152,7 @@ void start(const char *prio)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_init(&client, GNUTLS_CLIENT|GNUTLS_NO_EXTENSIONS);
+	ret = gnutls_init(&client, GNUTLS_CLIENT);
 	if (ret < 0)
 		exit(1);
 
@@ -203,5 +203,7 @@ void start(const char *prio)
 
 void doit(void)
 {
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.0:%NO_EXTENSIONS:%DISABLE_SAFE_RENEGOTIATION");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.0:%NO_EXTENSIONS");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.1:%NO_EXTENSIONS");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_EXTENSIONS");
 }

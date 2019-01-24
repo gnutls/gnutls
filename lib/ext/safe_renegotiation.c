@@ -54,7 +54,8 @@ _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 	sr_ext_st *priv;
 	gnutls_ext_priv_data_t epriv;
 
-	if (session->internals.priorities->sr == SR_DISABLED) {
+	if (session->internals.priorities->sr == SR_DISABLED ||
+	    session->internals.priorities->no_extensions) {
 		return 0;
 	}
 

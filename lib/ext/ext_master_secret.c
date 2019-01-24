@@ -72,6 +72,7 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 
 	if ((session->internals.flags & GNUTLS_NO_EXTENSIONS) ||
+	    session->internals.priorities->no_extensions ||
 	    session->internals.no_ext_master_secret != 0) {
 		return 0;
 	}
@@ -104,6 +105,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 			       gnutls_buffer_st * extdata)
 {
 	if ((session->internals.flags & GNUTLS_NO_EXTENSIONS) ||
+	    session->internals.priorities->no_extensions != 0 ||
 	    session->internals.no_ext_master_secret != 0) {
 	    session->security_parameters.ext_master_secret = 0;
 	    return 0;
