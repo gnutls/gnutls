@@ -104,7 +104,7 @@ static int client_handshake_callback(gnutls_session_t session, unsigned int htyp
 }
 
 static
-void start(const char *prio)
+void start(const char *prio, gnutls_protocol_t exp_version)
 {
 	int ret;
 	/* Server stuff. */
@@ -184,6 +184,8 @@ void start(const char *prio)
 		}
 	}
 
+	assert(gnutls_protocol_get_version(server) == exp_version);
+
 	assert(gnutls_certificate_type_get(server)==GNUTLS_CRT_X509);
 	assert(gnutls_certificate_type_get(client)==GNUTLS_CRT_X509);
 
@@ -203,7 +205,8 @@ void start(const char *prio)
 
 void doit(void)
 {
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.0:%NO_EXTENSIONS");
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.1:%NO_EXTENSIONS");
-	start("NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_EXTENSIONS");
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.0:%NO_EXTENSIONS", GNUTLS_TLS1_0);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.1:%NO_EXTENSIONS", GNUTLS_TLS1_1);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.2:%NO_EXTENSIONS", GNUTLS_TLS1_2);
+	start("NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:%NO_EXTENSIONS", GNUTLS_TLS1_2);
 }

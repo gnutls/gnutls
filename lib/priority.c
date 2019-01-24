@@ -1248,7 +1248,7 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 	/* if we have NULL ciphersuites, SRP, or RSA-PSK enabled remove TLS1.3+
 	 * protocol versions; they cannot be negotiated under TLS1.3. */
-	if (have_null || have_srp || have_rsa_psk) {
+	if (have_null || have_srp || have_rsa_psk || priority_cache->no_extensions) {
 		for (i = j = 0; i < priority_cache->protocol.num_priorities; i++) {
 			vers = version_to_entry(priority_cache->protocol.priorities[i]);
 			if (!vers || !vers->tls13_sem)
