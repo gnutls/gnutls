@@ -39,7 +39,7 @@ const hello_ext_entry_st ext_mod_record_size_limit = {
 	.name = "Record Size Limit",
 	.tls_id = 28,
 	.gid = GNUTLS_EXTENSION_RECORD_SIZE_LIMIT,
-	.parse_type = GNUTLS_EXT_TLS,
+	.parse_type = GNUTLS_EXT_MANDATORY,
 	.validity = GNUTLS_EXT_FLAG_TLS | GNUTLS_EXT_FLAG_DTLS | GNUTLS_EXT_FLAG_CLIENT_HELLO |
 		    GNUTLS_EXT_FLAG_EE | GNUTLS_EXT_FLAG_TLS12_SERVER_HELLO,
 	.recv_func = _gnutls_record_size_limit_recv_params,
@@ -54,6 +54,8 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 
 	DECR_LEN(data_size, 2);
+	if (data_size != 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 	new_size = _gnutls_read_uint16(data);
 
 	/* protocol error */
