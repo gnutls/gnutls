@@ -19,6 +19,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+include $(top_srcdir)/aminclude_static.am
+
 DISTCHECK_CONFIGURE_FLAGS = --enable-doc --enable-gtk-doc --disable-valgrind-tests AUTOGEN=false
 
 SUBDIRS = gl lib extra
@@ -148,8 +150,6 @@ symbol-check:
 		echo "**************************"; \
 	fi
 	rm -f symbols.last.tmp symbols.diff.tmp
-
-@CODE_COVERAGE_RULES@
 
 local-code-coverage-output: code-coverage-capture
 	cat GnuTLS-$(VERSION)-coverage/index.html|grep headerCovTableEntry|grep '%'|head -1|sed 's/^.*>\([0-9]\+\.[0-9]\+\s*%\)<.*$$/ coverage lines: \1/' || true

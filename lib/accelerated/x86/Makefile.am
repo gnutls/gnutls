@@ -22,7 +22,7 @@ AM_LIBTOOLFLAGS=--tag=CC
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS = -I$(srcdir)/../../../gl		\
+AM_CPPFLAGS += -I$(srcdir)/../../../gl		\
 	-I$(builddir)/../../../gl		\
 	-I$(srcdir)/../../includes	\
 	-I$(builddir)/../../includes	\

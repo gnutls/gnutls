@@ -22,7 +22,7 @@ ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS = \
+AM_CPPFLAGS += \
 	-I$(srcdir)/../gl		\
 	-I$(builddir)/../gl		\
 	-I$(builddir)/../lib/includes	\
@@ -34,14 +34,14 @@ AM_CPPFLAGS = \
 
 SUBDIRS = includes
 
-libgnutls_dane_la_LDFLAGS = -no-undefined $(COMMON_LINK_FLAGS)
+libgnutls_dane_la_LDFLAGS = -no-undefined
 
 lib_LTLIBRARIES = libgnutls-dane.la
 
 libgnutls_dane_la_SOURCES = dane.c dane-params.c errors.c libdane.map
 
 libgnutls_dane_la_LIBADD = ../gl/libgnu.la \
-	../lib/libgnutls.la
+	../lib/libgnutls.la $(COMMON_LINK_LIBS)
 
 libgnutls_dane_la_LDFLAGS += -version-info $(LT_DANE_CURRENT):$(LT_DANE_REVISION):$(LT_DANE_AGE)
 

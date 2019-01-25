@@ -18,7 +18,7 @@
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS = \
+AM_CPPFLAGS += \
 	-I$(srcdir)/../../gl		\
 	-I$(builddir)/../../gl		\
 	-I$(srcdir)/../includes		\

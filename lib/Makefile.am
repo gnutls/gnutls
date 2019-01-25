@@ -33,7 +33,7 @@ localedir = $(datadir)/locale
 
 include $(top_srcdir)/lib/common.mk
 
-AM_CPPFLAGS = \
+AM_CPPFLAGS += \
 	-DLOCALEDIR=\"$(localedir)\"		\
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
@@ -207,7 +207,7 @@ if MACOSX
 libgnutls_la_LDFLAGS += -framework Security -framework CoreFoundation
 endif
 
-libgnutls_la_LIBADD += $(thirdparty_libadd)
+libgnutls_la_LIBADD += $(thirdparty_libadd) $(COMMON_LINK_LIBS)
 
 # C++ library
 
