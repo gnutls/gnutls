@@ -170,6 +170,7 @@ files-update: libopts-check
 	@echo "******************************************************************************************"
 
 dist-hook: libopts-check symbol-check
+	$(PKG_CONFIG) --atleast-version=2.2.0 guile-2.2
 	$(MAKE) -C doc/ compare-makefile
 	$(MAKE) -C doc/ compare-exported
 	$(MAKE) -C doc/manpages compare-makefile
