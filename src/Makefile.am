@@ -282,9 +282,11 @@ SUFFIXES = .stamp .def .c.bak .h.bak
 	touch $@
 
 .c.c.bak:
+	-@rm -f $@
 	$(AM_V_GEN) cp -p $< $@
 
 .h.h.bak:
+	-@rm -f $@
 	$(AM_V_GEN) cp -p $< $@
 
 danetool-args.h: danetool-args.stamp
