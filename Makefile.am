@@ -85,7 +85,7 @@ ABIVERCMD="git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|ta
 	cd $(ABI_TMPCLONEDIR) && \
 	  git fetch --tags https://gitlab.com/gnutls/gnutls.git && \
 	  git checkout $$(eval $(ABIREFCMD)) && \
-	  $(MAKE) autoreconf && if test -f ../cache/config.cache;then \
+	  SUBMODULE_NOFETCH=1 ./bootstrap && if test -f ../cache/config.cache;then \
 	    CFLAGS="-g -Og" ./configure --disable-doc --cache-file ../cache/config.cache;\
 	  else\
 	    CFLAGS="-g -Og" ./configure --disable-doc;\
