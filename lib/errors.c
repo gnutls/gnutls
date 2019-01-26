@@ -206,6 +206,8 @@ static const gnutls_error_entry error_entries[] = {
 	ERROR_ENTRY(N_("An illegal parameter was found."),
 		    GNUTLS_E_ILLEGAL_PARAMETER),
 	ERROR_ENTRY(N_("Error while reading file."), GNUTLS_E_FILE_ERROR),
+	ERROR_ENTRY(N_("A disallowed SNI server name has been received."),
+		    GNUTLS_E_RECEIVED_DISALLOWED_NAME),
 
 	ERROR_ENTRY(N_("ASN1 parser: Element was not found."),
 		    GNUTLS_E_ASN1_ELEMENT_NOT_FOUND),
@@ -462,14 +464,14 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
  *
  * If a GnuTLS function returns a negative error code you may feed that
  * value to this function to see if the error condition is fatal to
- * a TLS session (i.e., must be terminated). 
+ * a TLS session (i.e., must be terminated).
  *
  * Note that you may also want to check the error code manually, since some
  * non-fatal errors to the protocol (such as a warning alert or
  * a rehandshake request) may be fatal for your program.
  *
  * This function is only useful if you are dealing with errors from
- * functions that relate to a TLS session (e.g., record layer or handshake 
+ * functions that relate to a TLS session (e.g., record layer or handshake
  * layer handling functions).
  *
  * Returns: Non-zero value on fatal errors or zero on non-fatal.

@@ -140,7 +140,7 @@ static void auto_parse(void)
 
 	/* the raw DNS should result to verification failure as the advertized name should
 	 * not be considered and the first cert should be provided */
-	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL", "raw:简体中文.εξτρα.com", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, GNUTLS_E_AGAIN);
+	test_cli_serv_expect(x509_cred, clicred, "NORMAL", "NORMAL", "raw:简体中文.εξτρα.com", GNUTLS_E_RECEIVED_DISALLOWED_NAME, GNUTLS_E_AGAIN);
 
 	gnutls_certificate_free_credentials(x509_cred);
 	gnutls_certificate_free_credentials(clicred);

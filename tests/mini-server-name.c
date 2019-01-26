@@ -310,21 +310,21 @@ void doit(void)
 	start("tls1.2 test.example.com", PRIO_TLS12, 0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"), 0);
 	start("tls1.2 longtest.example.com", PRIO_TLS12, 0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"), 0);
 	/* test embedded NULL */
-	start("tls1.2 embedded-NULL", PRIO_TLS12, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	start("tls1.2 embedded-NULL", PRIO_TLS12, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_DISALLOWED_NAME);
 
 	start("tls1.3 NULL", PRIO_TLS13, 0, NULL, 0, NULL, 0, 0);
 	start("tls1.3 empty", PRIO_TLS13, 0, "", 0, "", 0, 0);
 	start("tls1.3 test.example.com", PRIO_TLS13, 0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"), 0);
 	start("tls1.3 longtest.example.com", PRIO_TLS13, 0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"), 0);
 	/* test embedded NULL */
-	start("tls1.3 embedded-NULL", PRIO_TLS13, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	start("tls1.3 embedded-NULL", PRIO_TLS13, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_DISALLOWED_NAME);
 
 	start("NULL", PRIO_NORMAL, 0, NULL, 0, NULL, 0, 0);
 	start("empty", PRIO_NORMAL, 0, "", 0, "", 0, 0);
 	start("test.example.com", PRIO_NORMAL, 0, "test.example.com", strlen("test.example.com"), "test.example.com", strlen("test.example.com"), 0);
 	start("longtest.example.com", PRIO_NORMAL, 0, "longtest.example.com.", strlen("longtest.example.com"), "longtest.example.com.", strlen("longtest.example.com"), 0);
 	/* test embedded NULL */
-	start("embedded-NULL", PRIO_NORMAL, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+	start("embedded-NULL", PRIO_NORMAL, 1, "invalid\x00.example.com.", sizeof("invalid\x00.example.com")-1, NULL, 0, GNUTLS_E_RECEIVED_DISALLOWED_NAME);
 }
 
 #endif				/* _WIN32 */
