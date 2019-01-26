@@ -4,11 +4,11 @@
  * Copyright (C) 2008 Joe Orton <joe@manyfish.co.uk>
  * Copyright (C) 2013 Nikos Mavrogiannopoulos
  * Copyright (C) 2014-2017 Red Hat
- * 
+ *
  * Authors: Nikos Mavrogiannopoulos, Stef Walter
  *
- * Inspired and some parts (pkcs11_login) based on neon PKCS #11 support 
- * by Joe Orton. More ideas came from the pkcs11-helper library by 
+ * Inspired and some parts (pkcs11_login) based on neon PKCS #11 support
+ * by Joe Orton. More ideas came from the pkcs11-helper library by
  * Alon Bar-Lev.
  *
  * GnuTLS is free software; you can redistribute it and/or
@@ -1048,7 +1048,7 @@ static int _gnutls_pkcs11_reinit(void)
 /**
  * gnutls_pkcs11_reinit:
  *
- * This function will reinitialize the PKCS 11 subsystem in gnutls. 
+ * This function will reinitialize the PKCS 11 subsystem in gnutls.
  * This is required by PKCS 11 when an application uses fork(). The
  * reinitialization function must be called on the child.
  *
@@ -2521,6 +2521,7 @@ gnutls_pkcs11_token_get_info(const char *url,
 		if (temp_str == NULL) {
 			gnutls_assert();
 			str_max = 0;
+			str = NULL;
 		} else {
 			str = (uint8_t *)temp_str;
 		}
@@ -3586,7 +3587,7 @@ _gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		goto cleanup;
 	}
-	
+
 
 	ret = 0;
  cleanup:
@@ -3602,7 +3603,7 @@ _gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
  * @objs: A list of PKCS 11 objects
  * @flags: 0 for now
  *
- * This function will import a PKCS 11 certificate list to a list of 
+ * This function will import a PKCS 11 certificate list to a list of
  * #gnutls_x509_crt_t type. These must not be initialized.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -4451,7 +4452,7 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
  *
  * Since: 3.4.2
  **/
-int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url, 
+int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url,
 					const gnutls_datum_t *dn,
 					const gnutls_datum_t *spki,
 					gnutls_datum_t *issuer,
@@ -4530,7 +4531,7 @@ int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url,
  * @flags: Use zero or flags from %GNUTLS_PKCS11_OBJ_FLAG.
  *
  * This function will check whether the provided certificate is stored
- * in the specified token. This is useful in combination with 
+ * in the specified token. This is useful in combination with
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED or
  * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED,
  * to check whether a CA is present or a certificate is blacklisted in
