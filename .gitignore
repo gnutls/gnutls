@@ -517,6 +517,7 @@ tests/name-constraints
 tests/name-constraints-ip
 tests/name-constraints-merge
 tests/netconf-psk
+tests/no-extensions
 tests/no-signal
 tests/nul-in-x509-names
 tests/null_retrieve_function
@@ -603,8 +604,8 @@ tests/privkey-verify-broken
 tests/psk-file
 tests/pskself
 tests/pubkey-import-export
-tests/rawpk-api
 tests/random-art
+tests/rawpk-api
 tests/record-pad
 tests/record-retvals
 tests/record-sizes
@@ -726,6 +727,7 @@ tests/suite/cert-coverage
 tests/suite/ciphersuite/gnutls-ciphers.js
 tests/suite/danetool-cert*
 tests/suite/eagain-cli
+tests/suite/ecdsa
 tests/suite/libecore.la
 tests/suite/mini-record-timing
 tests/suite/ocsp-coverage
@@ -746,6 +748,7 @@ tests/suite/softhsm*.db-journal
 tests/suite/softhsm.config
 tests/suite/testpkcs11.debug
 tests/suite/testtpm.sh
+tests/suite/tlslite
 tests/suite/x509paths/X509tests
 tests/system-prio-file
 tests/tls-client-with-seccomp
@@ -861,7 +864,7 @@ tests/x509sign-verify-gost
 tests/x509sign-verify-rsa
 tests/x509sign-verify2
 tests/x509signself
-*.tmp
+*.tmp*
 tmp-*
 *.trs
 win32
