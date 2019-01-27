@@ -859,6 +859,7 @@ if test "$opt_guile_bindings" = "yes"; then
       AC_PATH_PROG([GUILD], [guild])
       AC_SUBST([GUILD])
 
+      GUILE_PKG
       GUILE_PROGS
       GUILE_FLAGS
 
