@@ -23,7 +23,7 @@ ADDFLAGS ?=
 CFGFLAGS ?= --enable-gtk-doc --enable-gtk-doc-pdf --enable-gtk-doc-html $(ADDFLAGS) $(WFLAGS)
 PACKAGE ?= gnutls
 
-.PHONY: config
+.PHONY: config glimport
 
 INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./lib/minitasn1/ -e ^./lib/build-aux/ -e ^./gl/ -e ^./src/libopts/ -e -args.[ch] -e asn1_tab.c -e ^./tests/suite/`
 
@@ -72,19 +72,10 @@ config:
 
 bootstrap: autoreconf .submodule.stamp
 
-UNISTRING_MODULES = "unistr/u8-check unistr/u8-to-u16 unistr/u8-to-u32 unistr/u32-to-u8 \
-	unistr/u16-to-u8 uninorm/nfc uninorm/nfkc uninorm/u8-normalize uninorm/u16-normalize \
-	uninorm/u32-normalize unictype/category-all unictype/property-not-a-character \
-	unictype/property-default-ignorable-code-point unictype/property-join-control"
-
-unistringimport:
-	../gnulib/gnulib-tool --without-tests --libtool --macro-prefix=unistring --lgpl=3orGPLv2 --dir=. --local-dir=lib/unistring/override --lib=libunistring --without-tests --source-base=lib/unistring --m4-base=lib/unistring/m4 --doc-base=doc --aux-dir=build-aux --import $(UNISTRING_MODULES)
-
-# The only non-lgpl modules used are: gettime progname timespec. Those
-# are not used (and must not be used) in the library)
-glimport: unistringimport
-	../gnulib/gnulib-tool --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --lgpl=2 --add-import
-	../gnulib/gnulib-tool --dir=. --local-dir=src/gl/override --lib=libgnu_gpl --source-base=src/gl --m4-base=src/gl/m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --add-import
+glimport:
+	pushd gnulib && git checkout master && git pull && popd
+	echo "If everything looks well, commit the gnulib update with:"
+	echo "  git commit -m "Update gnulib submodule" gnulib"
 
 # Code Coverage
 

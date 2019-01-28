@@ -278,17 +278,15 @@ are always active.
 
 # Gnulib
 
-The files at `gl/`, `src/gl/` and `lib/unistring` directories are part of
-gnulib project and are included mainly for systems which may miss functionality
-available in glibc and unistring libraries. These files are updated when new
-functionality is needed or bug fixes affecting gnutls are required.
+The directories `gl/`, `src/gl/` and `lib/unistring` contain gnulib files
+copied/created by `./bootstrap`. Gnulib is a portability source code library
+to handle API or behavior incompatibilities between target systems.
 
-They can be updated by the following make rule.
+To take advantage of the latest gnulib files, we have to update the
+`gnulib/` submodule from time to time:
 ```
 $ make glimport
 ```
-
-That rule assumes that an updated gnulib is present at `../gnulib/`.
 
 Note that the gnulib library in `gl/` is used by the GnuTLS library
 and is kept separate from the gnulib used by the GnuTLS tools because
