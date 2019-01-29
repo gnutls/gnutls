@@ -93,6 +93,36 @@ void doit(void)
 		exit(1);
 	}
 
+	{
+		static const char url[] = "pkcs11:token=whatever";
+
+		/* Testing a too small buffer */
+		size_t size = 1;
+		char *buf = gnutls_malloc(size);
+		ret = gnutls_pkcs11_token_get_info(url,
+			GNUTLS_PKCS11_TOKEN_LABEL,
+			buf, &size);
+		assert(ret == GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+		/* Testing a too small buffer by one */
+		size -= 1;
+		buf = gnutls_realloc(buf, size);
+		ret = gnutls_pkcs11_token_get_info(url,
+			GNUTLS_PKCS11_TOKEN_LABEL,
+			buf, &size);
+		assert(ret == GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+		/* Testing an exactly fitting buffer */
+		buf = gnutls_realloc(buf, size);
+		ret = gnutls_pkcs11_token_get_info(url,
+			GNUTLS_PKCS11_TOKEN_LABEL,
+			buf, &size);
+		assert(ret == 0);
+		assert(strcmp(buf, "whatever") == 0);
+
+		gnutls_free(buf);
+	}
+
 	ret = gnutls_pkcs11_token_get_ptr("pkcs11:token=invalid", (void**)&mod, &slot_id, 0);
 	assert(ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
