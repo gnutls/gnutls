@@ -822,6 +822,15 @@ int _gnutls_write_connection_state_init(gnutls_session_t session)
 	    session->security_parameters.epoch_next;
 	int ret;
 
+	/* reset max_record_recv_size if it was negotiated in the
+	 * previous handshake using the record_size_limit extension */
+	if (session->security_parameters.max_record_recv_size !=
+	    session->security_parameters.max_record_send_size &&
+	    !(session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED) &&
+	    session->security_parameters.entity == GNUTLS_SERVER)
+		session->security_parameters.max_record_recv_size =
+			session->security_parameters.max_record_send_size;
+
 /* Update internals from CipherSuite selected.
  * If we are resuming just copy the connection session
  */
