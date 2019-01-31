@@ -3141,6 +3141,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_TOO_MANY_EMPTY_PACKETS -78
 #define GNUTLS_E_UNKNOWN_PK_ALGORITHM -80
 #define GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS -81
+#define GNUTLS_E_RECEIVED_DISALLOWED_NAME -82 /* GNUTLS_A_ILLEGAL_PARAMETER */
 
   /* returned if you need to generate temporary RSA
    * parameters. These are needed for export cipher suites.
