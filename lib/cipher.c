@@ -872,6 +872,15 @@ decrypt_packet_tls13(gnutls_session_t session,
 	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 
+	/* 1 octet for content type */
+	if (length > max_decrypted_size(session) + 1) {
+		_gnutls_audit_log
+		    (session, "Received packet with illegal length: %u\n",
+		     (unsigned int) length);
+
+		return gnutls_assert_val(GNUTLS_E_RECORD_OVERFLOW);
+	}
+
 	length_set = 0;
 
 	/* now figure the actual data size. We intentionally iterate through all data,
