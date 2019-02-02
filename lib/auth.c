@@ -138,6 +138,29 @@ gnutls_credentials_set(gnutls_session_t session,
 		}
 	}
 
+	/* sanity tests */
+	if (type == GNUTLS_CRD_CERTIFICATE) {
+		gnutls_certificate_credentials_t c = cred;
+		unsigned i;
+		bool allow_tls13 = 0;
+		unsigned key_usage;
+
+		if (c != NULL && c->ncerts != 0) {
+			for (i = 0; i < c->ncerts; i++) {
+				key_usage = get_key_usage(session, c->certs[i].cert_list[0].pubkey);
+				if (key_usage == 0 || (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+					allow_tls13 = 1;
+					break;
+				}
+			}
+
+			if (!allow_tls13) {
+				/* to prevent the server random indicate TLS1.3 support */
+				session->internals.flags |= INT_FLAG_NO_TLS13;
+			}
+		}
+	}
+
 	return 0;
 }
 

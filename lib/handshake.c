@@ -444,6 +444,9 @@ _gnutls_negotiate_version(gnutls_session_t session,
 
 		if (aversion && aversion->id == GNUTLS_TLS1_2) {
 			vers = _gnutls_version_max(session);
+			if (unlikely(vers == NULL))
+				return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
+
 			if (vers->id >= GNUTLS_TLS1_2) {
 				session->security_parameters.pversion = aversion;
 				return 0;
@@ -2138,7 +2141,10 @@ static int send_client_hello(gnutls_session_t session, int again)
 
 		if (hver == NULL) {
 			gnutls_assert();
-			ret = GNUTLS_E_NO_PRIORITIES_WERE_SET;
+			if (session->internals.flags & INT_FLAG_NO_TLS13)
+				ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+			else
+				ret = GNUTLS_E_NO_PRIORITIES_WERE_SET;
 			goto cleanup;
 		}
 

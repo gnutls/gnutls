@@ -9,7 +9,9 @@ See the end for copying conditions.
 
 ** libgnutls: enforce key usage limitations on certificates more actively.
    Previously we would enforce it for TLS1.2 protocol, now we enforce it
-   even when TLS1.3 is negotiated, or on client certificates as well (#690).
+   even when TLS1.3 is negotiated, or on client certificates as well. When
+   an inappropriate for TLS1.3 certificate is seen on the credentials structure
+   GnuTLS will disable TLS1.3 support for that session (#690).
 
 ** API and ABI modifications:
 No changes since last version.

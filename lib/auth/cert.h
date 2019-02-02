@@ -174,7 +174,8 @@ int _gnutls_proc_rawpk_crt(gnutls_session_t session,
 
 inline static unsigned get_key_usage(gnutls_session_t session, gnutls_pubkey_t pubkey)
 {
-	if (unlikely(session->internals.priorities->allow_server_key_usage_violation))
+	if (unlikely(session->internals.priorities &&
+	    session->internals.priorities->allow_server_key_usage_violation))
 		return 0;
 	else
 		return pubkey->key_usage;

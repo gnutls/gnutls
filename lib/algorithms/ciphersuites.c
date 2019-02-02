@@ -1578,7 +1578,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	/* RFC7919 requires that we reply with insufficient security if we have
 	 * negotiated an FFDHE group, but cannot find a common ciphersuite. However,
 	 * we must also distinguish between not matching a ciphersuite due to an
-	 * incompatible certificate which we traditionally return GNUTLS_E_INSUFFICIENT_SECURITY.
+	 * incompatible certificate which we traditionally return GNUTLS_E_NO_CIPHER_SUITES.
 	 */
 	if (!no_cert_found && (session->internals.hsk_flags & HSK_HAVE_FFDHE) &&
 	    session->internals.priorities->groups.have_ffdhe && !version->tls13_sem)
