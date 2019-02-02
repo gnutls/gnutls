@@ -56,7 +56,7 @@ ARGS_STAMPS = \
 	systemkey-args.stamp srptool-args.stamp ocsptool-args.stamp p11tool-args.stamp \
 	danetool-args.stamp serv-args.stamp psktool-args.stamp
 
-BUILT_SOURCES = $(ARGS_BUILT) mech-list.h
+BUILT_SOURCES = $(ARGS_BUILT)
 
 DISTCLEANFILES = $(BUILT_SOURCES) $(ARGS_STAMPS)
 
@@ -226,8 +226,9 @@ libcmd_danetool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 # p11 tool
 if ENABLE_PKCS11
 
+BUILT_SOURCES += mech-list.h
 p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
-	certtool-extras.c p11tool.h common.c
+	certtool-extras.c p11tool.h common.c mech-list.h
 p11tool_LDADD = ../lib/libgnutls.la
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la gl/libgnu_gpl.la
 p11tool_LDADD += $(COMMON_LIBS)
