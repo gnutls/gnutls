@@ -32,6 +32,9 @@
  */
 #define MAX_SIG_SIZE (19 + MAX_HASH_SIZE)
 
+int _gnutls_check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage,
+				    unsigned our_cert);
+
 int _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 				    gnutls_pcert_st * cert,
 				    gnutls_privkey_t pkey,

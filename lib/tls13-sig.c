@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Red Hat, Inc.
+ * Copyright (C) 2017-2019 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -27,6 +27,7 @@
 #include <ext/signature.h>
 #include <abstract_int.h>
 #include "tls13-sig.h"
+#include "tls-sig.h"
 #include "hash_int.h"
 
 #undef PREFIX_SIZE
@@ -48,6 +49,7 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 	const version_entry_st *ver = get_version(session);
 	gnutls_buffer_st buf;
 	uint8_t prefix[PREFIX_SIZE];
+	unsigned key_usage = 0;
 	gnutls_datum_t p;
 
 	_gnutls_handshake_log
@@ -74,6 +76,12 @@ _gnutls13_handshake_verify_data(gnutls_session_t session,
 
 	if (se->tls13_ok == 0) /* explicitly prohibited */
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+
+	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
+
+	ret = _gnutls_check_key_usage_for_sig(session, key_usage, 0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	_gnutls_buffer_init(&buf);
 
@@ -150,6 +158,7 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 	if (unlikely(sign_supports_priv_pk_algorithm(se, pkey->pk_algorithm) == 0))
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
+	/* when we reach here we know we have a signing certificate */
 	_gnutls_handshake_log
 	    ("HSK[%p]: signing TLS 1.3 handshake data: using %s and PRF: %s\n", session, se->name,
 	     session->security_parameters.prf->name);

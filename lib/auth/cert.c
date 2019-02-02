@@ -181,6 +181,7 @@ find_x509_client_cert(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 	unsigned i, j;
 	int result, cert_pk;
+	unsigned key_usage;
 
 	*indx = -1;
 
@@ -191,6 +192,16 @@ find_x509_client_cert(gnutls_session_t session,
 	    (data_size == 0
 	     || (session->internals.flags & GNUTLS_FORCE_CLIENT_CERT))) {
 		if (cred->certs[0].cert_list[0].type == GNUTLS_CRT_X509) {
+
+			key_usage = get_key_usage(session, cred->certs[0].cert_list[0].pubkey);
+
+			/* For client certificates we require signatures */
+			result = _gnutls_check_key_usage_for_sig(session, key_usage, 1);
+			if (result < 0) {
+				_gnutls_debug_log("Client certificate is not suitable for signing\n");
+				return gnutls_assert_val(result);
+			}
+
 			/* This check is necessary to prevent sending other certificate
 			 * credentials that are set (e.g. raw public-key). */
 			*indx = 0;
@@ -220,6 +231,14 @@ find_x509_client_cert(gnutls_session_t session,
 
 				if (odn.size == 0 || odn.size != asked_dn.size)
 					continue;
+
+				key_usage = get_key_usage(session, cred->certs[i].cert_list[0].pubkey);
+
+				/* For client certificates we require signatures */
+				if (_gnutls_check_key_usage_for_sig(session, key_usage, 1) < 0) {
+					_gnutls_debug_log("Client certificate is not suitable for signing\n");
+					continue;
+				}
 
 				/* If the DN matches and
 				 * the *_SIGN algorithm matches
@@ -1462,11 +1481,11 @@ int cert_select_sign_algorithm(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 	}
 
-	if (unlikely(session->internals.priorities->allow_server_key_usage_violation)) {
-		key_usage = 0;
-	} else {
-		key_usage = pubkey->key_usage;
-	}
+	key_usage = get_key_usage(session, pubkey);
+
+	/* In TLS1.3 we support only signatures; ensure the selected key supports them */
+	if (ver->tls13_sem && _gnutls_check_key_usage_for_sig(session, key_usage, 1) < 0)
+		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
 	if (!ver->tls13_sem && !_gnutls_kx_supports_pk_usage(cs->kx_algorithm, pk, key_usage)) {
 		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
