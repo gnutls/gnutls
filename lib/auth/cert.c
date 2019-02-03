@@ -202,8 +202,6 @@ find_x509_client_cert(gnutls_session_t session,
 				return gnutls_assert_val(result);
 			}
 
-			/* This check is necessary to prevent sending other certificate
-			 * credentials that are set (e.g. raw public-key). */
 			*indx = 0;
 			return 0;
 		}
@@ -670,21 +668,24 @@ _gnutls_gen_rawpk_crt(gnutls_session_t session, gnutls_buffer_st* data)
 	/* Since we are transmitting a raw public key with no additional
 	 * certificate credentials attached to it, it doesn't make sense to
 	 * have more than one certificate set (i.e. to have a certificate chain).
-	 * This is enforced by the API so having a value other than 1 should
-	 * be an impossible situation.
 	 */
-	assert(apr_cert_list_length == 1);
+	assert(apr_cert_list_length <= 1);
 
 	/* Write our certificate containing only the SubjectPublicKeyInfo to
 	 * the output buffer. We always have exactly one certificate that
 	 * contains our raw public key. Our message looks like:
 	 * <length++certificate> where
-	 * length = 3 bytes and
+	 * length = 3 bytes (or 24 bits) and
 	 * certificate = length bytes.
 	 */
-	ret = _gnutls_buffer_append_data_prefix(data, 24,
-					apr_cert_list[0].cert.data,
-					apr_cert_list[0].cert.size);
+	if (apr_cert_list_length == 0) {
+		ret = _gnutls_buffer_append_prefix(data, 24, 0);
+	} else {
+		ret = _gnutls_buffer_append_data_prefix(data, 24,
+							apr_cert_list[0].cert.data,
+							apr_cert_list[0].cert.size);
+	}
+
 
 	if (ret < 0) return gnutls_assert_val(ret);
 
