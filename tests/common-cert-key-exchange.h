@@ -51,6 +51,14 @@ extern const char *server_priority;
 	try_with_key(name, client_prio, client_kx, server_sign_algo, client_sign_algo, \
 		&rawpk_public_key1, &rawpk_private_key1, &rawpk_public_key2, &rawpk_private_key2, client_cert, GNUTLS_CRT_RAWPK, GNUTLS_CRT_RAWPK)
 
+void try_with_rawpk_key_fail(const char *name, const char *client_prio,
+			     int server_err, int client_err,
+			     const gnutls_datum_t *serv_cert,
+			     const gnutls_datum_t *serv_key,
+			     unsigned server_ku,
+			     const gnutls_datum_t *cli_cert,
+			     const gnutls_datum_t *cli_key,
+			     unsigned client_ku);
 
 void try_with_key_ks(const char *name, const char *client_prio, gnutls_kx_algorithm_t client_kx,
 		gnutls_sign_algorithm_t server_sign_algo,

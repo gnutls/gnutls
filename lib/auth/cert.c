@@ -287,6 +287,7 @@ find_rawpk_client_cert(gnutls_session_t session,
 			int pk_algos_length, int* indx)
 {
 	unsigned i;
+	int ret;
 	gnutls_pk_algorithm_t pk;
 
 	*indx = -1;
@@ -295,15 +296,22 @@ find_rawpk_client_cert(gnutls_session_t session,
 		/* We know that our list length will be 1, therefore we can
 		 * ignore the rest.
 		 */
-		if (cred->certs[i].cert_list_length == 1) {
-			pk = gnutls_pubkey_get_pk_algorithm(cred->certs[i].
-																					cert_list[0].pubkey, NULL);
+		if (cred->certs[i].cert_list_length == 1 && cred->certs[i].cert_list[0].type == GNUTLS_CRT_RAWPK) {
+			pk = gnutls_pubkey_get_pk_algorithm(cred->certs[i].cert_list[0].pubkey, NULL);
+
+			/* For client certificates we require signatures */
+			ret = _gnutls_check_key_usage_for_sig(session, get_key_usage(session, cred->certs[i].cert_list[0].pubkey), 1);
+			if (ret < 0) {
+				/* we return an error instead of skipping so that the user is notified about
+				 * the key incompatibility */
+				_gnutls_debug_log("Client certificate is not suitable for signing\n");
+				return gnutls_assert_val(ret);
+			}
 
 			/* Check whether the public-key algorithm of our credential is in
 			 * the list with supported public-key algorithms and whether the
 			 * cert type matches. */
-			if ((check_pk_algo_in_list(pk_algos, pk_algos_length, pk) == 0)
-			   && (cred->certs[i].cert_list[0].type == GNUTLS_CRT_RAWPK))	{
+			if ((check_pk_algo_in_list(pk_algos, pk_algos_length, pk) == 0)) {
 				// We found a compatible credential
 				*indx = i;
 				break;
@@ -666,7 +674,7 @@ _gnutls_gen_rawpk_crt(gnutls_session_t session, gnutls_buffer_st* data)
 	 * be an impossible situation.
 	 */
 	assert(apr_cert_list_length == 1);
-	
+
 	/* Write our certificate containing only the SubjectPublicKeyInfo to
 	 * the output buffer. We always have exactly one certificate that
 	 * contains our raw public key. Our message looks like:
