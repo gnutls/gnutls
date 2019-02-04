@@ -537,7 +537,7 @@ AC_ARG_ENABLE(non-suiteb-curves,
 
 if test "$enable_non_suiteb" = "yes";then
 	dnl nettle_secp_192r1 is not really a function
-	AC_CHECK_LIB(hogweed, nettle_secp_192r1, enable_non_suiteb=yes, enable_non_suiteb=no, [$HOGWEED_LIBS])
+	AC_CHECK_LIB(hogweed, nettle_secp_192r1, enable_non_suiteb=yes, enable_non_suiteb=no, [$HOGWEED_LIBS $NETTLE_LIBS])
 
 	if test "$enable_non_suiteb" = "yes";then
 		AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
@@ -547,7 +547,7 @@ AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
 # We MUST require a Nettle version that has rsa_sec_decrypt now.
 save_LIBS=$LIBS
-LIBS="$LIBS $HOGWEED_LIBS"
+LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_rsa_sec_decrypt,
     [],
     [AC_MSG_ERROR([Nettle lacks the required rsa_sec_decrypt function])]
