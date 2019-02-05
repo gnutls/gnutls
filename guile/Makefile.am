@@ -74,7 +74,7 @@ AM_V_GUILEC_0 = @echo "  GUILEC  " $@;
 # Unset 'GUILE_LOAD_COMPILED_PATH' so we can be sure that any .go file that we
 # load comes from the build directory.
 # XXX: Use the C locale for when Guile lacks
-# <http://git.sv.gnu.org/cgit/guile.git/commit/?h=stable-2.0&id=e2c6bf3866d1186c60bacfbd4fe5037087ee5e3f>.
+# <https://git.sv.gnu.org/cgit/guile.git/commit/?h=stable-2.0&id=e2c6bf3866d1186c60bacfbd4fe5037087ee5e3f>.
 %.go: %.scm modules/gnutls.scm
 	$(AM_V_GUILEC)$(MKDIR_P) "`dirname "$@"`" ;			\
 	$(AM_V_P) && out=1 || out=- ;					\

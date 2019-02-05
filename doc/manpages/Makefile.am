@@ -1256,7 +1256,7 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-site "https://www.gnutls.org" \
 			-include "gnutls/`basename $$header .in`" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \

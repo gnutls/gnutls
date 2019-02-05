@@ -388,7 +388,7 @@ AM_CONDITIONAL(HAVE_LIBUNISTRING, test "$ac_have_unistring" = "yes")
 dnl Note that g*l_INIT are run after we check for library capabilities,
 dnl to prevent issues from caching lib dependencies. See discussion
 dnl in https://bugs.gentoo.org/show_bug.cgi?id=494940 and
-dnl http://gnu-autoconf.7623.n7.nabble.com/Correct-way-to-check-for-clock-gettime-td12276.html
+dnl https://gnu-autoconf.7623.n7.nabble.com/Correct-way-to-check-for-clock-gettime-td12276.html
 gl_INIT
 ggl_INIT
 unistring_INIT
@@ -650,7 +650,7 @@ if test "$with_p11_kit" != "no"; then
 *** 
 *** p11-kit >= $P11_KIT_MINIMUM was not found. To disable PKCS #11 support 
 *** use --without-p11-kit, otherwise you may get p11-kit from
-*** http://p11-glue.freedesktop.org/p11-kit.html
+*** https://p11-glue.freedesktop.org/p11-kit.html
 *** ]])
 	fi
 fi
@@ -770,7 +770,7 @@ if test "x$with_default_trust_store_dir" != x; then
     ["$with_default_trust_store_dir"], [use the given directory as default trust store])
 fi
 
-dnl auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
+dnl auto detect https://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
 AC_ARG_WITH([default-trust-store-file],
   [AS_HELP_STRING([--with-default-trust-store-file=FILE],
     [use the given file default trust store])], with_default_trust_store_file="$withval",

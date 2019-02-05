@@ -461,7 +461,7 @@ an efficient way.
 The Cryptographic library layer, currently supports only
 libnettle. Older versions of GnuTLS used to support libgcrypt,
 but it was switched with nettle mainly for performance reasons@footnote{See
-@url{http://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html}.}
+@url{https://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html}.}
 and secondary because it is a simpler library to use.
 In the future other cryptographic libraries might be supported as well.
 
@@ -470,7 +470,7 @@ Systems that include a cryptographic co-processor, typically come with
 kernel drivers to utilize the operations from software. For this reason
 GnuTLS provides a layer where each individual algorithm used can be replaced
 by another implementation, i.e., the one provided by the driver. The
-FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{http://home.gna.org/cryptodev-linux/}
+FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{https://home.gna.org/cryptodev-linux/}
 for the Linux kernel implementation of @code{/dev/crypto}.} include already
 a number of hardware assisted implementations, and also provide an interface
 to access them, called @code{/dev/crypto}.

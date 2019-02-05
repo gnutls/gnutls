@@ -4,48 +4,48 @@ People who have sent DCO for gnutls
 
 Adam Sampson <ats||offog.org>
 	16 Jul 2013 (received by personal mail by nmav)
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6857
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6857
 
 Alessandro Ghedini <alessandro||ghedini.me>
 	1 Aug 2015
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/8266	
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/8266	
 
 Frank Morgner <morgner||informatik.hu-berlin.de>
 	30 Aug 2013
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6960
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6960
 
 Wolfgang Meyer zu Bergsten <w.bergsten||sirrix.com>
 	25 Oct 2013
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7068
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7068
 
 Jens Lechtenboerger <jens.lechtenboerger||fsfe.org>
 	22 Feb 2014
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7337
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7337
 
 Jason Spafford <nullprogrammer||gmail.com>
 	6 Mar 2014
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7352
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7352
 
 Simon Arlott <simon||arlott.org>
 	10 Jul 2014
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7572
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7572
 
 Alon Bar-Lev <alon.barlev||gmail.com>
 	25 Aug 2014
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7615
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7615
 
 Armin Burgmeier <armin||arbur.net>
 	16 Sep 2014
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7657
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7657
 
 Jaak Ristioja <jaak.ristioja||cyber.ee>
 	17 Dec 2014
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7885
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7885
 
 Luke Dashjr <luke-jr+git||utopios.org>
 	13 Jan 2015
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7949
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7949
 
 Tim Kosse <tim.kosse||filezilla-project.org>
 	30 May 2016
-	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/8559
+	https://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/8559

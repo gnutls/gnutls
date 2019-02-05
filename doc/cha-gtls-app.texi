@@ -299,7 +299,7 @@ call the expected system call. For that it is recommended to test your
 program in all the targeted platforms when filters like seccomp are in place.
 
 An example with a seccomp filter from GnuTLS' test suite is at:
-@url{http://gitlab.com/gnutls/gnutls/blob/master/tests/seccomp.c}.
+@url{https://gitlab.com/gnutls/gnutls/blob/master/tests/seccomp.c}.
 
 @node Sessions and fork
 @subsection Sessions and fork

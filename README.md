@@ -13,7 +13,7 @@
 
 GnuTLS implements the TLS/SSL (Transport Layer Security aka Secure
 Sockets Layer) protocol.  Additional information can be found at
-[www.gnutls.org](http://www.gnutls.org/).
+[www.gnutls.org](https://www.gnutls.org/).
 
 This file contains instructions for developers and advanced users that
 want to build from version controlled sources. See [INSTALL.md](INSTALL.md)
@@ -30,13 +30,13 @@ We require several tools to check out and build the software, including:
 * [Texinfo](https://www.gnu.org/software/texinfo/)
 * [Tar](https://www.gnu.org/software/tar/)
 * [Gzip](https://www.gnu.org/software/gzip/)
-* [Texlive & epsf](http://www.tug.org/texlive/) (for PDF manual)
-* [GTK-DOC](http://www.gtk.org/gtk-doc/) (for API manual)
-* [Git](http://git-scm.com/)
-* [Perl](http://www.cpan.org/)
-* [Nettle](http://www.lysator.liu.se/~nisse/nettle/)
+* [Texlive & epsf](https://www.tug.org/texlive/) (for PDF manual)
+* [GTK-DOC](https://www.gtk.org/gtk-doc/) (for API manual)
+* [Git](https://git-scm.com/)
+* [Perl](https://www.cpan.org/)
+* [Nettle](https://www.lysator.liu.se/~nisse/nettle/)
 * [Guile](https://www.gnu.org/software/guile/)
-* [p11-kit](http://p11-glue.freedesktop.org/p11-kit.html)
+* [p11-kit](https://p11-glue.freedesktop.org/p11-kit.html)
 * [gperf](https://www.gnu.org/software/gperf/)
 * [libtasn1](https://www.gnu.org/software/libtasn1/) (optional)
 * [Libidn2](https://www.gnu.org/software/libidn/#libidn2) (optional, for internationalization of DNS, IDNA 2008)
@@ -44,11 +44,11 @@ We require several tools to check out and build the software, including:
 * [AWK](https://www.gnu.org/software/awk/) (for make dist, pmccabe2html)
 * [bison](https://www.gnu.org/software/bison) (for datetime parser in certtool)
 * [libunbound](https://unbound.net/) (for DANE support)
-* [abi-compliance-checker](http://ispras.linuxbase.org/index.php/ABI_compliance_checker) (for make dist)
-* [tcsd](http://trousers.sourceforge.net/) (for TPM support; optional)
+* [abi-compliance-checker](https://ispras.linuxbase.org/index.php/ABI_compliance_checker) (for make dist)
+* [tcsd](https://trousers.sourceforge.net/) (for TPM support; optional)
 * [swtpm](https://github.com/stefanberger/swtpm) (for TPM test; optional)
 * [ncat](https://nmap.org/download.html) (for TPM test; optional)
-* [tpm-tools](http://trousers.sourceforge.net/) (for TPM test; optional)
+* [tpm-tools](https://trousers.sourceforge.net/) (for TPM test; optional)
 * [expect](https://core.tcl.tk/expect/index) (for TPM test; optional)
 
 The required software is typically distributed with your operating
@@ -79,13 +79,13 @@ Dependencies that are used during make check or make dist are listed below.
 Moreover, for basic interoperability testing you may want to install openssl
 and mbedtls.
 
-* [Valgrind](http://valgrind.org/) (optional)
+* [Valgrind](https://valgrind.org/) (optional)
 * [Libasan](https://gcc.gnu.org//) (optional)
-* [datefudge](http://packages.debian.org/datefudge) (optional)
-* [nodejs](http://nodejs.org/) (needed for certain test cases)
-* [softhsm](http://www.opendnssec.org/softhsm/) (for testing smart card support)
-* [dieharder](http://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
-* [lcov](http://linux-test-project.github.io/) (for code coverage)
+* [datefudge](https://packages.debian.org/datefudge) (optional)
+* [nodejs](https://nodejs.org/) (needed for certain test cases)
+* [softhsm](https://www.opendnssec.org/softhsm/) (for testing smart card support)
+* [dieharder](https://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
+* [lcov](https://linux-test-project.github.io/) (for code coverage)
 
 Debian/Ubuntu:
 ```

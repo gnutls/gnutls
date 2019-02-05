@@ -1233,7 +1233,7 @@ CLASS_DIAGRAMS         = YES
 
 # You can define message sequence charts within doxygen comments using the \msc 
 # command. Doxygen will then run the mscgen tool (see 
-# http://www.mcternan.me.uk/mscgen/) to produce the chart and insert it in the 
+# https://www.mcternan.me.uk/mscgen/) to produce the chart and insert it in the 
 # documentation. The MSCGEN_PATH tag allows you to specify the directory where 
 # the mscgen tool resides. If left empty the tool is assumed to be found in the 
 # default search path.
