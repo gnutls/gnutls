@@ -951,7 +951,7 @@ challenge_password = 123456
 
 # An URL that has CRLs (certificate revocation lists)
 # available. Needed in CA certificates.
-#crl_dist_points = "http://www.getcrl.crl/getcrl/"
+#crl_dist_points = "https://www.getcrl.crl/getcrl/"
 
 # Whether this is a CA certificate or not
 #ca
@@ -1074,10 +1074,10 @@ encryption_key
 #path_len = 2
 
 # OCSP URI
-# ocsp_uri = http://my.ocsp.server/ocsp
+# ocsp_uri = https://my.ocsp.server/ocsp
 
 # CA issuers URI
-# ca_issuers_uri = http://my.ca.issuer
+# ca_issuers_uri = https://my.ca.issuer
 
 # Certificate policies
 #policy1 = 1.3.6.1.4.1.5484.1.10.99.1.0

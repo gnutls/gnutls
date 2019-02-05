@@ -21,7 +21,7 @@
 #include <config.h>
 
 /* Work around problem reported in
-   <http://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
+   <https://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
 #if GETTIMEOFDAY_CLOBBERS_LOCALTIME
 #undef localtime
 #endif

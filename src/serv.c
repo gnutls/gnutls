@@ -508,7 +508,7 @@ gnutls_session_t initialize_session(int dtls)
 static const char DEFAULT_DATA[] =
     "This is the default message reported by the GnuTLS implementation. "
     "For more information please visit "
-    "<a href=\"http://www.gnutls.org/\">http://www.gnutls.org/</a>.";
+    "<a href=\"https://www.gnutls.org/\">https://www.gnutls.org/</a>.";
 
 /* Creates html with the current session information.
  */

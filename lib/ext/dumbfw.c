@@ -30,7 +30,7 @@
  * data that are between 256 and 511 bytes, and this extension will
  * make sure that client hello isn't in this range.
  *
- * [0]. http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
+ * [0]. https://www.ietf.org/mail-archive/web/tls/current/msg10423.html
  */
 
 static int _gnutls_dumbfw_send_params(gnutls_session_t session,
