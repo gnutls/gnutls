@@ -28,7 +28,7 @@ Available from @url{http://tools.ietf.org/html/draft-ietf-websec-key-pinning-01}
 @item @anchor{NISTSP80057}[NISTSP80057]
 NIST Special Publication 800-57, "Recommendation for Key Management -
 Part 1: General (Revised)", March 2007, available from
-@url{http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57-Part1-revised2_Mar08-2007.pdf}.
+@url{https://csrc.nist.gov/publications/nistpubs/800-57/sp800-57-Part1-revised2_Mar08-2007.pdf}.
 
 @item @anchor{RFC7413}[RFC7413]
 Y. Cheng and J. Chu and S. Radhakrishnan and A. Jain, "TCP Fast Open",

@@ -887,7 +887,7 @@ gnutls_ext_get_name: Added
 * Version 3.5.0 (released 2016-05-09)
 
 ** libgnutls: Added SHA3 based signing algorithms for DSA, RSA and ECDSA,
-   based on http://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html
+   based on https://csrc.nist.gov/groups/ST/crypto_apps_infra/csor/algorithms.html
 
 ** libgnutls: Added support for curve X25519 (RFC 7748, draft-ietf-tls-rfc4492bis-07).
    This curve is disabled by default as it is still on specification status. It

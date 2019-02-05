@@ -1,7 +1,7 @@
 This directory contains self-tests based on NIST's old X.509 test
 vectors, downloaded (2007-02-13) from:
 
-http://csrc.nist.gov/pki/testing/x509paths_old.html
+https://csrc.nist.gov/pki/testing/x509paths_old.html
 
 6c42afd89f6e9ebe330bf5f361b837840c132bf5  x509tests.tgz
 92d43f0f24b15e9e2d42af8f0c4caffc78d94ad1  certpath1.07.zip
