@@ -71,7 +71,7 @@ Documentation License''.
 @node Preface
 @chapter Preface
 
-This manual describes the @uref{http://www.gnu.org/software/guile/,
+This manual describes the @uref{https://www.gnu.org/software/guile/,
 GNU Guile} Scheme programming interface to GnuTLS, which is distributed
 as part of @uref{http://gnutls.org,GnuTLS}.  The reader is
 assumed to have basic knowledge of the protocol and library.  Details

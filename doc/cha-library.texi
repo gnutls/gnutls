@@ -78,7 +78,7 @@ Several parts of GnuTLS require ASN.1 functionality, which is provided by
 a library called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
 want to install it separately (e.g., to make it possibly to use
 libtasn1 in other programs), you can get it from
-@url{http://www.gnu.org/software/libtasn1/}.
+@url{https://www.gnu.org/software/libtasn1/}.
 
 The compression library, @code{libz}, the PKCS #11 helper library @code{p11-kit},
 the TPM library @code{trousers}, as well as the IDN library @code{libidn}@footnote{Needed

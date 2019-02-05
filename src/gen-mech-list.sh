@@ -15,7 +15,7 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 HEADER=`pkg-config --cflags-only-I p11-kit-1|awk '{print $1}'|sed 's/-I//g'`
 HEADER="${HEADER}/p11-kit/pkcs11.h"

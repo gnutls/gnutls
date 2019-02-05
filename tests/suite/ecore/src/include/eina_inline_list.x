@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library;
- * if not, see <http://www.gnu.org/licenses/>.
+ * if not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef EINA_LIST_INLINE_H_

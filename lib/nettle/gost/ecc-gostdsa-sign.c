@@ -27,7 +27,7 @@
 
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
-   not, see http://www.gnu.org/licenses/.
+   not, see https://www.gnu.org/licenses/.
 */
 
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */

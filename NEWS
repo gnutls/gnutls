@@ -4910,7 +4910,7 @@ trusting that name.  Thanks for report and analysis from Martin von
 Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 
 Any updates with more details about this vulnerability will be added
-to <http://www.gnu.org/software/gnutls/security.html>
+to <https://www.gnu.org/software/gnutls/security.html>
 
 ** libgnutls: Fix namespace issue with version symbols.
 The symbols LIBGNUTLS_VERSION, LIBGNUTLS_VERSION_MAJOR,
@@ -5068,7 +5068,7 @@ GNUTLS_VERIFY_DISABLE_TIME_CHECKS, that can be used to disable the new
 behaviour.
 
 More details about the vulnerabilities will be posted at
-<http://www.gnu.org/software/gnutls/security.html>.
+<https://www.gnu.org/software/gnutls/security.html>.
 
 ** gnutls-cli, gnutls-cli-debug: Fix AIX build problem.
 Reported by LAUPRETRE François (P) <francois.laupretre@ratp.fr> in
@@ -5185,7 +5185,7 @@ trusting that name.  Thanks for report and analysis from Martin von
 Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 
 Any updates with more details about this vulnerability will be added
-to <http://www.gnu.org/software/gnutls/security.html>
+to <https://www.gnu.org/software/gnutls/security.html>
 
 ** libgnutls: Add missing prototype for gnutls_srp_set_prime_bits.
 Reported by Kevin Quick <quick@sparq.org> in
@@ -5602,7 +5602,7 @@ trusting that name.  Thanks for report and analysis from Martin von
 Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 
 Any updates with more details about this vulnerability will be added
-to <http://www.gnu.org/software/gnutls/security.html>
+to <https://www.gnu.org/software/gnutls/security.html>
 
 ** libgnutls: Fix buffer overrun in gnutls_x509_crt_list_import.
 Report and patch by Jonathan Manktelow.
@@ -5643,7 +5643,7 @@ can happen for re-handshakes, the library would crash because it tried
 to hash some data using a libgcrypt handle that had been deallocated.
 Report and tiny patch from Tomas Mraz <tmraz@redhat.com>.  Any updates
 with more details about this vulnerability will be added to
-<http://www.gnu.org/software/gnutls/security.html>
+<https://www.gnu.org/software/gnutls/security.html>
 
 ** libgnutls: Fix memory leaks when doing a re-handshake.
 Reported by Sam Varshavchik <mrsam@courier-mta.com> in
@@ -5952,7 +5952,7 @@ Thanks to CERT-FI for finding the bugs and providing detailed reports,
 which allowed the bugs to be reproduced and fixed easily.  Patches
 developed by Simon Josefsson and Nikos Mavrogiannopoulos.  Any updates
 with more details about these vulnerabilities will be added to
-<http://www.gnu.org/software/gnutls/security.html>
+<https://www.gnu.org/software/gnutls/security.html>
 
 *** [GNUTLS-SA-2008-1-1]
 *** libgnutls: Fix crash when sending invalid server name.
@@ -6364,7 +6364,7 @@ Thanks to CERT-FI for finding the bugs and providing detailed reports,
 which allowed the bugs to be reproduced and fixed easily.  Patches
 developed by Simon Josefsson and Nikos Mavrogiannopoulos.  Any updates
 with more details about these vulnerabilities will be added to
-<http://www.gnu.org/software/gnutls/security.html>
+<https://www.gnu.org/software/gnutls/security.html>
 
 *** [GNUTLS-SA-2008-1-1]
 *** libgnutls: Fix crash when sending invalid server name.
@@ -7865,7 +7865,7 @@ This enables 'make distcheck' to succeed.
 Reported by Daniel Black <dragonheart@gentoo.org>.
 
 ** Fix a crash (strcmp() on a NULL value) in the certificate verification logic.
-See http://www.gnu.org/software/gnutls/security.html regardging
+See https://www.gnu.org/software/gnutls/security.html regardging
 GNUTLS-SA-2006-2 for more up to date information.  Reported by
 satyakumar <satyam_kkd@hyd.hellosoft.com>.
 
@@ -7938,7 +7938,7 @@ known at this point whether the crash can be triggered without the
 special local CA certificate, and thus turn this into a remote crash
 of clients that verify server certificates when they talk to a server
 with the special server certificate.  See GNUTLS-SA-2006-2 on
-http://www.gnu.org/software/gnutls/security.html for more up to date
+https://www.gnu.org/software/gnutls/security.html for more up to date
 information.  Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
 
 ** Change SRP and Cert-Type extensions to match IANA registry.
@@ -8583,7 +8583,7 @@ LIBGNUTLS_VERSION_NUMBER: New CPP symbols, indicating the GnuTLS
 - Added self test that tests anonymous TLS client and server.
 - Added self tests of Nettle and generic crypto layer.
 - Added API reference manual in HTML format in doc/reference/ using GTK-DOC.
-  Online version at <http://www.gnu.org/software/gnutls/reference/>.
+  Online version at <https://www.gnu.org/software/gnutls/reference/>.
 - Assume C89 or better; removed checks for size_t, ptrdiff_t and time_t.
 - Man pages for API functions are included.
 
