@@ -165,7 +165,7 @@ A good name for the identifier would be GNUTLS_EXTENSION_FOOBAR. If the
 extension that you are implementing is an extension that is officially
 registered by IANA then it is recommended to use its official name such
 that the extension can be correctly identified by other developers. Check
-with @url{http://www.iana.org/assignments/tls-extensiontype-values}
+with @url{https://www.iana.org/assignments/tls-extensiontype-values}
 for registered extensions.
 
 @subsubheading Register the extension in @code{lib/hello_ext.c}.

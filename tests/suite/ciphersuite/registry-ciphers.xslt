@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- saxonb-xslt http://www.iana.org/assignments/tls-parameters/tls-parameters.xml registry-ciphers.xslt > registry-ciphers.js -->
+<!-- saxonb-xslt https://www.iana.org/assignments/tls-parameters/tls-parameters.xml registry-ciphers.xslt > registry-ciphers.js -->
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:iana="http://www.iana.org/assignments"
+        xmlns:iana="https://www.iana.org/assignments"
 >
 
         <xsl:output method="text" omit-xml-declaration="yes" encoding="UTF-8"/>

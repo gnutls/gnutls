@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="tls-parameters.xsl"?>
 <?oxygen RNGSchema="tls-parameters.rng" type="xml"?>
-<registry xmlns="http://www.iana.org/assignments" id="tls-parameters">
+<registry xmlns="https://www.iana.org/assignments" id="tls-parameters">
   <title>Transport Layer Security (TLS) Parameters</title>
   <category>Transport Layer Security (TLS)</category>
   <created>2005-08-23</created>
