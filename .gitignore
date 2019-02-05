@@ -3,6 +3,7 @@
 AUTHORS
 ABOUT-NLS
 aclocal.m4
+aminclude_static.am
 autom4te.cache/
 build/
 /build-aux
@@ -250,6 +251,7 @@ lib/x509/x509-api.texi
 *.lo
 *.log
 m4/*
+!m4/ax_*
 !m4/hooks.m4
 /maint.mk
 Makefile
