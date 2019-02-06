@@ -24,10 +24,7 @@
 #include "gnutls_int.h"
 #include "ip.h"
 #include <gnutls/x509.h>
-
-#ifdef HAVE_INET_NTOP
-# include <arpa/inet.h>
-#endif
+#include <arpa/inet.h>
 
 /*-
  * _gnutls_mask_to_prefix:
