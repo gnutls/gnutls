@@ -238,6 +238,11 @@ gnutls_record_overhead_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
+ip_utils_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl	\
+	$(NETTLE_CFLAGS)
+
 endif
 
 fips_mode_pthread_LDADD = $(LDADD) -lpthread

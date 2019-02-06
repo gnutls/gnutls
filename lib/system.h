@@ -107,21 +107,4 @@ void _gnutls_global_set_gettime_function(gnutls_gettime_func gettime_func);
 int gnutls_system_global_init(void);
 void gnutls_system_global_deinit(void);
 
-#ifndef _WIN32
-# if defined(HAVE_NETINET_IN_H)
-#  include <netinet/in.h>
-# endif
-# include <arpa/inet.h>
-#else
-# undef inet_aton
-# define inet_aton _gnutls_inet_aton
-int inet_aton(const char *cp, struct in_addr *inp);
-#endif
-
-#ifndef HAVE_INET_PTON
-# undef inet_pton
-# define inet_pton _gnutls_inet_pton
-int inet_pton(int af, const char *src, void *dst);
-#endif
-
 #endif				/* SYSTEM_H */

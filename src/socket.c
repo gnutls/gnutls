@@ -33,15 +33,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#ifndef _WIN32
-# include <arpa/inet.h>
-#else
-# undef endservent
-# define endservent()
-#endif
+#include <arpa/inet.h>
 #include <socket.h>
 #include <c-ctype.h>
 #include "sockets.h"
+
+#ifdef _WIN32
+# undef endservent
+# define endservent()
+#endif
 
 #define MAX_BUF 4096
 
