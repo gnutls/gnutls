@@ -301,7 +301,7 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork setitimer inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid localtime mmap explicit_bzero],,)
+AC_CHECK_FUNCS([fork setitimer inet_pton getrusage getpwuid_r nanosleep daemon getpid localtime mmap explicit_bzero],,)
 dnl Manually check some functions by including headers first. On macOS, you
 dnl normally only have the latest SDK available, containing all existing
 dnl functions, but having them restricted according to target version in
