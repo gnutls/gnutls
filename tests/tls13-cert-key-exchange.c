@@ -138,5 +138,48 @@ void doit(void)
 			GNUTLS_E_AGAIN, GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY,
 			&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, &cli_ca3_cert, &cli_ca3_key);
 
+	try_with_key_fail("TLS 1.3 with rsa encryption cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3",
+			GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
+			&server_ca3_localhost_rsa_decrypt_cert, &server_ca3_key, NULL, NULL);
+
+	try_with_key_fail("TLS 1.3 and TLS 1.2 with rsa encryption cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
+			GNUTLS_E_SUCCESS, GNUTLS_E_SUCCESS,
+			&server_ca3_localhost_rsa_decrypt_cert, &server_ca3_key, NULL, NULL);
+
+	try_with_key_fail("TLS 1.3 with (forced) rsa encryption cert - client should detect",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:%DEBUG_ALLOW_KEY_USAGE_VIOLATIONS",
+			GNUTLS_E_AGAIN, GNUTLS_E_KEY_USAGE_VIOLATION,
+			&server_ca3_localhost_rsa_decrypt_cert, &server_ca3_key, NULL, NULL);
+
+	try_with_key_fail("TLS 1.3 with client rsa encryption cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3",
+			GNUTLS_E_AGAIN, GNUTLS_E_INSUFFICIENT_CREDENTIALS,
+			&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, &server_ca3_localhost_rsa_decrypt_cert, &server_ca3_key);
+
+	try_with_key_fail("TLS 1.3 with (forced) client rsa encryption cert - server should detect",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:%DEBUG_ALLOW_KEY_USAGE_VIOLATIONS",
+			GNUTLS_E_KEY_USAGE_VIOLATION, GNUTLS_E_SUCCESS,
+			&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, &server_ca3_localhost_rsa_decrypt_cert, &server_ca3_key);
+
+	try_with_rawpk_key_fail("rawpk TLS 1.3 with rsa encryption cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:+CTYPE-RAWPK",
+			GNUTLS_E_NO_CIPHER_SUITES, GNUTLS_E_AGAIN,
+			&rawpk_public_key1, &rawpk_private_key1, GNUTLS_KEY_KEY_ENCIPHERMENT, NULL, NULL, 0);
+
+	try_with_rawpk_key_fail("rawpk TLS 1.3 and TLS 1.2 with rsa encryption cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+CTYPE-RAWPK",
+			GNUTLS_E_SUCCESS, GNUTLS_E_SUCCESS,
+			&rawpk_public_key1, &rawpk_private_key1, GNUTLS_KEY_KEY_ENCIPHERMENT, NULL, NULL, 0);
+
+	try_with_rawpk_key_fail("rawpk TLS 1.3 with client rsa encryption cert",
+			"NORMAL:-VERS-ALL:+VERS-TLS1.3:+CTYPE-RAWPK",
+			GNUTLS_E_AGAIN, GNUTLS_E_INSUFFICIENT_CREDENTIALS,
+			&rawpk_public_key2, &rawpk_private_key2, 0, &rawpk_public_key1, &rawpk_private_key1, GNUTLS_KEY_KEY_ENCIPHERMENT);
+
+	/* we do not test TLS 1.3 with (forced) rsa encryption cert - client should detect, because
+	 * there is no way under raw public keys for the client or server  to know the intended type. */
+
 	gnutls_global_deinit();
 }

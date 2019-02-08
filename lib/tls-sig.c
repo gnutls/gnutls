@@ -40,8 +40,7 @@
 #include <x509/common.h>
 #include <abstract_int.h>
 
-static
-int check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage, unsigned our_cert)
+int _gnutls_check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage, unsigned our_cert)
 {
 	const char *lstr;
 	unsigned allow_key_usage_violation;
@@ -192,7 +191,7 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-	ret = check_key_usage_for_sig(session, key_usage, 1);
+	ret = _gnutls_check_key_usage_for_sig(session, key_usage, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -336,7 +335,7 @@ _gnutls_handshake_verify_data(gnutls_session_t session,
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-	ret = check_key_usage_for_sig(session, key_usage, 0);
+	ret = _gnutls_check_key_usage_for_sig(session, key_usage, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -497,7 +496,7 @@ _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-	ret = check_key_usage_for_sig(session, key_usage, 0);
+	ret = _gnutls_check_key_usage_for_sig(session, key_usage, 0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -708,7 +707,7 @@ _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-	ret = check_key_usage_for_sig(session, key_usage, 1);
+	ret = _gnutls_check_key_usage_for_sig(session, key_usage, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

@@ -1566,9 +1566,9 @@ inline static size_t max_user_send_size(gnutls_session_t session,
  *
  * This function is made static inline for optimization reasons.
  */
-static inline gnutls_certificate_type_t
+inline static gnutls_certificate_type_t
 get_certificate_type(gnutls_session_t session,
-								gnutls_ctype_target_t target)
+		     gnutls_ctype_target_t target)
 {
 	switch (target) {
 		case GNUTLS_CTYPE_CLIENT:

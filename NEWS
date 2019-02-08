@@ -5,6 +5,18 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.7 (unreleased)
+
+** libgnutls: enforce key usage limitations on certificates more actively.
+   Previously we would enforce it for TLS1.2 protocol, now we enforce it
+   even when TLS1.3 is negotiated, or on client certificates as well. When
+   an inappropriate for TLS1.3 certificate is seen on the credentials structure
+   GnuTLS will disable TLS1.3 support for that session (#690).
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.6 (released 2019-01-25)
 
 ** libgnutls: gnutls_pubkey_import_ecc_raw() was fixed to set the number bits
