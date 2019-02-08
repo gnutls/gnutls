@@ -52,6 +52,7 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 {
 	ssize_t new_size;
 	ssize_t data_size = _data_size;
+	const version_entry_st *vers;
 
 	DECR_LEN(data_size, 2);
 	if (data_size != 0)
@@ -83,8 +84,14 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 	_gnutls_handshake_log("EXT[%p]: record_size_limit %u negotiated\n",
 			      session, (unsigned)new_size);
 
+	/* subtract 1 octet for content type */
+	vers = get_version(session);
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 	session->security_parameters.max_record_recv_size =
-		MIN(new_size, session->security_parameters.max_record_send_size);
+		MIN(new_size - vers->tls13_sem,
+		    session->security_parameters.max_record_send_size);
 
 	return 0;
 }
@@ -96,20 +103,40 @@ _gnutls_record_size_limit_send_params(gnutls_session_t session,
 				      gnutls_buffer_st * extdata)
 {
 	int ret;
+	uint16_t send_size;
 
 	assert(session->security_parameters.max_record_send_size >= 64 &&
 	       session->security_parameters.max_record_send_size <=
 	       DEFAULT_MAX_RECORD_SIZE);
 
+	send_size = session->security_parameters.max_record_send_size;
+
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		const version_entry_st *vers;
+
 		/* if we had received the extension and rejected, don't send it */
 		if (session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_RECEIVED &&
 		    !(session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED))
 			return gnutls_assert_val(0);
+
+		/* add 1 octet for content type */
+		vers = get_version(session);
+		if (unlikely(vers == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		send_size += vers->tls13_sem;
+	} else {
+		const version_entry_st *vers;
+
+		/* add 1 octet for content type */
+		vers = _gnutls_version_max(session);
+		if (unlikely(vers == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		send_size += vers->tls13_sem;
 	}
 
-	ret = _gnutls_buffer_append_prefix(extdata, 16,
-					   session->security_parameters.max_record_send_size);
+	ret = _gnutls_buffer_append_prefix(extdata, 16, send_size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
