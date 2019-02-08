@@ -240,8 +240,7 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
  * @size: is the new size
  *
  * This function sets the maximum record packet size in this
- * connection.  This property can only be set to clients.  The server
- * may choose not to accept the requested size.
+ * connection.
  *
  * The requested record size does get in effect immediately only while
  * sending data. The receive part will take effect after a successful
@@ -255,14 +254,14 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
  * 512 and 16384.  Note that not all TLS implementations use or even
  * understand those extension.
  *
+ * In TLS 1.3, the value is the length of plaintext content plus its
+ * padding, excluding content type octet.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
 ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 {
-	if (session->security_parameters.entity == GNUTLS_SERVER)
-		return GNUTLS_E_INVALID_REQUEST;
-
 	if (size < MIN_RECORD_SIZE || size > DEFAULT_MAX_RECORD_SIZE)
 		return GNUTLS_E_INVALID_REQUEST;
 

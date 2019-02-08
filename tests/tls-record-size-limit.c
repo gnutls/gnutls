@@ -52,9 +52,10 @@
 
 #define HANDSHAKE_SESSION_ID_POS 34
 
-static size_t max_record_size;
+static size_t server_max_send_size;
+static size_t client_max_send_size;
 
-#define SERVER_PUSH_ADD if (len > max_record_size + 5+32) fail("max record set to %d, len: %d\n", (int)max_record_size, (int)len);
+#define SERVER_PUSH_ADD if (len > server_max_send_size + 5+32) fail("max record set to %d, len: %d\n", (int)server_max_send_size, (int)len);
 #include "eagain-common.h"
 
 #include "cert-common.h"
@@ -136,22 +137,23 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 #define MAX_BUF 16384
 static char buffer[MAX_BUF];
 
-struct test_ext_st {
+struct test_exp_st {
+	int error;
+	size_t size;
 	bool max_record_size;
 	bool record_size_limit;
 };
 
 struct test_st {
 	const char *prio;
-	size_t max_size;
+	size_t server_max_size;
+	size_t client_max_size;
 
-	int expect_error;
-	size_t expect_size;
-	struct test_ext_st expect_server_ext;
-	struct test_ext_st expect_client_ext;
+	struct test_exp_st server_exp;
+	struct test_exp_st client_exp;
 };
 
-static void check_exts(const struct test_ext_st *exp,
+static void check_exts(const struct test_exp_st *exp,
 		       struct handshake_cb_data_st *data)
 {
 	if (exp->max_record_size && !data->found_max_record_size)
@@ -198,6 +200,15 @@ static void start(const struct test_st *test)
 				serverx509cred);
 
 	gnutls_priority_set_direct(server, test->prio, NULL);
+
+	ret = gnutls_record_set_max_size(server, test->server_max_size);
+	if (ret != test->server_exp.error)
+		fail("server: unexpected error from gnutls_record_set_max_size()");
+	if (ret == 0)
+		server_max_send_size = test->server_max_size;
+	else
+		server_max_send_size = MAX_BUF;
+
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_pull_timeout_function(server,
@@ -233,13 +244,13 @@ static void start(const struct test_st *test)
 	if (ret < 0)
 		exit(1);
 
-	ret = gnutls_record_set_max_size(client, test->max_size);
-	if (ret != test->expect_error)
-		fail("unexpected error from gnutls_record_set_max_size()");
+	ret = gnutls_record_set_max_size(client, test->client_max_size);
+	if (ret != test->client_exp.error)
+		fail("client: unexpected error from gnutls_record_set_max_size()");
 	if (ret == 0)
-		max_record_size = test->max_size;
+		client_max_send_size = test->client_max_size;
 	else
-		max_record_size = MAX_BUF;
+		client_max_send_size = MAX_BUF;
 
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -256,22 +267,39 @@ static void start(const struct test_st *test)
 	HANDSHAKE(client, server);
 
 	memset(buffer, 1, sizeof(buffer));
-	ret = gnutls_record_send(server, buffer, max_record_size + 1);
+	ret = gnutls_record_send(server, buffer, server_max_send_size + 1);
 	if (ret < 0) {
 		gnutls_perror(ret);
 		exit(1);
 	}
-	if (ret != (int)test->expect_size)
-		fail("unexpected record size sent: %d (%d)\n",
-		     ret, (int)test->expect_size);
-	success("did not send a %d-byte packet\n", (int)max_record_size + 1);
+	if (ret != (int)test->server_exp.size)
+		fail("server: unexpected record size sent: %d (%d)\n",
+		     ret, (int)test->server_exp.size);
+	success("server: did not send a %d-byte packet\n", (int)server_max_send_size + 1);
 
-	ret = gnutls_record_send(server, buffer, max_record_size);
+	ret = gnutls_record_send(server, buffer, server_max_send_size);
 	if (ret < 0) {
 		gnutls_perror(ret);
 		exit(1);
 	}
-	success("did send a %d-byte packet\n", (int)max_record_size);
+	success("server: did send a %d-byte packet\n", (int)server_max_send_size);
+
+	ret = gnutls_record_send(client, buffer, client_max_send_size + 1);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
+	if (ret != (int)test->client_exp.size)
+		fail("client: unexpected record size sent: %d (%d)\n",
+		     ret, (int)test->client_exp.size);
+	success("client: did not send a %d-byte packet\n", (int)client_max_send_size + 1);
+
+	ret = gnutls_record_send(client, buffer, client_max_send_size);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
+	success("client: did send a %d-byte packet\n", (int)client_max_send_size);
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
 	gnutls_bye(server, GNUTLS_SHUT_RDWR);
@@ -286,79 +314,94 @@ static void start(const struct test_st *test)
 
 	reset_buffers();
 
-	check_exts(&test->expect_server_ext,
+	check_exts(&test->server_exp,
 		   &server_handshake_cb_data);
-	check_exts(&test->expect_client_ext,
+	check_exts(&test->client_exp,
 		   &client_handshake_cb_data);
 }
 
 static const struct test_st tests[] = {
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2",
-		.max_size = 511,
-		.expect_error = GNUTLS_E_INVALID_REQUEST,
-		.expect_size = 16384,
-		.expect_server_ext = {
+		.server_max_size = 511,
+		.client_max_size = 511,
+		.server_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
 	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2",
-		.max_size = 512,
-		.expect_error = 0,
-		.expect_size = 512,
-		.expect_server_ext = {
+		.server_max_size = 512,
+		.client_max_size = 512,
+		.server_exp = {
+			.error = 0,
+			.size = 512,
 			.max_record_size = 1,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = 0,
+			.size = 512,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
 	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2",
-		.max_size = 8192,
-		.expect_error = 0,
-		.expect_size = 8192,
-		.expect_server_ext = {
+		.server_max_size = 8192,
+		.client_max_size = 8192,
+		.server_exp = {
+			.error = 0,
+			.size = 8192,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = 0,
+			.size = 8192,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
 	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2",
-		.max_size = 16384,
-		.expect_error = 0,
-		.expect_size = 16384,
-		.expect_server_ext = {
+		.server_max_size = 16384,
+		.client_max_size = 16384,
+		.server_exp = {
+			.error = 0,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = 0,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
 	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.2",
-		.max_size = 16385,
-		.expect_error = GNUTLS_E_INVALID_REQUEST,
-		.expect_size = 16384,
-		.expect_server_ext = {
+		.server_max_size = 16385,
+		.client_max_size = 16385,
+		.server_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
@@ -366,70 +409,102 @@ static const struct test_st tests[] = {
 
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
-		.max_size = 511,
-		.expect_error = GNUTLS_E_INVALID_REQUEST,
-		.expect_size = 16384,
-		.expect_server_ext = {
+		.server_max_size = 511,
+		.client_max_size = 511,
+		.server_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
-		},
+	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
-		.max_size = 512,
-		.expect_error = 0,
-		.expect_size = 512,
-		.expect_server_ext = {
+		.server_max_size = 512,
+		.client_max_size = 512,
+		.server_exp = {
+			.error = 0,
+			.size = 512,
 			.max_record_size = 1,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = 0,
+			.size = 512,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
 	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
-		.max_size = 8192,
-		.expect_error = 0,
-		.expect_size = 8192,
-		.expect_server_ext = {
+		.server_max_size = 8192,
+		.client_max_size = 8192,
+		.server_exp = {
+			.error = 0,
+			.size = 8192,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = 0,
+			.size = 8192,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
 	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
-		.max_size = 16384,
-		.expect_error = 0,
-		.expect_size = 16384,
-		.expect_server_ext = {
+		.server_max_size = 16384,
+		.client_max_size = 16384,
+		.server_exp = {
+			.error = 0,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = 0,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
 	},
 	{
 		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
-		.max_size = 16385,
-		.expect_error = GNUTLS_E_INVALID_REQUEST,
-		.expect_size = 16384,
-		.expect_server_ext = {
+		.server_max_size = 16383,
+		.client_max_size = 16384,
+		.server_exp = {
+			.error = 0,
+			.size = 16383,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		},
-		.expect_client_ext = {
+		.client_exp = {
+			.error = 0,
+			.size = 16383,
+			.max_record_size = 0,
+			.record_size_limit = 1
+		}
+	},
+	{
+		.prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
+		.server_max_size = 16385,
+		.client_max_size = 16385,
+		.server_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
+			.max_record_size = 0,
+			.record_size_limit = 1
+		},
+		.client_exp = {
+			.error = GNUTLS_E_INVALID_REQUEST,
+			.size = 16384,
 			.max_record_size = 0,
 			.record_size_limit = 1
 		}
