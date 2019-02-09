@@ -510,3 +510,24 @@ gnutls_pk_algorithm_t gnutls_ecc_curve_get_pk(gnutls_ecc_curve_t curve)
 	return ret;
 }
 
+/**
+ * _gnutls_ecc_curve_get_group:
+ * @curve: is an ECC curve
+ *
+ * Returns: the group associated with the named curve or %GNUTLS_GROUP_INVALID.
+ *
+ * Since: 3.6.11
+ */
+gnutls_group_t _gnutls_ecc_curve_get_group(gnutls_ecc_curve_t curve)
+{
+	gnutls_group_t ret = GNUTLS_GROUP_INVALID;
+
+	GNUTLS_ECC_CURVE_LOOP(
+		if (p->id == curve && p->supported && _gnutls_pk_curve_exists(p->id)) {
+			ret = p->group;
+			break;
+		}
+	);
+
+	return ret;
+}
