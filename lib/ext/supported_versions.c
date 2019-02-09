@@ -63,7 +63,10 @@ supported_versions_recv_params(gnutls_session_t session,
 	int ret;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		const version_entry_st *old_vers;
+
 		vers = _gnutls_version_max(session);
+		old_vers = get_version(session);
 
 		/* do not parse this extension when we haven't TLS1.3
 		 * enabled. That is because we cannot handle earlier protocol
@@ -97,6 +100,18 @@ supported_versions_recv_params(gnutls_session_t session,
 
 				_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
 						      session, (int)major, (int)minor);
+
+				vers = get_version(session);
+				if (old_vers != vers) {
+					/* regenerate the random value to set
+					 * downgrade sentinel if necessary
+					 */
+					ret = _gnutls_gen_server_random(session,
+									vers->id);
+					if (ret < 0)
+						return gnutls_assert_val(ret);
+				}
+
 				return 0;
 			}
 		}
