@@ -76,7 +76,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	str.c str-unicode.c str-idna.c state.c cert-cred-x509.c file.c supplemental.c	\
 	random.c crypto-api.c crypto-api.h privkey.c pcert.c pubkey.c locks.c dtls.c \
 	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
-	safe-memfuncs.c system/inet_pton.c atfork.c atfork.h randomart.c \
+	safe-memfuncs.c atfork.c atfork.h randomart.c \
 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
