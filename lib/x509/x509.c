@@ -338,7 +338,7 @@ static int compare_sig_algorithm(gnutls_x509_crt_t cert)
 		return ret;
 	}
 
-	ret = _gnutls_x509_read_value(cert->cert, "signatureAlgorithm.parameters", &sp2);
+	ret = _gnutls_x509_read_value(cert->cert, "tbsCertificate.signature.parameters", &sp2);
 	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
 		empty2 = 1;
 	} else if (ret < 0) {
