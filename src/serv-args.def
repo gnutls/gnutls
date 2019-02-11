@@ -51,7 +51,7 @@ flag = {
 flag = {
     name      = maxearlydata;
     arg-type  = number;
-    arg-range = "1->4294967296";
+    arg-range = "1->4294967295";
     descrip   = "The maximum early data size to accept";
     doc      = "";
 };
