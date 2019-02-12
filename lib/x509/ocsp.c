@@ -162,7 +162,6 @@ void gnutls_ocsp_resp_deinit(gnutls_ocsp_resp_t resp)
 		asn1_delete_structure(&resp->basicresp);
 
 	resp->resp = NULL;
-	resp->response_type_oid.data = NULL;
 	resp->basicresp = NULL;
 
 	gnutls_free(resp->der.data);
@@ -299,7 +298,6 @@ gnutls_ocsp_resp_import2(gnutls_ocsp_resp_t resp,
 		}
 
 		gnutls_free(resp->der.data);
-		resp->der.data = NULL;
 	}
 
 	resp->init = 1;
@@ -1668,18 +1666,12 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 
 	return GNUTLS_E_SUCCESS;
  fail:
-	if (issuer_name_hash) {
+	if (issuer_name_hash)
 		gnutls_free(issuer_name_hash->data);
-		issuer_name_hash->data = NULL;
-	}
-	if (issuer_key_hash) {
+	if (issuer_key_hash)
 		gnutls_free(issuer_key_hash->data);
-		issuer_key_hash->data = NULL;
-	}
-	if (serial_number) {
+	if (serial_number)
 		gnutls_free(serial_number->data);
-		serial_number->data = NULL;
-	}
 	return ret;
 }
 
@@ -1955,7 +1947,6 @@ gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_t resp,
 		}
 
 		gnutls_free(c.data);
-		c.data = NULL;
 	}
 
 	tmpcerts[ctr] = NULL;

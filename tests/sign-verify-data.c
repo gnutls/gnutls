@@ -153,7 +153,6 @@ void doit(void)
 
 		/* test the raw interface */
 		gnutls_free(signature.data);
-		signature.data = NULL;
 
 		gnutls_free(signature.data);
 		gnutls_x509_crt_deinit(crt);

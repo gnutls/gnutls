@@ -464,9 +464,8 @@ void _gnutls_hello_ext_deinit(void)
 			continue;
 
 		if (extfunc[i]->free_struct != 0) {
-			gnutls_free((void*)extfunc[i]->name);
-			gnutls_free((void*)extfunc[i]);
-			extfunc[i] = NULL;
+			gnutls_free(((hello_ext_entry_st *)extfunc[i])->name);
+			gnutls_free(extfunc[i]);
 		}
 	}
 }

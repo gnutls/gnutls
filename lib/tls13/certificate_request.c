@@ -152,7 +152,6 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 			return gnutls_assert_val(ret);
 
 		gnutls_free(session->internals.post_handshake_cr_context.data);
-		session->internals.post_handshake_cr_context.data = NULL;
 		ret = _gnutls_set_datum(&session->internals.post_handshake_cr_context,
 					context.data, context.size);
 		if (ret < 0)
@@ -279,7 +278,6 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 			}
 
 			gnutls_free(session->internals.post_handshake_cr_context.data);
-			session->internals.post_handshake_cr_context.data = NULL;
 			ret = _gnutls_set_datum(&session->internals.post_handshake_cr_context,
 						rnd, sizeof(rnd));
 			if (ret < 0) {

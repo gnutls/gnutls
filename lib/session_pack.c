@@ -574,8 +574,6 @@ unpack_certificate_auth_info(gnutls_session_t session,
 
 		gnutls_free(info->raw_certificate_list);
 		gnutls_free(info->raw_ocsp_list);
-		info->raw_certificate_list = NULL;
-		info->raw_ocsp_list = NULL;
 	}
 
 	return ret;

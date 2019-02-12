@@ -537,8 +537,6 @@ void gnutls_pk_params_release(gnutls_pk_params_st * p)
 	}
 	gnutls_free(p->raw_priv.data);
 	gnutls_free(p->raw_pub.data);
-	p->raw_priv.data = NULL;
-	p->raw_pub.data = NULL;
 
 	p->params_nr = 0;
 }

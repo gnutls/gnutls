@@ -692,7 +692,6 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx,
 
 		ret = gnutls_pkcs7_add_attr(&info->signed_attrs, oid, &tmp, 0);
 		gnutls_free(tmp.data);
-		tmp.data = NULL;
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -730,7 +729,6 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx,
 		ret =
 		    gnutls_pkcs7_add_attr(&info->unsigned_attrs, oid, &tmp, 0);
 		gnutls_free(tmp.data);
-		tmp.data = NULL;
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -842,9 +840,7 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 		}
 
 		gnutls_free(tmp.data);
-		tmp.data = NULL;
 		gnutls_free(tmp2.data);
-		tmp2.data = NULL;
 	}
 
 	if (msg_digest_ok)
@@ -1087,7 +1083,6 @@ static gnutls_x509_crt_t find_verified_issuer_of(gnutls_pkcs7_t pkcs7,
 			gnutls_x509_crt_deinit(issuer);
 			issuer = NULL;
 			gnutls_free(tmp.data);
-			tmp.data = NULL;
 			continue;
 		}
 
@@ -1204,7 +1199,6 @@ static gnutls_x509_crt_t find_child_of_with_serial(gnutls_pkcs7_t pkcs7,
 				gnutls_x509_crt_deinit(crt);
 				crt = NULL;
 				gnutls_free(tmpdata.data);
-				tmpdata.data = NULL;
 				continue;
 			}
 		} else {

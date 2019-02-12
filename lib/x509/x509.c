@@ -386,7 +386,6 @@ static int cache_alt_names(gnutls_x509_crt_t cert)
 	if (ret >= 0) {
 		ret = gnutls_x509_ext_import_subject_alt_names(&tmpder, cert->san, 0);
 		gnutls_free(tmpder.data);
-		tmpder.data = NULL;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -3684,7 +3683,6 @@ gnutls_x509_crt_list_import2(gnutls_x509_crt_t ** certs,
 
 	if (ret < 0) {
 		gnutls_free(*certs);
-		*certs = NULL;
 		return ret;
 	}
 
@@ -4316,7 +4314,6 @@ gnutls_x509_crt_list_import_url(gnutls_x509_crt_t **certs,
 
 		if (gnutls_x509_crt_equals2(crts[i-1], &issuer)) {
 			gnutls_free(issuer.data);
-			issuer.data = NULL;
 			break;
 		}
 
@@ -4337,7 +4334,6 @@ gnutls_x509_crt_list_import_url(gnutls_x509_crt_t **certs,
 		}
 
 		gnutls_free(issuer.data);
-		issuer.data = NULL;
 	}
 
 	*certs = gnutls_malloc(total*sizeof(gnutls_x509_crt_t));

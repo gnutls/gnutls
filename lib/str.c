@@ -80,7 +80,7 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 		return;
 	gnutls_free(str->allocd);
 
-	str->data = str->allocd = NULL;
+	str->data = NULL;
 	str->max_length = 0;
 	str->length = 0;
 }

@@ -268,7 +268,6 @@ static void clean_pubkey(struct ck_attribute *a, unsigned a_val)
 			case CKA_EC_PARAMS:
 			case CKA_EC_POINT:
 				gnutls_free(a[i].value);
-				a[i].value = NULL;
 				break;
 		}
 	}

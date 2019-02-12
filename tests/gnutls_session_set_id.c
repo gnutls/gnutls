@@ -200,7 +200,6 @@ static void start(const char *test, unsigned try_resume)
 	gnutls_certificate_free_credentials(clientx509cred);
 
 	gnutls_free(dbdata.data);
-	dbdata.data = NULL;
 	dbdata.size = 0;
 }
 

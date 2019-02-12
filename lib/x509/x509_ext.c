@@ -1994,7 +1994,6 @@ int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 				ret =
 				    decode_user_notice(td.data, td.size, &txt);
 				gnutls_free(td.data);
-				td.data = NULL;
 
 				if (ret < 0) {
 					gnutls_assert();

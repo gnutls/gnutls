@@ -372,8 +372,6 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
 			gnutls_free(info->raw_certificate_list);
 			gnutls_free(info->raw_ocsp_list);
-			info->raw_certificate_list = NULL;
-			info->raw_ocsp_list = NULL;
 			info->ncerts = 0;
 			info->nocsp = 0;
 
@@ -390,7 +388,6 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	}
 
 	gnutls_free(session->key.auth_info);
-	session->key.auth_info = NULL;
 	session->key.auth_info_size = 0;
 	session->key.auth_info_type = 0;
 
