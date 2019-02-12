@@ -735,18 +735,6 @@ fi
 
 AM_CONDITIONAL(NEED_LIBOPTS, test "$included_libopts" = "yes")
 
-AC_CHECK_TYPE(ssize_t,
-  [
-    DEFINE_SSIZE_T="#include <sys/types.h>"
-    AC_SUBST(DEFINE_SSIZE_T)
-  ], [
-    AC_DEFINE([NO_SSIZE_T], 1, [no ssize_t type was found])
-    DEFINE_SSIZE_T="typedef int ssize_t;"
-    AC_SUBST(DEFINE_SSIZE_T)
-  ], [
-    #include <sys/types.h>
-  ])
-
 # For minitasn1.
 AC_CHECK_SIZEOF(unsigned long int, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
