@@ -227,8 +227,8 @@ int gnutls_x509_crt_init(gnutls_x509_crt_t * cert)
 	if (result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&tmp->cert);
-		gnutls_free(tmp);
 		gnutls_subject_alt_names_deinit(tmp->san);
+		gnutls_free(tmp);
 		return result;
 	}
 
