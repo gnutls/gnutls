@@ -2194,6 +2194,10 @@ extern _SYM_EXPORT gnutls_realloc_function gnutls_realloc;
 extern _SYM_EXPORT gnutls_calloc_function gnutls_calloc;
 extern _SYM_EXPORT gnutls_free_function gnutls_free;
 
+#ifdef GNUTLS_INTERNAL_BUILD
+#define gnutls_free(a) gnutls_free((void *) (a)), a=NULL
+#endif
+
 extern _SYM_EXPORT char *(*gnutls_strdup) (const char *);
 
 /* a variant of memset that doesn't get optimized out */
