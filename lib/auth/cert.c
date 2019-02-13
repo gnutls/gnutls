@@ -327,7 +327,7 @@ find_rawpk_client_cert(gnutls_session_t session,
 static int
 get_issuers_num(gnutls_session_t session, const uint8_t * data, ssize_t data_size)
 {
-	int issuers_dn_len = 0, result;
+	int issuers_dn_len = 0;
 	unsigned size;
 
 	/* Count the number of the given issuers;
@@ -338,34 +338,23 @@ get_issuers_num(gnutls_session_t session, const uint8_t * data, ssize_t data_siz
 	if (data_size == 0 || data == NULL)
 		return 0;
 
-	if (data_size > 0)
-		do {
-			/* This works like DECR_LEN()
-			 */
-			result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			DECR_LENGTH_COM(data_size, 2, goto error);
-			size = _gnutls_read_uint16(data);
+	while (data_size > 0) {
+		/* This works like DECR_LEN()
+		 */
+		DECR_LENGTH_RET(data_size, 2, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+		size = _gnutls_read_uint16(data);
 
-			result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			DECR_LENGTH_COM(data_size, size, goto error);
+		DECR_LENGTH_RET(data_size, size, GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-			data += 2;
+		data += 2;
 
-			if (size > 0) {
-				issuers_dn_len++;
-				data += size;
-			}
-
-			if (data_size == 0)
-				break;
-
+		if (size > 0) {
+			issuers_dn_len++;
+			data += size;
 		}
-		while (1);
+	}
 
 	return issuers_dn_len;
-
- error:
-	return result;
 }
 
 /* Returns the issuers in the server's certificate request
@@ -990,7 +979,6 @@ cleanup:
 
 int _gnutls_proc_crt(gnutls_session_t session, uint8_t * data, size_t data_size)
 {
-	int ret;
 	gnutls_certificate_credentials_t cred;
 	gnutls_certificate_type_t cert_type;
 
@@ -1014,8 +1002,6 @@ int _gnutls_proc_crt(gnutls_session_t session, uint8_t * data, size_t data_size)
 		default:
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
-
-	return ret;
 }
 
 /* Checks if we support the given signature algorithm
