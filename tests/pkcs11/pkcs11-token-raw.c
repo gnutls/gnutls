@@ -57,6 +57,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
+#define TOKEN_NAME "whatever"
 void doit(void)
 {
 	int ret;
@@ -94,31 +95,37 @@ void doit(void)
 	}
 
 	{
-		static const char url[] = "pkcs11:token=whatever";
+		static const char url[] = "pkcs11:token="TOKEN_NAME;
 
 		/* Testing a too small buffer */
 		size_t size = 1;
 		char *buf = gnutls_malloc(size);
+		assert(buf != NULL);
 		ret = gnutls_pkcs11_token_get_info(url,
 			GNUTLS_PKCS11_TOKEN_LABEL,
 			buf, &size);
 		assert(ret == GNUTLS_E_SHORT_MEMORY_BUFFER);
+		assert(size == strlen(TOKEN_NAME)+1);
 
 		/* Testing a too small buffer by one */
 		size -= 1;
 		buf = gnutls_realloc(buf, size);
+		assert(buf != NULL);
 		ret = gnutls_pkcs11_token_get_info(url,
 			GNUTLS_PKCS11_TOKEN_LABEL,
 			buf, &size);
 		assert(ret == GNUTLS_E_SHORT_MEMORY_BUFFER);
+		assert(size == strlen(TOKEN_NAME)+1);
 
 		/* Testing an exactly fitting buffer */
 		buf = gnutls_realloc(buf, size);
+		assert(buf != NULL);
 		ret = gnutls_pkcs11_token_get_info(url,
 			GNUTLS_PKCS11_TOKEN_LABEL,
 			buf, &size);
 		assert(ret == 0);
-		assert(strcmp(buf, "whatever") == 0);
+		assert(strcmp(buf, TOKEN_NAME) == 0);
+		assert(size == strlen(TOKEN_NAME));
 
 		gnutls_free(buf);
 	}
