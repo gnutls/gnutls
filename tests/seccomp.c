@@ -26,6 +26,9 @@
 #include <seccomp.h>
 #include <errno.h>
 #include <string.h>
+#if defined(__linux__)
+#  include <sys/syscall.h>
+#endif
 
 int disable_system_calls(void)
 {
@@ -70,7 +73,9 @@ int disable_system_calls(void)
 
 	/* to read from /dev/urandom */
 	ADD_SYSCALL(read, 0);
+#ifdef SYS_getrandom
 	ADD_SYSCALL(getrandom, 0);
+#endif
 
 	/* we use it in select */
 	ADD_SYSCALL(sigprocmask, 0);
