@@ -2475,7 +2475,6 @@ gnutls_pkcs11_token_get_info(const char *url,
 {
 	struct p11_kit_uri *info = NULL;
 	const uint8_t *str;
-	size_t str_max;
 	char *temp_str = NULL;
 	size_t len;
 	int ret;
@@ -2491,19 +2490,19 @@ gnutls_pkcs11_token_get_info(const char *url,
 	switch (ttype) {
 	case GNUTLS_PKCS11_TOKEN_LABEL:
 		str = p11_kit_uri_get_token_info(info)->label;
-		str_max = 32;
+		len = p11_kit_space_strlen(str, 32);
 		break;
 	case GNUTLS_PKCS11_TOKEN_SERIAL:
 		str = p11_kit_uri_get_token_info(info)->serial_number;
-		str_max = 16;
+		len = p11_kit_space_strlen(str, 16);
 		break;
 	case GNUTLS_PKCS11_TOKEN_MANUFACTURER:
 		str = p11_kit_uri_get_token_info(info)->manufacturer_id;
-		str_max = 32;
+		len = p11_kit_space_strlen(str, 32);
 		break;
 	case GNUTLS_PKCS11_TOKEN_MODEL:
 		str = p11_kit_uri_get_token_info(info)->model;
-		str_max = 16;
+		len = p11_kit_space_strlen(str, 16);
 		break;
 	case GNUTLS_PKCS11_TOKEN_MODNAME: {
 		struct find_token_modname tn;
@@ -2518,11 +2517,12 @@ gnutls_pkcs11_token_get_info(const char *url,
 		}
 
 		temp_str = tn.modname;
-		if (temp_str == NULL) {
-			gnutls_assert();
-			str_max = 0;
-		} else {
+		if (temp_str) {
 			str = (uint8_t *)temp_str;
+			len = strlen(temp_str);
+		} else {
+			gnutls_assert();
+			len = 0;
 		}
 		break;
 	}
@@ -2532,26 +2532,16 @@ gnutls_pkcs11_token_get_info(const char *url,
 		goto cleanup;
 	}
 
-	if (temp_str)
-		len = strlen(temp_str);
-	else if (str_max == 0)
-		len = 0;
-	else
-		len = p11_kit_space_strlen(str, str_max);
-
-	if (len + 1 > *output_size) {
+	if (len < *output_size) {
+		if (len)
+			memcpy(output, str, len);
+		((char *) output)[len] = '\0';
+		*output_size = len;
+		ret = 0;
+	} else {
 		*output_size = len + 1;
 		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
-		goto cleanup;
 	}
-
-	if (len)
-		memcpy(output, str, len);
-	((char *) output)[len] = '\0';
-
-	*output_size = len;
-
-	ret = 0;
 
  cleanup:
 	free(temp_str);
