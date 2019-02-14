@@ -13,6 +13,10 @@ See the end for copying conditions.
    an inappropriate for TLS1.3 certificate is seen on the credentials structure
    GnuTLS will disable TLS1.3 support for that session (#690).
 
+** libgnutls: enforce the equality of the two signature parameters fields in
+   a certificate. We were already enforcing the signature algorithm, but there
+   was a bug in parameter checking code.
+
 ** API and ABI modifications:
 No changes since last version.
 

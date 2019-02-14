@@ -35,8 +35,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	templates/template-generalized.tmpl data/privkey1.pem data/privkey2.pem data/privkey3.pem \
 	data/name-constraints-ip.pem data/cert-invalid-utf8.der data/very-long-dn.pem \
 	data/provable3072.pem data/provable2048.pem data/provable-dsa2048.pem \
-	data/provable-dsa2048-fips.pem templates/template-crq.tmpl \
-	templates/template-unique.tmpl data/template-unique.pem \
+	data/provable-dsa2048-fips.pem templates/template-crq.tmpl data/invalid-sig5.pem \
+	templates/template-unique.tmpl data/template-unique.pem data/invalid-sig4.pem \
 	templates/template-othername.tmpl data/template-othername.pem \
 	templates/template-othername-xmpp.tmpl data/template-othername-xmpp.pem \
 	templates/template-krb5name.tmpl data/crl-demo1.pem data/crl-demo2.pem data/crl-demo3.pem \
