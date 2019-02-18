@@ -64,7 +64,6 @@ unset_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *, unsi
 static void unset_resumed_ext_data(gnutls_session_t session, const struct hello_ext_entry_st *, unsigned idx);
 
 static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
-	[GNUTLS_EXTENSION_MAX_RECORD_SIZE] = &ext_mod_max_record_size,
 	[GNUTLS_EXTENSION_EXT_MASTER_SECRET] = &ext_mod_ext_master_secret,
 	[GNUTLS_EXTENSION_SUPPORTED_VERSIONS] = &ext_mod_supported_versions,
 	[GNUTLS_EXTENSION_POST_HANDSHAKE] = &ext_mod_post_handshake,
@@ -95,9 +94,10 @@ static hello_ext_entry_st const *extfunc[MAX_EXT_TYPES+1] = {
 #ifdef ENABLE_ALPN
 	[GNUTLS_EXTENSION_ALPN] = &ext_mod_alpn,
 #endif
+	[GNUTLS_EXTENSION_RECORD_SIZE_LIMIT] = &ext_mod_record_size_limit,
+	[GNUTLS_EXTENSION_MAX_RECORD_SIZE] = &ext_mod_max_record_size,
 	[GNUTLS_EXTENSION_PSK_KE_MODES] = &ext_mod_psk_ke_modes,
 	[GNUTLS_EXTENSION_PRE_SHARED_KEY] = &ext_mod_pre_shared_key,
-	[GNUTLS_EXTENSION_RECORD_SIZE_LIMIT] = &ext_mod_record_size_limit,
 	/* This must be the last extension registered.
 	 */
 	[GNUTLS_EXTENSION_DUMBFW] = &ext_mod_dumbfw,

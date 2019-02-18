@@ -159,7 +159,7 @@ typedef struct hello_ext_entry_st {
 inline static unsigned
 _gnutls_hello_ext_is_present(gnutls_session_t session, extensions_t id)
 {
-	if (id != 0 && ((1 << id) & session->internals.used_exts))
+	if ((1 << id) & session->internals.used_exts)
 		return 1;
 
 	return 0;

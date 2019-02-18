@@ -1547,6 +1547,15 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		goto begin;
 	}
 
+	if (_mbuffer_get_udata_size(decrypted) > max_decrypted_size(session)) {
+		_gnutls_audit_log
+		    (session, "Received packet with illegal length: %u\n",
+		     (unsigned int) ret);
+
+		ret = gnutls_assert_val(GNUTLS_E_RECORD_OVERFLOW);
+		goto sanity_check_error;
+	}
+
 #ifdef ENABLE_SSL2
 	if (record.v2) {
 		decrypted->htype = GNUTLS_HANDSHAKE_CLIENT_HELLO_V2;

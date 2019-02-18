@@ -52,6 +52,7 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 {
 	ssize_t new_size;
 	ssize_t data_size = _data_size;
+	const version_entry_st *vers;
 
 	DECR_LEN(data_size, 2);
 	if (data_size != 0)
@@ -62,19 +63,35 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 	if (new_size < 64)
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	/* we do not want to accept sizes less than our minimum */
-	if (new_size < MIN_RECORD_SIZE)
-		return 0;
+	session->internals.hsk_flags |= HSK_RECORD_SIZE_LIMIT_RECEIVED;
+
+	/* we do not want to accept sizes outside of our supported range */
+	if (new_size < MIN_RECORD_SIZE) {
+		/* for server, reject it by omitting the extension in the reply */
+		if (session->security_parameters.entity == GNUTLS_SERVER) {
+			_gnutls_handshake_log("EXT[%p]: client requested too small record_size_limit %u; ignoring\n",
+					      session, (unsigned)new_size);
+			return gnutls_assert_val(0);
+		} else {
+			_gnutls_handshake_log("EXT[%p]: server requested too small record_size_limit %u; closing the connection\n",
+					      session, (unsigned)new_size);
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+		}
+	}
 
 	session->internals.hsk_flags |= HSK_RECORD_SIZE_LIMIT_NEGOTIATED;
 
-	/* if a larger record size limit than the protocol limit is
-	 * provided by the peer, ignore it and stick to the default */
-	if (unlikely(new_size > DEFAULT_MAX_RECORD_SIZE))
-		return gnutls_assert_val(0);
+	_gnutls_handshake_log("EXT[%p]: record_size_limit %u negotiated\n",
+			      session, (unsigned)new_size);
 
-	session->security_parameters.max_record_send_size = new_size;
-	session->security_parameters.max_record_recv_size = new_size;
+	/* subtract 1 octet for content type */
+	vers = get_version(session);
+	if (unlikely(vers == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	session->security_parameters.max_record_recv_size =
+		MIN(new_size - vers->tls13_sem,
+		    session->security_parameters.max_record_send_size);
 
 	return 0;
 }
@@ -86,15 +103,44 @@ _gnutls_record_size_limit_send_params(gnutls_session_t session,
 				      gnutls_buffer_st * extdata)
 {
 	int ret;
+	uint16_t send_size;
 
 	assert(session->security_parameters.max_record_send_size >= 64 &&
 	       session->security_parameters.max_record_send_size <=
 	       DEFAULT_MAX_RECORD_SIZE);
 
-	ret = _gnutls_buffer_append_prefix(extdata, 16,
-					   session->security_parameters.max_record_send_size);
+	send_size = session->security_parameters.max_record_send_size;
+
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		const version_entry_st *vers;
+
+		/* if we had received the extension and rejected, don't send it */
+		if (session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_RECEIVED &&
+		    !(session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED))
+			return gnutls_assert_val(0);
+
+		/* add 1 octet for content type */
+		vers = get_version(session);
+		if (unlikely(vers == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		send_size += vers->tls13_sem;
+	} else {
+		const version_entry_st *vers;
+
+		/* add 1 octet for content type */
+		vers = _gnutls_version_max(session);
+		if (unlikely(vers == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		send_size += vers->tls13_sem;
+	}
+
+	ret = _gnutls_buffer_append_prefix(extdata, 16, send_size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	session->internals.hsk_flags |= HSK_RECORD_SIZE_LIMIT_SENT;
 
 	return 2;
 }
