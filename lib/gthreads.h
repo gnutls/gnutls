@@ -26,6 +26,8 @@
 # include <threads.h>
 #elif defined(__GNUC__)
 # define _Thread_local __thread
+#elif defined(_MSC_VER)
+# define _Thread_local __declspec(thread)
 #else
 # error Unsupported platform
 #endif
