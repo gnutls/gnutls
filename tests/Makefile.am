@@ -41,7 +41,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ed25519.pem certs/cert-ed25519.pem \
 	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
 	rsa-md5-collision/README safe-renegotiation/README starttls-smtp.txt starttls-ftp.txt \
-	starttls-lmtp.txt starttls-pop3.txt starttls-nntp.txt starttls-sieve.txt \
+	starttls-lmtp.txt starttls-pop3.txt starttls-xmpp.txt starttls-nntp.txt starttls-sieve.txt \
 	rsa-md5-collision/colliding-chain-md5-2.pem rsa-md5-collision/colliding-chain-md5-1.pem \
 	ocsp-tests/certs/ocsp-amazon.com.der ocsp-tests/certs/chain-amazon.com.pem \
 	ocsp-tests/certs/chain-amazon.com-unsorted.pem cipher-neg-common.c \
@@ -461,7 +461,7 @@ dtls_stress_LDADD = $(COMMON_GNUTLS_LDADD) \
 	$(COMMON_DEPS_LDADD)
 
 dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
-	starttls-lmtp.sh starttls-pop3.sh starttls-nntp.sh starttls-sieve.sh \
+	starttls-lmtp.sh starttls-pop3.sh starttls-xmpp.sh starttls-nntp.sh starttls-sieve.sh \
 	ocsp-tests/ocsp-tls-connection ocsp-tests/ocsp-must-staple-connection \
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
