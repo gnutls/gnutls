@@ -434,7 +434,11 @@ int load_dir_certs(const char *dirname,
 	struct _tdirent *d;
 	gnutls_datum_t utf16 = {NULL, 0};
 
-	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16);
+#ifdef WORDS_BIGENDIAN
+	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 1);
+#else
+	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 0);
+#endif
 	if (r < 0)
 		return gnutls_assert_val(r);
 	dirp = _topendir((_TCHAR*)utf16.data);
