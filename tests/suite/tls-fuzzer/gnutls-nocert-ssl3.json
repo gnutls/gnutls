@@ -18,7 +18,7 @@
          },
          {"name" : "test-export-ciphers-rejected.py",
           "comment" : "we negotiate AES even in SSL3.0",
-          "arguments" : ["--ssl3", "-p", "@PORT@"] },
+          "arguments" : ["-p", "@PORT@"] },
          {"name" : "test-client-compatibility.py",
           "arguments" : ["-p", "@PORT@", "18: IE 6 on XP",
                          "52: YandexBot 3.0 on unknown",
