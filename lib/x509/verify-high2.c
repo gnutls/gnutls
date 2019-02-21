@@ -400,13 +400,11 @@ int load_dir_certs(const char *dirname,
 
 	dirp = opendir(dirname);
 	if (dirp != NULL) {
-		do {
-			d = readdir(dirp);
-			if (d != NULL
+		while ((d = readdir(dirp)) != NULL) {
 #ifdef _DIRENT_HAVE_D_TYPE
-				&& (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
+				if (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
 #endif
-			) {
+			{
 				snprintf(path, sizeof(path), "%s/%s",
 					 dirname, d->d_name);
 
@@ -425,7 +423,6 @@ int load_dir_certs(const char *dirname,
 					r += ret;
 			}
 		}
-		while (d != NULL);
 		closedir(dirp);
 	}
 #else /* _WIN32 */
