@@ -45,6 +45,10 @@
 # endif
 #endif
 
+#ifdef _WIN32
+# include <tchar.h>
+#endif
+
 /* Convenience functions for verify-high functionality 
  */
 
@@ -386,21 +390,21 @@ int load_dir_certs(const char *dirname,
 			  unsigned int tl_flags, unsigned int tl_vflags,
 			  unsigned type, unsigned crl)
 {
-	DIR *dirp;
-	struct dirent *d;
 	int ret;
 	int r = 0;
 	char path[GNUTLS_PATH_MAX];
 
+#if !defined(_WIN32) || !defined(_UNICODE)
+	DIR *dirp;
+	struct dirent *d;
+
 	dirp = opendir(dirname);
 	if (dirp != NULL) {
-		do {
-			d = readdir(dirp);
-			if (d != NULL
+		while ((d = readdir(dirp)) != NULL) {
 #ifdef _DIRENT_HAVE_D_TYPE
-				&& (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
+				if (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
 #endif
-			) {
+			{
 				snprintf(path, sizeof(path), "%s/%s",
 					 dirname, d->d_name);
 
@@ -419,10 +423,50 @@ int load_dir_certs(const char *dirname,
 					r += ret;
 			}
 		}
-		while (d != NULL);
 		closedir(dirp);
 	}
+#else /* _WIN32 */
 
+	_TDIR *dirp;
+	struct _tdirent *d;
+	gnutls_datum_t utf16 = {NULL, 0};
+
+#ifdef WORDS_BIGENDIAN
+	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 1);
+#else
+	r = _gnutls_utf8_to_ucs2(dirname, strlen(dirname), &utf16, 0);
+#endif
+	if (r < 0)
+		return gnutls_assert_val(r);
+	dirp = _topendir((_TCHAR*)utf16.data);
+	gnutls_free(utf16.data);
+	if (dirp != NULL) {
+		while ((d = _treaddir(dirp)) != NULL) {
+#ifdef _DIRENT_HAVE_D_TYPE
+			if (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
+#endif
+			{
+				snprintf(path, sizeof(path), "%s/%ls",
+					dirname, d->d_name);
+
+				if (crl != 0) {
+					ret =
+					    gnutls_x509_trust_list_add_trust_file
+					    (list, NULL, path, type, tl_flags,
+					     tl_vflags);
+				} else {
+					ret =
+					    gnutls_x509_trust_list_add_trust_file
+					    (list, path, NULL, type, tl_flags,
+					     tl_vflags);
+				}
+				if (ret >= 0)
+					r += ret;
+			}
+		}
+		_tclosedir(dirp);
+	}
+#endif /* _WIN32 */
 	return r;
 }
 

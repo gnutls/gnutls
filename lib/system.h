@@ -100,7 +100,7 @@ int _gnutls_find_config_path(char *path, size_t max_size);
 int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 			 gnutls_datum_t * output, unsigned bigendian);
 int _gnutls_utf8_to_ucs2(const void *data, size_t size,
-			 gnutls_datum_t * output);
+			 gnutls_datum_t * output, unsigned be);
 
 void _gnutls_global_set_gettime_function(gnutls_gettime_func gettime_func);
 

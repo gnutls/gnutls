@@ -117,9 +117,8 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 	return ret;
 }
 
-/* This is big-endian output only */
 int _gnutls_utf8_to_ucs2(const void *data, size_t size,
-			 gnutls_datum_t * output)
+			 gnutls_datum_t * output, unsigned be)
 {
 	int ret;
 	size_t dstlen, nrm_size = 0, tmp_size = 0;
@@ -150,7 +149,7 @@ int _gnutls_utf8_to_ucs2(const void *data, size_t size,
 	}
 
 	/* convert to BE */
-	change_u16_endianness(dst, (uint8_t*)tmp_dst, dstlen, 1);
+	change_u16_endianness(dst, (uint8_t*)tmp_dst, dstlen, be);
 	dst[dstlen] = 0;
 	dst[dstlen+1] = 0;
 
