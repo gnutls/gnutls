@@ -89,6 +89,8 @@ static void client(int fd)
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
 	gnutls_datum_t srandom;
+	unsigned try = 0;
+	gnutls_datum_t session_data = { NULL, 0 };
 
 	global_init();
 
@@ -102,6 +104,7 @@ static void client(int fd)
 					    &cli_ca3_key,
 					    GNUTLS_X509_FMT_PEM);
 
+ retry:
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT);
@@ -111,6 +114,9 @@ static void client(int fd)
 	ret = gnutls_priority_set_direct(session, PRIO, NULL);
 	if (ret < 0)
 		fail("cannot set TLS priorities\n");
+
+	if (try > 0)
+		gnutls_session_set_data(session, session_data.data, session_data.size);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -128,6 +134,9 @@ static void client(int fd)
 	if (ret < 0) {
 		fail("error in handshake: %s\n", gnutls_strerror(ret));
 	}
+
+	if (try > 0)
+		assert(gnutls_session_is_resumed(session));
 
 	gnutls_session_get_random(session, NULL, &srandom);
 
@@ -147,9 +156,27 @@ static void client(int fd)
 		fail("unexpected random data for %s\n", name);
 	}
 
-	close(fd);
+	do {
+		ret = gnutls_record_send(session, "\x00", 1);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (try == 0) {
+		ret = gnutls_session_get_data2(session, &session_data);
+		if (ret < 0)
+			fail("couldn't retrieve session data: %s\n",
+			     gnutls_strerror(ret));
+	}
 
 	gnutls_deinit(session);
+
+	if (try == 0) {
+		try++;
+		goto retry;
+	}
+
+	close(fd);
+
+	gnutls_free(session_data.data);
 
 	gnutls_certificate_free_credentials(x509_cred);
 
@@ -162,6 +189,9 @@ static void server(int fd)
 	int ret;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
+	gnutls_datum_t skey;
+	unsigned try = 0;
+	unsigned char buf[16];
 
 	/* this must be called once in the program
 	 */
@@ -177,6 +207,9 @@ static void server(int fd)
 					    &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
+	assert(gnutls_session_ticket_key_generate(&skey) >= 0);
+
+ retry:
 	gnutls_init(&session, GNUTLS_SERVER);
 
 	gnutls_handshake_set_timeout(session, 20 * 1000);
@@ -184,6 +217,8 @@ static void server(int fd)
 	assert(gnutls_priority_set_direct(session, "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0", NULL)>=0);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+
+	assert(gnutls_session_ticket_enable_server(session, &skey) >= 0);
 
 	gnutls_transport_set_int(session, fd);
 
@@ -197,9 +232,26 @@ static void server(int fd)
 	if (ret < 0)
 		fail("error in handshake: %s\n", gnutls_strerror(ret));
 
-	close(fd);
+	if (try > 0)
+		assert(gnutls_session_is_resumed(session));
+
+	do {
+		ret = gnutls_record_recv(session, buf, sizeof(buf));
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret < 0)
+		fail("server: recv did not succeed as expected: %s\n", gnutls_strerror(ret));
+
 	gnutls_deinit(session);
 
+	if (try == 0) {
+		try++;
+		goto retry;
+	}
+
+	close(fd);
+
+	gnutls_free(skey.data);
 	gnutls_certificate_free_credentials(x509_cred);
 
 	gnutls_global_deinit();
