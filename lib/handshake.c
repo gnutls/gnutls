@@ -1526,6 +1526,11 @@ _gnutls_recv_handshake(gnutls_session_t session,
 	switch (hsk.htype) {
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO_V2:
 	case GNUTLS_HANDSHAKE_CLIENT_HELLO:
+		if (!(IS_SERVER(session))) {
+			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			goto cleanup;
+		}
+
 #ifdef ENABLE_SSL2
 		if (hsk.htype == GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)
 			ret =
@@ -1552,6 +1557,11 @@ _gnutls_recv_handshake(gnutls_session_t session,
 		break;
 
 	case GNUTLS_HANDSHAKE_SERVER_HELLO:
+		if (IS_SERVER(session)) {
+			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			goto cleanup;
+		}
+
 		ret = read_server_hello(session, hsk.data.data,
 					hsk.data.length);
 
@@ -1562,6 +1572,11 @@ _gnutls_recv_handshake(gnutls_session_t session,
 
 		break;
 	case GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST:
+		if (IS_SERVER(session)) {
+			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			goto cleanup;
+		}
+
 		ret =
 		    recv_hello_verify_request(session,
 					      hsk.data.data,
@@ -1579,6 +1594,12 @@ _gnutls_recv_handshake(gnutls_session_t session,
 	case GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST: {
 		/* hash buffer synth message is generated during hello retry parsing */
 		gnutls_datum_t hrr = {hsk.data.data, hsk.data.length};
+
+		if (IS_SERVER(session)) {
+			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+			goto cleanup;
+		}
+
 		ret =
 		    _gnutls13_recv_hello_retry_request(session,
 						       &hsk.data);
@@ -2466,10 +2487,9 @@ recv_hello_verify_request(gnutls_session_t session,
 	unsigned int nb_verifs;
 	int ret;
 
-	if (!IS_DTLS(session)
-	    || session->security_parameters.entity == GNUTLS_SERVER) {
+	if (!IS_DTLS(session)) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		return GNUTLS_E_UNEXPECTED_PACKET;
 	}
 
 	nb_verifs = ++session->internals.dtls.hsk_hello_verify_requests;
