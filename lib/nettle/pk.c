@@ -371,7 +371,6 @@ dh_cleanup:
 
 			if (_gnutls_mem_is_zero(out->data, out->size)) {
 				gnutls_free(out->data);
-				out->data = NULL;
 				gnutls_assert();
 				ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 				goto cleanup;
@@ -2254,8 +2253,6 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	params->params_nr = 0;
 	gnutls_free(params->raw_priv.data);
 	gnutls_free(params->raw_pub.data);
-	params->raw_priv.data = NULL;
-	params->raw_pub.data = NULL;
 
 	FAIL_IF_LIB_ERROR;
 	return ret;

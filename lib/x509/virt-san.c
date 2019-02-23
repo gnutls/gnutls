@@ -70,7 +70,6 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutl
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 		gnutls_free(san->data);
-		san->data = NULL;
 
 		if (othername_oid) {
 			name->othername_oid.data = (uint8_t *) othername_oid;

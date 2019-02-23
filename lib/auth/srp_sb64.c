@@ -263,7 +263,6 @@ _gnutls_sbase64_decode(char *data, size_t idata_size, uint8_t ** result)
 		tmp = decode(tmpres, datrev);
 		if (tmp < 0) {
 			gnutls_free((*result));
-			*result = NULL;
 			return tmp;
 		}
 
@@ -277,7 +276,6 @@ _gnutls_sbase64_decode(char *data, size_t idata_size, uint8_t ** result)
 		tmp = decode(tmpres, (uint8_t *) & data[i]);
 		if (tmp < 0) {
 			gnutls_free((*result));
-			*result = NULL;
 			return tmp;
 		}
 		memcpy(&(*result)[j], tmpres, tmp);

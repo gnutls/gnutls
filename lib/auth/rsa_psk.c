@@ -341,7 +341,6 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 		    ("auth_rsa_psk: Possible PKCS #1 format attack\n");
 		if (ret >= 0) {
 			gnutls_free(plaintext.data);
-			plaintext.data = NULL;
 		}
 		randomize_key = 1;
 	} else {

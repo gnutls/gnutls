@@ -302,7 +302,6 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 
  fail:
 	gnutls_free(result->data);
-	result->data = NULL;
 
  cleanup:
 	gnutls_free(pdata.data);

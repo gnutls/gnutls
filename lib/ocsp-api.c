@@ -473,7 +473,6 @@ gnutls_certificate_set_ocsp_status_request_mem(gnutls_certificate_credentials_t 
 			nresp++;
 
 			gnutls_free(der.data);
-			der.data = NULL;
 
 			p.data++;
 			p.size--;

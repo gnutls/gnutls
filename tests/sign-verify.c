@@ -206,7 +206,6 @@ void doit(void)
 
 		/* test the raw interface */
 		gnutls_free(signature.data);
-		signature.data = NULL;
 
 		if (gnutls_pubkey_get_pk_algorithm(pubkey, NULL) ==
 		    GNUTLS_PK_RSA) {

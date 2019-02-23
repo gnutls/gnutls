@@ -200,9 +200,8 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 	ret = gnutls_rnd(GNUTLS_RND_NONCE, session->key.key.data,
 			 GNUTLS_MASTER_SIZE);
 	if (ret < 0) {
-                gnutls_free(session->key.key.data);
-                session->key.key.data = NULL;
-                session->key.key.size = 0;
+		gnutls_free(session->key.key.data);
+		session->key.key.size = 0;
 		gnutls_assert();
 		return ret;
 	}

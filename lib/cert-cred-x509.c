@@ -265,7 +265,6 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 	    gnutls_pcert_import_x509_list(pcerts, unsorted, &ncerts, GNUTLS_X509_CRT_LIST_SORT);
 	if (ret < 0) {
 		gnutls_free(pcerts);
-		pcerts = NULL;
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -508,7 +507,6 @@ read_cert_url(gnutls_certificate_credentials_t res, gnutls_privkey_t key, const 
 			goto cleanup;
 		}
 		gnutls_free(t.data);
-		t.data = NULL;
 	}
 
 	ret = _gnutls_certificate_credential_append_keypair(res, key, names, ccert, count);
@@ -908,7 +906,6 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
 			while (i--)
 				gnutls_x509_crt_deinit((*crt_list)[i]);
 			gnutls_free(*crt_list);
-			*crt_list = NULL;
 
 			return gnutls_assert_val(ret);
 		}

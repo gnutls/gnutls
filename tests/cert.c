@@ -89,7 +89,6 @@ static int getnextcert(DIR **dirp, gnutls_datum_t *der, int *exp_ret)
 				*exp_ret = atoi((char*)local.data);
 				success("expecting error code %d\n", *exp_ret);
 				gnutls_free(local.data);
-				local.data = NULL;
 			}
 
 			return 0;
@@ -135,7 +134,6 @@ void doit(void)
 
 		gnutls_x509_crt_deinit(cert);
 		gnutls_free(der.data);
-		der.data = NULL;
 		der.size = 0;
 		exp_ret = -1;
 	}

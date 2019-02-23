@@ -601,7 +601,6 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
  cleanup:
 	if (ret != GNUTLS_E_UNKNOWN_CIPHER_TYPE && oid) {
 		gnutls_free(*oid);
-		*oid = NULL;
 	}
 	if (need_free)
 		_gnutls_free_datum(&_data);

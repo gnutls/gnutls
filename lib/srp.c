@@ -609,7 +609,6 @@ gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res,
 	if (res->password_conf_file == NULL) {
 		gnutls_assert();
 		gnutls_free(res->password_file);
-		res->password_file = NULL;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 

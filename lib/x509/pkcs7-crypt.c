@@ -1269,7 +1269,6 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	    _gnutls_cipher_init(&ch, ce, &dkey, &d_iv, 0);
 
 	gnutls_free(key);
-	key = NULL;
 
 	if (ret < 0) {
 		gnutls_assert();

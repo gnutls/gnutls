@@ -88,7 +88,6 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 
 	if (buf_release != 0) {
 		gnutls_free(buf);
-		buf = NULL;
 	}
 
 	if (r != NULL) {

@@ -184,7 +184,6 @@ int remove_pkcs11_url(gnutls_x509_trust_list_t list, const char *ca_file)
 {
 	if (strcmp(ca_file, list->pkcs11_token) == 0) {
 		gnutls_free(list->pkcs11_token);
-		list->pkcs11_token = NULL;
 	}
 	return 0;
 }

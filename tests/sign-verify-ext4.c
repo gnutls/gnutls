@@ -227,7 +227,6 @@ void doit(void)
 			testfail("gnutls_pubkey_verify_data2\n");
 
 		gnutls_free(signature.data);
-		signature.data = NULL;
 
 
 		if (!tests[i].data_only) {
@@ -243,7 +242,6 @@ void doit(void)
 				testfail("gnutls_pubkey_verify_hash2-1 (hashed data)\n");
 
 			gnutls_free(signature2.data);
-			signature2.data = NULL;
 		}
 
 		if (gnutls_pubkey_get_pk_algorithm(pubkey, NULL) ==

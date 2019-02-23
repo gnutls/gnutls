@@ -91,7 +91,6 @@ void doit(void)
 	for (i=0;i<obj_list_size;i++)
 		gnutls_pkcs11_obj_deinit(obj_list[i]);
 	gnutls_free(obj_list);
-	obj_list = NULL;
 	obj_list_size = 0;
 
 #ifndef _WIN32
@@ -122,7 +121,6 @@ void doit(void)
 		for (i=0;i<obj_list_size;i++)
 			gnutls_pkcs11_obj_deinit(obj_list[i]);
 		gnutls_free(obj_list);
-		obj_list = NULL;
 		obj_list_size = 0;
 	}
 #endif

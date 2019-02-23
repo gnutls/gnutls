@@ -181,7 +181,6 @@ void doit(void)
 			fail("gnutls_privkey_sign_hash\n");
 
 		gnutls_free(signature2.data);
-		signature2.data = NULL;
 
 		_gnutls_lib_simulate_error();
 		ret = gnutls_privkey_sign_hash(privkey, GNUTLS_DIG_SHA1, 0,
