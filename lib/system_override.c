@@ -55,6 +55,9 @@
  * variable that is used by GnuTLS (e.g., the application is linked to
  * msvcr71.dll and gnutls is linked to msvcrt.dll).
  *
+ * This function is unreliable if you are using the same
+ * @session in different threads for sending and receiving.
+ *
  **/
 void gnutls_transport_set_errno(gnutls_session_t session, int err)
 {

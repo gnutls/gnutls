@@ -234,11 +234,21 @@ Read-only access to objects, for example the credentials holding structures,
 is also thread-safe. 
 
 A @code{gnutls_session_t} object could also be shared by two threads, one sending,
-the other receiving. In that case however, care must be taken during key
-updates and re-handshakes to be handled only by a single thread. The termination of a session 
-should be handled, either by a single thread being active, or by the sender thread 
-using @funcref{gnutls_bye} with @code{GNUTLS_SHUT_WR} and the receiving thread 
-waiting for a return value of zero.
+the other receiving. However, care must be taken on the following use cases:
+@itemize
+@item The re-handshake process in TLS 1.2 or earlier must be handled only in
+a single thread and no other thread may be performing any operation.
+@item The flag @code{GNUTLS_AUTO_REAUTH} cannot be used safely in this mode of operation.
+@item Any other operation which may send or receive data, like key update (c.f.,
+@funcref{gnutls_session_key_update}), must not be performed while threads
+are receiving or writing.
+@item The termination of a session should be handled, either by a single thread being
+active, or by the sender thread using @funcref{gnutls_bye} with @code{GNUTLS_SHUT_WR}
+and the receiving thread waiting for a return value of zero (or timeout on
+certain servers which do not respond).
+@item The functions @funcref{gnutls_transport_set_errno} and @funcref{gnutls_record_get_direction}
+should not be relied during parallel operation.
+@end itemize
 
 For several aspects of the library (e.g., the random generator, PKCS#11
 operations), the library may utilize mutex locks (e.g., pthreads on GNU/Linux and CriticalSection on Windows)

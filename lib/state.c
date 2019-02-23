@@ -1058,7 +1058,7 @@ void
  * interrupted GnuTLS function.
  *
  * This function's output is unreliable if you are using the same
- * @session in different threads, for sending and receiving.
+ * @session in different threads for sending and receiving.
  *
  * Returns: 0 if interrupted while trying to read data, or 1 while trying to write data.
  **/
