@@ -115,7 +115,7 @@ int _gnutls13_handshake_hash_buffers_synth(gnutls_session_t session,
 /* return the remaining time in ms */
 inline static int handshake_remaining_time(gnutls_session_t session)
 {
-	struct timespec *end = &session->internals.handshake_endtime;
+	struct timespec *end = &session->internals.handshake_abs_timeout;
 
 	if (end->tv_sec || end->tv_nsec) {
 		struct timespec now;

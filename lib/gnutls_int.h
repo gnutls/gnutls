@@ -1306,8 +1306,12 @@ typedef struct {
 	/* starting time of current handshake */
 	struct timespec handshake_start_time;
 
-	/* end time of current handshake */
-	struct timespec handshake_endtime;
+	/* expected end time of current handshake (start+timeout);
+	 * this is only filled if a handshake_time_ms is set. */
+	struct timespec handshake_abs_timeout;
+
+	/* An estimation of round-trip time under TLS1.3; populated in client side only */
+	unsigned ertt;
 
 	unsigned int handshake_timeout_ms;	/* timeout in milliseconds */
 	unsigned int record_timeout_ms;	/* timeout in milliseconds */
