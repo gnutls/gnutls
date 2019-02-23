@@ -147,7 +147,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls13-rehandshake-cert gnutls_ext_raw_parse handshake-large-cert \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify sign-verify-ed25519-rfc8080 \
 	 trustdb-tofu dtls-rehandshake-anon mini-alpn mini-dtls-large \
-	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
+	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple tls-pthread \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
 	 gnutls_x509_privkey_import gnutls_x509_crt_list_import \
@@ -245,6 +245,7 @@ ip_utils_CPPFLAGS = $(AM_CPPFLAGS) \
 
 endif
 
+tls_pthread_LDADD = $(LDADD) -lpthread
 fips_mode_pthread_LDADD = $(LDADD) -lpthread
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
