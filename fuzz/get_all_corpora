@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/sh -u
 
 if ! grep -q FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION Makefile; then
   echo "The fuzzers haven't been built for fuzzing (maybe for regression testing !?)"

@@ -4,10 +4,30 @@ These are fuzzers designed for use with `libFuzzer` or `afl`. They can
 be used to run on Google's OSS-Fuzz (https://github.com/google/oss-fuzz/).
 
 The convention used here is that the initial values for each parser fuzzer
-are taken from the $NAME.in directory.
+are taken from the $NAME.in directory ($NAME is the name of the fuzzer, e.g.
+'gnutls_x509_parser_fuzzer').
 
 Crash reproducers from OSS-Fuzz are put into $NAME.repro directory for
 regression testing with top dir 'make check'.
+
+The script `get_ossfuzz_corpora` downloads the corpora from OSS-Fuzz for
+the given fuzzer. It puts those files together with the local ones and performs
+a 'merge' step to remove superfluous corpora. The next step would be to add
+changed/new corpora to the git repository.
+
+Example:
+```
+./get_ossfuzz_corpora gnutls_x509_parser_fuzzer
+git add gnutls_x509_parser_fuzzer.in/*
+git commit -a -m "Update OSS-Fuzz corpora"
+(create a branch and push if something changed)
+(create a MR)
+```
+
+Since there are quite a few fuzzers now, you can update all their corpora
+in one step with `./get_all_corpora`. Do this from time to time to stay
+in sync with OSS-Fuzz. Whenever library code or fuzzers change, there might
+me new corpora after 1-2 days.
 
 
 # Running a fuzzer using clang and libFuzzer
@@ -55,11 +75,13 @@ Code coverage reports currently work best with gcc+lcov+genhtml.
 
 In the top directory:
 ```
-cd fuzz
-make coverage-prepare
-make coverage
-xdg-open lcov/index.html
-# repeat the last two steps after changing *fuzzer.c
+./configure --enable-code-coverage --disable-doc
+make clean
+make
+make -C fuzz check
+make code-coverage-capture
+xdg-open <URI given by previous command>
+# repeat the last three steps after changing *fuzzer.c
 ```
 
 Each fuzzer target has it's own files/functions to cover, e.g.
@@ -71,4 +93,7 @@ To work on corpora for better coverage, `cd fuzz` and use e.g.
 
 # Enhancing the testsuite for issues found
 
-Each reproducer corpus should be placed into <fuzzer>.repro/.
+Whenever you fix an issue from OSS-Fuzz (or an issue found via local fuzzing)
+please download the corpus (data file) that triggers that issue and put it
+into $NAME.repro. 'git add' the file and create a commit, to avoid future
+regressions.
