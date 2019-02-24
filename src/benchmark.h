@@ -24,6 +24,9 @@
 #include <windows.h>
 #endif
 
+/* for uint64_t */
+# include <stdint.h>
+
 #if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_PROCESS_CPUTIME_ID)
 #undef gettime
 #define gettime(x) clock_gettime(CLOCK_PROCESS_CPUTIME_ID, x)
@@ -44,7 +47,7 @@ void benchmark_tls(int debug_level, int ciphers);
 
 struct benchmark_st {
 	struct timespec start;
-	unsigned long size;
+	uint64_t size;
 	sighandler_t old_handler;
 #if defined(_WIN32)
 	HANDLE wtimer;

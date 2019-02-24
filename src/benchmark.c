@@ -47,7 +47,7 @@ static void alarm_handler(int signo)
 #endif
 
 static void
-value2human(unsigned long bytes, double time, double *data, double *speed,
+value2human(uint64_t bytes, double time, double *data, double *speed,
 	    char *metric)
 {
 	if (bytes > 1000 && bytes < 1000 * 1000) {
