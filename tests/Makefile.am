@@ -163,7 +163,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \
 	 mini-dtls-record-asym key-import-export priority-set priority-set2 \
 	 pubkey-import-export sign-is-secure spki spki-abstract rsa-rsa-pss \
-	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
+	 mini-dtls-fork dtls-pthread mini-key-material x509cert-invalid \
 	 tls-ext-register tls-supplemental mini-dtls0-9 duplicate-extensions \
 	 record-retvals mini-server-name tls-etm tls-force-etm x509-cert-callback alerts \
 	 client-sign-md5-rep tls12-invalid-key-exchanges session-rdn-read \
@@ -247,7 +247,7 @@ endif
 
 tls_pthread_LDADD = $(LDADD) -lpthread
 fips_mode_pthread_LDADD = $(LDADD) -lpthread
-mini_dtls_pthread_LDADD = $(LDADD) -lpthread
+dtls_pthread_LDADD = $(LDADD) -lpthread
 rng_pthread_LDADD = $(LDADD) -lpthread
 
 memset0_CFLAGS = -DCHAR=0x0
