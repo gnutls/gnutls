@@ -36,7 +36,7 @@ We require several tools to check out and build the software, including:
 * [Perl](https://www.cpan.org/)
 * [Nettle](https://www.lysator.liu.se/~nisse/nettle/)
 * [Guile](https://www.gnu.org/software/guile/)
-* [p11-kit](https://p11-glue.freedesktop.org/p11-kit.html)
+* [p11-kit](https://p11-glue.github.io/p11-glue/p11-kit.html)
 * [gperf](https://www.gnu.org/software/gperf/)
 * [libtasn1](https://www.gnu.org/software/libtasn1/) (optional)
 * [Libidn2](https://www.gnu.org/software/libidn/#libidn2) (optional, for internationalization of DNS, IDNA 2008)

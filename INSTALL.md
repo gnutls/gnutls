@@ -41,7 +41,7 @@ The library depends on libnettle and gmplib.
 
 Optionally it may use the following libraries:
 * libtasn1: For ASN.1 parsing (a copy is included, if not found), https://www.gnu.org/software/libtasn1/
-* p11-kit: for smart card support, https://p11-glue.freedesktop.org/p11-kit.html
+* p11-kit: for smart card support, https://p11-glue.github.io/p11-glue/p11-kit.html
 * libtspi: for Trusted Platform Module (TPM) support, https://trousers.sourceforge.net/
 * libunbound: For DNSSEC/DANE support, https://unbound.net/
 * libz: For compression support, https://www.zlib.net/
