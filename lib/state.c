@@ -459,8 +459,18 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 		return ret;
 	}
 
+	ret = gnutls_mutex_init(&(*session)->internals.epoch_lock);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_mutex_deinit(&(*session)->internals.post_negotiation_lock);
+		gnutls_free(*session);
+		return ret;
+	}
+
 	ret = _gnutls_epoch_setup_next(*session, 1, NULL);
 	if (ret < 0) {
+		gnutls_mutex_deinit(&(*session)->internals.post_negotiation_lock);
+		gnutls_mutex_deinit(&(*session)->internals.epoch_lock);
 		gnutls_free(*session);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -599,8 +609,6 @@ void gnutls_deinit(gnutls_session_t session)
 	if (session == NULL)
 		return;
 
-	gnutls_mutex_deinit(&session->internals.post_negotiation_lock);
-
 	/* remove auth info firstly */
 	_gnutls_free_auth_info(session);
 
@@ -649,6 +657,9 @@ void gnutls_deinit(gnutls_session_t session)
 
 	/* overwrite any temp TLS1.3 keys */
 	gnutls_memset(&session->key.proto, 0, sizeof(session->key.proto));
+
+	gnutls_mutex_deinit(&session->internals.post_negotiation_lock);
+	gnutls_mutex_deinit(&session->internals.epoch_lock);
 
 	gnutls_free(session);
 }

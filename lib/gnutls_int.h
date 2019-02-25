@@ -1469,6 +1469,10 @@ typedef struct {
 	/* anti-replay measure for 0-RTT mode */
 	gnutls_anti_replay_t anti_replay;
 
+	/* Protects _gnutls_epoch_gc() from _gnutls_epoch_get(); these may be
+	 * called in parallel when false start is used and false start is used. */
+	void *epoch_lock;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } internals_st;
