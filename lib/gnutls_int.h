@@ -1281,6 +1281,9 @@ typedef struct {
 
 	/* A handshake process has been completed */
 	bool initial_negotiation_completed;
+	void *post_negotiation_lock; /* protects access to the variable above
+				      * in the cases where negotiation is incomplete
+				      * after gnutls_handshake() - early/false start */
 
 	/* The type of transport protocol; stream or datagram */
 	transport_t transport;

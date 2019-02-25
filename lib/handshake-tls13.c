@@ -56,6 +56,7 @@
 #include "tls13/finished.h"
 #include "tls13/key_update.h"
 #include "ext/pre_shared_key.h"
+#include "locks.h"
 
 static int generate_rms_keys(gnutls_session_t session);
 static int generate_hs_traffic_keys(gnutls_session_t session);
@@ -202,8 +203,8 @@ int _gnutls13_handshake_client(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-
-	/* explicitly reset any false start flags */
+	/* no lock of post_negotiation_lock is required here as this is not run
+	 * after handshake */
 	session->internals.recv_state = RECV_STATE_0;
 	session->internals.initial_negotiation_completed = 1;
 
@@ -577,9 +578,11 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	/* explicitly reset any false start flags */
+	/* explicitly reset any early start flags */
+	gnutls_mutex_lock(&session->internals.post_negotiation_lock);
 	session->internals.recv_state = RECV_STATE_0;
 	session->internals.initial_negotiation_completed = 1;
+	gnutls_mutex_unlock(&session->internals.post_negotiation_lock);
 
 	SAVE_TRANSCRIPT;
 
