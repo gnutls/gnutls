@@ -44,7 +44,7 @@ We require several tools to check out and build the software, including:
 * [AWK](https://www.gnu.org/software/awk/) (for make dist, pmccabe2html)
 * [bison](https://www.gnu.org/software/bison) (for datetime parser in certtool)
 * [libunbound](https://unbound.net/) (for DANE support)
-* [abi-compliance-checker](https://ispras.linuxbase.org/index.php/ABI_compliance_checker) (for make dist)
+* [abi-compliance-checker](https://lvc.github.io/abi-compliance-checker/) (for make dist)
 * [tcsd](https://trousers.sourceforge.net/) (for TPM support; optional)
 * [swtpm](https://github.com/stefanberger/swtpm) (for TPM test; optional)
 * [ncat](https://nmap.org/download.html) (for TPM test; optional)
