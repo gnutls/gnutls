@@ -668,20 +668,22 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
  * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
  * @nonce_len: The length of the nonce
- * @auth: the data to be authenticated
+ * @auth: additional data to be authenticated
  * @auth_len: The length of the data
  * @tag_size: The size of the tag to use (use zero for the default)
- * @ctext: the data to decrypt
+ * @ctext: the data to decrypt (including the authentication tag)
  * @ctext_len: the length of data to decrypt (includes tag size)
  * @ptext: the decrypted data
  * @ptext_len: the length of decrypted data (initially must hold the maximum available size)
  *
  * This function will decrypt the given data using the algorithm
- * specified by the context. This function must be provided the whole
- * data to be decrypted, including the tag, and will fail if the tag
- * verification fails.
+ * specified by the context. This function must be provided the complete
+ * data to be decrypted, including the authentication tag. On several
+ * AEAD ciphers, the authentication tag is appended to the ciphertext,
+ * though this is not a general rule. This function will fail if
+ * the tag verification fails.
  *
- * Returns: Zero or a negative error code on error.
+ * Returns: Zero or a negative error code on verification failure or other error.
  *
  * Since: 3.4.0
  **/
@@ -725,12 +727,12 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
  * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
  * @nonce_len: The length of the nonce
- * @auth: the data to be authenticated
+ * @auth: additional data to be authenticated
  * @auth_len: The length of the data
  * @tag_size: The size of the tag to use (use zero for the default)
  * @ptext: the data to encrypt
  * @ptext_len: The length of data to encrypt
- * @ctext: the encrypted data
+ * @ctext: the encrypted data including authentication tag
  * @ctext_len: the length of encrypted data (initially must hold the maximum available size, including space for tag)
  *
  * This function will encrypt the given data using the algorithm
@@ -919,12 +921,12 @@ static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
  * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
  * @nonce_len: The length of the nonce
- * @auth_iov: the data to be authenticated
+ * @auth_iov: additional data to be authenticated
  * @auth_iovcnt: The number of buffers in @auth_iov
  * @tag_size: The size of the tag to use (use zero for the default)
  * @iov: the data to be encrypted
  * @iovcnt: The number of buffers in @iov
- * @ctext: the encrypted data
+ * @ctext: the encrypted data including authentication tag
  * @ctext_len: the length of encrypted data (initially must hold the maximum available size, including space for tag)
  *
  * This function will encrypt the provided data buffers using the algorithm
