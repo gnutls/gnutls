@@ -341,7 +341,9 @@ unsigned gnutls_cipher_get_tag_size(gnutls_cipher_algorithm_t algorithm)
  * gnutls_cipher_get_iv_size:
  * @algorithm: is an encryption algorithm
  *
- * Get block size for encryption algorithm.
+ * This function returns the size of the initialization vector (IV) for the
+ * provided algorithm. For algorithms with variable size IV (e.g., AES-CCM),
+ * the returned size will be the one used by TLS.
  *
  * Returns: block size for encryption algorithm.
  *
@@ -358,7 +360,7 @@ unsigned gnutls_cipher_get_iv_size(gnutls_cipher_algorithm_t algorithm)
  * gnutls_cipher_get_key_size:
  * @algorithm: is an encryption algorithm
  *
- * Get key size for cipher.
+ * This function returns the key size of the provided algorithm.
  *
  * Returns: length (in bytes) of the given cipher's key size, or 0 if
  *   the given cipher is invalid.
