@@ -84,6 +84,8 @@ static const gnutls_alert_entry sup_alerts[] = {
 	ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
 		    N_
 		    ("No supported application protocol could be negotiated")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REQUIRED,
+		    N_("Certificate is required")),
 	{0, NULL, NULL}
 };
 

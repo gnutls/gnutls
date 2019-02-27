@@ -526,6 +526,7 @@ typedef enum {
  *   recognized.
  * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
  *   or not known.
+ * @GNUTLS_A_CERTIFICATE_REQUIRED: Certificate is required.
  * @GNUTLS_A_NO_APPLICATION_PROTOCOL: The ALPN protocol requested is
  *   not supported by the peer.
  *
@@ -562,6 +563,7 @@ typedef enum {
 	GNUTLS_A_CERTIFICATE_UNOBTAINABLE = 111,
 	GNUTLS_A_UNRECOGNIZED_NAME = 112,
 	GNUTLS_A_UNKNOWN_PSK_IDENTITY = 115,
+	GNUTLS_A_CERTIFICATE_REQUIRED = 116,
 	GNUTLS_A_NO_APPLICATION_PROTOCOL = 120,
 	GNUTLS_A_MAX = GNUTLS_A_NO_APPLICATION_PROTOCOL
 } gnutls_alert_description_t;
