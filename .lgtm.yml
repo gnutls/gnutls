@@ -1,0 +1,16 @@
+extraction:
+  cpp:
+    configure:
+      command:
+      - "./bootstrap --no-git --skip-po --no-bootstrap-sync --gnulib-srcdir=gnulib"
+      - "wget -O nettle-master.zip https://git.lysator.liu.se/nettle/nettle/-/archive/master/nettle-master.zip?foo=`date +%Y%m%d`"
+      - "unzip nettle-master.zip"
+      - "mv nettle-master nettle"
+      - "cd nettle"
+      - "bash .bootstrap"
+      - "./configure --enable-mini-gmp --disable-documentation"
+      - "make"
+      - "cd .."
+      - "PKG_CONFIG_PATH=\"`pwd`/nettle\" LDFLAGS=\"-L`pwd`/nettle\" ./configure --disable-tests --disable-documentation"
+    index:
+      build_command: "LD_LIBRARY_PATH=\"`pwd`/nettle/.lib\" make"
