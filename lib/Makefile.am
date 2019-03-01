@@ -111,11 +111,11 @@ if ENABLE_NETTLE
 SUBDIRS += nettle
 endif
 
-HFILES = abstract_int.h debug.h cipher.h	\
-	buffers.h errors.h gnutls_int.h dtls.h	\
-	handshake.h num.h algorithms.h		\
-	dh.h kx.h hash_int.h cipher_int.h	\
-	db.h auth.h hello_ext.h	\
+HFILES = abstract_int.h debug.h cipher.h	 \
+	buffers.h errors.h gnutls_int.h dtls.h	 \
+	handshake.h num.h algorithms.h		 \
+	dh.h kx.h hash_int.h cipher_int.h	 \
+	db.h auth.h hello_ext.h	handshake-defs.h \
 	x509_b64.h sslv2_compat.h datum.h \
 	mpi.h pk.h record.h		\
 	constate.h global.h tls-sig.h mem.h	\

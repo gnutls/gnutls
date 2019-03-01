@@ -62,7 +62,7 @@
 	 {"name" : "test-tls13-conversation.py",
 	  "arguments": ["-p", "@PORT@"]},
 	 {"name" : "test-tls13-count-tickets.py",
-	  "arguments": ["-p", "@PORT@", "-t", "1"]},
+	  "arguments": ["-p", "@PORT@", "-t", "2"]},
 	 {"name" : "test-tls13-dhe-shared-secret-padding.py",
 	  "comment": "We do not support x448",
 	  "arguments": ["-p", "@PORT@",
