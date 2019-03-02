@@ -1281,6 +1281,9 @@ typedef struct {
 
 	/* A handshake process has been completed */
 	bool initial_negotiation_completed;
+	void *post_negotiation_lock; /* protects access to the variable above
+				      * in the cases where negotiation is incomplete
+				      * after gnutls_handshake() - early/false start */
 
 	/* The type of transport protocol; stream or datagram */
 	transport_t transport;
@@ -1465,6 +1468,10 @@ typedef struct {
 
 	/* anti-replay measure for 0-RTT mode */
 	gnutls_anti_replay_t anti_replay;
+
+	/* Protects _gnutls_epoch_gc() from _gnutls_epoch_get(); these may be
+	 * called in parallel when false start is used and false start is used. */
+	void *epoch_lock;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

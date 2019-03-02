@@ -53,6 +53,7 @@
 #include "dtls.h"
 #include "tls13/session_ticket.h"
 #include "ext/cert_types.h"
+#include "locks.h"
 
 /* to be used by supplemental data support to disable TLS1.3
  * when supplemental data have been globally registered */
@@ -451,8 +452,25 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	if (*session == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+	ret = gnutls_mutex_init(&(*session)->internals.post_negotiation_lock);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_free(*session);
+		return ret;
+	}
+
+	ret = gnutls_mutex_init(&(*session)->internals.epoch_lock);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_mutex_deinit(&(*session)->internals.post_negotiation_lock);
+		gnutls_free(*session);
+		return ret;
+	}
+
 	ret = _gnutls_epoch_setup_next(*session, 1, NULL);
 	if (ret < 0) {
+		gnutls_mutex_deinit(&(*session)->internals.post_negotiation_lock);
+		gnutls_mutex_deinit(&(*session)->internals.epoch_lock);
 		gnutls_free(*session);
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
@@ -639,6 +657,9 @@ void gnutls_deinit(gnutls_session_t session)
 
 	/* overwrite any temp TLS1.3 keys */
 	gnutls_memset(&session->key.proto, 0, sizeof(session->key.proto));
+
+	gnutls_mutex_deinit(&session->internals.post_negotiation_lock);
+	gnutls_mutex_deinit(&session->internals.epoch_lock);
 
 	gnutls_free(session);
 }
@@ -1058,7 +1079,7 @@ void
  * interrupted GnuTLS function.
  *
  * This function's output is unreliable if you are using the same
- * @session in different threads, for sending and receiving.
+ * @session in different threads for sending and receiving.
  *
  * Returns: 0 if interrupted while trying to read data, or 1 while trying to write data.
  **/

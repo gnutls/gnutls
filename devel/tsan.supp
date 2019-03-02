@@ -1,0 +1,9 @@
+# the following is an inherent issue on gnutls_record_get_direction()
+race:_gnutls_io_write_buffered
+race:_gnutls_io_write_flush
+
+# the following is an inherent issue on gnutls_transport_set_errno()
+race:reset_errno
+
+# this updates the recv_state to states that are harmless
+race:check_session_status

@@ -39,6 +39,7 @@
 #include "secrets.h"
 #include "handshake.h"
 #include "crypto-api.h"
+#include "locks.h"
 
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof(keyexp) - 1;
@@ -906,18 +907,28 @@ _gnutls_epoch_get(gnutls_session_t session, unsigned int epoch_rel,
 	record_parameters_st **params;
 	int ret;
 
+	gnutls_mutex_lock(&session->internals.epoch_lock);
+
 	ret = epoch_resolve(session, epoch_rel, &epoch);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	params = epoch_get_slot(session, epoch);
-	if (params == NULL || *params == NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (params == NULL || *params == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
 
 	if (params_out)
 		*params_out = *params;
 
-	return 0;
+	ret = 0;
+
+cleanup:
+	gnutls_mutex_unlock(&session->internals.epoch_lock);
+	return ret;
 }
 
 /* Ensures that the next epoch is setup. When an epoch will null ciphers
@@ -1008,6 +1019,8 @@ void _gnutls_epoch_gc(gnutls_session_t session)
 
 	_gnutls_record_log("REC[%p]: Start of epoch cleanup\n", session);
 
+	gnutls_mutex_lock(&session->internals.epoch_lock);
+
 	/* Free all dead cipher state */
 	for (i = 0; i < MAX_EPOCH_INDEX; i++) {
 		if (session->record_parameters[i] != NULL) {
@@ -1049,6 +1062,8 @@ void _gnutls_epoch_gc(gnutls_session_t session)
 	if (session->record_parameters[0] != NULL)
 		session->security_parameters.epoch_min =
 		    session->record_parameters[0]->epoch;
+
+	gnutls_mutex_unlock(&session->internals.epoch_lock);
 
 	_gnutls_record_log("REC[%p]: End of epoch cleanup\n", session);
 }

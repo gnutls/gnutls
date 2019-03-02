@@ -53,6 +53,7 @@
 #include <dh.h>
 #include <random.h>
 #include <xsize.h>
+#include "locks.h"
 
 struct tls_record_st {
 	uint16_t header_size;
@@ -1694,8 +1695,7 @@ check_session_status(gnutls_session_t session, unsigned ms)
 		    !(session->internals.flags & GNUTLS_ENABLE_FALSE_START))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		/* Attempt to complete handshake */
-
+		/* Attempt to complete handshake - we only need to receive */
 		session->internals.recv_state = RECV_STATE_FALSE_START_HANDLING;
 		ret = gnutls_handshake(session);
 		if (ret < 0) {
@@ -1714,7 +1714,7 @@ check_session_status(gnutls_session_t session, unsigned ms)
 		    !(session->internals.flags & GNUTLS_ENABLE_EARLY_START))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		/* Attempt to complete handshake */
+		/* Attempt to complete handshake - we only need to receive */
 		session->internals.recv_state = RECV_STATE_EARLY_START_HANDLING;
 		ret = gnutls_handshake(session);
 		if (ret < 0) {
@@ -1987,12 +1987,23 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 
 	if (unlikely(!session->internals.initial_negotiation_completed)) {
 		/* this is to protect buggy applications from sending unencrypted
-		 * data. We allow sending however, if we are in false start handshake
-		 * state. */
-		if (session->internals.recv_state != RECV_STATE_FALSE_START &&
+		 * data. We allow sending however, if we are in false or early start
+		 * handshake state. */
+		gnutls_mutex_lock(&session->internals.post_negotiation_lock);
+
+		/* we intentionally re-check the initial_negotation_completed variable
+		 * to avoid locking during normal operation of gnutls_record_send2() */
+		if (!session->internals.initial_negotiation_completed &&
+		    session->internals.recv_state != RECV_STATE_FALSE_START &&
+		    session->internals.recv_state != RECV_STATE_FALSE_START_HANDLING &&
 		    session->internals.recv_state != RECV_STATE_EARLY_START &&
-		    !(session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT))
+		    session->internals.recv_state != RECV_STATE_EARLY_START_HANDLING &&
+		    !(session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT)) {
+
+			gnutls_mutex_unlock(&session->internals.post_negotiation_lock);
 			return gnutls_assert_val(GNUTLS_E_UNAVAILABLE_DURING_HANDSHAKE);
+		}
+		gnutls_mutex_unlock(&session->internals.post_negotiation_lock);
 	}
 
 	if (unlikely(!vers))

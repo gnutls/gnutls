@@ -55,6 +55,7 @@
 #include <dtls.h>
 #include "secrets.h"
 #include "tls13/session_ticket.h"
+#include "locks.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -1007,8 +1008,6 @@ int _gnutls_recv_finished(gnutls_session_t session)
 		session->internals.cb_tls_unique_len = data_size;
 	}
 
-
-	session->internals.initial_negotiation_completed = 1;
 
       cleanup:
 	_gnutls_buffer_clear(&buf);
@@ -3144,7 +3143,10 @@ static int handshake_client(gnutls_session_t session)
 	}
 
 	/* explicitly reset any false start flags */
+	gnutls_mutex_lock(&session->internals.post_negotiation_lock);
+	session->internals.initial_negotiation_completed = 1;
 	session->internals.recv_state = RECV_STATE_0;
+	gnutls_mutex_unlock(&session->internals.post_negotiation_lock);
 
 	return 0;
 }
@@ -3363,7 +3365,6 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 		break;
 	}
 
-
 	return 0;
 }
 
@@ -3559,6 +3560,10 @@ static int handshake_server(gnutls_session_t session)
 	default:
 		break;
 	}
+
+	/* no lock of post_negotiation_lock is required here as this is not run
+	 * after handshake */
+	session->internals.initial_negotiation_completed = 1;
 
 	return _gnutls_check_id_for_change(session);
 }
