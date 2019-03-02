@@ -1,10 +1,10 @@
 #! /bin/sh
 # Print a version string.
-scriptversion=2018-04-28.14; # UTC
+scriptversion=2019-01-04.17; # UTC
 
 # Bootstrap this package from checked-out sources.
 
-# Copyright (C) 2003-2018 Free Software Foundation, Inc.
+# Copyright (C) 2003-2019 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,6 +47,8 @@ PERL="${PERL-perl}"
 
 me=$0
 
+default_gnulib_url=git://git.sv.gnu.org/gnulib
+
 usage() {
   cat <<EOF
 Usage: $me [OPTION]...
@@ -75,6 +77,37 @@ contents are read as shell variables to configure the bootstrap.
 
 For build prerequisites, environment variables like \$AUTOCONF and \$AMTAR
 are honored.
+
+Gnulib sources can be fetched in various ways:
+
+ * If this package is in a git repository with a 'gnulib' submodule
+   configured, then that submodule is initialized and updated and sources
+   are fetched from there.  If \$GNULIB_SRCDIR is set (directly or via
+   --gnulib-srcdir) and is a git repository, then it is used as a reference.
+
+ * Otherwise, if \$GNULIB_SRCDIR is set (directly or via --gnulib-srcdir),
+   then sources are fetched from that local directory.  If it is a git
+   repository and \$GNULIB_REVISION is set, then that revision is checked
+   out.
+
+ * Otherwise, if this package is in a git repository with a 'gnulib'
+   submodule configured, then that submodule is initialized and updated and
+   sources are fetched from there.
+
+ * Otherwise, if the 'gnulib' directory does not exist, Gnulib sources are
+   cloned into that directory using git from \$GNULIB_URL, defaulting to
+   $default_gnulib_url.
+   If \$GNULIB_REVISION is set, then that revision is checked out.
+
+ * Otherwise, the existing Gnulib sources in the 'gnulib' directory are
+   used.  If it is a git repository and \$GNULIB_REVISION is set, then that
+   revision is checked out.
+
+If you maintain a package and want to pin a particular revision of the
+Gnulib sources that has been tested with your package, then there are two
+possible approaches: either configure a 'gnulib' submodule with the
+appropriate revision, or set \$GNULIB_REVISION (and if necessary
+\$GNULIB_URL) in $me.conf.
 
 Running without arguments will suffice in most cases.
 EOF
@@ -109,6 +142,9 @@ die() { warn_ "$@"; exit 1; }
 
 # Configuration.
 
+# Name of the Makefile.am
+gnulib_mk=gnulib.mk
+
 # List of gnulib modules needed.
 gnulib_modules=
 
@@ -126,18 +162,11 @@ bootstrap_post_import_hook() { :; }
 # Override it via your own definition in bootstrap.conf.
 bootstrap_epilogue() { :; }
 
-# The command to download all .po files for a specified domain into
-# a specified directory.  Fill in the first %s is the domain name, and
-# the second with the destination directory.  Use rsync's -L and -r
-# options because the latest/%s directory and the .po files within are
-# all symlinks.
+# The command to download all .po files for a specified domain into a
+# specified directory.  Fill in the first %s with the destination
+# directory and the second with the domain name.
 po_download_command_format=\
-"rsync --delete --exclude '*.s1' -Lrtvz \
- 'translationproject.org::tp/latest/%s/' '%s'"
-
-# Fallback for downloading .po files (if rsync fails).
-po_download_command_format2=\
-"wget --mirror -nd -q -np -A.po -P '%s' \
+"wget --mirror --level=1 -nd -q -A.po -P '%s' \
  https://translationproject.org/latest/%s/"
 
 # Prefer a non-empty tarname (4th argument of AC_INIT if given), else
@@ -634,9 +663,11 @@ if $use_gnulib; then
       trap cleanup_gnulib 1 2 13 15
 
       shallow=
-      git clone -h 2>&1 | grep -- --depth > /dev/null && shallow='--depth 2'
-      git clone $shallow git://git.sv.gnu.org/gnulib "$gnulib_path" ||
-        cleanup_gnulib
+      if test -z "$GNULIB_REVISION"; then
+        git clone -h 2>&1 | grep -- --depth > /dev/null && shallow='--depth 2'
+      fi
+      git clone $shallow ${GNULIB_URL:-$default_gnulib_url} "$gnulib_path" \
+        || cleanup_gnulib
 
       trap - 1 2 13 15
     fi
@@ -671,6 +702,11 @@ if $use_gnulib; then
     ;;
   esac
 
+  if test -d "$GNULIB_SRCDIR"/.git && test -n "$GNULIB_REVISION" \
+     && ! git_modules_config submodule.gnulib.url >/dev/null; then
+    (cd "$GNULIB_SRCDIR" && git checkout "$GNULIB_REVISION") || cleanup_gnulib
+  fi
+
   # $GNULIB_SRCDIR now points to the version of gnulib to use, and
   # we no longer need to use git or $gnulib_path below here.
 
@@ -698,10 +734,7 @@ download_po_files() {
   subdir=$1
   domain=$2
   echo "$me: getting translations into $subdir for $domain..."
-  cmd=$(printf "$po_download_command_format" "$domain" "$subdir")
-  eval "$cmd" && return
-  # Fallback to HTTPS.
-  cmd=$(printf "$po_download_command_format2" "$subdir" "$domain")
+  cmd=$(printf "$po_download_command_format" "$subdir" "$domain")
   eval "$cmd"
 }
 
@@ -902,13 +935,13 @@ fi
 if $use_gnulib; then
   gnulib_tool_options="\
    --no-changelog\
-   --aux-dir $build_aux\
-   --doc-base $doc_base\
-   --lib $gnulib_name\
-   --m4-base $m4_base/\
-   --source-base $source_base/\
-   --tests-base $tests_base\
-   --local-dir $local_gl_dir\
+   --aux-dir=$build_aux\
+   --doc-base=$doc_base\
+   --lib=$gnulib_name\
+   --m4-base=$m4_base/\
+   --source-base=$source_base/\
+   --tests-base=$tests_base\
+   --local-dir=$local_gl_dir\
    $gnulib_tool_option_extras\
   "
   if test $use_libtool = 1; then
@@ -929,6 +962,16 @@ fi
 
 bootstrap_post_import_hook \
   || die "bootstrap_post_import_hook failed"
+
+# Don't proceed if there are uninitialized submodules.  In particular,
+# the next step will remove dangling links, which might be links into
+# uninitialized submodules.
+#
+# Uninitialized submodules are listed with an initial dash.
+#if $use_git && git submodule | grep '^-' >/dev/null; then
+#  die "some git submodules are not initialized. "     \
+#      "Run 'git submodule init' and bootstrap again."
+#fi
 
 # Remove any dangling symlink matching "*.m4" or "*.[ch]" in some
 # gnulib-populated directories.  Such .m4 files would cause aclocal to fail.
