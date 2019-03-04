@@ -328,6 +328,10 @@ int gnutls_error_to_alert(int err, int *level)
 		ret = GNUTLS_A_UNRECOGNIZED_NAME;
 		_level = GNUTLS_AL_FATAL;
 		break;
+	case GNUTLS_E_CERTIFICATE_REQUIRED:
+		ret = GNUTLS_A_CERTIFICATE_REQUIRED;
+		_level = GNUTLS_AL_FATAL;
+		break;
 	default:
 		ret = GNUTLS_A_INTERNAL_ERROR;
 		_level = GNUTLS_AL_FATAL;

@@ -110,17 +110,17 @@ void doit(void)
 
 	gnutls_certificate_allocate_credentials(&clicred);
 	gnutls_certificate_set_retrieve_function(clicred, cert_cb1);
-	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_NO_CERTIFICATE_FOUND, -1);
+	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_CERTIFICATE_REQUIRED, -1);
 	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_certificate_allocate_credentials(&clicred);
 	gnutls_certificate_set_retrieve_function2(clicred, cert_cb2);
-	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_NO_CERTIFICATE_FOUND, -1);
+	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_CERTIFICATE_REQUIRED, -1);
 	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_certificate_allocate_credentials(&clicred);
 	gnutls_certificate_set_retrieve_function3(clicred, cert_cb3);
-	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_NO_CERTIFICATE_FOUND, -1);
+	_test_cli_serv(x509_cred, clicred, "NORMAL", "NORMAL", "localhost", NULL, NULL, NULL, 0, 1, GNUTLS_E_CERTIFICATE_REQUIRED, -1);
 	gnutls_certificate_free_credentials(clicred);
 
 	gnutls_certificate_free_credentials(x509_cred);
