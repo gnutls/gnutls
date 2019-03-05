@@ -177,13 +177,13 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 		tv.tv_sec = 10;
 		tv.tv_usec = 0;
 		ret = select(socket->fd + 1, &read_fds, NULL, NULL, &tv);
-		if (ret <= 0)
-			ret = -1;
-		else
+		if (ret > 0)
 			ret = recv(socket->fd, pbuf, left, 0);
-		if (ret == -1 || ret == 0) {
-			int e = errno;
-			fprintf(stderr, "error receiving %s: %s\n", txt, strerror(e));
+		if (ret == -1) {
+			fprintf(stderr, "error receiving '%s': %s\n", txt, strerror(errno));
+			exit(2);
+		} else if (ret == 0) {
+			fprintf(stderr, "error receiving '%s': Timeout\n", txt);
 			exit(2);
 		}
 		pbuf[ret] = 0;
@@ -204,8 +204,8 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 			p = memmem(buf, got, txt, txt_size);
 			if (p != NULL && p != buf) {
 				p--;
-				if (*p == '\n' || *p == '\r')
-				break;
+				if (*p == '\n' || *p == '\r' || (*txt == '<' && *p == '>')) // XMPP is not line oriented, uses XML format
+					break;
 			}
 		}
 	} while(got < txt_size || strncmp(buf, txt, txt_size) != 0);
