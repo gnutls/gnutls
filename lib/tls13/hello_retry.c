@@ -115,7 +115,7 @@ _gnutls13_recv_hello_retry_request(gnutls_session_t session,
 
 	/* only under TLS 1.3 */
 	if (IS_DTLS(session))
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 
 	if (session->internals.hsk_flags & HSK_HRR_RECEIVED)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
