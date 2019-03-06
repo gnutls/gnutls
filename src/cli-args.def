@@ -416,6 +416,13 @@ flag = {
     doc      = "";
 };
 
+flag = {
+    name      = logfile;
+    arg-type  = string;
+    descrip   = "Redirect informational messages to a specific file.";
+    doc       = "";
+};
+
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
   ds-format = 'texi';      // or texi or mdoc format

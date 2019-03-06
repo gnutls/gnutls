@@ -52,6 +52,7 @@
 
 const char str_unknown[] = "(unknown)";
 
+static FILE *logfile = NULL;
 /* Hex encodes the given data adding a semicolon between hex bytes.
  */
 const char *raw_to_string(const unsigned char *raw, size_t raw_size)
@@ -145,7 +146,7 @@ static void print_x509_info_compact(gnutls_session_t session, int print_crt_stat
 
 	ret = gnutls_x509_crt_print(crt, GNUTLS_CRT_PRINT_COMPACT, &cinfo);
 	if (ret == 0) {
-		printf("- X.509 cert: %s\n", cinfo.data);
+		log_msg(stdout, "- X.509 cert: %s\n", cinfo.data);
 		gnutls_free(cinfo.data);
 	}
 
@@ -249,12 +250,12 @@ int cert_verify(gnutls_session_t session, const char *hostname, const char *purp
 
 	rc = gnutls_certificate_verify_peers(session, data, elements, &status);
 	if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND) {
-		printf("- Peer did not send any certificate.\n");
+		log_msg(stdout, "- Peer did not send any certificate.\n");
 		return 0;
 	}
 
 	if (rc < 0) {
-		printf("- Could not verify certificate (err: %s)\n",
+		log_msg(stdout, "- Could not verify certificate (err: %s)\n",
 		       gnutls_strerror(rc));
 		return 0;
 	}
@@ -263,12 +264,12 @@ int cert_verify(gnutls_session_t session, const char *hostname, const char *purp
 	rc = gnutls_certificate_verification_status_print(status, type,
 							  &out, 0);
 	if (rc < 0) {
-		printf("- Could not print verification flags (err: %s)\n",
+		log_msg(stdout, "- Could not print verification flags (err: %s)\n",
 		       gnutls_strerror(rc));
 		return 0;
 	}
 
-	printf("- Status: %s\n", out.data);
+	log_msg(stdout, "- Status: %s\n", out.data);
 
 	gnutls_free(out.data);
 
@@ -298,12 +299,12 @@ print_dh_info(gnutls_session_t session, const char *str, int print)
 		return;
 	}
 
-	printf("- %sDiffie-Hellman parameters\n", str);
-	printf(" - Using prime: %d bits\n",
+	log_msg(stdout, "- %sDiffie-Hellman parameters\n", str);
+	log_msg(stdout, " - Using prime: %d bits\n",
 	       gnutls_dh_get_prime_bits(session));
-	printf(" - Secret key: %d bits\n",
+	log_msg(stdout, " - Secret key: %d bits\n",
 	       gnutls_dh_get_secret_bits(session));
-	printf(" - Peer's public key: %d bits\n",
+	log_msg(stdout, " - Peer's public key: %d bits\n",
 	       gnutls_dh_get_peers_public_bits(session));
 
 	ret = gnutls_dh_get_group(session, &raw_gen, &raw_prime);
@@ -354,7 +355,7 @@ print_dh_info(gnutls_session_t session, const char *str, int print)
 		goto out;
 	}
 
-	printf(" - PKCS#3 format:\n\n%.*s\n",
+	log_msg(stdout, " - PKCS#3 format:\n\n%.*s\n",
 	       (int) params_data_size, params_data);
 
       out:
@@ -372,12 +373,12 @@ static void print_ecdh_info(gnutls_session_t session, const char *str, int print
 	if (!print)
 		return;
 
-	printf("- %sEC Diffie-Hellman parameters\n", str);
+	log_msg(stdout, "- %sEC Diffie-Hellman parameters\n", str);
 
 	curve = gnutls_ecc_curve_get(session);
 
-	printf(" - Using curve: %s\n", gnutls_ecc_curve_get_name(curve));
-	printf(" - Curve size: %d bits\n",
+	log_msg(stdout, " - Using curve: %s\n", gnutls_ecc_curve_get_name(curve));
+	log_msg(stdout, " - Curve size: %d bits\n",
 	       gnutls_ecc_curve_get_size(curve) * 8);
 
 }
@@ -396,13 +397,13 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 	int rc;
 
 	desc = gnutls_session_get_desc(session);
-	printf("- Description: %s\n", desc);
+	log_msg(stdout, "- Description: %s\n", desc);
 	gnutls_free(desc);
 
 	/* print session ID */
 	gnutls_session_get_id(session, session_id, &session_id_size);
 	if (session_id_size > 0) {
-		printf("- Session ID: %s\n",
+		log_msg(stdout, "- Session ID: %s\n",
 		       raw_to_string(session_id, session_id_size));
 	}
 
@@ -426,7 +427,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		 * side.
 		 */
 		if (gnutls_srp_server_get_username(session) != NULL)
-			printf("- SRP authentication. Connected as '%s'\n",
+			log_msg(stdout, "- SRP authentication. Connected as '%s'\n",
 			       gnutls_srp_server_get_username(session));
 		break;
 #endif
@@ -435,12 +436,12 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		/* This returns NULL in server side.
 		 */
 		if (gnutls_psk_client_get_hint(session) != NULL)
-			printf("- PSK authentication. PSK hint '%s'\n",
+			log_msg(stdout, "- PSK authentication. PSK hint '%s'\n",
 			       gnutls_psk_client_get_hint(session));
 		/* This returns NULL in client side.
 		 */
 		if (gnutls_psk_server_get_username(session) != NULL)
-			printf("- PSK authentication. Connected as '%s'\n",
+			log_msg(stdout, "- PSK authentication. Connected as '%s'\n",
 			       gnutls_psk_server_get_username(session));
 		if (kx == GNUTLS_KX_DHE_PSK)
 			print_dh_info(session, "Ephemeral ", verbose);
@@ -449,7 +450,7 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		break;
 #endif
 	case GNUTLS_CRD_IA:
-		printf("- TLS/IA authentication\n");
+		log_msg(stdout, "- TLS/IA authentication\n");
 		break;
 	case GNUTLS_CRD_CERTIFICATE:
 		{
@@ -460,13 +461,13 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 			/* This fails in client side */
 			if (gnutls_server_name_get
 			    (session, dns, &dns_size, &type, 0) == 0) {
-				printf("- Given server name[%d]: %s\n",
+				log_msg(stdout, "- Given server name[%d]: %s\n",
 				       type, dns);
 			}
 		}
 
 		if ((flags & P_WAIT_FOR_CERT) && gnutls_certificate_get_ours(session) == 0)
-			printf("- No certificate was sent to peer\n");
+			log_msg(stdout, "- No certificate was sent to peer\n");
 
 		if (flags& P_PRINT_CERT)
 			print_cert_info(session, verbose, (flags&P_PRINT_CERT));
@@ -483,18 +484,18 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		version = gnutls_protocol_get_version(session);
 		tmp =
 		    SU(gnutls_protocol_get_name(version));
-		printf("- Version: %s\n", tmp);
+		log_msg(stdout, "- Version: %s\n", tmp);
 
 		if (version < GNUTLS_TLS1_3) {
 			tmp = SU(gnutls_kx_get_name(kx));
-			printf("- Key Exchange: %s\n", tmp);
+			log_msg(stdout, "- Key Exchange: %s\n", tmp);
 		}
 
 		if (gnutls_sign_algorithm_get(session) != GNUTLS_SIGN_UNKNOWN) {
 			tmp =
 			    SU(gnutls_sign_get_name
 			       (gnutls_sign_algorithm_get(session)));
-			printf("- Server Signature: %s\n", tmp);
+			log_msg(stdout, "- Server Signature: %s\n", tmp);
 		}
 
 		if (gnutls_sign_algorithm_get_client(session) !=
@@ -502,41 +503,41 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 			tmp =
 			    SU(gnutls_sign_get_name
 			       (gnutls_sign_algorithm_get_client(session)));
-			printf("- Client Signature: %s\n", tmp);
+			log_msg(stdout, "- Client Signature: %s\n", tmp);
 		}
 
 		tmp = SU(gnutls_cipher_get_name(gnutls_cipher_get(session)));
-		printf("- Cipher: %s\n", tmp);
+		log_msg(stdout, "- Cipher: %s\n", tmp);
 
 		tmp = SU(gnutls_mac_get_name(gnutls_mac_get(session)));
-		printf("- MAC: %s\n", tmp);
+		log_msg(stdout, "- MAC: %s\n", tmp);
 	}
 
-	printf("- Options:");
+	log_msg(stdout, "- Options:");
 	if (gnutls_session_ext_master_secret_status(session)!=0)
-		printf(" extended master secret,");
+		log_msg(stdout, " extended master secret,");
 	if (gnutls_safe_renegotiation_status(session)!=0)
-		printf(" safe renegotiation,");
+		log_msg(stdout, " safe renegotiation,");
 	if (gnutls_session_etm_status(session)!=0)
-		printf(" EtM,");
+		log_msg(stdout, " EtM,");
 #ifdef ENABLE_OCSP
 	if (gnutls_ocsp_status_request_is_checked(session, GNUTLS_OCSP_SR_IS_AVAIL)!=0) {
-		printf(" OCSP status request%s,", gnutls_ocsp_status_request_is_checked(session,0)!=0?"":"[ignored]");
+		log_msg(stdout, " OCSP status request%s,", gnutls_ocsp_status_request_is_checked(session,0)!=0?"":"[ignored]");
 	}
 #endif
-	printf("\n");
+	log_msg(stdout, "\n");
 
 #ifdef ENABLE_DTLS_SRTP
 	rc = gnutls_srtp_get_selected_profile(session, &srtp_profile);
 	if (rc == 0)
-		printf("- SRTP profile: %s\n",
+		log_msg(stdout, "- SRTP profile: %s\n",
 		       gnutls_srtp_get_profile_name(srtp_profile));
 #endif
 
 #ifdef ENABLE_ALPN
 	rc = gnutls_alpn_get_selected_protocol(session, &p);
 	if (rc == 0)
-		printf("- Application protocol: %.*s\n", p.size, p.data);
+		log_msg(stdout, "- Application protocol: %.*s\n", p.size, p.data);
 #endif
 
 	if (verbose) {
@@ -551,10 +552,10 @@ int print_info(gnutls_session_t session, int verbose, int flags)
 		else {
 			size_t i;
 
-			printf("- Channel binding 'tls-unique': ");
+			log_msg(stdout, "- Channel binding 'tls-unique': ");
 			for (i = 0; i < cb.size; i++)
-				printf("%02x", cb.data[i]);
-			printf("\n");
+				log_msg(stdout, "%02x", cb.data[i]);
+			log_msg(stdout, "\n");
 			gnutls_free(cb.data);
 		}
 	}
@@ -579,7 +580,7 @@ void print_cert_info2(gnutls_session_t session, int verbose, FILE *out, int prin
 		flag = GNUTLS_CRT_PRINT_COMPACT;
 
 	if (gnutls_certificate_client_get_request_status(session) != 0) {
-		printf("- Server has requested a certificate.\n");
+		log_msg(stdout, "- Server has requested a certificate.\n");
 		print_crt_status = 1;
 	}
 
@@ -597,7 +598,7 @@ void print_cert_info_compact(gnutls_session_t session)
 	int verbose = 0;
 
 	if (gnutls_certificate_client_get_request_status(session) != 0) {
-		printf("- Server has requested a certificate.\n");
+		log_msg(stdout, "- Server has requested a certificate.\n");
 		verbose = 1;
 	}
 
@@ -626,7 +627,7 @@ void print_list(const char *priorities, int verbose)
 	const unsigned int *list;
 
 	if (priorities != NULL) {
-		printf("Cipher suites for %s\n", priorities);
+		log_msg(stdout, "Cipher suites for %s\n", priorities);
 
 		ret = gnutls_priority_init(&pcache, priorities, &err);
 		if (ret < 0) {
@@ -652,13 +653,13 @@ void print_list(const char *priorities, int verbose)
 						     NULL, &version);
 
 			if (name != NULL)
-				printf("%-50s\t0x%02x, 0x%02x\t%s\n",
+				log_msg(stdout, "%-50s\t0x%02x, 0x%02x\t%s\n",
 				       name, (unsigned char) id[0],
 				       (unsigned char) id[1],
 				       gnutls_protocol_get_name(version));
 		}
 
-		printf("\n");
+		log_msg(stdout, "\n");
 #if 0
 		{
 			ret =
@@ -666,17 +667,17 @@ void print_list(const char *priorities, int verbose)
 								  &list,
 								  GNUTLS_CTYPE_CLIENT);
 
-			printf("Certificate types: ");
+			log_msg(stdout, "Certificate types: ");
 			if (ret == 0)
-				printf("none\n");
+				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("CTYPE-%s",
+				log_msg(stdout, "CTYPE-%s",
 				       gnutls_certificate_type_get_name
 				       (list[i]));
 				if (i + 1 != (unsigned) ret)
-					printf(", ");
+					log_msg(stdout, ", ");
 				else
-					printf("\n");
+					log_msg(stdout, "\n");
 			}
 		}
 #endif
@@ -684,64 +685,64 @@ void print_list(const char *priorities, int verbose)
 		{
 			ret = gnutls_priority_protocol_list(pcache, &list);
 
-			printf("Protocols: ");
+			log_msg(stdout, "Protocols: ");
 			if (ret == 0)
-				printf("none\n");
+				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("VERS-%s",
+				log_msg(stdout, "VERS-%s",
 				       gnutls_protocol_get_name(list[i]));
 				if (i + 1 != (unsigned) ret)
-					printf(", ");
+					log_msg(stdout, ", ");
 				else
-					printf("\n");
+					log_msg(stdout, "\n");
 			}
 		}
 
 		{
 			ret = gnutls_priority_cipher_list(pcache, &list);
 
-			printf("Ciphers: ");
+			log_msg(stdout, "Ciphers: ");
 			if (ret == 0)
-				printf("none\n");
+				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("%s",
+				log_msg(stdout, "%s",
 				       gnutls_cipher_get_name(list[i]));
 				if (i + 1 != (unsigned) ret)
-					printf(", ");
+					log_msg(stdout, ", ");
 				else
-					printf("\n");
+					log_msg(stdout, "\n");
 			}
 		}
 
 		{
 			ret = gnutls_priority_mac_list(pcache, &list);
 
-			printf("MACs: ");
+			log_msg(stdout, "MACs: ");
 			if (ret == 0)
-				printf("none\n");
+				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("%s",
+				log_msg(stdout, "%s",
 				       gnutls_mac_get_name(list[i]));
 				if (i + 1 != (unsigned) ret)
-					printf(", ");
+					log_msg(stdout, ", ");
 				else
-					printf("\n");
+					log_msg(stdout, "\n");
 			}
 		}
 
 		{
 			ret = gnutls_priority_kx_list(pcache, &list);
 
-			printf("Key Exchange Algorithms: ");
+			log_msg(stdout, "Key Exchange Algorithms: ");
 			if (ret == 0)
-				printf("none\n");
+				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("%s",
+				log_msg(stdout, "%s",
 				       gnutls_kx_get_name(list[i]));
 				if (i + 1 != (unsigned) ret)
-					printf(", ");
+					log_msg(stdout, ", ");
 				else
-					printf("\n");
+					log_msg(stdout, "\n");
 			}
 		}
 
@@ -749,33 +750,33 @@ void print_list(const char *priorities, int verbose)
 			ret =
 			    gnutls_priority_group_list(pcache, &list);
 
-			printf("Groups: ");
+			log_msg(stdout, "Groups: ");
 			if (ret == 0)
-				printf("none\n");
+				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("GROUP-%s",
+				log_msg(stdout, "GROUP-%s",
 				       gnutls_group_get_name(list[i]));
 				if (i + 1 != (unsigned) ret)
-					printf(", ");
+					log_msg(stdout, ", ");
 				else
-					printf("\n");
+					log_msg(stdout, "\n");
 			}
 		}
 
 		{
 			ret = gnutls_priority_sign_list(pcache, &list);
 
-			printf("PK-signatures: ");
+			log_msg(stdout, "PK-signatures: ");
 			if (ret == 0)
-				printf("none\n");
+				log_msg(stdout, "none\n");
 			for (i = 0; i < (unsigned) ret; i++) {
-				printf("SIGN-%s",
+				log_msg(stdout, "SIGN-%s",
 				       gnutls_sign_algorithm_get_name(list
 								      [i]));
 				if (i + 1 != (unsigned) ret)
-					printf(", ");
+					log_msg(stdout, ", ");
 				else
-					printf("\n");
+					log_msg(stdout, "\n");
 			}
 		}
 
@@ -783,99 +784,99 @@ void print_list(const char *priorities, int verbose)
 		return;
 	}
 
-	printf("Cipher suites:\n");
+	log_msg(stdout, "Cipher suites:\n");
 	for (i = 0; (name = gnutls_cipher_suite_info
 		     (i, id, &kx, &cipher, &mac, &version)); i++) {
-		printf("%-50s\t0x%02x, 0x%02x\t%s\n",
+		log_msg(stdout, "%-50s\t0x%02x, 0x%02x\t%s\n",
 		       name,
 		       (unsigned char) id[0], (unsigned char) id[1],
 		       gnutls_protocol_get_name(version));
 		if (verbose)
-			printf
-			    ("\tKey exchange: %s\n\tCipher: %s\n\tMAC: %s\n\n",
+			log_msg
+			    (stdout, "\tKey exchange: %s\n\tCipher: %s\n\tMAC: %s\n\n",
 			     gnutls_kx_get_name(kx),
 			     gnutls_cipher_get_name(cipher),
 			     gnutls_mac_get_name(mac));
 	}
 
-	printf("\n");
+	log_msg(stdout, "\n");
 	{
 		const gnutls_certificate_type_t *p =
 		    gnutls_certificate_type_list();
 
-		printf("Certificate types: ");
+		log_msg(stdout, "Certificate types: ");
 		for (; *p; p++) {
-			printf("CTYPE-%s",
+			log_msg(stdout, "CTYPE-%s",
 			       gnutls_certificate_type_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_protocol_t *p = gnutls_protocol_list();
 
-		printf("Protocols: ");
+		log_msg(stdout, "Protocols: ");
 		for (; *p; p++) {
-			printf("VERS-%s", gnutls_protocol_get_name(*p));
+			log_msg(stdout, "VERS-%s", gnutls_protocol_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_cipher_algorithm_t *p = gnutls_cipher_list();
 
-		printf("Ciphers: ");
+		log_msg(stdout, "Ciphers: ");
 		for (; *p; p++) {
-			printf("%s", gnutls_cipher_get_name(*p));
+			log_msg(stdout, "%s", gnutls_cipher_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_mac_algorithm_t *p = gnutls_mac_list();
 
-		printf("MACs: ");
+		log_msg(stdout, "MACs: ");
 		for (; *p; p++) {
-			printf("%s", gnutls_mac_get_name(*p));
+			log_msg(stdout, "%s", gnutls_mac_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_digest_algorithm_t *p = gnutls_digest_list();
 
-		printf("Digests: ");
+		log_msg(stdout, "Digests: ");
 		for (; *p; p++) {
-			printf("%s", gnutls_digest_get_name(*p));
+			log_msg(stdout, "%s", gnutls_digest_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_kx_algorithm_t *p = gnutls_kx_list();
 
-		printf("Key exchange algorithms: ");
+		log_msg(stdout, "Key exchange algorithms: ");
 		for (; *p; p++) {
-			printf("%s", gnutls_kx_get_name(*p));
+			log_msg(stdout, "%s", gnutls_kx_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
@@ -883,53 +884,53 @@ void print_list(const char *priorities, int verbose)
 		const gnutls_compression_method_t *p =
 		    gnutls_compression_list();
 
-		printf("Compression: ");
+		log_msg(stdout, "Compression: ");
 		for (; *p; p++) {
-			printf("COMP-%s", gnutls_compression_get_name(*p));
+			log_msg(stdout, "COMP-%s", gnutls_compression_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_group_t *p = gnutls_group_list();
 
-		printf("Groups: ");
+		log_msg(stdout, "Groups: ");
 		for (; *p; p++) {
-			printf("GROUP-%s", gnutls_group_get_name(*p));
+			log_msg(stdout, "GROUP-%s", gnutls_group_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_pk_algorithm_t *p = gnutls_pk_list();
 
-		printf("Public Key Systems: ");
+		log_msg(stdout, "Public Key Systems: ");
 		for (; *p; p++) {
-			printf("%s", gnutls_pk_algorithm_get_name(*p));
+			log_msg(stdout, "%s", gnutls_pk_algorithm_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 
 	{
 		const gnutls_sign_algorithm_t *p = gnutls_sign_list();
 
-		printf("PK-signatures: ");
+		log_msg(stdout, "PK-signatures: ");
 		for (; *p; p++) {
-			printf("SIGN-%s",
+			log_msg(stdout, "SIGN-%s",
 			       gnutls_sign_algorithm_get_name(*p));
 			if (*(p + 1))
-				printf(", ");
+				log_msg(stdout, ", ");
 			else
-				printf("\n");
+				log_msg(stdout, "\n");
 		}
 	}
 }
@@ -1069,16 +1070,16 @@ pin_callback(void *user, int attempt, const char *token_url,
 
 	if (flags & GNUTLS_PIN_FINAL_TRY) {
 		cache = 0;
-		printf("*** This is the final try before locking!\n");
+		log_msg(stdout, "*** This is the final try before locking!\n");
 	}
 	if (flags & GNUTLS_PIN_COUNT_LOW) {
 		cache = 0;
-		printf("*** Only few tries left before locking!\n");
+		log_msg(stdout, "*** Only few tries left before locking!\n");
 	}
 
 	if (flags & GNUTLS_PIN_WRONG) {
 		cache = 0;
-		printf("*** Wrong PIN has been provided!\n");
+		log_msg(stdout, "*** Wrong PIN has been provided!\n");
 	}
 
 	if (cache > 0 && cached_url != NULL) {
@@ -1166,7 +1167,7 @@ token_callback(void *user, const char *label, const unsigned retry)
 		fprintf(stderr, "Could not find token %s\n", label);
 		return -1;
 	}
-	printf("Please insert token '%s' in slot and press enter\n",
+	log_msg(stdout, "Please insert token '%s' in slot and press enter\n",
 	       label);
 	if (fgets(buf, sizeof(buf), stdin) == NULL) {
 		fprintf(stderr, "error reading input\n");
@@ -1199,4 +1200,24 @@ void sockets_init(void)
 #else
 	signal(SIGPIPE, SIG_IGN);
 #endif
+}
+
+
+int log_msg(FILE *file, const char *message, ...)
+{
+	va_list args;
+	int rv;
+
+	va_start(args, message);
+
+	rv = vfprintf(logfile ? logfile : file, message, args);
+
+	va_end(args);
+
+	return rv;
+}
+
+void log_set(FILE *file)
+{
+	logfile = file;
 }

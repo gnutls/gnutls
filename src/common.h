@@ -62,6 +62,9 @@ int print_info(gnutls_session_t state, int verbose, int flags);
 void print_cert_info(gnutls_session_t, int flag, int print_cert);
 void print_cert_info_compact(gnutls_session_t session);
 
+int log_msg(FILE *file, const char *message, ...) __attribute__((format(printf, 2, 3)));
+void log_set(FILE *file);
+
 void print_cert_info2(gnutls_session_t, int flag, FILE *fp, int print_cert);
 
 void print_list(const char *priorities, int verbose);

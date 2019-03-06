@@ -363,21 +363,21 @@ static int cert_verify_callback(gnutls_session_t session)
 	if (ca_verify) {
 		rc = cert_verify(session, host, GNUTLS_KP_TLS_WWW_SERVER);
 		if (rc == 0) {
-			printf
-			    ("*** PKI verification of server certificate failed...\n");
+			log_msg
+			    (stdout, "*** PKI verification of server certificate failed...\n");
 			if (!insecure && !ssh)
 				return -1;
 		} else if (ENABLED_OPT(OCSP) && gnutls_ocsp_status_request_is_checked(session, 0) == 0) {	/* off-line verification succeeded. Try OCSP */
 			rc = cert_verify_ocsp(session);
 			if (rc == -1) {
-				printf
-				    ("*** Verifying (with OCSP) server certificate chain failed...\n");
+				log_msg
+				    (stdout, "*** Verifying (with OCSP) server certificate chain failed...\n");
 				if (!insecure && !ssh)
 					return -1;
 			} else if (rc == 0)
-				printf("*** OCSP: nothing to check.\n");
+				log_msg(stdout, "*** OCSP: nothing to check.\n");
 			else
-				printf("*** OCSP: verified %d certificate(s).\n", rc);
+				log_msg(stdout, "*** OCSP: verified %d certificate(s).\n", rc);
 		}
 	}
 
@@ -518,10 +518,10 @@ cert_callback(gnutls_session_t session,
 		/* Print the server's trusted CAs
 		 */
 		if (nreqs > 0)
-			printf("- Server's trusted authorities:\n");
+			log_msg(stdout, "- Server's trusted authorities:\n");
 		else
-			printf
-			    ("- Server did not send us any trusted authorities names.\n");
+			log_msg
+			    (stdout, "- Server did not send us any trusted authorities names.\n");
 
 		/* print the names (if any) */
 		for (i = 0; i < nreqs; i++) {
@@ -530,8 +530,8 @@ cert_callback(gnutls_session_t session,
 			    gnutls_x509_rdn_get(&req_ca_rdn[i], issuer_dn,
 						&len);
 			if (ret >= 0) {
-				printf("   [%d]: ", i);
-				printf("%s\n", issuer_dn);
+				log_msg(stdout, "   [%d]: ", i);
+				log_msg(stdout, "%s\n", issuer_dn);
 			}
 		}
 	}
@@ -550,8 +550,8 @@ cert_callback(gnutls_session_t session,
 			if (x509_key != NULL) {
 				*pkey = x509_key;
 			} else {
-				printf
-				    ("- Could not find a suitable key to send to server\n");
+				log_msg
+				    (stdout, "- Could not find a suitable key to send to server\n");
 				return -1;
 			}
 
@@ -560,7 +560,7 @@ cert_callback(gnutls_session_t session,
 		}
 	}
 
-	printf("- Successfully sent %u certificate(s) to server.\n",
+	log_msg(stdout, "- Successfully sent %u certificate(s) to server.\n",
 	       *pcert_length);
 	return 0;
 
@@ -717,7 +717,7 @@ static int handle_error(socket_st * hd, int err)
 		str = gnutls_alert_get_name(alert);
 		if (str == NULL)
 			str = str_unknown;
-		printf("*** Received alert [%d]: %s\n", alert, str);
+		log_msg(stdout, "*** Received alert [%d]: %s\n", alert, str);
 	}
 
 	check_server_cmd(hd, err);
@@ -813,7 +813,7 @@ static int try_rehandshake(socket_st * hd)
 		gnutls_perror(ret);
 		return ret;
 	} else {
-		printf("- ReHandshake was completed\n");
+		log_msg(stdout, "- ReHandshake was completed\n");
 		return 0;
 	}
 }
@@ -830,7 +830,7 @@ static int try_rekey(socket_st * hd, unsigned peer)
 		fprintf(stderr, "*** Rekey has failed: %s\n", gnutls_strerror(ret));
 		return ret;
 	} else {
-		printf("- Rekey was completed\n");
+		log_msg(stdout, "- Rekey was completed\n");
 		return 0;
 	}
 }
@@ -854,13 +854,13 @@ static int try_resume(socket_st * hd)
 		hd->rdata.data = NULL;
 	}
 
-	printf("- Disconnecting\n");
+	log_msg(stdout, "- Disconnecting\n");
 	socket_bye(hd, 1);
 
 	canonicalize_host(hostname, service, sizeof(service));
 
-	printf
-	    ("\n\n- Connecting again- trying to resume previous session\n");
+	log_msg
+	    (stdout, "\n\n- Connecting again- trying to resume previous session\n");
 	if (HAVE_OPT(STARTTLS_PROTO))
 		socket_flags |= SOCKET_FLAG_STARTTLS;
 	else if (fastopen)
@@ -886,9 +886,9 @@ static int try_resume(socket_st * hd)
 	socket_open3(hd, hostname, service, OPT_ARG(STARTTLS_PROTO),
 		     socket_flags, CONNECT_MSG, &rdata, &edata);
 
-	printf("- Resume Handshake was completed\n");
+	log_msg(stdout, "- Resume Handshake was completed\n");
 	if (gnutls_session_is_resumed(hd->session) != 0)
-		printf("*** This is a resumed session\n");
+		log_msg(stdout, "*** This is a resumed session\n");
 
 	return 0;
 }
@@ -1128,11 +1128,21 @@ int main(int argc, char **argv)
 	int socket_flags = SOCKET_FLAG_DONT_PRINT_ERRORS;
 	FILE *server_fp = NULL;
 	FILE *client_fp = NULL;
+	FILE *logfile = NULL;
 #ifndef _WIN32
 	struct sigaction new_action;
 #endif
 
 	cmd_parser(argc, argv);
+
+	if (HAVE_OPT(LOGFILE)) {
+		logfile = fopen(OPT_ARG(LOGFILE), "w+");
+		if (!logfile) {
+			log_msg(stderr, "Unable to open '%s'!\n", OPT_ARG(LOGFILE));
+			exit(1);
+		}
+		log_set(logfile);
+	}
 
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(OPT_VALUE_DEBUG);
@@ -1178,7 +1188,7 @@ int main(int argc, char **argv)
 	hd.verbose = verbose;
 
 	if (hd.secure) {
-		printf("- Handshake was completed\n");
+		log_msg(stdout, "- Handshake was completed\n");
 
 		if (resume != 0)
 			if (try_resume(&hd)) {
@@ -1191,7 +1201,7 @@ int main(int argc, char **argv)
 
 	/* Warning!  Do not touch this text string, it is used by external
 	   programs to search for when gnutls-cli has reached this point. */
-	printf("\n- Simple Client Mode:\n\n");
+	log_msg(stdout, "\n- Simple Client Mode:\n\n");
 
 	if (rehandshake)
 		if (try_rehandshake(&hd)) {
@@ -1246,8 +1256,8 @@ int main(int argc, char **argv)
 			ret = socket_recv(&hd, buffer, MAX_BUF);
 
 			if (ret == 0 || (ret == GNUTLS_E_PREMATURE_TERMINATION && user_term)) {
-				printf
-				    ("- Peer has closed the GnuTLS connection\n");
+				log_msg
+				    (stdout, "- Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (handle_error(&hd, ret) < 0) {
 				fprintf(stderr,
@@ -1256,7 +1266,7 @@ int main(int argc, char **argv)
 				break;
 			} else if (ret > 0) {
 				if (verbose != 0)
-					printf("- Received[%d]: ", ret);
+					log_msg(stdout, "- Received[%d]: ", ret);
 				for (ii = 0; ii < ret; ii++) {
 					fputc(buffer[ii], stdout);
 				}
@@ -1346,7 +1356,7 @@ int main(int argc, char **argv)
 
 			if (ret > 0) {
 				if (verbose != 0)
-					printf("- Sent: %d bytes\n", ret);
+					log_msg(stdout, "- Sent: %d bytes\n", ret);
 			} else
 				handle_error(&hd, ret);
 
@@ -1364,6 +1374,10 @@ int main(int argc, char **argv)
 
  cleanup:
 	socket_bye(&hd, 0);
+	if (logfile) {
+		fclose(logfile);
+		logfile = NULL;
+	}
 
 #ifdef ENABLE_SRP
 	if (srp_cred)
@@ -1392,21 +1406,21 @@ void print_priority_list(void)
 	const char *str;
 	unsigned int lineb = 0;
 
-	printf("Priority strings in GnuTLS %s:\n", gnutls_check_version(NULL));
+	log_msg(stdout, "Priority strings in GnuTLS %s:\n", gnutls_check_version(NULL));
 
 	fputs("\t", stdout);
 	for (idx=0;;idx++) {
 		str = gnutls_priority_string_list(idx, GNUTLS_PRIORITY_LIST_INIT_KEYWORDS);
 		if (str == NULL)
 			break;
-		lineb += printf("%s ", str);
+		lineb += log_msg(stdout, "%s ", str);
 		if (lineb > 64) {
 			lineb = 0;
-			printf("\n\t");
+			log_msg(stdout, "\n\t");
 		}
 	}
 
-	printf("\n\nSpecial strings:\n");
+	log_msg(stdout, "\n\nSpecial strings:\n");
 	lineb = 0;
 	fputs("\t", stdout);
 	for (idx=0;;idx++) {
@@ -1415,13 +1429,13 @@ void print_priority_list(void)
 			break;
 		if (str[0] == 0)
 			continue;
-		lineb += printf("%%%s ", str);
+		lineb += log_msg(stdout, "%%%s ", str);
 		if (lineb > 64) {
 			lineb = 0;
-			printf("\n\t");
+			log_msg(stdout, "\n\t");
 		}
 	}
-	printf("\n");
+	log_msg(stdout, "\n");
 
 	return;
 }
@@ -1593,15 +1607,15 @@ static void check_server_cmd(socket_st * socket, int ret)
 			 * the server thinks we ignored his request.
 			 * This is a bad design of this client.
 			 */
-			printf("*** Received rehandshake request\n");
+			log_msg(stdout, "*** Received rehandshake request\n");
 			/* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
 
 			ret = do_handshake(socket);
 
 			if (ret == 0) {
-				printf("*** Rehandshake was performed.\n");
+				log_msg(stdout, "*** Rehandshake was performed.\n");
 			} else {
-				printf("*** Rehandshake Failed: %s\n", gnutls_strerror(ret));
+				log_msg(stdout, "*** Rehandshake Failed: %s\n", gnutls_strerror(ret));
 			}
 		} else if (ret == GNUTLS_E_REAUTH_REQUEST) {
 			do {
@@ -1609,9 +1623,9 @@ static void check_server_cmd(socket_st * socket, int ret)
 			} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 			if (ret == 0) {
-				printf("*** Re-auth was performed.\n");
+				log_msg(stdout, "*** Re-auth was performed.\n");
 			} else {
-				printf("*** Re-auth failed: %s\n", gnutls_strerror(ret));
+				log_msg(stdout, "*** Re-auth failed: %s\n", gnutls_strerror(ret));
 			}
 		}
 	}
@@ -1678,11 +1692,11 @@ psk_callback(gnutls_session_t session, char **username,
 	size_t res_size;
 	gnutls_datum_t tmp;
 
-	printf("- PSK client callback. ");
+	log_msg(stdout, "- PSK client callback. ");
 	if (hint)
-		printf("PSK hint '%s'\n", hint);
+		log_msg(stdout, "PSK hint '%s'\n", hint);
 	else
-		printf("No PSK hint\n");
+		log_msg(stdout, "No PSK hint\n");
 
 	if (HAVE_OPT(PSKUSERNAME))
 		*username = gnutls_strdup(OPT_ARG(PSKUSERNAME));
@@ -1690,7 +1704,7 @@ psk_callback(gnutls_session_t session, char **username,
 		char *p = NULL;
 		size_t n;
 
-		printf("Enter PSK identity: ");
+		log_msg(stdout, "Enter PSK identity: ");
 		fflush(stdout);
 		ret = getline(&p, &n, stdin);
 
@@ -1805,7 +1819,7 @@ static void init_global_tls_stuff(void)
 		fprintf(stderr, "Error setting the x509 trust file: %s\n", gnutls_strerror(ret));
 		exit(1);
 	} else {
-		printf("Processed %d CA certificate(s).\n", ret);
+		log_msg(stdout, "Processed %d CA certificate(s).\n", ret);
 	}
 
 	if (x509_crlfile != NULL) {
@@ -1818,7 +1832,7 @@ static void init_global_tls_stuff(void)
 				"Error setting the x509 CRL file: %s\n", gnutls_strerror(ret));
 			exit(1);
 		} else {
-			printf("Processed %d CRL(s).\n", ret);
+			log_msg(stdout, "Processed %d CRL(s).\n", ret);
 		}
 	}
 
