@@ -93,6 +93,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_ERROR_IN_FINISHED_PACKET),
 	ERROR_ENTRY(N_("No certificate was found."),
 		    GNUTLS_E_NO_CERTIFICATE_FOUND),
+	ERROR_ENTRY(N_("Certificate is required."),
+		    GNUTLS_E_CERTIFICATE_REQUIRED),
 	ERROR_ENTRY(N_
 		    ("The given DSA key is incompatible with the selected TLS protocol."),
 		    GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL),

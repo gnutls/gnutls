@@ -526,6 +526,7 @@ typedef enum {
  *   recognized.
  * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
  *   or not known.
+ * @GNUTLS_A_CERTIFICATE_REQUIRED: Certificate is required.
  * @GNUTLS_A_NO_APPLICATION_PROTOCOL: The ALPN protocol requested is
  *   not supported by the peer.
  *
@@ -562,6 +563,7 @@ typedef enum {
 	GNUTLS_A_CERTIFICATE_UNOBTAINABLE = 111,
 	GNUTLS_A_UNRECOGNIZED_NAME = 112,
 	GNUTLS_A_UNKNOWN_PSK_IDENTITY = 115,
+	GNUTLS_A_CERTIFICATE_REQUIRED = 116,
 	GNUTLS_A_NO_APPLICATION_PROTOCOL = 120,
 	GNUTLS_A_MAX = GNUTLS_A_NO_APPLICATION_PROTOCOL
 } gnutls_alert_description_t;
@@ -3143,6 +3145,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_UNKNOWN_PK_ALGORITHM -80
 #define GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS -81
 #define GNUTLS_E_RECEIVED_DISALLOWED_NAME -82 /* GNUTLS_A_ILLEGAL_PARAMETER */
+#define GNUTLS_E_CERTIFICATE_REQUIRED -112 /* GNUTLS_A_CERTIFICATE_REQUIRED */
 
   /* returned if you need to generate temporary RSA
    * parameters. These are needed for export cipher suites.

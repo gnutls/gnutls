@@ -84,6 +84,8 @@ static const gnutls_alert_entry sup_alerts[] = {
 	ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
 		    N_
 		    ("No supported application protocol could be negotiated")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REQUIRED,
+		    N_("Certificate is required")),
 	{0, NULL, NULL}
 };
 
@@ -324,6 +326,10 @@ int gnutls_error_to_alert(int err, int *level)
 		break;
 	case GNUTLS_E_UNRECOGNIZED_NAME:
 		ret = GNUTLS_A_UNRECOGNIZED_NAME;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_CERTIFICATE_REQUIRED:
+		ret = GNUTLS_A_CERTIFICATE_REQUIRED;
 		_level = GNUTLS_AL_FATAL;
 		break;
 	default:
