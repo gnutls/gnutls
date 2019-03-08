@@ -12,14 +12,6 @@ See the end for copying conditions.
    double free issues. Use-after-free will be turned into NULL dereference.
    The counter-measure does not extend to applications using gnutls_free().
 
-** libgnutls, gnutls tools: Every gnutls_free() will automatically set
-   the free'd pointer to NULL. This prevents possible use-after-free and
-   double free issues. Use-after-free will be turned into NULL dereference,
-   effectively turning harmful attacks like remote-code-executions (RCE) into
-   segmentation faults. Double frees may also be used to achieve RCEs - turning
-   them into no-ops counter measures this attack at this point. 
-   This measurement is only active when building libgnutls and the gnutls tools.
-   
 ** libgnutls: enforce key usage limitations on certificates more actively.
    Previously we would enforce it for TLS1.2 protocol, now we enforce it
    even when TLS1.3 is negotiated, or on client certificates as well. When
