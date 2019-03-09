@@ -942,7 +942,6 @@ AC_CONFIG_FILES([
   doc/credentials/Makefile
   doc/credentials/srp/Makefile
   doc/credentials/x509/Makefile
-  doc/cyclo/Makefile
   doc/doxygen/Doxyfile
   doc/examples/Makefile
   doc/latex/Makefile

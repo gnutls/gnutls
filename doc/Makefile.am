@@ -32,7 +32,7 @@ IMAGES = \
 	gnutls-logo.png gnutls-x509.png	\
 	pkcs11-vision.png
 
-SUBDIRS = examples cyclo scripts credentials latex
+SUBDIRS = examples scripts credentials latex
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
