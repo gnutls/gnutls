@@ -21,11 +21,11 @@ branches which are affected. The commit message must refer to the bug
 report addressed (e.g., our issue tracker or some external issue tracker).
 
 For issues reported by third parties which request an embargo time, the
-general aim to have embargo dates which are two weeks or less in duration.
-In exceptional circumstances longer initial embargoes may be negotiated by
-mutual agreement between members of the security team and other relevant
-parties to the problem. Any such extended embargoes will aim to be at most
-one month in duration.
+general aim to have embargo dates which do not exceed the upcoming stable
+release date, or the following one, if the report was received late for
+a fix to be included. In exceptional circumstances longer initial embargoes
+may be negotiated by mutual agreement between members of the security team
+and other relevant parties to the problem.
 
 # Releasing
 
