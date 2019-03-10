@@ -132,6 +132,20 @@ if test "${id}" != "c4880390506a849cd2d8289fb8aea8c189e635aff1054faba58658a0f107
 	exit 1
 fi
 
+# Test whether certtool --outder doesn't output the informational text data
+
+${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/data/funny-spacing.pem" --outder --outfile ${TMPFILE1}
+if test $? != 0;then
+	echo "cert output to DER failed"
+	exit 1
+fi
+
+grep 'Version:' ${TMPFILE1}
+if test $? = 0;then
+	echo "found text info in DER certificate"
+	exit 1
+fi
+
 rm -f ${TMPFILE1} ${TMPFILE2}
 
 export TZ="UTC"
