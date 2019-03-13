@@ -293,7 +293,7 @@ this information:
 @example
 		Authority Information Access Information (not critical):
 			Access Method: 1.3.6.1.5.5.7.48.1 (id-ad-ocsp)
-			Access Location URI: http://ocsp.CAcert.org/
+			Access Location URI: https://ocsp.CAcert.org/
 @end example
 
 This means that ocsptool can discover the servers to contact over HTTP.
@@ -309,7 +309,7 @@ OCSP server as well as ask information on a particular certificate
 using --load-cert and --load-issuer.
 
 @example
-$ ocsptool --ask http://ocsp.CAcert.org/ --load-chain chain.pem
+$ ocsptool --ask https://ocsp.CAcert.org/ --load-chain chain.pem
 @end example
 
 _EOF_;

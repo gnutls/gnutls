@@ -16,10 +16,10 @@ A mailing list where users may help each other exists, and you can
 reach it by sending e-mail to @email{gnutls-help@@gnutls.org}.  Archives
 of the mailing list discussions, and an interface to manage
 subscriptions, is available through the World Wide Web at
-@url{http://lists.gnutls.org/pipermail/gnutls-help/}.
+@url{https://lists.gnutls.org/pipermail/gnutls-help/}.
 
 A mailing list for developers are also available, see
-@url{http://www.gnutls.org/lists.html}.
+@url{https://www.gnutls.org/lists.html}.
 Bug reports should be sent to @email{bugs@@gnutls.org}, see
 @ref{Bug Reports}.
 
@@ -27,7 +27,7 @@ Bug reports should be sent to @email{bugs@@gnutls.org}, see
 @section Commercial Support
 
 Commercial support is available for users of GnuTLS. See
-@url{http://www.gnutls.org/commercial.html} for more information.
+@url{https://www.gnutls.org/commercial.html} for more information.
 
 
 @node Bug Reports

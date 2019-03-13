@@ -17,7 +17,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -197,7 +197,7 @@ _gnutls_signature_algorithm_recv_params(gnutls_session_t session,
 		gnutls_assert();
 		/* Although TLS 1.2 mandates that we must not accept reply
 		 * to this message, there are good reasons to just ignore it. Check
-		 * http://www.ietf.org/mail-archive/web/tls/current/msg03880.html
+		 * https://www.ietf.org/mail-archive/web/tls/current/msg03880.html
 		 */
 		/* return GNUTLS_E_UNEXPECTED_PACKET; */
 	} else {

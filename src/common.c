@@ -15,13 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
 
 /* Work around problem reported in
-   <http://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
+   <https://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
 #if GETTIMEOFDAY_CLOBBERS_LOCALTIME
 #undef localtime
 #endif

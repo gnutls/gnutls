@@ -16,7 +16,7 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem \
 	data/template-test.key data/template-test.pem templates/template-test.tmpl \

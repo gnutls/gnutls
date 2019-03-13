@@ -6,7 +6,7 @@ it does not provide access to basic cryptographic primitives. However
 it abstracts the internal cryptographic back-end (see @ref{Cryptographic Backend}),
 providing symmetric crypto, hash and HMAC algorithms, as well access
 to the random number generation. For a low-level crypto API the usage of nettle
-@footnote{See @uref{http://www.lysator.liu.se/~nisse/nettle/}.} library is recommended.
+@footnote{See @uref{https://www.lysator.liu.se/~nisse/nettle/}.} library is recommended.
 
 @menu
 * Symmetric algorithms::

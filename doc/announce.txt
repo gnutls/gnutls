@@ -17,7 +17,7 @@ Public License version 3.0 (or later).  The manual is distributed
 under the GNU Free Documentation License version 1.3 (or later).
 
 The project page of the library is available at:
-  http://www.gnutls.org/
+  https://www.gnutls.org/
 
 What's New
 ==========
@@ -278,12 +278,12 @@ Community
 If you need help to use GnuTLS, or want to help others, you are invited
 to join our help-gnutls mailing list, see:
 
-  http://lists.gnutls.org/mailman/listinfo/gnutls-help
+  https://lists.gnutls.org/mailman/listinfo/gnutls-help
 
 If you wish to participate in the development of GnuTLS, you are invited
 to join our gnutls-dev mailing list, see:
 
-  http://lists.gnutls.org/mailman/listinfo/gnutls-dev
+  https://lists.gnutls.org/mailman/listinfo/gnutls-dev
 
 Internationalization
 ====================

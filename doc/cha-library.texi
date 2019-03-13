@@ -52,7 +52,7 @@ and gmplib libraries.
 @cindex download
 
 GnuTLS is available for download at:
-@url{http://www.gnutls.org/download.html}
+@url{https://www.gnutls.org/download.html}
 
 GnuTLS uses a development cycle where even minor version numbers
 indicate a stable release and a odd minor version number indicate a
@@ -62,8 +62,8 @@ release since 7 is odd.
 
 GnuTLS depends on @code{nettle} and @code{gmplib}, and you will need to install it
 before installing GnuTLS.  The @code{nettle} library is available from
-@url{http://www.lysator.liu.se/~nisse/nettle/}, while @code{gmplib} is available
-from @url{http://www.gmplib.org/}.
+@url{https://www.lysator.liu.se/~nisse/nettle/}, while @code{gmplib} is available
+from @url{https://www.gmplib.org/}.
 Don't forget to verify the cryptographic signature after downloading
 source code packages.
 
@@ -78,7 +78,7 @@ Several parts of GnuTLS require ASN.1 functionality, which is provided by
 a library called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
 want to install it separately (e.g., to make it possibly to use
 libtasn1 in other programs), you can get it from
-@url{http://www.gnu.org/software/libtasn1/}.
+@url{https://www.gnu.org/software/libtasn1/}.
 
 The compression library, @code{libz}, the PKCS #11 helper library @code{p11-kit},
 the TPM library @code{trousers}, as well as the IDN library @code{libidn}@footnote{Needed
@@ -142,7 +142,7 @@ the last, which allows to use a PKCS #11 trust policy module. That module not on
 provides the trusted certificates, but allows the categorization of them using purpose,
 e.g., CAs can be restricted for e-mail usage only, or administrative restrictions of CAs, for
 examples by restricting a CA to only issue certificates for a given DNS domain using NameConstraints.
-A publicly available PKCS #11 trust module is p11-kit's trust module@footnote{@url{http://p11-glue.freedesktop.org/doc/p11-kit/trust-module.html}}.
+A publicly available PKCS #11 trust module is p11-kit's trust module@footnote{@url{https://p11-glue.freedesktop.org/doc/p11-kit/trust-module.html}}.
 
 @node Document overview
 @section Overview

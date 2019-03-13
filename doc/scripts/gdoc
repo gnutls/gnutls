@@ -21,7 +21,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # This will read a C source code file and scan for embedded comments
 # in the style of gnome comments (+minor extensions - see below).
@@ -713,7 +713,7 @@ sub output_man {
 	print ".SH \"REPORTING BUGS\"\n";
 	print "Report bugs to <". $args{'bugsto'} . ">.\n";
         #print ".br\n";
-	#print "General guidelines for reporting bugs: http://www.gnu.org/gethelp/\n";
+	#print "General guidelines for reporting bugs: https://www.gnu.org/gethelp/\n";
         print ".br\n";
 	if ($args{'pkgsite'}) {
 	    print "Home page: " . $args{'pkgsite'} . "\n";

@@ -2404,7 +2404,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_dn, "x509-certificate-dn",
             (SCM cert),
             "Return the distinguished name (DN) of X.509 certificate "
             "@var{cert}.  The form of the DN is as described in @uref{"
-            "http://tools.ietf.org/html/rfc2253, RFC 2253}.")
+            "https://tools.ietf.org/html/rfc2253, RFC 2253}.")
 #define FUNC_NAME s_scm_gnutls_x509_certificate_dn
 {
   X509_CERTIFICATE_DN_FUNCTION_BODY (gnutls_x509_crt_get_dn);
@@ -2510,7 +2510,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_matches_hostname_p,
             (SCM cert, SCM hostname),
             "Return true if @var{cert} matches @var{hostname}, a string "
             "denoting a DNS host name.  This is the basic implementation "
-            "of @uref{http://tools.ietf.org/html/rfc2818, RFC 2818} (aka. "
+            "of @uref{https://tools.ietf.org/html/rfc2818, RFC 2818} (aka. "
             "HTTPS).")
 #define FUNC_NAME s_scm_gnutls_x509_certificate_matches_hostname_p
 {

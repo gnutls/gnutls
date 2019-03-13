@@ -16,7 +16,7 @@
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 # When new symbols are added in a release (x.y.z) they are added
 # as GNUTLS_x_y_z { global: new_symbol } GNUTLS_prev_release_version

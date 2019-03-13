@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /* This server is heavily modified for GnuTLS by Nikos Mavrogiannopoulos
@@ -508,7 +508,7 @@ gnutls_session_t initialize_session(int dtls)
 static const char DEFAULT_DATA[] =
     "This is the default message reported by the GnuTLS implementation. "
     "For more information please visit "
-    "<a href=\"http://www.gnutls.org/\">http://www.gnutls.org/</a>.";
+    "<a href=\"https://www.gnutls.org/\">https://www.gnutls.org/</a>.";
 
 /* Creates html with the current session information.
  */

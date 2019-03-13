@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <config.h>
@@ -651,7 +651,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		get_ca_issuers_set(crt);
 
 		if (usage != 0) {
-			/* http://tools.ietf.org/html/rfc4945#section-5.1.3.2: if any KU is
+			/* https://tools.ietf.org/html/rfc4945#section-5.1.3.2: if any KU is
 			   set, then either digitalSignature or the nonRepudiation bits in the
 			   KeyUsage extension MUST for all IKE certs */
 			if (is_ike && (get_sign_status(server) != 1))

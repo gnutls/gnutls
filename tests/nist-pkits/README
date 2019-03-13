@@ -1,7 +1,7 @@
 This directory contains self-tests based on NIST's Public Key
 Interoperability Test Suites, downloaded (2007-02-13) from:
 
-http://csrc.nist.gov/pki/testing/x509paths.html
+https://csrc.nist.gov/pki/testing/x509paths.html
 
 ada0f267e0ff4eb16a0e19964cf518a833f00093  PKITS_data.zip
 bb1dea2e3a1ef163c94c19d07de506228eac41ad  PKITS.pdf

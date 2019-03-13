@@ -18,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -853,7 +853,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
  * Russian differs from PKCS#12 here. It described proprietary way
  * to obtain MAC key instead of using standard mechanism.
  *
- * See http://wwwold.tc26.ru/standard/rs/%D0%A0%2050.1.112-2016.pdf
+ * See https://wwwold.tc26.ru/standard/rs/%D0%A0%2050.1.112-2016.pdf
  * section 5.
  */
 static int

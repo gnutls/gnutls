@@ -16,7 +16,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
 
@@ -40,7 +40,7 @@ extern mutex_unlock_func gnutls_mutex_unlock;
 # include <windows.h>
 
 /* Idea based based on comment 2 at:
- * http://stackoverflow.com/questions/3555859/is-it-possible-to-do-static-initialization-of-mutexes-in-windows
+ * https://stackoverflow.com/questions/3555859/is-it-possible-to-do-static-initialization-of-mutexes-in-windows
  */
 # define GNUTLS_STATIC_MUTEX(mutex) \
 	static CRITICAL_SECTION *mutex = NULL

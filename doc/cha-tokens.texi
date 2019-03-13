@@ -302,7 +302,7 @@ and tokens, @acronym{PKCS} #11 is automatically initialized during the first
 call of a @acronym{PKCS} #11 related function, in a thread safe way.
 The default initialization process, utilizes p11-kit configuration, and loads any
 appropriate @acronym{PKCS} #11 modules. The p11-kit configuration
-files@footnote{@url{http://p11-glue.freedesktop.org/}} are typically stored in @code{/etc/pkcs11/modules/}.
+files@footnote{@url{https://p11-glue.freedesktop.org/}} are typically stored in @code{/etc/pkcs11/modules/}.
 For example a file that will instruct GnuTLS to load the @acronym{OpenSC} module,
 could be named @code{/etc/pkcs11/modules/opensc.module} and contain the following:
 
@@ -506,7 +506,7 @@ The @acronym{PKCS} #11 API can be used to allow all applications in the
 same operating system to access shared cryptographic keys and certificates in a
 uniform way, as in @ref{fig-pkcs11-vision}. That way applications could load their
 trusted certificate list, as well as user certificates from a common PKCS #11 module.
-Such a provider is the p11-kit trust storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
+Such a provider is the p11-kit trust storage module@footnote{@url{https://p11-glue.freedesktop.org/trust-module.html}}
 and it provides access to the trusted Root CA certificates in a system. That
 provides a more dynamic list of Root CA certificates, as opposed to a static
 list in a file or directory.
@@ -514,7 +514,7 @@ list in a file or directory.
 That store, allows for blacklisting of CAs or certificates, as well as
 categorization of the Root CAs (Web verification, Code signing, etc.), in
 addition to restricting their purpose via stapled extensions@footnote{See
-the 'Restricting the scope of CA certificates' post at @url{http://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html}}.
+the 'Restricting the scope of CA certificates' post at @url{https://nmav.gnutls.org/2016/06/restricting-scope-of-ca-certificates.html}}.
 GnuTLS will utilize the p11-kit trust module as the default trust store
 if configured to; i.e., if '--with-default-trust-store-pkcs11=pkcs11:' is given to 
 the configure script.
