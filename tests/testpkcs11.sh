@@ -341,6 +341,24 @@ export_pubkey_of_privkey () {
 }
 
 # $1: token
+# $2: SO PIN
+# $3: bits
+list_pubkey_as_so () {
+	export GNUTLS_SO_PIN="$2"
+	token="$1"
+	bits="$3"
+
+	echo -n "* Exporting public key as SO... "
+	${P11TOOL} ${ADDITIONAL_PARAM} --so-login --list-all "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit 1
+	fi
+
+	echo ok
+}
+
+# $1: token
 # $2: PIN
 change_id_of_privkey () {
 	export GNUTLS_PIN="$2"
@@ -599,6 +617,7 @@ write_certificate_test () {
 		exit_error
 	fi
 
+	echo ok
 	rm -f ${TMPFILE}
 
 	echo -n "* Trying to obtain back the cert... "
@@ -1091,6 +1110,7 @@ generate_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 1024
 change_id_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 export_pubkey_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
 change_label_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
+list_pubkey_as_so "${TOKEN}" "${GNUTLS_SO_PIN}"
 
 write_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt" tmp-client.pub
 write_serv_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.key"
