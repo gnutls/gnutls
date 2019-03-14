@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HANDSHAKE_H
-#define HANDSHAKE_H
+#ifndef GNUTLS_LIB_HANDSHAKE_H
+#define GNUTLS_LIB_HANDSHAKE_H
 
 #include "errors.h"
 #include "record.h"
@@ -174,4 +174,4 @@ _gnutls13_recv_hello_retry_request(gnutls_session_t session,
 int
 _gnutls13_recv_async_handshake(gnutls_session_t session);
 
-#endif
+#endif /* GNUTLS_LIB_HANDSHAKE_H */

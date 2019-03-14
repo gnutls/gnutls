@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_EXTV_H
-#define GNUTLS_EXTV_H
+#ifndef GNUTLS_LIB_EXTV_H
+#define GNUTLS_LIB_EXTV_H
 
 #include <gnutls/gnutls.h>
 #include "str.h"
@@ -78,4 +78,4 @@ int _gnutls_extv_append(gnutls_buffer_st *buf,
 		        extv_append_func cb);
 
 
-#endif
+#endif /* GNUTLS_LIB_EXTV_H */

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef GNUTLS_INT_H
-#define GNUTLS_INT_H
+#ifndef GNUTLS_LIB_GNUTLS_INT_H
+#define GNUTLS_LIB_GNUTLS_INT_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -1608,4 +1608,4 @@ get_certificate_type(gnutls_session_t session,
 #define CONSTCHECK_NOT_EQUAL(a, b) ((-((uint32_t)(a) ^ (uint32_t)(b))) >> 31)
 #define CONSTCHECK_EQUAL(a, b) (1U - CONSTCHECK_NOT_EQUAL(a, b))
 
-#endif				/* GNUTLS_INT_H */
+#endif /* GNUTLS_LIB_GNUTLS_INT_H */

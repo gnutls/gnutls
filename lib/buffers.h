@@ -19,8 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef GNUTLS_BUFFERS_H
-#define GNUTLS_BUFFERS_H
+
+#ifndef GNUTLS_LIB_BUFFERS_H
+#define GNUTLS_LIB_BUFFERS_H
 
 #include "mbuffers.h"
 
@@ -126,4 +127,4 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	_mbuffer_head_clear( &session->internals.handshake_send_buffer); \
 	_gnutls_handshake_recv_buffer_clear( session);
 
-#endif
+#endif /* GNUTLS_LIB_BUFFERS_H */

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_AUTH_H
-#define GNUTLS_AUTH_H
+#ifndef GNUTLS_LIB_AUTH_H
+#define GNUTLS_LIB_AUTH_H
 
 #include "str.h"
 
@@ -83,4 +83,4 @@ void *_gnutls_get_auth_info(gnutls_session_t session, gnutls_credentials_type_t 
 		return NULL;
 }
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_H */

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_EXT_LIB_H
-#define GNUTLS_EXT_LIB_H
+#ifndef GNUTLS_LIB_HELLO_EXT_LIB_H
+#define GNUTLS_LIB_HELLO_EXT_LIB_H
 
 #include <gnutls/gnutls.h>
 #include "hello_ext.h"
@@ -64,4 +64,4 @@ _gnutls_hello_ext_default_pack(gnutls_ext_priv_data_t epriv, gnutls_buffer_st *p
 int
 _gnutls_hello_ext_default_unpack(gnutls_buffer_st *ps, gnutls_ext_priv_data_t *epriv);
 
-#endif
+#endif /* GNUTLS_LIB_HELLO_EXT_LIB_H */

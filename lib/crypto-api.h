@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef CRYPTO_API_H
-# define CRYPTO_API_H
+#ifndef GNUTLS_LIB_CRYPTO_API_H
+#define GNUTLS_LIB_CRYPTO_API_H
 
 #include <gnutls_int.h>
 
@@ -50,4 +50,4 @@ void _gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
 	_gnutls_cipher_deinit(&h->ctx_enc);
 }
 
-#endif
+#endif /* GNUTLS_LIB_CRYPTO_API_H */

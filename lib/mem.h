@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_MEM_H
-#define GNUTLS_MEM_H
+#ifndef GNUTLS_LIB_MEM_H
+#define GNUTLS_LIB_MEM_H
 
 #include <config.h>
 
@@ -54,4 +54,4 @@ int safe_memcmp(const void *s1, const void *s2, size_t n)
 #define zeroize_temp_key zeroize_key
 #define zrelease_temp_mpi_key zrelease_mpi_key
 
-#endif				/* GNUTLS_MEM_H */
+#endif /* GNUTLS_LIB_MEM_H */

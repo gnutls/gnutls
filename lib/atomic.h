@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_ATOMIC_H
-#define GNUTLS_ATOMIC_H
+#ifndef GNUTLS_LIB_ATOMIC_H
+#define GNUTLS_LIB_ATOMIC_H
 
 #ifdef HAVE_STDATOMIC_H
 # include <stdatomic.h>
@@ -78,4 +78,4 @@ inline static void gnutls_atomic_deinit(gnutls_atomic_uint_t x)
 }
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_ATOMIC_H */

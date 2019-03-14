@@ -20,8 +20,9 @@
  *
  */
 
-#ifndef SECRETS_H
-#define SECRETS_H
+#ifndef GNUTLS_LIB_SECRETS_H
+#define GNUTLS_LIB_SECRETS_H
+
 #include "gnutls_int.h"
 
 int _tls13_init_secret(gnutls_session_t session, const uint8_t *psk, size_t psk_size);
@@ -54,4 +55,4 @@ int _tls13_expand_secret2(const mac_entry_st *prf,
 			  const uint8_t secret[MAX_CIPHER_KEY_SIZE],
 			  unsigned out_size, void *out);
 
-#endif
+#endif /* GNUTLS_LIB_SECRETS_H */

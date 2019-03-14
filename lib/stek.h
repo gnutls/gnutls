@@ -19,6 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_STEK_H
+#define GNUTLS_LIB_STEK_H
+
 #include "gnutls_int.h"
 
 int _gnutls_get_session_ticket_encryption_key(gnutls_session_t session,
@@ -36,3 +40,5 @@ void _gnutls_set_session_ticket_key_rotation_callback(gnutls_session_t session,
 
 int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session,
 		const gnutls_datum_t *key);
+
+#endif /* GNUTLS_LIB_STEK_H */

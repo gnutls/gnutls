@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_ERRORS_H
-#define GNUTLS_ERRORS_H
+#ifndef GNUTLS_LIB_ERRORS_H
+#define GNUTLS_LIB_ERRORS_H
 
 #include "gnutls_int.h"
 #include <global.h>
@@ -143,4 +143,4 @@ int gnutls_assert_val_int(int val, const char *file, const char *func, int line)
 #define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __func__, __LINE__)
 #define gnutls_assert_val_fatal(x) (((x)!=GNUTLS_E_AGAIN && (x)!=GNUTLS_E_INTERRUPTED)?gnutls_assert_val_int(x, __FILE__, __func__, __LINE__):(x))
 
-#endif				/* GNUTLS_ERRORS_H */
+#endif /* GNUTLS_LIB_ERRORS_H */

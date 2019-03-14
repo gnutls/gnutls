@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef ATFORK_H
-# define ATFORK_H
+#ifndef GNUTLS_LIB_ATFORK_H
+#define GNUTLS_LIB_ATFORK_H
 
 #include <config.h>
 #include "gnutls_int.h"
@@ -61,4 +61,4 @@ unsigned int _gnutls_get_forkid(void);
 
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_ATFORK_H */

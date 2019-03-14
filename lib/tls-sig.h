@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_SIG_H
-#define GNUTLS_SIG_H
+#ifndef GNUTLS_LIB_TLS_SIG_H
+#define GNUTLS_LIB_TLS_SIG_H
 
 #include <gnutls/abstract.h>
 
@@ -60,4 +60,4 @@ int _gnutls_handshake_verify_data(gnutls_session_t session,
 				  gnutls_datum_t * signature,
 				  gnutls_sign_algorithm_t algo);
 
-#endif
+#endif /* GNUTLS_LIB_TLS_SIG_H */

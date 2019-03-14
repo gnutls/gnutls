@@ -18,9 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef PKCS11X_H
-#define PKCS11X_H
+#ifndef GNUTLS_LIB_PKCS11X_H
+#define GNUTLS_LIB_PKCS11X_H
 
 #include <p11-kit/pkcs11x.h>
 
-#endif
+#endif /* GNUTLS_LIB_PKCS11X_H */

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_MPI_H
-#define GNUTLS_MPI_H
+#ifndef GNUTLS_LIB_MPI_H
+#define GNUTLS_LIB_MPI_H
 
 #include "gnutls_int.h"
 
@@ -90,4 +90,4 @@ typedef int (*mpi_dprint_func)(const bigint_t a, gnutls_datum_t * dest);
 
 #define _gnutls_mpi_generate_group( gg, bits) _gnutls_mpi_ops.bigint_generate_group( gg, bits)
 
-#endif
+#endif /* GNUTLS_LIB_MPI_H */

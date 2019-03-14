@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_GLOBAL_H
-#define GNUTLS_GLOBAL_H
+#ifndef GNUTLS_LIB_GLOBAL_H
+#define GNUTLS_LIB_GLOBAL_H
 
 #include <libtasn1.h>
 #include <gnutls/gnutls.h>
@@ -49,4 +49,4 @@ extern void _gnutls_nss_keylog_deinit(void);
 extern void _gnutls_load_system_priorities(void);
 extern void _gnutls_unload_system_priorities(void);
 
-#endif
+#endif /* GNUTLS_LIB_GLOBAL_H */

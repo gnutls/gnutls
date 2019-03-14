@@ -18,6 +18,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_URLS_H
+#define GNUTLS_LIB_URLS_H
+
 #define PKCS11_URL "pkcs11:"
 #define SYSTEM_URL "system:"
 #define TPMKEY_URL "tpmkey:"
@@ -36,3 +39,5 @@ int _gnutls_url_is_known(const char *url);
 int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 				 gnutls_datum_t * issuer,
 				 unsigned int flags);
+
+#endif /* GNUTLS_LIB_URLS_H */

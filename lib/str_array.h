@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_STR_ARRAY_H
-#define GNUTLS_STR_ARRAY_H
+#ifndef GNUTLS_LIB_STR_ARRAY_H
+#define GNUTLS_LIB_STR_ARRAY_H
 
 #include "gnutls_int.h"
 #include "errors.h"
@@ -132,4 +132,4 @@ inline static int _gnutls_str_array_append_idna(gnutls_str_array_t * head,
 	return ret;
 }
 
-#endif
+#endif /* GNUTLS_LIB_STR_ARRAY_H */

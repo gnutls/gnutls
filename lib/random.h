@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef GNUTLS_LIB_RANDOM_H
+#define GNUTLS_LIB_RANDOM_H
 
 #include <gnutls/crypto.h>
 #include <crypto-backend.h>
@@ -38,4 +38,4 @@ inline static int _gnutls_rnd_check(void)
 	return _rnd_system_entropy_check();
 }
 
-#endif
+#endif /* GNUTLS_LIB_RANDOM_H */

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _SRP_H
-# define _SRP_H
+#ifndef GNUTLS_LIB_SRP_H
+#define GNUTLS_LIB_SRP_H
 
 #include <config.h>
 
@@ -44,4 +44,4 @@ int _gnutls_srp_gn(uint8_t ** ret_g, uint8_t ** ret_n, int bits);
 
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_SRP_H */

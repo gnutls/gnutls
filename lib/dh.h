@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_DH_H
-#define GNUTLS_DH_H
+#ifndef GNUTLS_LIB_DH_H
+#define GNUTLS_LIB_DH_H
 
 const bigint_t *_gnutls_dh_params_to_mpi(gnutls_dh_params_t);
 
@@ -31,4 +31,4 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 
 int _gnutls_set_cred_dh_params(gnutls_dh_params_t *cparams, gnutls_sec_param_t sec_param);
 
-#endif
+#endif /* GNUTLS_LIB_DH_H */

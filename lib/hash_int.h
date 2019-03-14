@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_HASH_INT_H
-#define GNUTLS_HASH_INT_H
+#ifndef GNUTLS_LIB_HASH_INT_H
+#define GNUTLS_LIB_HASH_INT_H
 
 #include "gnutls_int.h"
 #include <gnutls/crypto.h>
@@ -150,4 +150,4 @@ inline static int IS_SHA(gnutls_digest_algorithm_t algo)
 	return 0;
 }
 
-#endif				/* GNUTLS_HASH_INT_H */
+#endif /* GNUTLS_LIB_HASH_INT_H */

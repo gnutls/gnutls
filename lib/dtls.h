@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DTLS_H
-#define DTLS_H
+#ifndef GNUTLS_LIB_DTLS_H
+#define GNUTLS_LIB_DTLS_H
 
 #include <config.h>
 #include "gnutls_int.h"
@@ -135,4 +135,4 @@ inline static int _dtls_retransmit(gnutls_session_t session)
 	return _dtls_transmit(session);
 }
 
-#endif
+#endif /* GNUTLS_LIB_DTLS_H */

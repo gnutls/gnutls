@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_X509_H
+#define GNUTLS_LIB_X509_H
+
 #include <libtasn1.h>
 
 
@@ -39,3 +42,5 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 int _gnutls_x509_raw_privkey_to_gkey(gnutls_privkey_t * privkey,
 				     const gnutls_datum_t * raw_key,
 				     gnutls_x509_crt_fmt_t type);
+
+#endif /* GNUTLS_LIB_X509_H */

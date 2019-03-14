@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_GTHREADS_H
+#define GNUTLS_LIB_GTHREADS_H
+
 #include <config.h>
 
 #ifdef HAVE_THREADS_H
@@ -31,3 +34,5 @@
 #else
 # error Unsupported platform
 #endif
+
+#endif /* GNUTLS_LIB_GTHREADS_H */
