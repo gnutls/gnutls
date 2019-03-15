@@ -273,14 +273,13 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
  * gnutls_certificate_free_cas:
  * @sc: is a #gnutls_certificate_credentials_t type.
  *
- * This function will delete all the CAs associated with the given
- * credentials. Servers that do not use
- * gnutls_certificate_verify_peers2() may call this to save some
- * memory.
+ * This function was operational on very early versions of gnutls.
+ * Due to internal refactorings and the fact that this was hardly ever
+ * used, it is currently a no-op.
+ *
  **/
 void gnutls_certificate_free_cas(gnutls_certificate_credentials_t sc)
 {
-	/* FIXME: do nothing for now */
 	return;
 }
 

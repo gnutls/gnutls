@@ -89,8 +89,8 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 		return ret;
 	}
 
-	/* FIXME: copy key usage flags */
-
+	/* We do not copy key usage flags.
+	 */
 	a[0].type = CKA_CLASS;
 	a[0].value = &class;
 	a[0].value_len = sizeof(class);

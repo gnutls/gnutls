@@ -44,7 +44,7 @@ extern mod_auth_st srp_dss_auth_struct;
 
 
 /* Cred type mappings to KX algorithms
- * FIXME: The mappings are not 1-1. Some KX such as SRP_RSA require
+ * The mappings are not 1-1. Some KX such as SRP_RSA require
  * more than one credentials type.
  */
 typedef struct {

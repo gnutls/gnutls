@@ -2499,7 +2499,6 @@ recv_hello_verify_request(gnutls_session_t session,
 		return GNUTLS_E_UNEXPECTED_PACKET;
 	}
 
-	/* TODO: determine if we need to do anything with the server version field */
 	DECR_LEN(len, 2);
 	pos += 2;
 
@@ -3671,9 +3670,6 @@ gnutls_handshake_get_last_out(gnutls_session_t session)
 }
 
 /* This returns the session hash as in draft-ietf-tls-session-hash-02.
- *
- * FIXME: It duplicates some of the actions in _gnutls_handshake_sign_crt_vrfy*.
- * See whether they can be merged.
  */
 int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t *shash)
 {

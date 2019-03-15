@@ -56,8 +56,6 @@ static int
 _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 		 unsigned hash_size, unsigned IV_size, unsigned key_size)
 {
-	/* FIXME: This function is too long
-	 */
 	uint8_t rnd[2 * GNUTLS_RANDOM_SIZE];
 	int pos, ret;
 	int block_size;
