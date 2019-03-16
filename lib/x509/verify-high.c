@@ -186,14 +186,6 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 	 * This will be sent to clients when a certificate
 	 * request message is sent.
 	 */
-
-	/* FIXME: in case of a client it is not needed
-	 * to do that. This would save time and memory.
-	 * However we don't have that information available
-	 * here.
-	 * Further, this function is now much more efficient,
-	 * so optimizing that is less important.
-	 */
 	tmp.data = ca->raw_dn.data;
 	tmp.size = ca->raw_dn.size;
 

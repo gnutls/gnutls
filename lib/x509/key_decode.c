@@ -193,9 +193,9 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
 		return _gnutls_asn2err(result);
 	}
 
-	/* FIXME: If the parameters are not included in the certificate
+	/* If the parameters are not included in the certificate
 	 * then the issuer's parameters should be used. This is not
-	 * done yet.
+	 * implemented, and is not used in practice (along with DSA).
 	 */
 
 	/* Read p */

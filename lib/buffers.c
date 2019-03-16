@@ -277,7 +277,7 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 				 fd);
 		if (i == 0) {
 			/* If we get here, we likely have a stream socket.
-			 * FIXME: this probably breaks DCCP. */
+			 * That assumption may not work on DCCP. */
 			gnutls_assert();
 			ret = 0;
 			goto cleanup;

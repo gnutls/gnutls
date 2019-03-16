@@ -2999,7 +2999,6 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 
 	/* Find an object with private key class and a certificate ID
 	 * which matches the certificate. */
-	/* FIXME: also match the cert subject. */
 	a[0].type = CKA_CLASS;
 	a[0].value = &class;
 	a[0].value_len = sizeof class;

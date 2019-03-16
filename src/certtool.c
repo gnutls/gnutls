@@ -3702,8 +3702,7 @@ void smime_to_pkcs7(void)
 	char *lineptr = NULL;
 	ssize_t len;
 
-	/* Find body.  FIXME: Handle non-b64 Content-Transfer-Encoding.
-	   Reject non-S/MIME tagged Content-Type's? */
+	/* Find body. We do not handle non-b64 Content-Transfer-Encoding. */
 	do {
 		len = getline(&lineptr, &linesize, infile);
 		if (len == -1) {

@@ -187,6 +187,8 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 		a[1].value_len = cid->size;
 	}
 
+	/* we do not use the key usage flags; these are apparent from
+	 * the certificate itself. */
 	a[2].type = CKA_VALUE;
 	a[2].value = der;
 	a[2].value_len = der_size;
@@ -196,7 +198,6 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	a[4].type = CKA_CERTIFICATE_TYPE;
 	a[4].value = &type;
 	a[4].value_len = sizeof(type);
-	/* FIXME: copy key usage flags */
 
 	a_val = 5;
 
@@ -715,7 +716,6 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	pk = gnutls_x509_privkey_get_pk_algorithm(key);
 	FIX_KEY_USAGE(pk, key_usage);
 
-	/* FIXME: copy key usage flags */
 	a_val = 0;
 	a[a_val].type = CKA_CLASS;
 	a[a_val].value = &class;
