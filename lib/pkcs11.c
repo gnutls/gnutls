@@ -2254,7 +2254,7 @@ unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
 		ret_flags |= SESSION_LOGIN | SESSION_FORCE_LOGIN;
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO)
-		ret_flags |= SESSION_LOGIN | SESSION_SO | SESSION_FORCE_LOGIN;
+		ret_flags |= SESSION_LOGIN | SESSION_SO | SESSION_FORCE_LOGIN | SESSION_WRITE;
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE)
 		ret_flags |= SESSION_TRUSTED;

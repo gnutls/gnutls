@@ -25,6 +25,10 @@ See the end for copying conditions.
    a certificate. We were already enforcing the signature algorithm, but there
    was a bug in parameter checking code.
 
+** libgnutls: the flag GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO now implies a writable
+   session, as non-writeable security officer sessions are undefined in PKCS#11
+   (#721).
+
 ** libgnutls: no longer send downgrade sentinel in TLS 1.3.
    Previously the sentinel value was embedded to early in version
    negotiation and was sent even on TLS 1.3. It is now sent only when
