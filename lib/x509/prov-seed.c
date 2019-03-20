@@ -30,6 +30,9 @@
 #include <mpi.h>
 #include "prov-seed.h"
 
+/* This function encodes a seed value and a hash algorithm OID to the format
+ * described in RFC8479. The output is the DER encoded form.
+ */
 int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 {
 
@@ -76,6 +79,9 @@ int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der)
 	return ret;
 }
 
+/* This function decodes a DER encoded form of seed and a hash algorithm, as in
+ * RFC8479.
+ */
 int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t *der)
 {
 
