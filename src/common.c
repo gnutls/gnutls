@@ -168,8 +168,8 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert, i
 		return;
 	}
 
-	fprintf(out, "- Certificate type: X.509\n");
-	fprintf(out, "- Got a certificate list of %d certificates.\n",
+	log_msg(out, "- Certificate type: X.509\n");
+	log_msg(out, "- Got a certificate list of %d certificates.\n",
 	       cert_list_size);
 
 	for (j = 0; j < cert_list_size; j++) {
@@ -190,13 +190,13 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert, i
 			return;
 		}
 
-		fprintf(out, "- Certificate[%d] info:\n - ", j);
+		log_msg(out, "- Certificate[%d] info:\n - ", j);
 		if (flag == GNUTLS_CRT_PRINT_COMPACT && j > 0)
 			flag = GNUTLS_CRT_PRINT_ONELINE;
 
 		ret = gnutls_x509_crt_print(crt, flag, &cinfo);
 		if (ret == 0) {
-			fprintf(out, "%s\n", cinfo.data);
+			log_msg(out, "%s\n", cinfo.data);
 			gnutls_free(cinfo.data);
 		}
 
@@ -212,9 +212,7 @@ print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert, i
 				return;
 			}
 
-			fputs("\n", out);
-			fputs((char*)pem.data, out);
-			fputs("\n", out);
+			log_msg(out, "\n%s\n", (char*)pem.data);
 
 			gnutls_free(pem.data);
 		}

@@ -48,13 +48,15 @@ SERV="${SERV} -q"
 
 echo "Checking whether logfile option works."
 
-KEY1=${srcdir}/../doc/credentials/x509/key-rsa.pem
-CERT1=${srcdir}/../doc/credentials/x509/cert-rsa.pem
-OCSP1=${srcdir}/ocsp-tests/response1.der
+KEY1=${srcdir}/../doc/credentials/x509/example.com-key.pem
+CERT1=${srcdir}/../doc/credentials/x509/example.com-cert.pem
+CA1=${srcdir}/../doc/credentials/x509/ca.pem
 PSK=${srcdir}/psk.passwd
 
 TMPFILE1=save-data1.$$.tmp
 TMPFILE2=save-data2.$$.tmp
+
+OPTS="--sni-hostname example.com --verify-hostname example.com"
 
 eval "${GETPORT}"
 launch_server $$ --echo --priority NORMAL:+ECDHE-PSK:+DHE-PSK:+PSK --pskpasswd=${PSK}
@@ -107,6 +109,60 @@ if grep -q "Handshake was completed" ${TMPFILE1}; then
 else
 	echo "Cannot find the expected output!"
 	exit 1
+fi
+rm -f ${TMPFILE1} ${TMPFILE2}
+
+
+echo "x509 functionality test"
+eval "${GETPORT}"
+launch_server $$ --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
+PID=$!
+wait_server ${PID}
+
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 ${OPTS} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1}  </dev/null >${TMPFILE2}
+kill ${PID}
+wait
+
+if test -f ${TMPFILE1};then
+        echo "Logfile should not be created!"
+        exit 1
+fi
+if ! test -s ${TMPFILE2};then
+        echo "Stdout should not be empty!"
+        exit 1
+fi
+if grep -q "Handshake was completed" ${TMPFILE2};then
+        echo "Find the expected output!"
+else
+        echo "Cannot find the expected output!"
+        exit 1
+fi
+
+rm -f ${TMPFILE1} ${TMPFILE2}
+
+eval "${GETPORT}"
+launch_server $$ --echo --sni-hostname-fatal --sni-hostname example.com --x509keyfile ${KEY1} --x509certfile ${CERT1}
+PID=$!
+wait_server ${PID}
+
+${VALGRIND} "${CLI}" -p "${PORT}" 127.0.0.1 ${OPTS} --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2" --x509cafile ${CA1} --logfile ${TMPFILE1} </dev/null >${TMPFILE2}
+kill ${PID}
+wait
+
+if ! test -f ${TMPFILE1};then
+       echo "Logfile shoule be created!"
+       exit 1
+fi
+if test -s ${TMPFILE2};then
+       echo "Stdout should be empty!"
+       exit 1
+fi
+
+if grep -q "Handshake was completed" ${TMPFILE1}; then
+       echo "Found the expected output!"
+else
+       echo "Cannot find the expected output!"
+       exit 1
 fi
 rm -f ${TMPFILE1} ${TMPFILE2}
 
