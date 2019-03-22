@@ -42,10 +42,12 @@ We require several tools to check out and build the software, including:
 * [bison](https://www.gnu.org/software/bison) (for datetime parser in certtool)
 * [libunbound](https://unbound.net/) (for DANE support)
 * [libabigail](https://pagure.io/libabigail/) (for abi comparison in make dist)
+* [tpm2-tss](https://github.com/tpm2-software/tpm2-tss) (for TPM 2.0 support; optional)
 * [tcsd](https://trousers.sourceforge.net/) (for TPM support; optional)
 * [swtpm](https://github.com/stefanberger/swtpm) (for TPM test; optional)
-* [ncat](https://nmap.org/download.html) (for TPM test; optional)
 * [tpm-tools](https://trousers.sourceforge.net/) (for TPM test; optional)
+* [tpm2-tools](https://github.com/tpm2-software/tpm2-tools/) (for TPM 2.0 test; optional)
+* [ncat](https://nmap.org/download.html) (for TPM test; optional)
 * [expect](https://core.tcl.tk/expect/index) (for TPM test; optional)
 
 The required software is typically distributed with your operating
@@ -57,7 +59,7 @@ Debian/Ubuntu:
 apt-get install -y dash git-core autoconf libtool gettext autopoint
 apt-get install -y automake autogen nettle-dev libp11-kit-dev libtspi-dev libunistring-dev
 apt-get install -y guile-2.2-dev libtasn1-6-dev libidn2-0-dev gawk gperf
-apt-get install -y libunbound-dev dns-root-data bison gtk-doc-tools
+apt-get install -y libtss2-dev libunbound-dev dns-root-data bison gtk-doc-tools
 apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-utils
 ```
 
@@ -68,7 +70,7 @@ Fedora/RHEL:
 ```
 yum install -y dash git autoconf libtool gettext-devel automake autogen patch
 yum install -y nettle-devel p11-kit-devel autogen-libopts-devel libunistring-devel
-yum install -y trousers-devel guile22-devel libtasn1-devel libidn2-devel gawk gperf
+yum install -y tpm2-tss-devel trousers-devel guile22-devel libtasn1-devel libidn2-devel gawk gperf
 yum install -y libtasn1-tools unbound-devel bison gtk-doc texinfo texlive
 ```
 

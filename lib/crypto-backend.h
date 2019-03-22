@@ -465,4 +465,15 @@ int _gnutls_gost_key_unwrap(gnutls_gost_paramset_t gost_params,
 			    const gnutls_datum_t *imit,
 			    gnutls_datum_t *cek);
 
+int
+_gnutls_rsa_pkcs1_sign_pad(size_t key_bits,
+			   const gnutls_datum_t *data,
+			   unsigned char *buffer, size_t buffer_size);
+
+int
+_gnutls_rsa_pss_sign_pad(gnutls_x509_spki_st *params,
+			 size_t key_bits,
+			 const gnutls_datum_t *data,
+			 unsigned char *buffer, size_t buffer_size);
+
 #endif /* GNUTLS_LIB_CRYPTO_BACKEND_H */

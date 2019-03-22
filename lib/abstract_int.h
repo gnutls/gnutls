@@ -25,6 +25,10 @@
 
 #include <gnutls/abstract.h>
 
+typedef int (*gnutls_privkey_pk_params_func) (gnutls_privkey_t key,
+					      void *userdata,
+					      gnutls_pk_params_st *params);
+
 struct gnutls_privkey_st {
 	gnutls_privkey_type_t type;
 	gnutls_pk_algorithm_t pk_algorithm;
@@ -42,6 +46,7 @@ struct gnutls_privkey_st {
 			gnutls_privkey_decrypt_func2 decrypt_func2;
 			gnutls_privkey_deinit_func deinit_func;
 			gnutls_privkey_info_func info_func;
+			gnutls_privkey_pk_params_func pk_params_func;
 			void *userdata;
 			unsigned bits;
 		} ext;

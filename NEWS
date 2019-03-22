@@ -13,6 +13,12 @@ See the end for copying conditions.
    configuration directive now also disables TLS ciphersuites that use it
    as a PRF algorithm.
 
+** libgnutls: The tpm2-tss-engine compatible private blobs can be loaded and
+   used as a gnutls_privkey_t. The code was originally written for the
+   OpenConnect VPN project by David Woodhouse. To generate such blobs,
+   use the tpm2tss-genkey tool from tpm2-tss-engine:
+   https://github.com/tpm2-software/tpm2-tss-engine/#rsa-operations
+
 ** API and ABI modifications:
 GNUTLS_PRIVKEY_FLAG_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_privkey_flags_t
 GNUTLS_VERIFY_RSA_PSS_FIXED_SALT_LENGTH: new flag in gnutls_certificate_verify_flags

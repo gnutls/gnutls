@@ -490,6 +490,10 @@ endif
 
 dist_check_SCRIPTS = rfc2253-escape-test.sh rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
+if ENABLE_TPM2
+dist_check_SCRIPTS += tpm2.sh
+endif
+
 if !WINDOWS
 
 #
