@@ -415,8 +415,8 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 
 	_gnutls_epoch_gc(session);
 
-	session->internals.handshake_endtime.tv_sec = 0;
-	session->internals.handshake_endtime.tv_nsec = 0;
+	session->internals.handshake_abs_timeout.tv_sec = 0;
+	session->internals.handshake_abs_timeout.tv_nsec = 0;
 	session->internals.handshake_in_progress = 0;
 
 	session->internals.tfo.connect_addrlen = 0;

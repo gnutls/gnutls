@@ -2782,7 +2782,7 @@ int gnutls_handshake(gnutls_session_t session)
 		gnutls_gettime(&session->internals.handshake_start_time);
 
 		tmo_ms = session->internals.handshake_timeout_ms;
-		end = &session->internals.handshake_endtime;
+		end = &session->internals.handshake_abs_timeout;
 		start = &session->internals.handshake_start_time;
 
 		if (tmo_ms && end->tv_sec == 0 && end->tv_nsec == 0) {
@@ -2833,6 +2833,18 @@ int gnutls_handshake(gnutls_session_t session)
 		_gnutls_buffer_clear(&session->internals.record_presend_buffer);
 
 		_gnutls_epoch_bump(session);
+	}
+
+	/* Give an estimation of the round-trip under TLS1.3, used by gnutls_session_get_data2() */
+	if (!IS_SERVER(session) && vers->tls13_sem) {
+		struct timespec handshake_finish_time;
+		gnutls_gettime(&handshake_finish_time);
+
+		if (!(session->internals.hsk_flags & HSK_HRR_RECEIVED)) {
+			session->internals.ertt = timespec_sub_ms(&handshake_finish_time, &session->internals.handshake_start_time)/2;
+		} else {
+			session->internals.ertt = timespec_sub_ms(&handshake_finish_time, &session->internals.handshake_start_time)/4;
+		}
 	}
 
 	return 0;

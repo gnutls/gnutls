@@ -28,6 +28,7 @@
 #include "buffers.h"
 #include "state.h"
 #include "ext/cert_types.h"
+#include <minmax.h>
 
 /**
  * gnutls_session_get_data:
@@ -99,8 +100,10 @@ gnutls_session_get_data(gnutls_session_t session,
  * is received by the client. To ensure that such a ticket has been received use
  * gnutls_session_get_flags() and check for flag %GNUTLS_SFLAGS_SESSION_TICKET;
  * if this flag is not set, this function will wait for a new ticket within
- * 50ms, and if not received will return dummy data which cannot lead to
- * resumption. To get notified when new tickets are received by the server
+ * an estimated rountrip, and if not received will return dummy data which
+ * cannot lead to resumption.
+ *
+ * To get notified when new tickets are received by the server
  * use gnutls_handshake_set_hook_function() to wait for %GNUTLS_HANDSHAKE_NEW_SESSION_TICKET
  * messages. Each call of gnutls_session_get_data2() after a ticket is
  * received, will return session resumption data corresponding to the last
@@ -120,8 +123,13 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t *data)
 	}
 
 	if (vers->tls13_sem && !(session->internals.hsk_flags & HSK_TICKET_RECEIVED)) {
-		/* wait for a message with timeout of 1ms */
-		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, 50);
+		unsigned ertt = session->internals.ertt;
+		/* use our estimation of round-trip + some time for the server to calculate
+		 * the value(s). */
+		ertt += 60;
+
+		/* wait for a message with timeout */
+		ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1, ertt);
 		if (ret < 0 && (gnutls_error_is_fatal(ret) && ret != GNUTLS_E_TIMEDOUT)) {
 			return gnutls_assert_val(ret);
 		}
