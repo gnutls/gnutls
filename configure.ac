@@ -825,10 +825,6 @@ AC_ARG_ENABLE(guile,
 opt_guile_bindings=$enableval)
 AC_MSG_RESULT($opt_guile_bindings)
 
-AC_ARG_WITH([guile-site-dir],
-  [AS_HELP_STRING([--with-guile-site-dir],
-     [use the given directory as the Guile site (use with care)])])
-
 if test "$opt_guile_bindings" = "yes"; then
    AC_MSG_RESULT([***
 *** Detecting GNU Guile...
@@ -846,6 +842,7 @@ if test "$opt_guile_bindings" = "yes"; then
 
       GUILE_PKG
       GUILE_PROGS
+      GUILE_SITE_DIR
       GUILE_FLAGS
 
       save_CFLAGS="$CFLAGS"
@@ -864,24 +861,6 @@ if test "$opt_guile_bindings" = "yes"; then
 
       if test "$opt_guile_bindings" = "yes"; then
         AC_MSG_RESULT([yes])
-	case "x$with_guile_site_dir" in 
-	     xno)
-		# Use the default $(GUILE_SITE).
-		GUILE_SITE_DIR
-		;;
-	     x|xyes)
-		# Automatically derive $(GUILE_SITE) from $(pkgdatadir).  This
-		# hack is used to allow `distcheck' to work (see
-		# `DISTCHECK_CONFIGURE_FLAGS' in the top-level `Makefile.am').
-		GUILE_SITE="\$(datadir)/guile/site/$guile_effective_version"
-		AC_SUBST(GUILE_SITE)
-		;;
-	     *)
-		# Use the user-specified directory as $(GUILE_SITE).
-		GUILE_SITE="$with_guile_site_dir"
-		AC_SUBST(GUILE_SITE)
-		;;
-	esac
         AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
         _gcc_cflags_save="$CFLAGS"
         CFLAGS="${CFLAGS} -fgnu89-inline"
