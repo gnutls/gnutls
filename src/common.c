@@ -114,45 +114,6 @@ const char *raw_to_base64(const unsigned char *raw, size_t raw_size)
 	return buf;
 }
 
-static void print_x509_info_compact(gnutls_session_t session, int print_crt_status)
-{
-	gnutls_x509_crt_t crt;
-	const gnutls_datum_t *cert_list;
-	unsigned int cert_list_size = 0;
-	int ret;
-	gnutls_datum_t cinfo;
-
-	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
-	if (cert_list_size == 0) {
-		if (print_crt_status)
-			fprintf(stderr, "No certificates found!\n");
-		return;
-	}
-
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		fprintf(stderr, "Memory error\n");
-		return;
-	}
-
-	ret =
-	    gnutls_x509_crt_import(crt, &cert_list[0],
-				   GNUTLS_X509_FMT_DER);
-	if (ret < 0) {
-		fprintf(stderr, "Decoding error: %s\n",
-			gnutls_strerror(ret));
-		return;
-	}
-
-	ret = gnutls_x509_crt_print(crt, GNUTLS_CRT_PRINT_COMPACT, &cinfo);
-	if (ret == 0) {
-		log_msg(stdout, "- X.509 cert: %s\n", cinfo.data);
-		gnutls_free(cinfo.data);
-	}
-
-	gnutls_x509_crt_deinit(crt);
-}
-
 static void
 print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert, int print_crt_status)
 {
@@ -585,24 +546,6 @@ void print_cert_info2(gnutls_session_t session, int verbose, FILE *out, int prin
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
 		print_x509_info(session, out, flag, print_cert, print_crt_status);
-		break;
-	default:
-		break;
-	}
-}
-
-void print_cert_info_compact(gnutls_session_t session)
-{
-	int verbose = 0;
-
-	if (gnutls_certificate_client_get_request_status(session) != 0) {
-		log_msg(stdout, "- Server has requested a certificate.\n");
-		verbose = 1;
-	}
-
-	switch (gnutls_certificate_type_get(session)) {
-	case GNUTLS_CRT_X509:
-		print_x509_info_compact(session, verbose);
 		break;
 	default:
 		break;
