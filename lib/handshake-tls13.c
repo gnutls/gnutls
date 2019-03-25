@@ -605,6 +605,8 @@ _gnutls13_recv_async_handshake(gnutls_session_t session)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 
 	do {
+		_gnutls_handshake_buffer_init(&hsk);
+
 		/* the received handshake message has already been pushed into
 		 * handshake buffers. As we do not need to use the handshake hash
 		 * buffers we call the lower level receive functions */
