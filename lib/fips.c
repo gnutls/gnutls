@@ -323,6 +323,31 @@ int _gnutls_fips_perform_self_checks2(void)
 		goto error;
 	}
 
+	/* Digest tests */
+	ret = gnutls_digest_self_test(0, GNUTLS_DIG_SHA3_224);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = gnutls_digest_self_test(0, GNUTLS_DIG_SHA3_256);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = gnutls_digest_self_test(0, GNUTLS_DIG_SHA3_384);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = gnutls_digest_self_test(0, GNUTLS_DIG_SHA3_512);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	/* MAC (includes message digest test) */
 	ret = gnutls_mac_self_test(0, GNUTLS_MAC_SHA1);
 	if (ret < 0) {
