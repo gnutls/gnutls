@@ -1918,8 +1918,8 @@ is set using @funcref{gnutls_db_set_cache_expiration}. This function also contro
 the ticket key rotation period. Currently, the session key rotation interval is set
 to 3 times the expiration time set by this function.
 
-Under TLS 1.3, the server can send a new session ticket at any time
-using @funcref{gnutls_session_ticket_send}.
+Under TLS 1.3, the server sends by default 2 tickets, and can send
+additional session tickets at any time using @funcref{gnutls_session_ticket_send}.
 
 @showfuncdesc{gnutls_session_ticket_send}
 

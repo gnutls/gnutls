@@ -29,6 +29,10 @@ See the end for copying conditions.
    session, as non-writeable security officer sessions are undefined in PKCS#11
    (#721).
 
+** libgnutls: the default number of tickets sent under TLS 1.3 was increased to
+   two. This makes it easier for clients which perform multiple connections
+   to the server to use the tickets sent by a default server.
+
 ** libgnutls: no longer send downgrade sentinel in TLS 1.3.
    Previously the sentinel value was embedded to early in version
    negotiation and was sent even on TLS 1.3. It is now sent only when

@@ -47,6 +47,7 @@ int main()
 #include <signal.h>
 #include <assert.h>
 
+#include "../lib/handshake-defs.h"
 #include "cert-common.h"
 #include "utils.h"
 
@@ -75,7 +76,7 @@ static int ticket_callback(gnutls_session_t session, unsigned int htype,
 	assert(htype == GNUTLS_HANDSHAKE_NEW_SESSION_TICKET);
 
 	counter++;
-	if (counter == 1) /* ignore the first ticket */
+	if (counter <= TLS13_TICKETS_TO_SEND) /* ignore the default tickets sent */
 		return 0;
 
 	d = gnutls_session_get_ptr(session);

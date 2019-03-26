@@ -362,8 +362,6 @@ static int generate_hs_traffic_keys(gnutls_session_t session)
 	return 0;
 }
 
-#define TICKETS_TO_SEND 1
-
 /*
  * _gnutls13_handshake_server
  * This function does the server stuff of the handshake protocol.
@@ -510,7 +508,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 			_gnutls_set_resumed_parameters(session);
 
 		if (session->internals.hsk_flags & HSK_EARLY_START_USED) {
-			ret = _gnutls13_send_session_ticket(session, TICKETS_TO_SEND,
+			ret = _gnutls13_send_session_ticket(session, TLS13_TICKETS_TO_SEND,
 							    AGAIN(STATE109));
 
 			STATE = STATE109;
@@ -566,7 +564,7 @@ int _gnutls13_handshake_server(gnutls_session_t session)
 		FALLTHROUGH;
 	case STATE115:
 		if (!(session->internals.hsk_flags & (HSK_TLS13_TICKET_SENT|HSK_EARLY_START_USED))) {
-			ret = _gnutls13_send_session_ticket(session, TICKETS_TO_SEND,
+			ret = _gnutls13_send_session_ticket(session, TLS13_TICKETS_TO_SEND,
 							    AGAIN(STATE115));
 			STATE = STATE115;
 			IMED_RET("send session ticket", ret, 0);
@@ -738,7 +736,7 @@ _gnutls13_recv_async_handshake(gnutls_session_t session)
  *
  * Sends a fresh session ticket to the peer. This is relevant only
  * in server side under TLS1.3. This function may also return %GNUTLS_E_AGAIN
- * or %GNUTLS_E_INTERRUPTED.
+ * or %GNUTLS_E_INTERRUPTED and in that case it must be called again.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or a negative error code.
  **/
