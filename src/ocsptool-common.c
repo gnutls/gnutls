@@ -184,8 +184,7 @@ int send_ocsp_request(const char *server,
 
 		url = malloc(data.size + 1);
 		if (url == NULL) {
-		    ret = -1;
-		    return ret;
+		    return -1;
 		}
 		memcpy(url, data.data, data.size);
 		url[data.size] = 0;
