@@ -39,6 +39,7 @@ void gnutls_memset(void *data, int c, size_t size)
 #ifdef HAVE_EXPLICIT_BZERO
 	if (c == 0) {
 		explicit_bzero(data, size);
+		return;
 	}
 #endif
 	volatile_zero = 0;
