@@ -52,7 +52,7 @@ commit-check:
     policy: pull
   script:
     # we want $ALPINE_BASE_BUILD without git, so add it here
-    - apk add git
+    - apk add git bash
     - devel/check_if_signed
   retry: 0
 

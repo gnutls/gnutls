@@ -1,7 +1,9 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+set -e
 
 if test -z "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"; then
-  CI_MERGE_REQUEST_TARGET_BRANCH_NAME="master"
+  CI_MERGE_REQUEST_TARGET_BRANCH_NAME="origin/master"
 fi
 
 echo "target=$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
