@@ -42,7 +42,22 @@ ${fuzz} ${CFLAGS} -o ${TEST} main.c ${TEST}.c -L../lib/.libs/ -lgnutls || exit 1
 
 TMPOUT=${TEST}.$$.out
 mkdir -p ${TMPOUT}
-afl-fuzz -i ${TEST}.in -o ${TMPOUT} -- ./${TEST}
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -M fuzzer01 -- ./${TEST} &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer02 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer03 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer04 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer05 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer06 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer07 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer08 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer09 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer10 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer11 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer12 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer13 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer14 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer15 -- ./${TEST} >/dev/null 2>&1 &
+afl-fuzz -i ${TEST}.in -o ${TMPOUT} -S fuzzer16 -- ./${TEST} >/dev/null 2>&1 &
 
 echo "output was stored in $TMPOUT"
 

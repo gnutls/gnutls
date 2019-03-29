@@ -160,13 +160,24 @@ unsigned char _ca_der[] = {
 };
 unsigned int _ca_der_len = 1510;
 
+static time_t mytime(time_t * t)
+{
+	time_t then = 1553835274;
+	if (t)
+		*t = then;
+
+	return then;
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	gnutls_datum_t raw;
 	gnutls_datum_t ca;
 	gnutls_x509_crt_t crt, ca_crt;
 	int ret;
-	unsigned status;
+	unsigned status = 0;
+
+	gnutls_global_set_time_function(mytime);
 
 	raw.data = (unsigned char *)data;
 	raw.size = size;
@@ -192,7 +203,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 					  GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN|GNUTLS_VERIFY_ALLOW_BROKEN|
 					  GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS,
 					  &status);
-	assert(ret >= 0 || status != 0);
+	assert(ret < 0 || status != 0);
 
  fail:
 	gnutls_x509_crt_deinit(crt);
