@@ -1,27 +1,32 @@
 #!/usr/bin/env bash
 
-set -e
+# MRs have the contributor git tree as the only remote
+# Add GnuTLS Gitlab upstream tree as remote so we can compare against
+# the right master tree
 
-if test -z "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"; then
-  CI_MERGE_REQUEST_TARGET_BRANCH_NAME="origin/master"
+git remote add gitlab-gnutls-upstream-git-tree https://gitlab.com/gnutls/gnutls.git
+git fetch -q gitlab-gnutls-upstream-git-tree master
+
+if [ -z "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"]; then
+  CI_MERGE_REQUEST_TARGET_BRANCH_NAME="gitlab-gnutls-upstream-git-tree/master"
 fi
 
 echo "target=$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
 echo "source=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
 
-if test -z "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"; then
-  CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
-  echo "branch=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
-fi
-
 # create list of commits of the current branch
-commits=$(git rev-list --no-merges $CI_MERGE_REQUEST_TARGET_BRANCH_NAME..$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME)
+commits=$(git rev-list --no-merges $CI_MERGE_REQUEST_TARGET_BRANCH_NAME..)
+if [ -z "$commits" ]; then
+    echo "Couldn't find any commits to check"
+    exit 1
+fi
 
 # check if author's email matches email in 'Signed-off-by'
 for hash in $commits; do
   author=$(git log --format='%ae' ${hash}^\!)
   signed=$(git log --format='%b' ${hash}^\! | grep -i "Signed-off-by:")
-  if test $? -ne 0; then
+  echo "Checking commit $hash from Author $author and Signed-off-by: $signed"
+  if [ $? -ne 0 ]; then
     echo "Missing Signed-off-by"
     exit 1
   fi
