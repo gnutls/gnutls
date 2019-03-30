@@ -5,6 +5,14 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.8 (unreleased)
+
+** libgnutls: Added support for AES-XTS cipher (#354)
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.7 (released 2019-03-27)
 
 ** libgnutls, gnutls tools: Every gnutls_free() will automatically set
