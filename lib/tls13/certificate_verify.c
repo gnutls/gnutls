@@ -179,11 +179,11 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 			if (server) {
 				return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 			} else {
-				/* if we didn't get a cert request there will not be any */
-				if (!(session->internals.hsk_flags & HSK_CRT_SENT))
-					return 0;
-				else
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				/* for client, this means either we
+				 * didn't get a cert request or we are
+				 * declining authentication; in either
+				 * case we don't send a cert verify */
+				return 0;
 			}
 		}
 
