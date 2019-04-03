@@ -38,6 +38,8 @@
 #include <gnutls/gnutls.h>
 #include "profiles.h"
 #include "c-strcase.h"
+#include "inih/ini.h"
+#include "name_val_array.h"
 
 #define MAX_ELEMENTS 64
 
@@ -944,91 +946,65 @@ static void dummy_func(gnutls_priority_t c)
 
 #include <priority_options.h>
 
-static char *check_str(char *line, size_t line_size, const char *needle, size_t needle_size)
-{
-	char *p;
-	unsigned n;
-
-	while (c_isspace(*line)) {
-		line++;
-		line_size--;
-	}
-
-	if (line[0] == '#' || needle_size >= line_size)
-		return NULL;
-
-	if (memcmp(line, needle, needle_size) == 0) {
-		p = &line[needle_size];
-		while (c_isspace(*p)) {
-			p++;
-		}
-		if (*p != '=') {
-			return NULL;
-		} else
-			p++;
-
-		while (c_isspace(*p)) {
-			p++;
-		}
-
-		n = strlen(p);
-
-		if (n > 1 && p[n-1] == '\n') {
-			n--;
-			p[n] = 0;
-		}
-
-		if (n > 1 && p[n-1] == '\r') {
-			n--;
-			p[n] = 0;
-		}
-		return p;
-	}
-
-	return NULL;
-}
+static name_val_array_t system_wide_priority_strings = NULL;
+static unsigned system_wide_priority_strings_init = 0;
 
 static const char *system_priority_file = SYSTEM_PRIORITY_FILE;
-static char *system_priority_buf = NULL;
-static size_t system_priority_buf_size = 0;
 static time_t system_priority_last_mod = 0;
 
+static int cfg_ini_handler(void *_ctx, const char *section, const char *name, const char *value)
+{
+	/* Parse sections */
+	if (section == NULL || section[0] == 0) {
+		if (system_wide_priority_strings_init == 0) {
+			_name_val_array_init(&system_wide_priority_strings);
+			system_wide_priority_strings_init = 1;
+		}
+
+		_gnutls_debug_log("cfg: adding priority: %s -> %s\n", name, value);
+
+		return _name_val_array_append(&system_wide_priority_strings, name, value);
+	} else {
+		_gnutls_debug_log("cfg: skipping unknown section %s\n",
+				  section);
+	}
+
+	return 0;
+}
 
 static void _gnutls_update_system_priorities(void)
 {
-#ifdef HAVE_FMEMOPEN
-	gnutls_datum_t data;
 	int ret;
 	struct stat sb;
 
 	if (stat(system_priority_file, &sb) < 0) {
-		_gnutls_debug_log("unable to access: %s: %d\n",
+		_gnutls_debug_log("cfg: unable to access: %s: %d\n",
 				  system_priority_file, errno);
 		return;
 	}
 
-	if (system_priority_buf != NULL &&
+	if (system_wide_priority_strings_init != 0 &&
 	    sb.st_mtime == system_priority_last_mod) {
-		_gnutls_debug_log("system priority %s has not changed\n",
+		_gnutls_debug_log("cfg: system priority %s has not changed\n",
 				  system_priority_file);
 		return;
 	}
 
-	ret = gnutls_load_file(system_priority_file, &data);
+	if (system_wide_priority_strings_init != 0)
+		_name_val_array_clear(&system_wide_priority_strings);
+
+	ret = ini_parse(system_priority_file, cfg_ini_handler, NULL);
 	if (ret < 0) {
-		_gnutls_debug_log("unable to load: %s: %d\n",
+		_gnutls_debug_log("cfg: unable to parse: %s: %d\n",
 				  system_priority_file, ret);
 		return;
 	}
 
-	_gnutls_debug_log("cached system priority %s mtime %lld\n",
+	_gnutls_debug_log("cfg: loaded system priority %s mtime %lld\n",
 			  system_priority_file,
 			  (unsigned long long)sb.st_mtime);
-	gnutls_free(system_priority_buf);
-	system_priority_buf = (char*)data.data;
-	system_priority_buf_size = data.size;
+
 	system_priority_last_mod = sb.st_mtime;
-#endif
 }
 
 void _gnutls_load_system_priorities(void)
@@ -1044,11 +1020,7 @@ void _gnutls_load_system_priorities(void)
 
 void _gnutls_unload_system_priorities(void)
 {
-#ifdef HAVE_FMEMOPEN
-	gnutls_free(system_priority_buf);
-#endif
-	system_priority_buf = NULL;
-	system_priority_buf_size = 0;
+	_name_val_array_clear(&system_wide_priority_strings);
 	system_priority_last_mod = 0;
 }
 
@@ -1063,14 +1035,12 @@ void _gnutls_unload_system_priorities(void)
  */
 char *_gnutls_resolve_priorities(const char* priorities)
 {
-char *p = (char*)priorities;
-char *additional = NULL;
-char *ret = NULL;
-char *ss, *ss_next, *line = NULL;
-unsigned ss_len, ss_next_len;
-int l;
-FILE* fp = NULL;
-size_t n, n2 = 0, line_size;
+	const char *p = priorities;
+	char *additional = NULL;
+	char *ret = NULL;
+	const char *ss, *ss_next;
+	unsigned ss_len, ss_next_len;
+	size_t n, n2 = 0;
 
 	while (c_isspace(*p))
 		p++;
@@ -1102,35 +1072,17 @@ size_t n, n2 = 0, line_size;
 				ss_next_len = 0;
 			}
 
-#ifdef HAVE_FMEMOPEN
 			/* Always try to refresh the cached data, to
 			 * allow it to be updated without restarting
 			 * all applications
 			 */
 			_gnutls_update_system_priorities();
-			fp = fmemopen(system_priority_buf, system_priority_buf_size, "r");
-#else
-			fp = fopen(system_priority_file, "r");
-#endif
-			if (fp == NULL) {/* fail */
-				ret = NULL;
-				goto finish;
-			}
 
-			do {
-				l = getline(&line, &line_size, fp);
-				if (l > 0) {
-					p = check_str(line, line_size, ss, ss_len);
-					if (p != NULL)
-						break;
-				}
-			} while (l>0);
+			p = _name_val_array_value(system_wide_priority_strings, ss, ss_len);
 
 			_gnutls_debug_log("resolved '%.*s' to '%s', next '%.*s'\n",
 					  ss_len, ss, S(p), ss_next_len, S(ss_next));
 			ss = ss_next;
-			fclose(fp);
-			fp = NULL;
 		} while (ss && p == NULL);
 
 		if (p == NULL) {
@@ -1164,9 +1116,6 @@ finish:
 	if (ret != NULL) {
 		_gnutls_debug_log("selected priority string: %s\n", ret);
 	}
-	free(line);
-	if (fp != NULL)
-		fclose(fp);
 
 	return ret;
 }

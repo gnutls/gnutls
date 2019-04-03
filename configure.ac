@@ -950,6 +950,13 @@ dnl Some variables needed in makefiles
 YEAR=`date +%Y`
 AC_SUBST([YEAR], $YEAR)
 
+dnl configuration options for config file parsing (inih)
+AC_DEFINE([INI_MAX_LINE], 2048, [inih maximum line size])
+AC_DEFINE([INI_ALLOW_INLINE_COMMENTS], 1, [whether to allowin inline comments])
+AC_DEFINE([INI_STOP_ON_FIRST_ERROR], 1, [whether to stop on first error])
+AC_DEFINE_UNQUOTED([INI_INLINE_COMMENT_PREFIXES], [";#"], [The inline comment prefixes])
+AC_DEFINE_UNQUOTED([INI_START_COMMENT_PREFIXES], [";#"], [The comment prefixes])
+
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
   Makefile

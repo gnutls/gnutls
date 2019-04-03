@@ -45,7 +45,6 @@ VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|sr
 update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
-exclude_file_name_regexp--sc_error_message_period = ^src/crywrap/crywrap.c$$
 exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/core.c|src/certtool.c|src/ocsptool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
 exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
 exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$
@@ -56,6 +55,7 @@ exclude_file_name_regexp--sc_m4_quote_check='lib/unistring/m4/absolute-header.m4
 exclude_file_name_regexp--sc_makefile_at_at_check='lib/unistring/Makefile.am'
 exclude_file_name_regexp--sc_prohibit_stddef_without_use='u*-normalize.c'
 exclude_file_name_regexp--sc_prohibit_strncpy='unistr.in.h'
+exclude_file_name_regexp--sc_prohibit_strncpy='lib/inih/ini.c'
 gl_public_submodule_commit =
 
 autoreconf:
