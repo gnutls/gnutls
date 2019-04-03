@@ -46,6 +46,8 @@ commit-check:
     - /bin/true
   after_script:
     - /bin/true
+  except:
+  - master@gnutls/gnutls
   cache:
     # do not load cache files
     key: none
