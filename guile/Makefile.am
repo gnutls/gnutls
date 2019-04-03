@@ -22,8 +22,7 @@ SUBDIRS = src
 
 EXTRA_DIST = .dir-locals.el
 
-guilemoduledir = $(GUILE_SITE)
-guilemodulesubdir = $(GUILE_SITE)/gnutls
+guilemodulesubdir = $(guilemoduledir)/gnutls
 
 nodist_guilemodule_DATA = modules/gnutls.scm
 dist_guilemodulesub_DATA = modules/gnutls/extra.scm

@@ -825,12 +825,24 @@ if test "x$with_default_blacklist_file" != x; then
 fi
 
 dnl Guile bindings.
-opt_guile_bindings=yes
 AC_MSG_CHECKING([whether building Guile bindings])
 AC_ARG_ENABLE(guile,
 	AS_HELP_STRING([--enable-guile], [build GNU Guile bindings]),
-opt_guile_bindings=$enableval)
+		[opt_guile_bindings=$enableval], [opt_guile_bindings=yes])
 AC_MSG_RESULT($opt_guile_bindings)
+
+AC_ARG_WITH(guile-site-dir, AS_HELP_STRING([--with-guile-site-dir=DIR],
+    [guile site directory for gnutls, default is guile system settings]),
+    [guilemoduledir="${withval}"], [guilemoduledir='$(GUILE_SITE)'])
+AC_ARG_WITH(guile-site-ccache-dir, AS_HELP_STRING([--with-guile-site-ccache-dir=DIR],
+    [guile ccache directory for gnutls, default is guile system settings]),
+    [guileobjectdir="${withval}"], [guileobjectdir='$(GUILE_SITE_CCACHE)'])
+AC_ARG_WITH(guile-extension-dir, AS_HELP_STRING([--with-guile-extension-dir=DIR],
+    [guile extension directory for gnutls, default is guile system settings]),
+    [guileextensiondir="${withval}"], [guileextensiondir='$(GUILE_EXTENSION)'])
+AC_SUBST([guilemoduledir])
+AC_SUBST([guileobjectdir])
+AC_SUBST([guileextensiondir])
 
 if test "$opt_guile_bindings" = "yes"; then
    AC_MSG_RESULT([***
@@ -852,6 +864,28 @@ if test "$opt_guile_bindings" = "yes"; then
       GUILE_SITE_DIR
       GUILE_FLAGS
 
+      # Backward compatibility with <guile-2.2 m4 macro that is used
+      # due to autreconf of several CI machine.
+      # We need to guess the locations of ccache and extension
+      if test -z "${GUILE_SITE_CCACHE}"; then
+          AC_MSG_NOTICE([Found <guile-2.2 m4, macro emulating])
+
+          AC_MSG_CHECKING([for GUILE_SITE_CCACHE via pkg-config])
+          GUILE_SITE_CCACHE=`$PKG_CONFIG --variable=siteccachedir guile-$GUILE_EFFECTIVE_VERSION`
+          AC_MSG_RESULT([${GUILE_SITE_CCACHE}])
+          if test -z "${GUILE_SITE_CCACHE}"; then
+                  AC_MSG_CHECKING([for GUILE_SITE_CCACHE via guile])
+                  GUILE_SITE_CCACHE=`$GUILE -c "(display (if (defined? '%site-ccache-dir) (%site-ccache-dir) \"\"))"`
+                  AC_MSG_RESULT([${GUILE_SITE_CCACHE}])
+          fi
+          AC_SUBST([GUILE_SITE_CCACHE])
+
+          AC_MSG_CHECKING([for GUILE_EXTENSION])
+          GUILE_EXTENSION=`$PKG_CONFIG --print-errors --variable=extensiondir guile-$GUILE_EFFECTIVE_VERSION`
+          AC_MSG_RESULT([${GUILE_EXTENSION}])
+          AC_SUBST([GUILE_EXTENSION])
+      fi
+
       save_CFLAGS="$CFLAGS"
       save_LIBS="$LIBS"
       CFLAGS="$CFLAGS $GUILE_CFLAGS"
@@ -861,10 +895,6 @@ if test "$opt_guile_bindings" = "yes"; then
         [], [opt_guile_bindings=no])
       CFLAGS="$save_CFLAGS"
       LIBS="$save_LIBS"
-
-      AC_MSG_CHECKING([the Guile effective version])
-      guile_effective_version="`$GUILE -c '(display (effective-version))'`"
-      AC_MSG_RESULT([$guile_effective_version])
 
       if test "$opt_guile_bindings" = "yes"; then
         AC_MSG_RESULT([yes])
@@ -884,14 +914,6 @@ if test "$opt_guile_bindings" = "yes"; then
 	AC_CHECK_FUNCS([scm_gc_malloc_pointerless])
 	CFLAGS="$save_CFLAGS"
 	LIBS="$save_LIBS"
-
-	# The place where guile-gnutls.la will go.
-	guileextensiondir="$libdir/guile/$guile_effective_version"
-	AC_SUBST([guileextensiondir])
-
-	# The location of .go files.
-	guileobjectdir="$libdir/guile/$guile_effective_version/site-ccache"
-	AC_SUBST([guileobjectdir])
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
