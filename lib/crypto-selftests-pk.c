@@ -313,6 +313,7 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 {
 	int ret;
 	gnutls_datum_t sig = { NULL, 0 };
+	gnutls_datum_t known_sig = { NULL, 0 };
 	gnutls_datum_t raw_rsa_key = { (void*)rsa_key2048, sizeof(rsa_key2048)-1 };
 	gnutls_datum_t raw_dsa_key = { (void*)dsa_key, sizeof(dsa_key)-1 };
 	gnutls_datum_t raw_ecc_key = { (void*)ecc_key, sizeof(ecc_key)-1 };
@@ -343,6 +344,8 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	}
 
 	if (pk == GNUTLS_PK_RSA) {
+		known_sig.data = (void *)rsa_sig;
+		known_sig.size = sizeof(rsa_sig) - 1;
 		ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	} else if (pk == GNUTLS_PK_RSA_PSS) {
 		ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
@@ -376,6 +379,16 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
+	}
+
+	/* Compare with a stored known signature */
+	if (known_sig.data != NULL) {
+		if (sig.size != known_sig.size
+			|| memcmp(sig.data, known_sig.data, sig.size) != 0) {
+			ret = GNUTLS_E_SELF_TEST_ERROR;
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	ret =
