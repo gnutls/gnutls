@@ -187,14 +187,19 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 			}
 		}
 
-		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
-		if (algo == GNUTLS_SIGN_UNKNOWN)
-			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+		if (server) {
+			algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
+			if (algo == GNUTLS_SIGN_UNKNOWN)
+				return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 
-		if (server)
 			gnutls_sign_algorithm_set_server(session, algo);
-		else
-			gnutls_sign_algorithm_set_client(session, algo);
+		} else {
+			/* for client, signature algorithm is already
+			 * determined from Certificate Request */
+			algo = gnutls_sign_algorithm_get_client(session);
+			if (unlikely(algo == GNUTLS_SIGN_UNKNOWN))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
 
 		se = _gnutls_sign_to_entry(algo);
 
