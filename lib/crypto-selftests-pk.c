@@ -475,19 +475,17 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 		goto cleanup;
 	}
 
-	/* Test if the signature we generate matches the stored */
+	ret = gnutls_privkey_sign_data(key, dig, 0, &signed_data, &sig);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Test if the generated signature matches the stored */
 	ssig.data = (void *) stored_sig;
 	ssig.size = stored_sig_size;
 
 	if (deterministic_sigs != 0) {	/* do not compare against stored signature if not provided */
-		ret =
-		    gnutls_privkey_sign_data(key, dig, 0, &signed_data,
-					     &sig);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
 		if (sig.size != ssig.size
 		    || memcmp(sig.data, ssig.data, sig.size) != 0) {
 			ret = GNUTLS_E_SELF_TEST_ERROR;
@@ -507,13 +505,24 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 		}
 	}
 
-	/* Test if we can verify the signature */
+	/* Test if we can verify the generated signature */
 
 	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	ret =
+	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
+				       &signed_data, &sig);
+	if (ret < 0) {
+		ret = GNUTLS_E_SELF_TEST_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Test if we can verify the stored signature */
 
 	ret =
 	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
@@ -528,7 +537,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 
 	ret =
 	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
-				       &bad_data, &ssig);
+				       &bad_data, &sig);
 
 	if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 		ret = GNUTLS_E_SELF_TEST_ERROR;
