@@ -546,18 +546,14 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 			if (ret < 0) { \
 				gnutls_assert(); \
 				goto cleanup; \
-			} \
-			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL)) \
-				return 0
+			}
 
 #define PK_KNOWN_TEST(pk, det, bits, dig, pkey, sig) \
 			ret = test_known_sig(pk, bits, dig, pkey, sizeof(pkey)-1, sig, sizeof(sig)-1, det); \
 			if (ret < 0) { \
 				gnutls_assert(); \
 				goto cleanup; \
-			} \
-			if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL)) \
-				return 0
+			}
 
 
 /* Known answer tests for DH */
@@ -784,10 +780,11 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 2048, GNUTLS_DIG_SHA256,
 			      rsa_key2048, rsa_sig);
 		PK_TEST(GNUTLS_PK_RSA, test_rsa_enc, 2048, 0);
-		PK_TEST(GNUTLS_PK_RSA, test_sig, 3072, GNUTLS_SIGN_RSA_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
+
+		PK_TEST(GNUTLS_PK_RSA, test_sig, 3072, GNUTLS_SIGN_RSA_SHA256);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_RSA_PSS:
@@ -800,10 +797,11 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_DSA:
 		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 2048, GNUTLS_DIG_SHA256,
 			      dsa_privkey, dsa_sig);
-		PK_TEST(GNUTLS_PK_DSA, test_sig, 3072, GNUTLS_SIGN_DSA_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
+
+		PK_TEST(GNUTLS_PK_DSA, test_sig, 3072, GNUTLS_SIGN_DSA_SHA256);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_EC:
@@ -820,12 +818,13 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			      (GNUTLS_ECC_CURVE_SECP256R1),
 			      GNUTLS_DIG_SHA256, ecdsa_secp256r1_privkey,
 			      ecdsa_secp256r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
-			GNUTLS_SIGN_ECDSA_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
+
+		PK_TEST(GNUTLS_PK_EC, test_sig,
+			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
+			GNUTLS_SIGN_ECDSA_SHA256);
 
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
@@ -870,31 +869,35 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_GOST_01:
 		PK_KNOWN_TEST(GNUTLS_PK_GOST_01, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_GOSTR_94,
 			      gost01_privkey, gost01_sig);
-		PK_TEST(GNUTLS_PK_GOST_01, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
-			GNUTLS_SIGN_GOST_94);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
+
+		PK_TEST(GNUTLS_PK_GOST_01, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
+			GNUTLS_SIGN_GOST_94);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_GOST_12_256:
 		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_256, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_STREEBOG_256,
 			      gost12_256_privkey, gost12_256_sig);
-		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
-			GNUTLS_SIGN_GOST_256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
+
+		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
+			GNUTLS_SIGN_GOST_256);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_GOST_12_512:
 		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_512, 0, GNUTLS_ECC_CURVE_GOST512A, GNUTLS_DIG_STREEBOG_512,
 			      gost12_512_privkey, gost12_512_sig);
-		PK_TEST(GNUTLS_PK_GOST_12_512, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A),
-			GNUTLS_SIGN_GOST_512);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
+
+		PK_TEST(GNUTLS_PK_GOST_12_512, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A),
+			GNUTLS_SIGN_GOST_512);
+
 #endif
 
 		break;
