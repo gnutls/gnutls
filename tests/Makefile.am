@@ -450,6 +450,14 @@ tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
+if ENABLE_PKCS11
+if !WINDOWS
+ctests += tls13/post-handshake-with-cert-pkcs11
+tls13_post_handshake_with_cert_pkcs11_DEPENDENCIES = libpkcs11mock2.la libutils.la
+tls13_post_handshake_with_cert_pkcs11_LDADD = $(LDADD) $(LIBDL)
+endif
+endif
+
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
 if !WINDOWS
