@@ -628,17 +628,23 @@ fi
 AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
   ["$unbound_root_key_file"], [The DNSSEC root key file])
 
+system_config_file="/etc/gnutls/config"
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
-                                 [specify the system priority file]),
-            system_priority_file="$withval", 
-system_priority_file="/etc/gnutls/default-priorities"
+                                 [specify the system-wide config file (set empty to disable; default is $config)]),
+            system_config_file="$withval"
 )
 
+AM_CONDITIONAL(DISABLE_SYSTEM_CONFIG, test -z "${system_config_file}")
+
+if test -z "${system_config_file}";then
+	AC_DEFINE([DISABLE_SYSTEM_CONFIG], 1, [Whether to disable system configuration])
+fi
+
 AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
-  ["$system_priority_file"], [The system priority file])
+  ["$system_config_file"], [The system-wide gnutls configuration file])
 
 AC_ARG_WITH(default-priority-string, AS_HELP_STRING([--with-default-priority-string],
-                                 [specify the default priority string (e.g. @SYSTEM)]),
+                                 [specify the default priority string used by gnutls_set_default_priority (default is NORMAL)]),
             prio_string="$withval", 
             prio_string="NORMAL")
 
@@ -1079,7 +1085,7 @@ AC_MSG_NOTICE([System files:
   Trust store file:     $with_default_trust_store_file
   Blacklist file:       $with_default_blacklist_file
   CRL file:             $with_default_crl_file
-  Priority file:        $system_priority_file
+  Configuration file:   $system_config_file
   DNSSEC root key file: $unbound_root_key_file
 ])
 

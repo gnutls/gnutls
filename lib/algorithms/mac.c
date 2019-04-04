@@ -36,7 +36,8 @@
 #define MAC_OID_STREEBOG_256 "1.2.643.7.1.1.4.1"
 #define MAC_OID_STREEBOG_512 "1.2.643.7.1.1.4.2"
 
-static const mac_entry_st hash_algorithms[] = {
+static SYSTEM_CONFIG_OR_CONST
+mac_entry_st hash_algorithms[] = {
 	{.name = "SHA1",
 	 .oid = HASH_OID_SHA1,
 	 .mac_oid = MAC_OID_SHA1,
@@ -246,6 +247,35 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 	);
 
 	return ret;
+}
+
+int _gnutls_digest_mark_insecure(const char *name)
+{
+#ifndef DISABLE_SYSTEM_CONFIG
+	mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && c_strcasecmp(p->name, name) == 0) {
+			p->preimage_insecure = 1;
+			return 0;
+		}
+	}
+
+#endif
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig)
+{
+	const mac_entry_st *p;
+
+	for(p = hash_algorithms; p->name != NULL; p++) {
+		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
+			return p->preimage_insecure;
+		}
+	}
+
+	return 1;
 }
 
 /**

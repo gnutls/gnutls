@@ -151,7 +151,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
 	sec-tls-app.texi cha-errors.texi cha-support.texi		\
 	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi	\
-	cha-tokens.texi cha-crypto.texi cha-auth.texi
+	cha-tokens.texi cha-crypto.texi cha-auth.texi cha-config.texi
 
 AUTOGENED_DOC = invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
