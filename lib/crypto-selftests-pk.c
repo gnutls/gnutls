@@ -22,6 +22,7 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
+#include "fips.h"
 #include <cipher_int.h>
 #include <datum.h>
 #include <gnutls/crypto.h>
@@ -114,10 +115,10 @@ static const char dsa_2048_privkey[] =
 	"-----END DSA PRIVATE KEY-----\n";
 
 static const char dsa_2048_sig[] =
-	"\x30\x3d\x02\x1c\x2e\x40\x14\xb3\x7a\x3f\xc0\x4f\x06\x74\x4f\xa6"
-	"\x5f\xc2\x0a\x46\x35\x38\x88\xb4\x1a\xcf\x94\x02\x40\x42\x7c\x7f"
-	"\x02\x1d\x00\x98\xfc\xf1\x08\x66\xf1\x86\x28\xc9\x73\x9e\x2b\x5d"
-	"\xce\x57\xe8\xb5\xeb\xcf\xa3\xf6\x60\xf6\x63\x16\x0e\xc0\x42";
+	"\x30\x3d\x02\x1d\x00\xbe\x87\x2f\xcf\xa1\xe4\x86\x5c\x72\x58\x4a"
+	"\x7b\x8f\x32\x7f\xa5\x1b\xdc\x5c\xae\xda\x98\xea\x15\x32\xed\x0c"
+	"\x4e\x02\x1c\x4c\x76\x01\x2b\xcd\xb9\x33\x95\xf2\xfa\xde\x56\x01"
+	"\xb7\xaa\xe4\x5a\x4a\x2e\xf1\x24\x5a\xd1\xb5\x83\x9a\x93\x61";
 
 /* secp256r1 private key and signature */
 static const char ecdsa_secp256r1_privkey[] =
@@ -128,11 +129,11 @@ static const char ecdsa_secp256r1_privkey[] =
 	"-----END EC PRIVATE KEY-----\n";
 
 static const char ecdsa_secp256r1_sig[] =
-	"\x30\x45\x02\x21\x00\x9b\x8f\x60\xed\x9e\x40\x8d\x74\x82\x73\xab"
-	"\x20\x1a\x69\xfc\xf9\xee\x3c\x41\x80\xc0\x39\xdd\x21\x1a\x64\xfd"
-	"\xbf\x7e\xaa\x43\x70\x02\x20\x44\x28\x05\xdd\x30\x47\x58\x96\x18"
-	"\x39\x94\x18\xba\xe7\x7a\xf6\x1e\x2d\xba\xb1\xe0\x7d\x73\x9e\x2f"
-	"\x58\xee\x0c\x2a\x89\xe8\x35";
+	"\x30\x45\x02\x21\x00\x80\x67\x18\xb9\x72\xc6\x0b\xe1\xc9\x89\x9b"
+	"\x85\x11\x49\x29\x08\xd9\x86\x76\xcc\xfb\xc1\xf4\xd0\xa2\x5e\xa7"
+	"\xb9\x12\xfb\x1a\x68\x02\x20\x67\x12\xb1\x89\x9e\x1d\x9d\x5c\x0f"
+	"\xef\x6e\xa7\x2a\x95\x8c\xfa\x54\x20\x80\xc8\x30\x7c\xff\x06\xbc"
+	"\xc8\xe2\x9a\x2f\x05\x2f\x67";
 
 #ifdef ENABLE_NON_SUITEB_CURVES
 /* secp192r1 private key and signature */
@@ -143,10 +144,10 @@ static const char ecdsa_secp192r1_privkey[] =
 	"Fg==" "-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp192r1_sig[] =
-	"\x30\x34\x02\x18\x5f\xb3\x10\x4b\x4d\x44\x48\x29\x4b\xfd\xa7\x8e"
-	"\xce\x57\xac\x36\x38\x54\xab\x73\xdb\xed\xb8\x5f\x02\x18\x0b\x8b"
-	"\xf3\xae\x49\x50\x0e\x47\xca\x89\x1a\x00\xca\x23\xf5\x8d\xd6\xe3"
-	"\xce\x9a\xff\x2e\x4f\x5c";
+	"\x30\x34\x02\x18\x7c\x43\xe3\xb7\x26\x90\x43\xb5\xf5\x63\x8f\xee"
+	"\xac\x78\x3d\xac\x35\x35\xd0\x1e\x83\x17\x2b\x64\x02\x18\x14\x6e"
+	"\x94\xd5\x7e\xac\x43\x42\x0b\x71\x7a\xc8\x29\xe6\xe3\xda\xf2\x95"
+	"\x0e\xe0\x63\x24\xed\xf2";
 
 /* secp224r1 private key and signature */
 static const char ecdsa_secp224r1_privkey[] =
@@ -156,10 +157,10 @@ static const char ecdsa_secp224r1_privkey[] =
 	"DqPsk8xBHAB7pA==" "-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp224r1_sig[] =
-	"\x30\x3d\x02\x1c\x76\x03\x8d\x74\xf4\xd3\x09\x2a\xb5\xdf\x6b\x5b"
-	"\xf4\x4b\x86\xb8\x62\x81\x5d\x7b\x7a\xbb\x37\xfc\xf1\x46\x1c\x2b"
-	"\x02\x1d\x00\xa0\x98\x5d\x80\x43\x89\xe5\xee\x1a\xec\x46\x08\x04"
-	"\x55\xbc\x50\xfa\x2a\xd5\xa6\x18\x92\x19\xdb\x68\xa0\x2a\xda";
+	"\x30\x3d\x02\x1c\x14\x22\x09\xa1\x51\x33\x37\xfd\x78\x73\xbd\x84"
+	"\x6e\x76\xa8\x60\x90\xf5\xb6\x57\x34\x25\xe0\x79\xe3\x01\x61\xa9"
+	"\x02\x1d\x00\xb1\xee\xdb\xae\xb3\xe6\x9c\x04\x68\xd5\xe1\x0d\xb6"
+	"\xfc\x5c\x45\xc3\x4f\xbf\x2b\xa5\xe0\x89\x37\x84\x04\x82\x5f";
 #endif
 
 /* secp384r1 private key and signature */
@@ -171,13 +172,13 @@ static const char ecdsa_secp384r1_privkey[] =
 	"pv8e4ugXagVQVBXNZJ859iYPdJR24vo=" "-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp384r1_sig[] =
-	"\x30\x66\x02\x31\x00\xbb\x4d\x25\x30\x13\x1b\x3b\x75\x60\x07\xed"
-	"\x53\x8b\x52\xee\xd8\x6e\xf1\x9d\xa8\x36\x0e\x2e\x20\x31\x51\x11"
-	"\x48\x78\xdd\xaf\x24\x38\x64\x81\x71\x6b\xa6\xb7\x29\x58\x28\x82"
-	"\x32\xba\x29\x29\xd9\x02\x31\x00\xeb\x70\x09\x87\xac\x7b\x78\x0d"
-	"\x4c\x4f\x08\x2b\x86\x27\xe2\x60\x1f\xc9\x11\x9f\x1d\xf5\x82\x4c"
-	"\xc7\x3d\xb0\x27\xc8\x93\x29\xc7\xd0\x0e\x88\x02\x09\x93\xc2\x72"
-	"\xce\xa5\x74\x8c\x3d\xe0\x8c\xad";
+	"\x30\x65\x02\x31\x00\xa7\x73\x60\x16\xdb\xf9\x1f\xfc\x9e\xd2\x12"
+	"\x23\xd4\x04\xa7\x31\x1f\x15\x28\xfd\x87\x9c\x2c\xb1\xf3\x38\x35"
+	"\x23\x3b\x6e\xfe\x6a\x5d\x89\x34\xbe\x02\x82\xc6\x27\xea\x45\x53"
+	"\xa9\x87\xc5\x31\x0a\x02\x30\x76\x32\x80\x6b\x43\x3c\xb4\xfd\x90"
+	"\x03\xe0\x1d\x5d\x77\x18\x45\xf6\x71\x29\xa9\x05\x87\x49\x75\x3a"
+	"\x78\x9c\x49\xe5\x6c\x8e\x18\xcd\x5d\xee\x2c\x6f\x92\xf7\x15\xd3"
+	"\x38\xd5\xf9\x9b\x9d\x1a\xf4";
 
 /* secp521r1 private key and signature */
 static const char ecdsa_secp521r1_privkey[] =
@@ -190,59 +191,37 @@ static const char ecdsa_secp521r1_privkey[] =
 	"-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp521r1_sig[] =
-	"\x30\x81\x87\x02\x42\x01\xb8\xcb\x52\x9e\x10\xa8\x49\x3f\xe1\x9e"
-	"\x14\x0a\xcf\x96\xed\x7e\xab\x7d\x0c\xe1\x9b\xa4\x97\xdf\x01\xf5"
-	"\x35\x42\x5f\x5b\x28\x15\x24\x33\x6e\x59\x6c\xaf\x10\x8b\x98\x8e"
-	"\xe9\x4c\x23\x0d\x76\x92\x03\xdd\x6d\x8d\x08\x47\x15\x5b\xf8\x66"
-	"\x75\x75\x40\xe8\xf4\xa0\x52\x02\x41\x15\x27\x7c\x5f\xa6\x33\xa6"
-	"\x29\x68\x3f\x55\x8d\x7f\x1d\x4f\x88\xc6\x61\x6e\xac\x21\xdf\x2b"
-	"\x7b\xde\x76\x9a\xdc\xe6\x3b\x94\x3f\x03\x9c\xa2\xa6\xa3\x63\x39"
-	"\x48\xbd\x79\x70\x21\xf2\x6b\xff\x58\x66\xf1\x58\xc2\x58\xad\x4f"
-	"\x84\x14\x5d\x05\x12\x83\xd0\x87\xbd\xf3";
+	"\x30\x81\x88\x02\x42\x01\x9d\x13\x2e\xc9\x75\x1b\x60\x10\x62\xc5"
+	"\x0d\xcb\x08\x9e\x86\x01\xd3\xc9\x8c\xee\x2e\x16\x3d\x8c\xc2\x65"
+	"\x80\xe1\x32\x56\xc3\x02\x9d\xf0\x4a\x89\x8d\x2e\x33\x2a\x90\x4e"
+	"\x72\x1d\xaa\x84\x14\xe8\xcb\xdf\x7a\x4a\xc9\x67\x2e\xba\xa3\xf2"
+	"\xc2\x07\xf7\x1b\xa5\x91\xbd\x02\x42\x01\xe3\x32\xd2\x25\xeb\x2e"
+	"\xaf\xb4\x6c\xc0\xaa\x5c\xc1\x56\x14\x13\x23\x7f\x62\xcf\x4c\xb8"
+	"\xd1\x96\xe0\x29\x6d\xed\x74\xdd\x23\x64\xf9\x29\x86\x40\x22\x2f"
+	"\xb6\x8d\x4c\x8e\x0b\x7a\xda\xdb\x03\x44\x01\x9b\x81\x1c\x3c\xab"
+	"\x78\xee\xf2\xc5\x24\x33\x61\x65\x01\x87\x66";
 
-/* GOST01 private key and signature */
+/* GOST01 private key */
 static const char gost01_privkey[] =
 	"-----BEGIN PRIVATE KEY-----\n"
 	"MEUCAQAwHAYGKoUDAgITMBIGByqFAwICIwEGByqFAwICHgEEIgQgdNfuHGmmTdPm\n"
 	"p5dAa3ea9UYxpdYQPP9lbDwzQwG2bJM=\n"
 	"-----END PRIVATE KEY-----\n";
 
-static const char gost01_sig[] =
-	"\xc5\xc8\xf8\xdc\x22\x51\xb0\x72\xe9\xa2\xbb\x84\x6c\xe2\x24\xd5"
-	"\x72\x39\x2a\x5a\x0e\x7a\x43\xfc\x9c\xc3\x5d\x32\x92\xbb\xab\xc0"
-	"\x4b\x99\xbd\xc8\x47\x24\x70\x06\x7e\xa1\xc6\xe3\xa0\xdc\x42\xed"
-	"\xa0\x66\xf0\xcc\x50\x97\xe9\x5a\x7d\x3f\x65\x2d\x7b\x1b\x03\xcb";
-
-/* GOST12 256 private key and signature */
+/* GOST12 256 private key */
 static const char gost12_256_privkey[] =
 	"-----BEGIN PRIVATE KEY-----\n"
 	"MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIjAQYIKoUDBwEBAgIEIgQgKOF96tom\n"
 	"D61rhSnzKjyrmO3fv0gdlHei+6ovrc8SnBk=\n"
 	"-----END PRIVATE KEY-----\n";
 
-static const char gost12_256_sig[] =
-    "\xb2\x51\x5a\x1a\xbd\x95\x4e\x71\x55\xad\x74\x74\x81\xa6\xca\x6c"
-	"\x14\x01\xe0\x18\xda\xe4\x0d\x02\x4f\x14\xd2\x39\xd6\x3c\xb5\x85"
-	"\xa8\x37\xfd\x7f\x2b\xfa\xe4\xf5\xbc\xbc\x15\x20\x8b\x83\x4b\x84"
-	"\x0d\x5d\x02\x21\x8c\x0d\xb9\xc4\x2b\xc0\x3e\xfd\x42\x55\x1d\xb0";
-
-/* GOST12 512 private key and signature */
+/* GOST12 512 private key */
 static const char gost12_512_privkey[] =
 	"-----BEGIN PRIVATE KEY-----\n"
 	"MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBECjFpvp\n"
 	"B0vdc7u59b99TCNXhHiB69JJtUjvieNkGYJpoaaIvoKZTNCjpSZASsZcQZCHOTof\n"
 	"hsQ3JCCy4xnd5jWT\n"
 	"-----END PRIVATE KEY-----\n";
-
-static const char gost12_512_sig[] =
-	"\x52\x4f\xa2\x77\x51\xd2\xc5\xef\xd3\xa3\x99\x4e\xec\xff\xc6\xe9"
-	"\xfc\x2f\xc0\x28\x42\x03\x95\x6c\x9a\x38\xee\xea\x89\x79\xae\x1a"
-	"\xc3\x68\x5e\xe4\x15\x15\x4b\xec\x0f\xf1\x7e\x0f\xba\x01\xc7\x84"
-	"\x16\xc7\xb5\xac\x9d\x0c\x22\xdd\x31\xf7\xb0\x9b\x59\x4b\xf0\x02"
-	"\xa8\x7d\xfd\x6d\x02\x43\xc7\x4f\x65\xbd\x84\x5c\x54\x91\xba\x75"
-	"\x9f\x5a\x61\x19\x5c\x9a\x10\x78\x34\xa0\xa6\xf6\xdc\xb6\xb0\x50"
-	"\x22\x38\x5f\xb0\x16\x66\xf1\xd5\x46\x00\xd5\xe2\xa8\xe5\xd2\x11"
-	"\x5f\xd1\xbe\x6e\xac\xb2\x9c\x14\x34\x96\xe7\x58\x94\xb8\xf4\x5f";
 
 static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 			unsigned bits, gnutls_digest_algorithm_t ign)
@@ -488,7 +467,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 			  gnutls_digest_algorithm_t dig,
 			  const void *privkey, size_t privkey_size,
 			  const void *stored_sig, size_t stored_sig_size,
-			  unsigned deterministic_sigs)
+			  gnutls_privkey_flags_t flags)
 {
 	int ret;
 	gnutls_datum_t sig = { NULL, 0 };
@@ -497,8 +476,11 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	gnutls_privkey_t key;
 	char param_name[32];
 
-	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
-	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512) {
+	if (pk == GNUTLS_PK_EC ||
+	    pk == GNUTLS_PK_GOST_01 ||
+	    pk == GNUTLS_PK_GOST_12_256 ||
+	    pk == GNUTLS_PK_GOST_12_512)
+	{
 		snprintf(param_name, sizeof(param_name), "%s",
 			 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
 						   (bits)));
@@ -532,39 +514,37 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 		goto cleanup;
 	}
 
-	/* Test if the signature we generate matches the stored */
+	ret = gnutls_privkey_sign_data(key, dig, flags, &signed_data, &sig);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Test if the generated signature matches the stored */
 	ssig.data = (void *) stored_sig;
 	ssig.size = stored_sig_size;
 
-	if (deterministic_sigs != 0) {	/* do not compare against stored signature if not provided */
-		ret =
-		    gnutls_privkey_sign_data(key, dig, 0, &signed_data,
-					     &sig);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		if (sig.size != ssig.size
-		    || memcmp(sig.data, ssig.data, sig.size) != 0) {
-			ret = GNUTLS_E_SELF_TEST_ERROR;
+	if (sig.size != ssig.size
+		|| memcmp(sig.data, ssig.data, sig.size) != 0) {
+		ret = GNUTLS_E_SELF_TEST_ERROR;
 #if 0
-			unsigned i;
-			fprintf(stderr, "\nstored[%d]: ", ssig.size);
-			for (i = 0; i < ssig.size; i++)
-				fprintf(stderr, "\\x%.2x", ssig.data[i]);
+		unsigned i;
+		fprintf(stderr, "Algorithm: %s-%s\n",
+				  gnutls_pk_get_name(pk), param_name);
+		fprintf(stderr, "\nstored[%d]: ", ssig.size);
+		for (i = 0; i < ssig.size; i++)
+			fprintf(stderr, "\\x%.2x", ssig.data[i]);
 
-			fprintf(stderr, "\ngenerated[%d]: ", sig.size);
-			for (i = 0; i < sig.size; i++)
-				fprintf(stderr, "\\x%.2x", sig.data[i]);
-			fprintf(stderr, "\n");
+		fprintf(stderr, "\ngenerated[%d]: ", sig.size);
+		for (i = 0; i < sig.size; i++)
+			fprintf(stderr, "\\x%.2x", sig.data[i]);
+		fprintf(stderr, "\n");
 #endif
-			gnutls_assert();
-			goto cleanup;
-		}
+		gnutls_assert();
+		goto cleanup;
 	}
 
-	/* Test if we can verify the signature */
+	/* Test if we can verify the generated signature */
 
 	ret = gnutls_pubkey_import_privkey(pub, key, 0, 0);
 	if (ret < 0) {
@@ -574,7 +554,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 
 	ret =
 	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
-				       &signed_data, &ssig);
+				       &signed_data, &sig);
 	if (ret < 0) {
 		ret = GNUTLS_E_SELF_TEST_ERROR;
 		gnutls_assert();
@@ -585,7 +565,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 
 	ret =
 	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
-				       &bad_data, &ssig);
+				       &bad_data, &sig);
 
 	if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 		ret = GNUTLS_E_SELF_TEST_ERROR;
@@ -618,8 +598,8 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 				goto cleanup; \
 			}
 
-#define PK_KNOWN_TEST(pk, det, bits, dig, pkey, sig) \
-			ret = test_known_sig(pk, bits, dig, pkey, sizeof(pkey)-1, sig, sizeof(sig)-1, det); \
+#define PK_KNOWN_TEST(pk, bits, dig, pkey, sig, flags) \
+			ret = test_known_sig(pk, bits, dig, pkey, sizeof(pkey)-1, sig, sizeof(sig)-1, flags); \
 			if (ret < 0) { \
 				gnutls_assert(); \
 				goto cleanup; \
@@ -830,8 +810,17 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 {
 	int ret;
 
+	bool is_post = false;
+	bool is_fips140_mode_enabled = false;
+
 	if (flags & GNUTLS_SELF_TEST_FLAG_ALL)
 		pk = GNUTLS_PK_UNKNOWN;
+
+	if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+		is_post = true;
+
+	if (gnutls_fips140_mode_enabled())
+		is_fips140_mode_enabled = true;
 
 	switch (pk) {
 	case GNUTLS_PK_UNKNOWN:
@@ -847,31 +836,35 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			return 0;
 		FALLTHROUGH;
 	case GNUTLS_PK_RSA:
-		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 2048, GNUTLS_DIG_SHA256,
-			      rsa_2048_privkey, rsa_2048_sig);
+		PK_KNOWN_TEST(GNUTLS_PK_RSA, 2048, GNUTLS_DIG_SHA256,
+			      rsa_2048_privkey, rsa_2048_sig, 0);
+
 		PK_TEST(GNUTLS_PK_RSA, test_rsa_enc, 2048, 0);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
-		PK_TEST(GNUTLS_PK_RSA, test_sig, 2048, GNUTLS_SIGN_RSA_SHA256);
-
 		FALLTHROUGH;
 	case GNUTLS_PK_RSA_PSS:
-		PK_TEST(GNUTLS_PK_RSA_PSS, test_sig, 2048, GNUTLS_SIGN_RSA_PSS_RSAE_SHA256);
+		PK_TEST(GNUTLS_PK_RSA_PSS, test_sig, 2048,
+			GNUTLS_SIGN_RSA_PSS_RSAE_SHA256);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
 		FALLTHROUGH;
 	case GNUTLS_PK_DSA:
-		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 2048, GNUTLS_DIG_SHA256,
-			      dsa_2048_privkey, dsa_2048_sig);
+		if (is_post || !is_fips140_mode_enabled) {
+			PK_KNOWN_TEST(GNUTLS_PK_DSA, 2048, GNUTLS_DIG_SHA256,
+				      dsa_2048_privkey, dsa_2048_sig,
+				      GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE);
+		} else {
+			PK_TEST(GNUTLS_PK_DSA, test_sig, 2048,
+				GNUTLS_SIGN_DSA_SHA256);
+		}
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
-
-		PK_TEST(GNUTLS_PK_DSA, test_sig, 2048, GNUTLS_SIGN_DSA_SHA256);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_EC:
@@ -883,100 +876,95 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		}
 
 		/* Test ECDSA */
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP256R1),
-			      GNUTLS_DIG_SHA256, ecdsa_secp256r1_privkey,
-			      ecdsa_secp256r1_sig);
+		if (is_post || !is_fips140_mode_enabled) {
+			PK_KNOWN_TEST(GNUTLS_PK_EC,
+					  GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
+					  GNUTLS_DIG_SHA256, ecdsa_secp256r1_privkey,
+					  ecdsa_secp256r1_sig, GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE);
+		} else {
+			PK_TEST(GNUTLS_PK_EC, test_sig,
+				GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
+				GNUTLS_SIGN_ECDSA_SHA256);
+		}
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-		        GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
-		        GNUTLS_SIGN_ECDSA_SHA256);
+		if (is_post || !is_fips140_mode_enabled) {
+			PK_KNOWN_TEST(GNUTLS_PK_EC,
+					  GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1),
+					  GNUTLS_DIG_SHA384, ecdsa_secp384r1_privkey,
+					  ecdsa_secp384r1_sig, GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE);
+		} else {
+			PK_TEST(GNUTLS_PK_EC, test_sig,
+				GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1),
+				GNUTLS_SIGN_ECDSA_SHA384);
+		}
 
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP384R1),
-			      GNUTLS_DIG_SHA256, ecdsa_secp384r1_privkey,
-			      ecdsa_secp384r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1),
-			GNUTLS_SIGN_ECDSA_SHA384);
-
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP521R1),
-			      GNUTLS_DIG_SHA512, ecdsa_secp521r1_privkey,
-			      ecdsa_secp521r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP521R1),
-			GNUTLS_SIGN_ECDSA_SHA512);
+		if (is_post || !is_fips140_mode_enabled) {
+			PK_KNOWN_TEST(GNUTLS_PK_EC,
+					  GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP521R1),
+					  GNUTLS_DIG_SHA512, ecdsa_secp521r1_privkey,
+					  ecdsa_secp521r1_sig, GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE);
+		} else {
+			PK_TEST(GNUTLS_PK_EC, test_sig,
+				GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP521R1),
+				GNUTLS_SIGN_ECDSA_SHA512);
+		}
 
 #ifdef ENABLE_NON_SUITEB_CURVES
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP192R1),
-			      GNUTLS_DIG_SHA256, ecdsa_secp192r1_privkey,
-			      ecdsa_secp192r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP192R1),
-			GNUTLS_SIGN_ECDSA_SHA256);
+		if (is_post || !is_fips140_mode_enabled) {
+			PK_KNOWN_TEST(GNUTLS_PK_EC,
+					  GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP192R1),
+					  GNUTLS_DIG_SHA256, ecdsa_secp192r1_privkey,
+					  ecdsa_secp192r1_sig, GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE);
+		} else {
+			PK_TEST(GNUTLS_PK_EC, test_sig,
+				GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP192R1),
+				GNUTLS_SIGN_ECDSA_SHA256);
+		}
 
-		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
-			      GNUTLS_CURVE_TO_BITS
-			      (GNUTLS_ECC_CURVE_SECP224R1),
-			      GNUTLS_DIG_SHA256, ecdsa_secp224r1_privkey,
-			      ecdsa_secp224r1_sig);
-		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1),
-			GNUTLS_SIGN_ECDSA_SHA256);
+		if (is_post || !is_fips140_mode_enabled) {
+			PK_KNOWN_TEST(GNUTLS_PK_EC,
+					  GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1),
+					  GNUTLS_DIG_SHA256, ecdsa_secp224r1_privkey,
+					  ecdsa_secp224r1_sig, GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE);
+		} else {
+			PK_TEST(GNUTLS_PK_EC, test_sig,
+				GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1),
+				GNUTLS_SIGN_ECDSA_SHA256);
+		}
 #endif
+
 
 #if ENABLE_GOST
 		FALLTHROUGH;
 	case GNUTLS_PK_GOST_01:
-		PK_KNOWN_TEST(GNUTLS_PK_GOST_01, 0,
-			      GNUTLS_ECC_CURVE_GOST256CPA,
-			      GNUTLS_DIG_GOSTR_94,
-			      gost01_privkey, gost01_sig);
-
-		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
-			return 0;
-
 		PK_TEST(GNUTLS_PK_GOST_01, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
 			GNUTLS_SIGN_GOST_94);
 
-		FALLTHROUGH;
-	case GNUTLS_PK_GOST_12_256:
-		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_256, 0,
-			      GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_STREEBOG_256,
-			      gost12_256_privkey, gost12_256_sig);
-
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
+		FALLTHROUGH;
+	case GNUTLS_PK_GOST_12_256:
 		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
 			GNUTLS_SIGN_GOST_256);
 
-		FALLTHROUGH;
-	case GNUTLS_PK_GOST_12_512:
-		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_512, 0,
-			      GNUTLS_ECC_CURVE_GOST512A, GNUTLS_DIG_STREEBOG_512,
-			      gost12_512_privkey, gost12_512_sig);
-
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
+		FALLTHROUGH;
+	case GNUTLS_PK_GOST_12_512:
 		PK_TEST(GNUTLS_PK_GOST_12_512, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A),
 			GNUTLS_SIGN_GOST_512);
 
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
 #endif
-
 		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
