@@ -1392,6 +1392,9 @@ gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_t resp,
 	gnutls_datum_t dn = { NULL, 0 };
 	uint8_t cdn_hash[MAX_HASH_SIZE];
 	size_t t, hash_len;
+	
+	if (resp == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	ret =
 	    gnutls_ocsp_resp_get_single(resp, indx, &digest, &rdn_hash,
