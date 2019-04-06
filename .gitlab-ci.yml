@@ -281,7 +281,7 @@ static-analyzers.Fedora.x86_64:
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C libdane
   - make -j$(nproc) -C src/gl && scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C src
-  - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -j$(nproc) $CPPCHECK_OPTIONS
+  - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -j$(nproc) $CPPCHECK_OPTIONS
   - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j$(nproc) $CPPCHECK_OPTIONS
   after_script:
   - /bin/true

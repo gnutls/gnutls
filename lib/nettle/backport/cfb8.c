@@ -37,6 +37,10 @@
  * #############################################
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #ifndef HAVE_NETTLE_CFB8_ENCRYPT
 
 #include "cfb8.h"
