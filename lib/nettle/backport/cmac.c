@@ -38,6 +38,10 @@
  * #############################################
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #ifndef HAVE_NETTLE_CMAC128_UPDATE
 
 #include <nettle/aes.h>
