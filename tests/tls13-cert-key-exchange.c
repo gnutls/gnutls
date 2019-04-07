@@ -135,7 +135,7 @@ void doit(void)
 
 	try_with_key_fail("TLS 1.3 with rsa-pss cert and rsa cli cert with only RSA-PSS sig algos",
 			"NORMAL:-VERS-ALL:+VERS-TLS1.3:-SIGN-ALL:+SIGN-RSA-PSS-SHA256:+SIGN-RSA-PSS-SHA384:+SIGN-RSA-PSS-SHA512",
-			GNUTLS_E_AGAIN, GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY,
+			GNUTLS_E_CERTIFICATE_REQUIRED, GNUTLS_E_SUCCESS,
 			&server_ca3_rsa_pss_cert, &server_ca3_rsa_pss_key, &cli_ca3_cert, &cli_ca3_key);
 
 	try_with_key_fail("TLS 1.3 with rsa encryption cert",

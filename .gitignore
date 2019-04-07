@@ -824,6 +824,7 @@ tests/tls13/no-psk-exts
 tests/tls13/ocsp-client
 tests/tls13/post-handshake-with-cert
 tests/tls13/post-handshake-with-cert-auto
+tests/tls13/post-handshake-with-cert-pkcs11
 tests/tls13/post-handshake-with-cert-ticket
 tests/tls13/post-handshake-with-psk
 tests/tls13/post-handshake-without-cert

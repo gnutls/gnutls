@@ -311,6 +311,11 @@ libpkcs11mock1_la_SOURCES = pkcs11/pkcs11-mock.c pkcs11/pkcs11-mock.h pkcs11/pkc
 libpkcs11mock1_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
 libpkcs11mock1_la_LIBADD =  ../gl/libgnu.la
 
+noinst_LTLIBRARIES += libpkcs11mock2.la
+libpkcs11mock2_la_SOURCES = pkcs11/pkcs11-mock2.c
+libpkcs11mock2_la_LDFLAGS = -shared -rpath $(pkglibdir) -module -no-undefined -avoid-version
+libpkcs11mock2_la_LIBADD =  ../gl/libgnu.la
+
 pkcs11_cert_import_url_exts_SOURCES = pkcs11/pkcs11-cert-import-url-exts.c
 pkcs11_cert_import_url_exts_DEPENDENCIES = libpkcs11mock1.la libutils.la
 
@@ -445,6 +450,14 @@ tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
 
+if ENABLE_PKCS11
+if !WINDOWS
+ctests += tls13/post-handshake-with-cert-pkcs11
+tls13_post_handshake_with_cert_pkcs11_DEPENDENCIES = libpkcs11mock2.la libutils.la
+tls13_post_handshake_with_cert_pkcs11_LDADD = $(LDADD) $(LIBDL)
+endif
+endif
+
 dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
 
 if !WINDOWS
@@ -524,6 +537,7 @@ TESTS_ENVIRONMENT +=						\
 	LSAN_OPTIONS=suppressions=gnutls-asan.supp		\
 	CAFILE=$(srcdir)/cert-tests/data/ca-certs.pem		\
 	P11MOCKLIB1=$(abs_builddir)/.libs/libpkcs11mock1.so	\
+	P11MOCKLIB2=$(abs_builddir)/.libs/libpkcs11mock2.so	\
 	PKCS12_MANY_CERTS_FILE=$(srcdir)/cert-tests/data/pkcs12_5certs.p12	\
 	PKCS12FILE=$(srcdir)/cert-tests/data/client.p12		\
 	PKCS12PASSWORD=foobar					\

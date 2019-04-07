@@ -179,22 +179,27 @@ int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again)
 			if (server) {
 				return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 			} else {
-				/* if we didn't get a cert request there will not be any */
-				if (!(session->internals.hsk_flags & HSK_CRT_SENT))
-					return 0;
-				else
-					return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+				/* for client, this means either we
+				 * didn't get a cert request or we are
+				 * declining authentication; in either
+				 * case we don't send a cert verify */
+				return 0;
 			}
 		}
 
-		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
-		if (algo == GNUTLS_SIGN_UNKNOWN)
-			return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
+		if (server) {
+			algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
+			if (algo == GNUTLS_SIGN_UNKNOWN)
+				return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 
-		if (server)
 			gnutls_sign_algorithm_set_server(session, algo);
-		else
-			gnutls_sign_algorithm_set_client(session, algo);
+		} else {
+			/* for client, signature algorithm is already
+			 * determined from Certificate Request */
+			algo = gnutls_sign_algorithm_get_client(session);
+			if (unlikely(algo == GNUTLS_SIGN_UNKNOWN))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
 
 		se = _gnutls_sign_to_entry(algo);
 

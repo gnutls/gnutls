@@ -128,17 +128,20 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 {
 	int ret;
 	crt_req_ctx_st ctx;
+	gnutls_pcert_st *apr_cert_list;
+	gnutls_privkey_t apr_pkey;
+	int apr_cert_list_length;
 
 	_gnutls_handshake_log("HSK[%p]: parsing certificate request\n", session);
 
+	if (unlikely(session->security_parameters.entity == GNUTLS_SERVER))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	/* if initial negotiation is complete, this is a post-handshake auth */
-	if (!session->internals.initial_negotiation_completed ||
-	    session->security_parameters.entity == GNUTLS_SERVER) {
+	if (!session->internals.initial_negotiation_completed) {
 		if (buf->data[0] != 0) {
 			/* The context field must be empty during handshake */
-			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-			gnutls_assert();
-			goto cleanup;
+			return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 		}
 
 		/* buf->length is positive */
@@ -162,10 +165,8 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 	ctx.session = session;
 
 	ret = _gnutls_extv_parse(&ctx, parse_cert_extension, buf->data, buf->length);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	/* The "signature_algorithms" extension MUST be specified */
 	if (!ctx.got_sig_algo)
@@ -175,15 +176,28 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 
 	ret = _gnutls_select_client_cert(session, ctx.rdn, ctx.rdn_size,
 					 ctx.pk_algos, ctx.pk_algos_length);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_get_selected_cert(session, &apr_cert_list,
+					&apr_cert_list_length, &apr_pkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (apr_cert_list_length > 0) {
+		gnutls_sign_algorithm_t algo;
+
+		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
+		if (algo == GNUTLS_SIGN_UNKNOWN) {
+			_gnutls_handshake_log("HSK[%p]: rejecting client auth because of no suitable signature algorithm\n", session);
+			_gnutls_selected_certs_deinit(session);
+			return gnutls_assert_val(0);
+		}
+
+		gnutls_sign_algorithm_set_client(session, algo);
 	}
 
-	ret = 0;
-
- cleanup:
-	return ret;
+	return 0;
 }
 
 int _gnutls13_recv_certificate_request(gnutls_session_t session)
