@@ -446,6 +446,7 @@ tests/key-usage-rsa
 tests/keygen
 tests/keylog-env
 tests/libpkcs11mock1.la
+tests/libpkcs11mock2.la
 tests/libutils.la
 tests/long-session-id
 tests/memset
