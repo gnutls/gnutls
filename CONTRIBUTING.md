@@ -99,6 +99,9 @@ following.
  * ```gnutls_credentials_``` for the credentials structures
  * ```gnutls_global_``` for the global structures handling
 
+All exported API functions must be listed in libgnutls.map
+in order to be exported.
+
 Internal functions, i.e, functions that are not exported in the API but
 are used internally by multiple files, should be prefixed with an underscore.
 For example `_gnutls_handshake_begin()`.
@@ -108,9 +111,8 @@ not use the `_gnutls` prefix for simplicity, e.g., `get_version()`.
 
 Internal structures should not be exported. Especially pointers to
 internal data. Doing so harms future reorganization/rewrite of subsystems.
-
-All exported functions must be listed in libgnutls.map.in,
-in order to be exported.
+They can however be used by unit tests in tests/ directory; in that
+case they should be part of the GNUTLS_PRIVATE_3_4 tag in libgnutls.map.
 
 
 # Introducing new functions / API
