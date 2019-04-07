@@ -755,6 +755,8 @@ typedef enum {
 	GNUTLS_VERSION_UNKNOWN = 0xff	/* change it to 0xffff */
 } gnutls_protocol_t;
 
+#define GNUTLS_CRT_RAW GNUTLS_CRT_RAWPK
+
 /**
  * gnutls_certificate_type_t:
  * @GNUTLS_CRT_UNKNOWN: Unknown certificate type.
