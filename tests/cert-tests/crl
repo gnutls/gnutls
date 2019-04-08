@@ -38,8 +38,8 @@ fi
 OUTFILE=out-crl.$$.tmp
 INFOFILE=out-crl-info.$$.tmp
 OUTFILE2=out2-crl.$$.tmp
-TMPFILE=crl.$$.tmpl
-TMP2FILE=crl.$$.tmp2
+TMPFILE=crl.$$.tmp
+TMP2FILE=crl2.$$.tmp
 
 echo "crl_next_update = 43" >$TMPFILE
 echo "crl_number = 7" >>$TMPFILE
