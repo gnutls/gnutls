@@ -161,7 +161,7 @@ libopts-check:
 	@echo "Checking whether included libopts matches the system's. If the"
 	@echo "check fails upgrade the included libopts."
 	@echo "*****************************************************************"
-	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
+	test "`autoopts-config libsrc|awk -F '-' '{print $$NF}'|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
 files-update: libopts-check
 	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile $(srcdir)/doc/Makefile.am
