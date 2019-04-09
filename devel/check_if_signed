@@ -17,8 +17,11 @@ echo "source=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
 # create list of commits of the current branch
 commits=$(git rev-list --no-merges $CI_MERGE_REQUEST_TARGET_BRANCH_NAME..)
 if [ -z "$commits" ]; then
-    echo "Couldn't find any commits to check"
-    exit 1
+  # OK if both branches are 'even'
+  git diff --quiet $CI_MERGE_REQUEST_TARGET_BRANCH_NAME.. && exit 0
+
+  echo "Couldn't find any commits to check"
+  exit 1
 fi
 
 # check if author's email matches email in 'Signed-off-by'
