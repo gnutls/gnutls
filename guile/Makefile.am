@@ -22,10 +22,10 @@ SUBDIRS = src
 
 EXTRA_DIST = .dir-locals.el
 
-guilemodulesubdir = $(guilemoduledir)/gnutls
+guilesitesubdir = $(guilesitedir)/gnutls
 
-nodist_guilemodule_DATA = modules/gnutls.scm
-dist_guilemodulesub_DATA = modules/gnutls/extra.scm
+nodist_guilesite_DATA = modules/gnutls.scm
+dist_guilesitesub_DATA = modules/gnutls/extra.scm
 
 documentation_modules =				\
   modules/system/documentation/README		\
@@ -55,13 +55,13 @@ CLEANFILES = modules/gnutls.scm
 
 if HAVE_GUILD
 
-guileobjectsubdir = $(guileobjectdir)/gnutls
-nodist_guileobject_DATA = modules/gnutls.go
-nodist_guileobjectsub_DATA = modules/gnutls/extra.go
+guilesiteccachesubdir = $(guilesiteccachedir)/gnutls
+nodist_guilesiteccache_DATA = modules/gnutls.go
+nodist_guilesiteccachesub_DATA = modules/gnutls/extra.go
 
 GOBJECTS =					\
-  $(nodist_guileobject_DATA)			\
-  $(nodist_guileobjectsub_DATA)
+  $(nodist_guilesiteccache_DATA)		\
+  $(nodist_guilesiteccachesub_DATA)
 
 CLEANFILES += $(GOBJECTS)
 
