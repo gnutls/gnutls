@@ -19,7 +19,14 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-doc --enable-gtk-doc --disable-valgrind-tests AUTOGEN=false
+DISTCHECK_CONFIGURE_FLAGS = \
+	--enable-doc \
+	--enable-gtk-doc \
+	--disable-valgrind-tests \
+	--with-guile-site-dir='$$(datarootdir)/guile/site/$$(GUILE_EFFECTIVE_VERSION)' \
+	--with-guile-site-ccache-dir='$$(libdir)/guile/$$(GUILE_EFFECTIVE_VERSION)/site-ccache' \
+	--with-guile-extension-dir='$$(libdir)/guile/$$(GUILE_EFFECTIVE_VERSION)/extensions' \
+	AUTOGEN=false
 
 SUBDIRS = gl lib extra
 
