@@ -39,6 +39,10 @@
 #include "sockets.h"
 #include "common.h"
 
+#ifdef HAVE_SYS_UIO_H
+#include <sys/uio.h> // writev()
+#endif
+
 #ifdef _WIN32
 # undef endservent
 # define endservent()
@@ -445,6 +449,41 @@ wrap_push(gnutls_transport_ptr_t ptr, const void *data, size_t len)
 	return send(hd->fd, data, len, 0);
 }
 
+static ssize_t
+wrap_vec_push(gnutls_transport_ptr_t ptr, const giovec_t *iov, int iovcnt)
+{
+	socket_st *hd = ptr;
+
+#ifdef HAVE_WRITEV
+	return writev(hd->fd, iov, iovcnt);
+#else
+	// emulating writev()
+	ssize_t total = 0;
+
+	for (int j = 0; j < iovcnt; j++) {
+		size_t sent = 0;
+		size_t len = iov[j].iov_len;
+		char *data = iov[j].iov_base;
+
+		if (hd->client_trace) {
+			fwrite(data, 1, len, hd->client_trace);
+		}
+
+		while (sent < len) {
+			ssize_t ret = send(hd->fd, data + sent, len - sent, 0);
+
+			if (ret < 0)
+				return total ? total : ret;
+
+			sent += ret;
+			total += ret;
+		}
+	}
+
+	return total;
+#endif
+}
+
 /* inline is used to avoid a gcc warning if used in mini-eagain */
 inline static int wrap_pull_timeout_func(gnutls_transport_ptr_t ptr,
 					   unsigned int ms)
@@ -588,6 +627,7 @@ socket_open2(socket_st * hd, const char *hostname, const char *service,
 				hd->client_trace = client_trace;
 
 			gnutls_transport_set_push_function(hd->session, wrap_push);
+			gnutls_transport_set_vec_push_function(hd->session, wrap_vec_push);
 			gnutls_transport_set_pull_function(hd->session, wrap_pull);
 			gnutls_transport_set_pull_timeout_function(hd->session, wrap_pull_timeout_func);
 			gnutls_transport_set_ptr(hd->session, hd);
