@@ -427,13 +427,13 @@ void start(const char *name, int err, int cli_err, int type)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		client(fd[0], cli_err);
+		server(fd[0], err, type);
 		kill(child, SIGTERM);
 		wait(&status);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		server(fd[1], err, type);
+		client(fd[1], cli_err);
 		exit(0);
 	}
 
@@ -443,6 +443,9 @@ void doit(void)
 {
 	const char *bin;
 	char buf[128];
+
+	/* check if softhsm module is loadable */
+	(void) softhsm_lib();
 
 	/* initialize SoftHSM token that libpkcs11mock2.so internally uses */
 	bin = softhsm_bin();
