@@ -18,4 +18,6 @@ unsigned _gnutls_have_psk_credentials(const gnutls_psk_client_credentials_t cred
 		return 0;
 }
 
+int _gnutls_generate_early_secrets_for_psk(gnutls_session_t session);
+
 #endif

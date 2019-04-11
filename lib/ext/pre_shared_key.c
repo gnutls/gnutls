@@ -24,6 +24,7 @@
 #include "gnutls_int.h"
 #include "auth/psk.h"
 #include "handshake.h"
+#include "kx.h"
 #include "secrets.h"
 #include "tls13/anti_replay.h"
 #include "tls13/psk_ext_parser.h"
@@ -186,6 +187,58 @@ compute_psk_binder(gnutls_session_t session,
 error:
 	_gnutls_buffer_clear(&handshake_buf);
 	return ret;
+}
+
+static int
+generate_early_secrets(gnutls_session_t session,
+		       const mac_entry_st *prf)
+{
+	int ret;
+
+	ret = _tls13_derive_secret2(prf, EARLY_TRAFFIC_LABEL, sizeof(EARLY_TRAFFIC_LABEL)-1,
+				    session->internals.handshake_hash_buffer.data,
+				    session->internals.handshake_hash_buffer_client_hello_len,
+				    session->key.proto.tls13.temp_secret,
+				    session->key.proto.tls13.e_ckey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	_gnutls_nss_keylog_write(session, "CLIENT_EARLY_TRAFFIC_SECRET",
+				 session->key.proto.tls13.e_ckey,
+				 prf->output_size);
+
+	return 0;
+}
+
+/* Calculate TLS 1.3 Early Secret and the derived secrets from the
+ * selected PSK. */
+int
+_gnutls_generate_early_secrets_for_psk(gnutls_session_t session)
+{
+	const uint8_t *psk;
+	size_t psk_size;
+	const mac_entry_st *prf;
+	int ret;
+
+	psk = session->key.binders[0].psk.data;
+	psk_size = session->key.binders[0].psk.size;
+	prf = session->key.binders[0].prf;
+
+	if (unlikely(psk_size == 0))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = _tls13_init_secret2(prf, psk, psk_size,
+				  session->key.proto.tls13.temp_secret);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	session->key.proto.tls13.temp_secret_size = prf->output_size;
+
+	ret = generate_early_secrets(session, session->key.binders[0].prf);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
 }
 
 static int
@@ -651,6 +704,12 @@ static int server_recv_params(gnutls_session_t session,
 	session->key.binders[0].prf = prf;
 	session->key.binders[0].resumption = resuming;
 
+	ret = _gnutls_generate_early_secrets_for_psk(session);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
 	return 0;
 
  fail:
@@ -742,6 +801,7 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 	unsigned i;
 	gnutls_psk_server_credentials_t pskcred;
 	const version_entry_st *vers = get_version(session);
+	int ret;
 
 	if (!vers || !vers->tls13_sem)
 		return 0;
@@ -759,9 +819,15 @@ static int _gnutls_psk_recv_params(gnutls_session_t session,
 						_gnutls_handshake_log("EXT[%p]: selected PSK mode\n", session);
 					}
 
-					/* ensure that selected binder is set on (our) index zero */
-					if (i != 0)
+					/* different PSK is selected, than the one we calculated early secrets */
+					if (i != 0) {
+						/* ensure that selected binder is set on (our) index zero */
 						swap_binders(session);
+
+						ret = _gnutls_generate_early_secrets_for_psk(session);
+						if (ret < 0)
+							return gnutls_assert_val(ret);
+					}
 					session->internals.hsk_flags |= HSK_PSK_SELECTED;
 				}
 			}
