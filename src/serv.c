@@ -1331,6 +1331,13 @@ static void retry_handshake(listener_item *j)
 #endif
 
 			print_info(j->tls_session, verbose, verbose);
+
+			if (HAVE_OPT(KEYMATEXPORT))
+				print_key_material(j->tls_session,
+						   OPT_ARG(KEYMATEXPORT),
+						   HAVE_OPT(KEYMATEXPORTSIZE) ?
+						   OPT_VALUE_KEYMATEXPORTSIZE :
+						   20);
 		}
 
 		j->close_ok = 1;

@@ -264,6 +264,28 @@ run_client_suite() {
 	kill ${PID}
 	wait
 
+	# Try exporting keying material
+	echo_cmd "${PREFIX}Checking TLS 1.3 to export keying material..."
+	testdir=`create_testdir tls13-openssl-keymatexport`
+	eval "${GETPORT}"
+	LOGFILE="${testdir}/server.out"
+	launch_bare_server $$ s_server -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${RSA_KEY}" -cert "${RSA_CERT}" -CAfile "${CA_CERT}" -keymatexport label -keymatexportlen 20
+	unset LOGFILE
+	PID=$!
+	wait_server ${PID}
+
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+GROUP-ALL${ADD}" --keymatexport label --keymatexportsize 20| tee "${testdir}/client.out" >> ${OUTPUT}
+	grep '^- Key material: ' "${testdir}/client.out" | \
+	sed -e 's/^.*: //' -e 'y/abcdef/ABCDEF/' > "${testdir}/client.key" || \
+		fail ${PID} "Failed"
+	grep '^    Keying material: ' "${testdir}/server.out" | \
+	sed -e 's/^.*: //' -e 'y/abcdef/ABCDEF/' > "${testdir}/server.key" || \
+		fail ${PID} "Failed"
+	diff "${testdir}/client.key" "${testdir}/server.key" || \
+		fail ${PID} "Failed"
+	kill ${PID}
+	wait
+
 	rm -rf "${testdir}"
 
 }

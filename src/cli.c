@@ -1659,6 +1659,11 @@ int do_handshake(socket_st * socket)
 	if (ret == 0) {
 		/* print some information */
 		print_info(socket->session, verbose, HAVE_OPT(X509CERTFILE)?P_WAIT_FOR_CERT:0);
+		if (HAVE_OPT(KEYMATEXPORT))
+			print_key_material(socket->session,
+					   OPT_ARG(KEYMATEXPORT),
+					   HAVE_OPT(KEYMATEXPORTSIZE) ?
+					   OPT_VALUE_KEYMATEXPORTSIZE : 20);
 		socket->secure = 1;
 	} else {
 		gnutls_alert_send_appropriate(socket->session, ret);

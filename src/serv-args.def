@@ -318,6 +318,20 @@ flag = {
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
 };
 
+flag = {
+    name      = keymatexport;
+    arg-type  = string;
+    descrip   = "Label used for exporting keying material";
+    doc      = "";
+};
+
+flag = {
+    name      = keymatexportsize;
+    arg-type  = number;
+    descrip   = "Size of the exported keying material";
+    doc      = "";
+};
+
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
   ds-format = 'texi';      // or texi or mdoc format

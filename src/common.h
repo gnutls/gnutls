@@ -61,6 +61,7 @@ extern const char str_unknown[];
 #define P_WAIT_FOR_CERT (1<<1)
 int print_info(gnutls_session_t state, int verbose, int flags);
 void print_cert_info(gnutls_session_t, int flag, int print_cert);
+void print_key_material(gnutls_session_t, const char *label, size_t size);
 
 int log_msg(FILE *file, const char *message, ...) __attribute__((format(printf, 2, 3)));
 void log_set(FILE *file);
