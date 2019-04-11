@@ -537,7 +537,7 @@ struct gnutls_key_st {
 			uint8_t hs_skey[MAX_HASH_SIZE]; /* server_hs_traffic_secret */
 			uint8_t ap_ckey[MAX_HASH_SIZE]; /* client_ap_traffic_secret */
 			uint8_t ap_skey[MAX_HASH_SIZE]; /* server_ap_traffic_secret */
-			uint8_t ap_expkey[MAX_HASH_SIZE]; /* exporter_master_secret */
+			uint8_t ap_expkey[MAX_HASH_SIZE]; /* {early_,}exporter_master_secret */
 			uint8_t ap_rms[MAX_HASH_SIZE]; /* resumption_master_secret */
 		} tls13; /* tls1.3 */
 
