@@ -9,8 +9,10 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for AES-XTS cipher (#354)
 
+** libgnutls: Added new function to retrieve early keying material (#329)
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_prf_early: Added
 
 
 * Version 3.6.7 (released 2019-03-27)

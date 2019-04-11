@@ -830,6 +830,7 @@ tests/tls13/post-handshake-with-cert-ticket
 tests/tls13/post-handshake-with-psk
 tests/tls13/post-handshake-without-cert
 tests/tls13/prf
+tests/tls13/prf-early
 tests/tls13/psk-dumbfw
 tests/tls13/psk-ext
 tests/tls13/supported_versions

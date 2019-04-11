@@ -89,6 +89,36 @@ gnutls_prf_raw(gnutls_session_t session,
 	return ret;
 }
 
+static int
+_tls13_derive_exporter(const mac_entry_st *prf,
+		       gnutls_session_t session,
+		       size_t label_size, const char *label,
+		       size_t context_size, const char *context,
+		       size_t outsize, char *out,
+		       bool early)
+{
+	uint8_t secret[MAX_HASH_SIZE];
+	uint8_t digest[MAX_HASH_SIZE];
+	unsigned digest_size = prf->output_size;
+	int ret;
+
+	ret = _tls13_derive_secret2(prf, label, label_size, NULL, 0,
+				    session->key.proto.tls13.ap_expkey,
+				    secret);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_hash_fast((gnutls_digest_algorithm_t)prf->id,
+			       context, context_size, digest);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return _tls13_expand_secret2(prf,
+				     EXPORTER_LABEL, sizeof(EXPORTER_LABEL)-1,
+				     digest, digest_size,
+				     secret, outsize, out);
+}
+
 /**
  * gnutls_prf_rfc5705:
  * @session: is a #gnutls_session_t type.
@@ -99,8 +129,8 @@ gnutls_prf_raw(gnutls_session_t session,
  * @outsize: size of pre-allocated output buffer to hold the output.
  * @out: pre-allocated buffer to hold the generated data.
  *
- * Exports keyring material from TLS/DTLS session to an application,
- * as specified in RFC5705.
+ * Exports keying material from TLS/DTLS session to an application, as
+ * specified in RFC5705.
  *
  * In the TLS versions prior to 1.3, it applies the TLS
  * Pseudo-Random-Function (PRF) on the master secret and the provided
@@ -136,30 +166,12 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 	int ret;
 
 	if (vers && vers->tls13_sem) {
-		uint8_t secret[MAX_HASH_SIZE];
-		uint8_t digest[MAX_HASH_SIZE];
-		unsigned digest_size = session->security_parameters.prf->output_size;
-
-		/* exporter_master_secret might not be set, when
-		 * handshake is in progress */
-		if (session->internals.handshake_in_progress) {
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
-		}
-
-		ret = _tls13_derive_secret(session, label, label_size, NULL, 0,
-					   session->key.proto.tls13.ap_expkey, secret);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		ret = gnutls_hash_fast((gnutls_digest_algorithm_t)session->security_parameters.prf->id,
-				       context, context_size, digest);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		ret = _tls13_expand_secret(session, EXPORTER_LABEL, sizeof(EXPORTER_LABEL)-1,
-					   digest, digest_size,
-					   secret, outsize, out);
+		ret = _tls13_derive_exporter(session->security_parameters.prf,
+					     session,
+					     label_size, label,
+					     context_size, context,
+					     outsize, out,
+					     0);
 	} else {
 		char *pctx = NULL;
 
@@ -187,6 +199,58 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 	}
 
 	return ret;
+}
+
+/**
+ * gnutls_prf_early:
+ * @session: is a #gnutls_session_t type.
+ * @label_size: length of the @label variable.
+ * @label: label used in PRF computation, typically a short string.
+ * @context_size: length of the @extra variable.
+ * @context: optional extra data to seed the PRF with.
+ * @outsize: size of pre-allocated output buffer to hold the output.
+ * @out: pre-allocated buffer to hold the generated data.
+ *
+ * This function is similar to gnutls_prf_rfc5705(), but only works in
+ * TLS 1.3 or later to export early keying material.
+ *
+ * Note that the keying material is only available after the
+ * ClientHello message is processed and before the application traffic
+ * keys are established.  Therefore this function shall be called in a
+ * handshake hook function for %GNUTLS_HANDSHAKE_CLIENT_HELLO.
+ *
+ * The @label variable usually contains a string denoting the purpose
+ * for the generated data.
+ *
+ * The @context variable can be used to add more data to the seed, after
+ * the random variables.  It can be used to make sure the
+ * generated output is strongly connected to some additional data
+ * (e.g., a string used in user authentication).
+ *
+ * The output is placed in @out, which must be pre-allocated.
+ *
+ * Note that, to provide the RFC5705 context, the @context variable
+ * must be non-null.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.6.6
+ **/
+int
+gnutls_prf_early(gnutls_session_t session,
+		 size_t label_size, const char *label,
+		 size_t context_size, const char *context,
+		 size_t outsize, char *out)
+{
+	if (session->internals.initial_negotiation_completed ||
+	    session->key.binders[0].prf == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	return _tls13_derive_exporter(session->key.binders[0].prf, session,
+				      label_size, label,
+				      context_size, context,
+				      outsize, out,
+				      1);
 }
 
 /**
