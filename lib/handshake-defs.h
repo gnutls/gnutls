@@ -34,7 +34,7 @@
 #define APPLICATION_TRAFFIC_UPDATE "traffic upd"
 #define EXPORTER_MASTER_LABEL "exp master"
 #define RMS_MASTER_LABEL "res master"
-#define EXPORTER_LABEL "exp master"
+#define EXPORTER_LABEL "exporter"
 #define RESUMPTION_LABEL "resumption"
 
 #define HRR_RANDOM \

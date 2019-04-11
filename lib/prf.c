@@ -27,12 +27,11 @@
 
 #include "gnutls_int.h"
 #include "errors.h"
+#include "handshake.h"
 #include "secrets.h"
 #include <num.h>
 #include <state.h>
 #include <algorithms.h>
-
-#define EXPORTER_LABEL "exporter"
 
 /**
  * gnutls_prf_raw:
