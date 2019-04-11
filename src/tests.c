@@ -65,7 +65,7 @@ static size_t session_data_size = 0, session_id_size = 0;
 static int sfree = 0;
 static int handshake_output = 0;
 
-static int do_handshake(gnutls_session_t session)
+static int test_do_handshake(gnutls_session_t session)
 {
 	int ret, alert;
 
@@ -153,7 +153,7 @@ test_code_t test_server(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret != TEST_SUCCEED)
 		return TEST_FAILED;
 
@@ -194,7 +194,7 @@ test_code_t test_dhe(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	gnutls_dh_get_pubkey(session, &pubkey);
 
@@ -215,7 +215,7 @@ test_code_t test_rfc7919(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	if (ret != TEST_FAILED && (gnutls_session_get_flags(session) & GNUTLS_SFLAGS_RFC7919))
 		return TEST_SUCCEED;
@@ -240,7 +240,7 @@ test_code_t test_ecdhe(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	if (ret < 0)
 		return TEST_FAILED;
@@ -265,7 +265,7 @@ test_code_t test_ecdhe_curve(gnutls_session_t session, const char *curve, unsign
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	if (ret < 0)
 		return TEST_FAILED;
@@ -319,7 +319,7 @@ test_code_t test_rfc7507(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret < 0)
 		return TEST_IGNORE2;
 
@@ -344,7 +344,7 @@ test_code_t test_safe_renegotiation(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	return ret;
 }
@@ -367,7 +367,7 @@ test_code_t test_ocsp_status(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	if (ret < 0)
 		return TEST_FAILED;
@@ -396,7 +396,7 @@ test_code_t test_ext_master_secret(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	if (ret < 0)
 		return TEST_FAILED;
@@ -421,7 +421,7 @@ test_code_t test_etm(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	if (ret < 0)
 		return TEST_FAILED;
@@ -446,7 +446,7 @@ test_code_t test_safe_renegotiation_scsv(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	return ret;
 }
@@ -470,7 +470,7 @@ test_code_t test_dhe_group(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	ret2 = gnutls_dh_get_group(session, &gen, &prime);
 	if (ret2 >= 0) {
@@ -542,7 +542,7 @@ test_code_t test_ssl3(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED)
 		ssl3_ok = 1;
 
@@ -573,7 +573,7 @@ test_code_t test_bye(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED)
 		return ret;
 
@@ -623,7 +623,7 @@ test_code_t test_aes(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -639,7 +639,7 @@ test_code_t test_aes_gcm(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -655,7 +655,7 @@ test_code_t test_aes_ccm(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -671,7 +671,7 @@ test_code_t test_aes_ccm_8(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -690,7 +690,7 @@ test_code_t test_camellia_cbc(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -708,7 +708,7 @@ test_code_t test_camellia_gcm(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -724,7 +724,7 @@ test_code_t test_unknown_ciphersuites(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -743,7 +743,7 @@ test_code_t test_md5(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -758,7 +758,7 @@ test_code_t test_sha(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -773,7 +773,7 @@ test_code_t test_sha256(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -787,7 +787,7 @@ test_code_t test_3des(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -804,7 +804,7 @@ test_code_t test_arcfour(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -821,7 +821,7 @@ test_code_t test_chacha20(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -836,7 +836,7 @@ test_code_t test_tls1(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED)
 		tls1_ok = 1;
 
@@ -858,7 +858,7 @@ test_code_t test_tls1_nossl3(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED) {
 		strcat(rest, ":%LATEST_RECORD_VERSION");
 		tls1_ok = 1;
@@ -878,7 +878,7 @@ test_code_t test_record_padding(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED) {
 		tls1_ok = 1;
 	} else {
@@ -888,7 +888,7 @@ test_code_t test_record_padding(gnutls_session_t session)
 		_gnutls_priority_set_direct(session, prio_str);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-		ret = do_handshake(session);
+		ret = test_do_handshake(session);
 		if (ret == TEST_SUCCEED) {
 			tls1_ok = 1;
 			strcat(rest, ":%COMPAT");
@@ -909,7 +909,7 @@ test_code_t test_no_extensions(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	gnutls_record_set_max_size(session, 4096);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED) {
 		tls_ext_ok = 1;
 	} else {
@@ -919,7 +919,7 @@ test_code_t test_no_extensions(gnutls_session_t session)
 		_gnutls_priority_set_direct(session, prio_str);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-		ret = do_handshake(session);
+		ret = test_do_handshake(session);
 		if (ret == TEST_SUCCEED) {
 			tls_ext_ok = 0;
 			strcat(rest, ":%NO_EXTENSIONS");
@@ -940,7 +940,7 @@ test_code_t test_tls1_2(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED)
 		tls1_2_ok = 1;
 
@@ -959,7 +959,7 @@ test_code_t test_tls1_3(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED)
 		tls1_3_ok = 1;
 
@@ -978,7 +978,7 @@ test_code_t test_tls1_1(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_SUCCEED)
 		tls1_1_ok = 1;
 
@@ -1000,7 +1000,7 @@ test_code_t test_tls1_1_fallback(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret != TEST_SUCCEED)
 		return TEST_FAILED;
 
@@ -1028,7 +1028,7 @@ test_code_t test_tls1_6_fallback(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	_gnutls_hello_set_default_version(session, 3, 7);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret != TEST_SUCCEED)
 		return TEST_FAILED;
 
@@ -1052,7 +1052,7 @@ test_code_t test_tls_disable0(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED) {
 		/* disable TLS 1.0 */
 		if (ssl3_ok != 0) {
@@ -1077,7 +1077,7 @@ test_code_t test_tls_disable1(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED) {
 		/* disable TLS 1.1 */
 		snprintf(protocol_str, sizeof(protocol_str), "+VERS-TLS1.0:+VERS-SSL3.0");
@@ -1099,7 +1099,7 @@ test_code_t test_tls_disable2(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED) {
 		/* disable TLS 1.2 */
 		snprintf(protocol_str, sizeof(protocol_str), "+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0");
@@ -1123,7 +1123,7 @@ test_code_t test_rsa_pms(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED)
 		return TEST_FAILED;
 
@@ -1146,7 +1146,7 @@ test_code_t test_max_record_size(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	gnutls_record_set_max_size(session, 512);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED)
 		return ret;
 
@@ -1170,7 +1170,7 @@ test_code_t test_heartbeat_extension(gnutls_session_t session)
 	gnutls_record_set_max_size(session, 4096);
 
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
-	do_handshake(session);
+	test_do_handshake(session);
 
 	switch (gnutls_heartbeat_allowed(session, GNUTLS_HB_LOCAL_ALLOWED_TO_SEND)) {
 	case 0:
@@ -1191,7 +1191,7 @@ test_code_t test_small_records(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	gnutls_record_set_max_size(session, 512);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -1215,7 +1215,7 @@ test_code_t test_version_rollback(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	_gnutls_record_set_default_version(session, 3, 0);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret != TEST_SUCCEED)
 		return ret;
 
@@ -1243,7 +1243,7 @@ test_code_t test_version_oob(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	_gnutls_record_set_default_version(session, 5, 5);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 }
 
@@ -1265,7 +1265,7 @@ test_code_t test_rsa_pms_version_check(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	_gnutls_rsa_pms_set_version(session, 5, 5);	/* use SSL 5.5 version */
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	return ret;
 
 }
@@ -1282,7 +1282,7 @@ test_code_t test_anonymous(gnutls_session_t session)
 	_gnutls_priority_set_direct(session, prio_str);
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 
 	if (ret == TEST_SUCCEED)
 		gnutls_dh_get_pubkey(session, &pubkey);
@@ -1313,7 +1313,7 @@ test_code_t test_session_resume2(gnutls_session_t session)
 	memcpy(tmp_session_id, session_id, session_id_size);
 	tmp_session_id_size = session_id_size;
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED)
 		return ret;
 
@@ -1354,7 +1354,7 @@ test_code_t test_certificate(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED)
 		return ret;
 
@@ -1387,7 +1387,7 @@ test_code_t test_chain_order(gnutls_session_t session)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	if (ret == TEST_FAILED)
 		return ret;
 
@@ -1506,7 +1506,7 @@ test_code_t test_server_cas(gnutls_session_t session)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	gnutls_certificate_set_retrieve_function(xcred, cert_callback);
 
-	ret = do_handshake(session);
+	ret = test_do_handshake(session);
 	gnutls_certificate_set_retrieve_function(xcred, NULL);
 
 	if (ret == TEST_FAILED)
