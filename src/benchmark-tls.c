@@ -381,8 +381,8 @@ double calc_sstdev(unsigned int *diffs, unsigned int diffs_size,
 }
 
 
-unsigned int diffs[32 * 1024];
-unsigned int diffs_size = 0;
+unsigned int total_diffs[32 * 1024];
+unsigned int total_diffs_size = 0;
 
 static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 {
@@ -403,7 +403,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	double avg, sstddev;
 	gnutls_priority_t priority_cache;
 
-	diffs_size = 0;
+	total_diffs_size = 0;
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&s_certcred);
@@ -501,8 +501,8 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		gnutls_deinit(client);
 		gnutls_deinit(server);
 
-		diffs[diffs_size++] = timespec_sub_ms(&tr_stop, &tr_start);
-		if (diffs_size > sizeof(diffs)/sizeof(diffs[0]))
+		total_diffs[total_diffs_size++] = timespec_sub_ms(&tr_stop, &tr_start);
+		if (total_diffs_size > sizeof(total_diffs)/sizeof(total_diffs[0]))
 			abort();
 
 		st.size += 1;
@@ -514,8 +514,8 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	stop_benchmark(&st, "transactions", 1);
 	gnutls_priority_deinit(priority_cache);
 
-	avg = calc_avg(diffs, diffs_size);
-	sstddev = calc_sstdev(diffs, diffs_size, avg);
+	avg = calc_avg(total_diffs, total_diffs_size);
+	sstddev = calc_sstdev(total_diffs, total_diffs_size, avg);
 
 	printf("%32s %.2f ms, sample variance: %.2f)\n",
 	       "(avg. handshake time:", avg, sstddev);
