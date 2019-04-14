@@ -1297,8 +1297,12 @@ check_server_dh_params(gnutls_session_t session,
  * @cipher_algorithm: is a cipher algorithm
  * @mac_algorithm: is a MAC algorithm
  *
- * Note that the full cipher suite name must be prepended by TLS or
- * SSL depending of the protocol in use.
+ * This function returns the ciphersuite name under TLS1.2 or earlier
+ * versions when provided with individual algorithms. The full cipher suite
+ * name must be prepended by TLS or SSL depending of the protocol in use.
+ *
+ * To get a description of the current ciphersuite across versions, it
+ * is recommended to use gnutls_session_get_desc().
  *
  * Returns: a string that contains the name of a TLS cipher suite,
  * specified by the given algorithms, or %NULL.
@@ -1327,7 +1331,8 @@ const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm_t
  * @mac_algorithm: is a MAC algorithm
  * @suite: The id to be returned
  *
- * It fills @suite with the ID of the ciphersuite of the provided parameters.
+ * This function returns the ciphersuite ID in @suite, under TLS1.2 or earlier
+ * versions when provided with individual algorithms.
  *
  * Returns: 0 on success or a negative error code otherwise.
  -*/

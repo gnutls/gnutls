@@ -1314,6 +1314,8 @@ gnutls_session_get_random(gnutls_session_t session,
  * This function returns pointers to the master secret
  * used in the TLS session. The pointers are not to be modified or deallocated.
  *
+ * This function is only applicable under TLS 1.2 or earlier versions.
+ *
  * Since: 3.5.0
  **/
 void
