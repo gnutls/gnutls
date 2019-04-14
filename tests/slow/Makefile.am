@@ -53,7 +53,7 @@ check_PROGRAMS = $(ctests) cipher-test cipher-api-test cipher-override mac-overr
 TESTS = $(ctests) test-ciphers.sh override-ciphers test-hash-large.sh crypto test-ciphers-api.sh
 
 if HAVE_LIBCRYPTO
-cipher_openssl_compat_LDFLAGS = $(LDADD) $(LIBCRYPTO)
+cipher_openssl_compat_LDADD = $(LDADD) $(LIBCRYPTO)
 
 dist_check_SCRIPTS += test-ciphers-openssl.sh
 check_PROGRAMS += cipher-openssl-compat
