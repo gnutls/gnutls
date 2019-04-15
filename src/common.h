@@ -41,6 +41,7 @@
 #include <io.h>
 #include <winbase.h>
 #include <sys/select.h>
+#include "socket.h"
 #undef OCSP_RESPONSE
 #endif
 
@@ -103,7 +104,8 @@ static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 	fd_set rfds;
 	struct timeval tv;
-	int ret, fd = (long)ptr;
+	socket_st *hd = ptr;
+	int fd = hd->fd;
 
 	FD_ZERO(&rfds);
 	FD_SET(fd, &rfds);
@@ -117,13 +119,17 @@ static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 static ssize_t
 system_write(gnutls_transport_ptr ptr, const void *data, size_t data_size)
 {
-	return send((long)ptr, data, data_size, 0);
+	socket_st *hd = ptr;
+
+	return send(hd->fd, data, data_size, 0);
 }
 
 static ssize_t
 system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 {
-	return recv((long)ptr, data, data_size, 0);
+	socket_st *hd = ptr;
+
+	return recv(hd->fd, data, data_size, 0);
 }
 
 static

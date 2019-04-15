@@ -1,3 +1,6 @@
+#ifndef GNUTLS_SRC_SOCKET_H
+#define GNUTLS_SRC_SOCKET_H
+
 #include <gnutls/gnutls.h>
 #include <gnutls/socket.h>
 
@@ -37,7 +40,7 @@ typedef struct {
 
 /* calling program must provide that */
 extern gnutls_session_t init_tls_session(const char *host);
-extern int do_handshake(socket_st * socket);
+int do_handshake(socket_st * socket);
 
 ssize_t socket_recv(const socket_st * socket, void *buffer,
 		    int buffer_size);
@@ -68,3 +71,5 @@ const char *starttls_proto_to_service(const char *app_proto);
 void canonicalize_host(char *hostname, char *service, unsigned service_size);
 
 #define CONNECT_MSG "Connecting to"
+
+#endif /* GNUTLS_SRC_SOCKET_H */
