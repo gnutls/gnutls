@@ -128,6 +128,21 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+#define SET_SPKI_PARAMS(spki, cinfo) \
+	do { \
+		unsigned _salt_size; \
+		if (!cinfo->hash) { \
+			fprintf(stderr, "You must provide the hash algorithm and optionally the salt size for RSA-PSS\n"); \
+			app_exit(1); \
+		} \
+		if (HAVE_OPT(SALT_SIZE)) { \
+			_salt_size = OPT_VALUE_SALT_SIZE; \
+		} else { \
+			_salt_size = gnutls_hash_get_len(cinfo->hash); \
+		} \
+		gnutls_x509_spki_set_rsa_pss_params(spki, cinfo->hash, _salt_size); \
+	} while(0)
+
 static gnutls_x509_privkey_t
 generate_private_key_int(common_info_st * cinfo)
 {
@@ -220,20 +235,8 @@ generate_private_key_int(common_info_st * cinfo)
 	}
 
 	if (key_type == GNUTLS_PK_RSA_PSS && (cinfo->hash || HAVE_OPT(SALT_SIZE))) {
-		unsigned salt_size;
 
-		if (!cinfo->hash) {
-			fprintf(stderr, "You must provide the hash algorithm and optionally the salt size for RSA-PSS\n");
-			app_exit(1);
-		}
-
-		if (HAVE_OPT(SALT_SIZE)) {
-			salt_size = OPT_VALUE_SALT_SIZE;
-		} else {
-			salt_size = gnutls_hash_get_len(cinfo->hash);
-		}
-
-		gnutls_x509_spki_set_rsa_pss_params(spki, cinfo->hash, salt_size);
+		SET_SPKI_PARAMS(spki, cinfo);
 
 		kdata[kdata_size].type = GNUTLS_KEYGEN_SPKI;
 		kdata[kdata_size].data = (void*)spki;
@@ -308,6 +311,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		     common_info_st * cinfo)
 {
 	gnutls_x509_crt_t crt;
+	gnutls_x509_spki_t spki;
 	gnutls_privkey_t key = NULL;
 	gnutls_pubkey_t pubkey;
 	size_t size;
@@ -715,11 +719,10 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		app_exit(1);
 	}
 
+
 	/* Set algorithm parameter restriction in CAs.
 	 */
 	if (pk == GNUTLS_PK_RSA_PSS && ca_status && key) {
-		gnutls_x509_spki_t spki;
-
 		result = gnutls_x509_spki_init(&spki);
 		if (result < 0) {
 			fprintf(stderr, "spki_init: %s\n",
@@ -735,6 +738,25 @@ generate_certificate(gnutls_privkey_t * ret_key,
 					gnutls_strerror(result));
 				app_exit(1);
 			}
+		}
+
+		gnutls_x509_spki_deinit(spki);
+
+	} else if (pk == GNUTLS_PK_RSA && req_key_type == GNUTLS_PK_RSA_PSS) {
+		result = gnutls_x509_spki_init(&spki);
+		if (result < 0) {
+			fprintf(stderr, "spki_init: %s\n",
+				gnutls_strerror(result));
+			app_exit(1);
+		}
+
+		SET_SPKI_PARAMS(spki, cinfo);
+
+		result = gnutls_x509_crt_set_spki(crt, spki, 0);
+		if (result < 0) {
+			fprintf(stderr, "error setting RSA-PSS SPKI information: %s\n",
+				gnutls_strerror(result));
+			app_exit(1);
 		}
 
 		gnutls_x509_spki_deinit(spki);

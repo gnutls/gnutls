@@ -200,7 +200,9 @@ flag = {
     arg-type  = string;
     descrip   = "Specify the key type to use on key generation";
     doc = "This option can be combined with --generate-privkey, to specify
-the key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', and 'ed25519'.";
+the key type to be generated. Valid options are, 'rsa', 'rsa-pss', 'dsa', 'ecdsa', and 'ed25519'.
+When combined with certificate generation it can be used to specify an
+RSA-PSS certificate when an RSA key is given.";
 };
 
 flag = {

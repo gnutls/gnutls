@@ -44,9 +44,9 @@ check_for_datefudge
 for i in sha256 sha384 sha512;do
 datefudge -s "2007-04-22" \
 "${CERTTOOL}" --generate-self-signed --key-type rsa-pss \
-		--load-privkey "${srcdir}/data/template-test.key" \
+		--load-privkey "${srcdir}/data/privkey1.pem" \
 		--template "${srcdir}/templates/template-test.tmpl" \
-		--outfile "${TMPFILE}" --hash $i 2>/dev/null
+		--outfile "${TMPFILE}" --hash $i
 rc=$?
 
 if test -f "${srcdir}/data/template-rsa-$i.pem";then

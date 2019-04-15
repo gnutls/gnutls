@@ -49,7 +49,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" -k --password '' --infile "$OUTFILE"
+${VALGRIND} "${CERTTOOL}" -k --password '' --infile "$OUTFILE" >/dev/null
 rc=$?
 if test "${rc}" != "0"; then
 	echo "Could not read generated an RSA-PSS key ($i)"
@@ -68,6 +68,8 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
+rm -f "${TMPFILE}"
+
 # Create an RSA-PSS certificate from an RSA-PSS private key, with
 # mismatched parameters
 for j in sha256 sha384 sha512;do
@@ -82,6 +84,7 @@ if test "$j" != "$j" && "${rc}" = "0"; then
 	exit 1
 fi
 done
+rm -f "${TMPFILE}"
 
 # Create an RSA-PSS certificate from an RSA key
 ${VALGRIND} "${CERTTOOL}" --generate-certificate --key-type rsa-pss \
@@ -97,6 +100,15 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
+${CERTTOOL} -i --infile ${TMPFILE}|grep -i "Subject Public Key Algorithm: RSA-PSS"
+if test $? != 0;then
+	echo "Generated certificate is not RSA-PSS"
+	cat ${TMPFILE}
+	exit 1
+fi
+
+rm -f "${TMPFILE}"
+
 # Create an RSA certificate from an RSA key, and sign it with RSA-PSS
 ${VALGRIND} "${CERTTOOL}" --generate-certificate --rsa --sign-params rsa-pss \
 	    --load-privkey "${srcdir}/../../doc/credentials/x509/key-rsa.pem" \
@@ -110,6 +122,23 @@ if test "${rc}" != "0"; then
 	echo "Could not generate an RSA-PSS certificate"
 	exit 1
 fi
+
+${CERTTOOL} -i --infile ${TMPFILE}|tr -d '\r'|grep -i 'Subject Public Key Algorithm: RSA$' >/dev/null
+if test $? != 0;then
+	echo "Generated certificate is not RSA"
+	cat ${TMPFILE}
+	exit 1
+fi
+
+${CERTTOOL} -i --infile ${TMPFILE}|grep -i "Signature Algorithm: RSA-PSS"
+if test $? != 0;then
+	echo "Generated certificate is not signed with RSA-PSS"
+	cat ${TMPFILE}
+	exit 1
+fi
+
+rm -f "${TMPFILE}"
+
 done
 
 # Convert an RSA-PSS key to an RSA key
@@ -132,6 +161,8 @@ if test "${rc}" != "0"; then
 fi
 
 echo "RSA-PSS to RSA conversion was successful"
+
+rm -f "${TMPFILE}"
 
 export TZ="UTC"
 
