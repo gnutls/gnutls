@@ -279,6 +279,8 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		size_t size;
 		const char *p;
 		unsigned int oflags;
+		const char *vendor;
+		char *objurl;
 
 		ret =
 		    gnutls_pkcs11_obj_export_url(crt_list[i], detailed,
@@ -297,12 +299,22 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 			fprintf(outfile, "Object %d:\n\tURL: %s\n", i, output);
 		}
 
+		/* copy vendor query (e.g. pin-value) from the original URL */
+		vendor = strrchr(url, '?');
+		if (vendor) {
+			objurl = gnutls_malloc(strlen(output) + strlen(vendor) + 1);
+			strcpy(objurl, output);
+			strcat(objurl, vendor);
+		} else {
+			objurl = gnutls_strdup(output);
+		}
+
 		p = NULL;
 		otype = gnutls_pkcs11_obj_get_type(crt_list[i]);
 		if (otype == GNUTLS_PKCS11_OBJ_PRIVKEY ||
 		    otype == GNUTLS_PKCS11_OBJ_PUBKEY ||
 		    otype == GNUTLS_PKCS11_OBJ_X509_CRT) {
-			p = get_key_algo_type(otype, output, obj_flags, &exp);
+			p = get_key_algo_type(otype, objurl, obj_flags, &exp);
 		}
 
 		if (p) {
@@ -318,6 +330,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		}
 
 		gnutls_free(output);
+		gnutls_free(objurl);
 
 		size = sizeof(buf);
 		ret =
