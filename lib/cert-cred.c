@@ -542,13 +542,14 @@ alloc_and_load_pkcs11_key(gnutls_pkcs11_privkey_t key, int deinit)
 /**
  * gnutls_certificate_server_set_request:
  * @session: is a #gnutls_session_t type.
- * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
+ * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE, GNUTLS_CERT_IGNORE
  *
  * This function specifies if we (in case of a server) are going to
  * send a certificate request message to the client. If @req is
  * GNUTLS_CERT_REQUIRE then the server will return the %GNUTLS_E_NO_CERTIFICATE_FOUND
  * error if the peer does not provide a certificate. If you do not call this
- * function then the client will not be asked to send a certificate.
+ * function then the client will not be asked to send a certificate. Invoking
+ * the function with @req GNUTLS_CERT_IGNORE has the same effect.
  **/
 void
 gnutls_certificate_server_set_request(gnutls_session_t session,
