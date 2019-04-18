@@ -50,18 +50,20 @@ static int _rnd_called = 0;
 int __attribute__ ((visibility ("protected")))
 gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
+	static unsigned int value = 0;
+
 	_rnd_called = 1;
 
-	memset(data, 0xff, len);
+	/* Increment 'value' in each call up to 255, then start again from 0 */
+	value = (value + 1) & 0xFF;
+
+	memset(data, value, len);
+
 	return 0;
 }
 
 void doit(void)
 {
-	if (gnutls_fips140_mode_enabled()) {
-		exit(77);
-	}
-
 	global_init();
 
 	if (_rnd_called != 0)
