@@ -60,7 +60,7 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I src/libopts/m4 -I src/gl/m4 -I lib/unistring/m4 --install
 
 EXTRA_DIST = cfg.mk maint.mk CONTRIBUTING.md README.md LICENSE AUTHORS NEWS \
-	ChangeLog THANKS INSTALL.md symbols.last
+	ChangeLog THANKS INSTALL.md
 
 DISTCLEANFILES = AUTHORS
 
@@ -77,74 +77,89 @@ pic-check:
 	false; \
 	fi
 
-abi-dump:
-	@abi-dumper lib/.libs/libgnutls.so -lver $(VERSION) -o "./devel/ABI-$(VERSION)-$$(uname -m).dump" -public-headers lib/includes/gnutls/
+ABIDW_COMMON = --no-show-locs --no-corpus-path
+ABIGNORE_FILE = "$(top_srcdir)/devel/libgnutls.abignore"
+SYMBOLS_LAST_FILE = "$(top_srcdir)/devel/symbols.last"
+LIBGNUTLS_ABI_LAST_FILE = "$(top_srcdir)/devel/libgnutls-latest-$$(uname -m).abi"
+LIBDANE_ABI_LAST_FILE = "$(top_srcdir)/devel/libdane-latest-$$(uname -m).abi"
 
-ABI_TMPCLONEDIR="gnutls-prev-abi.tmp"
-ABI_TMPFILE_CUR="abi-temp-cur.xml"
-ABI_TMPFILE_PRE="abi-temp-prev.xml"
-ABIREFCMD="git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1"
-ABIVERCMD="git for-each-ref --sort=taggerdate --format '%(refname)' refs/tags|tail -1|cut -d '/' -f 3|sed -e 's/gnutls_//' -e 's/_/./g'"
-.prev-tag-abi.stamp:
-	@rm -rf $(ABI_TMPCLONEDIR)
-	@git clone -l . $(ABI_TMPCLONEDIR)
-	@echo "Creating ABI for $$(eval $(ABIVERCMD))"
-	cd $(ABI_TMPCLONEDIR) && \
-	  git fetch --tags https://gitlab.com/gnutls/gnutls.git && \
-	  git checkout $$(eval $(ABIREFCMD)) && \
-	  SUBMODULE_NOFETCH=1 ./bootstrap && if test -f ../cache/config.cache;then \
-	    CFLAGS="-g -Og" ./configure --disable-doc --cache-file ../cache/config.cache;\
-	  else\
-	    CFLAGS="-g -Og" ./configure --disable-doc;\
-	  fi && $(MAKE) -j$$(nproc) -C gl && $(MAKE) -j$$(nproc) -C lib && $(MAKE) -j$$(nproc) -C libdane
-	touch $@
+abi-dump-versioned: lib/libgnutls.la libdane/libgnutls-dane.la
+	@echo "**************************************************************************"
+	@echo "Generating versioned ABI files of current gnutls and gnutls-dane libraries"
+	@echo "**************************************************************************"
+	@abidw lib/.libs/libgnutls.so $(ABIDW_COMMON) --suppressions $(ABIGNORE_FILE) --out-file "$(srcdir)/devel/libgnutls-$(VERSION)-$$(uname -m).abi"
+	@abidw libdane/.libs/libgnutls-dane.so $(ABIDW_COMMON) --out-file "$(srcdir)/devel/libdane-$(VERSION)-$$(uname -m).abi"
 
-# We skip session::set_transport_vec_push_function() as it is seen as different when
-# compiled with the glibc struct iovec, under gcc8. This should be temporary for
-# 3.6.2 to 3.6.3 transition.
-abi-check: .prev-tag-abi.stamp
-	@rm -f $(ABI_TMPFILE_CUR) $(ABI_TMPFILE_PRE)
-	@echo "Checking libgnutls ABI"
-	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_CUR)
-	@echo "<headers>$(srcdir)/lib/includes/gnutls" >>$(ABI_TMPFILE_CUR)
-	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_CUR)
-	@echo "<libs>$(builddir)/lib/.libs</libs>" >>$(ABI_TMPFILE_CUR)
-	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_PRE)
-	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
-	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
-	@echo "<skip_symbols>_ZN6gnutls7session31set_transport_vec_push_functionEPFlPvPK8giovec_tiE</skip_symbols>" >>$(ABI_TMPFILE_PRE)
-	@echo "<libs>$(builddir)/$(ABI_TMPCLONEDIR)/lib/.libs</libs>" >>$(ABI_TMPFILE_PRE)
-	PATH="/sbin$(PATH_SEPARATOR)$$PATH" \
-	  abi-compliance-checker -abi -lib gnutls -old $(ABI_TMPFILE_PRE) -new $(ABI_TMPFILE_CUR) -skip-symbols $(srcdir)/devel/abi-unchecked-symbols
-	@echo "Checking libgnutls-dane ABI"
-	@echo "<version>$(VERSION)</version>" >$(ABI_TMPFILE_CUR)
-	@echo "<headers>$(srcdir)/libdane/includes/gnutls" >>$(ABI_TMPFILE_CUR)
-	@echo "$(srcdir)/lib/includes/gnutls" >>$(ABI_TMPFILE_CUR)
-	@echo "$(builddir)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_CUR)
-	@echo "<libs>$(builddir)/libdane/.libs</libs>" >>$(ABI_TMPFILE_CUR)
-	@echo "<version>$$(eval $(ABIVERCMD))</version>" >$(ABI_TMPFILE_PRE)
-	@echo "<headers>$(builddir)/$(ABI_TMPCLONEDIR)/libdane/includes/gnutls" >>$(ABI_TMPFILE_PRE)
-	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls" >>$(ABI_TMPFILE_PRE)
-	@echo "$(builddir)/$(ABI_TMPCLONEDIR)/lib/includes/gnutls</headers>" >>$(ABI_TMPFILE_PRE)
-	@echo "<libs>$(builddir)/$(ABI_TMPCLONEDIR)/libdane/.libs</libs>" >>$(ABI_TMPFILE_PRE)
-	PATH="/sbin$(PATH_SEPARATOR)$$PATH" \
-	  abi-compliance-checker -abi -lib gnutls-dane -old $(ABI_TMPFILE_PRE) -new $(ABI_TMPFILE_CUR)
-	@rm -f $(ABI_TMPFILE_CUR) $(ABI_TMPFILE_PRE)
+abi-dump-latest: lib/libgnutls.la libdane/libgnutls-dane.la
+	@echo "****************************************************************"
+	@echo "Generating ABI files of current gnutls and gnutls-dane libraries"
+	@echo "****************************************************************"
+	@abidw lib/.libs/libgnutls.so $(ABIDW_COMMON) --suppressions $(ABIGNORE_FILE) --out-file $(LIBGNUTLS_ABI_LAST_FILE)
+	@abidw libdane/.libs/libgnutls-dane.so $(ABIDW_COMMON) --out-file $(LIBDANE_ABI_LAST_FILE)
+	@rm -f "./devel/libgnutls-latest-$$(uname -m).tmp"
+	@rm -f "./devel/libdane-latest-$$(uname -m).tmp"
 
-symbol-check:
-	@objdump -T $(builddir)/lib/.libs/libgnutls.so  | grep -v ' \*UND\*'  | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE | grep -v '^@' |  sort -u >symbols.last.tmp
-	@diff -u $(srcdir)/symbols.last symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
-		diff -u $(srcdir)/symbols.last symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
+abi-check-latest: lib/libgnutls.la libdane/libgnutls-dane.la
+	@echo "Checking whether the latest ABI dump matches"
+	@abidiff --suppressions $(ABIGNORE_FILE) lib/.libs/libgnutls.so $(LIBGNUTLS_ABI_LAST_FILE); if test $$? != 0;then \
+		echo "*********************************************************"; \
+		echo "libgnutls ABI has changed; use 'make-files-update'       "; \
+		echo "and use 'git diff' to check correctness before committing"; \
+		echo "*********************************************************"; \
+		false; \
+	fi
+	@abidiff libdane/.libs/libgnutls-dane.so $(LIBDANE_ABI_LAST_FILE); if test $$? != 0;then \
+		echo "*********************************************************"; \
+		echo "libgnutls-dane ABI has changed; use 'make-files-update'  "; \
+		echo "and use 'git diff' to check correctness before committing"; \
+		echo "*********************************************************"; \
+		false; \
+	fi
+	@echo "********************************"
+	@echo "Current release matches ABI dump"
+	@echo "********************************"
+
+ABICHECK_COMMON = --no-added-syms
+abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
+	@for file in $$(echo $(srcdir)/devel/libgnutls-*-$$(uname -m).abi);do \
+		echo "Comparing libgnutls with $$file"; \
+		abidiff $${file} lib/.libs/libgnutls.so $(ABICHECK_COMMON) --suppressions $(ABIGNORE_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/"; \
+		if test $$? != 0;then \
+			echo "****************************************************************************"; \
+			echo "ABI check failed; If intentional add suppression in devel/libgnutls.abignore"; \
+			echo "****************************************************************************"; \
+			false; \
+		fi; \
+	done
+	@for file in $$(echo $(srcdir)/devel/libdane-*-$$(uname -m).abi);do \
+		echo "Comparing libgnutls-dane with $$file"; \
+		abidiff $${file} libdane/.libs/libgnutls-dane.so $(ABICHECK_COMMON) --hd2 "$(srcdir)/libdane/includes/gnutls/"; \
+		if test $$? != 0;then \
+			echo "**********************************************"; \
+			echo "ABI check failed; If intentional add a        "; \
+			echo "libabigail suppression file for libgnutls-dane"; \
+			echo "**********************************************"; \
+			false; \
+		fi; \
+	done
+	@echo "********************"
+	@echo "ABI checks completed"
+	@echo "********************"
+
+symbol-check: lib/libgnutls.la
+	@objdump -T $(builddir)/lib/.libs/libgnutls.so | grep -v ' \*UND\*'  | awk '{print $$7 "@" $$6;}' | grep -v GNUTLS_FIPS140 | grep -v GNUTLS_PRIVATE | grep -v '^@' |  sort -u >symbols.last.tmp
+	@diff -u $(SYMBOLS_LAST_FILE) symbols.last.tmp >/dev/null 2>&1; if test $$? != 0;then \
+		diff -u $(SYMBOLS_LAST_FILE) symbols.last.tmp | grep -v '\-\-\-' >symbols.diff.tmp 2>&1; \
 		if grep -e '^-' symbols.diff.tmp;then \
 			echo "*******************************************"; \
-			echo "Symbols were removed from the library."; \
+			echo "Symbols were removed from the library.     "; \
 			echo "Check symbols.diff.tmp for more information"; \
 			echo "*******************************************"; \
 			false; \
 		else \
 			echo "*************************************************************"; \
-			echo "Symbols were added in the library; check symbols.diff.tmp for"; \
-			echo "correctness; then use 'make files-update'"; \
+			echo "Symbols were added in the library; use 'make-files-update'   "; \
+			echo "and use 'git diff' to check correctness before committing    "; \
 			echo "*************************************************************"; \
 			false; \
 		fi \
@@ -170,16 +185,20 @@ libopts-check:
 	@echo "*****************************************************************"
 	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
-files-update: libopts-check
+files-update: libopts-check abi-dump-latest
 	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile $(srcdir)/doc/Makefile.am
 	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile $(srcdir)/doc/manpages/Makefile.am
-	$(MAKE) -C . symbol-check || mv symbols.last.tmp $(srcdir)/symbols.last
+	$(MAKE) -C . symbol-check || mv symbols.last.tmp $(SYMBOLS_LAST_FILE)
 	@echo "******************************************************************************************"
 	@echo "updated auto-generated files; please use git diff to verify the correctness of the changes"
 	@echo "******************************************************************************************"
 
-dist-hook: libopts-check symbol-check
+dist-hook: libopts-check
 	$(PKG_CONFIG) --atleast-version=2.2.0 guile-2.2
+	if test -d "$(top_srcdir)/devel";then \
+		$(MAKE) -C $(top_srcdir) symbol-check && \
+		$(MAKE) -C $(top_srcdir) abi-check-latest; \
+	fi
 	$(MAKE) -C doc/ compare-makefile
 	$(MAKE) -C doc/ compare-exported
 	$(MAKE) -C doc/manpages compare-makefile
@@ -187,4 +206,4 @@ dist-hook: libopts-check symbol-check
 	mv ChangeLog $(distdir)
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
-.PHONY: abi-check abi-dump pic-check symbol-check local-code-coverage-output files-update libopts-check AUTHORS
+.PHONY: abi-check abi-dump-versioned abi-dump-latest pic-check symbol-check local-code-coverage-output files-update libopts-check AUTHORS

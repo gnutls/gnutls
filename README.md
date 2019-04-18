@@ -44,7 +44,7 @@ We require several tools to check out and build the software, including:
 * [AWK](https://www.gnu.org/software/awk/) (for make dist, pmccabe2html)
 * [bison](https://www.gnu.org/software/bison) (for datetime parser in certtool)
 * [libunbound](https://unbound.net/) (for DANE support)
-* [abi-compliance-checker](https://lvc.github.io/abi-compliance-checker/) (for make dist)
+* [libabigail](https://pagure.io/libabigail/) (for abi comparison in make dist)
 * [tcsd](https://trousers.sourceforge.net/) (for TPM support; optional)
 * [swtpm](https://github.com/stefanberger/swtpm) (for TPM test; optional)
 * [ncat](https://nmap.org/download.html) (for TPM test; optional)
@@ -90,13 +90,13 @@ and mbedtls.
 Debian/Ubuntu:
 ```
 apt-get install -y valgrind libasan1 libubsan0 nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect
-apt-get install -y dieharder libpolarssl-runtime openssl abi-compliance-checker socat net-tools ppp lockfile-progs
+apt-get install -y dieharder libpolarssl-runtime openssl abigail-tools socat net-tools ppp lockfile-progs
 ```
 
 Fedora/RHEL:
 ```
 yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel expect
-yum install -y dieharder mbedtls-utils openssl abi-compliance-checker libcmocka-devel socat lockfile-progs
+yum install -y dieharder mbedtls-utils openssl libabigail libcmocka-devel socat lockfile-progs
 ```
 
 

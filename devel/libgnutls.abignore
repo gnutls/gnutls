@@ -1,0 +1,9 @@
+`[suppress_function]
+symbol_version = GNUTLS_PRIVATE_3_4
+
+[suppress_function]
+name_regexp = _gnutls*
+
+[suppress_variable]
+symbol_version = GNUTLS_PRIVATE_3_4
+
