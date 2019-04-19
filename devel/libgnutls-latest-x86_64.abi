@@ -587,6 +587,7 @@
     <elf-symbol name='gnutls_pkcs_schema_get_name' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_pkcs_schema_get_oid' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_prf' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_prf_early' version='GNUTLS_3_6_6' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_prf_raw' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_prf_rfc5705' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_priority_certificate_type_list2' version='GNUTLS_3_6_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>

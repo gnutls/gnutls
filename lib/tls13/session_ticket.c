@@ -79,7 +79,7 @@ pack_ticket(gnutls_session_t session, tls13_ticket_st *ticket, gnutls_datum_t *p
 	memcpy(p, state.data, state.size);
 	p += state.size;
 
-	_gnutls_write_uint32(ticket->creation_time.tv_sec >> 32, p);
+	_gnutls_write_uint32((uint64_t) ticket->creation_time.tv_sec >> 32, p);
 	p += 4;
 	_gnutls_write_uint32(ticket->creation_time.tv_sec & 0xFFFFFFFF, p);
 	p += 4;
@@ -106,6 +106,7 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_st 
 	const mac_entry_st *prf;
 	uint8_t *p;
 	ssize_t len;
+	uint64_t v;
 	int ret;
 
 	if (unlikely(packed == NULL || data == NULL))
@@ -168,10 +169,9 @@ unpack_ticket(gnutls_session_t session, gnutls_datum_t *packed, tls13_ticket_st 
 	p += state.size;
 
 	DECR_LEN(len, 12);
-	creation_time.tv_sec = _gnutls_read_uint32(p);
+	v = _gnutls_read_uint32(p);
 	p += 4;
-	creation_time.tv_sec <<= 32;
-	creation_time.tv_sec |= _gnutls_read_uint32(p);
+	creation_time.tv_sec = (v << 32) | _gnutls_read_uint32(p);
 	p += 4;
 	creation_time.tv_nsec = _gnutls_read_uint32(p);
 
@@ -223,7 +223,11 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st *ticket)
 
 	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE, &ticket->age_add, sizeof(uint32_t))) < 0)
 		return gnutls_assert_val(ret);
-
+	/* This is merely to produce the same binder value on
+	 * different endian architectures. */
+#ifdef WORDS_BIGENDIAN
+	ticket->age_add = bswap_32(ticket->age_add);
+#endif
 
 	ticket->prf = session->security_parameters.prf;
 

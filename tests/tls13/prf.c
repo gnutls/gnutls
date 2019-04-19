@@ -314,6 +314,8 @@ static void server(int fd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
+	check_prfs(session);
+
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);

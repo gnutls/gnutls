@@ -575,6 +575,7 @@ APIMANS += gnutls_pk_get_oid.3
 APIMANS += gnutls_pk_list.3
 APIMANS += gnutls_pk_to_sign.3
 APIMANS += gnutls_prf.3
+APIMANS += gnutls_prf_early.3
 APIMANS += gnutls_prf_raw.3
 APIMANS += gnutls_prf_rfc5705.3
 APIMANS += gnutls_priority_certificate_type_list.3

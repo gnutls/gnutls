@@ -76,7 +76,7 @@ check_for_datefudge() {
 		return
 	fi
 
-	TSTAMP=`datefudge -s "2006-09-23" date -u +%s || true`
+	TSTAMP=`datefudge -s "2006-09-23" "${top_builddir}/tests/datefudge-check" || true`
 	if test "$TSTAMP" != "1158969600" || test "$WINDOWS" = 1; then
 	echo $TSTAMP
 		echo "You need datefudge to run this test"
@@ -158,7 +158,7 @@ launch_server() {
 	shift
 
 	wait_for_free_port ${PORT}
-	${SERV} ${DEBUG} -p "${PORT}" $* >/dev/null &
+	${SERV} ${DEBUG} -p "${PORT}" $* >${LOGFILE-/dev/null} &
 }
 
 launch_pkcs11_server() {
@@ -177,7 +177,7 @@ launch_bare_server() {
 	shift
 
 	wait_for_free_port ${PORT}
-	${SERV} $* >/dev/null &
+	${SERV} $* >${LOGFILE-/dev/null} &
 }
 
 wait_server() {

@@ -104,7 +104,7 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c seccomp.c utils-adv.c
 libutils_la_LIBADD = ../lib/libgnutls.la
 
-indirect_tests =
+indirect_tests = tls13/prf-early
 ctests = tls13/supported_versions tls13/tls12-no-tls13-exts \
 	tls13/post-handshake-with-cert tls13/post-handshake-without-cert \
 	tls13/cookie tls13/key_share tls13/prf tls13/post-handshake-with-cert-ticket \
@@ -458,7 +458,7 @@ tls13_post_handshake_with_cert_pkcs11_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 
-dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh
+dist_check_SCRIPTS = rfc2253-escape-test rsa-md5-collision/rsa-md5-collision.sh systemkey.sh tls13/prf-early.sh
 
 if !WINDOWS
 
@@ -525,6 +525,10 @@ sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl
 endif
+endif
+
+if !WINDOWS
+indirect_tests += datefudge-check
 endif
 
 check_PROGRAMS = $(cpptests) $(ctests) $(indirect_tests)

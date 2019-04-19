@@ -45,6 +45,7 @@
 #include "constate.h"
 #include <record.h>
 #include <state.h>
+#include <ext/pre_shared_key.h>
 #include <ext/srp.h>
 #include <ext/session_ticket.h>
 #include <ext/status_request.h>
@@ -826,6 +827,14 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		return ret;
 	}
 
+	/* Calculate TLS 1.3 Early Secret */
+	if (session->security_parameters.pversion->tls13_sem &&
+	    !(session->internals.hsk_flags & HSK_PSK_SELECTED)) {
+		ret = _tls13_init_secret(session, NULL, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
 	ret = set_auth_types(session);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1265,7 +1274,7 @@ _gnutls_send_handshake2(gnutls_session_t session, mbuffer_st * bufel,
 
 	/* Here we keep the handshake messages in order to hash them...
 	 */
-	if (!IS_ASYNC(type, vers))
+	if (!IS_ASYNC(type, vers)) {
 		if ((ret =
 		     handshake_hash_add_sent(session, type, data,
 						     datasize)) < 0) {
@@ -1273,6 +1282,19 @@ _gnutls_send_handshake2(gnutls_session_t session, mbuffer_st * bufel,
 			_mbuffer_xfree(&bufel);
 			return ret;
 		}
+		/* If we are sending a PSK, generate early secrets here.
+		 * This cannot be done in pre_shared_key.c, because it
+		 * relies on transcript hash of a Client Hello. */
+		if (type == GNUTLS_HANDSHAKE_CLIENT_HELLO &&
+		    session->key.binders[0].prf != NULL) {
+			ret = _gnutls_generate_early_secrets_for_psk(session);
+			if (ret < 0) {
+				gnutls_assert();
+				_mbuffer_xfree(&bufel);
+				return ret;
+			}
+		}
+	}
 
 	ret = _gnutls_call_hook_func(session, type, GNUTLS_HOOK_PRE, 0,
 				     _mbuffer_get_udata_ptr(bufel), _mbuffer_get_udata_size(bufel));
@@ -1807,26 +1829,6 @@ no_resume:
 }
 
 
-static int generate_early_traffic_secret(gnutls_session_t session,
-					 const mac_entry_st *prf)
-{
-	int ret;
-
-	ret = _tls13_derive_secret2(prf, EARLY_TRAFFIC_LABEL, sizeof(EARLY_TRAFFIC_LABEL)-1,
-				    session->internals.handshake_hash_buffer.data,
-				    session->internals.handshake_hash_buffer_client_hello_len,
-				    session->key.proto.tls13.temp_secret,
-				    session->key.proto.tls13.e_ckey);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	_gnutls_nss_keylog_write(session, "CLIENT_EARLY_TRAFFIC_SECRET",
-				 session->key.proto.tls13.e_ckey,
-				 prf->output_size);
-
-	return 0;
-}
-
 /* This function reads and parses the server hello handshake message.
  * This function also restores resumed parameters if we are resuming a
  * session.
@@ -1840,12 +1842,10 @@ read_server_hello(gnutls_session_t session,
 	uint8_t *cs_pos, *comp_pos, *srandom_pos;
 	uint8_t major, minor;
 	int pos = 0;
-	int ret = 0;
+	int ret;
 	int len = datalen;
 	unsigned ext_parse_flag = 0;
 	const version_entry_st *vers, *saved_vers;
-	const uint8_t *psk = NULL;
-	size_t psk_size = 0;
 
 	if (datalen < GNUTLS_RANDOM_SIZE+2) {
 		gnutls_assert();
@@ -1924,6 +1924,13 @@ read_server_hello(gnutls_session_t session,
 	ret = _gnutls_set_server_random(session, vers, srandom_pos);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	/* reset keys and binders if we are not using TLS 1.3 */
+	if (!vers->tls13_sem) {
+		gnutls_memset(&session->key.proto.tls13, 0,
+			      sizeof(session->key.proto.tls13));
+		reset_binders(session);
+	}
 
 	/* check if we are resuming and set the appropriate
 	 * values;
@@ -2016,31 +2023,17 @@ read_server_hello(gnutls_session_t session,
 
 	/* Calculate TLS 1.3 Early Secret */
 	if (vers->tls13_sem &&
-	    !(session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT)) {
-		if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
-			psk = session->key.binders[0].psk.data;
-			psk_size = session->key.binders[0].psk.size;
-
-			if (psk_size == 0)
-				return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-		}
-
-		ret = _tls13_init_secret(session, psk, psk_size);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
+	    !(session->internals.hsk_flags & HSK_PSK_SELECTED)) {
+		ret = _tls13_init_secret(session, NULL, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
 
 	ret = set_auth_types(session);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-cleanup:
-
-	return ret;
+	return 0;
 }
 
 /* This function copies the appropriate compression methods, to a locally allocated buffer 
@@ -2060,56 +2053,6 @@ append_null_comp(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	ret = cdata->length - init_length;
-
-	return ret;
-}
-
-/* Calculate TLS 1.3 Early Secret and client_early_traffic_secret,
- * assuming that the PSK we offer will be accepted by the server */
-static int
-generate_early_traffic_secret_from_ticket(gnutls_session_t session)
-{
-	int ret = 0;
-	const uint8_t *psk;
-	size_t psk_size;
-	const mac_entry_st *prf;
-
-	if (!(session->internals.hsk_flags & HSK_TLS13_TICKET_SENT)) {
-		ret = GNUTLS_E_INVALID_REQUEST;
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	psk = session->key.binders[0].psk.data;
-	psk_size = session->key.binders[0].psk.size;
-	prf = session->key.binders[0].prf;
-
-	if (psk_size == 0) {
-		ret = GNUTLS_E_INVALID_REQUEST;
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = _tls13_init_secret2(prf, psk, psk_size,
-				  session->key.proto.tls13.temp_secret);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-	session->key.proto.tls13.temp_secret_size = prf->output_size;
-
-	ret = generate_early_traffic_secret(session, prf);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	return ret;
-
- cleanup:
-	/* If any of the above calculation fails, we are not going to
-	 * send early data. */
-	session->internals.hsk_flags &= ~HSK_EARLY_DATA_IN_FLIGHT;
 
 	return ret;
 }
@@ -2349,9 +2292,6 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 	const version_entry_st *vers;
 	uint8_t vbytes[2];
 	unsigned extflag = 0;
-	const uint8_t *psk = NULL;
-	size_t psk_size = 0;
-	const mac_entry_st *prf = session->security_parameters.prf;
 	gnutls_ext_parse_type_t etype;
 
 	_gnutls_buffer_init(&buf);
@@ -2362,25 +2302,6 @@ int _gnutls_send_server_hello(gnutls_session_t session, int again)
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		if (vers->tls13_sem) {
-			/* TLS 1.3 Early Secret */
-			if (session->internals.hsk_flags & HSK_PSK_SELECTED) {
-				psk = session->key.binders[0].psk.data;
-				psk_size = session->key.binders[0].psk.size;
-				prf = session->key.binders[0].prf;
-			}
-
-			ret = _tls13_init_secret(session, psk, psk_size);
-			if (ret < 0) {
-				gnutls_assert();
-				goto fail;
-			}
-
-			ret = generate_early_traffic_secret(session, prf);
-			if (ret < 0) {
-				gnutls_assert();
-				goto fail;
-			}
-
 			vbytes[0] = 0x03; /* TLS1.2 */
 			vbytes[1] = 0x03;
 			extflag |= GNUTLS_EXT_FLAG_TLS13_SERVER_HELLO;
@@ -2971,10 +2892,6 @@ static int handshake_client(gnutls_session_t session)
 		ret = send_client_hello(session, AGAIN(STATE1));
 		STATE = STATE1;
 		IMED_RET("send hello", ret, 1);
-		if (session->internals.hsk_flags & HSK_EARLY_DATA_IN_FLIGHT) {
-			ret = generate_early_traffic_secret_from_ticket(session);
-			IMED_RET_FATAL("generate early traffic keys from ticket", ret, 0);
-		}
 		FALLTHROUGH;
 	case STATE2:
 		if (IS_DTLS(session)) {

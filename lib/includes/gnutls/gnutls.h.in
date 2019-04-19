@@ -1471,6 +1471,10 @@ int gnutls_prf_rfc5705(gnutls_session_t session,
 	       size_t label_size, const char *label,
 	       size_t context_size, const char *context,
 	       size_t outsize, char *out);
+int gnutls_prf_early(gnutls_session_t session,
+		     size_t label_size, const char *label,
+		     size_t context_size, const char *context,
+		     size_t outsize, char *out);
 
 int gnutls_prf_raw(gnutls_session_t session,
 		   size_t label_size, const char *label,
