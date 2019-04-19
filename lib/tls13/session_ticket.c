@@ -223,7 +223,11 @@ generate_session_ticket(gnutls_session_t session, tls13_ticket_st *ticket)
 
 	if ((ret = gnutls_rnd(GNUTLS_RND_NONCE, &ticket->age_add, sizeof(uint32_t))) < 0)
 		return gnutls_assert_val(ret);
-
+	/* This is merely to produce the same binder value on
+	 * different endian architectures. */
+#ifdef WORDS_BIGENDIAN
+	ticket->age_add = bswap_32(ticket->age_add);
+#endif
 
 	ticket->prf = session->security_parameters.prf;
 
