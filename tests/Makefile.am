@@ -527,6 +527,10 @@ sanity_cpp_CXXFLAGS = $(AM_CPPFLAGS) \
 endif
 endif
 
+if !WINDOWS
+indirect_tests += datefudge-check
+endif
+
 check_PROGRAMS = $(cpptests) $(ctests) $(indirect_tests)
 TESTS = $(cpptests) $(ctests) $(dist_check_SCRIPTS)
 

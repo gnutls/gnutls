@@ -369,6 +369,7 @@ tests/cve-2009-1415
 tests/cve-2009-1416
 tests/dane
 tests/dane-strcodes
+tests/datefudge-check
 tests/dh-params
 tests/dhepskself
 tests/dhex509self
