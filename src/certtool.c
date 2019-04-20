@@ -92,9 +92,11 @@ static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt, common_info_st *
 FILE *outfile;
 static const char *outfile_name = NULL; /* to delete on exit */
 
+#define REQ_KEY_TYPE_DEFAULT GNUTLS_PK_RSA
+
 FILE *infile;
 static unsigned int incert_format, outcert_format;
-static unsigned int req_key_type = GNUTLS_PK_RSA;
+static unsigned int req_key_type = REQ_KEY_TYPE_DEFAULT;
 gnutls_certificate_print_formats_t full_format = GNUTLS_CRT_PRINT_FULL;
 
 /* non interactive operation if set
@@ -719,6 +721,13 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		app_exit(1);
 	}
 
+	if ((HAVE_OPT(KEY_TYPE) || req_key_type != REQ_KEY_TYPE_DEFAULT) && req_key_type != pk) {
+		if (pk != GNUTLS_PK_RSA || req_key_type != GNUTLS_PK_RSA_PSS) {
+			fprintf(stderr, "cannot set certificate type (%s) incompatible with the key (%s)\n",
+				gnutls_pk_get_name(req_key_type), gnutls_pk_get_name(pk));
+			app_exit(1);
+		}
+	}
 
 	/* Set algorithm parameter restriction in CAs.
 	 */
@@ -1257,7 +1266,9 @@ static void cmd_parser(int argc, char **argv)
 		outcert_format = GNUTLS_X509_FMT_PEM;
 
 	/* legacy options */
-	if (HAVE_OPT(DSA)) {
+	if (HAVE_OPT(RSA)) {
+		req_key_type = GNUTLS_PK_RSA;
+	} else if (HAVE_OPT(DSA)) {
 		req_key_type = GNUTLS_PK_DSA;
 	} else if (HAVE_OPT(ECC)) {
 		req_key_type = GNUTLS_PK_ECDSA;

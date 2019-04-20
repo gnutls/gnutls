@@ -25,6 +25,7 @@ CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff -b -B}"
 OUTFILE=cert-pss-privkey.$$.tmp
 TMPFILE=cert-pss.$$.tmp
+TMPFILE2=cert2-pss.$$.tmp
 
 if ! test -x "${CERTTOOL}"; then
 	exit 77
@@ -60,7 +61,7 @@ fi
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
 	--pkcs8 --load-privkey "$OUTFILE" --password '' \
 	--template "${srcdir}/templates/template-test.tmpl" \
-	--outfile "${TMPFILE}" --hash $i 2>/dev/null
+	--outfile "${TMPFILE}" --hash $i
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -76,7 +77,7 @@ for j in sha256 sha384 sha512;do
 ${VALGRIND} "${CERTTOOL}" --generate-self-signed \
 	--pkcs8 --load-privkey "$OUTFILE" --password '' \
 	--template "${srcdir}/templates/template-test.tmpl" \
-	--outfile "${TMPFILE}" --hash $j 2>/dev/null
+	--outfile "${TMPFILE}" --hash $j
 rc=$?
 
 if test "$j" != "$j" && "${rc}" = "0"; then
@@ -92,7 +93,7 @@ ${VALGRIND} "${CERTTOOL}" --generate-certificate --key-type rsa-pss \
 	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
 	    --template "${srcdir}/templates/template-test.tmpl" \
-	    --outfile "${TMPFILE}" --hash $i 2>/dev/null
+	    --outfile "${TMPFILE}" --hash $i
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -109,13 +110,27 @@ fi
 
 rm -f "${TMPFILE}"
 
+# Create an RSA certificate from an RSA key, with wrong key-type, should fail
+${VALGRIND} "${CERTTOOL}" --generate-certificate --key-type ecdsa \
+	    --load-privkey "${srcdir}/../../doc/credentials/x509/key-rsa.pem" \
+	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
+	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
+	    --template "${srcdir}/templates/template-test.tmpl" \
+	    --outfile "${TMPFILE}"
+rc=$?
+
+if test "${rc}" = "0"; then
+	echo "Succeeded with wrong key type"
+	exit 1
+fi
+
 # Create an RSA certificate from an RSA key, and sign it with RSA-PSS
 ${VALGRIND} "${CERTTOOL}" --generate-certificate --rsa --sign-params rsa-pss \
 	    --load-privkey "${srcdir}/../../doc/credentials/x509/key-rsa.pem" \
 	    --load-ca-privkey "${srcdir}/../../doc/credentials/x509/ca-key.pem" \
 	    --load-ca-certificate "${srcdir}/../../doc/credentials/x509/ca.pem" \
 	    --template "${srcdir}/templates/template-test.tmpl" \
-	    --outfile "${TMPFILE}" --hash $i 2>/dev/null
+	    --outfile "${TMPFILE}" --hash $i
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -123,21 +138,30 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${CERTTOOL} -i --infile ${TMPFILE}|tr -d '\r'|grep -i 'Subject Public Key Algorithm: RSA$' >/dev/null
+${CERTTOOL} -i --infile ${TMPFILE}|tr -d '\r' > ${TMPFILE2}
+grep -i 'Subject Public Key Algorithm: RSA$' ${TMPFILE2} >/dev/null
 if test $? != 0;then
 	echo "Generated certificate is not RSA"
 	cat ${TMPFILE}
 	exit 1
 fi
 
-${CERTTOOL} -i --infile ${TMPFILE}|grep -i "Signature Algorithm: RSA-PSS"
+grep -i "Signature Algorithm: RSA-PSS" ${TMPFILE2} 
 if test $? != 0;then
 	echo "Generated certificate is not signed with RSA-PSS"
 	cat ${TMPFILE}
 	exit 1
 fi
 
+grep -i "Signature Algorithm: RSA-PSS-${i}" ${TMPFILE2} 
+if test $? != 0;then
+	echo "Generated certificate is not signed with RSA-PSS-${i}"
+	cat ${TMPFILE}
+	exit 1
+fi
+
 rm -f "${TMPFILE}"
+rm -f "${TMPFILE2}"
 
 done
 
