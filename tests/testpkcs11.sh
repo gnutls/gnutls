@@ -318,11 +318,9 @@ delete_temp_privkey () {
 
 # $1: token
 # $2: PIN
-# $3: bits
 export_pubkey_of_privkey () {
 	export GNUTLS_PIN="$2"
 	token="$1"
-	bits="$3"
 
 	echo -n "* Exporting public key of generated private key... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --login --export-pubkey "${token};object=gnutls-client;object-type=private" --outfile tmp-client-2.pub >>"${LOGFILE}" 2>&1
@@ -342,14 +340,29 @@ export_pubkey_of_privkey () {
 
 # $1: token
 # $2: SO PIN
-# $3: bits
 list_pubkey_as_so () {
 	export GNUTLS_SO_PIN="$2"
 	token="$1"
-	bits="$3"
 
 	echo -n "* Exporting public key as SO... "
 	${P11TOOL} ${ADDITIONAL_PARAM} --so-login --list-all "${token}" >>"${LOGFILE}" 2>&1
+	if test $? != 0; then
+		echo failed
+		exit 1
+	fi
+
+	echo ok
+}
+
+# $1: token
+# $2: PIN
+list_privkey_without_pin_env () {
+	token="$1"
+	pin="$2"
+
+	echo -n "* List private key without GNUTLS_PIN... "
+	unset GNUTLS_PIN
+	${P11TOOL} ${ADDITIONAL_PARAM} --login --list-all-privkeys "${token}?pin-value=${pin}" >>"${LOGFILE}" 2>&1
 	if test $? != 0; then
 		echo failed
 		exit 1
@@ -1049,10 +1062,10 @@ fi
 
 . "${srcdir}/testpkcs11.${type}"
 
-export GNUTLS_PIN=12345678
-export GNUTLS_SO_PIN=00000001
+export TEST_PIN=12345678
+export TEST_SO_PIN=00000001
 
-init_card "${GNUTLS_PIN}" "${GNUTLS_SO_PIN}"
+init_card "${TEST_PIN}" "${TEST_SO_PIN}"
 
 
 # find token name
@@ -1069,67 +1082,68 @@ if test $? = 0;then
 	have_ed25519=1
 fi
 
-reset_pins "${TOKEN}" "${GNUTLS_PIN}" "${GNUTLS_SO_PIN}"
+reset_pins "${TOKEN}" "${TEST_PIN}" "${TEST_SO_PIN}"
 
 #write a given privkey
-write_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/client.key"
+write_privkey "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/client.key"
 
-generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 256
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-256
+generate_temp_ecc_privkey "${TOKEN}" "${TEST_PIN}" 256
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ecc-256
 
-generate_temp_ecc_privkey_no_login "${TOKEN}" "${GNUTLS_PIN}" 256
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-no-256
+generate_temp_ecc_privkey_no_login "${TOKEN}" "${TEST_PIN}" 256
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ecc-no-256
 
-generate_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 384
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-384
-
-if test $have_ed25519 != 0;then
-	generate_temp_ed25519_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
-	delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
-fi
-
-generate_temp_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 2048
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" rsa-2048
-
-generate_temp_dsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 3072
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" dsa-3072
-
-import_temp_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 1024
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" rsa-1024
-import_temp_ecc_privkey "${TOKEN}" "${GNUTLS_PIN}" 256
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ecc-256
-import_temp_dsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 2048
-delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" dsa-2048
+generate_temp_ecc_privkey "${TOKEN}" "${TEST_PIN}" 384
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ecc-384
 
 if test $have_ed25519 != 0;then
-	import_temp_ed25519_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
-	delete_temp_privkey "${TOKEN}" "${GNUTLS_PIN}" ed25519
+	generate_temp_ed25519_privkey "${TOKEN}" "${TEST_PIN}" ed25519
+	delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ed25519
 fi
 
-generate_rsa_privkey "${TOKEN}" "${GNUTLS_PIN}" 1024
-change_id_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
-export_pubkey_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
-change_label_of_privkey "${TOKEN}" "${GNUTLS_PIN}"
-list_pubkey_as_so "${TOKEN}" "${GNUTLS_SO_PIN}"
+generate_temp_rsa_privkey "${TOKEN}" "${TEST_PIN}" 2048
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" rsa-2048
 
-write_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt" tmp-client.pub
-write_serv_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.key"
-write_serv_cert "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
+generate_temp_dsa_privkey "${TOKEN}" "${TEST_PIN}" 3072
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" dsa-3072
 
-write_serv_pubkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
-test_sign "${TOKEN}" "${GNUTLS_PIN}"
+import_temp_rsa_privkey "${TOKEN}" "${TEST_PIN}" 1024
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" rsa-1024
+import_temp_ecc_privkey "${TOKEN}" "${TEST_PIN}" 256
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ecc-256
+import_temp_dsa_privkey "${TOKEN}" "${TEST_PIN}" 2048
+delete_temp_privkey "${TOKEN}" "${TEST_PIN}" dsa-2048
 
-use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/testpkcs11-certs/ca.crt" "full URLs"
+if test $have_ed25519 != 0;then
+	import_temp_ed25519_privkey "${TOKEN}" "${TEST_PIN}" ed25519
+	delete_temp_privkey "${TOKEN}" "${TEST_PIN}" ed25519
+fi
 
-use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/testpkcs11-certs/ca.crt" "abbrv URLs"
+generate_rsa_privkey "${TOKEN}" "${TEST_PIN}" 1024
+change_id_of_privkey "${TOKEN}" "${TEST_PIN}"
+export_pubkey_of_privkey "${TOKEN}" "${TEST_PIN}"
+change_label_of_privkey "${TOKEN}" "${TEST_PIN}"
+list_pubkey_as_so "${TOKEN}" "${TEST_SO_PIN}"
+list_privkey_without_pin_env "${TOKEN}" "${TEST_PIN}"
 
-write_certificate_id_test_rsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
-write_certificate_id_test_rsa2 "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
-write_certificate_id_test_ecdsa "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+write_certificate_test "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt" tmp-client.pub
+write_serv_privkey "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/server.key"
+write_serv_cert "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
 
-test_delete_cert "${TOKEN}" "${GNUTLS_PIN}"
+write_serv_pubkey "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/server.crt"
+test_sign "${TOKEN}" "${TEST_PIN}"
 
-test_sign_set_pin "${TOKEN}" "${GNUTLS_PIN}"
+use_certificate_test "${TOKEN}" "${TEST_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/testpkcs11-certs/ca.crt" "full URLs"
+
+use_certificate_test "${TOKEN}" "${TEST_PIN}" "${TOKEN};object=serv-cert" "${TOKEN};object=serv-key" "${srcdir}/testpkcs11-certs/ca.crt" "abbrv URLs"
+
+write_certificate_id_test_rsa "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+write_certificate_id_test_rsa2 "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+write_certificate_id_test_ecdsa "${TOKEN}" "${TEST_PIN}" "${srcdir}/testpkcs11-certs/ca.key" "${srcdir}/testpkcs11-certs/ca.crt"
+
+test_delete_cert "${TOKEN}" "${TEST_PIN}"
+
+test_sign_set_pin "${TOKEN}" "${TEST_PIN}"
 
 if test ${RETCODE} = 0; then
 	echo "* All smart cards tests succeeded"
