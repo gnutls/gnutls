@@ -650,6 +650,16 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_streebog512_update)
 LIBS=$save_LIBS
 
+# Check for Curve448 and Ed448
+have_curve448=no
+save_LIBS=$LIBS
+LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS([nettle_curve448_mul nettle_ed448_shake256_sign],
+               [AC_DEFINE([HAVE_CURVE448], 1, [Enable Curve448])
+	        have_curve448=yes])
+LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CURVE448, test "$have_curve448" != "yes")
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],

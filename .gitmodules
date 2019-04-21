@@ -13,3 +13,6 @@
 [submodule "gnulib"]
 	path = gnulib
 	url = https://gitlab.com/libidn/gnulib-mirror.git
+[submodule "devel/nettle"]
+	path = devel/nettle
+	url = https://gitlab.com/gnutls/nettle.git

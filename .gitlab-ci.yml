@@ -33,7 +33,7 @@ variables:
   FEDORA_BUILD: buildenv-fedora31
   MINGW_BUILD: buildenv-mingw
   ALPINE_BASE_BUILD: buildenv-alpine-base
-  CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
+  CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions -i lib/nettle/curve448 --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
 ##################################################
