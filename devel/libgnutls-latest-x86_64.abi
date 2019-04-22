@@ -1563,6 +1563,8 @@
       <enumerator name='GNUTLS_MAC_AES_GMAC_192' value='206'/>
       <enumerator name='GNUTLS_MAC_AES_GMAC_256' value='207'/>
       <enumerator name='GNUTLS_MAC_GOST28147_TC26Z_IMIT' value='208'/>
+      <enumerator name='GNUTLS_MAC_SHAKE_128' value='209'/>
+      <enumerator name='GNUTLS_MAC_SHAKE_256' value='210'/>
     </enum-decl>
     <typedef-decl name='gnutls_mac_algorithm_t' type-id='type-id-44' id='type-id-31'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-45'>
@@ -1680,6 +1682,7 @@
       <enumerator name='GNUTLS_GROUP_SECP384R1' value='3'/>
       <enumerator name='GNUTLS_GROUP_SECP521R1' value='4'/>
       <enumerator name='GNUTLS_GROUP_X25519' value='6'/>
+      <enumerator name='GNUTLS_GROUP_X448' value='20'/>
       <enumerator name='GNUTLS_GROUP_GC256A' value='16'/>
       <enumerator name='GNUTLS_GROUP_GC256B' value='17'/>
       <enumerator name='GNUTLS_GROUP_GC256C' value='18'/>
@@ -1731,7 +1734,9 @@
       <enumerator name='GNUTLS_ECC_CURVE_GOST256B' value='17'/>
       <enumerator name='GNUTLS_ECC_CURVE_GOST256C' value='18'/>
       <enumerator name='GNUTLS_ECC_CURVE_GOST256D' value='19'/>
-      <enumerator name='GNUTLS_ECC_CURVE_MAX' value='19'/>
+      <enumerator name='GNUTLS_ECC_CURVE_X448' value='20'/>
+      <enumerator name='GNUTLS_ECC_CURVE_ED448' value='21'/>
+      <enumerator name='GNUTLS_ECC_CURVE_MAX' value='21'/>
     </enum-decl>
     <typedef-decl name='gnutls_ecc_curve_t' type-id='type-id-67' id='type-id-59'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-68'>
@@ -1747,7 +1752,9 @@
       <enumerator name='GNUTLS_PK_GOST_01' value='8'/>
       <enumerator name='GNUTLS_PK_GOST_12_256' value='9'/>
       <enumerator name='GNUTLS_PK_GOST_12_512' value='10'/>
-      <enumerator name='GNUTLS_PK_MAX' value='10'/>
+      <enumerator name='GNUTLS_PK_ECDH_X448' value='11'/>
+      <enumerator name='GNUTLS_PK_EDDSA_ED448' value='12'/>
+      <enumerator name='GNUTLS_PK_MAX' value='12'/>
     </enum-decl>
     <typedef-decl name='gnutls_pk_algorithm_t' type-id='type-id-68' id='type-id-60'/>
     <typedef-decl name='gnutls_group_entry_st' type-id='type-id-55' id='type-id-69'/>
@@ -1802,7 +1809,8 @@
       <enumerator name='GNUTLS_SIGN_GOST_94' value='43'/>
       <enumerator name='GNUTLS_SIGN_GOST_256' value='44'/>
       <enumerator name='GNUTLS_SIGN_GOST_512' value='45'/>
-      <enumerator name='GNUTLS_SIGN_MAX' value='45'/>
+      <enumerator name='GNUTLS_SIGN_EDDSA_ED448' value='46'/>
+      <enumerator name='GNUTLS_SIGN_MAX' value='46'/>
     </enum-decl>
     <typedef-decl name='gnutls_sign_algorithm_t' type-id='type-id-71' id='type-id-21'/>
     <type-decl name='int' size-in-bits='32' id='type-id-22'/>
@@ -2963,6 +2971,8 @@
       <enumerator name='GNUTLS_DIG_GOSTR_94' value='15'/>
       <enumerator name='GNUTLS_DIG_STREEBOG_256' value='16'/>
       <enumerator name='GNUTLS_DIG_STREEBOG_512' value='17'/>
+      <enumerator name='GNUTLS_DIG_SHAKE_128' value='209'/>
+      <enumerator name='GNUTLS_DIG_SHAKE_256' value='210'/>
     </enum-decl>
     <typedef-decl name='gnutls_digest_algorithm_t' type-id='type-id-214' id='type-id-211'/>
     <class-decl name='__anonymous_struct__' size-in-bits='24' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-215' visibility='default' id='type-id-216'>

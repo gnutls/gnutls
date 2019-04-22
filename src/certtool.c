@@ -168,6 +168,7 @@ generate_private_key_int(common_info_st * cinfo)
 
 	if (key_type == GNUTLS_PK_ECDSA ||
 	    key_type == GNUTLS_PK_EDDSA_ED25519 ||
+	    key_type == GNUTLS_PK_EDDSA_ED448 ||
 	    key_type == GNUTLS_PK_GOST_01 ||
 	    key_type == GNUTLS_PK_GOST_12_256 ||
 	    key_type == GNUTLS_PK_GOST_12_512) {

@@ -177,6 +177,18 @@ run_client_suite() {
 	kill ${PID}
 	wait
 
+	echo_cmd "${PREFIX}Checking TLS 1.3 with Ed448 certificate..."
+	eval "${GETPORT}"
+	launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ED448_KEY}" -cert "${ED448_CERT}" -CAfile "${CA_CERT}"
+	PID=$!
+	wait_server ${PID}
+
+	${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --insecure </dev/null >>${OUTPUT} || \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
 	echo_cmd "${PREFIX}Checking TLS 1.3 with secp256r1 certificate..."
 	eval "${GETPORT}"
 	launch_bare_server $$ s_server -quiet -www -accept "${PORT}" -keyform pem -certform pem ${OPENSSL_DH_PARAMS_OPT} -key "${ECC_KEY}" -cert "${ECC_CERT}" -CAfile "${CA_CERT}"
@@ -324,7 +336,8 @@ run_server_suite() {
 		wait
 	done
 
-	for i in GROUP-X25519 GROUP-SECP256R1 GROUP-SECP384R1 GROUP-SECP521R1;do
+	GROUPS="GROUP-X25519 GROUP-X448 GROUP-SECP256R1 GROUP-SECP384R1 GROUP-SECP521R1"
+	for i in $GROUPS;do
 		echo_cmd "${PREFIX}Checking TLS 1.3 with ${i}..."
 
 		eval "${GETPORT}"
@@ -395,6 +408,10 @@ _EOF_
 	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${ED25519_CLI_CERT}" -key "${ED25519_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
 		fail ${PID} "Failed"
 
+	echo_cmd "${PREFIX}Checking TLS 1.3 with Ed448 client certificate..."
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${ED448_CLI_CERT}" -key "${ED448_CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+
 	kill ${PID}
 	wait
 
@@ -443,6 +460,19 @@ _EOF_
 
 	eval "${GETPORT}"
 	launch_server $$ --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${ED25519_CERT}" --x509keyfile "${ED25519_KEY}" --x509cafile "${CA_CERT}"  >>${OUTPUT} 2>&1
+	PID=$!
+	wait_server ${PID}
+
+	${OPENSSL_CLI} s_client -host localhost -port "${PORT}" -cert "${CLI_CERT}" -key "${CLI_KEY}" -CAfile "${CA_CERT}" </dev/null 2>&1 | grep "\:error\:" && \
+		fail ${PID} "Failed"
+
+	kill ${PID}
+	wait
+
+	echo_cmd "${PREFIX}Checking TLS 1.3 with Ed448 certificate..."
+
+	eval "${GETPORT}"
+	launch_server $$ --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3${ADD}" --x509certfile "${ED448_CERT}" --x509keyfile "${ED448_KEY}" --x509cafile "${CA_CERT}"  >>${OUTPUT} 2>&1
 	PID=$!
 	wait_server ${PID}
 

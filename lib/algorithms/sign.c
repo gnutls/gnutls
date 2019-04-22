@@ -125,6 +125,17 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 7}, SIG_SEM_DEFAULT}},
 
+	 /* Ed448: The hash algorithm here is set to be SHAKE256, although that is
+	  * an internal detail of Ed448; we set it, because CMS/PKCS#7 requires
+	  * that mapping. */
+	 {.name = "EdDSA-Ed448",
+	 .oid = SIG_ED448_OID,
+	 .id = GNUTLS_SIGN_EDDSA_ED448,
+	 .pk = GNUTLS_PK_EDDSA_ED448,
+	 .hash = GNUTLS_DIG_SHAKE_256,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
+	 .aid = {{8, 8}, SIG_SEM_DEFAULT}},
+
 	 /* ECDSA */
 	 /* The following three signature algorithms
 	  * have different semantics when used under TLS 1.2

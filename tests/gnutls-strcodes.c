@@ -129,6 +129,8 @@ void doit(void)
 		check_unique_non_null(gnutls_ecc_curve_get_name(i));
 		if (i == GNUTLS_ECC_CURVE_X25519)
 			continue; /* no oid yet */
+		if (i == GNUTLS_ECC_CURVE_X448)
+			continue; /* no oid yet */
 		check_unique_non_null(gnutls_ecc_curve_get_oid(i));
 	}
 

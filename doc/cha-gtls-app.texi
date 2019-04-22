@@ -1462,7 +1462,7 @@ Shortcut which enables secure GOST algorithms is SIGN-GOST-ALL.
 This option is only considered for TLS 1.2 and later.
 
 @item Groups @tab
-GROUP-SECP256R1, GROUP-SECP384R1, GROUP-SECP521R1, GROUP-X25519,
+GROUP-SECP256R1, GROUP-SECP384R1, GROUP-SECP521R1, GROUP-X25519, GROUP-X448,
 GROUP-FFDHE2048, GROUP-FFDHE3072, GROUP-FFDHE4096, GROUP-FFDHE6144, and
 GROUP-FFDHE8192.
 Groups include both elliptic curve groups, e.g., SECP256R1, as well as 
@@ -1473,7 +1473,7 @@ to finite fields (DH), GOST curves and generic elliptic curves.
 
 @item Elliptic curves (legacy) @tab
 CURVE-SECP192R1, CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1,
-CURVE-SECP521R1, and CURVE-X25519.
+CURVE-SECP521R1, CURVE-X25519, and CURVE-X448.
 Catch all which enables all curves from NORMAL priority is CURVE-ALL. Note
 that the CURVE keyword is kept for backwards compatibility only, for new
 applications see the GROUP keyword above.

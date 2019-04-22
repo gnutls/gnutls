@@ -43,6 +43,9 @@ RSA_PSS_CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey-rsa-pss.pem"
 ED25519_CLI_CERT="${srcdir}/../../doc/credentials/x509/clicert-ed25519.pem"
 ED25519_CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey-ed25519.pem"
 
+ED448_CLI_CERT="${srcdir}/../../doc/credentials/x509/clicert-ed448.pem"
+ED448_CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey-ed448.pem"
+
 RSA_PSS_CERT="${srcdir}/../../doc/credentials/x509/cert-rsa-pss.pem"
 RSA_PSS_KEY="${srcdir}/../../doc/credentials/x509/key-rsa-pss.pem"
 
@@ -51,6 +54,9 @@ RSA_KEY="${srcdir}/../../doc/credentials/x509/key-rsa.pem"
 
 ED25519_CERT="${srcdir}/../../doc/credentials/x509/cert-ed25519.pem"
 ED25519_KEY="${srcdir}/../../doc/credentials/x509/key-ed25519.pem"
+
+ED448_CERT="${srcdir}/../../doc/credentials/x509/cert-ed448.pem"
+ED448_KEY="${srcdir}/../../doc/credentials/x509/key-ed448.pem"
 
 ECC_CERT="${srcdir}/../../doc/credentials/x509/cert-ecc.pem"
 ECC_KEY="${srcdir}/../../doc/credentials/x509/key-ecc.pem"

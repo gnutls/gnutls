@@ -27,6 +27,9 @@ See the end for copying conditions.
    enabled both on a server and a client. It is recommended for now to disable
    TLS 1.3 in setups where GOST ciphersuites are enabled on GnuTLS-based servers.
 
+** libgnutls: Added support for X448 key exchange (RFC 7748) and Ed448
+   signature algorithm (RFC 8032) under TLS (#984).
+
 ** libgnutls: The min-verification-profile from system configuration applies
    for all certificate verifications, not only under TLS. The configuration can
    be overriden using the GNUTLS_SYSTEM_PRIORITY_FILE environment variable.

@@ -75,6 +75,7 @@ static int client_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 	int ret;
 
 	if (group->pk != GNUTLS_PK_EC && group->pk != GNUTLS_PK_ECDH_X25519 &&
+	    group->pk != GNUTLS_PK_ECDH_X448 &&
 	    group->pk != GNUTLS_PK_DH) {
 		_gnutls_debug_log("Cannot send key share for group %s!\n", group->name);
 		return GNUTLS_E_INT_RET_0;
@@ -115,7 +116,8 @@ static int client_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
 		gnutls_pk_params_init(&session->key.kshare.ecdhx_params);
 
@@ -195,6 +197,7 @@ static int server_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 	int ret;
 
 	if (group->pk != GNUTLS_PK_EC && group->pk != GNUTLS_PK_ECDH_X25519 &&
+	    group->pk != GNUTLS_PK_ECDH_X448 &&
 	    group->pk != GNUTLS_PK_DH) {
 		_gnutls_debug_log("Cannot send key share for group %s!\n", group->name);
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -224,7 +227,8 @@ static int server_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		ret =
 		    _gnutls_buffer_append_data_prefix(extdata, 16,
 				session->key.kshare.ecdhx_params.raw_pub.data,
@@ -300,7 +304,8 @@ server_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_st pub;
 
 		gnutls_pk_params_release(&session->key.kshare.ecdhx_params);
@@ -438,7 +443,8 @@ client_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 
 		ret = 0;
 
-	} else if (group->pk == GNUTLS_PK_ECDH_X25519) {
+	} else if (group->pk == GNUTLS_PK_ECDH_X25519 ||
+		   group->pk == GNUTLS_PK_ECDH_X448) {
 		gnutls_pk_params_st pub;
 
 		curve = _gnutls_ecc_curve_get_params(group->curve);
