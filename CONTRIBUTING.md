@@ -115,6 +115,28 @@ They can however be used by unit tests in tests/ directory; in that
 case they should be part of the GNUTLS_PRIVATE_3_4 tag in libgnutls.map.
 
 
+# Header guards
+
+  Each private C header file SHOULD have a header guard consisting of the
+project name and the file path relative to the project directory, all uppercase.
+
+Example: `lib/srp.h` uses the header guard `GNUTLS_LIB_SRP_H`.
+
+The header guard is used as first and last effective code in a header file,
+like e.g. in lib/srp.h:
+
+```
+#ifndef GNUTLS_LIB_SRP_H
+#define GNUTLS_LIB_SRP_H
+
+...
+
+#endif /* GNUTLS_LIB_SRP_H */
+
+The public header files follow a similar convention but use the relative
+install directory as template, e.g. `GNUTLS_GNUTLS_H` for `gnutls/gnutls.h`.
+
+
 # Introducing new functions / API
 
   Prior to introducing any new API consider all options to offer the same
