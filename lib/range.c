@@ -66,7 +66,7 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	if (vers->tls13_sem) {
-		max_pad = max_user_send_size(session, record_params);
+		max_pad = max_record_send_size(session, record_params);
 		fixed_pad = 2;
 	} else {
 		max_pad = MAX_PAD_SIZE;
@@ -182,7 +182,7 @@ gnutls_range_split(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	max_frag = max_user_send_size(session, record_params);
+	max_frag = max_record_send_size(session, record_params);
 
 	if (orig_high == orig_low) {
 		int length = MIN(orig_high, max_frag);

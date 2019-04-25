@@ -1271,8 +1271,14 @@ GNUTLS_3_6_6
 	gnutls_certificate_set_rawpk_key_file;
 	gnutls_pcert_import_rawpk;
 	gnutls_pcert_import_rawpk_raw;
-	gnutls_prf_early;
 } GNUTLS_3_6_5;
+
+GNUTLS_3_6_8
+{
+ global:
+	gnutls_prf_early;
+	gnutls_record_set_max_recv_size;
+} GNUTLS_3_6_6;
 
 GNUTLS_FIPS140_3_4 {
   global:

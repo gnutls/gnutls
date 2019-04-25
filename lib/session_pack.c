@@ -918,20 +918,22 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 		BUFFER_APPEND_PFX1(ps, session->security_parameters.server_random,
 			      GNUTLS_RANDOM_SIZE);
 
-		BUFFER_APPEND_NUM(ps,
-				  session->security_parameters.
-				  max_record_send_size);
-
 		/* reset max_record_recv_size if it was negotiated
 		 * using the record_size_limit extension */
 		if (session->internals.hsk_flags & HSK_RECORD_SIZE_LIMIT_NEGOTIATED) {
 			BUFFER_APPEND_NUM(ps,
 					  session->security_parameters.
-					  max_record_send_size);
+					  max_user_record_send_size);
+			BUFFER_APPEND_NUM(ps,
+					  session->security_parameters.
+					  max_user_record_recv_size);
 		} else {
 			BUFFER_APPEND_NUM(ps,
 					  session->security_parameters.
 					  max_record_recv_size);
+			BUFFER_APPEND_NUM(ps,
+					  session->security_parameters.
+					  max_record_send_size);
 		}
 
 		if (session->security_parameters.grp) {

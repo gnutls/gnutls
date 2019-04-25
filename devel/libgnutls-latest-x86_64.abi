@@ -587,7 +587,7 @@
     <elf-symbol name='gnutls_pkcs_schema_get_name' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_pkcs_schema_get_oid' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_prf' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
-    <elf-symbol name='gnutls_prf_early' version='GNUTLS_3_6_6' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_prf_early' version='GNUTLS_3_6_8' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_prf_raw' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_prf_rfc5705' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_priority_certificate_type_list2' version='GNUTLS_3_6_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
@@ -738,6 +738,7 @@
     <elf-symbol name='gnutls_record_send_early_data' version='GNUTLS_3_6_5' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_record_send_range' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_record_set_max_early_data_size' version='GNUTLS_3_6_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_record_set_max_recv_size' version='GNUTLS_3_6_8' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_record_set_max_size' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_record_set_state' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_record_set_timeout' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
@@ -17228,6 +17229,11 @@
     <typedef-decl name='hello_ext_entry_st' type-id='type-id-296' id='type-id-1075'/>
     <qualified-type-def type-id='type-id-1075' const='yes' id='type-id-1076'/>
     <var-decl name='ext_mod_max_record_size' type-id='type-id-1076' visibility='default'/>
+    <function-decl name='gnutls_record_set_max_recv_size' mangled-name='gnutls_record_set_max_recv_size' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_record_set_max_recv_size@@GNUTLS_3_6_6'>
+      <parameter type-id='type-id-236' name='session'/>
+      <parameter type-id='type-id-100' name='size'/>
+      <return type-id='type-id-3'/>
+    </function-decl>
     <function-decl name='gnutls_record_set_max_size' mangled-name='gnutls_record_set_max_size' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_record_set_max_size@@GNUTLS_3_4'>
       <parameter type-id='type-id-236' name='session'/>
       <parameter type-id='type-id-100' name='size'/>

@@ -522,6 +522,10 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	    DEFAULT_MAX_RECORD_SIZE;
 	(*session)->security_parameters.max_record_send_size =
 	    DEFAULT_MAX_RECORD_SIZE;
+	(*session)->security_parameters.max_user_record_recv_size =
+	    DEFAULT_MAX_RECORD_SIZE;
+	(*session)->security_parameters.max_user_record_send_size =
+	    DEFAULT_MAX_RECORD_SIZE;
 
 	/* set the default early data size for TLS
 	 */

@@ -105,10 +105,12 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 			}
 
 			if (new_size != session->security_parameters.
-			    max_record_send_size) {
+			    max_user_record_send_size) {
 				gnutls_assert();
 				return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			} else {
+				session->security_parameters.
+				    max_record_send_size = new_size;
 				session->security_parameters.
 				    max_record_recv_size = new_size;
 			}
@@ -132,11 +134,18 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 
 	/* this function sends the client extension data (dnsname) */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if (session->security_parameters.max_record_send_size !=
+		/* if the user limits for sending and receiving are
+		 * different, that means the programmer had chosen to
+		 * use record_size_limit instead */
+		if (session->security_parameters.max_user_record_send_size !=
+		    session->security_parameters.max_user_record_recv_size)
+			return 0;
+
+		if (session->security_parameters.max_user_record_send_size !=
 		    DEFAULT_MAX_RECORD_SIZE) {
 			ret = _gnutls_mre_record2num
 			      (session->security_parameters.
-			       max_record_send_size);
+			       max_user_record_send_size);
 
 			/* it's not an error, as long as we send the
 			 * record_size_limit extension with that value */
@@ -239,23 +248,22 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
  * @session: is a #gnutls_session_t type.
  * @size: is the new size
  *
- * This function sets the maximum record packet size in this
- * connection.
- *
- * The requested record size does get in effect immediately only while
- * sending data. The receive part will take effect after a successful
- * handshake.
+ * This function sets the maximum amount of plaintext sent and
+ * received in a record in this connection.
  *
  * Prior to 3.6.4, this function was implemented using a TLS extension
- * called 'max record size', which limits the acceptable values to
- * 512(=2^9), 1024(=2^10), 2048(=2^11) and 4096(=2^12). Since 3.6.4,
- * it uses another TLS extension called 'record size limit', which
- * doesn't have the limitation, as long as the value ranges between
- * 512 and 16384.  Note that not all TLS implementations use or even
- * understand those extension.
+ * called 'max fragment length', which limits the acceptable values to
+ * 512(=2^9), 1024(=2^10), 2048(=2^11) and 4096(=2^12).
  *
- * In TLS 1.3, the value is the length of plaintext content plus its
- * padding, excluding content type octet.
+ * Since 3.6.4, the limit is also negotiated through a new TLS
+ * extension called 'record size limit', which doesn't have the
+ * limitation, as long as the value ranges between 512 and 16384.
+ * Note that while the 'record size limit' extension is preferred, not
+ * all TLS implementations use or even understand the extension.
+ *
+ * Deprecated: if the client can assume that the 'record size limit'
+ * extension is supported by the server, we recommend using
+ * gnutls_record_set_max_recv_size() instead.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -265,7 +273,42 @@ ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 	if (size < MIN_RECORD_SIZE || size > DEFAULT_MAX_RECORD_SIZE)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	session->security_parameters.max_record_send_size = size;
+	if (session->internals.handshake_in_progress)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	session->security_parameters.max_user_record_send_size = size;
+	session->security_parameters.max_user_record_recv_size = size;
+
+	return 0;
+}
+
+/**
+ * gnutls_record_set_max_recv_size:
+ * @session: is a #gnutls_session_t type.
+ * @size: is the new size
+ *
+ * This function sets the maximum amount of plaintext received in a
+ * record in this connection.
+ *
+ * The limit is also negotiated through a TLS extension called 'record
+ * size limit'.  Note that while the 'record size limit' extension is
+ * preferred, not all TLS implementations use or even understand the
+ * extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ *
+ * Since: 3.6.8
+ **/
+ssize_t gnutls_record_set_max_recv_size(gnutls_session_t session, size_t size)
+{
+	if (size < MIN_RECORD_SIZE || size > DEFAULT_MAX_RECORD_SIZE)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	if (session->internals.handshake_in_progress)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	session->security_parameters.max_user_record_recv_size = size;
 
 	return 0;
 }
