@@ -1357,6 +1357,8 @@ static inline const struct ecc_curve *get_supported_gost_curve(int curve)
 		return nettle_get_gost_256cpa();
 	case GNUTLS_ECC_CURVE_GOST512A:
 		return nettle_get_gost_512a();
+	case GNUTLS_ECC_CURVE_GOST256B:
+		return nettle_get_gost_256cpa();
 #endif
 	default:
 		return NULL;
