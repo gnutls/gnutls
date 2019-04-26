@@ -21,7 +21,6 @@
 #
 # *** This file is auto-generated ***
 #
-.file	"devel/perlasm/cpuid-x86.s"
 .text
 .globl	_gnutls_cpuid
 .def	_gnutls_cpuid;	.scl	2;	.type	32;	.endef

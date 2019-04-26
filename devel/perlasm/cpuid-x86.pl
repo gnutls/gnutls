@@ -10,6 +10,9 @@ $0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
 push(@INC,"${dir}","${dir}../../crypto/perlasm");
 require "x86asm.pl";
 
+$output=pop;
+open STDOUT,">$output";
+
 &asm_init($ARGV[0],$0);
 
 &function_begin_B("gnutls_cpuid");
@@ -55,3 +58,5 @@ require "x86asm.pl";
 
 &asciz("CPUID for x86");
 &asm_finish();
+
+close STDOUT;
