@@ -21,6 +21,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_X509_IP_IN_CIDR_H
+#define GNUTLS_LIB_X509_IP_IN_CIDR_H
+
 /*-
  * ip_in_cidr:
  * @ip: IP datum (IPv4 or IPv6)
@@ -51,3 +54,5 @@ static unsigned ip_in_cidr(const gnutls_datum_t *ip, const gnutls_datum_t *cidr)
 
 	return 1; /* match */
 }
+
+#endif /* GNUTLS_LIB_X509_IP_IN_CIDR_H */

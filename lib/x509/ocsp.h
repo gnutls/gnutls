@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_X509_OCSP_H
+#define GNUTLS_LIB_X509_OCSP_H
+
 /* Online Certificate Status Protocol - RFC 2560
  */
 #include <gnutls/ocsp.h>
@@ -30,3 +33,5 @@
 time_t _gnutls_ocsp_get_validity(gnutls_ocsp_resp_t resp);
 #define MAX_OCSP_MSG_SIZE 128
 const char *_gnutls_ocsp_verify_status_to_str(gnutls_ocsp_verify_reason_t r, char out[MAX_OCSP_MSG_SIZE]);
+
+#endif /* GNUTLS_LIB_X509_OCSP_H */

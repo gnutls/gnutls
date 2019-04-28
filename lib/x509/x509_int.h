@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef X509_H
-#define X509_H
+#ifndef GNUTLS_LIB_X509_X509_INT_H
+#define GNUTLS_LIB_X509_X509_INT_H
 
 #include <gnutls/x509.h>
 #include <gnutls/x509-ext.h>
@@ -546,4 +546,4 @@ struct gnutls_x509_tlsfeatures_st {
 
 unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned int flags);
 
-#endif
+#endif /* GNUTLS_LIB_X509_X509_INT_H */
