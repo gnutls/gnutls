@@ -17,6 +17,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef GNUTLS_SRC_UDP_SERV_H
+#define GNUTLS_SRC_UDP_SERV_H
+
 #include <gnutls/dtls.h>
 
 void udp_server(const char *name, int port, int mtu);
@@ -25,3 +28,5 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 		       char *buf, size_t buflen);
 int wait_for_connection(void);
 int listen_socket(const char *name, int listen_port, int socktype);
+
+#endif /* GNUTLS_SRC_UDP_SERV_H */

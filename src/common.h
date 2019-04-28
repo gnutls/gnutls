@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_COMMON_H
-# define INCLUDE_COMMON_H
+#ifndef GNUTLS_SRC_COMMON_H
+#define GNUTLS_SRC_COMMON_H
 
 #define SERVER "127.0.0.1"
 
@@ -144,4 +144,4 @@ void set_read_funcs(gnutls_session_t session)
 # define set_read_funcs(x)
 #endif
 
-#endif
+#endif /* GNUTLS_SRC_COMMON_H */

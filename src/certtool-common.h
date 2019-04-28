@@ -19,8 +19,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CERTTOOL_COMMON_H
-#define CERTTOOL_COMMON_H
+#ifndef GNUTLS_SRC_CERTTOOL_COMMON_H
+#define GNUTLS_SRC_CERTTOOL_COMMON_H
 
 #include <gnutls/x509.h>
 #include <stdio.h>
@@ -193,4 +193,4 @@ gnutls_digest_algorithm_t hash_to_id(const char *hash);
 
 void sign_params_to_flags(common_info_st *cinfo, const char *params);
 
-#endif
+#endif /* GNUTLS_SRC_CERTTOOL_COMMON_H */

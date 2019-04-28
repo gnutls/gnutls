@@ -20,6 +20,9 @@
  * Written by Nikos Mavrogiannopoulos <nmav@gnutls.org>.
  */
 
+#ifndef GNUTLS_SRC_CERTTOOL_CFG_H
+#define GNUTLS_SRC_CERTTOOL_CFG_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <gnutls/x509.h>
@@ -103,3 +106,5 @@ void get_oid_crq_set(gnutls_x509_crq_t crq);
 const char *get_proxy_policy(char **policy, size_t * policylen);
 
 void crq_extensions_set(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
+
+#endif /* GNUTLS_SRC_CERTTOOL_CFG_H */

@@ -17,6 +17,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef GNUTLS_SRC_BENCHMARK_H
+#define GNUTLS_SRC_BENCHMARK_H
+
 #include <sys/time.h>
 #include <time.h>
 #include <signal.h>
@@ -67,3 +70,5 @@ timespec_sub_ms(struct timespec *a, struct timespec *b)
 {
 	return (a->tv_sec - b->tv_sec) * 1000 + (a->tv_nsec - b->tv_nsec) / (1000 * 1000);
 }
+
+#endif /* GNUTLS_SRC_BENCHMARK_H */
