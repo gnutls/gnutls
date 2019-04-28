@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef __GNUTLS_SELF_H
-#define __GNUTLS_SELF_H
+#ifndef GNUTLS_SELF_TEST_H
+#define GNUTLS_SELF_TEST_H
 
 #include <gnutls/gnutls.h>
 
@@ -35,4 +35,4 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac);
 int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest);
 int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk);
 
-#endif
+#endif /* GNUTLS_SELF_TEST_H */

@@ -149,4 +149,5 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 }
 #endif
 /* *INDENT-ON* */
-#endif				/* GNUTLS_PKCS7_H */
+
+#endif /* GNUTLS_PKCS7_H */

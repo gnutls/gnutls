@@ -932,7 +932,6 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 
 AM_CONDITIONAL(NEEDS_LIBRT, test "$gnutls_needs_librt" = "yes")
 
-AC_DEFINE([GNUTLS_COMPAT_H], 1, [Make sure we don't use old features in code.])
 AC_DEFINE([GNUTLS_INTERNAL_BUILD], 1, [We allow temporarily usage of deprecated functions - until they are removed.])
 
 AC_DEFINE([fread_file], [_gnutls_fread_file], [static lib rename])

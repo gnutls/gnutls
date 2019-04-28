@@ -33,9 +33,8 @@
  * The low level cipher functionality is in gnutls/crypto.h.
  */
 
-
-#ifndef GNUTLS_H
-#define GNUTLS_H
+#ifndef GNUTLS_GNUTLS_H
+#define GNUTLS_GNUTLS_H
 
 /* Get ssize_t. */
 #include <sys/types.h>
@@ -3354,4 +3353,4 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 
 #include <gnutls/compat.h>
 
-#endif				/* GNUTLS_H */
+#endif /* GNUTLS_GNUTLS_H */

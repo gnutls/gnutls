@@ -1717,4 +1717,5 @@ gnutls_x509_ext_print(gnutls_x509_ext_st *exts, unsigned int exts_size,
 }
 #endif
 /* *INDENT-ON* */
-#endif				/* GNUTLS_X509_H */
+
+#endif /* GNUTLS_X509_H */
