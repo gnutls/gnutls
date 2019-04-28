@@ -20,11 +20,11 @@
  *
  */
 
-#ifndef EXT_MAX_RECORD_H
-#define EXT_MAX_RECORD_H
+#ifndef GNUTLS_LIB_EXT_MAX_RECORD_H
+#define GNUTLS_LIB_EXT_MAX_RECORD_H
 
 #include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_max_record_size;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_MAX_RECORD_H */

@@ -20,11 +20,11 @@
  *
  */
 
-#ifndef EXT_POST_HANDSHAKE_H
-#define EXT_POST_HANDSHAKE_H
+#ifndef GNUTLS_LIB_EXT_POST_HANDSHAKE_H
+#define GNUTLS_LIB_EXT_POST_HANDSHAKE_H
 
 #include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_post_handshake;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_POST_HANDSHAKE_H */

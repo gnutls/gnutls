@@ -20,10 +20,11 @@
  *
  */
 
+#ifndef GNUTLS_LIB_EXT_SIGNATURE_H
+#define GNUTLS_LIB_EXT_SIGNATURE_H
+
 /* signature algorithms extension
  */
-#ifndef EXT_SIGNATURE_H
-#define EXT_SIGNATURE_H
 
 #include <hello_ext.h>
 
@@ -55,4 +56,5 @@ gnutls_sign_algorithm_set_client(gnutls_session_t session,
 {
 	session->security_parameters.client_sign_algo = sign;
 }
-#endif
+
+#endif /* GNUTLS_LIB_EXT_SIGNATURE_H */

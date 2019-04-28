@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef EXT_STATUS_REQUEST_H
-#define EXT_STATUS_REQUEST_H
+#ifndef GNUTLS_LIB_EXT_STATUS_REQUEST_H
+#define GNUTLS_LIB_EXT_STATUS_REQUEST_H
 
 #include <hello_ext.h>
 
@@ -38,4 +38,4 @@ int _gnutls_parse_ocsp_response(gnutls_session_t session, const uint8_t *data,
 				ssize_t data_size,
 				gnutls_datum_t *resp);
 
-#endif
+#endif /* GNUTLS_LIB_EXT_STATUS_REQUEST_H */

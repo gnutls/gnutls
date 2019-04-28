@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef EXT_HEARTBEAT_H
-#define EXT_HEARTBEAT_H
+#ifndef GNUTLS_LIB_EXT_HEARTBEAT_H
+#define GNUTLS_LIB_EXT_HEARTBEAT_H
 
 #include <hello_ext.h>
 
@@ -40,4 +40,5 @@ extern const hello_ext_entry_st ext_mod_heartbeat;
 
 int _gnutls_heartbeat_handle(gnutls_session_t session, mbuffer_st * bufel);
 int _gnutls_heartbeat_enabled(gnutls_session_t session, int local);
-#endif
+
+#endif /* GNUTLS_LIB_EXT_HEARTBEAT_H */

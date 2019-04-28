@@ -26,11 +26,11 @@
  * in order to authenticate the server.
  */
 
-#ifndef EXT_SERVER_CERT_TYPE_H
-#define EXT_SERVER_CERT_TYPE_H
+#ifndef GNUTLS_LIB_EXT_SERVER_CERT_TYPE_H
+#define GNUTLS_LIB_EXT_SERVER_CERT_TYPE_H
 
 #include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_server_cert_type;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_SERVER_CERT_TYPE_H */

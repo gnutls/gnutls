@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef EXT_SESSION_TICKET_H
-#define EXT_SESSION_TICKET_H
+#ifndef GNUTLS_LIB_EXT_SESSION_TICKET_H
+#define GNUTLS_LIB_EXT_SESSION_TICKET_H
 
 #include <hello_ext.h>
 
@@ -37,4 +37,4 @@ int _gnutls_decrypt_session_ticket(gnutls_session_t session,
 				   const gnutls_datum_t *ticket_data,
 				   gnutls_datum_t *state);
 
-#endif
+#endif /* GNUTLS_LIB_EXT_SESSION_TICKET_H */

@@ -20,11 +20,11 @@
  *
  */
 
-#ifndef EXT_KEY_SHARE_H
-#define EXT_KEY_SHARE_H
+#ifndef GNUTLS_LIB_EXT_KEY_SHARE_H
+#define GNUTLS_LIB_EXT_KEY_SHARE_H
 
 #include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_key_share;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_KEY_SHARE_H */

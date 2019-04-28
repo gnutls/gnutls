@@ -1,5 +1,5 @@
-#ifndef EXT_PRE_SHARED_KEY_H
-#define EXT_PRE_SHARED_KEY_H
+#ifndef GNUTLS_LIB_EXT_PRE_SHARED_KEY_H
+#define GNUTLS_LIB_EXT_PRE_SHARED_KEY_H
 
 #include "auth/psk.h"
 #include <hello_ext.h>
@@ -20,4 +20,4 @@ unsigned _gnutls_have_psk_credentials(const gnutls_psk_client_credentials_t cred
 
 int _gnutls_generate_early_secrets_for_psk(gnutls_session_t session);
 
-#endif
+#endif /* GNUTLS_LIB_EXT_PRE_SHARED_KEY_H */

@@ -20,11 +20,11 @@
  *
  */
 
-#ifndef EXT_EARLY_DATA_H
-#define EXT_EARLY_DATA_H
+#ifndef GNUTLS_LIB_EXT_EARLY_DATA_H
+#define GNUTLS_LIB_EXT_EARLY_DATA_H
 
 #include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_early_data;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_EARLY_DATA_H */

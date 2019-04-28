@@ -19,8 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef EXT_SUPPORTED_GROUPS_H
-#define EXT_SUPPORTED_GROUPS_H
+
+#ifndef GNUTLS_LIB_EXT_SUPPORTED_GROUPS_H
+#define GNUTLS_LIB_EXT_SUPPORTED_GROUPS_H
 
 #include <hello_ext.h>
 
@@ -30,4 +31,4 @@ int
 _gnutls_session_supports_group(gnutls_session_t session,
 				unsigned int group);
 
-#endif
+#endif /* GNUTLS_LIB_EXT_SUPPORTED_GROUPS_H */

@@ -19,6 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
+
+#ifndef GNUTLS_LIB_EXT_SRTP_H
+#define GNUTLS_LIB_EXT_SRTP_H
 #ifndef EXT_SRTP_H
 #define EXT_SRTP_H
 
@@ -38,3 +41,5 @@ typedef struct {
 extern const hello_ext_entry_st ext_mod_srtp;
 
 #endif
+
+#endif /* GNUTLS_LIB_EXT_SRTP_H */

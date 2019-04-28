@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef EXT_SAFE_RENEGOTIATION_H
-#define EXT_SAFE_RENEGOTIATION_H
+#ifndef GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
+#define GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H
 
 #include <hello_ext.h>
 
@@ -46,4 +46,4 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session);
 int _gnutls_ext_sr_verify(gnutls_session_t session);
 int _gnutls_ext_sr_send_cs(gnutls_session_t);
 
-#endif				/* EXT_SAFE_RENEGOTIATION_H */
+#endif /* GNUTLS_LIB_EXT_SAFE_RENEGOTIATION_H */

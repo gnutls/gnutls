@@ -17,11 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef EXT_DUMBFW_H
-#define EXT_DUMBFW_H
+
+#ifndef GNUTLS_LIB_EXT_DUMBFW_H
+#define GNUTLS_LIB_EXT_DUMBFW_H
 
 #include <hello_ext.h>
 
 extern const hello_ext_entry_st ext_mod_dumbfw;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_DUMBFW_H */
