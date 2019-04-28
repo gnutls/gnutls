@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef VIRT_TIME_H
-#define VIRT_TIME_H
+#ifndef GNUTLS_TESTS_VIRT_TIME_H
+#define GNUTLS_TESTS_VIRT_TIME_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -68,4 +68,4 @@ static void mygettime(struct timespec * t)
 		*t = _now_ts;
 }
 
-#endif
+#endif /* GNUTLS_TESTS_VIRT_TIME_H */

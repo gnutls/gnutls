@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef HEX_H
-#define HEX_H
+#ifndef GNUTLS_TESTS_HEX_H
+#define GNUTLS_TESTS_HEX_H
 
 #include <stdio.h>
 #include <string.h>
@@ -47,4 +47,4 @@ inline static gnutls_datum_t SDATA(const char *txt)
 	return output;
 }
 
-#endif
+#endif /* GNUTLS_TESTS_HEX_H */

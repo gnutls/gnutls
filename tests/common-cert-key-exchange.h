@@ -20,6 +20,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
+#ifndef GNUTLS_TESTS_COMMON_CERT_KEY_EXCHANGE_H
+#define GNUTLS_TESTS_COMMON_CERT_KEY_EXCHANGE_H
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -114,3 +117,5 @@ void dtls_try_with_key_mtu(const char *name, const char *client_prio, gnutls_kx_
 		const gnutls_datum_t *cli_cert,
 		const gnutls_datum_t *cli_key,
 		unsigned client_cert, unsigned mtu);
+
+#endif /* GNUTLS_TESTS_COMMON_CERT_KEY_EXCHANGE_H */

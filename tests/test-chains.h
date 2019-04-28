@@ -20,6 +20,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
+#ifndef GNUTLS_TESTS_TEST_CHAINS_H
+#define GNUTLS_TESTS_TEST_CHAINS_H
+
 /* *INDENT-OFF* */
 
 #define MAX_CHAIN 10
@@ -4150,3 +4153,5 @@ static struct
 #endif
 
 /* *INDENT-ON* */
+
+#endif /* GNUTLS_TESTS_TEST_CHAINS_H */

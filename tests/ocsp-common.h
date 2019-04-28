@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OCSP_COMMON_H
-#define OCSP_COMMON_H
+#ifndef GNUTLS_TESTS_OCSP_COMMON_H
+#define GNUTLS_TESTS_OCSP_COMMON_H
 
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #  pragma GCC diagnostic push
@@ -584,4 +584,4 @@ static gnutls_datum_t ocsp_subca3_unknown_pem = {
 #  pragma GCC diagnostic pop
 #endif
 
-#endif
+#endif /* GNUTLS_TESTS_OCSP_COMMON_H */

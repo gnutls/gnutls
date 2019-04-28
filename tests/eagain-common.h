@@ -1,3 +1,6 @@
+#ifndef GNUTLS_TESTS_EAGAIN_COMMON_H
+#define GNUTLS_TESTS_EAGAIN_COMMON_H
+
 #include <errno.h>
 #include <time.h>
 #include <stdio.h>
@@ -361,3 +364,5 @@ inline static int record_send_loop(gnutls_session_t session,
 
 	return ret;
 }
+
+#endif /* GNUTLS_TESTS_EAGAIN_COMMON_H */

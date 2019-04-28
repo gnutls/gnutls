@@ -20,8 +20,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef GNUTLS_TESTS_UTILS_H
+#define GNUTLS_TESTS_UTILS_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -174,4 +174,4 @@ inline static void check_wait_status_for_sig(int status)
 	_check_wait_status(status, 1);
 }
 
-#endif				/* UTILS_H */
+#endif /* GNUTLS_TESTS_UTILS_H */
