@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_AUTH_ANON_H
+#define GNUTLS_LIB_AUTH_ANON_H
+
 /* this is not to be included by gnutls_anon.c */
 #include <auth.h>
 #include <auth/dh_common.h>
@@ -45,3 +48,5 @@ typedef struct anon_auth_info_st {
 } *anon_auth_info_t;
 
 typedef struct anon_auth_info_st anon_auth_info_st;
+
+#endif /* GNUTLS_LIB_AUTH_ANON_H */

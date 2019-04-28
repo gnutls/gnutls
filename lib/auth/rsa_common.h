@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef AUTH_RSA_COMMON
-#define AUTH_RSA_COMMON
+#ifndef GNUTLS_LIB_AUTH_RSA_COMMON_H
+#define GNUTLS_LIB_AUTH_RSA_COMMON_H
 
 #include <abstract_int.h>
 
@@ -36,4 +36,4 @@ int
 _gnutls_get_public_rsa_params(gnutls_session_t session,
 			      gnutls_pk_params_st * params);
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_RSA_COMMON_H */

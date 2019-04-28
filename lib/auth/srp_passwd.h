@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_AUTH_SRP_PASSWD_H
+#define GNUTLS_LIB_AUTH_SRP_PASSWD_H
+
 #ifdef ENABLE_SRP
 
 typedef struct {
@@ -39,3 +42,5 @@ int _gnutls_sbase64_decode(char *data, size_t data_size,
 			   uint8_t ** result);
 
 #endif				/* ENABLE_SRP */
+
+#endif /* GNUTLS_LIB_AUTH_SRP_PASSWD_H */

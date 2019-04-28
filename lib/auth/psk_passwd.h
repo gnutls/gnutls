@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_AUTH_PSK_PASSWD_H
+#define GNUTLS_LIB_AUTH_PSK_PASSWD_H
+
 /* this is locally allocated. It should be freed using the provided function */
 int _gnutls_psk_pwd_find_entry(gnutls_session_t, char *username,
 			       gnutls_datum_t * key);
@@ -28,3 +31,5 @@ int _gnutls_find_psk_key(gnutls_session_t session,
 			 gnutls_psk_client_credentials_t cred,
 			 gnutls_datum_t * username, gnutls_datum_t * key,
 			 int *free);
+
+#endif /* GNUTLS_LIB_AUTH_PSK_PASSWD_H */
