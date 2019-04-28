@@ -20,9 +20,14 @@
  *
  */
 
+#ifndef GNUTLS_LIB_TLS13_FINISHED_H
+#define GNUTLS_LIB_TLS13_FINISHED_H
+
 int _gnutls13_compute_finished(const mac_entry_st *prf,
 		const uint8_t *base_key,
 		gnutls_buffer_st *handshake_hash_buffer,
 		void *out);
 int _gnutls13_recv_finished(gnutls_session_t session);
 int _gnutls13_send_finished(gnutls_session_t session, unsigned again);
+
+#endif /* GNUTLS_LIB_TLS13_FINISHED_H */
