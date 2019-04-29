@@ -444,11 +444,21 @@ static const test_st tests[] = {
 	 .sig = GNUTLS_SIGN_RSA_PSS_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	},
-	{.name = "tls1.3 rsa-pss cert, rsa-sign key", /* we expect the server to refuse negotiating */
+	{.name = "tls1.3 rsa-pss cert, rsa-sign key", /* we expect the server to attempt to downgrade to TLS 1.2, but it is not possible because it is not enabled */
 	 .pk = GNUTLS_PK_RSA,
 	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3",
 	 .cert = &server_ca3_rsa_pss_cert,
 	 .key = &server_ca3_rsa_pss_key,
+	 .sig = GNUTLS_SIGN_RSA_SHA256,
+	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
+	 .exp_serv_err = GNUTLS_E_INSUFFICIENT_SECURITY
+	},
+	{.name = "tls1.3 rsa-pss cert, rsa-sign key, downgrade to tls1.2", /* we expect the server to downgrade to TLS 1.2 and refuse negotiating */
+	 .pk = GNUTLS_PK_RSA,
+	 .prio = "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2",
+	 .cert = &server_ca3_rsa_pss_cert,
+	 .key = &server_ca3_rsa_pss_key,
+	 .sig = GNUTLS_SIGN_RSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
 	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
 	},

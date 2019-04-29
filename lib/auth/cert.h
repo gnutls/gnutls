@@ -102,6 +102,10 @@ typedef struct gnutls_certificate_credentials_st {
 	/* OCSP */
 	gnutls_status_request_ocsp_func glob_ocsp_func;
 	void *glob_ocsp_func_ptr; /* corresponding OCSP response function */
+
+	/* This is only used by server to indicate whether this
+	 * credentials can be used for signing in TLS 1.3. */
+	bool tls13_ok;
 } certificate_credentials_st;
 
 /* This is the information we keep for the peer

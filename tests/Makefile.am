@@ -453,9 +453,11 @@ tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 
 if ENABLE_PKCS11
 if !WINDOWS
-ctests += tls13/post-handshake-with-cert-pkcs11
+ctests += tls13/post-handshake-with-cert-pkcs11 pkcs11/tls-neg-pkcs11-no-key
 tls13_post_handshake_with_cert_pkcs11_DEPENDENCIES = libpkcs11mock2.la libutils.la
 tls13_post_handshake_with_cert_pkcs11_LDADD = $(LDADD) $(LIBDL)
+pkcs11_tls_neg_pkcs11_no_key_DEPENDENCIES = libpkcs11mock2.la libutils.la
+pkcs11_tls_neg_pkcs11_no_key_LDADD = $(LDADD) $(LIBDL)
 endif
 endif
 

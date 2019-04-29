@@ -154,6 +154,10 @@ gnutls_credentials_set(gnutls_session_t session,
 				}
 			}
 
+			if (session->security_parameters.entity == GNUTLS_SERVER &&
+			    !c->tls13_ok)
+				allow_tls13 = 0;
+
 			if (!allow_tls13) {
 				/* to prevent the server random indicate TLS1.3 support */
 				session->internals.flags |= INT_FLAG_NO_TLS13;

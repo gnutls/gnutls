@@ -736,3 +736,16 @@ _gnutls_tls_aid_to_sign_entry(uint8_t id0, uint8_t id1, const version_entry_st *
 
 	return NULL;
 }
+
+const gnutls_sign_entry_st *
+_gnutls13_sign_get_compatible_with_privkey(gnutls_privkey_t privkey)
+{
+	GNUTLS_SIGN_LOOP(
+		if (p->tls13_ok &&
+		    _gnutls_privkey_compatible_with_sig(privkey, p->id)) {
+			return p;
+		}
+	);
+
+	return NULL;
+}
