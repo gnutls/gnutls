@@ -1,4 +1,4 @@
-`[suppress_function]
+[suppress_function]
 symbol_version = GNUTLS_PRIVATE_3_4
 
 [suppress_function]
