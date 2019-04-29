@@ -130,8 +130,6 @@ ASM_SOURCES_XXX := \
 	lib/accelerated/aarch64/XXX/sha1-armv8.s \
 	lib/accelerated/aarch64/XXX/sha256-armv8.s \
 	lib/accelerated/aarch64/XXX/sha512-armv8.s \
-	lib/accelerated/x86/XXX/cpuid-x86_64.s \
-	lib/accelerated/x86/XXX/cpuid-x86.s \
 	lib/accelerated/x86/XXX/ghash-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86_64.s \
 	lib/accelerated/x86/XXX/aesni-x86.s \
@@ -154,10 +152,10 @@ asm-sources: $(ASM_SOURCES_ELF) $(ASM_SOURCES_COFF) $(ASM_SOURCES_MACOSX) lib/ac
 asm-sources-clean:
 	rm -f $(ASM_SOURCES_ELF) $(ASM_SOURCES_COFF) $(ASM_SOURCES_MACOSX) lib/accelerated/x86/files.mk
 
-X86_FILES=XXX/aesni-x86.s XXX/cpuid-x86.s XXX/sha1-ssse3-x86.s \
+X86_FILES=XXX/aesni-x86.s XXX/sha1-ssse3-x86.s \
 	XXX/sha256-ssse3-x86.s XXX/sha512-ssse3-x86.s XXX/aes-ssse3-x86.s
 
-X86_64_FILES=XXX/aesni-x86_64.s XXX/cpuid-x86_64.s XXX/ghash-x86_64.s \
+X86_64_FILES=XXX/aesni-x86_64.s XXX/ghash-x86_64.s \
 	XXX/sha1-ssse3-x86_64.s XXX/sha512-ssse3-x86_64.s XXX/aes-ssse3-x86_64.s \
 	XXX/aesni-gcm-x86_64.s XXX/sha256-ssse3-x86_64.s
 
