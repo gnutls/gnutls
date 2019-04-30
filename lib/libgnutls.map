@@ -1297,6 +1297,7 @@ GNUTLS_FIPS140_3_4 {
 	_gnutls_dh_generate_key;
 	_gnutls_ecdh_generate_key;
 	_gnutls_ecdh_compute_key;
+	_gnutls_cipher_get_iv;
 } GNUTLS_3_4;
 
 GNUTLS_PRIVATE_3_4 {

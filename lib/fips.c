@@ -329,6 +329,12 @@ int _gnutls_fips_perform_self_checks2(void)
 		goto error;
 	}
 
+	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_256_CFB8);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	/* Digest tests */
 	ret = gnutls_digest_self_test(0, GNUTLS_DIG_SHA3_224);
 	if (ret < 0) {

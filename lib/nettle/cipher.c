@@ -841,6 +841,19 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 }
 
 static int
+wrap_nettle_cipher_getiv(void *_ctx, void *iv, size_t iv_size)
+{
+	struct nettle_cipher_ctx *ctx = _ctx;
+
+	if (iv_size < ctx->iv_size)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	memcpy(iv, ctx->iv, ctx->iv_size);
+
+	return (int) ctx->iv_size;
+}
+
+static int
 wrap_nettle_cipher_decrypt(void *_ctx, const void *encr, size_t encr_size,
 			   void *plain, size_t plain_size)
 {
@@ -974,6 +987,7 @@ gnutls_crypto_cipher_st _gnutls_cipher_ops = {
 	.init = wrap_nettle_cipher_init,
 	.exists = wrap_nettle_cipher_exists,
 	.setiv = wrap_nettle_cipher_setiv,
+	.getiv = wrap_nettle_cipher_getiv,
 	.setkey = wrap_nettle_cipher_setkey,
 	.encrypt = wrap_nettle_cipher_encrypt,
 	.decrypt = wrap_nettle_cipher_decrypt,

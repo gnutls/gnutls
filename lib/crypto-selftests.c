@@ -52,6 +52,9 @@ struct cipher_vectors_st {
 
 	const uint8_t *iv;
 	unsigned int iv_size;
+
+	const uint8_t *internal_iv;
+	unsigned int internal_iv_size;
 };
 
 struct cipher_aead_vectors_st {
@@ -385,6 +388,9 @@ const struct cipher_vectors_st aes128_cfb8_vectors[] = { /* NIST 800-38a */
              "\x32\xb9",
 	 STR(iv, iv_size,
 	     "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+	 /* the least significant 16 bytes of ciphertext */
+	 STR(internal_iv, internal_iv_size,
+	     "\x42\x4c\x9c\x0d\xd4\x36\xba\xce\x9e\x0e\xd4\x58\x6a\x4f\x32\xb9"),
 	 },
 };
 
@@ -401,6 +407,9 @@ const struct cipher_vectors_st aes192_cfb8_vectors[] = { /* NIST 800-38a */
              "\x67\x8a",
 	 STR(iv, iv_size,
 	     "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+	 /* the least significant 16 bytes of ciphertext */
+	 STR(internal_iv, internal_iv_size,
+	     "\x52\x1e\xf0\xa9\x05\xca\x44\xcd\x05\x7c\xbf\x0d\x47\xa0\x67\x8a"),
 	 },
 };
 
@@ -417,6 +426,9 @@ const struct cipher_vectors_st aes256_cfb8_vectors[] = { /* NIST 800-38a */
              "\x97\x00",
 	 STR(iv, iv_size,
 	     "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"),
+	 /* the least significant 16 bytes of ciphertext */
+	 STR(internal_iv, internal_iv_size,
+	     "\x1a\x85\x20\xa6\x4d\xb5\x5f\xcc\x8a\xc5\x54\x84\x4e\x88\x97\x00"),
 	 },
 };
 
@@ -603,6 +615,20 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 
 			if (memcmp(tmp, vectors[i].ciphertext, vectors[i].plaintext_size) != 0) {
 				_gnutls_debug_log("%s vector %d in-place encryption failed!\n", gnutls_cipher_get_name(cipher), i);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+		}
+
+		/* check the internal IV */
+		if (vectors[i].internal_iv_size > 0) {
+			ret = _gnutls_cipher_get_iv(hd, tmp, sizeof(tmp));
+			if (ret < 0)
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+			if (memcmp(tmp, vectors[i].internal_iv, ret) != 0) {
+				_gnutls_debug_log("%s vector %d internal IV check failed!\n",
+						  gnutls_cipher_get_name(cipher),
+						  i);
 				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 			}
 		}

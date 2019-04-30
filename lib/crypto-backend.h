@@ -33,6 +33,7 @@ typedef struct {
 	gnutls_cipher_init_func init;
 	gnutls_cipher_setkey_func setkey;
 	gnutls_cipher_setiv_func setiv;
+	gnutls_cipher_getiv_func getiv;
 	gnutls_cipher_encrypt_func encrypt;
 	gnutls_cipher_decrypt_func decrypt;
 	gnutls_cipher_aead_encrypt_func aead_encrypt;

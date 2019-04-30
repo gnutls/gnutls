@@ -167,6 +167,34 @@ gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 		}
 }
 
+/*-
+ * _gnutls_cipher_get_iv:
+ * @handle: is a #gnutls_cipher_hd_t type
+ * @iv: the IV to set
+ * @ivlen: the length of the IV
+ *
+ * This function will retrieve the internally calculated IV value. It is
+ * intended to be used  for modes like CFB. @iv must have @ivlen length
+ * at least.
+ *
+ * This is solely for validation purposes of our crypto
+ * implementation.  For other purposes, the IV can be typically
+ * calculated from the initial IV value and the subsequent ciphertext
+ * values.  As such, this function only works with the internally
+ * registered ciphers.
+ *
+ * Returns: The length of IV or a negative error code on error.
+ *
+ * Since: 3.6.8
+ -*/
+int
+_gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
+{
+	api_cipher_hd_st *h = handle;
+
+	return _gnutls_cipher_getiv(&h->ctx_enc, iv, ivlen);
+}
+
 /**
  * gnutls_cipher_encrypt:
  * @handle: is a #gnutls_cipher_hd_t type
