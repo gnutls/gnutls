@@ -2366,7 +2366,7 @@ int gnutls_pubkey_import_x509_raw(gnutls_pubkey_t pkey,
  * gnutls_pubkey_verify_params:
  * @key: should contain a #gnutls_pubkey_t type
  *
- * This function will verify the private key parameters.
+ * This function will verify the public key parameters.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
