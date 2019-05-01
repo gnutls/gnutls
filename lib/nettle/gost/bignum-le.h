@@ -31,8 +31,8 @@
    not, see https://www.gnu.org/licenses/.
 */
  
-#ifndef NETTLE_BIGNUM_LE_H_INCLUDED
-#define NETTLE_BIGNUM_LE_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H
+#define GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H
 
 #include <nettle/nettle-meta.h>
 
@@ -68,4 +68,4 @@ nettle_mpz_init_set_str_256_u_le(mpz_t x,
 }
 #endif
 
-#endif /* NETTLE_BIGNUM_LE_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_BIGNUM_LE_H */

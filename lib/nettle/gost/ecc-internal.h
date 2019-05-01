@@ -31,8 +31,8 @@
 
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
-#ifndef NETTLE_GOST_ECC_INTERNAL_H_INCLUDED
-#define NETTLE_GOST_ECC_INTERNAL_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_ECC_INTERNAL_H
+#define GNUTLS_LIB_NETTLE_GOST_ECC_INTERNAL_H
 
 #include <nettle/nettle-types.h>
 #include <nettle/bignum.h>
@@ -250,4 +250,4 @@ cnd_copy (int cnd, mp_limb_t *rp, const mp_limb_t *ap, mp_size_t n);
 #endif
 #define ECC_GOSTDSA_SIGN_ITCH(size) (12*(size))
 
-#endif /* NETTLE_GOST_ECC_INTERNAL_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_ECC_INTERNAL_H */

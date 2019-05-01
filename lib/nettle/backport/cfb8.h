@@ -32,8 +32,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_CFB8_H_INCLUDED
-#define NETTLE_CFB8_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_BACKPORT_CFB8_H
+#define GNUTLS_LIB_NETTLE_BACKPORT_CFB8_H
 
 #include <nettle/cfb.h>
 
@@ -93,4 +93,5 @@ cfb8_decrypt(const void *ctx, nettle_cipher_func *f,
 #ifdef __cplusplus
 }
 #endif
-#endif /* NETTLE_CFB8_H_INCLUDED */
+
+#endif /* GNUTLS_LIB_NETTLE_BACKPORT_CFB8_H */

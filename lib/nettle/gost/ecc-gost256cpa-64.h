@@ -1,3 +1,6 @@
+#ifndef GNUTLS_LIB_NETTLE_GOST_ECC_GOST256CPA_64_H
+#define GNUTLS_LIB_NETTLE_GOST_ECC_GOST256CPA_64_H
+
 /* For NULL. */
 #include <stddef.h>
 #define ECC_LIMB_SIZE 4
@@ -1069,3 +1072,5 @@ static const mp_limb_t ecc_table[2048] = {
   0xc2081d2422753b51ULL, 0xfca3e2e2f3beada6ULL, 0x5ab1f1431cd6ca20ULL, 0x1c40a0a34c73315aULL,
 };
 #endif
+
+#endif /* GNUTLS_LIB_NETTLE_GOST_ECC_GOST256CPA_64_H */

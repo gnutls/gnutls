@@ -59,8 +59,8 @@
  * Ported to nettle by Nikos Mavrogiannopoulos.
  */
 
-#ifndef NETTLE_GOST_GOSTHASH94_H_INCLUDED
-#define NETTLE_GOST_GOSTHASH94_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_GOSTHASH94_H
+#define GNUTLS_LIB_NETTLE_GOST_GOSTHASH94_H
 
 #include <nettle/nettle-types.h>
 
@@ -92,4 +92,4 @@ extern const struct nettle_hash _gnutls_gosthash94cp;
 }
 #endif
 
-#endif /* NETTLE_GOST_GOSTHASH94_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_GOSTHASH94_H */

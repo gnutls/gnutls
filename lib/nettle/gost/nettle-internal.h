@@ -32,8 +32,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_INTERNAL_H_INCLUDED
-#define NETTLE_INTERNAL_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_NETTLE_INTERNAL_H
+#define GNUTLS_LIB_NETTLE_GOST_NETTLE_INTERNAL_H
 
 /* Temporary allocation, for systems that don't support alloca. Note
  * that the allocation requests should always be reasonably small, so
@@ -49,4 +49,4 @@
   do { if ((size) > (sizeof(name) / sizeof(name[0]))) abort(); } while (0)
 #endif 
 
-#endif /* NETTLE_INTERNAL_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_NETTLE_INTERNAL_H */

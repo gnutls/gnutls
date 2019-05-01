@@ -21,8 +21,8 @@
  * MA 02111-1301, USA.
  */
 
-#ifndef DRBG_AES_H_INCLUDED
-#define DRBG_AES_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_INT_DRBG_AES_H
+#define GNUTLS_LIB_NETTLE_INT_DRBG_AES_H
 
 #include <config.h>
 #include <nettle/aes.h>
@@ -90,4 +90,4 @@ int drbg_aes_is_seeded(struct drbg_aes_ctx *ctx);
 
 int drbg_aes_self_test(void);
 
-#endif				/* DRBG_AES_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_INT_DRBG_AES_H */

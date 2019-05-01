@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _BACKPORT_NETTLE_XTS_H_INCLUDED
-#define _BACKPORT_NETTLE_XTS_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_BACKPORT_XTS_H
+#define GNUTLS_LIB_NETTLE_BACKPORT_XTS_H
 
 #ifdef HAVE_XTS_ENCRYPT_MESSAGE
 #include <nettle/xts.h>
@@ -119,4 +119,4 @@ xts_aes256_decrypt_message(struct xts_aes256_key *xts_key,
 
 #endif /* HAVE_XTS_ENCRYPT_MESSAGE */
 
-#endif /* _BACKPORT_NETTLE_XTS_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_BACKPORT_XTS_H */

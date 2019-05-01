@@ -1,3 +1,6 @@
+#ifndef GNUTLS_LIB_NETTLE_GOST_ECC_GOST512A_32_H
+#define GNUTLS_LIB_NETTLE_GOST_ECC_GOST512A_32_H
+
 /* For NULL. */
 #include <stddef.h>
 #define ECC_LIMB_SIZE 16
@@ -1079,3 +1082,5 @@ static const mp_limb_t ecc_table[4096] = {
   0xebf08ccdUL, 0xfa5a5e9bUL, 0x1514341bUL, 0xf3fa901eUL, 0x7274c4deUL, 0x58450d39UL, 0x3d7994ddUL, 0x11e797e3UL,
 };
 #endif
+
+#endif /* GNUTLS_LIB_NETTLE_GOST_ECC_GOST512A_32_H */
