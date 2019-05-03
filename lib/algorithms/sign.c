@@ -465,6 +465,7 @@ unsigned gnutls_sign_is_secure2(gnutls_sign_algorithm_t algorithm, unsigned int 
  * gnutls_sign_list:
  *
  * Get a list of supported public key signature algorithms.
+ * This function is not thread safe.
  *
  * Returns: a (0)-terminated list of #gnutls_sign_algorithm_t
  *   integers indicating the available ciphers.
