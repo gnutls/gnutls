@@ -1200,7 +1200,7 @@ static void
 streebog512_compress (struct streebog512_ctx *ctx, const uint8_t *input, size_t count)
 {
   uint64_t M[8];
-  uint64_t l;
+  uint64_t l, cf;
   int i;
 
   for (i = 0; i < 8; i++, input += 8)
@@ -1219,12 +1219,14 @@ streebog512_compress (struct streebog512_ctx *ctx, const uint8_t *input, size_t 
         }
     }
 
+  cf = 0;
   ctx->sigma[0] += M[0];
   for (i = 1; i < 8; i++)
-    if (ctx->sigma[i-1] < M[i-1])
-      ctx->sigma[i] += M[i] + 1;
-    else
-      ctx->sigma[i] += M[i];
+    {
+      if (ctx->sigma[i-1] != M[i-1])
+	cf = (ctx->sigma[i-1] < M[i-1]);
+      ctx->sigma[i] += M[i] + cf;
+    }
 }
 
 static void
