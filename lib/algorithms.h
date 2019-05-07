@@ -429,6 +429,7 @@ typedef struct gnutls_ecc_curve_entry_st {
 	unsigned sig_size;	/* the size of curve signatures in bytes (EdDSA) */
 	unsigned gost_curve;
 	bool supported;
+	gnutls_group_t group;
 } gnutls_ecc_curve_entry_st;
 
 const gnutls_ecc_curve_entry_st
