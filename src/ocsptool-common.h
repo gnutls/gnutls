@@ -18,8 +18,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OCSPTOOL_COMMON_H
-#define OCSPTOOL_COMMON_H
+#ifndef GNUTLS_SRC_OCSPTOOL_COMMON_H
+#define GNUTLS_SRC_OCSPTOOL_COMMON_H
 
 #include <gnutls/ocsp.h>
 
@@ -45,4 +45,4 @@ check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 		    gnutls_datum_t * data, gnutls_datum_t *nonce,
 		    int verbose);
 
-#endif
+#endif /* GNUTLS_SRC_OCSPTOOL_COMMON_H */

@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef PKCS11_INT_H
-#define PKCS11_INT_H
+#ifndef GNUTLS_LIB_PKCS11_INT_H
+#define GNUTLS_LIB_PKCS11_INT_H
 
 #ifdef ENABLE_PKCS11
 
@@ -462,4 +462,4 @@ inline static bool is_pkcs11_url_object(const char *url)
 
 #endif				/* ENABLE_PKCS11 */
 
-#endif
+#endif /* GNUTLS_LIB_PKCS11_INT_H */

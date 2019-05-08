@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef VERIFY_HIGH_H
-# define VERIFY_HIGH_H
+#ifndef GNUTLS_LIB_X509_VERIFY_HIGH_H
+#define GNUTLS_LIB_X509_VERIFY_HIGH_H
 
 struct gnutls_x509_trust_list_st {
 	unsigned int size;
@@ -46,4 +46,4 @@ struct gnutls_x509_trust_list_st {
 int _gnutls_trustlist_inlist(gnutls_x509_trust_list_t list,
 			     gnutls_x509_crt_t cert);
 
-#endif
+#endif /* GNUTLS_LIB_X509_VERIFY_HIGH_H */

@@ -17,8 +17,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef EXT_ALPN_H
-#define EXT_ALPN_H
+
+#ifndef GNUTLS_LIB_EXT_ALPN_H
+#define GNUTLS_LIB_EXT_ALPN_H
 
 #include <hello_ext.h>
 
@@ -36,4 +37,4 @@ typedef struct {
 
 extern const hello_ext_entry_st ext_mod_alpn;
 
-#endif
+#endif /* GNUTLS_LIB_EXT_ALPN_H */

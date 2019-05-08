@@ -31,8 +31,8 @@
 
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
-#ifndef NETTLE_ECC_GOST_CURVE_H_INCLUDED
-#define NETTLE_ECC_GOST_CURVE_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_ECC_GOST_CURVE_H
+#define GNUTLS_LIB_NETTLE_GOST_ECC_GOST_CURVE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,4 +58,4 @@ const struct ecc_curve * NETTLE_PURE nettle_get_gost_512a(void);
 }
 #endif
 
-#endif /* NETTLE_ECC_GOST_CURVE_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_ECC_GOST_CURVE_H */

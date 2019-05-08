@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef GNUTLS_LIB_SYSTEM_H
+#define GNUTLS_LIB_SYSTEM_H
 
 #include "gnutls_int.h"
 #include <time.h>
@@ -107,4 +107,4 @@ void _gnutls_global_set_gettime_function(gnutls_gettime_func gettime_func);
 int gnutls_system_global_init(void);
 void gnutls_system_global_deinit(void);
 
-#endif				/* SYSTEM_H */
+#endif /* GNUTLS_LIB_SYSTEM_H */

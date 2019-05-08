@@ -32,8 +32,8 @@
 
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
-#ifndef NETTLE_GOSTDSA_H_INCLUDED
-#define NETTLE_GOSTDSA_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_GOSTDSA_H
+#define GNUTLS_LIB_NETTLE_GOST_GOSTDSA_H
 
 #include <nettle/ecc.h>
 #include <nettle/dsa.h>
@@ -104,4 +104,4 @@ ecc_gostdsa_verify (const struct ecc_curve *ecc,
 }
 #endif
 
-#endif /* NETTLE_GOSTDSA_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_GOSTDSA_H */

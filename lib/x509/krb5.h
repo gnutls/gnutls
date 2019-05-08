@@ -18,5 +18,10 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef GNUTLS_LIB_X509_KRB5_H
+#define GNUTLS_LIB_X509_KRB5_H
+
 int _gnutls_krb5_principal_to_der(const char *name, gnutls_datum_t * der);
 int _gnutls_krb5_der_to_principal(const gnutls_datum_t * der, gnutls_datum_t *name);
+
+#endif /* GNUTLS_LIB_X509_KRB5_H */

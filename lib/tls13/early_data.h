@@ -20,6 +20,11 @@
  *
  */
 
+#ifndef GNUTLS_LIB_TLS13_EARLY_DATA_H
+#define GNUTLS_LIB_TLS13_EARLY_DATA_H
+
 int _gnutls13_send_end_of_early_data(gnutls_session_t session, unsigned again);
 int _gnutls13_recv_end_of_early_data(gnutls_session_t session);
 int _gnutls13_send_early_data(gnutls_session_t session);
+
+#endif /* GNUTLS_LIB_TLS13_EARLY_DATA_H */

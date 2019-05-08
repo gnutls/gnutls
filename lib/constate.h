@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_CONSTATE_H
-#define GNUTLS_CONSTATE_H
+#ifndef GNUTLS_LIB_CONSTATE_H
+#define GNUTLS_LIB_CONSTATE_H
 
 int _gnutls_set_cipher_suite2(gnutls_session_t session,
 			     const gnutls_cipher_suite_entry_st *cs);
@@ -95,4 +95,4 @@ static inline int _gnutls_epoch_refcount_dec(gnutls_session_t session,
 	return 0;
 }
 
-#endif
+#endif /* GNUTLS_LIB_CONSTATE_H */

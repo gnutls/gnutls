@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef AUTH_DH_COMMON
-#define AUTH_DH_COMMON
+#ifndef GNUTLS_LIB_AUTH_DH_COMMON_H
+#define GNUTLS_LIB_AUTH_DH_COMMON_H
 
 #include <auth.h>
 
@@ -47,4 +47,4 @@ int _gnutls_dh_common_print_server_kx(gnutls_session_t,
 int _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 				     uint8_t * data, size_t _data_size);
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_DH_COMMON_H */

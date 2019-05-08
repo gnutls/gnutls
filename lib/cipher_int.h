@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_CIPHER_INT
-#define GNUTLS_CIPHER_INT
+#ifndef GNUTLS_LIB_CIPHER_INT_H
+#define GNUTLS_LIB_CIPHER_INT_H
 
 #include <gnutls/crypto.h>
 #include "errors.h"
@@ -259,4 +259,4 @@ inline static size_t _gnutls_auth_cipher_tag_len(auth_cipher_hd_st *
 void _gnutls_auth_cipher_deinit(auth_cipher_hd_st * handle);
 
 
-#endif				/* GNUTLS_CIPHER_INT */
+#endif /* GNUTLS_LIB_CIPHER_INT_H */

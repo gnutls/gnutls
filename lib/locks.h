@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_LOCKS_H
-#define GNUTLS_LOCKS_H
+#ifndef GNUTLS_LIB_LOCKS_H
+#define GNUTLS_LIB_LOCKS_H
 
 #include <gnutls/gnutls.h>
 #include "gnutls_int.h"
@@ -76,4 +76,4 @@ extern mutex_unlock_func gnutls_mutex_unlock;
 # define GNUTLS_STATIC_MUTEX_UNLOCK(mutex)
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_LOCKS_H */

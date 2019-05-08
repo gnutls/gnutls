@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef GNUTLS_EXTENSIONS_H
-#define GNUTLS_EXTENSIONS_H
+#ifndef GNUTLS_LIB_HELLO_EXT_H
+#define GNUTLS_LIB_HELLO_EXT_H
 
 #include "gnutls_int.h"
 #include <gnutls/gnutls.h>
@@ -194,4 +194,4 @@ void _gnutls_hello_ext_save_sr(gnutls_session_t session)
 	_gnutls_hello_ext_save(session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION, 1);
 }
 
-#endif
+#endif /* GNUTLS_LIB_HELLO_EXT_H */

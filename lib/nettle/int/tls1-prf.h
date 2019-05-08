@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef TLS_PRF_H_INCLUDED
-#define TLS_PRF_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H
+#define GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H
 
 #include <nettle/nettle-meta.h>
 
@@ -47,4 +47,4 @@ tls12_prf(void *mac_ctx,
 	  size_t seed_size, const uint8_t *seed,
 	  size_t length, uint8_t *dst);
 
-#endif /* TLS_PRF_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_INT_TLS1_PRF_H */

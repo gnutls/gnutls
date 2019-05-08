@@ -20,6 +20,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
+#ifndef GNUTLS_TESTS_CERT_COMMON_H
+#define GNUTLS_TESTS_CERT_COMMON_H
+
 #include <gnutls/gnutls.h>
 
 /* This file contains a lot of common parameters used by legacy and new
@@ -1911,3 +1914,5 @@ const gnutls_datum_t rawpk_private_key2 = {
 	(unsigned char*)rawpk_private_key_pem2,
 	sizeof(rawpk_private_key_pem2) - 1
 };
+
+#endif /* GNUTLS_TESTS_CERT_COMMON_H */

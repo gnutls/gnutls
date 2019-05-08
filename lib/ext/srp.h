@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef EXT_SRP_H
-#define EXT_SRP_H
+#ifndef GNUTLS_LIB_EXT_SRP_H
+#define GNUTLS_LIB_EXT_SRP_H
 
 #include <hello_ext.h>
 
@@ -39,4 +39,4 @@ typedef struct {
 
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_EXT_SRP_H */

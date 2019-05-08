@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_CIPHER_H
+#define GNUTLS_LIB_CIPHER_H
+
 int _gnutls_encrypt(gnutls_session_t session,
 		    const uint8_t * data,
 		    size_t data_size, size_t min_pad,
@@ -43,3 +46,5 @@ int cbc_mac_verify(gnutls_session_t session, record_parameters_st *params,
 		   gnutls_uint64 *sequence,
 		   const uint8_t *data, size_t data_size,
 		   size_t tag_size);
+
+#endif /* GNUTLS_LIB_CIPHER_H */

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef PKCS7_INT_H
-#define PKCS7_INT_H
+#ifndef GNUTLS_LIB_X509_PKCS7_INT_H
+#define GNUTLS_LIB_X509_PKCS7_INT_H
 
 #include <gnutls/x509.h>
 
@@ -131,4 +131,4 @@ int
 _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pkcs_cipher_schema_st **p,
 	struct pbkdf2_params *kdf_params, char **oid);
 
-#endif
+#endif /* GNUTLS_LIB_X509_PKCS7_INT_H */

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_PK_H
-#define GNUTLS_PK_H
+#ifndef GNUTLS_LIB_PK_H
+#define GNUTLS_LIB_PK_H
 
 extern int crypto_pk_prio;
 extern gnutls_crypto_pk_st _gnutls_pk_ops;
@@ -129,4 +129,4 @@ int pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
 int _gnutls_find_rsa_pss_salt_size(unsigned bits, const mac_entry_st *me,
 				   unsigned salt_size);
 
-#endif				/* GNUTLS_PK_H */
+#endif /* GNUTLS_LIB_PK_H */

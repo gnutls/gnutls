@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef AUTH_SRP_H
-#define AUTH_SRP_H
+#ifndef GNUTLS_LIB_AUTH_SRP_KX_H
+#define GNUTLS_LIB_AUTH_SRP_KX_H
 
 #include <auth.h>
 
@@ -68,4 +68,4 @@ typedef struct srp_server_auth_info_st srp_server_auth_info_st;
 
 #endif				/* ENABLE_SRP */
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_SRP_KX_H */

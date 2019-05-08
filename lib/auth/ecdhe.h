@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef AUTH_ECDH_COMMON
-#define AUTH_ECDH_COMMON
+#ifndef GNUTLS_LIB_AUTH_ECDHE_H
+#define GNUTLS_LIB_AUTH_ECDHE_H
 
 #include <auth.h>
 
@@ -49,4 +49,4 @@ int _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 
 
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_ECDHE_H */

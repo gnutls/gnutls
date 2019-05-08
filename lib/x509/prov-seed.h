@@ -20,5 +20,10 @@
  *
  */
 
+#ifndef GNUTLS_LIB_X509_PROV_SEED_H
+#define GNUTLS_LIB_X509_PROV_SEED_H
+
 int _x509_encode_provable_seed(gnutls_x509_privkey_t pkey, gnutls_datum_t *der);
 int _x509_decode_provable_seed(gnutls_x509_privkey_t pkey, const gnutls_datum_t *der);
+
+#endif /* GNUTLS_LIB_X509_PROV_SEED_H */

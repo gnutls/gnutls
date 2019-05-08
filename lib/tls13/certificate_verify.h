@@ -20,5 +20,10 @@
  *
  */
 
+#ifndef GNUTLS_LIB_TLS13_CERTIFICATE_VERIFY_H
+#define GNUTLS_LIB_TLS13_CERTIFICATE_VERIFY_H
+
 int _gnutls13_recv_certificate_verify(gnutls_session_t session);
 int _gnutls13_send_certificate_verify(gnutls_session_t session, unsigned again);
+
+#endif /* GNUTLS_LIB_TLS13_CERTIFICATE_VERIFY_H */

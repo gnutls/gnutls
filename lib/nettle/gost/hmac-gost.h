@@ -31,8 +31,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_HMAC_GOST_H_INCLUDED
-#define NETTLE_HMAC_GOST_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H
+#define GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H
 
 #include <nettle/hmac.h>
 
@@ -100,4 +100,4 @@ hmac_streebog256_digest(struct hmac_streebog256_ctx *ctx,
 }
 #endif
 
-#endif /* NETTLE_HMAC_GOST_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_HMAC_GOST_H */

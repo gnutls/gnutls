@@ -20,8 +20,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef P11TOOL_H
-#define P11TOOL_H
+#ifndef GNUTLS_SRC_P11TOOL_H
+#define GNUTLS_SRC_P11TOOL_H
 
 #include "certtool-common.h"
 
@@ -72,4 +72,4 @@ void pkcs11_set_label(FILE * outfile, const char *url, int detailed,
 #define PKCS11_TYPE_PRIVKEY 5
 #define PKCS11_TYPE_INFO 6
 
-#endif
+#endif /* GNUTLS_SRC_P11TOOL_H */

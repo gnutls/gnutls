@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_NUM_H
-#define GNUTLS_NUM_H
+#ifndef GNUTLS_LIB_NUM_H
+#define GNUTLS_LIB_NUM_H
 
 #include "gnutls_int.h"
 
@@ -162,4 +162,4 @@ inline static uint32_t _gnutls_uint64touint32(const gnutls_uint64 * num)
 	return ret;
 }
 
-#endif				/* GNUTLS_NUM_H */
+#endif /* GNUTLS_LIB_NUM_H */

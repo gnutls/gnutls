@@ -20,6 +20,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
+#ifndef GNUTLS_TESTS_COMMON_KEY_TESTS_H
+#define GNUTLS_TESTS_COMMON_KEY_TESTS_H
+
 #include "cert-common.h"
 
 #include <gnutls/abstract.h>
@@ -88,3 +91,5 @@ struct _key_tests_st common_key_tests[] = {
 		.data_only = 1
 	}
 };
+
+#endif /* GNUTLS_TESTS_COMMON_KEY_TESTS_H */

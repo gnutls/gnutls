@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef AUTH_PSK_H
-#define AUTH_PSK_H
+#ifndef GNUTLS_LIB_AUTH_PSK_H
+#define GNUTLS_LIB_AUTH_PSK_H
 
 #include <auth.h>
 #include <auth/dh_common.h>
@@ -79,4 +79,4 @@ int _gnutls_gen_psk_client_kx(gnutls_session_t, gnutls_buffer_st *);
 #define _gnutls_set_psk_session_key(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
 #endif				/* ENABLE_PSK */
 
-#endif
+#endif /* GNUTLS_LIB_AUTH_PSK_H */

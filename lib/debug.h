@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_DEBUG_H
+#define GNUTLS_LIB_DEBUG_H
+
 const char *_gnutls_packet2str(content_type_t packet);
 inline static const char *_gnutls_handshake2str(unsigned x)
 {
@@ -33,3 +36,5 @@ inline static const char *_gnutls_handshake2str(unsigned x)
 void _gnutls_dump_mpi(const char *prefix, bigint_t a);
 void _gnutls_dump_vector(const char *prefix, const uint8_t * a,
 			 size_t a_size);
+
+#endif /* GNUTLS_LIB_DEBUG_H */

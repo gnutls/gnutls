@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_STATE_H
-#define GNUTLS_STATE_H
+#ifndef GNUTLS_LIB_STATE_H
+#define GNUTLS_LIB_STATE_H
 
 #include "gnutls_int.h"
 
@@ -76,8 +76,6 @@ _gnutls_hello_set_default_version(gnutls_session_t session,
 	return ret; \
 	}
 
-#endif
-
 
 int _gnutls_session_cert_type_supported(gnutls_session_t session,
 				    gnutls_certificate_type_t cert_type,
@@ -123,3 +121,5 @@ _gnutls_PRF(gnutls_session_t session,
 }
 
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509
+
+#endif /* GNUTLS_LIB_STATE_H */

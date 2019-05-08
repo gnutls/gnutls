@@ -33,8 +33,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_CMAC_H_INCLUDED
-#define NETTLE_CMAC_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_BACKPORT_CMAC_H
+#define GNUTLS_LIB_NETTLE_BACKPORT_CMAC_H
 
 #include <nettle/nettle-types.h>
 
@@ -136,5 +136,4 @@ cmac_aes256_digest(struct cmac_aes256_ctx *ctx,
 }
 #endif
 
-#endif /* CMAC_H_INCLUDED */
-
+#endif /* GNUTLS_LIB_NETTLE_BACKPORT_CMAC_H */

@@ -1,3 +1,6 @@
+#ifndef GNUTLS_TESTS_X509SIGN_VERIFY_COMMON_H
+#define GNUTLS_TESTS_X509SIGN_VERIFY_COMMON_H
+
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "<%d> %s", level, str);
@@ -223,3 +226,5 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 		gnutls_pubkey_deinit(pubkey);
 	}
 }
+
+#endif /* GNUTLS_TESTS_X509SIGN_VERIFY_COMMON_H */

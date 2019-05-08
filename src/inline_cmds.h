@@ -17,6 +17,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef GNUTLS_SRC_INLINE_CMDS_H
+#define GNUTLS_SRC_INLINE_CMDS_H
+
 /* 
  * The inline commands is a facility that can be used optionally
  * when --inline-commands is set during invocation of gnutls-cli
@@ -73,3 +76,5 @@ struct inline_command_definitions inline_commands_def[] = {
 };
 
 #define NUM_INLINE_COMMANDS ((unsigned)(sizeof(inline_commands_def)/sizeof(inline_commands_def[0])))
+
+#endif /* GNUTLS_SRC_INLINE_CMDS_H */

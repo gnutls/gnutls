@@ -20,5 +20,10 @@
  *
  */
 
+#ifndef GNUTLS_LIB_TLS13_ENCRYPTED_EXTENSIONS_H
+#define GNUTLS_LIB_TLS13_ENCRYPTED_EXTENSIONS_H
+
 int _gnutls13_recv_encrypted_extensions(gnutls_session_t session);
 int _gnutls13_send_encrypted_extensions(gnutls_session_t session, unsigned again);
+
+#endif /* GNUTLS_LIB_TLS13_ENCRYPTED_EXTENSIONS_H */

@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_TLS13_PSK_EXT_PARSER_H
+#define GNUTLS_LIB_TLS13_PSK_EXT_PARSER_H
+
 struct psk_ext_parser_st {
 	const unsigned char *identities_data;
 	ssize_t identities_len;
@@ -51,3 +54,5 @@ int _gnutls13_psk_ext_iter_next_identity(psk_ext_iter_st *iter,
 					 struct psk_st *psk);
 int _gnutls13_psk_ext_iter_next_binder(psk_ext_iter_st *iter,
 				       gnutls_datum_t *binder);
+
+#endif /* GNUTLS_LIB_TLS13_PSK_EXT_PARSER_H */

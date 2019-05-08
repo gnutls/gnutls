@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef GNUTLS_LIB_X509_COMMON_H
+#define GNUTLS_LIB_X509_COMMON_H
 
 #include <algorithms.h>
 #include <abstract_int.h>
@@ -287,4 +287,4 @@ inline static int _asn1_strict_der_decode (asn1_node * element, const void *ider
 	return asn1_der_decoding2(element, ider, &len, _ASN1_DER_FLAGS, errorDescription);
 }
 
-#endif
+#endif /* GNUTLS_LIB_X509_COMMON_H */

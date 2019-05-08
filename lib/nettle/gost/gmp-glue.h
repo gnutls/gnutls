@@ -30,8 +30,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_GMP_GLUE_H_INCLUDED
-#define NETTLE_GMP_GLUE_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_GMP_GLUE_H
+#define GNUTLS_LIB_NETTLE_GOST_GMP_GLUE_H
 
 #include <nettle/bignum.h>
 
@@ -73,4 +73,4 @@ gmp_alloc_limbs (mp_size_t n);
 void
 gmp_free_limbs (mp_limb_t *p, mp_size_t n);
 
-#endif /* NETTLE_GMP_GLUE_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_GMP_GLUE_H */

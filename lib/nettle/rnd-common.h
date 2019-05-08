@@ -21,6 +21,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_NETTLE_RND_COMMON_H
+#define GNUTLS_LIB_NETTLE_RND_COMMON_H
+
 #include "gnutls_int.h"
 #ifdef HAVE_GETPID
 # include <unistd.h>		/* getpid */
@@ -39,3 +42,5 @@ typedef int (*get_entropy_func)(void* rnd, size_t size);
 
 extern get_entropy_func _rnd_get_system_entropy;
 
+
+#endif /* GNUTLS_LIB_NETTLE_RND_COMMON_H */

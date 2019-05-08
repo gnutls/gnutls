@@ -23,6 +23,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_EXT_CERT_TYPES_H
+#define GNUTLS_LIB_EXT_CERT_TYPES_H
+
 /* Maps IANA TLS Certificate Types identifiers to internal
  * certificate type representation.
  */
@@ -81,3 +84,5 @@ static inline bool are_alternative_cert_types_allowed(gnutls_session_t session)
 
 	#undef CERT_TYPES_FLAGS
 }
+
+#endif /* GNUTLS_LIB_EXT_CERT_TYPES_H */

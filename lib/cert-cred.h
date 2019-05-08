@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_CERT_CRED_H
+#define GNUTLS_LIB_CERT_CRED_H
+
 #include <gnutls/abstract.h>
 #include "str_array.h"
 
@@ -51,3 +54,5 @@ _gnutls_get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names);
 	} else { \
 		return 0; \
 	}
+
+#endif /* GNUTLS_LIB_CERT_CRED_H */

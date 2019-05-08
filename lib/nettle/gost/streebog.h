@@ -31,8 +31,8 @@
    not, see https://www.gnu.org/licenses/.
 */
  
-#ifndef NETTLE_STREEBOG_H_INCLUDED
-#define NETTLE_STREEBOG_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_STREEBOG_H
+#define GNUTLS_LIB_NETTLE_GOST_STREEBOG_H
 
 #include <nettle/nettle-types.h>
 #include <nettle/nettle-meta.h>
@@ -102,4 +102,4 @@ extern const struct nettle_hash _gnutls_streebog512;
 }
 #endif
 
-#endif /* NETTLE_STREEBOG_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_STREEBOG_H */

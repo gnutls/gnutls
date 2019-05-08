@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _ABSTRACT_INT_H
-#define _ABSTRACT_INT_H
+#ifndef GNUTLS_LIB_ABSTRACT_INT_H
+#define GNUTLS_LIB_ABSTRACT_INT_H
 
 #include <gnutls/abstract.h>
 
@@ -121,4 +121,4 @@ const mac_entry_st *_gnutls_dsa_q_to_hash(const gnutls_pk_params_st *
 int
 _gnutls_privkey_get_mpis(gnutls_privkey_t key, gnutls_pk_params_st * params);
 
-#endif
+#endif /* GNUTLS_LIB_ABSTRACT_INT_H */

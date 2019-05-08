@@ -19,11 +19,11 @@
  *
  */
 
-#ifndef VIRT_SAN_H
-# define VIRT_SAN_H
+#ifndef GNUTLS_LIB_X509_VIRT_SAN_H
+#define GNUTLS_LIB_X509_VIRT_SAN_H
 
 #include "x509_ext_int.h"
 
 int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutls_datum_t *san, const char *othername_oid, unsigned raw);
 
-#endif
+#endif /* GNUTLS_LIB_X509_VIRT_SAN_H */

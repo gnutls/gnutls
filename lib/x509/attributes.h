@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_X509_ATTRIBUTES_H
+#define GNUTLS_LIB_X509_ATTRIBUTES_H
+
 int
 _x509_parse_attribute(ASN1_TYPE asn1_struct,
 		const char *attr_name, const char *given_oid, unsigned indx,
@@ -28,3 +31,5 @@ _x509_parse_attribute(ASN1_TYPE asn1_struct,
 int
 _x509_set_attribute(ASN1_TYPE asn, const char *root,
 	      const char *ext_id, const gnutls_datum_t * ext_data);
+
+#endif /* GNUTLS_LIB_X509_ATTRIBUTES_H */

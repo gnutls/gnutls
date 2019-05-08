@@ -20,4 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_FILE_H
+#define GNUTLS_LIB_FILE_H
+
 int _gnutls_file_exists(const char *file);
+
+#endif /* GNUTLS_LIB_FILE_H */

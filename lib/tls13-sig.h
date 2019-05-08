@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _TLS13_SIG_H
-# define _TLS13_SIG_H
+#ifndef GNUTLS_LIB_TLS13_SIG_H
+#define GNUTLS_LIB_TLS13_SIG_H
 
 #include "gnutls_int.h"
 
@@ -40,4 +40,4 @@ _gnutls13_handshake_sign_data(gnutls_session_t session,
 			      gnutls_datum_t * signature,
 			      const gnutls_sign_entry_st *se);
 
-#endif
+#endif /* GNUTLS_LIB_TLS13_SIG_H */

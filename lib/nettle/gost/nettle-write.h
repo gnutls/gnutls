@@ -31,8 +31,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_WRITE_H_INCLUDED
-#define NETTLE_WRITE_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_NETTLE_WRITE_H
+#define GNUTLS_LIB_NETTLE_GOST_NETTLE_WRITE_H
 
 /* For size_t */
 #include <stddef.h>
@@ -55,4 +55,4 @@ void
 _nettle_write_le64(size_t length, uint8_t *dst,
 		   const uint64_t *src);
 
-#endif /* NETTLE_WRITE_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_NETTLE_WRITE_H */

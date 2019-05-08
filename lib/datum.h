@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_DATUM_H
-#define GNUTLS_DATUM_H
+#ifndef GNUTLS_LIB_DATUM_H
+#define GNUTLS_LIB_DATUM_H
 
 # include "gnutls_int.h"
 
@@ -74,4 +74,4 @@ void _gnutls_free_key_datum(gnutls_datum_t * dat)
 	dat->size = 0;
 }
 
-#endif
+#endif /* GNUTLS_LIB_DATUM_H */

@@ -20,5 +20,10 @@
  *
  */
 
+#ifndef GNUTLS_LIB_SSLV2_COMPAT_H
+#define GNUTLS_LIB_SSLV2_COMPAT_H
+
 int _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 				 unsigned int datalen);
+
+#endif /* GNUTLS_LIB_SSLV2_COMPAT_H */

@@ -20,4 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_TLS13_HELLO_RETRY_H
+#define GNUTLS_LIB_TLS13_HELLO_RETRY_H
+
 int _gnutls13_send_hello_retry_request(gnutls_session_t session, unsigned again);
+
+#endif /* GNUTLS_LIB_TLS13_HELLO_RETRY_H */

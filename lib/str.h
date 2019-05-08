@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef GNUTLS_STR_H
-#define GNUTLS_STR_H
+#ifndef GNUTLS_LIB_STR_H
+#define GNUTLS_LIB_STR_H
 
 #include <config.h>
 #include "gnutls_int.h"
@@ -315,4 +315,4 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
 	o.tv_nsec = s; \
     }
 
-#endif
+#endif /* GNUTLS_LIB_STR_H */

@@ -19,8 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  */
-#ifndef SESSION_TICKET_H
-#define SESSION_TICKET_H
+
+#ifndef GNUTLS_LIB_TLS13_SESSION_TICKET_H
+#define GNUTLS_LIB_TLS13_SESSION_TICKET_H
 
 int _gnutls13_recv_session_ticket(gnutls_session_t session, gnutls_buffer_st *buf);
 int _gnutls13_send_session_ticket(gnutls_session_t session, unsigned nr, unsigned again);
@@ -48,4 +49,4 @@ void _gnutls13_session_ticket_unset(gnutls_session_t session)
 		tls13_ticket_deinit(&session->internals.tls13_ticket);
 }
 
-#endif
+#endif /* GNUTLS_LIB_TLS13_SESSION_TICKET_H */

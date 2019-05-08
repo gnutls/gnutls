@@ -31,8 +31,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_PBKDF2_GOST_H_INCLUDED
-#define NETTLE_PBKDF2_GOST_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_PBKDF2_GOST_H
+#define GNUTLS_LIB_NETTLE_GOST_PBKDF2_GOST_H
 
 #include <nettle/nettle-meta.h>
 #include <nettle/pbkdf2.h>
@@ -69,4 +69,4 @@ pbkdf2_hmac_streebog512 (size_t key_length, const uint8_t *key,
 }
 #endif
 
-#endif /* NETTLE_PBKDF2_GOST_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_PBKDF2_GOST_H */

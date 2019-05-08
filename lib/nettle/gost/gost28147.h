@@ -32,8 +32,8 @@
    not, see https://www.gnu.org/licenses/.
 */
 
-#ifndef NETTLE_GOST28147_H_INCLUDED
-#define NETTLE_GOST28147_H_INCLUDED
+#ifndef GNUTLS_LIB_NETTLE_GOST_GOST28147_H
+#define GNUTLS_LIB_NETTLE_GOST_GOST28147_H
 
 #include <nettle/nettle-types.h>
 
@@ -115,4 +115,4 @@ gost28147_encrypt_for_cfb(struct gost28147_ctx *ctx,
 }
 #endif
 
-#endif /* NETTLE_GOST28147_H_INCLUDED */
+#endif /* GNUTLS_LIB_NETTLE_GOST_GOST28147_H */

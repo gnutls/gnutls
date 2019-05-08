@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GNUTLS_MBUFFERS_H
-#define GNUTLS_MBUFFERS_H
+#ifndef GNUTLS_LIB_MBUFFERS_H
+#define GNUTLS_LIB_MBUFFERS_H
 
 #include "gnutls_int.h"
 #include "errors.h"
@@ -198,4 +198,4 @@ int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos);
 # define _mbuffer_linearize_align16(x,y) _mbuffer_linearize(x)
 #endif
 
-#endif
+#endif /* GNUTLS_LIB_MBUFFERS_H */

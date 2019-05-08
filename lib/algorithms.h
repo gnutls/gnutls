@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef ALGORITHMS_H
-#define ALGORITHMS_H
+#ifndef GNUTLS_LIB_ALGORITHMS_H
+#define GNUTLS_LIB_ALGORITHMS_H
 
 #include "auth.h"
 
@@ -478,4 +478,4 @@ static inline int _sig_is_ecdsa(gnutls_sign_algorithm_t sig)
 
 bool _gnutls_pk_are_compat(gnutls_pk_algorithm_t pk1, gnutls_pk_algorithm_t pk2);
 
-#endif
+#endif /* GNUTLS_LIB_ALGORITHMS_H */
