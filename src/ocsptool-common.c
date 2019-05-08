@@ -335,6 +335,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	int ret;
 	unsigned int status, cert_status;
 	time_t rtime, vtime, ntime, now;
+	char timebuf1[SIMPLE_CTIME_BUF_SIZE];
+	char timebuf2[SIMPLE_CTIME_BUF_SIZE];
 
 	now = time(0);
 
@@ -395,7 +397,7 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	}
 
 	if (cert_status == GNUTLS_OCSP_CERT_REVOKED) {
-		printf("*** Certificate was revoked at %s", ctime(&rtime));
+		printf("*** Certificate was revoked at %s\n", simple_ctime(&rtime, timebuf1));
 		ret = 0;
 		goto cleanup;
 	}
@@ -403,17 +405,16 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	if (ntime == -1) {
 		if (now - vtime > OCSP_VALIDITY_SECS) {
 			printf
-			    ("*** The OCSP response is old (was issued at: %s) ignoring",
-			     ctime(&vtime));
+			    ("*** The OCSP response is old (was issued at: %s) ignoring\n",
+			     simple_ctime(&vtime, timebuf1));
 			ret = -1;
 			goto cleanup;
 		}
 	} else {
 		/* there is a newer OCSP answer, don't trust this one */
 		if (ntime < now) {
-			printf
-			    ("*** The OCSP response was issued at: %s, but there is a newer issue at %s",
-			     ctime(&vtime), ctime(&ntime));
+			printf("*** The OCSP response was issued at: %s but there is a newer issue at %s\n",
+				simple_ctime(&vtime, timebuf1), simple_ctime(&ntime, timebuf2));
 			ret = -1;
 			goto cleanup;
 		}
@@ -445,8 +446,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 	}
 
  finish_ok:
-	printf("- OCSP server flags certificate not revoked as of %s",
-	       ctime(&vtime));
+	printf("- OCSP server flags certificate not revoked as of %s\n",
+	       simple_ctime(&vtime, timebuf1));
 	ret = 1;
  cleanup:
 	gnutls_ocsp_resp_deinit(resp);

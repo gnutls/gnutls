@@ -144,4 +144,7 @@ void set_read_funcs(gnutls_session_t session)
 # define set_read_funcs(x)
 #endif
 
+#define SIMPLE_CTIME_BUF_SIZE 64
+char *simple_ctime(const time_t *t, char buf[SIMPLE_CTIME_BUF_SIZE]);
+
 #endif /* GNUTLS_SRC_COMMON_H */

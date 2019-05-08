@@ -325,6 +325,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	unsigned int usage = 0, server, ask;
 	gnutls_x509_crq_t crq;	/* request */
 	unsigned pk;
+	char timebuf[SIMPLE_CTIME_BUF_SIZE];
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0) {
@@ -439,8 +440,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 		if (ca_crt && (secs > gnutls_x509_crt_get_expiration_time(ca_crt))) {
 			time_t exp = gnutls_x509_crt_get_expiration_time(ca_crt);
-			fprintf(stderr, "\nExpiration time: %s", ctime(&secs));
-			fprintf(stderr, "CA expiration time: %s", ctime(&exp));
+			fprintf(stderr, "\nExpiration time: %s\n", simple_ctime(&secs, timebuf));
+			fprintf(stderr, "CA expiration time: %s\n", simple_ctime(&exp, timebuf));
 			fprintf(stderr, "Warning: The time set exceeds the CA's expiration time\n");
 			ask = 1;
 		}
@@ -2652,12 +2653,13 @@ static void print_pkcs7_sig_info(gnutls_pkcs7_signature_info_st *info, common_in
 	gnutls_datum_t data;
 	char prefix[128];
 	int ret;
+	char timebuf[SIMPLE_CTIME_BUF_SIZE];
 
 	print_dn("\tSigner's issuer DN", &info->issuer_dn);
 	print_raw("\tSigner's serial", &info->signer_serial);
 	print_raw("\tSigner's issuer key ID", &info->issuer_keyid);
 	if (info->signing_time != -1)
-		fprintf(outfile, "\tSigning time: %s", ctime(&info->signing_time));
+		fprintf(outfile, "\tSigning time: %s\n", simple_ctime(&info->signing_time, timebuf));
 
 	fprintf(outfile, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info->algo));
 
