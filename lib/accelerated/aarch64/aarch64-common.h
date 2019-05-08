@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef GNUTLS_LIB_ACCELERATED_AARCH64_AARCH64_COMMON_H
+# define GNUTLS_LIB_ACCELERATED_AARCH64_AARCH64_COMMON_H
+
 #if !__ASSEMBLER__
 #define NN_HASH(name, update_func, digest_func, NAME) {	\
  #name,						\
@@ -41,3 +44,5 @@ void register_aarch64_crypto(void);
 #define ARMV8_SHA256    (1<<4)
 #define ARMV8_PMULL     (1<<5)
 #define ARMV8_SHA512    (1<<6)
+
+#endif /* GNUTLS_LIB_ACCELERATED_AARCH64_AARCH64_COMMON_H */
