@@ -831,13 +831,13 @@ AC_ARG_ENABLE(guile,
 		[opt_guile_bindings=$enableval], [opt_guile_bindings=yes])
 AC_MSG_RESULT($opt_guile_bindings)
 
-AC_ARG_WITH(guile-site-dir, AS_HELP_STRING([--with-guile-site-dir=DIR],
+AC_ARG_WITH([guile-site-dir], AS_HELP_STRING([--with-guile-site-dir=DIR],
     [guile site directory for gnutls, default is guile system settings]),
     [guilesitedir="${withval}"], [guilesitedir='$(GUILE_SITE)'])
-AC_ARG_WITH(guile-site-ccache-dir, AS_HELP_STRING([--with-guile-site-ccache-dir=DIR],
+AC_ARG_WITH([guile-site-ccache-dir], AS_HELP_STRING([--with-guile-site-ccache-dir=DIR],
     [guile ccache directory for gnutls, default is guile system settings]),
     [guilesiteccachedir="${withval}"], [guilesiteccachedir='$(GUILE_SITE_CCACHE)'])
-AC_ARG_WITH(guile-extension-dir, AS_HELP_STRING([--with-guile-extension-dir=DIR],
+AC_ARG_WITH([guile-extension-dir], AS_HELP_STRING([--with-guile-extension-dir=DIR],
     [guile extension directory for gnutls, default is guile system settings]),
     [guileextensiondir="${withval}"], [guileextensiondir='$(GUILE_EXTENSION)'])
 AC_SUBST([guilesitedir])
