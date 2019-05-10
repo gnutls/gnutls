@@ -11,6 +11,9 @@ See the end for copying conditions.
 
 ** libgnutls: Added new function to retrieve early keying material (#329)
 
+** libgnutls: the gnutls_srp_set_server_credentials_function can be used
+   with the 8192 parameters as well (#995).
+
 ** API and ABI modifications:
 gnutls_prf_early: Added
 

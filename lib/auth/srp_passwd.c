@@ -447,20 +447,24 @@ void _gnutls_srp_entry_free(SRP_PWD_ENTRY * entry)
 	_gnutls_free_key_datum(&entry->v);
 	_gnutls_free_datum(&entry->salt);
 
-	if ((entry->g.data != gnutls_srp_1024_group_generator.data)
-	    && (entry->g.data != gnutls_srp_3072_group_generator.data))
+	if ((entry->g.data != gnutls_srp_1024_group_generator.data) &&
+	    (entry->g.data != gnutls_srp_1536_group_generator.data) &&
+	    (entry->g.data != gnutls_srp_2048_group_generator.data) &&
+	    (entry->g.data != gnutls_srp_3072_group_generator.data) &&
+	    (entry->g.data != gnutls_srp_4096_group_generator.data) &&
+	    (entry->g.data != gnutls_srp_8192_group_generator.data))
 		_gnutls_free_datum(&entry->g);
 
 	if (entry->n.data != gnutls_srp_1024_group_prime.data &&
 	    entry->n.data != gnutls_srp_1536_group_prime.data &&
 	    entry->n.data != gnutls_srp_2048_group_prime.data &&
 	    entry->n.data != gnutls_srp_3072_group_prime.data &&
-	    entry->n.data != gnutls_srp_4096_group_prime.data)
+	    entry->n.data != gnutls_srp_4096_group_prime.data &&
+	    entry->n.data != gnutls_srp_8192_group_prime.data)
 		_gnutls_free_datum(&entry->n);
 
 	gnutls_free(entry->username);
 	gnutls_free(entry);
 }
-
 
 #endif				/* ENABLE SRP */
