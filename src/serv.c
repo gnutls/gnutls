@@ -1451,6 +1451,7 @@ static void tcp_server(const char *name, int port)
 				if (accept_fd < 0) {
 					perror("accept()");
 				} else {
+					char timebuf[SIMPLE_CTIME_BUF_SIZE];
 					time_t tt = time(0);
 					char *ctt;
 
@@ -1472,7 +1473,7 @@ static void tcp_server(const char *name, int port)
 					j->close_ok = 0;
 
 					if (verbose != 0) {
-						ctt = ctime(&tt);
+						ctt = simple_ctime(&tt, timebuf);
 						ctt[strlen(ctt) - 1] = 0;
 
 						printf

@@ -281,6 +281,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		unsigned int oflags;
 		const char *vendor;
 		char *objurl;
+		char timebuf[SIMPLE_CTIME_BUF_SIZE];
 
 		ret =
 		    gnutls_pkcs11_obj_export_url(crt_list[i], detailed,
@@ -326,7 +327,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		}
 
 		if (otype == GNUTLS_PKCS11_OBJ_X509_CRT && exp != -1) {
-			fprintf(outfile, "\tExpires: %s", ctime(&exp));
+			fprintf(outfile, "\tExpires: %s\n", simple_ctime(&exp, timebuf));
 		}
 
 		gnutls_free(output);
