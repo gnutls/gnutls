@@ -19,6 +19,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_prf_early: Added
+gnutls_record_set_max_recv_size: Added
 
 
 * Version 3.6.7 (released 2019-03-27)

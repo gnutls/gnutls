@@ -779,11 +779,17 @@ typedef struct {
 	/* whether client has agreed in post handshake auth - only set on server side */
 	uint8_t post_handshake_auth;
 
-	/* The send size is the one requested by the programmer.
-	 * The recv size is the one negotiated with the peer.
+	/* The maximum amount of plaintext sent in a record,
+	 * negotiated with the peer.
 	 */
 	uint16_t max_record_send_size;
 	uint16_t max_record_recv_size;
+
+	/* The maximum amount of plaintext sent in a record, set by
+	 * the programmer.
+	 */
+	uint16_t max_user_record_send_size;
+	uint16_t max_user_record_recv_size;
 
 	/* The maximum amount of early data */
 	uint32_t max_early_data_size;
@@ -1551,17 +1557,17 @@ inline static int _gnutls_set_current_version(gnutls_session_t s, unsigned v)
 	return 0;
 }
 
-/* Returns the maximum size of the plaintext to be sent, considering
+/* Returns the maximum amount of the plaintext to be sent, considering
  * both user-specified/negotiated maximum values.
  */
-inline static size_t max_user_send_size(gnutls_session_t session,
-					record_parameters_st *
-					record_params)
+inline static size_t max_record_send_size(gnutls_session_t session,
+					  record_parameters_st *
+					  record_params)
 {
 	size_t max;
 
 	max = MIN(session->security_parameters.max_record_send_size,
-		  session->security_parameters.max_record_recv_size);
+		  session->security_parameters.max_user_record_send_size);
 
 	if (IS_DTLS(session))
 		max = MIN(gnutls_dtls_get_data_mtu(session), max);

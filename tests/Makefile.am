@@ -208,7 +208,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 dss-sig-val sign-pk-api tls-session-ext-override record-pad \
 	 tls13-server-kx-neg gnutls_ext_raw_parse_dtls key-export-pkcs8 \
 	 null_retrieve_function tls-record-size-limit tls-crt_type-neg \
-	 resume-with-stek-expiration resume-with-previous-stek rawpk-api
+	 resume-with-stek-expiration resume-with-previous-stek rawpk-api \
+	 tls-record-size-limit-asym
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp

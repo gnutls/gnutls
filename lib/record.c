@@ -467,7 +467,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 			return GNUTLS_E_INVALID_SESSION;
 		}
 
-	max_send_size = max_user_send_size(session, record_params);
+	max_send_size = max_record_send_size(session, record_params);
 
 	if (data_size > max_send_size) {
 		if (IS_DTLS(session))

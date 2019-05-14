@@ -765,6 +765,7 @@ tests/tls-max-record
 tests/tls-neg-ext-key
 tests/tls-neg-ext4-key
 tests/tls-record-size-limit
+tests/tls-record-size-limit-asym
 tests/tls-rehandshake-anon
 tests/tls-rehandshake-cert
 tests/tls-rehandshake-cert-2

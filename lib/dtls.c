@@ -65,8 +65,8 @@ transmit_message(gnutls_session_t session,
 	unsigned int mtu =
 	    gnutls_dtls_get_data_mtu(session);
 
-	if (session->security_parameters.max_record_recv_size < mtu)
-		mtu = session->security_parameters.max_record_recv_size;
+	if (session->security_parameters.max_record_send_size < mtu)
+		mtu = session->security_parameters.max_record_send_size;
 
 	mtu -= DTLS_HANDSHAKE_HEADER_SIZE;
 
