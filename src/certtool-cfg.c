@@ -65,6 +65,12 @@ extern int ask_pass;
 #define MAX_ENTRIES 128
 #define MAX_POLICIES 8
 
+#define CHECK_MALLOC(x) \
+	if (x == NULL) { \
+		fprintf(stderr, "memory error\n"); \
+		exit(1); \
+	}
+
 #define PRINT_TIME_T_ERROR \
 	if (sizeof(time_t) < 8) \
 		fprintf(stderr, "This system expresses time with a 32-bit time_t; that prevents dates after 2038 to be expressed by GnuTLS.\n")
@@ -245,6 +251,7 @@ void cfg_init(void)
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
+      CHECK_MALLOC(s_name); \
       do { \
 	if (val && strcmp(val->pzName, name)!=0) \
 	  continue; \
@@ -266,10 +273,12 @@ void cfg_init(void)
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
+      CHECK_MALLOC(s_name); \
       do { \
 	if (val && strcmp(val->pzName, name)!=0) \
 	  continue; \
 	str = strdup(val->v.strVal); \
+	CHECK_MALLOC(str); \
 	if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
 	  fprintf(stderr, "Error parsing %s\n", name); \
 	  exit(1); \
