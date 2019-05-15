@@ -178,6 +178,8 @@ tlssession_new (int isserver,
 {
   int ret;
   tlssession_t *s = calloc (1, sizeof (tlssession_t));
+  if (!s)
+    return NULL;
 
   if (quitfn)
     s->quitfn = quitfn;

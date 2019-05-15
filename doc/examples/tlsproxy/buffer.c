@@ -80,6 +80,8 @@ buffer_t *
 bufNew (ssize_t size, ssize_t hwm)
 {
   buffer_t *b = calloc (1, sizeof (buffer_t));
+  if (!b) return NULL;
+
   b->buf = calloc (1, size);
   b->size = size;
   b->hwm = hwm;
