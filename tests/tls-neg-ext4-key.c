@@ -451,7 +451,7 @@ static const test_st tests[] = {
 	 .key = &server_ca3_rsa_pss_key,
 	 .sig = GNUTLS_SIGN_RSA_SHA256,
 	 .exp_kx = GNUTLS_KX_ECDHE_RSA,
-	 .exp_serv_err = GNUTLS_E_INSUFFICIENT_SECURITY
+	 .exp_serv_err = GNUTLS_E_NO_CIPHER_SUITES
 	},
 	{.name = "tls1.3 rsa-pss cert, rsa-sign key, downgrade to tls1.2", /* we expect the server to downgrade to TLS 1.2 and refuse negotiating */
 	 .pk = GNUTLS_PK_RSA,
