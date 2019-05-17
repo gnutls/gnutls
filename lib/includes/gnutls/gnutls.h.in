@@ -2241,6 +2241,10 @@ int gnutls_dh_params_import_raw2(gnutls_dh_params_t dh_params,
 				 const gnutls_datum_t * prime,
 				 const gnutls_datum_t * generator,
 				 unsigned key_bits);
+int gnutls_dh_params_import_raw3(gnutls_dh_params_t dh_params,
+				 const gnutls_datum_t * prime,
+				 const gnutls_datum_t * q,
+				 const gnutls_datum_t * generator);
 int gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 				  const gnutls_datum_t * pkcs3_params,
 				  gnutls_x509_crt_fmt_t format);
@@ -2413,22 +2417,27 @@ extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1024_group_generator;
  */
 
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_q;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_8192_group_generator;
 extern _SYM_EXPORT const unsigned int gnutls_ffdhe_8192_key_bits;
 
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_6144_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_6144_group_q;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_6144_group_generator;
 extern _SYM_EXPORT const unsigned int gnutls_ffdhe_6144_key_bits;
 
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_4096_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_4096_group_q;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_4096_group_generator;
 extern _SYM_EXPORT const unsigned int gnutls_ffdhe_4096_key_bits;
 
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_3072_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_3072_group_q;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_3072_group_generator;
 extern _SYM_EXPORT const unsigned int gnutls_ffdhe_3072_key_bits;
 
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_2048_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_2048_group_q;
 extern _SYM_EXPORT const gnutls_datum_t gnutls_ffdhe_2048_group_generator;
 extern _SYM_EXPORT const unsigned int gnutls_ffdhe_2048_key_bits;
 

@@ -41,8 +41,8 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 			   const gnutls_datum_t *pub_key,
 			   const gnutls_datum_t *peer_key, gnutls_datum_t *Z);
 
-static void params(gnutls_dh_params_t *dh_params, unsigned int key_bits,
-		   const gnutls_datum_t *p, const gnutls_datum_t *g)
+static void params(gnutls_dh_params_t *dh_params, const gnutls_datum_t *p,
+		   const gnutls_datum_t *q, const gnutls_datum_t *g)
 {
 	int ret;
 
@@ -50,7 +50,7 @@ static void params(gnutls_dh_params_t *dh_params, unsigned int key_bits,
 	if (ret != 0)
 		fail("error\n");
 
-	ret = gnutls_dh_params_import_raw2(*dh_params, p, g, key_bits);
+	ret = gnutls_dh_params_import_raw3(*dh_params, p, q, g);
 	if (ret != 0)
 		fail("error\n");
 }
@@ -65,32 +65,33 @@ static void genkey(gnutls_dh_params_t *dh_params,
 		fail("error\n");
 }
 
-static void compute_key(gnutls_dh_params_t *dh_params,
+static void compute_key(const char *name, gnutls_dh_params_t *dh_params,
 			gnutls_datum_t *priv_key, gnutls_datum_t *pub_key,
 			const gnutls_datum_t *peer_key, int expect_error,
 			gnutls_datum_t *result, bool expect_success)
 {
-	gnutls_datum_t Z;
+	gnutls_datum_t Z = { 0 };
 	bool success;
 	int ret;
 
 	ret = _gnutls_dh_compute_key(*dh_params, priv_key, pub_key,
 				     peer_key, &Z);
 	if (expect_error != ret)
-		fail("error (%d)\n", ret);
+		fail("%s: error %d (expected %d)\n", name, ret, expect_error);
 
 	if (result) {
 		success = (Z.size != result->size &&
 			   memcmp(Z.data, result->data, Z.size));
 		if (success != expect_success)
-			fail("error\n");
+			fail("%s: failed to match result\n", name);
 	}
 	gnutls_free(Z.data);
 }
 
 struct dh_test_data {
-	const unsigned int key_size;
+	const char *name;
 	const gnutls_datum_t prime;
+	const gnutls_datum_t q;
 	const gnutls_datum_t generator;
 	const gnutls_datum_t peer_key;
 	int expected_error;
@@ -100,45 +101,60 @@ void doit(void)
 {
 	struct dh_test_data test_data[] = {
 		{
-                        /* y == 0 */
-			gnutls_ffdhe_2048_key_bits,
+			"[y == 0]",
 			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
 			gnutls_ffdhe_2048_group_generator,
 			{ (void *)"\x00", 1 },
 			GNUTLS_E_MPI_SCAN_FAILED
 		},
 		{
-                        /* y < 2 */
-			gnutls_ffdhe_2048_key_bits,
+			"[y < 2]",
 			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
 			gnutls_ffdhe_2048_group_generator,
 			{ (void *)"\x01", 1 },
 			GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER
 		},
 		{
-                        /* y > p - 2 */
-			gnutls_ffdhe_2048_key_bits,
+			"[y > p - 2]",
 			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
 			gnutls_ffdhe_2048_group_generator,
 			gnutls_ffdhe_2048_group_prime,
 			GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER
 		},
-		{ 0 }
+		{
+			"[y ^ q mod p == 1]",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			gnutls_ffdhe_2048_group_q,
+			GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER
+		},
+		{
+			"Legal Input",
+			gnutls_ffdhe_2048_group_prime,
+			gnutls_ffdhe_2048_group_q,
+			gnutls_ffdhe_2048_group_generator,
+			{ (void *)"\x02", 1 },
+			0
+		},
+		{ NULL }
 	};
 
-	for (int i = 0; test_data[i].key_size != 0; i++) {
+	for (int i = 0; test_data[i].name != NULL; i++) {
 		gnutls_datum_t priv_key, pub_key;
 		gnutls_dh_params_t dh_params;
 
-		params(&dh_params, test_data[i].key_size,
-		       &test_data[i].prime, &test_data[i].generator);
+		params(&dh_params, &test_data[i].prime, &test_data[i].q,
+		       &test_data[i].generator);
 
 		genkey(&dh_params, &priv_key, &pub_key);
 
-		compute_key(&dh_params, &priv_key, &pub_key,
-			    &test_data[i].peer_key,
-			    test_data[i].expected_error,
-			    NULL, 0);
+		compute_key(test_data[i].name, &dh_params, &priv_key,
+			    &pub_key, &test_data[i].peer_key,
+			    test_data[i].expected_error, NULL, 0);
 
 		gnutls_dh_params_deinit(dh_params);
 		gnutls_free(priv_key.data);

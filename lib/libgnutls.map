@@ -1278,6 +1278,12 @@ GNUTLS_3_6_8
  global:
 	gnutls_prf_early;
 	gnutls_record_set_max_recv_size;
+	gnutls_dh_params_import_raw3;
+	gnutls_ffdhe_2048_group_q;
+	gnutls_ffdhe_3072_group_q;
+	gnutls_ffdhe_4096_group_q;
+	gnutls_ffdhe_6144_group_q;
+	gnutls_ffdhe_8192_group_q;
 } GNUTLS_3_6_6;
 
 GNUTLS_FIPS140_3_4 {

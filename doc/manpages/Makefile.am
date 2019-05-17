@@ -277,6 +277,7 @@ APIMANS += gnutls_dh_params_import_dsa.3
 APIMANS += gnutls_dh_params_import_pkcs3.3
 APIMANS += gnutls_dh_params_import_raw.3
 APIMANS += gnutls_dh_params_import_raw2.3
+APIMANS += gnutls_dh_params_import_raw3.3
 APIMANS += gnutls_dh_params_init.3
 APIMANS += gnutls_dh_set_prime_bits.3
 APIMANS += gnutls_digest_get_id.3

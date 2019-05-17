@@ -1007,9 +1007,9 @@ struct gnutls_priority_st {
 /* DH and RSA parameters types.
  */
 typedef struct gnutls_dh_params_int {
-	/* [0] is the prime, [1] is the generator.
+	/* [0] is the prime, [1] is the generator, [2] is Q if available.
 	 */
-	bigint_t params[2];
+	bigint_t params[3];
 	int q_bits;		/* length of q in bits. If zero then length is unknown.
 				 */
 } dh_params_st;

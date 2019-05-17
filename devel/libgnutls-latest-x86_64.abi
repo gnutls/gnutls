@@ -222,6 +222,7 @@
     <elf-symbol name='gnutls_dh_params_import_dsa' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_dh_params_import_pkcs3' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_dh_params_import_raw2' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_dh_params_import_raw3' version='GNUTLS_3_6_8' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_dh_params_import_raw' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_dh_params_init' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_dh_set_prime_bits' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
@@ -1245,18 +1246,23 @@
     <elf-symbol name='gnutls_calloc' size='8' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_2048_group_generator' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_2048_group_prime' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_ffdhe_2048_group_q' size='16' version='GNUTLS_3_6_8' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_2048_key_bits' size='4' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_3072_group_generator' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_3072_group_prime' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_ffdhe_3072_group_q' size='16' version='GNUTLS_3_6_8' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_3072_key_bits' size='4' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_4096_group_generator' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_4096_group_prime' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_ffdhe_4096_group_q' size='16' version='GNUTLS_3_6_8' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_4096_key_bits' size='4' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_6144_group_generator' size='16' version='GNUTLS_3_6_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_6144_group_prime' size='16' version='GNUTLS_3_6_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_ffdhe_6144_group_q' size='16' version='GNUTLS_3_6_8' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_6144_key_bits' size='4' version='GNUTLS_3_6_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_8192_group_generator' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_8192_group_prime' size='16' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_ffdhe_8192_group_q' size='16' version='GNUTLS_3_6_8' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_ffdhe_8192_key_bits' size='4' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_free' size='8' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_malloc' size='8' version='GNUTLS_3_4' is-default-version='yes' type='object-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
@@ -5358,6 +5364,13 @@
       <parameter type-id='type-id-57' name='prime'/>
       <parameter type-id='type-id-57' name='generator'/>
       <parameter type-id='type-id-10' name='key_bits'/>
+      <return type-id='type-id-22'/>
+    </function-decl>
+    <function-decl name='gnutls_dh_params_import_raw3' mangled-name='gnutls_dh_params_import_raw3' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_dh_params_import_raw3@@GNUTLS_3_6_8'>
+      <parameter type-id='type-id-417' name='dh_params'/>
+      <parameter type-id='type-id-57' name='prime'/>
+      <parameter type-id='type-id-57' name='q'/>
+      <parameter type-id='type-id-57' name='generator'/>
       <return type-id='type-id-22'/>
     </function-decl>
     <function-decl name='gnutls_dh_params_import_dsa' mangled-name='gnutls_dh_params_import_dsa' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_dh_params_import_dsa@@GNUTLS_3_4'>
@@ -10835,19 +10848,24 @@
   </abi-instr>
   <abi-instr version='1.0' address-size='64' path='dh-primes.c' comp-dir-path='/home/nmavrogi/cvs/gnutls-nmav/lib' language='LANG_C99'>
     <var-decl name='gnutls_ffdhe_2048_group_prime' type-id='type-id-65' mangled-name='gnutls_ffdhe_2048_group_prime' visibility='default' elf-symbol-id='gnutls_ffdhe_2048_group_prime@@GNUTLS_3_4'/>
+    <var-decl name='gnutls_ffdhe_2048_group_q' type-id='type-id-65' mangled-name='gnutls_ffdhe_2048_group_q' visibility='default' elf-symbol-id='gnutls_ffdhe_2048_group_q@@GNUTLS_3_6_8'/>
     <var-decl name='gnutls_ffdhe_2048_group_generator' type-id='type-id-65' mangled-name='gnutls_ffdhe_2048_group_generator' visibility='default' elf-symbol-id='gnutls_ffdhe_2048_group_generator@@GNUTLS_3_4'/>
     <var-decl name='gnutls_ffdhe_2048_key_bits' type-id='type-id-66' mangled-name='gnutls_ffdhe_2048_key_bits' visibility='default' elf-symbol-id='gnutls_ffdhe_2048_key_bits@@GNUTLS_3_4'/>
     <var-decl name='gnutls_ffdhe_3072_group_generator' type-id='type-id-65' mangled-name='gnutls_ffdhe_3072_group_generator' visibility='default' elf-symbol-id='gnutls_ffdhe_3072_group_generator@@GNUTLS_3_4'/>
     <var-decl name='gnutls_ffdhe_3072_group_prime' type-id='type-id-65' mangled-name='gnutls_ffdhe_3072_group_prime' visibility='default' elf-symbol-id='gnutls_ffdhe_3072_group_prime@@GNUTLS_3_4'/>
+    <var-decl name='gnutls_ffdhe_3072_group_q' type-id='type-id-65' mangled-name='gnutls_ffdhe_3072_group_q' visibility='default' elf-symbol-id='gnutls_ffdhe_3072_group_q@@GNUTLS_3_6_8'/>
     <var-decl name='gnutls_ffdhe_3072_key_bits' type-id='type-id-66' mangled-name='gnutls_ffdhe_3072_key_bits' visibility='default' elf-symbol-id='gnutls_ffdhe_3072_key_bits@@GNUTLS_3_4'/>
     <var-decl name='gnutls_ffdhe_4096_group_generator' type-id='type-id-65' mangled-name='gnutls_ffdhe_4096_group_generator' visibility='default' elf-symbol-id='gnutls_ffdhe_4096_group_generator@@GNUTLS_3_4'/>
     <var-decl name='gnutls_ffdhe_4096_group_prime' type-id='type-id-65' mangled-name='gnutls_ffdhe_4096_group_prime' visibility='default' elf-symbol-id='gnutls_ffdhe_4096_group_prime@@GNUTLS_3_4'/>
+    <var-decl name='gnutls_ffdhe_4096_group_q' type-id='type-id-65' mangled-name='gnutls_ffdhe_4096_group_q' visibility='default' elf-symbol-id='gnutls_ffdhe_4096_group_q@@GNUTLS_3_6_8'/>
     <var-decl name='gnutls_ffdhe_4096_key_bits' type-id='type-id-66' mangled-name='gnutls_ffdhe_4096_key_bits' visibility='default' elf-symbol-id='gnutls_ffdhe_4096_key_bits@@GNUTLS_3_4'/>
     <var-decl name='gnutls_ffdhe_6144_group_prime' type-id='type-id-65' mangled-name='gnutls_ffdhe_6144_group_prime' visibility='default' elf-symbol-id='gnutls_ffdhe_6144_group_prime@@GNUTLS_3_6_4'/>
+    <var-decl name='gnutls_ffdhe_6144_group_q' type-id='type-id-65' mangled-name='gnutls_ffdhe_6144_group_q' visibility='default' elf-symbol-id='gnutls_ffdhe_6144_group_q@@GNUTLS_3_6_8'/>
     <var-decl name='gnutls_ffdhe_6144_group_generator' type-id='type-id-65' mangled-name='gnutls_ffdhe_6144_group_generator' visibility='default' elf-symbol-id='gnutls_ffdhe_6144_group_generator@@GNUTLS_3_6_4'/>
     <var-decl name='gnutls_ffdhe_6144_key_bits' type-id='type-id-66' mangled-name='gnutls_ffdhe_6144_key_bits' visibility='default' elf-symbol-id='gnutls_ffdhe_6144_key_bits@@GNUTLS_3_6_4'/>
     <var-decl name='gnutls_ffdhe_8192_group_generator' type-id='type-id-65' mangled-name='gnutls_ffdhe_8192_group_generator' visibility='default' elf-symbol-id='gnutls_ffdhe_8192_group_generator@@GNUTLS_3_4'/>
     <var-decl name='gnutls_ffdhe_8192_group_prime' type-id='type-id-65' mangled-name='gnutls_ffdhe_8192_group_prime' visibility='default' elf-symbol-id='gnutls_ffdhe_8192_group_prime@@GNUTLS_3_4'/>
+    <var-decl name='gnutls_ffdhe_8192_group_q' type-id='type-id-65' mangled-name='gnutls_ffdhe_8192_group_q' visibility='default' elf-symbol-id='gnutls_ffdhe_8192_group_q@@GNUTLS_3_6_8'/>
     <var-decl name='gnutls_ffdhe_8192_key_bits' type-id='type-id-66' mangled-name='gnutls_ffdhe_8192_key_bits' visibility='default' elf-symbol-id='gnutls_ffdhe_8192_key_bits@@GNUTLS_3_4'/>
   </abi-instr>
   <abi-instr version='1.0' address-size='64' path='openpgp_compat.c' comp-dir-path='/home/nmavrogi/cvs/gnutls-nmav/lib' language='LANG_C99'>

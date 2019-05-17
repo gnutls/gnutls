@@ -1550,6 +1550,8 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 
 	priv.params[DH_P] = _gnutls_mpi_copy(dh_params->params[0]);
 	priv.params[DH_G] = _gnutls_mpi_copy(dh_params->params[1]);
+	if (dh_params->params[2])
+		priv.params[DH_Q] = _gnutls_mpi_copy(dh_params->params[2]);
 
 	if (_gnutls_mpi_init_scan_nz
 		    (&priv.params[DH_X], priv_key->data,
@@ -1559,7 +1561,7 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 		goto cleanup;
 	}
 
-	priv.params_nr = 3; /* include empty q */
+	priv.params_nr = 3; /* include, possibly empty, q */
 	priv.algo = GNUTLS_PK_DH;
 
 	Z->data = NULL;

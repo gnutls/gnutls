@@ -224,25 +224,14 @@ int
 gnutls_dh_params_import_dsa(gnutls_dh_params_t dh_params, gnutls_x509_privkey_t key)
 {
 	gnutls_datum_t p, g, q;
-	bigint_t tmp_q;
 	int ret;
 
 	ret = gnutls_x509_privkey_export_dsa_raw(key, &p, &q, &g, NULL, NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_mpi_init_scan_nz(&tmp_q, q.data, q.size);
-	if (ret < 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
-	}
+	ret = gnutls_dh_params_import_raw3(dh_params, &p, &q, &g);
 
-	ret = gnutls_dh_params_import_raw2(dh_params, &p, &g, _gnutls_mpi_get_nbits(tmp_q));
-
-	_gnutls_mpi_release(&tmp_q);
-
- cleanup:
 	gnutls_free(p.data);
 	gnutls_free(g.data);
 	gnutls_free(q.data);
@@ -296,6 +285,64 @@ gnutls_dh_params_import_raw2(gnutls_dh_params_t dh_params,
 }
 
 /**
+ * gnutls_dh_params_import_raw3:
+ * @dh_params: The parameters
+ * @prime: holds the new prime
+ * @q: holds the subgroup if available, otherwise NULL
+ * @generator: holds the new generator
+ *
+ * This function will replace the pair of prime and generator for use
+ * in the Diffie-Hellman key exchange.  The new parameters should be
+ * stored in the appropriate gnutls_datum.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int
+gnutls_dh_params_import_raw3(gnutls_dh_params_t dh_params,
+			     const gnutls_datum_t * prime,
+			     const gnutls_datum_t * q,
+			     const gnutls_datum_t * generator)
+{
+	bigint_t tmp_p, tmp_g, tmp_q = NULL;
+
+	if (_gnutls_mpi_init_scan_nz(&tmp_p, prime->data, prime->size)) {
+		gnutls_assert();
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	if (_gnutls_mpi_init_scan_nz(&tmp_g, generator->data,
+				     generator->size)) {
+		_gnutls_mpi_release(&tmp_p);
+		gnutls_assert();
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	if (q) {
+		if (_gnutls_mpi_init_scan_nz(&tmp_q, q->data, q->size)) {
+			_gnutls_mpi_release(&tmp_p);
+			_gnutls_mpi_release(&tmp_g);
+			gnutls_assert();
+			return GNUTLS_E_MPI_SCAN_FAILED;
+		}
+	} else if (_gnutls_fips_mode_enabled()) {
+		/* Mandatory in FIPS mode */
+		gnutls_assert();
+		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
+	}
+
+	/* store the generated values
+	 */
+	dh_params->params[0] = tmp_p;
+	dh_params->params[1] = tmp_g;
+	dh_params->params[2] = tmp_q;
+	if (tmp_q)
+		dh_params->q_bits = _gnutls_mpi_get_nbits(tmp_q);
+
+	return 0;
+}
+
+/**
  * gnutls_dh_params_init:
  * @dh_params: The parameters
  *
@@ -330,6 +377,7 @@ void gnutls_dh_params_deinit(gnutls_dh_params_t dh_params)
 
 	_gnutls_mpi_release(&dh_params->params[0]);
 	_gnutls_mpi_release(&dh_params->params[1]);
+	_gnutls_mpi_release(&dh_params->params[2]);
 
 	gnutls_free(dh_params);
 
@@ -353,6 +401,8 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
 
 	dst->params[0] = _gnutls_mpi_copy(src->params[0]);
 	dst->params[1] = _gnutls_mpi_copy(src->params[1]);
+	if (src->params[2])
+		dst->params[2] = _gnutls_mpi_copy(src->params[2]);
 	dst->q_bits = src->q_bits;
 
 	if (dst->params[0] == NULL || dst->params[1] == NULL)
