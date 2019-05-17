@@ -150,7 +150,7 @@ unsigned gnutls_x509_crt_equals(gnutls_x509_crt_t cert1,
  **/
 unsigned
 gnutls_x509_crt_equals2(gnutls_x509_crt_t cert1,
-			gnutls_datum_t * der)
+			const gnutls_datum_t * der)
 {
 	bool result;
 
