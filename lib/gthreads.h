@@ -25,9 +25,11 @@
 
 #include <config.h>
 
-#ifdef HAVE_THREADS_H
+/* Using a C99-only compiler installed in parallel with modern C11 environment
+ * will see HAVE_THREADS_H, but won't be able to use _Thread_local. */
+#if __STDC_VERSION__ >= 201112 && !defined(__STDC_NO_THREADS__) && defined(HAVE_THREADS_H)
 # include <threads.h>
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) /* clang is also covered by __GNUC__ */
 # define _Thread_local __thread
 #elif defined(_MSC_VER)
 # define _Thread_local __declspec(thread)
