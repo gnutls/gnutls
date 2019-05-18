@@ -91,7 +91,8 @@ gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 		else if (IS_EC(algo)||IS_GOSTEC(algo))
 			ret = p->ecc_bits;
 		else
-			ret = p->pk_bits; break;
+			ret = p->pk_bits;
+		break;
 	}
 	);
 	return ret;
