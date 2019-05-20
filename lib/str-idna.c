@@ -76,9 +76,13 @@ int gnutls_idna_map(const char *input, unsigned ilen, gnutls_datum_t *out, unsig
 	 * Since IDN2_NONTRANSITIONAL implicitly does NFC conversion, we don't need
 	 * the additional IDN2_NFC_INPUT. But just for the unlikely case that the linked
 	 * library is not matching the headers when building and it doesn't support TR46,
-	 * we provide IDN2_NFC_INPUT. */
-	idn2_flags |= IDN2_NONTRANSITIONAL;
-	idn2_tflags |= IDN2_TRANSITIONAL;
+	 * we provide IDN2_NFC_INPUT.
+	 *
+	 * Without IDN2_USE_STD3_ASCII_RULES, the result could contain any ASCII characters,
+	 * e.g. 'evil.c\u2100.example.com' will be converted into
+	 * 'evil.ca/c.example.com', which seems no good idea. */
+	idn2_flags |= IDN2_NONTRANSITIONAL | IDN2_USE_STD3_ASCII_RULES;
+	idn2_tflags |= IDN2_TRANSITIONAL | IDN2_USE_STD3_ASCII_RULES;
 #endif
 
 	/* This avoids excessive CPU usage with libidn2 < 2.1.1 */

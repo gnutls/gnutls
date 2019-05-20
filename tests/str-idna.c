@@ -94,12 +94,16 @@ MATCH_FUNC(test_caps_german1, "Ü.ü", "xn--tda.xn--tda");
 MATCH_FUNC(test_caps_german2, "Bücher.de", "xn--bcher-kva.de");
 MATCH_FUNC(test_caps_german3, "Faß.de", "xn--fa-hia.de");
 MATCH_FUNC(test_dots, "a.b.c。d。", "a.b.c.d.");
+
+/* without STD3 ASCII rules, the result is: evil.ca/c..example.com */
+MATCH_FUNC(test_evil, "evil.c\u2100.example.com", "evil.c.example.com");
 # else
 EMPTY_FUNC(test_caps_german1);
 EMPTY_FUNC(test_caps_german2);
 EMPTY_FUNC(test_caps_german3);
 EMPTY_FUNC(test_caps_greek);
 EMPTY_FUNC(test_dots);
+EMPTY_FUNC(test_evil);
 # endif
 
 int main(void)
@@ -130,6 +134,7 @@ int main(void)
 		cmocka_unit_test(test_jp2),
 		cmocka_unit_test(test_jp2_reverse),
 		cmocka_unit_test(test_dots),
+		cmocka_unit_test(test_evil),
 		cmocka_unit_test(test_valid_idna2003)
 	};
 

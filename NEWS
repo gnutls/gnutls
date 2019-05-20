@@ -17,6 +17,9 @@ See the end for copying conditions.
 ** libgnutls: Fix calculation of Streebog digests (incorrect carry operation in
    512 bit addition)
 
+** libgnutls: Apply STD3 ASCII rules in gnutls_idna_map() to prevent
+   hostname/domain crafting via IDNA conversion
+
 ** API and ABI modifications:
 gnutls_prf_early: Added
 gnutls_record_set_max_recv_size: Added
