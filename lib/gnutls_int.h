@@ -664,6 +664,7 @@ typedef struct gnutls_group_entry_st {
 	const char *name;
 	gnutls_group_t id;
 	const gnutls_datum_t *prime;
+	const gnutls_datum_t *q;
 	const gnutls_datum_t *generator;
 	const unsigned *q_bits;
 	gnutls_ecc_curve_t curve;

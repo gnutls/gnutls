@@ -152,10 +152,15 @@ static int client_gen_key_share(gnutls_session_t session, const gnutls_group_ent
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
+		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_Q],
+			group->q->data, group->q->size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		session->key.kshare.dh_params.algo = group->pk;
 		session->key.kshare.dh_params.dh_group = group->id; /* no curve in FFDH, we write the group */
 		session->key.kshare.dh_params.qbits = *group->q_bits;
-		session->key.kshare.dh_params.params_nr = 3; /* empty q */
+		session->key.kshare.dh_params.params_nr = 3;
 
 		ret = _gnutls_pk_generate_keys(group->pk, 0, &session->key.kshare.dh_params, 1);
 		if (ret < 0)
@@ -350,9 +355,14 @@ server_use_key_share(gnutls_session_t session, const gnutls_group_entry_st *grou
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
+		ret = _gnutls_mpi_init_scan_nz(&session->key.kshare.dh_params.params[DH_Q],
+			group->q->data, group->q->size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		session->key.kshare.dh_params.algo = GNUTLS_PK_DH;
 		session->key.kshare.dh_params.qbits = *group->q_bits;
-		session->key.kshare.dh_params.params_nr = 3; /* empty q */
+		session->key.kshare.dh_params.params_nr = 3;
 
 		/* generate our keys */
 		ret = _gnutls_pk_generate_keys(group->pk, 0, &session->key.kshare.dh_params, 1);

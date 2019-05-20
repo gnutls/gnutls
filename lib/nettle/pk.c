@@ -282,6 +282,11 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 				goto dh_cleanup;
 			}
+		} else if ((flags & PK_DERIVE_TLS13) &&
+			   _gnutls_fips_mode_enabled()) {
+			/* Mandatory in FIPS mode for TLS 1.3 */
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto dh_cleanup;
 		}
 
 		/* prevent denial of service */
