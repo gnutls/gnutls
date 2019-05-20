@@ -1003,7 +1003,7 @@ typedef enum gnutls_certificate_verify_flags {
  *  corresponds to @GNUTLS_SEC_PARAM_ULTRA (192 bits)
  * @GNUTLS_PROFILE_FUTURE: A verification profile that
  *  corresponds to @GNUTLS_SEC_PARAM_FUTURE (256 bits)
-% * @GNUTLS_PROFILE_SUITEB128: A verification profile that
+ * @GNUTLS_PROFILE_SUITEB128: A verification profile that
  *  applies the SUITEB128 rules
  * @GNUTLS_PROFILE_SUITEB192: A verification profile that
  *  applies the SUITEB192 rules
