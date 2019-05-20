@@ -99,7 +99,7 @@ static void tcp_server(const char *name, int port);
 
 #define SMALL_READ_TEST (2147483647)
 
-#define GERR(ret) fprintf(stdout, "Error: %s\n", safe_strerror(ret))
+#define GERR(ret) fprintf(stderr, "Error: %s\n", safe_strerror(ret))
 
 #define HTTP_END  "</BODY></HTML>\n\n"
 
