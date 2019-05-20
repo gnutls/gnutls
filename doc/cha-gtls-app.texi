@@ -1610,7 +1610,7 @@ will disable CRL or OCSP checks in the verification of the certificate chain.
 @item %VERIFY_ALLOW_X509_V1_CA_CRT @tab
 will allow V1 CAs in chains.
 
-@item %PROFILE_(LOW|LEGACY|MEDIUM|HIGH|ULTRA) @tab
+@item %PROFILE_(LOW|LEGACY|MEDIUM|HIGH|ULTRA|FUTURE) @tab
 require a certificate verification profile the corresponds to the specified
 security level, see @ref{tab:key-sizes} for the mappings to values.
 

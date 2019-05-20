@@ -988,6 +988,7 @@ typedef enum gnutls_certificate_verify_flags {
 
 /**
  * gnutls_certificate_verification_profiles_t:
+ * @GNUTLS_PROFILE_UNKNOWN: An invalid/unknown profile.
  * @GNUTLS_PROFILE_VERY_WEAK: A verification profile that
  *  corresponds to @GNUTLS_SEC_PARAM_VERY_WEAK (64 bits)
  * @GNUTLS_PROFILE_LOW: A verification profile that
@@ -999,7 +1000,9 @@ typedef enum gnutls_certificate_verify_flags {
  * @GNUTLS_PROFILE_HIGH: A verification profile that
  *  corresponds to @GNUTLS_SEC_PARAM_HIGH (128 bits)
  * @GNUTLS_PROFILE_ULTRA: A verification profile that
- *  corresponds to @GNUTLS_SEC_PARAM_ULTRA (256 bits)
+ *  corresponds to @GNUTLS_SEC_PARAM_ULTRA (192 bits)
+ * @GNUTLS_PROFILE_FUTURE: A verification profile that
+ *  corresponds to @GNUTLS_SEC_PARAM_FUTURE (256 bits)
 % * @GNUTLS_PROFILE_SUITEB128: A verification profile that
  *  applies the SUITEB128 rules
  * @GNUTLS_PROFILE_SUITEB192: A verification profile that
@@ -1008,12 +1011,14 @@ typedef enum gnutls_certificate_verify_flags {
  * Enumeration of different certificate verification profiles.
  */
 typedef enum gnutls_certificate_verification_profiles_t {
+	GNUTLS_PROFILE_UNKNOWN = 0,
 	GNUTLS_PROFILE_VERY_WEAK = 1,
 	GNUTLS_PROFILE_LOW = 2,
 	GNUTLS_PROFILE_LEGACY = 4,
 	GNUTLS_PROFILE_MEDIUM = 5,
 	GNUTLS_PROFILE_HIGH = 6,
 	GNUTLS_PROFILE_ULTRA = 7,
+	GNUTLS_PROFILE_FUTURE = 9,
 	
 	GNUTLS_PROFILE_SUITEB128=32,
 	GNUTLS_PROFILE_SUITEB192=33
