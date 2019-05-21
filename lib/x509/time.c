@@ -34,6 +34,8 @@
 #include "extras/hex.h"
 #include <common.h>
 
+time_t _gnutls_utcTime2gtime(const char *ttime);
+
 /* TIME functions 
  * Conversions between generalized or UTC time to time_t
  *
@@ -171,7 +173,7 @@ static time_t time2gtime(const char *ttime, int year)
  *
  * (seconds are optional)
  */
-static time_t utcTime2gtime(const char *ttime)
+time_t _gnutls_utcTime2gtime(const char *ttime)
 {
 	char xx[3];
 	int year;
@@ -345,7 +347,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int force_general)
 			len = sizeof(ttime) - 1;
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
-				c_time = utcTime2gtime(ttime);
+				c_time = _gnutls_utcTime2gtime(ttime);
 		}
 
 		/* We cannot handle dates after 2031 in 32 bit machines.

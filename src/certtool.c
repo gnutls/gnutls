@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003-2016 Free Software Foundation, Inc.
- * Copyright (C) 2015-2017 Red Hat, Inc.
+ * Copyright (C) 2015-2019 Red Hat, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -579,6 +579,10 @@ generate_certificate(gnutls_privkey_t * ret_key,
 					app_exit(1);
 				}
 			}
+		} else if (ca_status) {
+			/* CAs always sign */
+			if (get_sign_status(server))
+				usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 		}
 
 		result = get_key_agreement_status();

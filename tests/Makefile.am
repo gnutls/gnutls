@@ -150,7 +150,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple tls-pthread \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
-	 gnutls_x509_privkey_import gnutls_x509_crt_list_import \
+	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time \
 	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime memset0 memset1 \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record handshake-timeout mini-record-range \
@@ -481,7 +481,7 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
 	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
-	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh
+	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh
 
 dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh
 

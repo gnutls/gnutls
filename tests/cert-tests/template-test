@@ -149,7 +149,6 @@ else
 
 	# We're done.
 	if test "${rc}" != "0"; then
-	echo $TMPFILE
 		echo "Test 5-2 (overflow2) failed"
 		exit ${rc}
 	fi

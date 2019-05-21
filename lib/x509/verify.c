@@ -461,7 +461,7 @@ static unsigned is_level_acceptable(
 	gnutls_sec_param_t sp;
 	int hash;
 
-	if (profile == 0)
+	if (profile == GNUTLS_PROFILE_UNKNOWN)
 		return 1;
 
 	pkalg = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
@@ -481,6 +481,7 @@ static unsigned is_level_acceptable(
 		CASE_SEC_PARAM(GNUTLS_PROFILE_MEDIUM, GNUTLS_SEC_PARAM_MEDIUM);
 		CASE_SEC_PARAM(GNUTLS_PROFILE_HIGH, GNUTLS_SEC_PARAM_HIGH);
 		CASE_SEC_PARAM(GNUTLS_PROFILE_ULTRA, GNUTLS_SEC_PARAM_ULTRA);
+		CASE_SEC_PARAM(GNUTLS_PROFILE_FUTURE, GNUTLS_SEC_PARAM_FUTURE);
 		case GNUTLS_PROFILE_SUITEB128:
 		case GNUTLS_PROFILE_SUITEB192: {
 			unsigned curve, issuer_curve;
@@ -563,6 +564,9 @@ static unsigned is_level_acceptable(
 			}
 
 			break;
+		case GNUTLS_PROFILE_UNKNOWN: /* already checked; avoid compiler warnings */
+			_gnutls_debug_log("An unknown profile (%d) was encountered\n", (int)profile);
+			return gnutls_assert_val(0);
 		}
 	}
 

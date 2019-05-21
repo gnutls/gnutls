@@ -1336,6 +1336,9 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_mpi_ops;
 	_gnutls_mpi_log;
 	_gnutls_mpi_release;
+	# tests/time.c
+	_gnutls_utcTime2gtime;
+	_gnutls_x509_generalTime2gtime;
 
 	# Internal symbols needed by tests/:
 	_gnutls_default_priority_string;
