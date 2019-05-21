@@ -1747,7 +1747,7 @@ _gnutls_pkcs_write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn,
 int
 _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 			      const struct pbe_enc_params *enc_params,
-			      gnutls_datum_t * key, gnutls_datum_t * encrypted)
+			      const gnutls_datum_t * key, gnutls_datum_t * encrypted)
 {
 	int result;
 	int data_size;

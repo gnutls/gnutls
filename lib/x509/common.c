@@ -274,7 +274,7 @@ const char *gnutls_x509_dn_oid_name(const char *oid, unsigned int flags)
 	unsigned len = strlen(oid);
 
 	do {
-		if ((_oid2str[i].oid_size == len) && 
+		if ((_oid2str[i].oid_size == len) &&
 			strcmp(_oid2str[i].oid, oid) == 0 && _oid2str[i].ldap_desc != NULL)
 			return _oid2str[i].ldap_desc;
 		i++;
@@ -977,7 +977,7 @@ _gnutls_x509_der_encode_and_copy(ASN1_TYPE src, const char *src_name,
 	return 0;
 }
 
-/* Writes the value of the datum in the given ASN1_TYPE. 
+/* Writes the value of the datum in the given ASN1_TYPE.
  */
 int
 _gnutls_x509_write_value(ASN1_TYPE c, const char *root,
@@ -996,7 +996,7 @@ _gnutls_x509_write_value(ASN1_TYPE c, const char *root,
 	return 0;
 }
 
-/* Writes the value of the datum in the given ASN1_TYPE as a string. 
+/* Writes the value of the datum in the given ASN1_TYPE as a string.
  */
 int
 _gnutls_x509_write_string(ASN1_TYPE c, const char *root,
@@ -1048,7 +1048,7 @@ _asnstr_append_name(char *name, size_t name_size, const char *part1,
 int
 _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					const char *dst_name,
-					gnutls_pk_params_st * params)
+					const gnutls_pk_params_st * params)
 {
 	const char *oid;
 	gnutls_datum_t der = { NULL, 0 };
@@ -1116,7 +1116,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
  */
 int
 _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
-			       gnutls_pk_params_st * params)
+			       const gnutls_pk_params_st * params)
 {
 	int ret;
 	ASN1_TYPE tmp;
@@ -1187,7 +1187,7 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
 		return algo;
 	}
 
-	/* Now read the parameters' bits 
+	/* Now read the parameters' bits
 	 */
 	if (lcurve != GNUTLS_ECC_CURVE_INVALID) { /* curve present */
 		bits[0] = gnutls_ecc_curve_get_size(lcurve)*8;
@@ -1326,7 +1326,7 @@ _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
 	signature->data = NULL;
 	signature->size = 0;
 
-	/* Read the signature 
+	/* Read the signature
 	 */
 	len = 0;
 	result = asn1_read_value(src, src_name, NULL, &len);
@@ -1562,7 +1562,7 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 }
 
 int
-_gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
+_gnutls_x509_get_raw_field2(ASN1_TYPE c2, const gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn)
 {
 	int result, len1;
@@ -1587,7 +1587,7 @@ _gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
 	return result;
 }
 
-int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size)
+int _gnutls_copy_string(const gnutls_datum_t* str, uint8_t *out, size_t *out_size)
 {
 unsigned size_to_check;
 
@@ -1610,7 +1610,7 @@ unsigned size_to_check;
 	return 0;
 }
 
-int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size)
+int _gnutls_copy_data(const gnutls_datum_t* str, uint8_t *out, size_t *out_size)
 {
 	if ((unsigned) str->size > *out_size) {
 		gnutls_assert();
@@ -1682,7 +1682,7 @@ int _gnutls_x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 }
 
 unsigned
-_gnutls_check_valid_key_id(gnutls_datum_t *key_id,
+_gnutls_check_valid_key_id(const gnutls_datum_t *key_id,
 			   gnutls_x509_crt_t cert, time_t now,
 			   unsigned *has_ski)
 {

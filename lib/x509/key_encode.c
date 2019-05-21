@@ -33,15 +33,15 @@
 #include <mpi.h>
 #include <ecc.h>
 
-static int _gnutls_x509_write_rsa_pubkey(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_dsa_pubkey(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
-static int _gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
+static int _gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
 					 gnutls_datum_t * der);
 
 /*
@@ -52,7 +52,7 @@ static int _gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 static int
-_gnutls_x509_write_rsa_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_rsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -110,7 +110,7 @@ _gnutls_x509_write_rsa_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_ecc_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -139,7 +139,7 @@ _gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the data.
  */
 int
-_gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * raw)
 {
 	int ret;
@@ -161,7 +161,7 @@ _gnutls_x509_write_eddsa_pubkey(gnutls_pk_params_st * params,
 }
 
 int
-_gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_gost_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	bigint_t x, y;
@@ -233,7 +233,7 @@ _gnutls_x509_write_gost_pubkey(gnutls_pk_params_st * params,
 }
 
 int
-_gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
 				 gnutls_datum_t * der)
 {
 	switch (params->algo) {
@@ -266,7 +266,7 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_params_st * params,
 }
 
 int
-_gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_pubkey(const gnutls_pk_params_st * params,
 			  gnutls_datum_t * der)
 {
 	switch (params->algo) {
@@ -295,7 +295,7 @@ _gnutls_x509_write_pubkey(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 static int
-_gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_dsa_params(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -355,7 +355,7 @@ _gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
+_gnutls_x509_write_ecc_params(const gnutls_ecc_curve_t curve,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -406,7 +406,7 @@ _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 }
 
 int
-_gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
+_gnutls_x509_write_rsa_pss_params(const gnutls_x509_spki_st *params,
 				  gnutls_datum_t *der)
 {
 	int result;
@@ -524,7 +524,7 @@ _gnutls_x509_write_rsa_pss_params(gnutls_x509_spki_st *params,
 }
 
 static int
-_gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -618,7 +618,7 @@ _gnutls_x509_write_gost_params(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 static int
-_gnutls_x509_write_dsa_pubkey(gnutls_pk_params_st * params,
+_gnutls_x509_write_dsa_pubkey(const gnutls_pk_params_st * params,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -702,7 +702,7 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	/* Write PRIME 
+	/* Write PRIME
 	 */
 	ret =
 	    _gnutls_x509_write_int(*c2, "modulus",
@@ -963,7 +963,7 @@ _gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		return _gnutls_asn2err(result);
 	}
 
-	/* Write PRIME 
+	/* Write PRIME
 	 */
 	ret =
 	    _gnutls_x509_write_int(*c2, "p",
