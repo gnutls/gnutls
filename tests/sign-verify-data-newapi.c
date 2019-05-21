@@ -15,9 +15,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -122,6 +122,13 @@ void doit(void)
 
 		ret =
 		    gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, 0, &raw_data,
+					      &signature);
+		if (ret < 0)
+			testfail("gnutls_x509_pubkey_verify_data2\n");
+
+		/* Test functionality of GNUTLS_VERIFY_DISABLE_CA_SIGN flag (see issue #754) */
+		ret =
+		    gnutls_pubkey_verify_data2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_DISABLE_CA_SIGN, &raw_data,
 					      &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_data2\n");
