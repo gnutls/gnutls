@@ -1461,7 +1461,6 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 	unsigned int is_dtls = IS_DTLS(session);
 	gnutls_kx_algorithm_t kx;
 	gnutls_credentials_type_t cred_type = GNUTLS_CRD_CERTIFICATE; /* default for TLS1.3 */
-	unsigned int no_cert_found = 0;
 	const gnutls_group_entry_st *sgroup = NULL;
 	gnutls_ext_priv_data_t epriv;
 	unsigned have_etm = 0;
@@ -1517,7 +1516,6 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();
-							no_cert_found = 1;
 							break;
 						}
 					}
@@ -1562,7 +1560,6 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 						if (ret < 0) {
 							/* couldn't select cert with this ciphersuite */
 							gnutls_assert();
-							no_cert_found = 1;
 							break;
 						}
 					}
@@ -1580,16 +1577,7 @@ _gnutls_figure_common_ciphersuite(gnutls_session_t session,
 
 	/* nothing in common */
 
-	/* RFC7919 requires that we reply with insufficient security if we have
-	 * negotiated an FFDHE group, but cannot find a common ciphersuite. However,
-	 * we must also distinguish between not matching a ciphersuite due to an
-	 * incompatible certificate which we traditionally return GNUTLS_E_NO_CIPHER_SUITES.
-	 */
-	if (!no_cert_found && (session->internals.hsk_flags & HSK_HAVE_FFDHE) &&
-	    session->internals.priorities->groups.have_ffdhe && !version->tls13_sem)
-		return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
-	else
-		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
+	return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 }
 
 #define CLIENT_VERSION_CHECK(minver, maxver, e) \

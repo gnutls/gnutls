@@ -582,6 +582,7 @@ tests/pkcs11/pkcs11-pubkey-import-ecdsa
 tests/pkcs11/pkcs11-pubkey-import-rsa
 tests/pkcs11/pkcs11-rsa-pss-privkey-test
 tests/pkcs11/tls-neg-pkcs11-key
+tests/pkcs11/tls-neg-pkcs11-no-key
 tests/pkcs12-decode/Makefile
 tests/pkcs12-decode/Makefile.in
 tests/pkcs12_encode

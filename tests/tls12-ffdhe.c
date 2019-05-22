@@ -344,7 +344,7 @@ test_case_st tests[] = {
 	{
 		.name = "TLS 1.2 DHE-RSA (incompatible options)",
 		.client_ret = GNUTLS_E_AGAIN,
-		.server_ret = GNUTLS_E_INSUFFICIENT_SECURITY,
+		.server_ret = GNUTLS_E_NO_CIPHER_SUITES,
 		.have_cert_cred = 1,
 		.have_rsa_sign_cert = 1,
 		.server_prio = "NORMAL:-KX-ALL:+DHE-RSA:-VERS-ALL:+VERS-TLS1.2:-GROUP-ALL:+GROUP-FFDHE8192",

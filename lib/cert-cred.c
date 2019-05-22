@@ -74,6 +74,9 @@ _gnutls_certificate_credential_append_keypair(gnutls_certificate_credentials_t r
 	res->certs[res->ncerts].names = names;
 	res->certs[res->ncerts].pkey = key;
 
+	if (_gnutls13_sign_get_compatible_with_privkey(key))
+		res->tls13_ok = 1;
+
 	/* move RSA-PSS certificates before any RSA key.
 	 * Note that we cannot assume that any previous pointers
 	 * to sorted list are ok, due to the realloc in res->certs. */
