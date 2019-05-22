@@ -28,7 +28,8 @@
 #include "mbuffers.h"
 #include "secrets.h"
 
-#define KEY_UPDATES_PER_SEC 1
+#define KEY_UPDATES_WINDOW 1000
+#define KEY_UPDATES_PER_WINDOW 8
 
 static int update_keys(gnutls_session_t session, hs_stage_t stage)
 {
@@ -60,18 +61,28 @@ static int update_keys(gnutls_session_t session, hs_stage_t stage)
 int _gnutls13_recv_key_update(gnutls_session_t session, gnutls_buffer_st *buf)
 {
 	int ret;
-	time_t now = gnutls_time(0);
+	struct timespec now;
 
 	if (buf->length != 1)
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-	if (unlikely(now - session->internals.last_key_update < KEY_UPDATES_PER_SEC)) {
-		_gnutls_debug_log("reached maximum number of key updates per second (%d)\n",
-				  KEY_UPDATES_PER_SEC);
-		return gnutls_assert_val(GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS);
+	gnutls_gettime(&now);
+
+	/* Roll over the counter if the time window has elapsed */
+	if (session->internals.key_update_count == 0 ||
+	    timespec_sub_ms(&now, &session->internals.last_key_update) >
+	    KEY_UPDATES_WINDOW) {
+		session->internals.last_key_update = now;
+		session->internals.key_update_count = 0;
 	}
 
-	session->internals.last_key_update = now;
+	if (unlikely(++session->internals.key_update_count >
+		     KEY_UPDATES_PER_WINDOW)) {
+		_gnutls_debug_log("reached maximum number of key updates per %d milliseconds (%d)\n",
+				  KEY_UPDATES_WINDOW,
+				  KEY_UPDATES_PER_WINDOW);
+		return gnutls_assert_val(GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS);
+	}
 
 	_gnutls_epoch_gc(session);
 
