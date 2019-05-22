@@ -233,7 +233,6 @@
          {"name" : "test-record-size-limit.py",
 	  "comment" : "TLS 1.3 tests are done separately; 1/n-1 splitting is not supported in TLS 1.0",
           "arguments" : ["-p", "@PORT@", "--reply-AD-size", "821",
-                         "--minimal-size", "512",
                          "-e", "check if server accepts maximum size in TLS 1.0",
                          "-e", "check if server accepts maximum size in TLS 1.3",
                          "-e", "check if server accepts minimal size in TLS 1.0",
