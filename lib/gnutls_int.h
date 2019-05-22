@@ -194,6 +194,7 @@ typedef enum record_send_state_t {
 #define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
 
 #define MIN_RECORD_SIZE 512
+#define MIN_RECORD_SIZE_SMALL 64
 
 /* The following macro is used to calculate the overhead when sending.
  * when receiving we use a different way as there are implementations that
@@ -969,6 +970,7 @@ struct gnutls_priority_st {
 	/* these should be accessed from
 	 * session->internals.VAR names */
 	bool _allow_large_records;
+	bool _allow_small_records;
 	bool _no_etm;
 	bool _no_ext_master_secret;
 	bool _allow_key_usage_violation;
@@ -986,6 +988,7 @@ struct gnutls_priority_st {
 
 #define ENABLE_COMPAT(x) \
 	      (x)->allow_large_records = 1; \
+	      (x)->allow_small_records = 1; \
 	      (x)->no_etm = 1; \
 	      (x)->no_ext_master_secret = 1; \
 	      (x)->allow_key_usage_violation = 1; \
@@ -994,6 +997,7 @@ struct gnutls_priority_st {
 
 #define ENABLE_PRIO_COMPAT(x) \
 	      (x)->_allow_large_records = 1; \
+	      (x)->_allow_small_records = 1; \
 	      (x)->_no_etm = 1; \
 	      (x)->_no_ext_master_secret = 1; \
 	      (x)->_allow_key_usage_violation = 1; \
@@ -1118,6 +1122,7 @@ typedef struct {
 	/* variables directly set when setting the priorities above, or
 	 * when overriding them */
 	bool allow_large_records;
+	bool allow_small_records;
 	bool no_etm;
 	bool no_ext_master_secret;
 	bool allow_key_usage_violation;

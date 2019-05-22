@@ -627,6 +627,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 #undef COPY_TO_INTERNALS
 #define COPY_TO_INTERNALS(xx) session->internals.xx = priority->_##xx
 	COPY_TO_INTERNALS(allow_large_records);
+	COPY_TO_INTERNALS(allow_small_records);
 	COPY_TO_INTERNALS(no_etm);
 	COPY_TO_INTERNALS(no_ext_master_secret);
 	COPY_TO_INTERNALS(allow_key_usage_violation);
@@ -815,6 +816,10 @@ static void enable_compat(gnutls_priority_t c)
 static void enable_server_key_usage_violations(gnutls_priority_t c)
 {
 	c->allow_server_key_usage_violation = 1;
+}
+static void enable_allow_small_records(gnutls_priority_t c)
+{
+	c->_allow_small_records = 1;
 }
 static void enable_dumbfw(gnutls_priority_t c)
 {

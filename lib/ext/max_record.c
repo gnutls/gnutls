@@ -302,7 +302,10 @@ ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
  **/
 ssize_t gnutls_record_set_max_recv_size(gnutls_session_t session, size_t size)
 {
-	if (size < MIN_RECORD_SIZE || size > DEFAULT_MAX_RECORD_SIZE)
+	if (size <
+	    (session->internals.allow_small_records ?
+	     MIN_RECORD_SIZE_SMALL : MIN_RECORD_SIZE) ||
+	    size > DEFAULT_MAX_RECORD_SIZE)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	if (session->internals.handshake_in_progress)

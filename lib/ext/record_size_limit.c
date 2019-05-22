@@ -66,7 +66,9 @@ _gnutls_record_size_limit_recv_params(gnutls_session_t session,
 	session->internals.hsk_flags |= HSK_RECORD_SIZE_LIMIT_RECEIVED;
 
 	/* we do not want to accept sizes outside of our supported range */
-	if (new_size < MIN_RECORD_SIZE) {
+	if (new_size <
+	    (session->internals.allow_small_records ?
+	     MIN_RECORD_SIZE_SMALL : MIN_RECORD_SIZE)) {
 		/* for server, reject it by omitting the extension in the reply */
 		if (session->security_parameters.entity == GNUTLS_SERVER) {
 			_gnutls_handshake_log("EXT[%p]: client requested too small record_size_limit %u; ignoring\n",
