@@ -182,10 +182,11 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 				 uint8_t * data, size_t _data_size)
 {
 	uint16_t n_Y, n_g, n_p;
-	size_t _n_Y, _n_g, _n_p;
+	size_t _n_Y, _n_g, _n_p, _n_q;
 	uint8_t *data_p;
 	uint8_t *data_g;
 	uint8_t *data_Y;
+	uint8_t *data_q = NULL;
 	int i, bits, ret, p_bits;
 	unsigned j;
 	ssize_t data_size = _data_size;
@@ -245,6 +246,8 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 				session->internals.hsk_flags |= HSK_USED_FFDHE;
 				_gnutls_session_group_set(session, session->internals.priorities->groups.entry[j]);
 				session->key.proto.tls12.dh.params.qbits = *session->internals.priorities->groups.entry[j]->q_bits;
+				data_q = session->internals.priorities->groups.entry[j]->q->data;
+				_n_q = session->internals.priorities->groups.entry[j]->q->size;
 				break;
 			}
 		}
@@ -265,8 +268,19 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 		_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_G]);
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
+	if (data_q && _gnutls_mpi_init_scan_nz(
+			    &session->key.proto.tls12.dh.params.params[DH_Q],
+			    data_q, _n_q) != 0) {
+		/* we release now because params_nr is not yet set */
+		_gnutls_mpi_release(
+			&session->key.proto.tls12.dh.params.params[DH_P]);
+		_gnutls_mpi_release(
+			&session->key.proto.tls12.dh.params.params[DH_G]);
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
 
-	session->key.proto.tls12.dh.params.params_nr = 3; /* include empty q */
+	/* include, possibly empty, q */
+	session->key.proto.tls12.dh.params.params_nr = 3;
 	session->key.proto.tls12.dh.params.algo = GNUTLS_PK_DH;
 
 	if (!(session->internals.hsk_flags & HSK_USED_FFDHE)) {

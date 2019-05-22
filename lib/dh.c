@@ -37,7 +37,7 @@
 
 static
 int set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
-			unsigned q_bits)
+		     bigint_t q, unsigned q_bits)
 {
 	/* just in case we are resuming a session */
 	gnutls_pk_params_release(&session->key.proto.tls12.dh.params);
@@ -54,7 +54,16 @@ int set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
 
-	session->key.proto.tls12.dh.params.params_nr = 3; /* include empty q */
+	if (q) {
+		session->key.proto.tls12.dh.params.params[DH_Q] = _gnutls_mpi_copy(q);
+		if (session->key.proto.tls12.dh.params.params[DH_Q] == NULL) {
+			_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_P]);
+			_gnutls_mpi_release(&session->key.proto.tls12.dh.params.params[DH_G]);
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		}
+	}
+	/* include, possibly empty, q */
+	session->key.proto.tls12.dh.params.params_nr = 3;
 	session->key.proto.tls12.dh.params.algo = GNUTLS_PK_DH;
 	session->key.proto.tls12.dh.params.qbits = q_bits;
 
@@ -70,7 +79,7 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 		      gnutls_params_function * func, gnutls_sec_param_t sec_param)
 {
 	gnutls_params_st params;
-	bigint_t p, g;
+	bigint_t p, g, q = NULL;
 	unsigned free_pg = 0;
 	int ret;
 	unsigned q_bits = 0, i;
@@ -95,6 +104,14 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
 				ret = _gnutls_mpi_init_scan_nz(&g,
 						session->internals.priorities->groups.entry[i]->generator->data,
 						session->internals.priorities->groups.entry[i]->generator->size);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+
+				ret = _gnutls_mpi_init_scan_nz(&q,
+						session->internals.priorities->groups.entry[i]->q->data,
+						session->internals.priorities->groups.entry[i]->q->size);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
@@ -158,7 +175,7 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
  finished:
 	_gnutls_dh_save_group(session, g, p);
 
-	ret = set_dh_pk_params(session, g, p, q_bits);
+	ret = set_dh_pk_params(session, g, p, q, q_bits);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -166,6 +183,7 @@ _gnutls_figure_dh_params(gnutls_session_t session, gnutls_dh_params_t dh_params,
  cleanup:
 	if (free_pg) {
 		_gnutls_mpi_release(&p);
+		_gnutls_mpi_release(&q);
 		_gnutls_mpi_release(&g);
 	}
 	if (params.deinit && params.type == GNUTLS_PARAMS_DH)
