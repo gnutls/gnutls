@@ -38,3 +38,4 @@ PROFILE_SUITEB128, enable_profile_suiteb128
 PROFILE_SUITEB192, enable_profile_suiteb192
 NEW_PADDING, dummy_func
 DEBUG_ALLOW_KEY_USAGE_VIOLATIONS, enable_server_key_usage_violations
+ALLOW_SMALL_RECORDS, enable_allow_small_records

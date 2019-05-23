@@ -20,6 +20,9 @@ See the end for copying conditions.
 ** libgnutls: Apply STD3 ASCII rules in gnutls_idna_map() to prevent
    hostname/domain crafting via IDNA conversion
 
+** libgnutls: The priority string option %ALLOW_SMALL_RECORDS was added to allow
+   clients to communicate with the server advertising smaller limits than 512
+
 ** API and ABI modifications:
 gnutls_prf_early: Added
 gnutls_record_set_max_recv_size: Added
