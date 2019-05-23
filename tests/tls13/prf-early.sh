@@ -25,5 +25,5 @@ builddir="${builddir:-.}"
 
 check_for_datefudge
 
-datefudge 2019-04-12 "${builddir}/tls13/prf-early" "$@"
+datefudge -s 2019-04-12 "${builddir}/tls13/prf-early" "$@"
 exit $?
