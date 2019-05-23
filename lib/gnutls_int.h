@@ -1373,7 +1373,8 @@ typedef struct {
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */
 	unsigned hsk_flags;
-	time_t last_key_update;
+	struct timespec last_key_update;
+	unsigned key_update_count;
 	/* Read-only pointer to the full ClientHello message */
 	gnutls_buffer_st full_client_hello;
 	/* The offset at which extensions start in the ClientHello buffer */

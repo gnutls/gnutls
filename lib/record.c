@@ -824,7 +824,9 @@ record_add_to_buffers(gnutls_session_t session,
 
 		/* application data cannot be inserted between (async) handshake
 		 * messages */
-		if (type == GNUTLS_APPLICATION_DATA && session->internals.handshake_recv_buffer_size != 0) {
+		if (type == GNUTLS_APPLICATION_DATA &&
+		    (session->internals.handshake_recv_buffer_size != 0 ||
+		     session->internals.handshake_header_recv_buffer.length != 0)) {
 			ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 			goto unexpected_packet;
 		}
