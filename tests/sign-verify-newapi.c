@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
- * Copyright (C) 2017 Red Hat, Inc.
+ * Copyright (C) 2017-2019 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos, Simon Josefsson
  *
@@ -16,12 +16,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with GnuTLS; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
  */
-
-/* Parts copied from GnuTLS example programs. */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -171,6 +169,13 @@ void doit(void)
 					      &signature);
 		if (ret < 0)
 			testfail("gnutls_x509_pubkey_verify_hash2\n");
+
+		/* Test functionality of GNUTLS_VERIFY_DISABLE_CA_SIGN (see issue #754) */
+		ret =
+		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_DISABLE_CA_SIGN, hash_data,
+					      &signature);
+		if (ret < 0)
+			testfail("gnutls_x509_pubkey_verify_hash2 with GNUTLS_VERIFY_DISABLE_CA_SIGN\n");
 
 		ret =
 		    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo, GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1, hash_data,
