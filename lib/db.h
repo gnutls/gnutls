@@ -30,6 +30,6 @@ int _gnutls_server_restore_session(gnutls_session_t session,
 
 int _gnutls_check_resumed_params(gnutls_session_t session);
 
-#define PACKED_SESSION_MAGIC ((0xfadebadd)+(GNUTLS_VERSION_NUMBER))
+#define PACKED_SESSION_MAGIC ((0xfadebadd)+(_gnutls_global_version))
 
 #endif /* GNUTLS_LIB_DB_H */

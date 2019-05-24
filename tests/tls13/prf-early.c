@@ -54,6 +54,8 @@ static void terminate(void);
 #define MAX_BUF 5*1024
 #define MSG "Hello TLS"
 
+extern unsigned int _gnutls_global_version;
+
 /* This program tests whether the gnutls_prf() works as
  * expected.
  */
@@ -421,6 +423,7 @@ void doit(void)
 	int i;
 	int ret;
 
+	_gnutls_global_version = 0x030607;
 	signal(SIGPIPE, SIG_IGN);
 
 	for (i = 0; i < SESSIONS; i++) {

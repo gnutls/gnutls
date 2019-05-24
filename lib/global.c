@@ -79,6 +79,8 @@ gnutls_log_func _gnutls_log_func = NULL;
 gnutls_audit_log_func _gnutls_audit_log_func = NULL;
 int _gnutls_log_level = 0;	/* default log level */
 
+unsigned int _gnutls_global_version = GNUTLS_VERSION_NUMBER;
+
 static int _gnutls_global_init(unsigned constructor);
 static void _gnutls_global_deinit(unsigned destructor);
 
