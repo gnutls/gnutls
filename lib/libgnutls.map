@@ -1347,6 +1347,8 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_x509_generalTime2gtime;
 
 	# Internal symbols needed by tests/:
+	# by tests/tls13/prf-early.c
+	_gnutls_global_version;
 	_gnutls_default_priority_string;
 	_gnutls_supplemental_deinit;
 	_gnutls_record_overhead;

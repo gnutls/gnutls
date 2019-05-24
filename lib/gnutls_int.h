@@ -1621,4 +1621,6 @@ get_certificate_type(gnutls_session_t session,
 #define CONSTCHECK_NOT_EQUAL(a, b) ((-((uint32_t)(a) ^ (uint32_t)(b))) >> 31)
 #define CONSTCHECK_EQUAL(a, b) (1U - CONSTCHECK_NOT_EQUAL(a, b))
 
+extern unsigned int _gnutls_global_version;
+
 #endif /* GNUTLS_LIB_GNUTLS_INT_H */
