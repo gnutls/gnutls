@@ -211,7 +211,10 @@ AC_CHECK_HEADERS([netinet/tcp.h])
 AC_CHECK_HEADERS([stdatomic.h])
 
 dnl This ensures that we link with the right library for atomic operations on Linux SPARC
+save_LIBS=$LIBS
 AC_SEARCH_LIBS([__atomic_load_4], [atomic], [], [AC_MSG_NOTICE([Could not detect libatomic])])
+LIBS=$save_LIBS
+
 AS_IF([test "$ac_cv_search___atomic_load_4" = "none required" || test "$ac_cv_search___atomic_load_4" = "no"],
       [AC_SUBST([LIBATOMIC_LIBS], [])],
       [AC_SUBST([LIBATOMIC_LIBS], [$ac_cv_search___atomic_load_4])])
@@ -370,6 +373,7 @@ AC_ARG_WITH(included-unistring, AS_HELP_STRING([--with-included-unistring],
 if test "$included_unistring" = yes;then
   ac_have_unistring=no
 else
+  save_LIBS=$LIBS
   AC_SEARCH_LIBS(u8_normalize, unistring, [
     included_unistring=no
     ac_have_unistring=yes
@@ -381,6 +385,7 @@ else
   *** Libunistring was not found. To use the included one, use --with-included-unistring
     ]])
   ])
+  LIBS=$save_LIBS
 fi
 
 AM_CONDITIONAL(HAVE_LIBUNISTRING, test "$ac_have_unistring" = "yes")
@@ -506,7 +511,8 @@ idna_support=no
 with_libidn2=no
 
 if test "$try_libidn2" = yes;then
-  AC_SEARCH_LIBS(idn2_lookup_u8, idn2, [
+    save_LIBS=$LIBS
+    AC_SEARCH_LIBS(idn2_lookup_u8, idn2, [
       with_libidn2=yes;
       idna_support="IDNA 2008 (libidn2)"
       AC_DEFINE([HAVE_LIBIDN2], 1, [Define if IDNA 2008 support is enabled.])
@@ -522,8 +528,9 @@ dnl      fi
       with_libidn2=no;
       AC_MSG_WARN(*** LIBIDN2 was not found. You will not be able to use IDN2008 support)
     ])
+    LIBS=$save_LIBS
 else
-    with_libidn2=no
+  with_libidn2=no
 fi
 
 AM_CONDITIONAL(HAVE_LIBIDN2, test "$with_libidn2" != "no")

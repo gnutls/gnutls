@@ -462,6 +462,7 @@ ubsan-Werror.Fedora.x86_64:
   - ./bootstrap
   - CFLAGS="-std=c99 -fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
      --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-full-test-suite --disable-doc
+  - grep "^LIBS=''" config.log || false
   - make -j$(nproc) -C gl
   - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g -Wimplicit-fallthrough=2"
   - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g -Wimplicit-fallthrough=2"
