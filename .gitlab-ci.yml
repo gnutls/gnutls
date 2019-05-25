@@ -385,9 +385,13 @@ MinGW64:
     echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
     mkdir -p build && cd build
   - dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc
+  # generate the certtool autogen file to check whether later compilation will modify it
+  - mingw64-make -C src certtool-args.c.bak
   - mingw64-make -j$(nproc)
   - mingw64-make -C tests check -j$(nproc)
   - cd ..
+  # since we use --enable-local-libopts the generated files must equal the .bak
+  - cmp build/src/certtool-args.c build/src/certtool-args.c.bak || false
   tags:
   - shared
   - docker
