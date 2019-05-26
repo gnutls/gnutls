@@ -60,7 +60,7 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I src/libopts/m4 -I src/gl/m4 -I lib/unistring/m4 --install
 
 EXTRA_DIST = cfg.mk maint.mk CONTRIBUTING.md README.md LICENSE AUTHORS NEWS \
-	ChangeLog THANKS INSTALL.md
+	ChangeLog THANKS INSTALL.md RELEASES.md
 
 DISTCLEANFILES = AUTHORS
 
