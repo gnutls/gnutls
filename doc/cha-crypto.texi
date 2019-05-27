@@ -11,7 +11,7 @@ to the random number generation. For a low-level crypto API the usage of nettle
 @menu
 * Symmetric algorithms::
 * Public key algorithms::
-* Cryptographic Message Syntax / PKCS#7::
+* Cryptographic Message Syntax / PKCS7::
 * Hash and MAC functions::
 * Random number generation::
 * Overriding algorithms::
@@ -94,8 +94,8 @@ or with the more advanced @funcref{gnutls_privkey_generate2}.
 
 @showfuncdesc{gnutls_privkey_generate2}
 
-@node Cryptographic Message Syntax / PKCS#7
-@section Cryptographic Message Syntax / PKCS#7
+@node Cryptographic Message Syntax / PKCS7
+@section Cryptographic Message Syntax / PKCS7
 @cindex public key algorithms
 @cindex cryptographic message syntax
 @cindex file signing

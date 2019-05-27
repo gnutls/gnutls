@@ -172,6 +172,9 @@ while ($line = <FILE>) {
 multitable:
                 if ($line =~ s/\@end multitable/\\\\\n\\hline\n\\end{tabular}/g) {
                         $mode = pop(@stack);
+                } elsif ($line =~ s/\@itemize/\\begin{itemize}/g) {
+                        $mode = ITEMIZE;
+                        push(@stack, MULTITABLE);
                 } else {
 			chomp $line;
 			if ($line eq "") {

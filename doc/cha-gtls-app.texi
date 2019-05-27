@@ -205,7 +205,8 @@ CPU. The currently available options are:
 @end itemize
 
 @item @code{GNUTLS_FORCE_FIPS_MODE}
-@tab In setups where GnuTLS is compiled with support for FIPS140-2 (see @ref{FIPS140-2 mode}).
+@tab In setups where GnuTLS is compiled with support for FIPS140-2 (see @ref{FIPS140-2 mode})
+if set to one it will force the FIPS mode enablement.
 
 @end multitable
 @caption{Environment variables used by the library.}
