@@ -59,8 +59,8 @@ Debian/Ubuntu:
 ```
 apt-get install -y dash git-core autoconf libtool gettext autopoint
 apt-get install -y automake autogen nettle-dev libp11-kit-dev libtspi-dev libunistring-dev
-apt-get install -y guile-2.0-dev libtasn1-6-dev libidn2-0-dev gawk gperf
-apt-get install -y libunbound-dev dns-root-data bison help2man gtk-doc-tools
+apt-get install -y guile-2.2-dev libtasn1-6-dev libidn2-0-dev gawk gperf
+apt-get install -y libunbound-dev dns-root-data bison gtk-doc-tools
 apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-utils
 ```
 
@@ -68,8 +68,8 @@ Fedora/RHEL:
 ```
 yum install -y dash git autoconf libtool gettext-devel automake autogen patch
 yum install -y nettle-devel p11-kit-devel autogen-libopts-devel libunistring-devel
-yum install -y trousers-devel guile-devel libtasn1-devel libidn2-devel gawk gperf
-yum install -y libtasn1-tools unbound-devel bison help2man gtk-doc texinfo texlive
+yum install -y trousers-devel guile22-devel libtasn1-devel libidn2-devel gawk gperf
+yum install -y libtasn1-tools unbound-devel bison gtk-doc texinfo texlive
 ```
 
 Sometimes, you may need to install more recent versions of Automake,

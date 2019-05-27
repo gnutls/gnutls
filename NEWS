@@ -30,6 +30,13 @@ See the end for copying conditions.
 ** libgnutls: The priority string option %ALLOW_SMALL_RECORDS was added to allow
    clients to communicate with the server advertising smaller limits than 512
 
+** certtool: allow the digital signature key usage flag in CA certificates.
+   Previously certtool would ignore this flag for CA certificates even if
+   specified (#767)
+
+** gnutls-cli/serv: added the --keymatexport and --keymatexportsize options.
+   These allow testing the RFC5705 using these tools.
+
 ** API and ABI modifications:
 gnutls_prf_early: Added
 gnutls_record_set_max_recv_size: Added
