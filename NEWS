@@ -5,30 +5,31 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.8 (unreleased)
+* Version 3.6.8 (released 2019-05-28)
+
+** libgnutls: Added gnutls_prf_early() function to retrieve early keying
+   material (#329)
 
 ** libgnutls: Added support for AES-XTS cipher (#354)
-
-** libgnutls: Added new function to retrieve early keying material (#329)
-
-** libgnutls: the gnutls_srp_set_server_credentials_function can be used
-   with the 8192 parameters as well (#995).
 
 ** libgnutls: Fix calculation of Streebog digests (incorrect carry operation in
    512 bit addition)
 
-** libgnutls: Apply STD3 ASCII rules in gnutls_idna_map() to prevent
-   hostname/domain crafting via IDNA conversion (#720)
-
 ** libgnutls: During Diffie-Hellman operations in TLS, verify that the peer's
    public key is on the right subgroup (y^q=1 mod p), when q is available (under
    TLS 1.3 and under earlier versions when RFC7919 parameters are used).
+
+** libgnutls: the gnutls_srp_set_server_credentials_function can now be used
+   with the 8192 parameters as well (#995).
 
 ** libgnutls: Fixed bug preventing the use of gnutls_pubkey_verify_data2() and
    gnutls_pubkey_verify_hash2() with the GNUTLS_VERIFY_DISABLE_CA_SIGN flag (#754)
 
 ** libgnutls: The priority string option %ALLOW_SMALL_RECORDS was added to allow
    clients to communicate with the server advertising smaller limits than 512
+
+** libgnutls: Apply STD3 ASCII rules in gnutls_idna_map() to prevent
+   hostname/domain crafting via IDNA conversion (#720)
 
 ** certtool: allow the digital signature key usage flag in CA certificates.
    Previously certtool would ignore this flag for CA certificates even if
