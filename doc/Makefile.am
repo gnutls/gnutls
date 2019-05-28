@@ -19,9 +19,9 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = TODO certtool.cfg gnutls.pdf gnutls.html	\
+EXTRA_DIST = TODO certtool.cfg gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
-	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions \
+	gnutls-guile.html stamp_enums stamp_functions \
 	doc.mk COPYING COPYING.LESSER
 
 IMAGES = \
