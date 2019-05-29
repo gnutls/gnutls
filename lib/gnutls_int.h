@@ -57,27 +57,43 @@ typedef int ssize_t;
 
 #define ENABLE_ALIGN16
 
-#ifdef __GNUC__
-#ifndef _GNUTLS_GCC_VERSION
-#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
-#if _GNUTLS_GCC_VERSION >= 30100
-#define likely(x)      __builtin_expect((x), 1)
-#define unlikely(x)    __builtin_expect((x), 0)
-#endif
-#if _GNUTLS_GCC_VERSION >= 70100
-#define FALLTHROUGH      __attribute__ ((fallthrough))
-#endif
+#ifdef __clang_major
+# define _GNUTLS_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
 
-#ifndef FALLTHROUGH
+/* clang also defines __GNUC__. It promotes a GCC version of 4.2.1. */
+#ifdef __GNUC__
+# define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 30100
+# define likely(x)      __builtin_expect((x), 1)
+# define unlikely(x)    __builtin_expect((x), 0)
+#else
+# define likely
+# define unlikely
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 30300
+# define nonnull_all __attribute__ ((nonnull))
+# define nonnull(a) __attribute__ ((nonnull a))
+#else
+# define G_GNUC_WGET_NONNULL_ALL
+# define G_GNUC_WGET_NONNULL(a)
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 30400
+# define warn_unused_result  __attribute__((warn_unused_result))
+#else
+# define warn_unused_result
+#endif
+
+#if _GNUTLS_GCC_VERSION >= 70100
+# define FALLTHROUGH      __attribute__ ((fallthrough))
+#else
 # define FALLTHROUGH
 #endif
 
-#ifndef likely
-#define likely
-#define unlikely
-#endif
 
 /* some systems had problems with long long int, thus,
  * it is not used.

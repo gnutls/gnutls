@@ -305,7 +305,11 @@ gnutls_session_set_data(gnutls_session_t session,
 
 	if (session->internals.resumption_data.data != NULL)
 		gnutls_free(session->internals.resumption_data.data);
-	_gnutls_set_datum(&session->internals.resumption_data, session_data, session_data_size);
+	ret = _gnutls_set_datum(&session->internals.resumption_data, session_data, session_data_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0;
 }
