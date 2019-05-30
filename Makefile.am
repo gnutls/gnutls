@@ -204,6 +204,6 @@ dist-hook: libopts-check
 	$(MAKE) -C doc/manpages compare-makefile
 	$(MAKE) ChangeLog
 	mv ChangeLog $(distdir)
-	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
+	touch -c $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
 .PHONY: abi-check abi-dump-versioned abi-dump-latest pic-check symbol-check local-code-coverage-output files-update libopts-check AUTHORS
