@@ -735,7 +735,7 @@ if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
 *** autogen not found. Will not link against system libopts.
 *** ]])
 		dnl simulate specifying option on the command line
-		enable_local_libopts=yes
+		included_libopts=yes
 	fi
 	LIBOPTS_CHECK([src/libopts])
 	if test "$NEED_LIBOPTS_DIR" = "true";then
