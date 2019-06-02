@@ -59,6 +59,8 @@ typedef int ssize_t;
 
 #ifdef __clang_major
 # define _GNUTLS_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+#else
+# define _GNUTLS_CLANG_VERSION 0
 #endif
 
 /* clang also defines __GNUC__. It promotes a GCC version of 4.2.1. */
@@ -82,7 +84,7 @@ typedef int ssize_t;
 # define G_GNUC_WGET_NONNULL(a)
 #endif
 
-#if _GNUTLS_GCC_VERSION >= 30400
+#if _GNUTLS_GCC_VERSION >= 30400 && (_GNUTLS_CLANG_VERSION == 0 || _GNUTLS_CLANG_VERSION >= 40000)
 # define warn_unused_result  __attribute__((warn_unused_result))
 #else
 # define warn_unused_result
