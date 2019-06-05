@@ -823,6 +823,7 @@ tests/tls13/hello_retry_request
 tests/tls13/key_limits
 tests/tls13/key_share
 tests/tls13/key_update
+tests/tls13/key_update_multiple
 tests/tls13/multi-ocsp
 tests/tls13/no-psk-exts
 tests/tls13/ocsp-client
