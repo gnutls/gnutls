@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014, 2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016, 2019 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -2797,7 +2797,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_subject_alternative_name,
 #define GUILE_GNUTLS_MAX_OPENPGP_NAME_LENGTH  2048
 
 SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
-            "import-openpgp-certificate", 2, 0, 0, (SCM data, SCM format),
+            "%import-openpgp-certificate", 2, 0, 0, (SCM data, SCM format),
             "Return a new OpenPGP certificate object resulting from the "
             "import of @var{data} (a uniform array) according to "
             "@var{format}.")
@@ -2841,7 +2841,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
-            "import-openpgp-private-key", 2, 1, 0, (SCM data, SCM format,
+            "%import-openpgp-private-key", 2, 1, 0, (SCM data, SCM format,
                                                     SCM pass),
             "Return a new OpenPGP private key object resulting from the "
             "import of @var{data} (a uniform array) according to "
@@ -2896,7 +2896,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "%openpgp-certificate-id",
             1, 0, 0,
             (SCM key),
             "Return the ID (an 8-element u8vector) of certificate "
@@ -2922,7 +2922,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "%openpgp-certificate-id!",
             2, 0, 0,
             (SCM key, SCM id),
             "Store the ID (an 8 byte sequence) of certificate "
@@ -2957,7 +2957,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
-            "openpgp-certificate-fingerprint!",
+            "%openpgp-certificate-fingerprint!",
             2, 0, 0,
             (SCM key, SCM fpr),
             "Store in @var{fpr} (a u8vector) the fingerprint of @var{key}.  "
@@ -2988,7 +2988,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
-            "openpgp-certificate-fingerprint",
+            "%openpgp-certificate-fingerprint",
             1, 0, 0,
             (SCM key),
             "Return a new u8vector denoting the fingerprint of " "@var{key}.")
@@ -3046,7 +3046,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "%openpgp-certificate-name",
             2, 0, 0,
             (SCM key, SCM index),
             "Return the @var{index}th name of @var{key}.")
@@ -3071,7 +3071,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "%openpgp-certificate-names",
             1, 0, 0, (SCM key), "Return the list of names for @var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_names
 {
@@ -3104,7 +3104,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
-            "openpgp-certificate-algorithm",
+            "%openpgp-certificate-algorithm",
             1, 0, 0,
             (SCM key),
             "Return two values: the certificate algorithm used by "
@@ -3125,7 +3125,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
-            "openpgp-certificate-version",
+            "%openpgp-certificate-version",
             1, 0, 0,
             (SCM key),
             "Return the version of the OpenPGP message format (RFC2440) "
@@ -3143,7 +3143,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "openpgp-certificate-usage",
+SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "%openpgp-certificate-usage",
             1, 0, 0,
             (SCM key),
             "Return a list of values denoting the key usage of @var{key}.")
@@ -3214,7 +3214,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
-            "openpgp-keyring-contains-key-id?",
+            "%openpgp-keyring-contains-key-id?",
             2, 0, 0,
             (SCM keyring, SCM id),
             "Return @code{#f} if key ID @var{id} is in @var{keyring}, "
@@ -3252,7 +3252,7 @@ SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
 /* OpenPGP certificates.  */
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_openpgp_keys_x,
-            "set-certificate-credentials-openpgp-keys!",
+            "%set-certificate-credentials-openpgp-keys!",
             3, 0, 0,
             (SCM cred, SCM pub, SCM sec),
             "Use certificate @var{pub} and secret key @var{sec} in "
