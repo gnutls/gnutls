@@ -119,6 +119,8 @@ ctests += tls13/psk-ext
 
 ctests += tls13/key_update
 
+ctests += tls13/key_update_multiple
+
 ctests += tls13/key_limits
 
 ctests += tls13/multi-ocsp
