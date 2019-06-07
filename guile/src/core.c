@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014, 2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016, 2019 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -36,6 +36,18 @@
 #include "utils.h"
 
 
+#ifndef HAVE_SCM_GC_MALLOC_POINTERLESS
+# define scm_gc_malloc_pointerless scm_gc_malloc
+#endif
+
+/* Maximum size allowed for 'alloca'.  */
+#define ALLOCA_MAX_SIZE  1024U
+
+/* Allocate SIZE bytes, either on the C stack or on the GC-managed heap.  */
+#define FAST_ALLOC(size)					\
+  (((size) <= ALLOCA_MAX_SIZE)					\
+   ? alloca (size)						\
+   : scm_gc_malloc_pointerless ((size), "gnutls-alloc"))
 
 /* SMOB and enums type definitions.  */
 #include "enum-map.i.c"
@@ -958,12 +970,8 @@ make_session_record_port (SCM session)
   const unsigned long mode_bits = SCM_OPN | SCM_RDNG | SCM_WRTNG;
 
   c_port_buf = (unsigned char *)
-#ifdef HAVE_SCM_GC_MALLOC_POINTERLESS
-    scm_gc_malloc_pointerless
-#else
-    scm_gc_malloc
-#endif
-    (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE, session_record_port_gc_hint);
+    scm_gc_malloc_pointerless (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
+			       session_record_port_gc_hint);
 
   /* Create a new port.  */
   port = scm_new_port_table_entry (session_record_port_type);
@@ -1438,7 +1446,7 @@ set_certificate_file (certificate_set_file_function_t set_file,
   c_format = scm_to_gnutls_x509_certificate_format (format, 3, FUNC_NAME);
 
   c_file_len = scm_c_string_length (file);
-  c_file = alloca (c_file_len + 1);
+  c_file = FAST_ALLOC (c_file_len + 1);
 
   (void) scm_to_locale_stringbuf (file, c_file, c_file_len + 1);
   c_file[c_file_len] = '\0';
@@ -1550,10 +1558,10 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_files_x,
   c_format = scm_to_gnutls_x509_certificate_format (format, 2, FUNC_NAME);
 
   c_cert_file_len = scm_c_string_length (cert_file);
-  c_cert_file = alloca (c_cert_file_len + 1);
+  c_cert_file = FAST_ALLOC (c_cert_file_len + 1);
 
   c_key_file_len = scm_c_string_length (key_file);
-  c_key_file = alloca (c_key_file_len + 1);
+  c_key_file = FAST_ALLOC (c_key_file_len + 1);
 
   (void) scm_to_locale_stringbuf (cert_file, c_cert_file,
                                   c_cert_file_len + 1);
@@ -1713,7 +1721,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_keys_x,
   SCM_VALIDATE_LIST_COPYLEN (2, certs, c_cert_count);
   c_key = scm_to_gnutls_x509_private_key (privkey, 3, FUNC_NAME);
 
-  c_certs = alloca (c_cert_count * sizeof (*c_certs));
+  c_certs = FAST_ALLOC (c_cert_count * sizeof (*c_certs));
   for (i = 0; scm_is_pair (certs); certs = SCM_CDR (certs), i++)
     {
       c_certs[i] = scm_to_gnutls_x509_certificate (SCM_CAR (certs),
@@ -1872,8 +1880,8 @@ SCM_DEFINE (scm_gnutls_set_srp_server_credentials_files_x,
   c_password_file_len = scm_c_string_length (password_file);
   c_password_conf_file_len = scm_c_string_length (password_conf_file);
 
-  c_password_file = alloca (c_password_file_len + 1);
-  c_password_conf_file = alloca (c_password_conf_file_len + 1);
+  c_password_file = FAST_ALLOC (c_password_file_len + 1);
+  c_password_conf_file = FAST_ALLOC (c_password_conf_file_len + 1);
 
   (void) scm_to_locale_stringbuf (password_file, c_password_file,
                                   c_password_file_len + 1);
@@ -1930,8 +1938,8 @@ SCM_DEFINE (scm_gnutls_set_srp_client_credentials_x,
   c_username_len = scm_c_string_length (username);
   c_password_len = scm_c_string_length (password);
 
-  c_username = alloca (c_username_len + 1);
-  c_password = alloca (c_password_len + 1);
+  c_username = FAST_ALLOC (c_username_len + 1);
+  c_password = FAST_ALLOC (c_password_len + 1);
 
   (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
@@ -1987,7 +1995,7 @@ SCM_DEFINE (scm_gnutls_srp_base64_encode, "srp-base64-encode",
   SCM_VALIDATE_STRING (1, str);
 
   c_str_len = scm_c_string_length (str);
-  c_str = alloca (c_str_len + 1);
+  c_str = FAST_ALLOC (c_str_len + 1);
   (void) scm_to_locale_stringbuf (str, c_str, c_str_len + 1);
   c_str[c_str_len] = '\0';
 
@@ -2050,14 +2058,14 @@ SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
   SCM_VALIDATE_STRING (1, str);
 
   c_str_len = scm_c_string_length (str);
-  c_str = alloca (c_str_len + 1);
+  c_str = FAST_ALLOC (c_str_len + 1);
   (void) scm_to_locale_stringbuf (str, c_str, c_str_len + 1);
   c_str[c_str_len] = '\0';
 
   /* We assume that the decoded string is smaller than the encoded
      string.  */
   c_result_len = c_str_len;
-  c_result = alloca (c_result_len + 1);
+  c_result = FAST_ALLOC (c_result_len + 1);
 
   c_str_d.data = (unsigned char *) c_str;
   c_str_d.size = c_str_len;
@@ -2112,7 +2120,7 @@ SCM_DEFINE (scm_gnutls_set_psk_server_credentials_file_x,
   SCM_VALIDATE_STRING (2, file);
 
   c_file_len = scm_c_string_length (file);
-  c_file = alloca (c_file_len + 1);
+  c_file = FAST_ALLOC (c_file_len + 1);
 
   (void) scm_to_locale_stringbuf (file, c_file, c_file_len + 1);
   c_file[c_file_len] = '\0';
@@ -2166,7 +2174,7 @@ SCM_DEFINE (scm_gnutls_set_psk_client_credentials_x,
   c_key_format = scm_to_gnutls_psk_key_format (key_format, 4, FUNC_NAME);
 
   c_username_len = scm_c_string_length (username);
-  c_username = alloca (c_username_len + 1);
+  c_username = FAST_ALLOC (c_username_len + 1);
 
   (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
@@ -2334,7 +2342,7 @@ SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
   else
     {
       c_pass_len = scm_c_string_length (pass);
-      c_pass = alloca (c_pass_len + 1);
+      c_pass = FAST_ALLOC (c_pass_len + 1);
       (void) scm_to_locale_stringbuf (pass, c_pass, c_pass_len + 1);
       c_pass[c_pass_len] = '\0';
     }
@@ -2390,7 +2398,7 @@ SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
   (void) get_the_dn (c_cert, NULL, &c_dn_len);			\
 								\
   /* Get the DN itself.  */					\
-  c_dn = alloca (c_dn_len);					\
+  c_dn = FAST_ALLOC (c_dn_len);					\
   err = get_the_dn (c_cert, c_dn, &c_dn_len);			\
 								\
   if (EXPECT_FALSE (err))					\
@@ -2523,7 +2531,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_matches_hostname_p,
   SCM_VALIDATE_STRING (2, hostname);
 
   c_hostname_len = scm_c_string_length (hostname);
-  c_hostname = alloca (c_hostname_len + 1);
+  c_hostname = FAST_ALLOC (c_hostname_len + 1);
 
   (void) scm_to_locale_stringbuf (hostname, c_hostname, c_hostname_len + 1);
   c_hostname[c_hostname_len] = '\0';
@@ -2864,7 +2872,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
   else
     {
       c_pass_len = scm_c_string_length (pass);
-      c_pass = alloca (c_pass_len + 1);
+      c_pass = FAST_ALLOC (c_pass_len + 1);
       (void) scm_to_locale_stringbuf (pass, c_pass, c_pass_len + 1);
       c_pass[c_pass_len] = '\0';
     }
