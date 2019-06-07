@@ -49,8 +49,6 @@ int main()
 #include "cert-common.h"
 #include "utils.h"
 
-static void terminate(void);
-
 /* This program tests that the server does not send the
  * status request extension if no status response exists. That
  * is to provide compatibility with gnutls 3.3.x which requires
@@ -200,7 +198,6 @@ static void client(int fd)
 
 	if (ret < 0) {
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
-		terminate();
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
@@ -224,15 +221,6 @@ static void client(int fd)
 	gnutls_global_deinit();
 }
 
-
-/* These are global */
-pid_t child;
-
-static void terminate(void)
-{
-	kill(child, SIGTERM);
-	exit(1);
-}
 
 static void server(int fd)
 {
@@ -311,6 +299,7 @@ static void ch_handler(int sig)
 
 void doit(void)
 {
+	pid_t child;
 	int fd[2];
 	int ret, status = 0;
 
