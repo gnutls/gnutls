@@ -155,7 +155,7 @@ static int handshake_callback(gnutls_session_t session, unsigned int htype,
 
 #define MAX_BUF 1024
 
-static void client(int fd)
+static void client(int fd, const char *prio)
 {
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
@@ -176,7 +176,7 @@ static void client(int fd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+ECDHE-RSA", NULL);
+	gnutls_priority_set_direct(session, prio, NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -222,7 +222,7 @@ static void client(int fd)
 }
 
 
-static void server(int fd)
+static void server(int fd, const char *prio)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
@@ -253,7 +253,7 @@ static void server(int fd)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL", NULL);
+	gnutls_priority_set_direct(session, prio, NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -297,7 +297,7 @@ static void ch_handler(int sig)
 	return;
 }
 
-void doit(void)
+static void start(const char *name, const char *prio)
 {
 	pid_t child;
 	int fd[2];
@@ -305,6 +305,8 @@ void doit(void)
 
 	signal(SIGCHLD, ch_handler);
 	signal(SIGPIPE, SIG_IGN);
+
+	success("running: %s\n", name);
 
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
@@ -322,14 +324,21 @@ void doit(void)
 	if (child) {
 		/* parent */
 		close(fd[1]);
-		server(fd[0]);
+		server(fd[0], prio);
 		waitpid(child, &status, 0);
 		check_wait_status(status);
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		client(fd[1], prio);
 		exit(0);
 	}
+}
+
+void doit(void)
+{
+	start("tls1.2", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2");
+	start("tls1.3", "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.3");
+	start("default", "NORMAL");
 }
 
 #endif				/* _WIN32 */
