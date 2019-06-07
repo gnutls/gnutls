@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012, 2014 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014, 2019 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -459,10 +459,11 @@ unrecognized-name unknown-psk-identity)
   (make-enum-type 'error "int"
                   '(
 ;; FIXME: Automate this:
-;; grep '^#define GNUTLS_E_' ../../../../includes/gnutls/gnutls.h.in \
+;; grep '^#define GNUTLS_E_' ../../../lib/includes/gnutls/gnutls.h.in \
 ;;  | sed -r -e 's/^#define GNUTLS_E_([^ ]+).*$/\1/' | tr A-Z_ a-z-
 success
 unsupported-version-packet
+tls-packet-decoding-error
 unexpected-packet-length
 invalid-session
 fatal-alert-received
@@ -478,6 +479,7 @@ again
 expired
 db-error
 srp-pwd-error
+keyfile-error
 insufficient-credentials
 insuficient-credentials
 insufficient-cred
@@ -509,6 +511,8 @@ file-error
 too-many-empty-packets
 unknown-pk-algorithm
 too-many-handshake-packets
+received-disallowed-name
+certificate-required
 no-temporary-rsa-params
 no-compression-algorithms
 no-cipher-suites
@@ -516,6 +520,7 @@ openpgp-getkey-failed
 pk-sig-verify-failed
 illegal-srp-username
 srp-pwd-parsing-error
+keyfile-parsing-error
 no-temporary-dh-params
 asn1-element-not-found
 asn1-identifier-not-found
@@ -551,6 +556,7 @@ safe-renegotiation-failed
 unsafe-renegotiation-denied
 unknown-srp-username
 premature-termination
+malformed-cidr
 base64-encoding-error
 incompatible-gcrypt-library
 incompatible-crypto-library
@@ -561,6 +567,7 @@ random-failed
 base64-unexpected-header-error
 openpgp-subkey-error
 crypto-already-registered
+already-registered
 handshake-too-large
 cryptodev-ioctl-error
 cryptodev-device-error
@@ -568,6 +575,10 @@ channel-binding-not-available
 bad-cookie
 openpgp-preferred-key-error
 incompat-dsa-key-with-tls-protocol
+insufficient-security
+heartbeat-pong-received
+heartbeat-ping-received
+unrecognized-name
 pkcs11-error
 pkcs11-load-error
 parsing-error
@@ -594,7 +605,60 @@ pkcs11-requested-object-not-availble
 certificate-list-unsorted
 illegal-parameter
 no-priorities-were-set
+x509-unsupported-extension
+session-eof
+tpm-error
+tpm-key-password-error
+tpm-srk-password-error
+tpm-session-error
+tpm-key-not-found
+tpm-uninitialized
+tpm-no-lib
+no-certificate-status
+ocsp-response-error
+random-device-error
+auth-error
+no-application-protocol
+sockets-init-error
+key-import-failed
+inappropriate-fallback
+certificate-verification-error
+privkey-verification-error
+unexpected-extensions-length
+asn1-embedded-null-in-string
+self-test-error
+no-self-test
+lib-in-error-state
+pk-generation-error
+idna-error
+need-fallback
+session-user-id-changed
+handshake-during-false-start
+unavailable-during-handshake
+pk-invalid-pubkey
+pk-invalid-privkey
+not-yet-activated
+invalid-utf8-string
+no-embedded-data
+invalid-utf8-email
+invalid-password-string
+certificate-time-error
+record-overflow
+asn1-time-error
+incompatible-sig-with-key
+pk-invalid-pubkey-params
+pk-no-validation-params
+ocsp-mismatch-with-certs
+no-common-key-share
+reauth-request
+too-many-matches
+crl-verification-error
+missing-extension
+db-entry-exists
+early-data-rejected
 unimplemented-feature
+int-ret-0
+int-check-again
 application-error-max
 application-error-min
 )
