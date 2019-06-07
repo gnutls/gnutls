@@ -453,6 +453,8 @@
            error/application-error-max
            error/application-error-min
 
+           fatal-error?
+
            ;; OpenPGP keys (formerly in GnuTLS-extra)
            openpgp-certificate? openpgp-private-key?
            import-openpgp-certificate import-openpgp-private-key
