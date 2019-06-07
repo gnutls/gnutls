@@ -142,4 +142,25 @@ fi
 
 rm -f ${OUTFILE}
 
+# Small records test
+echo ""
+echo "Checking output of gnutls-cli-debug for small records"
+
+eval "${GETPORT}"
+launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:%ALLOW_SMALL_RECORDS" --x509keyfile ${KEY1} --x509certfile ${CERT1} \
+	--x509keyfile ${KEY2} --x509certfile ${CERT2} --x509keyfile ${KEY3} --x509certfile ${CERT3} --recordsize=64 >/dev/null 2>&1
+PID=$!
+wait_server ${PID}
+
+timeout 1800 datefudge "2017-08-9" \
+"${DCLI}" -p "${PORT}" localhost >$OUTFILE 2>&1 || fail ${PID} "gnutls-cli-debug run should have succeeded!"
+
+kill ${PID}
+wait
+
+check_text "whether the server accepts default record size (512 bytes)... no"
+check_text "whether %ALLOW_SMALL_RECORDS is required... yes"
+
+rm -f ${OUTFILE}
+
 exit 0
