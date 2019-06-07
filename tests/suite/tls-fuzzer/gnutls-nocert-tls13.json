@@ -16,6 +16,7 @@
          {"name" : "test-record-size-limit.py",
           "comment" : "changed extension after HRR is not supported #617",
           "arguments" : ["-p", "@PORT@", "--reply-AD-size", "1024",
+                         "--minimal-size", "512",
                          "-e", "change size in TLS 1.2 resumption",
                          "-e", "check if server accepts maximum size in TLS 1.0",
                          "-e", "check if server accepts maximum size in TLS 1.1",
