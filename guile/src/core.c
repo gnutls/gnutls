@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2014, 2016 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014, 2016, 2019 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -35,6 +35,10 @@
 #include "errors.h"
 #include "utils.h"
 
+
+#ifndef HAVE_SCM_GC_MALLOC_POINTERLESS
+# define scm_gc_malloc_pointerless scm_gc_malloc
+#endif
 
 
 /* SMOB and enums type definitions.  */
@@ -958,12 +962,8 @@ make_session_record_port (SCM session)
   const unsigned long mode_bits = SCM_OPN | SCM_RDNG | SCM_WRTNG;
 
   c_port_buf = (unsigned char *)
-#ifdef HAVE_SCM_GC_MALLOC_POINTERLESS
-    scm_gc_malloc_pointerless
-#else
-    scm_gc_malloc
-#endif
-    (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE, session_record_port_gc_hint);
+    scm_gc_malloc_pointerless (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
+			       session_record_port_gc_hint);
 
   /* Create a new port.  */
   port = scm_new_port_table_entry (session_record_port_type);
