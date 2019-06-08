@@ -97,6 +97,7 @@ abi/coverage:
       - ./*.xml
       - ./gnutls-prev-abi.tmp/
       - compat_reports/
+      - ./*.log
       - tests/*.log
       - tests/*/*.log
       - tests/suite/*/*.log
@@ -293,6 +294,7 @@ static-analyzers.Fedora.x86_64:
     expire_in: 1 week
     when: on_failure
     paths:
+      - ./*.log
       - scan-build-lib/*
       - scan-build-libdane/*
   retry: 1
