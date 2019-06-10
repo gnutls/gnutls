@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.9 (unreleased)
+
+** libgnutls: gnutls_privkey_sign_hash2 now accepts the GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
+   flag as documented. This makes it a complete replacement of gnutls_privkey_sign_hash().
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.8 (released 2019-05-28)
 
 ** libgnutls: Added gnutls_prf_early() function to retrieve early keying

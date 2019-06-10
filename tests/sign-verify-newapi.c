@@ -227,19 +227,13 @@ void doit(void)
 				testfail("gnutls_privkey_sign_hash: %s\n",
 				     gnutls_strerror(ret));
 
-			sign_algo =
-			    gnutls_pk_to_sign
-			    (gnutls_pubkey_get_pk_algorithm(pubkey, NULL),
-			     tests[i].digest);
-
 			ret =
-			    gnutls_pubkey_verify_hash2(pubkey, sign_algo,
+			    gnutls_pubkey_verify_hash2(pubkey, tests[i].sigalgo,
 							GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
 							hash_data,
 							&signature);
 			if (ret < 0)
 				testfail("gnutls_pubkey_verify_hash-3 (raw hashed data)\n");
-
 			gnutls_free(signature.data);
 			/* test the legacy API */
 			ret =
