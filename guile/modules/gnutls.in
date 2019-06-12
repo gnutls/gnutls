@@ -25,7 +25,7 @@
 
            ;; sessions
            session?
-           make-session bye handshake rehandshake
+           make-session bye handshake rehandshake reauthenticate
            alert-get alert-send
            session-cipher session-kx session-mac session-protocol
            session-compression-method session-certificate-type
@@ -101,7 +101,8 @@
            ;; enum->string functions
            cipher->string kx->string params->string credentials->string
            mac->string digest->string compression-method->string
-           connection-end->string alert-level->string
+           connection-end->string connection-flag->string
+           alert-level->string
            alert-description->string handshake-description->string
            certificate-status->string certificate-request->string
            close-request->string
@@ -155,6 +156,25 @@
            compression-method/lzo
            connection-end/server
            connection-end/client
+           connection-flag/datagram
+           connection-flag/nonblock
+           connection-flag/no-extensions
+           connection-flag/no-replay-protection
+           connection-flag/no-signal
+           connection-flag/allow-id-change
+           connection-flag/enable-false-start
+           connection-flag/force-client-cert
+           connection-flag/no-tickets
+           connection-flag/key-share-top
+           connection-flag/key-share-top2
+           connection-flag/key-share-top3
+           connection-flag/post-handshake-auth
+           connection-flag/no-auto-rekey
+           connection-flag/safe-padding-check
+           connection-flag/enable-early-start
+           connection-flag/enable-rawpk
+           connection-flag/auto-reauth
+           connection-flag/enable-early-data
            alert-level/warning
            alert-level/fatal
            alert-description/close-notify

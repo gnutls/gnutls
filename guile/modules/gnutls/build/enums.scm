@@ -341,6 +341,30 @@
                   #f
                   "GNUTLS_"))
 
+(define %connection-flag-enum
+  (make-enum-type 'connection-flag "gnutls_init_flags_t"
+                  '(datagram
+                    nonblock
+                    no-extensions
+                    no-replay-protection
+                    no-signal
+                    allow-id-change
+                    enable-false-start
+                    force-client-cert
+                    no-tickets
+                    key-share-top
+                    key-share-top2
+                    key-share-top3
+                    post-handshake-auth
+                    no-auto-rekey
+                    safe-padding-check
+                    enable-early-start
+                    enable-rawpk
+                    auto-reauth
+                    enable-early-data)
+                  #f
+                  "GNUTLS_"))
+
 (define %alert-level-enum
   (make-enum-type 'alert-level "gnutls_alert_level_t"
                   '(warning fatal)
@@ -681,7 +705,8 @@ application-error-min
 (define %gnutls-enums
   ;; All enums.
   (list %cipher-enum %kx-enum %params-enum %credentials-enum %mac-enum
-        %digest-enum %compression-method-enum %connection-end-enum
+        %digest-enum %compression-method-enum
+        %connection-end-enum %connection-flag-enum
         %alert-level-enum %alert-description-enum %handshake-description-enum
         %certificate-status-enum %certificate-request-enum
         %close-request-enum %protocol-enum %certificate-type-enum

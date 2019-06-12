@@ -129,21 +129,27 @@ SCM_DEFINE (scm_gnutls_version, "gnutls-version", 0, 0, 0,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 0,
-            (SCM end),
+SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 1,
+            (SCM end, SCM flags),
             "Return a new session for connection end @var{end}, either "
-            "@code{connection-end/server} or @code{connection-end/client}.")
+            "@code{connection-end/server} or @code{connection-end/client}.  "
+	    "The optional @var{flags} arguments are @code{connection-flag} "
+	    "values such as @code{connection-flag/auto-reauth}.")
 #define FUNC_NAME s_scm_gnutls_make_session
 {
-  int err;
+  int err, i;
   gnutls_session_t c_session;
   gnutls_connection_end_t c_end;
+  gnutls_init_flags_t c_flags = 0;
   SCM session_data;
 
   c_end = scm_to_gnutls_connection_end (end, 1, FUNC_NAME);
 
   session_data = SCM_GNUTLS_MAKE_SESSION_DATA ();
-  err = gnutls_init (&c_session, c_end);
+  for (i = 2; scm_is_pair (flags); flags = scm_cdr (flags), i++)
+    c_flags |= scm_to_gnutls_connection_flag (scm_car (flags), i, FUNC_NAME);
+
+  err = gnutls_init (&c_session, c_end | c_flags);
 
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
@@ -209,7 +215,24 @@ SCM_DEFINE (scm_gnutls_rehandshake, "rehandshake", 1, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
+#undef FUNC_NAME
 
+SCM_DEFINE (scm_gnutls_reauthenticate, "reauthenticate", 1, 0, 0,
+            (SCM session), "Perform a re-authentication step for @var{session}.")
+#define FUNC_NAME s_scm_gnutls_reauthenticate
+{
+  int err;
+  gnutls_session_t c_session;
+
+  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
+
+  /* FIXME: Allow flags as an argument.  */
+  err = gnutls_reauth (c_session, 0);
+  if (EXPECT_FALSE (err))
+    scm_gnutls_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_alert_get, "alert-get", 1, 0, 0,
