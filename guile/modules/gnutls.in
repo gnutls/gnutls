@@ -426,6 +426,41 @@
   (load-extension (string-append %libdir "/guile-gnutls-v-2")
                   "scm_init_gnutls"))
 
+(cond-expand
+  ((not guile-2)
+   (define-macro (define-deprecated new)
+     `(define ,new ,(symbol-append '% new))))
+  (else
+   (define-syntax define-deprecated
+     (lambda (s)
+       "Define a deprecated variable or procedure, along these lines:
+
+  (define-deprecated variable alias)
+
+This defines 'variable' as an alias for 'alias', and emits a warning when
+'variable' is used."
+       (syntax-case s ()
+         ((_ variable)
+          (with-syntax ((alias (datum->syntax
+                                #'variable
+                                (symbol-append
+                                 '% (syntax->datum #'variable)))))
+            #'(define-deprecated variable alias)))
+         ((_ variable alias)
+          (identifier? #'variable)
+          #`(define-syntax variable
+              (lambda (s)
+                (issue-deprecation-warning
+                 (format #f "GnuTLS variable '~a' is deprecated"
+                         (syntax->datum #'variable)))
+                (syntax-case s ()
+                  ((_ args (... ...))
+                   #'(alias args (... ...)))
+                  (id
+                   (identifier? #'id)
+                   #'alias))))))))))
+
+
 ;; Renaming.
 (define protocol/ssl-3 protocol/ssl3)
 (define protocol/tls-1.0 protocol/tls1-0)
@@ -441,6 +476,40 @@
   certificate-verify/allow-any-x509-v1-ca-crt)
 (define certificate-verify/allow-x509-v1-ca-certificate
   certificate-verify/allow-x509-v1-ca-crt)
+
+;; Deprecated OpenPGP bindings.
+(define-deprecated certificate-type/openpgp)
+(define-deprecated error/openpgp-getkey-failed)
+(define-deprecated error/openpgp-uid-revoked)
+(define-deprecated error/openpgp-fingerprint-unsupported)
+(define-deprecated error/openpgp-keyring-error)
+(define-deprecated error/openpgp-subkey-error)
+(define-deprecated error/openpgp-preferred-key-error)
+(define-deprecated openpgp-private-key?)
+(define-deprecated import-openpgp-certificate)
+(define-deprecated import-openpgp-private-key)
+(define-deprecated openpgp-certificate-id)
+(define-deprecated openpgp-certificate-id!)
+(define-deprecated openpgp-certificate-fingerprint)
+(define-deprecated openpgp-certificate-fingerprint!)
+(define-deprecated openpgp-certificate-name)
+(define-deprecated openpgp-certificate-names)
+(define-deprecated openpgp-certificate-algorithm)
+(define-deprecated openpgp-certificate-version)
+(define-deprecated openpgp-certificate-usage)
+(define-deprecated openpgp-keyring?)
+(define-deprecated import-openpgp-keyring)
+(define-deprecated openpgp-keyring-contains-key-id?)
+(define-deprecated set-certificate-credentials-openpgp-keys!)
+
+;; XXX: The following bindings should be marked as deprecated as well, but due
+;; to the way binding names are constructed for enums and smobs, it's
+;; complicated.  Oh well.
+;;
+;; (define-deprecated openpgp-certificate?)
+;; (define-deprecated openpgp-certificate-format->string)
+;; (define-deprecated openpgp-certificate-format/raw)
+;; (define-deprecated openpgp-certificate-format/base64)
 
 ;;; Local Variables:
 ;;; mode: scheme
