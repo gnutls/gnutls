@@ -132,6 +132,7 @@ like e.g. in lib/srp.h:
 ...
 
 #endif /* GNUTLS_LIB_SRP_H */
+```
 
 The public header files follow a similar convention but use the relative
 install directory as template, e.g. `GNUTLS_GNUTLS_H` for `gnutls/gnutls.h`.
