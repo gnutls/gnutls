@@ -88,6 +88,7 @@ unsigned alpn_protos_size = 0;
 
 gnutls_datum_t session_ticket_key;
 gnutls_anti_replay_t anti_replay;
+int record_max_size;
 static void tcp_server(const char *name, int port);
 
 /* end of globals */
@@ -475,6 +476,17 @@ gnutls_session_t initialize_session(int dtls)
 		else
 			gnutls_certificate_server_set_request(session,
 							      GNUTLS_CERT_REQUEST);
+	}
+
+	/* use the record size limit extension */
+	if (record_max_size > 0) {
+		if (gnutls_record_set_max_recv_size(session, record_max_size) <
+		    0) {
+			fprintf(stderr,
+				"Cannot set the maximum record receive size to %d.\n",
+				record_max_size);
+			exit(1);
+		}
 	}
 
 	if (HAVE_OPT(HEARTBEAT))
@@ -1722,6 +1734,8 @@ static void cmd_parser(int argc, char **argv)
 		http = 0;
 	else
 		http = 1;
+
+	record_max_size = OPT_VALUE_RECORDSIZE;
 
 	if (HAVE_OPT(X509FMTDER))
 		x509ctype = GNUTLS_X509_FMT_DER;
