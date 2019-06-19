@@ -133,6 +133,9 @@ check_text "for RFC7919 Diffie-Hellman support... yes"
 check_text "for curve SECP256r1 (RFC4492)... yes"
 check_text "for AES-GCM cipher (RFC5288) support... yes"
 check_text "for SHA1 MAC support... yes"
+check_text "whether the server accepts default record size (512 bytes)... yes"
+check_text "whether %ALLOW_SMALL_RECORDS is required... no"
+
 if test "${GNUTLS_FORCE_FIPS_MODE}" != 1; then
 	#these tests are not run in FIPS mode
 	check_text "for MD5 MAC support... no"
