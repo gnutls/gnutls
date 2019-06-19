@@ -10,8 +10,17 @@ See the end for copying conditions.
 ** libgnutls: gnutls_privkey_sign_hash2 now accepts the GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
    flag as documented. This makes it a complete replacement of gnutls_privkey_sign_hash().
 
+** Marked the crypto cipher registration APIs as deprecated. These APIs are rarely used,
+   are for a niche use case, but have significant side effects, such as preventing any
+   internal re-organization and extension of the internal cipher API. The APIs remain
+   functional though a compiler warning will be issued, and a future minor version update
+   may transform them to a no-op while keeping the ABI compatibility (#789)
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_crypto_register_cipher: Deprecated
+gnutls_crypto_register_aead_cipher: Deprecated
+gnutls_crypto_register_digest: Deprecated
+gnutls_crypto_register_mac: Deprecated
 
 
 * Version 3.6.8 (released 2019-05-28)

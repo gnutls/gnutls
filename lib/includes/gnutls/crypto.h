@@ -186,7 +186,8 @@ gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
 			      gnutls_cipher_setiv_func setiv,
 			      gnutls_cipher_encrypt_func encrypt,
 			      gnutls_cipher_decrypt_func decrypt,
-			      gnutls_cipher_deinit_func deinit);
+			      gnutls_cipher_deinit_func deinit)
+			      _GNUTLS_GCC_ATTR_DEPRECATED;
 
 int
 gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
@@ -195,7 +196,8 @@ gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
 			      gnutls_cipher_setkey_func setkey,
 			      gnutls_cipher_aead_encrypt_func aead_encrypt,
 			      gnutls_cipher_aead_decrypt_func aead_decrypt,
-			      gnutls_cipher_deinit_func deinit);
+			      gnutls_cipher_deinit_func deinit)
+			      _GNUTLS_GCC_ATTR_DEPRECATED;
 
 typedef int (*gnutls_mac_init_func) (gnutls_mac_algorithm_t, void **ctx);
 typedef int (*gnutls_mac_setkey_func) (void *ctx, const void *key, size_t keysize);
@@ -216,7 +218,8 @@ gnutls_crypto_register_mac(gnutls_mac_algorithm_t mac,
 			   gnutls_mac_hash_func hash,
 			   gnutls_mac_output_func output,
 			   gnutls_mac_deinit_func deinit,
-			   gnutls_mac_fast_func hash_fast);
+			   gnutls_mac_fast_func hash_fast)
+			   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 typedef int (*gnutls_digest_init_func) (gnutls_digest_algorithm_t, void **ctx);
 typedef int (*gnutls_digest_hash_func) (void *ctx, const void *text, size_t textsize);
@@ -232,7 +235,8 @@ gnutls_crypto_register_digest(gnutls_digest_algorithm_t digest,
 			   gnutls_digest_hash_func hash,
 			   gnutls_digest_output_func output,
 			   gnutls_digest_deinit_func deinit,
-			   gnutls_digest_fast_func hash_fast);
+			   gnutls_digest_fast_func hash_fast)
+			   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* RSA-PKCS#1 1.5 helper functions */
 int
