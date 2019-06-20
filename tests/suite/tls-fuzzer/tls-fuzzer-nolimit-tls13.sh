@@ -21,9 +21,9 @@
 srcdir="${srcdir:-.}"
 
 tls_fuzzer_prepare() {
-PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1"
+PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:%ALLOW_SMALL_RECORDS"
 
-sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nocert-tls13.json >${TMPFILE}
+sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nolimit-tls13.json >${TMPFILE}
 }
 
 . "${srcdir}/tls-fuzzer/tls-fuzzer-common.sh"

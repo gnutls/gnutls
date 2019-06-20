@@ -1,0 +1,37 @@
+[
+    {"server_command": ["@SERVER@", "--http",
+                 "--x509keyfile", "tests/serverX509Key.pem",
+                 "--x509certfile", "tests/serverX509Cert.pem",
+                 "--x509keyfile", "../../../certs/ecc256.pem",
+                 "--x509certfile", "../../../certs/cert-ecc256.pem",
+                 "--debug=3",
+                 "--httpdata=../http.dat",
+                 "--noticket",
+                 "--priority=@PRIORITY@",
+                 "--disable-client-cert", "--port=@PORT@"],
+     "server_hostname": "localhost",
+     "server_port": @PORT@,
+     "tests" : [
+         {"name" : "test-record-size-limit.py",
+	  "comment" : "TLS 1.3 tests are done separately; 1/n-1 splitting is not supported in TLS 1.0",
+          "arguments" : ["-p", "@PORT@", "--reply-AD-size", "1024",
+                         "-e", "check if server accepts maximum size in TLS 1.0",
+                         "-e", "check if server accepts maximum size in TLS 1.3",
+                         "-e", "check if server accepts minimal size in TLS 1.0",
+                         "-e", "check if server accepts minimal size in TLS 1.3",
+                         "-e", "check if server omits extension for unrecognized size 64 in TLS 1.3",
+                         "-e", "check if server omits extension for unrecognized size 511 in TLS 1.3",
+                         "-e", "check server sent size in TLS 1.0",
+                         "-e", "check server sent size in TLS 1.3",
+                         "-e", "HRR sanity",
+                         "-e", "too large record payload in TLS 1.3",
+                         "-e", "change size in TLS 1.3 session resumption",
+                         "-e", "drop extension in TLS 1.3 session resumption",
+                         "-e", "modified extension in 2nd CH in HRR handshake",
+                         "-e", "added extension in 2nd CH in HRR handshake",
+                         "-e", "check server sent size in TLS 1.0 with max_fragment_length",
+                         "-e", "check server sent size in TLS 1.3 with max_fragment_length",
+                         "-e", "removed extension in 2nd CH in HRR handshake"] }
+     ]
+    }
+]
