@@ -628,17 +628,23 @@ fi
 AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
   ["$unbound_root_key_file"], [The DNSSEC root key file])
 
+system_config_file="/etc/gnutls/config"
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
-                                 [specify the system priority file]),
-            system_priority_file="$withval", 
-system_priority_file="/etc/gnutls/default-priorities"
+                                 [specify the system-wide config file (set empty to disable; default is $config)]),
+            system_config_file="$withval"
 )
 
+AM_CONDITIONAL(DISABLE_SYSTEM_CONFIG, test -z "${system_config_file}")
+
+if test -z "${system_config_file}";then
+	AC_DEFINE([DISABLE_SYSTEM_CONFIG], 1, [Whether to disable system configuration])
+fi
+
 AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
-  ["$system_priority_file"], [The system priority file])
+  ["$system_config_file"], [The system-wide gnutls configuration file])
 
 AC_ARG_WITH(default-priority-string, AS_HELP_STRING([--with-default-priority-string],
-                                 [specify the default priority string (e.g. @SYSTEM)]),
+                                 [specify the default priority string used by gnutls_set_default_priority (default is NORMAL)]),
             prio_string="$withval", 
             prio_string="NORMAL")
 
@@ -950,6 +956,13 @@ dnl Some variables needed in makefiles
 YEAR=`date +%Y`
 AC_SUBST([YEAR], $YEAR)
 
+dnl configuration options for config file parsing (inih)
+AC_DEFINE([INI_MAX_LINE], 2048, [inih maximum line size])
+AC_DEFINE([INI_ALLOW_INLINE_COMMENTS], 1, [whether to allowin inline comments])
+AC_DEFINE([INI_STOP_ON_FIRST_ERROR], 1, [whether to stop on first error])
+AC_DEFINE_UNQUOTED([INI_INLINE_COMMENT_PREFIXES], [";#"], [The inline comment prefixes])
+AC_DEFINE_UNQUOTED([INI_START_COMMENT_PREFIXES], [";#"], [The comment prefixes])
+
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
   Makefile
@@ -1072,7 +1085,7 @@ AC_MSG_NOTICE([System files:
   Trust store file:     $with_default_trust_store_file
   Blacklist file:       $with_default_blacklist_file
   CRL file:             $with_default_crl_file
-  Priority file:        $system_priority_file
+  Configuration file:   $system_config_file
   DNSSEC root key file: $unbound_root_key_file
 ])
 

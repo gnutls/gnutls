@@ -315,6 +315,7 @@ APIMANS += gnutls_ext_set_data.3
 APIMANS += gnutls_fingerprint.3
 APIMANS += gnutls_fips140_mode_enabled.3
 APIMANS += gnutls_fips140_set_mode.3
+APIMANS += gnutls_get_system_config_file.3
 APIMANS += gnutls_global_deinit.3
 APIMANS += gnutls_global_init.3
 APIMANS += gnutls_global_set_audit_log_function.3
