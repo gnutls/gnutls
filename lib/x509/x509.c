@@ -1344,7 +1344,7 @@ inline static int is_type_printable(int type)
 {
 	if (type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_RFC822NAME ||
 	    type == GNUTLS_SAN_URI || type == GNUTLS_SAN_OTHERNAME_XMPP ||
-	    type == GNUTLS_SAN_OTHERNAME)
+	    type == GNUTLS_SAN_OTHERNAME || type == GNUTLS_SAN_REGISTERED_ID)
 		return 1;
 	else
 		return 0;
@@ -1657,7 +1657,6 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 
 	len = sizeof(choice_type);
 	result = asn1_read_value(src, nptr, choice_type, &len);
-
 	if (result == ASN1_VALUE_NOT_FOUND
 	    || result == ASN1_ELEMENT_NOT_FOUND) {
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -1737,6 +1736,12 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
+		}
+
+		if (type == GNUTLS_SAN_REGISTERED_ID && tmp.size > 0) {
+			/* see #805; OIDs contain the null termination byte */
+			assert(tmp.data[tmp.size-1] == 0);
+			tmp.size--;
 		}
 
 		/* _gnutls_x509_read_value() null terminates */
