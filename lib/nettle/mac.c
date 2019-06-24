@@ -42,6 +42,7 @@
 #else
 #include "cmac.h"
 #endif /* HAVE_NETTLE_CMAC128_UPDATE */
+#include <nettle/gcm.h>
 
 typedef void (*update_func) (void *, size_t, const uint8_t *);
 typedef void (*digest_func) (void *, size_t, uint8_t *);
@@ -54,6 +55,19 @@ static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo,
 struct md5_sha1_ctx {
 	struct md5_ctx md5;
 	struct sha1_ctx sha1;
+};
+
+struct gmac_ctx {
+	unsigned int pos;
+	uint8_t buffer[GCM_BLOCK_SIZE];
+	struct gcm_key key;
+	struct gcm_ctx ctx;
+	nettle_cipher_func *encrypt;
+	union {
+		struct aes128_ctx aes128;
+		struct aes192_ctx aes192;
+		struct aes256_ctx aes256;
+	} cipher;
 };
 
 struct nettle_hash_ctx {
@@ -100,6 +114,7 @@ struct nettle_mac_ctx {
 		struct umac128_ctx umac128;
                 struct cmac_aes128_ctx cmac128;
                 struct cmac_aes256_ctx cmac256;
+		struct gmac_ctx gmac;
 	} ctx;
 
 	void *ctx_ptr;
@@ -141,6 +156,88 @@ _wrap_cmac256_set_key(void *ctx, size_t len, const uint8_t * key)
 	if (unlikely(len != 32))
 		abort();
 	cmac_aes256_set_key(ctx, key);
+}
+
+static void
+_wrap_gmac_aes128_set_key(void *_ctx, size_t len, const uint8_t * key)
+{
+	struct gmac_ctx *ctx = _ctx;
+
+	if (unlikely(len != 16))
+		abort();
+	aes128_set_encrypt_key(&ctx->cipher.aes128, key);
+	gcm_set_key(&ctx->key, &ctx->cipher, ctx->encrypt);
+	ctx->pos = 0;
+}
+
+static void
+_wrap_gmac_aes192_set_key(void *_ctx, size_t len, const uint8_t * key)
+{
+	struct gmac_ctx *ctx = _ctx;
+
+	if (unlikely(len != 24))
+		abort();
+	aes192_set_encrypt_key(&ctx->cipher.aes192, key);
+	gcm_set_key(&ctx->key, &ctx->cipher, ctx->encrypt);
+	ctx->pos = 0;
+}
+
+static void
+_wrap_gmac_aes256_set_key(void *_ctx, size_t len, const uint8_t * key)
+{
+	struct gmac_ctx *ctx = _ctx;
+
+	if (unlikely(len != 32))
+		abort();
+	aes256_set_encrypt_key(&ctx->cipher.aes256, key);
+	gcm_set_key(&ctx->key, &ctx->cipher, ctx->encrypt);
+	ctx->pos = 0;
+}
+
+static void _wrap_gmac_set_nonce(void *_ctx, size_t nonce_length, const uint8_t *nonce)
+{
+	struct gmac_ctx *ctx = _ctx;
+
+	gcm_set_iv(&ctx->ctx, &ctx->key, nonce_length, nonce);
+}
+
+static void _wrap_gmac_update(void *_ctx, size_t length, const uint8_t *data)
+{
+	struct gmac_ctx *ctx = _ctx;
+
+	if (ctx->pos + length < GCM_BLOCK_SIZE) {
+		memcpy(&ctx->buffer[ctx->pos], data, length);
+		ctx->pos += length;
+		return;
+	}
+
+	if (ctx->pos) {
+		memcpy(&ctx->buffer[ctx->pos], data, GCM_BLOCK_SIZE - ctx->pos);
+		gcm_update(&ctx->ctx, &ctx->key, GCM_BLOCK_SIZE, ctx->buffer);
+		data += GCM_BLOCK_SIZE - ctx->pos;
+		length -= GCM_BLOCK_SIZE - ctx->pos;
+	}
+
+	if (length >= GCM_BLOCK_SIZE) {
+		gcm_update(&ctx->ctx, &ctx->key,
+			   length / GCM_BLOCK_SIZE * GCM_BLOCK_SIZE,
+			   data);
+		data += length / GCM_BLOCK_SIZE * GCM_BLOCK_SIZE;
+		length %= GCM_BLOCK_SIZE;
+	}
+
+	memcpy(ctx->buffer, data, length);
+	ctx->pos = length;
+}
+
+static void _wrap_gmac_digest(void *_ctx, size_t length, uint8_t *digest)
+{
+	struct gmac_ctx *ctx = _ctx;
+
+	if (ctx->pos)
+		gcm_update(&ctx->ctx, &ctx->key, ctx->pos, ctx->buffer);
+	gcm_digest(&ctx->ctx, &ctx->key, &ctx->cipher, ctx->encrypt, length, digest);
+	ctx->pos = 0;
 }
 
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
@@ -246,6 +343,33 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.cmac256;
 		ctx->length = CMAC128_DIGEST_SIZE;
 		break;
+	case GNUTLS_MAC_AES_GMAC_128:
+		ctx->set_key = _wrap_gmac_aes128_set_key;
+		ctx->set_nonce = _wrap_gmac_set_nonce;
+		ctx->update = _wrap_gmac_update;
+		ctx->digest = _wrap_gmac_digest;
+		ctx->ctx_ptr = &ctx->ctx.gmac;
+		ctx->length = GCM_DIGEST_SIZE;
+		ctx->ctx.gmac.encrypt = (nettle_cipher_func *)aes128_encrypt;
+		break;
+	case GNUTLS_MAC_AES_GMAC_192:
+		ctx->set_key = _wrap_gmac_aes192_set_key;
+		ctx->set_nonce = _wrap_gmac_set_nonce;
+		ctx->update = _wrap_gmac_update;
+		ctx->digest = _wrap_gmac_digest;
+		ctx->ctx_ptr = &ctx->ctx.gmac;
+		ctx->length = GCM_DIGEST_SIZE;
+		ctx->ctx.gmac.encrypt = (nettle_cipher_func *)aes192_encrypt;
+		break;
+	case GNUTLS_MAC_AES_GMAC_256:
+		ctx->set_key = _wrap_gmac_aes256_set_key;
+		ctx->set_nonce = _wrap_gmac_set_nonce;
+		ctx->update = _wrap_gmac_update;
+		ctx->digest = _wrap_gmac_digest;
+		ctx->ctx_ptr = &ctx->ctx.gmac;
+		ctx->length = GCM_DIGEST_SIZE;
+		ctx->ctx.gmac.encrypt = (nettle_cipher_func *)aes256_encrypt;
+		break;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -289,6 +413,9 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_SHA512:
 	case GNUTLS_MAC_UMAC_96:
 	case GNUTLS_MAC_UMAC_128:
+	case GNUTLS_MAC_AES_GMAC_128:
+	case GNUTLS_MAC_AES_GMAC_192:
+	case GNUTLS_MAC_AES_GMAC_256:
 #if ENABLE_GOST
 	case GNUTLS_MAC_GOSTR_94:
 	case GNUTLS_MAC_STREEBOG_256:
