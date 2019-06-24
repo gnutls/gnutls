@@ -1544,6 +1544,7 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 	int ret;
 	size_t data_size;
 	gnutls_hmac_hd_t hd;
+	gnutls_hmac_hd_t copy;
 
 	for (i = 0; i < vectors_size; i++) {
 		ret = gnutls_hmac_init(&hd,
@@ -1559,6 +1560,14 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 		ret = gnutls_hmac(hd, vectors[i].plaintext, 1);
 		if (ret < 0)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+		copy = gnutls_hmac_copy(hd);
+		/* Returning NULL is not an error here for the time being, but
+		 * it might become one later */
+#if 0
+		if (!copy)
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+#endif
 
 		ret = gnutls_hmac(hd,
 				  &vectors[i].plaintext[1],
@@ -1581,6 +1590,25 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 			     gnutls_mac_get_name(mac), i);
 
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (copy != NULL) {
+			ret = gnutls_hmac(copy,
+					  &vectors[i].plaintext[1],
+					  vectors[i].plaintext_size - 1);
+			if (ret < 0)
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+			memset(data, 0xaa, data_size);
+			gnutls_hmac_deinit(copy, data);
+
+			if (memcmp(data, vectors[i].output,
+			    vectors[i].output_size) != 0) {
+				_gnutls_debug_log
+					("MAC-%s copy test vector %d failed!\n",
+					 gnutls_mac_get_name(mac), i);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
 		}
 	}
 
