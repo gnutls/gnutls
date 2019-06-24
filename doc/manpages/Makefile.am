@@ -358,6 +358,7 @@ APIMANS += gnutls_hex_decode2.3
 APIMANS += gnutls_hex_encode.3
 APIMANS += gnutls_hex_encode2.3
 APIMANS += gnutls_hmac.3
+APIMANS += gnutls_hmac_copy.3
 APIMANS += gnutls_hmac_deinit.3
 APIMANS += gnutls_hmac_fast.3
 APIMANS += gnutls_hmac_get_len.3

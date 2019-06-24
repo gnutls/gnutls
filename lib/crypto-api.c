@@ -482,6 +482,38 @@ gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 				digest);
 }
 
+/**
+ * gnutls_hmac_copy:
+ * @handle: is a #gnutls_hmac_hd_t type
+ *
+ * This function will create a copy of MAC context, containing all its current
+ * state. Copying contexts for MACs registered using
+ * gnutls_crypto_register_mac() is not supported and will always result in an
+ * error.
+ *
+ * Returns: new MAC context or NULL in case of an error.
+ *
+ * Since: 3.6.9
+ */
+gnutls_hmac_hd_t gnutls_hmac_copy(gnutls_hmac_hd_t handle)
+{
+	gnutls_hmac_hd_t dig;
+
+	dig = gnutls_malloc(sizeof(mac_hd_st));
+	if (dig == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	if (_gnutls_mac_copy((const mac_hd_st *) handle, (mac_hd_st *)dig) != GNUTLS_E_SUCCESS) {
+		gnutls_assert();
+		gnutls_free(dig);
+		return NULL;
+	}
+
+	return dig;
+}
+
 /* HASH */
 
 /**

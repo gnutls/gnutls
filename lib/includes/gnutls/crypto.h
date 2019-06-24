@@ -112,6 +112,7 @@ unsigned gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 		     const void *key, size_t keylen,
 		     const void *text, size_t textlen, void *digest);
+gnutls_hmac_hd_t gnutls_hmac_copy(gnutls_hmac_hd_t handle);
 
 int gnutls_hash_init(gnutls_hash_hd_t * dig,
 		     gnutls_digest_algorithm_t algorithm);

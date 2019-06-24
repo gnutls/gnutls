@@ -279,6 +279,7 @@ gnutls_hex_decode@GNUTLS_3_4
 gnutls_hex_encode2@GNUTLS_3_4
 gnutls_hex_encode@GNUTLS_3_4
 gnutls_hmac@GNUTLS_3_4
+gnutls_hmac_copy@GNUTLS_3_6_9
 gnutls_hmac_deinit@GNUTLS_3_4
 gnutls_hmac_fast@GNUTLS_3_4
 gnutls_hmac_get_len@GNUTLS_3_4
