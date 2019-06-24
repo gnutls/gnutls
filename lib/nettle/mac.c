@@ -417,6 +417,8 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_SHA512:
 	case GNUTLS_MAC_UMAC_96:
 	case GNUTLS_MAC_UMAC_128:
+	case GNUTLS_MAC_AES_CMAC_128:
+	case GNUTLS_MAC_AES_CMAC_256:
 	case GNUTLS_MAC_AES_GMAC_128:
 	case GNUTLS_MAC_AES_GMAC_192:
 	case GNUTLS_MAC_AES_GMAC_256:
