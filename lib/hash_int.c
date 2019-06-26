@@ -54,6 +54,7 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 		dig->hash = cc->hash;
 		dig->output = cc->output;
 		dig->deinit = cc->deinit;
+		dig->copy = cc->copy;
 
 		return 0;
 	}
@@ -67,6 +68,7 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 	dig->hash = _gnutls_digest_ops.hash;
 	dig->output = _gnutls_digest_ops.output;
 	dig->deinit = _gnutls_digest_ops.deinit;
+	dig->copy = _gnutls_digest_ops.copy;
 
 	return 0;
 }
@@ -86,6 +88,20 @@ int _gnutls_digest_exists(gnutls_digest_algorithm_t algo)
 		return 1;
 
 	return _gnutls_digest_ops.exists(algo);
+}
+
+int _gnutls_hash_copy(const digest_hd_st * handle, digest_hd_st * dst)
+{
+	if (handle->copy == NULL)
+		return gnutls_assert_val(GNUTLS_E_HASH_FAILED);
+
+	*dst = *handle; /* copy data */
+	dst->handle = handle->copy(handle->handle);
+
+	if (dst->handle == NULL)
+		return GNUTLS_E_HASH_FAILED;
+
+	return 0;
 }
 
 void _gnutls_hash_deinit(digest_hd_st * handle, void *digest)

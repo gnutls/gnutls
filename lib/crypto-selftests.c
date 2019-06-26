@@ -1355,6 +1355,7 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 	int ret;
 	size_t data_size;
 	gnutls_hash_hd_t hd;
+	gnutls_hash_hd_t copy;
 
 	if (_gnutls_digest_exists(dig) == 0)
 		return 0;
@@ -1370,6 +1371,14 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 		ret = gnutls_hash(hd, vectors[i].plaintext, 1);
 		if (ret < 0)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+		copy = gnutls_hash_copy(hd);
+		/* Returning NULL is not an error here for the time being, but
+		 * it might become one later */
+#if 0
+		if (!copy)
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+#endif
 
 		ret = gnutls_hash(hd,
 				  &vectors[i].plaintext[1],
@@ -1389,6 +1398,24 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 			_gnutls_debug_log("%s test vector %d failed!\n",
 					  gnutls_digest_get_name(dig), i);
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
+		if (copy != NULL) {
+			ret = gnutls_hash(copy,
+					  &vectors[i].plaintext[1],
+					  vectors[i].plaintext_size - 1);
+			if (ret < 0)
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+
+			memset(data, 0xaa, data_size);
+			gnutls_hash_deinit(copy, data);
+
+			if (memcmp(data, vectors[i].output,
+			    vectors[i].output_size) != 0) {
+				_gnutls_debug_log("%s copy test vector %d failed!\n",
+						  gnutls_digest_get_name(dig), i);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
 		}
 	}
 

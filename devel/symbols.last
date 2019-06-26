@@ -262,6 +262,7 @@ gnutls_handshake_set_private_extensions@GNUTLS_3_4
 gnutls_handshake_set_random@GNUTLS_3_4
 gnutls_handshake_set_timeout@GNUTLS_3_4
 gnutls_hash@GNUTLS_3_4
+gnutls_hash_copy@GNUTLS_3_6_9
 gnutls_hash_deinit@GNUTLS_3_4
 gnutls_hash_fast@GNUTLS_3_4
 gnutls_hash_get_len@GNUTLS_3_4

@@ -637,6 +637,38 @@ gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 }
 
 /**
+ * gnutls_hash_copy:
+ * @handle: is a #gnutls_hash_hd_t type
+ *
+ * This function will create a copy of Message Digest context, containing all
+ * its current state. Copying contexts for Message Digests registered using
+ * gnutls_crypto_register_digest() is not supported and will always result in
+ * an error.
+ *
+ * Returns: new Message Digest context or NULL in case of an error.
+ *
+ * Since: 3.6.9
+ */
+gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle)
+{
+	gnutls_hash_hd_t dig;
+
+	dig = gnutls_malloc(sizeof(digest_hd_st));
+	if (dig == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	if (_gnutls_hash_copy((const digest_hd_st *) handle, (digest_hd_st *)dig) != GNUTLS_E_SUCCESS) {
+		gnutls_assert();
+		gnutls_free(dig);
+		return NULL;
+	}
+
+	return dig;
+}
+
+/**
  * gnutls_key_generate:
  * @key: is a pointer to a #gnutls_datum_t which will contain a newly
  * created key

@@ -122,6 +122,7 @@ void gnutls_hash_deinit(gnutls_hash_hd_t handle, void *digest);
 unsigned gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		     const void *text, size_t textlen, void *digest);
+gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle);
 
 /* register ciphers */
 
@@ -229,6 +230,7 @@ typedef int (*gnutls_digest_output_func) (void *src_ctx, void *digest, size_t di
 typedef void (*gnutls_digest_deinit_func) (void *ctx);
 typedef int (*gnutls_digest_fast_func) (gnutls_digest_algorithm_t,
 		     const void *text, size_t textsize, void *digest);
+typedef void *(*gnutls_digest_copy_func) (const void *ctx);
 
 int
 gnutls_crypto_register_digest(gnutls_digest_algorithm_t digest,

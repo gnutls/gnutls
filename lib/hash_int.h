@@ -48,6 +48,7 @@ typedef struct {
 	hash_func hash;
 	output_func output;
 	hash_deinit_func deinit;
+	copy_func copy;
 
 	const void *key;	/* esoteric use by SSL3 MAC functions */
 	int keysize;
@@ -125,6 +126,8 @@ _gnutls_hash(digest_hd_st * handle, const void *text, size_t textlen)
   (h)->output((h)->handle, d, _gnutls_hash_get_algo_len((h)->e))
 
 void _gnutls_hash_deinit(digest_hd_st * handle, void *digest);
+
+int _gnutls_hash_copy(const digest_hd_st * handle, digest_hd_st * dst);
 
 int
 _gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,

@@ -341,6 +341,7 @@ APIMANS += gnutls_handshake_set_private_extensions.3
 APIMANS += gnutls_handshake_set_random.3
 APIMANS += gnutls_handshake_set_timeout.3
 APIMANS += gnutls_hash.3
+APIMANS += gnutls_hash_copy.3
 APIMANS += gnutls_hash_deinit.3
 APIMANS += gnutls_hash_fast.3
 APIMANS += gnutls_hash_get_len.3

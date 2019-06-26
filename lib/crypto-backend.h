@@ -68,6 +68,7 @@ typedef struct {
 	gnutls_digest_output_func output;
 	gnutls_digest_deinit_func deinit;
 	gnutls_digest_fast_func fast;
+	gnutls_digest_copy_func copy;
 
 	/* Not needed for registered on run-time. Only included
 	 * should define it. */
