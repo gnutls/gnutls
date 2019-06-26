@@ -224,6 +224,25 @@ static int wrap_x86_hmac_init(gnutls_mac_algorithm_t algo, void **_ctx)
 	return 0;
 }
 
+static void *
+wrap_x86_hmac_copy(const void *_ctx)
+{
+	struct x86_hmac_ctx *new_ctx;
+	const struct x86_hmac_ctx *ctx=_ctx;
+	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+
+	new_ctx = gnutls_malloc(sizeof(struct x86_hmac_ctx));
+	if (new_ctx == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	memcpy(new_ctx, ctx, sizeof(*new_ctx));
+	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+
+	return new_ctx;
+}
+
 static int
 wrap_x86_hmac_setkey(void *_ctx, const void *key, size_t keylen)
 {
@@ -293,6 +312,7 @@ const gnutls_crypto_mac_st _gnutls_hmac_sha_x86_ssse3 = {
 	.setnonce = NULL,
 	.hash = wrap_x86_hmac_update,
 	.output = wrap_x86_hmac_output,
+	.copy = wrap_x86_hmac_copy,
 	.deinit = wrap_x86_hmac_deinit,
 	.fast = wrap_x86_hmac_fast,
 };
