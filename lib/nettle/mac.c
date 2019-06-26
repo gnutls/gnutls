@@ -324,6 +324,22 @@ static int wrap_nettle_mac_init(gnutls_mac_algorithm_t algo, void **_ctx)
 	return 0;
 }
 
+static void *wrap_nettle_mac_copy(const void *_ctx)
+{
+	const struct nettle_mac_ctx *ctx = _ctx;
+	struct nettle_mac_ctx *new_ctx;
+	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+
+	new_ctx = gnutls_calloc(1, sizeof(struct nettle_mac_ctx));
+	if (new_ctx == NULL)
+		return NULL;
+
+	memcpy(new_ctx, ctx, sizeof(*ctx));
+	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+
+	return new_ctx;
+}
+
 static int
 wrap_nettle_mac_set_key(void *_ctx, const void *key, size_t keylen)
 {
@@ -616,6 +632,22 @@ wrap_nettle_hash_init(gnutls_digest_algorithm_t algo, void **_ctx)
 	return 0;
 }
 
+static void *wrap_nettle_hash_copy(const void *_ctx)
+{
+	const struct nettle_hash_ctx *ctx = _ctx;
+	struct nettle_hash_ctx *new_ctx;
+	ptrdiff_t off = (uint8_t *)ctx->ctx_ptr - (uint8_t *)(&ctx->ctx);
+
+	new_ctx = gnutls_calloc(1, sizeof(struct nettle_hash_ctx));
+	if (new_ctx == NULL)
+		return NULL;
+
+	memcpy(new_ctx, ctx, sizeof(*ctx));
+	new_ctx->ctx_ptr = (uint8_t *)&new_ctx->ctx + off;
+
+	return new_ctx;
+}
+
 static int
 wrap_nettle_hash_output(void *src_ctx, void *digest, size_t digestsize)
 {
@@ -641,6 +673,7 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
 	.deinit = wrap_nettle_mac_deinit,
 	.fast = wrap_nettle_mac_fast,
 	.exists = wrap_nettle_mac_exists,
+	.copy = wrap_nettle_mac_copy,
 };
 
 gnutls_crypto_digest_st _gnutls_digest_ops = {
@@ -650,4 +683,5 @@ gnutls_crypto_digest_st _gnutls_digest_ops = {
 	.deinit = wrap_nettle_hash_deinit,
 	.fast = wrap_nettle_hash_fast,
 	.exists = wrap_nettle_hash_exists,
+	.copy = wrap_nettle_hash_copy,
 };

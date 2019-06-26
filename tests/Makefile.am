@@ -571,6 +571,7 @@ TESTS_ENVIRONMENT +=						\
 	PSK_FILE=$(srcdir)/psk.passwd				\
 	OPENSSL_ia32cap=0x00000000				\
 	EXEEXT=$(EXEEXT)					\
+	GNUTLS_TEST_SUITE_RUN=1					\
 	builddir="$(builddir)"					\
 	top_builddir="$(top_builddir)"				\
 	libdir="$(libdir)"					\

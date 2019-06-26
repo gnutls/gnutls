@@ -102,6 +102,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	top_builddir="$(top_builddir)"	\
 	srcdir="$(srcdir)"		\
 	ASAN_OPTIONS="detect_leaks=0"	\
+	GNUTLS_TEST_SUITE_RUN=1		\
 	OPENSSL_ia32cap=0x00000000
 
 if ENABLE_NON_SUITEB_CURVES

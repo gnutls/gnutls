@@ -112,6 +112,7 @@ unsigned gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 		     const void *key, size_t keylen,
 		     const void *text, size_t textlen, void *digest);
+gnutls_hmac_hd_t gnutls_hmac_copy(gnutls_hmac_hd_t handle);
 
 int gnutls_hash_init(gnutls_hash_hd_t * dig,
 		     gnutls_digest_algorithm_t algorithm);
@@ -121,6 +122,7 @@ void gnutls_hash_deinit(gnutls_hash_hd_t handle, void *digest);
 unsigned gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST__;
 int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		     const void *text, size_t textlen, void *digest);
+gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle);
 
 /* register ciphers */
 
@@ -208,6 +210,7 @@ typedef void (*gnutls_mac_deinit_func) (void *ctx);
 typedef int (*gnutls_mac_fast_func) (gnutls_mac_algorithm_t, const void *nonce,
 		     size_t nonce_size, const void *key, size_t keysize,
 		     const void *text, size_t textsize, void *digest);
+typedef void *(*gnutls_mac_copy_func) (const void *ctx);
 
 int
 gnutls_crypto_register_mac(gnutls_mac_algorithm_t mac,
@@ -227,6 +230,7 @@ typedef int (*gnutls_digest_output_func) (void *src_ctx, void *digest, size_t di
 typedef void (*gnutls_digest_deinit_func) (void *ctx);
 typedef int (*gnutls_digest_fast_func) (gnutls_digest_algorithm_t,
 		     const void *text, size_t textsize, void *digest);
+typedef void *(*gnutls_digest_copy_func) (const void *ctx);
 
 int
 gnutls_crypto_register_digest(gnutls_digest_algorithm_t digest,

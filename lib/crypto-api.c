@@ -482,6 +482,38 @@ gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 				digest);
 }
 
+/**
+ * gnutls_hmac_copy:
+ * @handle: is a #gnutls_hmac_hd_t type
+ *
+ * This function will create a copy of MAC context, containing all its current
+ * state. Copying contexts for MACs registered using
+ * gnutls_crypto_register_mac() is not supported and will always result in an
+ * error.
+ *
+ * Returns: new MAC context or NULL in case of an error.
+ *
+ * Since: 3.6.9
+ */
+gnutls_hmac_hd_t gnutls_hmac_copy(gnutls_hmac_hd_t handle)
+{
+	gnutls_hmac_hd_t dig;
+
+	dig = gnutls_malloc(sizeof(mac_hd_st));
+	if (dig == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	if (_gnutls_mac_copy((const mac_hd_st *) handle, (mac_hd_st *)dig) != GNUTLS_E_SUCCESS) {
+		gnutls_assert();
+		gnutls_free(dig);
+		return NULL;
+	}
+
+	return dig;
+}
+
 /* HASH */
 
 /**
@@ -602,6 +634,38 @@ gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	return _gnutls_hash_fast(algorithm, ptext, ptext_len, digest);
+}
+
+/**
+ * gnutls_hash_copy:
+ * @handle: is a #gnutls_hash_hd_t type
+ *
+ * This function will create a copy of Message Digest context, containing all
+ * its current state. Copying contexts for Message Digests registered using
+ * gnutls_crypto_register_digest() is not supported and will always result in
+ * an error.
+ *
+ * Returns: new Message Digest context or NULL in case of an error.
+ *
+ * Since: 3.6.9
+ */
+gnutls_hash_hd_t gnutls_hash_copy(gnutls_hash_hd_t handle)
+{
+	gnutls_hash_hd_t dig;
+
+	dig = gnutls_malloc(sizeof(digest_hd_st));
+	if (dig == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	if (_gnutls_hash_copy((const digest_hd_st *) handle, (digest_hd_st *)dig) != GNUTLS_E_SUCCESS) {
+		gnutls_assert();
+		gnutls_free(dig);
+		return NULL;
+	}
+
+	return dig;
 }
 
 /**

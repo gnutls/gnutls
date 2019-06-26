@@ -1290,6 +1290,8 @@ GNUTLS_3_6_9
 {
  global:
 	gnutls_get_system_config_file;
+	gnutls_hmac_copy;
+	gnutls_hash_copy;
 } GNUTLS_3_6_8;
 
 GNUTLS_FIPS140_3_4 {
