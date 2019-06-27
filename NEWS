@@ -38,6 +38,9 @@ See the end for copying conditions.
    of digest or MAC context. Copying contexts for externally-registered digest and MAC
    contexts is unupported.
 
+** libgnutls: Added new flag for GNUTLS_CPUID_OVERRIDE
+  0x20: Enable SHA_NI instruction set
+
 ** API and ABI modifications:
 gnutls_get_system_config_file: Added
 gnutls_crypto_register_cipher: Deprecated

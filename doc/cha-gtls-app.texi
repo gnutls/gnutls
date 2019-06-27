@@ -199,6 +199,7 @@ CPU. The currently available options are:
 @item 0x4: Enable SSSE3
 @item 0x8: Enable PCLMUL
 @item 0x10: Enable AVX
+@item 0x20: Enable SHA_NI
 @item 0x100000: Enable VIA padlock
 @item 0x200000: Enable VIA PHE
 @item 0x400000: Enable VIA PHE SHA512
