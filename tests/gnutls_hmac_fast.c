@@ -113,5 +113,25 @@ void doit(void)
 	else if (debug)
 		success("gnutls_hmac_fast(GMAC-256) OK\n");
 
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_UMAC_96, "keykeykeykeykeyk", 16, "abcdefghabc", 8,
+			     digest);
+	if (err >= 0)
+		fail("gnutls_hmac_fast(UMAC-96) succeeded unexpectedly: %d\n", err);
+	else if (err != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_hmac_fast(UMAC-96) failure: %d\n", err);
+	else if (debug)
+		success("gnutls_hmac_fast(UMAC-96) OK\n");
+
+	err =
+	    gnutls_hmac_fast(GNUTLS_MAC_UMAC_128, "keykeykeykeykeyk", 16, "abcdefghabc", 8,
+			     digest);
+	if (err >= 0)
+		fail("gnutls_hmac_fast(UMAC-128) succeeded unexpectedly: %d\n", err);
+	else if (err != GNUTLS_E_INVALID_REQUEST)
+		fail("gnutls_hmac_fast(UMAC-128) failure: %d\n", err);
+	else if (debug)
+		success("gnutls_hmac_fast(UMAC-128) OK\n");
+
 	gnutls_global_deinit();
 }
