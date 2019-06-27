@@ -391,9 +391,9 @@ static int wrap_nettle_mac_fast(gnutls_mac_algorithm_t algo,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	ctx.set_key(&ctx, key_size, key);
 	if (ctx.set_nonce)
 		ctx.set_nonce(&ctx, nonce_size, nonce);
-	ctx.set_key(&ctx, key_size, key);
 	ctx.update(&ctx, text_size, text);
 	ctx.digest(&ctx, ctx.length, digest);
 	
