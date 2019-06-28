@@ -161,7 +161,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 cert-status fips-mode-pthread rsa-psk global-init sec-params sign-verify-data \
 	 fips-test fips-override-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr mini-dtls-lowmtu set_x509_key_file-late \
-	 crlverify mini-dtls-discard init_fds mini-record-failure \
+	 crlverify mini-dtls-discard init_fds mini-record-failure openconnect-dtls12 \
 	 tls12-rehandshake-cert-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 tls12-rehandshake-cert-auto tls12-rehandshake-set-prio \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu privkey-verify-broken \

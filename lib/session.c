@@ -413,16 +413,16 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 			return NULL;
 		}
 
-		if (kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ECDHE_RSA || 
-		    kx == GNUTLS_KX_ECDHE_PSK) {
+		if ((kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ECDHE_RSA ||
+		    kx == GNUTLS_KX_ECDHE_PSK) && group_name) {
 			if (sign_str)
 				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)-(%s)",
 					 group_name, sign_str);
 			else
 				snprintf(kx_name, sizeof(kx_name), "(ECDHE-%s)",
 					 group_name);
-		} else if (kx == GNUTLS_KX_DHE_DSS || kx == GNUTLS_KX_DHE_RSA || 
-		    kx == GNUTLS_KX_DHE_PSK) {
+		} else if ((kx == GNUTLS_KX_DHE_DSS || kx == GNUTLS_KX_DHE_RSA ||
+		    kx == GNUTLS_KX_DHE_PSK) && group_name) {
 			if (sign_str)
 				snprintf(kx_name, sizeof(kx_name), "(DHE-%s)-(%s)", group_name, sign_str);
 			else
