@@ -41,6 +41,8 @@ See the end for copying conditions.
 ** libgnutls: Added new flag for GNUTLS_CPUID_OVERRIDE
   0x20: Enable SHA_NI instruction set
 
+** libgnutls: Added support for AES-GMAC MAC (#781)
+
 ** API and ABI modifications:
 gnutls_get_system_config_file: Added
 gnutls_crypto_register_cipher: Deprecated
@@ -49,6 +51,9 @@ gnutls_crypto_register_digest: Deprecated
 gnutls_crypto_register_mac: Deprecated
 gnutls_hash_copy: Added
 gnutls_hmac_copy: Added
+GNUTLS_MAC_AES_GMAC_128: Added
+GNUTLS_MAC_AES_GMAC_192: Added
+GNUTLS_MAC_AES_CMAC_256: Added
 
 
 * Version 3.6.8 (released 2019-05-28)

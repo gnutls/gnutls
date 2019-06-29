@@ -278,10 +278,13 @@ typedef enum {
  * @GNUTLS_MAC_STREEBOG_256: HMAC GOST R 34.11-2001 (Streebog) algorithm, 256 bit.
  * @GNUTLS_MAC_STREEBOG_512: HMAC GOST R 34.11-2001 (Streebog) algorithm, 512 bit.
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
- * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
- * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
+ * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm (requires nonce).
+ * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm (requires nonce).
  * @GNUTLS_MAC_AES_CMAC_128: The AES-CMAC-128 MAC algorithm.
  * @GNUTLS_MAC_AES_CMAC_256: The AES-CMAC-256 MAC algorithm.
+ * @GNUTLS_MAC_AES_GMAC_128: The AES-GMAC-128 MAC algorithm (requires nonce).
+ * @GNUTLS_MAC_AES_GMAC_192: The AES-GMAC-192 MAC algorithm (requires nonce).
+ * @GNUTLS_MAC_AES_GMAC_256: The AES-GMAC-256 MAC algorithm (requires nonce).
  * @GNUTLS_MAC_SHA3_224: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_256: Reserved; unimplemented.
  * @GNUTLS_MAC_SHA3_384: Reserved; unimplemented.
@@ -316,6 +319,9 @@ typedef enum {
 	GNUTLS_MAC_UMAC_128 = 202,
 	GNUTLS_MAC_AES_CMAC_128 = 203,
 	GNUTLS_MAC_AES_CMAC_256 = 204,
+	GNUTLS_MAC_AES_GMAC_128 = 205,
+	GNUTLS_MAC_AES_GMAC_192 = 206,
+	GNUTLS_MAC_AES_GMAC_256 = 207,
 } gnutls_mac_algorithm_t;
 
 /**

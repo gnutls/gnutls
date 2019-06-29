@@ -1427,6 +1427,8 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 struct mac_vectors_st {
 	const uint8_t *key;
 	unsigned int key_size;
+	const uint8_t *nonce;
+	unsigned int nonce_size;
 	const uint8_t *plaintext;
 	unsigned int plaintext_size;
 	const uint8_t *output;
@@ -1560,6 +1562,47 @@ const struct mac_vectors_st aes_cmac_256_vectors[] = { /* NIST SP800-38A */
 	 },
 };
 
+const struct mac_vectors_st aes_gmac_128_vectors[] = { /* NIST test vectors */
+	{
+	 STR(key, key_size,
+	     "\x23\x70\xe3\x20\xd4\x34\x42\x08\xe0\xff\x56\x83\xf2\x43\xb2\x13"),
+	 STR(nonce, nonce_size,
+	     "\x04\xdb\xb8\x2f\x04\x4d\x30\x83\x1c\x44\x12\x28"),
+	 STR(plaintext, plaintext_size,
+	     "\xd4\x3a\x8e\x50\x89\xee\xa0\xd0\x26\xc0\x3a\x85\x17\x8b\x27\xda"),
+	 STR(output, output_size,
+	     "\x2a\x04\x9c\x04\x9d\x25\xaa\x95\x96\x9b\x45\x1d\x93\xc3\x1c\x6e"),
+	},
+};
+
+const struct mac_vectors_st aes_gmac_192_vectors[] = { /* NIST test vectors */
+	{
+	 STR(key, key_size,
+	     "\xaa\x92\x1c\xb5\xa2\x43\xab\x08\x91\x1f\x32\x89\x26\x6b\x39\xda"
+	     "\xb1\x33\xf5\xc4\x20\xa6\xc5\xcd"),
+	 STR(nonce, nonce_size,
+	     "\x8f\x73\xdb\x68\xda\xee\xed\x2d\x15\x5f\xb1\xa0"),
+	 STR(plaintext, plaintext_size,
+	     "\x48\x74\x43\xc7\xc1\x4c\xe4\x74\xcb\x3d\x29\x1f\x25\x70\x70\xa2"),
+	 STR(output, output_size,
+	     "\xb1\x26\x74\xfb\xea\xc6\x88\x9a\x24\x94\x8f\x27\x92\xe3\x0a\x50"),
+	},
+};
+
+const struct mac_vectors_st aes_gmac_256_vectors[] = { /* NIST test vectors */
+	{
+	 STR(key, key_size,
+	     "\x6d\xfd\xaf\xd6\x70\x3c\x28\x5c\x01\xf1\x4f\xd1\x0a\x60\x12\x86"
+	     "\x2b\x2a\xf9\x50\xd4\x73\x3a\xbb\x40\x3b\x2e\x74\x5b\x26\x94\x5d"),
+	 STR(nonce, nonce_size,
+	     "\x37\x49\xd0\xb3\xd5\xba\xcb\x71\xbe\x06\xad\xe6"),
+	 STR(plaintext, plaintext_size,
+	     "\xc0\xd2\x49\x87\x19\x92\xe7\x03\x02\xae\x00\x81\x93\xd1\xe8\x9f"),
+	 STR(output, output_size,
+	     "\x4a\xa4\xcc\x69\xf8\x4e\xe6\xac\x16\xd9\xbf\xb4\xe0\x5d\xe5\x00"),
+	},
+};
+
 static int test_mac(gnutls_mac_algorithm_t mac,
 		    const struct mac_vectors_st *vectors,
 		    size_t vectors_size, unsigned flags)
@@ -1581,6 +1624,11 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 					  gnutls_mac_get_name(mac));
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
+
+		if (vectors[i].nonce_size)
+			gnutls_hmac_set_nonce(hd,
+					      vectors[i].nonce,
+					      vectors[i].nonce_size);
 
 		ret = gnutls_hmac(hd, vectors[i].plaintext, 1);
 		if (ret < 0)
@@ -1794,6 +1842,12 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 		CASE(GNUTLS_MAC_AES_CMAC_128, test_mac, aes_cmac_128_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_MAC_AES_CMAC_256, test_mac, aes_cmac_256_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_GMAC_128, test_mac, aes_gmac_128_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_GMAC_192, test_mac, aes_gmac_192_vectors);
+		FALLTHROUGH;
+		CASE(GNUTLS_MAC_AES_GMAC_256, test_mac, aes_gmac_256_vectors);
 
 		break;
 	default:

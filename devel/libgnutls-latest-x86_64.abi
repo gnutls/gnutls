@@ -1546,6 +1546,9 @@
       <enumerator name='GNUTLS_MAC_UMAC_128' value='202'/>
       <enumerator name='GNUTLS_MAC_AES_CMAC_128' value='203'/>
       <enumerator name='GNUTLS_MAC_AES_CMAC_256' value='204'/>
+      <enumerator name='GNUTLS_MAC_AES_GMAC_128' value='205'/>
+      <enumerator name='GNUTLS_MAC_AES_GMAC_192' value='206'/>
+      <enumerator name='GNUTLS_MAC_AES_GMAC_256' value='207'/>
     </enum-decl>
     <typedef-decl name='gnutls_mac_algorithm_t' type-id='type-id-44' id='type-id-31'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-45'>
