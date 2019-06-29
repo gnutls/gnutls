@@ -149,6 +149,9 @@ static const TLS_TEST tls_tests[] = {
 	{"anonymous Diffie-Hellman group info", test_dhe_group, NULL, "N/A",
 	 "N/A"},
 #endif
+	{"for RSA key exchange support", test_rsa, "yes",
+	 "no",
+	 "dunno"},
 	{"for ephemeral Diffie-Hellman support", test_dhe, "yes", "no",
 	 "dunno"},
 	{"for RFC7919 Diffie-Hellman support", test_rfc7919, "yes", "no",
