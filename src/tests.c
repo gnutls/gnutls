@@ -249,6 +249,29 @@ test_code_t test_ecdhe(gnutls_session_t session)
 	return ret;
 }
 
+test_code_t test_rsa(gnutls_session_t session)
+{
+	int ret;
+
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":%s:" ALL_MACS
+		":+RSA:%s", protocol_all_str,
+		rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake(session);
+
+	if (ret < 0)
+		return TEST_FAILED;
+
+	return ret;
+}
+
 static
 test_code_t test_ecdhe_curve(gnutls_session_t session, const char *curve, unsigned id)
 {
