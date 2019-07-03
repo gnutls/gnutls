@@ -39,7 +39,7 @@ See the end for copying conditions.
    contexts is unupported.
 
 ** libgnutls: Added new flag for GNUTLS_CPUID_OVERRIDE
-  0x20: Enable SHA_NI instruction set
+    - 0x20: Enable SHA_NI instruction set
 
 ** libgnutls: Added support for AES-GMAC MAC (#781)
 
