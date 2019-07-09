@@ -175,8 +175,8 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 server-sign-md5-rep privkey-keygen mini-tls-nonblock no-signal pkcs7-gen dtls-etm \
 	 x509sign-verify-rsa x509sign-verify-ecdsa x509sign-verify-gost \
 	 mini-alignment oids atfork prf psk-file priority-init2 post-client-hello-change-prio \
-	 status-request status-request-ok status-request-missing sign-verify-ext \
-	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert \
+	 status-request status-request-ok rfc7633-missing sign-verify-ext \
+	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert rfc7633-ok \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 set-default-prio \
 	 tls12-anon-upgrade global-init-override tlsext-decoding rsa-psk-cb \
