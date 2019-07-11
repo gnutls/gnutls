@@ -576,6 +576,23 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(xts_encrypt_message)
 LIBS=$save_LIBS
 
+# Check for Gosthash94 with CryptoPro S-box support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_gosthash94cp_update)
+LIBS=$save_LIBS
+
+# Check for GOST28147
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_gost28147_set_key)
+LIBS=$save_LIBS
+
+# Check for Streebog support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_streebog512_update)
+LIBS=$save_LIBS
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,

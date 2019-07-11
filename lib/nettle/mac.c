@@ -34,8 +34,12 @@
 #include <nettle/umac.h>
 #if ENABLE_GOST
 #include "gost/hmac-gost.h"
+#ifndef HAVE_NETTLE_GOSTHASH94CP_UPDATE
 #include "gost/gosthash94.h"
+#endif
+#ifndef HAVE_NETTLE_STREEBOG512_UPDATE
 #include "gost/streebog.h"
+#endif
 #endif
 #ifdef HAVE_NETTLE_CMAC128_UPDATE
 #include <nettle/cmac.h>
