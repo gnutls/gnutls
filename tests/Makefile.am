@@ -508,7 +508,7 @@ dist_check_SCRIPTS += p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh
 if HAVE_PKCS11_TRUST_STORE
 if P11KIT_0_23_11_API
 dist_check_SCRIPTS += p11-kit-load.sh
-indirect_tests += pkcs11/list-tokens
+indirect_tests += pkcs11/list-tokens pkcs11/list-objects
 endif
 endif
 
