@@ -29,6 +29,7 @@
 #include <libguile.h>
 
 #include <alloca.h>
+#include <assert.h>
 
 #include "enums.h"
 #include "smobs.h"
@@ -128,21 +129,27 @@ SCM_DEFINE (scm_gnutls_version, "gnutls-version", 0, 0, 0,
 
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 0,
-            (SCM end),
+SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 1,
+            (SCM end, SCM flags),
             "Return a new session for connection end @var{end}, either "
-            "@code{connection-end/server} or @code{connection-end/client}.")
+            "@code{connection-end/server} or @code{connection-end/client}.  "
+	    "The optional @var{flags} arguments are @code{connection-flag} "
+	    "values such as @code{connection-flag/auto-reauth}.")
 #define FUNC_NAME s_scm_gnutls_make_session
 {
-  int err;
+  int err, i;
   gnutls_session_t c_session;
   gnutls_connection_end_t c_end;
+  gnutls_init_flags_t c_flags = 0;
   SCM session_data;
 
   c_end = scm_to_gnutls_connection_end (end, 1, FUNC_NAME);
 
   session_data = SCM_GNUTLS_MAKE_SESSION_DATA ();
-  err = gnutls_init (&c_session, c_end);
+  for (i = 2; scm_is_pair (flags); flags = scm_cdr (flags), i++)
+    c_flags |= scm_to_gnutls_connection_flag (scm_car (flags), i, FUNC_NAME);
+
+  err = gnutls_init (&c_session, c_end | c_flags);
 
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
@@ -208,7 +215,24 @@ SCM_DEFINE (scm_gnutls_rehandshake, "rehandshake", 1, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
+#undef FUNC_NAME
 
+SCM_DEFINE (scm_gnutls_reauthenticate, "reauthenticate", 1, 0, 0,
+            (SCM session), "Perform a re-authentication step for @var{session}.")
+#define FUNC_NAME s_scm_gnutls_reauthenticate
+{
+  int err;
+  gnutls_session_t c_session;
+
+  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
+
+  /* FIXME: Allow flags as an argument.  */
+  err = gnutls_reauth (c_session, 0);
+  if (EXPECT_FALSE (err))
+    scm_gnutls_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_alert_get, "alert-get", 1, 0, 0,
@@ -881,8 +905,15 @@ do_fill_port (void *data)
   const fill_port_data_t *args = (fill_port_data_t *) data;
 
   c_port = args->c_port;
-  result = gnutls_record_recv (args->c_session,
-                               c_port->read_buf, c_port->read_buf_size);
+
+  /* We can get GNUTLS_E_AGAIN due to a "short read", which does _not_
+     correspond to an actual EAGAIN from read(2) since the underlying file
+     descriptor is blocking.  Thus, we can safely loop right away.  */
+  do
+    result = gnutls_record_recv (args->c_session,
+				 c_port->read_buf, c_port->read_buf_size);
+  while (result == GNUTLS_E_AGAIN || result == GNUTLS_E_INTERRUPTED);
+
   if (EXPECT_TRUE (result > 0))
     {
       c_port->read_pos = c_port->read_buf;
@@ -1008,9 +1039,25 @@ read_from_session_record_port (SCM port, SCM dst, size_t start, size_t count)
 
   read_buf = (char *) SCM_BYTEVECTOR_CONTENTS (dst) + start;
 
-  /* XXX: Leave guile mode when SCM_GNUTLS_SESSION_TRANSPORT_IS_FD is
-     true?  */
-  result = gnutls_record_recv (c_session, read_buf, count);
+  /* We can get GNUTLS_E_AGAIN due to a "short read", which does _not_
+     correspond to an actual EAGAIN from read(2) if the underlying file
+     descriptor is blocking--e.g., from 'get_last_packet', returning
+     GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+
+     If SESSION is backed by a file descriptor, return -1 to indicate that
+     we'd better poll; otherwise loop, which is good enough if the underlying
+     port is blocking.  */
+  do
+    result = gnutls_record_recv (c_session, read_buf, count);
+  while (result == GNUTLS_E_INTERRUPTED
+	 || (result == GNUTLS_E_AGAIN
+	     && !SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session)));
+
+  if (result == GNUTLS_E_AGAIN
+      && SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session))
+    /* Tell Guile that reading would block.  */
+    return (size_t) -1;
+
   if (EXPECT_FALSE (result < 0))
     /* FIXME: Silently swallowed! */
     scm_gnutls_error (result, FUNC_NAME);
@@ -1018,6 +1065,22 @@ read_from_session_record_port (SCM port, SCM dst, size_t start, size_t count)
   return result;
 }
 #undef FUNC_NAME
+
+/* Return the file descriptor that backs PORT.  This function is called upon a
+   blocking read--i.e., 'read_from_session_record_port' returned -1.  */
+static int
+session_record_port_fd (SCM port)
+{
+  SCM session;
+  gnutls_session_t c_session;
+
+  session = SCM_GNUTLS_SESSION_RECORD_PORT_SESSION (port);
+  c_session = scm_to_gnutls_session (session, 1, __func__);
+
+  assert (SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session));
+
+  return gnutls_transport_get_int (c_session);
+}
 
 static size_t
 write_to_session_record_port (SCM port, SCM src, size_t start, size_t count)
@@ -1091,6 +1154,11 @@ scm_init_gnutls_session_record_port_type (void)
                         read_from_session_record_port,
 #endif
                         write_to_session_record_port);
+
+#if !USING_GUILE_BEFORE_2_2
+  scm_set_port_read_wait_fd (session_record_port_type,
+			     session_record_port_fd);
+#endif
 
   /* Guile >= 1.9.3 doesn't need a custom mark procedure, and doesn't need a
      finalizer (since memory associated with the port is automatically
