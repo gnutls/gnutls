@@ -573,7 +573,7 @@ LIBS=$save_LIBS
 # Check if nettle has XTS support
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS(xts_encrypt_message)
+AC_CHECK_FUNCS(nettle_xts_encrypt_message)
 LIBS=$save_LIBS
 
 # Check for Gosthash94 with CryptoPro S-box support
