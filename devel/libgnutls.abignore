@@ -1,3 +1,6 @@
+# Syntax is documented at
+# https://sourceware.org/libabigail/manual/libabigail-concepts.html#suppr-spec-label
+
 [suppress_function]
 symbol_version = GNUTLS_PRIVATE_3_4
 
