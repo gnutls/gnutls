@@ -128,7 +128,7 @@ abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
 			echo "****************************************************************************"; \
 			echo "ABI check failed; If intentional add suppression in devel/libgnutls.abignore"; \
 			echo "****************************************************************************"; \
-			false; \
+			exit 1; \
 		fi; \
 	done
 	@for file in $$(echo $(srcdir)/devel/libdane-*-$$(uname -m).abi);do \
@@ -139,7 +139,7 @@ abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
 			echo "ABI check failed; If intentional add a        "; \
 			echo "libabigail suppression file for libgnutls-dane"; \
 			echo "**********************************************"; \
-			false; \
+			exit 1; \
 		fi; \
 	done
 	@echo "********************"

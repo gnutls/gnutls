@@ -10,3 +10,43 @@ name_regexp = _gnutls*
 [suppress_variable]
 symbol_version = GNUTLS_PRIVATE_3_4
 
+[suppress_type]
+name = gnutls_x509_subject_alt_name_t
+changed_enumerators = GNUTLS_SAN_MAX
+
+[suppress_type]
+name = gnutls_alert_description_t
+changed_enumerators = GNUTLS_A_NO_APPLICATION_PROTOCOL
+
+[suppress_type]
+name = gnutls_protocol_t
+changed_enumerators = GNUTLS_TLS_VERSION_MAX
+
+[suppress_type]
+name = gnutls_protocol_t
+changed_enumerators = GNUTLS_DTLS_VERSION_MAX
+
+[suppress_type]
+name = gnutls_certificate_type_t
+changed_enumerators = GNUTLS_CRT_MAX
+
+[suppress_type]
+name = gnutls_pk_algorithm_t
+changed_enumerators = GNUTLS_PK_MAX
+
+[suppress_type]
+name = gnutls_sign_algorithm_t
+changed_enumerators = GNUTLS_SIGN_MAX
+
+[suppress_type]
+name = gnutls_ecc_curve_t
+changed_enumerators = GNUTLS_ECC_CURVE_MAX
+
+[suppress_type]
+name = gnutls_group_t
+changed_enumerators = GNUTLS_GROUP_MAX
+
+[suppress_type]
+name = gnutls_sec_param_t
+changed_enumerators = GNUTLS_SEC_PARAM_MAX
+
