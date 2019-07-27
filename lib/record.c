@@ -1931,9 +1931,12 @@ ssize_t append_data_to_corked(gnutls_session_t session, const void *data, size_t
  * If the EINTR is returned by the internal push function 
  * then %GNUTLS_E_INTERRUPTED will be returned. If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
- * call this function again, with the exact same parameters; alternatively
- * you could provide a %NULL pointer for data, and 0 for
- * size. cf. gnutls_record_get_direction(). 
+ * call this function again with the exact same parameters, or provide a
+ * %NULL pointer for @data and 0 for @data_size, in order to write the
+ * same data as before. If you wish to discard the previous data instead
+ * of retrying, you must call gnutls_record_discard_queued() before
+ * calling this function with different parameters.
+ * cf. gnutls_record_get_direction(). 
  *
  * Note that in DTLS this function will return the %GNUTLS_E_LARGE_PACKET
  * error code if the send data exceed the data MTU value - as returned
