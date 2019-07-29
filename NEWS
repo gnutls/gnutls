@@ -5,6 +5,13 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.10 (unreleased)
+
+** libgnutls: Added support for deterministic ECDSA/DSA (RFC6979)
+   Deterministic signing can be enabled by setting
+   GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE when calling gnutls_privkey_sign_*()
+   functions (#94).
+
 * Version 3.6.9 (released 2019-07-25)
 
 ** libgnutls: add gnutls_hash_copy/gnutls_hmac_copy functions that will create a copy

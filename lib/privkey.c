@@ -1134,6 +1134,8 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 		return ret;
 	}
 
+	FIX_SIGN_PARAMS(params, flags, hash);
+
 	return privkey_sign_and_hash_data(signer, _gnutls_pk_to_sign_entry(params.pk, hash), data, signature, &params);
 }
 
@@ -1185,6 +1187,8 @@ gnutls_privkey_sign_data2(gnutls_privkey_t signer,
 		gnutls_assert();
 		return ret;
 	}
+
+	FIX_SIGN_PARAMS(params, flags, se->hash);
 
 	return privkey_sign_and_hash_data(signer, se, data, signature, &params);
 }
@@ -1252,6 +1256,8 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 		gnutls_assert();
 		return ret;
 	}
+
+	FIX_SIGN_PARAMS(params, flags, se->hash);
 
 	return privkey_sign_prehashed(signer, se, hash_data, signature, &params);
 }
@@ -1375,6 +1381,8 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 
 	if (unlikely(se == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	FIX_SIGN_PARAMS(params, flags, hash_algo);
 
 	return privkey_sign_prehashed(signer, se,
 				      hash_data, signature, &params);
