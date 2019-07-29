@@ -1492,8 +1492,6 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 							   0,
 							   data, signature);
 		} else if (key->key.ext.sign_hash_func) {
-			unsigned int flags = 0;
-
 			if (se->pk == GNUTLS_PK_RSA) {
 				se = _gnutls_sign_to_entry(GNUTLS_SIGN_RSA_RAW);
 				assert(se != NULL);
@@ -1502,7 +1500,7 @@ privkey_sign_raw_data(gnutls_privkey_t key,
 			/* se may not be set here if we are doing legacy RSA */
 			return key->key.ext.sign_hash_func(key, se->id,
 							   key->key.ext.userdata,
-							   flags,
+							   0,
 							   data, signature);
 		} else {
 			if (!PK_IS_OK_FOR_EXT2(se->pk))
