@@ -20,7 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-EXTRA_DIST = priority_options.gperf common.mk
+EXTRA_DIST = priority_options.gperf common.mk inih/LICENSE.txt
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
