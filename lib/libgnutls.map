@@ -1384,4 +1384,7 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_anti_replay_check;
 	# needed by gnutls-strcodes.c
 	_gnutls_ecc_curve_is_supported;
+	# needed by tests/iov:
+	_gnutls_iov_iter_init;
+	_gnutls_iov_iter_next;
 } GNUTLS_3_4;

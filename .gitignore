@@ -431,6 +431,7 @@ tests/infoaccess
 tests/init_fds
 tests/init_roundtrip
 tests/insecure_key
+tests/iov
 tests/ip-check
 tests/ip-utils
 tests/key-export-pkcs8
