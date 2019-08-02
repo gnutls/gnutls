@@ -647,7 +647,7 @@ AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
 
 system_config_file="/etc/gnutls/config"
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
-                                 [specify the system-wide config file (set empty to disable; default is $config)]),
+                                 [specify the system-wide config file (set empty to disable)]),
             system_config_file="$withval"
 )
 
