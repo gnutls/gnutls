@@ -1,5 +1,6 @@
 GNUTLS_3_4@GNUTLS_3_4
 GNUTLS_3_6_0@GNUTLS_3_6_0
+GNUTLS_3_6_10@GNUTLS_3_6_10
 GNUTLS_3_6_2@GNUTLS_3_6_2
 GNUTLS_3_6_3@GNUTLS_3_6_3
 GNUTLS_3_6_4@GNUTLS_3_6_4
@@ -9,8 +10,10 @@ GNUTLS_3_6_8@GNUTLS_3_6_8
 GNUTLS_3_6_9@GNUTLS_3_6_9
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
+gnutls_aead_cipher_decryptv2@GNUTLS_3_6_10
 gnutls_aead_cipher_deinit@GNUTLS_3_4
 gnutls_aead_cipher_encrypt@GNUTLS_3_4
+gnutls_aead_cipher_encryptv2@GNUTLS_3_6_10
 gnutls_aead_cipher_encryptv@GNUTLS_3_6_3
 gnutls_aead_cipher_init@GNUTLS_3_4
 gnutls_alert_get@GNUTLS_3_4

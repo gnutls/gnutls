@@ -885,7 +885,26 @@ static void iov_store_free(struct iov_store_st *s)
 	}
 }
 
-static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
+static int iov_store_grow(struct iov_store_st *s, size_t length)
+{
+	if (s->allocated || s->data == NULL) {
+		s->size += length;
+		s->data = gnutls_realloc(s->data, s->size);
+		if (s->data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		s->allocated = 1;
+	} else {
+		void *data = s->data;
+		size_t size = s->size + length;
+		s->data = gnutls_malloc(size);
+		memcpy(s->data, data, s->size);
+		s->size += length;
+	}
+	return 0;
+}
+
+static int
+copy_from_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 {
 	memset(dst, 0, sizeof(*dst));
 	if (iovcnt == 0) {
@@ -915,6 +934,27 @@ static int copy_iov(struct iov_store_st *dst, const giovec_t *iov, int iovcnt)
 		dst->allocated = 1;
 		return 0;
 	}
+}
+
+static int
+copy_to_iov(struct iov_store_st *src, size_t size,
+	    const giovec_t *iov, int iovcnt)
+{
+	size_t offset = 0;
+	int i;
+
+	if (unlikely(src->size < size))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	for (i = 0; i < iovcnt && size > 0; i++) {
+		size_t to_copy = MIN(size, iov[i].iov_len);
+		memcpy(iov[i].iov_base, (uint8_t *) src->data + offset, to_copy);
+		offset += to_copy;
+		size -= to_copy;
+	}
+	if (size > 0)
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+	return 0;
 }
 
 
@@ -971,11 +1011,11 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 		struct iov_store_st auth;
 		struct iov_store_st ptext;
 
-		ret = copy_iov(&auth, auth_iov, auth_iovcnt);
+		ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		ret = copy_iov(&ptext, iov, iovcnt);
+		ret = copy_from_iov(&ptext, iov, iovcnt);
 		if (ret < 0) {
 			iov_store_free(&auth);
 			return gnutls_assert_val(ret);
@@ -1062,6 +1102,316 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 
 	total += tag_size;
 	*ctext_len = total;
+
+	return 0;
+}
+
+/**
+ * gnutls_aead_cipher_encryptv2:
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
+ * @nonce: the nonce to set
+ * @nonce_len: The length of the nonce
+ * @auth_iov: additional data to be authenticated
+ * @auth_iovcnt: The number of buffers in @auth_iov
+ * @iov: the data to be encrypted
+ * @iovcnt: The number of buffers in @iov
+ * @tag: The authentication tag
+ * @tag_size: The size of the tag to use (use zero for the default)
+ *
+ * This is similar to gnutls_aead_cipher_encrypt(), but it performs
+ * in-place encryption on the provided data buffers.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.10
+ **/
+int
+gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
+			     const void *nonce, size_t nonce_len,
+			     const giovec_t *auth_iov, int auth_iovcnt,
+			     const giovec_t *iov, int iovcnt,
+			     void *tag, size_t *tag_size)
+{
+	api_aead_cipher_hd_st *h = handle;
+	ssize_t ret;
+	uint8_t *p;
+	ssize_t blocksize = handle->ctx_enc.e->blocksize;
+	struct iov_iter_st iter;
+	size_t blocks;
+	size_t _tag_size;
+
+	if (tag_size == NULL || *tag_size == 0)
+		_tag_size = _gnutls_cipher_get_tag_size(h->ctx_enc.e);
+	else
+		_tag_size = *tag_size;
+
+	if (_tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	/* Limitation: this function provides an optimization under the internally registered
+	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
+	 * then this becomes a convenience function as it missed the lower-level primitives
+	 * necessary for piecemeal encryption. */
+	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+		/* ciphertext cannot be produced in a piecemeal approach */
+		struct iov_store_st auth;
+		struct iov_store_st ptext;
+		size_t ptext_size;
+
+		ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = copy_from_iov(&ptext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+
+		ptext_size = ptext.size;
+
+		/* append space for tag */
+		ret = iov_store_grow(&ptext, _tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+
+		ret = gnutls_aead_cipher_encrypt(handle, nonce, nonce_len,
+						 auth.data, auth.size,
+						 _tag_size,
+						 ptext.data, ptext_size,
+						 ptext.data, &ptext.size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+
+		ret = copy_to_iov(&ptext, ptext_size, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+
+		if (tag != NULL)
+			memcpy(tag,
+			       (uint8_t *) ptext.data + ptext_size,
+			       _tag_size);
+		if (tag_size != NULL)
+			*tag_size = _tag_size;
+
+	fallback_fail:
+		iov_store_free(&auth);
+		iov_store_free(&ptext);
+
+		return ret;
+	}
+
+	ret = _gnutls_cipher_setiv(&handle->ctx_enc, nonce, nonce_len);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_iov_iter_init(&iter, auth_iov, auth_iovcnt, blocksize);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+	while (1) {
+		ret = _gnutls_iov_iter_next(&iter, &p);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+		if (ret == 0)
+			break;
+		blocks = ret;
+		ret = _gnutls_cipher_auth(&handle->ctx_enc, p,
+					  blocksize * blocks);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+	if (iter.block_offset > 0) {
+		ret = _gnutls_cipher_auth(&handle->ctx_enc,
+					  iter.block, iter.block_offset);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+
+	ret = _gnutls_iov_iter_init(&iter, iov, iovcnt, blocksize);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+	while (1) {
+		ret = _gnutls_iov_iter_next(&iter, &p);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+		if (ret == 0)
+			break;
+		blocks = ret;
+		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc,
+					      p, blocksize * blocks,
+					      p, blocksize * blocks);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+	if (iter.block_offset > 0) {
+		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc,
+					      iter.block, iter.block_offset,
+					      iter.block, iter.block_offset);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+
+	if (tag != NULL)
+		_gnutls_cipher_tag(&handle->ctx_enc, tag, _tag_size);
+	if (tag_size != NULL)
+		*tag_size = _tag_size;
+
+	return 0;
+}
+
+/**
+ * gnutls_aead_cipher_decryptv2:
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
+ * @nonce: the nonce to set
+ * @nonce_len: The length of the nonce
+ * @auth_iov: additional data to be authenticated
+ * @auth_iovcnt: The number of buffers in @auth_iov
+ * @iov: the data to decrypt
+ * @iovcnt: The number of buffers in @iov
+ * @tag: The authentication tag
+ * @tag_size: The size of the tag to use (use zero for the default)
+ *
+ * This is similar to gnutls_aead_cipher_decrypt(), but it performs
+ * in-place encryption on the provided data buffers.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.10
+ **/
+int
+gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
+			     const void *nonce, size_t nonce_len,
+			     const giovec_t *auth_iov, int auth_iovcnt,
+			     const giovec_t *iov, int iovcnt,
+			     void *tag, size_t tag_size)
+{
+	api_aead_cipher_hd_st *h = handle;
+	ssize_t ret;
+	uint8_t *p;
+	ssize_t blocksize = handle->ctx_enc.e->blocksize;
+	struct iov_iter_st iter;
+	size_t blocks;
+	uint8_t _tag[MAX_HASH_SIZE];
+
+	if (tag_size == 0)
+		tag_size = _gnutls_cipher_get_tag_size(h->ctx_enc.e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	/* Limitation: this function provides an optimization under the internally registered
+	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
+	 * then this becomes a convenience function as it missed the lower-level primitives
+	 * necessary for piecemeal encryption. */
+	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+		/* ciphertext cannot be produced in a piecemeal approach */
+		struct iov_store_st auth;
+		struct iov_store_st ctext;
+		size_t ctext_size;
+
+		ret = copy_from_iov(&auth, auth_iov, auth_iovcnt);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = copy_from_iov(&ctext, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+
+		ctext_size = ctext.size;
+
+		/* append tag */
+		ret = iov_store_grow(&ctext, tag_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+		memcpy((uint8_t *) ctext.data + ctext_size, tag, tag_size);
+
+		ret = gnutls_aead_cipher_decrypt(handle, nonce, nonce_len,
+						 auth.data, auth.size,
+						 tag_size,
+						 ctext.data, ctext.size,
+						 ctext.data, &ctext_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+
+		ret = copy_to_iov(&ctext, ctext_size, iov, iovcnt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fallback_fail;
+		}
+
+	fallback_fail:
+		iov_store_free(&auth);
+		iov_store_free(&ctext);
+
+		return ret;
+	}
+
+	ret = _gnutls_cipher_setiv(&handle->ctx_enc, nonce, nonce_len);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_iov_iter_init(&iter, auth_iov, auth_iovcnt, blocksize);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+	while (1) {
+		ret = _gnutls_iov_iter_next(&iter, &p);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+		if (ret == 0)
+			break;
+		blocks = ret;
+		ret = _gnutls_cipher_auth(&handle->ctx_enc, p,
+					  blocksize * blocks);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+	if (iter.block_offset > 0) {
+		ret = _gnutls_cipher_auth(&handle->ctx_enc,
+					  iter.block, iter.block_offset);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+
+	ret = _gnutls_iov_iter_init(&iter, iov, iovcnt, blocksize);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+	while (1) {
+		ret = _gnutls_iov_iter_next(&iter, &p);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+		if (ret == 0)
+			break;
+		blocks = ret;
+		ret = _gnutls_cipher_decrypt2(&handle->ctx_enc,
+					      p, blocksize * blocks,
+					      p, blocksize * blocks);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+	if (iter.block_offset > 0) {
+		ret = _gnutls_cipher_decrypt2(&handle->ctx_enc,
+					      iter.block, iter.block_offset,
+					      iter.block, iter.block_offset);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+	}
+
+	if (tag != NULL) {
+		_gnutls_cipher_tag(&handle->ctx_enc, _tag, tag_size);
+		if (gnutls_memcmp(_tag, tag, tag_size) != 0)
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+	}
 
 	return 0;
 }

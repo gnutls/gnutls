@@ -331,6 +331,7 @@ tags
 tests/*/out
 tests/Makefile
 tests/Makefile.in
+tests/aead-cipher-vec
 tests/alerts
 tests/alpn-server-prec
 tests/anonself
