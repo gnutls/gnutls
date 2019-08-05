@@ -820,7 +820,8 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			}
 
 			mpz_init(k);
-			if (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE) {
+			if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
+			    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
 				ret = _gnutls_ecdsa_compute_k(k,
 							      curve_id,
 							      pk_params->params[ECC_K],
@@ -888,7 +889,8 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			}
 
 			mpz_init(k);
-			if (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE) {
+			if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST ||
+			    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE)) {
 				ret = _gnutls_dsa_compute_k(k,
 							    pub.q,
 							    TOMPZ(priv),
