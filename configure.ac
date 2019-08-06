@@ -182,6 +182,17 @@ case $host_cpu in
   ;;
 esac
 
+# check for gcc's __get_cpuid_count functionality
+AC_MSG_CHECKING([for __get_cpuid_count])
+AC_LINK_IFELSE(
+   [AC_LANG_SOURCE([
+    #include <cpuid.h>
+    int main(void) { unsigned t1; return __get_cpuid_count(7, 0, &t1, &t1, &t1, &t1); }
+   ])],
+   [AC_DEFINE([HAVE_GET_CPUID_COUNT], [1], [use __get_cpuid_count]) AC_MSG_RESULT([yes])],
+   [AC_MSG_RESULT([no])]
+)
+
 fi
 
 AC_ARG_ENABLE(tls13-interop,
@@ -647,7 +658,7 @@ AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
 
 system_config_file="/etc/gnutls/config"
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
-                                 [specify the system-wide config file (set empty to disable; default is $config)]),
+                                 [specify the system-wide config file (set empty to disable)]),
             system_config_file="$withval"
 )
 
