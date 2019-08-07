@@ -43,7 +43,7 @@ privkey_sign_prehashed(gnutls_privkey_t signer,
 		       const gnutls_sign_entry_st *se,
 		       const gnutls_datum_t * hash_data,
 		       gnutls_datum_t * signature,
-		       gnutls_x509_spki_st * params, unsigned flags);
+		       gnutls_x509_spki_st * params);
 
 /**
  * gnutls_privkey_get_type:
@@ -1253,7 +1253,7 @@ gnutls_privkey_sign_hash2(gnutls_privkey_t signer,
 		return ret;
 	}
 
-	return privkey_sign_prehashed(signer, se, hash_data, signature, &params, flags);
+	return privkey_sign_prehashed(signer, se, hash_data, signature, &params);
 }
 
 int
@@ -1377,7 +1377,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	return privkey_sign_prehashed(signer, se,
-				      hash_data, signature, &params, flags);
+				      hash_data, signature, &params);
 }
 
 static int
@@ -1385,8 +1385,7 @@ privkey_sign_prehashed(gnutls_privkey_t signer,
 		       const gnutls_sign_entry_st *se,
 		       const gnutls_datum_t * hash_data,
 		       gnutls_datum_t * signature,
-		       gnutls_x509_spki_st * params,
-		       unsigned flags)
+		       gnutls_x509_spki_st * params)
 {
 	int ret;
 	gnutls_datum_t digest;
