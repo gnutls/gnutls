@@ -154,11 +154,18 @@ void doit(void)
 		gnutls_global_set_log_level(6);
 
 	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
-		success("testing: %s - %s\n", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
+		success("testing: %s - %s", tests[i].name, gnutls_sign_algorithm_get_name(tests[i].sigalgo));
+
+		ret = gnutls_pubkey_init(&pubkey);
+		if (ret < 0)
+			testfail("gnutls_pubkey_init\n");
 
 		ret = gnutls_privkey_init(&privkey);
 		if (ret < 0)
 			testfail("gnutls_privkey_init\n");
+
+		signature.data = NULL;
+		signature.size = 0;
 
 		ret = gnutls_privkey_import_x509_raw(privkey, &tests[i].key, GNUTLS_X509_FMT_PEM, NULL, 0);
 		if (ret < 0)
@@ -166,16 +173,20 @@ void doit(void)
 
 		ret = gnutls_privkey_sign_data(privkey, tests[i].digest, tests[i].sign_flags,
 					       &tests[i].msg, &signature);
-		if (ret < 0)
-			testfail("gnutls_privkey_sign_data\n");
+		if (gnutls_fips140_mode_enabled()) {
+			/* deterministic ECDSA/DSA is prohibited under FIPS */
+			if (ret != GNUTLS_E_INVALID_REQUEST)
+				testfail("gnutls_privkey_sign_data unexpectedly succeeds\n");
+			success(" - skipping\n");
+			goto next;
+		} else {
+			if (ret < 0)
+				testfail("gnutls_privkey_sign_data\n");
+		}
 
 		if (signature.size != tests[i].sig.size ||
 		    memcmp(signature.data, tests[i].sig.data, signature.size) != 0)
 			testfail("signature does not match");
-
-		ret = gnutls_pubkey_init(&pubkey);
-		if (ret < 0)
-			testfail("gnutls_pubkey_init\n");
 
 		ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
 		if (ret < 0)
@@ -186,7 +197,9 @@ void doit(void)
 					      &signature);
 		if (ret < 0)
 			testfail("gnutls_pubkey_verify_data2\n");
+		success(" - pass");
 
+	next:
 		gnutls_free(signature.data);
 		gnutls_privkey_deinit(privkey);
 		gnutls_pubkey_deinit(pubkey);

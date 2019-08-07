@@ -703,6 +703,14 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 	}
 
+	/* deterministic ECDSA/DSA is prohibited under FIPS except in
+	 * the selftests */
+	if (_gnutls_fips_mode_enabled() &&
+	    _gnutls_get_lib_state() != LIB_STATE_SELFTEST &&
+	    (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_ECDSA) &&
+	    (sign_params->flags & GNUTLS_PK_FLAG_REPRODUCIBLE))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	switch (algo) {
 	case GNUTLS_PK_EDDSA_ED25519:	/* we do EdDSA */
 		{
