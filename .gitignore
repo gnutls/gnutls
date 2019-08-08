@@ -696,6 +696,7 @@ tests/sign-md5-rep
 tests/sign-pk-api
 tests/sign-verify
 tests/sign-verify-data
+tests/sign-verify-deterministic
 tests/sign-verify-ed25519-rfc8080
 tests/sign-verify-ext
 tests/sign-verify-ext4
