@@ -990,9 +990,9 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 	api_aead_cipher_hd_st *h = handle;
 	ssize_t ret;
 	uint8_t *dst;
-	ssize_t dst_size, total = 0;
+	size_t dst_size, total = 0;
 	uint8_t *p;
-	ssize_t blocksize = handle->ctx_enc.e->blocksize;
+	size_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
 	size_t blocks;
 
@@ -1071,7 +1071,7 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 		if (ret == 0)
 			break;
 		blocks = ret;
-		if (unlikely((size_t) dst_size < blocksize * blocks))
+		if (unlikely(dst_size < blocksize * blocks))
 			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc, p,
 					      blocksize * blocks,
@@ -1083,7 +1083,7 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 		total += blocksize * blocks;
 	}
 	if (iter.block_offset > 0) {
-		if (unlikely((size_t) dst_size < iter.block_offset))
+		if (unlikely(dst_size < iter.block_offset))
 			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc,
 					      iter.block, iter.block_offset,
@@ -1095,7 +1095,7 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 		total += iter.block_offset;
 	}
 
-	if ((size_t)dst_size < tag_size)
+	if (dst_size < tag_size)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	_gnutls_cipher_tag(&handle->ctx_enc, dst, tag_size);
