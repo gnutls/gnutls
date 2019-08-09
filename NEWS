@@ -12,6 +12,13 @@ See the end for copying conditions.
    GNUTLS_PRIVKEY_FLAG_REPRODUCIBLE when calling gnutls_privkey_sign_*()
    functions (#94).
 
+** libgnutls: add gnutls_aead_cipher_encryptv2 and gnutls_aead_cipher_decryptv2
+   functions that will perform in-place encryption/decryption on data buffers (#718).
+
+** API and ABI modifications:
+gnutls_aead_cipher_encryptv2: Added
+gnutls_aead_cipher_decryptv2: Added
+
 * Version 3.6.9 (released 2019-07-25)
 
 ** libgnutls: add gnutls_hash_copy/gnutls_hmac_copy functions that will create a copy

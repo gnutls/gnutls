@@ -59,9 +59,11 @@
     <elf-symbol name='_rsa_generate_fips186_4_keypair' version='GNUTLS_FIPS140_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='dsa_generate_dss_keypair' version='GNUTLS_FIPS140_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_aead_cipher_decrypt' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_aead_cipher_decryptv2' version='GNUTLS_3_6_10' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_aead_cipher_deinit' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_aead_cipher_encrypt' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_aead_cipher_encryptv' version='GNUTLS_3_6_3' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_aead_cipher_encryptv2' version='GNUTLS_3_6_10' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_aead_cipher_init' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alert_get' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alert_get_name' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
@@ -8916,6 +8918,30 @@
     <function-decl name='gnutls_aead_cipher_deinit' mangled-name='gnutls_aead_cipher_deinit' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_aead_cipher_deinit@@GNUTLS_3_4'>
       <parameter type-id='type-id-740' name='handle'/>
       <return type-id='type-id-112'/>
+    </function-decl>
+    <function-decl name='gnutls_aead_cipher_decryptv2' mangled-name='gnutls_aead_cipher_decryptv2' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_aead_cipher_decryptv2@@GNUTLS_3_6_10'>
+      <parameter type-id='type-id-740' name='handle'/>
+      <parameter type-id='type-id-102' name='nonce'/>
+      <parameter type-id='type-id-100' name='nonce_len'/>
+      <parameter type-id='type-id-250' name='auth_iov'/>
+      <parameter type-id='type-id-22' name='auth_iovcnt'/>
+      <parameter type-id='type-id-250' name='iov'/>
+      <parameter type-id='type-id-22' name='iovcnt'/>
+      <parameter type-id='type-id-102' name='tag'/>
+      <parameter type-id='type-id-100' name='tag_size'/>
+      <return type-id='type-id-22'/>
+    </function-decl>
+    <function-decl name='gnutls_aead_cipher_encryptv2' mangled-name='gnutls_aead_cipher_encryptv2' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_aead_cipher_encryptv2@@GNUTLS_3_6_10'>
+      <parameter type-id='type-id-740' name='handle'/>
+      <parameter type-id='type-id-102' name='nonce'/>
+      <parameter type-id='type-id-100' name='nonce_len'/>
+      <parameter type-id='type-id-250' name='auth_iov'/>
+      <parameter type-id='type-id-22' name='auth_iovcnt'/>
+      <parameter type-id='type-id-250' name='iov'/>
+      <parameter type-id='type-id-22' name='iovcnt'/>
+      <parameter type-id='type-id-102' name='tag'/>
+      <parameter type-id='type-id-423' name='tag_size'/>
+      <return type-id='type-id-22'/>
     </function-decl>
     <function-decl name='gnutls_aead_cipher_encryptv' mangled-name='gnutls_aead_cipher_encryptv' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='gnutls_aead_cipher_encryptv@@GNUTLS_3_6_3'>
       <parameter type-id='type-id-740' name='handle'/>

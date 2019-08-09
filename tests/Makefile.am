@@ -214,7 +214,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 null_retrieve_function tls-record-size-limit tls-crt_type-neg \
 	 resume-with-stek-expiration resume-with-previous-stek rawpk-api \
 	 tls-record-size-limit-asym dh-compute ecdh-compute sign-verify-data-newapi \
-	 sign-verify-newapi sign-verify-deterministic
+	 sign-verify-newapi sign-verify-deterministic iov aead-cipher-vec
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
@@ -459,6 +459,10 @@ tls13_anti_replay_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl	\
 	$(NETTLE_CFLAGS)
+
+iov_CPPFLAGS = $(AM_CPPFLAGS) \
+	-I$(top_srcdir)/gl	\
+	-I$(top_builddir)/gl
 
 if ENABLE_PKCS11
 if !WINDOWS
