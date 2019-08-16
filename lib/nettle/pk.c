@@ -107,6 +107,15 @@ static void rnd_mpz_func(void *_ctx, size_t length, uint8_t * data)
 	nettle_mpz_get_str_256 (length, data, *k);
 }
 
+static void rnd_nonce_func_fallback(void *_ctx, size_t length, uint8_t * data)
+{
+	if (unlikely(_gnutls_get_lib_state() != LIB_STATE_SELFTEST)) {
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+	}
+
+	memset(data, 0xAA, length);
+}
+
 static void
 ecc_scalar_zclear (struct ecc_scalar *s)
 {
@@ -526,6 +535,7 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_RSA:
 		{
 			struct rsa_public_key pub;
+			nettle_random_func *random_func;
 
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
 			if (ret < 0) {
@@ -533,8 +543,12 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 				goto cleanup;
 			}
 
+			if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+				random_func = rnd_nonce_func_fallback;
+			else
+				random_func = rnd_nonce_func;
 			ret =
-			    rsa_encrypt(&pub, NULL, rnd_nonce_func,
+			    rsa_encrypt(&pub, NULL, random_func,
 					plaintext->size, plaintext->data,
 					p);
 			if (ret == 0 || HAVE_LIB_ERROR()) {
@@ -587,6 +601,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 			struct rsa_public_key pub;
 			size_t length;
 			bigint_t c;
+			nettle_random_func *random_func;
 
 			_rsa_params_to_privkey(pk_params, &priv);
 			ret = _rsa_params_to_pubkey(pk_params, &pub);
@@ -617,8 +632,12 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 				goto cleanup;
 			}
 
+			if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+				random_func = rnd_nonce_func_fallback;
+			else
+				random_func = rnd_nonce_func;
 			ret =
-			    rsa_decrypt_tr(&pub, &priv, NULL, rnd_nonce_func,
+			    rsa_decrypt_tr(&pub, &priv, NULL, random_func,
 					   &length, plaintext->data,
 					   TOMPZ(c));
 			_gnutls_mpi_release(&c);
@@ -664,6 +683,7 @@ _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 	bigint_t c;
 	uint32_t is_err;
 	int ret;
+	nettle_random_func *random_func;
 
 	if (algo != GNUTLS_PK_RSA || plaintext == NULL) {
 		gnutls_assert();
@@ -683,7 +703,11 @@ _wrap_nettle_pk_decrypt2(gnutls_pk_algorithm_t algo,
 		return gnutls_assert_val (GNUTLS_E_MPI_SCAN_FAILED);
 	}
 
-	ret = rsa_sec_decrypt(&pub, &priv, NULL, rnd_nonce_func,
+	if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+		random_func = rnd_nonce_func_fallback;
+	else
+		random_func = rnd_nonce_func;
+	ret = rsa_sec_decrypt(&pub, &priv, NULL, random_func,
 			     plaintext_size, plaintext, TOMPZ(c));
 	/* after this point, any conditional on failure that cause differences
 	 * in execution may create a timing or cache access pattern side
@@ -1072,6 +1096,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		{
 			struct rsa_private_key priv;
 			struct rsa_public_key pub;
+			nettle_random_func *random_func;
 			mpz_t s;
 
 			_rsa_params_to_privkey(pk_params, &priv);
@@ -1082,8 +1107,12 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			mpz_init(s);
 
+			if (_gnutls_get_lib_state() == LIB_STATE_SELFTEST)
+				random_func = rnd_nonce_func_fallback;
+			else
+				random_func = rnd_nonce_func;
 			ret =
-			    rsa_pkcs1_sign_tr(&pub, &priv, NULL, rnd_nonce_func,
+			    rsa_pkcs1_sign_tr(&pub, &priv, NULL, random_func,
 					      vdata->size, vdata->data, s);
 			if (ret == 0 || HAVE_LIB_ERROR()) {
 				gnutls_assert();
