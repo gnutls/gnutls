@@ -13,6 +13,7 @@ FUZZERS = \
  gnutls_base64_decoder_fuzzer$(EXEEXT) \
  gnutls_base64_encoder_fuzzer$(EXEEXT) \
  gnutls_client_fuzzer$(EXEEXT) \
+ gnutls_client_rawpk_fuzzer$(EXEEXT) \
  gnutls_dn_parser_fuzzer$(EXEEXT) \
  gnutls_idna_parser_fuzzer$(EXEEXT) \
  gnutls_ocsp_req_parser_fuzzer$(EXEEXT) \
@@ -36,6 +37,7 @@ gnutls_x509_verify_fuzzer_SOURCES = gnutls_x509_verify_fuzzer.c main.c fuzzer.h
 gnutls_base64_decoder_fuzzer_SOURCES = gnutls_base64_decoder_fuzzer.c main.c fuzzer.h
 gnutls_base64_encoder_fuzzer_SOURCES = gnutls_base64_encoder_fuzzer.c main.c fuzzer.h
 gnutls_client_fuzzer_SOURCES = gnutls_client_fuzzer.c main.c fuzzer.h mem.h certs.h
+gnutls_client_rawpk_fuzzer_SOURCES = gnutls_client_rawpk_fuzzer.c main.c fuzzer.h mem.h certs.h
 gnutls_dn_parser_fuzzer_SOURCES = gnutls_dn_parser_fuzzer.c main.c fuzzer.h
 gnutls_idna_parser_fuzzer_SOURCES = gnutls_idna_parser_fuzzer.c main.c fuzzer.h
 gnutls_ocsp_req_parser_fuzzer_SOURCES = gnutls_ocsp_req_parser_fuzzer.c main.c fuzzer.h
