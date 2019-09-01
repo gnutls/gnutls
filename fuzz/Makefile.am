@@ -26,6 +26,7 @@ FUZZERS = \
  gnutls_psk_server_fuzzer$(EXEEXT) \
  gnutls_reverse_idna_parser_fuzzer$(EXEEXT) \
  gnutls_server_fuzzer$(EXEEXT) \
+ gnutls_server_rawpk_fuzzer$(EXEEXT) \
  gnutls_srp_client_fuzzer$(EXEEXT) \
  gnutls_srp_server_fuzzer$(EXEEXT) \
  gnutls_set_trust_file_fuzzer$(EXEEXT) \
@@ -50,6 +51,7 @@ gnutls_psk_client_fuzzer_SOURCES = gnutls_psk_client_fuzzer.c main.c fuzzer.h me
 gnutls_psk_server_fuzzer_SOURCES = gnutls_psk_server_fuzzer.c main.c fuzzer.h mem.h psk.h
 gnutls_reverse_idna_parser_fuzzer_SOURCES = gnutls_reverse_idna_parser_fuzzer.c main.c fuzzer.h
 gnutls_server_fuzzer_SOURCES = gnutls_server_fuzzer.c main.c fuzzer.h mem.h certs.h
+gnutls_server_rawpk_fuzzer_SOURCES = gnutls_server_rawpk_fuzzer.c main.c fuzzer.h mem.h certs.h
 gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c main.c fuzzer.h mem.h srp.h
 gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c main.c fuzzer.h mem.h srp.h
 gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c main.c fuzzer.h
