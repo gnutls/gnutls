@@ -86,7 +86,7 @@ run_client_suite() {
 	fi
 
 	eval "${GETPORT}"
-	LD_LIBRARY_PATH=$LDPATH launch_server $$ --priority "NORMAL${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+	LD_LIBRARY_PATH=$LDPATH launch_server $$ --priority "NORMAL:+SHA256${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -122,6 +122,12 @@ run_client_suite() {
 	${VALGRIND} "${CLI}" -d 6 ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" <${TMPFILE} >/dev/null ||
 		fail ${PID} "Failed"
 
+	echo "${PREFIX}Checking TLS 1.2 with RSA, AES-CBC-SHA256 and long packet..."
+	head -c 16384 /dev/zero|tr \\0 a >${TMPFILE}
+	echo >>${TMPFILE}
+	${VALGRIND} "${CLI}" -d 6 ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+SHA256:+VERS-TLS1.2:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" <${TMPFILE} >/dev/null ||
+		fail ${PID} "Failed"
+
 	kill ${PID}
 	wait
 }
@@ -144,7 +150,7 @@ run_server_suite() {
 	fi
 
 	eval "${GETPORT}"
-	launch_server $$ --priority "NORMAL${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+	launch_server $$ --priority "NORMAL:+SHA256${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 	PID=$!
 	wait_server ${PID}
 
@@ -176,6 +182,12 @@ run_server_suite() {
 	head -c 16384 /dev/zero|tr \\0 a >${TMPFILE}
 	echo >>${TMPFILE}
 	LD_LIBRARY_PATH=$LDPATH "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" <${TMPFILE} >/dev/null || \
+		fail ${PID} "Failed"
+
+	echo "${PREFIX}Checking TLS 1.2 with RSA, AES-CBC-SHA256 and long packet..."
+	head -c 16384 /dev/zero|tr \\0 a >${TMPFILE}
+	echo >>${TMPFILE}
+	LD_LIBRARY_PATH=$LDPATH "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+AES-128-CBC:+SIGN-ALL:+COMP-NULL:+SHA256:+VERS-TLS1.2:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" <${TMPFILE} >/dev/null || \
 		fail ${PID} "Failed"
 
 	kill ${PID}
