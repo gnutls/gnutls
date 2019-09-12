@@ -54,12 +54,11 @@ const hello_ext_entry_st ext_mod_supported_versions = {
 
 static int
 supported_versions_recv_params(gnutls_session_t session,
-			       const uint8_t * data, size_t _data_size)
+			       const uint8_t * data, size_t data_size)
 {
 	const version_entry_st *vers;
-	ssize_t data_size = _data_size;
 	uint8_t major, minor;
-	ssize_t bytes;
+	size_t bytes;
 	int ret;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
