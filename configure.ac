@@ -423,6 +423,16 @@ fi
 
 AM_CONDITIONAL(WANT_TEST_SUITE, test "$full_test_suite" = "yes")
 
+AC_ARG_ENABLE(oldgnutls-interop,
+  AS_HELP_STRING([--enable-oldgnutls-interop], [enable interoperability testing with old gnutls version]),
+    enable_oldgnutls_interop=$enableval, enable_oldgnutls_interop=no)
+
+if test "$enable_oldgnutls_interop" != "no" && test "$full_test_suite" != yes;then
+	AC_MSG_ERROR([cannot --enable-oldgnutls-interop without --enable-full-test-suite])
+fi
+
+AM_CONDITIONAL(ENABLE_OLDGNUTLS_INTEROP, test "$enable_oldgnutls_interop" != "no")
+
 dnl GCC warnings to enable
 
 AC_ARG_ENABLE([gcc-warnings],

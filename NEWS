@@ -15,9 +15,13 @@ See the end for copying conditions.
 ** libgnutls: add gnutls_aead_cipher_encryptv2 and gnutls_aead_cipher_decryptv2
    functions that will perform in-place encryption/decryption on data buffers (#718).
 
+** libgnutls: added interoperability tests with gnutls 2.12.x; addressed
+   issue with large record handling due to random padding (#811).
+
 ** API and ABI modifications:
 gnutls_aead_cipher_encryptv2: Added
 gnutls_aead_cipher_decryptv2: Added
+
 
 * Version 3.6.9 (released 2019-07-25)
 

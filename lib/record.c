@@ -1219,8 +1219,8 @@ static int recv_headers(gnutls_session_t session,
 
 	if (record->length == 0 || record->length > max_record_recv_size(session)) {
 		_gnutls_audit_log
-		    (session, "Received packet with illegal length: %u\n",
-		     (unsigned int) record->length);
+		    (session, "Received packet with illegal length: %u (max: %u)\n",
+		     (unsigned int) record->length, (unsigned)max_record_recv_size(session));
 
 		if (record->length == 0) {
 			/* Empty, unencrypted records are always unexpected. */
