@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver9"
+  key: "$CI_JOB_NAME-ver10"
   paths:
     - cache/
 
@@ -63,6 +63,10 @@ doc-dist.Fedora:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - SUBMODULE_NOFETCH=1 ./bootstrap
+  - GUILE=/usr/bin/guile2.2
+  - GUILD=/usr/bin/guild2.2
+  - guile_snarf=/usr/bin/guile-snarf2.2
+  - export GUILE GUILD guile_snarf
   - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
   - make -C doc stamp-vti && make -C doc stamp-1 && make -C doc stamp_enums && make -j$(nproc)
   - make -C doc gnutls.html
@@ -80,6 +84,10 @@ abi/coverage:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - SUBMODULE_NOFETCH=1 ./bootstrap
+  - GUILE=/usr/bin/guile2.2
+  - GUILD=/usr/bin/guild2.2
+  - guile_snarf=/usr/bin/guile-snarf2.2
+  - export GUILE GUILD guile_snarf
   - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc
   - make -j$(nproc)
   - make abi-check
@@ -124,6 +132,7 @@ minimal.Fedora.x86_64:
     --disable-ssl3-support --disable-ssl2-support --disable-doc --enable-openssl-compatibility
     --disable-gcc-warnings --with-system-priority-file=""
     --disable-gost
+    --disable-guile
   - make clean
   - make -j$(nproc)
   tags:
