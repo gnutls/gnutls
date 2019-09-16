@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000-2012, 2016 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2016, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #
@@ -910,7 +910,7 @@ if test "$opt_guile_bindings" = "yes"; then
       AC_PATH_PROG([GUILD], [guild])
       AC_SUBST([GUILD])
 
-      GUILE_PKG
+      GUILE_PKG([3.0 2.2 2.0 1.8])
       GUILE_PROGS
       GUILE_SITE_DIR
       GUILE_FLAGS

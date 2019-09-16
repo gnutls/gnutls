@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000-2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2019 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -492,7 +492,7 @@ if HAVE_GUILE
 
 GUILE_FOR_BUILD =				\
   GUILE_AUTO_COMPILE=0				\
-  $(GUILE) -L $(top_srcdir)/guile/modules
+  $(GUILE) -q -L $(top_srcdir)/guile/modules
 
 SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
