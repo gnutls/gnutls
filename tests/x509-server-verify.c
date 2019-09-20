@@ -94,6 +94,11 @@ static void start(const char *prio)
 	ret = gnutls_certificate_set_x509_key_mem2(clientx509cred, &cli_ca3_cert_chain,
 						   &cli_ca3_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	assert(ret>=0);
+	index1 = ret;
+
+	ret = gnutls_certificate_set_ocsp_status_request_mem(clientx509cred, &ocsp_cli_ca3_good_pem,
+							     index1, GNUTLS_X509_FMT_PEM);
+	assert(ret>=0);
 
 	assert(gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca3_cert,
 						     GNUTLS_X509_FMT_PEM) >= 0);
@@ -135,6 +140,21 @@ static void start(const char *prio)
 
 		if (status != 0)
 			fail("Verification should have succeeded!\n");
+
+		/* under TLS1.3 the client can send OCSP responses too */
+		if (gnutls_protocol_get_version(server) == GNUTLS_TLS1_3) {
+			ret = gnutls_ocsp_status_request_is_checked(server, GNUTLS_OCSP_SR_IS_AVAIL);
+			assert(ret >= 0);
+
+			ret = gnutls_ocsp_status_request_is_checked(server, 0);
+			assert(ret >= 0);
+		} else {
+			ret = gnutls_ocsp_status_request_is_checked(server, GNUTLS_OCSP_SR_IS_AVAIL);
+			assert(ret == 0);
+
+			ret = gnutls_ocsp_status_request_is_checked(server, 0);
+			assert(ret == 0);
+		}
 	}
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
