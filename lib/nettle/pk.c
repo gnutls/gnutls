@@ -1327,16 +1327,6 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	return ret;
 }
 
-#if !defined(NETTLE_VERSION_MAJOR) || (NETTLE_VERSION_MAJOR < 3 || (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR < 4))
-# ifdef ENABLE_NON_SUITEB_CURVES
-#  define nettle_get_secp_192r1() &nettle_secp_192r1
-#  define nettle_get_secp_224r1() &nettle_secp_224r1
-# endif
-# define nettle_get_secp_256r1() &nettle_secp_256r1
-# define nettle_get_secp_384r1() &nettle_secp_384r1
-# define nettle_get_secp_521r1() &nettle_secp_521r1
-#endif
-
 static inline const struct ecc_curve *get_supported_nist_curve(int curve)
 {
 	switch (curve) {
