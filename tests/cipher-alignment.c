@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 #include "ex-session-info.c"
 #include "ex-x509-info.c"
 
-pid_t child;
+static pid_t child;
 
 static void tls_log_func(int level, const char *str)
 {
@@ -126,6 +126,8 @@ struct myaes_ctx {
 	int enc;
 };
 
+static unsigned aes_init = 0;
+
 static int
 myaes_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
@@ -138,6 +140,7 @@ myaes_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 	}
 
 	((struct myaes_ctx *) (*_ctx))->enc = enc;
+	aes_init = 1;
 
 	return 0;
 }
@@ -510,6 +513,8 @@ void doit(void)
 
 	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.1");
 	start("NORMAL:-CIPHER-ALL:+AES-128-CBC:-VERS-ALL:+VERS-TLS1.2");
+
+	assert(aes_init != 0);
 
 	gnutls_global_deinit();
 }
