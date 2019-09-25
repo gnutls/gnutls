@@ -124,6 +124,11 @@ RSAPSSParameters ::= SEQUENCE {
 -- GOST R 34.10
 GOSTParameters ::= SEQUENCE {
    publicKeyParamSet  OBJECT IDENTIFIER,
+   digestParamSet     OBJECT IDENTIFIER OPTIONAL
+}
+
+GOSTParametersOld ::= SEQUENCE {
+   publicKeyParamSet  OBJECT IDENTIFIER,
    digestParamSet     OBJECT IDENTIFIER,
    encryptionParamSet OBJECT IDENTIFIER OPTIONAL
 }
