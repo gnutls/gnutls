@@ -1832,8 +1832,12 @@ void gnutls_packet_deinit(gnutls_packet_t packet)
  * gnutls_record_discard_queued:
  * @session: is a #gnutls_session_t type.
  *
- * This function discards all queued to be sent packets in a TLS or DTLS session.
+ * This function discards all queued to be sent packets in a DTLS session.
  * These are the packets queued after an interrupted gnutls_record_send().
+ *
+ * This function can only be used with transports where send() is
+ * an all-or-nothing operation (e.g., UDP). When partial writes are allowed
+ * this function will cause session errors.
  *
  * Returns: The number of bytes discarded.
  *
@@ -1935,7 +1939,8 @@ ssize_t append_data_to_corked(gnutls_session_t session, const void *data, size_t
  * %NULL pointer for @data and 0 for @data_size, in order to write the
  * same data as before. If you wish to discard the previous data instead
  * of retrying, you must call gnutls_record_discard_queued() before
- * calling this function with different parameters.
+ * calling this function with different parameters. Note that the latter
+ * works only on special transports (e.g., UDP).
  * cf. gnutls_record_get_direction(). 
  *
  * Note that in DTLS this function will return the %GNUTLS_E_LARGE_PACKET
