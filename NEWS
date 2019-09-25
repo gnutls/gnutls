@@ -15,6 +15,10 @@ See the end for copying conditions.
 ** libgnutls: add gnutls_aead_cipher_encryptv2 and gnutls_aead_cipher_decryptv2
    functions that will perform in-place encryption/decryption on data buffers (#718).
 
+** libgnutls: Corrected issue in gnutls_session_get_data2() which could fail under
+   TLS1.3, if a timeout callback was not set using gnutls_transport_set_pull_timeout_function()
+   (#823).
+
 ** libgnutls: added interoperability tests with gnutls 2.12.x; addressed
    issue with large record handling due to random padding (#811).
 
