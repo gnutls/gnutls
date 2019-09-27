@@ -63,6 +63,7 @@ supported_versions_recv_params(gnutls_session_t session,
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		const version_entry_st *old_vers;
+		const version_entry_st *cli_vers = NULL;
 
 		vers = _gnutls_version_max(session);
 		old_vers = get_version(session);
@@ -94,29 +95,41 @@ supported_versions_recv_params(gnutls_session_t session,
 			_gnutls_handshake_log("EXT[%p]: Found version: %d.%d\n",
 					      session, (int)major, (int)minor);
 
-			if (_gnutls_nversion_is_supported(session, major, minor)) {
-				session->security_parameters.pversion = nversion_to_entry(major, minor);
+			if (!_gnutls_nversion_is_supported(session, major, minor))
+				continue;
 
-				_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
-						      session, (int)major, (int)minor);
-
-				vers = get_version(session);
-				if (old_vers != vers) {
-					/* regenerate the random value to set
-					 * downgrade sentinel if necessary
-					 */
-					ret = _gnutls_gen_server_random(session,
-									vers->id);
-					if (ret < 0)
-						return gnutls_assert_val(ret);
-				}
-
-				return 0;
-			}
+			/* Prefer the latest possible version
+			 * regardless of the client's precedence.  See
+			 * https://gitlab.com/gnutls/gnutls/issues/837
+			 * for the rationale.
+			 */
+			if (!cli_vers ||
+			    major > cli_vers->major ||
+			    (major == cli_vers->major &&
+			     minor > cli_vers->minor))
+				cli_vers = nversion_to_entry(major, minor);
 		}
 
-		/* if we are here, none of the versions were acceptable */
-		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+		if (!cli_vers)
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
+		session->security_parameters.pversion = cli_vers;
+
+		_gnutls_handshake_log("EXT[%p]: Negotiated version: %d.%d\n",
+				      session,
+				      (int)cli_vers->major,
+				      (int)cli_vers->minor);
+
+		if (old_vers != cli_vers) {
+			/* regenerate the random value to set
+			 * downgrade sentinel if necessary
+			 */
+			ret = _gnutls_gen_server_random(session, cli_vers->id);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
+
+		return 0;
 	} else { /* client */
 
 		if (!have_creds_for_tls13(session)) {

@@ -22,6 +22,9 @@ See the end for copying conditions.
 ** libgnutls: added interoperability tests with gnutls 2.12.x; addressed
    issue with large record handling due to random padding (#811).
 
+** libgnutls: the server now selects the highest TLS protocol version,
+   if TLS 1.3 is enabled and the client advertises an older protocol version first (#837).
+
 ** API and ABI modifications:
 gnutls_aead_cipher_encryptv2: Added
 gnutls_aead_cipher_decryptv2: Added
