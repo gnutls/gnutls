@@ -25,10 +25,16 @@ See the end for copying conditions.
 ** libgnutls: the server now selects the highest TLS protocol version,
    if TLS 1.3 is enabled and the client advertises an older protocol version first (#837).
 
+** libgnutls: added support for GOST 28147-89 cipher in CNT (GOST counter) mode
+   and MAC generation based on GOST 28147-89 (IMIT). For description of the
+   modes see RFC 5830. S-Box is id-tc26-gost-28147-param-Z (TC26Z) defined in
+   RFC 7836.
+
 ** API and ABI modifications:
 gnutls_aead_cipher_encryptv2: Added
 gnutls_aead_cipher_decryptv2: Added
-
+GNUTLS_CIPHER_GOST28147_TC26Z_CNT: Added
+GNUTLS_MAC_GOST28147_TC26Z_IMIT: Added
 
 * Version 3.6.9 (released 2019-07-25)
 
