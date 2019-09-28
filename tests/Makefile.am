@@ -154,7 +154,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple tls-pthread \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead tls12-ffdhe \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities priorities-groups	\
-	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time \
+	 gnutls_x509_privkey_import gnutls_x509_crt_list_import time x509-server-verify \
 	 sign-verify-ext4 tls-neg-ext4-key resume-lifetime memset0 memset1 \
 	 mini-dtls-srtp rsa-encrypt-decrypt mini-loss-time gnutls-strcodes \
 	 mini-record mini-dtls-record handshake-timeout mini-record-range \
