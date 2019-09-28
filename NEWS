@@ -30,6 +30,9 @@ See the end for copying conditions.
    modes see RFC 5830. S-Box is id-tc26-gost-28147-param-Z (TC26Z) defined in
    RFC 7836.
 
+** certtool: when outputting an encrypted private key do not insert the textual description
+   of it. This fixes a regression since 3.6.5 (#840).
+
 ** API and ABI modifications:
 gnutls_aead_cipher_encryptv2: Added
 gnutls_aead_cipher_decryptv2: Added
