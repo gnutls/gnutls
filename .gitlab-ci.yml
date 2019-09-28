@@ -551,6 +551,7 @@ Debian.cross.i686-linux-gnu:
       --cache-file ../cache/config.cache --disable-doc --disable-guile
       --without-p11-kit --disable-full-test-suite
   - make -j$(nproc)
+  - make pic-check
   - make check -j$(nproc)
   - cd ..
   tags:
