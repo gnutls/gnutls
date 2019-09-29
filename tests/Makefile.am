@@ -411,8 +411,8 @@ endif
 
 rsa_illegal_import_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
 
-mini_alignment_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
-mini_alignment_LDADD = $(LDADD) $(NETTLE_LIBS)
+cipher_alignment_CPPFLAGS = $(AM_CPPFLAGS) $(NETTLE_CFLAGS)
+cipher_alignment_LDADD = $(LDADD) $(NETTLE_LIBS)
 
 if ENABLE_OPENSSL
 ctests +=  openssl
