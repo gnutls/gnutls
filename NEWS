@@ -5,7 +5,7 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.10 (unreleased)
+* Version 3.6.10 (released 2019-09-29)
 
 ** libgnutls: Added support for deterministic ECDSA/DSA (RFC6979)
    Deterministic signing can be enabled by setting
