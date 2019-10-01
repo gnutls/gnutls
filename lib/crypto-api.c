@@ -1113,6 +1113,7 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 	api_aead_cipher_hd_st *h = handle;
 	ssize_t ret;
 	uint8_t *p;
+	size_t len;
 	ssize_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
 	size_t _tag_size;
@@ -1211,7 +1212,13 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc, p, ret, p, ret);
+
+		len = ret;
+		ret = _gnutls_cipher_encrypt2(&handle->ctx_enc, p, len, p, len);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_iov_iter_sync(&iter, p, len);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}
@@ -1253,6 +1260,7 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 	api_aead_cipher_hd_st *h = handle;
 	ssize_t ret;
 	uint8_t *p;
+	size_t len;
 	ssize_t blocksize = handle->ctx_enc.e->blocksize;
 	struct iov_iter_st iter;
 	uint8_t _tag[MAX_HASH_SIZE];
@@ -1342,7 +1350,13 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 			return gnutls_assert_val(ret);
 		if (ret == 0)
 			break;
-		ret = _gnutls_cipher_decrypt2(&handle->ctx_enc, p, ret, p, ret);
+
+		len = ret;
+		ret = _gnutls_cipher_decrypt2(&handle->ctx_enc, p, len, p, len);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_iov_iter_sync(&iter, p, len);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}
