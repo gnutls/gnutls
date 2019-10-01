@@ -133,3 +133,62 @@ _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data)
 
 	return 0;
 }
+
+/**
+ * _gnutls_iov_iter_sync:
+ * @iter: the iterator
+ * @data: data returned by _gnutls_iov_iter_next
+ * @data_size: size of @data
+ *
+ * Flush the content of temp buffer (if any) to the data buffer.
+ */
+int
+_gnutls_iov_iter_sync(struct iov_iter_st *iter, const uint8_t *data,
+		      size_t data_size)
+{
+	size_t iov_index;
+	size_t iov_offset;
+
+	/* We didn't return the cached block. */
+	if (data != iter->block)
+		return 0;
+
+	iov_index = iter->iov_index;
+	iov_offset = iter->iov_offset;
+
+	/* When syncing a cache block we walk backwards because we only have a
+	 * pointer to were the block ends in the iovec, walking backwards is
+	 * fine as we are always writing a full block, so the whole content
+	 * is written in the right places:
+	 * iovec:     |--0--|---1---|--2--|-3-|
+	 * block:     |-----------------------|
+	 * 1st write                      |---|
+	 * 2nd write                |-----
+	 * 3rd write        |-------
+	 * last write |-----
+	 */
+	while (data_size > 0) {
+		const giovec_t *iov;
+		uint8_t *p;
+		size_t to_write;
+
+		while (iov_offset == 0) {
+			if (unlikely(iov_index == 0))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+			iov_index--;
+			iov_offset = iter->iov[iov_index].iov_len;
+		}
+
+		iov = &iter->iov[iov_index];
+		p = iov->iov_base;
+		to_write = MIN(data_size, iov_offset);
+
+		iov_offset -= to_write;
+		data_size -= to_write;
+
+		memcpy(p + iov_offset, &iter->block[data_size], to_write);
+	}
+
+	return 0;
+}

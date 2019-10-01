@@ -44,10 +44,10 @@ struct test_st {
 };
 
 static const giovec_t iov16[] = {
-	{(void *) "0123456789abcdef", 16},
-	{(void *) "0123456789abcdef", 16},
-	{(void *) "0123456789abcdef", 16},
-	{(void *) "0123456789abcdef", 16}
+	{(void *) "0123456789012345", 16},
+	{(void *) "0123456789012345", 16},
+	{(void *) "0123456789012345", 16},
+	{(void *) "0123456789012345", 16}
 };
 
 static const struct exp_st exp16_64[] = {
@@ -166,20 +166,53 @@ static const struct test_st tests[] = {
 	  exp_empty_16, sizeof(exp_empty_16)/sizeof(exp_empty_16[0]) },
 };
 
+static void
+copy(giovec_t *dst, uint8_t *buffer, const giovec_t *src, size_t iovcnt)
+{
+	uint8_t *p = buffer;
+	size_t i;
+
+	for (i = 0; i < iovcnt; i++) {
+		dst[i].iov_base = p;
+		dst[i].iov_len = src[i].iov_len;
+		memcpy(dst[i].iov_base, src[i].iov_base, src[i].iov_len);
+		p += src[i].iov_len;
+	}
+}
+
+static void
+translate(uint8_t *data, size_t len)
+{
+	for (; len > 0; len--) {
+		uint8_t *p = &data[len - 1];
+		if (*p >= '0' && *p <= '9')
+			*p = 'A' + *p - '0';
+		else if (*p >= 'A' && *p <= 'Z')
+			*p = '0' + *p - 'A';
+	}
+}
+
+#define MAX_BUF 1024
+#define MAX_IOV 16
+
 void
 doit (void)
 {
+	uint8_t buffer[MAX_BUF];
 	size_t i;
 
 	for (i = 0; i < sizeof(tests)/sizeof(tests[0]); i++) {
+		giovec_t iov[MAX_IOV];
 		struct iov_iter_st iter;
 		const struct exp_st *exp = tests[i].exp;
 		uint8_t *data;
 		size_t j;
 
+		copy(iov, buffer, tests[i].iov, tests[i].iovcnt);
+
 		success("%s\n", tests[i].name);
 		assert(_gnutls_iov_iter_init(&iter,
-					     tests[i].iov, tests[i].iovcnt,
+					     iov, tests[i].iovcnt,
 					     tests[i].block_size) == 0);
 		for (j = 0; j < tests[i].expcnt; j++) {
 			ssize_t ret;
@@ -212,7 +245,25 @@ doit (void)
 				else if (debug)
 					success("iter.block_offset: %u == 0\n",
 					     (unsigned) iter.block_offset);
+
+				translate(data, ret);
+
+				ret = _gnutls_iov_iter_sync(&iter, data, ret);
+				if (ret < 0)
+					fail("sync failed\n");
 			}
+		}
+
+		for (j = 0; j < tests[i].iovcnt; j++) {
+			translate(iov[j].iov_base, iov[j].iov_len);
+
+			if (memcmp(iov[j].iov_base, tests[i].iov[j].iov_base,
+				   iov[j].iov_len) != 0)
+				fail("iov doesn't match: %*s != %*s\n",
+				     (int)iov[j].iov_len,
+				     (char *)iov[j].iov_base,
+				     (int)tests[i].iov[j].iov_len,
+				     (char *)tests[i].iov[j].iov_len);
 		}
 	}
 }
