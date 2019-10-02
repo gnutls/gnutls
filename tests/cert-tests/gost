@@ -108,6 +108,34 @@ if ! cmp "${srcdir}"/data/grfc.crt $TMPFILE ; then
 	exit 1
 fi
 
+"${CERTTOOL}" -i < "${srcdir}"/data/gost-cert-ca.pem --outfile $TMPFILE
+if [ $? != 0 ]; then
+	cat $TMPFILE
+	exit 1
+fi
+
+if ! cmp "${srcdir}"/data/gost-cert-ca.pem $TMPFILE ; then
+	cat $TMPFILE
+	exit 1
+fi
+
+"${CERTTOOL}" -i < "${srcdir}"/data/gost-cert-new.pem --outfile $TMPFILE
+if [ $? != 0 ]; then
+	cat $TMPFILE
+	exit 1
+fi
+
+if ! cmp "${srcdir}"/data/gost-cert-new.pem $TMPFILE ; then
+	cat $TMPFILE
+	exit 1
+fi
+
+"${CERTTOOL}" --verify --load-ca-certificate "${srcdir}"/data/gost-cert-ca.pem --infile "${srcdir}"/data/gost-cert-new.pem --outfile $TMPFILE
+if [ $? != 0 ]; then
+	cat $TMPFILE
+	exit 1
+fi
+
 rm -f $VERIFYOUT $TMPUSER $TMPCA $TMPSUBCA $TMPTEMPL $TMPFILE
 rm -f $TMPSUBCAKEY $TMPCAKEY $TMPKEY
 
