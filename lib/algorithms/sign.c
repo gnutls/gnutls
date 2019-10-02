@@ -353,14 +353,14 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_GOST_512,
 	 .pk = GNUTLS_PK_GOST_12_512,
 	 .hash = GNUTLS_DIG_STREEBOG_512,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
+	 .aid = {{8, 65}, SIG_SEM_PRE_TLS12}},
 	/* GOST R 34.10-2012-256 */
 	{.name = "GOSTR341012-256",
 	 .oid = SIG_GOST_R3410_2012_256_OID,
 	 .id = GNUTLS_SIGN_GOST_256,
 	 .pk = GNUTLS_PK_GOST_12_256,
 	 .hash = GNUTLS_DIG_STREEBOG_256,
-	 .aid = TLS_SIGN_AID_UNKNOWN},
+	 .aid = {{8, 64}, SIG_SEM_PRE_TLS12}},
 	/* GOST R 34.10-2001 */
 	{.name = "GOSTR341001",
 	 .oid = SIG_GOST_R3410_2001_OID,
