@@ -58,8 +58,8 @@ _gnutls_iov_iter_init(struct iov_iter_st *iter,
  * @data: the return location of extracted data
  *
  * Retrieve block(s) pointed by @iter and advance it to the next
- * position.  It returns the number of consecutive blocks in @data.
- * At the end of iteration, 0 is returned.
+ * position.  It returns the number of bytes in @data.  At the end of
+ * iteration, 0 is returned.
  *
  * If the data stored in @iter is not multiple of the block size, the
  * remaining data is stored in the "block" field of @iter with the
@@ -88,25 +88,30 @@ _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data)
 			if ((len % iter->block_size) == 0) {
 				iter->iov_index++;
 				iter->iov_offset = 0;
-			} else
-				iter->iov_offset +=
-					len - (len % iter->block_size);
+			} else {
+				len -= (len % iter->block_size);
+				iter->iov_offset += len;
+			}
 
 			/* Return the blocks. */
 			*data = p;
-			return len / iter->block_size;
+			return len;
 		}
 
 		/* We can complete one full block to return. */
 		block_left = iter->block_size - iter->block_offset;
 		if (len >= block_left) {
 			memcpy(iter->block + iter->block_offset, p, block_left);
-			iter->iov_offset += block_left;
+			if (len == block_left) {
+				iter->iov_index++;
+				iter->iov_offset = 0;
+			} else
+				iter->iov_offset += block_left;
 			iter->block_offset = 0;
 
 			/* Return the filled block. */
 			*data = iter->block;
-			return 1;
+			return iter->block_size;
 		}
 
 		/* Not enough data for a full block, store in temp
@@ -116,5 +121,15 @@ _gnutls_iov_iter_next(struct iov_iter_st *iter, uint8_t **data)
 		iter->iov_index++;
 		iter->iov_offset = 0;
 	}
+
+	if (iter->block_offset > 0) {
+		size_t len = iter->block_offset;
+
+		/* Return the incomplete block. */
+		*data = iter->block;
+		iter->block_offset = 0;
+		return len;
+	}
+
 	return 0;
 }
