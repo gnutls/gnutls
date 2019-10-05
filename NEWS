@@ -35,6 +35,9 @@ See the end for copying conditions.
 ** certtool: when outputting an encrypted private key do not insert the textual description
    of it. This fixes a regression since 3.6.5 (#840).
 
+** gnutls-cli/serv: added raw public-key handling capabilities (RFC7250).
+   Key material can be set via the --rawpkkeyfile and --rawpkfile flags.
+
 ** API and ABI modifications:
 gnutls_aead_cipher_encryptv2: Added
 gnutls_aead_cipher_decryptv2: Added

@@ -505,7 +505,7 @@ dist_check_SCRIPTS += system-override-sig-hash.sh system-override-versions.sh sy
 	system-override-kx.sh
 endif
 
-dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh
+dist_check_SCRIPTS += gnutls-cli-self-signed.sh gnutls-cli-invalid-crl.sh gnutls-cli-rawpk.sh
 
 if ENABLE_PKCS11
 dist_check_SCRIPTS += p11-kit-trust.sh testpkcs11.sh certtool-pkcs11.sh
