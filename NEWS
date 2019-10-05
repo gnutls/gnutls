@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.11 (unreleased)
+
+** gnutls-cli/serv: added raw public-key handling capabilities (RFC7250).
+   Key material can be set via the --rawpkkeyfile and --rawpkfile flags.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.6.10 (released 2019-09-29)
 
 ** libgnutls: Added support for deterministic ECDSA/DSA (RFC6979)
@@ -34,9 +43,6 @@ See the end for copying conditions.
 
 ** certtool: when outputting an encrypted private key do not insert the textual description
    of it. This fixes a regression since 3.6.5 (#840).
-
-** gnutls-cli/serv: added raw public-key handling capabilities (RFC7250).
-   Key material can be set via the --rawpkkeyfile and --rawpkfile flags.
 
 ** API and ABI modifications:
 gnutls_aead_cipher_encryptv2: Added
