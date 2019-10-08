@@ -325,7 +325,7 @@ coverity:
   tags:
   - shared
   only:
-  - tags
+  - /^gnutls_3_6_.*$/@gnutls/gnutls
   artifacts:
     expire_in: 1 week
     when: on_failure
