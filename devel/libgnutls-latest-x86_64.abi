@@ -1709,7 +1709,12 @@
       <enumerator name='GNUTLS_ECC_CURVE_GOST256CPXB' value='12'/>
       <enumerator name='GNUTLS_ECC_CURVE_GOST512A' value='13'/>
       <enumerator name='GNUTLS_ECC_CURVE_GOST512B' value='14'/>
-      <enumerator name='GNUTLS_ECC_CURVE_MAX' value='14'/>
+      <enumerator name='GNUTLS_ECC_CURVE_GOST512C' value='15'/>
+      <enumerator name='GNUTLS_ECC_CURVE_GOST256A' value='16'/>
+      <enumerator name='GNUTLS_ECC_CURVE_GOST256B' value='17'/>
+      <enumerator name='GNUTLS_ECC_CURVE_GOST256C' value='18'/>
+      <enumerator name='GNUTLS_ECC_CURVE_GOST256D' value='19'/>
+      <enumerator name='GNUTLS_ECC_CURVE_MAX' value='19'/>
     </enum-decl>
     <typedef-decl name='gnutls_ecc_curve_t' type-id='type-id-67' id='type-id-59'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-68'>

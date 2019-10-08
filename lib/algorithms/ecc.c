@@ -91,6 +91,29 @@ gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .supported = 1,
 	},
 #if ENABLE_GOST
+	/* Curves for usage in GOST digital signature algorithm (GOST R
+	 * 34.10-2001/-2012) and key agreement (VKO GOST R 34.10-2001/-2012).
+	 *
+	 * Historically CryptoPro has defined three 256-bit curves for use with
+	 * digital signature algorithm (CryptoPro-A, -B, -C).
+	 *
+	 * Also it has reissues two of them with different OIDs for key
+	 * exchange (CryptoPro-XchA = CryptoPro-A and CryptoPro-XchB =
+	 * CryptoPro-C).
+	 *
+	 * Then TC26 (Standard comitee working on cryptographic standards) has
+	 * defined one 256-bit curve (TC26-256-A) and three 512-bit curves
+	 * (TC26-512-A, -B, -C).
+	 *
+	 * And finally TC26 has reissues original CryptoPro curves under their
+	 * own OID namespace (TC26-256-B = CryptoPro-A, TC26-256-C =
+	 * CryptoPro-B and TC26-256-D = CryptoPro-C).
+	 *
+	 * CryptoPro OIDs are usable for both GOST R 34.10-2001 and
+	 * GOST R 34.10-2012 keys (thus they have GNUTLS_PK_UNKNOWN in this
+	 * table).
+	 * TC26 OIDs are usable only for GOST R 34.10-2012 keys.
+	 */
 	{
 	 .name = "CryptoPro-A",
 	 .oid = "1.2.643.2.2.35.1",
@@ -137,6 +160,42 @@ gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .supported = 1,
 	},
 	{
+	 .name = "TC26-256-A",
+	 .oid = "1.2.643.7.1.2.1.1.1",
+	 .id = GNUTLS_ECC_CURVE_GOST256A,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .size = 64,
+	 .gost_curve = 1,
+	 .supported = 1,
+	},
+	{
+	 .name = "TC26-256-B",
+	 .oid = "1.2.643.7.1.2.1.1.2",
+	 .id = GNUTLS_ECC_CURVE_GOST256B,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .size = 64,
+	 .gost_curve = 1,
+	 .supported = 1,
+	},
+	{
+	 .name = "TC26-256-C",
+	 .oid = "1.2.643.7.1.2.1.1.3",
+	 .id = GNUTLS_ECC_CURVE_GOST256C,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .size = 64,
+	 .gost_curve = 1,
+	 .supported = 1,
+	},
+	{
+	 .name = "TC26-256-D",
+	 .oid = "1.2.643.7.1.2.1.1.4",
+	 .id = GNUTLS_ECC_CURVE_GOST256D,
+	 .pk = GNUTLS_PK_GOST_12_256,
+	 .size = 64,
+	 .gost_curve = 1,
+	 .supported = 1,
+	},
+	{
 	 .name = "TC26-512-A",
 	 .oid = "1.2.643.7.1.2.1.2.1",
 	 .id = GNUTLS_ECC_CURVE_GOST512A,
@@ -149,6 +208,15 @@ gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .name = "TC26-512-B",
 	 .oid = "1.2.643.7.1.2.1.2.2",
 	 .id = GNUTLS_ECC_CURVE_GOST512B,
+	 .pk = GNUTLS_PK_GOST_12_512,
+	 .size = 64,
+	 .gost_curve = 1,
+	 .supported = 1,
+	},
+	{
+	 .name = "TC26-512-C",
+	 .oid = "1.2.643.7.1.2.1.2.3",
+	 .id = GNUTLS_ECC_CURVE_GOST512C,
 	 .pk = GNUTLS_PK_GOST_12_512,
 	 .size = 64,
 	 .gost_curve = 1,
