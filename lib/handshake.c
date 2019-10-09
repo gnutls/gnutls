@@ -295,6 +295,8 @@ int _gnutls_gen_server_random(gnutls_session_t session, int version)
 	}
 
 	max = _gnutls_version_max(session);
+	if (max == NULL)
+		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
 
 	if (!IS_DTLS(session) && max->id >= GNUTLS_TLS1_3 &&
 	    version <= GNUTLS_TLS1_2) {
