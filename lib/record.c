@@ -1507,7 +1507,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 
 		/* store the last valid sequence number. We don't use that internally but
 		 * callers of gnutls_record_get_state() could take advantage of it. */
-		memcpy(&record_state->sequence_number, packet_sequence, 8);
+		record_state->sequence_number = record.sequence;
 	} else {
 		_gnutls_record_log
 		    ("REC[%p]: Decrypted Packet[%u] %s(%d) with length: %d\n",
