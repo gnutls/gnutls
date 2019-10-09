@@ -1817,7 +1817,7 @@ get_alt_name(gnutls_subject_alt_names_t san,
 		goto cleanup;
 	}
 
-	if (othername_oid && type == GNUTLS_SAN_OTHERNAME) {
+	if (othername_oid && type == GNUTLS_SAN_OTHERNAME && ooid.data) {
 		unsigned vtype;
 		ret = gnutls_x509_othername_to_virtual((char*)ooid.data, &oname, &vtype, &virt);
 		if (ret >= 0) {
