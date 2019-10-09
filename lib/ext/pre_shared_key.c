@@ -607,17 +607,20 @@ static int server_recv_params(gnutls_session_t session,
 			   psk.identity.size > 0 && psk.identity.size <= MAX_USERNAME_SIZE) {
 			/* _gnutls_psk_pwd_find_entry() expects 0-terminated identities */
 			char identity_str[MAX_USERNAME_SIZE + 1];
-
-			prf = pskcred->binder_algo;
+			gnutls_mac_algorithm_t binder_algo_id;
 
 			memcpy(identity_str, psk.identity.data, psk.identity.size);
 			identity_str[psk.identity.size] = 0;
 
 			/* this fails only on configuration errors; as such we always
 			 * return its error code in that case */
-			ret = _gnutls_psk_pwd_find_entry(session, identity_str, &key);
+			ret = _gnutls_psk_pwd_find_entry(session, identity_str, &key, &binder_algo_id);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
+
+			prf = (binder_algo_id == GNUTLS_MAC_UNKNOWN ?
+				pskcred->binder_algo :
+				mac_to_entry(binder_algo_id));
 
 			resuming = 0;
 			break;

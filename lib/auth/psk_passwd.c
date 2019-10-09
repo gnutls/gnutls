@@ -20,7 +20,7 @@
  *
  */
 
-/* Functions for operating in an PSK passwd file are included here */
+/* Functions for operating in a PSK passwd file are included here */
 
 #include "gnutls_int.h"
 
@@ -36,13 +36,39 @@
 #include <num.h>
 #include <random.h>
 
+static int read_prf_algo(const char *str, size_t len, gnutls_mac_algorithm_t *prf_algo)
+{
+	char algo_name[len + 1];
+	gnutls_mac_algorithm_t prf;
+
+	strncpy(algo_name, str, len);
+	algo_name[len] = '\0';
+
+	/* Some people are used to put dashes - make them happy */
+	if (strcmp(algo_name, "SHA-1") == 0)
+		strcpy(algo_name, "SHA1");
+	else if (strcmp(algo_name, "SHA-256") == 0)
+		strcpy(algo_name, "SHA256");
+	else if (strcmp(algo_name, "SHA-512") == 0)
+		strcpy(algo_name, "SHA512");
+	else if (strcmp(algo_name, "SHA-224") == 0)
+		strcpy(algo_name, "SHA224");
+	else if (strcmp(algo_name, "SHA-384") == 0)
+		strcpy(algo_name, "SHA384");
+
+	if ((prf = gnutls_mac_get_id(algo_name)) == GNUTLS_MAC_UNKNOWN)
+		return GNUTLS_E_KEYFILE_ERROR;
+
+	*prf_algo = prf;
+	return 0;
+}
 
 /* this function parses passwd.psk file. Format is:
  * string(username):hex(passwd)
  */
-static int pwd_put_values(gnutls_datum_t * psk, char *str)
+static int pwd_put_values(gnutls_datum_t * psk, gnutls_mac_algorithm_t *prf_algo, char *str)
 {
-	char *p;
+	char *p, *p2;
 	int len, ret;
 	gnutls_datum_t tmp;
 
@@ -60,9 +86,12 @@ static int pwd_put_values(gnutls_datum_t * psk, char *str)
 
 	/* read the key
 	 */
-	len = strlen(p);
-	if (p[len - 1] == '\n' || p[len - 1] == ' ')
-		len--;
+	p2 = strchr(p, ':');
+
+	if (p2)
+		len = p2 - p;
+	else
+		len = strlen(p) - 1;
 
 	tmp.data = (void*)p;
 	tmp.size = len;
@@ -70,6 +99,19 @@ static int pwd_put_values(gnutls_datum_t * psk, char *str)
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
+	}
+
+	/* read the algorithm, if present and wanted by the user */
+	if (p2 && prf_algo) {
+		len = strlen(++p2);
+
+		if (p2[len - 1] == '\n' || p2[len - 1] == ' ')
+			len--;
+
+		if ((ret = read_prf_algo(p2, len, prf_algo)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	return 0;
@@ -106,7 +148,8 @@ static int _randomize_psk(gnutls_datum_t * psk)
  */
 int
 _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
-			   gnutls_datum_t * psk)
+			   gnutls_datum_t * psk,
+			   gnutls_mac_algorithm_t *prf_algo)
 {
 	gnutls_psk_server_credentials_t cred;
 	FILE *fd;
@@ -114,6 +157,9 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 	size_t line_size = 0;
 	unsigned i, len;
 	int ret;
+
+	if (prf_algo)
+		*prf_algo = GNUTLS_MAC_UNKNOWN;
 
 	cred = (gnutls_psk_server_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
@@ -126,7 +172,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 	 * set, use it.
 	 */
 	if (cred->pwd_callback != NULL) {
-		ret = cred->pwd_callback(session, username, psk);
+		ret = cred->pwd_callback(session, username, psk, prf_algo);
 
 		if (ret == 1) {	/* the user does not exist */
 			ret = _randomize_psk(psk);
@@ -170,7 +216,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 		}
 
 		if (strncmp(username, line, MAX(i, len)) == 0) {
-			ret = pwd_put_values(psk, line);
+			ret = pwd_put_values(psk, prf_id, line);
 			if (ret < 0) {
 				gnutls_assert();
 				ret = GNUTLS_E_SRP_PWD_ERROR;

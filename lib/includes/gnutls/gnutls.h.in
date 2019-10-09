@@ -2544,7 +2544,8 @@ gnutls_psk_set_server_credentials_function(gnutls_psk_server_credentials_t
 
 typedef int gnutls_psk_client_credentials_function(gnutls_session_t,
 						   char **username,
-						   gnutls_datum_t * key);
+						   gnutls_datum_t * key,
+						   gnutls_mac_algorithm_t * prf);
 void
 gnutls_psk_set_client_credentials_function(gnutls_psk_client_credentials_t
 					   cred,
