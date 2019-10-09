@@ -322,9 +322,11 @@ encrypt_packet(gnutls_session_t session,
 			/* copy the random IV.
 			 */
 			memcpy(data_ptr, nonce, blocksize);
-			_gnutls_auth_cipher_setiv(&params->write.
+			ret = _gnutls_auth_cipher_setiv(&params->write.
 						  ctx.tls12, data_ptr,
 						  blocksize);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
 			/*data_ptr += blocksize;*/
 			cipher_data += blocksize;
@@ -734,10 +736,12 @@ decrypt_packet(gnutls_session_t session,
 		/* ignore the IV in TLS 1.1+
 		 */
 		if (explicit_iv) {
-			_gnutls_auth_cipher_setiv(&params->read.
+			ret = _gnutls_auth_cipher_setiv(&params->read.
 						  ctx.tls12,
 						  ciphertext->data,
 						  blocksize);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
 			memcpy(nonce, ciphertext->data, blocksize);
 			ciphertext->size -= blocksize;
