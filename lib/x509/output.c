@@ -1659,8 +1659,7 @@ print_crt_pubkey(gnutls_buffer_st * str, gnutls_x509_crt_t crt,
 	ret = 0;
 
  cleanup:
-	if (pubkey)
-		gnutls_pubkey_deinit(pubkey);
+	gnutls_pubkey_deinit(pubkey);
 
 	return ret;
 }
