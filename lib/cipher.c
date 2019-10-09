@@ -73,7 +73,7 @@ encrypt_packet_tls13(gnutls_session_t session,
 
 /* returns ciphertext which contains the headers too. This also
  * calculates the size in the header field.
- * 
+ *
  */
 int
 _gnutls_encrypt(gnutls_session_t session,
@@ -239,7 +239,7 @@ _gnutls_make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
 	return p - preamble;
 }
 
-/* This is the actual encryption 
+/* This is the actual encryption
  * Encrypts the given plaintext datum, and puts the result to cipher_data,
  * which has cipher_size size.
  * return the actual encrypted data length.
@@ -578,7 +578,7 @@ decrypt_packet(gnutls_session_t session,
 		ret = _gnutls_auth_cipher_tag(&params->read.ctx.tls12, tag, tag_size);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
-		
+
 		if (unlikely(gnutls_memcmp(tag, &ciphertext->data[ciphertext->size-tag_size], tag_size) != 0)) {
 			/* HMAC was not the same. */
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
@@ -786,7 +786,7 @@ decrypt_packet(gnutls_session_t session,
 
 			pad = plain->data[ciphertext->size - tag_size - 1]; /* pad */
 			length = ciphertext->size - tag_size - pad - 1;
-			
+
 			if (unlikely(length < 0))
 				return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}
