@@ -3033,12 +3033,12 @@ typedef enum {
 
 /* Register a custom tls extension
  */
-int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
+int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_point,
 				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
 				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 				gnutls_ext_unpack_func unpack_func);
 
-int gnutls_session_ext_register(gnutls_session_t, const char *name, int type, gnutls_ext_parse_type_t parse_type,
+int gnutls_session_ext_register(gnutls_session_t, const char *name, int type, gnutls_ext_parse_type_t parse_point,
 				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
 				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 				gnutls_ext_unpack_func unpack_func, unsigned flags);

@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 * Version 3.6.11 (unreleased)
 
+** libgnutls: Corrected issue with TLS 1.2 session ticket handling as client
+   during resumption (#841).
+
 ** gnutls-cli/serv: added raw public-key handling capabilities (RFC7250).
    Key material can be set via the --rawpkkeyfile and --rawpkfile flags.
 
