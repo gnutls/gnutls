@@ -308,30 +308,6 @@ static-analyzers.Fedora.x86_64:
       - scan-build-libdane/*
   retry: 1
 
-coverity:
-  stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
-  script:
-  - wget https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=$COVERITY_SCAN_PROJECT_NAME" -O /tmp/coverity_tool.tgz
-  - tar xfz /tmp/coverity_tool.tgz
-  - ./bootstrap
-  - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --disable-guile --disable-maintainer-mode --disable-doc
-  - cov-analysis-linux64-*/bin/cov-build --dir cov-int make -j$(nproc)
-  - tar cfz cov-int.tar.gz cov-int
-  - curl https://scan.coverity.com/builds?project=$COVERITY_SCAN_PROJECT_NAME
-    --form token=$COVERITY_SCAN_TOKEN --form email=n.mavrogiannopoulos@gmail.com
-    --form file=@cov-int.tar.gz --form version="`git describe --tags`"
-    --form description="CI build"
-  tags:
-  - shared
-  only:
-  - /^gnutls_3_6_.*$/@gnutls/gnutls
-  artifacts:
-    expire_in: 1 week
-    when: on_failure
-    paths:
-      - cov-int/*.txt
-
 MinGW32.DLLs:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
