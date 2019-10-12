@@ -54,14 +54,14 @@ static int decrypt_packet(gnutls_session_t session,
 			    gnutls_datum_t * plain,
 			    content_type_t type,
 			    record_parameters_st * params,
-			    gnutls_uint64 * sequence);
+			    const gnutls_uint64 * sequence);
 
 static int
 decrypt_packet_tls13(gnutls_session_t session,
 		     gnutls_datum_t * ciphertext,
 		     gnutls_datum_t * plain,
 		     content_type_t *type, record_parameters_st * params,
-		     gnutls_uint64 * sequence);
+		     const gnutls_uint64 * sequence);
 
 static int
 encrypt_packet_tls13(gnutls_session_t session,
@@ -138,7 +138,7 @@ _gnutls_decrypt(gnutls_session_t session,
 		gnutls_datum_t *output,
 		content_type_t *type,
 		record_parameters_st *params,
-		gnutls_uint64 *sequence)
+		const gnutls_uint64 *sequence)
 {
 	int ret;
 	const version_entry_st *vers = get_version(session);
@@ -213,7 +213,7 @@ calc_enc_length_stream(gnutls_session_t session, int data_size,
  * and are not to be sent). Returns their size.
  */
 int
-_gnutls_make_preamble(uint8_t * uint64_data, uint8_t type, unsigned int length,
+_gnutls_make_preamble(const uint8_t * uint64_data, uint8_t type, unsigned int length,
 		      const version_entry_st * ver, uint8_t preamble[MAX_PREAMBLE_SIZE])
 {
 	uint8_t *p = preamble;
@@ -526,7 +526,7 @@ decrypt_packet(gnutls_session_t session,
 		gnutls_datum_t * ciphertext,
 		gnutls_datum_t * plain,
 		content_type_t type, record_parameters_st * params,
-		gnutls_uint64 * sequence)
+		const gnutls_uint64 * sequence)
 {
 	uint8_t tag[MAX_HASH_SIZE];
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
@@ -808,7 +808,7 @@ decrypt_packet_tls13(gnutls_session_t session,
 		     gnutls_datum_t *ciphertext,
 		     gnutls_datum_t *plain,
 		     content_type_t *type, record_parameters_st *params,
-		     gnutls_uint64 *sequence)
+		     const gnutls_uint64 *sequence)
 {
 	uint8_t nonce[MAX_CIPHER_IV_SIZE];
 	size_t length, length_to_decrypt;

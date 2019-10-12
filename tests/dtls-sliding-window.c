@@ -47,7 +47,7 @@ typedef struct {
 #define gnutls_assert_val(x) x
 
 void _dtls_reset_window(struct record_parameters_st *rp);
-int _dtls_record_check(struct record_parameters_st *rp, gnutls_uint64 * _seq);
+int _dtls_record_check(struct record_parameters_st *rp, const gnutls_uint64 * _seq);
 
 /* taken from nettle */
 #ifdef WORDS_BIGENDIAN

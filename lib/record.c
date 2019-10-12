@@ -798,7 +798,7 @@ static int
 record_add_to_buffers(gnutls_session_t session,
 		      struct tls_record_st *recv, content_type_t type,
 		      gnutls_handshake_description_t htype,
-		      gnutls_uint64 * seq, mbuffer_st * bufel)
+		      const gnutls_uint64 * seq, mbuffer_st * bufel)
 {
 
 	int ret;
@@ -1260,7 +1260,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 			gnutls_handshake_description_t htype,
 			unsigned int ms)
 {
-	gnutls_uint64 *packet_sequence;
+	const gnutls_uint64 *packet_sequence;
 	gnutls_datum_t ciphertext;
 	mbuffer_st *bufel = NULL, *decrypted = NULL;
 	gnutls_datum_t t;
