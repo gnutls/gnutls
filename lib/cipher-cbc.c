@@ -72,7 +72,7 @@ static void dummy_wait(record_parameters_st *params,
 int cbc_mac_verify(gnutls_session_t session, record_parameters_st *params,
 		   uint8_t preamble[MAX_PREAMBLE_SIZE],
 		   content_type_t type,
-		   gnutls_uint64 *sequence,
+		   const gnutls_uint64 *sequence,
 		   const uint8_t *data, size_t data_size,
 		   size_t tag_size)
 {

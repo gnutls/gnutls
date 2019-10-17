@@ -241,11 +241,11 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void *tag,
 			    int tag_size);
 
-inline static void _gnutls_auth_cipher_setiv(const auth_cipher_hd_st *
+inline static int _gnutls_auth_cipher_setiv(const auth_cipher_hd_st *
 					     handle, const void *iv,
 					     size_t ivlen)
 {
-	_gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
+	return _gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
 }
 
 inline static size_t _gnutls_auth_cipher_tag_len(auth_cipher_hd_st *
