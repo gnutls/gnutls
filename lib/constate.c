@@ -538,8 +538,12 @@ _gnutls_init_record_state(record_parameters_st * params,
 	mac.data = state->mac_key;
 	mac.size = state->mac_key_size;
 
-	if (!_gnutls_version_has_explicit_iv(ver)) {
-		if (_gnutls_cipher_type(params->cipher) == CIPHER_BLOCK)
+	if (_gnutls_cipher_type(params->cipher) == CIPHER_BLOCK) {
+		if (!_gnutls_version_has_explicit_iv(ver))
+			iv = &_iv;
+	} else if (_gnutls_cipher_type(params->cipher) == CIPHER_STREAM) {
+		/* To handle GOST ciphersuites */
+		if (_gnutls_cipher_get_implicit_iv_size(params->cipher))
 			iv = &_iv;
 	}
 
