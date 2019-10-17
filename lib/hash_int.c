@@ -242,6 +242,7 @@ _gnutls_mac_init(mac_hd_st * mac, const mac_entry_st * e,
 		mac->output = cc->output;
 		mac->deinit = cc->deinit;
 		mac->copy = cc->copy;
+		mac->setkey = cc->setkey;
 
 		return 0;
 	}
@@ -257,6 +258,7 @@ _gnutls_mac_init(mac_hd_st * mac, const mac_entry_st * e,
 	mac->output = _gnutls_mac_ops.output;
 	mac->deinit = _gnutls_mac_ops.deinit;
 	mac->copy = _gnutls_mac_ops.copy;
+	mac->setkey = _gnutls_mac_ops.setkey;
 
 	if (_gnutls_mac_ops.setkey(mac->handle, key, keylen) < 0) {
 		gnutls_assert();
