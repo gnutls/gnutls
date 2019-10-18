@@ -645,6 +645,10 @@ typedef struct record_state_st record_state_st;
 struct record_parameters_st;
 typedef struct record_parameters_st record_parameters_st;
 
+#define GNUTLS_CIPHER_FLAG_ONLY_AEAD	(1 << 0) /* When set, this cipher is only available through the new AEAD API */
+#define GNUTLS_CIPHER_FLAG_XOR_NONCE	(1 << 1) /* In this TLS AEAD cipher xor the implicit_iv with the nonce */
+#define GNUTLS_CIPHER_FLAG_NO_REKEY	(1 << 2) /* whether this tls1.3 cipher doesn't need to rekey after 2^24 messages */
+
 /* cipher and mac parameters */
 typedef struct cipher_entry_st {
 	const char *name;
@@ -656,9 +660,7 @@ typedef struct cipher_entry_st {
 	uint16_t explicit_iv;	/* the size of explicit IV - the IV stored in record */
 	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
 	uint16_t tagsize;
-	bool xor_nonce;	/* In this TLS AEAD cipher xor the implicit_iv with the nonce */
-	bool only_aead; /* When set, this cipher is only available through the new AEAD API */
-	bool no_rekey; /* whether this tls1.3 cipher doesn't need to rekey after 2^24 messages */
+	unsigned flags;
 } cipher_entry_st;
 
 typedef struct gnutls_cipher_suite_entry_st {
