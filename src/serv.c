@@ -1070,7 +1070,7 @@ get_response(gnutls_session_t session, char *request,
 	*response_length = ((*response) ? strlen(*response) : 0);
 }
 
-static void terminate(int sig) __attribute__ ((noreturn));
+static void terminate(int sig) __attribute__ ((__noreturn__));
 
 static void terminate(int sig)
 {
