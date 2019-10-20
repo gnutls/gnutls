@@ -28,11 +28,6 @@
 #include <minmax.h>
 #include <byteswap.h>
 
-int _gnutls_uint64pp(gnutls_uint64 *);
-int _gnutls_uint48pp(gnutls_uint64 *);
-
-#define UINT64DATA(x) ((x).i)
-
 inline static uint32_t _gnutls_uint24touint32(uint24 num)
 {
 	uint32_t ret = 0;
@@ -67,6 +62,17 @@ inline static uint32_t _gnutls_read_uint24(const uint8_t * data)
 	res = _gnutls_uint24touint32(num);
 #ifndef WORDS_BIGENDIAN
 	res = bswap_32(res);
+#endif
+	return res;
+}
+
+inline static uint64_t _gnutls_read_uint64(const uint8_t * data)
+{
+	uint64_t res;
+
+	memcpy(&res, data, sizeof(uint64_t));
+#ifndef WORDS_BIGENDIAN
+	res = bswap_64(res);
 #endif
 	return res;
 }
@@ -148,18 +154,6 @@ inline static uint16_t _gnutls_conv_uint16(uint16_t data)
 #else
 	return data;
 #endif
-}
-
-inline static uint32_t _gnutls_uint64touint32(const gnutls_uint64 * num)
-{
-	uint32_t ret;
-
-	memcpy(&ret, &num->i[4], 4);
-#ifndef WORDS_BIGENDIAN
-	ret = bswap_32(ret);
-#endif
-
-	return ret;
 }
 
 #endif /* GNUTLS_LIB_NUM_H */

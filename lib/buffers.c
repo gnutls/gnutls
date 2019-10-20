@@ -67,12 +67,12 @@
  */
 void
 _gnutls_record_buffer_put(gnutls_session_t session,
-			  content_type_t type, const gnutls_uint64 * seq,
+			  content_type_t type, uint64_t seq,
 			  mbuffer_st * bufel)
 {
 
 	bufel->type = type;
-	memcpy(&bufel->record_sequence, seq, sizeof(*seq));
+	bufel->record_sequence = seq;
 
 	_mbuffer_enqueue(&session->internals.record_buffer, bufel);
 	_gnutls_buffers_log("BUF[REC]: Inserted %d bytes of Data(%d)\n",
@@ -155,7 +155,7 @@ _gnutls_record_buffer_get(content_type_t type,
 		length = msg.size;
 
 	if (seq)
-		memcpy(seq, bufel->record_sequence.i, 8);
+		_gnutls_write_uint64(bufel->record_sequence, seq);
 
 	memcpy(data, msg.data, length);
 	_mbuffer_head_remove_bytes(&session->internals.record_buffer,

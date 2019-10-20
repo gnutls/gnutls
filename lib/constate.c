@@ -981,10 +981,12 @@ _gnutls_epoch_setup_next(gnutls_session_t session, unsigned null_epoch, record_p
 		(*slot)->mac = NULL;
 	}
 
-	if (IS_DTLS(session))
-		_gnutls_write_uint16(session->security_parameters.epoch_next,
-				     UINT64DATA((*slot)->write.
-						sequence_number));
+	if (IS_DTLS(session)) {
+		uint64_t seq = (*slot)->write.sequence_number;
+		seq &= UINT64_C(0xffffffffffff);
+		seq |= ((uint64_t)session->security_parameters.epoch_next) << 48;
+		(*slot)->write.sequence_number = seq;
+	}
 
  finish:
 	if (newp != NULL)
