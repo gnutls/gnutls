@@ -361,7 +361,7 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 		const gnutls_sign_entry_st *se;
 
 		se = _gnutls_sign_to_entry(sig);
-		if (se == NULL || (se->tls13_ok == 0)) {
+		if (se == NULL || (se->flags & GNUTLS_SIGN_FLAG_TLS13_OK) == 0) {
 			gnutls_assert();
 			goto disallowed;
 		}
