@@ -183,7 +183,7 @@ inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
 	if (unlikely(e == NULL))
 		return 0;
 	else
-		return (e->preimage_insecure==0);
+		return !(e->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE);
 }
 
 /* Functions for cipher suites. */

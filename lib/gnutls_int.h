@@ -693,6 +693,7 @@ typedef struct gnutls_group_entry_st {
 	unsigned tls_id;		/* The RFC4492 namedCurve ID or TLS 1.3 group ID */
 } gnutls_group_entry_st;
 
+#define GNUTLS_MAC_FLAG_PREIMAGE_INSECURE	1  /* if this algorithm should not be trusted for pre-image attacks */
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {
@@ -705,7 +706,7 @@ typedef struct mac_entry_st {
 	unsigned nonce_size;
 	unsigned placeholder;	/* if set, then not a real MAC */
 	unsigned block_size;	/* internal block size for HMAC */
-	unsigned preimage_insecure; /* if this algorithm should not be trusted for pre-image attacks */
+	unsigned flags;
 } mac_entry_st;
 
 typedef struct {

@@ -49,7 +49,7 @@ mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_MD5_SHA1,
 	 .output_size = 36,
 	 .key_size = 36,
-	 .preimage_insecure = 1,
+	 .flags = GNUTLS_MAC_FLAG_PREIMAGE_INSECURE,
 	 .block_size = 64},
 	{.name = "SHA256",
 	 .oid = HASH_OID_SHA256,
@@ -121,11 +121,11 @@ mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_MD5,
 	 .output_size = 16,
 	 .key_size = 16,
-	 .preimage_insecure = 1,
+	 .flags = GNUTLS_MAC_FLAG_PREIMAGE_INSECURE,
 	 .block_size = 64},
 	{.name = "MD2",
 	 .oid = HASH_OID_MD2,
-	 .preimage_insecure = 1,
+	 .flags = GNUTLS_MAC_FLAG_PREIMAGE_INSECURE,
 	 .id = GNUTLS_MAC_MD2},
 	{.name = "RIPEMD160",
 	 .oid = HASH_OID_RMD160,
@@ -276,7 +276,7 @@ int _gnutls_digest_mark_insecure(const char *name)
 
 	for(p = hash_algorithms; p->name != NULL; p++) {
 		if (p->oid != NULL && c_strcasecmp(p->name, name) == 0) {
-			p->preimage_insecure = 1;
+			p->flags |= GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
 			return 0;
 		}
 	}
@@ -291,7 +291,7 @@ unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig)
 
 	for(p = hash_algorithms; p->name != NULL; p++) {
 		if (p->oid != NULL && p->id == (gnutls_mac_algorithm_t)dig) {
-			return p->preimage_insecure;
+			return p->flags & GNUTLS_MAC_FLAG_PREIMAGE_INSECURE;
 		}
 	}
 
