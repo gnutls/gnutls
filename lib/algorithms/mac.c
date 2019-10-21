@@ -181,7 +181,8 @@ mac_entry_st hash_algorithms[] = {
 	 .id = GNUTLS_MAC_GOST28147_TC26Z_IMIT,
 	 .output_size = 4,
 	 .key_size = 32,
-	 .block_size = 8},
+	 .block_size = 8,
+	 .flags = GNUTLS_MAC_FLAG_CONTINUOUS_MAC},
 	{.name = "MAC-NULL",
 	 .id = GNUTLS_MAC_NULL},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}
