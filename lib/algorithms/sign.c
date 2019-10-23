@@ -68,7 +68,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .priv_pk = GNUTLS_PK_RSA, /* PKCS#11 doesn't separate RSA from RSA-PSS privkeys */
 	 .hash = GNUTLS_DIG_SHA256,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 9}, SIG_SEM_DEFAULT}},
 	{.name = "RSA-PSS-RSAE-SHA256",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
@@ -77,7 +77,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .cert_pk = GNUTLS_PK_RSA,
 	 .priv_pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA256,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 4}, SIG_SEM_DEFAULT}},
 	{.name = "RSA-PSS-SHA384",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
@@ -85,7 +85,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .priv_pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA384,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 0x0A}, SIG_SEM_DEFAULT}},
 	{.name = "RSA-PSS-RSAE-SHA384",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
@@ -94,7 +94,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .cert_pk = GNUTLS_PK_RSA,
 	 .priv_pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA384,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 5}, SIG_SEM_DEFAULT}},
 	{.name = "RSA-PSS-SHA512",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
@@ -102,7 +102,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_RSA_PSS,
 	 .priv_pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 0x0B}, SIG_SEM_DEFAULT}},
 	{.name = "RSA-PSS-RSAE-SHA512",
 	 .oid = PK_PKIX1_RSA_PSS_OID,
@@ -111,7 +111,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .cert_pk = GNUTLS_PK_RSA,
 	 .priv_pk = GNUTLS_PK_RSA,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 6}, SIG_SEM_DEFAULT}},
 
 	 /* Ed25519: The hash algorithm here is set to be SHA512, although that is
@@ -122,7 +122,7 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .id = GNUTLS_SIGN_EDDSA_ED25519,
 	 .pk = GNUTLS_PK_EDDSA_ED25519,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{8, 7}, SIG_SEM_DEFAULT}},
 
 	 /* ECDSA */
@@ -159,21 +159,21 @@ gnutls_sign_entry_st sign_algorithms[] = {
 	 .pk = GNUTLS_PK_ECDSA,
 	 .curve = GNUTLS_ECC_CURVE_SECP256R1,
 	 .hash = GNUTLS_DIG_SHA256,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{4, 3}, SIG_SEM_TLS13}},
 	{.name = "ECDSA-SECP384R1-SHA384",
 	 .id = GNUTLS_SIGN_ECDSA_SECP384R1_SHA384,
 	 .pk = GNUTLS_PK_ECDSA,
 	 .curve = GNUTLS_ECC_CURVE_SECP384R1,
 	 .hash = GNUTLS_DIG_SHA384,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{5, 3}, SIG_SEM_TLS13}},
 	{.name = "ECDSA-SECP521R1-SHA512",
 	 .id = GNUTLS_SIGN_ECDSA_SECP521R1_SHA512,
 	 .pk = GNUTLS_PK_ECDSA,
 	 .curve = GNUTLS_ECC_CURVE_SECP521R1,
 	 .hash = GNUTLS_DIG_SHA512,
-	 .tls13_ok = 1,
+	 .flags = GNUTLS_SIGN_FLAG_TLS13_OK,
 	 .aid = {{6, 3}, SIG_SEM_TLS13}},
 
 	 /* ECDSA-SHA3 */
@@ -763,7 +763,7 @@ const gnutls_sign_entry_st *
 _gnutls13_sign_get_compatible_with_privkey(gnutls_privkey_t privkey)
 {
 	GNUTLS_SIGN_LOOP(
-		if (p->tls13_ok &&
+		if ((p->flags & GNUTLS_SIGN_FLAG_TLS13_OK) &&
 		    _gnutls_privkey_compatible_with_sig(privkey, p->id)) {
 			return p;
 		}

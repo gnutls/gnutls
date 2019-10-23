@@ -337,6 +337,7 @@ unsigned _gnutls_digest_is_insecure(gnutls_digest_algorithm_t dig);
 int _gnutls_version_mark_disabled(const char *name);
 gnutls_protocol_t _gnutls_protocol_get_id_if_supported(const char *name);
 
+#define GNUTLS_SIGN_FLAG_TLS13_OK	1 /* if it is ok to use under TLS1.3 */
 struct gnutls_sign_entry_st {
 	const char *name;
 	const char *oid;
@@ -353,8 +354,7 @@ struct gnutls_sign_entry_st {
 	gnutls_pk_algorithm_t priv_pk;
 	gnutls_pk_algorithm_t cert_pk;
 
-	/* non-zero if it is ok to use under TLS1.3 */
-	unsigned tls13_ok;
+	unsigned flags;
 
 	/* if this signature algorithm is restricted to a curve
 	 * under TLS 1.3. */
