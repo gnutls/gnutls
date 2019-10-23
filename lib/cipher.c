@@ -332,7 +332,7 @@ encrypt_packet(gnutls_session_t session,
 			cipher_data += blocksize;
 		}
 	} else { /* AEAD */
-		if (params->cipher->xor_nonce == 0) {
+		if ((params->cipher->flags & GNUTLS_CIPHER_FLAG_XOR_NONCE) == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
 			 if (params->write.iv_size != imp_iv_size)
@@ -602,7 +602,7 @@ decrypt_packet(gnutls_session_t session,
 		if (unlikely(ciphertext->size < (tag_size + exp_iv_size)))
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
-		if (params->cipher->xor_nonce == 0) {
+		if ((params->cipher->flags & GNUTLS_CIPHER_FLAG_XOR_NONCE) == 0) {
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
 			 if (unlikely(params->read.iv_size != 4))

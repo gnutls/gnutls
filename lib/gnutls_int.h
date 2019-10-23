@@ -645,6 +645,10 @@ typedef struct record_state_st record_state_st;
 struct record_parameters_st;
 typedef struct record_parameters_st record_parameters_st;
 
+#define GNUTLS_CIPHER_FLAG_ONLY_AEAD	(1 << 0) /* When set, this cipher is only available through the new AEAD API */
+#define GNUTLS_CIPHER_FLAG_XOR_NONCE	(1 << 1) /* In this TLS AEAD cipher xor the implicit_iv with the nonce */
+#define GNUTLS_CIPHER_FLAG_NO_REKEY	(1 << 2) /* whether this tls1.3 cipher doesn't need to rekey after 2^24 messages */
+
 /* cipher and mac parameters */
 typedef struct cipher_entry_st {
 	const char *name;
@@ -656,9 +660,7 @@ typedef struct cipher_entry_st {
 	uint16_t explicit_iv;	/* the size of explicit IV - the IV stored in record */
 	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
 	uint16_t tagsize;
-	bool xor_nonce;	/* In this TLS AEAD cipher xor the implicit_iv with the nonce */
-	bool only_aead; /* When set, this cipher is only available through the new AEAD API */
-	bool no_rekey; /* whether this tls1.3 cipher doesn't need to rekey after 2^24 messages */
+	unsigned flags;
 } cipher_entry_st;
 
 typedef struct gnutls_cipher_suite_entry_st {
@@ -691,6 +693,8 @@ typedef struct gnutls_group_entry_st {
 	unsigned tls_id;		/* The RFC4492 namedCurve ID or TLS 1.3 group ID */
 } gnutls_group_entry_st;
 
+#define GNUTLS_MAC_FLAG_PREIMAGE_INSECURE	1  /* if this algorithm should not be trusted for pre-image attacks */
+#define GNUTLS_MAC_FLAG_CONTINUOUS_MAC		(1 << 1) /* if this MAC should be used in a 'continuous' way in TLS */
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {
@@ -703,7 +707,7 @@ typedef struct mac_entry_st {
 	unsigned nonce_size;
 	unsigned placeholder;	/* if set, then not a real MAC */
 	unsigned block_size;	/* internal block size for HMAC */
-	unsigned preimage_insecure; /* if this algorithm should not be trusted for pre-image attacks */
+	unsigned flags;
 } mac_entry_st;
 
 typedef struct {

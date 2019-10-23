@@ -67,7 +67,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	e = cipher_to_entry(cipher);
-	if (e == NULL || e->only_aead)
+	if (e == NULL || (e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	*handle = gnutls_calloc(1, sizeof(api_cipher_hd_st));
@@ -1006,7 +1006,7 @@ gnutls_aead_cipher_encryptv(gnutls_aead_cipher_hd_t handle,
 	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
 		/* ciphertext cannot be produced in a piecemeal approach */
 		struct iov_store_st auth;
 		struct iov_store_st ptext;
@@ -1130,7 +1130,7 @@ gnutls_aead_cipher_encryptv2(gnutls_aead_cipher_hd_t handle,
 	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
 	 * then this becomes a convenience function as it missed the lower-level primitives
 	 * necessary for piecemeal encryption. */
-	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
 		/* ciphertext cannot be produced in a piecemeal approach */
 		struct iov_store_st auth;
 		struct iov_store_st ptext;
@@ -1274,7 +1274,7 @@ gnutls_aead_cipher_decryptv2(gnutls_aead_cipher_hd_t handle,
 	 * AEAD ciphers. When an AEAD cipher is used registered with gnutls_crypto_register_aead_cipher(),
 	 * then this becomes a convenience function as it missed the lower-level primitives
 	 * necessary for piecemeal encryption. */
-	if (handle->ctx_enc.e->only_aead || handle->ctx_enc.encrypt == NULL) {
+	if ((handle->ctx_enc.e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD) || handle->ctx_enc.encrypt == NULL) {
 		/* ciphertext cannot be produced in a piecemeal approach */
 		struct iov_store_st auth;
 		struct iov_store_st ctext;
