@@ -58,7 +58,7 @@
 struct tls_record_st {
 	uint16_t header_size;
 	uint8_t version[2];
-	gnutls_uint64 sequence;	/* DTLS */
+	uint64_t sequence;	/* DTLS */
 	uint16_t length;
 	uint16_t packet_size;	/* header_size + length */
 	content_type_t type;
@@ -390,13 +390,28 @@ copy_record_version(gnutls_session_t session,
 /* Increments the sequence value
  */
 inline static int
-sequence_increment(gnutls_session_t session, gnutls_uint64 * value)
+sequence_increment(gnutls_session_t session, uint64_t * value)
 {
+	uint64_t snmax = UINT64_C(0xffffffffffffffff);
+
 	if (IS_DTLS(session)) {
-		return _gnutls_uint48pp(value);
+		uint64_t mask;
+
+		snmax = UINT64_C(0xffffffffffff);
+		mask = snmax;
+
+		if ((*value & mask) == snmax)
+			return -1;
+
+		*value = ((*value & mask) + 1) | (*value & ~mask);
 	} else {
-		return _gnutls_uint64pp(value);
+		if (*value == snmax)
+			return -1;
+
+		(*value)++;
 	}
+
+	return 0;
 }
 
 /* This function behaves exactly like write(). The only difference is
@@ -516,8 +531,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 
 		/* Adjust header length and add sequence for DTLS */
 		if (IS_DTLS(session))
-			memcpy(&headers[3],
-			       record_state->sequence_number.i, 8);
+			_gnutls_write_uint64(record_state->sequence_number, &headers[3]);
 
 		_gnutls_record_log
 		    ("REC[%p]: Preparing Packet %s(%d) with length: %d and min pad: %d\n",
@@ -577,17 +591,14 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 	session->internals.record_send_buffer_user_size = 0;
 
 	_gnutls_record_log
-	    ("REC[%p]: Sent Packet[%d] %s(%d) in epoch %d and length: %d\n",
-	     session, (unsigned int)
-	     _gnutls_uint64touint32(&record_state->sequence_number),
+	    ("REC[%p]: Sent Packet[%ld] %s(%d) in epoch %d and length: %d\n",
+	     session, (unsigned long)(record_state->sequence_number),
 	     _gnutls_packet2str(type), type, (int) record_params->epoch,
 	     (int) cipher_size);
 
 	if (vers->tls13_sem && !(session->internals.flags & GNUTLS_NO_AUTO_REKEY) &&
 	    !(record_params->cipher->flags & GNUTLS_CIPHER_FLAG_NO_REKEY)) {
-		if (unlikely(record_state->sequence_number.i[7] == 0xfd &&
-		    record_state->sequence_number.i[6] == 0xff &&
-		    record_state->sequence_number.i[5] == 0xff)) {
+		if (unlikely((record_state->sequence_number & UINT64_C(0xffffff)) == UINT64_C(0xfffffd))) {
 			/* After we have sent 2^24 messages, mark the session
 			 * as needing a key update. */
 			session->internals.rsend_state = RECORD_SEND_KEY_UPDATE_1;
@@ -798,7 +809,7 @@ static int
 record_add_to_buffers(gnutls_session_t session,
 		      struct tls_record_st *recv, content_type_t type,
 		      gnutls_handshake_description_t htype,
-		      const gnutls_uint64 * seq, mbuffer_st * bufel)
+		      uint64_t seq, mbuffer_st * bufel)
 {
 
 	int ret;
@@ -1122,10 +1133,9 @@ record_read_headers(gnutls_session_t session,
 		record->version[1] = headers[2];
 
 		if (IS_DTLS(session)) {
-			memcpy(record->sequence.i, &headers[3], 8);
+			record->sequence = _gnutls_read_uint64(&headers[3]);
 			record->length = _gnutls_read_uint16(&headers[11]);
-			record->epoch =
-			    _gnutls_read_uint16(record->sequence.i);
+			record->epoch = record->sequence >> 48;
 		} else {
 			memset(&record->sequence, 0,
 			       sizeof(record->sequence));
@@ -1190,14 +1200,9 @@ static int recv_headers(gnutls_session_t session,
 	if (IS_DTLS(session)) {
 		if (_gnutls_epoch_is_valid(session, record->epoch) == 0) {
 			_gnutls_audit_log(session,
-					  "Discarded message[%u] with invalid epoch %u.\n",
-					  (unsigned int)
-					  _gnutls_uint64touint32(&record->
-								 sequence),
-					  (unsigned int) record->sequence.
-					  i[0] * 256 +
-					  (unsigned int) record->sequence.
-					  i[1]);
+					  "Discarded message[%lu] with invalid epoch %u.\n",
+					  (unsigned long)record->sequence,
+					  (unsigned int) (record->sequence >> 48));
 			gnutls_assert();
 			/* doesn't matter, just a fatal error */
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -1260,7 +1265,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 			gnutls_handshake_description_t htype,
 			unsigned int ms)
 {
-	const gnutls_uint64 *packet_sequence;
+	uint64_t packet_sequence;
 	gnutls_datum_t ciphertext;
 	mbuffer_st *bufel = NULL, *decrypted = NULL;
 	gnutls_datum_t t;
@@ -1306,9 +1311,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	}
 
 	if (IS_DTLS(session))
-		packet_sequence = &record.sequence;
+		packet_sequence = record.sequence;
 	else
-		packet_sequence = &record_state->sequence_number;
+		packet_sequence = record_state->sequence_number;
 
 	/* Read the packet data and insert it to record_recv_buffer.
 	 */
@@ -1451,10 +1456,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 					goto sanity_check_error;
 				}
 
-				_gnutls_record_log("REC[%p]: Discarded early data[%u] due to invalid decryption, length: %u\n",
+				_gnutls_record_log("REC[%p]: Discarded early data[%lu] due to invalid decryption, length: %u\n",
 						   session,
-						   (unsigned int)
-						   _gnutls_uint64touint32(packet_sequence),
+						   (unsigned long)packet_sequence,
 						   (unsigned int)
 						   record.length);
 				session->internals.early_data_received += record.length;
@@ -1470,9 +1474,8 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_audit_log(session,
-				  "Discarded message[%u] due to invalid decryption\n",
-				  (unsigned int)
-				  _gnutls_uint64touint32(packet_sequence));
+				  "Discarded message[%lu] due to invalid decryption\n",
+				  (unsigned long)packet_sequence);
 		goto sanity_check_error;
 	}
 
@@ -1484,24 +1487,20 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 			ret = _dtls_record_check(record_params, packet_sequence);
 			if (ret < 0) {
 				_gnutls_record_log
-				    ("REC[%p]: Discarded duplicate message[%u.%u]: %s\n",
+				    ("REC[%p]: Discarded duplicate message[%u.%lu]: %s\n",
 				     session,
-				     (unsigned int) record.sequence.i[0] * 256 +
-				     (unsigned int) record.sequence.i[1],
-				     (unsigned int)
-				     _gnutls_uint64touint32(packet_sequence),
+				     (unsigned int) (record.sequence >> 48),
+				     (unsigned long) (packet_sequence),
 				     _gnutls_packet2str(record.type));
 				goto sanity_check_error;
 			}
 		}
 
 		_gnutls_record_log
-		    ("REC[%p]: Decrypted Packet[%u.%u] %s(%d) with length: %d\n",
+		    ("REC[%p]: Decrypted Packet[%u.%lu] %s(%d) with length: %d\n",
 		     session,
-		     (unsigned int) record.sequence.i[0] * 256 +
-		     (unsigned int) record.sequence.i[1],
-		     (unsigned int)
-		     _gnutls_uint64touint32(packet_sequence),
+		     (unsigned int) (record.sequence >> 48),
+		     (unsigned long) packet_sequence,
 		     _gnutls_packet2str(record.type), record.type,
 		     (int) _mbuffer_get_udata_size(decrypted));
 
@@ -1510,10 +1509,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		record_state->sequence_number = record.sequence;
 	} else {
 		_gnutls_record_log
-		    ("REC[%p]: Decrypted Packet[%u] %s(%d) with length: %d\n",
+		    ("REC[%p]: Decrypted Packet[%lu] %s(%d) with length: %d\n",
 		     session,
-		     (unsigned int)
-		     _gnutls_uint64touint32(packet_sequence),
+		     (unsigned long) packet_sequence,
 		     _gnutls_packet2str(record.type), record.type,
 		     (int) _mbuffer_get_udata_size(decrypted));
 
@@ -1805,7 +1803,7 @@ void gnutls_packet_get(gnutls_packet_t packet, gnutls_datum_t *data, unsigned ch
 	assert(packet != NULL);
 
 	if (sequence) {
-		memcpy(sequence, packet->record_sequence.i, 8);
+		_gnutls_write_uint64(packet->record_sequence, sequence);
 	}
 
 	if (data) {

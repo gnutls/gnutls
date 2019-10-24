@@ -96,14 +96,6 @@ typedef int ssize_t;
 # define FALLTHROUGH
 #endif
 
-
-/* some systems had problems with long long int, thus,
- * it is not used.
- */
-typedef struct {
-	unsigned char i[8];
-} gnutls_uint64;
-
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 #include <gnutls/abstract.h>
@@ -462,7 +454,7 @@ typedef struct mbuffer_st {
 	content_type_t type;
 
 	/* record layer sequence */
-	gnutls_uint64 record_sequence;
+	uint64_t record_sequence;
 
 	/* Filled in by handshake layer on send:
 	 * type, epoch, htype, handshake_sequence
@@ -877,7 +869,7 @@ struct record_state_st {
 	} ctx;
 	unsigned aead_tag_size;
 	unsigned is_aead;
-	gnutls_uint64 sequence_number;
+	uint64_t sequence_number;
 };
 
 
