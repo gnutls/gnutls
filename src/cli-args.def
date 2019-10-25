@@ -445,7 +445,7 @@ flag = {
     name      = logfile;
     arg-type  = string;
     descrip   = "Redirect informational messages to a specific file.";
-    doc       = "";
+    doc       = "Redirect informational messages to a specific file. The file may be /dev/null also to make the gnutls client quiet to use it in piped server connections where only the server communication may appear on stdout.";
 };
 
 flag = {
