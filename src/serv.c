@@ -723,7 +723,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		if (tmp == NULL)
 			tmp = str_unknown;
 		snprintf(tmp_buffer, tmp_buffer_size,
-			 "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
+			 "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR>\n",
 			 tmp);
 	}
 
@@ -739,6 +739,8 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	snprintf(tmp_buffer, tmp_buffer_size,
 		 "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
 
+	snprintf(tmp_buffer, tmp_buffer_size,
+		 "</TABLE></P>\n");
 
 	if (crtinfo) {
 		snprintf(tmp_buffer, tmp_buffer_size,
