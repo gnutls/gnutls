@@ -97,6 +97,29 @@ if [ $? != 0 ]; then
 	exit 1
 fi
 
+echo "cn = End-user" > $TMPTEMPL
+
+"${CERTTOOL}" --generate-privkey --key-type gost01 --curve TC26-256-B > $TMPKEY 2>/dev/null
+
+"${CERTTOOL}" -d 2 --generate-certificate --template $TMPTEMPL \
+	--load-ca-privkey $TMPSUBCAKEY \
+	--load-ca-certificate $TMPSUBCA \
+	--load-privkey $TMPKEY \
+	--outfile $TMPUSER >$TMPFILE 2>&1
+
+if [ $? != 0 ]; then
+	cat $TMPFILE
+	exit 1
+fi
+
+cat $TMPUSER $TMPSUBCA $TMPCA > $TMPFILE
+"${CERTTOOL}" --verify-chain <$TMPFILE > $VERIFYOUT
+
+if [ $? != 0 ]; then
+	cat $VERIFYOUT
+	exit 1
+fi
+
 "${CERTTOOL}" -i < "${srcdir}"/data/grfc.crt --outfile $TMPFILE
 if [ $? != 0 ]; then
 	cat $TMPFILE
