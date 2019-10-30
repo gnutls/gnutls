@@ -30,7 +30,7 @@ variables:
   DEBIAN_CROSS_BUILD: buildenv-debian-cross
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
   FEDORA28_BUILD: buildenv-f28
-  FEDORA_BUILD: buildenv-f30
+  FEDORA_BUILD: buildenv-f31
   ALPINE_BASE_BUILD: buildenv-alpine-base
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
