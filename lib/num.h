@@ -28,42 +28,10 @@
 #include <minmax.h>
 #include <byteswap.h>
 
-inline static uint32_t _gnutls_uint24touint32(uint24 num)
-{
-	uint32_t ret = 0;
-
-	((uint8_t *) & ret)[1] = num.pint[0];
-	((uint8_t *) & ret)[2] = num.pint[1];
-	((uint8_t *) & ret)[3] = num.pint[2];
-	return ret;
-}
-
-inline static uint24 _gnutls_uint32touint24(uint32_t num)
-{
-	uint24 ret;
-
-	ret.pint[0] = ((uint8_t *) & num)[1];
-	ret.pint[1] = ((uint8_t *) & num)[2];
-	ret.pint[2] = ((uint8_t *) & num)[3];
-	return ret;
-
-}
-
 /* data should be at least 3 bytes */
 inline static uint32_t _gnutls_read_uint24(const uint8_t * data)
 {
-	uint32_t res;
-	uint24 num;
-
-	num.pint[0] = data[0];
-	num.pint[1] = data[1];
-	num.pint[2] = data[2];
-
-	res = _gnutls_uint24touint32(num);
-#ifndef WORDS_BIGENDIAN
-	res = bswap_32(res);
-#endif
-	return res;
+	return (data[0] << 16) | (data[1] << 8) | (data[2]);
 }
 
 inline static uint64_t _gnutls_read_uint64(const uint8_t * data)
@@ -87,16 +55,9 @@ inline static void _gnutls_write_uint64(uint64_t num, uint8_t * data)
 
 inline static void _gnutls_write_uint24(uint32_t num, uint8_t * data)
 {
-	uint24 tmp;
-
-#ifndef WORDS_BIGENDIAN
-	num = bswap_32(num);
-#endif
-	tmp = _gnutls_uint32touint24(num);
-
-	data[0] = tmp.pint[0];
-	data[1] = tmp.pint[1];
-	data[2] = tmp.pint[2];
+	data[0] = num >> 16;
+	data[1] = num >> 8;
+	data[2] = num;
 }
 
 inline static uint32_t _gnutls_read_uint32(const uint8_t * data)

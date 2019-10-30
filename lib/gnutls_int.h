@@ -263,10 +263,6 @@ typedef enum record_send_state_t {
 
 #define GNUTLS_KX_INVALID (-1)
 
-typedef struct {
-	uint8_t pint[3];
-} uint24;
-
 #include <mpi.h>
 
 typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
