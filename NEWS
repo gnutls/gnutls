@@ -7,6 +7,11 @@ See the end for copying conditions.
 
 * Version 3.6.11 (unreleased)
 
+** nettle: Use KERN_ARND for the system random number generator on NetBSD.
+   This syscall provides an endless stream of random numbers from the kernel's
+   ChaCha20-based random number generator, without blocking or requiring an open file
+   descriptor.
+
 ** libgnutls: Corrected issue with TLS 1.2 session ticket handling as client
    during resumption (#841).
 
