@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver10"
+  key: "$CI_JOB_NAME-ver12"
   paths:
     - cache/
 
@@ -205,7 +205,8 @@ valgrind.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - ./bootstrap
-  - dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
+# gcc in fedora31 inlines strcmp in a way that causes valgrind errors
+  - CFLAGS="-O2 -g -fno-builtin-strcmp" ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
   - make -j$(nproc)
   - make check -j$(nproc)
   tags:
