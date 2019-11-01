@@ -261,6 +261,23 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([
 		   rnd_variant=getrandom],
 		  [AC_MSG_RESULT(no)])
 
+AC_MSG_CHECKING([for KERN_ARND])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([
+	   #include <sys/sysctl.h>
+           #ifdef __linux__
+           #error 1
+           #endif
+           static int name[] = {CTL_KERN, KERN_ARND};
+	   ],[
+		   sysctl(0, 0, 0, 0, 0, 0);
+		  ])],
+		  [AC_MSG_RESULT(yes)
+		   AC_DEFINE([HAVE_KERN_ARND], 1, [Enable the BSD sysctl(KERN_ARND) function])
+		   rnd_variant=kern_arnd],
+		  [AC_MSG_RESULT(no)])
+
+AM_CONDITIONAL(HAVE_KERN_ARND, test "$rnd_variant" = "kern_arnd")
+
 AC_MSG_CHECKING([for getentropy])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([
 	   #include <unistd.h>

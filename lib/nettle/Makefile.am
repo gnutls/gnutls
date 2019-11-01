@@ -56,7 +56,11 @@ else
 if HAVE_GETENTROPY
 libcrypto_la_SOURCES += sysrng-getentropy.c
 else
+if HAVE_KERN_ARND
+libcrypto_la_SOURCES += sysrng-netbsd.c
+else
 libcrypto_la_SOURCES += sysrng-linux.c
+endif
 endif
 endif
 
