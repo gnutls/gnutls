@@ -123,7 +123,7 @@ minimal.Fedora.x86_64:
   - make -j$(nproc) check
   - echo "Minimal build"
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
-    dash ./configure --cache-file cache/config.cache --with-included-libtasn1 --enable-valgrind-tests
+    dash ./configure --cache-file cache/config.cache --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe
@@ -285,7 +285,7 @@ static-analyzers.Fedora.x86_64:
   - /bin/true
   script:
   - ./bootstrap
-  - scan-build ./configure --cache-file cache/config.cache --disable-doc --disable-guile --enable-fips140-mode --enable-valgrind-tests
+  - scan-build ./configure --cache-file cache/config.cache --disable-doc --disable-guile --enable-fips140-mode
   - make -j$(nproc) syntax-check gnulib_dir=$GNULIB_SRCDIR
   - make -j$(nproc) -C gl
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
