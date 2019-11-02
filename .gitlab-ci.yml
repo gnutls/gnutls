@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver10"
+  key: "$CI_JOB_NAME-ver12"
   paths:
     - cache/
 
@@ -30,7 +30,7 @@ variables:
   DEBIAN_CROSS_BUILD: buildenv-debian-cross
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
   FEDORA28_BUILD: buildenv-f28
-  FEDORA_BUILD: buildenv-f30
+  FEDORA_BUILD: buildenv-f31
   ALPINE_BASE_BUILD: buildenv-alpine-base
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
@@ -123,7 +123,7 @@ minimal.Fedora.x86_64:
   - make -j$(nproc) check
   - echo "Minimal build"
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
-    dash ./configure --cache-file cache/config.cache --with-included-libtasn1 --enable-valgrind-tests
+    dash ./configure --cache-file cache/config.cache --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe
@@ -205,7 +205,8 @@ valgrind.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - ./bootstrap
-  - dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
+# gcc in fedora31 inlines strcmp in a way that causes valgrind errors
+  - CFLAGS="-O2 -g -fno-builtin-strcmp" ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
   - make -j$(nproc)
   - make check -j$(nproc)
   tags:
@@ -285,7 +286,7 @@ static-analyzers.Fedora.x86_64:
   - /bin/true
   script:
   - ./bootstrap
-  - scan-build ./configure --cache-file cache/config.cache --disable-doc --disable-guile --enable-fips140-mode --enable-valgrind-tests
+  - scan-build ./configure --cache-file cache/config.cache --disable-doc --disable-guile --enable-fips140-mode
   - make -j$(nproc) syntax-check gnulib_dir=$GNULIB_SRCDIR
   - make -j$(nproc) -C gl
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
