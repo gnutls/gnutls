@@ -526,6 +526,26 @@ test_case_st tests[] = {
 		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+GOST28147-TC26Z-CNT:+GOST28147-TC26Z-IMIT:+SIGN-GOSTR341012-512:+SIGN-GOSTR341012-256:+SIGN-GOSTR341001:-VERS-ALL:+VERS-TLS1.2",
 		.client_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+GOST28147-TC26Z-CNT:+GOST28147-TC26Z-IMIT:+SIGN-GOSTR341012-512:+SIGN-GOSTR341012-256:+SIGN-GOSTR341001:-VERS-ALL:+VERS-TLS1.2"
 	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred and GOST12-256 cert client lacking signature algs (like SChannel)",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_gost12_256_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+GOST28147-TC26Z-CNT:+GOST28147-TC26Z-IMIT:+SIGN-GOSTR341012-512:+SIGN-GOSTR341012-256:+SIGN-GOSTR341001:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NONE:+VKO-GOST-12:+GROUP-GOST-ALL:+GOST28147-TC26Z-CNT:+GOST28147-TC26Z-IMIT:+VERS-TLS1.2:+SIGN-RSA-SHA256"
+	},
+	{
+		.name = "TLS 1.2 VKO-GOST-12 with cred and GOST12-512 cert client lacking signature algs (like SChannel)",
+		.server_ret = 0,
+		.client_ret = 0,
+		.have_cert_cred = 1,
+		.have_gost12_512_cert = 1,
+		.not_on_fips = 1,
+		.server_prio = "NORMAL:-KX-ALL:+VKO-GOST-12:+GROUP-GOST-ALL:+GOST28147-TC26Z-CNT:+GOST28147-TC26Z-IMIT:+SIGN-GOSTR341012-512:+SIGN-GOSTR341012-256:+SIGN-GOSTR341001:-VERS-ALL:+VERS-TLS1.2",
+		.client_prio = "NONE:+VKO-GOST-12:+GROUP-GOST-ALL:+GOST28147-TC26Z-CNT:+GOST28147-TC26Z-IMIT:+VERS-TLS1.2:+SIGN-RSA-SHA256"
+	},
 #endif
 };
 
