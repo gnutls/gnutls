@@ -1516,7 +1516,7 @@ int cert_select_sign_algorithm(gnutls_session_t session,
 		return 0;
 	}
 
-	algo = _gnutls_session_get_sign_algo(session, cert, pkey, 0);
+	algo = _gnutls_session_get_sign_algo(session, cert, pkey, 0, cs->kx_algorithm);
 	if (algo == GNUTLS_SIGN_UNKNOWN)
 		return gnutls_assert_val(GNUTLS_E_INCOMPATIBLE_SIG_WITH_KEY);
 
