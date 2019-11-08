@@ -144,4 +144,26 @@ IssuerSignTool ::= SEQUENCE {
 	cAToolCert	UTF8String  -- (SIZE (1..100))
 }
 
+Gost28147-89-EncryptedKey ::= SEQUENCE {
+	encryptedKey		OCTET STRING, -- (SIZE (32))
+	maskKey			[0] IMPLICIT OCTET STRING OPTIONAL,
+	macKey			OCTET STRING -- (SIZE (1..4))
+}
+
+SubjectPublicKeyInfo ::= SEQUENCE {
+	algorithm		AlgorithmIdentifier,
+	subjectPublicKey	BIT STRING
+}
+
+GostR3410-TransportParameters ::= SEQUENCE {
+	encryptionParamSet	OBJECT IDENTIFIER,
+	ephemeralPublicKey	[0] IMPLICIT SubjectPublicKeyInfo OPTIONAL,
+	ukm			OCTET STRING
+}
+
+GostR3410-KeyTransport ::= SEQUENCE {
+	sessionEncryptedKey	Gost28147-89-EncryptedKey,
+	transportParameters	[0] IMPLICIT GostR3410-TransportParameters OPTIONAL
+}
+
 END

@@ -1522,6 +1522,7 @@
       <enumerator name='GNUTLS_KX_ECDHE_ECDSA' value='13'/>
       <enumerator name='GNUTLS_KX_ECDHE_PSK' value='14'/>
       <enumerator name='GNUTLS_KX_RSA_PSK' value='15'/>
+      <enumerator name='GNUTLS_KX_VKO_GOST_12' value='16'/>
     </enum-decl>
     <typedef-decl name='gnutls_kx_algorithm_t' type-id='type-id-43' id='type-id-30'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-44'>
@@ -1670,6 +1671,13 @@
       <enumerator name='GNUTLS_GROUP_SECP384R1' value='3'/>
       <enumerator name='GNUTLS_GROUP_SECP521R1' value='4'/>
       <enumerator name='GNUTLS_GROUP_X25519' value='6'/>
+      <enumerator name='GNUTLS_GROUP_GC256A' value='16'/>
+      <enumerator name='GNUTLS_GROUP_GC256B' value='17'/>
+      <enumerator name='GNUTLS_GROUP_GC256C' value='18'/>
+      <enumerator name='GNUTLS_GROUP_GC256D' value='19'/>
+      <enumerator name='GNUTLS_GROUP_GC512A' value='13'/>
+      <enumerator name='GNUTLS_GROUP_GC512B' value='14'/>
+      <enumerator name='GNUTLS_GROUP_GC512C' value='15'/>
       <enumerator name='GNUTLS_GROUP_FFDHE2048' value='256'/>
       <enumerator name='GNUTLS_GROUP_FFDHE3072' value='257'/>
       <enumerator name='GNUTLS_GROUP_FFDHE4096' value='258'/>
