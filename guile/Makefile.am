@@ -84,7 +84,7 @@ endif
 	$(AM_V_GUILEC)$(MKDIR_P) "`dirname "$@"`" ;			\
 	$(AM_V_P) && out=1 || out=- ;					\
 	unset GUILE_LOAD_COMPILED_PATH ; LC_ALL=C			\
-	$(CROSS_COMPILING_VARIABLE)					\
+	GUILE_AUTO_COMPILE=0 $(CROSS_COMPILING_VARIABLE)		\
 	GNUTLS_GUILE_EXTENSION_DIR="$(abs_top_builddir)/guile/src"	\
 	$(GUILD) compile --target="$(host)"				\
 	  -L "$(top_builddir)/guile/modules"				\
