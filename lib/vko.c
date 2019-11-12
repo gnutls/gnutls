@@ -197,7 +197,9 @@ _gnutls_gost_keytrans_decrypt(gnutls_pk_params_st *priv,
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
-		goto cleanup;
+		asn1_delete_structure(&kx);
+
+		return ret;
 	}
 
 	ret = _gnutls_get_asn_mpis(kx,
