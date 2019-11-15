@@ -1000,6 +1000,7 @@ fi
 
 AM_CONDITIONAL([HAVE_GUILE], [test "$opt_guile_bindings" = "yes"])
 AM_CONDITIONAL([HAVE_GUILD], [test "x$GUILD" != "x"])
+AM_CONDITIONAL([CROSS_COMPILING], [test "x$cross_compiling" = "xyes"])
 
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
 LIBGNUTLS_CFLAGS="-I${includedir}"
