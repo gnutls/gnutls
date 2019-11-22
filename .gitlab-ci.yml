@@ -135,6 +135,7 @@ minimal.Fedora.x86_64:
     --disable-guile
   - make clean
   - make -j$(nproc)
+  - make -j$(nproc) check
   tags:
   - shared
   except:
