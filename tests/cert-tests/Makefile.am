@@ -78,7 +78,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/alt-chain.pem data/pkcs7-chain.pem data/pkcs7-chain-root.pem data/chain-eddsa.pem \
 	data/pkcs7-chain-endcert-key.pem data/cert-rsa-pss.pem data/openssl-invalid-time-format.pem \
 	data/cert-eddsa.pem data/pubkey-eddsa.pem data/pkcs7-eddsa-sig.p7s \
-	data/key-ca.pem data/key-user.pem \
+	data/key-ca.pem data/key-user.pem data/template-sgenerate.pem \
 	data/ca-gnutls-keyid.pem data/ca-no-keyid.pem data/ca-weird-keyid.pem \
 	data/key-ca-1234.p8 data/key-ca-empty.p8 data/key-ca-null.p8 \
 	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind \
