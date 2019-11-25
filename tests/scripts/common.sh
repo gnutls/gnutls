@@ -74,13 +74,13 @@ GETPORT='
 check_for_datefudge() {
 	# On certain platforms running datefudge date fails (e.g., x86 datefudge
 	# with x86-64 date app).
-	if test "${SKIP_DATEFUDGE_CHECK}" = 1;then
+	if test "${SKIP_DATEFUDGE_CHECK}" = 1 || test -z "${top_builddir}";then
 		return
 	fi
 
-	TSTAMP=`datefudge -s "2006-09-23" "${top_builddir}/tests/datefudge-check" || true`
+	TSTAMP=`datefudge -s "2006-09-23" "${top_builddir}/tests/datefudge-check"`
 	if test "$TSTAMP" != "1158969600" || test "$WINDOWS" = 1; then
-	echo $TSTAMP
+		echo "timestamp: ${TSTAMP}"
 		echo "You need datefudge to run this test"
 		exit 77
 	fi
