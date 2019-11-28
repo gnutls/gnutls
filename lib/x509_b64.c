@@ -258,8 +258,11 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 	gnutls_datum_t pdata;
 	struct base64_decode_ctx ctx;
 
-	if (data_size == 0)
-		return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+	if (data_size == 0) {
+		result->data = (unsigned char*)gnutls_strdup("");
+		result->size = 0;
+		return 0;
+	}
 
 	ret = cpydata(data, data_size, &pdata);
 	if (ret < 0) {
