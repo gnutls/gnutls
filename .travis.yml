@@ -6,7 +6,7 @@ compiler:
   - clang
 
 git:
-  submodules: false
+  submodules: true
 
 notifications:
   email:
