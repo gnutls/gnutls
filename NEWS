@@ -15,6 +15,10 @@ See the end for copying conditions.
 ** libgnutls: Corrected issue with TLS 1.2 session ticket handling as client
    during resumption (#841).
 
+** libgnutls: gnutls_base64_decode2() succeeds decoding the empty string to
+   the empty string. This is a behavioral change of the API but it conforms
+   to the RFC4648 expectations (#834).
+
 ** certtool: CRL distribution points will be set in CA certificates even when
    non self-signed (#765).
 
