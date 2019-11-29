@@ -19,6 +19,9 @@ See the end for copying conditions.
    the empty string. This is a behavioral change of the API but it conforms
    to the RFC4648 expectations (#834).
 
+** libgnutls: Fixed AES-CFB8 implementation, when input is shorter than
+   the block size. Fix backported from nettle.
+
 ** certtool: CRL distribution points will be set in CA certificates even when
    non self-signed (#765).
 
