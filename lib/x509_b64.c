@@ -260,6 +260,8 @@ _gnutls_base64_decode(const uint8_t * data, size_t data_size,
 
 	if (data_size == 0) {
 		result->data = (unsigned char*)gnutls_strdup("");
+		if (result->data == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		result->size = 0;
 		return 0;
 	}
