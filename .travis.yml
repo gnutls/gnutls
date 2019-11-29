@@ -6,7 +6,7 @@ compiler:
   - clang
 
 git:
-  submodules: true
+  submodules: false
 
 notifications:
   email:
@@ -17,10 +17,10 @@ notifications:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then
         brew update;
-        for pkg in autoconf automake autogen libtool nettle p11-kit libtasn1 gettext;do
+        for pkg in openssl autoconf automake autogen libtool nettle p11-kit libtasn1 gettext;do
           brew install $pkg || true;
         done;
-        for pkg in nettle p11-kit libtasn1;do
+        for pkg in nettle wget p11-kit libtasn1;do
           brew upgrade $pkg || true;
         done;
     fi
