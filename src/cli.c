@@ -1171,7 +1171,7 @@ print_other_info(gnutls_session_t session)
 		    gnutls_ocsp_resp_print(r, flag, &p);
 		gnutls_ocsp_resp_deinit(r);
 		if (ret>=0) {
-			fputs((char*)p.data, stdout);
+			log_msg(stdout, "%s", (char*) p.data);
 			gnutls_free(p.data);
 		}
 	}
