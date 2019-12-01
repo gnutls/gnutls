@@ -263,7 +263,7 @@ static void load_x509_keys(void)
 
 		load_priv_key(&x509_key, x509_keyfile);
 
-		fprintf(stdout,
+		log_msg(stdout,
 			"Processed %d client X.509 certificates...\n",
 			x509_crt_size);
 	}
@@ -298,7 +298,7 @@ static void load_rawpk_keys(void)
 		// Secondly, we load the private key corresponding to the raw pk
 		load_priv_key(&rawpk_key, rawpk_keyfile);
 
-		fprintf(stdout,
+		log_msg(stdout,
 			"Processed %d client raw public key pair...\n",	1);
 	}
 }
