@@ -72,6 +72,8 @@ doc-dist.Fedora:
   - make -C doc gnutls.html
   - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
     make -C doc/latex gnutls.pdf
+# check whether distribution with or without included libopts is ok
+  - make distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-local-libopts --disable-tests"
   - make distcheck
   tags:
   - shared
