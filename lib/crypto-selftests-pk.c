@@ -560,9 +560,6 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 				return 0
 
 
-/* This file is also included by the test app in tests/slow/cipher-test, so in that
- * case we cannot depend on gnutls internals */
-#ifndef AVOID_INTERNALS
 /* Known answer tests for DH */
 static int test_dh(void)
 {
@@ -751,7 +748,6 @@ cleanup:
 
 	return ret;
 }
-#endif
 
 /*-
  * gnutls_pk_self_test:
@@ -775,7 +771,6 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 	case GNUTLS_PK_UNKNOWN:
 		FALLTHROUGH;
 	case GNUTLS_PK_DH:
-#ifndef AVOID_INTERNALS
 		ret = test_dh();
 		if (ret < 0) {
 			gnutls_assert();
@@ -784,7 +779,6 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
-#endif
 		FALLTHROUGH;
 	case GNUTLS_PK_RSA:
 		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 2048, GNUTLS_DIG_SHA256,
@@ -814,14 +808,12 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		FALLTHROUGH;
 	case GNUTLS_PK_EC:
 		/* Test ECDH and ECDSA */
-#ifndef AVOID_INTERNALS
 		ret = test_ecdh();
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
-#endif
 		/* Test ECDSA */
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
