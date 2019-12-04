@@ -9,8 +9,7 @@ resource_rules:
             interval_type: days
             interval: 30
           state: opened
-          labels:
-            - No Label
+          no_additional_labels: true
         limits:
           most_recent: 50
         actions:
@@ -61,8 +60,7 @@ resource_rules:
             interval_type: months
             interval: 4
           state: opened
-          labels:
-            - No Label
+          no_additional_labels: true
         limits:
           most_recent: 50
         actions:
