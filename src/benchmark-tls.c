@@ -508,7 +508,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	}
 	while (benchmark_must_finish == 0);
 
-	fprintf(stdout, "%38s  ", suite);
+	fprintf(stdout, "%s\n - ", suite);
 	gnutls_free(suite);
 	stop_benchmark(&st, "transactions", 1);
 	gnutls_priority_deinit(priority_cache);
@@ -531,8 +531,8 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 
 	svar = calc_svar(total_diffs, total_diffs_size, avg);
 
-	printf("%32s %.2f %s, standard deviation: %.2f)\n",
-	       "(avg. handshake time:", avg, scale, sqrt(svar));
+	printf(" - avg. handshake time: %.2f %s\n - standard deviation: %.2f %s\n\n",
+	       avg, scale, sqrt(svar), scale);
 
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
