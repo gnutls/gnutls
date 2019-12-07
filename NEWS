@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.12 (unreleased)
+
+** libgnutls: Introduced the gnutls_ocsp_req_const_t which is compatible
+   with gnutls_ocsp_req_t but const.
+
+** API and ABI modifications:
+gnutls_ocsp_req_const_t: Added
+
+
 * Version 3.6.11 (released 2019-12-01)
 
 ** libgnutls: Use KERN_ARND for the system random number generator on NetBSD.
