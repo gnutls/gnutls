@@ -191,9 +191,9 @@ _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name);
 
 int _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					    const char *dst_name,
-					    gnutls_pk_params_st * params);
+					    const gnutls_pk_params_st * params);
 int _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
-				   gnutls_pk_params_st * params);
+				   const gnutls_pk_params_st * params);
 int _gnutls_asn1_copy_node(ASN1_TYPE * dst, const char *dst_name,
 			   ASN1_TYPE src, const char *src_name);
 
@@ -222,7 +222,7 @@ _gnutls_x509_get_raw_field(ASN1_TYPE c2, const char *whom, gnutls_datum_t *out)
 }
 
 int
-_gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
+_gnutls_x509_get_raw_field2(ASN1_TYPE c2, const gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn);
 
 unsigned
@@ -235,7 +235,7 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 			   gnutls_datum_t *cert2bin);
 
 unsigned
-_gnutls_check_valid_key_id(gnutls_datum_t *key_id,
+_gnutls_check_valid_key_id(const gnutls_datum_t *key_id,
 			   gnutls_x509_crt_t cert, time_t now,
 			   unsigned *has_ski);
 
@@ -256,8 +256,8 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 
 unsigned _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
-int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
-int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
+int _gnutls_copy_string(const gnutls_datum_t* str, uint8_t *out, size_t *out_size);
+int _gnutls_copy_data(const gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 
 int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out);
 int _gnutls_x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,

@@ -49,4 +49,3 @@ changed_enumerators = GNUTLS_GROUP_MAX
 [suppress_type]
 name = gnutls_sec_param_t
 changed_enumerators = GNUTLS_SEC_PARAM_MAX
-
