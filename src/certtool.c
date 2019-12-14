@@ -373,7 +373,6 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 			get_oid_crt_set(crt);
 			get_key_purpose_set(TYPE_CRT, crt);
-			get_extensions_crt_set(TYPE_CRT, crt);
 
 			if (!batch)
 				fprintf(stderr,
@@ -466,6 +465,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			app_exit(1);
 		}
 	}
+
+	get_extensions_crt_set(TYPE_CRT, crt);
 
 	/* append additional extensions */
 	if (cinfo->v1_cert == 0) {

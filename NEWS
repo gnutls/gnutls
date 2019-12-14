@@ -24,14 +24,17 @@ See the end for copying conditions.
    for all certificate verifications, not only under TLS. The configuration can
    be overriden using the GNUTLS_SYSTEM_PRIORITY_FILE environment variable.
 
-** certtool: Added the --verify-profile option to set a certificate
-   verification profile. Use '--verify-profile low' for certificate verification
-   to apply the 'NORMAL' verification profile.
-
 ** libgnutls: If a CA is found in the trusted list, check in addition to
    time validity, whether the algorithms comply to the expected level prior
    to accepting it. This addresses the problem of accepting CAs which would
    have been marked as insecure otherwise (#877).
+
+** certtool: Added the --verify-profile option to set a certificate
+   verification profile. Use '--verify-profile low' for certificate verification
+   to apply the 'NORMAL' verification profile.
+
+** certtool: The add_extension template option is considered even when generating
+   a certificate from a certificate request.
 
 ** API and ABI modifications:
 gnutls_ocsp_req_const_t: Added
