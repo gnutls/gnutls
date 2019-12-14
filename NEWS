@@ -7,10 +7,14 @@ See the end for copying conditions.
 
 * Version 3.6.12 (unreleased)
 
+** libgnutls: Introduced flag of gnutls_session_get_flags() to identify
+   sessions that client request OCSP status request (#829).
+
 ** libgnutls: Introduced the gnutls_ocsp_req_const_t which is compatible
    with gnutls_ocsp_req_t but const.
 
 ** API and ABI modifications:
+GNUTLS_SFLAGS_CLI_REQUESTED_OCSP: Added
 gnutls_ocsp_req_const_t: Added
 
 

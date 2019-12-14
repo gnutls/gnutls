@@ -1574,6 +1574,8 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH;
 	if (session->internals.hsk_flags & HSK_EARLY_DATA_ACCEPTED)
 		flags |= GNUTLS_SFLAGS_EARLY_DATA;
+	if (session->internals.hsk_flags & HSK_OCSP_REQUESTED)
+		flags |= GNUTLS_SFLAGS_CLI_REQUESTED_OCSP;
 
 	return flags;
 }

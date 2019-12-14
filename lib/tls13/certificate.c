@@ -273,7 +273,7 @@ int _gnutls13_send_certificate(gnutls_session_t session, unsigned again)
 #ifdef ENABLE_OCSP
 			if ((session->internals.selected_ocsp_length > 0 ||
 			     session->internals.selected_ocsp_func) &&
-			    _gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_STATUS_REQUEST)) {
+			     (session->internals.hsk_flags & HSK_OCSP_REQUESTED)) {
 				/* append status response if available */
 				ret = _gnutls_extv_append_init(&buf);
 				if (ret < 0) {
