@@ -40,11 +40,11 @@ fuzzer=$1
 workers=$(($(nproc) - 0))
 jobs=$workers
 
-clang-6.0 \
+clang \
  $CFLAGS -I/usr/local/include -I../lib/includes -I.. \
  ${fuzzer}.c -o ${fuzzer} \
  -Wl,-Bstatic ../lib/.libs/libgnutls.a -lFuzzer \
- -Wl,-Bdynamic -lnettle -lhogweed -lgmp -lp11-kit -ltasn1 -lidn2 -lunistring -lclang-6.0 -lstdc++
+ -Wl,-Bdynamic -lnettle -lhogweed -lgmp -lp11-kit -ltasn1 -lidn2 -lunistring -lstdc++
 
 if test -n "$BUILD_ONLY"; then
   exit 0
