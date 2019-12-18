@@ -97,6 +97,12 @@ _gnutls_sign_algorithm_write_params(gnutls_session_t session,
 		if (prev && prev->id[0] == aid->id[0] && prev->id[1] == aid->id[1])
 			continue;
 
+		/* Ignore non-GOST sign types for CertReq */
+		if (session->security_parameters.cs &&
+		    _gnutls_kx_is_vko_gost(session->security_parameters.cs->kx_algorithm) &&
+		    !_sign_is_gost(session->internals.priorities->sigalg.entry[i]))
+			continue;
+
 		_gnutls_handshake_log
 		    ("EXT[%p]: sent signature algo (%d.%d) %s\n", session,
 		     (int)aid->id[0], (int)aid->id[1],

@@ -136,6 +136,19 @@ static const int _supported_groups_ecdh[] = {
 	0
 };
 
+static const int _supported_groups_gost[] = {
+#ifdef ENABLE_GOST
+	GNUTLS_GROUP_GC256A,
+	GNUTLS_GROUP_GC256B,
+	GNUTLS_GROUP_GC256C,
+	GNUTLS_GROUP_GC256D,
+	GNUTLS_GROUP_GC512A,
+	GNUTLS_GROUP_GC512B,
+	GNUTLS_GROUP_GC512C,
+#endif
+	0
+};
+
 static const int _supported_groups_normal[] = {
 	GNUTLS_GROUP_SECP256R1,
 	GNUTLS_GROUP_SECP384R1,
@@ -1605,7 +1618,8 @@ static int set_ciphersuite_list(gnutls_priority_t priority_cache)
 
 				if (ce != NULL && priority_cache->cs.size < MAX_CIPHERSUITE_SIZE) {
 					priority_cache->cs.entry[priority_cache->cs.size++] = ce;
-					if (!have_ec && _gnutls_kx_is_ecc(ce->kx_algorithm)) {
+					if (!have_ec && (_gnutls_kx_is_ecc(ce->kx_algorithm) ||
+							 _gnutls_kx_is_vko_gost(ce->kx_algorithm))) {
 						have_ec = 1;
 						add_ec(priority_cache);
 					}
@@ -2060,6 +2074,12 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					bulk_given_fn(&(*priority_cache)->
 						_supported_ecc,
 						_supported_groups_ecdh);
+				} else if (strncasecmp
+				    (&broken_list[i][1], "GROUP-GOST-ALL",
+				     12) == 0) {
+					bulk_given_fn(&(*priority_cache)->
+						_supported_ecc,
+						_supported_groups_gost);
 				} else {
 					if ((algo =
 					     gnutls_group_get_id
