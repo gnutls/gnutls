@@ -1460,9 +1460,9 @@ GROUP-FFDHE2048, GROUP-FFDHE3072, GROUP-FFDHE4096, GROUP-FFDHE6144, and
 GROUP-FFDHE8192.
 Groups include both elliptic curve groups, e.g., SECP256R1, as well as 
 finite field groups such as FFDHE2048. Catch all which enables all groups
-from NORMAL priority is GROUP-ALL. The helper keywords GROUP-DH-ALL and
-GROUP-EC-ALL are also available, restricting the groups to finite fields
-(DH) and elliptic curves.
+from NORMAL priority is GROUP-ALL. The helper keywords GROUP-DH-ALL,
+GROUP-GOST-ALL and GROUP-EC-ALL are also available, restricting the groups
+to finite fields (DH), GOST curves and generic elliptic curves.
 
 @item Elliptic curves (legacy) @tab
 CURVE-SECP192R1, CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1,
