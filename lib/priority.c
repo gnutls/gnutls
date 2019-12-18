@@ -976,6 +976,11 @@ static time_t system_priority_last_mod = 0;
 #define OVERRIDES_SECTION "overrides"
 #define MAX_ALGO_NAME 128
 
+gnutls_certificate_verification_profiles_t _gnutls_get_system_wide_verification_profile(void)
+{
+	return system_wide_verification_profile;
+}
+
 /* removes spaces */
 static char *clear_spaces(const char *str, char out[MAX_ALGO_NAME])
 {

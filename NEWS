@@ -20,6 +20,9 @@ See the end for copying conditions.
    enabled both on a server and a client. It is recommended for now to disable
    TLS 1.3 in setups where GOST ciphersuites are enabled on GnuTLS-based servers.
 
+** libgnutls: The min-verification-profile from system configuration applies
+   for all certificate verifications, not only under TLS.
+
 ** API and ABI modifications:
 gnutls_ocsp_req_const_t: Added
 

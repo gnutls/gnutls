@@ -38,6 +38,7 @@
 #include <common.h>
 #include <pk.h>
 #include "supported_exts.h"
+#include "profiles.h"
 
 /* Checks if two certs have the same name and the same key.  Return 1 on match. 
  * If @is_ca is zero then this function is identical to gnutls_x509_crt_equals()
@@ -460,9 +461,20 @@ static unsigned is_level_acceptable(
 	gnutls_pk_params_st params;
 	gnutls_sec_param_t sp;
 	int hash;
+	gnutls_certificate_verification_profiles_t min_profile;
 
-	if (profile == GNUTLS_PROFILE_UNKNOWN)
+	min_profile = _gnutls_get_system_wide_verification_profile();
+
+	if (min_profile) {
+		if (profile < min_profile) {
+			gnutls_assert();
+			profile = min_profile;
+		}
+	}
+
+	if (profile == GNUTLS_PROFILE_UNKNOWN) {
 		return 1;
+	}
 
 	pkalg = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
 	if (pkalg < 0)
