@@ -475,26 +475,25 @@ FreeBSD.x86_64:
   retry: 1
 
 # Two runs, one with normal backend and another with pkcs11 trust store
-ubsan-Werror.Fedora.x86_64:
+UB+ASAN-Werror.Fedora.x86_64.gcc:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - ./bootstrap
-  - CFLAGS="-std=c99 -fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
-     --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-full-test-suite --disable-doc
-  - grep "^LIBS=''" config.log || false
-  - make -j$(nproc) -C gl
-  - make -j$(nproc) -C lib CFLAGS="-Werror -O2 -g -Wimplicit-fallthrough=2"
-  - make -j$(nproc) -C libdane CFLAGS="-Werror -O2 -g -Wimplicit-fallthrough=2"
-  - make -j$(nproc) -C src/gl
-  - make -j$(nproc) -C src CFLAGS="-Werror -O2 -g -fsanitize=undefined -Wno-error=parentheses -Wno-error=unused-macros -Wimplicit-fallthrough=2 -Wno-duplicated-branches"
+  - export UBSAN_OPTIONS=print_stacktrace=1
+  - export LSAN_OPTIONS=suppressions=$(pwd)/devel/lsan.supp
+  - export CFLAGS="-std=c99 -O1 -g -Wno-cpp -Werror -fno-omit-frame-pointer -fsanitize=undefined,bool,alignment,null,enum,bounds-strict,address,leak,nonnull-attribute -fno-sanitize-recover=all -fsanitize-address-use-after-scope"
+  - export CXXFLAGS="$CFLAGS"
+  - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration
+  - sed -i 's/-Werror/-Wno-parentheses -Werror/g' src/Makefile
   - make -j$(nproc)
-  - make check -j$(nproc)
-  - CFLAGS="-std=c99 -fsanitize=undefined -fsanitize=bool -fsanitize=alignment -fsanitize=null -fsanitize=bounds-strict -fsanitize=enum -fno-sanitize-recover -g -O2" CXXFLAGS=$CFLAGS LDFLAGS="-static-libubsan" dash ./configure
-   --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --disable-doc --disable-full-test-suite --with-default-trust-store-pkcs11="pkcs11:"
+  - make check -j$(nproc) -C fuzz
+  - make check -j$(nproc) -C tests
+  - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration --with-default-trust-store-pkcs11="pkcs11:"
   - make clean
+  - sed -i 's/-Werror/-Wno-parentheses -Werror/g' src/Makefile
   - make -j$(nproc)
-  - make -C tests check -j$(nproc) TESTS="trust-store p11-kit-load.sh" SUBDIRS=.
+  - make check -j$(nproc) -C tests TESTS="trust-store p11-kit-load.sh" SUBDIRS=.
   tags:
   - shared
   except:
