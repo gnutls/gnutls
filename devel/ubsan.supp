@@ -1,0 +1,31 @@
+unsigned-integer-overflow:str-two-way.h
+
+# tests/mini-overhead won't terminate
+#rsa.c:235:8: runtime error: negation of 1 cannot be represented in type 'unsigned int'
+#    #0 0x7fd3fd159893 in proc_rsa_client_kx /usr/oms/src/gnutls/lib/auth/rsa.c:235:8
+#    #1 0x7fd3fcee581a in _gnutls_recv_client_kx_message /usr/oms/src/gnutls/lib/kx.c:570:7
+#    #2 0x7fd3fced113a in handshake_server /usr/oms/src/gnutls/lib/handshake.c:3461:10
+#    #3 0x7fd3fcecbecd in gnutls_handshake /usr/oms/src/gnutls/lib/handshake.c:2730:9
+#    #4 0x4f98d7 in server /home/oms/src/gnutls/tests/mini-overhead.c:249:9
+unsigned-integer-overflow:rsa.c
+
+# tests/mini-overhead won't terminate
+#pk.c:668:12: runtime error: negation of 1 cannot be represented in type 'unsigned int'
+#    #0 0x7fd3fd17b686 in _wrap_nettle_pk_decrypt2 /usr/oms/src/gnutls/lib/nettle/pk.c:668:12
+#    #1 0x7fd3fcf674a3 in gnutls_privkey_decrypt_data2 /usr/oms/src/gnutls/lib/privkey.c:1617:10
+#    #2 0x7fd3fd15917c in proc_rsa_client_kx /usr/oms/src/gnutls/lib/auth/rsa.c:210:6
+#    #3 0x7fd3fcee581a in _gnutls_recv_client_kx_message /usr/oms/src/gnutls/lib/kx.c:570:7
+#    #4 0x7fd3fced113a in handshake_server /usr/oms/src/gnutls/lib/handshake.c:3461:10
+#    #5 0x7fd3fcecbecd in gnutls_handshake /usr/oms/src/gnutls/lib/handshake.c:2730:9
+#    #6 0x4f98d7 in server /home/oms/src/gnutls/tests/mini-overhead.c:249:9
+unsigned-integer-overflow:pk.c
+
+# tests/mini-tls-nonblock won't terminate
+#buffers.c:1135:36: runtime error: unsigned integer overflow: 0 - 1 cannot be represented in type 'unsigned int'
+#    #0 0x7ffbf53ea7ee in get_last_packet /usr/oms/src/gnutls/lib/buffers.c:1135:36
+#    #1 0x7ffbf53e99f2 in _gnutls_handshake_io_recv_int /usr/oms/src/gnutls/lib/buffers.c:1407:8
+#    #2 0x7ffbf53f006e in _gnutls_recv_handshake /usr/oms/src/gnutls/lib/handshake.c:1522:8
+#    #3 0x7ffbf53f9dbc in handshake_client /usr/oms/src/gnutls/lib/handshake.c:2999:8
+#    #4 0x7ffbf53f8e67 in gnutls_handshake /usr/oms/src/gnutls/lib/handshake.c:2727:10
+#    #5 0x4f9b45 in client /home/oms/src/gnutls/tests/mini-tls-nonblock.c:186:9
+unsigned-integer-overflow:buffers.c

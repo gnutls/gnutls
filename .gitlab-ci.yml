@@ -525,6 +525,110 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
       - tests/suite/*/*.log
   retry: 1
 
+# Two runs, one with normal backend and another with pkcs11 trust store
+# clang/llvm is not able to combine ASAN and UBSAN properly,
+#   tests/suite/testcompat-tls13-openssl.sh fails if we do so.
+UBSAN-Werror.Fedora.x86_64.clang:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - ./bootstrap
+  - export UBSAN_OPTIONS=print_stacktrace=1:report_error_type=1:suppressions=$(pwd)/devel/ubsan.supp
+  - export LSAN_OPTIONS=suppressions=$(pwd)/devel/lsan.supp
+  - export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer
+  - export CC=clang
+  - export CXX=clang++
+
+# This makes several tests fail, needs discussion if helpful
+# -fsanitize=nullability
+# -fsanitize=nonnull-attribute
+# Since OSS-Fuzz doesn't use them either, we leave them out for now.
+
+# This is from OSS-Fuzz (20.12.2019)
+  - export CFLAGS="-std=c99 -O1 -g -Werror -fno-omit-frame-pointer -fsanitize=array-bounds,bool,builtin,enum,float-divide-by-zero,function,integer-divide-by-zero,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,unsigned-integer-overflow,unreachable,vla-bound,vptr -fno-sanitize-recover=all -fsanitize-recover=unsigned-integer-overflow"
+
+  - export CXXFLAGS="$CFLAGS"
+
+  - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration
+  - sed -i 's/-Werror/-Wno-enum-conversion -Wno-parentheses -Werror/g' src/Makefile
+  - sed -i 's/-Werror/-Wno-enum-conversion -Werror/g' lib/Makefile lib/x509/Makefile lib/nettle/Makefile
+  - make -j$BUILDJOBS
+  - sed -i 's/-Werror//g' fuzz/Makefile tests/Makefile tests/slow/Makefile
+  - make check -j$BUILDJOBS -C fuzz
+  - make check -j$CHECKJOBS -C tests
+  - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration --disable-tls13-interop --with-default-trust-store-pkcs11="pkcs11:"
+  - make clean
+  - sed -i 's/-Werror/-Wno-enum-conversion -Wno-parentheses -Werror/g' src/Makefile
+  - sed -i 's/-Werror/-Wno-enum-conversion -Werror/g' lib/Makefile lib/x509/Makefile lib/nettle/Makefile
+  - make -j$BUILDJOBS
+  - sed -i 's/-Werror//g' tests/Makefile tests/slow/Makefile
+  - make check -j$CHECKJOBS -C tests TESTS="trust-store p11-kit-load.sh" SUBDIRS=.
+  tags:
+  - shared
+  - linux
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - guile/tests/*.log
+      - ./*.log
+      - tests/*.log
+      - tests/*/*.log
+      - tests/suite/*/*.log
+  retry: 1
+
+# Two runs, one with normal backend and another with pkcs11 trust store
+# clang/llvm is not able to combine ASAN and UBSAN properly,
+#   tests/suite/testcompat-tls13-openssl.sh fails if we do so.
+ASAN-Werror.Fedora.x86_64.clang:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - ./bootstrap
+  - export UBSAN_OPTIONS=print_stacktrace=1:report_error_type=1:suppressions=$(pwd)/devel/ubsan.supp
+  - export LSAN_OPTIONS=suppressions=$(pwd)/devel/lsan.supp
+  - export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer
+  - export CC=clang
+  - export CXX=clang++
+
+# This is from OSS-Fuzz (20.12.2019)
+  - export CFLAGS="-std=c99 -O1 -g -Werror -fno-omit-frame-pointer -fsanitize=address,leak,alignment -fno-sanitize-recover=all -fsanitize-address-use-after-scope"
+
+  - export CXXFLAGS="$CFLAGS"
+
+# --disable-tls13-interop because tests/suite/testcompat-tls13-openssl.sh fails with clang -fsanitize=address
+  - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration --disable-tls13-interop
+  - sed -i 's/-Werror/-Wno-enum-conversion -Wno-parentheses -Werror/g' src/Makefile
+  - sed -i 's/-Werror/-Wno-enum-conversion -Werror/g' lib/Makefile lib/x509/Makefile lib/nettle/Makefile
+  - make -j$BUILDJOBS
+  - sed -i 's/-Werror//g' fuzz/Makefile tests/Makefile tests/slow/Makefile
+  - make check -j$BUILDJOBS -C fuzz
+  - make check -j$CHECKJOBS -C tests
+  - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration --with-default-trust-store-pkcs11="pkcs11:"
+  - make clean
+  - sed -i 's/-Werror/-Wno-enum-conversion -Wno-parentheses -Werror/g' src/Makefile
+  - sed -i 's/-Werror/-Wno-enum-conversion -Werror/g' lib/Makefile lib/x509/Makefile lib/nettle/Makefile
+  - make -j$BUILDJOBS
+  - sed -i 's/-Werror//g' tests/Makefile tests/slow/Makefile
+  - make check -j$CHECKJOBS -C tests TESTS="trust-store p11-kit-load.sh" SUBDIRS=.
+  tags:
+  - shared
+  - linux
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - guile/tests/*.log
+      - ./*.log
+      - tests/*.log
+      - tests/*/*.log
+      - tests/suite/*/*.log
+  retry: 1
+
 # This includes interoperability testing with gnutls 2.12.x
 Debian.x86_64:
   stage: stage1-testing
