@@ -23,6 +23,10 @@ See the end for copying conditions.
 ** libgnutls: The min-verification-profile from system configuration applies
    for all certificate verifications, not only under TLS.
 
+** certtool: Added the --verify-profile option to set a certificate
+   verification profile. Use '--verify-profile low' for certificate verification
+   to apply the 'NORMAL' verification profile.
+
 ** API and ABI modifications:
 gnutls_ocsp_req_const_t: Added
 

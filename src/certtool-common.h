@@ -80,6 +80,8 @@ typedef struct common_info {
 
 	unsigned rsa_pss_sign;
 	unsigned sort_chain;
+
+	gnutls_sec_param_t verification_profile;
 } common_info_st;
 
 static inline
