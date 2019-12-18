@@ -115,6 +115,13 @@ void doit(void)
 		check_non_null(gnutls_sec_param_get_name(i));
 	}
 
+	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_VERY_WEAK));
+	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_LOW));
+	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_LEGACY));
+	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_MEDIUM));
+	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_HIGH));
+	check_non_null(gnutls_certificate_verification_profile_get_name(GNUTLS_PROFILE_ULTRA));
+
 	for (i=GNUTLS_ECC_CURVE_INVALID+1;i<=GNUTLS_ECC_CURVE_MAX;i++) {
 		if (_gnutls_ecc_curve_is_supported(i) == 0)
 			continue;

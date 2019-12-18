@@ -1088,7 +1088,7 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name, co
 			}
 		} else if (c_strcasecmp(name, "min-verification-profile")==0) {
 			gnutls_certificate_verification_profiles_t profile;
-			profile = _gnutls_profile_get_id(value);
+			profile = gnutls_certificate_verification_profile_get_id(value);
 
 			if (profile == GNUTLS_PROFILE_UNKNOWN) {
 				_gnutls_debug_log("cfg: found unknown profile %s in %s\n",
