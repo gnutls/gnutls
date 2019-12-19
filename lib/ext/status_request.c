@@ -114,7 +114,7 @@ server_recv(gnutls_session_t session,
 
 	/* sanity check only, we don't use any of the data below */
 
-	if (data_size < (ssize_t)rid_bytes)
+	if (data_size < rid_bytes)
 		return
 		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
