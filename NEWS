@@ -10,6 +10,8 @@ See the end for copying conditions.
 ** libgnutls: Introduced the gnutls_ocsp_req_const_t which is compatible
    with gnutls_ocsp_req_t but const.
 
+** libgnutls: Reject certificates with invalid characters in Time fields (#870).
+
 ** libgnutls: Added support for GOST CNT_IMIT ciphersuite (as defined by
    draft-smyshlyaev-tls12-gost-suites-06).
    By default this ciphersuite is disabled. One has to add following items to priority strings:
