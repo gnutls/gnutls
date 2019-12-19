@@ -1,9 +1,9 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/330/badge)](https://bestpractices.coreinfrastructure.org/projects/330)
 
-|Branch|CI system|Status|Coverage|
-|:----:|:-------:|-----:|:------:|
-|Master/3.6.x|Gitlab|[![build status](https://gitlab.com/gnutls/gnutls/badges/master/pipeline.svg)](https://gitlab.com/gnutls/gnutls/commits/master)|[![coverage report](https://gitlab.com/gnutls/gnutls/badges/master/coverage.svg)](https://gnutls.gitlab.io/coverage/master)|
-|Master/3.6.x|Travis|[![build status](https://travis-ci.org/gnutls/gnutls.svg?branch=master)](https://travis-ci.org/gnutls/gnutls)|N/A|
+|Branch|CI system|Status|Test suite coverage|Fuzzer coverage|
+|:----:|:-------:|-----:|:------:|:-------------:|
+|Master/3.6.x|Gitlab|[![build status](https://gitlab.com/gnutls/gnutls/badges/master/pipeline.svg)](https://gitlab.com/gnutls/gnutls/commits/master)|[![coverage report](https://gitlab.com/gnutls/gnutls/badges/master/coverage.svg)](https://gnutls.gitlab.io/coverage/master)|[![Fuzzer coverage report](https://gnutls.gitlab.io/coverage/master-fuzz/badge.svg)](https://gnutls.gitlab.io/coverage/master-fuzz)|
+|Master/3.6.x|Travis|[![build status](https://travis-ci.org/gnutls/gnutls.svg?branch=master)](https://travis-ci.org/gnutls/gnutls)|N/A|N/A|
 
 
 # GnuTLS -- Information for developers
