@@ -27,6 +27,11 @@ See the end for copying conditions.
    verification profile. Use '--verify-profile low' for certificate verification
    to apply the 'NORMAL' verification profile.
 
+** libgnutls: If a CA is found in the trusted list, check in addition to
+   time validity, whether the algorithms comply to the expected level prior
+   to accepting it. This addresses the problem of accepting CAs which would
+   have been marked as insecure otherwise (#877).
+
 ** API and ABI modifications:
 gnutls_ocsp_req_const_t: Added
 
