@@ -27,7 +27,6 @@
 #include "utils.h"
 #include "virt-time.h"
 #include "../../lib/tls13/anti_replay.h"
-#include "../../lib/system.h"
 
 #define MAX_CLIENT_HELLO_RECORDED 10
 
