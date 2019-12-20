@@ -1240,7 +1240,7 @@ typedef struct {
 	gnutls_handshake_post_client_hello_func user_hello_func;
 	/* handshake hook function */
 	gnutls_handshake_hook_func h_hook;
-	unsigned int h_type;	/* the hooked type */
+	gnutls_handshake_description_t h_type;	/* the hooked type */
 	int16_t h_post;		/* whether post-generation/receive */
 
 	/* holds the selected certificate and key.

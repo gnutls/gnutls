@@ -622,6 +622,7 @@ typedef enum {
  * Enumeration of different TLS handshake packets.
  */
 typedef enum {
+	GNUTLS_HANDSHAKE_ANY = -1,
 	GNUTLS_HANDSHAKE_HELLO_REQUEST = 0,
 	GNUTLS_HANDSHAKE_CLIENT_HELLO = 1,
 	GNUTLS_HANDSHAKE_SERVER_HELLO = 2,
@@ -643,8 +644,6 @@ typedef enum {
 	GNUTLS_HANDSHAKE_CLIENT_HELLO_V2 = 1024,
 	GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST = 1025,
 } gnutls_handshake_description_t;
-
-#define GNUTLS_HANDSHAKE_ANY ((unsigned int)-1)
 
 const char
     *gnutls_handshake_description_get_name(gnutls_handshake_description_t

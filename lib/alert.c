@@ -166,7 +166,7 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 			   data[1], name);
 
 	if ((ret =
-	     _gnutls_send_int(session, GNUTLS_ALERT, -1,
+	     _gnutls_send_int(session, GNUTLS_ALERT, GNUTLS_HANDSHAKE_ANY,
 			      EPOCH_WRITE_CURRENT, data, 2,
 			      MBUFFER_FLUSH)) >= 0)
 		return 0;
