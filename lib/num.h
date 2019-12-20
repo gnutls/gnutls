@@ -57,7 +57,7 @@ inline static void _gnutls_write_uint24(uint32_t num, uint8_t * data)
 {
 	data[0] = num >> 16;
 	data[1] = num >> 8;
-	data[2] = num;
+	data[2] = (uint8_t) num;
 }
 
 inline static uint32_t _gnutls_read_uint32(const uint8_t * data)
