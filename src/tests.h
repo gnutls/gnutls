@@ -87,4 +87,10 @@ test_code_t test_aes_ccm(gnutls_session_t session);
 test_code_t test_aes_ccm_8(gnutls_session_t session);
 test_code_t test_sha256(gnutls_session_t session);
 
+#ifdef ENABLE_GOST
+test_code_t test_vko_gost_12(gnutls_session_t session);
+test_code_t test_gost_cnt(gnutls_session_t session);
+test_code_t test_gost_imit(gnutls_session_t session);
+#endif
+
 #endif /* GNUTLS_SRC_TESTS_H */

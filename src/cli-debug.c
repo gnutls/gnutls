@@ -159,6 +159,9 @@ static const TLS_TEST tls_tests[] = {
 	{"for ephemeral EC Diffie-Hellman support", test_ecdhe, "yes",
 	 "no",
 	 "dunno"},
+#ifdef ENABLE_GOST
+	{"for VKO GOST-2012 (draft-smyshlyaev-tls12-gost-suites) support", test_vko_gost_12, "yes", "no", "dunno"},
+#endif
 	{"for curve SECP256r1 (RFC4492)", test_ecdhe_secp256r1, "yes", "no", "dunno"},
 	{"for curve SECP384r1 (RFC4492)", test_ecdhe_secp384r1, "yes", "no", "dunno"},
 	{"for curve SECP521r1 (RFC4492)", test_ecdhe_secp521r1, "yes", "no", "dunno"},
@@ -180,9 +183,16 @@ static const TLS_TEST tls_tests[] = {
 	 "dunno"},
 	{"for CHACHA20-POLY1305 cipher (RFC7905) support", test_chacha20, "yes", "no",
 	 "dunno"},
+#ifdef ENABLE_GOST
+	{"for GOST28147-CNT cipher (draft-smyshlyaev-tls12-gost-suites) support", test_gost_cnt, "yes", "no",
+	 "dunno"},
+#endif
 	{"for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 	{"for SHA256 MAC support", test_sha256, "yes", "no", "dunno"},
+#ifdef ENABLE_GOST
+	{"for GOST28147-IMIT MAC (draft-smyshlyaev-tls12-gost-suites) support", test_gost_imit, "yes", "no", "dunno"},
+#endif
 	{"for max record size (RFC6066) support", test_max_record_size, "yes",
 	 "no", "dunno"},
 #ifdef ENABLE_OCSP
