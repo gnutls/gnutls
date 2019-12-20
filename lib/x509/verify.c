@@ -626,10 +626,12 @@ verify_crt(gnutls_x509_crt_t cert,
 	gnutls_datum_t cert_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_x509_crt_t issuer = NULL;
+	gnutls_sign_algorithm_t sigalg;
 	int issuer_version;
 	unsigned result = 1;
 	unsigned int out = 0, usage;
-	int sigalg, ret;
+	int ret;
+
 	const gnutls_sign_entry_st *se;
 
 	if (output)
@@ -666,10 +668,12 @@ verify_crt(gnutls_x509_crt_t cert,
 						 "signatureAlgorithm");
 	if (ret < 0) {
 		MARK_INVALID(0);
+		sigalg = GNUTLS_SIGN_UNKNOWN;
+		se = NULL;
+	} else {
+		sigalg = (gnutls_sign_algorithm_t) ret;
+		se = _gnutls_sign_to_entry(sigalg);
 	}
-	sigalg = ret;
-
-	se = _gnutls_sign_to_entry(sigalg);
 
 	/* issuer is not in trusted certificate
 	 * authorities.
@@ -759,7 +763,7 @@ verify_crt(gnutls_x509_crt_t cert,
 			}
 		}
 
-		if (sigalg < 0) {
+		if (!se) {
 			MARK_INVALID(0);
 		} else if (cert_signed_data.data != NULL &&
 		    cert_signature.data != NULL) {
@@ -796,7 +800,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		}
 	}
 
-	if (sigalg >= 0 && se) {
+	if (se) {
 		if (is_level_acceptable(cert, issuer, sigalg, flags) == 0) {
 			MARK_INVALID(GNUTLS_CERT_INSECURE_ALGORITHM);
 		}
