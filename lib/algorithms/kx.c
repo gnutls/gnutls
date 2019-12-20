@@ -296,7 +296,7 @@ bool _gnutls_kx_needs_dh_params(gnutls_kx_algorithm_t algorithm)
 gnutls_credentials_type_t
 _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t algorithm, int server)
 {
-	gnutls_credentials_type_t ret = -1;
+	gnutls_credentials_type_t ret = (gnutls_credentials_type_t) -1;
 	if (server) {
 		GNUTLS_KX_MAP_LOOP(if (p->algorithm == algorithm) ret =
 				   p->server_type);
