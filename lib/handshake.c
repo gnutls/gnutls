@@ -2702,7 +2702,7 @@ int gnutls_handshake(gnutls_session_t session)
 		session->internals.used_exts = 0;
 		session->internals.hsk_flags = 0;
 		session->internals.handshake_in_progress = 1;
-		session->internals.vc_status = -1;
+		session->internals.vc_status = (unsigned) -1;
 		gnutls_gettime(&session->internals.handshake_start_time);
 
 		tmo_ms = session->internals.handshake_timeout_ms;
