@@ -1676,7 +1676,7 @@ check_session_status(gnutls_session_t session, unsigned ms)
 
 		return 1;
 	case RECV_STATE_ASYNC_HANDSHAKE:
-		ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, -1, ms);
+		ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, GNUTLS_HANDSHAKE_ANY, ms);
 		if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
 			return gnutls_assert_val(ret);
 
@@ -1770,7 +1770,7 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 	if (ret != 0)
 		return ret;
 
-	ret = _gnutls_recv_in_buffers(session, type, -1, ms);
+	ret = _gnutls_recv_in_buffers(session, type, GNUTLS_HANDSHAKE_ANY, ms);
 	if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
 		return gnutls_assert_val(ret);
 
@@ -1885,7 +1885,7 @@ gnutls_record_recv_packet(gnutls_session_t session,
 	if (ret != 0)
 		return ret;
 
-	ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, -1,
+	ret = _gnutls_recv_in_buffers(session, GNUTLS_APPLICATION_DATA, GNUTLS_HANDSHAKE_ANY,
 				      session->internals.record_timeout_ms);
 	if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
 		return gnutls_assert_val(ret);
@@ -2026,7 +2026,7 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 	switch(session->internals.rsend_state) {
 		case RECORD_SEND_NORMAL:
 			return _gnutls_send_tlen_int(session, GNUTLS_APPLICATION_DATA,
-						     -1, EPOCH_WRITE_CURRENT, data,
+						     GNUTLS_HANDSHAKE_ANY, EPOCH_WRITE_CURRENT, data,
 						     data_size, pad, MBUFFER_FLUSH);
 		case RECORD_SEND_CORKED:
 		case RECORD_SEND_CORKED_TO_KU:
@@ -2050,7 +2050,7 @@ gnutls_record_send2(gnutls_session_t session, const void *data,
 			FALLTHROUGH;
 		case RECORD_SEND_KEY_UPDATE_3:
 			ret = _gnutls_send_int(session, GNUTLS_APPLICATION_DATA,
-						-1, EPOCH_WRITE_CURRENT,
+						GNUTLS_HANDSHAKE_ANY, EPOCH_WRITE_CURRENT,
 						session->internals.record_key_update_buffer.data,
 						session->internals.record_key_update_buffer.length,
 						MBUFFER_FLUSH);
