@@ -1170,7 +1170,7 @@ static int recv_headers(gnutls_session_t session,
 	    RECORD_HEADER_SIZE(session);
 
 	ret =
-	    _gnutls_io_read_buffered(session, record->header_size, -1, ms);
+	    _gnutls_io_read_buffered(session, record->header_size, (content_type_t) -1, ms);
 	if (ret != record->header_size) {
 		if (ret < 0 && gnutls_error_is_fatal(ret) == 0)
 			return ret;
