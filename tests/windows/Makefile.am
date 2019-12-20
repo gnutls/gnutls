@@ -68,8 +68,9 @@ TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT =						\
 	WINEDLLOVERRIDES="crypt32=n,ncrypt=n"			\
-	LC_ALL="C"						\
+	LC_ALL="C"				\
 	GNUTLS_TEST_SUITE_RUN=1			\
-	EXEEXT=$(EXEEXT)					\
-	top_builddir="$(top_builddir)"				\
+	EXEEXT=$(EXEEXT)			\
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/../system.prio \
+	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"
