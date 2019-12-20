@@ -86,14 +86,14 @@ inline static void _gnutls_handshake_buffer_clear(handshake_buffer_st *
 						  hsk)
 {
 	_gnutls_buffer_clear(&hsk->data);
-	hsk->htype = -1;
+	hsk->htype = GNUTLS_HANDSHAKE_ANY;
 }
 
 inline static void _gnutls_handshake_buffer_init(handshake_buffer_st * hsk)
 {
 	memset(hsk, 0, sizeof(*hsk));
 	_gnutls_buffer_init(&hsk->data);
-	hsk->htype = -1;
+	hsk->htype = GNUTLS_HANDSHAKE_ANY;
 }
 
 inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t

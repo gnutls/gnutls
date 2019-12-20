@@ -979,7 +979,7 @@ static void _gnutls_handshake_buffer_move(handshake_buffer_st * dst,
 {
 	memcpy(dst, src, sizeof(*dst));
 	memset(src, 0, sizeof(*src));
-	src->htype = -1;
+	src->htype = GNUTLS_HANDSHAKE_ANY;
 }
 
 /* will merge the given handshake_buffer_st to the handshake_recv_buffer
