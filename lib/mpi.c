@@ -414,7 +414,7 @@ __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 	s_len = 0;
 	if (flags & GNUTLS_X509_INT_LZ)
 		result = _gnutls_mpi_print_lz(mpi, NULL, &s_len);
-	else if (GNUTLS_X509_INT_LE)
+	else if (flags & GNUTLS_X509_INT_LE)
 		result = _gnutls_mpi_print_le(mpi, NULL, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, NULL, &s_len);
@@ -432,7 +432,7 @@ __gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 
 	if (flags & GNUTLS_X509_INT_LZ)
 		result = _gnutls_mpi_print_lz(mpi, tmpstr, &s_len);
-	else if (GNUTLS_X509_INT_LE)
+	else if (flags & GNUTLS_X509_INT_LE)
 		result = _gnutls_mpi_print_le(mpi, tmpstr, &s_len);
 	else
 		result = _gnutls_mpi_print(mpi, tmpstr, &s_len);
