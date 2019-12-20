@@ -355,6 +355,17 @@ flag = {
     doc = "This can be combined with --p7-verify, --verify or --verify-chain.";
 };
 
+flag = {
+    name      = verify-profile;
+    descrip   = "Specify a security level profile to be used for verification";
+    arg-type  = string;
+    doc = "This option can be used to specify a certificate verification profile. Certificate
+    verification profiles correspond to the security level. This should be one of
+    'none', 'very weak', 'low', 'legacy', 'medium', 'high', 'ultra',
+    'future'. Note that by default no profile is applied, unless one is set
+    as minimum in the gnutls configuration file.";
+};
+
 //----------------------------------------
 flag = {
     name = pkcs7_options;

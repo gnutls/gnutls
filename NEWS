@@ -20,6 +20,19 @@ See the end for copying conditions.
    enabled both on a server and a client. It is recommended for now to disable
    TLS 1.3 in setups where GOST ciphersuites are enabled on GnuTLS-based servers.
 
+** libgnutls: The min-verification-profile from system configuration applies
+   for all certificate verifications, not only under TLS. The configuration can
+   be overriden using the GNUTLS_SYSTEM_PRIORITY_FILE environment variable.
+
+** certtool: Added the --verify-profile option to set a certificate
+   verification profile. Use '--verify-profile low' for certificate verification
+   to apply the 'NORMAL' verification profile.
+
+** libgnutls: If a CA is found in the trusted list, check in addition to
+   time validity, whether the algorithms comply to the expected level prior
+   to accepting it. This addresses the problem of accepting CAs which would
+   have been marked as insecure otherwise (#877).
+
 ** API and ABI modifications:
 gnutls_ocsp_req_const_t: Added
 

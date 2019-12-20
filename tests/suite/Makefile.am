@@ -103,6 +103,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	srcdir="$(srcdir)"		\
 	ASAN_OPTIONS="detect_leaks=0"	\
 	GNUTLS_TEST_SUITE_RUN=1		\
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/../system.prio \
 	OPENSSL_ia32cap=0x00000000
 
 if ENABLE_NON_SUITEB_CURVES

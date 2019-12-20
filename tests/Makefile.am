@@ -38,7 +38,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
 	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd \
 	certs/rawpk_priv.pem certs/rawpk_pub.pem \
-	certs/ed25519.pem certs/cert-ed25519.pem \
+	certs/ed25519.pem certs/cert-ed25519.pem certs/rsa-512.pem \
 	system.prio pkcs11/softhsm.h pkcs11/pkcs11-pubkey-import.c gnutls-asan.supp \
 	rsa-md5-collision/README safe-renegotiation/README starttls-smtp.txt starttls-ftp.txt \
 	starttls-lmtp.txt starttls-pop3.txt starttls-xmpp.txt starttls-nntp.txt starttls-sieve.txt \
@@ -179,7 +179,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 fallback-scsv pkcs8-key-decode urls dtls-rehandshake-cert rfc7633-ok \
 	 key-usage-rsa key-usage-ecdhe-rsa mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 set-default-prio \
-	 tls12-anon-upgrade tlsext-decoding rsa-psk-cb \
+	 tls12-anon-upgrade tlsext-decoding rsa-psk-cb gnutls-ids \
 	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
 	 rehandshake-switch-cert-client-allow handshake-versions dtls-handshake-versions \
 	 dtls-max-record tls12-max-record alpn-server-prec ocsp-filename-memleak \
@@ -502,7 +502,8 @@ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh start
 	ocsp-tests/ocsp-test cipher-listings.sh sni-hostname.sh server-multi-keys.sh \
 	psktool.sh ocsp-tests/ocsp-load-chain gnutls-cli-save-data.sh gnutls-cli-debug.sh \
 	sni-resume.sh ocsp-tests/ocsptool cert-reencoding.sh pkcs7-cat.sh long-crl.sh \
-	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh
+	serv-udp.sh logfile-option.sh gnutls-cli-resume.sh profile-tests.sh \
+	server-weak-keys.sh
 
 if !DISABLE_SYSTEM_CONFIG
 dist_check_SCRIPTS += system-override-sig-hash.sh system-override-versions.sh system-override-invalid.sh \

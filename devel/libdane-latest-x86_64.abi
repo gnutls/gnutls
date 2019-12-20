@@ -32,7 +32,7 @@
     <elf-symbol name='dane_verify_crt_raw' version='DANE_0_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='dane_verify_session_crt' version='DANE_0_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
   </elf-function-symbols>
-  <abi-instr version='1.0' address-size='64' path='dane.c' comp-dir-path='/home/nmavrogi/cvs/gnutls/libdane' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='dane.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/libdane' language='LANG_C99'>
     <type-decl name='int' size-in-bits='32' id='type-id-1'/>
     <type-decl name='unsigned int' size-in-bits='32' id='type-id-2'/>
     <class-decl name='__anonymous_struct__' size-in-bits='128' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-3' visibility='default' id='type-id-4'>
@@ -2920,7 +2920,7 @@
       <return type-id='type-id-105'/>
     </function-type>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='dane-params.c' comp-dir-path='/home/nmavrogi/cvs/gnutls/libdane' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='dane-params.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/libdane' language='LANG_C99'>
     <function-decl name='dane_cert_usage_name' mangled-name='dane_cert_usage_name' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_cert_usage_name@@DANE_0_0'>
       <parameter type-id='type-id-351' name='usage'/>
       <return type-id='type-id-34'/>
@@ -2934,13 +2934,13 @@
       <return type-id='type-id-34'/>
     </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='errors.c' comp-dir-path='/home/nmavrogi/cvs/gnutls/libdane' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='errors.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/libdane' language='LANG_C99'>
     <function-decl name='dane_strerror' mangled-name='dane_strerror' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_strerror@@DANE_0_0'>
       <parameter type-id='type-id-1' name='error'/>
       <return type-id='type-id-34'/>
     </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='read-file.c' comp-dir-path='/home/nmavrogi/cvs/gnutls/gl' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='read-file.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/gl' language='LANG_C99'>
     <function-decl name='fopen' mangled-name='fopen' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
@@ -2972,12 +2972,12 @@
       <return type-id='type-id-115'/>
     </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='asnprintf.c' comp-dir-path='/home/nmavrogi/cvs/gnutls/gl' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='asnprintf.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/gl' language='LANG_C99'>
     <function-decl name='vasnprintf' mangled-name='vasnprintf' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='vasnprintf.c' comp-dir-path='/home/nmavrogi/cvs/gnutls/gl' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='vasnprintf.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/gl' language='LANG_C99'>
     <function-decl name='abort' mangled-name='abort' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>

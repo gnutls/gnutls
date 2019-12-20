@@ -1,6 +1,7 @@
 GNUTLS_3_4@GNUTLS_3_4
 GNUTLS_3_6_0@GNUTLS_3_6_0
 GNUTLS_3_6_10@GNUTLS_3_6_10
+GNUTLS_3_6_12@GNUTLS_3_6_12
 GNUTLS_3_6_2@GNUTLS_3_6_2
 GNUTLS_3_6_3@GNUTLS_3_6_3
 GNUTLS_3_6_4@GNUTLS_3_6_4
@@ -115,6 +116,8 @@ gnutls_certificate_type_get@GNUTLS_3_4
 gnutls_certificate_type_get_id@GNUTLS_3_4
 gnutls_certificate_type_get_name@GNUTLS_3_4
 gnutls_certificate_type_list@GNUTLS_3_4
+gnutls_certificate_verification_profile_get_id@GNUTLS_3_6_12
+gnutls_certificate_verification_profile_get_name@GNUTLS_3_6_12
 gnutls_certificate_verification_status_print@GNUTLS_3_4
 gnutls_certificate_verify_peers2@GNUTLS_3_4
 gnutls_certificate_verify_peers3@GNUTLS_3_4

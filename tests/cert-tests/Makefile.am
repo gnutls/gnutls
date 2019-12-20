@@ -98,7 +98,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/key-gost01.p8 data/key-gost01-2.p8 data/key-gost01-2-enc.p8 \
 	data/key-gost12-256.p8 data/key-gost12-256-2.p8 data/key-gost12-256-2-enc.p8 \
 	data/key-gost12-512.p8 data/grfc.crt data/gost-cert-ca.pem data/gost-cert-new.pem \
-	data/cert-with-non-digits-time-ca.pem data/cert-with-non-digits-time.pem
+	data/cert-with-non-digits-time-ca.pem data/cert-with-non-digits-time.pem \
+	data/chain-512-leaf.pem data/chain-512-subca.pem data/chain-512-ca.pem
 
 dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs7 pkcs7-broken-sigs privkey-import name-constraints certtool-long-cn crl provable-privkey \
@@ -108,7 +109,7 @@ dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs12 certtool-crl-decoding pkcs12-encode pkcs12-corner-cases inhibit-anypolicy \
 	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa certtool-ecdsa \
 	key-id pkcs8 pkcs8-decode ecdsa illegal-rsa pkcs8-invalid key-invalid \
-	pkcs8-eddsa certtool-subca cert-non-digits-time
+	pkcs8-eddsa certtool-subca cert-non-digits-time certtool-verify-profiles
 
 dist_check_SCRIPTS += key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8 pkcs8-eddsa \
 	certtool-utf8 crq
@@ -148,6 +149,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	ac_cv_sizeof_time_t="$(ac_cv_sizeof_time_t)" \
 	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	GNUTLS_TEST_SUITE_RUN=1			\
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/../system.prio \
 	srcdir="$(srcdir)"
 
 if ENABLE_FIPS140

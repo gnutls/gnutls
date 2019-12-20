@@ -1301,6 +1301,13 @@ GNUTLS_3_6_10
 	gnutls_aead_cipher_decryptv2;
 } GNUTLS_3_6_9;
 
+GNUTLS_3_6_12
+{
+ global:
+	gnutls_certificate_verification_profile_get_name;
+	gnutls_certificate_verification_profile_get_id;
+} GNUTLS_3_6_10;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

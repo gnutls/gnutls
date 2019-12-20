@@ -1422,6 +1422,20 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.password = "";
 	}
 
+	if (HAVE_OPT(VERIFY_PROFILE)) {
+		if (strcasecmp(OPT_ARG(VERIFY_PROFILE), "none")) {
+			cinfo.verification_profile = GNUTLS_PROFILE_UNKNOWN;
+		} else {
+			cinfo.verification_profile = gnutls_certificate_verification_profile_get_id(OPT_ARG(VERIFY_PROFILE));
+		}
+	} else if (!HAVE_OPT(VERIFY_ALLOW_BROKEN)) {
+		if (HAVE_OPT(VERIFY_CHAIN) || HAVE_OPT(VERIFY)) {
+			fprintf(stderr, "Note that no verification profile was selected. In the future the medium profile will be enabled by default.\n");
+			fprintf(stderr, "Use --verify-profile low to apply the default verification of NORMAL priority string.\n");
+		}
+		/* cinfo.verification_profile = GNUTLS_PROFILE_LOW; */
+	}
+
 	if (HAVE_OPT(SIGN_PARAMS))
 		sign_params_to_flags(&cinfo, OPT_ARG(SIGN_PARAMS));
 
@@ -2395,6 +2409,7 @@ _verify_x509_mem(const void *cert, int cert_size, common_info_st *cinfo,
 	}
 
 	vflags = GNUTLS_VERIFY_DO_NOT_ALLOW_SAME;
+	vflags |= GNUTLS_PROFILE_TO_VFLAGS(cinfo->verification_profile);
 
 	if (HAVE_OPT(VERIFY_ALLOW_BROKEN))
 		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;

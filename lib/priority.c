@@ -976,6 +976,11 @@ static time_t system_priority_last_mod = 0;
 #define OVERRIDES_SECTION "overrides"
 #define MAX_ALGO_NAME 128
 
+gnutls_certificate_verification_profiles_t _gnutls_get_system_wide_verification_profile(void)
+{
+	return system_wide_verification_profile;
+}
+
 /* removes spaces */
 static char *clear_spaces(const char *str, char out[MAX_ALGO_NAME])
 {
@@ -1083,7 +1088,7 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name, co
 			}
 		} else if (c_strcasecmp(name, "min-verification-profile")==0) {
 			gnutls_certificate_verification_profiles_t profile;
-			profile = _gnutls_profile_get_id(value);
+			profile = gnutls_certificate_verification_profile_get_id(value);
 
 			if (profile == GNUTLS_PROFILE_UNKNOWN) {
 				_gnutls_debug_log("cfg: found unknown profile %s in %s\n",
