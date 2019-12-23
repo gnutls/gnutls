@@ -456,6 +456,23 @@ unsigned gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm)
 }
 
 /**
+ * gnutls_hmac_get_key_size:
+ * @algorithm: the mac algorithm to use
+ *
+ * This function will return the size of the key to be used with this
+ * algorithm. On the algorithms which may accept arbitrary key sizes,
+ * the returned size is the MAC key size used in the TLS protocol.
+ *
+ * Returns: The key size or zero on error.
+ *
+ * Since: 3.6.12
+ **/
+unsigned gnutls_hmac_get_key_size(gnutls_mac_algorithm_t algorithm)
+{
+	return _gnutls_mac_get_key_size(mac_to_entry(algorithm));
+}
+
+/**
  * gnutls_hmac_fast:
  * @algorithm: the hash algorithm to use
  * @key: the key to use
