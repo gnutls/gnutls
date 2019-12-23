@@ -1132,6 +1132,7 @@ if features are disabled)
   IDNA support:         $idna_support
   Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips
+  Strict DER time:	$ac_strict_der_time
 ])
 
 AC_MSG_NOTICE([Optional libraries:

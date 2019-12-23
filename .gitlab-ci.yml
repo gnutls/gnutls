@@ -161,7 +161,7 @@ SSL-3.0.Fedora.x86_64:
   script:
   - ./bootstrap
   - mkdir -p build && cd build &&
-    dash ../configure --disable-tls13-interop --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile &&
+    dash ../configure --disable-tls13-interop --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile --disable-strict-der-time &&
     make -j$(nproc) && make check -j$(nproc)
   - cd ..
   tags:
