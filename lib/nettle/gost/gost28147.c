@@ -2470,13 +2470,13 @@ gost28147_cnt_crypt(struct gost28147_cnt_ctx *ctx,
     }
 }
 
-void
-gost28147_imit_init(struct gost28147_imit_ctx *ctx)
+static void
+_gost28147_imit_reinit(struct gost28147_imit_ctx *ctx)
 {
-  memset(ctx->state, 0, GOST28147_BLOCK_SIZE);
+  ctx->state[0] = 0;
+  ctx->state[1] = 0;
   ctx->index = 0;
   ctx->count = 0;
-  gost28147_set_param(&ctx->cctx, &gost28147_param_TC26_Z); /* Default */
 }
 
 void
@@ -2488,7 +2488,9 @@ gost28147_imit_set_key(struct gost28147_imit_ctx *ctx,
   assert(key);
 
   _gost28147_set_key(&ctx->cctx, key);
-  /* Do not reset param here */
+  _gost28147_imit_reinit(ctx);
+  if (!ctx->cctx.sbox)
+    gost28147_set_param(&ctx->cctx, &gost28147_param_TC26_Z);
 }
 
 void
@@ -2549,6 +2551,6 @@ gost28147_imit_digest(struct gost28147_imit_ctx *ctx,
     }
 
   _nettle_write_le32(length, digest, ctx->state);
-  gost28147_imit_init(ctx);
+  _gost28147_imit_reinit(ctx);
 }
 #endif
