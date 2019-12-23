@@ -285,17 +285,29 @@ void benchmark_cipher(int debug_level)
 	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, size);
 	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256,
 			 size);
+#ifdef ENABLE_GOST
+	cipher_mac_bench(GNUTLS_CIPHER_GOST28147_TC26Z_CNT, GNUTLS_MAC_GOST28147_TC26Z_IMIT,
+			 size);
+#endif
 
 	printf("\nChecking MAC algorithms, payload size: %u\n", size * 1024);
 	mac_bench(GNUTLS_MAC_SHA1, size);
 	mac_bench(GNUTLS_MAC_SHA256, size);
 	mac_bench(GNUTLS_MAC_SHA512, size);
+#ifdef ENABLE_GOST
+	mac_bench(GNUTLS_MAC_GOST28147_TC26Z_IMIT, size);
+	mac_bench(GNUTLS_MAC_GOSTR_94, size);
+	mac_bench(GNUTLS_MAC_STREEBOG_512, size);
+#endif
 
 	printf("\nChecking ciphers, payload size: %u\n", size * 1024);
 	cipher_bench(GNUTLS_CIPHER_3DES_CBC, size, 0);
 	cipher_bench(GNUTLS_CIPHER_AES_128_CBC, size, 0);
 	cipher_bench(GNUTLS_CIPHER_SALSA20_256, size, 0);
 	cipher_bench(GNUTLS_CIPHER_NULL, size, 1);
+#ifdef ENABLE_GOST
+	cipher_bench(GNUTLS_CIPHER_GOST28147_TC26Z_CNT, size, 0);
+#endif
 
 	gnutls_global_deinit();
 }
