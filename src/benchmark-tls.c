@@ -349,7 +349,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 }
 
 static
-double calc_avg(unsigned int *diffs, unsigned int diffs_size)
+double calc_avg(uint64_t *diffs, unsigned int diffs_size)
 {
 	double avg = 0;
 	unsigned int i;
@@ -363,7 +363,7 @@ double calc_avg(unsigned int *diffs, unsigned int diffs_size)
 }
 
 static
-double calc_sstdev(unsigned int *diffs, unsigned int diffs_size,
+double calc_svar(uint64_t *diffs, unsigned int diffs_size,
 		   double avg)
 {
 	double sum = 0, d;
@@ -381,7 +381,7 @@ double calc_sstdev(unsigned int *diffs, unsigned int diffs_size,
 }
 
 
-unsigned int total_diffs[32 * 1024];
+uint64_t total_diffs[32 * 1024];
 unsigned int total_diffs_size = 0;
 
 static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
@@ -389,19 +389,18 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	/* Server stuff. */
 	gnutls_anon_server_credentials_t s_anoncred;
 	gnutls_session_t server;
-	int sret, cret;
+	int sret, cret, ret;
 	const char *str;
 	char *suite = NULL;
-	/* Client stuff. */
 	gnutls_anon_client_credentials_t c_anoncred;
 	gnutls_certificate_credentials_t c_certcred, s_certcred;
 	gnutls_session_t client;
-	/* Need to enable anonymous KX specifically. */
-	int ret;
+	unsigned i;
 	struct benchmark_st st;
 	struct timespec tr_start, tr_stop;
-	double avg, sstddev;
+	double avg, svar;
 	gnutls_priority_t priority_cache;
+	const char *scale;
 
 	total_diffs_size = 0;
 
@@ -501,7 +500,7 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		gnutls_deinit(client);
 		gnutls_deinit(server);
 
-		total_diffs[total_diffs_size++] = timespec_sub_ms(&tr_stop, &tr_start);
+		total_diffs[total_diffs_size++] = timespec_sub_ns(&tr_stop, &tr_start);
 		if (total_diffs_size > sizeof(total_diffs)/sizeof(total_diffs[0]))
 			abort();
 
@@ -509,16 +508,31 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	}
 	while (benchmark_must_finish == 0);
 
-	fprintf(stdout, "%38s  ", suite);
+	fprintf(stdout, "%s\n - ", suite);
 	gnutls_free(suite);
 	stop_benchmark(&st, "transactions", 1);
 	gnutls_priority_deinit(priority_cache);
 
 	avg = calc_avg(total_diffs, total_diffs_size);
-	sstddev = calc_sstdev(total_diffs, total_diffs_size, avg);
 
-	printf("%32s %.2f ms, sample variance: %.2f)\n",
-	       "(avg. handshake time:", avg, sstddev);
+	if (avg < 1000) {
+		scale = "ns";
+	} else if (avg < 1000000) {
+		scale = "\u00B5s";
+		avg /= 1000;
+		for (i=0;i<total_diffs_size;i++)
+			total_diffs[i] /= 1000;
+	} else {
+		scale = "ms";
+		avg /= 1000*1000;
+		for (i=0;i<total_diffs_size;i++)
+			total_diffs[i] /= 1000*1000;
+	}
+
+	svar = calc_svar(total_diffs, total_diffs_size, avg);
+
+	printf(" - avg. handshake time: %.2f %s\n - standard deviation: %.2f %s\n\n",
+	       avg, scale, sqrt(svar), scale);
 
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
