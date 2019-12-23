@@ -1014,7 +1014,7 @@ static void strip(char *data)
 	}
 }
 
-static void
+static unsigned
 get_response(gnutls_session_t session, char *request,
 	     char **response, int *response_length)
 {
@@ -1035,7 +1035,7 @@ get_response(gnutls_session_t session, char *request,
 			goto unimplemented;
 		*p = '\0';
 	}
-/*    *response = peer_print_info(session, request+4, h, response_length); */
+
 	if (http != 0) {
 		if (http_data_file == NULL)
 			*response = peer_print_info(session, response_length, h);
@@ -1051,25 +1051,34 @@ get_response(gnutls_session_t session, char *request,
 			*response = strdup("Successfully executed command\n");
 			if (*response == NULL) {
 				fprintf(stderr, "Memory error\n");
-				exit(1);
+				return 0;
 			}
 			*response_length = strlen(*response);
-			return;
+			return 1;
 		} else if (ret == 0) {
+			if (*response == NULL) {
+				fprintf(stderr, "Memory error\n");
+				return 0;
+			}
 			*response = strdup(request);
 			*response_length = ((*response) ? strlen(*response) : 0);
 		} else {
+			*response = NULL;
 			do {
-				ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
+				ret = gnutls_alert_send_appropriate(session, ret);
 			} while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+			return 0;
 		}
 	}
 
-	return;
+	return 1;
 
       unimplemented:
 	*response = strdup(HTTP_UNIMPLEMENTED);
+	if (*response == NULL)
+		return 0;
 	*response_length = ((*response) ? strlen(*response) : 0);
+	return 1;
 }
 
 static void terminate(int sig) __attribute__ ((__noreturn__));
@@ -1663,18 +1672,21 @@ static void tcp_server(const char *name, int port)
 						    || strstr(j->
 							      http_request,
 							      "\n\n")) {
-							get_response(j->
-								     tls_session,
-								     j->
-								     http_request,
-								     &j->
-								     http_response,
-								     &j->
-								     response_length);
-							j->http_state =
-							    HTTP_STATE_RESPONSE;
-							j->response_written
-							    = 0;
+							if (get_response(j->
+								         tls_session,
+								         j->
+								         http_request,
+								         &j->
+								         http_response,
+								         &j->
+								         response_length)) {
+								j->http_state =
+								    HTTP_STATE_RESPONSE;
+								j->response_written
+								    = 0;
+							} else {
+								j->http_state = HTTP_STATE_CLOSING;
+							}
 						}
 					}
 				}
