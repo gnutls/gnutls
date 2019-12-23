@@ -231,7 +231,7 @@ static void cipher_bench(int algo, int size, int aead)
 static void mac_bench(int algo, int size)
 {
 	void *_key;
-	int blocksize = gnutls_hmac_get_len(algo);
+	int key_size = gnutls_hmac_get_key_size(algo);
 	int step = size * 1024;
 	struct benchmark_st st;
 	void *input;
@@ -240,10 +240,10 @@ static void mac_bench(int algo, int size)
 	ALLOCM(input, MAX_MEM);
 	i = input;
 
-	_key = malloc(blocksize);
+	_key = malloc(key_size);
 	if (_key == NULL)
 		return;
-	memset(_key, 0xf0, blocksize);
+	memset(_key, 0xf0, key_size);
 
 	printf("%16s ", gnutls_mac_get_name(algo));
 	fflush(stdout);
@@ -253,7 +253,7 @@ static void mac_bench(int algo, int size)
 	start_benchmark(&st);
 
 	do {
-		gnutls_hmac_fast(algo, _key, blocksize, i, step, _key);
+		gnutls_hmac_fast(algo, _key, key_size, i, step, _key);
 		st.size += step;
 		INC(input, i, step);
 	}
