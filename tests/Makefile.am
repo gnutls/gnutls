@@ -221,6 +221,10 @@ if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
 endif
 
+if STRICT_DER_TIME
+ctests += strict-der
+endif
+
 if !DISABLE_SYSTEM_CONFIG
 ctests += system-prio-file
 endif

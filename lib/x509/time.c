@@ -184,12 +184,15 @@ time_t _gnutls_utcTime2gtime(const char *ttime)
 		gnutls_assert();
 		return (time_t) - 1;
 	}
+
+#ifdef STRICT_DER_TIME
 	/* Make sure everything else is digits. */
 	for (i = 0; i < len - 1; i++) {
 		if (c_isdigit(ttime[i]))
 			continue;
 		return gnutls_assert_val((time_t)-1);
 	}
+#endif
 	xx[2] = 0;
 
 /* get the year
