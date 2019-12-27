@@ -366,6 +366,7 @@ APIMANS += gnutls_hmac.3
 APIMANS += gnutls_hmac_copy.3
 APIMANS += gnutls_hmac_deinit.3
 APIMANS += gnutls_hmac_fast.3
+APIMANS += gnutls_hmac_get_key_size.3
 APIMANS += gnutls_hmac_get_len.3
 APIMANS += gnutls_hmac_init.3
 APIMANS += gnutls_hmac_output.3

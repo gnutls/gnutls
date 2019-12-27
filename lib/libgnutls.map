@@ -1306,6 +1306,7 @@ GNUTLS_3_6_12
  global:
 	gnutls_certificate_verification_profile_get_name;
 	gnutls_certificate_verification_profile_get_id;
+	gnutls_hmac_get_key_size;
 } GNUTLS_3_6_10;
 
 GNUTLS_FIPS140_3_4 {
