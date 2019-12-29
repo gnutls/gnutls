@@ -187,7 +187,7 @@ int _gnutls13_recv_certificate_request_int(gnutls_session_t session, gnutls_buff
 	if (apr_cert_list_length > 0) {
 		gnutls_sign_algorithm_t algo;
 
-		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0);
+		algo = _gnutls_session_get_sign_algo(session, &apr_cert_list[0], apr_pkey, 0, GNUTLS_KX_UNKNOWN);
 		if (algo == GNUTLS_SIGN_UNKNOWN) {
 			_gnutls_handshake_log("HSK[%p]: rejecting client auth because of no suitable signature algorithm\n", session);
 			_gnutls_selected_certs_deinit(session);
