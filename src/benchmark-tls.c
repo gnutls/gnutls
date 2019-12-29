@@ -486,10 +486,12 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_ed25519_cert,
 						    &server_ed25519_key,
 						    GNUTLS_X509_FMT_PEM);
+#ifdef ENABLE_GOST
 	else if (pk == GNUTLS_PK_GOST_12_256)
 		ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_gost12_256_cert,
 						    &server_gost12_256_key,
 						    GNUTLS_X509_FMT_PEM);
+#endif
 	if (ret < 0) {
 		fprintf(stderr, "Error in %d: %s\n", __LINE__,
 			gnutls_strerror(ret));
