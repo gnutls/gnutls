@@ -292,7 +292,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	const char *name;
 
 	/* Init server */
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
+#endif
 	gnutls_certificate_allocate_credentials(&s_certcred);
 
 	gnutls_certificate_set_x509_key_mem(s_certcred, &server_cert,
@@ -313,7 +315,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 		fprintf(stderr, "Error in %s\n", str);
 		exit(1);
 	}
+#ifdef ENABLE_ANON
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
+#endif
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, s_certcred);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -321,7 +325,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	reset_buffers();
 
 	/* Init client */
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
+#endif
 	gnutls_certificate_allocate_credentials(&c_certcred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 
@@ -330,7 +336,9 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 		fprintf(stderr, "Error in %s\n", str);
 		exit(1);
 	}
+#ifdef ENABLE_ANON
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
+#endif
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, c_certcred);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -386,8 +394,10 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	gnutls_deinit(client);
 	gnutls_deinit(server);
 
+#ifdef ENABLE_ANON
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
+#endif
 }
 
 static
@@ -448,7 +458,9 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&s_certcred);
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
+#endif
 
 	ret = 0;
 	if (pk == GNUTLS_PK_RSA_PSS)
@@ -485,7 +497,9 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	}
 
 	/* Init client */
+#ifdef ENABLE_ANON
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
+#endif
 	gnutls_certificate_allocate_credentials(&c_certcred);
 
 	start_benchmark(&st);
@@ -505,8 +519,10 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+#ifdef ENABLE_ANON
 		gnutls_credentials_set(server, GNUTLS_CRD_ANON,
 				       s_anoncred);
+#endif
 		gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 				       s_certcred);
 		gnutls_transport_set_push_function(server, server_push);
@@ -523,8 +539,10 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 			fprintf(stderr, "Error in setting priority: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+#ifdef ENABLE_ANON
 		gnutls_credentials_set(client, GNUTLS_CRD_ANON,
 				       c_anoncred);
+#endif
 		gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 				       c_certcred);
 
@@ -580,8 +598,10 @@ static void test_ciphersuite_kx(const char *cipher_prio, unsigned pk)
 	printf(" - avg. handshake time: %.2f %s\n - standard deviation: %.2f %s\n\n",
 	       avg, scale, sqrt(svar), scale);
 
+#ifdef ENABLE_ANON
 	gnutls_anon_free_client_credentials(c_anoncred);
 	gnutls_anon_free_server_credentials(s_anoncred);
+#endif
 }
 
 void benchmark_tls(int debug_level, int ciphers)
