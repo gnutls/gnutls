@@ -121,7 +121,9 @@ static void tcp_server(const char *name, int port);
 /* These are global */
 gnutls_srp_server_credentials_t srp_cred = NULL;
 gnutls_psk_server_credentials_t psk_cred = NULL;
+#ifdef ENABLE_ANON
 gnutls_anon_server_credentials_t dh_cred = NULL;
+#endif
 gnutls_certificate_credentials_t cert_cred = NULL;
 
 const int ssl_session_cache = 2048;
@@ -384,7 +386,9 @@ gnutls_session_t initialize_session(int dtls)
 	int ret;
 	unsigned i;
 	const char *err;
+#ifdef ENABLE_ALPN
 	gnutls_datum_t alpn[MAX_ALPN_PROTOCOLS];
+#endif
 	unsigned alpn_size;
 	unsigned flags = GNUTLS_SERVER | GNUTLS_POST_HANDSHAKE_AUTH | GNUTLS_ENABLE_RAWPK;
 
@@ -443,6 +447,12 @@ gnutls_session_t initialize_session(int dtls)
 		}
 	}
 
+#ifndef ENABLE_ALPN
+	if (alpn_protos_size != 0) {
+		fprintf(stderr, "ALPN is not supported\n");
+		exit(1);
+	}
+#else
 	alpn_size = MIN(MAX_ALPN_PROTOCOLS,alpn_protos_size);
 	for (i=0;i<alpn_size;i++) {
 		alpn[i].data = (void*)alpn_protos[i];
@@ -454,8 +464,11 @@ gnutls_session_t initialize_session(int dtls)
 		fprintf(stderr, "Error setting ALPN protocols: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+#endif
 
+#ifdef ENABLE_ANON
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, dh_cred);
+#endif
 
 	if (srp_cred != NULL)
 		gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
@@ -705,11 +718,13 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 		}
 #endif
 
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		if (kx_alg == GNUTLS_KX_DHE_RSA || kx_alg == GNUTLS_KX_DHE_DSS) {
 			snprintf(tmp_buffer, tmp_buffer_size,
 				 "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
 				 gnutls_dh_get_prime_bits(session));
 		}
+#endif
 
 		tmp = gnutls_compression_get_name(gnutls_compression_get(session));
 		if (tmp == NULL)
@@ -1256,6 +1271,12 @@ int main(int argc, char **argv)
 			"Warning: no private key and certificate pairs were set.\n");
 	}
 
+#ifndef ENABLE_OCSP
+	if (HAVE_OPT(IGNORE_OCSP_RESPONSE_ERRORS) || ocsp_responses_size != 0) {
+		fprintf(stderr, "OCSP is not supported!\n");
+			exit(1);
+	}
+#else
 	/* OCSP status-request TLS extension */
 	if (HAVE_OPT(IGNORE_OCSP_RESPONSE_ERRORS))
 		gnutls_certificate_set_flags(cert_cred, GNUTLS_CERTIFICATE_SKIP_OCSP_RESPONSE_CHECK);
@@ -1271,13 +1292,19 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 	}
+#endif
 
 	if (use_static_dh_params) {
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		ret = gnutls_certificate_set_known_dh_params(cert_cred, GNUTLS_SEC_PARAM_MEDIUM);
 		if (ret < 0) {
 			fprintf(stderr, "Error while setting DH parameters: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
+#else
+		fprintf(stderr, "Setting DH parameters is not supported\n");
+		exit(1);
+#endif
 	} else {
 		gnutls_certificate_set_params_function(cert_cred, get_params);
 	}

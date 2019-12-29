@@ -82,13 +82,13 @@ else
 LIBOPTS = $(LIBOPTS_LDADD)
 endif
 
-bin_PROGRAMS = psktool gnutls-cli-debug certtool
+bin_PROGRAMS = psktool gnutls-cli-debug certtool gnutls-serv
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
 
 if ENABLE_OCSP
-bin_PROGRAMS += ocsptool gnutls-serv 
+bin_PROGRAMS += ocsptool
 if ENABLE_ANON
 bin_PROGRAMS += gnutls-cli
 endif
@@ -140,6 +140,8 @@ noinst_LTLIBRARIES += libcmd-ocsp.la
 libcmd_ocsp_la_SOURCES = ocsptool-args.def
 nodist_libcmd_ocsp_la_SOURCES = ocsptool-args.h ocsptool-args.c
 
+endif
+
 gnutls_serv_SOURCES =		\
   list.h serv.c			\
   udp-serv.c udp-serv.h		\
@@ -153,6 +155,7 @@ noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_SOURCES = serv-args.def
 nodist_libcmd_serv_la_SOURCES = serv-args.c serv-args.h
 
+if ENABLE_OCSP
 if ENABLE_ANON
 
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
