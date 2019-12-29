@@ -82,7 +82,7 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	data/ca-gnutls-keyid.pem data/ca-no-keyid.pem data/ca-weird-keyid.pem \
 	data/key-ca-1234.p8 data/key-ca-empty.p8 data/key-ca-null.p8 \
 	data/openssl-key-ecc.p8 data/key-ecc.p8 data/key-ecc.pem suppressions.valgrind \
-	data/encpkcs8.pem data/unencpkcs8.pem data/enc2pkcs8.pem \
+	data/encpkcs8.pem data/unencpkcs8.pem data/enc2pkcs8.pem data/dup-exts.pem \
 	data/openssl-3des.p8 data/openssl-3des.p8.txt data/openssl-aes128.p8 \
 	data/openssl-aes128.p8.txt data/openssl-aes256.p8 data/openssl-aes256.p8.txt \
 	data/cert.dsa.1024.pem data/cert.dsa.2048.pem data/cert.dsa.3072.pem \
@@ -111,7 +111,7 @@ dist_check_SCRIPTS = pathlen aki invalid-sig email \
 	pkcs12 certtool-crl-decoding pkcs12-encode pkcs12-corner-cases inhibit-anypolicy \
 	smime cert-time alt-chain pkcs7-list-sign pkcs7-eddsa certtool-ecdsa \
 	key-id pkcs8 pkcs8-decode ecdsa illegal-rsa pkcs8-invalid key-invalid \
-	pkcs8-eddsa certtool-subca certtool-verify-profiles
+	pkcs8-eddsa certtool-subca certtool-verify-profiles x509-duplicate-ext
 
 dist_check_SCRIPTS += key-id ecdsa pkcs8-invalid key-invalid pkcs8-decode pkcs8 pkcs8-eddsa \
 	certtool-utf8 crq
