@@ -2695,16 +2695,16 @@ gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert, unsigned indx,
 	if (oid && len > 0 && ((uint8_t*)oid)[len-1] == 0)
 		(*oid_size)--;
 
-	snprintf(name, sizeof(name),
-		 "tbsCertificate.extensions.?%u.critical", indx + 1);
-	len = sizeof(str_critical);
-	result = asn1_read_value(cert->cert, name, str_critical, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
 	if (critical) {
+		snprintf(name, sizeof(name),
+			 "tbsCertificate.extensions.?%u.critical", indx + 1);
+		len = sizeof(str_critical);
+		result = asn1_read_value(cert->cert, name, str_critical, &len);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
 		if (str_critical[0] == 'T')
 			*critical = 1;
 		else
