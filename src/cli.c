@@ -389,6 +389,11 @@ static int cert_verify_callback(gnutls_session_t session)
 		try_save_cert(session);
 	}
 
+#ifndef ENABLE_OCSP
+	if (HAVE_OPT(SAVE_OCSP) || HAVE_OPT(OCSP)) {
+		fprintf(stderr, "OCSP is not supported!\n");
+	}
+#else
 	rc = gnutls_ocsp_status_request_get(session, &oresp);
 	if (rc < 0) {
 		oresp.data = NULL;
@@ -403,6 +408,7 @@ static int cert_verify_callback(gnutls_session_t session)
 			fclose(fp);
 		}
 	}
+#endif
 
 	print_cert_info(session, verbose, print_cert);
 
@@ -413,7 +419,9 @@ static int cert_verify_callback(gnutls_session_t session)
 			    (stdout, "*** PKI verification of server certificate failed...\n");
 			if (!insecure && !ssh)
 				return -1;
-		} else if (ENABLED_OPT(OCSP) && gnutls_ocsp_status_request_is_checked(session, 0) == 0) {	/* off-line verification succeeded. Try OCSP */
+		}
+#ifdef ENABLE_OCSP
+		else if (ENABLED_OPT(OCSP) && gnutls_ocsp_status_request_is_checked(session, 0) == 0) {	/* off-line verification succeeded. Try OCSP */
 			rc = cert_verify_ocsp(session);
 			if (rc == -1) {
 				log_msg
@@ -425,6 +433,7 @@ static int cert_verify_callback(gnutls_session_t session)
 			else
 				log_msg(stdout, "*** OCSP: verified %d certificate(s).\n", rc);
 		}
+#endif
 	}
 
 	if (dane) {		/* try DANE auth */
@@ -677,10 +686,21 @@ gnutls_session_t init_tls_session(const char *host)
 					       host, strlen(host));
 	}
 
-	if (HAVE_OPT(DH_BITS))
+	if (HAVE_OPT(DH_BITS)) {
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 		gnutls_dh_set_prime_bits(session, OPT_VALUE_DH_BITS);
+#else
+		fprintf(stderr, "Setting DH parameters is not supported\n");
+		exit(1);
+#endif
+	}
+
 
 	if (HAVE_OPT(ALPN)) {
+#ifndef ENABLE_ALPN
+		fprintf(stderr, "ALPN is not supported\n");
+		exit(1);
+#else
 		unsigned proto_n = STACKCT_OPT(ALPN);
 		char **protos = (void *) STACKLST_OPT(ALPN);
 
@@ -696,6 +716,7 @@ gnutls_session_t init_tls_session(const char *host)
 			p[i].size = strlen(protos[i]);
 		}
 		gnutls_alpn_set_protocols(session, p, proto_n, 0);
+#endif
 	}
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
@@ -1135,6 +1156,7 @@ int do_inline_command_processing(char *buffer_ptr, size_t curr_bytes,
 static void
 print_other_info(gnutls_session_t session)
 {
+#ifdef ENABLE_OCSP
 	int ret;
 	gnutls_datum_t oresp;
 
@@ -1175,7 +1197,7 @@ print_other_info(gnutls_session_t session)
 			gnutls_free(p.data);
 		}
 	}
-
+#endif
 }
 
 int main(int argc, char **argv)
@@ -1961,6 +1983,7 @@ static void init_global_tls_stuff(void)
  * -1: certificate chain could not be checked fully
  * >=0: number of certificates verified ok
  */
+#ifdef ENABLE_OCSP
 static int cert_verify_ocsp(gnutls_session_t session)
 {
 	gnutls_x509_crt_t cert, issuer;
@@ -2057,3 +2080,4 @@ cleanup:
 		return -1;
 	return ok >= 1 ? (int) ok : -1;
 }
+#endif
