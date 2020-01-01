@@ -919,6 +919,7 @@ AC_ARG_WITH([guile-extension-dir], AS_HELP_STRING([--with-guile-extension-dir=DI
 AC_SUBST([guilesitedir])
 AC_SUBST([guilesiteccachedir])
 AC_SUBST([guileextensiondir])
+maybe_guileextensiondir="\"$guileextensiondir\""
 
 if test "$opt_guile_bindings" = "yes"; then
    AC_MSG_RESULT([***
@@ -990,6 +991,14 @@ if test "$opt_guile_bindings" = "yes"; then
 	AC_CHECK_FUNCS([scm_gc_malloc_pointerless])
 	CFLAGS="$save_CFLAGS"
 	LIBS="$save_LIBS"
+
+	# Do we need to hard-code $guileextensiondir in gnutls.scm?
+	# This is not necessary when $guileextensiondir is equal to
+	# Guile's 'extensiondir' as specified in 'guile-MAJOR.MINOR.pc'.
+	if test "$guileextensiondir" = "`$PKG_CONFIG guile-$GUILE_EFFECTIVE_VERSION --variable extensiondir`" \
+	     || test "$guileextensiondir" = '$(GUILE_EXTENSION)'; then
+	  maybe_guileextensiondir='#f'
+	fi
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
@@ -998,6 +1007,7 @@ if test "$opt_guile_bindings" = "yes"; then
    fi
 fi
 
+AC_SUBST([maybe_guileextensiondir])
 AM_CONDITIONAL([HAVE_GUILE], [test "$opt_guile_bindings" = "yes"])
 AM_CONDITIONAL([HAVE_GUILD], [test "x$GUILD" != "x"])
 AM_CONDITIONAL([CROSS_COMPILING], [test "x$cross_compiling" = "xyes"])
