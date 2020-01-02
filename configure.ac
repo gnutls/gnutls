@@ -433,7 +433,7 @@ AC_ARG_ENABLE(full-test-suite,
 
 # test if we are in git master or in release build. In release
 # builds we do not use valgrind.
-SUITE_FILE="${srcdir}/tests/suite/mini-eagain2.c"
+SUITE_FILE="${srcdir}/tests/suite/prime-check.c"
 if test "$full_test_suite" = yes && test ! -f "$SUITE_FILE";then
 	full_test_suite=no
 fi
@@ -449,6 +449,16 @@ if test "$enable_oldgnutls_interop" != "no" && test "$full_test_suite" != yes;th
 fi
 
 AM_CONDITIONAL(ENABLE_OLDGNUTLS_INTEROP, test "$enable_oldgnutls_interop" != "no")
+
+# check for libev - used in full test suite
+AC_LIB_HAVE_LINKFLAGS(ev,, [#include <ev.h>], [ev_run(0,0);])
+if test "$ac_cv_libev" = yes; then
+        AC_SUBST([LIBEV_LIBS], [$LIBEV])
+elif test "$full_test_suite" = yes;then
+        AC_MSG_ERROR([[***
+*** libev4 was not found.
+***]])
+fi
 
 dnl GCC warnings to enable
 

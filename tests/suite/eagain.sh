@@ -33,7 +33,10 @@ SERV="${SERV} -q"
 
 eval "${GETPORT}"
 
-launch_server $$ --echo --priority "NORMAL:-VERS-ALL:+VERS-TLS1.2:+ANON-DH" --dhparams "${srcdir}/params.dh"
+KEY1=${srcdir}/../../doc/credentials/x509/key-rsa.pem
+CERT1=${srcdir}/../../doc/credentials/x509/cert-rsa.pem
+
+launch_server $$ --echo --x509keyfile ${KEY1} --x509certfile ${CERT1}
 PID=$!
 wait_server ${PID}
 

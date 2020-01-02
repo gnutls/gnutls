@@ -87,10 +87,11 @@ and mbedtls.
 * [dieharder](https://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
 * [lcov](https://linux-test-project.github.io/) (for code coverage)
 * [util-linux](https://github.com/karelzak/util-linux) or just [lscpu](https://github.com/NanXiao/lscpu) (for CPU feature detection)
+* [libev](hhttp://software.schmorp.de/pkg/libev.html) (for testing)
 
 Debian/Ubuntu:
 ```
-apt-get install -y valgrind nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect
+apt-get install -y valgrind nodejs softhsm2 datefudge lcov libssl-dev libcmocka-dev expect libev-dev
 apt-get install -y dieharder openssl abigail-tools socat net-tools ppp lockfile-progs util-linux
 ```
 
@@ -102,7 +103,7 @@ apt-get install -y v libubsan0 libasan1
 
 Fedora/RHEL:
 ```
-yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel expect
+yum install -y valgrind libasan libasan-static libubsan nodejs softhsm datefudge lcov openssl-devel expect libev-devel
 yum install -y dieharder mbedtls-utils openssl libabigail libcmocka-devel socat lockfile-progs util-linux
 ```
 
