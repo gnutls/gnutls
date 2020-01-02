@@ -30,7 +30,8 @@ variables:
   DEBIAN_CROSS_BUILD: buildenv-debian-cross
   DEBIAN_X86_CROSS_BUILD: buildenv-debian-x86-cross
   FEDORA28_BUILD: buildenv-f28
-  FEDORA_BUILD: buildenv-f31
+  FEDORA_BUILD: buildenv-fedora31
+  MINGW_BUILD: buildenv-mingw
   ALPINE_BASE_BUILD: buildenv-alpine-base
   CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
@@ -314,7 +315,7 @@ static-analyzers.Fedora.x86_64:
 
 MinGW32.DLLs:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
@@ -353,7 +354,7 @@ MinGW32.DLLs:
 
 MinGW64.DLLs:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   script:
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
     echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
@@ -392,7 +393,7 @@ MinGW64.DLLs:
 
 MinGW64:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   script:
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
@@ -423,7 +424,7 @@ MinGW64:
 
 MinGW32:
   stage: stage1-testing
-  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   script:
   - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
