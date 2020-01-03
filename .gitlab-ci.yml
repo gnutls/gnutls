@@ -74,8 +74,9 @@ doc-dist.Fedora:
   - make -C doc stamp_enums
   - make -j$(nproc)
   - make -C doc gnutls.html
-  - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub
-  - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc/latex gnutls.pdf
+  - make -C doc/latex gnutls.pdf
+  - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
+  - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
 # check whether distribution with or without included libopts is ok
   - make distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-local-libopts --disable-tests"
   - make distcheck
