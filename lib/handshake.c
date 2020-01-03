@@ -992,6 +992,7 @@ int _gnutls_recv_finished(gnutls_session_t session)
 #if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 	/* When fuzzying allow to proceed without verifying the handshake
 	 * consistency */
+	(void) vrfy;
 # warning This is unsafe for production builds
 
 #else
