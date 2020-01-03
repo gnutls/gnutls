@@ -69,10 +69,13 @@ doc-dist.Fedora:
   - guile_snarf=/usr/bin/guile-snarf2.2
   - export GUILE GUILD guile_snarf
   - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
-  - make -C doc stamp-vti && make -C doc stamp-1 && make -C doc stamp_enums && make -j$(nproc)
+  - make -C doc stamp-vti
+  - make -C doc stamp-1
+  - make -C doc stamp_enums
+  - make -j$(nproc)
   - make -C doc gnutls.html
-  - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub &&
-    make -C doc/latex gnutls.pdf
+  - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc gnutls.epub
+  - PATH="$PATH:/usr/share/sgml/docbook/xsl-stylesheets-1.79.1/epub/bin/" make -C doc/latex gnutls.pdf
 # check whether distribution with or without included libopts is ok
   - make distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-local-libopts --disable-tests"
   - make distcheck
@@ -125,8 +128,8 @@ minimal.Fedora.x86_64:
   - make -j$(nproc)
   - make -j$(nproc) check
   - echo "Minimal build"
-  - dnf remove -y libunistring-devel libtasn1-devel libidn-devel &&
-    dash ./configure --cache-file cache/config.cache --with-included-libtasn1
+  - dnf remove -y libunistring-devel libtasn1-devel libidn-devel
+  - dash ./configure --cache-file cache/config.cache --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-tests
     --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
     --disable-anon-authentication --disable-dhe --disable-ecdhe
@@ -161,9 +164,11 @@ SSL-3.0.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA28_BUILD
   script:
   - ./bootstrap
-  - mkdir -p build && cd build &&
-    dash ../configure --disable-tls13-interop --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile --disable-strict-der-time &&
-    make -j$(nproc) && make check -j$(nproc)
+  - mkdir -p build
+  - cd build
+  - dash ../configure --disable-tls13-interop --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile --disable-strict-der-time
+  - make -j$(nproc)
+  - make check -j$(nproc)
   - cd ..
   tags:
   - shared
@@ -185,10 +190,12 @@ FIPS140-2.Fedora.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
   script:
   - ./bootstrap
-  - mkdir -p build && cd build &&
-    dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
+  - mkdir -p build
+  - cd build
+  - dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
   - make -j$(nproc)
-  - mkdir -p lib/.libs/fipscheck && fipshmac -d lib/.libs/fipscheck/ -s .hmac lib/.libs/libgnutls.so*
+  - mkdir -p lib/.libs/fipscheck
+  - fipshmac -d lib/.libs/fipscheck/ -s .hmac lib/.libs/libgnutls.so*
   - GNUTLS_FORCE_FIPS_MODE=1 make check -j$(nproc)
   - cd ..
   tags:
@@ -262,7 +269,8 @@ static-analyzers.Fedora.x86_64:
   - make -j$(nproc) -C gl
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
   - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C libdane
-  - make -j$(nproc) -C src/gl && scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C src
+  - make -j$(nproc) -C src/gl
+  - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C src
   - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -j$(nproc) $CPPCHECK_OPTIONS
   - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j$(nproc) $CPPCHECK_OPTIONS
   after_script:
@@ -284,8 +292,8 @@ MinGW32.DLLs:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   script:
-  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
-    echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
   - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
@@ -294,20 +302,20 @@ MinGW32.DLLs:
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
 #libffi is required by libp11-kit
-  - mkdir -p win32-build/bin && mkdir -p win32-build/lib/includes &&
-    cp lib/.libs/*.dll src/.libs/*.exe win32-build/bin &&
-    i686-w64-mingw32-strip --strip-unneeded win32-build/bin/*.dll &&
-    i686-w64-mingw32-strip win32-build/bin/*.exe &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win32-build/bin &&
-    cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win32-build/bin &&
-    cp lib/.libs/*.a lib/*.def lib/gnutls.pc win32-build/lib &&
-    cp lib/includes/gnutls/*.h win32-build/lib/includes
+  - mkdir -p win32-build/bin win32-build/lib/includes
+  - cp lib/.libs/*.dll src/.libs/*.exe win32-build/bin
+  - i686-w64-mingw32-strip --strip-unneeded win32-build/bin/*.dll
+  - i686-w64-mingw32-strip win32-build/bin/*.exe
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win32-build/bin
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win32-build/bin
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win32-build/bin
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win32-build/bin
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win32-build/bin
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win32-build/bin
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win32-build/bin
+  - cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win32-build/bin
+  - cp lib/.libs/*.a lib/*.def lib/gnutls.pc win32-build/lib
+  - cp lib/includes/gnutls/*.h win32-build/lib/includes
   tags:
   - shared
   - docker
@@ -323,8 +331,8 @@ MinGW64.DLLs:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
   script:
-  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
-    echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
   - dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
@@ -333,20 +341,20 @@ MinGW64.DLLs:
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
 #libffi is required by libp11-kit
-  - mkdir -p win64-build/bin && mkdir -p win64-build/lib/includes &&
-    cp lib/.libs/*.dll src/.libs/*.exe win64-build/bin &&
-    x86_64-w64-mingw32-strip --strip-unneeded win64-build/bin/*.dll &&
-    x86_64-w64-mingw32-strip win64-build/bin/*.exe &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win64-build/bin &&
-    cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win64-build/bin &&
-    cp lib/.libs/*.a lib/*.def lib/gnutls.pc win64-build/lib &&
-    cp lib/includes/gnutls/*.h win64-build/lib/includes
+  - mkdir -p win64-build/bin win64-build/lib/includes
+  - cp lib/.libs/*.dll src/.libs/*.exe win64-build/bin
+  - x86_64-w64-mingw32-strip --strip-unneeded win64-build/bin/*.dll
+  - x86_64-w64-mingw32-strip win64-build/bin/*.exe
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win64-build/bin
+  - cp lib/.libs/*.a lib/*.def lib/gnutls.pc win64-build/lib
+  - cp lib/includes/gnutls/*.h win64-build/lib/includes
   tags:
   - shared
   - docker
@@ -364,9 +372,10 @@ MinGW64:
   script:
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
-  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
-    echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register &&
-    mkdir -p build && cd build
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
+  - mkdir -p build
+  - cd build
   - dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc
   # generate the certtool autogen file to check whether later compilation will modify it
   - mingw64-make -C src certtool-args.c.bak
@@ -395,9 +404,10 @@ MinGW32:
   script:
   - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
-  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc &&
-    echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register &&
-    mkdir -p build && cd build
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - mkdir -p build
+  - cd build
   - dash ../configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc
   - mingw32-make -j$(nproc)
   - mingw32-make -C tests check -j$(nproc)
@@ -425,7 +435,9 @@ FreeBSD.x86_64:
   - export CC="ccache clang"
   - ./bootstrap
   - LIBS="-L/usr/local/lib" ./configure --disable-full-test-suite
-    --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc && gmake -j$(sysctl hw.ncpu | awk '{print $2}') && gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
+    --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc
+  - gmake -j$(sysctl hw.ncpu | awk '{print $2}')
+  - gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
   tags:
   - freebsd
   only:
@@ -488,7 +500,8 @@ Debian.x86_64:
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$DEBIAN_BUILD
   script:
   - ./bootstrap
-  - mkdir -p build && cd build
+  - mkdir -p build
+  - cd build
   - dash ../configure --enable-oldgnutls-interop --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile LDFLAGS='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now'
   - make -j$(nproc)
   - make check -j$(nproc)
