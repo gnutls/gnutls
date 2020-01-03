@@ -265,7 +265,7 @@ threadsan.Fedora.x86_64:
   script:
   - ./bootstrap
   - CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
-    dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --enable-fips140-mode
+    dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --enable-fips140-mode --disable-full-test-suite
   - make -j$(nproc)
   - make -C tests check -j$(nproc) SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
   tags:
