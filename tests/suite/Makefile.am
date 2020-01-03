@@ -29,8 +29,6 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/tests			\
 	-I$(top_srcdir)/doc/examples
 
-EXTRA_DIST = cbc-record-check.sh
-
 check_PROGRAMS = rng prime-check
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
@@ -39,9 +37,6 @@ LDADD = ../../lib/libgnutls.la \
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
 prime_check_LDADD = $(LDADD) -lhogweed -lgmp
-
-EXTRA_DIST += testcompat-main-polarssl testcompat-main-openssl \
-	      testcompat-common params.dh tls-fuzzer/tls-fuzzer-common.sh
 
 scripts_to_test = chain.sh \
 	testrng.sh testcompat-polarssl.sh testcompat-openssl.sh \
@@ -85,6 +80,7 @@ endif
 if !MACOSX
 if !WINDOWS
 mini_record_timing_LDADD = -lrt $(LDADD)
+nodist_mini_record_timing_SOURCES = mini-record-timing.c
 eagain_cli_LDADD = $(LIBEV_LIBS) -lrt -lm $(LIBDL) -lpthread $(LDADD)
 nodist_eagain_cli_SOURCES = eagain-cli.c
 
@@ -95,6 +91,7 @@ endif
 endif
 
 nodist_prime_check_SOURCES = prime-check.c
+nodist_rng_SOURCES = rng.c
 
 nodist_check_SCRIPTS = $(scripts_to_test)
 
