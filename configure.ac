@@ -453,12 +453,14 @@ AM_CONDITIONAL(ENABLE_OLDGNUTLS_INTEROP, test "$enable_oldgnutls_interop" != "no
 # check for libev - used in full test suite
 AC_LIB_HAVE_LINKFLAGS(ev,, [#include <ev.h>], [ev_run(0,0);])
 if test "$ac_cv_libev" = yes; then
-        AC_SUBST([LIBEV_LIBS], [$LIBEV])
-elif test "$full_test_suite" = yes;then
-        AC_MSG_ERROR([[***
-*** libev4 was not found.
-***]])
+  AC_SUBST([LIBEV_LIBS], [$LIBEV])
+else
+  AC_MSG_WARN([[
+*** tests/suite/eagain.sh is disabled due to missing libev ***
+]])
 fi
+
+AM_CONDITIONAL(HAVE_LIBEV, test "$ac_cv_libev" = "yes")
 
 dnl GCC warnings to enable
 

@@ -81,12 +81,14 @@ if !MACOSX
 if !WINDOWS
 mini_record_timing_LDADD = -lrt $(LDADD)
 nodist_mini_record_timing_SOURCES = mini-record-timing.c
+noinst_PROGRAMS = mini-record-timing
+
+if HAVE_LIBEV
 eagain_cli_LDADD = $(LIBEV_LIBS) -lrt -lm $(LIBDL) -lpthread $(LDADD)
 nodist_eagain_cli_SOURCES = eagain-cli.c
-
-noinst_PROGRAMS = eagain-cli mini-record-timing
-
+noinst_PROGRAMS += eagain-cli
 scripts_to_test += eagain.sh
+endif
 endif
 endif
 
