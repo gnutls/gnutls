@@ -71,6 +71,6 @@ TESTS_ENVIRONMENT =						\
 	LC_ALL="C"				\
 	GNUTLS_TEST_SUITE_RUN=1			\
 	EXEEXT=$(EXEEXT)			\
-	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/../system.prio \
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio \
 	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"

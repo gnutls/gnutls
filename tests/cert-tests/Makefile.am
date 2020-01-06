@@ -156,7 +156,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	ac_cv_sizeof_time_t="$(ac_cv_sizeof_time_t)" \
 	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	GNUTLS_TEST_SUITE_RUN=1			\
-	GNUTLS_SYSTEM_PRIORITY_FILE=$(srcdir)/../system.prio \
+	GNUTLS_SYSTEM_PRIORITY_FILE=$(abs_top_srcdir)/tests/system.prio \
 	srcdir="$(srcdir)"
 
 if ENABLE_FIPS140
