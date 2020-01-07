@@ -963,6 +963,7 @@ static void dummy_func(gnutls_priority_t c)
 static gnutls_certificate_verification_profiles_t system_wide_verification_profile = GNUTLS_PROFILE_UNKNOWN;
 static name_val_array_t system_wide_priority_strings = NULL;
 static unsigned system_wide_priority_strings_init = 0;
+static unsigned system_wide_default_priority_string = 0;
 static unsigned fail_on_invalid_config = 0;
 static unsigned system_wide_disabled_ciphers[MAX_ALGOS+1] = {0};
 static unsigned system_wide_disabled_macs[MAX_ALGOS+1] = {0};
@@ -974,7 +975,17 @@ static time_t system_priority_last_mod = 0;
 
 #define CUSTOM_PRIORITY_SECTION "priorities"
 #define OVERRIDES_SECTION "overrides"
-#define MAX_ALGO_NAME 128
+#define MAX_ALGO_NAME 2048
+
+static void _clear_default_system_priority(void)
+{
+        if (system_wide_default_priority_string) {
+                gnutls_free(_gnutls_default_priority_string);
+                _gnutls_default_priority_string = DEFAULT_PRIORITY_STRING;
+                system_wide_default_priority_string = 0;
+        }
+
+}
 
 gnutls_certificate_verification_profiles_t _gnutls_get_system_wide_verification_profile(void)
 {
@@ -1027,7 +1038,24 @@ static int cfg_ini_handler(void *_ctx, const char *section, const char *name, co
 		if (ret < 0)
 			return 0;
 	} else if (c_strcasecmp(section, OVERRIDES_SECTION)==0) {
-		if (c_strcasecmp(name, "insecure-hash")==0) {
+		if (c_strcasecmp(name, "default-priority-string")==0) {
+			_clear_default_system_priority();
+			p = clear_spaces(value, str);
+			_gnutls_debug_log("cfg: setting default-priority-string to %s\n", p);
+			if (strlen(p) > 0) {
+				_gnutls_default_priority_string = gnutls_strdup(p);
+				if (!_gnutls_default_priority_string) {
+					_gnutls_default_priority_string = DEFAULT_PRIORITY_STRING;
+					_gnutls_debug_log("cfg: failed setting default-priority-string\n");
+					return 0;
+				}
+				system_wide_default_priority_string = 1;
+			} else {
+				_gnutls_debug_log("cfg: empty default-priority-string, using default\n");
+				if (fail_on_invalid_config)
+					return 0;
+			}
+		} else if (c_strcasecmp(name, "insecure-hash")==0) {
 			p = clear_spaces(value, str);
 
 			_gnutls_debug_log("cfg: marking hash %s as insecure\n",
@@ -1293,6 +1321,7 @@ void _gnutls_load_system_priorities(void)
 void _gnutls_unload_system_priorities(void)
 {
 	_name_val_array_clear(&system_wide_priority_strings);
+	_clear_default_system_priority();
 	system_priority_last_mod = 0;
 }
 
