@@ -297,6 +297,11 @@ static const int _kx_priority_secure[] = {
 };
 static const int* kx_priority_secure = _kx_priority_secure;
 
+static const int _kx_priority_gost[] = {
+	GNUTLS_KX_VKO_GOST_12,
+};
+static const int* kx_priority_gost = _kx_priority_gost;
+
 static const int _cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
@@ -506,6 +511,18 @@ static const int mac_priority_normal_fips[] = {
 static const int *cipher_priority_performance = _cipher_priority_performance_default;
 static const int *cipher_priority_normal = _cipher_priority_normal_default;
 static const int *mac_priority_normal = mac_priority_normal_default;
+
+static const int _cipher_priority_gost[] = {
+	GNUTLS_CIPHER_GOST28147_TC26Z_CNT,
+	0
+};
+static const int *cipher_priority_gost = _cipher_priority_gost;
+
+static const int _mac_priority_gost[] = {
+	GNUTLS_MAC_GOST28147_TC26Z_IMIT,
+	0
+};
+static const int *mac_priority_gost = _mac_priority_gost;
 
 /* if called with replace the default priorities with the FIPS140 ones */
 void _gnutls_priority_update_fips(void)
@@ -2168,18 +2185,38 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 						goto error;
 				}
 			} else if (c_strncasecmp
-				(&broken_list[i][1], "MAC-ALL", 7) == 0) {
-				bulk_fn(&(*priority_cache)->_mac,
-					mac_priority_normal);
+				 (&broken_list[i][1], "MAC-", 4) == 0) {
+				if (c_strncasecmp
+				    (&broken_list[i][1], "MAC-ALL", 7) == 0) {
+					bulk_fn(&(*priority_cache)->_mac,
+							mac_priority_normal);
+				} else if (c_strncasecmp
+				    (&broken_list[i][1], "MAC-GOST-ALL", 12) == 0) {
+					bulk_fn(&(*priority_cache)->_mac,
+							mac_priority_gost);
+				}
 			} else if (c_strncasecmp
-				(&broken_list[i][1], "CIPHER-ALL",
-				 10) == 0) {
-				bulk_fn(&(*priority_cache)->_cipher,
-					cipher_priority_normal);
+				 (&broken_list[i][1], "CIPHER-", 7) == 0) {
+				if (c_strncasecmp
+				    (&broken_list[i][1], "CIPHER-ALL", 10) == 0) {
+					bulk_fn(&(*priority_cache)->_cipher,
+							cipher_priority_normal);
+				} else if (c_strncasecmp
+				    (&broken_list[i][1], "CIPHER-GOST-ALL", 15) == 0) {
+					bulk_fn(&(*priority_cache)->_cipher,
+							cipher_priority_gost);
+				}
 			} else if (c_strncasecmp
-				(&broken_list[i][1], "KX-ALL", 6) == 0) {
-				bulk_fn(&(*priority_cache)->_kx,
-					kx_priority_secure);
+				 (&broken_list[i][1], "KX-", 3) == 0) {
+				if (c_strncasecmp
+				    (&broken_list[i][1], "KX-ALL", 6) == 0) {
+					bulk_fn(&(*priority_cache)->_kx,
+							kx_priority_secure);
+				} else if (c_strncasecmp
+				    (&broken_list[i][1], "KX-GOST-ALL", 11) == 0) {
+					bulk_fn(&(*priority_cache)->_kx,
+							kx_priority_gost);
+				}
 			} else
 				goto error;
 		} else if (broken_list[i][0] == '%') {

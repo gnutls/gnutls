@@ -1422,18 +1422,21 @@ appended with an algorithm will add this algorithm.
 @item Ciphers @tab
 Examples are AES-128-GCM, AES-256-GCM, AES-256-CBC, GOST28147-TC26Z-CNT; see also
 @ref{tab:ciphers} for more options. Catch all name is CIPHER-ALL which will add
-all the algorithms from NORMAL priority.
+all the algorithms from NORMAL priority. The shortcut for secure GOST
+algorithms is CIPHER-GOST-ALL.
 
 @item Key exchange @tab
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
 PSK, DHE-PSK, ECDHE-PSK, ECDHE-RSA, ECDHE-ECDSA, VKO-GOST-12, ANON-ECDH, ANON-DH.
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
 priority. Under TLS1.3, the DHE-PSK and ECDHE-PSK strings are equivalent
-and instruct for a Diffie-Hellman key exchange using the enabled groups.
+and instruct for a Diffie-Hellman key exchange using the enabled groups. The
+shortcut for secure GOST algorithms is KX-GOST-ALL.
 
 @item MAC @tab
 MD5, SHA1, SHA256, SHA384, GOST28147-TC26Z-IMIT, AEAD (used with
-GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-ALL.
+GCM ciphers only). All algorithms from NORMAL priority can be accessed with
+MAC-ALL. The shortcut for secure GOST algorithms is MAC-GOST-ALL.
 
 @item Compression algorithms @tab
 COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
