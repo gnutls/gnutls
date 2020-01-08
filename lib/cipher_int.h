@@ -182,6 +182,8 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher);
 int _gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv,
 			  size_t ivlen);
 
+int _gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen);
+
 #define _gnutls_cipher_is_aead(h) _gnutls_cipher_algo_is_aead((h)->e)
 
 /* returns the tag in AUTHENC ciphers */

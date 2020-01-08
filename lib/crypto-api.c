@@ -206,6 +206,31 @@ _gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 	return _gnutls_cipher_getiv(&h->ctx_enc, iv, ivlen);
 }
 
+/*-
+ * _gnutls_cipher_set_key:
+ * @handle: is a #gnutls_cipher_hd_t type
+ * @key: the key to set
+ * @keylen: the length of the key
+ *
+ * This function will set the key used by the cipher
+ *
+ * This is solely for validation purposes of our crypto
+ * implementation.  For other purposes, the key should be set at the time of
+ * cipher setup.  As such, this function only works with the internally
+ * registered ciphers.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.6.14
+ -*/
+int
+_gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen)
+{
+	api_cipher_hd_st *h = handle;
+
+	return _gnutls_cipher_setkey(&h->ctx_enc, key, keylen);
+}
+
 /**
  * gnutls_cipher_encrypt:
  * @handle: is a #gnutls_cipher_hd_t type
