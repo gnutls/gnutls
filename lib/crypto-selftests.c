@@ -1853,6 +1853,38 @@ const struct mac_vectors_st gost28147_tc26z_imit_vectors[] = {
 	},
 };
 
+/* GOST R 34.13-2015 */
+const struct mac_vectors_st magma_omac_vectors[] = {
+	{
+        STR(key, key_size,
+	    "\xff\xee\xdd\xcc\xbb\xaa\x99\x88\x77\x66\x55\x44\x33\x22\x11\x00"
+	    "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff"),
+        STR(plaintext, plaintext_size,
+	    "\x92\xde\xf0\x6b\x3c\x13\x0a\x59"
+	    "\xdb\x54\xc7\x04\xf8\x18\x9d\x20"
+	    "\x4a\x98\xfb\x2e\x67\xa8\x02\x4c"
+	    "\x89\x12\x40\x9b\x17\xb5\x7e\x41"),
+	STR(output, output_size,
+	    "\x15\x4e\x72\x10\x20\x30\xc5\xbb"),
+	},
+};
+
+/* GOST R 34.13-2015 */
+const struct mac_vectors_st kuznyechik_omac_vectors[] = {
+	{
+        STR(key, key_size,
+	    "\x88\x99\xaa\xbb\xcc\xdd\xee\xff\x00\x11\x22\x33\x44\x55\x66\x77"
+	    "\xfe\xdc\xba\x98\x76\x54\x32\x10\x01\x23\x45\x67\x89\xab\xcd\xef"),
+        STR(plaintext, plaintext_size,
+	    "\x11\x22\x33\x44\x55\x66\x77\x00\xff\xee\xdd\xcc\xbb\xaa\x99\x88"
+	    "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xee\xff\x0a"
+	    "\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xee\xff\x0a\x00"
+	    "\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xee\xff\x0a\x00\x11"),
+	STR(output, output_size,
+	    "\x33\x6f\x4d\x29\x60\x59\xfb\xe3\x4d\xde\xb3\x5b\x37\x74\x9c\x67"),
+	},
+};
+
 static int test_mac(gnutls_mac_algorithm_t mac,
 		    const struct mac_vectors_st *vectors,
 		    size_t vectors_size, unsigned flags)
@@ -2112,6 +2144,10 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 		NON_FIPS_CASE(GNUTLS_MAC_STREEBOG_256, test_mac, hmac_streebog_256_vectors);
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_MAC_GOST28147_TC26Z_IMIT, test_mac, gost28147_tc26z_imit_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_MAC_MAGMA_OMAC, test_mac, magma_omac_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_MAC_KUZNYECHIK_OMAC, test_mac, kuznyechik_omac_vectors);
 #endif
 		FALLTHROUGH;
 		CASE(GNUTLS_MAC_AES_CMAC_128, test_mac, aes_cmac_128_vectors);
