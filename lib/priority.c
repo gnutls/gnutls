@@ -2067,19 +2067,19 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					bulk_fn(&(*priority_cache)->
 						_supported_ecc,
 						supported_groups_normal);
-				} else if (strncasecmp
+				} else if (c_strncasecmp
 				    (&broken_list[i][1], "GROUP-DH-ALL",
 				     12) == 0) {
 					bulk_given_fn(&(*priority_cache)->
 						_supported_ecc,
 						_supported_groups_dh);
-				} else if (strncasecmp
+				} else if (c_strncasecmp
 				    (&broken_list[i][1], "GROUP-EC-ALL",
 				     12) == 0) {
 					bulk_given_fn(&(*priority_cache)->
 						_supported_ecc,
 						_supported_groups_ecdh);
-				} else if (strncasecmp
+				} else if (c_strncasecmp
 				    (&broken_list[i][1], "GROUP-GOST-ALL",
 				     14) == 0) {
 					bulk_given_fn(&(*priority_cache)->
@@ -2095,17 +2095,17 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					else
 						goto error;
 				}
-			} else if (strncasecmp(&broken_list[i][1], "CTYPE-", 6) == 0) {
+			} else if (c_strncasecmp(&broken_list[i][1], "CTYPE-", 6) == 0) {
 				// Certificate types
-				if (strncasecmp(&broken_list[i][1], "CTYPE-ALL", 9) == 0) {
+				if (c_strncasecmp(&broken_list[i][1], "CTYPE-ALL", 9) == 0) {
 					// Symmetric cert types, all types allowed
 					bulk_fn(&(*priority_cache)->client_ctype,
 						cert_type_priority_all);
 					bulk_fn(&(*priority_cache)->server_ctype,
 						cert_type_priority_all);
-				} else if (strncasecmp(&broken_list[i][1], "CTYPE-CLI-", 10) == 0) {
+				} else if (c_strncasecmp(&broken_list[i][1], "CTYPE-CLI-", 10) == 0) {
 					// Client certificate types
-					if (strncasecmp(&broken_list[i][1], "CTYPE-CLI-ALL", 13) == 0) {
+					if (c_strncasecmp(&broken_list[i][1], "CTYPE-CLI-ALL", 13) == 0) {
 						// All client cert types allowed
 						bulk_fn(&(*priority_cache)->client_ctype,
 							cert_type_priority_all);
@@ -2114,9 +2114,9 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 						// Specific client cert type allowed
 						fn(&(*priority_cache)->client_ctype, algo);
 					} else goto error;
-				} else if (strncasecmp(&broken_list[i][1], "CTYPE-SRV-", 10) == 0) {
+				} else if (c_strncasecmp(&broken_list[i][1], "CTYPE-SRV-", 10) == 0) {
 					// Server certificate types
-					if (strncasecmp(&broken_list[i][1], "CTYPE-SRV-ALL", 13) == 0) {
+					if (c_strncasecmp(&broken_list[i][1], "CTYPE-SRV-ALL", 13) == 0) {
 						// All server cert types allowed
 						bulk_fn(&(*priority_cache)->server_ctype,
 							cert_type_priority_all);
@@ -2130,14 +2130,14 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					     (&broken_list[i][7])) != GNUTLS_CRT_UNKNOWN) {
 						fn(&(*priority_cache)->client_ctype, algo);
 						fn(&(*priority_cache)->server_ctype, algo);
-					} else if (strncasecmp(&broken_list[i][1], "CTYPE-OPENPGP", 13) == 0) {
+					} else if (c_strncasecmp(&broken_list[i][1], "CTYPE-OPENPGP", 13) == 0) {
 						/* legacy openpgp option - ignore */
 						continue;
 					} else goto error;
 				}
-			} else if (strncasecmp
+			} else if (c_strncasecmp
 				 (&broken_list[i][1], "SIGN-", 5) == 0) {
-				if (strncasecmp
+				if (c_strncasecmp
 				    (&broken_list[i][1], "SIGN-ALL",
 				     8) == 0) {
 					bulk_fn(&(*priority_cache)->
