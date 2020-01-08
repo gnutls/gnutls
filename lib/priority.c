@@ -483,6 +483,14 @@ static const int _sign_priority_secure192[] = {
 };
 static const int* sign_priority_secure192 = _sign_priority_secure192;
 
+static const int _sign_priority_gost[] = {
+	GNUTLS_SIGN_GOST_256,
+	GNUTLS_SIGN_GOST_512,
+
+	0
+};
+static const int* sign_priority_gost = _sign_priority_gost;
+
 static const int mac_priority_normal_default[] = {
 	GNUTLS_MAC_SHA1,
 	GNUTLS_MAC_AEAD,
@@ -2143,6 +2151,12 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					bulk_fn(&(*priority_cache)->
 						_sign_algo,
 						sign_priority_default);
+				} else if (c_strncasecmp
+				    (&broken_list[i][1], "SIGN-GOST-ALL",
+				     13) == 0) {
+					bulk_fn(&(*priority_cache)->
+						_sign_algo,
+						sign_priority_gost);
 				} else {
 					if ((algo =
 					     gnutls_sign_get_id

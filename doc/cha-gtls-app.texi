@@ -1453,6 +1453,7 @@ SIGN-ECDSA-SHA224, SIGN-ECDSA-SHA256, SIGN-ECDSA-SHA384, SIGN-ECDSA-SHA512,
 SIGN-RSA-PSS-SHA256, SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512,
 SIGN-GOSTR341001, SIGN-GOSTR341012-256, SIGN-GOSTR341012-512.
 Catch all which enables all algorithms from NORMAL priority is SIGN-ALL.
+Shortcut which enables secure GOST algorithms is SIGN-GOST-ALL.
 This option is only considered for TLS 1.2 and later.
 
 @item Groups @tab
