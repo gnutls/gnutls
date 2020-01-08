@@ -2081,7 +2081,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 						_supported_groups_ecdh);
 				} else if (strncasecmp
 				    (&broken_list[i][1], "GROUP-GOST-ALL",
-				     12) == 0) {
+				     14) == 0) {
 					bulk_given_fn(&(*priority_cache)->
 						_supported_ecc,
 						_supported_groups_gost);
