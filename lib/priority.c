@@ -2217,6 +2217,18 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					bulk_fn(&(*priority_cache)->_kx,
 							kx_priority_gost);
 				}
+			} else if (c_strncasecmp
+				 (&broken_list[i][1], "GOST", 4) == 0) {
+				bulk_given_fn(&(*priority_cache)->_supported_ecc,
+					_supported_groups_gost);
+				bulk_fn(&(*priority_cache)->_sign_algo,
+					sign_priority_gost);
+				bulk_fn(&(*priority_cache)->_mac,
+						mac_priority_gost);
+				bulk_fn(&(*priority_cache)->_cipher,
+						cipher_priority_gost);
+				bulk_fn(&(*priority_cache)->_kx,
+						kx_priority_gost);
 			} else
 				goto error;
 		} else if (broken_list[i][0] == '%') {

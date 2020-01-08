@@ -1488,6 +1488,11 @@ CTYPE-CLI-RAWPK, CTYPE-SRV-RAWPK can be used to specialize on client or server;
 catch all is CTYPE-CLI-ALL and CTYPE-SRV-ALL. The type 'X509' is aliased to 'X.509'
 for legacy reasons.
 
+@item Generic @tab
+The keyword GOST is a shortcut for secure GOST algorithms (MACs, ciphers,
+KXes, groups and signatures). For example the following string will enable all
+TLS 1.2 GOST ciphersuites: 'NONE:+VERS-TLS1.2:+GOST'.
+
 @end multitable
 @caption{The supported algorithm keywords in priority strings.}
 @end float
