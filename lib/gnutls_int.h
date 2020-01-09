@@ -719,6 +719,7 @@ typedef struct {
 	bool only_extension;	/* negotiated only with an extension */
 	bool post_handshake_auth;	/* Supports the TLS 1.3 post handshake auth */
 	bool key_shares;	/* TLS 1.3 key share key exchange */
+	bool multi_ocsp;	/* TLS 1.3 multiple OCSP responses */
 	/*
 	 * TLS versions modify the semantics of signature algorithms. This number
 	 * is there to distinguish signature algorithms semantics between versions
@@ -1381,6 +1382,7 @@ typedef struct {
 #define HSK_RECORD_SIZE_LIMIT_NEGOTIATED (1<<24)
 #define HSK_RECORD_SIZE_LIMIT_SENT (1<<25) /* record_size_limit extension was sent */
 #define HSK_RECORD_SIZE_LIMIT_RECEIVED (1<<26) /* server: record_size_limit extension was seen but not accepted yet */
+#define HSK_OCSP_REQUESTED (1<<27) /* server: client requested OCSP stapling */
 
 	/* The hsk_flags are for use within the ongoing handshake;
 	 * they are reset to zero prior to handshake start by gnutls_handshake. */

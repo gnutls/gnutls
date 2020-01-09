@@ -383,9 +383,8 @@ _gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
 	 *
 	 * To proceed, first check whether we have requested the certificate status
 	 */
-	if (!_gnutls_hello_ext_is_present(session, GNUTLS_EXTENSION_STATUS_REQUEST)) {
+	if (!(session->internals.hsk_flags & HSK_OCSP_REQUESTED))
 		return 0;
-	}
 
 	ret = gnutls_x509_tlsfeatures_init(&tlsfeatures);
 	if (ret < 0) {
