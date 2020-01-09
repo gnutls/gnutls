@@ -211,7 +211,7 @@ static int _gnutls_init_ret = 0;
  * called as many times as gnutls_global_init().  This is useful when
  * GnuTLS is used by more than one library in an application.  This
  * function can be called many times, but will only do something the
- * first time.
+ * first time. It is thread safe since GnuTLS 3.3.0.
  *
  * A subsequent call of this function if the initial has failed will
  * return the same error code.
