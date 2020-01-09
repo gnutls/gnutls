@@ -3386,6 +3386,7 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 #define GNUTLS_E_MISSING_EXTENSION -427
 #define GNUTLS_E_DB_ENTRY_EXISTS -428
 #define GNUTLS_E_EARLY_DATA_REJECTED -429
+#define GNUTLS_E_X509_DUPLICATE_EXTENSION -430
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
