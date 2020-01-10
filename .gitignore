@@ -729,6 +729,7 @@ tests/status-request
 tests/status-request-ext
 tests/status-request-missing
 tests/status-request-ok
+tests/status-request-revoked
 tests/str-idna
 tests/str-unicode
 tests/strict-der
