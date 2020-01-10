@@ -2369,6 +2369,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	params->algo = algo;
+
 #ifdef ENABLE_FIPS140
 	ret = pct_test(algo, params);
 	if (ret < 0) {
@@ -2376,8 +2378,6 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		goto fail;
 	}
 #endif
-
-	params->algo = algo;
 
 	FAIL_IF_LIB_ERROR;
 	return 0;
