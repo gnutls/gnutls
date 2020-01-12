@@ -1422,20 +1422,23 @@ appended with an algorithm will add this algorithm.
 @multitable @columnfractions .20 .70
 @headitem Type @tab Keywords
 @item Ciphers @tab
-Examples are AES-128-GCM, AES-256-GCM, AES-256-CBC; see also
+Examples are AES-128-GCM, AES-256-GCM, AES-256-CBC, GOST28147-TC26Z-CNT; see also
 @ref{tab:ciphers} for more options. Catch all name is CIPHER-ALL which will add
-all the algorithms from NORMAL priority.
+all the algorithms from NORMAL priority. The shortcut for secure GOST
+algorithms is CIPHER-GOST-ALL.
 
 @item Key exchange @tab
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
-PSK, DHE-PSK, ECDHE-PSK, ECDHE-RSA, ECDHE-ECDSA, ANON-ECDH, ANON-DH. The
+PSK, DHE-PSK, ECDHE-PSK, ECDHE-RSA, ECDHE-ECDSA, VKO-GOST-12, ANON-ECDH, ANON-DH.
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
 priority. Under TLS1.3, the DHE-PSK and ECDHE-PSK strings are equivalent
-and instruct for a Diffie-Hellman key exchange using the enabled groups.
+and instruct for a Diffie-Hellman key exchange using the enabled groups. The
+shortcut for secure GOST algorithms is KX-GOST-ALL.
 
 @item MAC @tab
-MD5, SHA1, SHA256, SHA384, AEAD (used with
-GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-ALL.
+MD5, SHA1, SHA256, SHA384, GOST28147-TC26Z-IMIT, AEAD (used with
+GCM ciphers only). All algorithms from NORMAL priority can be accessed with
+MAC-ALL. The shortcut for secure GOST algorithms is MAC-GOST-ALL.
 
 @item Compression algorithms @tab
 COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
@@ -1452,8 +1455,10 @@ SIGN-RSA-SHA1, SIGN-RSA-SHA224,
 SIGN-RSA-SHA256, SIGN-RSA-SHA384, SIGN-RSA-SHA512, SIGN-DSA-SHA1,
 SIGN-DSA-SHA224, SIGN-DSA-SHA256, SIGN-RSA-MD5, SIGN-ECDSA-SHA1,
 SIGN-ECDSA-SHA224, SIGN-ECDSA-SHA256, SIGN-ECDSA-SHA384, SIGN-ECDSA-SHA512,
-SIGN-RSA-PSS-SHA256, SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512.
+SIGN-RSA-PSS-SHA256, SIGN-RSA-PSS-SHA384, SIGN-RSA-PSS-SHA512,
+SIGN-GOSTR341001, SIGN-GOSTR341012-256, SIGN-GOSTR341012-512.
 Catch all which enables all algorithms from NORMAL priority is SIGN-ALL.
+Shortcut which enables secure GOST algorithms is SIGN-GOST-ALL.
 This option is only considered for TLS 1.2 and later.
 
 @item Groups @tab
@@ -1484,6 +1489,11 @@ client and server; catch all is CTYPE-ALL. The types CTYPE-CLI-X509, CTYPE-SRV-X
 CTYPE-CLI-RAWPK, CTYPE-SRV-RAWPK can be used to specialize on client or server;
 catch all is CTYPE-CLI-ALL and CTYPE-SRV-ALL. The type 'X509' is aliased to 'X.509'
 for legacy reasons.
+
+@item Generic @tab
+The keyword GOST is a shortcut for secure GOST algorithms (MACs, ciphers,
+KXes, groups and signatures). For example the following string will enable all
+TLS 1.2 GOST ciphersuites: 'NONE:+VERS-TLS1.2:+GOST'.
 
 @end multitable
 @caption{The supported algorithm keywords in priority strings.}
