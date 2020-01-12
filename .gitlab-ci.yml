@@ -195,6 +195,7 @@ FIPS140-2.Fedora.x86_64:
   - cd build
   - dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
   - make -j$(nproc)
+  - make check -j$(nproc)
   - mkdir -p lib/.libs/fipscheck
   - fipshmac -d lib/.libs/fipscheck/ -s .hmac lib/.libs/libgnutls.so*
   - GNUTLS_FORCE_FIPS_MODE=1 make check -j$(nproc)
