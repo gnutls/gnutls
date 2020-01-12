@@ -299,6 +299,7 @@ static const int* kx_priority_secure = _kx_priority_secure;
 
 static const int _kx_priority_gost[] = {
 	GNUTLS_KX_VKO_GOST_12,
+	0,
 };
 static const int* kx_priority_gost = _kx_priority_gost;
 
