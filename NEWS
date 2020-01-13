@@ -41,6 +41,9 @@ See the end for copying conditions.
    to accepting it. This addresses the problem of accepting CAs which would
    have been marked as insecure otherwise (#877).
 
+** libgnutls: The default-priority-string added to system configuration
+   to allow overriding compiled-in default-priority-string.
+
 ** certtool: Added the --verify-profile option to set a certificate
    verification profile. Use '--verify-profile low' for certificate verification
    to apply the 'NORMAL' verification profile.
