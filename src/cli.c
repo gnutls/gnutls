@@ -1158,15 +1158,24 @@ print_other_info(gnutls_session_t session)
 {
 #ifdef ENABLE_OCSP
 	int ret;
+	unsigned i;
+	unsigned int list_size;
 	gnutls_datum_t oresp;
+	const gnutls_datum_t * peers;
 
-	ret = gnutls_ocsp_status_request_get(session, &oresp);
-	if (ret < 0) {
-		oresp.data = NULL;
-		oresp.size = 0;
-	}
+	peers = gnutls_certificate_get_peers(session, &list_size);
 
-	if (ENABLED_OPT(VERBOSE) && oresp.data) {
+	if (!ENABLED_OPT(VERBOSE) || peers == NULL)
+		return;
+
+	for (i = 0; i < list_size; i++) {
+		ret = gnutls_ocsp_status_request_get2(session, i, &oresp);
+		if (ret < 0) {
+			oresp.data = NULL;
+			oresp.size = 0;
+			continue;
+		}
+
 		gnutls_ocsp_resp_t r;
 		gnutls_datum_t p;
 		unsigned flag;
