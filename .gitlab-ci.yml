@@ -609,3 +609,34 @@ Debian.cross.mips-linux-gnu:
 
 Debian.cross.aarch64-linux-gnu:
   <<: *Debian_cross_template
+
+nettle-master.Fedora:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
+  - export NETTLE_DIR=${PWD}/nettle
+  - pushd nettle-git
+  - ./.bootstrap
+  - ./configure --disable-documentation --prefix=$NETTLE_DIR
+  - make -j$(nproc)
+  - make -j$(nproc) install
+  - popd
+  - SUBMODULE_NOFETCH=1 ./bootstrap
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-doc --disable-guile --disable-gost
+  - make -j$(nproc)
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$(nproc) check
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - fuzz/*.log
+      - tests/*.log
+      - tests/*/*.log
+      - tests/suite/*/*.log
+  retry: 1
