@@ -266,6 +266,11 @@ int write_certificate_authorities(void *ctx, gnutls_buffer_st *buf)
 					      size);
 }
 
+static int append_empty_ext(void *ctx, gnutls_buffer_st *buf)
+{
+	return GNUTLS_E_INT_RET_0;
+}
+
 int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 {
 	gnutls_certificate_credentials_t cred;
@@ -340,6 +345,17 @@ int _gnutls13_send_certificate_request(gnutls_session_t session, unsigned again)
 			gnutls_assert();
 			goto cleanup;
 		}
+
+#ifdef ENABLE_OCSP
+		/* We always advertise our support for OCSP stapling */
+		ret = _gnutls_extv_append(&buf, ext_mod_status_request.tls_id, session,
+					  append_empty_ext);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		session->internals.hsk_flags |= HSK_CLIENT_OCSP_REQUESTED;
+#endif
 
 		ret = _gnutls_extv_append_final(&buf, init_pos, 0);
 		if (ret < 0) {

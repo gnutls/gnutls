@@ -42,7 +42,8 @@ See the end for copying conditions.
    have been marked as insecure otherwise (#877).
 
 ** libgnutls: On client side only send OCSP staples if they have been requested
-   by the server (#876).
+   by the server, and on server side always advertise that we support OCSP stapling
+   (#876).
 
 ** libgnutls: The default-priority-string added to system configuration
    to allow overriding compiled-in default-priority-string.
