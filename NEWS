@@ -31,6 +31,9 @@ See the end for copying conditions.
    for all certificate verifications, not only under TLS. The configuration can
    be overriden using the GNUTLS_SYSTEM_PRIORITY_FILE environment variable.
 
+** libgnutls: The stapled OCSP certificate verification adheres to the convention
+   used throughout the library of setting the 'GNUTLS_CERT_INVALID' flag.
+
 ** libgnutls: Reject certificates which contain duplicate extensions. We were
    previously printing warnings when printing such a certificate, but that is
    insufficient to flag such certificates as invalid. Instead we now refuse to
