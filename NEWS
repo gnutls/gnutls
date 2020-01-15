@@ -41,6 +41,9 @@ See the end for copying conditions.
    to accepting it. This addresses the problem of accepting CAs which would
    have been marked as insecure otherwise (#877).
 
+** libgnutls: On client side only send OCSP staples if they have been requested
+   by the server (#876).
+
 ** libgnutls: The default-priority-string added to system configuration
    to allow overriding compiled-in default-priority-string.
 
@@ -56,6 +59,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 GNUTLS_SFLAGS_CLI_REQUESTED_OCSP: Added
+GNUTLS_SFLAGS_SERV_REQUESTED_OCSP: Added
 gnutls_ocsp_req_const_t: Added
 
 

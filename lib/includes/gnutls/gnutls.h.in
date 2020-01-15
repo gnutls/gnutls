@@ -1570,6 +1570,7 @@ unsigned gnutls_session_etm_status(gnutls_session_t session);
  * @GNUTLS_SFLAGS_EARLY_START: The TLS1.3 server session returned early.
  * @GNUTLS_SFLAGS_EARLY_DATA: The TLS1.3 early data has been received by the server.
  * @GNUTLS_SFLAGS_CLI_REQUESTED_OCSP: Set when the client has requested OCSP staple during handshake.
+ * @GNUTLS_SFLAGS_SERV_REQUESTED_OCSP: Set when the server has requested OCSP staple during handshake.
  *
  * Enumeration of different session parameters.
  */
@@ -1585,7 +1586,8 @@ typedef enum {
 	GNUTLS_SFLAGS_POST_HANDSHAKE_AUTH = 1<<8,
 	GNUTLS_SFLAGS_EARLY_START = 1<<9,
 	GNUTLS_SFLAGS_EARLY_DATA = 1<<10,
-	GNUTLS_SFLAGS_CLI_REQUESTED_OCSP = 1<<11
+	GNUTLS_SFLAGS_CLI_REQUESTED_OCSP = 1<<11,
+	GNUTLS_SFLAGS_SERV_REQUESTED_OCSP = 1<<12
 } gnutls_session_flags_t;
 
 unsigned gnutls_session_get_flags(gnutls_session_t session);

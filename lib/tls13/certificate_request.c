@@ -26,6 +26,7 @@
 #include "handshake.h"
 #include "tls13/certificate_request.h"
 #include "ext/signature.h"
+#include "ext/status_request.h"
 #include "mbuffers.h"
 #include "algorithms.h"
 #include "auth/cert.h"
@@ -108,6 +109,14 @@ int parse_cert_extension(void *_ctx, unsigned tls_id, const uint8_t *data, unsig
 
 			ctx->pk_algos[ctx->pk_algos_length++] = se->pk;
 		}
+#ifdef ENABLE_OCSP
+	} else if (tls_id == ext_mod_status_request.tls_id) {
+		if (data_size != 0)
+			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
+
+		/* we are now allowed to send OCSP staples */
+		session->internals.hsk_flags |= HSK_CLIENT_OCSP_REQUESTED;
+#endif
 	} else if (tls_id == EXTID_CERTIFICATE_AUTHORITIES) {
 		if (data_size < 3) {
 			return gnutls_assert_val(GNUTLS_E_TLS_PACKET_DECODING_ERROR);
