@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver13"
+  key: "$CI_JOB_NAME-ver14"
   paths:
     - cache/
 
@@ -436,7 +436,8 @@ FreeBSD.x86_64:
   script:
   - export CC="ccache clang"
   - ./bootstrap
-  - LIBS="-L/usr/local/lib" ./configure --disable-full-test-suite
+  - export LDFLAGS="-L/usr/local/lib"
+  - ./configure --disable-full-test-suite
     --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc
   - gmake -j$(sysctl hw.ncpu | awk '{print $2}')
   - gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
