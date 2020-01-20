@@ -298,6 +298,7 @@ MinGW32.DLLs:
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
+  - export WINEPATH=/usr/i686-w64-mingw32/sys-root/mingw/bin
   - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
   - mingw32-make -j$(nproc)
   - mingw32-make -C tests check -j$(nproc)
@@ -337,6 +338,7 @@ MinGW64.DLLs:
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
   - dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
   - mingw64-make -j$(nproc)
   - mingw64-make -C tests check -j$(nproc)
@@ -374,6 +376,7 @@ MinGW64:
   script:
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
   - mkdir -p build
@@ -406,6 +409,7 @@ MinGW32:
   script:
   - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
+  - export WINEPATH=/usr/i686-w64-mingw32/sys-root/mingw/bin
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - mkdir -p build
