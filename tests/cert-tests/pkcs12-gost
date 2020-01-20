@@ -81,6 +81,20 @@ if test ${rc} != 0; then
 	exit 1
 fi
 
+${VALGRIND} "${CERTTOOL}" --pkcs-cipher=gost28147-tc26z --hash streebog-512 --to-p12 --password "Пароль для PFX" --p12-name "my-key" --load-certificate "${srcdir}/../certs/cert-ecc256.pem" --load-privkey "${srcdir}/../certs/ecc256.pem" --load-ca-certificate "${srcdir}/../certs/ca-cert-ecc.pem" --outder --outfile $TMPFILE >/dev/null
+rc=$?
+if test ${rc} != 0; then
+	echo "PKCS12 FATAL encoding"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --p12-info --inder --password "Пароль для PFX" --infile $TMPFILE >${TMPFILE_PEM} 2>/dev/null
+rc=$?
+if test ${rc} != 0; then
+	echo "PKCS12 FATAL decrypting/decoding"
+	exit 1
+fi
+
 rm -f "$TMPFILE" "$TMPFILE_PEM"
 
 exit 0
