@@ -1576,6 +1576,8 @@ unsigned gnutls_session_get_flags(gnutls_session_t session)
 		flags |= GNUTLS_SFLAGS_EARLY_DATA;
 	if (session->internals.hsk_flags & HSK_OCSP_REQUESTED)
 		flags |= GNUTLS_SFLAGS_CLI_REQUESTED_OCSP;
+	if (session->internals.hsk_flags & HSK_CLIENT_OCSP_REQUESTED)
+		flags |= GNUTLS_SFLAGS_SERV_REQUESTED_OCSP;
 
 	return flags;
 }
