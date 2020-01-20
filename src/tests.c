@@ -134,20 +134,31 @@ char prio_str[768] = "";
 #define INIT_STR "NONE:"
 char rest[384] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+GROUP-ALL" GOST_REST;
 
-#define _gnutls_priority_set_direct(s, str) __gnutls_priority_set_direct(s, str, __LINE__)
+#define _gnutls_priority_set_direct(s, str) { \
+		int _ret; \
+		if ((_ret=__gnutls_priority_set_direct(s, str, __LINE__)) != TEST_SUCCEED) { \
+			return _ret; \
+		} \
+	}
 
-static inline void
+static inline int
 __gnutls_priority_set_direct(gnutls_session_t session, const char *str, int line)
 {
 	const char *err;
 	int ret = gnutls_priority_set_direct(session, str, &err);
 
 	if (ret < 0) {
+		/* this can happen when some cipher is disabled system-wide */
+		if (ret == GNUTLS_E_NO_PRIORITIES_WERE_SET)
+			return TEST_IGNORE;
+
 		fprintf(stderr, "Error at %d with string %s\n", line, str);
 		fprintf(stderr, "Error at %s: %s\n", err,
 			gnutls_strerror(ret));
 		exit(1);
 	}
+
+	return TEST_SUCCEED;
 }
 
 test_code_t test_server(gnutls_session_t session)
