@@ -136,6 +136,8 @@ static const struct oid_to_string _oid2str[] = {
 	ENTRY("1.2.643.100.1", "OGRN", NULL, ASN1_ETYPE_NUMERIC_STRING),
 	/* Individual insurance account number */
 	ENTRY("1.2.643.100.3", "SNILS", NULL, ASN1_ETYPE_NUMERIC_STRING),
+	/* Main state registration number for individual enterpreneurs */
+	ENTRY("1.2.643.100.5", "OGRNIP", NULL, ASN1_ETYPE_NUMERIC_STRING),
 	/* VAT identification number */
 	ENTRY("1.2.643.3.131.1.1", "INN", NULL, ASN1_ETYPE_NUMERIC_STRING),
 
