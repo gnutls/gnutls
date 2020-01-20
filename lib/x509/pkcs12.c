@@ -970,7 +970,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 							   sizeof(salt),
 							   iter,
 							   pass,
-							   mac_size,
+							   key_len,
 							   key);
 	} else
 #endif
