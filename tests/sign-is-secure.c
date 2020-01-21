@@ -85,13 +85,14 @@ void doit(void)
 
 	CHECK_INSECURE_SIG(GNUTLS_SIGN_RSA_MD5);
 	CHECK_INSECURE_SIG(GNUTLS_SIGN_RSA_MD2);
+	CHECK_INSECURE_SIG(GNUTLS_SIGN_GOST_94);
 
 	for (i=1;i<GNUTLS_SIGN_MAX;i++) {
 #ifndef ALLOW_SHA1
 		if (i==GNUTLS_SIGN_RSA_SHA1||i==GNUTLS_SIGN_DSA_SHA1||i==GNUTLS_SIGN_ECDSA_SHA1)
 			continue;
 #endif
-		if (i==GNUTLS_SIGN_RSA_MD5||i==GNUTLS_SIGN_RSA_MD2||i==GNUTLS_SIGN_UNKNOWN)
+		if (i==GNUTLS_SIGN_GOST_94||i==GNUTLS_SIGN_RSA_MD5||i==GNUTLS_SIGN_RSA_MD2||i==GNUTLS_SIGN_UNKNOWN)
 			continue;
 		/* skip any unused elements */
 		if (gnutls_sign_algorithm_get_name(i)==NULL)

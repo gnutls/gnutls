@@ -114,9 +114,10 @@ void test_sig(gnutls_pk_algorithm_t pk, unsigned hash, unsigned bits)
 		vflags |= GNUTLS_VERIFY_ALLOW_SIGN_WITH_SHA1;
 	} else if (hash == GNUTLS_DIG_SHA256)
 		hash_data = &sha256_data;
-	else if (hash == GNUTLS_DIG_GOSTR_94)
+	else if (hash == GNUTLS_DIG_GOSTR_94) {
 		hash_data = &gostr94_data;
-	else if (hash == GNUTLS_DIG_STREEBOG_256)
+		vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
+	} else if (hash == GNUTLS_DIG_STREEBOG_256)
 		hash_data = &streebog256_data;
 	else if (hash == GNUTLS_DIG_STREEBOG_512)
 		hash_data = &streebog512_data;

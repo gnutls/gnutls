@@ -210,12 +210,16 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub = NULL;
 	char param_name[32];
+	unsigned vflags = 0;
 
 	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
 	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512) {
 		snprintf(param_name, sizeof(param_name), "%s",
 			 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
 						   (bits)));
+
+		if (sigalgo == GNUTLS_SIGN_GOST_94)
+			vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
 	} else {
 		snprintf(param_name, sizeof(param_name), "%u", bits);
 	}
@@ -267,7 +271,7 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	}
 
 	ret =
-	    gnutls_pubkey_verify_data2(pub, sigalgo, 0,
+	    gnutls_pubkey_verify_data2(pub, sigalgo, vflags,
 				       &signed_data, &sig);
 	if (ret < 0) {
 		ret = GNUTLS_E_SELF_TEST_ERROR;
@@ -276,7 +280,7 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	}
 
 	ret =
-	    gnutls_pubkey_verify_data2(pub, sigalgo, 0,
+	    gnutls_pubkey_verify_data2(pub, sigalgo, vflags,
 				       &bad_data, &sig);
 
 	if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED) {
@@ -426,12 +430,15 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	gnutls_pubkey_t pub = NULL;
 	gnutls_privkey_t key;
 	char param_name[32];
+	unsigned vflags = 0;
 
 	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
 	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512) {
 		snprintf(param_name, sizeof(param_name), "%s",
 			 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
 						   (bits)));
+		if (dig == GNUTLS_DIG_GOSTR_94)
+			vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
 	} else {
 		snprintf(param_name, sizeof(param_name), "%u", bits);
 	}
@@ -503,7 +510,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	}
 
 	ret =
-	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), 0,
+	    gnutls_pubkey_verify_data2(pub, gnutls_pk_to_sign(pk, dig), vflags,
 				       &signed_data, &ssig);
 	if (ret < 0) {
 		ret = GNUTLS_E_SELF_TEST_ERROR;

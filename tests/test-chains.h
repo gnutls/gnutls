@@ -4153,8 +4153,10 @@ static struct
   { "rsa pss: chain with changing hashes - ok", rsa_pss_chain_sha512_sha384_sha256_ok, &rsa_pss_chain_sha512_sha384_sha256_ok[3], 0, 0, 0, 1501159136},
   { "no subject id: chain with missing subject id, but valid auth id - ok", chain_with_no_subject_id_in_ca_ok, &chain_with_no_subject_id_in_ca_ok[4], 0, 0, 0, 1537518468},
 #ifdef ENABLE_GOST
-  { "gost 34.10-01 - ok", gost01, &gost01[2], 0, 0, 0, 1466612070, 1},
-  { "gost 34.10-01 - not ok (due to profile)", gost01, &gost01[2], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA),
+  { "gost 34.10-01 - ok", gost01, &gost01[2], GNUTLS_VERIFY_ALLOW_BROKEN, 0, 0, 1466612070, 1},
+  { "gost 34.10-01 - not ok (due to gostr94)", gost01, &gost01[2], 0,
+    GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1466612070, 1},
+  { "gost 34.10-01 - not ok (due to profile)", gost01, &gost01[2], GNUTLS_VERIFY_ALLOW_BROKEN|GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA),
     GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1466612070, 1},
   { "gost 34.10-12-256 - ok", gost12_256, &gost12_256[0], 0, 0, 0, 1466612070, 1},
   { "gost 34.10-12-512 - ok", gost12_512, &gost12_512[0], 0, 0, 0, 1466612070, 1},
