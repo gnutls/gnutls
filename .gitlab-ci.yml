@@ -82,6 +82,7 @@ doc-dist.Fedora:
   - make distcheck
   tags:
   - shared
+  - linux
   except:
   - tags
   retry: 1
@@ -103,6 +104,7 @@ abi/coverage:
   - make local-code-coverage-output || true
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -145,6 +147,7 @@ minimal.Fedora.x86_64:
   - make -j$(nproc) check
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -173,6 +176,7 @@ SSL-3.0.Fedora.x86_64:
   - cd ..
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -202,6 +206,7 @@ FIPS140-2.Fedora.x86_64:
   - cd ..
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -224,6 +229,7 @@ valgrind.Fedora.x86_64:
   - make check -j$(nproc)
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -246,6 +252,7 @@ threadsan.Fedora.x86_64:
   - make -C tests check -j$(nproc) SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -279,6 +286,7 @@ static-analyzers.Fedora.x86_64:
   - /bin/true
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -322,6 +330,7 @@ MinGW32.DLLs:
   tags:
   - shared
   - docker
+  - linux
   only:
   - tags
   artifacts:
@@ -362,6 +371,7 @@ MinGW64.DLLs:
   tags:
   - shared
   - docker
+  - linux
   only:
   - tags
   artifacts:
@@ -392,6 +402,7 @@ MinGW64:
   tags:
   - shared
   - docker
+  - linux
   except:
   - tags
   artifacts:
@@ -421,6 +432,7 @@ MinGW32:
   tags:
   - shared
   - docker
+  - linux
   except:
   - tags
   artifacts:
@@ -487,6 +499,7 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
   - make check -j$(nproc) -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -515,6 +528,7 @@ Debian.x86_64:
   - cd ..
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
@@ -554,6 +568,7 @@ Debian.cross.i686-linux-gnu:
   tags:
   - shared
   - docker
+  - linux
   except:
   - tags
   artifacts:
@@ -593,6 +608,7 @@ Debian.cross.i686-linux-gnu:
   tags:
   - shared
   - docker
+  - linux
   except:
   - tags
   artifacts:
@@ -633,6 +649,7 @@ nettle-master.Fedora:
   - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$(nproc) check
   tags:
   - shared
+  - linux
   except:
   - tags
   artifacts:
