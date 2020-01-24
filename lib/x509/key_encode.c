@@ -572,6 +572,10 @@ _gnutls_x509_write_gost_params(const gnutls_pk_params_st * params,
 		  params->curve == GNUTLS_ECC_CURVE_GOST256CPXA ||
 		  params->curve == GNUTLS_ECC_CURVE_GOST256CPXB))
 		oid = HASH_OID_STREEBOG_256;
+	else if (params->algo == GNUTLS_PK_GOST_12_512 &&
+		 (params->curve == GNUTLS_ECC_CURVE_GOST512A ||
+		  params->curve == GNUTLS_ECC_CURVE_GOST512B))
+		oid = HASH_OID_STREEBOG_512;
 	else
 		oid = NULL;
 
