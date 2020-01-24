@@ -98,6 +98,7 @@
 #define SIG_RSA_SHA3_512_OID "2.16.840.1.101.3.4.3.16"
 
 #define SIG_EDDSA_SHA512_OID "1.3.101.112"
+#define SIG_ED448_OID "1.3.101.113"
 
 #define XMPP_OID "1.3.6.1.5.5.7.8.5"
 #define KRB5_PRINCIPAL_OID "1.3.6.1.5.2.2"

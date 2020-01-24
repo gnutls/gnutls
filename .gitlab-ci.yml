@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver13"
+  key: "$CI_JOB_NAME-ver14"
   paths:
     - cache/
 
@@ -33,7 +33,7 @@ variables:
   FEDORA_BUILD: buildenv-fedora31
   MINGW_BUILD: buildenv-mingw
   ALPINE_BASE_BUILD: buildenv-alpine-base
-  CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions --template='{id}:{file}:{line},{severity},{message}'"
+  CPPCHECK_OPTIONS: "--enable=warning --enable=style --enable=performance --enable=portability --std=c99 --suppressions-list=devel/cppcheck.suppressions -i lib/nettle/curve448 --template='{id}:{file}:{line},{severity},{message}'"
   GET_SOURCES_ATTEMPTS: "3"
 
 ##################################################
@@ -298,6 +298,7 @@ MinGW32.DLLs:
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
+  - export WINEPATH=/usr/i686-w64-mingw32/sys-root/mingw/bin
   - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
   - mingw32-make -j$(nproc)
   - mingw32-make -C tests check -j$(nproc)
@@ -337,6 +338,7 @@ MinGW64.DLLs:
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
   - dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
   - mingw64-make -j$(nproc)
   - mingw64-make -C tests check -j$(nproc)
@@ -374,6 +376,7 @@ MinGW64:
   script:
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
   - mkdir -p build
@@ -406,6 +409,7 @@ MinGW32:
   script:
   - ./bootstrap
   - export CC="ccache i686-w64-mingw32-gcc"
+  - export WINEPATH=/usr/i686-w64-mingw32/sys-root/mingw/bin
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
   - mkdir -p build
@@ -436,7 +440,8 @@ FreeBSD.x86_64:
   script:
   - export CC="ccache clang"
   - ./bootstrap
-  - LIBS="-L/usr/local/lib" ./configure --disable-full-test-suite
+  - export LDFLAGS="-L/usr/local/lib"
+  - ./configure --disable-full-test-suite
     --cache-file cache/config.cache --disable-gcc-warnings --disable-guile --disable-doc
   - gmake -j$(sysctl hw.ncpu | awk '{print $2}')
   - gmake check -j$(sysctl hw.ncpu | awk '{print $2}')
@@ -609,3 +614,34 @@ Debian.cross.mips-linux-gnu:
 
 Debian.cross.aarch64-linux-gnu:
   <<: *Debian_cross_template
+
+nettle-master.Fedora:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$FEDORA_BUILD
+  script:
+  - git clone --depth 1 --branch master https://gitlab.com/gnutls/nettle.git nettle-git
+  - export NETTLE_DIR=${PWD}/nettle
+  - pushd nettle-git
+  - ./.bootstrap
+  - ./configure --disable-documentation --prefix=$NETTLE_DIR
+  - make -j$(nproc)
+  - make -j$(nproc) install
+  - popd
+  - SUBMODULE_NOFETCH=1 ./bootstrap
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-doc --disable-guile --disable-gost
+  - make -j$(nproc)
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$(nproc) check
+  tags:
+  - shared
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - ./*.log
+      - fuzz/*.log
+      - tests/*.log
+      - tests/*/*.log
+      - tests/suite/*/*.log
+  retry: 1

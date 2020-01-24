@@ -150,7 +150,8 @@ _gnutls_x509_write_eddsa_pubkey(const gnutls_pk_params_st * params,
 	if (params->raw_pub.size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (params->curve != GNUTLS_ECC_CURVE_ED25519)
+	if (params->curve != GNUTLS_ECC_CURVE_ED25519 &&
+	    params->curve != GNUTLS_ECC_CURVE_ED448)
 		return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
 	ret = _gnutls_set_datum(raw, params->raw_pub.data, params->raw_pub.size);
@@ -252,6 +253,7 @@ _gnutls_x509_write_pubkey_params(const gnutls_pk_params_st * params,
 	case GNUTLS_PK_ECDSA:
 		return _gnutls_x509_write_ecc_params(params->curve, der);
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		der->data = NULL;
 		der->size = 0;
 
@@ -278,6 +280,7 @@ _gnutls_x509_write_pubkey(const gnutls_pk_params_st * params,
 	case GNUTLS_PK_ECDSA:
 		return _gnutls_x509_write_ecc_pubkey(params, der);
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		return _gnutls_x509_write_eddsa_pubkey(params, der);
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
@@ -1031,6 +1034,7 @@ int _gnutls_asn1_encode_privkey(ASN1_TYPE * c2,
 		return _gnutls_asn1_encode_dsa(c2, params);
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		return _gnutls_asn1_encode_ecc(c2, params);
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:

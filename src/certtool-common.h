@@ -90,7 +90,7 @@ void switch_to_pkcs8_when_needed(common_info_st *cinfo, gnutls_x509_privkey_t ke
 	if (cinfo->pkcs8)
 		return;
 
-	if (key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519 ||
+	if (key_type == GNUTLS_PK_RSA_PSS || key_type == GNUTLS_PK_EDDSA_ED25519 || key_type == GNUTLS_PK_EDDSA_ED448 ||
 	    key_type == GNUTLS_PK_GOST_01 || key_type == GNUTLS_PK_GOST_12_256 ||
 	    key_type == GNUTLS_PK_GOST_12_512) {
 		if (cinfo->verbose)

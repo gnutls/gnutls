@@ -1406,6 +1406,7 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 		break;
 
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 	case GNUTLS_PK_ECDSA:
 		{
 			gnutls_datum_t x, y;

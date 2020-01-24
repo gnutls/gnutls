@@ -61,6 +61,7 @@ unsigned pubkey_to_bits(const gnutls_pk_params_st * params)
 		return _gnutls_mpi_get_nbits(params->params[DSA_P]);
 	case GNUTLS_PK_ECDSA:
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 	case GNUTLS_PK_GOST_01:
 	case GNUTLS_PK_GOST_12_256:
 	case GNUTLS_PK_GOST_12_512:
@@ -313,6 +314,12 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 	case GNUTLS_PK_EDDSA_ED25519:
 		if (hash)
 			*hash = GNUTLS_DIG_SHA512;
+
+		ret = 0;
+		break;
+	case GNUTLS_PK_EDDSA_ED448:
+		if (hash)
+			*hash = GNUTLS_DIG_SHAKE_256;
 
 		ret = 0;
 		break;
@@ -891,7 +898,8 @@ gnutls_pubkey_export_ecc_raw2(gnutls_pubkey_t key,
 	if (curve)
 		*curve = key->params.curve;
 
-	if (key->params.algo == GNUTLS_PK_EDDSA_ED25519) {
+	if (key->params.algo == GNUTLS_PK_EDDSA_ED25519 ||
+	    key->params.algo == GNUTLS_PK_EDDSA_ED448) {
 		if (x) {
 			ret = _gnutls_set_datum(x, key->params.raw_pub.data, key->params.raw_pub.size);
 			if (ret < 0)
@@ -1429,7 +1437,16 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 			goto cleanup;
 		}
 
-		key->params.algo = GNUTLS_PK_EDDSA_ED25519;
+		switch (curve) {
+		case GNUTLS_ECC_CURVE_ED25519:
+			key->params.algo = GNUTLS_PK_EDDSA_ED25519;
+			break;
+		case GNUTLS_ECC_CURVE_ED448:
+			key->params.algo = GNUTLS_PK_EDDSA_ED448;
+			break;
+		default:
+			break;
+		}
 		key->params.curve = curve;
 		key->bits = pubkey_to_bits(&key->params);
 
@@ -2232,6 +2249,7 @@ pubkey_verify_data(const gnutls_sign_entry_st *se,
 		break;
 
 	case GNUTLS_PK_EDDSA_ED25519:
+	case GNUTLS_PK_EDDSA_ED448:
 		if (_gnutls_pk_verify(se->pk, data, signature, params, sign_params) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_PK_SIG_VERIFY_FAILED;
