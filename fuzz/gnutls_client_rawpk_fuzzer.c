@@ -54,13 +54,7 @@
 
 int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
-	(void) kEd25519PrivateKeyDER;
-	(void) kEd25519CertificateDER;
-	(void) kECDSAPrivateKeyDER;
-	(void) kECDSACertificateDER;
-	(void) kRSAPrivateKeyDER;
-	(void) kRSACertificateDER;
-
+	IGNORE_CERTS;
 	int res;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t rawpk_cred;
