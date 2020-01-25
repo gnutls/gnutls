@@ -109,19 +109,33 @@ static const struct ecc_curve _gnutls_gost_256cpa =
   ECC_PIPPENGER_K,
   ECC_PIPPENGER_C,
 
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  ECC_ADD_JJA_ITCH (ECC_LIMB_SIZE),
+#endif
   ECC_ADD_JJJ_ITCH (ECC_LIMB_SIZE),
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  ECC_DUP_JJ_ITCH (ECC_LIMB_SIZE),
+#endif
   ECC_MUL_A_ITCH (ECC_LIMB_SIZE),
   ECC_MUL_G_ITCH (ECC_LIMB_SIZE),
   ECC_J_TO_A_ITCH (ECC_LIMB_SIZE),
 
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  ecc_add_jja,
+#endif
   ecc_add_jjj,
+#ifdef HAVE_NETTLE_CURVE448_MUL
+  ecc_dup_jj,
+#endif
   ecc_mul_a,
   ecc_mul_g,
   ecc_j_to_a,
 
   ecc_b,
   ecc_g,
+#ifndef HAVE_NETTLE_CURVE448_MUL
   NULL,
+#endif
   ecc_unit,
   ecc_table
 };
