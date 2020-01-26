@@ -48,10 +48,10 @@ KEY1=${srcdir}/tls-fuzzer/tlslite-ng/tests/serverX509Key.pem
 CERT1=${srcdir}/tls-fuzzer/tlsfuzzer/tests/serverX509Cert.pem 
 
 #create links necessary for tlslite to function
-pushd "${srcdir}/tls-fuzzer/tlsfuzzer"
-test -L ecdsa || ln -s ../python-ecdsa/src/ecdsa ecdsa
-test -L tlslite || ln -s ../tlslite-ng/tlslite tlslite 2>/dev/null
-popd
+test -L "${srcdir}/tls-fuzzer/tlsfuzzer/ecdsa" || \
+	ln -s ../python-ecdsa/src/ecdsa "${srcdir}/tls-fuzzer/tlsfuzzer/"
+test -L "${srcdir}/tls-fuzzer/tlsfuzzer/tlslite" || \
+	ln -s ../tlslite-ng/tlslite  "${srcdir}/tls-fuzzer/tlsfuzzer/"
 
 echo "Checking whether receiving 1 ticket succeeds (sanity)"
 
