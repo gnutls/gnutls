@@ -21,7 +21,7 @@
 srcdir="${srcdir:-.}"
 
 tls_fuzzer_prepare() {
-PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1"
+PRIORITY="NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2:+VERS-TLS1.1:+AES-128-CCM:+AES-256-CCM:+AES-128-CCM-8"
 
 sed -e "s|@SERVER@|$SERV|g" -e "s/@PORT@/$PORT/g" -e "s/@PRIORITY@/$PRIORITY/g" ../gnutls-nocert-tls13.json >${TMPFILE}
 }
