@@ -18,6 +18,15 @@ before_script:
   - export CCACHE_DIR=${PWD}/cache
   - export CC="ccache gcc"
 
+# With just one virtual core, parallel builds only make sense when
+# I/O wait is involved. If too many parallel builds are used, the overall
+# time even increases (e.g. due to more cache misses).
+# $BUILDJOBS seems to be best with $(nproc)+1, while $CHECKJOBS can be much
+# higher because several tests have a large I/O waiting time.
+# The numbers are hard-coded since FreeBSD doesn't know the nproc command.
+  - export BUILDJOBS=2
+  - export CHECKJOBS=16
+
 after_script:
   # somehow after_script looses environment
   - export CCACHE_BASEDIR=${PWD}
@@ -69,17 +78,17 @@ doc-dist.Fedora:
   - guile_snarf=/usr/bin/guile-snarf2.2
   - export GUILE GUILD guile_snarf
   - CFLAGS="-std=c99 -O2 -g" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache --prefix=/usr --libdir=/usr/lib64 --disable-cxx --disable-non-suiteb-curves --enable-gtk-doc --disable-maintainer-mode
-  - make -C doc stamp-vti
-  - make -C doc stamp-1
-  - make -C doc stamp_enums
-  - make -j$(nproc)
-  - make -C doc gnutls.html
-  - make -C doc/latex gnutls.pdf
+  - make -j$BUILDJOBS -C doc stamp-vti
+  - make -j$BUILDJOBS -C doc stamp-1
+  - make -j$BUILDJOBS -C doc stamp_enums
+  - make -j$BUILDJOBS
+  - make -j$BUILDJOBS -C doc gnutls.html
+  - make -j$BUILDJOBS -C doc/latex gnutls.pdf
   - DB2EPUBDIR=$(dirname $(find /usr/share/sgml/docbook/xsl-ns-stylesheets-*/epub/bin/ -name dbtoepub -print))
   - PATH="$PATH:$DB2EPUBDIR" make -C doc gnutls.epub
 # check whether distribution with or without included libopts is ok
-  - make distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-local-libopts --disable-tests"
-  - make distcheck
+  - make -j$CHECKJOBS distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-local-libopts --disable-tests"
+  - make -j$CHECKJOBS distcheck
   tags:
   - shared
   - linux
@@ -97,10 +106,10 @@ abi/coverage:
   - guile_snarf=/usr/bin/guile-snarf2.2
   - export GUILE GUILD guile_snarf
   - CFLAGS="-g -Og" dash ./configure --disable-gcc-warnings --cache-file cache/config.cache  --prefix=/usr --libdir=/usr/lib64 --enable-code-coverage --disable-maintainer-mode --disable-doc
-  - make -j$(nproc)
+  - make -j$BUILDJOBS
   - make abi-check
   - make pic-check
-  - make -j$(nproc) check
+  - make -j$CHECKJOBS check
   - make local-code-coverage-output || true
   tags:
   - shared
@@ -128,8 +137,8 @@ minimal.Fedora.x86_64:
   - echo "No tools build"
   - ./bootstrap
   - dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-full-test-suite --disable-doc --disable-guile --disable-tools --enable-tests
-  - make -j$(nproc)
-  - make -j$(nproc) check
+  - make -j$BUILDJOBS
+  - make -j$CHECKJOBS check
   - echo "Minimal build"
   - dnf remove -y libunistring-devel libtasn1-devel libidn-devel
   - dash ./configure --cache-file cache/config.cache --with-included-libtasn1
@@ -143,8 +152,8 @@ minimal.Fedora.x86_64:
     --disable-gost
     --disable-guile
   - make clean
-  - make -j$(nproc)
-  - make -j$(nproc) check
+  - make -j$BUILDJOBS
+  - make -j$CHECKJOBS check
   tags:
   - shared
   - linux
@@ -171,8 +180,8 @@ SSL-3.0.Fedora.x86_64:
   - mkdir -p build
   - cd build
   - dash ../configure --disable-tls13-interop --disable-gcc-warnings --cache-file ../cache/config.cache --enable-sha1-support --enable-ssl3-support --enable-seccomp-tests --disable-doc --disable-guile --disable-strict-der-time
-  - make -j$(nproc)
-  - make check -j$(nproc)
+  - make -j$BUILDJOBS
+  - make -j$CHECKJOBS check
   - cd ..
   tags:
   - shared
@@ -198,11 +207,11 @@ FIPS140-2.Fedora.x86_64:
   - mkdir -p build
   - cd build
   - dash ../configure --disable-gcc-warnings --cache-file ../cache/config.cache --disable-non-suiteb-curves --enable-fips140-mode --disable-doc --disable-full-test-suite --disable-guile
-  - make -j$(nproc)
-  - make check -j$(nproc)
+  - make -j$BUILDJOBS
+  - make -j$CHECKJOBS check
   - mkdir -p lib/.libs/fipscheck
   - fipshmac -d lib/.libs/fipscheck/ -s .hmac lib/.libs/libgnutls.so*
-  - GNUTLS_FORCE_FIPS_MODE=1 make check -j$(nproc)
+  - GNUTLS_FORCE_FIPS_MODE=1 make -j$CHECKJOBS check
   - cd ..
   tags:
   - shared
@@ -225,8 +234,8 @@ valgrind.Fedora.x86_64:
   - ./bootstrap
 # gcc in fedora31 inlines strcmp in a way that causes valgrind errors
   - CFLAGS="-O2 -g -fno-builtin-strcmp" ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-guile --disable-full-test-suite --enable-valgrind-tests
-  - make -j$(nproc)
-  - make check -j$(nproc)
+  - make -j$BUILDJOBS
+  - make -j$CHECKJOBS check
   tags:
   - shared
   - linux
@@ -248,8 +257,8 @@ threadsan.Fedora.x86_64:
   - ./bootstrap
   - CFLAGS="-fsanitize=thread -g -O2" CXXFLAGS=$CFLAGS
     dash ./configure --disable-gcc-warnings --disable-doc --cache-file cache/config.cache --disable-non-suiteb-curves --disable-guile --enable-fips140-mode --disable-full-test-suite
-  - make -j$(nproc)
-  - make -C tests check -j$(nproc) SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
+  - make -j$BUILDJOBS
+  - make -j$CHECKJOBS -C tests check SUBDIRS=. TESTS="tls-pthread dtls-pthread fips-mode-pthread rng-pthread" TSAN_OPTIONS="suppressions=$(pwd)/devel/tsan.supp" GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS=1 GNUTLS_FORCE_FIPS_MODE=1
   tags:
   - shared
   - linux
@@ -274,14 +283,14 @@ static-analyzers.Fedora.x86_64:
   script:
   - ./bootstrap
   - scan-build ./configure --cache-file cache/config.cache --disable-doc --disable-guile --enable-fips140-mode
-  - make -j$(nproc) syntax-check gnulib_dir=$GNULIB_SRCDIR
-  - make -j$(nproc) -C gl
-  - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C lib
-  - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C libdane
-  - make -j$(nproc) -C src/gl
-  - scan-build --status-bugs -o scan-build-lib make -j$(nproc) -C src
-  - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -j$(nproc) $CPPCHECK_OPTIONS
-  - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j$(nproc) $CPPCHECK_OPTIONS
+  - make -j$BUILDJOBS syntax-check gnulib_dir=$GNULIB_SRCDIR
+  - make -j$BUILDJOBS -C gl
+  - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C lib
+  - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C libdane
+  - make -j$BUILDJOBS -C src/gl
+  - scan-build --status-bugs -o scan-build-lib make -j$BUILDJOBS -C src
+  - cppcheck --force -q -Ilib/include -Igl/ -Ilib/ -I. --error-exitcode=1 lib/ -i lib/unistring -i lib/minitasn1 -i lib/nettle/backport -j2 $CPPCHECK_OPTIONS
+  - cppcheck --force -q -Ilib/include -Igl/ -Ilibdane/ -I. --error-exitcode=1 libdane/ -j2 $CPPCHECK_OPTIONS
   after_script:
   - /bin/true
   tags:
@@ -308,8 +317,8 @@ MinGW32.DLLs:
   - export CC="ccache i686-w64-mingw32-gcc"
   - export WINEPATH=/usr/i686-w64-mingw32/sys-root/mingw/bin
   - dash ./configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-nls --disable-guile --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
-  - mingw32-make -j$(nproc)
-  - mingw32-make -C tests check -j$(nproc)
+  - mingw32-make -j$BUILDJOBS
+  - mingw32-make -j$BUILDJOBS -C tests check
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
 #libffi is required by libp11-kit
@@ -349,8 +358,8 @@ MinGW64.DLLs:
   - export CC="ccache x86_64-w64-mingw32-gcc"
   - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
   - dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
-  - mingw64-make -j$(nproc)
-  - mingw64-make -C tests check -j$(nproc)
+  - mingw64-make -j$BUILDJOBS
+  - mingw64-make -j$BUILDJOBS -C tests check
 # Combine generated apps and DLLs.
 #libwinpthread is required by libgcc
 #libffi is required by libp11-kit
@@ -393,9 +402,9 @@ MinGW64:
   - cd build
   - dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc
   # generate the certtool autogen file to check whether later compilation will modify it
-  - mingw64-make -C src certtool-args.c.bak
-  - mingw64-make -j$(nproc)
-  - mingw64-make -C tests check -j$(nproc)
+  - mingw64-make -j$BUILDJOBS -C src certtool-args.c.bak
+  - mingw64-make -j$BUILDJOBS
+  - mingw64-make -j$CHECKJOBS -C tests check
   - cd ..
   # since we use --enable-local-libopts the generated files must equal the .bak
   - cmp build/src/certtool-args.c build/src/certtool-args.c.bak || false
@@ -426,8 +435,8 @@ MinGW32:
   - mkdir -p build
   - cd build
   - dash ../configure --disable-gcc-warnings --host=i686-w64-mingw32 --target=i686-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc
-  - mingw32-make -j$(nproc)
-  - mingw32-make -C tests check -j$(nproc)
+  - mingw32-make -j$BUILDJOBS
+  - mingw32-make -j$CHECKJOBS -C tests check
   - cd ..
   tags:
   - shared
@@ -484,19 +493,21 @@ UB+ASAN-Werror.Fedora.x86_64.gcc:
   - export CXXFLAGS="$CFLAGS"
   - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration
   - sed -i 's/-Werror/-Wno-parentheses -Werror/g' src/Makefile
-  - make -j$(nproc)
-  - make check -j$(nproc) -C fuzz
-  - make check -j$(nproc) -C fuzz GNUTLS_CPUID_OVERRIDE=0x1
-  - make check -j$(nproc) -C fuzz GNUTLS_CPUID_OVERRIDE=0x2
-  - make check -j$(nproc) -C fuzz GNUTLS_CPUID_OVERRIDE=0x4
-  - make check -j$(nproc) -C fuzz GNUTLS_CPUID_OVERRIDE=0x8
-  - make check -j$(nproc) -C fuzz GNUTLS_CPUID_OVERRIDE=0x20
-  - make check -j$(nproc) -C tests
+  - make -j$BUILDJOBS
+  # Use $BUILDJOBS since the fuzzers should use mainly CPU (no blocking I/O)
+  - make -j$BUILDJOBS check -C fuzz
+  - make -j$BUILDJOBS check -C fuzz GNUTLS_CPUID_OVERRIDE=0x1
+  - make -j$BUILDJOBS check -C fuzz GNUTLS_CPUID_OVERRIDE=0x2
+  - make -j$BUILDJOBS check -C fuzz GNUTLS_CPUID_OVERRIDE=0x4
+  - make -j$BUILDJOBS check -C fuzz GNUTLS_CPUID_OVERRIDE=0x8
+  - make -j$BUILDJOBS check -C fuzz GNUTLS_CPUID_OVERRIDE=0x20
+  - make -j$CHECKJOBS check -C tests
   - dash ./configure --cache-file cache/config.cache --disable-guile --disable-doc --disable-hardware-acceleration --with-default-trust-store-pkcs11="pkcs11:" --with-system-priority-file=/etc/crypto-policies/back-ends/gnutls.config --with-default-priority-string=@SYSTEM
   - make clean
   - sed -i 's/-Werror/-Wno-parentheses -Werror/g' src/Makefile
-  - make -j$(nproc)
-  - make check -j$(nproc) -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
+  - make -j$BUILDJOBS
+  # Use $BUILDJOBS since most of the job is building all tests, then just running 4 tests
+  - make -j$BUILDJOBS check -C tests TESTS="trust-store p11-kit-load.sh priority-init2 set-default-prio" SUBDIRS=.
   tags:
   - shared
   - linux
@@ -523,8 +534,8 @@ Debian.x86_64:
   - mkdir -p build
   - cd build
   - dash ../configure --enable-oldgnutls-interop --disable-gcc-warnings --cache-file ../cache/config.cache --disable-doc --disable-guile LDFLAGS='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now'
-  - make -j$(nproc)
-  - make check -j$(nproc)
+  - make -j$BUILDJOBS
+  - make -j$CHECKJOBS check
   - cd ..
   tags:
   - shared
@@ -561,9 +572,10 @@ Debian.cross.i686-linux-gnu:
   - dash ../configure --build=$build --host=$host --disable-gcc-warnings
       --cache-file ../cache/config.cache --disable-doc --disable-guile
       --without-p11-kit --disable-full-test-suite
-  - make -j$(nproc)
+  - make -j$BUILDJOBS
   - make pic-check
-  - make check -j$(nproc)
+  # Parallel tests cause random failures, likely timing errors
+  - make -j1 check
   - cd ..
   tags:
   - shared
@@ -602,8 +614,9 @@ Debian.cross.i686-linux-gnu:
   - dash ../configure --build=$build --host=$host --disable-gcc-warnings
       --cache-file ../cache/config.cache --disable-doc --disable-guile
       --without-p11-kit --disable-full-test-suite
-  - make -j$(nproc)
-  - make check -j$(nproc)
+  - make -j$BUILDJOBS
+  # Parallel tests cause random failures, likely timing errors
+  - make -j1 check
   - cd ..
   tags:
   - shared
@@ -640,13 +653,13 @@ nettle-master.Fedora:
   - pushd nettle-git
   - ./.bootstrap
   - ./configure --disable-documentation --prefix=$NETTLE_DIR
-  - make -j$(nproc)
-  - make -j$(nproc) install
+  - make -j$BUILDJOBS
+  - make -j$BUILDJOBS install
   - popd
   - SUBMODULE_NOFETCH=1 ./bootstrap
   - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig dash ./configure --cache-file cache/config.cache --disable-gcc-warnings --disable-doc --disable-guile
-  - make -j$(nproc)
-  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$(nproc) check
+  - make -j$BUILDJOBS
+  - PKG_CONFIG_PATH=$NETTLE_DIR/lib64/pkgconfig LD_LIBRARY_PATH=$NETTLE_DIR/lib64 make -j$CHECKJOBS check
   tags:
   - shared
   - linux
