@@ -867,6 +867,9 @@ _gnutls_pkcs12_gost_string_to_key(gnutls_mac_algorithm_t algo,
 	size_t temp_len = sizeof(temp);
 	unsigned int pass_len = 0;
 
+	if (iter == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	if (pass)
 		pass_len = strlen(pass);
 
