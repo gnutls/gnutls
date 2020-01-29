@@ -660,6 +660,15 @@ AC_CHECK_FUNCS([nettle_curve448_mul nettle_ed448_shake256_sign],
 LIBS=$save_LIBS
 AM_CONDITIONAL(NEED_CURVE448, test "$have_curve448" != "yes")
 
+have_gostdsa=yes
+save_LIBS=$LIBS
+LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS([nettle_get_gost_gc256b nettle_get_gost_gc512a nettle_gostdsa_sign], [],
+	       have_gostdsa=no)
+LIBS=$save_LIBS
+AS_IF([test "$have_gostdsa" != "yes"], AC_DEFINE([NEED_GOSTDSA], 1, [Use backported GOST R 34.10 DSA support]))
+AM_CONDITIONAL(NEED_GOSTDSA, [test "$have_gostdsa" != "yes"])
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],

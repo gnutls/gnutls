@@ -1,5 +1,6 @@
-/* ecc-gost-curve.h
+/* gostdsa.h
 
+   Copyright (C) 2015 Dmity Eremin-Solenikov
    Copyright (C) 2013 Niels Möller
 
    This file is part of GNU Nettle.
@@ -31,31 +32,31 @@
 
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
 
-#ifndef GNUTLS_LIB_NETTLE_GOST_ECC_GOST_CURVE_H
-#define GNUTLS_LIB_NETTLE_GOST_ECC_GOST_CURVE_H
+#ifndef GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H
+#define GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H
+
+#include <nettle/ecc.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* The contents of this struct is internal. */
-struct ecc_curve;
+/* Name mangling */
+#define gostdsa_unmask_key _gnutls_gostdsa_unmask_key
+#define gostdsa_vko _gnutls_gostdsa_vko
 
-#ifndef NETTLE_PURE
-#ifdef __GNUC__
-#define NETTLE_PURE __attribute__((pure))
-#else
-#define NETTLE_PURE
-#endif
-#endif
+int
+gostdsa_unmask_key (const struct ecc_curve *ecc,
+		    mpz_t key);
 
-#define nettle_get_gost_gc256b _gnutls_get_gost_gc256b
-#define nettle_get_gost_gc512a _gnutls_get_gost_gc512a
-const struct ecc_curve * NETTLE_PURE nettle_get_gost_gc256b(void);
-const struct ecc_curve * NETTLE_PURE nettle_get_gost_gc512a(void);
+int
+gostdsa_vko(const struct ecc_scalar *key,
+	    const struct ecc_point *pub,
+	    size_t ukm_length, const uint8_t *ukm,
+	    size_t out_length, uint8_t *out);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNUTLS_LIB_NETTLE_GOST_ECC_GOST_CURVE_H */
+#endif /* GNUTLS_LIB_NETTLE_GOST_GOSTDSA2_H */

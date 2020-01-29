@@ -64,7 +64,7 @@
 #define ecc_512_modp ecc_mod
 #define ecc_512_modq ecc_mod
 
-static const struct ecc_curve _gnutls_gost_512a =
+static const struct ecc_curve _gnutls_gost_gc512a =
 {
   {
     512,
@@ -140,7 +140,7 @@ static const struct ecc_curve _gnutls_gost_512a =
   ecc_table
 };
 
-const struct ecc_curve *nettle_get_gost_512a(void)
+const struct ecc_curve *nettle_get_gost_gc512a(void)
 {
-  return &_gnutls_gost_512a;
+  return &_gnutls_gost_gc512a;
 }
