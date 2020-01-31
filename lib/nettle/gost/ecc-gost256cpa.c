@@ -64,7 +64,7 @@
 #define ecc_256_modp ecc_mod
 #define ecc_256_modq ecc_mod
 
-static const struct ecc_curve _gnutls_gost_256cpa =
+static const struct ecc_curve _gnutls_gost_gc256b =
 {
   {
     256,
@@ -140,7 +140,7 @@ static const struct ecc_curve _gnutls_gost_256cpa =
   ecc_table
 };
 
-const struct ecc_curve *nettle_get_gost_256cpa(void)
+const struct ecc_curve *nettle_get_gost_gc256b(void)
 {
-  return &_gnutls_gost_256cpa;
+  return &_gnutls_gost_gc256b;
 }

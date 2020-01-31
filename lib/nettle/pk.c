@@ -57,8 +57,13 @@
 #include <nettle/eddsa.h>
 #include <nettle/version.h>
 #if ENABLE_GOST
+#if NEED_GOSTDSA
 #include "gost/gostdsa.h"
 #include "gost/ecc-gost-curve.h"
+#else
+#include <nettle/gostdsa.h>
+#endif
+#include "gost/gostdsa2.h"
 #endif
 #include "int/ecdsa-compute-k.h"
 #include "int/dsa-compute-k.h"
@@ -1499,13 +1504,11 @@ static inline const struct ecc_curve *get_supported_gost_curve(int curve)
 	switch (curve) {
 #if ENABLE_GOST
 	case GNUTLS_ECC_CURVE_GOST256CPA:
-		return nettle_get_gost_256cpa();
 	case GNUTLS_ECC_CURVE_GOST256CPXA:
-		return nettle_get_gost_256cpa();
-	case GNUTLS_ECC_CURVE_GOST512A:
-		return nettle_get_gost_512a();
 	case GNUTLS_ECC_CURVE_GOST256B:
-		return nettle_get_gost_256cpa();
+		return nettle_get_gost_gc256b();
+	case GNUTLS_ECC_CURVE_GOST512A:
+		return nettle_get_gost_gc512a();
 #endif
 	default:
 		return NULL;
