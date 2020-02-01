@@ -5,30 +5,43 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.12 (unreleased)
+* Version 3.6.12 (released 2020-02-01)
 
-** libgnutls: Introduced flag of gnutls_session_get_flags() to identify
-   sessions that client request OCSP status request (#829).
+** libgnutls: Introduced TLS session flag (gnutls_session_get_flags())
+   to identify sessions that client request OCSP status request (#829).
 
-** libgnutls: Introduced the gnutls_ocsp_req_const_t which is compatible
-   with gnutls_ocsp_req_t but const.
+** libgnutls: Added support for X448 key exchange (RFC 7748) and Ed448
+   signature algorithm (RFC 8032) under TLS (#984).
+
+** libgnutls: Added the default-priority-string option to system configuration;
+   it allows overriding the compiled-in default-priority-string.
+
+** libgnutls: Added support for GOST CNT_IMIT ciphersuite (as defined by
+   draft-smyshlyaev-tls12-gost-suites-07).
+   By default this ciphersuite is disabled. It can be enabled by adding
+   +GOST to priority string. In the future this priority string may enable
+   other GOST ciphersuites as well.  Note, that server will fail to negotiate
+   GOST ciphersuites if TLS 1.3 is enabled both on a server and a client. It
+   is recommended for now to disable TLS 1.3 in setups where GOST ciphersuites
+   are enabled on GnuTLS-based servers.
+
+** libgnutls: added priority shortcuts for different GOST categories like
+   CIPHER-GOST-ALL, MAC-GOST-ALL, KX-GOST-ALL, SIGN-GOST-ALL, GROUP-GOST-ALL.
 
 ** libgnutls: Reject certificates with invalid time fields. That is we reject
    certificates with invalid characters in Time fields, or invalid time formatting
    To continue accepting the invalid form compile with --disable-strict-der-time
    (#207, #870).
 
-** libgnutls: Added support for GOST CNT_IMIT ciphersuite (as defined by
-   draft-smyshlyaev-tls12-gost-suites-06).
-   By default this ciphersuite is disabled. One has to enable it by adding
-   +GOST to priority string. It will enable this ciphersuite (and other GOST
-   ciphersuites in future).
-   Note, that server will fail to negotiate GOST ciphersuites if TLS 1.3 is
-   enabled both on a server and a client. It is recommended for now to disable
-   TLS 1.3 in setups where GOST ciphersuites are enabled on GnuTLS-based servers.
+** libgnutls: Reject certificates which contain duplicate extensions. We were
+   previously printing warnings when printing such a certificate, but that is
+   not always sufficient to flag such certificates as invalid. Instead we now
+   refuse to import them (#887).
 
-** libgnutls: Added support for X448 key exchange (RFC 7748) and Ed448
-   signature algorithm (RFC 8032) under TLS (#984).
+** libgnutls: If a CA is found in the trusted list, check in addition to
+   time validity, whether the algorithms comply to the expected level prior
+   to accepting it. This addresses the problem of accepting CAs which would
+   have been marked as insecure otherwise (#877).
 
 ** libgnutls: The min-verification-profile from system configuration applies
    for all certificate verifications, not only under TLS. The configuration can
@@ -37,22 +50,12 @@ See the end for copying conditions.
 ** libgnutls: The stapled OCSP certificate verification adheres to the convention
    used throughout the library of setting the 'GNUTLS_CERT_INVALID' flag.
 
-** libgnutls: Reject certificates which contain duplicate extensions. We were
-   previously printing warnings when printing such a certificate, but that is
-   insufficient to flag such certificates as invalid. Instead we now refuse to
-   import them (#887).
-
-** libgnutls: If a CA is found in the trusted list, check in addition to
-   time validity, whether the algorithms comply to the expected level prior
-   to accepting it. This addresses the problem of accepting CAs which would
-   have been marked as insecure otherwise (#877).
-
 ** libgnutls: On client side only send OCSP staples if they have been requested
    by the server, and on server side always advertise that we support OCSP stapling
    (#876).
 
-** libgnutls: The default-priority-string added to system configuration
-   to allow overriding compiled-in default-priority-string.
+** libgnutls: Introduced the gnutls_ocsp_req_const_t which is compatible
+   with gnutls_ocsp_req_t but const.
 
 ** certtool: Added the --verify-profile option to set a certificate
    verification profile. Use '--verify-profile low' for certificate verification
@@ -60,9 +63,6 @@ See the end for copying conditions.
 
 ** certtool: The add_extension template option is considered even when generating
    a certificate from a certificate request.
-
-** libgnutls: added priority shortcuts for different GOST categories like
-   CIPHER-GOST-ALL, MAC-GOST-ALL, KX-GOST-ALL, SIGN-GOST-ALL, GROUP-GOST-ALL.
 
 ** API and ABI modifications:
 GNUTLS_SFLAGS_CLI_REQUESTED_OCSP: Added
