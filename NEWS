@@ -11,7 +11,7 @@ See the end for copying conditions.
    to identify sessions that client request OCSP status request (#829).
 
 ** libgnutls: Added support for X448 key exchange (RFC 7748) and Ed448
-   signature algorithm (RFC 8032) under TLS (#984).
+   signature algorithm (RFC 8032) under TLS (#86).
 
 ** libgnutls: Added the default-priority-string option to system configuration;
    it allows overriding the compiled-in default-priority-string.
