@@ -36,7 +36,6 @@
 #include <num.h>
 #include <random.h>
 #include <pk.h>
-#include <nettle/pbkdf2.h>
 #include "attributes.h"
 #include "prov-seed.h"
 
