@@ -143,7 +143,8 @@ _gnutls_session_pack(gnutls_session_t session,
 		}
 		break;
 	default:
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		goto fail;
 
 	}
 
