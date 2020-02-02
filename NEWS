@@ -5,6 +5,15 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.13 (unreleased)
+
+** libgnutls: Added new APIs to access KDF algorithms (#813).
+
+** API and ABI modifications:
+gnutls_hkdf_extract: Added
+gnutls_hkdf_expand: Added
+gnutls_pbkdf2: Added
+
 * Version 3.6.12 (released 2020-02-01)
 
 ** libgnutls: Introduced TLS session flag (gnutls_session_get_flags())

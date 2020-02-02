@@ -436,6 +436,7 @@ tests/insecure_key
 tests/iov
 tests/ip-check
 tests/ip-utils
+tests/kdf-api
 tests/key-export-pkcs8
 tests/key-id/Makefile
 tests/key-id/Makefile.in
