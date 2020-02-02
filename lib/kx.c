@@ -70,6 +70,83 @@ int _gnutls_generate_master(gnutls_session_t session, int keep_premaster)
 	return 0;
 }
 
+/**
+ * gnutls_handshake_set_secret_function:
+ * @session: is #gnutls_session_t type
+ * @func: is the function to be called
+ *
+ * This function will set a callback to be called when a new secret is
+ * derived and installed during handshake.
+ *
+ * Since: 3.6.13
+ */
+void
+gnutls_handshake_set_secret_function(gnutls_session_t session,
+				     gnutls_handshake_secret_func func)
+{
+	session->internals.secret_func = func;
+}
+
+int
+_gnutls_call_secret_func(gnutls_session_t session,
+			 gnutls_handshake_secret_type_t type,
+			 const uint8_t *data,
+			 unsigned size)
+{
+	if (session->internals.secret_func) {
+		gnutls_datum_t secret = {(void*)data, size};
+		return session->internals.secret_func(session, type, &secret);
+	}
+	return 0;
+}
+
+static const char *
+secret_type_to_nss_keylog_label(gnutls_handshake_secret_type_t type)
+{
+	switch (type) {
+	case GNUTLS_SECRET_CLIENT_RANDOM:
+		return "CLIENT_RANDOM";
+	case GNUTLS_SECRET_CLIENT_EARLY_TRAFFIC_SECRET:
+		return "CLIENT_EARLY_TRAFFIC_SECRET";
+	case GNUTLS_SECRET_CLIENT_HANDSHAKE_TRAFFIC_SECRET:
+		return "CLIENT_HANDSHAKE_TRAFFIC_SECRET";
+	case GNUTLS_SECRET_SERVER_HANDSHAKE_TRAFFIC_SECRET:
+		return "SERVER_HANDSHAKE_TRAFFIC_SECRET";
+	case GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET:
+		return "CLIENT_TRAFFIC_SECRET_0";
+	case GNUTLS_SECRET_SERVER_TRAFFIC_SECRET:
+		return "SERVER_TRAFFIC_SECRET_0";
+	case GNUTLS_SECRET_EARLY_EXPORTER_SECRET:
+		return "EARLY_EXPORTER_SECRET";
+	case GNUTLS_SECRET_EXPORTER_SECRET:
+		return "EXPORTER_SECRET";
+	default:
+		gnutls_assert();
+		return NULL;
+	}
+}
+
+int
+_gnutls_nss_keylog_secret_func(gnutls_session_t session,
+			       gnutls_handshake_secret_type_t type,
+			       const gnutls_datum_t *secret)
+{
+	const char *label;
+
+	/* ignore subsequent traffic secrets that are calculated from
+	 * the previous traffic secret
+	 */
+	if (!session->internals.handshake_in_progress)
+		return 0;
+
+	label = secret_type_to_nss_keylog_label(type);
+	if (unlikely(label == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	_gnutls_nss_keylog_write(session, label, secret->data, secret->size);
+	return 0;
+}
+
 void _gnutls_nss_keylog_write(gnutls_session_t session,
 			      const char *label,
 			      const uint8_t *secret, size_t secret_size)
@@ -182,15 +259,17 @@ generate_normal_master(gnutls_session_t session,
 		gnutls_free(shash.data);
 	}
 
-	_gnutls_nss_keylog_write(session, "CLIENT_RANDOM",
-				 session->security_parameters.master_secret,
-				 GNUTLS_MASTER_SIZE);
-
 	if (!keep_premaster)
 		_gnutls_free_temp_key_datum(premaster);
 
 	if (ret < 0)
 		return ret;
+
+	ret = _gnutls_call_secret_func(session, GNUTLS_SECRET_CLIENT_RANDOM,
+				       session->security_parameters.master_secret,
+				       GNUTLS_MASTER_SIZE);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	_gnutls_hard_log("INT: MASTER SECRET[%d]: %s\n",
 			 GNUTLS_MASTER_SIZE,

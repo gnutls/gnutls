@@ -1243,6 +1243,8 @@ typedef struct {
 	unsigned int h_type;	/* the hooked type */
 	int16_t h_post;		/* whether post-generation/receive */
 
+	gnutls_handshake_secret_func secret_func;
+
 	/* holds the selected certificate and key.
 	 * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
 	 * to change them.

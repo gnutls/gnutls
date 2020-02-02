@@ -2292,6 +2292,59 @@ void gnutls_global_set_log_function(gnutls_log_func log_func);
 void gnutls_global_set_audit_log_function(gnutls_audit_log_func log_func);
 void gnutls_global_set_log_level(int level);
 
+/**
+ * gnutls_handshake_secret_type_t:
+ * @GNUTLS_SECRET_CLIENT_RANDOM: 48 bytes for the master secret (for SSL 3.0,
+ *    TLS 1.0, 1.1 and 1.2)
+ * @GNUTLS_SECRET_CLIENT_EARLY_TRAFFIC_SECRET: the early traffic secret for the
+ *    client side (for TLS 1.3)
+ * @GNUTLS_SECRET_CLIENT_HANDSHAKE_TRAFFIC_SECRET: the handshake traffic secret
+ *    for the client side (for TLS 1.3)
+ * @GNUTLS_SECRET_SERVER_HANDSHAKE_TRAFFIC_SECRET: the handshake traffic secret
+ *    for the server side (for TLS 1.3)
+ * @GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET: the application traffic secret for the
+ *    client side (for TLS 1.3)
+ * @GNUTLS_SECRET_SERVER_TRAFFIC_SECRET: the application traffic secret for the
+ *    server side (for TLS 1.3)
+ * @GNUTLS_SECRET_EARLY_EXPORTER_SECRET: the early exporter secret (for TLS 1.3,
+ *    used for 0-RTT keys).
+ * @GNUTLS_SECRET_EXPORTER_SECRET: the exporter secret (for TLS 1.3, used for
+ *    1-RTT keys)
+ *
+ * Enumeration of different types of secrets derived during handshake.
+ * This is used by gnutls_handshake_set_secret_function().
+ *
+ * Since: 3.6.13
+ */
+typedef enum {
+	GNUTLS_SECRET_CLIENT_RANDOM,
+	GNUTLS_SECRET_CLIENT_EARLY_TRAFFIC_SECRET,
+	GNUTLS_SECRET_CLIENT_HANDSHAKE_TRAFFIC_SECRET,
+	GNUTLS_SECRET_SERVER_HANDSHAKE_TRAFFIC_SECRET,
+	GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET,
+	GNUTLS_SECRET_SERVER_TRAFFIC_SECRET,
+	GNUTLS_SECRET_EARLY_EXPORTER_SECRET,
+	GNUTLS_SECRET_EXPORTER_SECRET
+} gnutls_handshake_secret_type_t;
+
+  /**
+   * gnutls_handshake_secret_function:
+   * @session: the current session
+   * @type: #gnutls_handshake_secret_type_t
+   * @secret: the (const) data of the derived secret.
+   *
+   * Function prototype for secret derivation hooks. It is set using
+   * gnutls_handshake_set_secret_function().
+   *
+   * Returns: Non zero on error.
+   * Since: 3.6.13
+   */
+typedef int (*gnutls_handshake_secret_func) (gnutls_session_t session,
+					     gnutls_handshake_secret_type_t type,
+					     const gnutls_datum_t *secret);
+void gnutls_handshake_set_secret_function(gnutls_session_t session,
+					  gnutls_handshake_secret_func func);
+
 /* Diffie-Hellman parameter handling.
  */
 int gnutls_dh_params_init(gnutls_dh_params_t * dh_params);
