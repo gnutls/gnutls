@@ -2,6 +2,7 @@ GNUTLS_3_4@GNUTLS_3_4
 GNUTLS_3_6_0@GNUTLS_3_6_0
 GNUTLS_3_6_10@GNUTLS_3_6_10
 GNUTLS_3_6_12@GNUTLS_3_6_12
+GNUTLS_3_6_13@GNUTLS_3_6_13
 GNUTLS_3_6_2@GNUTLS_3_6_2
 GNUTLS_3_6_3@GNUTLS_3_6_3
 GNUTLS_3_6_4@GNUTLS_3_6_4
@@ -285,6 +286,8 @@ gnutls_hex_decode2@GNUTLS_3_4
 gnutls_hex_decode@GNUTLS_3_4
 gnutls_hex_encode2@GNUTLS_3_4
 gnutls_hex_encode@GNUTLS_3_4
+gnutls_hkdf_expand@GNUTLS_3_6_13
+gnutls_hkdf_extract@GNUTLS_3_6_13
 gnutls_hmac@GNUTLS_3_4
 gnutls_hmac_copy@GNUTLS_3_6_9
 gnutls_hmac_deinit@GNUTLS_3_4
@@ -431,6 +434,7 @@ gnutls_openpgp_send_cert@GNUTLS_3_4
 gnutls_openpgp_set_recv_key_function@GNUTLS_3_4
 gnutls_packet_deinit@GNUTLS_3_4
 gnutls_packet_get@GNUTLS_3_4
+gnutls_pbkdf2@GNUTLS_3_6_13
 gnutls_pcert_deinit@GNUTLS_3_4
 gnutls_pcert_export_openpgp@GNUTLS_3_4
 gnutls_pcert_export_x509@GNUTLS_3_4

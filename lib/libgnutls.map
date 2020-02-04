@@ -1309,6 +1309,14 @@ GNUTLS_3_6_12
 	gnutls_hmac_get_key_size;
 } GNUTLS_3_6_10;
 
+GNUTLS_3_6_13
+{
+ global:
+	gnutls_hkdf_extract;
+	gnutls_hkdf_expand;
+	gnutls_pbkdf2;
+} GNUTLS_3_6_12;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
