@@ -166,36 +166,36 @@ _cfb_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 static void
 _gost28147_set_key_tc26z(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_TC26_Z);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpa(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_A);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpb(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_B);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpc(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_C);
+	gost28147_set_key(ctx, key);
 }
 
 static void
 _gost28147_set_key_cpd(void *ctx, const uint8_t *key)
 {
-	gost28147_set_key(ctx, key);
 	gost28147_set_param(ctx, &gost28147_param_CryptoPro_D);
+	gost28147_set_key(ctx, key);
 }
 
 static void
