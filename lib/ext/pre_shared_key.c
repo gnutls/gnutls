@@ -203,9 +203,11 @@ generate_early_secrets(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, "CLIENT_EARLY_TRAFFIC_SECRET",
-				 session->key.proto.tls13.e_ckey,
-				 prf->output_size);
+	ret = _gnutls_call_secret_func(session, GNUTLS_SECRET_CLIENT_EARLY_TRAFFIC_SECRET,
+				       session->key.proto.tls13.e_ckey,
+				       prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret = _tls13_derive_secret2(prf, EARLY_EXPORTER_MASTER_LABEL, sizeof(EARLY_EXPORTER_MASTER_LABEL)-1,
 				    session->internals.handshake_hash_buffer.data,
@@ -215,9 +217,11 @@ generate_early_secrets(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, "EARLY_EXPORTER_SECRET",
-				 session->key.proto.tls13.ap_expkey,
-				 prf->output_size);
+	ret = _gnutls_call_secret_func(session, GNUTLS_SECRET_EARLY_EXPORTER_SECRET,
+				       session->key.proto.tls13.ap_expkey,
+				       prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }

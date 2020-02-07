@@ -197,6 +197,7 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 	char buf[65];
 	record_state_st *upd_state;
 	record_parameters_st *prev = NULL;
+	gnutls_handshake_secret_type_t secret_type;
 	int ret;
 
 	/* generate new keys for direction needed and copy old from previous epoch */
@@ -274,6 +275,7 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.ap_ckey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+		secret_type = GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET;
 	} else {
 		ret = _tls13_expand_secret(session, APPLICATION_TRAFFIC_UPDATE,
 					   sizeof(APPLICATION_TRAFFIC_UPDATE)-1,
@@ -291,7 +293,13 @@ _tls13_update_keys(gnutls_session_t session, hs_stage_t stage,
 		ret = _tls13_expand_secret(session, "iv", 2, NULL, 0, session->key.proto.tls13.ap_skey, iv_size, iv_block);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+		secret_type = GNUTLS_SECRET_SERVER_TRAFFIC_SECRET;
 	}
+
+	ret = _gnutls_call_secret_func(session, secret_type,
+				       key_block, key_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	upd_state->mac_key_size = 0;
 
@@ -388,7 +396,7 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	record_state_st *client_write, *server_write;
 	const char *label;
 	unsigned label_size, hsk_len;
-	const char *keylog_label;
+	gnutls_handshake_secret_type_t secret_type;
 	void *ckey, *skey;
 	int ret;
 
@@ -404,13 +412,13 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 		label = HANDSHAKE_CLIENT_TRAFFIC_LABEL;
 		label_size = sizeof(HANDSHAKE_CLIENT_TRAFFIC_LABEL)-1;
 		hsk_len = session->internals.handshake_hash_buffer.length;
-		keylog_label = "CLIENT_HANDSHAKE_TRAFFIC_SECRET";
+		secret_type = GNUTLS_SECRET_CLIENT_HANDSHAKE_TRAFFIC_SECRET;
 		ckey = session->key.proto.tls13.hs_ckey;
 	} else {
 		label = APPLICATION_CLIENT_TRAFFIC_LABEL;
 		label_size = sizeof(APPLICATION_CLIENT_TRAFFIC_LABEL)-1;
 		hsk_len = session->internals.handshake_hash_buffer_server_finished_len;
-		keylog_label = "CLIENT_TRAFFIC_SECRET_0";
+		secret_type = GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET;
 		ckey = session->key.proto.tls13.ap_ckey;
 	}
 
@@ -422,9 +430,11 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, keylog_label,
-				 ckey,
-				 session->security_parameters.prf->output_size);
+	ret = _gnutls_call_secret_func(session, secret_type,
+				       ckey,
+				       session->security_parameters.prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	/* client keys */
 	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, ckey, key_size, ckey_block);
@@ -439,12 +449,12 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	if (stage == STAGE_HS) {
 		label = HANDSHAKE_SERVER_TRAFFIC_LABEL;
 		label_size = sizeof(HANDSHAKE_SERVER_TRAFFIC_LABEL)-1;
-		keylog_label = "SERVER_HANDSHAKE_TRAFFIC_SECRET";
+		secret_type = GNUTLS_SECRET_SERVER_HANDSHAKE_TRAFFIC_SECRET;
 		skey = session->key.proto.tls13.hs_skey;
 	} else {
 		label = APPLICATION_SERVER_TRAFFIC_LABEL;
 		label_size = sizeof(APPLICATION_SERVER_TRAFFIC_LABEL)-1;
-		keylog_label = "SERVER_TRAFFIC_SECRET_0";
+		secret_type = GNUTLS_SECRET_SERVER_TRAFFIC_SECRET;
 		skey = session->key.proto.tls13.ap_skey;
 	}
 
@@ -457,9 +467,11 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_nss_keylog_write(session, keylog_label,
-				 skey,
-				 session->security_parameters.prf->output_size);
+	ret = _gnutls_call_secret_func(session, secret_type,
+				       skey,
+				       session->security_parameters.prf->output_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret = _tls13_expand_secret(session, "key", 3, NULL, 0, skey, key_size, skey_block);
 	if (ret < 0)

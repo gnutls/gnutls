@@ -661,6 +661,7 @@ tests/safe-renegotiation/srn2
 tests/safe-renegotiation/srn3
 tests/sanity-cpp
 tests/sec-params
+tests/secret-hook
 tests/send-client-cert
 tests/send-data-befor
 tests/send-data-before-handshake
