@@ -11,6 +11,6 @@ extraction:
       - "./configure --enable-mini-gmp --disable-documentation"
       - "make"
       - "cd .."
-      - "PKG_CONFIG_PATH=\"`pwd`/nettle\" LDFLAGS=\"-L`pwd`/nettle\" ./configure --disable-tests --disable-documentation"
+      - "PKG_CONFIG_PATH=\"`pwd`/nettle\" LDFLAGS=\"-L`pwd`/nettle\" ./configure --disable-tests --disable-doc"
     index:
       build_command: "LD_LIBRARY_PATH=\"`pwd`/nettle/.lib\" make"
