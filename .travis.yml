@@ -17,7 +17,7 @@ notifications:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then
         brew update;
-        for pkg in openssl autoconf automake autogen libtool nettle p11-kit libtasn1 gettext;do
+        for pkg in openssl autoconf automake autogen libtool nettle p11-kit libtasn1 gettext bison;do
           brew install $pkg || true;
         done;
         for pkg in nettle wget p11-kit libtasn1;do
@@ -26,12 +26,14 @@ before_install:
     fi
 
 script:
-  - PATH=/usr/local/opt/gettext/bin:$PATH ./bootstrap
-  - PATH=/usr/local/opt/gettext/bin:$PATH ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-dependency-tracking
-  - make -j$(sysctl -n hw.ncpu)
+  - export PATH="/usr/local/opt/gettext/bin:$PATH"
+  - export PATH="/usr/local/opt/bison/bin:$PATH"
+  - ./bootstrap
+  - ./configure --disable-full-test-suite --disable-valgrind-tests --disable-doc --disable-guile --disable-dependency-tracking
+  - make -j$(sysctl -n hw.ncpu) || make -j$(sysctl -n hw.ncpu) V=1
   - make -j$(sysctl -n hw.ncpu) check gl_public_submodule_commit=
 
 after_failure:
   - find . -name 'test-suite.log' -execdir grep -il "FAILED" {} \; -exec echo {} \; -exec cat {} \;
   - for i in tests/*.log fuzz/*.log;do echo "" && echo $i && cat $i;done
-
+  - cat config.log
