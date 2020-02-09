@@ -358,6 +358,84 @@ static void try_save_cert(gnutls_session_t session)
 	return;
 }
 
+static void try_save_ocsp_status(gnutls_session_t session)
+{
+	unsigned int cert_num = 0;
+	gnutls_certificate_get_peers(session, &cert_num);
+	if (cert_num == 0) {
+		fprintf(stderr, "no certificates sent by server, so can't get OCSP status!\n");
+		return;
+	}
+
+	const char *path;
+	gnutls_x509_crt_fmt_t type;
+	unsigned int max_out;
+
+	/* This function is called if exactly one of SAVE_OCSP and
+	 * SAVE_OCSP_MULTI is set. */
+	if (HAVE_OPT(SAVE_OCSP))
+	{
+		path = OPT_ARG(SAVE_OCSP);
+		type = GNUTLS_X509_FMT_DER;
+		max_out = 1;
+	} else {
+		path = OPT_ARG(SAVE_OCSP_MULTI);
+		type = GNUTLS_X509_FMT_PEM;
+		max_out = cert_num;
+	}
+
+	FILE *fp = fopen(path, "w");
+	if (fp == NULL) {
+		fprintf(stderr, "could not open %s for writing\n", path);
+		exit(1);
+	}
+
+	for (unsigned int i = 0; i < max_out; i++) {
+		gnutls_datum_t oresp;
+		int ret = gnutls_ocsp_status_request_get2(session, i, &oresp);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			fprintf(stderr, "no OCSP response for certificate %u\n", i);
+			continue;
+		} else if (ret < 0) {
+			fprintf(stderr, "error getting OCSP response %u: %s\n",
+			        i, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (type == GNUTLS_X509_FMT_DER) {
+			/* on success the return value is equal to the
+			 * number of items (third parameter) */
+			if (fwrite(oresp.data, oresp.size, 1, fp) != 1) {
+				fprintf(stderr, "writing to %s failed\n", path);
+				exit(1);
+			}
+			continue;
+		}
+
+		gnutls_datum_t t;
+		ret = gnutls_pem_base64_encode_alloc("OCSP RESPONSE",
+		                                     &oresp, &t);
+		if (ret < 0) {
+			fprintf(stderr, "error allocating PEM OCSP response: %s\n",
+			        gnutls_strerror(ret));
+			exit(1);
+		}
+
+		/* on success the return value is equal to the number
+		 * of items (third parameter) */
+		if (fwrite(t.data, t.size, 1, fp) != 1) {
+			fprintf(stderr, "writing to %s failed\n", path);
+			exit(1);
+		}
+		gnutls_free(t.data);
+	}
+	if (fclose(fp) != 0) {
+		perror("failed to close OCSP save file");
+	}
+
+	return;
+}
+
 static int cert_verify_callback(gnutls_session_t session)
 {
 	int rc;
@@ -367,7 +445,6 @@ static int cert_verify_callback(gnutls_session_t session)
 	int dane = ENABLED_OPT(DANE);
 	int ca_verify = ENABLED_OPT(CA_VERIFICATION);
 	const char *txt_service;
-	gnutls_datum_t oresp;
 	const char *host;
 
 	/* On an session with TOFU the PKI/DANE verification
@@ -390,23 +467,12 @@ static int cert_verify_callback(gnutls_session_t session)
 	}
 
 #ifndef ENABLE_OCSP
-	if (HAVE_OPT(SAVE_OCSP) || HAVE_OPT(OCSP)) {
+	if (HAVE_OPT(SAVE_OCSP_MULTI) || HAVE_OPT(SAVE_OCSP) || HAVE_OPT(OCSP)) {
 		fprintf(stderr, "OCSP is not supported!\n");
 	}
 #else
-	rc = gnutls_ocsp_status_request_get(session, &oresp);
-	if (rc < 0) {
-		oresp.data = NULL;
-		oresp.size = 0;
-	}
-
-	if (HAVE_OPT(SAVE_OCSP) && oresp.data) {
-		FILE *fp = fopen(OPT_ARG(SAVE_OCSP), "w");
-
-		if (fp != NULL) {
-			fwrite(oresp.data, 1, oresp.size, fp);
-			fclose(fp);
-		}
+	if (HAVE_OPT(SAVE_OCSP_MULTI) || HAVE_OPT(SAVE_OCSP)) {
+		try_save_ocsp_status(session);
 	}
 #endif
 
