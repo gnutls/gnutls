@@ -37,23 +37,30 @@
 
 #include <nettle/ecc.h>
 
+#if HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Name mangling */
 #define gostdsa_unmask_key _gnutls_gostdsa_unmask_key
-#define gostdsa_vko _gnutls_gostdsa_vko
 
 int
 gostdsa_unmask_key (const struct ecc_curve *ecc,
 		    mpz_t key);
 
-int
-gostdsa_vko(const struct ecc_scalar *key,
+#ifndef HAVE_NETTLE_GOSTDSA_VKO
+
+#define gostdsa_vko _gnutls_gostdsa_vko
+void
+gostdsa_vko(const struct ecc_scalar *priv,
 	    const struct ecc_point *pub,
 	    size_t ukm_length, const uint8_t *ukm,
-	    size_t out_length, uint8_t *out);
+	    uint8_t *out);
+#endif
 
 #ifdef __cplusplus
 }

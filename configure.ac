@@ -663,6 +663,12 @@ AC_CHECK_FUNCS([nettle_chacha_set_counter],
 LIBS=$save_LIBS
 AM_CONDITIONAL(NEED_CHACHA, [test "$have_chacha_set_counter" != "yes"])
 
+# Check for VKO
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS $HOGWEED_LIBS"
+AC_CHECK_FUNCS(nettle_gostdsa_vko)
+LIBS=$save_LIBS
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],
