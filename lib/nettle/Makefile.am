@@ -82,10 +82,6 @@ libcrypto_la_SOURCES += \
 libcrypto_la_SOURCES += \
 	gost/bignum-le.c gost/bignum-le.h
 
-libcrypto_la_SOURCES += \
-	gost/pbkdf2-hmac-gosthash94.c gost/pbkdf2-hmac-streebog.c \
-	gost/pbkdf2-gost.h
-
 if NEED_GOSTDSA
 libcrypto_la_SOURCES += \
 	gost/nettle-internal.h \
