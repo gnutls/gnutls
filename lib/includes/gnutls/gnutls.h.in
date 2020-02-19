@@ -3183,6 +3183,55 @@ void gnutls_anti_replay_set_add_function(gnutls_anti_replay_t,
 void gnutls_anti_replay_set_ptr(gnutls_anti_replay_t, void *ptr);
 
 
+/**
+ * gnutls_record_encryption_level_t:
+ * @GNUTLS_ENCRYPTION_LEVEL_INITIAL: initial level that doesn't involve any
+ *    encryption
+ * @GNUTLS_ENCRYPTION_LEVEL_EARLY: early traffic secret is installed
+ * @GNUTLS_ENCRYPTION_LEVEL_HANDSHAKE: handshake traffic secret is installed
+ * @GNUTLS_ENCRYPTION_LEVEL_APPLICATION: application traffic secret is installed
+ *
+ * Enumeration of of different levels of record encryption currently in place.
+ * This is used by gnutls_handshake_set_read_function() and
+ * gnutls_handshake_write().
+ *
+ * Since: 3.6.14
+ */
+typedef enum {
+	GNUTLS_ENCRYPTION_LEVEL_INITIAL,
+	GNUTLS_ENCRYPTION_LEVEL_EARLY,
+	GNUTLS_ENCRYPTION_LEVEL_HANDSHAKE,
+	GNUTLS_ENCRYPTION_LEVEL_APPLICATION
+} gnutls_record_encryption_level_t;
+
+  /**
+   * gnutls_handshake_read_func:
+   * @session: the current session
+   * @htype: the type of the handshake message (#gnutls_handshake_description_t)
+   * @level: #gnutls_record_encryption_level_t
+   * @data: the (const) data that was being sent
+   * @data_size: the size of data
+   *
+   * Function prototype for handshake intercepting hooks. It is set using
+   * gnutls_handshake_set_read_function().
+   *
+   * Returns: Non zero on error.
+   * Since: 3.6.14
+   */
+typedef int (*gnutls_handshake_read_func) (gnutls_session_t session,
+					   gnutls_record_encryption_level_t level,
+					   gnutls_handshake_description_t htype,
+					   const void *data, size_t data_size);
+
+void
+gnutls_handshake_set_read_function(gnutls_session_t session,
+				   gnutls_handshake_read_func func);
+
+int
+gnutls_handshake_write(gnutls_session_t session,
+		       gnutls_record_encryption_level_t level,
+		       const void *data, size_t data_size);
+
 /* FIPS140-2 related functions */
 unsigned gnutls_fips140_mode_enabled(void);
 

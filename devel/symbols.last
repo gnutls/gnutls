@@ -11,6 +11,7 @@ GNUTLS_3_6_5@GNUTLS_3_6_5
 GNUTLS_3_6_6@GNUTLS_3_6_6
 GNUTLS_3_6_8@GNUTLS_3_6_8
 GNUTLS_3_6_9@GNUTLS_3_6_9
+GNUTLS_QUIC_3_6_13@GNUTLS_QUIC_3_6_13
 _gnutls_global_init_skip@GNUTLS_3_4
 gnutls_aead_cipher_decrypt@GNUTLS_3_4
 gnutls_aead_cipher_decryptv2@GNUTLS_3_6_10
@@ -269,7 +270,9 @@ gnutls_handshake_set_max_packet_length@GNUTLS_3_4
 gnutls_handshake_set_post_client_hello_function@GNUTLS_3_4
 gnutls_handshake_set_private_extensions@GNUTLS_3_4
 gnutls_handshake_set_random@GNUTLS_3_4
+gnutls_handshake_set_read_function@GNUTLS_QUIC_3_6_13
 gnutls_handshake_set_timeout@GNUTLS_3_4
+gnutls_handshake_write@GNUTLS_QUIC_3_6_13
 gnutls_hash@GNUTLS_3_4
 gnutls_hash_copy@GNUTLS_3_6_9
 gnutls_hash_deinit@GNUTLS_3_4

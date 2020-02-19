@@ -1330,6 +1330,13 @@ GNUTLS_3_6_14
 	gnutls_ext_get_name2;
 } GNUTLS_3_6_13;
 
+GNUTLS_QUIC_3_6_13
+{
+ global:
+	gnutls_handshake_set_read_function;
+	gnutls_handshake_write;
+} GNUTLS_3_6_13;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;

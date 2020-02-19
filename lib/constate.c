@@ -520,6 +520,10 @@ _tls13_set_keys(gnutls_session_t session, hs_stage_t stage,
 						 buf, sizeof(buf), NULL));
 	}
 
+	client_write->level = server_write->level = stage == STAGE_HS ?
+		GNUTLS_ENCRYPTION_LEVEL_HANDSHAKE :
+		GNUTLS_ENCRYPTION_LEVEL_APPLICATION;
+
 	return 0;
 }
 
