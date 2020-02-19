@@ -792,9 +792,26 @@ ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session)
 	{
 		epoch = cur->epoch;
 
-		ret = _gnutls_send_int(session, cur->type,
-				       cur->htype,
-				       epoch, msg.data, msg.size, 0);
+		if (session->internals.h_read_func) {
+			record_parameters_st *params;
+
+			ret = _gnutls_epoch_get(session, epoch, &params);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+			ret = session->internals.h_read_func(session,
+							     params->write.level,
+							     cur->htype,
+							     msg.data,
+							     msg.size);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			ret = msg.size;
+		} else {
+			ret = _gnutls_send_int(session, cur->type,
+					       cur->htype,
+					       epoch, msg.data, msg.size, 0);
+		}
 
 		if (ret >= 0) {
 			total += ret;
@@ -1428,6 +1445,10 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 		     && ret < 0) || ret >= 0)
 			return gnutls_assert_val(ret);
 	}
+
+	/* If handshake is handled manually, don't receive records from I/O */
+	if (session->internals.h_read_func)
+		return GNUTLS_E_AGAIN;
 
 	if (htype != (gnutls_handshake_description_t) -1) {
 		ret = handshake_remaining_time(session);

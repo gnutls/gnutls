@@ -851,6 +851,7 @@ struct record_state_st {
 	unsigned aead_tag_size;
 	unsigned is_aead;
 	uint64_t sequence_number;
+	gnutls_record_encryption_level_t level;
 };
 
 
@@ -1231,6 +1232,7 @@ typedef struct {
 	gnutls_handshake_hook_func h_hook;
 	unsigned int h_type;	/* the hooked type */
 	int16_t h_post;		/* whether post-generation/receive */
+	gnutls_handshake_read_func h_read_func;
 
 	gnutls_keylog_func keylog_func;
 
