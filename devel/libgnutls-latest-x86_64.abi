@@ -300,7 +300,6 @@
     <elf-symbol name='gnutls_handshake_set_post_client_hello_function' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_handshake_set_private_extensions' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_handshake_set_random' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
-    <elf-symbol name='gnutls_handshake_set_secret_function' version='GNUTLS_3_6_13' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_handshake_set_timeout' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_hash' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_hash_copy' version='GNUTLS_3_6_9' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
@@ -797,6 +796,7 @@
     <elf-symbol name='gnutls_session_resumption_requested' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_session_set_data' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_session_set_id' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_session_set_keylog_function' version='GNUTLS_3_6_13' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_session_set_premaster' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_session_set_ptr' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_session_set_verify_cert2' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>

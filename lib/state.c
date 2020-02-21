@@ -588,9 +588,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	if (_gnutls_disable_tls13 != 0)
 		(*session)->internals.flags |= INT_FLAG_NO_TLS13;
 
-	/* Install the default secret function */
-	gnutls_handshake_set_secret_function(*session,
-					     _gnutls_nss_keylog_secret_func);
+	/* Install the default keylog function */
+	gnutls_session_set_keylog_function(*session, _gnutls_nss_keylog_func);
 
 	return 0;
 }

@@ -217,7 +217,7 @@ ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniquei
 	 tls-record-size-limit-asym dh-compute ecdh-compute sign-verify-data-newapi \
 	 sign-verify-newapi sign-verify-deterministic iov aead-cipher-vec \
 	 tls13-without-timeout-func buffer status-request-revoked \
-	 set_x509_ocsp_multi_cli kdf-api secret-hook
+	 set_x509_ocsp_multi_cli kdf-api keylog-func
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp

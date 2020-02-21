@@ -49,8 +49,7 @@ int main(int argc, char **argv)
 #include "cert-common.h"
 #include "utils.h"
 
-/* This program tests whether a secret hook function is called upon a
- * new traffic secret is installed.
+/* This program tests whether a keylog function is called.
  */
 
 static void terminate(void);
@@ -72,57 +71,30 @@ static pid_t child;
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static const char *
-secret_type_to_str(gnutls_handshake_secret_type_t type)
-{
-	switch (type) {
-	case GNUTLS_SECRET_CLIENT_RANDOM:
-		return "CLIENT_RANDOM";
-	case GNUTLS_SECRET_CLIENT_EARLY_TRAFFIC_SECRET:
-		return "CLIENT_EARLY_TRAFFIC_SECRET";
-	case GNUTLS_SECRET_CLIENT_HANDSHAKE_TRAFFIC_SECRET:
-		return "CLIENT_HANDSHAKE_TRAFFIC_SECRET";
-	case GNUTLS_SECRET_SERVER_HANDSHAKE_TRAFFIC_SECRET:
-		return "SERVER_HANDSHAKE_TRAFFIC_SECRET";
-	case GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET:
-		return "CLIENT_TRAFFIC_SECRET";
-	case GNUTLS_SECRET_SERVER_TRAFFIC_SECRET:
-		return "SERVER_TRAFFIC_SECRET";
-	case GNUTLS_SECRET_EARLY_EXPORTER_SECRET:
-		return "EARLY_EXPORTER_SECRET";
-	case GNUTLS_SECRET_EXPORTER_SECRET:
-		return "EXPORTER_SECRET";
-	default:
-		return NULL;
-	}
-}
-
 static int
-secret_hook_func(gnutls_session_t session,
-		 gnutls_handshake_secret_type_t type,
-		 const gnutls_datum_t *secret)
+keylog_func(gnutls_session_t session,
+	    const char *label,
+	    const gnutls_datum_t *secret)
 {
 	unsigned int *call_count = gnutls_session_get_ptr(session);
-	static const gnutls_handshake_secret_type_t exp_types[] = {
-		GNUTLS_SECRET_CLIENT_HANDSHAKE_TRAFFIC_SECRET,
-		GNUTLS_SECRET_SERVER_HANDSHAKE_TRAFFIC_SECRET,
-		GNUTLS_SECRET_EXPORTER_SECRET,
-		GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET,
-		GNUTLS_SECRET_SERVER_TRAFFIC_SECRET,
-		GNUTLS_SECRET_CLIENT_TRAFFIC_SECRET,
-		GNUTLS_SECRET_SERVER_TRAFFIC_SECRET
+	static const char *exp_labels[] = {
+		"CLIENT_HANDSHAKE_TRAFFIC_SECRET",
+		"SERVER_HANDSHAKE_TRAFFIC_SECRET",
+		"EXPORTER_SECRET",
+		"CLIENT_TRAFFIC_SECRET_0",
+		"SERVER_TRAFFIC_SECRET_0"
 	};
 
-	if (*call_count >= sizeof(exp_types)/sizeof(exp_types[0]))
+	if (*call_count >= sizeof(exp_labels)/sizeof(exp_labels[0]))
 		fail("unexpected secret at call count %u\n",
 		     *call_count);
 
-	if (type != exp_types[*call_count])
+	if (strcmp(label, exp_labels[*call_count]) != 0)
 		fail("unexpected %s at call count %u\n",
-		     secret_type_to_str(type), *call_count);
+		     label, *call_count);
 	else if (debug)
 		success("received %s at call count %u\n",
-			secret_type_to_str(type), *call_count);
+			label, *call_count);
 
 	(*call_count)++;
 	return 0;
@@ -168,7 +140,7 @@ static void client(int fd, const char *prio, unsigned int exp_call_count)
 
 	gnutls_transport_set_int(session, fd);
 
-	gnutls_handshake_set_secret_function(session, secret_hook_func);
+	gnutls_session_set_keylog_function(session, keylog_func);
 
 	/* Perform the TLS handshake
 	 */
@@ -188,18 +160,6 @@ static void client(int fd, const char *prio, unsigned int exp_call_count)
 		success("client: TLS version is: %s\n",
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
-
-	/* Send key update */
-	do {
-		ret = gnutls_session_key_update(session, GNUTLS_KU_PEER);
-	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-
-	if (ret < 0)
-		fail("error in key update: %s\n", gnutls_strerror(ret));
-	else {
-		if (debug)
-			success("client: Sent key update\n");
-	}
 
 	gnutls_record_send(session, MSG, strlen(MSG));
 
@@ -279,7 +239,7 @@ static void server(int fd, const char *prio, unsigned int exp_call_count)
 
 	gnutls_transport_set_int(session, fd);
 
-	gnutls_handshake_set_secret_function(session, secret_hook_func);
+	gnutls_session_set_keylog_function(session, keylog_func);
 
 	do {
 		ret = gnutls_handshake(session);
@@ -383,7 +343,7 @@ run(const char *prio, unsigned int exp_call_count)
 
 void doit(void)
 {
-	run("NORMAL:-VERS-ALL:+VERS-TLS1.3", 7);
+	run("NORMAL:-VERS-ALL:+VERS-TLS1.3", 5);
 }
 
 #endif				/* _WIN32 */

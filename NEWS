@@ -9,12 +9,14 @@ See the end for copying conditions.
 
 ** libgnutls: Added new APIs to access KDF algorithms (#813).
 
+** libgnutls: Added new callback gnutls_keylog_func that enables a custom
+   logging functionality.
+
 ** API and ABI modifications:
 gnutls_hkdf_extract: Added
 gnutls_hkdf_expand: Added
 gnutls_pbkdf2: Added
-gnutls_handshake_secret_type_t: New enumeration
-gnutls_handshake_set_secret_function: Added
+gnutls_session_set_keylog_function: Added
 
 * Version 3.6.12 (released 2020-02-01)
 

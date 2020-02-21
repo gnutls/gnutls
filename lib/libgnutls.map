@@ -1315,7 +1315,7 @@ GNUTLS_3_6_13
 	gnutls_hkdf_extract;
 	gnutls_hkdf_expand;
 	gnutls_pbkdf2;
-	gnutls_handshake_set_secret_function;
+	gnutls_session_set_keylog_function;
 } GNUTLS_3_6_12;
 
 GNUTLS_FIPS140_3_4 {
