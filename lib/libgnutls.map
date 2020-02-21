@@ -1335,6 +1335,7 @@ GNUTLS_QUIC_3_6_13
  global:
 	gnutls_handshake_set_read_function;
 	gnutls_handshake_write;
+	gnutls_handshake_set_secret_function;
 } GNUTLS_3_6_13;
 
 GNUTLS_FIPS140_3_4 {
