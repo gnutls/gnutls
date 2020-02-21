@@ -3241,6 +3241,30 @@ gnutls_handshake_write(gnutls_session_t session,
 		       gnutls_record_encryption_level_t level,
 		       const void *data, size_t data_size);
 
+  /**
+   * gnutls_handshake_secret_func:
+   * @session: the current session
+   * @level: the encryption level
+   * @secret_read: the secret used for reading, can be %NULL if not set
+   * @secret_write: the secret used for writing, can be %NULL if not set
+   * @secret_size: the size of the secrets
+   *
+   * Function prototype for secret hooks. It is set using
+   * gnutls_handshake_set_secret_function().
+   *
+   * Returns: Non zero on error.
+   * Since: 3.7.0
+   */
+typedef int (*gnutls_handshake_secret_func) (gnutls_session_t session,
+					     gnutls_record_encryption_level_t level,
+					     const void *secret_read,
+					     const void *secret_write,
+					     size_t secret_size);
+
+void
+gnutls_handshake_set_secret_function(gnutls_session_t session,
+				     gnutls_handshake_secret_func func);
+
 /* FIPS140-2 related functions */
 unsigned gnutls_fips140_mode_enabled(void);
 

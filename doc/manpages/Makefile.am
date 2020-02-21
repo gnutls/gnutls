@@ -345,6 +345,7 @@ APIMANS += gnutls_handshake_set_post_client_hello_function.3
 APIMANS += gnutls_handshake_set_private_extensions.3
 APIMANS += gnutls_handshake_set_random.3
 APIMANS += gnutls_handshake_set_read_function.3
+APIMANS += gnutls_handshake_set_secret_function.3
 APIMANS += gnutls_handshake_set_timeout.3
 APIMANS += gnutls_handshake_write.3
 APIMANS += gnutls_hash.3

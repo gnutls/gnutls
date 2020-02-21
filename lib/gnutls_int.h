@@ -1233,6 +1233,7 @@ typedef struct {
 	unsigned int h_type;	/* the hooked type */
 	int16_t h_post;		/* whether post-generation/receive */
 	gnutls_handshake_read_func h_read_func;
+	gnutls_handshake_secret_func h_secret_func;
 
 	gnutls_keylog_func keylog_func;
 

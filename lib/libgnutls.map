@@ -1335,6 +1335,7 @@ GNUTLS_3_7_0
 {
  global:
 	gnutls_handshake_set_read_function;
+	gnutls_handshake_set_secret_function;
 	gnutls_handshake_write;
 	gnutls_x509_trust_list_set_getissuer_function;
 	gnutls_x509_trust_list_get_ptr;
