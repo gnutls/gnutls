@@ -348,4 +348,3 @@ gnutls_prf(gnutls_session_t session,
 
 	return ret;
 }
-

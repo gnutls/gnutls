@@ -214,6 +214,7 @@ lib/algorithms/libgnutls_alg.la
 lib/auth/libgnutls_auth.la
 libdane/gnutls-dane.pc
 libdane/libgnutls-dane.la
+lib/ephemeral_functions.h
 lib/ext/libgnutls_ext.la
 lib/extras/libgnutls_extras.la
 lib/gcrypt/libcrypto.la

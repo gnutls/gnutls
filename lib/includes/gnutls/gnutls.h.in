@@ -3448,4 +3448,8 @@ void gnutls_fips140_set_mode(gnutls_fips_mode_t mode, unsigned flags);
 
 #include <gnutls/compat.h>
 
+#if defined(GNUTLS_INTERNAL_BUILD) || defined(GNUTLS_EPHEMERAL_API)
+#include <gnutls/ephemeral.h>
+#endif
+
 #endif				/* GNUTLS_H */

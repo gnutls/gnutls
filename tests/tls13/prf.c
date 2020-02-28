@@ -234,6 +234,12 @@ static void client(int fd)
 		exit(1);
 	}
 
+	ret = gnutls_prf_get(session);
+	if (ret != GNUTLS_MAC_SHA384) {
+		fprintf(stderr, "negotiated unexpected prf: %s\n", gnutls_mac_get_name(ret));
+		exit(1);
+	}
+
 	check_prfs(session);
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);

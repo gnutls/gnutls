@@ -22,7 +22,8 @@ nobase_include_HEADERS = gnutls/x509.h gnutls/pkcs12.h gnutls/compat.h	\
 	gnutls/openpgp.h gnutls/crypto.h gnutls/pkcs11.h		\
 	gnutls/abstract.h gnutls/dtls.h gnutls/ocsp.h gnutls/tpm.h	\
 	gnutls/x509-ext.h gnutls/self-test.h gnutls/system-keys.h	\
-	gnutls/urls.h gnutls/pkcs7.h gnutls/socket.h
+	gnutls/urls.h gnutls/pkcs7.h gnutls/socket.h \
+	gnutls/ephemeral.h
 
 if ENABLE_CXX
 nobase_include_HEADERS += gnutls/gnutlsxx.h

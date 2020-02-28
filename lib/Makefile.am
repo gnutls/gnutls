@@ -20,8 +20,11 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-EXTRA_DIST = priority_options.gperf common.mk inih/LICENSE.txt
-BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
+EXTRA_DIST = priority_options.gperf common.mk inih/LICENSE.txt \
+	ephemeral_functions.gperf
+
+BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h \
+	ephemeral_functions.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
 
@@ -81,7 +84,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
 	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
 	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
-	iov.c iov.h
+	iov.c iov.h ephemeral-api.c
 
 if ENABLE_GOST
 COBJECTS += vko.c
@@ -129,7 +132,8 @@ HFILES = abstract_int.h debug.h cipher.h	 \
 	srp.h auth/srp_kx.h auth/srp_passwd.h	\
 	file.h supplemental.h crypto.h random.h system.h\
 	locks.h mbuffers.h ecc.h pin.h fips.h \
-	priority_options.h secrets.h stek.h cert-cred.h
+	priority_options.h secrets.h stek.h cert-cred.h \
+	ephemeral_functions.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h pkcs11x.h
@@ -247,4 +251,9 @@ gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 priority_options.h: $(srcdir)/priority_options.gperf
 	-gperf --global-table -t $^ > $@-tmp \
 	&& sed 's/^const struct priority_options_st \*/static const struct priority_options_st \*/' <$@-tmp >$@ \
+	&& rm -f $@-tmp
+
+ephemeral_functions.h: $(srcdir)/ephemeral_functions.gperf
+	-gperf --global-table -t $^ > $@-tmp \
+	&& sed 's/^const struct ephemeral_function_st \*/static const struct ephemeral_function_st \*/' <$@-tmp >$@ \
 	&& rm -f $@-tmp

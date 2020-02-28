@@ -1,0 +1,5 @@
+%define lookup-function-name _gnutls_ephemeral_get_function
+%language=ANSI-C
+%readonly-tables
+struct ephemeral_function_st { const char *name; void *func; };
+%%
