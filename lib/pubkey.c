@@ -362,6 +362,33 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 
 #ifdef ENABLE_PKCS11
 
+
+static int
+gnutls_pubkey_import_ecc_eddsa(gnutls_pubkey_t key,
+			       const gnutls_datum_t * parameters,
+			       const gnutls_datum_t * ecpoint)
+{
+	int ret;
+	gnutls_datum_t raw_point = {NULL, 0};
+
+	/* TODO handle parameters containing curve name to figure
+	 * out if it is Ed25519, Ed448 or even something else */
+
+	ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
+					 ecpoint->data, ecpoint->size,
+					 &raw_point, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_free(raw_point.data);
+		return ret;
+	}
+	ret = gnutls_pubkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519,
+					   &raw_point, NULL);
+
+	gnutls_free(raw_point.data);
+	return ret;
+}
+
 /**
  * gnutls_pubkey_import_pkcs11:
  * @key: The public key
@@ -437,6 +464,10 @@ gnutls_pubkey_import_pkcs11(gnutls_pubkey_t key,
 	case GNUTLS_PK_EC:
 		ret = gnutls_pubkey_import_ecc_x962(key, &obj->pubkey[0],
 						    &obj->pubkey[1]);
+		break;
+	case GNUTLS_PK_EDDSA_ED25519:
+		ret = gnutls_pubkey_import_ecc_eddsa(key, &obj->pubkey[0],
+						     &obj->pubkey[1]);
 		break;
 	default:
 		gnutls_assert();
