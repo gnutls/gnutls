@@ -146,7 +146,7 @@ typedef int ssize_t;
 /* TLS Extensions */
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
-#define MAX_EXT_TYPES 32
+#define MAX_EXT_TYPES 64
 
 /* TLS-internal extension (will be parsed after a ciphersuite is selected).
  * This amends the gnutls_ext_parse_type_t. Not exported yet to allow more refining
@@ -358,8 +358,8 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_MAX /* not real extension - used for iterators */
 } extensions_t;
 
-#define GNUTLS_EXTENSION_MAX_VALUE 31
-#define ext_track_t uint32_t
+#define GNUTLS_EXTENSION_MAX_VALUE 63
+#define ext_track_t uint64_t
 
 #if GNUTLS_EXTENSION_MAX >= GNUTLS_EXTENSION_MAX_VALUE
 # error over limit
