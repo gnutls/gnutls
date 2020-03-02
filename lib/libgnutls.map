@@ -1317,6 +1317,10 @@ GNUTLS_3_6_13
 	gnutls_pbkdf2;
 	gnutls_session_set_keylog_function;
 	gnutls_prf_hash_get;
+	gnutls_psk_server_get_username2;
+	gnutls_psk_set_server_credentials_function2;
+	gnutls_psk_set_client_credentials2;
+	gnutls_psk_set_client_credentials_function2;
 } GNUTLS_3_6_12;
 
 GNUTLS_FIPS140_3_4 {
