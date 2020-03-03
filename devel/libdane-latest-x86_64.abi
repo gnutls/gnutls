@@ -1,14 +1,6 @@
 <abi-corpus architecture='elf-amd-x86_64' soname='libgnutls-dane.so.0'>
   <elf-needed>
     <dependency name='libgnutls.so.30'/>
-    <dependency name='libp11-kit.so.0'/>
-    <dependency name='libidn2.so.0'/>
-    <dependency name='libunistring.so.2'/>
-    <dependency name='libdl.so.2'/>
-    <dependency name='libtasn1.so.6'/>
-    <dependency name='libnettle.so.7'/>
-    <dependency name='libhogweed.so.5'/>
-    <dependency name='libgmp.so.10'/>
     <dependency name='libunbound.so.8'/>
     <dependency name='libc.so.6'/>
   </elf-needed>
@@ -32,7 +24,7 @@
     <elf-symbol name='dane_verify_crt_raw' version='DANE_0_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='dane_verify_session_crt' version='DANE_0_0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
   </elf-function-symbols>
-  <abi-instr version='1.0' address-size='64' path='dane.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/libdane' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='dane.c' comp-dir-path='/root/gnutls/libdane' language='LANG_C99'>
     <type-decl name='int' size-in-bits='32' id='type-id-1'/>
     <type-decl name='unsigned int' size-in-bits='32' id='type-id-2'/>
     <class-decl name='__anonymous_struct__' size-in-bits='128' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-3' visibility='default' id='type-id-4'>
@@ -65,7 +57,7 @@
     <pointer-type-def type-id='type-id-10' size-in-bits='64' id='type-id-9'/>
     <pointer-type-def type-id='type-id-8' size-in-bits='64' id='type-id-11'/>
     <typedef-decl name='dane_state_t' type-id='type-id-11' id='type-id-12'/>
-    <class-decl name='gnutls_session_int' size-in-bits='52736' is-struct='yes' visibility='default' id='type-id-13'>
+    <class-decl name='gnutls_session_int' size-in-bits='52800' is-struct='yes' visibility='default' id='type-id-13'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='security_parameters' type-id='type-id-14' visibility='default'/>
       </data-member>
@@ -75,7 +67,7 @@
       <data-member access='public' layout-offset-in-bits='2304'>
         <var-decl name='internals' type-id='type-id-16' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='30080'>
+      <data-member access='public' layout-offset-in-bits='30144'>
         <var-decl name='key' type-id='type-id-17' visibility='default'/>
       </data-member>
     </class-decl>
@@ -615,6 +607,9 @@
         <var-decl name='key_shares' type-id='type-id-79' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='280'>
+        <var-decl name='multi_ocsp' type-id='type-id-79' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='288'>
         <var-decl name='tls_sig_sem' type-id='type-id-24' visibility='default'/>
       </data-member>
     </class-decl>
@@ -917,7 +912,7 @@
       <subrange length='4' type-id='type-id-44' id='type-id-140'/>
 
     </array-type-def>
-    <class-decl name='__anonymous_struct__' size-in-bits='27776' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-16' visibility='default' id='type-id-141'>
+    <class-decl name='__anonymous_struct__' size-in-bits='27840' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-16' visibility='default' id='type-id-141'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='record_buffer' type-id='type-id-142' visibility='default'/>
       </data-member>
@@ -1120,240 +1115,243 @@
         <var-decl name='h_post' type-id='type-id-164' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10496'>
-        <var-decl name='selected_cert_list' type-id='type-id-165' visibility='default'/>
+        <var-decl name='keylog_func' type-id='type-id-165' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10560'>
-        <var-decl name='selected_cert_list_length' type-id='type-id-19' visibility='default'/>
+        <var-decl name='selected_cert_list' type-id='type-id-166' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10624'>
-        <var-decl name='selected_key' type-id='type-id-166' visibility='default'/>
+        <var-decl name='selected_cert_list_length' type-id='type-id-19' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10688'>
-        <var-decl name='selected_ocsp' type-id='type-id-167' visibility='default'/>
+        <var-decl name='selected_key' type-id='type-id-167' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10752'>
-        <var-decl name='selected_ocsp_length' type-id='type-id-19' visibility='default'/>
+        <var-decl name='selected_ocsp' type-id='type-id-168' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10816'>
-        <var-decl name='selected_ocsp_func' type-id='type-id-168' visibility='default'/>
+        <var-decl name='selected_ocsp_length' type-id='type-id-19' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10880'>
-        <var-decl name='selected_ocsp_func_ptr' type-id='type-id-105' visibility='default'/>
+        <var-decl name='selected_ocsp_func' type-id='type-id-169' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10944'>
-        <var-decl name='selected_need_free' type-id='type-id-79' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='10952'>
-        <var-decl name='default_record_version' type-id='type-id-169' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='10968'>
-        <var-decl name='default_hello_version' type-id='type-id-169' visibility='default'/>
+        <var-decl name='selected_ocsp_func_ptr' type-id='type-id-105' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11008'>
-        <var-decl name='user_ptr' type-id='type-id-105' visibility='default'/>
+        <var-decl name='selected_need_free' type-id='type-id-79' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='11016'>
+        <var-decl name='default_record_version' type-id='type-id-170' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='11032'>
+        <var-decl name='default_hello_version' type-id='type-id-170' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11072'>
-        <var-decl name='direction' type-id='type-id-79' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='11080'>
-        <var-decl name='ignore_rdn_sequence' type-id='type-id-79' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='11088'>
-        <var-decl name='rsa_pms_version' type-id='type-id-169' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='11104'>
-        <var-decl name='errnum' type-id='type-id-1' visibility='default'/>
+        <var-decl name='user_ptr' type-id='type-id-105' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11136'>
-        <var-decl name='initial_negotiation_completed' type-id='type-id-79' visibility='default'/>
+        <var-decl name='direction' type-id='type-id-79' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='11144'>
+        <var-decl name='ignore_rdn_sequence' type-id='type-id-79' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='11152'>
+        <var-decl name='rsa_pms_version' type-id='type-id-170' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='11168'>
+        <var-decl name='errnum' type-id='type-id-1' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11200'>
-        <var-decl name='post_negotiation_lock' type-id='type-id-105' visibility='default'/>
+        <var-decl name='initial_negotiation_completed' type-id='type-id-79' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11264'>
-        <var-decl name='transport' type-id='type-id-78' visibility='default'/>
+        <var-decl name='post_negotiation_lock' type-id='type-id-105' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11328'>
-        <var-decl name='dtls' type-id='type-id-170' visibility='default'/>
+        <var-decl name='transport' type-id='type-id-78' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='11904'>
-        <var-decl name='handshake_suspicious_loops' type-id='type-id-2' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='11936'>
-        <var-decl name='handshake_in_progress' type-id='type-id-79' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='11944'>
-        <var-decl name='premaster_set' type-id='type-id-79' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='11392'>
+        <var-decl name='dtls' type-id='type-id-171' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11968'>
-        <var-decl name='cb_tls_unique_len' type-id='type-id-2' visibility='default'/>
+        <var-decl name='handshake_suspicious_loops' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='12000'>
-        <var-decl name='cb_tls_unique' type-id='type-id-171' visibility='default'/>
+        <var-decl name='handshake_in_progress' type-id='type-id-79' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='12288'>
-        <var-decl name='handshake_start_time' type-id='type-id-172' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='12008'>
+        <var-decl name='premaster_set' type-id='type-id-79' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='12416'>
-        <var-decl name='handshake_abs_timeout' type-id='type-id-172' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='12032'>
+        <var-decl name='cb_tls_unique_len' type-id='type-id-2' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='12544'>
-        <var-decl name='ertt' type-id='type-id-2' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='12064'>
+        <var-decl name='cb_tls_unique' type-id='type-id-172' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='12576'>
-        <var-decl name='handshake_timeout_ms' type-id='type-id-2' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='12352'>
+        <var-decl name='handshake_start_time' type-id='type-id-173' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='12480'>
+        <var-decl name='handshake_abs_timeout' type-id='type-id-173' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='12608'>
-        <var-decl name='record_timeout_ms' type-id='type-id-2' visibility='default'/>
+        <var-decl name='ertt' type-id='type-id-2' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='12640'>
+        <var-decl name='handshake_timeout_ms' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='12672'>
+        <var-decl name='record_timeout_ms' type-id='type-id-2' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='12736'>
         <var-decl name='post_handshake_cr_context' type-id='type-id-3' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='12800'>
+      <data-member access='public' layout-offset-in-bits='12864'>
         <var-decl name='post_handshake_hash_buffer' type-id='type-id-143' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='13056'>
+      <data-member access='public' layout-offset-in-bits='13120'>
         <var-decl name='hsk_flags' type-id='type-id-2' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='13120'>
-        <var-decl name='last_key_update' type-id='type-id-172' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='13248'>
-        <var-decl name='key_update_count' type-id='type-id-2' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='13184'>
+        <var-decl name='last_key_update' type-id='type-id-173' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='13312'>
+        <var-decl name='key_update_count' type-id='type-id-2' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='13376'>
         <var-decl name='full_client_hello' type-id='type-id-143' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='13568'>
+      <data-member access='public' layout-offset-in-bits='13632'>
         <var-decl name='extensions_offset' type-id='type-id-1' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='13632'>
+      <data-member access='public' layout-offset-in-bits='13696'>
         <var-decl name='hb_local_data' type-id='type-id-143' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='13888'>
+      <data-member access='public' layout-offset-in-bits='13952'>
         <var-decl name='hb_remote_data' type-id='type-id-143' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='14144'>
-        <var-decl name='hb_ping_start' type-id='type-id-172' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='14208'>
+        <var-decl name='hb_ping_start' type-id='type-id-173' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='14272'>
-        <var-decl name='hb_ping_sent' type-id='type-id-172' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='14400'>
-        <var-decl name='hb_actual_retrans_timeout_ms' type-id='type-id-2' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='14432'>
-        <var-decl name='hb_retrans_timeout_ms' type-id='type-id-2' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='14336'>
+        <var-decl name='hb_ping_sent' type-id='type-id-173' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14464'>
-        <var-decl name='hb_total_timeout_ms' type-id='type-id-2' visibility='default'/>
+        <var-decl name='hb_actual_retrans_timeout_ms' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14496'>
-        <var-decl name='ocsp_check_ok' type-id='type-id-79' visibility='default'/>
+        <var-decl name='hb_retrans_timeout_ms' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14528'>
-        <var-decl name='hb_state' type-id='type-id-173' visibility='default'/>
+        <var-decl name='hb_total_timeout_ms' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14560'>
-        <var-decl name='recv_state' type-id='type-id-174' visibility='default'/>
+        <var-decl name='ocsp_check_ok' type-id='type-id-79' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14592'>
-        <var-decl name='sc_random_set' type-id='type-id-79' visibility='default'/>
+        <var-decl name='hb_state' type-id='type-id-174' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='14624'>
+        <var-decl name='recv_state' type-id='type-id-175' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14656'>
-        <var-decl name='flags' type-id='type-id-84' visibility='default'/>
+        <var-decl name='sc_random_set' type-id='type-id-79' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14720'>
-        <var-decl name='verify_callback' type-id='type-id-175' visibility='default'/>
+        <var-decl name='flags' type-id='type-id-84' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14784'>
-        <var-decl name='vc_data' type-id='type-id-176' visibility='default'/>
+        <var-decl name='verify_callback' type-id='type-id-176' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14848'>
-        <var-decl name='vc_sdata' type-id='type-id-177' visibility='default'/>
+        <var-decl name='vc_data' type-id='type-id-177' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='15040'>
-        <var-decl name='vc_elements' type-id='type-id-2' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='15072'>
-        <var-decl name='vc_status' type-id='type-id-2' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='14912'>
+        <var-decl name='vc_sdata' type-id='type-id-178' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='15104'>
-        <var-decl name='additional_verify_flags' type-id='type-id-2' visibility='default'/>
+        <var-decl name='vc_elements' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='15136'>
+        <var-decl name='vc_status' type-id='type-id-2' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='15168'>
+        <var-decl name='additional_verify_flags' type-id='type-id-2' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='15200'>
         <var-decl name='cert_hash' type-id='type-id-23' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='15392'>
+      <data-member access='public' layout-offset-in-bits='15456'>
         <var-decl name='cert_hash_set' type-id='type-id-79' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='15400'>
-        <var-decl name='saved_username' type-id='type-id-178' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='15464'>
+        <var-decl name='saved_username' type-id='type-id-179' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='16432'>
+      <data-member access='public' layout-offset-in-bits='16496'>
         <var-decl name='saved_username_set' type-id='type-id-79' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='16448'>
-        <var-decl name='tfo' type-id='type-id-179' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='17664'>
-        <var-decl name='rsup' type-id='type-id-180' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='16512'>
+        <var-decl name='tfo' type-id='type-id-180' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='17728'>
-        <var-decl name='rsup_size' type-id='type-id-2' visibility='default'/>
+        <var-decl name='rsup' type-id='type-id-181' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='17792'>
-        <var-decl name='rexts' type-id='type-id-181' visibility='default'/>
+        <var-decl name='rsup_size' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='17856'>
-        <var-decl name='rexts_size' type-id='type-id-2' visibility='default'/>
+        <var-decl name='rexts' type-id='type-id-182' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='17920'>
-        <var-decl name='ext_data' type-id='type-id-182' visibility='default'/>
+        <var-decl name='rexts_size' type-id='type-id-2' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='24064'>
-        <var-decl name='used_exts' type-id='type-id-26' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='24096'>
-        <var-decl name='ext_msg' type-id='type-id-183' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='17984'>
+        <var-decl name='ext_data' type-id='type-id-183' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='24128'>
-        <var-decl name='max_recv_size' type-id='type-id-2' visibility='default'/>
+        <var-decl name='used_exts' type-id='type-id-26' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='24160'>
+        <var-decl name='ext_msg' type-id='type-id-184' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='24192'>
-        <var-decl name='cand_ec_group' type-id='type-id-28' visibility='default'/>
+        <var-decl name='max_recv_size' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='24256'>
-        <var-decl name='cand_dh_group' type-id='type-id-28' visibility='default'/>
+        <var-decl name='cand_ec_group' type-id='type-id-28' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='24320'>
-        <var-decl name='cand_group' type-id='type-id-28' visibility='default'/>
+        <var-decl name='cand_dh_group' type-id='type-id-28' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='24384'>
-        <var-decl name='hrr_cs' type-id='type-id-169' visibility='default'/>
-      </data-member>
-      <data-member access='public' layout-offset-in-bits='24416'>
-        <var-decl name='session_ticket_renew' type-id='type-id-1' visibility='default'/>
+        <var-decl name='cand_group' type-id='type-id-28' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='24448'>
-        <var-decl name='tls13_ticket' type-id='type-id-184' visibility='default'/>
+        <var-decl name='hrr_cs' type-id='type-id-170' visibility='default'/>
       </data-member>
-      <data-member access='public' layout-offset-in-bits='27584'>
-        <var-decl name='early_data_received' type-id='type-id-26' visibility='default'/>
+      <data-member access='public' layout-offset-in-bits='24480'>
+        <var-decl name='session_ticket_renew' type-id='type-id-1' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='24512'>
+        <var-decl name='tls13_ticket' type-id='type-id-185' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='27648'>
-        <var-decl name='anti_replay' type-id='type-id-185' visibility='default'/>
+        <var-decl name='early_data_received' type-id='type-id-26' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='27712'>
+        <var-decl name='anti_replay' type-id='type-id-186' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='27776'>
         <var-decl name='epoch_lock' type-id='type-id-105' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='mbuffer_head_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-186'>
+    <class-decl name='mbuffer_head_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-187'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='head' type-id='type-id-187' visibility='default'/>
+        <var-decl name='head' type-id='type-id-188' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
-        <var-decl name='tail' type-id='type-id-187' visibility='default'/>
+        <var-decl name='tail' type-id='type-id-188' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
         <var-decl name='length' type-id='type-id-2' visibility='default'/>
@@ -1362,12 +1360,12 @@
         <var-decl name='byte_length' type-id='type-id-103' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='mbuffer_st' size-in-bits='640' is-struct='yes' visibility='default' id='type-id-188'>
+    <class-decl name='mbuffer_st' size-in-bits='640' is-struct='yes' visibility='default' id='type-id-189'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='next' type-id='type-id-187' visibility='default'/>
+        <var-decl name='next' type-id='type-id-188' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
-        <var-decl name='prev' type-id='type-id-187' visibility='default'/>
+        <var-decl name='prev' type-id='type-id-188' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
         <var-decl name='mark' type-id='type-id-103' visibility='default'/>
@@ -1382,7 +1380,7 @@
         <var-decl name='uhead_mark' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='416'>
-        <var-decl name='type' type-id='type-id-189' visibility='default'/>
+        <var-decl name='type' type-id='type-id-190' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='448'>
         <var-decl name='record_sequence' type-id='type-id-84' visibility='default'/>
@@ -1391,14 +1389,14 @@
         <var-decl name='epoch' type-id='type-id-19' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='544'>
-        <var-decl name='htype' type-id='type-id-190' visibility='default'/>
+        <var-decl name='htype' type-id='type-id-191' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='576'>
         <var-decl name='handshake_sequence' type-id='type-id-19' visibility='default'/>
       </data-member>
     </class-decl>
-    <pointer-type-def type-id='type-id-188' size-in-bits='64' id='type-id-187'/>
-    <enum-decl name='content_type_t' id='type-id-191'>
+    <pointer-type-def type-id='type-id-189' size-in-bits='64' id='type-id-188'/>
+    <enum-decl name='content_type_t' id='type-id-192'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_CHANGE_CIPHER_SPEC' value='20'/>
       <enumerator name='GNUTLS_ALERT' value='21'/>
@@ -1406,8 +1404,8 @@
       <enumerator name='GNUTLS_APPLICATION_DATA' value='23'/>
       <enumerator name='GNUTLS_HEARTBEAT' value='24'/>
     </enum-decl>
-    <typedef-decl name='content_type_t' type-id='type-id-191' id='type-id-189'/>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-192'>
+    <typedef-decl name='content_type_t' type-id='type-id-192' id='type-id-190'/>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-193'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_HANDSHAKE_HELLO_REQUEST' value='0'/>
       <enumerator name='GNUTLS_HANDSHAKE_CLIENT_HELLO' value='1'/>
@@ -1430,15 +1428,15 @@
       <enumerator name='GNUTLS_HANDSHAKE_CLIENT_HELLO_V2' value='1024'/>
       <enumerator name='GNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST' value='1025'/>
     </enum-decl>
-    <typedef-decl name='gnutls_handshake_description_t' type-id='type-id-192' id='type-id-190'/>
-    <typedef-decl name='mbuffer_st' type-id='type-id-188' id='type-id-193'/>
-    <typedef-decl name='mbuffer_head_st' type-id='type-id-186' id='type-id-142'/>
-    <class-decl name='gnutls_buffer_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-194'>
+    <typedef-decl name='gnutls_handshake_description_t' type-id='type-id-193' id='type-id-191'/>
+    <typedef-decl name='mbuffer_st' type-id='type-id-189' id='type-id-194'/>
+    <typedef-decl name='mbuffer_head_st' type-id='type-id-187' id='type-id-142'/>
+    <class-decl name='gnutls_buffer_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-195'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='allocd' type-id='type-id-195' visibility='default'/>
+        <var-decl name='allocd' type-id='type-id-196' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
-        <var-decl name='data' type-id='type-id-195' visibility='default'/>
+        <var-decl name='data' type-id='type-id-196' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
         <var-decl name='max_length' type-id='type-id-103' visibility='default'/>
@@ -1447,22 +1445,22 @@
         <var-decl name='length' type-id='type-id-103' visibility='default'/>
       </data-member>
     </class-decl>
-    <pointer-type-def type-id='type-id-24' size-in-bits='64' id='type-id-195'/>
-    <typedef-decl name='gnutls_buffer_st' type-id='type-id-194' id='type-id-143'/>
-    <enum-decl name='send_ticket_state_t' id='type-id-196'>
+    <pointer-type-def type-id='type-id-24' size-in-bits='64' id='type-id-196'/>
+    <typedef-decl name='gnutls_buffer_st' type-id='type-id-195' id='type-id-143'/>
+    <enum-decl name='send_ticket_state_t' id='type-id-197'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='TICKET_STATE0' value='0'/>
       <enumerator name='TICKET_STATE1' value='1'/>
     </enum-decl>
-    <typedef-decl name='send_ticket_state_t' type-id='type-id-196' id='type-id-144'/>
-    <enum-decl name='bye_state_t' id='type-id-197'>
+    <typedef-decl name='send_ticket_state_t' type-id='type-id-197' id='type-id-144'/>
+    <enum-decl name='bye_state_t' id='type-id-198'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='BYE_STATE0' value='0'/>
       <enumerator name='BYE_STATE1' value='1'/>
       <enumerator name='BYE_STATE2' value='2'/>
     </enum-decl>
-    <typedef-decl name='bye_state_t' type-id='type-id-197' id='type-id-145'/>
-    <enum-decl name='reauth_state_t' id='type-id-198'>
+    <typedef-decl name='bye_state_t' type-id='type-id-198' id='type-id-145'/>
+    <enum-decl name='reauth_state_t' id='type-id-199'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='REAUTH_STATE0' value='0'/>
       <enumerator name='REAUTH_STATE1' value='1'/>
@@ -1471,8 +1469,8 @@
       <enumerator name='REAUTH_STATE4' value='4'/>
       <enumerator name='REAUTH_STATE5' value='5'/>
     </enum-decl>
-    <typedef-decl name='reauth_state_t' type-id='type-id-198' id='type-id-146'/>
-    <enum-decl name='handshake_state_t' id='type-id-199'>
+    <typedef-decl name='reauth_state_t' type-id='type-id-199' id='type-id-146'/>
+    <enum-decl name='handshake_state_t' id='type-id-200'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='STATE0' value='0'/>
       <enumerator name='STATE1' value='1'/>
@@ -1526,46 +1524,46 @@
       <enumerator name='STATE115' value='115'/>
       <enumerator name='STATE150' value='116'/>
     </enum-decl>
-    <typedef-decl name='handshake_state_t' type-id='type-id-199' id='type-id-147'/>
-    <class-decl name='gnutls_priority_st' size-in-bits='41792' is-struct='yes' visibility='default' id='type-id-200'>
+    <typedef-decl name='handshake_state_t' type-id='type-id-200' id='type-id-147'/>
+    <class-decl name='gnutls_priority_st' size-in-bits='41792' is-struct='yes' visibility='default' id='type-id-201'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='protocol' type-id='type-id-201' visibility='default'/>
+        <var-decl name='protocol' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='2080'>
-        <var-decl name='client_ctype' type-id='type-id-201' visibility='default'/>
+        <var-decl name='client_ctype' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='4160'>
-        <var-decl name='server_ctype' type-id='type-id-201' visibility='default'/>
+        <var-decl name='server_ctype' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='6240'>
-        <var-decl name='_cipher' type-id='type-id-201' visibility='default'/>
+        <var-decl name='_cipher' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='8320'>
-        <var-decl name='_mac' type-id='type-id-201' visibility='default'/>
+        <var-decl name='_mac' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='10400'>
-        <var-decl name='_kx' type-id='type-id-201' visibility='default'/>
+        <var-decl name='_kx' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='12480'>
-        <var-decl name='_sign_algo' type-id='type-id-201' visibility='default'/>
+        <var-decl name='_sign_algo' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='14560'>
-        <var-decl name='_supported_ecc' type-id='type-id-201' visibility='default'/>
+        <var-decl name='_supported_ecc' type-id='type-id-202' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='16640'>
-        <var-decl name='groups' type-id='type-id-202' visibility='default'/>
+        <var-decl name='groups' type-id='type-id-203' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='20800'>
-        <var-decl name='sigalg' type-id='type-id-203' visibility='default'/>
+        <var-decl name='sigalg' type-id='type-id-204' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='24960'>
-        <var-decl name='cs' type-id='type-id-204' visibility='default'/>
+        <var-decl name='cs' type-id='type-id-205' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='41408'>
         <var-decl name='no_extensions' type-id='type-id-79' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='41440'>
-        <var-decl name='sr' type-id='type-id-205' visibility='default'/>
+        <var-decl name='sr' type-id='type-id-206' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='41472'>
         <var-decl name='min_record_version' type-id='type-id-79' visibility='default'/>
@@ -1595,7 +1593,7 @@
         <var-decl name='fallback' type-id='type-id-79' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='41600'>
-        <var-decl name='level' type-id='type-id-206' visibility='default'/>
+        <var-decl name='level' type-id='type-id-207' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='41632'>
         <var-decl name='_allow_large_records' type-id='type-id-79' visibility='default'/>
@@ -1622,26 +1620,26 @@
         <var-decl name='_dh_prime_bits' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='41728'>
-        <var-decl name='usage_cnt' type-id='type-id-207' visibility='default'/>
+        <var-decl name='usage_cnt' type-id='type-id-208' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='2080' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-201' visibility='default' id='type-id-208'>
+    <class-decl name='__anonymous_struct__' size-in-bits='2080' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-202' visibility='default' id='type-id-209'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='priorities' type-id='type-id-209' visibility='default'/>
+        <var-decl name='priorities' type-id='type-id-210' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='2048'>
         <var-decl name='num_priorities' type-id='type-id-2' visibility='default'/>
       </data-member>
     </class-decl>
 
-    <array-type-def dimensions='1' type-id='type-id-2' size-in-bits='2048' id='type-id-209'>
+    <array-type-def dimensions='1' type-id='type-id-2' size-in-bits='2048' id='type-id-210'>
       <subrange length='64' type-id='type-id-44' id='type-id-96'/>
 
     </array-type-def>
-    <typedef-decl name='priority_st' type-id='type-id-208' id='type-id-201'/>
-    <class-decl name='group_list_st' size-in-bits='4160' is-struct='yes' visibility='default' id='type-id-210'>
+    <typedef-decl name='priority_st' type-id='type-id-209' id='type-id-202'/>
+    <class-decl name='group_list_st' size-in-bits='4160' is-struct='yes' visibility='default' id='type-id-211'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='entry' type-id='type-id-211' visibility='default'/>
+        <var-decl name='entry' type-id='type-id-212' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='4096'>
         <var-decl name='size' type-id='type-id-2' visibility='default'/>
@@ -1651,20 +1649,20 @@
       </data-member>
     </class-decl>
 
-    <array-type-def dimensions='1' type-id='type-id-28' size-in-bits='4096' id='type-id-211'>
+    <array-type-def dimensions='1' type-id='type-id-28' size-in-bits='4096' id='type-id-212'>
       <subrange length='64' type-id='type-id-44' id='type-id-96'/>
 
     </array-type-def>
-    <typedef-decl name='group_list_st' type-id='type-id-210' id='type-id-202'/>
-    <class-decl name='sign_algo_list_st' size-in-bits='4160' is-struct='yes' visibility='default' id='type-id-212'>
+    <typedef-decl name='group_list_st' type-id='type-id-211' id='type-id-203'/>
+    <class-decl name='sign_algo_list_st' size-in-bits='4160' is-struct='yes' visibility='default' id='type-id-213'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='entry' type-id='type-id-213' visibility='default'/>
+        <var-decl name='entry' type-id='type-id-214' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='4096'>
         <var-decl name='size' type-id='type-id-2' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='gnutls_sign_entry_st' size-in-bits='448' is-struct='yes' visibility='default' id='type-id-214'>
+    <class-decl name='gnutls_sign_entry_st' size-in-bits='448' is-struct='yes' visibility='default' id='type-id-215'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='name' type-id='type-id-34' visibility='default'/>
       </data-member>
@@ -1678,7 +1676,7 @@
         <var-decl name='pk' type-id='type-id-67' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='192'>
-        <var-decl name='hash' type-id='type-id-215' visibility='default'/>
+        <var-decl name='hash' type-id='type-id-216' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='224'>
         <var-decl name='priv_pk' type-id='type-id-67' visibility='default'/>
@@ -1693,13 +1691,13 @@
         <var-decl name='curve' type-id='type-id-66' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='352'>
-        <var-decl name='aid' type-id='type-id-216' visibility='default'/>
+        <var-decl name='aid' type-id='type-id-217' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='384'>
-        <var-decl name='slevel' type-id='type-id-217' visibility='default'/>
+        <var-decl name='slevel' type-id='type-id-218' visibility='default'/>
       </data-member>
     </class-decl>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-218'>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-219'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_DIG_UNKNOWN' value='0'/>
       <enumerator name='GNUTLS_DIG_NULL' value='1'/>
@@ -1722,61 +1720,61 @@
       <enumerator name='GNUTLS_DIG_SHAKE_128' value='209'/>
       <enumerator name='GNUTLS_DIG_SHAKE_256' value='210'/>
     </enum-decl>
-    <typedef-decl name='gnutls_digest_algorithm_t' type-id='type-id-218' id='type-id-215'/>
-    <class-decl name='__anonymous_struct__' size-in-bits='24' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-219' visibility='default' id='type-id-220'>
+    <typedef-decl name='gnutls_digest_algorithm_t' type-id='type-id-219' id='type-id-216'/>
+    <class-decl name='__anonymous_struct__' size-in-bits='24' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-220' visibility='default' id='type-id-221'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='id' type-id='type-id-169' visibility='default'/>
+        <var-decl name='id' type-id='type-id-170' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='16'>
         <var-decl name='tls_sem' type-id='type-id-24' visibility='default'/>
       </data-member>
     </class-decl>
 
-    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='16' id='type-id-169'>
+    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='16' id='type-id-170'>
       <subrange length='2' type-id='type-id-44' id='type-id-46'/>
 
     </array-type-def>
-    <typedef-decl name='sign_algorithm_st' type-id='type-id-220' id='type-id-219'/>
-    <qualified-type-def type-id='type-id-219' const='yes' id='type-id-216'/>
-    <enum-decl name='hash_security_level_t' id='type-id-221'>
+    <typedef-decl name='sign_algorithm_st' type-id='type-id-221' id='type-id-220'/>
+    <qualified-type-def type-id='type-id-220' const='yes' id='type-id-217'/>
+    <enum-decl name='hash_security_level_t' id='type-id-222'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='_SECURE' value='0'/>
       <enumerator name='_INSECURE_FOR_CERTS' value='1'/>
       <enumerator name='_INSECURE' value='2'/>
     </enum-decl>
-    <typedef-decl name='hash_security_level_t' type-id='type-id-221' id='type-id-217'/>
-    <qualified-type-def type-id='type-id-214' const='yes' id='type-id-222'/>
-    <pointer-type-def type-id='type-id-222' size-in-bits='64' id='type-id-223'/>
+    <typedef-decl name='hash_security_level_t' type-id='type-id-222' id='type-id-218'/>
+    <qualified-type-def type-id='type-id-215' const='yes' id='type-id-223'/>
+    <pointer-type-def type-id='type-id-223' size-in-bits='64' id='type-id-224'/>
 
-    <array-type-def dimensions='1' type-id='type-id-223' size-in-bits='4096' id='type-id-213'>
+    <array-type-def dimensions='1' type-id='type-id-224' size-in-bits='4096' id='type-id-214'>
       <subrange length='64' type-id='type-id-44' id='type-id-96'/>
 
     </array-type-def>
-    <typedef-decl name='sign_algo_list_st' type-id='type-id-212' id='type-id-203'/>
-    <class-decl name='ciphersuite_list_st' size-in-bits='16448' is-struct='yes' visibility='default' id='type-id-224'>
+    <typedef-decl name='sign_algo_list_st' type-id='type-id-213' id='type-id-204'/>
+    <class-decl name='ciphersuite_list_st' size-in-bits='16448' is-struct='yes' visibility='default' id='type-id-225'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='entry' type-id='type-id-225' visibility='default'/>
+        <var-decl name='entry' type-id='type-id-226' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='16384'>
         <var-decl name='size' type-id='type-id-2' visibility='default'/>
       </data-member>
     </class-decl>
-    <typedef-decl name='gnutls_cipher_suite_entry_st' type-id='type-id-33' id='type-id-226'/>
+    <typedef-decl name='gnutls_cipher_suite_entry_st' type-id='type-id-33' id='type-id-227'/>
 
-    <array-type-def dimensions='1' type-id='type-id-20' size-in-bits='16384' id='type-id-225'>
-      <subrange length='256' type-id='type-id-44' id='type-id-227'/>
+    <array-type-def dimensions='1' type-id='type-id-20' size-in-bits='16384' id='type-id-226'>
+      <subrange length='256' type-id='type-id-44' id='type-id-228'/>
 
     </array-type-def>
-    <typedef-decl name='ciphersuite_list_st' type-id='type-id-224' id='type-id-204'/>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-228'>
+    <typedef-decl name='ciphersuite_list_st' type-id='type-id-225' id='type-id-205'/>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-229'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='SR_DISABLED' value='0'/>
       <enumerator name='SR_UNSAFE' value='1'/>
       <enumerator name='SR_PARTIAL' value='2'/>
       <enumerator name='SR_SAFE' value='3'/>
     </enum-decl>
-    <typedef-decl name='safe_renegotiation_t' type-id='type-id-228' id='type-id-205'/>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-229'>
+    <typedef-decl name='safe_renegotiation_t' type-id='type-id-229' id='type-id-206'/>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-230'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_SEC_PARAM_UNKNOWN' value='0'/>
       <enumerator name='GNUTLS_SEC_PARAM_INSECURE' value='5'/>
@@ -1791,15 +1789,15 @@
       <enumerator name='GNUTLS_SEC_PARAM_FUTURE' value='50'/>
       <enumerator name='GNUTLS_SEC_PARAM_MAX' value='50'/>
     </enum-decl>
-    <typedef-decl name='gnutls_sec_param_t' type-id='type-id-229' id='type-id-206'/>
-    <type-decl name='atomic_uint' size-in-bits='32' id='type-id-207'/>
-    <pointer-type-def type-id='type-id-200' size-in-bits='64' id='type-id-148'/>
-    <class-decl name='__anonymous_struct__' size-in-bits='576' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-230' visibility='default' id='type-id-231'>
+    <typedef-decl name='gnutls_sec_param_t' type-id='type-id-230' id='type-id-207'/>
+    <type-decl name='atomic_uint' size-in-bits='32' id='type-id-208'/>
+    <pointer-type-def type-id='type-id-201' size-in-bits='64' id='type-id-148'/>
+    <class-decl name='__anonymous_struct__' size-in-bits='576' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-231' visibility='default' id='type-id-232'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='htype' type-id='type-id-190' visibility='default'/>
+        <var-decl name='htype' type-id='type-id-191' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='32'>
-        <var-decl name='rtype' type-id='type-id-190' visibility='default'/>
+        <var-decl name='rtype' type-id='type-id-191' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
         <var-decl name='length' type-id='type-id-26' visibility='default'/>
@@ -1814,7 +1812,7 @@
         <var-decl name='end_offset' type-id='type-id-26' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='192'>
-        <var-decl name='header' type-id='type-id-232' visibility='default'/>
+        <var-decl name='header' type-id='type-id-233' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='288'>
         <var-decl name='header_size' type-id='type-id-1' visibility='default'/>
@@ -1824,17 +1822,17 @@
       </data-member>
     </class-decl>
 
-    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='96' id='type-id-232'>
-      <subrange length='12' type-id='type-id-44' id='type-id-233'/>
+    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='96' id='type-id-233'>
+      <subrange length='12' type-id='type-id-44' id='type-id-234'/>
 
     </array-type-def>
-    <typedef-decl name='handshake_buffer_st' type-id='type-id-231' id='type-id-230'/>
+    <typedef-decl name='handshake_buffer_st' type-id='type-id-232' id='type-id-231'/>
 
-    <array-type-def dimensions='1' type-id='type-id-230' size-in-bits='3456' id='type-id-149'>
-      <subrange length='6' type-id='type-id-44' id='type-id-234'/>
+    <array-type-def dimensions='1' type-id='type-id-231' size-in-bits='3456' id='type-id-149'>
+      <subrange length='6' type-id='type-id-44' id='type-id-235'/>
 
     </array-type-def>
-    <enum-decl name='record_send_state_t' id='type-id-235'>
+    <enum-decl name='record_send_state_t' id='type-id-236'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='RECORD_SEND_NORMAL' value='0'/>
       <enumerator name='RECORD_SEND_CORKED' value='1'/>
@@ -1843,71 +1841,71 @@
       <enumerator name='RECORD_SEND_KEY_UPDATE_2' value='4'/>
       <enumerator name='RECORD_SEND_KEY_UPDATE_3' value='5'/>
     </enum-decl>
-    <typedef-decl name='record_send_state_t' type-id='type-id-235' id='type-id-150'/>
-    <class-decl name='mod_auth_st_int' size-in-bits='832' is-struct='yes' visibility='default' id='type-id-236'>
+    <typedef-decl name='record_send_state_t' type-id='type-id-236' id='type-id-150'/>
+    <class-decl name='mod_auth_st_int' size-in-bits='832' is-struct='yes' visibility='default' id='type-id-237'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='name' type-id='type-id-34' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
-        <var-decl name='gnutls_generate_server_certificate' type-id='type-id-237' visibility='default'/>
+        <var-decl name='gnutls_generate_server_certificate' type-id='type-id-238' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='gnutls_generate_client_certificate' type-id='type-id-237' visibility='default'/>
+        <var-decl name='gnutls_generate_client_certificate' type-id='type-id-238' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='192'>
-        <var-decl name='gnutls_generate_server_kx' type-id='type-id-237' visibility='default'/>
+        <var-decl name='gnutls_generate_server_kx' type-id='type-id-238' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='256'>
-        <var-decl name='gnutls_generate_client_kx' type-id='type-id-237' visibility='default'/>
+        <var-decl name='gnutls_generate_client_kx' type-id='type-id-238' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='320'>
-        <var-decl name='gnutls_generate_client_crt_vrfy' type-id='type-id-237' visibility='default'/>
+        <var-decl name='gnutls_generate_client_crt_vrfy' type-id='type-id-238' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='384'>
-        <var-decl name='gnutls_generate_server_crt_request' type-id='type-id-237' visibility='default'/>
+        <var-decl name='gnutls_generate_server_crt_request' type-id='type-id-238' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='448'>
-        <var-decl name='gnutls_process_server_certificate' type-id='type-id-238' visibility='default'/>
+        <var-decl name='gnutls_process_server_certificate' type-id='type-id-239' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='512'>
-        <var-decl name='gnutls_process_client_certificate' type-id='type-id-238' visibility='default'/>
+        <var-decl name='gnutls_process_client_certificate' type-id='type-id-239' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='576'>
-        <var-decl name='gnutls_process_server_kx' type-id='type-id-238' visibility='default'/>
+        <var-decl name='gnutls_process_server_kx' type-id='type-id-239' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='640'>
-        <var-decl name='gnutls_process_client_kx' type-id='type-id-238' visibility='default'/>
+        <var-decl name='gnutls_process_client_kx' type-id='type-id-239' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='704'>
-        <var-decl name='gnutls_process_client_crt_vrfy' type-id='type-id-238' visibility='default'/>
+        <var-decl name='gnutls_process_client_crt_vrfy' type-id='type-id-239' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='768'>
-        <var-decl name='gnutls_process_server_crt_request' type-id='type-id-238' visibility='default'/>
+        <var-decl name='gnutls_process_server_crt_request' type-id='type-id-239' visibility='default'/>
       </data-member>
     </class-decl>
-    <pointer-type-def type-id='type-id-13' size-in-bits='64' id='type-id-239'/>
-    <typedef-decl name='gnutls_session_t' type-id='type-id-239' id='type-id-240'/>
-    <pointer-type-def type-id='type-id-143' size-in-bits='64' id='type-id-241'/>
-    <pointer-type-def type-id='type-id-242' size-in-bits='64' id='type-id-237'/>
+    <pointer-type-def type-id='type-id-13' size-in-bits='64' id='type-id-240'/>
+    <typedef-decl name='gnutls_session_t' type-id='type-id-240' id='type-id-241'/>
+    <pointer-type-def type-id='type-id-143' size-in-bits='64' id='type-id-242'/>
     <pointer-type-def type-id='type-id-243' size-in-bits='64' id='type-id-238'/>
-    <qualified-type-def type-id='type-id-236' const='yes' id='type-id-244'/>
-    <pointer-type-def type-id='type-id-244' size-in-bits='64' id='type-id-151'/>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-245'>
+    <pointer-type-def type-id='type-id-244' size-in-bits='64' id='type-id-239'/>
+    <qualified-type-def type-id='type-id-237' const='yes' id='type-id-245'/>
+    <pointer-type-def type-id='type-id-245' size-in-bits='64' id='type-id-151'/>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-246'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_CERT_IGNORE' value='0'/>
       <enumerator name='GNUTLS_CERT_REQUEST' value='1'/>
       <enumerator name='GNUTLS_CERT_REQUIRE' value='2'/>
     </enum-decl>
-    <typedef-decl name='gnutls_certificate_request_t' type-id='type-id-245' id='type-id-152'/>
+    <typedef-decl name='gnutls_certificate_request_t' type-id='type-id-246' id='type-id-152'/>
     <typedef-decl name='gnutls_transport_ptr_t' type-id='type-id-105' id='type-id-158'/>
-    <pointer-type-def type-id='type-id-246' size-in-bits='64' id='type-id-247'/>
-    <typedef-decl name='gnutls_pull_timeout_func' type-id='type-id-247' id='type-id-153'/>
-    <typedef-decl name='__ssize_t' type-id='type-id-58' id='type-id-248'/>
-    <typedef-decl name='ssize_t' type-id='type-id-248' id='type-id-249'/>
-    <pointer-type-def type-id='type-id-250' size-in-bits='64' id='type-id-251'/>
-    <typedef-decl name='gnutls_pull_func' type-id='type-id-251' id='type-id-154'/>
-    <typedef-decl name='gnutls_push_func' type-id='type-id-251' id='type-id-155'/>
-    <class-decl name='iovec' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-252'>
+    <pointer-type-def type-id='type-id-247' size-in-bits='64' id='type-id-248'/>
+    <typedef-decl name='gnutls_pull_timeout_func' type-id='type-id-248' id='type-id-153'/>
+    <typedef-decl name='__ssize_t' type-id='type-id-58' id='type-id-249'/>
+    <typedef-decl name='ssize_t' type-id='type-id-249' id='type-id-250'/>
+    <pointer-type-def type-id='type-id-251' size-in-bits='64' id='type-id-252'/>
+    <typedef-decl name='gnutls_pull_func' type-id='type-id-252' id='type-id-154'/>
+    <typedef-decl name='gnutls_push_func' type-id='type-id-252' id='type-id-155'/>
+    <class-decl name='iovec' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-253'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='iov_base' type-id='type-id-105' visibility='default'/>
       </data-member>
@@ -1915,29 +1913,31 @@
         <var-decl name='iov_len' type-id='type-id-103' visibility='default'/>
       </data-member>
     </class-decl>
-    <typedef-decl name='giovec_t' type-id='type-id-252' id='type-id-253'/>
-    <qualified-type-def type-id='type-id-253' const='yes' id='type-id-254'/>
-    <pointer-type-def type-id='type-id-254' size-in-bits='64' id='type-id-255'/>
-    <pointer-type-def type-id='type-id-256' size-in-bits='64' id='type-id-257'/>
-    <typedef-decl name='gnutls_vec_push_func' type-id='type-id-257' id='type-id-156'/>
-    <pointer-type-def type-id='type-id-258' size-in-bits='64' id='type-id-259'/>
-    <typedef-decl name='gnutls_errno_func' type-id='type-id-259' id='type-id-157'/>
-    <pointer-type-def type-id='type-id-260' size-in-bits='64' id='type-id-261'/>
-    <typedef-decl name='gnutls_db_store_func' type-id='type-id-261' id='type-id-159'/>
-    <pointer-type-def type-id='type-id-262' size-in-bits='64' id='type-id-263'/>
-    <typedef-decl name='gnutls_db_retr_func' type-id='type-id-263' id='type-id-160'/>
-    <pointer-type-def type-id='type-id-264' size-in-bits='64' id='type-id-265'/>
-    <typedef-decl name='gnutls_db_remove_func' type-id='type-id-265' id='type-id-161'/>
-    <pointer-type-def type-id='type-id-266' size-in-bits='64' id='type-id-267'/>
-    <typedef-decl name='gnutls_handshake_simple_hook_func' type-id='type-id-267' id='type-id-162'/>
-    <pointer-type-def type-id='type-id-268' size-in-bits='64' id='type-id-269'/>
-    <typedef-decl name='gnutls_handshake_hook_func' type-id='type-id-269' id='type-id-163'/>
-    <type-decl name='short int' size-in-bits='16' id='type-id-270'/>
-    <typedef-decl name='__int16_t' type-id='type-id-270' id='type-id-271'/>
-    <typedef-decl name='int16_t' type-id='type-id-271' id='type-id-164'/>
-    <class-decl name='gnutls_pcert_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-272'>
+    <typedef-decl name='giovec_t' type-id='type-id-253' id='type-id-254'/>
+    <qualified-type-def type-id='type-id-254' const='yes' id='type-id-255'/>
+    <pointer-type-def type-id='type-id-255' size-in-bits='64' id='type-id-256'/>
+    <pointer-type-def type-id='type-id-257' size-in-bits='64' id='type-id-258'/>
+    <typedef-decl name='gnutls_vec_push_func' type-id='type-id-258' id='type-id-156'/>
+    <pointer-type-def type-id='type-id-259' size-in-bits='64' id='type-id-260'/>
+    <typedef-decl name='gnutls_errno_func' type-id='type-id-260' id='type-id-157'/>
+    <pointer-type-def type-id='type-id-261' size-in-bits='64' id='type-id-262'/>
+    <typedef-decl name='gnutls_db_store_func' type-id='type-id-262' id='type-id-159'/>
+    <pointer-type-def type-id='type-id-263' size-in-bits='64' id='type-id-264'/>
+    <typedef-decl name='gnutls_db_retr_func' type-id='type-id-264' id='type-id-160'/>
+    <pointer-type-def type-id='type-id-265' size-in-bits='64' id='type-id-266'/>
+    <typedef-decl name='gnutls_db_remove_func' type-id='type-id-266' id='type-id-161'/>
+    <pointer-type-def type-id='type-id-267' size-in-bits='64' id='type-id-268'/>
+    <typedef-decl name='gnutls_handshake_simple_hook_func' type-id='type-id-268' id='type-id-162'/>
+    <pointer-type-def type-id='type-id-269' size-in-bits='64' id='type-id-270'/>
+    <typedef-decl name='gnutls_handshake_hook_func' type-id='type-id-270' id='type-id-163'/>
+    <type-decl name='short int' size-in-bits='16' id='type-id-271'/>
+    <typedef-decl name='__int16_t' type-id='type-id-271' id='type-id-272'/>
+    <typedef-decl name='int16_t' type-id='type-id-272' id='type-id-164'/>
+    <pointer-type-def type-id='type-id-273' size-in-bits='64' id='type-id-274'/>
+    <typedef-decl name='gnutls_keylog_func' type-id='type-id-274' id='type-id-165'/>
+    <class-decl name='gnutls_pcert_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-275'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='pubkey' type-id='type-id-273' visibility='default'/>
+        <var-decl name='pubkey' type-id='type-id-276' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
         <var-decl name='cert' type-id='type-id-3' visibility='default'/>
@@ -1946,14 +1946,14 @@
         <var-decl name='type' type-id='type-id-27' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='gnutls_pubkey_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-274'/>
-    <pointer-type-def type-id='type-id-274' size-in-bits='64' id='type-id-275'/>
-    <typedef-decl name='gnutls_pubkey_t' type-id='type-id-275' id='type-id-273'/>
-    <typedef-decl name='gnutls_pcert_st' type-id='type-id-272' id='type-id-276'/>
-    <pointer-type-def type-id='type-id-276' size-in-bits='64' id='type-id-165'/>
-    <class-decl name='gnutls_privkey_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-277'/>
-    <pointer-type-def type-id='type-id-277' size-in-bits='64' id='type-id-166'/>
-    <class-decl name='gnutls_ocsp_data_st' size-in-bits='512' is-struct='yes' visibility='default' id='type-id-278'>
+    <class-decl name='gnutls_pubkey_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-277'/>
+    <pointer-type-def type-id='type-id-277' size-in-bits='64' id='type-id-278'/>
+    <typedef-decl name='gnutls_pubkey_t' type-id='type-id-278' id='type-id-276'/>
+    <typedef-decl name='gnutls_pcert_st' type-id='type-id-275' id='type-id-279'/>
+    <pointer-type-def type-id='type-id-279' size-in-bits='64' id='type-id-166'/>
+    <class-decl name='gnutls_privkey_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-280'/>
+    <pointer-type-def type-id='type-id-280' size-in-bits='64' id='type-id-167'/>
+    <class-decl name='gnutls_ocsp_data_st' size-in-bits='512' is-struct='yes' visibility='default' id='type-id-281'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='version' type-id='type-id-2' visibility='default'/>
       </data-member>
@@ -1964,19 +1964,19 @@
         <var-decl name='exptime' type-id='type-id-25' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='256'>
-        <var-decl name='padding' type-id='type-id-279' visibility='default'/>
+        <var-decl name='padding' type-id='type-id-282' visibility='default'/>
       </data-member>
     </class-decl>
 
-    <array-type-def dimensions='1' type-id='type-id-6' size-in-bits='256' id='type-id-279'>
+    <array-type-def dimensions='1' type-id='type-id-6' size-in-bits='256' id='type-id-282'>
       <subrange length='32' type-id='type-id-44' id='type-id-57'/>
 
     </array-type-def>
-    <typedef-decl name='gnutls_ocsp_data_st' type-id='type-id-278' id='type-id-280'/>
-    <pointer-type-def type-id='type-id-280' size-in-bits='64' id='type-id-167'/>
-    <pointer-type-def type-id='type-id-281' size-in-bits='64' id='type-id-282'/>
-    <typedef-decl name='gnutls_status_request_ocsp_func' type-id='type-id-282' id='type-id-168'/>
-    <class-decl name='__anonymous_struct__' size-in-bits='576' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-170' visibility='default' id='type-id-283'>
+    <typedef-decl name='gnutls_ocsp_data_st' type-id='type-id-281' id='type-id-283'/>
+    <pointer-type-def type-id='type-id-283' size-in-bits='64' id='type-id-168'/>
+    <pointer-type-def type-id='type-id-284' size-in-bits='64' id='type-id-285'/>
+    <typedef-decl name='gnutls_status_request_ocsp_func' type-id='type-id-285' id='type-id-169'/>
+    <class-decl name='__anonymous_struct__' size-in-bits='576' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-171' visibility='default' id='type-id-286'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='dcookie' type-id='type-id-3' visibility='default'/>
       </data-member>
@@ -2008,35 +2008,35 @@
         <var-decl name='async_term' type-id='type-id-25' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='384'>
-        <var-decl name='last_retransmit' type-id='type-id-172' visibility='default'/>
+        <var-decl name='last_retransmit' type-id='type-id-173' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='512'>
         <var-decl name='packets_dropped' type-id='type-id-2' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='timespec' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-172'>
+    <class-decl name='timespec' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-173'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='tv_sec' type-id='type-id-59' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
-        <var-decl name='tv_nsec' type-id='type-id-284' visibility='default'/>
+        <var-decl name='tv_nsec' type-id='type-id-287' visibility='default'/>
       </data-member>
     </class-decl>
-    <typedef-decl name='__syscall_slong_t' type-id='type-id-58' id='type-id-284'/>
-    <typedef-decl name='dtls_st' type-id='type-id-283' id='type-id-170'/>
+    <typedef-decl name='__syscall_slong_t' type-id='type-id-58' id='type-id-287'/>
+    <typedef-decl name='dtls_st' type-id='type-id-286' id='type-id-171'/>
 
-    <array-type-def dimensions='1' type-id='type-id-6' size-in-bits='288' id='type-id-171'>
-      <subrange length='36' type-id='type-id-44' id='type-id-285'/>
+    <array-type-def dimensions='1' type-id='type-id-6' size-in-bits='288' id='type-id-172'>
+      <subrange length='36' type-id='type-id-44' id='type-id-288'/>
 
     </array-type-def>
-    <enum-decl name='heartbeat_state_t' id='type-id-286'>
+    <enum-decl name='heartbeat_state_t' id='type-id-289'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='SHB_SEND1' value='0'/>
       <enumerator name='SHB_SEND2' value='1'/>
       <enumerator name='SHB_RECV' value='2'/>
     </enum-decl>
-    <typedef-decl name='heartbeat_state_t' type-id='type-id-286' id='type-id-173'/>
-    <enum-decl name='recv_state_t' id='type-id-287'>
+    <typedef-decl name='heartbeat_state_t' type-id='type-id-289' id='type-id-174'/>
+    <enum-decl name='recv_state_t' id='type-id-290'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='RECV_STATE_0' value='0'/>
       <enumerator name='RECV_STATE_DTLS_RETRANSMIT' value='1'/>
@@ -2048,12 +2048,12 @@
       <enumerator name='RECV_STATE_REHANDSHAKE' value='7'/>
       <enumerator name='RECV_STATE_REAUTH' value='8'/>
     </enum-decl>
-    <typedef-decl name='recv_state_t' type-id='type-id-287' id='type-id-174'/>
-    <typedef-decl name='gnutls_certificate_verify_function' type-id='type-id-266' id='type-id-288'/>
-    <pointer-type-def type-id='type-id-288' size-in-bits='64' id='type-id-175'/>
-    <class-decl name='__anonymous_struct__' size-in-bits='192' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-177' visibility='default' id='type-id-289'>
+    <typedef-decl name='recv_state_t' type-id='type-id-290' id='type-id-175'/>
+    <typedef-decl name='gnutls_certificate_verify_function' type-id='type-id-267' id='type-id-291'/>
+    <pointer-type-def type-id='type-id-291' size-in-bits='64' id='type-id-176'/>
+    <class-decl name='__anonymous_struct__' size-in-bits='192' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-178' visibility='default' id='type-id-292'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='type' type-id='type-id-290' visibility='default'/>
+        <var-decl name='type' type-id='type-id-293' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
         <var-decl name='data' type-id='type-id-5' visibility='default'/>
@@ -2062,7 +2062,7 @@
         <var-decl name='size' type-id='type-id-2' visibility='default'/>
       </data-member>
     </class-decl>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-291'>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-294'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_DT_UNKNOWN' value='0'/>
       <enumerator name='GNUTLS_DT_DNS_HOSTNAME' value='1'/>
@@ -2070,15 +2070,15 @@
       <enumerator name='GNUTLS_DT_RFC822NAME' value='3'/>
       <enumerator name='GNUTLS_DT_IP_ADDRESS' value='4'/>
     </enum-decl>
-    <typedef-decl name='gnutls_vdata_types_t' type-id='type-id-291' id='type-id-290'/>
-    <typedef-decl name='gnutls_typed_vdata_st' type-id='type-id-289' id='type-id-177'/>
-    <pointer-type-def type-id='type-id-177' size-in-bits='64' id='type-id-176'/>
+    <typedef-decl name='gnutls_vdata_types_t' type-id='type-id-294' id='type-id-293'/>
+    <typedef-decl name='gnutls_typed_vdata_st' type-id='type-id-292' id='type-id-178'/>
+    <pointer-type-def type-id='type-id-178' size-in-bits='64' id='type-id-177'/>
 
-    <array-type-def dimensions='1' type-id='type-id-40' size-in-bits='1032' id='type-id-178'>
-      <subrange length='129' type-id='type-id-44' id='type-id-292'/>
+    <array-type-def dimensions='1' type-id='type-id-40' size-in-bits='1032' id='type-id-179'>
+      <subrange length='129' type-id='type-id-44' id='type-id-295'/>
 
     </array-type-def>
-    <class-decl name='tfo_st' size-in-bits='1216' is-struct='yes' visibility='default' id='type-id-293'>
+    <class-decl name='tfo_st' size-in-bits='1216' is-struct='yes' visibility='default' id='type-id-296'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='fd' type-id='type-id-1' visibility='default'/>
       </data-member>
@@ -2089,42 +2089,42 @@
         <var-decl name='connect_only' type-id='type-id-79' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='connect_addr' type-id='type-id-294' visibility='default'/>
+        <var-decl name='connect_addr' type-id='type-id-297' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='1152'>
-        <var-decl name='connect_addrlen' type-id='type-id-295' visibility='default'/>
+        <var-decl name='connect_addrlen' type-id='type-id-298' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='sockaddr_storage' size-in-bits='1024' is-struct='yes' visibility='default' id='type-id-294'>
+    <class-decl name='sockaddr_storage' size-in-bits='1024' is-struct='yes' visibility='default' id='type-id-297'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='ss_family' type-id='type-id-296' visibility='default'/>
+        <var-decl name='ss_family' type-id='type-id-299' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='16'>
-        <var-decl name='__ss_padding' type-id='type-id-297' visibility='default'/>
+        <var-decl name='__ss_padding' type-id='type-id-300' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='960'>
         <var-decl name='__ss_align' type-id='type-id-44' visibility='default'/>
       </data-member>
     </class-decl>
-    <typedef-decl name='sa_family_t' type-id='type-id-31' id='type-id-296'/>
+    <typedef-decl name='sa_family_t' type-id='type-id-31' id='type-id-299'/>
 
-    <array-type-def dimensions='1' type-id='type-id-40' size-in-bits='944' id='type-id-297'>
-      <subrange length='118' type-id='type-id-44' id='type-id-298'/>
+    <array-type-def dimensions='1' type-id='type-id-40' size-in-bits='944' id='type-id-300'>
+      <subrange length='118' type-id='type-id-44' id='type-id-301'/>
 
     </array-type-def>
-    <typedef-decl name='__socklen_t' type-id='type-id-2' id='type-id-299'/>
-    <typedef-decl name='socklen_t' type-id='type-id-299' id='type-id-295'/>
-    <typedef-decl name='tfo_st' type-id='type-id-293' id='type-id-179'/>
-    <class-decl name='gnutls_supplemental_entry_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-300'/>
-    <pointer-type-def type-id='type-id-300' size-in-bits='64' id='type-id-180'/>
-    <class-decl name='hello_ext_entry_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-301'/>
-    <pointer-type-def type-id='type-id-301' size-in-bits='64' id='type-id-181'/>
-    <class-decl name='__anonymous_struct__' size-in-bits='192' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-302'>
+    <typedef-decl name='__socklen_t' type-id='type-id-2' id='type-id-302'/>
+    <typedef-decl name='socklen_t' type-id='type-id-302' id='type-id-298'/>
+    <typedef-decl name='tfo_st' type-id='type-id-296' id='type-id-180'/>
+    <class-decl name='gnutls_supplemental_entry_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-303'/>
+    <pointer-type-def type-id='type-id-303' size-in-bits='64' id='type-id-181'/>
+    <class-decl name='hello_ext_entry_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-304'/>
+    <pointer-type-def type-id='type-id-304' size-in-bits='64' id='type-id-182'/>
+    <class-decl name='__anonymous_struct__' size-in-bits='192' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-305'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='priv' type-id='type-id-303' visibility='default'/>
+        <var-decl name='priv' type-id='type-id-306' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
-        <var-decl name='resumed_priv' type-id='type-id-303' visibility='default'/>
+        <var-decl name='resumed_priv' type-id='type-id-306' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
         <var-decl name='set' type-id='type-id-24' visibility='default'/>
@@ -2133,13 +2133,13 @@
         <var-decl name='resumed_set' type-id='type-id-24' visibility='default'/>
       </data-member>
     </class-decl>
-    <typedef-decl name='gnutls_ext_priv_data_t' type-id='type-id-105' id='type-id-303'/>
+    <typedef-decl name='gnutls_ext_priv_data_t' type-id='type-id-105' id='type-id-306'/>
 
-    <array-type-def dimensions='1' type-id='type-id-302' size-in-bits='6144' id='type-id-182'>
+    <array-type-def dimensions='1' type-id='type-id-305' size-in-bits='6144' id='type-id-183'>
       <subrange length='32' type-id='type-id-44' id='type-id-57'/>
 
     </array-type-def>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-304'>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-307'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL' value='1'/>
       <enumerator name='GNUTLS_EXT_FLAG_CLIENT_HELLO' value='2'/>
@@ -2151,13 +2151,13 @@
       <enumerator name='GNUTLS_EXT_FLAG_TLS' value='128'/>
       <enumerator name='GNUTLS_EXT_FLAG_DTLS' value='256'/>
     </enum-decl>
-    <typedef-decl name='gnutls_ext_flags_t' type-id='type-id-304' id='type-id-183'/>
-    <class-decl name='__anonymous_struct__' size-in-bits='3136' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-184' visibility='default' id='type-id-305'>
+    <typedef-decl name='gnutls_ext_flags_t' type-id='type-id-307' id='type-id-184'/>
+    <class-decl name='__anonymous_struct__' size-in-bits='3136' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-185' visibility='default' id='type-id-308'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='arrival_time' type-id='type-id-172' visibility='default'/>
+        <var-decl name='arrival_time' type-id='type-id-173' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='creation_time' type-id='type-id-172' visibility='default'/>
+        <var-decl name='creation_time' type-id='type-id-173' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='256'>
         <var-decl name='lifetime' type-id='type-id-26' visibility='default'/>
@@ -2166,7 +2166,7 @@
         <var-decl name='age_add' type-id='type-id-26' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='320'>
-        <var-decl name='nonce' type-id='type-id-306' visibility='default'/>
+        <var-decl name='nonce' type-id='type-id-309' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='2368'>
         <var-decl name='nonce_size' type-id='type-id-103' visibility='default'/>
@@ -2182,24 +2182,24 @@
       </data-member>
     </class-decl>
 
-    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='2040' id='type-id-306'>
-      <subrange length='255' type-id='type-id-44' id='type-id-307'/>
+    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='2040' id='type-id-309'>
+      <subrange length='255' type-id='type-id-44' id='type-id-310'/>
 
     </array-type-def>
-    <typedef-decl name='tls13_ticket_st' type-id='type-id-305' id='type-id-184'/>
-    <class-decl name='gnutls_anti_replay_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-308'/>
-    <pointer-type-def type-id='type-id-308' size-in-bits='64' id='type-id-309'/>
-    <typedef-decl name='gnutls_anti_replay_t' type-id='type-id-309' id='type-id-185'/>
+    <typedef-decl name='tls13_ticket_st' type-id='type-id-308' id='type-id-185'/>
+    <class-decl name='gnutls_anti_replay_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-311'/>
+    <pointer-type-def type-id='type-id-311' size-in-bits='64' id='type-id-312'/>
+    <typedef-decl name='gnutls_anti_replay_t' type-id='type-id-312' id='type-id-186'/>
     <typedef-decl name='internals_st' type-id='type-id-141' id='type-id-16'/>
-    <class-decl name='gnutls_key_st' size-in-bits='22656' is-struct='yes' visibility='default' id='type-id-310'>
+    <class-decl name='gnutls_key_st' size-in-bits='22656' is-struct='yes' visibility='default' id='type-id-313'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='kshare' type-id='type-id-311' visibility='default'/>
+        <var-decl name='kshare' type-id='type-id-314' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='11520'>
-        <var-decl name='proto' type-id='type-id-312' visibility='default'/>
+        <var-decl name='proto' type-id='type-id-315' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='20096'>
-        <var-decl name='binders' type-id='type-id-313' visibility='default'/>
+        <var-decl name='binders' type-id='type-id-316' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='20608'>
         <var-decl name='key' type-id='type-id-3' visibility='default'/>
@@ -2217,32 +2217,32 @@
         <var-decl name='auth_info' type-id='type-id-105' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='22336'>
-        <var-decl name='auth_info_type' type-id='type-id-314' visibility='default'/>
+        <var-decl name='auth_info_type' type-id='type-id-317' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='22368'>
         <var-decl name='auth_info_size' type-id='type-id-1' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='22400'>
-        <var-decl name='cred' type-id='type-id-315' visibility='default'/>
+        <var-decl name='cred' type-id='type-id-318' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='22464'>
-        <var-decl name='totp' type-id='type-id-316' visibility='default'/>
+        <var-decl name='totp' type-id='type-id-319' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='11520' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-311'>
+    <class-decl name='__anonymous_struct__' size-in-bits='11520' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-314'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='ecdh_params' type-id='type-id-317' visibility='default'/>
+        <var-decl name='ecdh_params' type-id='type-id-320' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3840'>
-        <var-decl name='ecdhx_params' type-id='type-id-317' visibility='default'/>
+        <var-decl name='ecdhx_params' type-id='type-id-320' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='7680'>
-        <var-decl name='dh_params' type-id='type-id-317' visibility='default'/>
+        <var-decl name='dh_params' type-id='type-id-320' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='3840' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-317' visibility='default' id='type-id-318'>
+    <class-decl name='__anonymous_struct__' size-in-bits='3840' is-struct='yes' is-anonymous='yes' naming-typedef-id='type-id-320' visibility='default' id='type-id-321'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='params' type-id='type-id-319' visibility='default'/>
+        <var-decl name='params' type-id='type-id-322' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='1024'>
         <var-decl name='params_nr' type-id='type-id-2' visibility='default'/>
@@ -2260,7 +2260,7 @@
         <var-decl name='dh_group' type-id='type-id-63' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='1184'>
-        <var-decl name='gost_params' type-id='type-id-320' visibility='default'/>
+        <var-decl name='gost_params' type-id='type-id-323' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='1216'>
         <var-decl name='raw_pub' type-id='type-id-3' visibility='default'/>
@@ -2272,25 +2272,25 @@
         <var-decl name='seed_size' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='1504'>
-        <var-decl name='seed' type-id='type-id-321' visibility='default'/>
+        <var-decl name='seed' type-id='type-id-324' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3552'>
-        <var-decl name='palgo' type-id='type-id-215' visibility='default'/>
+        <var-decl name='palgo' type-id='type-id-216' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3584'>
-        <var-decl name='spki' type-id='type-id-322' visibility='default'/>
+        <var-decl name='spki' type-id='type-id-325' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3776'>
         <var-decl name='algo' type-id='type-id-67' visibility='default'/>
       </data-member>
     </class-decl>
-    <typedef-decl name='bigint_t' type-id='type-id-105' id='type-id-323'/>
+    <typedef-decl name='bigint_t' type-id='type-id-105' id='type-id-326'/>
 
-    <array-type-def dimensions='1' type-id='type-id-323' size-in-bits='1024' id='type-id-319'>
+    <array-type-def dimensions='1' type-id='type-id-326' size-in-bits='1024' id='type-id-322'>
       <subrange length='16' type-id='type-id-44' id='type-id-97'/>
 
     </array-type-def>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-324'>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-327'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_GOST_PARAMSET_UNKNOWN' value='0'/>
       <enumerator name='GNUTLS_GOST_PARAMSET_TC26_Z' value='1'/>
@@ -2299,18 +2299,18 @@
       <enumerator name='GNUTLS_GOST_PARAMSET_CP_C' value='4'/>
       <enumerator name='GNUTLS_GOST_PARAMSET_CP_D' value='5'/>
     </enum-decl>
-    <typedef-decl name='gnutls_gost_paramset_t' type-id='type-id-324' id='type-id-320'/>
+    <typedef-decl name='gnutls_gost_paramset_t' type-id='type-id-327' id='type-id-323'/>
 
-    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='2048' id='type-id-321'>
-      <subrange length='256' type-id='type-id-44' id='type-id-227'/>
+    <array-type-def dimensions='1' type-id='type-id-24' size-in-bits='2048' id='type-id-324'>
+      <subrange length='256' type-id='type-id-44' id='type-id-228'/>
 
     </array-type-def>
-    <class-decl name='gnutls_x509_spki_st' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-325'>
+    <class-decl name='gnutls_x509_spki_st' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-328'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='pk' type-id='type-id-67' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='32'>
-        <var-decl name='rsa_pss_dig' type-id='type-id-215' visibility='default'/>
+        <var-decl name='rsa_pss_dig' type-id='type-id-216' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
         <var-decl name='salt_size' type-id='type-id-2' visibility='default'/>
@@ -2319,23 +2319,23 @@
         <var-decl name='legacy' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='dsa_dig' type-id='type-id-215' visibility='default'/>
+        <var-decl name='dsa_dig' type-id='type-id-216' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='160'>
         <var-decl name='flags' type-id='type-id-2' visibility='default'/>
       </data-member>
     </class-decl>
-    <typedef-decl name='gnutls_x509_spki_st' type-id='type-id-325' id='type-id-322'/>
-    <typedef-decl name='gnutls_pk_params_st' type-id='type-id-318' id='type-id-317'/>
-    <union-decl name='__anonymous_union__' size-in-bits='8576' is-anonymous='yes' visibility='default' id='type-id-312'>
+    <typedef-decl name='gnutls_x509_spki_st' type-id='type-id-328' id='type-id-325'/>
+    <typedef-decl name='gnutls_pk_params_st' type-id='type-id-321' id='type-id-320'/>
+    <union-decl name='__anonymous_union__' size-in-bits='8576' is-anonymous='yes' visibility='default' id='type-id-315'>
       <data-member access='private'>
-        <var-decl name='tls13' type-id='type-id-326' visibility='default'/>
+        <var-decl name='tls13' type-id='type-id-329' visibility='default'/>
       </data-member>
       <data-member access='private'>
-        <var-decl name='tls12' type-id='type-id-327' visibility='default'/>
+        <var-decl name='tls12' type-id='type-id-330' visibility='default'/>
       </data-member>
     </union-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='4128' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-326'>
+    <class-decl name='__anonymous_struct__' size-in-bits='4128' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-329'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='temp_secret' type-id='type-id-93' visibility='default'/>
       </data-member>
@@ -2364,69 +2364,69 @@
         <var-decl name='ap_rms' type-id='type-id-93' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='8576' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-327'>
+    <class-decl name='__anonymous_struct__' size-in-bits='8576' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-330'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='ecdh' type-id='type-id-328' visibility='default'/>
+        <var-decl name='ecdh' type-id='type-id-331' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='4096'>
-        <var-decl name='dh' type-id='type-id-329' visibility='default'/>
+        <var-decl name='dh' type-id='type-id-332' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='8000'>
-        <var-decl name='srp' type-id='type-id-330' visibility='default'/>
+        <var-decl name='srp' type-id='type-id-333' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='4096' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-328'>
+    <class-decl name='__anonymous_struct__' size-in-bits='4096' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-331'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='params' type-id='type-id-317' visibility='default'/>
+        <var-decl name='params' type-id='type-id-320' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3840'>
-        <var-decl name='x' type-id='type-id-323' visibility='default'/>
+        <var-decl name='x' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3904'>
-        <var-decl name='y' type-id='type-id-323' visibility='default'/>
+        <var-decl name='y' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3968'>
         <var-decl name='raw' type-id='type-id-3' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='3904' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-329'>
+    <class-decl name='__anonymous_struct__' size-in-bits='3904' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-332'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='params' type-id='type-id-317' visibility='default'/>
+        <var-decl name='params' type-id='type-id-320' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3840'>
-        <var-decl name='client_Y' type-id='type-id-323' visibility='default'/>
+        <var-decl name='client_Y' type-id='type-id-326' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='__anonymous_struct__' size-in-bits='576' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-330'>
+    <class-decl name='__anonymous_struct__' size-in-bits='576' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-333'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='srp_key' type-id='type-id-323' visibility='default'/>
+        <var-decl name='srp_key' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
-        <var-decl name='srp_g' type-id='type-id-323' visibility='default'/>
+        <var-decl name='srp_g' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='srp_p' type-id='type-id-323' visibility='default'/>
+        <var-decl name='srp_p' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='192'>
-        <var-decl name='A' type-id='type-id-323' visibility='default'/>
+        <var-decl name='A' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='256'>
-        <var-decl name='B' type-id='type-id-323' visibility='default'/>
+        <var-decl name='B' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='320'>
-        <var-decl name='u' type-id='type-id-323' visibility='default'/>
+        <var-decl name='u' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='384'>
-        <var-decl name='b' type-id='type-id-323' visibility='default'/>
+        <var-decl name='b' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='448'>
-        <var-decl name='a' type-id='type-id-323' visibility='default'/>
+        <var-decl name='a' type-id='type-id-326' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='512'>
-        <var-decl name='x' type-id='type-id-323' visibility='default'/>
+        <var-decl name='x' type-id='type-id-326' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='binder_data_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-331'>
+    <class-decl name='binder_data_st' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-334'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='prf' type-id='type-id-21' visibility='default'/>
       </data-member>
@@ -2441,11 +2441,11 @@
       </data-member>
     </class-decl>
 
-    <array-type-def dimensions='1' type-id='type-id-331' size-in-bits='512' id='type-id-313'>
+    <array-type-def dimensions='1' type-id='type-id-334' size-in-bits='512' id='type-id-316'>
       <subrange length='2' type-id='type-id-44' id='type-id-46'/>
 
     </array-type-def>
-    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-332'>
+    <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-335'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='GNUTLS_CRD_CERTIFICATE' value='1'/>
       <enumerator name='GNUTLS_CRD_ANON' value='2'/>
@@ -2453,21 +2453,21 @@
       <enumerator name='GNUTLS_CRD_PSK' value='4'/>
       <enumerator name='GNUTLS_CRD_IA' value='5'/>
     </enum-decl>
-    <typedef-decl name='gnutls_credentials_type_t' type-id='type-id-332' id='type-id-314'/>
-    <class-decl name='auth_cred_st' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-333'>
+    <typedef-decl name='gnutls_credentials_type_t' type-id='type-id-335' id='type-id-317'/>
+    <class-decl name='auth_cred_st' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-336'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='algorithm' type-id='type-id-314' visibility='default'/>
+        <var-decl name='algorithm' type-id='type-id-317' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
         <var-decl name='credentials' type-id='type-id-105' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='next' type-id='type-id-315' visibility='default'/>
+        <var-decl name='next' type-id='type-id-318' visibility='default'/>
       </data-member>
     </class-decl>
-    <pointer-type-def type-id='type-id-333' size-in-bits='64' id='type-id-315'/>
-    <typedef-decl name='auth_cred_st' type-id='type-id-333' id='type-id-334'/>
-    <class-decl name='__anonymous_struct__' size-in-bits='192' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-316'>
+    <pointer-type-def type-id='type-id-336' size-in-bits='64' id='type-id-318'/>
+    <typedef-decl name='auth_cred_st' type-id='type-id-336' id='type-id-337'/>
+    <class-decl name='__anonymous_struct__' size-in-bits='192' is-struct='yes' is-anonymous='yes' visibility='default' id='type-id-319'>
       <data-member access='public' layout-offset-in-bits='0'>
         <var-decl name='last_result' type-id='type-id-84' visibility='default'/>
       </data-member>
@@ -2475,22 +2475,22 @@
         <var-decl name='was_rotated' type-id='type-id-24' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='cb' type-id='type-id-335' visibility='default'/>
+        <var-decl name='cb' type-id='type-id-338' visibility='default'/>
       </data-member>
     </class-decl>
-    <pointer-type-def type-id='type-id-336' size-in-bits='64' id='type-id-337'/>
-    <typedef-decl name='gnutls_stek_rotation_callback_t' type-id='type-id-337' id='type-id-335'/>
-    <typedef-decl name='gnutls_key_st' type-id='type-id-310' id='type-id-17'/>
-    <pointer-type-def type-id='type-id-2' size-in-bits='64' id='type-id-338'/>
+    <pointer-type-def type-id='type-id-339' size-in-bits='64' id='type-id-340'/>
+    <typedef-decl name='gnutls_stek_rotation_callback_t' type-id='type-id-340' id='type-id-338'/>
+    <typedef-decl name='gnutls_key_st' type-id='type-id-313' id='type-id-17'/>
+    <pointer-type-def type-id='type-id-2' size-in-bits='64' id='type-id-341'/>
     <function-decl name='dane_verify_session_crt' mangled-name='dane_verify_session_crt' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_verify_session_crt@@DANE_0_0'>
       <parameter type-id='type-id-12' name='s'/>
-      <parameter type-id='type-id-240' name='session'/>
+      <parameter type-id='type-id-241' name='session'/>
       <parameter type-id='type-id-34' name='hostname'/>
       <parameter type-id='type-id-34' name='proto'/>
       <parameter type-id='type-id-2' name='port'/>
       <parameter type-id='type-id-2' name='sflags'/>
       <parameter type-id='type-id-2' name='vflags'/>
-      <parameter type-id='type-id-338' name='verify'/>
+      <parameter type-id='type-id-341' name='verify'/>
       <return type-id='type-id-1'/>
     </function-decl>
     <function-decl name='dane_verify_crt' mangled-name='dane_verify_crt' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_verify_crt@@DANE_0_0'>
@@ -2503,38 +2503,38 @@
       <parameter type-id='type-id-2' name='port'/>
       <parameter type-id='type-id-2' name='sflags'/>
       <parameter type-id='type-id-2' name='vflags'/>
-      <parameter type-id='type-id-338' name='verify'/>
+      <parameter type-id='type-id-341' name='verify'/>
       <return type-id='type-id-1'/>
     </function-decl>
-    <class-decl name='dane_query_st' size-in-bits='22592' is-struct='yes' visibility='default' id='type-id-339'>
+    <class-decl name='dane_query_st' size-in-bits='22592' is-struct='yes' visibility='default' id='type-id-342'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='result' type-id='type-id-340' visibility='default'/>
+        <var-decl name='result' type-id='type-id-343' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
         <var-decl name='data_entries' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='96'>
-        <var-decl name='usage' type-id='type-id-341' visibility='default'/>
+        <var-decl name='usage' type-id='type-id-344' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='3296'>
-        <var-decl name='type' type-id='type-id-342' visibility='default'/>
+        <var-decl name='type' type-id='type-id-345' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='6496'>
-        <var-decl name='match' type-id='type-id-343' visibility='default'/>
+        <var-decl name='match' type-id='type-id-346' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='9728'>
-        <var-decl name='data' type-id='type-id-344' visibility='default'/>
+        <var-decl name='data' type-id='type-id-347' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='22528'>
         <var-decl name='flags' type-id='type-id-2' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='22560'>
-        <var-decl name='status' type-id='type-id-345' visibility='default'/>
+        <var-decl name='status' type-id='type-id-348' visibility='default'/>
       </data-member>
     </class-decl>
-    <class-decl name='ub_result' size-in-bits='768' is-struct='yes' visibility='default' id='type-id-346'>
+    <class-decl name='ub_result' size-in-bits='768' is-struct='yes' visibility='default' id='type-id-349'>
       <data-member access='public' layout-offset-in-bits='0'>
-        <var-decl name='qname' type-id='type-id-347' visibility='default'/>
+        <var-decl name='qname' type-id='type-id-350' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='64'>
         <var-decl name='qtype' type-id='type-id-1' visibility='default'/>
@@ -2543,13 +2543,13 @@
         <var-decl name='qclass' type-id='type-id-1' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='128'>
-        <var-decl name='data' type-id='type-id-348' visibility='default'/>
+        <var-decl name='data' type-id='type-id-351' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='192'>
-        <var-decl name='len' type-id='type-id-349' visibility='default'/>
+        <var-decl name='len' type-id='type-id-352' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='256'>
-        <var-decl name='canonname' type-id='type-id-347' visibility='default'/>
+        <var-decl name='canonname' type-id='type-id-350' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='320'>
         <var-decl name='rcode' type-id='type-id-1' visibility='default'/>
@@ -2573,7 +2573,7 @@
         <var-decl name='bogus' type-id='type-id-1' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='640'>
-        <var-decl name='why_bogus' type-id='type-id-347' visibility='default'/>
+        <var-decl name='why_bogus' type-id='type-id-350' visibility='default'/>
       </data-member>
       <data-member access='public' layout-offset-in-bits='704'>
         <var-decl name='was_ratelimited' type-id='type-id-1' visibility='default'/>
@@ -2582,85 +2582,85 @@
         <var-decl name='ttl' type-id='type-id-1' visibility='default'/>
       </data-member>
     </class-decl>
-    <pointer-type-def type-id='type-id-40' size-in-bits='64' id='type-id-347'/>
-    <pointer-type-def type-id='type-id-347' size-in-bits='64' id='type-id-348'/>
-    <pointer-type-def type-id='type-id-1' size-in-bits='64' id='type-id-349'/>
-    <pointer-type-def type-id='type-id-346' size-in-bits='64' id='type-id-340'/>
-    <enum-decl name='dane_cert_usage_t' id='type-id-350'>
+    <pointer-type-def type-id='type-id-40' size-in-bits='64' id='type-id-350'/>
+    <pointer-type-def type-id='type-id-350' size-in-bits='64' id='type-id-351'/>
+    <pointer-type-def type-id='type-id-1' size-in-bits='64' id='type-id-352'/>
+    <pointer-type-def type-id='type-id-349' size-in-bits='64' id='type-id-343'/>
+    <enum-decl name='dane_cert_usage_t' id='type-id-353'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='DANE_CERT_USAGE_CA' value='0'/>
       <enumerator name='DANE_CERT_USAGE_EE' value='1'/>
       <enumerator name='DANE_CERT_USAGE_LOCAL_CA' value='2'/>
       <enumerator name='DANE_CERT_USAGE_LOCAL_EE' value='3'/>
     </enum-decl>
-    <typedef-decl name='dane_cert_usage_t' type-id='type-id-350' id='type-id-351'/>
+    <typedef-decl name='dane_cert_usage_t' type-id='type-id-353' id='type-id-354'/>
 
-    <array-type-def dimensions='1' type-id='type-id-351' size-in-bits='3200' alignment-in-bits='32' id='type-id-341'>
-      <subrange length='100' type-id='type-id-44' id='type-id-352'/>
+    <array-type-def dimensions='1' type-id='type-id-354' size-in-bits='3200' alignment-in-bits='32' id='type-id-344'>
+      <subrange length='100' type-id='type-id-44' id='type-id-355'/>
 
     </array-type-def>
-    <enum-decl name='dane_cert_type_t' id='type-id-353'>
+    <enum-decl name='dane_cert_type_t' id='type-id-356'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='DANE_CERT_X509' value='0'/>
       <enumerator name='DANE_CERT_PK' value='1'/>
     </enum-decl>
-    <typedef-decl name='dane_cert_type_t' type-id='type-id-353' id='type-id-354'/>
+    <typedef-decl name='dane_cert_type_t' type-id='type-id-356' id='type-id-357'/>
 
-    <array-type-def dimensions='1' type-id='type-id-354' size-in-bits='3200' alignment-in-bits='32' id='type-id-342'>
-      <subrange length='100' type-id='type-id-44' id='type-id-352'/>
+    <array-type-def dimensions='1' type-id='type-id-357' size-in-bits='3200' alignment-in-bits='32' id='type-id-345'>
+      <subrange length='100' type-id='type-id-44' id='type-id-355'/>
 
     </array-type-def>
-    <enum-decl name='dane_match_type_t' id='type-id-355'>
+    <enum-decl name='dane_match_type_t' id='type-id-358'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='DANE_MATCH_EXACT' value='0'/>
       <enumerator name='DANE_MATCH_SHA2_256' value='1'/>
       <enumerator name='DANE_MATCH_SHA2_512' value='2'/>
     </enum-decl>
-    <typedef-decl name='dane_match_type_t' type-id='type-id-355' id='type-id-356'/>
+    <typedef-decl name='dane_match_type_t' type-id='type-id-358' id='type-id-359'/>
 
-    <array-type-def dimensions='1' type-id='type-id-356' size-in-bits='3200' alignment-in-bits='32' id='type-id-343'>
-      <subrange length='100' type-id='type-id-44' id='type-id-352'/>
-
-    </array-type-def>
-
-    <array-type-def dimensions='1' type-id='type-id-3' size-in-bits='12800' id='type-id-344'>
-      <subrange length='100' type-id='type-id-44' id='type-id-352'/>
+    <array-type-def dimensions='1' type-id='type-id-359' size-in-bits='3200' alignment-in-bits='32' id='type-id-346'>
+      <subrange length='100' type-id='type-id-44' id='type-id-355'/>
 
     </array-type-def>
-    <enum-decl name='dane_query_status_t' id='type-id-357'>
+
+    <array-type-def dimensions='1' type-id='type-id-3' size-in-bits='12800' id='type-id-347'>
+      <subrange length='100' type-id='type-id-44' id='type-id-355'/>
+
+    </array-type-def>
+    <enum-decl name='dane_query_status_t' id='type-id-360'>
       <underlying-type type-id='type-id-47'/>
       <enumerator name='DANE_QUERY_UNKNOWN' value='0'/>
       <enumerator name='DANE_QUERY_DNSSEC_VERIFIED' value='1'/>
       <enumerator name='DANE_QUERY_BOGUS' value='2'/>
       <enumerator name='DANE_QUERY_NO_DNSSEC' value='3'/>
     </enum-decl>
-    <typedef-decl name='dane_query_status_t' type-id='type-id-357' id='type-id-345'/>
-    <pointer-type-def type-id='type-id-339' size-in-bits='64' id='type-id-358'/>
-    <typedef-decl name='dane_query_t' type-id='type-id-358' id='type-id-359'/>
-    <pointer-type-def type-id='type-id-359' size-in-bits='64' id='type-id-360'/>
+    <typedef-decl name='dane_query_status_t' type-id='type-id-360' id='type-id-348'/>
+    <pointer-type-def type-id='type-id-342' size-in-bits='64' id='type-id-361'/>
+    <typedef-decl name='dane_query_t' type-id='type-id-361' id='type-id-362'/>
+    <pointer-type-def type-id='type-id-362' size-in-bits='64' id='type-id-363'/>
     <function-decl name='dane_query_tlsa' mangled-name='dane_query_tlsa' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_query_tlsa@@DANE_0_0'>
       <parameter type-id='type-id-12' name='s'/>
-      <parameter type-id='type-id-360' name='r'/>
+      <parameter type-id='type-id-363' name='r'/>
       <parameter type-id='type-id-34' name='host'/>
       <parameter type-id='type-id-34' name='proto'/>
       <parameter type-id='type-id-2' name='port'/>
       <return type-id='type-id-1'/>
     </function-decl>
-    <qualified-type-def type-id='type-id-347' const='yes' id='type-id-361'/>
-    <pointer-type-def type-id='type-id-361' size-in-bits='64' id='type-id-362'/>
-    <qualified-type-def type-id='type-id-1' const='yes' id='type-id-363'/>
-    <pointer-type-def type-id='type-id-363' size-in-bits='64' id='type-id-364'/>
+    <qualified-type-def type-id='type-id-350' const='yes' id='type-id-364'/>
+    <pointer-type-def type-id='type-id-364' size-in-bits='64' id='type-id-365'/>
+    <qualified-type-def type-id='type-id-1' const='yes' id='type-id-366'/>
+    <pointer-type-def type-id='type-id-366' size-in-bits='64' id='type-id-367'/>
     <function-decl name='dane_raw_tlsa' mangled-name='dane_raw_tlsa' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_raw_tlsa@@DANE_0_0'>
       <parameter type-id='type-id-12' name='s'/>
-      <parameter type-id='type-id-360' name='r'/>
-      <parameter type-id='type-id-362' name='dane_data'/>
-      <parameter type-id='type-id-364' name='dane_data_len'/>
+      <parameter type-id='type-id-363' name='r'/>
+      <parameter type-id='type-id-365' name='dane_data'/>
+      <parameter type-id='type-id-367' name='dane_data_len'/>
       <parameter type-id='type-id-1' name='secure'/>
       <parameter type-id='type-id-1' name='bogus'/>
       <return type-id='type-id-1'/>
     </function-decl>
     <function-decl name='dane_query_deinit' mangled-name='dane_query_deinit' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_query_deinit@@DANE_0_0'>
-      <parameter type-id='type-id-359' name='q'/>
+      <parameter type-id='type-id-362' name='q'/>
       <return type-id='type-id-115'/>
     </function-decl>
     <function-decl name='dane_state_set_dlv_file' mangled-name='dane_state_set_dlv_file' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_state_set_dlv_file@@DANE_0_0'>
@@ -2672,49 +2672,49 @@
       <parameter type-id='type-id-12' name='s'/>
       <return type-id='type-id-115'/>
     </function-decl>
-    <pointer-type-def type-id='type-id-12' size-in-bits='64' id='type-id-365'/>
+    <pointer-type-def type-id='type-id-12' size-in-bits='64' id='type-id-368'/>
     <function-decl name='dane_state_init' mangled-name='dane_state_init' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_state_init@@DANE_0_0'>
-      <parameter type-id='type-id-365' name='s'/>
+      <parameter type-id='type-id-368' name='s'/>
       <parameter type-id='type-id-2' name='flags'/>
       <return type-id='type-id-1'/>
     </function-decl>
-    <pointer-type-def type-id='type-id-348' size-in-bits='64' id='type-id-366'/>
-    <pointer-type-def type-id='type-id-349' size-in-bits='64' id='type-id-367'/>
+    <pointer-type-def type-id='type-id-351' size-in-bits='64' id='type-id-369'/>
+    <pointer-type-def type-id='type-id-352' size-in-bits='64' id='type-id-370'/>
     <function-decl name='dane_query_to_raw_tlsa' mangled-name='dane_query_to_raw_tlsa' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_query_to_raw_tlsa@@DANE_0_0'>
-      <parameter type-id='type-id-359' name='q'/>
-      <parameter type-id='type-id-338' name='data_entries'/>
-      <parameter type-id='type-id-366' name='dane_data'/>
-      <parameter type-id='type-id-367' name='dane_data_len'/>
-      <parameter type-id='type-id-349' name='secure'/>
-      <parameter type-id='type-id-349' name='bogus'/>
+      <parameter type-id='type-id-362' name='q'/>
+      <parameter type-id='type-id-341' name='data_entries'/>
+      <parameter type-id='type-id-369' name='dane_data'/>
+      <parameter type-id='type-id-370' name='dane_data_len'/>
+      <parameter type-id='type-id-352' name='secure'/>
+      <parameter type-id='type-id-352' name='bogus'/>
       <return type-id='type-id-1'/>
     </function-decl>
     <function-decl name='dane_query_data' mangled-name='dane_query_data' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_query_data@@DANE_0_0'>
-      <parameter type-id='type-id-359' name='q'/>
+      <parameter type-id='type-id-362' name='q'/>
       <parameter type-id='type-id-2' name='idx'/>
-      <parameter type-id='type-id-338' name='usage'/>
-      <parameter type-id='type-id-338' name='type'/>
-      <parameter type-id='type-id-338' name='match'/>
+      <parameter type-id='type-id-341' name='usage'/>
+      <parameter type-id='type-id-341' name='type'/>
+      <parameter type-id='type-id-341' name='match'/>
       <parameter type-id='type-id-7' name='data'/>
       <return type-id='type-id-1'/>
     </function-decl>
     <function-decl name='dane_query_entries' mangled-name='dane_query_entries' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_query_entries@@DANE_0_0'>
-      <parameter type-id='type-id-359' name='q'/>
+      <parameter type-id='type-id-362' name='q'/>
       <return type-id='type-id-2'/>
     </function-decl>
     <function-decl name='dane_query_status' mangled-name='dane_query_status' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_query_status@@DANE_0_0'>
-      <parameter type-id='type-id-359' name='q'/>
-      <return type-id='type-id-345'/>
+      <parameter type-id='type-id-362' name='q'/>
+      <return type-id='type-id-348'/>
     </function-decl>
     <function-decl name='dane_verify_crt_raw' mangled-name='dane_verify_crt_raw' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_verify_crt_raw@@DANE_0_0'>
       <parameter type-id='type-id-12' name='s'/>
       <parameter type-id='type-id-64' name='chain'/>
       <parameter type-id='type-id-2' name='chain_size'/>
       <parameter type-id='type-id-27' name='chain_type'/>
-      <parameter type-id='type-id-359' name='r'/>
+      <parameter type-id='type-id-362' name='r'/>
       <parameter type-id='type-id-2' name='sflags'/>
       <parameter type-id='type-id-2' name='vflags'/>
-      <parameter type-id='type-id-338' name='verify'/>
+      <parameter type-id='type-id-341' name='verify'/>
       <return type-id='type-id-1'/>
     </function-decl>
     <function-decl name='_gnutls_buffer_init' mangled-name='_gnutls_buffer_init' visibility='default' binding='global' size-in-bits='64'>
@@ -2727,6 +2727,12 @@
       <return type-id='type-id-115'/>
     </function-decl>
     <function-decl name='_gnutls_buffer_to_datum' mangled-name='_gnutls_buffer_to_datum' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-115'/>
+    </function-decl>
+    <function-decl name='__stack_chk_fail' mangled-name='__stack_chk_fail' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-115'/>
+    </function-decl>
+    <function-decl name='__builtin_memcpy' mangled-name='memcpy' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
     <function-decl name='gnutls_x509_crt_init' mangled-name='gnutls_x509_crt_init' visibility='default' binding='global' size-in-bits='64'>
@@ -2742,9 +2748,6 @@
       <return type-id='type-id-115'/>
     </function-decl>
     <function-decl name='gnutls_certificate_get_issuer' mangled-name='gnutls_certificate_get_issuer' visibility='default' binding='global' size-in-bits='64'>
-      <return type-id='type-id-115'/>
-    </function-decl>
-    <function-decl name='__builtin_memcpy' mangled-name='memcpy' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
     <function-decl name='gnutls_x509_crt_export2' mangled-name='gnutls_x509_crt_export2' visibility='default' binding='global' size-in-bits='64'>
@@ -2774,7 +2777,7 @@
     <function-decl name='gnutls_pubkey_deinit' mangled-name='gnutls_pubkey_deinit' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
-    <function-decl name='snprintf' mangled-name='snprintf' visibility='default' binding='global' size-in-bits='64'>
+    <function-decl name='__builtin___snprintf_chk' mangled-name='__snprintf_chk' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
     <function-decl name='ub_resolve' mangled-name='ub_resolve' visibility='default' binding='global' size-in-bits='64'>
@@ -2816,50 +2819,56 @@
     <function-decl name='gnutls_x509_crt_verify' mangled-name='gnutls_x509_crt_verify' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
-    <function-type size-in-bits='64' id='type-id-266'>
-      <parameter type-id='type-id-240'/>
-      <return type-id='type-id-1'/>
-    </function-type>
-    <function-type size-in-bits='64' id='type-id-242'>
-      <parameter type-id='type-id-240'/>
+    <function-type size-in-bits='64' id='type-id-267'>
       <parameter type-id='type-id-241'/>
       <return type-id='type-id-1'/>
     </function-type>
+    <function-type size-in-bits='64' id='type-id-273'>
+      <parameter type-id='type-id-241'/>
+      <parameter type-id='type-id-34'/>
+      <parameter type-id='type-id-64'/>
+      <return type-id='type-id-1'/>
+    </function-type>
     <function-type size-in-bits='64' id='type-id-243'>
-      <parameter type-id='type-id-240'/>
-      <parameter type-id='type-id-195'/>
+      <parameter type-id='type-id-241'/>
+      <parameter type-id='type-id-242'/>
+      <return type-id='type-id-1'/>
+    </function-type>
+    <function-type size-in-bits='64' id='type-id-244'>
+      <parameter type-id='type-id-241'/>
+      <parameter type-id='type-id-196'/>
       <parameter type-id='type-id-103'/>
       <return type-id='type-id-1'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-268'>
-      <parameter type-id='type-id-240'/>
+    <function-type size-in-bits='64' id='type-id-269'>
+      <parameter type-id='type-id-241'/>
       <parameter type-id='type-id-2'/>
       <parameter type-id='type-id-2'/>
       <parameter type-id='type-id-2'/>
       <parameter type-id='type-id-64'/>
       <return type-id='type-id-1'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-281'>
-      <parameter type-id='type-id-240'/>
+    <function-type size-in-bits='64' id='type-id-284'>
+      <parameter type-id='type-id-241'/>
       <parameter type-id='type-id-105'/>
       <parameter type-id='type-id-7'/>
       <return type-id='type-id-1'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-258'>
+    <function-type size-in-bits='64' id='type-id-259'>
       <parameter type-id='type-id-158'/>
       <return type-id='type-id-1'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-246'>
+    <function-type size-in-bits='64' id='type-id-247'>
       <parameter type-id='type-id-158'/>
       <parameter type-id='type-id-2'/>
       <return type-id='type-id-1'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-264'>
+    <function-type size-in-bits='64' id='type-id-265'>
       <parameter type-id='type-id-105'/>
       <parameter type-id='type-id-3'/>
       <return type-id='type-id-1'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-260'>
+    <function-type size-in-bits='64' id='type-id-261'>
       <parameter type-id='type-id-105'/>
       <parameter type-id='type-id-3'/>
       <parameter type-id='type-id-3'/>
@@ -2892,24 +2901,24 @@
       <parameter type-id='type-id-103'/>
       <return type-id='type-id-1'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-262'>
+    <function-type size-in-bits='64' id='type-id-263'>
       <parameter type-id='type-id-105'/>
       <parameter type-id='type-id-3'/>
       <return type-id='type-id-3'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-256'>
+    <function-type size-in-bits='64' id='type-id-257'>
       <parameter type-id='type-id-158'/>
-      <parameter type-id='type-id-255'/>
+      <parameter type-id='type-id-256'/>
       <parameter type-id='type-id-1'/>
-      <return type-id='type-id-249'/>
+      <return type-id='type-id-250'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-250'>
+    <function-type size-in-bits='64' id='type-id-251'>
       <parameter type-id='type-id-158'/>
       <parameter type-id='type-id-105'/>
       <parameter type-id='type-id-103'/>
-      <return type-id='type-id-249'/>
+      <return type-id='type-id-250'/>
     </function-type>
-    <function-type size-in-bits='64' id='type-id-336'>
+    <function-type size-in-bits='64' id='type-id-339'>
       <parameter type-id='type-id-64'/>
       <parameter type-id='type-id-64'/>
       <parameter type-id='type-id-84'/>
@@ -2930,27 +2939,38 @@
       <return type-id='type-id-105'/>
     </function-type>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='dane-params.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/libdane' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='dane-params.c' comp-dir-path='/root/gnutls/libdane' language='LANG_C99'>
     <function-decl name='dane_cert_usage_name' mangled-name='dane_cert_usage_name' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_cert_usage_name@@DANE_0_0'>
-      <parameter type-id='type-id-351' name='usage'/>
+      <parameter type-id='type-id-354' name='usage'/>
       <return type-id='type-id-34'/>
     </function-decl>
     <function-decl name='dane_match_type_name' mangled-name='dane_match_type_name' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_match_type_name@@DANE_0_0'>
-      <parameter type-id='type-id-356' name='type'/>
+      <parameter type-id='type-id-359' name='type'/>
       <return type-id='type-id-34'/>
     </function-decl>
     <function-decl name='dane_cert_type_name' mangled-name='dane_cert_type_name' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_cert_type_name@@DANE_0_0'>
-      <parameter type-id='type-id-354' name='type'/>
+      <parameter type-id='type-id-357' name='type'/>
       <return type-id='type-id-34'/>
     </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='errors.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/libdane' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='errors.c' comp-dir-path='/root/gnutls/libdane' language='LANG_C99'>
     <function-decl name='dane_strerror' mangled-name='dane_strerror' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='dane_strerror@@DANE_0_0'>
       <parameter type-id='type-id-1' name='error'/>
       <return type-id='type-id-34'/>
     </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='read-file.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/gl' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='hash.c' comp-dir-path='/root/gnutls/gl' language='LANG_C99'>
+    <function-decl name='malloc' mangled-name='malloc' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-115'/>
+    </function-decl>
+    <function-decl name='abort' mangled-name='abort' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-115'/>
+    </function-decl>
+    <function-decl name='__fprintf_chk' mangled-name='__fprintf_chk' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-115'/>
+    </function-decl>
+  </abi-instr>
+  <abi-instr version='1.0' address-size='64' path='read-file.c' comp-dir-path='/root/gnutls/gl' language='LANG_C99'>
     <function-decl name='fopen' mangled-name='fopen' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
@@ -2972,25 +2992,19 @@
     <function-decl name='realloc' mangled-name='realloc' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
-    <function-decl name='fread' mangled-name='fread' visibility='default' binding='global' size-in-bits='64'>
+    <function-decl name='__fread_alias' mangled-name='fread' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
     <function-decl name='ferror' mangled-name='ferror' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
-    <function-decl name='malloc' mangled-name='malloc' visibility='default' binding='global' size-in-bits='64'>
-      <return type-id='type-id-115'/>
-    </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='asnprintf.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/gl' language='LANG_C99'>
+  <abi-instr version='1.0' address-size='64' path='asnprintf.c' comp-dir-path='/root/gnutls/gl' language='LANG_C99'>
     <function-decl name='vasnprintf' mangled-name='vasnprintf' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
   </abi-instr>
-  <abi-instr version='1.0' address-size='64' path='vasnprintf.c' comp-dir-path='/home/nmav/cvs/gnutls-mine/gl' language='LANG_C99'>
-    <function-decl name='abort' mangled-name='abort' visibility='default' binding='global' size-in-bits='64'>
-      <return type-id='type-id-115'/>
-    </function-decl>
+  <abi-instr version='1.0' address-size='64' path='vasnprintf.c' comp-dir-path='/root/gnutls/gl' language='LANG_C99'>
     <function-decl name='printf_parse' mangled-name='printf_parse' visibility='default' binding='global' size-in-bits='64'>
       <return type-id='type-id-115'/>
     </function-decl>
