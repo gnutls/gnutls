@@ -42,182 +42,207 @@ static const gnutls_datum_t bad_data = {
 	.size = sizeof(DATASTR) - 2
 };
 
-static const char rsa_key2048[] =
- "-----BEGIN RSA PRIVATE KEY-----\n"
- "MIIEogIBAAKCAQEA6yCv+BLrRP/dMPBXJWK21c0aqxIX6JkODL4K+zlyEURt8/Wp\n"
- "nw37CJwHD3VrimSnk2SJvBfTNhzYhCsLShDOPvi4qBrLZ1WozjoVJ8tRE4VCcjQJ\n"
- "snpJ7ldiV+Eos1Z3FkbV/uQcw5CYCb/TciSukaWlI+G/xas9EOOFt4aELbc1yDe0\n"
- "hyfPDtoaKfek4GhT9qT1I8pTC40P9OrA9Jt8lblqxHWwqmdunLTjPjB5zJT6QgI+\n"
- "j1xuq7ZOQhveNA/AOyzh574GIpgsuvPPLBQwsCQkscr7cFnCsyOPgYJrQW3De2+l\n"
- "wjp2D7gZeeQcFQKazXcFoiqNpJWoBWmU0qqsgwIDAQABAoIBAAghNzRioxPdrO42\n"
- "QS0fvqah0tw7Yew+7oduQr7w+4qxTQP0aIsBVr6zdmMIclF0rX6hKUoBoOHsGWho\n"
- "fJlw/1CaFPhrBMFr6sxGodigZQtBvkxolDVBmTDOgK39MQUSZke0501K4du5MiiU\n"
- "I2F89zQ9//m/onvZMeFVnJf95LAX5qHr/FLARQFtOpgWzcGVxdvJdJlYb1zMUril\n"
- "PqyAZXo1j0vgHWwSd54k8mBLus7l8KT57VFce8+9nBPrOrqW4rDVXzs/go3S+kiI\n"
- "OyzYeUs9czg1N1e3VhEaC+EdYUawc0ASuEkbsJ53L8pwDvS+2ly2ykYziJp95Fjv\n"
- "bzyd1dECgYEA8FzGCxu7A6/ei9Dn0Fmi8Ns/QvEgbdlGw4v4MlXHjrGJYdOB0BwG\n"
- "2D2k0ODNYKlUX2J4hi5x8aCH33y/v0EcOHyuqM33vOWBVbdcumCqcOmp341UebAO\n"
- "uCPgDJNhjxXaeDVPnizqnOBA1B9sTxwmCOmFIiFRLbR+XluvDh3t8L0CgYEA+my6\n"
- "124Rw7kcFx+9JoB/Z+bUJDYpefUT91gBUhhEdEMx5fujhMzAbLpIRjFQq+75Qb7v\n"
- "0NyIS09B4oKOqQYzVEJwqKY7H71BTl7QuzJ8Qtuh/DMZsVIt6xpvdeuAKpEOqz44\n"
- "ZD3fW1B59A3ja7kqZadCqq2b02UTk+gdeOrYBj8CgYACX3gZDfoHrEnPKY3QUcI5\n"
- "DIEQYR8H1phLP+uAW7ZvozMPAy6J5mzu35Tr9vwwExvhITC9amH3l7UfsLSX58Wm\n"
- "jRyQUBA9Dir7tKa2tFOab8Qcj+GgnetXSAtjNGVHK1kPzL7vedQLHm+laHYCRe3e\n"
- "Mqf80UVi5SBGQDN3OTZrJQKBgEkj2oozDqMwfGDQl0kYfJ2XEFynKQQCrVsva+tT\n"
- "RSMDwR4fmcmel5Dp81P08U/WExy9rIM+9duxAVgrs4jwU6uHYCoRqvEBMIK4NJSI\n"
- "ETzhsvTa4+UjUF/7L5SsPJmyFiuzl3rHi2W7InNCXyrGQPjBmjoJTJq4SbiIMZtw\n"
- "U7m3AoGACG2rE/Ud71kyOJcKwxzEt8kd+2CMuaZeE/xk+3zLSSjXJzKPficogM3I\n"
- "K37/N7N0FjhdQ5hRuD3GH1fcjv9AKdGHsH7RuaG+jHTRUjS1glr17SSQzh6xXnWj\n"
- "jG0M4UZm5P9STL09nZuWH0wfpr/eg+9+A6yOVfnADI13v+Ygk7k=\n"
- "-----END RSA PRIVATE KEY-----\n";
+/* RSA 2048 private key and signature */
+static const char rsa_2048_privkey[] =
+	"-----BEGIN RSA PRIVATE KEY-----\n"
+	"MIIEogIBAAKCAQEA6yCv+BLrRP/dMPBXJWK21c0aqxIX6JkODL4K+zlyEURt8/Wp\n"
+	"nw37CJwHD3VrimSnk2SJvBfTNhzYhCsLShDOPvi4qBrLZ1WozjoVJ8tRE4VCcjQJ\n"
+	"snpJ7ldiV+Eos1Z3FkbV/uQcw5CYCb/TciSukaWlI+G/xas9EOOFt4aELbc1yDe0\n"
+	"hyfPDtoaKfek4GhT9qT1I8pTC40P9OrA9Jt8lblqxHWwqmdunLTjPjB5zJT6QgI+\n"
+	"j1xuq7ZOQhveNA/AOyzh574GIpgsuvPPLBQwsCQkscr7cFnCsyOPgYJrQW3De2+l\n"
+	"wjp2D7gZeeQcFQKazXcFoiqNpJWoBWmU0qqsgwIDAQABAoIBAAghNzRioxPdrO42\n"
+	"QS0fvqah0tw7Yew+7oduQr7w+4qxTQP0aIsBVr6zdmMIclF0rX6hKUoBoOHsGWho\n"
+	"fJlw/1CaFPhrBMFr6sxGodigZQtBvkxolDVBmTDOgK39MQUSZke0501K4du5MiiU\n"
+	"I2F89zQ9//m/onvZMeFVnJf95LAX5qHr/FLARQFtOpgWzcGVxdvJdJlYb1zMUril\n"
+	"PqyAZXo1j0vgHWwSd54k8mBLus7l8KT57VFce8+9nBPrOrqW4rDVXzs/go3S+kiI\n"
+	"OyzYeUs9czg1N1e3VhEaC+EdYUawc0ASuEkbsJ53L8pwDvS+2ly2ykYziJp95Fjv\n"
+	"bzyd1dECgYEA8FzGCxu7A6/ei9Dn0Fmi8Ns/QvEgbdlGw4v4MlXHjrGJYdOB0BwG\n"
+	"2D2k0ODNYKlUX2J4hi5x8aCH33y/v0EcOHyuqM33vOWBVbdcumCqcOmp341UebAO\n"
+	"uCPgDJNhjxXaeDVPnizqnOBA1B9sTxwmCOmFIiFRLbR+XluvDh3t8L0CgYEA+my6\n"
+	"124Rw7kcFx+9JoB/Z+bUJDYpefUT91gBUhhEdEMx5fujhMzAbLpIRjFQq+75Qb7v\n"
+	"0NyIS09B4oKOqQYzVEJwqKY7H71BTl7QuzJ8Qtuh/DMZsVIt6xpvdeuAKpEOqz44\n"
+	"ZD3fW1B59A3ja7kqZadCqq2b02UTk+gdeOrYBj8CgYACX3gZDfoHrEnPKY3QUcI5\n"
+	"DIEQYR8H1phLP+uAW7ZvozMPAy6J5mzu35Tr9vwwExvhITC9amH3l7UfsLSX58Wm\n"
+	"jRyQUBA9Dir7tKa2tFOab8Qcj+GgnetXSAtjNGVHK1kPzL7vedQLHm+laHYCRe3e\n"
+	"Mqf80UVi5SBGQDN3OTZrJQKBgEkj2oozDqMwfGDQl0kYfJ2XEFynKQQCrVsva+tT\n"
+	"RSMDwR4fmcmel5Dp81P08U/WExy9rIM+9duxAVgrs4jwU6uHYCoRqvEBMIK4NJSI\n"
+	"ETzhsvTa4+UjUF/7L5SsPJmyFiuzl3rHi2W7InNCXyrGQPjBmjoJTJq4SbiIMZtw\n"
+	"U7m3AoGACG2rE/Ud71kyOJcKwxzEt8kd+2CMuaZeE/xk+3zLSSjXJzKPficogM3I\n"
+	"K37/N7N0FjhdQ5hRuD3GH1fcjv9AKdGHsH7RuaG+jHTRUjS1glr17SSQzh6xXnWj\n"
+	"jG0M4UZm5P9STL09nZuWH0wfpr/eg+9+A6yOVfnADI13v+Ygk7k=\n"
+	"-----END RSA PRIVATE KEY-----\n";
 
-static const char ecc_key[] =
- "-----BEGIN EC PRIVATE KEY-----\n"
- "MHgCAQEEIQDzaOg65+brGV6INN0zXrUodxwRuocGG+GtKzN7ko26v6AKBggqhkjO\n"
- "PQMBB6FEA0IABEppi34ngyNQ2a9kJmnT5QxIHAUGI1SpnsAyCfze4j6MJ7o/g7qx\n"
- "MSHpe5vd0TQz+/GAa1zxle8mB/Cdh0JaTrA=\n"
- "-----END EC PRIVATE KEY-----\n";
+static const char rsa_2048_sig[] =
+	"\x7a\xb3\xf8\xb0\xf9\xf0\x52\x88\x37\x17\x97\x9f\xbe\x61\xb4\xd2"
+	"\x43\x78\x9f\x79\x92\xd0\xad\x08\xdb\xbd\x3c\x72\x7a\xb5\x51\x59"
+	"\x63\xd6\x7d\xf1\x9c\x1e\x10\x7b\x27\xab\xf8\xd4\x9d\xcd\xc5\xf9"
+	"\xae\xf7\x09\x6b\x40\x93\xc5\xe9\x1c\x0f\xb4\x82\xa1\x47\x86\x54"
+	"\x63\xd2\x4d\x40\x9a\x80\xb9\x38\x45\x69\xa2\xd6\x92\xb6\x69\x7f"
+	"\x3f\xf3\x5b\xa5\x1d\xac\x06\xad\xdf\x4e\xbb\xe6\xda\x68\x0d\xe5"
+	"\xab\xef\xd2\xf0\xc5\xd8\xc0\xed\x80\xe2\xd4\x76\x98\xec\x44\xa2"
+	"\xfc\x3f\xce\x2e\x8b\xc4\x4b\xab\xb0\x70\x24\x52\x85\x2a\x36\xcd"
+	"\x9a\xb5\x05\x00\xea\x98\x7c\x72\x06\x68\xb1\x38\x44\x16\x80\x6a"
+	"\x3b\x64\x72\xbb\xfd\x4b\xc9\xdd\xda\x2a\x68\xde\x7f\x6e\x48\x28"
+	"\xc1\x63\x57\x2b\xde\x83\xa3\x27\x34\xd7\xa6\x87\x18\x35\x10\xff"
+	"\x31\xd9\x47\xc9\x84\x35\xe1\xaa\xe2\xf7\x98\xfa\x19\xd3\xf1\x94"
+	"\x25\x2a\x96\xe4\xa8\xa7\x05\x10\x93\x87\xde\x96\x85\xe5\x68\xb8"
+	"\xe5\x4e\xbf\x66\x85\x91\xbd\x52\x5b\x3d\x9f\x1b\x79\xea\xe3\x8b"
+	"\xef\x62\x18\x39\x7a\x50\x01\x46\x1b\xde\x8d\x37\xbc\x90\x6c\x07"
+	"\xc0\x07\xed\x60\xce\x2e\x31\xd6\x8f\xe8\x75\xdb\x45\x21\xc6\xcb";
 
-static const char dsa_key[] =
- "-----BEGIN DSA PRIVATE KEY-----\n"
- "MIH4AgEAAkEA6KUOSXfFNcInFLPdOlLlKNCe79zJrkxnsQN+lllxuk1ifZrE07r2\n"
- "3edTrc4riQNnZ2nZ372tYUAMJg+5jM6IIwIVAOa58exwZ+42Tl+p3b4Kbpyu2Ron\n"
- "AkBocj7gkiBYHtv6HMIIzooaxn4vpGR0Ns6wBfroBUGvrnSAgfT3WyiNaHkIF28e\n"
- "quWcEeOJjUgFvatcM8gcY288AkEAyKWlgzBurIYST8TM3j4PuQJDTvdHDaGoAUAa\n"
- "EfjmOw2UXKwqTmwPiT5BYKgCo2ILS87ttlTpd8vndH37pmnmVQIUQIVuKpZ8y9Bw\n"
- "VzO8qcrLCFvTOXY=\n"
- "-----END DSA PRIVATE KEY-----\n";
+/* DSA 2048 private key and signature */
+static const char dsa_2048_privkey[] =
+	"-----BEGIN DSA PRIVATE KEY-----\n"
+	"MIIDTQIBAAKCAQEAh60B6yPMRIT7udq2kKuwnQDohvT1U0w+RJcSr23C05cM/Ovn\n"
+	"UP/8Rrj6T8K+uYhMbKgLaZiJJW9q04jaPQk0cfUphbLvRjzVHwE/0Bkb+Y1Rv7ni\n"
+	"Jot2IFMq5iuNraf889PC0WREvFCcIkSFY2Ac4WT7mCcBtfx/raGFXDUjcUrJ0HwZ\n"
+	"IOhjQDfcXUsztuyYsYA75ociEY8kyDZq/ixyr5++R1VjNf30Re8AbQlXOEGxEN5t\n"
+	"t+Tvpq8K5L3prQs2KNSzyOUmedjb/ojH4T4qe/RL9EVjjeuIGHDNUT6F197yZ91y\n"
+	"qLLTf1WjnUyZcKij5rryX0LJBBWawEZjNSHZawIdAMQlyycia4NigCdiDR+QptUn\n"
+	"2xrj9o14fXkIrXcCggEAXRZm1rbPhsjSTo6cpCVrmDzO1grv83EHiBH4MvRQQnP8\n"
+	"FpAREsBA5cYju97XvLaLhioZeMjLn08kU7TUbHRUB+ULTuVvE2dQbBpGuKiLRRt9\n"
+	"6U2T0eD3xGLoM+o8EY/kpqaWGEpZv7hzM9xuo4vy55+viAZgFWULqmltwfG/7w7V\n"
+	"NXUHNv5H4Ipw//fSDLTPqzUlNqSSswDLz6pCjWEs0rWAqNAMaOiLTz4id9pL48Oe\n"
+	"oAfpcQR9tgTEnwyXfZBnrJVclHhkHKGeXvU05IgCzpKO76Z5R+By50T0i/JV7vzM\n"
+	"l2yS9aAl/cprT6U7yI3oU/blldCVNpMcFAFb+fO8DAKCAQBVMo8xptyvQOJeSvbO\n"
+	"SSYdJ3IiI/0GdkcGWXblWg9z7mrPaWEnT7OquEm/+vYtWd3GHDtyNM+jzsN4Xgjc\n"
+	"TL3AEd2hLiozJQ1BFKw25VU08UHAYTzUxZhO4Vwtmp46Kwj8YLDQ3NHRWCBxpDQR\n"
+	"fbiFvyXP+qXap6plMfrydnUD1mae/JSOWOYgdB7tFIehstLxVXx/cAnjwgFU03Df\n"
+	"grjsad92zA1Hc9wIjbsgAQdTR5DWnFRkRt3UtayBwoyqm6QceZHsv1NAGvkQ4ion\n"
+	"bEjkHkjF9YCkR9/rspR8cLghRIXMjOpypuSbaRPeeWq0gP2UOxFL/d3iWH0ETr/L\n"
+	"kTlCAhxYGpVgtfB96qmJukyl9GOGvfkwFTgEyIDoV84M\n"
+	"-----END DSA PRIVATE KEY-----\n";
 
-static const char gost01_key[] =
- "-----BEGIN PRIVATE KEY-----\n"
- "MEUCAQAwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEEIgQgR1lBLIr4WBpn\n"
- "4MOCH8oxGWb52EPNL3gjNJiQuBQuf6U=\n"
- "-----END PRIVATE KEY-----\n";
+static const char dsa_2048_sig[] =
+	"\x30\x3d\x02\x1c\x2e\x40\x14\xb3\x7a\x3f\xc0\x4f\x06\x74\x4f\xa6"
+	"\x5f\xc2\x0a\x46\x35\x38\x88\xb4\x1a\xcf\x94\x02\x40\x42\x7c\x7f"
+	"\x02\x1d\x00\x98\xfc\xf1\x08\x66\xf1\x86\x28\xc9\x73\x9e\x2b\x5d"
+	"\xce\x57\xe8\xb5\xeb\xcf\xa3\xf6\x60\xf6\x63\x16\x0e\xc0\x42";
 
-static const char gost12_256_key[] =
- "-----BEGIN PRIVATE KEY-----\n"
- "MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIkAAYIKoUDBwEBAgIEIgQg0+JttJEV\n"
- "Ud+XBzX9q13ByKK+j2b+mEmNIo1yB0wGleo=\n"
- "-----END PRIVATE KEY-----\n";
-
-static const char gost12_512_key[] =
- "-----BEGIN PRIVATE KEY-----\n"
- "MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBECS7bAh\n"
- "TP5um5bxziaKkhb6xSI5WBQCSlaiHPBaMbgmgJiF8RubF7k0YMefpt0+sA3GvVGA\n"
- "KjL7CLBERDm7Yvlv\n"
- "-----END PRIVATE KEY-----\n";
-
-/* A precomputed RSA-SHA256 signature using the rsa_key2048 */
-static const char rsa_sig[] =
-    "\x7a\xb3\xf8\xb0\xf9\xf0\x52\x88\x37\x17\x97\x9f\xbe\x61\xb4\xd2\x43\x78\x9f\x79\x92\xd0\xad\x08\xdb\xbd\x3c\x72\x7a\xb5\x51\x59\x63\xd6\x7d\xf1\x9c\x1e\x10\x7b\x27\xab\xf8\xd4\x9d\xcd\xc5\xf9\xae\xf7\x09\x6b\x40\x93\xc5\xe9\x1c\x0f\xb4\x82\xa1\x47\x86\x54\x63\xd2\x4d\x40\x9a\x80\xb9\x38\x45\x69\xa2\xd6\x92\xb6\x69\x7f\x3f\xf3\x5b\xa5\x1d\xac\x06\xad\xdf\x4e\xbb\xe6\xda\x68\x0d\xe5\xab\xef\xd2\xf0\xc5\xd8\xc0\xed\x80\xe2\xd4\x76\x98\xec\x44\xa2\xfc\x3f\xce\x2e\x8b\xc4\x4b\xab\xb0\x70\x24\x52\x85\x2a\x36\xcd\x9a\xb5\x05\x00\xea\x98\x7c\x72\x06\x68\xb1\x38\x44\x16\x80\x6a\x3b\x64\x72\xbb\xfd\x4b\xc9\xdd\xda\x2a\x68\xde\x7f\x6e\x48\x28\xc1\x63\x57\x2b\xde\x83\xa3\x27\x34\xd7\xa6\x87\x18\x35\x10\xff\x31\xd9\x47\xc9\x84\x35\xe1\xaa\xe2\xf7\x98\xfa\x19\xd3\xf1\x94\x25\x2a\x96\xe4\xa8\xa7\x05\x10\x93\x87\xde\x96\x85\xe5\x68\xb8\xe5\x4e\xbf\x66\x85\x91\xbd\x52\x5b\x3d\x9f\x1b\x79\xea\xe3\x8b\xef\x62\x18\x39\x7a\x50\x01\x46\x1b\xde\x8d\x37\xbc\x90\x6c\x07\xc0\x07\xed\x60\xce\x2e\x31\xd6\x8f\xe8\x75\xdb\x45\x21\xc6\xcb";
-
-/* ECDSA key and signature */
+/* secp256r1 private key and signature */
 static const char ecdsa_secp256r1_privkey[] =
-    "-----BEGIN EC PRIVATE KEY-----\n"
-    "MHcCAQEEIPAKWV7+pZe9c5EubMNfAEKWRQtP/MvlO9HehwHmJssNoAoGCCqGSM49\n"
-    "AwEHoUQDQgAE2CNONRio3ciuXtoomJKs3MdbzLbd44VPhtzJN30VLFm5gvnfiCj2\n"
-    "zzz7pl9Cv0ECHl6yedNI8QEKdcwCDgEmkQ==\n"
-    "-----END EC PRIVATE KEY-----\n";
+	"-----BEGIN EC PRIVATE KEY-----\n"
+	"MHcCAQEEIPAKWV7+pZe9c5EubMNfAEKWRQtP/MvlO9HehwHmJssNoAoGCCqGSM49\n"
+	"AwEHoUQDQgAE2CNONRio3ciuXtoomJKs3MdbzLbd44VPhtzJN30VLFm5gvnfiCj2\n"
+	"zzz7pl9Cv0ECHl6yedNI8QEKdcwCDgEmkQ==\n"
+	"-----END EC PRIVATE KEY-----\n";
 
 static const char ecdsa_secp256r1_sig[] =
-    "\x30\x45\x02\x21\x00\x9b\x8f\x60\xed\x9e\x40\x8d\x74\x82\x73\xab\x20\x1a\x69\xfc\xf9\xee\x3c\x41\x80\xc0\x39\xdd\x21\x1a\x64\xfd\xbf\x7e\xaa\x43\x70\x02\x20\x44\x28\x05\xdd\x30\x47\x58\x96\x18\x39\x94\x18\xba\xe7\x7a\xf6\x1e\x2d\xba\xb1\xe0\x7d\x73\x9e\x2f\x58\xee\x0c\x2a\x89\xe8\x35";
+	"\x30\x45\x02\x21\x00\x9b\x8f\x60\xed\x9e\x40\x8d\x74\x82\x73\xab"
+	"\x20\x1a\x69\xfc\xf9\xee\x3c\x41\x80\xc0\x39\xdd\x21\x1a\x64\xfd"
+	"\xbf\x7e\xaa\x43\x70\x02\x20\x44\x28\x05\xdd\x30\x47\x58\x96\x18"
+	"\x39\x94\x18\xba\xe7\x7a\xf6\x1e\x2d\xba\xb1\xe0\x7d\x73\x9e\x2f"
+	"\x58\xee\x0c\x2a\x89\xe8\x35";
 
 #ifdef ENABLE_NON_SUITEB_CURVES
-/* sha256 */
+/* secp192r1 private key and signature */
 static const char ecdsa_secp192r1_privkey[] =
-    "-----BEGIN EC PRIVATE KEY-----"
-    "MF8CAQEEGLjezFcbgDMeApVrdtZHvu/k1a8/tVZ41KAKBggqhkjOPQMBAaE0AzIA"
-    "BO1lciKdgxeRH8k64vxcaV1OYIK9akVrW02Dw21MXhRLP0l0wzCw6LGSr5rS6AaL"
-    "Fg==" "-----END EC PRIVATE KEY-----";
+	"-----BEGIN EC PRIVATE KEY-----"
+	"MF8CAQEEGLjezFcbgDMeApVrdtZHvu/k1a8/tVZ41KAKBggqhkjOPQMBAaE0AzIA"
+	"BO1lciKdgxeRH8k64vxcaV1OYIK9akVrW02Dw21MXhRLP0l0wzCw6LGSr5rS6AaL"
+	"Fg==" "-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp192r1_sig[] =
-    "\x30\x34\x02\x18\x5f\xb3\x10\x4b\x4d\x44\x48\x29\x4b\xfd\xa7\x8e\xce\x57\xac\x36\x38\x54\xab\x73\xdb\xed\xb8\x5f\x02\x18\x0b\x8b\xf3\xae\x49\x50\x0e\x47\xca\x89\x1a\x00\xca\x23\xf5\x8d\xd6\xe3\xce\x9a\xff\x2e\x4f\x5c";
+	"\x30\x34\x02\x18\x5f\xb3\x10\x4b\x4d\x44\x48\x29\x4b\xfd\xa7\x8e"
+	"\xce\x57\xac\x36\x38\x54\xab\x73\xdb\xed\xb8\x5f\x02\x18\x0b\x8b"
+	"\xf3\xae\x49\x50\x0e\x47\xca\x89\x1a\x00\xca\x23\xf5\x8d\xd6\xe3"
+	"\xce\x9a\xff\x2e\x4f\x5c";
 
+/* secp224r1 private key and signature */
 static const char ecdsa_secp224r1_privkey[] =
-    "-----BEGIN EC PRIVATE KEY-----"
-    "MGgCAQEEHOKWJFdWdrR/CgVrUeTeawOrJ9GozE9KKx2a8PmgBwYFK4EEACGhPAM6"
-    "AAQKQj3YpenWT7lFR41SnBvmj/+Bj+kgzQnaF65qWAtPRJsZXFlLTu3/IUNqSRu9"
-    "DqPsk8xBHAB7pA==" "-----END EC PRIVATE KEY-----";
+	"-----BEGIN EC PRIVATE KEY-----"
+	"MGgCAQEEHOKWJFdWdrR/CgVrUeTeawOrJ9GozE9KKx2a8PmgBwYFK4EEACGhPAM6"
+	"AAQKQj3YpenWT7lFR41SnBvmj/+Bj+kgzQnaF65qWAtPRJsZXFlLTu3/IUNqSRu9"
+	"DqPsk8xBHAB7pA==" "-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp224r1_sig[] =
-    "\x30\x3d\x02\x1c\x76\x03\x8d\x74\xf4\xd3\x09\x2a\xb5\xdf\x6b\x5b\xf4\x4b\x86\xb8\x62\x81\x5d\x7b\x7a\xbb\x37\xfc\xf1\x46\x1c\x2b\x02\x1d\x00\xa0\x98\x5d\x80\x43\x89\xe5\xee\x1a\xec\x46\x08\x04\x55\xbc\x50\xfa\x2a\xd5\xa6\x18\x92\x19\xdb\x68\xa0\x2a\xda";
+	"\x30\x3d\x02\x1c\x76\x03\x8d\x74\xf4\xd3\x09\x2a\xb5\xdf\x6b\x5b"
+	"\xf4\x4b\x86\xb8\x62\x81\x5d\x7b\x7a\xbb\x37\xfc\xf1\x46\x1c\x2b"
+	"\x02\x1d\x00\xa0\x98\x5d\x80\x43\x89\xe5\xee\x1a\xec\x46\x08\x04"
+	"\x55\xbc\x50\xfa\x2a\xd5\xa6\x18\x92\x19\xdb\x68\xa0\x2a\xda";
 #endif
 
+/* secp384r1 private key and signature */
 static const char ecdsa_secp384r1_privkey[] =
-    "-----BEGIN EC PRIVATE KEY-----"
-    "MIGkAgEBBDDevshD6gb+4rZpC9vwFcIwNs4KmGzdqCxyyN40a8uOWRbyf7aHdiSS"
-    "03oAyKtc4JCgBwYFK4EEACKhZANiAARO1KkPMno2tnNXx1S9EZkp8SOpDCZ4aobH"
-    "IYv8RHnSmKf8I3OKD6TaoeR+1MwJmNJUH90Bj45WXla68/vsPiFcfVKboxsZYe/n"
-    "pv8e4ugXagVQVBXNZJ859iYPdJR24vo=" "-----END EC PRIVATE KEY-----";
+	"-----BEGIN EC PRIVATE KEY-----"
+	"MIGkAgEBBDDevshD6gb+4rZpC9vwFcIwNs4KmGzdqCxyyN40a8uOWRbyf7aHdiSS"
+	"03oAyKtc4JCgBwYFK4EEACKhZANiAARO1KkPMno2tnNXx1S9EZkp8SOpDCZ4aobH"
+	"IYv8RHnSmKf8I3OKD6TaoeR+1MwJmNJUH90Bj45WXla68/vsPiFcfVKboxsZYe/n"
+	"pv8e4ugXagVQVBXNZJ859iYPdJR24vo=" "-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp384r1_sig[] =
-    "\x30\x66\x02\x31\x00\xbb\x4d\x25\x30\x13\x1b\x3b\x75\x60\x07\xed\x53\x8b\x52\xee\xd8\x6e\xf1\x9d\xa8\x36\x0e\x2e\x20\x31\x51\x11\x48\x78\xdd\xaf\x24\x38\x64\x81\x71\x6b\xa6\xb7\x29\x58\x28\x82\x32\xba\x29\x29\xd9\x02\x31\x00\xeb\x70\x09\x87\xac\x7b\x78\x0d\x4c\x4f\x08\x2b\x86\x27\xe2\x60\x1f\xc9\x11\x9f\x1d\xf5\x82\x4c\xc7\x3d\xb0\x27\xc8\x93\x29\xc7\xd0\x0e\x88\x02\x09\x93\xc2\x72\xce\xa5\x74\x8c\x3d\xe0\x8c\xad";
+	"\x30\x66\x02\x31\x00\xbb\x4d\x25\x30\x13\x1b\x3b\x75\x60\x07\xed"
+	"\x53\x8b\x52\xee\xd8\x6e\xf1\x9d\xa8\x36\x0e\x2e\x20\x31\x51\x11"
+	"\x48\x78\xdd\xaf\x24\x38\x64\x81\x71\x6b\xa6\xb7\x29\x58\x28\x82"
+	"\x32\xba\x29\x29\xd9\x02\x31\x00\xeb\x70\x09\x87\xac\x7b\x78\x0d"
+	"\x4c\x4f\x08\x2b\x86\x27\xe2\x60\x1f\xc9\x11\x9f\x1d\xf5\x82\x4c"
+	"\xc7\x3d\xb0\x27\xc8\x93\x29\xc7\xd0\x0e\x88\x02\x09\x93\xc2\x72"
+	"\xce\xa5\x74\x8c\x3d\xe0\x8c\xad";
 
+/* secp521r1 private key and signature */
 static const char ecdsa_secp521r1_privkey[] =
-    "-----BEGIN EC PRIVATE KEY-----"
-    "MIHbAgEBBEGO2n7NN363qSCvJVdlQtCvudtaW4o0fEufXRjE1AsCrle+VXX0Zh0w"
-    "Y1slSeDHMndpakoiF+XkQ+bhcB867UV6aKAHBgUrgQQAI6GBiQOBhgAEAQb6jDpo"
-    "byy1tF8Zucg0TMGUzIN2DK+RZJ3QQRdWdirO25OIC3FoFi1Yird6rpoB6HlNyJ7R"
-    "0bNG9Uv34bSHMn8yAFoiqxUCdJZQbEenMoZsi6COaePe3e0QqvDMr0hEWT23Sr3t"
-    "LpEV7eZGFfFIJw5wSUp2KOcs+O9WjmoukTWtDKNV"
-    "-----END EC PRIVATE KEY-----";
+	"-----BEGIN EC PRIVATE KEY-----"
+	"MIHbAgEBBEGO2n7NN363qSCvJVdlQtCvudtaW4o0fEufXRjE1AsCrle+VXX0Zh0w"
+	"Y1slSeDHMndpakoiF+XkQ+bhcB867UV6aKAHBgUrgQQAI6GBiQOBhgAEAQb6jDpo"
+	"byy1tF8Zucg0TMGUzIN2DK+RZJ3QQRdWdirO25OIC3FoFi1Yird6rpoB6HlNyJ7R"
+	"0bNG9Uv34bSHMn8yAFoiqxUCdJZQbEenMoZsi6COaePe3e0QqvDMr0hEWT23Sr3t"
+	"LpEV7eZGFfFIJw5wSUp2KOcs+O9WjmoukTWtDKNV"
+	"-----END EC PRIVATE KEY-----";
 
 static const char ecdsa_secp521r1_sig[] =
-    "\x30\x81\x87\x02\x42\x01\xb8\xcb\x52\x9e\x10\xa8\x49\x3f\xe1\x9e\x14\x0a\xcf\x96\xed\x7e\xab\x7d\x0c\xe1\x9b\xa4\x97\xdf\x01\xf5\x35\x42\x5f\x5b\x28\x15\x24\x33\x6e\x59\x6c\xaf\x10\x8b\x98\x8e\xe9\x4c\x23\x0d\x76\x92\x03\xdd\x6d\x8d\x08\x47\x15\x5b\xf8\x66\x75\x75\x40\xe8\xf4\xa0\x52\x02\x41\x15\x27\x7c\x5f\xa6\x33\xa6\x29\x68\x3f\x55\x8d\x7f\x1d\x4f\x88\xc6\x61\x6e\xac\x21\xdf\x2b\x7b\xde\x76\x9a\xdc\xe6\x3b\x94\x3f\x03\x9c\xa2\xa6\xa3\x63\x39\x48\xbd\x79\x70\x21\xf2\x6b\xff\x58\x66\xf1\x58\xc2\x58\xad\x4f\x84\x14\x5d\x05\x12\x83\xd0\x87\xbd\xf3";
+	"\x30\x81\x87\x02\x42\x01\xb8\xcb\x52\x9e\x10\xa8\x49\x3f\xe1\x9e"
+	"\x14\x0a\xcf\x96\xed\x7e\xab\x7d\x0c\xe1\x9b\xa4\x97\xdf\x01\xf5"
+	"\x35\x42\x5f\x5b\x28\x15\x24\x33\x6e\x59\x6c\xaf\x10\x8b\x98\x8e"
+	"\xe9\x4c\x23\x0d\x76\x92\x03\xdd\x6d\x8d\x08\x47\x15\x5b\xf8\x66"
+	"\x75\x75\x40\xe8\xf4\xa0\x52\x02\x41\x15\x27\x7c\x5f\xa6\x33\xa6"
+	"\x29\x68\x3f\x55\x8d\x7f\x1d\x4f\x88\xc6\x61\x6e\xac\x21\xdf\x2b"
+	"\x7b\xde\x76\x9a\xdc\xe6\x3b\x94\x3f\x03\x9c\xa2\xa6\xa3\x63\x39"
+	"\x48\xbd\x79\x70\x21\xf2\x6b\xff\x58\x66\xf1\x58\xc2\x58\xad\x4f"
+	"\x84\x14\x5d\x05\x12\x83\xd0\x87\xbd\xf3";
 
-/* DSA key and signature */
-static const char dsa_privkey[] =
- "-----BEGIN DSA PRIVATE KEY-----\n"
- "MIIDTQIBAAKCAQEAh60B6yPMRIT7udq2kKuwnQDohvT1U0w+RJcSr23C05cM/Ovn\n"
- "UP/8Rrj6T8K+uYhMbKgLaZiJJW9q04jaPQk0cfUphbLvRjzVHwE/0Bkb+Y1Rv7ni\n"
- "Jot2IFMq5iuNraf889PC0WREvFCcIkSFY2Ac4WT7mCcBtfx/raGFXDUjcUrJ0HwZ\n"
- "IOhjQDfcXUsztuyYsYA75ociEY8kyDZq/ixyr5++R1VjNf30Re8AbQlXOEGxEN5t\n"
- "t+Tvpq8K5L3prQs2KNSzyOUmedjb/ojH4T4qe/RL9EVjjeuIGHDNUT6F197yZ91y\n"
- "qLLTf1WjnUyZcKij5rryX0LJBBWawEZjNSHZawIdAMQlyycia4NigCdiDR+QptUn\n"
- "2xrj9o14fXkIrXcCggEAXRZm1rbPhsjSTo6cpCVrmDzO1grv83EHiBH4MvRQQnP8\n"
- "FpAREsBA5cYju97XvLaLhioZeMjLn08kU7TUbHRUB+ULTuVvE2dQbBpGuKiLRRt9\n"
- "6U2T0eD3xGLoM+o8EY/kpqaWGEpZv7hzM9xuo4vy55+viAZgFWULqmltwfG/7w7V\n"
- "NXUHNv5H4Ipw//fSDLTPqzUlNqSSswDLz6pCjWEs0rWAqNAMaOiLTz4id9pL48Oe\n"
- "oAfpcQR9tgTEnwyXfZBnrJVclHhkHKGeXvU05IgCzpKO76Z5R+By50T0i/JV7vzM\n"
- "l2yS9aAl/cprT6U7yI3oU/blldCVNpMcFAFb+fO8DAKCAQBVMo8xptyvQOJeSvbO\n"
- "SSYdJ3IiI/0GdkcGWXblWg9z7mrPaWEnT7OquEm/+vYtWd3GHDtyNM+jzsN4Xgjc\n"
- "TL3AEd2hLiozJQ1BFKw25VU08UHAYTzUxZhO4Vwtmp46Kwj8YLDQ3NHRWCBxpDQR\n"
- "fbiFvyXP+qXap6plMfrydnUD1mae/JSOWOYgdB7tFIehstLxVXx/cAnjwgFU03Df\n"
- "grjsad92zA1Hc9wIjbsgAQdTR5DWnFRkRt3UtayBwoyqm6QceZHsv1NAGvkQ4ion\n"
- "bEjkHkjF9YCkR9/rspR8cLghRIXMjOpypuSbaRPeeWq0gP2UOxFL/d3iWH0ETr/L\n"
- "kTlCAhxYGpVgtfB96qmJukyl9GOGvfkwFTgEyIDoV84M\n"
- "-----END DSA PRIVATE KEY-----\n";
-
-static const char dsa_sig[] =
-    "\x30\x3d\x02\x1c\x2e\x40\x14\xb3\x7a\x3f\xc0\x4f\x06\x74\x4f\xa6\x5f\xc2\x0a\x46\x35\x38\x88\xb4\x1a\xcf\x94\x02\x40\x42\x7c\x7f\x02\x1d\x00\x98\xfc\xf1\x08\x66\xf1\x86\x28\xc9\x73\x9e\x2b\x5d\xce\x57\xe8\xb5\xeb\xcf\xa3\xf6\x60\xf6\x63\x16\x0e\xc0\x42";
-
+/* GOST01 private key and signature */
 static const char gost01_privkey[] =
- "-----BEGIN PRIVATE KEY-----\n"
- "MEUCAQAwHAYGKoUDAgITMBIGByqFAwICIwEGByqFAwICHgEEIgQgdNfuHGmmTdPm\n"
- "p5dAa3ea9UYxpdYQPP9lbDwzQwG2bJM=\n"
- "-----END PRIVATE KEY-----\n";
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEUCAQAwHAYGKoUDAgITMBIGByqFAwICIwEGByqFAwICHgEEIgQgdNfuHGmmTdPm\n"
+	"p5dAa3ea9UYxpdYQPP9lbDwzQwG2bJM=\n"
+	"-----END PRIVATE KEY-----\n";
 
 static const char gost01_sig[] =
-    "\xc5\xc8\xf8\xdc\x22\x51\xb0\x72\xe9\xa2\xbb\x84\x6c\xe2\x24\xd5\x72\x39\x2a\x5a\x0e\x7a\x43\xfc\x9c\xc3\x5d\x32\x92\xbb\xab\xc0\x4b\x99\xbd\xc8\x47\x24\x70\x06\x7e\xa1\xc6\xe3\xa0\xdc\x42\xed\xa0\x66\xf0\xcc\x50\x97\xe9\x5a\x7d\x3f\x65\x2d\x7b\x1b\x03\xcb";
+	"\xc5\xc8\xf8\xdc\x22\x51\xb0\x72\xe9\xa2\xbb\x84\x6c\xe2\x24\xd5"
+	"\x72\x39\x2a\x5a\x0e\x7a\x43\xfc\x9c\xc3\x5d\x32\x92\xbb\xab\xc0"
+	"\x4b\x99\xbd\xc8\x47\x24\x70\x06\x7e\xa1\xc6\xe3\xa0\xdc\x42\xed"
+	"\xa0\x66\xf0\xcc\x50\x97\xe9\x5a\x7d\x3f\x65\x2d\x7b\x1b\x03\xcb";
 
+/* GOST12 256 private key and signature */
 static const char gost12_256_privkey[] =
- "-----BEGIN PRIVATE KEY-----\n"
- "MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIjAQYIKoUDBwEBAgIEIgQgKOF96tom\n"
- "D61rhSnzKjyrmO3fv0gdlHei+6ovrc8SnBk=\n"
- "-----END PRIVATE KEY-----\n";
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MEgCAQAwHwYIKoUDBwEBAQEwEwYHKoUDAgIjAQYIKoUDBwEBAgIEIgQgKOF96tom\n"
+	"D61rhSnzKjyrmO3fv0gdlHei+6ovrc8SnBk=\n"
+	"-----END PRIVATE KEY-----\n";
 
 static const char gost12_256_sig[] =
-    "\xb2\x51\x5a\x1a\xbd\x95\x4e\x71\x55\xad\x74\x74\x81\xa6\xca\x6c\x14\x01\xe0\x18\xda\xe4\x0d\x02\x4f\x14\xd2\x39\xd6\x3c\xb5\x85\xa8\x37\xfd\x7f\x2b\xfa\xe4\xf5\xbc\xbc\x15\x20\x8b\x83\x4b\x84\x0d\x5d\x02\x21\x8c\x0d\xb9\xc4\x2b\xc0\x3e\xfd\x42\x55\x1d\xb0";
+    "\xb2\x51\x5a\x1a\xbd\x95\x4e\x71\x55\xad\x74\x74\x81\xa6\xca\x6c"
+	"\x14\x01\xe0\x18\xda\xe4\x0d\x02\x4f\x14\xd2\x39\xd6\x3c\xb5\x85"
+	"\xa8\x37\xfd\x7f\x2b\xfa\xe4\xf5\xbc\xbc\x15\x20\x8b\x83\x4b\x84"
+	"\x0d\x5d\x02\x21\x8c\x0d\xb9\xc4\x2b\xc0\x3e\xfd\x42\x55\x1d\xb0";
 
+/* GOST12 512 private key and signature */
 static const char gost12_512_privkey[] =
- "-----BEGIN PRIVATE KEY-----\n"
- "MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBECjFpvp\n"
- "B0vdc7u59b99TCNXhHiB69JJtUjvieNkGYJpoaaIvoKZTNCjpSZASsZcQZCHOTof\n"
- "hsQ3JCCy4xnd5jWT\n"
- "-----END PRIVATE KEY-----\n";
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MGoCAQAwIQYIKoUDBwEBAQIwFQYJKoUDBwECAQIBBggqhQMHAQECAwRCBECjFpvp\n"
+	"B0vdc7u59b99TCNXhHiB69JJtUjvieNkGYJpoaaIvoKZTNCjpSZASsZcQZCHOTof\n"
+	"hsQ3JCCy4xnd5jWT\n"
+	"-----END PRIVATE KEY-----\n";
 
 static const char gost12_512_sig[] =
-    "\x52\x4f\xa2\x77\x51\xd2\xc5\xef\xd3\xa3\x99\x4e\xec\xff\xc6\xe9\xfc\x2f\xc0\x28\x42\x03\x95\x6c\x9a\x38\xee\xea\x89\x79\xae\x1a\xc3\x68\x5e\xe4\x15\x15\x4b\xec\x0f\xf1\x7e\x0f\xba\x01\xc7\x84\x16\xc7\xb5\xac\x9d\x0c\x22\xdd\x31\xf7\xb0\x9b\x59\x4b\xf0\x02\xa8\x7d\xfd\x6d\x02\x43\xc7\x4f\x65\xbd\x84\x5c\x54\x91\xba\x75\x9f\x5a\x61\x19\x5c\x9a\x10\x78\x34\xa0\xa6\xf6\xdc\xb6\xb0\x50\x22\x38\x5f\xb0\x16\x66\xf1\xd5\x46\x00\xd5\xe2\xa8\xe5\xd2\x11\x5f\xd1\xbe\x6e\xac\xb2\x9c\x14\x34\x96\xe7\x58\x94\xb8\xf4\x5f";
+	"\x52\x4f\xa2\x77\x51\xd2\xc5\xef\xd3\xa3\x99\x4e\xec\xff\xc6\xe9"
+	"\xfc\x2f\xc0\x28\x42\x03\x95\x6c\x9a\x38\xee\xea\x89\x79\xae\x1a"
+	"\xc3\x68\x5e\xe4\x15\x15\x4b\xec\x0f\xf1\x7e\x0f\xba\x01\xc7\x84"
+	"\x16\xc7\xb5\xac\x9d\x0c\x22\xdd\x31\xf7\xb0\x9b\x59\x4b\xf0\x02"
+	"\xa8\x7d\xfd\x6d\x02\x43\xc7\x4f\x65\xbd\x84\x5c\x54\x91\xba\x75"
+	"\x9f\x5a\x61\x19\x5c\x9a\x10\x78\x34\xa0\xa6\xf6\xdc\xb6\xb0\x50"
+	"\x22\x38\x5f\xb0\x16\x66\xf1\xd5\x46\x00\xd5\xe2\xa8\xe5\xd2\x11"
+	"\x5f\xd1\xbe\x6e\xac\xb2\x9c\x14\x34\x96\xe7\x58\x94\xb8\xf4\x5f";
 
 static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 			unsigned bits, gnutls_digest_algorithm_t ign)
@@ -225,7 +250,7 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 	int ret;
 	gnutls_datum_t enc = { NULL, 0 };
 	gnutls_datum_t dec = { NULL, 0 };
-	gnutls_datum_t raw_rsa_key = { (void*)rsa_key2048, sizeof(rsa_key2048)-1 };
+	gnutls_datum_t raw_rsa_key = { (void*)rsa_2048_privkey, sizeof(rsa_2048_privkey)-1 };
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub = NULL;
 	unsigned char plaintext2[sizeof(DATASTR) - 1];
@@ -312,25 +337,11 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 		    unsigned bits, gnutls_sign_algorithm_t sigalgo)
 {
 	int ret;
-	gnutls_datum_t sig = { NULL, 0 };
-	gnutls_datum_t raw_rsa_key = { (void*)rsa_key2048, sizeof(rsa_key2048)-1 };
-	gnutls_datum_t raw_dsa_key = { (void*)dsa_key, sizeof(dsa_key)-1 };
-	gnutls_datum_t raw_ecc_key = { (void*)ecc_key, sizeof(ecc_key)-1 };
-	gnutls_datum_t raw_gost01_key = { (void*)gost01_key, sizeof(gost01_key)-1 };
-	gnutls_datum_t raw_gost12_256_key = { (void*)gost12_256_key, sizeof(gost12_256_key)-1 };
-	gnutls_datum_t raw_gost12_512_key = { (void*)gost12_512_key, sizeof(gost12_512_key)-1 };
 	gnutls_privkey_t key;
+	gnutls_datum_t raw_key;
+	gnutls_datum_t sig = { NULL, 0 };
 	gnutls_pubkey_t pub = NULL;
 	char param_name[32];
-
-	if (pk == GNUTLS_PK_EC || pk == GNUTLS_PK_GOST_01 ||
-	    pk == GNUTLS_PK_GOST_12_256 || pk == GNUTLS_PK_GOST_12_512) {
-		snprintf(param_name, sizeof(param_name), "%s",
-			 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
-						   (bits)));
-	} else {
-		snprintf(param_name, sizeof(param_name), "%u", bits);
-	}
 
 	ret = gnutls_privkey_init(&key);
 	if (ret < 0)
@@ -342,25 +353,83 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 		goto cleanup;
 	}
 
-	if (pk == GNUTLS_PK_RSA) {
-		ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-	} else if (pk == GNUTLS_PK_RSA_PSS) {
-		ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-	} else if (pk == GNUTLS_PK_DSA) {
-		ret = gnutls_privkey_import_x509_raw(key, &raw_dsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-	} else if (pk == GNUTLS_PK_ECC) {
-		ret = gnutls_privkey_import_x509_raw(key, &raw_ecc_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-	} else if (pk == GNUTLS_PK_GOST_01) {
-		ret = gnutls_privkey_import_x509_raw(key, &raw_gost01_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-	} else if (pk == GNUTLS_PK_GOST_12_256) {
-		ret = gnutls_privkey_import_x509_raw(key, &raw_gost12_256_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-	} else if (pk == GNUTLS_PK_GOST_12_512) {
-		ret = gnutls_privkey_import_x509_raw(key, &raw_gost12_512_key, GNUTLS_X509_FMT_PEM, NULL, 0);
-	} else {
-		gnutls_assert();
-		ret = GNUTLS_E_INTERNAL_ERROR;
+	switch(pk) {
+		case GNUTLS_PK_RSA:
+				raw_key.data = (void*)rsa_2048_privkey;
+				raw_key.size = sizeof(rsa_2048_privkey) - 1;
+				snprintf(param_name, sizeof(param_name), "%u", bits);
+			break;
+		case GNUTLS_PK_RSA_PSS:
+				raw_key.data = (void*)rsa_2048_privkey;
+				raw_key.size = sizeof(rsa_2048_privkey) - 1;
+				snprintf(param_name, sizeof(param_name), "%u", bits);
+			break;
+		case GNUTLS_PK_DSA:
+				raw_key.data = (void*)dsa_2048_privkey;
+				raw_key.size = sizeof(dsa_2048_privkey) - 1;
+				snprintf(param_name, sizeof(param_name), "%u", bits);
+			break;
+		case GNUTLS_PK_ECC:
+			switch(bits) {
+#ifdef ENABLE_NON_SUITEB_CURVES
+				case GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP192R1):
+					raw_key.data = (void*)ecdsa_secp192r1_privkey;
+					raw_key.size = sizeof(ecdsa_secp192r1_privkey) - 1;
+					break;
+				case GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1):
+					raw_key.data = (void*)ecdsa_secp224r1_privkey;
+					raw_key.size = sizeof(ecdsa_secp224r1_privkey) - 1;
+					break;
+#endif
+				case GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1):
+					raw_key.data = (void*)ecdsa_secp256r1_privkey;
+					raw_key.size = sizeof(ecdsa_secp256r1_privkey) - 1;
+					break;
+				case GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP384R1):
+					raw_key.data = (void*)ecdsa_secp384r1_privkey;
+					raw_key.size = sizeof(ecdsa_secp384r1_privkey) - 1;
+					break;
+				case GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP521R1):
+					raw_key.data = (void*)ecdsa_secp521r1_privkey;
+					raw_key.size = sizeof(ecdsa_secp521r1_privkey) - 1;
+					break;
+				default:
+					gnutls_assert();
+					ret = GNUTLS_E_INTERNAL_ERROR;
+					goto cleanup;
+			}
+			snprintf(param_name, sizeof(param_name), "%s",
+					 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
+					 (bits)));
+			break;
+		case GNUTLS_PK_GOST_01:
+			raw_key.data = (void*)gost01_privkey;
+			raw_key.size = sizeof(gost01_privkey) - 1;
+			snprintf(param_name, sizeof(param_name), "%s",
+					 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
+					 (bits)));
+			break;
+		case GNUTLS_PK_GOST_12_256:
+			raw_key.data = (void*)gost12_256_privkey;
+			raw_key.size = sizeof(gost12_256_privkey) - 1;
+			snprintf(param_name, sizeof(param_name), "%s",
+					 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
+					 (bits)));
+			break;
+		case GNUTLS_PK_GOST_12_512:
+			raw_key.data = (void*)gost12_512_privkey;
+			raw_key.size = sizeof(gost12_512_privkey) - 1;
+			snprintf(param_name, sizeof(param_name), "%s",
+					 gnutls_ecc_curve_get_name(GNUTLS_BITS_TO_CURVE
+					 (bits)));
+			break;
+		default:
+			gnutls_assert();
+			ret = GNUTLS_E_INTERNAL_ERROR;
+			goto cleanup;
 	}
 
+	ret = gnutls_privkey_import_x509_raw(key, &raw_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -398,7 +467,8 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 	}
 
 	ret = 0;
-      cleanup:
+
+cleanup:
 	if (pub != NULL)
 		gnutls_pubkey_deinit(pub);
 	gnutls_privkey_deinit(key);
@@ -778,13 +848,13 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		FALLTHROUGH;
 	case GNUTLS_PK_RSA:
 		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 2048, GNUTLS_DIG_SHA256,
-			      rsa_key2048, rsa_sig);
+			      rsa_2048_privkey, rsa_2048_sig);
 		PK_TEST(GNUTLS_PK_RSA, test_rsa_enc, 2048, 0);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
-		PK_TEST(GNUTLS_PK_RSA, test_sig, 3072, GNUTLS_SIGN_RSA_SHA256);
+		PK_TEST(GNUTLS_PK_RSA, test_sig, 2048, GNUTLS_SIGN_RSA_SHA256);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_RSA_PSS:
@@ -796,12 +866,12 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		FALLTHROUGH;
 	case GNUTLS_PK_DSA:
 		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 2048, GNUTLS_DIG_SHA256,
-			      dsa_privkey, dsa_sig);
+			      dsa_2048_privkey, dsa_2048_sig);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
-		PK_TEST(GNUTLS_PK_DSA, test_sig, 3072, GNUTLS_SIGN_DSA_SHA256);
+		PK_TEST(GNUTLS_PK_DSA, test_sig, 2048, GNUTLS_SIGN_DSA_SHA256);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_EC:
@@ -823,8 +893,8 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			return 0;
 
 		PK_TEST(GNUTLS_PK_EC, test_sig,
-			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
-			GNUTLS_SIGN_ECDSA_SHA256);
+		        GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP256R1),
+		        GNUTLS_SIGN_ECDSA_SHA256);
 
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
@@ -867,35 +937,42 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 #if ENABLE_GOST
 		FALLTHROUGH;
 	case GNUTLS_PK_GOST_01:
-		PK_KNOWN_TEST(GNUTLS_PK_GOST_01, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_GOSTR_94,
+		PK_KNOWN_TEST(GNUTLS_PK_GOST_01, 0,
+			      GNUTLS_ECC_CURVE_GOST256CPA,
+			      GNUTLS_DIG_GOSTR_94,
 			      gost01_privkey, gost01_sig);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
-		PK_TEST(GNUTLS_PK_GOST_01, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
+		PK_TEST(GNUTLS_PK_GOST_01, test_sig,
+			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
 			GNUTLS_SIGN_GOST_94);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_GOST_12_256:
-		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_256, 0, GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_STREEBOG_256,
+		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_256, 0,
+			      GNUTLS_ECC_CURVE_GOST256CPA, GNUTLS_DIG_STREEBOG_256,
 			      gost12_256_privkey, gost12_256_sig);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
-		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
+		PK_TEST(GNUTLS_PK_GOST_12_256, test_sig,
+			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST256CPA),
 			GNUTLS_SIGN_GOST_256);
 
 		FALLTHROUGH;
 	case GNUTLS_PK_GOST_12_512:
-		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_512, 0, GNUTLS_ECC_CURVE_GOST512A, GNUTLS_DIG_STREEBOG_512,
+		PK_KNOWN_TEST(GNUTLS_PK_GOST_12_512, 0,
+			      GNUTLS_ECC_CURVE_GOST512A, GNUTLS_DIG_STREEBOG_512,
 			      gost12_512_privkey, gost12_512_sig);
 
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 
-		PK_TEST(GNUTLS_PK_GOST_12_512, test_sig, GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A),
+		PK_TEST(GNUTLS_PK_GOST_12_512, test_sig,
+			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_GOST512A),
 			GNUTLS_SIGN_GOST_512);
 
 #endif
