@@ -30,6 +30,8 @@ FUZZERS = \
  gnutls_srp_client_fuzzer$(EXEEXT) \
  gnutls_srp_server_fuzzer$(EXEEXT) \
  gnutls_set_trust_file_fuzzer$(EXEEXT) \
+ gnutls_x509_crl_parser_fuzzer$(EXEEXT) \
+ gnutls_x509_crq_parser_fuzzer$(EXEEXT) \
  gnutls_x509_parser_fuzzer$(EXEEXT) \
  gnutls_ext_raw_parse_fuzzer$(EXEEXT)
 
@@ -57,6 +59,8 @@ gnutls_server_rawpk_fuzzer_SOURCES = gnutls_server_rawpk_fuzzer.c $(COMMON_SOURC
 gnutls_srp_client_fuzzer_SOURCES = gnutls_srp_client_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
 gnutls_srp_server_fuzzer_SOURCES = gnutls_srp_server_fuzzer.c $(COMMON_SOURCES) mem.h srp.h
 gnutls_set_trust_file_fuzzer_SOURCES = gnutls_set_trust_file_fuzzer.c $(COMMON_SOURCES)
+gnutls_x509_crl_parser_fuzzer_SOURCES = gnutls_x509_crq_parser_fuzzer.c $(COMMON_SOURCES)
+gnutls_x509_crq_parser_fuzzer_SOURCES = gnutls_x509_crq_parser_fuzzer.c $(COMMON_SOURCES)
 gnutls_x509_parser_fuzzer_SOURCES = gnutls_x509_parser_fuzzer.c $(COMMON_SOURCES)
 gnutls_ext_raw_parse_fuzzer_SOURCES = gnutls_ext_raw_parse_fuzzer.c $(COMMON_SOURCES)
 
