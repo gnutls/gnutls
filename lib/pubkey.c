@@ -1447,7 +1447,7 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 {
 	int ret;
 
-	if (key == NULL) {
+	if (key == NULL || x == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -1485,6 +1485,11 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 	}
 
 	/* ECDSA */
+	if (y == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	key->params.curve = curve;
 
 	if (_gnutls_mpi_init_scan_nz
