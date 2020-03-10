@@ -908,7 +908,6 @@ static void print_issuer_sign_tool(gnutls_buffer_st * str, const char *prefix, c
 	if ((result = _asn1_strict_der_decode(&tmpasn, der->data, der->size, asn1_err)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		_gnutls_debug_log("_asn1_strict_der_decode: %s\n", asn1_err);
-		asn1_delete_structure(&tmpasn);
 		goto hexdump;
 	}
 
@@ -949,6 +948,8 @@ static void print_issuer_sign_tool(gnutls_buffer_st * str, const char *prefix, c
 	return;
 
 hexdump:
+	asn1_delete_structure(&tmpasn);
+
 	addf(str, _("%s\t\t\tASCII: "), prefix);
 	_gnutls_buffer_asciiprint(str, (char*)der->data, der->size);
 
