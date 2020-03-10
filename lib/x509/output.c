@@ -2290,14 +2290,13 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 								 oid,
 								 &sizeof_oid,
 								 &critical);
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
 			if (err < 0) {
-				if (err ==
-				    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-					break;
 				addf(str,
 				     "error: get_extension_info: %s\n",
 				     gnutls_strerror(err));
-				continue;
+				break;
 			}
 
 			if (i == 0)
