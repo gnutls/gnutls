@@ -1281,12 +1281,12 @@ print_extensions(gnutls_buffer_st * str, const char *prefix, int type,
 			return;
 		}
 
+		if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
 		if (err < 0) {
-			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-				break;
 			addf(str, "error: get_extension_info: %s\n",
 			     gnutls_strerror(err));
-			continue;
+			break;
 		}
 
 		if (i == 0)
