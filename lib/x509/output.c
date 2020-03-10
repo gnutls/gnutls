@@ -2660,14 +2660,13 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 			    gnutls_x509_crq_get_attribute_info(cert, i,
 							       oid,
 							       &sizeof_oid);
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
 			if (err < 0) {
-				if (err ==
-				    GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-					break;
 				addf(str,
 				     "error: get_extension_info: %s\n",
 				     gnutls_strerror(err));
-				continue;
+				break;
 			}
 
 			if (i == 0)
