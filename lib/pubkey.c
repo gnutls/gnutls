@@ -362,6 +362,111 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 
 #ifdef ENABLE_PKCS11
 
+/* The EC_PARAMS attribute can contain either printable string with curve name
+ * or OID defined in RFC 8410 */
+static int
+gnutls_pubkey_parse_ecc_eddsa_params(const gnutls_datum_t *parameters,
+				     gnutls_ecc_curve_t *outcurve)
+{
+	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
+	ASN1_TYPE asn1 = ASN1_TYPE_EMPTY;
+	unsigned int etype = ASN1_ETYPE_INVALID;
+	char str[MAX_OID_SIZE];
+	int str_size;
+	int ret;
+
+	ret = asn1_create_element(_gnutls_get_gnutls_asn(),
+				  "GNUTLS.pkcs-11-ec-Parameters", &asn1);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(ret);
+	}
+
+	ret = asn1_der_decoding(&asn1, parameters->data, parameters->size,
+				NULL);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+
+	/* Read the type of choice.
+	 */
+	str_size = sizeof(str) - 1;
+	ret = asn1_read_value(asn1, "", str, &str_size);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
+		goto cleanup;
+	}
+	str[str_size] = 0;
+
+	/* Convert the choice to enum type */
+	if (strcmp(str, "oId") == 0) {
+		etype = ASN1_ETYPE_OBJECT_ID;
+	} else if (strcmp(str, "curveName") == 0) {
+		etype = ASN1_ETYPE_PRINTABLE_STRING;
+	}
+
+	str_size = sizeof(str) - 1;
+	switch (etype) {
+	case ASN1_ETYPE_OBJECT_ID:
+		ret = asn1_read_value(asn1, "oId", str, &str_size);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			break;
+		}
+
+		curve = gnutls_oid_to_ecc_curve(str);
+		if (curve != GNUTLS_ECC_CURVE_ED25519 &&
+		    curve != GNUTLS_ECC_CURVE_ED448) {
+			_gnutls_debug_log("Curve %s is not supported for EdDSA\n", str);
+			gnutls_assert();
+			curve = GNUTLS_ECC_CURVE_INVALID;
+			ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+			break;
+		}
+
+		ret = GNUTLS_E_SUCCESS;
+		break;
+
+	case ASN1_ETYPE_PRINTABLE_STRING:
+		ret = asn1_read_value(asn1, "curveName", str, &str_size);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			break;
+		}
+
+		if (str_size == strlen("edwards25519") &&
+		    strncmp(str, "edwards25519", str_size) == 0) {
+			curve = GNUTLS_ECC_CURVE_ED25519;
+			ret = GNUTLS_E_SUCCESS;
+			break;
+		} else if (str_size == strlen("edwards448") &&
+			   strncmp(str, "edwards448", str_size) == 0) {
+			curve = GNUTLS_ECC_CURVE_ED448;
+			ret = GNUTLS_E_SUCCESS;
+			break;
+		}
+		/* FALLTHROUGH */
+
+	default:
+		/* Neither of CHOICEs found. Fail */
+		gnutls_assert();
+		ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+		curve = GNUTLS_ECC_CURVE_INVALID;
+		break;
+	}
+
+
+      cleanup:
+	asn1_delete_structure(&asn1);
+	*outcurve = curve;
+	return ret;
+}
+
 
 static int
 gnutls_pubkey_import_ecc_eddsa(gnutls_pubkey_t key,
@@ -369,10 +474,14 @@ gnutls_pubkey_import_ecc_eddsa(gnutls_pubkey_t key,
 			       const gnutls_datum_t * ecpoint)
 {
 	int ret;
+
+	gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;
 	gnutls_datum_t raw_point = {NULL, 0};
 
-	/* TODO handle parameters containing curve name to figure
-	 * out if it is Ed25519, Ed448 or even something else */
+	ret = gnutls_pubkey_parse_ecc_eddsa_params(parameters, &curve);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
 
 	ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
 					 ecpoint->data, ecpoint->size,
@@ -382,8 +491,7 @@ gnutls_pubkey_import_ecc_eddsa(gnutls_pubkey_t key,
 		gnutls_free(raw_point.data);
 		return ret;
 	}
-	ret = gnutls_pubkey_import_ecc_raw(key, GNUTLS_ECC_CURVE_ED25519,
-					   &raw_point, NULL);
+	ret = gnutls_pubkey_import_ecc_raw(key, curve, &raw_point, NULL);
 
 	gnutls_free(raw_point.data);
 	return ret;
