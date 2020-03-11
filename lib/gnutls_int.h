@@ -146,7 +146,7 @@ typedef int ssize_t;
 /* TLS Extensions */
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
-#define MAX_EXT_TYPES 32
+#define MAX_EXT_TYPES 64
 
 /* TLS-internal extension (will be parsed after a ciphersuite is selected).
  * This amends the gnutls_ext_parse_type_t. Not exported yet to allow more refining
@@ -358,22 +358,24 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_MAX /* not real extension - used for iterators */
 } extensions_t;
 
-#define GNUTLS_EXTENSION_MAX_VALUE 31
-#define ext_track_t uint32_t
+#define GNUTLS_EXTENSION_MAX_VALUE 63
+#define ext_track_t uint64_t
 
-#if GNUTLS_EXTENSION_MAX >= GNUTLS_EXTENSION_MAX_VALUE
-# error over limit
-#endif
+#include <verify.h>
 
-#if GNUTLS_EXTENSION_MAX >= MAX_EXT_TYPES
-# error over limit
-#endif
+verify(GNUTLS_EXTENSION_MAX < GNUTLS_EXTENSION_MAX_VALUE);
+verify(GNUTLS_EXTENSION_MAX < MAX_EXT_TYPES);
 
-/* we must provide at least 16 extensions for users to register */
-#if GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX < 16
-# error not enough extension types; increase GNUTLS_EXTENSION_MAX_VALUE, MAX_EXT_TYPES and used_exts type
-#endif
+/* we must provide at least 16 extensions for users to register;
+ * increase GNUTLS_EXTENSION_MAX_VALUE, MAX_EXT_TYPES and used_exts
+ * type if this fails
+ */
+verify(GNUTLS_EXTENSION_MAX_VALUE - GNUTLS_EXTENSION_MAX >= 16);
 
+/* The 'verify' symbol from <verify.h> is used extensively in the
+ * code; undef it to avoid clash
+ */
+#undef verify
 
 typedef enum { CIPHER_STREAM, CIPHER_BLOCK, CIPHER_AEAD } cipher_type_t;
 
