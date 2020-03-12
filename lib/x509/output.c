@@ -2204,9 +2204,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 	/* Version. */
 	{
 		int version = gnutls_x509_crl_get_version(crl);
-		if (version == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-			adds(str, _("\tVersion: 1 (default)\n"));
-		else if (version < 0)
+		if (version < 0)
 			addf(str, "error: get_version: %s\n",
 			     gnutls_strerror(version));
 		else

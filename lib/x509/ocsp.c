@@ -456,25 +456,12 @@ int gnutls_ocsp_resp_export2(gnutls_ocsp_resp_const_t resp, gnutls_datum_t * dat
  **/
 int gnutls_ocsp_req_get_version(gnutls_ocsp_req_const_t req)
 {
-	uint8_t version[8];
-	int len, ret;
-
 	if (req == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	len = sizeof(version);
-	ret =
-	    asn1_read_value(req->req, "tbsRequest.version", version, &len);
-	if (ret != ASN1_SUCCESS) {
-		if (ret == ASN1_ELEMENT_NOT_FOUND)
-			return 1;	/* the DEFAULT version */
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	return (int) version[0] + 1;
+	return _gnutls_x509_get_version(req->req, "tbsRequest.version");
 }
 
 /**
@@ -1153,26 +1140,12 @@ gnutls_ocsp_resp_get_response(gnutls_ocsp_resp_const_t resp,
  **/
 int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_const_t resp)
 {
-	uint8_t version[8];
-	int len, ret;
-
 	if (resp == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	len = sizeof(version);
-	ret =
-	    asn1_read_value(resp->resp, "tbsResponseData.version", version,
-			    &len);
-	if (ret != ASN1_SUCCESS) {
-		if (ret == ASN1_ELEMENT_NOT_FOUND)
-			return 1;	/* the DEFAULT version */
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	return (int) version[0] + 1;
+	return _gnutls_x509_get_version(resp->resp, "tbsResponseData.version");
 }
 
 /**

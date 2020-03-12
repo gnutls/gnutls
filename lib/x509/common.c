@@ -1926,3 +1926,23 @@ gnutls_gost_paramset_t gnutls_oid_to_gost_paramset(const char *oid)
 	else
 		return gnutls_assert_val(GNUTLS_GOST_PARAMSET_UNKNOWN);
 }
+
+int _gnutls_x509_get_version(ASN1_TYPE root, const char *name)
+{
+	uint8_t version[8];
+	int len, result;
+
+	len = sizeof(version);
+	result = asn1_read_value(root, name, version, &len);
+	if (result != ASN1_SUCCESS) {
+		if (result == ASN1_ELEMENT_NOT_FOUND)
+			return 1;	/* the DEFAULT version */
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (len != 1 || version[0] >= 0x80)
+		return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+
+	return (int) version[0] + 1;
+}
