@@ -148,3 +148,11 @@ libcrypto_la_SOURCES += \
 	curve448/ed448-shake256.c curve448/ed448-shake256-pubkey.c \
 	curve448/ed448-shake256-sign.c curve448/ed448-shake256-verify.c
 endif
+
+if NEED_CHACHA
+libcrypto_la_SOURCES += \
+	chacha/chacha-core-internal.c chacha/chacha-crypt.c \
+	chacha/chacha-internal.h chacha/chacha-poly1305.c \
+	chacha/chacha-poly1305.h chacha/chacha-set-key.c \
+	chacha/chacha-set-nonce.c chacha/chacha.h
+endif
