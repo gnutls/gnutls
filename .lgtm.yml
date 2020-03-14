@@ -2,7 +2,9 @@ extraction:
   cpp:
     configure:
       command:
+      - sed 's/--with-tests/--without-tests/g' -i bootstrap.conf
       - "./bootstrap --no-git --skip-po --no-bootstrap-sync --gnulib-srcdir=gnulib"
-      - "./configure --disable-tests --disable-doc --disable-gtk-doc"
+      - "./configure --disable-tests --disable-doc --disable-gtk-doc --disable-dependency-tracking"
     index:
-      build_command: "make"
+      build_command:
+      - "make -j4"
