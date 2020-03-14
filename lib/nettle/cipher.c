@@ -247,6 +247,13 @@ _ccm_decrypt(struct nettle_cipher_ctx *ctx,
 }
 
 static void
+_chacha_set_nonce (struct chacha_poly1305_ctx *ctx,
+		   size_t length, const uint8_t *nonce)
+{
+	chacha_set_nonce(ctx, nonce);
+}
+
+static void
 _chacha_poly1305_set_nonce (struct chacha_poly1305_ctx *ctx,
 		   size_t length, const uint8_t *nonce)
 {
@@ -606,6 +613,20 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .set_encrypt_key = (nettle_set_key_func*)salsa20_256_set_key,
 	   .set_decrypt_key = (nettle_set_key_func*)salsa20_256_set_key,
 	   .max_iv_size = SALSA20_NONCE_SIZE,
+	},
+	{  .algo = GNUTLS_CIPHER_CHACHA20_64,
+	   .block_size = 1,
+	   .key_size = CHACHA_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)chacha_crypt,
+	   .decrypt_block = (nettle_cipher_func*)chacha_crypt,
+
+	   .ctx_size = sizeof(struct chacha_ctx),
+	   .encrypt = _stream_encrypt,
+	   .decrypt = _stream_encrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)chacha_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)chacha_set_key,
+	   .set_iv = (setiv_func)_chacha_set_nonce,
+	   .max_iv_size = CHACHA_NONCE_SIZE,
 	},
 	{  .algo = GNUTLS_CIPHER_CHACHA20_POLY1305,
 	   .block_size = CHACHA_POLY1305_BLOCK_SIZE,

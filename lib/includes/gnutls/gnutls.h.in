@@ -113,6 +113,7 @@ extern "C" {
  * @GNUTLS_CIPHER_CAMELLIA_256_GCM: CAMELLIA in GCM mode with 256-bit keys (AEAD).
  * @GNUTLS_CIPHER_SALSA20_256: Salsa20 with 256-bit keys.
  * @GNUTLS_CIPHER_ESTREAM_SALSA20_256: Estream's Salsa20 variant with 256-bit keys.
+ * @GNUTLS_CIPHER_CHACHA20_64: Chacha20 cipher with 64-bit nonces.
  * @GNUTLS_CIPHER_CHACHA20_POLY1305: The Chacha20 cipher with the Poly1305 authenticator (AEAD).
  * @GNUTLS_CIPHER_GOST28147_TC26Z_CFB: GOST 28147-89 (Magma) cipher in CFB mode with TC26 Z S-box.
  * @GNUTLS_CIPHER_GOST28147_CPA_CFB: GOST 28147-89 (Magma) cipher in CFB mode with CryptoPro A S-box.
@@ -174,6 +175,7 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_AES_128_XTS = 32,
 	GNUTLS_CIPHER_AES_256_XTS = 33,
 	GNUTLS_CIPHER_GOST28147_TC26Z_CNT = 34,
+	GNUTLS_CIPHER_CHACHA20_64 = 35,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */
