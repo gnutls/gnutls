@@ -80,8 +80,11 @@ pic-check:
 ABIDW_COMMON = --no-show-locs --no-corpus-path
 ABIGNORE_FILE = "$(top_srcdir)/devel/libgnutls.abignore"
 SYMBOLS_LAST_FILE = "$(top_srcdir)/devel/symbols.last"
-LIBGNUTLS_ABI_LAST_FILE = "$(top_srcdir)/devel/libgnutls-latest-$$(uname -m).abi"
-LIBDANE_ABI_LAST_FILE = "$(top_srcdir)/devel/libdane-latest-$$(uname -m).abi"
+LAST_VERSION=3.6.12
+LIBGNUTLS_ABI_LAST_FILE = "$(top_srcdir)/devel/libgnutls-$(LAST_VERSION)-$$(uname -m).abi"
+LIBDANE_ABI_LAST_FILE = "$(top_srcdir)/devel/libdane-$(LAST_VERSION)-$$(uname -m).abi"
+LIBGNUTLS_ABIDIFF_FILE = "$(top_srcdir)/devel/libgnutls-$$(uname -m).abidiff"
+LIBDANE_ABIDIFF_FILE = "$(top_srcdir)/devel/libdane-$$(uname -m).abidiff"
 
 abi-dump-versioned: lib/libgnutls.la libdane/libgnutls-dane.la
 	@echo "**************************************************************************"
@@ -90,25 +93,27 @@ abi-dump-versioned: lib/libgnutls.la libdane/libgnutls-dane.la
 	@abidw lib/.libs/libgnutls.so $(ABIDW_COMMON) --suppressions $(ABIGNORE_FILE) --out-file "$(srcdir)/devel/libgnutls-$(VERSION)-$$(uname -m).abi"
 	@abidw libdane/.libs/libgnutls-dane.so $(ABIDW_COMMON) --out-file "$(srcdir)/devel/libdane-$(VERSION)-$$(uname -m).abi"
 
-abi-dump-latest: lib/libgnutls.la libdane/libgnutls-dane.la
+abi-dump-diff: lib/libgnutls.la libdane/libgnutls-dane.la
 	@echo "****************************************************************"
 	@echo "Generating ABI files of current gnutls and gnutls-dane libraries"
 	@echo "****************************************************************"
-	@abidw lib/.libs/libgnutls.so $(ABIDW_COMMON) --suppressions $(ABIGNORE_FILE) --out-file $(LIBGNUTLS_ABI_LAST_FILE)
-	@abidw libdane/.libs/libgnutls-dane.so $(ABIDW_COMMON) --out-file $(LIBDANE_ABI_LAST_FILE)
-	@rm -f "./devel/libgnutls-latest-$$(uname -m).tmp"
-	@rm -f "./devel/libdane-latest-$$(uname -m).tmp"
+	@abidiff --suppressions $(ABIGNORE_FILE) $(LIBGNUTLS_ABI_LAST_FILE) lib/.libs/libgnutls.so --hd2 "$(srcdir)/lib/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/ | sed 's/ ([0-9]* filtered out)//' > $(LIBGNUTLS_ABIDIFF_FILE) || :
+	@abidiff $(LIBDANE_ABI_LAST_FILE) libdane/.libs/libgnutls-dane.so --hd2 "$(srcdir)/libdane/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/ | sed 's/ ([0-9]* filtered out)//' > $(LIBDANE_ABIDIFF_FILE) || :
 
 abi-check-latest: lib/libgnutls.la libdane/libgnutls-dane.la
 	@echo "Checking whether the latest ABI dump matches"
-	@abidiff --suppressions $(ABIGNORE_FILE) lib/.libs/libgnutls.so $(LIBGNUTLS_ABI_LAST_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/ ; if test $$? != 0;then \
+	@abidiff --suppressions $(ABIGNORE_FILE) $(LIBGNUTLS_ABI_LAST_FILE) lib/.libs/libgnutls.so --hd2 "$(srcdir)/lib/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/ | sed 's/ ([0-9]* filtered out)//' > libgnutls.abidiff; \
+	diff -u $(LIBGNUTLS_ABIDIFF_FILE) libgnutls.abidiff; \
+	if test $$? != 0;then \
 		echo "*********************************************************"; \
 		echo "libgnutls ABI has changed; use 'make files-update'       "; \
 		echo "and use 'git diff' to check correctness before committing"; \
 		echo "*********************************************************"; \
 		false; \
 	fi
-	@abidiff libdane/.libs/libgnutls-dane.so $(LIBDANE_ABI_LAST_FILE) --hd2 "$(srcdir)/libdane/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/; if test $$? != 0;then \
+	@abidiff $(LIBDANE_ABI_LAST_FILE) libdane/.libs/libgnutls-dane.so --hd2 "$(srcdir)/libdane/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/ | sed 's/ ([0-9]* filtered out)//' > libdane.abidiff; \
+	diff -u $(LIBDANE_ABIDIFF_FILE) libdane.abidiff; \
+	if test $$? != 0;then \
 		echo "*********************************************************"; \
 		echo "libgnutls-dane ABI has changed; use 'make files-update'  "; \
 		echo "and use 'git diff' to check correctness before committing"; \
@@ -118,9 +123,10 @@ abi-check-latest: lib/libgnutls.la libdane/libgnutls-dane.la
 	@echo "********************************"
 	@echo "Current release matches ABI dump"
 	@echo "********************************"
+	@rm -f libgnutls.abidiff libdane.abidiff
 
 ABICHECK_COMMON = --no-added-syms
-abi-check: lib/libgnutls.la libdane/libgnutls-dane.la
+abi-check: abi-check-latest
 	@for file in $$(echo $(srcdir)/devel/libgnutls-*-$$(uname -m).abi);do \
 		echo "Comparing libgnutls with $$file"; \
 		abidiff $${file} lib/.libs/libgnutls.so $(ABICHECK_COMMON) --suppressions $(ABIGNORE_FILE) --hd2 "$(srcdir)/lib/includes/gnutls/" --hd2 $(builddir)/lib/includes/gnutls/; \
@@ -185,7 +191,7 @@ libopts-check:
 	@echo "*****************************************************************"
 	test "`autoopts-config libsrc|awk -F '-' '{print $$NF}'|sed 's/.tar.gz//'`" = "`cat $(srcdir)/src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 
-files-update: libopts-check abi-dump-latest
+files-update: libopts-check abi-dump-diff
 	$(MAKE) -C doc/ compare-makefile || mv doc/tmp-compare-makefile $(srcdir)/doc/Makefile.am
 	$(MAKE) -C doc/manpages compare-makefile || mv doc/manpages/tmp-compare-makefile $(srcdir)/doc/manpages/Makefile.am
 	$(MAKE) -C . symbol-check || mv symbols.last.tmp $(SYMBOLS_LAST_FILE)
@@ -206,4 +212,4 @@ dist-hook: libopts-check
 	mv ChangeLog $(distdir)
 	touch -c $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
 
-.PHONY: abi-check abi-dump-versioned abi-dump-latest pic-check symbol-check local-code-coverage-output files-update libopts-check AUTHORS
+.PHONY: abi-check abi-check-latest abi-dump-versioned abi-dump-diff pic-check symbol-check local-code-coverage-output files-update libopts-check AUTHORS

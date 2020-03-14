@@ -1,0 +1,13 @@
+Functions changes summary: 0 Removed, 0 Changed, 7 Added functions
+Variables changes summary: 0 Removed, 0 Changed, 0 Added variables
+
+7 Added functions:
+
+  'function gnutls_certificate_verification_profiles_t gnutls_certificate_verification_profile_get_id(const char*)'    {gnutls_certificate_verification_profile_get_id@@GNUTLS_3_6_12}
+  'function const char* gnutls_certificate_verification_profile_get_name(gnutls_certificate_verification_profiles_t)'    {gnutls_certificate_verification_profile_get_name@@GNUTLS_3_6_12}
+  'function int gnutls_hkdf_expand(gnutls_mac_algorithm_t, const gnutls_datum_t*, const gnutls_datum_t*, void*, size_t)'    {gnutls_hkdf_expand@@GNUTLS_3_6_13}
+  'function int gnutls_hkdf_extract(gnutls_mac_algorithm_t, const gnutls_datum_t*, const gnutls_datum_t*, void*)'    {gnutls_hkdf_extract@@GNUTLS_3_6_13}
+  'function unsigned int gnutls_hmac_get_key_size(gnutls_mac_algorithm_t)'    {gnutls_hmac_get_key_size@@GNUTLS_3_6_12}
+  'function int gnutls_pbkdf2(gnutls_mac_algorithm_t, const gnutls_datum_t*, const gnutls_datum_t*, unsigned int, void*, size_t)'    {gnutls_pbkdf2@@GNUTLS_3_6_13}
+  'function void gnutls_session_set_keylog_function(gnutls_session_t, gnutls_keylog_func)'    {gnutls_session_set_keylog_function@@GNUTLS_3_6_13}
+
