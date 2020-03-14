@@ -42,3 +42,22 @@ cases change the API.
     which is mirrored twice a day by www.gnutls.org.
 10. Use the @GnuTLS twitter account to announce the release.
 11. Close the current release milestone.
+
+# Post-release process
+
+After a new release is made, update the development infrastructure for
+the next cycle.
+
+1. Prepare a new `.abi` files:
+   ```sh
+   git rm devel/*-x86_64.abi
+   make abi-dump-versioned
+   git add devel/*-x86_64.abi
+   git commit -s -m 'abi: regenerate .abi files'
+   ```
+2. Clear abidiff files with empty content:
+   ```sh
+   : > devel/libgnutls-x86_64.abidiff
+   : > devel/libdane-x86_64.abidiff
+   ```
+3. Update `LAST_VERSION` in [devel/Makefile.am](devel/Makefile.am) to the latest release
