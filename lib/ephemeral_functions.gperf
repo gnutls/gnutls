@@ -3,3 +3,4 @@
 %readonly-tables
 struct ephemeral_function_st { const char *name; void *func; };
 %%
+gnutls_prf_get, _gnutls_prf_get

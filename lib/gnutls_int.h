@@ -1639,4 +1639,6 @@ get_certificate_type(gnutls_session_t session,
 
 extern unsigned int _gnutls_global_version;
 
+int _gnutls_prf_get(gnutls_session_t session);
+
 #endif /* GNUTLS_LIB_GNUTLS_INT_H */

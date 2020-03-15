@@ -53,6 +53,8 @@ static inline ret name arglist \
 	return ((ret (*)arglist)func)args; \
 }
 
+GNUTLS_EPHEMERAL_INT(gnutls_prf_get, int, (gnutls_session_t session), (session))
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }

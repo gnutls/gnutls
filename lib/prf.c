@@ -348,3 +348,23 @@ gnutls_prf(gnutls_session_t session,
 
 	return ret;
 }
+
+/**
+ * _gnutls_prf_get:
+ * @session: is a #gnutls_session_t type.
+ *
+ * Returns the current PRF algorithm enabled on the session.
+ *
+ * Returns: a #gnutls_mac_algorithm_t on success, or a negative error code.
+ *
+ * Since: 3.6.13
+ * Stability: Unstable
+ **/
+int
+_gnutls_prf_get(gnutls_session_t session)
+{
+	if (session->security_parameters.prf == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	return session->security_parameters.prf->id;
+}
