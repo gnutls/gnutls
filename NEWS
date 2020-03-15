@@ -17,6 +17,7 @@ gnutls_hkdf_extract: Added
 gnutls_hkdf_expand: Added
 gnutls_pbkdf2: Added
 gnutls_session_set_keylog_function: Added
+gnutls_prf_hash_get: Added
 
 * Version 3.6.12 (released 2020-02-01)
 
