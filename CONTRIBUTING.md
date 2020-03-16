@@ -158,7 +158,7 @@ As such, some questions to answer before adding a new API:
 
 
 The make rule 'abi-check' verifies that the ABI remained compatible since
-the last tagged release. It relies on the git tree and abi-compliance-checker.
+the last tagged release. It relies on the git tree and libabigail.
 
 The above do not apply to the C++ library; this library's ABI should not
 be considered stable.
@@ -402,6 +402,12 @@ files (.def) are auto-generated. Normally when introducing new functions,
 or adding new command line options to tools you need to run 'make
 files-update', review the output (when feasible) and commit it separately,
 e.g., with a message: "auto-generated files update".
+
+ The 'files-update' rule also regenerates the ABI dump files (.abi), used by
+the 'abi-check' rule to ensure library ABI compatibility. To make it easier
+to track actual changes to be made in those files, a git external diff
+driver is provided as `devel/git-abidiff-gnutls`. See the comment in the
+file for the instruction.
 
 
 # Guile bindings:
