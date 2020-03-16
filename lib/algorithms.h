@@ -367,6 +367,10 @@ struct gnutls_sign_entry_st {
 	   for values to use in aid struct. */
 	const sign_algorithm_st aid;
 	hash_security_level_t slevel;	/* contains values of hash_security_level_t */
+
+	/* 0 if it matches the predefined hash output size, otherwise
+	 * it is truncated or expanded (with XOF) */
+	unsigned hash_output_size;
 };
 typedef struct gnutls_sign_entry_st gnutls_sign_entry_st;
 
@@ -520,5 +524,7 @@ static inline int _sig_is_ecdsa(gnutls_sign_algorithm_t sig)
 }
 
 bool _gnutls_pk_are_compat(gnutls_pk_algorithm_t pk1, gnutls_pk_algorithm_t pk2);
+
+unsigned _gnutls_sign_get_hash_strength(gnutls_sign_algorithm_t sign);
 
 #endif /* GNUTLS_LIB_ALGORITHMS_H */
