@@ -100,7 +100,8 @@ static bool username_matches(const gnutls_datum_t *username,
 		i++;
 	}
 
-	if (line[0] == '#') {
+	/* if format is in hex, e.g. #FAFAFA */
+	if (line[0] == '#' && line_size > 1) {
 		hexline.data = (void *) &line[1];
 		hexline.size = i - 1;
 
