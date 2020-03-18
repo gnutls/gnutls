@@ -3995,6 +3995,21 @@ static const char *rsa_512[] = {
 	NULL
 };
 
+static const char *ed448[] = {
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBhDCCAQSgAwIBAgIUIWKQV5hisum31Z2Fw+PeZ80wqnkwBQYDK2VxMBkxFzAV\n"
+	"BgNVBAMTDkdudVRMUyB0ZXN0IENBMCAXDTIwMDMxNjA5MTY1M1oYDzk5OTkxMjMx\n"
+	"MjM1OTU5WjAZMRcwFQYDVQQDEw5HbnVUTFMgdGVzdCBDQTBDMAUGAytlcQM6AFsM\n"
+	"fQUL5TonNaVrBB7H4UtwnVlolZatMXceHZiWnzMKXOZXlIabi0nTGkvSFu9ed6JJ\n"
+	"L7EWarjRAKNDMEEwDwYDVR0TAQH/BAUwAwEB/zAPBgNVHQ8BAf8EBQMDBwQAMB0G\n"
+	"A1UdDgQWBBRMwtFQ9T9Ndw63UP2QGAuIFoYb6TAFBgMrZXEDcwB8hbYLw7KMlb3a\n"
+	"Q2YAXiugWt2WcAMtvKgqzjXzUt2jilaDA72d3MCAWQQsMmQfRNSthDIao5CksoDk\n"
+	"Xc8qFzckmdBiF7W+UNT3OMisE9yIxF4iA1Sxsji3C0WDUq2jen5Uv9E99H+r47L8\n"
+	"U955wKxWJAA=\n"
+	"-----END CERTIFICATE-----\n",
+	NULL
+};
+
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4161,6 +4176,8 @@ static struct
 #endif
   { "rsa-512 - not ok (due to profile)", rsa_512, &rsa_512[0], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_MEDIUM),
     GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID, NULL, 1576759855, 1},
+  { "ed448 - ok", ed448, &ed448[0], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA),
+    0, NULL, 1584352960, 1},
   { NULL, NULL, NULL, 0, 0}
 };
 

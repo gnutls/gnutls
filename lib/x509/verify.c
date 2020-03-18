@@ -421,9 +421,9 @@ unsigned _gnutls_is_broken_sig_allowed(const gnutls_sign_entry_st *se, unsigned 
 			_gnutls_debug_log(#level": certificate's signature hash is unknown\n"); \
 			return gnutls_assert_val(0); \
 		} \
-		if (entry->output_size*8/2 < sym_bits) { \
+		if (_gnutls_sign_get_hash_strength(sigalg) < sym_bits) { \
 			_gnutls_cert_log("cert", crt); \
-			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", entry->output_size*8/2, sym_bits); \
+			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", _gnutls_sign_get_hash_strength(sigalg), sym_bits); \
 			return gnutls_assert_val(0); \
 		} \
 		sp = gnutls_pk_bits_to_sec_param(pkalg, bits); \
