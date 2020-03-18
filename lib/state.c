@@ -584,6 +584,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	(*session)->internals.pull_func = system_read;
 	(*session)->internals.errno_func = system_errno;
 
+	(*session)->internals.saved_username_size = -1;
+
 	/* heartbeat timeouts */
 	(*session)->internals.hb_retrans_timeout_ms = 1000;
 	(*session)->internals.hb_total_timeout_ms = 60000;

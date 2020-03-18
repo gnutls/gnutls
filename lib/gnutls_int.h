@@ -1445,7 +1445,7 @@ typedef struct {
 
 	/* The saved username from PSK or SRP auth */
 	char saved_username[MAX_USERNAME_SIZE+1];
-	bool saved_username_set;
+	int saved_username_size;
 
 	/* Needed for TCP Fast Open (TFO), set by gnutls_transport_set_fastopen() */
 	tfo_st tfo;
