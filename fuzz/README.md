@@ -35,15 +35,17 @@ me new corpora after 1-2 days.
 Use the following commands on top dir:
 ```
 export CC=clang
-export CFLAGS="-O1 -g -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined,integer,nullability -fsanitize=address -fsanitize-address-use-after-scope -fsanitize-coverage=trace-pc-guard,trace-cmp"
+export CXX=clang++
+export CFLAGS="-O1 -g -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=undefined,integer,nullability,bool,alignment,null,enum,address,leak,nonnull-attribute -fno-sanitize-recover=all -fsanitize-recover=unsigned-integer-overflow -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link"
+export CXXFLAGS="$CFLAGS"
 ./configure --disable-guile --enable-fuzzer-target --enable-static --disable-doc --disable-gcc-warnings --disable-hardware-acceleration
 make clean
 make
 cd fuzz
 
-# build and run gnutls_base64_decode_fuzzer (change ASAN path if not using clang-8)
-export UBSAN_OPTIONS=print_stacktrace=1
-export ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-8/bin/llvm-symbolizer
+# build and run gnutls_base64_decode_fuzzer
+export UBSAN_OPTIONS=print_stacktrace=1:report_error_type=1
+export ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer
 ./run-clang.sh gnutls_base64_decoder_fuzzer
 ```
 
