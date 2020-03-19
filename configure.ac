@@ -669,6 +669,15 @@ LIBS=$save_LIBS
 AS_IF([test "$have_gostdsa" != "yes"], AC_DEFINE([NEED_GOSTDSA], 1, [Use backported GOST R 34.10 DSA support]))
 AM_CONDITIONAL(NEED_GOSTDSA, [test "$have_gostdsa" != "yes"])
 
+# Check if nettle has ChaCha20 initial block counter support
+have_chacha_set_counter=no
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS([nettle_chacha_set_counter],
+               [have_chacha_set_counter=yes])
+LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CHACHA, [test "$have_chacha_set_counter" != "yes"])
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],

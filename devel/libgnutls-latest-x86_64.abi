@@ -1506,6 +1506,8 @@
       <enumerator name='GNUTLS_CIPHER_AES_128_XTS' value='32'/>
       <enumerator name='GNUTLS_CIPHER_AES_256_XTS' value='33'/>
       <enumerator name='GNUTLS_CIPHER_GOST28147_TC26Z_CNT' value='34'/>
+      <enumerator name='GNUTLS_CIPHER_CHACHA20_64' value='35'/>
+      <enumerator name='GNUTLS_CIPHER_CHACHA20_32' value='36'/>
       <enumerator name='GNUTLS_CIPHER_IDEA_PGP_CFB' value='200'/>
       <enumerator name='GNUTLS_CIPHER_3DES_PGP_CFB' value='201'/>
       <enumerator name='GNUTLS_CIPHER_CAST5_PGP_CFB' value='202'/>
