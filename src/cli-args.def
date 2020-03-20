@@ -471,6 +471,12 @@ flag = {
     doc      = "";
 };
 
+flag = {
+    name     = waitresumption;
+    descrip  = "Block waiting for the resumption data under TLS1.3";
+    doc      = "This option makes the client to block waiting for the resumption data under TLS1.3. The option has effect only when --resume is provided.";
+};
+
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
   ds-format = 'texi';      // or texi or mdoc format
