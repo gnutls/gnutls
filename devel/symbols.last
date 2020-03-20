@@ -576,6 +576,7 @@ gnutls_pkcs_schema_get_name@GNUTLS_3_4
 gnutls_pkcs_schema_get_oid@GNUTLS_3_4
 gnutls_prf@GNUTLS_3_4
 gnutls_prf_early@GNUTLS_3_6_8
+gnutls_prf_hash_get@GNUTLS_3_6_13
 gnutls_prf_raw@GNUTLS_3_4
 gnutls_prf_rfc5705@GNUTLS_3_4
 gnutls_priority_certificate_type_list2@GNUTLS_3_6_4

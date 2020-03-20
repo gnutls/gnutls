@@ -1275,6 +1275,7 @@ gnutls_group_t gnutls_group_get(gnutls_session_t session);
 gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session);
 gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session);
 gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session);
+gnutls_digest_algorithm_t gnutls_prf_hash_get(const gnutls_session_t session);
 gnutls_certificate_type_t
 gnutls_certificate_type_get(gnutls_session_t session);
 gnutls_certificate_type_t
