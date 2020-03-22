@@ -94,7 +94,7 @@ oss-fuzz:
 	../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
 	-Wl,-Bstatic \
 	$${XLIBS} \
-	-Wl,-Bdynamic; \
+	-Wl,-Bdynamic || exit $?; \
 	done; \
 	fi
 
