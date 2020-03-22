@@ -71,6 +71,23 @@ int _gnutls_generate_master(gnutls_session_t session, int keep_premaster)
 }
 
 /**
+ * gnutls_session_get_keylog_function:
+ * @session: is #gnutls_session_t type
+ *
+ * This function will return the callback function set using
+ * gnutls_session_set_keylog_function().
+ *
+ * Returns: The function set or %NULL otherwise.
+ *
+ * Since: 3.6.13
+ */
+gnutls_keylog_func
+gnutls_session_get_keylog_function(const gnutls_session_t session)
+{
+	return session->internals.keylog_func;
+}
+
+/**
  * gnutls_session_set_keylog_function:
  * @session: is #gnutls_session_t type
  * @func: is the function to be called

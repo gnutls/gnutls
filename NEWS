@@ -16,6 +16,7 @@ See the end for copying conditions.
 gnutls_hkdf_extract: Added
 gnutls_hkdf_expand: Added
 gnutls_pbkdf2: Added
+gnutls_session_get_keylog_function: Added
 gnutls_session_set_keylog_function: Added
 gnutls_prf_hash_get: Added
 

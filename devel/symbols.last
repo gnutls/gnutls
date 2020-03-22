@@ -756,6 +756,7 @@ gnutls_session_get_desc@GNUTLS_3_4
 gnutls_session_get_flags@GNUTLS_3_4
 gnutls_session_get_id2@GNUTLS_3_4
 gnutls_session_get_id@GNUTLS_3_4
+gnutls_session_get_keylog_function@GNUTLS_3_6_13
 gnutls_session_get_master_secret@GNUTLS_3_4
 gnutls_session_get_ptr@GNUTLS_3_4
 gnutls_session_get_random@GNUTLS_3_4
