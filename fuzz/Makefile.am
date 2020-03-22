@@ -88,8 +88,9 @@ oss-fuzz:
 	for ccfile in *_fuzzer.c; do \
 	fuzzer=$$(basename $$ccfile .c); \
 	XLIBS="-lhogweed -lnettle -ltasn1 -lgmp -lidn2 -lunistring"; \
-	$$CXX $$CXXFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
-	"$${fuzzer}.c" -o "$${fuzzer}" \
+	$$CC $$CFLAGS -I$(top_srcdir)/lib/includes/ -I$(top_srcdir) \
+	-c "$${fuzzer}.c" -o "$${fuzzer}.o" ; \
+	$$CXX $$CXXFLAGS "$${fuzzer}.o" -o "$${fuzzer}" \
 	../lib/.libs/libgnutls.a $${LIB_FUZZING_ENGINE} \
 	-Wl,-Bstatic \
 	$${XLIBS} \
