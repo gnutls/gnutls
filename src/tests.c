@@ -128,9 +128,12 @@ char prio_str[768] = "";
 
 #define ALL_CIPHERS "+CIPHER-ALL:+ARCFOUR-128:+3DES-CBC" GOST_CIPHERS
 #define BLOCK_CIPHERS "+3DES-CBC:+AES-128-CBC:+CAMELLIA-128-CBC:+AES-256-CBC:+CAMELLIA-256-CBC"
+#define SSL3_CIPHERS "+ARCFOUR-128:+3DES-CBC"
 #define ALL_COMP "+COMP-NULL"
 #define ALL_MACS "+MAC-ALL:+MD5:+SHA1" GOST_MACS
+#define SSL3_MACS "+MD5:+SHA1"
 #define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+ECDHE-RSA:+ECDHE-ECDSA:+ANON-ECDH" GOST_KX
+#define SSL3_KX "+RSA:+DHE-RSA:+DHE-DSS"
 #define INIT_STR "NONE:"
 char rest[384] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+GROUP-ALL" GOST_REST;
 
@@ -608,8 +611,8 @@ test_code_t test_ssl3(gnutls_session_t session)
 {
 	int ret;
 	sprintf(prio_str, INIT_STR
-		ALL3_CIPHERS ":" ALL_COMP ":+VERS-SSL3.0:%%NO_EXTENSIONS:"
-		ALL_MACS ":" ALL_KX ":%s", rest);
+		SSL3_CIPHERS ":" ALL_COMP ":+VERS-SSL3.0:%%NO_EXTENSIONS:"
+		SSL3_MACS ":" SSL3_KX ":%s", rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
