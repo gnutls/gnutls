@@ -624,6 +624,40 @@ test_code_t test_ssl3(gnutls_session_t session)
 	return ret;
 }
 
+test_code_t test_ssl3_with_extensions(gnutls_session_t session)
+{
+	int ret;
+	sprintf(prio_str, INIT_STR
+		SSL3_CIPHERS ":" ALL_COMP ":+VERS-SSL3.0:"
+		SSL3_MACS ":" SSL3_KX ":%s", rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake(session);
+	if (ret == TEST_SUCCEED)
+		ssl3_ok = 1;
+
+	return ret;
+}
+
+test_code_t test_ssl3_unknown_ciphersuites(gnutls_session_t session)
+{
+	int ret;
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":+VERS-SSL3.0:%%NO_EXTENSIONS:"
+		ALL_MACS ":" ALL_KX ":%s", rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = test_do_handshake(session);
+	if (ret == TEST_SUCCEED)
+		ssl3_ok = 1;
+
+	return ret;
+}
+
 static int alrm = 0;
 static void got_alarm(int k)
 {

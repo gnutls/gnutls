@@ -85,15 +85,20 @@ static const TLS_TEST tls_tests[] = {
 	 test_send_record_with_allow_small_records, "yes", "no", "dunno"},
 #ifdef ENABLE_SSL3
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
+	{"for SSL 3.0 with extensions", test_ssl3_with_extensions, "yes", "no", "dunno"},
+	{"for SSL 3.0 with cipher suites not in SSL 3.0 spec",
+	 test_ssl3_unknown_ciphersuites, "yes", "no", "dunno"},
+#endif
 	/* The following tests will disable TLS 1.x if the server is
 	 * buggy */
-#endif
 	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
 	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.1", test_tls_disable1, "no",
 	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.0", test_tls_disable0, "no",
 	 "yes", "dunno"},
+	/* The following test will disable extensions if the server
+	 * is buggy */
 	{"whether %NO_EXTENSIONS is required", test_no_extensions, "no", "yes",
 	 "dunno"},
 	{"whether %COMPAT is required", test_record_padding, "no", "yes",
