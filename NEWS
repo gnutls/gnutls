@@ -19,6 +19,9 @@ gnutls_pbkdf2: Added
 gnutls_session_set_keylog_function: Added
 gnutls_prf_hash_get: Added
 
+** gnutls-cli-debug: Improved support for old servers that only support
+   SSL 3.0.
+
 * Version 3.6.12 (released 2020-02-01)
 
 ** libgnutls: Introduced TLS session flag (gnutls_session_get_flags())
