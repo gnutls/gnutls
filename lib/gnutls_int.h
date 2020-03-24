@@ -1247,6 +1247,7 @@ typedef struct {
 	int16_t h_post;		/* whether post-generation/receive */
 	gnutls_handshake_read_func h_read_func;
 	gnutls_handshake_secret_func h_secret_func;
+	gnutls_alert_read_func a_read_func;
 
 	gnutls_keylog_func keylog_func;
 

@@ -77,6 +77,7 @@
     <elf-symbol name='gnutls_alert_get_strname' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alert_send' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alert_send_appropriate' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='gnutls_alert_set_read_function' version='GNUTLS_QUIC_3_6_13' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alpn_get_selected_protocol' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_alpn_set_protocols' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='gnutls_anon_allocate_client_credentials' version='GNUTLS_3_4' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
