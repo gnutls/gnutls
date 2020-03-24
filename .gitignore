@@ -870,6 +870,7 @@ tests/x509-extensions
 tests/x509-verify-with-crl
 tests/x509_altname
 tests/x509cert
+tests/x509cert-dntypes
 tests/x509cert-invalid
 tests/x509cert-tl
 tests/x509dn
