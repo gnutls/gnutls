@@ -12,12 +12,19 @@ See the end for copying conditions.
 ** libgnutls: Added new callback gnutls_keylog_func that enables a custom
    logging functionality.
 
+** libgnutls: Added support for non-null terminated usernames in PSK
+   negotiation (#586).
+
 ** API and ABI modifications:
 gnutls_hkdf_extract: Added
 gnutls_hkdf_expand: Added
 gnutls_pbkdf2: Added
 gnutls_session_set_keylog_function: Added
 gnutls_prf_hash_get: Added
+gnutls_psk_server_get_username2: Added
+gnutls_psk_set_client_credentials2: Added
+gnutls_psk_set_client_credentials_function2: Added
+gnutls_psk_set_server_credentials_function2: Added
 
 * Version 3.6.12 (released 2020-02-01)
 
