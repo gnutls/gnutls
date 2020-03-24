@@ -1071,12 +1071,12 @@ get_response(gnutls_session_t session, char *request,
 			*response_length = strlen(*response);
 			return 1;
 		} else if (ret == 0) {
+			*response = strdup(request);
 			if (*response == NULL) {
 				fprintf(stderr, "Memory error\n");
 				return 0;
 			}
-			*response = strdup(request);
-			*response_length = ((*response) ? strlen(*response) : 0);
+			*response_length = strlen(*response);
 		} else {
 			*response = NULL;
 			do {
