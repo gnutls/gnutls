@@ -165,6 +165,22 @@ gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
 	_gnutls_record_log("REC: Sending Alert[%d|%d] - %s\n", data[0],
 			   data[1], name);
 
+	if (session->internals.alert_read_func) {
+		record_parameters_st *params;
+
+		ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &params);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+		ret = session->internals.alert_read_func(session,
+						     params->write.level,
+						     level,
+						     desc);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		return ret;
+	}
+
 	if ((ret =
 	     _gnutls_send_int(session, GNUTLS_ALERT, -1,
 			      EPOCH_WRITE_CURRENT, data, 2,

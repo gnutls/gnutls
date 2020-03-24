@@ -130,6 +130,7 @@ APIMANS += gnutls_alert_get_name.3
 APIMANS += gnutls_alert_get_strname.3
 APIMANS += gnutls_alert_send.3
 APIMANS += gnutls_alert_send_appropriate.3
+APIMANS += gnutls_alert_set_read_function.3
 APIMANS += gnutls_alpn_get_selected_protocol.3
 APIMANS += gnutls_alpn_set_protocols.3
 APIMANS += gnutls_anon_allocate_client_credentials.3

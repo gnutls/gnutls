@@ -25,6 +25,7 @@ gnutls_alert_get_name@GNUTLS_3_4
 gnutls_alert_get_strname@GNUTLS_3_4
 gnutls_alert_send@GNUTLS_3_4
 gnutls_alert_send_appropriate@GNUTLS_3_4
+gnutls_alert_set_read_function@GNUTLS_3_7_0
 gnutls_alpn_get_selected_protocol@GNUTLS_3_4
 gnutls_alpn_set_protocols@GNUTLS_3_4
 gnutls_anon_allocate_client_credentials@GNUTLS_3_4
