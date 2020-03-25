@@ -2312,6 +2312,7 @@ void gnutls_global_set_log_level(int level);
 typedef int (*gnutls_keylog_func) (gnutls_session_t session,
 				   const char *label,
 				   const gnutls_datum_t *secret);
+gnutls_keylog_func gnutls_session_get_keylog_function(const gnutls_session_t session);
 void gnutls_session_set_keylog_function(gnutls_session_t session,
 					gnutls_keylog_func func);
 

@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #if !defined(__linux__) || !defined(__GNUC__)
 
@@ -141,6 +142,7 @@ static void client(int fd, const char *prio, unsigned int exp_call_count)
 	gnutls_transport_set_int(session, fd);
 
 	gnutls_session_set_keylog_function(session, keylog_func);
+	assert(gnutls_session_get_keylog_function(session) == keylog_func);
 
 	/* Perform the TLS handshake
 	 */

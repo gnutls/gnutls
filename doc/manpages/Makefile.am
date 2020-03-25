@@ -771,6 +771,7 @@ APIMANS += gnutls_session_get_desc.3
 APIMANS += gnutls_session_get_flags.3
 APIMANS += gnutls_session_get_id.3
 APIMANS += gnutls_session_get_id2.3
+APIMANS += gnutls_session_get_keylog_function.3
 APIMANS += gnutls_session_get_master_secret.3
 APIMANS += gnutls_session_get_ptr.3
 APIMANS += gnutls_session_get_random.3
