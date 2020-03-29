@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 * Version 3.6.13 (unreleased)
 
+** libgnutls: Fix a DTLS-protocol regression (caused by TLS1.3 support), since 3.6.3.
+   The DTLS client would not contribute any randomness to the DTLS negotiation,
+   breaking the security guarantees of the DTLS protocol (#960) [CVSS: high]
+
 ** libgnutls: Added new APIs to access KDF algorithms (#813).
 
 ** libgnutls: Added new callback gnutls_keylog_func that enables a custom
@@ -26,6 +30,7 @@ gnutls_psk_server_get_username2: Added
 gnutls_psk_set_client_credentials2: Added
 gnutls_psk_set_client_credentials_function2: Added
 gnutls_psk_set_server_credentials_function2: Added
+
 
 ** gnutls-cli-debug: Improved support for old servers that only support
    SSL 3.0.
