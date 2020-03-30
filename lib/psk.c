@@ -294,6 +294,9 @@ static int call_server_callback_legacy(gnutls_session_t session,
 	gnutls_psk_server_credentials_t cred =
 			(gnutls_psk_server_credentials_t)
 				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	if (unlikely(cred == NULL))
+	  return gnutls_assert_val(-1);
+
 	return cred->pwd_callback_legacy(session, (const char *) username->data, key);
 }
 
@@ -367,6 +370,9 @@ static int call_client_callback_legacy(gnutls_session_t session,
 	gnutls_psk_client_credentials_t cred =
 			(gnutls_psk_client_credentials_t)
 				_gnutls_get_cred(session, GNUTLS_CRD_PSK);
+	if (unlikely(cred == NULL))
+	  return gnutls_assert_val(-1);
+
 
 	ret = cred->get_function_legacy(session, &user_p, key);
 
