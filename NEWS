@@ -19,6 +19,9 @@ See the end for copying conditions.
 ** libgnutls: Added support for non-null terminated usernames in PSK
    negotiation (#586).
 
+** gnutls-cli-debug: Improved support for old servers that only support
+   SSL 3.0.
+
 ** API and ABI modifications:
 gnutls_hkdf_extract: Added
 gnutls_hkdf_expand: Added
@@ -31,9 +34,6 @@ gnutls_psk_set_client_credentials2: Added
 gnutls_psk_set_client_credentials_function2: Added
 gnutls_psk_set_server_credentials_function2: Added
 
-
-** gnutls-cli-debug: Improved support for old servers that only support
-   SSL 3.0.
 
 * Version 3.6.12 (released 2020-02-01)
 
