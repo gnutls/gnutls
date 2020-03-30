@@ -848,6 +848,7 @@ tests/tls13/psk-dumbfw
 tests/tls13/psk-ext
 tests/tls13/supported_versions
 tests/tls13/tls12-no-tls13-exts
+tests/tls13/no-auto-send-ticket
 tests/tlsext-decoding
 tests/tlsfeature-crt
 tests/tlsfeature-ext
