@@ -233,6 +233,8 @@ AS_IF([test "$ac_cv_search___atomic_load_4" = "none required" || test "$ac_cv_se
 dnl We use its presence to detect C11 threads
 AC_CHECK_HEADERS([threads.h])
 
+AC_CHECK_HEADERS([valgrind/memcheck.h])
+
 AC_ARG_ENABLE(padlock,
   AS_HELP_STRING([--disable-padlock], [unconditionally disable padlock acceleration]),
     use_padlock=$enableval)

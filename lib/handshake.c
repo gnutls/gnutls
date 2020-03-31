@@ -57,6 +57,9 @@
 #include "secrets.h"
 #include "tls13/session_ticket.h"
 #include "locks.h"
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+#include <valgrind/memcheck.h>
+#endif
 
 #define TRUE 1
 #define FALSE 0
@@ -242,6 +245,12 @@ int _gnutls_gen_client_random(gnutls_session_t session)
 			return gnutls_assert_val(ret);
 	}
 
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+	if (RUNNING_ON_VALGRIND)
+		VALGRIND_MAKE_MEM_DEFINED(session->security_parameters.client_random,
+					  GNUTLS_RANDOM_SIZE);
+#endif
+
 	return 0;
 }
 
@@ -319,6 +328,12 @@ int _gnutls_gen_server_random(gnutls_session_t session, int version)
 		gnutls_assert();
 		return ret;
 	}
+
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+	if (RUNNING_ON_VALGRIND)
+		VALGRIND_MAKE_MEM_DEFINED(session->security_parameters.server_random,
+					  GNUTLS_RANDOM_SIZE);
+#endif
 
 	return 0;
 }
