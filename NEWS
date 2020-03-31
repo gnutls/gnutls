@@ -5,11 +5,12 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.13 (unreleased)
+* Version 3.6.13 (released 2020-03-31)
 
 ** libgnutls: Fix a DTLS-protocol regression (caused by TLS1.3 support), since 3.6.3.
    The DTLS client would not contribute any randomness to the DTLS negotiation,
-   breaking the security guarantees of the DTLS protocol (#960) [CVSS: high]
+   breaking the security guarantees of the DTLS protocol (#960)
+   [GNUTLS-SA-2020-03-31, CVSS: high]
 
 ** libgnutls: Added new APIs to access KDF algorithms (#813).
 
