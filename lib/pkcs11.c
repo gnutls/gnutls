@@ -4141,6 +4141,8 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 			a_vals++;
 		}
 
+		/* This doesn't do a proper comparison, see
+		 * _gnutls_x509_compare_raw_dn() */
 		if (priv->dn.size > 0) {
 			a[a_vals].type = CKA_SUBJECT;
 			a[a_vals].value = priv->dn.data;
@@ -4155,6 +4157,7 @@ find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 			a_vals++;
 		}
 
+		/* Same problem as for priv->dn */
 		if (priv->issuer_dn.size > 0) {
 			a[a_vals].type = CKA_ISSUER;
 			a[a_vals].value = priv->issuer_dn.data;
