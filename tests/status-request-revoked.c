@@ -65,6 +65,16 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
+static time_t mytime(time_t * t)
+{
+	time_t then = 1586000000;
+
+	if (t)
+		*t = then;
+
+	return then;
+}
+
 static unsigned char server_cert_pem[] =
 "-----BEGIN CERTIFICATE-----\n"
 "MIIEKjCCAhKgAwIBAgIIRiBQA6KFBj0wDQYJKoZIhvcNAQELBQAwDzENMAsGA1UE\n"
@@ -252,6 +262,7 @@ static int cert_verify_callback(gnutls_session_t session)
 	unsigned int status;
 	int ret;
 
+	gnutls_global_set_time_function(mytime);
 	ret = gnutls_certificate_verify_peers2(session, &status);
 	if (ret < 0)
 		return -1;
