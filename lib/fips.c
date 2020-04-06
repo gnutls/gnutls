@@ -135,10 +135,12 @@ void _gnutls_fips_mode_reset_zombie(void)
 	}
 }
 
-#define GNUTLS_LIBRARY_NAME "libgnutls.so.30"
-#define NETTLE_LIBRARY_NAME "libnettle.so.6"
-#define HOGWEED_LIBRARY_NAME "libhogweed.so.4"
-#define GMP_LIBRARY_NAME "libgmp.so.10"
+/* These only works with the platform where SONAME is part of the ABI.
+ * For example, *_SONAME will be set to "none" on Windows platforms. */
+#define GNUTLS_LIBRARY_NAME GNUTLS_LIBRARY_SONAME
+#define NETTLE_LIBRARY_NAME NETTLE_LIBRARY_SONAME
+#define HOGWEED_LIBRARY_NAME HOGWEED_LIBRARY_SONAME
+#define GMP_LIBRARY_NAME GMP_LIBRARY_SONAME
 
 #define HMAC_SUFFIX ".hmac"
 #define HMAC_SIZE 32

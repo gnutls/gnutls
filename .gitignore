@@ -1,3 +1,4 @@
+/.#configure.ac
 *~
 /ABOUT-NLS
 AUTHORS
@@ -207,6 +208,7 @@ guile/src/Makefile.in
 guile/tests/Makefile
 guile/tests/Makefile.in
 INSTALL
+ldd.sh
 lib/accelerated/aarch64/libaarch64.la
 lib/accelerated/libaccelerated.la
 lib/accelerated/x86/libx86.la
