@@ -327,6 +327,50 @@ _cfb8_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 }
 
 static void
+_xts_aes128_set_encrypt_key(struct xts_aes128_key *xts_key,
+			    const uint8_t *key)
+{
+	if (_gnutls_fips_mode_enabled() &&
+	    safe_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+
+	xts_aes128_set_encrypt_key(xts_key, key);
+}
+
+static void
+_xts_aes128_set_decrypt_key(struct xts_aes128_key *xts_key,
+			    const uint8_t *key)
+{
+	if (_gnutls_fips_mode_enabled() &&
+	    safe_memcmp(key, key + AES128_KEY_SIZE, AES128_KEY_SIZE) == 0)
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+
+	xts_aes128_set_decrypt_key(xts_key, key);
+}
+
+static void
+_xts_aes256_set_encrypt_key(struct xts_aes256_key *xts_key,
+			    const uint8_t *key)
+{
+	if (_gnutls_fips_mode_enabled() &&
+	    safe_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+
+	xts_aes256_set_encrypt_key(xts_key, key);
+}
+
+static void
+_xts_aes256_set_decrypt_key(struct xts_aes256_key *xts_key,
+			    const uint8_t *key)
+{
+	if (_gnutls_fips_mode_enabled() &&
+	    safe_memcmp(key, key + AES256_KEY_SIZE, AES256_KEY_SIZE) == 0)
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+
+	xts_aes256_set_decrypt_key(xts_key, key);
+}
+
+static void
 _xts_aes128_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 		    const uint8_t * src)
 {
@@ -802,8 +846,8 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct xts_aes128_key),
 	   .encrypt = _xts_aes128_encrypt,
 	   .decrypt = _xts_aes128_decrypt,
-	   .set_encrypt_key = (nettle_set_key_func*)xts_aes128_set_encrypt_key,
-	   .set_decrypt_key = (nettle_set_key_func*)xts_aes128_set_decrypt_key,
+	   .set_encrypt_key = (nettle_set_key_func*)_xts_aes128_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)_xts_aes128_set_decrypt_key,
 	   .max_iv_size = AES_BLOCK_SIZE,
 	},
 	{  .algo = GNUTLS_CIPHER_AES_256_XTS,
@@ -813,8 +857,8 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct xts_aes256_key),
 	   .encrypt = _xts_aes256_encrypt,
 	   .decrypt = _xts_aes256_decrypt,
-	   .set_encrypt_key = (nettle_set_key_func*)xts_aes256_set_encrypt_key,
-	   .set_decrypt_key = (nettle_set_key_func*)xts_aes256_set_decrypt_key,
+	   .set_encrypt_key = (nettle_set_key_func*)_xts_aes256_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)_xts_aes256_set_decrypt_key,
 	   .max_iv_size = AES_BLOCK_SIZE,
 	},
 };
