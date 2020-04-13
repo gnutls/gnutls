@@ -100,54 +100,54 @@ libcrypto_la_SOURCES += gost_keywrap.c
 endif
 
 if NEED_CURVE448
-curve448_generated_headers = \
-	curve448/ecc-curve448-32.h curve448/ecc-curve448-64.h
+ecc_generated_headers = \
+	ecc/ecc-curve448-32.h ecc/ecc-curve448-64.h
 
-BUILT_SOURCES = $(curve448_generated_headers)
-EXTRA_DIST = $(curve448_generated_headers) curve448/eccdata.stamp
+BUILT_SOURCES = $(ecc_generated_headers)
+EXTRA_DIST = $(ecc_generated_headers) ecc/eccdata.stamp
 
-noinst_PROGRAMS = curve448/eccdata$(EXEEXT)
+noinst_PROGRAMS = ecc/eccdata$(EXEEXT)
 
-curve448_eccdata_SOURCES = curve448/eccdata.c
-curve448_eccdata_CFLAGS = $(GMP_CFLAGS)
-curve448_eccdata_LDADD = $(GMP_LIBS) ../../gl/libgnu.la
+ecc_eccdata_SOURCES = ecc/eccdata.c
+ecc_eccdata_CFLAGS = $(GMP_CFLAGS)
+ecc_eccdata_LDADD = $(GMP_LIBS) ../../gl/libgnu.la
 
-curve448/eccdata.stamp: $(curve448_eccdata_SOURCES)
-	$(AM_V_GEN)$(MAKE) $(AM_MAKEFLAGS) curve448/eccdata$(EXEEXT) && touch $@
+ecc/eccdata.stamp: $(ecc_eccdata_SOURCES)
+	$(AM_V_GEN)$(MAKE) $(AM_MAKEFLAGS) ecc/eccdata$(EXEEXT) && touch $@
 
-curve448/ecc-curve448-32.h: curve448/eccdata.stamp
-	$(AM_V_GEN)curve448/eccdata$(EXEEXT) curve448 38 6 32 > $@T && mv $@T $@
+ecc/ecc-curve448-32.h: ecc/eccdata.stamp
+	$(AM_V_GEN)ecc/eccdata$(EXEEXT) curve448 38 6 32 > $@T && mv $@T $@
 
-curve448/ecc-curve448-64.h: curve448/eccdata.stamp
-	$(AM_V_GEN)curve448/eccdata$(EXEEXT) curve448 38 6 64 > $@T && mv $@T $@
-
-libcrypto_la_SOURCES += \
-	curve448/write-le64.c \
-	curve448/nettle-write.h curve448/gmp-glue.h curve448/gmp-glue.c
+ecc/ecc-curve448-64.h: ecc/eccdata.stamp
+	$(AM_V_GEN)ecc/eccdata$(EXEEXT) curve448 38 6 64 > $@T && mv $@T $@
 
 libcrypto_la_SOURCES += \
-	curve448/sha3.c curve448/sha3.h curve448/sha3-256.c \
-	curve448/sha3-permute.c curve448/sha3-internal.h \
-	curve448/shake256.c
+	ecc/write-le64.c \
+	ecc/nettle-write.h ecc/gmp-glue.h ecc/gmp-glue.c
 
 libcrypto_la_SOURCES += \
-	curve448/ecc-internal.h \
-	curve448/ecc-add-eh.c curve448/ecc-add-ehh.c curve448/ecc-dup-eh.c \
-	curve448/ecc-eh-to-a.c curve448/ecc-mul-a-eh.c curve448/ecc-mul-g-eh.c \
-	curve448/ecc-mul-m.c curve448/ecc-mod.c curve448/ecc-mod-arith.c \
-	curve448/ecc-mod-inv.c \
-	curve448/ecc-a-to-j.c \
-	curve448/sec-tabselect.c curve448/cnd-copy.c curve448/sec-add-1.c \
-	curve448/ecc-curve448.c $(curve448_genereated_headers) \
-	curve448/curve448-eh-to-x.c curve448/curve448.h curve448/curve448-mul.c \
-	curve448/curve448-mul-g.c
+	ecc/sha3.c ecc/sha3.h ecc/sha3-256.c \
+	ecc/sha3-permute.c ecc/sha3-internal.h \
+	ecc/shake256.c
 
 libcrypto_la_SOURCES += \
-	curve448/eddsa.h curve448/eddsa-compress.c curve448/eddsa-decompress.c \
-	curve448/eddsa-expand.c curve448/eddsa-hash.c curve448/eddsa-internal.h \
-	curve448/eddsa-pubkey.c curve448/eddsa-sign.c curve448/eddsa-verify.c \
-	curve448/ed448-shake256.c curve448/ed448-shake256-pubkey.c \
-	curve448/ed448-shake256-sign.c curve448/ed448-shake256-verify.c
+	ecc/ecc-internal.h \
+	ecc/ecc-add-eh.c ecc/ecc-add-ehh.c ecc/ecc-dup-eh.c \
+	ecc/ecc-eh-to-a.c ecc/ecc-mul-a-eh.c ecc/ecc-mul-g-eh.c \
+	ecc/ecc-mul-m.c ecc/ecc-mod.c ecc/ecc-mod-arith.c \
+	ecc/ecc-mod-inv.c \
+	ecc/ecc-a-to-j.c \
+	ecc/sec-tabselect.c ecc/cnd-copy.c ecc/sec-add-1.c \
+	ecc/ecc-curve448.c $(ecc_genereated_headers) \
+	ecc/curve448-eh-to-x.c ecc/curve448.h ecc/curve448-mul.c \
+	ecc/curve448-mul-g.c
+
+libcrypto_la_SOURCES += \
+	ecc/eddsa.h ecc/eddsa-compress.c ecc/eddsa-decompress.c \
+	ecc/eddsa-expand.c ecc/eddsa-hash.c ecc/eddsa-internal.h \
+	ecc/eddsa-pubkey.c ecc/eddsa-sign.c ecc/eddsa-verify.c \
+	ecc/ed448-shake256.c ecc/ed448-shake256-pubkey.c \
+	ecc/ed448-shake256-sign.c ecc/ed448-shake256-verify.c
 endif
 
 if NEED_CHACHA

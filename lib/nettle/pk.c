@@ -51,8 +51,8 @@
 #if HAVE_CURVE448
 #include <nettle/curve448.h>
 #else
-#include "curve448/curve448.h"
-#include "curve448/eddsa.h"
+#include "ecc/curve448.h"
+#include "ecc/eddsa.h"
 #endif
 #include <nettle/eddsa.h>
 #include <nettle/version.h>

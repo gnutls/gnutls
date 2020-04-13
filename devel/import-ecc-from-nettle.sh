@@ -7,7 +7,7 @@ set +e
 
 : ${srcdir=.}
 SRC=$srcdir/devel/nettle
-DST=$srcdir/lib/nettle/curve448
+DST=$srcdir/lib/nettle/ecc
 
 IMPORTS="
 cnd-copy.c
@@ -114,16 +114,16 @@ for f in $IMPORTS; do
 	# Rename header guard so as not to conflict with the public ones.
 	if grep '^#ifndef NETTLE_.*_H\(_INCLUDED\)*' $dst 2>&1 >/dev/null; then
 	  g=$(sed -n 's/^#ifndef NETTLE_\(.*_H\(_INCLUDED\)*\)/\1/p' $dst)
-	  sed 's/\(NETTLE_'$g'\)/GNUTLS_LIB_NETTLE_CURVE448_\1/' $dst > $dst-t && \
+	  sed 's/\(NETTLE_'$g'\)/GNUTLS_LIB_NETTLE_ECC_\1/' $dst > $dst-t && \
 	    mv $dst-t $dst
 	fi
 	# Add prefix to function symbols avoid clashing with the public ones.
-	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_curve448_\1/' \
-	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_curve448_\1/' \
-	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_curve448_\1/' \
-	    -e 's/^_nettle_\(.*\)(.*/#define _nettle_\1 _gnutls_nettle_curve448_\1\n\0/' \
-	    -e 's/^extern const struct ecc_curve _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_curve448_\1\n\0/' \
-	    -e 's/^extern const struct ecc_eddsa _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_curve448_\1\n\0/' \
+	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_ecc_\1/' \
+	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_ecc_\1/' \
+	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_ecc_\1/' \
+	    -e 's/^_nettle_\(.*\)(.*/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
+	    -e 's/^extern const struct ecc_curve _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
+	    -e 's/^extern const struct ecc_eddsa _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;
@@ -139,9 +139,9 @@ for f in $IMPORTS; do
 # pragma GCC diagnostic ignored "-Wunused-const-variable"\
 #endif\
 #if GMP_NUMB_BITS == 32\
-#include "curve448/ecc-curve448-32.h"\
+#include "ecc/ecc-curve448-32.h"\
 #elif GMP_NUMB_BITS == 64\
-#include "curve448/ecc-curve448-64.h"\
+#include "ecc/ecc-curve448-64.h"\
 #else\
 #error unsupported configuration\
 #endif
@@ -156,9 +156,9 @@ for f in $IMPORTS; do
 # pragma GCC diagnostic ignored "-Wunused-const-variable"\
 #endif\
 #if GMP_NUMB_BITS == 32\
-#include "curve448/ecc-gost-gc256b-32.h"\
+#include "ecc/ecc-gost-gc256b-32.h"\
 #elif GMP_NUMB_BITS == 64\
-#include "curve448/ecc-gost-gc256b-64.h"\
+#include "ecc/ecc-gost-gc256b-64.h"\
 #else\
 #error unsupported configuration\
 #endif
@@ -173,9 +173,9 @@ for f in $IMPORTS; do
 # pragma GCC diagnostic ignored "-Wunused-const-variable"\
 #endif\
 #if GMP_NUMB_BITS == 32\
-#include "curve448/ecc-gost-gc512a-32.h"\
+#include "ecc/ecc-gost-gc512a-32.h"\
 #elif GMP_NUMB_BITS == 64\
-#include "curve448/ecc-gost-gc512a-64.h"\
+#include "ecc/ecc-gost-gc512a-64.h"\
 #else\
 #error unsupported configuration\
 #endif
