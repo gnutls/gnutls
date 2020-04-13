@@ -1,8 +1,6 @@
-/* nettle-write.h
+/* write-le32.c
 
-   Internal functions to write out word-sized data to byte arrays.
-
-   Copyright (C) 2010 Niels Möller
+   Copyright (C) 2001, 2011 Niels Möller
 
    This file is part of GNU Nettle.
 
@@ -28,34 +26,44 @@
 
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
-   not, see https://www.gnu.org/licenses/.
+   not, see http://www.gnu.org/licenses/.
 */
 
-#ifndef GNUTLS_LIB_NETTLE_GOST_NETTLE_WRITE_H
-#define GNUTLS_LIB_NETTLE_GOST_NETTLE_WRITE_H
+#if HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-/* For size_t */
-#include <stddef.h>
+#include <stdlib.h>
 
-#include <stdint.h>
+#include "nettle-write.h"
 
-/* Write the word array at SRC to the byte array at DST, using little
-   endian (le) or big endian (be) byte order, and truncating the
-   result to LENGTH bytes. */
+#include <nettle/macros.h>
 
-/* FIXME: Use a macro shortcut to memcpy for native endianness. */
 void
-#define _nettle_write_be32 _gnutls_nettle_ecc_write_be32
-_nettle_write_be32(size_t length, uint8_t *dst,
-		   const uint32_t *src);
-void
-#define _nettle_write_le32 _gnutls_nettle_ecc_write_le32
 _nettle_write_le32(size_t length, uint8_t *dst,
-		   const uint32_t *src);
+		   const uint32_t *src)
+{
+  size_t i;
+  size_t words;
+  unsigned leftover;
+  
+  words = length / 4;
+  leftover = length % 4;
 
-void
-#define _nettle_write_le64 _gnutls_nettle_ecc_write_le64
-_nettle_write_le64(size_t length, uint8_t *dst,
-		   const uint64_t *src);
+  for (i = 0; i < words; i++, dst += 4)
+    LE_WRITE_UINT32(dst, src[i]);
 
-#endif /* GNUTLS_LIB_NETTLE_GOST_NETTLE_WRITE_H */
+  if (leftover)
+    {
+      uint32_t word;
+      
+      word = src[i];
+
+      do
+	{
+	  *dst++ = word & 0xff;
+	  word >>= 8;
+	}
+      while (--leftover);
+    }
+}

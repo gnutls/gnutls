@@ -73,7 +73,7 @@ endif
 
 if ENABLE_GOST
 libcrypto_la_SOURCES += \
-	gost/nettle-write.h \
+	gost/nettle-write.h gost/write-le32.c \
 	gost/gost28147.c gost/gost28147.h gost/gost-wrap.c \
 	gost/gosthash94.c gost/gosthash94.h gost/gosthash94-meta.c \
 	gost/streebog.c gost/streebog.h gost/streebog-meta.c \
