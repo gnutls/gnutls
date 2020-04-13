@@ -72,7 +72,9 @@ for f in $IMPORTS; do
       *.h)
 	# Add prefix to function symbols avoid clashing with the public ones.
 	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_chacha_\1/' \
-	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_chacha_\1/' $dst > $dst-t && \
+	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_chacha_\1/' \
+	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_chacha_\1/' \
+	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;
     esac
