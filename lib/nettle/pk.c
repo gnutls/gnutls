@@ -48,7 +48,7 @@
 #include <nettle/ecdsa.h>
 #include <nettle/ecc-curve.h>
 #include <nettle/curve25519.h>
-#if HAVE_CURVE448
+#if !NEED_INT_ECC
 #include <nettle/curve448.h>
 #else
 #include "ecc/curve448.h"
@@ -57,11 +57,13 @@
 #include <nettle/eddsa.h>
 #include <nettle/version.h>
 #if ENABLE_GOST
-#if NEED_GOSTDSA
-#include "gost/gostdsa.h"
-#include "gost/ecc-gost-curve.h"
+#if NEED_INT_ECC
+#include "ecc/gostdsa.h"
+#include "ecc-gost-curve.h"
 #else
 #include <nettle/gostdsa.h>
+#define gost_point_mul_g ecc_point_mul_g
+#define gost_point_set ecc_point_set
 #endif
 #include "gost/gostdsa2.h"
 #endif
@@ -208,7 +210,7 @@ _gost_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 		       struct ecc_point *pub, const struct ecc_curve *curve)
 {
 	ecc_point_init(pub, curve);
-	if (ecc_point_set
+	if (gost_point_set
 	    (pub, pk_params->params[GOST_X], pk_params->params[GOST_Y]) == 0) {
 		ecc_point_clear(pub);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -2791,7 +2793,7 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 			ecc_point_init(&r, curve);
 			/* verify that x,y lie on the curve */
 			ret =
-			    ecc_point_set(&r, TOMPZ(params->params[GOST_X]),
+			    gost_point_set(&r, TOMPZ(params->params[GOST_X]),
 					  TOMPZ(params->params[GOST_Y]));
 			if (ret == 0) {
 				ret =
@@ -2802,7 +2804,7 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 			ecc_point_clear(&r);
 
 			ecc_point_init(&r, curve);
-			ecc_point_mul_g(&r, &priv);
+			gost_point_mul_g(&r, &priv);
 
 			mpz_init(x1);
 			mpz_init(y1);
@@ -3101,7 +3103,7 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		}
 
 		ecc_point_init(&r, curve);
-		ecc_point_mul_g(&r, &priv);
+		gost_point_mul_g(&r, &priv);
 
 		ecc_point_get(&r, params->params[GOST_X],
 				  params->params[GOST_Y]);

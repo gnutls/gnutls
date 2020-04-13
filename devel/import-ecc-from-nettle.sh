@@ -124,6 +124,7 @@ for f in $IMPORTS; do
 	    -e 's/^_nettle_\(.*\)(.*/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
 	    -e 's/^extern const struct ecc_curve _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
 	    -e 's/^extern const struct ecc_eddsa _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
+	    -e '/gostdsa_generate_keypair/d' \
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;

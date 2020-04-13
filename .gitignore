@@ -231,8 +231,8 @@ lib/minitasn1/libminitasn1.la
 lib/minitasn1/Makefile
 lib/minitasn1/Makefile.in
 lib/nettle/libcrypto.la
-lib/nettle/curve448
 lib/nettle/chacha
+lib/nettle/ecc
 lib/opencdk/libminiopencdk.la
 lib/opencdk/Makefile
 lib/opencdk/Makefile.in

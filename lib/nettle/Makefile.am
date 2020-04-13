@@ -82,25 +82,16 @@ libcrypto_la_SOURCES += \
 libcrypto_la_SOURCES += \
 	gost/bignum-le.c gost/bignum-le.h
 
-if NEED_GOSTDSA
-libcrypto_la_SOURCES += \
-	gost/nettle-internal.h \
-	gost/ecc-gost256cpa.c gost/ecc-gost256cpa-32.h  gost/ecc-gost256cpa-64.h\
-	gost/ecc-gost512a.c gost/ecc-gost512a-32.h gost/ecc-gost512a-64.h \
-	gost/ecc-internal.h gost/gmp-glue.h \
-	gost/ecc-gostdsa-sign.c gost/ecc-gostdsa-verify.c \
-	gost/gostdsa-sign.c gost/gostdsa-verify.c \
-	gost/gostdsa.h gost/ecc-gost-curve.h gost/ecc-gost-hash.c
-endif
-
 libcrypto_la_SOURCES += \
 	gost/gostdsa-mask.c gost/gostdsa-vko.c gost/gostdsa2.h
 
 libcrypto_la_SOURCES += gost_keywrap.c
 endif
 
-if NEED_CURVE448
+if NEED_INT_ECC
 ecc_generated_headers = \
+	ecc/ecc-gost-gc256b-32.h ecc/ecc-gost-gc256b-64.h \
+	ecc/ecc-gost-gc512a-32.h ecc/ecc-gost-gc512a-64.h \
 	ecc/ecc-curve448-32.h ecc/ecc-curve448-64.h
 
 BUILT_SOURCES = $(ecc_generated_headers)
@@ -120,6 +111,21 @@ ecc/ecc-curve448-32.h: ecc/eccdata.stamp
 
 ecc/ecc-curve448-64.h: ecc/eccdata.stamp
 	$(AM_V_GEN)ecc/eccdata$(EXEEXT) curve448 38 6 64 > $@T && mv $@T $@
+
+ecc/ecc-gost-gc256b-32.h: ecc/eccdata.stamp
+	$(AM_V_GEN)ecc/eccdata$(EXEEXT) gost_gc256b 11 6 32 > $@T && mv $@T $@
+
+ecc/ecc-gost-gc256b-64.h: ecc/eccdata.stamp
+	$(AM_V_GEN)ecc/eccdata$(EXEEXT) gost_gc256b 11 6 64 > $@T && mv $@T $@
+
+ecc/ecc-gost-gc512a-32.h: ecc/eccdata.stamp
+	$(AM_V_GEN)ecc/eccdata$(EXEEXT) gost_gc512a 43 6 32 > $@T && mv $@T $@
+
+ecc/ecc-gost-gc512a-64.h: ecc/eccdata.stamp
+	$(AM_V_GEN)ecc/eccdata$(EXEEXT) gost_gc512a 43 6 64 > $@T && mv $@T $@
+
+libcrypto_la_SOURCES += \
+	gost/ecc-gost-hash.c nettle-alloca.h ecc-gost-curve.h
 
 libcrypto_la_SOURCES += \
 	ecc/write-le64.c \
@@ -143,11 +149,24 @@ libcrypto_la_SOURCES += \
 	ecc/curve448-mul-g.c
 
 libcrypto_la_SOURCES += \
+	gost/gost-point.c gost/gost-point-mul-g.c gost/gostdsa-keygen.c \
+	ecc/ecc-add-jja.c ecc/ecc-add-jjj.c ecc/ecc-dup-jj.c \
+	ecc/ecc-mul-a.c ecc/ecc-mul-g.c \
+	ecc/ecc-random.c \
+	ecc/ecc-j-to-a.c \
+	ecc/ecc-gost-gc256b.c ecc/ecc-gost-gc512a.c \
+	ecc/ecc-gostdsa-sign.c ecc/ecc-gostdsa-verify.c \
+	ecc/gostdsa.h ecc/gostdsa-sign.c ecc/gostdsa-verify.c
+
+libcrypto_la_SOURCES += \
 	ecc/eddsa.h ecc/eddsa-compress.c ecc/eddsa-decompress.c \
 	ecc/eddsa-expand.c ecc/eddsa-hash.c ecc/eddsa-internal.h \
 	ecc/eddsa-pubkey.c ecc/eddsa-sign.c ecc/eddsa-verify.c \
 	ecc/ed448-shake256.c ecc/ed448-shake256-pubkey.c \
 	ecc/ed448-shake256-sign.c ecc/ed448-shake256-verify.c
+else
+libcrypto_la_SOURCES += \
+	ecc/gmp-glue.h ecc/gmp-glue.c ecc/ecc-mod-arith.c
 endif
 
 if NEED_CHACHA

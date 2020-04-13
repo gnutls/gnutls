@@ -35,12 +35,17 @@
 #ifndef GNUTLS_LIB_NETTLE_GOST_NETTLE_INTERNAL_H
 #define GNUTLS_LIB_NETTLE_GOST_NETTLE_INTERNAL_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 /* Temporary allocation, for systems that don't support alloca. Note
  * that the allocation requests should always be reasonably small, so
  * that they can fit on the stack. For non-alloca systems, we use a
  * fix maximum size, and abort if we ever need anything larger. */
 
 #if HAVE_ALLOCA
+#include <alloca.h>
 # define TMP_DECL(name, type, max) type *name
 # define TMP_ALLOC(name, size) (name = alloca(sizeof (*name) * (size)))
 #else /* !HAVE_ALLOCA */
