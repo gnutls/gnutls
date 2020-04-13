@@ -53,6 +53,7 @@ sha3-256.c
 sha3-internal.h
 sha3-permute.c
 shake256.c
+write-le64.c
 "
 
 PUBLIC="
@@ -108,6 +109,7 @@ for f in $IMPORTS; do
 	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_curve448_\1/' \
 	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_curve448_\1/' \
 	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_curve448_\1/' \
+	    -e 's/^_nettle_\(.*\)(.*/#define _nettle_\1 _gnutls_nettle_curve448_\1\n\0/' \
 	    -e 's/^extern const struct ecc_curve _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_curve448_\1\n\0/' \
 	    -e 's/^extern const struct ecc_eddsa _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_curve448_\1\n\0/' \
 	    $dst > $dst-t && \

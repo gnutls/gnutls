@@ -122,6 +122,7 @@ curve448/ecc-curve448-64.h: curve448/eccdata.stamp
 	$(AM_V_GEN)curve448/eccdata$(EXEEXT) curve448 38 6 64 > $@T && mv $@T $@
 
 libcrypto_la_SOURCES += \
+	curve448/write-le64.c \
 	curve448/nettle-write.h curve448/gmp-glue.h curve448/gmp-glue.c
 
 libcrypto_la_SOURCES += \
