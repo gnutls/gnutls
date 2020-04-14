@@ -18,9 +18,12 @@ chacha-poly1305.h
 chacha-set-key.c
 chacha-set-nonce.c
 chacha.h
+poly1305-internal.c
+poly1305.h
 "
 
 PUBLIC="
+aes.h
 bignum.h
 ecc-curve.h
 ecc.h
@@ -28,7 +31,6 @@ macros.h
 memxor.h
 nettle-meta.h
 nettle-types.h
-poly1305.h
 "
 
 test -d $DST || mkdir $DST
