@@ -111,6 +111,7 @@ abi/coverage:
   - make pic-check
   - make -j$CHECKJOBS check
   - make local-code-coverage-output || true
+  - if objdump -R lib/.libs/libgnutls.so | grep INTERNAL ; then false ; fi
   tags:
   - shared
   - linux
