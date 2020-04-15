@@ -191,8 +191,16 @@ for f in $IMPORTS; do
 	# Suppress whitespace errors in 'make syntax-check'.
 	sed 's/ *	/		/g' $dst > $dst-t && mv $dst-t $dst
 	;;
-      */ecc-random.c|*/gostdsa-sign.c)
-	sed 's/"nettle-internal\.h"/"nettle-alloca.h"/' $dst > $dst-t && mv $dst-t $dst
+      */ecc-random.c )
+	sed \
+	  -e 's/"nettle-internal\.h"/"nettle-alloca.h"/' \
+	  -e 's/^    & (mpn_sub_n/    \& (int)(mpn_sub_n/' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
+      */gostdsa-sign.c)
+	sed \
+	  -e 's/"nettle-internal\.h"/"nettle-alloca.h"/' \
+	  $dst > $dst-t && mv $dst-t $dst
 	;;
     esac
   else
