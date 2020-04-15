@@ -1,4 +1,4 @@
-/* ecdsa-hash.c
+/* ecdsa-keygen.c
 
    Copyright (C) 2013 Niels Möller
 
@@ -26,7 +26,7 @@
 
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
-   not, see https://www.gnu.org/licenses/.
+   not, see http://www.gnu.org/licenses/.
 */
 
 /* Development of Nettle's ECC support was funded by the .SE Internet Fund. */
@@ -35,32 +35,29 @@
 # include "config.h"
 #endif
 
-#include <gnutls_int.h>
+#include <assert.h>
+#include <stdlib.h>
 
+#include <nettle/ecc.h>
 #include "ecc/ecc-internal.h"
-
-/* Convert hash value to an integer. If the digest is larger than
-   the ecc bit size, then we must truncate it and use the leftmost
-   bits. */
-
-/* NOTE: We don't considered the hash value to be secret, so it's ok
-   if the running time of this conversion depends on h.
-
-   Requires m->size + 1 limbs, the extra limb may be needed for
-   unusual limb sizes.
-*/
+#include "ecc-gost-curve.h"
+#include "nettle-alloca.h"
 
 void
-gost_hash (const struct ecc_modulo *m,
-	   mp_limb_t *hp,
-	   size_t length, const uint8_t *digest)
+gostdsa_generate_keypair (struct ecc_point *pub,
+			  struct ecc_scalar *key,
+			  void *random_ctx, nettle_random_func *random)
 {
-  if (length > ((size_t) m->bit_size + 7) / 8)
-    length = (m->bit_size + 7) / 8;
+  TMP_DECL(p, mp_limb_t, 3*ECC_MAX_SIZE + ECC_MUL_G_ITCH (ECC_MAX_SIZE));
+  const struct ecc_curve *ecc = pub->ecc;
+  mp_size_t itch = 3*ecc->p.size + ecc->mul_g_itch;
 
-  mpn_set_base256_le (hp, m->size + 1, digest, length);
+  assert (key->ecc == ecc);
+  assert (ecc->h_to_a_itch <= ecc->mul_g_itch);
 
-  if (8 * length > m->bit_size)
-    /* We got a few extra bits, at the low end. Discard them. */
-    mpn_rshift (hp, hp, m->size + 1, 8*length - m->bit_size);
+  TMP_ALLOC (p, itch);
+
+  ecc_mod_random (&ecc->q, key->p, random_ctx, random, p);
+  ecc->mul_g (ecc, p, key->p, p + 3*ecc->p.size);
+  ecc->h_to_a (ecc, 0, pub->p, p, p + 3*ecc->p.size);
 }

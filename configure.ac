@@ -645,23 +645,14 @@ AC_CHECK_FUNCS(nettle_streebog512_update)
 LIBS=$save_LIBS
 
 # Check for Curve448 and Ed448
-have_curve448=no
+have_new_ecc=yes
 save_LIBS=$LIBS
 LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS([nettle_curve448_mul nettle_ed448_shake256_sign],
-               [AC_DEFINE([HAVE_CURVE448], 1, [Enable Curve448])
-	        have_curve448=yes])
+AC_CHECK_FUNCS([nettle_curve448_mul nettle_ed448_shake256_sign nettle_get_gost_gc256b nettle_get_gost_gc512a nettle_gostdsa_sign],
+	       [], [have_new_ecc=no])
 LIBS=$save_LIBS
-AM_CONDITIONAL(NEED_CURVE448, test "$have_curve448" != "yes")
-
-have_gostdsa=yes
-save_LIBS=$LIBS
-LIBS="$LIBS $HOGWEED_LIBS $NETTLE_LIBS"
-AC_CHECK_FUNCS([nettle_get_gost_gc256b nettle_get_gost_gc512a nettle_gostdsa_sign], [],
-	       have_gostdsa=no)
-LIBS=$save_LIBS
-AS_IF([test "$have_gostdsa" != "yes"], AC_DEFINE([NEED_GOSTDSA], 1, [Use backported GOST R 34.10 DSA support]))
-AM_CONDITIONAL(NEED_GOSTDSA, [test "$have_gostdsa" != "yes"])
+AS_IF([test "$have_new_ecc" != "yes"], AC_DEFINE([NEED_INT_ECC], 1, [Use backported Curve448/GOST R 34.10 DSA support]))
+AM_CONDITIONAL(NEED_INT_ECC, test "$have_new_ecc" != "yes")
 
 # Check if nettle has ChaCha20 initial block counter support
 have_chacha_set_counter=no

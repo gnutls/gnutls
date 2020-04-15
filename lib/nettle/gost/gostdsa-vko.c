@@ -37,7 +37,7 @@
 
 #include <stdlib.h>
 
-#include "ecc-internal.h"
+#include "ecc/ecc-internal.h"
 #include "gostdsa2.h"
 
 int
@@ -67,7 +67,7 @@ gostdsa_vko(const struct ecc_scalar *key,
   mpn_set_base256_le (scratch, size, ukm, ukm_length);
   if (mpn_zero_p (scratch, size))
     mpn_add_1 (scratch, scratch, size, 1);
-  ecc_modq_mul (ecc, scratch + 3*size, key->p, scratch);
+  ecc_mod_mul (&ecc->q, scratch + 3*size, key->p, scratch);
   ecc->mul (ecc, scratch, scratch + 3*size, pub->p, scratch + 4*size);
   ecc->h_to_a (ecc, 0, scratch + 3*size, scratch, scratch + 5*size);
   mpn_get_base256_le (out, bsize, scratch + 3*size, size);

@@ -18,9 +18,12 @@ chacha-poly1305.h
 chacha-set-key.c
 chacha-set-nonce.c
 chacha.h
+poly1305-internal.c
+poly1305.h
 "
 
 PUBLIC="
+aes.h
 bignum.h
 ecc-curve.h
 ecc.h
@@ -28,7 +31,6 @@ macros.h
 memxor.h
 nettle-meta.h
 nettle-types.h
-poly1305.h
 "
 
 test -d $DST || mkdir $DST
@@ -72,7 +74,9 @@ for f in $IMPORTS; do
       *.h)
 	# Add prefix to function symbols avoid clashing with the public ones.
 	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_chacha_\1/' \
-	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_chacha_\1/' $dst > $dst-t && \
+	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_chacha_\1/' \
+	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_chacha_\1/' \
+	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;
     esac
