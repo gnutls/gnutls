@@ -121,9 +121,9 @@ for f in $IMPORTS; do
 	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_ecc_\1/' \
 	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_ecc_\1/' \
 	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_ecc_\1/' \
-	    -e 's/^_nettle_\(.*\)(.*/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
-	    -e 's/^extern const struct ecc_curve _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
-	    -e 's/^extern const struct ecc_eddsa _nettle_\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1\n\0/' \
+	    -e '/^_nettle_/ { h ; s/^_nettle_\(.*\)(.*/#define _nettle_\1 _gnutls_nettle_ecc_\1/g ; p; x; }' \
+	    -e '/^extern const struct ecc_curve _nettle_\(.*\);/ { h ; s/.*_nettle\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1/ ; p; x; }' \
+	    -e '/^extern const struct ecc_eddsa _nettle_\(.*\);/ { h ; s/.*_nettle\(.*\);/#define _nettle_\1 _gnutls_nettle_ecc_\1/ ; p; x; }' \
 	    -e '/gostdsa_generate_keypair/d' \
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
@@ -152,7 +152,7 @@ for f in $IMPORTS; do
       */ecc-gost-gc256b.c)
 	# The generated file is arch dependent, conditionalize the
 	# inclusion.
-	sed '/^#include "ecc-gost-gc256b\.h"/ { i\
+	sed -e '/^#include "ecc-gost-gc256b\.h"/ { i\
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)\
 # pragma GCC diagnostic ignored "-Wunused-const-variable"\
 #endif\
@@ -164,12 +164,16 @@ for f in $IMPORTS; do
 #error unsupported configuration\
 #endif
 ; d
-}' $dst | sed -e 's/#include "ecc-internal.h"/\0\n#include "ecc-gost-curve.h"/' > $dst-t && mv $dst-t $dst
+}' \
+	  -e '/#include "ecc-internal.h"/ { i\
+#include "ecc-gost-curve.h"
+; }' \
+	  $dst > $dst-t && mv $dst-t $dst
 	;;
       */ecc-gost-gc512a.c)
 	# The generated file is arch dependent, conditionalize the
 	# inclusion.
-	sed '/^#include "ecc-gost-gc512a\.h"/ { i\
+	sed -e '/^#include "ecc-gost-gc512a\.h"/ { i\
 #if defined __clang__ || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)\
 # pragma GCC diagnostic ignored "-Wunused-const-variable"\
 #endif\
@@ -181,7 +185,11 @@ for f in $IMPORTS; do
 #error unsupported configuration\
 #endif
 ; d
-}' $dst | sed -e 's/#include "ecc-internal.h"/\0\n#include "ecc-gost-curve.h"/' > $dst-t && mv $dst-t $dst
+}' \
+	  -e '/#include "ecc-internal.h"/ { i\
+#include "ecc-gost-curve.h"
+; }' \
+	  $dst > $dst-t && mv $dst-t $dst
 	;;
       */eddsa-hash.c)
 	# Known to be unnecessary.
