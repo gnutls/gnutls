@@ -3,6 +3,7 @@ GNUTLS_3_6_0@GNUTLS_3_6_0
 GNUTLS_3_6_10@GNUTLS_3_6_10
 GNUTLS_3_6_12@GNUTLS_3_6_12
 GNUTLS_3_6_13@GNUTLS_3_6_13
+GNUTLS_3_6_14@GNUTLS_3_6_14
 GNUTLS_3_6_2@GNUTLS_3_6_2
 GNUTLS_3_6_3@GNUTLS_3_6_3
 GNUTLS_3_6_4@GNUTLS_3_6_4
@@ -215,6 +216,7 @@ gnutls_error_to_alert@GNUTLS_3_4
 gnutls_est_record_overhead_size@GNUTLS_3_4
 gnutls_ext_get_current_msg@GNUTLS_3_6_3
 gnutls_ext_get_data@GNUTLS_3_4
+gnutls_ext_get_name2@GNUTLS_3_6_14
 gnutls_ext_get_name@GNUTLS_3_4
 gnutls_ext_raw_parse@GNUTLS_3_6_3
 gnutls_ext_register@GNUTLS_3_4

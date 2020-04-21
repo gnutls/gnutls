@@ -1324,6 +1324,12 @@ GNUTLS_3_6_13
 	gnutls_psk_set_client_credentials_function2;
 } GNUTLS_3_6_12;
 
+GNUTLS_3_6_14
+{
+ global:
+	gnutls_ext_get_name2;
+} GNUTLS_3_6_13;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
