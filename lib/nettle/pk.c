@@ -486,11 +486,9 @@ dh_cleanup:
 			goto gost_cleanup;
 		}
 
-		out->size = gostdsa_vko(&ecc_priv, &ecc_pub,
-					nonce->size, nonce->data,
-					out->size, out->data);
-		if (out->size == 0)
-			ret = GNUTLS_E_INVALID_REQUEST;
+		gostdsa_vko(&ecc_priv, &ecc_pub,
+			    nonce->size, nonce->data,
+			    out->data);
 
 	      gost_cleanup:
 		ecc_point_clear(&ecc_pub);
