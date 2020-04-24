@@ -692,6 +692,8 @@ void gnutls_deinit(gnutls_session_t session)
 	_gnutls_free_datum(&session->internals.resumption_data);
 	_gnutls_free_datum(&session->internals.dtls.dcookie);
 
+	for (i = 0; i < session->internals.rexts_size; i++)
+		gnutls_free(session->internals.rexts[i].name);
 	gnutls_free(session->internals.rexts);
 	gnutls_free(session->internals.post_handshake_cr_context.data);
 

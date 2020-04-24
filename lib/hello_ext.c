@@ -898,6 +898,7 @@ gnutls_session_ext_register(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	memset(&tmp_mod, 0, sizeof(hello_ext_entry_st));
+	tmp_mod.name = gnutls_strdup(name);
 	tmp_mod.free_struct = 1;
 	tmp_mod.tls_id = id;
 	tmp_mod.gid = gid;
@@ -1000,3 +1001,27 @@ unsigned gnutls_ext_get_current_msg(gnutls_session_t session)
 {
 	return _gnutls_ext_get_msg(session);
 }
+
+/**
+ * gnutls_ext_get_name2:
+ * @session: a #gnutls_session_t opaque pointer
+ * @tls_id: is a TLS extension numeric ID
+ * @parse_point: the parse type of the extension
+ *
+ * Convert a TLS extension numeric ID to a printable string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified cipher, or %NULL.
+ **/
+const char *gnutls_ext_get_name2(gnutls_session_t session, unsigned int tls_id,
+				 gnutls_ext_parse_type_t parse_point)
+{
+	const struct hello_ext_entry_st *ext;
+
+	ext = tls_id_to_ext_entry(session, tls_id, parse_point);
+	if (ext)
+		return ext->name;
+
+	return NULL;
+}
+

@@ -3130,6 +3130,8 @@ int gnutls_session_ext_register(gnutls_session_t, const char *name, int type, gn
 				gnutls_ext_unpack_func unpack_func, unsigned flags);
 
 const char *gnutls_ext_get_name(unsigned int ext);
+const char *gnutls_ext_get_name2(gnutls_session_t session, unsigned int tls_id,
+				 gnutls_ext_parse_type_t parse_point);
 
 /* Public supplemental data related functions */
 
