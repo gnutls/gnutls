@@ -670,6 +670,13 @@ AC_CHECK_FUNCS([nettle_chacha_set_counter],
 LIBS=$save_LIBS
 AM_CONDITIONAL(NEED_CHACHA, [test "$have_chacha_set_counter" != "yes"])
 
+# Check for SIV-CMAC
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_siv_cmac_aes128_set_key)
+LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_SIV, [test "$ac_cv_func_nettle_siv_cmac_aes128_set_key" != "yes"])
+
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_LIBS=$LIBS
 LIBS="$LIBS $GMP_LIBS"

@@ -190,3 +190,9 @@ libcrypto_la_SOURCES += \
 	backport/poly1305.h backport/poly1305-internal.c \
 	backport/poly1305-internal.h
 endif
+
+if NEED_SIV
+libcrypto_la_SOURCES += \
+	backport/siv-cmac-aes128.c backport/siv-cmac-aes256.c \
+	backport/siv-cmac.c backport/siv-cmac.h
+endif

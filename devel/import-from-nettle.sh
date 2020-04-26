@@ -32,6 +32,10 @@ xts.c
 xts.h
 xts-aes128.c
 xts-aes256.c
+siv-cmac.c
+siv-cmac.h
+siv-cmac-aes128.c
+siv-cmac-aes256.c
 "
 
 PUBLIC="
@@ -96,7 +100,7 @@ for f in $IMPORTS; do
       ;;
     esac
     case $dst in
-      */cfb.c | */cmac.c | */xts.c)
+      */cfb.c | */cmac.c | */xts.c | */siv-cmac.c)
 	sed \
 	  -e 's/"nettle-internal\.h"/"nettle-alloca.h"/' \
 	  $dst > $dst-t && mv $dst-t $dst
@@ -110,6 +114,20 @@ for f in $IMPORTS; do
 ' \
 	  $dst > $dst-t && mv $dst-t $dst
 	;;
+    esac
+    case $dst in
+      */siv-cmac*.[ch])
+	sed \
+	  -e '/^#include "cmac\.h"/ { i\
+#ifdef HAVE_NETTLE_CMAC128_UPDATE\
+#include <nettle/cmac.h>\
+#else\
+#include "cmac.h"\
+#endif
+; d
+}' \
+	$dst > $dst-t && mv $dst-t $dst
+      ;;
     esac
   else
     echo "Error: $src not found" 1>&2
