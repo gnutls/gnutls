@@ -73,6 +73,7 @@ struct cipher_aead_vectors_st {
 	const uint8_t *iv;
 	const uint8_t *tag;
 	unsigned tag_size;
+	unsigned tag_prepended;
 };
 
 const struct cipher_aead_vectors_st chacha_poly1305_vectors[] = {
@@ -570,6 +571,60 @@ const struct cipher_vectors_st aes256_xts_vectors[] = {
 	 },
 };
 
+const struct cipher_aead_vectors_st aes128_siv_vectors[] = {
+	{
+	 STR(key, key_size,
+	     "\x7f\x7e\x7d\x7c\x7b\x7a\x79\x78\x77\x76\x75\x74\x73\x72\x71\x70"
+	     "\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"),
+	 STR(auth, auth_size,
+	     "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+	     "\xde\xad\xda\xda\xde\xad\xda\xda\xff\xee\xdd\xcc\xbb\xaa\x99\x88"
+	     "\x77\x66\x55\x44\x33\x22\x11\x00"),
+	 STR(plaintext, plaintext_size,
+	     "\x74\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x70\x6c\x61"
+	     "\x69\x6e\x74\x65\x78\x74\x20\x74\x6f\x20\x65\x6e\x63\x72\x79\x70"
+	     "\x74\x20\x75\x73\x69\x6e\x67\x20\x53\x49\x56\x2d\x41\x45\x53"),
+	 .ciphertext = (uint8_t *)
+	     "\xa4\xff\xb8\x7f\xdb\xa9\x7c\x89\x44\xa6\x23\x25\xf1\x33\xb4\xe0"
+	     "\x1c\xa5\x52\x76\xe2\x26\x1c\x1a\x1d\x1d\x42\x48\xd1\xda\x30\xba"
+	     "\x52\xb9\xc8\xd7\x95\x5d\x65\xc8\xd2\xce\x6e\xb7\xe3\x67\xd0",
+	 STR(iv, iv_size,
+	     "\x02\x03\x04"),
+	 .tag_size = 16,
+	 .tag = (void *)
+	     "\xf1\xdb\xa3\x3d\xe5\xb3\x36\x9e\x88\x3f\x67\xb6\xfc\x82\x3c\xee",
+	 .tag_prepended = 1,
+	}
+};
+
+const struct cipher_aead_vectors_st aes256_siv_vectors[] = {
+	{
+	 STR(key, key_size,
+	     "\xc2\x7d\xf2\xfd\xae\xc3\x5d\x4a\x2a\x41\x2a\x50\xc3\xe8\xc4\x7d"
+	     "\x2d\x56\x8e\x91\xa3\x8e\x54\x14\x8a\xbd\xc0\xb6\xe8\x6c\xaf\x87"
+	     "\x69\x5c\x0a\x8a\xdf\x4c\x5f\x8e\xb2\xc6\xc8\xb1\x36\x52\x98\x64"
+	     "\xf3\xb8\x4b\x3a\xe8\xe3\x67\x6c\xe7\x60\xc4\x61\xf3\xa1\x3e\x83"),
+	 STR(auth, auth_size,
+	     "\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+	     "\xde\xad\xda\xda\xde\xad\xda\xda\xff\xee\xdd\xcc\xbb\xaa\x99\x88"
+	     "\x77\x66\x55\x44\x33\x22\x11\x00"),
+	 STR(plaintext, plaintext_size,
+	     "\x74\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x70\x6c\x61"
+	     "\x69\x6e\x74\x65\x78\x74\x20\x74\x6f\x20\x65\x6e\x63\x72\x79\x70"
+	     "\x74\x20\x75\x73\x69\x6e\x67\x20\x53\x49\x56\x2d\x41\x45\x53"),
+	 .ciphertext = (uint8_t *)
+	     "\x50\x93\x3d\xa8\x04\x7b\xc3\x06\xfa\xba\xf0\xc3\xd9\xfa\x84\x71"
+	 "\xc7\x0a\x7d\xef\x39\xa2\xf9\x1d\x68\xa2\x02\x1c\x99\xac\x7e\x2a\x24"
+	 "\x53\x5a\x13\x4b\xa2\x3e\xc1\x57\x87\xce\xbe\x5c\x53\xcc",
+	 STR(iv, iv_size,
+	     "\x09\xf9\x11\x02\x9d\x74\xe3\x5b\xd8\x41\x56\xc5\x63\x56\x88\xc0"),
+	 .tag_size = 16,
+	 .tag = (void *)
+	     "\x5a\x97\x9b\x0d\xa5\x8f\xde\x80\x51\x62\x1a\xe6\xbf\x96\xfe\xda",
+	 .tag_prepended = 1,
+	}
+};
+
 const struct cipher_vectors_st chacha20_32_vectors[] = { /* RFC8439 */
 	{
 	 STR(key, key_size,
@@ -1002,6 +1057,8 @@ static int test_cipher_aead_scatter(gnutls_cipher_algorithm_t cipher,
 	int auth_iov_len;
 	int iov_len;
 	giovec_t iov[IOV_PARTS];
+	const uint8_t *tag;
+	uint8_t *ciphertext;
 
 	_gnutls_debug_log("running scatter (iovec) tests for: %s\n",
 				  gnutls_cipher_get_name(cipher));
@@ -1055,16 +1112,26 @@ static int test_cipher_aead_scatter(gnutls_cipher_algorithm_t cipher,
 			    (GNUTLS_E_SELF_TEST_ERROR);
 		}
 
-		if (memcmp(tmp+vectors[i].plaintext_size, vectors[i].tag, tag_size) != 0) {
+		if (vectors[i].tag_prepended)
+			tag = tmp;
+		else
+			tag = tmp+vectors[i].plaintext_size;
+
+		if (memcmp(tag, vectors[i].tag, tag_size) != 0) {
 			_gnutls_debug_log
 			    ("%s test vector %d failed (tag)!\n",
 			     gnutls_cipher_get_name(cipher), i);
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 
+		if (vectors[i].tag_prepended)
+			ciphertext = tmp+vectors[i].tag_size;
+		else
+			ciphertext = tmp;
+
 		if (vectors[i].plaintext_size > 0) {
 			if (memcmp
-			    (tmp, vectors[i].ciphertext,
+			    (ciphertext, vectors[i].ciphertext,
 			     vectors[i].plaintext_size) != 0) {
 				_gnutls_debug_log
 				    ("%s test vector %d failed!\n",
@@ -1134,16 +1201,26 @@ static int test_cipher_aead_scatter(gnutls_cipher_algorithm_t cipher,
 			    (GNUTLS_E_SELF_TEST_ERROR);
 		}
 
-		if (memcmp(tmp+vectors[i].plaintext_size, vectors[i].tag, tag_size) != 0) {
+		if (vectors[i].tag_prepended)
+			tag = tmp;
+		else
+			tag = tmp+vectors[i].plaintext_size;
+
+		if (memcmp(tag, vectors[i].tag, tag_size) != 0) {
 			_gnutls_debug_log
 			    ("%s test vector %d failed (tag)!\n",
 			     gnutls_cipher_get_name(cipher), i);
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 
+		if (vectors[i].tag_prepended)
+			ciphertext = tmp+vectors[i].tag_size;
+		else
+			ciphertext = tmp;
+
 		if (vectors[i].plaintext_size > 0) {
 			if (memcmp
-			    (tmp, vectors[i].ciphertext,
+			    (ciphertext, vectors[i].ciphertext,
 			     vectors[i].plaintext_size) != 0) {
 				_gnutls_debug_log
 				    ("%s test vector %d failed!\n",
@@ -1182,7 +1259,9 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 	uint8_t tmp2[384];
 	gnutls_datum_t key, iv;
 	size_t s, s2;
+	const uint8_t *tag;
 	unsigned tag_size;
+	uint8_t *ciphertext;
 
 	_gnutls_debug_log("running tests for: %s\n",
 				  gnutls_cipher_get_name(cipher));
@@ -1231,16 +1310,26 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 			    (GNUTLS_E_SELF_TEST_ERROR);
 		}
 
-		if (memcmp(tmp+vectors[i].plaintext_size, vectors[i].tag, tag_size) != 0) {
+		if (vectors[i].tag_prepended)
+			tag = tmp;
+		else
+			tag = tmp+vectors[i].plaintext_size;
+
+		if (memcmp(tag, vectors[i].tag, tag_size) != 0) {
 			_gnutls_debug_log
 			    ("%s test vector %d failed (tag)!\n",
 			     gnutls_cipher_get_name(cipher), i);
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 
+		if (vectors[i].tag_prepended)
+			ciphertext = tmp+vectors[i].tag_size;
+		else
+			ciphertext = tmp;
+
 		if (vectors[i].plaintext_size > 0) {
 			if (memcmp
-			    (tmp, vectors[i].ciphertext,
+			    (ciphertext, vectors[i].ciphertext,
 			     vectors[i].plaintext_size) != 0) {
 				_gnutls_debug_log
 				    ("%s test vector %d failed!\n",
@@ -1275,7 +1364,7 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 
 			/* test tag verification */
 			if (s > 0) {
-				tmp[0]++;
+				(*ciphertext)++;
 
 				s2 = sizeof(tmp2);
 				ret =
@@ -1925,6 +2014,12 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_256_XTS, test_cipher,
 		     aes256_xts_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_CIPHER_AES_128_SIV, test_cipher_aead,
+		     aes128_siv_vectors);
+		FALLTHROUGH;
+		NON_FIPS_CASE(GNUTLS_CIPHER_AES_256_SIV, test_cipher_aead,
+		     aes256_siv_vectors);
 		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_CIPHER_CHACHA20_32, test_cipher,
 		     chacha20_32_vectors);
