@@ -168,10 +168,10 @@ endif
 
 if NEED_CHACHA
 libcrypto_la_SOURCES += \
-	chacha/chacha-core-internal.c chacha/chacha-crypt.c \
-	chacha/chacha-internal.h chacha/chacha-poly1305.c \
-	chacha/chacha-poly1305.h chacha/chacha-set-key.c \
-	chacha/chacha-set-nonce.c chacha/chacha.h \
-	chacha/poly1305.h chacha/poly1305-internal.c \
-	chacha/poly1305-internal.h
+	backport/chacha-core-internal.c backport/chacha-crypt.c \
+	backport/chacha-internal.h backport/chacha-poly1305.c \
+	backport/chacha-poly1305.h backport/chacha-set-key.c \
+	backport/chacha-set-nonce.c backport/chacha.h \
+	backport/poly1305.h backport/poly1305-internal.c \
+	backport/poly1305-internal.h
 endif

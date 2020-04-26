@@ -1,13 +1,13 @@
 #!/bin/sh
 
-# This script copies the ChaCha20 implementation from the
-# nettle upstream, with necessary adjustments for bundling in GnuTLS.
+# This script copies files from the nettle upstream, with necessary
+# adjustments for bundling in GnuTLS.
 
 set +e
 
 : ${srcdir=.}
 SRC=$srcdir/devel/nettle
-DST=$srcdir/lib/nettle/chacha
+DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
 chacha-core-internal.c
@@ -66,7 +66,7 @@ for f in $IMPORTS; do
 	# Rename header guard so as not to conflict with the public ones.
 	if grep '^#ifndef NETTLE_.*_H\(_INCLUDED\)*' $dst 2>&1 >/dev/null; then
 	  g=$(sed -n 's/^#ifndef NETTLE_\(.*_H\(_INCLUDED\)*\)/\1/p' $dst)
-	  sed 's/\(NETTLE_'$g'\)/GNUTLS_LIB_NETTLE_CHACHA_\1/' $dst > $dst-t && \
+	  sed 's/\(NETTLE_'$g'\)/GNUTLS_LIB_NETTLE_BACKPORT_\1/' $dst > $dst-t && \
 	    mv $dst-t $dst
 	fi
 	;;
@@ -74,9 +74,9 @@ for f in $IMPORTS; do
     case $dst in
       *.h)
 	# Add prefix to function symbols avoid clashing with the public ones.
-	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_chacha_\1/' \
-	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_chacha_\1/' \
-	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_chacha_\1/' \
+	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_backport_\1/' \
+	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_backport_\1/' \
+	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_backport_\1/' \
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;

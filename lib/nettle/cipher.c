@@ -49,8 +49,8 @@
 #include <nettle/chacha.h>
 #include <nettle/chacha-poly1305.h>
 #else
-#include "chacha/chacha.h"
-#include "chacha/chacha-poly1305.h"
+#include "chacha.h"
+#include "chacha-poly1305.h"
 #endif
 #ifdef HAVE_NETTLE_CFB8_ENCRYPT
 #include <nettle/cfb.h>
