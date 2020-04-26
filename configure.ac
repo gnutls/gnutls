@@ -602,9 +602,8 @@ LIBS=$save_LIBS
 
 # Check if nettle has CFB8 support
 if test -z "$ac_cv_func_nettle_cfb8_encrypt"; then
-	# nettle_cfb8_decrypt in nettle 3.5 is known to be broken
-	ver=`$PKG_CONFIG --modversion nettle`
-	if expr "$ver" : '^3\.5\b' >/dev/null; then
+	# nettle_cfb8_decrypt in nettle upto 3.6 is known to be broken
+	if ! $PKG_CONFIG --atleast-version=3.6 nettle; then
 		ac_cv_func_nettle_cfb8_encrypt=no
 	fi
 fi
