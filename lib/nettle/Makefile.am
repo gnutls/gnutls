@@ -40,15 +40,13 @@ noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	gnettle.h rnd-common.h prf.c \
-	backport/cfb8.c backport/cfb8.h \
-	backport/cmac.c backport/cmac.h \
-	backport/xts.c backport/xts.h \
 	rnd.c int/rsa-fips.h int/rsa-keygen-fips186.c int/provable-prime.c \
 	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c \
 	int/tls1-prf.c int/tls1-prf.h \
 	int/dsa-compute-k.c int/dsa-compute-k.h \
 	int/ecdsa-compute-k.c int/ecdsa-compute-k.h \
-	int/mpn-base256.c int/mpn-base256.h
+	int/mpn-base256.c int/mpn-base256.h \
+	int/block8.h backport/block-internal.h
 
 if WINDOWS
 libcrypto_la_SOURCES += sysrng-windows.c
@@ -164,6 +162,23 @@ libcrypto_la_SOURCES += \
 	ecc/eddsa-pubkey.c ecc/eddsa-sign.c ecc/eddsa-verify.c \
 	ecc/ed448-shake256.c ecc/ed448-shake256-pubkey.c \
 	ecc/ed448-shake256-sign.c ecc/ed448-shake256-verify.c
+endif
+
+if NEED_CFB
+libcrypto_la_SOURCES += \
+	backport/cfb.c backport/cfb.h
+endif
+
+if NEED_CMAC
+libcrypto_la_SOURCES += \
+	backport/cmac.c backport/cmac.h \
+	backport/cmac-aes128.c backport/cmac-aes256.c
+endif
+
+if NEED_XTS
+libcrypto_la_SOURCES += \
+	backport/xts.c backport/xts.h \
+	backport/xts-aes128.c backport/xts-aes256.c
 endif
 
 if NEED_CHACHA

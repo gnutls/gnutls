@@ -10,6 +10,13 @@ SRC=$srcdir/devel/nettle
 DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
+block-internal.h
+cfb.c
+cfb.h
+cmac.c
+cmac.h
+cmac-aes128.c
+cmac-aes256.c
 chacha-core-internal.c
 chacha-crypt.c
 chacha-internal.h
@@ -21,14 +28,21 @@ chacha.h
 poly1305-internal.c
 poly1305-internal.h
 poly1305.h
+xts.c
+xts.h
+xts-aes128.c
+xts-aes256.c
 "
 
 PUBLIC="
 aes.h
 bignum.h
+ctr.h
+des.h
 ecc-curve.h
 ecc.h
 macros.h
+memops.h
 memxor.h
 nettle-meta.h
 nettle-types.h
@@ -80,6 +94,22 @@ for f in $IMPORTS; do
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
       ;;
+    esac
+    case $dst in
+      */cfb.c | */cmac.c | */xts.c)
+	sed \
+	  -e 's/"nettle-internal\.h"/"nettle-alloca.h"/' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
+    esac
+    case $dst in
+      */*.[ch])
+	sed \
+	  -e '/^#include <nettle\/nettle-types\.h>/a\
+#include "block8.h"
+' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
     esac
   else
     echo "Error: $src not found" 1>&2

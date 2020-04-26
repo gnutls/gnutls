@@ -55,9 +55,13 @@
 #ifdef HAVE_NETTLE_CFB8_ENCRYPT
 #include <nettle/cfb.h>
 #else
-#include "cfb8.h"
+#include "cfb.h"
 #endif /* HAVE_NETTLE_CFB8_ENCRYPT */
+#ifdef HAVE_NETTLE_XTS_ENCRYPT_MESSAGE
+#include <nettle/xts.h>
+#else
 #include "xts.h"
+#endif
 #include <fips.h>
 
 struct nettle_cipher_ctx;

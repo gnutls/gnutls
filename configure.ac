@@ -612,18 +612,26 @@ save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cfb8_encrypt)
 LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CFB, [test "$ac_cv_func_nettle_cfb8_encrypt" != "yes"])
 
 # Check if nettle has CMAC support
+save_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $NETTLE_CFLAGS"
+AC_CHECK_TYPES([union nettle_block8], , , [[#include <nettle/nettle-types.h>]])
+CFLAGS=$save_CFLAGS
+
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cmac128_update)
 LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CMAC, [test "$ac_cv_func_nettle_cmac128_update" != "yes"])
 
 # Check if nettle has XTS support
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_xts_encrypt_message)
 LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_XTS, [test "$ac_cv_func_nettle_xts_encrypt_message" != "yes"])
 
 # Check for Gosthash94 with CryptoPro S-box support
 save_LIBS=$LIBS

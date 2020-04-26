@@ -233,7 +233,7 @@ lib/minitasn1/libminitasn1.la
 lib/minitasn1/Makefile
 lib/minitasn1/Makefile.in
 lib/nettle/libcrypto.la
-lib/nettle/chacha
+lib/nettle/backport
 lib/nettle/ecc
 lib/opencdk/libminiopencdk.la
 lib/opencdk/Makefile
