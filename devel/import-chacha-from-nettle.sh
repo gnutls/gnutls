@@ -19,6 +19,7 @@ chacha-set-key.c
 chacha-set-nonce.c
 chacha.h
 poly1305-internal.c
+poly1305-internal.h
 poly1305.h
 "
 

@@ -175,5 +175,6 @@ libcrypto_la_SOURCES += \
 	chacha/chacha-internal.h chacha/chacha-poly1305.c \
 	chacha/chacha-poly1305.h chacha/chacha-set-key.c \
 	chacha/chacha-set-nonce.c chacha/chacha.h \
-	chacha/poly1305.h chacha/poly1305-internal.c
+	chacha/poly1305.h chacha/poly1305-internal.c \
+	chacha/poly1305-internal.h
 endif
