@@ -52,16 +52,6 @@ int
 gostdsa_unmask_key (const struct ecc_curve *ecc,
 		    mpz_t key);
 
-#ifndef HAVE_NETTLE_GOSTDSA_VKO
-
-#define gostdsa_vko _gnutls_gostdsa_vko
-void
-gostdsa_vko(const struct ecc_scalar *priv,
-	    const struct ecc_point *pub,
-	    size_t ukm_length, const uint8_t *ukm,
-	    uint8_t *out);
-#endif
-
 #ifdef __cplusplus
 }
 #endif

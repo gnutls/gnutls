@@ -56,6 +56,7 @@ eddsa-verify.c
 gostdsa.h
 gostdsa-sign.c
 gostdsa-verify.c
+gostdsa-vko.c
 gmp-glue.h
 gmp-glue.c
 nettle-write.h
