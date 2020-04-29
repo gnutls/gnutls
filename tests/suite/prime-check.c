@@ -21,7 +21,6 @@
  */
 
 #include <nettle/bignum.h>
-#include <gmp.h>
 #include <gnutls/gnutls.h>
 #include <assert.h>
 
