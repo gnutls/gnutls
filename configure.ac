@@ -1098,10 +1098,6 @@ AC_DEFINE([fread_file], [_gnutls_fread_file], [static lib rename])
 AC_DEFINE([read_file], [_gnutls_read_file], [static lib rename])
 AC_DEFINE([read_binary_file], [_gnutls_read_binary_file], [static lib rename])
 
-dnl Some variables needed in makefiles
-YEAR=`date +%Y`
-AC_SUBST([YEAR], $YEAR)
-
 dnl configuration options for config file parsing (inih)
 AC_DEFINE([INI_MAX_LINE], 2048, [inih maximum line size])
 AC_DEFINE([INI_ALLOW_INLINE_COMMENTS], 1, [whether to allowin inline comments])
