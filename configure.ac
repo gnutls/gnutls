@@ -596,6 +596,13 @@ fi
 
 AM_CONDITIONAL(HAVE_LIBIDN2, test "$with_libidn2" != "no")
 
+if test "x$have_vista_dynamic" = "xno"; then
+  AC_CHECK_TYPES([BCRYPT_ALG_HANDLE],[LIBBCRYPT="-lbcrypt"],[],[#include <windows.h>
+  #include <bcrypt.h>])
+fi
+AM_CONDITIONAL(HAVE_BCRYPT, test "$ac_cv_type_BCRYPT_ALG_HANDLE" = "yes")
+AC_SUBST([LIBBCRYPT])
+
 AC_ARG_ENABLE(non-suiteb-curves,
   AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
     enable_non_suiteb=$enableval, enable_non_suiteb=yes)

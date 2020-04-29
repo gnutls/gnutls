@@ -49,7 +49,11 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	int/block8.h backport/block-internal.h
 
 if WINDOWS
+if HAVE_BCRYPT
+libcrypto_la_SOURCES += sysrng-bcrypt.c
+else
 libcrypto_la_SOURCES += sysrng-windows.c
+endif
 else
 if HAVE_GETENTROPY
 libcrypto_la_SOURCES += sysrng-getentropy.c
