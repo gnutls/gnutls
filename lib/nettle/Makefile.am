@@ -83,7 +83,7 @@ libcrypto_la_SOURCES += \
 	gost/bignum-le.c gost/bignum-le.h
 
 libcrypto_la_SOURCES += \
-	gost/gostdsa-mask.c gost/gostdsa-vko.c gost/gostdsa2.h
+	gost/gostdsa-mask.c gost/gostdsa2.h
 
 libcrypto_la_SOURCES += gost_keywrap.c
 endif
@@ -156,7 +156,7 @@ libcrypto_la_SOURCES += \
 	ecc/ecc-j-to-a.c \
 	ecc/ecc-gost-gc256b.c ecc/ecc-gost-gc512a.c \
 	ecc/ecc-gostdsa-sign.c ecc/ecc-gostdsa-verify.c \
-	ecc/gostdsa.h ecc/gostdsa-sign.c ecc/gostdsa-verify.c
+	ecc/gostdsa.h ecc/gostdsa-sign.c ecc/gostdsa-verify.c ecc/gostdsa-vko.c
 
 libcrypto_la_SOURCES += \
 	ecc/eddsa.h ecc/eddsa-compress.c ecc/eddsa-decompress.c \
@@ -164,9 +164,6 @@ libcrypto_la_SOURCES += \
 	ecc/eddsa-pubkey.c ecc/eddsa-sign.c ecc/eddsa-verify.c \
 	ecc/ed448-shake256.c ecc/ed448-shake256-pubkey.c \
 	ecc/ed448-shake256-sign.c ecc/ed448-shake256-verify.c
-else
-libcrypto_la_SOURCES += \
-	ecc/gmp-glue.h ecc/gmp-glue.c ecc/ecc-mod-arith.c
 endif
 
 if NEED_CHACHA
@@ -175,5 +172,6 @@ libcrypto_la_SOURCES += \
 	chacha/chacha-internal.h chacha/chacha-poly1305.c \
 	chacha/chacha-poly1305.h chacha/chacha-set-key.c \
 	chacha/chacha-set-nonce.c chacha/chacha.h \
-	chacha/poly1305.h chacha/poly1305-internal.c
+	chacha/poly1305.h chacha/poly1305-internal.c \
+	chacha/poly1305-internal.h
 endif

@@ -663,12 +663,6 @@ AC_CHECK_FUNCS([nettle_chacha_set_counter],
 LIBS=$save_LIBS
 AM_CONDITIONAL(NEED_CHACHA, [test "$have_chacha_set_counter" != "yes"])
 
-# Check for VKO
-save_LIBS=$LIBS
-LIBS="$LIBS $NETTLE_LIBS $HOGWEED_LIBS"
-AC_CHECK_FUNCS(nettle_gostdsa_vko)
-LIBS=$save_LIBS
-
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_LIBS=$LIBS
 LIBS="$LIBS $GMP_LIBS"
