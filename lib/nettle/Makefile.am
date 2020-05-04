@@ -40,15 +40,13 @@ noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c \
 	gnettle.h rnd-common.h prf.c \
-	backport/cfb8.c backport/cfb8.h \
-	backport/cmac.c backport/cmac.h \
-	backport/xts.c backport/xts.h \
 	rnd.c int/rsa-fips.h int/rsa-keygen-fips186.c int/provable-prime.c \
 	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c \
 	int/tls1-prf.c int/tls1-prf.h \
 	int/dsa-compute-k.c int/dsa-compute-k.h \
 	int/ecdsa-compute-k.c int/ecdsa-compute-k.h \
-	int/mpn-base256.c int/mpn-base256.h
+	int/mpn-base256.c int/mpn-base256.h \
+	int/block8.h backport/block-internal.h
 
 if WINDOWS
 libcrypto_la_SOURCES += sysrng-windows.c
@@ -166,12 +164,35 @@ libcrypto_la_SOURCES += \
 	ecc/ed448-shake256-sign.c ecc/ed448-shake256-verify.c
 endif
 
+if NEED_CFB
+libcrypto_la_SOURCES += \
+	backport/cfb.c backport/cfb.h
+endif
+
+if NEED_CMAC
+libcrypto_la_SOURCES += \
+	backport/cmac.c backport/cmac.h \
+	backport/cmac-aes128.c backport/cmac-aes256.c
+endif
+
+if NEED_XTS
+libcrypto_la_SOURCES += \
+	backport/xts.c backport/xts.h \
+	backport/xts-aes128.c backport/xts-aes256.c
+endif
+
 if NEED_CHACHA
 libcrypto_la_SOURCES += \
-	chacha/chacha-core-internal.c chacha/chacha-crypt.c \
-	chacha/chacha-internal.h chacha/chacha-poly1305.c \
-	chacha/chacha-poly1305.h chacha/chacha-set-key.c \
-	chacha/chacha-set-nonce.c chacha/chacha.h \
-	chacha/poly1305.h chacha/poly1305-internal.c \
-	chacha/poly1305-internal.h
+	backport/chacha-core-internal.c backport/chacha-crypt.c \
+	backport/chacha-internal.h backport/chacha-poly1305.c \
+	backport/chacha-poly1305.h backport/chacha-set-key.c \
+	backport/chacha-set-nonce.c backport/chacha.h \
+	backport/poly1305.h backport/poly1305-internal.c \
+	backport/poly1305-internal.h
+endif
+
+if NEED_SIV
+libcrypto_la_SOURCES += \
+	backport/siv-cmac-aes128.c backport/siv-cmac-aes256.c \
+	backport/siv-cmac.c backport/siv-cmac.h
 endif

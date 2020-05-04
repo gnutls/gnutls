@@ -1,15 +1,22 @@
 #!/bin/sh
 
-# This script copies the ChaCha20 implementation from the
-# nettle upstream, with necessary adjustments for bundling in GnuTLS.
+# This script copies files from the nettle upstream, with necessary
+# adjustments for bundling in GnuTLS.
 
 set +e
 
 : ${srcdir=.}
 SRC=$srcdir/devel/nettle
-DST=$srcdir/lib/nettle/chacha
+DST=$srcdir/lib/nettle/backport
 
 IMPORTS="
+block-internal.h
+cfb.c
+cfb.h
+cmac.c
+cmac.h
+cmac-aes128.c
+cmac-aes256.c
 chacha-core-internal.c
 chacha-crypt.c
 chacha-internal.h
@@ -21,14 +28,25 @@ chacha.h
 poly1305-internal.c
 poly1305-internal.h
 poly1305.h
+xts.c
+xts.h
+xts-aes128.c
+xts-aes256.c
+siv-cmac.c
+siv-cmac.h
+siv-cmac-aes128.c
+siv-cmac-aes256.c
 "
 
 PUBLIC="
 aes.h
 bignum.h
+ctr.h
+des.h
 ecc-curve.h
 ecc.h
 macros.h
+memops.h
 memxor.h
 nettle-meta.h
 nettle-types.h
@@ -66,7 +84,7 @@ for f in $IMPORTS; do
 	# Rename header guard so as not to conflict with the public ones.
 	if grep '^#ifndef NETTLE_.*_H\(_INCLUDED\)*' $dst 2>&1 >/dev/null; then
 	  g=$(sed -n 's/^#ifndef NETTLE_\(.*_H\(_INCLUDED\)*\)/\1/p' $dst)
-	  sed 's/\(NETTLE_'$g'\)/GNUTLS_LIB_NETTLE_CHACHA_\1/' $dst > $dst-t && \
+	  sed 's/\(NETTLE_'$g'\)/GNUTLS_LIB_NETTLE_BACKPORT_\1/' $dst > $dst-t && \
 	    mv $dst-t $dst
 	fi
 	;;
@@ -74,11 +92,41 @@ for f in $IMPORTS; do
     case $dst in
       *.h)
 	# Add prefix to function symbols avoid clashing with the public ones.
-	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_chacha_\1/' \
-	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_chacha_\1/' \
-	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_chacha_\1/' \
+	sed -e 's/^#define \(.*\) nettle_\1/#define \1 gnutls_nettle_backport_\1/' \
+	    -e 's/^#define _\(.*\) _nettle_\1/#define _\1 _gnutls_nettle_backport_\1/' \
+	    -e 's/^#define \(.*\) _nettle_\1/#define \1 _gnutls_nettle_backport_\1/' \
 	    $dst > $dst-t && \
 	  mv $dst-t $dst
+      ;;
+    esac
+    case $dst in
+      */cfb.c | */cmac.c | */xts.c | */siv-cmac.c)
+	sed \
+	  -e 's/"nettle-internal\.h"/"nettle-alloca.h"/' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
+    esac
+    case $dst in
+      */*.[ch])
+	sed \
+	  -e '/^#include <nettle\/nettle-types\.h>/a\
+#include "block8.h"
+' \
+	  $dst > $dst-t && mv $dst-t $dst
+	;;
+    esac
+    case $dst in
+      */siv-cmac*.[ch])
+	sed \
+	  -e '/^#include "cmac\.h"/ { i\
+#ifdef HAVE_NETTLE_CMAC128_UPDATE\
+#include <nettle/cmac.h>\
+#else\
+#include "cmac.h"\
+#endif
+; d
+}' \
+	$dst > $dst-t && mv $dst-t $dst
       ;;
     esac
   else

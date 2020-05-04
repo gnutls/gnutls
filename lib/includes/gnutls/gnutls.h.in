@@ -137,6 +137,12 @@ extern "C" {
  * @GNUTLS_CIPHER_AES192_PGP_CFB: AES in CFB mode with 192-bit keys (placeholder - unsupported).
  * @GNUTLS_CIPHER_AES256_PGP_CFB: AES in CFB mode with 256-bit keys (placeholder - unsupported).
  * @GNUTLS_CIPHER_TWOFISH_PGP_CFB: Twofish in CFB mode (placeholder - unsupported).
+ * @GNUTLS_CIPHER_AES_128_SIV: AES in SIV mode with 128-bit key.
+ * @GNUTLS_CIPHER_AES_256_SIV: AES in SIV mode with 256-bit key.
+ *                             Note that the SIV ciphers can only be used with
+ *                             the AEAD interface, and the IV plays a role as
+ *                             the authentication tag while it is prepended to
+ *                             the cipher text.
  *
  * Enumeration of different symmetric encryption algorithms.
  */
@@ -178,6 +184,8 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_GOST28147_TC26Z_CNT = 34,
 	GNUTLS_CIPHER_CHACHA20_64 = 35,
 	GNUTLS_CIPHER_CHACHA20_32 = 36,
+	GNUTLS_CIPHER_AES_128_SIV = 37,
+	GNUTLS_CIPHER_AES_256_SIV = 38,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */

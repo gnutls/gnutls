@@ -5,6 +5,12 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.6.14 (unreleased)
+
+** API and ABI modifications:
+GNUTLS_CIPHER_AES_128_SIV: Added
+GNUTLS_CIPHER_AES_256_SIV: Added
+
 * Version 3.6.13 (released 2020-03-31)
 
 ** libgnutls: Fix a DTLS-protocol regression (caused by TLS1.3 support), since 3.6.3.

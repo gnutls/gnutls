@@ -602,9 +602,8 @@ LIBS=$save_LIBS
 
 # Check if nettle has CFB8 support
 if test -z "$ac_cv_func_nettle_cfb8_encrypt"; then
-	# nettle_cfb8_decrypt in nettle 3.5 is known to be broken
-	ver=`$PKG_CONFIG --modversion nettle`
-	if expr "$ver" : '^3\.5\b' >/dev/null; then
+	# nettle_cfb8_decrypt in nettle upto 3.6 is known to be broken
+	if ! $PKG_CONFIG --atleast-version=3.6 nettle; then
 		ac_cv_func_nettle_cfb8_encrypt=no
 	fi
 fi
@@ -613,18 +612,26 @@ save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cfb8_encrypt)
 LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CFB, [test "$ac_cv_func_nettle_cfb8_encrypt" != "yes"])
 
 # Check if nettle has CMAC support
+save_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $NETTLE_CFLAGS"
+AC_CHECK_TYPES([union nettle_block8], , , [[#include <nettle/nettle-types.h>]])
+CFLAGS=$save_CFLAGS
+
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_cmac128_update)
 LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CMAC, [test "$ac_cv_func_nettle_cmac128_update" != "yes"])
 
 # Check if nettle has XTS support
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_xts_encrypt_message)
 LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_XTS, [test "$ac_cv_func_nettle_xts_encrypt_message" != "yes"])
 
 # Check for Gosthash94 with CryptoPro S-box support
 save_LIBS=$LIBS
@@ -662,6 +669,13 @@ AC_CHECK_FUNCS([nettle_chacha_set_counter],
                [have_chacha_set_counter=yes])
 LIBS=$save_LIBS
 AM_CONDITIONAL(NEED_CHACHA, [test "$have_chacha_set_counter" != "yes"])
+
+# Check for SIV-CMAC
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_siv_cmac_aes128_set_key)
+LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_SIV, [test "$ac_cv_func_nettle_siv_cmac_aes128_set_key" != "yes"])
 
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_LIBS=$LIBS
