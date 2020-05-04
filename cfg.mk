@@ -43,7 +43,6 @@ local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_two_space_separator_in_usage
 
 VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|src/.*\.bak|src/crywrap/|(devel/perlasm/|lib/accelerated/x86/|build-aux/|gl/|src/libopts/|tests/suite/ecore/|doc/protocol/).*$$
-update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
 exclude_file_name_regexp--sc_copyright_check = ^./gnulib/.*$$
@@ -77,6 +76,12 @@ glimport:
 	pushd gnulib && git checkout master && git pull && popd
 	echo "If everything looks well, commit the gnulib update with:"
 	echo "  git commit -m "Update gnulib submodule" gnulib"
+
+# Update Copyright year in tools and docs
+
+update-copyright-year:
+	$(AM_V_at)$(SED) -i "s/\"2000-[0-9]\{4,\}\"/\"2000-`date +%Y`\"/g" src/args-std.def.in
+	$(AM_V_at)$(SED) -i "s/ 2001-[0-9]\{4,\} / 2001-`date +%Y` /g" doc/gnutls.texi
 
 # Code Coverage
 
