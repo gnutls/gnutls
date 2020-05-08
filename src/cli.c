@@ -78,7 +78,7 @@
 
 /* global stuff here */
 int resume, starttls, insecure, ranges, rehandshake, udp, mtu,
-    inline_commands;
+    inline_commands, waitresumption;
 unsigned int global_vflags = 0;
 char *hostname = NULL;
 char service[32]="";
@@ -992,11 +992,19 @@ static int try_resume(socket_st * hd)
 	gnutls_datum_t edata = {NULL, 0};
 
 	if (gnutls_session_is_resumed(hd->session) == 0) {
-		/* not resumed - obtain the session data */
-		ret = gnutls_session_get_data2(hd->session, &rdata);
-		if (ret < 0) {
-			rdata.data = NULL;
-		}
+		do {
+			/* not resumed - obtain the session data */
+			ret = gnutls_session_get_data2(hd->session, &rdata);
+			if (ret < 0) {
+				rdata.data = NULL;
+			}
+
+			if ((gnutls_protocol_get_version(hd->session) != GNUTLS_TLS1_3) ||
+					((gnutls_session_get_flags(hd->session) &
+					 GNUTLS_SFLAGS_SESSION_TICKET))) {
+				break;
+			}
+		} while (waitresumption);
 	} else {
 		/* resumed - try to reuse the previous session data */
 		rdata.data = hd->rdata.data;
@@ -1688,6 +1696,7 @@ static void cmd_parser(int argc, char **argv)
 	rehandshake = HAVE_OPT(REHANDSHAKE);
 	insecure = HAVE_OPT(INSECURE);
 	ranges = HAVE_OPT(RANGES);
+	waitresumption = HAVE_OPT(WAITRESUMPTION);
 
 	if (insecure || HAVE_OPT(VERIFY_ALLOW_BROKEN)) {
 		global_vflags |= GNUTLS_VERIFY_ALLOW_BROKEN;
