@@ -959,6 +959,19 @@ hexdump:
 	adds(str, "\n");
 }
 
+#define ENTRY(oid, name) {oid, sizeof(oid)-1, name, sizeof(name)-1, NULL, 0}
+
+static const struct oid_to_string cp_oid2str[] = {
+	ENTRY("2.5.29.32.0", "anyPolicy"),
+
+	ENTRY("2.23.140.1.2.1", "CA/B Domain Validated"),
+	ENTRY("2.23.140.1.2.2", "CA/B Organization Validated"),
+	ENTRY("2.23.140.1.2.3", "CA/B Individual Validated"),
+	ENTRY("2.23.140.1.1", "CA/B Extended Validation"),
+
+	{NULL, 0, NULL, 0},
+};
+
 struct ext_indexes_st {
 	int san;
 	int ian;
@@ -1011,6 +1024,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 		struct gnutls_x509_policy_st policy;
 		gnutls_x509_policies_t policies;
 		const char *name;
+		const struct oid_to_string *entry;
 		int x;
 
 		err = gnutls_x509_policies_init(&policies);
@@ -1050,7 +1064,11 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 				     critical ? _("critical") :
 				     _("not critical"));
 
-			addf(str, "%s\t\t\t%s\n", prefix, policy.oid);
+			entry = _gnutls_oid_get_entry(cp_oid2str, policy.oid);
+			if (entry != NULL && entry->name_desc != NULL)
+				addf(str, "%s\t\t\t%s (%s)\n", prefix, policy.oid, entry->name_desc);
+			else
+				addf(str, "%s\t\t\t%s\n", prefix, policy.oid);
 			for (j = 0; j < policy.qualifiers; j++) {
 				if (policy.qualifier[j].type ==
 				    GNUTLS_X509_QUALIFIER_URI)
