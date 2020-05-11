@@ -969,6 +969,14 @@ static const struct oid_to_string cp_oid2str[] = {
 	ENTRY("2.23.140.1.2.3", "CA/B Individual Validated"),
 	ENTRY("2.23.140.1.1", "CA/B Extended Validation"),
 
+	/* draft-deremin-rfc4491-bis */
+	ENTRY("1.2.643.100.113.1", "Russian security class KC1"),
+	ENTRY("1.2.643.100.113.2", "Russian security class KC2"),
+	ENTRY("1.2.643.100.113.3", "Russian security class KC3"),
+	ENTRY("1.2.643.100.113.4", "Russian security class KB1"),
+	ENTRY("1.2.643.100.113.5", "Russian security class KB2"),
+	ENTRY("1.2.643.100.113.6", "Russian security class KA1"),
+
 	{NULL, 0, NULL, 0},
 };
 

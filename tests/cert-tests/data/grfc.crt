@@ -37,8 +37,8 @@ X.509 Certificate Information:
 			ASCII: ...
 			Hexdump: 020100
 		Certificate Policies (not critical):
-			1.2.643.100.113.1
-			1.2.643.100.113.2
+			1.2.643.100.113.1 (Russian security class KC1)
+			1.2.643.100.113.2 (Russian security class KC2)
 			2.5.29.32.0 (anyPolicy)
 	Signature Algorithm: GOSTR341001
 	Signature:
