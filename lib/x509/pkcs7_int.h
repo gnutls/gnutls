@@ -131,4 +131,6 @@ int
 _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pkcs_cipher_schema_st **p,
 	struct pbkdf2_params *kdf_params, char **oid);
 
+int _gnutls_pkcs7_decode_signed_data(gnutls_pkcs7_t pkcs7);
+
 #endif /* GNUTLS_LIB_X509_PKCS7_INT_H */
