@@ -145,14 +145,11 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 		need_free = 1;
 	}
 
-	if (pkcs7->expanded) {
-		result = pkcs7_reinit(pkcs7);
-		if (result < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
+	result = pkcs7_reinit(pkcs7);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
-	pkcs7->expanded = 1;
 
 	result = asn1_der_decoding(&pkcs7->pkcs7, _data.data, _data.size, NULL);
 	if (result != ASN1_SUCCESS) {

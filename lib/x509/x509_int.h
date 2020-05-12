@@ -128,7 +128,6 @@ typedef struct gnutls_pkcs7_int {
 
 	gnutls_datum_t der_signed_data;
 	asn1_node signed_data;
-	unsigned expanded;
 } gnutls_pkcs7_int;
 
 struct pbkdf2_params {
