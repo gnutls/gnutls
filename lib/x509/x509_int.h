@@ -126,8 +126,8 @@ typedef struct gnutls_pkcs7_int {
 
 	char encap_data_oid[MAX_OID_SIZE];
 
-	gnutls_datum_t der_signed_data;
-	asn1_node signed_data;
+	gnutls_datum_t der_encap_data;
+	asn1_node content_data;
 } gnutls_pkcs7_int;
 
 struct pbkdf2_params {

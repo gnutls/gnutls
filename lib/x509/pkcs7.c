@@ -90,10 +90,10 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7_t pkcs7)
 	if (pkcs7->pkcs7)
 		asn1_delete_structure(&pkcs7->pkcs7);
 
-	if (pkcs7->signed_data)
-		asn1_delete_structure(&pkcs7->signed_data);
+	if (pkcs7->content_data)
+		asn1_delete_structure(&pkcs7->content_data);
 
-	_gnutls_free_datum(&pkcs7->der_signed_data);
+	_gnutls_free_datum(&pkcs7->der_encap_data);
 
 	gnutls_free(pkcs7);
 }
@@ -216,16 +216,16 @@ gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned flags,
 	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	if (pkcs7->der_signed_data.size == 0)
+	if (pkcs7->der_encap_data.size == 0)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	if (flags & GNUTLS_PKCS7_EDATA_GET_RAW) {
-		if (pkcs7->signed_data == NULL)
+		if (pkcs7->content_data == NULL)
 			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-		return _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", data);
+		return _gnutls_x509_read_value(pkcs7->content_data, "encapContentInfo.eContent", data);
 	} else {
-		return _gnutls_set_datum(data, pkcs7->der_signed_data.data, pkcs7->der_signed_data.size);
+		return _gnutls_set_datum(data, pkcs7->der_encap_data.data, pkcs7->der_encap_data.size);
 	}
 }
 
@@ -258,15 +258,15 @@ static void disable_opt_fields(gnutls_pkcs7_t pkcs7)
 	int count;
 
 	/* disable the optional fields */
-	result = asn1_number_of_elements(pkcs7->signed_data, "crls", &count);
+	result = asn1_number_of_elements(pkcs7->content_data, "crls", &count);
 	if (result != ASN1_SUCCESS || count == 0) {
-		(void)asn1_write_value(pkcs7->signed_data, "crls", NULL, 0);
+		(void)asn1_write_value(pkcs7->content_data, "crls", NULL, 0);
 	}
 
 	result =
-	    asn1_number_of_elements(pkcs7->signed_data, "certificates", &count);
+	    asn1_number_of_elements(pkcs7->content_data, "certificates", &count);
 	if (result != ASN1_SUCCESS || count == 0) {
-		(void)asn1_write_value(pkcs7->signed_data, "certificates", NULL, 0);
+		(void)asn1_write_value(pkcs7->content_data, "certificates", NULL, 0);
 	}
 
 	return;
@@ -276,13 +276,13 @@ static int reencode(gnutls_pkcs7_t pkcs7)
 {
 	int result;
 
-	if (pkcs7->signed_data != NULL) {
+	if (pkcs7->content_data != NULL) {
 		disable_opt_fields(pkcs7);
 
 		/* Replace the old content with the new
 		 */
 		result =
-		    _gnutls_x509_der_encode_and_copy(pkcs7->signed_data, "",
+		    _gnutls_x509_der_encode_and_copy(pkcs7->content_data, "",
 						     pkcs7->pkcs7, "content",
 						     0);
 		if (result < 0) {
