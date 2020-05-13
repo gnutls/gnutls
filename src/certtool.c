@@ -2624,94 +2624,20 @@ void verify_crl(common_info_st * cinfo)
 	app_exit(rc);
 }
 
-static void print_dn(const char *prefix, const gnutls_datum_t *raw)
-{
-	gnutls_x509_dn_t dn = NULL;
-	gnutls_datum_t str = {NULL, 0};
-	int ret;
-
-	ret = gnutls_x509_dn_init(&dn);
-	if (ret < 0)
-		return;
-
-	ret = gnutls_x509_dn_import(dn, raw);
-	if (ret < 0)
-		goto cleanup;
-
-	ret = gnutls_x509_dn_get_str2(dn, &str, 0);
-	if (ret < 0)
-		goto cleanup;
-
-	fprintf(outfile, "%s: %s\n", prefix, str.data);
-
- cleanup:
-	gnutls_x509_dn_deinit(dn);
-	gnutls_free(str.data);
-}
-
-static void print_raw(const char *prefix, const gnutls_datum_t *raw)
+static void print_pkcs7_sig_info(gnutls_pkcs7_signature_info_st *info, common_info_st *cinfo)
 {
 	int ret;
-	gnutls_datum_t tmp;
+	gnutls_datum_t str;
 
-	if (raw->data == NULL || raw->size == 0)
-		return;
-
-	ret = gnutls_hex_encode2(raw, &tmp);
+	ret = gnutls_pkcs7_print_signature_info(info, GNUTLS_CRT_PRINT_COMPACT, &str);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_hex_encode2: %s\n",
-			gnutls_strerror(ret));
+		fprintf(stderr, "printing error: %s\n",
+				gnutls_strerror(ret));
 		app_exit(1);
 	}
 
-	fprintf(outfile, "%s: %s\n", prefix, tmp.data);
-	gnutls_free(tmp.data);
-}
-
-static void print_pkcs7_sig_info(gnutls_pkcs7_signature_info_st *info, common_info_st *cinfo)
-{
-	unsigned i;
-	char *oid;
-	gnutls_datum_t data;
-	char prefix[128];
-	int ret;
-	char timebuf[SIMPLE_CTIME_BUF_SIZE];
-
-	print_dn("\tSigner's issuer DN", &info->issuer_dn);
-	print_raw("\tSigner's serial", &info->signer_serial);
-	print_raw("\tSigner's issuer key ID", &info->issuer_keyid);
-	if (info->signing_time != -1)
-		fprintf(outfile, "\tSigning time: %s\n", simple_ctime(&info->signing_time, timebuf));
-
-	fprintf(outfile, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info->algo));
-
-	if (info->signed_attrs) {
-		for (i=0;;i++) {
-			ret = gnutls_pkcs7_get_attr(info->signed_attrs, i, &oid, &data, 0);
-			if (ret < 0)
-				break;
-			if (i==0)
-				fprintf(outfile, "\tSigned Attributes:\n");
-
-			snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
-			print_raw(prefix, &data);
-			gnutls_free(data.data);
-		}
-	}
-	if (info->unsigned_attrs) {
-		for (i=0;;i++) {
-			ret = gnutls_pkcs7_get_attr(info->unsigned_attrs, i, &oid, &data, 0);
-			if (ret < 0)
-				break;
-			if (i==0)
-				fprintf(outfile, "\tUnsigned Attributes:\n");
-
-			snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
-			print_raw(prefix, &data);
-			gnutls_free(data.data);
-		}
-	}
-	fprintf(outfile, "\n");
+	fprintf(outfile, "%s", str.data);
+	gnutls_free(str.data);
 }
 
 void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_data)
