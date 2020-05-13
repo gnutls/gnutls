@@ -114,6 +114,18 @@
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2
 
+struct oid_to_string {
+	const char *oid;
+	unsigned oid_size;
+	const char *name_desc;
+	unsigned name_desc_size;
+	const char *asn_desc;	/* description in the pkix file if complex type */
+	unsigned int etype;	/* the libtasn1 ASN1_ETYPE or INVALID
+				 * if cannot be simply parsed */
+};
+
+const struct oid_to_string *_gnutls_oid_get_entry(const struct oid_to_string *ots, const char *oid);
+
 int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 			  int force_general);
 int
