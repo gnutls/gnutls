@@ -10,6 +10,7 @@ See the end for copying conditions.
 ** API and ABI modifications:
 GNUTLS_CIPHER_AES_128_SIV: Added
 GNUTLS_CIPHER_AES_256_SIV: Added
+gnutls_pkcs7_print_signature_info: Added
 
 * Version 3.6.13 (released 2020-03-31)
 

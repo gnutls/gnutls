@@ -185,6 +185,37 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
 }
 
 /**
+ * gnutls_pkcs7_print_signature_info:
+ * @info: The PKCS7 signature info struct to be printed
+ * @format: Indicate the format to use
+ * @out: Newly allocated datum with null terminated string.
+ *
+ * This function will pretty print a PKCS #7 signature info structure, suitable
+ * for display to a human.
+ *
+ * Currently the supported formats are %GNUTLS_CRT_PRINT_FULL and
+ * %GNUTLS_CRT_PRINT_COMPACT.
+ *
+ * The output @out needs to be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.6.14
+ **/
+int gnutls_pkcs7_print_signature_info(gnutls_pkcs7_signature_info_st * info,
+				      gnutls_certificate_print_formats_t format,
+				      gnutls_datum_t * out)
+{
+	gnutls_buffer_st str;
+
+	_gnutls_buffer_init(&str);
+	print_pkcs7_info(info, &str, format);
+
+	return _gnutls_buffer_to_datum(&str, out, 1);
+}
+
+/**
  * gnutls_pkcs7_crt_print:
  * @pkcs7: The PKCS7 struct to be printed
  * @format: Indicate the format to use
