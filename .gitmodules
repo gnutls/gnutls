@@ -16,3 +16,6 @@
 [submodule "devel/nettle"]
 	path = devel/nettle
 	url = https://gitlab.com/gnutls/nettle.git
+[submodule "devel/libtasn1"]
+	path = devel/libtasn1
+	url = https://gitlab.com/gnutls/libtasn1.git
