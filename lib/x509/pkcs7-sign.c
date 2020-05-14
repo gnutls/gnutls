@@ -167,7 +167,7 @@ gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
 	char oid[MAX_OID_SIZE];
 	gnutls_datum_t tmp = { NULL, 0 };
 
-	if (pkcs7 == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	/* Step 2. Parse the CertificateSet
@@ -369,7 +369,7 @@ int gnutls_pkcs7_get_signature_count(gnutls_pkcs7_t pkcs7)
 {
 	int ret, count;
 
-	if (pkcs7 == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	ret =
@@ -408,7 +408,7 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx,
 	gnutls_datum_t tmp = { NULL, 0 };
 	unsigned i;
 
-	if (pkcs7 == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	memset(info, 0, sizeof(*info));
@@ -772,7 +772,7 @@ int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
 
 	memset(&info, 0, sizeof(info));
 
-	if (pkcs7 == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	ret =
@@ -1193,7 +1193,7 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 
 	memset(&info, 0, sizeof(info));
 
-	if (pkcs7 == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	ret =
@@ -1243,15 +1243,15 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 /* Creates an empty signed data structure in the pkcs7
  * structure and returns a handle to the signed data.
  */
-static int create_empty_signed_data(asn1_node pkcs7, asn1_node * sdata)
+static int create_empty_signed_data(gnutls_pkcs7_t pkcs7)
 {
 	int result;
 
-	*sdata = NULL;
+	pkcs7->content_data = NULL;
 
 	if ((result = asn1_create_element
 	     (_gnutls_get_pkix(), "PKIX1.pkcs-7-SignedData",
-	      sdata)) != ASN1_SUCCESS) {
+	      &pkcs7->content_data)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -1259,7 +1259,7 @@ static int create_empty_signed_data(asn1_node pkcs7, asn1_node * sdata)
 
 	/* Use version 1
 	 */
-	result = asn1_write_value(*sdata, "version", &one, 1);
+	result = asn1_write_value(pkcs7->content_data, "version", &one, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -1271,7 +1271,7 @@ static int create_empty_signed_data(asn1_node pkcs7, asn1_node * sdata)
 
 	/* id-data */
 	result =
-	    asn1_write_value(*sdata, "encapContentInfo.eContentType",
+	    asn1_write_value(pkcs7->content_data, "encapContentInfo.eContentType",
 			     DIGESTED_DATA_OID, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -1279,12 +1279,14 @@ static int create_empty_signed_data(asn1_node pkcs7, asn1_node * sdata)
 		goto cleanup;
 	}
 
-	result = asn1_write_value(*sdata, "encapContentInfo.eContent", NULL, 0);
+	result = asn1_write_value(pkcs7->content_data, "encapContentInfo.eContent", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
+
+	pkcs7->type = GNUTLS_PKCS7_SIGNED;
 
 	/* Add no certificates.
 	 */
@@ -1298,7 +1300,8 @@ static int create_empty_signed_data(asn1_node pkcs7, asn1_node * sdata)
 	return 0;
 
  cleanup:
-	asn1_delete_structure(sdata);
+	asn1_delete_structure(&pkcs7->content_data);
+	pkcs7->type = GNUTLS_PKCS7_UNINITIALIZED;
 	return result;
 
 }
@@ -1329,12 +1332,15 @@ int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crt)
 		 * signedData.
 		 */
 		result =
-		    create_empty_signed_data(pkcs7->pkcs7, &pkcs7->content_data);
+		    create_empty_signed_data(pkcs7);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
 	}
+
+	if (pkcs7->type != GNUTLS_PKCS7_SIGNED)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* Step 2. Append the new certificate.
 	 */
@@ -1425,7 +1431,7 @@ int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx)
 	int result;
 	char root2[MAX_NAME_SIZE];
 
-	if (pkcs7 == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	/* Step 2. Delete the certificate.
@@ -1472,7 +1478,7 @@ gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
 	gnutls_datum_t tmp = { NULL, 0 };
 	int start, end;
 
-	if (pkcs7 == NULL || crl == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED || crl == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	result = _gnutls_x509_read_value(pkcs7->pkcs7, "content", &tmp);
@@ -1604,12 +1610,16 @@ int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crl)
 		 * signedData.
 		 */
 		result =
-		    create_empty_signed_data(pkcs7->pkcs7, &pkcs7->content_data);
+		    create_empty_signed_data(pkcs7);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
 	}
+
+	if (pkcs7->type != GNUTLS_PKCS7_SIGNED)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 
 	/* Step 2. Append the new crl.
 	 */
@@ -1689,7 +1699,7 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx)
 	int result;
 	char root2[MAX_NAME_SIZE];
 
-	if (pkcs7 == NULL)
+	if (pkcs7 == NULL || pkcs7->type != GNUTLS_PKCS7_SIGNED)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	/* Delete the crl.
@@ -2010,6 +2020,9 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	if (pkcs7 == NULL || me == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
+	if (pkcs7->type != GNUTLS_PKCS7_SIGNED)
+		asn1_delete_structure(&pkcs7->content_data);
+
 	if (pkcs7->content_data == NULL) {
 		result =
 		    asn1_create_element(_gnutls_get_pkix(),
@@ -2025,6 +2038,7 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 			(void)asn1_write_value(pkcs7->content_data,
 					 "encapContentInfo.eContent", NULL, 0);
 		}
+		pkcs7->type = GNUTLS_PKCS7_SIGNED;
 	}
 
 	result = asn1_write_value(pkcs7->content_data, "version", &one, 1);

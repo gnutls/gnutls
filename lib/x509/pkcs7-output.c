@@ -215,8 +215,92 @@ int gnutls_pkcs7_print_signature_info(gnutls_pkcs7_signature_info_st * info,
 	return _gnutls_buffer_to_datum(&str, out, 1);
 }
 
+static void _gnutls_pkcs7_print_signed(gnutls_pkcs7_t pkcs7,
+				       gnutls_certificate_print_formats_t format,
+				       gnutls_buffer_st * str)
+{
+	int count, ret, i;
+	gnutls_pkcs7_signature_info_st info;
+
+	for (i = 0;; i++) {
+		if (i == 0)
+			addf(str, "Signers:\n");
+
+		ret = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
+		if (ret < 0)
+			break;
+
+		print_pkcs7_info(&info, str, format);
+		gnutls_pkcs7_signature_info_deinit(&info);
+	}
+
+	if (format == GNUTLS_CRT_PRINT_FULL) {
+		gnutls_datum_t data, b64;
+
+		count = gnutls_pkcs7_get_crt_count(pkcs7);
+
+		if (count > 0) {
+			addf(str, "Number of certificates: %u\n\n",
+			     count);
+
+			for (i = 0; i < count; i++) {
+				ret =
+				    gnutls_pkcs7_get_crt_raw2(pkcs7, i, &data);
+				if (ret < 0) {
+					addf(str,
+					     "Error: cannot print certificate %d\n",
+					     i);
+					continue;
+				}
+
+				ret =
+				    gnutls_pem_base64_encode_alloc
+				    ("CERTIFICATE", &data, &b64);
+				if (ret < 0) {
+					gnutls_free(data.data);
+					continue;
+				}
+
+				adds(str, (char*)b64.data);
+				adds(str, "\n");
+				gnutls_free(b64.data);
+				gnutls_free(data.data);
+			}
+		}
+
+		count = gnutls_pkcs7_get_crl_count(pkcs7);
+		if (count > 0) {
+			addf(str, "Number of CRLs: %u\n\n", count);
+
+			for (i = 0; i < count; i++) {
+				ret =
+				    gnutls_pkcs7_get_crl_raw2(pkcs7, i, &data);
+				if (ret < 0) {
+					addf(str,
+					     "Error: cannot print certificate %d\n",
+					     i);
+					continue;
+				}
+
+				ret =
+				    gnutls_pem_base64_encode_alloc("X509 CRL",
+								   &data, &b64);
+				if (ret < 0) {
+					gnutls_free(data.data);
+					continue;
+				}
+
+				adds(str, (char*)b64.data);
+				adds(str, "\n");
+				gnutls_free(b64.data);
+				gnutls_free(data.data);
+			}
+		}
+	}
+}
+
 /**
- * gnutls_pkcs7_crt_print:
+ * gnutls_pkcs7_print:
  * @pkcs7: The PKCS7 struct to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with null terminated string.
@@ -236,8 +320,6 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_datum_t * out)
 {
-	int count, ret, i;
-	gnutls_pkcs7_signature_info_st info;
 	gnutls_buffer_st str;
 	const char *oid;
 
@@ -253,80 +335,19 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		}
 	}
 
-	for (i = 0;; i++) {
-		if (i == 0)
-			addf(&str, "Signers:\n");
-
-		ret = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
-		if (ret < 0)
-			break;
-
-		print_pkcs7_info(&info, &str, format);
-		gnutls_pkcs7_signature_info_deinit(&info);
-	}
-
-	if (format == GNUTLS_CRT_PRINT_FULL) {
-		gnutls_datum_t data, b64;
-
-		count = gnutls_pkcs7_get_crt_count(pkcs7);
-
-		if (count > 0) {
-			addf(&str, "Number of certificates: %u\n\n",
-			     count);
-
-			for (i = 0; i < count; i++) {
-				ret =
-				    gnutls_pkcs7_get_crt_raw2(pkcs7, i, &data);
-				if (ret < 0) {
-					addf(&str,
-					     "Error: cannot print certificate %d\n",
-					     i);
-					continue;
-				}
-
-				ret =
-				    gnutls_pem_base64_encode_alloc
-				    ("CERTIFICATE", &data, &b64);
-				if (ret < 0) {
-					gnutls_free(data.data);
-					continue;
-				}
-
-				adds(&str, (char*)b64.data);
-				adds(&str, "\n");
-				gnutls_free(b64.data);
-				gnutls_free(data.data);
-			}
-		}
-
-		count = gnutls_pkcs7_get_crl_count(pkcs7);
-		if (count > 0) {
-			addf(&str, "Number of CRLs: %u\n\n", count);
-
-			for (i = 0; i < count; i++) {
-				ret =
-				    gnutls_pkcs7_get_crl_raw2(pkcs7, i, &data);
-				if (ret < 0) {
-					addf(&str,
-					     "Error: cannot print certificate %d\n",
-					     i);
-					continue;
-				}
-
-				ret =
-				    gnutls_pem_base64_encode_alloc("X509 CRL",
-								   &data, &b64);
-				if (ret < 0) {
-					gnutls_free(data.data);
-					continue;
-				}
-
-				adds(&str, (char*)b64.data);
-				adds(&str, "\n");
-				gnutls_free(b64.data);
-				gnutls_free(data.data);
-			}
-		}
+	/* For backwards compatibility don't print anything for Signed-data
+	 * files. Print type for all other files */
+	switch (pkcs7->type) {
+	case GNUTLS_PKCS7_DATA:
+		adds(&str, "Content Type: Data\n");
+		addf(&str, "Embedded size: %d octets\n\n", pkcs7->der_encap_data.size);
+		break;
+	case GNUTLS_PKCS7_SIGNED:
+		_gnutls_pkcs7_print_signed(pkcs7, format, &str);
+		break;
+	default:
+		adds(&str, "Unsupported PKCS#7 Content Type\n");
+		break;
 	}
 
 	return _gnutls_buffer_to_datum(&str, out, 1);

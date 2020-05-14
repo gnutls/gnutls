@@ -36,6 +36,11 @@ static int pkcs7_reinit(gnutls_pkcs7_t pkcs7)
 {
 	int result;
 
+	if (pkcs7->content_data)
+		asn1_delete_structure(&pkcs7->content_data);
+
+	_gnutls_free_datum(&pkcs7->der_encap_data);
+
 	asn1_delete_structure(&pkcs7->pkcs7);
 
 	result = asn1_create_element(_gnutls_get_pkix(),
@@ -45,6 +50,8 @@ static int pkcs7_reinit(gnutls_pkcs7_t pkcs7)
 		gnutls_assert();
 		return result;
 	}
+
+	pkcs7->type = GNUTLS_PKCS7_UNINITIALIZED;
 
 	return 0;
 }
@@ -96,6 +103,54 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7_t pkcs7)
 	_gnutls_free_datum(&pkcs7->der_encap_data);
 
 	gnutls_free(pkcs7);
+}
+
+static int _gnutls_pkcs7_decode_plain_data(gnutls_pkcs7_t pkcs7)
+{
+	asn1_node c2;
+	int result;
+	gnutls_datum_t tmp = {NULL, 0};
+
+	if ((result = asn1_create_element
+	     (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data",
+	      &c2)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* the Data has been created, so decode it.
+	 */
+	result = _gnutls_x509_read_value(pkcs7->pkcs7, "content", &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = asn1_der_decoding(&c2, tmp.data, tmp.size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_read_value(c2, "", &pkcs7->der_encap_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	strcpy(pkcs7->encap_data_oid, DATA_OID);
+
+	pkcs7->content_data = c2;
+	gnutls_free(tmp.data);
+
+	return 0;
+
+ cleanup:
+	gnutls_free(tmp.data);
+	if (c2)
+		asn1_delete_structure(&c2);
+	return result;
 }
 
 /**
@@ -165,15 +220,18 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 		return _gnutls_asn2err(result);
 	}
 
-	if (strcmp(data_oid, SIGNED_DATA_OID) != 0) {
+	if (strcmp(data_oid, DATA_OID) == 0) {
+		pkcs7->type = GNUTLS_PKCS7_DATA;
+		result = _gnutls_pkcs7_decode_plain_data(pkcs7);
+	} else if (strcmp(data_oid, SIGNED_DATA_OID) == 0) {
+		pkcs7->type = GNUTLS_PKCS7_SIGNED;
+		result = _gnutls_pkcs7_decode_signed_data(pkcs7);
+	} else {
 		gnutls_assert();
 		_gnutls_debug_log("Unknown PKCS7 Content OID '%s'\n", pkcs7->encap_data_oid);
 		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
 	}
 
-	/* Decode the signed data.
-	 */
-	result = _gnutls_pkcs7_decode_signed_data(pkcs7);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -257,6 +315,9 @@ static void disable_opt_fields(gnutls_pkcs7_t pkcs7)
 	int result;
 	int count;
 
+	if (pkcs7->type != GNUTLS_PKCS7_SIGNED)
+		return;
+
 	/* disable the optional fields */
 	result = asn1_number_of_elements(pkcs7->content_data, "crls", &count);
 	if (result != ASN1_SUCCESS || count == 0) {
@@ -275,6 +336,7 @@ static void disable_opt_fields(gnutls_pkcs7_t pkcs7)
 static int reencode(gnutls_pkcs7_t pkcs7)
 {
 	int result;
+	const char *oid;
 
 	if (pkcs7->content_data != NULL) {
 		disable_opt_fields(pkcs7);
@@ -289,11 +351,20 @@ static int reencode(gnutls_pkcs7_t pkcs7)
 			return gnutls_assert_val(result);
 		}
 
+		switch (pkcs7->type) {
+		case GNUTLS_PKCS7_DATA:
+			oid = DATA_OID;
+			break;
+		case GNUTLS_PKCS7_SIGNED:
+			oid = SIGNED_DATA_OID;
+			break;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+		}
+
 		/* Write the content type of the signed data
 		 */
-		result =
-		    asn1_write_value(pkcs7->pkcs7, "contentType",
-				     SIGNED_DATA_OID, 1);
+		result = asn1_write_value(pkcs7->pkcs7, "contentType", oid, 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			return _gnutls_asn2err(result);

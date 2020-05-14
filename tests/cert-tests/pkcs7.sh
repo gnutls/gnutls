@@ -47,7 +47,7 @@ else
 	GOST_P7B=""
 fi
 
-for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b $GOST_P7B; do
+for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b rfc4134-3.1.der rfc4134-3.2.der $GOST_P7B; do
 ${VALGRIND} "${CERTTOOL}" --inder --p7-info --infile "${srcdir}/data/${FILE}"|grep -v "Signing time" >"${OUTFILE}"
 rc=$?
 
