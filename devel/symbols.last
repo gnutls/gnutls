@@ -565,6 +565,7 @@ gnutls_pkcs7_get_signature_info@GNUTLS_3_4
 gnutls_pkcs7_import@GNUTLS_3_4
 gnutls_pkcs7_init@GNUTLS_3_4
 gnutls_pkcs7_print@GNUTLS_3_4
+gnutls_pkcs7_print_signature_info@GNUTLS_3_6_14
 gnutls_pkcs7_set_crl@GNUTLS_3_4
 gnutls_pkcs7_set_crl_raw@GNUTLS_3_4
 gnutls_pkcs7_set_crt@GNUTLS_3_4

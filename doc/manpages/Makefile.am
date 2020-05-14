@@ -571,6 +571,7 @@ APIMANS += gnutls_pkcs7_get_signature_info.3
 APIMANS += gnutls_pkcs7_import.3
 APIMANS += gnutls_pkcs7_init.3
 APIMANS += gnutls_pkcs7_print.3
+APIMANS += gnutls_pkcs7_print_signature_info.3
 APIMANS += gnutls_pkcs7_set_crl.3
 APIMANS += gnutls_pkcs7_set_crl_raw.3
 APIMANS += gnutls_pkcs7_set_crt.3
