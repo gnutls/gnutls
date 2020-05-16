@@ -308,6 +308,12 @@ SignerIdentifier ::= CHOICE {
 
 pkcs-7-SignerInfos ::= SET OF pkcs-7-SignerInfo
 
+pkcs-7-DigestedData ::= SEQUENCE {
+	version INTEGER,
+	digestAlgorithm AlgorithmIdentifier,
+	encapContentInfo pkcs-7-EncapsulatedContentInfo,
+	digest OCTET STRING
+}
 
 -- BEGIN of RFC2986
 

@@ -119,6 +119,7 @@ typedef enum {
 	GNUTLS_PKCS7_UNINITIALIZED = 0,
 	GNUTLS_PKCS7_DATA = 1,
 	GNUTLS_PKCS7_SIGNED = 2,
+	GNUTLS_PKCS7_DIGESTED = 5,
 } gnutls_pkcs7_content_type_t;
 
 typedef struct gnutls_pkcs7_attrs_st {

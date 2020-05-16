@@ -103,6 +103,8 @@ EXTRA_DIST = data/ca-no-pathlen.pem data/no-ca-or-pathlen.pem data/aki-cert.pem 
 	templates/template-no-ca-honor.tmpl templates/template-no-ca-explicit.tmpl \
 	data/rfc4134-3.1.der data/rfc4134-3.1.der.out \
 	data/rfc4134-3.2.der data/rfc4134-3.2.der.out \
+	data/pkcs7-sha1.der data/pkcs7-sha1.der.out \
+	data/pkcs7-streebog256.der data/pkcs7-streebog256.der.out \
 	data/crq-cert-no-ca-explicit.pem data/crq-cert-no-ca-honor.pem data/commonName.cer \
 	templates/simple-policy.tmpl data/simple-policy.pem
 
@@ -116,7 +118,8 @@ dist_check_SCRIPTS = pathlen.sh aki.sh invalid-sig.sh email.sh \
 	key-id.sh pkcs8.sh pkcs8-decode.sh ecdsa.sh illegal-rsa.sh pkcs8-invalid.sh key-invalid.sh \
 	pkcs8-eddsa.sh certtool-subca.sh certtool-verify-profiles.sh x509-duplicate-ext.sh x25519-and-x448.sh
 
-dist_check_SCRIPTS += cmstool.sh cms-cat.sh cms-broken-sigs.sh cms-constraints.sh cms-constraints2.sh cms-eddsa.sh cms-list-sign.sh
+dist_check_SCRIPTS += cmstool.sh cms-cat.sh cms-broken-sigs.sh cms-constraints.sh cms-constraints2.sh cms-eddsa.sh \
+	cms-list-sign.sh cms-broken-dig.sh
 
 dist_check_SCRIPTS += key-id.sh ecdsa.sh pkcs8-invalid.sh key-invalid.sh pkcs8-decode.sh pkcs8.sh pkcs8-eddsa.sh \
 	certtool-utf8.sh crq.sh

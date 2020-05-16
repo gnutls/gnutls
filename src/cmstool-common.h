@@ -23,6 +23,7 @@
 
 #include <certtool-common.h>
 
+void load_data(common_info_st *cinfo, gnutls_datum_t *data);
 void pkcs7_info(common_info_st *cinfo, unsigned display_data);
 void pkcs7_generate(common_info_st *);
 void pkcs7_sign_common(common_info_st *, unsigned embed, gnutls_pkcs7_sign_flags flags);

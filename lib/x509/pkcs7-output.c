@@ -299,6 +299,34 @@ static void _gnutls_pkcs7_print_signed(gnutls_pkcs7_t pkcs7,
 	}
 }
 
+static void _gnutls_pkcs7_print_digested(gnutls_pkcs7_t pkcs7,
+					 gnutls_certificate_print_formats_t format,
+					 gnutls_buffer_st * str)
+{
+	int ret, len;
+	char oid[MAX_OID_SIZE];
+	gnutls_digest_algorithm_t dig;
+
+	adds(str, "Content Type: Digested\n");
+
+	len = sizeof(oid) - 1;
+	ret = asn1_read_value(pkcs7->content_data, "digestAlgorithm.algorithm", oid, &len);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		adds(str, "Digest algorithm: unsupported\n");
+	} else {
+		dig = gnutls_oid_to_digest(oid);
+		if (dig == GNUTLS_DIG_UNKNOWN) {
+			gnutls_assert();
+			addf(str, "Digest algorithm: unsupported (%s)\n", oid);
+		} else {
+			addf(str, "Digest algorithm: %s\n", gnutls_digest_get_name(dig));
+		}
+	}
+
+	adds(str, "\n");
+}
+
 /**
  * gnutls_pkcs7_print:
  * @pkcs7: The PKCS7 struct to be printed
@@ -344,6 +372,9 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		break;
 	case GNUTLS_PKCS7_SIGNED:
 		_gnutls_pkcs7_print_signed(pkcs7, format, &str);
+		break;
+	case GNUTLS_PKCS7_DIGESTED:
+		_gnutls_pkcs7_print_digested(pkcs7, format, &str);
 		break;
 	default:
 		adds(&str, "Unsupported PKCS#7 Content Type\n");

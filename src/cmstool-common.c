@@ -86,7 +86,7 @@ static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt, common_info_st *
 	return dig;
 }
 
-static void load_data(common_info_st *cinfo, gnutls_datum_t *data)
+void load_data(common_info_st *cinfo, gnutls_datum_t *data)
 {
 	FILE *fp;
 	size_t size;

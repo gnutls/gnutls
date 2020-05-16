@@ -133,6 +133,121 @@ static void pkcs7_verify(common_info_st * cinfo, const char *purpose, unsigned d
 	return pkcs7_verify_common(cinfo, purpose, display_data, flags);
 }
 
+static void pkcs7_digest(common_info_st * cinfo, unsigned embed)
+{
+	gnutls_pkcs7_t pkcs7;
+	int ret;
+	size_t size;
+	gnutls_datum_t data;
+	unsigned flags = 0;
+
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	data.data = (void *) fread_file(infile, 0, &size);
+	data.size = size;
+
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		app_exit(1);
+	}
+
+	if (embed)
+		flags |= GNUTLS_PKCS7_EMBED_DATA;
+
+	ret = gnutls_pkcs7_digest(pkcs7, &data, cinfo->hash, flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error digesting: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	size = lbuffer_size;
+	ret =
+	    gnutls_pkcs7_export(pkcs7, cinfo->outcert_format, lbuffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "pkcs7_export: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	fwrite(lbuffer, 1, size, outfile);
+
+	gnutls_pkcs7_deinit(pkcs7);
+	app_exit(0);
+}
+
+static void pkcs7_verify_digest(common_info_st * cinfo, unsigned display_data)
+{
+	gnutls_pkcs7_t pkcs7;
+	int ret, ecode;
+	size_t size;
+	gnutls_datum_t data, detached = {NULL,0};
+	gnutls_datum_t tmp = {NULL,0};
+	unsigned flags = 0;
+
+	if (HAVE_OPT(VERIFY_ALLOW_BROKEN))
+		flags |= GNUTLS_VERIFY_ALLOW_BROKEN;
+
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	data.data = (void *) fread_file(infile, 0, &size);
+	data.size = size;
+
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		app_exit(1);
+	}
+
+	ret = gnutls_pkcs7_import(pkcs7, &data, cinfo->incert_format);
+	free(data.data);
+	if (ret < 0) {
+		fprintf(stderr, "import error: %s\n",
+			gnutls_strerror(ret));
+		app_exit(1);
+	}
+
+	if (cinfo->data_file)
+		load_data(cinfo, &detached);
+
+	if (!display_data) {
+		fprintf(outfile, "eContent Type: %s\n", gnutls_pkcs7_get_embedded_data_oid(pkcs7));
+		fprintf(outfile, "Digest: %s\n", gnutls_digest_get_name(gnutls_pkcs7_get_digest_algo(pkcs7)));
+	}
+
+	if (!detached.data) {
+		ret = gnutls_pkcs7_get_embedded_data(pkcs7, 0, &tmp);
+		if (ret < 0) {
+			fprintf(stderr, "error getting embedded data: %s\n", gnutls_strerror(ret));
+			app_exit(1);
+		}
+
+		fwrite(tmp.data, 1, tmp.size, outfile);
+		gnutls_free(tmp.data);
+		tmp.data = NULL;
+	} else {
+		fwrite(detached.data, 1, detached.size, outfile);
+	}
+
+	ret = gnutls_pkcs7_verify_digest(pkcs7, detached.data!=NULL?&detached:NULL, flags);
+	if (ret < 0) {
+		fprintf(stderr, "Digest status: verification failed: %s\n", gnutls_strerror(ret));
+		ecode = 1;
+	} else {
+		fprintf(stderr, "Digest status: ok\n");
+		ecode = 0;
+	}
+
+	gnutls_pkcs7_deinit(pkcs7);
+	free(detached.data);
+	app_exit(ecode);
+}
+
 static void cmd_parser(int argc, char **argv)
 {
 	int ret, privkey_op = 0;
@@ -277,6 +392,10 @@ static void cmd_parser(int argc, char **argv)
 		pkcs7_verify(&cinfo, OPT_ARG(VERIFY_PURPOSE), ENABLED_OPT(SHOW_DATA));
 	else if (HAVE_OPT(SMIME_TO_CMS))
 		smime_to_pkcs7();
+	else if (HAVE_OPT(DIGEST))
+		pkcs7_digest(&cinfo, 1);
+	else if (HAVE_OPT(VERIFY_DIGEST))
+		pkcs7_verify_digest(&cinfo, ENABLED_OPT(SHOW_DATA));
 	else
 		USAGE(1);
 

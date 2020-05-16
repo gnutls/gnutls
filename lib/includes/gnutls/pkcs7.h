@@ -140,6 +140,14 @@ int
 gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
 			  unsigned indx, gnutls_datum_t *crl);
 
+int gnutls_pkcs7_digest(gnutls_pkcs7_t pkcs7,
+			const gnutls_datum_t *data,
+			gnutls_digest_algorithm_t dig, unsigned flags);
+
+int gnutls_pkcs7_verify_digest(gnutls_pkcs7_t pkcs7,
+			       const gnutls_datum_t *data, unsigned flags);
+int gnutls_pkcs7_get_digest_algo(gnutls_pkcs7_t pkcs7);
+
 int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_datum_t * out);

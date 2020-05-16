@@ -89,6 +89,16 @@
         {
           "long-option": "smime-to-cms",
           "description": "Convert S/MIME to PKCS #7 structure"
+        },
+        {
+          "long-option": "digest",
+          "description": "Digest using a PKCS #7 structure",
+          "detail": "This option generates a PKCS #7 structure containing a digest for the provided data from infile. The data are stored within the structure."
+        },
+        {
+          "long-option": "verify-digest",
+          "description": "Verify the provided PKCS #7 digested structure",
+          "detail": "This option verifies the digested PKCS #7 structure. The --load-data option will utilize detached data."
         }
       ]
     },

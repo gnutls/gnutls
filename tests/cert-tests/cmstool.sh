@@ -42,12 +42,12 @@ skip_if_no_datefudge
 
 if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != "1"
 then
-	GOST_P7B="rfc4490.p7b"
+	GOST_P7B="rfc4490.p7b pkcs7-streebog256.der"
 else
 	GOST_P7B=""
 fi
 
-for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b rfc4134-3.1.der rfc4134-3.2.der $GOST_P7B; do
+for FILE in single-ca.p7b full.p7b openssl.p7b openssl-keyid.p7b rfc4134-3.1.der rfc4134-3.2.der pkcs7-sha1.der $GOST_P7B; do
 ${VALGRIND} "${CMSTOOL}" --inder --info --infile "${srcdir}/data/${FILE}"|grep -v "Signing time" >"${OUTFILE}"
 rc=$?
 
@@ -335,6 +335,36 @@ then
 		exit ${rc}
 	fi
 fi
+
+# Test digest
+FILE="digest"
+${VALGRIND} "${CMSTOOL}" --digest --infile "${srcdir}/data/pkcs7-detached.txt" --hash sha512 >"${OUTFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 struct digest failed"
+	exit ${rc}
+fi
+
+FILE="digest-verify"
+${VALGRIND} "${CMSTOOL}" --verify-digest  <"${OUTFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 struct digest failed verification"
+	exit ${rc}
+fi
+
+#check extraction of embedded data in digest
+FILE="digest-verify-data"
+${VALGRIND} "${CMSTOOL}" --verify-digest --show-data --outfile "${OUTFILE2}" <"${OUTFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 struct signing failed verification with data"
+	exit ${rc}
+fi
+
 
 rm -f "${OUTFILE}"
 rm -f "${OUTFILE2}"

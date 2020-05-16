@@ -576,6 +576,7 @@ gnutls_pkcs7_attrs_deinit@GNUTLS_3_4
 gnutls_pkcs7_deinit@GNUTLS_3_4
 gnutls_pkcs7_delete_crl@GNUTLS_3_4
 gnutls_pkcs7_delete_crt@GNUTLS_3_4
+gnutls_pkcs7_digest@GNUTLS_3_7_0
 gnutls_pkcs7_export2@GNUTLS_3_4
 gnutls_pkcs7_export@GNUTLS_3_4
 gnutls_pkcs7_get_attr@GNUTLS_3_4
@@ -585,6 +586,7 @@ gnutls_pkcs7_get_crl_raw@GNUTLS_3_4
 gnutls_pkcs7_get_crt_count@GNUTLS_3_4
 gnutls_pkcs7_get_crt_raw2@GNUTLS_3_4
 gnutls_pkcs7_get_crt_raw@GNUTLS_3_4
+gnutls_pkcs7_get_digest_algo@GNUTLS_3_7_0
 gnutls_pkcs7_get_embedded_data@GNUTLS_3_4
 gnutls_pkcs7_get_embedded_data_oid@GNUTLS_3_4
 gnutls_pkcs7_get_signature_count@GNUTLS_3_4
@@ -600,6 +602,7 @@ gnutls_pkcs7_set_crt_raw@GNUTLS_3_4
 gnutls_pkcs7_sign@GNUTLS_3_4
 gnutls_pkcs7_signature_info_deinit@GNUTLS_3_4
 gnutls_pkcs7_verify@GNUTLS_3_4
+gnutls_pkcs7_verify_digest@GNUTLS_3_7_0
 gnutls_pkcs7_verify_direct@GNUTLS_3_4
 gnutls_pkcs8_info@GNUTLS_3_4
 gnutls_pkcs_schema_get_name@GNUTLS_3_4
