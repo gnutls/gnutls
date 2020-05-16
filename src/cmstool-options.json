@@ -1,0 +1,226 @@
+{
+  "format-version": "0.1.0",
+  "tool": {
+    "name": "cmstool",
+    "title": "GnuTLS CMS tool",
+    "description": "Manipulate Cryptographic Message Syntax files.",
+    "detail": "Tool to parse and generate CMS and PKCS#7 files.\n\nThe tool accepts files or supported URIs via the --infile option. In case PIN\nis required for URI access you can provide it using the environment variables GNUTLS_PIN \nand GNUTLS_SO_PIN.\n",
+    "short-usage": "cmstool [options]\ncmstool --help for usage instructions.\n"
+  },
+  "sections": [
+    {
+      "options": [
+        {
+          "long-option": "debug",
+          "short-option": "d",
+          "description": "Enable debugging",
+          "detail": "Specifies the debug level.",
+          "argument-range": {
+            "min": 0,
+            "max": 9999
+          },
+          "argument-type": "number"
+        },
+        {
+          "long-option": "verbose",
+          "short-option": "V",
+          "description": "More verbose output"
+        },
+        {
+          "long-option": "infile",
+          "description": "Input file",
+          "file-exists": true,
+          "argument-type": "file"
+        },
+        {
+          "long-option": "outfile",
+          "description": "Output file",
+          "argument-type": "string"
+        }
+      ]
+    },
+    {
+      "ref": "pkcs7-options",
+      "description": "PKCS#7 structure options",
+      "options": [
+        {
+          "long-option": "generate",
+          "description": "Generate a PKCS #7 structure",
+          "detail": "This option generates a PKCS #7 certificate container structure. To add certificates in the structure use --load-certificate and --load-crl."
+        },
+        {
+          "long-option": "sign",
+          "description": "Signs using a PKCS #7 structure",
+          "detail": "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The data are stored within the structure. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure."
+        },
+        {
+          "long-option": "detached-sign",
+          "description": "Signs using a detached PKCS #7 structure",
+          "detail": "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure."
+        },
+        {
+          "long-option": "include-cert",
+          "description": "The signer's certificate will be included in the cert list",
+          "detail": "This options works with --sign or --detached-sign and will include or exclude the signer's certificate into the generated signature.",
+          "enabled": true,
+          "disable-prefix": "no-"
+        },
+        {
+          "long-option": "time",
+          "description": "Will include a timestamp in the PKCS #7 structure",
+          "detail": "This option will include a timestamp in the generated signature",
+          "disable-prefix": "no-"
+        },
+        {
+          "long-option": "show-data",
+          "description": "Will show the embedded data in the PKCS #7 structure",
+          "detail": "This option can be combined with --verify or --info and will display the embedded signed data in the PKCS #7 structure.",
+          "disable-prefix": "no-"
+        },
+        {
+          "long-option": "info",
+          "description": "Print information on a PKCS #7 structure"
+        },
+        {
+          "long-option": "verify",
+          "description": "Verify the provided PKCS #7 structure",
+          "detail": "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. When no certificate list is provided, then the system's certificate list is used. Alternatively a direct signer can be provided using --load-certificate. A key purpose can be enforced with the --verify-purpose option, and the --load-data option will utilize detached data."
+        },
+        {
+          "long-option": "smime-to-cms",
+          "description": "Convert S/MIME to PKCS #7 structure"
+        }
+      ]
+    },
+    {
+      "ref": "other-options",
+      "description": "Other options",
+      "options": [
+        {
+          "long-option": "load-privkey",
+          "description": "Loads a private key file",
+          "detail": "This can be either a file or a PKCS #11 URL",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "load-pubkey",
+          "description": "Loads a public key file",
+          "detail": "This can be either a file or a PKCS #11 URL",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "load-certificate",
+          "description": "Loads a certificate file",
+          "detail": "This option can be used with a file",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "load-ca-certificate",
+          "description": "Loads the certificate authority's certificate file",
+          "detail": "This can be either a file or a PKCS #11 URL",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "load-crl",
+          "description": "Loads the provided CRL",
+          "detail": "This option can be used with a file",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "load-data",
+          "description": "Loads auxiliary data",
+          "detail": "This option can be used with a file",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "password",
+          "description": "Password to use",
+          "detail": "You can use this option to specify the password in the command line instead of reading it from the tty. Note, that the command line arguments are available for view in others in the system. Specifying password as '' is the same as specifying no password.",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "null-password",
+          "description": "Enforce a NULL password",
+          "detail": "This option enforces a NULL password. This is different than the empty or no password in schemas like PKCS #8."
+        },
+        {
+          "long-option": "empty-password",
+          "description": "Enforce an empty password",
+          "detail": "This option enforces an empty password. This is different than the NULL or no password in schemas like PKCS #8."
+        },
+        {
+          "long-option": "cprint",
+          "description": "In certain operations it prints the information in C-friendly format",
+          "detail": "In certain operations it prints the information in C-friendly format, suitable for including into C programs."
+        },
+        {
+          "long-option": "hash",
+          "description": "Hash algorithm to use for signing",
+          "detail": "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "salt-size",
+          "description": "Specify the RSA-PSS key default salt size",
+          "detail": "Typical keys shouldn't set or restrict this option.",
+          "argument-type": "number"
+        },
+        {
+          "long-option": "inder",
+          "description": "Use DER format for input certificates, private keys, and DH parameters ",
+          "detail": "The input files will be assumed to be in DER or RAW format. \nUnlike options that in PEM input would allow multiple input data (e.g. multiple \ncertificates), when reading in DER format a single data structure is read.",
+          "disable-prefix": "no-"
+        },
+        {
+          "long-option": "inraw",
+          "aliases": "inder"
+        },
+        {
+          "long-option": "outder",
+          "description": "Use DER format for output certificates, private keys, and DH parameters",
+          "detail": "The output will be in DER or RAW format.",
+          "disable-prefix": "no-"
+        },
+        {
+          "long-option": "outraw",
+          "aliases": "outder"
+        },
+        {
+          "long-option": "stdout-info",
+          "description": "Print information to stdout instead of stderr"
+        },
+        {
+          "long-option": "pkcs-cipher",
+          "description": "Cipher to use for PKCS #8 and #12 operations",
+          "detail": "Cipher may be one of 3des, 3des-pkcs12, aes-128, aes-192, aes-256, rc2-40, arcfour.",
+          "argument-type": "string",
+          "argument-name": "Cipher"
+        },
+        {
+          "long-option": "provider",
+          "description": "Specify the PKCS #11 provider library",
+          "detail": "This will override the default options in /etc/gnutls/pkcs11.conf",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "verify-purpose",
+          "description": "Specify a purpose OID to be used for certificate chain verification",
+          "detail": "This object identifier restricts the purpose of the certificates to be verified. Example purposes are 1.3.6.1.5.5.7.3.1 (TLS WWW), 1.3.6.1.5.5.7.3.4 (EMAIL) etc. Note that a CA certificate without a purpose set (extended key usage) is valid for any purpose.",
+          "argument-type": "string"
+        },
+        {
+          "long-option": "verify-allow-broken",
+          "description": "Allow broken algorithms, such as MD5 for verification",
+          "detail": "This can be combined with --verify."
+        },
+        {
+          "long-option": "text",
+          "description": "Output textual information before PEM-encoded certificates, private keys, etc",
+          "detail": "Output textual information before PEM-encoded data",
+          "enabled": true,
+          "disable-prefix": "no-"
+        }
+      ]
+    }
+  ]
+}

@@ -26,7 +26,7 @@ MAINTAINERCLEANFILES = stamp_mans
 -include $(top_srcdir)/doc/doc.mk
 
 TOOLS_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
-	certtool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
+	certtool.1 cmstool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
 SRP_MANS = srptool.1
 DANE_MANS = danetool.1
 
@@ -62,6 +62,15 @@ certtool.1: $(top_srcdir)/src/certtool-options.json
 		--include see-also=$(top_srcdir)/doc/certtool-see-also.texi \
 		--include examples=$(top_srcdir)/doc/certtool-examples.texi \
 		--include files=$(top_srcdir)/doc/certtool-files.texi \
+		$< $@
+
+cmstool.1: $(top_srcdir)/doc/cmstool-see-also.texi $(top_srcdir)/doc/cmstool-examples.texi
+cmstool.1: $(top_srcdir)/src/cmstool-options.json
+	$(AM_V_GEN) PYTHONPATH='$(top_srcdir)/python' \
+		$(PYTHON) $(top_srcdir)/cligen/cli-docgen.py \
+		--format man $(CLIGEN_ARGS) \
+		--include see-also=$(top_srcdir)/doc/cmstool-see-also.texi \
+		--include examples=$(top_srcdir)/doc/cmstool-examples.texi \
 		$< $@
 
 ocsptool.1: $(top_srcdir)/doc/ocsptool-see-also.texi $(top_srcdir)/doc/ocsptool-examples.texi $(top_srcdir)/doc/ocsptool-description.texi

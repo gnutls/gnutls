@@ -25,6 +25,7 @@ OPTIONS_BUILT = \
 	gnutls-cli-options.c gnutls-cli-options.h \
 	gnutls-cli-debug-options.c gnutls-cli-debug-options.h \
 	certtool-options.c certtool-options.h \
+	cmstool-options.c cmstool-options.h \
 	danetool-options.c danetool-options.h \
 	p11tool-options.c p11tool-options.h \
 	tpmtool-options.c tpmtool-options.h \
@@ -33,12 +34,12 @@ OPTIONS_BUILT = \
 OPTIONS_JSON = \
 	certtool-options.json gnutls-cli-debug-options.json gnutls-cli-options.json tpmtool-options.json \
 	systemkey-tool-options.json srptool-options.json ocsptool-options.json p11tool-options.json \
-	danetool-options.json gnutls-serv-options.json psktool-options.json
+	danetool-options.json gnutls-serv-options.json psktool-options.json cmstool-options.json
 
 OPTIONS_STAMP = \
 	certtool-options.stamp gnutls-cli-debug-options.stamp gnutls-cli-options.stamp tpmtool-options.stamp \
 	systemkey-tool-options.stamp srptool-options.stamp ocsptool-options.stamp p11tool-options.stamp \
-	danetool-options.stamp gnutls-serv-options.stamp psktool-options.stamp
+	danetool-options.stamp gnutls-serv-options.stamp psktool-options.stamp cmstool-options.stamp
 
 BUILT_SOURCES = $(OPTIONS_BUILT)
 
@@ -55,7 +56,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../libdane/includes		\
 	-I$(srcdir)/../extra/includes
 
-bin_PROGRAMS = psktool gnutls-cli-debug certtool gnutls-serv gnutls-cli
+bin_PROGRAMS = psktool gnutls-cli-debug certtool cmstool gnutls-serv gnutls-cli
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
@@ -157,6 +158,7 @@ endif
 
 
 certtool_SOURCES = certtool.c certtool-common.c certtool-extras.c common.c
+certtool_SOURCES += cmstool-common.h cmstool-common.c
 certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la gl/libgnu_gpl.la
 
@@ -167,6 +169,17 @@ libcmd_certtool_la_LIBADD += $(COMMON_LIBS)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE) gl/libgnu_gpl.la
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
+cmstool_SOURCES = cmstool.c certtool-common.c common.c
+cmstool_SOURCES += cmstool-common.h cmstool-common.c
+cmstool_LDADD = ../lib/libgnutls.la
+cmstool_LDADD += libcmd-cmstool.la ../gl/libgnu.la gl/libgnu_gpl.la
+
+noinst_LTLIBRARIES += libcmd-cmstool.la
+libcmd_cmstool_la_SOURCES = cmstool-options.c cmstool-options.h
+libcmd_cmstool_la_LIBADD = libcerttool-cfg.la ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la
+libcmd_cmstool_la_LIBADD += $(COMMON_LIBS)
+libcmd_cmstool_la_LIBADD += $(LTLIBREADLINE) gl/libgnu_gpl.la
+libcmd_cmstool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c socket.c
 danetool_LDADD = ../lib/libgnutls.la  $(LIBIDN_LIBS)
@@ -268,6 +281,7 @@ gnutls-cli-options.stamp: gnutls-cli-options.json
 gnutls-serv-options.stamp: gnutls-serv-options.json
 srptool-options.stamp: srptool-options.json
 certtool-options.stamp: certtool-options.json
+cmstool-options.stamp: cmstool-options.json
 systemkey-tool-options.stamp: systemkey-tool-options.json
 
 danetool-options.c danetool-options.h: danetool-options.stamp
@@ -280,6 +294,7 @@ gnutls-cli-options.c gnutls-cli-options.h: gnutls-cli-options.stamp
 gnutls-serv-options.c gnutls-serv-options.h: gnutls-serv-options.stamp
 srptool-options.c srptool-options.h: srptool-options.stamp
 certtool-options.c certtool-options.h: certtool-options.stamp
+cmstool-options.c cmstool-options.h: cmstool-options.stamp
 systemkey-tool-options.c systemkey-tool-options.h: systemkey-tool-options.stamp
 
 mech-list.h: gen-mech-list.sh

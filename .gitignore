@@ -121,6 +121,7 @@ doc/latex/gnutls.lot
 doc/Makefile
 doc/Makefile.in
 doc/manpages/certtool.1
+doc/manpages/cmstool.1
 doc/manpages/dane_*.3
 doc/manpages/danetool.1
 doc/manpages/gnutls_*.3
@@ -280,6 +281,9 @@ src/certtool-options.c
 src/certtool-options.h
 src/cli-cfg.c
 src/cli-cfg.h
+src/cmstool
+src/cmstool-options.c
+src/cmstool-options.h
 src/dumpcfg
 src/gnutls-cli-options.c
 src/gnutls-cli-options.h
@@ -300,6 +304,7 @@ src/libcerttool-cfg.la
 src/libcmd-certtool.la
 src/libcmd-cli-debug.la
 src/libcmd-cli.la
+src/libcmd-cmstool.la
 src/libcmd-danetool.la
 src/libcmd-ocsp.la
 src/libcmd-p11tool.la
