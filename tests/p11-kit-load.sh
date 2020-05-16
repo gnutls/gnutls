@@ -26,6 +26,7 @@
 : ${DIFF=diff}
 : ${PKG_CONFIG=pkg-config}
 TMP_SOFTHSM_DIR="./softhsm-load.$$.tmp"
+TMP_SOFTHSM_REMOTE_DIR="./softhsm-remote.$$.tmp"
 P11DIR="p11-kit-conf.$$.tmp"
 PIN=1234
 PUK=1234
@@ -64,8 +65,8 @@ if ! test -f "${SOFTHSM_MODULE}"; then
 	exit 77
 fi
 
-# Create pkcs11.conf with two modules, a trusted (p11-kit-trust)
-# and softhsm (not trusted)
+# Create pkcs11.conf with three modules, a trusted (p11-kit-trust)
+# and two non-trusted softhsm modules (local and remote)
 mkdir -p ${P11DIR}
 
 cat <<_EOF_ >${P11DIR}/p11-kit-trust.module
@@ -77,7 +78,11 @@ cat <<_EOF_ >${P11DIR}/softhsm.module
 module: libsofthsm2.so
 _EOF_
 
-# Setup softhsm
+cat <<_EOF_ >${P11DIR}/softhsm-remote.module
+remote: |env - SOFTHSM2_CONF=${TMP_SOFTHSM_REMOTE_DIR}/conf p11-kit remote ${SOFTHSM_MODULE}
+_EOF_
+
+# Setup local softhsm
 rm -rf ${TMP_SOFTHSM_DIR}
 mkdir -p ${TMP_SOFTHSM_DIR}
 SOFTHSM2_CONF=${TMP_SOFTHSM_DIR}/conf
@@ -97,15 +102,48 @@ if test $? != 0; then
 	exit 1
 fi
 
+# Setup remote softhsm
+rm -rf ${TMP_SOFTHSM_REMOTE_DIR}
+mkdir -p ${TMP_SOFTHSM_REMOTE_DIR}
+SOFTHSM2_CONF=${TMP_SOFTHSM_REMOTE_DIR}/conf
+export SOFTHSM2_CONF
+echo "objectstore.backend = file" > "${SOFTHSM2_CONF}"
+echo "directories.tokendir = ${TMP_SOFTHSM_REMOTE_DIR}" >> "${SOFTHSM2_CONF}"
+
+softhsm2-util --init-token --slot 0 --label "GnuTLS-Remote" --so-pin "${PUK}" --pin "${PIN}" >/dev/null #2>&1
+if test $? != 0; then
+	echo "failed to initialize softhsm"
+	exit 1
+fi
+
+GNUTLS_PIN="${PIN}" ${P11TOOL} --login --label GnuTLS-Test-RSA --generate-privkey rsa --provider "${SOFTHSM_MODULE}" pkcs11: --outfile /dev/null
+if test $? != 0; then
+	echo "failed to generate privkey"
+	exit 1
+fi
+
+# Use the local softhsm configuration throughout the tests, unless
+# explicitly specified with the module configuration
+SOFTHSM2_CONF=${TMP_SOFTHSM_DIR}/conf
+export SOFTHSM2_CONF
+
 FILTERTOKEN="sed s/token=.*//g"
 
 # Check whether both are listed
-
 nr=$(${builddir}/pkcs11/list-tokens -o ${P11DIR} -a|${FILTERTOKEN}|sort -u|wc -l)
+#nr=$(${P11TOOL} --list-tokens|grep 'Module:'|sort -u|wc -l)
+if test "$nr" != 3;then
+	echo "Error: did not find 3 modules ($nr)"
+	${builddir}/pkcs11/list-tokens -o ${P11DIR} -a
+	exit 1
+fi
+
+# Check whether duplicate modules are filtered
+nr=$(${builddir}/pkcs11/list-tokens -o ${P11DIR} -a -i|${FILTERTOKEN}|sort -u|wc -l)
 #nr=$(${P11TOOL} --list-tokens|grep 'Module:'|sort -u|wc -l)
 if test "$nr" != 2;then
 	echo "Error: did not find 2 modules ($nr)"
-	${builddir}/pkcs11/list-tokens -o ${P11DIR}
+	${builddir}/pkcs11/list-tokens -o ${P11DIR} -a -i
 	exit 1
 fi
 
@@ -123,8 +161,8 @@ fi
 # Check whether both modules are found when gnutls_pkcs11_init
 # is not called but a pkcs11 operation is called.
 nr=$(${builddir}/pkcs11/list-tokens -o ${P11DIR} -d|${FILTERTOKEN}|sort -u|wc -l)
-if test "$nr" != 2;then
-	echo "Error in test 1: did not find 2 modules"
+if test "$nr" != 3;then
+	echo "Error in test 1: did not find 3 modules"
 	${builddir}/pkcs11/list-tokens -o ${P11DIR} -d
 	exit 1
 fi
@@ -132,8 +170,8 @@ fi
 # Check whether both modules are found when gnutls_pkcs11_init 
 # is called with the auto flag
 nr=$(${builddir}/pkcs11/list-tokens -o ${P11DIR} -a|${FILTERTOKEN}|sort -u|wc -l)
-if test "$nr" != 2;then
-	echo "Error in test 2: did not find 2 modules"
+if test "$nr" != 3;then
+	echo "Error in test 2: did not find 3 modules"
 	${builddir}/pkcs11/list-tokens -o ${P11DIR} -a
 	exit 1
 fi

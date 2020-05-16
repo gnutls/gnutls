@@ -228,7 +228,8 @@ static int scan_slots(struct gnutls_pkcs11_provider_st *p,
 }
 
 static int
-pkcs11_add_module(const char* name, struct ck_function_list *module, unsigned custom_init, const char *params)
+pkcs11_add_module(const char* name, struct ck_function_list *module,
+		  unsigned custom_init, const char *params, unsigned flags)
 {
 	unsigned int i;
 	struct ck_info info;
@@ -241,13 +242,15 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, unsigned cu
 	memset(&info, 0, sizeof(info));
 	pkcs11_get_module_info(module, &info);
 
-	/* initially check if this module is a duplicate */
-	for (i = 0; i < active_providers; i++) {
-		/* already loaded, skip the rest */
-		if (module == providers[i].module ||
-		    memcmp(&info, &providers[i].info, sizeof(info)) == 0) {
-			_gnutls_debug_log("p11: module %s is already loaded.\n", name);
-			return GNUTLS_E_INT_RET_0;
+	if (flags & GNUTLS_PKCS11_FLAG_IGNORE_DUPLICATE) {
+		/* initially check if this module is a duplicate */
+		for (i = 0; i < active_providers; i++) {
+			/* already loaded, skip the rest */
+			if (module == providers[i].module ||
+			    memcmp(&info, &providers[i].info, sizeof(info)) == 0) {
+				_gnutls_debug_log("p11: module %s is already loaded.\n", name);
+				return GNUTLS_E_INT_RET_0;
+			}
 		}
 	}
 
@@ -415,7 +418,7 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 		return pkcs11_rv_to_err(ret);
 	}
 
-	ret = pkcs11_add_module(name, module, custom_init, params);
+	ret = pkcs11_add_module(name, module, custom_init, params, 0);
 	if (ret != 0) {
 		if (ret == GNUTLS_E_INT_RET_0)
 			ret = 0;
@@ -925,13 +928,13 @@ static void compat_load(const char *configfile)
 	return;
 }
 
-static int auto_load(unsigned trusted)
+static int auto_load(unsigned flags)
 {
 	struct ck_function_list **modules;
 	int i, ret;
 	char* name;
 
-	modules = p11_kit_modules_load_and_initialize(trusted?P11_KIT_MODULE_TRUSTED:0);
+	modules = p11_kit_modules_load_and_initialize((flags & GNUTLS_PKCS11_FLAG_AUTO_TRUSTED)?P11_KIT_MODULE_TRUSTED:0);
 	if (modules == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log
@@ -945,7 +948,7 @@ static int auto_load(unsigned trusted)
 		_gnutls_debug_log
 			    ("p11: Initializing module: %s\n", name);
 
-		ret = pkcs11_add_module(name, modules[i], 0, NULL);
+		ret = pkcs11_add_module(name, modules[i], 0, NULL, flags);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log
@@ -1004,7 +1007,7 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 		return 0;
 	 } else if (flags & GNUTLS_PKCS11_FLAG_AUTO) {
 		if (deprecated_config_file == NULL)
-			ret = auto_load(0);
+			ret = auto_load(flags);
 
 		compat_load(deprecated_config_file);
 
@@ -1012,7 +1015,7 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 
 		return ret;
 	} else if (flags & GNUTLS_PKCS11_FLAG_AUTO_TRUSTED) {
-		ret = auto_load(1);
+		ret = auto_load(flags);
 
 		providers_initialized = PROV_INIT_TRUSTED;
 

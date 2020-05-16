@@ -23,6 +23,7 @@
 #include <config.h>
 #endif
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,6 +64,8 @@ int main(int argc, char **argv)
 	gnutls_pkcs11_privkey_t key;
 	unsigned flag = 1;
 	unsigned int status;
+	bool need_init = false;
+	unsigned init_flags = 0;
 
 	ret = gnutls_global_init();
 	if (ret != 0) {
@@ -73,7 +76,7 @@ int main(int argc, char **argv)
 	gnutls_global_set_log_function(tls_log_func);
 	//gnutls_global_set_log_level(4711);
 
-	while((opt = getopt(argc, argv, "s:o:mvatdp")) != -1) {
+	while((opt = getopt(argc, argv, "s:o:mvatdpi")) != -1) {
 		switch(opt) {
 			case 'o':
 				mod = strdup(optarg);
@@ -81,11 +84,8 @@ int main(int argc, char **argv)
 				break;
 			case 'm':
 				/* initialize manually - i.e., do no module loading */
-				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
-				if (ret != 0) {
-					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
-					exit(1);
-				}
+				need_init = true;
+				init_flags |= GNUTLS_PKCS11_FLAG_MANUAL;
 				break;
 			case 's':
 				/* load module */
@@ -108,19 +108,17 @@ int main(int argc, char **argv)
 				break;
 			case 'a':
 				/* initialize auto - i.e., do module loading */
-				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
-				if (ret != 0) {
-					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
-					exit(1);
-				}
+				need_init = true;
+				init_flags |= GNUTLS_PKCS11_FLAG_AUTO;
 				break;
 			case 't':
 				/* do trusted module loading */
-				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO_TRUSTED, NULL);
-				if (ret != 0) {
-					fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
-					exit(1);
-				}
+				need_init = true;
+				init_flags |= GNUTLS_PKCS11_FLAG_AUTO_TRUSTED;
+				break;
+			case 'i':
+				/* ignore duplicate modules */
+				init_flags |= GNUTLS_PKCS11_FLAG_IGNORE_DUPLICATE;
 				break;
 			case 'v':
 				/* do verification which should trigger trusted module loading */
@@ -139,6 +137,13 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (need_init) {
+		ret = gnutls_pkcs11_init(init_flags, NULL);
+		if (ret != 0) {
+			fprintf(stderr, "error at %d: %s\n", __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+	}
 
 	for (i=0;;i++) {
 		ret = _gnutls_pkcs11_token_get_url(i, 0, &url, flag);
