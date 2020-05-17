@@ -85,6 +85,9 @@ static const TLS_TEST tls_tests[] = {
 	 test_send_record_with_allow_small_records, "yes", "no", "dunno"},
 #ifdef ENABLE_SSL3
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
+	/* The following test will disable extensions if the server
+	 * does support SSL 3.0, but only incompletely and without
+	 * extensions. */
 	{"for SSL 3.0 with extensions", test_ssl3_with_extensions, "yes", "no", "dunno"},
 	{"for SSL 3.0 with cipher suites not in SSL 3.0 spec",
 	 test_ssl3_unknown_ciphersuites, "yes", "no", "dunno"},
