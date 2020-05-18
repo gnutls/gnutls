@@ -510,6 +510,7 @@ APIMANS += gnutls_ocsp_status_request_enable_client.3
 APIMANS += gnutls_ocsp_status_request_get.3
 APIMANS += gnutls_ocsp_status_request_get2.3
 APIMANS += gnutls_ocsp_status_request_is_checked.3
+APIMANS += gnutls_oid_to_cipher.3
 APIMANS += gnutls_oid_to_digest.3
 APIMANS += gnutls_oid_to_ecc_curve.3
 APIMANS += gnutls_oid_to_gost_paramset.3

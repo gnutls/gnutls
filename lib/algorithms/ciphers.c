@@ -41,6 +41,7 @@
 static const cipher_entry_st algorithms[] = {
 	{ .name = "AES-256-CBC",
 	  .id = GNUTLS_CIPHER_AES_256_CBC,
+	  .oid = AES_256_CBC_OID,
 	  .blocksize = 16,
 	  .keysize = 32,
 	  .type = CIPHER_BLOCK,
@@ -48,6 +49,7 @@ static const cipher_entry_st algorithms[] = {
 	  .cipher_iv = 16},
 	{ .name = "AES-192-CBC",
 	  .id = GNUTLS_CIPHER_AES_192_CBC,
+	  .oid = AES_192_CBC_OID,
 	  .blocksize = 16,
 	  .keysize = 24,
 	  .type = CIPHER_BLOCK,
@@ -322,6 +324,7 @@ static const cipher_entry_st algorithms[] = {
 	  .cipher_iv = 16},
 	{ .name = "3DES-CBC",
 	  .id = GNUTLS_CIPHER_3DES_CBC,
+	  .oid = DES_EDE3_CBC_OID,
 	  .blocksize = 8,
 	  .keysize = 24,
 	  .type = CIPHER_BLOCK,
@@ -329,6 +332,7 @@ static const cipher_entry_st algorithms[] = {
 	  .cipher_iv = 8},
 	{ .name = "DES-CBC",
 	  .id = GNUTLS_CIPHER_DES_CBC,
+	  .oid = DES_CBC_OID,
 	  .blocksize = 8,
 	  .keysize = 8,
 	  .type = CIPHER_BLOCK,
@@ -336,11 +340,13 @@ static const cipher_entry_st algorithms[] = {
 	  .cipher_iv = 8},
 	{ .name = "ARCFOUR-40",
 	  .id = GNUTLS_CIPHER_ARCFOUR_40,
+	  .oid = RC4_CBC_OID,
 	  .blocksize = 1,
 	  .keysize = 5,
 	  .type = CIPHER_STREAM},
 	{ .name = "RC2-40",
 	  .id = GNUTLS_CIPHER_RC2_40_CBC,
+	  .oid = RC2_CBC_OID,
 	  .blocksize = 8,
 	  .keysize = 5,
 	  .type = CIPHER_BLOCK,
@@ -526,4 +532,29 @@ const gnutls_cipher_algorithm_t *gnutls_cipher_list(void)
 	}
 
 	return supported_ciphers;
+}
+
+/**
+ * gnutls_oid_to_cipher:
+ * @oid: is an object identifier
+ *
+ * Converts a textual object identifier to a #gnutls_cipher_algorithm_t value.
+ *
+ * Returns: a #gnutls_cipher_algorithm_t id of the specified cipher
+ *   algorithm, or %GNUTLS_CIPHER_UNKNOWN on failure.
+ *
+ * Since: 3.7.0
+ **/
+gnutls_cipher_algorithm_t gnutls_oid_to_cipher(const char *oid)
+{
+	GNUTLS_CIPHER_LOOP(
+		if (p->oid && strcmp(oid, p->oid) == 0) {
+			if (_gnutls_cipher_exists(p->id)) {
+				return p->id;
+			}
+			break;
+		}
+	);
+
+	return GNUTLS_CIPHER_UNKNOWN;
 }

@@ -1421,6 +1421,8 @@ gnutls_ecc_curve_t
 	gnutls_oid_to_ecc_curve(const char *oid) __GNUTLS_CONST__;
 gnutls_gost_paramset_t
 	gnutls_oid_to_gost_paramset(const char *oid) __GNUTLS_CONST__;
+gnutls_cipher_algorithm_t
+	gnutls_oid_to_cipher(const char *oid) __GNUTLS_CONST__;
 
   /* list supported algorithms */
 const gnutls_ecc_curve_t *

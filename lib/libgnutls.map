@@ -1338,6 +1338,7 @@ GNUTLS_3_7_0
 	gnutls_handshake_set_read_function;
 	gnutls_handshake_set_secret_function;
 	gnutls_handshake_write;
+	gnutls_oid_to_cipher;
 	gnutls_pkcs7_digest;
 	gnutls_pkcs7_get_digest_algo;
 	gnutls_pkcs7_verify_digest;

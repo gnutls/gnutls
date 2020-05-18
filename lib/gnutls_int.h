@@ -632,6 +632,7 @@ typedef struct record_parameters_st record_parameters_st;
 typedef struct cipher_entry_st {
 	const char *name;
 	gnutls_cipher_algorithm_t id;
+	const char *oid;
 	uint16_t blocksize;
 	uint16_t keysize;
 	cipher_type_t type;
