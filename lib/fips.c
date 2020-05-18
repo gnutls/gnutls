@@ -102,14 +102,13 @@ unsigned _gnutls_fips_mode_enabled(void)
 		else f1p = 0;
 	}
 
-	f2p = !access(FIPS_SYSTEM_FILE, F_OK);
-
-	if (f1p != 0 && f2p != 0) {
+	if (f1p != 0) {
 		_gnutls_debug_log("FIPS140-2 mode enabled\n");
 		ret = GNUTLS_FIPS140_STRICT;
 		goto exit;
 	}
 
+	f2p = !access(FIPS_SYSTEM_FILE, F_OK);
 	if (f2p != 0) {
 		/* a funny state where self tests are performed
 		 * and ignored */
