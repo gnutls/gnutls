@@ -119,6 +119,8 @@ case "$host" in
   *mingw32* | *mingw64*)
     have_win=yes
     AC_DEFINE([_UNICODE], [1], [Defined to 1 for Unicode (wide chars) APIs])
+    LIB_CRYPT32="-lcrypt32"
+    AC_SUBST([LIB_CRYPT32])
   ;;
   *darwin*)
     have_macosx=yes
