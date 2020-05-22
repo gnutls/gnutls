@@ -1698,6 +1698,12 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t
 					unsigned int tl_flags,
 					unsigned int tl_vflags);
 
+typedef int gnutls_x509_trust_list_getissuer_function(gnutls_x509_trust_list_t tlist,
+						      const gnutls_x509_crt_t crt);
+
+void gnutls_x509_trust_list_set_getissuer_function(gnutls_x509_trust_list_t tlist,
+				gnutls_x509_trust_list_getissuer_function *func);
+
 void gnutls_certificate_set_trust_list
     (gnutls_certificate_credentials_t res,
      gnutls_x509_trust_list_t tlist, unsigned flags);

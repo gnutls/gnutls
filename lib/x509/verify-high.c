@@ -851,11 +851,10 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
 	return clist_size;
 }
 
-static
-int trust_list_get_issuer(gnutls_x509_trust_list_t list,
-				      gnutls_x509_crt_t cert,
-				      gnutls_x509_crt_t * issuer,
-				      unsigned int flags)
+int _gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
+				  gnutls_x509_crt_t cert,
+				  gnutls_x509_crt_t * issuer,
+				  unsigned int flags)
 {
 	int ret;
 	unsigned int i;
@@ -968,7 +967,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 {
 	int ret;
 
-	ret = trust_list_get_issuer(list, cert, issuer, flags);
+	ret = _gnutls_trust_list_get_issuer(list, cert, issuer, flags);
 	if (ret == 0) {
 		return 0;
 	}
@@ -1335,11 +1334,10 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	}
 
 	*voutput =
-	    _gnutls_verify_crt_status(cert_list, cert_list_size,
-					    list->node[hash].trusted_cas,
-					    list->
-					    node[hash].trusted_ca_size,
-					    flags, purpose, func);
+	    _gnutls_verify_crt_status(list, cert_list, cert_list_size,
+				      list->node[hash].trusted_cas,
+				      list->node[hash].trusted_ca_size,
+				      flags, purpose, func);
 	saved_output = *voutput;
 
 	if (SIGNER_OLD_OR_UNKNOWN(*voutput) &&
@@ -1357,11 +1355,10 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		 _gnutls_debug_log("issuer in verification was not found or insecure; trying against trust list\n");
 
 		*voutput =
-		    _gnutls_verify_crt_status(cert_list, cert_list_size,
-					    list->node[hash].trusted_cas,
-					    list->
-					    node[hash].trusted_ca_size,
-					    flags, purpose, func);
+		    _gnutls_verify_crt_status(list, cert_list, cert_list_size,
+					      list->node[hash].trusted_cas,
+					      list->node[hash].trusted_ca_size,
+					      flags, purpose, func);
 		if (*voutput != 0) {
 			if (SIGNER_WAS_KNOWN(saved_output))
 				*voutput = saved_output;
@@ -1375,10 +1372,10 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	if (SIGNER_OLD_OR_UNKNOWN(*voutput) && list->pkcs11_token) {
 		/* use the token for verification */
 
-		*voutput = _gnutls_pkcs11_verify_crt_status(list->pkcs11_token,
-								cert_list, cert_list_size,
-								purpose,
-								flags, func);
+		*voutput = _gnutls_pkcs11_verify_crt_status(list, list->pkcs11_token,
+							    cert_list, cert_list_size,
+							    purpose,
+							    flags, func);
 		if (*voutput != 0) {
 			if (SIGNER_WAS_KNOWN(saved_output))
 				*voutput = saved_output;

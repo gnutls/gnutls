@@ -39,8 +39,12 @@ struct gnutls_x509_trust_list_st {
 	 * will be deinitialized */
 	gnutls_x509_crt_t *keep_certs;
 	unsigned int keep_certs_size;
-	
+
 	char* pkcs11_token;
+
+	/* set this callback if the issuer in the certificate
+	 * chain is missing. */
+	gnutls_x509_trust_list_getissuer_function *issuer_callback;
 };
 
 int _gnutls_trustlist_inlist(gnutls_x509_trust_list_t list,
