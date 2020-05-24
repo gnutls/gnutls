@@ -438,10 +438,10 @@ _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
  * which are of the ANY.
  */
 int
-_gnutls_x509_set_raw_time(asn1_node c2, const char *where, time_t tim)
+_gnutls_x509_get_raw_time(time_t tim, gnutls_datum_t *out)
 {
 	char str_time[MAX_TIME];
-	uint8_t buf[128];
+	uint8_t *buf;
 	int result, len, der_len;
 	unsigned tag;
 
@@ -451,18 +451,22 @@ _gnutls_x509_set_raw_time(asn1_node c2, const char *where, time_t tim)
 		return gnutls_assert_val(result);
 	len = strlen(str_time);
 
+	buf = gnutls_malloc(1 + ASN1_MAX_LENGTH_SIZE + len);
+	if (buf == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
 	buf[0] = tag;
 	asn1_length_der(len, buf+1, &der_len);
 
-	if ((unsigned)len > sizeof(buf)-der_len-1) {
+	if (der_len > ASN1_MAX_LENGTH_SIZE) {
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
 	memcpy(buf+1+der_len, str_time, len);
 
-	result = asn1_write_value(c2, where, buf, len+1+der_len);
-	if (result != ASN1_SUCCESS)
-		return gnutls_assert_val(_gnutls_asn2err(result));
+	out->size = 1 + der_len + len;
+	out->data = buf;
+
 	return 0;
 }
 

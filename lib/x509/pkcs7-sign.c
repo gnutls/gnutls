@@ -1794,57 +1794,7 @@ static int write_signer_id(asn1_node c2, const char *root,
 	return 0;
 }
 
-static int add_attrs(asn1_node c2, const char *root, gnutls_pkcs7_attrs_t attrs,
-		     unsigned already_set)
-{
-	char name[256];
-	gnutls_pkcs7_attrs_st *p = attrs;
-	int result;
-
-	if (attrs == NULL) {
-		/* if there are no other attributes delete that field */
-		if (already_set == 0)
-			(void)asn1_write_value(c2, root, NULL, 0);
-	} else {
-		while (p != NULL) {
-			result = asn1_write_value(c2, root, "NEW", 1);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(result);
-			}
-
-			snprintf(name, sizeof(name), "%s.?LAST.type", root);
-			result = asn1_write_value(c2, name, p->oid, 1);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(result);
-			}
-
-			snprintf(name, sizeof(name), "%s.?LAST.values", root);
-			result = asn1_write_value(c2, name, "NEW", 1);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(result);
-			}
-
-			snprintf(name, sizeof(name), "%s.?LAST.values.?1",
-				 root);
-			result =
-			    asn1_write_value(c2, name, p->data.data,
-					     p->data.size);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(result);
-			}
-
-			p = p->next;
-		}
-	}
-
-	return 0;
-}
-
-static int write_attributes(asn1_node c2, const char *root,
+static int write_signed_attributes(asn1_node c2, const char *root,
 			    const gnutls_datum_t * data,
 			    const mac_entry_st * me,
 			    gnutls_pkcs7_attrs_t other_attrs, unsigned flags)
@@ -1863,70 +1813,29 @@ static int write_attributes(asn1_node c2, const char *root,
 		}
 
 		/* Add time */
-		result = asn1_write_value(c2, root, "NEW", 1);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(result);
-			return ret;
-		}
+		ret = _gnutls_x509_get_raw_time(gnutls_time(0), &tmp);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-		snprintf(name, sizeof(name), "%s.?LAST.type", root);
-		result = asn1_write_value(c2, name, ATTR_SIGNING_TIME, 1);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(result);
-			return ret;
-		}
+		ret = _gnutls_pkcs7_write_attr(c2, root, ATTR_SIGNING_TIME, &tmp);
+		_gnutls_free_datum(&tmp);
 
-		snprintf(name, sizeof(name), "%s.?LAST.values", root);
-		result = asn1_write_value(c2, name, "NEW", 1);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(result);
-			return ret;
-		}
-
-		snprintf(name, sizeof(name), "%s.?LAST.values.?1", root);
-		ret = _gnutls_x509_set_raw_time(c2, name, gnutls_time(0));
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
 		already_set = 1;
 	}
 
-	ret = add_attrs(c2, root, other_attrs, already_set);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+	if (other_attrs || !already_set) {
+		ret = _gnutls_pkcs7_write_attrs(c2, root, other_attrs);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	if (already_set != 0 || other_attrs != NULL) {
 		/* Add content type */
-		result = asn1_write_value(c2, root, "NEW", 1);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(result);
-			return ret;
-		}
-
-		snprintf(name, sizeof(name), "%s.?LAST.type", root);
-		result = asn1_write_value(c2, name, ATTR_CONTENT_TYPE, 1);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(result);
-			return ret;
-		}
-
-		snprintf(name, sizeof(name), "%s.?LAST.values", root);
-		result = asn1_write_value(c2, name, "NEW", 1);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			ret = _gnutls_asn2err(result);
-			return ret;
-		}
-
 		ret =
 		    _gnutls_x509_get_raw_field(c2,
 					       "encapContentInfo.eContentType",
@@ -1936,13 +1845,10 @@ static int write_attributes(asn1_node c2, const char *root,
 			return ret;
 		}
 
-		snprintf(name, sizeof(name), "%s.?LAST.values.?1", root);
-		result = asn1_write_value(c2, name, tmp.data, tmp.size);
+		ret = _gnutls_pkcs7_write_attr(c2, root, ATTR_CONTENT_TYPE, &tmp);
 		gnutls_free(tmp.data);
-
-		if (result != ASN1_SUCCESS) {
+		if (ret < 0) {
 			gnutls_assert();
-			ret = _gnutls_asn2err(result);
 			return ret;
 		}
 
@@ -2136,15 +2042,15 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	}
 
 	ret =
-	    add_attrs(pkcs7->content_data, "signerInfos.?LAST.unsignedAttrs",
-		      unsigned_attrs, 0);
+	    _gnutls_pkcs7_write_attrs(pkcs7->content_data, "signerInfos.?LAST.unsignedAttrs",
+		      unsigned_attrs);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret =
-	    write_attributes(pkcs7->content_data,
+	    write_signed_attributes(pkcs7->content_data,
 			     "signerInfos.?LAST.signedAttrs", data, me,
 			     signed_attrs, flags);
 	if (ret < 0) {

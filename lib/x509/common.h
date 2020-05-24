@@ -135,7 +135,7 @@ const char *_gnutls_oid_get_asn_desc(const char *oid);
 int _gnutls_x509_set_time(asn1_node c2, const char *where, time_t tim,
 			  int force_general);
 int
-_gnutls_x509_set_raw_time(asn1_node c2, const char *where, time_t tim);
+_gnutls_x509_get_raw_time(time_t tim, gnutls_datum_t *out);
 
 int _gnutls_x509_decode_string(unsigned int etype,
 			       const uint8_t * der, size_t der_size,

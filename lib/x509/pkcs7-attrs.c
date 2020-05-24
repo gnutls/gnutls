@@ -32,6 +32,7 @@
 #include <x509_b64.h>
 #include <gnutls/abstract.h>
 #include <gnutls/pkcs7.h>
+#include <pkcs7_int.h>
 
 /**
  * gnutls_pkcs7_add_attr:
@@ -159,4 +160,64 @@ void gnutls_pkcs7_attrs_deinit(gnutls_pkcs7_attrs_t list)
 		gnutls_free(r);
 		r = next;
 	}
+}
+
+int _gnutls_pkcs7_write_attr(asn1_node c2, const char *root, const char *oid, gnutls_datum_t *data)
+{
+	char name[256];
+	int result;
+
+	result = asn1_write_value(c2, root, "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	snprintf(name, sizeof(name), "%s.?LAST.type", root);
+	result = asn1_write_value(c2, name, oid, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	snprintf(name, sizeof(name), "%s.?LAST.values", root);
+	result = asn1_write_value(c2, name, "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	snprintf(name, sizeof(name), "%s.?LAST.values.?1",
+			root);
+	result = asn1_write_value(c2, name, data->data,
+			data->size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+int _gnutls_pkcs7_write_attrs(asn1_node c2, const char *root, gnutls_pkcs7_attrs_t attrs)
+{
+	gnutls_pkcs7_attrs_st *p = attrs;
+	int result;
+
+	if (attrs == NULL) {
+		/* if there are no other attributes delete that field */
+		(void)asn1_write_value(c2, root, NULL, 0);
+	} else {
+		while (p != NULL) {
+			result = _gnutls_pkcs7_write_attr(c2, root, p->oid, &p->data);
+			if (result < 0) {
+				gnutls_assert();
+				return result;
+			}
+
+			p = p->next;
+		}
+	}
+
+	return 0;
 }

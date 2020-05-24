@@ -134,4 +134,7 @@ _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pkcs_ciphe
 int _gnutls_pkcs7_decode_signed_data(gnutls_pkcs7_t pkcs7);
 int _gnutls_pkcs7_decode_digested_data(gnutls_pkcs7_t pkcs7);
 
+int _gnutls_pkcs7_write_attr(asn1_node c2, const char *root, const char *oid, gnutls_datum_t *data);
+int _gnutls_pkcs7_write_attrs(asn1_node c2, const char *root, gnutls_pkcs7_attrs_t attrs);
+
 #endif /* GNUTLS_LIB_X509_PKCS7_INT_H */
