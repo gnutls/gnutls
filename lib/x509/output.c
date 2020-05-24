@@ -1262,6 +1262,22 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 			 critical ? _("critical") : _("not critical"));
 
 		print_issuer_sign_tool(str, prefix, der);
+	} else if (strcmp(oid, "2.5.4.3") == 0) {
+		int ret;
+		gnutls_datum_t tmp = {NULL, 0};
+
+		addf(str, _("%s\t\tCommon Name (%s):\n"),
+				prefix,
+				critical ? _("critical") : _("not critical"));
+
+		ret = _gnutls_x509_decode_string(ASN1_ETYPE_PRINTABLE_STRING, der->data, der->size, &tmp, 0);
+		if (ret < 0) {
+			addf(str, "error: x509_decode_string: %s\n",
+					gnutls_strerror(ret));
+		} else {
+			addf(str, "%s\t\t\t%s\n", prefix, tmp.data);
+			gnutls_free(tmp.data);
+		}
 	} else {
 		addf(str, _("%s\t\tUnknown extension %s (%s):\n"),
 		     prefix, oid,
