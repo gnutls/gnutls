@@ -448,7 +448,9 @@ print_aki_gn_serial(gnutls_buffer_st * str, gnutls_x509_aki_t aki)
 	err =
 	    gnutls_x509_aki_get_cert_issuer(aki,
 					    0, &alt_type, &san, &other_oid, &serial);
-	if (err < 0) {
+	if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		return;
+	} else if (err < 0) {
 		addf(str, "error: gnutls_x509_aki_get_cert_issuer: %s\n",
 		     gnutls_strerror(err));
 		return;
@@ -481,10 +483,11 @@ static void print_aki(gnutls_buffer_st * str, gnutls_datum_t *der)
 		goto cleanup;
 	}
 
+	/* Check if an alternative name is there */
+	print_aki_gn_serial(str, aki);
+
 	err = gnutls_x509_aki_get_id(aki, &id);
 	if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-		/* Check if an alternative name is there */
-		print_aki_gn_serial(str, aki);
 		goto cleanup;
 	} else if (err < 0) {
 		addf(str, "error: gnutls_x509_aki_get_id: %s\n",
