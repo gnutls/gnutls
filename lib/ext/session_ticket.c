@@ -787,15 +787,17 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 		ret = GNUTLS_E_MEMORY_ERROR;
 		goto error;
 	}
-	priv->session_ticket =
-	    gnutls_realloc_fast(priv->session_ticket, ticket_len);
-	if (!priv->session_ticket) {
-		gnutls_free(priv);
-		gnutls_assert();
-		ret = GNUTLS_E_MEMORY_ERROR;
-		goto error;
+	if (ticket_len > 0) {
+		priv->session_ticket =
+		    gnutls_realloc_fast(priv->session_ticket, ticket_len);
+		if (!priv->session_ticket) {
+			gnutls_free(priv);
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto error;
+		}
+		memcpy(priv->session_ticket, p, ticket_len);
 	}
-	memcpy(priv->session_ticket, p, ticket_len);
 	priv->session_ticket_len = ticket_len;
 	epriv = priv;
 
