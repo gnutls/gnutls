@@ -270,7 +270,7 @@ gnutls_privkey_t load_private_key(int mand, common_info_st * info)
 	if (gnutls_url_is_supported(info->privkey) != 0)
 		return _load_url_privkey(info->privkey);
 
-	dat.data = (void *) read_binary_file(info->privkey, &size);
+	dat.data = (void *) read_file(info->privkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -313,7 +313,7 @@ load_x509_private_key(int mand, common_info_st * info)
 		app_exit(1);
 	}
 
-	dat.data = (void *) read_binary_file(info->privkey, &size);
+	dat.data = (void *) read_file(info->privkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -519,7 +519,7 @@ gnutls_x509_crq_t load_request(common_info_st * info)
 		app_exit(1);
 	}
 
-	dat.data = (void *) read_binary_file(info->request, &size);
+	dat.data = (void *) read_file(info->request, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -560,7 +560,7 @@ gnutls_privkey_t load_ca_private_key(common_info_st * info)
 	if (gnutls_url_is_supported(info->ca_privkey) != 0)
 		return _load_url_privkey(info->ca_privkey);
 
-	dat.data = (void *) read_binary_file(info->ca_privkey, &size);
+	dat.data = (void *) read_file(info->ca_privkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -610,7 +610,7 @@ gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 		return crt;
 	}
 
-	dat.data = (void *) read_binary_file(info->ca, &size);
+	dat.data = (void *) read_file(info->ca, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -657,7 +657,7 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 		app_exit(1);
 	}
 
-	dat.data = (void *) read_binary_file(info->pubkey, &size);
+	dat.data = (void *) read_file(info->pubkey, RF_BINARY, &size);
 	dat.size = size;
 
 	if (!dat.data) {
@@ -1090,7 +1090,7 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 		app_exit(1);
 	}
 
-	params.data = (void *) fread_file(infile, &size);
+	params.data = (void *) fread_file(infile, 0, &size);
 	params.size = size;
 
 	if (params.data == NULL) {

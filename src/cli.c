@@ -1036,7 +1036,7 @@ static int try_resume(socket_st * hd)
 			fprintf(stderr, "could not open %s\n", OPT_ARG(EARLYDATA));
 			exit(1);
 		}
-		edata.data = (void *) fread_file(fp, &size);
+		edata.data = (void *) fread_file(fp, 0, &size);
 		edata.size = size;
 		fclose(fp);
 	}

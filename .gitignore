@@ -189,7 +189,8 @@ fuzz/*_fuzzer
 *.gcda
 *.gcno
 *.gcov
-gl
+/gl/*
+!/gl/override
 /GNUmakefile
 GnuTLS-*-coverage/
 gnutls-*.tar.*

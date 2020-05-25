@@ -55,6 +55,8 @@ typedef int ssize_t;
 
 #include <nettle/memxor.h>
 
+#include "attribute.h"
+
 #define ENABLE_ALIGN16
 
 #ifdef __clang_major
@@ -74,26 +76,6 @@ typedef int ssize_t;
 #else
 # define likely
 # define unlikely
-#endif
-
-#if _GNUTLS_GCC_VERSION >= 30300
-# define attr_nonnull_all __attribute__ ((nonnull))
-# define attr_nonnull(a)  __attribute__ ((nonnull a))
-#else
-# define attr_nonnull_all
-# define attr_nonnull(a)
-#endif
-
-#if _GNUTLS_GCC_VERSION >= 30400 && (_GNUTLS_CLANG_VERSION == 0 || _GNUTLS_CLANG_VERSION >= 40000)
-# define attr_warn_unused_result __attribute__((warn_unused_result))
-#else
-# define attr_warn_unused_result
-#endif
-
-#if _GNUTLS_GCC_VERSION >= 70100
-# define FALLTHROUGH __attribute__ ((fallthrough))
-#else
-# define FALLTHROUGH
 #endif
 
 #include <gnutls/gnutls.h>

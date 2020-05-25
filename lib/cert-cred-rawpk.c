@@ -292,7 +292,7 @@ int gnutls_certificate_set_rawpk_key_file(gnutls_certificate_credentials_t cred,
 
 	} else {
 		/* Read our raw public-key into memory from file */
-		rawpubkey.data = (void*) read_binary_file(rawpkfile, &key_size);
+		rawpubkey.data = (void*) read_file(rawpkfile, RF_BINARY, &key_size);
 		if (rawpubkey.data == NULL) {
 			gnutls_privkey_deinit(privkey);
 

@@ -1104,7 +1104,6 @@ AC_DEFINE([GNUTLS_INTERNAL_BUILD], 1, [We allow temporarily usage of deprecated 
 
 AC_DEFINE([fread_file], [_gnutls_fread_file], [static lib rename])
 AC_DEFINE([read_file], [_gnutls_read_file], [static lib rename])
-AC_DEFINE([read_binary_file], [_gnutls_read_binary_file], [static lib rename])
 
 dnl configuration options for config file parsing (inih)
 AC_DEFINE([INI_MAX_LINE], 2048, [inih maximum line size])
