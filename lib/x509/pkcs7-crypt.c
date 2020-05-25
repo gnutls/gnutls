@@ -1125,11 +1125,9 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	gnutls_datum_t enc = { NULL, 0 };
 	uint8_t *key = NULL;
 	gnutls_datum_t dkey, d_iv;
-	gnutls_cipher_hd_t ch = NULL;
 	int key_size, ret;
 	unsigned int pass_len = 0;
 	const struct pkcs_cipher_schema_st *p;
-	unsigned block_size;
 	const cipher_entry_st *ce;
 	char *password;
 
@@ -1206,22 +1204,6 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	}
 
 	ce = cipher_to_entry(enc_params->cipher);
-	block_size = _gnutls_cipher_get_block_size(ce);
-
-	if (ce->type == CIPHER_BLOCK) {
-		if (enc.size % block_size != 0 || (unsigned)enc_params->iv_size != block_size) {
-			gnutls_assert();
-			ret = GNUTLS_E_DECRYPTION_FAILED;
-			goto error;
-		}
-	} else {
-		unsigned iv_size = _gnutls_cipher_get_iv_size(ce);
-		if (iv_size > (unsigned)enc_params->iv_size) {
-			gnutls_assert();
-			ret = GNUTLS_E_DECRYPTION_FAILED;
-			goto error;
-		}
-	}
 
 	/* do the decryption.
 	 */
@@ -1231,7 +1213,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 	d_iv.data = (uint8_t *) enc_params->iv;
 	d_iv.size = enc_params->iv_size;
 
-	ret = gnutls_cipher_init(&ch, ce->id, &dkey, &d_iv);
+	ret = _gnutls_pkcs7_decrypt_int(ce, &dkey, &d_iv, &enc);
 
 	zeroize_temp_key(key, key_size);
 	gnutls_free(key);
@@ -1241,39 +1223,7 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 		goto error;
 	}
 
-	ret = gnutls_cipher_decrypt(ch, enc.data, enc.size);
-	if (ret < 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_DECRYPTION_FAILED;
-		goto error;
-	}
-
-	decrypted_data->data = enc.data;
-
-	if (ce->type == CIPHER_BLOCK && block_size != 1) {
-		unsigned pslen = (uint8_t)enc.data[enc.size - 1];
-		unsigned i;
-
-		if (pslen > block_size || pslen >= enc.size  || pslen == 0) {
-			gnutls_assert();
-			ret = GNUTLS_E_DECRYPTION_FAILED;
-			goto error;
-		}
-
-		/* verify padding according to rfc2898 */
-		decrypted_data->size = enc.size - pslen;
-		for (i=0;i<pslen;i++) {
-			if (enc.data[enc.size-1-i] != pslen) {
-				gnutls_assert();
-				ret = GNUTLS_E_DECRYPTION_FAILED;
-				goto error;
-			}
-		}
-	} else {
-		decrypted_data->size = enc.size;
-	}
-
-	gnutls_cipher_deinit(ch);
+	*decrypted_data = enc;
 
 	ret = 0;
 
@@ -1298,10 +1248,49 @@ _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 		zeroize_temp_key(key, key_size);
 		gnutls_free(key);
 	}
-	if (ch) {
-		gnutls_cipher_deinit(ch);
-	}
 	return ret;
+}
+
+int _gnutls_pkcs7_decrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *key, const gnutls_datum_t *iv, gnutls_datum_t *data)
+{
+	gnutls_cipher_hd_t ch = NULL;
+	int ret;
+
+	if (iv->size != ce->cipher_iv || key->size != ce->keysize)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	if (ce->type == CIPHER_BLOCK && data->size % ce->blocksize != 0)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	ret = gnutls_cipher_init(&ch, ce->id, key, iv);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_cipher_decrypt(ch, data->data, data->size);
+	gnutls_cipher_deinit(ch);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* constant time verification, depends only on last byte value */
+	if (ce->type == CIPHER_BLOCK && ce->blocksize != 1) {
+		unsigned int pslen = (uint8_t)data->data[data->size - 1];
+		unsigned int i;
+		int sum = 0;
+
+		if (pslen > ce->blocksize || pslen >= data->size  || pslen == 0)
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+		/* verify padding according to rfc2898 */
+		for (i = 0; i < pslen; i++) {
+			int diff = data->data[data->size-1-i] - pslen;
+			sum += diff * diff;
+		}
+		if (sum != 0)
+			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+		data->size -= pslen;
+	}
+
+	return 0;
 }
 
 /* Writes the PBKDF2 parameters.
@@ -1727,15 +1716,33 @@ _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 			      const gnutls_datum_t * key, gnutls_datum_t * encrypted)
 {
 	int result;
-	int data_size;
-	uint8_t *data = NULL;
 	gnutls_datum_t d_iv;
-	gnutls_cipher_hd_t ch = NULL;
-	uint8_t pad, pad_size;
 	const cipher_entry_st *ce;
 
 	ce = cipher_to_entry(enc_params->cipher);
-	pad_size = _gnutls_cipher_get_block_size(ce);
+
+	d_iv.data = (uint8_t *) enc_params->iv;
+	d_iv.size = enc_params->iv_size;
+
+	result = _gnutls_pkcs7_encrypt_int(ce, key, &d_iv, plain, encrypted);
+	if (result < 0)
+		return gnutls_assert_val(result);
+
+	return 0;
+}
+
+int _gnutls_pkcs7_encrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *key, const gnutls_datum_t *iv, const gnutls_datum_t *plain, gnutls_datum_t *enc)
+{
+	int ret;
+	int data_size;
+	uint8_t *data = NULL;
+	gnutls_cipher_hd_t ch = NULL;
+	uint8_t pad, pad_size;
+
+	if (ce == NULL || iv->size != ce->cipher_iv || key->size != ce->keysize)
+		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
+
+	pad_size = gnutls_cipher_get_block_size(ce->id);
 
 	if (pad_size == 1 || ce->type == CIPHER_STREAM)	/* stream */
 		pad_size = 0;
@@ -1758,31 +1765,17 @@ _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 
 	data_size = plain->size + pad;
 
-	d_iv.data = (uint8_t *) enc_params->iv;
-	d_iv.size = enc_params->iv_size;
-	result = gnutls_cipher_init(&ch, enc_params->cipher, key, &d_iv);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
+	ret = gnutls_cipher_init(&ch, ce->id, key, iv);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	result = gnutls_cipher_encrypt(ch, data, data_size);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	encrypted->data = data;
-	encrypted->size = data_size;
-
+	ret = gnutls_cipher_encrypt(ch, data, data_size);
 	gnutls_cipher_deinit(ch);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	enc->data = data;
+	enc->size = data_size;
 
 	return 0;
-
- error:
-	gnutls_free(data);
-	if (ch) {
-		gnutls_cipher_deinit(ch);
-	}
-	return result;
 }

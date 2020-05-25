@@ -95,6 +95,9 @@ _gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
 	     const struct pbe_enc_params *enc_params,
 	     const gnutls_datum_t * key, gnutls_datum_t * encrypted);
 
+int _gnutls_pkcs7_encrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *key, const gnutls_datum_t *iv, const gnutls_datum_t *plain, gnutls_datum_t *enc);
+int _gnutls_pkcs7_decrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *key, const gnutls_datum_t *iv, gnutls_datum_t *data);
+
 int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 			       const char *password, gnutls_datum_t * dec);
 
