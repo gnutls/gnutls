@@ -46,6 +46,10 @@ int _gnutls_file_exists(const char *file)
  * zero terminated but the terminating null is not included in length.
  * The returned data are allocated using gnutls_malloc().
  *
+ * Note that this function is not designed for reading sensitive materials,
+ * such as private keys, on practical applications. When the reading fails
+ * in the middle, the partially loaded content might remain on memory.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  *
