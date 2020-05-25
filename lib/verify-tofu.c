@@ -343,7 +343,7 @@ static int verify_pubkey(const char *file,
 	if (service != NULL)
 		service_len = strlen(service);
 
-	fd = fopen(file, "rb");
+	fd = fopen(file, "rbe");
 	if (fd == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 		goto cleanup;
@@ -414,7 +414,7 @@ int store_pubkey(const char *db_name, const char *host,
 		goto cleanup;
 	}
 
-	fd = fopen(db_name, "ab+");
+	fd = fopen(db_name, "abe+");
 	if (fd == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 		goto cleanup;
@@ -449,7 +449,7 @@ int store_commitment(const char *db_name, const char *host,
 	FILE *fd;
 	char buffer[MAX_HASH_SIZE * 2 + 1];
 
-	fd = fopen(db_name, "ab+");
+	fd = fopen(db_name, "abe+");
 	if (fd == NULL)
 		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 

@@ -143,7 +143,7 @@ void _gnutls_nss_keylog_write(gnutls_session_t session,
 		checked_env = 1;
 		keylogfile = secure_getenv("SSLKEYLOGFILE");
 		if (keylogfile != NULL)
-			keylog = fopen(keylogfile, "a");
+			keylog = fopen(keylogfile, "ae");
 	}
 
 	if (keylog) {

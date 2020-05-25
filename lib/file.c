@@ -29,7 +29,7 @@ int _gnutls_file_exists(const char *file)
 {
 	FILE *fd;
 
-	fd = fopen(file, "r");
+	fd = fopen(file, "re");
 	if (fd == NULL)
 		return -1;
 

@@ -1304,6 +1304,7 @@ static void _gnutls_update_system_priorities(void)
 {
 	int ret;
 	struct stat sb;
+	FILE *fp;
 
 	if (stat(system_priority_file, &sb) < 0) {
 		_gnutls_debug_log("cfg: unable to access: %s: %d\n",
@@ -1321,7 +1322,14 @@ static void _gnutls_update_system_priorities(void)
 	if (system_wide_priority_strings_init != 0)
 		_name_val_array_clear(&system_wide_priority_strings);
 
-	ret = ini_parse(system_priority_file, cfg_ini_handler, NULL);
+	fp = fopen(system_priority_file, "re");
+	if (fp == NULL) {
+		_gnutls_debug_log("cfg: unable to open: %s: %d\n",
+				  system_priority_file, errno);
+		return;
+	}
+	ret = ini_parse_file(fp, cfg_ini_handler, NULL);
+	fclose(fp);
 	if (ret != 0) {
 		_gnutls_debug_log("cfg: unable to parse: %s: %d\n",
 				  system_priority_file, ret);

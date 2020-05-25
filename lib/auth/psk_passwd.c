@@ -203,7 +203,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 
 	/* Open the selected password file.
 	 */
-	fd = fopen(cred->password_file, "r");
+	fd = fopen(cred->password_file, "re");
 	if (fd == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_SRP_PWD_ERROR;

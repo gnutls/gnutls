@@ -202,7 +202,7 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 
 	snprintf(indexstr, sizeof(indexstr), "%u", (unsigned int) idx);
 
-	fd = fopen(pconf_file, "r");
+	fd = fopen(pconf_file, "re");
 	if (fd == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
@@ -308,7 +308,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 
 	/* Open the selected password file.
 	 */
-	fd = fopen(cred->password_file, "r");
+	fd = fopen(cred->password_file, "re");
 	if (fd == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_SRP_PWD_ERROR;
