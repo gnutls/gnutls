@@ -84,16 +84,19 @@ _gnutls_decrypt_pbes1_des_md5_data(const char *password,
 int _gnutls_check_pkcs_cipher_schema(const char *oid);
 
 int
-_gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
-	     const char *root, const char *password,
-	     const struct pbkdf2_params *kdf_params,
-	     const struct pbe_enc_params *enc_params,
-	     gnutls_datum_t *decrypted_data);
-
+_gnutls_pkcs_pbe_encrypt_data(asn1_node asn,
+			      schema_id schema,
+			      const gnutls_datum_t * plain,
+			      const char *password,
+			      const char *algo,
+			      const char *params,
+			      const char *content);
 int
-_gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
-	     const struct pbe_enc_params *enc_params,
-	     const gnutls_datum_t * key, gnutls_datum_t * encrypted);
+_gnutls_pkcs_pbe_decrypt_data(const gnutls_datum_t * data, asn1_node asn,
+			   const char *password, gnutls_datum_t * dec,
+			   const char *algo,
+			   const char *params,
+			   const char *content);
 
 int _gnutls_pkcs7_encrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *key, const gnutls_datum_t *iv, const gnutls_datum_t *plain, gnutls_datum_t *enc);
 int _gnutls_pkcs7_decrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *key, const gnutls_datum_t *iv, gnutls_datum_t *data);

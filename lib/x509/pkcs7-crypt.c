@@ -319,14 +319,9 @@ int
 _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 			   const char *password, gnutls_datum_t * dec)
 {
-	int result, len;
-	char enc_oid[MAX_OID_SIZE];
+	int result;
 	gnutls_datum_t tmp;
-	asn1_node pasn = NULL, pkcs7_asn = NULL;
-	int params_start, params_end, params_len;
-	struct pbkdf2_params kdf_params;
-	struct pbe_enc_params enc_params;
-	schema_id schema;
+	asn1_node pkcs7_asn = NULL;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -344,57 +339,10 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 		goto error;
 	}
 
-	/* Check the encryption schema OID
-	 */
-	len = sizeof(enc_oid);
-	result =
-	    asn1_read_value(pkcs7_asn,
+	result = _gnutls_pkcs_pbe_decrypt_data(data, pkcs7_asn, password, &tmp,
 			    "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
-			    enc_oid, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
-	}
-
-	if ((result = _gnutls_check_pkcs_cipher_schema(enc_oid)) < 0) {
-		gnutls_assert();
-		goto error;
-	}
-	schema = result;
-
-	/* Get the DER encoding of the parameters.
-	 */
-	result =
-	    asn1_der_decoding_startEnd(pkcs7_asn, data->data, data->size,
 				       "encryptedContentInfo.contentEncryptionAlgorithm.parameters",
-				       &params_start, &params_end);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
-	}
-	params_len = params_end - params_start + 1;
-
-	result =
-	    _gnutls_read_pkcs_schema_params(&schema, password,
-					    &data->data[params_start],
-					    params_len, &kdf_params,
-					    &enc_params);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* Parameters have been decoded. Now
-	 * decrypt the EncryptedData.
-	 */
-
-	result =
-	    _gnutls_pkcs_raw_decrypt_data(schema, pkcs7_asn,
-					  "encryptedContentInfo.encryptedContent",
-					  password, &kdf_params, &enc_params,
-					  &tmp);
+					  "encryptedContentInfo.encryptedContent");
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -407,7 +355,6 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 	return 0;
 
  error:
-	asn1_delete_structure(&pasn);
 	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }
@@ -419,7 +366,7 @@ _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data,
 {
 	int result, len;
 	char enc_oid[MAX_OID_SIZE];
-	asn1_node pasn = NULL, pkcs7_asn = NULL;
+	asn1_node pkcs7_asn = NULL;
 	int params_start, params_end, params_len;
 	struct pbe_enc_params enc_params;
 	schema_id schema;
@@ -498,7 +445,6 @@ _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data,
 	return 0;
 
  error:
-	asn1_delete_structure(&pasn);
 	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }
@@ -512,17 +458,7 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 			   const char *password, gnutls_datum_t * enc)
 {
 	int result;
-	gnutls_datum_t key = { NULL, 0 };
-	gnutls_datum_t tmp = { NULL, 0 };
 	asn1_node pkcs7_asn = NULL;
-	struct pbkdf2_params kdf_params;
-	struct pbe_enc_params enc_params;
-	const struct pkcs_cipher_schema_st *s;
-
-	s = _gnutls_pkcs_schema_get(schema);
-	if (s == NULL || s->decrypt_only) {
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -533,59 +469,14 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 		goto error;
 	}
 
-	result =
-	    asn1_write_value(pkcs7_asn,
+	result = _gnutls_pkcs_pbe_encrypt_data(pkcs7_asn, schema, data, password,
 			     "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
-			     s->write_oid, 1);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
-	}
-
-	/* Generate a symmetric key.
-	 */
-
-	result =
-	    _gnutls_pkcs_generate_key(schema, password, &kdf_params,
-				      &enc_params, &key);
+			     "encryptedContentInfo.contentEncryptionAlgorithm.parameters",
+			     "encryptedContentInfo.encryptedContent");
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
 	}
-
-	result = _gnutls_pkcs_write_schema_params(schema, pkcs7_asn,
-						  "encryptedContentInfo.contentEncryptionAlgorithm.parameters",
-						  &kdf_params, &enc_params);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* Parameters have been encoded. Now
-	 * encrypt the Data.
-	 */
-	result = _gnutls_pkcs_raw_encrypt_data(data, &enc_params, &key, &tmp);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* write the encrypted data.
-	 */
-	result =
-	    asn1_write_value(pkcs7_asn,
-			     "encryptedContentInfo.encryptedContent",
-			     tmp.data, tmp.size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
-	}
-
-	_gnutls_free_datum(&tmp);
-	_gnutls_free_key_datum(&key);
 
 	/* Now write the rest of the pkcs-7 stuff.
 	 */
@@ -624,8 +515,6 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 	}
 
  error:
-	_gnutls_free_key_datum(&key);
-	_gnutls_free_datum(&tmp);
 	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }
@@ -1115,7 +1004,7 @@ _gnutls_pbes2_string_to_key(unsigned int pass_len, const char *password,
 			     kdf_params->iter_count, key, key_size);
 }
 
-int
+static int
 _gnutls_pkcs_raw_decrypt_data(schema_id schema, asn1_node pkcs8_asn,
 			      const char *root, const char *_password,
 			      const struct pbkdf2_params *kdf_params,
@@ -1710,27 +1599,6 @@ _gnutls_pkcs_write_schema_params(schema_id schema, asn1_node pkcs8_asn,
 
 }
 
-int
-_gnutls_pkcs_raw_encrypt_data(const gnutls_datum_t * plain,
-			      const struct pbe_enc_params *enc_params,
-			      const gnutls_datum_t * key, gnutls_datum_t * encrypted)
-{
-	int result;
-	gnutls_datum_t d_iv;
-	const cipher_entry_st *ce;
-
-	ce = cipher_to_entry(enc_params->cipher);
-
-	d_iv.data = (uint8_t *) enc_params->iv;
-	d_iv.size = enc_params->iv_size;
-
-	result = _gnutls_pkcs7_encrypt_int(ce, key, &d_iv, plain, encrypted);
-	if (result < 0)
-		return gnutls_assert_val(result);
-
-	return 0;
-}
-
 int _gnutls_pkcs7_encrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *key, const gnutls_datum_t *iv, const gnutls_datum_t *plain, gnutls_datum_t *enc)
 {
 	int ret;
@@ -1778,4 +1646,164 @@ int _gnutls_pkcs7_encrypt_int(const cipher_entry_st *ce, const gnutls_datum_t *k
 	enc->size = data_size;
 
 	return 0;
+}
+
+int
+_gnutls_pkcs_pbe_encrypt_data(asn1_node asn,
+			      schema_id schema,
+			      const gnutls_datum_t * plain,
+			      const char *password,
+			      const char *algo,
+			      const char *params,
+			      const char *content)
+{
+	int result;
+	gnutls_datum_t key = { NULL, 0 };
+	gnutls_datum_t tmp = { NULL, 0 };
+	struct pbkdf2_params kdf_params;
+	struct pbe_enc_params enc_params;
+	const struct pkcs_cipher_schema_st *s;
+	gnutls_datum_t d_iv;
+	const cipher_entry_st *ce;
+
+	s = _gnutls_pkcs_schema_get(schema);
+	if (s == NULL || s->decrypt_only) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	/* Write the encryption schema OID
+	 */
+	result = asn1_write_value(asn, algo, s->write_oid, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	/* Generate a symmetric key.
+	 */
+
+	result =
+	    _gnutls_pkcs_generate_key(schema, password, &kdf_params, &enc_params, &key);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	result =
+	    _gnutls_pkcs_write_schema_params(schema, asn, params,
+				&kdf_params, &enc_params);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* Parameters have been encoded. Now
+	 * encrypt the Data.
+	 */
+	ce = cipher_to_entry(enc_params.cipher);
+
+	d_iv.data = (uint8_t *) enc_params.iv;
+	d_iv.size = enc_params.iv_size;
+
+	result = _gnutls_pkcs7_encrypt_int(ce, &key, &d_iv, plain, &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* write the encrypted data.
+	 */
+	result =
+	    asn1_write_value(asn, content, tmp.data, tmp.size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	_gnutls_free_datum(&tmp);
+	_gnutls_free_key_datum(&key);
+
+error:
+	_gnutls_free_key_datum(&key);
+	_gnutls_free_datum(&tmp);
+	return result;
+
+}
+
+int
+_gnutls_pkcs_pbe_decrypt_data(const gnutls_datum_t * data, asn1_node asn,
+			   const char *password, gnutls_datum_t * dec,
+			   const char *algo,
+			   const char *params,
+			   const char *content)
+{
+	int result, len;
+	char enc_oid[MAX_OID_SIZE];
+	gnutls_datum_t tmp;
+	int params_start, params_end, params_len;
+	struct pbkdf2_params kdf_params;
+	struct pbe_enc_params enc_params;
+	schema_id schema;
+
+	/* Check the encryption schema OID
+	 */
+	len = sizeof(enc_oid);
+	result =
+	    asn1_read_value(asn, algo, enc_oid, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	if ((result = _gnutls_check_pkcs_cipher_schema(enc_oid)) < 0) {
+		gnutls_assert();
+		goto error;
+	}
+	schema = result;
+
+	/* Get the DER encoding of the parameters.
+	 */
+	result =
+	    asn1_der_decoding_startEnd(asn, data->data, data->size,
+				       params,
+				       &params_start, &params_end);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+	params_len = params_end - params_start + 1;
+
+	result =
+	    _gnutls_read_pkcs_schema_params(&schema, password,
+					    &data->data[params_start],
+					    params_len, &kdf_params,
+					    &enc_params);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* Parameters have been decoded. Now
+	 * decrypt the EncryptedData.
+	 */
+
+	result =
+	    _gnutls_pkcs_raw_decrypt_data(schema, asn, content,
+					  password, &kdf_params, &enc_params,
+					  &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	*dec = tmp;
+
+	return 0;
+
+ error:
+	return result;
 }
