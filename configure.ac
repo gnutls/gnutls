@@ -130,7 +130,7 @@ case "$host" in
     dnl intended minimum runtime version.
     LDFLAGS="$LDFLAGS -Wl,-no_weak_imports"
     AC_MSG_CHECKING([whether the linker supports -Wl,-no_weak_imports])
-    AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <sys/select.h>], [fd_set rfds; FD_ZERO(&rfds); FD_SET(0, &rfds);])],
       [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); LDFLAGS="$save_LDFLAGS"])
   ;;
   *solaris*)
