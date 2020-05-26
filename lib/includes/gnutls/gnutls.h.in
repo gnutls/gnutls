@@ -143,6 +143,7 @@ extern "C" {
  *                             the AEAD interface, and the IV plays a role as
  *                             the authentication tag while it is prepended to
  *                             the cipher text.
+ * @GNUTLS_CIPHER_AES_192_GCM: AES in GCM mode with 192-bit keys (AEAD).
  *
  * Enumeration of different symmetric encryption algorithms.
  */
@@ -186,6 +187,7 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_CHACHA20_32 = 36,
 	GNUTLS_CIPHER_AES_128_SIV = 37,
 	GNUTLS_CIPHER_AES_256_SIV = 38,
+	GNUTLS_CIPHER_AES_192_GCM = 39,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */
