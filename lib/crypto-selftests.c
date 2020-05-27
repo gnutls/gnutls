@@ -1939,13 +1939,6 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 					return ret; \
 			}
 
-#define FIPS_STARTUP_ONLY_TEST_CASE(x, func, vectors) case x: \
-			if (_gnutls_fips_mode_enabled() != 1) { \
-				ret = func(x, V(vectors), flags); \
-				if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL) || ret < 0) \
-					return ret; \
-			}
-
 /*-
  * gnutls_cipher_self_test:
  * @flags: GNUTLS_SELF_TEST_FLAG flags
@@ -2075,7 +2068,7 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 
 	switch (mac) {
 	case GNUTLS_MAC_UNKNOWN:
-		FIPS_STARTUP_ONLY_TEST_CASE(GNUTLS_MAC_MD5, test_mac, hmac_md5_vectors);
+		NON_FIPS_CASE(GNUTLS_MAC_MD5, test_mac, hmac_md5_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_MAC_SHA1, test_mac, hmac_sha1_vectors);
 		FALLTHROUGH;
@@ -2135,7 +2128,7 @@ int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest)
 
 	switch (digest) {
 	case GNUTLS_DIG_UNKNOWN:
-		FIPS_STARTUP_ONLY_TEST_CASE(GNUTLS_DIG_MD5, test_digest, md5_vectors);
+		NON_FIPS_CASE(GNUTLS_DIG_MD5, test_digest, md5_vectors);
 		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA1, test_digest, sha1_vectors);
 		FALLTHROUGH;
