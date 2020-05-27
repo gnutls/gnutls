@@ -390,6 +390,42 @@ MinGW64.DLLs:
       - win64-build/
   retry: 1
 
+MinGW64.Vista+:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
+  script:
+  - ./bootstrap
+  - export CC="ccache x86_64-w64-mingw32-gcc"
+ # Target Vista instead of XP, currently the default in mingw
+  - export CPPFLAGS="-D_WIN32_WINT=0x600"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
+  - mkdir -p build
+  - cd build
+  - dash ../configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file ../cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-full-test-suite --disable-non-suiteb-curves --disable-doc
+  # generate the certtool autogen file to check whether later compilation will modify it
+  - mingw64-make -j$BUILDJOBS -C src certtool-args.c.bak
+  - mingw64-make -j$BUILDJOBS
+  - mingw64-make -j$CHECKJOBS -C tests check
+  - cd ..
+  # since we use --enable-local-libopts the generated files must equal the .bak
+  - cmp build/src/certtool-args.c build/src/certtool-args.c.bak || false
+  tags:
+  - shared
+  - docker
+  - linux
+  except:
+  - tags
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - build/*.log
+      - build/tests/*.log
+      - build/tests/*/*.log
+  retry: 1
+
 MinGW64:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
