@@ -26,6 +26,7 @@
 #define _WIN32_WINNT 0x600
 #endif
 
+#include <config.h>
 #include "gnutls_int.h"
 #include "errors.h"
 #include <gnutls/gnutls.h>
@@ -44,8 +45,6 @@
 #include <wincrypt.h>
 #include <winbase.h>
 #include <winapifamily.h>
-
-#define DYN_NCRYPT
 
 #ifdef __MINGW32__
 # include <_mingw.h>
@@ -1487,13 +1486,16 @@ int _gnutls_system_key_init(void)
 		ret = GNUTLS_E_CRYPTO_INIT_FAILED;
 		goto fail;
 	}
-#endif
 	ncrypt_init = 1;
 
 	return 0;
  fail:
 	FreeLibrary(ncrypt_lib);
 	return ret;
+#else
+    ncrypt_init = 1;
+    return 0;
+#endif
 }
 
 void _gnutls_system_key_deinit(void)

@@ -111,6 +111,7 @@ AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 
 dnl Detect windows build
 use_accel=yes
+have_vista_dynamic=yes
 case "$host" in
   *android*)
     have_android=yes
@@ -121,6 +122,22 @@ case "$host" in
     AC_DEFINE([_UNICODE], [1], [Defined to 1 for Unicode (wide chars) APIs])
     LIB_CRYPT32="-lcrypt32"
     AC_SUBST([LIB_CRYPT32])
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
+      [[#include <windows.h>
+       #if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
+       # error Vista APIs allowed statically
+       #endif
+      ]],[[;]])],[have_vista_dynamic=yes],[have_vista_dynamic=no])
+    AC_ARG_ENABLE(dyn_ncrypt,
+      AS_HELP_STRING([--enable-dyn-ncrypt], [use ncrypt dynamically]),
+      enable_dyn_ncrypt=$enableval, enable_dyn_ncrypt=$have_vista_dynamic
+    )
+    if test "x$enable_dyn_ncrypt" = "xyes"; then
+      AC_DEFINE([DYN_NCRYPT], 1, [Dynamic use of ncrypt API (win32)])
+    else
+      LIBNCRYPT="-lncrypt"
+    fi
+    AC_SUBST([LIBNCRYPT])
   ;;
   *darwin*)
     have_macosx=yes
