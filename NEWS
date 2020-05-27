@@ -5,6 +5,14 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.7.0 (unreleased)
+
+** libgnutls: Added a new API that provides a callback function to
+   retrieve missing certificates from incomplete certificate chains (#202).
+
+** API and ABI modifications:
+gnutls_x509_trust_list_set_getissuer_function: Added
+
 * Version 3.6.14 (released 2020-06-03)
 
 ** libgnutls: Fixed insecure session ticket key construction, since 3.6.4.
