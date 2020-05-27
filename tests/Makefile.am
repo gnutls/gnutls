@@ -567,6 +567,7 @@ endif
 
 if !WINDOWS
 indirect_tests += datefudge-check
+noinst_PROGRAMS = datefudge-check
 endif
 
 check_PROGRAMS = $(cpptests) $(ctests) $(indirect_tests)
