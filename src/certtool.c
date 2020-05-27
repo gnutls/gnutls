@@ -3027,7 +3027,8 @@ void generate_pkcs12(common_info_st * cinfo)
 			app_exit(1);
 		}
 
-		result = gnutls_pkcs12_bag_encrypt(bag, pass, flags);
+		if (!(flags & GNUTLS_PKCS_PLAIN) || cinfo->empty_password)
+			result = gnutls_pkcs12_bag_encrypt(bag, pass, flags);
 		if (result < 0) {
 			fprintf(stderr, "bag_encrypt: %s\n",
 				gnutls_strerror(result));
