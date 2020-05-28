@@ -1,6 +1,16 @@
 os:
  - osx
 
+osx_image:
+  # MacOS X 10.15.4
+  - xcode11.5
+  # MacOS X 10.14.6
+  - xcode11.3
+  # MacOS X 10.13
+  - xcode10.1
+  # MacOS X 10.13, Default
+  - xcode9.4
+
 language: c
 compiler:
   - clang
