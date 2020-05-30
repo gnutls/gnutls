@@ -1530,7 +1530,7 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 	gnutls_datum_t pem;
 	unsigned int crt_num;
 
-	pem.data = (void *) fread_file(infile, &size);
+	pem.data = (void *) fread_file(infile, 0, &size);
 	pem.size = size;
 
 	if (!pem.data) {
@@ -1651,7 +1651,7 @@ void crl_info(common_info_st *cinfo)
 		app_exit(1);
 	}
 
-	pem.data = (void *) fread_file(infile, &size);
+	pem.data = (void *) fread_file(infile, 0, &size);
 	pem.size = size;
 
 	if (!pem.data) {
@@ -1723,7 +1723,7 @@ void crq_info(common_info_st *cinfo)
 		app_exit(1);
 	}
 
-	pem.data = (void *) fread_file(infile, &size);
+	pem.data = (void *) fread_file(infile, 0, &size);
 	pem.size = size;
 
 	if (!pem.data) {
@@ -2241,7 +2241,7 @@ static void load_data(common_info_st *cinfo, gnutls_datum_t *data)
 		app_exit(1);
 	}
 
-	data->data = (void *) fread_file(fp, &size);
+	data->data = (void *) fread_file(fp, 0, &size);
 	if (data->data == NULL) {
 		fprintf(stderr, "Error reading data file");
 		app_exit(1);
@@ -2513,7 +2513,7 @@ static void verify_chain(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	buf = (void *) fread_file(infile, &size);
+	buf = (void *) fread_file(infile, 0, &size);
 	if (buf == NULL) {
 		fprintf(stderr, "Error reading certificate chain");
 		app_exit(1);
@@ -2530,7 +2530,7 @@ static void verify_certificate(common_info_st * cinfo)
 	char *cas = NULL;
 	size_t cert_size;
 
-	cert = (void *) fread_file(infile, &cert_size);
+	cert = (void *) fread_file(infile, 0, &cert_size);
 	if (cert == NULL) {
 		fprintf(stderr, "Error reading certificate chain");
 		app_exit(1);
@@ -2573,7 +2573,7 @@ void verify_crl(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	pem.data = (void *) fread_file(infile, &size);
+	pem.data = (void *) fread_file(infile, 0, &size);
 	pem.size = size;
 
 	if (!pem.data) {
@@ -2661,7 +2661,7 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_
 		app_exit(1);
 	}
 
-	data.data = (void *) fread_file(infile, &size);
+	data.data = (void *) fread_file(infile, 0, &size);
 	data.size = size;
 
 	if (!data.data) {
@@ -2785,7 +2785,7 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 		app_exit(1);
 	}
 
-	data.data = (void *) fread_file(infile, &size);
+	data.data = (void *) fread_file(infile, 0, &size);
 	data.size = size;
 
 	if (!data.data) {
@@ -3404,7 +3404,7 @@ void pkcs12_info(common_info_st * cinfo)
 		app_exit(1);
 	}
 
-	data.data = (void *) fread_file(infile, &size);
+	data.data = (void *) fread_file(infile, 0, &size);
 	data.size = size;
 
 	if (!data.data) {
@@ -3593,7 +3593,7 @@ void pkcs8_info(void)
 	size_t size;
 	gnutls_datum_t data;
 
-	data.data = (void *) fread_file(infile, &size);
+	data.data = (void *) fread_file(infile, 0, &size);
 	data.size = size;
 
 	if (!data.data) {
@@ -3618,7 +3618,7 @@ void pkcs7_info(common_info_st *cinfo, unsigned display_data)
 		app_exit(1);
 	}
 
-	data.data = (void *) fread_file(infile, &size);
+	data.data = (void *) fread_file(infile, 0, &size);
 	data.size = size;
 
 	if (!data.data) {
@@ -3787,7 +3787,7 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 			pubkey = load_pubkey(0, cinfo);
 
 			if (pubkey == NULL) { /* load from stdin */
-				pem.data = (void *) fread_file(infile, &size);
+				pem.data = (void *) fread_file(infile, 0, &size);
 				pem.size = size;
 
 				if (!pem.data) {
@@ -3931,7 +3931,7 @@ void certificate_fpr(common_info_st * cinfo)
 	crt = load_cert(0, cinfo);
 
 	if (crt == NULL) {
-		pem.data = (void *) fread_file(infile, &size);
+		pem.data = (void *) fread_file(infile, 0, &size);
 		pem.size = size;
 
 		if (!pem.data) {

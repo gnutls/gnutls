@@ -155,7 +155,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 			   gnutls_datum_t * psk)
 {
 	gnutls_psk_server_credentials_t cred;
-	FILE *fd;
+	FILE *fp;
 	char *line = NULL;
 	size_t line_size = 0;
 	int ret;
@@ -203,13 +203,13 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 
 	/* Open the selected password file.
 	 */
-	fd = fopen(cred->password_file, "r");
-	if (fd == NULL) {
+	fp = fopen(cred->password_file, "re");
+	if (fp == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_SRP_PWD_ERROR;
 	}
 
-	while (getline(&line, &line_size, fd) > 0) {
+	while (getline(&line, &line_size, fp) > 0) {
 		if (username_matches(&username_datum, line, line_size)) {
 			ret = pwd_put_values(psk, line);
 			if (ret < 0) {
@@ -231,8 +231,8 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session,
 
 	ret = 0;
 cleanup:
-	if (fd != NULL)
-		fclose(fd);
+	if (fp != NULL)
+		fclose(fp);
 
 	zeroize_key(line, line_size);
 	free(line);

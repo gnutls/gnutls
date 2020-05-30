@@ -93,7 +93,7 @@ unsigned _gnutls_fips_mode_enabled(void)
 		goto exit;
 	}
 
-	fd = fopen(FIPS_KERNEL_FILE, "r");
+	fd = fopen(FIPS_KERNEL_FILE, "re");
 	if (fd != NULL) {
 		f1p = fgetc(fd);
 		fclose(fd);

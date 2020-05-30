@@ -889,7 +889,7 @@ static void compat_load(const char *configfile)
 	if (configfile == NULL)
 		configfile = "/etc/gnutls/pkcs11.conf";
 
-	fp = fopen(configfile, "r");
+	fp = fopen(configfile, "re");
 	if (fp == NULL) {
 		gnutls_assert();
 		return;
