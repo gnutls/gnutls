@@ -329,21 +329,21 @@ const char *tpasswd_conf_file =
 
 void doit(void)
 {
-	FILE *fd;
+	FILE *fp;
 
-	fd = fopen("tpasswd.conf", "w");
-	if (fd == NULL)
+	fp = fopen("tpasswd.conf", "w");
+	if (fp == NULL)
 		exit(1);
 
-	fwrite(tpasswd_conf_file, 1, strlen(tpasswd_conf_file), fd);
-	fclose(fd);
+	fwrite(tpasswd_conf_file, 1, strlen(tpasswd_conf_file), fp);
+	fclose(fp);
 
-	fd = fopen("tpasswd", "w");
-	if (fd == NULL)
+	fp = fopen("tpasswd", "w");
+	if (fp == NULL)
 		exit(1);
 
-	fwrite(tpasswd_file, 1, strlen(tpasswd_file), fd);
-	fclose(fd);
+	fwrite(tpasswd_file, 1, strlen(tpasswd_file), fp);
+	fclose(fp);
 
 	start("tls1.2 srp-1024", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test", "test", 0);
 	start("tls1.2 srp-1536", "NORMAL:-VERS-ALL:+VERS-TLS1.2:-KX-ALL:+SRP", "test2", "test2", 0);

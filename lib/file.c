@@ -27,13 +27,13 @@
 
 int _gnutls_file_exists(const char *file)
 {
-	FILE *fd;
+	FILE *fp;
 
-	fd = fopen(file, "re");
-	if (fd == NULL)
+	fp = fopen(file, "re");
+	if (fp == NULL)
 		return -1;
 
-	fclose(fd);
+	fclose(fp);
 	return 0;
 }
 

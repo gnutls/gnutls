@@ -389,7 +389,7 @@ gnutls_x509_crt_t load_cert(int mand, common_info_st * info)
 gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 				  common_info_st * info)
 {
-	FILE *fd;
+	FILE *fp;
 	static gnutls_x509_crt_t *crt;
 	int ret;
 	gnutls_datum_t dat;
@@ -409,18 +409,18 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 			return NULL;
 	}
 
-	fd = fopen(info->cert, "r");
-	if (fd == NULL) {
+	fp = fopen(info->cert, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "Could not open %s\n", info->cert);
 		app_exit(1);
 	}
 
-	fix_lbuffer(file_size(fd));
+	fix_lbuffer(file_size(fp));
 
-	size = fread(lbuffer, 1, lbuffer_size - 1, fd);
+	size = fread(lbuffer, 1, lbuffer_size - 1, fp);
 	lbuffer[size] = 0;
 
-	fclose(fd);
+	fclose(fp);
 
 	dat.data = (void *) lbuffer;
 	dat.size = size;
@@ -448,7 +448,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 				  common_info_st * info)
 {
-	FILE *fd;
+	FILE *fp;
 	static gnutls_x509_crl_t *crl;
 	unsigned int crl_max;
 	int ret;
@@ -467,18 +467,18 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 			return NULL;
 	}
 
-	fd = fopen(info->crl, "r");
-	if (fd == NULL) {
+	fp = fopen(info->crl, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "Could not open %s\n", info->crl);
 		app_exit(1);
 	}
 
-	fix_lbuffer(file_size(fd));
+	fix_lbuffer(file_size(fp));
 
-	size = fread(lbuffer, 1, lbuffer_size - 1, fd);
+	size = fread(lbuffer, 1, lbuffer_size - 1, fp);
 	lbuffer[size] = 0;
 
-	fclose(fd);
+	fclose(fp);
 
 	dat.data = (void *) lbuffer;
 	dat.size = size;
