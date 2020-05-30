@@ -481,6 +481,23 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .set_iv = (setiv_func)gcm_aes128_set_iv,
 	   .max_iv_size = GCM_IV_SIZE,
 	},
+	{  .algo = GNUTLS_CIPHER_AES_192_GCM,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES192_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes192_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes192_decrypt,
+
+	   .ctx_size = sizeof(struct gcm_aes192_ctx),
+	   .encrypt = _gcm_encrypt,
+	   .decrypt = _gcm_decrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)gcm_aes192_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)gcm_aes192_set_key,
+
+	   .tag = (nettle_hash_digest_func*)gcm_aes192_digest,
+	   .auth = (nettle_hash_update_func*)gcm_aes192_update,
+	   .set_iv = (setiv_func)gcm_aes192_set_iv,
+	   .max_iv_size = GCM_IV_SIZE,
+	},
 	{  .algo = GNUTLS_CIPHER_AES_256_GCM,
 	   .block_size = AES_BLOCK_SIZE,
 	   .key_size = AES256_KEY_SIZE,
@@ -1030,6 +1047,7 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 
 	switch (ctx->cipher->algo) {
 	case GNUTLS_CIPHER_AES_128_GCM:
+	case GNUTLS_CIPHER_AES_192_GCM:
 	case GNUTLS_CIPHER_AES_256_GCM:
 		FIPS_RULE(iv_size < GCM_IV_SIZE, GNUTLS_E_INVALID_REQUEST, "access to short GCM nonce size\n");
 		break;
