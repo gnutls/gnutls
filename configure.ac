@@ -532,6 +532,10 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
+if test "$gl_cv_opt_valgrind_tests" != no; then
+  gl_WARN_ADD([-fno-builtin-strcmp])
+fi
+
 AC_SUBST([WERROR_CFLAGS])
 AC_SUBST([WSTACK_CFLAGS])
 AC_SUBST([WARN_CFLAGS])
