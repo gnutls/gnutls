@@ -1192,11 +1192,13 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 
 #define LAST_DN cert_list[cert_list_size-1]->raw_dn
 #define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
-/* This macro is introduced to detect a verification output
- * which indicates an unknown signer, or a signer which uses
- * an insecure algorithm (e.g., sha1), something that indicates
- * a superseded signer */
-#define SIGNER_OLD_OR_UNKNOWN(output) ((output & GNUTLS_CERT_SIGNER_NOT_FOUND) || (output & GNUTLS_CERT_INSECURE_ALGORITHM))
+/* This macro is introduced to detect a verification output which
+ * indicates an unknown signer, a signer which uses an insecure
+ * algorithm (e.g., sha1), a signer has expired, or something that
+ * indicates a superseded signer */
+#define SIGNER_OLD_OR_UNKNOWN(output) ((output & GNUTLS_CERT_SIGNER_NOT_FOUND) || \
+				       (output & GNUTLS_CERT_EXPIRED) || \
+				       (output & GNUTLS_CERT_INSECURE_ALGORITHM))
 #define SIGNER_WAS_KNOWN(output) (!(output & GNUTLS_CERT_SIGNER_NOT_FOUND))
 
 /**
