@@ -4547,34 +4547,10 @@ int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url,
 	return ret;
 }
 
-/**
- * gnutls_pkcs11_crt_is_known:
- * @url: A PKCS 11 url identifying a token
- * @cert: is the certificate to find issuer for
- * @issuer: Will hold the issuer if any in an allocated buffer.
- * @fmt: The format of the exported issuer.
- * @flags: Use zero or flags from %GNUTLS_PKCS11_OBJ_FLAG.
- *
- * This function will check whether the provided certificate is stored
- * in the specified token. This is useful in combination with 
- * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED or
- * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED,
- * to check whether a CA is present or a certificate is blacklisted in
- * a trust PKCS #11 module.
- *
- * This function can be used with a @url of "pkcs11:", and in that case all modules
- * will be searched. To restrict the modules to the marked as trusted in p11-kit
- * use the %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE flag.
- *
- * Note that the flag %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED is
- * specific to p11-kit trust modules.
- *
- * Returns: If the certificate exists non-zero is returned, otherwise zero.
- *
- * Since: 3.3.0
- **/
-unsigned gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
-				 unsigned int flags)
+unsigned
+_gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
+			    unsigned int flags,
+			    gnutls_x509_crt_t *trusted_cert)
 {
 	int ret;
 	struct find_cert_st priv;
@@ -4585,6 +4561,15 @@ unsigned gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	PKCS11_CHECK_INIT_FLAGS_RET(flags, 0);
 
 	memset(&priv, 0, sizeof(priv));
+
+	if (trusted_cert) {
+		ret = gnutls_pkcs11_obj_init(&priv.obj);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		priv.need_import = 1;
+	}
 
 	if (url == NULL || url[0] == 0) {
 		url = "pkcs11:";
@@ -4632,8 +4617,18 @@ unsigned gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 		_gnutls_debug_log("crt_is_known: did not find cert, using issuer DN + serial, using DN only\n");
 		/* attempt searching with the subject DN only */
 		gnutls_assert();
+		if (priv.obj)
+			gnutls_pkcs11_obj_deinit(priv.obj);
 		gnutls_free(priv.serial.data);
 		memset(&priv, 0, sizeof(priv));
+		if (trusted_cert) {
+			ret = gnutls_pkcs11_obj_init(&priv.obj);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			priv.need_import = 1;
+		}
 		priv.crt = cert;
 		priv.flags = flags;
 
@@ -4650,14 +4645,61 @@ unsigned gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
+	if (trusted_cert) {
+		ret = gnutls_x509_crt_init(trusted_cert);
+		if (ret < 0) {
+			gnutls_assert();
+			ret = 0;
+			goto cleanup;
+		}
+		ret = gnutls_x509_crt_import_pkcs11(*trusted_cert, priv.obj);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(*trusted_cert);
+			ret = 0;
+			goto cleanup;
+		}
+	}
 	ret = 1;
 
       cleanup:
+	if (priv.obj)
+		gnutls_pkcs11_obj_deinit(priv.obj);
 	if (info)
 		p11_kit_uri_free(info);
 	gnutls_free(priv.serial.data);
 
 	return ret;
+}
+
+/**
+ * gnutls_pkcs11_crt_is_known:
+ * @url: A PKCS 11 url identifying a token
+ * @cert: is the certificate to find issuer for
+ * @flags: Use zero or flags from %GNUTLS_PKCS11_OBJ_FLAG.
+ *
+ * This function will check whether the provided certificate is stored
+ * in the specified token. This is useful in combination with 
+ * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED or
+ * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED,
+ * to check whether a CA is present or a certificate is blacklisted in
+ * a trust PKCS #11 module.
+ *
+ * This function can be used with a @url of "pkcs11:", and in that case all modules
+ * will be searched. To restrict the modules to the marked as trusted in p11-kit
+ * use the %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE flag.
+ *
+ * Note that the flag %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED is
+ * specific to p11-kit trust modules.
+ *
+ * Returns: If the certificate exists non-zero is returned, otherwise zero.
+ *
+ * Since: 3.3.0
+ **/
+unsigned gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
+				 unsigned int flags)
+{
+	return _gnutls_pkcs11_crt_is_known(url, cert, flags, NULL);
 }
 
 /**

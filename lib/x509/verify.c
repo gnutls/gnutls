@@ -34,6 +34,7 @@
 #include <tls-sig.h>
 #include <str.h>
 #include <datum.h>
+#include <pkcs11_int.h>
 #include <x509_int.h>
 #include <common.h>
 #include <pk.h>
@@ -1188,6 +1189,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 
 	for (; i < clist_size; i++) {
 		unsigned vflags;
+		gnutls_x509_crt_t trusted_cert;
 
 		if (i == 0) /* in the end certificate do full comparison */
 			vflags = GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
@@ -1196,9 +1198,10 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 			vflags = GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
 				GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED;
 
-		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], vflags) != 0) {
+		if (_gnutls_pkcs11_crt_is_known (url, certificate_list[i], vflags, &trusted_cert) != 0) {
 
-			status |= check_ca_sanity(certificate_list[i], now, flags);
+			status |= check_ca_sanity(trusted_cert, now, flags);
+			gnutls_x509_crt_deinit(trusted_cert);
 
 			if (func)
 				func(certificate_list[i],
