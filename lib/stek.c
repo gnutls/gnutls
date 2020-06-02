@@ -21,6 +21,9 @@
  */
 #include "gnutls_int.h"
 #include "stek.h"
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+#include <valgrind/memcheck.h>
+#endif
 
 #define NAME_POS (0)
 #define KEY_POS (TICKET_KEY_NAME_SIZE)
@@ -143,6 +146,11 @@ static int rotate(gnutls_session_t session)
 		call_rotation_callback(session, key, t);
 		session->key.totp.last_result = t;
 		memcpy(session->key.session_ticket_key, key, sizeof(key));
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+		if (RUNNING_ON_VALGRIND)
+			VALGRIND_MAKE_MEM_DEFINED(session->key.session_ticket_key,
+						  TICKET_MASTER_KEY_SIZE);
+#endif
 
 		session->key.totp.was_rotated = 1;
 	} else if (t < 0) {
