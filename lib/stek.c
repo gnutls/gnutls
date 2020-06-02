@@ -323,20 +323,13 @@ int _gnutls_initialize_session_ticket_key_rotation(gnutls_session_t session, con
 	if (unlikely(session == NULL || key == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	if (session->key.totp.last_result == 0) {
-		int64_t t;
-		memcpy(session->key.initial_stek, key->data, key->size);
-		t = totp_next(session);
-		if (t < 0)
-			return gnutls_assert_val(t);
+	if (unlikely(session->key.totp.last_result != 0))
+		return GNUTLS_E_INVALID_REQUEST;
 
-		session->key.totp.last_result = t;
-		session->key.totp.was_rotated = 0;
+	memcpy(session->key.initial_stek, key->data, key->size);
 
-		return GNUTLS_E_SUCCESS;
-	}
-
-	return GNUTLS_E_INVALID_REQUEST;
+	session->key.totp.was_rotated = 0;
+	return 0;
 }
 
 /*
