@@ -70,20 +70,30 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 	if (e == NULL || (e->flags & GNUTLS_CIPHER_FLAG_ONLY_AEAD))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	*handle = gnutls_calloc(1, sizeof(api_cipher_hd_st));
-	if (*handle == NULL) {
+	h = gnutls_calloc(1, sizeof(api_cipher_hd_st));
+	if (h == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	h = *handle;
 	ret =
 	    _gnutls_cipher_init(&h->ctx_enc, e, key,
 				iv, 1);
+	if (ret < 0) {
+		gnutls_free(h);
+		return ret;
+	}
 
-	if (ret >= 0 && _gnutls_cipher_type(e) == CIPHER_BLOCK)
+	if (_gnutls_cipher_type(e) == CIPHER_BLOCK) {
 		ret =
 		    _gnutls_cipher_init(&h->ctx_dec, e, key, iv, 0);
+		if (ret < 0) {
+			gnutls_free(h);
+			return ret;
+		}
+	}
+
+	*handle = h;
 
 	return ret;
 }
