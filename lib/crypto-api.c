@@ -755,6 +755,7 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 {
 	api_aead_cipher_hd_st *h;
 	const cipher_entry_st *e;
+	int ret;
 
 	if (is_cipher_algo_forbidden(cipher))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
@@ -763,15 +764,21 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t *handle,
 	if (e == NULL || e->type != CIPHER_AEAD)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	*handle = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
-	if (*handle == NULL) {
+	h = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
+	if (h == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	h = *handle;
+	ret = _gnutls_aead_cipher_init(h, cipher, key);
+	if (ret < 0) {
+		gnutls_free(h);
+		return ret;
+	}
 
-	return _gnutls_aead_cipher_init(h, cipher, key);
+	*handle = h;
+
+	return ret;
 }
 
 /**
