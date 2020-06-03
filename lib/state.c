@@ -578,9 +578,12 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 		if (flags & GNUTLS_CLIENT)
 			VALGRIND_MAKE_MEM_UNDEFINED((*session)->security_parameters.client_random,
 						    GNUTLS_RANDOM_SIZE);
-		if (flags & GNUTLS_SERVER)
+		if (flags & GNUTLS_SERVER) {
 			VALGRIND_MAKE_MEM_UNDEFINED((*session)->security_parameters.server_random,
 						    GNUTLS_RANDOM_SIZE);
+			VALGRIND_MAKE_MEM_UNDEFINED((*session)->key.session_ticket_key,
+						    TICKET_MASTER_KEY_SIZE);
+		}
 	}
 #endif
 	handshake_internal_state_clear1(*session);
