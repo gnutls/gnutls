@@ -5,7 +5,39 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2019 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.6.14 (unreleased)
+* Version 3.6.14 (released 2020-06-03)
+
+** libgnutls: Fixed insecure session ticket key construction, since 3.6.4.
+   The TLS server would not bind the session ticket encryption key with a
+   value supplied by the application until the initial key rotation, allowing
+   attacker to bypass authentication in TLS 1.3 and recover previous
+   conversations in TLS 1.2 (#1011).
+   [GNUTLS-SA-2020-06-03, CVSS: high]
+
+** libgnutls: Fixed handling of certificate chain with cross-signed
+   intermediate CA certificates (#1008).
+
+** libgnutls: Fixed reception of empty session ticket under TLS 1.2 (#997).
+
+** libgnutls: gnutls_x509_crt_print() is enhanced to recognizes commonName
+   (2.5.4.3), decodes certificate policy OIDs (!1245), and prints Authority
+   Key Identifier (AKI) properly (#989, #991).
+
+** certtool: PKCS #7 attributes are now printed with symbolic names (!1246).
+
+** libgnutls: Added several improvements on Windows Vista and later releases
+   (!1257, !1254, !1256). Most notably the system random number generator now
+   uses Windows BCrypt* API if available (!1255).
+
+** libgnutls: Use accelerated AES-XTS implementation if possible (!1244).
+   Also both accelerated and non-accelerated implementations check key block
+   according to FIPS-140-2 IG A.9 (!1233).
+
+** libgnutls: Added support for AES-SIV ciphers (#463).
+
+** libgnutls: Added support for 192-bit AES-GCM cipher (!1267).
+
+** libgnutls: No longer use internal symbols exported from Nettle (!1235)
 
 ** API and ABI modifications:
 GNUTLS_CIPHER_AES_128_SIV: Added
