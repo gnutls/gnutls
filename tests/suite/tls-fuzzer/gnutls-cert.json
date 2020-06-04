@@ -91,6 +91,8 @@
                          "-c", "tests/clientX509Cert.pem",
                          "-e", "fuzz empty certificate - overall 7, certs 4, cert 1",
                          "-e", "fuzz empty certificate - overall 8, certs 5, cert 2",
+                         "-e", "sanity - empty client cert",
+                         "-e", "Correct cert followed by an empty one",
                          "-p", "@PORT@"]
 	 }
      ]
