@@ -38,6 +38,7 @@
 #include <x509_int.h>
 #include <common.h>
 #include <pk.h>
+#include <x509/verify-high.h>
 #include "supported_exts.h"
 #include "profiles.h"
 
@@ -604,11 +605,11 @@ static int _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
 				    gnutls_x509_crt_t issuer,
 				    unsigned vflags);
 
-/* 
+/*
  * Verifies the given certificate against a certificate list of
  * trusted CAs.
  *
- * Returns only 0 or 1. If 1 it means that the certificate 
+ * Returns only 0 or 1. If 1 it means that the certificate
  * was successfully verified.
  *
  * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
@@ -616,13 +617,13 @@ static int _gnutls_x509_verify_data(gnutls_sign_algorithm_t sign,
  * Output will hold some extra information about the verification
  * procedure.
  */
-static unsigned
-verify_crt(gnutls_x509_crt_t cert,
-			    const gnutls_x509_crt_t * trusted_cas,
-			    int tcas_size, unsigned int flags,
-			    unsigned int *output,
-			    verify_state_st *vparams,
-			    unsigned end_cert)
+static unsigned verify_crt(gnutls_x509_trust_list_t tlist,
+			   gnutls_x509_crt_t cert,
+			   const gnutls_x509_crt_t * trusted_cas,
+			   int tcas_size, unsigned int flags,
+			   unsigned int *output,
+			   verify_state_st *vparams,
+			   unsigned end_cert)
 {
 	gnutls_datum_t cert_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
@@ -645,6 +646,25 @@ verify_crt(gnutls_x509_crt_t cert,
 
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
+
+	if (issuer == NULL && tlist != NULL && tlist->issuer_callback != NULL) {
+		_gnutls_debug_log("Missing issuer callback set.\n");
+
+		/* missing issuer is populated by the callback */
+		ret = tlist->issuer_callback(tlist, cert);
+		if (ret < 0) {
+			/* if the callback fails, continue as though the callback
+			 * wasn't invoked i.e issuer remains NULL */
+			gnutls_assert();
+			issuer = NULL;
+		}
+
+		ret = _gnutls_trust_list_get_issuer(tlist, cert, &issuer, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			issuer = NULL;
+		}
+	}
 
 	ret =
 	    _gnutls_x509_get_signed_data(cert->cert, &cert->der, "tbsCertificate",
@@ -680,7 +700,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	} else {
 		if (vparams->nc != NULL) {
 			/* append the issuer's constraints */
-			ret = gnutls_x509_crt_get_name_constraints(issuer, vparams->nc, 
+			ret = gnutls_x509_crt_get_name_constraints(issuer, vparams->nc,
 				GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, NULL);
 			if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 				MARK_INVALID(GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE);
@@ -909,13 +929,14 @@ unsigned check_ca_sanity(const gnutls_x509_crt_t issuer,
  * list should lead to a trusted certificate in order to be trusted.
  */
 unsigned int
-_gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
-				int clist_size,
-				const gnutls_x509_crt_t * trusted_cas,
-				int tcas_size,
-				unsigned int flags,
-				const char *purpose,
-				gnutls_verify_output_function func)
+_gnutls_verify_crt_status(gnutls_x509_trust_list_t tlist,
+			  const gnutls_x509_crt_t * certificate_list,
+			  int clist_size,
+			  const gnutls_x509_crt_t * trusted_cas,
+			  int tcas_size,
+			  unsigned int flags,
+			  const char *purpose,
+			  gnutls_verify_output_function func)
 {
 	int i = 0, ret;
 	unsigned int status = 0, output;
@@ -1010,11 +1031,12 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 	 */
 	output = 0;
 
-	ret = verify_crt(certificate_list[clist_size - 1],
-					  trusted_cas, tcas_size, flags,
-					  &output,
-					  &vparams,
-					  clist_size==1?1:0);
+	ret = verify_crt(tlist,
+                         certificate_list[clist_size - 1],
+			 trusted_cas, tcas_size, flags,
+			 &output,
+			 &vparams,
+			 clist_size==1?1:0);
 	if (ret != 1) {
 		/* if the last certificate in the certificate
 		 * list is invalid, then the certificate is not
@@ -1053,11 +1075,12 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		}
 
 		if ((ret =
-		     verify_crt(certificate_list[i - 1],
-						 &certificate_list[i], 1,
-						 flags, &output,
-						 &vparams,
-						 i==1?1:0)) != 1) {
+                     verify_crt(tlist,
+                                certificate_list[i - 1],
+				&certificate_list[i], 1,
+				flags, &output,
+				&vparams,
+				i==1?1:0)) != 1) {
 			gnutls_assert();
 			status |= output;
 			status |= GNUTLS_CERT_INVALID;
@@ -1147,12 +1170,13 @@ unsigned _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, 
  * list should lead to a trusted certificate in order to be trusted.
  */
 unsigned int
-_gnutls_pkcs11_verify_crt_status(const char* url,
-				const gnutls_x509_crt_t * certificate_list,
-				unsigned clist_size,
-				const char *purpose,
-				unsigned int flags,
-				gnutls_verify_output_function func)
+_gnutls_pkcs11_verify_crt_status(gnutls_x509_trust_list_t tlist,
+				 const char* url,
+				 const gnutls_x509_crt_t * certificate_list,
+				 unsigned clist_size,
+				 const char *purpose,
+				 unsigned int flags,
+				 gnutls_verify_output_function func)
 {
 	int ret;
 	unsigned int status = 0, i;
@@ -1249,9 +1273,10 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 			ret = gnutls_pkcs11_crt_is_known(url, certificate_list[clist_size - 1],
 				GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_COMPARE);
 			if (ret != 0) {
-				return _gnutls_verify_crt_status(certificate_list, clist_size,
-					&certificate_list[clist_size - 1], 1, flags,
-					purpose, func);
+				return _gnutls_verify_crt_status(tlist,
+						certificate_list, clist_size,
+						&certificate_list[clist_size - 1],
+						1, flags, purpose, func);
 			}
 		}
 
@@ -1260,7 +1285,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		/* verify the certificate list against 0 trusted CAs in order
 		 * to get, any additional flags from the certificate list (e.g.,
 		 * insecure algorithms or expired */
-		status |= _gnutls_verify_crt_status(certificate_list, clist_size,
+		status |= _gnutls_verify_crt_status(tlist, certificate_list, clist_size,
 						    NULL, 0, flags, purpose, func);
 		goto cleanup;
 	}
@@ -1303,8 +1328,8 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		goto cleanup;
 	}
 
-	status = _gnutls_verify_crt_status(certificate_list, clist_size,
-				&issuer, 1, flags, purpose, func);
+	status = _gnutls_verify_crt_status(tlist, certificate_list, clist_size,
+					   &issuer, 1, flags, purpose, func);
 
 cleanup:
 	gnutls_free(raw_issuer.data);
@@ -1468,18 +1493,20 @@ gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
 {
 	unsigned i;
 	int ret;
+        gnutls_x509_trust_list_t tlist;
 
 	if (cert_list == NULL || cert_list_length == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-	/* Verify certificate 
+        gnutls_x509_trust_list_init(&tlist, 0);
+
+	/* Verify certificate
 	 */
-	*verify =
-	    _gnutls_verify_crt_status(cert_list, cert_list_length,
+	*verify = _gnutls_verify_crt_status(tlist, cert_list, cert_list_length,
 					    CA_list, CA_list_length,
 					    flags, NULL, NULL);
 
-	/* Check for revoked certificates in the chain. 
+	/* Check for revoked certificates in the chain.
 	 */
 	for (i = 0; i < cert_list_length; i++) {
 		ret = gnutls_x509_crt_check_revocation(cert_list[i],
@@ -1491,6 +1518,7 @@ gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
 		}
 	}
 
+        gnutls_x509_trust_list_deinit(tlist, 0);
 	return 0;
 }
 
@@ -1518,12 +1546,17 @@ gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
 		       unsigned CA_list_length, unsigned int flags,
 		       unsigned int *verify)
 {
-	/* Verify certificate 
+	gnutls_x509_trust_list_t tlist;
+
+	gnutls_x509_trust_list_init(&tlist, 0);
+
+	/* Verify certificate
 	 */
-	*verify =
-	    _gnutls_verify_crt_status(&cert, 1,
+	*verify = _gnutls_verify_crt_status(tlist, &cert, 1,
 					    CA_list, CA_list_length,
 					    flags, NULL, NULL);
+
+	gnutls_x509_trust_list_deinit(tlist, 0);
 	return 0;
 }
 
@@ -1533,9 +1566,9 @@ gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
  * @issuer: is the certificate of a possible issuer
  *
  * This function will check if the given CRL was issued by the given
- * issuer certificate.  
+ * issuer certificate.
  *
- * Returns: true (1) if the given CRL was issued by the given issuer, 
+ * Returns: true (1) if the given CRL was issued by the given issuer,
  * and false (0) if not.
  **/
 unsigned

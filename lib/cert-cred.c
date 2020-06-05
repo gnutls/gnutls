@@ -882,6 +882,38 @@ void
 	cred->verify_callback = func;
 }
 
+/**
+ * gnutls_x509_trust_list_set_getissuer_function:
+ * @tlist: is a #gnutls_x509_trust_list_t type.
+ * @func: is the callback function
+ *
+ * This function sets a callback to be called when the peer's certificate
+ * chain is incomplete due a missing intermediate certificate/certificates.
+ *
+ * The callback's function prototype is defined in `abstract.h':
+ * int (*callback)(
+ * gnutls_x509_trust_list_t tlist,
+ * const gnutls_x509_crt_t crt);
+ *
+ * If the callback function is provided then gnutls will call it, in the
+ * certificate verification procedure.
+ * To verify or obtain the certificate the verification functions such as
+ * gnutls_x509_trust_list_verify_crt() and gnutls_x509_trust_list_verify_crt2()
+ * can be used.
+ *
+ * The callback function should return 0 if the missing issuer certificate
+ * for 'crt' was properly polulated and added to the 'tlist' using
+ * gnutls_x509_trust_list_add_cas() or non-zero to continue the certificate list
+ * verification but with issuer as %NULL.
+ *
+ * Since: 3.7.0
+ **/
+void gnutls_x509_trust_list_set_getissuer_function(gnutls_x509_trust_list_t tlist,
+		gnutls_x509_trust_list_getissuer_function * func)
+{
+	tlist->issuer_callback = func;
+}
+
 #define TEST_TEXT "test text"
 /* returns error if the certificate has different algorithm than
  * the given key parameters.

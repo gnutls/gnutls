@@ -1245,6 +1245,7 @@ APIMANS += gnutls_x509_trust_list_iter_get_ca.3
 APIMANS += gnutls_x509_trust_list_remove_cas.3
 APIMANS += gnutls_x509_trust_list_remove_trust_file.3
 APIMANS += gnutls_x509_trust_list_remove_trust_mem.3
+APIMANS += gnutls_x509_trust_list_set_getissuer_function.3
 APIMANS += gnutls_x509_trust_list_verify_crt.3
 APIMANS += gnutls_x509_trust_list_verify_crt2.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3

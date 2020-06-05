@@ -32,7 +32,7 @@ SUBDIRS += suite
 endif
 
 EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
-	ocsp-common.h cmocka-common.h virt-time.h \
+	ocsp-common.h cmocka-common.h virt-time.h test-chains-issuer.h test-chains-issuer-aia.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem hex.h \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
@@ -144,7 +144,7 @@ ctests += tls13/no-auto-send-ticket
 
 ctests += mini-record-2 simple gnutls_hmac_fast set_pkcs12_cred cert certuniqueid tls-neg-ext-key \
 	 mpi certificate_set_x509_crl dn parse_ca x509-dn x509-dn-decode record-sizes \
-	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
+	 hostname-check cve-2008-4989 pkcs12_s2k chainverify missingissuer missingissuer_aia record-sizes-range \
 	 crq_key_id x509sign-verify sign-verify cve-2009-1415 cve-2009-1416		\
 	 tls10-server-kx-neg tls11-server-kx-neg tls12-server-kx-neg ssl30-server-kx-neg \
 	 tls12-cipher-neg tls11-cipher-neg tls10-cipher-neg ssl30-cipher-neg \

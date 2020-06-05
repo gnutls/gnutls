@@ -1331,6 +1331,14 @@ GNUTLS_3_6_14
 	gnutls_pkcs7_print_signature_info;
 } GNUTLS_3_6_13;
 
+GNUTLS_3_7_0
+{
+ global:
+	gnutls_x509_trust_list_set_getissuer_function;
+ local:
+	*;
+} GNUTLS_3_4;
+
 GNUTLS_FIPS140_3_4 {
   global:
 	gnutls_cipher_self_test;
