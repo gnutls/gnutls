@@ -1520,6 +1520,8 @@
       <enumerator name='GNUTLS_CIPHER_AES_128_SIV' value='37'/>
       <enumerator name='GNUTLS_CIPHER_AES_256_SIV' value='38'/>
       <enumerator name='GNUTLS_CIPHER_AES_192_GCM' value='39'/>
+      <enumerator name='GNUTLS_CIPHER_MAGMA_CTR_ACPKM' value='40'/>
+      <enumerator name='GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM' value='41'/>
       <enumerator name='GNUTLS_CIPHER_IDEA_PGP_CFB' value='200'/>
       <enumerator name='GNUTLS_CIPHER_3DES_PGP_CFB' value='201'/>
       <enumerator name='GNUTLS_CIPHER_CAST5_PGP_CFB' value='202'/>
@@ -1583,6 +1585,8 @@
       <enumerator name='GNUTLS_MAC_GOST28147_TC26Z_IMIT' value='208'/>
       <enumerator name='GNUTLS_MAC_SHAKE_128' value='209'/>
       <enumerator name='GNUTLS_MAC_SHAKE_256' value='210'/>
+      <enumerator name='GNUTLS_MAC_MAGMA_OMAC' value='211'/>
+      <enumerator name='GNUTLS_MAC_KUZNYECHIK_OMAC' value='212'/>
     </enum-decl>
     <typedef-decl name='gnutls_mac_algorithm_t' type-id='type-id-44' id='type-id-31'/>
     <enum-decl name='__anonymous_enum__' is-anonymous='yes' id='type-id-45'>

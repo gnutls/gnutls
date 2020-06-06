@@ -655,6 +655,13 @@ AC_CHECK_FUNCS(nettle_cmac128_update)
 LIBS=$save_LIBS
 AM_CONDITIONAL(NEED_CMAC, [test "$ac_cv_func_nettle_cmac128_update" != "yes"])
 
+# Check for CMAC-64 support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_cmac64_update)
+LIBS=$save_LIBS
+AM_CONDITIONAL(NEED_CMAC64, [test "$ac_cv_func_nettle_cmac64_update" != "yes"])
+
 # Check if nettle has XTS support
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
@@ -705,6 +712,30 @@ LIBS="$LIBS $NETTLE_LIBS"
 AC_CHECK_FUNCS(nettle_siv_cmac_aes128_set_key)
 LIBS=$save_LIBS
 AM_CONDITIONAL(NEED_SIV, [test "$ac_cv_func_nettle_siv_cmac_aes128_set_key" != "yes"])
+
+# Check for Magma
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_magma_set_key)
+LIBS=$save_LIBS
+
+# Check for Kuznyechik
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_kuznyechik_set_key)
+LIBS=$save_LIBS
+
+# Check for CMAC MAGMA support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_cmac_magma_update)
+LIBS=$save_LIBS
+
+# Check for CMAC KUZNYECHIK support
+save_LIBS=$LIBS
+LIBS="$LIBS $NETTLE_LIBS"
+AC_CHECK_FUNCS(nettle_cmac_kuznyechik_update)
+LIBS=$save_LIBS
 
 # Check sonames of the linked libraries needed for FIPS selftests.
 save_LIBS=$LIBS

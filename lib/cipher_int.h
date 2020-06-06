@@ -52,6 +52,8 @@ typedef int (*cipher_auth_func) (void *hd, const void *data, size_t);
 typedef int (*cipher_setiv_func) (void *hd, const void *iv, size_t);
 typedef int (*cipher_getiv_func) (void *hd, void *iv, size_t);
 
+typedef int (*cipher_setkey_func) (void *hd, const void *key, size_t keysize);
+
 typedef void (*cipher_tag_func) (void *hd, void *tag, size_t);
 
 typedef struct {
@@ -65,6 +67,7 @@ typedef struct {
 	cipher_tag_func tag;
 	cipher_setiv_func setiv;
 	cipher_getiv_func getiv;
+	cipher_setkey_func setkey;
 	cipher_deinit_func deinit;
 } cipher_hd_st;
 
@@ -86,6 +89,12 @@ inline static int _gnutls_cipher_getiv(const cipher_hd_st * handle,
 		return GNUTLS_E_INVALID_REQUEST;
 
 	return handle->getiv(handle->handle, iv, ivlen);
+}
+
+inline static int _gnutls_cipher_setkey(const cipher_hd_st * handle,
+					const void *key, size_t keylen)
+{
+	return handle->setkey(handle->handle, key, keylen);
 }
 
 inline static int
@@ -172,6 +181,8 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher);
 
 int _gnutls_cipher_get_iv(gnutls_cipher_hd_t handle, void *iv,
 			  size_t ivlen);
+
+int _gnutls_cipher_set_key(gnutls_cipher_hd_t handle, void *key, size_t keylen);
 
 #define _gnutls_cipher_is_aead(h) _gnutls_cipher_algo_is_aead((h)->e)
 

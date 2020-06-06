@@ -15,6 +15,8 @@ cfb.c
 cfb.h
 cmac.c
 cmac.h
+cmac64.c
+cmac64.h
 cmac-aes128.c
 cmac-aes256.c
 chacha-core-internal.c
@@ -57,6 +59,9 @@ test -d $DST || mkdir $DST
 for f in $IMPORTS; do
   src=$SRC/$f
   dst=$DST/$f
+  if test "$f" = "cmac64.h"; then
+    src=$SRC/cmac.h
+  fi
   if test -f $src; then
     if test -f $dst; then
       echo "Replacing $dst (existing file backed up in $dst~)"
@@ -100,7 +105,7 @@ for f in $IMPORTS; do
       ;;
     esac
     case $dst in
-      */cfb.c | */cmac.c | */xts.c | */siv-cmac.c)
+      */cfb.c | */cmac.c | */cmac64.c | */xts.c | */siv-cmac.c)
 	sed \
 	  -e 's/"nettle-internal\.h"/"nettle-alloca.h"/' \
 	  $dst > $dst-t && mv $dst-t $dst
@@ -116,6 +121,14 @@ for f in $IMPORTS; do
 	;;
     esac
     case $dst in
+      # Special file that can be included in parallel with nettle's cmac.h defininig 128-bit CMAC
+      */cmac64.h)
+	sed \
+	  -e 's/CMAC128/_FOO_CMAC128/g' \
+	  -e 's/cmac128/_foo_cmac128/g' \
+	  -e 's/cmac_aes/_foo_cmac_aes/g' \
+	$dst > $dst-t && mv $dst-t $dst
+	;;
       */siv-cmac*.[ch])
 	sed \
 	  -e '/^#include "cmac\.h"/ { i\

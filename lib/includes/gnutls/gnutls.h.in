@@ -128,6 +128,8 @@ extern "C" {
  *                             cipher-stealing requires to know where the message actually terminates
  *                             in order to be able to compute where the stealing occurs.
  * @GNUTLS_CIPHER_GOST28147_TC26Z_CNT: GOST 28147-89 (Magma) cipher in CNT mode with TC26 Z S-box.
+ * @GNUTLS_CIPHER_MAGMA_CTR_ACPKM: GOST R 34.12-2015 (Magma) cipher in CTR-ACPKM mode.
+ * @GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM: GOST R 34.12-2015 (Kuznyechik) cipher in CTR-ACPKM mode.
  * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode (placeholder - unsupported).
  * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode (placeholder - unsupported).
  * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode (placeholder - unsupported).
@@ -188,6 +190,8 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_AES_128_SIV = 37,
 	GNUTLS_CIPHER_AES_256_SIV = 38,
 	GNUTLS_CIPHER_AES_192_GCM = 39,
+	GNUTLS_CIPHER_MAGMA_CTR_ACPKM = 40,
+	GNUTLS_CIPHER_KUZNYECHIK_CTR_ACPKM = 41,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */
@@ -310,6 +314,8 @@ typedef enum {
  * @GNUTLS_MAC_GOST28147_TC26Z_IMIT: The GOST 28147-89 working in IMIT mode with TC26 Z S-box.
  * @GNUTLS_MAC_SHAKE_128: Reserved; unimplemented.
  * @GNUTLS_MAC_SHAKE_256: Reserved; unimplemented.
+ * @GNUTLS_MAC_MAGMA_OMAC: GOST R 34.12-2015 (Magma) in OMAC (CMAC) mode.
+ * @GNUTLS_MAC_KUZNYECHIK_OMAC: GOST R 34.12-2015 (Kuznyechik) in OMAC (CMAC) mode.
  *
  * Enumeration of different Message Authentication Code (MAC)
  * algorithms.
@@ -345,7 +351,9 @@ typedef enum {
 	GNUTLS_MAC_AES_GMAC_256 = 207,
 	GNUTLS_MAC_GOST28147_TC26Z_IMIT = 208,
 	GNUTLS_MAC_SHAKE_128 = 209,
-	GNUTLS_MAC_SHAKE_256 = 210
+	GNUTLS_MAC_SHAKE_256 = 210,
+	GNUTLS_MAC_MAGMA_OMAC = 211,
+	GNUTLS_MAC_KUZNYECHIK_OMAC = 212
 } gnutls_mac_algorithm_t;
 
 /**
