@@ -14,8 +14,8 @@ cases change the API.
 
 |Branch|Version|Release interval|
 |:----:|:-----:|:--------------:|
-|stable|3.6.x  |bi-monthly      |
-|next  |-      |                |
+|stable|3.6.x  |as needed       |
+|next  |3.7.x  |bi-monthly      |
 
 
 # Release process
