@@ -120,8 +120,7 @@ case "$host" in
   *mingw32* | *mingw64*)
     have_win=yes
     AC_DEFINE([_UNICODE], [1], [Defined to 1 for Unicode (wide chars) APIs])
-    LIB_CRYPT32="-lcrypt32"
-    AC_SUBST([LIB_CRYPT32])
+    GNUTLS_LIBS_PRIVATE="${GNUTLS_LIBS_PRIVATE} -lcrypt32"
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
       [[#include <windows.h>
        #if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
@@ -135,9 +134,8 @@ case "$host" in
     if test "x$enable_dyn_ncrypt" = "xyes"; then
       AC_DEFINE([DYN_NCRYPT], 1, [Dynamic use of ncrypt API (win32)])
     else
-      LIBNCRYPT="-lncrypt"
+      GNUTLS_LIBS_PRIVATE="${GNUTLS_LIBS_PRIVATE} -lncrypt"
     fi
-    AC_SUBST([LIBNCRYPT])
   ;;
   *darwin*)
     have_macosx=yes
@@ -601,11 +599,12 @@ fi
 AM_CONDITIONAL(HAVE_LIBIDN2, test "$with_libidn2" != "no")
 
 if test "x$have_vista_dynamic" = "xno"; then
-  AC_CHECK_TYPES([BCRYPT_ALG_HANDLE],[LIBBCRYPT="-lbcrypt"],[],[#include <windows.h>
+  AC_CHECK_TYPES([BCRYPT_ALG_HANDLE],[
+    GNUTLS_LIBS_PRIVATE="${GNUTLS_LIBS_PRIVATE} -lbcrypt"
+  ],[],[#include <windows.h>
   #include <bcrypt.h>])
 fi
 AM_CONDITIONAL(HAVE_BCRYPT, test "$ac_cv_type_BCRYPT_ALG_HANDLE" = "yes")
-AC_SUBST([LIBBCRYPT])
 
 AC_ARG_ENABLE(non-suiteb-curves,
   AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
@@ -937,6 +936,7 @@ AC_CHECK_SIZEOF(time_t, 4)
 # export for use in scripts
 AC_SUBST(ac_cv_sizeof_time_t)
 
+AC_SUBST(GNUTLS_LIBS_PRIVATE)
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
 
 
