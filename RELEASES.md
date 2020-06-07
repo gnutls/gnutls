@@ -32,7 +32,7 @@ cases change the API.
     now on.
  5. git push && git push --tags
  6. make dist && gpg --sign --detach gnutls-$(VERSION).tar.xz
- 7. scp gnutls-$(VERSION).tar.xz* trithemius.gnupg.org:/home/ftp/gcrypt/v3.6/
+ 7. scp gnutls-$(VERSION).tar.xz* ftp.gnupg.org:/home/ftp/gcrypt/gnutls/v3.6/
  8. Create and send announcement email based on previously sent email to the list and
     [NEWS](NEWS) file.
  9. Create a NEWS entry at [web-pages repository](https://gitlab.com/gnutls/web-pages/-/tree/master/news-entries),
