@@ -54,7 +54,7 @@ export TZ="UTC"
 # Check for datefudge
 . "${srcdir}/../scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 timeout 1800 datefudge "2012-09-2" "${srcdir}/testcompat-main-openssl"
 

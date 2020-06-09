@@ -33,7 +33,7 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \

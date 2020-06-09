@@ -31,7 +31,7 @@ export TZ="UTC"
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 datefudge -s "2017-06-19" \
 	"${OCSPTOOL}" -e --load-chain "${srcdir}/ocsp-tests/certs/chain-amazon.com.pem" --infile "${srcdir}/ocsp-tests/certs/ocsp-amazon.com.der" --verify-allow-broken

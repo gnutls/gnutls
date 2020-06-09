@@ -36,7 +36,7 @@ OUTFILE=out-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 # test the --smime-to-p7 functionality
 ${VAGRLIND} "${CERTTOOL}" --smime-to-p7 --infile "${srcdir}/data/pkcs7.smime" --outfile ${OUTFILE}

@@ -34,7 +34,7 @@ TMPFILE=tmp-tt.pem.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 echo "Running test for ${ac_cv_sizeof_time_t}-byte time_t"
 

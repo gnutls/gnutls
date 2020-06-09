@@ -36,7 +36,7 @@ TMPFILE=constraints.$$.pem.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 datefudge -s "2016-04-22" \
 	${VALGRIND} "${CERTTOOL}" --verify-allow-broken -e --infile "${srcdir}/data/name-constraints-ip.pem"
