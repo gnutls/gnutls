@@ -45,7 +45,7 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 echo "Checking whether connecting to a self signed certificate returns the expected error"
 

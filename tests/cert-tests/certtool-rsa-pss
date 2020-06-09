@@ -210,7 +210,7 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 datefudge "2012-11-22" \
 ${VALGRIND} "${CERTTOOL}" --verify --load-ca-certificate "${srcdir}/data/cert-rsa-pss.pem" --infile "${srcdir}/data/cert-rsa-pss.pem"

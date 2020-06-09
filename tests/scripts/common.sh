@@ -80,7 +80,12 @@ check_for_datefudge() {
 
 	TSTAMP=`datefudge -s "2006-09-23" "${top_builddir}/tests/datefudge-check" || true`
 	if test "$TSTAMP" != "1158969600" || test "$WINDOWS" = 1; then
-	echo $TSTAMP
+		return 1
+	fi
+}
+
+skip_if_no_datefudge() {
+	if ! check_for_datefudge; then
 		echo "You need datefudge to run this test"
 		exit 77
 	fi

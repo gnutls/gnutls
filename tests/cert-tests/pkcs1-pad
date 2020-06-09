@@ -34,7 +34,7 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 TMPFILE1=pkcs1-pad.$$.tmp
 TMPFILE2=pkcs1-pad-2.$$.tmp

@@ -68,7 +68,7 @@ exit_error () {
 	exit 1
 }
 
-check_for_datefudge
+skip_if_no_datefudge
 
 # $1: token
 # $2: PIN

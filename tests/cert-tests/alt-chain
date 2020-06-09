@@ -36,7 +36,7 @@ OUTFILE=out-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 OLD_CA_FILE="${srcdir}/data/alt-chain-old-ca.pem"
 NEW_CA_FILE="${srcdir}/data/alt-chain-new-ca.pem"
