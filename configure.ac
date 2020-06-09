@@ -741,7 +741,10 @@ LIBS=$save_LIBS
 save_LIBS=$LIBS
 LIBS="$LIBS $GMP_LIBS"
 AC_MSG_CHECKING([gmp soname])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+AC_LINK_IFELSE([AC_LANG_PROGRAM([
+               #include <gmp.h>],[
+               mpz_t n;
+               mpz_init(n);])],
 	[gmp_so=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^libgmp\.so'`],
 	[gmp_so=none])
 if test -z "$gmp_so"; then
@@ -754,7 +757,10 @@ LIBS=$save_LIBS
 save_LIBS=$LIBS
 LIBS="$LIBS $NETTLE_LIBS"
 AC_MSG_CHECKING([nettle soname])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+AC_LINK_IFELSE([AC_LANG_PROGRAM([
+               #include <nettle/sha2.h>],[
+               struct sha256_ctx ctx;
+               sha256_init(&ctx);])],
 	[nettle_so=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^libnettle\.so'`],
 	[nettle_so=none])
 if test -z "$nettle_so"; then
@@ -767,7 +773,10 @@ LIBS=$save_LIBS
 save_LIBS=$LIBS
 LIBS="$LIBS $HOGWEED_LIBS"
 AC_MSG_CHECKING([hogweed soname])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+AC_LINK_IFELSE([AC_LANG_PROGRAM([
+               #include <nettle/rsa.h>],[
+               struct rsa_private_key priv;
+               nettle_rsa_private_key_init(&priv);])],
 	[hogweed_so=`(eval "$LDDPROG conftest$EXEEXT $LDDPOSTPROC") | grep '^libhogweed\.so'`],
 	[hogweed_so=none])
 if test -z "$hogweed_so"; then
