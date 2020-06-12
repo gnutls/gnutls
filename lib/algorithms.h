@@ -174,10 +174,23 @@ inline static int _gnutls_mac_get_key_size(const mac_entry_st * e)
 		return e->key_size;
 }
 
+inline static gnutls_digest_algorithm_t
+_gnutls_mac_to_dig(gnutls_mac_algorithm_t mac)
+{
+	if (unlikely(mac >= GNUTLS_MAC_AEAD))
+		return GNUTLS_DIG_UNKNOWN;
+
+	return (gnutls_digest_algorithm_t)mac;
+}
+
+#define MAC_TO_DIG(mac) _gnutls_mac_to_dig(mac)
+
 /* Functions for digests. */
 #define _gnutls_x509_digest_to_oid _gnutls_x509_mac_to_oid
 #define _gnutls_digest_get_name _gnutls_mac_get_name
 #define _gnutls_hash_get_algo_len _gnutls_mac_get_algo_len
+
+#define DIG_TO_MAC(dig) (gnutls_mac_algorithm_t)(dig)
 
 /* Security against pre-image attacks */
 inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
