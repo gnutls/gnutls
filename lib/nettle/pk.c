@@ -917,7 +917,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 			/* This call will return a valid MAC entry and
 			 * getters will check that is not null anyway. */
-			me = mac_to_entry(_gnutls_gost_digest(pk_params->algo));
+			me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
 			if (_gnutls_mac_get_algo_len(me) != vdata->size) {
 				gnutls_assert();
 				_gnutls_debug_log
@@ -987,7 +987,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				ret = _gnutls_ecdsa_compute_k(k,
 							      curve_id,
 							      pk_params->params[ECC_K],
-							      sign_params->dsa_dig,
+							      DIG_TO_MAC(sign_params->dsa_dig),
 							      vdata->data,
 							      vdata->size);
 				if (ret < 0)
@@ -1056,7 +1056,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 				ret = _gnutls_dsa_compute_k(k,
 							    pub.q,
 							    TOMPZ(priv),
-							    sign_params->dsa_dig,
+							    DIG_TO_MAC(sign_params->dsa_dig),
 							    vdata->data,
 							    vdata->size);
 				if (ret < 0)
@@ -1312,7 +1312,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 
 			/* This call will return a valid MAC entry and
 			 * getters will check that is not null anyway. */
-			me = mac_to_entry(_gnutls_gost_digest(pk_params->algo));
+			me = hash_to_entry(_gnutls_gost_digest(pk_params->algo));
 			if (_gnutls_mac_get_algo_len(me) != vdata->size)
 				return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
 

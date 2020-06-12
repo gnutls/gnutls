@@ -1426,9 +1426,9 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(VERIFY_PROFILE)) {
 		if (strcasecmp(OPT_ARG(VERIFY_PROFILE), "none")) {
-			cinfo.verification_profile = GNUTLS_PROFILE_UNKNOWN;
+			cinfo.verification_profile = (gnutls_sec_param_t)GNUTLS_PROFILE_UNKNOWN;
 		} else {
-			cinfo.verification_profile = gnutls_certificate_verification_profile_get_id(OPT_ARG(VERIFY_PROFILE));
+			cinfo.verification_profile = (gnutls_sec_param_t)gnutls_certificate_verification_profile_get_id(OPT_ARG(VERIFY_PROFILE));
 		}
 	} else if (!HAVE_OPT(VERIFY_ALLOW_BROKEN)) {
 		if (HAVE_OPT(VERIFY_CHAIN) || HAVE_OPT(VERIFY)) {
@@ -2956,7 +2956,7 @@ void generate_pkcs12(common_info_st * cinfo)
 	}
 
 	if (cinfo->hash != GNUTLS_DIG_UNKNOWN)
-		mac = cinfo->hash;
+		mac = (gnutls_mac_algorithm_t)cinfo->hash;
 	else
 		mac = GNUTLS_MAC_SHA1;
 

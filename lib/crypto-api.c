@@ -563,7 +563,7 @@ int
 gnutls_hash_init(gnutls_hash_hd_t * dig,
 		 gnutls_digest_algorithm_t algorithm)
 {
-	if (is_mac_algo_forbidden(algorithm))
+	if (is_mac_algo_forbidden(DIG_TO_MAC(algorithm)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	*dig = gnutls_malloc(sizeof(digest_hd_st));
@@ -659,7 +659,7 @@ int
 gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 		 const void *ptext, size_t ptext_len, void *digest)
 {
-	if (is_mac_algo_forbidden(algorithm))
+	if (is_mac_algo_forbidden(DIG_TO_MAC(algorithm)))
 		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 
 	return _gnutls_hash_fast(algorithm, ptext, ptext_len, digest);
