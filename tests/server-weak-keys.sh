@@ -46,7 +46,7 @@ SERV="${SERV} -q"
 
 . "${srcdir}/scripts/common.sh"
 
-check_for_datefudge
+skip_if_no_datefudge
 
 echo "Checking whether a client will refuse weak but trusted keys"
 

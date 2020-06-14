@@ -124,7 +124,7 @@ rm -f "${TMPFILE}" "${TMPFILE2}"
 rm -f "${KEYFILE}"
 
 
-check_for_datefudge
+skip_if_no_datefudge
 
 # Test certificate chain using Ed25519
 datefudge "2017-7-6" \

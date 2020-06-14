@@ -36,7 +36,7 @@ export TZ="UTC"
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 datefudge "2017-2-28" \
 ${VALGRIND} "${CERTTOOL}" --verify-chain --infile ${srcdir}/data/chain-with-critical-on-root.pem

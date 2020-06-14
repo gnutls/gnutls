@@ -38,7 +38,7 @@ TMPFILE=tmp-pkcs7.$$.tmp
 
 . ${srcdir}/../scripts/common.sh
 
-check_for_datefudge
+skip_if_no_datefudge
 
 if test "${ENABLE_GOST}" = "1" && test "${GNUTLS_FORCE_FIPS_MODE}" != "1"
 then

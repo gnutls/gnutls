@@ -32,7 +32,7 @@ if ! test -z "${VALGRIND}"; then
     VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-check_for_datefudge
+skip_if_no_datefudge
 
 # Check whether certificates with non-digits time fields are accepted
 datefudge -s "2019-12-19" \
