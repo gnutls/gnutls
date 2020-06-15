@@ -7,7 +7,7 @@ stages:
 # name to allow expiration of old caches.
 
 cache:
-  key: "$CI_JOB_NAME-ver14"
+  key: "$CI_JOB_NAME-ver15"
   paths:
     - cache/
 
@@ -390,6 +390,49 @@ MinGW64.DLLs:
       - win64-build/
   retry: 1
 
+MinGW64.DLLs.Vista+:
+  stage: stage1-testing
+  image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
+  script:
+  - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+  - echo ':DOSWin:M::MZ::/usr/bin/wine:' > /proc/sys/fs/binfmt_misc/register
+  - ./bootstrap
+  - export CC="ccache x86_64-w64-mingw32-gcc"
+ # Target Vista instead of XP, currently the default in mingw
+  - export CPPFLAGS="-D_WIN32_WINNT=0x600"
+  - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
+  - dash ./configure --disable-gcc-warnings --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --cache-file cache/config.cache --with-included-libtasn1 --disable-guile --disable-nls --with-included-unistring --enable-local-libopts --disable-non-suiteb-curves --disable-full-test-suite --disable-doc
+  - mingw64-make -j$BUILDJOBS
+  - mingw64-make -j$BUILDJOBS -C tests check
+# Combine generated apps and DLLs.
+#libwinpthread is required by libgcc
+#libffi is required by libp11-kit
+  - mkdir -p win64-build/bin win64-build/lib/includes
+  - cp lib/.libs/*.dll src/.libs/*.exe win64-build/bin
+  - x86_64-w64-mingw32-strip --strip-unneeded win64-build/bin/*.dll
+  - x86_64-w64-mingw32-strip win64-build/bin/*.exe
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libp11-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libnettle-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libhogweed-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgmp-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libgcc*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libidn2-*.dll win64-build/bin
+  - cp /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libffi-*.dll win64-build/bin
+  - cp lib/.libs/*.a lib/*.def lib/gnutls.pc win64-build/lib
+  - cp lib/includes/gnutls/*.h win64-build/lib/includes
+  tags:
+  - shared
+  - docker
+  - linux
+  only:
+  - tags
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    paths:
+      - win64-build/
+  retry: 1
+
 MinGW64.Vista+:
   stage: stage1-testing
   image: $CI_REGISTRY/$BUILD_IMAGES_PROJECT:$MINGW_BUILD
@@ -397,7 +440,7 @@ MinGW64.Vista+:
   - ./bootstrap
   - export CC="ccache x86_64-w64-mingw32-gcc"
  # Target Vista instead of XP, currently the default in mingw
-  - export CPPFLAGS="-D_WIN32_WINT=0x600"
+  - export CPPFLAGS="-D_WIN32_WINNT=0x600"
   - export WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin
   - mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
   - echo ':DOSWin:M::MZ::/usr/bin/wine64:' > /proc/sys/fs/binfmt_misc/register
